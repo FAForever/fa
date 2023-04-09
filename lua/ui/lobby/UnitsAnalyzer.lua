@@ -64,7 +64,6 @@ CategoriesSkipped  = {
     ["urb3103"] = true,    -- Scout-Deployed Land Sensor
     ["uxl0021"] = true,    -- Test Unit Arc Projectile
     ["xec9001"] = true,    -- Wall Segment Extra
-    ["xec9002"] = true,    -- Wall Segment Extra
     ["xec9003"] = true,    -- Wall Segment Extra
     ["xec9002"] = true,    -- Wall Segment Extra
     ["xec9004"] = true,    -- Wall Segment Extra
@@ -72,8 +71,6 @@ CategoriesSkipped  = {
     ["xec9006"] = true,    -- Wall Segment Extra
     ["xec9007"] = true,    -- Wall Segment Extra
     ["xec9008"] = true,    -- Wall Segment Extra
-    ["xec9009"] = true,    -- Wall Segment Extra
-    ["xec9009"] = true,    -- Wall Segment Extra
     ["xec9009"] = true,    -- Wall Segment Extra
     ["xec9010"] = true,    -- Wall Segment Extra
     ["xec9011"] = true,    -- Wall Segment Extra
@@ -135,7 +132,6 @@ CategoriesHidden  = {
     ["BUBBLESHIELDSPILLOVERCHECK"] = true,
     ["BENIGN"] = true,
     ["CAPTURE"] = true,
-    ["CANNOTUSEAIRSTAGING"] = true,
     ["CANTRANSPORTCOMMANDER"] = true,
     ["CANNOTUSEAIRSTAGING"] = true,
     ["CONSTRUCTION"] = true,
@@ -209,7 +205,9 @@ Factions = {
     { Name = 'UNKNOWN',  Color = 'FFD619CE' }, ----FFD619CE
 }
 
--- Gets unit's color based on faction of given blueprint
+--- Gets unit's color based on faction of given blueprint
+---@param bp UnitBlueprint
+---@return string
 function GetUnitColor(bp)
     for _, faction in Factions do
         if faction.Name == bp.Faction then
@@ -219,7 +217,9 @@ function GetUnitColor(bp)
     return 'FFD619CE'
 end
 
--- Gets unit's faction based on categories of given blueprint
+--- Gets unit's faction based on categories of given blueprint
+---@param bp UnitBlueprint
+---@return string
 function GetUnitFaction(bp)
     local factionCategory = nil
     local factionName = bp.General.FactionName
@@ -244,7 +244,9 @@ function GetUnitFaction(bp)
     return 'UNKNOWN'
 end
 
--- Gets unit's localizable name of given blueprint or show warning if not found
+--- Gets unit's localizable name of given blueprint or show warning if not found
+---@param bp UnitBlueprint
+---@return string|any
 function GetUnitName(bp)
     local name = nil
 
@@ -262,6 +264,8 @@ function GetUnitName(bp)
     return name
 end
 
+---@param bp UnitBlueprint
+---@return string
 function GetUnitTitle(bp)
     local name = nil
     if bp.General.UnitName then
@@ -279,7 +283,9 @@ function GetUnitTitle(bp)
     return name
 end
 
--- Gets units tech level based on categories of given blueprint
+--- Gets units tech level based on categories of given blueprint1
+---@param bp UnitBlueprint
+---@return string
 function GetUnitTech(bp)
     if bp.CategoriesHash['TECH1'] then return 'T1' end
     if bp.CategoriesHash['TECH2'] then return 'T2' end
@@ -294,7 +300,9 @@ function GetUnitTech(bp)
     return "T?"
 end
 
--- Gets units type based on categories of given blueprint
+--- Gets units type based on categories of given blueprint
+---@param bp Blueprint
+---@return string
 function GetUnitType(bp)
     if bp.CategoriesHash['STRUCTURE'] then return 'BASE' end
     if bp.CategoriesHash['AIR'] then return 'AIR' end
@@ -309,8 +317,11 @@ function GetUnitType(bp)
     return "UNKNOWN"
 end
 
--- Gets a path to an image representing a given blueprint and faction
--- Improved version of UIUtil.UIFile() function
+--- Gets a path to an image representing a given blueprint and faction
+--- Improved version of UIUtil.UIFile() function
+---@param bp Blueprint
+---@param faction Faction
+---@return any
 function GetImagePath(bp, faction)
     local root = ''
     local id = bp.ID or ''
@@ -388,6 +399,10 @@ function GetImagePath(bp, faction)
     return unknown
 end
 
+--- Unused
+---@param text string
+---@param spaces any
+---@return string
 local function stringPad(text, spaces)
     local len = string.len(text)
     if spaces > len then
@@ -397,11 +412,15 @@ local function stringPad(text, spaces)
     return text
 end
 
+---@param value number
+---@return number
 local function init(value)
     return value >= 1 and value or 0
 end
 
--- Gets Economy stats for unit/enhancement blueprint and calculates production yield
+--- Gets Economy stats for unit/enhancement blueprint and calculates production yield
+---@param bp UnitBlueprint
+---@return table
 function GetEconomyStats(bp)
     local eco = {}
 
@@ -448,14 +467,20 @@ function GetEconomyStats(bp)
     return eco
 end
 
--- Some calculation based on this code
--- https://github.com/spooky/unitdb/blob/master/app/js/dps.js
--- Gets shots per second of specified weapon (inverse of RateOfFire)
+--- Some calculation based on this code
+--- https://github.com/spooky/unitdb/blob/master/app/js/dps.js
+--- Gets shots per second of specified weapon (inverse of RateOfFire)
+---@param bp UnitBlueprint
+---@param weapon Weapon
+---@return number
 function GetWeaponRatePerSecond(bp, weapon)
     local rate = weapon.RateOfFire or 1
     return math.round(10 / rate) / 10 -- Ticks per second
 end
 
+---@param bp Blueprint
+---@param w Weapon
+---@return table
 function GetWeaponDefaults(bp, w)
     local weapon = table.deepcopy(w)
     weapon.Category = w.WeaponCategory or '<MISSING_CATEGORY>'
@@ -476,7 +501,9 @@ function GetWeaponDefaults(bp, w)
     return weapon
 end
 
--- Get damage of nuke weapon or normal weapon
+--- Get damage of nuke weapon or normal weapon
+---@param weapon Weapon
+---@return integer
 function GetWeaponDamage(weapon)
     local damage = 0
     if weapon.NukeWeapon then -- Stack nuke damages
@@ -490,6 +517,9 @@ function GetWeaponDamage(weapon)
 end
 
 -- Get specs for a weapon with projectiles
+---@param bp Blueprint
+---@param weapon Weapon
+---@return Weapon|any
 function GetWeaponProjectile(bp, weapon)
 
     local split = 1
@@ -522,7 +552,10 @@ function GetWeaponProjectile(bp, weapon)
     return weapon
 end
 
--- Get specs for a weapon with beam pulses
+--- Get specs for a weapon with beam pulses
+---@param bp Blueprint
+---@param weapon Weapon
+---@return any
 function GetWeaponBeamPulse(bp, weapon)
     if weapon.BeamLifetime then
         if weapon.BeamCollisionDelay > 0 then
@@ -542,7 +575,10 @@ function GetWeaponBeamPulse(bp, weapon)
     return weapon
 end
 
--- Get specs for a weapon with continuous beam
+--- Get specs for a weapon with continuous beam
+---@param bp Blueprint
+---@param weapon Weapon
+---@return Weapon
 function GetWeaponBeamContinuous(bp, weapon)
     if weapon.ContinuousBeam then
        weapon.Multi = 10
@@ -556,6 +592,9 @@ function GetWeaponBeamContinuous(bp, weapon)
 end
 
 -- Get specs for a weapon with dots per pulses
+---@param bp Blueprint
+---@param weapon Weapon
+---@return Weapon
 function GetWeaponDOT(bp, weapon)
     if weapon.DoTPulses then
         local initial = GetWeaponProjectile(bp, weapon)
@@ -570,6 +609,9 @@ function GetWeaponDOT(bp, weapon)
 end
 
 -- Gets specs for a weapon
+---@param bp Blueprint
+---@param weapon Weapon
+---@return Weapon
 function GetWeaponSpecs(bp, weapon)
     weapon = GetWeaponDefaults(bp, weapon)
 
@@ -587,6 +629,8 @@ function GetWeaponSpecs(bp, weapon)
 end
 
 -- Gets weapons stats in given blueprint, more accurate than in-game unitviewDetails.lua
+---@param bp Blueprint
+---@return table|Weapon
 function GetWeaponsStats(bp)
     local weapons = {}
 
@@ -640,6 +684,8 @@ function GetWeaponsStats(bp)
     return weapons
 end
 
+---@param weapons Weapon
+---@return table
 function GetWeaponsTotal(weapons)
     local total = {}
     total.Range = 100000
@@ -670,6 +716,9 @@ function GetWeaponsTotal(weapons)
 end
 
 -- Returns unit's categories that should not be hidden in tooltips
+---@param bp Blueprint
+---@param showAll any
+---@return table
 function GetUnitsCategories(bp, showAll)
     local ret = {}
 
@@ -730,6 +779,8 @@ function GetUnitsCategories(bp, showAll)
 end
 
 -- Creates basic tooltip for given blueprints based on its categories, name, and source
+---@param bp Blueprint
+---@return unknown
 function GetTooltip(bp)
     -- Create unique key for caching tooltips
     local key = bp.Source .. ' {' .. bp.Name .. '}'
