@@ -1,15 +1,15 @@
 
-BuilderGroup {
-    BuilderGroupName = 'EasyEngineerFactoryBuilders',
-    BuildersType = 'EngineerBuilder',
+AIBuilderGroupTemplate {
+    Identifier = 'EasyEngineerFactoryBuilders',
+    ManagerName = 'EngineerManager',
 
-    Builder {
-        BuilderName = 'Easy - T1 Land Factory Builder',
+    AIBuilderTemplate {
+        Identifier = 'Easy - T1 Land Factory Builder',
         PlatoonTemplate = 'CommanderBuilder',
         Priority = 1500,
-        BuilderConditions = { },
-        BuilderType = 'Any',
-        BuilderData = {
+        Conditions = { },
+        Type = 'Any',
+        Data = {
             Construction = {
                 Location = 'LocationType',
                 BuildStructures = {

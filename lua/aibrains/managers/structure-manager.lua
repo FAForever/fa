@@ -1,38 +1,51 @@
 --****************************************************************************
---**  File     :  /lua/sim/BaseAIStructureManager.lua
---**  Summary  : Manage structures for a location
---**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--**  Summary: Manage structures for a location
 --****************************************************************************
 
-local BuilderManager = import("/lua/sim/buildermanager.lua").BuilderManager
+local BuilderManager = import("/lua/aibrains/managers/builder-manager.lua").AIBuilderManager
 
 local TableGetSize = table.getsize
 
 local WeakValues = { __mode = 'v' }
 
----@class BaseAIStructureManager : BuilderManager
----@field Structures table
----@field StructuresBeingBuilt table     
----@field StructureTotalCount number     # Recomputed every 10 ticks
----@field StructureCount table           # Recomputed every 10 ticks
-BaseAIStructureManager = Class(BuilderManager) {
+---@class AIStructureManagerReferences 
+---@field TECH1 table<EntityId, Unit>
+---@field TECH2 table<EntityId, Unit>
+---@field TECH3 table<EntityId, Unit>
+---@field EXPERIMENTAL table<EntityId, Unit>
 
-    ---@param self BaseAIStructureManager
+---@class AIStructureManagerCounts
+---@field TECH1 number
+---@field TECH2 number
+---@field TECH3 number
+---@field EXPERIMENTAL number
+
+---@class AIStructureManager : AIBuilderManager
+---@field Structures AIStructureManagerReferences
+---@field StructuresBeingBuilt AIStructureManagerReferences     
+---@field StructureCount AIStructureManagerCounts               # Recomputed every 10 ticks
+---@field StructureBeingBuiltCount AIStructureManagerCounts     # Recomputed every 10 ticks
+AIStructureManager = Class(BuilderManager) {
+
+    ---@param self AIStructureManager
     ---@param brain AIBrain
-    ---@param locationType LocationType
-    ---@param location Vector
-    ---@param radius number
-    ---@return boolean
-    Create = function(self, brain, locationType, location, radius)
-        BuilderManager.Create(self, brain, locationType, location, radius)
+    ---@param base AIBase
+    Create = function(self, brain, base, locationType)
+        BuilderManager.Create(self, brain, base, locationType)
+        self.Identifier = 'AIStructureManager at ' .. locationType
 
         self.Structures = {
             TECH1 = setmetatable({}, WeakValues),
             TECH2 = setmetatable({}, WeakValues),
             TECH3 = setmetatable({}, WeakValues),
             EXPERIMENTAL = setmetatable({}, WeakValues),
-            SUBCOMMANDER = setmetatable({}, WeakValues),
-            COMMAND = setmetatable({}, WeakValues),
+        }
+
+        self.StructureCount = {
+            TECH1 = 0,
+            TECH2 = 0,
+            TECH3 = 0,
+            EXPERIMENTAL = 0,
         }
 
         self.StructuresBeingBuilt = {
@@ -40,34 +53,25 @@ BaseAIStructureManager = Class(BuilderManager) {
             TECH2 = setmetatable({}, WeakValues),
             TECH3 = setmetatable({}, WeakValues),
             EXPERIMENTAL = setmetatable({}, WeakValues),
-            SUBCOMMANDER = setmetatable({}, WeakValues),
-            COMMAND = setmetatable({}, WeakValues),
         }
 
-        self.StructureTotalCount = 0
-        self.StructureCount = {
+        self.StructureBeingBuiltCount = {
             TECH1 = 0,
             TECH2 = 0,
             TECH3 = 0,
             EXPERIMENTAL = 0,
-            SUBCOMMANDER = 0,
-            COMMAND = 0,
         }
-
-        self.StructuresBeingBuilt = setmetatable({}, WeakValues)
 
         self:AddBuilderType('Any')
 
         -- TODO: refactor this to base class?
         self:ForkThread(self.UpdateThread)
-
-        return true
     end,
 
     --------------------------------------------------------------------------------------------
     -- manager interface
 
-    ---@param self BaseAIStructureManager
+    ---@param self AIStructureManager
     UpdateThread = function(self)
         while true do
             if self.Active then
@@ -78,7 +82,7 @@ BaseAIStructureManager = Class(BuilderManager) {
         end
     end,
 
-    ---@param self BaseAIStructureManager
+    ---@param self AIStructureManager
     Update = function(self)
         local total = 0
         local engineers = self.Structures
@@ -89,7 +93,13 @@ BaseAIStructureManager = Class(BuilderManager) {
             total = total + count
         end
 
-        self.EngineerTotalCount = total
+        local StructureBeingBuilt = self.StructuresBeingBuilt
+        local StructureBeingBuiltCount = self.StructureBeingBuiltCount
+        for tech, _ in StructureBeingBuiltCount do
+            local count = TableGetSize(StructureBeingBuilt[tech])
+            StructureBeingBuiltCount[tech] = count
+            total = total + count
+        end
     end,
 
     --------------------------------------------------------------------------------------------
@@ -100,7 +110,7 @@ BaseAIStructureManager = Class(BuilderManager) {
     --- `Time complexity: O(1)`
     --- 
     --- `Memory complexity: O(1)`
-    ---@param self BaseAIStructureManager
+    ---@param self AIStructureManager
     ---@param unit Unit
     ---@param builder Unit
     ---@param layer Layer
@@ -124,7 +134,7 @@ BaseAIStructureManager = Class(BuilderManager) {
     --- `Time complexity: O(1)`
     --- 
     --- `Memory complexity: O(1)`
-    ---@param self BaseAIStructureManager
+    ---@param self AIStructureManager
     ---@param unit Unit
     ---@param builder Unit
     ---@param layer Layer
@@ -149,7 +159,7 @@ BaseAIStructureManager = Class(BuilderManager) {
     --- `Time complexity: O(1)`
     --- 
     --- `Memory complexity: O(1)`
-    ---@param self BaseAIStructureManager
+    ---@param self AIStructureManager
     ---@param unit Unit
     OnUnitDestroyed = function(self, unit)
         local blueprint = unit.Blueprint
@@ -166,6 +176,9 @@ BaseAIStructureManager = Class(BuilderManager) {
     ---@param unit Unit
     ---@param built Unit
     OnUnitStartBuilding = function(self, unit, built)
+        local blueprint = unit.Blueprint
+        if blueprint.CategoriesHash['STRUCTURE'] then
+        end
     end,
 
     --- Called by a unit as it stops building
@@ -173,6 +186,9 @@ BaseAIStructureManager = Class(BuilderManager) {
     ---@param unit Unit
     ---@param built Unit
     OnUnitStopBuilding = function(self, unit, built)
+        local blueprint = unit.Blueprint
+        if blueprint.CategoriesHash['STRUCTURE'] then
+        end
     end,
 
     --------------------------------------------------------------------------------------------
@@ -183,7 +199,7 @@ BaseAIStructureManager = Class(BuilderManager) {
     --- `Time complexity: O(1)`
     --- 
     --- `Memory complexity: O(1)`
-    ---@param self BaseAIStructureManager
+    ---@param self AIStructureManager
     ---@param unit Unit
     AddUnit = function(self, unit)
         local blueprint = unit.Blueprint
@@ -206,7 +222,7 @@ BaseAIStructureManager = Class(BuilderManager) {
     --- `Complexity: O(1)`
     --- 
     --- `Memory complexity: O(1)`
-    ---@param self BaseAIStructureManager
+    ---@param self AIStructureManager
     ---@param unit Unit
     RemoveUnit = function(self, unit)
         local blueprint = unit.Blueprint
@@ -220,12 +236,11 @@ BaseAIStructureManager = Class(BuilderManager) {
 }
 
 ---@param brain AIBrain
+---@param base AIBase
 ---@param locationType LocationType
----@param location Vector
----@param radius number
----@return BaseAIStructureManager
-function CreateStructureManager(brain, locationType, location, radius)
-    local manager = BaseAIStructureManager()
-    manager:Create(brain, locationType, location, radius)
+---@return AIStructureManager
+function CreateStructureManager(brain, base, locationType)
+    local manager = AIStructureManager()
+    manager:Create(brain, base, locationType)
     return manager
 end

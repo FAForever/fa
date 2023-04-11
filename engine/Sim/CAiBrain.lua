@@ -394,9 +394,9 @@ function CAiBrain:IsOpponentAIRunning()
 end
 
 --- Creates a new platoon.
--- @param name or '', custom platoon name
--- @param aiPlan Plan to follow for this platoon or '', the function for the plan is in '/lua/platoon.lua'.
--- @return Platoon.
+---@param name string   # unique name for platoon
+---@param aiPlan string # to follow for this platoon or '', the function for the plan is in '/lua/platoon.lua'.
+---@return Platoon
 function CAiBrain:MakePlatoon(name, aiPlan)
 end
 

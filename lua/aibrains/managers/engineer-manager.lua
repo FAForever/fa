@@ -1,24 +1,23 @@
 --****************************************************************************
---**  File     :  /lua/sim/BaseAIEngineerManager.lua
+--**  File     :  /lua/sim/AIEngineerManager.lua
 --**  Summary  : Manage engineers for a location
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local BuilderManager = import("/lua/sim/buildermanager.lua").BuilderManager
-local Builder = import("/lua/sim/builder.lua")
+local AIBuilderManager = import("/lua/aibrains/managers/builder-manager.lua").AIBuilderManager
 
 local TableGetn = table.getn
 local TableGetSize = table.getsize
 
 local WeakValues = { __mode = 'v' }
 
----@class BaseAIEngineerManager : BuilderManager
+---@class AIEngineerManager : AIBuilderManager
 ---@field Engineers table
 ---@field EngineersBeingBuilt table     
 ---@field StructuresBeingBuilt table
 ---@field EngineerTotalCount number     # Recomputed every 10 ticks
 ---@field EngineerCount table           # Recomputed every 10 ticks
-BaseAIEngineerManager = Class(BuilderManager) {
+AIEngineerManager = Class(AIBuilderManager) {
 
     --- TODO:
 
@@ -26,14 +25,14 @@ BaseAIEngineerManager = Class(BuilderManager) {
     --- Factor out GetNumCategoryUnits
     --- Factor out GetEngineersWantingAssistance
 
-    ---@param self BaseAIEngineerManager
+    ---@param self AIEngineerManager
     ---@param brain AIBrain
+    ---@param base AIBase
     ---@param locationType LocationType
-    ---@param location Vector
-    ---@param radius number
     ---@return boolean
-    Create = function(self, brain, locationType, location, radius)
-        BuilderManager.Create(self, brain, locationType, location, radius)
+    Create = function(self, brain, base, locationType)
+        AIBuilderManager.Create(self, brain, base, locationType)
+        self.Identifier = 'AIEngineerManager at ' .. locationType
 
         self.Engineers = {
             TECH1 = setmetatable({}, WeakValues),
@@ -76,27 +75,12 @@ BaseAIEngineerManager = Class(BuilderManager) {
     --------------------------------------------------------------------------------------------
     -- builder interface
 
-    -- This is where the majority of the magic happens. See the description of the same section
-    -- in the BuilderManager class for an extensive description
-
-    --- TODO
-    ---@param self BaseAIEngineerManager
-    ---@param builderData BuilderSpec
-    ---@param locationType LocationType
-    ---@param builderType BuilderType
-    ---@return Builder
-    AddBuilder = function(self, builderData, locationType, builderType)
-        local newBuilder = Builder.CreateEngineerBuilder(self.Brain, builderData, locationType)
-        self:AddInstancedBuilder(newBuilder, builderType)
-        return newBuilder
-    end,
-
     --- Retrieves the engineer platoon template. Creates a new table if the cache is not provided
     --- 
     --- `Time complexity: O(1)`
     --- 
     --- `Memory complexity: O(1)`
-    ---@param self BaseAIEngineerManager
+    ---@param self AIEngineerManager
     ---@param templateName string
     ---@return table
     GetEngineerPlatoonTemplate = function(self, templateName, cache)
@@ -122,18 +106,17 @@ BaseAIEngineerManager = Class(BuilderManager) {
     end,
 
     --- TODO
-    ---@param self BaseAIEngineerManager
-    ---@param builder BuilderSpec
+    ---@param self AIEngineerManager
+    ---@param builder AIBuilder
     ---@param params { [1]: Unit }
     ---@return boolean
     BuilderParamCheck = function(self, builder, params)
         local unit = params[1]
 
-        builder:FormDebug()
-
+        -- and builder:CheckInstanceCount()
         -- Check if the category of the unit matches the category of the builder
         local template = self:GetEngineerPlatoonTemplate(builder:GetPlatoonTemplate())
-        if not unit.Dead and EntityCategoryContains(template[3][1], unit) and builder:CheckInstanceCount() then
+        if not unit.Dead and EntityCategoryContains(template[3][1], unit) then
             return true
         end
 
@@ -147,7 +130,7 @@ BaseAIEngineerManager = Class(BuilderManager) {
     --------------------------------------------------------------------------------------------
     -- manager interface
 
-    ---@param self BaseAIEngineerManager
+    ---@param self AIEngineerManager
     UpdateThread = function(self)
         while true do
             if self.Active then
@@ -158,7 +141,7 @@ BaseAIEngineerManager = Class(BuilderManager) {
         end
     end,
 
-    ---@param self BaseAIEngineerManager
+    ---@param self AIEngineerManager
     Update = function(self)
         local total = 0
         local engineers = self.Engineers
@@ -180,20 +163,22 @@ BaseAIEngineerManager = Class(BuilderManager) {
     --- `Time complexity: O(1)`
     --- 
     --- `Memory complexity: O(1)`
-    ---@param self BaseAIEngineerManager
+    ---@param self AIEngineerManager
     ---@param unit Unit
     ---@param builder Unit
     ---@param layer Layer
     OnUnitStartBeingBuilt = function(self, unit, builder, layer)
-        local tech = unit.Blueprint.TechCategory
-        local id = unit.EntityId
-        self.EngineersBeingBuilt[tech][id] = unit
+        local blueprint = unit.Blueprint
+        if blueprint.CategoriesHash['ENGINEER'] then
+            local tech = blueprint.TechCategory
+            local id = unit.EntityId
+            self.EngineersBeingBuilt[tech][id] = unit
 
-        -- used by platoon functions to find the manager
-        local builderManagerData = unit.BuilderManagerData or { }
-        unit.BuilderManagerData = builderManagerData
-        builderManagerData.EngineerManager = self
-        builderManagerData.LocationType = self.LocationType
+            -- used by platoon functions to find the manager
+            local builderManagerData = unit.BuilderManagerData or { }
+            unit.BuilderManagerData = builderManagerData
+            builderManagerData.EngineerManager = self
+        end
     end,
 
     --- Called by a unit that is an engineer as it is finished being built
@@ -201,24 +186,25 @@ BaseAIEngineerManager = Class(BuilderManager) {
     --- `Time complexity: O(1)`
     --- 
     --- `Memory complexity: O(1)`
-    ---@param self BaseAIEngineerManager
+    ---@param self AIEngineerManager
     ---@param unit Unit
     ---@param builder Unit
     ---@param layer Layer
     OnUnitStopBeingBuilt = function(self, unit, builder, layer)
-        LOG("OnUnitStopBeingBuilt")
-        local tech = unit.Blueprint.TechCategory
-        local id = unit.EntityId
-        self.EngineersBeingBuilt[tech][id] = nil
-        self.Engineers[tech][id] = unit
+        local blueprint = unit.Blueprint
+        if blueprint.CategoriesHash['ENGINEER'] then
+            local tech = blueprint.TechCategory
+            local id = unit.EntityId
+            self.EngineersBeingBuilt[tech][id] = nil
+            self.Engineers[tech][id] = unit
 
-        -- used by platoon functions to find the manager
-        local builderManagerData = unit.BuilderManagerData or { }
-        unit.BuilderManagerData = builderManagerData
-        builderManagerData.EngineerManager = self
-        builderManagerData.LocationType = self.LocationType
+            -- used by platoon functions to find the manager
+            local builderManagerData = unit.BuilderManagerData or { }
+            unit.BuilderManagerData = builderManagerData
+            builderManagerData.EngineerManager = self
 
-        self:ForkEngineerTask(unit)
+            self:ForkEngineerTask(unit)
+        end
     end,
 
     --- Called by a unit that is an engineer as it is destroyed
@@ -226,13 +212,16 @@ BaseAIEngineerManager = Class(BuilderManager) {
     --- `Time complexity: O(1)`
     --- 
     --- `Memory complexity: O(1)`
-    ---@param self BaseAIEngineerManager
+    ---@param self AIEngineerManager
     ---@param unit Unit
     OnUnitDestroyed = function(self, unit)
-        local tech = unit.Blueprint.TechCategory
-        local id = unit.EntityId
-        self.EngineersBeingBuilt[tech][id] = nil
-        self.Engineers[tech][id] = nil
+        local blueprint = unit.Blueprint
+        if blueprint.CategoriesHash['ENGINEER'] then
+            local tech = blueprint.TechCategory
+            local id = unit.EntityId
+            self.EngineersBeingBuilt[tech][id] = nil
+            self.Engineers[tech][id] = nil
+        end
     end,
 
     --- Called by a unit as it starts building
@@ -240,27 +229,30 @@ BaseAIEngineerManager = Class(BuilderManager) {
     --- `Time complexity: O(1)`
     --- 
     --- `Memory complexity: O(1)`
-    ---@param self BuilderManager
+    ---@param self AIBuilderManager
     ---@param unit Unit
     ---@param built Unit
     OnUnitStartBuilding = function(self, unit, built)
-        if unit.Blueprint.CategoriesHash['ENGINEER'] then
-
+        local blueprint = unit.Blueprint
+        if blueprint.CategoriesHash['ENGINEER'] then
         end
     end,
 
     --- Called by a unit as it stops building
-    ---@param self BuilderManager
+    ---@param self AIBuilderManager
     ---@param unit Unit
     ---@param built Unit
     OnUnitStopBuilding = function(self, unit, built)
+        local blueprint = unit.Blueprint
+        if blueprint.CategoriesHash['ENGINEER'] then
+        end
     end,
 
     --------------------------------------------------------------------------------------------
     -- platoon events 
 
     --- Called by a platoon of the engineer as it is being disbanded
-    ---@param self BaseAIEngineerManager
+    ---@param self AIEngineerManager
     ---@param unit Unit
     TaskFinished = function(self, unit)
         if VDist3(self.Location, unit:GetPosition()) > self.Radius and
@@ -276,7 +268,7 @@ BaseAIEngineerManager = Class(BuilderManager) {
     --- `Time complexity: O(1)`
     --- 
     --- `Memory complexity: O(1)`
-    ---@param self BaseAIEngineerManager
+    ---@param self AIEngineerManager
     ---@param builderName string
     AssignTimeout = function(self, builderName)
         local oldPri = self:GetBuilderPriority(builderName)
@@ -293,10 +285,10 @@ BaseAIEngineerManager = Class(BuilderManager) {
     --- `Time complexity: O(1)`
     --- 
     --- `Memory complexity: O(1)`
-    ---@param self BaseAIEngineerManager
+    ---@param self AIEngineerManager
     ---@param unit Unit
     ---@param doNotAssignTask boolean
-    AddUnit = function(self, unit, doNotAssignTask)
+    AddEngineer = function(self, unit, doNotAssignTask)
         local tech = unit.Blueprint.TechCategory
         local id = unit.EntityId
         self.EngineersBeingBuilt[tech][id] = nil
@@ -306,7 +298,6 @@ BaseAIEngineerManager = Class(BuilderManager) {
         local builderManagerData = unit.BuilderManagerData or { }
         unit.BuilderManagerData = builderManagerData
         builderManagerData.EngineerManager = self
-        builderManagerData.LocationType = self.LocationType
 
         if not doNotAssignTask then
             self:ForkEngineerTask(unit)
@@ -318,9 +309,9 @@ BaseAIEngineerManager = Class(BuilderManager) {
     --- `Complexity: O(1)`
     --- 
     --- `Memory complexity: O(1)`
-    ---@param self BaseAIEngineerManager
+    ---@param self AIEngineerManager
     ---@param unit Unit
-    RemoveUnit = function(self, unit)
+    RemoveEngineer = function(self, unit)
         local tech = unit.Blueprint.TechCategory
         local id = unit.EntityId
         self.EngineersBeingBuilt[tech][id] = nil
@@ -332,7 +323,7 @@ BaseAIEngineerManager = Class(BuilderManager) {
     --- `Complexity: O(1)`
     --- 
     --- `Memory complexity: O(1)`
-    ---@param self BaseAIEngineerManager
+    ---@param self AIEngineerManager
     ---@return number
     GetNumUnits = function(self)
         return self.EngineerTotalCount
@@ -343,7 +334,7 @@ BaseAIEngineerManager = Class(BuilderManager) {
     --- `Complexity: O(1)`
     --- 
     --- `Memory complexity: O(1)`
-    ---@param self BaseAIEngineerManager
+    ---@param self AIEngineerManager
     ---@param tech TechCategory
     ---@return number
     GetNumUnitsByTech = function(self, tech)
@@ -355,7 +346,7 @@ BaseAIEngineerManager = Class(BuilderManager) {
     --- `Time complexity: O(n)` where `n` is `EngineerTotalCount`
     --- 
     --- `Memory complexity: O(1)`
-    ---@param self BaseAIEngineerManager
+    ---@param self AIEngineerManager
     ---@param cat EntityCategory
     ---@return number
     GetNumUnitsRequestingAssistance = function(self, cat)
@@ -380,7 +371,7 @@ BaseAIEngineerManager = Class(BuilderManager) {
     --- `Time complexity: O(n)` where `n` is `EngineerTotalCount`
     --- 
     --- `Memory complexity: O(k), where `k` is the number of engineers assisting. If the cache is provided then `O(1)`
-    ---@param self BaseAIEngineerManager
+    ---@param self AIEngineerManager
     ---@param cat EntityCategory
     ---@param cache? table
     ---@return Unit[]
@@ -409,7 +400,7 @@ BaseAIEngineerManager = Class(BuilderManager) {
     --- `Time complexity: O(n)` where `n` is `EngineerCount[tech]`
     --- 
     --- `Memory complexity: O(1)`
-    ---@param self BaseAIEngineerManager
+    ---@param self AIEngineerManager
     ---@param tech TechCategory
     ---@param cat EntityCategory
     ---@return number
@@ -433,7 +424,7 @@ BaseAIEngineerManager = Class(BuilderManager) {
     -- properties
 
     --- TODO
-    ---@param self BaseAIEngineerManager
+    ---@param self AIEngineerManager
     ---@param unit Unit
     ReassignUnit = function(self, unit)
         local managers = self.Brain.BuilderManagers
@@ -442,7 +433,7 @@ BaseAIEngineerManager = Class(BuilderManager) {
         local unitPos = unit:GetPosition()
         for k, v in managers do
             if v.FactoryManager:GetNumCategoryFactories(categories.ALLUNITS) > 0 or v == 'MAIN' then
-                local checkDistance = VDist3(v.BaseAIEngineerManager:GetLocationCoords(), unitPos)
+                local checkDistance = VDist3(v.AIEngineerManager:GetLocationCoords(), unitPos)
                 if not distance or checkDistance < distance then
                     distance = checkDistance
                     bestManager = v.EngineerManager
@@ -459,7 +450,7 @@ BaseAIEngineerManager = Class(BuilderManager) {
 
 
     --- TODO
-    ---@param manager BaseAIEngineerManager
+    ---@param manager AIEngineerManager
     ---@param unit Unit
     ForkEngineerTask = function(manager, unit)
         local task = unit.ForkedEngineerTask
@@ -477,7 +468,7 @@ BaseAIEngineerManager = Class(BuilderManager) {
     end,
 
     --- TODO
-    ---@param manager BaseAIEngineerManager
+    ---@param manager AIEngineerManager
     ---@param unit Unit
     ---@param delaytime number          # in ticks
     DelayAssign = function(manager, unit, delaytime)
@@ -493,7 +484,7 @@ BaseAIEngineerManager = Class(BuilderManager) {
 
     --- TODO
     ---@param unit Unit
-    ---@param manager BaseAIEngineerManager
+    ---@param manager AIEngineerManager
     ---@param ticks number
     Wait = function(unit, manager, ticks)
         coroutine.yield(ticks)
@@ -503,7 +494,7 @@ BaseAIEngineerManager = Class(BuilderManager) {
     end,
 
     --- TODO
-    ---@param self BaseAIEngineerManager
+    ---@param self AIEngineerManager
     ---@param unit Unit
     AssignEngineerTask = function(self, unit)
         --LOG('+ AssignEngineerTask')
@@ -524,71 +515,49 @@ BaseAIEngineerManager = Class(BuilderManager) {
         end
 
         local builder = self:GetHighestBuilder('Any', { unit })
-        LOG(builder.BuilderName)
         if builder then
             -- Fork off the platoon here
             local template = self:GetEngineerPlatoonTemplate(builder:GetPlatoonTemplate())
-            local hndl = self.Brain:MakePlatoon(template[1], template[2])
-            self.Brain:AssignUnitsToPlatoon(hndl, { unit }, 'support', 'none')
-            unit.PlatoonHandle = hndl
-
-            --if EntityCategoryContains(categories.COMMAND, unit) then
-            --    LOG('*AI DEBUG: ARMY '..self.Brain.Nickname..': Engineer Manager Forming - '..builder.BuilderName..' - Priority: '..builder:GetPriority())
-            --end
+            local platoon = self.Brain:MakePlatoon(template[1], template[2]) --[[@type Platoon]]
+            self.Brain:AssignUnitsToPlatoon(platoon, { unit }, 'support', 'none')
+            unit.PlatoonHandle = platoon
 
             --LOG('*AI DEBUG: ARMY ', repr(self.Brain:GetArmyIndex()),': Engineer Manager Forming - ',repr(builder.BuilderName),' - Priority: ', builder:GetPriority())
-            hndl.PlanName = template[2]
+            platoon.PlanName = template[2]
 
             --If we have specific AI, fork that AI thread
-            if builder:GetPlatoonAIFunction() then
-                hndl:StopAI()
-                local aiFunc = builder:GetPlatoonAIFunction()
-                hndl:ForkAIThread(import(aiFunc[1])[ aiFunc[2] ])
-            end
-            if builder:GetPlatoonAIPlan() then
-                hndl.PlanName = builder:GetPlatoonAIPlan()
-                hndl:SetAIPlan(hndl.PlanName)
+            local aiFunc = builder:GetPlatoonAIFunction()
+            if aiFunc then
+                platoon:StopAI()
+                platoon:ForkAIThread(import(aiFunc[1])[ aiFunc[2] ])
             end
 
-            --If we have additional threads to fork on the platoon, do that as well.
-            if builder:GetPlatoonAddPlans() then
-                for papk, papv in builder:GetPlatoonAddPlans() do
-                    hndl:ForkThread(hndl[papv])
-                end
+            local aiPlan = builder:GetPlatoonAIPlan()
+            if aiPlan then
+                platoon.PlanName = aiPlan
+                platoon:SetAIPlan(aiPlan)
             end
 
-            if builder:GetPlatoonAddFunctions() then
-                for pafk, pafv in builder:GetPlatoonAddFunctions() do
-                    hndl:ForkThread(import(pafv[1])[ pafv[2] ])
-                end
-            end
+            platoon.Priority = builder:GetPriority()
+            platoon.BuilderName = builder:GetIdentifier()
 
-            if builder:GetPlatoonAddBehaviors() then
-                for pafk, pafv in builder:GetPlatoonAddBehaviors() do
-                    hndl:ForkThread(import("/lua/ai/aibehaviors.lua")[pafv])
-                end
-            end
+            platoon:SetPlatoonData(builder:GetData())
 
-            hndl.Priority = builder:GetPriority()
-            hndl.BuilderName = builder:GetBuilderName()
-
-            hndl:SetPlatoonData(builder:GetBuilderData(self.LocationType))
-
-            if hndl.PlatoonData.DesiresAssist then
-                unit.DesiresAssist = hndl.PlatoonData.DesiresAssist
+            if platoon.PlatoonData.DesiresAssist then
+                unit.DesiresAssist = platoon.PlatoonData.DesiresAssist
             else
                 unit.DesiresAssist = true
             end
 
-            if hndl.PlatoonData.NumAssistees then
-                unit.NumAssistees = hndl.PlatoonData.NumAssistees
+            if platoon.PlatoonData.NumAssistees then
+                unit.NumAssistees = platoon.PlatoonData.NumAssistees
             end
 
-            if hndl.PlatoonData.MinNumAssistees then
-                unit.MinNumAssistees = hndl.PlatoonData.MinNumAssistees
+            if platoon.PlatoonData.MinNumAssistees then
+                unit.MinNumAssistees = platoon.PlatoonData.MinNumAssistees
             end
 
-            builder:StoreHandle(hndl)
+            -- builder:StoreHandle(platoon)
             self.AssigningTask = false
             return
         end
@@ -603,7 +572,7 @@ BaseAIEngineerManager = Class(BuilderManager) {
     --- functionality that is considered bad practice for performance
 
     ---@deprecated
-    ---@param self BaseAIEngineerManager
+    ---@param self AIEngineerManager
     ---@param unitType string
     ---@param category EntityCategory
     ---@return number
@@ -612,7 +581,7 @@ BaseAIEngineerManager = Class(BuilderManager) {
     end,
 
     ---@deprecated
-    ---@param self BaseAIEngineerManager
+    ---@param self AIEngineerManager
     ---@param category EntityCategory
     ---@param engCategory EntityCategory
     ---@return integer
@@ -621,7 +590,7 @@ BaseAIEngineerManager = Class(BuilderManager) {
     end,
 
     ---@deprecated
-    ---@param self BaseAIEngineerManager
+    ---@param self AIEngineerManager
     ---@param category EntityCategory
     ---@param engCategory EntityCategory
     ---@return table
@@ -632,12 +601,11 @@ BaseAIEngineerManager = Class(BuilderManager) {
 }
 
 ---@param brain AIBrain
+---@param base AIBase
 ---@param locationType LocationType
----@param location Vector
----@param radius number
----@return BaseAIEngineerManager
-function CreateEngineerManager(brain, locationType, location, radius)
-    local em = BaseAIEngineerManager()
-    em:Create(brain, locationType, location, radius)
+---@return AIEngineerManager
+function CreateEngineerManager(brain, base, locationType)
+    local em = AIEngineerManager()
+    em:Create(brain, base, locationType)
     return em
 end

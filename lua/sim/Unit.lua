@@ -84,11 +84,12 @@ SyncMeta = {
 }
 
 ---@class AIUnitProperties
+---@field AIBaseManager LocationType
 ---@field ForkedEngineerTask? thread    # used by the engineer manager
 ---@field DesiresAssist? boolean         # used by the engineer manager
 ---@field NumAssistees? number           # used by the engineer manager
 ---@field MinNumAssistees? number
----@field BuilderManagerData? { EngineerManager: BaseAIEngineerManager, LocationType: LocationType }
+---@field BuilderManagerData? { EngineerManager: AIEngineerManager, LocationType: LocationType }
 ---@field UnitBeingAssist? Unit
 ---@field UnitBeingBuilt? Unit
 ---@field UnitBeingBuiltBehavior? thread

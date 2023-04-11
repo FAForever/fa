@@ -1,11 +1,15 @@
-local FactoryManager = import("/lua/sim/factorybuildermanager.lua")
-local PlatoonFormManager = import("/lua/sim/platoonformmanager.lua")
-local BrainConditionsMonitor = import("/lua/sim/brainconditionsmonitor.lua")
-local EngineerManager = import("/lua/aibrains/managers/engineer.lua")
-local StructureManager = import("/lua/aibrains/managers/structure.lua")
+local BaseManager = import("/lua/aibrains/managers/base-manager.lua")
 
 local StandardBrain = import("/lua/aibrain.lua").AIBrain
 local EconomyComponent = import("/lua/aibrains/components/economy.lua").AIBrainEconomyComponent
+
+-- TO GET RID OF
+local BrainConditionsMonitor = import("/lua/sim/brainconditionsmonitor.lua")
+
+---@class EasyAIBrainManagers
+---@field FactoryManager AIFactoryManager
+---@field EngineerManager AIEngineerManager
+---@field StructureManager AIStructureManager
 
 ---@class TriggerSpec
 ---@field Callback function
@@ -17,6 +21,10 @@ local EconomyComponent = import("/lua/aibrains/components/economy.lua").AIBrainE
 ---@field TargetAIBrain AIBrain
 
 ---@class EasyAIBrain: AIBrain, AIBrainEconomyComponent
+---@field GridReclaim AIGridReclaim
+---@field GridBrain AIGridBrain
+---@field BuilderManagers table<LocationType, AIBase>
+---@field BuilderManagers table<LocationType, AIBase>
 AIBrain = Class(StandardBrain, EconomyComponent) {
 
     SkirmishSystems = true,
@@ -50,34 +58,28 @@ AIBrain = Class(StandardBrain, EconomyComponent) {
             poolPlatoon:TurnOffPoolAI()
         end
 
-        -- Stores handles to all builders for quick iteration and updates to all
-        self.BuilderHandles = {}
-
         -- Condition monitor for the whole brain
         self.ConditionsMonitor = BrainConditionsMonitor.CreateConditionsMonitor(self)
-
-        -- Add default main location and setup the builder managers
-        self.NumBases = 0 -- AddBuilderManagers will increase the number
 
         -- Set the map center point
         self.MapCenterPoint = { (ScenarioInfo.size[1] / 2),
             GetSurfaceHeight((ScenarioInfo.size[1] / 2), (ScenarioInfo.size[2] / 2)), (ScenarioInfo.size[2] / 2) }
 
-        LOG("Running!")
-
+        -- start initial base
         local startX, startZ = self:GetArmyStartPos()
-        self.BuilderManagers = {}
-        self:AddBuilderManagers({ startX, 0, startZ }, 100, 'MAIN', false)
-        self:IMAPConfiguration()
+        local main = BaseManager.CreateBaseManager(self, 'main', { startX, 0, startZ }, 60)
+        self.BuilderManagers = {
+            MAIN = main
+        }
 
         ForkThread(
             function()
                 WaitTicks(30)
-                local loader = import("/lua/ai/aiarchetype-managerloader.lua")
-                loader.ExecutePlan(self)
+                main:AddBaseTemplate('AIBaseTemplate - Easy main')
             end
         )
 
+        self:IMAPConfiguration()
         EconomyComponent.OnCreateAI(self)
     end,
 
@@ -108,27 +110,9 @@ AIBrain = Class(StandardBrain, EconomyComponent) {
     ---@param self EasyAIBrain
     ---@param position Vector
     ---@param radius number
-    ---@param baseName string
-    ---@param useCenter boolean
-    AddBuilderManagers = function(self, position, radius, baseName, useCenter)
-
-        local baseLayer = 'Land'
-        position[2] = GetTerrainHeight(position[1], position[3])
-        if GetSurfaceHeight(position[1], position[3]) > position[2] then
-            position[2] = GetSurfaceHeight(position[1], position[3])
-            baseLayer = 'Water'
-        end
-
-        self.BuilderManagers[baseName] = {
-            FactoryManager = FactoryManager.CreateFactoryBuilderManager(self, baseName, position, radius, useCenter),
-            PlatoonFormManager = PlatoonFormManager.CreatePlatoonFormManager(self, baseName, position, radius, useCenter),
-            EngineerManager = EngineerManager.CreateEngineerManager(self, baseName, position, radius),
-            BuilderHandles = {},
-            Position = position,
-            BaseType = Scenario.MasterChain._MASTERCHAIN_.Markers[baseName].type or 'MAIN',
-            Layer = baseLayer,
-        }
-        self.NumBases = self.NumBases + 1
+    ---@param baseName LocationType
+    AddBaseManagers = function(self, baseName, position, radius)
+        self.BuilderManagers[baseName] = BaseManager.CreateBaseManager(self, baseName, position, radius)
     end,
 
 
@@ -171,14 +155,14 @@ AIBrain = Class(StandardBrain, EconomyComponent) {
     --- Retrieves the nearest base for the given position
     ---@param self EasyAIBrain
     ---@param position Vector
-    ---@return string?
+    ---@return LocationType
     FindNearestBaseIdentifier = function(self, position)
         local ux, _, uz = position[1], nil, position[3]
         local nearestManagerIdentifier = nil
         local nearestDistance = nil
         for id, managers in self.BuilderManagers do
             if nearestManagerIdentifier then
-                local location = managers.FactoryManager.Location
+                local location = managers.Position
                 local dx, dz = location[1] - ux, location[3] - uz
                 local distance = dx * dx + dz * dz
                 if distance < nearestDistance then
@@ -187,7 +171,7 @@ AIBrain = Class(StandardBrain, EconomyComponent) {
                     nearestManagerIdentifier = id
                 end
             else
-                local location = managers.FactoryManager.Location
+                local location = managers.Position
                 local dx, dz = location[1] - ux, location[3] - uz
                 nearestDistance = dx * dx + dz * dz
                 nearestManagerIdentifier = id
@@ -203,16 +187,14 @@ AIBrain = Class(StandardBrain, EconomyComponent) {
     ---@param builder Unit
     ---@param layer Layer
     OnUnitStartBeingBuilt = function(self, unit, builder, layer)
-        StandardBrain.OnUnitStartBeingBuilt(self, unit, builder, layer)
-
         -- find nearest base
-        local nearestBaseIdentifier = builder.AIManagerIdentifier or self:FindNearestBaseIdentifier(unit:GetPosition())
-        unit.AIManagerIdentifier = nearestBaseIdentifier
+        local nearestBaseIdentifier = builder.AIBaseManager or self:FindNearestBaseIdentifier(unit:GetPosition())
+        unit.AIBaseManager = nearestBaseIdentifier
 
         -- register unit at managers of base
-        local managers = self.BuilderManagers[nearestBaseIdentifier]
-        if managers then
-            managers.EngineerManager:OnUnitStartBeingBuilt(unit, builder, layer)
+        local baseManager = self.BuilderManagers[nearestBaseIdentifier]
+        if baseManager then
+            baseManager:OnUnitStartBeingBuilt(unit, builder, layer)
         end
     end,
 
@@ -222,17 +204,15 @@ AIBrain = Class(StandardBrain, EconomyComponent) {
     ---@param builder Unit
     ---@param layer Layer
     OnUnitStopBeingBuilt = function(self, unit, builder, layer)
-        StandardBrain.OnUnitStopBeingBuilt(self, unit, builder, layer)
-
-        local baseIdentifier = unit.AIManagerIdentifier
+        local baseIdentifier = unit.AIBaseManager
         if not baseIdentifier then
             baseIdentifier = self:FindNearestBaseIdentifier(unit:GetPosition())
-            unit.AIManagerIdentifier = baseIdentifier
+            unit.AIBaseManager = baseIdentifier
         end
 
         local managers = self.BuilderManagers[baseIdentifier]
         if managers then
-            managers.EngineerManager:OnUnitStopBeingBuilt(unit, builder, layer)
+            managers:OnUnitStopBeingBuilt(unit, builder, layer)
         end
     end,
 
@@ -240,16 +220,14 @@ AIBrain = Class(StandardBrain, EconomyComponent) {
     ---@param self EasyAIBrain
     ---@param unit Unit
     OnUnitDestroyed = function(self, unit)
-        StandardBrain.OnUnitDestroyed(self, unit)
-
-        local baseIdentifier = unit.AIManagerIdentifier
+        local baseIdentifier = unit.AIBaseManager
         if not baseIdentifier then
             return
         end
 
         local managers = self.BuilderManagers[baseIdentifier]
         if managers then
-            managers.EngineerManager:OnUnitStopBeingBuilt(unit)
+            managers:OnUnitDestroyed(unit)
         end
     end,
 
@@ -258,16 +236,14 @@ AIBrain = Class(StandardBrain, EconomyComponent) {
     ---@param unit Unit
     ---@param built Unit
     OnUnitStartBuilding = function(self, unit, built)
-        StandardBrain.OnUnitStartBuilding(self, unit, built)
-
-        local baseIdentifier = unit.AIManagerIdentifier
+        local baseIdentifier = unit.AIBaseManager
         if not baseIdentifier then
             return
         end
 
         local managers = self.BuilderManagers[baseIdentifier]
         if managers then
-            managers.EngineerManager:OnUnitStartBuilding(unit)
+            managers:OnUnitStartBuilding(unit, built)
         end
     end,
 
@@ -276,16 +252,14 @@ AIBrain = Class(StandardBrain, EconomyComponent) {
     ---@param unit Unit
     ---@param built Unit
     OnUnitStopBuilding = function(self, unit, built)
-        StandardBrain.OnUnitStopBuilding(self, unit, built)
-
-        local baseIdentifier = unit.AIManagerIdentifier
+        local baseIdentifier = unit.AIBaseManager
         if not baseIdentifier then
             return
         end
 
         local managers = self.BuilderManagers[baseIdentifier]
         if managers then
-            managers.EngineerManager:OnUnitStopBuilding(unit)
+            managers.EngineerManager:OnUnitStopBuilding(unit, built)
         end
     end,
 

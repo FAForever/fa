@@ -17,14 +17,6 @@ local ForkThread = ForkThread
 
 local BuilderCache = { }
 
----@alias LocationType
---- can only be applied to the main base
---- | 'MAIN'
---- can be applied by any base
---- | 'LocationType'
---- name of expansion marker of the base
---- | string
-
 ---@param a Builder
 ---@param b Builder
 local function BuilderSortLambda(a, b)

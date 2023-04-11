@@ -20,6 +20,17 @@
 -- Do global initialization and set up common global functions
 doscript '/lua/globalInit.lua'
 
+-- load legacy builder systems
+doscript '/lua/system/GlobalPlatoonTemplate.lua'
+doscript '/lua/system/GlobalBuilderTemplate.lua'
+doscript '/lua/system/GlobalBuilderGroup.lua'
+doscript '/lua/system/GlobalBaseTemplate.lua'
+
+-- load builder systems
+doscript '/lua/aibrains/templates/base/base-template.lua'
+doscript '/lua/aibrains/templates/builder-groups/builder-group-template.lua'
+doscript '/lua/aibrains/templates/builder-groups/builder-template.lua'
+
 GameOverListeners = {}
 WaitTicks = coroutine.yield
 
@@ -38,7 +49,7 @@ doscript '/lua/SimHooks.lua'
 -- Set up the sync table and some globals for use by scenario functions
 doscript '/lua/SimSync.lua'
 
-local syncStartPositions = false -- This is held here because the Sync table is cleared between SetupSession() and BeginSession()
+local syncStartPositions = false -- This is held here because the Sync table iFBlobas cleared between SetupSession() and BeginSession()
 
 function ShuffleStartPositions(syncNewPositions)
     local markers = ScenarioInfo.Env.Scenario.MasterChain._MASTERCHAIN_.Markers
@@ -355,6 +366,7 @@ function BeginSessionAI()
             end
         end
 
+        -- import legacy templates, builder groups and builders
         for k,file in DiskFindFiles('/lua/AI/PlatoonTemplates', '*.lua') do
             import(file)
         end
@@ -364,6 +376,11 @@ function BeginSessionAI()
         end
 
         for k,file in DiskFindFiles('/lua/AI/AIBaseTemplates', '*.lua') do
+            import(file)
+        end
+
+        -- import base templates, builder group templates and builder templates
+        for k,file in DiskFindFiles('/lua/aibrains/templates/', '*.lua') do
             import(file)
         end
     end
