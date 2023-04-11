@@ -93,32 +93,32 @@ AIBuilderManager = ClassSimple {
     ---@param builder AIBuilder
     ---@param builderType? BuilderType
     AddInstancedBuilder = function(self, builder, builderType)
-        builderType = builderType or builder:GetType()
+        builderType = builderType or builder:GetBuilderType()
 
         -- can't proceed without a builder type that we support
-        local identifier = builder:GetIdentifier()
+        local builderName = builder:GetBuilderName()
         local builderDataType = self.BuilderData[builderType]
         if not builderDataType then
             WARN('[' ..
                 string.gsub(debug.getinfo(1).source, ".*\\(.*.lua)", "%1") ..
                 ', line:' ..
                 debug.getinfo(1).currentline ..
-                '] *BUILDERMANAGER ERROR: No BuilderData for builder: ' .. tostring(builder:GetIdentifier()))
+                '] *BUILDERMANAGER ERROR: No BuilderData for builder: ' .. tostring(builderName))
             return
         end
 
         -- register the builder
         builderDataType.NeedSort = true
         TableInsert(builderDataType.Builders, builder)
-        self.BuilderLookup[identifier] = builder
+        self.BuilderLookup[builderName] = builder
     end,
 
     --- Retrieves the first builder with a matching `BuilderName` field
     ---@param self AIBuilderManager
-    ---@param identifier string
+    ---@param builderName string
     ---@return AIBuilder?
-    GetBuilder = function(self, identifier)
-        return self.BuilderLookup[identifier]
+    GetBuilder = function(self, builderName)
+        return self.BuilderLookup[builderName]
     end,
 
     --- Retrieves the highest builder that is valid with the given parameters

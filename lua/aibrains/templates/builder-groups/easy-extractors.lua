@@ -1,16 +1,16 @@
 AIBuilderGroupTemplate {
-    Identifier = 'EasyEngineerExtractorBuilders',
+    BuilderGroupName = 'EasyEngineerExtractorBuilders',
     ManagerName = 'EngineerManager',
 
     AIBuilderTemplate {
-        Identifier = 'Easy - T1ResourceEngineer 40',
+        BuilderName = 'Easy - T1ResourceEngineer 40',
         PlatoonTemplate = 'EngineerBuilder',
         Priority = 1005,
         InstanceCount = 2,
-        Conditions = {},
-        Type = 'Any',
+        BuilderConditions = {},
+        BuilderType = 'Any',
         LocationType = 'MAIN',
-        Data = {
+        BuilderData = {
             NeedGuard = true,
             DesiresAssist = false,
             Construction = {

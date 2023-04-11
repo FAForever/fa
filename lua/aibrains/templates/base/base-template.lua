@@ -1,8 +1,8 @@
 ---@declare-global
 
 ---@class AIBaseTemplate
----@field Identifier string                         # Unique identifier to reference the base template
----@field BuilderGroupTemplates string[]            # List of names of builder groups
+---@field BaseTemplateName string           # Unique identifier to reference the base template
+---@field BuilderGroupTemplates string[]    # List of names of builder groups
 ---@field BuilderGroupTemplatesNonCheating string[] # List of names of builder groups when AI does not have `SallyShears` enabled
 
 ---@type table<string, AIBaseTemplate>
@@ -20,8 +20,8 @@ AIBaseTemplate = function(spec)
     end
 
     -- should have a name, as that is used as its identifier
-    if not spec.Identifier then
-        WARN('Base builder template excluded for missing field "Identifier": ', reprs(spec))
+    if not spec.BaseTemplateName then
+        WARN('Base builder template excluded for missing field "BaseTemplateName": ', reprs(spec))
         return
     end
 
@@ -32,17 +32,16 @@ AIBaseTemplate = function(spec)
     end
 
     -- overwrite any existing definitions
-    if AIBaseTemplates[spec.Identifier] then
-        SPEW(string.format('Overwriting base template: %s', spec.Identifier))
+    if AIBaseTemplates[spec.BaseTemplateName] then
+        SPEW(string.format('Overwriting base template: %s', spec.BaseTemplateName))
         for k,v in spec do
-            AIBaseTemplates[spec.Identifier][k] = v
+            AIBaseTemplates[spec.BaseTemplateName][k] = v
         end
 
     -- first one, we become the definition
     else
-        AIBaseTemplates[spec.Identifier] = spec
+        AIBaseTemplates[spec.BaseTemplateName] = spec
     end
 
-    LOG(spec.Identifier)
-    return spec.Identifier
+    return spec.BaseTemplateName
 end

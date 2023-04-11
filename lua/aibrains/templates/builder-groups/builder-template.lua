@@ -8,10 +8,10 @@
 ---@alias AIBuilderType 'Any' | 'Land' | 'Air' | 'Sea' | 'Gate' 
 
 ---@class AIBuilderTemplate
----@field Conditions AIBuilderCondition[]
----@field Data table
----@field Identifier string
----@field Type AIBuilderType
+---@field BuilderConditions AIBuilderCondition[]
+---@field BuilderData table
+---@field BuilderName string
+---@field BuilderType AIBuilderType
 ---@field Priority number
 ---@field PriorityFunction fun(brain: AIBrain, base: AIBase)
 ---@field PlatoonTemplate? string
@@ -35,8 +35,8 @@ AIBuilderTemplate = function(spec)
     end
 
     -- should have a name, as that is used as its identifier
-    if not spec.Identifier then 
-        WARN('Builder excluded for missing field "Identifier": ', reprs(spec))
+    if not spec.BuilderName then 
+        WARN('Builder excluded for missing field "BuilderName": ', reprs(spec))
         return
     end
 
@@ -47,27 +47,27 @@ AIBuilderTemplate = function(spec)
     end
 
     -- should have a type
-    if not spec.Type then 
-        WARN('Builder excluded for missing field "Type": ', reprs(spec))
+    if not spec.BuilderType then 
+        WARN('Builder excluded for missing field "BuilderType": ', reprs(spec))
         return
     end
 
     -- default value
-    if not spec.Data then
-        spec.Data = {}
+    if not spec.BuilderData then
+        spec.BuilderData = {}
     end
 
     -- overwrite any existing definitions
-    if AIBuilderTemplates[spec.Identifier] then
-        LOG(string.format('Overwriting builder: %s', spec.Identifier))
+    if AIBuilderTemplates[spec.BuilderName] then
+        LOG(string.format('Overwriting builder: %s', spec.BuilderName))
         for k,v in spec do
-            AIBuilderTemplates[spec.Identifier][k] = v
+            AIBuilderTemplates[spec.BuilderName][k] = v
         end
 
     -- first one, we become the definition
     else
-        AIBuilderTemplates[spec.Identifier] = spec
+        AIBuilderTemplates[spec.BuilderName] = spec
     end
 
-    return spec.Identifier
+    return spec.BuilderName
 end

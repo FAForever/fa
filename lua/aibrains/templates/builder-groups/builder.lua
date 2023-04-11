@@ -10,8 +10,8 @@ local TableDeepCopy = table.deepcopy
 ---@field [2] table
 
 ---@class AIBuilder
----@field Conditions AIBuilderCondition[]       # Converted conditions from the builder template
----@field Data table                            # Converted data from the builder template
+---@field BuilderConditions AIBuilderCondition[]       # Converted conditions from the builder template
+---@field BuilderData table                            # Converted data from the builder template
 ---@field DisabledUntilTick number      # Allows us to temporarily disable builders
 ---@field EvaluatedAtTick number        # Allows us to cache evaluation results
 ---@field EvaluatedStatus boolean       # Allows us to cache evaluation results
@@ -35,8 +35,9 @@ AIBuilder = ClassSimple {
         -- copy over and convert conditions
         ---@type AIBuilderCondition[]
         local conditions = { }
-        if template.Conditions then
-            for k, data in template.Conditions do
+        self.BuilderConditions = conditions
+        if template.BuilderConditions then
+            for k, data in template.BuilderConditions do
                 -- pre-import the function
                 ---@type function
                 local func = import(data[1])[2]
@@ -46,15 +47,13 @@ AIBuilder = ClassSimple {
             end
         end
 
-        self.Conditions = conditions
-
         -- TODO PERFORMANCE: is this _really _ required here?
         -- copy over and convert builder data
-        if template.Data then
-            local data = TableDeepCopy(template.Data)
+        if template.BuilderData then
+            local data = TableDeepCopy(template.BuilderData)
             data.Brain = brain
             data.Base = base
-            self.Data = data
+            self.BuilderData = data
         end
     end,
 
@@ -75,7 +74,7 @@ AIBuilder = ClassSimple {
             return self.EvaluatedStatus
         else
             local status = true
-            for _, condition in self.Conditions do
+            for _, condition in self.BuilderConditions do
                 if not condition[1](brain, base, unpack(condition[2])) then
                     status = false
                     break
@@ -110,36 +109,36 @@ AIBuilder = ClassSimple {
     --- Retrieves the priority
     ---@param self AIBuilder
     ---@return number
-    GetPriority = function(self)
+    GetBuilderPriority = function(self)
         return self.Priority
     end,
 
     --- Retrieves the builder template
     ---@param self AIBuilder
     ---@return AIBuilderTemplate
-    GetTemplate = function(self)
+    GetBuilderTemplate = function(self)
         return self.Template
     end,
 
     --- Retrieves the (converted) builder data
     ---@param self AIBuilder
     ---@return AIBuilderTemplate
-    GetData = function(self)
-        return self.Data
+    GetBuilderData = function(self)
+        return self.BuilderData
     end,
 
     --- Retrieves the identifier of the builder template
     ---@param self AIBuilder
     ---@return string
-    GetIdentifier = function(self)
-        return self.Template.Identifier
+    GetBuilderName = function(self)
+        return self.Template.BuilderName
     end,
 
     ---- Retrieves the type of the builder template
     ---@param self AIBuilder
     ---@return BuilderType
-    GetType = function(self)
-        return self.Template.Type
+    GetBuilderType = function(self)
+        return self.Template.BuilderType
     end,
 
     --- Retrieves the identifier of the platoon template from the builder template

@@ -1,16 +1,16 @@
 
 AIBuilderGroupTemplate {
-    Identifier = 'EasyEngineerPowerBuilders',
+    BuilderGroupName = 'EasyEngineerPowerBuilders',
     ManagerName = 'EngineerManager',
 
     AIBuilderTemplate {
-        Identifier = 'Easy - T1 Power Engineer',
+        BuilderName = 'Easy - T1 Power Engineer',
         PlatoonTemplate = 'EngineerBuilder',
         Priority = 1100,
-        Conditions = { },
-        Type = 'Any',
+        BuilderConditions = { },
+        BuilderType = 'Any',
         LocationType = 'MAIN',
-        Data = {
+        BuilderData = {
             Construction = {
                 AdjacencyCategory = categories.FACTORY * categories.STRUCTURE - categories.NAVAL,
                 BuildStructures = {

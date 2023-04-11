@@ -45,7 +45,8 @@ AIBase = ClassSimple {
     -- builder interface
 
     --- Adds all builders of the given base template to this base
-    --- For reference, see `GlobalBaseTemplate.lua` file
+    --- 
+    --- For reference, see `base-template.lua` file
     ---@param self AIBase
     ---@param baseTemplateIdentifier string
     AddBaseTemplate = function(self, baseTemplateIdentifier)
@@ -53,8 +54,6 @@ AIBase = ClassSimple {
         if not aiBaseTemplate then
             WARN(string.format("AI Base - Unknown base template: %s", baseTemplateIdentifier))
         end
-
-        reprsl(baseTemplateIdentifier)
 
         -- add default builders
         local builders = aiBaseTemplate.BuilderGroupTemplates
@@ -74,7 +73,8 @@ AIBase = ClassSimple {
     end,
 
     --- Adds all builders of the given builder group to the managers of this base
-    --- For reference, see `GlobalBuilderGroup` file
+    ---
+    --- For reference, see `builder-group-template.lua` and `builder-template.lua` files
     AddBuilderGroup = function(self, builderGroupName)
         local aiBuilderGroupTemplate = AIBuilderGroupTemplates[builderGroupName]
         if not aiBuilderGroupTemplate then

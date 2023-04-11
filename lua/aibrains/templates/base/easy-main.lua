@@ -1,6 +1,6 @@
 
 AIBaseTemplate {
-    Identifier = 'AIBaseTemplate - Easy main',
+    BaseTemplateName = 'AIBaseTemplate - Easy main',
     BuilderGroupTemplates = {
         "EasyEngineerFactoryBuilders",
         "EasyEngineerExtractorBuilders",

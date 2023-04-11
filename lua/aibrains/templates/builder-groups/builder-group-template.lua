@@ -3,7 +3,7 @@
 ---@alias AIBuilderGroupManager 'EngineeManager' | 'FactoryManager' | 'StructureManager'
 
 ---@class AIBuilderGroupTemplate : string[]
----@field Identifier string
+---@field BuilderGroupName string
 ---@field ManagerName AIBuilderGroupManager
 
 --- Global list of all builder groups
@@ -21,8 +21,8 @@ function AIBuilderGroupTemplate(spec)
     end
 
     -- should have a name, as that is used as its identifier
-    if not spec.Identifier then
-        WARN('Builder group excluded for missing "Identifier": ', reprs(spec))
+    if not spec.BuilderGroupName then
+        WARN('Builder group excluded for missing "BuilderGroupName": ', reprs(spec))
         return
     end
 
@@ -33,16 +33,16 @@ function AIBuilderGroupTemplate(spec)
     end
 
     -- overwrite any existing definitions
-    if AIBuilderGroupTemplates[spec.Identifier] then
-        SPEW(string.format('Overwriting builder group template: %s', spec.Identifier))
+    if AIBuilderGroupTemplates[spec.BuilderGroupName] then
+        SPEW(string.format('Overwriting builder group template: %s', spec.BuilderGroupName))
         for k, v in spec do
-            AIBuilderGroupTemplates[spec.Identifier][k] = v
+            AIBuilderGroupTemplates[spec.BuilderGroupName][k] = v
         end
 
         -- first one, we become the definition
     else
-        AIBuilderGroupTemplates[spec.Identifier] = spec
+        AIBuilderGroupTemplates[spec.BuilderGroupName] = spec
     end
 
-    return spec.Identifier
+    return spec.BuilderGroupName
 end

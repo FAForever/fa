@@ -255,27 +255,22 @@ AIEngineerManager = Class(AIBuilderManager) {
     ---@param self AIEngineerManager
     ---@param unit Unit
     TaskFinished = function(self, unit)
-        if VDist3(self.Location, unit:GetPosition()) > self.Radius and
-            not EntityCategoryContains(categories.COMMAND, unit) then
-            self:ReassignUnit(unit)
-        else
-            self:ForkEngineerTask(unit)
-        end
+        self:ForkEngineerTask(unit)
     end,
 
-    --- Called by a platoon of the engineer as it is being disbanded
-    --- 
-    --- `Time complexity: O(1)`
-    --- 
-    --- `Memory complexity: O(1)`
-    ---@param self AIEngineerManager
-    ---@param builderName string
-    AssignTimeout = function(self, builderName)
-        local oldPri = self:GetBuilderPriority(builderName)
-        if oldPri then
-            self:SetBuilderPriority(builderName, 0, true)
-        end
-    end,
+    -- --- Called by a platoon of the engineer as it is being disbanded
+    -- --- 
+    -- --- `Time complexity: O(1)`
+    -- --- 
+    -- --- `Memory complexity: O(1)`
+    -- ---@param self AIEngineerManager
+    -- ---@param builderName string
+    -- AssignTimeout = function(self, builderName)
+    --     local oldPri = self:GetBuilderPriority(builderName)
+    --     if oldPri then
+    --         self:SetBuilderPriority(builderName, 0, true)
+    --     end
+    -- end,
 
     --------------------------------------------------------------------------------------------
     -- unit interface
@@ -525,7 +520,6 @@ AIEngineerManager = Class(AIBuilderManager) {
             --LOG('*AI DEBUG: ARMY ', repr(self.Brain:GetArmyIndex()),': Engineer Manager Forming - ',repr(builder.BuilderName),' - Priority: ', builder:GetPriority())
             platoon.PlanName = template[2]
 
-            --If we have specific AI, fork that AI thread
             local aiFunc = builder:GetPlatoonAIFunction()
             if aiFunc then
                 platoon:StopAI()
@@ -538,10 +532,10 @@ AIEngineerManager = Class(AIBuilderManager) {
                 platoon:SetAIPlan(aiPlan)
             end
 
-            platoon.Priority = builder:GetPriority()
-            platoon.BuilderName = builder:GetIdentifier()
+            platoon.Priority = builder:GetBuilderPriority()
+            platoon.BuilderName = builder:GetBuilderName()
 
-            platoon:SetPlatoonData(builder:GetData())
+            platoon:SetPlatoonData(builder:GetBuilderData())
 
             if platoon.PlatoonData.DesiresAssist then
                 unit.DesiresAssist = platoon.PlatoonData.DesiresAssist
