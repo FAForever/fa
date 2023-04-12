@@ -1,12 +1,8 @@
--- ****************************************************************************
--- **
--- **  File     :  /lua/terranunits.lua
--- **  Author(s): John Comes, Dave Tomandl, Gordon Duclos
--- **
--- **  Summary  :
--- **
--- **  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
--- ****************************************************************************
+-- File     :  /lua/terranunits.lua
+-- Author(s): John Comes, Dave Tomandl, Gordon Duclos
+-- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+------------------------------------------------------------------
+
 ---------------------------------------------------------------------------
 -- TERRAN DEFAULT UNITS
 ---------------------------------------------------------------------------
@@ -17,7 +13,6 @@ local LandFactoryUnit = DefaultUnitsFile.LandFactoryUnit
 local RadarJammerUnit = DefaultUnitsFile.RadarJammerUnit
 local SeaFactoryUnit = DefaultUnitsFile.SeaFactoryUnit
 local AmphibiousLandUnit = DefaultUnitsFile.AmphibiousLandUnit
-
 local EffectUtil = import("/lua/effectutilities.lua")
 local CreateBuildCubeThread = EffectUtil.CreateBuildCubeThread
 
@@ -25,16 +20,17 @@ local CreateBuildCubeThread = EffectUtil.CreateBuildCubeThread
 --  AIR FACTORY STRUCTURES
 --------------------------------------------------------------
 ---@class TAirFactoryUnit : AirFactoryUnit
+---@field BuildEffectsBag TrashBag
 TAirFactoryUnit = ClassUnit(AirFactoryUnit) {
 
     ---@param self TAirFactoryUnit
     ---@param unitBeingBuilt Unit
     ---@param order string
     CreateBuildEffects = function(self, unitBeingBuilt, order)
-        WaitSeconds(0.1)
+        WaitTicks(2)
         for _, v in self.BuildEffectBones do
             self.BuildEffectsBag:Add(CreateAttachedEmitter(self, v, self.Army, '/effects/emitters/flashing_blue_glow_01_emit.bp'))
-            self.BuildEffectsBag:Add(self:ForkThread(EffectUtil.CreateDefaultBuildBeams, unitBeingBuilt, {v}, self.BuildEffectsBag))
+            self.BuildEffectsBag:Add(self.Trash:Add(ForkThread(EffectUtil.CreateDefaultBuildBeams, unitBeingBuilt, {v}, self.BuildEffectsBag,self)))
         end
     end,
 
@@ -53,7 +49,7 @@ TAirFactoryUnit = ClassUnit(AirFactoryUnit) {
     end,
 
     ---@param self TAirFactoryUnit
-    ---@param unitBeingBuilt boolean
+    ---@param unitBeingBuilt Unit
     ---@param order string
     OnStartBuild = function(self, unitBeingBuilt, order)
         AirFactoryUnit.OnStartBuild(self, unitBeingBuilt, order)
@@ -63,7 +59,7 @@ TAirFactoryUnit = ClassUnit(AirFactoryUnit) {
     end,
 
     ---@param self TAirFactoryUnit
-    ---@param unitBuilding boolean
+    ---@param unitBuilding Unit
     OnStopBuild = function(self, unitBuilding)
         AirFactoryUnit.OnStopBuild(self, unitBuilding)
         self:StopArmsMoving()
@@ -78,7 +74,7 @@ TAirFactoryUnit = ClassUnit(AirFactoryUnit) {
     ---@param self TAirFactoryUnit
     StartArmsMoving = function(self)
         if not self.ArmsThread then
-            self.ArmsThread = self:ForkThread(self.MovingArmsThread)
+            self.ArmsThread = self.Trash:Add(ForkThread(self.MovingArmsThread,self))
         end
     end,
 
@@ -117,6 +113,8 @@ TConcreteStructureUnit = ClassUnit(DefaultUnitsFile.ConcreteStructureUnit) {}
 --  Construction Units
 --------------------------------------------------------------
 ---@class TConstructionUnit : ConstructionUnit
+---@field BuildEffectsBag TrashBag
+---@field BuildEffectBones string[] 
 TConstructionUnit = ClassUnit(ConstructionUnit) {
 
     ---@param self TConstructionUnit
@@ -125,7 +123,7 @@ TConstructionUnit = ClassUnit(ConstructionUnit) {
     OnStopBeingBuilt = function(self, builder, layer)
         ConstructionUnit.OnStopBeingBuilt(self, builder, layer)
         if self.Layer == 'Water' then
-            self.TerrainLayerTransitionThread = self:ForkThread(self.TransformThread, true)
+            self.TerrainLayerTransitionThread = self.Trash:Add(ForkThread(self.TransformThread, true,self))
         end
     end,
 
@@ -151,7 +149,7 @@ TConstructionUnit = ClassUnit(ConstructionUnit) {
                 self.TerrainLayerTransitionThread = nil
             end
             if (old ~= 'None') then
-                self.TerrainLayerTransitionThread = self:ForkThread(self.TransformThread, (new == 'Water'))
+                self.TerrainLayerTransitionThread = self.Trash:Add(ForkThread(self.TransformThread, (new == 'Water'),self))
             end
         end
     end,
@@ -205,10 +203,10 @@ TLandFactoryUnit = ClassUnit(LandFactoryUnit) {
     ---@param unitBeingBuilt Unit
     ---@param order string
     CreateBuildEffects = function(self, unitBeingBuilt, order)
-        WaitSeconds(0.1)
+        WaitTicks(2)
         for _, v in self.BuildEffectBones do
             self.BuildEffectsBag:Add(CreateAttachedEmitter(self, v, self.Army, '/effects/emitters/flashing_blue_glow_01_emit.bp'))
-            self.BuildEffectsBag:Add(self:ForkThread(EffectUtil.CreateDefaultBuildBeams, unitBeingBuilt, {v}, self.BuildEffectsBag))
+            self.BuildEffectsBag:Add(self.Trash:Add(ForkThread(EffectUtil.CreateDefaultBuildBeams, unitBeingBuilt, {v}, self.BuildEffectsBag,self)))
         end
     end,
 }
@@ -246,10 +244,10 @@ TMobileFactoryUnit = ClassUnit(AmphibiousLandUnit) {
     ---@param builder Unit
     ---@param layer Layer
     StartBeingBuiltEffects = function(self, builder, layer)
-        self:SetMesh(self:GetBlueprint().Display.BuildMeshBlueprint, true)
+        self:SetMesh(self.Blueprint.Display.BuildMeshBlueprint, true)
         if self:GetBlueprint().General.UpgradesFrom  ~= builder.UnitId then
             self:HideBone(0, true)
-            self.OnBeingBuiltEffectsBag:Add(self:ForkThread(CreateBuildCubeThread, builder, self.OnBeingBuiltEffectsBag))
+            self.OnBeingBuiltEffectsBag:Add(self.Trash:Add(ForkThread(CreateBuildCubeThread, builder, self.OnBeingBuiltEffectsBag,self)))
         end
     end,
 }
@@ -270,15 +268,16 @@ TSonarUnit = ClassUnit(DefaultUnitsFile.SonarUnit) {}
 --  SEA FACTORY STRUCTURES
 --------------------------------------------------------------
 ---@class TSeaFactoryUnit : SeaFactoryUnit
+---@field BuildEffectsBag TrashBag
 TSeaFactoryUnit = ClassUnit(SeaFactoryUnit) {
     ---@param self TSeaFactoryUnit
     ---@param unitBeingBuilt Unit
     ---@param order string
     CreateBuildEffects = function(self, unitBeingBuilt, order)
-        WaitSeconds(0.1)
+        WaitTicks(2)
         for _, v in self.BuildEffectBones do
             self.BuildEffectsBag:Add(CreateAttachedEmitter(self, v, self.Army, '/effects/emitters/flashing_blue_glow_01_emit.bp'))
-            self.BuildEffectsBag:Add(self:ForkThread(EffectUtil.CreateDefaultBuildBeams, unitBeingBuilt, {v}, self.BuildEffectsBag))
+            self.BuildEffectsBag:Add(self.Trash:Add(ForkThread(EffectUtil.CreateDefaultBuildBeams, unitBeingBuilt, {v}, self.BuildEffectsBag,self)))
         end
     end,
 
@@ -307,7 +306,7 @@ TSeaFactoryUnit = ClassUnit(SeaFactoryUnit) {
     end,
 
     ---@param self TSeaFactoryUnit
-    ---@param unitBuilding boolean
+    ---@param unitBuilding Unit
     OnStopBuild = function(self, unitBuilding)
         SeaFactoryUnit.OnStopBuild(self, unitBuilding)
         self:StopArmsMoving()
@@ -322,7 +321,7 @@ TSeaFactoryUnit = ClassUnit(SeaFactoryUnit) {
     ---@param self TSeaFactoryUnit
     StartArmsMoving = function(self)
         if not self.ArmsThread then
-            self.ArmsThread = self:ForkThread(self.MovingArmsThread)
+            self.ArmsThread = self.Trash:Add(ForkThread(self.MovingArmsThread,self))
         end
     end,
 
@@ -430,6 +429,7 @@ TShieldSeaUnit = ClassUnit(DefaultUnitsFile.ShieldSeaUnit) {}
 --  Pod Tower Unit (Kennels)
 --------------------------------------------------------------
 ---@class TPodTowerUnit : TStructureUnit
+---@field PodData any
 TPodTowerUnit = ClassUnit(TStructureUnit) {
 
     ---@param self TPodTowerUnit
@@ -507,7 +507,7 @@ TPodTowerUnit = ClassUnit(TStructureUnit) {
     ---@param order string
     OnStartBuild = function(self, unitBeingBuilt, order)
         TStructureUnit.OnStartBuild(self,unitBeingBuilt,order)
-        local unitid = self:GetBlueprint().General.UpgradesTo
+        local unitid = self.Blueprint.General.UpgradesTo
         if unitBeingBuilt.UnitId == unitid and order == 'Upgrade' then
             self.NowUpgrading = true
             ChangeState(self, self.UpgradingState)
@@ -523,7 +523,7 @@ TPodTowerUnit = ClassUnit(TStructureUnit) {
     ---@param self TPodTowerUnit
     ---@param podData any
     SetPodConsumptionRebuildRate = function(self, podData)
-        local bp = self:GetBlueprint()
+        local bp = self.Blueprint
         -- Get build rate of tower
         local buildRate = bp.Economy.BuildRate
 
@@ -565,7 +565,7 @@ TPodTowerUnit = ClassUnit(TStructureUnit) {
             PodAttached = PodAttached + 1
         end
         if PodAttached == PodPresent and self.OpeningAnimationStarted then
-            local bp = self:GetBlueprint()
+            local bp = self.Blueprint
             if not self.OpenAnim then return end
             self.OpenAnim:SetRate(1.5)
             self.OpeningAnimationStarted = false
@@ -580,7 +580,7 @@ TPodTowerUnit = ClassUnit(TStructureUnit) {
         self:RequestRefreshUI()
         if not self.OpeningAnimationStarted then
             self.OpeningAnimationStarted = true
-            local bp = self:GetBlueprint()
+            local bp = self.Blueprint
             if not self.OpenAnim then
                 self.OpenAnim = CreateAnimator(self)
                 self.Trash:Add(self.OpenAnim)
@@ -601,7 +601,7 @@ TPodTowerUnit = ClassUnit(TStructureUnit) {
         -- This pod may have to be passed to another unit after it upgrades.  We cannot let the trash clean it up
         -- when this unit is destroyed at the tail end of the upgrade.  Make sure the unit dies properly elsewhere.
         self.TowerCaptured = nil
-        local bp = self:GetBlueprint()
+        local bp = self.Blueprint
         for _, v in bp.Economy.EngineeringPods do
             if v.CreateWithUnit and not self.PodData[v.PodName].Active then
                 if not self.PodData then
