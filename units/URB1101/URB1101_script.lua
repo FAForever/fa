@@ -7,33 +7,13 @@ local CEnergyCreationUnit = import("/lua/cybranunits.lua").CEnergyCreationUnit
 
 ---@class URB1101 : CEnergyCreationUnit
 URB1101 = ClassUnit(CEnergyCreationUnit) {
-
     OnStopBeingBuilt = function(self,builder,layer)
         CEnergyCreationUnit.OnStopBeingBuilt(self,builder,layer)
-        ChangeState(self, self.ActiveState)
+        local myBlueprint = self.Blueprint
+        if myBlueprint.Audio.Activate then
+            self:PlaySound(myBlueprint.Audio.Activate)
+        end
     end,
-
-    ActiveState = State {
-        Main = function(self)
-            local myBlueprint = self.Blueprint
-            if myBlueprint.Audio.Activate then
-                self:PlaySound(myBlueprint.Audio.Activate)
-            end
-        end,
-
-        OnInActive = function(self)
-            ChangeState(self, self.InActiveState)
-        end,
-    },
-
-    InActiveState = State {
-        Main = function(self)
-        end,
-
-        OnActive = function(self)
-            ChangeState(self, self.ActiveState)
-        end,
-    },
 }
 
 TypeClass = URB1101
