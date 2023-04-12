@@ -9028,9 +9028,9 @@ technique SeraphimStunned_LowFidelity
     }
 }
 
-////////////////////////////////
-// Physically Based Rendering //
-////////////////////////////////
+/////////////////////////////////////////////////
+// Physically Based Rendering
+/////////////////////////////////////////////////
 
 const float PI = 3.14159265359;
 
@@ -9473,7 +9473,7 @@ float4 PBR_Seraphim(
     float roughness = saturate((1 - pow(specular.g, 0.5) + 0.3) * 0.7);
     float3 color = PBR_PS(vertex, albedo.rgb, metallic, roughness, normal, hiDefShadows).rgb;
     color = lerp(color, teamColor * 0.5, albedo.a - 0.2);
-
+ 
     float3 emission = saturate(specular.b - 0.1) + teamColor * albedo.a + whiteness * 2;
     color += emission * albedo;
 
@@ -9524,7 +9524,7 @@ float4 PBR_SeraphimBuildPS(NORMALMAPPED_VERTEX vertex, uniform bool hiDefShadows
 
 technique PBR_UEF
 <
-    string abstractTechnique = "PBR_UEF_PS";
+    string abstractTechnique = "PBR_UEF";
     int fidelity = FIDELITY_HIGH;
 
     string cartographicTechnique = "CartographicUnit";
@@ -9553,7 +9553,7 @@ technique PBR_UEF_Navy
     string depthTechnique = "Depth";
     int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
     int parameter = PARAM_FRACTIONCOMPLETE;
-
+    
     string environment = "<water>";
 >
 {
@@ -9595,7 +9595,7 @@ technique PBR_Aeon_Navy
     string depthTechnique = "Depth";
     int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
     int parameter = PARAM_FRACTIONCOMPLETE;
-
+        
     string environment = "<water>";
 >
 {
@@ -9657,7 +9657,7 @@ technique PBR_Cybran_Navy
     string depthTechnique = "Depth";
     int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
     int parameter = PARAM_FRACTIONCOMPLETE;
-
+            
     string environment = "<water>";
 >
 {
@@ -9681,9 +9681,6 @@ technique PBR_Seraphim
 
     int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
     int parameter = PARAM_FRACTIONCOMPLETE;
-
-    string environment = "<seraphim>";
-
 >
 {
     pass P0
@@ -9691,7 +9688,7 @@ technique PBR_Seraphim
         RasterizerState( Rasterizer_Cull_CW )
 
         VertexShader = compile vs_1_1 UnitFalloffVS();
-        PixelShader = compile ps_2_a PBR_Seraphim(true);
+        PixelShader = compile ps_2_a PBR_SeraphimPS(true);
     }
 }
 
@@ -9706,7 +9703,7 @@ technique PBR_Seraphim_Navy
 
     int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
     int parameter = PARAM_FRACTIONCOMPLETE;
-
+            
     string environment = "<water>";
 >
 {
@@ -9823,6 +9820,7 @@ technique PBR_SeraphimPersonalShield
     {
         AlphaState( AlphaBlend_Disable_Write_RGBA )
         RasterizerState( Rasterizer_Cull_CW )
+
         VertexShader = compile vs_1_1 UnitFalloffVS();
         PixelShader = compile ps_2_a PBR_SeraphimPS(true);
     }
