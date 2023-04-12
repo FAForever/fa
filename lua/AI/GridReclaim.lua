@@ -1,6 +1,7 @@
 local Grid = import("/lua/ai/grid.lua").Grid
 
 local TableInsert = table.insert
+local TableSort = table.sort
 
 local WeakValue = { __mode = 'v' }
 
@@ -33,7 +34,15 @@ local DebugUpdateData = {
     Updates = -1,
 }
 
+---@param a AIGridReclaimCell
+---@param b AIGridReclaimCell
+---@return boolean
+local function SortLambda (a, b)
+    return a.TotalMass > b.TotalMass
+end
+
 ---@class AIGridReclaimCell : AIGridCell
+---@field Grid AIGridReclaim
 ---@field TotalMass number
 ---@field TotalEnergy number
 ---@field ReclaimCount number
@@ -72,6 +81,25 @@ GridReclaim = Class(Grid) {
 
         self:Update()
         self:DebugUpdate()
+    end,
+
+    --- Converts a world position to a cell
+    ---@param self AIGrid
+    ---@param wx number     # in world space
+    ---@param wz number     # in world space
+    ---@return AIGridReclaimCell
+    ToCellFromWorldSpace = function(self, wx, wz)
+        local gx, gz = self:ToGridSpace(wx, wz)
+        return self.Cells[gx][gz]
+    end,
+
+    --- Converts a grid position to a cell
+    ---@param self AIGridReclaim
+    ---@param gx number     # in grid space
+    ---@param gz number     # in grid space
+    ---@return AIGridReclaimCell
+    ToCellFromGridSpace = function(self, gx, gz)
+        return self.Cells[gx][gz]
     end,
 
     ---@param self AIGridReclaim
@@ -130,16 +158,7 @@ GridReclaim = Class(Grid) {
 
         -- sort the cells
         if updates > 0 then
-            table.sort(
-                self.OrderedCells,
-
-                ---@param a AIGridReclaimCell
-                ---@param b AIGridReclaimCell
-                ---@return boolean
-                function(a, b)
-                    return a.TotalMass > b.TotalMass
-                end
-            )
+            TableSort(self.OrderedCells, SortLambda)
         end
     end,
 
@@ -167,6 +186,92 @@ GridReclaim = Class(Grid) {
         end
     end,
 
+    ---@param self AIGridReclaim   
+    ---@param bx number             # in grid space
+    ---@param bz number             # in grid space
+    ---@param radius number         # in grid space
+    ---@return AIGridReclaimCell    # most valuable cell in radius
+    MaximumInRadius = function(self, bx, bz, radius)
+        -- negative radius or a radius of 0
+        local cells = self.Cells
+        if radius <= 0 then
+            return cells[bx][bz]
+        end
+
+        local candidate = nil
+        local value = 0
+
+        -- non-negative radius, search for most valuable cell
+        for lx = -radius, radius do
+            local column = cells[bx + lx]
+            if column then
+                for lz = -radius, radius do
+                    local cell = column[bz + lz]
+                    if cell then
+                        -- any candidate is a good candidate
+                        if not candidate then
+                            candidate = cell
+                            value = cell.TotalMass
+                        -- compare if the cell we're evaluating is better
+                        else
+                            local alt = cell.TotalMass
+                            if alt > value then
+                                candidate = cell
+                                value = alt
+                            end
+                        end
+                    end
+                end
+            end
+        end
+
+        return candidate
+    end,
+
+    ---@param self AIGridReclaim   
+    ---@param bx number                 # in grid space
+    ---@param bz number                 # in grid space
+    ---@param radius number             # in grid space
+    ---@param threshold number          # 
+    ---@param cache? table              # optional value, allows you to re-use memory in hot spots
+    ---@return AIGridReclaimCell[]      # all cells that meet the threhsold
+    ---@return number                   # number of cells found
+    FilterInRadius = function(self, bx, bz, radius, threshold, cache)
+        local candidates = cache or { }
+        local head = 1
+        local cells = self.Cells
+        for lx = -radius, radius do
+            local column = cells[bx + lx]
+            if column then
+                for lz = -radius, radius do
+                    local cell = column[bz + lz]
+                    if cell then
+                        if cell.TotalMass >= threshold then
+                            candidates[head] = cell
+                            head = head + 1
+                        end
+                    end
+                end
+            end
+        end
+
+        return candidates, head - 1
+    end,
+
+    ---@param self AIGridReclaim   
+    ---@param bx number                 # in grid space
+    ---@param bz number                 # in grid space
+    ---@param radius number             # in grid space
+    ---@param threshold number          # 
+    ---@param cache? table               # optional value, allows you to re-use memory in hot spots
+    ---@return AIGridReclaimCell[]      # all cells that meet the threhsold
+    ---@return number                   # number of cells found
+    FilterAndSortInRadius = function(self, bx, bz, radius, threshold, cache)
+        local filtered, count = self:FilterInRadius(bx, bz, radius, threshold, cache)
+        TableSort(filtered, SortLambda)
+        return filtered, count
+    end,
+
     -------------------------------
     -- Reclaim related functions --
 
@@ -175,7 +280,7 @@ GridReclaim = Class(Grid) {
     ---@param prop Prop
     OnReclaimDestroyed = function(self, prop)
         local position = prop.CachePosition or prop:GetPosition()
-        local bx, bz = self:ToCellIndices(position[1], position[3])
+        local bx, bz = self:ToGridSpace(position[1], position[3])
 
         local cell = self.Cells[bx][bz]
         cell.Reclaim[prop.EntityId] = nil
@@ -190,7 +295,7 @@ GridReclaim = Class(Grid) {
     ---@param prop Prop
     OnReclaimUpdate = function(self, prop)
         local position = prop.CachePosition or prop:GetPosition()
-        local bx, bz = self:ToCellIndices(position[1], position[3])
+        local bx, bz = self:ToGridSpace(position[1], position[3])
 
         local cell = self.Cells[bx][bz]
         cell.Reclaim[prop.EntityId] = prop
@@ -225,13 +330,16 @@ GridReclaim = Class(Grid) {
     --- Allows us to scan the map
     ---@param self AIGridReclaim
     DebugUpdateThread = function(self)
+
+        local ColorRGB = import("/lua/shared/color.lua").ColorRGB
+
         while true do
             WaitTicks(1)
 
             -- mouse scanning
             if Debug then
                 local mouse = GetMouseWorldPos()
-                local bx, bz = self:ToCellIndices(mouse[1], mouse[3])
+                local bx, bz = self:ToGridSpace(mouse[1], mouse[3])
                 local cell = self.Cells[bx][bz]
 
                 local totalMass = cell.TotalMass
@@ -246,8 +354,7 @@ GridReclaim = Class(Grid) {
 
                 self:DrawCell(bx, bz, 0, 'ffffff')
 
-                local px, pz = self:ToWorldSpace(bx, bz)
-                DrawCircle({px, GetSurfaceHeight(px, pz), pz}, 4, '000000')
+                DrawCircle(self:ToWorldSpace(bx, bz), 4, '000000')
 
                 DebugCellData.ReclaimCount = cell.ReclaimCount
                 DebugCellData.TotalEnergy = cell.TotalEnergy
@@ -260,6 +367,19 @@ GridReclaim = Class(Grid) {
                 for k = 1, 8 do 
                     local cell = self.OrderedCells[k]
                     self:DrawCell(cell.X, cell.Z, 0, 'ff0000')
+                end
+
+                -- draw most valuable cell in range
+                local maximum = self:MaximumInRadius(bx, bz, 1)
+                self:DrawCell(maximum.X, maximum.Z, 1, '0000ff')
+
+                -- draw filtered and sorted cells
+                local filtered, count = self:FilterAndSortInRadius(bx, bz, 1, 500)
+                for k, cell in filtered do
+                    local factor = 1 - ((k - 1) / count)
+                    local color = ColorRGB(factor, factor, factor)
+                    self:DrawCell(cell.X, cell.Z, 2, color)
+                    self:DrawCell(cell.X, cell.Z, 2.5, color)
                 end
             end
         end
