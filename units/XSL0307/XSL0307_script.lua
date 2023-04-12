@@ -49,7 +49,10 @@ XSL0307 = ClassUnit(SShieldHoverLandUnit, ShieldEffectsComponent) {
     ---@param self XSL0307
     DisablePointer = function(self)
         self.TargetPointer:SetFireTargetLayerCaps('None')
-        self.PointerRestartThread = self.Trash:Add(ForkThread(self.PointerRestart,self))
+        
+        local thread = ForkThread(self.PointerRestart,self)
+        self.Trash:Add(thread)
+        self.PointerRestartThread = thread
     end,
 
     ---@param self XSL0307
