@@ -2392,26 +2392,27 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
     ----------------------------------------------------------------------------------------------
     -- CONSTRUCTING - BUILDING - REPAIR
     ----------------------------------------------------------------------------------------------
+
     ---@param self Unit
     SetupBuildBones = function(self)
-        local bp = self.Blueprint
-        if not bp.General.BuildBones or
-           not bp.General.BuildBones.YawBone or
-           not bp.General.BuildBones.PitchBone or
-           not bp.General.BuildBones.AimBone then
-           return
+        local buildBones = self.Blueprint.General.BuildBones
+        if  not buildBones or
+            not buildBones.YawBone or
+            not buildBones.PitchBone or
+            not buildBones.AimBone
+        then
+            return
         end
 
-        -- Syntactical reference:
-        -- CreateBuilderArmController(unit, turretBone, [barrelBone], [aimBone])
-        -- BuilderArmManipulator:SetAimingArc(minHeading, maxHeading, headingMaxSlew, minPitch, maxPitch, pitchMaxSlew)
-        self.BuildArmManipulator = CreateBuilderArmController(self, bp.General.BuildBones.YawBone or 0 , bp.General.BuildBones.PitchBone or 0, bp.General.BuildBones.AimBone or 0)
-        self.BuildArmManipulator:SetAimingArc(-180, 180, 360, -90, 90, 360)
-        self.BuildArmManipulator:SetPrecedence(5)
-        if self.BuildingOpenAnimManip and self.BuildArmManipulator then
-            self.BuildArmManipulator:Disable()
+        local buildArmManipulator = CreateBuilderArmController(self, buildBones.YawBone or 0 , buildBones.PitchBone or 0, buildBones.AimBone or 0)
+        buildArmManipulator:SetAimingArc(-180, 180, 360, -90, 90, 360)
+        buildArmManipulator:SetPrecedence(5)
+        if self.BuildingOpenAnimManip and buildArmManipulator then
+            buildArmManipulator:Disable()
         end
-        self.Trash:Add(self.BuildArmManipulator)
+
+        self.BuildArmManipulator = buildArmManipulator
+        self.Trash:Add(buildArmManipulator)
     end,
 
     ---@param self Unit
