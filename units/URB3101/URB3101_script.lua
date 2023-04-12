@@ -6,104 +6,180 @@
 local CRadarUnit = import("/lua/cybranunits.lua").CRadarUnit
 
 ---@class URB3101 : CRadarUnit
+---@field Thread1 thread
+---@field Thread2 thread
+---@field Thread3 thread
+---@field Dish1Rotator moho.RotateManipulator
+---@field Dish2Rotator moho.RotateManipulator
+---@field Dish3Rotator moho.RotateManipulator
 URB3101 = ClassUnit(CRadarUnit) {
+
+    ---@param self URB3101
+    ---@param intel IntelType
     OnIntelDisabled = function(self, intel)
         CRadarUnit.OnIntelDisabled(self, intel)
-        if (self.Thread1) then
-            KillThread(self.Thread1)
+
+        local thread1 = self.Thread1
+        if (thread1) then
+            KillThread(thread1)
             self.Thread1 = nil
+            self.Dish1Rotator:SetTargetSpeed(0)
         end
-        if (self.Thread2) then
-            KillThread(self.Thread2)
+
+        local thread2 = self.Thread2
+        if (thread2) then
+            KillThread(thread2)
             self.Thread2 = nil
+            self.Dish2Rotator:SetTargetSpeed(0)
         end
-        if (self.Thread3) then
-            KillThread(self.Thread3)
+
+        local thread3 = self.Thread3
+        if (thread3) then
+            KillThread(thread3)
             self.Thread3 = nil
+            self.Dish3Rotator:SetTargetSpeed(0)
         end
-        self.Dish1Rotator:SetTargetSpeed(0)
-        self.Dish2Rotator:SetTargetSpeed(0)
-        self.Dish3Rotator:SetTargetSpeed(0)
     end,
 
+    ---@param self URB3101
     OnIntelEnabled = function(self)
         CRadarUnit.OnIntelEnabled(self)
-        self.Thread1 = self.Trash:Add(ForkThread(self.Dish1Behavior,self))
-        self.Thread2 = self.Trash:Add(ForkThread(self.Dish2Behavior,self))
-        self.Thread3 = self.Trash:Add(ForkThread(self.Dish3Behavior,self))
+
+        local thread
+        local trash = self.Trash
+
+        thread = ForkThread(self.Dish1Behavior, self)
+        self.Thread1 = thread
+        trash:Add(thread)
+
+        thread = ForkThread(self.Dish2Behavior, self)
+        self.Thread2 = thread
+        trash:Add(thread)
+
+        thread = ForkThread(self.Dish3Behavior, self)
+        self.Thread3 = thread
+        trash:Add(thread)
     end,
 
+    ---@param self URB3101
     Dish1Behavior = function(self)
-        if not self.Dish1Rotator then
-            self.Dish1Rotator = CreateRotator(self, 'Dish01', 'x')
-            self.Trash:Add(self.Dish1Rotator)
+        local rotator = self.Dish1Rotator
+        if not rotator then
+            rotator = CreateRotator(self, 'Dish01', 'x')
+            self.Dish1Rotator = rotator
+            self.Trash:Add(rotator)
         end
-        self.Dish1Rotator:SetSpeed(5):SetGoal(0)
-        WaitFor(self.Dish1Rotator)
-        self.Dish1Rotator:SetSpeed(0)
-        self.Dish1Rotator:ClearGoal()
-        self.Dish1Rotator:SetAccel(5)
+
+        -- local scope for performance
+        local WaitFor = WaitFor
+        local WaitTicks = WaitTicks
+
+        rotator:SetSpeed(5):SetGoal(0)
+        WaitFor(rotator)
+        rotator:SetSpeed(0)
+        rotator:ClearGoal()
+        rotator:SetAccel(5)
+
         while true do
-            self.Dish1Rotator:SetTargetSpeed(-15)
-            WaitFor(self.Dish1Rotator)
-            self.Dish1Rotator:SetTargetSpeed(0)
-            WaitFor(self.Dish1Rotator)
-            if (Random() < 0.5) then WaitTicks(11) end
-            self.Dish1Rotator:SetTargetSpeed(15)
-            WaitFor(self.Dish1Rotator)
-            self.Dish1Rotator:SetTargetSpeed(0)
-            WaitFor(self.Dish1Rotator)
-            if (Random() < 0.5) then WaitTicks(11) end
+            rotator:SetTargetSpeed(-15)
+            WaitFor(rotator)
+            rotator:SetTargetSpeed(0)
+            WaitFor(rotator)
+
+            if (Random() < 0.5) then
+                WaitTicks(11)
+            end
+
+            rotator:SetTargetSpeed(15)
+            WaitFor(rotator)
+            rotator:SetTargetSpeed(0)
+            WaitFor(rotator)
+
+            if (Random() < 0.5) then
+                WaitTicks(11)
+            end
         end
     end,
 
+    ---@param self URB3101
     Dish2Behavior = function(self)
-        if not self.Dish2Rotator then
-            self.Dish2Rotator = CreateRotator(self, 'Dish02', 'x')
-            self.Trash:Add(self.Dish2Rotator)
+        local rotator = self.Dish2Rotator
+        if not rotator then
+            rotator = CreateRotator(self, 'Dish02', 'x')
+            self.Dish2Rotator = rotator
+            self.Trash:Add(rotator)
         end
-        self.Dish2Rotator:SetSpeed(5):SetGoal(0)
-        WaitFor(self.Dish2Rotator)
+
+        -- local scope for performance
+        local WaitFor = WaitFor
+        local WaitTicks = WaitTicks
+
+        rotator:SetSpeed(5):SetGoal(0)
+        WaitFor(rotator)
         WaitTicks(21)
-        self.Dish2Rotator:SetSpeed(0)
-        self.Dish2Rotator:ClearGoal()
-        self.Dish2Rotator:SetAccel(5)
+        rotator:SetSpeed(0)
+        rotator:ClearGoal()
+        rotator:SetAccel(5)
+
         while true do
-            self.Dish2Rotator:SetTargetSpeed(-15)
-            WaitFor(self.Dish2Rotator)
-            self.Dish2Rotator:SetTargetSpeed(0)
-            WaitFor(self.Dish2Rotator)
-            if (Random() < 0.4) then WaitTicks(11) end
-            self.Dish2Rotator:SetTargetSpeed(15)
-            WaitFor(self.Dish2Rotator)
-            self.Dish2Rotator:SetTargetSpeed(0)
-            WaitFor(self.Dish2Rotator)
-            if (Random() < 0.4) then WaitTicks(11) end
+            rotator:SetTargetSpeed(-15)
+            WaitFor(rotator)
+            rotator:SetTargetSpeed(0)
+            WaitFor(rotator)
+
+            if (Random() < 0.4) then
+                WaitTicks(11)
+            end
+
+            rotator:SetTargetSpeed(15)
+            WaitFor(rotator)
+            rotator:SetTargetSpeed(0)
+            WaitFor(rotator)
+
+            if (Random() < 0.4) then
+                WaitTicks(11)
+            end
         end
     end,
 
+    ---@param self URB3101
     Dish3Behavior = function(self)
-        if not self.Dish3Rotator then
-            self.Dish3Rotator = CreateRotator(self, 'Dish03', 'x')
-            self.Trash:Add(self.Dish3Rotator)
+        local rotator = self.Dish3Rotator
+        if not rotator then
+            rotator = CreateRotator(self, 'Dish03', 'x')
+            self.Dish3Rotator = rotator
+            self.Trash:Add(rotator)
         end
-        self.Dish3Rotator:SetSpeed(5):SetGoal(0)
-        WaitFor(self.Dish3Rotator)
+
+        -- local scope for performance
+        local WaitFor = WaitFor
+        local WaitTicks = WaitTicks
+
+        rotator:SetSpeed(5):SetGoal(0)
+        WaitFor(rotator)
         WaitTicks(51)
-        self.Dish3Rotator:SetSpeed(0)
-        self.Dish3Rotator:ClearGoal()
-        self.Dish3Rotator:SetAccel(5)
+        rotator:SetSpeed(0)
+        rotator:ClearGoal()
+        rotator:SetAccel(5)
+
         while true do
-            self.Dish3Rotator:SetTargetSpeed(-15)
-            WaitFor(self.Dish3Rotator)
-            self.Dish3Rotator:SetTargetSpeed(0)
-            WaitFor(self.Dish3Rotator)
-            if (Random() < 0.6) then WaitTicks(11) end
-            self.Dish3Rotator:SetTargetSpeed(15)
-            WaitFor(self.Dish3Rotator)
-            self.Dish3Rotator:SetTargetSpeed(0)
-            WaitFor(self.Dish3Rotator)
-            if (Random() < 0.6) then WaitTicks(11) end
+            rotator:SetTargetSpeed(-15)
+            WaitFor(rotator)
+            rotator:SetTargetSpeed(0)
+            WaitFor(rotator)
+
+            if (Random() < 0.6) then
+                WaitTicks(11)
+            end
+
+            rotator:SetTargetSpeed(15)
+            WaitFor(rotator)
+            rotator:SetTargetSpeed(0)
+            WaitFor(rotator)
+
+            if (Random() < 0.6) then
+                WaitTicks(11)
+            end
         end
     end,
 }
