@@ -12,24 +12,22 @@ local NullShell = import("/lua/sim/defaultprojectiles.lua").NullShell
 local EffectTemplate = import("/lua/effecttemplates.lua")
 
 UEFNukeEffect02 = Class(NullShell) {
-    
-    OnCreate = function(self)
+
+	OnCreate = function(self)
 		NullShell.OnCreate(self)
 		self:ForkThread(self.EffectThread)
-    end,
-    
-    EffectThread = function(self)
-		local army = self:GetArmy()
-		
-		
-		WaitSeconds(4)
-		for k, v in EffectTemplate.TNukeHeadEffects01 do
-			CreateEmitterOnEntity(self, army, v ) 
-		end	
+	end,
 
-		self:SetVelocity(0,3,0)
-    end,      
+	EffectThread = function(self)
+		local army = self.Army
+
+		WaitTicks(41)
+		for k, v in EffectTemplate.TNukeHeadEffects01 do
+			CreateEmitterOnEntity(self, army, v)
+		end
+
+		self:SetVelocity(0, 3, 0)
+	end,
 }
 
 TypeClass = UEFNukeEffect02
-
