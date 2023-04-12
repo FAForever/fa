@@ -110,6 +110,7 @@ function TransferUnitsOwnership(units, toArmy, captured)
 
         -- B E F O R E
         local orientation = unit:GetOrientation()
+        local workprogress = unit:GetWorkProgress()
         local numNukes = unit:GetNukeSiloAmmoCount() -- nuclear missiles; SML or SMD
         local numTacMsl = unit:GetTacticalSiloAmmoCount()
         local massKilled = unit.VetExperience
@@ -223,6 +224,10 @@ function TransferUnitsOwnership(units, toArmy, captured)
 
         if numTacMsl and numTacMsl > 0 then
             newUnit:GiveTacticalSiloAmmo(numTacMsl - newUnit:GetTacticalSiloAmmoCount())
+        end
+
+        if newUnit.Blueprint.CategoriesHash["SILO"] then
+            newUnit:GiveNukeSiloBlocks(workprogress)
         end
 
         local newShield = newUnit.MyShield
