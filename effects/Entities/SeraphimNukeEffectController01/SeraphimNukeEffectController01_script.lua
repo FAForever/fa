@@ -1,4 +1,3 @@
----------------------------------------------------------------------------------------------------------
 -- File     :  /effects/Entities/SeraphimNukeEffectController01/SeraphimNukeEffectController01_script.lua
 -- Author(s):  Gordon Duclos
 -- Summary  :  Seraphim nuclear explosion script
@@ -24,7 +23,7 @@ SeraphimNukeEffectController01 = Class(NullShell) {
         local offsetMultiple = 10.0
         local px, pz
 
-        WaitSeconds(3.5)
+        WaitTicks(36)
         for i = 0, (num_projectiles -1) do
             xVec = (math.sin(angleInitial + (i*horizontal_angle)))
             zVec = (math.cos(angleInitial + (i*horizontal_angle)))
@@ -48,7 +47,7 @@ SeraphimNukeEffectController01 = Class(NullShell) {
         local offsetMultiple = 0.0
         local px, pz
 
-        WaitSeconds(3.5)
+        WaitTicks(36)
         for i = 0, (num_projectiles -1) do
             xVec = (math.sin(angleInitial + (i*horizontal_angle)))
             zVec = (math.cos(angleInitial + (i*horizontal_angle)))
@@ -66,36 +65,37 @@ SeraphimNukeEffectController01 = Class(NullShell) {
         self:ForkThread(self.CreateEffectInnerPlasma)
         self:ForkThread(self.CreateEffectElectricity)
         local position = self:GetPosition()
+        local army = self.Army
 
         -- Knockdown force rings
         DamageRing(self, position, 0.1, 45, 1, 'Force', true)
-        WaitSeconds(0.1)
+        WaitTicks(2)
         DamageRing(self, position, 0.1, 45, 1, 'Force', true)
 
         -- Create full-screen glow flash
-        CreateLightParticle(self, -1, self.Army, 140, 10, 'glow_02', 'ramp_blue_22')
-        WaitSeconds(0.3)
-        CreateLightParticle(self, -1, self.Army, 80, 36, 'glow_02', 'ramp_blue_16')
+        CreateLightParticle(self, -1, army, 140, 10, 'glow_02', 'ramp_blue_22')
+        WaitTicks(4)
+        CreateLightParticle(self, -1, army, 80, 36, 'glow_02', 'ramp_blue_16')
 
         -- Create explosion effects
         for k, v in EffectTemplate.SIFExperimentalStrategicMissileHit01 do
-            emit = CreateEmitterAtEntity(self, self.Army, v)
+            emit = CreateEmitterAtEntity(self, army, v)
         end
         
-        WaitSeconds(3.0)
-        CreateLightParticle(self, -1, self.Army, 160, 6, 'glow_02', 'ramp_blue_16')
-        WaitSeconds(0.1)
-        CreateLightParticle(self, -1, self.Army, 60, 60, 'glow', 'ramp_blue_22')
+        WaitTicks(31)
+        CreateLightParticle(self, -1, army, 160, 6, 'glow_02', 'ramp_blue_16')
+        WaitTicks(2)
+        CreateLightParticle(self, -1, army, 60, 60, 'glow', 'ramp_blue_22')
 
         -- Create detonate effects
         for k, v in EffectTemplate.SIFExperimentalStrategicMissileDetonate01 do
-            emit = CreateEmitterAtEntity(self, self.Army, v)
+            emit = CreateEmitterAtEntity(self, army, v)
         end
 
         -- Create ground decals
         local orientation = RandomFloat(0,2*math.pi)
-        CreateDecal(position, orientation, 'Scorch_012_albedo', '', 'Albedo', 300, 300, 1200, 0, self.Army)
-        CreateDecal(position, orientation, 'Crater01_normals', '', 'Normals', 150, 150, 1200, 0, self.Army)
+        CreateDecal(position, orientation, 'Scorch_012_albedo', '', 'Albedo', 300, 300, 1200, 0, army)
+        CreateDecal(position, orientation, 'Crater01_normals', '', 'Normals', 150, 150, 1200, 0, army)
 
         -- Create explosion dust ring
         local vx, vy, vz = self:GetVelocity()
@@ -126,7 +126,7 @@ SeraphimNukeEffectController01 = Class(NullShell) {
         plume:SetCollision(false)
         plume:SetVelocityAlign(true)
 
-        WaitSeconds(1.0)
+        WaitTicks(11)
 
         -- Create fireball plumes to accentuate the explosive detonation
         local num_projectiles = 15

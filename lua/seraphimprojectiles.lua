@@ -28,6 +28,10 @@ SIFHuAntiNuke = ClassProjectile(SinglePolyTrailProjectile) {
 SIFKhuAntiNukeTendril = ClassProjectile(EmitterProjectile) {
     FxImpactTrajectoryAligned = false,
     FxTrails = EffectTemplate.SKhuAntiNukeHitTendrilFxTrails,
+
+    OnCreate = function(self)
+        SIFKhuAntiNukeTendril.OnCreate(self)
+    end,
 }
 
 ---@class SIFKhuAntiNukeSmallTendril : EmitterProjectile
