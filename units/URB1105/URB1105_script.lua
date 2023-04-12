@@ -11,16 +11,12 @@ URB1105 = ClassUnit(CEnergyStorageUnit) {
 
     OnStopBeingBuilt = function(self,builder,layer)
         CEnergyStorageUnit.OnStopBeingBuilt(self,builder,layer)
-        self.Trash:Add(ForkThread(self.AnimThread,self))
-    end,
-
-    AnimThread = function(self)
-        local myBlueprint = self.Blueprint
-        if myBlueprint.Audio.Activate then
-            self:PlaySound(myBlueprint.Audio.Activate)
+        local audio = self.Blueprint.Audio.DoneBeingBuilt
+        if audio then
+            self:PlaySound(audio)
         end
 
-        local sliderManip = CreateStorageManip(self, 'Lift', 'ENERGY', 0, 0, 0, 0, .8, 0)
+        self.Trash:Add(CreateStorageManip(self, 'Lift', 'ENERGY', 0, 0, 0, 0, .8, 0))
     end,
 }
 
