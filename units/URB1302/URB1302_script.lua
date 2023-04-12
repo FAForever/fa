@@ -3,37 +3,7 @@
 -- Summary  :  Cybran Tier 2 Mass Extractor Script
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 ------------------------------------------------------------------
-local CMassCollectionUnit = import("/lua/cybranunits.lua").CMassCollectionUnit
 
 ---@class URB1302 : CMassCollectionUnit
-URB1302 = ClassUnit(CMassCollectionUnit) {
-
-    OnStopBeingBuilt = function(self, builder, layer)
-        CMassCollectionUnit.OnStopBeingBuilt(self, builder, layer)
-        self.AnimationManipulator = CreateAnimator(self)
-        self.Trash:Add(self.AnimationManipulator)
-        self.AnimationManipulator:PlayAnim(self.Blueprint.Display.AnimationOpen, true)
-    end,
-
-    OnStartBuild = function(self, unitBeingBuilt, order)
-        CMassCollectionUnit.OnStartBuild(self, unitBeingBuilt, order)
-        if not self.AnimationManipulator then return end
-        self.AnimationManipulator:SetRate(0)
-        self.AnimationManipulator:Destroy()
-        self.AnimationManipulator = nil
-    end,
-
-    OnProductionPaused = function(self)
-        CMassCollectionUnit.OnProductionPaused(self)
-        if not self.AnimationManipulator then return end
-        self.AnimationManipulator:SetRate(0)
-    end,
-
-    OnProductionUnpaused = function(self)
-        CMassCollectionUnit.OnProductionUnpaused(self)
-        if not self.AnimationManipulator then return end
-        self.AnimationManipulator:SetRate(1)
-    end,
-}
-
+URB1302 = ClassUnit(import("/lua/cybranunits.lua").CMassCollectionUnit) { }
 TypeClass = URB1302

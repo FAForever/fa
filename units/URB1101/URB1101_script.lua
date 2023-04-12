@@ -6,14 +6,6 @@
 local CEnergyCreationUnit = import("/lua/cybranunits.lua").CEnergyCreationUnit
 
 ---@class URB1101 : CEnergyCreationUnit
-URB1101 = ClassUnit(CEnergyCreationUnit) {
-    OnStopBeingBuilt = function(self,builder,layer)
-        CEnergyCreationUnit.OnStopBeingBuilt(self,builder,layer)
-        local audio = self.Blueprint.Audio.DoneBeingBuilt
-        if audio then
-            self:PlaySound(audio)
-        end
-    end,
-}
+URB1101 = ClassUnit(CEnergyCreationUnit) { }
 
 TypeClass = URB1101

@@ -23,6 +23,7 @@ local QuantumGateUnit = DefaultUnitsFile.QuantumGateUnit
 local RadarJammerUnit = DefaultUnitsFile.RadarJammerUnit
 local CommandUnit = DefaultUnitsFile.CommandUnit
 local RadarUnit = DefaultUnitsFile.RadarUnit
+local MassCollectionUnit = DefaultUnitsFile.MassCollectionUnit
 
 local EffectTemplate = import("/lua/effecttemplates.lua")
 local EffectUtil = import("/lua/effectutilities.lua")
@@ -574,7 +575,40 @@ CLandUnit = ClassUnit(DefaultUnitsFile.LandUnit) {}
 
 -- MASS COLLECTION UNITS
 ---@class CMassCollectionUnit : MassCollectionUnit
-CMassCollectionUnit = ClassUnit(DefaultUnitsFile.MassCollectionUnit) {}
+---@field AnimationManipulator moho.AnimationManipulator
+CMassCollectionUnit = ClassUnit(MassCollectionUnit) {
+
+    ---@param self CMassCollectionUnit
+    PlayActiveAnimation = function(self)
+        MassCollectionUnit.PlayActiveAnimation(self)
+
+        local animationManipulator = self.AnimationManipulator
+        if not animationManipulator then
+            animationManipulator = CreateAnimator(self)
+            self.Trash:Add(animationManipulator)
+            self.AnimationManipulator = animationManipulator
+        end
+
+        animationManipulator:PlayAnim(self.Blueprint.Display.AnimationOpen, true)
+    end,
+
+    ---@param self CMassCollectionUnit
+    OnProductionPaused = function(self)
+        MassCollectionUnit.OnProductionPaused(self)
+        local animationManipulator = self.AnimationManipulator
+        if not animationManipulator then return end
+        animationManipulator:SetRate(0)
+    end,
+
+    ---@param self CMassCollectionUnit
+    OnProductionUnpaused = function(self)
+        MassCollectionUnit.OnProductionUnpaused(self)
+        local animationManipulator = self.AnimationManipulator
+        if not animationManipulator then return end
+        animationManipulator:SetRate(1)
+    end,
+
+}
 
 --  MASS FABRICATION UNITS
 ---@class CMassFabricationUnit : MassFabricationUnit

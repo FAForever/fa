@@ -9,10 +9,6 @@ local CMassStorageUnit = import("/lua/cybranunits.lua").CMassStorageUnit
 URB1106 = ClassUnit(CMassStorageUnit) {
     OnStopBeingBuilt = function(self,builder,layer)
         CMassStorageUnit.OnStopBeingBuilt(self,builder,layer)
-        local audio = self.Blueprint.Audio.DoneBeingBuilt
-        if audio then
-            self:PlaySound(audio)
-        end
 
         self.Trash:Add(CreateStorageManip(self, 'B01', 'MASS', 0, 0, 0, 0, 0, .61))
     end,

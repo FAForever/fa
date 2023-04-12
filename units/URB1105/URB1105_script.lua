@@ -11,10 +11,6 @@ URB1105 = ClassUnit(CEnergyStorageUnit) {
 
     OnStopBeingBuilt = function(self,builder,layer)
         CEnergyStorageUnit.OnStopBeingBuilt(self,builder,layer)
-        local audio = self.Blueprint.Audio.DoneBeingBuilt
-        if audio then
-            self:PlaySound(audio)
-        end
 
         self.Trash:Add(CreateStorageManip(self, 'Lift', 'ENERGY', 0, 0, 0, 0, .8, 0))
     end,
