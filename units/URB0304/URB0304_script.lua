@@ -30,29 +30,33 @@ URB0304 = ClassUnit(CQuantumGateUnit) {
 
     OnStopBeingBuilt = function(self, builder, layer)
         CQuantumGateUnit.OnStopBeingBuilt(self, builder, layer)
-        self.Trash:Add(ForkThread(EffectUtil.CreateCybranQuantumGateEffect, self.GateBones[1][1], self.GateBones[1][2],
-            self.Trash, 0.1, self))
-        self.Trash:Add(ForkThread(EffectUtil.CreateCybranQuantumGateEffect, self.GateBones[2][1], self.GateBones[2][2],
-            self.Trash, 0.5, self))
-        self.Trash:Add(ForkThread(EffectUtil.CreateCybranQuantumGateEffect, self.GateBones[3][1], self.GateBones[3][2],
-            self.Trash, 1.1, self))
-        self.Trash:Add(ForkThread(EffectUtil.CreateCybranQuantumGateEffect, self.GateBones[1][1], self.GateBones[1][2],
-            self.Trash, 0.6, self))
-        self.Trash:Add(ForkThread(EffectUtil.CreateCybranQuantumGateEffect, self.GateBones[2][1], self.GateBones[2][2],
-            self.Trash, 1.2, self))
-        self.Trash:Add(ForkThread(EffectUtil.CreateCybranQuantumGateEffect, self.GateBones[3][1], self.GateBones[3][2],
-            self.Trash, 1.8, self))
-        self.Trash:Add(ForkThread(EffectUtil.CreateCybranQuantumGateEffect, self.GateBones[1][1], self.GateBones[1][2],
-            self.Trash, 2.3, self))
-        self.Trash:Add(ForkThread(EffectUtil.CreateCybranQuantumGateEffect, self.GateBones[2][1], self.GateBones[2][2],
-            self.Trash, 2.7, self))
-        self.Trash:Add(ForkThread(EffectUtil.CreateCybranQuantumGateEffect, self.GateBones[3][1], self.GateBones[3][2],
-            self.Trash, 3.1, self))
+        local trash = self.Trash
+        local gateBones = self.GateBones
+        trash:Add(ForkThread(EffectUtil.CreateCybranQuantumGateEffect, self, gateBones[1][1], gateBones[1][2],
+            trash, 0.1))
+        trash:Add(ForkThread(EffectUtil.CreateCybranQuantumGateEffect, self, gateBones[2][1], gateBones[2][2],
+            trash, 0.5))
+        trash:Add(ForkThread(EffectUtil.CreateCybranQuantumGateEffect, self, gateBones[3][1], gateBones[3][2],
+            trash, 1.1))
+        trash:Add(ForkThread(EffectUtil.CreateCybranQuantumGateEffect, self, gateBones[1][1], gateBones[1][2],
+            trash, 0.6))
+        trash:Add(ForkThread(EffectUtil.CreateCybranQuantumGateEffect, self, gateBones[2][1], gateBones[2][2],
+            trash, 1.2))
+        trash:Add(ForkThread(EffectUtil.CreateCybranQuantumGateEffect, self, gateBones[3][1], gateBones[3][2],
+            trash, 1.8))
+        trash:Add(ForkThread(EffectUtil.CreateCybranQuantumGateEffect, self, gateBones[1][1], gateBones[1][2],
+            trash, 2.3))
+        trash:Add(ForkThread(EffectUtil.CreateCybranQuantumGateEffect, self, gateBones[2][1], gateBones[2][2],
+            trash, 2.7))
+        trash:Add(ForkThread(EffectUtil.CreateCybranQuantumGateEffect, self, gateBones[3][1], gateBones[3][2],
+            trash, 3.1))
 
-        for kBonesSet, vBoneSet in self.GateBones do
+        local army = self.Army
+        local gateEffects = self.GateEffects
+        for kBonesSet, vBoneSet in gateBones do
             for kBone, vBone in vBoneSet do
-                for kEffect, vEffect in self.GateEffects do
-                    self.Trash:Add(CreateAttachedEmitter(self, vBone, self.Army, vEffect))
+                for kEffect, vEffect in gateEffects do
+                    self.Trash:Add(CreateAttachedEmitter(self, vBone, army, vEffect))
                 end
             end
         end
