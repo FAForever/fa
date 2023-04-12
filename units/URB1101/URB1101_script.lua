@@ -9,9 +9,9 @@ local CEnergyCreationUnit = import("/lua/cybranunits.lua").CEnergyCreationUnit
 URB1101 = ClassUnit(CEnergyCreationUnit) {
     OnStopBeingBuilt = function(self,builder,layer)
         CEnergyCreationUnit.OnStopBeingBuilt(self,builder,layer)
-        local myBlueprint = self.Blueprint
-        if myBlueprint.Audio.DoneBeingBuilt then
-            self:PlaySound(myBlueprint.Audio.DoneBeingBuilt)
+        local audio = self.Blueprint.Audio.DoneBeingBuilt
+        if audio then
+            self:PlaySound(audio)
         end
     end,
 }
