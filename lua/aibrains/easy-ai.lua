@@ -259,7 +259,7 @@ AIBrain = Class(StandardBrain, EconomyComponent) {
 
         local managers = self.BuilderManagers[baseIdentifier]
         if managers then
-            managers.EngineerManager:OnUnitStopBuilding(unit, built)
+            managers:OnUnitStopBuilding(unit, built)
         end
     end,
 

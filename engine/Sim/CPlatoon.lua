@@ -31,30 +31,33 @@ end
 function CPlatoon:CalculatePlatoonThreat(threatType, category)
 end
 
----@param threatType BrainThreatType Examples: 'AntiSurface', 'AntiAir', 'Overall'.
----@param category EntityCategory Unit's category, example: categories.TECH2 .
----@param position Vector Table with position {x, y, z}.
----@param radius number Radius in game units.
+---@param threatType BrainThreatType
+---@param category EntityCategory
+---@param position Vector
+---@param radius number
 ---@return number
 function CPlatoon:CalculatePlatoonThreatAroundPosition(threatType, category, position, radius)
 end
 
---- Returns true if squad can attack target unit.
+--- Returns true if squad can attack target unit. As an example: can this platoon attack a bomber?
 ---@param squad PlatoonSquadType
----@param target Unit Unit to check.
+---@param target Unit
 ---@return boolean
 function CPlatoon:CanAttackTarget(squad, target)
 end
 
---- TODO.
+---@deprecated
 ---@return boolean
 function CPlatoon:CanConsiderFormingPlatoon()
 end
 
 --- TODO.
 -- Example: local formIt = poolPlatoon:CanFormPlatoon(template, personality:GetPlatoonSize(), self.Location, radius)
----@return boolean
-function CPlatoon:CanFormPlatoon()
+---@param template table
+---@param size number
+---@param location Vector
+---@param radius number
+function CPlatoon:CanFormPlatoon(template, size, location, radius)
 end
 
 --- Destroys the platoon including all its units.
@@ -84,6 +87,7 @@ end
 
 --- TODO.
 -- Needs 4 parametrs.
+---@deprecated
 function CPlatoon:FindClosestUnitToBase()
 end
 
@@ -105,6 +109,7 @@ end
 --- Finds prioritized unit to attack for squad.
 -- Uses priorities set by SetPrioritizedTargetList function.
 -- Used for TMLs to find a pick a target in their range
+---@see `SetPrioritizedTargetList`
 ---@param squad PlatoonSquadType
 ---@param alliance AllianceType
 ---@param canAttack boolean true/false if the squad has to be able to attack the unit.
@@ -121,6 +126,7 @@ function CPlatoon:FormPlatoon()
 end
 
 --- TODO.
+---@return string
 function CPlatoon:GetAIPlan()
 end
 

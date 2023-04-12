@@ -48,7 +48,7 @@ Platoon = Class(moho.platoon_methods) {
     ---@param self Platoon
     ---@param dataTable table
     SetPlatoonData = function(self, dataTable)
-        self.PlatoonData = table.deepcopy(dataTable)
+        self.PlatoonData = dataTable
     end,
 
     ---@param self Platoon
@@ -2211,6 +2211,7 @@ Platoon = Class(moho.platoon_methods) {
             self:PlatoonDisband()
             return
         end
+
         if cons.NearUnitCategory then
             self:SetPrioritizedTargetList('support', {ParseEntityCategory(cons.NearUnitCategory)})
             local unitNearBy = self:FindPrioritizedUnit('support', 'Ally', false, self:GetPlatoonPosition(), cons.NearUnitRadius or 50)
@@ -2405,7 +2406,7 @@ Platoon = Class(moho.platoon_methods) {
             table.insert(baseTmplList, baseTmpl)
         elseif cons.AdjacencyCategory then
             relative = false
-            local pos = aiBrain.BuilderManagers[eng.BuilderManagerData.LocationType].EngineerManager.Location
+            local pos = self.PlatoonData.Base.Position
             local cat = cons.AdjacencyCategory
             -- convert text categories like 'MOBILE AIR' to 'categories.MOBILE * categories.AIR'
             if type(cat) == 'string' then

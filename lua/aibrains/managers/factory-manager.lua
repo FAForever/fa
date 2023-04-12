@@ -16,7 +16,7 @@ local TemplateCache = {}
 local MapFactionCategory = {
     UEF = 'UEF',
     AEON = 'Aeon',
-    CYBRAN = 'CYBRAN',
+    CYBRAN = 'Cybran',
     SERAPHIM = 'Seraphim',
     NOMADS = 'Nomads'
 }
@@ -143,7 +143,7 @@ AIFactoryManager = Class(BuilderManager) {
     ---@param factories Unit[]
     ---@return boolean
     BuilderParamCheck = function(self, builder, factories)
-        local template = self:GetFactoryTemplate(builder:GetPlatoonTemplate(), factories[1])
+        local template = self:GetFactoryTemplate(factories[1], builder:GetPlatoonTemplate())
 
         -- This faction doesn't have unit of this type
         if TableGetn(template) == 2 then
@@ -164,7 +164,7 @@ AIFactoryManager = Class(BuilderManager) {
     ---@param layer Layer
     OnUnitStartBeingBuilt = function(self, unit, builder, layer)
         local blueprint = unit.Blueprint
-        if blueprint.CategoriesHash['STRUCTURE'] then
+        if blueprint.CategoriesHash['STRUCTURE'] and blueprint.CategoriesHash['FACTORY'] then
             local type = (blueprint.CategoriesHash['RESEARCH'] and 'RESEARCH') or 'SUPPORT'
             local tech = blueprint.TechCategory
             local id = unit.EntityId
@@ -184,7 +184,7 @@ AIFactoryManager = Class(BuilderManager) {
     ---@param layer Layer
     OnUnitStopBeingBuilt = function(self, unit, builder, layer)
         local blueprint = unit.Blueprint
-        if blueprint.CategoriesHash['STRUCTURE'] then
+        if blueprint.CategoriesHash['STRUCTURE'] and blueprint.CategoriesHash['FACTORY'] then
             local type = (blueprint.CategoriesHash['RESEARCH'] and 'RESEARCH') or 'SUPPORT'
             local tech = blueprint.TechCategory
             local id = unit.EntityId
@@ -205,7 +205,7 @@ AIFactoryManager = Class(BuilderManager) {
     ---@param unit Unit
     OnUnitDestroyed = function(self, unit)
         local blueprint = unit.Blueprint
-        if blueprint.CategoriesHash['STRUCTURE'] then
+        if blueprint.CategoriesHash['STRUCTURE'] and blueprint.CategoriesHash['FACTORY'] then
             local type = (blueprint.CategoriesHash['RESEARCH'] and 'RESEARCH') or 'SUPPORT'
             local tech = blueprint.TechCategory
             local id = unit.EntityId
@@ -230,7 +230,7 @@ AIFactoryManager = Class(BuilderManager) {
     ---@param built Unit
     OnUnitStopBuilding = function(self, unit, built)
         local blueprint = unit.Blueprint
-        if blueprint.CategoriesHash['STRUCTURE'] then
+        if blueprint.CategoriesHash['STRUCTURE'] and blueprint.CategoriesHash['FACTORY'] then
             self:DelayOrder(unit, 'Any', 10)
         end
     end,

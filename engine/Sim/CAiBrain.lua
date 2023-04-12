@@ -384,7 +384,9 @@ end
 function CAiBrain:GiveStorage(type, amount)
 end
 
---- TODO.
+--- Returns true when any engineer is building something of the given category
+---@param category EntityCategory
+---@return boolean
 function CAiBrain:IsAnyEngineerBuilding(category)
 end
 
@@ -400,10 +402,10 @@ end
 function CAiBrain:MakePlatoon(name, aiPlan)
 end
 
---- Return number of unit's categories being built.
--- @param entityCategoryOfBuildee Unit's category that is being built.
--- @param entityCategoryOfBuilder Unit's category of the unit building, example: categories.CONSTRUCTION .
--- @return Number.
+--- Returns number of units of a given category building units of another given category
+---@param entityCategoryOfBuildee EntityCategory # Category of unit that is being built
+---@param entityCategoryOfBuilder EntityCategory # Category of unit that is building
+---@return number
 function CAiBrain:NumCurrentlyBuilding(entityCategoryOfBuildee, entityCategoryOfBuilder)
 end
 
