@@ -12,21 +12,24 @@
 ---@field Priority number
 ---@field OriginalPriority number
 ---@field BuilderName string 
----@field BuilderType string 
----@field BuilderData table 
+---@field BuilderType BuilderType 
 ---@field BuilderConditions function[]
+---@field DelayEqualBuildPlattons { [1]: string, [2]: number }
+---@field InstantCheck boolean
 Builder = ClassSimple {
-    
+
     ---@param self Builder
     ---@param brain AIBrain
-    ---@param data table
+    ---@param data BuilderSpec
     ---@param locationType string
     ---@return boolean
     Create = function(self, brain, data, locationType)
         -- make sure the table of strings exist, they are required for the builder
         local verifyDictionary = { 'Priority', 'BuilderName' }
         for k,v in verifyDictionary do
-            if not self:VerifyDataName(v, data) then return false end
+            if not self:VerifyDataName(v, data) then
+                return false
+            end
         end
 
         self.Priority = data.Priority
@@ -36,9 +39,9 @@ Builder = ClassSimple {
 
         self.BuilderName = data.BuilderName
 
-        self.DelayEqualBuildPlattons = data.DelayEqualBuildPlattons
-
         self.ReportFailure = data.ReportFailure
+
+        self.DelayEqualBuildPlattons = data.DelayEqualBuildPlattons
 
         self:SetupBuilderConditions(data, locationType)
 
@@ -132,7 +135,7 @@ Builder = ClassSimple {
     end,
 
     ---@param self Builder
-    ---@return 'Air'|'Any'|'Land'|'Sea'
+    ---@return BuilderType
     GetBuilderType = function(self)
         return Builders[self.BuilderName].BuilderType
     end,
@@ -146,9 +149,6 @@ Builder = ClassSimple {
     ---@param self Builder
     ---@return boolean
     GetBuilderStatus = function(self)
-        if self.GetStatusFunction then
-            self.GetStatusFunction()
-        end
         self:CheckBuilderConditions()
         return self.BuilderStatus
     end,

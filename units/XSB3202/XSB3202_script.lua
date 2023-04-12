@@ -4,8 +4,6 @@
 --  Summary  :  Aeon Long Range Sonar Script
 --  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
-
-local SSonarUnit = import("/lua/seraphimunits.lua").SSonarUnit
 local SSubUnit = import("/lua/seraphimunits.lua").SSubUnit
 local SSeaUnit = import("/lua/seraphimunits.lua").SSeaUnit
 
@@ -14,12 +12,7 @@ XSB3202 = ClassUnit(SSubUnit) {
 
     OnStopBeingBuilt = function(self, builder, layer)
         SSubUnit.OnStopBeingBuilt(self, builder, layer)
-
-        -- enable sonar economy
         self:SetMaintenanceConsumptionActive()
-
-        -- Unless we're gifted, we should have an original builder.
-        -- Remains to be seen if this property is actually copied during gift
         if self.originalBuilder then
             IssueDive({ self })
         end
@@ -41,7 +34,7 @@ XSB3202 = ClassUnit(SSubUnit) {
     end,
 
     OnMotionVertEventChange = function(self, new, old)
-        local mult = self:GetBlueprint().Physics.SubSpeedMultiplier
+        local mult = self.Blueprint.Physics.SubSpeedMultiplier
         SSubUnit.OnMotionVertEventChange(self, new, old)
         if new == 'Top' then
             self:SetSpeedMult(1)
@@ -69,10 +62,9 @@ XSB3202 = ClassUnit(SSubUnit) {
                         end
                     end
                 end
-                WaitSeconds(6.0)
+                WaitTicks(61)
             end
         end
     end,
 }
-
 TypeClass = XSB3202

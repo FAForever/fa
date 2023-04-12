@@ -1389,7 +1389,7 @@ function UnfinishedUnits(aiBrain, locationType, category)
     end
     local unfinished = aiBrain:GetUnitsAroundPoint(category, engineerManager:GetLocationCoords(), engineerManager.Radius, 'Ally')
     for num, unit in unfinished do
-        donePercent = unit:GetFractionComplete()
+        local donePercent = unit:GetFractionComplete()
         if donePercent < 1 and GetGuards(aiBrain, unit) < 1 then
             return true
         end
@@ -1419,17 +1419,6 @@ function GetGuards(aiBrain, Unit)
     return count
 end
 
---- Buildcondition to check if a platoon is still delayed
----@param aiBrain AIBrain
----@param PlatoonName string
----@return boolean
-function CheckBuildPlattonDelay(aiBrain, PlatoonName)
-    if aiBrain.DelayEqualBuildPlattons[PlatoonName] and aiBrain.DelayEqualBuildPlattons[PlatoonName] > GetGameTimeSeconds() then
-        return false
-    end
-    return true
-end
-
 --- Buildcondition to limit the number of factories 
 ---@param aiBrain AIBrain
 ---@param locationType string
@@ -1444,8 +1433,31 @@ function ForcePathLimit(aiBrain, locationType, unitCategory, pathType, unitCount
     end
     local enemyIndex = aiBrain:GetCurrentEnemy():GetArmyIndex()
     local selfIndex = aiBrain:GetArmyIndex()
-    if aiBrain.CanPathToEnemy[selfIndex][enemyIndex][locationType] ~= pathType and FactoryComparisonAtLocation(aiBrain, locationType, unitCount, unitCategory, '>=') then
-        return false
+    if aiBrain.CanPathToEnemy[selfIndex][enemyIndex][locationType] ~= pathType then
+        local factoryManager = aiBrain.BuilderManagers[locationType].FactoryManager
+        local testCat = unitCategory
+        if not factoryManager then
+            WARN('*AI WARNING: FactoryComparisonAtLocation - Invalid location - ' .. locationType)
+            return false
+        end
+        if factoryManager.LocationActive then
+            local numUnits = factoryManager:GetNumCategoryFactories(testCat) or 0
+            if numUnits > unitCount then
+                return false
+            end
+            local unitsBuilding = aiBrain:GetListOfUnits(categories.CONSTRUCTION, false)
+            for _, unit in unitsBuilding do
+                if not unit:BeenDestroyed() and unit:IsUnitState('Building') then
+                    local buildingUnit = unit.UnitBeingBuilt
+                    if buildingUnit and not buildingUnit:BeenDestroyed() and EntityCategoryContains(unitCategory, buildingUnit) then
+                        numUnits = numUnits + 1
+                    end
+                end
+            end
+            if numUnits > unitCount then
+                return false
+            end
+        end
     end
     return true
 end
@@ -1472,6 +1484,41 @@ function ShouldUpgradeRadar(aiBrain, locationType, radarTech)
                 return false
             end
         end
+    end
+    return true
+end
+
+---@param aiBrain AIBrain
+---@param locationType string
+---@param distance number
+---@param threatMin number
+---@param threatMax number
+---@param threatRings number
+---@param threatType string
+---@param maxNum number
+---@return boolean
+function CanBuildOnHydroLessThanDistance(aiBrain, locationType, distance, threatMin, threatMax, threatRings, threatType, maxNum)
+    local engineerManager = aiBrain.BuilderManagers[locationType].EngineerManager
+    if not engineerManager then
+        return false
+    end
+    local position = engineerManager:GetLocationCoords()
+
+    local markerTable = AIUtils.AIGetSortedHydroLocations(aiBrain, maxNum, threatMin, threatMax, threatRings, threatType, position)
+    if markerTable[1] and VDist3(markerTable[1], position) < distance then
+        return true
+    end
+    return false
+end
+
+--- Checks whether the builder / task is intentionally delayed
+---@param aiBrain AIBrain
+---@param PlatoonName string
+---@return boolean
+function CheckBuildPlattonDelay(aiBrain, PlatoonName)
+    local timeToDelay = aiBrain.DelayEqualBuildPlattons[PlatoonName]
+    if timeToDelay and timeToDelay > GetGameTimeSeconds() then
+        return false
     end
     return true
 end

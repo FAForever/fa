@@ -582,7 +582,7 @@ function InitializeArmies()
     local FindUnitGroup = FindUnitGroup
     local CreatePlatoons = CreatePlatoons
     local CreateWreckageUnit = CreateWreckageUnit
-    local LocalSetAlliance = SetAlliance
+    local SetAlliance = SetAlliance
 
     local armySetups = ScenarioInfo.ArmySetup
     local civOpt = ScenarioInfo.Options.CivilianAlliance
@@ -601,6 +601,7 @@ function InitializeArmies()
         if tblData then
             local setup = armySetups[strArmy]
             local brain = GetArmyBrain(strArmy)
+            LOG('Initialize Armies brain nickname is '..brain.Nickname)
 
             local econ = tblData.Economy
             SetArmyEconomy(strArmy, econ.mass, econ.energy)
@@ -634,39 +635,46 @@ function InitializeArmies()
                 end
             end
 
-            ----[ irumsey                                                         ]--
-            ----[ Temporary defaults.  Make sure some fighting will break out.    ]--
+
             for iEnemy, _ in tblArmy do
-                -- only do it once for each pair
+
+                -- only run this logic once for each pair
                 if iEnemy >= iArmy then
                     continue
                 end
+
+                -- by default we are enemies
                 local state = "Enemy"
                 if armyIsCiv then
+
+                    -- or neutral, to the neutral civilians
                     if civOpt == "neutral" or strArmy == "NEUTRAL_CIVILIAN" then
                         state = "Neutral"
                     end
 
+                    -- temporarily ally them to gain vision
                     if revealCivilians then
                         ForkThread(function(civ, army)
-                            WaitSeconds(0.1)
-
+                            -- keep track of army status
                             local real_state = IsAlly(civ, army) and "Ally" or IsEnemy(civ, army) and "Enemy" or "Neutral"
-                            GetArmyBrain(army):SetupArmyIntelTrigger({
-                                Category = categories.ALLUNITS,
-                                Type = "LOSNow",
-                                Value = true,
-                                OnceOnly = true,
-                                TargetAIBrain = GetArmyBrain(civ),
-                                CallbackFunction = function()
-                                    SetAlliance(civ, army, real_state)
-                                end,
-                            })
+
+                            -- guarantee the army has _some_ vision at _some_ point, to prevent them from
+                            -- having complete vision. The intel / vision system defaults to giving complete
+                            -- vision over a map when an army did not have a single unit at some point. This 
+                            -- prevents the triggering of intel for each unit creation of every player. The
+                            -- behavior is easiest spotted on Seton's clutch
+                            local dummy = CreateUnitHPR('xsl0101', civ, 0, 0, 0, 0, 0, 0)
                             SetAlliance(civ, army, "Ally")
+                            WaitTicks(20)
+
+                            -- revert army status and destroy the dummy unit
+                            SetAlliance(civ, army, real_state)
+                            dummy:Destroy()
                         end, iArmy, iEnemy)
                     end
                 end
-                LocalSetAlliance(iArmy, iEnemy, state)
+
+                SetAlliance(iArmy, iEnemy, state)
             end
         end
     end
@@ -1001,6 +1009,7 @@ end
 ---@return table|nil
 ---@return Platoon[]|nil
 function CreateArmyGroup(strArmy,strGroup,wreckage, balance)
+    LOG('CreateArmy group '..repr(strArmy))
     local brain = GetArmyBrain(strArmy)
     if not brain.IgnoreArmyCaps then
         SetIgnoreArmyUnitCap(brain:GetArmyIndex(), true)

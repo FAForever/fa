@@ -74,6 +74,11 @@ teamOptions =
                 key = 'fixed',
             },
             {
+                text = "<LOC lobui_0444>Autobalance",
+                help = "<LOC lobui_0625>Players will be put into two equally-sized teams that are mirrored and balanced using both base rating and uncertainty",
+                key = 'penguin_autobalance',
+            },
+            {
                 text = "<LOC lobui_0094>Random - Unbalanced",
                 help = "<LOC lobui_0091>Spawn everyone in random locations",
                 key = 'random',
@@ -276,7 +281,7 @@ globalOpts = {
     },
 
     {
-        default = 1,
+        default = 2,
         label = "<LOC lobui_0434>Share Unit Cap at Death",
         help = "<LOC lobui_0435>Enable this to share unitcap when a player dies",
         key = 'ShareUnitCap',
