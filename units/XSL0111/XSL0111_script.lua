@@ -9,35 +9,7 @@ local SLaanseMissileWeapon = import("/lua/seraphimweapons.lua").SLaanseMissileWe
 ---@class XSL0111 : SLandUnit
 XSL0111 = ClassUnit(SLandUnit) {
     Weapons = {
-        MissileRack = ClassWeapon(SLaanseMissileWeapon) {
-            OnLostTarget = function(self)
-                self.Trash:Add(ForkThread(self.LostTargetThread,self))
-            end,
-
-            RackSalvoFiringState = State(SLaanseMissileWeapon.RackSalvoFiringState) {
-                OnLostTarget = function(self)
-                    self.Trash:Add(ForkThread(self.LostTargetThread,self))
-                end,
-            },
-
-            LostTargetThread = function(self)
-                while not self.unit:IsDead() and self.unit:IsUnitState('Busy') do
-                    WaitTicks(21)
-                end
-
-                if self.unit:IsDead() then
-                    return
-                end
-
-                local bp = self.Blueprint
-
-                if bp.WeaponUnpacks then
-                    ChangeState(self, self.WeaponPackingState)
-                else
-                    ChangeState(self, self.IdleState)
-                end
-            end,
-        },
+        MissileRack = ClassWeapon(SLaanseMissileWeapon) { },
     },
 }
 TypeClass = XSL0111
