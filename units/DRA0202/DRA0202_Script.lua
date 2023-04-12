@@ -20,32 +20,35 @@ DRA0202 = ClassUnit(CAirUnit) {
                 end,
 
                 OnGotTarget = function(self)
-                    if self.unit:IsUnitState('Moving') then
-                        self.unit:SetSpeedMult(1.0)
+                    local unit = self.unit
+                    if unit:IsUnitState('Moving') then
+                        unit:SetSpeedMult(1.0)
                     else
-                        self.unit:SetBreakOffTriggerMult(2.0)
-                        self.unit:SetBreakOffDistanceMult(8.0)
-                        self.unit:SetSpeedMult(0.67)
+                        unit:SetBreakOffTriggerMult(2.0)
+                        unit:SetBreakOffDistanceMult(8.0)
+                        unit:SetSpeedMult(0.67)
                         CIFMissileCorsairWeapon.IdleState.OnGotTarget(self)
                     end
                 end,
             },
 
             OnGotTarget = function(self)
-                if self.unit:IsUnitState('Moving') then
-                    self.unit:SetSpeedMult(1.0)
+                local unit = self.unit
+                if unit:IsUnitState('Moving') then
+                    unit:SetSpeedMult(1.0)
                 else
-                    self.unit:SetBreakOffTriggerMult(2.0)
-                    self.unit:SetBreakOffDistanceMult(8.0)
-                    self.unit:SetSpeedMult(0.67)
+                    unit:SetBreakOffTriggerMult(2.0)
+                    unit:SetBreakOffDistanceMult(8.0)
+                    unit:SetSpeedMult(0.67)
                     CIFMissileCorsairWeapon.OnGotTarget(self)
                 end
             end,
 
             OnLostTarget = function(self)
-                self.unit:SetBreakOffTriggerMult(1.0)
-                self.unit:SetBreakOffDistanceMult(1.0)
-                self.unit:SetSpeedMult(1.0)
+                local unit = self.unit
+                unit:SetBreakOffTriggerMult(1.0)
+                unit:SetBreakOffDistanceMult(1.0)
+                unit:SetSpeedMult(1.0)
                 CIFMissileCorsairWeapon.OnLostTarget(self)
             end,
         },
@@ -58,34 +61,37 @@ DRA0202 = ClassUnit(CAirUnit) {
     end,
 
     RotateWings = function(self, target)
-        if not self.LWingRotator then
-            self.LWingRotator = CreateRotator(self, 'B01', 'x')
-            self.Trash:Add(self.LWingRotator)
+        local Lwing = self.LWingRotator
+        local Rwing = self.RWingRotator
+        local Trash = self.Trash
+        if not Lwing then
+            Lwing = CreateRotator(self, 'B01', 'x')
+            Trash:Add(Lwing)
         end
-        if not self.RWingRotator then
-            self.RWingRotator = CreateRotator(self, 'B03', 'x')
-            self.Trash:Add(self.RWingRotator)
+        if not Rwing then
+            Rwing = CreateRotator(self, 'B03', 'x')
+            Trash:Add(Rwing)
         end
         local fighterAngle = 0
         local bomberAngle = -90
         local wingSpeed = 45
         if target and EntityCategoryContains(categories.AIR, target) then
-            if self.LWingRotator then
-                self.LWingRotator:SetSpeed(wingSpeed)
-                self.LWingRotator:SetGoal(-fighterAngle)
+            if Lwing then
+                Lwing:SetSpeed(wingSpeed)
+                Lwing:SetGoal(-fighterAngle)
             end
-            if self.RWingRotator then
-                self.RWingRotator:SetSpeed(wingSpeed)
-                self.RWingRotator:SetGoal(fighterAngle)
+            if Rwing then
+                Rwing:SetSpeed(wingSpeed)
+                Rwing:SetGoal(fighterAngle)
             end
         else
-            if self.LWingRotator then
-                self.LWingRotator:SetSpeed(wingSpeed)
-                self.LWingRotator:SetGoal(-bomberAngle)
+            if Lwing then
+                Lwing:SetSpeed(wingSpeed)
+                Lwing:SetGoal(-bomberAngle)
             end
-            if self.RWingRotator then
-                self.RWingRotator:SetSpeed(wingSpeed)
-                self.RWingRotator:SetGoal(bomberAngle)
+            if Rwing then
+                Rwing:SetSpeed(wingSpeed)
+                Rwing:SetGoal(bomberAngle)
             end
         end
     end,

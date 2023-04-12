@@ -5,7 +5,6 @@
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 ------------------------------------------------------------------------------
 
--- changes from ALandUnit to AHoverLandUnit
 local AHoverLandUnit = import("/lua/aeonunits.lua").AHoverLandUnit
 local ADFDisruptorCannonWeapon = import("/lua/aeonweapons.lua").ADFDisruptorWeapon
 

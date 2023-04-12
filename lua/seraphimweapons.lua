@@ -348,21 +348,23 @@ PhasonCollisionBeam2 = ClassWeapon(PhasonCollisionBeam) {
     TerrainImpactScale = 0.1,
 
     OnImpact = function(self, impactType, targetEntity)
+        local scorching = self.Scorching
         if impactType == 'Terrain' then
-            if self.Scorching == nil then
-                self.Scorching = self:ForkThread(self.ScorchThread)
+            if scorching == nil then
+            scorching = self.Trash:Add(ForkThread(self.ScorchThread,self))
             end
         elseif not impactType == 'Unit' then
-            KillThread(self.Scorching)
-            self.Scorching = nil
+            KillThread(scorching)
+            scorching = nil
         end
         PhasonCollisionBeam.OnImpact(self, impactType, targetEntity)
     end,
 
     OnDisable = function(self)
         PhasonCollisionBeam.OnDisable(self)
-        KillThread(self.Scorching)
-        self.Scorching = nil
+        local scorching = self.Scorching
+        KillThread(scorching)
+        scorching = nil
     end,
 
     ScorchThread = function(self)
