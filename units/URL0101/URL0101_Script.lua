@@ -4,19 +4,13 @@
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -------------------------------------------------------------------
 local CWalkingLandUnit = import("/lua/cybranunits.lua").CWalkingLandUnit
-local Entity = import("/lua/sim/entity.lua").Entity
 
 ---@class URL0101 : CWalkingLandUnit
 URL0101 = ClassUnit(CWalkingLandUnit) {
     OnStopBeingBuilt = function(self, builder, layer)
         CWalkingLandUnit.OnStopBeingBuilt(self, builder, layer)
-        local bp = self.Blueprint
-        self.RadarEnt = Entity {}
-        self.Trash:Add(self.RadarEnt)
-        self.RadarEnt:InitIntel(self.Army, 'Radar', bp.Intel.RadarRadius)
-        self.RadarEnt:EnableIntel('Radar')
-        self.RadarEnt:AttachBoneTo(-1, self, 0)
-        CreateRotator(self, 'Spinner', 'y', nil, 90, 5, 90)
+
+        self.Trash:Add(CreateRotator(self, 'Spinner', 'y', nil, 90, 5, 90))
         self:SetMaintenanceConsumptionInactive()
         self:SetScriptBit('RULEUTC_CloakToggle', true)
         self:RequestRefreshUI()
