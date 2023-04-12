@@ -33,11 +33,6 @@ local Factions = import('/lua/factions.lua').GetFactions(true)
 ---@alias PlatoonType 'Air' | 'Land' | 'Sea'
 ---@alias AllianceStatus 'Ally' | 'Enemy' | 'Neutral'
 
-local BrainGetUnitsAroundPoint = moho.aibrain_methods.GetUnitsAroundPoint
-local BrainGetListOfUnits = moho.aibrain_methods.GetListOfUnits
-local CategoriesDummyUnit = categories.DUMMYUNIT
-local CoroutineYield = coroutine.yield
-
 ---@class AIBrainHQComponent
 ---@field HQs table
 local AIBrainHQComponent = ClassSimple {
@@ -383,7 +378,7 @@ local AIBrainEnergyComponent = ClassSimple {
         -- localize scope for better performance
         local pcall = pcall
         local TableSize = table.getsize
-        local CoroutineYield = CoroutineYield
+        local CoroutineYield = coroutine.yield
 
         local ok, msg
 
@@ -534,6 +529,10 @@ local AIBrainEnergyComponent = ClassSimple {
     end,
 
 }
+
+local BrainGetUnitsAroundPoint = moho.aibrain_methods.GetUnitsAroundPoint
+local BrainGetListOfUnits = moho.aibrain_methods.GetListOfUnits
+local CategoriesDummyUnit = categories.DUMMYUNIT
 
 ---@class AIBrain: AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerComponent, AIBrainEnergyComponent, moho.aibrain_methods
 ---@field AI boolean
