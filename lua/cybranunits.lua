@@ -595,7 +595,7 @@ CMassStorageUnit = ClassUnit(DefaultUnitsFile.MassStorageUnit) {}
 ---@field Dish3Rotator moho.RotateManipulator
 CRadarUnit = ClassUnit(RadarUnit) {
 
-    ---@param self URB3104
+    ---@param self CRadarUnit
     ---@param intel IntelType
     OnIntelDisabled = function(self, intel)
         RadarUnit.OnIntelDisabled(self, intel)
@@ -637,7 +637,7 @@ CRadarUnit = ClassUnit(RadarUnit) {
         end
     end,
 
-    ---@param self URB3104
+    ---@param self CRadarUnit
     ---@param intel IntelType
     OnIntelEnabled = function(self, intel)
         RadarUnit.OnIntelEnabled(self, intel)
@@ -667,7 +667,7 @@ CRadarUnit = ClassUnit(RadarUnit) {
         end
     end,
 
-    ---@param self URB3104
+    ---@param self CRadarUnit
     Dish1Behavior = function(self)
         local rotator = self.Dish1Rotator
         if not rotator then
@@ -708,7 +708,7 @@ CRadarUnit = ClassUnit(RadarUnit) {
         end
     end,
 
-    ---@param self URB3104
+    ---@param self CRadarUnit
     Dish2Behavior = function(self)
         local rotator = self.Dish2Rotator
         if not rotator then
@@ -750,7 +750,7 @@ CRadarUnit = ClassUnit(RadarUnit) {
         end
     end,
 
-    ---@param self URB3104
+    ---@param self CRadarUnit
     Dish3Behavior = function(self)
         local rotator = self.Dish3Rotator
         if not rotator then
