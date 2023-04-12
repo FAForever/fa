@@ -6,34 +6,41 @@
 local CMassCollectionUnit = import("/lua/cybranunits.lua").CMassCollectionUnit
 
 ---@class URB1202 : CMassCollectionUnit
+---@field AnimationManipulator moho.AnimationManipulator
 URB1202 = ClassUnit(CMassCollectionUnit) {
-    OnStartBuild = function(self, unitBeingBuilt, order)
-        CMassCollectionUnit.OnStartBuild(self, unitBeingBuilt, order)
-        if not self.AnimationManipulator then return end
-        self.AnimationManipulator:SetRate(0)
-        self.AnimationManipulator:Destroy()
-        self.AnimationManipulator = nil
+    OnStopBeingBuilt = function(self, builder, layer)
+        CMassCollectionUnit.OnStopBeingBuilt(self, builder, layer)
+        local audio = self.Blueprint.Audio.DoneBeingBuilt
+        if audio then
+            self:PlaySound(audio)
+        end
     end,
 
     PlayActiveAnimation = function(self)
         CMassCollectionUnit.PlayActiveAnimation(self)
-        if not self.AnimationManipulator then
-            self.AnimationManipulator = CreateAnimator(self)
-            self.Trash:Add(self.AnimationManipulator)
+
+        local animationManipulator = self.AnimationManipulator
+        if not animationManipulator then
+            animationManipulator = CreateAnimator(self)
+            self.Trash:Add(animationManipulator)
+            self.AnimationManipulator = animationManipulator
         end
-        self.AnimationManipulator:PlayAnim(self.Blueprint.Display.AnimationOpen, true)
+
+        animationManipulator:PlayAnim(self.Blueprint.Display.AnimationOpen, true)
     end,
 
     OnProductionPaused = function(self)
         CMassCollectionUnit.OnProductionPaused(self)
-        if not self.AnimationManipulator then return end
-        self.AnimationManipulator:SetRate(0)
+        local animationManipulator = self.AnimationManipulator
+        if not animationManipulator then return end
+        animationManipulator:SetRate(0)
     end,
 
     OnProductionUnpaused = function(self)
         CMassCollectionUnit.OnProductionUnpaused(self)
-        if not self.AnimationManipulator then return end
-        self.AnimationManipulator:SetRate(1)
+        local animationManipulator = self.AnimationManipulator
+        if not animationManipulator then return end
+        animationManipulator:SetRate(1)
     end,
 
 }
