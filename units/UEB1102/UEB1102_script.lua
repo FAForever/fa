@@ -15,10 +15,12 @@ UEB1102 = ClassUnit(TEnergyCreationUnit) {
     OnStopBeingBuilt = function(self,builder,layer)
         TEnergyCreationUnit.OnStopBeingBuilt(self,builder,layer)
         local effects, bones, scale = nil, nil, 1
-        if self.Layer == 'Land' then
+        local layer = self.Layer
+
+        if layer == 'Land' then
             effects = self.AirEffects
             bones = self.AirEffectsBones
-        elseif self.Layer == 'Seabed' then
+        elseif layer == 'Seabed' then
             effects = self.WaterEffects
             bones = self.WaterEffectsBones
             scale = 3

@@ -89,6 +89,8 @@ UAS0401 = ClassUnit(ASeaUnit) {
     end,
 
     DiveDepthThread = function(self)
+        local SinkSlider = self.SinkSlider
+
         -- Takes the given location, adjusts the Y value to the surface height on that location, with an offset
         local Yoffset = 1.2 -- The default (built in) offset appears to be 0.25 - if the place where thats set is found, that would be epic.
         -- 1.2 is for Tempest to clear the torpedo tubes from most cases of ground clipping, keeping overall height minimal.
@@ -96,14 +98,14 @@ UAS0401 = ClassUnit(ASeaUnit) {
             local pos = self:GetPosition()
             local seafloor = GetTerrainHeight(pos[1], pos[3]) + GetTerrainTypeOffset(pos[1], pos[3]) -- Target depth, in this case the seabed
             local difference = math.max(((seafloor + Yoffset) - pos[2]), -0.5) -- Doesnt sink too much, just maneuveres the bed better.
-            self.SinkSlider:SetSpeed(1)
+            SinkSlider:SetSpeed(1)
 
-            self.SinkSlider:SetGoal(0, difference, 0)
+            SinkSlider:SetGoal(0, difference, 0)
             WaitTicks(3)
         end
 
-        self.SinkSlider:SetGoal(0, 0, 0) -- Reset the slider while we are not watching depth
-        WaitFor(self.SinkSlider) -- We have to wait for it to finish before killing the thread or it stops
+        SinkSlider:SetGoal(0, 0, 0) -- Reset the slider while we are not watching depth
+        WaitFor(SinkSlider) -- We have to wait for it to finish before killing the thread or it stops
 
         KillThread(self.DiverThread)
     end,
@@ -176,7 +178,7 @@ UAS0401 = ClassUnit(ASeaUnit) {
         local layer = self.Layer
         self:DestroyIdleEffects()
         if layer == 'Water' or layer == 'Seabed' or layer == 'Sub' then
-            self.SinkExplosionThread = self:ForkThread(self.ExplosionThread)
+            self.SinkExplosionThread = self.Trash:Add(ForkThread(self.ExplosionThread,self))
             self.SinkThread = self.Trash:Add(ForkThread(self.SinkingThread, self))
         end
 

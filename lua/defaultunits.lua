@@ -2301,6 +2301,7 @@ BaseTransport = ClassSimple {
 ---@class AirTransport: AirUnit, BaseTransport
 AirTransport = ClassUnit(AirUnit, BaseTransport) {
 
+    
     ---@param self AirTransport
     OnTransportAborted = function(self)
     end,
@@ -2314,6 +2315,56 @@ AirTransport = ClassUnit(AirUnit, BaseTransport) {
         AirUnit.OnCreate(self)
         self.slots = {}
         self.transData = {}
+    end,
+
+    OnStopBeingBuilt = function(self, builder, layer)
+
+        local Trash = self.Trash
+        local LandingManip = self.LandingAnimManip
+
+        AirTransport.OnStopBeingBuilt(self, builder, layer)
+        for _, bone in self.EngineRotateBones do
+            local controller = CreateThrustController(self, 'Thruster', bone)
+            controller:SetThrustingParam(-0.25, 0.25, -0.75, 0.75, -0.0, 0.0, 1.0, 0.25)
+            Trash:Add(controller)
+        end
+
+        LandingManip = CreateAnimator(self)
+        LandingManip:SetPrecedence(0)
+        Trash:Add(LandingManip)
+        LandingManip:PlayAnim(self.Blueprint.Display.AnimationLand):SetRate(1)
+        Trash:Add(ForkThread(self.ExpandThread,self))
+    end,
+  
+    OnMotionVertEventChange = function(self, new, old)
+        AirTransport.OnMotionVertEventChange(self, new, old)
+        if (new == 'Down') then
+            self.LandingAnimManip:SetRate(-1)
+        elseif (new == 'Up') then
+            self.LandingAnimManip:SetRate(1)
+        end
+    end,
+
+    CreateUnitAirDestructionEffects = function(self, scale)
+        self.Trash:Add(ForkThread(self.AirDestructionEffectsThread, self))
+    end,
+
+    AirDestructionEffectsThread = function(self)
+        local numExplosions = math.floor(table.getn(self.AirDestructionEffectBones) * 0.5)
+        for i = 0, numExplosions do
+            explosion.CreateDefaultHitExplosionAtBone(self,
+                self.AirDestructionEffectBones[util.GetRandomInt(1, numExplosions)], 0.5)
+            WaitSeconds(util.GetRandomFloat(0.2, 0.9))
+        end
+    end,
+
+    GetUnitSizes = function(self)
+        local bp = self.Blueprint
+        if self:GetFractionComplete() < 1.0 then
+            return bp.SizeX, bp.SizeY, bp.SizeZ * 0.5
+        else
+            return bp.SizeX, bp.SizeY, bp.SizeZ
+        end
     end,
 
     ---@param self AirTransport

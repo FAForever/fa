@@ -3,36 +3,7 @@
 -- Summary  :  UEF Tier 2 Power Generator Script
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -------------------------------------------------------------------
-local TEnergyCreationUnit = import("/lua/terranunits.lua").TEnergyCreationUnit
 
 ---@class UEB1201 : TEnergyCreationUnit
-UEB1201 = ClassUnit(TEnergyCreationUnit) {
-    OnStopBeingBuilt = function(self, builder, layer)
-        TEnergyCreationUnit.OnStopBeingBuilt(self, builder, layer)
-        ChangeState(self, self.ActiveState)
-    end,
-
-    ActiveState = State {
-        Main = function(self)
-            local myBlueprint = self.Blueprint
-            if myBlueprint.Audio.Activate then
-                self:PlaySound(myBlueprint.Audio.Activate)
-            end
-        end,
-
-        OnInActive = function(self)
-            ChangeState(self, self.InActiveState)
-        end,
-    },
-
-    InActiveState = State {
-        Main = function(self)
-        end,
-
-        OnActive = function(self)
-            ChangeState(self, self.ActiveState)
-        end,
-    },
-}
-
+UEB1201 = ClassUnit(import("/lua/terranunits.lua").TEnergyCreationUnit) {}
 TypeClass = UEB1201

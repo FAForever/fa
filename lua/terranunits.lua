@@ -17,6 +17,7 @@ local LandFactoryUnit = DefaultUnitsFile.LandFactoryUnit
 local RadarJammerUnit = DefaultUnitsFile.RadarJammerUnit
 local SeaFactoryUnit = DefaultUnitsFile.SeaFactoryUnit
 local AmphibiousLandUnit = DefaultUnitsFile.AmphibiousLandUnit
+local MassCollectionUnit = DefaultUnitsFile.MassCollectionUnit
 
 local EffectUtil = import("/lua/effectutilities.lua")
 local CreateBuildCubeThread = EffectUtil.CreateBuildCubeThread
@@ -91,6 +92,43 @@ TAirFactoryUnit = ClassUnit(AirFactoryUnit) {
         if self.ArmsThread then
             KillThread(self.ArmsThread)
             self.ArmsThread = nil
+        end
+    end,
+
+    FinishBuildThread = function(self, unitBeingBuilt, order)
+        self:SetBusy(true)
+        self:SetBlockCommandQueue(true)
+        local bp = self.Blueprint
+        local bpAnim = bp.Display.AnimationFinishBuildLand
+        local RollOffAnim = self.RollOffAnim
+
+        if bpAnim and EntityCategoryContains(categories.LAND, unitBeingBuilt) then
+            RollOffAnim = CreateAnimator(self):PlayAnim(bpAnim):SetRate(10)
+            self.Trash:Add(RollOffAnim)
+            WaitTicks(1)
+            WaitFor(RollOffAnim)
+        end
+        if unitBeingBuilt and not unitBeingBuilt.Dead then
+            unitBeingBuilt:DetachFrom(true)
+        end
+        self:DetachAll(bp.Display.BuildAttachBone or 0)
+        self:DestroyBuildRotator()
+        if order != 'Upgrade' then
+            ChangeState(self, self.RollingOffState)
+        else
+            self:SetBusy(false)
+            self:SetBlockCommandQueue(false)
+        end
+    end,
+
+    PlayFxRollOffEnd = function(self)
+        local RollOffAnim = self.RollOffAnim
+
+        if RollOffAnim then
+            RollOffAnim:SetRate(10)
+            WaitFor(RollOffAnim)
+            RollOffAnim:Destroy()
+            RollOffAnim = nil
         end
     end,
 }
@@ -223,7 +261,43 @@ TLandUnit = ClassUnit(DefaultUnitsFile.LandUnit) {}
 --  MASS COLLECTION UNITS
 --------------------------------------------------------------
 ---@class TMassCollectionUnit : MassCollectionUnit
-TMassCollectionUnit = ClassUnit(DefaultUnitsFile.MassCollectionUnit) {}
+TMassCollectionUnit = ClassUnit(MassCollectionUnit) {
+
+    ---@param self TMassCollectionUnit
+    ---@param unitBeingBuilt Unit
+    ---@param order string
+    OnStartBuild = function(self, unitBeingBuilt, order)
+        TMassCollectionUnit.OnStartBuild(self, unitBeingBuilt, order)
+        if not self.AnimationManipulator then return end
+        self.AnimationManipulator:SetRate(0)
+        self.AnimationManipulator:Destroy()
+        self.AnimationManipulator = nil
+    end,
+
+    ---@param self TMassCollectionUnit
+    PlayActiveAnimation = function(self)
+        TMassCollectionUnit.PlayActiveAnimation(self)
+        if not self.AnimationManipulator then
+            self.AnimationManipulator = CreateAnimator(self)
+            self.Trash:Add(self.AnimationManipulator)
+        end
+        self.AnimationManipulator:PlayAnim(self.Blueprint.Display.AnimationOpen, true)
+    end,
+
+    ---@param self TMassCollectionUnit
+    OnProductionPaused = function(self)
+        TMassCollectionUnit.OnProductionPaused(self)
+        if not self.AnimationManipulator then return end
+        self.AnimationManipulator:SetRate(0)
+    end,
+
+    ---@param self TMassCollectionUnit
+    OnProductionUnpaused = function(self)
+        TMassCollectionUnit.OnProductionUnpaused(self)
+        if not self.AnimationManipulator then return end
+        self.AnimationManipulator:SetRate(1)
+    end,
+}
 
 --------------------------------------------------------------
 -- MASS FABRICATION STRUCTURES

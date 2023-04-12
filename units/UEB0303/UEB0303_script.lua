@@ -15,59 +15,73 @@ UEB0303 = ClassUnit(TSeaFactoryUnit) {
 
     StartArmsMoving = function(self)
         TSeaFactoryUnit.StartArmsMoving(self)
-        if not self.ArmSlider1 then
-            self.ArmSlider1 = CreateSlider(self, 'Right_Arm')
-            self.Trash:Add(self.ArmSlider1)
+        local arm1 = self.ArmSlider1
+        local arm2 = self.ArmSlider2
+        local arm3 = self.ArmSlider3
+        local Trash = self.Trash
+
+        if not arm1 then
+            arm1 = CreateSlider(self, 'Right_Arm')
+            Trash:Add(arm1)
         end
-        if not self.ArmSlider2 then
-            self.ArmSlider2 = CreateSlider(self, 'Center_Arm')
-            self.Trash:Add(self.ArmSlider2)
+        if not arm2 then
+            arm2 = CreateSlider(self, 'Center_Arm')
+            Trash:Add(arm2)
         end
-        if not self.ArmSlider3 then
-            self.ArmSlider3 = CreateSlider(self, 'Left_Arm')
-            self.Trash:Add(self.ArmSlider3)
+        if not arm3 then
+            arm3 = CreateSlider(self, 'Left_Arm')
+            Trash:Add(arm3)
         end
     end,
 
     MovingArmsThread = function(self)
         TSeaFactoryUnit.MovingArmsThread(self)
         local dir = 1
-        if not self.ArmSlider1 then return end
-        if not self.ArmSlider2 then return end
-        self.ArmSlider1:SetGoal(0, 0, 0)
-        self.ArmSlider1:SetSpeed(40)
-        self.ArmSlider2:SetGoal(10, 0, 0)
-        self.ArmSlider2:SetSpeed(40)
-        self.ArmSlider3:SetGoal(20, 0, 0)
-        self.ArmSlider3:SetSpeed(40)
-        WaitFor(self.ArmSlider1)
+        local arm1 = self.ArmSlider1
+        local arm2 = self.ArmSlider2
+        local arm3 = self.ArmSlider3
+        local WaitFor = WaitFor
+
+        if not arm1 then return end
+        if not arm2 then return end
+        arm1:SetGoal(0, 0, 0)
+        arm1:SetSpeed(40)
+        arm2:SetGoal(10, 0, 0)
+        arm2:SetSpeed(40)
+        arm3:SetGoal(20, 0, 0)
+        arm3:SetSpeed(40)
+        WaitFor(arm1)
         while true do
-            self.ArmSlider1:SetGoal(0, 0, 0)
-            self.ArmSlider1:SetSpeed(40)
-            self.ArmSlider2:SetGoal(8 + 5 * dir, 0, 0)
-            self.ArmSlider2:SetSpeed(40)
-            self.ArmSlider3:SetGoal(10, 0, 0)
-            self.ArmSlider3:SetSpeed(40)
-            WaitFor(self.ArmSlider3)
-            self.ArmSlider1:SetGoal(10, 0, 0)
-            self.ArmSlider1:SetSpeed(40)
-            self.ArmSlider2:SetGoal(10, 0, 0)
-            self.ArmSlider2:SetSpeed(40)
-            self.ArmSlider3:SetGoal(20, 0, 0)
-            self.ArmSlider3:SetSpeed(40)
-            WaitFor(self.ArmSlider3)
+            arm1:SetGoal(0, 0, 0)
+            arm1:SetSpeed(40)
+            arm2:SetGoal(8 + 5 * dir, 0, 0)
+            arm2:SetSpeed(40)
+            arm3:SetGoal(10, 0, 0)
+            arm3:SetSpeed(40)
+            WaitFor(arm3)
+            arm1:SetGoal(10, 0, 0)
+            arm1:SetSpeed(40)
+            arm2:SetGoal(10, 0, 0)
+            arm2:SetSpeed(40)
+            arm3:SetGoal(20, 0, 0)
+            arm3:SetSpeed(40)
+            WaitFor(arm3)
             dir = dir * -1
         end
     end,
 
     StopArmsMoving = function(self)
         TSeaFactoryUnit.StopArmsMoving(self)
-        self.ArmSlider1:SetGoal(0, 0, 0)
-        self.ArmSlider2:SetGoal(0, 0, 0)
-        self.ArmSlider3:SetGoal(0, 0, 0)
-        self.ArmSlider1:SetSpeed(40)
-        self.ArmSlider2:SetSpeed(40)
-        self.ArmSlider3:SetSpeed(40)
+        local arm1 = self.ArmSlider1
+        local arm2 = self.ArmSlider2
+        local arm3 = self.ArmSlider3
+        
+        arm1:SetGoal(0, 0, 0)
+        arm2:SetGoal(0, 0, 0)
+        arm3:SetGoal(0, 0, 0)
+        arm1:SetSpeed(40)
+        arm2:SetSpeed(40)
+        arm3:SetSpeed(40)
     end,
 }
 

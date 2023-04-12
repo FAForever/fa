@@ -9,6 +9,8 @@ local TEnergyCreationUnit = import("/lua/terranunits.lua").TEnergyCreationUnit
 UEB1101 = ClassUnit(TEnergyCreationUnit) {
     OnCreate = function(self)
         TEnergyCreationUnit.OnCreate(self)
+        local Trash = self.Trash
+
         self.Sliders = {
             Slider1 = CreateSlider(self, 'B03'),
             Slider2 = CreateSlider(self, 'B04'),
@@ -20,10 +22,10 @@ UEB1101 = ClassUnit(TEnergyCreationUnit) {
             Spinner2 = CreateRotator(self, 'B02', 'y', nil, 0, 30, 360):SetTargetSpeed(0),
         }
         for k, v in self.Sliders do
-            self.Trash:Add(v)
+            Trash:Add(v)
         end
         for k, v in self.Spinners do
-            self.Trash:Add(v)
+            Trash:Add(v)
         end
     end,
 
@@ -46,26 +48,30 @@ UEB1101 = ClassUnit(TEnergyCreationUnit) {
     OpeningState = State {
         Main = function(self)
             local bp = self.Blueprint
+            local Sliders = self.Sliders
+            local Spinners = self.Spinners
+
             if bp.Audio.Activate then
                 self:PlaySound(bp.Audio.Activate)
             end
-            self.Sliders.Slider1:SetGoal(0, 0, -3)
-            self.Sliders.Slider1:SetSpeed(5)
-            self.Sliders.Slider2:SetGoal(-3, 0, 0)
-            self.Sliders.Slider2:SetSpeed(5)
-            self.Sliders.Slider3:SetGoal(0, 0, 3)
-            self.Sliders.Slider3:SetSpeed(5)
-            self.Sliders.Slider4:SetGoal(3, 0, 0)
-            self.Sliders.Slider4:SetSpeed(5)
-            for k, v in self.Sliders do
+
+            Sliders.Slider1:SetGoal(0, 0, -3)
+            Sliders.Slider1:SetSpeed(5)
+            Sliders.Slider2:SetGoal(-3, 0, 0)
+            Sliders.Slider2:SetSpeed(5)
+            Sliders.Slider3:SetGoal(0, 0, 3)
+            Sliders.Slider3:SetSpeed(5)
+            Sliders.Slider4:SetGoal(3, 0, 0)
+            Sliders.Slider4:SetSpeed(5)
+            for k, v in Sliders do
                 WaitFor(v)
             end
-            for k, v in self.Spinners do
+            for k, v in Spinners do
                 v:SetSpinDown(false)
             end
-            self.Spinners.Spinner1:SetTargetSpeed(180)
-            self.Spinners.Spinner2:SetTargetSpeed(-90)
-            WaitSeconds(5)
+            Spinners.Spinner1:SetTargetSpeed(180)
+            Spinners.Spinner2:SetTargetSpeed(-90)
+            WaitTicks(51)
             ChangeState(self, self.IdleOpenState)
         end,
     },
@@ -103,9 +109,10 @@ UEB1101 = ClassUnit(TEnergyCreationUnit) {
 
     ClosedIdleState = State {
         Main = function(self)
-            while self.DamageSeconds > 0 do
+            local Damage = self.DamageSeconds
+            while Damage > 0 do
                 WaitTicks(11)
-                self.DamageSeconds = self.DamageSeconds - 1
+                Damage = Damage - 1
             end
             ChangeState(self, self.OpeningState)
         end,
@@ -113,12 +120,6 @@ UEB1101 = ClassUnit(TEnergyCreationUnit) {
         OnDamage = function(self, instigator, amount, vector, damageType)
             TEnergyCreationUnit.OnDamage(self, instigator, amount, vector, damageType)
             self.DamageSeconds = 10
-        end,
-    },
-
-    DeadState = State {
-        Main = function(self)
-
         end,
     },
 }
