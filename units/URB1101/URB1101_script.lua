@@ -10,8 +10,8 @@ URB1101 = ClassUnit(CEnergyCreationUnit) {
     OnStopBeingBuilt = function(self,builder,layer)
         CEnergyCreationUnit.OnStopBeingBuilt(self,builder,layer)
         local myBlueprint = self.Blueprint
-        if myBlueprint.Audio.Activate then
-            self:PlaySound(myBlueprint.Audio.Activate)
+        if myBlueprint.Audio.DoneBeingBuilt then
+            self:PlaySound(myBlueprint.Audio.DoneBeingBuilt)
         end
     end,
 }

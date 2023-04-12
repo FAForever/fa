@@ -9,15 +9,12 @@ local CMassStorageUnit = import("/lua/cybranunits.lua").CMassStorageUnit
 URB1106 = ClassUnit(CMassStorageUnit) {
     OnStopBeingBuilt = function(self,builder,layer)
         CMassStorageUnit.OnStopBeingBuilt(self,builder,layer)
-        self:ForkThread(self.AnimThread)
-        local myBlueprint = self.Blueprint
-        if myBlueprint.Audio.Activate then
-            self:PlaySound(myBlueprint.Audio.Activate)
+        local audio = self.Blueprint.Audio.DoneBeingBuilt
+        if audio then
+            self:PlaySound(audio)
         end
-    end,
 
-    AnimThread = function(self)
-        local sliderManip = CreateStorageManip(self, 'B01', 'MASS', 0, 0, 0, 0, 0, .61)
+        self.Trash:Add(CreateStorageManip(self, 'B01', 'MASS', 0, 0, 0, 0, 0, .61))
     end,
 }
 
