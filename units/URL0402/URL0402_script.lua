@@ -103,7 +103,7 @@ URL0402 = ClassUnit(CWalkingLandUnit) {
         self.AmbientExhaustEffectsBag = self.AmbientExhaustEffectsBag or TrashBag()
         self.AmbientExhaustEffectsBag:Destroy()
         if layer == 'Land' then
-            self.AmbientEffectThread = self.Trash:Add(ForkThread(self.UnitLandAmbientEffectThread,self))
+            self.AmbientEffectThread = self.Trash:Add(ForkThread(self.UnitLandAmbientEffectThread, self))
         elseif layer == 'Seabed' then
             local army = self.Army
             for _, vE in self.AmbientSeabedExhaustEffects do
@@ -255,17 +255,17 @@ URL0402 = ClassUnit(CWalkingLandUnit) {
         CreateDeathExplosion(self, 'Left_Projectile01', 2)
         self:CreateFirePlumes(army, { 'Left_Projectile01' }, -1)
         self:CreateDamageEffects('Right_Turret', army)
-        WaitSeconds(0.5)
+        WaitTicks(6)
 
         CreateDeathExplosion(self, 'Left_Leg0' .. Random(1, 3) .. '_B0' .. Random(1, 3), 0.25)
         self:CreateDamageEffects('Right_Leg01_B03', army)
-        WaitSeconds(0.5)
+        WaitTicks(6)
         CreateDeathExplosion(self, 'Left_Turret_Muzzle', 1)
         self:CreateExplosionDebris(army)
 
         CreateDeathExplosion(self, 'Right_Leg0' .. Random(1, 3) .. '_B0' .. Random(1, 3), 0.25)
         self:CreateDamageEffects('Right_Projectile0' .. Random(1, 2), army)
-        WaitSeconds(0.5)
+        WaitTicks(6)
 
         CreateDeathExplosion(self, 'Left_Leg0' .. Random(1, 3) .. '_B0' .. Random(1, 3), 0.25)
         CreateDeathExplosion(self, 'Left_Projectile01', 2)

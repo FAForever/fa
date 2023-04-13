@@ -59,6 +59,7 @@ URL0401 = ClassUnit(CLandUnit) {
                 if self.initialaim then
                     self.Rotator = CreateRotator(self.unit, 'Turret_Fake', 'y')
                     self.unit.Trash:Add(self.Rotator)
+
                     for k, v in barrelBones do
                         local tmprotator = CreateRotator(self.unit, v, 'x')
                         tmprotator:SetSpeed(30)
@@ -66,30 +67,38 @@ URL0401 = ClassUnit(CLandUnit) {
                         self.PitchRotators[k] = tmprotator
                         self.unit.Trash:Add(self.PitchRotators[k])
                     end
-                    self.Goal                                                        = 0
-                    local barrel                                                     = self.currentbarrel
+
+                    local barrel = self.currentbarrel
+                    local basedirvector = {}
+
+                    self.Goal = 0
                     self.restdirvector.x, self.restdirvector.y, self.restdirvector.z = self.unit:GetBoneDirection(barrelBones
                         [barrel])
-                    local basedirvector                                              = {}
-                    basedirvector.x, basedirvector.y, basedirvector.z                = self.unit:GetBoneDirection('Turret_Aim')
-                    self.basediftorest                                               = Util.GetAngleInBetween(self.restdirvector
-                        , basedirvector)
-                end
-                if self.losttarget or self.initialaim then
-                    local dirvector                                   = {}
-                    dirvector.x, dirvector.y, dirvector.z             = self.unit:GetBoneDirection('Turret_Aim_Barrel')
-                    local basedirvector                               = {}
                     basedirvector.x, basedirvector.y, basedirvector.z = self.unit:GetBoneDirection('Turret_Aim')
-                    local basediftoaim                                = Util.GetAngleInBetween(dirvector, basedirvector)
-                    self.pitchdif                                     = self.basediftorest - basediftoaim
+                    self.basediftorest = Util.GetAngleInBetween(self.restdirvector, basedirvector)
+                end
+
+                if self.losttarget or self.initialaim then
+                    local dirvector = {}
+                    local basedirvector = {}
+                    local basediftoaim = Util.GetAngleInBetween(dirvector, basedirvector)
+
+                    dirvector.x, dirvector.y, dirvector.z = self.unit:GetBoneDirection('Turret_Aim_Barrel')
+                    basedirvector.x, basedirvector.y, basedirvector.z = self.unit:GetBoneDirection('Turret_Aim')
+                    self.pitchdif = self.basediftorest - basediftoaim
+
                     for k, v in barrelBones do
                         self.PitchRotators[k]:SetGoal(self.pitchdif)
                     end
+
                     WaitFor(self.PitchRotators[1])
+
                     WaitTicks(3)
+
                     if self.losttarget then
                         self.losttarget = false
                     end
+
                     if self.initialaim then
                         self.initialaim = false
                     end

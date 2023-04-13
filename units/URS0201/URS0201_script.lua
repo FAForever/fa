@@ -36,7 +36,8 @@ URS0201 = ClassUnit(CSeaUnit) {
                 if old == 'Stopped' then
                     if self.SwitchAnims then
                         self.SwitchAnims = false
-                        self.AnimManip:PlayAnim(self.Blueprint.Display.AnimationWalk, true):SetRate(self.Blueprint.Display.AnimationWalkRate or 1.1)
+                        self.AnimManip:PlayAnim(self.Blueprint.Display.AnimationWalk, true):SetRate(self.Blueprint.Display
+                            .AnimationWalkRate or 1.1)
                     else
                         self.AnimManip:SetRate(2.8)
                     end
@@ -65,42 +66,45 @@ URS0201 = ClassUnit(CSeaUnit) {
             if self.AT1 then
                 self.AT1:Destroy()
             end
-            self.AT1 = self.Trash:Add(ForkThread(self.TransformThread, new == 'Land',self))
+            self.AT1 = self.Trash:Add(ForkThread(self.TransformThread, new == 'Land', self))
         end
     end,
 
     TransformThread = function(self, land)
-        if not self.AnimManip then
-            self.AnimManip = CreateAnimator(self)
-        end
-
         local bp = self.Blueprint
         local scale = bp.Display.UniformScale or 1
+        local animManip = self.AnimManip
+        local WaitFor = WaitFor
+
+        if not animManip then
+            animManip = CreateAnimator(self)
+        end
+
         if land then
             self:SetImmobile(true)
-            self.AnimManip:PlayAnim(self.Blueprint.Display.AnimationTransform)
-            self.AnimManip:SetRate(2)
+            animManip:PlayAnim(self.Blueprint.Display.AnimationTransform)
+            animManip:SetRate(2)
             self.IsWaiting = true
-            WaitFor(self.AnimManip)
+            WaitFor(animManip)
             self:SetCollisionShape('Box', bp.CollisionOffsetX or 0, (bp.CollisionOffsetY + (bp.SizeY * 1.0)) or 0,
                 bp.CollisionOffsetZ or 0, bp.SizeX * scale, bp.SizeY * scale, bp.SizeZ * scale)
             self.IsWaiting = false
             self:SetImmobile(false)
             self.SwitchAnims = true
             self.Walking = true
-            self.Trash:Add(self.AnimManip)
+            self.Trash:Add(animManip)
         else
             self:SetImmobile(true)
-            self.AnimManip:PlayAnim(self.Blueprint.Display.AnimationTransform)
-            self.AnimManip:SetAnimationFraction(1)
-            self.AnimManip:SetRate(-2)
+            animManip:PlayAnim(self.Blueprint.Display.AnimationTransform)
+            animManip:SetAnimationFraction(1)
+            animManip:SetRate(-2)
             self.IsWaiting = true
-            WaitFor(self.AnimManip)
+            WaitFor(animManip)
             self:SetCollisionShape('Box', bp.CollisionOffsetX or 0, (bp.CollisionOffsetY + (bp.SizeY * 0.5)) or 0,
                 bp.CollisionOffsetZ or 0, bp.SizeX * scale, bp.SizeY * scale, bp.SizeZ * scale)
             self.IsWaiting = false
-            self.AnimManip:Destroy()
-            self.AnimManip = nil
+            animManip:Destroy()
+            animManip = nil
             self:SetImmobile(false)
             self.Walking = false
         end

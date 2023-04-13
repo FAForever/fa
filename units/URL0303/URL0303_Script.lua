@@ -12,6 +12,7 @@ local CDFLaserDisintegratorWeapon = cWeapons.CDFLaserDisintegratorWeapon01
 local CDFElectronBolterWeapon = cWeapons.CDFElectronBolterWeapon
 local MissileRedirect = import("/lua/defaultantiprojectile.lua").MissileRedirect
 
+---@class EMPDeathWeapon : Weapon
 local EMPDeathWeapon = ClassWeapon(Weapon) {
     OnCreate = function(self)
         Weapon.OnCreate(self)
@@ -50,11 +51,14 @@ URL0303 = ClassUnit(CWalkingLandUnit) {
     end,
 
     InitiateCharge = function(self)
+        local army = self.Army
+        
+        
         if self.ChargingInitiated then return end
 
         self.ChargingInitiated = true
         local blueprint = self.Blueprint
-        local bufffx3 = CreateAttachedEmitter(self, 0, self.Army, '/effects/emitters/cybran_loyalist_charge_03_emit.bp')
+        local bufffx3 = CreateAttachedEmitter(self, 0, army, '/effects/emitters/cybran_loyalist_charge_03_emit.bp')
         self.Trash:Add(bufffx3)
         WaitSeconds(blueprint.SecondsBeforeChargeKicksIn)
 
@@ -62,8 +66,8 @@ URL0303 = ClassUnit(CWalkingLandUnit) {
         self:SetAccMult(blueprint.Physics.ChargeAccMult)
         self:SetSpeedMult(blueprint.Physics.ChargeSpeedMult)
 
-        local bufffx1 = CreateAttachedEmitter(self, 0, self.Army, '/effects/emitters/cybran_loyalist_charge_01_emit.bp')
-        local bufffx2 = CreateAttachedEmitter(self, 0, self.Army, '/effects/emitters/cybran_loyalist_charge_02_emit.bp')
+        local bufffx1 = CreateAttachedEmitter(self, 0, army, '/effects/emitters/cybran_loyalist_charge_01_emit.bp')
+        local bufffx2 = CreateAttachedEmitter(self, 0, army, '/effects/emitters/cybran_loyalist_charge_02_emit.bp')
         self.Trash:Add(bufffx1)
         self.Trash:Add(bufffx2)
         StartCountdown(self.EntityId, blueprint.SecondsBeforeExplosionWhenCharging)

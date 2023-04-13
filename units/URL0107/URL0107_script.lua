@@ -11,6 +11,7 @@ local EffectUtil = import("/lua/effectutilities.lua")
 local EmptyTable = EmptyTable
 
 ---@class URL0107 : CWalkingLandUnit
+---@field BuildEffectsBag TrashBag
 URL0107 = ClassUnit(CWalkingLandUnit) {
     Weapons = {
         LaserArms = ClassWeapon(CDFLaserHeavyWeapon) {},
