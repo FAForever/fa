@@ -3171,3 +3171,207 @@ function ShiftPosition(pos1, pos2, dist, reverse)
     z = math.min(ScenarioInfo.size[2]-5,math.max(5,z))
     return {x,GetSurfaceHeight(x,z),z}
 end
+
+---@param aiBrain AIBrain
+---@param eng unit
+---@return boolean
+function EngAvoidLocalDanger(aiBrain, eng)
+    local engPos = eng:GetPosition()
+    local enemyUnits = aiBrain:GetUnitsAroundPoint(categories.LAND * categories.MOBILE, engPos, 45, 'Enemy')
+    local action = false
+    for _, unit in enemyUnits do
+        local enemyUnitPos = unit:GetPosition()
+        if EntityCategoryContains(categories.SCOUT + categories.ENGINEER * (categories.TECH1 + categories.TECH2) - categories.COMMAND, unit) then
+            if VDist2Sq(engPos[1], engPos[3], enemyUnitPos[1], enemyUnitPos[3]) < 144 then
+                if unit and not IsDestroyed(unit) and unit:GetFractionComplete() == 1 then
+                    if VDist2Sq(engPos[1], engPos[3], enemyUnitPos[1], enemyUnitPos[3]) < 156 then
+                        IssueClearCommands({eng})
+                        IssueReclaim({eng}, unit)
+                        action = true
+                        break
+                    end
+                end
+            end
+        elseif EntityCategoryContains(categories.LAND * categories.MOBILE - categories.SCOUT, unit) then
+            if VDist2Sq(engPos[1], engPos[3], enemyUnitPos[1], enemyUnitPos[3]) < 81 then
+                if unit and not IsDestroyed(unit) and unit:GetFractionComplete() == 1 then
+                    if VDist2Sq(engPos[1], engPos[3], enemyUnitPos[1], enemyUnitPos[3]) < 156 then
+                        IssueClearCommands({eng})
+                        IssueReclaim({eng}, unit)
+                        action = true
+                        break
+                    end
+                end
+            else
+                IssueClearCommands({eng})
+                IssueMove({eng}, ShiftPosition(enemyUnitPos, engPos, 50, false))
+                coroutine.yield(60)
+                action = true
+            end
+        end
+    end
+    return action
+end
+
+---@param aiBrain AIBrain
+---@param eng Unit
+---@return boolean
+function EngLocalExtractorBuild(aiBrain, eng)
+    -- Will get an engineer to build a mass extractor on nearby mass markers
+    -- if the marker is too close to the border then it will use IssueBuildMobile to avoid issues
+    -- requires the engineer to not have the default EngineerBuildAI OnUnitBuilt callback set
+    local action = false
+    local bool,markers=CanBuildOnLocalMassPoints(aiBrain, eng:GetPosition(), 25)
+    if bool then
+        IssueClearCommands({eng})
+        local factionIndex = aiBrain:GetFactionIndex()
+        local buildingTmplFile = import('/lua/BuildingTemplates.lua')
+        local buildingTmpl = buildingTmplFile[('BuildingTemplates')][factionIndex]
+        local whatToBuild = aiBrain:DecideWhatToBuild(eng, 'T1Resource', buildingTmpl)
+        for _,massMarker in markers do
+            EngineerTryReclaimCaptureArea(aiBrain, eng, massMarker.Position, 2)
+            EngineerTryRepair(aiBrain, eng, whatToBuild, massMarker.Position)
+            if massMarker.BorderWarning then
+                IssueBuildMobile({eng}, massMarker.Position, whatToBuild, {})
+                action = true
+            else
+                aiBrain:BuildStructure(eng, whatToBuild, {massMarker.Position[1], massMarker.Position[3], 0}, false)
+                action = true
+            end
+        end
+        while eng and not eng.Dead and (0<table.getn(eng:GetCommandQueue()) or eng:IsUnitState('Building') or eng:IsUnitState("Moving")) do
+            coroutine.yield(20)
+        end
+        return action
+    end
+end
+
+---@param aiBrain AIBrain
+---@param engPos table
+---@param distance number
+---@return boolean
+---@return table
+function CanBuildOnLocalMassPoints(aiBrain, engPos, distance)
+    -- Checks if an engineer can build on mass points close to its location
+    -- will return a bool if it found anything and if it did then a table of mass markers
+    -- the BorderWarning is used to tell the AI that the mass marker is too close to the map border
+    local pointDistance = distance * distance
+    local massMarkers = import("/lua/sim/markerutilities.lua").GetMarkersByType('Mass')
+    local validMassMarkers = {}
+    for _, v in massMarkers do
+        if v.type == 'Mass' then
+            local massBorderWarn = false
+            if v.position[1] <= 8 or v.position[1] >= ScenarioInfo.size[1] - 8 or v.position[3] <= 8 or v.position[3] >= ScenarioInfo.size[2] - 8 then
+                massBorderWarn = true
+            end 
+            local mexDistance = VDist2Sq( v.position[1],v.position[3], engPos[1], engPos[3] )
+            if mexDistance < pointDistance and aiBrain:CanBuildStructureAt('ueb1103', v.position) then
+                table.insert(validMassMarkers, {Position = v.position, Distance = mexDistance , MassSpot = v, BorderWarning = massBorderWarn})
+            end
+        end
+    end
+    table.sort(validMassMarkers, function(a,b) return a.Distance < b.Distance end)
+    if table.getn(validMassMarkers) > 0 then
+        return true, validMassMarkers
+    else
+        return false
+    end
+end
+
+---@param eng Unit
+---@param minimumReclaim number
+---@return boolean
+function EngPerformReclaim(eng, minimumReclaim)
+    -- Will get an engineer to search within its reclaim range for any close reclaim 
+    -- and issue reclaim commands if it is above the minimumReclaim requires the
+    -- engineer to not have the EngineerBuildAi OnReclaimed callback set also requires
+    -- the delay for reclaim time when the return is true
+    -- Could be improved with a OnStartReclaim callback utilized
+    local engPos = eng:GetPosition()
+    local rectDef = Rect(engPos[1] - 10, engPos[3] - 10, engPos[1] + 10, engPos[3] + 10)
+    local reclaimRect = GetReclaimablesInRect(rectDef)
+    local maxReclaimCount = 0
+    local action = false
+    if reclaimRect then
+        local closeReclaim = {}
+        for _, v in reclaimRect do
+            if not IsProp(v) then continue end
+            if v.MaxMassReclaim and v.MaxMassReclaim > minimumReclaim then
+                if VDist2Sq(engPos[1],engPos[3], v.CachePosition[1], v.CachePosition[3]) <= 100 then
+                    table.insert(closeReclaim, v)
+                    maxReclaimCount = maxReclaimCount + 1
+                end
+            end
+            if maxReclaimCount > 10 then
+                break
+            end
+        end
+        if table.getn(closeReclaim) > 0 then
+            IssueClearCommands({eng})
+            for _, rec in closeReclaim do
+                IssueReclaim({eng}, rec)
+            end
+            action = true
+        end
+    end
+    return action
+end
+
+---@param aiBrain AIBrain
+---@param eng Unit
+---@param movementLayer string
+---@return number
+---@return number
+function EngFindReclaimCell(aiBrain, eng, movementLayer, searchType)
+    -- Will find a reclaim grid cell to target for reclaim engineers
+    -- requires the GridReclaim and GridBrain to have an instance against the 
+    -- AI Brain, movementLayer is included for mods that have different layer engineers
+    -- searchRadius could be improved to be dynamic
+        -----------------------------------
+    -- find a nearby cell to reclaim --
+
+    -- @Relent0r this uses the newly introduced API to find nearby cells. Short descriptions:
+    -- `MaximumInRadius`            Finds most valuable cell to reclaim in a radius
+    -- `FilterInRadius`             Finds all cells that meets some threshold
+    -- `FilterAndSortInRadius`      Finds all cells that meets some threshold and sorts the list of cells from high value to low value
+    local CanPathTo = import("/lua/sim/navutils.lua").CanPathTo
+    local reclaimGridInstance = aiBrain.GridReclaim
+    local brainGridInstance = aiBrain.GridBrain
+    local maxmapdimension = math.max(ScenarioInfo.size[1],ScenarioInfo.size[2])
+    local searchRadius = 16
+    if maxmapdimension == 256 then
+        searchRadius = 8
+    end
+    if searchType == 'MAIN' then
+        searchRadius = aiBrain.IMAPConfig.Rings
+    end
+    local searchLoop = 0
+    local reclaimTargetX, reclaimTargetZ
+    local engPos = eng:GetPosition()
+    local gx, gz = reclaimGridInstance:ToGridSpace(engPos[1],engPos[3])
+    while searchLoop < searchRadius and (not (reclaimTargetX and reclaimTargetZ)) do 
+        WaitTicks(1)
+        
+        -- retrieve a list of cells with some mass value
+        local cells, count = reclaimGridInstance:FilterAndSortInRadius(gx, gz, searchRadius, 10)
+        -- find out if we can path to the center of the cell and check engineer maximums
+        for k = 1, count do
+            local cell = cells[k] --[[@as AIGridReclaimCell]]
+            local centerOfCell = reclaimGridInstance:ToWorldSpace(cell.X, cell.Z)
+            local maxEngineers = math.min(math.ceil(cell.TotalMass / 500), 8)
+            -- make sure we can path to it and it doesnt have high threat e.g Point Defense
+            if CanPathTo(movementLayer, engPos, centerOfCell) and aiBrain:GetThreatAtPosition(centerOfCell, 0, true, 'AntiSurface') < 10 then
+                local brainCell = brainGridInstance:ToCellFromGridSpace(cell.X, cell.Z)
+                local engineersInCell = brainGridInstance:CountReclaimingEngineers(brainCell)
+                if engineersInCell < maxEngineers then
+                    reclaimTargetX, reclaimTargetZ = cell.X, cell.Z
+                    break
+                end
+            end
+        end
+        searchLoop = searchLoop + 1
+    end
+    if reclaimTargetX and reclaimTargetZ then
+        return reclaimTargetX, reclaimTargetZ
+    end
+end
