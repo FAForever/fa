@@ -11,22 +11,18 @@ UEB2401 = ClassUnit(TStructureUnit) {
     Weapons = {
         MainGun = ClassWeapon(TIFArtilleryWeapon) {
             FxMuzzleFlashScale = 3,
-
-            IdleState = State(TIFArtilleryWeapon.IdleState) {
-                OnGotTarget = function(self)
-                    TIFArtilleryWeapon.IdleState.OnGotTarget(self)
-                    local artyAnim = self.ArtyAnim
-                    local unit = self.unit
-
-                    if not artyAnim then
-                        artyAnim = CreateAnimator(unit)
-                        artyAnim:PlayAnim(unit.Blueprint.Display.AnimationOpen)
-                        unit.Trash:Add(artyAnim)
-                    end
-                end,
-            },
         },
     },
+
+    OnGotTarget = function(self, weapon)
+        local unpackAnimation = self.UnpackAnimation
+        if not unpackAnimation then
+            unpackAnimation = CreateAnimator(self)
+            unpackAnimation:PlayAnim(self.Blueprint.Display.AnimationOpen)
+            self.UnpackAnimation = unpackAnimation
+            self.Trash:Add(unpackAnimation)
+        end
+    end,
 }
 
 TypeClass = UEB2401
