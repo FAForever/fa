@@ -115,6 +115,7 @@ function TransferUnitsOwnership(units, toArmy, captured)
         local numTacMsl = unit:GetTacticalSiloAmmoCount()
         local massKilled = unit.VetExperience
         local unitHealth = unit:GetHealth()
+        local tarmacs = unit.TarmacBag
         local shieldIsOn = false
         local shieldHealth = 0
         local hasFuel = false
@@ -216,6 +217,10 @@ function TransferUnitsOwnership(units, toArmy, captured)
 
         if hasFuel then
             newUnit:SetFuelRatio(fuelRatio)
+        end
+        
+        if tarmacs then
+            newUnit.TarmacBag = tarmacs
         end
 
         if numNukes and numNukes > 0 then
