@@ -15,10 +15,13 @@ UEB2401 = ClassUnit(TStructureUnit) {
             IdleState = State(TIFArtilleryWeapon.IdleState) {
                 OnGotTarget = function(self)
                     TIFArtilleryWeapon.IdleState.OnGotTarget(self)
-                    if not self.ArtyAnim then
-                        self.ArtyAnim = CreateAnimator(self.unit)
-                        self.ArtyAnim:PlayAnim(self.unit.Blueprint.Display.AnimationOpen)
-                        self.unit.Trash:Add(self.ArtyAnim)
+                    local artyAnim = self.ArtyAnim
+                    local unit = self.unit
+
+                    if not artyAnim then
+                        artyAnim = CreateAnimator(unit)
+                        artyAnim:PlayAnim(unit.Blueprint.Display.AnimationOpen)
+                        unit.Trash:Add(artyAnim)
                     end
                 end,
             },
