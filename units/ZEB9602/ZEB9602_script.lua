@@ -10,6 +10,8 @@ ZEB9602 = ClassUnit(TAirFactoryUnit) {
 
     StartArmsMoving = function(self)
         TAirFactoryUnit.StartArmsMoving(self)
+
+
         if not self.ArmSlider1 then
             self.ArmSlider1 = CreateSlider(self, 'Arm01')
             self.Trash:Add(self.ArmSlider1)

@@ -8,15 +8,14 @@ local ShieldEffectsComponent = import("/lua/defaultcomponents.lua").ShieldEffect
 
 ---@class XSL0307 : SShieldHoverLandUnit, ShieldEffectsComponent
 XSL0307 = ClassUnit(SShieldHoverLandUnit, ShieldEffectsComponent) {
-    
-    Weapons = {        
+
+    Weapons = {
         TargetPointer = ClassWeapon(DefaultProjectileWeapon) {},
     },
 
     ShieldEffects = {
         '/effects/emitters/aeon_shield_generator_mobile_01_emit.bp',
     },
-   
     ---@param self XSL0307
     OnCreate = function(self) -- Are these missng on purpose?
         SShieldHoverLandUnit.OnCreate(self)
@@ -26,14 +25,14 @@ XSL0307 = ClassUnit(SShieldHoverLandUnit, ShieldEffectsComponent) {
     ---@param self XSL0307
     ---@param builder Unit
     ---@param layer Layer
-    OnStopBeingBuilt = function(self,builder,layer)
-        SShieldHoverLandUnit.OnStopBeingBuilt(self,builder,layer)
-        
+    OnStopBeingBuilt = function(self, builder, layer)
+        SShieldHoverLandUnit.OnStopBeingBuilt(self, builder, layer)
+
         self.TargetPointer = self:GetWeapon(1) --save the pointer weapon for later - this is extra clever since the pointer weapon has to be first!
-        self.TargetLayerCaps = self:GetBlueprint().Weapon[1].FireTargetLayerCapsTable --we save this to the unit table so dont have to call every time.
+        self.TargetLayerCaps = self.Blueprint.Weapon[1].FireTargetLayerCapsTable --we save this to the unit table so dont have to call every time.
         self.PointerEnabled = true --a flag to let our thread know whether we should turn on our pointer.
     end,
-    
+
     ---@param self XSL0307
     OnShieldEnabled = function(self)
         SShieldHoverLandUnit.OnShieldEnabled(self)
@@ -49,8 +48,8 @@ XSL0307 = ClassUnit(SShieldHoverLandUnit, ShieldEffectsComponent) {
     ---@param self XSL0307
     DisablePointer = function(self)
         self.TargetPointer:SetFireTargetLayerCaps('None')
-        
-        local thread = ForkThread(self.PointerRestart,self)
+
+        local thread = ForkThread(self.PointerRestart, self)
         self.Trash:Add(thread)
         self.PointerRestartThread = thread
     end,

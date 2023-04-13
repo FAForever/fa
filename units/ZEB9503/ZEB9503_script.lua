@@ -15,49 +15,59 @@ ZEB9503 = ClassUnit(TSeaFactoryUnit) {
 
     StartArmsMoving = function(self)
         TSeaFactoryUnit.StartArmsMoving(self)
-        if not self.ArmSlider1 then
-            self.ArmSlider1 = CreateSlider(self, 'Right_Arm')
-            self.Trash:Add(self.ArmSlider1)
+        local arm1 = self.ArmSlider1
+        local arm2 = self.ArmSlider2
+        local Trash = self.Trash
+
+        if not arm1 then
+            arm1 = CreateSlider(self, 'Right_Arm')
+            Trash:Add(arm1)
         end
-        if not self.ArmSlider2 then
-            self.ArmSlider2 = CreateSlider(self, 'Center_Arm')
-            self.Trash:Add(self.ArmSlider2)
+        if not arm2 then
+            arm2 = CreateSlider(self, 'Center_Arm')
+            Trash:Add(arm2)
         end
     end,
 
     MovingArmsThread = function(self)
         TSeaFactoryUnit.MovingArmsThread(self)
-        if not self.ArmSlider1 then return end
-        if not self.ArmSlider2 then return end
-        self.ArmSlider1:SetGoal(0, 0, 0)
-        self.ArmSlider1:SetSpeed(40)
-        self.ArmSlider2:SetGoal(30, 0, 0)
-        self.ArmSlider2:SetSpeed(40)
-        WaitFor(self.ArmSlider1)
+        local arm1 = self.ArmSlider1
+        local arm2 = self.ArmSlider2
+
+        if not arm1 then return end
+        if not arm2 then return end
+        arm1:SetGoal(0, 0, 0)
+        arm1:SetSpeed(40)
+        arm2:SetGoal(30, 0, 0)
+        arm2:SetSpeed(40)
+        WaitFor(arm1)
         while true do
-            self.ArmSlider1:SetGoal(15, 0, 0)
-            self.ArmSlider1:SetSpeed(40)
-            self.ArmSlider2:SetGoal(15, 0, 0)
-            self.ArmSlider2:SetSpeed(40)
-            WaitFor(self.ArmSlider1)
-            WaitFor(self.ArmSlider2)
-            self.ArmSlider1:SetGoal(0, 0, 0)
-            self.ArmSlider1:SetSpeed(40)
-            self.ArmSlider2:SetGoal(30, 0, 0)
-            self.ArmSlider2:SetSpeed(40)
-            WaitFor(self.ArmSlider1)
-            WaitFor(self.ArmSlider2)
+            arm1:SetGoal(15, 0, 0)
+            arm1:SetSpeed(40)
+            arm2:SetGoal(15, 0, 0)
+            arm2:SetSpeed(40)
+            WaitFor(arm1)
+            WaitFor(arm2)
+            arm1:SetGoal(0, 0, 0)
+            arm1:SetSpeed(40)
+            arm2:SetGoal(30, 0, 0)
+            arm2:SetSpeed(40)
+            WaitFor(arm1)
+            WaitFor(arm2)
         end
     end,
 
     StopArmsMoving = function(self)
         TSeaFactoryUnit.StopArmsMoving(self)
-        if not self.ArmSlider1 then return end
-        if not self.ArmSlider2 then return end
-        self.ArmSlider1:SetGoal(0, 0, 0)
-        self.ArmSlider2:SetGoal(0, 0, 0)
-        self.ArmSlider1:SetSpeed(40)
-        self.ArmSlider2:SetSpeed(40)
+        local arm1 = self.ArmSlider1
+        local arm2 = self.ArmSlider2
+
+        if not arm1 then return end
+        if not arm2 then return end
+        arm1:SetGoal(0, 0, 0)
+        arm2:SetGoal(0, 0, 0)
+        arm1:SetSpeed(40)
+        arm2:SetSpeed(40)
     end,
 
 

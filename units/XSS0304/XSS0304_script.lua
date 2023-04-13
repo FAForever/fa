@@ -38,14 +38,15 @@ XSS0304 = ClassUnit(SSubUnit) {
 
     OpenState = State() {
         Main = function(self)
-            if not self.CannonAnim then
-                self.CannonAnim = CreateAnimator(self)
-                self.Trash:Add(self.CannonAnim)
+            local cannonAnim = self.CannonAnim
+            if not cannonAnim then
+                cannonAnim = CreateAnimator(self)
+                self.Trash:Add(cannonAnim)
             end
             local bp = self.Blueprint
-            self.CannonAnim:PlayAnim(bp.Display.CannonOpenAnimation)
-            self.CannonAnim:SetRate(bp.Display.CannonOpenRate or 1)
-            WaitFor(self.CannonAnim)
+            cannonAnim:PlayAnim(bp.Display.CannonOpenAnimation)
+            cannonAnim:SetRate(bp.Display.CannonOpenRate or 1)
+            WaitFor(cannonAnim)
             self:SetWeaponEnabledByLabel('AutoCannon', true)
         end,
     },
