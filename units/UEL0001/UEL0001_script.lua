@@ -131,11 +131,15 @@ UEL0001 = ClassUnit(ACUUnit) {
         if rebuildDrone == true then
             if pod == 'LeftPod' then
                 if self.HasLeftPod == true then
-                    self.RebuildThread = self.Trash:Add(ForkThread(self.RebuildPod, 1,self))
+                    local thread = ForkThread(self.RebuildPod, 1,self)
+                    self.Trash:Add(thread)
+                    self.RebuildThread = thread
                 end
             elseif pod == 'RightPod' then
                 if self.HasRightPod == true then
-                    self.RebuildThread2 = self.Trash:Add(ForkThread(self.RebuildPod, 2,self))
+                    local thread = ForkThread(self.RebuildPod, 2,self)
+                    self.Trash:Add(thread)
+                    self.RebuildThread2 = thread
                 end
             end
         else

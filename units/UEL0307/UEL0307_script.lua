@@ -55,7 +55,10 @@ UEL0307 = ClassUnit(TShieldLandUnit, ShieldEffectsComponent) {
         TShieldLandUnit.OnShieldDisabled(self)
         ShieldEffectsComponent.OnShieldDisabled(self)
         KillThread(self.DestroyManipulatorsThread)
-        self.DestroyManipulatorsThread = self.Trash:Add(ForkThread(self.DestroyManipulators, self))
+
+        local thread = ForkThread(self.DestroyManipulators, self)
+        self.Trash:Add(thread)
+        self.DestroyManipulatorsThread = thread
     end,
 
     DestroyManipulators = function(self)
@@ -79,7 +82,10 @@ UEL0307 = ClassUnit(TShieldLandUnit, ShieldEffectsComponent) {
 
     DisablePointer = function(self)
         self.TargetPointer:SetFireTargetLayerCaps('None') --this disables the stop feature - note that its reset on layer change!
-        self.PointerRestartThread = self.Trash:Add(ForkThread(self.PointerRestart, self))
+
+        local thread = ForkThread(self.PointerRestart, self)
+        self.Trash:Add(thread)
+        self.PointerRestartThread = thread
     end,
 
     PointerRestart = function(self)
@@ -90,7 +96,7 @@ UEL0307 = ClassUnit(TShieldLandUnit, ShieldEffectsComponent) {
             end
             if not self:GetGuardedUnit() then
                 self.PointerEnabled = true
-                self.TargetPointer:SetFireTargetLayerCaps(self.TargetLayerCaps[self.Layer]) 
+                self.TargetPointer:SetFireTargetLayerCaps(self.TargetLayerCaps[self.Layer])
             end
         end
     end,
