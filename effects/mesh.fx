@@ -9236,6 +9236,7 @@ float4 PBR_PS(
 
     float3 ambient = sunAmbient * lightMultiplier;
     ambient += shadowFill * (1 - ambient);
+    env_irradiance += ambient;
 
     // As maps were not created with this shader in mind we would get too much environment lighting.
     // So we need to tune it down, especially in the shadows, so the darkness of the shadows
@@ -9246,7 +9247,6 @@ float4 PBR_PS(
     env_reflection *= shadowCorrection;
     env_irradiance *= shadowCorrection;
 
-    env_irradiance += ambient;
     float3 diffuse = env_irradiance * albedo;
     float3 specular = env_reflection * (kS * envBRDFlookuptexture.r + envBRDFlookuptexture.g);
     color += (kD * diffuse + specular) * ao;
