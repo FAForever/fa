@@ -1,12 +1,7 @@
---***************************************************************************
---*
---**  File     :  /lua/sim/BuilderManager.lua
---**
---**  Summary  : Manage builders
---**
---**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
---****************************************************************************
-
+-- File     :  /lua/sim/BuilderManager.lua
+-- Summary  : Manage builders
+-- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+-------------------------------------------------------------------
 local BuilderManager = import("/lua/sim/buildermanager.lua").BuilderManager
 local AIUtils = import("/lua/ai/aiutilities.lua")
 local Builder = import("/lua/sim/builder.lua")
@@ -38,9 +33,9 @@ PlatoonFormManager = Class(BuilderManager) {
 
     ---@param self PlatoonFormManager
     ---@param builderData table
-    ---@param locationType Vector
+    ---@param locationType string
     ---@param builderType string
-    ---@return boolean
+    ---@return PlatoonBuilder | false
     AddBuilder = function(self, builderData, locationType, builderType)
         local newBuilder = Builder.CreatePlatoonBuilder(self.Brain, builderData, locationType)
         self:AddInstancedBuilder(newBuilder, builderType)
@@ -75,7 +70,7 @@ PlatoonFormManager = Class(BuilderManager) {
     end,
 
     ---@param self PlatoonFormManager
-    ---@param buildingCategory string
+    ---@param buildingCategory EntityCategory
     ---@param builderCategory string
     ---@return table
     GetUnitsBeingBuilt = function(self, buildingCategory, builderCategory)

@@ -1,6 +1,6 @@
 -- Depth Charge Script
 local ADepthChargeProjectile = import("/lua/aeonprojectiles.lua").ADepthChargeProjectile
-local VisionMarkerOpti = import("/lua/sim/vizmarker.lua").VisionMarkerOpti
+local VisionMarkerOpti = import("/lua/sim/VizMarker.lua").VisionMarkerOpti
 
 AANDepthCharge03 = ClassProjectile(ADepthChargeProjectile) {
     CountdownLength = 101,

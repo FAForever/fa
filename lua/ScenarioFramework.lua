@@ -31,7 +31,7 @@ local ScenarioUtils = import("/lua/sim/scenarioutilities.lua")
 local SimCamera = import("/lua/simcamera.lua").SimCamera
 local SimUIVars = import("/lua/sim/simuistate.lua")
 local TriggerFile = import("/lua/scenariotriggers.lua")
-local VizMarker = import("/lua/sim/vizmarker.lua").VizMarker
+local VizMarker = import("/lua/sim/VizMarker.lua").VizMarker
 
 Objectives = import("/lua/simobjectives.lua")
 PingGroups = import("/lua/simpinggroup.lua")
@@ -41,9 +41,7 @@ PingGroups = import("/lua/simpinggroup.lua")
 ---@field Armies string[] names of armies in team
 ---@field LastRecallVoteTime number game tick of last recall vote
 
-
 local PauseUnitDeathActive = false
-
 
 --- Causes the game to exit immediately
 function ExitGame()
@@ -170,7 +168,7 @@ end
 ---@param self Unit
 ---@param instigator Unit
 ---@param amount number
----@param vector any
+---@param vector Vector2
 ---@param damageType DamageType
 function OverrideDoDamage(self, instigator, amount, vector, damageType)
     local preAdjHealth = self:GetHealth()
@@ -193,6 +191,11 @@ function OverrideDoDamage(self, instigator, amount, vector, damageType)
         end
     end
 end
+
+---@param self Unit
+---@param instigator Unit
+---@param damageType DamageType
+---@param excessDamageRatio number
 function UnlockAndKillUnitThread(self, instigator, damageType, excessDamageRatio)
     self:DoUnitCallbacks('OnKilled')
     while PauseUnitDeathActive do
@@ -205,7 +208,7 @@ end
 --- An override for `Unit.OnKilled` to make unit death pausing work
 ---@param self Unit
 ---@param instigator Unit
----@param type any
+---@param type DamageType
 ---@param overkillRatio number
 function OverrideKilled(self, instigator, type, overkillRatio)
     if not self.CanBeKilled then
@@ -259,7 +262,7 @@ end
 
 ---
 ---@param unit Unit
----@param army number
+---@param army Army
 ---@param triggerOnGiven boolean
 ---@return Unit
 function GiveUnitToArmy(unit, army, triggerOnGiven)
@@ -844,10 +847,10 @@ end
 ---@param pauseAtDeath? boolean
 ---@param deathTrigger? fun(self: Unit)
 ---@param enhancements? string[]
----@return CommandUnit
+---@return Unit|nil
 function SpawnCommander(brain, unit, effect, name, pauseAtDeath, deathTrigger, enhancements)
     local ACU = ScenarioUtils.CreateArmyUnit(brain, unit)
-    local bp = ACU:GetBlueprint()
+    local bp = ACU.Blueprint
     local bonesToHide = bp.WarpInEffect.HideBones
     local delay = 0
 
@@ -980,7 +983,7 @@ end
 ---@param callback fun()
 ---@param bonesToHide Bone[]
 function FakeGateInUnit(unit, callback, bonesToHide)
-    local bp = unit:GetBlueprint()
+    local bp = unit.Blueprint
 
     if EntityCategoryContains(categories.COMMAND + categories.SUBCOMMANDER, unit) then
         unit:HideBone(0, true)
