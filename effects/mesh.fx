@@ -9193,9 +9193,6 @@ float4 PBR_PS(
     // so we have to tune them down a bit across the board.
     envBRDFlookuptexture.g *= 0.5;
 
-    float3 ambient = sunAmbient + shadowFill;
-    env_irradiance += ambient;
-
     float shadow = ComputeShadow(vertex.shadow, hiDefShadows);
     float3 sunLight = sunDiffuse * lightMultiplier;
     // We need to do this to stay consistent with ComputeLight()
@@ -9237,15 +9234,22 @@ float4 PBR_PS(
     kD = float3(1.0, 1.0, 1.0) - kS;
     kD *= 1.0 - metallic;
 
-    // As maps were not created with this shader in mind we would get too much ambient lighting.
+    float3 ambient = sunAmbient * lightMultiplier;
+    ambient += shadowFill * (1 - ambient);
+
+    // As maps were not created with this shader in mind we would get too much environment lighting.
     // So we need to tune it down, especially in the shadows, so the darkness of the shadows
     // matches with the terrain. This is very non-physical and uses empirical values.
-    float shadowCorrection = min(max((ambient.r + ambient.g + ambient.b) / 3, 0.2), 0.8);
-    shadowCorrection = lerp(shadowCorrection, 0.8, shadow * nDotL);
+    float shadowCorrection = saturate((ambient.r + ambient.g + ambient.b) / 3);
+    shadowCorrection = shadowCorrection * 0.6 + 0.4;
+    shadowCorrection = lerp(shadowCorrection * 0.8, 0.8, shadow * nDotL);
+    env_reflection *= shadowCorrection;
+    env_irradiance *= shadowCorrection;
 
+    env_irradiance += ambient;
     float3 diffuse = env_irradiance * albedo;
     float3 specular = env_reflection * (kS * envBRDFlookuptexture.r + envBRDFlookuptexture.g);
-    color += (kD * diffuse + specular) * ao * shadowCorrection;
+    color += (kD * diffuse + specular) * ao;
 
     return float4(color, 0);
 }
