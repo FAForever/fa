@@ -4,14 +4,12 @@ AIBuilderGroupTemplate {
     ManagerName = 'EngineerManager',
 
     AIBuilderTemplate {
-        BuilderName = 'Easy - T1 Land Factory Builder',
-        PlatoonTemplate = 'CommanderBuilder',
+        BuilderName = 'Easy - Tech 1 Initial Land Factory',
         Priority = 1500,
         BuilderConditions = { },
         BuilderType = 'Any',
         BuilderData = {
             Construction = {
-                Location = 'MAIN',
                 BuildStructures = {
                     'T1LandFactory',
                 },

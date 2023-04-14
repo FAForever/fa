@@ -164,8 +164,8 @@ end
 function CPlatoon:GetPlatoonUniqueName()
 end
 
---- Returns list of units in theh platoon.
--- @return Table containing units.
+--- Returns list of units in the platoon
+---@return Unit[]
 function CPlatoon:GetPlatoonUnits()
 end
 

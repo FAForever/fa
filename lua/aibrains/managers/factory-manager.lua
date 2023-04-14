@@ -109,7 +109,6 @@ AIFactoryManager = Class(BuilderManager) {
         }
 
         self:AddBuilderType('Any')
-
         self.Trash:Add(ForkThread(self.UpdateFactoryThread, self))
     end,
 
@@ -336,6 +335,11 @@ AIFactoryManager = Class(BuilderManager) {
             self:AssignOrder(factory, builderType)
         end
     end,
+
+    --------------------------------------------------------------------------------------------
+    -- factory conditions interface
+
+
 }
 
 ---@param brain AIBrain

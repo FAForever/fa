@@ -65,40 +65,32 @@ AIStructureManager = Class(BuilderManager) {
         self:AddBuilderType('Any')
 
         -- TODO: refactor this to base class?
-        self:ForkThread(self.UpdateThread)
+        self.Trash:Add(ForkThread(self.UpdateStructureThread, self))
     end,
 
     --------------------------------------------------------------------------------------------
     -- manager interface
 
     ---@param self AIStructureManager
-    UpdateThread = function(self)
+    UpdateStructureThread = function(self)
         while true do
-            if self.Active then
-                self:Update()
+            local total = 0
+            local engineers = self.Structures
+            local engineerCount = self.StructureCount
+            for tech, _ in engineerCount do
+                local count = TableGetSize(engineers[tech])
+                engineerCount[tech] = count
+                total = total + count
             end
-
+    
+            local StructureBeingBuilt = self.StructuresBeingBuilt
+            local StructureBeingBuiltCount = self.StructureBeingBuiltCount
+            for tech, _ in StructureBeingBuiltCount do
+                local count = TableGetSize(StructureBeingBuilt[tech])
+                StructureBeingBuiltCount[tech] = count
+                total = total + count
+            end
             WaitSeconds(1.0)
-        end
-    end,
-
-    ---@param self AIStructureManager
-    Update = function(self)
-        local total = 0
-        local engineers = self.Structures
-        local engineerCount = self.StructureCount
-        for tech, _ in engineerCount do
-            local count = TableGetSize(engineers[tech])
-            engineerCount[tech] = count
-            total = total + count
-        end
-
-        local StructureBeingBuilt = self.StructuresBeingBuilt
-        local StructureBeingBuiltCount = self.StructureBeingBuiltCount
-        for tech, _ in StructureBeingBuiltCount do
-            local count = TableGetSize(StructureBeingBuilt[tech])
-            StructureBeingBuiltCount[tech] = count
-            total = total + count
         end
     end,
 

@@ -16,7 +16,6 @@ AIPlatoon = Class(moho.platoon_methods) {
         self.Trash:Destroy()
     end,
 
-
     OnUnitsAddedToPlatoon = function(self)
 
     end,
