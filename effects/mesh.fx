@@ -9546,7 +9546,7 @@ float4 PBR_Seraphim(
     float3 color = PBR_PS(vertex, albedo.rgb, metallic, roughness, normal, hiDefShadows).rgb;
     color = lerp(color, teamColor * 0.5, albedo.a - 0.2);
  
-    float3 emission = saturate(specular.b - 0.1) + teamColor * albedo.a + whiteness * 2;
+    float3 emission = saturate(specular.b - 0.1) + teamColor * albedo.a + whiteness * 1.5;
     color += emission * albedo;
 
     // Substitute all the computations on pure glowing parts with the
@@ -9557,7 +9557,7 @@ float4 PBR_Seraphim(
     // Bloom is only rendered where alpha > 0
     float teamColorGlow = (vertex.color.r + vertex.color.g + vertex.color.b) / 3;
     teamColorGlow = albedo.a * (1 - teamColorGlow) * 0.06;
-    float alpha = mirrored ? 0.5 : saturate(specular.b - 0.1) * 0.4 + teamColorGlow + whiteness * 0.2;
+    float alpha = mirrored ? 0.5 : saturate(specular.b - 0.1) * 0.4 + teamColorGlow + whiteness * 0.1;
     
     return float4(color, alpha);
 }
