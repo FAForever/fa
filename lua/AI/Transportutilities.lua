@@ -1265,7 +1265,7 @@ function SendPlatoonWithTransportsLOUD( self, aiBrain, destination, attempts, bS
 				
 						if not u.Dead then
                         
-                            Defense = __blueprints[u.BlueprintID].Defense
+                            Defense = u.Blueprint.Defense
 
 							airthreat = airthreat + Defense.AirThreatLevel
 							surthreat = surthreat + Defense.SurfaceThreatLevel
