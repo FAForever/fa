@@ -4466,20 +4466,20 @@ Platoon = Class(moho.platoon_methods) {
         -- Putting the acu into a statemachine after this would allow some interesting personality based long term build outs.
         -- For now we'll just use the personality that the FirstBaseFunction might spit out (check AIBaseTemplates for more info).
         local personality = ScenarioInfo.ArmySetup[aiBrain.Name].AIPersonality
-        
+        local NavUtils = import("/lua/sim/navutils.lua")
         local engPos = eng:GetPosition()
         local massMarkers = import("/lua/sim/markerutilities.lua").GetMarkersByType('Mass')
         local closeMarkers = 0
         local distantMarkers = 0
         -- Create mass point tables for points within build range and points outside of build range.
         for _, marker in massMarkers do
-            if VDist2Sq(marker.position[1], marker.position[3],engPos[1], engPos[3]) < 165 then
+            if VDist2Sq(marker.position[1], marker.position[3],engPos[1], engPos[3]) < 165 and NavUtils.CanPathTo('Amphibious', engPos, marker.position) then
                 closeMarkers = closeMarkers + 1
                 table.insert(buildMassPoints, marker)
                 if closeMarkers > 3 then
                     break
                 end
-            elseif VDist2Sq(marker.position[1], marker.position[3],engPos[1], engPos[3]) < 484 then
+            elseif VDist2Sq(marker.position[1], marker.position[3],engPos[1], engPos[3]) < 484 and NavUtils.CanPathTo('Amphibious', engPos, marker.position) then
                 distantMarkers = distantMarkers + 1
                 table.insert(buildMassDistantPoints, marker)
                 if distantMarkers > 3 then
@@ -4490,7 +4490,7 @@ Platoon = Class(moho.platoon_methods) {
         -- Check if there is a hydrocarbon marker within 65 units. The distance is based on the open palms hydro distance from spawn if your wondering.
         -- 65 units can be far if the hydro is behind the spawn point, we could check angles if we are thinking of alternatives.
         local closestHydro = AIUtils.GetResourceMarkerWithinRadius(aiBrain, engPos, 'Hydrocarbon', 65, false, false, false)
-        if closestHydro then
+        if closestHydro and NavUtils.CanPathTo('Amphibious', engPos, closestHydro.Position) then
             hydroPresent = true
         end
         -- Check if we spawned in water. In which case we want a naval factory first up, and hope for the best.
@@ -4868,7 +4868,7 @@ Platoon = Class(moho.platoon_methods) {
                             WARN('No buildLocation or whatToBuild during ACU initialization')
                         end
                         aiBrain:BuildStructure(eng, whatToBuild, buildLocation, false)
-                        if playableArea[3] > 256 or playableArea[4] > 256 and aiBrain:GetEngineerManagerUnitsBeingBuilt(categories.FACTORY * categories.AIR) < 1 then
+                        if playableArea[3] > 256 or playableArea[4] > 256 and aiBrain:GetEngineerManagerUnitsBeingBuilt(categories.FACTORY * categories.AIR) < 1 and aiBrain:GetCurrentUnits(categories.FACTORY * categories.AIR) < 1 then
                             buildLocation, whatToBuild, borderWarning = AIUtils.GetBuildLocation(aiBrain, buildingTmpl, baseTmplDefault['BaseTemplates'][factionIndex], 'T1AirFactory', eng, true, categories.HYDROCARBON, 25, true)
                             if borderWarning and buildLocation and whatToBuild then
                                 IssueBuildMobile({eng}, {buildLocation[1],GetTerrainHeight(buildLocation[1], buildLocation[2]),buildLocation[2]}, whatToBuild, {})

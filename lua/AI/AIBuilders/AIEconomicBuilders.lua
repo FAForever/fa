@@ -1242,7 +1242,7 @@ BuilderGroup {
     Builder {
         BuilderName = 'T1 Hydrocarbon Engineer Single',
         PlatoonTemplate = 'EngineerBuilder',
-        Priority = 1000,
+        Priority = 1005,
         BuilderConditions = {
                 { UCBC, 'HaveLessThanUnitsWithCategory', { 1, categories.HYDROCARBON}},
                 { UCBC, 'CanBuildOnHydroLessThanDistance', { 'LocationType', 160, -500, 0, 0, 'AntiSurface', 1 }},
