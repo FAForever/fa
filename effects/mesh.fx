@@ -9281,7 +9281,7 @@ float4 PBR_UEF(NORMALMAPPED_VERTEX vertex, float teamColorFactor, uniform bool h
 
     float4 color = PBR_PS(vertex, albedo.rgb, metallic, roughness, normal, hiDefShadows, .04, ao);
 
-    float emission = specular.b * 0.5;
+    float emission = specular.b * 0.8;
     color += emission * albedo;
     float alphaGlow = mirrored ? 0.5 : emission;
     return float4(color.rgb, alphaGlow);
