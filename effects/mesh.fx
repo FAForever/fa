@@ -9496,7 +9496,7 @@ float4 PBR_Cybran(NORMALMAPPED_VERTEX vertex, float teamColorFactor, uniform boo
     float roughness = lerp(0.8 * (1 - specular.g), lerp(0.5, 0.25, specular.g), metallic);
 
     albedo.rgb = min(lerp(albedo.rgb, albedo.rgb * 3, pow(metallic, 2.5)), float3(1, 1, 1));
-    albedo.rgb = lerp(albedo.rgb, vertex.color.rgb * 0.9, teamColorFactor * specular.a);
+    albedo.rgb = lerp(albedo.rgb, vertex.color.rgb, teamColorFactor * specular.a);
 
     float4 color = PBR_PS(vertex, albedo.rgb, metallic, roughness, normal, hiDefShadows);
 
