@@ -1,4 +1,3 @@
 
-local DummyProjectile = import("/lua/sim/projectile.lua").DummyProjectile
-AeonBuildEffect01 = ClassDummyProjectile(DummyProjectile) { }
+AeonBuildEffect01 = ClassDummyProjectile(import("/lua/sim/projectile.lua").DummyProjectile) { }
 TypeClass = AeonBuildEffect01

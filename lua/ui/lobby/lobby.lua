@@ -1519,7 +1519,7 @@ end
 local function AssignRandomStartSpots()
     local teamSpawn = gameInfo.GameOptions['TeamSpawn']
 
-    if teamSpawn == 'fixed' then
+    if teamSpawn == 'fixed' or teamSpawn == 'penguin_autobalance' then
         return
     end
 
@@ -2074,6 +2074,25 @@ local function TryLaunch(skipNoObserversCheck)
     end
 
     if not gameInfo.GameOptions.AllowObservers then
+        
+        -- if observers are not allowed, and team spawn is set to penguin_autobalance, and there are
+        -- an odd number of players, then make the last player an observer now if human 
+        -- (before the check(s)/prompt(s) for having observer(s) when they're not allowed)
+        if gameInfo.GameOptions.TeamSpawn == 'penguin_autobalance' then
+            if math.mod(numPlayers, 2) == 1 then
+                for i = 16, 1, -1 do
+                    -- this gets the last occupied slot
+                    if gameInfo.PlayerOptions[i] then
+                        LOG(gameInfo.PlayerOptions[i].Human)
+                        if gameInfo.PlayerOptions[i].Human then
+                            HostUtils.ConvertPlayerToObserver(i)
+                        end
+                        break
+                    end
+                end
+            end
+        end
+
         local hostIsObserver = false
         local anyOtherObservers = false
         for k, observer in gameInfo.Observers:pairs() do
@@ -2106,6 +2125,11 @@ local function TryLaunch(skipNoObserversCheck)
 
     numberOfPlayers = numPlayers
     local function LaunchGame()
+
+        if gameInfo.GameOptions.TeamSpawn == 'penguin_autobalance' then
+            GUI.PenguinAutoBalance.OnClick()
+        end
+
         -- These two things must happen before the flattening step, mostly for terrible reasons.
         -- This isn't ideal, as it leads to redundant UI repaints :/
         AssignAutoTeams()
@@ -3884,8 +3908,8 @@ function CreateUI(maxPlayers)
         -- Automatically balance an even number of non-observer players into 2 teams in the lobby
         GUI.PenguinAutoBalance.OnClick = function()
 
-            -- make sure spawns are set to fixed
-            if gameInfo.GameOptions.TeamSpawn ~= 'fixed' then
+            -- make sure spawns are set to fixed or penguin_autobalance
+            if gameInfo.GameOptions.TeamSpawn ~= 'fixed' and gameInfo.GameOptions.TeamSpawn ~= 'penguin_autobalance' then
                 gameInfo.GameOptions.TeamSpawn = 'fixed'
                 -- tell everyone else to set spawns to fixed
                 lobbyComm:BroadcastData {
@@ -3926,9 +3950,9 @@ function CreateUI(maxPlayers)
                 goalValue[2] = goalValue[2] - playerRatings[lastSlot[2]][2]
                 playerRatings[lastSlot[2]] = nil
                 playerCount = playerCount - 1
-                -- set the player to not be on a team if teams are manual
+                -- set the player to not be on a team if teams are manual and fixed
                 -- otherwise make the player an observer if human or remove it if AI
-                if gameInfo.GameOptions.AutoTeams == 'none' then
+                if gameInfo.GameOptions.AutoTeams == 'none' and gameInfo.GameOptions.TeamSpawn == 'fixed' then
                     for i, player in gameInfo.PlayerOptions:pairs() do
                         if player.StartSpot == lastSlot[1] then
                             player.Team = 1 -- no team
@@ -4184,6 +4208,23 @@ function CreateUI(maxPlayers)
                 if not table.find(bestTeam, i) then
                     table.insert(bestTeam2, i)
                 end
+            end
+
+            --shuffle player pairs
+            local random
+            local temp
+            for i, slot in bestTeam do
+                random = Random(1, teamSize)
+
+                --random swap on team 1
+                temp = bestTeam[random]
+                bestTeam[random] = bestTeam[i]
+                bestTeam[i] = temp
+
+                --mirrored swap on team2
+                temp = bestTeam2[random]
+                bestTeam2[random] = bestTeam2[i]
+                bestTeam2[i] = temp
             end
 
             -- move players on team1 to the intended slots

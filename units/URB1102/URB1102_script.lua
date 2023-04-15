@@ -1,20 +1,16 @@
-----****************************************************************************
-----**
-----**  File     :  /cdimage/units/URB1102/URB1102_script.lua
-----**  Author(s):  John Comes, Dave Tomandl, Jessica St. Croix
-----**
-----**  Summary  :  Cybran Hydrocarbon Power Plant Script
-----**
-----**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-----****************************************************************************
+-- File     :  /cdimage/units/URB1102/URB1102_script.lua
+-- Author(s):  John Comes, Dave Tomandl, Jessica St. Croix
+-- Summary  :  Cybran Hydrocarbon Power Plant Script
+-- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+------------------------------------------------------------------
 local CEnergyCreationUnit = import("/lua/cybranunits.lua").CEnergyCreationUnit
 
 ---@class URB1102 : CEnergyCreationUnit
 URB1102 = ClassUnit(CEnergyCreationUnit) {
-    AirEffects = {'/effects/emitters/hydrocarbon_smoke_01_emit.bp',},
-    AirEffectsBones = {'Exhaust01', 'Exhaust02', 'Exhaust03', 'Exhaust04',},
-    WaterEffects = {'/effects/emitters/underwater_idle_bubbles_01_emit.bp',},
-    WaterEffectsBones = {'Exhaust01', 'Exhaust02', 'Exhaust03', 'Exhaust04',},
+    AirEffects = { '/effects/emitters/hydrocarbon_smoke_01_emit.bp', },
+    AirEffectsBones = { 'Exhaust01', 'Exhaust02', 'Exhaust03', 'Exhaust04', },
+    WaterEffects = { '/effects/emitters/underwater_idle_bubbles_01_emit.bp', },
+    WaterEffectsBones = { 'Exhaust01', 'Exhaust02', 'Exhaust03', 'Exhaust04', },
 
     OnStopBeingBuilt = function(self,builder,layer)
         CEnergyCreationUnit.OnStopBeingBuilt(self,builder,layer)
@@ -38,5 +34,4 @@ URB1102 = ClassUnit(CEnergyCreationUnit) {
         end
     end,
 }
-
 TypeClass = URB1102
