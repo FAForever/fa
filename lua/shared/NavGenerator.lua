@@ -26,6 +26,15 @@ LayerColors = {
 ---@field Destination Vector 
 ---@field Layer NavLayers
 
+---@class NavDebugPathToStateWithThreatThreshold
+---@field Origin Vector 
+---@field Destination Vector 
+---@field Layer NavLayers
+---@field Radius number
+---@field Threshold number
+---@field ThreatFunctionName AIThreatFunctionNames
+---@field Army Army
+
 ---@class NavDebugCanPathToState
 ---@field Origin Vector 
 ---@field Destination Vector 

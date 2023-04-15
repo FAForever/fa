@@ -298,14 +298,22 @@ function PathTo(layer, origin, destination, options)
     return path, head, distance
 end
 
-local ThreatPosition = { }
+---@alias AIThreatFunctionNames
+--- | 'AntiSurface' 
+--- | 'AntiAir'
+--- | 'MobileAntiSurface'
+--- | 'StructureAntiSurface'
 
----@type table<string, fun(aiBrain: AIBrain, position: Vector, radius: number) : number>
+---@type table<AIThreatFunctionNames, fun(aiBrain: AIBrain, position: Vector, radius: number) : number>
 ThreatFunctions = {
     ---@param aibrain AIBrain
     ---@param position Vector
     ---@param radius number
     AntiSurface = function(aibrain, position, radius)
+        position[2] = GetSurfaceHeight(position[1], position[3])
+        DrawCircle(position, 10, 'ffffff')
+        reprsl(position)
+        LOG("AntiSurface")
         return aibrain:GetThreatAtPosition(position, radius, true, 'AntiSurface')
     end,
 
@@ -314,6 +322,29 @@ ThreatFunctions = {
     ---@param radius number
     AntiAir = function(aibrain, position, radius)
         return aibrain:GetThreatAtPosition(position, radius, true, 'AntiAir')
+    end,
+
+    ---@param aibrain AIBrain
+    ---@param position Vector
+    ---@param radius number
+    MobileAntiSurface = function(aibrain, position, radius)
+        local antiSurface = aibrain:GetThreatAtPosition(position, radius, true, 'AntiSurface')
+        local structure = aibrain:GetThreatAtPosition(position, radius, true, 'Structures')
+        local economic = aibrain:GetThreatAtPosition(position, radius, true, 'Economy')
+
+        return antiSurface - (structure - economic)
+    end,
+
+    ---@param aibrain AIBrain
+    ---@param position Vector
+    ---@param radius number
+    StructureAntiSurface = function(aibrain, position, radius)
+        local antiSurface = aibrain:GetThreatAtPosition(position, radius, true, 'AntiSurface')
+        local structure = aibrain:GetThreatAtPosition(position, radius, true, 'Structures')
+        local economic = aibrain:GetThreatAtPosition(position, radius, true, 'Economy')
+        local land = aibrain:GetThreatAtPosition(position, radius, true, 'Land')
+
+        return antiSurface - (structure - economic) - land
     end,
 }
 
