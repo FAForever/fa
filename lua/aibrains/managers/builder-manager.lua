@@ -123,13 +123,14 @@ AIBuilderManager = ClassSimple {
 
     --- Retrieves the highest builder that is valid with the given parameters
     ---@param self AIBuilderManager
-    ---@param bType BuilderType
-    ---@param params table
+    ---@param builderType BuilderType
+    ---@param platoon AIPlatoon
+    ---@param unit Unit
     ---@return AIBuilder?
-    GetHighestBuilder = function(self, bType, params)
-        local builderData = self.BuilderData[bType]
+    GetHighestBuilder = function(self, builderType, platoon, unit)
+        local builderData = self.BuilderData[builderType]
         if not builderData then
-            error('*BUILDERMANAGER ERROR: Invalid builder type - ' .. bType)
+            error('*BUILDERMANAGER ERROR: Invalid builder type - ' .. builderType)
         end
 
         local tick = GetGameTick()
@@ -153,7 +154,7 @@ AIBuilderManager = ClassSimple {
                 end
 
                 -- check builder conditions
-                if self:BuilderParamCheck(builder, params) then
+                if self:BuilderParamCheck(builder, platoon, unit) then
                     -- check task conditions
                     if builder:EvaluateBuilderConditions(brain, base, tick) then
                         candidates[candidateNext] = builder
@@ -177,9 +178,10 @@ AIBuilderManager = ClassSimple {
     --- Returns true if the given builders matches the manager-specific parameters
     ---@param self AIBuilderManager
     ---@param builder AIBuilder
-    ---@param params table
+    ---@param platoon AIPlatoon
+    ---@param unit Unit
     ---@return boolean
-    BuilderParamCheck = function(self, builder, params)
+    BuilderParamCheck = function(self, builder, platoon, unit)
         return true
     end,
 

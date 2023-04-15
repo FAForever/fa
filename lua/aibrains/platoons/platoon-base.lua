@@ -9,6 +9,7 @@ AIPlatoon = Class(moho.platoon_methods) {
     ---@param plan string
     OnCreate = function(self, plan)
         self.Trash = TrashBag()
+        self.TrashState = TrashBag()
         self.Plan = plan
     end,
 
@@ -23,6 +24,16 @@ AIPlatoon = Class(moho.platoon_methods) {
     PlatoonDisband = function(self)
 
     end,
+
+    ChangeState = function(self, name)
+        ChangeState(self, self[name])
+    end,
+
+    Blank = State {
+        ---@param self AIPlatoon
+        Main = function(self)
+        end,
+    },
 
     -----------------------------------------------------------------
     -- unit events

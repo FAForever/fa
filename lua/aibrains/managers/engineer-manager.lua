@@ -5,6 +5,7 @@
 --****************************************************************************
 
 local AIBuilderManager = import("/lua/aibrains/managers/builder-manager.lua").AIBuilderManager
+local AIPlatoonEngineer = import("/lua/aibrains/platoons/platoon-engineer.lua").AIPlatoonEngineer
 
 local TableGetSize = table.getsize
 
@@ -128,11 +129,10 @@ AIEngineerManager = Class(AIBuilderManager) {
     --- TODO
     ---@param self AIEngineerManager
     ---@param builder AIBuilder
-    ---@param params { [1]: Unit }
+    ---@param platoon AIPlatoon
+    ---@param unit Unit
     ---@return boolean
-    BuilderParamCheck = function(self, builder, params)
-        local unit = params[1]
-
+    BuilderParamCheck = function(self, builder, platoon, unit)
         -- and builder:CheckInstanceCount()
         -- Check if the category of the unit matches the category of the builder
         local template = self:GetEngineerPlatoonTemplate(builder:GetPlatoonTemplate())
@@ -162,11 +162,6 @@ AIEngineerManager = Class(AIBuilderManager) {
             local tech = blueprint.TechCategory
             local id = unit.EntityId
             self.EngineersBeingBuilt[tech][id] = unit
-
-            -- used by platoon functions to find the manager
-            local builderManagerData = unit.BuilderManagerData or { }
-            unit.BuilderManagerData = builderManagerData
-            builderManagerData.EngineerManager = self
         end
     end,
 
@@ -186,11 +181,6 @@ AIEngineerManager = Class(AIBuilderManager) {
             local id = unit.EntityId
             self.EngineersBeingBuilt[tech][id] = nil
             self.Engineers[tech][id] = unit
-
-            -- used by platoon functions to find the manager
-            local builderManagerData = unit.BuilderManagerData or { }
-            unit.BuilderManagerData = builderManagerData
-            builderManagerData.EngineerManager = self
         end
     end,
 
@@ -251,11 +241,6 @@ AIEngineerManager = Class(AIBuilderManager) {
         local id = unit.EntityId
         self.EngineersBeingBuilt[tech][id] = nil
         self.Engineers[tech][id] = unit
-
-        -- used by platoon functions to find the manager
-        local builderManagerData = unit.BuilderManagerData or { }
-        unit.BuilderManagerData = builderManagerData
-        builderManagerData.EngineerManager = self
     end,
 
     --- Remove a unit from the engineer manager, similar to calling `OnUnitDestroyed`
@@ -275,8 +260,54 @@ AIEngineerManager = Class(AIBuilderManager) {
     --------------------------------------------------------------------------------------------
     -- engineer manager interface
 
+    ---@param self AIEngineerManager
+    ---@param unit Unit
     AssignPlatoon = function(self, unit)
+        -- switch any existing behavior to the blank state
+        local aiPlatoon = unit.AIPlatoonReference
+        if aiPlatoon then
+            aiPlatoon:ChangeState('Blank')
+        end
 
+        -- create the platoon, switch metatables and assign the unit
+        local platoon = self.Brain:MakePlatoon('Engineer platoon', '') --[[@as AIPlatoonEngineer]]
+        setmetatable(platoon, AIPlatoonEngineer)
+        self.Brain:AssignUnitsToPlatoon(platoon, {unit}, 'support', 'none')
+        unit.AIPlatoonReference = platoon
+
+        -- assign assets required for this platoon
+        platoon.Brain = self.Brain
+        platoon.Base = self.Base
+
+        -- enable the build behavior
+        platoon:ChangeState('AIBehaviorBuild')
+    end,
+
+    ---@param self AIEngineerManager
+    ---@param platoon AIPlatoonEngineer
+    ---@param unit Unit
+    ---@return AIBuilder?
+    GetBuildTask = function(self, platoon, unit)
+        -- TODO: replace 'Any' with 'BuildTask'
+        return self:GetHighestBuilder('Any', platoon, unit)
+    end,
+
+    ---@param self AIEngineerManager
+    ---@param platoon AIPlatoonEngineer
+    ---@param unit Unit
+    ---@return AIBuilder?
+    GetRepairTask = function(self, platoon, unit)
+        -- TODO: replace 'Any' with 'RepairTask'
+        return self:GetHighestBuilder('Any', platoon, unit)
+    end,
+
+    ---@param self AIEngineerManager
+    ---@param platoon AIPlatoonEngineer
+    ---@param unit Unit
+    ---@return AIBuilder?
+    GetReclaimTask = function(self, platoon, unit)
+        -- TODO: replace 'Any' with 'ReclaimTask'
+        return self:GetHighestBuilder('Any', platoon, unit)
     end,
 }
 
