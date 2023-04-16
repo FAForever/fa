@@ -305,42 +305,7 @@ end
 --- | 'StructureAntiSurface'
 
 ---@type table<AIThreatFunctionNames, fun(aiBrain: AIBrain, position: Vector, radius: number) : number>
-ThreatFunctions = {
-    ---@param aibrain AIBrain
-    ---@param position Vector
-    ---@param radius number
-    AntiSurface = function(aibrain, position, radius)
-        return aibrain:GetThreatAtPosition(position, radius, true, 'AntiSurface')
-    end,
-
-    ---@param aibrain AIBrain
-    ---@param position Vector
-    ---@param radius number
-    AntiAir = function(aibrain, position, radius)
-        return aibrain:GetThreatAtPosition(position, radius, true, 'AntiAir')
-    end,
-
-    ---@param aibrain AIBrain
-    ---@param position Vector
-    ---@param radius number
-    MobileAntiSurface = function(aibrain, position, radius)
-        local antiSurface = aibrain:GetThreatAtPosition(position, radius, true, 'AntiSurface')
-        local structure = aibrain:GetThreatAtPosition(position, radius, true, 'Structures')
-        local economic = aibrain:GetThreatAtPosition(position, radius, true, 'Economy')
-
-        return antiSurface - (structure - economic)
-    end,
-
-    ---@param aibrain AIBrain
-    ---@param position Vector
-    ---@param radius number
-    StructureAntiSurface = function(aibrain, position, radius)
-        local antiSurface = aibrain:GetThreatAtPosition(position, radius, true, 'AntiSurface')
-        local land = aibrain:GetThreatAtPosition(position, radius, true, 'Land')
-
-        return antiSurface - land
-    end,
-}
+ThreatFunctions = Shared.ThreatFunctions
 
 ---@param layer NavLayers
 ---@param origin Vector
@@ -414,7 +379,7 @@ function PathToWithThreatThreshold(layer, origin, destination, aibrain, threatFu
                 neighbor.AcquiredCosts = leaf.AcquiredCosts + leaf:DistanceTo(neighbor) + 2 + preferLargeNeighbor
                 neighbor.TotalCosts = neighbor.AcquiredCosts + 0.25 * destinationLeaf:DistanceTo(neighbor)
 
-                -- include in search, if threat is low enough
+                -- include in search when threat is low enough
                 if root.Threat <= threatThreshold then
                     PathToHeap:Insert(neighbor)
                 end

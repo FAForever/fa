@@ -494,9 +494,9 @@ NavUIPathToWithThreatThreshold = ClassUI(Group) {
             :Width(100)
             :End() --[[@as Combo]]
 
-        self.ComboThreatFunction:AddItems({ 'AntiSurface', 'AntiAir', 'MobileAntiSurface', 'StructureAntiSurface' })
+        self.ComboThreatFunction:AddItems(Shared.ThreatFunctionsList)
         self.ComboThreatFunction:SetItem(1)
-        self.ComboThreatFunction.Layer = Shared.Layers['AntiSurface']
+        self.State.ThreatFunctionName = Shared.ThreatFunctionsList[1]
         self.ComboThreatFunction.OnClick = function(combo, index, text)
             self.State.Army = GetFocusArmy()
             self.State.ThreatFunctionName = text

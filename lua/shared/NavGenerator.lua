@@ -129,3 +129,73 @@ function LabelToColor(label)
 
     return r .. g .. b
 end
+
+---@type table<AIThreatFunctionNames, fun(aiBrain: AIBrain, position: Vector, radius: number) : number>
+ThreatFunctions = {
+    ---@param aibrain AIBrain
+    ---@param position Vector
+    ---@param radius number
+    Land = function(aibrain, position, radius)
+        return aibrain:GetThreatAtPosition(position, radius, true, 'Land')
+    end,
+
+    ---@param aibrain AIBrain
+    ---@param position Vector
+    ---@param radius number
+    Air = function(aibrain, position, radius)
+        return aibrain:GetThreatAtPosition(position, radius, true, 'Air')
+    end,
+
+    ---@param aibrain AIBrain
+    ---@param position Vector
+    ---@param radius number
+    Naval = function(aibrain, position, radius)
+        return aibrain:GetThreatAtPosition(position, radius, true, 'Naval')
+    end,
+
+    ---@param aibrain AIBrain
+    ---@param position Vector
+    ---@param radius number
+    AntiSurface = function(aibrain, position, radius)
+        return aibrain:GetThreatAtPosition(position, radius, true, 'AntiSurface')
+    end,
+
+    ---@param aibrain AIBrain
+    ---@param position Vector
+    ---@param radius number
+    AntiSub = function(aibrain, position, radius)
+        return aibrain:GetThreatAtPosition(position, radius, true, 'AntiSub')
+    end,
+
+    ---@param aibrain AIBrain
+    ---@param position Vector
+    ---@param radius number
+    AntiAir = function(aibrain, position, radius)
+        return aibrain:GetThreatAtPosition(position, radius, true, 'AntiAir')
+    end,
+
+    ---@param aibrain AIBrain
+    ---@param position Vector
+    ---@param radius number
+    MobileAntiSurface = function(aibrain, position, radius)
+        local antiSurface = aibrain:GetThreatAtPosition(position, radius, true, 'AntiSurface')
+        local structure = aibrain:GetThreatAtPosition(position, radius, true, 'Structures')
+        local economic = aibrain:GetThreatAtPosition(position, radius, true, 'Economy')
+
+        return antiSurface - (structure - economic)
+    end,
+
+    ---@param aibrain AIBrain
+    ---@param position Vector
+    ---@param radius number
+    StructureAntiSurface = function(aibrain, position, radius)
+        local antiSurface = aibrain:GetThreatAtPosition(position, radius, true, 'AntiSurface')
+        local land = aibrain:GetThreatAtPosition(position, radius, true, 'Land')
+        local air = aibrain:GetThreatAtPosition(position, radius, false, 'Air')
+
+        return antiSurface - (land + air)
+    end,
+}
+
+-- list of the available threat functions for the debug UI
+ThreatFunctionsList = table.keys(ThreatFunctions)
