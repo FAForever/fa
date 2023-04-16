@@ -207,4 +207,5 @@ ThreatFunctions = {
 }
 
 -- list of the available threat functions for the debug UI
+---@type AIThreatFunctionNames[]
 ThreatFunctionsList = table.keys(ThreatFunctions)
