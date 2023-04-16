@@ -381,7 +381,12 @@ NavUIPathToWithThreatThreshold = ClassUI(Group) {
         local name = 'NavUIPathToWithThreatThreshold'
         Group.__init(self, parent, name)
 
-        self.State = { }
+        self.State = { 
+            Layer = 'Land',
+            Radius = 0,
+            ThreatFunctionName = 'AntiSurface',
+            Threshold = 0,
+        }
 
         self.Background = LayoutHelpers.LayoutFor(Bitmap(self))
             :Fill(self)

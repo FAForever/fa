@@ -310,10 +310,6 @@ ThreatFunctions = {
     ---@param position Vector
     ---@param radius number
     AntiSurface = function(aibrain, position, radius)
-        position[2] = GetSurfaceHeight(position[1], position[3])
-        DrawCircle(position, 10, 'ffffff')
-        reprsl(position)
-        LOG("AntiSurface")
         return aibrain:GetThreatAtPosition(position, radius, true, 'AntiSurface')
     end,
 
@@ -340,11 +336,9 @@ ThreatFunctions = {
     ---@param radius number
     StructureAntiSurface = function(aibrain, position, radius)
         local antiSurface = aibrain:GetThreatAtPosition(position, radius, true, 'AntiSurface')
-        local structure = aibrain:GetThreatAtPosition(position, radius, true, 'Structures')
-        local economic = aibrain:GetThreatAtPosition(position, radius, true, 'Economy')
         local land = aibrain:GetThreatAtPosition(position, radius, true, 'Land')
 
-        return antiSurface - (structure - economic) - land
+        return antiSurface - land
     end,
 }
 
@@ -377,9 +371,6 @@ function PathToWithThreatThreshold(layer, origin, destination, aibrain, threatFu
     local originLeaf = FindLeaf(grid, origin)           --[[@as CompressedLabelTreeLeaf]]
     local destinationLeaf = FindLeaf(grid, destination) --[[@as CompressedLabelTreeLeaf]]
 
-    ---@type CompressedLabelTreeLeaf[]
-    local invalidDueToThreat = { }
-
     -- 0th iteration of search
     originLeaf.From = nil
     originLeaf.AcquiredCosts = 0
@@ -397,39 +388,34 @@ function PathToWithThreatThreshold(layer, origin, destination, aibrain, threatFu
 
         local leaf = PathToHeap:ExtractMin() --[[@as CompressedLabelTreeLeaf]]
 
-        -- final state
+        -- did we reach the destination?
         if leaf == destinationLeaf then
             break
         end
 
-        local root = leaf.Root
-        if root.Seen != seenIdentifier then
-            root.Seen = seenIdentifier
-            root.Threat = threatFunc(aibrain, {leaf.px, 0, leaf.pz}, threatRadius)
-            
-            if root.Threat > 0 then
-                local surface = GetSurfaceHeight(leaf.px, leaf.pz)
-                DrawCircle({leaf.px, surface, leaf.pz}, 10, 'ff0000')
-            end
-        end
+        -- search through neighbors
+        for k = 1, table.getn(leaf) do
+            local neighbor = leaf[k]
+            if neighbor.Label > 0 and neighbor.Seen != seenIdentifier then
+                local preferLargeNeighbor = 0
+                if leaf.Size > neighbor.Size then
+                    preferLargeNeighbor = 100
+                end
 
-        -- do nothing, for now
-        if root.Threat > threatThreshold then
+                -- update threat state
+                local root = neighbor.Root
+                if neighbor.Seen != seenIdentifier then
+                    root.Threat = threatFunc(aibrain, {neighbor.px, 0, neighbor.pz}, threatRadius)
+                end
 
-        -- scan all neighbors and continue the search
-        else
-            for k = 1, table.getn(leaf) do
-                local neighbor = leaf[k]
-                if neighbor.Label > 0 and neighbor.Seen != seenIdentifier then
-                    local preferLargeNeighbor = 0
-                    if leaf.Size > neighbor.Size then
-                        preferLargeNeighbor = 100
-                    end
-                    neighbor.From = leaf
-                    neighbor.Seen = seenIdentifier
-                    neighbor.AcquiredCosts = leaf.AcquiredCosts + leaf:DistanceTo(neighbor) + 2 + preferLargeNeighbor
-                    neighbor.TotalCosts = neighbor.AcquiredCosts + 0.25 * destinationLeaf:DistanceTo(neighbor)
+                -- update pathing state
+                neighbor.From = leaf
+                neighbor.Seen = seenIdentifier
+                neighbor.AcquiredCosts = leaf.AcquiredCosts + leaf:DistanceTo(neighbor) + 2 + preferLargeNeighbor
+                neighbor.TotalCosts = neighbor.AcquiredCosts + 0.25 * destinationLeaf:DistanceTo(neighbor)
 
+                -- include in search, if threat is low enough
+                if root.Threat <= threatThreshold then
                     PathToHeap:Insert(neighbor)
                 end
             end
