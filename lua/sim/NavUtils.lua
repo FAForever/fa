@@ -303,6 +303,10 @@ end
 --- | 'AntiAir'
 --- | 'MobileAntiSurface'
 --- | 'StructureAntiSurface'
+--- | 'Land'
+--- | 'Air' 
+--- | 'Naval'
+--- | 'Amphibious'
 
 ---@type table<AIThreatFunctionNames, fun(aiBrain: AIBrain, position: Vector, radius: number) : number>
 ThreatFunctions = Shared.ThreatFunctions
