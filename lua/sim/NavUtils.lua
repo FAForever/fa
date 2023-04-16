@@ -298,17 +298,6 @@ function PathTo(layer, origin, destination, options)
     return path, head, distance
 end
 
----@alias AIThreatFunctionNames
---- | 'AntiSurface' 
---- | 'AntiAir'
---- | 'MobileAntiSurface'
---- | 'StructureAntiSurface'
---- | 'Land'
---- | 'Air' 
---- | 'Naval'
---- | 'Amphibious'
-
----@type table<AIThreatFunctionNames, fun(aiBrain: AIBrain, position: Vector, radius: number) : number>
 ThreatFunctions = Shared.ThreatFunctions
 
 ---@param layer NavLayers

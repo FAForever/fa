@@ -130,6 +130,15 @@ function LabelToColor(label)
     return r .. g .. b
 end
 
+---@alias AIThreatFunctionNames
+--- | 'AntiSurface' 
+--- | 'AntiAir'
+--- | 'MobileAntiSurface'
+--- | 'StructureAntiSurface'
+--- | 'Land'
+--- | 'Air' 
+--- | 'Naval'
+
 ---@type table<AIThreatFunctionNames, fun(aiBrain: AIBrain, position: Vector, radius: number) : number>
 ThreatFunctions = {
     ---@param aibrain AIBrain
