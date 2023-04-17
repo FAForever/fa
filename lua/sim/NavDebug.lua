@@ -266,6 +266,18 @@ function Scan()
                 end
             end
 
+            if PathToWithThreatThresholdState.Origin then
+                DrawCircle(PathToWithThreatThresholdState.Origin, 3.9, '000000')
+                DrawCircle(PathToWithThreatThresholdState.Origin, 4, Shared.LayerColors[PathToWithThreatThresholdState.Layer] or 'ffffff')
+                DrawCircle(PathToWithThreatThresholdState.Origin, 4.1, '000000')
+            end
+
+            if PathToWithThreatThresholdState.Destination then
+                DrawCircle(PathToWithThreatThresholdState.Destination, 3.9, '000000')
+                DrawCircle(PathToWithThreatThresholdState.Destination, 4, Shared.LayerColors[PathToWithThreatThresholdState.Layer] or 'ffffff')
+                DrawCircle(PathToWithThreatThresholdState.Destination, 4.1, '000000')
+            end
+
             if PathToWithThreatThresholdState.Origin and
                 PathToWithThreatThresholdState.Destination and
                 PathToWithThreatThresholdState.Layer and
