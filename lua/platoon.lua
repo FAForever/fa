@@ -588,8 +588,9 @@ Platoon = Class(moho.platoon_methods) {
         if not aiBrain:PlatoonExists(self) or not self:GetPlatoonPosition() then
             return
         end
-
+        local NavUtils = import("/lua/sim/navutils.lua")
         local renderThread = false
+        self.PlatoonSurfaceThreat = self:GetPlatoonThreat('Surface', categories.ALLUNITS)
         AIAttackUtils.GetMostRestrictiveLayer(self)
 
         if forceGuardBase or not self.PlatoonData.NeverGuardBases then
@@ -634,7 +635,7 @@ Platoon = Class(moho.platoon_methods) {
             end
 
             if bestBase and bestDefense < threshold then
-                local path, reason = AIAttackUtils.PlatoonGenerateSafePathTo(aiBrain, self.MovementLayer, self:GetPlatoonPosition(), bestBase.Position, 200)
+                local path, reason = NavUtils.PathToWithThreatThreshold(self.MovementLayer, self:GetPlatoonPosition(), bestBase.Position, aiBrain, NavUtils.ThreatFunctions.AntiSurface, self.PlatoonSurfaceThreat * 2, aiBrain.IMAPConfig.Rings)
 
                 IssueClearCommands(self:GetPlatoonUnits())
 
@@ -836,9 +837,14 @@ Platoon = Class(moho.platoon_methods) {
         -----------------------------------------------------------------------
 
 
+
+
+        
+        local markerLocations = import("/lua/sim/markerutilities.lua").GetMarkersByType(markerType)
+        local NavUtils = import("/lua/sim/navutils.lua")
         AIAttackUtils.GetMostRestrictiveLayer(self)
         self:SetPlatoonFormationOverride(PlatoonFormation)
-        local markerLocations = import("/lua/sim/markerutilities.lua").GetMarkersByType(markerType)
+        self.PlatoonSurfaceThreat = self:GetPlatoonThreat('Surface', categories.ALLUNITS)
 
         local bestMarker = false
 
@@ -942,7 +948,7 @@ Platoon = Class(moho.platoon_methods) {
             self.LastMarker[2] = self.LastMarker[1]
             self.LastMarker[1] = bestMarker.position
             --LOG("GuardMarker: Attacking " .. bestMarker.Name)
-            local path, reason = AIAttackUtils.PlatoonGenerateSafePathTo(aiBrain, self.MovementLayer, self:GetPlatoonPosition(), bestMarker.position, 200)
+            local path, reason = NavUtils.PathToWithThreatThreshold(self.MovementLayer, self:GetPlatoonPosition(), bestBase.Position, aiBrain, NavUtils.ThreatFunctions.AntiSurface, self.PlatoonSurfaceThreat * 2, aiBrain.IMAPConfig.Rings)
             local success, bestGoalPos = AIAttackUtils.CheckPlatoonPathingEx(self, bestMarker.position)
             IssueClearCommands(self:GetPlatoonUnits())
             if path then
@@ -1100,6 +1106,7 @@ Platoon = Class(moho.platoon_methods) {
     ---@param self Platoon
     ---@return nil
     LandScoutingAI = function(self)
+        local NavUtils = import("/lua/sim/navutils.lua")
         AIAttackUtils.GetMostRestrictiveLayer(self)
 
         local aiBrain = self:GetBrain()
@@ -1142,7 +1149,7 @@ Platoon = Class(moho.platoon_methods) {
             --Is there someplace we should scout?
             if targetData then
                 --Can we get there safely?
-                local path, reason = AIAttackUtils.PlatoonGenerateSafePathTo(aiBrain, self.MovementLayer, scout:GetPosition(), targetData.Position, 400) --DUNCAN - Increase threatwieght from 100
+                local path, reason = NavUtils.PathToWithThreatThreshold(self.MovementLayer, scout:GetPosition(), targetData.Position, aiBrain, NavUtils.ThreatFunctions.AntiSurface, 400, aiBrain.IMAPConfig.Rings)
 
                 IssueClearCommands(self:GetPlatoonUnits())
 
@@ -2600,6 +2607,8 @@ Platoon = Class(moho.platoon_methods) {
     --DUNCAN - Credit to sorian, called AirHuntAI in his pack
     ---@param self Platoon
     GunshipHuntAI = function(self)
+        local NavUtils = import("/lua/sim/navutils.lua")
+        AIAttackUtils.GetMostRestrictiveLayer(self)
         self:Stop()
         local aiBrain = self:GetBrain()
         local armyIndex = aiBrain:GetArmyIndex()
@@ -2619,7 +2628,7 @@ Platoon = Class(moho.platoon_methods) {
             elseif not target and hadtarget then
                 local x,z = aiBrain:GetArmyStartPos()
                 local position = AIUtils.RandomLocation(x,z)
-                local safePath, reason = AIAttackUtils.PlatoonGenerateSafePathTo(aiBrain, 'Air', self:GetPlatoonPosition(), position, 200)
+                local safePath, reason = NavUtils.PathToWithThreatThreshold(self.MovementLayer, self:GetPlatoonPosition(), position, aiBrain, NavUtils.ThreatFunctions.AntiAir, 200, aiBrain.IMAPConfig.Rings)
                 if safePath then
                     for _,p in safePath do
                         self:MoveToLocation(p, false)
@@ -2767,6 +2776,7 @@ Platoon = Class(moho.platoon_methods) {
         if not aiBrain then
             return
         end
+        self.PlatoonSurfaceThreat = self:GetPlatoonThreat('Surface', categories.ALLUNITS)
 
         -- only works for carriers!
         for k,v in self:GetPlatoonUnits() do
