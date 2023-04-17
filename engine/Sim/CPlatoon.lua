@@ -125,12 +125,13 @@ function CPlatoon:GetAIPlan()
 end
 
 --- Returns army brain of the platoon.
+---@return AIBrain
 function CPlatoon:GetBrain()
 end
 
 --- Returns number representing faction.
 -- 1 UEF, 2 Aeon, 3 Cybran, 4 Seraphim.
--- @return Number 1-4
+---@return number
 function CPlatoon:GetFactionIndex()
 end
 

@@ -91,6 +91,7 @@ local TableEmpty = table.empty
 local TableGetn = table.getn
 
 local Exclusions = {
+    __base = true,
     __index = true,
     n = true,
     __name = true,
@@ -553,6 +554,7 @@ function ConstructClass(bases, specs)
             local d = Deepcopy(v)
 
             -- set meta table information
+            d.__base = class
             d.__index = d
             setmetatable(d, class)
 

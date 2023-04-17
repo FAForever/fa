@@ -961,6 +961,8 @@
 ---@field FuelUseTime number
 --- How much the collision model is offset from the ground. Used to make aircraft land properly.
 ---@field GroundCollisionOffset? number
+--- Used in combination with `FlattenSkirt` to guarantee the result is completely horizontal
+---@field HorizontalSkirt boolean
 --- used by the Seraphim sniper bot script as the speed multiplier when the alternate sniper mode
 --- is activated
 ---@field LandSpeedMultiplier? number
