@@ -2077,12 +2077,13 @@ function EngineerMoveWithSafePath(aiBrain, unit, destination)
     if not destination then
         return false
     end
+    local NavUtils = import("/lua/sim/navutils.lua")
     local pos = unit:GetPosition()
     -- don't check a path if we are in build range
     if VDist2(pos[1], pos[3], destination[1], destination[3]) < 14 then
         return true
     end
-    local result, bestPos = unit:CanPathTo(destination)
+    local result = CanPathTo('Amphibious', pos, destination)
     local bUsedTransports = false
     -- Increase check to 300 for transports
     if not result or VDist2Sq(pos[1], pos[3], destination[1], destination[3]) > 300 * 300
@@ -2106,7 +2107,7 @@ function EngineerMoveWithSafePath(aiBrain, unit, destination)
 
     -- If we're here, we haven't used transports and we can path to the destination
     if result then
-        local path, reason = AIAttackUtils.PlatoonGenerateSafePathTo(aiBrain, 'Amphibious', pos, destination)
+        local path, reason = NavUtils.PathToWithThreatThreshold('Amphibious', pos, destination, aiBrain, NavUtils.ThreatFunctions.AntiSurface, 200, aiBrain.IMAPConfig.Rings)
         if path then
             local pathSize = table.getn(path)
             -- Move to way points (but not to destination... leave that for the final command)

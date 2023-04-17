@@ -2772,11 +2772,12 @@ Platoon = Class(moho.platoon_methods) {
     --- to wreck havoc on air units
     ---@param self Platoon
     CarrierAI = function(self)
+        local NavUtils = import("/lua/sim/navutils.lua")
         local aiBrain = self:GetBrain()
         if not aiBrain then
             return
         end
-        self.PlatoonSurfaceThreat = self:GetPlatoonThreat('Surface', categories.ALLUNITS)
+        self.PlatoonAirThreat = self:GetPlatoonThreat('Air', categories.ALLUNITS)
 
         -- only works for carriers!
         for k,v in self:GetPlatoonUnits() do
@@ -2832,12 +2833,12 @@ Platoon = Class(moho.platoon_methods) {
             if attackPos and oldPathSize == 0 or attackPos[1] != self.LastAttackDestination[oldPathSize][1] or attackPos[3] != self.LastAttackDestination[oldPathSize][3] then
                 AIAttackUtils.GetMostRestrictiveLayer(self)
                 -- check if we can path to here safely... give a large threat weight to sort by threat first
-                local path, reason = AIAttackUtils.PlatoonGenerateSafePathTo(aiBrain, self.MovementLayer, self:GetPlatoonPosition(), attackPos, self.PlatoonData.NodeWeight or 10)
-
+                local path, reason = NavUtils.PathToWithThreatThreshold(self.MovementLayer, self:GetPlatoonPosition(), attackPos, aiBrain, NavUtils.ThreatFunctions.AntiSurface, self.PlatoonAirThreat * 2, aiBrain.IMAPConfig.Rings)
                 -- clear command queue
                 self:Stop()
 
                 if not path then
+                    -- Need to understand the reason for this in navmesh
                     if reason == 'NoStartNode' or reason == 'NoEndNode' then
                         --Couldn't find a valid pathing node. Just use shortest path.
                         self:AggressiveMoveToLocation(attackPos)
@@ -3252,6 +3253,7 @@ Platoon = Class(moho.platoon_methods) {
     --- for a new platoon
     ---@param self Platoon
     ReturnToBaseAI = function(self)
+        local NavUtils = import("/lua/sim/navutils.lua")
         local aiBrain = self:GetBrain()
 
         if not aiBrain:PlatoonExists(self) or not self:GetPlatoonPosition() then
@@ -3284,7 +3286,8 @@ Platoon = Class(moho.platoon_methods) {
             else
                 returnPos = bestBase.Position
             end
-            local path, reason = AIAttackUtils.PlatoonGenerateSafePathTo(aiBrain, self.MovementLayer, self:GetPlatoonPosition(), returnPos, 200)
+            -- needs to support air, land, sea
+            local path, reason =  NavUtils.PathToWithThreatThreshold(self.MovementLayer, self:GetPlatoonPosition(), returnPos, aiBrain, NavUtils.ThreatFunctions.AntiSurface, 200, aiBrain.IMAPConfig.Rings)
             -- remove any formation settings to ensure a quick return to base.
             self:SetPlatoonFormationOverride('NoFormation')
             self:Stop()
@@ -3846,6 +3849,7 @@ Platoon = Class(moho.platoon_methods) {
     ---@param self Platoon
     ---@return nil
     AirHuntAI = function(self)
+        
         self:Stop()
         local aiBrain = self:GetBrain()
         local armyIndex = aiBrain:GetArmyIndex()
@@ -3857,6 +3861,7 @@ Platoon = Class(moho.platoon_methods) {
         'MOBILE LAND', 'MASSFABRICATION', 'SHIELD', 'ANTIAIR STRUCTURE', 'DEFENSE STRUCTURE', 'STRUCTURE', 'COMMAND',
         'MOBILE ANTIAIR', 'ALLUNITS',
         }
+        self.PlatoonAirThreat = self:GetPlatoonThreat('Air', categories.ALLUNITS)
         while aiBrain:PlatoonExists(self) do
             target = self:FindClosestUnit('Attack', 'Enemy', true, categories.ALLUNITS - categories.WALL)
             local newtarget = false
@@ -3882,9 +3887,10 @@ Platoon = Class(moho.platoon_methods) {
                 self:AggressiveMoveToLocation(table.copy(target:GetPosition()))
                 hadtarget = true
             elseif not target and hadtarget then
+                local NavUtils = import("/lua/sim/navutils.lua")
                 local x,z = aiBrain:GetArmyStartPos()
                 local position = AIUtils.RandomLocation(x,z)
-                local safePath, reason = AIAttackUtils.PlatoonGenerateSafePathTo(aiBrain, 'Air', self:GetPlatoonPosition(), position, 200)
+                local safePath, reason = NavUtils.PathToWithThreatThreshold(self.MovementLayer, self:GetPlatoonPosition(), position, aiBrain, NavUtils.ThreatFunctions.AntiAir, self.PlatoonAirThreat * 2, aiBrain.IMAPConfig.Rings)
                 if safePath then
                     for _,p in safePath do
                         self:MoveToLocation(p, false)
