@@ -75,14 +75,20 @@ StructureUnit = ClassUnit(Unit) {
         local blueprint = self.Blueprint
         local physicsBlueprint = blueprint.Physics
         local flatten = physicsBlueprint.FlattenSkirt
+        local horizontalSkirt = physicsBlueprint.HorizontalSkirt
         if flatten then
-            self:FlattenSkirt()
+            if horizontalSkirt then
+                self:FlattenSkirtHorizontally()
+            else
+                self:FlattenSkirt()
+            end
         end
 
         -- check for terrain orientation
         if not (
                 physicsBlueprint.AltitudeToTerrain or
-                physicsBlueprint.StandUpright
+                physicsBlueprint.StandUpright or
+                horizontalSkirt
             ) and (flatten or physicsBlueprint.AlwaysAlignToTerrain)
             and (layer == 'Land' or layer == 'Seabed')
         then
@@ -220,8 +226,40 @@ StructureUnit = ClassUnit(Unit) {
     end,
 
     ---@param self StructureUnit
+    FlattenSkirtHorizontally = function(self)
+        local x0, z0, x1, z1 = self:GetSkirtRect()
+
+        -- floor them
+        x0 = x0 ^ 0
+        z0 = z0 ^ 0
+
+        -- ceil them
+        x1 = 1 + (x1 ^ 0)
+        z1 = 1 + (z1 ^ 0)
+
+        -- compute average elevation and flatten
+        local elevation = 0.25 * (
+            GetTerrainHeight(x0, z0) +
+            GetTerrainHeight(x1, z0) +
+            GetTerrainHeight(x0, z1) +
+            GetTerrainHeight(x1, z1)
+        )
+
+        FlattenMapRect(x0, z0, x1 - x0, z1 - z0, elevation)
+    end,
+
+    ---@param self StructureUnit
     FlattenSkirt = function(self)
         local x0, z0, x1, z1 = self:GetSkirtRect()
+
+        -- floor them
+        x0 = x0 ^ 0
+        z0 = z0 ^ 0
+
+        -- ceil them
+        x1 = 1 + (x1 ^ 0)
+        z1 = 1 + (z1 ^ 0)
+
         import('/lua/sim/TerrainUtils.lua').FlattenGradientMapRect(x0, z0, x1 - x0, z1 - z0)
     end,
 

@@ -1,13 +1,8 @@
---****************************************************************************
---**
---**  File     :  /effects/entities/UnitTeleport01/UnitTeleport01_script.lua
---**  Author(s):  Gordon Duclos
---**
---**  Summary  :  Unit Teleport effect entity
---**
---**  Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
---****************************************************************************
-
+-- File     :  /effects/entities/UnitTeleport01/UnitTeleport01_script.lua
+-- Author(s):  Gordon Duclos
+-- Summary  :  Unit Teleport effect entity
+-- Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
+--------------------------------------------------------------------------
 local NullShell = import("/lua/sim/defaultprojectiles.lua").NullShell
 local RandomFloat = import("/lua/utilities.lua").GetRandomFloat
 local EffectTemplate = import("/lua/effecttemplates.lua")
@@ -52,10 +47,9 @@ UnitTeleportEffect01 = Class(NullShell) {
 
         DamageRing(self, pos, 2, 7, 1, 'Fire', false, false)
 
-		-- Wait till we want the commander to appear visibily
+        -- Wait till we want the commander to appear visibily
 		WaitSeconds(1.4)
 
-        -- Smoke ring, explosion effects
         CreateLightParticleIntel( self, -1, army, 35, 10, 'glow_02', 'ramp_blue_13' )
         DamageRing(self, pos, .1, 11, 100, 'Disintegrate', false, false)
 
@@ -72,11 +66,11 @@ UnitTeleportEffect01 = Class(NullShell) {
 
         DamageRing(self, pos, .1, 11, 100, 'Disintegrate', false, false)
         WaitSeconds(0.2)
-        
+
         -- light some trees on fire
         DamageRing(self, pos, 1, 16, 1, 'TreeFire', false, false)
 
-		-- knockdown trees
+        -- knockdown trees
         for k = 1, 2 do 
             DamageRing(self, pos, 11, 11 + k, 1, 'TreeForce', false, false)
             WaitSeconds(0.1)
@@ -85,7 +79,7 @@ UnitTeleportEffect01 = Class(NullShell) {
         -- light some trees on fire
         DamageRing(self, pos, 13, 21, 1, 'TreeFire', false, false)
 
-		-- knockdown trees
+        -- knockdown trees
         for k = 1, 4 do 
             DamageRing(self, pos, 11, 13 + k * 2, 1, 'TreeForce', false, false)
             WaitSeconds(0.1)
@@ -111,16 +105,16 @@ UnitTeleportEffect01 = Class(NullShell) {
     CreateFlares = function( self, army )
         local numFlares = 45
         local angle = (2*math.pi) / numFlares
-        local angleInitial = 0.0 --RandomFloat( 0, angle )
-        local angleVariation = (2*math.pi) --0.0 --angle * 0.5
+        local angleInitial = 0.0
+        local angleVariation = (2*math.pi)
 
-        local emit, x, y, z = nil
+        local emit, x, y, z = nil,nil,nil,nil
         local DirectionMul = 0.02
         local OffsetMul = 1
 
         for i = 0, (numFlares - 1) do
             x = math.sin(angleInitial + (i*angle) + RandomFloat(-angleVariation, angleVariation))
-            y = 0.5 --RandomFloat(0.5, 1.5)
+            y = 0.5
             z = math.cos(angleInitial + (i*angle) + RandomFloat(-angleVariation, angleVariation))
 
             for k, v in EffectTemplate.CloudFlareEffects01 do

@@ -5,6 +5,7 @@ local bl = { 0, 0, 0 }
 local br = { 0, 0, 0 }
 
 ---@class AIGridCell
+---@field Grid AIGrid
 ---@field Identifier string
 ---@field X number
 ---@field Z number
@@ -27,12 +28,13 @@ Grid = ClassSimple {
         end
 
         local cells = {}
-        for k = 1, cellCount do
-            cells[k] = {}
-            for l = 1, cellCount do
-                cells[k][l] = {
-                    X = k, Z = l,
-                    Identifier = string.format('%d - %d', k, l),
+        for x = 1, cellCount do
+            cells[x] = {}
+            for z = 1, cellCount do
+                cells[x][z] = {
+                    Grid = self,
+                    X = x, Z = z,
+                    Identifier = string.format('%d - %d', x, z),
                 }
             end
         end
@@ -42,28 +44,47 @@ Grid = ClassSimple {
         self.Cells = cells
     end,
 
+    --- Converts a world position to a cell
+    ---@param self AIGrid
+    ---@param wx number     # in world space
+    ---@param wz number     # in world space
+    ---@return AIGridCell
+    ToCellFromWorldSpace = function(self, wx, wz)
+        local gx, gz = self:ToGridSpace(wx, wz)
+        return self.Cells[gx][gz]
+    end,
+
+    --- Converts a grid position to a cell
+    ---@param self AIGrid
+    ---@param gx number     # in grid space
+    ---@param gz number     # in grid space
+    ---@return AIGridCell
+    ToCellFromGridSpace = function(self, gx, gz)
+        return self.Cells[gx][gz]
+    end,
+
     --- Converts a world position to a grid position, always returns a valid position
     ---@param self AIGrid
-    ---@param px number     # in world space
-    ---@param pz number     # in world space
+    ---@param wx number     # in world space
+    ---@param wz number     # in world space
     ---@return number       # in grid space
     ---@return number       # in grid space
-    ToCellIndices = function(self, px, pz)
+    ToGridSpace = function(self, wx, wz)
         local cellCount = self.CellCount
         local cellSize = self.CellSize
         local inverse = 1 / cellSize
 
         local bx = 1
-        if px > 0 then
-            bx = ((px * inverse) ^ 0) + 1
+        if wx > 0 then
+            bx = ((wx * inverse) ^ 0) + 1
             if bx > cellCount then
                 bx = cellCount
             end
         end
 
         local bz = 1
-        if pz > 0 then
-            bz = ((pz * inverse) ^ 0) + 1
+        if wz > 0 then
+            bz = ((wz * inverse) ^ 0) + 1
             if bz > cellCount then
                 bz = cellCount
             end
@@ -76,13 +97,19 @@ Grid = ClassSimple {
     ---@param self AIGrid
     ---@param bx number     # in grid space
     ---@param bz number     # in grid space
-    ---@return number       # in world space
-    ---@return number       # in world space
-    ToWorldSpace = function(self, bx, bz)
+    ---@param cache? Vector # optional value, allows you to re-use memory in hot spots
+    ---@return Vector       # in world space
+    ToWorldSpace = function(self, bx, bz, cache)
         local cellSize = self.CellSize
         local px = (bx - 1) * cellSize + 0.5 * cellSize
         local pz = (bz - 1) * cellSize + 0.5 * cellSize
-        return px, pz
+
+        local position = cache or { }
+        position[1] = px
+        position[2] = GetSurfaceHeight(px, pz)
+        position[3] = pz
+
+        return position
     end,
 
     --- Converts a cell into a rectangle
