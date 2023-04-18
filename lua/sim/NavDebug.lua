@@ -277,7 +277,7 @@ function Scan()
                         end
                     end
                 end
-
+                
                 if PathToWithThreatThresholdState.Origin then
                     DrawCircle(PathToWithThreatThresholdState.Origin, 3.9, '000000')
                     DrawCircle(PathToWithThreatThresholdState.Origin, 4,
