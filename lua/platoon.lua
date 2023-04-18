@@ -48,7 +48,7 @@ Platoon = Class(moho.platoon_methods) {
     ---@param self Platoon
     ---@param dataTable table
     SetPlatoonData = function(self, dataTable)
-        self.PlatoonData = dataTable
+        self.PlatoonData = table.deepcopy(dataTable)
     end,
 
     ---@param self Platoon
@@ -2406,7 +2406,7 @@ Platoon = Class(moho.platoon_methods) {
             table.insert(baseTmplList, baseTmpl)
         elseif cons.AdjacencyCategory then
             relative = false
-            local pos = self.PlatoonData.Base.Position
+            local pos = aiBrain.BuilderManagers[eng.BuilderManagerData.LocationType].EngineerManager.Location
             local cat = cons.AdjacencyCategory
             -- convert text categories like 'MOBILE AIR' to 'categories.MOBILE * categories.AIR'
             if type(cat) == 'string' then
