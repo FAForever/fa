@@ -25,6 +25,101 @@ local Shared = import("/lua/shared/navgenerator.lua")
 local NavGenerator = import("/lua/sim/navgenerator.lua")
 local NavDatastructures = import("/lua/sim/navdatastructures.lua")
 
+-------------------------------------------------------------------------------
+-- Debugging functionality
+
+local Debug = false
+function EnableDebugging()
+    Debug = true
+end
+
+function DisableDebugging()
+    Debug = false
+end
+
+---@type { PathTo: { Tick: number, Path: Vector[], Origin: Vector, Destination: Vector }[] , PathToWithThreatThreshold: { Tick: number, Path: Vector[], Origin: Vector, Destination: Vector }[] }
+local paths = {
+    PathTo = { },
+    PathToWithThreatThreshold = { }
+}
+
+---@param path Vector[]
+---@param type 'PathTo' | 'PathToWithThreatThreshold'
+function DebugRegisterPath(type, path, origin, destination)
+    if Debug then
+        ---@type { Tick: number, Path: Vector[], Origin: Vector, Destination: Vector }[]
+        local cache = paths[type]
+        if cache then
+            local n = table.getn(cache)
+            cache[n + 1] = {
+                Tick = GetGameTick(),
+                Path = path,
+                Origin = origin,
+                Destination = destination,
+            }
+        end
+    end
+end
+
+function DebugPathRender()
+    local DrawCircle = DrawCircle
+    local DrawLinePop = DrawLinePop
+    local GetGameTick = GetGameTick
+    local TableGetn = table.getn
+
+    while true do
+        local tick = GetGameTick()
+        for type, cache in paths do
+            local color = '4BFF4B'
+            if type == 'PathToWithThreatThreshold' then
+                color = '0099FF'
+            end
+
+            for id, info in cache do
+                -- draw start
+                DrawCircle(info.Origin, 1.9, '000000')
+                DrawCircle(info.Origin, 2, color)
+                DrawCircle(info.Origin, 2.1, '000000')
+
+                -- draw end
+                DrawCircle(info.Destination, 1.9, '000000')
+                DrawCircle(info.Destination, 2, color)
+                DrawCircle(info.Destination, 2.1, '000000')
+
+                -- draw path
+                local path = info.Path
+                local n = TableGetn(path)
+                if n >= 2 then
+                    local last = path[1]
+                    for k = 2, n do
+                        DrawLinePop(last, path[k], color)
+                        last = path[k]
+                    end
+                end
+
+                -- remove paths we're no longer interested in
+                if info.Tick + 60 < tick then
+                    cache[id] =  nil
+                end
+            end
+        end
+
+        WaitTicks(1)
+    end
+end
+
+local DebugPathRenderThread = ForkThread(DebugPathRender)
+
+--- Called by the module manager when this module is dirty due to a disk change
+function __moduleinfo.OnDirty()
+    if DebugPathRenderThread then
+        DebugPathRenderThread:Destroy()
+    end
+end
+
+-- Debugging functionality
+-------------------------------------------------------------------------------
+
 --- Returns true if the navigational mesh is generated
 ---@return boolean
 function IsGenerated()
@@ -294,6 +389,8 @@ function PathTo(layer, origin, destination, options)
     -- clear up after ourselves
     PathToHeap:Clear()
 
+    DebugRegisterPath('PathTo', path, origin, destination)
+
     -- return all the goodies!!
     return path, head, distance
 end
@@ -419,6 +516,8 @@ function PathToWithThreatThreshold(layer, origin, destination, aibrain, threatFu
 
     -- clear up after ourselves
     PathToHeap:Clear()
+
+    DebugRegisterPath('PathToWithThreatThreshold', path, origin, destination)
 
     -- return all the goodies!!
     return path, head, distance
