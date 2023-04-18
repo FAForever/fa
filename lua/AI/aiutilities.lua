@@ -2083,7 +2083,7 @@ function EngineerMoveWithSafePath(aiBrain, unit, destination)
     if VDist2(pos[1], pos[3], destination[1], destination[3]) < 14 then
         return true
     end
-    local result = CanPathTo('Amphibious', pos, destination)
+    local result = NavUtils.CanPathTo('Amphibious', pos, destination)
     local bUsedTransports = false
     -- Increase check to 300 for transports
     if not result or VDist2Sq(pos[1], pos[3], destination[1], destination[3]) > 300 * 300

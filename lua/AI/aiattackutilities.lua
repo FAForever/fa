@@ -533,6 +533,9 @@ function AIPlatoonNavalAttackVector(aiBrain, platoon)
     local NavUtils = import("/lua/sim/navutils.lua")
     --Engine handles whether or not we can occupy our vector now, so this should always be a valid, occupiable spot.
     local attackPos, targetPos = GetBestThreatTarget(aiBrain, platoon)
+    if not platoon.PlatoonSurfaceThreat then
+        platoon.PlatoonSurfaceThreat = platoon:GetPlatoonThreat('Surface', categories.ALLUNITS)
+    end
 
     -- if no pathable attack spot found
     --DUNCAN - removed as still need to patrol
