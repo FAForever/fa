@@ -45,8 +45,6 @@ end
 ---@param builderTable table
 ---@param tableName string
 function AddBuilderTable(aiBrain, locationType, builderTable, tableName)
-    LOG("Helloooo")
-    LOG(locationType)
     aiBrain.BuilderManagers[locationType].BuilderHandles = aiBrain.BuilderManagers[locationType].BuilderHandles or {}
     aiBrain.BuilderManagers[locationType].BuilderHandles[tableName] = {}
 
