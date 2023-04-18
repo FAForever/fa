@@ -4418,6 +4418,34 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         end
     end,
 
+    ---@param self Unit
+    ---@param count number
+    GiveNukeSiloAmmo = function(self, count)
+        cUnit.GiveNukeSiloAmmo(self, count)
+    end,
+
+    ---@param self Unit
+    ---@param fraction number
+    GiveNukeSiloBlocks = function(self, fraction)
+        if fraction < 0 or fraction > 1 then
+            return
+        end
+
+        local buildRate = self.Blueprint.Economy.BuildRate
+        if not buildRate then
+            return
+        end
+
+        local buildTime = self:GetWeapon(1):GetProjectileBlueprint().Economy.BuildTime
+        if not buildTime then
+            return
+        end
+
+        local total = 10 * (buildTime / buildRate)
+        local blocks = math.ceil(fraction * total)
+        cUnit.GiveNukeSiloAmmo(self, blocks, true)
+    end,
+
     --- Stuns the unit, if it isn't set to be immune by the flag unit.ImmuneToStun
     ---@param self Unit A reference to the unit itself, automatically set when you use the ':' notation
     ---@param duration number Stun duration in seconds

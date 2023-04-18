@@ -1,6 +1,3 @@
---
--- Fire Test Projectile Script
---
 local NullShell = import("/lua/sim/defaultprojectiles.lua").NullShell
 
 DestructionFire01 = Class(NullShell) {
@@ -9,7 +6,4 @@ DestructionFire01 = Class(NullShell) {
     FxImpactWater = import("/lua/effecttemplates.lua").NoEffects,
     FxImpactNone = import("/lua/effecttemplates.lua").NoEffects,
 }
-
-
 TypeClass = DestructionFire01
-

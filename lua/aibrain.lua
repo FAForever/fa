@@ -380,7 +380,7 @@ local AIBrainEnergyComponent = ClassSimple {
         -- localize scope for better performance
         local pcall = pcall
         local TableSize = table.getsize
-        local CoroutineYield = CoroutineYield
+        local CoroutineYield = coroutine.yield
 
         local ok, msg
 
