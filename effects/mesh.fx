@@ -9193,12 +9193,6 @@ float4 PBR_PS(
     // so we have to tune them down a bit across the board.
     envBRDFlookuptexture.g *= 0.5;
 
-    float shadow = ComputeShadow(vertex.shadow, hiDefShadows);
-    float3 sunLight = sunDiffuse * lightMultiplier;
-    // We need to do this to stay consistent with ComputeLight()
-    sunLight += (1 - sunLight) * shadowFill;
-    sunLight *= shadow;
-
     //////////////////////////////
     // Compute sun light
     //
@@ -9206,6 +9200,13 @@ float4 PBR_PS(
     float3 l = sunDirection;
     float3 h = normalize(v + l);
     float nDotL = max(dot(n, l), 0.0);
+
+    float shadow = ComputeShadow(vertex.shadow, hiDefShadows);
+    float3 sunLight = sunDiffuse * lightMultiplier;
+    // We need to do this to stay consistent with ComputeLight()
+    float3 shadowColor = (1 - (sunDiffuse * shadow * nDotL + sunAmbient)) * shadowFill;
+    sunLight += shadowColor;
+    sunLight *= shadow;
 
     // Cook-Torrance BRDF
     float3 F = FresnelSchlick(max(dot(h, v), 0.0), F0);
@@ -9234,8 +9235,7 @@ float4 PBR_PS(
     kD = float3(1.0, 1.0, 1.0) - kS;
     kD *= 1.0 - metallic;
 
-    float3 ambient = sunAmbient * lightMultiplier;
-    ambient += shadowFill * (1 - ambient);
+    float3 ambient = sunAmbient * lightMultiplier + shadowColor;
     env_irradiance += ambient;
 
     // As maps were not created with this shader in mind we would get too much environment lighting.
