@@ -162,17 +162,8 @@ function table.removeByValue(t,val)
     end
 end
 
--- local count = { }
-
 --- table.deepcopy(t) returns a copy of t with all sub-tables also copied.
 function table.deepcopy(t,backrefs)
-    -- local trace = debug.traceback()
-    -- count[trace] = (count[trace] or 0) + 1
-
-    -- if count[trace] == 1000 then
-    --     LOG(trace)
-    -- end
-
     if type(t)=='table' then
         if backrefs==nil then backrefs = {} end
 
