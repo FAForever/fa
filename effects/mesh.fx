@@ -9353,9 +9353,9 @@ float4 PBR_Aeon(NORMALMAPPED_VERTEX vertex, float teamColorFactor, uniform bool 
 
     float3 color = PBR_PS(vertex, albedo, metallic, roughness, normal, hiDefShadows, specularAmount).rgb;
 
-    float3 emission = specular.b + specular.a * vertex.color.rgb * 0.3;
+    float3 emission = specular.b + specular.a * vertex.color.rgb * 0.5;
     color += emission;
-    float alpha = mirrored ? 0.5 : specular.b + glowMinimum + specular.a * 0.1;
+    float alpha = mirrored ? 0.5 : specular.b + glowMinimum + specular.a * 0.13;
 
     return float4(color, alpha);
 }
