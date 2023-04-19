@@ -22,6 +22,7 @@
 --******************************************************************************************************
 
 local Shared = import("/lua/shared/navgenerator.lua")
+local Colors = import("/lua/shared/color.lua")
 local NavGenerator = import("/lua/sim/navgenerator.lua")
 local NavDatastructures = import("/lua/sim/navdatastructures.lua")
 
@@ -66,16 +67,23 @@ function DebugPathRender()
     local DrawLinePop = DrawLinePop
     local GetGameTick = GetGameTick
     local TableGetn = table.getn
+    local ColorsRGB = Colors.ColorRGB
+
+    local duration = 150
 
     while true do
         local tick = GetGameTick()
         for type, cache in paths do
-            local color = '4BFF4B'
-            if type == 'PathToWithThreatThreshold' then
-                color = '0099FF'
-            end
-
             for id, info in cache do
+                local fraction = (tick - info.Tick) / (duration)
+                if fraction > 1 then
+                    fraction = 1
+                elseif fraction < 0 then
+                    fraction = 0
+                end
+
+                local color = ColorsRGB(1 - fraction, 1 - fraction, 1 - fraction)
+
                 -- draw start
                 DrawCircle(info.Origin, 1.9, '000000')
                 DrawCircle(info.Origin, 2, color)
@@ -98,7 +106,7 @@ function DebugPathRender()
                 end
 
                 -- remove paths we're no longer interested in
-                if info.Tick + 60 < tick then
+                if info.Tick + duration < tick then
                     cache[id] =  nil
                 end
             end
