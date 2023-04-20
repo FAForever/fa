@@ -247,6 +247,7 @@ end
 -- restricts the use of out/low fuel transports and to keep transports moving back to a base when not in use
 -- Will now also limit transport selection to those within 16 km
 function GetTransports( platoon, aiBrain)
+	LOG('GetTransports')
 
     if platoon.UsingTransport then
         return false, false
@@ -293,7 +294,7 @@ function GetTransports( platoon, aiBrain)
         if TransportDialog then
             LOG("*AI DEBUG "..aiBrain.Nickname.." "..platoon.BuilderName.." there are no transports at all")
         end
-    
+        LOG('Need transports set to true')
         aiBrain.NeedTransports = true   -- turn on need flag
 
         return false, false
@@ -481,7 +482,7 @@ function GetTransports( platoon, aiBrain)
             if TransportDialog then
                 LOG("*AI DEBUG "..aiBrain.Nickname.." "..platoon.BuilderName.." no transports available")
             end
-            
+            LOG('Need transports set to true')
             aiBrain.NeedTransports = true
         end
 
@@ -724,6 +725,7 @@ function GetTransports( platoon, aiBrain)
 		if not out_of_range then
 
 			-- let the brain know we couldn't fill a transport request by a ground platoon
+			LOG('Need transports set to true')
 			aiBrain.NeedTransports = true
 
 		end
@@ -1155,10 +1157,12 @@ end
     -- attempts - how many tries will be made to get transport
     -- bSkipLastMove - make drop at closest safe marker rather than at destination
     -- platoonpath - source platoon can optionally feed it's current travel path in order to provide additional alternate drop points if the destination is not good
-function SendPlatoonWithTransports( platoon, aiBrain, destination, attempts, bSkipLastMove, platoonpath )
+function SendPlatoonWithTransports(aiBrain, platoon, destination, attempts, bSkipLastMove, platoonpath )
+	LOG('Sendplatoon with transports started')
 
     -- destination must be in playable areas --
     if not InPlayableArea(destination) then
+		LOG('Destination is not in map')
         return false
     end
     local NavUtils = import("/lua/sim/navutils.lua")
@@ -1209,7 +1213,7 @@ function SendPlatoonWithTransports( platoon, aiBrain, destination, attempts, bSk
                 if TransportDialog then	
                     LOG("*AI DEBUG "..aiBrain.Nickname.." SendPlatWTrans "..repr(platoon.BuilderName).." "..repr(platoon.BuilderInstance).." trying to go to WATER destination "..repr(destination) )
                 end
-
+                LOG('Destination is sea and platoon is land')
 				return false
 			end
 		end
@@ -1237,7 +1241,7 @@ function SendPlatoonWithTransports( platoon, aiBrain, destination, attempts, bSk
 			if transportplatoon then
 				ForkTo( ReturnTransportsToPool, aiBrain, GetPlatoonUnits(transportplatoon), true)
 			end
-
+            LOG('didnt use transports')
 			return false
 		end
 			
@@ -1379,7 +1383,7 @@ function SendPlatoonWithTransports( platoon, aiBrain, destination, attempts, bSk
                         end
 					end
 				end
-
+                LOG('no safe drop found')
 				return false, nil
 			end
 	
@@ -1467,7 +1471,7 @@ function SendPlatoonWithTransports( platoon, aiBrain, destination, attempts, bSk
             if PlatoonExists(aiBrain,platoon) then
                 platoon.UsingTransport = false
             end
-
+            LOG('transport aborted')
 			return false
 		end
 
@@ -1491,7 +1495,7 @@ function SendPlatoonWithTransports( platoon, aiBrain, destination, attempts, bSk
 			if PlatoonExists(aiBrain,transportplatoon) then
 				ForkTo( ReturnTransportsToPool, aiBrain, GetPlatoonUnits(transportplatoon), true)
 			end
-
+            LOG('platoon died or not transport')
 			return false
 		end
 
@@ -1529,7 +1533,7 @@ function SendPlatoonWithTransports( platoon, aiBrain, destination, attempts, bSk
 				
 				-- if no path then fail otherwise use it
 				if not path and destination != nil then
-
+                    LOG('no path to destination')
 					return false
 				
 				elseif path then

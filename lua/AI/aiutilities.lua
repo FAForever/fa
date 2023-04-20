@@ -2077,6 +2077,7 @@ function EngineerMoveWithSafePath(aiBrain, unit, destination)
     if not destination then
         return false
     end
+    local TransportUtils = import("/lua/ai/transportutilities.lua")
     local pos = unit:GetPosition()
     -- don't check a path if we are in build range
     if VDist2(pos[1], pos[3], destination[1], destination[3]) < 14 then
@@ -2094,8 +2095,8 @@ function EngineerMoveWithSafePath(aiBrain, unit, destination)
         end
 
         -- Skip the last move... we want to return and do a build
-        bUsedTransports = AIAttackUtils.SendPlatoonWithTransportsNoCheck(aiBrain, unit.PlatoonHandle, destination, needTransports, true, false)
-
+        -- needTransports need to fix this
+        bUsedTransports = TransportUtils.SendPlatoonWithTransports(aiBrain, unit.PlatoonHandle, destination, 1, true)
         if bUsedTransports then
             return true
         elseif VDist2Sq(pos[1], pos[3], destination[1], destination[3]) > 512 * 512 then
@@ -3060,17 +3061,17 @@ function AIFindFurthestMarkerNeedsEngineer(aiBrain, pos, radius, tMin, tMax, tRi
    local positions = AIFilterAlliedBases(aiBrain, positions)
    for _, v in positions do
        if not aiBrain.BuilderManagers[v.Name] then
-           if not closest or VDist3(pos, v.Position) > closest then
-               closest = VDist3(pos, v.Position)
-               retPos = v.Position
+           if not closest or VDist3(pos, v.position) > closest then
+               closest = VDist3(pos, v.position)
+               retPos = v.position
                retName = v.Name
            end
        else
            local managers = aiBrain.BuilderManagers[v.Name]
            if managers.EngineerManager:GetNumUnits('Engineers') == 0 and managers.FactoryManager:GetNumFactories() == 0 then
-               if not closest or VDist3(pos, v.Position) > closest then
-                   closest = VDist3(pos, v.Position)
-                   retPos = v.Position
+               if not closest or VDist3(pos, v.position) > closest then
+                   closest = VDist3(pos, v.position)
+                   retPos = v.position
                    retName = v.Name
                end
            end
