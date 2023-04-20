@@ -934,6 +934,7 @@ function ReturnTransportsToPool( aiBrain, units, move )
     local TransportDialog = ScenarioInfo.TransportDialog or false
     
     local RandomLocation = import('/lua/ai/aiutilities.lua').RandomLocation
+	local NavUtils = import("/lua/sim/navutils.lua")
 
     local VDist3 = VDist3
     
@@ -1052,7 +1053,7 @@ function ReturnTransportsToPool( aiBrain, units, move )
                 if VDist3( baseposition, unitposition ) > 100 then
 
                     -- this requests a path for the transport with a threat allowance of 20 - which is kinda steep sometimes
-                    safePath, reason = returnpool.PlatoonGenerateSafePathToLOUD(aiBrain, returnpool, 'Air', unitposition, baseposition, 20, 256)
+					safePath, reason = NavUtils.PathToWithThreatThreshold('Air', unitposition, baseposition, aiBrain, NavUtils.ThreatFunctions.AntiAir, 20, aiBrain.IMAPConfig.Rings)
 
                     if safePath then
 
@@ -1162,7 +1163,7 @@ function SendPlatoonWithTransportsLOUD( self, aiBrain, destination, attempts, bS
     if not import('/lua/loudutilities.lua').BaseInPlayableArea(aiBrain, destination) then
         return false
     end
-
+    local NavUtils = import("/lua/sim/navutils.lua")
     local TransportDialog = ScenarioInfo.TransportDialog or false
 
     local MovementLayer = self.MovementLayer    
@@ -1193,9 +1194,7 @@ function SendPlatoonWithTransportsLOUD( self, aiBrain, destination, attempts, bS
         local airthreat = 0
         local counter = 0
 		local bUsedTransports = false
-		local transportplatoon = false
-
-		local PlatoonGenerateSafePathToLOUD = self.PlatoonGenerateSafePathToLOUD            
+		local transportplatoon = false    
 
 		local IsEngineer = PlatoonCategoryCount( self, ENGINEERS ) > 0
 
@@ -1324,15 +1323,14 @@ function SendPlatoonWithTransportsLOUD( self, aiBrain, destination, attempts, bS
                         landpathlength = 0
                         
 						-- can the platoon path safely from this marker to the final destination 
-						landpath, landreason, landpathlength = PlatoonGenerateSafePathToLOUD(aiBrain, self, layer, destination, lastlocationtested, threatMax, 160 )
+						landpath, landreason, landpathlength = NavUtils.PathToWithThreatThreshold(layer, destination, lastlocationtested, aiBrain, NavUtils.ThreatFunctions.AntiAir, threatMax, aiBrain.IMAPConfig.Rings)
 	
 						-- can the transports reach that marker ?
 						if landpath then
                         
                             path = false
                             pathlength = 0
-
-							path, reason, pathlength = PlatoonGenerateSafePathToLOUD( aiBrain, transportplatoon, 'Air', lastlocationtested, GetPlatoonPosition(self), airthreatMax, 256 )
+                            path, reason, pathlength = NavUtils.PathToWithThreatThreshold('Air', lastlocationtested, GetPlatoonPosition(self), aiBrain, NavUtils.ThreatFunctions.AntiAir, airthreatMax, aiBrain.IMAPConfig.Rings)
 						
 							if path then
 
@@ -1527,7 +1525,7 @@ function SendPlatoonWithTransportsLOUD( self, aiBrain, destination, attempts, bS
 			end
 
 			-- path from where we are to the destination - use inflated threat to get there --
-			path = PlatoonGenerateSafePathToLOUD(aiBrain, self, MovementLayer, GetPlatoonPosition(self), destination, mythreat * 1.25, 160)
+			path = NavUtils.PathToWithThreatThreshold(MovementLayer, GetPlatoonPosition(self), destination, aiBrain, NavUtils.ThreatFunctions.AntiAir,  mythreat * 1.25, aiBrain.IMAPConfig.Rings)
 
 			if PlatoonExists( aiBrain, self ) then
 				
@@ -2013,8 +2011,7 @@ function UseTransports( aiBrain, transports, location, UnitPlatoon, IsEngineer )
 			local airthreatMax = counter * 4.2
 			
 			airthreatMax = airthreatMax + ( airthreatMax * math.log10(counter))
-
-            local safePath, reason, pathlength, pathcost = transports.PlatoonGenerateSafePathToLOUD(aiBrain, transports, 'Air', platpos, location, airthreatMax, 256)
+            local safePath, reason, pathlength = NavUtils.PathToWithThreatThreshold('Air', platpos, location, aiBrain, NavUtils.ThreatFunctions.AntiAir,  airthreatMax, aiBrain.IMAPConfig.Rings)
 
             if TransportDialog then
             
@@ -2026,7 +2023,7 @@ function UseTransports( aiBrain, transports, location, UnitPlatoon, IsEngineer )
                         ForkTo ( import('/lua/loudutilities.lua').DrawPath, platpos, safePath, location )
                     end
                     
-                    LOG("*AI DEBUG "..aiBrain.Nickname.." "..UnitPlatoon.BuilderName.." "..transports.BuilderName.." has path to "..repr(location).." - length "..repr(pathlength).." - reason "..reason.." - cost "..pathcost)
+                    LOG("*AI DEBUG "..aiBrain.Nickname.." "..UnitPlatoon.BuilderName.." "..transports.BuilderName.." has path to "..repr(location).." - length "..repr(pathlength).." - reason "..reason)
 
                 end
             end
