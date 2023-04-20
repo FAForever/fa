@@ -91,6 +91,8 @@ AIBrain = Class(StandardBrain) {
         StandardBrain.OnCreateAI(self, planName)
 
         self.GridReclaim = import("/lua/ai/gridreclaim.lua").Setup(self)
+        LOG("HELLO!")
+        self.GridTerritorium = import("/lua/AI/GridTerritorium.lua").Setup()
         self.GridBrain = import("/lua/ai/gridbrain.lua").Setup()
 
         local civilian = false
