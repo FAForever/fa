@@ -9268,7 +9268,7 @@ float4 PBR_UEF(NORMALMAPPED_VERTEX vertex, float teamColorFactor, uniform bool h
     float teamcolor = min(pow(specular.a * 1.1, 0.6), 1);
     float metallic = max(1 - teamcolor * 2.2, 0);
 
-    albedo.rgb = lerp(albedo.rgb, albedo.rgb * 2.2, metallic);
+    albedo.rgb = lerp(albedo.rgb, albedo.rgb * 1.9, metallic);
     albedo.rgb = lerp(albedo.rgb, vertex.color.rgb * 0.6, teamColorFactor * teamcolor);
 
     float planeCockpitMask = saturate((specular.r - 0.65) * 3);
@@ -9344,8 +9344,8 @@ float4 PBR_Aeon(NORMALMAPPED_VERTEX vertex, float teamColorFactor, uniform bool 
     float roughness = lerp(specular.g, 0.03, teamcolorBorder);
     roughness = saturate(roughness + darkAreas);
 
-    albedo *= (specular.r + 0.3) * 1.05;
-    albedo = pow(albedo, (1 - metallic * 0.99));
+    albedo *= (specular.r + 0.3) * 1.25;
+    albedo = pow(albedo, (1 - metallic * 0.95));
     albedo = lerp(albedo, vertex.color.rgb * specular.a * 0.4, teamColorFactor * fullTeamColor);
 
     float specularAmount = lerp(0.08, 0, darkAreas);
@@ -9494,7 +9494,7 @@ float4 PBR_Cybran(NORMALMAPPED_VERTEX vertex, float teamColorFactor, uniform boo
     float metallic = saturate((pow(specular.r, 0.7) + specular.g * 0.2 - specular.a * 0.5) * 4.37);
     float roughness = lerp(0.8 * (1 - specular.g), lerp(0.5, 0.25, specular.g), metallic);
 
-    albedo.rgb = min(lerp(albedo.rgb, albedo.rgb * 3, pow(metallic, 2.5)), float3(1, 1, 1));
+    albedo.rgb = min(lerp(albedo.rgb, albedo.rgb * 2.3, pow(metallic, 2.5)), float3(1, 1, 1));
     albedo.rgb = lerp(albedo.rgb, vertex.color.rgb, teamColorFactor * specular.a);
 
     float4 color = PBR_PS(vertex, albedo.rgb, metallic, roughness, normal, hiDefShadows);
