@@ -471,15 +471,15 @@ end
 ---@param threatType string
 ---@return table
 function AIGetMarkersAroundLocation(aiBrain, markerType, pos, radius, threatMin, threatMax, threatRings, threatType)
-    local markers = AIGetMarkerLocations(aiBrain, markerType)
+    local markers = import("/lua/sim/markerutilities.lua").GetMarkersByType(markerType)
     local returnMarkers = {}
     for _, v in markers do
-        local dist = VDist2(pos[1], pos[3], v.Position[1], v.Position[3])
+        local dist = VDist2(pos[1], pos[3], v.position[1], v.position[3])
         if dist < radius then
             if not threatMin then
                 table.insert(returnMarkers, v)
             else
-                local threat = aiBrain:GetThreatAtPosition(v.Position, threatRings, true, threatType or 'Overall')
+                local threat = aiBrain:GetThreatAtPosition(v.position, threatRings, true, threatType or 'Overall')
                 if threat >= threatMin and threat <= threatMax then
                     table.insert(returnMarkers, v)
                 end
@@ -581,17 +581,17 @@ function AIFindMarkerNeedsEngineer(aiBrain, pos, radius, tMin, tMax, tRings, tTy
     local positions = AIFilterAlliedBases(aiBrain, positions)
     for _, v in positions do
         if not aiBrain.BuilderManagers[v.Name] then
-            if not closest or VDist3(pos, v.Position) < closest then
-                closest = VDist3(pos, v.Position)
-                retPos = v.Position
+            if not closest or VDist3(pos, v.position) < closest then
+                closest = VDist3(pos, v.position)
+                retPos = v.position
                 retName = v.Name
             end
         else
             local managers = aiBrain.BuilderManagers[v.Name]
             if managers.EngineerManager:GetNumUnits('Engineers') == 0 and managers.FactoryManager:GetNumFactories() == 0 then
-                if not closest or VDist3(pos, v.Position) < closest then
-                    closest = VDist3(pos, v.Position)
-                    retPos = v.Position
+                if not closest or VDist3(pos, v.position) < closest then
+                    closest = VDist3(pos, v.position)
+                    retPos = v.position
                     retName = v.Name
                 end
             end
@@ -620,7 +620,7 @@ function AIFindStartLocationNeedsEngineer(aiBrain, locationType, radius, tMin, t
 
     local validPos = AIGetMarkersAroundLocation(aiBrain, 'Large Expansion Area', pos, radius, tMin, tMax, tRings, tType)
 
-    local positions = AIGetMarkersAroundLocation(aiBrain, 'Blank Marker', pos, radius, tMin, tMax, tRings, tType)
+    local positions = AIGetMarkersAroundLocation(aiBrain, 'Spawn', pos, radius, tMin, tMax, tRings, tType)
     local startX, startZ = aiBrain:GetArmyStartPos()
     for _, v in positions do
         if string.sub(v.Name, 1, 5) == 'ARMY_' then

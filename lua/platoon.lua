@@ -11,6 +11,7 @@
 -- Platoon Lua Module                    --
 ----------------------------------------------------------------------------------
 local AIUtils = import("/lua/ai/aiutilities.lua")
+local TransportUtils = import("/lua/ai/transportutilities.lua")
 local Utilities = import("/lua/utilities.lua")
 local AIBuildStructures = import("/lua/ai/aibuildstructures.lua")
 local UpgradeTemplates = import("/lua/upgradetemplates.lua")
@@ -948,9 +949,9 @@ Platoon = Class(moho.platoon_methods) {
             if path then
                 local position = self:GetPlatoonPosition()
                 if not success or VDist2(position[1], position[3], bestMarker.position[1], bestMarker.position[3]) > 512 then
-                    usedTransports = AIAttackUtils.SendPlatoonWithTransportsNoCheck(aiBrain, self, bestMarker.position, true)
+                    usedTransports = TransportUtils.SendPlatoonWithTransports(aiBrain, self, bestMarker.position, true)
                 elseif VDist2(position[1], position[3], bestMarker.position[1], bestMarker.position[3]) > 256 then
-                    usedTransports = AIAttackUtils.SendPlatoonWithTransportsNoCheck(aiBrain, self, bestMarker.position, false)
+                    usedTransports = TransportUtils.SendPlatoonWithTransports(aiBrain, self, bestMarker.position, false)
                 end
                 if not usedTransports then
                     local pathLength = table.getn(path)
@@ -964,7 +965,7 @@ Platoon = Class(moho.platoon_methods) {
                 end
             elseif (not path and reason == 'NoPath') and self.MovementLayer ~= 'Water' then
                 --LOG('Guardmarker requesting transports')
-                local foundTransport = AIAttackUtils.SendPlatoonWithTransportsNoCheck(aiBrain, self, bestMarker.position, true)
+                local foundTransport = TransportUtils.SendPlatoonWithTransports(aiBrain, self, bestMarker.position, true)
                 --DUNCAN - if we need a transport and we cant get one the disband
                 if not foundTransport then
                     --LOG('Guardmarker no transports')
