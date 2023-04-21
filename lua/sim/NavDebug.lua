@@ -24,6 +24,17 @@ local Shared = import("/lua/shared/navgenerator.lua")
 local NavGenerator = import("/lua/sim/navgenerator.lua")
 local NavUtils = import("/lua/sim/navutils.lua")
 
+local Debug = false
+function EnableDebugging()
+    NavUtils.EnableDebugging()
+    Debug = true
+end
+
+function DisableDebugging()
+    NavUtils.DisableDebugging()
+    Debug = false
+end
+
 local ScanState = {
     LandLayer = false,
     AirLayer = false,
@@ -154,187 +165,193 @@ end
 --- Scans and draws the navigational mesh, is controllable by the UI for debugging purposes
 function Scan()
     while true do
+        if Debug then
+            -- re-import it to catch disk ejections
+            local NavGenerator = import("/lua/sim/navgenerator.lua")
 
-        -- re-import it to catch disk ejections
-        local NavGenerator = import("/lua/sim/navgenerator.lua")
+            -- we can only work with it once it is finished generating
+            if NavGenerator.IsGenerated() then
 
-        -- we can only work with it once it is finished generating
-        if NavGenerator.IsGenerated() then
-
-            local mouse = nil
-            if rawget(_G, 'GetMouseWorldPos') then
-                mouse = GetMouseWorldPos()
-            end
-
-            if ScanState.LandLayer then
-                local layer = 'Land'
-                NavGenerator.NavGrids[layer]:Draw()
-                ScanOver(mouse, layer)
-            end
-
-            if ScanState.HoverLayer then
-                local layer = 'Hover'
-                NavGenerator.NavGrids[layer]:Draw()
-                ScanOver(mouse, layer)
-            end
-
-            if ScanState.WaterLayer then
-                local layer = 'Water'
-                NavGenerator.NavGrids[layer]:Draw()
-                ScanOver(mouse, layer)
-            end
-
-            if ScanState.AmphibiousLayer then
-                local layer = 'Amphibious'
-                NavGenerator.NavGrids[layer]:Draw()
-                ScanOver(mouse, layer)
-            end
-
-            if ScanState.AirLayer then
-                local layer = 'Air'
-                NavGenerator.NavGrids[layer]:Draw()
-                ScanOver(mouse, layer)
-            end
-
-            if ScanState.LandLabels then
-                NavGenerator.NavGrids['Land']:DrawLabels()
-            end
-
-            if ScanState.HoverLabels then
-                NavGenerator.NavGrids['Hover']:DrawLabels()
-            end
-
-            if ScanState.WaterLabels then
-                NavGenerator.NavGrids['Water']:DrawLabels()
-            end
-
-            if ScanState.AmphibiousLabels then
-                NavGenerator.NavGrids['Amphibious']:DrawLabels()
-            end
-
-            if ScanState.AirLabels then
-                NavGenerator.NavGrids['Air']:DrawLabels()
-            end
-
-            if CanPathToState.Origin then
-                DrawCircle(CanPathToState.Origin, 3.9, '000000')
-                DrawCircle(CanPathToState.Origin, 4, Shared.LayerColors[CanPathToState.Layer] or 'ffffff')
-                DrawCircle(CanPathToState.Origin, 4.1, '000000')
-            end
-
-            if CanPathToState.Destination then
-                DrawCircle(CanPathToState.Destination, 3.9, '000000')
-                DrawCircle(CanPathToState.Destination, 4, Shared.LayerColors[CanPathToState.Layer] or 'ffffff')
-                DrawCircle(CanPathToState.Destination, 4.1, '000000')
-            end
-
-            if CanPathToState.Origin and CanPathToState.Destination and CanPathToState.Layer then
-                local ok, msg = NavUtils.CanPathTo(CanPathToState.Layer, CanPathToState.Origin,
-                    CanPathToState.Destination)
-
-                if ok then
-                    DrawLinePop(CanPathToState.Origin, CanPathToState.Destination, 'ffffff')
-                else
-                    DrawLinePop(CanPathToState.Origin, CanPathToState.Destination, 'ff0000')
+                local mouse = nil
+                if rawget(_G, 'GetMouseWorldPos') then
+                    mouse = GetMouseWorldPos()
                 end
 
-                Sync.NavCanPathToDebug = {
-                    Ok = ok,
-                    Msg = msg
-                }
-            end
+                if ScanState.LandLayer then
+                    local layer = 'Land'
+                    NavGenerator.NavGrids[layer]:Draw()
+                    ScanOver(mouse, layer)
+                end
 
-            if PathToState.Origin then
-                DrawCircle(PathToState.Origin, 3.9, '000000')
-                DrawCircle(PathToState.Origin, 4, Shared.LayerColors[PathToState.Layer] or 'ffffff')
-                DrawCircle(PathToState.Origin, 4.1, '000000')
-            end
+                if ScanState.HoverLayer then
+                    local layer = 'Hover'
+                    NavGenerator.NavGrids[layer]:Draw()
+                    ScanOver(mouse, layer)
+                end
 
-            if PathToState.Destination then
-                DrawCircle(PathToState.Destination, 3.9, '000000')
-                DrawCircle(PathToState.Destination, 4, Shared.LayerColors[PathToState.Layer] or 'ffffff')
-                DrawCircle(PathToState.Destination, 4.1, '000000')
-            end
+                if ScanState.WaterLayer then
+                    local layer = 'Water'
+                    NavGenerator.NavGrids[layer]:Draw()
+                    ScanOver(mouse, layer)
+                end
 
-            if PathToState.Origin and PathToState.Destination then
-                local path, n, label = NavUtils.PathTo(PathToState.Layer, PathToState.Origin, PathToState.Destination,
-                    ArmyBrains[1])
+                if ScanState.AmphibiousLayer then
+                    local layer = 'Amphibious'
+                    NavGenerator.NavGrids[layer]:Draw()
+                    ScanOver(mouse, layer)
+                end
 
-                if not path then
-                    DrawLinePop(PathToState.Origin, PathToState.Destination, 'ff0000')
-                else
-                    if n >= 2 then
-                        local last = path[1]
-                        for k = 2, n do
-                            DrawLinePop(last, path[k], 'ff0000')
-                            last = path[k]
+                if ScanState.AirLayer then
+                    local layer = 'Air'
+                    NavGenerator.NavGrids[layer]:Draw()
+                    ScanOver(mouse, layer)
+                end
+
+                if ScanState.LandLabels then
+                    NavGenerator.NavGrids['Land']:DrawLabels()
+                end
+
+                if ScanState.HoverLabels then
+                    NavGenerator.NavGrids['Hover']:DrawLabels()
+                end
+
+                if ScanState.WaterLabels then
+                    NavGenerator.NavGrids['Water']:DrawLabels()
+                end
+
+                if ScanState.AmphibiousLabels then
+                    NavGenerator.NavGrids['Amphibious']:DrawLabels()
+                end
+
+                if ScanState.AirLabels then
+                    NavGenerator.NavGrids['Air']:DrawLabels()
+                end
+
+                if CanPathToState.Origin then
+                    DrawCircle(CanPathToState.Origin, 3.9, '000000')
+                    DrawCircle(CanPathToState.Origin, 4, Shared.LayerColors[CanPathToState.Layer] or 'ffffff')
+                    DrawCircle(CanPathToState.Origin, 4.1, '000000')
+                end
+
+                if CanPathToState.Destination then
+                    DrawCircle(CanPathToState.Destination, 3.9, '000000')
+                    DrawCircle(CanPathToState.Destination, 4, Shared.LayerColors[CanPathToState.Layer] or 'ffffff')
+                    DrawCircle(CanPathToState.Destination, 4.1, '000000')
+                end
+
+                if CanPathToState.Origin and CanPathToState.Destination and CanPathToState.Layer then
+                    local ok, msg = NavUtils.CanPathTo(CanPathToState.Layer, CanPathToState.Origin,
+                        CanPathToState.Destination)
+
+                    if ok then
+                        DrawLinePop(CanPathToState.Origin, CanPathToState.Destination, 'ffffff')
+                    else
+                        DrawLinePop(CanPathToState.Origin, CanPathToState.Destination, 'ff0000')
+                    end
+
+                    Sync.NavCanPathToDebug = {
+                        Ok = ok,
+                        Msg = msg
+                    }
+                end
+
+                if PathToState.Origin then
+                    DrawCircle(PathToState.Origin, 3.9, '000000')
+                    DrawCircle(PathToState.Origin, 4, Shared.LayerColors[PathToState.Layer] or 'ffffff')
+                    DrawCircle(PathToState.Origin, 4.1, '000000')
+                end
+
+                if PathToState.Destination then
+                    DrawCircle(PathToState.Destination, 3.9, '000000')
+                    DrawCircle(PathToState.Destination, 4, Shared.LayerColors[PathToState.Layer] or 'ffffff')
+                    DrawCircle(PathToState.Destination, 4.1, '000000')
+                end
+
+                if PathToState.Origin and PathToState.Destination then
+                    local path, n, label = NavUtils.PathTo(PathToState.Layer, PathToState.Origin, PathToState.Destination
+                        ,
+                        ArmyBrains[1])
+
+                    if not path then
+                        DrawLinePop(PathToState.Origin, PathToState.Destination, 'ff0000')
+                    else
+                        if n >= 2 then
+                            local last = path[1]
+                            for k = 2, n do
+                                DrawLinePop(last, path[k], 'ff0000')
+                                last = path[k]
+                            end
                         end
                     end
                 end
-            end
+                
+                if PathToWithThreatThresholdState.Origin then
+                    DrawCircle(PathToWithThreatThresholdState.Origin, 3.9, '000000')
+                    DrawCircle(PathToWithThreatThresholdState.Origin, 4,
+                        Shared.LayerColors[PathToWithThreatThresholdState.Layer] or 'ffffff')
+                    DrawCircle(PathToWithThreatThresholdState.Origin, 4.1, '000000')
+                end
 
-            if PathToWithThreatThresholdState.Origin then
-                DrawCircle(PathToWithThreatThresholdState.Origin, 3.9, '000000')
-                DrawCircle(PathToWithThreatThresholdState.Origin, 4, Shared.LayerColors[PathToWithThreatThresholdState.Layer] or 'ffffff')
-                DrawCircle(PathToWithThreatThresholdState.Origin, 4.1, '000000')
-            end
+                if PathToWithThreatThresholdState.Destination then
+                    DrawCircle(PathToWithThreatThresholdState.Destination, 3.9, '000000')
+                    DrawCircle(PathToWithThreatThresholdState.Destination, 4,
+                        Shared.LayerColors[PathToWithThreatThresholdState.Layer] or 'ffffff')
+                    DrawCircle(PathToWithThreatThresholdState.Destination, 4.1, '000000')
+                end
 
-            if PathToWithThreatThresholdState.Destination then
-                DrawCircle(PathToWithThreatThresholdState.Destination, 3.9, '000000')
-                DrawCircle(PathToWithThreatThresholdState.Destination, 4, Shared.LayerColors[PathToWithThreatThresholdState.Layer] or 'ffffff')
-                DrawCircle(PathToWithThreatThresholdState.Destination, 4.1, '000000')
-            end
+                if PathToWithThreatThresholdState.Origin and
+                    PathToWithThreatThresholdState.Destination and
+                    PathToWithThreatThresholdState.Layer and
+                    PathToWithThreatThresholdState.Radius and
+                    PathToWithThreatThresholdState.ThreatFunctionName and
+                    PathToWithThreatThresholdState.Threshold and
+                    PathToWithThreatThresholdState.Army
+                then
+                    local path, n, label = NavUtils.PathToWithThreatThreshold(
+                        PathToWithThreatThresholdState.Layer,
+                        PathToWithThreatThresholdState.Origin,
+                        PathToWithThreatThresholdState.Destination,
+                        ArmyBrains[PathToWithThreatThresholdState.Army],
+                        NavUtils.ThreatFunctions[PathToWithThreatThresholdState.ThreatFunctionName],
+                        PathToWithThreatThresholdState.Threshold,
+                        PathToWithThreatThresholdState.Radius
+                    )
 
-            if PathToWithThreatThresholdState.Origin and
-                PathToWithThreatThresholdState.Destination and
-                PathToWithThreatThresholdState.Layer and
-                PathToWithThreatThresholdState.Radius and
-                PathToWithThreatThresholdState.ThreatFunctionName and
-                PathToWithThreatThresholdState.Threshold and
-                PathToWithThreatThresholdState.Army
-            then
-                local path, n, label = NavUtils.PathToWithThreatThreshold(
-                    PathToWithThreatThresholdState.Layer,
-                    PathToWithThreatThresholdState.Origin,
-                    PathToWithThreatThresholdState.Destination,
-                    ArmyBrains[PathToWithThreatThresholdState.Army],
-                    NavUtils.ThreatFunctions[PathToWithThreatThresholdState.ThreatFunctionName],
-                    PathToWithThreatThresholdState.Threshold,
-                    PathToWithThreatThresholdState.Radius
-                )
-
-                if not path then
-                    DrawLinePop(PathToWithThreatThresholdState.Origin, PathToWithThreatThresholdState.Destination, 'ff0000')
-                else
-                    if n >= 2 then
-                        local last = path[1]
-                        for k = 2, n do
-                            DrawLinePop(last, path[k], 'ff0000')
-                            last = path[k]
+                    if not path then
+                        DrawLinePop(PathToWithThreatThresholdState.Origin, PathToWithThreatThresholdState.Destination,
+                            'ff0000')
+                    else
+                        if n >= 2 then
+                            local last = path[1]
+                            for k = 2, n do
+                                DrawLinePop(last, path[k], 'ff0000')
+                                last = path[k]
+                            end
                         end
                     end
                 end
-            end
 
-            if GetLabelState.Position then
-                local label, msg = NavUtils.GetLabel(GetLabelState.Layer, GetLabelState.Position)
-                if label then
-                    local color = Shared.LabelToColor(label) or 'ffffff'
-                    DrawCircle(GetLabelState.Position, 3.9, color)
-                    DrawCircle(GetLabelState.Position, 4.0, color)
-                    DrawCircle(GetLabelState.Position, 4.1, color)
-                else
-                    DrawCircle(GetLabelState.Position, 3.9, '000000')
-                    DrawCircle(GetLabelState.Position, 4.0, 'ffffff')
-                    DrawCircle(GetLabelState.Position, 4.1, '000000')
+                if GetLabelState.Position then
+                    local label, msg = NavUtils.GetLabel(GetLabelState.Layer, GetLabelState.Position)
+                    if label then
+                        local color = Shared.LabelToColor(label) or 'ffffff'
+                        DrawCircle(GetLabelState.Position, 3.9, color)
+                        DrawCircle(GetLabelState.Position, 4.0, color)
+                        DrawCircle(GetLabelState.Position, 4.1, color)
+                    else
+                        DrawCircle(GetLabelState.Position, 3.9, '000000')
+                        DrawCircle(GetLabelState.Position, 4.0, 'ffffff')
+                        DrawCircle(GetLabelState.Position, 4.1, '000000')
+                    end
+
+                    Sync.NavDebugGetLabel = {
+                        Label = label,
+                        Msg = msg
+                    }
                 end
-
-                Sync.NavDebugGetLabel = {
-                    Label = label,
-                    Msg = msg
-                }
             end
         end
+
         WaitTicks(2)
     end
 end
