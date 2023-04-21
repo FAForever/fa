@@ -24,7 +24,6 @@ local BrainConditionsMonitor = import("/lua/sim/brainconditionsmonitor.lua")
 ---@field GridReclaim AIGridReclaim
 ---@field GridBrain AIGridBrain
 ---@field BuilderManagers table<LocationType, AIBase>
----@field BuilderManagers table<LocationType, AIBase>
 AIBrain = Class(StandardBrain, EconomyComponent) {
 
     SkirmishSystems = true,
@@ -46,47 +45,34 @@ AIBrain = Class(StandardBrain, EconomyComponent) {
             return
         end
 
-        self.GridReclaim = import("/lua/ai/gridreclaim.lua").Setup(self)
-        self.GridBrain = import("/lua/ai/gridbrain.lua").Setup()
-
-        -- TODO: do things with this mess below
-
-        -- TURNING OFF AI POOL PLATOON, I MAY JUST REMOVE THAT PLATOON FUNCTIONALITY LATER
-        local poolPlatoon = self:GetPlatoonUniquelyNamed('ArmyPool')
-        if poolPlatoon then
-            poolPlatoon.ArmyPool = true
-            poolPlatoon:TurnOffPoolAI()
-        end
-
-        -- Condition monitor for the whole brain
-        self.ConditionsMonitor = BrainConditionsMonitor.CreateConditionsMonitor(self)
-
-        -- Set the map center point
-        self.MapCenterPoint = { (ScenarioInfo.size[1] / 2),
-            GetSurfaceHeight((ScenarioInfo.size[1] / 2), (ScenarioInfo.size[2] / 2)), (ScenarioInfo.size[2] / 2) }
-
-        -- start initial base
-        local startX, startZ = self:GetArmyStartPos()
-        local main = BaseManager.CreateBaseManager(self, 'main', { startX, 0, startZ }, 60)
-        self.BuilderManagers = {
-            MAIN = main
-        }
-
-        ForkThread(
-            function()
-                WaitTicks(30)
-                main:AddBaseTemplate('AIBaseTemplate - Easy main')
-            end
-        )
-
+        ForkThread(self.OnCreateAIThread, self)
+        
         self:IMAPConfiguration()
         EconomyComponent.OnCreateAI(self)
     end,
 
-    ---@param self EasyAIBrain
-    ---@param planName string
-    CreateBrainShared = function(self, planName)
-        StandardBrain.CreateBrainShared(self, planName)
+    OnCreateAIThread = function(self)
+        WaitSeconds(1.0)
+
+        -- requires navigational mesh
+        import("/lua/sim/NavUtils.lua").Generate()
+
+        -- requires these markers to exist
+        import("/lua/sim/MarkerUtilities.lua").GenerateExpansionMarkers()
+        import("/lua/sim/MarkerUtilities.lua").GenerateRallyPointMarkers()
+
+        -- requires these datastructures to understand the game
+        self.GridReclaim = import("/lua/ai/gridreclaim.lua").Setup(self)
+        self.GridBrain = import("/lua/ai/gridbrain.lua").Setup()
+
+        -- start initial base
+        local startX, startZ = self:GetArmyStartPos()
+        local main = BaseManager.CreateBaseManager(self, 'main', { startX, 0, startZ }, 60)
+        main:AddBaseTemplate('AIBaseTemplate - Easy main')
+        self.BuilderManagers = {
+            MAIN = main
+        }
+
     end,
 
     ---@param self EasyAIBrain
@@ -94,7 +80,6 @@ AIBrain = Class(StandardBrain, EconomyComponent) {
         StandardBrain.OnDestroy(self)
 
         if self.BuilderManagers then
-            self.ConditionsMonitor:Destroy()
             for _, v in self.BuilderManagers do
 
                 v.EngineerManager:SetEnabled(false)

@@ -1,25 +1,24 @@
---**************************************************************************************************
---** Shared under the MIT license
---**************************************************************************************************
-
------------------------------------------------------------------
--- File     : /lua/sim/MarkerUtilities.lua
--- Summary  : Aim of this file is to work with markers without
--- worrying about unneccesary table allocations. All base game
--- functionality allocates a new table when you wish to retrieve
--- a sequence of markers. This file implicitly stores a sequence
--- of markers and returns a reference, unless you explicitly
--- want a new table with unique values.
-
--- Extractor / hydrocarbon markers are setup different from the other
--- markers. As an example, you can not flush these markers. This
--- is done to support adaptive maps and the crazy rush mode.
-
--- Contains various debug facilities to help understand the
--- state that is stored in this file.
-
--- Supports crazyrush-like maps.
------------------------------------------------------------------
+--******************************************************************************************************
+--** Copyright (c) 2023  Willem 'Jip' Wijnia
+--**
+--** Permission is hereby granted, free of charge, to any person obtaining a copy
+--** of this software and associated documentation files (the "Software"), to deal
+--** in the Software without restriction, including without limitation the rights
+--** to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+--** copies of the Software, and to permit persons to whom the Software is
+--** furnished to do so, subject to the following conditions:
+--**
+--** The above copyright notice and this permission notice shall be included in all
+--** copies or substantial portions of the Software.
+--**
+--** THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+--** IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+--** FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+--** AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+--** LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+--** OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+--** SOFTWARE.
+--******************************************************************************************************
 
 local StringSplit = import("/lua/system/utils.lua").StringSplit
 local TableDeepCopy = table.deepcopy
@@ -32,7 +31,7 @@ local TableDeepCopy = table.deepcopy
 ---@field type string
 ---@field orientation Vector
 ---@field position Vector
----@field Name string              # Unique name for marker
+---@field Name string               # Unique name for marker
 ---@field color? Color
 ---@field adjacentTo? string
 ---@field NavLayer? NavLayers       # Navigational layer that this marker is on, only defined for resources
@@ -536,3 +535,6 @@ function Setup()
         MarkerCache[type].Markers[count + 1] = marker
     end
 end
+
+GenerateExpansionMarkers = import("/lua/sim/MarkerUtilities/Expansions.lua").Generate
+GenerateRallyPointMarkers = import("/lua/sim/MarkerUtilities/RallyPoints.lua").Generate

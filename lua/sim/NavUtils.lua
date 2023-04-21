@@ -486,3 +486,124 @@ function GetLabelMetadata(id)
 
     return meta, nil
 end
+
+local ComputeVectorCandidates = { }
+local ComputeVectorFound = { }
+
+--- Returns a series of 
+---@param layer any
+---@param origin any
+---@param distance any
+---@return Vector[] | nil
+---@return number | string
+function ComputeVectors(layer, origin, distance, sizeThreshold)
+
+    -- check if generated
+    if not NavGenerator.IsGenerated() then
+        WarnNoNavMesh()
+        return nil, 'Navigational mesh is not generated'
+    end
+
+    -- setup pathing
+    local seenIdentifier = PathToGetUniqueIdentifier()
+    local grid = FindGrid(layer)                        --[[@as NavGrid]]
+    local originLeaf = FindLeaf(grid, origin)           --[[@as CompressedLabelTreeLeaf]]
+
+    -- sanity check
+    if not originLeaf then
+        return nil, 'outside-map'
+    end
+
+    -- local scope for performance
+    local ox = origin[1]
+    local oz = origin[3]
+    local found = ComputeVectorFound
+    local candidates = ComputeVectorCandidates
+    local head = 1
+
+    -- 0th iteration of search
+    originLeaf.From = nil
+    originLeaf.AcquiredCosts = 0
+    originLeaf.TotalCosts = distance
+    originLeaf.Seen = seenIdentifier
+    PathToHeap:Insert(originLeaf)
+
+    while not PathToHeap:IsEmpty() do
+        local leaf = PathToHeap:ExtractMin() --[[@as CompressedLabelTreeLeaf]]
+
+        -- do not take into account small leafs as they clutter the results
+        if leaf.Size < sizeThreshold then
+            continue
+        end
+
+        -- threshold for when we accept a leaf
+        local px = leaf.px
+        local pz = leaf.pz
+
+        local dx = px - ox
+        local dz = pz - oz
+
+        local d2 = dx * dx + dz * dz
+
+        if d2 > distance * distance then
+            if not found[leaf] then
+                found[leaf] = true
+                candidates[head] = leaf
+                head = head + 1
+            end
+
+            continue
+        end
+
+        -- search neighbors for more leafs
+        for k = 1, table.getn(leaf) do
+            local neighbor = leaf[k]
+            if neighbor.Label > 0 and neighbor.Seen != seenIdentifier then
+                neighbor.From = leaf
+                neighbor.Seen = seenIdentifier
+                neighbor.AcquiredCosts = leaf.AcquiredCosts + leaf:DistanceTo(neighbor)
+                neighbor.TotalCosts = 0
+
+                PathToHeap:Insert(neighbor)
+            end
+        end
+    end
+
+    -- convert to a series of positions
+    local positions = { }
+    for k = 1, head - 1 do
+        local candidate = candidates[k]
+        local px = candidate.px
+        local pz = candidate.pz
+
+        local dx = px - ox
+        local dz = pz - oz
+
+        local d = math.sqrt(dx * dx + dz * dz)
+
+        local x = ox + distance / d * dx
+        local z = oz + distance / d * dz
+
+        positions[k] = {
+            x,
+            GetSurfaceHeight(x, z),
+            z,
+        }
+    end
+
+    -- clean up after ourselves
+    PathToHeap:Clear()
+
+    for k, _ in found do
+        found[k] = nil
+    end
+
+    for k , _ in candidates do
+        candidates[k] = nil
+    end
+
+    return positions, head - 1
+end
+
+
+
