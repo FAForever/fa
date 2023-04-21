@@ -79,7 +79,7 @@ GridTerritorium = Class(Grid) {
             -- structures for each army
             local structures = {}
             for army, _ in ArmyBrains do
-                structures[army] = {}
+                structures[army] = setmetatable({}, WeakValues)
             end
 
             table.insert(
@@ -169,12 +169,6 @@ GridTerritorium = Class(Grid) {
 
             for k = 1, expansionCount do
                 local expansionInfo = expansions[k]
-
-                local color = 'ffffff'
-                local brain = ArmyBrains[expansionInfo.OwnedBy] --[[@as AIBrain]]
-                if brain then
-                    color = armies[expansionInfo.OwnedBy]
-                end
                 DrawCircle(expansionInfo.Position, expansionInfo.Size, 'ffffff')
                 DrawCircle(expansionInfo.Position, 1, 'ffffff')
 
