@@ -496,7 +496,7 @@ local ComputeVectorFound = { }
 ---@param distance any
 ---@return Vector[] | nil
 ---@return number | string
-function ComputeVectors(layer, origin, distance, sizeThreshold)
+function GetDirections(layer, origin, distance, sizeThreshold)
 
     -- check if generated
     if not NavGenerator.IsGenerated() then
@@ -604,6 +604,3 @@ function ComputeVectors(layer, origin, distance, sizeThreshold)
 
     return positions, head - 1
 end
-
-
-

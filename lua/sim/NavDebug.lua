@@ -142,7 +142,7 @@ function ScanOver(mouse, layer)
             end
         end
 
-        local points, n = NavUtils.ComputeVectors(layer, mouse, 45, 16)
+        local points, n = NavUtils.GetDirections(layer, mouse, 45, 16)
         if points then
             for k = 1, n do 
                 DrawCircle(points[k], 5, 'ffffff')

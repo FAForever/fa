@@ -21,7 +21,6 @@
 --** SOFTWARE.
 --******************************************************************************************************
 
-local MarkerUtilities = import("/lua/sim/markerutilities.lua")
 local Stack = import("/lua/sim/navdatastructures.lua").Stack
 
 local Generated = false
@@ -193,6 +192,7 @@ function Generate()
             position = center,
             Extractors = extractors,
             Hydrocarbons = { },
+            RallyPoints = { },
             NavLabel = extractors[1].NavLabel,
         }
 
@@ -215,6 +215,6 @@ function Generate()
     -- of those extractors is used as the location of
     -- the marker
 
-    MarkerUtilities.OverwriteMarkerByType('Large Expansion Area', largeExpansions)
-    MarkerUtilities.OverwriteMarkerByType('Expansion Area', smallExpansions)
+    import("/lua/sim/markerutilities.lua").OverwriteMarkerByType('Large Expansion Area', largeExpansions)
+    import("/lua/sim/markerutilities.lua").OverwriteMarkerByType('Expansion Area', smallExpansions)
 end

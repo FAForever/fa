@@ -142,7 +142,7 @@ function OverwriteMarkerByType(type, markers)
     local n = 1
 
     for k, marker in markers do
-        marker.Name = k
+        marker.Name = marker.Name or k
         ms[n] = marker
         n = n + 1
     end
