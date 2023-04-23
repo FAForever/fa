@@ -257,7 +257,7 @@ NavGrid = ClassNavGrid {
 
 local FactoryCompressedLabelTree = {
     __call = function(self, layer, treeSize)
-        return setmetatable({&0 &4}, self)
+        return setmetatable({&3 &4}, self)
     end
 }
 
@@ -295,6 +295,8 @@ local CompressedLabelTree
 
 --- A simplified quad tree that acts as a compression of the pathing capabilities of a section of the heightmap
 ---@class CompressedLabelTreeNode
+---@field Seen number
+---@field Threat number
 ---@field [1] CompressedLabelTreeNode?
 ---@field [2] CompressedLabelTreeNode?
 ---@field [3] CompressedLabelTreeNode?

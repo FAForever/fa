@@ -13,15 +13,13 @@ local CAirFactoryUnit = import("/lua/cybranunits.lua").CAirFactoryUnit
 URB0302 = Class(CAirFactoryUnit) {
     PlatformBone = 'B01',
 
---Overwrite FinishBuildThread to speed up platform lowering rate
-
     FinishBuildThread = function(self, unitBeingBuilt, order)
         self:SetBusy(true)
         self:SetBlockCommandQueue(true)
-        local bp = self:GetBlueprint()
+        local bp = self.Blueprint
         local bpAnim = bp.Display.AnimationFinishBuildLand
         if bpAnim and EntityCategoryContains(categories.LAND, unitBeingBuilt) then
-            self.RollOffAnim = CreateAnimator(self):PlayAnim(bpAnim):SetRate(40)        --Change: SetRate(4)
+            self.RollOffAnim = CreateAnimator(self):PlayAnim(bpAnim):SetRate(40)
             self.Trash:Add(self.RollOffAnim)
             WaitTicks(1)
             WaitFor(self.RollOffAnim)
@@ -39,11 +37,9 @@ URB0302 = Class(CAirFactoryUnit) {
         end
     end,
 
---Overwrite PlayFxRollOffEnd to speed up platform raising rate
-
     PlayFxRollOffEnd = function(self)
         if self.RollOffAnim then
-            self.RollOffAnim:SetRate(40)                                            --Change: SetRate(-4)
+            self.RollOffAnim:SetRate(40)
             WaitFor(self.RollOffAnim)
             self.RollOffAnim:Destroy()
             self.RollOffAnim = nil

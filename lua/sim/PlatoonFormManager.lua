@@ -10,21 +10,22 @@ local Builder = import("/lua/sim/builder.lua")
 PlatoonFormManager = Class(BuilderManager) {
     ---@param self PlatoonFormManager
     ---@param brain AIBrain
-    ---@param lType any
+    ---@param lType LocationType
     ---@param location Vector
     ---@param radius number
     ---@return boolean
     Create = function(self, brain, lType, location, radius)
-        BuilderManager.Create(self,brain)
+        BuilderManager.Create(self, brain, lType, location, radius)
 
         if not lType or not location or not radius then
             error('*PLATOOM FORM MANAGER ERROR: Invalid parameters; requires locationType, location, and radius')
             return false
         end
 
-        self.Location = location
-        self.Radius = radius
-        self.LocationType= lType
+        -- backwards compatibility for mods
+        self.Location = self.Location or location
+        self.Radius = self.Radius or radius
+        self.LocationType = self.LocationType or lType
 
         self:AddBuilderType('Any')
 
