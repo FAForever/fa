@@ -2599,7 +2599,7 @@ float4 NormalMappedTerrainPS( NORMALMAPPED_VERTEX vertex ) : COLOR
 
     float4 albedo = tex2D( albedoSampler, vertex.texcoord0.xy);
     albedo.rgb = albedo.rgb * vertex.color.rgb;
-    float3 light = ComputeLight( dotLightNormal, 1);
+    float3 light = ComputeLight( dotLightNormal, ComputeShadow(vertex.shadow, true));
     float alpha = mirrored ? 0.5 : glowMinimum;
 
     float3 color = light * albedo.rgb;
@@ -5083,7 +5083,7 @@ technique NormalMappedTerrain
 #endif
 
         VertexShader = compile vs_1_1 NormalMappedVS();
-        PixelShader = compile ps_2_0 NormalMappedTerrainPS();
+        PixelShader = compile ps_2_a NormalMappedTerrainPS();
     }
 }
 
