@@ -1060,12 +1060,6 @@ function SendPlatoonWithTransports(aiBrain, platoon, destination, attempts, bSki
 				-- this call will return the # of units transported (true) or false, if true, the platoon holding the transports or false
 				bUsedTransports, transportplatoon = GetTransports( platoon, aiBrain )
 				if bUsedTransports or counter == attempts then
-					if bUsedTransports then
-						LOG('Used transport')
-					end
-					if counter == attempts then
-						LOG('Count exceeded')
-					end
 					break
 				end
 				WaitTicks(120)
@@ -1077,7 +1071,6 @@ function SendPlatoonWithTransports(aiBrain, platoon, destination, attempts, bSki
 			if transportplatoon then
 				ForkTo( ReturnTransportsToPool, aiBrain, GetPlatoonUnits(transportplatoon), true)
 			end
-            LOG('didnt use transports')
 			return false
 		end
 			
