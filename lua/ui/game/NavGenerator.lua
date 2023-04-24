@@ -964,6 +964,7 @@ NavUI = ClassUI(Window) {
     end,
 
     OnClose = function(self)
+        SimCallback({Func = 'NavDisableDebugging', Args = { }})
         self:Hide()
     end,
 }
@@ -975,11 +976,13 @@ function OpenWindow()
         Root = NavUI(GetFrame(0))
         Root:Show()
     end
+
+    SimCallback({Func = 'NavEnableDebugging', Args = { }})
 end
 
 function CloseWindow()
     if Root then
-        Root:Hide()
+        Root:OnClose()
     end
 end
 
