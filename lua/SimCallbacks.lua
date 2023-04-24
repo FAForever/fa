@@ -859,3 +859,5 @@ Callbacks.GridReclaimDebugDisable = import("/lua/ai/gridreclaim.lua").DisableDeb
 
 Callbacks.AIBrainEconomyDebugEnable = import("/lua/aibrains/components/economy.lua").EnableDebugging
 Callbacks.AIBrainEconomyDebugDisable = import("/lua/aibrains/components/economy.lua").DisableDebugging
+
+Callbacks.AIPlatoonSiloTacticalBehavior = import("/lua/aibrains/platoons/platoon-silo.lua").DebugAssignToUnits

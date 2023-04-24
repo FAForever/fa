@@ -1,6 +1,7 @@
 
 ---@class AIPlatoon : moho.platoon_methods
 ---@field BuilderData table
+---@field Brain moho.aibrain_methods
 ---@field Trash TrashBag
 AIPlatoon = Class(moho.platoon_methods) {
 
@@ -9,22 +10,31 @@ AIPlatoon = Class(moho.platoon_methods) {
     ---@param plan string
     OnCreate = function(self, plan)
         self.Trash = TrashBag()
+        self.Brain = self:GetBrain()
         self.TrashState = TrashBag()
-        self.Plan = plan
     end,
 
+    ---@param self AIPlatoon
     OnDestroy = function(self)
         self.Trash:Destroy()
     end,
 
+    ---@param self AIPlatoon
     OnUnitsAddedToPlatoon = function(self)
-
+        LOG("OnUnitsAddedToPlatoon")
+        local units = self:GetPlatoonUnits()
+        for k, unit in units do
+            unit.AIPlatoonReference = self
+        end
     end,
 
+    ---@param self AIPlatoon
     PlatoonDisband = function(self)
 
     end,
 
+    ---@param self AIPlatoon
+    ---@param name string
     ChangeState = function(self, name)
         ChangeState(self, self[name])
     end,

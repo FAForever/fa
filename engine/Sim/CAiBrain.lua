@@ -21,7 +21,7 @@ function CAiBrain:AssignThreatAtPosition(position, threat, decay, threatType)
 end
 
 --- Assigns a unit to a platoon
----@param platoon Platoon | string Either a reference to a platoon, or the unique name of the platoon
+---@param platoon moho.platoon_methods | string Either a reference to a platoon, or the unique name of the platoon
 ---@param unit Unit
 ---@param squad PlatoonSquads
 ---@param formation UnitFormations
