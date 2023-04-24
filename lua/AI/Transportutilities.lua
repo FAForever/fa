@@ -182,9 +182,9 @@ function CheckTransportPool( aiBrain )
 					continue
 				end
 				
-				if platoon.CreationTime and (aiBrain.CycleTime - platoon.CreationTime) < 360 then
-					continue
-				end
+				--if platoon.CreationTime and (aiBrain.CycleTime - platoon.CreationTime) < 360 then
+				--	continue
+				--end
 			end
 			
 			IssueClearCommands( {v} )
@@ -1287,7 +1287,7 @@ function SendPlatoonWithTransports(aiBrain, platoon, destination, attempts, bSki
 				end
 				
 				-- sort the markers by closest distance to final destination
-				TableSort( markerlist, function(a,b) local VDist2Sq = VDist2Sq return VDist2Sq( a.Position[1],a.Position[3], destination[1],destination[3] ) < VDist2Sq( b.Position[1],b.Position[3], destination[1],destination[3] )  end )
+				TableSort( markerlist, function(a,b) local VDist2Sq = VDist2Sq return VDist2Sq( a.position[1],a.position[3], destination[1],destination[3] ) < VDist2Sq( b.Position[1],b.Position[3], destination[1],destination[3] )  end )
 
 				-- loop thru each marker -- see if you can form a safe path on the surface 
 				-- and a safe path for the transports -- use the first one that satisfies both
@@ -1961,7 +1961,9 @@ function UseTransports( aiBrain, transports, location, UnitPlatoon, IsEngineer )
                     local Direction
 					for _,p in safePath do
 						if prevposition then
-							Direction = import('/lua/utilities.lua').GetDirectionInDegrees( prevposition, p )
+							local base = Vector( 0, 0, 1 )
+                            local direction = import('/lua/utilities.lua').GetDirectionVector(prevposition, p)
+							Direction = import('/lua/utilities.lua').GetAngleCCW( base, direction )
 							IssueFormMove( GetPlatoonUnits(transports), p, 'AttackFormation', Direction)
 							prevposition = p
 						end
@@ -1972,7 +1974,9 @@ function UseTransports( aiBrain, transports, location, UnitPlatoon, IsEngineer )
                         LOG("*AI DEBUG "..aiBrain.Nickname.." "..UnitPlatoon.BuilderName.." "..transports.BuilderName.." goes direct to "..repr(location))
                     end
 					-- go direct ?? -- what ?
-					IssueFormMove( GetPlatoonUnits(transports), location, 'AttackFormation', import('/lua/utilities.lua').GetDirectionInDegrees( GetPlatoonPosition(transports), location )) 
+					local base = Vector( 0, 0, 1 )
+                    local direction = import('/lua/utilities.lua').GetDirectionVector(GetPlatoonPosition(transports), location)
+					IssueFormMove( GetPlatoonUnits(transports), location, 'AttackFormation', import('/lua/utilities.lua').GetAngleCCW( base, direction )) 
 				end
 
 				if TransportDialog then
