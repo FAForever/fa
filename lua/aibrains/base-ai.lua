@@ -422,18 +422,18 @@ AIBrain = Class(StandardBrain) {
     FindClosestBuilderManagerPosition = function(self, position)
         local distance, closest
         for k, v in self.BuilderManagers do
-            if v.EngineerManager:GetNumCategoryUnits('Engineers', categories.ALLUNITS) <= 0 and v.FactoryManager:GetNumCategoryFactories(categories.ALLUNITS) <= 0 then
-                continue
-            end
-            if position and v.Position then
-                if not closest then
-                    distance = VDist3(position, v.Position)
-                    closest = v.Position
-                else
-                    local tempDist = VDist3(position, v.Position)
-                    if tempDist < distance then
-                        distance = tempDist
+            if v.EngineerManager and v.EngineerManager:GetNumCategoryUnits('Engineers', categories.ALLUNITS) > 0
+            and v.FactoryManager and v.FactoryManager:GetNumCategoryFactories(categories.ALLUNITS) > 0 then
+                if position and v.Position then
+                    if not closest then
+                        distance = VDist3(position, v.Position)
                         closest = v.Position
+                    else
+                        local tempDist = VDist3(position, v.Position)
+                        if tempDist < distance then
+                            distance = tempDist
+                            closest = v.Position
+                        end
                     end
                 end
             end
