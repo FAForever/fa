@@ -1237,7 +1237,7 @@ function SendPlatoonWithTransports(aiBrain, platoon, destination, attempts, bSki
 			-- I'm thinking of mixing the two values so that it will error on the side of caution
 			local GetRealThreatAtPosition = function( position, range )
             
-                local IMAPblocks = ScenarioInfo.IMAPBlocks or 1
+                local IMAPblocks = aiBrain.IMAPConfig.Rings or 1
 
 				local sfake = GetThreatAtPosition( aiBrain, position, IMAPblocks, true, 'AntiSurface' )
 				local afake = GetThreatAtPosition( aiBrain, position, IMAPblocks, true, 'AntiAir' )
@@ -1287,17 +1287,17 @@ function SendPlatoonWithTransports(aiBrain, platoon, destination, attempts, bSki
 				end
 				
 				-- sort the markers by closest distance to final destination
-				TableSort( markerlist, function(a,b) local VDist2Sq = VDist2Sq return VDist2Sq( a.position[1],a.position[3], destination[1],destination[3] ) < VDist2Sq( b.Position[1],b.Position[3], destination[1],destination[3] )  end )
+				TableSort( markerlist, function(a,b) local VDist2Sq = VDist2Sq return VDist2Sq( a.position[1],a.position[3], destination[1],destination[3] ) < VDist2Sq( b.position[1],b.position[3], destination[1],destination[3] )  end )
 
 				-- loop thru each marker -- see if you can form a safe path on the surface 
 				-- and a safe path for the transports -- use the first one that satisfies both
 				for _, v in markerlist do
 
-                    if lastlocationtested and TableEqual(lastlocationtested, v.Position) then
+                    if lastlocationtested and TableEqual(lastlocationtested, v.position) then
                         continue
                     end
                     
-                    lastlocationtested = TableCopy( v.Position )
+                    lastlocationtested = TableCopy( v.position )
                     
 					-- test the real values for that position
 					stest, atest = GetRealThreatAtPosition( lastlocationtested, 80 )
@@ -1430,8 +1430,6 @@ function SendPlatoonWithTransports(aiBrain, platoon, destination, attempts, bSki
                         else
                             LOG("*AI DEBUG "..aiBrain.Nickname.." "..transportplatoon.BuilderName.." finds alternate landing position at "..repr(transportLocation).." AIRthreat is "..airthreat.." vs. my max of "..airthreatMax)
                         end
-
-                        import('/lua/ai/altaiutilities.lua').AISendPing( transportLocation, 'warning', aiBrain.ArmyIndex )
                     end
                 end
             else
@@ -1962,7 +1960,7 @@ function UseTransports( aiBrain, transports, location, UnitPlatoon, IsEngineer )
 					for _,p in safePath do
 						if prevposition then
 							local base = Vector( 0, 0, 1 )
-                            local direction = import('/lua/utilities.lua').GetDirectionVector(prevposition, p)
+                            local direction = import('/lua/utilities.lua').GetDirectionVector(Vector(prevposition[1], prevposition[2], prevposition[3]), Vector(p[1], p[2], p[3]))
 							Direction = import('/lua/utilities.lua').GetAngleCCW( base, direction )
 							IssueFormMove( GetPlatoonUnits(transports), p, 'AttackFormation', Direction)
 							prevposition = p
@@ -1975,7 +1973,8 @@ function UseTransports( aiBrain, transports, location, UnitPlatoon, IsEngineer )
                     end
 					-- go direct ?? -- what ?
 					local base = Vector( 0, 0, 1 )
-                    local direction = import('/lua/utilities.lua').GetDirectionVector(GetPlatoonPosition(transports), location)
+					local transPos = GetPlatoonPosition(transports)
+                    local direction = import('/lua/utilities.lua').GetDirectionVector(Vector(transPos[1], transPos[2], transPos[3]), Vector(location[1], location[2], location[3]))
 					IssueFormMove( GetPlatoonUnits(transports), location, 'AttackFormation', import('/lua/utilities.lua').GetAngleCCW( base, direction )) 
 				end
 
@@ -2591,7 +2590,7 @@ function ProcessAirUnits( unit, aiBrain )
                 end
             
                 -- and send it off to the refit thread --
-                unit:ForkThread( AirUnitRefitThread, aiBrain )
+                --unit:ForkThread( AirUnitRefitThread, aiBrain )
                 
                 return true
                 
