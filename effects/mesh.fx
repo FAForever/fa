@@ -9202,11 +9202,7 @@ float4 PBR_PS(
     float nDotL = max(dot(n, l), 0.0);
 
     float shadow = ComputeShadow(vertex.shadow, hiDefShadows);
-    float3 sunLight = sunDiffuse * lightMultiplier;
-    // We need to do this to stay consistent with ComputeLight()
-    float3 shadowColor = (1 - (sunDiffuse * shadow * nDotL + sunAmbient)) * shadowFill;
-    sunLight += shadowColor;
-    sunLight *= shadow;
+    float3 sunLight = sunDiffuse * lightMultiplier * shadow;
 
     // Cook-Torrance BRDF
     float3 F = FresnelSchlick(max(dot(h, v), 0.0), F0);
@@ -9235,6 +9231,8 @@ float4 PBR_PS(
     kD = float3(1.0, 1.0, 1.0) - kS;
     kD *= 1.0 - metallic;
 
+    // We need to do this to stay consistent with ComputeLight()
+    float3 shadowColor = (1 - (sunDiffuse * shadow * nDotL + sunAmbient)) * shadowFill;
     float3 ambient = sunAmbient * lightMultiplier + shadowColor;
 
     // As maps were not created with this shader in mind we need to do some tuning to match
