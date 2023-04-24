@@ -22,8 +22,111 @@
 --******************************************************************************************************
 
 local Shared = import("/lua/shared/navgenerator.lua")
+local Colors = import("/lua/shared/color.lua")
 local NavGenerator = import("/lua/sim/navgenerator.lua")
 local NavDatastructures = import("/lua/sim/navdatastructures.lua")
+
+-------------------------------------------------------------------------------
+-- Debugging functionality
+
+local Debug = false
+function EnableDebugging()
+    Debug = true
+end
+
+function DisableDebugging()
+    Debug = false
+end
+
+---@type { PathTo: { Tick: number, Path: Vector[], Origin: Vector, Destination: Vector }[] , PathToWithThreatThreshold: { Tick: number, Path: Vector[], Origin: Vector, Destination: Vector }[] }
+local paths = {
+    PathTo = { },
+    PathToWithThreatThreshold = { }
+}
+
+---@param path Vector[]
+---@param type 'PathTo' | 'PathToWithThreatThreshold'
+function DebugRegisterPath(type, path, origin, destination)
+    if Debug then
+        ---@type { Tick: number, Path: Vector[], Origin: Vector, Destination: Vector }[]
+        local cache = paths[type]
+        if cache then
+            local n = table.getn(cache)
+            cache[n + 1] = {
+                Tick = GetGameTick(),
+                Path = path,
+                Origin = origin,
+                Destination = destination,
+            }
+        end
+    end
+end
+
+function DebugPathRender()
+    local DrawCircle = DrawCircle
+    local DrawLinePop = DrawLinePop
+    local GetGameTick = GetGameTick
+    local TableGetn = table.getn
+    local ColorsRGB = Colors.ColorRGB
+
+    local duration = 150
+
+    while true do
+        local tick = GetGameTick()
+        for type, cache in paths do
+            for id, info in cache do
+                local fraction = (tick - info.Tick) / (duration)
+                if fraction > 1 then
+                    fraction = 1
+                elseif fraction < 0 then
+                    fraction = 0
+                end
+
+                local color = ColorsRGB(1 - fraction, 1 - fraction, 1 - fraction)
+
+                -- draw start
+                DrawCircle(info.Origin, 1.9, '000000')
+                DrawCircle(info.Origin, 2, color)
+                DrawCircle(info.Origin, 2.1, '000000')
+
+                -- draw end
+                DrawCircle(info.Destination, 1.9, '000000')
+                DrawCircle(info.Destination, 2, color)
+                DrawCircle(info.Destination, 2.1, '000000')
+
+                -- draw path
+                local path = info.Path
+                local n = TableGetn(path)
+                if n >= 2 then
+                    local last = path[1]
+                    for k = 2, n do
+                        DrawLinePop(last, path[k], color)
+                        last = path[k]
+                    end
+                end
+
+                -- remove paths we're no longer interested in
+                if info.Tick + duration < tick then
+                    cache[id] =  nil
+                end
+            end
+        end
+
+        WaitTicks(1)
+    end
+end
+
+local DebugPathRenderThread = ForkThread(DebugPathRender)
+
+--- Called by the module manager when this module is dirty due to a disk change
+function __moduleinfo.OnDirty()
+    if DebugPathRenderThread then
+        DebugPathRenderThread:Destroy()
+    end
+end
+
+-- Debugging functionality
+-------------------------------------------------------------------------------
 
 --- Returns true if the navigational mesh is generated
 ---@return boolean
@@ -184,7 +287,6 @@ function PathToDefaultOptions()
     return PathToOptions
 end
 
---- Returns true when you can path from the origin to the destination
 ---@param layer NavLayers
 ---@param origin Vector
 ---@param destination Vector
@@ -294,6 +396,136 @@ function PathTo(layer, origin, destination, options)
 
     -- clear up after ourselves
     PathToHeap:Clear()
+
+    DebugRegisterPath('PathTo', path, origin, destination)
+
+    -- return all the goodies!!
+    return path, head, distance
+end
+
+ThreatFunctions = Shared.ThreatFunctions
+
+---@param layer NavLayers
+---@param origin Vector
+---@param destination Vector
+---@param aibrain AIBrain
+---@param threatFunc fun(aiBrain: AIBrain, position: Vector, radius: number) : number
+---@param threatThreshold number
+---@param threatRadius number
+---@return Vector[]?            # List of positions
+---@return (string | number)?   # Error message, or the number of positions
+---@return number?              # Length of path
+function PathToWithThreatThreshold(layer, origin, destination, aibrain, threatFunc, threatThreshold, threatRadius)
+    -- check if generated
+    if not NavGenerator.IsGenerated() then
+        WarnNoNavMesh()
+        return nil, 'Navigational mesh is not generated'
+    end
+
+    -- check if we can path
+    local ok, msg = CanPathTo(layer, origin, destination)
+    if not ok then
+        return nil, msg
+    end
+
+    -- setup pathing
+    local seenIdentifier = PathToGetUniqueIdentifier()
+    local grid = FindGrid(layer)                        --[[@as NavGrid]]
+    local originLeaf = FindLeaf(grid, origin)           --[[@as CompressedLabelTreeLeaf]]
+    local destinationLeaf = FindLeaf(grid, destination) --[[@as CompressedLabelTreeLeaf]]
+
+    -- 0th iteration of search
+    originLeaf.From = nil
+    originLeaf.AcquiredCosts = 0
+    originLeaf.TotalCosts = originLeaf:DistanceTo(destinationLeaf)
+    originLeaf.Seen = seenIdentifier
+    PathToHeap:Insert(originLeaf)
+
+    destinationLeaf.From = nil
+    destinationLeaf.AcquiredCosts = 0
+    destinationLeaf.TotalCosts = 0
+    destinationLeaf.Seen = 0
+
+    -- search iterations
+    while not PathToHeap:IsEmpty() do
+
+        local leaf = PathToHeap:ExtractMin() --[[@as CompressedLabelTreeLeaf]]
+
+        -- did we reach the destination?
+        if leaf == destinationLeaf then
+            break
+        end
+
+        -- search through neighbors
+        for k = 1, table.getn(leaf) do
+            local neighbor = leaf[k]
+            if neighbor.Label > 0 and neighbor.Seen != seenIdentifier then
+                local preferLargeNeighbor = 0
+                if leaf.Size > neighbor.Size then
+                    preferLargeNeighbor = 100
+                end
+
+                -- update threat state
+                local root = neighbor.Root
+                if neighbor.Seen != seenIdentifier then
+                    root.Threat = threatFunc(aibrain, {neighbor.px, 0, neighbor.pz}, threatRadius)
+                end
+
+                -- update pathing state
+                neighbor.From = leaf
+                neighbor.Seen = seenIdentifier
+                neighbor.AcquiredCosts = leaf.AcquiredCosts + leaf:DistanceTo(neighbor) + 2 + preferLargeNeighbor
+                neighbor.TotalCosts = neighbor.AcquiredCosts + 0.25 * destinationLeaf:DistanceTo(neighbor)
+
+                -- include in search when threat is low enough
+                if root.Threat <= threatThreshold then
+                    PathToHeap:Insert(neighbor)
+                end
+            end
+        end
+    end
+
+    -- check if we found a path
+    if not destinationLeaf.Seen == seenIdentifier then
+        return nil, 'Did not manage to find the destination'
+    end
+
+    -- construct current path
+    local head = 1
+    local path = { }
+    local distance = 0
+    local leaf = destinationLeaf.From
+    while leaf.From and leaf.From != leaf do
+
+        -- add to path
+        path[head] = {
+            leaf.px,
+            GetSurfaceHeight(leaf.px, leaf.pz),
+            leaf.pz
+        }
+        head = head + 1
+
+        -- keep track of distance
+        distance = distance + leaf:DistanceTo(leaf.From)
+
+        -- continue down the tree
+        leaf = leaf.From
+    end
+
+    -- reverse the path
+    for k = 1, (0.5 * head) ^ 0 do
+        local temp = path[k]
+        path[k] = path[head - k]
+        path[head - k] = temp
+    end
+
+    -- add destination to the path
+    path[head] = destination
+
+    -- clear up after ourselves
+    PathToHeap:Clear()
+
+    DebugRegisterPath('PathToWithThreatThreshold', path, origin, destination)
 
     -- return all the goodies!!
     return path, head, distance
