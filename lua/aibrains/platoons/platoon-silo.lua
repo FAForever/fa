@@ -1,20 +1,22 @@
 local AIPlatoon = import("/lua/aibrains/platoons/platoon-base.lua").AIPlatoon
 
+local WeakValue = { __mode = 'v' }
+
 -- upvalue scope for performance
 local ForkThread = ForkThread
 local WaitTicks = WaitTicks
 local IssueTactical = IssueTactical
+
+local TableGetn = table.getn
 local TableEmpty = table.empty
 local TableRandom = table.random
 
 ---@class AIPlatoonSilo : AIPlatoon
----@field Base AIBase
----@field Brain AIBrain
 ---@field Targets EntityCategory
----@field TargetScanningThread thread
+---@field ReadyToLaunch table<EntityId, Unit>
 AIPlatoonSilo = Class(AIPlatoon) {
 
-    AIBehaviorTactical = State {
+    AIBehaviorTacticalSimple = State {
 
         -- series of valid targets for the silo
         Targets = (categories.MASSEXTRACTION + categories.ENERGYPRODUCTION + categories.RESEARCH) *
@@ -22,34 +24,60 @@ AIPlatoonSilo = Class(AIPlatoon) {
 
         ---@param self AIPlatoonSilo
         Main = function(self)
-        end,
+            self.ReadyToLaunch = setmetatable({}, WeakValue)
 
-        --- Scans the surrounding of the silo for targets. Assumes to be running in a thread
-        ---@param self AIPlatoonSilo
-        ---@param unit Unit
-        ---@param weapon Weapon
-        TargetScanning = function(self, unit, weapon)
-            -- local scope for performance
+            ---@type Unit | nil
+            local target
+
+            ---@type moho.aibrain_methods
             local brain = self:GetBrain()
 
-            while unit:GetTacticalSiloAmmoCount() > 0 do
+            while not IsDestroyed(self) do
 
-                -- search for a target
-                local units = brain:GetUnitsAroundPoint(
-                    self.Targets,
-                    unit:GetPosition(),
-                    weapon.Blueprint.MaxRadius,
-                    'Enemy'
-                )
+                -- find target
+                if not target or IsDestroyed(target) then
+                    local units = brain:GetUnitsAroundPoint(
+                        self.Targets,
+                        self:GetPlatoonPosition(),
+                        100, -- TODO: determine range dynamically?
+                        'Enemy'
+                    )
 
-                if units and not TableEmpty(units) then
-                    IssueTactical({ unit }, TableRandom(units))
+                    -- choose a random target
+                    if units and not TableEmpty(units) then
+                        target = TableRandom(units)
+                    end
                 end
 
-                WaitTicks(100)
-            end
+                -- fire at target
+                local launchers = self.ReadyToLaunch
+                if target and not IsDestroyed(target) and not TableEmpty(launchers) then
 
-            self.TargetScanningThread = nil
+                    local health = target:GetHealth()
+                    for _, unit in launchers do
+
+                        -- unit should be destroyed at this point
+                        if health < 0 then
+                            target = nil
+                            break
+                        end
+
+                        -- TODO: make this dynamic somehow
+                        health = health - 5000
+
+                        IssueTactical({unit}, target)
+
+                        -- check ammo
+                        if unit:GetTacticalSiloAmmoCount() <= 1 then
+                            launchers[unit.EntityId] = nil
+                        end
+                    end
+
+                    WaitTicks(20)
+                else
+                    WaitTicks(100)
+                end
+            end
         end,
 
         --- Initiates the search for a target, if we are not already searching for one
@@ -57,11 +85,7 @@ AIPlatoonSilo = Class(AIPlatoon) {
         ---@param unit Unit
         ---@param weapon Weapon
         OnSiloBuildEnd = function(self, unit, weapon)
-            if not self.TargetScanningThread then
-                local targetScanningThread = ForkThread(self.TargetScanning, self, unit, weapon)
-                self.Trash:Add(targetScanningThread)
-                self.TargetScanningThread = targetScanningThread
-            end
+            self.ReadyToLaunch[unit.EntityId] = unit
         end,
 
         --- Pauses the silo if it is too damaged, to save on resources
@@ -80,7 +104,7 @@ AIPlatoonSilo = Class(AIPlatoon) {
     },
 }
 
----@param data { Behavior: 'AIBehaviorTactical' }
+---@param data { Behavior: 'AIBehaviorTacticalSimple' }
 ---@param units Unit[]
 DebugAssignToUnits = function(data, units)
     if units and not TableEmpty(units) then

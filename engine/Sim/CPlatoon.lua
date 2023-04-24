@@ -153,8 +153,8 @@ end
 function CPlatoon:GetPlatoonLifetimeStats()
 end
 
---- Returns platoon position
--- @return Table with position {x, y, z}.
+--- Computes the average platoon position, returns {0,0,0} if the platoon has no units
+---@return Vector
 function CPlatoon:GetPlatoonPosition()
 end
 
