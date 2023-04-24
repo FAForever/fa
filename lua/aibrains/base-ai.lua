@@ -308,6 +308,7 @@ AIBrain = Class(StandardBrain) {
         if self.BrainType == 'Human' then
             return
         end
+        LOG('Initialize Skirmish for '..self.Nickname)
 
         -- TURNING OFF AI POOL PLATOON, I MAY JUST REMOVE THAT PLATOON FUNCTIONALITY LATER
         local poolPlatoon = self:GetPlatoonUniquelyNamed('ArmyPool')

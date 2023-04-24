@@ -475,6 +475,7 @@ FactoryBuilderManager = Class(BuilderManager) {
 			end
 		elseif EntityCategoryContains(categories.TRANSPORTFOCUS - categories.uea0203, finishedUnit ) and self.Brain.NeedTransports then
             self.Brain.NeedTransports = nil
+            finishedUnit:ForkThread( import('/lua/ai/transportutilities.lua').AssignTransportToPool, finishedUnit:GetAIBrain() )
         end
         self:AssignBuildOrder(factory, factory.BuilderManagerData.BuilderType)
     end,

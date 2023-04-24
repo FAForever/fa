@@ -749,7 +749,7 @@ function AIFindDefensivePointNeedsStructure(aiBrain, locationType, radius, categ
 
     local retPos, retName, lowest
     for k, v in positions do
-        local numUnits = table.getn(GetOwnUnitsAroundPoint(aiBrain, ParseEntityCategory(category), v.Position, markerRadius))
+        local numUnits = table.getn(GetOwnUnitsAroundPoint(aiBrain, ParseEntityCategory(category), v.position, markerRadius))
         if numUnits < unitMax then
             if not retPos or numUnits < lowest then
                 lowest = numUnits
