@@ -1328,7 +1328,7 @@ AIBrain = Class(AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerCom
     ---@param position Vector The center point to start looking for units.
     ---@param radius number The radius of the circle we look for units in.
     ---@param alliance AllianceStatus
-    ---@return nil
+    ---@return Unit[]
     GetUnitsAroundPoint = function(self, category, position, radius, alliance)
         if alliance then
             -- call where we do care about alliance

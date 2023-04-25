@@ -22,6 +22,7 @@
 --******************************************************************************************************
 
 local Stack = import("/lua/sim/navdatastructures.lua").Stack
+local NavUtils = import("/lua/sim/NavUtils.lua")
 
 local Generated = false
 
@@ -193,7 +194,7 @@ function Generate()
             Extractors = extractors,
             Hydrocarbons = { },
             RallyPoints = { },
-            NavLabel = extractors[1].NavLabel,
+            NavLabel = NavUtils.GetLabel('Land', center),
         }
 
         if numberOfExtractors > 3 then

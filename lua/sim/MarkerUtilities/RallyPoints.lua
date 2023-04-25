@@ -43,7 +43,7 @@ local RallyPointCount = 0
 local function GenerateForExpansion(expansion, layer, distance, threshold)
     local position = expansion.position
     local rallyPoints = expansion.RallyPoints
-    local points, count = NavUtils.GetDirections(layer, position, distance, threshold)
+    local points, count = NavUtils.DirectionsFrom(layer, position, distance, threshold)
     if points then
         for k = 1, count do
             local point = points[k]

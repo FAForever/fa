@@ -41,14 +41,64 @@ AIPlatoon = Class(moho.platoon_methods) {
     ---@param name string
     ChangeState = function(self, name)
         LOG("ChangeState: " .. name)
+
+        WaitTicks(1)
         ChangeState(self, self[name])
     end,
 
-    Blank = State {
+    Start = State {
         ---@param self AIPlatoon
         Main = function(self)
+            LOG(tostring(self) .. " - Start")
+            self:ChangeState('Error')
         end,
     },
+
+    Error = State {
+        ---@param self AIPlatoon
+        Main = function(self)
+            LOG(tostring(self) .. " - Error")
+
+            -- tell the developer that something went wrong
+            while not IsDestroyed(self) do
+                DrawCircle(self:GetPlatoonPosition(), 10, 'ff0000')
+                WaitTicks(1)
+            end
+        end,
+    },
+
+    -----------------------------------------------------------------
+    -- brain events
+
+    ---@param self AIPlatoon
+    ---@param units Unit[]
+    OnUnitsAddedToAttackSquad = function(self, units)
+        LOG("OnUnitsAddedToAttackSquad")
+    end,
+
+    ---@param self AIPlatoon
+    ---@param units Unit[]
+    OnUnitsAddedToScoutSquad = function(self, units)
+        LOG("OnUnitsAddedToScoutSquad")
+    end,
+
+    ---@param self AIPlatoon
+    ---@param units Unit[]
+    OnUnitsAddedToArtillerySquad = function(self, units)
+        LOG("OnUnitsAddedToArtillerySquad")
+    end,
+
+    ---@param self AIPlatoon
+    ---@param units Unit[]
+    OnUnitsAddedToSupportSquad = function(self, units)
+        LOG("OnUnitsAddedToSupportSquad")
+    end,
+
+    ---@param self AIPlatoon
+    ---@param units Unit[]
+    OnUnitsAddedToGuardSquad = function(self, units)
+        LOG("OnUnitsAddedToGuardSquad")
+    end,
 
     -----------------------------------------------------------------
     -- unit events

@@ -45,8 +45,16 @@ AIBrain = Class(StandardBrain, EconomyComponent) {
             return
         end
 
+        -- start initial base
+        local startX, startZ = self:GetArmyStartPos()
+        local main = BaseManager.CreateBaseManager(self, 'main', { startX, 0, startZ }, 60)
+        main:AddBaseTemplate('AIBaseTemplate - Easy main')
+        self.BuilderManagers = {
+            MAIN = main
+        }
+
         ForkThread(self.OnCreateAIThread, self)
-        
+
         self:IMAPConfiguration()
         EconomyComponent.OnCreateAI(self)
     end,
@@ -64,15 +72,6 @@ AIBrain = Class(StandardBrain, EconomyComponent) {
         -- requires these datastructures to understand the game
         self.GridReclaim = import("/lua/ai/gridreclaim.lua").Setup(self)
         self.GridBrain = import("/lua/ai/gridbrain.lua").Setup()
-
-        -- start initial base
-        local startX, startZ = self:GetArmyStartPos()
-        local main = BaseManager.CreateBaseManager(self, 'main', { startX, 0, startZ }, 60)
-        main:AddBaseTemplate('AIBaseTemplate - Easy main')
-        self.BuilderManagers = {
-            MAIN = main
-        }
-
     end,
 
     ---@param self EasyAIBrain
@@ -134,9 +133,6 @@ AIBrain = Class(StandardBrain, EconomyComponent) {
         end
     end,
 
-    ---------------------------------------------
-    -- Unit events
-
     --- Retrieves the nearest base for the given position
     ---@param self EasyAIBrain
     ---@param position Vector
@@ -165,6 +161,33 @@ AIBrain = Class(StandardBrain, EconomyComponent) {
 
         return nearestManagerIdentifier
     end,
+
+    ---------------------------------------------
+    -- C hooks
+
+    ---@param platoon AIPlatoon
+    ---@param units Unit[]
+    ---@param squad PlatoonSquads
+    ---@param formation UnitFormations
+    AssignUnitsToPlatoon = function(self, platoon, units, squad, formation)
+        LOG("AssignUnitsToPlatoon")
+        StandardBrain.AssignUnitsToPlatoon(self, platoon, units, squad, formation)
+
+        if squad == 'Attack' then
+            platoon:OnUnitsAddedToAttackSquad(units)
+        elseif squad == 'Artillery' then
+            platoon:OnUnitsAddedToArtillerySquad(units)
+        elseif squad == 'Guard' then
+            platoon:OnUnitsAddedToGuardSquad(units)
+        elseif squad =='Scout' then
+            platoon:OnUnitsAddedToScoutSquad(units)
+        elseif squad == 'Support' then
+            platoon:OnUnitsAddedToSupportSquad(units)
+        end
+    end,
+
+    ---------------------------------------------
+    -- Unit events
 
     --- Called by a unit as it starts being built
     ---@param self EasyAIBrain
@@ -265,4 +288,5 @@ AIBrain = Class(StandardBrain, EconomyComponent) {
 
     ForceManagerSort = function(self)
     end,
+
 }

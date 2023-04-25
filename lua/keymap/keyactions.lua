@@ -367,6 +367,8 @@ keyActions = {
         category = 'debug', order = 24},
     ['toggle_platoon_behavior_silo'] = {action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").AssignPlatoonBehaviorSilo()',
         category = 'debug', order = 24},
+    ['toggle_platoon_simple_raid'] = {action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").AIPlatoonSimpleRaidBehavior()',
+        category = 'debug', order = 24},
     ['toggle_ai_reclaim_grid_ui'] = {action = 'UI_Lua import("/lua/ui/game/gridreclaim.lua").OpenWindow()',
         category = 'debug', order = 24},
     ['toggle_ai_economy_ui'] = {action = 'UI_Lua import("/lua/ui/game/AIBrainEconomyData.lua").OpenWindow()',

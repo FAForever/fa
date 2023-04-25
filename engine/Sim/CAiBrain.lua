@@ -267,7 +267,9 @@ end
 function CAiBrain:GetHighestThreatPosition(ring, restriction, threatType, armyIndex)
 end
 
---- Returns a list of units that match the categories
+--- Returns a list of units that match the categories.
+---
+--- This function does **not** take into account intel.
 ---@param category EntityCategory
 ---@param needToBeIdle boolean
 ---@param requireBuilt boolean Appears to be not functional
@@ -346,7 +348,7 @@ end
 ---@param radius number in game units
 ---@param restriction boolean
 ---@param threatType BrainThreatType
----@param armyIndex number
+---@param armyIndex number?
 ---@return BrainPositionThreat[]
 function CAiBrain:GetThreatsAroundPosition(position, radius, restriction, threatType, armyIndex)
 end
@@ -357,14 +359,9 @@ end
 function CAiBrain:GetUnitBlueprint(bpName)
 end
 
---- Return list of units around position.
--- @param category Unit's category, example: categories.TECH2 .
--- @param position Table with position {x, y, z}.
--- @param radius Number in game units.
--- @param alliance Types: 'Ally', 'Enemy', 'Neutral'.
--- @return tblUnits Table containing units.
-
---- Returns the units around a position that match the categories
+--- Returns the units around a position that match the categories.
+---
+--- This function takes into account intel.
 ---@param category EntityCategory
 ---@param position Vector
 ---@param radius number

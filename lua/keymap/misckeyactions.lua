@@ -553,3 +553,7 @@ import("/lua/ui/game/gamemain.lua").ObserveSelection:AddObserver(
 AssignPlatoonBehaviorSilo = function()
     SimCallback({Func = 'AIPlatoonSiloTacticalBehavior', Args = { Behavior = 'AIBehaviorTacticalSimple' }}, true)
 end
+
+AIPlatoonSimpleRaidBehavior = function()
+    SimCallback({Func = 'AIPlatoonSimpleRaidBehavior', Args = {}}, true)
+end

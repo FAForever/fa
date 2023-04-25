@@ -290,11 +290,10 @@ end
 ---@param layer NavLayers
 ---@param origin Vector
 ---@param destination Vector
----@param options NavPathToOptions
 ---@return Vector[]?            # List of positions
 ---@return (string | number)?   # Error message, or the number of positions
 ---@return number?              # Length of path
-function PathTo(layer, origin, destination, options)
+function PathTo(layer, origin, destination)
     -- check if generated
     if not NavGenerator.IsGenerated() then
         WarnNoNavMesh()
@@ -597,13 +596,13 @@ end
 local ComputeVectorCandidates = { }
 local ComputeVectorFound = { }
 
---- Returns a series of 
----@param layer any
----@param origin any
----@param distance any
+--- Returns a list of directions one can take from the origin
+---@param layer NavLayers
+---@param origin Vector
+---@param distance number
 ---@return Vector[] | nil
 ---@return number | string
-function GetDirections(layer, origin, distance, sizeThreshold)
+function DirectionsFrom(layer, origin, distance, sizeThreshold)
 
     -- check if generated
     if not NavGenerator.IsGenerated() then
