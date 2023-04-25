@@ -40,7 +40,7 @@ AIPlatoon = Class(moho.platoon_methods) {
     ---@param self AIPlatoon
     ---@param name string
     ChangeState = function(self, name)
-        LOG("ChangeState: " .. name)
+        LOG(tostring(self) .. " - Changing state to: " .. name)
 
         WaitTicks(1)
         ChangeState(self, self[name])

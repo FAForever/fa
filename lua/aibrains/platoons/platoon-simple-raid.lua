@@ -5,12 +5,13 @@ local MarkerUtils = import("/lua/sim/markerutilities.lua")
 
 -- upvalue scope for performance
 local Random = Random
+local IsDestroyed = IsDestroyed
 local TableGetn = table.getn
 local TableEmpty = table.empty
 
 -- constants
-local valuableCategories = categories.MASSEXTRACTION + categories.ENERGYPRODUCTION + (categories.ENGINEER - categories.COMMAND) + categories.MASSFABRICATION 
-local RaidDistanceThreshold = 30 
+local ValuableCategories = categories.MASSEXTRACTION + categories.ENERGYPRODUCTION + (categories.ENGINEER - categories.COMMAND) + categories.MASSFABRICATION 
+local RaidDistanceThreshold = 20 
 local NavigateDistanceThresholdSquared = 20 * 20
 
 ---@class AIPlatoonRaid : AIPlatoon
@@ -22,8 +23,6 @@ AIPlatoonRaid = Class(AIPlatoon) {
         --- Initial state of any state machine
         ---@param self AIPlatoonRaid
         Main = function(self)
-            LOG(tostring(self) .. " - Start")
-
             -- requires expansion markers
             if not import("/lua/sim/markerutilities/expansions.lua").IsGenerated() then
                 WARN("AI raid behavior requires generated expansion markers")
@@ -46,8 +45,6 @@ AIPlatoonRaid = Class(AIPlatoon) {
         --- The platoon searches for a target
         ---@param self AIPlatoonRaid
         Main = function(self)
-            LOG(tostring(self) .. " - Searching")
-
             -- reset state
             self.LocationToRaid = nil
             self.OpportunityToRaid = nil
@@ -98,8 +95,6 @@ AIPlatoonRaid = Class(AIPlatoon) {
         --- The platoon navigates towards a target, picking up oppertunities as it finds them
         ---@param self AIPlatoonRaid
         Main = function(self)
-            LOG(tostring(self) .. " - Navigating")
-
             -- reset state
             self.OpportunityToRaid = nil
 
@@ -143,6 +138,7 @@ AIPlatoonRaid = Class(AIPlatoon) {
 
                 -- TODO
                 -- use the pathing introduced by #3134
+                -- check if waypoint is too close to existing waypoint
                 self:MoveToLocation(waypoint, false, 'Attack')
                 -- END OF TODO
 
@@ -159,7 +155,7 @@ AIPlatoonRaid = Class(AIPlatoon) {
 
                     -- check for opportunities
                     local position = self:GetPlatoonPosition()
-                    local opportunities = brain:GetUnitsAroundPoint(valuableCategories, position, 20, 'Enemy')
+                    local opportunities = brain:GetUnitsAroundPoint(ValuableCategories, position, 20, 'Enemy')
                     if opportunities and not TableEmpty(opportunities) then
 
                         -- pick random opportunity and raid it
@@ -190,8 +186,6 @@ AIPlatoonRaid = Class(AIPlatoon) {
         --- The platoon raids the target
         ---@param self AIPlatoonRaid
         Main = function(self)
-            LOG(tostring(self) .. " - RaidingTarget")
-
             local brain = self:GetBrain()
 
             -- sanity check
@@ -214,8 +208,6 @@ AIPlatoonRaid = Class(AIPlatoon) {
         --- The platoon raids the opportunity it walked into
         ---@param self AIPlatoonRaid
         Main = function(self)
-            LOG(tostring(self) .. " - RaidingOpportunity")
-
             local brain = self:GetBrain()
 
             -- sanity check
@@ -239,8 +231,6 @@ AIPlatoonRaid = Class(AIPlatoon) {
         --- The platoon retreats from a threat
         ---@param self AIPlatoonRaid
         Main = function(self)
-            LOG(tostring(self) .. " - Retreating")
-
             local brain = self:GetBrain()
 
             -- sanity check
