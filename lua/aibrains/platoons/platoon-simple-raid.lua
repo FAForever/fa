@@ -20,13 +20,7 @@ AIPlatoonRaid = Class(AIPlatoon) {
 
     ---@param self AIPlatoonRaid
     __init = function(self)
-        if not import("/lua/sim/markerutilities/expansions.lua").IsGenerated() then
-            error("AI raid behavior requires generated expansion markers")
-        end
 
-        if not NavUtils.IsGenerated() then
-            error("AI raid behavior requires navigational mesh")
-        end
     end,
 
     Start = State {
@@ -34,6 +28,21 @@ AIPlatoonRaid = Class(AIPlatoon) {
         ---@param self AIPlatoonRaid
         Main = function(self)
             LOG(tostring(self) .. " - Start")
+
+            -- requires expansion markers
+            if not import("/lua/sim/markerutilities/expansions.lua").IsGenerated() then
+                WARN("AI raid behavior requires generated expansion markers")
+                self:ChangeState('Error')
+                return
+            end
+
+            -- requires navigational mesh
+            if not NavUtils.IsGenerated() then
+                WARN("AI raid behavior requires navigational mesh")
+                self:ChangeState('Error')
+                return
+            end
+
             self:ChangeState('Searching')
         end,
     },
