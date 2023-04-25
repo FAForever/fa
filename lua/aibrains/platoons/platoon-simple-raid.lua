@@ -18,11 +18,6 @@ local NavigateDistanceThresholdSquared = 20 * 20
 ---@field OpportunityToRaid Vector | nil
 AIPlatoonRaid = Class(AIPlatoon) {
 
-    ---@param self AIPlatoonRaid
-    __init = function(self)
-
-    end,
-
     Start = State {
         --- Initial state of any state machine
         ---@param self AIPlatoonRaid
