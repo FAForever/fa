@@ -53,7 +53,6 @@ function CreateTransportPool( aiBrain )
     end
 
     local transportplatoon = aiBrain:MakePlatoon( 'TransportPool', 'none' )
-
     transportplatoon:UniquelyNamePlatoon('TransportPool') 
     transportplatoon.BuilderName = 'TPool'
     transportplatoon.UsingTransport = true      -- never review this platoon during a merge
@@ -75,58 +74,41 @@ function AssignTransportToPool( unit, aiBrain )
 
     -- this sets up the OnTransportDetach callback so that this function runs EVERY time a transport drops units
 	if not unit.EventCallbacks['OnTransportDetach'] then
-
 		unit:AddUnitCallback( function(unit)
-    
             if TransportDialog then
                 LOG("*AI DEBUG TRANSPORT "..unit.PlatoonHandle.BuilderName.." Transport "..unit.EntityId.." Fires ReturnToPool callback" )
             end
-	
 			if TableGetn(unit:GetCargo()) == 0 then
-
 				if unit.WatchUnloadThread then
 					KillThread(unit.WatchUnloadThread)
 					unit.WatchUnloadThread = nil
 				end
-
 				ForkTo( AssignTransportToPool, unit, aiBrain )
-
 			end
-            
 		end, 'OnTransportDetach')
-
 	end
 
     -- if the unit is not already in the transport Pool --
 	if not unit.Dead and (not unit.PlatoonHandle != aiBrain.TransportPool) then
-    
         if TransportDialog then
             LOG("*AI DEBUG TRANSPORT "..repr(unit.PlatoonHandle.BuilderName).." Transport "..unit.EntityId.." starts assigning to Transport Pool" )
         end
-
 		IssueClearCommands( {unit} )
-
 		-- if not in need of repair or fuel -- 
 		if not ProcessAirUnits( unit, aiBrain ) then
-            
             if aiBrain.TransportPool then
                 AssignUnitsToPlatoon( aiBrain, aiBrain.TransportPool, {unit}, 'Support','')
             else
                 return
             end
-
             unit.Assigning = false        
-
 			unit.PlatoonHandle = aiBrain.TransportPool
-            
             if not IsBeingBuilt(unit) then
                 ForkTo( ReturnTransportsToPool, aiBrain, {unit}, true )
                 return
             end
 		end
-        
 	else
-    
         if not unit.Dead and (not IsBeingBuilt(unit)) then
             LOG("*AI DEBUG "..aiBrain.Nickname.." Transport "..unit.EntityId.." already in Transport Pool")
         end
@@ -166,57 +148,40 @@ function CheckTransportPool( aiBrain )
 	local unitlist = GetListOfUnits( aiBrain, AIRTRANSPORTS - categories.uea0203, true, true)
 	
 	for k,v in unitlist do
-        
 		if v and v.PlatoonHandle != TransportPool and v.PlatoonHandle != RefuelPool and GetFractionComplete(v) == 1 then
-		
 			platoon = v.PlatoonHandle or false
 			oldplatoonname = false
-			
 			if platoon then
 				oldplatoonname = platoon.BuilderName or false
 			end
-			
 			if (not IsIdleState(v)) or v.InUse or v.Assigning or (platoon and PlatoonExists(aiBrain,platoon)) then
-			
 				if not IsIdleState(v) then
 					continue
 				end
-				
 				--if platoon.CreationTime and (aiBrain.CycleTime - platoon.CreationTime) < 360 then
 				--	continue
 				--end
 			end
-			
 			IssueClearCommands( {v} )
-			
 			if v.WatchLoadingThread then
-            
                 if TransportDialog then
                     LOG("*AI DEBUG "..aiBrain.Nickname.." Killing Watch Loading thread - transport "..v.EntityId.." in CheckTransportPool")
                 end
-                
 				KillThread(v.WatchLoadingThread)
 				v.WatchLoadingThread = nil
 			end
-			
 			if v.WatchTravelThread then
-            
                 if TransportDialog then
                     LOG("*AI DEBUG "..aiBrain.Nickname.." Killing Watch Travel thread - transport "..v.EntityId.." in CheckTransportPool")
                 end            
-
 				KillThread(v.WatchTravelThread)
 				v.WatchTravelThread = nil
 			end
-			
 			if platoon and PlatoonExists(aiBrain,platoon) then
-			
 				if platoon != ArmyPool and platoon != RefuelPool and platoon != StructurePool then
-				
 					aiBrain:DisbandPlatoon(platoon)
 				end
 			end
-
             if TransportDialog then
                 LOG("*AI DEBUG "..aiBrain.Nickname.." Assigning Transport "..v.EntityId.." to Pool in CheckTransportPool")
             end
@@ -245,11 +210,8 @@ function GetTransports( platoon, aiBrain)
     end
 
 	local IsEngineer = platoon:PlatoonCategoryCount( ENGINEERS ) > 0
-    
     local TransportDialog = ScenarioInfo.TransportDialog or true
-
 	-- GATHER PHASE -- gather info on all available transports
-    
 	local Special = false
 	
 	if aiBrain.FactionIndex == 1 then
@@ -258,7 +220,6 @@ function GetTransports( platoon, aiBrain)
 	
     local transportpool = aiBrain.TransportPool
 	local armypool = aiBrain.ArmyPool
-	
 	local armypooltransports = {}
 	local TransportPoolTransports = false
 	
@@ -703,7 +664,6 @@ function GetTransports( platoon, aiBrain)
 				if not transportplatoon then
 					local ident = Random(10000,99999)
 					transportplatoon = aiBrain:MakePlatoon('TransportPlatoon '..tostring(ident),'none')
-
 					transportplatoon.PlanName = 'TransportUnits '..tostring(ident)
 					transportplatoon.BuilderName = 'Load and Transport '..tostring(ident)
                     transportplatoon.UsingTransport = true      -- keep this platoon from being reviewed in a merge
@@ -718,11 +678,7 @@ function GetTransports( platoon, aiBrain)
                 end
                 
 				AssignUnitsToPlatoon( aiBrain, transportplatoon, {transport}, 'Support', 'BlockFormation')
-
 				IssueClearCommands({transport})
-				
-				--transport:SetCustomName(transportplatoon.PlanName)
-				
 				IssueMove( {transport}, location )
 
                 while neededTable.Large >= 1 and AvailableSlots.Large >= 1 do
@@ -731,13 +687,11 @@ function GetTransports( platoon, aiBrain)
 					AvailableSlots.Medium = AvailableSlots.Medium - 0.25
                     AvailableSlots.Small = AvailableSlots.Small - 0.34
 				end
-				
                 while neededTable.Medium >= 1 and AvailableSlots.Medium >= 1 do
                     neededTable.Medium = neededTable.Medium - 1.0
                     AvailableSlots.Medium = AvailableSlots.Medium - 1.0
 					AvailableSlots.Small = AvailableSlots.Small - 0.34
                 end
-				
                 while neededTable.Small >= 1 and AvailableSlots.Small >= 1 do
                     neededTable.Small = neededTable.Small - 1.0
 					if Special then
@@ -745,13 +699,11 @@ function GetTransports( platoon, aiBrain)
 					end
                     AvailableSlots.Small = AvailableSlots.Small - 1.0
                 end
-				
 				-- if no more slots are needed signal that we have all the transport we require
                 if neededTable.Small < 1 and neededTable.Medium < 1 and neededTable.Large < 1 then
                     CanUseTransports = true
                 end
 			end
-            
             -- mark each transport (used or not) as no longer in Assignment
             transport.Assigning = false
         end
@@ -761,30 +713,24 @@ function GetTransports( platoon, aiBrain)
 	if CanUseTransports and counter > 0 then
 		counter = 0
 		local location = false
-		
 		if PlatoonExists(aiBrain, platoon) then
 			for _,u in GetPlatoonUnits(platoon) do
 				if not u.Dead then
 					counter = counter + 1
 				end
 			end
-			
 			if counter > 0 then
 				location = TableCopy(GetPlatoonPosition(platoon))
 			end
 		end
-
 		if not transportplatoon or counter < 1 then
-		
             if TransportDialog then
-            
                 if not transportplatoon then
                     LOG("*AI DEBUG "..aiBrain.Nickname.." "..platoon.BuilderName.." transport platoon dead after assignmnet "..repr(transportplatoon))
                 else
                     LOG("*AI DEBUG "..aiBrain.Nickname.." "..platoon.BuilderName.." unit platoon dead after assignment ")
                 end
             end
-			
 			CanUseTransports = false
 		end
 	end
@@ -799,7 +745,6 @@ function GetTransports( platoon, aiBrain)
             if TransportDialog then
                 LOG("*AI DEBUG "..aiBrain.Nickname.." "..platoon.BuilderName.." cannot be serviced by "..transportplatoon.BuilderName )
             end
-            
             for _,transport in GetPlatoonUnits(transportplatoon) do
                 -- unmark the transport
                 --transport.InUse = false
@@ -1161,7 +1106,6 @@ function SendPlatoonWithTransports(aiBrain, platoon, destination, attempts, bSki
                                 end
                             end
 						end
-                        
                         if platoonpath then
                             lastlocationtested = false
                             for k,v in platoonpath do
@@ -1217,20 +1161,15 @@ function SendPlatoonWithTransports(aiBrain, platoon, destination, attempts, bSki
                 if TransportDialog then
                     LOG("*AI DEBUG "..aiBrain.Nickname.." "..repr(platoon.BuilderName).." carried by "..transportplatoon.BuilderName.." seeking alternate landing zone within "..markerrange.." of destination "..repr(destination))
                 end
-
                 transportLocation = false
-
                 -- If destination is too hot -- locate the nearest movement marker that is safe
                 if MovementLayer == 'Amphibious' then
                     transportLocation = FindSafeDropZoneWithPath( platoon, transportplatoon, {'Amphibious Path Node','Land Path Node','Transport Marker'}, markerrange, destination, mythreat, airthreatMax, 'AntiSurface', MovementLayer)
                 else
                     transportLocation = FindSafeDropZoneWithPath( platoon, transportplatoon, {'Land Path Node','Transport Marker'}, markerrange, destination, mythreat, airthreatMax, 'AntiSurface', MovementLayer)
                 end
-
                 if transportLocation then
-
                     if TransportDialog then
-
                         if surthreat > mythreat then
                             LOG("*AI DEBUG "..aiBrain.Nickname.." "..transportplatoon.BuilderName.." finds alternate landing position at "..repr(transportLocation).." surthreat is "..surthreat.." vs. mine "..mythreat)
                         else
@@ -1356,26 +1295,20 @@ function UseTransports( aiBrain, transports, location, UnitPlatoon, IsEngineer )
 	if PlatoonExists( aiBrain, transports ) then
 
 		for _,v in GetPlatoonUnits(transports) do
-		
 			if not v.Dead then
-			
 				if v:TestToggleCaps('RULEUTC_StealthToggle') then
 					v:SetScriptBit('RULEUTC_StealthToggle', false)
 				end
-				
 				if v:TestToggleCaps('RULEUTC_CloakToggle') then
 					v:SetScriptBit('RULEUTC_CloakToggle', false)
 				end
-				
 				if v:TestToggleCaps('RULEUTC_IntelToggle') then
 					v:SetScriptBit('RULEUTC_IntelToggle', false)
 				end
 			
 				local slots = TableCopy( aiBrain.TransportSlotTable[v.UnitId] )
-		
 				counter = counter + 1
 				transportTable[counter] = {	Transport = v, LargeSlots = slots.Large, MediumSlots = slots.Medium, SmallSlots = slots.Small, Units = { ["Small"] = {}, ["Medium"] = {}, ["Large"] = {} } }
-
 			end
 		end
 	end
@@ -1397,69 +1330,51 @@ function UseTransports( aiBrain, transports, location, UnitPlatoon, IsEngineer )
         local count = 0
 	
 		for num, unit in unitTable do
-		
 			local transSlotNum = 0
 			local remainingLarge = 0
 			local remainingMed = 0
 			local remainingSml = 0
-		
 			local TransportClass = 	unit.Blueprint.Transport.TransportClass
 			
 			-- pick the transport with the greatest number of appropriate slots left
 			for tNum, tData in transportTable do
-			
 				if tData.LargeSlots >= remainingLarge and TransportClass == 3 then
-				
 					transSlotNum = tNum
 					remainingLarge = tData.LargeSlots
 					remainingMed = tData.MediumSlots
 					remainingSml = tData.SmallSlots
-					
 				elseif tData.MediumSlots >= remainingMed and TransportClass == 2 then
-				
 					transSlotNum = tNum
 					remainingLarge = tData.LargeSlots
 					remainingMed = tData.MediumSlots
 					remainingSml = tData.SmallSlots
-					
 				elseif tData.SmallSlots >= remainingSml and TransportClass == 1 then
-				
 					transSlotNum = tNum
 					remainingLarge = tData.LargeSlots
 					remainingMed = tData.MediumSlots
 					remainingSml = tData.SmallSlots
 				end
 			end
-			
 			if transSlotNum > 0 then
-
 				-- assign the large units
 				-- notice how we reduce the count of the lower slots as we use up larger ones
 				-- and we do the same to larger slots as we use up smaller ones - this was not the 
 				-- case before - and caused errors leaving units unassigned - or over-assigned
 				if TransportClass == 3 and remainingLarge >= 1.0 then
-				
 					transportTable[transSlotNum].LargeSlots = transportTable[transSlotNum].LargeSlots - 1.0
 					transportTable[transSlotNum].MediumSlots = transportTable[transSlotNum].MediumSlots - 0.25
 					transportTable[transSlotNum].SmallSlots = transportTable[transSlotNum].SmallSlots - 0.50
-					
 					-- add the unit to the Large list for this transport
 					TableInsert( transportTable[transSlotNum].Units.Large, unit )
-					
 				elseif TransportClass == 2 and remainingMed >= 1.0 then
-				
 					transportTable[transSlotNum].LargeSlots = transportTable[transSlotNum].LargeSlots - 0.1
 					transportTable[transSlotNum].MediumSlots = transportTable[transSlotNum].MediumSlots - 1.0
 					transportTable[transSlotNum].SmallSlots = transportTable[transSlotNum].SmallSlots - 0.34
-					
 					-- add the unit to the Medium list for this transport
 					TableInsert( transportTable[transSlotNum].Units.Medium, unit )
-					
 				elseif TransportClass == 1 and remainingSml >= 1.0 then
-				
 					transportTable[transSlotNum].MediumSlots = transportTable[transSlotNum].MediumSlots - 0.1	-- yes .1 - for UEF T2 gunships
 					transportTable[transSlotNum].SmallSlots = transportTable[transSlotNum].SmallSlots - 1
-					
 					-- add the unit to the list for this transport
 					TableInsert( transportTable[transSlotNum].Units.Small, unit )
 				else
@@ -1471,7 +1386,6 @@ function UseTransports( aiBrain, transports, location, UnitPlatoon, IsEngineer )
 				leftoverUnits[count] = unit
 			end
 		end
-
 		return transportTable, leftoverUnits
 	end	
 
@@ -1485,35 +1399,22 @@ function UseTransports( aiBrain, transports, location, UnitPlatoon, IsEngineer )
 
 	-- check the unit platoon, load the unit remaining tables, and count
 	if PlatoonExists( aiBrain, UnitPlatoon) then
-	
 		-- load the unit remaining tables according to TransportClass size
 		for k, v in GetPlatoonUnits(UnitPlatoon) do
-	
 			if v and not v.Dead then
-
 				counter = counter + 1
-
 				if v.Blueprint.Transport.TransportClass == 3 then
-				
 					TableInsert( remainingSize3, v )
-					
 				elseif v.Blueprint.Transport.TransportClass == 2 then
-				
 					TableInsert( remainingSize2, v )
-					
 				elseif v.Blueprint.Transport.TransportClass == 1 then
-				
 					TableInsert( remainingSize1, v )
-					
 				else
-				
 					WARN("*AI DEBUG "..aiBrain.Nickname.." Cannot transport "..GetBlueprint(v).Description)
 					counter = counter - 1  -- take it back
 					
 				end
-			
 				if IsUnitState( v, 'Attached') then
-				
 					LOG("*AI DEBUG unit "..v:GetBlueprint().Description.." is attached at "..repr(v:GetPosition()))
 					v:DetachFrom()
 					v:SetCanTakeDamage(true)
@@ -1532,17 +1433,14 @@ function UseTransports( aiBrain, transports, location, UnitPlatoon, IsEngineer )
 	
 		-- flag the unit platoon as busy
 		UnitPlatoon.UsingTransport = true
-	
 		local leftoverUnits = {}
 		local currLeftovers = {}
         counter = 0
 	
 		-- assign the large units - note how we come back with leftoverunits here
 		transportTable, leftoverUnits = SortUnitsOnTransports( transportTable, remainingSize3 )
-		
 		-- assign the medium units - but this time we come back with currleftovers
 		transportTable, currLeftovers = SortUnitsOnTransports( transportTable, remainingSize2 )
-	
 		-- and we move any currleftovers into the leftoverunits table
 		for k,v in currLeftovers do
 		
@@ -1572,7 +1470,6 @@ function UseTransports( aiBrain, transports, location, UnitPlatoon, IsEngineer )
 			transportTable, currLeftovers = SortUnitsOnTransports( transportTable, leftoverUnits )
 		end
 	
-	
 		-- send any leftovers to RTB --
 		if currLeftovers[1] then
 			for _,v in currLeftovers do
@@ -1600,7 +1497,6 @@ function UseTransports( aiBrain, transports, location, UnitPlatoon, IsEngineer )
 		loadissued = false
 		unitstoload = false
 		counter = 0
-		
 		-- look for dead/missing units in this transports unit list
 		-- and those that may somehow be attached already
         for size,unitlist in data.Units do
@@ -1792,33 +1688,23 @@ function UseTransports( aiBrain, transports, location, UnitPlatoon, IsEngineer )
 	
 	-- if there are loaded, moving transports, watch them while traveling
 	if transporters and TableGetn(transporters) != 0 then
-	
 		-- this sets up the transports platoon ability to call for help and to detect major threats to itself
 		-- we'll also use it to signal an 'abort transport' capability using the DistressCall field
         -- threat trigger is based on number of transports
 		transports:ForkThread( transports.PlatoonCallForHelpAI, aiBrain, TableGetn(transporters) )
-		
 		transports.AtGoal = false -- flag to allow unpathed unload of the platoon
-      
 		local travelwatch = true
-		
 		-- loop here until all transports signal travel complete
 		-- each transport should be running the WatchTravel thread
 		-- until it dies, the units it is carrying die or it gets to target
 		while travelwatch and PlatoonExists( aiBrain, transports ) do
-
 			travelwatch = false
-
 			WaitTicks(4)
-            
 			for _,t in GetPlatoonUnits(transports) do
-			
 				if t.Travelling and not t.Dead then
-				
 					travelwatch = true
 				end
 			end
-
 		end
 
         if TransportDialog then
@@ -1839,16 +1725,11 @@ function UseTransports( aiBrain, transports, location, UnitPlatoon, IsEngineer )
         local unloadcount = 0 
 		
 		while unloadwatch do
-		
 			WaitTicks(5)
             unloadcount = unloadcount + .4
-			
 			unloadwatch = false
-		
 			for _,t in GetPlatoonUnits(transports) do
-			
 				if t.Unloading and not t.Dead then
-				
 					unloadwatch = true
                 else
                     if t.WatchUnloadThread then
@@ -1864,9 +1745,7 @@ function UseTransports( aiBrain, transports, location, UnitPlatoon, IsEngineer )
         end
         
         for _,t in GetPlatoonUnits(transports) do
-        
             if not t.EventCallbacks['OnTransportDetach'] then
-
                 ForkTo( ReturnTransportsToPool, aiBrain, {t}, true )
             end
         end
@@ -1903,14 +1782,11 @@ function WatchUnitLoading( transport, units, aiBrain, UnitPlatoon)
 	
 	local unitsdead = true
 	local loading = false
-	
 	local reloads = 0
 	local reissue = 0
 	local newunits = TableCopy(units)
-	
 	local GetPosition = GetPosition
 	local watchcount = 0
-    
     transport.Loading = true
 
 	IssueStop( {transport} )
@@ -1922,19 +1798,14 @@ function WatchUnitLoading( transport, units, aiBrain, UnitPlatoon)
     -- At this point we really should safepath to the position
     -- and we should probably use a movement thread 
 	IssueMove( {transport}, GetPosition(units[1]) )
-	
 	WaitTicks(5)
 	
 	for _,u in newunits do
-	
 		if not u.Dead then
-		
 			unitsdead = false
 			loading = true
-		
 			-- here is where we issue the Load command to the transport --
 			safecall("Unable to IssueTransportLoad units are "..repr(units), IssueTransportLoad, newunits, transport )
-			
 			break
 		end
 	end
@@ -1950,17 +1821,11 @@ function WatchUnitLoading( transport, units, aiBrain, UnitPlatoon)
 	-- there is another trigger (watchcount) which will force loading
 	-- to false after 210 seconds
 	while (not unitsdead) and loading do
-	
 		watchcount = watchcount + 1.3
-
 		if watchcount > 210 then
-        
             WARN("*AI DEBUG "..aiBrain.Nickname.." "..UnitPlatoon.BuilderName.." "..transport.PlatoonHandle.BuilderName.." Transport "..transport.EntityId.." ABORTING LOAD - watchcount "..watchcount)
-            
 			loading = false
-
             transport.Loading = nil
-            
             ForkTo ( ReturnTransportsToPool, aiBrain, {transport}, true )
 			break
 		end
@@ -1972,21 +1837,15 @@ function WatchUnitLoading( transport, units, aiBrain, UnitPlatoon)
 
         -- check for death of transport - and verify that units are still awaiting load
 		if (not transport.Dead) and transport.Loading and ( not IsUnitState(transport,'Moving') or IsUnitState(transport,'TransportLoading') ) then
-		
 			unitsdead = true
 			loading = false
-	
 			-- loop thru the units and pick out those that are not yet 'attached'
 			-- also detect if all units to be loaded are dead
 			for _,u in newunits do
-		
 				if not u.Dead then
-				
 					-- we have some live units
 					unitsdead = false
-			
 					if not IsUnitState( u, 'Attached') then
-					
 						loading = true
 						counter = counter + 1
 						tempunits[counter] = u
@@ -1996,11 +1855,8 @@ function WatchUnitLoading( transport, units, aiBrain, UnitPlatoon)
 		
 			-- if all dead or all loaded or unit platoon no longer exists, RTB the transport
 			if unitsdead or (not loading) or reloads > 20 then
-			
 				if unitsdead then
-
                     transport.Loading = nil
-
 					ForkTo ( ReturnTransportsToPool, aiBrain, {transport}, true )
                     return
 				end
@@ -2018,128 +1874,87 @@ function WatchUnitLoading( transport, units, aiBrain, UnitPlatoon)
 			counter = 0
 			
 			for k,u in tempunits do
-			
 				if (not u.Dead) and not IsUnitState( u, 'Attached') then
-
 					-- if the unit is not attached and the transport has space for it or it's a UEF Gunship (TransportHasSpaceFor command is unreliable)
 					if (not transport.Dead) and transport:TransportHasSpaceFor(u) then
-					
 						IssueStop({u})
-					
 						if reissue > 1 then
-                        
                             LOG("*AI DEBUG "..aiBrain.Nickname.." "..UnitPlatoon.BuilderName.." "..transport.PlatoonHandle.BuilderName.." Transport"..transport.EntityId.." Warping unit "..u.EntityId.." to transport ")
-						
 							Warp( u, GetPosition(transport) )
 							reissue = 0
 						end
-						
 						if not newunits then
 							newunits = {}
 						end
-                        
 						counter = counter + 1						
 						newunits[counter] = u
-
-					
 					-- if the unit is not attached and the transport does NOT have space for it - turn off loading flag and clear the tempunits list
 					elseif (not transport.Dead) and (not transport:TransportHasSpaceFor(u)) and (not EntityCategoryContains(categories.uea0203,transport)) then
-
 						loading = false
 						newunits = false
 						break
-			
 					elseif (not transport.Dead) and EntityCategoryContains(categories.uea0203,transport) then
-
 						loading = false
 						newunits = false
 						break
-						
 					end	
 				end
 			end
 			
 			if newunits and counter > 0 then
-			
 				if reloads > 1 then
 					LOG("*AI DEBUG "..aiBrain.Nickname.." "..UnitPlatoon.BuilderName.." "..transport.PlatoonHandle.BuilderName.." Transport "..transport.EntityId.." Reloading "..counter.." units - reload "..reloads)
 				end
-			
 				IssueStop( newunits )
-				
 				IssueStop( {transport} )
-				
 				local goload = safecall("Unable to IssueTransportLoad", IssueTransportLoad, newunits, transport )
-				
 				if goload then
-				
 					LOG("*AI DEBUG "..aiBrain.Nickname.." "..UnitPlatoon.BuilderName.." "..transport.PlatoonHandle.BuilderName.." Transport "..transport.EntityId.." reloads is "..reloads.." goload is "..repr(goload).." for "..transport:GetBlueprint().Description)
-
 				end
-				
 			else
-			
 				loading = false
 			end
 		end
-        
 	end
 
     if TransportDialog then
-    
         if transport.Dead then
             -- at this point we should find a way to reprocess the units this transport was responsible for
             LOG("*AI DEBUG "..aiBrain.Nickname.." "..UnitPlatoon.BuilderName.." Transport "..transport.EntityId.." dead during WatchLoading")
         else
             LOG("*AI DEBUG "..aiBrain.Nickname.." "..UnitPlatoon.BuilderName.." "..transport.PlatoonHandle.BuilderName.." Transport "..transport.EntityId.." completes load in "..watchcount)
         end
-        
     end
 
     if transport.InUse then
-    
         IssueStop( {transport} )
-    
         if (not transport.Dead) then
-
             if not unitsdead then
-            
                 -- have the transport guard his loading spot until everyone else has loaded up
                 IssueGuard( {transport}, GetPosition(transport) )
-                
                 if TransportDialog then
                     LOG("*AI DEBUG "..aiBrain.Nickname.." "..UnitPlatoon.BuilderName.." "..transport.PlatoonHandle.BuilderName.." Transport "..transport.EntityId.." begins to loiter after load")
                 end
-                
             else
-			
                 transport.Loading = nil
-                
                 if TransportDialog then
                     LOG("*AI DEBUG "..aiBrain.Nickname.." "..UnitPlatoon.BuilderName.." "..transport.PlatoonHandle.BuilderName.." Transport "..transport.EntityId.." aborts load - unitsdead is "..repr(unitsdead).." watchcount is "..watchcount)
                 end
-
                 ForkTo ( ReturnTransportsToPool, aiBrain, {transport}, true )
                 return
             end
         end
-        
     end
-    
 	transport.Loading = nil
 end
 
 function WatchTransportTravel( transport, destination, aiBrain, UnitPlatoon )
 
     local TransportDialog = ScenarioInfo.TransportDialog or true
-    
 	local unitsdead = false
 	local watchcount = 0
-	
 	local GetPosition = GetPosition
-    
     local VDist2 = VDist2
-    
     local WaitTicks = WaitTicks
 	
 	transport.StuckCount = 0
@@ -2151,38 +1966,30 @@ function WatchTransportTravel( transport, destination, aiBrain, UnitPlatoon )
     end
 	
 	while (not transport.Dead) and (not unitsdead) and transport.Travelling do
-			
 			-- major distress call -- 
 			if transport.PlatoonHandle.DistressCall then
-			
 				-- reassign destination and begin immediate drop --
 				-- this really needs to be sensitive to the platoons layer
 				-- and find an appropriate marker to drop at -- 
-            
                 if TransportDialog then
                     LOG("*AI DEBUG "..aiBrain.Nickname.." "..UnitPlatoon.BuilderName.." "..transport.PlatoonHandle.BuilderName.." Transport "..transport.EntityId.." DISTRESS ends travelwatch after "..watchcount)
                 end
-                
 				destination = GetPosition(transport)
                 break
 			end
 			
 			-- someone in transport platoon is close - begin the drop -
 			if transport.PlatoonHandle.AtGoal then
-            
                 if TransportDialog then
                     LOG("*AI DEBUG "..aiBrain.Nickname.." "..UnitPlatoon.BuilderName.." "..transport.PlatoonHandle.BuilderName.." Transport "..transport.EntityId.." signals ARRIVAL after "..watchcount)
                 end
-            
 				break
 			end
         
 			unitsdead = true
 
 			for _,u in transport:GetCargo() do
-			
 				if not u.Dead then
-				
 					unitsdead = false
 					break
 				end
@@ -2190,7 +1997,6 @@ function WatchTransportTravel( transport, destination, aiBrain, UnitPlatoon )
 
 			-- if all dead except UEF Gunship RTB the transport
 			if unitsdead and not EntityCategoryContains(categories.uea0203,transport) then
-			
 				transport.StuckCount = nil
 				transport.LastPosition = nil
 				transport.Travelling = false
@@ -2205,9 +2011,7 @@ function WatchTransportTravel( transport, destination, aiBrain, UnitPlatoon )
 		
 			-- is the transport still close to its last position bump the stuckcount
 			if transport.LastPosition then
-			
 				if VDist2(transport.LastPosition[1], transport.LastPosition[3], GetPosition(transport)[1],GetPosition(transport)[3]) < 6 then
-				
 					transport.StuckCount = transport.StuckCount + 0.5
 				else
 					transport.StuckCount = 0
@@ -2215,9 +2019,7 @@ function WatchTransportTravel( transport, destination, aiBrain, UnitPlatoon )
 			end
 
 			if ( IsIdleState(transport) or transport.StuckCount > 8 ) then
-		
 				if transport.StuckCount > 8 then
-				
                     LOG("*AI DEBUG "..aiBrain.Nickname.." "..UnitPlatoon.BuilderName.." "..transport.PlatoonHandle.BuilderName.." Transport "..transport.EntityId.." StuckCount in WatchTransportTravel to "..repr(destination) )				
 					transport.StuckCount = 0
 				end
@@ -2228,11 +2030,8 @@ function WatchTransportTravel( transport, destination, aiBrain, UnitPlatoon )
 		
 			-- this needs some examination -- it should signal the entire transport platoon - not just itself --
 			if VDist2(GetPosition(transport)[1], GetPosition(transport)[3], destination[1],destination[3]) < 100 then
- 			
 				transport.PlatoonHandle.AtGoal = true
-
 			else
-
                 transport.LastPosition = TableCopy(transport:GetPosition())
             end
     
@@ -2244,11 +2043,8 @@ function WatchTransportTravel( transport, destination, aiBrain, UnitPlatoon )
 	end
 
 	if not transport.Dead then
-	
 		IssueClearCommands( {transport} )
-
 		if not transport.Dead then
-    
             if TransportDialog then
                 LOG("*AI DEBUG "..aiBrain.Nickname.." "..UnitPlatoon.BuilderName.." "..transport.PlatoonHandle.BuilderName.." Transport "..transport.EntityId.." ends travelwatch ")
             end
@@ -2266,12 +2062,9 @@ end
 function WatchUnitUnload( transport, unitlist, destination, aiBrain, UnitPlatoon )
 
     local TransportDialog = ScenarioInfo.TransportDialog or true
-  
     local WaitTicks = WaitTicks
-	
 	local unitsdead = false
 	local unloading = true
-
     transport.Unloading = true
     
     if TransportDialog then
@@ -2279,25 +2072,18 @@ function WatchUnitUnload( transport, unitlist, destination, aiBrain, UnitPlatoon
     end
 	
 	IssueTransportUnload( {transport}, destination)
-    
     WaitTicks(4)
-	
 	local watchcount = 0.3
 
 	while (not unitsdead) and unloading and (not transport.Dead) do
-	
 		unitsdead = true
 		unloading = false
 	
         if not transport.Dead then
-		
 			-- do we have loaded units
 			for _,u in unitlist do
-		
 				if not u.Dead then
-				
 					unitsdead = false
-				
 					if IsUnitState( u, 'Attached') then
 					
 						unloading = true
@@ -2308,65 +2094,45 @@ function WatchUnitUnload( transport, unitlist, destination, aiBrain, UnitPlatoon
 
             -- in this case unitsdead can mean that OR that we've unloaded - either way we're done
 			if unitsdead or not unloading then
-
                 if TransportDialog then
-                    
                     if not transport.Dead then
-                    
                         LOG("*AI DEBUG "..aiBrain.Nickname.." "..UnitPlatoon.BuilderName.." "..transport.PlatoonHandle.BuilderName.." transport "..transport.EntityId.." unloadwatch complete after "..watchcount.." seconds")
-				
                         --transport.InUse = false
                         transport.Unloading = nil
-                        
                         if not transport.EventCallbacks['OnTransportDetach'] then
                             ForkTo( ReturnTransportsToPool, aiBrain, {transport}, true )
                         end
-                        
                     else
                         LOG("*AI DEBUG "..aiBrain.Nickname.." "..UnitPlatoon.BuilderName.." "..transport.PlatoonHandle.BuilderName.." transport "..transport.EntityId.." dead during unload")
                     end
                 end
-
 			end
-
             -- watch the count and try to force the unload
 			if unloading and (not transport:IsUnitState('TransportUnloading')) then
-
 				if watchcount >= 12 then
-				
 					LOG("*AI DEBUG "..aiBrain.Nickname.." "..UnitPlatoon.BuilderName.." "..transport.PlatoonHandle.BuilderName.." transport "..transport.EntityId.." FAILS TO UNLOAD after "..watchcount.." seconds")
-                    
 					break			
-					
 				elseif watchcount >= 8 then
-				
 					LOG("*AI DEBUG "..aiBrain.Nickname.." "..UnitPlatoon.BuilderName.." "..transport.PlatoonHandle.BuilderName.." transport "..transport.EntityId.." watched unload for "..watchcount.." seconds")
-                    
 					IssueTransportUnload( {transport}, GetPosition(transport))
-					
 				elseif watchcount > 4 then
-				
 					IssueTransportUnload( {transport}, GetPosition(transport))
 				end
 			end
 		end
         
 		WaitTicks(6)
-        
 		watchcount = watchcount + 0.5
     
         if TransportDialog then
             LOG("*AI DEBUG "..aiBrain.Nickname.." "..UnitPlatoon.BuilderName.." "..transport.PlatoonHandle.BuilderName.." Transport "..transport.EntityId.." unloadwatch cycles "..watchcount )
         end
-
 	end
     
     if TransportDialog then
         LOG("*AI DEBUG "..aiBrain.Nickname.." "..UnitPlatoon.BuilderName.." "..transport.PlatoonHandle.BuilderName.." Transport "..transport.EntityId.." unloadwatch ends" )
     end
-   
     transport.Unloading = nil
-
 end
 
 -- this was previously in the loudutils file
@@ -2374,28 +2140,20 @@ end
 function ProcessAirUnits( unit, aiBrain )
 
 	if (not unit.Dead) and (not IsBeingBuilt(unit)) then
-
         local fuel = GetFuelRatio(unit)
-
 		if ( fuel > -1 and fuel < .75 ) or unit:GetHealthPercent() < .80 then
-
             if not unit.InRefit then
-
                 if ScenarioInfo.TransportDialog then
                     LOG("*AI DEBUG "..aiBrain.Nickname.." Air Unit "..unit.Sync.id.." assigned to AirUnitRefitThread ")
                 end
-            
                 -- and send it off to the refit thread --
                 --unit:ForkThread( AirUnitRefitThread, aiBrain )
-                
                 return true
-                
             else
                 LOG("*AI DEBUG "..aiBrain.Nickname.." Air Unit "..unit.Sync.id.." "..unit:GetBlueprint().Description.." already in refit Thread")
             end
 		end
 	end
-	
 	return false    -- unit did not need processing
 end
 
