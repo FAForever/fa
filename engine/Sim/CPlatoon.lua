@@ -20,7 +20,7 @@ end
 --- Orders platoon to attack mote to target position..
 -- If squad is specified, attack moves only with the squad.
 ---@param position Vector Table with position {x, y, z}.
----@param squad PlatoonSquadType
+---@param squad PlatoonSquadType?
 ---@return PlatoonCommand
 function CPlatoon:AggressiveMoveToLocation(position, squad)
 end
@@ -235,7 +235,7 @@ end
 -- If squad is specified, moves only the squad.
 ---@param position Vector Table with position {x, y, z}.
 ---@param useTransports boolean true/false
----@param squad PlatoonSquadType
+---@param squad PlatoonSquadType?
 ---@return PlatoonCommand
 function CPlatoon:MoveToLocation(position, useTransports, squad)
 end
@@ -285,7 +285,7 @@ end
 --- Orders platoon to stop, cancels all commands.
 -- If squad is specified, stops only the squad.
 -- Cancels all commands.
----@param squad PlatoonSquadType
+---@param squad PlatoonSquadType?
 function CPlatoon:Stop(squad)
 end
 

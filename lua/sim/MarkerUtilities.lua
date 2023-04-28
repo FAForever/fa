@@ -56,10 +56,10 @@ local TableDeepCopy = table.deepcopy
 
 -- easier access to all markers and all chains
 ---@type table<string, MarkerData>
-local AllMarkers
+local AllMarkers = { }
 
 ---@type table<string, MarkerChain>
-local AllChains
+local AllChains = { }
 
 --- Represents a cache of markers to prevent re-populating tables
 local MarkerCache = {
@@ -151,6 +151,8 @@ function OverwriteMarkerByType(type, markers)
         Count = n - 1,
         Markers = ms
     }
+
+    SPEW("Overwriting " .. n - 1 .. " markers of type " .. type .. " in cache!")
 end
 
 --- Flushes the cache of a certain type. Does not remove
@@ -538,3 +540,10 @@ end
 
 GenerateExpansionMarkers = import("/lua/sim/MarkerUtilities/Expansions.lua").Generate
 GenerateRallyPointMarkers = import("/lua/sim/MarkerUtilities/RallyPoints.lua").Generate
+
+function __moduleinfo.OnReload(newModule)
+    -- add existing markers to new module
+    for key, info in MarkerCache do 
+        newModule.OverwriteMarkerByType(key, info.Markers)
+    end
+end

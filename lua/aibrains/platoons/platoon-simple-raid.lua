@@ -11,10 +11,10 @@ local TableEmpty = table.empty
 
 -- constants
 local ValuableCategories = categories.MASSEXTRACTION + categories.ENERGYPRODUCTION + (categories.ENGINEER - categories.COMMAND) + categories.MASSFABRICATION 
-local RaidDistanceThreshold = 20 
 local NavigateDistanceThresholdSquared = 20 * 20
 
 ---@class AIPlatoonRaid : AIPlatoon
+---@field ThreatToEvade Vector | nil
 ---@field LocationToRaid Vector | nil
 ---@field OpportunityToRaid Vector | nil
 AIPlatoonRaid = Class(AIPlatoon) {
@@ -38,6 +38,7 @@ AIPlatoonRaid = Class(AIPlatoon) {
             end
 
             self:ChangeState('Searching')
+            return
         end,
     },
 
@@ -48,6 +49,9 @@ AIPlatoonRaid = Class(AIPlatoon) {
             -- reset state
             self.LocationToRaid = nil
             self.OpportunityToRaid = nil
+            self.ThreatToEvade = nil
+
+            self:Stop()
 
             -- pick random unit
             local units = self:GetPlatoonUnits()
@@ -58,6 +62,7 @@ AIPlatoonRaid = Class(AIPlatoon) {
             local label, error = NavUtils.GetLabel('Land', position)
 
             if label then
+                
                 -- TODO
                 -- this should be cached, part of the marker utilities
                 local expansions, count = MarkerUtils.GetMarkersByType('Expansion Area')
@@ -77,16 +82,19 @@ AIPlatoonRaid = Class(AIPlatoon) {
                 if candidateCount == 0 then
                     WARN(string.format("AI raid behavior expansion error: no expansion markers on navigational label (%d)", label))
                     self:ChangeState('Error')
+                    return
                 end
 
                 -- pick random expansion that we can Navigating to
                 local expansion = candidates[Random(1, count)]
                 self.LocationToRaid = expansion.position
                 self:ChangeState('Navigating')
+                return
             else
                 -- something odd happened: try again with another unit
                 WARN(string.format("AI raid behavior label error: %s", error))
                 self:ChangeState('Searching')
+                return
             end
         end,
     },
@@ -97,6 +105,7 @@ AIPlatoonRaid = Class(AIPlatoon) {
         Main = function(self)
             -- reset state
             self.OpportunityToRaid = nil
+            self.ThreatToEvade = nil
 
             -- sanity check
             local destination = self.LocationToRaid
@@ -106,6 +115,9 @@ AIPlatoonRaid = Class(AIPlatoon) {
                 return
             end
 
+            self:Stop()
+
+            local cache = { 0, 0, 0 }
             local brain = self:GetBrain()
 
             while not IsDestroyed(self) do
@@ -114,24 +126,18 @@ AIPlatoonRaid = Class(AIPlatoon) {
                 local unit = units[Random(1, TableGetn(units))]
                 local origin = unit:GetPosition()
 
-                -- generate a path
-                local path, n, distance = NavUtils.PathTo('Land', origin, destination)
+                -- generate a direction
+                local waypoint, length = NavUtils.DirectionTo('Land', origin, destination, 45)
 
-                if not path then
+                -- something odd happened: no direction found
+                if not waypoint then
                     WARN(string.format("AI simple raid behavior error: unable to find a path"))
                     self:ChangeState('Searching')
                     return
                 end
 
-                -- threshold to start the raid
-                if distance < RaidDistanceThreshold then
-                    self:ChangeState('RaidingTarget')
-                    return
-                end
-
-                -- determine waypoint
-                local waypoint = path[2] or path[1]
-                if not waypoint then
+                -- we're near the destination, better start raiding it!
+                if waypoint == destination then
                     self:ChangeState('RaidingTarget')
                     return
                 end
@@ -139,7 +145,7 @@ AIPlatoonRaid = Class(AIPlatoon) {
                 -- TODO
                 -- use the pathing introduced by #3134
                 -- check if waypoint is too close to existing waypoint
-                self:MoveToLocation(waypoint, false, 'Attack')
+                self:MoveToLocation(waypoint, false)
                 -- END OF TODO
 
                 -- check for opportunities
@@ -147,29 +153,44 @@ AIPlatoonRaid = Class(AIPlatoon) {
                 local wz = waypoint[3]
                 while not IsDestroyed(self) do
                     local position = self:GetPlatoonPosition()
+
+                    -- check if we're near our current waypoint
                     local dx = position[1] - wx
                     local dz = position[3] - wz
                     if dx * dx + dz * dz < NavigateDistanceThresholdSquared then
                         break
                     end
 
-                    -- check for opportunities
-                    local position = self:GetPlatoonPosition()
-                    local opportunities = brain:GetUnitsAroundPoint(ValuableCategories, position, 20, 'Enemy')
-                    if opportunities and not TableEmpty(opportunities) then
-
-                        -- pick random opportunity and raid it
-                        local opportunity = opportunities[Random(1, TableGetn(opportunities))]
-                        self.OpportunityToRaid = opportunity:GetPosition()
-                        self:ChangeState('Raiding')
-                    end
-
                     -- check for threats
                     local threat = brain:GetThreatAtPosition(position, 1, true, 'AntiSurface')
                     if threat > 0 then
                         local threatTable = brain:GetThreatsAroundPosition(position, 1, true, 'AntiSurface')
-                        if not table.empty(threatTable) then
-                            reprsl(threatTable)
+                        if threatTable and not table.empty(threatTable) then
+                            local info = threatTable[Random(1, table.getn(threatTable))]
+                            self.ThreatToEvade = { info[1], GetSurfaceHeight(info[1], info[2]), info[2] }
+                            DrawCircle(self.ThreatToEvade, 5, 'ff0000')
+                            self:ChangeState('Retreating')
+                            return
+                        end
+                    end
+
+                    -- check for opportunities
+                    local oppertunity = brain:GetThreatAtPosition(position, 2, true, 'Economy')
+                    if oppertunity > 0 then
+                        local opportunities = brain:GetThreatsAroundPosition(position, 2, true, 'Economy')
+                        if opportunities and not table.empty(opportunities) then
+                            for k = 1, table.getn(opportunities) do
+                                local info = opportunities[k]
+                                cache[1] = info[1]
+                                cache[3] = info[2]
+
+                                local threat = brain:GetThreatAtPosition(cache, 0, true, 'AntiSurface')
+                                if threat == 0 then
+                                    self.OpportunityToRaid = { info[1], GetSurfaceHeight(info[1], info[2]), info[2] }
+                                    self:ChangeState('RaidingOpportunity')
+                                    return
+                                end
+                            end
                         end
                     end
 
@@ -196,10 +217,38 @@ AIPlatoonRaid = Class(AIPlatoon) {
                 return
             end
 
+            self:Stop()
+            local command = self:AggressiveMoveToLocation(location)
+
             while not IsDestroyed(self) do
 
+                -- check if there is something to raid
+                local opportunity = brain:GetThreatAtPosition(location, 0, true, 'Economy')
+                if opportunity == 0 then
+                    self:ChangeState('Searching')
+                    return
+                end
 
-                WaitSeconds(2.0)
+                -- check for threats
+                local position = self:GetPlatoonPosition()
+                local threat = brain:GetThreatAtPosition(position, 1, true, 'AntiSurface')
+                if threat > 0 then
+                    local threatTable = brain:GetThreatsAroundPosition(position, 1, true, 'AntiSurface')
+                    if threatTable and not table.empty(threatTable) then
+                        local info = threatTable[Random(1, table.getn(threatTable))]
+                        self.ThreatToEvade = { info[1], GetSurfaceHeight(info[1], info[2]), info[2] }
+                        self:ChangeState('Retreating')
+                        return
+                    end
+                end
+
+                -- check if our command is still going
+                if not self:IsCommandsActive(command) then
+
+                    return
+                end
+
+                WaitTicks(10)
             end
         end,
     },
@@ -215,36 +264,91 @@ AIPlatoonRaid = Class(AIPlatoon) {
             if not location then
                 WARN(string.format("AI raid behavior error: no opportunity to raid"))
                 self:ChangeState('Navigating')
+                return
+            end
+
+            self:Stop()
+
+            -- tell attack units to attack
+            local attackCommand
+            local attackOffset, error = NavUtils.RandomDirectionFrom('Land', location, 32, 4)       -- TODO: remove magic numbers'
+            if not attackOffset then
+                attackCommand = self:AggressiveMoveToLocation(location, 'Attack')
+            else
+                attackCommand = self:AggressiveMoveToLocation(attackOffset, 'Attack')
+            end
+
+            -- tell scout units to patrol for threats
+            local scoutOffsets, countOrError = NavUtils.DirectionsFrom('Land', location, 32, 4)    -- TODO: remove magic numbers
+            if not scoutOffsets then
+                self:Patrol(location, 'Scout')
+            else
+                local scoutOffsetCount = table.getn(scoutOffsets)
+                for k = 1, 3 do
+                    self:Patrol(scoutOffsets[Random(1, scoutOffsetCount)], 'Scout')
+                end
             end
 
             while not IsDestroyed(self) do
 
+                -- check for opportunities
+                local opportunity = brain:GetThreatAtPosition(location, 0, true, 'Economy')
+                if opportunity == 0 then
+                    self:ChangeState('Navigating')
+                    return
+                end
 
+                -- check for threats
+                local position = self:GetPlatoonPosition()
+                local threat = brain:GetThreatAtPosition(position, 1, true, 'AntiSurface')
+                if threat > 0 then
+                    local threatTable = brain:GetThreatsAroundPosition(position, 1, true, 'AntiSurface')
+                    if threatTable and not table.empty(threatTable) then
+                        local info = threatTable[Random(1, table.getn(threatTable))]
+                        self.ThreatToEvade = { info[1], GetSurfaceHeight(info[1], info[2]), info[2] }
+                        self:ChangeState('Retreating')
+                        return
+                    end
+                end
 
-                WaitSeconds(2.0)
+                -- check if our command is still going
+                if not self:IsCommandsActive(attackCommand) then
+                    -- setup attack units
+                    local attackOffset, error = NavUtils.RandomDirectionFrom('Land', location, 10, 8)       -- TODO: remove magic numbers
+                    if not attackOffset then
+                        WARN(string.format("AI simple raid behavior error: no alternative directions found because of %s", tostring(error)))
+                        self:ChangeState('Error')
+                        return
+                    end
+
+                    attackCommand = self:AggressiveMoveToLocation(attackOffset, 'Attack')
+                end
+
+                WaitTicks(10)
             end
         end,
     },
 
     Retreating = State {
-
         --- The platoon retreats from a threat
         ---@param self AIPlatoonRaid
         Main = function(self)
             local brain = self:GetBrain()
 
             -- sanity check
-            local location = self.OpportunityToRaid
+            local location = self.ThreatToEvade
             if not location then
                 WARN(string.format("AI raid behavior error: no opportunity to raid"))
                 self:ChangeState('Navigating')
+                return
             end
 
             while not IsDestroyed(self) do
 
+                local position = self:GetPlatoonPosition()
+                local escapeOffset, error = NavUtils.EscapeDirectionFrom('Land', position, location, 25, 4)       -- TODO: remove magic numbers
 
-
-                WaitSeconds(2.0)
+                WaitSeconds(1.0)
             end
         end,
     },
@@ -282,6 +386,10 @@ AIPlatoonRaid = Class(AIPlatoon) {
                 IssueGuard(cache, attacks[Random(1, count)])
             end
         end
+
+        for k, scout in units do 
+            scout:SetFireState(1)
+        end
     end,
 
     ---@param self AIPlatoon
@@ -307,6 +415,11 @@ AIPlatoonRaid = Class(AIPlatoon) {
 ---@param units Unit[]
 DebugAssignToUnits = function(data, units)
     if units and not TableEmpty(units) then
+
+        -- meet platoon requirements
+        import("/lua/sim/navutils.lua").Generate()
+        import("/lua/sim/markerutilities.lua").GenerateExpansionMarkers()
+
         -- create the platoon
         local brain = units[1].Brain
         local platoon = brain:MakePlatoon('', '') --[[@as AIPlatoonRaid]]

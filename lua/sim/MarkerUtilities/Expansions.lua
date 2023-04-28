@@ -40,7 +40,7 @@ function Generate()
 
     Generated = true
 
-    SPEW("Generating expansion markers in... ")
+    local start = GetSystemTimeSecondsOnlyForProfileUse()
 
     ---@class ExtractorNode 
     ---@field Identifier number
@@ -218,4 +218,6 @@ function Generate()
 
     import("/lua/sim/markerutilities.lua").OverwriteMarkerByType('Large Expansion Area', largeExpansions)
     import("/lua/sim/markerutilities.lua").OverwriteMarkerByType('Expansion Area', smallExpansions)
+
+    SPEW(string.format("Generated rally point markers in %.2f miliseconds", 1000 * (GetSystemTimeSecondsOnlyForProfileUse() - start)))
 end

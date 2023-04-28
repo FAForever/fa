@@ -593,10 +593,10 @@ function GetLabelMetadata(id)
     return meta, nil
 end
 
-local ComputeVectorCandidates = { }
-local ComputeVectorFound = { }
+local DirectionsFromCandidates = { }
+local DirectionsFromFound = { }
 
---- Returns a list of directions one can take from the origin
+--- Returns a list of waypoints at the given distance that one can take from the origin
 ---@param layer NavLayers
 ---@param origin Vector
 ---@param distance number
@@ -623,8 +623,8 @@ function DirectionsFrom(layer, origin, distance, sizeThreshold)
     -- local scope for performance
     local ox = origin[1]
     local oz = origin[3]
-    local found = ComputeVectorFound
-    local candidates = ComputeVectorCandidates
+    local found = DirectionsFromFound
+    local candidates = DirectionsFromCandidates
     local head = 1
 
     -- 0th iteration of search
@@ -709,4 +709,269 @@ function DirectionsFrom(layer, origin, distance, sizeThreshold)
     end
 
     return positions, head - 1
+end
+
+local RandomDirectionFromFound = { }
+local RandomDirectionFromCandidates = { }
+
+---@param layer NavLayers
+---@param origin Vector
+---@param distance number
+---@return Vector | nil
+---@return string
+function RandomDirectionFrom(layer, origin, distance, sizeThreshold)
+
+    -- check if generated
+    if not NavGenerator.IsGenerated() then
+        WarnNoNavMesh()
+        return nil, 'Navigational mesh is not generated'
+    end
+
+    -- setup pathing
+    local seenIdentifier = PathToGetUniqueIdentifier()
+    local grid = FindGrid(layer)                        --[[@as NavGrid]]
+    local originLeaf = FindLeaf(grid, origin)           --[[@as CompressedLabelTreeLeaf]]
+
+    -- sanity check
+    if not originLeaf then
+        return nil, 'outside-map'
+    end
+
+    -- local scope for performance
+    local ox = origin[1]
+    local oz = origin[3]
+    local found = RandomDirectionFromFound
+    local candidates = RandomDirectionFromCandidates
+    local head = 1
+
+    -- 0th iteration of search
+    originLeaf.From = nil
+    originLeaf.AcquiredCosts = 0
+    originLeaf.TotalCosts = distance
+    originLeaf.Seen = seenIdentifier
+    PathToHeap:Insert(originLeaf)
+
+    while not PathToHeap:IsEmpty() do
+        local leaf = PathToHeap:ExtractMin() --[[@as CompressedLabelTreeLeaf]]
+
+        -- do not take into account small leafs as they clutter the results
+        if leaf.Size < sizeThreshold then
+            continue
+        end
+
+        -- threshold for when we accept a leaf
+        local px = leaf.px
+        local pz = leaf.pz
+
+        local dx = px - ox
+        local dz = pz - oz
+
+        local d2 = dx * dx + dz * dz
+
+        if d2 > distance * distance then
+            if not found[leaf] then
+                found[leaf] = true
+                candidates[head] = leaf
+                head = head + 1
+            end
+
+            continue
+        end
+
+        -- search neighbors for more leafs
+        for k = 1, table.getn(leaf) do
+            local neighbor = leaf[k]
+            if neighbor.Label > 0 and neighbor.Seen != seenIdentifier then
+                neighbor.From = leaf
+                neighbor.Seen = seenIdentifier
+                neighbor.AcquiredCosts = leaf.AcquiredCosts + leaf:DistanceTo(neighbor)
+                neighbor.TotalCosts = 0
+
+                PathToHeap:Insert(neighbor)
+            end
+        end
+    end
+
+    -- convert to a series of positions
+    if head <= 1 then
+        return nil, 'no-directions-found'
+    end
+
+    -- retrieve a random candidate
+    local candidate = candidates[Random(1, table.getn(candidates))]
+
+    local px = candidate.px
+    local pz = candidate.pz
+
+    local dx = px - ox
+    local dz = pz - oz
+
+    local d = math.sqrt(dx * dx + dz * dz)
+
+    local x = ox + distance / d * dx
+    local z = oz + distance / d * dz
+
+    local waypoint = { 
+        x,
+        GetSurfaceHeight(x, z),
+        z
+    }
+
+    -- clean up after ourselves
+    PathToHeap:Clear()
+
+    for k, _ in found do
+        found[k] = nil
+    end
+
+    for k , _ in candidates do
+        candidates[k] = nil
+    end
+
+    return waypoint
+end
+
+local DirectionToPath = { }
+
+---@param layer NavLayers
+---@param origin Vector
+---@param destination Vector
+---@return Vector?              # List of positions
+---@return string | number      # Error message, or the length of the path
+function DirectionTo(layer, origin, destination, distance)
+    -- check if generated
+    if not NavGenerator.IsGenerated() then
+        WarnNoNavMesh()
+        return nil, 'Navigational mesh is not generated'
+    end
+
+    -- check if we can path
+    local ok, msg = CanPathTo(layer, origin, destination)
+    if not ok then
+        return nil, msg
+    end
+
+    -- setup pathing
+    local seenIdentifier = PathToGetUniqueIdentifier()
+    local grid = FindGrid(layer)                        --[[@as NavGrid]]
+    local originLeaf = FindLeaf(grid, origin)           --[[@as CompressedLabelTreeLeaf]]
+    local destinationLeaf = FindLeaf(grid, destination) --[[@as CompressedLabelTreeLeaf]]
+
+    -- 0th iteration of search
+    originLeaf.From = nil
+    originLeaf.AcquiredCosts = 0
+    originLeaf.TotalCosts = originLeaf:DistanceTo(destinationLeaf)
+    originLeaf.Seen = seenIdentifier
+    PathToHeap:Insert(originLeaf)
+
+    destinationLeaf.From = nil
+    destinationLeaf.AcquiredCosts = 0
+    destinationLeaf.TotalCosts = 0
+    destinationLeaf.Seen = 0
+
+    -- search iterations
+    while not PathToHeap:IsEmpty() do
+
+        local leaf = PathToHeap:ExtractMin() --[[@as CompressedLabelTreeLeaf]]
+
+        -- final state
+        if leaf == destinationLeaf then
+            break
+        end
+
+        -- continue state
+        for k = 1, table.getn(leaf) do
+            local neighbor = leaf[k]
+            if neighbor.Label > 0 and neighbor.Seen != seenIdentifier then
+                local preferLargeNeighbor = 0
+                if leaf.Size > neighbor.Size then
+                    preferLargeNeighbor = 100
+                end
+                neighbor.From = leaf
+                neighbor.Seen = seenIdentifier
+                neighbor.AcquiredCosts = leaf.AcquiredCosts + leaf:DistanceTo(neighbor) + 2 + preferLargeNeighbor
+                neighbor.TotalCosts = neighbor.AcquiredCosts + 0.25 * destinationLeaf:DistanceTo(neighbor)
+
+                PathToHeap:Insert(neighbor)
+            end
+        end
+    end
+
+    -- clear up after ourselves
+    PathToHeap:Clear()
+
+    -- check if we found a path
+    if not destinationLeaf.Seen == seenIdentifier then
+        return nil, 'Did not manage to find the destination'
+    end
+
+    -- construct 
+
+    -- construct current path
+    local head = 1
+    local path = DirectionToPath
+    local length = 0
+    local leaf = destinationLeaf
+    while leaf.From and leaf.From != leaf do
+
+        -- add to path
+        local waypoint = path[head] or { }
+        path[head] = waypoint
+        head = head + 1
+
+        waypoint[1] = leaf.px
+        waypoint[2] = 0
+        waypoint[3] = leaf.pz
+
+        -- keep track of distance
+        length = length + leaf:DistanceTo(leaf.From)
+
+        -- continue down the tree
+        leaf = leaf.From
+    end
+
+    -- add origin to the list
+    local waypoint = path[head] or { }
+    path[head] = waypoint
+    waypoint[1] = originLeaf.px
+    waypoint[2] = 0
+    waypoint[3] = originLeaf.pz
+
+    -- total path length is too short
+    if length <= distance then
+        return destination, length
+    end
+
+    -- not enough steps, likely a line
+    if head <= 2 then
+        return destination, length
+    end
+
+    -- determine waypoint to pass back
+    local lastWaypoint = origin
+    local taken = 0
+    local output = { destination[1], destination[2], destination[3] }
+
+    -- traverse the path
+    for k = head, 1, -1 do
+        local waypoint = path[k]
+        local dx = waypoint[1] - lastWaypoint[1]
+        local dz = waypoint[3] - lastWaypoint[3]
+        local d = math.sqrt(dx * dx + dz * dz)
+        lastWaypoint = waypoint
+
+        if d + taken < distance then
+            taken = taken + d
+            lastWaypoint = waypoint
+        else
+            local remainder = distance - taken
+            local factor = remainder / d
+            output[1] = factor * waypoint[1] + (1 - factor) * lastWaypoint[1]
+            output[3] = factor * waypoint[3] + (1 - factor) * lastWaypoint[3]
+            output[2] = GetSurfaceHeight(output[1], output[3])
+            break
+        end
+    end
+
+    return output, distance
 end
