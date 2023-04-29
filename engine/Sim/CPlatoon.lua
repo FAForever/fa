@@ -244,7 +244,7 @@ end
 -- If squad is specified, move only with the squad.
 ---@param target Unit Unit to move to.
 ---@param useTransports boolean true/false
----@param squad PlatoonSquadType
+---@param squad PlatoonSquadType?
 ---@return PlatoonCommand
 function CPlatoon:MoveToTarget(target, useTransports, squad)
 end

@@ -596,7 +596,7 @@ end
 local DirectionsFromCandidates = { }
 local DirectionsFromFound = { }
 
---- Returns a list of waypoints at the given distance that one can take from the origin
+--- Computes a list of waypoints that represent random directions that are valid locations to path to
 ---@param layer NavLayers
 ---@param origin Vector
 ---@param distance number
@@ -714,6 +714,7 @@ end
 local RandomDirectionFromFound = { }
 local RandomDirectionFromCandidates = { }
 
+--- Computes a waypoint that represents a random direction that is a valid location to path to
 ---@param layer NavLayers
 ---@param origin Vector
 ---@param distance number
@@ -831,8 +832,145 @@ function RandomDirectionFrom(layer, origin, distance, sizeThreshold)
     return waypoint
 end
 
+local EscapeFromFound = { }
+local EscapeFromCandidates = { }
+
+--- Computes a waypoint that represents a retreat direction that is a valid location to path to
+---@param layer NavLayers
+---@param origin Vector
+---@param threat Vector
+---@param distance number
+---@return Vector | nil
+---@return string
+function RetreatDirectionFrom(layer, origin, threat, distance)
+
+    -- check if generated
+    if not NavGenerator.IsGenerated() then
+        WarnNoNavMesh()
+        return nil, 'Navigational mesh is not generated'
+    end
+
+    -- setup pathing
+    local seenIdentifier = PathToGetUniqueIdentifier()
+    local grid = FindGrid(layer)                        --[[@as NavGrid]]
+    local originLeaf = FindLeaf(grid, origin)           --[[@as CompressedLabelTreeLeaf]]
+
+    -- sanity check
+    if not originLeaf then
+        return nil, 'outside-map'
+    end
+
+    -- compute direction we're trying to threat
+    local tx = threat[1] - origin[1]
+    local tz = threat[3] - origin[3]
+    local ed = 1 / (math.sqrt(tx * tx + tz * tz))
+    tx = ed * tx
+    tz = ed * tz
+
+    -- local scope for performance
+    local ox = origin[1]
+    local oz = origin[3]
+    local found = EscapeFromFound
+    local candidates = EscapeFromCandidates
+    local head = 1
+
+    -- 0th iteration of search
+    originLeaf.From = nil
+    originLeaf.AcquiredCosts = 0
+    originLeaf.TotalCosts = distance
+    originLeaf.Seen = seenIdentifier
+    PathToHeap:Insert(originLeaf)
+
+    while not PathToHeap:IsEmpty() do
+        local leaf = PathToHeap:ExtractMin() --[[@as CompressedLabelTreeLeaf]]
+
+        -- do not look into the direction of the threat when we found something else
+        if head > 1 and leaf.TotalCosts > 0 then
+            continue
+        end
+
+        -- distance threshold for when we accept a leaf
+        local px = leaf.px
+        local pz = leaf.pz
+
+        local dx = px - ox
+        local dz = pz - oz
+
+        local d2 = dx * dx + dz * dz
+
+        if d2 > distance * distance then
+            if not found[leaf] then
+                found[leaf] = true
+                candidates[head] = leaf
+                head = head + 1
+            end
+
+            continue
+        end
+
+        -- add neighbors of leaf that is too close to the origin
+        for k = 1, table.getn(leaf) do
+            local neighbor = leaf[k]
+            if neighbor.Label > 0 and neighbor.Seen != seenIdentifier then
+
+                px = neighbor.px
+                pz = neighbor.pz
+
+                dx = px - ox
+                dz = pz - oz
+
+                neighbor.From = leaf
+                neighbor.Seen = seenIdentifier
+                neighbor.AcquiredCosts = 0
+                neighbor.TotalCosts = tx * dx + tz * dz
+
+                PathToHeap:Insert(neighbor)
+            end
+        end
+    end
+
+    -- convert to a series of positions
+    if head <= 1 then
+        return nil, 'no-directions-found'
+    end
+
+    -- retrieve a random candidate
+    local candidate = candidates[Random(1, table.getn(candidates))]
+
+    local px = candidate.px
+    local pz = candidate.pz
+
+    local dx = px - ox
+    local dz = pz - oz
+
+    local d = math.sqrt(dx * dx + dz * dz)
+
+    local x = ox + distance / d * dx
+    local z = oz + distance / d * dz
+
+    local waypoint = { 
+        x,
+        GetSurfaceHeight(x, z),
+        z
+    }
+
+    -- clean up after ourselves
+    PathToHeap:Clear()
+
+    for k, _ in found do
+        found[k] = nil
+    end
+
+    for k , _ in candidates do
+        candidates[k] = nil
+    end
+
+    return waypoint
+end
+
 local DirectionToPath = { }
 
+--- Computes a waypoint that represents the direction towards a destination
 ---@param layer NavLayers
 ---@param origin Vector
 ---@param destination Vector

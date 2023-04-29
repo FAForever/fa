@@ -14,6 +14,7 @@ local ValuableCategories = categories.MASSEXTRACTION + categories.ENERGYPRODUCTI
 local NavigateDistanceThresholdSquared = 20 * 20
 
 ---@class AIPlatoonRaid : AIPlatoon
+---@field RetreatCount number 
 ---@field ThreatToEvade Vector | nil
 ---@field LocationToRaid Vector | nil
 ---@field OpportunityToRaid Vector | nil
@@ -50,6 +51,7 @@ AIPlatoonRaid = Class(AIPlatoon) {
             self.LocationToRaid = nil
             self.OpportunityToRaid = nil
             self.ThreatToEvade = nil
+            self.RetreatCount = 0
 
             self:Stop()
 
@@ -343,12 +345,45 @@ AIPlatoonRaid = Class(AIPlatoon) {
                 return
             end
 
+            self:Stop()
+
+            self.RetreatCount = self.RetreatCount + 1
+
             while not IsDestroyed(self) do
 
                 local position = self:GetPlatoonPosition()
-                local escapeOffset, error = NavUtils.EscapeDirectionFrom('Land', position, location, 25, 4)       -- TODO: remove magic numbers
+                local waypoint, error = NavUtils.RetreatDirectionFrom('Land', position, location, 40)
 
-                WaitSeconds(1.0)
+
+                if not waypoint then
+                    -- do something
+                    return
+                end
+
+                local wx = waypoint[1]
+                local wz = waypoint[3]
+
+                local retreatCommand = self:MoveToLocation(waypoint, false)
+
+                while not IsDestroyed(self) do
+                    local position = self:GetPlatoonPosition()
+
+                    -- check if we're near our retreat point
+                    local dx = position[1] - wx
+                    local dz = position[3] - wz
+                    if dx * dx + dz * dz < NavigateDistanceThresholdSquared then
+                        if self.RetreatCount < 3 then
+                            self:ChangeState('Navigating')
+                        else
+                            self:ChangeState('Searching')
+                        end
+                        return
+                    end
+
+                    WaitTicks(10)
+                end
+
+                WaitTicks(1)
             end
         end,
     },
