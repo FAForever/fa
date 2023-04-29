@@ -596,7 +596,7 @@ end
 local DirectionsFromCandidates = { }
 local DirectionsFromFound = { }
 
---- Computes a list of waypoints that represent random directions that are valid locations to path to
+--- Computes a list of waypoints that represent random directions that we can navigate to
 ---@param layer NavLayers
 ---@param origin Vector
 ---@param distance number
@@ -714,7 +714,7 @@ end
 local RandomDirectionFromFound = { }
 local RandomDirectionFromCandidates = { }
 
---- Computes a waypoint that represents a random direction that is a valid location to path to
+--- Computes a waypoint that represents a random direction that we can navigate to
 ---@param layer NavLayers
 ---@param origin Vector
 ---@param distance number
@@ -974,8 +974,8 @@ local DirectionToPath = { }
 ---@param layer NavLayers
 ---@param origin Vector
 ---@param destination Vector
----@return Vector?              # List of positions
----@return string | number      # Error message, or the length of the path
+---@return Vector?              
+---@return string | number      
 function DirectionTo(layer, origin, destination, distance)
     -- check if generated
     if not NavGenerator.IsGenerated() then

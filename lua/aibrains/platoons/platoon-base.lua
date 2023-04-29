@@ -1,9 +1,17 @@
 
+local AIPlatoonMoho = moho.platoon_methods
+
+-- upvalue scope for performance
+local IsDestroyed = IsDestroyed
+
+local TableGetn = table.getn
+
 ---@class AIPlatoon : moho.platoon_methods
 ---@field BuilderData table
 ---@field Units Unit[]
 ---@field Brain moho.aibrain_methods
 ---@field Trash TrashBag
+---@field PlatoonUnits
 AIPlatoon = Class(moho.platoon_methods) {
 
     ---@see `AIBrain:MakePlatoon`
@@ -43,7 +51,10 @@ AIPlatoon = Class(moho.platoon_methods) {
         LOG(tostring(self) .. " - Changing state to: " .. name)
 
         WaitTicks(1)
-        ChangeState(self, self[name])
+
+        if not IsDestroyed(self) then
+            ChangeState(self, self[name])
+        end
     end,
 
     Start = State {
@@ -224,6 +235,40 @@ AIPlatoon = Class(moho.platoon_methods) {
     ---@param self AIPlatoon
     ---@param unit Unit
     OnShieldDisabled = function(self, unit)
+    end,
+
+    -----------------------------------------------------------------
+    -- hooks
+
+    --- Returns all units that are part of this platoon.
+    ---@param self AIPlatoon
+    ---@return Unit[]   # Table of alive (non-destroyed) units
+    ---@return number   # Number of units
+    GetPlatoonUnits = function(self)
+
+        -- this function is hooked because the cfunction returns units
+        -- that are destroyed. We filter those out and return the remainder
+
+        local units = AIPlatoonMoho.GetPlatoonUnits(self)
+
+        -- populate the cache
+        local head = 1
+        for k, unit in units do
+            if not IsDestroyed(unit) then
+                units[head] = unit
+                head = head + 1
+            end
+        end
+
+        -- discard remaining elements of the cache
+        local count = TableGetn(units)
+        if count >= head then
+            for k = head, count do
+                units[k] = nil
+            end
+        end
+
+        return units, head - 1
     end,
 
 }
