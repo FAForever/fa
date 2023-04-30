@@ -6,6 +6,9 @@ local IsDestroyed = IsDestroyed
 
 local TableGetn = table.getn
 
+---@type Vector
+local BaseDirectionForAngles = { 0, 0, 1 }
+
 ---@class AIPlatoon : moho.platoon_methods
 ---@field BuilderData table
 ---@field Units Unit[]
@@ -44,6 +47,43 @@ AIPlatoon = Class(moho.platoon_methods) {
     PlatoonDisband = function(self)
         LOG("PlatoonDisband")
     end,
+
+    -----------------------------------------------------------------
+    -- platoon functions
+
+    ---@param self AIPlatoon
+    ---@param units Unit[] | nil
+    ---@param origin Vector | nil
+    ---@param waypoint Vector
+    ---@param formation UnitFormations | 'GrowthFormation' | nil
+    ---@return SimCommand
+    IssueFormMoveToWaypoint = function(self, units, origin, waypoint, formation)
+        -- default values
+        units = units or self:GetPlatoonUnits()
+        origin = origin or self:GetPlatoonPosition()
+        formation = formation or 'GrowthFormation'
+
+        -- compute normalized direction
+        local dx = waypoint[1] - origin[1]
+        local dz = waypoint[3] - origin[3]
+        local di = 1 / math.sqrt(dx * dx + dz * dz)
+        dx = di * dx
+        dz = di * dz
+
+        -- compute radians
+        local rads = math.acos(dz)
+        if dx < 0 then
+            rads = 2 * 3.14159 - rads
+        end
+
+        -- convert to degrees
+        local degrees = 57.2958279 * rads
+
+        return IssueFormMove(units, waypoint, formation, degrees)
+    end,
+
+    -----------------------------------------------------------------
+    -- platoon states
 
     ---@param self AIPlatoon
     ---@param name string

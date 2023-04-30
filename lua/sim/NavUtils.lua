@@ -1092,11 +1092,11 @@ function DirectionTo(layer, origin, destination, distance)
 
     -- traverse the path
     for k = head, 1, -1 do
+
         local waypoint = path[k]
         local dx = waypoint[1] - lastWaypoint[1]
         local dz = waypoint[3] - lastWaypoint[3]
         local d = math.sqrt(dx * dx + dz * dz)
-        lastWaypoint = waypoint
 
         if d + taken < distance then
             taken = taken + d
@@ -1107,8 +1107,11 @@ function DirectionTo(layer, origin, destination, distance)
             output[1] = factor * waypoint[1] + (1 - factor) * lastWaypoint[1]
             output[3] = factor * waypoint[3] + (1 - factor) * lastWaypoint[3]
             output[2] = GetSurfaceHeight(output[1], output[3])
+            DrawCircle(output, 10, 'ffffff')
             break
         end
+
+        lastWaypoint = waypoint
     end
 
     return output, distance

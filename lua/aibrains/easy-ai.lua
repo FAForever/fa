@@ -23,6 +23,7 @@ local BrainConditionsMonitor = import("/lua/sim/brainconditionsmonitor.lua")
 ---@class EasyAIBrain: AIBrain, AIBrainEconomyComponent
 ---@field GridReclaim AIGridReclaim
 ---@field GridBrain AIGridBrain
+---@field GridRecon AIGridRecon
 ---@field BuilderManagers table<LocationType, AIBase>
 AIBrain = Class(StandardBrain, EconomyComponent) {
 
@@ -53,6 +54,11 @@ AIBrain = Class(StandardBrain, EconomyComponent) {
             MAIN = main
         }
 
+        -- requires these datastructures to understand the game
+        self.GridReclaim = import("/lua/ai/gridreclaim.lua").Setup(self)
+        self.GridBrain = import("/lua/ai/gridbrain.lua").Setup()
+        self.GridRecon = import("/lua/ai/gridrecon.lua").Setup(self)
+
         ForkThread(self.OnCreateAIThread, self)
 
         self:IMAPConfiguration()
@@ -68,10 +74,6 @@ AIBrain = Class(StandardBrain, EconomyComponent) {
         -- requires these markers to exist
         import("/lua/sim/MarkerUtilities.lua").GenerateExpansionMarkers()
         import("/lua/sim/MarkerUtilities.lua").GenerateRallyPointMarkers()
-
-        -- requires these datastructures to understand the game
-        self.GridReclaim = import("/lua/ai/gridreclaim.lua").Setup(self)
-        self.GridBrain = import("/lua/ai/gridbrain.lua").Setup()
     end,
 
     ---@param self EasyAIBrain
@@ -89,6 +91,15 @@ AIBrain = Class(StandardBrain, EconomyComponent) {
                 v.EngineerManager:Destroy()
             end
         end
+    end,
+
+    ---@param self EasyAIBrain
+    ---@param blip Blip
+    ---@param reconType ReconTypes
+    ---@param val boolean
+    OnIntelChange = function(self, blip, reconType, val)
+        local position = blip:GetPosition()
+        self.GridRecon:OnIntelChange(position[1], position[3], reconType, val)
     end,
 
     ---@param self EasyAIBrain

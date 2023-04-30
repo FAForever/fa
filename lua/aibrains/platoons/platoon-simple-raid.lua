@@ -125,11 +125,10 @@ AIPlatoonSimpleRaidBehavior = Class(AIPlatoon) {
             while not IsDestroyed(self) do
                 -- pick random unit for a position on the grid
                 local units, unitCount = self:GetPlatoonUnits()
-                local unit = units[Random(1, unitCount)]
-                local origin = unit:GetPosition()
+                local origin = self:GetPlatoonPosition()
 
                 -- generate a direction
-                local waypoint, length = NavUtils.DirectionTo('Land', origin, destination, 45)
+                local waypoint, length = NavUtils.DirectionTo('Land', origin, destination, 60)
 
                 -- something odd happened: no direction found
                 if not waypoint then
@@ -144,11 +143,11 @@ AIPlatoonSimpleRaidBehavior = Class(AIPlatoon) {
                     return
                 end
 
-                -- TODO
-                -- use the pathing introduced by #3134
-                -- check if waypoint is too close to existing waypoint
-                self:MoveToLocation(waypoint, false)
-                -- END OF TODO
+                -- navigate towards waypoint 
+                local dx = origin[1] - waypoint[1]
+                local dz = origin[3] - waypoint[3]
+                local d = math.sqrt(dx * dx + dz * dz)
+                self:IssueFormMoveToWaypoint(units, origin, waypoint)
 
                 -- check for opportunities
                 local wx = waypoint[1]
