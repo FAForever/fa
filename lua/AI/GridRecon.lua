@@ -231,7 +231,7 @@ GridRecon = Class(Grid) {
     --- Allows us to scan the map
     ---@param self AIGridRecon
     DebugUpdateThread = function(self)
-        while false do
+        while true do
             WaitTicks(1)
 
             if Debug and GetFocusArmy() == self.Brain:GetArmyIndex() then
