@@ -1356,12 +1356,12 @@ BuilderGroup {
         InstanceCount = 1,
         BuilderConditions = {
                 { EBC, 'GreaterThanEconEfficiencyCombined', { 0.1, 1.1 }},
-                { UCBC, 'UnitsGreaterAtLocation', { 'LocationType', 1, categories.TECH3 * categories.ENERGYPRODUCTION}},
-                { UCBC, 'UnitsGreaterAtLocation', { 'LocationType', 0, categories.TECH1 * categories.ENERGYPRODUCTION * categories.DRAGBUILD }},
+                { UCBC, 'UnitsGreaterAtLocation', { 'LocationType', 1, categories.TECH3 * categories.ENERGYPRODUCTION }},
+                { UCBC, 'UnitsGreaterAtLocation', { 'LocationType', 0, categories.TECH1 * categories.ENERGYPRODUCTION * categories.DRAGBUILD - categories.HYDROCARBON }},
             },
         BuilderData = {
             Location = 'LocationType',
-            Reclaim = {'STRUCTURE ENERGYPRODUCTION TECH1 DRAGBUILD'},
+            Reclaim = { categories.STRUCTURE * categories.ENERGYPRODUCTION * categories.TECH1 * categories.DRAGBUILD - categories.HYDROCARBON },
         },
         BuilderType = 'Any',
     },
@@ -1623,11 +1623,11 @@ BuilderGroup {
         BuilderConditions = {
                 { EBC, 'GreaterThanEconEfficiencyCombined', { 0.1, 1.1 }},
                 { UCBC, 'UnitsGreaterAtLocation', { 'LocationType', 1, categories.TECH3 * categories.ENERGYPRODUCTION}},
-                { UCBC, 'UnitsGreaterAtLocation', { 'LocationType', 0, categories.TECH1 * categories.ENERGYPRODUCTION * categories.DRAGBUILD }},
+                { UCBC, 'UnitsGreaterAtLocation', { 'LocationType', 0, categories.TECH1 * categories.ENERGYPRODUCTION * categories.DRAGBUILD - categories.HYDROCARBON }},
             },
         BuilderData = {
             Location = 'LocationType',
-            Reclaim = {'STRUCTURE ENERGYPRODUCTION TECH1 DRAGBUILD'},
+            Reclaim = { categories.STRUCTURE * categories.ENERGYPRODUCTION * categories.TECH1 * categories.DRAGBUILD - categories.HYDROCARBON },
         },
         BuilderType = 'Any',
     },
