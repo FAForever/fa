@@ -3172,6 +3172,103 @@ function ShiftPosition(pos1, pos2, dist, reverse)
     return {x,GetSurfaceHeight(x,z),z}
 end
 
+CalculateTeamdata = function(aiBrain)
+    local allyCount = 0
+    local enemyCount = 0
+    local teamTable = {}
+    local teamKey = 1
+    local teams = 0
+    local teamStarts = {}
+    local selfIndex = aiBrain:GetArmyIndex()
+    for _, v in ArmyBrains do
+        local armyIndex = v:GetArmyIndex()
+        local army
+        for _,b in ScenarioInfo.ArmySetup do
+            if b.ArmyIndex == armyIndex then
+                army = b
+            end
+        end
+        if not ArmyIsCivilian(armyIndex) then
+            local startx, startz = v:GetArmyStartPos()
+            if IsAlly(selfIndex, armyIndex) then
+                allyCount = allyCount + 1
+                LOG(allyCount..' Ally '..v.Nickname)
+                if army.Team and army.Team ~= 1 then
+                    teamTable[army.Team] = true
+                    if not teamStarts[armyIndex] then
+                        teamStarts[armyIndex] = {
+                            Position = {startx, GetTerrainHeight(startx, startz), startz},
+                            Team = army.Team,
+                            Ally = true
+                        }
+                    end
+                elseif not teamTable[teamKey] then
+                    --RNGLOG('Settings teams index 2 to true')
+                    teamTable[teamKey] = true
+                    if not teamStarts[armyIndex] then
+                        teamStarts[armyIndex] = {
+                            Position = {startx, GetTerrainHeight(startx, startz), startz},
+                            Team = teamKey,
+                            Ally = true
+                        }
+                    end
+                    teamKey = teamKey + 1
+                else
+                    teamKey = teamKey + 1
+                    if not teamStarts[armyIndex] then
+                        teamStarts[armyIndex] = {
+                            Position = {startx, GetTerrainHeight(startx, startz), startz},
+                            Team = teamKey,
+                            Ally = true
+                        }
+                    end
+                    teamTable[teamKey] = true
+                end
+            elseif IsEnemy(selfIndex, armyIndex) then
+                enemyCount = enemyCount + 1
+                LOG(enemyCount..' Enemy '..v.Nickname)
+                if army.Team and army.Team ~= 1 then
+                    teamTable[army.Team] = true
+                    if not teamStarts[armyIndex] then
+                        teamStarts[armyIndex] = {
+                            Position = {startx, GetTerrainHeight(startx, startz), startz},
+                            Team = army.Team,
+                            Ally = false
+                        }
+                    end
+                elseif not teamTable[teamKey] then
+                    --RNGLOG('Settings teams index 2 to true')
+                    teamTable[teamKey] = true
+                    if not teamStarts[armyIndex] then
+                        teamStarts[armyIndex] = {
+                            Position = {startx, GetTerrainHeight(startx, startz), startz},
+                            Team = teamKey,
+                            Ally = false
+                        }
+                    end
+                    teamKey = teamKey + 1
+                else
+                    if not teamStarts[armyIndex] then
+                        teamStarts[armyIndex] = {
+                            Position = {startx, GetTerrainHeight(startx, startz), startz},
+                            Team = teamKey,
+                            Ally = false
+                        }
+                    end
+                    teamKey = teamKey + 1
+                    teamTable[teamKey] = true
+                end
+            end
+        end
+    end
+    for _, v in teamTable do
+        if v then
+            teams = teams + 1
+        end
+    end
+    return teams, teamStarts, allyCount, enemyCount
+end
+
 ---@param aiBrain AIBrain
 ---@param eng unit
 ---@return boolean
@@ -3351,7 +3448,7 @@ function EngFindReclaimCell(aiBrain, eng, movementLayer, searchType)
     local gx, gz = reclaimGridInstance:ToGridSpace(engPos[1],engPos[3])
     while searchLoop < searchRadius and (not (reclaimTargetX and reclaimTargetZ)) do 
         WaitTicks(1)
-        
+
         -- retrieve a list of cells with some mass value
         local cells, count = reclaimGridInstance:FilterAndSortInRadius(gx, gz, searchRadius, 10)
         -- find out if we can path to the center of the cell and check engineer maximums

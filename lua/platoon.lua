@@ -1165,6 +1165,146 @@ Platoon = Class(moho.platoon_methods) {
         end
     end,
 
+    ---## Function: LandScoutingAI
+    --- Handles sending land scouts to important locations.
+    ---@param self Platoon
+    ---@return nil
+    LandGridScoutingAI = function(self)
+        local deathFunction = function(unit)
+            LOG('Scout Death '..repr(unit.CellAssigned))
+            if unit.CellAssigned then
+                -- Brain is assigned on unit create, if issues use eng:GetAIBrain()
+                local brainGridInstance = unit.Brain.IntelFramework.IntelGrid
+                local brainCell = brainGridInstance:ToCellFromGridSpace(unit.CellAssigned[1], unit.CellAssigned[2])
+                -- confirm engineer is removed from cell during debug
+                LOG('Scout unassigned from '..repr(unit.CellAssigned))
+                brainGridInstance:RemoveAssignedScout(brainCell, unit, 1)
+            end
+        end
+        AIAttackUtils.GetMostRestrictiveLayer(self)
+        local aiBrain = self:GetBrain()
+        local scout = self:GetPlatoonUnits()[1]
+        import("/lua/scenariotriggers.lua").CreateUnitDestroyedTrigger(deathFunction, scout)
+        local radarRange = scout.Blueprint.Intel.RadarRadius
+        if radarRange then
+            scout.RadarRange = radarRange
+        end
+        local brainGridInstance = scout.Brain.IntelFramework.IntelGrid
+        --If we have cloaking (are cybran), then turn on our cloaking
+        --DUNCAN - Fixed to use same bits
+        if scout:TestToggleCaps('RULEUTC_CloakToggle') then
+            scout:SetScriptBit('RULEUTC_CloakToggle', false)
+        end
+        
+        while not scout.Dead do
+            --Head towards the the area that has not had a scout sent to it in a while
+            local targetData = aiBrain.IntelFramework:QueryScoutLocation(aiBrain, scout)
+            LOG('Scout Target Data was '..repr(targetData))
+
+            --Is there someplace we should scout?
+            if targetData then
+                scout.CellAssigned = {targetData.X, targetData.Z}
+                brainGridInstance:AddAssignedScout(targetData, scout, 1)
+                LOG('Scout Assigned to '..repr(scout.CellAssigned))
+                --Can we get there safely?
+                local path, reason = AIAttackUtils.PlatoonGenerateSafePathTo(aiBrain, self.MovementLayer, scout:GetPosition(), targetData.Position, 400) --DUNCAN - Increase threatwieght from 100
+                IssueClearCommands(self:GetPlatoonUnits())
+
+                if path then
+                    self.ScoutMoveToLocation(scout, aiBrain, path)
+                end
+                IssueMove({scout}, targetData.Position)
+                if scout.CellAssigned[1] then
+                    scout.CellAssigned = nil
+                    brainGridInstance:RemoveAssignedScout(targetData, scout, 1)
+                end
+            end
+            WaitTicks(10)
+        end
+    end,
+
+    ScoutMoveToLocation = function(scout, aiBrain, path)
+        -- I've tried to split out the platoon movement function as its getting too messy and hard to maintain
+        --RNGLOG('Scout starts ScoutMoveWithMicro')
+
+        if not path then
+            WARN('No path passed to ScoutMoveWithMicro')
+            return false
+        end
+
+        local function VariableKite(unit,target)
+            local function KiteDist(pos1,pos2,distance)
+                local vec={}
+                local dist=VDist3(pos1,pos2)
+                for i,k in pos2 do
+                    if type(k)~='number' then continue end
+                    vec[i]=k+distance/dist*(pos1[i]-k)
+                end
+                return vec
+            end
+            if target.Dead then return end
+            if unit.Dead then return end
+                
+            local pos=unit:GetPosition()
+            local tpos=target:GetPosition()
+            local dest=KiteDist(pos,tpos,unit.RadarRange)
+            if VDist3Sq(pos,dest)>6 then
+                IssueMove({unit},dest)
+                coroutine.yield(2)
+                return
+            else
+                coroutine.yield(2)
+                return
+            end
+        end
+        local ScoutDangerCategory = categories.MOBILE * categories.LAND * (categories.DIRECTFIRE + categories.INDIRECTFIRE) - categories.SCOUT
+        local brainGridInstance = scout.Brain.IntelFramework.IntelGrid
+        local pathLength = table.getn(path)
+        for i=1, pathLength do
+            IssueMove({scout}, path[i])
+            local Lastdist
+            local dist
+            local Stuck = 0
+            while not scout.Dead do
+                coroutine.yield(1)
+                local scoutPosition = scout:GetPosition()
+                dist = VDist2Sq(path[i][1], path[i][3], scoutPosition[1], scoutPosition[3])
+                if dist < 400 then
+                    local cx, cz = brainGridInstance:ToGridSpace(scoutPosition[1], scoutPosition[3])
+                    local cell = brainGridInstance:ToCellFromGridSpace(cx, cz)
+                    cell.LastScouted = GetGameTick()
+                    if cell.MustScout then
+                        cell.MustScout = false
+                    end
+                    IssueClearCommands({scout})
+                    break
+                end
+                if Lastdist ~= dist then
+                    Stuck = 0
+                    Lastdist = dist
+                else
+                    Stuck = Stuck + 1
+                    if Stuck > 15 then
+                        IssueClearCommands({scout})
+                        break
+                    end
+                end
+                local enemyUnitCheck = aiBrain:GetUnitsAroundPoint(ScoutDangerCategory, scoutPosition, scout.RadarRange, 'Enemy')
+                if next(enemyUnitCheck) then
+                    for _, v in enemyUnitCheck do
+                        if not v.Dead then
+                            IssueClearCommands({scout})
+                            IssueMove({scout}, AIUtils.ShiftPosition(v:GetPosition(), scoutPosition, scout.RadarRange - 1, false))
+                            coroutine.yield(30)
+                            break
+                        end
+                    end
+                end
+                coroutine.yield(20)
+            end
+        end
+    end,
+
     ---## Function: DoAirScoutVecs
     --- Creates an attack vector that will cause the scout to fly by the target at a distance of its visual range.
     --- Whether to fly by on the left or right is decided randomly. This whole affair should hopefully extend the
@@ -1316,6 +1456,18 @@ Platoon = Class(moho.platoon_methods) {
             return self:AirScoutingAI()
         else
             return self:LandScoutingAI()
+        end
+    end,
+
+    ---@param self Platoon
+    ---@return nil
+    GridScoutingAI = function(self)
+        AIAttackUtils.GetMostRestrictiveLayer(self)
+
+        if self.MovementLayer == 'Air' then
+            return self:AirScoutingAI()
+        else
+            return self:LandGridScoutingAI()
         end
     end,
 
@@ -4316,7 +4468,7 @@ Platoon = Class(moho.platoon_methods) {
         local gridSize = reclaimGridInstance.CellSize * reclaimGridInstance.CellSize
         local searchType = self.PlatoonData.SearchType
             -- Placeholders this part is temporary until the ReclaimGrid defines the playable area min and max grid sizes
-        
+
         eng.CellAssigned = false
         -- Combat is added to stop the engineer manager from doing anything with the engineer
         eng.Combat = true
@@ -4425,6 +4577,7 @@ Platoon = Class(moho.platoon_methods) {
             WaitTicks(100)
         end
     end,
+
 }
 
 -- backwards compatibility with mods

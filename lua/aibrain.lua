@@ -1363,4 +1363,5 @@ AIBrain = Class(AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerCom
     ---@param result AIResult
     SetResult = function(self, result)
     end,
+
 }
