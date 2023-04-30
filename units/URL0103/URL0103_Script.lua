@@ -12,10 +12,10 @@ local CWalkingLandUnit = import("/lua/cybranunits.lua").CWalkingLandUnit
 local CIFGrenadeWeapon = import("/lua/cybranweapons.lua").CIFGrenadeWeapon
 
 ---@class URL0103 : CWalkingLandUnit
-URL0103 = Class(CWalkingLandUnit) {
+URL0103 = ClassUnit(CWalkingLandUnit) {
 
     Weapons = {
-        MainGun = Class(CIFGrenadeWeapon) {
+        MainGun = ClassWeapon(CIFGrenadeWeapon) {
             FxMuzzleFlash = {
                 '/effects/emitters/cybran_artillery_muzzle_flash_01_emit.bp',
                 '/effects/emitters/cybran_artillery_muzzle_flash_02_emit.bp',

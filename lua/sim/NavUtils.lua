@@ -31,6 +31,77 @@ function IsGenerated()
     return NavGenerator.IsGenerated()
 end
 
+--- Generates the navigational mesh if it is not generated yet
+function Generate()
+    if not IsGenerated() then
+        NavGenerator.Generate()
+    end
+end
+
+--- Produces various warning messages in the logs to inform the developer
+local function WarnNoNavMesh()
+    WARN("Navigational utilities are used without a generated navigational mesh")
+    WARN("For AI development: ")
+    WARN(" - Add in the field `requiresNavMesh = true` to each of your AI entries in  `lua/AI/CustomAIs_v2`")
+    WARN("For map or regular mod development: ")
+    WARN(" - Call the Generate function of NavUtils before calling any other function")
+end
+
+---@param layer NavLayers
+---@return NavGrid?
+---@return string?
+local function FindGrid(layer)
+    -- check layer argument
+    local grid = NavGenerator.NavGrids[layer] --[[@as NavGrid]]
+    if not grid then
+        return nil, 'Invalid layer type - this is likely a typo. The layer is case sensitive'
+    end
+
+    return grid
+end
+
+---@param grid NavGrid
+---@param position Vector
+---@return CompressedLabelTreeLeaf?
+---@return string?
+local function FindLeaf(grid, position)
+    -- check position argument
+    local leaf = grid:FindLeafXZ(position[1], position[3])
+    if not leaf then
+        return nil, 'position is not inside the map'
+    end
+
+    if leaf.Label == -1 then
+        local distance = 1048576
+        local nearest = nil
+        local px = position[1]
+        local pz = position[3]
+
+        -- try and find nearest valid neighbor
+        for k = 1, table.getn(leaf) do
+
+            ---@type CompressedLabelTreeLeaf
+            local neighbor = leaf[k]
+            if neighbor.Label > 0 then
+                local size = 2 * neighbor.Size
+                size = size * size
+
+                local dx = px - neighbor.px
+                local dz = pz - neighbor.pz
+                local d = dx * dx + dz * dz
+                if d < distance and d < size then
+                    distance = d
+                    nearest = neighbor
+                end
+            end
+        end
+
+        return nearest or leaf
+    end
+
+    return leaf
+end
+
 --- Returns true when you can path from the origin to the destination
 ---@param layer NavLayers
 ---@param origin Vector
@@ -38,42 +109,47 @@ end
 ---@return boolean?
 ---@return string?
 function CanPathTo(layer, origin, destination)
+    -- check if generated
+    if not NavGenerator.IsGenerated() then
+        WarnNoNavMesh()
+        return nil, 'Navigational mesh is not generated'
+    end
 
     -- check layer argument
-    local root = NavGenerator.NavGrids[layer] --[[@as NavGrid]]
-    if not root then
+    local grid = FindGrid(layer)
+    if not grid then
         return nil, 'Invalid layer type - this is likely a typo. The layer is case sensitive'
     end
 
     -- check origin argument
-    local originLeaf = root:FindLeafXZ(origin[1], origin[3])
+    local originLeaf = FindLeaf(grid, origin)
     if not originLeaf then
         return nil, 'Origin is not inside the map'
     end
 
-    if originLeaf.label == -1 then
+    if originLeaf.Label == -1 then
         return nil, 'Origin is unpathable'
     end
 
-    if originLeaf.label == 0 then
+    if originLeaf.Label == 0 then
         return nil, 'Origin has no label assigned, report to the maintainers. This should not be possible'
     end
 
     -- check destination argument
-    local destinationLeaf = root:FindLeafXZ(destination[1], destination[3])
+    local destinationLeaf = FindLeaf(grid, destination)
     if not destinationLeaf then
         return nil, 'Destination is not inside the map'
     end
 
-    if destinationLeaf.label == -1 then
+    if destinationLeaf.Label == -1 then
         return nil, 'Destination is unpathable'
     end
 
-    if destinationLeaf.label == 0 then
+    if destinationLeaf.Label == 0 then
         return nil, 'Destination has no label assigned, report to the maintainers. This should not be possible'
     end
 
-    if originLeaf.label == destinationLeaf.label then
+    if originLeaf.Label == destinationLeaf.Label then
         return true
     else
         return false, 'Not reachable for this layer'
@@ -117,6 +193,11 @@ end
 ---@return (string | number)?   # Error message, or the number of positions
 ---@return number?              # Length of path
 function PathTo(layer, origin, destination, options)
+    -- check if generated
+    if not NavGenerator.IsGenerated() then
+        WarnNoNavMesh()
+        return nil, 'Navigational mesh is not generated'
+    end
 
     -- check if we can path
     local ok, msg = CanPathTo(layer, origin, destination)
@@ -125,27 +206,24 @@ function PathTo(layer, origin, destination, options)
     end
 
     -- setup pathing
-
     local seenIdentifier = PathToGetUniqueIdentifier()
-    local root = NavGenerator.NavGrids[layer] --[[@as NavGrid]]
-    local originLeaf = root:FindLeafXZ(origin[1], origin[3]) --[[@as CompressedLabelTreeLeaf]]
-    local destinationLeaf = root:FindLeafXZ(destination[1], destination[3]) --[[@as CompressedLabelTreeLeaf]]
+    local grid = FindGrid(layer)                        --[[@as NavGrid]]
+    local originLeaf = FindLeaf(grid, origin)           --[[@as CompressedLabelTreeLeaf]]
+    local destinationLeaf = FindLeaf(grid, destination) --[[@as CompressedLabelTreeLeaf]]
 
     -- 0th iteration of search
-
     originLeaf.From = nil
     originLeaf.AcquiredCosts = 0
-    originLeaf.ExpectedCosts = originLeaf:DistanceTo(destinationLeaf)
+    originLeaf.TotalCosts = originLeaf:DistanceTo(destinationLeaf)
     originLeaf.Seen = seenIdentifier
     PathToHeap:Insert(originLeaf)
 
     destinationLeaf.From = nil
     destinationLeaf.AcquiredCosts = 0
-    destinationLeaf.ExpectedCosts = 0
+    destinationLeaf.TotalCosts = 0
     destinationLeaf.Seen = 0
 
     -- search iterations
-
     while not PathToHeap:IsEmpty() do
 
         local leaf = PathToHeap:ExtractMin() --[[@as CompressedLabelTreeLeaf]]
@@ -156,16 +234,17 @@ function PathTo(layer, origin, destination, options)
         end
 
         -- continue state
-        for id, neighbor in leaf.neighbors do
-            if neighbor.Seen != seenIdentifier then
+        for k = 1, table.getn(leaf) do
+            local neighbor = leaf[k]
+            if neighbor.Label > 0 and neighbor.Seen != seenIdentifier then
                 local preferLargeNeighbor = 0
-                if leaf.c > neighbor.c then
+                if leaf.Size > neighbor.Size then
                     preferLargeNeighbor = 100
                 end
                 neighbor.From = leaf
                 neighbor.Seen = seenIdentifier
-                neighbor.AcquiredCosts = leaf.AcquiredCosts + leaf.neighborDistances[id] + 2 + preferLargeNeighbor
-                neighbor.ExpectedCosts = 0.25 * destinationLeaf:DistanceTo(neighbor)
+                neighbor.AcquiredCosts = leaf.AcquiredCosts + leaf:DistanceTo(neighbor) + 2 + preferLargeNeighbor
+                neighbor.TotalCosts = neighbor.AcquiredCosts + 0.25 * destinationLeaf:DistanceTo(neighbor)
 
                 PathToHeap:Insert(neighbor)
             else 
@@ -177,13 +256,11 @@ function PathTo(layer, origin, destination, options)
     end
 
     -- check if we found a path
-
     if not destinationLeaf.Seen == seenIdentifier then
         return nil, 'Did not manage to find the destination'
     end
 
     -- construct current path
-
     local head = 1
     local path = { }
     local distance = 0
@@ -199,14 +276,13 @@ function PathTo(layer, origin, destination, options)
         head = head + 1
 
         -- keep track of distance
-        distance = distance + leaf.From.neighborDistances[leaf.identifier]
-        
+        distance = distance + leaf:DistanceTo(leaf.From)
+
         -- continue down the tree
         leaf = leaf.From
     end
 
     -- reverse the path
-
     for k = 1, (0.5 * head) ^ 0 do
         local temp = path[k]
         path[k] = path[head - k]
@@ -214,15 +290,12 @@ function PathTo(layer, origin, destination, options)
     end
 
     -- add destination to the path
-
     path[head] = destination
 
     -- clear up after ourselves
-
     PathToHeap:Clear()
 
     -- return all the goodies!!
-
     return path, head, distance
 end
 
@@ -232,25 +305,59 @@ end
 ---@return number? 
 ---@return string?
 function GetLabel(layer, position)
+    -- check if generated
+    if not NavGenerator.IsGenerated() then
+        WarnNoNavMesh()
+        return nil, 'Navigational mesh is not generated'
+    end
+
     -- check layer argument
-    local root = NavGenerator.NavGrids[layer] --[[@as NavGrid]]
-    if not root then
+    local grid = FindGrid(layer)
+    if not grid then
         return nil, 'Invalid layer type - this is likely a typo. The layer is case sensitive'
     end
 
     -- check position argument
-    local leaf = root:FindLeafXZ(position[1], position[3])
+    local leaf = FindLeaf(grid, position)
     if not leaf then
         return nil, 'Position is not inside the map'
     end
 
-    if leaf.label == 0 then
+    if leaf.Label == 0 then
         return nil, 'Position has no label assigned, report to the maintainers. This should not be possible'
     end
 
-    if leaf.label == -1 then
+    if leaf.Label == -1 then
         return nil, 'Position is unpathable'
     end
 
-    return leaf.label, nil
+    return leaf.Label, nil
+end
+
+--- Returns the metadata of a label.
+---@param id number
+---@return NavLabelMetadata?
+---@return string?
+function GetLabelMetadata(id)
+    -- check if generated
+    if not NavGenerator.IsGenerated() then
+        WarnNoNavMesh()
+        return nil, 'Navigational mesh is not generated'
+    end
+
+    -- check id argument
+    if id == 0 then
+        return nil, 'Invalid layer id - this should not be possible'
+    end
+
+    if id == -1 then
+        return nil, 'Position is unpathable'
+    end
+
+    local meta = NavGenerator.NavLabels[id]
+    if not meta then
+        return nil, 'Invalid layer id - no metadata is assigned to this label'
+    end
+
+    return meta, nil
 end

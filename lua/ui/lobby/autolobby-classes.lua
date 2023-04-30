@@ -10,7 +10,7 @@ local MathMin = math.min
 
 --- A small UI component created according to the Model / View / Controller (MVC) principle
 ---@class ConnectionStatus : Group
-ConnectionStatus = Class(Group) {
+ConnectionStatus = ClassUI(Group) {
 
     -- Initialisation
 

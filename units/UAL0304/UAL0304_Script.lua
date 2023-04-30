@@ -12,9 +12,9 @@ local ALandUnit = import("/lua/aeonunits.lua").ALandUnit
 local AIFArtillerySonanceShellWeapon = import("/lua/aeonweapons.lua").AIFArtillerySonanceShellWeapon
 
 ---@class UAL0304 : ALandUnit
-UAL0304 = Class(ALandUnit) {
+UAL0304 = ClassUnit(ALandUnit) {
     Weapons = {
-        MainGun = Class(AIFArtillerySonanceShellWeapon) {
+        MainGun = ClassWeapon(AIFArtillerySonanceShellWeapon) {
             FxMuzzleFlash = { 
                 '/effects/emitters/aeon_heavy_artillery_flash_01_emit.bp', 
                 '/effects/emitters/aeon_heavy_artillery_flash_02_emit.bp', 

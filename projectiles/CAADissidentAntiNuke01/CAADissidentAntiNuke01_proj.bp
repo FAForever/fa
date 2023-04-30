@@ -12,7 +12,7 @@ ProjectileBlueprint {
         'NOSPLASHDAMAGE',
         'CYBRAN',
         'DEFENSE',
-        'TECH_THREE',
+        'TECH3',
     },
     Description = 'CYBRAN Anti Nuclear Missile',
     Display = {

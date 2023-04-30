@@ -173,7 +173,7 @@ UnitBlueprint {
         FactionName = 'UEF',
         Icon = 'air',
         SelectionPriority = 5,
-        TechLevel = 'RULEUTL_Basic',
+        TechLevel = 'RULEUTL_Experimental',
         UnitName = '<LOC xeb2402_name>Novax Center',
         UnitWeight = 1,
     },

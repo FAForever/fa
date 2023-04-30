@@ -13,11 +13,11 @@ local TAirToAirLinkedRailgun = import("/lua/terranweapons.lua").TAirToAirLinkedR
 local TIFCarpetBombWeapon = import("/lua/terranweapons.lua").TIFCarpetBombWeapon
 
 ---@class DEA0202 : TAirUnit
-DEA0202 = Class(TAirUnit) {
+DEA0202 = ClassUnit(TAirUnit) {
     Weapons = {
-        RightBeam = Class(TAirToAirLinkedRailgun) {},
-        LeftBeam = Class(TAirToAirLinkedRailgun) {},
-        Bomb = Class(TIFCarpetBombWeapon) {
+        RightBeam = ClassWeapon(TAirToAirLinkedRailgun) {},
+        LeftBeam = ClassWeapon(TAirToAirLinkedRailgun) {},
+        Bomb = ClassWeapon(TIFCarpetBombWeapon) {
 
     IdleState = State (TIFCarpetBombWeapon.IdleState) {
         Main = function(self)

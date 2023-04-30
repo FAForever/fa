@@ -126,12 +126,11 @@ UnitBlueprint {
         FactionName = 'UEF',
         Icon = 'land',
         SelectionPriority = 5,
-        TechLevel = 'RULEUTL_Basic',
+        TechLevel = 'RULEUTL_Advanced',
         ToggleCaps = {
             RULEUTC_ProductionToggle = true,
         },
         UnitWeight = 1,
-        UpgradesTo = nil, --from the T3 massfab
     },
     Interface = {
         HelpText = '<LOC ueb1104_help>Mass Fabricator',

@@ -1,5 +1,4 @@
 UnitBlueprint {
-    ResolvePath = true,
     AI = {
         TargetBones = { 
             'Torso'

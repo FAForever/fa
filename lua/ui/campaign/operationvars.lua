@@ -1,17 +1,16 @@
---****************************************************************************
---**
---**  File     :  /lua/ui/campaign/operationvars.lua
---**  Author(s):  Evan Pongress
---**
---**  Summary  :  function to generate the vars for operationselect.lua and operationbriefing.lua. uses the ID set in /maps/*_operation.lua, e.g. SCCA_E01.
---**
---**  Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
---****************************************************************************
+------------------------------------------------------------------------------
+-- File : /lua/ui/campaign/operationvars.lua
+-- Author(s): Evan Pongress
+-- Summary : function to generate the vars for operationselect.lua and operationbriefing.lua.
+--			 uses the ID set in /maps/*_operation.lua, e.g. SCCA_E01.
+-- Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
+------------------------------------------------------------------------------
 
 function MakeOpVars(thisID, factionKey, sequenceID)
 	local opStrings = import('/maps/' .. thisID .. '/' .. thisID .. '_strings.lua')
 	
-	if rawget(opStrings, 'BriefingData') then											-- if briefing data exists (use 'rawget' to bypass missing global error if it doesn't exist)
+	-- if briefing data exists (use 'rawget' to bypass missing global error if it doesn't exist)
+	if rawget(opStrings, 'BriefingData') then											
 		op_text = opStrings.BriefingData
 	else
 		op_text = {{phase = 1, character = 'NO_DATA', text = 'ERROR - NO BRIEFING DATA'}}

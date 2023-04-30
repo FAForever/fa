@@ -601,7 +601,8 @@ end
 function InternalCreateScrollbar(scrollBar, parent, axis)
 end
 
---- For internal use by `Text.__init()`
+--- For internal use by `Text.__init()`. This adds the engine lazyvars
+--- `FontAscent`, `FontDescent`, `FontExternalLeading`, and `TextAdvance`.
 ---@param text Text
 ---@param parent Control
 function InternalCreateText(text, parent)
@@ -625,7 +626,7 @@ function InternalSaveGame(filename, friendlyname, oncompletion)
 end
 
 ---
----@param keyCode string
+---@param keyCode string | number
 ---@return boolean
 function IsKeyDown(keyCode)
 end

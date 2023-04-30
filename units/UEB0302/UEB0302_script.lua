@@ -12,7 +12,7 @@ local TAirFactoryUnit = import("/lua/terranunits.lua").TAirFactoryUnit
 
 
 ---@class UEB0302 : TAirFactoryUnit
-UEB0302 = Class(TAirFactoryUnit) {
+UEB0302 = ClassUnit(TAirFactoryUnit) {
 
     StartArmsMoving = function(self)
         TAirFactoryUnit.StartArmsMoving(self)

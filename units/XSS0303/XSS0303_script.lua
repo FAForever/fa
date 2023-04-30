@@ -14,12 +14,12 @@ local SAALosaareAutoCannonWeapon = SeraphimWeapons.SAALosaareAutoCannonWeaponSea
 local SLaanseMissileWeapon = SeraphimWeapons.SLaanseMissileWeapon
 
 ---@class XSS0303 : AircraftCarrier
-XSS0303 = Class(AircraftCarrier) {
+XSS0303 = ClassUnit(AircraftCarrier) {
 
     Weapons = {
-        AntiAirRight = Class(SAALosaareAutoCannonWeapon) {},
-        AntiAirLeft = Class(SAALosaareAutoCannonWeapon) {},
-        CruiseMissiles = Class(SLaanseMissileWeapon) {},
+        AntiAirRight = ClassWeapon(SAALosaareAutoCannonWeapon) {},
+        AntiAirLeft = ClassWeapon(SAALosaareAutoCannonWeapon) {},
+        CruiseMissiles = ClassWeapon(SLaanseMissileWeapon) {},
     },
 
 

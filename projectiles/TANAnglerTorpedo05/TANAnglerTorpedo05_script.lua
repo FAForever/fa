@@ -9,6 +9,5 @@
 --****************************************************************************
 local TTorpedoSubProjectile = import("/lua/terranprojectiles.lua").TTorpedoSubProjectile
 
-TANAnglerTorpedo05 = Class(TTorpedoSubProjectile) {
-}
+TANAnglerTorpedo05 = ClassProjectile(TTorpedoSubProjectile) { }
 TypeClass = TANAnglerTorpedo05

@@ -22,7 +22,7 @@ local Dragger = import("/lua/maui/dragger.lua").Dragger
 ---
 ---@field mRolloverCue? string
 ---@field mClickCue? string
-Checkbox = Class(Bitmap) {
+Checkbox = ClassUI(Bitmap) {
     ---@param self MauiCheckbox
     ---@param parent Control
     ---@param normalUnchecked FileName

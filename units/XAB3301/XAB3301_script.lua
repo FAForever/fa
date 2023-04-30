@@ -15,7 +15,7 @@ local AQuantumGateAmbient = import("/lua/effecttemplates.lua").AQuantumGateAmbie
 local RemoteViewing = import("/lua/remoteviewing.lua").RemoteViewing
 AStructureUnit = RemoteViewing( AStructureUnit )
 
-XAB3301 = Class( AStructureUnit ) {
+XAB3301 = ClassUnit( AStructureUnit ) {
 
     OnStopBeingBuilt = function(self, builder, layer)
         AStructureUnit.OnStopBeingBuilt(self, builder, layer)

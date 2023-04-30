@@ -11,7 +11,7 @@ ProjectileBlueprint {
         'ANTIMISSILE',
         'NOSPLASHDAMAGE',
         'SERAPHIM',
-        'TECH_THREE',
+        'TECH3',
     },
     Description = 'Seraphim Anti Nuclear Missile',
     Display = {

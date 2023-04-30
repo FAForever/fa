@@ -10,7 +10,7 @@
 local AMassFabricationUnit = import("/lua/aeonunits.lua").AMassFabricationUnit
 
 ---@class UAB1104 : AMassFabricationUnit
-UAB1104 = Class(AMassFabricationUnit) {
+UAB1104 = ClassUnit(AMassFabricationUnit) {
     OnCreate = function(self)
         AMassFabricationUnit.OnCreate(self)
         self.Damaged = false

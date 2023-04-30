@@ -10,6 +10,6 @@
 
 local THeavyPlasmaCannonProjectile = import("/lua/terranprojectiles.lua").THeavyPlasmaCannonProjectile
 
-TDFPlasmaHeavy04 = Class(THeavyPlasmaCannonProjectile) { }
+TDFPlasmaHeavy04 = ClassProjectile(THeavyPlasmaCannonProjectile) { }
 TypeClass = TDFPlasmaHeavy04
 

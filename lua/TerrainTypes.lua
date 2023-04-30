@@ -5,124 +5,140 @@
 ----[  Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.             ]--
 
 --[[ 
-	Each terrain type has a type code that must be unique, with a max of 255. If you
-	modify a terrain type you will modify all maps using that type, so be careful.
-	Also note that changes in these values can could potentially affect the 
-	simulation (for example, he Bumpy type could jostle a unit's orientation as it 
-	is driving). 
-	 
-	In script use GetTerrainType() with the current map o-grid position, to get access
-	to the terrain type type table at that location. Position (-1, -1) will return the 
-	'Default' terrain type.
+    Each terrain type has a type code that must be unique, with a max of 255. If you
+    modify a terrain type you will modify all maps using that type, so be careful.
+    Also note that changes in these values can could potentially affect the 
+    simulation (for example, he `Bumpiness` field could jostle a unit's orientation as it 
+    is driving).
+     
+    In script use GetTerrainType() with the current map o-grid position, to get access
+    to the terrain type type table at that location. Position (-1, -1) will return the 
+    'Default' terrain type.
 
 - Terrain type code ranges -
-	002-079 reserved for dirt, dust, and sand
-	080-149 reserved for vegetation
-	150-189 reserved for rocky
-	190-199 reserved for tarmacs
-	200-219 reserved for snowy
-	220-255 reserved for water
+    002-079 reserved for dirt, dust, and sand
+    080-149 reserved for vegetation
+    150-189 reserved for rocky
+    190-199 reserved for tarmacs
+    200-219 reserved for snowy
+    220-255 reserved for water
  
-- Map Style List (7)-	
-	Desert
-	Evergreen
-	Geothermal
-	Lava
-	RedRock
-	Tropical
-	Tundra	
+- Map Style List (7)-
+    Desert
+    Evergreen
+    Geothermal
+    Lava
+    RedRock
+    Tropical
+    Tundra    
  
 - Effect mapping key descriptions -
 
-	These type mappings map to effect 'Type' names, mapped in unit display 
-	blueprints. If there is no effects defined for a specific terrain, the 'Default' 
-	terrain type will be used. This is list of effect types and a brief description
-	of what they are used for.
+    These type mappings map to effect 'Type' names, mapped in unit display 
+    blueprints. If there is no effects defined for a specific terrain, the 'Default' 
+    terrain type will be used. This is list of effect types and a brief description
+    of what they are used for.
 
-	Idle:
-		Hover02					- Hover jet effect, used on UEA0305
-		SeaIdle01				- 
-		SeaIdle02				- 
-		SonarBouy01				- Sonar buoy pulse ring effect
-		Radar01					- Radar ambient effect
-		Jammer01				- Radar Jammer ambient effects
-		Hover01					- Hover effect used by hover tanks.
-		Hover04					- Hover exhaust for Cybran gunships, URA0203, XRA0105, XRA0305
-		Hover03					- Large hover exhaust for URA0401 Cybran Reaver
-		AeonGroundFX01			- Aeon factional hover energy unit effect
-		AeonGroundFXT1Engineer	- Aeon factional hover exhaust effect 
-		AeonGroundFXT2Engineer	- Aeon factional hover exhaust effect 2
-		UnderWater01			-	
-		SeraphimGroundFX01		- Seraphim factional hover energy unit effect
-		SeraphimGroundFX02		- Seraphim factional hover energy unit effect for XSL0305
-	Impact:	 
-		Small01					- Small projectile impact effect, z-axis aligned for directional impact, used on UAL0101
-		Small02					- Small projectile impact effect, y-axis aligned for bomb impacts, used on URA0103
-		Medium01				- Medium sized impact effect, y-axis aligned for bomb impacts, used on UAA0103
-		Medium02				- Medium sized impact effect, for projectiles with low impact rate, 
-							      z-axis aligned for directional impact, used on UEL0201
-		Medium03				- Medium sized impact effect, for projectiles with high impact rate, 
-							      z-axis aligned for directional impact, used on UEA0203
-		Large01					- Large radial impact effect, uaa0304
-		LargeBeam01				- Large static beam impact effect, infinite lifetime emitter, UAL0401
-		LargeBeam02				- Huge static beam impact effect, infinite lifetime emitter, C.Z.A.R
-	LayerChange:
-		TakeOff01				- Air unit takeoff effects
-		Landing01				- Air unit landing effects
-	MotionChange:
-		Submerge01				-
-		Submerge02				-
-		Surface01				- 
-		Surface02				-
-	Movement:
-		GroundKickup01			- Small unit dirt/debris kickup effects, used on UEL0101
-		GroundKickup02			- Large Rear tread kickup, used on UEL0401
-		GroundKickup03			- Medium unit dirt.debris kickup effects, used on UAL0202
-		GroundKickup04			- Front tread kickup, used on UEL0401
-		FootFall01				- Large walking unit footfalls effects, used on SpiderBot, Galactic C.
-		FootFall02				- Small walker unit footfall effects, used on Commander units
-		Hover01					- Hover unit terrain effects, used on UEL0203
-		Hover04					- Hover exhaust for Cybran gunships, URA0203, XRA0105, XRA0305	
-		Hover03					- Large hover exhaust for URA0401 Cybran Reaver		
-		AeonGroundFX01			- Aeon factional hover energy unit effect
-		AeonGroundFXT1Engineer	- Aeon factional hover exhaust effect 
-		AeonGroundFXT2Engineer	- Aeon factional hover exhaust effect 2
-		AirMoveExhaust01		- Air unit movement effects 
-		AirMoveExhaust02		- Air unit movement effects
-		AirMoveExhaust03		- Air unit movement effects, Seraphim
-		BackWake        		- Sea unit rear movement effects. (water/underwater)
-		LeftFrontWake			- Sea unit left wake movement effect
-		RightFrontWake			- Sea unit right wake movement effect
-		SeraphimGroundFX01		- Seraphim factional hover energy unit effect
-		SeraphimGroundFX02		- Seraphim factional hover energy unit effect for XSL0305
+    Idle:
+        Hover02                 - Hover jet effect, used on UEA0305
+        SeaIdle01               - 
+        SeaIdle02               - 
+        SonarBouy01             - Sonar buoy pulse ring effect
+        Radar01                 - Radar ambient effect
+        Jammer01                - Radar Jammer ambient effects
+        Hover01                 - Hover effect used by hover tanks.
+        Hover04                 - Hover exhaust for Cybran gunships, URA0203, XRA0105, XRA0305
+        Hover03                 - Large hover exhaust for URA0401 Cybran Reaver
+        AeonGroundFX01          - Aeon factional hover energy unit effect
+        AeonGroundFXT1Engineer  - Aeon factional hover exhaust effect 
+        AeonGroundFXT2Engineer  - Aeon factional hover exhaust effect 2
+        UnderWater01            -
+        SeraphimGroundFX01      - Seraphim factional hover energy unit effect
+        SeraphimGroundFX02      - Seraphim factional hover energy unit effect for XSL0305
+    Impact:     
+        Small01                 - Small projectile impact effect, z-axis aligned for directional impact, used on UAL0101
+        Small02                 - Small projectile impact effect, y-axis aligned for bomb impacts, used on URA0103
+        Medium01                - Medium sized impact effect, y-axis aligned for bomb impacts, used on UAA0103
+        Medium02                - Medium sized impact effect, for projectiles with low impact rate, 
+                                  z-axis aligned for directional impact, used on UEL0201
+        Medium03                - Medium sized impact effect, for projectiles with high impact rate, 
+                                  z-axis aligned for directional impact, used on UEA0203
+        Large01                 - Large radial impact effect, uaa0304
+        LargeBeam01             - Large static beam impact effect, infinite lifetime emitter, UAL0401
+        LargeBeam02             - Huge static beam impact effect, infinite lifetime emitter, C.Z.A.R
+    LayerChange:
+        TakeOff01               - Air unit takeoff effects
+        Landing01               - Air unit landing effects
+    MotionChange:
+        Submerge01              -
+        Submerge02              -
+        Surface01               - 
+        Surface02               -
+        GroundKickup02          - Large Rear tread kickup, used on UEL0401
+        GroundKickup03          - Medium unit dirt.debris kickup effects, used on UAL0202
+        GroundKickup04          - Front tread kickup, used on UEL0401
+        FootFall01              - Large walking unit footfalls effects, used on SpiderBot, Galactic C.
+        FootFall02              - Small walker unit footfall effects, used on Commander units
+        Hover01                 - Hover unit terrain effects, used on UEL0203
+        Hover04                 - Hover exhaust for Cybran gunships, URA0203, XRA0105, XRA0305    
+        Hover03                 - Large hover exhaust for URA0401 Cybran Reaver        
+        AeonGroundFX01          - Aeon factional hover energy unit effect
+        AeonGroundFXT1Engineer  - Aeon factional hover exhaust effect 
+        AeonGroundFXT2Engineer  - Aeon factional hover exhaust effect 2
+        AirMoveExhaust01        - Air unit movement effects 
+        AirMoveExhaust02        - Air unit movement effects
+        AirMoveExhaust03        - Air unit movement effects, Seraphim
+        BackWake                - Sea unit rear movement effects. (water/underwater)
+        LeftFrontWake           - Sea unit left wake movement effect
+        RightFrontWake          - Sea unit right wake movement effect
+        SeraphimGroundFX01      - Seraphim factional hover energy unit effect
+        SeraphimGroundFX02      - Seraphim factional hover energy unit effect for XSL0305
 --]]
 
+---@alias TerrainStyle
+---| "Desert"
+---| "Evergreen"
+---| "Geothermal"
+---| "Lava"
+---| "RedRock"
+---| "Tropical"
+---| "Tundra"
+
+---@alias TerrainTreadType "Default" | "None"
+
+
+---@alias TerrainEffectType
+---| LayerTerrainEffectType  # block type `Layer`
+---| "FXImpact"              # block type `ImpactType`
+---| "FXMotionChange"        # block type `MotionChangeType`
+---| "FXLayerChange"         # block type `LayerChangeType`
+---@alias LayerTerrainEffectType
+---| "FXIdle"
+---| "FXMovement"
+---| "FXOther"
+
+---@class TerrainType
+---@field Name string
+---@field TypeCode integer
+---@field Color Color
+---@field Description string
+---@field Style TerrainStyle
+---@field Slippery number
+---@field Bumpiness number
+---@field Blocking boolean
+---@field FXIdle table<Layer, table<IdleEffectType, FileName[]>>
+---@field FXImpact table<ImpactType, table<ImpactEffectType, FileName[]>>
+---@field FXLayerChange table<LayerChangeType, table<LayerChangeEffectType, FileName[]>>
+---@field FXMotionChange table<MotionChangeType, table<MotionChangeEffectType, FileName[]>>
+---@field FXMovement table<Layer, table<MovementEffectType, FileName[]>>
+---@field FXOther table<Layer, table<OtherEffectType, FileName[]>>
+---@field Treads? TerrainTreadType
 
 local EmitterBasePath = '/effects/emitters/'
 
----- Terrain clutter definitions
-----
-----
-TerrainClutter = {
-    Test = {
-        density = 10,
-        Seeds = {
-            { 0.66, "/env/common/props/clutter01_prop.bp", },
-            { 0.20, "/env/common/props/clutter02_prop.bp", },
-            { 0.14, "/env/common/props/clutter03_prop.bp", },
-        },
-    },
-    Grass = {
-        density = 30,
-        Seeds = {
-            { 1.0, "/env/common/props/clutter02_prop.bp", },
-        },
-    },
-};
 
----- Terrain type definitions
-----
-----
+--- Terrain type definitions
+---@type TerrainType[]
 TerrainTypes = {
     {
         Name = 'Default',
@@ -135,34 +151,32 @@ TerrainTypes = {
         Blocking = false,
         FXIdle = {
             Air = {
-                Hover02 = {},
                 Hover03 = { EmitterBasePath .. 'air_hover_exhaust_01_emit.bp', },
                 Hover04 = { EmitterBasePath .. 'cybran_hover_01_emit.bp', },
             },
             Land = {
                 AeonGroundFX01 = { EmitterBasePath .. 'aeon_groundfx_emit.bp', },
                 AeonGroundFXT1Engineer = { EmitterBasePath .. 'aeon_t1eng_groundfx01_emit.bp', },
-                AeonGroundFXT2Engineer = { 
+                AeonGroundFXT2Engineer = {
                     EmitterBasePath .. 'aeon_t2eng_groundfx01_emit.bp',
                     EmitterBasePath .. 'aeon_t2eng_groundfx02_emit.bp',
-                },            
-                Hover01 = {},
-                Jammer01 = { 
-					EmitterBasePath .. 'jammer_ambient_01_emit.bp',
-					EmitterBasePath .. 'jammer_ambient_02_emit.bp',
+                },
+                Jammer01 = {
+                    EmitterBasePath .. 'jammer_ambient_01_emit.bp',
+                    EmitterBasePath .. 'jammer_ambient_02_emit.bp',
                 },
                 Cloak01 = {
                     EmitterBasePath .. 'cloak_ambient_01_emit.bp',
                 },
                 Radar01 = { EmitterBasePath .. 'radar_ambient_01_emit.bp', },
-                SeraphimGroundFX01 = { 
-					EmitterBasePath .. 'seraphim_groundfx_emit.bp',
-					EmitterBasePath .. 'seraphim_groundfx_02_emit.bp',
-				},
-				SeraphimGroundFX02 = { 
-					EmitterBasePath .. 'seraphim_groundfx_03_emit.bp',
-					EmitterBasePath .. 'seraphim_groundfx_04_emit.bp',
-				},
+                SeraphimGroundFX01 = {
+                    EmitterBasePath .. 'seraphim_groundfx_emit.bp',
+                    EmitterBasePath .. 'seraphim_groundfx_02_emit.bp',
+                },
+                SeraphimGroundFX02 = {
+                    EmitterBasePath .. 'seraphim_groundfx_03_emit.bp',
+                    EmitterBasePath .. 'seraphim_groundfx_04_emit.bp',
+                },
             },
             Sub = {
                 UnderWater01 = { EmitterBasePath .. 'underwater_idle_bubbles_01_emit.bp', },
@@ -173,37 +187,30 @@ TerrainTypes = {
             Water = {
                 AeonGroundFX01 = { EmitterBasePath .. 'aeon_groundfx_emit.bp', },
                 AeonGroundFXT1Engineer = { EmitterBasePath .. 'aeon_t1eng_groundfx01_emit.bp', },
-                AeonGroundFXT2Engineer = { 
+                AeonGroundFXT2Engineer = {
                     EmitterBasePath .. 'aeon_t2eng_groundfx01_emit.bp',
                     EmitterBasePath .. 'aeon_t2eng_groundfx02_emit.bp',
-                },            
-                Hover01 = { EmitterBasePath .. 'tt_water_hover01_01_emit.bp', }, 
+                },
+                Hover01 = { EmitterBasePath .. 'tt_water_hover01_01_emit.bp', },
                 SeaIdle01 = { EmitterBasePath .. 'water_idle_ripples_02_emit.bp', },
-				SeaIdle02 = { EmitterBasePath .. 'water_idle_ripples_03_emit.bp', },
+                SeaIdle02 = { EmitterBasePath .. 'water_idle_ripples_03_emit.bp', },
                 SonarBuoy01 = { EmitterBasePath .. 'water_sonarbuoyring_01_emit.bp', },
-                SeraphimGroundFX01 = { 
-					EmitterBasePath .. 'seraphim_groundfx_emit.bp',
-					EmitterBasePath .. 'seraphim_groundfx_02_emit.bp',
-				},
-				SeraphimGroundFX02 = { 
-					EmitterBasePath .. 'seraphim_groundfx_03_emit.bp',
-					EmitterBasePath .. 'seraphim_groundfx_04_emit.bp',
-				},
-            },            
+                SeraphimGroundFX01 = {
+                    EmitterBasePath .. 'seraphim_groundfx_emit.bp',
+                    EmitterBasePath .. 'seraphim_groundfx_02_emit.bp',
+                },
+                SeraphimGroundFX02 = {
+                    EmitterBasePath .. 'seraphim_groundfx_03_emit.bp',
+                    EmitterBasePath .. 'seraphim_groundfx_04_emit.bp',
+                },
+            },
         },
         FXImpact = {
             Terrain = {
-                Large01 = {},
-                LargeBeam01 = {},
                 LargeBeam02 = {
-					EmitterBasePath .. 'dust_cloud_01_emit.bp',
-					EmitterBasePath .. 'quantum_generator_end_02_emit.bp',					
-                },            
-                Medium01 = {},
-                Medium02 = {},
-                Medium03 = {},
-                Small01 = {},
-                Small02 = {}, 
+                    EmitterBasePath .. 'dust_cloud_01_emit.bp',
+                    EmitterBasePath .. 'quantum_generator_end_02_emit.bp',
+                },
             },
             UnderWater = {
                 Small01 = {
@@ -218,7 +225,7 @@ TerrainTypes = {
                     EmitterBasePath .. 'tti_default_underwater_hit_01_emit.bp',
                     EmitterBasePath .. 'water_splash_plume_02_emit.bp',
                 },
-            },            
+            },
             Water = {
                 Small01 = {
                     EmitterBasePath .. 'water_splash_ripples_ring_01_emit.bp',
@@ -227,31 +234,23 @@ TerrainTypes = {
                 Small02 = {
                     EmitterBasePath .. 'water_splash_ripples_ring_01_emit.bp',
                     EmitterBasePath .. 'water_splash_plume_02_emit.bp',
-                },                
+                },
                 Medium01 = {
                     EmitterBasePath .. 'water_splash_ripples_ring_01_emit.bp',
-                    EmitterBasePath .. 'water_splash_plume_02_emit.bp',                
-                },                
+                    EmitterBasePath .. 'water_splash_plume_02_emit.bp',
+                },
                 Medium02 = {
                     EmitterBasePath .. 'water_splash_ripples_ring_01_emit.bp',
-                    EmitterBasePath .. 'water_splash_plume_02_emit.bp',                
+                    EmitterBasePath .. 'water_splash_plume_02_emit.bp',
                 },
                 Medium03 = {
                     EmitterBasePath .. 'water_splash_ripples_ring_01_emit.bp',
-                    EmitterBasePath .. 'water_splash_plume_02_emit.bp',                
-                },                
+                    EmitterBasePath .. 'water_splash_plume_02_emit.bp',
+                },
                 Large01 = {
                     EmitterBasePath .. 'water_splash_ripples_ring_01_emit.bp',
-                    EmitterBasePath .. 'water_splash_plume_02_emit.bp',                
-                },                
-            },
-        },
-        FXLayerChange = {
-            AirLand = {
-                Landing01 = {},
-            },
-            LandAir = {
-                TakeOff01 = {},
+                    EmitterBasePath .. 'water_splash_plume_02_emit.bp',
+                },
             },
         },
         FXMotionChange = {
@@ -265,7 +264,7 @@ TerrainTypes = {
                     EmitterBasePath .. 'tt_water_surface02_02_emit.bp',
                     EmitterBasePath .. 'tt_water_surface02_03_emit.bp',
                 },
-            },        
+            },
             WaterTopDown = {
                 Submerge01 = { EmitterBasePath .. 'tt_water_submerge01_01_emit.bp', },
                 Submerge02 = { EmitterBasePath .. 'tt_water_submerge02_01_emit.bp', },
@@ -277,56 +276,49 @@ TerrainTypes = {
                 AirMoveExhaust02 = { EmitterBasePath .. 'tt_airhover_exhaust02_01_emit.bp', },
                 AirMoveExhaust03 = { EmitterBasePath .. 'seraphim_airmoveexhaust_01_emit.bp', },
                 Hover04 = { EmitterBasePath .. 'cybran_hover_01_emit.bp', },
-                Hover03 = { EmitterBasePath .. 'air_hover_exhaust_01_emit.bp', },          
-                SerOHWAirMoveExhaust01 = { 
-						EmitterBasePath .. 'seraphim_ohwalli_strategic_flight_fxtrails_01_emit.bp', -- faint blue
-						EmitterBasePath .. 'seraphim_ohwalli_strategic_flight_fxtrails_02_emit.bp', -- faint rings
-						EmitterBasePath .. 'seraphim_ohwalli_strategic_flight_fxtrails_03_emit.bp', -- distortion
-						EmitterBasePath .. 'seraphim_ohwalli_strategic_flight_fxtrails_04_emit.bp', -- bright blue, shorter lifetime
-				},      
-				SerOHWAirMoveExhaust02 = { 
-						EmitterBasePath .. 'seraphim_ohwalli_strategic_flight_fxtrails_05_emit.bp', -- bright blue, shorter lifetime
-						EmitterBasePath .. 'seraphim_ohwalli_strategic_flight_fxtrails_06_emit.bp', -- faint blue
-						EmitterBasePath .. 'seraphim_ohwalli_strategic_flight_fxtrails_07_emit.bp', -- distortion
-						EmitterBasePath .. 'seraphim_ohwalli_strategic_flight_fxtrails_08_emit.bp', -- bright spot
-				},   
-            },        
+                Hover03 = { EmitterBasePath .. 'air_hover_exhaust_01_emit.bp', },
+                SerOHWAirMoveExhaust01 = {
+                    EmitterBasePath .. 'seraphim_ohwalli_strategic_flight_fxtrails_01_emit.bp', -- faint blue
+                    EmitterBasePath .. 'seraphim_ohwalli_strategic_flight_fxtrails_02_emit.bp', -- faint rings
+                    EmitterBasePath .. 'seraphim_ohwalli_strategic_flight_fxtrails_03_emit.bp', -- distortion
+                    EmitterBasePath .. 'seraphim_ohwalli_strategic_flight_fxtrails_04_emit.bp', -- bright blue, shorter lifetime
+                },
+                SerOHWAirMoveExhaust02 = {
+                    EmitterBasePath .. 'seraphim_ohwalli_strategic_flight_fxtrails_05_emit.bp', -- bright blue, shorter lifetime
+                    EmitterBasePath .. 'seraphim_ohwalli_strategic_flight_fxtrails_06_emit.bp', -- faint blue
+                    EmitterBasePath .. 'seraphim_ohwalli_strategic_flight_fxtrails_07_emit.bp', -- distortion
+                    EmitterBasePath .. 'seraphim_ohwalli_strategic_flight_fxtrails_08_emit.bp', -- bright spot
+                },
+            },
             Land = {
                 AeonGroundFX01 = { EmitterBasePath .. 'aeon_groundfx_emit.bp', },
                 AeonGroundFXT1Engineer = { EmitterBasePath .. 'aeon_t1eng_groundfx01_emit.bp', },
-                AeonGroundFXT2Engineer = { 
+                AeonGroundFXT2Engineer = {
                     EmitterBasePath .. 'aeon_t2eng_groundfx01_emit.bp',
                     EmitterBasePath .. 'aeon_t2eng_groundfx02_emit.bp',
-                },            
-                GroundKickup01 = {},
-                GroundKickup02 = {},
-                GroundKickup03 = {},
-                GroundKickup04 = {},
-                FootFall01 = {},
-                FootFall02 = {},
-                Hover01 = {},
-                SeraphimGroundFX01 = { 
-					EmitterBasePath .. 'seraphim_groundfx_emit.bp',
-					EmitterBasePath .. 'seraphim_groundfx_02_emit.bp',
-				},
-				SeraphimGroundFX02 = { 
-					EmitterBasePath .. 'seraphim_groundfx_03_emit.bp',
-					EmitterBasePath .. 'seraphim_groundfx_04_emit.bp',
-				},
+                },
+                SeraphimGroundFX01 = {
+                    EmitterBasePath .. 'seraphim_groundfx_emit.bp',
+                    EmitterBasePath .. 'seraphim_groundfx_02_emit.bp',
+                },
+                SeraphimGroundFX02 = {
+                    EmitterBasePath .. 'seraphim_groundfx_03_emit.bp',
+                    EmitterBasePath .. 'seraphim_groundfx_04_emit.bp',
+                },
             },
             Sub = {
                 BackWake = { EmitterBasePath .. 'underwater_move_trail_01_emit.bp', },
-            }, 
+            },
             Seabed = {
                 UnderWater01 = { EmitterBasePath .. 'underwater_bubbles_01_emit.bp', },
             },
             Water = {
                 AeonGroundFX01 = { EmitterBasePath .. 'aeon_groundfx_emit.bp', },
                 AeonGroundFXT1Engineer = { EmitterBasePath .. 'aeon_t1eng_groundfx01_emit.bp', },
-                AeonGroundFXT2Engineer = { 
+                AeonGroundFXT2Engineer = {
                     EmitterBasePath .. 'aeon_t2eng_groundfx01_emit.bp',
                     EmitterBasePath .. 'aeon_t2eng_groundfx02_emit.bp',
-                },         
+                },
                 BackWake = {
                     EmitterBasePath .. 'water_move_trail_back_02_emit.bp',
                     EmitterBasePath .. 'water_move_trail_back_03_emit.bp',
@@ -335,21 +327,21 @@ TerrainTypes = {
                 Hover01 = { EmitterBasePath .. 'tt_water_hover01_01_emit.bp', },
                 LeftFrontWake = { EmitterBasePath .. 'water_move_wake_front_l_01_emit.bp', },
                 RightFrontWake = { EmitterBasePath .. 'water_move_wake_front_r_01_emit.bp', },
-                SeraphimGroundFX01 = { 
-					EmitterBasePath .. 'seraphim_groundfx_emit.bp',
-					EmitterBasePath .. 'seraphim_groundfx_02_emit.bp',
-				},
-				SeraphimGroundFX02 = { 
-					EmitterBasePath .. 'seraphim_groundfx_03_emit.bp',
-					EmitterBasePath .. 'seraphim_groundfx_04_emit.bp',
-				},
-            },                              
+                SeraphimGroundFX01 = {
+                    EmitterBasePath .. 'seraphim_groundfx_emit.bp',
+                    EmitterBasePath .. 'seraphim_groundfx_02_emit.bp',
+                },
+                SeraphimGroundFX02 = {
+                    EmitterBasePath .. 'seraphim_groundfx_03_emit.bp',
+                    EmitterBasePath .. 'seraphim_groundfx_04_emit.bp',
+                },
+            },
         },
         FXOther = {
-			Land = {
-				TreeRootDirt01 = { EmitterBasePath .. 'tree_uproot_01_emit.bp', },
-				ThauTerrainMuzzle = { EmitterBasePath .. 'seraphim_tau_cannon_muzzle_flash_05_emit.bp', },
-			},			
+            Land = {
+                TreeRootDirt01 = { EmitterBasePath .. 'tree_uproot_01_emit.bp', },
+                ThauTerrainMuzzle = { EmitterBasePath .. 'seraphim_tau_cannon_muzzle_flash_05_emit.bp', },
+            },
         },
         Treads = 'Default',
     },
@@ -365,15 +357,7 @@ TerrainTypes = {
                 Hover02 = { EmitterBasePath .. 'tt_airhover_exhaust02_01_emit.bp', },
             },
         },
-        FXImpact = {},
-        FXMovement = {},
         Treads = 'Default',
-        
-        FXOther = {
-			Land = {
-				ThauTerrainMuzzle = { EmitterBasePath .. 'seraphim_tau_cannon_muzzle_flash_05_emit.bp', },
-			},			
-        },
     },
     {
         Name = 'Dirt02',
@@ -392,23 +376,23 @@ TerrainTypes = {
         FXImpact = {
             Terrain = {
                 Large01 = {
-					EmitterBasePath .. 'tti_dirt02_large01_01_emit.bp',
-					EmitterBasePath .. 'tti_dirt02_large01_02_emit.bp',
-				},
+                    EmitterBasePath .. 'tti_dirt02_large01_01_emit.bp',
+                    EmitterBasePath .. 'tti_dirt02_large01_02_emit.bp',
+                },
                 LargeBeam01 = {
-					EmitterBasePath .. 'tti_dirt02_largebeam01_01_emit.bp',
-					EmitterBasePath .. 'tti_dirt02_largebeam01_02_emit.bp',
-				},
-				LargeBeam02 = {
-					EmitterBasePath .. 'dust_cloud_01_emit.bp',
-					EmitterBasePath .. 'quantum_generator_end_02_emit.bp',					
+                    EmitterBasePath .. 'tti_dirt02_largebeam01_01_emit.bp',
+                    EmitterBasePath .. 'tti_dirt02_largebeam01_02_emit.bp',
+                },
+                LargeBeam02 = {
+                    EmitterBasePath .. 'dust_cloud_01_emit.bp',
+                    EmitterBasePath .. 'quantum_generator_end_02_emit.bp',
                 },
                 Medium01 = { EmitterBasePath .. 'tti_dirt02_medium01_01_emit.bp', },
                 Medium02 = { EmitterBasePath .. 'tti_dirt02_medium02_01_emit.bp', },
                 Medium03 = { EmitterBasePath .. 'tti_dirt02_medium03_01_emit.bp', },
                 Small01 = { EmitterBasePath .. 'tti_dirt02_small01_01_emit.bp', },
-                Small02 = { EmitterBasePath .. 'tti_dirt02_small02_01_emit.bp', },                   
-            },                
+                Small02 = { EmitterBasePath .. 'tti_dirt02_small02_01_emit.bp', },
+            },
         },
         FXLayerChange = {
             AirLand = {
@@ -426,20 +410,13 @@ TerrainTypes = {
                 },
                 FootFall02 = { EmitterBasePath .. 'tt_dirt02_footfall02_01_emit.bp', },
                 GroundKickup01 = { EmitterBasePath .. 'tt_dirt02_groundkickup01_01_emit.bp', },
-				GroundKickup02 = { EmitterBasePath .. 'tt_dirt02_groundkickup02_01_emit.bp', },
+                GroundKickup02 = { EmitterBasePath .. 'tt_dirt02_groundkickup02_01_emit.bp', },
                 GroundKickup03 = { EmitterBasePath .. 'tt_dirt02_groundkickup03_01_emit.bp', },
                 GroundKickup04 = { EmitterBasePath .. 'tt_dirt02_groundkickup04_01_emit.bp', },
                 Hover01 = { EmitterBasePath .. 'tt_dirt02_hover01_01_emit.bp', },
-
             },
         },
         Treads = 'Default',
-        
-        FXOther = {
-			Land = {
-				ThauTerrainMuzzle = { EmitterBasePath .. 'seraphim_tau_cannon_muzzle_flash_05_emit.bp', },
-			},			
-        },
     },
     {
         Name = 'Dirt03',
@@ -451,15 +428,7 @@ TerrainTypes = {
                 Hover02 = { EmitterBasePath .. 'tt_airhover_exhaust02_01_emit.bp', },
             },
         },
-        FXImpact = {},
-        FXMovement = {},
         Treads = 'Default',
-        
-        FXOther = {
-			Land = {
-				ThauTerrainMuzzle = { EmitterBasePath .. 'seraphim_tau_cannon_muzzle_flash_05_emit.bp', },
-			},			
-        },
     },
     {
         Name = 'Dirt05',
@@ -467,7 +436,7 @@ TerrainTypes = {
         Color = 'FF880066',
         Description = 'Red earth',
         Style = 'RedRock',
-		FXIdle = {
+        FXIdle = {
             Air = {
                 Hover02 = { EmitterBasePath .. 'tt_airhover_exhaust02_01_emit.bp', },
             },
@@ -478,18 +447,18 @@ TerrainTypes = {
         FXImpact = {
             Terrain = {
                 Large01 = {
-					EmitterBasePath .. 'tti_dirt05_large01_01_emit.bp',
-					EmitterBasePath .. 'tti_dirt05_large01_02_emit.bp',
-				},
+                    EmitterBasePath .. 'tti_dirt05_large01_01_emit.bp',
+                    EmitterBasePath .. 'tti_dirt05_large01_02_emit.bp',
+                },
                 LargeBeam01 = {
-					EmitterBasePath .. 'tti_dirt05_largebeam01_01_emit.bp',
-					EmitterBasePath .. 'tti_dirt05_largebeam01_02_emit.bp',
-				},
+                    EmitterBasePath .. 'tti_dirt05_largebeam01_01_emit.bp',
+                    EmitterBasePath .. 'tti_dirt05_largebeam01_02_emit.bp',
+                },
                 Medium01 = { EmitterBasePath .. 'tti_dirt05_medium01_01_emit.bp', },
                 Medium02 = { EmitterBasePath .. 'tti_dirt05_medium02_01_emit.bp', },
                 Medium03 = { EmitterBasePath .. 'tti_dirt05_medium03_01_emit.bp', },
                 Small01 = { EmitterBasePath .. 'tti_dirt05_small01_01_emit.bp', },
-                Small02 = { EmitterBasePath .. 'tti_dirt05_small02_01_emit.bp', },                
+                Small02 = { EmitterBasePath .. 'tti_dirt05_small02_01_emit.bp', },
             },
         },
         FXLayerChange = {
@@ -500,8 +469,6 @@ TerrainTypes = {
                 TakeOff01 = { EmitterBasePath .. 'tt_dirt05_takeoff01_01_emit.bp', },
             },
         },
-        FXMotionChange = {
-        },
         FXMovement = {
             Land = {
                 FootFall01 = {
@@ -519,13 +486,12 @@ TerrainTypes = {
                 Hover01 = { EmitterBasePath .. 'tt_dirt05_hover01_01_emit.bp', },
             },
         },
-        Treads = 'Default',
-        
         FXOther = {
-			Land = {
-				ThauTerrainMuzzle = { EmitterBasePath .. 'seraphim_tau_cannon_muzzle_flash_07_emit.bp', },
-			},			
+            Land = {
+                ThauTerrainMuzzle = { EmitterBasePath .. 'seraphim_tau_cannon_muzzle_flash_07_emit.bp', },
+            },
         },
+        Treads = 'Default',
     },
     {
         Name = 'Dirt06',
@@ -533,7 +499,7 @@ TerrainTypes = {
         Color = 'FF886611',
         Description = 'darker red/brown earth',
         Style = 'RedRock',
-		FXIdle = {
+        FXIdle = {
             Air = {
                 Hover02 = { EmitterBasePath .. 'tt_airhover_exhaust02_01_emit.bp', },
             },
@@ -544,18 +510,18 @@ TerrainTypes = {
         FXImpact = {
             Terrain = {
                 Large01 = {
-					EmitterBasePath .. 'tti_dirt05_large01_01_emit.bp',
-					EmitterBasePath .. 'tti_dirt05_large01_02_emit.bp',
-				},
+                    EmitterBasePath .. 'tti_dirt05_large01_01_emit.bp',
+                    EmitterBasePath .. 'tti_dirt05_large01_02_emit.bp',
+                },
                 LargeBeam01 = {
-					EmitterBasePath .. 'tti_dirt05_largebeam01_01_emit.bp',
-					EmitterBasePath .. 'tti_dirt05_largebeam01_02_emit.bp',
-				},
+                    EmitterBasePath .. 'tti_dirt05_largebeam01_01_emit.bp',
+                    EmitterBasePath .. 'tti_dirt05_largebeam01_02_emit.bp',
+                },
                 Medium01 = { EmitterBasePath .. 'tti_dirt05_medium01_01_emit.bp', },
                 Medium02 = { EmitterBasePath .. 'tti_dirt05_medium02_01_emit.bp', },
                 Medium03 = { EmitterBasePath .. 'tti_dirt05_medium03_01_emit.bp', },
-				Small01 = { EmitterBasePath .. 'tti_dirt05_small01_01_emit.bp', },
-                Small02 = { EmitterBasePath .. 'tti_dirt05_small02_01_emit.bp', },                  
+                Small01 = { EmitterBasePath .. 'tti_dirt05_small01_01_emit.bp', },
+                Small02 = { EmitterBasePath .. 'tti_dirt05_small02_01_emit.bp', },
             },
         },
         FXLayerChange = {
@@ -565,8 +531,6 @@ TerrainTypes = {
             LandAir = {
                 TakeOff01 = { EmitterBasePath .. 'tt_dirt05_takeoff01_01_emit.bp' },
             },
-        },
-        FXMotionChange = {
         },
         FXMovement = {
             Land = {
@@ -586,12 +550,6 @@ TerrainTypes = {
             },
         },
         Treads = 'Default',
-        
-        FXOther = {
-			Land = {
-				ThauTerrainMuzzle = { EmitterBasePath .. 'seraphim_tau_cannon_muzzle_flash_05_emit.bp', },
-			},			
-        },
     },
     {
         Name = 'Dirt07',
@@ -615,7 +573,7 @@ TerrainTypes = {
                 Medium02 = { EmitterBasePath .. 'tti_dirt07_medium02_01_emit.bp', },
                 Medium03 = { EmitterBasePath .. 'tti_dirt07_medium03_01_emit.bp', },
                 Small01 = { EmitterBasePath .. 'tti_dirt07_small01_01_emit.bp', },
-				Small02 = { EmitterBasePath .. 'tti_dirt07_small02_01_emit.bp', },
+                Small02 = { EmitterBasePath .. 'tti_dirt07_small02_01_emit.bp', },
             },
         },
         FXLayerChange = {
@@ -637,13 +595,12 @@ TerrainTypes = {
                 Hover01 = { EmitterBasePath .. 'tt_dirt07_hover01_01_emit.bp', },
             },
         },
-        Treads = 'Default',
-        
         FXOther = {
-			Land = {
-				ThauTerrainMuzzle = { EmitterBasePath .. 'seraphim_tau_cannon_muzzle_flash_06_emit.bp', },
-			},			
+            Land = {
+                ThauTerrainMuzzle = { EmitterBasePath .. 'seraphim_tau_cannon_muzzle_flash_06_emit.bp', },
+            },
         },
+        Treads = 'Default',
     },
     {
         Name = 'Dirt08',
@@ -667,7 +624,7 @@ TerrainTypes = {
                 Medium02 = { EmitterBasePath .. 'tti_dirt07_medium02_01_emit.bp', },
                 Medium03 = { EmitterBasePath .. 'tti_dirt07_medium03_01_emit.bp', },
                 Small01 = { EmitterBasePath .. 'tti_dirt07_small01_01_emit.bp', },
-				Small02 = { EmitterBasePath .. 'tti_dirt07_small02_01_emit.bp', },
+                Small02 = { EmitterBasePath .. 'tti_dirt07_small02_01_emit.bp', },
             },
         },
         FXLayerChange = {
@@ -689,13 +646,12 @@ TerrainTypes = {
                 Hover01 = { EmitterBasePath .. 'tt_dirt07_hover01_01_emit.bp', },
             },
         },
-        Treads = 'Default',
-        
         FXOther = {
-			Land = {
-				ThauTerrainMuzzle = { EmitterBasePath .. 'seraphim_tau_cannon_muzzle_flash_06_emit.bp', },
-			},			
+            Land = {
+                ThauTerrainMuzzle = { EmitterBasePath .. 'seraphim_tau_cannon_muzzle_flash_06_emit.bp', },
+            },
         },
+        Treads = 'Default',
     },
     {
         Name = 'Dirt09',
@@ -715,23 +671,23 @@ TerrainTypes = {
         FXImpact = {
             Terrain = {
                 Large01 = {
-					EmitterBasePath .. 'tti_dirt02_large01_01_emit.bp',
-					EmitterBasePath .. 'tti_dirt02_large01_02_emit.bp',
-				},
+                    EmitterBasePath .. 'tti_dirt02_large01_01_emit.bp',
+                    EmitterBasePath .. 'tti_dirt02_large01_02_emit.bp',
+                },
                 LargeBeam01 = {
-					EmitterBasePath .. 'tti_dirt02_largebeam01_01_emit.bp',
-					EmitterBasePath .. 'tti_dirt02_largebeam01_02_emit.bp',
-				},
-				LargeBeam02 = {
-					EmitterBasePath .. 'dust_cloud_01_emit.bp',
-					EmitterBasePath .. 'quantum_generator_end_02_emit.bp',					
+                    EmitterBasePath .. 'tti_dirt02_largebeam01_01_emit.bp',
+                    EmitterBasePath .. 'tti_dirt02_largebeam01_02_emit.bp',
+                },
+                LargeBeam02 = {
+                    EmitterBasePath .. 'dust_cloud_01_emit.bp',
+                    EmitterBasePath .. 'quantum_generator_end_02_emit.bp',
                 },
                 Medium01 = { EmitterBasePath .. 'tti_dirt02_medium01_01_emit.bp', },
                 Medium02 = { EmitterBasePath .. 'tti_dirt02_medium02_01_emit.bp', },
                 Medium03 = { EmitterBasePath .. 'tti_dirt02_medium03_01_emit.bp', },
                 Small01 = { EmitterBasePath .. 'tti_dirt02_small01_01_emit.bp', },
-                Small02 = { EmitterBasePath .. 'tti_dirt02_small02_01_emit.bp', },                   
-            },                
+                Small02 = { EmitterBasePath .. 'tti_dirt02_small02_01_emit.bp', },
+            },
         },
         FXLayerChange = {
             AirLand = {
@@ -749,21 +705,14 @@ TerrainTypes = {
                 },
                 FootFall02 = { EmitterBasePath .. 'tt_dirt02_footfall02_01_emit.bp', },
                 GroundKickup01 = { EmitterBasePath .. 'tt_dirt02_groundkickup01_01_emit.bp', },
-				GroundKickup02 = { EmitterBasePath .. 'tt_dirt02_groundkickup02_01_emit.bp', },
+                GroundKickup02 = { EmitterBasePath .. 'tt_dirt02_groundkickup02_01_emit.bp', },
                 GroundKickup03 = { EmitterBasePath .. 'tt_dirt02_groundkickup03_01_emit.bp', },
                 GroundKickup04 = { EmitterBasePath .. 'tt_dirt02_groundkickup04_01_emit.bp', },
                 Hover01 = { EmitterBasePath .. 'tt_dirt02_hover01_01_emit.bp', },
-
             },
         },
         Treads = 'Default',
-        
-        FXOther = {
-			Land = {
-				ThauTerrainMuzzle = { EmitterBasePath .. 'seraphim_tau_cannon_muzzle_flash_05_emit.bp', },
-			},			
-        },
-    },    
+    },
     {
         Name = 'Sand01',
         TypeCode = 40,
@@ -793,7 +742,7 @@ TerrainTypes = {
             LandAir = {
                 TakeOff01 = { EmitterBasePath .. 'tt_sand01_takeoff01_01_emit.bp', },
             },
-        },        
+        },
         FXMovement = {
             Land = {
                 FootFall01 = { EmitterBasePath .. 'tt_sand01_footfall01_01_emit.bp', },
@@ -803,15 +752,14 @@ TerrainTypes = {
                 GroundKickup03 = { EmitterBasePath .. 'tt_sand01_groundkickup01_01_emit.bp', },
                 GroundKickup04 = { EmitterBasePath .. 'tt_sand01_groundkickup04_01_emit.bp', },
                 Hover01 = { EmitterBasePath .. 'tt_sand01_hover01_01_emit.bp', },
-            },            
+            },
+        },
+        FXOther = {
+            Land = {
+                ThauTerrainMuzzle = { EmitterBasePath .. 'seraphim_tau_cannon_muzzle_flash_06_emit.bp', },
+            },
         },
         Treads = 'Default',
-        
-        FXOther = {
-			Land = {
-				ThauTerrainMuzzle = { EmitterBasePath .. 'seraphim_tau_cannon_muzzle_flash_06_emit.bp', },
-			},			
-        },
     },
     {
         Name = 'Sand02',
@@ -824,15 +772,12 @@ TerrainTypes = {
                 Hover02 = { EmitterBasePath .. 'tt_airhover_exhaust02_01_emit.bp', },
             },
         },
-        FXImpact = {},
-        FXMovement = {},
-        Treads = 'Default',
-        
         FXOther = {
-			Land = {
-				ThauTerrainMuzzle = { EmitterBasePath .. 'seraphim_tau_cannon_muzzle_flash_06_emit.bp', },
-			},			
+            Land = {
+                ThauTerrainMuzzle = { EmitterBasePath .. 'seraphim_tau_cannon_muzzle_flash_06_emit.bp', },
+            },
         },
+        Treads = 'Default',
     },
     {
         Name = 'Vegetation01',
@@ -845,15 +790,12 @@ TerrainTypes = {
                 Hover02 = { EmitterBasePath .. 'tt_airhover_exhaust02_01_emit.bp', },
             },
         },
-        FXImpact = {},
-        FXMovement = {},
-        Treads = 'Default',
-        
         FXOther = {
-			Land = {
-				ThauTerrainMuzzle = { EmitterBasePath .. 'seraphim_tau_cannon_muzzle_flash_08_emit.bp', },
-			},			
+            Land = {
+                ThauTerrainMuzzle = { EmitterBasePath .. 'seraphim_tau_cannon_muzzle_flash_08_emit.bp', },
+            },
         },
+        Treads = 'Default',
     },
     {
         Name = 'Vegetation02',
@@ -872,23 +814,23 @@ TerrainTypes = {
         FXImpact = {
             Terrain = {
                 Large01 = {
-					EmitterBasePath .. 'tti_dirt02_large01_01_emit.bp',
-					EmitterBasePath .. 'tti_dirt02_large01_02_emit.bp',
-				},
+                    EmitterBasePath .. 'tti_dirt02_large01_01_emit.bp',
+                    EmitterBasePath .. 'tti_dirt02_large01_02_emit.bp',
+                },
                 LargeBeam01 = {
-					EmitterBasePath .. 'tti_dirt02_largebeam01_01_emit.bp',
-					EmitterBasePath .. 'tti_dirt02_largebeam01_02_emit.bp',
-				},
-				LargeBeam02 = {
-					EmitterBasePath .. 'dust_cloud_01_emit.bp',
-					EmitterBasePath .. 'quantum_generator_end_02_emit.bp',					
+                    EmitterBasePath .. 'tti_dirt02_largebeam01_01_emit.bp',
+                    EmitterBasePath .. 'tti_dirt02_largebeam01_02_emit.bp',
+                },
+                LargeBeam02 = {
+                    EmitterBasePath .. 'dust_cloud_01_emit.bp',
+                    EmitterBasePath .. 'quantum_generator_end_02_emit.bp',
                 },
                 Medium01 = { EmitterBasePath .. 'tti_dirt02_medium01_01_emit.bp', },
                 Medium02 = { EmitterBasePath .. 'tti_dirt02_medium02_01_emit.bp', },
                 Medium03 = { EmitterBasePath .. 'tti_dirt02_medium03_01_emit.bp', },
                 Small01 = { EmitterBasePath .. 'tti_dirt02_small01_01_emit.bp', },
-                Small02 = { EmitterBasePath .. 'tti_dirt02_small02_01_emit.bp', },                
-            },  
+                Small02 = { EmitterBasePath .. 'tti_dirt02_small02_01_emit.bp', },
+            },
         },
         FXLayerChange = {
             AirLand = {
@@ -906,19 +848,18 @@ TerrainTypes = {
                 },
                 FootFall02 = { EmitterBasePath .. 'tt_dirt02_footfall02_01_emit.bp', },
                 GroundKickup01 = { EmitterBasePath .. 'tt_dirt02_groundkickup01_01_emit.bp', },
-				GroundKickup02 = { EmitterBasePath .. 'tt_dirt02_groundkickup02_01_emit.bp', },
+                GroundKickup02 = { EmitterBasePath .. 'tt_dirt02_groundkickup02_01_emit.bp', },
                 GroundKickup03 = { EmitterBasePath .. 'tt_dirt02_groundkickup03_01_emit.bp', },
                 GroundKickup04 = { EmitterBasePath .. 'tt_dirt02_groundkickup04_01_emit.bp', },
                 Hover01 = { EmitterBasePath .. 'tt_dirt02_hover01_01_emit.bp', },
             },
         },
-        Treads = 'Default',
-        
         FXOther = {
-			Land = {
-				ThauTerrainMuzzle = { EmitterBasePath .. 'seraphim_tau_cannon_muzzle_flash_08_emit.bp', },
-			},			
+            Land = {
+                ThauTerrainMuzzle = { EmitterBasePath .. 'seraphim_tau_cannon_muzzle_flash_08_emit.bp', },
+            },
         },
+        Treads = 'Default',
     },
     {
         Name = 'Vegetation03',
@@ -933,21 +874,21 @@ TerrainTypes = {
             },
             Land = {
                 Hover01 = { EmitterBasePath .. 'tt_vegetation03_hover01_01_emit.bp', },
-            },            
+            },
         },
         FXImpact = {
             Terrain = {
-                Large01 = { 
-					EmitterBasePath .. 'tti_vegetation05_large01_01_emit.bp', 
-					EmitterBasePath .. 'tti_vegetation05_large01_02_emit.bp',
+                Large01 = {
+                    EmitterBasePath .. 'tti_vegetation05_large01_01_emit.bp',
+                    EmitterBasePath .. 'tti_vegetation05_large01_02_emit.bp',
                 },
-                LargeBeam01 = { EmitterBasePath .. 'tti_vegetation05_largebeam01_01_emit.bp', },                
+                LargeBeam01 = { EmitterBasePath .. 'tti_vegetation05_largebeam01_01_emit.bp', },
                 Medium01 = { EmitterBasePath .. 'tti_vegetation05_medium01_01_emit.bp', },
                 Medium02 = { EmitterBasePath .. 'tti_vegetation05_medium02_01_emit.bp', },
                 Medium03 = { EmitterBasePath .. 'tti_vegetation05_medium03_01_emit.bp', },
                 Small01 = { EmitterBasePath .. 'tti_vegetation05_small01_01_emit.bp', },
-                Small02 = { EmitterBasePath .. 'tti_vegetation05_small02_01_emit.bp', },                      
-            },        
+                Small02 = { EmitterBasePath .. 'tti_vegetation05_small02_01_emit.bp', },
+            },
         },
         FXLayerChange = {
             AirLand = {
@@ -956,7 +897,7 @@ TerrainTypes = {
             LandAir = {
                 TakeOff01 = { EmitterBasePath .. 'tt_vegetation05_takeoff01_01_emit.bp', },
             },
-        },        
+        },
         FXMovement = {
             Land = {
                 FootFall01 = {
@@ -964,26 +905,25 @@ TerrainTypes = {
                     EmitterBasePath .. 'tt_vegetation03_footfall01_02_emit.bp',
                 },
                 FootFall02 = { EmitterBasePath .. 'tt_vegetation03_footfall02_01_emit.bp', },
-                GroundKickup01 = { 
+                GroundKickup01 = {
                     EmitterBasePath .. 'tt_vegetation03_groundkickup01_01_emit.bp',
-                    EmitterBasePath .. 'tt_vegetation03_groundkickup01_02_emit.bp',                    
+                    EmitterBasePath .. 'tt_vegetation03_groundkickup01_02_emit.bp',
                 },
                 GroundKickup02 = {
                     EmitterBasePath .. 'tt_vegetation03_groundkickup02_01_emit.bp',
-                    EmitterBasePath .. 'tt_vegetation03_groundkickup02_02_emit.bp',                  
+                    EmitterBasePath .. 'tt_vegetation03_groundkickup02_02_emit.bp',
                 },
                 GroundKickup03 = { EmitterBasePath .. 'tt_vegetation03_groundkickup03_01_emit.bp', },
                 GroundKickup04 = { EmitterBasePath .. 'tt_vegetation03_groundkickup04_01_emit.bp', },
-                Hover01 = { EmitterBasePath .. 'tt_vegetation03_hover01_01_emit.bp', },      
+                Hover01 = { EmitterBasePath .. 'tt_vegetation03_hover01_01_emit.bp', },
+            },
+        },
+        FXOther = {
+            Land = {
+                ThauTerrainMuzzle = { EmitterBasePath .. 'seraphim_tau_cannon_muzzle_flash_08_emit.bp', },
             },
         },
         Treads = 'Default',
-        
-        FXOther = {
-			Land = {
-				ThauTerrainMuzzle = { EmitterBasePath .. 'seraphim_tau_cannon_muzzle_flash_08_emit.bp', },
-			},			
-        },
     },
     {
         Name = 'Vegetation04',
@@ -998,16 +938,16 @@ TerrainTypes = {
         },
         FXImpact = {
             Terrain = {
-                Large01 = { 
-					EmitterBasePath .. 'tti_vegetation05_large01_01_emit.bp', 
-					EmitterBasePath .. 'tti_vegetation05_large01_02_emit.bp',
+                Large01 = {
+                    EmitterBasePath .. 'tti_vegetation05_large01_01_emit.bp',
+                    EmitterBasePath .. 'tti_vegetation05_large01_02_emit.bp',
                 },
-                LargeBeam01 = { EmitterBasePath .. 'tti_vegetation05_largebeam01_01_emit.bp', },              
+                LargeBeam01 = { EmitterBasePath .. 'tti_vegetation05_largebeam01_01_emit.bp', },
                 Medium01 = { EmitterBasePath .. 'tti_vegetation05_medium01_01_emit.bp', },
                 Medium02 = { EmitterBasePath .. 'tti_vegetation05_medium02_01_emit.bp', },
                 Medium03 = { EmitterBasePath .. 'tti_vegetation05_medium03_01_emit.bp', },
                 Small01 = { EmitterBasePath .. 'tti_vegetation05_small01_01_emit.bp', },
-                Small02 = { EmitterBasePath .. 'tti_vegetation05_small02_01_emit.bp', },                
+                Small02 = { EmitterBasePath .. 'tti_vegetation05_small02_01_emit.bp', },
             },
         },
         FXLayerChange = {
@@ -1025,26 +965,25 @@ TerrainTypes = {
                     EmitterBasePath .. 'tt_vegetation03_footfall01_02_emit.bp',
                 },
                 FootFall02 = { EmitterBasePath .. 'tt_vegetation03_footfall02_01_emit.bp', },
-                GroundKickup01 = { 
+                GroundKickup01 = {
                     EmitterBasePath .. 'tt_vegetation03_groundkickup01_01_emit.bp',
-                    EmitterBasePath .. 'tt_vegetation03_groundkickup01_02_emit.bp',                    
+                    EmitterBasePath .. 'tt_vegetation03_groundkickup01_02_emit.bp',
                 },
                 GroundKickup02 = {
                     EmitterBasePath .. 'tt_vegetation03_groundkickup02_01_emit.bp',
-                    EmitterBasePath .. 'tt_vegetation03_groundkickup02_02_emit.bp',                  
+                    EmitterBasePath .. 'tt_vegetation03_groundkickup02_02_emit.bp',
                 },
                 GroundKickup03 = { EmitterBasePath .. 'tt_vegetation03_groundkickup03_01_emit.bp', },
                 GroundKickup04 = { EmitterBasePath .. 'tt_vegetation03_groundkickup04_01_emit.bp', },
-                Hover01 = { EmitterBasePath .. 'tt_vegetation03_hover01_01_emit.bp', },                 
+                Hover01 = { EmitterBasePath .. 'tt_vegetation03_hover01_01_emit.bp', },
+            },
+        },
+        FXOther = {
+            Land = {
+                ThauTerrainMuzzle = { EmitterBasePath .. 'seraphim_tau_cannon_muzzle_flash_08_emit.bp', },
             },
         },
         Treads = 'Default',
-        
-        FXOther = {
-			Land = {
-				ThauTerrainMuzzle = { EmitterBasePath .. 'seraphim_tau_cannon_muzzle_flash_08_emit.bp', },
-			},			
-        },
     },
     {
         Name = 'Vegetation05',
@@ -1059,16 +998,16 @@ TerrainTypes = {
         },
         FXImpact = {
             Terrain = {
-                Large01 = { 
-					EmitterBasePath .. 'tti_vegetation05_large01_01_emit.bp', 
-					EmitterBasePath .. 'tti_vegetation05_large01_02_emit.bp',
+                Large01 = {
+                    EmitterBasePath .. 'tti_vegetation05_large01_01_emit.bp',
+                    EmitterBasePath .. 'tti_vegetation05_large01_02_emit.bp',
                 },
-                LargeBeam01 = { EmitterBasePath .. 'tti_vegetation05_largebeam01_01_emit.bp', },      
+                LargeBeam01 = { EmitterBasePath .. 'tti_vegetation05_largebeam01_01_emit.bp', },
                 Medium01 = { EmitterBasePath .. 'tti_vegetation05_medium01_01_emit.bp', },
                 Medium02 = { EmitterBasePath .. 'tti_vegetation05_medium02_01_emit.bp', },
                 Medium03 = { EmitterBasePath .. 'tti_vegetation05_medium03_01_emit.bp', },
                 Small01 = { EmitterBasePath .. 'tti_vegetation05_small01_01_emit.bp', },
-                Small02 = { EmitterBasePath .. 'tti_vegetation05_small02_01_emit.bp', },                
+                Small02 = { EmitterBasePath .. 'tti_vegetation05_small02_01_emit.bp', },
             },
         },
         FXLayerChange = {
@@ -1090,26 +1029,25 @@ TerrainTypes = {
                     EmitterBasePath .. 'tt_vegetation05_groundkickup01_01_emit.bp',
                     EmitterBasePath .. 'tt_vegetation05_groundkickup01_02_emit.bp',
                 },
-                GroundKickup02 = { 
-					EmitterBasePath .. 'tt_vegetation05_groundkickup02_01_emit.bp', 
-					EmitterBasePath .. 'tt_vegetation05_groundkickup02_02_emit.bp', 				
-				},                
+                GroundKickup02 = {
+                    EmitterBasePath .. 'tt_vegetation05_groundkickup02_01_emit.bp',
+                    EmitterBasePath .. 'tt_vegetation05_groundkickup02_02_emit.bp',
+                },
                 GroundKickup03 = {
                     EmitterBasePath .. 'tt_vegetation05_groundkickup03_01_emit.bp',
                     EmitterBasePath .. 'tt_vegetation05_groundkickup01_02_emit.bp',
                 },
-                GroundKickup04 = { EmitterBasePath .. 'tt_vegetation05_groundkickup04_01_emit.bp', },                
-                Hover01 = { EmitterBasePath .. 'tt_vegetation05_hover01_01_emit.bp', },                
+                GroundKickup04 = { EmitterBasePath .. 'tt_vegetation05_groundkickup04_01_emit.bp', },
+                Hover01 = { EmitterBasePath .. 'tt_vegetation05_hover01_01_emit.bp', },
+            },
+        },
+        FXOther = {
+            Land = {
+                ThauTerrainMuzzle = { EmitterBasePath .. 'seraphim_tau_cannon_muzzle_flash_08_emit.bp', },
             },
         },
         Treads = 'Default',
-        
-        FXOther = {
-			Land = {
-				ThauTerrainMuzzle = { EmitterBasePath .. 'seraphim_tau_cannon_muzzle_flash_08_emit.bp', },
-			},			
-        },
-    },    
+    },
     {
         Name = 'Rocky01',
         TypeCode = 150,
@@ -1122,8 +1060,6 @@ TerrainTypes = {
                 Hover02 = { EmitterBasePath .. 'tt_airhover_exhaust02_01_emit.bp', },
             },
         },
-        FXImpact = {},
-        FXMovement = {},
         Treads = 'Default',
     },
     {
@@ -1138,8 +1074,6 @@ TerrainTypes = {
                 Hover02 = { EmitterBasePath .. 'tt_airhover_exhaust02_01_emit.bp', },
             },
         },
-        FXImpact = {},
-        FXMovement = {},
         Treads = 'None',
     },
     {
@@ -1155,8 +1089,6 @@ TerrainTypes = {
                 Hover02 = { EmitterBasePath .. 'tt_airhover_exhaust02_01_emit.bp', },
             },
         },
-        FXImpact = {},
-        FXMovement = {},
         Treads = 'Default',
     },
     {
@@ -1167,43 +1099,9 @@ TerrainTypes = {
         Style = 'Tundra',
         Bumpiness = 0,
         Slippery = 0,
-		FXIdle = {
+        FXIdle = {
             Air = {
                 Hover02 = { EmitterBasePath .. 'tt_airhover_exhaust02_01_emit.bp', },
-            },
-            Land = {
-                Hover01 = {},
-            },
-        },
-        FXImpact = {
-            Terrain = {
-                Large01 = {},
-                LargeBeam01 = {},            
-                Medium01 = {},
-                Medium02 = {},
-                Medium03 = {},
-                Small01 = {},
-            },
-        },
-        FXLayerChange = {
-            AirLand = {
-                Landing01 = {},
-            },
-            LandAir = {
-                TakeOff01 = {},
-            },
-        },
-        FXMotionChange = {
-        },
-        FXMovement = {
-            Land = {
-                FootFall01 = {},
-                FootFall02 = {},
-                GroundKickup01 = {},
-                GroundKickup02 = {},
-                GroundKickup03 = {},
-                GroundKickup04 = {},
-                Hover01 = {},
             },
         },
         Treads = 'Default',
@@ -1216,43 +1114,9 @@ TerrainTypes = {
         Style = 'RedRock',
         Bumpiness = 0,
         Slippery = 0,
-		FXIdle = {
+        FXIdle = {
             Air = {
                 Hover02 = { EmitterBasePath .. 'tt_airhover_exhaust02_01_emit.bp', },
-            },
-            Land = {
-                Hover01 = {},
-            },
-        },
-        FXImpact = {
-            Terrain = {
-                Large01 = {},
-                LargeBeam01 = {},            
-                Medium01 = {},
-                Medium02 = {},
-                Medium03 = {},
-                Small01 = {},
-            },
-        },
-        FXLayerChange = {
-            AirLand = {
-                Landing01 = {},
-            },
-            LandAir = {
-                TakeOff01 = {},
-            },
-        },
-        FXMotionChange = {
-        },
-        FXMovement = {
-            Land = {
-                FootFall01 = {},
-                FootFall02 = {},
-                GroundKickup01 = {},
-                GroundKickup02 = {},
-                GroundKickup03 = {},
-                GroundKickup04 = {},
-                Hover01 = {},
             },
         },
         Treads = 'Default',
@@ -1270,8 +1134,6 @@ TerrainTypes = {
                 Hover02 = { EmitterBasePath .. 'tt_airhover_exhaust02_01_emit.bp', },
             },
         },
-        FXImpact = {},
-        FXMovement = {},
         Treads = 'Default',
     },
     {
@@ -1292,16 +1154,16 @@ TerrainTypes = {
         },
         FXImpact = {
             Terrain = {
-                Large01 = { 
-                    EmitterBasePath .. 'tti_rocky06_large01_01_emit.bp', 
-                    EmitterBasePath .. 'tti_rocky06_large01_02_emit.bp', 
+                Large01 = {
+                    EmitterBasePath .. 'tti_rocky06_large01_01_emit.bp',
+                    EmitterBasePath .. 'tti_rocky06_large01_02_emit.bp',
                 },
                 LargeBeam01 = { EmitterBasePath .. 'tti_rocky06_largebeam01_01_emit.bp', },
                 Medium01 = { EmitterBasePath .. 'tti_rocky06_medium01_01_emit.bp', },
                 Medium02 = { EmitterBasePath .. 'tti_rocky06_medium02_01_emit.bp', },
                 Medium03 = { EmitterBasePath .. 'tti_rocky06_medium03_01_emit.bp', },
                 Small01 = { EmitterBasePath .. 'tti_rocky06_small01_01_emit.bp', },
-                Small02 = { EmitterBasePath .. 'tti_rocky06_small02_01_emit.bp', },                
+                Small02 = { EmitterBasePath .. 'tti_rocky06_small02_01_emit.bp', },
             },
         },
         FXLayerChange = {
@@ -1344,12 +1206,12 @@ TerrainTypes = {
         FXImpact = {
             Terrain = {
                 Large01 = { EmitterBasePath .. 'tti_rocky06_large01_01_emit.bp', },
-                LargeBeam01 = { EmitterBasePath .. 'tti_rocky06_largebeam01_01_emit.bp', },          
+                LargeBeam01 = { EmitterBasePath .. 'tti_rocky06_largebeam01_01_emit.bp', },
                 Medium01 = { EmitterBasePath .. 'tti_rocky06_medium01_01_emit.bp', },
                 Medium02 = { EmitterBasePath .. 'tti_rocky06_medium02_01_emit.bp', },
                 Medium03 = { EmitterBasePath .. 'tti_rocky06_medium03_01_emit.bp', },
                 Small01 = { EmitterBasePath .. 'tti_rocky06_small01_01_emit.bp', },
-                Small02 = { EmitterBasePath .. 'tti_rocky06_small02_01_emit.bp', },                    
+                Small02 = { EmitterBasePath .. 'tti_rocky06_small02_01_emit.bp', },
             },
         },
         FXLayerChange = {
@@ -1386,10 +1248,8 @@ TerrainTypes = {
                 Hover02 = { EmitterBasePath .. 'tt_airhover_exhaust02_01_emit.bp', },
             },
         },
-        FXImpact = {},
-        FXMovement = {},
         Treads = 'Default',
-    },   
+    },
     {
         Name = 'Rocky09',
         TypeCode = 159,
@@ -1421,36 +1281,36 @@ TerrainTypes = {
                 AirMoveExhaust01 = { EmitterBasePath .. 'contrail_delayed_mist_01_emit.bp', },
                 AirMoveExhaust02 = { EmitterBasePath .. 'tt_airhover_exhaust02_01_emit.bp', },
                 AirMoveExhaust03 = { EmitterBasePath .. 'seraphim_airmoveexhaust_01_emit.bp', },
-            },        
+            },
             Land = {
                 AeonGroundFX01 = { EmitterBasePath .. 'aeon_groundfx_emit.bp', },
                 AeonGroundFXT1Engineer = { EmitterBasePath .. 'aeon_t1eng_groundfx01_emit.bp', },
-                AeonGroundFXT2Engineer = { 
+                AeonGroundFXT2Engineer = {
                     EmitterBasePath .. 'aeon_t2eng_groundfx01_emit.bp',
                     EmitterBasePath .. 'aeon_t2eng_groundfx02_emit.bp',
-                },            
+                },
                 FootFall01 = { EmitterBasePath .. 'tt_rocky09_footfall01_01_emit.bp', },
                 FootFall02 = { EmitterBasePath .. 'tt_rocky09_footfall01_01_emit.bp', },
-                GroundKickup01 = { 
+                GroundKickup01 = {
                     EmitterBasePath .. 'tt_rocky09_groundkickup01_01_emit.bp',
                     EmitterBasePath .. 'tt_rocky09_groundkickup01_02_emit.bp',
                 },
                 GroundKickup02 = { EmitterBasePath .. 'tt_rocky06_groundkickup02_01_emit.bp', },
-                GroundKickup03 = { 
+                GroundKickup03 = {
                     EmitterBasePath .. 'tt_rocky09_groundkickup01_01_emit.bp',
                     EmitterBasePath .. 'tt_rocky09_groundkickup01_02_emit.bp',
                 },
                 GroundKickup04 = { EmitterBasePath .. 'tt_rocky06_groundkickup04_01_emit.bp', },
                 Hover01 = { EmitterBasePath .. 'tt_rocky09_hover01_01_emit.bp', },
-                SeraphimGroundFX01 = { 
-					EmitterBasePath .. 'seraphim_groundfx_emit.bp',
-					EmitterBasePath .. 'seraphim_groundfx_02_emit.bp',
-				},
+                SeraphimGroundFX01 = {
+                    EmitterBasePath .. 'seraphim_groundfx_emit.bp',
+                    EmitterBasePath .. 'seraphim_groundfx_02_emit.bp',
+                },
 
             },
         },
         Treads = 'Default',
-    },    
+    },
     {
         Name = 'Rocky10',
         TypeCode = 160,
@@ -1464,10 +1324,8 @@ TerrainTypes = {
                 Hover02 = { EmitterBasePath .. 'tt_airhover_exhaust02_01_emit.bp', },
             },
         },
-        FXImpact = {},
-        FXMovement = {},
         Treads = 'Default',
-    }, 
+    },
     {
         Name = 'Rocky11',
         TypeCode = 161,
@@ -1482,23 +1340,23 @@ TerrainTypes = {
             },
             Land = {
                 Hover01 = { EmitterBasePath .. 'tt_rocky11_hover01_01_emit.bp', },
-            },            
+            },
         },
         FXImpact = {
             Terrain = {
-                Large01 = { 
+                Large01 = {
                     EmitterBasePath .. 'tti_rocky11_large01_01_emit.bp',
-                    EmitterBasePath .. 'tti_rocky11_large01_02_emit.bp',   
+                    EmitterBasePath .. 'tti_rocky11_large01_02_emit.bp',
                 },
-                LargeBeam01 = { 
-                    EmitterBasePath .. 'tti_rocky11_largebeam01_01_emit.bp', 
-                    EmitterBasePath .. 'tti_rocky11_largebeam01_02_emit.bp', 
-                },  
+                LargeBeam01 = {
+                    EmitterBasePath .. 'tti_rocky11_largebeam01_01_emit.bp',
+                    EmitterBasePath .. 'tti_rocky11_largebeam01_02_emit.bp',
+                },
                 Medium01 = { EmitterBasePath .. 'tti_rocky11_medium01_01_emit.bp', },
                 Medium02 = { EmitterBasePath .. 'tti_rocky11_medium02_01_emit.bp', },
-                Medium03 = { EmitterBasePath .. 'tti_rocky11_medium03_01_emit.bp', },                          
+                Medium03 = { EmitterBasePath .. 'tti_rocky11_medium03_01_emit.bp', },
                 Small01 = { EmitterBasePath .. 'tti_rocky11_small01_01_emit.bp', },
-                Small02 = { EmitterBasePath .. 'tti_rocky11_small02_01_emit.bp', },                
+                Small02 = { EmitterBasePath .. 'tti_rocky11_small02_01_emit.bp', },
             },
         },
         FXLayerChange = {
@@ -1508,18 +1366,18 @@ TerrainTypes = {
             LandAir = {
                 TakeOff01 = { EmitterBasePath .. 'tt_rocky11_takeoff01_01_emit.bp', },
             },
-        },        
+        },
         FXMovement = {
             Land = {
                 FootFall01 = { EmitterBasePath .. 'tt_rocky11_footfall01_01_emit.bp', },
                 FootFall02 = { EmitterBasePath .. 'tt_rocky11_footfall02_01_emit.bp', },
                 GroundKickup01 = { EmitterBasePath .. 'tt_rocky11_groundkickup01_01_emit.bp', },
                 GroundKickup02 = {
-                    EmitterBasePath .. 'tt_rocky11_groundkickup02_01_emit.bp', 
-                    EmitterBasePath .. 'tt_rocky11_groundkickup02_02_emit.bp', 
+                    EmitterBasePath .. 'tt_rocky11_groundkickup02_01_emit.bp',
+                    EmitterBasePath .. 'tt_rocky11_groundkickup02_02_emit.bp',
                 },
                 GroundKickup03 = { EmitterBasePath .. 'tt_rocky11_groundkickup03_01_emit.bp', },
-                GroundKickup04 = { EmitterBasePath .. 'tt_rocky11_groundkickup04_01_emit.bp', },                
+                GroundKickup04 = { EmitterBasePath .. 'tt_rocky11_groundkickup04_01_emit.bp', },
                 Hover01 = { EmitterBasePath .. 'tt_rocky11_hover01_01_emit.bp', },
             },
         },
@@ -1539,23 +1397,23 @@ TerrainTypes = {
             },
             Land = {
                 Hover01 = { EmitterBasePath .. 'tt_rocky12_hover01_01_emit.bp', },
-            },                
+            },
         },
         FXImpact = {
             Terrain = {
-                Large01 = { 
+                Large01 = {
                     EmitterBasePath .. 'tti_rocky12_large01_01_emit.bp',
-                    EmitterBasePath .. 'tti_rocky12_large01_02_emit.bp',   
+                    EmitterBasePath .. 'tti_rocky12_large01_02_emit.bp',
                 },
-                LargeBeam01 = { 
-                    EmitterBasePath .. 'tti_rocky12_largebeam01_01_emit.bp', 
-                    EmitterBasePath .. 'tti_rocky12_largebeam01_02_emit.bp', 
-                },            
+                LargeBeam01 = {
+                    EmitterBasePath .. 'tti_rocky12_largebeam01_01_emit.bp',
+                    EmitterBasePath .. 'tti_rocky12_largebeam01_02_emit.bp',
+                },
                 Medium01 = { EmitterBasePath .. 'tti_rocky12_medium01_01_emit.bp', },
                 Medium02 = { EmitterBasePath .. 'tti_rocky12_medium02_01_emit.bp', },
                 Medium03 = { EmitterBasePath .. 'tti_rocky12_medium03_01_emit.bp', },
                 Small01 = { EmitterBasePath .. 'tti_rocky12_small01_01_emit.bp', },
-                Small02 = { EmitterBasePath .. 'tti_rocky12_small02_01_emit.bp', },      
+                Small02 = { EmitterBasePath .. 'tti_rocky12_small02_01_emit.bp', },
             },
         },
         FXLayerChange = {
@@ -1565,15 +1423,15 @@ TerrainTypes = {
             LandAir = {
                 TakeOff01 = { EmitterBasePath .. 'tt_rocky12_takeoff01_01_emit.bp', },
             },
-        },        
+        },
         FXMovement = {
             Land = {
                 FootFall01 = { EmitterBasePath .. 'tt_rocky12_footfall01_01_emit.bp', },
-                FootFall02 = { EmitterBasePath .. 'tt_rocky12_footfall02_01_emit.bp', },            
+                FootFall02 = { EmitterBasePath .. 'tt_rocky12_footfall02_01_emit.bp', },
                 GroundKickup01 = { EmitterBasePath .. 'tt_rocky12_groundkickup01_01_emit.bp', },
                 GroundKickup02 = {
-                    EmitterBasePath .. 'tt_rocky12_groundkickup02_01_emit.bp', 
-                    EmitterBasePath .. 'tt_rocky12_groundkickup02_02_emit.bp', 
+                    EmitterBasePath .. 'tt_rocky12_groundkickup02_01_emit.bp',
+                    EmitterBasePath .. 'tt_rocky12_groundkickup02_02_emit.bp',
                 },
                 GroundKickup03 = { EmitterBasePath .. 'tt_rocky12_groundkickup03_01_emit.bp', },
                 GroundKickup04 = { EmitterBasePath .. 'tt_rocky12_groundkickup04_01_emit.bp', },
@@ -1581,7 +1439,7 @@ TerrainTypes = {
             },
         },
         Treads = 'Default',
-    },   
+    },
     {
         Name = 'Rocky13',
         TypeCode = 163,
@@ -1596,23 +1454,23 @@ TerrainTypes = {
             },
             Land = {
                 Hover01 = { EmitterBasePath .. 'tt_rocky13_hover01_01_emit.bp', },
-            },             
+            },
         },
         FXImpact = {
             Terrain = {
-                Large01 = { 
+                Large01 = {
                     EmitterBasePath .. 'tti_rocky13_large01_01_emit.bp',
-                    EmitterBasePath .. 'tti_rocky13_large01_02_emit.bp',   
+                    EmitterBasePath .. 'tti_rocky13_large01_02_emit.bp',
                 },
-                LargeBeam01 = { 
-                    EmitterBasePath .. 'tti_rocky13_largebeam01_01_emit.bp', 
-                    EmitterBasePath .. 'tti_rocky13_largebeam01_02_emit.bp', 
+                LargeBeam01 = {
+                    EmitterBasePath .. 'tti_rocky13_largebeam01_01_emit.bp',
+                    EmitterBasePath .. 'tti_rocky13_largebeam01_02_emit.bp',
                 },
                 Medium01 = { EmitterBasePath .. 'tti_rocky13_medium01_01_emit.bp', },
                 Medium02 = { EmitterBasePath .. 'tti_rocky13_medium02_01_emit.bp', },
-                Medium03 = { EmitterBasePath .. 'tti_rocky13_medium03_01_emit.bp', },                
+                Medium03 = { EmitterBasePath .. 'tti_rocky13_medium03_01_emit.bp', },
                 Small01 = { EmitterBasePath .. 'tti_rocky13_small01_01_emit.bp', },
-                Small02 = { EmitterBasePath .. 'tti_rocky13_small02_01_emit.bp', },                
+                Small02 = { EmitterBasePath .. 'tti_rocky13_small02_01_emit.bp', },
             },
         },
         FXLayerChange = {
@@ -1622,15 +1480,15 @@ TerrainTypes = {
             LandAir = {
                 TakeOff01 = { EmitterBasePath .. 'tt_rocky13_takeoff01_01_emit.bp', },
             },
-        },        
+        },
         FXMovement = {
             Land = {
                 FootFall01 = { EmitterBasePath .. 'tt_rocky13_footfall01_01_emit.bp', },
                 FootFall02 = { EmitterBasePath .. 'tt_rocky13_footfall02_01_emit.bp', },
                 GroundKickup01 = { EmitterBasePath .. 'tt_rocky13_groundkickup01_01_emit.bp', },
                 GroundKickup02 = {
-                    EmitterBasePath .. 'tt_rocky13_groundkickup02_01_emit.bp', 
-                    EmitterBasePath .. 'tt_rocky13_groundkickup02_02_emit.bp', 
+                    EmitterBasePath .. 'tt_rocky13_groundkickup02_01_emit.bp',
+                    EmitterBasePath .. 'tt_rocky13_groundkickup02_02_emit.bp',
                 },
                 GroundKickup03 = { EmitterBasePath .. 'tt_rocky13_groundkickup03_01_emit.bp', },
                 GroundKickup04 = { EmitterBasePath .. 'tt_rocky13_groundkickup04_01_emit.bp', },
@@ -1638,7 +1496,7 @@ TerrainTypes = {
             },
         },
         Treads = 'Default',
-    },  
+    },
     {
         Name = 'Rocky14',
         TypeCode = 164,
@@ -1663,13 +1521,13 @@ TerrainTypes = {
                 },
                 LargeBeam02 = {
                     EmitterBasePath .. 'dust_cloud_07_emit.bp',
-					EmitterBasePath .. 'quantum_generator_end_02_emit.bp',	
-                },            
+                    EmitterBasePath .. 'quantum_generator_end_02_emit.bp',
+                },
                 Medium01 = { EmitterBasePath .. 'tti_crystal_medium01_01_emit.bp', },
                 Medium02 = { EmitterBasePath .. 'tti_crystal_medium02_01_emit.bp', },
                 Medium03 = { EmitterBasePath .. 'tti_crystal_medium03_01_emit.bp', },
                 Small01 = { EmitterBasePath .. 'tti_crystal_small01_01_emit.bp', },
-                Small02 = { EmitterBasePath .. 'tti_crystal_small01_01_emit.bp', }, 
+                Small02 = { EmitterBasePath .. 'tti_crystal_small01_01_emit.bp', },
             },
         },
         FXLayerChange = {
@@ -1681,9 +1539,9 @@ TerrainTypes = {
             },
         },
         FXMovement = {
-        Land = {       
+            Land = {
                 GroundKickup01 = { EmitterBasePath .. 'tt_crystal_groundkickup01_01_emit.bp', },
-				GroundKickup02 = { EmitterBasePath .. 'tt_crystal_groundkickup02_01_emit.bp', },
+                GroundKickup02 = { EmitterBasePath .. 'tt_crystal_groundkickup02_01_emit.bp', },
                 GroundKickup03 = { EmitterBasePath .. 'tt_crystal_groundkickup03_01_emit.bp', },
                 GroundKickup04 = { EmitterBasePath .. 'tt_crystal_groundkickup04_01_emit.bp', },
                 FootFall01 = { EmitterBasePath .. 'tt_crystal_footfall01_01_emit.bp', },
@@ -1692,7 +1550,7 @@ TerrainTypes = {
             },
         },
         Treads = 'Default',
-    },     
+    },
     {
         Name = 'Rocky15',
         TypeCode = 165,
@@ -1705,10 +1563,8 @@ TerrainTypes = {
                 Hover02 = { EmitterBasePath .. 'tt_airhover_exhaust02_01_emit.bp', },
             },
         },
-        FXImpact = {},
-        FXMovement = {},
         Treads = 'Default',
-    },                   
+    },
     {
         Name = 'TarmacUEF',
         TypeCode = 190,
@@ -1721,8 +1577,6 @@ TerrainTypes = {
                 Hover02 = { EmitterBasePath .. 'tt_airhover_exhaust02_01_emit.bp', },
             },
         },
-        FXImpact = {},
-        FXMovement = {},
         Treads = 'None',
     },
     {
@@ -1737,8 +1591,6 @@ TerrainTypes = {
                 Hover02 = { EmitterBasePath .. 'tt_airhover_exhaust02_01_emit.bp', },
             },
         },
-        FXImpact = {},
-        FXMovement = {},
         Treads = 'None',
     },
     {
@@ -1753,8 +1605,6 @@ TerrainTypes = {
                 Hover02 = { EmitterBasePath .. 'tt_airhover_exhaust02_01_emit.bp', },
             },
         },
-        FXImpact = {},
-        FXMovement = {},
         Treads = 'None',
     },
     {
@@ -1763,7 +1613,7 @@ TerrainTypes = {
         Color = 'FF9999FF',
         Description = 'Snowy, dark blue, hard ice',
         Style = 'Tundra',
-		FXIdle = {
+        FXIdle = {
             Air = {
                 Hover02 = { EmitterBasePath .. 'tt_airhover_exhaust02_01_emit.bp', },
             },
@@ -1774,7 +1624,7 @@ TerrainTypes = {
         FXImpact = {
             Terrain = {
                 Large01 = { EmitterBasePath .. 'tti_snowy01_large01_01_emit.bp', },
-                LargeBeam01 = { EmitterBasePath .. 'tti_snowy01_largebeam01_01_emit.bp', },            
+                LargeBeam01 = { EmitterBasePath .. 'tti_snowy01_largebeam01_01_emit.bp', },
                 Medium01 = { EmitterBasePath .. 'tti_snowy01_medium01_01_emit.bp', },
                 Medium02 = { EmitterBasePath .. 'tti_snowy01_medium02_01_emit.bp', },
                 Medium03 = { EmitterBasePath .. 'tti_snowy01_medium03_01_emit.bp', },
@@ -1790,15 +1640,13 @@ TerrainTypes = {
                 TakeOff01 = { EmitterBasePath .. 'tt_snowy01_takeoff01_01_emit.bp', },
             },
         },
-        FXMotionChange = {
-        },
         FXMovement = {
             Land = {
                 FootFall01 = {
-					EmitterBasePath .. 'tt_snowy01_footfall01_01_emit.bp',
-					EmitterBasePath .. 'tt_snowy01_footfall01_02_emit.bp',
+                    EmitterBasePath .. 'tt_snowy01_footfall01_01_emit.bp',
+                    EmitterBasePath .. 'tt_snowy01_footfall01_02_emit.bp',
                 },
-                FootFall02 = { EmitterBasePath .. 'tt_snowy02_footfall02_01_emit.bp', },            
+                FootFall02 = { EmitterBasePath .. 'tt_snowy02_footfall02_01_emit.bp', },
                 GroundKickup01 = { EmitterBasePath .. 'tt_snowy01_groundkickup01_01_emit.bp', },
                 GroundKickup02 = {
                     EmitterBasePath .. 'tt_snowy01_groundkickup02_01_emit.bp',
@@ -1809,11 +1657,10 @@ TerrainTypes = {
                 Hover01 = { EmitterBasePath .. 'tt_snowy01_hover01_01_emit.bp', },
             },
         },
-        
         FXOther = {
-			Land = {
-				ThauTerrainMuzzle = { EmitterBasePath .. 'seraphim_tau_cannon_muzzle_flash_09_emit.bp', },
-			},			
+            Land = {
+                ThauTerrainMuzzle = { EmitterBasePath .. 'seraphim_tau_cannon_muzzle_flash_09_emit.bp', },
+            },
         },
     },
     {
@@ -1822,7 +1669,7 @@ TerrainTypes = {
         Color = 'FFBBBBBB',
         Description = 'Snowy, light blue snow pack',
         Style = 'Tundra',
-		FXIdle = {
+        FXIdle = {
             Air = {
                 Hover02 = { EmitterBasePath .. 'tt_airhover_exhaust02_01_emit.bp', },
             },
@@ -1849,13 +1696,11 @@ TerrainTypes = {
                 TakeOff01 = { EmitterBasePath .. 'tt_snowy02_takeoff01_01_emit.bp', },
             },
         },
-        FXMotionChange = {
-        },
         FXMovement = {
             Land = {
                 FootFall01 = {
-					EmitterBasePath .. 'tt_snowy02_footfall01_01_emit.bp',
-					EmitterBasePath .. 'tt_snowy02_footfall01_02_emit.bp',
+                    EmitterBasePath .. 'tt_snowy02_footfall01_01_emit.bp',
+                    EmitterBasePath .. 'tt_snowy02_footfall01_02_emit.bp',
                 },
                 FootFall02 = { EmitterBasePath .. 'tt_snowy02_footfall02_01_emit.bp', },
                 GroundKickup01 = { EmitterBasePath .. 'tt_snowy02_groundkickup01_01_emit.bp', },
@@ -1868,11 +1713,10 @@ TerrainTypes = {
                 Hover01 = { EmitterBasePath .. 'tt_snowy02_hover01_01_emit.bp', },
             },
         },
-        
         FXOther = {
-			Land = {
-				ThauTerrainMuzzle = { EmitterBasePath .. 'seraphim_tau_cannon_muzzle_flash_09_emit.bp', },
-			},			
+            Land = {
+                ThauTerrainMuzzle = { EmitterBasePath .. 'seraphim_tau_cannon_muzzle_flash_09_emit.bp', },
+            },
         },
     },
     {
@@ -1881,7 +1725,7 @@ TerrainTypes = {
         Color = 'FF995599',
         Description = 'Snowy, high albedo, bright white snow',
         Style = 'Tundra',
-		FXIdle = {
+        FXIdle = {
             Air = {
                 Hover02 = { EmitterBasePath .. 'tt_airhover_exhaust02_01_emit.bp', },
             },
@@ -1892,12 +1736,12 @@ TerrainTypes = {
         FXImpact = {
             Terrain = {
                 Large01 = { EmitterBasePath .. 'tti_snowy02_large01_01_emit.bp', },
-                LargeBeam01 = { EmitterBasePath .. 'tti_snowy02_largebeam01_01_emit.bp', },            
+                LargeBeam01 = { EmitterBasePath .. 'tti_snowy02_largebeam01_01_emit.bp', },
                 Medium01 = { EmitterBasePath .. 'tti_snowy02_medium01_01_emit.bp', },
                 Medium02 = { EmitterBasePath .. 'tti_snowy02_medium02_01_emit.bp', },
                 Medium03 = { EmitterBasePath .. 'tti_snowy02_medium03_01_emit.bp', },
                 Small01 = { EmitterBasePath .. 'tti_snowy02_small01_01_emit.bp', },
-                Small02 = { EmitterBasePath .. 'tti_snowy01_small02_01_emit.bp', },                                
+                Small02 = { EmitterBasePath .. 'tti_snowy01_small02_01_emit.bp', },
             },
         },
         FXLayerChange = {
@@ -1908,13 +1752,11 @@ TerrainTypes = {
                 TakeOff01 = { EmitterBasePath .. 'tt_snowy02_takeoff01_01_emit.bp', },
             },
         },
-        FXMotionChange = {
-        },
         FXMovement = {
             Land = {
                 FootFall01 = {
-					EmitterBasePath .. 'tt_snowy02_footfall01_01_emit.bp',
-					EmitterBasePath .. 'tt_snowy02_footfall01_02_emit.bp',
+                    EmitterBasePath .. 'tt_snowy02_footfall01_01_emit.bp',
+                    EmitterBasePath .. 'tt_snowy02_footfall01_02_emit.bp',
                 },
                 FootFall02 = { EmitterBasePath .. 'tt_snowy02_footfall02_01_emit.bp', },
                 GroundKickup01 = { EmitterBasePath .. 'tt_snowy02_groundkickup01_01_emit.bp', },
@@ -1927,11 +1769,10 @@ TerrainTypes = {
                 Hover01 = { EmitterBasePath .. 'tt_snowy02_hover01_01_emit.bp', },
             },
         },
-        
         FXOther = {
-			Land = {
-				ThauTerrainMuzzle = { EmitterBasePath .. 'seraphim_tau_cannon_muzzle_flash_09_emit.bp', },
-			},			
+            Land = {
+                ThauTerrainMuzzle = { EmitterBasePath .. 'seraphim_tau_cannon_muzzle_flash_09_emit.bp', },
+            },
         },
     },
     {
@@ -1946,9 +1787,6 @@ TerrainTypes = {
                 Hover02 = { EmitterBasePath .. 'tt_airhover_exhaust02_01_emit.bp', },
             },
         },
-        FXImpact = {},
-        FXMotionChange = {},
-        FXMovement = {},
     },
     {
         Name = 'Water02',
@@ -1966,7 +1804,6 @@ TerrainTypes = {
                 SeaIdle02 = { EmitterBasePath .. 'tt_water02_seaidle02_01_emit.bp', },
             },
         },
-        FXImpact = { },
         FXLayerChange = {
             SeabedLand = {
                 Surface01 = { EmitterBasePath .. 'tt_water_shoreline_surface01_01_emit.bp', },
@@ -1976,7 +1813,6 @@ TerrainTypes = {
                 Surface01 = { EmitterBasePath .. 'tt_water02_surface03_01_emit.bp', },
             },
         },
-        FXMotionChange = {},
         FXMovement = {
             Land = {
                 Shoreline01 = { EmitterBasePath .. 'tt_water02_shoreline01_01_emit.bp', },
@@ -2003,9 +1839,6 @@ TerrainTypes = {
                 Hover02 = { EmitterBasePath .. 'tt_airhover_exhaust02_01_emit.bp', },
             },
         },
-        FXImpact = {},
-        FXMotionChange = {},
-        FXMovement = {},
     },
     {
         Name = 'Water04',
@@ -2020,15 +1853,12 @@ TerrainTypes = {
                 Hover02 = { EmitterBasePath .. 'tt_airhover_exhaust02_01_emit.bp', },
             },
         },
-        FXImpact = {},
         FXLayerChange = {
             SeabedLand = {
                 Surface01 = { EmitterBasePath .. 'tt_water_shoreline_surface01_01_emit.bp', },
                 Surface02 = { EmitterBasePath .. 'tt_water_shoreline_surface02_01_emit.bp', },
             },
         },
-        FXMotionChange = {},
-        FXMovement = {},
     },
     {
         Name = 'Water05',
@@ -2038,11 +1868,6 @@ TerrainTypes = {
         Style = 'RedRock',
         Bumpiness = 0,
         Slippery = 0,
-        FXIdle = {},
-        FXImpact = {},
-        FXLayerChange = {},
-        FXMotionChange = {},
-        FXMovement = {},
     },
     {
         Name = 'Water06',
@@ -2052,11 +1877,6 @@ TerrainTypes = {
         Style = 'RedRock',
         Bumpiness = 0,
         Slippery = 0,
-        FXIdle = {},
-        FXImpact = {},
-        FXLayerChange = {},
-        FXMotionChange = {},
-        FXMovement = {},
     },
     {
         Name = 'Water07',
@@ -2066,8 +1886,6 @@ TerrainTypes = {
         Style = 'Tropical',
         Bumpiness = 0,
         Slippery = 0,
-        FXIdle = {},
-        FXImpact = {},
         FXLayerChange = {
             SeabedLand = {
                 Surface01 = { EmitterBasePath .. 'tt_water_shoreline_surface01_01_emit.bp', },
@@ -2077,7 +1895,6 @@ TerrainTypes = {
                 Surface01 = { EmitterBasePath .. 'tt_water02_surface03_01_emit.bp', },
             },
         },
-        FXMotionChange = {},
         FXMovement = {
             Land = {
                 Shoreline01 = { EmitterBasePath .. 'tt_water02_shoreline01_01_emit.bp', },
@@ -2089,8 +1906,7 @@ TerrainTypes = {
             Seabed = {
                 Shoreline01 = { EmitterBasePath .. 'tt_water02_shoreline01_01_emit.bp', },
             },
-        },        
-        
+        },
     },
     {
         Name = 'Water08',
@@ -2100,12 +1916,7 @@ TerrainTypes = {
         Style = 'Tropical',
         Bumpiness = 0,
         Slippery = 0,
-        FXIdle = {},
-        FXImpact = {},
-        FXLayerChange = {},
-        FXMotionChange = {},
-        FXMovement = {},
-    },  
+    },
     {
         Name = 'Water09',
         TypeCode = 228,
@@ -2114,12 +1925,7 @@ TerrainTypes = {
         Style = 'Tropical',
         Bumpiness = 0,
         Slippery = 0,
-        FXIdle = {},
-        FXImpact = {},
-        FXLayerChange = {},
-        FXMotionChange = {},
-        FXMovement = {},
-    }, 
+    },
     {
         Name = 'Water10',
         TypeCode = 229,
@@ -2128,13 +1934,7 @@ TerrainTypes = {
         Style = 'Tropical',
         Bumpiness = 0,
         Slippery = 0,
-        FXIdle = {},
-        FXImpact = {},
-        FXLayerChange = {},
-        FXMotionChange = {},
-        FXMovement = {},
-    }, 
-                   
+    },
     {
         Name = 'Lava01',
         TypeCode = 230,
@@ -2151,8 +1951,6 @@ TerrainTypes = {
                 Hover02 = { EmitterBasePath .. 'tt_airhover_exhaust02_01_emit.bp', },
             },
         },
-        FXImpact = {},
-        FXMovement = {},
         Treads = 'Default',
     },
     {
@@ -2163,12 +1961,7 @@ TerrainTypes = {
         Style = 'Desert',
         Bumpiness = 0,
         Slippery = 0,
-        FXIdle = {},
-        FXImpact = {},
-        FXLayerChange = {},
-        FXMotionChange = {},
-        FXMovement = {},
-    }, 
+    },
     {
         Name = 'Water12',
         TypeCode = 232,
@@ -2177,12 +1970,7 @@ TerrainTypes = {
         Style = 'Desert',
         Bumpiness = 0,
         Slippery = 0,
-        FXIdle = {},
-        FXImpact = {},
-        FXLayerChange = {},
-        FXMotionChange = {},
-        FXMovement = {},
-    }, 
+    },
     {
         Name = 'Water13',
         TypeCode = 233,
@@ -2191,12 +1979,7 @@ TerrainTypes = {
         Style = 'Tundra',
         Bumpiness = 0,
         Slippery = 0,
-        FXIdle = {},
-        FXImpact = {},
-        FXLayerChange = {},
-        FXMotionChange = {},
-        FXMovement = {},
-    }, 
+    },
     {
         Name = 'Water14',
         TypeCode = 234,
@@ -2205,12 +1988,7 @@ TerrainTypes = {
         Style = 'Tundra',
         Bumpiness = 0,
         Slippery = 0,
-        FXIdle = {},
-        FXImpact = {},
-        FXLayerChange = {},
-        FXMotionChange = {},
-        FXMovement = {},
-    },   
+    },
     {
         Name = 'Water15',
         TypeCode = 235,
@@ -2219,12 +1997,7 @@ TerrainTypes = {
         Style = 'Tundra',
         Bumpiness = 0,
         Slippery = 0,
-        FXIdle = {},
-        FXImpact = {},
-        FXLayerChange = {},
-        FXMotionChange = {},
-        FXMovement = {},
-    },    
+    },
     {
         Name = 'Water16',
         TypeCode = 236,
@@ -2233,12 +2006,7 @@ TerrainTypes = {
         Style = 'Lava',
         Bumpiness = 0,
         Slippery = 0,
-        FXIdle = {},
-        FXImpact = {},
-        FXLayerChange = {},
-        FXMotionChange = {},
-        FXMovement = {},
-    },  
+    },
     {
         Name = 'Water17',
         TypeCode = 237,
@@ -2247,12 +2015,7 @@ TerrainTypes = {
         Style = 'Lava',
         Bumpiness = 0,
         Slippery = 0,
-        FXIdle = {},
-        FXImpact = {},
-        FXLayerChange = {},
-        FXMotionChange = {},
-        FXMovement = {},
-    },   
+    },
     {
         Name = 'Water18',
         TypeCode = 238,
@@ -2261,12 +2024,7 @@ TerrainTypes = {
         Style = 'Geothermal',
         Bumpiness = 0,
         Slippery = 0,
-        FXIdle = {},
-        FXImpact = {},
-        FXLayerChange = {},
-        FXMotionChange = {},
-        FXMovement = {},
-    }, 
+    },
     {
         Name = 'Water19',
         TypeCode = 239,
@@ -2275,12 +2033,7 @@ TerrainTypes = {
         Style = 'Geothermal',
         Bumpiness = 0,
         Slippery = 0,
-        FXIdle = {},
-        FXImpact = {},
-        FXLayerChange = {},
-        FXMotionChange = {},
-        FXMovement = {},
-    },   
+    },
     {
         Name = 'Water20',
         TypeCode = 240,
@@ -2289,12 +2042,7 @@ TerrainTypes = {
         Style = 'Geothermal',
         Bumpiness = 0,
         Slippery = 0,
-        FXIdle = {},
-        FXImpact = {},
-        FXLayerChange = {},
-        FXMotionChange = {},
-        FXMovement = {},
-    },                                
+    },
 }
 
 -- These are the names of the columns to create and populate (in order) in the editor's

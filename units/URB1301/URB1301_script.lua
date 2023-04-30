@@ -10,7 +10,7 @@
 local CEnergyCreationUnit = import("/lua/cybranunits.lua").CEnergyCreationUnit
 
 ---@class URB1301 : CEnergyCreationUnit
-URB1301 = Class(CEnergyCreationUnit) {
+URB1301 = ClassUnit(CEnergyCreationUnit) {
     AmbientEffects = 'CT3PowerAmbient',
 
     OnStopBeingBuilt = function(self, builder, layer)

@@ -10,6 +10,6 @@
 local TWallStructureUnit = import("/lua/terranunits.lua").TWallStructureUnit
 
 ---@class XEC9006 : TWallStructureUnit
-XEC9006 = Class(TWallStructureUnit) {}
+XEC9006 = ClassUnit(TWallStructureUnit) {}
 
 TypeClass = XEC9006

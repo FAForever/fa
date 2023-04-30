@@ -11,6 +11,6 @@
 local SAirUnit = import("/lua/seraphimunits.lua").SAirUnit
 
 ---@class XSA0302 : SAirUnit
-XSA0302 = Class(SAirUnit) {
+XSA0302 = ClassUnit(SAirUnit) {
 }
 TypeClass = XSA0302

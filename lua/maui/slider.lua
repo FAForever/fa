@@ -6,7 +6,7 @@ local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
 local lazyvar = import("/lua/lazyvar.lua")
 
 ---@class Slider : Group
-Slider = Class(Group) {
+Slider = ClassUI(Group) {
     -- TODO make it possible for the start value to be greate than the end value and have that work the opposite way
     __init = function(self, parent, isVertical, startValue, endValue, thumb, thumbOver, thumbDown, background, debugname)
         Group.__init(self, parent)
@@ -149,7 +149,7 @@ Slider = Class(Group) {
 }
 
 ---@class IntegerSlider : Slider
-IntegerSlider = Class(Slider) {
+IntegerSlider = ClassUI(Slider) {
     __init = function(self, parent, isVertical, startValue, endValue, indentValue, thumb, thumbOver, thumbDown, background)
         Slider.__init(self, parent, isVertical, math.floor(startValue), math.floor(endValue), thumb, thumbOver, thumbDown, background)
         self._indentValue = math.floor(indentValue)

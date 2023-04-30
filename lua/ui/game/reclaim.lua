@@ -14,7 +14,6 @@ local MathMax = math.max
 local MathMin = math.min
 local TableGetn = table.getn
 
-
 ---@class UIReclaimDataPoint
 ---@field mass number
 ---@field position Vector
@@ -62,7 +61,7 @@ local PlayableArea
 ---@field position Vector
 ---@field mass Bitmap
 ---@field text Text
-local WorldLabel = Class(Group) {
+local WorldLabel = ClassUI(Group) {
     __init = function(self, parent, position)
         Group.__init(self, parent)
         self.parent = parent
@@ -323,7 +322,7 @@ end
 function UpdateReclaim(reclaimPoints)
     ReclaimChanged = true
     for id, reclaimPoint in reclaimPoints do
-        if not reclaimPoint.mass then
+        if not reclaimPoint then
             Reclaim[id] = nil
             OutsidePlayableAreaReclaim[id] = nil
         else
@@ -377,7 +376,7 @@ local function _CombineReclaim(reclaim)
 
     local zoom = GetCamera('WorldCamera'):SaveSettings().Zoom
 
-    if zoom < ZoomThreshold then
+    if zoom < (Prefs.GetFromCurrentProfile('options.reclaim_batching_distance_treshold') or ZoomThreshold) then
         return false
     end
 
