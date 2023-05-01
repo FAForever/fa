@@ -254,7 +254,7 @@ BuilderGroup {
     Builder {
         BuilderName = 'CDR Initial Land Rush',
         PlatoonAddBehaviors = { 'CommanderBehaviorImproved', },
-        PlatoonTemplate = 'CommanderBuilder',
+        PlatoonTemplate = 'CommanderInitialBuilder',
         Priority = 1000,
         BuilderConditions = {
                 { IBC, 'NotPreBuilt', {}},
@@ -264,20 +264,8 @@ BuilderGroup {
         PlatoonAddFunctions = { {SAI, 'BuildOnce'}, },
         BuilderData = {
             Construction = {
-                BuildStructures = {
-                    --DUNCAN - Altered build order
-                    'T1LandFactory',
-                    'T1EnergyProduction',
-                    'T1EnergyProduction',
-                    --'T1Resource',
-                    'T1EnergyProduction',
-                    'T1EnergyProduction',
-                    'T1EnergyProduction',
-                    'T1EnergyProduction',
-                    'T1LandFactory',
-                    'T1EnergyProduction',
-                    'T1LandFactory',
-                }
+                BaseTemplateFile = '/lua/AI/AIBaseTemplates/ACUBaseTemplate.lua',
+                BaseTemplate = 'ACUBaseTemplate',
             }
         }
     },
@@ -319,7 +307,7 @@ BuilderGroup {
     Builder {
         BuilderName = 'CDR Initial Balanced',
         PlatoonAddBehaviors = { 'CommanderBehaviorImproved', },
-        PlatoonTemplate = 'CommanderBuilder',
+        PlatoonTemplate = 'CommanderInitialBuilder',
         Priority = 1000,
         BuilderConditions = {
                 { IBC, 'NotPreBuilt', {}},
@@ -329,21 +317,8 @@ BuilderGroup {
         PlatoonAddFunctions = { {SAI, 'BuildOnce'}, },
         BuilderData = {
             Construction = {
-                BuildStructures = {
-                    --DUNCAN - Altered build order
-                    'T1LandFactory',
-                    'T1EnergyProduction',
-                    'T1EnergyProduction',
-                    --'T1Resource',
-                    'T1EnergyProduction',
-                    'T1EnergyProduction',
-                    --'T1Resource',
-                    'T1EnergyProduction',
-                    'T1EnergyProduction',
-                    'T1AirFactory',
-                    'T1EnergyProduction',
-                    'T1LandFactory',
-                }
+                BaseTemplateFile = '/lua/AI/AIBaseTemplates/ACUBaseTemplate.lua',
+                BaseTemplate = 'ACUBaseTemplate',
             }
         }
     },
@@ -383,7 +358,7 @@ BuilderGroup {
     Builder {
         BuilderName = 'CDR Initial Air Rush',
         PlatoonAddBehaviors = { 'CommanderBehaviorImproved', },
-        PlatoonTemplate = 'CommanderBuilder',
+        PlatoonTemplate = 'CommanderInitialBuilder',
         Priority = 1000,
         BuilderConditions = {
                 { IBC, 'NotPreBuilt', {}},
@@ -393,17 +368,8 @@ BuilderGroup {
         PlatoonAddFunctions = { {SAI, 'BuildOnce'}, },
         BuilderData = {
             Construction = {
-                BuildStructures = {
-                    'T1AirFactory',
-                    'T1EnergyProduction',
-                    'T1EnergyProduction',
-                    --'T1Resource',
-                    'T1EnergyProduction',
-                    'T1EnergyProduction',
-                    'T1EnergyProduction',
-                    'T1EnergyProduction',
-                    'T1AirFactory',
-                }
+                BaseTemplateFile = '/lua/AI/AIBaseTemplates/ACUBaseTemplate.lua',
+                BaseTemplate = 'ACUBaseTemplate',
             }
         }
     },
@@ -444,7 +410,7 @@ BuilderGroup {
     Builder {
         BuilderName = 'CDR Initial Naval Rush',
         PlatoonAddBehaviors = { 'CommanderBehaviorImproved', },
-        PlatoonTemplate = 'CommanderBuilder',
+        PlatoonTemplate = 'CommanderInitialBuilder',
         Priority = 1000,
         BuilderConditions = {
                 { IBC, 'NotPreBuilt', {}},
@@ -454,18 +420,8 @@ BuilderGroup {
         PlatoonAddFunctions = { {SAI, 'BuildOnce'}, },
         BuilderData = {
             Construction = {
-                BuildStructures = {
-                    --DUNCAN - order changed
-                    'T1AirFactory',
-                    'T1EnergyProduction',
-                    'T1EnergyProduction',
-                    --'T1Resource',
-                    'T1EnergyProduction',
-                    'T1EnergyProduction',
-                    'T1LandFactory',
-                    'T1EnergyProduction',
-                    'T1EnergyProduction',
-                }
+                BaseTemplateFile = '/lua/AI/AIBaseTemplates/ACUBaseTemplate.lua',
+                BaseTemplate = 'ACUBaseTemplate',
             }
         }
     },
@@ -1286,7 +1242,7 @@ BuilderGroup {
     Builder {
         BuilderName = 'T1 Hydrocarbon Engineer Single',
         PlatoonTemplate = 'EngineerBuilder',
-        Priority = 1000,
+        Priority = 1005,
         BuilderConditions = {
                 { UCBC, 'HaveLessThanUnitsWithCategory', { 1, categories.HYDROCARBON}},
                 { UCBC, 'CanBuildOnHydroLessThanDistance', { 'LocationType', 160, -500, 0, 0, 'AntiSurface', 1 }},
