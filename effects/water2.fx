@@ -314,12 +314,10 @@ float4 HighFidelityPS( VS_OUTPUT inV,
 					   uniform int alphaFunc, 
 					   uniform int alphaRef ) : COLOR
 {
-    // calculate the depth of water at this pixel, we use this to decide
-    // how to shade and it should become lesser as we get shallower
-    // so that we don't have a sharp line
+    // calculate the depth of water at this pixel
     float4 waterTexture = tex2D( UtilitySamplerC, inV.mTexUV );
     float waterDepth =  waterTexture.g;
-  
+
     float3 viewVector = normalize(inV.mViewVec);
 
     // get perspective correct coordinate for sampling from the other textures
@@ -331,9 +329,8 @@ float4 HighFidelityPS( VS_OUTPUT inV,
 
     // get the unaltered sea floor
     float4 backGroundPixels = tex2D(RefractionSampler, screenPos);
-	// because the range of the alpha value that we use for the water is very small
-    // we multiply by a large number and then saturate
-    // this will also help in the case where we filter to an intermediate value
+	// because the alpha value holds the unit parts above water and uses a small value
+    // for the land cutout, we multiply by a large number and then saturate
     float mask = saturate(backGroundPixels.a * 255);
 
     // calculate the normal we will be using for the water surface
@@ -359,21 +356,24 @@ float4 HighFidelityPS( VS_OUTPUT inV,
     float2 refractionPos = screenPos;
     refractionPos -=  refractionScale * N.xz * OneOverW;
 
+	// keep in mind the alpha channel holds the unit parts above water
+	// specifically the alpha channel of that unit's shader
     float4 refractedPixels = tex2D(RefractionSampler, refractionPos);
 
-	// we want to lerp in some of the water color based on depth, but
-    // not totally on depth as it gets clamped
+	// we need to exclude the unit refraction above the water line. This creats small areas with
+	// no refraction, but the water color in the next step will make this mostly unnoticeable
+	refractedPixels.xyz = lerp(refractedPixels, backGroundPixels, saturate(refractedPixels.a * 255)).xyz;
+	// we want to lerp in the water color based on depth, but clamped
     float waterLerp = clamp(waterDepth, waterLerp.x, waterLerp.y);
     refractedPixels.xyz = lerp(refractedPixels.xyz, waterColor, waterLerp);
-	refractedPixels.xyz = lerp(refractedPixels, backGroundPixels, saturate(refractedPixels.w * 255) ).xyz;
 
-    // calculate reflections of units
 	// We can't compute wich part of the unit we would hit with our reflection vector,
 	// so we have to resort to an approximation using the refractionPos
 	float4 reflectedPixels = tex2D(ReflectionSampler, refractionPos);
 
 	float4 skyReflection = texCUBE(SkySampler, R);
-    // lerp the reflections together
+	// The alpha channel acts as a mask for unit parts above the water and probably
+	// uses unitReflectionAmount as the positive value of the mask
     reflectedPixels = lerp(skyReflection, reflectedPixels, saturate(reflectedPixels.a));
    
    	//Schlick approximation for fresnel
