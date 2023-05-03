@@ -842,11 +842,14 @@ local function GetCargoSlots(unit)
     return slots
 end
 
+Callbacks.NavEnableDebugging = import("/lua/sim/NavDebug.lua").EnableDebugging
+Callbacks.NavDisableDebugging = import("/lua/sim/NavDebug.lua").DisableDebugging
 Callbacks.NavToggleScanLayer = import("/lua/sim/navdebug.lua").ToggleScanLayer
 Callbacks.NavToggleScanLabels = import("/lua/sim/navdebug.lua").ToggleScanLabels
 Callbacks.NavDebugStatisticsToUI = import("/lua/sim/navdebug.lua").StatisticsToUI
 Callbacks.NavDebugCanPathTo = import("/lua/sim/navdebug.lua").CanPathTo
 Callbacks.NavDebugPathTo = import("/lua/sim/navdebug.lua").PathTo
+Callbacks.NavDebugPathToWithThreatThreshold = import("/lua/sim/navdebug.lua").PathToWithThreatThreshold
 Callbacks.NavDebugGetLabel = import("/lua/sim/navdebug.lua").GetLabel
 Callbacks.NavDebugGetLabelMetadata = import("/lua/sim/navdebug.lua").GetLabelMeta
 Callbacks.NavGenerate = import("/lua/sim/navgenerator.lua").Generate
