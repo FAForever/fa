@@ -1,5 +1,3 @@
--- script for projectile BoneAttached
-
 local GenericDebris = import("/lua/genericdebris.lua").GenericDebris
 DebrisBoneAttachLow01 = ClassDummyProjectile(GenericDebris) {
     FxUnitHitScale = 0.25,
@@ -10,5 +8,4 @@ DebrisBoneAttachLow01 = ClassDummyProjectile(GenericDebris) {
     FxTrails = import("/lua/effecttemplates.lua").NoEffects,
     FxTrailScale = 1,
 }
-
 TypeClass = DebrisBoneAttachLow01
