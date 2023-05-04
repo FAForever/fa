@@ -83,13 +83,28 @@ SyncMeta = {
     end,
 }
 
+---@class AIUnitProperties
+---@field AIPlatoonReference AIPlatoon
+---@field AIBaseManager LocationType
+---@field ForkedEngineerTask? thread    # used by the engineer manager
+---@field DesiresAssist? boolean         # used by the engineer manager
+---@field NumAssistees? number           # used by the engineer manager
+---@field MinNumAssistees? number
+---@field BuilderManagerData? { EngineerManager: AIEngineerManager, LocationType: LocationType }
+---@field UnitBeingAssist? Unit
+---@field UnitBeingBuilt? Unit
+---@field UnitBeingBuiltBehavior? thread
+---@field Combat? boolean
+
 local cUnit = moho.unit_methods
----@class Unit : moho.unit_methods, InternalObject, IntelComponent, VeterancyComponent
+---@class Unit : moho.unit_methods, InternalObject, IntelComponent, VeterancyComponent, AIUnitProperties
+---@field AIManagerIdentifier? string
 ---@field Brain AIBrain
 ---@field Blueprint UnitBlueprint
 ---@field Trash TrashBag
 ---@field Layer Layer
 ---@field Army Army
+---@field Dead? boolean
 ---@field UnitId UnitId
 ---@field EntityId EntityId
 ---@field EventCallbacks table<string, function[]>
@@ -707,11 +722,22 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
                 self:CheckAssistFocus()
             end)
         end
+
+        -- awareness of event for AI
+        local aiPlatoon = self.AIPlatoonReference
+        if aiPlatoon then
+            aiPlatoon:OnStartRepair(self, unit)
+        end
     end,
 
     ---@param self Unit
     ---@param unit Unit
     OnStopRepair = function(self, unit)
+        -- awareness of event for AI
+        local aiPlatoon = self.AIPlatoonReference
+        if aiPlatoon then
+            aiPlatoon:OnStopRepair(self, unit)
+        end
     end,
 
     ---@param self Unit
@@ -742,6 +768,12 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
             self.OnStartReclaimPropMass = mass
             self.OnStartReclaimPropEnergy = energy
         end
+
+        -- awareness of event for AI
+        local aiPlatoon = self.AIPlatoonReference
+        if aiPlatoon then
+            aiPlatoon:OnStartReclaim(self, target)
+        end
     end,
 
     --- Called when the unit stops reclaiming
@@ -754,7 +786,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         self:PlayUnitSound('StopReclaim')
         self:SetUnitState('Reclaiming', false)
 
-        if target.IsProp then -- This is a prop
+        if target.IsProp then
             target:UpdateReclaimLeft()
         end
 
@@ -787,6 +819,12 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         self.OnStartReclaimPropTicksRequired = nil
         self.OnStartReclaimPropMass = nil
         self.OnStartReclaimPropEnergy = nil
+
+        -- awareness of event for AI
+        local aiPlatoon = self.AIPlatoonReference
+        if aiPlatoon then
+            aiPlatoon:OnStopReclaim(self, target)
+        end
     end,
 
     ---@param self Unit
@@ -1234,6 +1272,12 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
     ---@param old number
     OnHealthChanged = function(self, new, old)
         self:ManageDamageEffects(new, old)
+
+        -- awareness of event for AI
+        local aiPlatoon = self.AIPlatoonReference
+        if aiPlatoon then
+            aiPlatoon:OnHealthChanged(self, new, old)
+        end
     end,
 
     ---@param self Unit
@@ -1387,6 +1431,12 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         self:ForkThread(self.DeathThread, overkillRatio , instigator)
 
         ArmyBrains[self.Army]:AddUnitStat(self.UnitId, "lost", 1)
+
+        -- awareness of event for AI
+        local aiPlatoon = self.AIPlatoonReference
+        if aiPlatoon then
+            aiPlatoon:OnKilled(self, instigator, type, overkillRatio)
+        end
     end,
 
     ---@param self Unit
@@ -1912,6 +1962,8 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
     OnDestroy = function(self)
         self.Dead = true
 
+        self.Brain:OnUnitDestroyed(self)
+
         if self:GetFractionComplete() < 1 then
             self:SendNotifyMessage('cancelled')
         end
@@ -1950,6 +2002,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
             self.Brain:UntrackJammer(self)
         end
         
+
         ChangeState(self, self.DeadState)
     end,
 
@@ -2101,6 +2154,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         self:StartBeingBuiltEffects(builder, layer)
 
         local aiBrain = self:GetAIBrain()
+        aiBrain:OnUnitStartBeingBuilt(self, builder, layer)
         if not table.empty(aiBrain.UnitBuiltTriggerList) then
             for _, v in aiBrain.UnitBuiltTriggerList do
                 if EntityCategoryContains(v.Category, self) then
@@ -2141,11 +2195,13 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
             return false
         end
 
+        self.Brain:OnUnitStopBeingBuilt(self, builder, layer)
+
         -- Create any idle effects on unit
         if TrashEmpty(self.IdleEffectsBag) then
             self:CreateIdleEffects()
         end
-        
+
         IntelComponent.OnStopBeingBuilt(self, builder, layer)
 
         local bp = self.Blueprint
@@ -2295,6 +2351,12 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
     OnSiloBuildStart = function(self, weapon)
         self.SiloWeapon = weapon
         self.SiloProjectile = weapon:GetProjectileBlueprint()
+
+        -- awareness of event for AI
+        local aiPlatoon = self.AIPlatoonReference
+        if aiPlatoon then
+            aiPlatoon:OnSiloBuildStart(self, weapon)
+        end
     end,
 
     ---@param self Unit
@@ -2302,6 +2364,12 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
     OnSiloBuildEnd = function(self, weapon)
         self.SiloWeapon = nil
         self.SiloProjectile = nil
+
+        -- awareness of event for AI
+        local aiPlatoon = self.AIPlatoonReference
+        if aiPlatoon then
+            aiPlatoon:OnSiloBuildEnd(self, weapon)
+        end
     end,
 
     -------------------------------------------------------------------------------------------
@@ -2576,7 +2644,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         self:PlayUnitAmbientSound('ConstructLoop')
 
         self:DoOnStartBuildCallbacks(built)
-
+        self.Brain:OnUnitStartBuilding(self, built)
 
         if order == 'Upgrade' and bp.General.UpgradesFrom == self.UnitId then
             built.DisallowCollisions = true
@@ -2590,6 +2658,12 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
             self.UpgradesTo = bp.BlueprintId
         end
 
+        -- awareness of event for AI
+        local aiPlatoon = self.AIPlatoonReference
+        if aiPlatoon then
+            aiPlatoon:OnStartBuild(self, built, order)
+        end
+
         return true
     end,
 
@@ -2599,6 +2673,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         self:StopBuildingEffects(built)
         self:SetActiveConsumptionInactive()
         self:DoOnUnitBuiltCallbacks(built)
+        self.Brain:OnUnitStopBuilding(self, built)
         self:StopUnitAmbientSound('ConstructLoop')
         self:PlayUnitSound('ConstructStop')
         self.TransferUpgradeProgress = nil
@@ -2606,6 +2681,12 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         if built.Repairers[self.EntityId] then
             self:OnStopRepair(self, built)
             built.Repairers[self.EntityId] = nil
+        end
+
+        -- awareness of event for AI
+        local aiPlatoon = self.AIPlatoonReference
+        if aiPlatoon then
+            aiPlatoon:OnStopBuild(self, built)
         end
     end,
 
@@ -2739,6 +2820,12 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
 
         ChangeState(self, self.WorkingState)
 
+        -- awareness of event for AI
+        local aiPlatoon = self.AIPlatoonReference
+        if aiPlatoon then
+            aiPlatoon:OnWorkBegin(self, work)
+        end
+
         -- Inform EnhanceTask that enhancement is not restricted
         return true
     end,
@@ -2751,6 +2838,12 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         self:PlayUnitSound('EnhanceEnd')
         self:StopUnitAmbientSound('EnhanceLoop')
         self:CleanupEnhancementEffects()
+
+       -- awareness of event for AI
+       local aiPlatoon = self.AIPlatoonReference
+       if aiPlatoon then
+           aiPlatoon:OnWorkEnd(self, work)
+       end
     end,
 
     ---@param self Unit
@@ -4432,7 +4525,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
     --- Called when a missile launched by this unit is intercepted
     ---@param self Unit
     ---@param target Unit
-    ---@param defense boolean Requires an `IsDestroyed` check as the defense may have been destroyed when the missile is intercepted
+    ---@param defense Unit Requires an `IsDestroyed` check as the defense may have been destroyed when the missile is intercepted
     ---@param position Vector Location where the missile got intercepted
     OnMissileIntercepted = function(self, target, defense, position)
         -- try and run callbacks
@@ -4445,13 +4538,19 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
                 end
             end
         end
+
+        -- awareness of event for AI
+        local aiPlatoon = self.AIPlatoonReference
+        if aiPlatoon then
+            aiPlatoon:OnMissileIntercepted(self, target, defense, position)
+        end
     end,
 
 
     --- Called when a missile launched by this unit hits a shield
     ---@param self Unit
     ---@param target Unit
-    ---@param shield UnitBlueprintDefenseShield  Requires an `IsDestroyed` check when using as the shield may have been destroyed when the missile impacts
+    ---@param shield Shield  Requires an `IsDestroyed` check when using as the shield may have been destroyed when the missile impacts
     ---@param position Vector Location where the missile hit the shield
     OnMissileImpactShield = function(self, target, shield, position)
         -- try and run callbacks
@@ -4463,6 +4562,12 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
                     WARN(msg)
                 end
             end
+        end
+
+        -- awareness of event for AI
+        local aiPlatoon = self.AIPlatoonReference
+        if aiPlatoon then
+            aiPlatoon:OnMissileImpactShield(self, target, shield, position)
         end
     end,
 
@@ -4480,6 +4585,12 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
                     WARN(msg)
                 end
             end
+        end
+
+        -- awareness of event for AI
+        local aiPlatoon = self.AIPlatoonReference
+        if aiPlatoon then
+            aiPlatoon:OnMissileImpactTerrain(self, target, position)
         end
     end,
 
@@ -4523,9 +4634,22 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
 
     -- Called by the shield class 
     ---@param self Unit
-    OnShieldEnabled = function(self) end,
+    OnShieldEnabled = function(self) 
+        -- awareness of event for AI
+        local aiPlatoon = self.AIPlatoonReference
+        if aiPlatoon then
+            aiPlatoon:OnShieldEnabled(self)
+        end
+    end,
+
     ---@param self Unit
-    OnShieldDisabled = function(self) end,
+    OnShieldDisabled = function(self) 
+        -- awareness of event for AI
+        local aiPlatoon = self.AIPlatoonReference
+        if aiPlatoon then
+            aiPlatoon:OnShieldDisabled(self)
+        end
+    end,
 
     -- Called by the brain when the unit registered itself
     ---@param self Unit
