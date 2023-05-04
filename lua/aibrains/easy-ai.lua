@@ -35,6 +35,17 @@ AIBrain = Class(StandardBrain, EconomyComponent) {
         StandardBrain.OnCreateAI(self, planName)
         EconomyComponent.OnCreateAI(self)
 
+        -- load in base templates
+        -- todo
+
+        -- start initial base
+        local startX, startZ = self:GetArmyStartPos()
+        local main = BaseManager.CreateBaseManager(self, 'main', { startX, 0, startZ }, 60)
+        main:AddBaseTemplate('AIBaseTemplate - Easy main')
+        self.BuilderManagers = {
+            MAIN = main
+        }
+
         self:IMAPConfiguration()
     end,
 
@@ -55,13 +66,7 @@ AIBrain = Class(StandardBrain, EconomyComponent) {
         self.GridBrain = import("/lua/ai/gridbrain.lua").Setup()
         self.GridRecon = import("/lua/ai/gridrecon.lua").Setup(self)
 
-        -- start initial base
-        local startX, startZ = self:GetArmyStartPos()
-        local main = BaseManager.CreateBaseManager(self, 'main', { startX, 0, startZ }, 60)
-        main:AddBaseTemplate('AIBaseTemplate - Easy main')
-        self.BuilderManagers = {
-            MAIN = main
-        }
+
     end,
 
     ---@param self EasyAIBrain
