@@ -33,18 +33,27 @@ AIBrain = Class(StandardBrain, EconomyComponent) {
     ---@param planName string
     OnCreateAI = function(self, planName)
         StandardBrain.OnCreateAI(self, planName)
+        EconomyComponent.OnCreateAI(self)
 
-        local civilian = false
-        for name, data in ScenarioInfo.ArmySetup do
-            if name == self.Name then
-                civilian = data.Civilian
-                break
-            end
-        end
+        self:IMAPConfiguration()
+    end,
 
-        if civilian then
-            return
-        end
+    --- Called after `BeginSession`, at this point all props, resources and initial units exist in the map
+    ---@param self AIBrain
+    OnBeginSession = function(self)
+        StandardBrain.OnBeginSession(self)
+
+        -- requires navigational mesh
+        import("/lua/sim/NavUtils.lua").Generate()
+
+        -- requires these markers to exist
+        import("/lua/sim/MarkerUtilities.lua").GenerateExpansionMarkers()
+        import("/lua/sim/MarkerUtilities.lua").GenerateRallyPointMarkers()
+
+        -- requires these datastructures to understand the game
+        self.GridReclaim = import("/lua/ai/gridreclaim.lua").Setup(self)
+        self.GridBrain = import("/lua/ai/gridbrain.lua").Setup()
+        self.GridRecon = import("/lua/ai/gridrecon.lua").Setup(self)
 
         -- start initial base
         local startX, startZ = self:GetArmyStartPos()
@@ -53,27 +62,6 @@ AIBrain = Class(StandardBrain, EconomyComponent) {
         self.BuilderManagers = {
             MAIN = main
         }
-
-        -- requires these datastructures to understand the game
-        self.GridReclaim = import("/lua/ai/gridreclaim.lua").Setup(self)
-        self.GridBrain = import("/lua/ai/gridbrain.lua").Setup()
-        self.GridRecon = import("/lua/ai/gridrecon.lua").Setup(self)
-
-        ForkThread(self.OnCreateAIThread, self)
-
-        self:IMAPConfiguration()
-        EconomyComponent.OnCreateAI(self)
-    end,
-
-    OnCreateAIThread = function(self)
-        WaitSeconds(1.0)
-
-        -- requires navigational mesh
-        import("/lua/sim/NavUtils.lua").Generate()
-
-        -- requires these markers to exist
-        import("/lua/sim/MarkerUtilities.lua").GenerateExpansionMarkers()
-        import("/lua/sim/MarkerUtilities.lua").GenerateRallyPointMarkers()
     end,
 
     ---@param self EasyAIBrain

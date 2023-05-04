@@ -548,6 +548,7 @@ AIBrain = Class(AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerCom
 
     Status = 'InProgress',
 
+    --- Called after `SetupSession` but before `BeginSession`
     ---@param self AIBrain
     ---@param planName string
     OnCreateHuman = function(self, planName)
@@ -557,11 +558,15 @@ AIBrain = Class(AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerCom
         self.EnergyExcessThread = ForkThread(self.ToggleEnergyExcessUnitsThread, self)
     end,
 
+    --- Called after `SetupSession` but before `BeginSession`
+    ---@param self AIBrain
+    ---@param planName string
     OnCreateAI = function(self, planName)
         self.BrainType = 'AI'
         self:CreateBrainShared(planName)
     end,
 
+    --- Called after `SetupSession` but before `BeginSession`
     ---@param self AIBrain
     ---@param planName string
     CreateBrainShared = function(self, planName)
@@ -599,6 +604,11 @@ AIBrain = Class(AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerCom
         AIBrainHQComponent.CreateBrainShared(self)
         AIBrainStatisticsComponent.CreateBrainShared(self)
         AIBrainJammerComponent.CreateBrainShared(self)
+    end,
+
+    --- Called after `BeginSession`, at this point all props, resources and initial units exist
+    ---@param self AIBrain
+    OnBeginSession = function(self)
     end,
 
     ---@param self AIBrain

@@ -329,6 +329,11 @@ function BeginSession()
 
     -- keep track of units off map
     OnStartOffMapPreventionThread()
+
+    -- trigger event for brains
+    for k, brain in ArmyBrains do
+        brain:OnBeginSession()
+    end
 end
 
 --- Setup for AI related logic and data
