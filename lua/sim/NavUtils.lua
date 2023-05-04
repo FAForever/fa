@@ -152,12 +152,12 @@ end
 
 ---@param layer NavLayers
 ---@return NavGrid?
----@return string?
+---@return 'InvalidLayer'?
 local function FindGrid(layer)
     -- check layer argument
     local grid = NavGenerator.NavGrids[layer] --[[@as NavGrid]]
     if not grid then
-        return nil, 'Invalid layer type - this is likely a typo. The layer is case sensitive'
+        return nil, 'InvalidLayer'
     end
 
     return grid
@@ -166,12 +166,12 @@ end
 ---@param grid NavGrid
 ---@param position Vector
 ---@return CompressedLabelTreeLeaf?
----@return string?
+---@return 'OutsideMap'?
 local function FindLeaf(grid, position)
     -- check position argument
     local leaf = grid:FindLeafXZ(position[1], position[3])
     if not leaf then
-        return nil, 'position is not inside the map'
+        return nil, 'OutsideMap'
     end
 
     if leaf.Label == -1 then
@@ -210,52 +210,52 @@ end
 ---@param origin Vector
 ---@param destination Vector
 ---@return boolean?
----@return string?
+---@return ('SystemError' | 'NotGenerated' | 'InvalidLayer' | 'OutsideMap' | 'OriginOutsideMap' | 'OriginUnpathable' | 'DestinationOutsideMap' | 'DestinationUnpathable' | 'Unpathable')?
 function CanPathTo(layer, origin, destination)
     -- check if generated
     if not NavGenerator.IsGenerated() then
         WarnNoNavMesh()
-        return nil, 'Navigational mesh is not generated'
+        return nil, 'NotGenerated'
     end
 
     -- check layer argument
     local grid = FindGrid(layer)
     if not grid then
-        return nil, 'Invalid layer type - this is likely a typo. The layer is case sensitive'
+        return nil, 'InvalidLayer'
     end
 
     -- check origin argument
     local originLeaf = FindLeaf(grid, origin)
     if not originLeaf then
-        return nil, 'Origin is not inside the map'
+        return nil, 'OriginOutsideMap'
     end
 
     if originLeaf.Label == -1 then
-        return nil, 'Origin is unpathable'
+        return nil, 'OriginUnpathable'
     end
 
     if originLeaf.Label == 0 then
-        return nil, 'Origin has no label assigned, report to the maintainers. This should not be possible'
+        return nil, 'SystemError'
     end
 
     -- check destination argument
     local destinationLeaf = FindLeaf(grid, destination)
     if not destinationLeaf then
-        return nil, 'Destination is not inside the map'
+        return nil, 'DestinationOutsideMap'
     end
 
     if destinationLeaf.Label == -1 then
-        return nil, 'Destination is unpathable'
+        return nil, 'DestinationUnpathable'
     end
 
     if destinationLeaf.Label == 0 then
-        return nil, 'Destination has no label assigned, report to the maintainers. This should not be possible'
+        return nil, 'SystemError'
     end
 
     if originLeaf.Label == destinationLeaf.Label then
         return true
     else
-        return false, 'Not reachable for this layer'
+        return false, 'Unpathable'
     end
 end
 
@@ -291,13 +291,13 @@ end
 ---@param origin Vector
 ---@param destination Vector
 ---@return Vector[]?            # List of positions
----@return (string | number)?   # Error message, or the number of positions
+---@return ('SystemError' | 'NotGenerated' | 'InvalidLayer' | 'OutsideMap' | 'OriginOutsideMap' | 'OriginUnpathable' | 'DestinationOutsideMap' | 'DestinationUnpathable' | 'Unpathable') | number   # Error message, or the number of positions
 ---@return number?              # Length of path
 function PathTo(layer, origin, destination)
     -- check if generated
     if not NavGenerator.IsGenerated() then
         WarnNoNavMesh()
-        return nil, 'Navigational mesh is not generated'
+        return nil, 'NotGenerated'
     end
 
     -- check if we can path
@@ -358,7 +358,7 @@ function PathTo(layer, origin, destination)
 
     -- check if we found a path
     if not destinationLeaf.Seen == seenIdentifier then
-        return nil, 'Did not manage to find the destination'
+        return nil, 'SystemError'
     end
 
     -- construct current path
@@ -412,13 +412,13 @@ ThreatFunctions = Shared.ThreatFunctions
 ---@param threatThreshold number
 ---@param threatRadius number
 ---@return Vector[]?            # List of positions
----@return (string | number)?   # Error message, or the number of positions
+---@return (('SystemError' | 'NotGenerated' | 'InvalidLayer' | 'OutsideMap' | 'OriginOutsideMap' | 'OriginUnpathable' | 'DestinationOutsideMap' | 'DestinationUnpathable' | 'Unpathable') | number)?   # Error message, or the number of positions
 ---@return number?              # Length of path
 function PathToWithThreatThreshold(layer, origin, destination, aibrain, threatFunc, threatThreshold, threatRadius)
     -- check if generated
     if not NavGenerator.IsGenerated() then
         WarnNoNavMesh()
-        return nil, 'Navigational mesh is not generated'
+        return nil, 'NotGenerated'
     end
 
     -- check if we can path
@@ -486,7 +486,7 @@ function PathToWithThreatThreshold(layer, origin, destination, aibrain, threatFu
 
     -- check if we found a path
     if not destinationLeaf.Seen == seenIdentifier then
-        return nil, 'Did not manage to find the destination'
+        return nil, 'SystemError'
     end
 
     -- construct current path
@@ -534,32 +534,32 @@ end
 ---@param layer NavLayers
 ---@param position Vector
 ---@return number? 
----@return string?
+---@return ('NotGenerated' | 'InvalidLayer' | 'OutsideMap' | 'SystemError' | 'Unpathable')?
 function GetLabel(layer, position)
     -- check if generated
     if not NavGenerator.IsGenerated() then
         WarnNoNavMesh()
-        return nil, 'Navigational mesh is not generated'
+        return nil, 'NotGenerated'
     end
 
     -- check layer argument
     local grid = FindGrid(layer)
     if not grid then
-        return nil, 'Invalid layer type - this is likely a typo. The layer is case sensitive'
+        return nil, 'InvalidLayer'
     end
 
     -- check position argument
     local leaf = FindLeaf(grid, position)
     if not leaf then
-        return nil, 'Position is not inside the map'
+        return nil, 'OutsideMap'
     end
 
     if leaf.Label == 0 then
-        return nil, 'Position has no label assigned, report to the maintainers. This should not be possible'
+        return nil, 'SystemError'
     end
 
     if leaf.Label == -1 then
-        return nil, 'Position is unpathable'
+        return nil, 'Unpathable'
     end
 
     return leaf.Label, nil
@@ -568,26 +568,26 @@ end
 --- Returns the metadata of a label.
 ---@param id number
 ---@return NavLabelMetadata?
----@return string?
+---@return ('NotGenerated' | 'InvalidLayer' | 'OutsideMap' | 'SystemError' | 'Unpathable' | 'NoData' )?
 function GetLabelMetadata(id)
     -- check if generated
     if not NavGenerator.IsGenerated() then
         WarnNoNavMesh()
-        return nil, 'Navigational mesh is not generated'
+        return nil, 'NotGenerated'
     end
 
     -- check id argument
     if id == 0 then
-        return nil, 'Invalid layer id - this should not be possible'
+        return nil, 'SystemError'
     end
 
     if id == -1 then
-        return nil, 'Position is unpathable'
+        return nil, 'Unpathable'
     end
 
     local meta = NavGenerator.NavLabels[id]
     if not meta then
-        return nil, 'Invalid layer id - no metadata is assigned to this label'
+        return nil, 'NoData'
     end
 
     return meta, nil
@@ -601,13 +601,13 @@ local DirectionsFromFound = { }
 ---@param origin Vector
 ---@param distance number
 ---@return Vector[] | nil
----@return number | string
+---@return number | ('NotGenerated' | 'OutsideMap' | 'NoResults')
 function DirectionsFrom(layer, origin, distance, sizeThreshold)
 
     -- check if generated
     if not NavGenerator.IsGenerated() then
         WarnNoNavMesh()
-        return nil, 'Navigational mesh is not generated'
+        return nil, 'NotGenerated'
     end
 
     -- setup pathing
@@ -617,7 +617,7 @@ function DirectionsFrom(layer, origin, distance, sizeThreshold)
 
     -- sanity check
     if not originLeaf then
-        return nil, 'outside-map'
+        return nil, 'OutsideMap'
     end
 
     -- local scope for performance
@@ -676,6 +676,11 @@ function DirectionsFrom(layer, origin, distance, sizeThreshold)
     end
 
     -- convert to a series of positions
+    if head <= 1 then
+        return nil, 'NoResults'
+    end
+
+    -- convert to a series of positions
     local positions = { }
     for k = 1, head - 1 do
         local candidate = candidates[k]
@@ -719,13 +724,13 @@ local RandomDirectionFromCandidates = { }
 ---@param origin Vector
 ---@param distance number
 ---@return Vector | nil
----@return string
+---@return ('NotGenerated' | 'OutsideMap' | 'NoResults')?
 function RandomDirectionFrom(layer, origin, distance, sizeThreshold)
 
     -- check if generated
     if not NavGenerator.IsGenerated() then
         WarnNoNavMesh()
-        return nil, 'Navigational mesh is not generated'
+        return nil, 'NotGenerated'
     end
 
     -- setup pathing
@@ -735,7 +740,7 @@ function RandomDirectionFrom(layer, origin, distance, sizeThreshold)
 
     -- sanity check
     if not originLeaf then
-        return nil, 'outside-map'
+        return nil, 'OutsideMap'
     end
 
     -- local scope for performance
@@ -795,7 +800,7 @@ function RandomDirectionFrom(layer, origin, distance, sizeThreshold)
 
     -- convert to a series of positions
     if head <= 1 then
-        return nil, 'no-directions-found'
+        return nil, 'NoResults'
     end
 
     -- retrieve a random candidate
@@ -841,13 +846,13 @@ local EscapeFromCandidates = { }
 ---@param threat Vector
 ---@param distance number
 ---@return Vector | nil
----@return string
+---@return ('NotGenerated' | 'OutsideMap' | 'NoResults')?
 function RetreatDirectionFrom(layer, origin, threat, distance)
 
     -- check if generated
     if not NavGenerator.IsGenerated() then
         WarnNoNavMesh()
-        return nil, 'Navigational mesh is not generated'
+        return nil, 'NotGenerated'
     end
 
     -- setup pathing
@@ -857,7 +862,7 @@ function RetreatDirectionFrom(layer, origin, threat, distance)
 
     -- sanity check
     if not originLeaf then
-        return nil, 'outside-map'
+        return nil, 'OutsideMap'
     end
 
     -- compute direction we're trying to threat
@@ -931,7 +936,7 @@ function RetreatDirectionFrom(layer, origin, threat, distance)
 
     -- convert to a series of positions
     if head <= 1 then
-        return nil, 'no-directions-found'
+        return nil, 'NoResults'
     end
 
     -- retrieve a random candidate
@@ -975,12 +980,12 @@ local DirectionToPath = { }
 ---@param origin Vector
 ---@param destination Vector
 ---@return Vector?              
----@return string | number      
+---@return ('SystemError' | 'NotGenerated' | 'InvalidLayer' | 'OutsideMap' | 'OriginOutsideMap' | 'OriginUnpathable' | 'DestinationOutsideMap' | 'DestinationUnpathable' | 'Unpathable') | number      
 function DirectionTo(layer, origin, destination, distance)
     -- check if generated
     if not NavGenerator.IsGenerated() then
         WarnNoNavMesh()
-        return nil, 'Navigational mesh is not generated'
+        return nil, 'NotGenerated'
     end
 
     -- check if we can path
@@ -1040,7 +1045,7 @@ function DirectionTo(layer, origin, destination, distance)
 
     -- check if we found a path
     if not destinationLeaf.Seen == seenIdentifier then
-        return nil, 'Did not manage to find the destination'
+        return nil, 'SystemError'
     end
 
     -- construct 
