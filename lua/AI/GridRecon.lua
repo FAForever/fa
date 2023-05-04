@@ -3,7 +3,7 @@ local Grid = import("/lua/ai/grid.lua").Grid
 local TableInsert = table.insert
 local TableSort = table.sort
 
-local Debug = true
+local Debug = false
 function EnableDebugging()
     if ScenarioInfo.GameHasAIs or CheatsEnabled() then
         Debug = true
@@ -25,9 +25,8 @@ local DebugCellData = {
     LossOfLOSNow = -1,
 }
 
----@type GridReconUIDebugUpdate
 local DebugUpdateData = {
-    Time = -1,
+    Time = -1
 }
 
 ---@param a AIGridReconCell
@@ -238,6 +237,13 @@ GridRecon = Class(Grid) {
                 local mouse = GetMouseWorldPos()
                 local bx, bz = self:ToGridSpace(mouse[1], mouse[3])
                 local cell = self.Cells[bx][bz]
+
+                DebugCellData.LossOfLOSNow = cell.LossOfReconType.LOSNow
+                DebugCellData.LossOfOmni = cell.LossOfReconType.Omni
+                DebugCellData.LossOfRadar = cell.LossOfReconType.Radar
+                DebugCellData.LossOfRecon = cell.LossOfRecon
+                DebugCellData.LossOfSonar = cell.LossOfReconType.Sonar
+                Sync.GridReconUIDebugCell = DebugCellData
 
                 self:DrawCell(bx, bz, 0, 'ffffff')
 

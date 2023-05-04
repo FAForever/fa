@@ -371,6 +371,8 @@ keyActions = {
         category = 'debug', order = 24},
     ['toggle_ai_reclaim_grid_ui'] = {action = 'UI_Lua import("/lua/ui/game/gridreclaim.lua").OpenWindow()',
         category = 'debug', order = 24},
+    ['toggle_ai_recon_grid_ui'] = {action = 'UI_Lua import("/lua/ui/game/gridrecon.lua").OpenWindow()',
+        category = 'debug', order = 24},
     ['toggle_ai_economy_ui'] = {action = 'UI_Lua import("/lua/ui/game/AIBrainEconomyData.lua").OpenWindow()',
         category = 'debug', order = 24},
     ['toggle_profiler_window'] = {action = 'UI_Lua import("/lua/ui/game/profiler.lua").OpenWindow()',
