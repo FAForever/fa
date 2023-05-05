@@ -1125,6 +1125,10 @@ float4 DecalsNormalsPS( VS_OUTPUT inV, uniform bool alphablend ) : COLOR
     float3 decalNormal;
     decalNormal.xz = decalRaw.ag * 2 - 1;
     decalNormal.y = sqrt(1 - dot(decalNormal.xz,decalNormal.xz));
+    // decals are not interpolated correctly with the ground, so we have to improvise by
+    // making them partially transparent and stronger to counteract the transparency
+    float factor = 2.0;
+    decalNormal = normalize(float3(decalNormal.x * factor, decalNormal.y, decalNormal.z * factor));
 
     // rotate the decalnormal by the decal matrix to get the decal into world space
     // from tangent space
@@ -1136,7 +1140,7 @@ float4 DecalsNormalsPS( VS_OUTPUT inV, uniform bool alphablend ) : COLOR
 
     // get decal normal back into 0..1 range and output
     decalNormal = (decalNormal * 0.5) + 0.5;
-    return float4( decalNormal.xzy,  blendFactor * decalMask.w * DecalAlpha);
+    return float4( decalNormal.xzy,  blendFactor * decalMask.w * DecalAlpha / factor);
 }
 
 
