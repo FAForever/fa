@@ -40,7 +40,7 @@ AIBuilder = ClassSimple {
             for k, data in template.BuilderConditions do
                 -- pre-import the function
                 ---@type function
-                local func = import(data[1])[2]
+                local func = import(data[1])[data[2]]
 
                 -- re-create the condition
                 conditions[k] = { func, data[3] }

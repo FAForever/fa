@@ -1,10 +1,12 @@
-local BaseManager = import("/lua/aibrains/managers/base-manager.lua")
+
+-- load builder systems
+doscript '/lua/aibrains/templates/base/base-template.lua'
+doscript '/lua/aibrains/templates/builder-groups/builder-group-template.lua'
+doscript '/lua/aibrains/templates/builders/builder-template.lua'
 
 local StandardBrain = import("/lua/aibrain.lua").AIBrain
 local EconomyComponent = import("/lua/aibrains/components/economy.lua").AIBrainEconomyComponent
-
--- TO GET RID OF
-local BrainConditionsMonitor = import("/lua/sim/brainconditionsmonitor.lua")
+local BaseManager = import("/lua/aibrains/managers/base-manager.lua")
 
 ---@class EasyAIBrainManagers
 ---@field FactoryManager AIFactoryManager
@@ -45,6 +47,8 @@ AIBrain = Class(StandardBrain, EconomyComponent) {
         self.BuilderManagers = {
             MAIN = main
         }
+
+        self.BaseTemplates = { }
 
         self:IMAPConfiguration()
     end,
@@ -189,6 +193,16 @@ AIBrain = Class(StandardBrain, EconomyComponent) {
             platoon:OnUnitsAddedToSupportSquad(units)
         end
     end,
+
+    ---------------------------------------------
+    -- Builders
+
+    ---@param self EasyAIBrain
+    ---@param template AIBaseTemplate
+    LoadBaseTemplate = function(self, template)
+
+    end,
+
 
     ---------------------------------------------
     -- Unit events
