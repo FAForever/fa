@@ -1704,8 +1704,10 @@ float4 TerrainNormalsExtendedPS ( VerticesExtended pixel ) : COLOR
     float cameraFractionFurtherOut = 0.3 + 0.7 * clamp(0.001 * CameraPosition.y, 0, 1);
 
     // combine them
-    float4 normal = (2 * lowerNormal - 1);
-    normal = UDNBlending(normal, (2 * lowerNormalNear - 1),          cameraFractionNear);
+    float fractionLower = (1 - mask0.x)*(1 - mask0.y)*(1 - mask0.z)*(1 - mask0.w)*(1 - mask1.x)*(1 - mask1.y)*(1 - mask1.z)*(1 - mask1.w);
+    float4 normal = float4(0, 0, 1, 0);
+    normal = UDNBlending(normal, (2 * lowerNormal - 1),              fractionLower);
+    normal = UDNBlending(normal, (2 * lowerNormalNear - 1),          fractionLower * cameraFractionNear);
     normal = UDNBlending(normal, (2 * stratum0Normal - 1),           mask0.x);
     normal = UDNBlending(normal, (2 * stratum0NormalNear - 1),       mask0.x * cameraFractionNear);
     normal = UDNBlending(normal, (2 * stratum1Normal - 1),           mask0.y);
