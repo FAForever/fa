@@ -1721,7 +1721,7 @@ float4 TerrainNormalsExtendedPS ( VerticesExtended pixel ) : COLOR
     normal = UDNBlending(normal, (2 * stratum6Normal - 1),           mask1.z); 
     normal = UDNBlending(normal, (2 * stratum6NormalOut - 1),        mask1.z * cameraFractionOut);
     normal = UDNBlending(normal, (2 * stratum6NormalNear - 1),       mask1.z * cameraFractionNear); 
-    normal = UDNBlending(normal, (2 * stratum7Normal - 1),           mask0.w);
+    normal = UDNBlending(normal, (2 * stratum7Normal - 1),           mask1.w);
     normal = UDNBlending(normal, (2 * stratum7NormalOut - 1),        mask1.w * cameraFractionOut);
     normal = UDNBlending(normal, (2 * stratum7NormalFurtherOut - 1), mask1.w * cameraFractionFurtherOut);
     normal = UDNBlending(normal, (2 * stratum7NormalNear - 1),       mask1.w * cameraFractionNear); 
