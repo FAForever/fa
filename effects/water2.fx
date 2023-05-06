@@ -365,7 +365,7 @@ float4 HighFidelityPS( VS_OUTPUT inV,
 
     // get the correct coordinate for sampling refraction and reflection
     float2 refractionPos = screenPos;
-    refractionPos -=  refractionScale * N.xz * OneOverW;
+    refractionPos -= sqrt(waterDepth) * refractionScale * N.xz * OneOverW;
 
 	// keep in mind the alpha channel holds the unit parts above water
 	// specifically the alpha channel of that unit's shader
