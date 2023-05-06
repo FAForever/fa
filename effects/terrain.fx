@@ -1670,8 +1670,8 @@ float4 TerrainNormalsExtendedPS ( VerticesExtended pixel ) : COLOR
     float2 uvZ = coords.xy; // z facing plane
 
     // pre-fetch mask information
-    float4 mask0 = saturate(tex2D(UtilitySamplerA, position.xy)*2-1);
-    float4 mask1 = saturate(tex2D(UtilitySamplerB, position.xy)*2-1);
+    float4 mask0 = tex2D(UtilitySamplerA, position.xy);
+    float4 mask1 = tex2D(UtilitySamplerB, position.xy);
 
     // load in normals
     float4 lowerNormal      = tex2D(LowerNormalSampler,    position.xy * LowerNormalTile.xy   );
@@ -1743,9 +1743,8 @@ float4 TTerrainAlbedoExtendedPS ( VerticesExtended pixel) : COLOR
     // do arthmetics to get range from (0, 1) to (-1, 1) as normal maps store their values as (0, 1)
     float3 normal = normalize(2 * SampleScreen(NormalSampler,pixel.mTexSS).xyz - 1);
 
-    float4 mask0 = saturate(tex2D(UtilitySamplerA, position.xy)*2-1);
-    float4 mask1 = saturate(tex2D(UtilitySamplerB, position.xy)*2-1);
-    float4 mask2 = saturate(tex2D(UtilitySamplerC, position.xy));
+    float4 mask0 = tex2D(UtilitySamplerA, position.xy);
+    float4 mask1 = tex2D(UtilitySamplerB, position.xy);
 
     float4 lowerAlbedo    = tex2D(LowerAlbedoSampler,    position.xy * LowerAlbedoTile.xy);
     float4 stratum0Albedo = tex2D(Stratum0AlbedoSampler, position.xy * Stratum0AlbedoTile.xy);
