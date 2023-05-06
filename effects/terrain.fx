@@ -1767,6 +1767,7 @@ float4 TTerrainAlbedoExtendedPS ( VerticesExtended pixel) : COLOR
     float4 stratum5Albedo = tex2D(Stratum5AlbedoSampler, position.xy * Stratum5AlbedoTile.xy);
     float4 stratum6Albedo = tex2D(Stratum6AlbedoSampler, position.xy * Stratum6AlbedoTile.xy);
     float4 stratum7Albedo = tex2D(Stratum7AlbedoSampler, position.xy * Stratum7AlbedoTile.xy);
+    float4 upperAlbedo    = tex2D(UpperAlbedoSampler,    position.xy * UpperAlbedoTile.xy);
 
     float4 lowerAlbedoNear    = tex2D(LowerAlbedoSampler,    3 * position.xy * LowerAlbedoTile.xy);
     float4 stratum0AlbedoNear = tex2D(Stratum0AlbedoSampler, 3 * position.xy * Stratum0AlbedoTile.xy);
@@ -1795,11 +1796,6 @@ float4 TTerrainAlbedoExtendedPS ( VerticesExtended pixel) : COLOR
     float4 s6ABrightness = tex2Dgrad(Stratum6AlbedoSampler, position.xy * Stratum6AlbedoTile.xy, ddx, ddy);
     float4 s7ABrightness = tex2Dgrad(Stratum7AlbedoSampler, position.xy * Stratum7AlbedoTile.xy, ddx, ddy);
 
-    // load in utility map
-    float4 properties = tex2D(UpperAlbedoSampler, coords.xz);
-    float shadowSample = (1 - (properties.x));    // TODO: adjust texture in generator
-    float ambientSample = 0.5 + 0.5 * properties.y;
-
     float cameraFractionNear = 1 - clamp(0.01 * (CameraPosition.y - 20), 0, 1);
     float cameraFractionOut = clamp(0.001 * (CameraPosition.y - 250), 0, 1);
     float cameraFractionFurtherOut = clamp(0.001 * (CameraPosition.y - 800), 0, 1);
@@ -1825,6 +1821,7 @@ float4 TTerrainAlbedoExtendedPS ( VerticesExtended pixel) : COLOR
     albedo = CorrectedAddition(albedo, stratum7AlbedoOut, s7ABrightness, mask1.w * cameraFractionOut);
     albedo = CorrectedAddition(albedo, stratum7AlbedoFurtherOut, s7ABrightness, mask1.w * cameraFractionFurtherOut);
     albedo = CorrectedAddition(albedo, stratum7AlbedoNear, s7ABrightness, mask1.w * cameraFractionNear); 
+    albedo.rgb = lerp(albedo.xyz,upperAlbedo.xyz,upperAlbedo.w);
 
     float3 r = reflect(normalize(pixel.mViewDirection),normal);
     float3 specular = pow(saturate(dot(r,SunDirection)),80)*albedo.aaa*SpecularColor.a*SpecularColor.rgb;
