@@ -14,11 +14,6 @@ local BrainConditionsMonitor = import("/lua/sim/brainconditionsmonitor.lua")
 local EngineerManager = import("/lua/sim/engineermanager.lua")
 
 local SUtils = import("/lua/ai/sorianutilities.lua")
-local StratManager = import("/lua/sim/strategymanager.lua")
-local TransferUnitsOwnership = import("/lua/simutils.lua").TransferUnitsOwnership
-local TransferUnfinishedUnitsAfterDeath = import("/lua/simutils.lua").TransferUnfinishedUnitsAfterDeath
-local CalculateBrainScore = import("/lua/sim/score.lua").CalculateBrainScore
-local Factions = import('/lua/factions.lua').GetFactions(true)
 
 -- upvalue for performance
 local BrainGetUnitsAroundPoint = moho.aibrain_methods.GetUnitsAroundPoint
@@ -372,10 +367,6 @@ AIBrain = Class(StandardBrain) {
                     v.FactoryManager:Destroy()
                     v.PlatoonFormManager:SetEnabled(false)
                     v.PlatoonFormManager:Destroy()
-                    if v.StrategyManager then
-                        v.StrategyManager:SetEnabled(false)
-                        v.StrategyManager:Destroy()
-                    end
                     self.BuilderManagers[k] = nil
                     self.NumBases = self.NumBases - 1
                     needSort = true
@@ -555,7 +546,6 @@ AIBrain = Class(StandardBrain) {
             FactoryManager = FactoryManager.CreateFactoryBuilderManager(self, baseName, position, radius, useCenter),
             PlatoonFormManager = PlatoonFormManager.CreatePlatoonFormManager(self, baseName, position, radius, useCenter),
             EngineerManager = EngineerManager.CreateEngineerManager(self, baseName, position, radius),
-            StrategyManager = StratManager.CreateStrategyManager(self, baseName, position, radius),
             BuilderHandles = {},
             Position = position,
             BaseType = Scenario.MasterChain._MASTERCHAIN_.Markers[baseName].type or 'MAIN',
@@ -573,105 +563,6 @@ AIBrain = Class(StandardBrain) {
             unitCount = unitCount + TableGetn(v.EngineerManager:GetEngineersBuildingCategory(category, categories.ALLUNITS))
         end
         return unitCount
-    end,
-
-    ---@param self BaseAIBrain
-    GetFactoriesBeingBuilt = function(self)
-        local unitCount = 0
-
-        -- Units queued up
-        for k, v in self.BuilderManagers do
-            unitCount = unitCount + TableGetn(v.EngineerManager:GetEngineersQueued('T1LandFactory'))
-        end
-        return unitCount
-    end,
-
-    ---@param self BaseAIBrain
-    UnderEnergyThreshold = function(self)
-        self:SetupOverEnergyStatTrigger(0.1)
-        for k, v in self.BuilderManagers do
-           v.EngineerManager:LowEnergy()
-        end
-    end,
-
-    ---@param self BaseAIBrain
-    OverEnergyThreshold = function(self)
-        self:SetupUnderEnergyStatTrigger(0.05)
-        for k, v in self.BuilderManagers do
-            v.EngineerManager:RestoreEnergy()
-        end
-    end,
-
-    ---@param self BaseAIBrain
-    UnderMassThreshold = function(self)
-        self:SetupOverMassStatTrigger(0.1)
-        for k, v in self.BuilderManagers do
-            v.EngineerManager:LowMass()
-        end
-    end,
-
-    ---@param self BaseAIBrain
-    OverMassThreshold = function(self)
-        self:SetupUnderMassStatTrigger(0.05)
-        for k, v in self.BuilderManagers do
-            v.EngineerManager:RestoreMass()
-        end
-    end,
-
-    ---@param self BaseAIBrain
-    ---@param threshold number
-    SetupUnderEnergyStatTrigger = function(self, threshold)
-        import("/lua/scenariotriggers.lua").CreateArmyStatTrigger(self.UnderEnergyThreshold, self, 'SkirmishUnderEnergyThreshold',
-            {
-                {
-                    StatType = 'Economy_Ratio_Energy',
-                    CompareType = 'LessThanOrEqual',
-                    Value = threshold,
-                },
-            }
-        )
-    end,
-
-    ---@param self BaseAIBrain
-    ---@param threshold number
-    SetupOverEnergyStatTrigger = function(self, threshold)
-        import("/lua/scenariotriggers.lua").CreateArmyStatTrigger(self.OverEnergyThreshold, self, 'SkirmishOverEnergyThreshold',
-            {
-                {
-                    StatType = 'Economy_Ratio_Energy',
-                    CompareType = 'GreaterThanOrEqual',
-                    Value = threshold,
-                },
-            }
-        )
-    end,
-
-    ---@param self BaseAIBrain
-    ---@param threshold number
-    SetupUnderMassStatTrigger = function(self, threshold)
-        import("/lua/scenariotriggers.lua").CreateArmyStatTrigger(self.UnderMassThreshold, self, 'SkirmishUnderMassThreshold',
-            {
-                {
-                    StatType = 'Economy_Ratio_Mass',
-                    CompareType = 'LessThanOrEqual',
-                    Value = threshold,
-                },
-            }
-        )
-    end,
-
-    ---@param self BaseAIBrain
-    ---@param threshold number
-    SetupOverMassStatTrigger = function(self, threshold)
-        import("/lua/scenariotriggers.lua").CreateArmyStatTrigger(self.OverMassThreshold, self, 'SkirmishOverMassThreshold',
-            {
-                {
-                    StatType = 'Economy_Ratio_Mass',
-                    CompareType = 'GreaterThanOrEqual',
-                    Value = threshold,
-                },
-            }
-        )
     end,
 
     ---@param self BaseAIBrain
@@ -3318,6 +3209,130 @@ AIBrain = Class(StandardBrain) {
         local AIAttackUtils = import("/lua/ai/aiattackutilities.lua")
         AIAttackUtils.NavalAttackCheck(self)
 
+    end,
+
+    ---------------------------------------------
+    -- Unit events
+
+    --- Retrieves the nearest base for the given position
+    ---@param self BaseAIBrain
+    ---@param position Vector
+    ---@return string?
+    FindNearestBaseIdentifier = function(self, position)
+        local ux, _, uz = position[1], nil, position[3]
+        local nearestManagerIdentifier = nil
+        local nearestDistance = nil
+        for id, managers in self.BuilderManagers do
+            if nearestManagerIdentifier then
+                local location = managers.FactoryManager.Location
+                local dx, dz = location[1] - ux, location[3] - uz
+                local distance = dx * dx + dz * dz
+                if distance < nearestDistance then
+                    nearestDistance = distance
+
+                    nearestManagerIdentifier = id
+                end
+            else
+                local location = managers.FactoryManager.Location
+                local dx, dz = location[1] - ux, location[3] - uz
+                nearestDistance = dx * dx + dz * dz
+                nearestManagerIdentifier = id
+            end
+        end
+
+        return nearestManagerIdentifier
+    end,
+
+    --- Called by a unit as it starts being built
+    ---@param self BaseAIBrain
+    ---@param unit Unit
+    ---@param builder Unit  
+    ---@param layer Layer
+    OnUnitStartBeingBuilt = function(self, unit, builder, layer)
+        StandardBrain.OnUnitStartBeingBuilt(self, unit, builder, layer)
+
+        -- find nearest base
+        local nearestBaseIdentifier = builder.AIManagerIdentifier or self:FindNearestBaseIdentifier(unit:GetPosition())
+        unit.AIManagerIdentifier = nearestBaseIdentifier
+
+        -- register unit at managers of base
+        local managers = self.BuilderManagers[nearestBaseIdentifier]
+        if managers then
+            managers.EngineerManager:OnUnitStartBeingBuilt(unit, builder, layer)
+        end
+    end,
+
+    --- Called by a unit as it is finished being built
+    ---@param self BaseAIBrain
+    ---@param unit Unit
+    ---@param builder Unit
+    ---@param layer Layer
+    OnUnitStopBeingBuilt = function(self, unit, builder, layer)
+        StandardBrain.OnUnitStopBeingBuilt(self, unit, builder, layer)
+
+        local baseIdentifier = unit.AIManagerIdentifier
+        if not baseIdentifier then
+            baseIdentifier = self:FindNearestBaseIdentifier(unit:GetPosition())
+            unit.AIManagerIdentifier = baseIdentifier
+        end
+
+        local managers = self.BuilderManagers[baseIdentifier]
+        if managers then
+            managers.EngineerManager:OnUnitStopBeingBuilt(unit, builder, layer)
+        end
+    end,
+
+    --- Called by a unit as it is destroyed
+    ---@param self BaseAIBrain
+    ---@param unit Unit
+    OnUnitDestroyed = function(self, unit)
+        StandardBrain.OnUnitDestroyed(self, unit)
+
+        local baseIdentifier = unit.AIManagerIdentifier
+        if not baseIdentifier then
+            return
+        end
+
+        local managers = self.BuilderManagers[baseIdentifier]
+        if managers then
+            managers.EngineerManager:OnUnitStopBeingBuilt(unit)
+        end
+    end,
+
+    --- Called by a unit as it starts building
+    ---@param self BaseAIBrain
+    ---@param unit Unit
+    ---@param built Unit
+    OnUnitStartBuilding = function(self, unit, built)
+        StandardBrain.OnUnitStartBuilding(self, unit, built)
+
+        local baseIdentifier = unit.AIManagerIdentifier
+        if not baseIdentifier then
+            return
+        end
+
+        local managers = self.BuilderManagers[baseIdentifier]
+        if managers then
+            managers.EngineerManager:OnUnitStartBuilding(unit)
+        end
+    end,
+
+    --- Called by a unit as it stops building
+    ---@param self BaseAIBrain
+    ---@param unit Unit
+    ---@param built Unit
+    OnUnitStopBuilding = function(self, unit, built)
+        StandardBrain.OnUnitStopBuilding(self, unit, built)
+        
+        local baseIdentifier = unit.AIManagerIdentifier
+        if not baseIdentifier then
+            return
+        end
+
+        local managers = self.BuilderManagers[baseIdentifier]
+        if managers then
+            managers.EngineerManager:OnUnitStopBuilding(unit)
+        end
     end,
 }
 
