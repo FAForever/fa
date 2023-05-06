@@ -2268,6 +2268,23 @@ BaseTransport = ClassSimple {
             end
         end
 
+        --any ACU : Cybran, Aeon, Seraphim, Uef
+        if SessionIsReplay() and EntityCategoryContains(categories.COMMAND, unit) then
+            -- prepare sync
+            local sync = Sync
+            local events = sync.Events or { }
+            sync.Events = events
+            local AcuEntersTransporter = events.ACUEntersTransporter or { }
+            events.ACUEntersTransporter = AcuEntersTransporter
+
+            -- sync the event
+            table.insert(AcuEntersTransporter, {
+                Timestamp = GetGameTimeSeconds(),
+                ACUArmyID = unit.Army
+            })
+        end
+
+
         unit:OnAttachedToTransport(self, attachBone)
     end,
 
