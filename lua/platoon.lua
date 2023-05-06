@@ -2211,6 +2211,7 @@ Platoon = Class(moho.platoon_methods) {
             self:PlatoonDisband()
             return
         end
+
         if cons.NearUnitCategory then
             self:SetPrioritizedTargetList('support', {ParseEntityCategory(cons.NearUnitCategory)})
             local unitNearBy = self:FindPrioritizedUnit('support', 'Ally', false, self:GetPlatoonPosition(), cons.NearUnitRadius or 50)
