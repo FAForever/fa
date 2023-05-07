@@ -903,5 +903,8 @@ keyActions = {
         category = 'ai', order = 24},
     ['toggle_ai_economy_ui'] = {action = 'UI_Lua import("/lua/ui/game/AIBrainEconomyData.lua").OpenWindow()',
         category = 'ai', order = 24},
+
+    ['toggle_selection_lock'] = {action = 'UI_Lua import("/lua/ui/game/selection.lua").ToggleLockoutSelection()',
+        category = 'selectionDeprioritize', order = 24},
     
 }

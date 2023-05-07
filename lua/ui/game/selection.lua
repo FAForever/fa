@@ -437,7 +437,7 @@ end
 
 ---@param oldSelection UserUnit[]
 ---@param splits UserUnit[][]
-local function SetupStaticSplits(oldSelection, splits)
+function SetupStaticSplits(oldSelection, splits)
     OldSelection = oldSelection
     SplitType = 'Static'
 
@@ -448,7 +448,7 @@ end
 
 ---@param oldSelection any
 ---@param func fun(): UserUnit[]?
-local function SetupDynamicSplits(oldSelection, func)
+function SetupDynamicSplits(oldSelection, func)
     OldSelection = oldSelection
     SplitType = 'Dynamic'
 
@@ -891,3 +891,44 @@ function SplitIntoGroups(size)
         SetupDynamicSplits(units, func)
     end
 end
+
+----------------------------------------------------------------------------------
+-- selection deprioritize
+
+--- Automatically removes the `LockedOutOfSelection` flag when the user unit is idle
+---@param userUnit UserUnit
+local function UnlockWhenIdleThread(userUnit)
+    LOG("UnlockWhenIdleThread")
+    WaitSeconds(1.0)
+
+    while not IsDestroyed(userUnit) and (userUnit:GetArmy() == GetFocusArmy()) do
+        if userUnit:IsIdle() then
+            userUnit.LockedOutOfSelection = nil
+            return
+        end
+
+        WaitSeconds(1.0)
+    end
+end
+
+--- Toggles the `LockedOutOfSelection` flag for the selected user units
+function ToggleLockoutSelection ()
+    LOG("ToggleLockoutSelection")
+    local userUnits = GetSelectedUnits()
+
+    for k, userUnit in userUnits do 
+        if userUnit.LockedOutOfSelection then
+            -- remove the lock
+            userUnit.LockedOutOfSelection = nil
+            if userUnit.LockedOutOfSelectionThread then
+                KillThread(userUnit.LockedOutOfSelectionThread)
+                userUnit.LockedOutOfSelectionThread = nil
+            end
+        else
+            -- apply the lock
+            userUnit.LockedOutOfSelection = true
+            userUnit.LockedOutOfSelectionThread = ForkThread(UnlockWhenIdleThread, userUnit)
+        end
+    end
+end
+

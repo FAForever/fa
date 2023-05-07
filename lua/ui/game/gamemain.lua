@@ -36,11 +36,6 @@ local sendChat = import("/lua/ui/game/chat.lua").ReceiveChatFromSim
 local oldData = {}
 local lastObserving
 
-local ignoreSelection = false
-function SetIgnoreSelection(ignore)
-    ignoreSelection = ignore
-    import("/lua/ui/game/commandmode.lua").SetIgnoreSelection(ignore)
-end
 
 -- generating hotbuild modifier shortcuts on the fly
 modifiersKeys = import("/lua/keymap/keymapper.lua").GenerateHotbuildModifiers()
@@ -526,172 +521,6 @@ function AddOnUIDestroyedFunction(func)
     table.insert(OnDestroyFuncs, func)
 end
 
--- Function to remove low priority units from a selection which includes units other than low priority ones
-function DeselectSelens(selection)
-    local LowPriorityUnits = false
-    local otherUnits = false
-
-    -- Find any units with the low priority flag
-    for id, unit in selection do
-        -- Stupid-ass UnitData table uses string number IDs as keys
-        if UnitData[unit:GetEntityId()].LowPriority then
-            LowPriorityUnits = true
-        else
-            if not otherUnits then otherUnits = {} end -- Ugly hack to make later logic easier
-            table.insert(otherUnits, unit)
-        end
-    end
-
-    -- Return original selection with no-change key if nothing has changed
-    if (otherUnits and not LowPriorityUnits) or (not otherUnits and LowPriorityUnits) then
-        return selection, false
-    end
-
-    return otherUnits, true
-end
-
---- A cache used with ObserveSelection to prevent continious table allocations
-local cachedSelection = {
-    oldSelection = { },
-    newSelection = { },
-    added = { },
-    removed = { },
-}
-
---- Observable to allow mods to do something with a new selection
-ObserveSelection = import("/lua/shared/observable.lua").Create()
-
--- This function is called whenever the set of currently selected units changes
--- See /lua/unit.lua for more information on the lua unit object
--- @param oldSelection: What the selection was before
--- @param newSelection: What the selection is now
--- @param added: Which units were added to the old selection
--- @param removed: Which units where removed from the old selection
-local hotkeyLabelsOnSelectionChanged = false
-local upgradeTab = false
-function OnSelectionChanged(oldSelection, newSelection, added, removed)
-
-    if ignoreSelection then
-        return
-    end
-
-    if import("/lua/ui/game/selection.lua").IsHidden() then
-        return
-    end
-
-    -- populate observable and send out a notification
-    cachedSelection.oldSelection = oldSelection
-    cachedSelection.newSelection = newSelection
-    cachedSelection.added = added
-    cachedSelection.removed = removed
-    ObserveSelection:Set(cachedSelection)
-
-    if not hotkeyLabelsOnSelectionChanged then
-        hotkeyLabelsOnSelectionChanged = import("/lua/keymap/hotkeylabels.lua").onSelectionChanged
-    end
-    if not upgradeTab then
-        upgradeTab = import("/lua/keymap/upgradetab.lua").upgradeTab
-    end
-
-    -- Deselect Selens if necessary. Also do work on Hotbuild labels
-    local changed = false -- Prevent recursion
-    if newSelection and not table.empty(newSelection) then
-        newSelection, changed = DeselectSelens(newSelection)
-
-        if changed then
-            ForkThread(function()
-                SelectUnits(newSelection)
-            end)
-            return
-        end
-
-        -- This bit is for the Hotbuild labels. See the buildActionUpgrade() function in hotbuild.lua for a bit more
-        -- documentation
-        local bp = newSelection[1]:GetBlueprint()
-        local upgradesTo = nil
-        local potentialUpgrades = upgradeTab[bp.BlueprintId] or {bp.General.UpgradesTo}
-        if potentialUpgrades then
-            local availableOrders, availableToggles, buildableCategories = GetUnitCommandData(newSelection)
-            for _, upgr in potentialUpgrades do
-                if EntityCategoryContains(buildableCategories, upgr) then
-                    upgradesTo = upgr
-                    break
-                end
-                local nextSuccessiveUpgrade = __blueprints[upgr].General.UpgradesTo
-                while nextSuccessiveUpgrade do
-                    -- Note: Should we ever add a structure that has different upgrade path choices on a non-base
-                    -- version of the structure, e.g. different choices for the 4th cybran shield upgrade or something
-                    -- like it, the way we find the correct icon to put the hotbuild upgrade keybind label using this
-                    -- while loop will break. As there currently is no such structure in the game, and I don't know how
-                    -- the general case of finding that correct icon should work in such an imaginary case, I'll leave
-                    -- it at this, currently working, code.
-                    if EntityCategoryContains(buildableCategories, nextSuccessiveUpgrade) then
-                        upgradesTo = nextSuccessiveUpgrade
-                        break
-                    end
-                    nextSuccessiveUpgrade = __blueprints[nextSuccessiveUpgrade].General.UpgradesTo
-                end
-            end
-        end
-
-        if upgradesTo and upgradesTo:len() < 7 then
-            upgradesTo = nil
-        end
-        local isFactory = newSelection[1]:IsInCategory("FACTORY")
-        hotkeyLabelsOnSelectionChanged(upgradesTo, isFactory)
-    end
-
-    local availableOrders, availableToggles, buildableCategories = GetUnitCommandData(newSelection)
-    local isOldSelection = table.equal(oldSelection, newSelection)
-
-    if not gameUIHidden then
-        if not isReplay then
-            import("/lua/ui/game/orders.lua").SetAvailableOrders(availableOrders, availableToggles, newSelection)
-        end
-        -- TODO change the current command mode if no longer available? or set to nil?
-        import("/lua/ui/game/construction.lua").OnSelection(buildableCategories,newSelection,isOldSelection)
-    end
-
-    if not isOldSelection then
-        import("/lua/ui/game/selection.lua").PlaySelectionSound(added)
-        import("/lua/ui/game/rallypoint.lua").OnSelectionChanged(newSelection)
-        if Prefs.GetFromCurrentProfile('options.repeatbuild') == 'On' then
-            local factories = EntityCategoryFilterDown(categories.STRUCTURE * categories.FACTORY, added) -- find all newly selected factories
-            for _, factory in factories do
-                if not factory.HasBeenSelected then
-                    factory:ProcessInfo('SetRepeatQueue','true')
-                    factory.HasBeenSelected = true
-                end
-            end
-        end
-
-    end
-
-    if newSelection then
-        local n = table.getn(newSelection)
-
-        -- if something died in selection, restore command mode
-        if n > 0 and not table.empty(removed) and table.empty(added) then
-            local CM = import("/lua/ui/game/commandmode.lua")
-            local mode, data = unpack(CM.GetCommandMode())
-
-            if mode then
-                ForkThread(function()
-                    CM.StartCommandMode(mode, data)
-                end)
-            end
-        end
-    end
-
-    import("/lua/ui/game/unitview.lua").OnSelection(newSelection)
-end
-
-function OnQueueChanged(newQueue)
-    if not gameUIHidden then
-        import("/lua/ui/game/construction.lua").OnQueueChanged(newQueue)
-    end
-end
-
 -- Called after the Sim has confirmed the game is indeed paused. This will happen
 -- on everyone's machine in a network game.
 function OnPause(pausedBy, timeoutsRemaining)
@@ -1088,5 +917,398 @@ SendChat = function()
             end
         end
         WaitSeconds(0.1)
+    end
+end
+
+-----------------------------------------------------------------------------------------------
+--- Selection related functionality
+--- 
+--- There's a tricky flow going on in this section. It is important to understand it before you
+--- try to interact with it.
+---
+--- The goal is to filter the selection based on some preferences. The flow that is the engine
+--- walks through is:
+---
+--- - (1) (engine)  Selection event: either through `SelectUnits` or the user selecting units
+--- - (2) (engine)  Filtering of selection: this is where the engine excludes engineers
+--- - (3) (Lua)     Selection changed event: the call to `OnSelectionChanged`
+---
+--- We can not access step (2) to add our own filtering based on some preferences. Therefore we 
+--- introduced our own, adjusted flow:
+---
+--- - (1) (engine)  Selection event: either through `SelectUnits` or the user selecting units
+--- - (2) (engine)  Filtering of selection: this is where the engine excludes engineers
+--- - (3) (Lua)     Filtering of selection in Lua via `OnSelectionChanged`
+--- - (4) (engine)  Selection event through `SelectUnits`
+--- - (5) (engine)  Filtering of selection
+--- - (6) (Lua)     Selection changed event: the second call to `OnSelectionChanged` with the 
+---                     correct selection
+--- 
+--- But the complexity doesn't end there: there are a lot of mods that hook the `OnSelectionChanged`
+--- function which is now being called multiple times, with wrong parameters! As an example, the
+--- following parameters make no sense in the new flow:
+---
+--- - `added`: list of units that are introduced
+--- - `removed`: list of units that are removed
+--- - `oldSelection`: list of units that we previously selected
+---
+--- These parameters make no sense because they are applied between steps 3 and 6, which is therefore 
+--- no longer representative of the actual changes. 
+---
+--- And all of that on top of various strange hooks and calls that makes this function a gigantic mess.
+
+local hotkeyLabelsOnSelectionChanged = false
+local upgradeTab = import("/lua/keymap/upgradetab.lua").upgradeTab
+
+--- allows us to ignore the depriorization phase
+local ignoreDeprio = false
+function SetIgnoreDeprio()
+    ignoreDeprio = true
+end
+
+-- allows us to entirely ignore the selection event
+local ignoreSelection = false
+function SetIgnoreSelection(ignore)
+    ignoreSelection = ignore
+    import("/lua/ui/game/commandmode.lua").SetIgnoreSelection(ignore)
+end
+
+--- Deselects units by their layer type
+---@param selection UserUnit[]
+---@param count number
+---@return UserUnit[]
+---@return number
+function DeselectByLayer(selection, count)
+    local filter = 'L+N/A'
+
+    local units, unitCount
+    if filter == 'L+N/A' then
+        -- find and return land or naval units
+        units = EntityCategoryFilterDown(categories.LAND + categories.AMPHIBIOUS + categories.NAVAL + categories.HOVER, selection)
+        unitCount = table.getn(units)
+
+        if unitCount > 0 then
+            return units, unitCount
+        end
+
+        -- find and return air units
+        units = EntityCategoryFilterDown(categories.AIR, selection)
+        unitCount = table.getn(units)
+
+        if unitCount > 0 then
+            return units, unitCount
+        end
+
+    elseif filter == 'L/N/A' then
+        -- find and return land units
+        units = EntityCategoryFilterDown(categories.LAND + categories.AMPHIBIOUS + categories.HOVER, selection)
+        unitCount = table.getn(units)
+
+        if unitCount > 0 then
+            return units, unitCount
+        end
+
+        -- find and return naval units
+        units = EntityCategoryFilterDown(categories.NAVAL, selection)
+        unitCount = table.getn(units)
+
+        if unitCount > 0 then
+            return units, unitCount
+        end
+
+        -- find and return air units
+        units = EntityCategoryFilterDown(categories.AIR, selection)
+        unitCount = table.getn(units)
+
+        if unitCount > 0 then
+            return units, unitCount
+        end
+    elseif filter == 'N/L/A' then
+        -- find and return naval units
+        units = EntityCategoryFilterDown(categories.NAVAL, selection)
+        unitCount = table.getn(units)
+
+        if unitCount > 0 then
+            return units, unitCount
+        end
+
+        -- find and return land units
+        units = EntityCategoryFilterDown(categories.LAND + categories.AMPHIBIOUS + categories.HOVER, selection)
+        unitCount = table.getn(units)
+
+        if unitCount > 0 then
+            return units, unitCount
+        end
+
+        -- find and return air units
+        units = EntityCategoryFilterDown(categories.AIR, selection)
+        unitCount = table.getn(units)
+
+        if unitCount > 0 then
+            return units, unitCount
+        end
+    end
+
+    return selection, count
+end
+
+--- Deselects units that are locked out
+---@param selection UserUnit[]
+---@param count number
+---@return UserUnit[]
+---@return number
+function DeselectLockedOut(selection, count)
+    -- try and filter locked out units
+    local head = 1
+    for k = 1, count do
+        local userUnit = selection[k]
+        if not userUnit.LockedOutOfSelection then
+            selection[head] = userUnit
+            head = head + 1
+        end
+    end
+
+    -- if we end up with nothing, just keep the selection
+    if head == 1 then
+        return selection, count
+    end
+
+    -- remove units that are no longer part of the selection
+    for k = head, count do
+        selection[k] = nil
+    end
+
+    return selection, head - 1
+end
+
+--- Deselects unit by their unit type
+---@param selection UserUnit[]
+---@param count number
+---@return UserUnit[]
+---@return number
+function DeselectByType(selection, count)
+
+end
+
+---@param selection UserUnit[]
+---@param count number
+---@return UserUnit[]
+---@return number
+function DeselectAssisting(selection, count)
+    -- try and filter locked out units
+    local head = 1
+    for k = 1, count do
+        local userUnit = selection[k]
+        if not userUnit:GetGuardedEntity() then
+            selection[head] = userUnit
+            head = head + 1
+        end
+    end
+
+    -- if we end up with nothing, just keep the selection
+    if head == 1 then
+        return selection, count
+    end
+
+    -- remove units that are no longer part of the selection
+    for k = head, count do
+        selection[k] = nil
+    end
+
+    return selection, head - 1
+end
+
+-- Function to remove low priority units from a selection which includes units other than low priority ones
+function DeselectSelens(selection)
+    local LowPriorityUnits = false
+    local otherUnits = false
+
+    -- Find any units with the low priority flag
+    for id, unit in selection do
+        -- Stupid-ass UnitData table uses string number IDs as keys
+        if UnitData[unit:GetEntityId()].LowPriority then
+            LowPriorityUnits = true
+        else
+            if not otherUnits then otherUnits = {} end -- Ugly hack to make later logic easier
+            table.insert(otherUnits, unit)
+        end
+    end
+
+    -- Return original selection with no-change key if nothing has changed
+    if (otherUnits and not LowPriorityUnits) or (not otherUnits and LowPriorityUnits) then
+        return selection, false
+    end
+
+    return otherUnits, true
+end
+
+--- A cache used with ObserveSelection to prevent continious table allocations
+local cachedSelection = {
+    oldSelection = { },
+    newSelection = { },
+    added = { },
+    removed = { },
+}
+
+--- Observable to allow mods to do something with a new selection
+ObserveSelection = import("/lua/shared/observable.lua").Create()
+
+-- This function is called whenever the set of currently selected units changes
+-- See /lua/unit.lua for more information on the lua unit object
+---@param oldSelection UserUnit[]   This parameter is usually wrong and you should not use it
+---@param newSelection UserUnit[]   
+---@param added UserUnit[]          This parameter is usually wrong and you should not use it
+---@param removed UserUnit[]        This parameter is usually wrong and you should not use it
+function OnSelectionChanged(oldSelection, newSelection, added, removed)
+
+    -- allows us to ignore the selection - including the selection sound
+    if ignoreSelection then
+        return
+    end
+
+    -- unironically, allows us to ignore the selection - including the selection sound
+    if import("/lua/ui/game/selection.lua").IsHidden() then
+        return
+    end
+
+    -- allows us to ignore the deprioritzation for this selection
+    if ignoreDeprio then
+        ignoreDeprio = false
+
+    else
+        -- do not ignore selections when holding down shift
+        if not IsKeyDown('Shift') and not table.empty(added) and table.empty(removed) then
+            ---@type number
+            local originalCount = table.getn(newSelection)
+
+            -- go through the various deprioritzation categories
+            local selection, count = newSelection, originalCount
+            selection, count = DeselectLockedOut(selection, count)
+            selection, count = DeselectByLayer(selection, count)
+            selection, count = DeselectAssisting(selection, count)
+
+            -- if something changed then we re-select the units through this hacky-approach
+            if originalCount != count then
+                ForkThread(
+                    function()
+                        SelectUnits(selection)
+                    end
+                )
+
+                ignoreDeprio = true
+                return
+            end
+        end
+    end
+
+    -- populate observable and send out a notification
+    cachedSelection.oldSelection = oldSelection
+    cachedSelection.newSelection = newSelection
+    cachedSelection.added = added
+    cachedSelection.removed = removed
+    ObserveSelection:Set(cachedSelection)
+
+    -- apparently we can't import these files at the start, therefore we have this odd pattern
+    if not hotkeyLabelsOnSelectionChanged then
+        hotkeyLabelsOnSelectionChanged = import("/lua/keymap/hotkeylabels.lua").onSelectionChanged
+    end
+
+    -- Deselect Selens if necessary. Also do work on Hotbuild labels
+    local changed = false -- Prevent recursion
+    if newSelection and not table.empty(newSelection) then
+        newSelection, changed = DeselectSelens(newSelection)
+
+        if changed then
+            ForkThread(function()
+                SelectUnits(newSelection)
+            end)
+            return
+        end
+
+        -- This bit is for the Hotbuild labels. See the buildActionUpgrade() function in hotbuild.lua for a bit more
+        -- documentation
+        local bp = newSelection[1]:GetBlueprint()
+        local upgradesTo = nil
+        local potentialUpgrades = upgradeTab[bp.BlueprintId] or {bp.General.UpgradesTo}
+        if potentialUpgrades then
+            local availableOrders, availableToggles, buildableCategories = GetUnitCommandData(newSelection)
+            for _, upgr in potentialUpgrades do
+                if EntityCategoryContains(buildableCategories, upgr) then
+                    upgradesTo = upgr
+                    break
+                end
+                local nextSuccessiveUpgrade = __blueprints[upgr].General.UpgradesTo
+                while nextSuccessiveUpgrade do
+                    -- Note: Should we ever add a structure that has different upgrade path choices on a non-base
+                    -- version of the structure, e.g. different choices for the 4th cybran shield upgrade or something
+                    -- like it, the way we find the correct icon to put the hotbuild upgrade keybind label using this
+                    -- while loop will break. As there currently is no such structure in the game, and I don't know how
+                    -- the general case of finding that correct icon should work in such an imaginary case, I'll leave
+                    -- it at this, currently working, code.
+                    if EntityCategoryContains(buildableCategories, nextSuccessiveUpgrade) then
+                        upgradesTo = nextSuccessiveUpgrade
+                        break
+                    end
+                    nextSuccessiveUpgrade = __blueprints[nextSuccessiveUpgrade].General.UpgradesTo
+                end
+            end
+        end
+
+        if upgradesTo and upgradesTo:len() < 7 then
+            upgradesTo = nil
+        end
+        local isFactory = newSelection[1]:IsInCategory("FACTORY")
+        hotkeyLabelsOnSelectionChanged(upgradesTo, isFactory)
+    end
+
+    local availableOrders, availableToggles, buildableCategories = GetUnitCommandData(newSelection)
+    local isOldSelection = table.equal(oldSelection, newSelection)
+
+    if not gameUIHidden then
+        if not isReplay then
+            import("/lua/ui/game/orders.lua").SetAvailableOrders(availableOrders, availableToggles, newSelection)
+        end
+        -- TODO change the current command mode if no longer available? or set to nil?
+        import("/lua/ui/game/construction.lua").OnSelection(buildableCategories,newSelection,isOldSelection)
+    end
+
+    if not isOldSelection then
+        import("/lua/ui/game/selection.lua").PlaySelectionSound(added)
+        import("/lua/ui/game/rallypoint.lua").OnSelectionChanged(newSelection)
+        if Prefs.GetFromCurrentProfile('options.repeatbuild') == 'On' then
+            local factories = EntityCategoryFilterDown(categories.STRUCTURE * categories.FACTORY, added) -- find all newly selected factories
+            for _, factory in factories do
+                if not factory.HasBeenSelected then
+                    factory:ProcessInfo('SetRepeatQueue','true')
+                    factory.HasBeenSelected = true
+                end
+            end
+        end
+
+    end
+
+    if newSelection then
+        local n = table.getn(newSelection)
+
+        -- if something died in selection, restore command mode
+        if n > 0 and not table.empty(removed) and table.empty(added) then
+            local CM = import("/lua/ui/game/commandmode.lua")
+            local mode, data = unpack(CM.GetCommandMode())
+
+            if mode then
+                ForkThread(function()
+                    CM.StartCommandMode(mode, data)
+                end)
+            end
+        end
+    end
+
+    import("/lua/ui/game/unitview.lua").OnSelection(newSelection)
+end
+
+function OnQueueChanged(newQueue)
+    reprsl(newQueue)
+    if not gameUIHidden then
+        import("/lua/ui/game/construction.lua").OnQueueChanged(newQueue)
     end
 end
