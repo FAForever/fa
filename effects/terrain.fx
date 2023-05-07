@@ -876,21 +876,6 @@ technique TTerrain <
     }
 }
 
-technique TTerrainXP <
-    string usage = "composite";
-    string normals = "TTerrainNormalsXP";
->
-{
-    pass P0
-    {
-        AlphaState( AlphaBlend_Disable_Write_RGBA )
-        DepthState( Depth_Enable )
-
-        VertexShader = compile vs_1_1 TerrainVS(true);
-        PixelShader = compile ps_2_a TerrainAlbedoXP();
-    }
-}
-
 // Terrain where the the 1st strata texture's alpha
 // is animated and used as a glow channel
 technique TTerrainGlow <
@@ -1589,19 +1574,41 @@ float4 WhiteoutBlending(float4 n1, float4 n2, float factor) {
     return normalize(float4(n1.xy + n2.xy, n1.z * n2.z, 0));
 }
 
-float textureSplatting(float4 t2, float4 correction, float factor) {
-    float avg = (t2.r + t2.g + t2.b) / 3;
+float textureSplatting(float4 t1, float4 t2, float4 correction, float factor) {
+    float t1height = (t1.r + t1.g + t1.b) / 3;
+    float t2height = (t2.r + t2.g + t2.b) / 3;
+    // we assume height of 0.5 for the previous layers
+    // factor = (t1height + 0.5 > t2height + factor) ? 0 : 1;
+    // return factor;
+
     float correctionavg = (correction.r + correction.g + correction.b) / 3;
-    // factor *= (avg - correctionavg + 1) * 10;
+    factor *= (t2height - correctionavg + 1) * 10;
+    return factor + (t2height - correctionavg) * 5; // This produces wild but interesting results
     return saturate(factor);
 }
 
 float4 CorrectedAddition(float4 t1, float4 t2, float4 correction, float factor) {
-    factor = textureSplatting(t2, correction, factor);
+    factor = textureSplatting(t1, t2, correction, factor);
     // return t1;
     // return t1 + (t2 - correction) * factor; // This increases contrast
     // return lerp(t1, t2, factor * 0.8);// This decreases contrast
     return (t1 + (t2 - correction) * factor + lerp(t1, t2, factor * 0.8)) * 0.5;
+}
+
+float4 splatLerp(float4 t1, float4 t2, float factor) {
+    // return lerp(t1, t2, factor);
+    float t1height = (t1.r + t1.g + t1.b) / 3;
+    float t2height = (t2.r + t2.g + t2.b) / 3;
+
+    // we assume height of 0.3 for the previous layers
+    float bias = 0.3;
+    float depth = 0.2;
+    float ma = max(t1height + bias, t2height + factor) - depth;
+    float b1 = max(t1height + bias - ma, 0);
+    float b2 = max(t2height + factor - ma, 0);
+    return (t1 * b1 + t2 * b2) / (b1 + b2);
+
+    return (t1height + bias > t2height + factor) ? t1 : t2;
 }
 
 
@@ -1685,8 +1692,8 @@ float4 TerrainNormalsExtendedPS ( VerticesExtended pixel ) : COLOR
     float2 uvZ = coords.xy; // z facing plane
 
     // pre-fetch mask information
-    float4 mask0 = tex2D(UtilitySamplerA, position.xy);
-    float4 mask1 = tex2D(UtilitySamplerB, position.xy);
+    float4 mask0 = saturate(tex2D(UtilitySamplerA, position.xy)*2-1);
+    float4 mask1 = saturate(tex2D(UtilitySamplerB, position.xy)*2-1);
 
     // load in normals
     float4 lowerNormal      = tex2D(LowerNormalSampler,    position.xy * LowerNormalTile.xy   );
@@ -1755,8 +1762,8 @@ float4 TTerrainAlbedoExtendedPS ( VerticesExtended pixel) : COLOR
     // do arthmetics to get range from (0, 1) to (-1, 1) as normal maps store their values as (0, 1)
     float3 normal = normalize(2 * SampleScreen(NormalSampler,pixel.mTexSS).xyz - 1);
 
-    float4 mask0 = tex2D(UtilitySamplerA, position.xy);
-    float4 mask1 = tex2D(UtilitySamplerB, position.xy);
+    float4 mask0 = saturate(tex2D(UtilitySamplerA, position.xy)*2-1);
+    float4 mask1 = saturate(tex2D(UtilitySamplerB, position.xy)*2-1);
 
     float4 lowerAlbedo    = tex2D(LowerAlbedoSampler,    position.xy * LowerAlbedoTile.xy);
     float4 stratum0Albedo = tex2D(Stratum0AlbedoSampler, position.xy * Stratum0AlbedoTile.xy);
@@ -1802,22 +1809,22 @@ float4 TTerrainAlbedoExtendedPS ( VerticesExtended pixel) : COLOR
 
     float4 albedo = lowerAlbedo;
     albedo = CorrectedAddition(albedo, lowerAlbedoNear, lABrightness, cameraFractionNear);
-    albedo = lerp(albedo, stratum0Albedo, mask0.x); 
+    albedo = splatLerp(albedo, stratum0Albedo, mask0.x); 
     albedo = CorrectedAddition(albedo, stratum0AlbedoNear, s0ABrightness, mask0.x * cameraFractionNear);
-    albedo = lerp(albedo, stratum1Albedo, mask0.y); 
+    albedo = splatLerp(albedo, stratum1Albedo, mask0.y); 
     albedo = CorrectedAddition(albedo, stratum1AlbedoNear, s1ABrightness, mask0.y * cameraFractionNear); 
-    albedo = lerp(albedo, stratum2Albedo, mask0.z); 
+    albedo = splatLerp(albedo, stratum2Albedo, mask0.z); 
     albedo = CorrectedAddition(albedo, stratum2AlbedoNear, s2ABrightness, mask0.z * cameraFractionNear); 
-    albedo = lerp(albedo, stratum3Albedo, mask0.w); 
+    albedo = splatLerp(albedo, stratum3Albedo, mask0.w); 
     albedo = CorrectedAddition(albedo, stratum3AlbedoNear, s3ABrightness, mask0.w * cameraFractionNear); 
-    albedo = lerp(albedo, stratum4Albedo, mask1.x); 
+    albedo = splatLerp(albedo, stratum4Albedo, mask1.x); 
     albedo = CorrectedAddition(albedo, stratum4AlbedoNear, s4ABrightness, mask1.x * cameraFractionNear); 
-    albedo = lerp(albedo, stratum5Albedo, mask1.y); 
+    albedo = splatLerp(albedo, stratum5Albedo, mask1.y); 
     albedo = CorrectedAddition(albedo, stratum5AlbedoNear, s5ABrightness, mask1.y * cameraFractionNear); 
-    albedo = lerp(albedo, stratum6Albedo, mask1.z); 
+    albedo = splatLerp(albedo, stratum6Albedo, mask1.z); 
     albedo = CorrectedAddition(albedo, stratum6AlbedoOut, s6ABrightness, mask1.z * cameraFractionOut);
     albedo = CorrectedAddition(albedo, stratum6AlbedoNear, s6ABrightness, mask1.z * cameraFractionNear); 
-    albedo = lerp(albedo, stratum7Albedo, mask1.w); 
+    albedo = splatLerp(albedo, stratum7Albedo, mask1.w); 
     albedo = CorrectedAddition(albedo, stratum7AlbedoOut, s7ABrightness, mask1.w * cameraFractionOut);
     albedo = CorrectedAddition(albedo, stratum7AlbedoFurtherOut, s7ABrightness, mask1.w * cameraFractionFurtherOut);
     albedo = CorrectedAddition(albedo, stratum7AlbedoNear, s7ABrightness, mask1.w * cameraFractionNear); 
@@ -1852,7 +1859,7 @@ technique TTerainNormalsExtended
     }
 }
 
-technique TTerrainXPExtended <
+technique TTerrainXP <
     string usage = "composite";
     string normals = "TTerainNormalsExtended";
 >
