@@ -640,6 +640,35 @@ options = {
             },
 
             {
+                title = '<LOC OPTIONS_SELECTION_FILTERING>Selection filters',
+                type = 'header',
+
+                -- these are expected everywhere
+                default = '',
+                key = '',
+            },
+
+            {
+                title = "<LOC OPTIONS_SELECTION_FILTERING_LAYER>Filter selection on layer",
+                key = 'options_selection_filtering_layer',
+                type = 'toggle',
+                default = 'off',
+                custom = {
+                    states = {
+                        {text = "<LOC _Off>", key = 'off' },
+                        {text = "<LOC _L+N/A>Land and Naval, then Air", key = 'L+N/A' },
+                        {text = "<LOC _L/N/A>Land, then Naval and then Air", key = 'L/N/A' },
+                        {text = "<LOC _N/L/A>Naval, then Land and then Air", key = 'N/L/A' },
+                    },
+                },
+                set = function(key,value,startup)
+                    if GetCurrentUIState() == 'game' then
+                        import("/lua/ui/game/gamemain.lua").UpdatePrefsDeselectByLayer(value)
+                    end
+                end,
+            },
+
+            {
                 title = '<LOC OPTIONS_0311>Cursor features',
                 type = 'header',
 

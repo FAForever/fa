@@ -959,6 +959,11 @@ end
 
 local hotkeyLabelsOnSelectionChanged = false
 local upgradeTab = import("/lua/keymap/upgradetab.lua").upgradeTab
+local PrefsDeselectByLayer = 'off'
+
+function UpdatePrefsDeselectByLayer(value)
+    PrefsDeselectByLayer = value
+end
 
 --- allows us to ignore the depriorization phase
 local ignoreDeprio = false
@@ -979,10 +984,12 @@ end
 ---@return UserUnit[]
 ---@return number
 function DeselectByLayer(selection, count)
-    local filter = 'L+N/A'
+    if PrefsDeselectByLayer == 'off' then
+        return selection, count
+    end
 
     local units, unitCount
-    if filter == 'L+N/A' then
+    if PrefsDeselectByLayer == 'L+N/A' then
         -- find and return land or naval units
         units = EntityCategoryFilterDown(categories.LAND + categories.AMPHIBIOUS + categories.NAVAL + categories.HOVER, selection)
         unitCount = table.getn(units)
@@ -999,7 +1006,7 @@ function DeselectByLayer(selection, count)
             return units, unitCount
         end
 
-    elseif filter == 'L/N/A' then
+    elseif PrefsDeselectByLayer == 'L/N/A' then
         -- find and return land units
         units = EntityCategoryFilterDown(categories.LAND + categories.AMPHIBIOUS + categories.HOVER, selection)
         unitCount = table.getn(units)
@@ -1023,7 +1030,7 @@ function DeselectByLayer(selection, count)
         if unitCount > 0 then
             return units, unitCount
         end
-    elseif filter == 'N/L/A' then
+    elseif PrefsDeselectByLayer == 'N/L/A' then
         -- find and return naval units
         units = EntityCategoryFilterDown(categories.NAVAL, selection)
         unitCount = table.getn(units)
@@ -1094,12 +1101,40 @@ end
 ---@param count number
 ---@return UserUnit[]
 ---@return number
-function DeselectAssisting(selection, count)
+function DeselectAssistingEngineers(selection, count)
     -- try and filter locked out units
     local head = 1
     for k = 1, count do
         local userUnit = selection[k]
-        if not userUnit:GetGuardedEntity() then
+        if not (userUnit:GetBlueprint().CategoriesHash["ENGINEER"] and userUnit:GetGuardedEntity()) then
+            selection[head] = userUnit
+            head = head + 1
+        end
+    end
+
+    -- if we end up with nothing, just keep the selection
+    if head == 1 then
+        return selection, count
+    end
+
+    -- remove units that are no longer part of the selection
+    for k = head, count do
+        selection[k] = nil
+    end
+
+    return selection, head - 1
+end
+
+---@param selection UserUnit[]
+---@param count number
+---@return UserUnit[]
+---@return number
+function DeselectAssistingOthers(selection, count)
+    -- try and filter locked out units
+    local head = 1
+    for k = 1, count do
+        local userUnit = selection[k]
+        if not (not userUnit:GetBlueprint().CategoriesHash["ENGINEER"] and userUnit:GetGuardedEntity()) then
             selection[head] = userUnit
             head = head + 1
         end
@@ -1185,7 +1220,8 @@ function OnSelectionChanged(oldSelection, newSelection, added, removed)
             local selection, count = newSelection, originalCount
             selection, count = DeselectLockedOut(selection, count)
             selection, count = DeselectByLayer(selection, count)
-            selection, count = DeselectAssisting(selection, count)
+            selection, count = DeselectAssistingEngineers(selection, count)
+            selection, count = DeselectAssistingOthers(selection, count)
 
             -- if something changed then we re-select the units through this hacky-approach
             if originalCount != count then
