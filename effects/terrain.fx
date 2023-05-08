@@ -1696,59 +1696,70 @@ float4 TerrainNormalsExtendedPS ( VerticesExtended pixel ) : COLOR
     float4 mask1 = saturate(tex2D(UtilitySamplerB, position.xy)*2-1);
 
     // load in normals
-    float4 lowerNormal      = tex2D(LowerNormalSampler,    position.xy * LowerNormalTile.xy   );
-    float4 stratum0Normal   = tex2D(Stratum0NormalSampler, position.xy * Stratum0NormalTile.xy);
-    float4 stratum1Normal   = tex2D(Stratum1NormalSampler, position.xy * Stratum1NormalTile.xy);
-    float4 stratum2Normal   = tex2D(Stratum2NormalSampler, position.xy * Stratum2NormalTile.xy);
-    float4 stratum3Normal   = tex2D(Stratum3NormalSampler, position.xy * Stratum3NormalTile.xy);
-    float4 stratum4Normal   = tex2D(Stratum4NormalSampler, position.xy * Stratum4NormalTile.xy);
-    float4 stratum5Normal   = tex2D(Stratum5NormalSampler, position.xy * Stratum5NormalTile.xy);
-    float4 stratum6Normal   = tex2D(Stratum6NormalSampler, position.xy * Stratum6NormalTile.xy);
-    float4 stratum7Normal   = tex2D(Stratum7NormalSampler, position.xy * Stratum7NormalTile.xy);
+    float4 lowerNormal    = tex2D(LowerNormalSampler,    position.xy * LowerNormalTile.xy   );
+    float4 stratum0Normal = tex2D(Stratum0NormalSampler, position.xy * Stratum0NormalTile.xy);
+    float4 stratum1Normal = tex2D(Stratum1NormalSampler, position.xy * Stratum1NormalTile.xy);
+    float4 stratum2Normal = tex2D(Stratum2NormalSampler, position.xy * Stratum2NormalTile.xy);
+    float4 stratum3Normal = tex2D(Stratum3NormalSampler, position.xy * Stratum3NormalTile.xy);
+    float4 stratum4Normal = tex2D(Stratum4NormalSampler, position.xy * Stratum4NormalTile.xy);
+    float4 stratum5Normal = tex2D(Stratum5NormalSampler, position.xy * Stratum5NormalTile.xy);
+    float4 stratum6Normal = tex2D(Stratum6NormalSampler, position.xy * Stratum6NormalTile.xy);
+    float4 stratum7Normal = tex2D(Stratum7NormalSampler, position.xy * Stratum7NormalTile.xy);
 
-    float4 lowerNormalNear      = tex2D(LowerNormalSampler,    3 * position.xy * LowerNormalTile.xy   );
-    float4 stratum0NormalNear   = tex2D(Stratum0NormalSampler, 3 * position.xy * Stratum0NormalTile.xy);
-    float4 stratum1NormalNear   = tex2D(Stratum1NormalSampler, 3 * position.xy * Stratum1NormalTile.xy);
-    float4 stratum2NormalNear   = tex2D(Stratum2NormalSampler, 3 * position.xy * Stratum2NormalTile.xy);
-    float4 stratum3NormalNear   = tex2D(Stratum3NormalSampler, 3 * position.xy * Stratum3NormalTile.xy);
-    float4 stratum4NormalNear   = tex2D(Stratum4NormalSampler, 3 * position.xy * Stratum4NormalTile.xy);
-    float4 stratum5NormalNear   = tex2D(Stratum5NormalSampler, 3 * position.xy * Stratum5NormalTile.xy);
-    float4 stratum6NormalNear   = tex2D(Stratum6NormalSampler, 3 * position.xy * Stratum6NormalTile.xy);
-    float4 stratum7NormalNear   = tex2D(Stratum7NormalSampler, 3 * position.xy * Stratum7NormalTile.xy);
+    float4 lowerNormalNear    = tex2D(LowerNormalSampler,    3 * position.xy * LowerNormalTile.xy   );
+    float4 stratum0NormalNear = tex2D(Stratum0NormalSampler, 3 * position.xy * Stratum0NormalTile.xy);
+    float4 stratum1NormalNear = tex2D(Stratum1NormalSampler, 3 * position.xy * Stratum1NormalTile.xy);
+    float4 stratum2NormalNear = tex2D(Stratum2NormalSampler, 3 * position.xy * Stratum2NormalTile.xy);
+    float4 stratum3NormalNear = tex2D(Stratum3NormalSampler, 3 * position.xy * Stratum3NormalTile.xy);
+    float4 stratum4NormalNear = tex2D(Stratum4NormalSampler, 3 * position.xy * Stratum4NormalTile.xy);
+    float4 stratum5NormalNear = tex2D(Stratum5NormalSampler, 3 * position.xy * Stratum5NormalTile.xy);
+    float4 stratum6NormalNear = tex2D(Stratum6NormalSampler, 3 * position.xy * Stratum6NormalTile.xy);
+    float4 stratum7NormalNear = tex2D(Stratum7NormalSampler, 3 * position.xy * Stratum7NormalTile.xy);
 
-    float4 stratum6NormalOut = tex2D(Stratum6NormalSampler, 0.5 * position.yx * Stratum6NormalTile.xy);
-    float4 stratum7NormalOut = tex2D(Stratum7NormalSampler, 0.5 * position.yx * Stratum7NormalTile.xy);
-    float4 stratum7NormalFurtherOut = tex2D(Stratum7NormalSampler, 0.25 * position.xy * Stratum7NormalTile.xy);
+    float4 lowerNormalFar    = tex2D(LowerNormalSampler,    0.2 * position.xy * LowerNormalTile.xy   );
+    float4 stratum0NormalFar = tex2D(Stratum0NormalSampler, 0.2 * position.xy * Stratum0NormalTile.xy);
+    float4 stratum1NormalFar = tex2D(Stratum1NormalSampler, 0.2 * position.xy * Stratum1NormalTile.xy);
+    float4 stratum2NormalFar = tex2D(Stratum2NormalSampler, 0.2 * position.xy * Stratum2NormalTile.xy);
+    float4 stratum3NormalFar = tex2D(Stratum3NormalSampler, 0.2 * position.xy * Stratum3NormalTile.xy);
+    float4 stratum4NormalFar = tex2D(Stratum4NormalSampler, 0.2 * position.xy * Stratum4NormalTile.xy);
+    float4 stratum5NormalFar = tex2D(Stratum5NormalSampler, 0.2 * position.xy * Stratum5NormalTile.xy);
+    float4 stratum6NormalFar = tex2D(Stratum6NormalSampler, 0.2 * position.xy * Stratum6NormalTile.xy);
+    float4 stratum7NormalFar = tex2D(Stratum7NormalSampler, 0.2 * position.xy * Stratum7NormalTile.xy);
 
     // allow textures to scale as we zoom in and out
     float cameraFractionNear = 0.8 - 0.8 * clamp(0.01 * (CameraPosition.y - 20), 0, 1);
-    float cameraFractionOut = clamp(0.001 * (CameraPosition.y - 250), 0, 1);
-    float cameraFractionFurtherOut = clamp(0.001 * (CameraPosition.y - 800), 0, 1);
+    float cameraFractionFar = clamp(0.001 * (CameraPosition.y - 250), 0, 1);
 
     // combine them
     float fractionLower = (1 - mask0.x)*(1 - mask0.y)*(1 - mask0.z)*(1 - mask0.w)*(1 - mask1.x)*(1 - mask1.y)*(1 - mask1.z)*(1 - mask1.w);
     float4 normal = float4(0, 0, 1, 0);
-    normal = UDNBlending(normal, (2 * lowerNormal - 1),              fractionLower);
-    normal = UDNBlending(normal, (2 * lowerNormalNear - 1),          fractionLower * cameraFractionNear);
-    normal = UDNBlending(normal, (2 * stratum0Normal - 1),           mask0.x);
-    normal = UDNBlending(normal, (2 * stratum0NormalNear - 1),       mask0.x * cameraFractionNear);
-    normal = UDNBlending(normal, (2 * stratum1Normal - 1),           mask0.y);
-    normal = UDNBlending(normal, (2 * stratum1NormalNear - 1),       mask0.y * cameraFractionNear);
-    normal = UDNBlending(normal, (2 * stratum2Normal - 1),           mask0.z);
-    normal = UDNBlending(normal, (2 * stratum2NormalNear - 1),       mask0.z * cameraFractionNear);
-    normal = UDNBlending(normal, (2 * stratum3Normal - 1),           mask0.w);
-    normal = UDNBlending(normal, (2 * stratum3NormalNear - 1),       mask0.w * cameraFractionNear);
-    normal = UDNBlending(normal, (2 * stratum4Normal - 1),           mask1.x);
-    normal = UDNBlending(normal, (2 * stratum4NormalNear - 1),       mask1.x * cameraFractionNear);
-    normal = UDNBlending(normal, (2 * stratum5Normal - 1),           mask1.y);
-    normal = UDNBlending(normal, (2 * stratum5NormalNear - 1),       mask1.y * cameraFractionNear);
-    normal = UDNBlending(normal, (2 * stratum6Normal - 1),           mask1.z); 
-    normal = UDNBlending(normal, (2 * stratum6NormalOut - 1),        mask1.z * cameraFractionOut);
-    normal = UDNBlending(normal, (2 * stratum6NormalNear - 1),       mask1.z * cameraFractionNear); 
-    normal = UDNBlending(normal, (2 * stratum7Normal - 1),           mask1.w);
-    normal = UDNBlending(normal, (2 * stratum7NormalOut - 1),        mask1.w * cameraFractionOut);
-    normal = UDNBlending(normal, (2 * stratum7NormalFurtherOut - 1), mask1.w * cameraFractionFurtherOut);
-    normal = UDNBlending(normal, (2 * stratum7NormalNear - 1),       mask1.w * cameraFractionNear);
+    normal = UDNBlending(normal, (2 * lowerNormal - 1),        fractionLower);
+    normal = UDNBlending(normal, (2 * lowerNormalFar - 1),     fractionLower * cameraFractionFar);
+    normal = UDNBlending(normal, (2 * lowerNormalNear - 1),    fractionLower * cameraFractionNear);
+    normal = UDNBlending(normal, (2 * stratum0Normal - 1),     mask0.x);
+    normal = UDNBlending(normal, (2 * stratum0NormalFar - 1),  mask0.x * cameraFractionFar);
+    normal = UDNBlending(normal, (2 * stratum0NormalNear - 1), mask0.x * cameraFractionNear);
+    normal = UDNBlending(normal, (2 * stratum1Normal - 1),     mask0.y);
+    normal = UDNBlending(normal, (2 * stratum1NormalFar - 1),  mask0.y * cameraFractionFar);
+    normal = UDNBlending(normal, (2 * stratum1NormalNear - 1), mask0.y * cameraFractionNear);
+    normal = UDNBlending(normal, (2 * stratum2Normal - 1),     mask0.z);
+    normal = UDNBlending(normal, (2 * stratum2NormalFar - 1),  mask0.z * cameraFractionFar);
+    normal = UDNBlending(normal, (2 * stratum2NormalNear - 1), mask0.z * cameraFractionNear);
+    normal = UDNBlending(normal, (2 * stratum3Normal - 1),     mask0.w);
+    normal = UDNBlending(normal, (2 * stratum3NormalFar - 1),  mask0.w * cameraFractionFar);
+    normal = UDNBlending(normal, (2 * stratum3NormalNear - 1), mask0.w * cameraFractionNear);
+    normal = UDNBlending(normal, (2 * stratum4Normal - 1),     mask1.x);
+    normal = UDNBlending(normal, (2 * stratum4NormalFar - 1),  mask1.x * cameraFractionFar);
+    normal = UDNBlending(normal, (2 * stratum4NormalNear - 1), mask1.x * cameraFractionNear);
+    normal = UDNBlending(normal, (2 * stratum5Normal - 1),     mask1.y);
+    normal = UDNBlending(normal, (2 * stratum5NormalFar - 1),  mask1.y * cameraFractionFar);
+    normal = UDNBlending(normal, (2 * stratum5NormalNear - 1), mask1.y * cameraFractionNear);
+    normal = UDNBlending(normal, (2 * stratum6Normal - 1),     mask1.z); 
+    normal = UDNBlending(normal, (2 * stratum6NormalFar - 1),  mask1.z * cameraFractionFar);
+    normal = UDNBlending(normal, (2 * stratum6NormalNear - 1), mask1.z * cameraFractionNear); 
+    normal = UDNBlending(normal, (2 * stratum7Normal - 1),     mask1.w);
+    normal = UDNBlending(normal, (2 * stratum7NormalFar - 1),  mask1.w * cameraFractionFar);
+    normal = UDNBlending(normal, (2 * stratum7NormalNear - 1), mask1.w * cameraFractionNear);
 
     return float4( 0.5 + 0.5 * normal.rgb, 1);
 }
@@ -1786,7 +1797,14 @@ float4 TTerrainAlbedoExtendedPS ( VerticesExtended pixel) : COLOR
     float4 stratum5AlbedoNear = tex2D(Stratum5AlbedoSampler, 3 * position.xy * Stratum5AlbedoTile.xy);
     float4 stratum6AlbedoNear = tex2D(Stratum6AlbedoSampler, 3 * position.xy * Stratum6AlbedoTile.xy);
 
-    float4 stratum6AlbedoOut = tex2D(Stratum6AlbedoSampler, 0.5 * position.yx * Stratum6AlbedoTile.xy);
+    float4 lowerAlbedoFar    = tex2D(LowerAlbedoSampler,    0.2 * position.xy * LowerAlbedoTile.xy);
+    float4 stratum0AlbedoFar = tex2D(Stratum0AlbedoSampler, 0.2 * position.xy * Stratum0AlbedoTile.xy);
+    float4 stratum1AlbedoFar = tex2D(Stratum1AlbedoSampler, 0.2 * position.xy * Stratum1AlbedoTile.xy);
+    float4 stratum2AlbedoFar = tex2D(Stratum2AlbedoSampler, 0.2 * position.xy * Stratum2AlbedoTile.xy);
+    float4 stratum3AlbedoFar = tex2D(Stratum3AlbedoSampler, 0.2 * position.xy * Stratum3AlbedoTile.xy);
+    float4 stratum4AlbedoFar = tex2D(Stratum4AlbedoSampler, 0.2 * position.xy * Stratum4AlbedoTile.xy);
+    float4 stratum5AlbedoFar = tex2D(Stratum5AlbedoSampler, 0.2 * position.xy * Stratum5AlbedoTile.xy);
+    float4 stratum6AlbedoFar = tex2D(Stratum6AlbedoSampler, 0.2 * position.xy * Stratum6AlbedoTile.xy);
 
     // We want the lowest mipmap
     float2 ddx = float2(1.0, 0.0); 
@@ -1801,24 +1819,31 @@ float4 TTerrainAlbedoExtendedPS ( VerticesExtended pixel) : COLOR
     float4 s6ABrightness = tex2Dgrad(Stratum6AlbedoSampler, position.xy * Stratum6AlbedoTile.xy, ddx, ddy);
 
     float cameraFractionNear = 1 - clamp(0.01 * (CameraPosition.y - 20), 0, 1);
-    float cameraFractionOut = clamp(0.001 * (CameraPosition.y - 250), 0, 1);
+    float cameraFractionFar = 0.5 + 0.5 * clamp(0.001 * (CameraPosition.y - 250), 0, 1);
 
     float4 albedo = lowerAlbedo;
     albedo = CorrectedAddition(albedo, lowerAlbedoNear, lABrightness, cameraFractionNear);
+    albedo = CorrectedAddition(albedo, lowerAlbedoFar,  lABrightness, cameraFractionFar);
     albedo = splatLerp(albedo, stratum0Albedo, mask0.x); 
+    albedo = CorrectedAddition(albedo, stratum0AlbedoFar,  s0ABrightness, mask0.x * cameraFractionFar);
     albedo = CorrectedAddition(albedo, stratum0AlbedoNear, s0ABrightness, mask0.x * cameraFractionNear);
     albedo = splatLerp(albedo, stratum1Albedo, mask0.y); 
+    albedo = CorrectedAddition(albedo, stratum1AlbedoFar,  s1ABrightness, mask0.y * cameraFractionFar); 
     albedo = CorrectedAddition(albedo, stratum1AlbedoNear, s1ABrightness, mask0.y * cameraFractionNear); 
     albedo = splatLerp(albedo, stratum2Albedo, mask0.z); 
+    albedo = CorrectedAddition(albedo, stratum2AlbedoFar,  s2ABrightness, mask0.z * cameraFractionFar); 
     albedo = CorrectedAddition(albedo, stratum2AlbedoNear, s2ABrightness, mask0.z * cameraFractionNear); 
     albedo = splatLerp(albedo, stratum3Albedo, mask0.w); 
+    albedo = CorrectedAddition(albedo, stratum3AlbedoFar,  s3ABrightness, mask0.w * cameraFractionFar); 
     albedo = CorrectedAddition(albedo, stratum3AlbedoNear, s3ABrightness, mask0.w * cameraFractionNear); 
     albedo = splatLerp(albedo, stratum4Albedo, mask1.x); 
+    albedo = CorrectedAddition(albedo, stratum4AlbedoFar,  s4ABrightness, mask1.x * cameraFractionFar); 
     albedo = CorrectedAddition(albedo, stratum4AlbedoNear, s4ABrightness, mask1.x * cameraFractionNear); 
     albedo = splatLerp(albedo, stratum5Albedo, mask1.y); 
+    albedo = CorrectedAddition(albedo, stratum5AlbedoFar,  s5ABrightness, mask1.y * cameraFractionFar); 
     albedo = CorrectedAddition(albedo, stratum5AlbedoNear, s5ABrightness, mask1.y * cameraFractionNear); 
     albedo = splatLerp(albedo, stratum6Albedo, mask1.z); 
-    albedo = CorrectedAddition(albedo, stratum6AlbedoOut, s6ABrightness, mask1.z * cameraFractionOut);
+    albedo = CorrectedAddition(albedo, stratum6AlbedoFar,  s6ABrightness, mask1.z * cameraFractionFar);
     albedo = CorrectedAddition(albedo, stratum6AlbedoNear, s6ABrightness, mask1.z * cameraFractionNear); 
     albedo.rgb = lerp(albedo.xyz,upperAlbedo.xyz,upperAlbedo.w);
 
