@@ -1852,11 +1852,11 @@ float4 TTerrainAlbedoExtendedPS ( VerticesExtended pixel) : COLOR
 
     // We use stratum 7 as a utility map
     float4 properties = tex2D(Stratum7AlbedoSampler, coords.xz);
-    float shadowSample = saturate(1 - (properties.b * 1));
+    float shadowSample = saturate(1 - properties.b); // 1 where sun is, 0 where shadow is
+    float shadow = tex2D(ShadowSampler,pixel.mShadow.xy).g; // 1 where sun is, 0 where shadow is
+    shadow = shadow * shadowSample;
 
-    float dotSunNormal = dot(SunDirection,normal);
-    float shadow = min(tex2D(ShadowSampler,pixel.mShadow.xy).g, shadowSample);
-    float3 light = SunColor * saturate(dotSunNormal) * shadow + SunAmbience;
+    float3 light = SunColor * saturate(dot(SunDirection, normal)) * shadow + SunAmbience;
     light = LightingMultiplier * light + ShadowFillColor * (1 - light);
     albedo.rgb = light * (albedo.rgb + specular.rgb);
 
