@@ -1765,8 +1765,8 @@ float4 TTerrainAlbedoExtendedPS ( VerticesExtended pixel) : COLOR
     float4 mask0 = saturate(tex2D(UtilitySamplerA, position.xy)*2-1);
     float4 mask1 = saturate(tex2D(UtilitySamplerB, position.xy)*2-1);
 
-    // We bias the mipmaps for higher texture quality
-    float bias = -1.0;
+    // bias leads to aliasing
+    float bias = 0;
     float4 lowerAlbedo    = tex2Dbias(LowerAlbedoSampler,    float4(position.xy * LowerAlbedoTile.xy   , 0, bias));
     float4 stratum0Albedo = tex2Dbias(Stratum0AlbedoSampler, float4(position.xy * Stratum0AlbedoTile.xy, 0, bias));
     float4 stratum1Albedo = tex2Dbias(Stratum1AlbedoSampler, float4(position.xy * Stratum1AlbedoTile.xy, 0, bias));
