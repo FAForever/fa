@@ -382,7 +382,13 @@ float3 ApplyWaterColor( float depth, float3  inColor)
 float4 CalculateLighting( float3 inNormal, float3 inViewPosition, float3 inAlbedo, float specAmount, float waterDepth, float4 inShadow, uniform bool inShadows)
 {
     float4 color = float4( 0, 0, 0, 0 );
+
+    float3 position = TerrainScale * inViewPosition;
+    float4 properties = tex2D(Stratum7AlbedoSampler, position.xy);
+    float shadowSample = saturate(1 - (properties.b * 1));
+
     float shadow = ( inShadows && ( 1 == ShadowsEnabled ) ) ? ComputeShadow( inShadow ) : 1;
+    shadow = saturate(shadow * shadowSample);
 
     // calculate some specular
     float3 viewDirection = normalize(inViewPosition.xzy-CameraPosition);
