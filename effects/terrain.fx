@@ -1775,7 +1775,6 @@ float4 TTerrainAlbedoExtendedPS ( VerticesExtended pixel) : COLOR
     float4 stratum4Albedo = tex2Dbias(Stratum4AlbedoSampler, float4(position.xy * Stratum4AlbedoTile.xy, 0, bias));
     float4 stratum5Albedo = tex2Dbias(Stratum5AlbedoSampler, float4(position.xy * Stratum5AlbedoTile.xy, 0, bias));
     float4 stratum6Albedo = tex2Dbias(Stratum6AlbedoSampler, float4(position.xy * Stratum6AlbedoTile.xy, 0, bias));
-    float4 stratum7Albedo = tex2Dbias(Stratum7AlbedoSampler, float4(position.xy * Stratum7AlbedoTile.xy, 0, bias));
     float4 upperAlbedo    = tex2Dbias(UpperAlbedoSampler,    float4(position.xy * UpperAlbedoTile.xy   , 0, bias));
 
     float4 lowerAlbedoNear    = tex2D(LowerAlbedoSampler,    3 * position.xy * LowerAlbedoTile.xy);
@@ -1786,11 +1785,8 @@ float4 TTerrainAlbedoExtendedPS ( VerticesExtended pixel) : COLOR
     float4 stratum4AlbedoNear = tex2D(Stratum4AlbedoSampler, 3 * position.xy * Stratum4AlbedoTile.xy);
     float4 stratum5AlbedoNear = tex2D(Stratum5AlbedoSampler, 3 * position.xy * Stratum5AlbedoTile.xy);
     float4 stratum6AlbedoNear = tex2D(Stratum6AlbedoSampler, 3 * position.xy * Stratum6AlbedoTile.xy);
-    float4 stratum7AlbedoNear = tex2D(Stratum7AlbedoSampler, 3 * position.xy * Stratum7AlbedoTile.xy);
 
     float4 stratum6AlbedoOut = tex2D(Stratum6AlbedoSampler, 0.5 * position.yx * Stratum6AlbedoTile.xy);
-    float4 stratum7AlbedoOut = tex2D(Stratum7AlbedoSampler, 0.5 * position.yx * Stratum7AlbedoTile.xy);
-    float4 stratum7AlbedoFurtherOut = tex2D(Stratum7AlbedoSampler, 0.25 * position.xy * Stratum7AlbedoTile.xy);
 
     // We want the lowest mipmap
     float2 ddx = float2(1.0, 0.0); 
@@ -1803,11 +1799,9 @@ float4 TTerrainAlbedoExtendedPS ( VerticesExtended pixel) : COLOR
     float4 s4ABrightness = tex2Dgrad(Stratum4AlbedoSampler, position.xy * Stratum4AlbedoTile.xy, ddx, ddy);
     float4 s5ABrightness = tex2Dgrad(Stratum5AlbedoSampler, position.xy * Stratum5AlbedoTile.xy, ddx, ddy);
     float4 s6ABrightness = tex2Dgrad(Stratum6AlbedoSampler, position.xy * Stratum6AlbedoTile.xy, ddx, ddy);
-    float4 s7ABrightness = tex2Dgrad(Stratum7AlbedoSampler, position.xy * Stratum7AlbedoTile.xy, ddx, ddy);
 
     float cameraFractionNear = 1 - clamp(0.01 * (CameraPosition.y - 20), 0, 1);
     float cameraFractionOut = clamp(0.001 * (CameraPosition.y - 250), 0, 1);
-    float cameraFractionFurtherOut = clamp(0.001 * (CameraPosition.y - 800), 0, 1);
 
     float4 albedo = lowerAlbedo;
     albedo = CorrectedAddition(albedo, lowerAlbedoNear, lABrightness, cameraFractionNear);
@@ -1826,21 +1820,20 @@ float4 TTerrainAlbedoExtendedPS ( VerticesExtended pixel) : COLOR
     albedo = splatLerp(albedo, stratum6Albedo, mask1.z); 
     albedo = CorrectedAddition(albedo, stratum6AlbedoOut, s6ABrightness, mask1.z * cameraFractionOut);
     albedo = CorrectedAddition(albedo, stratum6AlbedoNear, s6ABrightness, mask1.z * cameraFractionNear); 
-    albedo = splatLerp(albedo, stratum7Albedo, mask1.w); 
-    albedo = CorrectedAddition(albedo, stratum7AlbedoOut, s7ABrightness, mask1.w * cameraFractionOut);
-    albedo = CorrectedAddition(albedo, stratum7AlbedoFurtherOut, s7ABrightness, mask1.w * cameraFractionFurtherOut);
-    albedo = CorrectedAddition(albedo, stratum7AlbedoNear, s7ABrightness, mask1.w * cameraFractionNear); 
     albedo.rgb = lerp(albedo.xyz,upperAlbedo.xyz,upperAlbedo.w);
 
     float3 r = reflect(normalize(pixel.mViewDirection),normal);
     float3 specular = pow(saturate(dot(r,SunDirection)),80)*albedo.aaa*SpecularColor.a*SpecularColor.rgb;
 
-    float dotSunNormal = dot(SunDirection,normal);
+    // We use stratum 7 as a utility map
+    float4 properties = tex2D(Stratum7AlbedoSampler, coords.xz);
+    float shadowSample = saturate(1 - (properties.b * 1));
 
-    float shadow = tex2D(ShadowSampler,pixel.mShadow.xy).g;
-    float3 light = SunColor*saturate(dotSunNormal)*shadow + SunAmbience;
-    light = LightingMultiplier*light + ShadowFillColor*(1-light);
-    albedo.rgb = light * ( albedo.rgb + specular.rgb );
+    float dotSunNormal = dot(SunDirection,normal);
+    float shadow = min(tex2D(ShadowSampler,pixel.mShadow.xy).g, shadowSample);
+    float3 light = SunColor * saturate(dotSunNormal) * shadow + SunAmbience;
+    light = LightingMultiplier * light + ShadowFillColor * (1 - light);
+    albedo.rgb = light * (albedo.rgb + specular.rgb);
 
     float waterDepth = tex2Dproj(UtilitySamplerC,pixel.mTexWT*TerrainScale).g;
     float4 water = tex1D(WaterRampSampler,waterDepth);
