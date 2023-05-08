@@ -1579,7 +1579,7 @@ float textureSplatting(float4 t1, float4 t2, float4 correction, float factor) {
     float t2height = (t2.r + t2.g + t2.b) / 3;
     // we assume height of 0.5 for the previous layers
     // factor = (t1height + 0.5 > t2height + factor) ? 0 : 1;
-    // return factor;
+    return factor;
 
     float correctionavg = (correction.r + correction.g + correction.b) / 3;
     factor *= (t2height - correctionavg + 1) * 10;
@@ -1596,7 +1596,7 @@ float4 CorrectedAddition(float4 t1, float4 t2, float4 correction, float factor) 
 }
 
 float4 splatLerp(float4 t1, float4 t2, float factor) {
-    // return lerp(t1, t2, factor);
+    return lerp(t1, t2, factor);
     float t1height = (t1.r + t1.g + t1.b) / 3;
     float t2height = (t2.r + t2.g + t2.b) / 3;
 
