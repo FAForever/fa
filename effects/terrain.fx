@@ -1862,13 +1862,11 @@ float4 TTerrainAlbedoExtendedPS ( VerticesExtended pixel) : COLOR
     float shadow = tex2D(ShadowSampler,pixel.mShadow.xy).g; // 1 where sun is, 0 where shadow is
     shadow = shadow * shadowSample;
 
-    float ambientOcclusion = properties.w;
+    float overlay = properties.w;
+    albedo *= overlay * 2;
 
-    float nDotL = saturate(dot(SunDirection, normal));
-    float3 sunLight = SunColor * nDotL * shadow * LightingMultiplier;
-    float3 shadowColor = (1 - (SunColor * nDotL * shadow + SunAmbience)) * ShadowFillColor;
-    float3 ambientLight = (LightingMultiplier * SunAmbience + shadowColor) * ambientOcclusion;
-    float3 light = sunLight + ambientLight;
+    float3 light = SunColor * saturate(dot(SunDirection, normal)) * shadow + SunAmbience;
+    light = LightingMultiplier * light + ShadowFillColor * (1 - light);
     albedo.rgb = light * (albedo.rgb + specular.rgb);
 
     float waterDepth = tex2Dproj(UtilitySamplerC,pixel.mTexWT*TerrainScale).g;
