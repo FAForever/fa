@@ -530,7 +530,8 @@ function PathToWithThreatThreshold(layer, origin, destination, aibrain, threatFu
     return path, head, distance
 end
 
---- Returns a label that indicates to what sub-graph it belongs to, these graphs can be visualised using the Nav UI
+--- Returns a label that indicates to what sub-graph it belongs to. Unlike `GetTerrainLabel` this function will try to find the nearest valid neighbor
+---@see GetTerrainLabel
 ---@param layer NavLayers
 ---@param position Vector
 ---@return number? 
@@ -560,6 +561,42 @@ function GetLabel(layer, position)
 
     if leaf.Label == -1 then
         return nil, 'Unpathable'
+    end
+
+    return leaf.Label, nil
+end
+
+--- Returns a label that indicates to what sub-graph it belongs to. Unlike `GetLabel` this function does not try to find valid neighbors
+---@see GetLabel
+---@param layer NavLayers
+---@param position Vector
+---@return number? 
+---@return string?
+function GetTerrainLabel(layer, position)
+    -- check if generated
+    if not NavGenerator.IsGenerated() then
+        WarnNoNavMesh()
+        return nil, 'Navigational mesh is not generated'
+    end
+
+    -- check layer argument
+    local grid = FindGrid(layer)
+    if not grid then
+        return nil, 'Invalid layer type - this is likely a typo. The layer is case sensitive'
+    end
+
+    -- check position argument
+    local leaf = grid:FindLeaf(position)
+    if not leaf then
+        return nil, 'Position is not inside the map'
+    end
+
+    if leaf.Label == 0 then
+        return nil, 'Position has no label assigned, report to the maintainers. This should not be possible'
+    end
+
+    if leaf.Label == -1 then
+        return nil, 'Position is unpathable'
     end
 
     return leaf.Label, nil
