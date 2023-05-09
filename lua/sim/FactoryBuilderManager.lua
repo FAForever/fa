@@ -13,8 +13,6 @@ local Builder = import("/lua/sim/builder.lua")
 
 local TableGetn = table.getn
 
-
-
 ---@class FactoryBuilderManager : BuilderManager
 ---@field Location Vector
 ---@field Radius number

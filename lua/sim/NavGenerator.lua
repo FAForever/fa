@@ -21,7 +21,6 @@
 --******************************************************************************************************
 
 local Shared = import("/lua/shared/navgenerator.lua")
-local MarkerGenerator = import("/lua/sim/markergenerator.lua")
 
 ---@alias NavTerrainCache number[][]
 ---@alias NavDepthCache number[][]
@@ -1219,8 +1218,4 @@ function Generate()
 
     -- allows debugging tools to function
     import("/lua/sim/navdebug.lua")
-end
-
-function GenerateMarkers()
-    MarkerGenerator.GenerateExpansions()
 end

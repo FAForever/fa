@@ -36,6 +36,11 @@ EngineerManager = Class(BuilderManager) {
 
         self.ConsumptionUnits = {
             Engineers = { Category = categories.ENGINEER, Units = {}, UnitsList = {}, Count = 0, },
+
+
+
+
+            
             Fabricators = { Category = categories.MASSFABRICATION * categories.STRUCTURE, Units = {}, UnitsList = {}, Count = 0, },
             Shields = { Category = categories.SHIELD * categories.STRUCTURE, Units = {}, UnitsList = {}, Count = 0, },
             MobileShields = { Category = categories.SHIELD * categories.MOBILE, Units = {}, UnitsList = {}, Count = 0, },

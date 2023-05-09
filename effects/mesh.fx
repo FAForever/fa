@@ -9280,7 +9280,10 @@ float4 PBR_UEF(NORMALMAPPED_VERTEX vertex, float teamColorFactor, uniform bool h
 
     float emission = specular.b * 0.8;
     color += emission * albedo;
-    float alphaGlow = mirrored ? 0.5 : emission;
+    // The glowminimum is required to make the unit behave properly with the water shader.
+    // If the alpha channel is 0 somewhere, those parts will show as water refractions even
+    // if they are above the water line. See https://github.com/FAForever/fa/issues/4696
+    float alphaGlow = mirrored ? 0.5 : emission + glowMinimum;
     return float4(color.rgb, alphaGlow);
 }
 
@@ -9388,7 +9391,7 @@ float4 PBR_AeonBuildPuddlePS(NORMALMAPPED_VERTEX vertex, uniform bool hiDefShado
 
     float3 color = PBR_PS(vertex, albedo, metallic, roughness, normal, hiDefShadows).rgb;
 
-    float alpha = mirrored ? 0.5 : specular.b;
+    float alpha = mirrored ? 0.5 : specular.b + glowMinimum;
 
     return float4(color, alpha);
 }
@@ -9499,7 +9502,7 @@ float4 PBR_Cybran(NORMALMAPPED_VERTEX vertex, float teamColorFactor, uniform boo
 
     float emission = pow(max(specular.b - 0.04, 0.0), 0.5);
     color += emission * albedo;
-    float alpha = mirrored ? 0.5 : emission;
+    float alpha = mirrored ? 0.5 : emission + glowMinimum;
 
     return float4(color.rgb, alpha);
 }
@@ -9554,7 +9557,7 @@ float4 PBR_Seraphim(
     // Bloom is only rendered where alpha > 0
     float teamColorGlow = (vertex.color.r + vertex.color.g + vertex.color.b) / 3;
     teamColorGlow = albedo.a * (1 - teamColorGlow) * 0.06;
-    float alpha = mirrored ? 0.5 : saturate(specular.b - 0.1) * 0.4 + teamColorGlow + whiteness * 0.1;
+    float alpha = mirrored ? 0.5 : saturate(specular.b - 0.1) * 0.4 + teamColorGlow + whiteness * 0.1 + glowMinimum;
     
     return float4(color, alpha);
 }

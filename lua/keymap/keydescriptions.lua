@@ -499,4 +499,13 @@ keyDescriptions = {
     ['recheck_targets_of_weapons'] = 'Recheck targets of weapons of selected units',
     ['set_target_priority'] = 'Set weapon target priorities to the type of unit that you hover over with the mouse',
     ['set_default_target_priority'] = 'Set weapon target priorities of selected units to their defaults',
+
+    ['toggle_navui'] = 'Toggle the debugging UI for the navigational mesh',
+    ['toggle_ai_reclaim_grid_ui'] = 'Toggle the debugging UI for the reclaim grid',
+    ['toggle_ai_recon_grid_ui'] = 'Toggle the debugging UI for the recon grid',
+
+    ['toggle_ai_economy_ui'] = 'Toggle the debugging UI for the economy brain data',
+
+    ['toggle_platoon_behavior_silo'] = 'Applies the simple silo AI behavior to your selection',
+    ['toggle_platoon_simple_raid'] = 'Applies the simple raid AI behavior to your selection'
 }
