@@ -1858,12 +1858,17 @@ float4 TTerrainAlbedoExtendedPS ( VerticesExtended pixel) : COLOR
 
     // We use stratum 7 as a utility map
     float4 properties = tex2D(Stratum7AlbedoSampler, coords.xz);
-    float shadowSample = saturate(1 - properties.b); // 1 where sun is, 0 where shadow is
+    float shadowSample = saturate(1 - properties.z); // 1 where sun is, 0 where shadow is
     float shadow = tex2D(ShadowSampler,pixel.mShadow.xy).g; // 1 where sun is, 0 where shadow is
     shadow = shadow * shadowSample;
 
-    float3 light = SunColor * saturate(dot(SunDirection, normal)) * shadow + SunAmbience;
-    light = LightingMultiplier * light + ShadowFillColor * (1 - light);
+    float ambientOcclusion = properties.w;
+
+    float nDotL = saturate(dot(SunDirection, normal));
+    float3 sunLight = SunColor * nDotL * shadow * LightingMultiplier;
+    float3 shadowColor = (1 - (SunColor * nDotL * shadow + SunAmbience)) * ShadowFillColor;
+    float3 ambientLight = (LightingMultiplier * SunAmbience + shadowColor) * ambientOcclusion;
+    float3 light = sunLight + ambientLight;
     albedo.rgb = light * (albedo.rgb + specular.rgb);
 
     float waterDepth = tex2Dproj(UtilitySamplerC,pixel.mTexWT*TerrainScale).g;
