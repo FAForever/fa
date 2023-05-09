@@ -571,32 +571,32 @@ end
 ---@param layer NavLayers
 ---@param position Vector
 ---@return number? 
----@return string?
+---@return ('NotGenerated' | 'InvalidLayer' | 'OutsideMap' | 'SystemError' | 'Unpathable')?
 function GetTerrainLabel(layer, position)
     -- check if generated
     if not NavGenerator.IsGenerated() then
         WarnNoNavMesh()
-        return nil, 'Navigational mesh is not generated'
+        return nil, 'NotGenerated'
     end
 
     -- check layer argument
     local grid = FindGrid(layer)
     if not grid then
-        return nil, 'Invalid layer type - this is likely a typo. The layer is case sensitive'
+        return nil, 'InvalidLayer'
     end
 
     -- check position argument
     local leaf = grid:FindLeaf(position)
     if not leaf then
-        return nil, 'Position is not inside the map'
+        return nil, 'OutsideMap'
     end
 
     if leaf.Label == 0 then
-        return nil, 'Position has no label assigned, report to the maintainers. This should not be possible'
+        return nil, 'SystemError'
     end
 
     if leaf.Label == -1 then
-        return nil, 'Position is unpathable'
+        return nil, 'Unpathable'
     end
 
     return leaf.Label, nil
