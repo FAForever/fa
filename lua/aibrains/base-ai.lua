@@ -154,6 +154,24 @@ AIBrain = Class(StandardBrain) {
         self.IgnoreArmyCaps = false
     end,
 
+    --- Called after `BeginSession`, at this point all props, resources and initial units exist in the map
+    ---@param self AIBrain
+    OnBeginSession = function(self)
+        StandardBrain.OnBeginSession(self)
+
+        -- requires navigational mesh
+        import("/lua/sim/NavUtils.lua").Generate()
+
+        -- requires these markers to exist
+        import("/lua/sim/MarkerUtilities.lua").GenerateExpansionMarkers()
+        import("/lua/sim/MarkerUtilities.lua").GenerateRallyPointMarkers()
+
+        -- requires these datastructures to understand the game
+        self.GridReclaim = import("/lua/ai/gridreclaim.lua").Setup(self)
+        self.GridBrain = import("/lua/ai/gridbrain.lua").Setup()
+        self.GridRecon = import("/lua/ai/gridrecon.lua").Setup(self)
+    end,
+
     -- AI BRAIN FUNCTIONS HANDLED HERE --
 
     ---@param self BaseAIBrain
