@@ -142,6 +142,16 @@ struct TERRAIN_DEPTH
     float4 mDepth       : TEXCOORD0;
 };
 
+samplerCUBE environmentSampler = sampler_state
+{
+    Texture   = (UpperAlbedoTexture);
+    MipFilter = LINEAR;
+    MinFilter = LINEAR;
+    MagFilter = LINEAR;
+    AddressU  = WRAP;
+    AddressV  = WRAP;
+};
+
 #ifdef DIRECT3D10
     sampler2D BiCubicLookupSampler = sampler_state
 #else
@@ -1616,6 +1626,16 @@ float4 splatLerp(float4 t1, float4 t2, float factor) {
     return (t1height + h1 > t2height + factor) ? t1 : t2;
 }
 
+/* # Sample a 2D 2x2 texture atlas # */
+float4 atlas2D(sampler2D s, float2 uv, float2 offset) {
+    // We need to manually provide the derivatives.
+    // See https://forum.unity.com/threads/tiling-textures-within-an-atlas-by-wrapping-uvs-within-frag-shader-getting-artifacts.535793/
+    float2 uv_ddx = ddx(uv);
+    float2 uv_ddy = ddy(uv);
+    uv.x = frac(uv.x * 2) / 2 + offset.x;
+    uv.y = frac(uv.y * 2) / 2 + offset.y;
+    return tex2Dgrad(s, uv, uv_ddx, uv_ddy);
+}
 
 /* # Terrain XP Extended # */
 
@@ -1639,12 +1659,13 @@ float4 splatLerp(float4 t1, float4 t2, float factor) {
 struct VerticesExtended
 {
     float4 mPos             : POSITION0;
-    float4 mWorld           : TEXCOORD6;
     float4 mTexWT           : TEXCOORD1;
     float4 mTexSS           : TEXCOORD2;
     float4 mShadow          : TEXCOORD3;
     float3 mViewDirection   : TEXCOORD4;
     float4 mTexDecal        : TEXCOORD5;
+    float4 mWorld           : TEXCOORD6;
+    float2 mS1UV            : TEXCOORD7;
 };
 
 VerticesExtended TerrainExtendedVS( position_t p : POSITION0, uniform bool shadowed)
@@ -1657,6 +1678,12 @@ VerticesExtended TerrainExtendedVS( position_t p : POSITION0, uniform bool shado
     float4 position = float4(p);
     position.y *= HeightScale;
 
+    // we can save some instructions by computing uvs in the vertex shader
+    float2 uv = TerrainScale * position.xyz * Stratum1AlbedoTile.xy;
+    uv.x = frac(uv.x * 2) / 2 + 0.5;
+    uv.y = frac(uv.y * 2) / 2 + 0.5;
+    result.mS1UV = uv;
+
     // calculate output position
     result.mPos = calculateHomogenousCoordinate(position);
 
@@ -1666,7 +1693,8 @@ VerticesExtended TerrainExtendedVS( position_t p : POSITION0, uniform bool shado
     result.mTexSS = result.mPos;
     result.mTexDecal = float4(0,0,0,0);
 
-    result.mViewDirection = normalize(position.xyz-CameraPosition.xyz);
+    // Now the view vector points to the camera
+    result.mViewDirection = normalize(CameraPosition.xyz - position.xyz);
 
     // if we have shadows enabled fill in the tex coordinate for the shadow projection
     if ( shadowed && ( 1 == ShadowsEnabled ))
@@ -1809,6 +1837,25 @@ float4 TTerrainAlbedoExtendedPS ( VerticesExtended pixel) : COLOR
     float4 stratum5AlbedoFar = tex2D(Stratum5AlbedoSampler, 0.2 * position.xy * Stratum5AlbedoTile.xy);
     float4 stratum6AlbedoFar = tex2D(Stratum6AlbedoSampler, 0.2 * position.xy * Stratum6AlbedoTile.xy);
 
+    // First value is height, second is roughness
+    float2 lowerHR    = atlas2D(Stratum7AlbedoSampler, position.xy * LowerAlbedoTile.xy   , float2(0.0, 0.0)).xy;
+    float2 stratum0HR = atlas2D(Stratum7AlbedoSampler, position.xy * Stratum0AlbedoTile.xy, float2(0.0, 0.5)).xy;
+    float2 stratum1HR = atlas2D(Stratum7AlbedoSampler, position.xy * Stratum1AlbedoTile.xy, float2(0.5, 0.0)).xy;
+    float2 stratum2HR = atlas2D(Stratum7AlbedoSampler, position.xy * Stratum2AlbedoTile.xy, float2(0.5, 0.5)).xy;
+    float2 stratum3HR = atlas2D(Stratum7AlbedoSampler, position.xy * Stratum3AlbedoTile.xy, float2(0.0, 0.0)).zw;
+    float2 stratum4HR = atlas2D(Stratum7AlbedoSampler, position.xy * Stratum4AlbedoTile.xy, float2(0.0, 0.5)).zw;
+    float2 stratum5HR = atlas2D(Stratum7AlbedoSampler, position.xy * Stratum5AlbedoTile.xy, float2(0.5, 0.0)).zw;
+    float2 stratum6HR = atlas2D(Stratum7AlbedoSampler, position.xy * Stratum6AlbedoTile.xy, float2(0.5, 0.5)).zw;
+
+    float2 lowerHRFar    = atlas2D(Stratum7AlbedoSampler, position.xy * LowerNormalTile.xy   , float2(0.0, 0.0)).xy;
+    float2 stratum0HRFar = atlas2D(Stratum7AlbedoSampler, position.xy * Stratum0NormalTile.xy, float2(0.0, 0.5)).xy;
+    float2 stratum1HRFar = atlas2D(Stratum7AlbedoSampler, position.xy * Stratum1NormalTile.xy, float2(0.5, 0.0)).xy;
+    float2 stratum2HRFar = atlas2D(Stratum7AlbedoSampler, position.xy * Stratum2NormalTile.xy, float2(0.5, 0.5)).xy;
+    float2 stratum3HRFar = atlas2D(Stratum7AlbedoSampler, position.xy * Stratum3NormalTile.xy, float2(0.0, 0.0)).zw;
+    float2 stratum4HRFar = atlas2D(Stratum7AlbedoSampler, position.xy * Stratum4NormalTile.xy, float2(0.0, 0.5)).zw;
+    float2 stratum5HRFar = atlas2D(Stratum7AlbedoSampler, position.xy * Stratum5NormalTile.xy, float2(0.5, 0.0)).zw;
+    float2 stratum6HRFar = atlas2D(Stratum7AlbedoSampler, position.xy * Stratum6NormalTile.xy, float2(0.5, 0.5)).zw;
+
     // We want the lowest mipmap
     float2 ddx = float2(1.0, 0.0); 
     float2 ddy = float2(0.0, 1.0); 
@@ -1850,7 +1897,7 @@ float4 TTerrainAlbedoExtendedPS ( VerticesExtended pixel) : COLOR
     albedo = CorrectedAddition(albedo, stratum6AlbedoNear, s6ABrightness, mask1.z * cameraFractionNear); 
     albedo.rgb = lerp(albedo.xyz,upperAlbedo.xyz,upperAlbedo.w);
 
-    float3 r = reflect(normalize(pixel.mViewDirection),normal);
+    float3 r = reflect(-pixel.mViewDirection, normal);
     float3 specular = pow(saturate(dot(r,SunDirection)),80)*albedo.aaa*SpecularColor.a*SpecularColor.rgb;
 
     // We use stratum 7 as a utility map
