@@ -3251,8 +3251,8 @@ Platoon = Class(moho.platoon_methods) {
         end
 
         local bestBase = false
-        local bestBaseName = ""
-        local bestDistSq = 999999999
+        local bestBaseName
+        local bestDistSq
         local platPos = self:GetPlatoonPosition()
         local returnPos
 
@@ -3262,7 +3262,7 @@ Platoon = Class(moho.platoon_methods) {
             end
             local distSq = VDist2Sq(platPos[1], platPos[3], base.Position[1], base.Position[3])
 
-            if distSq < bestDistSq then
+            if not bestDistSq or distSq < bestDistSq then
                 bestBase = base
                 bestBaseName = baseName
                 bestDistSq = distSq
@@ -3305,8 +3305,6 @@ Platoon = Class(moho.platoon_methods) {
                 oldDistSq = distSq
             end
         end
-        -- default to returning to attacking
-        return self:AttackForceAI()
     end,
 
     -- -------------------
