@@ -1585,16 +1585,16 @@ float textureSplatting(float4 t1, float4 t2, float4 correction, float factor) {
     float t2height = (t2.r + t2.g + t2.b) / 3;
     // we assume height of 0.5 for the previous layers
     // factor = (t1height + 0.5 > t2height + factor) ? 0 : 1;
-    return factor;
+    // return factor;
 
     float correctionavg = (correction.r + correction.g + correction.b) / 3;
-    factor *= (t2height - correctionavg + 1) * 10;
+    // factor *= (t2height - correctionavg + 1) * 10;
     return factor + (t2height - correctionavg) * 5; // This produces wild but interesting results
     return saturate(factor);
 }
 
 float4 CorrectedAddition(float4 t1, float4 t2, float4 correction, float factor) {
-    factor = textureSplatting(t1, t2, correction, factor);
+    // factor = textureSplatting(t1, t2, correction, factor);
     // return t1;
     // return t1 + (t2 - correction) * factor; // This increases contrast
     // return lerp(t1, t2, factor * 0.8);// This decreases contrast
@@ -1603,18 +1603,17 @@ float4 CorrectedAddition(float4 t1, float4 t2, float4 correction, float factor) 
 
 float4 splatLerp(float4 t1, float4 t2, float factor) {
     return lerp(t1, t2, factor);
-    float t1height = (t1.r + t1.g + t1.b) / 3;
-    float t2height = (t2.r + t2.g + t2.b) / 3;
+    float t1height = (t1.r + t1.g + t1.b);
+    float t2height = (t2.r + t2.g + t2.b);
 
-    // we assume height of 0.3 for the previous layers
-    float bias = 0.3;
-    float depth = 0.2;
-    float ma = max(t1height + bias, t2height + factor) - depth;
-    float b1 = max(t1height + bias - ma, 0);
+    float h1 = 1.3 - factor;
+    float depth = 0.1;
+    float ma = max(t1height + h1, t2height + factor) - depth;
+    float b1 = max(t1height + h1 - ma, 0);
     float b2 = max(t2height + factor - ma, 0);
     return (t1 * b1 + t2 * b2) / (b1 + b2);
 
-    return (t1height + bias > t2height + factor) ? t1 : t2;
+    return (t1height + h1 > t2height + factor) ? t1 : t2;
 }
 
 
