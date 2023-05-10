@@ -1782,17 +1782,15 @@ float4 TTerrainAlbedoExtendedPS ( VerticesExtended pixel) : COLOR
     float4 mask0 = saturate(tex2D(UtilitySamplerA, position.xy)*2-1);
     float4 mask1 = saturate(tex2D(UtilitySamplerB, position.xy)*2-1);
 
-    // bias leads to aliasing
-    float bias = 0;
-    float4 lowerAlbedo    = tex2Dbias(LowerAlbedoSampler,    float4(position.xy * LowerAlbedoTile.xy   , 0, bias));
-    float4 stratum0Albedo = tex2Dbias(Stratum0AlbedoSampler, float4(position.xy * Stratum0AlbedoTile.xy, 0, bias));
-    float4 stratum1Albedo = tex2Dbias(Stratum1AlbedoSampler, float4(position.xy * Stratum1AlbedoTile.xy, 0, bias));
-    float4 stratum2Albedo = tex2Dbias(Stratum2AlbedoSampler, float4(position.xy * Stratum2AlbedoTile.xy, 0, bias));
-    float4 stratum3Albedo = tex2Dbias(Stratum3AlbedoSampler, float4(position.xy * Stratum3AlbedoTile.xy, 0, bias));
-    float4 stratum4Albedo = tex2Dbias(Stratum4AlbedoSampler, float4(position.xy * Stratum4AlbedoTile.xy, 0, bias));
-    float4 stratum5Albedo = tex2Dbias(Stratum5AlbedoSampler, float4(position.xy * Stratum5AlbedoTile.xy, 0, bias));
-    float4 stratum6Albedo = tex2Dbias(Stratum6AlbedoSampler, float4(position.xy * Stratum6AlbedoTile.xy, 0, bias));
-    float4 upperAlbedo    = tex2Dbias(UpperAlbedoSampler,    float4(position.xy * UpperAlbedoTile.xy   , 0, bias));
+    float4 lowerAlbedo    = tex2D(LowerAlbedoSampler,    position.xy * LowerAlbedoTile.xy   );
+    float4 stratum0Albedo = tex2D(Stratum0AlbedoSampler, position.xy * Stratum0AlbedoTile.xy);
+    float4 stratum1Albedo = tex2D(Stratum1AlbedoSampler, position.xy * Stratum1AlbedoTile.xy);
+    float4 stratum2Albedo = tex2D(Stratum2AlbedoSampler, position.xy * Stratum2AlbedoTile.xy);
+    float4 stratum3Albedo = tex2D(Stratum3AlbedoSampler, position.xy * Stratum3AlbedoTile.xy);
+    float4 stratum4Albedo = tex2D(Stratum4AlbedoSampler, position.xy * Stratum4AlbedoTile.xy);
+    float4 stratum5Albedo = tex2D(Stratum5AlbedoSampler, position.xy * Stratum5AlbedoTile.xy);
+    float4 stratum6Albedo = tex2D(Stratum6AlbedoSampler, position.xy * Stratum6AlbedoTile.xy);
+    float4 upperAlbedo    = tex2D(UpperAlbedoSampler,    position.xy * UpperAlbedoTile.xy   );
 
     float4 lowerAlbedoNear    = tex2D(LowerAlbedoSampler,    3 * position.xy * LowerAlbedoTile.xy);
     float4 stratum0AlbedoNear = tex2D(Stratum0AlbedoSampler, 3 * position.xy * Stratum0AlbedoTile.xy);
