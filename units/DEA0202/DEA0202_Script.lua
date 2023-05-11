@@ -1,12 +1,8 @@
---****************************************************************************
---**
---**  File     :  /cdimage/units/DEA0202/DEA0202_script.lua
---**  Author(s):  John Comes, David Tomandl, Jessica St. Croix, Matt Vainio
---**
---**  Summary  :  UEF Supersonic Fighter Script
---**
---**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
---****************************************************************************
+-- File     :  /cdimage/units/DEA0202/DEA0202_script.lua
+-- Author(s):  John Comes, David Tomandl, Jessica St. Croix, Matt Vainio
+-- Summary  :  UEF Supersonic Fighter Script
+-- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+---------------------------------------------------------------------------
 
 local TAirUnit = import("/lua/terranunits.lua").TAirUnit
 local TAirToAirLinkedRailgun = import("/lua/terranweapons.lua").TAirToAirLinkedRailgun
@@ -30,7 +26,7 @@ DEA0202 = ClassUnit(TAirUnit) {
         else
            self.unit:SetBreakOffTriggerMult(2.0)
            self.unit:SetBreakOffDistanceMult(8.0)
-           self.unit:SetSpeedMult(0.67)
+           self.unit:SetSpeedMult(1.0)
            TIFCarpetBombWeapon.IdleState.OnGotTarget(self)
         end
     end,
@@ -51,7 +47,7 @@ DEA0202 = ClassUnit(TAirUnit) {
         else
            self.unit:SetBreakOffTriggerMult(2.0)
            self.unit:SetBreakOffDistanceMult(8.0)
-           self.unit:SetSpeedMult(0.67)
+           self.unit:SetSpeedMult(1.0)
            TIFCarpetBombWeapon.OnGotTarget(self)
         end
     end,
@@ -125,7 +121,7 @@ DEA0202 = ClassUnit(TAirUnit) {
                 self:RotateWings(nil)
             end
             
-            WaitSeconds(1)
+            WaitTicks(11)
         end
     end,
 }
