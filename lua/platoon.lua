@@ -3244,6 +3244,7 @@ Platoon = Class(moho.platoon_methods) {
     --- for a new platoon
     ---@param self Platoon
     ReturnToBaseAI = function(self)
+        LOG('Platoon returning to base')
         local aiBrain = self:GetBrain()
 
         if not aiBrain:PlatoonExists(self) or not self:GetPlatoonPosition() then
@@ -3276,6 +3277,7 @@ Platoon = Class(moho.platoon_methods) {
             else
                 returnPos = bestBase.Position
             end
+            LOG('Bestbase found, generating path')
             local path, reason = AIAttackUtils.PlatoonGenerateSafePathTo(aiBrain, self.MovementLayer, self:GetPlatoonPosition(), returnPos, 200)
             -- remove any formation settings to ensure a quick return to base.
             self:SetPlatoonFormationOverride('NoFormation')
@@ -3283,6 +3285,7 @@ Platoon = Class(moho.platoon_methods) {
 
             if path then
                 local pathLength = table.getn(path)
+                LOG('path found, moving to location')
                 for i=1, pathLength-1 do
                     self:MoveToLocation(path[i], false)
                 end
@@ -3300,6 +3303,7 @@ Platoon = Class(moho.platoon_methods) {
                 end
                 -- if we haven't moved in 10 seconds... go back to attacking
                 if (distSq - oldDistSq) < 5 then
+                    LOG('return to base should have platoon at location now')
                     break
                 end
                 oldDistSq = distSq
