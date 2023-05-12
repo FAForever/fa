@@ -1348,7 +1348,6 @@ function OnSelectionChanged(oldSelection, newSelection, added, removed)
 end
 
 function OnQueueChanged(newQueue)
-    reprsl(newQueue)
     if not gameUIHidden then
         import("/lua/ui/game/construction.lua").OnQueueChanged(newQueue)
     end
