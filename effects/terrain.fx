@@ -1808,8 +1808,8 @@ float4 TerrainPBRNormalsPS ( VS_OUTPUT inV ) : COLOR
     float4 utility = tex2D(UpperAlbedoSampler, position.xy);
 
     float4 overlayNormal;
-    overlayNormal.xz = utility.xy * 2 - 1;
-    overlayNormal.y = sqrt(1 - dot(overlayNormal.xz,overlayNormal.xz));
+    overlayNormal.xy = utility.xy * 2 - 1;
+    overlayNormal.z = sqrt(1 - dot(overlayNormal.xy,overlayNormal.xy));
     overlayNormal.w = 0;
 
     // load in normals
