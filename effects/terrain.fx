@@ -1829,8 +1829,8 @@ float4 TerrainPBRNormalsPS ( VertexPBR inV ) : COLOR
     float4 stratum6NormalFar  = tex2D(Stratum6NormalSampler, position.xy * Stratum6NormalTile.xy);
 
     // allow textures to scale as we zoom in and out
-    float cameraFractionNear = (0.8 - 0.8 * clamp(0.01 * (CameraPosition.y - 20), 0, 1)) * Stratum7AlbedoTile.x;
-    float cameraFractionFar = (0.5 + 0.5 * clamp(0.001 * (CameraPosition.y - 250), 0, 1)) * Stratum7NormalTile.x;
+    float cameraFractionNear = (0.8 - 0.8 * clamp(0.01 * (CameraPosition.y - 20), 0, 1)) * Stratum7AlbedoTile.x * TerrainScale;
+    float cameraFractionFar = (0.5 + 0.5 * clamp(0.001 * (CameraPosition.y - 250), 0, 1)) * Stratum7NormalTile.x * TerrainScale;
 
     // combine them
     float fractionLower = (1 - mask0.x)*(1 - mask0.y)*(1 - mask0.z)*(1 - mask0.w)*(1 - mask1.x)*(1 - mask1.y)*(1 - mask1.z)*(1 - mask1.w);
