@@ -1710,7 +1710,14 @@ float GeometrySmith(float3 n, float3 v, float3 l, float roughness)
     return gs1 * gs2;
 }
 
-float3 PBR(float3 albedo, float3 v, float3 n, float shadow, float roughness) {
+float3 PBR(VS_OUTPUT inV, float3 albedo, float3 n, float roughness) {
+
+    float4 position = TerrainScale * inV.mTexWT;
+    float mapShadow = 1 - tex2D(UpperAlbedoSampler, position.xy).z; // 1 where sun is, 0 where shadow is
+    float shadow = tex2D(ShadowSampler,inV.mShadow.xy).g; // 1 where sun is, 0 where shadow is
+    shadow = shadow * mapShadow;
+
+    float3 v = normalize(-inV.mViewDirection);
     float3 F0 = float3(0.04, 0.04, 0.04);
     float3 l = SunDirection;
     float3 h = normalize(v + l);
@@ -1767,7 +1774,7 @@ VertexPBR TerrainPBRVS( position_t p : POSITION0, uniform bool shadowed)
     result.mPos = calculateHomogenousCoordinate(position);
 
     // calculate 0..1 uv based on size of map
-    result.mTexWT = float4(position.xzyw);
+    result.mTexWT = position.xzyw;
     // caluclate screen space coordinate for sample a frame buffer of this size
     result.mTexSS = result.mPos;
     result.mTexDecal = float4(0,0,0,0);
@@ -1791,18 +1798,14 @@ VertexPBR TerrainPBRVS( position_t p : POSITION0, uniform bool shadowed)
     return result;
 }
 
-float4 TerrainPBRNormalsPS ( VertexPBR inV ) : COLOR
+float4 TerrainPBRNormalsPS ( VS_OUTPUT inV ) : COLOR
 {
-    // retrieve x / y / z terrain coordinates
     float4 position = TerrainScale * inV.mTexWT;
-    float4 height = TerrainScale * inV.mWorld.y;
-    float3 mapCoords = float3(position.x, height.y, position.y);
 
-    // pre-fetch mask information
     float4 mask0 = tex2D(UtilitySamplerA, position.xy);
     float4 mask1 = tex2D(UtilitySamplerB, position.xy);
     // We use the upper stratum as a utility map
-    float4 utility = tex2D(UpperAlbedoSampler, mapCoords.xz);
+    float4 utility = tex2D(UpperAlbedoSampler, position.xy);
 
     float4 overlayNormal;
     overlayNormal.xz = utility.xy * 2 - 1;
@@ -1853,22 +1856,20 @@ float4 TerrainPBRNormalsPS ( VertexPBR inV ) : COLOR
     normal = UDNBlending(normal, normalize(2 * stratum6NormalNear - 1), mask1.z * cameraFractionNear);
     normal = UDNBlending(normal, normalize(overlayNormal), 1);
 
-
     return float4( 0.5 + 0.5 * normal.rgb, 1);
 }
 
-float4 TerrainPBRAlbedoPS ( VertexPBR inV) : COLOR
+float4 TerrainPBRAlbedoPS ( VS_OUTPUT inV) : COLOR
 {
+    // height is now in the z coordinate
     float4 position = TerrainScale * inV.mTexWT;
-    float4 height = TerrainScale * inV.mWorld.y;
-    float3 mapCoords = float3(position.x, height.y, position.y);
 
     // do arthmetics to get range from (0, 1) to (-1, 1) as normal maps store their values as (0, 1)
     float3 normal = normalize(2 * SampleScreen(NormalSampler,inV.mTexSS).xyz - 1);
 
     float4 mask0 = saturate(tex2D(UtilitySamplerA, position.xy));
     float4 mask1 = saturate(tex2D(UtilitySamplerB, position.xy));
-    float4 utility = tex2D(UpperAlbedoSampler, mapCoords.xz);
+    float4 utility = tex2D(UpperAlbedoSampler, position.xy);
 
     float4 lowerAlbedo    = tex2D(LowerAlbedoSampler,    position.xy * LowerAlbedoTile.xy);
     float4 stratum0Albedo = tex2D(Stratum0AlbedoSampler, position.xy * Stratum0AlbedoTile.xy);
@@ -1942,20 +1943,20 @@ float4 TerrainPBRAlbedoPS ( VertexPBR inV) : COLOR
     albedo.rgb *= utility.w * 2;
 
     float roughness = albedo.a * mask1.w * 2;
-    roughness = inV.mWorld.y < WaterElevation ? 0.9 : saturate(roughness + 0.01);
+    roughness = inV.mTexWT.z < WaterElevation ? 0.9 : saturate(roughness + 0.01);
 
     float shadowSample = saturate(1 - utility.z); // 1 where sun is, 0 where shadow is
     float shadow = tex2D(ShadowSampler,inV.mShadow.xy).g; // 1 where sun is, 0 where shadow is
     shadow = shadow * shadowSample;
 
-    float3 color = PBR(albedo, inV.mViewDirection, normal, shadow, roughness);
+    float3 color = PBR(inV, albedo, normal, roughness);
 
     float waterDepth = tex2Dproj(UtilitySamplerC,inV.mTexWT*TerrainScale).g;
     float4 water = tex1D(WaterRampSampler,waterDepth);
     color.rgb = lerp(color.rgb,water.rgb,water.a);
 
     return float4(color.rgb, 0.01f);
-    // SpecularColor.rgba is unused now
+    // SpecularColor.rgba and UpperAlbedoTile is unused now
 }
 
 /* # Experimental stuff for playing around # */
@@ -2175,7 +2176,7 @@ technique TTerainNormalsExtended
         AlphaState( AlphaBlend_Disable_Write_RG )
         DepthState( Depth_Enable )
 
-        VertexShader = compile vs_1_1 TerrainPBRVS( false );
+        VertexShader = compile vs_1_1 TerrainVS( false );
         PixelShader = compile ps_2_a TerrainPBRNormalsPS();
     }
 }
@@ -2190,7 +2191,7 @@ technique TTerrainXP <
         AlphaState( AlphaBlend_Disable_Write_RGBA )
         DepthState( Depth_Enable )
 
-        VertexShader = compile vs_1_1 TerrainPBRVS(true);
+        VertexShader = compile vs_1_1 TerrainVS(true);
         PixelShader = compile ps_3_0 TerrainPBRAlbedoPS();
     }
 }
