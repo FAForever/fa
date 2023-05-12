@@ -421,6 +421,85 @@ float4 CalculateLighting( float3 inNormal, float3 inViewPosition, float3 inAlbed
     return color;
 }
 
+const float PI = 3.14159265359;
+
+float3 FresnelSchlick(float hDotN, float3 F0)
+{
+    return F0 + (1.0 - F0) * pow(1.0 - hDotN, 5.0);
+}
+
+float NormalDistribution(float3 n, float3 h, float roughness)
+{
+    float a2 = roughness*roughness;
+    float nDotH = max(dot(n, h), 0.0);
+    float nDotH2 = nDotH*nDotH;
+
+    float num = a2;
+    float denom = nDotH2 * (a2 - 1.0) + 1.0;
+    denom = PI * denom * denom;
+
+    return num / denom;
+}
+
+float GeometrySchlick(float nDotV, float roughness)
+{
+    float r = (roughness + 1.0);
+    float k = (r*r) / 8.0;
+
+    float num = nDotV;
+    float denom = nDotV * (1.0 - k) + k;
+
+    return num / denom;
+}
+
+float GeometrySmith(float3 n, float3 v, float3 l, float roughness)
+{
+    float nDotV = max(dot(n, v), 0.0);
+    float nDotL = max(dot(n, l), 0.0);
+    float gs2 = GeometrySchlick(nDotV, roughness);
+    float gs1 = GeometrySchlick(nDotL, roughness);
+
+    return gs1 * gs2;
+}
+
+float3 PBR(VS_OUTPUT inV, float3 albedo, float3 n, float roughness) {
+
+    float4 position = TerrainScale * inV.mTexWT;
+    float mapShadow = 1 - tex2D(UpperAlbedoSampler, position.xy).z; // 1 where sun is, 0 where shadow is
+    float shadow = tex2D(ShadowSampler,inV.mShadow.xy).g; // 1 where sun is, 0 where shadow is
+    shadow = shadow * mapShadow;
+
+    float3 v = normalize(-inV.mViewDirection);
+    float3 F0 = float3(0.04, 0.04, 0.04);
+    float3 l = SunDirection;
+    float3 h = normalize(v + l);
+    float nDotL = max(dot(n, l), 0.0);
+    float3 sunLight = SunColor * LightingMultiplier * shadow;
+
+    // Cook-Torrance BRDF
+    float3 F = FresnelSchlick(max(dot(h, v), 0.0), F0);
+    float NDF = NormalDistribution(n, h, roughness);
+    float G = GeometrySmith(n, v, l, roughness);
+
+    float3 numerator = NDF * G * F;
+    // add 0.0001 to avoid division by zero
+    float denominator = 4.0 * max(dot(n, v), 0.0) * nDotL + 0.0001;
+    float3 reflected = numerator / denominator;
+    
+    float3 kD = float3(1.0, 1.0, 1.0) - F;	
+    float3 refracted = kD * albedo;
+    float3 irradiance = sunLight * nDotL;
+    float3 color = (refracted + reflected * PI) * irradiance;
+
+    float3 shadowColor = (1 - (SunColor * shadow * nDotL + SunAmbience)) * ShadowFillColor;
+    float3 ambient = SunAmbience * LightingMultiplier + shadowColor;
+
+    // we simplify here for the ambient lighting
+    color += albedo * ambient;
+
+    return color;
+}
+
 TERRAIN_DEPTH TerrainDepthVS( position_t p : POSITION0)
 {
     TERRAIN_DEPTH result;
@@ -1144,15 +1223,24 @@ float4 DecalsNormalsPS( VS_OUTPUT inV, uniform bool alphablend ) : COLOR
 float4 DecalsPS( VS_OUTPUT inV, uniform bool inShadows) : COLOR
 {
     // sample all the textures we'll need
-    float4 decalAlbedo = tex2Dproj( DecalAlbedoSampler, inV.mTexDecal );
-    float4 decalSpec = tex2Dproj( DecalSpecSampler, inV.mTexDecal );
-    float4 decalMask = tex2Dproj( DecalMaskSampler, inV.mTexDecal ).xxxx;
+    float4 decalAlbedo = tex2Dproj(DecalAlbedoSampler, inV.mTexDecal);
+    float4 decalSpec = tex2Dproj(DecalSpecSampler, inV.mTexDecal);
+    float4 decalMask = tex2Dproj(DecalMaskSampler, inV.mTexDecal).xxxx;
     float3 normal = SampleScreen(NormalSampler, inV.mTexSS).xyz * 2 -1;
 
-    float waterDepth = tex2Dproj( UtilitySamplerC, inV.mTexWT * TerrainScale).g;
-    // calculate the lit pixel
-    float3 color = CalculateLighting( normal, inV.mTexWT.xyz, decalAlbedo.xyz, decalSpec.r, waterDepth, inV.mShadow, inShadows).xyz;
-    return float4( color.rgb, decalAlbedo.w * decalMask.w * DecalAlpha);
+    float waterDepth = tex2Dproj(UtilitySamplerC, inV.mTexWT * TerrainScale).g;
+    float3 color;
+
+    if (UpperAlbedoTile.x * TerrainScale.x > 1000) {
+        float roughness = 1 - decalSpec.r;
+        color = PBR(inV, decalAlbedo, normal, roughness);
+    } else {
+        color = CalculateLighting(normal, inV.mTexWT.xyz, decalAlbedo.xyz, decalSpec.r, waterDepth, inV.mShadow, inShadows).xyz;
+    }
+
+    color.rgb = ApplyWaterColor(waterDepth, color);
+
+    return float4(color.rgb, decalAlbedo.w * decalMask.w * DecalAlpha);
 }
 
 float4 DecalAlbedoXP( VS_OUTPUT inV, uniform bool inShadows) : COLOR
@@ -1264,7 +1352,7 @@ technique TDecals
         RasterizerState( Rasterizer_Bias_Decal )
 
         VertexShader = compile vs_2_0 DecalsVS( true );
-        PixelShader = compile ps_2_0 DecalsPS( true);
+        PixelShader = compile ps_2_a DecalsPS( true);
     }
 }
 
@@ -1668,86 +1756,6 @@ float4 atlas2D(sampler2D s, float2 uv, float2 offset) {
 // | S7 | height S0-3   roughness S0-3  height S4-7    roughness S4-7   envMap R        envMap G        envMap B        unused       |
 //  ----            ---             ---             ---             ---             ---             ---             ---            ---
 // | U  | normal.x      normal.z        shadow         albedo overlay | 
-
-const float PI = 3.14159265359;
-
-float3 FresnelSchlick(float hDotN, float3 F0)
-{
-    return F0 + (1.0 - F0) * pow(1.0 - hDotN, 5.0);
-}
-
-float NormalDistribution(float3 n, float3 h, float roughness)
-{
-    float a2 = roughness*roughness;
-    float nDotH = max(dot(n, h), 0.0);
-    float nDotH2 = nDotH*nDotH;
-
-    float num = a2;
-    float denom = nDotH2 * (a2 - 1.0) + 1.0;
-    denom = PI * denom * denom;
-
-    return num / denom;
-}
-
-float GeometrySchlick(float nDotV, float roughness)
-{
-    float r = (roughness + 1.0);
-    float k = (r*r) / 8.0;
-
-    float num = nDotV;
-    float denom = nDotV * (1.0 - k) + k;
-
-    return num / denom;
-}
-
-float GeometrySmith(float3 n, float3 v, float3 l, float roughness)
-{
-    float nDotV = max(dot(n, v), 0.0);
-    float nDotL = max(dot(n, l), 0.0);
-    float gs2 = GeometrySchlick(nDotV, roughness);
-    float gs1 = GeometrySchlick(nDotL, roughness);
-
-    return gs1 * gs2;
-}
-
-float3 PBR(VS_OUTPUT inV, float3 albedo, float3 n, float roughness) {
-
-    float4 position = TerrainScale * inV.mTexWT;
-    float mapShadow = 1 - tex2D(UpperAlbedoSampler, position.xy).z; // 1 where sun is, 0 where shadow is
-    float shadow = tex2D(ShadowSampler,inV.mShadow.xy).g; // 1 where sun is, 0 where shadow is
-    shadow = shadow * mapShadow;
-
-    float3 v = normalize(-inV.mViewDirection);
-    float3 F0 = float3(0.04, 0.04, 0.04);
-    float3 l = SunDirection;
-    float3 h = normalize(v + l);
-    float nDotL = max(dot(n, l), 0.0);
-    float3 sunLight = SunColor * LightingMultiplier * shadow;
-
-    // Cook-Torrance BRDF
-    float3 F = FresnelSchlick(max(dot(h, v), 0.0), F0);
-    float NDF = NormalDistribution(n, h, roughness);
-    float G = GeometrySmith(n, v, l, roughness);
-
-    float3 numerator = NDF * G * F;
-    // add 0.0001 to avoid division by zero
-    float denominator = 4.0 * max(dot(n, v), 0.0) * nDotL + 0.0001;
-    float3 reflected = numerator / denominator;
-    
-    float3 kD = float3(1.0, 1.0, 1.0) - F;	
-    float3 refracted = kD * albedo;
-    float3 irradiance = sunLight * nDotL;
-    float3 color = (refracted + reflected * PI) * irradiance;
-
-    float3 shadowColor = (1 - (SunColor * shadow * nDotL + SunAmbience)) * ShadowFillColor;
-    float3 ambient = SunAmbience * LightingMultiplier + shadowColor;
-
-    // we simplify here for the ambient lighting
-    color += albedo * ambient;
-
-    return color;
-}
- 
 
 struct VertexPBR
 {
