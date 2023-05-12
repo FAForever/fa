@@ -649,7 +649,7 @@ options = {
             },
 
             {
-                title = "<LOC OPTIONS_SELECTION_FILTERING_LAYER>Filter selection on layer",
+                title = "<LOC OPTIONS_SELECTION_FILTERING_LAYER>Filter on layer",
                 key = 'options_selection_filtering_layer',
                 type = 'toggle',
                 default = 'off',
@@ -664,6 +664,42 @@ options = {
                 set = function(key,value,startup)
                     if GetCurrentUIState() == 'game' then
                         import("/lua/ui/game/gamemain.lua").UpdatePrefsDeselectByLayer(value)
+                    end
+                end,
+            },
+
+            {
+                title = "<LOC OPTIONS_SELECTION_FILTERING_ASSISTING_ENGINEERS>Filter out assisting engineers",
+                key = 'options_selection_filter_assisting_engineers',
+                type = 'toggle',
+                default = 'off',
+                custom = {
+                    states = {
+                        {text = "<LOC _Off>", key = 'off' },
+                        {text = "<LOC _On>", key = 'on' },
+                    },
+                },
+                set = function(key,value,startup)
+                    if GetCurrentUIState() == 'game' then
+                        import("/lua/ui/game/gamemain.lua").UpdatePrefsDeselectAssistingEngineers(value)
+                    end
+                end,
+            },
+
+            {
+                title = "<LOC OPTIONS_SELECTION_FILTERING_LAYER>Filter out assisting units",
+                key = 'options_selection_filter_assisting_units',
+                type = 'toggle',
+                default = 'off',
+                custom = {
+                    states = {
+                        {text = "<LOC _Off>", key = 'off' },
+                        {text = "<LOC _On>", key = 'on' },
+                    },
+                },
+                set = function(key,value,startup)
+                    if GetCurrentUIState() == 'game' then
+                        import("/lua/ui/game/gamemain.lua").UpdatePrefsDeselectAssistingUnits(value)
                     end
                 end,
             },

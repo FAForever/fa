@@ -15,8 +15,8 @@ BehaviorSubject = ClassSimple {
     Next = function(self, value)
         self.Value = value
 
-        for _, subscriber in self.Subscribers do 
-            
+        for _, subscriber in self.Subscribers do
+            subscriber(value)
         end
     end,
 

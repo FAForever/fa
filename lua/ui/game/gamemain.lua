@@ -959,16 +959,26 @@ end
 
 local hotkeyLabelsOnSelectionChanged = false
 local upgradeTab = import("/lua/keymap/upgradetab.lua").upgradeTab
-local PrefsDeselectByLayer = 'off'
 
+local PrefsDeselectByLayer = Prefs.GetFromCurrentProfile('options.options_selection_filtering_layer')
 function UpdatePrefsDeselectByLayer(value)
     PrefsDeselectByLayer = value
 end
 
+local PrefsDeselectAssistingEngineers = Prefs.GetFromCurrentProfile('options.options_selection_filter_assisting_engineers')
+function UpdatePrefsDeselectAssistingEngineers(value)
+    PrefsDeselectAssistingEngineers = value
+end
+
+local PrefsDeselectAssistingUnits = Prefs.GetFromCurrentProfile('options.options_selection_filter_assisting_units')
+function UpdatePrefsDeselectAssistingUnits(value)
+    PrefsDeselectAssistingUnits = value
+end
+
 --- allows us to ignore the depriorization phase
-local ignoreDeprio = false
-function SetIgnoreDeprio()
-    ignoreDeprio = true
+local ignoreFiltering = false
+function IgnoreFiltering()
+    ignoreFiltering = true
 end
 
 -- allows us to entirely ignore the selection event
@@ -984,10 +994,6 @@ end
 ---@return UserUnit[]
 ---@return number
 function DeselectByLayer(selection, count)
-    if PrefsDeselectByLayer == 'off' then
-        return selection, count
-    end
-
     local units, unitCount
     if PrefsDeselectByLayer == 'L+N/A' then
         -- find and return land or naval units
@@ -1088,15 +1094,6 @@ function DeselectLockedOut(selection, count)
     return selection, head - 1
 end
 
---- Deselects unit by their unit type
----@param selection UserUnit[]
----@param count number
----@return UserUnit[]
----@return number
-function DeselectByType(selection, count)
-
-end
-
 ---@param selection UserUnit[]
 ---@param count number
 ---@return UserUnit[]
@@ -1129,7 +1126,7 @@ end
 ---@param count number
 ---@return UserUnit[]
 ---@return number
-function DeselectAssistingOthers(selection, count)
+function DeselectAssistingUnits(selection, count)
     -- try and filter locked out units
     local head = 1
     for k = 1, count do
@@ -1207,8 +1204,8 @@ function OnSelectionChanged(oldSelection, newSelection, added, removed)
     end
 
     -- allows us to ignore the deprioritzation for this selection
-    if ignoreDeprio then
-        ignoreDeprio = false
+    if ignoreFiltering then
+        ignoreFiltering = false
 
     else
         -- do not ignore selections when holding down shift
@@ -1219,19 +1216,27 @@ function OnSelectionChanged(oldSelection, newSelection, added, removed)
             -- go through the various deprioritzation categories
             local selection, count = newSelection, originalCount
             selection, count = DeselectLockedOut(selection, count)
-            selection, count = DeselectByLayer(selection, count)
-            selection, count = DeselectAssistingEngineers(selection, count)
-            selection, count = DeselectAssistingOthers(selection, count)
+
+            if PrefsDeselectByLayer ~= 'off' then
+                selection, count = DeselectByLayer(selection, count)
+            end
+
+            if PrefsDeselectAssistingEngineers ~= 'off' then
+                selection, count = DeselectAssistingEngineers(selection, count)
+            end
+
+            if PrefsDeselectAssistingUnits ~= 'off' then
+                selection, count = DeselectAssistingUnits(selection, count)
+            end
 
             -- if something changed then we re-select the units through this hacky-approach
             if originalCount != count then
                 ForkThread(
                     function()
+                        IgnoreFiltering()
                         SelectUnits(selection)
                     end
                 )
-
-                ignoreDeprio = true
                 return
             end
         end
