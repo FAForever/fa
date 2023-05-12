@@ -774,6 +774,7 @@ end
 --  This routine should get transports on the way back to an existing base 
 --  BEFORE marking them as not 'InUse' and adding them to the Transport Pool
 function ReturnTransportsToPool( aiBrain, units, move )
+	LOG('Returning transports to pool')
 
     local TransportDialog = ScenarioInfo.TransportDialog or true
     local RandomLocation = import('/lua/ai/aiutilities.lua').RandomLocation
@@ -849,18 +850,24 @@ function ReturnTransportsToPool( aiBrain, units, move )
                 v.PlatoonHandle = returnpool
                 unitposition = v:GetPosition()
                 baseposition = aiBrain:FindClosestBuilderManagerPosition(unitposition)
+				local x, z
                 if baseposition then
+					LOG('transport rtb base position found')
                     x = baseposition[1]
                     z = baseposition[3]
                 else
+					LOG('transport rtb no base position found')
                     return
                 end
+				LOG('Moving transport to base')
                 baseposition = RandomLocation(x,z)
                 IssueClearCommands( {v} )
                 if VDist3( baseposition, unitposition ) > 100 then
                     -- this requests a path for the transport with a threat allowance of 20 - which is kinda steep sometimes
-					safePath, reason = NavUtils.PathToWithThreatThreshold('Air', unitposition, baseposition, aiBrain, NavUtils.ThreatFunctions.AntiAir, 20, aiBrain.IMAPConfig.Rings)
+					local safePath, reason = NavUtils.PathToWithThreatThreshold('Air', unitposition, baseposition, aiBrain, NavUtils.ThreatFunctions.AntiAir, 20, aiBrain.IMAPConfig.Rings)
                     if safePath then
+						LOG('safePath found for transport, issuing move')
+
                         if TransportDialog then
                             LOG("*AI DEBUG "..aiBrain.Nickname.." "..returnpool.BuilderName.." Transport "..v.EntityId.." gets RTB path of "..repr(safePath))
                         end
@@ -876,6 +883,7 @@ function ReturnTransportsToPool( aiBrain, units, move )
                         IssueMove( {v}, baseposition )
                     end
                 else
+					LOG('Distance less than 100')
                     IssueMove( {v}, baseposition)
                 end
 
@@ -930,6 +938,7 @@ function ReturnUnloadedUnitToPool( aiBrain, unit )
                 WaitTicks(20)
 			end
 		end
+		LOG('Transport platoon attempting to return to base')
 		returnpool:SetAIPlan('ReturnToBaseAI', aiBrain )
 	end
 	return
@@ -1064,16 +1073,16 @@ function SendPlatoonWithTransports(aiBrain, platoon, destination, attempts, bSki
 					markerlist = TableCat( markerlist, AIGetMarkersAroundLocation(aiBrain, v, destination, markerrange, 0, threatMax, 0, 'AntiSurface') )
 				end
 				-- sort the markers by closest distance to final destination
-				TableSort( markerlist, function(a,b) local VDist2Sq = VDist2Sq return VDist2Sq( a.position[1],a.position[3], destination[1],destination[3] ) < VDist2Sq( b.position[1],b.position[3], destination[1],destination[3] )  end )
+				TableSort( markerlist, function(a,b) local VDist2Sq = VDist2Sq return VDist2Sq( a.Position[1],a.Position[3], destination[1],destination[3] ) < VDist2Sq( b.Position[1],b.Position[3], destination[1],destination[3] )  end )
 
 				-- loop thru each marker -- see if you can form a safe path on the surface 
 				-- and a safe path for the transports -- use the first one that satisfies both
 				for _, v in markerlist do
-                    if lastlocationtested and TableEqual(lastlocationtested, v.position) then
+                    if lastlocationtested and TableEqual(lastlocationtested, v.Position) then
                         continue
                     end
 
-                    lastlocationtested = TableCopy( v.position )
+                    lastlocationtested = TableCopy( v.Position )
 					-- test the real values for that position
 					stest, atest = GetRealThreatAtPosition( lastlocationtested, 80 )
 			
@@ -1102,7 +1111,7 @@ function SendPlatoonWithTransports(aiBrain, platoon, destination, attempts, bSki
                                     LOG("*AI DEBUG "..aiBrain.Nickname.." "..repr(platoon.BuilderName).." got transports but they cannot find a safe drop point")
                                 end
                                 if platoonpath then
-                                    LOG("*AI DEBUG "..aBrain.Nickname.." "..repr(platoon.BuilderName).." has a path of it's own "..repr(platoonpath))
+                                    LOG("*AI DEBUG "..aiBrain.Nickname.." "..repr(platoon.BuilderName).." has a path of it's own "..repr(platoonpath))
                                 end
                             end
 						end
@@ -1250,7 +1259,7 @@ function SendPlatoonWithTransports(aiBrain, platoon, destination, attempts, bSki
 			end
 
 			-- path from where we are to the destination - use inflated threat to get there --
-			path = NavUtils.PathToWithThreatThreshold(MovementLayer, GetPlatoonPosition(platoon), destination, aiBrain, NavUtils.ThreatFunctions.AntiAir,  mythreat * 1.25, aiBrain.IMAPConfig.Rings)
+			path = NavUtils.PathToWithThreatThreshold(MovementLayer, GetPlatoonPosition(platoon), destination, aiBrain, NavUtils.ThreatFunctions.AntiSurface,  mythreat * 1.25, aiBrain.IMAPConfig.Rings)
 
 			if PlatoonExists( aiBrain, platoon ) then
 				-- if no path then fail otherwise use it
@@ -1480,6 +1489,7 @@ function UseTransports( aiBrain, transports, location, UnitPlatoon, IsEngineer )
 			AssignUnitsToPlatoon( aiBrain, returnpool, currLeftovers, 'Unassigned', 'None' )
 			returnpool.PlanName = 'ReturnToBaseAI'
 			returnpool.BuilderName = 'SortUnitsOnTransportsLeftovers'..tostring(ident)
+			LOG('Transport platoon attempting to return to base')
 			returnpool:SetAIPlan('ReturnToBaseAI',aiBrain)
 		end
 	end
@@ -1610,6 +1620,7 @@ function UseTransports( aiBrain, transports, location, UnitPlatoon, IsEngineer )
 			end
 		end
 		if returnpool then
+			LOG('Transport platoon attempting to return to base')
 			returnpool:SetAIPlan('ReturnToBaseAI', aiBrain )
 		end
 	end

@@ -3244,13 +3244,24 @@ Platoon = Class(moho.platoon_methods) {
     --- for a new platoon
     ---@param self Platoon
     ReturnToBaseAI = function(self)
-        LOG('Platoon returning to base')
+        if IsDestroyed(self) then
+            return
+        end
+        if self.MovementLayer == 'Air' then
+            LOG('Platoon returning to base')
+        end
         local aiBrain = self:GetBrain()
-
+        
         if not aiBrain:PlatoonExists(self) or not self:GetPlatoonPosition() then
             return
         end
 
+        local NavUtils = import("/lua/sim/navutils.lua")
+
+        if not self.MovementLayer then
+            AIAttackUtils.GetMostRestrictiveLayer(self)
+        end
+        
         local bestBase = false
         local bestBaseName
         local bestDistSq
@@ -3271,29 +3282,40 @@ Platoon = Class(moho.platoon_methods) {
         end
 
         if bestBase then
-            AIAttackUtils.GetMostRestrictiveLayer(self)
             if bestBase.FactoryManager.RallyPoint then
                 returnPos = bestBase.FactoryManager.RallyPoint
             else
                 returnPos = bestBase.Position
             end
-            LOG('Bestbase found, generating path')
-            local path, reason = AIAttackUtils.PlatoonGenerateSafePathTo(aiBrain, self.MovementLayer, self:GetPlatoonPosition(), returnPos, 200)
+            if self.MovementLayer == 'Air' then
+                LOG('Bestbase found, generating path')
+            end
+            local path, reason =  NavUtils.PathToWithThreatThreshold(self.MovementLayer, self:GetPlatoonPosition(), returnPos, aiBrain, NavUtils.ThreatFunctions.AntiSurface, 200, aiBrain.IMAPConfig.Rings)
+            --local path, reason = AIAttackUtils.PlatoonGenerateSafePathTo(aiBrain, self.MovementLayer, self:GetPlatoonPosition(), returnPos, 200)
             -- remove any formation settings to ensure a quick return to base.
             self:SetPlatoonFormationOverride('NoFormation')
             self:Stop()
 
             if path then
                 local pathLength = table.getn(path)
-                LOG('path found, moving to location')
+                if self.MovementLayer == 'Air' then
+                    LOG('path found, moving to location')
+                end
                 for i=1, pathLength-1 do
                     self:MoveToLocation(path[i], false)
                 end
             end
             self:MoveToLocation(returnPos, false)
+            if self.MovementLayer == 'Air' then
+                LOG('movement queue is finished')
+            end
 
             local oldDistSq = 0
             while aiBrain:PlatoonExists(self) do
+                if self.MovementLayer == 'Air' then
+                    LOG('movement loop for movement')
+                end
+                
                 WaitTicks(100)
                 platPos = self:GetPlatoonPosition()
                 local distSq = VDist2Sq(platPos[1], platPos[3], returnPos[1], returnPos[3])
