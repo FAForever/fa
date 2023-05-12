@@ -26,7 +26,6 @@ DEA0202 = ClassUnit(TAirUnit) {
         else
            self.unit:SetBreakOffTriggerMult(2.0)
            self.unit:SetBreakOffDistanceMult(8.0)
-           self.unit:SetSpeedMult(1.0)
            TIFCarpetBombWeapon.IdleState.OnGotTarget(self)
         end
     end,
@@ -47,7 +46,6 @@ DEA0202 = ClassUnit(TAirUnit) {
         else
            self.unit:SetBreakOffTriggerMult(2.0)
            self.unit:SetBreakOffDistanceMult(8.0)
-           self.unit:SetSpeedMult(1.0)
            TIFCarpetBombWeapon.OnGotTarget(self)
         end
     end,
