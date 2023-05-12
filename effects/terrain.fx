@@ -1629,8 +1629,9 @@ float4 splatLerp(float4 t1, float4 t2, float factor) {
 float4 splatLerp(float4 t1, float4 t2, float t1height, float t2height, float factor) {
     // return lerp(t1, t2, factor);
 
-    float h1 = 1.0 - factor;
-    float depth = 0.1;
+    factor *= 1.5;
+    float h1 = 1.5 - factor;
+    float depth = 0.3;
     float ma = max(t1height + h1, t2height + factor) - depth;
     float b1 = max(t1height + h1 - ma, 0);
     float b2 = max(t2height + factor - ma, 0);
@@ -1890,8 +1891,7 @@ float4 TerrainPBRAlbedoPS ( VertexPBR inV) : COLOR
     float4 s5Brightness = tex2Dgrad(Stratum5AlbedoSampler, position.xy * Stratum5AlbedoTile.xy, ddx, ddy);
     float4 s6Brightness = tex2Dgrad(Stratum6AlbedoSampler, position.xy * Stratum6AlbedoTile.xy, ddx, ddy);
 
-    float cameraFractionNear = 1 - clamp(0.01 * (CameraPosition.y - 20), 0, 1);
-    float cameraFractionFar = 0.5 + 0.5 * clamp(0.001 * (CameraPosition.y - 250), 0, 1);
+    float cameraFractionNear = 1;
 
     lowerAlbedo    = CorrectedAddition(lowerAlbedo, tex2D(LowerAlbedoSampler,    position.xy * LowerNormalTile.xy)   , lBrightness,  cameraFractionNear);
     stratum0Albedo = CorrectedAddition(stratum0Albedo, tex2D(Stratum0AlbedoSampler, position.xy * Stratum0NormalTile.xy), s0Brightness, cameraFractionNear);
@@ -1903,23 +1903,23 @@ float4 TerrainPBRAlbedoPS ( VertexPBR inV) : COLOR
     stratum6Albedo = CorrectedAddition(stratum6Albedo, tex2D(Stratum6AlbedoSampler, position.xy * Stratum6NormalTile.xy), s6Brightness, cameraFractionNear);
 
     // First value is height, second is roughness
-    float2 lowerHRNear    = atlas2D(Stratum7AlbedoSampler, position.xy * LowerAlbedoTile.xy   , float2(0.0, 0.0)).xy;
-    float2 stratum0HRNear = atlas2D(Stratum7AlbedoSampler, position.xy * Stratum0AlbedoTile.xy, float2(0.0, 0.5)).xy;
-    float2 stratum1HRNear = atlas2D(Stratum7AlbedoSampler, position.xy * Stratum1AlbedoTile.xy, float2(0.5, 0.0)).xy;
-    float2 stratum2HRNear = atlas2D(Stratum7AlbedoSampler, position.xy * Stratum2AlbedoTile.xy, float2(0.5, 0.5)).xy;
-    float2 stratum3HRNear = atlas2D(Stratum7AlbedoSampler, position.xy * Stratum3AlbedoTile.xy, float2(0.0, 0.0)).zw;
-    float2 stratum4HRNear = atlas2D(Stratum7AlbedoSampler, position.xy * Stratum4AlbedoTile.xy, float2(0.0, 0.5)).zw;
-    float2 stratum5HRNear = atlas2D(Stratum7AlbedoSampler, position.xy * Stratum5AlbedoTile.xy, float2(0.5, 0.0)).zw;
-    float2 stratum6HRNear = atlas2D(Stratum7AlbedoSampler, position.xy * Stratum6AlbedoTile.xy, float2(0.5, 0.5)).zw;
+    float2 lowerHRNear    = atlas2D(Stratum7AlbedoSampler, 0.3 * position.xy * LowerAlbedoTile.xy   , float2(0.0, 0.0)).xy;
+    float2 stratum0HRNear = atlas2D(Stratum7AlbedoSampler, 0.3 * position.xy * Stratum0AlbedoTile.xy, float2(0.0, 0.5)).xy;
+    float2 stratum1HRNear = atlas2D(Stratum7AlbedoSampler, 0.3 * position.xy * Stratum1AlbedoTile.xy, float2(0.5, 0.0)).xy;
+    float2 stratum2HRNear = atlas2D(Stratum7AlbedoSampler, 0.3 * position.xy * Stratum2AlbedoTile.xy, float2(0.5, 0.5)).xy;
+    float2 stratum3HRNear = atlas2D(Stratum7AlbedoSampler, 0.3 * position.xy * Stratum3AlbedoTile.xy, float2(0.0, 0.0)).zw;
+    float2 stratum4HRNear = atlas2D(Stratum7AlbedoSampler, 0.3 * position.xy * Stratum4AlbedoTile.xy, float2(0.0, 0.5)).zw;
+    float2 stratum5HRNear = atlas2D(Stratum7AlbedoSampler, 0.3 * position.xy * Stratum5AlbedoTile.xy, float2(0.5, 0.0)).zw;
+    float2 stratum6HRNear = atlas2D(Stratum7AlbedoSampler, 0.3 * position.xy * Stratum6AlbedoTile.xy, float2(0.5, 0.5)).zw;
 
-    float2 lowerHRFar     = atlas2D(Stratum7AlbedoSampler, position.xy * LowerNormalTile.xy   , float2(0.0, 0.0)).xy;
-    float2 stratum0HRFar  = atlas2D(Stratum7AlbedoSampler, position.xy * Stratum0NormalTile.xy, float2(0.0, 0.5)).xy;
-    float2 stratum1HRFar  = atlas2D(Stratum7AlbedoSampler, position.xy * Stratum1NormalTile.xy, float2(0.5, 0.0)).xy;
-    float2 stratum2HRFar  = atlas2D(Stratum7AlbedoSampler, position.xy * Stratum2NormalTile.xy, float2(0.5, 0.5)).xy;
-    float2 stratum3HRFar  = atlas2D(Stratum7AlbedoSampler, position.xy * Stratum3NormalTile.xy, float2(0.0, 0.0)).zw;
-    float2 stratum4HRFar  = atlas2D(Stratum7AlbedoSampler, position.xy * Stratum4NormalTile.xy, float2(0.0, 0.5)).zw;
-    float2 stratum5HRFar  = atlas2D(Stratum7AlbedoSampler, position.xy * Stratum5NormalTile.xy, float2(0.5, 0.0)).zw;
-    float2 stratum6HRFar  = atlas2D(Stratum7AlbedoSampler, position.xy * Stratum6NormalTile.xy, float2(0.5, 0.5)).zw;
+    float2 lowerHRFar     = atlas2D(Stratum7AlbedoSampler, 0.3 * position.xy * LowerNormalTile.xy   , float2(0.0, 0.0)).xy;
+    float2 stratum0HRFar  = atlas2D(Stratum7AlbedoSampler, 0.3 * position.xy * Stratum0NormalTile.xy, float2(0.0, 0.5)).xy;
+    float2 stratum1HRFar  = atlas2D(Stratum7AlbedoSampler, 0.3 * position.xy * Stratum1NormalTile.xy, float2(0.5, 0.0)).xy;
+    float2 stratum2HRFar  = atlas2D(Stratum7AlbedoSampler, 0.3 * position.xy * Stratum2NormalTile.xy, float2(0.5, 0.5)).xy;
+    float2 stratum3HRFar  = atlas2D(Stratum7AlbedoSampler, 0.3 * position.xy * Stratum3NormalTile.xy, float2(0.0, 0.0)).zw;
+    float2 stratum4HRFar  = atlas2D(Stratum7AlbedoSampler, 0.3 * position.xy * Stratum4NormalTile.xy, float2(0.0, 0.5)).zw;
+    float2 stratum5HRFar  = atlas2D(Stratum7AlbedoSampler, 0.3 * position.xy * Stratum5NormalTile.xy, float2(0.5, 0.0)).zw;
+    float2 stratum6HRFar  = atlas2D(Stratum7AlbedoSampler, 0.3 * position.xy * Stratum6NormalTile.xy, float2(0.5, 0.5)).zw;
 
     // store roughness in albedo so we get the roughness splatting for free
     lowerAlbedo.a    = lerp(lowerHRNear.y, lowerHRFar.y, cameraFractionNear);
@@ -1932,16 +1932,17 @@ float4 TerrainPBRAlbedoPS ( VertexPBR inV) : COLOR
     stratum6Albedo.a = lerp(stratum6HRNear.y, stratum6HRFar.y, cameraFractionNear);
 
     float4 albedo = lowerAlbedo;
-    albedo = splatLerp(albedo, stratum0Albedo, 1, stratum0HRNear.x + stratum0HRFar.x * Stratum0AlbedoTile.x / Stratum0NormalTile.x, mask0.x);
-    albedo = splatLerp(albedo, stratum1Albedo, 1, stratum1HRNear.x + stratum1HRFar.x * Stratum1AlbedoTile.x / Stratum1NormalTile.x, mask0.y);
-    albedo = splatLerp(albedo, stratum2Albedo, 1, stratum2HRNear.x + stratum2HRFar.x * Stratum2AlbedoTile.x / Stratum2NormalTile.x, mask0.z);
-    albedo = splatLerp(albedo, stratum3Albedo, 1, stratum3HRNear.x + stratum3HRFar.x * Stratum3AlbedoTile.x / Stratum3NormalTile.x, mask0.w);
-    albedo = splatLerp(albedo, stratum4Albedo, 1, stratum4HRNear.x + stratum4HRFar.x * Stratum4AlbedoTile.x / Stratum4NormalTile.x, mask1.x);
-    albedo = splatLerp(albedo, stratum5Albedo, 1, stratum5HRNear.x + stratum5HRFar.x * Stratum5AlbedoTile.x / Stratum5NormalTile.x, mask1.y);
-    albedo = splatLerp(albedo, stratum6Albedo, 1, stratum6HRNear.x + stratum6HRFar.x * Stratum6AlbedoTile.x / Stratum6NormalTile.x, mask1.z);
+    albedo = splatLerp(albedo, stratum0Albedo, 1.0, stratum0HRNear.x + (stratum0HRFar.x - 0.25) * Stratum0AlbedoTile.x / Stratum0NormalTile.x, mask0.x);
+    albedo = splatLerp(albedo, stratum1Albedo, 1.0, stratum1HRNear.x + (stratum1HRFar.x - 0.25) * Stratum1AlbedoTile.x / Stratum1NormalTile.x, mask0.y);
+    albedo = splatLerp(albedo, stratum2Albedo, 1.0, stratum2HRNear.x + (stratum2HRFar.x - 0.25) * Stratum2AlbedoTile.x / Stratum2NormalTile.x, mask0.z);
+    albedo = splatLerp(albedo, stratum3Albedo, 1.0, stratum3HRNear.x + (stratum3HRFar.x - 0.25) * Stratum3AlbedoTile.x / Stratum3NormalTile.x, mask0.w);
+    albedo = splatLerp(albedo, stratum4Albedo, 1.0, stratum4HRNear.x + (stratum4HRFar.x - 0.25) * Stratum4AlbedoTile.x / Stratum4NormalTile.x, mask1.x);
+    albedo = splatLerp(albedo, stratum5Albedo, 1.0, stratum5HRNear.x + (stratum5HRFar.x - 0.25) * Stratum5AlbedoTile.x / Stratum5NormalTile.x, mask1.y);
+    albedo = splatLerp(albedo, stratum6Albedo, 1.0, stratum6HRNear.x + (stratum6HRFar.x - 0.25) * Stratum6AlbedoTile.x / Stratum6NormalTile.x, mask1.z);
     albedo.rgb *= utility.w * 2;
 
     float roughness = albedo.a * mask1.w * 2;
+    roughness = inV.mWorld.y < WaterElevation ? 0.9 : saturate(roughness + 0.01);
 
     float shadowSample = saturate(1 - utility.z); // 1 where sun is, 0 where shadow is
     float shadow = tex2D(ShadowSampler,inV.mShadow.xy).g; // 1 where sun is, 0 where shadow is
@@ -2175,7 +2176,7 @@ technique TTerainNormalsExtended
         DepthState( Depth_Enable )
 
         VertexShader = compile vs_1_1 TerrainPBRVS( false );
-        PixelShader = compile ps_2_a TerrainNormalsExperimentalPS();
+        PixelShader = compile ps_2_a TerrainPBRNormalsPS();
     }
 }
 
@@ -2190,6 +2191,6 @@ technique TTerrainXP <
         DepthState( Depth_Enable )
 
         VertexShader = compile vs_1_1 TerrainPBRVS(true);
-        PixelShader = compile ps_2_a TTerrainAlbedoExperimentalPS();
+        PixelShader = compile ps_3_0 TerrainPBRAlbedoPS();
     }
 }
