@@ -3248,7 +3248,7 @@ Platoon = Class(moho.platoon_methods) {
             return
         end
         if self.MovementLayer == 'Air' then
-            LOG('Platoon returning to base')
+            LOG('Platoon returning to base '..self.BuilderName)
         end
         local aiBrain = self:GetBrain()
         
@@ -3288,7 +3288,7 @@ Platoon = Class(moho.platoon_methods) {
                 returnPos = bestBase.Position
             end
             if self.MovementLayer == 'Air' then
-                LOG('Bestbase found, generating path')
+                LOG('Bestbase found, generating path '..self.BuilderName)
             end
             local path, reason =  NavUtils.PathToWithThreatThreshold(self.MovementLayer, self:GetPlatoonPosition(), returnPos, aiBrain, NavUtils.ThreatFunctions.AntiSurface, 200, aiBrain.IMAPConfig.Rings)
             --local path, reason = AIAttackUtils.PlatoonGenerateSafePathTo(aiBrain, self.MovementLayer, self:GetPlatoonPosition(), returnPos, 200)
@@ -3299,7 +3299,7 @@ Platoon = Class(moho.platoon_methods) {
             if path then
                 local pathLength = table.getn(path)
                 if self.MovementLayer == 'Air' then
-                    LOG('path found, moving to location')
+                    LOG('path found, moving to location '..self.BuilderName)
                 end
                 for i=1, pathLength-1 do
                     self:MoveToLocation(path[i], false)
@@ -3307,13 +3307,13 @@ Platoon = Class(moho.platoon_methods) {
             end
             self:MoveToLocation(returnPos, false)
             if self.MovementLayer == 'Air' then
-                LOG('movement queue is finished')
+                LOG('movement queue is finished '..self.BuilderName)
             end
 
             local oldDistSq = 0
             while aiBrain:PlatoonExists(self) do
                 if self.MovementLayer == 'Air' then
-                    LOG('movement loop for movement')
+                    LOG('movement loop for movement '..self.BuilderName)
                 end
                 
                 WaitTicks(100)
@@ -3325,7 +3325,7 @@ Platoon = Class(moho.platoon_methods) {
                 end
                 -- if we haven't moved in 10 seconds... go back to attacking
                 if (distSq - oldDistSq) < 5 then
-                    LOG('return to base should have platoon at location now')
+                    LOG('return to base should have platoon at location now '..self.BuilderName)
                     break
                 end
                 oldDistSq = distSq

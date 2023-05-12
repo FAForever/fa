@@ -74,6 +74,7 @@ function AssignTransportToPool( unit, aiBrain )
 
     -- this sets up the OnTransportDetach callback so that this function runs EVERY time a transport drops units
 	if not unit.EventCallbacks['OnTransportDetach'] then
+		LOG('Create callback for OnTransportDetach')
 		unit:AddUnitCallback( function(unit)
             if TransportDialog then
                 LOG("*AI DEBUG TRANSPORT "..unit.PlatoonHandle.BuilderName.." Transport "..unit.EntityId.." Fires ReturnToPool callback" )
@@ -87,6 +88,7 @@ function AssignTransportToPool( unit, aiBrain )
 			end
 		end, 'OnTransportDetach')
 	end
+	LOG('Assign transport to pool')
 
     -- if the unit is not already in the transport Pool --
 	if not unit.Dead and (not unit.PlatoonHandle != aiBrain.TransportPool) then
@@ -97,13 +99,16 @@ function AssignTransportToPool( unit, aiBrain )
 		-- if not in need of repair or fuel -- 
 		if not ProcessAirUnits( unit, aiBrain ) then
             if aiBrain.TransportPool then
+				LOG('Assign transport to pool')
                 AssignUnitsToPlatoon( aiBrain, aiBrain.TransportPool, {unit}, 'Support','')
             else
+				LOG('no transport pool, return')
                 return
             end
             unit.Assigning = false        
 			unit.PlatoonHandle = aiBrain.TransportPool
             if not IsBeingBuilt(unit) then
+				LOG('returntopool forked')
                 ForkTo( ReturnTransportsToPool, aiBrain, {unit}, true )
                 return
             end
