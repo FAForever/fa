@@ -183,14 +183,14 @@ function CreateUI(isReplay)
     ConExecute('d3d_WindowsCursor on')
 
     -- tweak networking parameters
-    ConExecute('net_MinResendDelay 100')
-    ConExecute('net_MaxResendDelay 1000')
+    ConExecute('net_MinResendDelay 100')        -- standard value of 100
+    ConExecute('net_MaxResendDelay 1000')       -- standard value of 1000
 
-    ConExecute('net_MaxSendRate 2048')
-    ConExecute('net_MaxBacklog 2048')
+    ConExecute('net_MaxSendRate 2048')          -- standard value of 1024 bytes
+    ConExecute('net_MaxBacklog 2048')           -- standard value of 1024 bytes
 
-    ConExecute('net_SendDelay 5')
-    ConExecute('net_AckDelay 5')
+    ConExecute('net_SendDelay 5')               -- standard value of 25
+    ConExecute('net_AckDelay 5')                -- standard value of 25
 
     ConExecute("ren_ViewError 0.004")           -- standard value of 0.003, the higher the value the less flickering but the less accurate the terrain is      
     ConExecute("ren_ClipDecalLevel 4")          -- standard value of 2, causes a lot of clipping
