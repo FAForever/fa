@@ -200,14 +200,15 @@ function CreateUI(isReplay)
             WaitSeconds(1.0)
 
             if Prefs.GetFromCurrentProfile('options.level_of_detail') == 2 then
-                -- allow meshes and effects to be seen from further away
-                ConExecute("cam_SetLOD WorldCamera 0.65")
+                ConExecute("cam_SetLOD WorldCamera 0.70")
             end
 
             if Prefs.GetFromCurrentProfile('options.shadow_quality') == 3 then
-                -- improve shadow LOD and resolution
                 ConExecute("ren_ShadowLOD 1024")
                 ConExecute("ren_ShadowSize 2048")
+
+                ConExecute("ren_ClipDecalLevel 4")          -- standard value of 2, causes a lot of clipping
+                ConExecute("ren_DecalFadeFraction 0.25")    -- standard value of 0.5, causes decals to suddenly pop into screen
             end
         end)
     end
