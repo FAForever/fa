@@ -192,6 +192,10 @@ function CreateUI(isReplay)
     ConExecute('net_SendDelay 5')
     ConExecute('net_AckDelay 5')
 
+    ConExecute("ren_ViewError 0.004")           -- standard value of 0.003, the higher the value the less flickering but the less accurate the terrain is      
+    ConExecute("ren_ClipDecalLevel 4")          -- standard value of 2, causes a lot of clipping
+    ConExecute("ren_DecalFadeFraction 0.25")    -- standard value of 0.5, causes decals to suddenly pop into screen
+
     -- enable experimental graphics
     if  Prefs.GetFromCurrentProfile('options.fidelity') >= 2 and
         Prefs.GetFromCurrentProfile('options.experimental_graphics') == 1
@@ -200,12 +204,10 @@ function CreateUI(isReplay)
             WaitSeconds(1.0)
 
             if Prefs.GetFromCurrentProfile('options.level_of_detail') == 2 then
-                -- allow meshes and effects to be seen from further away
-                ConExecute("cam_SetLOD WorldCamera 0.65")
+                ConExecute("cam_SetLOD WorldCamera 0.70")
             end
 
             if Prefs.GetFromCurrentProfile('options.shadow_quality') == 3 then
-                -- improve shadow LOD and resolution
                 ConExecute("ren_ShadowLOD 1024")
                 ConExecute("ren_ShadowSize 2048")
             end
