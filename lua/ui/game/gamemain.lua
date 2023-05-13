@@ -192,6 +192,7 @@ function CreateUI(isReplay)
     ConExecute('net_SendDelay 5')               -- standard value of 25ms
     ConExecute('net_AckDelay 5')                -- standard value of 25ms
 
+    -- tweak decal properties
     ConExecute("ren_ViewError 0.004")           -- standard value of 0.003, the higher the value the less flickering but the less accurate the terrain is      
     ConExecute("ren_ClipDecalLevel 4")          -- standard value of 2, causes a lot of clipping
     ConExecute("ren_DecalFadeFraction 0.25")    -- standard value of 0.5, causes decals to suddenly pop into screen
