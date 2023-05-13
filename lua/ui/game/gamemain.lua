@@ -207,6 +207,7 @@ function CreateUI(isReplay)
                 ConExecute("ren_ShadowLOD 1024")
                 ConExecute("ren_ShadowSize 2048")
 
+                ConExecute("ren_ViewError 0.004")           -- standard value of 0.003, the higher the value the less flickering but the less accurate the terrain is      
                 ConExecute("ren_ClipDecalLevel 4")          -- standard value of 2, causes a lot of clipping
                 ConExecute("ren_DecalFadeFraction 0.25")    -- standard value of 0.5, causes decals to suddenly pop into screen
             end
