@@ -186,8 +186,8 @@ function CreateUI(isReplay)
     ConExecute('net_MinResendDelay 100')
     ConExecute('net_MaxResendDelay 1000')
 
-    ConExecute('net_MaxSendRate 8192')
-    ConExecute('net_MaxBacklog 8192')
+    ConExecute('net_MaxSendRate 2048')
+    ConExecute('net_MaxBacklog 2048')
 
     ConExecute('net_SendDelay 5')
     ConExecute('net_AckDelay 5')
