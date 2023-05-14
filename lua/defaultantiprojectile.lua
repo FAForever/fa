@@ -1,12 +1,8 @@
---****************************************************************************
---**
---**  File     :  /lua/defaultantimissile.lua
---**  Author(s):  Gordon Duclos
---**
---**  Summary  :  Default definitions collision beams
---**
---**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
---****************************************************************************
+-- File     :  /lua/defaultantimissile.lua
+-- Author(s):  Gordon Duclos
+-- Summary  :  Default definitions collision beams
+-- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+------------------------------------------------------------------
 local Entity = import("/lua/sim/entity.lua").Entity
 local GetRandomFloat = import("/lua/utilities.lua").GetRandomFloat
 
@@ -93,7 +89,7 @@ MissileRedirect = Class(Entity) {
         ---@param self MissileRedirect
         ---@param spec MissileRedirectSpec
         OnCreate = function(self, spec)
-            self.Army = self:GetArmy()
+            self.Army = self.Army
             self.Owner = spec.Owner
             self.Radius = spec.Radius
             self.RedirectRateOfFire = spec.RedirectRateOfFire or 1
@@ -122,7 +118,7 @@ MissileRedirect = Class(Entity) {
                     other ~= self.EnemyProj and 
                     EntityCategoryContains(categories.MISSILE - (categories.STRATEGIC + categories.TACTICALNUKE), other)
                 then
-                    self.Enemy = other:GetLauncher()
+                    self.Enemy = other.Launcher
                     self.EnemyProj = other
 
                     ChangeState(self, self.RedirectingState)

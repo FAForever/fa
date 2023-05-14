@@ -88,6 +88,7 @@ AConcreteStructureUnit = ClassUnit(DefaultUnitsFile.ConcreteStructureUnit) {}
 --  Construction Units
 ---------------------------------------------------------------
 ---@class AConstructionUnit : ConstructionUnit
+---@field BuildEffectsBag TrashBag
 AConstructionUnit = ClassUnit(ConstructionUnit) {
 
     ---@param self AConstructionUnit
@@ -102,6 +103,7 @@ AConstructionUnit = ClassUnit(ConstructionUnit) {
 --  ENERGY CREATION UNITS
 ---------------------------------------------------------------
 ---@class AEnergyCreationUnit : EnergyCreationUnit
+---@field AmbientEffects any
 AEnergyCreationUnit = ClassUnit(EnergyCreationUnit) {
     ---@param self AEnergyCreationUnit
     ---@param builder Unit
@@ -178,6 +180,7 @@ ASonarUnit = ClassUnit(DefaultUnitsFile.SonarUnit) {}
 --  SEA FACTORY STRUCTURES
 ---------------------------------------------------------------
 ---@class ASeaFactoryUnit : SeaFactoryUnit
+---@field BuildEffectsBag TrashBag
 ASeaFactoryUnit = ClassUnit(SeaFactoryUnit) {
 
     ---@param self ASeaFactoryUnit
@@ -293,7 +296,7 @@ ARadarJammerUnit = ClassUnit(RadarJammerUnit) {
     ---@param layer Layer
     OnStopBeingBuilt = function(self, builder, layer)
         RadarJammerUnit.OnStopBeingBuilt(self, builder, layer)
-        local bp = self:GetBlueprint()
+        local bp = self.Blueprint
         local bpAnim = bp.Display.AnimationOpen
         if not bpAnim then return end
         if not self.OpenAnim then

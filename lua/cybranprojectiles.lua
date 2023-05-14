@@ -38,8 +38,7 @@ CDFBrackmanHackPegProjectile02 = ClassProjectile(MultiPolyTrailProjectile) {
     FxTrailOffset = 0,
 }
 
---- CYBRAN PROTON PROJECTILES
---- T3 strategic bomber
+--- CYBRAN PROTON PROJECTILES | T3 strategic bomber
 ---@class CIFProtonBombProjectile : NullShell
 CIFProtonBombProjectile = ClassProjectile(NullShell) {
     FxImpactTrajectoryAligned = false,
@@ -81,8 +80,7 @@ CDFProtonCannonProjectile = ClassProjectile(MultiPolyTrailProjectile) {
     FxTrailOffset = 0,
 }
 
---- CYBRAN PROTON PROJECTILES
---- XRL0403 experimental crab heavy proton cannon
+--- CYBRAN PROTON PROJECTILES | XRL0403 experimental crab heavy proton cannon
 ---@class CDFHvyProtonCannonProjectile : MultiPolyTrailProjectile
 CDFHvyProtonCannonProjectile = ClassProjectile(MultiPolyTrailProjectile) {
     PolyTrails = {
@@ -153,8 +151,7 @@ CAANanoDartProjectile02 = ClassProjectile(CAANanoDartProjectile) {
     PolyTrail= EffectTemplate.CNanoDartPolyTrail02,
 }
 
----  NANODART PROJECILE
---- adjustment to make the effects for URL0104 cheaper
+---  NANODART PROJECILE | Adjustment to make the effects for URL0104 cheaper
 ---@class CAANanoDartProjectile03 : CAANanoDartProjectile
 CAANanoDartProjectile03 = ClassProjectile(CAANanoDartProjectile) {
     FxImpactAirUnit = EffectTemplate.CNanoDartUnitHit02,
@@ -265,8 +262,7 @@ CDisintegratorLaserProjectile02 = ClassProjectile(MultiPolyTrailProjectile) {
     FxImpactLand = EffectTemplate.CDisintegratorHitLand01,
 }
 
----  CYBRAN ELECTRON BOLTER PROJECILES
---- loya, wagner, monkeylord & soul ripper
+---  CYBRAN ELECTRON BOLTER PROJECILES | loya, wagner, monkeylord & soul ripper
 ---@class CElectronBolterProjectile : MultiPolyTrailProjectile
 CElectronBolterProjectile = ClassProjectile(MultiPolyTrailProjectile) {
     PolyTrails = {
@@ -362,8 +358,7 @@ CIFMolecularResonanceShell = ClassProjectile(SinglePolyTrailProjectile) {
     end,
 }
 
---- IRIDIUM ROCKET PROJECTILES
---- T2 gs & SR & hoplite
+--- IRIDIUM ROCKET PROJECTILES | T2 gs & SR & hoplite
 ---@class CIridiumRocketProjectile : SingleCompositeEmitterProjectile
 CIridiumRocketProjectile = ClassProjectile(SingleCompositeEmitterProjectile) {
     PolyTrail = '/effects/emitters/cybran_iridium_missile_polytrail_01_emit.bp',
@@ -422,8 +417,7 @@ CHeavyLaserProjectile2 = ClassProjectile(MultiPolyTrailProjectile) {
     FxImpactLand = EffectTemplate.CBeamHitLand01,
 }
 
----  CYBRAN MOLECULAR CANNON PROJECTILE
---- ACU
+---  CYBRAN MOLECULAR CANNON PROJECTILE | ACU
 ---@class CMolecularCannonProjectile : SinglePolyTrailProjectile
 CMolecularCannonProjectile = ClassProjectile(SinglePolyTrailProjectile) {
     FxImpactTrajectoryAligned = false,
@@ -434,7 +428,7 @@ CMolecularCannonProjectile = ClassProjectile(SinglePolyTrailProjectile) {
     FxImpactLand = EffectTemplate.CMolecularRipperHit01,
 }
 
----  CYBRAN AA MISSILE PROJECILES - Air Targets
+---  CYBRAN AA MISSILE PROJECILES | Air Targets
 ---@class CMissileAAProjectile : SingleCompositeEmitterProjectile
 CMissileAAProjectile = ClassProjectile(SingleCompositeEmitterProjectile) {
     TrailDelay = 1,

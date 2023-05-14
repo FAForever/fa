@@ -707,7 +707,7 @@ VeterancyComponent = ClassSimple {
 
     ---@deprecated
     ---@param self Unit | VeterancyComponent
-    ---@param instigator Unit
+    ---@param unitThatIsDying Unit
     OnKilledUnit = function (self, unitThatIsDying, experience)
         if not experience then
             return

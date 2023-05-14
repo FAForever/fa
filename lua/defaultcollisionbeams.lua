@@ -200,13 +200,13 @@ MicrowaveLaserCollisionBeam01 = Class(SCCollisionBeam) {
 
     ---@param self MicrowaveLaserCollisionBeam01
     ScorchThread = function(self)
-        local army = self:GetArmy()
+        local army = self.Army
         local size = 1.5 + (Random() * 1.5) 
         local CurrentPosition = self:GetPosition(1)
         local LastPosition = Vector(0,0,0)
         local skipCount = 1
         -- local FriendlyFire = self.DamageData.DamageFriendly
-        
+
         while true do
             if Util.GetDistanceBetweenTwoVectors( CurrentPosition, LastPosition ) > 0.25 or skipCount > 100 then
                 CreateSplat( CurrentPosition, Util.GetRandomFloat(0,2*math.pi), self.SplatTexture, size, size, 200, 100, army )
@@ -346,7 +346,7 @@ ExperimentalPhasonLaserCollisionBeam = Class(SCCollisionBeam) {
 
     ---@param self ExperimentalPhasonLaserCollisionBeam
     ScorchThread = function(self)
-        local army = self:GetArmy()
+        local army = self.Army
         local size = 4.0 + (Random() * 1.0) 
         local CurrentPosition = self:GetPosition(1)
         local LastPosition = Vector(0,0,0)
@@ -376,7 +376,7 @@ ExperimentalPhasonLaserCollisionBeam = Class(SCCollisionBeam) {
     CreateBeamEffects = function(self)
         SCCollisionBeam.CreateBeamEffects(self)
         for k, v in EffectTemplate.SExperimentalPhasonLaserBeam do
-			local fxBeam = CreateBeamEntityToEntity(self, 0, self, 1, self:GetArmy(), v )
+			local fxBeam = CreateBeamEntityToEntity(self, 0, self, 1, self.Army, v )
 			table.insert( self.BeamEffectsBag, fxBeam )
 			self.Trash:Add(fxBeam)
         end
@@ -421,7 +421,7 @@ UnstablePhasonLaserCollisionBeam = Class(SCCollisionBeam) {
 
     ---@param self ExperimentalPhasonLaserCollisionBeam
     ScorchThread = function(self)
-        local army = self:GetArmy()
+        local army = self.Army
         local size = 1.5 + (Random() * 1.5) 
         local CurrentPosition = self:GetPosition(1)
         local LastPosition = Vector(0,0,0)
@@ -484,7 +484,7 @@ UltraChromaticBeamGeneratorCollisionBeam = Class(SCCollisionBeam) {
 
     ---@param self UltraChromaticBeamGeneratorCollisionBeam
     ScorchThread = function(self)
-        local army = self:GetArmy()
+        local army = self.Army
         local size = 1 + (Random() * 1) 
         local CurrentPosition = self:GetPosition(1)
         local LastPosition = Vector(0,0,0)
@@ -556,7 +556,7 @@ TDFHiroCollisionBeam = Class(CollisionBeam) {
 
     ---@param self TDFHiroCollisionBeam
     ScorchThread = function(self)
-        local army = self:GetArmy()
+        local army = self.Army
         local size = 1.5 + (Random() * 1.5) 
         local CurrentPosition = self:GetPosition(1)
         local LastPosition = Vector(0,0,0)
@@ -639,7 +639,7 @@ OrbitalDeathLaserCollisionBeam = Class(SCCollisionBeam) {
 
     ---@param self OrbitalDeathLaserCollisionBeam
     ScorchThread = function(self)
-        local army = self:GetArmy()
+        local army = self.Army
         local size = 3.5 + (Random() * 3.5) 
         local CurrentPosition = self:GetPosition(1)
         local LastPosition = Vector(0,0,0)

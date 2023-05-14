@@ -70,8 +70,7 @@ ABeamProjectile = ClassProjectile(NullShell) {
     FxImpactLand = EffectTemplate.ABeamHitLand01,
 }
 
---- AEON GRAVITON BOMB
---- used by T1 bomber
+--- AEON GRAVITON BOMB | Used by T1 bomber
 ---@class AGravitonBombProjectile : SinglePolyTrailProjectile
 AGravitonBombProjectile = ClassProjectile(SinglePolyTrailProjectile) { 
     PolyTrail = '/effects/emitters/default_polytrail_03_emit.bp',
