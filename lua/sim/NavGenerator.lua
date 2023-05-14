@@ -386,7 +386,8 @@ CompressedLabelTree = ClassCompressedLabelTree {
         end
     end,
 
-    --- Flattens the label tree, disregarding the actual values
+    --- Flattens the label tree into a leaf
+    ---@see Compress
     ---@param self CompressedLabelTreeNode
     ---@param bx number             # Location of top-left corner, in world space
     ---@param bz number             # Location of top-left corner, in world space
