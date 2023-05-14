@@ -871,16 +871,36 @@ function PopulateCaches(tCache, dCache, daCache, pxCache, pzCache, pCache, bCach
 
     -- compute cliff walkability
     -- compute average depth
-    -- compute terrain type
+    for z = 1, c do
+        for x = 1, c do
+            pCache[z][x] = pxCache[z][x] and pzCache[z][x] and pxCache[z + 1][x] and pzCache[z][x + 1]
+            daCache[z][x] = (dCache[z][x] + dCache[z + 1][x] + dCache[z][x + 1] + dCache[z + 1][x + 1]) * 0.25
+        end
+    end
+
+    -- determine playable area
+    local playableArea = ScenarioInfo.MapData.PlayableRect
+    local isSkirmish = ScenarioInfo.type == 'skirmish'
+
+    local tlx, tlz, brx, brz
+    if playableArea and isSkirmish then
+        tlx = playableArea[1]
+        tlz = playableArea[2]
+        brx = playableArea[3]
+        brz = playableArea[4]
+    else
+        tlx = 0
+        tlz = 0
+        brx = ScenarioInfo.size[1]
+        brz = ScenarioInfo.size[2]
+    end
+
+    -- compute terrain path blockers
     for z = 1, c do
         local absZ = bz + z
         for x = 1, c do
             local absX = bx + x
-            pCache[z][x] = pxCache[z][x] and pzCache[z][x] and pxCache[z + 1][x] and pzCache[z][x + 1]
-            daCache[z][x] = (dCache[z][x] + dCache[z + 1][x] + dCache[z][x + 1] + dCache[z + 1][x + 1]) * 0.25
-            bCache[z][x] = not GetTerrainType(absX, absZ).Blocking
-
-
+            bCache[z][x] = (tlx <= absX and brx >= absX) and (tlz <= absZ and brz >= absZ) and (not GetTerrainType(absX, absZ).Blocking)
         end
     end
 end
@@ -1130,7 +1150,16 @@ local function GenerateMarkerMetadata()
     end
 end
 
+---@param mapSize number
+---@param compressionTreeSize number
+---@param compressionThreshold number
+local function GenerateWithWater(mapSize, compressionTreeSize, compressionThreshold)
 
+end
+
+local function GenerateWithNoWater()
+
+end
 
 --- Generates a navigational mesh based on the heightmap
 function Generate()
@@ -1162,6 +1191,19 @@ function Generate()
     -- 40x40+
     if MapSize >= 2048 then
         compressionThreshold = 2 * compressionThreshold
+    end
+
+    ---@type moho.aibrain_methods
+    local brain = ArmyBrains[1]
+    local waterRatio
+    if brain then
+        waterRatio = brain:GetMapWaterRatio()
+    end
+
+    if waterRatio and waterRatio <= 0 then
+
+    else
+
     end
 
     NavGrids['Land'] = NavGrid('Land', CompressionTreeSize)
