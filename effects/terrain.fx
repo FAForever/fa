@@ -1195,7 +1195,10 @@ float4 DecalsPSGlow( VS_OUTPUT inV) : COLOR
     return glow * decalMask * DecalAlpha; // + 0.01;
 }
 
-
+float3 UDNBlending(float3 n1, float3 n2, float factor) {
+    n2.xz *= factor;
+    return normalize(float3(n1.x + n2.x, n1.y, n1.z + n2.z));
+}
 
 float4 DecalsNormalsPS( VS_OUTPUT inV, uniform bool alphablend ) : COLOR
 {
@@ -1210,6 +1213,17 @@ float4 DecalsNormalsPS( VS_OUTPUT inV, uniform bool alphablend ) : COLOR
     // from tangent space
     decalNormal = mul( TangentMatrix, decalNormal);
     decalNormal = normalize(decalNormal);
+
+    if (UpperAlbedoTile.x * TerrainScale.x > 1000) {
+        float4 position = TerrainScale * inV.mTexWT;
+        float4 utility = tex2D(UpperAlbedoSampler, position.xy);
+
+        float4 overlayNormal;
+        overlayNormal.xz = utility.xy * 2 - 1;
+        overlayNormal.y = sqrt(1 - dot(overlayNormal.xz,overlayNormal.xz));
+        overlayNormal.w = 0;
+        decalNormal = UDNBlending(decalNormal.xyz, overlayNormal.xyz, 1);
+    }
 
     // our blend mask is stored in the r channel of the decal
     float blendFactor = decalRaw.r;
