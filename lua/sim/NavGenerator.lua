@@ -1150,17 +1150,6 @@ local function GenerateMarkerMetadata()
     end
 end
 
----@param mapSize number
----@param compressionTreeSize number
----@param compressionThreshold number
-local function GenerateWithWater(mapSize, compressionTreeSize, compressionThreshold)
-
-end
-
-local function GenerateWithNoWater()
-
-end
-
 --- Generates a navigational mesh based on the heightmap
 function Generate()
 
@@ -1191,19 +1180,6 @@ function Generate()
     -- 40x40+
     if MapSize >= 2048 then
         compressionThreshold = 2 * compressionThreshold
-    end
-
-    ---@type moho.aibrain_methods
-    local brain = ArmyBrains[1]
-    local waterRatio
-    if brain then
-        waterRatio = brain:GetMapWaterRatio()
-    end
-
-    if waterRatio and waterRatio <= 0 then
-
-    else
-
     end
 
     NavGrids['Land'] = NavGrid('Land', CompressionTreeSize)
