@@ -45,9 +45,9 @@ texture        UtilityTextureA;
 // masks of stratum layers 5 - 8
 texture        UtilityTextureB;
 
-// red: ???
-// green: foam
-// blue: water depth
+// red: wave normal strength
+// green: water depth
+// blue: ???
 // ???
 texture        UtilityTextureC;
 
@@ -1250,11 +1250,10 @@ float4 DecalsPS( VS_OUTPUT inV, uniform bool inShadows) : COLOR
     if (UpperAlbedoTile.x * TerrainScale.x > 1000) {
         float roughness = 1 - decalSpec.r;
         color = PBR(inV, decalAlbedo, normal, roughness);
+        color = ApplyWaterColor(waterDepth, color);
     } else {
         color = CalculateLighting(normal, inV.mTexWT.xyz, decalAlbedo.xyz, decalSpec.r, waterDepth, inV.mShadow, inShadows).xyz;
     }
-
-    color.rgb = ApplyWaterColor(waterDepth, color);
 
     return float4(color.rgb, decalAlbedo.w * decalMask.w * DecalAlpha);
 }
@@ -1907,7 +1906,7 @@ float4 TerrainPBRAlbedoPS ( VS_OUTPUT inV) : COLOR
     // We want the lowest mipmap
     float2 ddx = float2(1.0, 0.0); 
     float2 ddy = float2(0.0, 1.0); 
-    float4 lBrightness  = tex2Dgrad(LowerAlbedoSampler,    position.xy * LowerAlbedoTile.xy   , ddx, ddy);
+    float4 lBrightness  = tex2Dgrad(LowerAlbedoSampler,    position.xy * LowerAlbedoTile.xy,    ddx, ddy);
     float4 s0Brightness = tex2Dgrad(Stratum0AlbedoSampler, position.xy * Stratum0AlbedoTile.xy, ddx, ddy);
     float4 s1Brightness = tex2Dgrad(Stratum1AlbedoSampler, position.xy * Stratum1AlbedoTile.xy, ddx, ddy);
     float4 s2Brightness = tex2Dgrad(Stratum2AlbedoSampler, position.xy * Stratum2AlbedoTile.xy, ddx, ddy);
@@ -1918,7 +1917,7 @@ float4 TerrainPBRAlbedoPS ( VS_OUTPUT inV) : COLOR
 
     float cameraFractionNear = 1;
 
-    lowerAlbedo    = CorrectedAddition(lowerAlbedo, tex2D(LowerAlbedoSampler,    position.xy * LowerNormalTile.xy)   , lBrightness,  cameraFractionNear);
+    lowerAlbedo    = CorrectedAddition(lowerAlbedo,    tex2D(LowerAlbedoSampler,    position.xy * LowerNormalTile.xy),    lBrightness,  cameraFractionNear);
     stratum0Albedo = CorrectedAddition(stratum0Albedo, tex2D(Stratum0AlbedoSampler, position.xy * Stratum0NormalTile.xy), s0Brightness, cameraFractionNear);
     stratum1Albedo = CorrectedAddition(stratum1Albedo, tex2D(Stratum1AlbedoSampler, position.xy * Stratum1NormalTile.xy), s1Brightness, cameraFractionNear);
     stratum2Albedo = CorrectedAddition(stratum2Albedo, tex2D(Stratum2AlbedoSampler, position.xy * Stratum2NormalTile.xy), s2Brightness, cameraFractionNear);
@@ -1928,7 +1927,7 @@ float4 TerrainPBRAlbedoPS ( VS_OUTPUT inV) : COLOR
     stratum6Albedo = CorrectedAddition(stratum6Albedo, tex2D(Stratum6AlbedoSampler, position.xy * Stratum6NormalTile.xy), s6Brightness, cameraFractionNear);
 
     // First value is height, second is roughness
-    float2 lowerHRNear    = atlas2D(Stratum7AlbedoSampler, 0.3 * position.xy * LowerAlbedoTile.xy   , float2(0.0, 0.0)).xy;
+    float2 lowerHRNear    = atlas2D(Stratum7AlbedoSampler, 0.3 * position.xy * LowerAlbedoTile.xy,    float2(0.0, 0.0)).xy;
     float2 stratum0HRNear = atlas2D(Stratum7AlbedoSampler, 0.3 * position.xy * Stratum0AlbedoTile.xy, float2(0.0, 0.5)).xy;
     float2 stratum1HRNear = atlas2D(Stratum7AlbedoSampler, 0.3 * position.xy * Stratum1AlbedoTile.xy, float2(0.5, 0.0)).xy;
     float2 stratum2HRNear = atlas2D(Stratum7AlbedoSampler, 0.3 * position.xy * Stratum2AlbedoTile.xy, float2(0.5, 0.5)).xy;
@@ -1937,7 +1936,7 @@ float4 TerrainPBRAlbedoPS ( VS_OUTPUT inV) : COLOR
     float2 stratum5HRNear = atlas2D(Stratum7AlbedoSampler, 0.3 * position.xy * Stratum5AlbedoTile.xy, float2(0.5, 0.0)).zw;
     float2 stratum6HRNear = atlas2D(Stratum7AlbedoSampler, 0.3 * position.xy * Stratum6AlbedoTile.xy, float2(0.5, 0.5)).zw;
 
-    float2 lowerHRFar     = atlas2D(Stratum7AlbedoSampler, 0.3 * position.xy * LowerNormalTile.xy   , float2(0.0, 0.0)).xy;
+    float2 lowerHRFar     = atlas2D(Stratum7AlbedoSampler, 0.3 * position.xy * LowerNormalTile.xy,    float2(0.0, 0.0)).xy;
     float2 stratum0HRFar  = atlas2D(Stratum7AlbedoSampler, 0.3 * position.xy * Stratum0NormalTile.xy, float2(0.0, 0.5)).xy;
     float2 stratum1HRFar  = atlas2D(Stratum7AlbedoSampler, 0.3 * position.xy * Stratum1NormalTile.xy, float2(0.5, 0.0)).xy;
     float2 stratum2HRFar  = atlas2D(Stratum7AlbedoSampler, 0.3 * position.xy * Stratum2NormalTile.xy, float2(0.5, 0.5)).xy;
@@ -1947,7 +1946,7 @@ float4 TerrainPBRAlbedoPS ( VS_OUTPUT inV) : COLOR
     float2 stratum6HRFar  = atlas2D(Stratum7AlbedoSampler, 0.3 * position.xy * Stratum6NormalTile.xy, float2(0.5, 0.5)).zw;
 
     // store roughness in albedo so we get the roughness splatting for free
-    lowerAlbedo.a    = lerp(lowerHRNear.y, lowerHRFar.y, cameraFractionNear);
+    lowerAlbedo.a    = lerp(lowerHRNear.y,    lowerHRFar.y,    cameraFractionNear);
     stratum0Albedo.a = lerp(stratum0HRNear.y, stratum0HRFar.y, cameraFractionNear);
     stratum1Albedo.a = lerp(stratum1HRNear.y, stratum1HRFar.y, cameraFractionNear);
     stratum2Albedo.a = lerp(stratum2HRNear.y, stratum2HRFar.y, cameraFractionNear);
@@ -1966,20 +1965,16 @@ float4 TerrainPBRAlbedoPS ( VS_OUTPUT inV) : COLOR
     albedo = splatLerp(albedo, stratum6Albedo, 1.0, stratum6HRNear.x + (stratum6HRFar.x - 0.25) * Stratum6AlbedoTile.x / Stratum6NormalTile.x, mask1.z);
     albedo.rgb *= utility.w * 2;
 
-    float roughness = albedo.a * mask1.w * 2;
-    roughness = inV.mTexWT.z < WaterElevation ? 0.9 : saturate(roughness + 0.01);
-
-    float shadowSample = saturate(1 - utility.z); // 1 where sun is, 0 where shadow is
-    float shadow = tex2D(ShadowSampler,inV.mShadow.xy).g; // 1 where sun is, 0 where shadow is
-    shadow = shadow * shadowSample;
+    // We need to add 0.01 as the reflection disappears at 0
+    float roughness = saturate(albedo.a * mask1.w * 2 + 0.01);
+    roughness = inV.mTexWT.z < WaterElevation ? 0.9 : roughness;
 
     float3 color = PBR(inV, albedo, normal, roughness);
 
-    float waterDepth = tex2Dproj(UtilitySamplerC,inV.mTexWT*TerrainScale).g;
-    float4 water = tex1D(WaterRampSampler,waterDepth);
-    color.rgb = lerp(color.rgb,water.rgb,water.a);
+    float waterDepth = tex2Dproj(UtilitySamplerC, inV.mTexWT * TerrainScale).g;
+    color = ApplyWaterColor(waterDepth, color);
 
-    return float4(color.rgb, 0.01f);
+    return float4(color, 0.01f);
     // SpecularColor.rgba and UpperAlbedoTile is unused now
 }
 
