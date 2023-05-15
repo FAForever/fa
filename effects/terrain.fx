@@ -1978,6 +1978,33 @@ float4 TerrainPBRAlbedoPS ( VS_OUTPUT inV) : COLOR
     // SpecularColor.rgba and UpperAlbedoTile is unused now
 }
 
+technique TTerrainPBRNormals
+{
+    pass P0
+    {
+        AlphaState( AlphaBlend_Disable_Write_RG )
+        DepthState( Depth_Enable )
+
+        VertexShader = compile vs_1_1 TerrainVS(false);
+        PixelShader = compile ps_2_a TerrainPBRNormalsPS();
+    }
+}
+
+technique TTerrainPBR <
+    string usage = "composite";
+    string normals = "TTerrainPBRNormals";
+>
+{
+    pass P0
+    {
+        AlphaState( AlphaBlend_Disable_Write_RGBA )
+        DepthState( Depth_Enable )
+
+        VertexShader = compile vs_1_1 TerrainVS(true);
+        PixelShader = compile ps_3_0 TerrainPBRAlbedoPS();
+    }
+}
+
 /* # Experimental stuff for playing around # */
 
 float4 TerrainNormalsExperimentalPS ( VertexPBR pixel ) : COLOR
@@ -2196,7 +2223,7 @@ technique TTerainNormalsExtended
         DepthState( Depth_Enable )
 
         VertexShader = compile vs_1_1 TerrainVS( false );
-        PixelShader = compile ps_2_a TerrainPBRNormalsPS();
+        PixelShader = compile ps_2_a TerrainNormalsExperimentalPS();
     }
 }
 
@@ -2211,6 +2238,6 @@ technique TTerrainXP <
         DepthState( Depth_Enable )
 
         VertexShader = compile vs_1_1 TerrainVS(true);
-        PixelShader = compile ps_3_0 TerrainPBRAlbedoPS();
+        PixelShader = compile ps_2_a TTerrainAlbedoExperimentalPS();
     }
 }
