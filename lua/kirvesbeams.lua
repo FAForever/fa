@@ -43,7 +43,7 @@ UnstablePhasonLaserCollisionBeam = Class(SCCollisionBeam) {
 
     ---@param self UnstablePhasonLaserCollisionBeam
     ---@param impactType ImpactType
-    ---@param targetEntity Projectile
+    ---@param targetEntity Prop|Unit?
     OnImpact = function(self, impactType, targetEntity)
         CollisionBeam.OnImpact(self, impactType, targetEntity)
     end,
@@ -70,7 +70,7 @@ UnstablePhasonLaserCollisionBeam2 = Class(SCCollisionBeam) {
 
     ---@param self UnstablePhasonLaserCollisionBeam
     ---@param impactType ImpactType
-    ---@param targetEntity Projectile
+    ---@param targetEntity Prop|Unit?
     OnImpact = function(self, impactType, targetEntity)
         if impactType == 'Terrain' then
             if self.Scorching == nil then

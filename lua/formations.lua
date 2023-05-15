@@ -1,17 +1,9 @@
--- ****************************************************************************
--- **
--- **  File     :  /cdimage/lua/formations.lua
--- **  Author(s):
--- **
--- **  Summary  :
--- **
--- **  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
--- ****************************************************************************
---
--- Basic create formation scripts
+-- File     :  /cdimage/lua/formations.lua
+-- Summary  : Basic create formation scripts
+-- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+-----------------------------------------------------------------
 
 ---@alias UnitFormations 'AttackFormation' | 'GrowthFormation' | 'NoFormation' | 'None' | 'none'
-
 
 SurfaceFormations = {
     'AttackFormation',
@@ -704,7 +696,7 @@ end
 -- ============ Formation Functions =============
 -- ==============================================
 ---@param formationUnits Unit[]
----@return table
+---@return boolean|table
 function AttackFormation(formationUnits)
     local cachedResults = GetCachedResults(formationUnits, 'AttackFormation')
     if cachedResults then
@@ -762,7 +754,7 @@ function AttackFormation(formationUnits)
 end
 
 ---@param formationUnits Unit[]
----@return table
+---@return boolean|table
 function GrowthFormation(formationUnits)
     local cachedResults = GetCachedResults(formationUnits, 'GrowthFormation')
     if cachedResults then
@@ -1453,7 +1445,7 @@ function GetLargeAirPositions(unitsList, airBlock)
     return results
 end
 
----@param chevronPos Vector
+---@param chevronPos number
 ---@param currCol number
 ---@param formationLen number
 ---@return number xPos

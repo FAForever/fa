@@ -24,7 +24,7 @@ TAAPhalanxWeapon = Class(DefaultProjectileWeapon) {
     FxShellEject  = EffectTemplate.TPhalanxGunShells,
 
     ---@param self TAAPhalanxWeapon
-    ---@param muzzle Bone
+    ---@param muzzle string
     PlayFxMuzzleSequence = function(self, muzzle)
         DefaultProjectileWeapon.PlayFxMuzzleSequence(self, muzzle)
         for k, v in self.FxShellEject do
