@@ -393,12 +393,12 @@ float4 CalculateLighting( float3 inNormal, float3 inViewPosition, float3 inAlbed
 {
     float4 color = float4( 0, 0, 0, 0 );
 
-    float3 position = TerrainScale * inViewPosition;
-    float4 properties = tex2D(Stratum7AlbedoSampler, position.xy);
-    float shadowSample = saturate(1 - (properties.b * 1));
-
     float shadow = ( inShadows && ( 1 == ShadowsEnabled ) ) ? ComputeShadow( inShadow ) : 1;
-    shadow = saturate(shadow * shadowSample);
+    if (UpperAlbedoTile.x * TerrainScale.x > 1000) {
+        float3 position = TerrainScale * inViewPosition;
+        float mapShadow = saturate(1 - tex2D(Stratum7AlbedoSampler, position.xy).b);
+        shadow = shadow * mapShadow;
+    }
 
     // calculate some specular
     float3 viewDirection = normalize(inViewPosition.xzy-CameraPosition);
@@ -1238,18 +1238,6 @@ float4 DecalsNormalsPS( VS_OUTPUT inV, uniform bool alphablend ) : COLOR
     // from tangent space
     decalNormal = mul( TangentMatrix, decalNormal);
     decalNormal = normalize(decalNormal);
-
-    if (UpperAlbedoTile.x * TerrainScale.x > 1000) {
-        float4 position = TerrainScale * inV.mTexWT;
-        float4 utility = tex2D(UpperAlbedoSampler, position.xy);
-
-        float4 overlayNormal;
-        overlayNormal.xz = utility.xy * 2 - 1;
-        overlayNormal.y = sqrt(1 - dot(overlayNormal.xz,overlayNormal.xz));
-        overlayNormal.w = 0;
-        decalNormal = UDNBlending(decalNormal.xyz, overlayNormal.xyz, 1);
-    }
-
     // our blend mask is stored in the r channel of the decal
     float blendFactor = decalRaw.r;
 
@@ -1268,8 +1256,8 @@ float4 DecalsPS( VS_OUTPUT inV, uniform bool inShadows) : COLOR
     float3 normal = SampleScreen(NormalSampler, inV.mTexSS).xyz * 2 -1;
 
     float waterDepth = tex2Dproj(UtilitySamplerC, inV.mTexWT * TerrainScale).g;
-    float3 color;
 
+    float3 color;
     if (UpperAlbedoTile.x * TerrainScale.x > 1000) {
         float roughness = 1 - decalSpec.r;
         color = PBR(inV, decalAlbedo, normal, roughness);
@@ -1712,49 +1700,11 @@ float4 UDNBlending(float4 n1, float4 n2, float factor) {
     return normalize(float4(n1.xy + n2.xy, n1.z, 0));
 }
 
-float4 WhiteoutBlending(float4 n1, float4 n2, float factor) {
-    return normalize(float4(n1.xy + n2.xy, n1.z * n2.z, 0));
-}
-
-float textureSplatting(float4 t1, float4 t2, float4 correction, float factor) {
-    float t1height = (t1.r + t1.g + t1.b) / 3;
-    float t2height = (t2.r + t2.g + t2.b) / 3;
-    // we assume height of 0.5 for the previous layers
-    // factor = (t1height + 0.5 > t2height + factor) ? 0 : 1;
-    // return factor;
-
-    float correctionavg = (correction.r + correction.g + correction.b) / 3;
-    // factor *= (t2height - correctionavg + 1) * 10;
-    return factor + (t2height - correctionavg) * 5; // This produces wild but interesting results
-    return saturate(factor);
-}
-
 float4 CorrectedAddition(float4 t1, float4 t2, float4 correction, float factor) {
-    // factor = textureSplatting(t1, t2, correction, factor);
-    // return t1;
-    // return t1 + (t2 - correction) * factor; // This increases contrast
-    // return lerp(t1, t2, factor * 0.8);// This decreases contrast
     return (t1 + (t2 - correction) * factor + lerp(t1, t2, factor * 0.8)) * 0.5;
 }
 
-float4 splatLerp(float4 t1, float4 t2, float factor) {
-    return lerp(t1, t2, factor);
-    float t1height = (t1.r + t1.g + t1.b);
-    float t2height = (t2.r + t2.g + t2.b);
-
-    float h1 = 1.3 - factor;
-    float depth = 0.1;
-    float ma = max(t1height + h1, t2height + factor) - depth;
-    float b1 = max(t1height + h1 - ma, 0);
-    float b2 = max(t2height + factor - ma, 0);
-    return (t1 * b1 + t2 * b2) / (b1 + b2);
-
-    return (t1height + h1 > t2height + factor) ? t1 : t2;
-}
-
 float4 splatLerp(float4 t1, float4 t2, float t1height, float t2height, float factor) {
-    // return lerp(t1, t2, factor);
-
     factor *= 1.5;
     float h1 = 1.5 - factor;
     float depth = 0.3;
@@ -1762,7 +1712,6 @@ float4 splatLerp(float4 t1, float4 t2, float t1height, float t2height, float fac
     float b1 = max(t1height + h1 - ma, 0);
     float b2 = max(t2height + factor - ma, 0);
     return (t1 * b1 + t2 * b2) / (b1 + b2);
-
 }
 
 /* # Sample a 2D 2x2 texture atlas # */
@@ -1778,33 +1727,22 @@ float4 atlas2D(sampler2D s, float2 uv, float2 offset) {
 
 /* # TerrainPBR # */
  
-// Layer| Albedo stratum                                              | Normal stratum
-//      | R           | G             | B            | A              | R             | G             | B             | A            |
-//  ----            ---             ---             ---             ---             ---             ---             ---            ---
-// | L  | R             G               B              unused         | X               Y               Z               unused       |
-//  ----            ---             ---             ---             ---             ---             ---             ---            ---
-// | S0 | R             G               B              unused         | X               Y               Z               unused       |
-// | S1 | R             G               B              unused         | X               Y               Z               unused       |
-// | S2 | R             G               B              unused         | X               Y               Z               unused       |
-// | S3 | R             G               B              unused         | X               Y               Z               unused       |
-//  ----            ---             ---            ---              ---             ---             ---             ---            ---
-// | S4 | R             G               B              unused         | X               Y               Z               unused       |
-// | S5 | R             G               B              unused         | X               Y               Z               unused       |
-// | S6 | R             G               B              unused         | X               Y               Z               unused       |
-// | S7 | height S0-3   roughness S0-3  height S4-7    roughness S4-7   envMap R        envMap G        envMap B        unused       |
-//  ----            ---             ---             ---             ---             ---             ---             ---            ---
-// | U  | normal.x      normal.z        shadow         albedo overlay | 
-
-struct VertexPBR
-{
-    float4 mPos             : POSITION0;
-    float4 mTexWT           : TEXCOORD1;
-    float4 mTexSS           : TEXCOORD2;
-    float4 mShadow          : TEXCOORD3;
-    float3 mViewDirection   : TEXCOORD4;
-    float4 mTexDecal        : TEXCOORD5;
-    float4 mWorld           : TEXCOORD6;
-};
+// Layer| Albedo stratum                                               | Normal stratum
+//      | R           | G             | B            | A               | R             | G             | B             | A            |
+//  ----            ---             ---             ---              ---             ---             ---             ---            ---
+// | L  | R             G               B              unused          | X               Y               Z               unused       |
+//  ----            ---             ---             ---              ---             ---             ---             ---            ---
+// | S0 | R             G               B              unused          | X               Y               Z               unused       |
+// | S1 | R             G               B              unused          | X               Y               Z               unused       |
+// | S2 | R             G               B              unused          | X               Y               Z               unused       |
+// | S3 | R             G               B              unused          | X               Y               Z               unused       |
+//  ----            ---             ---            ---               ---             ---             ---             ---            ---
+// | S4 | R             G               B              unused          | X               Y               Z               unused       |
+// | S5 | R             G               B              unused          | X               Y               Z               unused       |
+// | S6 | R             G               B              unused          | X               Y               Z               unused       |
+// | S7 | height L-S2   roughness L-S2  height S3-S6   roughness S3-S6 | envMap R        envMap G        envMap B        unused       |
+//  ----            ---             ---             ---              ---             ---             ---             ---            ---
+// | U  | normal.x      normal.z        shadow         albedo overlay  | 
 
 float4 TerrainPBRNormalsPS ( VS_OUTPUT inV ) : COLOR
 {
@@ -1812,15 +1750,7 @@ float4 TerrainPBRNormalsPS ( VS_OUTPUT inV ) : COLOR
 
     float4 mask0 = tex2D(UtilitySamplerA, position.xy);
     float4 mask1 = tex2D(UtilitySamplerB, position.xy);
-    // We use the upper stratum as a utility map
-    float4 utility = tex2D(UpperAlbedoSampler, position.xy);
 
-    float4 overlayNormal;
-    overlayNormal.xy = utility.xy * 2 - 1;
-    overlayNormal.z = sqrt(1 - dot(overlayNormal.xy,overlayNormal.xy));
-    overlayNormal.w = 0;
-
-    // load in normals
     float4 lowerNormalNear    = tex2D(LowerNormalSampler,    position.xy * LowerAlbedoTile.xy   );
     float4 stratum0NormalNear = tex2D(Stratum0NormalSampler, position.xy * Stratum0AlbedoTile.xy);
     float4 stratum1NormalNear = tex2D(Stratum1NormalSampler, position.xy * Stratum1AlbedoTile.xy);
@@ -1874,8 +1804,9 @@ float4 TerrainPBRAlbedoPS ( VS_OUTPUT inV) : COLOR
     // do arthmetics to get range from (0, 1) to (-1, 1) as normal maps store their values as (0, 1)
     float3 normal = normalize(2 * SampleScreen(NormalSampler,inV.mTexSS).xyz - 1);
 
-    float4 mask0 = saturate(tex2D(UtilitySamplerA, position.xy));
-    float4 mask1 = saturate(tex2D(UtilitySamplerB, position.xy));
+    float4 mask0 = tex2D(UtilitySamplerA, position.xy);
+    float4 mask1 = tex2D(UtilitySamplerB, position.xy);
+    // We use the upper stratum as a utility map
     float4 utility = tex2D(UpperAlbedoSampler, position.xy);
 
     float4 lowerAlbedo    = tex2D(LowerAlbedoSampler,    position.xy * LowerAlbedoTile.xy);
