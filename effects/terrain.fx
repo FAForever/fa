@@ -465,7 +465,7 @@ float3 PBR(VS_OUTPUT inV, float3 albedo, float3 n, float roughness) {
 
     float4 position = TerrainScale * inV.mTexWT;
     float mapShadow = 1 - tex2D(UpperAlbedoSampler, position.xy).z; // 1 where sun is, 0 where shadow is
-    float shadow = tex2D(ShadowSampler,inV.mShadow.xy).g; // 1 where sun is, 0 where shadow is
+    float shadow = tex2D(ShadowSampler, inV.mShadow.xy).g; // 1 where sun is, 0 where shadow is
     shadow = shadow * mapShadow;
 
     float3 v = normalize(-inV.mViewDirection);
@@ -758,45 +758,53 @@ float4 TerrainBasisPS( VS_OUTPUT inV ) : COLOR
 // special thanks to Sigg and Hadwiger GPU Gems 2 pg 313
 float4 TerrainBasisPSBiCubic( VS_OUTPUT inV ) : COLOR
 {
-    float2 coord_source = (inV.mTexWT * TerrainScale * NormalMapScale + NormalMapOffset).xy;
-    float2 coord_hg = coord_source * size_source - float2(0.5, 0.5);
+    float4 result;
+    if (UpperAlbedoTile.x * TerrainScale.x > 1000) {
+        float4 position = TerrainScale * inV.mTexWT;
+        result = (float4(1, 1, tex2D(UpperAlbedoSampler, position.xy).xy));
+        
+    } else {
+        float2 coord_source = (inV.mTexWT * TerrainScale * NormalMapScale + NormalMapOffset).xy;
+        float2 coord_hg = coord_source * size_source - float2(0.5, 0.5);
 
-    // fetch offsets and weights from filter texture
-#ifdef DIRECT3D10
-    // force to a 2d lookup for d3d10 since d3d10 is much stricter when enforcing
-    // 1d lookups from 2d textures
-    float3 hg_x = tex2D(BiCubicLookupSampler, float2(coord_hg.x,0)).xyz;
-    float3 hg_y = tex2D(BiCubicLookupSampler, float2(coord_hg.y,0)).xyz;
-#else
-    float3 hg_x = tex1D(BiCubicLookupSampler, coord_hg.x).xyz;
-    float3 hg_y = tex1D(BiCubicLookupSampler, coord_hg.y).xyz;
-#endif
+        // fetch offsets and weights from filter texture
+    #ifdef DIRECT3D10
+        // force to a 2d lookup for d3d10 since d3d10 is much stricter when enforcing
+        // 1d lookups from 2d textures
+        float3 hg_x = tex2D(BiCubicLookupSampler, float2(coord_hg.x,0)).xyz;
+        float3 hg_y = tex2D(BiCubicLookupSampler, float2(coord_hg.y,0)).xyz;
+    #else
+        float3 hg_x = tex1D(BiCubicLookupSampler, coord_hg.x).xyz;
+        float3 hg_y = tex1D(BiCubicLookupSampler, coord_hg.y).xyz;
+    #endif
 
-    // determine linear sampling coordinates
-    float2 coord_source10 = coord_source + hg_x.x * e_x;
-    float2 coord_source00 = coord_source - hg_x.y * e_x;
-    float2 coord_source11 = coord_source10 + hg_y.x * e_y;
-    float2 coord_source01 = coord_source00 + hg_y.x * e_y;
-    coord_source10 = coord_source10 - hg_y.y * e_y;
-    coord_source00 = coord_source00 - hg_y.y * e_y;
+        // determine linear sampling coordinates
+        float2 coord_source10 = coord_source + hg_x.x * e_x;
+        float2 coord_source00 = coord_source - hg_x.y * e_x;
+        float2 coord_source11 = coord_source10 + hg_y.x * e_y;
+        float2 coord_source01 = coord_source00 + hg_y.x * e_y;
+        coord_source10 = coord_source10 - hg_y.y * e_y;
+        coord_source00 = coord_source00 - hg_y.y * e_y;
 
-    // fetch the samples from the appropriate spot on the texture
-    float4 tex_source00 = tex2D( UtilitySamplerA, coord_source00 );
-    float4 tex_source10 = tex2D( UtilitySamplerA, coord_source10 );
-    float4 tex_source01 = tex2D( UtilitySamplerA, coord_source01 );
-    float4 tex_source11 = tex2D( UtilitySamplerA, coord_source11 );
+        // fetch the samples from the appropriate spot on the texture
+        float4 tex_source00 = tex2D( UtilitySamplerA, coord_source00 );
+        float4 tex_source10 = tex2D( UtilitySamplerA, coord_source10 );
+        float4 tex_source01 = tex2D( UtilitySamplerA, coord_source01 );
+        float4 tex_source11 = tex2D( UtilitySamplerA, coord_source11 );
 
-    // weight along y direction
-    tex_source00 = lerp(tex_source00, tex_source01, hg_y.z );
-    tex_source10 = lerp(tex_source10, tex_source11, hg_y.z );
+        // weight along y direction
+        tex_source00 = lerp(tex_source00, tex_source01, hg_y.z );
+        tex_source10 = lerp(tex_source10, tex_source11, hg_y.z );
 
-    // weight along x direction
-    tex_source00 = lerp(tex_source00, tex_source10, hg_x.z );
+        // weight along x direction
+        tex_source00 = lerp(tex_source00, tex_source10, hg_x.z );
 
-    // remember we are only writing into the blue and alpha channels.
-    // we can probably optimize our lerps above by taking advantage of the fact that
-    // we only have 2 channels.
-    return tex_source00.xxwy;
+        // remember we are only writing into the blue and alpha channels.
+        // we can probably optimize our lerps above by taking advantage of the fact that
+        // we only have 2 channels.
+        result = tex_source00.xxwy;
+    }
+    return result;
 }
 
 
@@ -970,6 +978,21 @@ technique TTerrain <
 
         VertexShader = compile vs_1_1 TerrainVS( true );
         PixelShader = compile ps_2_a TerrainPS( true);
+    }
+}
+
+technique TTerrainXP <
+    string usage = "composite";
+    string normals = "TTerrainNormalsXP";
+>
+{
+    pass P0
+    {
+        AlphaState( AlphaBlend_Disable_Write_RGBA )
+        DepthState( Depth_Enable )
+
+        VertexShader = compile vs_1_1 TerrainVS(true);
+        PixelShader = compile ps_2_a TerrainAlbedoXP();
     }
 }
 
@@ -1783,44 +1806,6 @@ struct VertexPBR
     float4 mWorld           : TEXCOORD6;
 };
 
-VertexPBR TerrainPBRVS( position_t p : POSITION0, uniform bool shadowed)
-{
-    VertexPBR result;
-
-    result.mWorld = float4(p);
-    result.mWorld.y *= HeightScale;
-
-    float4 position = float4(p);
-    position.y *= HeightScale;
-
-    // calculate output position
-    result.mPos = calculateHomogenousCoordinate(position);
-
-    // calculate 0..1 uv based on size of map
-    result.mTexWT = position.xzyw;
-    // caluclate screen space coordinate for sample a frame buffer of this size
-    result.mTexSS = result.mPos;
-    result.mTexDecal = float4(0,0,0,0);
-
-    // Now the view vector points to the camera
-    result.mViewDirection = normalize(CameraPosition.xyz - position.xyz);
-
-    // if we have shadows enabled fill in the tex coordinate for the shadow projection
-    if ( shadowed && ( 1 == ShadowsEnabled ))
-    {
-        result.mShadow = mul(position,ShadowMatrix);
-        result.mShadow.x = ( +result.mShadow.x + result.mShadow.w ) * 0.5;
-        result.mShadow.y = ( -result.mShadow.y + result.mShadow.w ) * 0.5;
-        result.mShadow.z -= 0.01f; // put epsilon in vs to save ps instruction
-    }
-    else
-    {
-        result.mShadow = float4( 0, 0, 0, 1);
-    }
-
-    return result;
-}
-
 float4 TerrainPBRNormalsPS ( VS_OUTPUT inV ) : COLOR
 {
     float4 position = TerrainScale * inV.mTexWT;
@@ -1877,7 +1862,6 @@ float4 TerrainPBRNormalsPS ( VS_OUTPUT inV ) : COLOR
     normal = UDNBlending(normal, normalize(2 * stratum5NormalNear - 1), mask1.y * cameraFractionNear);
     normal = UDNBlending(normal, normalize(2 * stratum6NormalFar - 1),  mask1.z * cameraFractionFar);
     normal = UDNBlending(normal, normalize(2 * stratum6NormalNear - 1), mask1.z * cameraFractionNear);
-    normal = UDNBlending(normal, normalize(overlayNormal), 1);
 
     return float4( 0.5 + 0.5 * normal.rgb, 1);
 }
@@ -1975,10 +1959,10 @@ float4 TerrainPBRAlbedoPS ( VS_OUTPUT inV) : COLOR
     color = ApplyWaterColor(waterDepth, color);
 
     return float4(color, 0.01f);
-    // SpecularColor.rgba and UpperAlbedoTile is unused now
+    // SpecularColor.rgba is unused now
 }
 
-technique TTerrainPBRNormals
+technique TerrainPBRNormals
 {
     pass P0
     {
@@ -1990,9 +1974,9 @@ technique TTerrainPBRNormals
     }
 }
 
-technique TTerrainPBR <
+technique TerrainPBR <
     string usage = "composite";
-    string normals = "TTerrainPBRNormals";
+    string normals = "TerrainPBRNormals";
 >
 {
     pass P0
@@ -2005,231 +1989,62 @@ technique TTerrainPBR <
     }
 }
 
-/* # Experimental stuff for playing around # */
+/* # Similar to TTerrainXP, but upperAlbedo is used for map-wide textures # */
 
-float4 TerrainNormalsExperimentalPS ( VertexPBR pixel ) : COLOR
+float4 Terrain001AlbedoPS ( VS_OUTPUT inV) : COLOR
 {
-    // retrieve x / y / z terrain coordinates
-    float4 position = TerrainScale * pixel.mTexWT;
-    float4 height = TerrainScale * pixel.mWorld.y;
-    float3 coords = float3(position.x, height.y, position.y);
+    float4 position = TerrainScale * inV.mTexWT;
 
-    // retrieve plane coordinates   
-    float2 uvX = coords.zy; // x facing plane
-    float2 uvY = coords.xz; // y facing plane
-    float2 uvZ = coords.xy; // z facing plane
+    float4 mask0 = saturate(tex2Dproj(UtilitySamplerA,position)*2-1);
+    float4 mask1 = saturate(tex2Dproj(UtilitySamplerB,position)*2-1);
+    float4 utility = tex2D(UpperAlbedoSampler, position.xy);
 
-    // pre-fetch mask information
-    float4 mask0 = saturate(tex2D(UtilitySamplerA, position.xy)*2-1);
-    float4 mask1 = saturate(tex2D(UtilitySamplerB, position.xy)*2-1);
-
-    // load in normals
-    float4 lowerNormal    = tex2D(LowerNormalSampler,    position.xy * LowerNormalTile.xy   );
-    float4 stratum0Normal = tex2D(Stratum0NormalSampler, position.xy * Stratum0NormalTile.xy);
-    float4 stratum1Normal = tex2D(Stratum1NormalSampler, position.xy * Stratum1NormalTile.xy);
-    float4 stratum2Normal = tex2D(Stratum2NormalSampler, position.xy * Stratum2NormalTile.xy);
-    float4 stratum3Normal = tex2D(Stratum3NormalSampler, position.xy * Stratum3NormalTile.xy);
-    float4 stratum4Normal = tex2D(Stratum4NormalSampler, position.xy * Stratum4NormalTile.xy);
-    float4 stratum5Normal = tex2D(Stratum5NormalSampler, position.xy * Stratum5NormalTile.xy);
-    float4 stratum6Normal = tex2D(Stratum6NormalSampler, position.xy * Stratum6NormalTile.xy);
-    float4 stratum7Normal = tex2D(Stratum7NormalSampler, position.xy * Stratum7NormalTile.xy);
-
-    float4 lowerNormalNear    = tex2D(LowerNormalSampler,    3 * position.xy * LowerNormalTile.xy   );
-    float4 stratum0NormalNear = tex2D(Stratum0NormalSampler, 3 * position.xy * Stratum0NormalTile.xy);
-    float4 stratum1NormalNear = tex2D(Stratum1NormalSampler, 3 * position.xy * Stratum1NormalTile.xy);
-    float4 stratum2NormalNear = tex2D(Stratum2NormalSampler, 3 * position.xy * Stratum2NormalTile.xy);
-    float4 stratum3NormalNear = tex2D(Stratum3NormalSampler, 3 * position.xy * Stratum3NormalTile.xy);
-    float4 stratum4NormalNear = tex2D(Stratum4NormalSampler, 3 * position.xy * Stratum4NormalTile.xy);
-    float4 stratum5NormalNear = tex2D(Stratum5NormalSampler, 3 * position.xy * Stratum5NormalTile.xy);
-    float4 stratum6NormalNear = tex2D(Stratum6NormalSampler, 3 * position.xy * Stratum6NormalTile.xy);
-    float4 stratum7NormalNear = tex2D(Stratum7NormalSampler, 3 * position.xy * Stratum7NormalTile.xy);
-
-    float4 lowerNormalFar    = tex2D(LowerNormalSampler,    0.2 * position.xy * LowerNormalTile.xy   );
-    float4 stratum0NormalFar = tex2D(Stratum0NormalSampler, 0.2 * position.xy * Stratum0NormalTile.xy);
-    float4 stratum1NormalFar = tex2D(Stratum1NormalSampler, 0.2 * position.xy * Stratum1NormalTile.xy);
-    float4 stratum2NormalFar = tex2D(Stratum2NormalSampler, 0.2 * position.xy * Stratum2NormalTile.xy);
-    float4 stratum3NormalFar = tex2D(Stratum3NormalSampler, 0.2 * position.xy * Stratum3NormalTile.xy);
-    float4 stratum4NormalFar = tex2D(Stratum4NormalSampler, 0.2 * position.xy * Stratum4NormalTile.xy);
-    float4 stratum5NormalFar = tex2D(Stratum5NormalSampler, 0.2 * position.xy * Stratum5NormalTile.xy);
-    float4 stratum6NormalFar = tex2D(Stratum6NormalSampler, 0.2 * position.xy * Stratum6NormalTile.xy);
-    float4 stratum7NormalFar = tex2D(Stratum7NormalSampler, 0.2 * position.xy * Stratum7NormalTile.xy);
-
-    // allow textures to scale as we zoom in and out
-    float cameraFractionNear = 0.8 - 0.8 * clamp(0.01 * (CameraPosition.y - 20), 0, 1);
-    float cameraFractionFar = clamp(0.001 * (CameraPosition.y - 250), 0, 1);
-
-    // combine them
-    float fractionLower = (1 - mask0.x)*(1 - mask0.y)*(1 - mask0.z)*(1 - mask0.w)*(1 - mask1.x)*(1 - mask1.y)*(1 - mask1.z)*(1 - mask1.w);
-    float4 normal = float4(0, 0, 1, 0);
-    normal = UDNBlending(normal, normalize(2 * lowerNormal - 1),        fractionLower);
-    normal = UDNBlending(normal, normalize(2 * lowerNormalFar - 1),     fractionLower * cameraFractionFar);
-    normal = UDNBlending(normal, normalize(2 * lowerNormalNear - 1),    fractionLower * cameraFractionNear);
-    normal = UDNBlending(normal, normalize(2 * stratum0Normal - 1),     mask0.x);
-    normal = UDNBlending(normal, normalize(2 * stratum0NormalFar - 1),  mask0.x * cameraFractionFar);
-    normal = UDNBlending(normal, normalize(2 * stratum0NormalNear - 1), mask0.x * cameraFractionNear);
-    normal = UDNBlending(normal, normalize(2 * stratum1Normal - 1),     mask0.y);
-    normal = UDNBlending(normal, normalize(2 * stratum1NormalFar - 1),  mask0.y * cameraFractionFar);
-    normal = UDNBlending(normal, normalize(2 * stratum1NormalNear - 1), mask0.y * cameraFractionNear);
-    normal = UDNBlending(normal, normalize(2 * stratum2Normal - 1),     mask0.z);
-    normal = UDNBlending(normal, normalize(2 * stratum2NormalFar - 1),  mask0.z * cameraFractionFar);
-    normal = UDNBlending(normal, normalize(2 * stratum2NormalNear - 1), mask0.z * cameraFractionNear);
-    normal = UDNBlending(normal, normalize(2 * stratum3Normal - 1),     mask0.w);
-    normal = UDNBlending(normal, normalize(2 * stratum3NormalFar - 1),  mask0.w * cameraFractionFar);
-    normal = UDNBlending(normal, normalize(2 * stratum3NormalNear - 1), mask0.w * cameraFractionNear);
-    normal = UDNBlending(normal, normalize(2 * stratum4Normal - 1),     mask1.x);
-    normal = UDNBlending(normal, normalize(2 * stratum4NormalFar - 1),  mask1.x * cameraFractionFar);
-    normal = UDNBlending(normal, normalize(2 * stratum4NormalNear - 1), mask1.x * cameraFractionNear);
-    normal = UDNBlending(normal, normalize(2 * stratum5Normal - 1),     mask1.y);
-    normal = UDNBlending(normal, normalize(2 * stratum5NormalFar - 1),  mask1.y * cameraFractionFar);
-    normal = UDNBlending(normal, normalize(2 * stratum5NormalNear - 1), mask1.y * cameraFractionNear);
-    normal = UDNBlending(normal, normalize(2 * stratum6Normal - 1),     mask1.z); 
-    normal = UDNBlending(normal, normalize(2 * stratum6NormalFar - 1),  mask1.z * cameraFractionFar);
-    normal = UDNBlending(normal, normalize(2 * stratum6NormalNear - 1), mask1.z * cameraFractionNear); 
-    normal = UDNBlending(normal, normalize(2 * stratum7Normal - 1),     mask1.w);
-    normal = UDNBlending(normal, normalize(2 * stratum7NormalFar - 1),  mask1.w * cameraFractionFar);
-    normal = UDNBlending(normal, normalize(2 * stratum7NormalNear - 1), mask1.w * cameraFractionNear);
-
-    return float4( 0.5 + 0.5 * normal.rgb, 1);
-}
-
-float4 TTerrainAlbedoExperimentalPS ( VertexPBR pixel) : COLOR
-{
-    float4 position = TerrainScale * pixel.mTexWT;
-    float4 height = TerrainScale * pixel.mWorld.y;
-    float3 coords = float3(position.x, height.y, position.y);
-
-    // do arthmetics to get range from (0, 1) to (-1, 1) as normal maps store their values as (0, 1)
-    float3 normal = normalize(2 * SampleScreen(NormalSampler,pixel.mTexSS).xyz - 1);
-
-    float4 mask0 = saturate(tex2D(UtilitySamplerA, position.xy)*2-1);
-    float4 mask1 = saturate(tex2D(UtilitySamplerB, position.xy)*2-1);
-
-    float4 lowerAlbedo    = tex2D(LowerAlbedoSampler,    position.xy * LowerAlbedoTile.xy   );
-    float4 stratum0Albedo = tex2D(Stratum0AlbedoSampler, position.xy * Stratum0AlbedoTile.xy);
-    float4 stratum1Albedo = tex2D(Stratum1AlbedoSampler, position.xy * Stratum1AlbedoTile.xy);
-    float4 stratum2Albedo = tex2D(Stratum2AlbedoSampler, position.xy * Stratum2AlbedoTile.xy);
-    float4 stratum3Albedo = tex2D(Stratum3AlbedoSampler, position.xy * Stratum3AlbedoTile.xy);
-    float4 stratum4Albedo = tex2D(Stratum4AlbedoSampler, position.xy * Stratum4AlbedoTile.xy);
-    float4 stratum5Albedo = tex2D(Stratum5AlbedoSampler, position.xy * Stratum5AlbedoTile.xy);
-    float4 stratum6Albedo = tex2D(Stratum6AlbedoSampler, position.xy * Stratum6AlbedoTile.xy);
-    float4 upperAlbedo    = tex2D(UpperAlbedoSampler,    position.xy * UpperAlbedoTile.xy   );
-
-    float4 lowerAlbedoNear    = tex2D(LowerAlbedoSampler,    3 * position.xy * LowerAlbedoTile.xy);
-    float4 stratum0AlbedoNear = tex2D(Stratum0AlbedoSampler, 3 * position.xy * Stratum0AlbedoTile.xy);
-    float4 stratum1AlbedoNear = tex2D(Stratum1AlbedoSampler, 3 * position.xy * Stratum1AlbedoTile.xy);
-    float4 stratum2AlbedoNear = tex2D(Stratum2AlbedoSampler, 3 * position.xy * Stratum2AlbedoTile.xy);
-    float4 stratum3AlbedoNear = tex2D(Stratum3AlbedoSampler, 3 * position.xy * Stratum3AlbedoTile.xy);
-    float4 stratum4AlbedoNear = tex2D(Stratum4AlbedoSampler, 3 * position.xy * Stratum4AlbedoTile.xy);
-    float4 stratum5AlbedoNear = tex2D(Stratum5AlbedoSampler, 3 * position.xy * Stratum5AlbedoTile.xy);
-    float4 stratum6AlbedoNear = tex2D(Stratum6AlbedoSampler, 3 * position.xy * Stratum6AlbedoTile.xy);
-
-    float4 lowerAlbedoFar    = tex2D(LowerAlbedoSampler,    0.2 * position.xy * LowerAlbedoTile.xy);
-    float4 stratum0AlbedoFar = tex2D(Stratum0AlbedoSampler, 0.2 * position.xy * Stratum0AlbedoTile.xy);
-    float4 stratum1AlbedoFar = tex2D(Stratum1AlbedoSampler, 0.2 * position.xy * Stratum1AlbedoTile.xy);
-    float4 stratum2AlbedoFar = tex2D(Stratum2AlbedoSampler, 0.2 * position.xy * Stratum2AlbedoTile.xy);
-    float4 stratum3AlbedoFar = tex2D(Stratum3AlbedoSampler, 0.2 * position.xy * Stratum3AlbedoTile.xy);
-    float4 stratum4AlbedoFar = tex2D(Stratum4AlbedoSampler, 0.2 * position.xy * Stratum4AlbedoTile.xy);
-    float4 stratum5AlbedoFar = tex2D(Stratum5AlbedoSampler, 0.2 * position.xy * Stratum5AlbedoTile.xy);
-    float4 stratum6AlbedoFar = tex2D(Stratum6AlbedoSampler, 0.2 * position.xy * Stratum6AlbedoTile.xy);
-
-    // First value is height, second is roughness
-    float2 lowerHR    = atlas2D(Stratum7AlbedoSampler, position.xy * LowerAlbedoTile.xy   , float2(0.0, 0.0)).xy;
-    float2 stratum0HR = atlas2D(Stratum7AlbedoSampler, position.xy * Stratum0AlbedoTile.xy, float2(0.0, 0.5)).xy;
-    float2 stratum1HR = atlas2D(Stratum7AlbedoSampler, position.xy * Stratum1AlbedoTile.xy, float2(0.5, 0.0)).xy;
-    float2 stratum2HR = atlas2D(Stratum7AlbedoSampler, position.xy * Stratum2AlbedoTile.xy, float2(0.5, 0.5)).xy;
-    float2 stratum3HR = atlas2D(Stratum7AlbedoSampler, position.xy * Stratum3AlbedoTile.xy, float2(0.0, 0.0)).zw;
-    float2 stratum4HR = atlas2D(Stratum7AlbedoSampler, position.xy * Stratum4AlbedoTile.xy, float2(0.0, 0.5)).zw;
-    float2 stratum5HR = atlas2D(Stratum7AlbedoSampler, position.xy * Stratum5AlbedoTile.xy, float2(0.5, 0.0)).zw;
-    float2 stratum6HR = atlas2D(Stratum7AlbedoSampler, position.xy * Stratum6AlbedoTile.xy, float2(0.5, 0.5)).zw;
-
-    float2 lowerHRFar    = atlas2D(Stratum7AlbedoSampler, position.xy * LowerNormalTile.xy   , float2(0.0, 0.0)).xy;
-    float2 stratum0HRFar = atlas2D(Stratum7AlbedoSampler, position.xy * Stratum0NormalTile.xy, float2(0.0, 0.5)).xy;
-    float2 stratum1HRFar = atlas2D(Stratum7AlbedoSampler, position.xy * Stratum1NormalTile.xy, float2(0.5, 0.0)).xy;
-    float2 stratum2HRFar = atlas2D(Stratum7AlbedoSampler, position.xy * Stratum2NormalTile.xy, float2(0.5, 0.5)).xy;
-    float2 stratum3HRFar = atlas2D(Stratum7AlbedoSampler, position.xy * Stratum3NormalTile.xy, float2(0.0, 0.0)).zw;
-    float2 stratum4HRFar = atlas2D(Stratum7AlbedoSampler, position.xy * Stratum4NormalTile.xy, float2(0.0, 0.5)).zw;
-    float2 stratum5HRFar = atlas2D(Stratum7AlbedoSampler, position.xy * Stratum5NormalTile.xy, float2(0.5, 0.0)).zw;
-    float2 stratum6HRFar = atlas2D(Stratum7AlbedoSampler, position.xy * Stratum6NormalTile.xy, float2(0.5, 0.5)).zw;
-
-    // We want the lowest mipmap
-    float2 ddx = float2(1.0, 0.0); 
-    float2 ddy = float2(0.0, 1.0); 
-    float4 lABrightness  = tex2Dgrad(LowerAlbedoSampler,    position.xy * LowerAlbedoTile.xy   , ddx, ddy);
-    float4 s0ABrightness = tex2Dgrad(Stratum0AlbedoSampler, position.xy * Stratum0AlbedoTile.xy, ddx, ddy);
-    float4 s1ABrightness = tex2Dgrad(Stratum1AlbedoSampler, position.xy * Stratum1AlbedoTile.xy, ddx, ddy);
-    float4 s2ABrightness = tex2Dgrad(Stratum2AlbedoSampler, position.xy * Stratum2AlbedoTile.xy, ddx, ddy);
-    float4 s3ABrightness = tex2Dgrad(Stratum3AlbedoSampler, position.xy * Stratum3AlbedoTile.xy, ddx, ddy);
-    float4 s4ABrightness = tex2Dgrad(Stratum4AlbedoSampler, position.xy * Stratum4AlbedoTile.xy, ddx, ddy);
-    float4 s5ABrightness = tex2Dgrad(Stratum5AlbedoSampler, position.xy * Stratum5AlbedoTile.xy, ddx, ddy);
-    float4 s6ABrightness = tex2Dgrad(Stratum6AlbedoSampler, position.xy * Stratum6AlbedoTile.xy, ddx, ddy);
-
-    float cameraFractionNear = 1 - clamp(0.01 * (CameraPosition.y - 20), 0, 1);
-    float cameraFractionFar = 0.5 + 0.5 * clamp(0.001 * (CameraPosition.y - 250), 0, 1);
+    float4 lowerAlbedo = tex2Dproj(LowerAlbedoSampler,position*LowerAlbedoTile);
+    float4 stratum0Albedo = tex2Dproj(Stratum0AlbedoSampler,position*Stratum0AlbedoTile);
+    float4 stratum1Albedo = tex2Dproj(Stratum1AlbedoSampler,position*Stratum1AlbedoTile);
+    float4 stratum2Albedo = tex2Dproj(Stratum2AlbedoSampler,position*Stratum2AlbedoTile);
+    float4 stratum3Albedo = tex2Dproj(Stratum3AlbedoSampler,position*Stratum3AlbedoTile);
+    float4 stratum4Albedo = tex2Dproj(Stratum4AlbedoSampler,position*Stratum4AlbedoTile);
+    float4 stratum5Albedo = tex2Dproj(Stratum5AlbedoSampler,position*Stratum5AlbedoTile);
+    float4 stratum6Albedo = tex2Dproj(Stratum6AlbedoSampler,position*Stratum6AlbedoTile);
+    float4 stratum7Albedo = tex2Dproj(Stratum7AlbedoSampler,position*Stratum7AlbedoTile);
 
     float4 albedo = lowerAlbedo;
-    albedo = CorrectedAddition(albedo, lowerAlbedoNear, lABrightness, cameraFractionNear);
-    albedo = CorrectedAddition(albedo, lowerAlbedoFar,  lABrightness, cameraFractionFar);
-    albedo = splatLerp(albedo, stratum0Albedo, mask0.x); 
-    albedo = CorrectedAddition(albedo, stratum0AlbedoFar,  s0ABrightness, mask0.x * cameraFractionFar);
-    albedo = CorrectedAddition(albedo, stratum0AlbedoNear, s0ABrightness, mask0.x * cameraFractionNear);
-    albedo = splatLerp(albedo, stratum1Albedo, mask0.y); 
-    albedo = CorrectedAddition(albedo, stratum1AlbedoFar,  s1ABrightness, mask0.y * cameraFractionFar); 
-    albedo = CorrectedAddition(albedo, stratum1AlbedoNear, s1ABrightness, mask0.y * cameraFractionNear); 
-    albedo = splatLerp(albedo, stratum2Albedo, mask0.z); 
-    albedo = CorrectedAddition(albedo, stratum2AlbedoFar,  s2ABrightness, mask0.z * cameraFractionFar); 
-    albedo = CorrectedAddition(albedo, stratum2AlbedoNear, s2ABrightness, mask0.z * cameraFractionNear); 
-    albedo = splatLerp(albedo, stratum3Albedo, mask0.w); 
-    albedo = CorrectedAddition(albedo, stratum3AlbedoFar,  s3ABrightness, mask0.w * cameraFractionFar); 
-    albedo = CorrectedAddition(albedo, stratum3AlbedoNear, s3ABrightness, mask0.w * cameraFractionNear); 
-    albedo = splatLerp(albedo, stratum4Albedo, mask1.x); 
-    albedo = CorrectedAddition(albedo, stratum4AlbedoFar,  s4ABrightness, mask1.x * cameraFractionFar); 
-    albedo = CorrectedAddition(albedo, stratum4AlbedoNear, s4ABrightness, mask1.x * cameraFractionNear); 
-    albedo = splatLerp(albedo, stratum5Albedo, mask1.y); 
-    albedo = CorrectedAddition(albedo, stratum5AlbedoFar,  s5ABrightness, mask1.y * cameraFractionFar); 
-    albedo = CorrectedAddition(albedo, stratum5AlbedoNear, s5ABrightness, mask1.y * cameraFractionNear); 
-    albedo = splatLerp(albedo, stratum6Albedo, mask1.z); 
-    albedo = CorrectedAddition(albedo, stratum6AlbedoFar,  s6ABrightness, mask1.z * cameraFractionFar);
-    albedo = CorrectedAddition(albedo, stratum6AlbedoNear, s6ABrightness, mask1.z * cameraFractionNear); 
-    albedo.rgb = lerp(albedo.xyz,upperAlbedo.xyz,upperAlbedo.w);
+    albedo = lerp(albedo,stratum0Albedo,mask0.x);
+    albedo = lerp(albedo,stratum1Albedo,mask0.y);
+    albedo = lerp(albedo,stratum2Albedo,mask0.z);
+    albedo = lerp(albedo,stratum3Albedo,mask0.w);
+    albedo = lerp(albedo,stratum4Albedo,mask1.x);
+    albedo = lerp(albedo,stratum5Albedo,mask1.y);
+    albedo = lerp(albedo,stratum6Albedo,mask1.z);
+    albedo = lerp(albedo,stratum7Albedo,mask1.w);
+    albedo.rgb *= utility.w * 2;
 
-    float3 r = reflect(-pixel.mViewDirection, normal);
-    float3 specular = pow(saturate(dot(r,SunDirection)),80)*albedo.aaa*SpecularColor.a*SpecularColor.rgb;
+    float3 normal = normalize(2 * SampleScreen(NormalSampler,inV.mTexSS).xyz - 1);
 
-    // We use stratum 7 as a utility map
-    float4 properties = tex2D(Stratum7AlbedoSampler, coords.xz);
-    float shadowSample = saturate(1 - properties.z); // 1 where sun is, 0 where shadow is
-    float shadow = tex2D(ShadowSampler,pixel.mShadow.xy).g; // 1 where sun is, 0 where shadow is
-    shadow = shadow * shadowSample;
+    float3 r = reflect(normalize(inV.mViewDirection), normal);
+    float3 specular = pow(saturate(dot(r, SunDirection)),80) * albedo.aaa * SpecularColor.a * SpecularColor.rgb;
 
-    float overlay = properties.w;
-    albedo *= overlay * 2;
+    float dotSunNormal = dot(SunDirection, normal);
 
-    float3 light = SunColor * saturate(dot(SunDirection, normal)) * shadow + SunAmbience;
+    float mapShadow = 1 - utility.z; // 1 where sun is, 0 where shadow is
+    float shadow = tex2D(ShadowSampler, inV.mShadow.xy).g; // 1 where sun is, 0 where shadow is
+    shadow = shadow * mapShadow;
+
+    float3 light = SunColor * saturate(dotSunNormal) * shadow + SunAmbience;
     light = LightingMultiplier * light + ShadowFillColor * (1 - light);
     albedo.rgb = light * (albedo.rgb + specular.rgb);
 
-    float waterDepth = tex2Dproj(UtilitySamplerC,pixel.mTexWT*TerrainScale).g;
-    float4 water = tex1D(WaterRampSampler,waterDepth);
-    albedo.rgb = lerp(albedo.rgb,water.rgb,water.a);
+    float waterDepth = tex2Dproj(UtilitySamplerC, inV.mTexWT * TerrainScale).g;
+    float4 water = tex1D(WaterRampSampler, waterDepth);
+    albedo.rgb = lerp(albedo.rgb, water.rgb, water.a);
 
     return float4(albedo.rgb, 0.01f);
 }
 
-technique TTerainNormalsExtended
-{
-    pass P0
-    {
-        AlphaState( AlphaBlend_Disable_Write_RG )
-        DepthState( Depth_Enable )
-
-        VertexShader = compile vs_1_1 TerrainVS( false );
-        PixelShader = compile ps_2_a TerrainNormalsExperimentalPS();
-    }
-}
-
-technique TTerrainXP <
+technique Terrain001 <
     string usage = "composite";
-    string normals = "TTerainNormalsExtended";
+    string normals = "TTerrainNormalsXP"; 
 >
 {
     pass P0
@@ -2238,6 +2053,6 @@ technique TTerrainXP <
         DepthState( Depth_Enable )
 
         VertexShader = compile vs_1_1 TerrainVS(true);
-        PixelShader = compile ps_2_a TTerrainAlbedoExperimentalPS();
+        PixelShader = compile ps_2_a Terrain001AlbedoPS();
     }
 }
