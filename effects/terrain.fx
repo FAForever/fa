@@ -452,9 +452,8 @@ float GeometrySchlick(float nDotV, float roughness)
     return num / denom;
 }
 
-float GeometrySmith(float3 n, float3 v, float3 l, float roughness)
+float GeometrySmith(float3 n, float nDotV, float3 l, float roughness)
 {
-    float nDotV = max(dot(n, v), 0.0);
     float nDotL = max(dot(n, l), 0.0);
     float gs2 = GeometrySchlick(nDotV, roughness);
     float gs1 = GeometrySchlick(nDotL, roughness);
@@ -474,16 +473,19 @@ float3 PBR(VS_OUTPUT inV, float3 albedo, float3 n, float roughness) {
     float3 l = SunDirection;
     float3 h = normalize(v + l);
     float nDotL = max(dot(n, l), 0.0);
+    // Normal maps can cause an angle > 90° betweeen n and v which would 
+    // cause artifacts if we don't take some countermeasures
+    float nDotV = abs(dot(n, v)) + 0.001;
     float3 sunLight = SunColor * LightingMultiplier * shadow;
 
     // Cook-Torrance BRDF
     float3 F = FresnelSchlick(max(dot(h, v), 0.0), F0);
     float NDF = NormalDistribution(n, h, roughness);
-    float G = GeometrySmith(n, v, l, roughness);
+    float G = GeometrySmith(n, nDotV, l, roughness);
 
     float3 numerator = NDF * G * F;
     // add 0.0001 to avoid division by zero
-    float denominator = 4.0 * max(dot(n, v), 0.0) * nDotL + 0.0001;
+    float denominator = 4.0 * nDotV * nDotL + 0.0001;
     float3 reflected = numerator / denominator;
     
     float3 kD = float3(1.0, 1.0, 1.0) - F;	
