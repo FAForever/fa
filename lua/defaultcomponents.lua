@@ -42,6 +42,8 @@ ShieldEffectsComponent = ClassSimple {
 IntelComponent = ClassSimple {
 
     ---@param self IntelComponent | Unit
+    ---@param builder Unit
+    ---@param layer Layer
     OnStopBeingBuilt = function(self, builder, layer)
         local intelBlueprint = self.Blueprint.Intel
         if intelBlueprint and intelBlueprint.State then

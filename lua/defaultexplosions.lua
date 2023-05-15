@@ -819,10 +819,10 @@ function CreateFirePlume(object, scale)
 end
 
 ---@param object Unit
----@param projectile string
+---@param projectile FileName
 ---@param minnumber integer
 ---@param maxnumber integer
----@param effect string
+---@param effect FileName
 ---@param fxscalemin number
 ---@param fxscalemax number
 ---@param gravitymin number

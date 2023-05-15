@@ -41,7 +41,7 @@ TrashBag = ClassTrashBag {
 
     --- Adds an entity to the trash bag
     ---@param self TrashBag
-    ---@param trash Destroyable
+    ---@param trash Destroyable | thread
     Add = function(self, trash)
         -- -- Uncomment for performance testing
         -- if entity == nil then 

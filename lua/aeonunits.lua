@@ -27,13 +27,13 @@ local CreateAeonFactoryBuildingEffects = EffectUtil.CreateAeonFactoryBuildingEff
 --  FACTORIES
 ---------------------------------------------------------------
 ---@class AFactoryUnit : FactoryUnit
+---@field BuildEffectsBag TrashBag
 AFactoryUnit = ClassUnit(FactoryUnit) {
 
     ---@param self AFactoryUnit
     ---@param unitBeingBuilt Unit
     StartBuildFx = function(self, unitBeingBuilt)
-        local thread = self:ForkThread(CreateAeonFactoryBuildingEffects, unitBeingBuilt, self.BuildEffectBones, 'Attachpoint', self.BuildEffectsBag)
-        unitBeingBuilt.Trash:Add(thread)
+        self.Trash:Add(ForkThread(CreateAeonFactoryBuildingEffects,self, unitBeingBuilt, self.BuildEffectBones, 'Attachpoint', self.BuildEffectsBag))
     end,
 
     ---@param self AFactoryUnit
@@ -186,8 +186,7 @@ ASeaFactoryUnit = ClassUnit(SeaFactoryUnit) {
     ---@param self ASeaFactoryUnit
     ---@param unitBeingBuilt Unit
     StartBuildFx = function(self, unitBeingBuilt)
-        local thread = self:ForkThread(CreateAeonFactoryBuildingEffects, unitBeingBuilt, self.BuildEffectBones, 'Attachpoint01', self.BuildEffectsBag)
-        unitBeingBuilt.Trash:Add(thread)
+        self.Trash:Add(ForkThread(CreateAeonFactoryBuildingEffects,self, unitBeingBuilt, self.BuildEffectBones, 'Attachpoint01', self.BuildEffectsBag))
     end,
 
     OnPaused = AFactoryUnit.OnPaused,
