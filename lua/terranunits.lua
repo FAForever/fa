@@ -74,7 +74,7 @@ TAirFactoryUnit = ClassUnit(AirFactoryUnit) {
     ---@param self TAirFactoryUnit
     StartArmsMoving = function(self)
         if not self.ArmsThread then
-            self.ArmsThread = self.Trash:Add(ForkThread(self.MovingArmsThread,self))
+            self.ArmsThread = self:ForkThread(self.MovingArmsThread,self)
         end
     end,
 
@@ -206,7 +206,7 @@ TLandFactoryUnit = ClassUnit(LandFactoryUnit) {
         WaitTicks(2)
         for _, v in self.BuildEffectBones do
             self.BuildEffectsBag:Add(CreateAttachedEmitter(self, v, self.Army, '/effects/emitters/flashing_blue_glow_01_emit.bp'))
-            self.BuildEffectsBag:Add(self.Trash:Add(ForkThread(EffectUtil.CreateDefaultBuildBeams, unitBeingBuilt, {v}, self.BuildEffectsBag,self)))
+            self.BuildEffectsBag:Add(self:ForkThread(EffectUtil.CreateDefaultBuildBeams, unitBeingBuilt, {v}, self.BuildEffectsBag,self))
         end
     end,
 }
@@ -247,7 +247,7 @@ TMobileFactoryUnit = ClassUnit(AmphibiousLandUnit) {
         self:SetMesh(self.Blueprint.Display.BuildMeshBlueprint, true)
         if self:GetBlueprint().General.UpgradesFrom  ~= builder.UnitId then
             self:HideBone(0, true)
-            self.OnBeingBuiltEffectsBag:Add(self.Trash:Add(ForkThread(CreateBuildCubeThread, builder, self.OnBeingBuiltEffectsBag,self)))
+            self.OnBeingBuiltEffectsBag:Add(self:ForkThread(CreateBuildCubeThread, builder, self.OnBeingBuiltEffectsBag,self))
         end
     end,
 }
