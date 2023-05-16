@@ -240,6 +240,16 @@ sampler2D falloffSampler = sampler_state
     AddressV  = CLAMP;
 };
 
+sampler WaterRampSampler = sampler_state
+{
+    Texture = (waterRamp);
+    MipFilter = LINEAR;
+    MinFilter = LINEAR;
+    MagFilter = LINEAR;
+    AddressU  = CLAMP;
+    AddressV  = CLAMP;
+};
+
 ///////////////////////////////////////
 ///
 /// Structures
@@ -9196,6 +9206,9 @@ float4 PBR_PS(
     //////////////////////////////
     // Compute sun light
     //
+    if (vertex.depth.x < 0) {
+        facingSpecular = facingSpecular * 0.3;
+    }
     float3 F0 = lerp(float3(facingSpecular, facingSpecular, facingSpecular), albedo, metallic);
     float3 l = sunDirection;
     float3 h = normalize(v + l);
@@ -9354,8 +9367,17 @@ float4 PBR_Aeon(NORMALMAPPED_VERTEX vertex, float teamColorFactor, uniform bool 
 
     float3 color = PBR_PS(vertex, albedo, metallic, roughness, normal, hiDefShadows, specularAmount).rgb;
 
+    float4 waterColor = tex1D(WaterRampSampler, -vertex.depth.x * 0.05);
+    float3 v = normalize(vertex.viewDirection);
+    float3 up = float3(0,1,0);
+    float oneovercos = 1 / max(dot(up, v), 0.0001);
+    float waterAbsorption = saturate(waterColor.w * (1 + oneovercos) * 0.5);
+    float emissionAbsorption = saturate(waterColor.w * oneovercos * 0.5);
+    color = lerp(color, waterColor.rgb, waterAbsorption);
+
     float3 emission = specular.b + specular.a * vertex.color.rgb * 0.5;
-    color += emission;
+    color += emission * (1 - emissionAbsorption);
+     
     float alpha = mirrored ? 0.5 : specular.b + glowMinimum + specular.a * 0.13;
 
     return float4(color, alpha);

@@ -1885,7 +1885,15 @@ float4 TerrainPBRAlbedoPS ( VS_OUTPUT inV) : COLOR
     float3 color = PBR(inV, albedo, normal, roughness);
 
     float waterDepth = tex2Dproj(UtilitySamplerC, inV.mTexWT * TerrainScale).g;
-    color = ApplyWaterColor(waterDepth, color);
+    float3 v = normalize(-inV.mViewDirection);
+    float3 up = float3(0,1,0);
+    float oneovercos = 1 / max(dot(up, v), 0.0001);
+    // float waterAbsorption = saturate(exp(waterDepth * (1 + oneovercos) * -2));
+    // color = lerp(float3(0.05,0.13,0.1), color, waterAbsorption);
+    // color = ApplyWaterColor(waterDepth * (1 + oneovercos) * 0.5, color);
+    float4 waterColor = tex1D(WaterRampSampler, waterDepth);
+    float waterAbsorption = saturate(waterColor.w * (1 + oneovercos) * 0.5);
+    color = lerp(color, waterColor.xyz, waterAbsorption);
 
     return float4(color, 0.01f);
     // SpecularColor.rgba is unused now
