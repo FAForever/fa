@@ -518,6 +518,20 @@ float3 PBR(VS_OUTPUT inV, float3 albedo, float3 n, float roughness) {
     // we simplify here for the ambient lighting
     color += albedo * ambient;
 
+    // While it would be nice to be more sophisticated here by sampling the
+    // environment map and making correct specular calculations with the
+    // BRDF lookup texture, there are several problems:
+    // We can't access that lookup texture and we run into the shader limit
+    // of 16 different texture samplers per shader.
+    // Luckily, ground is generally pretty rough, so specular reflections of
+    // the environment are not that noticeable and we still have the specular
+    // reflections of the sun, which does most of the visual work.
+    // It's a bit sad that we can't use the env map to truely match the lighting
+    // of the mesh shader, but the alternative would be to sacrifice one albedo
+    // slot or to sacrifice water rendering.
+    // In the future we could write another shader that does exactly this, so
+    // mappers can choose to use that if they want to make a shiny map.
+
     return color;
 }
 
