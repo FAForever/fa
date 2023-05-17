@@ -388,8 +388,7 @@ float3 ApplyWaterColor( float depth, float3  inColor)
     return lerp( inColor.xyz, wcolor.xyz, wcolor.w );
 }
 
-float3 ApplyWaterColorExponentially(VS_OUTPUT inV, float3 color) {
-    float waterDepth = tex2Dproj(UtilitySamplerC, inV.mTexWT * TerrainScale).g;
+float3 ApplyWaterColorExponentially(VS_OUTPUT inV, float waterDepth, float3 color) {
     float4 waterColor = tex1D(WaterRampSampler, waterDepth);
     float3 v = normalize(-inV.mViewDirection);
     float3 up = float3(0,1,0);
@@ -1292,7 +1291,7 @@ float4 DecalsPS( VS_OUTPUT inV, uniform bool inShadows) : COLOR
     if (UpperAlbedoTile.x * TerrainScale.x > 1000) {
         float roughness = 1 - decalSpec.r;
         color = PBR(inV, decalAlbedo, normal, roughness);
-        color = ApplyWaterColorExponentially(inV, color);
+        color = ApplyWaterColorExponentially(inV, waterDepth, color);
     } else {
         color = CalculateLighting(normal, inV.mTexWT.xyz, decalAlbedo.xyz, decalSpec.r, waterDepth, inV.mShadow, inShadows).xyz;
     }
@@ -1916,7 +1915,9 @@ float4 TerrainPBRAlbedoPS ( VS_OUTPUT inV) : COLOR
     roughness = inV.mTexWT.z < WaterElevation ? 0.9 : roughness;
 
     float3 color = PBR(inV, albedo, normal, roughness);
-    color = ApplyWaterColorExponentially(inV, color);
+
+    float waterDepth = tex2Dproj(UtilitySamplerC, position).g;
+    color = ApplyWaterColorExponentially(inV, waterDepth, color);
 
     return float4(color, 0.01f);
     // SpecularColor.rgba is unused now
@@ -1996,7 +1997,8 @@ float4 Terrain001AlbedoPS ( VS_OUTPUT inV) : COLOR
     light = LightingMultiplier * light + ShadowFillColor * (1 - light);
     albedo.rgb = light * (albedo.rgb + specular.rgb);
 
-    albedo.rgb = ApplyWaterColorExponentially(inV, albedo.rgb);
+    float waterDepth = tex2Dproj(UtilitySamplerC, position).g;
+    albedo.rgb = ApplyWaterColorExponentially(inV, waterDepth, albedo.rgb);
 
     return float4(albedo.rgb, 0.01f);
 }
