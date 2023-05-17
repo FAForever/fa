@@ -197,6 +197,14 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
             -- SpecialToggleDisableFunction = false,
             -- OnAttachedToTransport = {}, -- Returns self, transport, bone
             -- OnDetachedFromTransport = {}, -- Returns self, transport, bone
+
+            -- OnTransportAttach = {}
+            -- OnTransportDetach = {}
+            -- OnTransportAborted = {}
+            -- OnTransportOrdered = {}
+            -- OnAttachedKilled = {}
+            -- OnStartTransportLoading = {}
+            -- OnStopTransportLoading = {}
         }
     end,
 
@@ -2721,7 +2729,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
     ---@param attachedUnit Unit
     OnTransportAttach = function(self, attachBone, attachedUnit)
         -- awareness of event for campaign scripts
-        local callbacks = self.EventCallbacks['OnTransportAttach'] or { }
+        local callbacks = self.EventCallbacks['OnTransportAttach']
         if callbacks then
             for _, cb in callbacks do
                 cb(self, attachBone, attachedUnit)
@@ -2744,7 +2752,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
     ---@param deattachedUnit Unit
     OnTransportDetach = function(self, attachBone, deattachedUnit)
         -- awareness of event for campaign scripts
-        local callbacks = self.EventCallbacks['OnTransportDetach'] or { }
+        local callbacks = self.EventCallbacks['OnTransportDetach']
         if callbacks then
             for _, cb in callbacks do
                 cb(self, attachBone, deattachedUnit)
@@ -2765,7 +2773,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
     ---@param self Unit
     OnTransportAborted = function(self)
         -- awareness of event for campaign scripts
-        local callbacks = self.EventCallbacks['OnTransportAborted'] or { }
+        local callbacks = self.EventCallbacks['OnTransportAborted']
         if callbacks then
             for _, cb in callbacks do
                 cb(self)
@@ -2783,7 +2791,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
     ---@param self Unit
     OnTransportOrdered = function(self)
         -- awareness of event for campaign scripts
-        local callbacks = self.EventCallbacks['OnTransportOrdered'] or { }
+        local callbacks = self.EventCallbacks['OnTransportOrdered']
         if callbacks then
             for _, cb in callbacks do
                 cb(self)
@@ -2802,7 +2810,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
     ---@param attached Unit
     OnAttachedKilled = function(self, attached)
         -- awareness of event for campaign scripts
-        local callbacks = self.EventCallbacks['OnAttachedKilled'] or { }
+        local callbacks = self.EventCallbacks['OnAttachedKilled']
         if callbacks then
             for _, cb in callbacks do
                 cb(self)
@@ -2820,7 +2828,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
     ---@param self Unit
     OnStartTransportLoading = function(self)
         -- awareness of event for campaign scripts
-        local callbacks = self.EventCallbacks['OnStartTransportLoading'] or { }
+        local callbacks = self.EventCallbacks['OnStartTransportLoading']
         if callbacks then
             for _, cb in callbacks do
                 cb(self)
@@ -2838,7 +2846,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
     ---@param self Unit
     OnStopTransportLoading = function(self)
         -- awareness of event for campaign scripts
-        local callbacks = self.EventCallbacks['OnStopTransportLoading'] or { }
+        local callbacks = self.EventCallbacks['OnStopTransportLoading']
         if callbacks then
             for _, cb in callbacks do
                 cb(self)
