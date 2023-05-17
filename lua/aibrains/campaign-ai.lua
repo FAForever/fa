@@ -34,6 +34,7 @@ AIBrain = Class(StandardBrain) {
         self.CurrentPlan = self.AIPlansList[self:GetFactionIndex()][1]
         self:ForkThread(self.InitialAIThread)
 
+        self.BaseTemplates = { }
         self.PlatoonNameCounter = {}
         self.PlatoonNameCounter['AttackForce'] = 0
         self.RepeatExecution = true
