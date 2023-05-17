@@ -9,23 +9,19 @@ local TableGetn = table.getn
 
 local StandardBrain = import("/lua/aibrain.lua").AIBrain
 
---- A basic campaign brain. Contains all the functionality that a campaign brain requires.
+--- A basic campaign brain. Contains all the functionality that a campaign brain requires. This
+--- brain is a 'blunt' copy of the functionality that is required to run various campaign maps.
 ---@class EasyAIBrain: AIBrain
 ---@field PBM AiPlatoonBuildManager
 AIBrain = Class(StandardBrain) {
 
-    SkirmishSystems = true,
-
-    ---@param self EasyAIBrain
+    --- Called after `SetupSession` but before `BeginSession` - no initial units, props or resources exist at this point
+    ---@param self AIBrain
     ---@param planName string
     OnCreateAI = function(self, planName)
         StandardBrain.OnCreateAI(self, planName)
-        LOG("OnCreateAI")
 
         local per = ScenarioInfo.ArmySetup[self.Name].AIPersonality
-
-        -- Flag this brain as a possible brain to have skirmish systems enabled on
-        self.SkirmishSystems = true
 
         local cheatPos = string.find(per, 'cheat')
         if cheatPos then
@@ -43,6 +39,9 @@ AIBrain = Class(StandardBrain) {
         self.RepeatExecution = true
     end,
 
+    --- Called after `SetupSession` but before `BeginSession` - no initial units, props or resources exist at this point
+    ---@param self AIBrain
+    ---@param planName string
     CreateBrainShared = function(self, planName)
         StandardBrain.CreateBrainShared(self, planName)
 
@@ -63,7 +62,7 @@ AIBrain = Class(StandardBrain) {
         self.IgnoreArmyCaps = false
     end,
 
-    --- Called after `BeginSession`, at this point all props, resources and initial units exist in the map
+    --- Called after `SetupSession` but before `BeginSession` - no initial units, props or resources exist at this point
     ---@param self AIBrain
     OnBeginSession = function(self)
         StandardBrain.OnBeginSession(self)

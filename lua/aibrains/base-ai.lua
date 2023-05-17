@@ -78,7 +78,8 @@ AIBrain = Class(StandardBrain) {
 
     SkirmishSystems = true,
 
-    ---@param self BaseAIBrain
+    --- Called after `SetupSession` but before `BeginSession` - no initial units, props or resources exist at this point
+    ---@param self AIBrain
     ---@param planName string
     OnCreateAI = function(self, planName)
         StandardBrain.OnCreateAI(self, planName)
@@ -110,7 +111,8 @@ AIBrain = Class(StandardBrain) {
         self.DelayEqualBuildPlattons = {}
     end,
 
-    ---@param self BaseAIBrain
+    --- Called after `SetupSession` but before `BeginSession` - no initial units, props or resources exist at this point
+    ---@param self AIBrain
     ---@param planName string
     CreateBrainShared = function(self, planName)
         StandardBrain.CreateBrainShared(self, planName)
