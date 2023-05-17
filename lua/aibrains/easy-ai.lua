@@ -91,6 +91,7 @@ AIBrain = Class(StandardBrain, EconomyComponent) {
     ---@param reconType ReconTypes
     ---@param val boolean
     OnIntelChange = function(self, blip, reconType, val)
+        StandardBrain.OnIntelChange(self, blip, reconType, val)
         local position = blip:GetPosition()
         self.GridRecon:OnIntelChange(position[1], position[3], reconType, val)
     end,

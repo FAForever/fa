@@ -7,7 +7,6 @@
 ---@alias Task table
 ---@alias CSimSoundManager any
 ---@alias EconomyEvent moho.EconomyEvent
----@alias AIPersonality string
 ---@alias ArmyPlans any
 
 ---@alias Faction
