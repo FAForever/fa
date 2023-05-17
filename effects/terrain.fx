@@ -1791,7 +1791,7 @@ float4 TerrainPBRNormalsPS ( VS_OUTPUT inV ) : COLOR
     float cameraFractionFar = (0.5 + 0.5 * clamp(0.001 * (CameraPosition.y - 250), 0, 1)) * Stratum7NormalTile.x * TerrainScale;
 
     // combine them
-    float fractionLower = (1 - mask0.x)*(1 - mask0.y)*(1 - mask0.z)*(1 - mask0.w)*(1 - mask1.x)*(1 - mask1.y)*(1 - mask1.z)*(1 - mask1.w);
+    float fractionLower = (1 - mask0.x)*(1 - mask0.y)*(1 - mask0.z)*(1 - mask0.w)*(1 - mask1.x)*(1 - mask1.y)*(1 - mask1.z);
     float4 normal = float4(0, 0, 1, 0);
     normal = UDNBlending(normal, normalize(2 * lowerNormalFar - 1),     fractionLower * cameraFractionFar);
     normal = UDNBlending(normal, normalize(2 * lowerNormalNear - 1),    fractionLower * cameraFractionNear);
