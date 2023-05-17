@@ -2813,7 +2813,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         local callbacks = self.EventCallbacks['OnAttachedKilled']
         if callbacks then
             for _, cb in callbacks do
-                cb(self)
+                cb(self, attached)
             end
         end
 
