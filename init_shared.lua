@@ -13,10 +13,6 @@ LOG("Game version: " .. tostring(GameVersion))
 LOG("Game type: " .. tostring(GameType))
 
 -- upvalued performance
-local dofile = dofile
-
-local StringFind = string.find 
-local StringGsub = string.gsub
 local StringSub = string.sub
 local StringLower = string.lower
 
@@ -55,6 +51,22 @@ local function LowerHashTable(t)
         o[StringLower(k)] = v 
     end
     return o
+end
+
+local function FindFilesWithExtension(dir, extension, prepend, files)
+    files = files or { }
+
+    for k, file in IoDir(dir .. "/*") do
+        if not (file == '.' or file == '..') then
+            if StringSub(file, -3) == extension then
+                LOG(prepend .. "/" .. file)
+                TableInsert(files, prepend .. "/" .. file)
+            end
+            FindFilesWithExtension(dir .. "/" .. file, extension, prepend .. "/" .. file, files)
+        end
+    end
+
+    return files
 end
 
 -- mods that have been integrated, based on folder name 
@@ -137,8 +149,8 @@ allowedAssetsNxt = LowerHashTable(allowedAssetsNxt)
 
 -- default wave banks to prevent collisions
 local soundsBlocked = { }
-local faSounds = IoDir(fa_path .. '/sounds/*')
-for k, v in faSounds do 
+local sounds = FindFilesWithExtension(fa_path .. '/sounds', "xwb", "/sounds")
+for k, v in sounds do 
     if v == '.' or v == '..' then 
         continue 
     end
@@ -293,19 +305,19 @@ local function MountMapContent(dir)
                     MountDirectory(dir .. "/" .. map .. '/movies', '/movies')
                 end
             elseif folder == 'sounds' then
+                local banks = FindFilesWithExtension(dir .. '/' .. map .. "/sounds", "xwb", "/sounds")
+
                 -- find conflicting files
                 local conflictingFiles = { }
-                for _, file in IoDir(dir .. '/' .. map .. '/sounds/*') do
-                    if not (file == '.' or file == '..') then 
-                        local identifier = StringLower(file) 
-                        if soundsBlocked[identifier] then 
-                            TableInsert(conflictingFiles, { file = file, conflict = soundsBlocked[identifier] })
-                        else 
-                            soundsBlocked[identifier] = StringLower(map)
-                        end
+                for _, bank in banks do
+                    local identifier = StringLower(bank) 
+                    if soundsBlocked[identifier] then 
+                        TableInsert(conflictingFiles, { file = bank, conflict = soundsBlocked[identifier] })
+                    else 
+                        soundsBlocked[identifier] = StringLower(map)
                     end
                 end
-                    
+                
                 -- report them if they exist and do not mount
                 if TableGetn(conflictingFiles) > 0 then 
                     LOG("Found conflicting sound banks for map: '" .. map .. "', cannot mount the sound bank(s):")
@@ -467,26 +479,26 @@ local function MountModContent(dir)
 
         -- look at each directory inside this mod
         for _, folder in IoDir(dir .. '/' .. mod .. '/*') do
-            
+
             -- if we found a directory named 'sounds' then we mount its content
             if folder == 'sounds' then
+                local banks = FindFilesWithExtension(dir .. '/' ..  mod .. "/sounds", "xwb", "/sounds")
+
                 -- find conflicting files
                 local conflictingFiles = { }
-                for _, file in IoDir(dir .. '/' .. mod .. '/sounds/*') do
-                    if not (file == '.' or file == '..') then 
-                        local identifier = StringLower(file) 
-                        if soundsBlocked[identifier] then 
-                            TableInsert(conflictingFiles, { file = file, conflict = soundsBlocked[identifier] })
-                        else 
-                            soundsBlocked[identifier] = StringLower(mod)
-                        end
+                for _, bank in banks do
+                    local identifier = StringLower(bank) 
+                    if soundsBlocked[identifier] then 
+                        TableInsert(conflictingFiles, { file = bank, conflict = soundsBlocked[identifier] })
+                    else
+                        soundsBlocked[identifier] = StringLower(mod)
                     end
                 end
-                    
+
                 -- report them if they exist and do not mount
                 if TableGetn(conflictingFiles) > 0 then 
                     LOG("Found conflicting sound banks for mod: '" .. mod .. "', cannot mount the sound bank(s):")
-                    for k, v in conflictingFiles do 
+                    for _, v in conflictingFiles do 
                         LOG(" - Conflicting sound bank: '" .. v.file .. "' of mod '" .. mod .. "' is conflicting with a sound bank from: '" .. v.conflict .. "'" )
                     end
                 -- else, mount folder
