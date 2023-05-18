@@ -165,6 +165,39 @@ NavGrid = ClassNavGrid {
         self.Trees[z][x] = labelTree
     end,
 
+    ---@param self NavGrid
+    ---@param position Vector A position in world space
+    ---@return CompressedLabelTreeRoot?
+    FindRoot = function(self, position)
+        return self:FindRootXZ(position[1], position[3])
+    end,
+
+    ---@param self NavGrid
+    ---@param x number x-coordinate, in world space
+    ---@param z number z-coordinate, in world space
+    ---@return CompressedLabelTreeRoot?
+    FindRootXZ = function(self, x, z)
+        if x > 0 and z > 0 then
+            local size = self.TreeSize
+            local trees = self.Trees
+
+            local bx = (x / size) ^ 0
+            local bz = (z / size) ^ 0
+            local root = trees[bz][bx] --[[@as CompressedLabelTreeRoot]]
+            return root
+        end
+
+        return nil
+    end,
+
+    ---@param self NavGrid
+    ---@param gx number x-coordinate, in grid space
+    ---@param gz number z-coordinate, in grid space
+    ---@return CompressedLabelTreeRoot?
+    FindRootGridspaceXZ = function(self, gx, gz)
+        return self.Trees[gx][gz] --[[@as CompressedLabelTreeRoot]]
+    end,
+
     --- Returns the leaf that encompasses the position, or nil if no leaf does
     ---@param self NavGrid
     ---@param position Vector A position in world space
