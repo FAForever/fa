@@ -76,9 +76,8 @@ function AssignTransportToPool( unit, aiBrain )
 	if not unit.EventCallbacks['OnTransportDetach'] then
 		LOG('Create callback for OnTransportDetach')
 		unit:AddUnitCallback( function(unit)
-            if TransportDialog then
-                LOG("*AI DEBUG TRANSPORT "..unit.PlatoonHandle.BuilderName.." Transport "..unit.EntityId.." Fires ReturnToPool callback" )
-            end
+            LOG("*AI DEBUG TRANSPORT "..unit.PlatoonHandle.BuilderName.." Transport "..unit.EntityId.." Fires ReturnToPool callback" )
+
 			if TableGetn(unit:GetCargo()) == 0 then
 				if unit.WatchUnloadThread then
 					KillThread(unit.WatchUnloadThread)
