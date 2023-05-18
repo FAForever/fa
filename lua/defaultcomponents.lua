@@ -691,7 +691,7 @@ VeterancyComponent = ClassSimple {
     SetVeterancy = function(self, level)
         self.VetExperience = 0
         self.VetLevel = 0
-        self:AddVetExperience(self.Blueprint.VetThresholds[MathMin(level, 5)] or 0, true)
+        self:AddVetExperience(self.Blueprint.VetThresholds[MathMin(level or 0, 5)], true)
     end,
 
     ---@param self Unit | VeterancyComponent
