@@ -4,6 +4,7 @@
 keyToBrain = {
     -- default
     default = import("/lua/aibrains/base-ai.lua").AIBrain,
+    campaign = import("/lua/aibrains/campaign-ai.lua").AIBrain,
 
     -- base AIs
     easy = import("/lua/aibrains/easy-ai.lua").AIBrain,

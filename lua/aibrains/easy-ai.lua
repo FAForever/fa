@@ -3,9 +3,6 @@ local BaseManager = import("/lua/aibrains/managers/base-manager.lua")
 local StandardBrain = import("/lua/aibrain.lua").AIBrain
 local EconomyComponent = import("/lua/aibrains/components/economy.lua").AIBrainEconomyComponent
 
--- TO GET RID OF
-local BrainConditionsMonitor = import("/lua/sim/brainconditionsmonitor.lua")
-
 ---@class EasyAIBrainManagers
 ---@field FactoryManager AIFactoryManager
 ---@field EngineerManager AIEngineerManager
@@ -29,7 +26,8 @@ AIBrain = Class(StandardBrain, EconomyComponent) {
 
     SkirmishSystems = true,
 
-    ---@param self EasyAIBrain
+    --- Called after `SetupSession` but before `BeginSession` - no initial units, props or resources exist at this point
+    ---@param self AIBrain
     ---@param planName string
     OnCreateAI = function(self, planName)
         StandardBrain.OnCreateAI(self, planName)
@@ -91,6 +89,7 @@ AIBrain = Class(StandardBrain, EconomyComponent) {
     ---@param reconType ReconTypes
     ---@param val boolean
     OnIntelChange = function(self, blip, reconType, val)
+        StandardBrain.OnIntelChange(self, blip, reconType, val)
         local position = blip:GetPosition()
         self.GridRecon:OnIntelChange(position[1], position[3], reconType, val)
     end,
@@ -102,7 +101,6 @@ AIBrain = Class(StandardBrain, EconomyComponent) {
     AddBaseManagers = function(self, baseName, position, radius)
         self.BuilderManagers[baseName] = BaseManager.CreateBaseManager(self, baseName, position, radius)
     end,
-
 
     IMAPConfiguration = function(self)
         -- Used to configure imap values, used for setting threat ring sizes depending on map size to try and get a somewhat decent radius
@@ -282,15 +280,24 @@ AIBrain = Class(StandardBrain, EconomyComponent) {
     --- remove them without drastically changing how the code base works. We can't do that
     --- because it would break mod compatibility
 
-    ---@param self EasyAIBrain
+    ---@deprecated
+    ---@param self AIBrain
     SetConstantEvaluate = function(self)
     end,
 
-    ---@param self EasyAIBrain
+    ---@deprecated
+    ---@param self AIBrain
     InitializeSkirmishSystems = function(self)
     end,
 
+    ---@deprecated
+    ---@param self AIBrain
     ForceManagerSort = function(self)
+    end,
+
+    ---@deprecated
+    ---@param self AIBrain
+    InitializePlatoonBuildManager = function(self)
     end,
 
 }

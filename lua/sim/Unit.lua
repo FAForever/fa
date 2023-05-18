@@ -197,6 +197,14 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
             -- SpecialToggleDisableFunction = false,
             -- OnAttachedToTransport = {}, -- Returns self, transport, bone
             -- OnDetachedFromTransport = {}, -- Returns self, transport, bone
+
+            -- OnTransportAttach = {}
+            -- OnTransportDetach = {}
+            -- OnTransportAborted = {}
+            -- OnTransportOrdered = {}
+            -- OnAttachedKilled = {}
+            -- OnStartTransportLoading = {}
+            -- OnStopTransportLoading = {}
         }
     end,
 
@@ -2715,6 +2723,143 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
     OnBuildProgress = function(self, unit, oldProg, newProg)
     end,
 
+    --- Called as this unit (with transport capabilities) attached another unit to itself
+    ---@param self Unit
+    ---@param attachBone Bone
+    ---@param attachedUnit Unit
+    OnTransportAttach = function(self, attachBone, attachedUnit)
+        -- awareness of event for campaign scripts
+        local callbacks = self.EventCallbacks['OnTransportAttach']
+        if callbacks then
+            for _, cb in callbacks do
+                cb(self, attachBone, attachedUnit)
+            end
+        end
+
+        -- manual Lua callback for the unit
+        attachedUnit:OnAttachedToTransport(self, attachBone)
+
+        -- awareness of event for AI
+        local aiPlatoon = self.AIPlatoonReference
+        if aiPlatoon then
+            aiPlatoon:OnTransportAttach(self, attachBone, attachedUnit)
+        end
+    end,
+
+    --- Called as this unit (with transport capabilities) deattached another unit from itself
+    ---@param self Unit
+    ---@param attachBone Bone
+    ---@param deattachedUnit Unit
+    OnTransportDetach = function(self, attachBone, deattachedUnit)
+        -- awareness of event for campaign scripts
+        local callbacks = self.EventCallbacks['OnTransportDetach']
+        if callbacks then
+            for _, cb in callbacks do
+                cb(self, attachBone, deattachedUnit)
+            end
+        end
+
+        -- manual Lua callback
+        deattachedUnit:OnDetachedFromTransport(self, attachBone)
+
+        -- awareness of event for AI
+        local aiPlatoon = self.AIPlatoonReference
+        if aiPlatoon then
+            aiPlatoon:OnTransportDetach(self, attachBone, deattachedUnit)
+        end
+    end,
+
+    --- Called as a unit (with transport capabilities) aborts the transport order
+    ---@param self Unit
+    OnTransportAborted = function(self)
+        -- awareness of event for campaign scripts
+        local callbacks = self.EventCallbacks['OnTransportAborted']
+        if callbacks then
+            for _, cb in callbacks do
+                cb(self)
+            end
+        end
+
+        -- awareness of event for AI
+        local aiPlatoon = self.AIPlatoonReference
+        if aiPlatoon then
+            aiPlatoon:OnTransportAborted(self)
+        end
+    end,
+
+    --- Called as a unit (with transport capabilities) initiates the a transport order
+    ---@param self Unit
+    OnTransportOrdered = function(self)
+        -- awareness of event for campaign scripts
+        local callbacks = self.EventCallbacks['OnTransportOrdered']
+        if callbacks then
+            for _, cb in callbacks do
+                cb(self)
+            end
+        end
+
+        -- awareness of event for AI
+        local aiPlatoon = self.AIPlatoonReference
+        if aiPlatoon then
+            aiPlatoon:OnTransportOrdered(self)
+        end
+    end,
+
+    --- Called as a unit is killed while being transported by a unit (with transport capabilities) of this platoon
+    ---@param self Unit
+    ---@param attached Unit
+    OnAttachedKilled = function(self, attached)
+        -- awareness of event for campaign scripts
+        local callbacks = self.EventCallbacks['OnAttachedKilled']
+        if callbacks then
+            for _, cb in callbacks do
+                cb(self, attached)
+            end
+        end
+
+        -- awareness of event for AI
+        local aiPlatoon = self.AIPlatoonReference
+        if aiPlatoon then
+            aiPlatoon:OnAttachedKilled(self)
+        end
+    end,
+
+    --- Called as a unit (with transport capabilities) is ready to load in units
+    ---@param self Unit
+    OnStartTransportLoading = function(self)
+        -- awareness of event for campaign scripts
+        local callbacks = self.EventCallbacks['OnStartTransportLoading']
+        if callbacks then
+            for _, cb in callbacks do
+                cb(self)
+            end
+        end
+
+        -- awareness of event for AI
+        local aiPlatoon = self.AIPlatoonReference
+        if aiPlatoon then
+            aiPlatoon:OnStartTransportLoading(self)
+        end
+    end,
+
+    --- Called as a unit (with transport capabilities) of this platoon is done loading in units
+    ---@param self Unit
+    OnStopTransportLoading = function(self)
+        -- awareness of event for campaign scripts
+        local callbacks = self.EventCallbacks['OnStopTransportLoading']
+        if callbacks then
+            for _, cb in callbacks do
+                cb(self)
+            end
+        end
+
+        -- awareness of event for AI
+        local aiPlatoon = self.AIPlatoonReference
+        if aiPlatoon then
+            aiPlatoon:OnStopTransportLoading(self)
+        end
+    end,
+
     ---@param self Unit
     ---@param built boolean
     ---@param order string
@@ -3755,6 +3900,111 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         end
     end,
 
+    --- Adds a callback for the `OnTransportAttach` event
+    ---@param self Unit
+    ---@param fn fun(transport: Unit, attachBone: Bone,  attachedUnit: Unit)
+    ---@param id string | nil       # if provided, stores the function using the identifier as key
+    AddOnTransportAttachCallback = function(self, fn, id)
+        local callbacks = self.EventCallbacks['OnTransportAttach'] or { }
+        self.EventCallbacks['OnTransportAttach'] = callbacks
+
+        if id then
+            callbacks[id] = fn
+        else
+            table.insert(callbacks, fn)
+        end
+    end,
+
+    --- Adds a callback for the `OnTransportDetach` event
+    ---@param self Unit
+    ---@param fn fun(transport: Unit, attachBone: Bone,  deattachedUnit: Unit)
+    ---@param id string | nil       # if provided, stores the function using the identifier as key
+    AddOnTransportDetachCallback = function(self, fn, id)
+        local callbacks = self.EventCallbacks['OnTransportDetach'] or { }
+        self.EventCallbacks['OnTransportDetach'] = callbacks
+
+        if id then
+            callbacks[id] = fn
+        else
+            table.insert(callbacks, fn)
+        end
+    end,
+
+    --- Adds a callback for the `OnTransportOrdered` event
+    ---@param self Unit
+    ---@param fn fun(transport: Unit)
+    ---@param id string | nil       # if provided, stores the function using the identifier as key
+    AddOnTransportOrderedCallback = function(self, fn, id)
+        local callbacks = self.EventCallbacks['OnTransportOrdered'] or { }
+        self.EventCallbacks['OnTransportOrdered'] = callbacks
+
+        if id then
+            callbacks[id] = fn
+        else
+            table.insert(callbacks, fn)
+        end
+    end,
+
+    --- Adds a callback for the `OnTransportAborted` event
+    ---@param self Unit
+    ---@param fn fun(transport: Unit)
+    ---@param id string | nil       # if provided, stores the function using the identifier as key
+    AddOnTransportAbortedCallback = function(self, fn, id)
+        local callbacks = self.EventCallbacks['OnTransportAborted'] or { }
+        self.EventCallbacks['OnTransportAborted'] = callbacks
+
+        if id then
+            callbacks[id] = fn
+        else
+            table.insert(callbacks, fn)
+        end
+    end,
+
+    --- Adds a callback for the `OnAttachedKilled` event
+    ---@param self Unit
+    ---@param fn fun(transport: Unit, killedUnit: Unit)
+    ---@param id string | nil       # if provided, stores the function using the identifier as key
+    AddOnAttachedKilledCallback = function(self, fn, id)
+        local callbacks = self.EventCallbacks['OnAttachedKilled'] or { }
+        self.EventCallbacks['OnAttachedKilled'] = callbacks
+
+        if id then
+            callbacks[id] = fn
+        else
+            table.insert(callbacks, fn)
+        end
+    end,
+
+    --- Adds a callback for the `OnStartTransportLoading` event
+    ---@param self Unit
+    ---@param fn fun(transport: Unit)
+    ---@param id string | nil       # if provided, stores the function using the identifier as key
+    AddOnStartTransportLoadingCallback = function(self, fn, id)
+        local callbacks = self.EventCallbacks['OnStartTransportLoading'] or { }
+        self.EventCallbacks['OnStartTransportLoading'] = callbacks
+
+        if id then
+            callbacks[id] = fn
+        else
+            table.insert(callbacks, fn)
+        end
+    end,
+
+    --- Adds a callback for the `OnStopTransportLoading` event
+    ---@param self Unit
+    ---@param fn fun(transport: Unit)
+    ---@param id string | nil       # if provided, stores the function using the identifier as key
+    AddOnStopTransportLoadingCallback = function(self, fn, id)
+        local callbacks = self.EventCallbacks['OnStopTransportLoading'] or { }
+        self.EventCallbacks['OnStopTransportLoading'] = callbacks
+
+        if id then
+            callbacks[id] = fn
+        else
+            table.insert(callbacks, fn)
+        end
+    end,
+
     ---@param self Unit
     ---@param fn function
     AddProjectileDamagedCallback = function(self, fn)
@@ -4112,18 +4362,36 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         self:SetDoNotTarget(loading)
         self:SetReclaimable(not loading)
         self:SetCapturable(not loading)
+
+        -- awareness of event for AI
+        local aiPlatoon = self.AIPlatoonReference
+        if aiPlatoon then
+            aiPlatoon:OnStorageChange(self, loading)
+        end
     end,
 
     ---@param self Unit
     ---@param unit Unit
     OnAddToStorage = function(self, unit)
         self:OnStorageChange(true)
+
+        -- awareness of event for AI
+        local aiPlatoon = self.AIPlatoonReference
+        if aiPlatoon then
+            aiPlatoon:OnAddToStorage(self, unit)
+        end
     end,
 
     ---@param self Unit
     ---@param unit Unit
     OnRemoveFromStorage = function(self, unit)
         self:OnStorageChange(false)
+
+        -- awareness of event for AI
+        local aiPlatoon = self.AIPlatoonReference
+        if aiPlatoon then
+            aiPlatoon:OnRemoveFromStorage(self, unit)
+        end
     end,
 
     -- Animation when being dropped from a transport.
@@ -4336,7 +4604,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
     end,
 
     ---@param self Unit
-    ---@param transport BaseTransport
+    ---@param transport Unit
     ---@param bone Bone
     OnAttachedToTransport = function(self, transport, bone)
         self:MarkWeaponsOnTransport(true)
@@ -4352,7 +4620,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
     end,
 
     ---@param self Unit
-    ---@param transport BaseTransport
+    ---@param transport Unit
     ---@param bone Bone
     OnDetachedFromTransport = function(self, transport, bone)
         self.Trash:Add(ForkThread(self.OnDetachedFromTransportThread, self, transport, bone))
