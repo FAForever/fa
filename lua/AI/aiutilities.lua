@@ -749,7 +749,7 @@ function AIFindDefensivePointNeedsStructure(aiBrain, locationType, radius, categ
 
     local retPos, retName, lowest
     for k, v in positions do
-        local numUnits = table.getn(GetOwnUnitsAroundPoint(aiBrain, ParseEntityCategory(category), v.position, markerRadius))
+        local numUnits = table.getn(GetOwnUnitsAroundPoint(aiBrain, ParseEntityCategory(category), v.Position, markerRadius))
         if numUnits < unitMax then
             if not retPos or numUnits < lowest then
                 lowest = numUnits
@@ -3061,17 +3061,17 @@ function AIFindFurthestMarkerNeedsEngineer(aiBrain, pos, radius, tMin, tMax, tRi
    local positions = AIFilterAlliedBases(aiBrain, positions)
    for _, v in positions do
        if not aiBrain.BuilderManagers[v.Name] then
-           if not closest or VDist3(pos, v.position) > closest then
-               closest = VDist3(pos, v.position)
-               retPos = v.position
+           if not closest or VDist3(pos, v.Position) > closest then
+               closest = VDist3(pos, v.Position)
+               retPos = v.Position
                retName = v.Name
            end
        else
            local managers = aiBrain.BuilderManagers[v.Name]
            if managers.EngineerManager:GetNumUnits('Engineers') == 0 and managers.FactoryManager:GetNumFactories() == 0 then
-               if not closest or VDist3(pos, v.position) > closest then
-                   closest = VDist3(pos, v.position)
-                   retPos = v.position
+               if not closest or VDist3(pos, v.Position) > closest then
+                   closest = VDist3(pos, v.Position)
+                   retPos = v.Position
                    retName = v.Name
                end
            end
