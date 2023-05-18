@@ -385,9 +385,9 @@ float4 HighFidelityPS( VS_OUTPUT inV,
 	float4 skyReflection = texCUBE(SkySampler, R);
 	// The alpha channel acts as a mask for unit parts above the water and probably
 	// uses unitReflectionAmount as the positive value of the mask
-    reflectedPixels = lerp(skyReflection, reflectedPixels, saturate(reflectedPixels.a));
+    reflectedPixels.xyz = lerp(skyReflection.xyz, reflectedPixels.xyz, saturate(reflectedPixels.a));
    
-   	//Schlick approximation for fresnel
+   	// Schlick approximation for fresnel
     float NDotV = saturate(dot(viewVector, N));
 	float F0 = 0.08;
     float fresnel = F0 + (1.0 - F0) * pow(1.0 - NDotV, 5.0);
@@ -400,6 +400,8 @@ float4 HighFidelityPS( VS_OUTPUT inV,
     // add in the sun reflection
 	float3 sunReflection = pow(saturate(dot(-R, SunDirection)), SunShininess) * SunColor;
     sunReflection = sunReflection * fresnel;
+	// the sun shouldn't be visible where a unit reflection is
+	sunReflection *= (1 - saturate(reflectedPixels.a * 2));
     refractedPixels.xyz +=  sunReflection;
 
     // Lerp in the wave crests
