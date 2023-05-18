@@ -479,6 +479,7 @@ float GeometrySmith(float3 n, float nDotV, float3 l, float roughness)
 }
 
 float3 PBR(VS_OUTPUT inV, float3 albedo, float3 n, float roughness) {
+    // See https://blog.selfshadow.com/publications/s2013-shading-course/
 
     float4 position = TerrainScale * inV.mTexWT;
     float mapShadow = 1 - tex2D(UpperAlbedoSampler, position.xy).z; // 1 where sun is, 0 where shadow is
@@ -500,7 +501,8 @@ float3 PBR(VS_OUTPUT inV, float3 albedo, float3 n, float roughness) {
     float NDF = NormalDistribution(n, h, roughness);
     float G = GeometrySmith(n, nDotV, l, roughness);
 
-    float3 numerator = NDF * G * F;
+    // For point lights we need to multiply with Pi
+    float3 numerator = PI * NDF * G * F;
     // add 0.0001 to avoid division by zero
     float denominator = 4.0 * nDotV * nDotL + 0.0001;
     float3 reflected = numerator / denominator;
@@ -508,7 +510,7 @@ float3 PBR(VS_OUTPUT inV, float3 albedo, float3 n, float roughness) {
     float3 kD = float3(1.0, 1.0, 1.0) - F;	
     float3 refracted = kD * albedo;
     float3 irradiance = sunLight * nDotL;
-    float3 color = (refracted + reflected * PI) * irradiance;
+    float3 color = (refracted + reflected) * irradiance;
 
     float3 shadowColor = (1 - (SunColor * shadow * nDotL + SunAmbience)) * ShadowFillColor;
     float3 ambient = SunAmbience * LightingMultiplier + shadowColor;
