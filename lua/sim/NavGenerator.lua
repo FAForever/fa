@@ -292,10 +292,13 @@ local CompressedLabelTree
 ---@field TotalCosts number                 # Populated during path finding
 ---@field Seen number                       # Populated during path
 
+---@class CompressedLabelTreeRoot : CompressedLabelTreeNode
+---@field Labels table<number, number>      # Table that tells us which labels are part of this compression tree. The key represents as the label, the value represents as the fractional area that the label consumes. A value of 1 means the label tree entirely consists of one value.
+---@field Seen number | nil                 # used 
+---@field Threat number | nil
+
 --- A simplified quad tree that acts as a compression of the pathing capabilities of a section of the heightmap
 ---@class CompressedLabelTreeNode
----@field Seen number
----@field Threat number
 ---@field [1] CompressedLabelTreeNode?
 ---@field [2] CompressedLabelTreeNode?
 ---@field [3] CompressedLabelTreeNode?

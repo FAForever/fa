@@ -63,7 +63,6 @@ local StandardBrain = import("/lua/aibrain.lua").AIBrain
 ---@field IntelTriggerList table
 ---@field LayerPref "LAND" | "AIR"
 ---@field Name string
----@field PingCallbackList table
 ---@field Radars table<string, Unit[]>
 ---@field Result? AIResult
 ---@field Sorian boolean

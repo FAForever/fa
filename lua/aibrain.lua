@@ -1,9 +1,9 @@
------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------
 -- File     :  /lua/aibrain.lua
 -- Author(s):
 -- Summary  :
 -- Copyright Š 2005 Gas Powered Games, Inc.  All rights reserved.
------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------
 
 -- AIBrain Lua Module
 
@@ -544,6 +544,7 @@ local CategoriesDummyUnit = categories.DUMMYUNIT
 ---@field Human boolean
 ---@field Civilian boolean
 ---@field Trash TrashBag
+---@field PingCallbackList { CallbackFunction: fun(pingData: any), PingType: string }[]
 ---@field BrainType 'Human' | 'AI'
 AIBrain = Class(AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerComponent, AIBrainEnergyComponent,
     moho.aibrain_methods) {
@@ -601,6 +602,8 @@ AIBrain = Class(AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerCom
             TECH3 = {},
             EXPERIMENTAL = {},
         }
+
+        self.PingCallbackList = { }
 
         AIBrainEnergyComponent.CreateBrainShared(self)
         AIBrainHQComponent.CreateBrainShared(self)
@@ -1332,7 +1335,41 @@ AIBrain = Class(AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerCom
         end
     end,
 
-    -- overwritten
+    --------------------------------------------------------------------------------
+    --#region ping functionality
+
+    ---@param self AIBrain
+    ---@param callback function
+    ---@param pingType string
+    AddPingCallback = function(self, callback, pingType)
+        if callback and pingType then
+            table.insert(self.PingCallbackList, {CallbackFunction = callback, PingType = pingType})
+        end
+    end,
+
+    ---@param self AIBrain
+    ---@param pingData table
+    DoPingCallbacks = function(self, pingData)
+        for _, v in self.PingCallbackList do
+            v.CallbackFunction(self, pingData)
+        end
+    end,
+
+    ---@param self AIBrain
+    ---@param pingData table
+    DoAIPing = function(self, pingData)
+        if self.Sorian then
+            if pingData.Type then
+                SUtils.AIHandlePing(self, pingData)
+            end
+        end
+    end,
+
+    --#endregion
+    -------------------------------------------------------------------------------
+
+    -------------------------------------------------------------------------------
+    --#region overwritten c-functionality
 
     --- Retrieves all units that fit the criteria around some point. Excludes dummy units.
     ---@param self AIBrain
@@ -1365,8 +1402,11 @@ AIBrain = Class(AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerCom
         return BrainGetListOfUnits(self, cats - CategoriesDummyUnit, needToBeIdle, requireBuilt)
     end,
 
-    ---------------------------------------------
-    -- Unit callbacks
+    --#endregion
+    -------------------------------------------------------------------------------
+
+    -------------------------------------------------------------------------------
+    --#region Unit callbacks
 
     --- Called by a unit as it starts being built
     ---@param self AIBrain
@@ -1409,8 +1449,14 @@ AIBrain = Class(AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerCom
         -- LOG(string.format('OnUnitStopBuilding: %s -> %s', unit.Blueprint.BlueprintId or '', built.Blueprint.BlueprintId or ''))
     end,
 
-    ---------------------------------------------
-    -- deprecated
+    --#endregion
+    -------------------------------------------------------------------------------
+
+    -------------------------------------------------------------------------------
+    --#region deprecated
+
+    --- All functions in this region exist because they may still be called from
+    --- unmaintained mods. They no longer serve any purpose.
 
     ---@deprecated
     ---@param self AIBrain
@@ -1423,12 +1469,15 @@ AIBrain = Class(AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerCom
     SetResult = function(self, result)
     end,
 
-    ----------------------------------------------------------------------------------------
-    --- legacy functionality
-    ---
-    --- All functions below solely exist because the code is too tightly coupled. We can't
-    --- remove them without drastically changing how the code base works. We can't do that
-    --- because it would break mod compatibility
+    --#endregion
+    -------------------------------------------------------------------------------
+
+    -------------------------------------------------------------------------------
+    --#region legacy functionality
+
+    --- All functions below solely exist because the code is too tightly coupled. 
+    --- We can't remove them without drastically changing how the code base works. 
+    --- We can't do that because it would break mod compatibility
 
     ---@deprecated
     ---@param self AIBrain
@@ -1449,4 +1498,7 @@ AIBrain = Class(AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerCom
     ---@param self AIBrain
     InitializePlatoonBuildManager = function(self)
     end,
+
+    --#endregion
+    -------------------------------------------------------------------------------
 }
