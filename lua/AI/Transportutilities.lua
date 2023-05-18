@@ -2101,7 +2101,6 @@ function WatchUnitUnload( transport, unitlist, destination, aiBrain, UnitPlatoon
 				if not u.Dead then
 					unitsdead = false
 					if IsUnitState( u, 'Attached') then
-					
 						unloading = true
 						break
 					end
@@ -2151,10 +2150,8 @@ function WatchUnitUnload( transport, unitlist, destination, aiBrain, UnitPlatoon
     transport.Unloading = nil
 end
 
--- this was previously in the loudutils file
-
+-- Processes air units at the end of work. Note we dont have an AirUnitRefitThread that handles transport yet so it is disabled.
 function ProcessAirUnits( unit, aiBrain )
-
 	if (not unit.Dead) and (not IsBeingBuilt(unit)) then
         local fuel = GetFuelRatio(unit)
 		if ( fuel > -1 and fuel < .75 ) or unit:GetHealthPercent() < .80 then
@@ -2173,6 +2170,7 @@ function ProcessAirUnits( unit, aiBrain )
 	return false    -- unit did not need processing
 end
 
+-- Supporting function. Should be replaced by navutils equivalent.
 function InPlayableArea(pos)
     local playableArea = ScenarioInfo.PlayableArea or {0, 0, ScenarioInfo.size[1], ScenarioInfo.size[2]}
     if playableArea then
