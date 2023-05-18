@@ -295,7 +295,7 @@ local CompressedLabelTree
 ---@class CompressedLabelTreeRoot : CompressedLabelTreeNode
 ---@field Labels table<number, number>      # Table that tells us which labels are part of this compression tree. The key represents as the label, the value represents as the fractional area that the label consumes. A value of 1 means the label tree entirely consists of one value.
 ---@field Seen number | nil                 # Used during navigating
----@field Threat number | nil               # used during navigating
+---@field Threat number | nil               # Used during navigating
 
 --- A simplified quad tree that acts as a compression of the pathing capabilities of a section of the heightmap
 ---@class CompressedLabelTreeNode
