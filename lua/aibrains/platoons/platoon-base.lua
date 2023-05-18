@@ -277,6 +277,74 @@ AIPlatoon = Class(moho.platoon_methods) {
     OnShieldDisabled = function(self, unit)
     end,
 
+    --- Called as a unit (with transport capabilities) of this platoon attached a unit to itself
+    ---@param self AIPlatoon
+    ---@param transport Unit
+    ---@param attachBone Bone
+    ---@param attachedUnit Unit
+    OnTransportAttach = function(self, transport, attachBone, attachedUnit)
+    end,
+
+    --- Called as a unit (with transport capabilities) of this platoon deattached a unit from itself
+    ---@param self AIPlatoon
+    ---@param transport Unit
+    ---@param attachBone Bone
+    ---@param deattachedUnit Unit
+    OnTransportDetach = function(self, transport, attachBone, deattachedUnit)
+    end,
+
+    --- Called as a unit (with transport capabilities) of this platoon aborts the a transport order
+    ---@param self AIPlatoon
+    ---@param transport Unit
+    OnTransportAborted = function(self, transport)
+    end,
+
+    --- Called as a unit (with transport capabilities) of this platoon initiates the a transport order
+    ---@param self AIPlatoon
+    ---@param transport Unit
+    OnTransportOrdered = function(self, transport)
+    end,
+
+    --- Called as a unit is killed while being transported by a unit (with transport capabilities) of this platoon
+    ---@param self AIPlatoon
+    ---@param transport Unit
+    OnAttachedKilled = function(self, transport, attached)
+    end,
+
+    --- Called as a unit (with transport capabilities) of this platoon is ready to load in units
+    ---@param self AIPlatoon
+    ---@param transport Unit
+    OnStartTransportLoading = function(self, transport)
+    end,
+
+    --- Called as a unit (with transport capabilities) of this platoon is done loading in units
+    ---@param self AIPlatoon
+    ---@param transport Unit
+    OnStopTransportLoading = function(self, transport)
+    end,
+
+    --- Called as a unit (with carrier capabilities) of this platoon has a change in storage
+    ---@see `OnAddToStorage` and `OnRemoveFromStorage` for the unit in question
+    ---@param self AIPlatoon
+    ---@param carrier Unit
+    ---@param loading boolean
+    OnStorageChange = function(self, carrier, loading)
+    end,
+
+    --- Called as a unit (with carrier capabilities) of this platoon adds a unit to its storage
+    ---@param self AIPlatoon
+    ---@param carrier Unit
+    ---@param unit Unit
+    OnAddToStorage = function(self, carrier, unit)
+    end,
+
+    --- Called as a unit (with carrier capabilities) of this platoon removes a unit from its storage
+    ---@param self AIPlatoon
+    ---@param carrier Unit
+    ---@param unit Unit
+    OnRemoveFromStorage = function(self, carrier, unit)
+    end,
+
     -----------------------------------------------------------------
     -- hooks
 
