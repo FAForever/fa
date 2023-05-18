@@ -308,7 +308,7 @@ function CAiBrain:GetNumUnitsAroundPoint(category, position, radius, alliance)
 end
 
 --- Return the personality for this brain to use.
--- @return AIPersonalityTemplate from aipersonality.lua
+---@return AIPersonality
 function CAiBrain:GetPersonality()
 end
 

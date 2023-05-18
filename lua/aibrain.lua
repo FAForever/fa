@@ -538,6 +538,8 @@ local CategoriesDummyUnit = categories.DUMMYUNIT
 
 ---@class AIBrain: AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerComponent, AIBrainEnergyComponent, moho.aibrain_methods
 ---@field AI boolean
+---@field Name string           # Army name
+---@field Nickname string       # Player / AI / character name
 ---@field Status BrainState
 ---@field Human boolean
 ---@field Civilian boolean
@@ -1419,5 +1421,32 @@ AIBrain = Class(AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerCom
     ---@param self AIBrain
     ---@param result AIResult
     SetResult = function(self, result)
+    end,
+
+    ----------------------------------------------------------------------------------------
+    --- legacy functionality
+    ---
+    --- All functions below solely exist because the code is too tightly coupled. We can't
+    --- remove them without drastically changing how the code base works. We can't do that
+    --- because it would break mod compatibility
+
+    ---@deprecated
+    ---@param self AIBrain
+    SetConstantEvaluate = function(self)
+    end,
+
+    ---@deprecated
+    ---@param self AIBrain
+    InitializeSkirmishSystems = function(self)
+    end,
+
+    ---@deprecated
+    ---@param self AIBrain
+    ForceManagerSort = function(self)
+    end,
+
+    ---@deprecated
+    ---@param self AIBrain
+    InitializePlatoonBuildManager = function(self)
     end,
 }
