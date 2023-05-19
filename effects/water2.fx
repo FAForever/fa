@@ -333,17 +333,28 @@ float4 HighFidelityPS( VS_OUTPUT inV,
     // for the land cutout, we multiply by a large number and then saturate
     float mask = saturate(backGroundPixels.a * 255);
 
-    // calculate the normal we will be using for the water surface
-    float4 W0 = tex2D( NormalSampler0, inV.mLayer0 );
+    // Calculate the normal we will be using for the water surface.
+	// We bias the mipmaps for higher texture quality
+    float4 W0bias = tex2Dbias( NormalSampler0, float4(inV.mLayer0, 0, -2));
+	float4 W1bias = tex2Dbias( NormalSampler1, float4(inV.mLayer1, 0, -2));
+	float4 W2bias = tex2Dbias( NormalSampler2, float4(inV.mLayer2, 0, -2));
+	float4 W3bias = tex2Dbias( NormalSampler3, float4(inV.mLayer3, 0, -2));
+
+	// Calculate the normal we will be using for the foam.
+	// We don't change the mipmaps here because that would create 
+	// too drastic visual changes from the original shader
+	float4 W0 = tex2D( NormalSampler0, inV.mLayer0 );
 	float4 W1 = tex2D( NormalSampler1, inV.mLayer1 );
 	float4 W2 = tex2D( NormalSampler2, inV.mLayer2 );
 	float4 W3 = tex2D( NormalSampler3, inV.mLayer3 );
 
     float4 sum = W0 + W1 + W2 + W3;
     float waveCrest = saturate( sum.a - waveCrestThreshold );
+
+	float4 sumBias = W0bias + W1bias + W2bias + W3bias;
     
     // scale, bias and normalize
-    float3 N = 2.0 * sum.xyz - 4.0;
+    float3 N = 2.0 * sumBias.xyz - 4.0;
     N = normalize(N.xzy); 
 
 	// flatness
@@ -354,7 +365,7 @@ float4 HighFidelityPS( VS_OUTPUT inV,
 
     // get the correct coordinate for sampling refraction and reflection
     float2 refractionPos = screenPos;
-    refractionPos -=  refractionScale * N.xz * OneOverW;
+    refractionPos -= sqrt(waterDepth) * refractionScale * N.xz * OneOverW;
 
 	// keep in mind the alpha channel holds the unit parts above water
 	// specifically the alpha channel of that unit's shader
@@ -374,9 +385,9 @@ float4 HighFidelityPS( VS_OUTPUT inV,
 	float4 skyReflection = texCUBE(SkySampler, R);
 	// The alpha channel acts as a mask for unit parts above the water and probably
 	// uses unitReflectionAmount as the positive value of the mask
-    reflectedPixels = lerp(skyReflection, reflectedPixels, saturate(reflectedPixels.a));
+    reflectedPixels.xyz = lerp(skyReflection.xyz, reflectedPixels.xyz, saturate(reflectedPixels.a));
    
-   	//Schlick approximation for fresnel
+   	// Schlick approximation for fresnel
     float NDotV = saturate(dot(viewVector, N));
 	float F0 = 0.08;
     float fresnel = F0 + (1.0 - F0) * pow(1.0 - NDotV, 5.0);
@@ -389,6 +400,8 @@ float4 HighFidelityPS( VS_OUTPUT inV,
     // add in the sun reflection
 	float3 sunReflection = pow(saturate(dot(-R, SunDirection)), SunShininess) * SunColor;
     sunReflection = sunReflection * fresnel;
+	// the sun shouldn't be visible where a unit reflection is
+	sunReflection *= (1 - saturate(reflectedPixels.a * 2));
     refractedPixels.xyz +=  sunReflection;
 
     // Lerp in the wave crests
@@ -476,7 +489,7 @@ technique Water_HighFidelity
 #endif
 
 		VertexShader = compile vs_1_1 WaterVS();
-		PixelShader = compile ps_2_0 HighFidelityPS( true, d3d_NotEqual, 0 );
+		PixelShader = compile ps_2_a HighFidelityPS( true, d3d_NotEqual, 0 );
 	}
 }
 

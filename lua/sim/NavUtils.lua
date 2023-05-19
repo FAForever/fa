@@ -1123,3 +1123,44 @@ function DirectionTo(layer, origin, destination, distance)
 
     return output, distance
 end
+
+--- Returns true when the origin is in the playable area
+---@param origin Vector
+---@param offset number | nil
+---@return boolean
+function IsInPlayableArea(origin, offset)
+    offset = offset or 0
+
+    -- determine playable area
+    local playableArea = ScenarioInfo.MapData.PlayableRect
+    local tlx, tlz, brx, brz
+    if playableArea then
+        tlx = playableArea[1]
+        tlz = playableArea[2]
+        brx = playableArea[3]
+        brz = playableArea[4]
+    else
+        tlx = 0
+        tlz = 0
+        brx = ScenarioInfo.size[1]
+        brz = ScenarioInfo.size[2]
+    end
+
+    -- take into account offset
+    tlx = tlx + offset
+    tlz = tlz + offset
+    brx = brx - offset
+    brz = brz - offset
+
+    local x = origin[1]
+    local z = origin[3]
+
+    return (tlx <= x and brx >= x) and (tlz <= z and brz >= z)
+end
+
+--- Returns true when the origin is in the buildable area
+---@param origin Vector
+---@return boolean
+function IsInBuildableArea(origin)
+    return IsInPlayableArea(origin, 8)
+end

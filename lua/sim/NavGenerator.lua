@@ -292,10 +292,13 @@ local CompressedLabelTree
 ---@field TotalCosts number                 # Populated during path finding
 ---@field Seen number                       # Populated during path
 
+---@class CompressedLabelTreeRoot : CompressedLabelTreeNode
+---@field Labels table<number, number>      # Table that tells us which labels are part of this compression tree. The key represents as the label, the value represents as the fractional area that the label consumes. A value of 1 means the label tree entirely consists of one value.
+---@field Seen number | nil                 # Used during navigating
+---@field Threat number | nil               # Used during navigating
+
 --- A simplified quad tree that acts as a compression of the pathing capabilities of a section of the heightmap
 ---@class CompressedLabelTreeNode
----@field Seen number
----@field Threat number
 ---@field [1] CompressedLabelTreeNode?
 ---@field [2] CompressedLabelTreeNode?
 ---@field [3] CompressedLabelTreeNode?
@@ -683,6 +686,36 @@ CompressedLabelTree = ClassCompressedLabelTree {
     ---@return number
     DirectionTo = function(self, other)
         return self.px - other.px, self.pz - other.pz
+    end,
+
+    --- Returns all leaves in a table
+    ---@param self CompressedLabelTreeNode
+    ---@return CompressedLabelTreeLeaf[]
+    ---@return number
+    FindLeaves = function(self, cache)
+        local head = 1
+        cache = cache or { }
+        cache, head = self:_FindLeaves(cache, head)
+
+        return cache, head - 1
+    end,
+
+    --- Returns all leaves in a table
+    ---@param self CompressedLabelTreeNode
+    ---@return CompressedLabelTreeLeaf[]
+    ---@return number
+    _FindLeaves = function(self, cache, head)
+        if not self.Label then
+            cache, head = self[1]:_FindLeaves(cache, head)
+            cache, head = self[2]:_FindLeaves(cache, head)
+            cache, head = self[3]:_FindLeaves(cache, head)
+            cache, head = self[4]:_FindLeaves(cache, head)
+        else
+            cache[head] = self
+            head = head + 1
+        end
+
+        return cache, head
     end,
 
     --- Returns the leaf that encompasses the position, or nil if no leaf does
@@ -1150,6 +1183,45 @@ local function GenerateMarkerMetadata()
     end
 end
 
+--- Computes various fields for the root nodes
+local function GenerateRootInformation()
+
+    local cache = { }
+    local size = ScenarioInfo.size[1] / LabelCompressionTreesPerAxis
+    local area = ((0.01 * size) * (0.01 * size))
+
+    for _, grid in NavGrids do
+        for z = 0, LabelCompressionTreesPerAxis - 1 do
+            for x = 0, LabelCompressionTreesPerAxis - 1 do
+                ---@type CompressedLabelTreeRoot
+                local tree = grid.Trees[z][x]
+
+                if not tree.Labels then
+                    local leaves, count = tree:FindLeaves(cache)
+
+                    -- sum up area
+                    local labels = { }
+                    for k = 1, count do
+                        local leaf = leaves[k]
+                        local label = leaf.Label
+                        if label > 0 then
+                            local areaOfLeaf = ((0.01 * leaf.Size) * (0.01 * leaf.Size))
+                            labels[label] = (labels[label] or 0) + areaOfLeaf
+                        end
+                    end
+
+                    -- compute ratio of total area for each label
+                    for label, areaOfLabel in labels do
+                        labels[label] = areaOfLabel / area
+                    end
+
+                    tree.Labels = labels
+                end
+            end
+        end
+    end
+end
+
 --- Generates a navigational mesh based on the heightmap
 function Generate()
 
@@ -1199,6 +1271,8 @@ function Generate()
 
     GenerateCullLabels()
     print(string.format("cleaning up generated data: %f", GetSystemTimeSecondsOnlyForProfileUse() - start))
+
+    GenerateRootInformation()
 
     -- ditch hover / amphibious if they are identical to land
     if  NavLayerData['Land'].Labels == NavLayerData['Hover'].Labels and
