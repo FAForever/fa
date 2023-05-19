@@ -95,6 +95,17 @@ local function LoadPreGameData()
         end
     )
 
+    reprsl(preGameData)
+    local scenario = DiskFindFiles(preGameData.CurrentMapDir, "*_scenario.lua")
+    reprsl(scenario)
+    local info = {
+        STRING = function(value)
+            return value
+        end,
+     }
+    doscript(scenario[1], info)
+    reprsl(info)
+
     -- tell us if something went wrong
     if not ok then
         WARN("Blueprints.lua - Preferences file is locked or corrupt. Skipping pre game data.")
@@ -102,6 +113,44 @@ local function LoadPreGameData()
     end
 
     return preGameData
+end
+
+--- 
+---@param units UnitBlueprint[]
+---@param preGameData PreGameData
+local function AssignShaders(units)
+    local preGameData = LoadPreGameData()
+
+    reprsl(preGameData)
+    local scenario = DiskFindFiles(preGameData.CurrentMapDir, "*_scenario.lua")
+    reprsl(scenario)
+    local info = {
+        STRING = function(value)
+            return value
+        end,
+     }
+    doscript(scenario[1], info)
+    reprsl(info)
+
+    if info.applyAdvancedShaders or true then
+        for _, unit in units do
+            if unit.Display and unit.Display.Mesh and unit.Display.Mesh.LODs then
+                for id, lod in unit.Display.Mesh.LODs do
+                    if lod.ShaderName then
+                        local old = lod.ShaderName 
+                        lod.ShaderName = 'PBR_' .. lod.ShaderName
+
+                        -- special shaders for naval units
+                        if unit.CategoriesHash and unit.CategoriesHash["NAVAL"] then
+                            lod.ShaderName = lod.ShaderName .. '_Navy'
+                        end
+
+                        LOG(string.format("%s: %s -> %s", unit.BlueprintId, old, lod.ShaderName))
+                    end
+                end
+            end
+        end
+    end
 end
 
 ---@class BlueprintIconAssignment
@@ -887,6 +936,7 @@ function PostModBlueprints(all_bps)
     -- units, even those included by mods
     FindCustomStrategicIcons(all_bps)
     BlueprintLoaderUpdateProgress()
+    AssignShaders(all_bps.Unit)
 
     -- dynamically compute the unit threat values that are used by the AI to make sense
     -- of a units capabilities
