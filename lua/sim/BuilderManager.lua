@@ -17,14 +17,6 @@ local ForkThread = ForkThread
 
 local BuilderCache = { }
 
----@alias LocationType
---- can only be applied to the main base
---- | 'MAIN'
---- can be applied by any base
---- | 'LocationType'
---- name of expansion marker of the base
---- | string
-
 ---@param a Builder
 ---@param b Builder
 local function BuilderSortLambda(a, b)
@@ -74,6 +66,7 @@ BuilderManager = ClassSimple {
         self.Active = false
         self.NumBuilders = 0
         self:SetEnabled(true)
+        self:ForkThread(self.DebugThread)
     end,
 
     ---@param self BuilderManager
@@ -418,6 +411,51 @@ BuilderManager = ClassSimple {
     ---@param interval number
     SetCheckInterval = function(self, interval)
         self.BuildCheckInterval = interval
+    end,
+
+    --------------------------------------------------------------------------------------------
+    -- unit events
+
+    --- Called by a unit as it starts being built
+    ---@param self BuilderManager
+    ---@param unit Unit
+    OnUnitStartBeingBuilt = function(self, unit)
+    end,
+
+    --- Called by a unit as it is finished being built
+    ---@param self BuilderManager
+    ---@param unit Unit
+    OnUnitStopBeingBuilt = function(self, unit)
+    end,
+
+    --- Called by a unit as it is destroyed
+    ---@param self BuilderManager
+    ---@param unit Unit
+    OnUnitDestroyed = function(self, unit)
+    end,
+
+    --- Called by a unit as it starts building
+    ---@param self BuilderManager
+    ---@param unit Unit
+    ---@param built Unit
+    OnUnitStartBuilding = function(self, unit, built)
+    end,
+
+    --- Called by a unit as it stops building
+    ---@param self BuilderManager
+    ---@param unit Unit
+    ---@param built Unit
+    OnUnitStopBuilding = function(self, unit, built)
+    end,
+
+    --------------------------------------------------------------------------------------------
+    --- debug functionality
+
+    DebugThread = function(self)
+        while true do
+            WaitTicks(1)
+            DrawCircle(self.Location, self.Radius, 'ffffff')
+        end
     end,
 
     --------------------------------------------------------------------------------------------

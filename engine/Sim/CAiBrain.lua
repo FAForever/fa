@@ -21,7 +21,7 @@ function CAiBrain:AssignThreatAtPosition(position, threat, decay, threatType)
 end
 
 --- Assigns a unit to a platoon
----@param platoon Platoon | string Either a reference to a platoon, or the unique name of the platoon
+---@param platoon moho.platoon_methods | string Either a reference to a platoon, or the unique name of the platoon
 ---@param unit Unit
 ---@param squad PlatoonSquads
 ---@param formation UnitFormations
@@ -267,7 +267,9 @@ end
 function CAiBrain:GetHighestThreatPosition(ring, restriction, threatType, armyIndex)
 end
 
---- Returns a list of units that match the categories
+--- Returns a list of units that match the categories.
+---
+--- This function does **not** take into account intel.
 ---@param category EntityCategory
 ---@param needToBeIdle boolean
 ---@param requireBuilt boolean Appears to be not functional
@@ -306,7 +308,7 @@ function CAiBrain:GetNumUnitsAroundPoint(category, position, radius, alliance)
 end
 
 --- Return the personality for this brain to use.
--- @return AIPersonalityTemplate from aipersonality.lua
+---@return AIPersonality
 function CAiBrain:GetPersonality()
 end
 
@@ -346,7 +348,7 @@ end
 ---@param radius number in game units
 ---@param restriction boolean
 ---@param threatType BrainThreatType
----@param armyIndex number
+---@param armyIndex number?
 ---@return BrainPositionThreat[]
 function CAiBrain:GetThreatsAroundPosition(position, radius, restriction, threatType, armyIndex)
 end
@@ -357,14 +359,9 @@ end
 function CAiBrain:GetUnitBlueprint(bpName)
 end
 
---- Return list of units around position.
--- @param category Unit's category, example: categories.TECH2 .
--- @param position Table with position {x, y, z}.
--- @param radius Number in game units.
--- @param alliance Types: 'Ally', 'Enemy', 'Neutral'.
--- @return tblUnits Table containing units.
-
---- Returns the units around a position that match the categories
+--- Returns the units around a position that match the categories.
+---
+--- This function takes into account intel.
 ---@param category EntityCategory
 ---@param position Vector
 ---@param radius number
@@ -384,7 +381,9 @@ end
 function CAiBrain:GiveStorage(type, amount)
 end
 
---- TODO.
+--- Returns true when any engineer is building something of the given category
+---@param category EntityCategory
+---@return boolean
 function CAiBrain:IsAnyEngineerBuilding(category)
 end
 
@@ -394,16 +393,16 @@ function CAiBrain:IsOpponentAIRunning()
 end
 
 --- Creates a new platoon.
--- @param name or '', custom platoon name
--- @param aiPlan Plan to follow for this platoon or '', the function for the plan is in '/lua/platoon.lua'.
--- @return Platoon.
+---@param name string   # unique name for platoon
+---@param aiPlan string # to follow for this platoon or '', the function for the plan is in '/lua/platoon.lua'.
+---@return Platoon
 function CAiBrain:MakePlatoon(name, aiPlan)
 end
 
---- Return number of unit's categories being built.
--- @param entityCategoryOfBuildee Unit's category that is being built.
--- @param entityCategoryOfBuilder Unit's category of the unit building, example: categories.CONSTRUCTION .
--- @return Number.
+--- Returns number of units of a given category building units of another given category
+---@param entityCategoryOfBuildee EntityCategory # Category of unit that is being built
+---@param entityCategoryOfBuilder EntityCategory # Category of unit that is building
+---@return number
 function CAiBrain:NumCurrentlyBuilding(entityCategoryOfBuildee, entityCategoryOfBuilder)
 end
 

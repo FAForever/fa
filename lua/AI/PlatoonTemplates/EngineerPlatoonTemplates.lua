@@ -26,6 +26,14 @@ PlatoonTemplate {
 }
 
 PlatoonTemplate {
+    Name = 'CommanderInitialBuilder',
+    Plan = 'CommanderInitialBOAI',
+    GlobalSquads = {
+        { categories.COMMAND, 1, 1, 'support', 'None' }
+    },
+}
+
+PlatoonTemplate {
     Name = 'CommanderEnhance',
     Plan = 'EnhanceAI',
     GlobalSquads = {

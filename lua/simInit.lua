@@ -20,6 +20,17 @@
 -- Do global initialization and set up common global functions
 doscript '/lua/globalInit.lua'
 
+-- load legacy builder systems
+doscript '/lua/system/GlobalPlatoonTemplate.lua'
+doscript '/lua/system/GlobalBuilderTemplate.lua'
+doscript '/lua/system/GlobalBuilderGroup.lua'
+doscript '/lua/system/GlobalBaseTemplate.lua'
+
+-- load builder systems
+doscript '/lua/aibrains/templates/base/base-template.lua'
+doscript '/lua/aibrains/templates/builder-groups/builder-group-template.lua'
+doscript '/lua/aibrains/templates/builder-groups/builder-template.lua'
+
 GameOverListeners = {}
 WaitTicks = coroutine.yield
 
@@ -38,7 +49,7 @@ doscript '/lua/SimHooks.lua'
 -- Set up the sync table and some globals for use by scenario functions
 doscript '/lua/SimSync.lua'
 
-local syncStartPositions = false -- This is held here because the Sync table is cleared between SetupSession() and BeginSession()
+local syncStartPositions = false -- This is held here because the Sync table iFBlobas cleared between SetupSession() and BeginSession()
 
 function ShuffleStartPositions(syncNewPositions)
     local markers = ScenarioInfo.Env.Scenario.MasterChain._MASTERCHAIN_.Markers
@@ -225,9 +236,18 @@ end
 function OnCreateArmyBrain(index, brain, name, nickname)
     -- switch out brains for non-human armies
     local info = ScenarioInfo.ArmySetup[name]
-    if (not info.Human) and (info.AIPersonality != '') then
+    if (not info.Human) then
+        local instance
         local keyToBrain = import("/lua/aibrains/index.lua").keyToBrain
-        local instance = keyToBrain[info.AIPersonality]
+        if (not info.Civilian) and (info.AIPersonality != '') then
+            -- likely a skirmish scenario
+            instance = keyToBrain[info.AIPersonality]
+        else
+            -- likely a campaign scenario
+            if ScenarioInfo.type != 'skirmish' then
+                instance = keyToBrain['campaign']
+            end
+        end
 
         if instance then
             setmetatable(brain, instance)
@@ -285,9 +305,6 @@ function BeginSession()
     import("/lua/sim/scenarioutilities.lua").CreateProps()
     import("/lua/sim/scenarioutilities.lua").CreateResources()
 
-    BeginSessionGenerateMarkers()
-    BeginSessionGenerateNavMesh()
-
     import("/lua/sim/score.lua").init()
     import("/lua/sim/recall.lua").init()
 
@@ -321,17 +338,10 @@ function BeginSession()
 
     -- keep track of units off map
     OnStartOffMapPreventionThread()
-end
 
-function BeginSessionGenerateNavMesh()
-    Sync.GameHasAIs = ScenarioInfo.GameHasAIs
-    if ScenarioInfo.GameHasAIs then
-        for k, brain in ArmyBrains do
-            if ScenarioInfo.ArmySetup[brain.Name].RequiresNavMesh then
-                import('/lua/sim/navutils.lua').Generate()
-                break
-            end
-        end
+    -- trigger event for brains
+    for k, brain in ArmyBrains do
+        brain:OnBeginSession()
     end
 end
 
@@ -355,6 +365,7 @@ function BeginSessionAI()
             end
         end
 
+        -- import legacy templates, builder groups and builders
         for k,file in DiskFindFiles('/lua/AI/PlatoonTemplates', '*.lua') do
             import(file)
         end
@@ -366,17 +377,10 @@ function BeginSessionAI()
         for k,file in DiskFindFiles('/lua/AI/AIBaseTemplates', '*.lua') do
             import(file)
         end
-    end
-end
 
-function BeginSessionGenerateMarkers()
-    Sync.GameHasAIs = ScenarioInfo.GameHasAIs
-    if ScenarioInfo.GameHasAIs then
-        for k, brain in ArmyBrains do
-            if ScenarioInfo.ArmySetup[brain.Name].RequiresNavMesh then
-                import('/lua/sim/navgenerator.lua').GenerateMarkers()
-                break
-            end
+        -- import base templates, builder group templates and builder templates
+        for k,file in DiskFindFiles('/lua/aibrains/templates/', '*.lua') do
+            import(file)
         end
     end
 end
