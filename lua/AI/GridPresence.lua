@@ -2,6 +2,9 @@ local Grid = import("/lua/ai/grid.lua").Grid
 local MarkerUtilities = import("/lua/sim/MarkerUtilities.lua")
 local NavUtils = import("/lua/sim/NavUtils.lua")
 
+-- upvalue scope for performance
+local TableGetn = table.getn
+
 local Debug = false
 function EnableDebugging()
     if ScenarioInfo.GameHasAIs or CheatsEnabled() then
@@ -14,6 +17,20 @@ function DisableDebugging()
         Debug = false
     end
 end
+
+---@type GridPresenceUIDebugCell
+local DebugCellData = {
+    Label = 0,
+    Inferred = 'Unoccupied',
+}
+
+---@type GridPresenceUIDebugUpdate
+local DebugUpdateData = {
+    ResourcePointsTime = 0,
+    ResourcePointsTick = 0,
+    InferredTime = 0,
+    InferredTick = 0,
+}
 
 ---@class AIGridPresenceCell : AIGridCell
 ---@field Labels table<number, boolean>         # <label, boolean>
@@ -41,26 +58,19 @@ GridPresence = Class(Grid) {
         for gx = 1, cellCount do
             for gz = 1, cellCount do
                 local cell = cells[gx][gz]
-                cell.Labels = NavUtils.GetLabelsofIMAP('Hover', gz, gx) or { }
+                cell.Labels = NavUtils.GetLabelsofIMAP('Hover', gx, gz) or { }
 
                 cell.Inferred = { }
+                cell.StatusQuo = { }
+                cell.CountAllied = { }
+                cell.CountHostile = { }
+
                 for label, _ in cell.Labels do
                     cell.Inferred[label] = 'Unoccupied'
-                end
-
-                cell.StatusQuo = { }
-                for label, _ in cell.Labels do
                     cell.StatusQuo[label] = 'Unoccupied'
-                end
-
-                cell.CountAllied = { }
-                for label, _ in cell.Labels do
                     cell.CountAllied[label] = 0
-                end
-
-                cell.CountHostile = { }
-                for label, _ in cell.Labels do
                     cell.CountHostile[label] = 0
+                    self.Labels[label] = true
                 end
             end
         end
@@ -79,9 +89,19 @@ GridPresence = Class(Grid) {
 
     ---@param self AIGridPresence
     UpdateThread = function(self)
+
+        -- local scope for performance
         local cellCount = self.CellCount
         local cells = self.Cells
         local brain = self.Brain
+
+        local GetUnitsAroundPoint = brain.GetUnitsAroundPoint
+        local GetLabel = NavUtils.GetLabel
+        local ToCellFromWorldSpace = self.ToCellFromWorldSpace
+
+        local TableGetn = TableGetn
+        local cSTRUCTURE = categories.STRUCTURE
+        local Random = Random
 
         ---@type AIGridPresenceCell[]
         local iterationA = { }
@@ -91,6 +111,8 @@ GridPresence = Class(Grid) {
 
         while true do
 
+            local start = GetSystemTimeSecondsOnlyForProfileUse()
+
             -- counting of extractors
             local massMarkers, extractorCount = MarkerUtilities.GetMarkersByType('Mass')
             for k = 1, extractorCount do
@@ -98,30 +120,42 @@ GridPresence = Class(Grid) {
                 local position = massMarker.position
 
                 -- compute hostile / allied units
-                local countHostile = table.getn(brain:GetUnitsAroundPoint(categories.STRUCTURE, position, 6, 'Enemy'))
-                local countAllied = table.getn(brain:GetUnitsAroundPoint(categories.STRUCTURE, position, 6, 'Ally'))
+                local countHostile = TableGetn(GetUnitsAroundPoint(brain, cSTRUCTURE, position, 6, 'Enemy'))
+                local countAllied = TableGetn(GetUnitsAroundPoint(brain, cSTRUCTURE, position, 6, 'Ally'))
 
                 -- update status quo
-                local label = NavUtils.GetLabel('Hover', position)
+                local label = GetLabel('Hover', position)
                 if label and label > 0 then
-                    local cell = self:ToCellFromWorldSpace(position[1], position[3])
-                    cell.CountAllied[label] = (cell.CountAllied[label] or 0) + countAllied
-                    cell.CountHostile[label] = (cell.CountHostile[label] or 0) + countHostile
-
-                    self.Labels[label] = true
+                    local cell = ToCellFromWorldSpace(self, position[1], position[3])
+                    cell.CountAllied[label] = cell.CountAllied[label] + countAllied
+                    cell.CountHostile[label] = cell.CountHostile[label] + countHostile
                 end
+            end
+
+            -- only show debugging information of the focus army
+            if Debug and GetFocusArmy() == brain:GetArmyIndex() then
+                DebugUpdateData.ResourcePointsTick = GetGameTick()
+                DebugUpdateData.ResourcePointsTime = GetSystemTimeSecondsOnlyForProfileUse() - start
+                Sync.GridPresenceUIDebugUpdate = DebugUpdateData
             end
 
             WaitTicks(1)
 
-            -- initial status quo
+            start = GetSystemTimeSecondsOnlyForProfileUse()
+
+            -- initial status quo and inferred values
             for k = 1, cellCount do
                 for l = 1, cellCount do
                     local cell = cells[k][l]
-
+                    local countAllied = cell.CountAllied
+                    local countHostile = cell.CountHostile
                     for label, _ in cell.Labels do
-                        local allied = cell.CountAllied[label]
-                        local hostile = cell.CountHostile[label]
+                        -- we have not inferred anything yet
+                        cell.Inferred[label] = 'Unoccupied'
+
+                        -- compute initial status quo
+                        local allied = countAllied[label]
+                        local hostile = countHostile[label]
                         if allied and hostile then
                             if allied > hostile then
                                 cell.StatusQuo[label] = 'Allied'
@@ -136,19 +170,8 @@ GridPresence = Class(Grid) {
                             cell.StatusQuo[label] = 'Unoccupied'
                         end
 
-                        cell.CountAllied[label] = 0
-                        cell.CountHostile[label] = 0
-                    end
-                end
-            end
-
-            -- initial inferred
-            for k = 1, cellCount do
-                for l = 1, cellCount do
-                    local cell = cells[k][l]
-
-                    for label, _ in cell.Labels do
-                        cell.Inferred[label] = 'Unoccupied'
+                        countAllied[label] = 0
+                        countHostile[label] = 0
                     end
                 end
             end
@@ -175,7 +198,6 @@ GridPresence = Class(Grid) {
 
                     -- shuffle the order
                     for k = headA - 1, 1, -1 do
-
                         local j = (Random() * (k - 1) + 1) ^ 0;
                         local value = iterationA[j];
                         iterationA[j] = iterationA[k];
@@ -208,14 +230,10 @@ GridPresence = Class(Grid) {
                     iterationB = iterationT
                     headA = headB
 
-                    WaitTicks(1)
-
                 until headA <= 1
             end
 
-            WaitTicks(1)
-
-            -- use status quo to populate status quo fields
+            -- switch inferred to status quo to re-use memory
             for label, _ in self.Labels do
                 for k = 1, cellCount do
                     for l = 1, cellCount do
@@ -225,9 +243,7 @@ GridPresence = Class(Grid) {
                 end
             end
 
-            WaitTicks(1)
-
-            -- use status quo to finalize the inferred fields
+            -- compute final values of inferred
             for label, _ in self.Labels do
                 for k = 1, cellCount do
                     for l = 1, cellCount do
@@ -250,7 +266,15 @@ GridPresence = Class(Grid) {
                 end
             end
 
-            WaitTicks(1)
+            -- only show debugging information of the focus army
+            if Debug and GetFocusArmy() == brain:GetArmyIndex() then
+                DebugUpdateData.InferredTick = GetGameTick()
+                DebugUpdateData.InferredTime = GetSystemTimeSecondsOnlyForProfileUse() - start
+                Sync.GridPresenceUIDebugUpdate = DebugUpdateData
+                reprsl(DebugUpdateData)
+            end
+
+            WaitTicks(29)
         end
     end,
 
@@ -285,25 +309,57 @@ GridPresence = Class(Grid) {
     --- Allows us to scan the map
     ---@param self AIGridPresence
     DebugUpdateThread = function(self)
-
-        local cellCount = self.CellCount
         local cells = self.Cells
         local brain = self.Brain
 
         while true do
-            for k = 1, cellCount do
-                for l = 1, cellCount do
-                    local cell = cells[k][l]
-                    for label, _ in cell.Labels do
-                        if cell.Inferred[label] == 'Allied' then
-                            self:DrawCell(cell.X, cell.Z, math.sqrt(label), '00ff00')
-                        elseif cell.Inferred[label] == 'Hostile' then
-                            self:DrawCell(cell.X, cell.Z, math.sqrt(label), 'ff0000')
-                        elseif cell.Inferred[label] == 'Contested' then
-                            self:DrawCell(cell.X, cell.Z, math.sqrt(label), 'FFD900')
-                        else
-                            self:DrawCell(cell.X, cell.Z, math.sqrt(label), 'A0FFFFFF')
+
+            -- only show debugging information of the focus army
+            if Debug and GetFocusArmy() == brain:GetArmyIndex() then
+                local mouse = GetMouseWorldPos()
+                local cell = self:ToCellFromWorldSpace(mouse[1], mouse[3])
+
+                local label = NavUtils.GetLabel('Hover', mouse)
+                if label then
+                    DebugCellData.Inferred = cell.Inferred[label]
+                    DebugCellData.Label = label
+                    Sync.GridPresenceUIDebugCell = DebugCellData
+
+                    if cell.Inferred[label] == 'Allied' then
+                        self:DrawCell(cell.X, cell.Z, math.sqrt(label) + 0.075, '00ff00')
+                        self:DrawCell(cell.X, cell.Z, math.sqrt(label) - 0.075, '00ff00')
+                    elseif cell.Inferred[label] == 'Hostile' then
+                        self:DrawCell(cell.X, cell.Z, math.sqrt(label) + 0.075, 'ff0000')
+                        self:DrawCell(cell.X, cell.Z, math.sqrt(label) - 0.075, 'ff0000')
+                    elseif cell.Inferred[label] == 'Contested' then
+                        self:DrawCell(cell.X, cell.Z, math.sqrt(label) + 0.075, 'FFD900')
+                        self:DrawCell(cell.X, cell.Z, math.sqrt(label) - 0.075, 'FFD900')
+                    else
+                        self:DrawCell(cell.X, cell.Z, math.sqrt(label) + 0.075, 'A0FFFFFF')
+                        self:DrawCell(cell.X, cell.Z, math.sqrt(label) - 0.075, 'A0FFFFFF')
+                    end
+                end
+                -- draw the status of the cells
+                for lx = -1, 1 do
+                    for lz = -1, 1 do 
+                        local alt = cells[cell.X + lx][cell.Z + lz]
+                        if alt then
+                            for label, _ in alt.Labels do
+
+                                if alt.Inferred[label] == 'Allied' then
+                                    self:DrawCell(alt.X, alt.Z, math.sqrt(label), '00ff00')
+                                elseif alt.Inferred[label] == 'Hostile' then
+                                    self:DrawCell(alt.X, alt.Z, math.sqrt(label), 'ff0000')
+                                elseif alt.Inferred[label] == 'Contested' then
+                                    self:DrawCell(alt.X, alt.Z, math.sqrt(label), 'FFD900')
+                                else
+                                    self:DrawCell(alt.X, alt.Z, math.sqrt(label), 'A0FFFFFF')
+                                end
+                            end
+
+
                         end
+
                     end
                 end
             end

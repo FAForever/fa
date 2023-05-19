@@ -558,7 +558,7 @@ function GetLabelsofIMAP(layer, gx, gz)
     end
 
     -- check position argument
-    local root = grid:FindRootGridspaceXZ(gx - 1, gz - 1)
+    local root = grid:FindRootGridspaceXZ(gz - 1, gx - 1)
     if not root then
         return nil, 'OutsideMap'
     end

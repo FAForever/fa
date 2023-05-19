@@ -899,6 +899,8 @@ keyActions = {
         category = 'ai', order = 24},
     ['toggle_ai_reclaim_grid_ui'] = {action = 'UI_Lua import("/lua/ui/game/gridreclaim.lua").OpenWindow()',
         category = 'ai', order = 24},
+    ['toggle_ai_presence_grid_ui'] = {action = 'UI_Lua import("/lua/ui/game/gridpresence.lua").OpenWindow()',
+        category = 'ai', order = 24},
     ['toggle_ai_recon_grid_ui'] = {action = 'UI_Lua import("/lua/ui/game/gridrecon.lua").OpenWindow()',
         category = 'ai', order = 24},
     ['toggle_ai_economy_ui'] = {action = 'UI_Lua import("/lua/ui/game/AIBrainEconomyData.lua").OpenWindow()',
