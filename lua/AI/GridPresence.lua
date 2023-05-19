@@ -79,6 +79,25 @@ GridPresence = Class(Grid) {
         self:DebugUpdate()
     end,
 
+    --- Converts a world position to a cell
+    ---@param self AIGridPresence
+    ---@param wx number     # in world space
+    ---@param wz number     # in world space
+    ---@return AIGridPresenceCell
+    ToCellFromWorldSpace = function(self, wx, wz)
+        local gx, gz = self:ToGridSpace(wx, wz)
+        return self.Cells[gx][gz]
+    end,
+
+    --- Converts a grid position to a cell
+    ---@param self AIGridPresence
+    ---@param gx number     # in grid space
+    ---@param gz number     # in grid space
+    ---@return AIGridPresenceCell
+    ToCellFromGridSpace = function(self, gx, gz)
+        return self.Cells[gx][gz]
+    end,
+
     ---@param self AIGridPresence
     Update = function(self)
         ForkThread(
@@ -271,30 +290,10 @@ GridPresence = Class(Grid) {
                 DebugUpdateData.InferredTick = GetGameTick()
                 DebugUpdateData.InferredTime = GetSystemTimeSecondsOnlyForProfileUse() - start
                 Sync.GridPresenceUIDebugUpdate = DebugUpdateData
-                reprsl(DebugUpdateData)
             end
 
             WaitTicks(29)
         end
-    end,
-
-    --- Converts a world position to a cell
-    ---@param self AIGridPresence
-    ---@param wx number     # in world space
-    ---@param wz number     # in world space
-    ---@return AIGridPresenceCell
-    ToCellFromWorldSpace = function(self, wx, wz)
-        local gx, gz = self:ToGridSpace(wx, wz)
-        return self.Cells[gx][gz]
-    end,
-
-    --- Converts a grid position to a cell
-    ---@param self AIGridPresence
-    ---@param gx number     # in grid space
-    ---@param gz number     # in grid space
-    ---@return AIGridPresenceCell
-    ToCellFromGridSpace = function(self, gx, gz)
-        return self.Cells[gx][gz]
     end,
 
     --- Contains various debug logic
