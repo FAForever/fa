@@ -1,6 +1,14 @@
 
 Some sections of the changelog are available in other languages such as [French](changelog-fr.md) or [Russian](changelog-ru.md)
 
+# Game version 3757 (20th of May, 2023)
+
+## Balance
+
+- 
+
+
+
 # Game version 3756 (18th of March, 2023)
 
 Hopefully this is the last hotfix for now. Includes various fixes of recent and longstanding bugs.
