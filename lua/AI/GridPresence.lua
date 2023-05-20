@@ -296,6 +296,17 @@ GridPresence = Class(Grid) {
         end
     end,
 
+    ---@param self AIGridPresence
+    ---@param position Vector
+    ---@return ('Allied' | 'Hostile' | 'Contested' | 'Unoccupied')?
+    GetInferredStatus = function(self, position)
+        local cell = self:ToCellFromWorldSpace(position[1], position[3])
+        local label = NavUtils.GetLabel('Hover', position)
+        if label then
+            return cell.Inferred[label]
+        end
+    end,
+
     --- Contains various debug logic
     ---@param self AIGridPresence
     DebugUpdate = function(self)
