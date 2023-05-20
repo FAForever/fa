@@ -138,7 +138,7 @@ ADFTractorClaw = ClassWeapon(Weapon) {
     ---@param self ADFTractorClaw
     ---@param blip Blip | Unit
     ---@return Blip | Unit | false
-        GetUnitBehindTarget = function(self, blip)
+    GetUnitBehindTarget = function(self, blip)
         if IsUnit(blip) then
             -- return the unit
             return blip
@@ -233,9 +233,7 @@ ADFTractorClaw = ClassWeapon(Weapon) {
                 WaitTicks(1)
 
                 if not IsDestroyed(unit) then 
-                    
 
-                    target.CanTakeDamage = true
                     while not IsDestroyed(target) and not IsDestroyed(unit) and target:GetHealth() >= 730 do
                         Damage(unit, bonePosition, target, 729, "Normal")
                         Explosion.CreateScalableUnitExplosion(target, 1, true)
@@ -346,8 +344,6 @@ ADFTractorClaw = ClassWeapon(Weapon) {
     MakeImmune = function (self, target)
         if not IsDestroyed(target) then
             target:SetDoNotTarget(true)
-            target.CanTakeDamage = false
-            target.DisallowCollisions = true
         end
     end,
 
@@ -356,8 +352,6 @@ ADFTractorClaw = ClassWeapon(Weapon) {
     MakeVulnerable = function (self, target)
         if not IsDestroyed(target) then
             target:SetDoNotTarget(false)
-            target.CanTakeDamage = true
-            target.DisallowCollisions = false
             target.Tractored = nil
         end
     end,
