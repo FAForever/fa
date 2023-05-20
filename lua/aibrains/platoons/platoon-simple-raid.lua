@@ -95,9 +95,18 @@ AIPlatoonSimpleRaidBehavior = Class(AIPlatoon) {
                 end
 
                 -- pick random expansion that we can Navigating to
-                local expansion = candidates[Random(1, count)]
+                local selectionNumber = Random(1, count)
+                local expansion = candidates[selectionNumber]
                 self.LocationToRaid = expansion.position
-                self:ChangeState(self.Navigating)
+                if self.LocationToRaid then
+                    LOG('Location to raid is '..repr(self.LocationToRaid))
+                else
+                    LOG('Location to raid is nil')
+                    LOG(repr(expansion))
+                    LOG('Selection was '..selectionNumber)
+                    LOG('candidates '..repr(candidates))
+                end
+                self:ChangeState('Navigating')
                 return
             else
                 -- something odd happened: try again with another unit
@@ -450,6 +459,7 @@ AIPlatoonSimpleRaidBehavior = Class(AIPlatoon) {
 ---@param units Unit[]
 DebugAssignToUnits = function(data, units)
     if units and not TableEmpty(units) then
+        LOG('Assigning Units to new platoon')
 
         -- meet platoon requirements
         import("/lua/sim/navutils.lua").Generate()
@@ -470,3 +480,31 @@ DebugAssignToUnits = function(data, units)
         ChangeState(platoon, platoon.Start)
     end
 end
+
+---@param data { Behavior: 'AIBehaviorTacticalSimple' }
+---@param units Unit[]
+AssignToUnitsMachine = function(data, platoon, units)
+    if units and not TableEmpty(units) then
+        LOG('Assigning Units to new platoon')
+
+        -- meet platoon requirements
+        import("/lua/sim/navutils.lua").Generate()
+        import("/lua/sim/markerutilities.lua").GenerateExpansionMarkers()
+        -- create the platoon
+        setmetatable(platoon, AIPlatoonSimpleRaidBehavior)
+        local count = TableGetn(platoon:GetSquadUnits('Attack'))
+        local scouts = platoon:GetSquadUnits('Scout')
+        if scouts then
+            for k, scout in scouts do
+                IssueClearCommands(scout)
+                IssueGuard(scout, units[Random(1, count)])
+            end
+        end
+
+        -- start the behavior
+        ChangeState(platoon, platoon.Start)
+    end
+end
+
+
+

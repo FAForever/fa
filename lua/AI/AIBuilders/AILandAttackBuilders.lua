@@ -870,7 +870,7 @@ BuilderGroup {
     -- Also the platoon carries an engineer with it
     Builder {
         BuilderName = 'Start Location Attack',
-        PlatoonTemplate = 'StartLocationAttack',
+        PlatoonTemplate = 'StateMachinePlatoon',
         Priority = 1000, --DUNCAN - was 960
         BuilderConditions = {
                 { MIBC, 'MapCheck', { 'Seton\'s Clutch', false } },
@@ -879,6 +879,7 @@ BuilderGroup {
                 --{ UCBC, 'HaveLessThanUnitsWithCategory', { 1, categories.TECH2 * categories.MOBILE * categories.LAND - categories.ENGINEER } },
             },
         BuilderData = {
+            StateMachine = 'AIPlatoonSimpleRaidBehavior',
             MarkerType = 'Start Location',
             MoveFirst = 'Closest',
             MoveNext = 'None', --DUNCAN - was guard base
