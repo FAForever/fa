@@ -336,19 +336,20 @@ GridPresence = Class(Grid) {
                     Sync.GridPresenceUIDebugCell = DebugCellData
 
                     if cell.Inferred[label] == 'Allied' then
-                        self:DrawCell(cell.X, cell.Z, math.sqrt(label) + 0.075, '00ff00')
-                        self:DrawCell(cell.X, cell.Z, math.sqrt(label) - 0.075, '00ff00')
+                        self:DrawCell(cell.X, cell.Z, math.log(label) + 0.075, '00ff00')
+                        self:DrawCell(cell.X, cell.Z, math.log(label) - 0.075, '00ff00')
                     elseif cell.Inferred[label] == 'Hostile' then
-                        self:DrawCell(cell.X, cell.Z, math.sqrt(label) + 0.075, 'ff0000')
-                        self:DrawCell(cell.X, cell.Z, math.sqrt(label) - 0.075, 'ff0000')
+                        self:DrawCell(cell.X, cell.Z, math.log(label) + 0.075, 'ff0000')
+                        self:DrawCell(cell.X, cell.Z, math.log(label) - 0.075, 'ff0000')
                     elseif cell.Inferred[label] == 'Contested' then
-                        self:DrawCell(cell.X, cell.Z, math.sqrt(label) + 0.075, 'FFD900')
-                        self:DrawCell(cell.X, cell.Z, math.sqrt(label) - 0.075, 'FFD900')
+                        self:DrawCell(cell.X, cell.Z, math.log(label) + 0.075, 'FFD900')
+                        self:DrawCell(cell.X, cell.Z, math.log(label) - 0.075, 'FFD900')
                     else
-                        self:DrawCell(cell.X, cell.Z, math.sqrt(label) + 0.075, 'A0FFFFFF')
-                        self:DrawCell(cell.X, cell.Z, math.sqrt(label) - 0.075, 'A0FFFFFF')
+                        self:DrawCell(cell.X, cell.Z, math.log(label) + 0.075, 'A0FFFFFF')
+                        self:DrawCell(cell.X, cell.Z, math.log(label) - 0.075, 'A0FFFFFF')
                     end
                 end
+
                 -- draw the status of the cells
                 for lx = -1, 1 do
                     for lz = -1, 1 do 
@@ -357,13 +358,13 @@ GridPresence = Class(Grid) {
                             for label, _ in alt.Labels do
 
                                 if alt.Inferred[label] == 'Allied' then
-                                    self:DrawCell(alt.X, alt.Z, math.sqrt(label), '00ff00')
+                                    self:DrawCell(alt.X, alt.Z, math.log(label), '00ff00')
                                 elseif alt.Inferred[label] == 'Hostile' then
-                                    self:DrawCell(alt.X, alt.Z, math.sqrt(label), 'ff0000')
+                                    self:DrawCell(alt.X, alt.Z, math.log(label), 'ff0000')
                                 elseif alt.Inferred[label] == 'Contested' then
-                                    self:DrawCell(alt.X, alt.Z, math.sqrt(label), 'FFD900')
+                                    self:DrawCell(alt.X, alt.Z, math.log(label), 'FFD900')
                                 else
-                                    self:DrawCell(alt.X, alt.Z, math.sqrt(label), 'A0FFFFFF')
+                                    self:DrawCell(alt.X, alt.Z, math.log(label), 'A0FFFFFF')
                                 end
                             end
 
