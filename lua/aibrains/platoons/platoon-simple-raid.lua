@@ -88,7 +88,7 @@ AIPlatoonSimpleRaidBehavior = Class(AIPlatoon) {
                 end
 
                 -- pick random expansion that we can Navigating to
-                local selectionNumber = Random(1, count)
+                local selectionNumber = Random(1, candidateCount)
                 local expansion = candidates[selectionNumber]
                 self.LocationToRaid = expansion.position
                 if self.LocationToRaid then
@@ -133,8 +133,13 @@ AIPlatoonSimpleRaidBehavior = Class(AIPlatoon) {
 
             while not IsDestroyed(self) do
                 -- pick random unit for a position on the grid
-                local units, unitCount = self:GetPlatoonUnits()
-                local origin = self:GetPlatoonPosition()
+                local units = self:GetPlatoonUnits()
+                local origin
+                for _, v in units do
+                    if v and not v.Dead then
+                        origin = v:GetPosition()
+                    end
+                end
 
                 -- generate a direction
                 local waypoint, length = NavUtils.DirectionTo('Land', origin, destination, 60)
@@ -174,6 +179,7 @@ AIPlatoonSimpleRaidBehavior = Class(AIPlatoon) {
                     -- check for threats
                     local threat = brain:GetThreatAtPosition(position, 1, true, 'AntiSurface')
                     if threat > 0 then
+                        local platoonThreat = self:GetPlatoonThreat('Surface', categories.MOBILE * categories.DIRECTFIRE - categories.SCOUT, position, 30)
                         local threatTable = brain:GetThreatsAroundPosition(position, 1, true, 'AntiSurface')
                         if threatTable and not TableEmpty(threatTable) then
                             local info = threatTable[Random(1, TableGetn(threatTable))]

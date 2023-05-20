@@ -806,7 +806,7 @@ BuilderGroup {
     -- Hunts for mass locations with Economic threat value of no more than 2 mass extractors
     Builder {
         BuilderName = 'Mass Hunter Early Game',
-        PlatoonTemplate = 'T1MassHuntersCategory',
+        PlatoonTemplate = 'StateMachinePlatoon',
         -- Commented out as the platoon doesn't exist in AILandAttackBuilders.lua
         --PlatoonTemplate = 'EarlyGameMassHuntersCategory',
         Priority = 950,
@@ -816,6 +816,7 @@ BuilderGroup {
                 --{ UCBC, 'HaveLessThanUnitsWithCategory', { 1, categories.TECH2 * categories.MOBILE * categories.LAND - categories.ENGINEER } },
             },
         BuilderData = {
+            StateMachine = 'AIPlatoonSimpleRaidBehavior',
             MarkerType = 'Mass',
             MoveFirst = 'Random',
             MoveNext = 'Threat',
@@ -837,7 +838,7 @@ BuilderGroup {
     -- Used after 10, goes after mass locations of no max threat
     Builder {
         BuilderName = 'Mass Hunter Mid Game',
-        PlatoonTemplate = 'T2MassHuntersCategory',
+        PlatoonTemplate = 'StateMachinePlatoon',
         Priority = 950,
         BuilderConditions = {
                 { MIBC, 'MapCheck', { 'Seton\'s Clutch', false } },
@@ -845,6 +846,7 @@ BuilderGroup {
                 --{ UCBC, 'HaveLessThanUnitsWithCategory', { 1, categories.TECH2 * categories.MOBILE * categories.LAND - categories.ENGINEER } },
             },
         BuilderData = {
+            StateMachine = 'AIPlatoonSimpleRaidBehavior',
             MarkerType = 'Mass',
             MoveFirst = 'Random',
             MoveNext = 'Threat',
