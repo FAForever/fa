@@ -483,6 +483,26 @@ Callbacks.CheatSpawnUnit = function(data)
     end
 end
 
+---@param data { fromFocusArmy: Army, event: string }
+Callbacks.EventMessage = function(data)
+    local army = data.fromFocusArmy
+    if OkayToMessWithArmy(army) then
+        local brain = GetArmyBrain(army)
+        if brain then
+            SPEW(string.format("%s: %s", brain.Nickname, data.event))
+        end
+    else
+        -- something funky happened
+        local brain = GetArmyBrain(GetCurrentCommandSource())
+        if brain then
+            SPEW(string.format("%s: send an odd event message", brain.Nickname))
+        end
+
+        -- add a 'is trying to cheat!' thing
+        CheatsEnabled()
+    end
+end
+
 Callbacks.BreakAlliance = SimUtils.BreakAlliance
 
 Callbacks.GiveUnitsToPlayer = SimUtils.GiveUnitsToPlayer
