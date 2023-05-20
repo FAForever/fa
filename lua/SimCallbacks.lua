@@ -858,6 +858,8 @@ Callbacks.GridReclaimDebugEnable = import("/lua/ai/gridreclaim.lua").EnableDebug
 Callbacks.GridReclaimDebugDisable = import("/lua/ai/gridreclaim.lua").DisableDebugging
 Callbacks.GridReconDebugEnable = import("/lua/ai/gridrecon.lua").EnableDebugging
 Callbacks.GridReconDebugDisable = import("/lua/ai/gridrecon.lua").DisableDebugging
+Callbacks.GridPresenceDebugEnable = import("/lua/ai/gridpresence.lua").EnableDebugging
+Callbacks.GridPresenceDebugDisable = import("/lua/ai/gridpresence.lua").DisableDebugging
 
 Callbacks.AIBrainEconomyDebugEnable = import("/lua/aibrains/components/economy.lua").EnableDebugging
 Callbacks.AIBrainEconomyDebugDisable = import("/lua/aibrains/components/economy.lua").DisableDebugging

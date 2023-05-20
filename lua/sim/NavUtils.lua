@@ -539,6 +539,37 @@ function GetLabel(layer, position)
     return leaf.Label, nil
 end
 
+--- Returns a table with all labels in the current iMAP cell. The keys represent the labels. The values represent the ratio of area it occupies in the cell
+---@param layer NavLayers
+---@param gx number
+---@param gz number
+---@return table<number, number>? 
+---@return ('NotGenerated' | 'InvalidLayer' | 'OutsideMap' | 'SystemError' | 'Unpathable')?
+function GetLabelsofIMAP(layer, gx, gz)
+    -- check if generated
+    if not NavGenerator.IsGenerated() then
+        return nil, 'NotGenerated'
+    end
+
+    -- check layer argument
+    local grid = FindGrid(layer)
+    if not grid then
+        return nil, 'InvalidLayer'
+    end
+
+    -- check position argument
+    local root = grid:FindRootGridspaceXZ(gz - 1, gx - 1)
+    if not root then
+        return nil, 'OutsideMap'
+    end
+
+    if not root.Labels then
+        return nil, 'SystemError'
+    end
+
+    return root.Labels, nil
+end
+
 --- Returns a label that indicates to what sub-graph it belongs to. Unlike `GetLabel` this function does not try to find valid neighbors
 ---@see GetLabel
 ---@param layer NavLayers
