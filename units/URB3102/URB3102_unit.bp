@@ -141,7 +141,7 @@ UnitBlueprint {
     },
     Intel = {
         ShowIntelOnSelect = true,
-        SonarRadius = 115,
+        SonarRadius = 130,
         VisionRadius = 20,
     },
     Interface = {
