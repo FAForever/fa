@@ -495,7 +495,7 @@ keyActions = {
         category = 'ui', order = 59,},
     ['Kill_Selected_Units'] = {action = 'UI_Lua import("/lua/ui/game/confirmunitdestroy.lua").ConfirmUnitDestruction(true)',
         category = 'orders', order = 60,},
-    ['Kill_All'] = {action = 'KillAll',
+    ['Kill_All'] = {action = 'UI_Lua import("/lua/ui/game/confirmunitdestroy.lua").ConfirmUnitDestruction(true, true)',
         category = 'orders', order = 61,},
     ['Show_Bandwidth_Usage'] = {action = 'ren_ShowBandwidthUsage',
         category = 'ui', order = 62,},
