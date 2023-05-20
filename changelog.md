@@ -5,9 +5,26 @@ Some sections of the changelog are available in other languages such as [French]
 
 ## Balance
 
-- 
+- (#4796) Air Staging Facility
+    When they were moved from tech 2 to tech 1 their build time was not reduced accordingly. The build time is now reduced from 450 to 350. For a tech 1 engineer, it takes 70 seconds to build.
 
+- (#4442, #4938) Claws of Galactic Colossus
+    Previously the claws would instantaneously destroy the unit upon arrival. This matched the old behavior, but with the bug fixes of the claws it was only slightly too strong.
 
+    A unit now receives 730 damage per second upon arriving at the claw. Combining both claws and the beam the colossus has a maximum damage per second of 2460, which matches the old situation.
+
+- (#3918) Chrono Dampener
+    The chrono dampener received several buffs over the past year. With this patch we nerf it by changing how the Chrono Dampener behaves.
+
+    The old behavior applies the same stun on all units over a large radius every 5.0 seconds. The stun duration was 3.5 seconds.
+
+    The new behavior applies a diminishing stun based on the distance of the unit to the ACU over a large radius every 5.0 seconds. The stun is applied in slices of 0.4 seconds. There are 10 slices. Units that are on top of the ACU receive all slices, and are therefore stunned for 4.0 seconds. Units at the outer edge of the radius receive only a single slice and are therefore stunned for 0.4 seconds.
+
+## Contributors
+
+- Jip (#4442, #4938, #3918)
+- SpikeyNoob (#4442, #4938, #3918)
+- Basilisk3 (#4796)
 
 # Game version 3756 (18th of March, 2023)
 
