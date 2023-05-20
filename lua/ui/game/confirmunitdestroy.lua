@@ -15,13 +15,9 @@ function ConfirmUnitDestruction(instant, allUnits)
 
         CreateAnnouncement('<LOC confirm_0001>You cannot self destruct during an operation!')
     else
-        SimCallback({ Func = "GiveResourcesToPlayer",
-            Args = { From = GetFocusArmy(), To = GetFocusArmy(), Mass = 0, Energy = 0, Msg = {
-                Chat = true,
-                sender = GetFocusArmy(),
-                to = 'allies',
-                text = 'bob',
-            } }, }, true)
+        msg = { to = 0, text = string.format('boo') }
+        SimCallback({ Func = "GiveResourcesToPlayer", Args = { From = 0, To = 0, Mass = 0, Energy = 0, Sender = -1,
+            Msg = msg }, }, true)
         SimCallback({ Func = 'ToggleSelfDestruct',
             Args = { owner = GetFocusArmy(), noDelay = instant, allUnits = allUnits } }, true)
     end
