@@ -138,7 +138,7 @@ ADFTractorClaw = ClassWeapon(Weapon) {
     ---@param self ADFTractorClaw
     ---@param blip Blip | Unit
     ---@return Blip | Unit | false
-        GetUnitBehindTarget = function(self, blip)
+    GetUnitBehindTarget = function(self, blip)
         if IsUnit(blip) then
             -- return the unit
             return blip
@@ -213,15 +213,25 @@ ADFTractorClaw = ClassWeapon(Weapon) {
             slider:SetSpeed(velocity)
             slider:SetGoal(0, 0, 0)
 
-            trash:Add(CreateRotator(target, 0, 'x', nil, 0, 15 + Random(0, 45), 20 + Random(0, 80)))
-            trash:Add(CreateRotator(target, 0, 'y', nil, 0, 15 + Random(0, 15), 20 + Random(0, 80)))
-            trash:Add(CreateRotator(target, 0, 'z', nil, 0, 15 + Random(0, 45), 20 + Random(0, 80)))
+            local rotatorA = CreateRotator(target, 0, 'x', nil, 0, 15 + Random(0, 45), 20 + Random(0, 80))
+            trash:Add(rotatorA)
+
+            local rotatorB = CreateRotator(target, 0, 'y', nil, 0, 15 + Random(0, 15), 20 + Random(0, 80))
+            trash:Add(rotatorB)
+
+            local rotatorC = CreateRotator(target, 0, 'z', nil, 0, 15 + Random(0, 45), 20 + Random(0, 80))
+            trash:Add(rotatorC)
 
             WaitTicks(1)
             WaitFor(slider)
 
             -- we're at the arm, do destruction effects
             if (not IsDestroyed(target)) and (not IsDestroyed(unit)) and (not IsDestroyed(self)) then
+
+                -- stop rotating
+                rotatorA:SetGoal(0)
+                rotatorB:SetGoal(0)
+                rotatorC:SetGoal(0)
 
                 -- create crush effect
                 for k, effect in self.CrushFx do
@@ -232,11 +242,9 @@ ADFTractorClaw = ClassWeapon(Weapon) {
                 CreateLightParticle(unit, muzzle, self.Army, 1, 4, 'glow_02', 'ramp_blue_16')
                 WaitTicks(1)
 
-                if not IsDestroyed(unit) then 
-                    
+                if not IsDestroyed(unit) then
 
-                    target.CanTakeDamage = true
-                    while not IsDestroyed(target) and not IsDestroyed(unit) and target:GetHealth() >= 730 do
+                    while not IsDestroyed(target) and not IsDestroyed(unit) and not unit.Dead and target:GetHealth() >= 730 do
                         Damage(unit, bonePosition, target, 729, "Normal")
                         Explosion.CreateScalableUnitExplosion(target, 1, true)
                         WaitTicks(11)
@@ -249,15 +257,15 @@ ADFTractorClaw = ClassWeapon(Weapon) {
                     unit:DetachAll(muzzle)
                     slider:Destroy()
 
-                    -- turn off any shields
-                    if target.MyShield then
-                        target.MyShield:TurnOff()
-                    end
-
                     -- create thread to take into account the fall
-                    self:ResetTarget()
-                    self:ForkThread(self.TargetFallThread, target, trash, muzzle)
-                else 
+                    if not IsDestroyed(self) then
+                        self:ResetTarget()
+                        self:ForkThread(self.TargetFallThread, target, trash, muzzle)
+                    else
+                        self:MakeVulnerable(target)
+                        trash:Destroy()
+                    end
+                else
                     self:MakeVulnerable(target)
                     trash:Destroy()
                 end
@@ -318,7 +326,6 @@ ADFTractorClaw = ClassWeapon(Weapon) {
             Warp(projectile, target:GetPosition(), target:GetOrientation())
             projectile.OnImpact = function(projectile)
                 if not IsDestroyed(target) then
-                    target.CanTakeDamage = true
                     target:Kill()
 
                     CreateLightParticle(target, 0, self.Army, 4, 2, 'glow_02', 'ramp_blue_16')
@@ -346,8 +353,6 @@ ADFTractorClaw = ClassWeapon(Weapon) {
     MakeImmune = function (self, target)
         if not IsDestroyed(target) then
             target:SetDoNotTarget(true)
-            target.CanTakeDamage = false
-            target.DisallowCollisions = true
         end
     end,
 
@@ -356,8 +361,6 @@ ADFTractorClaw = ClassWeapon(Weapon) {
     MakeVulnerable = function (self, target)
         if not IsDestroyed(target) then
             target:SetDoNotTarget(false)
-            target.CanTakeDamage = true
-            target.DisallowCollisions = false
             target.Tractored = nil
         end
     end,
