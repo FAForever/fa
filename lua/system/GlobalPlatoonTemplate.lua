@@ -33,6 +33,7 @@
 ---@alias PlatoonTemplateSpec PlatoonTemplatePlanSpec | PlatoonTemplateFactionalSpec
 
 -- Global list of all buffs found in the system.
+---@type table<string, PlatoonTemplateSpec>
 PlatoonTemplates = {}
 
 --- Register a platoon template, or override an existing platoon template
