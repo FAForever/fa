@@ -1,21 +1,17 @@
---****************************************************************************
---**
---**  File     :  /cdimage/units/ZEB9602/ZEB9602_script.lua
---**  Author(s):  John Comes, David Tomandl
---**
---**  Summary  :  UEF T3 Air Factory Script
---**
---**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
---****************************************************************************
-
+-- File     :  /cdimage/units/ZEB9602/ZEB9602_script.lua
+-- Author(s):  John Comes, David Tomandl
+-- Summary  :  UEF T3 Air Factory Script
+-- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+-------------------------------------------------------------------
 local TAirFactoryUnit = import("/lua/terranunits.lua").TAirFactoryUnit
-
 
 ---@class ZEB9602 : TAirFactoryUnit
 ZEB9602 = ClassUnit(TAirFactoryUnit) {
 
     StartArmsMoving = function(self)
         TAirFactoryUnit.StartArmsMoving(self)
+
+
         if not self.ArmSlider1 then
             self.ArmSlider1 = CreateSlider(self, 'Arm01')
             self.Trash:Add(self.ArmSlider1)
@@ -63,43 +59,6 @@ ZEB9602 = ClassUnit(TAirFactoryUnit) {
         self.ArmSlider1:SetSpeed(40)
         self.ArmSlider2:SetSpeed(40)
         self.ArmSlider3:SetSpeed(40)
-    end,
-
---Overwrite FinishBuildThread to speed up platform lowering rate
-
-    FinishBuildThread = function(self, unitBeingBuilt, order)
-        self:SetBusy(true)
-        self:SetBlockCommandQueue(true)
-        local bp = self:GetBlueprint()
-        local bpAnim = bp.Display.AnimationFinishBuildLand
-        if bpAnim and EntityCategoryContains(categories.LAND, unitBeingBuilt) then
-            self.RollOffAnim = CreateAnimator(self):PlayAnim(bpAnim):SetRate(15)        --Change: SetRate(4)
-            self.Trash:Add(self.RollOffAnim)
-            WaitTicks(1)
-            WaitFor(self.RollOffAnim)
-        end
-        if unitBeingBuilt and not unitBeingBuilt.Dead then
-            unitBeingBuilt:DetachFrom(true)
-        end
-        self:DetachAll(bp.Display.BuildAttachBone or 0)
-        self:DestroyBuildRotator()
-        if order != 'Upgrade' then
-            ChangeState(self, self.RollingOffState)
-        else
-            self:SetBusy(false)
-            self:SetBlockCommandQueue(false)
-        end
-    end,
-
---Overwrite PlayFxRollOffEnd to speed up platform raising rate
-
-    PlayFxRollOffEnd = function(self)
-        if self.RollOffAnim then
-            self.RollOffAnim:SetRate(15)                                            --Change: SetRate(-4)
-            WaitFor(self.RollOffAnim)
-            self.RollOffAnim:Destroy()
-            self.RollOffAnim = nil
-        end
     end,
 }
 
