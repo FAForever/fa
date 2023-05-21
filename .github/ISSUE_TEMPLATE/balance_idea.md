@@ -2,7 +2,7 @@
 name: Balance idea
 about: Create a balance idea
 title: 'Balance idea: '
-labels: 'status: balance idea'
+labels: 'area: balance idea, area: balance'
 assignees: ''
 ---
 
