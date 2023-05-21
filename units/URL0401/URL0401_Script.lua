@@ -80,11 +80,13 @@ URL0401 = ClassUnit(CLandUnit) {
 
                 if self.losttarget or self.initialaim then
                     local dirvector = {}
+                    dirvector.x, dirvector.y, dirvector.z = self.unit:GetBoneDirection('Turret_Aim_Barrel')
                     local basedirvector = {}
+                    basedirvector.x, basedirvector.y, basedirvector.z = self.unit:GetBoneDirection('Turret_Aim')
+
                     local basediftoaim = Util.GetAngleInBetween(dirvector, basedirvector)
 
-                    dirvector.x, dirvector.y, dirvector.z = self.unit:GetBoneDirection('Turret_Aim_Barrel')
-                    basedirvector.x, basedirvector.y, basedirvector.z = self.unit:GetBoneDirection('Turret_Aim')
+
                     self.pitchdif = self.basediftorest - basediftoaim
 
                     for k, v in barrelBones do

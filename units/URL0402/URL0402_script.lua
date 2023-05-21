@@ -20,6 +20,7 @@ local CANTorpedoLauncherWeapon = CybranWeaponsFile.CANTorpedoLauncherWeapon
 local Entity = import("/lua/sim/entity.lua").Entity
 
 ---@class URL0402 : CWalkingLandUnit
+---@field AmbientExhaustEffectsBag TrashBag
 URL0402 = ClassUnit(CWalkingLandUnit) {
     WalkingAnimRate = 1.2,
 
@@ -32,17 +33,22 @@ URL0402 = ClassUnit(CWalkingLandUnit) {
         Torpedo = ClassWeapon(CANTorpedoLauncherWeapon) {},
     },
 
+    ---@param self URL0402
     OnCreate = function(self)
         CWalkingLandUnit.OnCreate(self)
         self.AmbientExhaustEffectsBag = self.AmbientExhaustEffectsBag or TrashBag()
         self.Trash:Add(self.AmbientExhaustEffectsBag)
     end,
 
+    ---@param self URL0402
     DestroyAllTrashBags = function(self)
         CWalkingLandUnit.DestroyAllTrashBags(self)
         self.AmbientExhaustEffectsBag:Destroy()
     end,
 
+    ---@param self URL0402
+    ---@param builder Unit
+    ---@param layer Layer
     OnStartBeingBuilt = function(self, builder, layer)
         CWalkingLandUnit.OnStartBeingBuilt(self, builder, layer)
         if not self.AnimationManipulator then
@@ -52,6 +58,9 @@ URL0402 = ClassUnit(CWalkingLandUnit) {
         self.AnimationManipulator:PlayAnim(self.Blueprint.Display.AnimationActivate, false):SetRate(0)
     end,
 
+    ---@param self URL0402
+    ---@param builder Unit
+    ---@param layer Layer
     OnStopBeingBuilt = function(self, builder, layer)
         CWalkingLandUnit.OnStopBeingBuilt(self, builder, layer)
         self:CreateUnitAmbientEffect(self.Layer)
@@ -68,6 +77,9 @@ URL0402 = ClassUnit(CWalkingLandUnit) {
         self:SetMaintenanceConsumptionActive()
     end,
 
+    ---@param self URL0402
+    ---@param new Layer
+    ---@param old Layer
     OnLayerChange = function(self, new, old)
         CWalkingLandUnit.OnLayerChange(self, new, old)
         self:CreateUnitAmbientEffect(new)
@@ -95,7 +107,11 @@ URL0402 = ClassUnit(CWalkingLandUnit) {
         '/effects/emitters/underwater_vent_bubbles_02_emit.bp',
     },
 
+    ---@param self URL0402
+    ---@param layer Layer
     CreateUnitAmbientEffect = function(self, layer)
+        LOG("CreateUnitAmbientEffect")
+        LOG(layer)
         if self:GetFractionComplete() ~= 1 then
             return
         end
@@ -103,7 +119,7 @@ URL0402 = ClassUnit(CWalkingLandUnit) {
         self.AmbientExhaustEffectsBag = self.AmbientExhaustEffectsBag or TrashBag()
         self.AmbientExhaustEffectsBag:Destroy()
         if layer == 'Land' then
-            self.AmbientEffectThread = self.Trash:Add(ForkThread(self.UnitLandAmbientEffectThread, self))
+            self.AmbientEffectThread = self.AmbientExhaustEffectsBag:Add(ForkThread(self.UnitLandAmbientEffectThread, self))
         elseif layer == 'Seabed' then
             local army = self.Army
             for _, vE in self.AmbientSeabedExhaustEffects do
@@ -114,6 +130,7 @@ URL0402 = ClassUnit(CWalkingLandUnit) {
         end
     end,
 
+    ---@param self URL0402
     UnitLandAmbientEffectThread = function(self)
         while not self.Dead do
             local army = self.Army
@@ -138,22 +155,6 @@ URL0402 = ClassUnit(CWalkingLandUnit) {
     CreateDamageEffects = function(self, bone, army)
         for k, v in EffectTemplate.DamageFireSmoke01 do
             CreateAttachedEmitter(self, bone, army, v):ScaleEmitter(1.5)
-        end
-    end,
-
-    CreateDeathExplosionDustRing = function(self)
-        local blanketSides = 18
-        local blanketAngle = (2 * math.pi) / blanketSides
-        local blanketStrength = 1
-        local blanketVelocity = 2.8
-
-        for i = 0, (blanketSides - 1) do
-            local blanketX = math.sin(i * blanketAngle)
-            local blanketZ = math.cos(i * blanketAngle)
-
-            local Blanketparts = self:CreateProjectile('/effects/entities/DestructionDust01/DestructionDust01_proj.bp',
-                blanketX, 1.5, blanketZ + 4, blanketX, 0, blanketZ)
-                :SetVelocity(blanketVelocity):SetAcceleration(-0.3)
         end
     end,
 
@@ -200,17 +201,17 @@ URL0402 = ClassUnit(CWalkingLandUnit) {
         self:CreateExplosionDebris(army)
         self:CreateExplosionDebris(army)
 
-        WaitTicks(11)
+        WaitTicks(10)
 
         CreateDeathExplosion(self, 'Center_Turret', 1.5)
         self:CreateDamageEffects('Center_Turret_B01', army)
         self:CreateDamageEffects('Center_Turret_Barrel', army)
 
-        WaitTicks(11)
+        WaitTicks(10)
         self:CreateFirePlumes(army, { 'Right_Leg01_B01', 'Right_Leg03_B01', 'Left_Leg03_B01', }, 0.5)
-        WaitTicks(4)
+        WaitTicks(3)
         self:CreateDeathExplosionDustRing()
-        WaitTicks(5)
+        WaitTicks(4)
 
         self:ShakeCamera(50, 5, 0, 1)
         CreateDeathExplosion(self, 'Left_Turret_Muzzle', 1)
@@ -244,7 +245,7 @@ URL0402 = ClassUnit(CWalkingLandUnit) {
         end
 
         DamageRing(self, { x, y, z }, 0.1, 3, 1, 'Force', true)
-        WaitTicks(6)
+        WaitTicks(5)
         CreateDeathExplosion(self, 'Center_Turret', 2)
 
         -- Finish up force ring to push trees
@@ -255,17 +256,17 @@ URL0402 = ClassUnit(CWalkingLandUnit) {
         CreateDeathExplosion(self, 'Left_Projectile01', 2)
         self:CreateFirePlumes(army, { 'Left_Projectile01' }, -1)
         self:CreateDamageEffects('Right_Turret', army)
-        WaitTicks(6)
+        WaitTicks(5)
 
         CreateDeathExplosion(self, 'Left_Leg0' .. Random(1, 3) .. '_B0' .. Random(1, 3), 0.25)
         self:CreateDamageEffects('Right_Leg01_B03', army)
-        WaitTicks(6)
+        WaitTicks(5)
         CreateDeathExplosion(self, 'Left_Turret_Muzzle', 1)
         self:CreateExplosionDebris(army)
 
         CreateDeathExplosion(self, 'Right_Leg0' .. Random(1, 3) .. '_B0' .. Random(1, 3), 0.25)
         self:CreateDamageEffects('Right_Projectile0' .. Random(1, 2), army)
-        WaitTicks(6)
+        WaitTicks(5)
 
         CreateDeathExplosion(self, 'Left_Leg0' .. Random(1, 3) .. '_B0' .. Random(1, 3), 0.25)
         CreateDeathExplosion(self, 'Left_Projectile01', 2)
@@ -273,6 +274,11 @@ URL0402 = ClassUnit(CWalkingLandUnit) {
 
         self:CreateWreckage(0.1)
         self:Destroy()
+    end,
+
+    ---@deprecated
+    ---@param self URL0402
+    CreateDeathExplosionDustRing = function(self)
     end,
 }
 

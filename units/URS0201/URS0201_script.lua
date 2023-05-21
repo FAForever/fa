@@ -66,18 +66,19 @@ URS0201 = ClassUnit(CSeaUnit) {
             if self.AT1 then
                 self.AT1:Destroy()
             end
-            self.AT1 = self.Trash:Add(ForkThread(self.TransformThread, new == 'Land', self))
+            self.AT1 = self.Trash:Add(ForkThread(self.TransformThread, self, new == 'Land', self))
         end
     end,
 
     TransformThread = function(self, land)
         local bp = self.Blueprint
         local scale = bp.Display.UniformScale or 1
-        local animManip = self.AnimManip
         local WaitFor = WaitFor
 
+        local animManip = self.AnimManip
         if not animManip then
             animManip = CreateAnimator(self)
+            self.AnimManip = animManip
         end
 
         if land then
