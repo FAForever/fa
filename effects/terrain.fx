@@ -753,18 +753,18 @@ float4 TerrainNormalsPS( VS_OUTPUT inV ) : COLOR
 
 float4 TerrainNormalsXP( VS_OUTPUT pixel ) : COLOR
 {
-    float4 mask0 = tex2D(UtilitySamplerA,pixel.mTexWT*TerrainScale);
-    float4 mask1 = tex2D(UtilitySamplerB,pixel.mTexWT*TerrainScale);
+    float4 mask0 = saturate(tex2D(UtilitySamplerA,pixel.mTexWT*TerrainScale)* 2 - 1);
+    float4 mask1 = saturate(tex2D(UtilitySamplerB,pixel.mTexWT*TerrainScale)* 2 - 1);
 
-    float4 lowerNormal = tex2D(LowerNormalSampler,pixel.mTexWT*TerrainScale*LowerNormalTile)*2-1;
-    float4 stratum0Normal = tex2D(Stratum0NormalSampler,pixel.mTexWT*TerrainScale*Stratum0NormalTile)*2-1;
-    float4 stratum1Normal = tex2D(Stratum1NormalSampler,pixel.mTexWT*TerrainScale*Stratum1NormalTile)*2-1;
-    float4 stratum2Normal = tex2D(Stratum2NormalSampler,pixel.mTexWT*TerrainScale*Stratum2NormalTile)*2-1;
-    float4 stratum3Normal = tex2D(Stratum3NormalSampler,pixel.mTexWT*TerrainScale*Stratum3NormalTile)*2-1;
-    float4 stratum4Normal = tex2D(Stratum4NormalSampler,pixel.mTexWT*TerrainScale*Stratum4NormalTile)*2-1;
-    float4 stratum5Normal = tex2D(Stratum5NormalSampler,pixel.mTexWT*TerrainScale*Stratum5NormalTile)*2-1;
-    float4 stratum6Normal = tex2D(Stratum6NormalSampler,pixel.mTexWT*TerrainScale*Stratum6NormalTile)*2-1;
-    float4 stratum7Normal = tex2D(Stratum7NormalSampler,pixel.mTexWT*TerrainScale*Stratum7NormalTile)*2-1;
+    float4 lowerNormal = normalize(tex2D(LowerNormalSampler,pixel.mTexWT*TerrainScale*LowerNormalTile)*2-1);
+    float4 stratum0Normal = normalize(tex2D(Stratum0NormalSampler,pixel.mTexWT*TerrainScale*Stratum0NormalTile)*2-1);
+    float4 stratum1Normal = normalize(tex2D(Stratum1NormalSampler,pixel.mTexWT*TerrainScale*Stratum1NormalTile)*2-1);
+    float4 stratum2Normal = normalize(tex2D(Stratum2NormalSampler,pixel.mTexWT*TerrainScale*Stratum2NormalTile)*2-1);
+    float4 stratum3Normal = normalize(tex2D(Stratum3NormalSampler,pixel.mTexWT*TerrainScale*Stratum3NormalTile)*2-1);
+    float4 stratum4Normal = normalize(tex2D(Stratum4NormalSampler,pixel.mTexWT*TerrainScale*Stratum4NormalTile)*2-1);
+    float4 stratum5Normal = normalize(tex2D(Stratum5NormalSampler,pixel.mTexWT*TerrainScale*Stratum5NormalTile)*2-1);
+    float4 stratum6Normal = normalize(tex2D(Stratum6NormalSampler,pixel.mTexWT*TerrainScale*Stratum6NormalTile)*2-1);
+    float4 stratum7Normal = normalize(tex2D(Stratum7NormalSampler,pixel.mTexWT*TerrainScale*Stratum7NormalTile)*2-1);
 
     float4 normal = lowerNormal;
     normal = lerp(normal,stratum0Normal,mask0.x);
