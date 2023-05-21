@@ -731,14 +731,14 @@ float4 TerrainSkirtPS( VS_OUTPUT inV ) : COLOR
 
 float4 TerrainNormalsPS( VS_OUTPUT inV ) : COLOR
 {
-
     // sample all the textures we'll need
-    float4 mask = tex2D( UtilitySamplerA, inV.mTexWT * TerrainScale);
-    float4 lowerNormal = tex2D( LowerNormalSampler, inV.mTexWT  * TerrainScale * LowerNormalTile ) * 2 - 1;
-    float4 stratum0Normal = tex2D( Stratum0NormalSampler, inV.mTexWT  * TerrainScale * Stratum0NormalTile ) * 2 - 1;
-    float4 stratum1Normal = tex2D( Stratum1NormalSampler, inV.mTexWT  * TerrainScale * Stratum1NormalTile ) * 2 - 1;
-    float4 stratum2Normal = tex2D( Stratum2NormalSampler, inV.mTexWT  * TerrainScale * Stratum2NormalTile ) * 2 - 1;
-    float4 stratum3Normal = tex2D( Stratum3NormalSampler, inV.mTexWT  * TerrainScale * Stratum3NormalTile ) * 2 - 1;
+    float4 mask = saturate(tex2D( UtilitySamplerA, inV.mTexWT * TerrainScale) * 2 - 1);
+
+    float4 lowerNormal = normalize(tex2D( LowerNormalSampler, inV.mTexWT  * TerrainScale * LowerNormalTile ) * 2 - 1);
+    float4 stratum0Normal = normalize(tex2D( Stratum0NormalSampler, inV.mTexWT  * TerrainScale * Stratum0NormalTile ) * 2 - 1);
+    float4 stratum1Normal = normalize(tex2D( Stratum1NormalSampler, inV.mTexWT  * TerrainScale * Stratum1NormalTile ) * 2 - 1);
+    float4 stratum2Normal = normalize(tex2D( Stratum2NormalSampler, inV.mTexWT  * TerrainScale * Stratum2NormalTile ) * 2 - 1);
+    float4 stratum3Normal = normalize(tex2D( Stratum3NormalSampler, inV.mTexWT  * TerrainScale * Stratum3NormalTile ) * 2 - 1);
 
     // blend all normals together
     float4 normal = lowerNormal;
