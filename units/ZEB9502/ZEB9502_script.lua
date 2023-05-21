@@ -15,10 +15,12 @@ ZEB9502 = ClassUnit(TAirFactoryUnit) {
         TAirFactoryUnit.StartArmsMoving(self)
         if not arm1 then
             arm1 = CreateSlider(self, 'Arm01')
+            self.ArmSlider1 = arm1
             trash:Add(arm1)
         end
         if not arm2 then
             arm2 = CreateSlider(self, 'Arm02')
+            self.ArmSlider2 = arm2
             trash:Add(arm2)
         end
     end,

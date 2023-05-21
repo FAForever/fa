@@ -21,10 +21,12 @@ ZEB9503 = ClassUnit(TSeaFactoryUnit) {
 
         if not arm1 then
             arm1 = CreateSlider(self, 'Right_Arm')
+            self.ArmSlider1 = arm1
             Trash:Add(arm1)
         end
         if not arm2 then
             arm2 = CreateSlider(self, 'Center_Arm')
+            self.ArmSlider2 = arm2
             Trash:Add(arm2)
         end
     end,

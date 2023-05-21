@@ -60,39 +60,6 @@ ZEB9602 = ClassUnit(TAirFactoryUnit) {
         self.ArmSlider2:SetSpeed(40)
         self.ArmSlider3:SetSpeed(40)
     end,
-
-    FinishBuildThread = function(self, unitBeingBuilt, order)
-        self:SetBusy(true)
-        self:SetBlockCommandQueue(true)
-        local bp = self.Blueprint
-        local bpAnim = bp.Display.AnimationFinishBuildLand
-        if bpAnim and EntityCategoryContains(categories.LAND, unitBeingBuilt) then
-            self.RollOffAnim = CreateAnimator(self):PlayAnim(bpAnim):SetRate(15)
-            self.Trash:Add(self.RollOffAnim)
-            WaitTicks(1)
-            WaitFor(self.RollOffAnim)
-        end
-        if unitBeingBuilt and not unitBeingBuilt.Dead then
-            unitBeingBuilt:DetachFrom(true)
-        end
-        self:DetachAll(bp.Display.BuildAttachBone or 0)
-        self:DestroyBuildRotator()
-        if order != 'Upgrade' then
-            ChangeState(self, self.RollingOffState)
-        else
-            self:SetBusy(false)
-            self:SetBlockCommandQueue(false)
-        end
-    end,
-
-    PlayFxRollOffEnd = function(self)
-        if self.RollOffAnim then
-            self.RollOffAnim:SetRate(15)
-            WaitFor(self.RollOffAnim)
-            self.RollOffAnim:Destroy()
-            self.RollOffAnim = nil
-        end
-    end,
 }
 
 TypeClass = ZEB9602

@@ -40,6 +40,7 @@ XSS0203 = ClassUnit(SSubUnit) {
             local cannonAnim = self.CannonAnim
             if not cannonAnim then
                 cannonAnim = CreateAnimator(self)
+                self.CannonAnim = cannonAnim
                 self.Trash:Add(cannonAnim)
             end
             local bp = self.Blueprint
