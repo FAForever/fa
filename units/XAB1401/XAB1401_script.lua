@@ -28,12 +28,11 @@ XAB1401 = ClassUnit(AStructureUnit) {
         self.BallManip = CreateRotator(self, 'Orb', 'y', nil, 0, 15, 80 + Random(0, 20) * num)
         self.Trash:Add(self.BallManip)
 
-        ChangeState(self, self.ResourceOn)
-        self.Trash:Add(ForkThread(self.ResourceMonitor,self))
-
         for k, v in FxAmbient do
             CreateAttachedEmitter(self, 'Orb', self.Army, v)
         end
+
+        ChangeState(self, self.ResourceOn)
     end,
 
     ResourceOn = State {

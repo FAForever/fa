@@ -9,14 +9,11 @@ local SSQuantumJammerTowerAmbient = import("/lua/effecttemplates.lua").SJammerTo
 XRC1101 = ClassUnit(CCivilianStructureUnit)
 {
     OnCreate = function(self, builder, layer)
+        CCivilianStructureUnit.OnCreate(self)
+
         for k, v in SSQuantumJammerTowerAmbient do
             CreateAttachedEmitter(self, 'Jammer', self.Army, v)
         end
-
-        self.Trash:Add(ForkThread(self.LandBlipThread, self))
-        self.Trash:Add(ForkThread(self.AirBlipThread, self))
-
-        CCivilianStructureUnit.OnCreate(self)
 
         if not self.AnimationManipulator then
             self.AnimationManipulator = CreateAnimator(self)

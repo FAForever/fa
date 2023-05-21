@@ -38,10 +38,12 @@ XRB3301 = ClassUnit(CRadarUnit) {
     end,
 
     OnKilled = function(self, instigator, type, overkillRatio)
+        CRadarUnit.OnKilled(self, instigator, type, overkillRatio)
+
         local curRadius = self:GetIntelRadius('vision')
         local position = self:GetPosition()
         local army = self:GetAIBrain():GetArmyIndex()
-        CRadarUnit.OnKilled(self, instigator, type, overkillRatio)
+
         local spec = {
             X = position[1],
             Z = position[3],
@@ -56,15 +58,16 @@ XRB3301 = ClassUnit(CRadarUnit) {
     VisibleEntityDeathThread = function(entity, curRadius)
         local lifetime = 0
         while lifetime < 30 do
+            LOG("Tick!")
             if curRadius > 1 then
                 curRadius = curRadius - 1
                 if curRadius < 1 then
-                    curRadius = 1
+                    break
                 end
                 entity:SetIntelRadius('vision', curRadius)
             end
-            lifetime = lifetime + 2
-            WaitTicks(2)
+            lifetime = lifetime + 1
+            WaitTicks(1)
         end
         entity:Destroy()
     end,
@@ -90,7 +93,7 @@ XRB3301 = ClassUnit(CRadarUnit) {
 
     ExpandingVision = State {
         Main = function(self)
-            WaitTicks(2)
+            WaitTicks(1)
             while true do
                 if self:GetResourceConsumed() ~= 1 then
                     self.ExpandingVisionEnergyCheck = true
@@ -106,7 +109,7 @@ XRB3301 = ClassUnit(CRadarUnit) {
                         self:SetIntelRadius('vision', curRadius)
                     end
                 end
-                WaitTicks(3)
+                WaitTicks(1)
             end
         end,
     },
@@ -132,7 +135,7 @@ XRB3301 = ClassUnit(CRadarUnit) {
                         self:SetIntelRadius('vision', curRadius)
                     end
                 end
-                WaitTicks(3)
+                WaitTicks(1)
             end
         end,
     },
