@@ -20,7 +20,7 @@ function GetHighestBuilder(aiBrain)
     for k,v in BaseBuilderTemplates do
         if v.FirstBaseFunction then
             local baseVal, baseType = v.FirstBaseFunction(aiBrain)
-            --LOG('*DEBUG: testing ' .. k .. ' - Val ' .. baseVal)
+            -- LOG('*DEBUG: testing ' .. k .. ' - Val ' .. baseVal)
             if baseVal > returnVal then
                 returnVal = baseVal
                 base = k
@@ -50,8 +50,6 @@ function ExecutePlan(aiBrain)
     WaitSeconds(1)
     if not aiBrain.BuilderManagers.MAIN.FactoryManager:HasBuilderList() then
         aiBrain:SetResourceSharing(true)
-        aiBrain:SetupUnderEnergyStatTrigger(0.1)
-        aiBrain:SetupUnderMassStatTrigger(0.1)
         SetupMainBase(aiBrain)
 
         -- Get units out of pool and assign them to the managers

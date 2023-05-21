@@ -183,14 +183,19 @@ function CreateUI(isReplay)
     ConExecute('d3d_WindowsCursor on')
 
     -- tweak networking parameters
-    ConExecute('net_MinResendDelay 100')
-    ConExecute('net_MaxResendDelay 1000')
+    ConExecute('net_MinResendDelay 100')        -- standard value of 100ms
+    ConExecute('net_MaxResendDelay 1000')       -- standard value of 1000ms
 
-    ConExecute('net_MaxSendRate 8192')
-    ConExecute('net_MaxBacklog 8192')
+    ConExecute('net_MaxSendRate 2048')          -- standard value of 1024 bytes
+    ConExecute('net_MaxBacklog 2048')           -- standard value of 1024 bytes
 
-    ConExecute('net_SendDelay 5')
-    ConExecute('net_AckDelay 5')
+    ConExecute('net_SendDelay 5')               -- standard value of 25ms
+    ConExecute('net_AckDelay 5')                -- standard value of 25ms
+
+    -- tweak decal properties
+    ConExecute("ren_ViewError 0.004")           -- standard value of 0.003, the higher the value the less flickering but the less accurate the terrain is      
+    ConExecute("ren_ClipDecalLevel 4")          -- standard value of 2, causes a lot of clipping
+    ConExecute("ren_DecalFadeFraction 0.25")    -- standard value of 0.5, causes decals to suddenly pop into screen
 
     -- enable experimental graphics
     if  Prefs.GetFromCurrentProfile('options.fidelity') >= 2 and
@@ -200,12 +205,10 @@ function CreateUI(isReplay)
             WaitSeconds(1.0)
 
             if Prefs.GetFromCurrentProfile('options.level_of_detail') == 2 then
-                -- allow meshes and effects to be seen from further away
-                ConExecute("cam_SetLOD WorldCamera 0.65")
+                ConExecute("cam_SetLOD WorldCamera 0.70")
             end
 
             if Prefs.GetFromCurrentProfile('options.shadow_quality') == 3 then
-                -- improve shadow LOD and resolution
                 ConExecute("ren_ShadowLOD 1024")
                 ConExecute("ren_ShadowSize 2048")
             end
