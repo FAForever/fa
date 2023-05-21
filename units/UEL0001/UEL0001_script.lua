@@ -67,7 +67,7 @@ UEL0001 = ClassUnit(ACUUnit) {
         self:SetWeaponEnabledByLabel('RightZephyr', true)
         self:SetWeaponEnabledByLabel('TacMissile', false)
         self:SetWeaponEnabledByLabel('TacNukeMissile', false)
-        self.Trash:Add(ForkThread(self.GiveInitialResources))
+        self.Trash:Add(ForkThread(self.GiveInitialResources, self))
     end,
 
     OnStartBuild = function(self, unitBeingBuilt, order)

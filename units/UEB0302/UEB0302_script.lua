@@ -14,8 +14,6 @@ local TAirFactoryUnit = import("/lua/terranunits.lua").TAirFactoryUnit
 ---@class UEB0302 : TAirFactoryUnit
 UEB0302 = ClassUnit(TAirFactoryUnit) {
 
-    RollOffAnimationRate = 12,
-
     StartArmsMoving = function(self)
         TAirFactoryUnit.StartArmsMoving(self)
         if not self.ArmSlider1 then
