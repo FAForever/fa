@@ -1,254 +1,364 @@
---[[ ------------------------------------------------------------------------------------------------------------------
-Mods
+--[[
+----------------------------------------------------------------------------------------------------
+FAF Mods
+----------------------------------------------------------------------------------------------------
 
-All mods must be in subdirectories somewhere under /mods. Each mod has a
-mod_info.lua file which contains various bits of info:
+FAF mods are special kinds of Supreme Commander mods in the FAF vault designed to work within the
+FAF framework. They differ from regular Supreme Commander mods, i.e. those that directly replace
+and hook original .scd files on startup. In a sense, FAF itself is a Supreme Commander mod that
+coordinates the participation of other mods intended to be used inside of it once the game launches.
+In this light, there are certain technical limitations and restrictions that are necessary to be
+able to flexibly support the modding scene, but beyond these basic managerial requirements, they are
+pretty much free to do whatever they like with the game and the FAF framework.
 
-    name = "Happy mod"                          -- Name to use for this mod
-    version = 123                               -- Version number to use for this mod
-    copyright = "Copyright © 2006, Someone"     -- Optional copyright info
+A couple (but not all) of the restrictions include:
+ * If you upload the mod to the vault, you MUST follow the vault rules:
+   https://wiki.faforever.com/en/Vault-Rules
+    * In particular, make sure you own all the content of the mod you are uploading. Require other
+      mods when available to avoid copying others' work.
+ * Mods are not able to modify the lobby or provide game options (since mods are only fully loaded
+   after the game launches).
+ * All of a mod's files are mounted behind the mod directory to avoid conflicts. Outside of lua
+   scripting (which can always hook original and FAF files), this means that files are never
+   replaced (in practice, since the location a resource such as a texture points to can be changed
+   by a lua file, this only really affects shaders, which are accessed by the game engine directly)
+
+
+----------
+Mod info file
+----------
+
+Each mod has a `mod_info.lua` file which contains various bits of info:
+
+    -- Required name to use for this mod. This is what is displayed in the Lobby, after undergoing
+	-- title-casing. Do NOT add version information here - keep this the exactly same when you
+    -- update what you consider to be the same mod as the FAF client will uses this to auto-update
+    -- mods (based on the most recent `uid` - the version number does not matter and is only used
+    -- for display purposes).
+    name = "Happy mod"
+  
+    -- Optional integer version to use for this mod (please only increment) to indicate to humans
+    -- the most current version. Decimals are not supported. If updating the mod, make sure to
+    -- change the `uid` as that is what the FAF client actually uses and leave the name exactly the
+    -- same.
+    version = 4
+
+    -- Optional copyright info. If absent, the mod author is presumed to maintain full ownership of
+    -- the mod. Invisible in-game but shown in the FAF client.
+    copyright = "Copyright © 2023, Someone"
+
+    -- Optional text displayed in the mods manager and FAF client
     description = "A long description of happy mod and why it will make you happy"
-    author = "Joe"                              -- Optional author info
-    url = "http://www.gaspoweredgames.com"      -- Optional URL to anywhere author likes
 
+    -- Required name(s) of author(s). Shows up as `"UNKNOWN"` if left blank. Will be begin to be
+    -- truncated in-game if over 20 characters. Make sure this reflects who is uploading the mod to
+    -- the vault (if applicable) as well as all contributors whose work is present.
+    author = "Joe"
+    
+    -- Optional URL to anywhere author likes. Will show up in the mods manager if valid.
+    url = "https://www.faforever.com"
+    
+    -- Optional URL to anywhere author likes. Will show up in the mods manager if valid.
+    github = "https://github.com/FAForever"
+
+    -- Uniquely identify this mod. This defaults to the mod's name, but that's not a very safe way
+	-- to keep mods differentiated. I'd recommend using a GUID or Guaranteed Unique ID.
+    -- Every new version of a mod should get a new GUID so that mods which rely on the old version
+    -- can select it appropriately, and so that the FAF client can keep track.
+    -- The following webpages allow you to generate a GUID online (as of  April 2023)
+    --   http://www.somacon.com/p113.php
+    --   http://www.famkruithof.net/uuid/uuidgen
     uid = B019FBEE-E411-11DB-AFAE-13D355D89593
-        Uniquely identify this mod. This defaults to the mods name, but that's
-        not a very safe way to keep mods differentiated. I'd recommend using a GUID
-        or Guaranteed Unique ID. Also, every new version of a mod should get a new
-        GUID so that mods which rely on the old version can select it appropriately.
-        This following webpages allow you to generate a guaranteed unique ID on line (as of 4/6/07)
-        http://www.somacon.com/p113.php
-        http://www.famkruithof.net/uuid/uuidgen
 
+    -- Flag for whether to list this mod in the mod manager window, where the player can select it.
+    -- An example where you would set it to false is library mod supplying functions, textures, and
+    -- props for use by other mods. Those mods indicate that they require this one, and it is
+    -- automatically enabled when they are.
     selectable = true
-        Flag for whether to list this mod in the mod manager window, where the
-        player can select it. Examples where you would set it to false are:
 
-        1.  A mod containing just custom maps, along with textures and props used
-            on those maps. The mod will be automatically enabled when one of its
-            maps is used.
-
-        2.  A mod supplying textures and props for use by other mods. Those mods
-            indicate that they require this one, and it is automatically enabled
-            when they are.
-
+    -- Setting enabled to false causes a mod to never be loaded. Provides an easy way to disable a
+    -- mod during development. The default is true.
     enabled = true
-        Setting enabled to false causes a mod to never be loaded. Provides
-        an easy way to disable a mod during development. The default is true.
 
+    -- A simple form of preventing conflicting mods. If a mod has `exclusive`, then no other mod can
+    -- be active. The default is false. Note that this precludes the use of `conflicts`.
     exclusive = false
-        A simple form of preventing conflicting mods. Only one 'exclusive' mod
-        can be active at a time. The default is false. Note that this precludes
-        the use of requires/conflicts
 
+    -- Set to true to indicate that this mod only affects the user interface. If this flag is false
+    -- (the default), all players in a multiplayer game must have it in order for anyone to use it.
+    -- If true, one player can have it active independently of the other players.
     ui_only = false
-        Set true to indicate that this mod only affects the user interface. If
-        this flag is false (the default), all players in a multiplayer game must
-        have it in order for anyone to use it. If true, one player can have it
-        active independently of the other players. (Games on GPGNet may restrict
-        this further.)
 
-        TODO: If ui_only is set true, the mod's files should not even be accessible
-        from within the sim, but we need the VFS stuff implemented properly first.
-
+    -- Path of the icon to use for this mod in the mods manager window. The default is
+    -- `"mod_icon.dds"` and in the same directory as the `mod_info.lua` file.
+    -- Note that this is unrelated to the `mod_icons.lua` file explained below.
     icon = "mod_icon.dds"
-        Name of icon to use for this mod in the mod selection window. The default is
-        mod_icon.dds in the same directory as the mod_info.lua file.
 
+	-- Optionally indicates that this mod only works if another mod is also present. Does not affect
+    -- mod loading order.
+    -- It might be nice if you add a comment after each UID to denote the name of the mod so mere
+    -- mortals can maintain your list :)
     requires = {
-        -- Optionally indicates that this mod only works if another mod is also present.
-        -- It might be nice if you add a comment after each uid to denote the name of the mod
-        -- so mere mortals can maintain your list :)
         "fec58b30-0036-4b9e-9995-fe2d6fe4c6e9",     -- Chris' Whacky Mod
         "18e391bc-67aa-49fb-8a5f-34efec2d1c2c",     -- Jeffs Cool Mod
         "61d2cb50-08ac-46ba-b261-3c3e3372aef0",     -- Teds Dumb Mod
     }
 
-    conflicts = {
-        Indicate any other mods that this mod is known to conflict with; the game
-        will refuse to enable both of them at the same time.
-        Same format as 'requires'.
-    }
-
-    before = {
-        List of other mod names. If this mod happens to be active at the same time
-        as any of the named other mods, it will be applied before them.
-        Same format as 'requires'.
-    }
-
-    after = {
-        List of other mod names. If this mod happens to be active at the same time
-        as any of the named other mods, it will be applied after them. If you do
-        not supply an 'after' list, the 'requires' list will be used in its place.
-        Same format as 'requires'.
-    }
-
+	-- Optional table which will map the required UID's to friendly names so the user of the mod can
+	-- determine what they are missing.
     requiresNames = {
-        -- an optional table which will map the required uids to friendly names so the user of the mod can determine what they are missing
         ["fec58b30-0036-4b9e-9995-fe2d6fe4c6e9"] = "Chris' Whacky Mod v123",
         ["18e391bc-67aa-49fb-8a5f-34efec2d1c2c"] = "Jeff's Cool Mod",
         ["61d2cb50-08ac-46ba-b261-3c3e3372aef0"] = "Ted's Dumb Mod",
     }
+    
+	-- Optionally indicates any other mods that this mod is known to conflict with; the game will
+	-- refuse to enable both of them at the same time. You do not need to add old versions of your
+    -- mod here (unless you'd like to be extra careful); the client determines mods with the same
+    -- name to be the same mod and auto-updates them. Same format as `requires`.
+    conflicts = {
+    }
 
-Fields 'id' and 'location' also get filled in during initialization, to the full
-path to the mod_info file and the directory containing it.
+	-- Optional list of other mod UID's. If this mod happens to be active at the same time as any of
+	-- the named other mods, it will be applied before them. Same format as `requires`.
+    before = {
+    }
 
-
-
-Adding extra maps
-
-   Any extra maps in a mod will automatically show up on the available maps list on
-   the single- and multi-player skirmish screen, as long as they have an appropriate
-   Configuration set up.
-
-   If you select a map from a mod for play, that mod (and any other mods it depends on)
-   will automatically be active for that session. This allows you to define custom
-   units or props just for a particular set of maps.
-
-
- Adding custom units
-
-   If an active mod has any .bp files defining units, they will be automatically
-   included during blueprint loading.
-
-   If a mod contains a blueprint matching the ID of an existing unit (e.g. uel0001)
-   then the mod's blueprint will replace the original. If the "Merge=true" flag is
-   set in the mod blueprint, it will be merged with the original can can override
-   some fields while leaving others intact.
+	-- Optional list of other mod UID's. If this mod happens to be active at the same time as any of
+	-- the named other mods, it will be applied after them. If you do not supply an `after` list,
+	-- the `requires` list will be used in its place (if present). Same format as `requires`.
+    after = {
+    }
 
 
- Balance changes
+`location` also gets filled in before initialization (in case you want to use it for relative paths)
+to the full path to the mod_info file and the directory containing it. It is also set afterwards as
+well, so changing this has no affect.
 
-   There are two ways to make large-scale balance changes.
+There are a couple other fields that a mod can specify - it's best to leave them alone.
 
-   First, you can define one or more .bp files with "Merge=true", that override
-   particular fields for many units. This is how the campaign balance mod works.
+----------
+Adding custom units
+----------
 
-   Second, you can define a function <TODO>, which is called on each blueprint
-   as it is loaded. This function can then manipulate the blueprint in arbitrary
-   ways.
+If an active mod has any .bp files defining units, they will be automatically included during
+blueprint loading.
 
-   First, a mod can simply add a new blueprint file that defines a new blueprint.
-
-   Second, a mod can contain a blueprint with the same ID as an existing blueprint.
-   In this case it will completely override the original blueprint. Note that in
-   order to replace an original non-unit blueprint, the mod must set the "BlueprintId"
-   field to name the blueprint to be replaced. Otherwise the BlueprintId is defaulted
-   off the source file name. (Units don't have this problem because the BlueprintId is
-   shortened and doesn't include the original path).
-
-   Finally, a mod can define a ModBlueprints() function which manipulates the
-   original_blueprints table in arbitrary ways. [How/when exactly is this done?]
+If a mod contains a blueprint matching the ID of an existing unit (e.g. `"uel0001"`) then the mod's
+blueprint will replace the original. If the `Merge = true` flag is set in the mod blueprint, it will
+be merged with the original can can override some fields while leaving others intact.
 
 
- Custom skins
+----------
+Balance changes
+----------
 
-   A mod can add a ??? file to indicate that it contains a custom skin. The skin
-   will automatically be made available on the list of available skins.
-   TODO: need help from CBlackwell to work out and document custom skin system.
+There are two ways to make balance changes.
 
+First, a mod can contain a blueprint with the same ID as an existing blueprint. In this case it will
+completely override the original blueprint. Note that in order to replace an original non-unit
+blueprint, the mod must set the "BlueprintId" field to name the blueprint to be replaced. Otherwise,
+the BlueprintId is defaulted off the source file name. (Units don't have this problem because the
+BlueprintId is shortened and doesn't include the original path). Setting `Merge = true` while doing
+this will make it so that only the new fields in the modded blueprint are overridden, and the rest
+from the original blueprint are kept (possibly also changed from other mods).
 
- Other changes
+Second, a mod can hook the `/lua/system/Blueprints.lua` file and override the `ModBlueprints` to
+modify existing blueprints in an organized manner. Be sure to call the old function like this, so
+that other mods' changes aren't overridden:
 
-   A mod can contain a 'shadow' folder, which contains files matching the names
-   and directory structure of the game's top-level folder. These files will REPLACE
-   the game's files on all lookups. You can use this mechanism to replace entire
-   textures, audio files, scripts, blueprints, or any other game data. Note that
-   when a game file is shadowed, the original file becomes completely inaccessible.
-   This is ok for textures and such but usually not what you want for scripts.
-
-   A mod can also contain a 'hook' folder, which contains files named the same way,
-   matching the structure of the game's main data folder. After any script file is
-   loaded, we check in the active mods to see if they define a hook of the same
-   name; if so, we run the hook in the same environment as the original script. This
-   allows hooks to tweak or replace individual functions, classes, or other data
-   while still using the original code.
-
-
- Mod ordering
-
-   It often matters in what order mods take effect. For example, perhaps two mods
-   both adjust the tuning of some units, and they have a few in common. The mod
-   that is applied last will take precedence.
-
-   By default, mods are applied in simple alphabetical order. However, you can
-   get more control by listing other mods in the 'before' and 'after' sections.
-
-   If two mods specify an inconsistent ordering (e.g. they both ask to be before
-   the other), SC will choose an arbitrary ordering and log a warning, but both
-   mods will still be active.
+    -- introduce new scope to gaurentee our local variables don't overwrite anything in another mod
+    do
+        local oldModBlueprints = ModBlueprints
+        function ModBlueprints(all_bps)
+			-- hook the old function
+			oldModBlueprints(all_bps)
+			
+			-- now we do our modifications
+			for _, unitBp in all_bps.Unit do
+				-- some systematic change to each `unitBp`
+			end
+		end
+	end
 
 
-Mod initialization issues
+----------
+Custom skins
+----------
 
-    There are three general sorts of mods:
-        Front end mods [do not work at the moment]
-        Ingame UI mods    [ui_only flag set]
-        Game mods         [all others]
+UI skins are pulled from the `/lua/skins/skins.lua#skins` table.
+Until a proper system is in place, call this when your mods loads:
 
-    The mod manager (whether run from the front end or from the lobby) loads this module
-    to get a list of all mods in the system, so the user can select and deselect mods.
-    Those changes are stored in the player's preferences.
+   import("/lua/skins/skins.lua").skins.<new skin name> = <skin table>
 
-    When launching a game, the lobby scripts call this module to get the list of active
-    Game mods to pass into the simulation (in gameinfo.Options.Mods). The simulation just
-    uses whatever list it was given.
+Take a look at the skins defined there for an idea of the fields you can set. When a field is not
+found, it will simply use whatever field is in the `default` table.
 
-    The ingame UI calls this module to get a list of ingame UI mods to apply directly from
-    preferences.
-'
--------------------------------------------------------------------------------------------------------------------- ]]
+You can proceed to cycle between faction skins in-game as usual with `Alt+Left` and `Alt+Right` (by
+default). Note that new layouts are not supported, and even the existing ones do not work properly.
 
--- we should really stick `optiondir` in here, so it isn't hardcoded to `mapname .. 'options.lua'`
+
+----------
+Script Hooking
+----------
+
+A mod can also contain a `/hook` folder, which contains files named the same way, matching the
+structure of the game's main data folder. After any script file is loaded, we check in the active
+mods to see if they define a hook of the same name; if so, we run the hook in the same environment
+as the original script. This allows hooks to tweak or replace individual functions, classes, or
+other data while still using the rest of the original code in the file.
+
+
+----------
+Strategic Icon Replacement
+----------
+
+A UI mod can contain a `mod_icons.lua` file to specify strategic icons to replace for particular
+units. This is one of the few times a UI mod is allowed to modify things in the simulation
+(blueprints in this case), and as such it is done in a controlled manner (for example, the
+environment of the file is heavily restricted).
+
+Either a function `ScriptedIconAssignments` or a table `UnitIconAssignments` can be define (or both;
+the script is applied before the manual unit icon assignment table is). The table is a list of
+units-icons pairs to replace in the form `{BlueprintID = "id", IconSet = "filename"}` (see below).
+If defined, the function returns a table with the same format. 
+
+    ---@param units UnitBlueprint[] reference copy of the unit blueprints (modifying has no affect)
+    ---@param projectiles ProjectileBlueprint[] for reference only; projectile strategic icons cannot be replaced
+    ---@param icons FileName[] list of icons found in your mod's `/custom-strategic-icons` folder
+    ---@return BlueprintIconAssignment[] list of 
+    function ScriptedIconAssignments(units, projectiles, icons)
+    --  ...
+    --  return UnitIconAssignment
+    end
+
+    ---@type BlueprintIconAssignment[]
+    UnitIconAssignments = {
+    --  {
+    --      BlueprintId = "", -- blueprint id to target
+    --      IconSet = "",     -- filename to set `StrategicIconName` to
+    --      TypeId = "",      -- unused
+    --  },
+    --  ...
+    }
+
+
+----------
+Mod ordering
+----------
+
+It often matters in what order mods take effect. For example, perhaps two mods both adjust the
+tuning of some units, and they have a few in common. The mod that is applied last will have the last
+say in what happens to that unit.
+
+Mods are applied in an arbitrary order. However, you can get more control by listing other mods in
+the `before` and `after` sections of your mod info file. Requiring other mods does not affect order,
+only presence.
+
+If any mods specify an inconsistent ordering (e.g. they both ask to be before the other or form a
+cycle), the mod loader will abort the dependency system entirely (including the dependencies of
+other well-specified mods that don't have any problems) and all active mods will be loaded in an
+arbitrary ordering with a warning logged. No mods are disabled when this happens.
+
+
+----------
+Mod initialization
+----------
+
+There are three general sorts of mods:
+
+    Front end mods   [`mountpoints` set] - used internally by FAF, applied before the game launches
+    Game mods        [`ui_only` not set] - all players in the game will have the same ones
+    UI mods          [`ui_only` flag set] - each user can have a different set applied to their UI
+
+The mod manager (whether run from the front end or from the lobby) loads this module to get a list
+of all mods in the system, so the user can select and deselect mods. This selection is stored in the
+player's preferences.
+
+When launching a game, the lobby scripts call this module to get the list of active Game mods to
+pass into the simulation (in `gameinfo.Options.Mods`). The simulation just uses whatever list it was
+given.
+
+The ingame UI calls this module to get a list of ingame UI mods to apply directly from preferences.
+
+----------------------------------------------------------------------------------------------------
+]]
+
+
+---@alias ModType
+---| "BLACKLISTED"
+---| "GAME"
+---| "LOCAL"
+---| "NO_DEPENDENCY"
+---| "UI"
+
+---@alias ModSort ModType | 'X'
+
+
+-- we should really stick in an option for the `/custom-strategic-icons` folder here
 
 ---@class ModInfo
----@field location string    defaults to `Dirname(filename)`
----@field name string        defaults to `filename`
----@field description string defaults to `"<LOC uimod_0006>(No description)"`
----@field author string      defaults to `''`
----@field copyright string   defaults to `''`
+---@field location FileName  defaults to `Dirname(filename)`
+---@field name UnlocalizedString        defaults to `filename`
+---@field description UnlocalizedString defaults to `"<LOC uimod_0006>(No description)"`
+---@field author UnlocalizedString      defaults to `''`; if left this way, appears as `"UNKNOWN"`
+---@field copyright string              unused, defaults to `''`
 ---@field exclusive boolean  defaults to `false`
----@field icon string        defaults to `'/textures/ui/common/dialogs/mod-manager/generic-icon_bmp.dds'`
+---@field icon FileName      defaults to `'/textures/ui/common/dialogs/mod-manager/generic-icon_bmp.dds'`
 ---@field selectable boolean defaults to `true`
----@field hookdir string     defaults to `'/hook'`
----@field shadowdir string   defaults to `'/shadow'`
+---@field hookdir FileName   defaults to `'/hook'`
+---@field shadowdir FileName legacy field, defaults to `'/shadow'`
 ---@field uid string         defaults to `filename`
+---@field url? string        must be a valid link if present
+---@field github? string     must be a valid link if present
+---@field version? number    must be an integer
 ---@field ui_only? boolean
 ---@field enabled? boolean
----@field requires? string[] UID list of mods that this mod requires to be also present
----@field conflicts? string[] UID list of mods that the game will refuse to launch with
----@field before? string[] UID list of mods that this mod will be applied before
----@field after? string[] UID list of mods this this mod will be applied after; defaults to `requires` if present
+---@field requires? string[]   UID list of mods that this mod requires to be also present
+---@field conflicts? string[]  UID list of mods that the game will refuse to launch with
+---@field before? string[]     UID list of mods that this mod will be applied before
+---@field after? string[]      UID list of mods this this mod will be applied after; defaults to `requires` if absent
 ---@field requiresNames? table<string, string> Optional UID-to-name map of required mods
+---
+---@field title? UnlocalizedString   used by the mods manager (title-cased name and version)
+---@field type? ModType              used by the mods manager
+---@field sort? ModSort              used by the mods manager (nearly the same as `type`)
+---@field status? LocalizedString    used by the mods manager (localized version of `type`)
+---@field tags? table                used by the mods manager
+---
+---@field _faf_modname? "faf"    frontend mod field, if present in a FAF vault mod, must be `"faf"`
+---@field mountpoints? table     frontend mod field, must be absent for a FAF vault mod
 
 ---@alias uidSet table<string, true>
+
 
 local SetUtils = import("/lua/system/setutils.lua")
 
 -- Table of all mods found on disk, indexed by id
+---@type table<string, ModInfo>?
 local _mod_cache = nil
 
 
---- Set the list of active mods requested by the user from the mod manager.
+--- Sets the list of active mods requested by the user from the mod manager.
 --- `nil` means do nothing (happens when `cancel` is selected from mod manager)
----@param s? uidSet set of mod UID's
-function SetSelectedMods(s)
-    if s then
+---@param selectedMods? uidSet set of mod UID's
+function SetSelectedMods(selectedMods)
+    if selectedMods then
         LOG("MOD LIST SET TO:")
-        for uid,v in s do
+        for uid in selectedMods do
             LOG("\t" .. tostring(_mod_cache[uid].name) .. "\t(" .. uid .. ")")
         end
 
-        SetPreference('active_mods', s)
+        SetPreference('active_mods', selectedMods)
         UpdateUIMods()
     end
 end
 
----
+--- Returns the set of all sim mod UID's a player has installed
 ---@return uidSet #set of mod UID's
 function GetLocallyAvailableMods()
     local result = {}
-    for k,mod in AllMods() do
+    for _, mod in AllMods() do
         if not mod.ui_only then
             result[mod.uid] = true
         end
@@ -256,51 +366,54 @@ function GetLocallyAvailableMods()
     return result
 end
 
---- Get list of selected mods and check if they still exist
+--- Gets the list of selected mods (both sim and UI) from the preferences and checks if they still
+--- exist on disk
 ---@return uidSet #set of mod UID's
 function GetSelectedMods()
-    local ModsFromGamePrefs = GetPreference('active_mods') or {}
-    local ModsFromDisk= {}
-    for modid,moddata in AllMods() do
-        ModsFromDisk[moddata.uid] = true
+    local modsFromGamePrefs = GetPreference('active_mods') or {}
+    local modsFromDisk = {}
+    for _, moddata in AllMods() do
+        modsFromDisk[moddata.uid] = true
     end
-    for modid in ModsFromGamePrefs do
-        if not ModsFromDisk[modid] then
+    for modid in modsFromGamePrefs do
+        if not modsFromDisk[modid] then
             SPEW('Mod ID='..modid..' is selected as active mod, but missing on Disk!')
-            ModsFromGamePrefs[modid] = nil
-            SetPreference('active_mods', ModsFromGamePrefs)
+            modsFromGamePrefs[modid] = nil
+            SetPreference('active_mods', modsFromGamePrefs)
         end
     end
-    return ModsFromGamePrefs
+    return modsFromGamePrefs
 end
 
---- Return those selected mods with `ui_only` set to true filtered out
+--- Returns currently selected sim mods (active mods without `ui_only` set to true)
 ---@return uidSet #set of mod UID's
+---@see GetSimMods(mods) # for a version that tries to sort by dependency
 function GetSelectedSimMods()
-    return SetUtils.PredicateFilter(GetSelectedMods(),
-        function(uid)
-            return not AllMods()[uid].ui_only
-        end
-    )
+    local allMods = AllMods()
+    return SetUtils.PredicateFilter(GetSelectedMods(), function(uid)
+        return not allMods[uid].ui_only
+    end)
 end
 
---- Return those selected mods with `ui_only` not set to true filtered out
+--- Returns currently selected UI mods (active mods with `ui_only` set to true)
 ---@return uidSet #set of mod UID's
+---@see GetUiMods(mods) # for a version that tries to sort by dependency
 function GetSelectedUIMods()
-    return SetUtils.PredicateFilter(GetSelectedMods(),
-        function(uid)
-            return AllMods()[uid].ui_only
-        end
-    )
+    local allMods = AllMods()
+    return SetUtils.PredicateFilter(GetSelectedMods(), function(uid)
+        return allMods[uid].ui_only
+    end)
 end
 
---- Load a mod from `filename` and return a `ModInfo` table with default values set
----@param filename string
----@return ModInfo
+--- Loads a mod from `filename` and returns its `ModInfo` table with default values set if no
+--- problems occur
+---@param filename FileName
+---@return ModInfo | nil
 local function LoadModInfo(filename)
-    -- Fill in some defaults to start with...
+    local location = Dirname(filename)
+    -- fill in some defaults to start with...
     local env = {
-        location = Dirname(filename),
+        location = location,
         name = filename,
         description = "<LOC uimod_0006>(No description)",
         author = '',
@@ -309,76 +422,82 @@ local function LoadModInfo(filename)
         icon = '/textures/ui/common/dialogs/mod-manager/generic-icon_bmp.dds',
         selectable = true,
         hookdir = '/hook',      -- specify the name of the hook sub-directory
-        shadowdir = '/shadow',  -- specify the name of shadow sub-directory
+        shadowdir = '/shadow',  -- legacy
         uid = filename, -- default uid to name, should be a unique id
     }
+
     local ok, result = pcall(doscript, filename, env)
-    if ok then
-        env.location = Dirname(filename)
-        return env
-    else
+    if not ok then
         WARN("Problem loading " .. filename .. ":\n" .. result)
         return nil
     end
+
+    env.location = location -- make sure the mod didn't change this
+    return env
 end
 
 
---- Clear `_mod_cache` to pick up any changes on disk
+--- Clears `_mod_cache` to pick up any changes on disk
 function ClearCache()
     _mod_cache = nil
 end
 
 
---- Return a table of all mods found on disk (where table keys are the UID's to the mod info)
----@return table<string, ModInfo>
+--- Returns a map of all mods found on disk
+---@return table<string, ModInfo> #keys are UID's
 function AllMods()
     if not _mod_cache then
-        local r = {}
-        for i,file in DiskFindFiles('/mods', '*mod_info.lua') do
+        local cache = {}
+        for _, file in DiskFindFiles('/mods', '*mod_info.lua') do
             local mod = LoadModInfo(file)
-            if mod and (mod.enabled != false) and (mod.name != "Hotstats") then
-                r[mod.uid] = mod
+            -- why can't a mod be named `Hotstats`?
+            if mod and mod.enabled ~= false and mod.name ~= "Hotstats" then
+                cache[mod.uid] = mod
             end
         end
-        _mod_cache = r
+        _mod_cache = cache
     end
     return _mod_cache
 end
 
-
---- Return a table of all mods found on disk with the `selectable` flag set
+--- Returns a map of all mods found on disk with the `selectable` flag set
 ---@return table<string, ModInfo> #keys are UID's
 function AllSelectableMods()
-    local r = {}
-    for uid,mod in AllMods() do
+    local selectableMods = {}
+    for uid, mod in AllMods() do
         if mod.selectable then
-            r[uid] = mod
+            selectableMods[uid] = mod
         end
     end
-    return r
+    return selectableMods
 end
 
---- topological sort the mods using before/after lists  
+--- Topological sort the mods using before/after lists  
 --- log a warning and return `nil` in case of a cycle
 ---@param mods_to_sort table<string, ModInfo> keys are UID's
 ---@return ModInfo[] | nil
 local function ModTopSort(mods_to_sort)
+    ---@type table<string, string[]>
     local required_for = {}
-    for uid,mod in mods_to_sort do
+    for uid in mods_to_sort do
         required_for[uid] = {}
     end
 
-    for uid,mod in mods_to_sort do
-        if _mod_cache[uid].before then
-            for i,before_uid in _mod_cache[uid].before do
+    for uid in mods_to_sort do
+        local mod = _mod_cache[uid]
+        local before_mods = mod.before
+        local after_mods = mod.after
+
+        if before_mods then
+            for _, before_uid in before_mods do
                 if mods_to_sort[before_uid] ~= nil then
                     table.insert(required_for[uid], before_uid)
                 end
             end
         end
 
-        if _mod_cache[uid].after then
-            for i,after_uid in _mod_cache[uid].after do
+        if after_mods then
+            for _, after_uid in after_mods do
                 if mods_to_sort[after_uid] ~= nil then
                     table.insert(required_for[after_uid], uid)
                 end
@@ -387,33 +506,28 @@ local function ModTopSort(mods_to_sort)
     end
 
     local result = {}
-    local processing = {}
-    local done_with = {}
-
-    local function visit(uid)
-        if done_with[uid] then
-            return 0
-        end
-        if processing[uid] then
-            return 1
+    local has_cycle = {}
+    --- Returns if an cycle is detected in the graph node
+    ---@param uid string
+    ---@return boolean 
+    local function HasCycle(uid)
+        if has_cycle[uid] ~= nil then
+            return has_cycle[uid]
         end
 
-        processing[uid] = true
-        for i,child_uid in required_for[uid] do
-            local r = visit(child_uid)
-            if r == 1 then return 1 end
+        has_cycle[uid] = true -- only tentatively
+        for _, child_uid in required_for[uid] do
+            if HasCycle(child_uid) then return true end
         end
+        has_cycle[uid] = false
 
-        processing[uid] = false
-        done_with[uid] = true
         table.insert(result, mods_to_sort[uid])
-        return 0
+        return false
     end
 
-    local r = 0
-    for uid,mod in mods_to_sort do
-        r = visit(uid)
-        if r == 1 then
+    -- traverse the directed graph and look for cycles
+    for uid in mods_to_sort do
+        if HasCycle(uid) then
             WARN('Inconsistent mod order lists, load order will be arbitrary')
             return
         end
@@ -422,11 +536,10 @@ local function ModTopSort(mods_to_sort)
     return table.reverse(result)
 end
 
---- Get a list of ingame UI mods that should be active, based on preferences.
---- Only `ui_only` mods are included in the list; mods that affect the sim
---- are from `GetActiveGameMods()`.
+--- Gets a list of mods based on a filter (optionally over a selection) and sorts them topologically
+--- based on dependencies, if possible.
 ---@param filter fun(mod: ModInfo): boolean
----@param selected? uidSet set of mod UID's; defaults to `GetSelectedMods()`
+---@param selected? uidSet set of mod UID's to filter from; defaults to `GetSelectedMods()`
 ---@return ModInfo[]
 local function GetActiveModsFiltered(filter, selected)
     if not selected then
@@ -436,122 +549,132 @@ local function GetActiveModsFiltered(filter, selected)
     local all_mods = AllMods()
     local filtered = {}
 
-    for uid,mod in all_mods do
+    for uid, mod in all_mods do
         if selected[uid] and filter(mod) then
             filtered[uid] = mod
         end
     end
 
-    local r = ModTopSort(filtered)
-    if r == nil then
-        r = {}
-        for uid,m in filtered do
-            table.insert(r,m)
+    local active_mods = ModTopSort(filtered)
+    if active_mods == nil then
+        active_mods = {}
+        for _, mod in filtered do
+            table.insert(active_mods, mod)
         end
     end
 
-    return r
+    return active_mods
 end
 
---- Return a list out of the mods that have `ui_only` set to true
----@param mods? uidSet set of mod UID's; defaults to `GetSelectedMods()`
+--- Returns a list of UI mods (mods with `ui_only` set to true) that is sorted topologically by mod
+--- dependency, if possible.
+---@param mods? uidSet set of mod UID's to filter from; defaults to `GetSelectedMods()`
 ---@return ModInfo[]
+---@see GetSelectedUIMods() # for a version that doesn't try to sort by dependency
 function GetUiMods(mods)
     return GetActiveModsFiltered(function(m) return m.ui_only end, mods)
 end
 
---- Return a list out of the mods that don't have `ui_only` set to true
----@param mods? uidSet set of mod UID's; defaults to `GetSelectedMods()`
+--- Returns a list of sim mods (mods without `ui_only` set to true) that is sorted topologically by
+--- mod dependency, if possible.
+---@param mods? uidSet set of mod UID's to filter from; defaults to `GetSelectedMods()`
 ---@return ModInfo[]
+---@see GetSelectedSimMods() # for a version that doesn't try to sort by dependency
 function GetGameMods(mods)
     return GetActiveModsFiltered(function(m) return not m.ui_only end, mods)
 end
 
---- If `scenario` is a campaign type, return only the FAF campaign mod (`6AAFE20A-E851-11DB-B8BE-ECC755D89593`).
---- Otherwise, return `GetGameMods()`.
+--- If `scenario` is a campaign type, returns only the FAF campaign mod
+--- (`6AAFE20A-E851-11DB-B8BE-ECC755D89593`) or an empty list if it is not enabled.
+--- Otherwise, returns `GetGameMods()`.
 ---@param scenario UIScenarioInfo
 ---@return uidSet #set of mod UID's
 function GetCampaignMods(scenario)
     local r
     if scenario.type == 'campaign' then
-        r = GetGameMods { ['6AAFE20A-E851-11DB-B8BE-ECC755D89593']=true }
+        r = GetGameMods{ ['6AAFE20A-E851-11DB-B8BE-ECC755D89593'] = true }
     else
         r = GetGameMods()
     end
     return r
 end
 
---- Given a uid of a mod, return a table containing:  
----  `requires`: set of installed uids that this mod requires  
----  `missing`: set of uids that this mod requires but aren't installed  
----  `conflicts`: set of installed uids that this mod conflicts with (or conflict with this mod)
+--- Given a UID of a mod, return a table containing:  
+---  `requires`: set of installed UID's that this mod requires  
+---  `missing`: set of UID's that this mod requires but aren't installed  
+---  `conflicts`: set of installed UID's that this mod conflicts with (or conflict with this mod)
 ---@param uid string
 ---@return {requires: uidSet, missing: uidSet, conflicts: uidSet}
 function GetDependencies(uid)
-    local ret = {requires = {}, missing = {}, conflicts = {}}
     local allMods = AllMods()
+    local depRequires = {}
+    local depMissing = {}
+    local depConflicts = {}
 
-    local function RecurseDependencies(uid, ret)
+    local function RecurseDependencies(uid)
+        local mod = allMods[uid]
+
         -- check if this mod lists known conflicts with other mods
-        if allMods[uid].conflicts then
-            for i, conflict in allMods[uid].conflicts do
+        if mod.conflicts then
+            for _, conflict in mod.conflicts do
                 if allMods[conflict] then
-                    ret.conflicts[conflict] = true
+                    depConflicts[conflict] = true
                 end
             end
         end
 
-        -- Exclusive mods conflict with everything.
-        if allMods[uid].exclusive then
-            ret.conflicts = table.map(function() return true end, allMods)
+        -- exclusive mods conflict with everything
+        if mod.exclusive then
+            for con in allMods do
+                depConflicts[con] = true
+            end
         end
 
         -- check if any other mods list this mod as a conflict
-        for id, info in allMods do
-            if id != uid then
-                if allMods[id].conflicts then
-                    for i, conflict in allMods[id].conflicts do
-                        if uid == conflict then
-                            ret.conflicts[id] = true
-                            break;  -- don't need to continue as we're just looking for this mod
-                        end
+        for id in allMods do
+            if id == uid then continue end
+            local otherMod = allMods[id]
+            if otherMod.conflicts then
+                for _, conflict in otherMod.conflicts do
+                    if uid == conflict then
+                        depConflicts[id] = true
+                        break -- don't need to continue as we're just looking for this mod
                     end
                 end
             end
         end
 
         -- check for all mods required by this mod, and then check those required dependencies
-        if allMods[uid].requires then
-            -- this variable gets installed requirements so we can check them
-            local locReq = {}
-            for i, required in allMods[uid].requires do
+        if mod.requires then
+            for _, required in mod.requires do
                 if allMods[required] then
-                    ret.requires[required] = true
-                    table.insert(locReq, required)
+                    depRequires[required] = true
+                    RecurseDependencies(required)
                 else
-                    ret.missing[required] = true
+                    depMissing[required] = true
                 end
-            end
-            for i, required in locReq do
-                RecurseDependencies(required, ret)
             end
         end
     end
 
     if allMods[uid] then
-        RecurseDependencies(uid, ret)
+        RecurseDependencies(uid)
     end
 
-    if table.empty(ret.requires) then ret.requires = nil end
-    if table.empty(ret.missing) then ret.missing = nil end
-    if table.empty(ret.conflicts) then ret.conflicts = nil end
-    return ret
+    if table.empty(depRequires) then depRequires = nil end
+    if table.empty(depMissing) then depMissing = nil end
+    if table.empty(depConflicts) then depConflicts = nil end
+    return {
+        requires = depRequires,
+        missing = depMissing,
+        conflicts = depConflicts,
+    }
 end
 
 --- Update `__active_mods` from `GetUiMods`
 function UpdateUIMods()
     __active_mods = {}
-    for i,m in ipairs(GetUiMods()) do
-        table.insert(__active_mods, m)
+    for _, mod in ipairs(GetUiMods()) do
+        table.insert(__active_mods, mod)
     end
 end
