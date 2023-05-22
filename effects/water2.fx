@@ -385,11 +385,11 @@ float4 HighFidelityPS( VS_OUTPUT inV,
 	float4 skyReflection = texCUBE(SkySampler, R);
 	// The alpha channel acts as a mask for unit parts above the water and probably
 	// uses unitReflectionAmount as the positive value of the mask
-    reflectedPixels = lerp(skyReflection, reflectedPixels, saturate(reflectedPixels.a));
+    reflectedPixels.xyz = lerp(skyReflection.xyz, reflectedPixels.xyz, saturate(reflectedPixels.a));
    
-   	//Schlick approximation for fresnel
+   	// Schlick approximation for fresnel
     float NDotV = saturate(dot(viewVector, N));
-	float F0 = 0.08;
+	float F0 = 0.04;
     float fresnel = F0 + (1.0 - F0) * pow(1.0 - NDotV, 5.0);
 
 	// the default value of 1.5 is way to high, but we want to preserve manually set values in existing maps
@@ -400,7 +400,22 @@ float4 HighFidelityPS( VS_OUTPUT inV,
     // add in the sun reflection
 	float3 sunReflection = pow(saturate(dot(-R, SunDirection)), SunShininess) * SunColor;
     sunReflection = sunReflection * fresnel;
-    refractedPixels.xyz +=  sunReflection;
+	// the sun shouldn't be visible where a unit reflection is
+	sunReflection *= (1 - saturate(reflectedPixels.a * 2));
+    refractedPixels.xyz += sunReflection;
+
+ 	float3 defaultSunDirection = normalize(float3(0.1, -0.967, 0.253));
+	if (length(defaultSunDirection - SunDirection) > 0.1) {
+		// On many maps the sun direction is left as the default value to 
+		// accentuate the waves from the standard view angle. If we set the
+		// SunDirection to the correct value, then we lose this accentuation,
+		// so we need to add something in to make the waves more visible.
+		float3 fakeSunReflection = pow(saturate(dot(-R, defaultSunDirection)), 60) * waterColorLowFi;
+		// We skip the masking with the unit reflection, because this should
+		// behave more like a highlight in the sky texture and it's almost
+		// vertical anyway, so the difference is neglegible.
+		refractedPixels.xyz += fakeSunReflection * fresnel * sunReflectionAmount * 0.6;
+	}
 
     // Lerp in the wave crests
     refractedPixels.xyz = lerp(refractedPixels.xyz, waveCrestColor, (1 - waterTexture.a) * waveCrest);
