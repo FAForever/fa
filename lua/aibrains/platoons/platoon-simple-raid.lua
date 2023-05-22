@@ -140,6 +140,9 @@ AIPlatoonSimpleRaidBehavior = Class(AIPlatoon) {
 
             local cache = { 0, 0, 0 }
             local brain = self:GetBrain()
+            if not brain.GridPresence then
+                WARN('GridPresence does not exist, unable to detect conflict line')
+            end
 
             while not IsDestroyed(self) do
                 -- pick random unit for a position on the grid
@@ -189,14 +192,19 @@ AIPlatoonSimpleRaidBehavior = Class(AIPlatoon) {
                     -- check for threats
                     local threat = brain:GetThreatAtPosition(position, 1, true, 'AntiSurface')
                     if threat > 0 then
-                        local platoonThreat = self:GetPlatoonThreat('Surface', categories.MOBILE * categories.DIRECTFIRE - categories.SCOUT, position, 30)
                         local threatTable = brain:GetThreatsAroundPosition(position, 1, true, 'AntiSurface')
-                        if threatTable and not TableEmpty(threatTable) then
-                            local info = threatTable[Random(1, TableGetn(threatTable))]
-                            self.ThreatToEvade = { info[1], GetSurfaceHeight(info[1], info[2]), info[2] }
-                            DrawCircle(self.ThreatToEvade, 5, 'ff0000')
-                            self:ChangeState(self.Retreating)
-                            return
+                        local platoonThreat = self:CalculatePlatoonThreatAroundPosition('Surface', categories.MOBILE * categories.DIRECTFIRE - categories.SCOUT, position, 30)
+                        local positionStatus = brain.GridPresence:GetInferredStatus(position)
+                        if positionStatus != 'Allied' or platoonThreat * 2 < threat then
+                            if threatTable and not TableEmpty(threatTable) then
+                                local info = threatTable[Random(1, TableGetn(threatTable))]
+                                self.ThreatToEvade = { info[1], GetSurfaceHeight(info[1], info[2]), info[2] }
+                                DrawCircle(self.ThreatToEvade, 5, 'ff0000')
+                                self:ChangeState('Retreating')
+                                return
+                            end
+                        else
+                            LOG('Threat and we need to attack then since it is allied, status '..positionStatus)
                         end
                     end
 
