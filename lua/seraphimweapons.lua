@@ -1,13 +1,8 @@
---****************************************************************************
---**
---**  File     :  /lua/seraphimweapons.lua
---**  Author(s):  Greg Kohne, Gordon Duclos,
---**              Matt Vainio, Aaron Lundquist, Dru Staltman, Jessica St. Croix
---**
---**  Summary  :  Default definitions of Seraphim weapons
---**
---**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
---****************************************************************************
+-- File     :  /lua/seraphimweapons.lua
+-- Author(s):  Greg Kohne, Gordon Duclos, Matt Vainio, Aaron Lundquist, Dru Staltman, Jessica St. Croix
+-- Summary  :  Default definitions of Seraphim weapons
+-- Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
+---------------------------------------------------------------------------------------------------------   
 
 local WeaponFile = import("/lua/sim/defaultweapons.lua")
 local CollisionBeamFile = import("/lua/defaultcollisionbeams.lua")
@@ -104,6 +99,8 @@ SDFThauCannon = ClassWeapon(DefaultProjectileWeapon) {
     FxMuzzleFlash = EffectTemplate.STauCannonMuzzleFlash,
     FxMuzzleTerrainTypeName = 'ThauTerrainMuzzle',
 
+    ---@param self SDFThauCannon
+    ---@param muzzle string
     PlayFxMuzzleSequence = function(self, muzzle)
         DefaultProjectileWeapon.PlayFxMuzzleSequence(self, muzzle)
         local pos = self.unit:GetPosition()
@@ -227,6 +224,7 @@ SDFExperimentalPhasonLaser = ClassWeapon(DefaultBeamWeapon) {
     FxUpackingChargeEffects = EffectTemplate.SChargeExperimentalPhasonLaser,
     FxUpackingChargeEffectScale = 1,
 
+    ---@param self SDFExperimentalPhasonLaser
     PlayFxWeaponUnpackSequence = function(self)
         if not self.ContBeamOn then
             local army = self.unit.Army
@@ -254,6 +252,7 @@ SDFUltraChromaticBeamGenerator = ClassWeapon(DefaultBeamWeapon) {
     FxUpackingChargeEffects = EffectTemplate.SChargeUltraChromaticBeamGenerator,
     FxUpackingChargeEffectScale = 1,
 
+    ---@param self SDFUltraChromaticBeamGenerator
     PlayFxWeaponUnpackSequence = function(self)
         if not self.ContBeamOn then
             local army = self.unit.Army
@@ -347,6 +346,9 @@ PhasonCollisionBeam2 = ClassWeapon(PhasonCollisionBeam) {
     FxBeam = { '/Effects/Emitters/seraphim_lightning_beam_02_emit.bp', },
     TerrainImpactScale = 0.1,
 
+    ---@param self PhasonCollisionBeam2
+    ---@param impactType string
+    ---@param targetEntity Prop|Unit
     OnImpact = function(self, impactType, targetEntity)
         local scorching = self.Scorching
         if impactType == 'Terrain' then
@@ -360,6 +362,7 @@ PhasonCollisionBeam2 = ClassWeapon(PhasonCollisionBeam) {
         PhasonCollisionBeam.OnImpact(self, impactType, targetEntity)
     end,
 
+    ---@param self PhasonCollisionBeam2
     OnDisable = function(self)
         PhasonCollisionBeam.OnDisable(self)
         local scorching = self.Scorching
@@ -367,6 +370,7 @@ PhasonCollisionBeam2 = ClassWeapon(PhasonCollisionBeam) {
         scorching = nil
     end,
 
+    ---@param self PhasonCollisionBeam2
     ScorchThread = function(self)
         local size = 1 + (Random() * 1.1)
         local CurrentPosition = self:GetPosition(1)
@@ -398,9 +402,6 @@ PhasonBeam = ClassWeapon(DefaultBeamWeapon) {
     FxUpackingChargeEffects = EffectTemplate.CMicrowaveLaserCharge01,
     FxUpackingChargeEffectScale = 0.2,
 }
-
-
-
 
 --- Kept Mod Support
 local KamikazeWeapon = WeaponFile.KamikazeWeapon
