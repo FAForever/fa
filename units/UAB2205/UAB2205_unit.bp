@@ -225,7 +225,7 @@ UnitBlueprint {
             },
             BallisticArc = 'RULEUBA_None',
             CollideFriendly = false,
-            Damage = 150,
+            Damage = 175,
             DamageType = 'Normal',
             DisplayName = 'Chrono Torpedo',
             FireTargetLayerCapsTable = {

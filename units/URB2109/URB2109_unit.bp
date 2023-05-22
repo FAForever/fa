@@ -186,7 +186,7 @@ UnitBlueprint {
             },
             BallisticArc = 'RULEUBA_None',
             CollideFriendly = false,
-            Damage = 25,
+            Damage = 29,
             DamageType = 'Normal',
             DisplayName = 'Nanite Torpedo',
             DoTPulses = 5,

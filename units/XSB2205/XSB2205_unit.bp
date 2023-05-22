@@ -229,7 +229,7 @@ UnitBlueprint {
             },
             BallisticArc = 'RULEUBA_None',
             CollideFriendly = false,
-            Damage = 201,
+            Damage = 230,
             DamageType = 'Normal',
             DisplayName = 'Heavy Cavitation Torpedo Cluster',
             FireTargetLayerCapsTable = {
