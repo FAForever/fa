@@ -120,7 +120,7 @@ BuilderGroup {
     Builder {
         BuilderName = 'T1 Mortar',
         PlatoonTemplate = 'T1LandArtillery',
-        Priority = 820,
+        Priority = 825,
         BuilderConditions = {
             { UCBC, 'HaveLessThanUnitsWithCategory', { 150, categories.MOBILE * categories.LAND * categories.TECH1 - categories.ENGINEER - categories.ANTIAIR } },
             --{ UCBC, 'LocationFactoriesBuildingLess', { 'LocationType', 1, 'INDIRECTFIRE LAND MOBILE' } },
