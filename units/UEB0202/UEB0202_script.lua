@@ -53,9 +53,9 @@ UEB0202 = ClassUnit(TAirFactoryUnit) {
         if not arm1 then return end
         if not arm2 then return end
         arm1:SetGoal(0, 0, 0)
-            arm1:SetSpeed(40)
-            arm2:SetGoal(0, 0, 0)
-            arm2:SetSpeed(40)
+        arm1:SetSpeed(40)
+        arm2:SetGoal(0, 0, 0)
+        arm2:SetSpeed(40)
     end,
 }
 TypeClass = UEB0202

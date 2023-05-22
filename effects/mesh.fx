@@ -240,6 +240,16 @@ sampler2D falloffSampler = sampler_state
     AddressV  = CLAMP;
 };
 
+sampler WaterRampSampler = sampler_state
+{
+    Texture = (waterRamp);
+    MipFilter = LINEAR;
+    MinFilter = LINEAR;
+    MagFilter = LINEAR;
+    AddressU  = CLAMP;
+    AddressV  = CLAMP;
+};
+
 ///////////////////////////////////////
 ///
 /// Structures
@@ -9155,7 +9165,7 @@ float GeometrySmith(float3 n, float3 v, float3 l, float roughness)
     return gs1 * gs2;
 }
 
-float4 PBR_PS(
+float3 PBR_PS(
     NORMALMAPPED_VERTEX vertex,
     float3 albedo,
     float metallic,
@@ -9193,20 +9203,21 @@ float4 PBR_PS(
     // so we have to tune them down a bit across the board.
     envBRDFlookuptexture.g *= 0.5;
 
-    float3 ambient = sunAmbient + shadowFill;
-    env_irradiance += ambient;
-
-    float3 shadow = ComputeShadow(vertex.shadow, hiDefShadows);
-    float3 sunLight = sunDiffuse * lightMultiplier;
-    sunLight += (1 - sunLight) * shadowFill;
-    sunLight *= shadow;
-
     //////////////////////////////
     // Compute sun light
     //
+
+    // specular reflections of dielectrics mostly disappear underwater
+    if (vertex.depth.x < 0) {
+        facingSpecular = facingSpecular * 0.05;
+    }
     float3 F0 = lerp(float3(facingSpecular, facingSpecular, facingSpecular), albedo, metallic);
     float3 l = sunDirection;
     float3 h = normalize(v + l);
+    float nDotL = max(dot(n, l), 0.0);
+
+    float shadow = ComputeShadow(vertex.shadow, hiDefShadows);
+    float3 sunLight = sunDiffuse * lightMultiplier * shadow;
 
     // Cook-Torrance BRDF
     float3 F = FresnelSchlick(max(dot(h, v), 0.0), F0);
@@ -9215,7 +9226,7 @@ float4 PBR_PS(
 
     float3 numerator = NDF * G * F;
     // add 0.0001 to avoid division by zero
-    float denominator = 4.0 * max(dot(n, v), 0.0) * max(dot(n, l), 0.0) + 0.0001;
+    float denominator = 4.0 * max(dot(n, v), 0.0) * nDotL + 0.0001;
     float3 reflected = numerator / denominator;
     
     float3 kD = float3(1.0, 1.0, 1.0) - F;
@@ -9225,7 +9236,7 @@ float4 PBR_PS(
     // We divide the diffuse from point lights by pi, so to get the same response like we 
     // would get from the environment light where we don't need to divide by pi, we need
     // to multiply the radiance here with pi.
-    float3 irradiance = sunLight * max(dot(n, l), 0.0) * PI;
+    float3 irradiance = sunLight * nDotL * PI;
     float3 color = (refracted + reflected) * irradiance;
 
     //////////////////////////////
@@ -9235,14 +9246,44 @@ float4 PBR_PS(
     kD = float3(1.0, 1.0, 1.0) - kS;
     kD *= 1.0 - metallic;
 
-    // As maps were not created with this shader in mind we get too much ambient lighting in general.
-    // So we need to tune it down, so the darkness of the shadows matches with the terrain.
-    float shadowCorrection = 0.8;
+    // We need to do this to stay consistent with ComputeLight()
+    float3 shadowColor = (1 - (sunDiffuse * shadow * nDotL + sunAmbient)) * shadowFill;
+    float3 ambient = sunAmbient * lightMultiplier + shadowColor;
+
+    // As maps were not created with this shader in mind we need to do some tuning to match
+    // the shadows of the terrain. This is very non-physical and uses empirical values.
+    float shadowCorrection = saturate((ambient.r + ambient.g + ambient.b) / 3);
+    shadowCorrection = lerp(shadowCorrection, 1, shadow * nDotL);
+    env_irradiance *= shadowCorrection;
+    env_reflection *= shadowCorrection;
+    env_irradiance += ambient * 0.5;
+    env_reflection += ambient * 0.15;
+
     float3 diffuse = env_irradiance * albedo;
     float3 specular = env_reflection * (kS * envBRDFlookuptexture.r + envBRDFlookuptexture.g);
-    color += (kD * diffuse + specular) * ao * shadowCorrection;
+    color += (kD * diffuse + specular) * ao;
 
-    return float4(color, 0);
+    return color;
+}
+
+float3 ApplyWaterColor(NORMALMAPPED_VERTEX vertex, float3 color, float3 emission) {
+    float4 waterColor = tex1D(WaterRampSampler, -vertex.depth.x / (surfaceElevation - abyssElevation));
+    float3 v = normalize(vertex.viewDirection);
+    float3 up = float3(0,1,0);
+    // To simplify, we assume that the light enters vertically into the water,
+    // this is the length that the light travels underwater back to the camera
+    float oneOverCosV = 1 / max(dot(up, v), 0.0001);
+    // light gets absorbed exponentially
+    float waterAbsorption = saturate(exp(-waterColor.w * (1 + oneOverCosV)));
+    // when the mesh emits light, then the path from the surface to the mesh doesn't apply
+    float emissionAbsorption = saturate(exp(-waterColor.w * oneOverCosV));
+    // darken the color first to simulate the light absorption on the way in and out
+    color *= waterAbsorption;
+    // lerp in the watercolor to simulate the scattered light from the dirty water
+    color = lerp(waterColor.rgb, color, waterAbsorption);
+    // similarly tune down the emission light
+    color += emission * emissionAbsorption;
+    return color;
 }
 
 float4 PBR_UEF(NORMALMAPPED_VERTEX vertex, float teamColorFactor, uniform bool hiDefShadows) : COLOR0
@@ -9260,7 +9301,7 @@ float4 PBR_UEF(NORMALMAPPED_VERTEX vertex, float teamColorFactor, uniform bool h
     float teamcolor = min(pow(specular.a * 1.1, 0.6), 1);
     float metallic = max(1 - teamcolor * 2.2, 0);
 
-    albedo.rgb = lerp(albedo.rgb, albedo.rgb * 2.2, metallic);
+    albedo.rgb = lerp(albedo.rgb, albedo.rgb * 1.9, metallic);
     albedo.rgb = lerp(albedo.rgb, vertex.color.rgb * 0.6, teamColorFactor * teamcolor);
 
     float planeCockpitMask = saturate((specular.r - 0.65) * 3);
@@ -9270,12 +9311,15 @@ float4 PBR_UEF(NORMALMAPPED_VERTEX vertex, float teamColorFactor, uniform bool h
     roughness += planeCockpitMask - specular.b * 3;
     roughness = saturate(1 - roughness);
 
-    float4 color = PBR_PS(vertex, albedo.rgb, metallic, roughness, normal, hiDefShadows, .04, ao);
+    float3 color = PBR_PS(vertex, albedo.rgb, metallic, roughness, normal, hiDefShadows, .04, ao);
+    float emission = specular.b * 0.8;
+    color = ApplyWaterColor(vertex, color, emission * albedo);
 
-    float emission = specular.b * 0.5;
-    color += emission * albedo;
-    float alphaGlow = mirrored ? 0.5 : emission;
-    return float4(color.rgb, alphaGlow);
+    // The glowminimum is required to make the unit behave properly with the water shader.
+    // If the alpha channel is 0 somewhere, those parts will show as water refractions even
+    // if they are above the water line. See https://github.com/FAForever/fa/issues/4696
+    float alphaGlow = mirrored ? 0.5 : emission + glowMinimum;
+    return float4(color, alphaGlow);
 }
 
 float4 PBR_UEF_PS(NORMALMAPPED_VERTEX vertex,
@@ -9336,18 +9380,18 @@ float4 PBR_Aeon(NORMALMAPPED_VERTEX vertex, float teamColorFactor, uniform bool 
     float roughness = lerp(specular.g, 0.03, teamcolorBorder);
     roughness = saturate(roughness + darkAreas);
 
-    albedo *= (specular.r + 0.3) * 1.05;
-    albedo = pow(albedo, (1 - metallic * 0.99));
+    albedo *= (specular.r + 0.3) * 1.25;
+    albedo = pow(albedo, (1 - metallic * 0.95));
     albedo = lerp(albedo, vertex.color.rgb * specular.a * 0.4, teamColorFactor * fullTeamColor);
 
     float specularAmount = lerp(0.08, 0, darkAreas);
     specularAmount = lerp(specularAmount, 0.04, fullTeamColor);
 
-    float3 color = PBR_PS(vertex, albedo, metallic, roughness, normal, hiDefShadows, specularAmount).rgb;
-
-    float3 emission = specular.b + specular.a * vertex.color.rgb * 0.3;
-    color += emission;
-    float alpha = mirrored ? 0.5 : specular.b + glowMinimum + specular.a * 0.1;
+    float3 color = PBR_PS(vertex, albedo, metallic, roughness, normal, hiDefShadows, specularAmount);
+    float3 emission = specular.b + specular.a * vertex.color.rgb * 0.5;
+    color = ApplyWaterColor(vertex, color, emission);
+     
+    float alpha = mirrored ? 0.5 : specular.b + glowMinimum + specular.a * 0.13;
 
     return float4(color, alpha);
 }
@@ -9380,9 +9424,9 @@ float4 PBR_AeonBuildPuddlePS(NORMALMAPPED_VERTEX vertex, uniform bool hiDefShado
     float metallic = 1;
     float roughness = specular.g;
 
-    float3 color = PBR_PS(vertex, albedo, metallic, roughness, normal, hiDefShadows).rgb;
+    float3 color = PBR_PS(vertex, albedo, metallic, roughness, normal, hiDefShadows);
 
-    float alpha = mirrored ? 0.5 : specular.b;
+    float alpha = mirrored ? 0.5 : specular.b + glowMinimum;
 
     return float4(color, alpha);
 }
@@ -9413,7 +9457,7 @@ float4 PBR_AeonBuildOverlayPS( NORMALMAPPED_VERTEX vertex) : COLOR0
 
     float metallic = 1;
     float roughness = 0.15;
-    float3 color = PBR_PS(vertex, diffuse, metallic, roughness, normal, true).rgb;
+    float3 color = PBR_PS(vertex, diffuse, metallic, roughness, normal, true);
 
     // Fade out 95% complete
     float percentComplete = vertex.material.y;
@@ -9455,7 +9499,7 @@ float4 PBR_AeonCZARPS( NORMALMAPPED_VERTEX vertex, uniform bool hiDefShadows) : 
     float specularAmount = lerp(0.08, 0, darkAreas);
     specularAmount = lerp(specularAmount, 0.04, saturate(specular.a * 3));
 
-    float3 color = PBR_PS(vertex, albedo.rgb, metallic, roughness, normal, hiDefShadows, specularAmount).rgb;
+    float3 color = PBR_PS(vertex, albedo.rgb, metallic, roughness, normal, hiDefShadows, specularAmount);
 
     float emission = specular.b + (pow(specular.a, 2) * 0.13);
     color += emission * albedo.rgb;
@@ -9486,16 +9530,16 @@ float4 PBR_Cybran(NORMALMAPPED_VERTEX vertex, float teamColorFactor, uniform boo
     float metallic = saturate((pow(specular.r, 0.7) + specular.g * 0.2 - specular.a * 0.5) * 4.37);
     float roughness = lerp(0.8 * (1 - specular.g), lerp(0.5, 0.25, specular.g), metallic);
 
-    albedo.rgb = min(lerp(albedo.rgb, albedo.rgb * 3, pow(metallic, 2.5)), float3(1, 1, 1));
-    albedo.rgb = lerp(albedo.rgb, vertex.color.rgb * 0.9, teamColorFactor * specular.a);
+    albedo.rgb = min(lerp(albedo.rgb, albedo.rgb * 2.3, pow(metallic, 2.5)), float3(1, 1, 1));
+    albedo.rgb = lerp(albedo.rgb, vertex.color.rgb, teamColorFactor * specular.a);
 
-    float4 color = PBR_PS(vertex, albedo.rgb, metallic, roughness, normal, hiDefShadows);
-
+    float3 color = PBR_PS(vertex, albedo.rgb, metallic, roughness, normal, hiDefShadows);
     float emission = pow(max(specular.b - 0.04, 0.0), 0.5);
-    color += emission * albedo;
-    float alpha = mirrored ? 0.5 : emission;
+    color = ApplyWaterColor(vertex, color, emission * albedo);
 
-    return float4(color.rgb, alpha);
+    float alpha = mirrored ? 0.5 : emission + glowMinimum;
+
+    return float4(color, alpha);
 }
 
 float4 PBR_CybranPS(NORMALMAPPED_VERTEX vertex, uniform bool hiDefShadows) : COLOR0
@@ -9529,26 +9573,27 @@ float4 PBR_Seraphim(
     // There are also white highlights in the albedo texture in some models
     float3 whiteness = saturate(albedo.rgb - float3 (0.4,0.4,0.4));
 
-    albedo.rgb = (albedo.rgb + float3(0.4, 0.43, 0.47)) * 0.8;
+    albedo.rgb = (albedo.bbg + float3(0.4, 0.43, 0.47)) * 0.8;
     albedo.rgb = lerp(albedo.rgb, teamColor, albedo.a);
 
     float metallic = 1;
     float roughness = saturate((1 - pow(specular.g, 0.5) + 0.3) * 0.7);
-    float3 color = PBR_PS(vertex, albedo.rgb, metallic, roughness, normal, hiDefShadows).rgb;
+
+    float3 color = PBR_PS(vertex, albedo.rgb, metallic, roughness, normal, hiDefShadows);
     color = lerp(color, teamColor * 0.5, albedo.a - 0.2);
- 
-    float3 emission = saturate(specular.b - 0.1) + teamColor * albedo.a + whiteness * 2;
-    color += emission * albedo;
+    float3 emission = saturate(specular.b - 0.1) + teamColor * albedo.a + whiteness * 1.5;
 
     // Substitute all the computations on pure glowing parts with the
     // pure brightness texture to get rid of reflections and shadows
     float mask = saturate(saturate(specular.b * 2) - albedo.a);
-    color = lerp(color, specular.b, mask);
+    color = lerp(color, specular.b * 2, mask);
+
+    color = ApplyWaterColor(vertex, color, emission * albedo);
 
     // Bloom is only rendered where alpha > 0
     float teamColorGlow = (vertex.color.r + vertex.color.g + vertex.color.b) / 3;
     teamColorGlow = albedo.a * (1 - teamColorGlow) * 0.06;
-    float alpha = mirrored ? 0.5 : saturate(specular.b - 0.1) * 0.4 + teamColorGlow + whiteness * 0.2;
+    float alpha = mirrored ? 0.5 : saturate(specular.b - 0.1) * 0.4 + teamColorGlow + whiteness * 0.1 + glowMinimum;
     
     return float4(color, alpha);
 }

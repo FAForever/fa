@@ -21,7 +21,6 @@
 --******************************************************************************************************
 
 local Shared = import("/lua/shared/navgenerator.lua")
-local MarkerGenerator = import("/lua/sim/markergenerator.lua")
 
 ---@alias NavTerrainCache number[][]
 ---@alias NavDepthCache number[][]
@@ -166,6 +165,39 @@ NavGrid = ClassNavGrid {
         self.Trees[z][x] = labelTree
     end,
 
+    ---@param self NavGrid
+    ---@param position Vector A position in world space
+    ---@return CompressedLabelTreeRoot?
+    FindRoot = function(self, position)
+        return self:FindRootXZ(position[1], position[3])
+    end,
+
+    ---@param self NavGrid
+    ---@param x number x-coordinate, in world space
+    ---@param z number z-coordinate, in world space
+    ---@return CompressedLabelTreeRoot?
+    FindRootXZ = function(self, x, z)
+        if x > 0 and z > 0 then
+            local size = self.TreeSize
+            local trees = self.Trees
+
+            local bx = (x / size) ^ 0
+            local bz = (z / size) ^ 0
+            local root = trees[bz][bx] --[[@as CompressedLabelTreeRoot]]
+            return root
+        end
+
+        return nil
+    end,
+
+    ---@param self NavGrid
+    ---@param gx number x-coordinate, in grid space
+    ---@param gz number z-coordinate, in grid space
+    ---@return CompressedLabelTreeRoot?
+    FindRootGridspaceXZ = function(self, gx, gz)
+        return self.Trees[gx][gz] --[[@as CompressedLabelTreeRoot]]
+    end,
+
     --- Returns the leaf that encompasses the position, or nil if no leaf does
     ---@param self NavGrid
     ---@param position Vector A position in world space
@@ -293,10 +325,13 @@ local CompressedLabelTree
 ---@field TotalCosts number                 # Populated during path finding
 ---@field Seen number                       # Populated during path
 
+---@class CompressedLabelTreeRoot : CompressedLabelTreeNode
+---@field Labels table<number, number>      # Table that tells us which labels are part of this compression tree. The key represents as the label, the value represents as the fractional area that the label consumes. A value of 1 means the label tree entirely consists of one value.
+---@field Seen number | nil                 # Used during navigating
+---@field Threat number | nil               # Used during navigating
+
 --- A simplified quad tree that acts as a compression of the pathing capabilities of a section of the heightmap
 ---@class CompressedLabelTreeNode
----@field Seen number
----@field Threat number
 ---@field [1] CompressedLabelTreeNode?
 ---@field [2] CompressedLabelTreeNode?
 ---@field [3] CompressedLabelTreeNode?
@@ -384,6 +419,28 @@ CompressedLabelTree = ClassCompressedLabelTree {
             self[4]:Compress(bx, bz, ox + hc, oz + hc, hc, root, rCache, compressionThreshold, layer)
 
             NavLayerData[layer].Subdivisions = NavLayerData[layer].Subdivisions + 1
+        end
+    end,
+
+    --- Flattens the label tree into a leaf
+    ---@see Compress
+    ---@param self CompressedLabelTreeNode
+    ---@param bx number             # Location of top-left corner, in world space
+    ---@param bz number             # Location of top-left corner, in world space
+    ---@param ox number             # Offset from top-left corner, in local space
+    ---@param oz number             # Offset from top-left corner, in local space
+    ---@param size number           # Element count starting at { bx + ox, bz + oz }
+    ---@param label -1 | 0
+    ---@param layer NavLayers
+    Flatten = function(self, bx, bz, ox, oz, size, root, label, layer)
+        self.Label = label
+        self.Size = size
+        self.Root = root
+
+        if self.Label >= 0 then
+            NavLayerData[layer].PathableLeafs = NavLayerData[layer].PathableLeafs + 1
+        else
+            NavLayerData[layer].UnpathableLeafs = NavLayerData[layer].UnpathableLeafs + 1
         end
     end,
 
@@ -664,6 +721,36 @@ CompressedLabelTree = ClassCompressedLabelTree {
         return self.px - other.px, self.pz - other.pz
     end,
 
+    --- Returns all leaves in a table
+    ---@param self CompressedLabelTreeNode
+    ---@return CompressedLabelTreeLeaf[]
+    ---@return number
+    FindLeaves = function(self, cache)
+        local head = 1
+        cache = cache or { }
+        cache, head = self:_FindLeaves(cache, head)
+
+        return cache, head - 1
+    end,
+
+    --- Returns all leaves in a table
+    ---@param self CompressedLabelTreeNode
+    ---@return CompressedLabelTreeLeaf[]
+    ---@return number
+    _FindLeaves = function(self, cache, head)
+        if not self.Label then
+            cache, head = self[1]:_FindLeaves(cache, head)
+            cache, head = self[2]:_FindLeaves(cache, head)
+            cache, head = self[3]:_FindLeaves(cache, head)
+            cache, head = self[4]:_FindLeaves(cache, head)
+        else
+            cache[head] = self
+            head = head + 1
+        end
+
+        return cache, head
+    end,
+
     --- Returns the leaf that encompasses the position, or nil if no leaf does
     ---@param self CompressedLabelTreeNode
     ---@param bx number             # Location of top-left corner, in world space
@@ -850,16 +937,36 @@ function PopulateCaches(tCache, dCache, daCache, pxCache, pzCache, pCache, bCach
 
     -- compute cliff walkability
     -- compute average depth
-    -- compute terrain type
+    for z = 1, c do
+        for x = 1, c do
+            pCache[z][x] = pxCache[z][x] and pzCache[z][x] and pxCache[z + 1][x] and pzCache[z][x + 1]
+            daCache[z][x] = (dCache[z][x] + dCache[z + 1][x] + dCache[z][x + 1] + dCache[z + 1][x + 1]) * 0.25
+        end
+    end
+
+    -- determine playable area
+    local playableArea = ScenarioInfo.MapData.PlayableRect
+    local isSkirmish = ScenarioInfo.type == 'skirmish'
+
+    local tlx, tlz, brx, brz
+    if playableArea and isSkirmish then
+        tlx = playableArea[1]
+        tlz = playableArea[2]
+        brx = playableArea[3]
+        brz = playableArea[4]
+    else
+        tlx = 0
+        tlz = 0
+        brx = ScenarioInfo.size[1]
+        brz = ScenarioInfo.size[2]
+    end
+
+    -- compute terrain path blockers
     for z = 1, c do
         local absZ = bz + z
         for x = 1, c do
             local absX = bx + x
-            pCache[z][x] = pxCache[z][x] and pzCache[z][x] and pxCache[z + 1][x] and pzCache[z][x + 1]
-            daCache[z][x] = (dCache[z][x] + dCache[z + 1][x] + dCache[z][x + 1] + dCache[z + 1][x + 1]) * 0.25
-            bCache[z][x] = not GetTerrainType(absX, absZ).Blocking
-
-
+            bCache[z][x] = (tlx <= absX and brx >= absX) and (tlz <= absZ and brz >= absZ) and (not GetTerrainType(absX, absZ).Blocking)
         end
     end
 end
@@ -947,19 +1054,6 @@ function ComputeAmphPathingMatrix(size, daCache, pCache, bCache, rCache)
     end
 end
 
----@param size number
----@param daCache NavAverageDepthCache
----@param bCache NavTerrainBlockCache
----@param pCache NavPathCache
----@param rCache NavLabelCache
-function ComputeAirPathingMatrix(size, daCache, pCache, bCache, rCache)
-    for z = 1, size do
-        for x = 1, size do
-            rCache[z][x] = 0
-        end
-    end
-end
-
 --- Generates the compression grids based on the heightmap
 ---@param size number (square) size of each cell of the compression grid
 ---@param threshold number (square) size of the smallest acceptable leafs, used for culling
@@ -1002,8 +1096,7 @@ local function GenerateCompressionGrids(size, threshold)
             labelTreeAmph:Compress(bx, bz, 0, 0, size, labelTreeAmph, rCache, threshold, 'Amphibious')
             navAmphibious:AddTree(z, x, labelTreeAmph)
 
-            ComputeAirPathingMatrix(size, daCache, pCache, bCache, rCache)
-            labelTreeAir:Compress(bx, bz, 0, 0, size, labelTreeAir, rCache, threshold, 'Air')
+            labelTreeAir:Flatten(bx, bz, 0, 0, size, labelTreeAir, 0, 'Air')
             navAir:AddTree(z, x, labelTreeAir)
         end
     end
@@ -1017,23 +1110,23 @@ local function GenerateGraphs()
     local navAmphibious = NavGrids['Amphibious'] --[[@as NavGrid]]
     local navAir = NavGrids['Air'] --[[@as NavGrid]]
 
+    navAir:GenerateNeighbors()
     navLand:GenerateNeighbors()
     navWater:GenerateNeighbors()
     navHover:GenerateNeighbors()
     navAmphibious:GenerateNeighbors()
-    navAir:GenerateNeighbors()
 
+    navAir:GenerateLabels()
     navLand:GenerateLabels()
     navWater:GenerateLabels()
     navAmphibious:GenerateLabels()
     navHover:GenerateLabels()
-    navAir:GenerateLabels()
 
+    navAir:Precompute()
     navLand:Precompute()
     navWater:Precompute()
     navHover:Precompute()
     navAmphibious:Precompute()
-    navAir:Precompute()
 end
 
 --- Culls generated labels that are too small and have no meaning
@@ -1123,7 +1216,44 @@ local function GenerateMarkerMetadata()
     end
 end
 
+--- Computes various fields for the root nodes
+local function GenerateRootInformation()
 
+    local cache = { }
+    local size = ScenarioInfo.size[1] / LabelCompressionTreesPerAxis
+    local area = ((0.01 * size) * (0.01 * size))
+
+    for _, grid in NavGrids do
+        for z = 0, LabelCompressionTreesPerAxis - 1 do
+            for x = 0, LabelCompressionTreesPerAxis - 1 do
+                ---@type CompressedLabelTreeRoot
+                local tree = grid.Trees[z][x]
+
+                if not tree.Labels then
+                    local leaves, count = tree:FindLeaves(cache)
+
+                    -- sum up area
+                    local labels = { }
+                    for k = 1, count do
+                        local leaf = leaves[k]
+                        local label = leaf.Label
+                        if label > 0 then
+                            local areaOfLeaf = ((0.01 * leaf.Size) * (0.01 * leaf.Size))
+                            labels[label] = (labels[label] or 0) + areaOfLeaf
+                        end
+                    end
+
+                    -- compute ratio of total area for each label
+                    for label, areaOfLabel in labels do
+                        labels[label] = areaOfLabel / area
+                    end
+
+                    tree.Labels = labels
+                end
+            end
+        end
+    end
+end
 
 --- Generates a navigational mesh based on the heightmap
 function Generate()
@@ -1175,6 +1305,8 @@ function Generate()
     GenerateCullLabels()
     print(string.format("cleaning up generated data: %f", GetSystemTimeSecondsOnlyForProfileUse() - start))
 
+    GenerateRootInformation()
+
     -- ditch hover / amphibious if they are identical to land
     if  NavLayerData['Land'].Labels == NavLayerData['Hover'].Labels and
         NavLayerData['Land'].Neighbors == NavLayerData['Hover'].Neighbors and
@@ -1219,8 +1351,4 @@ function Generate()
 
     -- allows debugging tools to function
     import("/lua/sim/navdebug.lua")
-end
-
-function GenerateMarkers()
-    MarkerGenerator.GenerateExpansions()
 end

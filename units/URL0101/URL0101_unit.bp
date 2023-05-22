@@ -140,6 +140,7 @@ UnitBlueprint {
         },
         UnitName = '<LOC url0101_name>Mole',
         UnitWeight = 1,
+        ExcludeFromVeterancy = true,
     },
     Intel = {
         Cloak = true,

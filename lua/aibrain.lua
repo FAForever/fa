@@ -1,9 +1,9 @@
------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------
 -- File     :  /lua/aibrain.lua
 -- Author(s):
 -- Summary  :
 -- Copyright Š 2005 Gas Powered Games, Inc.  All rights reserved.
------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------
 
 -- AIBrain Lua Module
 
@@ -12,6 +12,8 @@ local TransferUnitsOwnership = import("/lua/simutils.lua").TransferUnitsOwnershi
 local TransferUnfinishedUnitsAfterDeath = import("/lua/simutils.lua").TransferUnfinishedUnitsAfterDeath
 local CalculateBrainScore = import("/lua/sim/score.lua").CalculateBrainScore
 local Factions = import('/lua/factions.lua').GetFactions(true)
+
+local CoroutineYield = coroutine.yield
 
 ---@class TriggerSpec
 ---@field Callback function
@@ -536,16 +538,20 @@ local CategoriesDummyUnit = categories.DUMMYUNIT
 
 ---@class AIBrain: AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerComponent, AIBrainEnergyComponent, moho.aibrain_methods
 ---@field AI boolean
+---@field Name string           # Army name
+---@field Nickname string       # Player / AI / character name
 ---@field Status BrainState
 ---@field Human boolean
 ---@field Civilian boolean
 ---@field Trash TrashBag
+---@field PingCallbackList { CallbackFunction: fun(pingData: any), PingType: string }[]
 ---@field BrainType 'Human' | 'AI'
 AIBrain = Class(AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerComponent, AIBrainEnergyComponent,
     moho.aibrain_methods) {
 
     Status = 'InProgress',
 
+    --- Called after `SetupSession` but before `BeginSession` - no initial units, props or resources exist at this point
     ---@param self AIBrain
     ---@param planName string
     OnCreateHuman = function(self, planName)
@@ -555,11 +561,15 @@ AIBrain = Class(AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerCom
         self.EnergyExcessThread = ForkThread(self.ToggleEnergyExcessUnitsThread, self)
     end,
 
+    --- Called after `SetupSession` but before `BeginSession` - no initial units, props or resources exist at this point
+    ---@param self AIBrain
+    ---@param planName string
     OnCreateAI = function(self, planName)
         self.BrainType = 'AI'
         self:CreateBrainShared(planName)
     end,
 
+    --- Called after `SetupSession` but before `BeginSession` - no initial units, props or resources exist at this point
     ---@param self AIBrain
     ---@param planName string
     CreateBrainShared = function(self, planName)
@@ -593,10 +603,17 @@ AIBrain = Class(AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerCom
             EXPERIMENTAL = {},
         }
 
+        self.PingCallbackList = { }
+
         AIBrainEnergyComponent.CreateBrainShared(self)
         AIBrainHQComponent.CreateBrainShared(self)
         AIBrainStatisticsComponent.CreateBrainShared(self)
         AIBrainJammerComponent.CreateBrainShared(self)
+    end,
+
+    --- Called after `BeginSession`, at this point all props, resources and initial units exist
+    ---@param self AIBrain
+    OnBeginSession = function(self)
     end,
 
     ---@param self AIBrain
@@ -1318,7 +1335,41 @@ AIBrain = Class(AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerCom
         end
     end,
 
-    -- overwritten
+    --------------------------------------------------------------------------------
+    --#region ping functionality
+
+    ---@param self AIBrain
+    ---@param callback function
+    ---@param pingType string
+    AddPingCallback = function(self, callback, pingType)
+        if callback and pingType then
+            table.insert(self.PingCallbackList, {CallbackFunction = callback, PingType = pingType})
+        end
+    end,
+
+    ---@param self AIBrain
+    ---@param pingData table
+    DoPingCallbacks = function(self, pingData)
+        for _, v in self.PingCallbackList do
+            v.CallbackFunction(self, pingData)
+        end
+    end,
+
+    ---@param self AIBrain
+    ---@param pingData table
+    DoAIPing = function(self, pingData)
+        if self.Sorian then
+            if pingData.Type then
+                SUtils.AIHandlePing(self, pingData)
+            end
+        end
+    end,
+
+    --#endregion
+    -------------------------------------------------------------------------------
+
+    -------------------------------------------------------------------------------
+    --#region overwritten c-functionality
 
     --- Retrieves all units that fit the criteria around some point. Excludes dummy units.
     ---@param self AIBrain
@@ -1326,7 +1377,7 @@ AIBrain = Class(AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerCom
     ---@param position Vector The center point to start looking for units.
     ---@param radius number The radius of the circle we look for units in.
     ---@param alliance AllianceStatus
-    ---@return nil
+    ---@return Unit[]
     GetUnitsAroundPoint = function(self, category, position, radius, alliance)
         if alliance then
             -- call where we do care about alliance
@@ -1351,7 +1402,61 @@ AIBrain = Class(AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerCom
         return BrainGetListOfUnits(self, cats - CategoriesDummyUnit, needToBeIdle, requireBuilt)
     end,
 
-    -- deprecated
+    --#endregion
+    -------------------------------------------------------------------------------
+
+    -------------------------------------------------------------------------------
+    --#region Unit callbacks
+
+    --- Called by a unit as it starts being built
+    ---@param self AIBrain
+    ---@param unit Unit
+    ---@param builder Unit  
+    ---@param layer Layer
+    OnUnitStartBeingBuilt = function(self, unit, builder, layer)
+        -- LOG(string.format('OnUnitStartBeingBuilt: %s', unit.Blueprint.BlueprintId or ''))
+    end,
+
+    --- Called by a unit as it is finished being built
+    ---@param self AIBrain
+    ---@param unit Unit
+    ---@param builder Unit
+    ---@param layer Layer
+    OnUnitStopBeingBuilt = function(self, unit, builder, layer)
+        -- LOG(string.format('OnUnitStopBeingBuilt: %s', unit.Blueprint.BlueprintId or ''))
+    end,
+
+    --- Called by a unit as it is destroyed
+    ---@param self AIBrain
+    ---@param unit Unit
+    OnUnitDestroyed = function(self, unit)
+        -- LOG(string.format('OnUnitDestroyed: %s', unit.Blueprint.BlueprintId or ''))
+    end,
+
+    --- Called by a unit as it starts building
+    ---@param self AIBrain
+    ---@param unit Unit
+    ---@param built Unit
+    OnUnitStartBuilding = function(self, unit, built)
+        -- LOG(string.format('OnUnitStartBuilding: %s -> %s', unit.Blueprint.BlueprintId or '', built.Blueprint.BlueprintId or ''))
+    end,
+
+    --- Called by a unit as it stops building
+    ---@param self AIBrain
+    ---@param unit Unit
+    ---@param built Unit
+    OnUnitStopBuilding = function(self, unit, built)
+        -- LOG(string.format('OnUnitStopBuilding: %s -> %s', unit.Blueprint.BlueprintId or '', built.Blueprint.BlueprintId or ''))
+    end,
+
+    --#endregion
+    -------------------------------------------------------------------------------
+
+    -------------------------------------------------------------------------------
+    --#region deprecated
+
+    --- All functions in this region exist because they may still be called from
+    --- unmaintained mods. They no longer serve any purpose.
 
     ---@deprecated
     ---@param self AIBrain
@@ -1363,4 +1468,37 @@ AIBrain = Class(AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerCom
     ---@param result AIResult
     SetResult = function(self, result)
     end,
+
+    --#endregion
+    -------------------------------------------------------------------------------
+
+    -------------------------------------------------------------------------------
+    --#region legacy functionality
+
+    --- All functions below solely exist because the code is too tightly coupled. 
+    --- We can't remove them without drastically changing how the code base works. 
+    --- We can't do that because it would break mod compatibility
+
+    ---@deprecated
+    ---@param self AIBrain
+    SetConstantEvaluate = function(self)
+    end,
+
+    ---@deprecated
+    ---@param self AIBrain
+    InitializeSkirmishSystems = function(self)
+    end,
+
+    ---@deprecated
+    ---@param self AIBrain
+    ForceManagerSort = function(self)
+    end,
+
+    ---@deprecated
+    ---@param self AIBrain
+    InitializePlatoonBuildManager = function(self)
+    end,
+
+    --#endregion
+    -------------------------------------------------------------------------------
 }

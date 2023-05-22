@@ -921,6 +921,8 @@ StructureUnit = ClassUnit(Unit) {
 ---@field BuildEffectBones string[]
 FactoryUnit = ClassUnit(StructureUnit) {
 
+    RollOffAnimationRate = 10,
+
     ---@param self FactoryUnit
     OnCreate = function(self)
         StructureUnit.OnCreate(self)
@@ -1145,7 +1147,7 @@ FactoryUnit = ClassUnit(StructureUnit) {
         local bp = self.Blueprint
         local bpAnim = bp.Display.AnimationFinishBuildLand
         if bpAnim and EntityCategoryContains(categories.LAND, unitBeingBuilt) then
-            self.RollOffAnim = CreateAnimator(self):PlayAnim(bpAnim)
+            self.RollOffAnim = CreateAnimator(self):PlayAnim(bpAnim):SetRate(self.RollOffAnimationRate)
             self.Trash:Add(self.RollOffAnim)
             WaitTicks(1)
             WaitFor(self.RollOffAnim)
@@ -1265,7 +1267,7 @@ FactoryUnit = ClassUnit(StructureUnit) {
     ---@param self FactoryUnit
     PlayFxRollOffEnd = function(self)
         if self.RollOffAnim then
-            self.RollOffAnim:SetRate(-1)
+            self.RollOffAnim:SetRate(-1 * self.RollOffAnimationRate)
             WaitFor(self.RollOffAnim)
             self.RollOffAnim:Destroy()
             self.RollOffAnim = nil
@@ -2267,8 +2269,6 @@ BaseTransport = ClassSimple {
                 unit.attachmentBone = i
             end
         end
-
-        unit:OnAttachedToTransport(self, attachBone)
     end,
 
     ---@param self BaseTransport
@@ -2279,7 +2279,6 @@ BaseTransport = ClassSimple {
         self:RequestRefreshUI()
         self.slots[unit.attachmentBone] = nil
         unit.attachmentBone = nil
-        unit:OnDetachedFromTransport(self, attachBone)
     end,
 
     -- When one of our attached units gets killed, detach it
@@ -2298,12 +2297,10 @@ BaseTransport = ClassSimple {
         self:GetAIBrain().loadingTransport = self
     end,
 
-    ---comment
-    ---@param ... BaseTransport
-    OnStopTransportLoading = function(...)
+    ---@param self BaseTransport
+    OnStopTransportLoading = function(self)
     end,
 
-    ---comment
     ---@param self BaseTransport
     DestroyedOnTransport = function(self)
     end,
@@ -2338,21 +2335,51 @@ BaseTransport = ClassSimple {
 --- Base class for air transports.
 ---@class AirTransport: AirUnit, BaseTransport
 AirTransport = ClassUnit(AirUnit, BaseTransport) {
-
-    
-    ---@param self AirTransport
-    OnTransportAborted = function(self)
-    end,
-
-    ---@param self AirTransport
-    OnTransportOrdered = function(self)
-    end,
-
     ---@param self AirTransport
     OnCreate = function(self)
         AirUnit.OnCreate(self)
         self.slots = {}
         self.transData = {}
+    end,
+
+    
+    ---@param self AirTransport
+    ---@param attachBone Bone
+    ---@param unit Unit
+    OnTransportAttach = function(self, attachBone, unit)
+        AirUnit.OnTransportAttach(self, attachBone, unit)
+        BaseTransport.OnTransportAttach(self, attachBone, unit)
+    end,
+
+    ---@param self AirTransport
+    ---@param attachBone Bone
+    ---@param unit Unit
+    OnTransportDetach = function(self, attachBone, unit)
+        AirUnit.OnTransportDetach(self, attachBone, unit)
+        BaseTransport.OnTransportDetach(self, attachBone, unit)
+    end,
+
+    OnAttachedKilled = function(self, attached)
+        AirUnit.OnAttachedKilled(self, attached)
+        BaseTransport.OnAttachedKilled(self, attached)
+    end,
+
+    ---@param self AirTransport
+    OnStartTransportLoading = function(self)
+        AirUnit.OnStartTransportLoading(self)
+        BaseTransport.OnStartTransportLoading(self)
+    end,
+
+    ---@param self AirTransport
+    OnStopTransportLoading = function(self)
+        AirUnit.OnStopTransportLoading(self)
+        BaseTransport.OnStopTransportLoading(self)
+    end,
+
+    ---@param self AirTransport
+    DestroyedOnTransport = function(self)
+        -- AirUnit.DestroyedOnTransport(self)
+        BaseTransport.DestroyedOnTransport(self)
     end,
 
     OnStopBeingBuilt = function(self, builder, layer)
@@ -2637,8 +2664,46 @@ SeaUnit = ClassUnit(MobileUnit){
 }
 
 --- Base class for aircraft carriers.
----@class AircraftCarrier : SeaUnit
+---@class AircraftCarrier : SeaUnit, BaseTransport
 AircraftCarrier = ClassUnit(SeaUnit, BaseTransport) {
+    ---@param self AircraftCarrier
+    ---@param attachBone Bone
+    ---@param unit Unit
+    OnTransportAttach = function(self, attachBone, unit)
+        SeaUnit.OnTransportAttach(self, attachBone, unit)
+        BaseTransport.OnTransportAttach(self, attachBone, unit)
+    end,
+
+    ---@param self AircraftCarrier
+    ---@param attachBone Bone
+    ---@param unit Unit
+    OnTransportDetach = function(self, attachBone, unit)
+        SeaUnit.OnTransportDetach(self, attachBone, unit)
+        BaseTransport.OnTransportDetach(self, attachBone, unit)
+    end,
+
+    OnAttachedKilled = function(self, attached)
+        SeaUnit.OnAttachedKilled(self, attached)
+        BaseTransport.OnAttachedKilled(self, attached)
+    end,
+
+    ---@param self AircraftCarrier
+    OnStartTransportLoading = function(self)
+        SeaUnit.OnStartTransportLoading(self)
+        BaseTransport.OnStartTransportLoading(self)
+    end,
+
+    ---@param self AircraftCarrier
+    OnStopTransportLoading = function(self)
+        SeaUnit.OnStopTransportLoading(self)
+        BaseTransport.OnStopTransportLoading(self)
+    end,
+
+    ---@param self AircraftCarrier
+    DestroyedOnTransport = function(self)
+        -- SeaUnit.DestroyedOnTransport(self)
+        BaseTransport.DestroyedOnTransport(self)
+    end,
 
     ---@param self AircraftCarrier
     ---@param instigator Unit
