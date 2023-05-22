@@ -26,6 +26,9 @@ local Colors = import("/lua/shared/color.lua")
 local NavGenerator = import("/lua/sim/navgenerator.lua")
 local NavDatastructures = import("/lua/sim/navdatastructures.lua")
 
+-- upvalue scope for performance
+local TableGetn = table.getn
+
 -------------------------------------------------------------------------------
 -- Debugging functionality
 
@@ -51,7 +54,7 @@ function DebugRegisterPath(type, path, origin, destination)
         ---@type { Tick: number, Path: Vector[], Origin: Vector, Destination: Vector }[]
         local cache = paths[type]
         if cache then
-            local n = table.getn(cache)
+            local n = TableGetn(cache)
             cache[n + 1] = {
                 Tick = GetGameTick(),
                 Path = path,
@@ -66,7 +69,7 @@ function DebugPathRender()
     local DrawCircle = DrawCircle
     local DrawLinePop = DrawLinePop
     local GetGameTick = GetGameTick
-    local TableGetn = table.getn
+    local TableGetn = TableGetn
     local ColorsRGB = Colors.ColorRGB
 
     local duration = 150
@@ -141,20 +144,10 @@ function Generate()
     end
 end
 
---- Produces various warning messages in the logs to inform the developer
-local function WarnNoNavMesh()
-    WARN("Navigational utilities are used without a generated navigational mesh")
-    WARN("For AI development: ")
-    WARN(" - Add in the field `requiresNavMesh = true` to each of your AI entries in  `lua/AI/CustomAIs_v2`")
-    WARN("For map or regular mod development: ")
-    WARN(" - Call the Generate function of NavUtils before calling any other function")
-end
-
 ---@param layer NavLayers
 ---@return NavGrid?
 ---@return 'InvalidLayer'?
 local function FindGrid(layer)
-    -- check layer argument
     local grid = NavGenerator.NavGrids[layer] --[[@as NavGrid]]
     if not grid then
         return nil, 'InvalidLayer'
@@ -181,7 +174,7 @@ local function FindLeaf(grid, position)
         local pz = position[3]
 
         -- try and find nearest valid neighbor
-        for k = 1, table.getn(leaf) do
+        for k = 1, TableGetn(leaf) do
 
             ---@type CompressedLabelTreeLeaf
             local neighbor = leaf[k]
@@ -214,7 +207,6 @@ end
 function CanPathTo(layer, origin, destination)
     -- check if generated
     if not NavGenerator.IsGenerated() then
-        WarnNoNavMesh()
         return nil, 'NotGenerated'
     end
 
@@ -271,22 +263,6 @@ local function PathToGetUniqueIdentifier()
     return PathToIdentifier
 end
 
----@class NavPathToOptions
-local PathToOptions = {
-    UseCache = false
-}
-
---- Retrieves a shallow copy of the default options
----@return NavPathToOptions
-function PathToDefaultOptions()
-    PathToOptions.StepSize = 0
-    PathToOptions.IncludeOrigin = false
-    PathToOptions.IncludeDestination = true
-    PathToOptions.Simplify = true
-
-    return PathToOptions
-end
-
 ---@param layer NavLayers
 ---@param origin Vector
 ---@param destination Vector
@@ -296,7 +272,6 @@ end
 function PathTo(layer, origin, destination)
     -- check if generated
     if not NavGenerator.IsGenerated() then
-        WarnNoNavMesh()
         return nil, 'NotGenerated'
     end
 
@@ -317,6 +292,9 @@ function PathTo(layer, origin, destination)
     originLeaf.AcquiredCosts = 0
     originLeaf.TotalCosts = originLeaf:DistanceTo(destinationLeaf)
     originLeaf.Seen = seenIdentifier
+
+    -- start using the navigational heap
+    PathToHeap:Clear()
     PathToHeap:Insert(originLeaf)
 
     destinationLeaf.From = nil
@@ -335,7 +313,7 @@ function PathTo(layer, origin, destination)
         end
 
         -- continue state
-        for k = 1, table.getn(leaf) do
+        for k = 1, TableGetn(leaf) do
             local neighbor = leaf[k]
             if neighbor.Label > 0 and neighbor.Seen != seenIdentifier then
                 local preferLargeNeighbor = 0
@@ -393,9 +371,6 @@ function PathTo(layer, origin, destination)
     -- add destination to the path
     path[head] = destination
 
-    -- clear up after ourselves
-    PathToHeap:Clear()
-
     DebugRegisterPath('PathTo', path, origin, destination)
 
     -- return all the goodies!!
@@ -417,7 +392,6 @@ ThreatFunctions = Shared.ThreatFunctions
 function PathToWithThreatThreshold(layer, origin, destination, aibrain, threatFunc, threatThreshold, threatRadius)
     -- check if generated
     if not NavGenerator.IsGenerated() then
-        WarnNoNavMesh()
         return nil, 'NotGenerated'
     end
 
@@ -438,6 +412,9 @@ function PathToWithThreatThreshold(layer, origin, destination, aibrain, threatFu
     originLeaf.AcquiredCosts = 0
     originLeaf.TotalCosts = originLeaf:DistanceTo(destinationLeaf)
     originLeaf.Seen = seenIdentifier
+
+    -- start using the navigational heap
+    PathToHeap:Clear()
     PathToHeap:Insert(originLeaf)
 
     destinationLeaf.From = nil
@@ -456,7 +433,7 @@ function PathToWithThreatThreshold(layer, origin, destination, aibrain, threatFu
         end
 
         -- search through neighbors
-        for k = 1, table.getn(leaf) do
+        for k = 1, TableGetn(leaf) do
             local neighbor = leaf[k]
             if neighbor.Label > 0 and neighbor.Seen != seenIdentifier then
                 local preferLargeNeighbor = 0
@@ -521,9 +498,6 @@ function PathToWithThreatThreshold(layer, origin, destination, aibrain, threatFu
     -- add destination to the path
     path[head] = destination
 
-    -- clear up after ourselves
-    PathToHeap:Clear()
-
     DebugRegisterPath('PathToWithThreatThreshold', path, origin, destination)
 
     -- return all the goodies!!
@@ -539,7 +513,6 @@ end
 function GetLabel(layer, position)
     -- check if generated
     if not NavGenerator.IsGenerated() then
-        WarnNoNavMesh()
         return nil, 'NotGenerated'
     end
 
@@ -566,6 +539,37 @@ function GetLabel(layer, position)
     return leaf.Label, nil
 end
 
+--- Returns a table with all labels in the current iMAP cell. The keys represent the labels. The values represent the ratio of area it occupies in the cell
+---@param layer NavLayers
+---@param gx number
+---@param gz number
+---@return table<number, number>? 
+---@return ('NotGenerated' | 'InvalidLayer' | 'OutsideMap' | 'SystemError' | 'Unpathable')?
+function GetLabelsofIMAP(layer, gx, gz)
+    -- check if generated
+    if not NavGenerator.IsGenerated() then
+        return nil, 'NotGenerated'
+    end
+
+    -- check layer argument
+    local grid = FindGrid(layer)
+    if not grid then
+        return nil, 'InvalidLayer'
+    end
+
+    -- check position argument
+    local root = grid:FindRootGridspaceXZ(gz - 1, gx - 1)
+    if not root then
+        return nil, 'OutsideMap'
+    end
+
+    if not root.Labels then
+        return nil, 'SystemError'
+    end
+
+    return root.Labels, nil
+end
+
 --- Returns a label that indicates to what sub-graph it belongs to. Unlike `GetLabel` this function does not try to find valid neighbors
 ---@see GetLabel
 ---@param layer NavLayers
@@ -575,7 +579,6 @@ end
 function GetTerrainLabel(layer, position)
     -- check if generated
     if not NavGenerator.IsGenerated() then
-        WarnNoNavMesh()
         return nil, 'NotGenerated'
     end
 
@@ -609,7 +612,6 @@ end
 function GetLabelMetadata(id)
     -- check if generated
     if not NavGenerator.IsGenerated() then
-        WarnNoNavMesh()
         return nil, 'NotGenerated'
     end
 
@@ -643,7 +645,6 @@ function DirectionsFrom(layer, origin, distance, sizeThreshold)
 
     -- check if generated
     if not NavGenerator.IsGenerated() then
-        WarnNoNavMesh()
         return nil, 'NotGenerated'
     end
 
@@ -669,6 +670,9 @@ function DirectionsFrom(layer, origin, distance, sizeThreshold)
     originLeaf.AcquiredCosts = 0
     originLeaf.TotalCosts = distance
     originLeaf.Seen = seenIdentifier
+
+    -- start using the navigational heap
+    PathToHeap:Clear()
     PathToHeap:Insert(originLeaf)
 
     while not PathToHeap:IsEmpty() do
@@ -699,7 +703,7 @@ function DirectionsFrom(layer, origin, distance, sizeThreshold)
         end
 
         -- search neighbors for more leafs
-        for k = 1, table.getn(leaf) do
+        for k = 1, TableGetn(leaf) do
             local neighbor = leaf[k]
             if neighbor.Label > 0 and neighbor.Seen != seenIdentifier then
                 neighbor.From = leaf
@@ -739,9 +743,6 @@ function DirectionsFrom(layer, origin, distance, sizeThreshold)
         }
     end
 
-    -- clean up after ourselves
-    PathToHeap:Clear()
-
     for k, _ in found do
         found[k] = nil
     end
@@ -766,7 +767,6 @@ function RandomDirectionFrom(layer, origin, distance, sizeThreshold)
 
     -- check if generated
     if not NavGenerator.IsGenerated() then
-        WarnNoNavMesh()
         return nil, 'NotGenerated'
     end
 
@@ -792,6 +792,9 @@ function RandomDirectionFrom(layer, origin, distance, sizeThreshold)
     originLeaf.AcquiredCosts = 0
     originLeaf.TotalCosts = distance
     originLeaf.Seen = seenIdentifier
+
+    -- start using the navigational heap
+    PathToHeap:Clear()
     PathToHeap:Insert(originLeaf)
 
     while not PathToHeap:IsEmpty() do
@@ -822,7 +825,7 @@ function RandomDirectionFrom(layer, origin, distance, sizeThreshold)
         end
 
         -- search neighbors for more leafs
-        for k = 1, table.getn(leaf) do
+        for k = 1, TableGetn(leaf) do
             local neighbor = leaf[k]
             if neighbor.Label > 0 and neighbor.Seen != seenIdentifier then
                 neighbor.From = leaf
@@ -841,7 +844,7 @@ function RandomDirectionFrom(layer, origin, distance, sizeThreshold)
     end
 
     -- retrieve a random candidate
-    local candidate = candidates[Random(1, table.getn(candidates))]
+    local candidate = candidates[Random(1, TableGetn(candidates))]
 
     local px = candidate.px
     local pz = candidate.pz
@@ -859,9 +862,6 @@ function RandomDirectionFrom(layer, origin, distance, sizeThreshold)
         GetSurfaceHeight(x, z),
         z
     }
-
-    -- clean up after ourselves
-    PathToHeap:Clear()
 
     for k, _ in found do
         found[k] = nil
@@ -888,7 +888,6 @@ function RetreatDirectionFrom(layer, origin, threat, distance)
 
     -- check if generated
     if not NavGenerator.IsGenerated() then
-        WarnNoNavMesh()
         return nil, 'NotGenerated'
     end
 
@@ -921,6 +920,9 @@ function RetreatDirectionFrom(layer, origin, threat, distance)
     originLeaf.AcquiredCosts = 0
     originLeaf.TotalCosts = distance
     originLeaf.Seen = seenIdentifier
+
+    -- start using the navigational heap
+    PathToHeap:Clear()
     PathToHeap:Insert(originLeaf)
 
     while not PathToHeap:IsEmpty() do
@@ -951,7 +953,7 @@ function RetreatDirectionFrom(layer, origin, threat, distance)
         end
 
         -- add neighbors of leaf that is too close to the origin
-        for k = 1, table.getn(leaf) do
+        for k = 1, TableGetn(leaf) do
             local neighbor = leaf[k]
             if neighbor.Label > 0 and neighbor.Seen != seenIdentifier then
 
@@ -977,7 +979,7 @@ function RetreatDirectionFrom(layer, origin, threat, distance)
     end
 
     -- retrieve a random candidate
-    local candidate = candidates[Random(1, table.getn(candidates))]
+    local candidate = candidates[Random(1, TableGetn(candidates))]
 
     local px = candidate.px
     local pz = candidate.pz
@@ -995,9 +997,6 @@ function RetreatDirectionFrom(layer, origin, threat, distance)
         GetSurfaceHeight(x, z),
         z
     }
-
-    -- clean up after ourselves
-    PathToHeap:Clear()
 
     for k, _ in found do
         found[k] = nil
@@ -1021,7 +1020,6 @@ local DirectionToPath = { }
 function DirectionTo(layer, origin, destination, distance)
     -- check if generated
     if not NavGenerator.IsGenerated() then
-        WarnNoNavMesh()
         return nil, 'NotGenerated'
     end
 
@@ -1042,6 +1040,9 @@ function DirectionTo(layer, origin, destination, distance)
     originLeaf.AcquiredCosts = 0
     originLeaf.TotalCosts = originLeaf:DistanceTo(destinationLeaf)
     originLeaf.Seen = seenIdentifier
+
+    -- start using the navigational heap
+    PathToHeap:Clear()
     PathToHeap:Insert(originLeaf)
 
     destinationLeaf.From = nil
@@ -1060,7 +1061,7 @@ function DirectionTo(layer, origin, destination, distance)
         end
 
         -- continue state
-        for k = 1, table.getn(leaf) do
+        for k = 1, TableGetn(leaf) do
             local neighbor = leaf[k]
             if neighbor.Label > 0 and neighbor.Seen != seenIdentifier then
                 local preferLargeNeighbor = 0
@@ -1077,15 +1078,10 @@ function DirectionTo(layer, origin, destination, distance)
         end
     end
 
-    -- clear up after ourselves
-    PathToHeap:Clear()
-
     -- check if we found a path
     if not destinationLeaf.Seen == seenIdentifier then
         return nil, 'SystemError'
     end
-
-    -- construct 
 
     -- construct current path
     local head = 1
@@ -1157,4 +1153,45 @@ function DirectionTo(layer, origin, destination, distance)
     end
 
     return output, distance
+end
+
+--- Returns true when the origin is in the playable area
+---@param origin Vector
+---@param offset number | nil
+---@return boolean
+function IsInPlayableArea(origin, offset)
+    offset = offset or 0
+
+    -- determine playable area
+    local playableArea = ScenarioInfo.MapData.PlayableRect
+    local tlx, tlz, brx, brz
+    if playableArea then
+        tlx = playableArea[1]
+        tlz = playableArea[2]
+        brx = playableArea[3]
+        brz = playableArea[4]
+    else
+        tlx = 0
+        tlz = 0
+        brx = ScenarioInfo.size[1]
+        brz = ScenarioInfo.size[2]
+    end
+
+    -- take into account offset
+    tlx = tlx + offset
+    tlz = tlz + offset
+    brx = brx - offset
+    brz = brz - offset
+
+    local x = origin[1]
+    local z = origin[3]
+
+    return (tlx <= x and brx >= x) and (tlz <= z and brz >= z)
+end
+
+--- Returns true when the origin is in the buildable area
+---@param origin Vector
+---@return boolean
+function IsInBuildableArea(origin)
+    return IsInPlayableArea(origin, 8)
 end

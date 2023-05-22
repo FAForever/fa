@@ -854,6 +854,10 @@ Tooltips = {
         title = "<LOC OPTIONS_0184>Bloom Render",
         description = "<LOC OPTIONS_0185>Toggles a glow type effect that is used on many weapon effects and some UI elements (off = fastest)",
     },
+    options_bloom_intensity = {
+        title = "<LOC OPTIONS_BLOOM_INTENSITY>Bloom Intensity",
+        description = "<LOC OPTIONS_BLOOM_INTENSITY_DESCRIPTION>Allows you to adjust the bloom intensity. Ranges from 10 (essentially no bloom) to 17 (more bright than usual). The standard value is 15.\r\n\r\nThis feature only works when bloom is enabled.",
+    },
     options_experimental_graphics = {
         title = "<LOC OPTIONS_EXP_GRAPHICS_01>Experimental graphics",
         description = "<LOC OPTIONS_EXP_GRAPHICS_02>Requires fidelity set to 'High'.\r\n\r\nIntroduces experimental graphics that high-end hardware should be able to support.\r\n\r\nThis feature may be unstable - use at your own risk.",
