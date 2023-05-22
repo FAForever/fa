@@ -1,5 +1,6 @@
 local StandardBrain = import("/lua/aibrain.lua").AIBrain
 local BaseAIBrainClass = import("/lua/aibrains/base-ai.lua").AIBrain
+local EconomyComponent = import("/lua/aibrains/components/economy.lua").AIBrainEconomyComponent
 
 ---@class EasyAIBrainManagers
 ---@field FactoryManager AIFactoryManager
@@ -21,7 +22,7 @@ local BaseAIBrainClass = import("/lua/aibrains/base-ai.lua").AIBrain
 ---@field GridRecon AIGridRecon
 ---@field BuilderManagers table<LocationType, AIBase>
 
-AIBrain = Class(BaseAIBrainClass) {
+AIBrain = Class(BaseAIBrainClass, EconomyComponent) {
 
     SkirmishSystems = true,
     --- Called after `SetupSession` but before `BeginSession` - no initial units, props or resources exist at this point
@@ -29,6 +30,7 @@ AIBrain = Class(BaseAIBrainClass) {
     ---@param planName string
     OnCreateAI = function(self, planName)
         BaseAIBrainClass.OnCreateAI(self, planName)
+        EconomyComponent.OnCreateAI(self)
 
         -- load in base templates
         -- todo
