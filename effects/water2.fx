@@ -406,7 +406,7 @@ float4 HighFidelityPS( VS_OUTPUT inV,
 
  	float3 defaultSunDirection = normalize(float3(0.1, -0.967, 0.253));
 	if (length(defaultSunDirection - SunDirection) > 0.1) {
-		// On many maps the sun direction is left as the default value to 
+		// On many maps the sun direction is left as the default value to
 		// accentuate the waves from the standard view angle. If we set the
 		// SunDirection to the correct value, then we lose this accentuation,
 		// so we need to add something in to make the waves more visible.

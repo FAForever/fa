@@ -28,12 +28,11 @@ XAB1401 = ClassUnit(AStructureUnit) {
         self.BallManip = CreateRotator(self, 'Orb', 'y', nil, 0, 15, 80 + Random(0, 20) * num)
         self.Trash:Add(self.BallManip)
 
-        ChangeState(self, self.ResourceOn)
-        self:ForkThread(self.ResourceMonitor)
-
         for k, v in FxAmbient do
             CreateAttachedEmitter(self, 'Orb', self.Army, v)
         end
+
+        ChangeState(self, self.ResourceOn)
     end,
 
     ResourceOn = State {
@@ -41,8 +40,8 @@ XAB1401 = ClassUnit(AStructureUnit) {
             local aiBrain = self:GetAIBrain()
             local massAdd = 0
             local energyAdd = 0
-            local maxMass = self:GetBlueprint().Economy.MaxMass
-            local maxEnergy = self:GetBlueprint().Economy.MaxEnergy
+            local maxMass = self.Blueprint.Economy.MaxMass
+            local maxEnergy = self.Blueprint.Economy.MaxEnergy
 
             while true do
                 local massNeed = aiBrain:GetEconomyRequested('MASS') * 10
@@ -57,7 +56,7 @@ XAB1401 = ClassUnit(AStructureUnit) {
                 end
 
                 if maxMass and massAdd > maxMass then
-                   massAdd = maxMass
+                    massAdd = maxMass
                 end
                 self:SetProductionPerSecondMass(massAdd)
 
@@ -70,7 +69,7 @@ XAB1401 = ClassUnit(AStructureUnit) {
                 end
                 self:SetProductionPerSecondEnergy(energyAdd)
 
-                WaitSeconds(.5)
+                WaitTicks(6)
             end
         end,
     },

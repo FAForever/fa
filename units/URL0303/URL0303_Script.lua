@@ -12,6 +12,7 @@ local CDFLaserDisintegratorWeapon = cWeapons.CDFLaserDisintegratorWeapon01
 local CDFElectronBolterWeapon = cWeapons.CDFElectronBolterWeapon
 local MissileRedirect = import("/lua/defaultantiprojectile.lua").MissileRedirect
 
+---@class EMPDeathWeapon : Weapon
 local EMPDeathWeapon = ClassWeapon(Weapon) {
     OnCreate = function(self)
         Weapon.OnCreate(self)
@@ -19,9 +20,9 @@ local EMPDeathWeapon = ClassWeapon(Weapon) {
     end,
 
     Fire = function(self)
-        local blueprint = self:GetBlueprint()
+        local blueprint = self.Blueprint
         DamageArea(self.unit, self.unit:GetPosition(), blueprint.DamageRadius,
-                   blueprint.Damage, blueprint.DamageType, blueprint.DamageFriendly)
+            blueprint.Damage, blueprint.DamageType, blueprint.DamageFriendly)
     end,
 }
 
@@ -35,9 +36,9 @@ URL0303 = ClassUnit(CWalkingLandUnit) {
         DeathWeapon = ClassWeapon(EMPDeathWeapon) {},
     },
 
-    OnStopBeingBuilt = function(self,builder,layer)
-        CWalkingLandUnit.OnStopBeingBuilt(self,builder,layer)
-        local bp = self:GetBlueprint().Defense.AntiMissile
+    OnStopBeingBuilt = function(self, builder, layer)
+        CWalkingLandUnit.OnStopBeingBuilt(self, builder, layer)
+        local bp = self.Blueprint.Defense.AntiMissile
         local antiMissile = MissileRedirect {
             Owner = self,
             Radius = bp.Radius,
@@ -50,21 +51,23 @@ URL0303 = ClassUnit(CWalkingLandUnit) {
     end,
 
     InitiateCharge = function(self)
+        local army = self.Army
+        
+        
         if self.ChargingInitiated then return end
 
         self.ChargingInitiated = true
-        local blueprint = self:GetBlueprint()
-        local bufffx3 = CreateAttachedEmitter(self, 0, self:GetArmy(), '/effects/emitters/cybran_loyalist_charge_03_emit.bp')
+        local blueprint = self.Blueprint
+        local bufffx3 = CreateAttachedEmitter(self, 0, army, '/effects/emitters/cybran_loyalist_charge_03_emit.bp')
         self.Trash:Add(bufffx3)
         WaitSeconds(blueprint.SecondsBeforeChargeKicksIn)
 
         self.ChargingInProgress = true
         self:SetAccMult(blueprint.Physics.ChargeAccMult)
         self:SetSpeedMult(blueprint.Physics.ChargeSpeedMult)
-        -- EMP duration mult added in DoDeathWeapon 
 
-        local bufffx1 = CreateAttachedEmitter(self, 0, self:GetArmy(), '/effects/emitters/cybran_loyalist_charge_01_emit.bp')
-        local bufffx2 = CreateAttachedEmitter(self, 0, self:GetArmy(), '/effects/emitters/cybran_loyalist_charge_02_emit.bp')
+        local bufffx1 = CreateAttachedEmitter(self, 0, army, '/effects/emitters/cybran_loyalist_charge_01_emit.bp')
+        local bufffx2 = CreateAttachedEmitter(self, 0, army, '/effects/emitters/cybran_loyalist_charge_02_emit.bp')
         self.Trash:Add(bufffx1)
         self.Trash:Add(bufffx2)
         StartCountdown(self.EntityId, blueprint.SecondsBeforeExplosionWhenCharging)
@@ -74,17 +77,14 @@ URL0303 = ClassUnit(CWalkingLandUnit) {
 
     OnScriptBitSet = function(self, bit)
         if bit == 7 then
-            self:ForkThread(self.InitiateCharge)
+            self.Trash:Add(ForkThread(self.InitiateCharge, self))
         end
     end,
 
     DoDeathWeapon = function(self)
         if self:IsBeingBuilt() then return end
-
-        CWalkingLandUnit.DoDeathWeapon(self) -- Handle the normal DeathWeapon procedures
-
-        -- Now handle our special buff and FX
-        local original_bp = table.deepcopy(self:GetBlueprint().Buffs)
+        CWalkingLandUnit.DoDeathWeapon(self)
+        local original_bp = table.deepcopy(self.Blueprint.Buffs)
         local bp
         for k, v in original_bp do
             if v.Add.OnDeath then
@@ -95,12 +95,10 @@ URL0303 = ClassUnit(CWalkingLandUnit) {
             end
         end
 
-        -- If we could find a blueprint with v.Add.OnDeath, then add the buff
         if bp ~= nil then
             self:AddBuff(bp)
         end
 
-        -- Play EMP Effect
         CreateLightParticle(self, -1, self.Army, 24, 62, 'flare_lens_add_02', 'ramp_red_10')
     end,
 }

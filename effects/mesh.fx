@@ -9206,8 +9206,10 @@ float3 PBR_PS(
     //////////////////////////////
     // Compute sun light
     //
+
+    // specular reflections of dielectrics mostly disappear underwater
     if (vertex.depth.x < 0) {
-        facingSpecular = facingSpecular * 0.3;
+        facingSpecular = facingSpecular * 0.05;
     }
     float3 F0 = lerp(float3(facingSpecular, facingSpecular, facingSpecular), albedo, metallic);
     float3 l = sunDirection;
