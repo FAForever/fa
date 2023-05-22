@@ -20,6 +20,46 @@
 --** SOFTWARE.
 --******************************************************************************************************
 
+---@class Stack
+---@field Size number
+Stack = ClassSimple {
+
+    ---@param self Stack
+    __init = function(self)
+        self.Size = 0
+    end,
+
+    ---@param self Stack
+    ---@param element any
+    Push = function(self, element)
+        local size = self.Size
+        self[size + 1] = element
+        self.Size = size + 1
+    end,
+
+    ---@param self Stack
+    ---@return any
+    Pop = function(self)
+        local size = self.Size
+        if size > 0 then
+            local element = self[size]
+            self.Size = size - 1
+            return element
+        end
+    end,
+
+    ---@param self Stack
+    ---@return boolean
+    Empty = function(self)
+        return self.Size == 0
+    end,
+
+    ---@param self Stack
+    Clear = function(self)
+        self.Size = 0
+    end,
+}
+
 ---@class NavPathToHeap
 ---@field Heap CompressedLabelTreeLeaf[]
 ---@field HeapSize number
@@ -39,11 +79,6 @@ NavPathToHeap = ClassSimple {
 
     ---@param self NavPathToHeap
     Clear = function(self)
-        local heap = self.Heap
-
-        for k = 1, self.HeapSize do
-            heap[k] = nil
-        end
         self.HeapSize = 0
     end,
 
@@ -89,7 +124,7 @@ NavPathToHeap = ClassSimple {
 
             -- if there is a right child, compare its value with the left one
             -- if right is smaller, then assign min = right. Else, keep min on left.
-            if heap[right] and (heap[right].TotalCosts < heap[left].TotalCosts) then
+            if right <= heapSize and (heap[right].TotalCosts < heap[left].TotalCosts) then
                 min = right
             end
 

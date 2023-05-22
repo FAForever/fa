@@ -11,7 +11,7 @@
 local CConstructionUnit = import("/lua/cybranunits.lua").CConstructionUnit
 
 ---@class URL0208 : CConstructionUnit
-URL0208 = Class(CConstructionUnit) {
+URL0208 = ClassUnit(CConstructionUnit) {
     Treads = {
         ScrollTreads = true,
         BoneName = 'URL0208',

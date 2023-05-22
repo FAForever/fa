@@ -11,9 +11,9 @@
 
 ---@param aiBrain AIBrain
 ---@param locationType string
----@param threatValue integer
+---@param threatValue number
 ---@param threatType string
----@param rings integer
+---@param rings number
 ---@return boolean
 function EnemyThreatGreaterThanValueAtBase(aiBrain, locationType, threatValue, threatType, rings)
     local testRings = rings or aiBrain.IMAPConfig.Rings + 1
@@ -30,9 +30,9 @@ end
 
 ---@param aiBrain AIBrain
 ---@param locationType string
----@param threatValue integer
+---@param threatValue number
 ---@param threatType string
----@param rings integer
+---@param rings number
 ---@return boolean
 function EnemyThreatLessThanValueAtBase(aiBrain, locationType, threatValue, threatType, rings)
     local testRings = rings or 10
@@ -51,7 +51,7 @@ end
 ---@param locationType string
 ---@param poolType string
 ---@param enemyType string
----@param rings integer
+---@param rings number
 ---@return boolean
 function HaveLessThreatThanNearby( aiBrain, locationType, poolType, enemyType, rings )
     local pool = aiBrain:GetPlatoonUniquelyNamed('ArmyPool')

@@ -1,19 +1,14 @@
-----****************************************************************************
-----**
-----**  File     :  /cdimage/units/URB3202/URB3202_script.lua
-----**  Author(s):  John Comes
-----**
-----**  Summary  :  Cybran Long Range Sonar Script
-----**
-----**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-----****************************************************************************
+-- File     :  /cdimage/units/URB3202/URB3202_script.lua
+-- Author(s):  John Comes
+-- Summary  :  Cybran Long Range Sonar Script
+-- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+------------------------------------------------------------------
 local CSeaUnit = import("/lua/cybranunits.lua").CSeaUnit
 
 ---@class URB3302 : CSeaUnit
-URB3302 = Class(CSeaUnit) {
+URB3302 = ClassUnit(CSeaUnit) {
     OnStopBeingBuilt = function(self, builder, layer)
         CSeaUnit.OnStopBeingBuilt(self, builder, layer)
-        --enable sonar economy
         self:SetMaintenanceConsumptionActive()
     end,
 
@@ -24,11 +19,11 @@ URB3302 = Class(CSeaUnit) {
             },
             Type = 'SonarBuoy01',
         },
-    }, 
+    },
 
     CreateIdleEffects = function(self)
         CSeaUnit.CreateIdleEffects(self)
-        self.TimedSonarEffectsThread = self:ForkThread(self.TimedIdleSonarEffects)
+        self.TimedSonarEffectsThread = self.Trash:Add(ForkThread(self.TimedIdleSonarEffects,self))
     end,
 
     TimedIdleSonarEffects = function(self)
@@ -42,14 +37,16 @@ URB3302 = Class(CSeaUnit) {
 
                     for kb, vBone in vTypeGroup.Bones do
                         for ke, vEffect in effects do
-                            emit = CreateAttachedEmitter(self, vBone, self.Army, vEffect):ScaleEmitter(vTypeGroup.Scale or 1)
+                            emit = CreateAttachedEmitter(self, vBone, self.Army, vEffect):ScaleEmitter(vTypeGroup.Scale
+                                or 1)
                             if vTypeGroup.Offset then
-                                emit:OffsetEmitter(vTypeGroup.Offset[1] or 0, vTypeGroup.Offset[2] or 0,vTypeGroup.Offset[3] or 0)
+                                emit:OffsetEmitter(vTypeGroup.Offset[1] or 0, vTypeGroup.Offset[2] or 0,
+                                    vTypeGroup.Offset[3] or 0)
                             end
                         end
                     end
                 end
-                WaitSeconds(6)
+                WaitTicks(61)
             end
         end
     end,

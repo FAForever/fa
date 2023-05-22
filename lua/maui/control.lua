@@ -27,7 +27,7 @@
 
 ---@class Control : moho.control_methods
 ---@field _isDisabled boolean
-Control = Class(moho.control_methods) {
+Control = ClassUI(moho.control_methods) {
     --- Resets the control's layout to the defaults, in this case
     --- makes a circular dependency where you must have at least 4 defined.
     --- Overload this in your own classes to make it behave differently

@@ -22,6 +22,8 @@ local StructureUnit = DefaultUnitsFile.StructureUnit
 local QuantumGateUnit = DefaultUnitsFile.QuantumGateUnit
 local RadarJammerUnit = DefaultUnitsFile.RadarJammerUnit
 local CommandUnit = DefaultUnitsFile.CommandUnit
+local RadarUnit = DefaultUnitsFile.RadarUnit
+local MassCollectionUnit = DefaultUnitsFile.MassCollectionUnit
 
 local EffectTemplate = import("/lua/effecttemplates.lua")
 local EffectUtil = import("/lua/effectutilities.lua")
@@ -272,7 +274,7 @@ CConstructionTemplate = ClassSimple {
 --- The build bot class for drones. It removes a lot of
 -- the basic functionality of a unit to save on performance.
 ---@class CBuildBotUnit : DummyUnit
-CBuildBotUnit = Class(DummyUnit) {
+CBuildBotUnit = ClassDummyUnit(DummyUnit) {
 
     -- Keep track of the builder that made the bot
     SpawnedBy = false,
@@ -281,13 +283,13 @@ CBuildBotUnit = Class(DummyUnit) {
     ---@param self CBuildBotUnit
     OnPreCreate = function(self) 
         self.Trash = TrashBag()
-    end,             
+    end,         
 
     --- only initialise what we need
     ---@param self CBuildBotUnit
     OnCreate = function(self)
         DummyUnit.OnCreate(self)
-        
+
         -- prevent drone from consuming anything
         UnitSetConsumptionActive(self, false)
     end,
@@ -295,14 +297,14 @@ CBuildBotUnit = Class(DummyUnit) {
     --- short-cut when being destroyed
     ---@param self CBuildBotUnit
     OnDestroy = function(self) 
-        self.Dead = true 
+        self.Dead = true
         self.Trash:Destroy()
 
         if self.SpawnedBy then 
             self.SpawnedBy.BuildBotsNext = self.SpawnedBy.BuildBotsNext - 1
         end
     end,
-    
+
     ---@param self CBuildBotUnit
     Kill = function(self)
         -- make it go boom
@@ -346,7 +348,7 @@ CBuildBotUnit = Class(DummyUnit) {
 
 -- AIR FACTORY STRUCTURES
 ---@class CAirFactoryUnit : AirFactoryUnit
-CAirFactoryUnit = Class(AirFactoryUnit) {
+CAirFactoryUnit = ClassUnit(AirFactoryUnit) {
 
     ---@param self CAirFactoryUnit
     ---@param unitBeingBuilt Unit
@@ -395,19 +397,19 @@ CAirFactoryUnit = Class(AirFactoryUnit) {
 
 -- AIR STAGING STRUCTURES
 ---@class CAirStagingPlatformUnit : AirStagingPlatformUnit
-CAirStagingPlatformUnit = Class(AirStagingPlatformUnit) {}
+CAirStagingPlatformUnit = ClassUnit(AirStagingPlatformUnit) {}
 
 -- AIR UNITS
 ---@class CAirUnit : AirUnit
-CAirUnit = Class(AirUnit) {}
+CAirUnit = ClassUnit(AirUnit) {}
 
 -- WALL STRUCTURES
 ---@class CConcreteStructureUnit : ConcreteStructureUnit
-CConcreteStructureUnit = Class(ConcreteStructureUnit) {}
+CConcreteStructureUnit = ClassUnit(ConcreteStructureUnit) {}
 
 -- CONSTRUCTION UNITS
 ---@class CConstructionUnit : ConstructionUnit, CConstructionTemplate
-CConstructionUnit = Class(ConstructionUnit, CConstructionTemplate){
+CConstructionUnit = ClassUnit(ConstructionUnit, CConstructionTemplate){
 
     ---@param self CConstructionUnit
     OnCreate = function(self)
@@ -496,7 +498,7 @@ CConstructionUnit = Class(ConstructionUnit, CConstructionTemplate){
 
 -- ENERGY CREATION UNITS
 ---@class CEnergyCreationUnit : EnergyCreationUnit
-CEnergyCreationUnit = Class(DefaultUnitsFile.EnergyCreationUnit) {
+CEnergyCreationUnit = ClassUnit(DefaultUnitsFile.EnergyCreationUnit) {
 
     ---@param self CEnergyCreationUnit
     ---@param builder Unit
@@ -513,11 +515,11 @@ CEnergyCreationUnit = Class(DefaultUnitsFile.EnergyCreationUnit) {
 
 -- ENERGY STORAGE STRUCTURES
 ---@class CEnergyStorageUnit : EnergyStorageUnit
-CEnergyStorageUnit = Class(EnergyStorageUnit) {}
+CEnergyStorageUnit = ClassUnit(EnergyStorageUnit) {}
 
 -- LAND FACTORY STRUCTURES
 ---@class CLandFactoryUnit : LandFactoryUnit
-CLandFactoryUnit = Class(LandFactoryUnit) {
+CLandFactoryUnit = ClassUnit(LandFactoryUnit) {
 
     ---@param self CLandFactoryUnit
     ---@param unitBeingBuilt Unit
@@ -569,31 +571,271 @@ CLandFactoryUnit = Class(LandFactoryUnit) {
 
 -- LAND UNITS
 ---@class CLandUnit : LandUnit
-CLandUnit = Class(DefaultUnitsFile.LandUnit) {}
+CLandUnit = ClassUnit(DefaultUnitsFile.LandUnit) {}
 
 -- MASS COLLECTION UNITS
 ---@class CMassCollectionUnit : MassCollectionUnit
-CMassCollectionUnit = Class(DefaultUnitsFile.MassCollectionUnit) {}
+---@field AnimationManipulator moho.AnimationManipulator
+CMassCollectionUnit = ClassUnit(MassCollectionUnit) {
+
+    ---@param self CMassCollectionUnit
+    PlayActiveAnimation = function(self)
+        MassCollectionUnit.PlayActiveAnimation(self)
+
+        local animationManipulator = self.AnimationManipulator
+        if not animationManipulator then
+            animationManipulator = CreateAnimator(self)
+            self.Trash:Add(animationManipulator)
+            self.AnimationManipulator = animationManipulator
+        end
+
+        animationManipulator:PlayAnim(self.Blueprint.Display.AnimationOpen, true)
+    end,
+
+    ---@param self CMassCollectionUnit
+    OnProductionPaused = function(self)
+        MassCollectionUnit.OnProductionPaused(self)
+        local animationManipulator = self.AnimationManipulator
+        if not animationManipulator then return end
+        animationManipulator:SetRate(0)
+    end,
+
+    ---@param self CMassCollectionUnit
+    OnProductionUnpaused = function(self)
+        MassCollectionUnit.OnProductionUnpaused(self)
+        local animationManipulator = self.AnimationManipulator
+        if not animationManipulator then return end
+        animationManipulator:SetRate(1)
+    end,
+
+}
 
 --  MASS FABRICATION UNITS
 ---@class CMassFabricationUnit : MassFabricationUnit
-CMassFabricationUnit = Class(DefaultUnitsFile.MassFabricationUnit) {}
+CMassFabricationUnit = ClassUnit(DefaultUnitsFile.MassFabricationUnit) {}
 
 --  MASS STORAGE UNITS
 ---@class CMassStorageUnit : MassStorageUnit
-CMassStorageUnit = Class(DefaultUnitsFile.MassStorageUnit) {}
+CMassStorageUnit = ClassUnit(DefaultUnitsFile.MassStorageUnit) {}
 
 -- RADAR STRUCTURES
+
 ---@class CRadarUnit : RadarUnit
-CRadarUnit = Class(DefaultUnitsFile.RadarUnit) {}
+---@field Thread1 thread
+---@field Thread2 thread
+---@field Thread3 thread
+---@field Dish1Rotator moho.RotateManipulator
+---@field Dish2Rotator moho.RotateManipulator
+---@field Dish3Rotator moho.RotateManipulator
+CRadarUnit = ClassUnit(RadarUnit) {
+
+    ---@param self CRadarUnit
+    ---@param intel IntelType
+    OnIntelDisabled = function(self, intel)
+        RadarUnit.OnIntelDisabled(self, intel)
+
+        local rotator, thread
+
+        thread = self.Thread1
+        if (thread) then
+            KillThread(thread)
+            self.Thread1 = nil
+
+        end
+
+        rotator = self.Dish1Rotator
+        if rotator then
+            rotator:SetTargetSpeed(0)
+        end
+
+        thread = self.Thread2
+        if (thread) then
+            KillThread(thread)
+            self.Thread2 = nil
+        end
+
+        rotator = self.Dish2Rotator
+        if rotator then
+            rotator:SetTargetSpeed(0)
+        end
+
+        thread = self.Thread3
+        if (thread) then
+            KillThread(thread)
+            self.Thread3 = nil
+        end
+
+        rotator = self.Dish3Rotator
+        if rotator then
+            rotator:SetTargetSpeed(0)
+        end
+    end,
+
+    ---@param self CRadarUnit
+    ---@param intel IntelType
+    OnIntelEnabled = function(self, intel)
+        RadarUnit.OnIntelEnabled(self, intel)
+
+        local thread
+        local trash = self.Trash
+
+        thread = self.Thread1
+        if not thread then
+            thread = ForkThread(self.Dish1Behavior, self)
+            self.Thread1 = thread
+            trash:Add(thread)
+        end
+
+        thread = self.Thread2 
+        if not thread then
+            thread = ForkThread(self.Dish2Behavior, self)
+            self.Thread2 = thread
+            trash:Add(thread)
+        end
+
+        thread = self.Thread3
+        if not thread then
+            thread = ForkThread(self.Dish3Behavior, self)
+            self.Thread3 = thread
+            trash:Add(thread)
+        end
+    end,
+
+    ---@param self CRadarUnit
+    Dish1Behavior = function(self)
+        local rotator = self.Dish1Rotator
+        if not rotator then
+            rotator = CreateRotator(self, 'Dish01', 'x')
+            self.Dish1Rotator = rotator
+            self.Trash:Add(rotator)
+        end
+
+        -- local scope for performance
+        local WaitFor = WaitFor
+        local WaitTicks = WaitTicks
+        local Random = Random
+
+        rotator:SetSpeed(5):SetGoal(0)
+        WaitFor(rotator)
+        rotator:SetSpeed(0)
+        rotator:ClearGoal()
+        rotator:SetAccel(5)
+
+        while true do
+            rotator:SetTargetSpeed(-15)
+            WaitFor(rotator)
+            rotator:SetTargetSpeed(0)
+            WaitFor(rotator)
+
+            if (Random() < 0.5) then
+                WaitTicks(11)
+            end
+
+            rotator:SetTargetSpeed(15)
+            WaitFor(rotator)
+            rotator:SetTargetSpeed(0)
+            WaitFor(rotator)
+
+            if (Random() < 0.5) then
+                WaitTicks(11)
+            end
+        end
+    end,
+
+    ---@param self CRadarUnit
+    Dish2Behavior = function(self)
+        local rotator = self.Dish2Rotator
+        if not rotator then
+            rotator = CreateRotator(self, 'Dish02', 'x')
+            self.Dish2Rotator = rotator
+            self.Trash:Add(rotator)
+        end
+
+        -- local scope for performance
+        local WaitFor = WaitFor
+        local WaitTicks = WaitTicks
+        local Random = Random
+
+        rotator:SetSpeed(5):SetGoal(0)
+        WaitFor(rotator)
+        WaitTicks(21)
+        rotator:SetSpeed(0)
+        rotator:ClearGoal()
+        rotator:SetAccel(5)
+
+        while true do
+            rotator:SetTargetSpeed(-15)
+            WaitFor(rotator)
+            rotator:SetTargetSpeed(0)
+            WaitFor(rotator)
+
+            if (Random() < 0.4) then
+                WaitTicks(11)
+            end
+
+            rotator:SetTargetSpeed(15)
+            WaitFor(rotator)
+            rotator:SetTargetSpeed(0)
+            WaitFor(rotator)
+
+            if (Random() < 0.4) then
+                WaitTicks(11)
+            end
+        end
+    end,
+
+    ---@param self CRadarUnit
+    Dish3Behavior = function(self)
+        local rotator = self.Dish3Rotator
+        if not rotator then
+            rotator = CreateRotator(self, 'Dish03', 'x')
+            self.Dish3Rotator = rotator
+            self.Trash:Add(rotator)
+        end
+
+        -- local scope for performance
+        local WaitFor = WaitFor
+        local WaitTicks = WaitTicks
+        local Random = Random
+
+        rotator:SetSpeed(5):SetGoal(0)
+        WaitFor(rotator)
+        WaitTicks(51)
+        rotator:SetSpeed(0)
+        rotator:ClearGoal()
+        rotator:SetAccel(5)
+
+        while true do
+            rotator:SetTargetSpeed(-15)
+            WaitFor(rotator)
+            rotator:SetTargetSpeed(0)
+            WaitFor(rotator)
+
+            if (Random() < 0.6) then
+                WaitTicks(11)
+            end
+
+            rotator:SetTargetSpeed(15)
+            WaitFor(rotator)
+            rotator:SetTargetSpeed(0)
+            WaitFor(rotator)
+
+            if (Random() < 0.6) then
+                WaitTicks(11)
+            end
+        end
+    end,
+
+
+}
 
 -- SONAR STRUCTURES
 ---@class CSonarUnit : SonarUnit
-CSonarUnit = Class(DefaultUnitsFile.SonarUnit) {}
+CSonarUnit = ClassUnit(DefaultUnitsFile.SonarUnit) {}
 
 -- SEA FACTORY STRUCTURES
 ---@class CSeaFactoryUnit : SeaFactoryUnit
-CSeaFactoryUnit = Class(SeaFactoryUnit) {
+CSeaFactoryUnit = ClassUnit(SeaFactoryUnit) {
 
     ---@param self CSeaFactoryUnit
     ---@param unitBeingBuilt Unit
@@ -669,27 +911,27 @@ CSeaFactoryUnit = Class(SeaFactoryUnit) {
 
 -- SEA UNITS
 ---@class CSeaUnit : SeaUnit
-CSeaUnit = Class(SeaUnit) {}
+CSeaUnit = ClassUnit(SeaUnit) {}
 
 -- SHIELD LAND UNITS
 ---@class CShieldLandUnit : ShieldLandUnit
-CShieldLandUnit = Class(ShieldLandUnit) {}
+CShieldLandUnit = ClassUnit(ShieldLandUnit) {}
 
 -- SHIELD STRUCTURES
 ---@class CShieldStructureUnit : ShieldStructureUnit
-CShieldStructureUnit = Class(ShieldStructureUnit) {}
+CShieldStructureUnit = ClassUnit(ShieldStructureUnit) {}
 
 -- STRUCTURES
 ---@class CStructureUnit : StructureUnit
-CStructureUnit = Class(StructureUnit) {}
+CStructureUnit = ClassUnit(StructureUnit) {}
 
 -- SUBMARINE UNITS
 ---@class CSubUnit : SubUnit
-CSubUnit = Class(DefaultUnitsFile.SubUnit) {}
+CSubUnit = ClassUnit(DefaultUnitsFile.SubUnit) {}
 
 -- TRANSPORT BEACON UNITS
 ---@class CTransportBeaconUnit : TransportBeaconUnit
-CTransportBeaconUnit = Class(DefaultUnitsFile.TransportBeaconUnit) {}
+CTransportBeaconUnit = ClassUnit(DefaultUnitsFile.TransportBeaconUnit) {}
 
 -- WALKING LAND UNITS
 ---@class CWalkingLandUnit : WalkingLandUnit
@@ -697,22 +939,22 @@ CWalkingLandUnit = DefaultUnitsFile.WalkingLandUnit
 
 -- WALL STRUCTURES
 ---@class CWallStructureUnit : WallStructureUnit
-CWallStructureUnit = Class(DefaultUnitsFile.WallStructureUnit) {}
+CWallStructureUnit = ClassUnit(DefaultUnitsFile.WallStructureUnit) {}
 
 -- CIVILIAN STRUCTURES
 ---@class CCivilianStructureUnit : CStructureUnit
-CCivilianStructureUnit = Class(CStructureUnit) {}
+CCivilianStructureUnit = ClassUnit(CStructureUnit) {}
 
 -- QUANTUM GATE UNITS
 ---@class CQuantumGateUnit : QuantumGateUnit
-CQuantumGateUnit = Class(QuantumGateUnit) {}
+CQuantumGateUnit = ClassUnit(QuantumGateUnit) {}
 
 -- RADAR JAMMER UNITS
 ---@class CRadarJammerUnit : RadarJammerUnit
-CRadarJammerUnit = Class(RadarJammerUnit) {}
+CRadarJammerUnit = ClassUnit(RadarJammerUnit) {}
 
 ---@class CConstructionEggUnit : CStructureUnit
-CConstructionEggUnit = Class(CStructureUnit) {
+CConstructionEggUnit = ClassUnit(CStructureUnit) {
 
     ---@param self CConstructionEggUnit
     ---@param builder Unit
@@ -762,7 +1004,7 @@ CConstructionEggUnit = Class(CStructureUnit) {
 -- TODO: This should be made more general and put in defaultunits.lua in case other factions get similar buildings
 -- CConstructionStructureUnit
 ---@class CConstructionStructureUnit : CStructureUnit, CConstructionTemplate
-CConstructionStructureUnit = Class(CStructureUnit, CConstructionTemplate) {
+CConstructionStructureUnit = ClassUnit(CStructureUnit, CConstructionTemplate) {
 
     ---@param self CConstructionStructureUnit
     OnCreate = function(self)
@@ -774,7 +1016,6 @@ CConstructionStructureUnit = Class(CStructureUnit, CConstructionTemplate) {
         local bp = self:GetBlueprint()
 
         -- Construction stuff
-        self.EffectsBag = {}
         if bp.General.BuildBones then
             self:SetupBuildBones()
         end
@@ -924,7 +1165,7 @@ CConstructionStructureUnit = Class(CStructureUnit, CConstructionTemplate) {
 ---# CCommandUnit
 ---Cybran Command Units (ACU and SCU) have stealth and cloak enhancements, toggles can be handled in one class
 ---@class CCommandUnit : CommandUnit
-CCommandUnit = Class(CommandUnit, CConstructionTemplate) {
+CCommandUnit = ClassUnit(CommandUnit, CConstructionTemplate) {
 
     ---@param self CCommandUnit
     OnCreate = function(self)

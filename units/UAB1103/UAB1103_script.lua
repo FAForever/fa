@@ -1,18 +1,12 @@
---****************************************************************************
---**
---**  File     :  /cdimage/units/UAB1103/UAB1103_script.lua
---**  Author(s):  John Comes, David Tomandl, Jessica St. Croix
---**
---**  Summary  :  Aeon Mass Extractor Script
---**
---**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
---****************************************************************************
-
+-- File     :  /cdimage/units/UAB1103/UAB1103_script.lua
+-- Author(s):  John Comes, David Tomandl, Jessica St. Croix
+-- Summary  :  Aeon Mass Extractor Script
+-- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+-------------------------------------------------------------------
 local AMassCollectionUnit = import("/lua/aeonunits.lua").AMassCollectionUnit
 
 ---@class UAB1103 : AMassCollectionUnit
-UAB1103 = Class(AMassCollectionUnit) {
-
+UAB1103 = ClassUnit(AMassCollectionUnit) {
     OnStartBuild = function(self, unitBeingBuilt, order)
         AMassCollectionUnit.OnStartBuild(self, unitBeingBuilt, order)
         if not self.AnimationManipulator then return end
@@ -27,7 +21,7 @@ UAB1103 = Class(AMassCollectionUnit) {
             self.AnimationManipulator = CreateAnimator(self)
             self.Trash:Add(self.AnimationManipulator)
         end
-        self.AnimationManipulator:PlayAnim(self:GetBlueprint().Display.AnimationActivate, true)
+        self.AnimationManipulator:PlayAnim(self.Blueprint.Display.AnimationActivate, true)
     end,
 
     OnProductionPaused = function(self)

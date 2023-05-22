@@ -10,7 +10,8 @@ local UIUtil = import("/lua/ui/uiutil.lua")
 ---@field mMouseOver boolean
 ---@field mClickCue string
 ---@field mRolloverCue string
-Button = Class(Bitmap) {
+---@field mDragger? Dragger
+Button = ClassUI(Bitmap) {
     ---@param self Button
     ---@param parent Control
     ---@param normal FileName
@@ -46,6 +47,10 @@ Button = Class(Bitmap) {
     ApplyTextures = function(self)
         if self._isDisabled and self.mDisabled then
             self:SetTexture(self.mDisabled)
+        elseif self.mDragger and self.mMouseOver and self.mActive then
+            self:SetTexture(self.mActive)
+        elseif self.mMouseOver and self.mHighlight then
+            self:SetTexture(self.mHighlight)
         elseif self.mNormal then
             self:SetTexture(self.mNormal)
         end
@@ -53,6 +58,12 @@ Button = Class(Bitmap) {
     end,
 
     OnDisable = function(self)
+        -- it probably makes sense to enable this, but I'll leave the behavior as-is for now
+        --self.mMouseOver = false
+        --if self.mDragger then
+        --    self.mDragger:Destroy()
+        --    self.mDragger = nil
+        --end
         self:ApplyTextures()
     end,
 
@@ -65,6 +76,13 @@ Button = Class(Bitmap) {
 
     HandleEvent = function(self, event)
         if self._isDisabled then
+            if not self:IsHitTestDisabled() then
+                if event.Type == 'MouseEnter' then
+                    self.mMouseOver = true
+                elseif event.Type == 'MouseExit' then
+                    self.mMouseOver = false
+                end
+            end
             return true
         end
 
@@ -94,7 +112,7 @@ Button = Class(Bitmap) {
             dragger.OnRelease = function(dragger, x, y)
                 dragger:Destroy()
                 self.mDragger = nil
-                if self.mMouseOver then
+                if self.mMouseOver and not self._isDisabled then
                     self:SetTexture(self.mHighlight)
                     self:OnRolloverEvent('exit')
                     self:OnClick(event.Modifiers)
@@ -102,7 +120,7 @@ Button = Class(Bitmap) {
                 end
             end
             dragger.OnCancel = function(dragger)
-                if self.mMouseOver then
+                if self.mMouseOver and not self._isDisabled then
                     self:SetTexture(self.mHighlight)
                     self:Play()
                 end
@@ -133,13 +151,20 @@ Button = Class(Bitmap) {
 -- for the retarded construction UI, and can probably be got rid of when we think of a better way of
 -- doing this. For now this at least gets this bollocks out of the Button class.
 ---@class FixableButton : Button
-FixableButton = Class(Button) {
+FixableButton = ClassUI(Button) {
     SetOverrideTexture = function(self, texture)
         self.textureOverride = texture
     end,
 
     OverrideHandleEvent = function(self, event)
         if self._isDisabled then
+            if not self:IsHitTestDisabled() then
+                if event.Type == 'MouseEnter' then
+                    self.mMouseOver = true
+                elseif event.Type == 'MouseExit' then
+                    self.mMouseOver = false
+                end
+            end
             return true
         end
 
@@ -163,7 +188,7 @@ FixableButton = Class(Button) {
             dragger.OnRelease = function(dragger, x, y)
                 dragger:Destroy()
                 self.mDragger = nil
-                if self.mMouseOver then
+                if self.mMouseOver and not self._isDisabled then
                     self:OnRolloverEvent('exit')
                     self:OnClick(event.Modifiers)
                 end

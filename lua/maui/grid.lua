@@ -4,7 +4,7 @@ local ScaleNumber = import("/lua/maui/layouthelpers.lua").ScaleNumber
 local LazyVar = import("/lua/lazyvar.lua")
 
 ---@class Grid : Group
-Grid = Class(Group) {
+Grid = ClassUI(Group) {
     -- note that the grid "assumes" your entries will be the correct width and height but doesn't enforce it
     -- controls could be bigger or smaller, it's up to you, but if they're bigger they will overlap as only
     -- the left top is placed, the whole grid is not resized

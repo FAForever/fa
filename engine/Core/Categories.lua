@@ -194,7 +194,6 @@ categories = {
     TECH1 = categoryValue,
     TECH2 = categoryValue,
     TECH3 = categoryValue,
-    TECH_THREE = categoryValue,
     TECH_TWO = categoryValue,
     TELEPORTBEACON = categoryValue,
     TORPEDO = categoryValue,
@@ -429,7 +428,6 @@ categories = {
 ---| "TECH1"
 ---| "TECH2"
 ---| "TECH3"
----| "TECH_THREE"
 ---| "TECH_TWO"
 ---| "TELEPORTBEACON"
 ---| "TORPEDO"

@@ -108,6 +108,16 @@ function LoadScenario(scenName)
         end
     end
 
+    -- Check if the map has mission briefing data
+    local stringsFileName = string.sub(scenName, 1, string.len(scenName) - string.len("scenario.lua")) .. "strings.lua"
+    if DiskGetFileInfo(stringsFileName) then
+        local stringsEnv = {}
+        doscript(stringsFileName, stringsEnv)
+        if stringsEnv.BriefingData ~= nil then
+            env.ScenarioInfo.hasBriefing = true
+        end
+    end
+
     -- Is this map flagged out of date? *CACKLES INSANELY*
     local pathBits = Utils.StringSplit(scenName, '/')
     env.ScenarioInfo.Outdated = OutdatedMaps[pathBits[2]]
@@ -212,7 +222,7 @@ function GetStartPositions(scenario)
     if not table.empty(armyPositions) then
         for army, position in armyPositions do
             if saveData.Scenario.MasterChain['_MASTERCHAIN_'].Markers[army] then
-                pos = saveData.Scenario.MasterChain['_MASTERCHAIN_'].Markers[army].position
+                local pos = saveData.Scenario.MasterChain['_MASTERCHAIN_'].Markers[army].position
                 -- x and z value are of interest so ignore y (index 2)
                 position[1] = pos[1]
                 position[2] = pos[3]

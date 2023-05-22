@@ -131,7 +131,7 @@ UnitBlueprint {
             },
         },
         SelectionPriority = 5,
-        TechLevel = 'RULEUTL_Advanced',
+        TechLevel = 'RULEUTL_Basic',
         UnitWeight = 1,
     },
     Interface = {

@@ -9,16 +9,16 @@ local SAirUnit = import("/lua/seraphimunits.lua").SAirUnit
 local SIFBombZhanaseeWeapon = import("/lua/seraphimweapons.lua").SIFBombZhanaseeWeapon
 
 ---@class XSA0304 : SAirUnit
-XSA0304 = Class(SAirUnit) {
+XSA0304 = ClassUnit(SAirUnit) {
     Weapons = {
-        Bomb = Class(SIFBombZhanaseeWeapon) {},
+        Bomb = ClassWeapon(SIFBombZhanaseeWeapon) {},
     },
-    
+
     OnDamage = function(self, instigator, amount, vector, damageType)
-        if instigator and instigator:GetBlueprint().CategoriesHash.STRATEGICBOMBER and instigator.Army == self.Army then
+        if instigator and instigator.Blueprint.CategoriesHash.STRATEGICBOMBER and instigator.Army == self.Army then
             return
         end
-        
+
         SAirUnit.OnDamage(self, instigator, amount, vector, damageType)
     end,
 }

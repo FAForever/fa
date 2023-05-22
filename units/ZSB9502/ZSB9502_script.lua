@@ -1,20 +1,15 @@
---****************************************************************************
---**
---**  File     :  /units/ZSB9502/ZSB9502_script.lua
---**
---**  Summary  :  Seraphim T2 Air Factory Script
---**
---**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
---****************************************************************************
+-- File     :  /units/ZSB9502/ZSB9502_script.lua
+-- Summary  :  Seraphim T2 Air Factory Script
+-- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+------------------------------------------------------------------
 local SAirFactoryUnit = import("/lua/seraphimunits.lua").SAirFactoryUnit
 ---@class ZSB9502 : SAirFactoryUnit
-ZSB9502 = Class(SAirFactoryUnit) {
+ZSB9502 = ClassUnit(SAirFactoryUnit) {
 
     RollOffBones = { 'Pod01', 'Pod02', },
 
     OnCreate = function(self)
         SAirFactoryUnit.OnCreate(self)
-        local bp = self:GetBlueprint()
         self.Rotator1 = CreateRotator(self, 'Pod01', 'y', nil, 5, 0, 0)
         self.Trash:Add(self.Rotator1)
 

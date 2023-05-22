@@ -71,26 +71,34 @@ end
 
 --- Sets fixed width of a control, scaled by the pixel scale factor
 ---@param control Control
----@param width? number no change if nil
+---@param width? LazyVar | number change if nil
 function SetWidth(control, width)
     if width then
-        control.Width:SetValue(MathFloor(width * pixelScaleFactor))
+        if type(width) == 'number' then
+            control.Width:SetValue(MathFloor(width * pixelScaleFactor))
+        else
+            control.Width:Set(width)
+        end
     end
 end
 
 --- Sets fixed height of a control, scaled by the pixel scale factor
 ---@param control Control
----@param height? number no change if nil
+---@param height? LazyVar | number no change if nil
 function SetHeight(control, height)
     if height then
-        control.Height:SetValue(MathFloor(height * pixelScaleFactor))
+        if type(height) == 'number' then
+            control.Height:SetValue(MathFloor(height * pixelScaleFactor))
+        else
+            control.Height:Set(height)
+        end
     end
 end
 
 --- Sets fixed dimensions of a control, scaled by the pixel scale factor
 ---@param control Control
----@param width? number no change if nil
----@param height? number no change if nil
+---@param width? LazyVar | number no change if nil
+---@param height? LazyVar | number no change if nil
 function SetDimensions(control, width, height)
     SetWidth(control, width)
     SetHeight(control, height)

@@ -65,7 +65,7 @@ end
 --- Transfers units to an army, returning the new units (since changing the army
 --- replaces the units with new ones)
 ---@param units Unit[]
----@param toArmy number 
+---@param toArmy number
 ---@param captured boolean
 ---@return Unit[]?
 function TransferUnitsOwnership(units, toArmy, captured)
@@ -96,7 +96,7 @@ function TransferUnitsOwnership(units, toArmy, captured)
         -- Only allow units not attached to be given. This is because units will give all of its
         -- children over as well, so we only want the top level units to be given.
         -- Units currently being captured are also denied
-        if  owner == toArmy or
+        if owner == toArmy or
             unit:GetParent() ~= unit or (unit.Parent and unit.Parent ~= unit) or
             unit.CaptureProgress > 0 or
             unit:GetFractionComplete() < 1.0
@@ -109,12 +109,13 @@ function TransferUnitsOwnership(units, toArmy, captured)
         local categoriesHash = bp.CategoriesHash
 
         -- B E F O R E
+        local orientation = unit:GetOrientation()
+        local workprogress = unit:GetWorkProgress()
         local numNukes = unit:GetNukeSiloAmmoCount() -- nuclear missiles; SML or SMD
         local numTacMsl = unit:GetTacticalSiloAmmoCount()
-        local unitSync = unit.Sync
-        local massKilled = unitSync.totalMassKilled
-        local massKilledTrue = unitSync.totalMassKilledTrue
+        local massKilled = unit.VetExperience
         local unitHealth = unit:GetHealth()
+        local tarmacs = unit.TarmacBag
         local shieldIsOn = false
         local shieldHealth = 0
         local hasFuel = false
@@ -132,9 +133,9 @@ function TransferUnitsOwnership(units, toArmy, captured)
             shieldHealth = shield:GetHealth()
         end
         local fuelUseTime = bpPhysics.FuelUseTime
-        if fuelUseTime and fuelUseTime > 0 then   -- going through the BP to check for fuel
-            fuelRatio = unit:GetFuelRatio()       -- usage is more reliable then unit.HasFuel
-            hasFuel = true                        -- cause some buildings say they use fuel
+        if fuelUseTime and fuelUseTime > 0 then -- going through the BP to check for fuel
+            fuelRatio = unit:GetFuelRatio() -- usage is more reliable then unit.HasFuel
+            hasFuel = true -- cause some buildings say they use fuel
         end
         local enhancements = bp.Enhancements
         if enhancements then
@@ -172,13 +173,13 @@ function TransferUnitsOwnership(units, toArmy, captured)
         unit.IsBeingTransferred = true
 
         -- changing owner
-        unit = ChangeUnitArmy(unit, toArmy)
-        if not unit then
+        local newUnit = ChangeUnitArmy(unit, toArmy)
+        if not newUnit then
             continue
         end
 
         newUnitCount = newUnitCount + 1
-        newUnits[newUnitCount] = unit
+        newUnits[newUnitCount] = newUnit
 
         if IsAlly(owner, toArmy) then
             if not oldowner then
@@ -190,78 +191,96 @@ function TransferUnitsOwnership(units, toArmy, captured)
                 sharedUnitsTable = {}
                 sharedUnits[oldowner] = sharedUnitsTable
             end
-            table.insert(sharedUnitsTable, unit)
+            table.insert(sharedUnitsTable, newUnit)
         end
 
-        unit.oldowner = oldowner
+        newUnit.oldowner = oldowner
 
         -- A F T E R
+        unit:SetOrientation(orientation, true)
+
         if massKilled and massKilled > 0 then
-            unit:CalculateVeterancyLevelAfterTransfer(massKilled, massKilledTrue)
+            newUnit:CalculateVeterancyLevelAfterTransfer(massKilled, true)
         end
+
         if activeEnhancements then
             for _, enh in activeEnhancements do
-                unit:CreateEnhancement(enh)
+                newUnit:CreateEnhancement(enh)
             end
         end
-        local maxHealth = unit:GetMaxHealth()
+    
+        local maxHealth = newUnit:GetMaxHealth()
         if unitHealth > maxHealth then
             unitHealth = maxHealth
         end
-        unit:SetHealth(unit, unitHealth)
+        newUnit:SetHealth(newUnit, unitHealth)
+
         if hasFuel then
-            unit:SetFuelRatio(fuelRatio)
+            newUnit:SetFuelRatio(fuelRatio)
         end
+        
+        if tarmacs then
+            newUnit.TarmacBag = tarmacs
+        end
+
         if numNukes and numNukes > 0 then
-            unit:GiveNukeSiloAmmo(numNukes - unit:GetNukeSiloAmmoCount())
+            newUnit:GiveNukeSiloAmmo(numNukes - newUnit:GetNukeSiloAmmoCount())
         end
+
         if numTacMsl and numTacMsl > 0 then
-            unit:GiveTacticalSiloAmmo(numTacMsl - unit:GetTacticalSiloAmmoCount())
+            newUnit:GiveTacticalSiloAmmo(numTacMsl - newUnit:GetTacticalSiloAmmoCount())
         end
-        local newShield = unit.MyShield
+
+        if newUnit.Blueprint.CategoriesHash["SILO"] then
+            newUnit:GiveNukeSiloBlocks(workprogress)
+        end
+
+        local newShield = newUnit.MyShield
+
         if newShield then
-            newShield:SetHealth(unit, shieldHealth)
+            newShield:SetHealth(newUnit, shieldHealth)
             if shieldIsOn then
-                unit:EnableShield()
+                newUnit:EnableShield()
             else
-                unit:DisableShield()
+                newUnit:DisableShield()
             end
         end
-        if EntityCategoryContains(categoriesENGINEERSTATION, unit) then
+
+        if EntityCategoryContains(categoriesENGINEERSTATION, newUnit) then
             if not upgradeBuildTimeComplete or not shareUpgrades then
                 if categoriesHash.UEF then
                     -- use special thread for UEF Kennels
                     -- Give them 1 tick to spawn their drones and then pause both station and drone
                     pauseKennelCount = pauseKennelCount + 1
-                    pauseKennels[pauseKennelCount] = unit
+                    pauseKennels[pauseKennelCount] = newUnit
                 else -- pause cybran hives immediately
-                    unit:SetPaused(true)
+                    newUnit:SetPaused(true)
                 end
             elseif categoriesHash.UEF then
-                unit.UpgradesTo = upgradesTo
-                unit.DefaultBuildRate = defaultBuildRate
-                unit.TargetUpgradeBuildTime = upgradeBuildTimeComplete
+                newUnit.UpgradesTo = upgradesTo
+                newUnit.DefaultBuildRate = defaultBuildRate
+                newUnit.TargetUpgradeBuildTime = upgradeBuildTimeComplete
 
                 upgradeKennelCount = upgradeKennelCount + 1
-                upgradeKennels[upgradeKennelCount] = unit
+                upgradeKennels[upgradeKennelCount] = newUnit
 
                 exclude = true
             end
         end
 
         if upgradeBuildTimeComplete and not exclude then
-            unit.UpgradesTo = upgradesTo
-            unit.DefaultBuildRate = defaultBuildRate
-            unit.TargetUpgradeBuildTime = upgradeBuildTimeComplete
+            newUnit.UpgradesTo = upgradesTo
+            newUnit.DefaultBuildRate = defaultBuildRate
+            newUnit.TargetUpgradeBuildTime = upgradeBuildTimeComplete
 
             upgradeUnitCount = upgradeUnitCount + 1
-            upgradeUnits[upgradeUnitCount] =  unit
+            upgradeUnits[upgradeUnitCount] = newUnit
         end
 
         unit.IsBeingTransferred = nil
 
         if unit.OnGiven then
-            unit:OnGiven(unit)
+            unit:OnGiven(newUnit)
         end
     end
 
@@ -277,7 +296,7 @@ function TransferUnitsOwnership(units, toArmy, captured)
         end
     end
 
-    -- add delay on turning on each weapon 
+    -- add delay on turning on each weapon
     for _, unit in newUnits do
         -- disable all weapons, enable with a delay
         for k = 1, unit.WeaponCount do
@@ -324,7 +343,7 @@ function UpgradeTransferredKennels(kennels)
                 end
             end
 
-            IssueUpgrade({unit}, unit.UpgradesTo)
+            IssueUpgrade({ unit }, unit.UpgradesTo)
         end
     end
 
@@ -350,7 +369,7 @@ function UpgradeTransferredKennels(kennels)
     end
 end
 
---- Takes the units and tries to rebuild them for each army (in order). 
+--- Takes the units and tries to rebuild them for each army (in order).
 --- The transfer procedure is fairly expensive, so it is filtered to important units (EXPs and T3 arty).
 ---@param units Unit[]
 ---@param armies Army[]
@@ -375,7 +394,7 @@ end
 ---@param units Unit[]
 function UpgradeUnits(units)
     for _, unit in units do
-        IssueUpgrade({unit}, unit.UpgradesTo)
+        IssueUpgrade({ unit }, unit.UpgradesTo)
         if not unit.DefaultBuildRate then
             unit.DefaultBuildRate = unit:GetBuildRate()
         end
@@ -518,7 +537,7 @@ function TryRebuildUnits(trackers, army)
         rebuilder.TargetBuildTime = tracker.TargetBuildTime
         rebuilders[k] = rebuilder
 
-        IssueBuildMobile({rebuilder}, tracker.UnitPos, tracker.UnitBlueprintID, {})
+        IssueBuildMobile({ rebuilder }, tracker.UnitPos, tracker.UnitBlueprintID, {})
     end
 
     WaitTicks(3) -- wait some ticks (3 is minimum), IssueBuildMobile() is not instant
@@ -563,7 +582,11 @@ function FinalizeRebuiltUnits(trackers, blockingEntities)
     -- revert collision shapes of any blocking units or wreckage
     for _, entity in blockingEntities do
         if not entity:BeenDestroyed() then
-            entity:ApplyCachedCollisionExtents()
+            if entity.IsProp then
+                entity:ApplyCachedCollisionExtents()
+            else
+                entity:RevertCollisionShape()
+            end
         end
     end
 end
@@ -587,7 +610,8 @@ function GiveUnitsToPlayer(data, units)
 
                 if unitsAfter ~= unitsBefore then
                     -- Maybe spawn an UI dialog instead?
-                    print((unitsBefore - unitsAfter) .. " engineers/factories could not be transferred due to manual share rules")
+                    print((unitsBefore - unitsAfter) ..
+                        " engineers/factories could not be transferred due to manual share rules")
                 end
             end
 
@@ -673,7 +697,7 @@ function SendChatToReplay(data)
         if not Sync.UnitData.Chat then
             Sync.UnitData.Chat = {}
         end
-        table.insert(Sync.UnitData.Chat, {sender = data.Sender, msg = data.Msg})
+        table.insert(Sync.UnitData.Chat, { sender = data.Sender, msg = data.Msg })
     end
 end
 
@@ -727,7 +751,7 @@ function OnAllianceResult(resultData)
 
     if OkayToMessWithArmy(resultData.From) then
         if resultData.ResultValue == "accept" then
-            SetAlliance(resultData.From,resultData.To, "Ally")
+            SetAlliance(resultData.From, resultData.To, "Ally")
             if Sync.FormedAlliances == nil then
                 Sync.FormedAlliances = {}
             end
@@ -736,4 +760,5 @@ function OnAllianceResult(resultData)
     end
     import("/lua/simping.lua").OnAllianceChange()
 end
+
 import("/lua/simplayerquery.lua").AddResultListener("OfferAlliance", OnAllianceResult)

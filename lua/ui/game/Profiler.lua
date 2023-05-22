@@ -1,3 +1,7 @@
+--**************************************************************************************************
+--** Shared under the MIT license
+--**************************************************************************************************
+
 -- Note to modders:
 -- if you feel the need to extend the capabilities of this file, please make a pull request to
 -- https://github.com/FAForever/fa/blob/deploy/fafdevelop/lua/ui/game/Profiler.lua
@@ -359,7 +363,7 @@ end
 
 ---@class ProfilerWindow : Window
 ---@field Tabs {Overview: ProfilerOverview, Timers: ProfilerTimers, Stamps: ProfilerStamps, Benchmarks: ProfilerBenchmarks, Options: ProfilerOptions}
-ProfilerWindow = Class(Window) {
+ProfilerWindow = ClassUI(Window) {
     ---@param self ProfilerWindow
     ---@param parent Control
     __init = function(self, parent)

@@ -29,6 +29,7 @@ local Group = import("/lua/maui/group.lua").Group
 local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
 local Combo = import("/lua/ui/controls/combo.lua").Combo
 local Edit = import("/lua/maui/edit.lua").Edit
+local IntegerSlider = import("/lua/maui/slider.lua").IntegerSlider
 
 local Shared = import("/lua/shared/navgenerator.lua")
 
@@ -38,7 +39,7 @@ local DebugInterface = false
 ---@alias NavUIStates 'overview' | 'actions'
 
 ---@class NavUIOverview : Group
-NavUIOverview = Class(Group) {
+NavUIOverview = ClassUI(Group) {
     __init = function(self, parent) 
         Group.__init(self, parent, 'NavUIOverview')
     end
@@ -46,7 +47,7 @@ NavUIOverview = Class(Group) {
 
 ---@class NavUIPathTo : Group
 ---@field State NavDebugGetLabelState
-NavUIGetLabel = Class(Group) {
+NavUIGetLabel = ClassUI(Group) {
     __init = function (self, parent)
         local name = 'NavUIGetLabel'
         Group.__init(self, parent, name)
@@ -55,7 +56,7 @@ NavUIGetLabel = Class(Group) {
 
         self.Background = LayoutHelpers.LayoutFor(Bitmap(self))
             :Fill(self)
-            :Color('77000000')
+            :Color('77999999')
             :DisableHitTest(true)
             :End()
 
@@ -81,7 +82,7 @@ NavUIGetLabel = Class(Group) {
                 "build",
                 {
                     -- default information required
-                    name = 'ual0105',
+                    name = 'uaa0101',
 
                     --- 
                     ---@param mode CommandModeDataBuild
@@ -152,7 +153,7 @@ NavUIGetLabel = Class(Group) {
 
 ---@class NavUIPathTo : Group
 ---@field State NavDebugGetLabelState
-NavUIGetLabelMetadata = Class(Group) {
+NavUIGetLabelMetadata = ClassUI(Group) {
     __init = function (self, parent)
         local name = 'NavUIGetLabelMetadata'
         Group.__init(self, parent, name)
@@ -161,7 +162,7 @@ NavUIGetLabelMetadata = Class(Group) {
 
         self.Background = LayoutHelpers.LayoutFor(Bitmap(self))
             :Fill(self)
-            :Color('77000000')
+            :Color('77999999')
             :DisableHitTest(true)
             :End()
 
@@ -247,16 +248,18 @@ NavUIGetLabelMetadata = Class(Group) {
 
 ---@class NavUIPathTo : Group
 ---@field State NavDebugCanPathToState
-NavUIPathTo = Class(Group) {
+NavUIPathTo = ClassUI(Group) {
+    ---@param self NavUIPathTo
+    ---@param parent Control
     __init = function (self, parent)
         local name = 'NavUIPathTo'
         Group.__init(self, parent, name)
 
-        self.State = { }
+        self.State = {}
 
         self.Background = LayoutHelpers.LayoutFor(Bitmap(self))
             :Fill(self)
-            :Color('77000000')
+            :Color('77999999')
             :DisableHitTest(true)
             :End()
 
@@ -282,7 +285,7 @@ NavUIPathTo = Class(Group) {
                 "build",
                 {
                     -- default information required
-                    name = 'ual0105',
+                    name = 'uaa0101',
 
                     --- 
                     ---@param mode CommandModeDataBuild
@@ -311,7 +314,7 @@ NavUIPathTo = Class(Group) {
                 "build",
                 {
                     -- default information required
-                    name = 'ual0105',
+                    name = 'uaa0101',
 
                     --- 
                     ---@param mode CommandModeDataBuild
@@ -368,9 +371,177 @@ NavUIPathTo = Class(Group) {
     end,
 }
 
+---@class NavUIPathToWithThreatThreshold : Group
+---@field State NavDebugPathToStateWithThreatThreshold
+NavUIPathToWithThreatThreshold = ClassUI(Group) {
+
+    ---@param self NavUIPathToWithThreatThreshold
+    ---@param parent Control
+    __init = function (self, parent)
+        local name = 'NavUIPathToWithThreatThreshold'
+        Group.__init(self, parent, name)
+
+        self.State = { 
+            Layer = 'Land',
+            Radius = 0,
+            ThreatFunctionName = 'AntiSurface',
+            Threshold = 0,
+        }
+
+        self.Background = LayoutHelpers.LayoutFor(Bitmap(self))
+            :Fill(self)
+            :Color('77999999')
+            :DisableHitTest(true)
+            :End()
+
+        self.Title = LayoutHelpers.LayoutFor(UIUtil.CreateText(self, 'Debug \'PathToWithThreatThreshold\'', 10, UIUtil.bodyFont))
+            :AtLeftTopIn(self, 10, 10)
+            :Over(self, 1)
+            :End() --[[@as Text]]
+
+
+        self.ButtonOrigin = LayoutHelpers.LayoutFor(UIUtil.CreateButtonWithDropshadow(self, '/BUTTON/medium/', "Origin"))
+            :AtLeftBottomIn(self.Background, -5, 5)
+            :Over(self, 1)
+            :End()
+
+        self.ButtonOrigin.OnClick = function()
+
+            -- make sure we have nothing selected
+            local selection = GetSelectedUnits()
+            SelectUnits(nil);
+
+            -- enables command mode for spawning units
+            import("/lua/ui/game/commandmode.lua").StartCommandMode(
+                "build",
+                {
+                    -- default information required
+                    name = 'uaa0101',
+
+                    --- 
+                    ---@param mode CommandModeDataBuild
+                    ---@param command any
+                    callback = function(mode, command)
+                        self.State.Army = GetFocusArmy()
+                        self.State.Origin = command.Target.Position
+                        SimCallback({Func = 'NavDebugPathToWithThreatThreshold', Args = self.State })
+                        SelectUnits(selection)
+                    end,
+                }
+            )
+        end
+
+        self.ButtonDestination = LayoutHelpers.LayoutFor(UIUtil.CreateButtonWithDropshadow(self, '/BUTTON/medium/', "Destination"))
+            :RightOf(self.ButtonOrigin, -20)
+            :Over(self, 1)
+            :End()
+
+        self.ButtonDestination.OnClick = function()
+            -- make sure we have nothing selected
+            local selection = GetSelectedUnits()
+            SelectUnits(nil);
+
+            -- enables command mode for spawning units
+            import("/lua/ui/game/commandmode.lua").StartCommandMode(
+                "build",
+                {
+                    -- default information required
+                    name = 'uaa0101',
+
+                    --- 
+                    ---@param mode CommandModeDataBuild
+                    ---@param command any
+                    callback = function(mode, command)
+                        self.State.Army = GetFocusArmy()
+                        self.State.Destination = command.Target.Position
+                        SimCallback({Func = 'NavDebugPathToWithThreatThreshold', Args = self.State })
+                        SelectUnits(selection)
+                    end,
+                }
+            )
+        end
+
+        self.LabelLayer = LayoutHelpers.LayoutFor(UIUtil.CreateText(self, 'For layer:', 10, UIUtil.bodyFont))
+            :RightOf(self.ButtonDestination)
+            :Top(function() return self.ButtonDestination.Top() + LayoutHelpers.ScaleNumber(8) end)
+            :Over(self, 1)
+            :End()
+
+        self.ComboLayer = LayoutHelpers.LayoutFor(Combo(self, 14, 10, nil, nil, "UI_Tab_Click_01", "UI_Tab_Rollover_01"))
+            :RightOf(self.ButtonDestination)
+            :Top(function() return self.ButtonDestination.Top() + LayoutHelpers.ScaleNumber(20) end)
+            :Width(100)
+            :End() --[[@as Combo]]
+
+        self.ComboLayer:AddItems(Shared.Layers)
+        self.ComboLayer:SetItem(1)
+        self.State.Layer = Shared.Layers[1]
+        self.ComboLayer.OnClick = function(combo, index, text)
+            self.State.Army = GetFocusArmy()
+            self.State.Layer = Shared.Layers[index]
+            SimCallback({Func = 'NavDebugPathToWithThreatThreshold', Args = self.State })
+        end
+
+        self.LabelThreatFunction = LayoutHelpers.LayoutFor(UIUtil.CreateText(self, 'For threat function:', 10, UIUtil.bodyFont))
+            :RightOf(self.ButtonDestination)
+            :Top(function() return self.ButtonDestination.Top() - LayoutHelpers.ScaleNumber(22) end)
+            :Over(self, 1)
+            :End()
+
+        self.ComboThreatFunction = LayoutHelpers.LayoutFor(Combo(self, 14, 10, nil, nil, "UI_Tab_Click_01", "UI_Tab_Rollover_01"))
+            :RightOf(self.ButtonDestination)
+            :Top(function() return self.ButtonDestination.Top() - LayoutHelpers.ScaleNumber(10) end)
+            :Width(100)
+            :End() --[[@as Combo]]
+
+        self.ComboThreatFunction:AddItems(Shared.ThreatFunctionsList)
+        self.ComboThreatFunction:SetItem(1)
+        self.State.ThreatFunctionName = Shared.ThreatFunctionsList[1]
+        self.ComboThreatFunction.OnClick = function(combo, index, text)
+            self.State.Army = GetFocusArmy()
+            self.State.ThreatFunctionName = text
+            SimCallback({Func = 'NavDebugPathToWithThreatThreshold', Args = self.State })
+        end
+
+        self.Radius = LayoutHelpers.LayoutFor(IntegerSlider(self, false, 0, 8, 1))
+            :RightOf(self.ComboLayer, 10)
+            :Over(self, 1)
+            :End()
+
+        self.Radius.OnValueChanged = function(slider, value)
+            self.LabelRadius:SetText(string.format("Radius: %d", value))
+            self.State.Radius = value
+            self.State.Army = GetFocusArmy()
+            SimCallback({Func = 'NavDebugPathToWithThreatThreshold', Args = self.State })
+        end
+
+        self.LabelRadius = LayoutHelpers.LayoutFor(UIUtil.CreateText(self, 'Radius: 0', 10, UIUtil.bodyFont))
+            :Above(self.Radius)
+            :Over(self, 1)
+            :End()
+
+        self.ThreatThreshold = LayoutHelpers.LayoutFor(IntegerSlider(self, false, 0, 1000, 10))
+            :RightOf(self.ComboThreatFunction, 10)
+            :Over(self, 1)
+            :End()
+
+        self.ThreatThreshold.OnValueChanged = function(slider, value)
+            self.LabelThreatThreshold:SetText(string.format("Threat threshold: %d", value))
+            self.State.Army = GetFocusArmy()
+            self.State.Threshold = value
+            SimCallback({Func = 'NavDebugPathToWithThreatThreshold', Args = self.State })
+        end
+
+        self.LabelThreatThreshold = LayoutHelpers.LayoutFor(UIUtil.CreateText(self, 'Threat threshold: 0', 10, UIUtil.bodyFont))
+            :Above(self.ThreatThreshold)
+            :Over(self, 1)
+            :End()
+    end,
+}
+
 ---@class NavUICanPathTo : Group
 ---@field State NavDebugCanPathToState
-NavUICanPathTo = Class(Group) {
+NavUICanPathTo = ClassUI(Group) {
     __init = function (self, parent)
         local name = 'NavUICanPathTo'
         Group.__init(self, parent, name)
@@ -379,7 +550,7 @@ NavUICanPathTo = Class(Group) {
 
         self.Background = LayoutHelpers.LayoutFor(Bitmap(self))
             :Fill(self)
-            :Color('77000000')
+            :Color('77999999')
             :DisableHitTest(true)
             :End()
 
@@ -406,7 +577,7 @@ NavUICanPathTo = Class(Group) {
                 "build",
                 {
                     -- default information required
-                    name = 'ual0105',
+                    name = 'uaa0101',
 
                     --- 
                     ---@param mode CommandModeDataBuild
@@ -435,7 +606,7 @@ NavUICanPathTo = Class(Group) {
                 "build",
                 {
                     -- default information required
-                    name = 'ual0105',
+                    name = 'uaa0101',
 
                     --- 
                     ---@param mode CommandModeDataBuild
@@ -508,7 +679,7 @@ NavUICanPathTo = Class(Group) {
 }
 
 ---@class NavUILayerStatistics : Group
-NavUILayerStatistics = Class(Group) {
+NavUILayerStatistics = ClassUI(Group) {
     __init = function(self, parent, layer)
         local name = 'NavUILayerStatistics - ' .. tostring(layer)
         Group.__init(self, parent, 'NavUILayerStatistics - ' .. tostring(layer))
@@ -576,8 +747,14 @@ NavUILayerStatistics = Class(Group) {
         self.ToggleLabelGrid.OnClick = function()
             SimCallback({ Func = 'NavToggleScanLabels', Args = { Layer = layer }}, false)
         end
-    
 
+        -- tell sim to send the known stats
+        SimCallback({
+            Func = "NavDebugStatisticsToUI",
+            Args = { }
+        })
+
+        -- list to sim sending us stats
         AddOnSyncCallback(
             function(Sync)
                 if Sync.NavLayerData then
@@ -596,7 +773,7 @@ NavUILayerStatistics = Class(Group) {
 }
 
 ---@class NavUIActions : Group
-NavUIActions = Class(Group) {
+NavUIActions = ClassUI(Group) {
     __init = function(self, parent) 
         Group.__init(self, parent, 'NavUIActions')
 
@@ -611,8 +788,6 @@ NavUIActions = Class(Group) {
             :Bottom(function() return self.Bottom() - LayoutHelpers.ScaleNumber(10) end)
             :Over(self, 1)
             :End()
-
-        UIUtil.SurroundWithBorder(self.BodyGenerate, '/scx_menu/lan-game-lobby/frame/')
 
         LayoutHelpers.LayoutFor(Bitmap(self.Debug))
             :Fill(self.BodyGenerate)
@@ -676,8 +851,6 @@ NavUIActions = Class(Group) {
             :Over(self, 1)
             :End()
 
-        UIUtil.SurroundWithBorder(self.BodyDebug, '/scx_menu/lan-game-lobby/frame/')
-
         self.NavUICanPathTo = LayoutHelpers.LayoutFor(NavUICanPathTo(self))
             :Left(function() return self.BodyDebug.Left() + LayoutHelpers.ScaleNumber(10) end)
             :Right(function() return self.BodyDebug.Right() - LayoutHelpers.ScaleNumber(10) end)
@@ -692,11 +865,18 @@ NavUIActions = Class(Group) {
             :Bottom(function() return self.NavUICanPathTo.Bottom() + LayoutHelpers.ScaleNumber(85) end)
             :End()
 
-        self.NavUIGetLabel = LayoutHelpers.LayoutFor(NavUIGetLabel(self))
+        self.NavUIPathToWithThreatThreshold = LayoutHelpers.LayoutFor(NavUIPathToWithThreatThreshold(self))
             :Left(function() return self.BodyDebug.Left() + LayoutHelpers.ScaleNumber(10) end)
             :Right(function() return self.BodyDebug.Right() - LayoutHelpers.ScaleNumber(10) end)
             :Top(function() return self.NavUIPathTo.Bottom() + LayoutHelpers.ScaleNumber(10) end)
             :Bottom(function() return self.NavUIPathTo.Bottom() + LayoutHelpers.ScaleNumber(85) end)
+            :End()
+
+        self.NavUIGetLabel = LayoutHelpers.LayoutFor(NavUIGetLabel(self))
+            :Left(function() return self.BodyDebug.Left() + LayoutHelpers.ScaleNumber(10) end)
+            :Right(function() return self.BodyDebug.Right() - LayoutHelpers.ScaleNumber(10) end)
+            :Top(function() return self.NavUIPathToWithThreatThreshold.Bottom() + LayoutHelpers.ScaleNumber(10) end)
+            :Bottom(function() return self.NavUIPathToWithThreatThreshold.Bottom() + LayoutHelpers.ScaleNumber(85) end)
             :End()
 
         self.NavUIGetLabelMetadata = LayoutHelpers.LayoutFor(NavUIGetLabelMetadata(self))
@@ -714,7 +894,7 @@ NavUIActions = Class(Group) {
 }
 
 ---@class NavUI : Window
-NavUI = Class(Window) {
+NavUI = ClassUI(Window) {
 
     __init = function(self, parent)
 
@@ -727,15 +907,11 @@ NavUI = Class(Window) {
             Bottom = 960
         })
 
+        self:SetAlpha(0.8)
+
         LayoutHelpers.DepthOverParent(self, parent, 1)
-        self._border = UIUtil.SurroundWithBorder(self, '/scx_menu/lan-game-lobby/frame/')
 
         -- prepare this class
-
-        self.Background = LayoutHelpers.LayoutFor(Bitmap(self))
-            :Fill(self)
-            :Color('22ffffff')
-            :End()
 
         self.Debug = LayoutHelpers.LayoutFor(Group(GetFrame(0)))
             :Fill(self)
@@ -788,6 +964,7 @@ NavUI = Class(Window) {
     end,
 
     OnClose = function(self)
+        SimCallback({Func = 'NavDisableDebugging', Args = { }})
         self:Hide()
     end,
 }
@@ -799,11 +976,13 @@ function OpenWindow()
         Root = NavUI(GetFrame(0))
         Root:Show()
     end
+
+    SimCallback({Func = 'NavEnableDebugging', Args = { }})
 end
 
 function CloseWindow()
     if Root then
-        Root:Hide()
+        Root:OnClose()
     end
 end
 

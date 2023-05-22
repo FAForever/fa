@@ -11,6 +11,6 @@
 local SConstructionUnit = import("/lua/seraphimunits.lua").SConstructionUnit
 
 ---@class XSL0105 : SConstructionUnit
-XSL0105 = Class(SConstructionUnit) {}
+XSL0105 = ClassUnit(SConstructionUnit) {}
 
 TypeClass = XSL0105

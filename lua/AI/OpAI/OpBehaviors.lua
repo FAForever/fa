@@ -98,11 +98,11 @@ function CDROverChargeThread( cdr )
                     end
                     if overCharging then
                         while target and not target:IsDead() and not cdr:IsDead() and counter <= 5 do
-                            WaitSeconds(.5)
+                            WaitTicks(6)
                             counter = counter + .5
                         end
                     else
-                        WaitSeconds(5)
+                        WaitTicks(51)
                         counter = counter + 5
                     end
                     cdrPos = cdr:GetPosition()
@@ -130,7 +130,7 @@ function CDROverChargeThread( cdr )
                 end
             end
         end
-        WaitSeconds(3)
+        WaitTicks(31)
     end
 end
 
@@ -142,7 +142,7 @@ function CDRRepairBuildingUnit( cdr, plat )
         IssueClearCommands( {cdr} )
         IssueRepair( {cdr}, cdr.UnitBeingBuiltBehavior )
         repeat
-            WaitSeconds(1)
+            WaitTicks(11)
             if cdr.Fighting or cdr.Running or cdr.GivingUp or cdr.Leashing or cdr.Cornered then
                 return
             end
@@ -184,7 +184,7 @@ function CDRLeashThread(cdr)
                 plat:MoveToLocation( loc, false )
                 cdr.Leashing = true
                 --LOG('*AI DEBUG: ARMY ' .. aiBrain:GetArmyIndex() .. ': CDR AI ACTIVATE - Commander leashing to MAIN' )
-                WaitSeconds( 10 )
+                WaitTicks(101)
                 if not cdr:IsDead() then
                     cdr.Leashing = false
                     if aiBrain:PlatoonExists(plat) then
@@ -193,7 +193,7 @@ function CDRLeashThread(cdr)
                 end
             end
         end
-        WaitSeconds(5)
+        WaitTicks(51)
     end
 end
 
@@ -225,7 +225,7 @@ function CDRRunAwayThread( cdr )
                 repeat
                     plat:Stop()
                     cmd = plat:MoveToLocation( runSpot, false )
-                    WaitSeconds(3)
+                    WaitTicks(31)
                     if not cdr:IsDead() then
                         cdrPos = cdr:GetPosition()
                         nmeAir = aiBrain:GetUnitsAroundPoint( categories.AIR, cdrPos, 25, 'Enemy' )
@@ -244,6 +244,6 @@ function CDRRunAwayThread( cdr )
                 end
             end
         end
-        WaitSeconds(3)
+        WaitTicks(31)
     end
 end

@@ -11,6 +11,11 @@
 EmtBpPath = '/effects/emitters/'
 EmitterTempEmtBpPath = '/effects/emitters/temp/'
 
+NoEffects = { }
+DefaultPolyTrailOffset1 = { 0 }
+DefaultPolyTrailOffset2 = { 0, 0 }
+DefaultPolyTrailOffset3 = { 0, 0, 0 }
+
 -- For gatling gun cooldown
 WeaponSteam01 = {
     EmtBpPath .. 'weapon_mist_01_emit.bp',
@@ -37,7 +42,6 @@ FireCloudSml01 = {
 }
 
 FireCloudMed01 = {
-    EmtBpPath .. 'fire_cloud_06_emit.bp',
     EmtBpPath .. 'explosion_fire_sparks_01_emit.bp',
     EmtBpPath .. 'small_test_sonic.bp',
     EmtBpPath .. 'small_test_fire.bp',
@@ -244,8 +248,10 @@ DustDebrisLand01 = {
     EmtBpPath .. 'destruction_explosion_debris_05_emit.bp',
 }
 GenericDebrisLandImpact01 = {
-    EmtBpPath .. 'dirtchunks_01_emit.bp',
-    EmtBpPath .. 'dust_cloud_05_emit.bp',
+    EmtBpPath .. 'dust_cloud_02_emit.bp',
+    EmtBpPath .. 'dust_cloud_04_emit.bp',
+    EmtBpPath .. 'destruction_explosion_debris_04_emit.bp',
+    EmtBpPath .. 'destruction_explosion_debris_05_emit.bp',
 }
 GenericDebrisTrails01 = {
     EmtBpPath .. 'destruction_explosion_debris_trail_01_emit.bp',
@@ -1354,8 +1360,8 @@ CCorsairMissileUnitHit01 = {
     EmtBpPath .. 'cybran_corsair_missile_hit_ring.bp',
     EmtBpPath .. 'unit_shrapnel_hit_01_emit.bp',
 }
-CCorsairMissileFxTrails01 = {}
-CCorsairMissilePolyTrail01= EmtBpPath .. 'cybran_corsair_missile_polytrail_01_emit.bp'
+CCorsairMissileFxTrails01 = NoEffects
+CCorsairMissilePolyTrail01 = EmtBpPath .. 'cybran_corsair_missile_polytrail_01_emit.bp'
 
 
 

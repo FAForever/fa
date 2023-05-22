@@ -1,4 +1,8 @@
 
+--**************************************************************************************************
+--** Shared under the MIT license
+--**************************************************************************************************
+
 ---@alias ProfilerSource "C" | "Lua" | "main" | "unknown"
 
 ---@class ProfilerData
@@ -52,7 +56,7 @@
 
 --- Constructs an empty table that the profiler can populate
 ---@return ProfilerData
-function CreateEmptyProfilerTable()
+function CreateEmptyProfilerTable() 
     return {
         Lua = {
             ["field"]  = {},

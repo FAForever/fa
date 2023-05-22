@@ -20,6 +20,17 @@
 -- Do global initialization and set up common global functions
 doscript '/lua/globalInit.lua'
 
+-- load legacy builder systems
+doscript '/lua/system/GlobalPlatoonTemplate.lua'
+doscript '/lua/system/GlobalBuilderTemplate.lua'
+doscript '/lua/system/GlobalBuilderGroup.lua'
+doscript '/lua/system/GlobalBaseTemplate.lua'
+
+-- load builder systems
+doscript '/lua/aibrains/templates/base/base-template.lua'
+doscript '/lua/aibrains/templates/builder-groups/builder-group-template.lua'
+doscript '/lua/aibrains/templates/builder-groups/builder-template.lua'
+
 GameOverListeners = {}
 WaitTicks = coroutine.yield
 
@@ -38,7 +49,7 @@ doscript '/lua/SimHooks.lua'
 -- Set up the sync table and some globals for use by scenario functions
 doscript '/lua/SimSync.lua'
 
-local syncStartPositions = false -- This is held here because the Sync table is cleared between SetupSession() and BeginSession()
+local syncStartPositions = false -- This is held here because the Sync table iFBlobas cleared between SetupSession() and BeginSession()
 
 function ShuffleStartPositions(syncNewPositions)
     local markers = ScenarioInfo.Env.Scenario.MasterChain._MASTERCHAIN_.Markers
@@ -75,6 +86,8 @@ end
 --SetupSession will be called by the engine after ScenarioInfo is set
 --but before any armies are created.
 function SetupSession()
+
+    import("/lua/ai/gridreclaim.lua").Setup()
 
     ScenarioInfo.TriggerManager = import("/lua/triggermanager.lua").Manager
     TriggerManager = ScenarioInfo.TriggerManager
@@ -221,6 +234,25 @@ end
 -- use it to store off various useful bits of info.
 -- The global variable "ArmyBrains" contains an array of AI brains, one for each army.
 function OnCreateArmyBrain(index, brain, name, nickname)
+    -- switch out brains for non-human armies
+    local info = ScenarioInfo.ArmySetup[name]
+    if (not info.Human) then
+        local instance
+        local keyToBrain = import("/lua/aibrains/index.lua").keyToBrain
+        if (not info.Civilian) and (info.AIPersonality != '') then
+            -- likely a skirmish scenario
+            instance = keyToBrain[info.AIPersonality]
+        else
+            -- likely a campaign scenario
+            if ScenarioInfo.type != 'skirmish' then
+                instance = keyToBrain['campaign']
+            end
+        end
+
+        if instance then
+            setmetatable(brain, instance)
+        end
+    end
 
     import("/lua/sim/scenarioutilities.lua").InitializeStartLocation(name)
     import("/lua/sim/scenarioutilities.lua").SetPlans(name)
@@ -228,6 +260,9 @@ function OnCreateArmyBrain(index, brain, name, nickname)
     ArmyBrains[index] = brain
     ArmyBrains[index].Name = name
     ArmyBrains[index].Nickname = nickname
+    ArmyBrains[index].AI = info.AI
+    ArmyBrains[index].Human = info.Human
+    ArmyBrains[index].Civilian = info.Civilian
     ScenarioInfo.PlatoonHandles[index] = {}
     ScenarioInfo.UnitGroups[index] = {}
     ScenarioInfo.UnitNames[index] = {}
@@ -259,8 +294,8 @@ end
 function BeginSession()
 
     -- imported for side effects
-    import("/lua/sim/matchstate.lua")
-    import("/lua/sim/markerutilities.lua")
+    import("/lua/sim/matchstate.lua").Setup()
+    import("/lua/sim/markerutilities.lua").Setup()
 
     BeginSessionAI()
     BeginSessionMapSetup()
@@ -303,20 +338,17 @@ function BeginSession()
 
     -- keep track of units off map
     OnStartOffMapPreventionThread()
+
+    -- trigger event for brains
+    for k, brain in ArmyBrains do
+        brain:OnBeginSession()
+    end
 end
 
 --- Setup for AI related logic and data
 function BeginSessionAI()
     Sync.GameHasAIs = ScenarioInfo.GameHasAIs
     if ScenarioInfo.GameHasAIs then
-
-        for k, brain in ArmyBrains do
-            if ScenarioInfo.ArmySetup[brain.Name].RequiresNavMesh then
-                import('/lua/sim/navutils.lua').Generate()
-                break
-            end
-        end
-
         local simMods = __active_mods or {}
         for Index, ModData in simMods do
             ModAIFiles = DiskFindFiles(ModData.location..'/lua/AI/CustomAIs_v2', '*.lua')
@@ -333,6 +365,7 @@ function BeginSessionAI()
             end
         end
 
+        -- import legacy templates, builder groups and builders
         for k,file in DiskFindFiles('/lua/AI/PlatoonTemplates', '*.lua') do
             import(file)
         end
@@ -342,6 +375,11 @@ function BeginSessionAI()
         end
 
         for k,file in DiskFindFiles('/lua/AI/AIBaseTemplates', '*.lua') do
+            import(file)
+        end
+
+        -- import base templates, builder group templates and builder templates
+        for k,file in DiskFindFiles('/lua/aibrains/templates/', '*.lua') do
             import(file)
         end
     end
@@ -411,6 +449,16 @@ end
 
 --- Setup for common army, where all teams are batched together into one army
 function BeginSessionCommonArmy()
+    local teams = {}
+    for name,army in ScenarioInfo.ArmySetup do
+        if army.Team > 1 then
+            if not teams[army.Team] then
+                teams[army.Team] = {}
+            end
+            table.insert(teams[army.Team],army.ArmyIndex)
+        end
+    end
+
     local humanIndex = 0
     local IsHuman = {}
     for _, brain in ArmyBrains do
@@ -421,6 +469,7 @@ function BeginSessionCommonArmy()
             table.insert(IsHuman, false)
         end
     end
+
     local teamIndex = 1
     for _, armyIndices in teams do
         for _, i in armyIndices do
@@ -481,7 +530,6 @@ function BeginSessionEffects()
 end
 
 function GameTimeLogger()
-    local time
     while true do
         GTS = GetGameTimeSeconds()
         hours   = math.floor(GTS / 3600);
@@ -513,7 +561,10 @@ function OnPostLoad()
     end
 end
 
--- due to cyclic dependencies we need to import these files to break the cycle them
+-- these imports break cycle dependencies of import sequences of mods
 
-import('/lua/ScenarioFramework.lua')
-import('/lua/sim/ScenarioUtilities.lua')
+import('/lua/scenarioframework.lua')
+import('/lua/sim/scenarioutilities.lua')
+import("/lua/ai/aiutilities.lua")
+import("/lua/ai/sorianutilities.lua")
+import("/lua/ai/aiattackutilities.lua")

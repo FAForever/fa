@@ -20,7 +20,7 @@ local TrashBagAdd = TrashBag.Add
 
 local CBuildBotUnit = import("/lua/cybranunits.lua").CBuildBotUnit
 ---@class URA0004 : CBuildBotUnit
-URA0004 = Class(CBuildBotUnit) { 
+URA0004 = ClassUnit(CBuildBotUnit) { 
 
     OnCreate = function(self)
         CBuildBotUnit.OnCreate(self)

@@ -88,7 +88,6 @@ UnitBlueprint {
             },
         },
         UniformScale = 0.04,
-        olderMeshName = 'UXB0026',
     },
     Economy = {
         BuildCostEnergy = 5100,
@@ -151,6 +150,7 @@ UnitBlueprint {
         },
         DragCoefficient = 0.2,
         FlattenSkirt = true,
+        HorizontalSkirt = true,
         MaxSteerForce = 0,
         MinSpeedPercent = 0,
         MotionType = 'RULEUMT_None',

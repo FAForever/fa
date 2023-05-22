@@ -10,14 +10,13 @@ local ADFLaserHighIntensityWeapon = import("/lua/aeonweapons.lua").ADFLaserHighI
 local EffectUtil = import("/lua/effectutilities.lua")
 
 ---@class UAL0303 : AWalkingLandUnit
-UAL0303 = Class(AWalkingLandUnit) {
+UAL0303 = ClassUnit(AWalkingLandUnit) {
     Weapons = {
-        FrontTurret01 = Class(ADFLaserHighIntensityWeapon) {}
+        FrontTurret01 = ClassWeapon(ADFLaserHighIntensityWeapon) {}
     },
 
     CreateBuildEffects = function(self, unitBeingBuilt, order)
-        EffectUtil.CreateAeonCommanderBuildingEffects(self, unitBeingBuilt, self:GetBlueprint().General.BuildBones.BuildEffectBones, self.BuildEffectsBag)
+        EffectUtil.CreateAeonCommanderBuildingEffects(self, unitBeingBuilt, self.Blueprint.General.BuildBones.BuildEffectBones, self.BuildEffectsBag)
     end,
 }
-
 TypeClass = UAL0303

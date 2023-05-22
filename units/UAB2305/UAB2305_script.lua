@@ -7,42 +7,41 @@
 
 local AStructureUnit = import("/lua/aeonunits.lua").AStructureUnit
 local AIFQuantumWarhead = import("/lua/aeonweapons.lua").AIFQuantumWarhead
-local EffectUtil = import("/lua/effectutilities.lua")
 
 ---@class UAB2305 : AStructureUnit
-UAB2305 = Class(AStructureUnit) {
+UAB2305 = ClassUnit(AStructureUnit) {
     Weapons = {
-        QuantumMissiles = Class(AIFQuantumWarhead) {
-            UnpackEffects01 = {'/effects/emitters/aeon_nuke_unpack_01_emit.bp',},
-
+        QuantumMissiles = ClassWeapon(AIFQuantumWarhead) {
+            UnpackEffects01 = { '/effects/emitters/aeon_nuke_unpack_01_emit.bp', },
             PlayFxWeaponUnpackSequence = function(self)
                 for k, v in self.UnpackEffects01 do
                     CreateAttachedEmitter(self.unit, 'B04', self.unit.Army, v)
                 end
-
                 AIFQuantumWarhead.PlayFxWeaponUnpackSequence(self)
             end,
         },
     },
 
-    OnStopBeingBuilt = function(self,builder,layer)
-        AStructureUnit.OnStopBeingBuilt(self,builder,layer)
-        local bp = self:GetBlueprint()
+    OnStopBeingBuilt = function(self, builder, layer)
+        AStructureUnit.OnStopBeingBuilt(self, builder, layer)
+        local bp = self.Blueprint
         self.Trash:Add(CreateAnimator(self):PlayAnim(bp.Display.AnimationOpen))
-        self:ForkThread(self.PlayArmSounds)
+        self.Trash:Add(ForkThread(self.PlayArmSounds,self))
     end,
 
     PlayArmSounds = function(self)
-        local myBlueprint = self:GetBlueprint()
+        local myBlueprint = self.Blueprint
         if myBlueprint.Audio.Open and myBlueprint.Audio.Activate then
-            WaitSeconds(4.75)
+            WaitTicks(48)
             self:PlaySound(myBlueprint.Audio.Activate)
-            WaitSeconds(3.75)
+            WaitTicks(38)
             self:PlaySound(myBlueprint.Audio.Activate)
-            WaitSeconds(3.85)
+            WaitTicks(39)
             self:PlaySound(myBlueprint.Audio.Activate)
         end
     end,
 }
-
 TypeClass = UAB2305
+
+-- Kept for mod support
+local EffectUtil = import("/lua/effectutilities.lua")

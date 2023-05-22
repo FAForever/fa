@@ -4,6 +4,13 @@
 -- Summary  :  Aeon Sub Commander Script
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
+---@alias AeonSCUEnhancementBuffType
+---| "SCUBUILDRATE"
+---| "SCUREGENRATE"
+
+---@alias AeonSCUEnhancementBuffName          # BuffType
+---| "AeonSCUBuildRate"                       # SCUBUILDRATE
+---| "AeonSCURegenRate"                       # SCUREGENRATE
 
 local CommandUnit = import("/lua/defaultunits.lua").CommandUnit
 local AWeapons = import("/lua/aeonweapons.lua")
@@ -13,10 +20,10 @@ local EffectUtil = import("/lua/effectutilities.lua")
 local Buff = import("/lua/sim/buff.lua")
 
 ---@class UAL0301 : CommandUnit
-UAL0301 = Class(CommandUnit) {
+UAL0301 = ClassUnit(CommandUnit) {
     Weapons = {
-        RightReactonCannon = Class(ADFReactonCannon) {},
-        DeathWeapon = Class(SCUDeathWeapon) {},
+        RightReactonCannon = ClassWeapon(ADFReactonCannon) {},
+        DeathWeapon = ClassWeapon(SCUDeathWeapon) {},
     },
 
     __init = function(self)
@@ -47,7 +54,7 @@ UAL0301 = Class(CommandUnit) {
 
     CreateEnhancement = function(self, enh)
         CommandUnit.CreateEnhancement(self, enh)
-        local bp = self:GetBlueprint().Enhancements[enh]
+        local bp = self.Blueprint.Enhancements[enh]
         if not bp then return end
         -- Teleporter
         if enh == 'Teleporter' then
@@ -65,24 +72,24 @@ UAL0301 = Class(CommandUnit) {
             self:SetMaintenanceConsumptionInactive()
             self:RemoveToggleCap('RULEUTC_ShieldToggle')
         elseif enh == 'ShieldHeavy' then
-            self:ForkThread(self.CreateHeavyShield, bp)
+            self.Trash:Add(ForkThread(self.CreateHeavyShield, bp,self))
         elseif enh == 'ShieldHeavyRemove' then
             self:DestroyShield()
             self:SetMaintenanceConsumptionInactive()
             self:RemoveToggleCap('RULEUTC_ShieldToggle')
-        -- ResourceAllocation
-        elseif enh =='ResourceAllocation' then
-            local bp = self:GetBlueprint().Enhancements[enh]
-            local bpEcon = self:GetBlueprint().Economy
+            -- ResourceAllocation
+        elseif enh == 'ResourceAllocation' then
+            local bp = self.Blueprint.Enhancements[enh]
+            local bpEcon = self.Blueprint.Economy
             if not bp then return end
-            self:SetProductionPerSecondEnergy(bp.ProductionPerSecondEnergy + bpEcon.ProductionPerSecondEnergy or 0)
-            self:SetProductionPerSecondMass(bp.ProductionPerSecondMass + bpEcon.ProductionPerSecondMass or 0)
+            self:SetProductionPerSecondEnergy((bp.ProductionPerSecondEnergy + bpEcon.ProductionPerSecondEnergy) or 0)
+            self:SetProductionPerSecondMass((bp.ProductionPerSecondMass + bpEcon.ProductionPerSecondMass) or 0)
         elseif enh == 'ResourceAllocationRemove' then
-            local bpEcon = self:GetBlueprint().Economy
+            local bpEcon = self.Blueprint.Economy
             self:SetProductionPerSecondEnergy(bpEcon.ProductionPerSecondEnergy or 0)
             self:SetProductionPerSecondMass(bpEcon.ProductionPerSecondMass or 0)
-        -- Engineering Focus Module
-        elseif enh =='EngineeringFocusingModule' then
+            -- Engineering Focus Module
+        elseif enh == 'EngineeringFocusingModule' then
             if not Buffs['AeonSCUBuildRate'] then
                 BuffBlueprint {
                     Name = 'AeonSCUBuildRate',
@@ -92,7 +99,7 @@ UAL0301 = Class(CommandUnit) {
                     Duration = -1,
                     Affects = {
                         BuildRate = {
-                            Add =  bp.NewBuildRate - self:GetBlueprint().Economy.BuildRate,
+                            Add = bp.NewBuildRate - self.Blueprint.Economy.BuildRate,
                             Mult = 1,
                         },
                     },
@@ -103,7 +110,7 @@ UAL0301 = Class(CommandUnit) {
             if Buff.HasBuff(self, 'AeonSCUBuildRate') then
                 Buff.RemoveBuff(self, 'AeonSCUBuildRate')
             end
-        -- SystemIntegrityCompensator
+            -- SystemIntegrityCompensator
         elseif enh == 'SystemIntegrityCompensator' then
             local name = 'AeonSCURegenRate'
             if not Buffs[name] then
@@ -115,7 +122,7 @@ UAL0301 = Class(CommandUnit) {
                     Duration = -1,
                     Affects = {
                         Regen = {
-                            Add =  bp.NewRegenRate - self:GetBlueprint().Defense.RegenRate,
+                            Add = bp.NewRegenRate - self.Blueprint.Defense.RegenRate,
                             Mult = 1,
                         },
                     },
@@ -126,20 +133,20 @@ UAL0301 = Class(CommandUnit) {
             if Buff.HasBuff(self, 'AeonSCURegenRate') then
                 Buff.RemoveBuff(self, 'AeonSCURegenRate')
             end
-        -- Sacrifice
+            -- Sacrifice
         elseif enh == 'Sacrifice' then
             self:AddCommandCap('RULEUCC_Sacrifice')
         elseif enh == 'SacrificeRemove' then
             self:RemoveCommandCap('RULEUCC_Sacrifice')
-        -- StabilitySupressant
-        elseif enh =='StabilitySuppressant' then
+            -- StabilitySupressant
+        elseif enh == 'StabilitySuppressant' then
             local wep = self:GetWeaponByLabel('RightReactonCannon')
             wep:AddDamageMod(bp.NewDamageMod or 0)
             wep:AddDamageRadiusMod(bp.NewDamageRadiusMod or 0)
             wep:ChangeMaxRadius(bp.NewMaxRadius or 40)
-        elseif enh =='StabilitySuppressantRemove' then
+        elseif enh == 'StabilitySuppressantRemove' then
             local wep = self:GetWeaponByLabel('RightReactonCannon')
-            wep:AddDamageMod(-self:GetBlueprint().Enhancements['RightReactonCannon'].NewDamageMod)
+            wep:AddDamageMod(-self.Blueprint.Enhancements['RightReactonCannon'].NewDamageMod)
             wep:AddDamageRadiusMod(bp.NewDamageRadiusMod or 0)
             wep:ChangeMaxRadius(bp.NewMaxRadius or 30)
         end

@@ -20,6 +20,62 @@ local TableGetn = table.getn
 local TableRemove = table.remove 
 local TableSort = table.sort
 
+--- Determines the size in bytes of the given element
+---@param element any
+---@param ignore table<string, boolean>     # List of key names to ignore of all (referenced) tables
+---@return integer
+function ToBytes(element, ignore)
+
+    -- has no allocated bytes
+    if element == nil then
+        return 0
+    end
+
+    -- applies to tables and strings, to prevent counting them multiple times
+    local seen = { }
+
+    -- prepare stack to prevent recursion
+    local allocatedSize = 0
+    local stack = { element }
+    local head = 2
+
+    while head > 1 do
+
+        head = head - 1
+        local value = stack[head]
+        stack[head] = nil
+
+        local size = debug.allocatedsize(value)
+
+        -- size of usual value
+        if size == 0 then
+            allocatedSize = allocatedSize + 8
+
+        -- size of string
+        elseif type(value) ~= 'table' then
+            if not seen[value] then
+                seen[value] = true
+                allocatedSize = allocatedSize + size
+            end
+
+        -- size of table
+        else
+            if not seen[value] then
+                allocatedSize = allocatedSize + size
+                seen[value] = true
+                for k, v in value do
+                    if not ignore[k] then
+                        stack[head] = v
+                        head = head + 1
+                    end
+                end
+            end
+        end
+    end
+
+    return allocatedSize
+end
+
 --- RandomIter(table) returns a function that when called, returns a pseudo-random element of the supplied table.
 --- Each element of the table will be returned once. This is essentially for "shuffling" sets.
 function RandomIter(someSet)
@@ -52,6 +108,10 @@ function safecall(msg, fn, ...)
         return
     end
 end
+
+--- Returns actual size of a table, including string keys
+table.getsize = table.getsize2 or table.getsize
+table.empty = table.empty2 or table.empty
 
 --- table.copy(t) returns a shallow copy of t.
 function table.copy(t)
@@ -307,21 +367,6 @@ function sortedpairs(t, comp)
     end
 end
 
---- Returns actual size of a table, including string keys
-function table.getsize(t)
-    -- handling nil table like empty tables so that no need to check
-    -- for nil table and then size of table:
-    -- if t and not table.empty(t) then
-    -- do some thing
-    -- end
-    if type(t) ~= 'table' then return 0 end
-    local size = 0
-    for k, v in t do
-        size = size + 1
-    end
-    return size
-end
-
 --- Returns a table with keys and values from t reversed.
 --- e.g. table.inverse {'one','two','three'} => {one=1, two=2, three=3}
 ---      table.inverse {foo=17, bar=100}     => {[17]=foo, [100]=bar}
@@ -342,7 +387,7 @@ function table.reverse(t)
     if not t then return {} end -- prevents looping over nil table
     local r = {}
     local items = table.indexize(t) -- convert from hash table
-    local itemsCount = table.getsize(t)
+    local itemsCount = table.getn(t)
     for k, v in ipairs(items) do
         r[itemsCount + 1 - k] = v
     end
@@ -418,12 +463,6 @@ function table.map(fn, t)
         r[k] = fn(v)
     end
     return r
-end
-
---- table.empty(t) returns true iff t has no keys/values.
-function table.empty(t)
-    if type(t) ~= 'table' then return true end
-    return next(t) == nil
 end
 
 --- table.shuffle(t) returns a shuffled table
@@ -541,6 +580,16 @@ function table.unique(t)
 
     return unique
 end
+
+
+---Returns a random entry from an array
+---@generic T
+---@param array T[]
+---@return T
+function table.random(array)
+    return array[Random(1, TableGetn(array))]
+end
+
 
 -- Lua 5.0 implementation of the Lua 5.1 function string.match
 -- Returns a regex match

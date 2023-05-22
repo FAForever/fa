@@ -102,7 +102,7 @@ local activeCombo = nil
 ---@field _staticTitle? boolean the title will not be set to the selected item when true
 ---@field _titleColor? Color
 ---@field _titleDefaultColor? Color the title color used when the default item is selected (and `EnableColor` is true)
-Combo = Class(Group) {
+Combo = ClassUI(Group) {
     ---@param self Combo
     ---@param parent Control
     ---@param pointSize? number defaults to 12
@@ -537,7 +537,7 @@ Combo = Class(Group) {
 ---@field _ddhidden? boolean
 ---@field _globalMouseClickFn function
 ---@field _isColor? boolean
-BitmapCombo = Class(Group) {
+BitmapCombo = ClassUI(Group) {
     __init = function(self, parent, bitmapArray, defaultIndex, isColor, bitmaps, rolloverCue, clickCue, debugName)
         bitmaps = bitmaps or defaultBitmaps
         debugName = debugName or "BitmapCombo"

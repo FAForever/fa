@@ -6,8 +6,8 @@
 -----------------------------------------------------------------
 
 ---@class UnitRestrictions
----@field Global table<UnitId, boolean>
----@field PerArmy table<UnitId, boolean>[]
+---@field Global table<BlueprintId, boolean>
+---@field PerArmy table<BlueprintId, boolean>[]
 
 
 

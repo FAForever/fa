@@ -9,7 +9,7 @@
 --****************************************************************************
 local SSeaFactoryUnit = import("/lua/seraphimunits.lua").SSeaFactoryUnit
 ---@class XSB0103 : SSeaFactoryUnit
-XSB0103 = Class(SSeaFactoryUnit) {
+XSB0103 = ClassUnit(SSeaFactoryUnit) {
     OnCreate = function(self)
         SSeaFactoryUnit.OnCreate(self)
         self.Rotator1 = CreateRotator(self, 'Pod01', 'y', nil, 5, 0, 0)

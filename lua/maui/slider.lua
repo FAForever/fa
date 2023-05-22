@@ -5,8 +5,10 @@ local Dragger = import("/lua/maui/dragger.lua").Dragger
 local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
 local lazyvar = import("/lua/lazyvar.lua")
 
+local UIUtil = import("/lua/ui/uiutil.lua")
+
 ---@class Slider : Group
-Slider = Class(Group) {
+Slider = ClassUI(Group) {
     -- TODO make it possible for the start value to be greate than the end value and have that work the opposite way
     __init = function(self, parent, isVertical, startValue, endValue, thumb, thumbOver, thumbDown, background, debugname)
         Group.__init(self, parent)
@@ -149,8 +151,14 @@ Slider = Class(Group) {
 }
 
 ---@class IntegerSlider : Slider
-IntegerSlider = Class(Slider) {
+IntegerSlider = ClassUI(Slider) {
     __init = function(self, parent, isVertical, startValue, endValue, indentValue, thumb, thumbOver, thumbDown, background)
+
+        thumb = thumb or UIUtil.SkinnableFile('/slider02/slider_btn_up.dds')
+        thumbOver = thumbOver or UIUtil.SkinnableFile('/slider02/slider_btn_over.dds')
+        thumbDown = thumbDown or UIUtil.SkinnableFile('/slider02/slider_btn_down.dds')
+        background = background or UIUtil.SkinnableFile('/dialogs/options-02/slider-back_bmp.dds')
+
         Slider.__init(self, parent, isVertical, math.floor(startValue), math.floor(endValue), thumb, thumbOver, thumbDown, background)
         self._indentValue = math.floor(indentValue)
     end,

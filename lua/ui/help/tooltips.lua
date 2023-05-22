@@ -622,9 +622,27 @@ Tooltips = {
         title = "<LOC OPTIONS_0115>Always Render Strategic Icons",
         description = "<LOC OPTIONS_0116>Strategic icons are always shown, regardless of zoom distance",
     },
+    options_camera_shake_intensity = {
+        title = "<LOC OPTIONS_CAMERA_SHAKE_TITLE>Adjust shake intensity of camera",
+        description = "<LOC OPTIONS_CAMERA_SHAKE_DESCRIPTION>Adjusts the shake intensity: 0% is no shaking at all and 100% is the default shake behavior. \r\nLarge explosions and units can shake the camera to improve immersion, but practically it can be annoying.",
+    },
     options_uvd_format = {
         title = "<LOC OPTIONS_0107>Construction Tooltip Information",
         description = "<LOC OPTIONS_0118>Shows full, partial or no description when the unit icon is moused over",
+    },
+    options_assist_to_upgrade = {
+        title = "<LOC ASSIST_TO_UPGRADE_TITLE>Assist to Upgrade",
+        description = "<LOC ASSIST_TO_UPGRADE_DESCRIPTION>When enabled structures automatically queue and pause their upgrade when you issue an assist order",
+    },
+
+    options_alt_to_force_attack_move = {
+        title = "<LOC ALT_TO_FORCE_ATTACK_MOVE_TITLE>Hold alt to force attack move",
+        description = "<LOC ALT_TO_FORCE_ATTACK_MOVE_TITLE>When enabled holding alt will always turn orders into an attack move order"
+    },
+
+    options_assist_to_unpause = {
+        title = "<LOC ASSIST_TO_UNPAUSE_TITLE>Assist to Unpause",
+        description = "<LOC ASSIST_TO_UNPAUSE_DESCRIPTION>When enabled structures automatically unpause as engineers start assisting it.",
     },
     options_mp_taunt_head = {
         title = "<LOC OPTIONS_0119>MP Taunt Head",
@@ -836,6 +854,10 @@ Tooltips = {
         title = "<LOC OPTIONS_0184>Bloom Render",
         description = "<LOC OPTIONS_0185>Toggles a glow type effect that is used on many weapon effects and some UI elements (off = fastest)",
     },
+    options_bloom_intensity = {
+        title = "<LOC OPTIONS_BLOOM_INTENSITY>Bloom Intensity",
+        description = "<LOC OPTIONS_BLOOM_INTENSITY_DESCRIPTION>Allows you to adjust the bloom intensity. Ranges from 10 (essentially no bloom) to 17 (more bright than usual). The standard value is 15.\r\n\r\nThis feature only works when bloom is enabled.",
+    },
     options_experimental_graphics = {
         title = "<LOC OPTIONS_EXP_GRAPHICS_01>Experimental graphics",
         description = "<LOC OPTIONS_EXP_GRAPHICS_02>Requires fidelity set to 'High'.\r\n\r\nIntroduces experimental graphics that high-end hardware should be able to support.\r\n\r\nThis feature may be unstable - use at your own risk.",
@@ -973,11 +995,11 @@ Tooltips = {
         title = '<LOC OPTIONS_0291>Reclaim Batching',
         description = '<LOC OPTIONS_0292>Combines nearby reclaim labels as you zoom out. Does not work properly with reclaim labels scaled 30% or more.\r\n\r\nSignificantly improves performance. Recommended for lower end systems.',
     },
-    options_selection_sets_add_behavior = {
+    options_steal_from_other_control_groups = {
         title = "<LOC OPTIONS_0293>Unique Control Groups",
         description = "<LOC OPTIONS_0294>When on, a unit can only be part of one control group. A unit will be transferred from any previously assigned control groups to the new control group.",
     },
-    options_selection_sets_production_behavior = {
+    options_add_to_factory_control_group = {
         title= "<LOC OPTIONS_0295>Transitive Control Groups of Factories",
         description= "<LOC OPTIONS_0296>When on, a unit inherits the control group of the factory it is produced by."
     },
@@ -994,8 +1016,12 @@ Tooltips = {
         description = "<LOC OPTIONS_0302>Shows a splash damage indicator when an attack command is possible, usually when you attempt to ground-fire with a unit with splash damage, like a bomber.\r\n\r\nDoes not interfere with how the attack command is processed, this is merely a visual change.",
     },
     options_cursor_depth_scanning = {
-        title = "<LOC OPTIONS_0303>Depth Scanning",
-        description = "<LOC OPTIONS_0304>Visualizes the height difference between the water surface and the ocean floor on the cursor cursor.",
+        title = "<LOC WATER_DEPTH_ASSISTANCE_TITLE>Water depth indication",
+        description = "<LOC WATER_DEPTH_ASSISTANCE_DESCRIPTION>When enabled, adds visual elements to visualize the offset between the water surface and the ocean floor at the position of the cursor.",
+    },
+    options_cursor_hover_scanning = {
+        title = "<LOC PLANE_HEIGHT_ASSISTANCE_TITLE>Plane height indication",
+        description = "<LOC WATER_DEPTH_ASSISTANCE_DESCRIPTION>When enabled, adds visual elements to visualize the offset between the terrain surface and the (expected) height of the selected air unit at the position of the cursor. \r\nIs only applied when you have one unit selected.",
     },
     options_share_mouse = {
         title = '<LOC OPTIONS_0305>Show Player Cursor Locations for Observers',
@@ -1155,54 +1181,6 @@ Tooltips = {
     lobby_click_Settings = {
         title = "<LOC lobui_0611>Lobby Settings",
         description = "<LOC lobui_0612>Change your lobby background or chat font size.",
-    },
-    aitype_sorian = {
-        title = "<LOC sorian_0001>AI: Sorian",
-        description = "<LOC sorian_0002>A balanced AI. Good for 20x20+ maps.",
-    },
-    aitype_sorianrush = {
-        title = "<LOC sorian_0003>AI: Sorian Rush",
-        description = "<LOC sorian_0004>A rush AI. Good for 10x10 or smaller maps.",
-    },
-    aitype_sorianair = {
-        title = "<LOC sorian_0005>AI: Sorian Air",
-        description = "<LOC sorian_0006>An AI that focuses on air. Good for 20x20+ maps.",
-    },
-    aitype_sorianwater = {
-        title = "<LOC sorian_0007>AI: Sorian Water",
-        description = "<LOC sorian_0008>An AI that focuses on water. Good for 20x20+ water maps.",
-    },
-    aitype_sorianturtle = {
-        title = "<LOC sorian_0009>AI: Sorian Turtle",
-        description = "<LOC sorian_0010>A turtle AI. Good for 20x20+ maps.",
-    },
-    aitype_sorianadaptive = {
-        title = "<LOC sorian_0011>AI: Sorian Adaptive",
-        description = "<LOC sorian_0012>Chooses a Sorian AI based on the map. Use this if you can\'t decide on an AI.",
-    },
-    aitype_soriancheat = {
-        title = "<LOC sorian_0013>AIx: Sorian Cheat",
-        description = "<LOC sorian_0014>A cheating balanced AI. Good for 20x20+ maps.",
-    },
-    aitype_sorianrushcheat = {
-        title = "<LOC sorian_0015>AIx: Sorian Rush Cheat",
-        description = "<LOC sorian_0016>A cheating rush AI. Good for 10x10 or smaller maps.",
-    },
-    aitype_sorianaircheat = {
-        title = "<LOC sorian_0017>AIx: Sorian Air Cheat",
-        description = "<LOC sorian_0018>A cheating AI that focuses on air. Good for 20x20+ maps.",
-    },
-    aitype_sorianwatercheat = {
-        title = "<LOC sorian_0019>AIx: Sorian Water Cheat",
-        description = "<LOC sorian_0020>A cheating AI that focuses on water. Good for 20x20+ water maps.",
-    },
-    aitype_sorianturtlecheat = {
-        title = "<LOC sorian_0021>AIx: Sorian Turtle Cheat",
-        description = "<LOC sorian_0022>A cheating turtle AI. Good for 20x20+ maps.",
-    },
-    aitype_sorianadaptivecheat = {
-        title = "<LOC sorian_0023>AIx: Sorian Adaptive Cheat",
-        description = "<LOC sorian_0024>Chooses a Sorian cheating AI based on the map. Use this if you can\'t decide on an AI.",
     },
     num_games = {
         title = '<LOC lobui_0748>Number of Games',
@@ -1709,40 +1687,41 @@ Tooltips = {
         description = "<LOC tooltipui0464>Propose ending the game in a draw.  All players must click this to accept.",
     },
     dip_recall_request = {
-        title = "<LOC tooltipui0722>Activate Recall Beacon",
+        title = "<LOC tooltipui0722>Recall",
         description = "<LOC tooltipui0723>Signal to your allies that you are ready to recall from battle.",
     },
     dip_recall_request_dis_active = {
-        title = "<LOC tooltipui0724>Recall Beacon Active",
+        title = "<LOC tooltipui0724>Recall Requested",
         description = "<LOC tooltipui0725>Your team has been notified of your request to recall from battle.",
     },
     dip_recall_request_dis_scenario = {
-        title = "<LOC tooltipui0726>Cannot Activate Recall Beacon",
+        title = "<LOC tooltipui0726>Cannot Recall",
         description = "<LOC tooltipui0727>You cannot recall from battle in this scenario.",
     },
     dip_recall_request_dis_gate = {
-        title = "<LOC tooltipui0726>Cannot Activate Recall Beacon",
+        title = "<LOC tooltipui0726>Cannot Recall",
         description = "<LOC tooltipui0728>You cannot recall from battle within 5 minutes of gating in.",
     },
     dip_recall_request_dis_ai = {
-        title = "<LOC tooltipui0726>Cannot Activate Recall Beacon",
+        title = "<LOC tooltipui0726>Cannot Recall",
         description = "<LOC tooltipui0729>There are AI armies on your team that will not recall.",
     },
     dip_recall_request_dis_request = {
-        title = "<LOC tooltipui0726>Cannot Activate Recall Beacon",
+        title = "<LOC tooltipui0726>Cannot Recall",
         description = "<LOC tooltipui0730>You have sent a recall request too recently.",
     },
     dip_recall_request_dis_vote = {
-        title = "<LOC tooltipui0726>Cannot Activate Recall Beacon",
+        title = "<LOC tooltipui0726>Cannot Recall",
         description = "<LOC tooltipui0731>Your team has had a recall vote too recently.",
     },
+    -- TODO: rename to `dip_recall_request_yes` and `dip_recall_request_no`
     dip_recall_request_accept = {
-        title = "<LOC tooltipui0732>Accept Recall Request",
-        description = "<LOC tooltipui0733>Accept the request for your team to recall from battle.",
+        title = "<LOC tooltipui0732>Yes Vote",
+        description = "<LOC tooltipui0733>Vote yes to your team recalling from battle as a defeat.",
     },
     dip_recall_request_veto = {
-        title = "<LOC tooltipui0734>Veto Recall Request",
-        description = "<LOC tooltipui0735>Veto the request for your team to recall from battle.",
+        title = "<LOC tooltipui0734>No Vote",
+        description = "<LOC tooltipui0735>Vote no to your team recalling from battle as a defeat.",
     },
     dip_give_units = {
         title = "<LOC tooltipui0465>Give Units",

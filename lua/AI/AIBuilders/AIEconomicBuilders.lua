@@ -21,7 +21,6 @@ local EBC = '/lua/editor/economybuildconditions.lua'
 local PCBC = '/lua/editor/platooncountbuildconditions.lua'
 local SAI = '/lua/scenarioplatoonai.lua'
 local TBC = '/lua/editor/threatbuildconditions.lua'
-local SBC = '/lua/editor/SorianBuildConditions.lua'
 local PlatoonFile = '/lua/platoon.lua'
 
 ---@alias BuilderGroupsEconomic 'EngineerFactoryBuilders' | 'Engineer Transfers' | 'Land Rush Initial ACU Builders' | 'Balanced Rush Initial ACU Builders' | 'Air Rush Initial ACU Builders' | 'Naval Rush Initial ACU Builders' | 'Default Initial ACU Builders' | 'ACUBuilders' | 'ACUUpgrades - Gun improvements' | 'ACUUpgrades - Tech 2 Engineering' | 'ACUUpgrades - Shields' | 'ACUUpgrades' | 'T1EngineerBuilders' | 'T2EngineerBuilders' | 'T3EngineerBuilders' | 'EngineerMassBuildersHighPri' | 'EngineerMassBuilders - Naval' | 'EngineerMassBuildersLowerPri' | 'EngineerMassBuildersMidPriSingle' | 'EngineerEnergyBuilders' | 'EngineerEnergyBuildersExpansions' | 'EngineeringSupportBuilder'
@@ -255,7 +254,7 @@ BuilderGroup {
     Builder {
         BuilderName = 'CDR Initial Land Rush',
         PlatoonAddBehaviors = { 'CommanderBehaviorImproved', },
-        PlatoonTemplate = 'CommanderBuilder',
+        PlatoonTemplate = 'CommanderInitialBuilder',
         Priority = 1000,
         BuilderConditions = {
                 { IBC, 'NotPreBuilt', {}},
@@ -265,20 +264,8 @@ BuilderGroup {
         PlatoonAddFunctions = { {SAI, 'BuildOnce'}, },
         BuilderData = {
             Construction = {
-                BuildStructures = {
-                    --DUNCAN - Altered build order
-                    'T1LandFactory',
-                    'T1EnergyProduction',
-                    'T1EnergyProduction',
-                    --'T1Resource',
-                    'T1EnergyProduction',
-                    'T1EnergyProduction',
-                    'T1EnergyProduction',
-                    'T1EnergyProduction',
-                    'T1LandFactory',
-                    'T1EnergyProduction',
-                    'T1LandFactory',
-                }
+                BaseTemplateFile = '/lua/AI/AIBaseTemplates/ACUBaseTemplate.lua',
+                BaseTemplate = 'ACUBaseTemplate',
             }
         }
     },
@@ -320,7 +307,7 @@ BuilderGroup {
     Builder {
         BuilderName = 'CDR Initial Balanced',
         PlatoonAddBehaviors = { 'CommanderBehaviorImproved', },
-        PlatoonTemplate = 'CommanderBuilder',
+        PlatoonTemplate = 'CommanderInitialBuilder',
         Priority = 1000,
         BuilderConditions = {
                 { IBC, 'NotPreBuilt', {}},
@@ -330,21 +317,8 @@ BuilderGroup {
         PlatoonAddFunctions = { {SAI, 'BuildOnce'}, },
         BuilderData = {
             Construction = {
-                BuildStructures = {
-                    --DUNCAN - Altered build order
-                    'T1LandFactory',
-                    'T1EnergyProduction',
-                    'T1EnergyProduction',
-                    --'T1Resource',
-                    'T1EnergyProduction',
-                    'T1EnergyProduction',
-                    --'T1Resource',
-                    'T1EnergyProduction',
-                    'T1EnergyProduction',
-                    'T1AirFactory',
-                    'T1EnergyProduction',
-                    'T1LandFactory',
-                }
+                BaseTemplateFile = '/lua/AI/AIBaseTemplates/ACUBaseTemplate.lua',
+                BaseTemplate = 'ACUBaseTemplate',
             }
         }
     },
@@ -384,7 +358,7 @@ BuilderGroup {
     Builder {
         BuilderName = 'CDR Initial Air Rush',
         PlatoonAddBehaviors = { 'CommanderBehaviorImproved', },
-        PlatoonTemplate = 'CommanderBuilder',
+        PlatoonTemplate = 'CommanderInitialBuilder',
         Priority = 1000,
         BuilderConditions = {
                 { IBC, 'NotPreBuilt', {}},
@@ -394,17 +368,8 @@ BuilderGroup {
         PlatoonAddFunctions = { {SAI, 'BuildOnce'}, },
         BuilderData = {
             Construction = {
-                BuildStructures = {
-                    'T1AirFactory',
-                    'T1EnergyProduction',
-                    'T1EnergyProduction',
-                    --'T1Resource',
-                    'T1EnergyProduction',
-                    'T1EnergyProduction',
-                    'T1EnergyProduction',
-                    'T1EnergyProduction',
-                    'T1AirFactory',
-                }
+                BaseTemplateFile = '/lua/AI/AIBaseTemplates/ACUBaseTemplate.lua',
+                BaseTemplate = 'ACUBaseTemplate',
             }
         }
     },
@@ -445,7 +410,7 @@ BuilderGroup {
     Builder {
         BuilderName = 'CDR Initial Naval Rush',
         PlatoonAddBehaviors = { 'CommanderBehaviorImproved', },
-        PlatoonTemplate = 'CommanderBuilder',
+        PlatoonTemplate = 'CommanderInitialBuilder',
         Priority = 1000,
         BuilderConditions = {
                 { IBC, 'NotPreBuilt', {}},
@@ -455,18 +420,8 @@ BuilderGroup {
         PlatoonAddFunctions = { {SAI, 'BuildOnce'}, },
         BuilderData = {
             Construction = {
-                BuildStructures = {
-                    --DUNCAN - order changed
-                    'T1AirFactory',
-                    'T1EnergyProduction',
-                    'T1EnergyProduction',
-                    --'T1Resource',
-                    'T1EnergyProduction',
-                    'T1EnergyProduction',
-                    'T1LandFactory',
-                    'T1EnergyProduction',
-                    'T1EnergyProduction',
-                }
+                BaseTemplateFile = '/lua/AI/AIBaseTemplates/ACUBaseTemplate.lua',
+                BaseTemplate = 'ACUBaseTemplate',
             }
         }
     },
@@ -1287,10 +1242,10 @@ BuilderGroup {
     Builder {
         BuilderName = 'T1 Hydrocarbon Engineer Single',
         PlatoonTemplate = 'EngineerBuilder',
-        Priority = 1000,
+        Priority = 1005,
         BuilderConditions = {
                 { UCBC, 'HaveLessThanUnitsWithCategory', { 1, categories.HYDROCARBON}},
-                { SBC, 'CanBuildOnHydroLessThanDistance', { 'LocationType', 160, -500, 0, 0, 'AntiSurface', 1 }},
+                { UCBC, 'CanBuildOnHydroLessThanDistance', { 'LocationType', 160, -500, 0, 0, 'AntiSurface', 1 }},
             },
         BuilderType = 'Any',
         BuilderData = {
@@ -1309,7 +1264,7 @@ BuilderGroup {
         BuilderConditions = {
                 { UCBC, 'HaveLessThanUnitsWithCategory', { 3, categories.HYDROCARBON}},
                 { UCBC, 'HaveGreaterThanUnitsWithCategory', { 4, categories.MASSEXTRACTION}},
-                { SBC, 'CanBuildOnHydroLessThanDistance', { 'LocationType', 200, -500, 0, 0, 'AntiSurface', 1 }},
+                { UCBC, 'CanBuildOnHydroLessThanDistance', { 'LocationType', 200, -500, 0, 0, 'AntiSurface', 1 }},
             },
         BuilderType = 'Any',
         BuilderData = {
@@ -1322,30 +1277,30 @@ BuilderGroup {
     },
     Builder {
         BuilderName = 'T1 Engineer Reclaim',
-        PlatoonTemplate = 'EngineerBuilder',
-        PlatoonAIPlan = 'ReclaimAI',
-        Priority = 900, --DUNCAN - was 950
-        InstanceCount = 3,
+        PlatoonTemplate = 'T1EngineerGridReclaimer',
+        Priority = 1000,
+        InstanceCount = 2,
         BuilderConditions = {
-                { MIBC, 'ReclaimablesInArea', { 'LocationType', }},
+                { EBC, 'LessThanEconStorageRatio', { 0.75, 2.0}},
+                { MIBC, 'ReclaimAvailableInGrid', { 'LocationType', }},
             },
         BuilderData = {
             LocationType = 'LocationType',
+            SearchType   = 'MAIN',
         },
         BuilderType = 'Any',
     },
     Builder {
         BuilderName = 'T1 Engineer Reclaim Excess',
-        PlatoonTemplate = 'EngineerBuilder',
-        PlatoonAIPlan = 'ReclaimAI',
-        Priority = 2, --DUNCAN - was 1
+        PlatoonTemplate = 'T1EngineerGridReclaimer',
+        Priority = 3, --DUNCAN - was 1
         InstanceCount = 10,
         BuilderConditions = {
-                { MIBC, 'ReclaimablesInArea', { 'LocationType', }},
+                { EBC, 'LessThanEconStorageRatio', { 0.75, 2.0}},
+                { MIBC, 'ReclaimAvailableInGrid', { 'LocationType', true}},
             },
         BuilderData = {
             LocationType = 'LocationType',
-            ReclaimTime = 30,
         },
         BuilderType = 'Any',
     },
@@ -1357,12 +1312,12 @@ BuilderGroup {
         InstanceCount = 1,
         BuilderConditions = {
                 { EBC, 'GreaterThanEconEfficiencyCombined', { 0.1, 1.1 }},
-                { UCBC, 'UnitsGreaterAtLocation', { 'LocationType', 1, categories.TECH3 * categories.ENERGYPRODUCTION}},
-                { UCBC, 'UnitsGreaterAtLocation', { 'LocationType', 0, categories.TECH1 * categories.ENERGYPRODUCTION * categories.DRAGBUILD }},
+                { UCBC, 'UnitsGreaterAtLocation', { 'LocationType', 1, categories.TECH3 * categories.ENERGYPRODUCTION }},
+                { UCBC, 'UnitsGreaterAtLocation', { 'LocationType', 0, categories.TECH1 * categories.ENERGYPRODUCTION * categories.DRAGBUILD - categories.HYDROCARBON }},
             },
         BuilderData = {
             Location = 'LocationType',
-            Reclaim = {'STRUCTURE ENERGYPRODUCTION TECH1 DRAGBUILD'},
+            Reclaim = { categories.STRUCTURE * categories.ENERGYPRODUCTION * categories.TECH1 * categories.DRAGBUILD - categories.HYDROCARBON },
         },
         BuilderType = 'Any',
     },
@@ -1602,12 +1557,12 @@ BuilderGroup {
     },
     Builder {
         BuilderName = 'T2 Engineer Reclaim Excess',
-        PlatoonTemplate = 'T2EngineerBuilder',
-        PlatoonAIPlan = 'ReclaimAI',
+        PlatoonTemplate = 'T2EngineerGridReclaimer',
         Priority = 2, --DUNCAN - was 1
         InstanceCount = 10,
         BuilderConditions = {
-                { MIBC, 'ReclaimablesInArea', { 'LocationType', }},
+                { EBC, 'LessThanEconStorageRatio', { 0.75, 2.0}},
+                { MIBC, 'ReclaimAvailableInGrid', { 'LocationType', true}},
             },
         BuilderData = {
             LocationType = 'LocationType',
@@ -1624,11 +1579,11 @@ BuilderGroup {
         BuilderConditions = {
                 { EBC, 'GreaterThanEconEfficiencyCombined', { 0.1, 1.1 }},
                 { UCBC, 'UnitsGreaterAtLocation', { 'LocationType', 1, categories.TECH3 * categories.ENERGYPRODUCTION}},
-                { UCBC, 'UnitsGreaterAtLocation', { 'LocationType', 0, categories.TECH1 * categories.ENERGYPRODUCTION * categories.DRAGBUILD }},
+                { UCBC, 'UnitsGreaterAtLocation', { 'LocationType', 0, categories.TECH1 * categories.ENERGYPRODUCTION * categories.DRAGBUILD - categories.HYDROCARBON }},
             },
         BuilderData = {
             Location = 'LocationType',
-            Reclaim = {'STRUCTURE ENERGYPRODUCTION TECH1 DRAGBUILD'},
+            Reclaim = { categories.STRUCTURE * categories.ENERGYPRODUCTION * categories.TECH1 * categories.DRAGBUILD - categories.HYDROCARBON },
         },
         BuilderType = 'Any',
     },
@@ -1756,13 +1711,13 @@ BuilderGroup {
     -- =========================
     Builder {
         BuilderName = 'T3 Engineer Reclaim Excess',
-        PlatoonTemplate = 'T3EngineerBuilder',
-        PlatoonAIPlan = 'ReclaimAI',
+        PlatoonTemplate = 'T3EngineerGridReclaimer',
         Priority = 0, --DUNCAN - was 1
         InstanceCount = 2, --DUNCAN - was 10
         BuilderConditions = {
-                { MIBC, 'ReclaimablesInArea', { 'LocationType', }},
-            },
+            { EBC, 'LessThanEconStorageRatio', { 0.75, 2.0}},
+            { MIBC, 'ReclaimAvailableInGrid', { 'LocationType', true}},
+        },
         BuilderData = {
             LocationType = 'LocationType',
             ReclaimTime = 10,

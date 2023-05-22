@@ -481,11 +481,6 @@ function GetAIPlayerData(name, AIPersonality, slot)
         end
     end
 
-    reprsl(aitypes)
-
-    LOG(baseAI)
-    LOG(requiresNavMesh)
-
     return PlayerData(
         {
             OwnerID = hostID,
@@ -1524,7 +1519,7 @@ end
 local function AssignRandomStartSpots()
     local teamSpawn = gameInfo.GameOptions['TeamSpawn']
 
-    if teamSpawn == 'fixed' then
+    if teamSpawn == 'fixed' or teamSpawn == 'penguin_autobalance' then
         return
     end
 
@@ -2079,6 +2074,25 @@ local function TryLaunch(skipNoObserversCheck)
     end
 
     if not gameInfo.GameOptions.AllowObservers then
+        
+        -- if observers are not allowed, and team spawn is set to penguin_autobalance, and there are
+        -- an odd number of players, then make the last player an observer now if human 
+        -- (before the check(s)/prompt(s) for having observer(s) when they're not allowed)
+        if gameInfo.GameOptions.TeamSpawn == 'penguin_autobalance' then
+            if math.mod(numPlayers, 2) == 1 then
+                for i = 16, 1, -1 do
+                    -- this gets the last occupied slot
+                    if gameInfo.PlayerOptions[i] then
+                        LOG(gameInfo.PlayerOptions[i].Human)
+                        if gameInfo.PlayerOptions[i].Human then
+                            HostUtils.ConvertPlayerToObserver(i)
+                        end
+                        break
+                    end
+                end
+            end
+        end
+
         local hostIsObserver = false
         local anyOtherObservers = false
         for k, observer in gameInfo.Observers:pairs() do
@@ -2111,6 +2125,11 @@ local function TryLaunch(skipNoObserversCheck)
 
     numberOfPlayers = numPlayers
     local function LaunchGame()
+
+        if gameInfo.GameOptions.TeamSpawn == 'penguin_autobalance' then
+            GUI.PenguinAutoBalance.OnClick()
+        end
+
         -- These two things must happen before the flattening step, mostly for terrible reasons.
         -- This isn't ideal, as it leads to redundant UI repaints :/
         AssignAutoTeams()
@@ -2242,6 +2261,15 @@ local function UpdateGame()
             ShowMapPositions(GUI.mapView, scenarioInfo)
             ConfigureMapListeners(GUI.mapView, scenarioInfo)
 
+            -- Briefing button takes priority over the patch notes if the map has a briefing
+            if scenarioInfo.hasBriefing then
+                GUI.briefingButton:Show()
+                GUI.patchnotesButton:Hide()
+            else
+                GUI.briefingButton:Hide()
+                GUI.patchnotesButton:Show()
+            end
+
             -- contains information that is available during blueprint loading
             local preGameData = {}
 
@@ -2348,6 +2376,7 @@ local function UpdateGame()
         local notReady = not playerOptions.Ready
 
         UIUtil.setEnabled(GUI.becomeObserver, notReady)
+        UIUtil.setEnabled(GUI.briefingButton, notReady)
         -- This button is enabled for all non-host players to view the configuration, and for the
         -- host to select presets (rather confusingly, one object represents both potential buttons)
         UIUtil.setEnabled(GUI.restrictedUnitsOrPresetsBtn, not isHost or notReady)
@@ -3232,6 +3261,18 @@ function CreateUI(maxPlayers)
         Changelog.Changelog(GUI)
     end
 
+    -- Create mission briefing button
+    local briefingButton = UIUtil.CreateButtonWithDropshadow(GUI.optionsPanel, '/BUTTON/medium/', "Briefing")
+    GUI.briefingButton = briefingButton
+    LayoutHelpers.AtBottomIn(GUI.briefingButton, GUI.optionsPanel, -51)
+    LayoutHelpers.AtHorizontalCenterIn(GUI.briefingButton, GUI.optionsPanel, -55)
+    briefingButton.OnClick = function(self, modifiers)
+        GUI.briefing = Group(GUI)
+        GUI.briefing.Depth:Set(function() return GUI.Depth() + 20 end)
+        LayoutHelpers.FillParent(GUI.briefing, GUI)
+        import('/lua/ui/campaign/operationbriefing.lua').CreateUI(GUI.briefing, gameInfo.GameOptions.ScenarioFile)
+    end
+
     -- A buton that, for the host, is "game options", but for everyone else shows a ready-only mod
     -- manager.
     if isHost then
@@ -3867,8 +3908,8 @@ function CreateUI(maxPlayers)
         -- Automatically balance an even number of non-observer players into 2 teams in the lobby
         GUI.PenguinAutoBalance.OnClick = function()
 
-            -- make sure spawns are set to fixed
-            if gameInfo.GameOptions.TeamSpawn ~= 'fixed' then
+            -- make sure spawns are set to fixed or penguin_autobalance
+            if gameInfo.GameOptions.TeamSpawn ~= 'fixed' and gameInfo.GameOptions.TeamSpawn ~= 'penguin_autobalance' then
                 gameInfo.GameOptions.TeamSpawn = 'fixed'
                 -- tell everyone else to set spawns to fixed
                 lobbyComm:BroadcastData {
@@ -3909,9 +3950,9 @@ function CreateUI(maxPlayers)
                 goalValue[2] = goalValue[2] - playerRatings[lastSlot[2]][2]
                 playerRatings[lastSlot[2]] = nil
                 playerCount = playerCount - 1
-                -- set the player to not be on a team if teams are manual
+                -- set the player to not be on a team if teams are manual and fixed
                 -- otherwise make the player an observer if human or remove it if AI
-                if gameInfo.GameOptions.AutoTeams == 'none' then
+                if gameInfo.GameOptions.AutoTeams == 'none' and gameInfo.GameOptions.TeamSpawn == 'fixed' then
                     for i, player in gameInfo.PlayerOptions:pairs() do
                         if player.StartSpot == lastSlot[1] then
                             player.Team = 1 -- no team
@@ -4169,6 +4210,23 @@ function CreateUI(maxPlayers)
                 end
             end
 
+            --shuffle player pairs
+            local random
+            local temp
+            for i, slot in bestTeam do
+                random = Random(1, teamSize)
+
+                --random swap on team 1
+                temp = bestTeam[random]
+                bestTeam[random] = bestTeam[i]
+                bestTeam[i] = temp
+
+                --mirrored swap on team2
+                temp = bestTeam2[random]
+                bestTeam2[random] = bestTeam2[i]
+                bestTeam2[i] = temp
+            end
+
             -- move players on team1 to the intended slots
             local team1OrderNum = 0
             local slotA
@@ -4297,7 +4355,7 @@ function CreateUI(maxPlayers)
             WaitSeconds(1)
         end
     end)
-    if true then
+    if false then
         import("/lua/ui/events/SnowFlake.lua"). CreateSnowFlakes(GUI)
     end
 end
@@ -4808,10 +4866,11 @@ function ConfigureMapListeners(mapCtrl, scenario)
         local marker = mapCtrl.startPositions[inSlot]
 
         marker.OnRollover = function(self, state)
+            local slotName = GUI.slots[slot].name
             if state == 'enter' then
-                GUI.slots[slot].name.HandleEvent(self, {Type='MouseEnter'})
+                slotName:HandleEvent({Type = 'MouseEnter'})
             elseif state == 'exit' then
-                GUI.slots[slot].name.HandleEvent(self, {Type='MouseExit'})
+                slotName:HandleEvent({Type = 'MouseExit'})
             end
         end
 

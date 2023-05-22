@@ -5,6 +5,15 @@
 -- Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
+---@alias SeraphimSCUEnhancementBuffType
+---| "SCUBUILDRATE"
+---| "SCUUPGRADEDMG"
+
+---@alias SeraphimSCUEnhancementBuffName      # BuffType
+---| "SeraphimSCUDamageStabilization"         # SCUUPGRADEDMG
+---| "SeraphimSCUBuildRate"                   # SCUBUILDRATE
+
+
 local CommandUnit = import("/lua/defaultunits.lua").CommandUnit
 local SWeapons = import("/lua/seraphimweapons.lua")
 local Buff = import("/lua/sim/buff.lua")
@@ -15,13 +24,13 @@ local SDFOverChargeWeapon = SWeapons.SDFLightChronotronCannonOverchargeWeapon
 local SIFLaanseTacticalMissileLauncher = SWeapons.SIFLaanseTacticalMissileLauncher
 
 ---@class XSL0301 : CommandUnit
-XSL0301 = Class(CommandUnit) {
+XSL0301 = ClassUnit(CommandUnit) {
     Weapons = {
-        LightChronatronCannon = Class(SDFLightChronotronCannonWeapon) {},
-        DeathWeapon = Class(SCUDeathWeapon) {},
-        OverCharge = Class(SDFOverChargeWeapon) {},
-        AutoOverCharge = Class(SDFOverChargeWeapon) {},
-        Missile = Class(SIFLaanseTacticalMissileLauncher) {
+        LightChronatronCannon = ClassWeapon(SDFLightChronotronCannonWeapon) {},
+        DeathWeapon = ClassWeapon(SCUDeathWeapon) {},
+        OverCharge = ClassWeapon(SDFOverChargeWeapon) {},
+        AutoOverCharge = ClassWeapon(SDFOverChargeWeapon) {},
+        Missile = ClassWeapon(SIFLaanseTacticalMissileLauncher) {
             OnCreate = function(self)
                 SIFLaanseTacticalMissileLauncher.OnCreate(self)
                 self:SetWeaponEnabled(false)
@@ -44,23 +53,24 @@ XSL0301 = Class(CommandUnit) {
 
     StartBeingBuiltEffects = function(self, builder, layer)
         CommandUnit.StartBeingBuiltEffects(self, builder, layer)
-        self:ForkThread( EffectUtil.CreateSeraphimBuildThread, builder, self.OnBeingBuiltEffectsBag, 2 )
+        self.Trash:Add(ForkThread(EffectUtil.CreateSeraphimBuildThread, self, builder, self.OnBeingBuiltEffectsBag, 2))
     end,
 
     CreateBuildEffects = function(self, unitBeingBuilt, order)
-        EffectUtil.CreateSeraphimUnitEngineerBuildingEffects(self, unitBeingBuilt, self.BuildEffectBones, self.BuildEffectsBag)
+        EffectUtil.CreateSeraphimUnitEngineerBuildingEffects(self, unitBeingBuilt, self.BuildEffectBones,
+            self.BuildEffectsBag)
     end,
 
     CreateEnhancement = function(self, enh)
         CommandUnit.CreateEnhancement(self, enh)
-        local bp = self:GetBlueprint().Enhancements[enh]
+        local bp = self.Blueprint.Enhancements[enh]
         if not bp then return end
         -- Teleporter
         if enh == 'Teleporter' then
             self:AddCommandCap('RULEUCC_Teleport')
         elseif enh == 'TeleporterRemove' then
             self:RemoveCommandCap('RULEUCC_Teleport')
-        -- Missile
+            -- Missile
         elseif enh == 'Missile' then
             self:AddCommandCap('RULEUCC_Tactical')
             self:AddCommandCap('RULEUCC_SiloBuildTactical')
@@ -69,7 +79,7 @@ XSL0301 = Class(CommandUnit) {
             self:RemoveCommandCap('RULEUCC_Tactical')
             self:RemoveCommandCap('RULEUCC_SiloBuildTactical')
             self:SetWeaponEnabledByLabel('Missile', false)
-        -- Shields
+            -- Shields
         elseif enh == 'Shield' then
             self:AddToggleCap('RULEUTC_ShieldToggle')
             self:SetEnergyMaintenanceConsumptionOverride(bp.MaintenanceConsumptionPerSecondEnergy or 0)
@@ -79,7 +89,7 @@ XSL0301 = Class(CommandUnit) {
             self:DestroyShield()
             self:SetMaintenanceConsumptionInactive()
             self:RemoveToggleCap('RULEUTC_ShieldToggle')
-        -- Overcharge
+            -- Overcharge
         elseif enh == 'Overcharge' then
             self:AddCommandCap('RULEUCC_Overcharge')
             self:GetWeaponByLabel('OverCharge').NeedsUpgrade = false
@@ -90,8 +100,8 @@ XSL0301 = Class(CommandUnit) {
             self:SetWeaponEnabledByLabel('AutoOverCharge', false)
             self:GetWeaponByLabel('OverCharge').NeedsUpgrade = true
             self:GetWeaponByLabel('AutoOverCharge').NeedsUpgrade = true
-        -- Engineering Throughput Upgrade
-        elseif enh =='EngineeringThroughput' then
+            -- Engineering Throughput Upgrade
+        elseif enh == 'EngineeringThroughput' then
             if not Buffs['SeraphimSCUBuildRate'] then
                 BuffBlueprint {
                     Name = 'SeraphimSCUBuildRate',
@@ -101,7 +111,7 @@ XSL0301 = Class(CommandUnit) {
                     Duration = -1,
                     Affects = {
                         BuildRate = {
-                            Add =  bp.NewBuildRate - self:GetBlueprint().Economy.BuildRate,
+                            Add = bp.NewBuildRate - self.Blueprint.Economy.BuildRate,
                             Mult = 1,
                         },
                     },
@@ -112,10 +122,10 @@ XSL0301 = Class(CommandUnit) {
             if Buff.HasBuff(self, 'SeraphimSCUBuildRate') then
                 Buff.RemoveBuff(self, 'SeraphimSCUBuildRate')
             end
-        -- Damage Stabilization
+            -- Damage Stabilization
         elseif enh == 'DamageStabilization' then
             if not Buffs['SeraphimSCUDamageStabilization'] then
-               BuffBlueprint {
+                BuffBlueprint {
                     Name = 'SeraphimSCUDamageStabilization',
                     DisplayName = 'SeraphimSCUDamageStabilization',
                     BuffType = 'SCUUPGRADEDMG',
@@ -137,11 +147,11 @@ XSL0301 = Class(CommandUnit) {
                 Buff.RemoveBuff(self, 'SeraphimSCUDamageStabilization')
             end
             Buff.ApplyBuff(self, 'SeraphimSCUDamageStabilization')
-          elseif enh == 'DamageStabilizationRemove' then
+        elseif enh == 'DamageStabilizationRemove' then
             if Buff.HasBuff(self, 'SeraphimSCUDamageStabilization') then
                 Buff.RemoveBuff(self, 'SeraphimSCUDamageStabilization')
             end
-        -- Enhanced Sensor Systems
+            -- Enhanced Sensor Systems
         elseif enh == 'EnhancedSensors' then
             self:SetIntelRadius('Vision', bp.NewVisionRadius or 104)
             self:SetIntelRadius('Omni', bp.NewOmniRadius or 104)
@@ -152,7 +162,7 @@ XSL0301 = Class(CommandUnit) {
             local aoc = self:GetWeaponByLabel('AutoOverCharge')
             aoc:ChangeMaxRadius(35)
         elseif enh == 'EnhancedSensorsRemove' then
-            local bpIntel = self:GetBlueprint().Intel
+            local bpIntel = self.Blueprint.Intel
             self:SetIntelRadius('Vision', bpIntel.VisionRadius or 26)
             self:SetIntelRadius('Omni', bpIntel.OmniRadius or 16)
             local wep = self:GetWeaponByLabel('LightChronatronCannon')

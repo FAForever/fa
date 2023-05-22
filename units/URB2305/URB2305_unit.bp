@@ -146,8 +146,8 @@ UnitBlueprint {
         UniformScale = 0.19,
     },
     Economy = {
-        BuildCostEnergy = 210000,
-        BuildCostMass = 15000,
+        BuildCostEnergy = 412500,
+        BuildCostMass = 16500,
         BuildRate = 1500,
         BuildTime = 25000,
         RebuildBonusIds = {
@@ -201,6 +201,7 @@ UnitBlueprint {
         },
         DragCoefficient = 0.2,
         FlattenSkirt = true,
+        HorizontalSkirt = true,
         MaxSteerForce = 0,
         MinSpeedPercent = 0,
         MotionType = 'RULEUMT_None',
@@ -265,7 +266,7 @@ UnitBlueprint {
             ForceSingleFire = true,
             InitialProjectileStorage = 0,
             Label = 'NukeMissiles',
-            ManualFire = 1,
+            ManualFire = true,
             MaxProjectileStorage = 5,
             MaxRadius = 20000,
             MinRadius = 0,

@@ -1,32 +1,27 @@
-﻿--****************************************************************************
---**
---**  File     :  /data/projectiles/SANHeavyCavitationTorpedo03/SANHeavyCavitationTorpedo03_script.lua
---**  Author(s):  Gordon Duclos
---**
---**  Summary  :  Heavy Cavitation Torpedo Projectile script, XSB2205
---**
---**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
---****************************************************************************
+﻿-- File     :  /data/projectiles/SANHeavyCavitationTorpedo03/SANHeavyCavitationTorpedo03_script.lua
+-- Author(s):  Gordon Duclos
+-- Summary  :  Heavy Cavitation Torpedo Projectile script, XSB2205
+-- Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
+-----------------------------------------------------------------------------------------------------
 local SHeavyCavitationTorpedo = import("/lua/seraphimprojectiles.lua").SHeavyCavitationTorpedo
-local RandomFloat = import("/lua/utilities.lua").GetRandomFloat
 local EffectTemplate = import("/lua/effecttemplates.lua")
 
-SANHeavyCavitationTorpedo03 = Class(SHeavyCavitationTorpedo) {
+SANHeavyCavitationTorpedo03 = ClassProjectile(SHeavyCavitationTorpedo) {
     OnCreate = function(self)
         self:SetCollisionShape('Sphere', 0, 0, 0, 0.1)
         SHeavyCavitationTorpedo.OnCreate(self)
-        self:ForkThread(self.PauseUntilTrack)
+        self.Trash:Add(ForkThread(self.PauseUntilTrack,self))
         CreateEmitterOnEntity(self,self.Army,EffectTemplate.SHeavyCavitationTorpedoFxTrails)
     end,
 
     PauseUntilTrack = function(self)
         local distance = self:GetDistanceToTarget()
         local turnrate = 360
-        
+
         if distance < 6 then
             turnrate = 720
         end
-        WaitSeconds(0.1)
+        WaitTicks(2)
         self:SetMaxSpeed(20)
         self:TrackTarget(true)
         self:SetTurnRate(turnrate)

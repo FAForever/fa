@@ -3,7 +3,7 @@
 ---@class moho.unit_methods : moho.entity_methods
 local Unit = {}
 
----@class UnitId: string
+---@alias FocusObject Entity | Unit | Prop | Projectile
 
 ---@alias UnitState
 ---| "Immobile"
@@ -86,31 +86,29 @@ end
 function Unit:CalculateWorldPositionFromRelative(vector)
 end
 
---- Returns if the unit can build the target unit
+--- returns true if the unit can build the target unit
 ---@param blueprintID string
 ---@return boolean
 function Unit:CanBuild(blueprintID)
 end
 
---- Returns if the unit can path to the goal
+--- returns true if the unit can path to the goal
 ---@param position Vector
 ---@return boolean result if false, returns the closest position, else the original position
 ---@return Vector bestGoal
 function Unit:CanPathTo(position)
 end
 
---- Returns if the unit can path to the goal rectangle
+--- returns true if the unit can path to the goal rectangle
 --- TODO: find out if it returns position as well
 ---@param rectangle Rectangle
 ---@return boolean
 function Unit:CanPathToRect(rectangle)
 end
 
----
 function Unit:ClearFocusEntity()
 end
 
----
 ---@param bone Bone
 ---@param Enable boolean
 function Unit:EnableManipulators(bone, Enable)
@@ -178,7 +176,6 @@ end
 function Unit:GetFireState()
 end
 
----
 ---@return Unit
 function Unit:GetFocusUnit()
 end
@@ -281,11 +278,10 @@ function Unit:GetTransportFerryBeacon()
 end
 
 --- Returns the unit's blueprint ID
----@return UnitId
+---@return EntityId
 function Unit:GetUnitId()
 end
 
----
 ---@return number x
 ---@return number y
 ---@return number z
@@ -305,7 +301,6 @@ end
 function Unit:GetWeaponCount()
 end
 
----
 ---@return number
 function Unit:GetWorkProgress()
 end
@@ -314,7 +309,8 @@ end
 --- This is the method to call for both SML's and SMD's.
 ---@see GiveTacticalSiloAmmo() # for tactical missiles
 ---@param amount number
-function Unit:GiveNukeSiloAmmo(amount)
+---@param inBlocks? boolean
+function Unit:GiveNukeSiloAmmo(amount, inBlocks)
 end
 
 --- Adds tactical missiles to the unit
@@ -323,154 +319,146 @@ end
 function Unit:GiveTacticalSiloAmmo(amount)
 end
 
----
 ---@param target Entity | Unit
 ---@return boolean
 function Unit:HasMeleeSpaceAroundTarget(target)
 end
 
----
 ---@return boolean
 function Unit:HasValidTeleportDest()
 end
 
---- Makes the unit's bone invisible
+--- makes the unit's bone invisible
 ---@param bone Bone
 ---@param affectChildren boolean
 function Unit:HideBone(bone, affectChildren)
 end
 
---- Returns if the unit is under construction
+--- returns true if the unit is under construction
 ---@return boolean
 function Unit:IsBeingBuilt()
 end
 
---- Returns if this unit can be captured or not
+--- returns true if this unit can be captured or not
 ---@return boolean
 function Unit:IsCapturable()
 end
 
---- Returns if the unit is in an Idle state or not
+--- returns true if the unit is in an Idle state or not
 ---@return boolean
 function Unit:IsIdleState()
 end
 
---- Returns if the unit is mobile
+--- returns true if the unit is mobile
 ---@return boolean
 function Unit:IsMobile()
 end
 
---- Returns if the unit is moving or not
+--- returns true if the unit is moving or not
 ---@return boolean
 function Unit:IsMoving()
 end
 
---- Returns if the unit has paused overcharge
+--- returns true if the unit has paused overcharge
 ---@return boolean
 function Unit:IsOverchargePaused()
 end
 
---- Returns if the unit is paused
+--- returns true if the unit is paused
 ---@return boolean
 function Unit:IsPaused()
 end
 
---- Returns if the unit is stunned
+--- returns true if the unit is stunned
 ---@return boolean
 function Unit:IsStunned()
 end
 
---- Returns if the unit is in given state
+--- returns true if the unit is in given state
 ---@param stateName UnitState
 ---@return boolean
 function Unit:IsUnitState(stateName)
 end
 
----
 ---@return boolean
 function Unit:IsValidTarget()
 end
 
----
 function Unit:KillManipulator()
 end
 
----
 ---@param bone Bone
 function Unit:KillManipulators(bone)
 end
 
----
 ---@param target Unit
 function Unit:MeleeWarpAdjacentToTarget(target)
 end
 
----
 function Unit:PrintCommandQueue()
 end
 
---- Applies an impulse to the unit (e.g. weapon recoil), usually for ship-rocking
+--- applies an impulse to the unit (e.g. weapon recoil), usually for ship-rocking
 ---@param x number
 ---@param y number
 ---@param z number
 function Unit:RecoilImpulse(x, y, z)
 end
 
---- Allows build categories for this unit
+--- allows build categories for this unit
 ---@param category EntityCategory
 function Unit:RemoveBuildRestriction(category)
 end
 
 --- Removes a command cap from the unit.
---- Also removes the command button, or disables it, from the UI.
+--- Also removes the command button (or disables it if a default cap) from the UI.
 ---@param capName CommandCap
 function Unit:RemoveCommandCap(capName)
 end
 
 --- Removes nuclear missiles from the unit.
 --- This is the method to call for both SML's and SMD's.
----@see RemoveTacticalSiloAmmo() # for tactical missiles
+---@see Unit:RemoveTacticalSiloAmmo(amount) # for tactical missiles
 ---@param amount number
 function Unit:RemoveNukeSiloAmmo(amount)
 end
 
 --- Removes tactical missiles from the unit
----@see RemoveNukeSiloAmmo() # for nuclear missiles
+---@see Unit:RemoveNukeSiloAmmo(amount) # for nuclear missiles
 ---@param amount number
 function Unit:RemoveTacticalSiloAmmo(amount)
 end
 
 --- Removes a toggle cap from the unit.
---- Also removes the command button, or disables it, from the UI.
+--- Also removes the command button (or disables it if a default cap) from the UI.
 ---@param capName ToggleCap
 function Unit:RemoveToggleCap(capName)
 end
 
---- Restores buildable categories to that as defined in the blueprint
+--- restores buildable categories to that as defined in the blueprint
 function Unit:RestoreBuildRestrictions()
 end
 
---- Restores the command caps of the unit back to blueprint spec
+--- restores the command caps of the unit back to blueprint spec
 function Unit:RestoreCommandCaps()
 end
 
---- Restores the toggle caps of the unit back to blueprint spec
+--- restores the toggle caps of the unit back to blueprint spec
 function Unit:RestoreToggleCaps()
 end
 
---- Reverts the collision shape to the blueprint spec
+--- reverts the collision shape to the blueprint spec
 function Unit:RevertCollisionShape()
 end
 
---- Reverts the elevation of the unit back to the blueperint spec
+--- reverts the elevation of the unit back to the blueperint spec
 function Unit:RevertElevation()
 end
 
---- Reverts regen rate of the unit back to blueprint spec
+--- reverts the regen rate of the unit back to blueprint spec
 function Unit:RevertRegenRate()
 end
 
----
 ---@param emitter moho.IEffect
 function Unit:ScaleGetBuiltEmitter(emitter)
 end
@@ -480,52 +468,49 @@ end
 function Unit:SetAccMult(accelMult)
 end
 
---- Sets auto silo build mode to on/off
+--- sets silo auto-build mode
 ---@param mode boolean
 function Unit:SetAutoMode(mode)
 end
 
----
 ---@param block boolean
 function Unit:SetBlockCommandQueue(block)
 end
 
---- Sets the break off distance multiplier of the unit
+--- sets the break off distance multiplier of the unit
 ---@param mult number
 function Unit:SetBreakOffDistanceMult(mult)
 end
 
---- Sets the break off trigger multiplier of the unit.
+--- sets the break off trigger multiplier of the unit
 ---@param mult number
 function Unit:SetBreakOffTriggerMult(mult)
 end
 
---- Sets the build rate of the unit
+--- sets the build rate of the unit
 ---@param rate number
 function Unit:SetBuildRate(rate)
 end
 
----
 ---@param busy boolean
 function Unit:SetBusy(busy)
 end
 
---- Sets if this unit can be captured or not
+--- sets if this unit can be captured or not
 ---@param capturable boolean
 function Unit:SetCapturable(capturable)
 end
 
----
 ---@param active boolean
 function Unit:SetConsumptionActive(active)
 end
 
---- Sets the energy consumption of the unit
+--- sets the energy consumption of the unit
 ---@param amount number
 function Unit:SetConsumptionPerSecondEnergy(amount)
 end
 
---- Sets the mass consumption of the unit
+--- sets the mass consumption of the unit
 ---@param amount number
 function Unit:SetConsumptionPerSecondMass(amount)
 end
@@ -536,58 +521,57 @@ end
 function Unit:SetCreator(unit)
 end
 
---- Sets a custom name for the unit, displayed in green text
+--- sets a custom name for the unit, displayed in green text
 ---@param name string
 function Unit:SetCustomName(name)
 end
 
 --- Sets if enemy units won't target this unit.
---- Accidental hits can still damage it but it enemy units won't lock onto it.
+--- Accidental hits can still damage it but enemy units won't lock onto it.
 ---@param dontTarget boolean
 function Unit:SetDoNotTarget(dontTarget)
 end
 
---- Sets the elevation of the unit
+--- sets the elevation of the unit
 ---@param elevation number
 function Unit:SetElevation(elevation)
 end
 
---- Sets a specific fire state for the unit's retaliation mode
+--- sets a specific fire state for the unit's retaliation mode
 ---@param fireState FireState
 function Unit:SetFireState(fireState)
 end
 
----
----@param focus Entity | Unit | Prop | Projectile
+---@param focus FocusObject
 function Unit:SetFocusEntity(focus)
 end
 
---- Sets how much fuel has the unit left, `0.0` - `1.0`
+--- sets how much fuel has the unit left, `0.0` - `1.0`
 ---@param ratio number
 function Unit:SetFuelRatio(ratio)
 end
 
---- Sets the fuel use time in seconds
+--- sets the fuel use time in seconds
 ---@param time number
 function Unit:SetFuelUseTime(time)
 end
 
---- Sets if the unit is able to move
+--- sets if the unit is able to move
 ---@param immobile boolean
 function Unit:SetImmobile(immobile)
 end
 
----
 ---@param valid boolean
 function Unit:SetIsValidTarget(valid)
 end
 
---- Sets if this unit's overcharge is paused
+--- sets if this unit's overcharge is paused
 ---@param paused boolean
 function Unit:SetOverchargePaused(paused)
 end
 
---- Pauses building, upgrading, and other tasks
+--- Pauses building, upgrading, and other tasks this unit can perform.
+--- Assisting units are unaffected.
 ---@param paused boolean
 function Unit:SetPaused(paused)
 end
@@ -598,120 +582,123 @@ end
 function Unit:SetProductionActive(active)
 end
 
---- Sets the production of energy of the unit
+--- sets the production of energy of the unit
 ---@param amount number
 function Unit:SetProductionPerSecondEnergy(amount)
 end
 
---- Sets the production of mass of the unit
+--- sets the production of mass of the unit
 ---@param amount number
 function Unit:SetProductionPerSecondMass(amount)
 end
 
---- Sets if this unit can be reclaimed or not
+--- sets if this unit can be reclaimed or not
 ---@param reclaimable boolean
 function Unit:SetReclaimable(reclaimable)
 end
 
---- Sets the regen rate of the unit
+--- sets the regen rate of the unit
 ---@param rate number
 function Unit:SetRegenRate(rate)
 end
 
---- Sets the script bit to the desired state
+--- sets the script bit
 ---@param bit number
 ---@param state boolean
 function Unit:SetScriptBit(bit, state)
 end
 
---- Sets the shield ratio, `0.0` - `1.0`
+--- sets the shield ratio, `0.0` - `1.0`
 ---@param ratio number
 function Unit:SetShieldRatio(ratio)
 end
 
---- Sets the speed multiplier of the unit
+--- sets the speed multiplier of the unit
 ---@param mult number
 function Unit:SetSpeedMult(mult)
 end
 
---- Sets the unit statistic
+--- sets the unit statistic
 ---@param name string
 ---@param value number
 function Unit:SetStat(name, value)
 end
 
 --- Sets the icon underlay to set texture.
---- Used in campaign to highlight objetcive targets.
+--- Used in campaign to highlight objective targets.
 ---@param icon string
 function Unit:SetStrategicUnderlay(icon)
 end
 
---- Stuns the unit for the set time in seconds
+--- stuns the unit for the set time in seconds
 ---@param time number
 function Unit:SetStunned(time)
 end
 
---- Sets the turn multiplier of the unit
+--- sets the turn multiplier of the unit
 ---@param mult number
 function Unit:SetTurnMult(mult)
 end
 
---- Sets if the unit can be selected
+--- sets if the unit can be selected
 ---@param unselectable boolean
 function Unit:SetUnSelectable(unselectable)
 end
 
---- Sets the unit's state
+--- sets the unit's state
 ---@param stateName UnitState
 ---@param bool boolean
 function Unit:SetUnitState(stateName, bool)
 end
 
---- Sets the work progress on the unit, `0.0` - `1.0`
+--- sets the work progress on the unit, `0.0` - `1.0`
 ---@param progress number
 function Unit:SetWorkProgress(progress)
 end
 
---- Makes unit's bone visible
+--- makes the unit's bone visible, and if `affectChildren` is true, all child bones as well
+--- (this is almost always what you want)
 ---@param bone Bone
 ---@param affectChildren boolean
 function Unit:ShowBone(bone, affectChildren)
 end
 
---- Stops production of a missile
+--- stops production of a missile
 function Unit:StopSiloBuild()
 end
 
---- Tests if the unit has this command cap specified in the blueprint spec
+--- Tests if the unit has this command cap specified in the blueprint spec.
+--- May not always work.
 ---@param capName CommandCap
 function Unit:TestCommandCaps(capName)
 end
 
---- Tests if the unit has this toggle cap specified in the blueprint spec
+--- Tests if the unit has this toggle cap specified in the blueprint spec.
+--- May not always work.
 ---@param capName ToggleCap
 function Unit:TestToggleCaps(capName)
 end
 
---- Toggles the fire state for the retaliation state of the unit
+--- toggles the fire state for the retaliation state of the unit
 function Unit:ToggleFireState()
 end
 
---- Toggles the script bit
+--- toggles the script bit
 ---@param bit number
 function Unit:ToggleScriptBit(bit)
 end
 
---- Detaches all units from a transport
+--- detaches all units from this transport
 ---@param destroySomeUnits unknown
 function Unit:TransportDetachAllUnits(destroySomeUnits)
 end
 
---- Returns if carrier is full or not
+--- returns true if this transport is full or not
 ---@return boolean
 function Unit:TransportHasAvailableStorage()
 end
 
---- Returns if the target unit can fit into the carrier
+--- returns true if the target unit can fit into this transport
 ---@param target Unit
 ---@return boolean
 function Unit:TransportHasSpaceFor(target)

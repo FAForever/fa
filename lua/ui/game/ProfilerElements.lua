@@ -128,7 +128,7 @@ end
 ---@field ElementCount number
 ---@field Elements ProfilerData
 ---@field First number
-ProfilerScrollArea = Class(Group) {
+ProfilerScrollArea = ClassUI(Group) {
     ---@param self ProfilerScrollArea
     ---@param parent Group
     __init = function(self, parent)

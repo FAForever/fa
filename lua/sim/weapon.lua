@@ -61,10 +61,8 @@ end
 ---@field Label string
 ---@field NumTargets number
 ---@field Trash TrashBag
----@field TrashManipulators TrashBag
----@field TrashProjectiles TrashBag
 ---@field unit Unit
-Weapon = Class(moho.weapon_methods) {
+Weapon = ClassWeapon(moho.weapon_methods) {
 
     -- stored here for mods compatibility, overridden in the inner table when written to
     DamageMod = 0,
@@ -78,7 +76,6 @@ Weapon = Class(moho.weapon_methods) {
 
     ---@param self Weapon
     OnCreate = function(self)
-
         -- Store blueprint for improved access pattern, see benchmark on blueprints
         local bp = self:GetBlueprint()
         self.Blueprint = bp
@@ -88,14 +85,10 @@ Weapon = Class(moho.weapon_methods) {
         self.EnergyRequired = bp.EnergyRequired
         self.EnergyDrainPerSecond = bp.EnergyDrainPerSecond
 
-        -- cache information of unit, weapons get created before unit.OnCreate is called
-        self.Trash = TrashBag()
-        self.TrashProjectiles = TrashBag()
-        self.TrashManipulators = TrashBag()
-
         local unit = self.unit
         self.Brain = unit:GetAIBrain()
         self.Army = unit:GetArmy()
+        self.Trash = unit.Trash
 
         self:SetValidTargetsForCurrentLayer(unit.Layer)
 
@@ -160,7 +153,7 @@ Weapon = Class(moho.weapon_methods) {
         end
         local aimControl, aimRight, aimLeft
         if yawBone and pitchBone and muzzleBone then
-            local trashManipulators = self.TrashManipulators
+            local trashManipulators = self.Trash
             if bp.TurretDualManipulators then
                 aimControl = CreateAimController(self, 'Torso', yawBone)
                 aimRight = CreateAimController(self, 'Right', pitchBone, pitchBone, muzzleBone)
@@ -365,7 +358,7 @@ Weapon = Class(moho.weapon_methods) {
     ---@param self Weapon
     ---@param sound SoundBlueprint
     PlayWeaponSound = function(self, sound)
-        local weaponSound = self.Audio[sound]
+        local weaponSound = self.Blueprint.Audio[sound]
         if not weaponSound then return end
         self:PlaySound(weaponSound)
     end,
@@ -373,7 +366,7 @@ Weapon = Class(moho.weapon_methods) {
     ---@param self Weapon
     ---@param sound SoundBlueprint
     PlayWeaponAmbientSound = function(self, sound)
-        local audio = self.Audio[sound]
+        local audio = self.Blueprint.Audio[sound]
         if not audio then return end
         local ambientSounds = self.AmbientSounds
         if not self.AmbientSounds then
@@ -397,7 +390,7 @@ Weapon = Class(moho.weapon_methods) {
         if not ambientSounds then return end
         local ambientSound = ambientSounds[sound]
         if not ambientSound then return end
-        if not self.Audio[sound] then return end
+        if not self.Blueprint.Audio[sound] then return end
         ambientSound:Destroy()
         ambientSounds[sound] = nil
     end,
@@ -503,18 +496,6 @@ Weapon = Class(moho.weapon_methods) {
 
     ---@param self Weapon
     OnDestroy = function(self)
-    end,
-
-    --- Clears out the trash of projectiles, such as beams. Called by the owning unit
-    ---@param self Weapon
-    ClearProjectileTrash = function(self)
-        self.TrashProjectiles:Destroy()
-    end,
-
-    --- Clears out the manipulators. Called by the owning unit
-    ---@param self Weapon
-    ClearManipulatorTrash = function(self)
-        self.TrashManipulators:Destroy()
     end,
 
     ---@param self Weapon

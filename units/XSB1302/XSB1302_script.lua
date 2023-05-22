@@ -1,65 +1,32 @@
---****************************************************************************
---**
---**  File     :  /cdimage/units/UAB1202/UAB1202_script.lua
---**  Author(s):  John Comes, David Tomandl, Jessica St. Croix
---**
---**  Summary  :  Aeon Tier 2 Mass Extractor Script
---**
---**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
---****************************************************************************
-
+-- File     :  /cdimage/units/UAB1202/UAB1202_script.lua
+-- Author(s):  John Comes, David Tomandl, Jessica St. Croix
+-- Summary  :  Aeon Tier 2 Mass Extractor Script
+-- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+-------------------------------------------------------------------
 local SMassCollectionUnit = import("/lua/seraphimunits.lua").SMassCollectionUnit
 
 ---@class XSB1302 : SMassCollectionUnit
-XSB1302 = Class(SMassCollectionUnit) {
-
-    OnCreate = function(self)
-        SMassCollectionUnit.OnCreate(self)
-        self.ExtractionAnimManip = CreateAnimator(self)
+XSB1302 = ClassUnit(SMassCollectionUnit) {
+    PlayActiveAnimation = function(self)
+        SMassCollectionUnit.PlayActiveAnimation(self)
+        if not self.AnimationManipulator then
+            self.AnimationManipulator = CreateAnimator(self)
+            self.Trash:Add(self.AnimationManipulator)
+        end
+        self.AnimationManipulator:PlayAnim(self.Blueprint.Display.AnimationActivate, true)
     end,
 
-    OnStopBeingBuilt = function(self,builder,layer)
-        self.ExtractionAnimManip:PlayAnim(self:GetBlueprint().Display.AnimationActivate):SetRate(1)
-        self.Trash:Add(self.ExtractionAnimManip)
-        SMassCollectionUnit.OnStopBeingBuilt(self,builder,layer)
-        ChangeState(self, self.ActiveState)
+    OnProductionPaused = function(self)
+        SMassCollectionUnit.OnProductionPaused(self)
+        if not self.AnimationManipulator then return end
+        self.AnimationManipulator:SetRate(0)
     end,
 
-    ActiveState = State {
-        Main = function(self)
-            WaitFor(self.ExtractionAnimManip)
-            while not self:IsDead() do
-                
-                self.ExtractionAnimManip:PlayAnim(self:GetBlueprint().Display.AnimationActivate):SetRate(1)
-                WaitFor(self.ExtractionAnimManip)
-            end
-        end,
-
-        OnProductionPaused = function(self)
-            SMassCollectionUnit.OnProductionPaused(self)
-            ChangeState(self, self.InActiveState)
-        end,
-    },
-
-    InActiveState = State {
-        Main = function(self)
-            WaitFor(self.ExtractionAnimManip)
-            if self.ArmsUp == true then
-                self.ExtractionAnimManip:SetRate(-1)
-                WaitFor(self.ExtractionAnimManip)
-                self.ArmsUp = false
-            end
-            WaitFor(self.ExtractionAnimManip)
-        end,
-
-        OnProductionUnpaused = function(self)
-            SMassCollectionUnit.OnProductionUnpaused(self)
-            ChangeState(self, self.ActiveState)
-        end,
-    },
+    OnProductionUnpaused = function(self)
+        SMassCollectionUnit.OnProductionUnpaused(self)
+        if not self.AnimationManipulator then return end
+        self.AnimationManipulator:SetRate(1)
+    end,
 }
 
 TypeClass = XSB1302
-    
-    
-    

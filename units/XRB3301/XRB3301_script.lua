@@ -1,18 +1,14 @@
---****************************************************************************
---**
---**  File     :  /cdimage/units/XRB3301/XRB3301_script.lua
---**  Author(s):  Dru Staltman, Ted Snook
---**
---**  Summary  :  Cybran Vision unit thing
---**
---**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
---****************************************************************************
+-- File     :  /cdimage/units/XRB3301/XRB3301_script.lua
+-- Author(s):  Dru Staltman, Ted Snook
+-- Summary  :  Cybran Vision unit thing
+-- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+------------------------------------------------------------------
 local CRadarUnit = import("/lua/cybranunits.lua").CRadarUnit
 local VizMarker = import("/lua/sim/vizmarker.lua").VizMarker
 local CSoothSayerAmbient = import("/lua/effecttemplates.lua").CSoothSayerAmbient
 
 ---@class XRB3301 : CRadarUnit
-XRB3301 = Class(CRadarUnit) {
+XRB3301 = ClassUnit(CRadarUnit) {
     IntelEffects = {
         {
             Bones = { 'Emitter', },
@@ -22,27 +18,32 @@ XRB3301 = Class(CRadarUnit) {
     },
     ExpandingVisionDisableCount = 0,
 
-    OnStopBeingBuilt = function(self)
-        CRadarUnit.OnStopBeingBuilt(self)
+    OnCreate = function(self)
+        CRadarUnit.OnCreate(self)
+        self.OmniEffectsBag = TrashBag()
+    end,
+
+    DestroyAllTrashBags = function(self)
+        CRadarUnit.DestroyAllTrashBags(self)
+        self.OmniEffectsBag:Destroy()
+    end,
+
+    OnStopBeingBuilt = function(self, builder, layer)
+        CRadarUnit.OnStopBeingBuilt(self, builder, layer)
         ChangeState(self, self.ExpandingVision)
 
-        if self.OmniEffectsBag then
-            for k, v in self.OmniEffectsBag do
-                v:Destroy()
-            end
-        end
-        self.OmniEffectsBag = {}
-
         for k, v in CSoothSayerAmbient do
-            table.insert(self.OmniEffectsBag, CreateAttachedEmitter(self, 'XRB3301', self.Army, v))
+            self.OmniEffectsBag:Add(CreateAttachedEmitter(self, 'XRB3301', self.Army, v))
         end
     end,
 
     OnKilled = function(self, instigator, type, overkillRatio)
+        CRadarUnit.OnKilled(self, instigator, type, overkillRatio)
+
         local curRadius = self:GetIntelRadius('vision')
         local position = self:GetPosition()
         local army = self:GetAIBrain():GetArmyIndex()
-        CRadarUnit.OnKilled(self, instigator, type, overkillRatio)
+
         local spec = {
             X = position[1],
             Z = position[3],
@@ -57,58 +58,49 @@ XRB3301 = Class(CRadarUnit) {
     VisibleEntityDeathThread = function(entity, curRadius)
         local lifetime = 0
         while lifetime < 30 do
+            LOG("Tick!")
             if curRadius > 1 then
                 curRadius = curRadius - 1
                 if curRadius < 1 then
-                    curRadius = 1
+                    break
                 end
                 entity:SetIntelRadius('vision', curRadius)
             end
-            lifetime = lifetime + 2
-            WaitSeconds(0.1)
+            lifetime = lifetime + 1
+            WaitTicks(1)
         end
         entity:Destroy()
     end,
 
-    OnIntelEnabled = function(self)
+    OnIntelEnabled = function(self, intel)
         self.ExpandingVisionDisableCount = self.ExpandingVisionDisableCount - 1
         if self.ExpandingVisionDisableCount == 0 then
-            if self.OmniEffectsBag then
-                for k, v in self.OmniEffectsBag do
-                    v:Destroy()
-                end
-                self.OmniEffectsBag = {}
-            end
+            self.OmniEffectsBag:Destroy()
             for k, v in CSoothSayerAmbient do
-                table.insert(self.OmniEffectsBag, CreateAttachedEmitter(self, 'XRB3301', self.Army, v))
+                self.OmniEffectsBag:Add(CreateAttachedEmitter(self, 'XRB3301', self.Army, v))
             end
             ChangeState(self, self.ExpandingVision)
         end
     end,
 
-    OnIntelDisabled = function(self)
+    OnIntelDisabled = function(self, intel)
         self.ExpandingVisionDisableCount = self.ExpandingVisionDisableCount + 1
         if self.ExpandingVisionDisableCount == 1 then
-            if self.OmniEffectsBag then
-                for k, v in self.OmniEffectsBag do
-                    v:Destroy()
-                end
-                self.OmniEffectsBag = {}
-            end
+            self.OmniEffectsBag:Destroy()
             ChangeState(self, self.ContractingVision)
         end
     end,
 
     ExpandingVision = State {
         Main = function(self)
-            WaitSeconds(0.1)
+            WaitTicks(1)
             while true do
                 if self:GetResourceConsumed() ~= 1 then
                     self.ExpandingVisionEnergyCheck = true
                     self:OnIntelDisabled()
                 end
                 local curRadius = self:GetIntelRadius('vision')
-                local targetRadius = self:GetBlueprint().Intel.MaxVisionRadius
+                local targetRadius = self.Blueprint.Intel.MaxVisionRadius
                 if curRadius < targetRadius then
                     curRadius = curRadius + 1
                     if curRadius >= targetRadius then
@@ -117,7 +109,7 @@ XRB3301 = Class(CRadarUnit) {
                         self:SetIntelRadius('vision', curRadius)
                     end
                 end
-                WaitSeconds(0.2)
+                WaitTicks(1)
             end
         end,
     },
@@ -134,7 +126,7 @@ XRB3301 = Class(CRadarUnit) {
                     end
                 end
                 local curRadius = self:GetIntelRadius('vision')
-                local targetRadius = self:GetBlueprint().Intel.MinVisionRadius
+                local targetRadius = self.Blueprint.Intel.MinVisionRadius
                 if curRadius > targetRadius then
                     curRadius = curRadius - 1
                     if curRadius <= targetRadius then
@@ -143,7 +135,7 @@ XRB3301 = Class(CRadarUnit) {
                         self:SetIntelRadius('vision', curRadius)
                     end
                 end
-                WaitSeconds(0.2)
+                WaitTicks(1)
             end
         end,
     },

@@ -10,7 +10,7 @@
 local CLandFactoryUnit = import("/lua/cybranunits.lua").CLandFactoryUnit
 
 ---@class URB0201 : CLandFactoryUnit
-URB0201 = Class(CLandFactoryUnit) {
+URB0201 = ClassUnit(CLandFactoryUnit) {
     BuildAttachBone = 'Attachpoint',
     UpgradeThreshhold1 = 0.267,
     UpgradeThreshhold2 = 0.53,

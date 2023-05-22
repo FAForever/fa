@@ -1,16 +1,12 @@
-----****************************************************************************
-----**
-----**  File     :  /cdimage/units/UAB1104/UAB1104_script.lua
-----**  Author(s):  Jessica St. Croix, David Tomandl, John Comes
-----**
-----**  Summary  :  Aeon Mass Fabricator
-----**
-----**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-----****************************************************************************
+-- File     :  /cdimage/units/UAB1104/UAB1104_script.lua
+-- Author(s):  Jessica St. Croix, David Tomandl, John Comes
+-- Summary  :  Aeon Mass Fabricator
+-- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+-------------------------------------------------------------------
 local AMassFabricationUnit = import("/lua/aeonunits.lua").AMassFabricationUnit
 
 ---@class UAB1104 : AMassFabricationUnit
-UAB1104 = Class(AMassFabricationUnit) {
+UAB1104 = ClassUnit(AMassFabricationUnit) {
     OnCreate = function(self)
         AMassFabricationUnit.OnCreate(self)
         self.Damaged = false
@@ -36,7 +32,7 @@ UAB1104 = Class(AMassFabricationUnit) {
 
             if not self.Open then
                 self.Open = true
-                self.AnimManip:PlayAnim(self:GetBlueprint().Display.AnimationOpen):SetRate(1)
+                self.AnimManip:PlayAnim(self.Blueprint.Display.AnimationOpen):SetRate(1)
                 WaitFor(self.AnimManip)
             end
 

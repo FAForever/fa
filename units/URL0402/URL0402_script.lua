@@ -20,27 +20,47 @@ local CANTorpedoLauncherWeapon = CybranWeaponsFile.CANTorpedoLauncherWeapon
 local Entity = import("/lua/sim/entity.lua").Entity
 
 ---@class URL0402 : CWalkingLandUnit
-URL0402 = Class(CWalkingLandUnit) {
+---@field AmbientExhaustEffectsBag TrashBag
+URL0402 = ClassUnit(CWalkingLandUnit) {
     WalkingAnimRate = 1.2,
 
     Weapons = {
-        MainGun = Class(CDFHeavyMicrowaveLaserGenerator) {},
-        RightLaserTurret = Class(CDFElectronBolterWeapon) {},
-        LeftLaserTurret = Class(CDFElectronBolterWeapon) {},
-        RightAntiAirMissile = Class(CAAMissileNaniteWeapon) {},
-        LeftAntiAirMissile = Class(CAAMissileNaniteWeapon) {},
-        Torpedo = Class(CANTorpedoLauncherWeapon) {},
+        MainGun = ClassWeapon(CDFHeavyMicrowaveLaserGenerator) {},
+        RightLaserTurret = ClassWeapon(CDFElectronBolterWeapon) {},
+        LeftLaserTurret = ClassWeapon(CDFElectronBolterWeapon) {},
+        RightAntiAirMissile = ClassWeapon(CAAMissileNaniteWeapon) {},
+        LeftAntiAirMissile = ClassWeapon(CAAMissileNaniteWeapon) {},
+        Torpedo = ClassWeapon(CANTorpedoLauncherWeapon) {},
     },
 
+    ---@param self URL0402
+    OnCreate = function(self)
+        CWalkingLandUnit.OnCreate(self)
+        self.AmbientExhaustEffectsBag = self.AmbientExhaustEffectsBag or TrashBag()
+        self.Trash:Add(self.AmbientExhaustEffectsBag)
+    end,
+
+    ---@param self URL0402
+    DestroyAllTrashBags = function(self)
+        CWalkingLandUnit.DestroyAllTrashBags(self)
+        self.AmbientExhaustEffectsBag:Destroy()
+    end,
+
+    ---@param self URL0402
+    ---@param builder Unit
+    ---@param layer Layer
     OnStartBeingBuilt = function(self, builder, layer)
         CWalkingLandUnit.OnStartBeingBuilt(self, builder, layer)
         if not self.AnimationManipulator then
             self.AnimationManipulator = CreateAnimator(self)
             self.Trash:Add(self.AnimationManipulator)
         end
-        self.AnimationManipulator:PlayAnim(self:GetBlueprint().Display.AnimationActivate, false):SetRate(0)
+        self.AnimationManipulator:PlayAnim(self.Blueprint.Display.AnimationActivate, false):SetRate(0)
     end,
 
+    ---@param self URL0402
+    ---@param builder Unit
+    ---@param layer Layer
     OnStopBeingBuilt = function(self, builder, layer)
         CWalkingLandUnit.OnStopBeingBuilt(self, builder, layer)
         self:CreateUnitAmbientEffect(self.Layer)
@@ -57,6 +77,9 @@ URL0402 = Class(CWalkingLandUnit) {
         self:SetMaintenanceConsumptionActive()
     end,
 
+    ---@param self URL0402
+    ---@param new Layer
+    ---@param old Layer
     OnLayerChange = function(self, new, old)
         CWalkingLandUnit.OnLayerChange(self, new, old)
         self:CreateUnitAmbientEffect(new)
@@ -84,42 +107,41 @@ URL0402 = Class(CWalkingLandUnit) {
         '/effects/emitters/underwater_vent_bubbles_02_emit.bp',
     },
 
+    ---@param self URL0402
+    ---@param layer Layer
     CreateUnitAmbientEffect = function(self, layer)
+        LOG("CreateUnitAmbientEffect")
+        LOG(layer)
         if self:GetFractionComplete() ~= 1 then
             return
         end
-        if self.AmbientEffectThread ~= nil then
-           self.AmbientEffectThread:Destroy()
-        end
-        if self.AmbientExhaustEffectsBag then
-            EffectUtil.CleanupEffectBag(self, 'AmbientExhaustEffectsBag')
-        end
 
-        self.AmbientEffectThread = nil
-        self.AmbientExhaustEffectsBag = {}
+        self.AmbientExhaustEffectsBag = self.AmbientExhaustEffectsBag or TrashBag()
+        self.AmbientExhaustEffectsBag:Destroy()
         if layer == 'Land' then
-            self.AmbientEffectThread = self:ForkThread(self.UnitLandAmbientEffectThread)
+            self.AmbientEffectThread = self.AmbientExhaustEffectsBag:Add(ForkThread(self.UnitLandAmbientEffectThread, self))
         elseif layer == 'Seabed' then
             local army = self.Army
-            for kE, vE in self.AmbientSeabedExhaustEffects do
-                for kB, vB in self.AmbientExhaustBones do
-                    table.insert(self.AmbientExhaustEffectsBag, CreateAttachedEmitter(self, vB, army, vE))
+            for _, vE in self.AmbientSeabedExhaustEffects do
+                for _, vB in self.AmbientExhaustBones do
+                    self.AmbientExhaustEffectsBag:Add(CreateAttachedEmitter(self, vB, army, vE))
                 end
             end
         end
     end,
 
+    ---@param self URL0402
     UnitLandAmbientEffectThread = function(self)
         while not self.Dead do
             local army = self.Army
 
-            for kE, vE in self.AmbientLandExhaustEffects do
-                for kB, vB in self.AmbientExhaustBones do
-                    table.insert(self.AmbientExhaustEffectsBag, CreateAttachedEmitter(self, vB, army, vE))
+            for _, vE in self.AmbientLandExhaustEffects do
+                for _, vB in self.AmbientExhaustBones do
+                    self.AmbientExhaustEffectsBag:Add(CreateAttachedEmitter(self, vB, army, vE))
                 end
             end
 
-            WaitSeconds(2)
+            WaitTicks(21)
             EffectUtil.CleanupEffectBag(self, 'AmbientExhaustEffectsBag')
 
             WaitSeconds(utilities.GetRandomFloat(1, 7))
@@ -127,41 +149,12 @@ URL0402 = Class(CWalkingLandUnit) {
     end,
 
     OnKilled = function(self, inst, type, okr)
-        if self.AmbientExhaustEffectsBag then
-            EffectUtil.CleanupEffectBag(self, 'AmbientExhaustEffectsBag')
-        end
-        if not self.Dead then
-            local wep = self:GetWeapon(1)
-            if wep.Beams then
-                if wep.Audio.BeamLoop and wep.Beams[1].Beam then
-                    wep.Beams[1].Beam:SetAmbientSound(nil, nil)
-                end
-                for k, v in wep.Beams do
-                    v.Beam:Disable()
-                end
-            end
-        end
         CWalkingLandUnit.OnKilled(self, inst, type, okr)
     end,
 
     CreateDamageEffects = function(self, bone, army)
         for k, v in EffectTemplate.DamageFireSmoke01 do
             CreateAttachedEmitter(self, bone, army, v):ScaleEmitter(1.5)
-        end
-    end,
-
-    CreateDeathExplosionDustRing = function(self)
-        local blanketSides = 18
-        local blanketAngle = (2 * math.pi) / blanketSides
-        local blanketStrength = 1
-        local blanketVelocity = 2.8
-
-        for i = 0, (blanketSides - 1) do
-            local blanketX = math.sin(i * blanketAngle)
-            local blanketZ = math.cos(i * blanketAngle)
-
-            local Blanketparts = self:CreateProjectile('/effects/entities/DestructionDust01/DestructionDust01_proj.bp', blanketX, 1.5, blanketZ + 4, blanketX, 0, blanketZ)
-                :SetVelocity(blanketVelocity):SetAcceleration(-0.3)
         end
     end,
 
@@ -175,10 +168,13 @@ URL0402 = Class(CWalkingLandUnit) {
             velocity.x = velocity.x + utilities.GetRandomFloat(-0.3, 0.3)
             velocity.z = velocity.z + utilities.GetRandomFloat(-0.3, 0.3)
             velocity.y = velocity.y + utilities.GetRandomFloat(0.0, 0.3)
-            proj = self:CreateProjectile('/effects/entities/DestructionFirePlume01/DestructionFirePlume01_proj.bp', offset.x, offset.y + yBoneOffset, offset.z, velocity.x, velocity.y, velocity.z)
-            proj:SetBallisticAcceleration(utilities.GetRandomFloat(-1, -2)):SetVelocity(utilities.GetRandomFloat(3, 4)):SetCollision(false)
+            proj = self:CreateProjectile('/effects/entities/DestructionFirePlume01/DestructionFirePlume01_proj.bp',
+                offset.x, offset.y + yBoneOffset, offset.z, velocity.x, velocity.y, velocity.z)
+            proj:SetBallisticAcceleration(utilities.GetRandomFloat(-1, -2)):SetVelocity(utilities.GetRandomFloat(3, 4)):
+                SetCollision(false)
 
-            local emitter = CreateEmitterOnEntity(proj, army, '/effects/emitters/destruction_explosion_fire_plume_02_emit.bp')
+            local emitter = CreateEmitterOnEntity(proj, army,
+                '/effects/emitters/destruction_explosion_fire_plume_02_emit.bp')
 
             local lifetime = utilities.GetRandomFloat(12, 22)
         end
@@ -194,35 +190,29 @@ URL0402 = Class(CWalkingLandUnit) {
         self:PlayUnitSound('Destroyed')
         local army = self.Army
 
-        -- Create Initial explosion effects
         explosion.CreateFlash(self, 'Center_Turret', 4.5, army)
         CreateAttachedEmitter(self, 'URL0402', army, '/effects/emitters/destruction_explosion_concussion_ring_03_emit.bp')
         CreateAttachedEmitter(self, 'URL0402', army, '/effects/emitters/explosion_fire_sparks_02_emit.bp')
-        self:CreateFirePlumes(army, {'Center_Turret'}, 0)
+        self:CreateFirePlumes(army, { 'Center_Turret' }, 0)
 
-        self:CreateFirePlumes(army, {'Right_Leg01_B01', 'Right_Leg03_B01', 'Left_Leg03_B01', }, 0.5)
+        self:CreateFirePlumes(army, { 'Right_Leg01_B01', 'Right_Leg03_B01', 'Left_Leg03_B01', }, 0.5)
 
         self:CreateExplosionDebris(army)
         self:CreateExplosionDebris(army)
         self:CreateExplosionDebris(army)
 
-        WaitSeconds(1)
+        WaitTicks(10)
 
-        -- Create damage effects on turret bone
         CreateDeathExplosion(self, 'Center_Turret', 1.5)
         self:CreateDamageEffects('Center_Turret_B01', army)
         self:CreateDamageEffects('Center_Turret_Barrel', army)
 
-        WaitSeconds(1)
-        self:CreateFirePlumes(army, {'Right_Leg01_B01', 'Right_Leg03_B01', 'Left_Leg03_B01', }, 0.5)
-        WaitSeconds(0.3)
+        WaitTicks(10)
+        self:CreateFirePlumes(army, { 'Right_Leg01_B01', 'Right_Leg03_B01', 'Left_Leg03_B01', }, 0.5)
+        WaitTicks(3)
         self:CreateDeathExplosionDustRing()
-        WaitSeconds(0.4)
+        WaitTicks(4)
 
-
-        -- When the spider bot impacts with the ground
-        -- Effects: Explosion on turret, dust effects on the muzzle tip, large dust ring around unit
-        -- Other: Damage force ring to force trees over and camera shake
         self:ShakeCamera(50, 5, 0, 1)
         CreateDeathExplosion(self, 'Left_Turret_Muzzle', 1)
         for k, v in EffectTemplate.FootFall01 do
@@ -230,54 +220,53 @@ URL0402 = Class(CWalkingLandUnit) {
             CreateAttachedEmitter(self, 'Center_Turret_Muzzle', army, v):ScaleEmitter(2)
         end
 
-
         self:CreateExplosionDebris(army)
         self:CreateExplosionDebris(army)
 
         local x, y, z = unpack(self:GetPosition())
         z = z + 3
 
-        -- only apply death damage when the unit is sufficiently build
-        local bp = self:GetBlueprint()
+        local bp = self.Blueprint
         local FractionThreshold = bp.General.FractionThreshold or 0.99
-        if self:GetFractionComplete() >= FractionThreshold then 
-            local bp = self:GetBlueprint()
+        if self:GetFractionComplete() >= FractionThreshold then
+            local bp = self.Blueprint
             local position = self:GetPosition()
             local qx, qy, qz, qw = unpack(self:GetOrientation())
             local a = math.atan2(2.0 * (qx * qz + qw * qy), qw * qw + qx * qx - qz * qz - qy * qy)
             for i, numWeapons in bp.Weapon do
                 if bp.Weapon[i].Label == 'SpiderDeath' then
-                    position[3] = position[3]+3*math.cos(a)
-                    position[1] = position[1]+3*math.sin(a)
-                    DamageArea(self, position, bp.Weapon[i].DamageRadius, bp.Weapon[i].Damage, bp.Weapon[i].DamageType, bp.Weapon[i].DamageFriendly)
+                    position[3] = position[3] + 3 * math.cos(a)
+                    position[1] = position[1] + 3 * math.sin(a)
+                    DamageArea(self, position, bp.Weapon[i].DamageRadius, bp.Weapon[i].Damage, bp.Weapon[i].DamageType,
+                        bp.Weapon[i].DamageFriendly)
                     break
                 end
             end
         end
 
-        DamageRing(self, {x, y,z}, 0.1, 3, 1, 'Force', true)
-        WaitSeconds(0.5)
+        DamageRing(self, { x, y, z }, 0.1, 3, 1, 'Force', true)
+        WaitTicks(5)
         CreateDeathExplosion(self, 'Center_Turret', 2)
 
         -- Finish up force ring to push trees
-        DamageRing(self, {x, y,z}, 0.1, 3, 1, 'Force', true)
+        DamageRing(self, { x, y, z }, 0.1, 3, 1, 'Force', true)
 
         -- Explosion on and damage fire on various bones
         CreateDeathExplosion(self, 'Right_Leg0' .. Random(1, 3) .. '_B0' .. Random(1, 3), 0.25)
         CreateDeathExplosion(self, 'Left_Projectile01', 2)
-        self:CreateFirePlumes(army, {'Left_Projectile01'}, -1)
+        self:CreateFirePlumes(army, { 'Left_Projectile01' }, -1)
         self:CreateDamageEffects('Right_Turret', army)
-        WaitSeconds(0.5)
+        WaitTicks(5)
 
         CreateDeathExplosion(self, 'Left_Leg0' .. Random(1, 3) .. '_B0' .. Random(1, 3), 0.25)
         self:CreateDamageEffects('Right_Leg01_B03', army)
-        WaitSeconds(0.5)
+        WaitTicks(5)
         CreateDeathExplosion(self, 'Left_Turret_Muzzle', 1)
         self:CreateExplosionDebris(army)
 
         CreateDeathExplosion(self, 'Right_Leg0' .. Random(1, 3) .. '_B0' .. Random(1, 3), 0.25)
         self:CreateDamageEffects('Right_Projectile0' .. Random(1, 2), army)
-        WaitSeconds(0.5)
+        WaitTicks(5)
 
         CreateDeathExplosion(self, 'Left_Leg0' .. Random(1, 3) .. '_B0' .. Random(1, 3), 0.25)
         CreateDeathExplosion(self, 'Left_Projectile01', 2)
@@ -285,6 +274,11 @@ URL0402 = Class(CWalkingLandUnit) {
 
         self:CreateWreckage(0.1)
         self:Destroy()
+    end,
+
+    ---@deprecated
+    ---@param self URL0402
+    CreateDeathExplosionDustRing = function(self)
     end,
 }
 

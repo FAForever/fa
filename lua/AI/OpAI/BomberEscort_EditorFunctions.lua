@@ -97,6 +97,6 @@ function BomberEscortAI(platoon)
         else
             platoon:AggressiveMoveToLocation( (aiBrain:GetHighestThreatPosition(2, true)) )
         end
-        WaitSeconds(17)
+        WaitTicks(171)
     end
 end

@@ -63,7 +63,7 @@ end
 
 --- Attaches this entity to another entity, matching the bone position of `selfBone` and `bone`
 ---@param selfbone Bone
----@param entity Entity
+---@param entity moho.entity_methods
 ---@param bone Bone
 function Entity:AttachBoneTo(selfbone, entity, bone)
 end
@@ -71,14 +71,14 @@ end
 --- Attaches a bone on this entity's mesh to another entity's bone.
 --- This does not move either entity.
 ---@param selfBone Bone
----@param other Entity
+---@param other moho.entity_methods
 ---@param otherBone Bone
 ---@param flag any unknown usage, always `false`
 function Entity:AttachBoneToEntityBone(selfBone, other, otherBone, flag)
 end
 
 --- Attaches this entity to another entity at a bone position on it
----@param entity Entity
+---@param entity moho.entity_methods
 ---@param bone Bone
 function Entity:AttachTo(entity, bone)
 end
@@ -234,7 +234,7 @@ function Entity:GetOrientation()
 end
 
 --- Returns the parent entity (e.g. the transport a unit is on), or nil if none
----@return Entity | nil
+---@return moho.entity_methods | nil
 function Entity:GetParent()
 end
 
@@ -269,7 +269,6 @@ function Entity:InitIntel(army, type, radius)
 end
 
 --- Returns if the intel type is currently enabled on the unit.
---- Throws an error if the intel type has not been initialized.
 ---@param type IntelType
 ---@return boolean
 function Entity:IsIntelEnabled(type)
@@ -311,7 +310,7 @@ function Entity:RemoveScroller()
 end
 
 ---@unknown
----@param shooter Entity
+---@param shooter moho.entity_methods
 function Entity:RemoveShooter(shooter)
 end
 
@@ -324,9 +323,9 @@ end
 function Entity:SetAmbientSound(paramTableDetail, paramTableRumble)
 end
 
----@overload fun(self: Entity, type: "None")
----@overload fun(self: Entity, type: "Sphere", centerX: number, centerY: number, centerZ: number, radius: number)
----@overload fun(self: Entity, type: "Box", centerX: number, centerY: number, centerZ: number, sizeX: number, sizeY: number, sizeZ: number)
+---@overload fun(self: moho.entity_methods, type: "None")
+---@overload fun(self: moho.entity_methods, type: "Sphere", centerX: number, centerY: number, centerZ: number, radius: number)
+---@overload fun(self: moho.entity_methods, type: "Box", centerX: number, centerY: number, centerZ: number, sizeX: number, sizeY: number, sizeZ: number)
 --- Defines the collision shape of the entity.
 --- Should not be used excessively due to its performance impact
 ---@param type CollisionShape
@@ -344,7 +343,7 @@ end
 function Entity:SetDrawScale(size)
 end
 
----@param instigator Entity
+---@param instigator? moho.entity_methods
 ---@param health number
 function Entity:SetHealth(instigator, health)
 end
@@ -364,7 +363,7 @@ end
 
 --- Changes the mesh of the entity
 ---@param meshBp FileName
----@param keepActor boolean if set, all manipulators are kept attached
+---@param keepActor? boolean if set, all manipulators are kept attached
 function Entity:SetMesh(meshBp, keepActor)
 end
 
@@ -385,6 +384,7 @@ end
 function Entity:SetPosition(vector, immediate)
 end
 
+---@overload fun(self: moho.entity_methods, size: number)
 --- Defines the draw scale of the mesh of the entity, note that this functionality does not work on units
 ---@param sx number
 ---@param sy number
