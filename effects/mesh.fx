@@ -3461,7 +3461,7 @@ float4 NormalMappedInsectPS_02( NORMALMAPPED_VERTEX vertex, uniform bool hiDefSh
 
     //Finish it
     float3 color = (albedo.rgb * 0.125) + emissive + (light * albedo.rgb) + (phongAdditive) + phongMultiplicative;
-    float alpha = mirrored ? 0.5 : specular.b + glowMinimum + (phongAdditive * 0.04);
+    float alpha = mirrored ? 0.5 : min(specular.b, 0.3) + glowMinimum + (phongAdditive * 0.04);
     //color = phongAdditive;
     //alpha = 0;
     return float4( color, alpha);
