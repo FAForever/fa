@@ -9,6 +9,7 @@ local ItemList = import("/lua/maui/itemlist.lua").ItemList
 local Layouter = LayoutHelpers.ReusedLayoutFor
 --local ScrollPolicy = import("/lua/maui/scrollbar.lua").ScrollPolicy
 
+
 ---@class ProfilerElementRow : Group
 ---@field name Text
 ---@field source Text
@@ -17,6 +18,10 @@ local Layouter = LayoutHelpers.ReusedLayoutFor
 ---@field growth Text
 ---@field is_group boolean
 ProfilerElementRow = Class(Group) {
+    ---@param self ProfilerElementRow
+    ---@param parent Control
+    ---@param size number
+    ---@param font LazyVarString
     __init = function(self, parent, size, font)
         Group.__init(self, parent)
 
@@ -54,6 +59,16 @@ ProfilerElementRow = Class(Group) {
             :End()
         return self
     end;
+
+    ---@param self ProfilerElementRow
+    ---@param color Color
+    SetColor = function(self, color)
+        self.name:SetColor(color)
+        self.source:SetColor(color)
+        self.scope:SetColor(color)
+        self.value:SetColor(color)
+        self.growth:SetColor(color)
+    end;
 }
 
 ---@param control ProfilerElementRow
@@ -90,12 +105,7 @@ end
 ---@return ProfilerElementRow
 function CreateTitle(parent)
     local title = ProfilerElementRow(parent, 16, UIUtil.titleFont)
-    local color = "F1F382"
-    title.name:SetColor(color)
-    title.source:SetColor(color)
-    title.scope:SetColor(color)
-    title.value:SetColor(color)
-    title.growth:SetColor(color)
+    title.SetColor("F1F382")
     return title
 end
 
