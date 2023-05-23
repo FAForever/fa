@@ -9537,7 +9537,7 @@ float4 PBR_Cybran(NORMALMAPPED_VERTEX vertex, float teamColorFactor, uniform boo
     float emission = pow(max(specular.b - 0.04, 0.0), 0.5);
     color = ApplyWaterColor(vertex, color, emission * albedo);
 
-    float alpha = mirrored ? 0.5 : emission + glowMinimum;
+    float alpha = mirrored ? 0.5 : min(emission + glowMinimum, 0.3);
 
     return float4(color, alpha);
 }
