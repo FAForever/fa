@@ -591,6 +591,11 @@ float3 ComputeNormal( sampler2D source, float2 uv, float3x3 rotationMatrix)
     return normalize( mul( normal, rotationMatrix));
 }
 
+float3 ApplyWaterColor(NORMALMAPPED_VERTEX vertex, float3 color) {
+    float4 waterColor = tex1D(WaterRampSampler, -vertex.depth.x / (surfaceElevation - abyssElevation));
+    return lerp(color, waterColor.rgb, waterColor.w);
+}
+
 ///////////////////////////////////////
 ///
 /// Vertex Shaders
@@ -2428,6 +2433,8 @@ float4 NormalMappedPS_02( NORMALMAPPED_VERTEX vertex,
     float emissive = glowMultiplier * specular.b * 0.02;
 
   float3 color = (albedo.rgb * 0.125) + ( emissive.r + (light * albedo.rgb) ) + phongMultiplicative + (phongAdditive);
+  color = ApplyWaterColor(vertex, color);
+
   float alpha = mirrored ? 0.5 : ( glow ? ( specular.b + glowMinimum ) : ( vertex.material.g * albedo.a )) + (phongAdditive * 0.13);
     //float alpha = mirrored ? 0.5 : ( glow ? ( specular.b + glowMinimum ) : ( vertex.material.g * albedo.a ));
   //color = phongMultiplicative;
@@ -2583,6 +2590,8 @@ float4 WreckagePS( NORMALMAPPED_VERTEX vertex) : COLOR0
         color *= (albedo + specular.r + specular.a) * specular.b * 2.5;
     else
         color *= specular.b * 2;
+
+    color = ApplyWaterColor(vertex, color);
 
     return float4( color, glowMinimum );
 }
@@ -2872,6 +2881,8 @@ float4 AeonPS_02( NORMALMAPPED_VERTEX vertex, uniform bool hiDefShadows) : COLOR
     float alpha = mirrored ? 0.5 : specular.b + glowMinimum + (pow(specular.a * 1.5, 2) * 0.07 * (1.4 - teamColGlowCompensation)) + ((phongMultiplicativeGlow + phongAdditiveGlow) * 0.05);
     //alpha = 0;
     //color = light;
+    color = ApplyWaterColor(vertex, color);
+
     return float4( color, alpha );
 }
 
@@ -3016,6 +3027,7 @@ float4 UnitFalloffPS_02( NORMALMAPPED_VERTEX vertex, uniform bool hiDefShadows) 
     float mask = saturate( saturate(specular.b * 2) - diffuse.a );
     color *= 1 - mask;
     color += specular.b * 2 * mask;
+    color = ApplyWaterColor(vertex, color);
 
     // Bloom is only rendered where alpha > 0
     float teamColorGlow = (vertex.color.r + vertex.color.g + vertex.color.b) / 3;
@@ -3461,6 +3473,8 @@ float4 NormalMappedInsectPS_02( NORMALMAPPED_VERTEX vertex, uniform bool hiDefSh
 
     //Finish it
     float3 color = (albedo.rgb * 0.125) + emissive + (light * albedo.rgb) + (phongAdditive) + phongMultiplicative;
+    color = ApplyWaterColor(vertex, color);
+
     float alpha = mirrored ? 0.5 : specular.b + glowMinimum + (phongAdditive * 0.04);
     //color = phongAdditive;
     //alpha = 0;
@@ -9266,7 +9280,7 @@ float3 PBR_PS(
     return color;
 }
 
-float3 ApplyWaterColor(NORMALMAPPED_VERTEX vertex, float3 color, float3 emission) {
+float3 ApplyWaterColorExponentially(NORMALMAPPED_VERTEX vertex, float3 color, float3 emission) {
     float4 waterColor = tex1D(WaterRampSampler, -vertex.depth.x / (surfaceElevation - abyssElevation));
     float3 v = normalize(vertex.viewDirection);
     float3 up = float3(0,1,0);
@@ -9313,7 +9327,7 @@ float4 PBR_UEF(NORMALMAPPED_VERTEX vertex, float teamColorFactor, uniform bool h
 
     float3 color = PBR_PS(vertex, albedo.rgb, metallic, roughness, normal, hiDefShadows, .04, ao);
     float emission = specular.b * 0.8;
-    color = ApplyWaterColor(vertex, color, emission * albedo);
+    color = ApplyWaterColorExponentially(vertex, color, emission * albedo);
 
     // The glowminimum is required to make the unit behave properly with the water shader.
     // If the alpha channel is 0 somewhere, those parts will show as water refractions even
@@ -9389,7 +9403,7 @@ float4 PBR_Aeon(NORMALMAPPED_VERTEX vertex, float teamColorFactor, uniform bool 
 
     float3 color = PBR_PS(vertex, albedo, metallic, roughness, normal, hiDefShadows, specularAmount);
     float3 emission = specular.b + specular.a * vertex.color.rgb * 0.5;
-    color = ApplyWaterColor(vertex, color, emission);
+    color = ApplyWaterColorExponentially(vertex, color, emission);
      
     float alpha = mirrored ? 0.5 : specular.b + glowMinimum + specular.a * 0.13;
 
@@ -9535,7 +9549,7 @@ float4 PBR_Cybran(NORMALMAPPED_VERTEX vertex, float teamColorFactor, uniform boo
 
     float3 color = PBR_PS(vertex, albedo.rgb, metallic, roughness, normal, hiDefShadows);
     float emission = pow(max(specular.b - 0.04, 0.0), 0.5);
-    color = ApplyWaterColor(vertex, color, emission * albedo);
+    color = ApplyWaterColorExponentially(vertex, color, emission * albedo);
 
     float alpha = mirrored ? 0.5 : emission + glowMinimum;
 
@@ -9588,7 +9602,7 @@ float4 PBR_Seraphim(
     float mask = saturate(saturate(specular.b * 2) - albedo.a);
     color = lerp(color, specular.b * 2, mask);
 
-    color = ApplyWaterColor(vertex, color, emission * albedo);
+    color = ApplyWaterColorExponentially(vertex, color, emission * albedo);
 
     // Bloom is only rendered where alpha > 0
     float teamColorGlow = (vertex.color.r + vertex.color.g + vertex.color.b) / 3;
