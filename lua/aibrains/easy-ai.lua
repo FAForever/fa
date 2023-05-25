@@ -31,7 +31,8 @@ AIBrain = Class(StandardBrain, EconomyComponent) {
 
     SkirmishSystems = true,
 
-    ---@param self EasyAIBrain
+    --- Called after `SetupSession` but before `BeginSession` - no initial units, props or resources exist at this point
+    ---@param self AIBrain
     ---@param planName string
     OnCreateAI = function(self, planName)
         StandardBrain.OnCreateAI(self, planName)
@@ -69,7 +70,7 @@ AIBrain = Class(StandardBrain, EconomyComponent) {
         self.GridReclaim = import("/lua/ai/gridreclaim.lua").Setup(self)
         self.GridBrain = import("/lua/ai/gridbrain.lua").Setup()
         self.GridRecon = import("/lua/ai/gridrecon.lua").Setup(self)
-
+        self.GridPresence = import("/lua/AI/GridPresence.lua").Setup(self)
 
     end,
 
@@ -95,6 +96,7 @@ AIBrain = Class(StandardBrain, EconomyComponent) {
     ---@param reconType ReconTypes
     ---@param val boolean
     OnIntelChange = function(self, blip, reconType, val)
+        StandardBrain.OnIntelChange(self, blip, reconType, val)
         local position = blip:GetPosition()
         self.GridRecon:OnIntelChange(position[1], position[3], reconType, val)
     end,
@@ -106,7 +108,6 @@ AIBrain = Class(StandardBrain, EconomyComponent) {
     AddBaseManagers = function(self, baseName, position, radius)
         self.BuilderManagers[baseName] = BaseManager.CreateBaseManager(self, baseName, position, radius)
     end,
-
 
     IMAPConfiguration = function(self)
         -- Used to configure imap values, used for setting threat ring sizes depending on map size to try and get a somewhat decent radius
@@ -296,15 +297,24 @@ AIBrain = Class(StandardBrain, EconomyComponent) {
     --- remove them without drastically changing how the code base works. We can't do that
     --- because it would break mod compatibility
 
-    ---@param self EasyAIBrain
+    ---@deprecated
+    ---@param self AIBrain
     SetConstantEvaluate = function(self)
     end,
 
-    ---@param self EasyAIBrain
+    ---@deprecated
+    ---@param self AIBrain
     InitializeSkirmishSystems = function(self)
     end,
 
+    ---@deprecated
+    ---@param self AIBrain
     ForceManagerSort = function(self)
+    end,
+
+    ---@deprecated
+    ---@param self AIBrain
+    InitializePlatoonBuildManager = function(self)
     end,
 
 }

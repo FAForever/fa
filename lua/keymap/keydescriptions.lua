@@ -503,6 +503,7 @@ keyDescriptions = {
     ['toggle_navui'] = 'Toggle the debugging UI for the navigational mesh',
     ['toggle_ai_reclaim_grid_ui'] = 'Toggle the debugging UI for the reclaim grid',
     ['toggle_ai_recon_grid_ui'] = 'Toggle the debugging UI for the recon grid',
+    ['toggle_ai_presence_grid_ui'] = 'Toggle the debugging UI for the presence grid',
 
     ['toggle_ai_economy_ui'] = 'Toggle the debugging UI for the economy brain data',
 
