@@ -77,14 +77,23 @@ NinePatch = ClassUI(Group) {
         self:DisableHitTest(true)
     end,
 
+    ---@param self NinePatch
+    ---@return number
     TotalWidth = function(self)
         return self.l.Width() + self.Width() + self.r.Width()
     end;
+
+    ---@param self NinePatch
+    ---@return number
     TotalHeight = function(self)
         return self.t.Height() + self.Height() + self.b.Height()
     end;
 
     -- Lay this NinePatch out around the given control
+    ---@param self NinePatch
+    ---@param control Control
+    ---@param horizontalPadding number
+    ---@param verticalPadding number
     Surround = function(self, control, horizontalPadding, verticalPadding)
         horizontalPadding = ScaleNumber(horizontalPadding)
         verticalPadding = ScaleNumber(verticalPadding)
