@@ -1862,14 +1862,14 @@ float4 TerrainPBRAlbedoPS ( VS_OUTPUT inV) : COLOR
 
     float cameraFractionNear = 1;
 
-    lowerAlbedo    = CorrectedAddition(lowerAlbedo,    tex2D(LowerAlbedoSampler,    position.xy * LowerNormalTile.xy),    lBrightness,  cameraFractionNear);
-    stratum0Albedo = CorrectedAddition(stratum0Albedo, tex2D(Stratum0AlbedoSampler, position.xy * Stratum0NormalTile.xy), s0Brightness, cameraFractionNear);
-    stratum1Albedo = CorrectedAddition(stratum1Albedo, tex2D(Stratum1AlbedoSampler, position.xy * Stratum1NormalTile.xy), s1Brightness, cameraFractionNear);
-    stratum2Albedo = CorrectedAddition(stratum2Albedo, tex2D(Stratum2AlbedoSampler, position.xy * Stratum2NormalTile.xy), s2Brightness, cameraFractionNear);
-    stratum3Albedo = CorrectedAddition(stratum3Albedo, tex2D(Stratum3AlbedoSampler, position.xy * Stratum3NormalTile.xy), s3Brightness, cameraFractionNear);
-    stratum4Albedo = CorrectedAddition(stratum4Albedo, tex2D(Stratum4AlbedoSampler, position.xy * Stratum4NormalTile.xy), s4Brightness, cameraFractionNear);
-    stratum5Albedo = CorrectedAddition(stratum5Albedo, tex2D(Stratum5AlbedoSampler, position.xy * Stratum5NormalTile.xy), s5Brightness, cameraFractionNear);
-    stratum6Albedo = CorrectedAddition(stratum6Albedo, tex2D(Stratum6AlbedoSampler, position.xy * Stratum6NormalTile.xy), s6Brightness, cameraFractionNear);
+    lowerAlbedo    = CorrectedAddition(tex2D(LowerAlbedoSampler,    position.xy * LowerNormalTile.xy),    lowerAlbedo,    lBrightness,  cameraFractionNear);
+    stratum0Albedo = CorrectedAddition(tex2D(Stratum0AlbedoSampler, position.xy * Stratum0NormalTile.xy), stratum0Albedo, s0Brightness, cameraFractionNear);
+    stratum1Albedo = CorrectedAddition(tex2D(Stratum1AlbedoSampler, position.xy * Stratum1NormalTile.xy), stratum1Albedo, s1Brightness, cameraFractionNear);
+    stratum2Albedo = CorrectedAddition(tex2D(Stratum2AlbedoSampler, position.xy * Stratum2NormalTile.xy), stratum2Albedo, s2Brightness, cameraFractionNear);
+    stratum3Albedo = CorrectedAddition(tex2D(Stratum3AlbedoSampler, position.xy * Stratum3NormalTile.xy), stratum3Albedo, s3Brightness, cameraFractionNear);
+    stratum4Albedo = CorrectedAddition(tex2D(Stratum4AlbedoSampler, position.xy * Stratum4NormalTile.xy), stratum4Albedo, s4Brightness, cameraFractionNear);
+    stratum5Albedo = CorrectedAddition(tex2D(Stratum5AlbedoSampler, position.xy * Stratum5NormalTile.xy), stratum5Albedo, s5Brightness, cameraFractionNear);
+    stratum6Albedo = CorrectedAddition(tex2D(Stratum6AlbedoSampler, position.xy * Stratum6NormalTile.xy), stratum6Albedo, s6Brightness, cameraFractionNear);
 
     // First value is height, second is roughness
     float2 lowerHRNear    = atlas2D(Stratum7AlbedoSampler, 0.3 * position.xy * LowerAlbedoTile.xy,    float2(0.0, 0.0)).xy;
