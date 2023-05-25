@@ -1,10 +1,8 @@
---*****************************************************************************
---* File: lua/modules/ui/dialogs/mapselect.lua
---* Author: Chris Blackwell
---* Summary: Dialog to facilitate map selection
---*
---* Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
---*****************************************************************************
+-- File: lua/modules/ui/dialogs/mapselect.lua
+-- Author: Chris Blackwell
+-- Summary: Dialog to facilitate map selection
+-- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+-------------------------------------------------------------------
 
 local UIUtil = import("/lua/ui/uiutil.lua")
 local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
@@ -467,7 +465,7 @@ function CreateDialog(selectBehavior, exitBehavior, over, singlePlayer, defaultS
     dialogContent.title = title
 
     local cancelButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "<LOC _Cancel>")
-    LayoutHelpers.AtRightIn(cancelButton, dialogContent, -2)
+    LayoutHelpers.AtRightIn(cancelButton, dialogContent, 81)
     LayoutHelpers.AtBottomIn(cancelButton, dialogContent, 10)
     dialogContent.cancelButton = cancelButton
 
@@ -475,43 +473,8 @@ function CreateDialog(selectBehavior, exitBehavior, over, singlePlayer, defaultS
     LayoutHelpers.LeftOf(selectButton, cancelButton, 72)
     dialogContent.selectButton = selectButton
 
-    local doNotRepeatMap
-    local randomMapButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "<LOC lobui_0501>Random Map")
-    LayoutHelpers.AtHorizontalCenterIn(randomMapButton, dialogContent)
-    LayoutHelpers.AtVerticalCenterIn(randomMapButton, selectButton)
-    Tooltip.AddButtonTooltip(randomMapButton, 'lob_click_randmap')
-    dialogContent.randomMapButton = randomMapButton
-
-    randomMapButton.OnClick = function(self, modifiers)
-        local randomMapIndex
-        repeat
-            randomMapIndex = math.random(0, mapList:GetItemCount() - 1)
-        until randomMapIndex ~= mapList:GetSelection()
-
-        mapList:OnClick(randomMapIndex)
-    end
-    function randomAutoMap(official)
-        local nummapa
-        nummapa = math.random(1, randMapList)
-        if randMapList >= 2 and nummapa == doNotRepeatMap then
-            repeat
-                nummapa = math.random(1, randMapList)
-            until nummapa ~= doNotRepeatMap
-        end
-        doNotRepeatMap = nummapa
-        local scen = scenarios[scenarioKeymap[nummapa]]
-        if official then
-            if not CheckMapIsOfficial(scen) then
-                return randomAutoMap(true)
-            end
-        end
-        selectedScenario = scen
-        selectBehavior(selectedScenario, changedOptions, restrictedCategories)
-        ResetFilters()
-    end
-
     local restrictedUnitsButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "<LOC sel_map_0006>Unit Manager")
-    LayoutHelpers.LeftOf(restrictedUnitsButton, randomMapButton, 81)
+    LayoutHelpers.LeftOf(restrictedUnitsButton, selectButton, 81)
     Tooltip.AddButtonTooltip(restrictedUnitsButton, "lob_RestrictedUnits")
     dialogContent.restrictedUnitsButton = restrictedUnitsButton
 
@@ -690,7 +653,6 @@ function CreateDialog(selectBehavior, exitBehavior, over, singlePlayer, defaultS
     end
 
     PopulateMapList()
-
 
     return popup
 end
