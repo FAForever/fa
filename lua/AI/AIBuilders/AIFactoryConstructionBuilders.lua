@@ -96,7 +96,7 @@ BuilderGroup {
         BuilderConditions = {
             { IBC, 'BrainNotLowPowerMode', {} },
             { UCBC, 'FactoryCapCheck', { 'LocationType', 'Air' } },
-            { EBC, 'GreaterThanEconEfficiencyCombined', { 1.0, 1.1} },
+            { EBC, 'GreaterThanEconEfficiencyCombined', { 1.05, 1.1} },
             { UCBC, 'FactoryLessAtLocation', { 'LocationType', 3, categories.AIR } },
             { UCBC, 'UnitCapCheckLess', { .8 } },
             { EBC, 'MassToFactoryRatioBaseCheck', { 'LocationType' } },
@@ -119,7 +119,7 @@ BuilderGroup {
         BuilderConditions = {
             { IBC, 'BrainNotLowPowerMode', {} },
             { UCBC, 'FactoryCapCheck', { 'LocationType', 'Land' } },
-            { EBC, 'GreaterThanEconEfficiencyCombined', { 1.0, 1.1} },
+            { EBC, 'GreaterThanEconEfficiencyCombined', { 1.05, 1.1} },
             { UCBC, 'FactoryLessAtLocation', { 'LocationType', 3, categories.LAND } },
             { UCBC, 'UnitCapCheckLess', { .8 } },
             { EBC, 'MassToFactoryRatioBaseCheck', { 'LocationType' } },
@@ -174,7 +174,7 @@ BuilderGroup {
         BuilderConditions = {
             { IBC, 'BrainNotLowPowerMode', {} },
             { UCBC, 'FactoryCapCheck', { 'LocationType', 'Land' } },
-            { EBC, 'GreaterThanEconEfficiencyCombined', { 0.85, 1.0 } },
+            { EBC, 'GreaterThanEconEfficiencyCombined', { 0.85, 0.85 } },
             { MIBC, 'PathToEnemy', { 'LocationType', 'Land' }},
             { UCBC, 'FactoryLessAtLocation', { 'MAIN', 4, categories.STRUCTURE * categories.FACTORY * categories.LAND }},
             { UCBC, 'UnitCapCheckLess', { .8 } },

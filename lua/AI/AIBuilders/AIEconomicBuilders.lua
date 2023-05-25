@@ -2501,10 +2501,30 @@ BuilderGroup {
         BuilderName = 'T1 Power Engineer',
         PlatoonTemplate = 'EngineerBuilder',
         Priority = 1000,
-        InstanceCount = 2,
+        InstanceCount = 1,
+        BuilderConditions = {
+            { EBC, 'GreaterThanEconEfficiencyCombined', { 0.6, 0.1 }},
+            { EBC, 'LessThanEnergyTrendOverTime', { 10.0 } },
+            { UCBC, 'HaveLessThanUnitsWithCategory', { 1, categories.ENERGYPRODUCTION * (categories.TECH2 + categories.TECH3) }},
+        },
+        BuilderType = 'Any',
+        BuilderData = {
+            Construction = {
+                AdjacencyCategory = categories.FACTORY * categories.STRUCTURE - categories.NAVAL,
+                BuildStructures = {
+                    'T1EnergyProduction',
+                },
+            }
+        }
+    },
+    Builder {
+        BuilderName = 'T1 Power Engineer Scale',
+        PlatoonTemplate = 'EngineerBuilder',
+        Priority = 1000,
+        InstanceCount = 1,
         BuilderConditions = {
             { EBC, 'GreaterThanEconEfficiencyCombined', { 0.7, 0.1 }},
-            { EBC, 'LessThanEconEfficiencyOverTime', { 2.0, 1.35 }},
+            { EBC, 'LessThanEnergyTrendOverTime', { 25.0 } },
             { UCBC, 'HaveLessThanUnitsWithCategory', { 1, categories.ENERGYPRODUCTION * (categories.TECH2 + categories.TECH3) }},
         },
         BuilderType = 'Any',
@@ -2522,10 +2542,11 @@ BuilderGroup {
         PlatoonTemplate = 'T2EngineerBuilder',
         Priority = 950,
         BuilderConditions = {
+            { EBC, 'LessThanEnergyTrendOverTime', { 45.0 } },
+            { EBC, 'GreaterThanEconEfficiencyCombined', { 0.5, 0.1 }},
             { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, categories.ENERGYPRODUCTION * categories.TECH2}}, --DUNCAN - Added
             { UCBC, 'EngineerLessAtLocation', { 'LocationType', 1, categories.TECH3 * categories.ENGINEER }},
-            { EBC, 'GreaterThanEconEfficiencyCombined', { 0.5, 0.1 }},
-            { EBC, 'LessThanEconEfficiencyOverTime', { 2.0, 1.3 }}, --DUNCAN - Moved check from 1.7
+            
         },
         BuilderType = 'Any',
         BuilderData = {
@@ -2549,7 +2570,7 @@ BuilderGroup {
         BuilderConditions = {
             { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, categories.ENERGYPRODUCTION * (categories.TECH2 + categories.TECH3)}},
             { EBC, 'GreaterThanEconEfficiencyCombined', { 0.5, 0.1 }},
-            { EBC, 'LessThanEconEfficiencyOverTime', { 2.0, 1.3 }}, --DUNCAN - added
+            { EBC, 'LessThanEnergyTrendOverTime', { 200.0 } },
         },
         BuilderData = {
             Construction = {

@@ -196,7 +196,7 @@ BuilderGroup {
             { UCBC, 'UnitsLessAtLocation', { 'LocationType', 1, (categories.RADAR + categories.OMNI) * categories.STRUCTURE}},
             { EBC, 'GreaterThanEconIncomeOverTime',  { 0.5, 15 } },
             { IBC, 'BrainNotLowPowerMode', {} },
-            { EBC, 'GreaterThanEconEfficiencyCombined', { 0.7, 1.2 }}, --DUNCAN - was 0.9,1.2
+            { EBC, 'GreaterThanEconEfficiencyCombined', { 0.7, 1.05 }}, --DUNCAN - was 0.9,1.2
         },
         BuilderType = 'Any',
         BuilderData = {

@@ -3257,6 +3257,7 @@ function CanBuildOnLocalMassPoints(aiBrain, engPos, distance)
     -- the BorderWarning is used to tell the AI that the mass marker is too close to the map border
     local pointDistance = distance * distance
     local massMarkers = import("/lua/sim/markerutilities.lua").GetMarkersByType('Mass')
+    local NavUtils = import("/lua/sim/navutils.lua")
     local validMassMarkers = {}
     for _, v in massMarkers do
         if v.type == 'Mass' then
@@ -3265,7 +3266,7 @@ function CanBuildOnLocalMassPoints(aiBrain, engPos, distance)
                 massBorderWarn = true
             end 
             local mexDistance = VDist2Sq( v.position[1],v.position[3], engPos[1], engPos[3] )
-            if mexDistance < pointDistance and aiBrain:CanBuildStructureAt('ueb1103', v.position) then
+            if mexDistance < pointDistance and aiBrain:CanBuildStructureAt('ueb1103', v.position) and NavUtils.CanPathTo('Amphibious', engPos, v.position) then
                 table.insert(validMassMarkers, {Position = v.position, Distance = mexDistance , MassSpot = v, BorderWarning = massBorderWarn})
             end
         end
