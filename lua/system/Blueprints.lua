@@ -245,6 +245,8 @@ local function NewSafeEnv()
     env.table.shuffle = nil
     env.table.random = nil
     env.math.random = nil
+    -- add the same behavior for non-existent globals as usual
+    setmetatable(env, getmetatable(_G))
     return env
 end
 
