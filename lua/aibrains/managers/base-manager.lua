@@ -105,7 +105,7 @@ AIBase = ClassSimple {
     ---@param manager AIBuilderManager
     AddBuilderGroup = function(self, builderGroupTemplate, manager)
         if Debug then
-            SPEW("Loading builder group template: " .. builderGroupTemplate.BuilderGroupName .. " for " .. manager.ManagerType)
+            SPEW("Loading builder group template: " .. builderGroupTemplate.BuilderGroupName .. " for " .. manager.ManagerName)
         end
 
         local builderTemplates = builderGroupTemplate.BuilderTemplates

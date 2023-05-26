@@ -5,7 +5,7 @@
 --****************************************************************************
 
 local AIBuilderManager = import("/lua/aibrains/managers/builder-manager.lua").AIBuilderManager
-local AIPlatoonEngineer = import("/lua/aibrains/platoons/platoon-engineer.lua").AIPlatoonEngineer
+-- local AIPlatoonEngineer = import("/lua/aibrains/platoons/platoon-engineer.lua").AIPlatoonEngineer
 
 local TableGetSize = table.getsize
 
@@ -34,7 +34,7 @@ local WeakValues = { __mode = 'v' }
 ---@field EngineerCount AIEngineerManagerCount      # Recomputed every 10 ticks
 AIEngineerManager = Class(AIBuilderManager) {
 
-    ManagerType = "EngineerManager",
+    ManagerName = "EngineerManager",
 
     ---@param self AIEngineerManager
     ---@param brain AIBrain
@@ -259,29 +259,6 @@ AIEngineerManager = Class(AIBuilderManager) {
 
     --------------------------------------------------------------------------------------------
     -- engineer manager interface
-
-    ---@param self AIEngineerManager
-    ---@param unit Unit
-    AssignPlatoon = function(self, unit)
-        -- switch any existing behavior to the blank state
-        local aiPlatoon = unit.AIPlatoonReference
-        if aiPlatoon then
-            aiPlatoon:ChangeState('Blank')
-        end
-
-        -- create the platoon, switch metatables and assign the unit
-        local platoon = self.Brain:MakePlatoon('Engineer platoon', '') --[[@as AIPlatoonEngineer]]
-        setmetatable(platoon, AIPlatoonEngineer)
-        self.Brain:AssignUnitsToPlatoon(platoon, {unit}, 'support', 'none')
-        unit.AIPlatoonReference = platoon
-
-        -- assign assets required for this platoon
-        platoon.Brain = self.Brain
-        platoon.Base = self.Base
-
-        -- enable the build behavior
-        platoon:ChangeState('AIBehaviorBuild')
-    end,
 
     ---@param self AIEngineerManager
     ---@param platoon AIPlatoonEngineer

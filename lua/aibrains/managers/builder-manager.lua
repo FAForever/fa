@@ -32,7 +32,7 @@ end
 ---@field Trash TrashBag                            # Trashbag of this manager
 AIBuilderManager = ClassSimple {
 
-    ManagerType = "BuilderManager",
+    ManagerName = "BuilderManager",
 
     ---@param self AIBuilderManager
     ---@param brain AIBrain

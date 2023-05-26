@@ -16,36 +16,47 @@ local TableEmpty = table.empty
 ---@field Builder AIBuilder | nil
 AIPlatoonSimpleStructure = Class(AIPlatoon) {
 
+    PlatoonName = 'SimpleStructureBehavior',
+
     Start = State {
+
+        StateName = 'Start',
+
         --- Initial state of any state machine
         ---@param self AIPlatoonSimpleStructure
         Main = function(self)
             LOG("AIPlatoonSimpleStructure - Start")
             if not self.Base then
-                error("AI simple structure behavior requires an AI base reference")
+                self:LogWarning("requires a base reference")
+                self:ChangeState(self.Error)
             end
 
             if not self.Brain then
-                error("AI simple structure behavior requires an AI brain reference")
+                self:LogWarning("requires a brain reference")
+                self:ChangeState(self.Error)
             end
 
             if not self.Base.StructureManager then
-                error("AI simple structure behavior requires an engineer manager reference")
+                self:LogWarning("requires a structure manager reference")
+                self:ChangeState(self.Error)
             end
 
-            self:ChangeState('SearchingForTask')
+            self:ChangeState(self.SearchingForTask)
             return
         end,
     },
 
     SearchingForTask = State {
+
+        StateName = 'SearchingForTask',
+
         --- The platoon searches for a target
         ---@param self AIPlatoonSimpleStructure
         Main = function(self)
             local units, count = self:GetPlatoonUnits()
             if count > 1 then
-                WARN("AI simple structure behavior warning: multiple units in platoon is unsupported")
-                self:ChangeState('Error')
+                self:LogWarning("multiple units is not supported")
+                self:ChangeState(self.Error)
                 return
             end
 
@@ -55,39 +66,45 @@ AIPlatoonSimpleStructure = Class(AIPlatoon) {
                 local builder = self.Base.StructureManager:GetHighestBuilder(self, unit)
                 if builder then
                     self.Builder = builder
-                    self:ChangeState('Upgrading')
+                    self:ChangeState(self.Upgrading)
                 else
-                    self:ChangeState('Waiting')
+                    self:ChangeState(self.Waiting)
                 end
             end
         end,
     },
 
     Waiting = State {
+
+        StateName = 'Waiting',
+
         --- 
         ---@param self AIPlatoonSimpleStructure
         Main = function(self)
             WaitTicks(10)
-            self:ChangeState('SearchingForTask')
+            self:ChangeState(self.SearchingForTask)
         end,
     },
 
     Upgrading = State {
+
+        StateName = 'Upgrading',
+
         --- The structure is upgrading. At the end of the sequence the structure no longer exists
         ---@param self AIPlatoonSimpleStructure
         Main = function(self)
 
             local builder = self.Builder
             if not builder then
-                WARN(string.format("AI simple structure behavior error: no builder defined"))
-                self:ChangeState('Waiting')
+                self:LogWarning('no builder defined')
+                self:ChangeState(self.Waiting)
                 return
             end
 
             local units, count = self:GetPlatoonUnits()
             if count > 1 then
-                WARN("AI simple structure behavior warning: multiple units in platoon is unsupported")
-                self:ChangeState('Error')
+                self:LogWarning('multiple units in platoon is not supported')
+                self:ChangeState(self.Error)
                 return
             end
 
@@ -96,8 +113,8 @@ AIPlatoonSimpleStructure = Class(AIPlatoon) {
                 local unit = units[1]
                 local upgradeId = unit.Blueprint.General.UpgradesTo
                 if not upgradeId then
-                    WARN("AI simple structure behavior warning: unit has no upgrade to field")
-                    self:ChangeState('Error')
+                    self:LogWarning(string.format('the field "UseUpgradeToBlueprintField" is set but no field "UpgradesTo" in blueprint %s exists', unit.Blueprint.BlueprintId))
+                    self:ChangeState(self.Error)
                     return
                 end
 
@@ -108,36 +125,6 @@ AIPlatoonSimpleStructure = Class(AIPlatoon) {
 
     -----------------------------------------------------------------
     -- brain events
-
-    ---@param self AIPlatoon
-    ---@param units Unit[]
-    OnUnitsAddedToAttackSquad = function(self, units)
-        WARN("AI simple structure behavior error: attack squad is unsupported")
-    end,
-
-    ---@param self AIPlatoon
-    ---@param units Unit[]
-    OnUnitsAddedToScoutSquad = function(self, units)
-        WARN("AI simple structure behavior error: scout squad is unsupported")
-    end,
-
-    ---@param self AIPlatoon
-    ---@param units Unit[]
-    OnUnitsAddedToArtillerySquad = function(self, units)
-        WARN("AI simple structure behavior error: artillery squad is unsupported")
-    end,
-
-    ---@param self AIPlatoon
-    ---@param units Unit[]
-    OnUnitsAddedToSupportSquad = function(self, units)
-        WARN("AI simple structure behavior error: support squad is unsupported")
-    end,
-
-    ---@param self AIPlatoon
-    ---@param units Unit[]
-    OnUnitsAddedToGuardSquad = function(self, units)
-        WARN("AI simple structure behavior error: guard squad is unsupported")
-    end,
 }
 
 ---@param data { }

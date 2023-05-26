@@ -9,6 +9,9 @@ local TableGetn = table.getn
 ---@type Vector
 local BaseDirectionForAngles = { 0, 0, 1 }
 
+---@class AIPlatoonState : State
+---@field StateName string
+
 ---@class AIPlatoon : moho.platoon_methods
 ---@field BuilderData table
 ---@field Units Unit[]
@@ -16,6 +19,9 @@ local BaseDirectionForAngles = { 0, 0, 1 }
 ---@field Trash TrashBag
 ---@field PlatoonUnits
 AIPlatoon = Class(moho.platoon_methods) {
+
+    PlatoonName = 'PlatoonBase',
+    StateName = 'Unknown',
 
     ---@see `AIBrain:MakePlatoon`
     ---@param self AIPlatoon
@@ -85,30 +91,50 @@ AIPlatoon = Class(moho.platoon_methods) {
     -----------------------------------------------------------------
     -- platoon states
 
+    ---
     ---@param self AIPlatoon
-    ---@param name string
-    ChangeState = function(self, name)
-        LOG(tostring(self) .. " - Changing state to: " .. name)
+    LogDebug = function(self, message)
+        local platoonName = self.PlatoonName
+        local stateName = self.StateName
+        SPEW(string.format("%s - %s: %s", platoonName, stateName, message))
+    end,
+
+    --- 
+    ---@param self AIPlatoon
+    LogWarning = function(self, message)
+        local platoonName = self.PlatoonName
+        local stateName = self.StateName
+        WARN(string.format("%s - %s: %s", platoonName, stateName, message))
+    end,
+
+    ---@param self AIPlatoon
+    ---@param state AIPlatoonState
+    ChangeState = function(self, state)
+        self:LogDebug(string.format('Changing state to: %s', state.StateName))
 
         WaitTicks(1)
 
         if not IsDestroyed(self) then
-            ChangeState(self, self[name])
+            ChangeState(self, state)
         end
     end,
 
     Start = State {
+
+        StateName = 'Start',
+
         ---@param self AIPlatoon
         Main = function(self)
-            LOG(tostring(self) .. " - Start")
-            self:ChangeState('Error')
+            self:ChangeState(self.Error)
         end,
     },
 
     Error = State {
+
+        StateName = 'Error',
+
         ---@param self AIPlatoon
         Main = function(self)
-            LOG(tostring(self) .. " - Error")
 
             -- tell the developer that something went wrong
             while not IsDestroyed(self) do
@@ -124,31 +150,31 @@ AIPlatoon = Class(moho.platoon_methods) {
     ---@param self AIPlatoon
     ---@param units Unit[]
     OnUnitsAddedToAttackSquad = function(self, units)
-        LOG("OnUnitsAddedToAttackSquad")
+        self:LogWarning('no support for units in attack squad')
     end,
 
     ---@param self AIPlatoon
     ---@param units Unit[]
     OnUnitsAddedToScoutSquad = function(self, units)
-        LOG("OnUnitsAddedToScoutSquad")
+        self:LogWarning('no support for units in scout squad')
     end,
 
     ---@param self AIPlatoon
     ---@param units Unit[]
     OnUnitsAddedToArtillerySquad = function(self, units)
-        LOG("OnUnitsAddedToArtillerySquad")
+        self:LogWarning('no support for units in artillery squad')
     end,
 
     ---@param self AIPlatoon
     ---@param units Unit[]
     OnUnitsAddedToSupportSquad = function(self, units)
-        LOG("OnUnitsAddedToSupportSquad")
+        self:LogWarning('no support for units in support squad')
     end,
 
     ---@param self AIPlatoon
     ---@param units Unit[]
     OnUnitsAddedToGuardSquad = function(self, units)
-        LOG("OnUnitsAddedToGuardSquad")
+        self:LogWarning('no support for units in guard squad')
     end,
 
     -----------------------------------------------------------------

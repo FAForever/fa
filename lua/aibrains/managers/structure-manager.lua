@@ -27,7 +27,7 @@ local WeakValues = { __mode = 'v' }
 ---@field StructureBeingBuiltCount AIStructureManagerCounts     # Recomputed every 10 ticks
 AIStructureManager = Class(BuilderManager) {
 
-    ManagerType = "StructureManager",
+    ManagerName = "StructureManager",
 
     ---@param self AIStructureManager
     ---@param brain AIBrain

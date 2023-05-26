@@ -40,7 +40,7 @@ local MapFactionCategory = {
 ---@field FactoryBeingBuiltCount AIFactoryManagerCounts     # Recomputed every 10 ticks
 AIFactoryManager = Class(BuilderManager) {
 
-    ManagerType = "FactoryManager",
+    ManagerName = "FactoryManager",
 
     ---@param self AIFactoryManager
     ---@param brain AIBrain
