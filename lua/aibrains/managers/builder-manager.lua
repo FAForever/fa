@@ -118,12 +118,9 @@ AIBuilderManager = ClassSimple {
     ---@param platoon AIPlatoon
     ---@param unit Unit
     ---@return AIBuilder?
-    GetHighestBuilder = function(self, platoon, unit)
-        LOG("GetHighestBuilder")
-        local unitType = 'RESOURCE' -- todo
+    GetHighestBuilder = function(self, platoon, unit, unitType)
         local builderData = self.BuilderData[unitType]
         if not builderData then
-            reprsl(self.BuilderData)
             return nil
         end
 
@@ -148,21 +145,18 @@ AIBuilderManager = ClassSimple {
             -- check tech requirement
             local builderTech = builderTemplate.BuilderTech
             if builderTech and builderTech != unitTech then
-                SPEW(" - Invalid tech")
                 continue
             end
 
             -- check layer requirement
             local builderLayer = builderTemplate.BuilderLayer
             if builderLayer and builderLayer != unitLayer then
-                SPEW(" - Invalid layer")
                 continue
             end
 
             -- check faction requirement
             local builderFaction = builderTemplate.BuilderFaction
             if builderFaction and builderFaction != unitFaction then
-                SPEW(" - Invalid faction")
                 continue
             end
 

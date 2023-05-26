@@ -1,4 +1,3 @@
-
 local AIPlatoon = import("/lua/aibrains/platoons/platoon-base.lua").AIPlatoon
 local NavUtils = import("/lua/sim/navutils.lua")
 local MarkerUtils = import("/lua/sim/markerutilities.lua")
@@ -10,9 +9,22 @@ local IsDestroyed = IsDestroyed
 local TableGetn = table.getn
 local TableEmpty = table.empty
 
+--- Table of stringified categories to help determine
+local UnitTypeOrder = {
+    'FACTORY',
+    'MASSEXTRACTION',
+    'ENERGYPRODUCTION',
+    'RADAR',
+    'SONAR',
+    'MASSSTORAGE',
+    'ENERGYSTORAGE',
+    'SHIELD',
+}
+
 ---@class AIPlatoonSimpleStructure : AIPlatoon
 ---@field Base AIBase
 ---@field Brain EasyAIBrain
+---@field BuilderType 'FACTORY' | 'SHIELD' | 'MASSEXTRACTION' | 'ENERGYPRODUCTION' | 'RADAR' | 'SONAR' | 'MASSSTORAGE' | 'ENERGYSTORAGE' | 'SHIELD'
 ---@field Builder AIBuilder | nil
 AIPlatoonSimpleStructure = Class(AIPlatoon) {
 
@@ -25,7 +37,6 @@ AIPlatoonSimpleStructure = Class(AIPlatoon) {
         --- Initial state of any state machine
         ---@param self AIPlatoonSimpleStructure
         Main = function(self)
-            LOG("AIPlatoonSimpleStructure - Start")
             if not self.Base then
                 self:LogWarning("requires a base reference")
                 self:ChangeState(self.Error)
@@ -39,6 +50,22 @@ AIPlatoonSimpleStructure = Class(AIPlatoon) {
             if not self.Base.StructureManager then
                 self:LogWarning("requires a structure manager reference")
                 self:ChangeState(self.Error)
+            end
+
+            local units, count = self:GetPlatoonUnits()
+            if count > 1 then
+                self:LogWarning("multiple units is not supported")
+                self:ChangeState(self.Error)
+                return
+            end
+
+            -- determine unit type
+            local categoriesHashed = units[1].Blueprint.CategoriesHash
+            for k, category in UnitTypeOrder do
+                if categoriesHashed[category] then
+                    self.BuilderType = category
+                    break
+                end
             end
 
             self:ChangeState(self.SearchingForTask)
@@ -60,16 +87,22 @@ AIPlatoonSimpleStructure = Class(AIPlatoon) {
                 return
             end
 
+            -- check if the unit can upgrade
             local unit = units[1]
-
-            if not IsDestroyed(unit) then
-                local builder = self.Base.StructureManager:GetHighestBuilder(self, unit)
-                if builder then
-                    self.Builder = builder
-                    self:ChangeState(self.Upgrading)
-                else
-                    self:ChangeState(self.Waiting)
+            local upgradeId = unit.Blueprint.General.UpgradesTo
+            if upgradeId then
+                if not IsDestroyed(unit) then
+                    local builder = self.Base.StructureManager:GetHighestBuilder(self, unit, self.BuilderType)
+                    if builder then
+                        self.Builder = builder
+                        self:ChangeState(self.Upgrading)
+                    else
+                        self:ChangeState(self.Waiting)
+                    end
                 end
+            else
+                -- if it can't, go into an idle state
+                self:ChangeState(self.Idling)
             end
         end,
     },
@@ -78,10 +111,9 @@ AIPlatoonSimpleStructure = Class(AIPlatoon) {
 
         StateName = 'Waiting',
 
-        --- 
         ---@param self AIPlatoonSimpleStructure
         Main = function(self)
-            WaitTicks(10)
+            WaitTicks(40)
             self:ChangeState(self.SearchingForTask)
         end,
     },
@@ -108,12 +140,14 @@ AIPlatoonSimpleStructure = Class(AIPlatoon) {
                 return
             end
 
+            -- try to upgrade
             local builderData = builder.BuilderData
             if builderData.UseUpgradeToBlueprintField then
                 local unit = units[1]
                 local upgradeId = unit.Blueprint.General.UpgradesTo
                 if not upgradeId then
-                    self:LogWarning(string.format('the field "UseUpgradeToBlueprintField" is set but no field "UpgradesTo" in blueprint %s exists', unit.Blueprint.BlueprintId))
+                    self:LogWarning(string.format('the field "UseUpgradeToBlueprintField" is set but no field "UpgradesTo" in blueprint %s exists'
+                        , unit.Blueprint.BlueprintId))
                     self:ChangeState(self.Error)
                     return
                 end
@@ -122,6 +156,12 @@ AIPlatoonSimpleStructure = Class(AIPlatoon) {
             end
         end,
     },
+
+    Idling = State {
+        ---@param self AIPlatoonSimpleStructure
+        Main = function(self)
+        end,
+    }
 
     -----------------------------------------------------------------
     -- brain events
@@ -138,6 +178,3 @@ DebugAssignToUnits = function(data, units)
         end
     end
 end
-
-
-

@@ -6,9 +6,6 @@ local IsDestroyed = IsDestroyed
 
 local TableGetn = table.getn
 
----@type Vector
-local BaseDirectionForAngles = { 0, 0, 1 }
-
 ---@class AIPlatoonState : State
 ---@field StateName string
 
@@ -17,7 +14,6 @@ local BaseDirectionForAngles = { 0, 0, 1 }
 ---@field Units Unit[]
 ---@field Brain moho.aibrain_methods
 ---@field Trash TrashBag
----@field PlatoonUnits
 AIPlatoon = Class(moho.platoon_methods) {
 
     PlatoonName = 'PlatoonBase',
@@ -47,11 +43,6 @@ AIPlatoon = Class(moho.platoon_methods) {
         for k, unit in units do
             unit.AIPlatoonReference = self
         end
-    end,
-
-    ---@param self AIPlatoon
-    PlatoonDisband = function(self)
-        LOG("PlatoonDisband")
     end,
 
     -----------------------------------------------------------------
@@ -90,22 +81,6 @@ AIPlatoon = Class(moho.platoon_methods) {
 
     -----------------------------------------------------------------
     -- platoon states
-
-    ---
-    ---@param self AIPlatoon
-    LogDebug = function(self, message)
-        local platoonName = self.PlatoonName
-        local stateName = self.StateName
-        SPEW(string.format("%s - %s: %s", platoonName, stateName, message))
-    end,
-
-    --- 
-    ---@param self AIPlatoon
-    LogWarning = function(self, message)
-        local platoonName = self.PlatoonName
-        local stateName = self.StateName
-        WARN(string.format("%s - %s: %s", platoonName, stateName, message))
-    end,
 
     ---@param self AIPlatoon
     ---@param state AIPlatoonState
@@ -403,6 +378,25 @@ AIPlatoon = Class(moho.platoon_methods) {
         end
 
         return units, head - 1
+    end,
+
+    -----------------------------------------------------------------
+    -- debugging
+
+    ---
+    ---@param self AIPlatoon
+    LogDebug = function(self, message)
+        local platoonName = self.PlatoonName
+        local stateName = self.StateName
+        SPEW(string.format("%s - %s: %s", platoonName, stateName, message))
+    end,
+
+    --- 
+    ---@param self AIPlatoon
+    LogWarning = function(self, message)
+        local platoonName = self.PlatoonName
+        local stateName = self.StateName
+        WARN(string.format("%s - %s: %s", platoonName, stateName, message))
     end,
 
 }

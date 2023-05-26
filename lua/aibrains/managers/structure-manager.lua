@@ -82,7 +82,7 @@ AIStructureManager = Class(BuilderManager) {
                 engineerCount[tech] = count
                 total = total + count
             end
-    
+
             local StructureBeingBuilt = self.StructuresBeingBuilt
             local StructureBeingBuiltCount = self.StructureBeingBuiltCount
             for tech, _ in StructureBeingBuiltCount do
@@ -98,10 +98,6 @@ AIStructureManager = Class(BuilderManager) {
     -- unit events
 
     --- Called by a unit as it starts being built
-    --- 
-    --- `Time complexity: O(1)`
-    --- 
-    --- `Memory complexity: O(1)`
     ---@param self AIStructureManager
     ---@param unit Unit
     ---@param builder Unit
@@ -112,20 +108,10 @@ AIStructureManager = Class(BuilderManager) {
             local tech = blueprint.TechCategory
             local id = unit.EntityId
             self.StructuresBeingBuilt[tech][id] = unit
-
-            -- used by platoon functions to find the manager
-            local builderManagerData = unit.BuilderManagerData or { }
-            unit.BuilderManagerData = builderManagerData
-            builderManagerData.StructureManager = self
-            builderManagerData.LocationType = self.LocationType
         end
     end,
 
     --- Called by a unit as it is finished being built
-    --- 
-    --- `Time complexity: O(1)`
-    --- 
-    --- `Memory complexity: O(1)`
     ---@param self AIStructureManager
     ---@param unit Unit
     ---@param builder Unit
@@ -151,10 +137,6 @@ AIStructureManager = Class(BuilderManager) {
     end,
 
     --- Called by a unit as it is destroyed
-    --- 
-    --- `Time complexity: O(1)`
-    --- 
-    --- `Memory complexity: O(1)`
     ---@param self AIStructureManager
     ---@param unit Unit
     OnUnitDestroyed = function(self, unit)
@@ -172,9 +154,6 @@ AIStructureManager = Class(BuilderManager) {
     ---@param unit Unit
     ---@param built Unit
     OnUnitStartBuilding = function(self, unit, built)
-        local blueprint = unit.Blueprint
-        if blueprint.CategoriesHash['STRUCTURE'] then
-        end
     end,
 
     --- Called by a unit as it stops building
@@ -182,52 +161,23 @@ AIStructureManager = Class(BuilderManager) {
     ---@param unit Unit
     ---@param built Unit
     OnUnitStopBuilding = function(self, unit, built)
-        local blueprint = unit.Blueprint
-        if blueprint.CategoriesHash['STRUCTURE'] then
-        end
     end,
 
     --------------------------------------------------------------------------------------------
     -- unit interface
 
-    --- Add a unit to, similar to calling `OnUnitStopBeingBuilt`
-    --- 
-    --- `Time complexity: O(1)`
-    --- 
-    --- `Memory complexity: O(1)`
+    --- Add a unit, similar to calling `OnUnitStopBeingBuilt`
     ---@param self AIStructureManager
     ---@param unit Unit
     AddUnit = function(self, unit)
-        local blueprint = unit.Blueprint
-        if blueprint.CategoriesHash['STRUCTURE'] then
-            local tech = blueprint.TechCategory
-            local id = unit.EntityId
-            self.StructuresBeingBuilt[tech][id] = nil
-            self.Structures[tech][id] = unit
-
-            -- used by platoon functions to find the manager
-            local builderManagerData = unit.BuilderManagerData or { }
-            unit.BuilderManagerData = builderManagerData
-            builderManagerData.StructureManager = self
-            builderManagerData.LocationType = self.LocationType
-        end
+        self:OnUnitStopBeingBuilt(unit, nil, unit.Layer)
     end,
 
     --- Remove a unit, similar to calling `OnUnitDestroyed`
-    --- 
-    --- `Complexity: O(1)`
-    --- 
-    --- `Memory complexity: O(1)`
     ---@param self AIStructureManager
     ---@param unit Unit
     RemoveUnit = function(self, unit)
-        local blueprint = unit.Blueprint
-        if blueprint.CategoriesHash['STRUCTURE'] then
-            local tech = blueprint.TechCategory
-            local id = unit.EntityId
-            self.StructuresBeingBuilt[tech][id] = nil
-            self.Structures[tech][id] = nil
-        end
+        self:OnUnitDestroyed(unit)
     end,
 }
 
