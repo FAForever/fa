@@ -23,3 +23,27 @@ UpgradeToTech3LandHQ = AIBuilderTemplate {
 
     BuilderPriority = 400,
 }
+
+UpgradeToTech2Extractor = AIBuilderTemplate {
+    BuilderManager = 'StructureManager',
+    BuilderName = 'Easy AI - Upgrade to Tech 2 Extractor',
+    BuilderConditions = {},
+    BuilderType = 'TECH1',
+    BuilderFaction = 'Any',
+    BuilderPriority = 400,
+    BuilderData = {
+        UseUpgradeToBlueprintField = true,
+    },
+}
+
+UpgradeToTech3Extractor = AIBuilderTemplate {
+    BuilderManager = 'StructureManager',
+    BuilderName = 'Easy AI - Upgrade to Tech 3 Extractor',
+    BuilderConditions = {},
+    BuilderType = 'TECH1',
+    BuilderFaction = 'Any',
+    BuilderPriority = 400,
+    BuilderData = {
+        UseUpgradeToBlueprintField = true,
+    },
+}

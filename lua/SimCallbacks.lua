@@ -866,3 +866,4 @@ Callbacks.AIBrainEconomyDebugDisable = import("/lua/aibrains/components/economy.
 
 Callbacks.AIPlatoonSiloTacticalBehavior = import("/lua/aibrains/platoons/platoon-silo.lua").DebugAssignToUnits
 Callbacks.AIPlatoonSimpleRaidBehavior = import("/lua/aibrains/platoons/platoon-simple-raid.lua").DebugAssignToUnits
+Callbacks.AIPlatoonSimpleStructureBehavior = import("/lua/aibrains/platoons/platoon-simple-structure.lua").DebugAssignToUnits
