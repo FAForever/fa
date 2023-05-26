@@ -1735,6 +1735,15 @@ sampler2D HeightRoughnessSampler = sampler_state
     AddressV  = CLAMP;
 };
 
+const float2 indexArray[4] = {
+    float2(0.0, 0.0), 
+    float2(0.5, 0.0), 
+    float2(0.0, 0.5), 
+    float2(0.5, 0.5)
+    };
+
+// 30° rotation
+const float2x2 rotationMatrix = float2x2(float2(0.866, -0.5), float2(0.5, 0.866));
 
 float4 UDNBlending(float4 n1, float4 n2, float factor) {
     n2.xy *= factor;
@@ -1747,20 +1756,18 @@ float4 CorrectedAddition(float4 t1, float4 t2, float4 correction, float factor) 
     return (t1 + (t2 - correction) * factor + lerp(t1, t2, factor * 0.8)) * 0.5;
 }
 
-float4 splatLerp(float4 t1, float4 t2, float t1height, float t2height, float factor) {
+float4 splatLerp(float4 t1, float4 t2, float t1height, float t2height, float factor, float depth = 0.3) {
     factor *= 1.5;
     float h1 = 1.5 - factor;
-    float depth = 0.1;
     float ma = max(t1height + h1, t2height + factor) - depth;
     float b1 = max(t1height + h1 - ma, 0);
     float b2 = max(t2height + factor - ma, 0);
     return (t1 * b1 + t2 * b2) / (b1 + b2);
 }
 
-float4 splatBlendNormal(float4 n1, float4 n2, float t1height, float t2height, float factor) {
+float4 splatBlendNormal(float4 n1, float4 n2, float t1height, float t2height, float factor, float depth = 0.3) {
     factor *= 1.5;
     float h1 = 1.5 - factor;
-    float depth = 0.1;
     float ma = max(t1height + h1, t2height + factor) - depth;
     float b1 = max(t1height + h1 - ma, 0);
     float b2 = max(t2height + factor - ma, 0);
@@ -1779,44 +1786,37 @@ float4 atlas2D(sampler2D s, float2 uv, float2 offset) {
     return tex2Dgrad(s, uv, uv_ddx, uv_ddy);
 }
 
-float4 sampleNormal(sampler2D s, float4 position, float4 nearScale, float4 farScale, float cameraFractionNear, float cameraFractionFar) {
-    float4 normalNear = tex2D(s, position.xy * nearScale.xy);
-    float4 normalFar  = tex2D(s, position.xy * farScale.xy);
-    float4 normal = UDNBlending(float4(0, 0, 1, 0), normalize(2 * normalNear - 1), cameraFractionNear);
-    return UDNBlending(normal, normalize(2 * normalFar - 1),  cameraFractionFar);
+float4 sampleNormal(sampler2D s, float4 position, float4 scale) {
+    float4 normal = tex2D(s, position.xy * scale.xy);
+    float4 normalRotated = tex2D(s, mul(position, rotationMatrix).xy * scale.xy);
+
+    float mask = atlas2D(HeightRoughnessSampler, position.xy * 3.5, indexArray[1]).x * 1.2;
+    return splatBlendNormal(normalize(2 * normal - 1), normalize(2 * normalRotated - 1), 0.5, mask, 0.5, 0.03);
 }
 
-float4 sampleAlbedo(sampler2D s, float4 position, float4 nearScale, float4 farScale, float cameraFractionNear) {
-    float4 albedo = tex2D(s, position.xy * nearScale.xy);
-    // We want the lowest mipmap
-    float2 ddx = float2(1.0, 0.0); 
-    float2 ddy = float2(0.0, 1.0); 
-    float4 brightness  = tex2Dgrad(s, position.xy * nearScale.xy, ddx, ddy);
-    return CorrectedAddition(tex2D(s, position.xy * farScale.xy), albedo, brightness,  cameraFractionNear);
+float4 sampleAlbedo(sampler2D s, float4 position, float4 scale) {
+    float4 albedo = tex2D(s, position.xy * scale.xy);
+    float4 albedoRotated = tex2D(s, mul(position, rotationMatrix).xy * scale.xy);
+
+    float mask = atlas2D(HeightRoughnessSampler, position.xy * 3.5, indexArray[1]).x * 1.2;
+    return splatLerp(albedo, albedoRotated, 0.5, mask, 0.5, 0.03);
 }
 
-const float2 indexArray[4] = {
-    float2(0.0, 0.0), 
-    float2(0.5, 0.0), 
-    float2(0.0, 0.5), 
-    float2(0.5, 0.5)
-    };
-
-float2 sampleHeightAndRoughnessXY(float4 position, float4 nearScale, float4 farScale, int index, float cameraFractionNear) {
+float2 sampleHeightAndRoughnessXY(float4 position, float4 nearScale, float4 farScale, int index) {
     float2 HRNear = atlas2D(HeightRoughnessSampler, position.xy * nearScale.xy, indexArray[index]).xy;
     float2 HRFar  = atlas2D(HeightRoughnessSampler, position.xy * farScale.xy, indexArray[index]).xy;
     float2 heightRoughness; 
     heightRoughness.x = 1.2 * (HRNear.x * 1 + HRFar.x * 1 - 0);
-    heightRoughness.y = lerp(HRNear.y, HRFar.y, cameraFractionNear);
+    heightRoughness.y = (HRNear.y + HRFar.y) * 0.5;
     return heightRoughness;
 }
 
-float2 sampleHeightAndRoughnessZW(float4 position, float4 nearScale, float4 farScale, int index, float cameraFractionNear) {
+float2 sampleHeightAndRoughnessZW(float4 position, float4 nearScale, float4 farScale, int index) {
     float2 HRNear = atlas2D(HeightRoughnessSampler, position.xy * nearScale.xy, indexArray[index]).zw;
     float2 HRFar  = atlas2D(HeightRoughnessSampler,  position.xy * farScale.xy, indexArray[index]).zw;
     float2 heightRoughness; 
     heightRoughness.x = 1.2 * (HRNear.x * 1 + HRFar.x * 1 - 0);
-    heightRoughness.y = lerp(HRNear.y, HRFar.y, cameraFractionNear);
+    heightRoughness.y = (HRNear.y + HRFar.y) * 0.5;
     return heightRoughness;
 }
 
@@ -1846,27 +1846,23 @@ float4 TerrainPBRNormalsPS ( VS_OUTPUT inV ) : COLOR
     float4 mask0 = tex2D(UtilitySamplerA, position.xy);
     float4 mask1 = tex2D(UtilitySamplerB, position.xy);
 
-    // allow textures to scale as we zoom in and out
-    float cameraFractionNear = (0.8 - 0.8 * clamp(0.01 * (CameraPosition.y - 20), 0, 1)) * Stratum7AlbedoTile.x * TerrainScale;
-    float cameraFractionFar = (0.5 + 0.5 * clamp(0.001 * (CameraPosition.y - 250), 0, 1)) * Stratum7NormalTile.x * TerrainScale;
-
-    float4 lowerNormal    = sampleNormal(LowerNormalSampler,    position, LowerAlbedoTile,    LowerNormalTile,    cameraFractionNear, cameraFractionFar);
-    float4 stratum0Normal = sampleNormal(Stratum0NormalSampler, position, Stratum0AlbedoTile, Stratum0NormalTile, cameraFractionNear, cameraFractionFar);
-    float4 stratum1Normal = sampleNormal(Stratum1NormalSampler, position, Stratum1AlbedoTile, Stratum1NormalTile, cameraFractionNear, cameraFractionFar);
-    float4 stratum2Normal = sampleNormal(Stratum2NormalSampler, position, Stratum2AlbedoTile, Stratum2NormalTile, cameraFractionNear, cameraFractionFar);
-    float4 stratum3Normal = sampleNormal(Stratum3NormalSampler, position, Stratum3AlbedoTile, Stratum3NormalTile, cameraFractionNear, cameraFractionFar);
-    float4 stratum4Normal = sampleNormal(Stratum4NormalSampler, position, Stratum4AlbedoTile, Stratum4NormalTile, cameraFractionNear, cameraFractionFar);
-    float4 stratum5Normal = sampleNormal(Stratum5NormalSampler, position, Stratum5AlbedoTile, Stratum5NormalTile, cameraFractionNear, cameraFractionFar);
-    float4 stratum6Normal = sampleNormal(Stratum6NormalSampler, position, Stratum6AlbedoTile, Stratum6NormalTile, cameraFractionNear, cameraFractionFar);
+    float4 lowerNormal    = sampleNormal(LowerNormalSampler,    position, LowerAlbedoTile);
+    float4 stratum0Normal = sampleNormal(Stratum0NormalSampler, position, Stratum0AlbedoTile);
+    float4 stratum1Normal = sampleNormal(Stratum1NormalSampler, position, Stratum1AlbedoTile);
+    float4 stratum2Normal = sampleNormal(Stratum2NormalSampler, position, Stratum2AlbedoTile);
+    float4 stratum3Normal = sampleNormal(Stratum3NormalSampler, position, Stratum3AlbedoTile);
+    float4 stratum4Normal = sampleNormal(Stratum4NormalSampler, position, Stratum4AlbedoTile);
+    float4 stratum5Normal = sampleNormal(Stratum5NormalSampler, position, Stratum5AlbedoTile);
+    float4 stratum6Normal = sampleNormal(Stratum6NormalSampler, position, Stratum6AlbedoTile);
 
     // First value is height, second is roughness
-    float2 stratum0HR = sampleHeightAndRoughnessXY(position, Stratum0AlbedoTile, Stratum0NormalTile, 1, cameraFractionNear);
-    float2 stratum1HR = sampleHeightAndRoughnessXY(position, Stratum1AlbedoTile, Stratum1NormalTile, 2, cameraFractionNear);
-    float2 stratum2HR = sampleHeightAndRoughnessXY(position, Stratum2AlbedoTile, Stratum2NormalTile, 3, cameraFractionNear);
-    float2 stratum3HR = sampleHeightAndRoughnessZW(position, Stratum3AlbedoTile, Stratum3NormalTile, 0, cameraFractionNear);
-    float2 stratum4HR = sampleHeightAndRoughnessZW(position, Stratum4AlbedoTile, Stratum4NormalTile, 1, cameraFractionNear);
-    float2 stratum5HR = sampleHeightAndRoughnessZW(position, Stratum5AlbedoTile, Stratum5NormalTile, 2, cameraFractionNear);
-    float2 stratum6HR = sampleHeightAndRoughnessZW(position, Stratum6AlbedoTile, Stratum6NormalTile, 3, cameraFractionNear);
+    float2 stratum0HR = sampleHeightAndRoughnessXY(position, Stratum0NormalTile, 0.3 * Stratum0NormalTile, 1);
+    float2 stratum1HR = sampleHeightAndRoughnessXY(position, Stratum1NormalTile, 0.3 * Stratum1NormalTile, 2);
+    float2 stratum2HR = sampleHeightAndRoughnessXY(position, Stratum2NormalTile, 0.3 * Stratum2NormalTile, 3);
+    float2 stratum3HR = sampleHeightAndRoughnessZW(position, Stratum3NormalTile, 0.3 * Stratum3NormalTile, 0);
+    float2 stratum4HR = sampleHeightAndRoughnessZW(position, Stratum4NormalTile, 0.3 * Stratum4NormalTile, 1);
+    float2 stratum5HR = sampleHeightAndRoughnessZW(position, Stratum5NormalTile, 0.3 * Stratum5NormalTile, 2);
+    float2 stratum6HR = sampleHeightAndRoughnessZW(position, Stratum6NormalTile, 0.3 * Stratum6NormalTile, 3);
 
     float4 normal = lowerNormal;
     normal = splatBlendNormal(normal, stratum0Normal, 1.0, stratum0HR.x, mask0.x);
@@ -1895,24 +1891,24 @@ float4 TerrainPBRAlbedoPS ( VS_OUTPUT inV) : COLOR
 
     float cameraFractionNear = (1 - 0.6 * clamp(0.008 * (CameraPosition.y - 20), 0, 1));
 
-    float4 lowerAlbedo    = sampleAlbedo(LowerAlbedoSampler,    position, LowerAlbedoTile,    LowerNormalTile,    cameraFractionNear);
-    float4 stratum0Albedo = sampleAlbedo(Stratum0AlbedoSampler, position, Stratum0AlbedoTile, Stratum0NormalTile, cameraFractionNear);
-    float4 stratum1Albedo = sampleAlbedo(Stratum1AlbedoSampler, position, Stratum1AlbedoTile, Stratum1NormalTile, cameraFractionNear);
-    float4 stratum2Albedo = sampleAlbedo(Stratum2AlbedoSampler, position, Stratum2AlbedoTile, Stratum2NormalTile, cameraFractionNear);
-    float4 stratum3Albedo = sampleAlbedo(Stratum3AlbedoSampler, position, Stratum3AlbedoTile, Stratum3NormalTile, cameraFractionNear);
-    float4 stratum4Albedo = sampleAlbedo(Stratum4AlbedoSampler, position, Stratum4AlbedoTile, Stratum4NormalTile, cameraFractionNear);
-    float4 stratum5Albedo = sampleAlbedo(Stratum5AlbedoSampler, position, Stratum5AlbedoTile, Stratum5NormalTile, cameraFractionNear);
-    float4 stratum6Albedo = sampleAlbedo(Stratum6AlbedoSampler, position, Stratum6AlbedoTile, Stratum6NormalTile, cameraFractionNear);
+    float4 lowerAlbedo    = sampleAlbedo(LowerAlbedoSampler,    position, LowerAlbedoTile);
+    float4 stratum0Albedo = sampleAlbedo(Stratum0AlbedoSampler, position, Stratum0AlbedoTile);
+    float4 stratum1Albedo = sampleAlbedo(Stratum1AlbedoSampler, position, Stratum1AlbedoTile);
+    float4 stratum2Albedo = sampleAlbedo(Stratum2AlbedoSampler, position, Stratum2AlbedoTile);
+    float4 stratum3Albedo = sampleAlbedo(Stratum3AlbedoSampler, position, Stratum3AlbedoTile);
+    float4 stratum4Albedo = sampleAlbedo(Stratum4AlbedoSampler, position, Stratum4AlbedoTile);
+    float4 stratum5Albedo = sampleAlbedo(Stratum5AlbedoSampler, position, Stratum5AlbedoTile);
+    float4 stratum6Albedo = sampleAlbedo(Stratum6AlbedoSampler, position, Stratum6AlbedoTile);
 
     // First value is height, second is roughness
-    float2 lowerHR =    sampleHeightAndRoughnessXY(position, LowerAlbedoTile,    LowerNormalTile,    0, cameraFractionNear);
-    float2 stratum0HR = sampleHeightAndRoughnessXY(position, Stratum0AlbedoTile, Stratum0NormalTile, 1, cameraFractionNear);
-    float2 stratum1HR = sampleHeightAndRoughnessXY(position, Stratum1AlbedoTile, Stratum1NormalTile, 2, cameraFractionNear);
-    float2 stratum2HR = sampleHeightAndRoughnessXY(position, Stratum2AlbedoTile, Stratum2NormalTile, 3, cameraFractionNear);
-    float2 stratum3HR = sampleHeightAndRoughnessZW(position, Stratum3AlbedoTile, Stratum3NormalTile, 0, cameraFractionNear);
-    float2 stratum4HR = sampleHeightAndRoughnessZW(position, Stratum4AlbedoTile, Stratum4NormalTile, 1, cameraFractionNear);
-    float2 stratum5HR = sampleHeightAndRoughnessZW(position, Stratum5AlbedoTile, Stratum5NormalTile, 2, cameraFractionNear);
-    float2 stratum6HR = sampleHeightAndRoughnessZW(position, Stratum6AlbedoTile, Stratum6NormalTile, 3, cameraFractionNear);
+    float2 lowerHR =    sampleHeightAndRoughnessXY(position, LowerNormalTile,    0.3 * LowerNormalTile,    0);
+    float2 stratum0HR = sampleHeightAndRoughnessXY(position, Stratum0NormalTile, 0.3 * Stratum0NormalTile, 1);
+    float2 stratum1HR = sampleHeightAndRoughnessXY(position, Stratum1NormalTile, 0.3 * Stratum1NormalTile, 2);
+    float2 stratum2HR = sampleHeightAndRoughnessXY(position, Stratum2NormalTile, 0.3 * Stratum2NormalTile, 3);
+    float2 stratum3HR = sampleHeightAndRoughnessZW(position, Stratum3NormalTile, 0.3 * Stratum3NormalTile, 0);
+    float2 stratum4HR = sampleHeightAndRoughnessZW(position, Stratum4NormalTile, 0.3 * Stratum4NormalTile, 1);
+    float2 stratum5HR = sampleHeightAndRoughnessZW(position, Stratum5NormalTile, 0.3 * Stratum5NormalTile, 2);
+    float2 stratum6HR = sampleHeightAndRoughnessZW(position, Stratum6NormalTile, 0.3 * Stratum6NormalTile, 3);
 
     // store roughness in albedo so we get the roughness splatting for free
     lowerAlbedo.a    = lowerHR.y;
