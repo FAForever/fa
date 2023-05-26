@@ -189,7 +189,7 @@ BuilderGroup {
     Builder {
         BuilderName = 'T1 Radar Engineer',
         PlatoonTemplate = 'EngineerBuilder',
-        Priority = 930,
+        Priority = 950,
         BuilderConditions = {
             --DUNCAN - commented out
             --{ UCBC, 'EngineerLessAtLocation', { 'LocationType', 1, categories.ENGINEER - categories.COMMAND - categories.TECH1 } },

@@ -1886,7 +1886,7 @@ BuilderGroup {
     Builder {
         BuilderName = 'T1ResourceEngineer 40',
         PlatoonTemplate = 'EngineerBuilder',
-        Priority = 1005,
+        Priority = 1002,
         InstanceCount = 2,
         BuilderConditions = {
                 { MABC, 'CanBuildOnMassLessThanDistance', { 'LocationType', 40, -500, 1, 0, 'AntiSurface', 1 }},
