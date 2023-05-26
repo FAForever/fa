@@ -1,7 +1,8 @@
-
 local FactoryManager = import("/lua/aibrains/managers/factory-manager.lua")
 local EngineerManager = import("/lua/aibrains/managers/engineer-manager.lua")
 local StructureManager = import("/lua/aibrains/managers/structure-manager.lua")
+
+local Debug = true
 
 ---@alias LocationType
 --- can only be applied to the main base
@@ -12,6 +13,7 @@ local StructureManager = import("/lua/aibrains/managers/structure-manager.lua")
 --- | string
 
 ---@class AIBase
+---@field Brain AIBrain
 ---@field BuilderHandles table
 ---@field FactoryManager AIFactoryManager
 ---@field EngineerManager AIEngineerManager
@@ -31,6 +33,7 @@ AIBase = ClassSimple {
         end
 
         -- store various properties
+        self.Brain = brain
         self.Position = location
         self.Layer = baseLayer
         self.Radius = radius
@@ -45,12 +48,15 @@ AIBase = ClassSimple {
     -- builder interface
 
     --- Adds all builders of the given base template to this base
-    --- 
+    ---
     --- For reference, see `base-template.lua` file
     ---@param self AIBase
     ---@param baseTemplate AIBaseTemplate
     AddBaseTemplate = function(self, baseTemplate)
-        SPEW("Loading base template: " .. baseTemplate.BaseTemplateName)
+        if Debug then
+            SPEW(string.format("Loading base template: %s for %s", baseTemplate.BaseTemplateName, self.Brain.Nickname))
+        end
+
         if baseTemplate.EngineerManager then
             local builderGroups
             builderGroups = baseTemplate.EngineerManager.BuilderGroupTemplates
@@ -98,7 +104,10 @@ AIBase = ClassSimple {
     ---@param builderGroupTemplate AIBuilderGroupTemplate
     ---@param manager AIBuilderManager
     AddBuilderGroup = function(self, builderGroupTemplate, manager)
-        SPEW("Loading builder group template: " .. builderGroupTemplate.BuilderGroupName)
+        if Debug then
+            SPEW("Loading builder group template: " .. builderGroupTemplate.BuilderGroupName)
+        end
+
         local builderTemplates = builderGroupTemplate.BuilderTemplates
         for k = 1, table.getn(builderTemplates) do
             local builderTemplate = builderTemplates[k]

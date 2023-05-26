@@ -209,16 +209,6 @@ AIBrain = Class(StandardBrain, EconomyComponent) {
     end,
 
     ---------------------------------------------
-    -- Builders
-
-    ---@param self EasyAIBrain
-    ---@param template AIBaseTemplate
-    LoadBaseTemplate = function(self, template)
-
-    end,
-
-
-    ---------------------------------------------
     -- Unit events
 
     --- Called by a unit as it starts being built
