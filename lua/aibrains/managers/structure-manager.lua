@@ -62,8 +62,6 @@ AIStructureManager = Class(BuilderManager) {
             EXPERIMENTAL = 0,
         }
 
-        self:AddBuilderType('Any')
-
         -- TODO: refactor this to base class?
         self.Trash:Add(ForkThread(self.UpdateStructureThread, self))
     end,
@@ -90,7 +88,7 @@ AIStructureManager = Class(BuilderManager) {
                 StructureBeingBuiltCount[tech] = count
                 total = total + count
             end
-            WaitSeconds(1.0)
+            WaitTicks(10)
         end
     end,
 

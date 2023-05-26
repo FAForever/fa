@@ -71,8 +71,6 @@ AIEngineerManager = Class(AIBuilderManager) {
         }
 
         self.StructuresBeingBuilt = setmetatable({}, WeakValues)
-
-        self:AddBuilderType('Any')
         self.Trash:Add(ForkThread(self.UpdateEngineerThread, self))
     end,
 
@@ -89,7 +87,7 @@ AIEngineerManager = Class(AIBuilderManager) {
             end
     
             self.EngineerTotalCount = total
-            WaitSeconds(1.0)
+            WaitTicks(10)
         end
     end,
 
