@@ -11,17 +11,21 @@ In this light, there are certain technical limitations and restrictions that are
 able to flexibly support the modding scene, but beyond these basic managerial requirements, they are
 pretty much free to do whatever they like with the game and the FAF framework.
 
-A couple (but not all) of the restrictions include:
+Several (but not all) of the restrictions include:
  * If you upload the mod to the vault, you MUST follow the vault rules:
    https://wiki.faforever.com/en/Vault-Rules
-    * In particular, make sure you own all the content of the mod you are uploading. Require other
-      mods when available to avoid copying others' work.
- * Mods are not able to modify the lobby or provide game options (since mods are only fully loaded
-   after the game launches).
- * All of a mod's files are mounted behind the mod directory to avoid conflicts. Outside of lua
-   scripting (which can always hook original and FAF files), this means that files are never
-   replaced (in practice, since the location a resource such as a texture points to can be changed
-   by a lua file, this only really affects shaders, which are accessed by the game engine directly)
+    * In particular, make sure you have the right to distribute the content of the mod you are
+      uploading. Require other mods when available to avoid copying others' work.
+ * Mods are not able to modify the lobby (since mods are only fully loaded after the game launches).
+    * However, you can provide AI lobby options (see below).
+ * All of a mod's files are mounted behind the mod directory to avoid naming conflicts or accidental
+   file replacement. Outside of lua scripting (which can always hook original and FAF files), this
+   means that files are never replaced 
+    * In practice, since the location a resource such as a texture points to can be changed by a lua
+      file, this only really affects shaders, which are accessed by the game engine directly and
+      cannot be modded under the FAF framework.
+    * Note that mods can still have all kinds of logical conflicts, such overriding the same
+      function or blueprint.
 
 
 ----------
@@ -68,29 +72,32 @@ Each mod has a `mod_info.lua` file which contains various bits of info:
     -- The following webpages allow you to generate a GUID online (as of  April 2023)
     --   http://www.somacon.com/p113.php
     --   http://www.famkruithof.net/uuid/uuidgen
-    uid = B019FBEE-E411-11DB-AFAE-13D355D89593
+    uid = "B019FBEE-E411-11DB-AFAE-13D355D89593"
 
     -- Flag for whether to list this mod in the mod manager window, where the player can select it.
     -- An example where you would set it to false is library mod supplying functions, textures, and
     -- props for use by other mods. Those mods indicate that they require this one, and it is
-    -- automatically enabled when they are.
+    -- automatically loaded when they are. Note that unselectable mods can still be loaded.
     selectable = true
 
     -- Setting enabled to false causes a mod to never be loaded. Provides an easy way to disable a
-    -- mod during development. The default is true.
+    -- mod during development or for dummy mod packs that nest other mods inside directly (please
+    -- use the requires mechanism instead however). The default is true.
     enabled = true
 
     -- A simple form of preventing conflicting mods. If a mod has `exclusive`, then no other mod can
-    -- be active. The default is false. Note that this precludes the use of `conflicts`.
+    -- be active. The default is false (please leave it like that). Note that this precludes the use
+    -- of `conflicts`.
     exclusive = false
 
-    -- Set to true to indicate that this mod only affects the user interface. If this flag is false
-    -- (the default), all players in a multiplayer game must have it in order for anyone to use it.
-    -- If true, one player can have it active independently of the other players.
+    -- Setting to true means this mod will only affect the user interface's Lua state. If this flag
+    -- is false (the default), all players in a multiplayer game must have it in order for anyone to
+    -- use it. If true, one player can have it active independently of the other players.
     ui_only = false
 
-    -- Path of the icon to use for this mod in the mods manager window. The default is
-    -- `"mod_icon.dds"` and in the same directory as the `mod_info.lua` file.
+    -- Path of the icon to use for this mod in the mods manager window. The game defaults to
+    -- `"/textures/ui/common/dialogs/mod-manager/generic-icon_bmp.dds"`. The FAF client does cannot
+    -- read `.dds` so please use `.png` or `.jpg` as both the game and client understand those.
     -- Note that this is unrelated to the `mod_icons.lua` file explained below.
     icon = "mod_icon.dds"
 
@@ -137,41 +144,80 @@ well, so changing this has no affect.
 
 There are a couple other fields that a mod can specify - it's best to leave them alone.
 
+
+----------
+Script Hooking
+----------
+
+A mod can also contain a `/hook` folder, which contains files named the same way, matching the
+structure of the game's main data folder. After any script file is loaded, we check in the active
+mods to see if they define a hook of the same name; if so, we run the hook in the same environment
+as the original script. This allows hooks to tweak or replace individual functions, classes, or
+other data while still using the rest of the original code in the file.
+
+The pattern for overriding a function called `Fn` is
+
+    -- introduce new scope to gaurentee our local variables don't overwrite anything in another mod
+    do
+        local oldFn = Fn
+        function Fn(arguments)
+			-- preserve original behavior or another mod's changes
+			oldFn(arguments)
+			
+			-- now we do our modifications
+			-- ...
+		end
+	end
+
+The pattern for overriding a class method called `Method` in a class called `Cls` is
+
+    -- introduce new scope to gaurentee our local variables don't overwrite anything in another mod
+    do
+        local oldCls = Cls
+        local oldMethod = oldCls.Method
+
+        Cls = Class(oldCls) {
+            Method = function(self, arguments)
+                -- preserve original behavior or another mod's changes
+                oldMethod(self, arguments)
+                
+                -- now we do our modifications
+                -- ...
+            end,
+        }
+    end
+
+
 ----------
 Adding custom units
 ----------
 
-If an active mod has any .bp files defining units, they will be automatically included during
-blueprint loading.
+If an active sim mod has any .bp files defining units, they will be automatically included during
+blueprint loading. The blueprint id will be determined from the source file name if not specified.
 
-If a mod contains a blueprint matching the ID of an existing unit (e.g. `"uel0001"`) then the mod's
-blueprint will replace the original. If the `Merge = true` flag is set in the mod blueprint, it will
-be merged with the original can can override some fields while leaving others intact.
+If the blueprint contains a `BlueprintId` field matching the ID of an existing unit
+(e.g. `BlueprintId = "uel0001"`) then the mod's blueprint will replace the original. If the
+`Merge = true` flag is set in the mod blueprint, it will be merged with the original and can
+override some fields while leaving others intact (possibly also changed by other mods).
 
 
 ----------
 Balance changes
 ----------
 
-There are two ways to make balance changes.
+There are two main ways to make balance changes.
 
-First, a mod can contain a blueprint with the same ID as an existing blueprint. In this case it will
-completely override the original blueprint. Note that in order to replace an original non-unit
-blueprint, the mod must set the "BlueprintId" field to name the blueprint to be replaced. Otherwise,
-the BlueprintId is defaulted off the source file name. (Units don't have this problem because the
-BlueprintId is shortened and doesn't include the original path). Setting `Merge = true` while doing
-this will make it so that only the new fields in the modded blueprint are overridden, and the rest
-from the original blueprint are kept (possibly also changed from other mods).
+First, a mod can merge or override blueprints as described above.
 
-Second, a mod can hook the `/lua/system/Blueprints.lua` file and override the `ModBlueprints` to
-modify existing blueprints in an organized manner. Be sure to call the old function like this, so
-that other mods' changes aren't overridden:
+Second, a mod can hook the `/lua/system/Blueprints.lua` file and override the `ModBlueprints`
+function to modify existing blueprints in an organized manner. Be sure to call the old function like
+this, so that other mods' changes aren't overridden:
 
     -- introduce new scope to gaurentee our local variables don't overwrite anything in another mod
     do
         local oldModBlueprints = ModBlueprints
         function ModBlueprints(all_bps)
-			-- hook the old function
+			-- preserve original behavior or another mod's changes
 			oldModBlueprints(all_bps)
 			
 			-- now we do our modifications
@@ -189,7 +235,7 @@ Custom skins
 UI skins are pulled from the `/lua/skins/skins.lua#skins` table.
 Until a proper system is in place, call this when your mods loads:
 
-   import("/lua/skins/skins.lua").skins.<new skin name> = <skin table>
+    import("/lua/skins/skins.lua").skins.<new skin name> = <skin table>
 
 Take a look at the skins defined there for an idea of the fields you can set. When a field is not
 found, it will simply use whatever field is in the `default` table.
@@ -199,14 +245,51 @@ default). Note that new layouts are not supported, and even the existing ones do
 
 
 ----------
-Script Hooking
+AI Lobby Options
 ----------
 
-A mod can also contain a `/hook` folder, which contains files named the same way, matching the
-structure of the game's main data folder. After any script file is loaded, we check in the active
-mods to see if they define a hook of the same name; if so, we run the hook in the same environment
-as the original script. This allows hooks to tweak or replace individual functions, classes, or
-other data while still using the rest of the original code in the file.
+The lobby will pull lobby options from any mod in the player's mod folder, regardless of if the mod
+is active. It does this by importing all `/lua/AI/LobbyOptions/lobbyoptions.lua` files it finds in
+every mod. After that, it pulls the `AIOpts` global table and merges all of the options it finds
+under the AI Options header. The table should be a list of `ScenarioOption`s, each having the
+following format:
+
+    {
+        -- required default index into the values table the option starts at
+        default = 6,
+        -- title of the option
+        label = "<LOC aisettings_0119>AI Land Expansion Limit",
+        -- optional tooltip body
+        help = "<LOC aisettings_0120>Set the limit for the number of land expansions that each AI can have (will still be modified by the number of AIs).",
+        -- required unique identifier for the option 
+        key = 'LandExpansionsAllowed',
+        -- optional flag for multiplayer options; if true, will not show up in singleplayer
+        mponly = false,
+        -- String formatter used if any values don't have a `.text` key; the value is passed as a
+        -- formatting option to this format specifier. Required when non-`ScenarioOptionValue`s
+        -- are used.
+        value_text = "%s",
+        -- optional string formatter used for the tooltip body in the same manner as above
+        value_help = "<LOC aisettings_0123>%s Land Expansions Allowed",
+        -- list of values or `ScenarioOptionValue`s
+        values = {
+            -- a `ScenarioOptionValue` has the following format:
+            {
+                -- required display name for the value
+                text = "<LOC aisettings_0121>None",
+                -- optional tooltip body
+                help = "<LOC aisettings_0122>No Land Expansions Allowed",
+                -- the actual value that will be used if this is selected
+                key = '0',
+            },
+            '1', '2', '3', '4', '5', '6', '7', '8',
+            {
+                text = "<LOC aisettings_0131>Unlimited",
+                help = "<LOC aisettings_0132>Unlimited Land Expansions Allowed",
+                key = '99999',
+            },
+        },
+    },
 
 
 ----------
@@ -214,14 +297,14 @@ Strategic Icon Replacement
 ----------
 
 A UI mod can contain a `mod_icons.lua` file to specify strategic icons to replace for particular
-units. This is one of the few times a UI mod is allowed to modify things in the simulation
-(blueprints in this case), and as such it is done in a controlled manner (for example, the
-environment of the file is heavily restricted).
+units. This is one of the few times a UI mod will be able to have an affect things in the simulation
+(blueprints, in this case), and as such it is done in a controlled manner (for example, the
+environment of the file is heavily restricted, and only available inside the called function).
 
 Either a function `ScriptedIconAssignments` or a table `UnitIconAssignments` can be define (or both;
 the script is applied before the manual unit icon assignment table is). The table is a list of
 units-icons pairs to replace in the form `{BlueprintID = "id", IconSet = "filename"}` (see below).
-If defined, the function returns a table with the same format. 
+If defined, the function returns a table with the same format.
 
     ---@param units UnitBlueprint[] reference copy of the unit blueprints (modifying has no affect)
     ---@param projectiles ProjectileBlueprint[] for reference only; projectile strategic icons cannot be replaced
