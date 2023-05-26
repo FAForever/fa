@@ -241,7 +241,10 @@ local function NewSafeEnv()
         StringStarts = StringStarts,
         StringStartsWith = StringStartsWith,
     }
-    env.math.random = nil -- this can cause desyncs
+    -- these can cause desyncs
+    env.table.shuffle = nil
+    env.table.random = nil
+    env.math.random = nil
     return env
 end
 
