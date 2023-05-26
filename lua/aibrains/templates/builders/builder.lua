@@ -26,7 +26,7 @@ AIBuilder = ClassSimple {
     ---@param locationType string
     Create = function(self, brain, base, template, locationType)
         self.Template = template
-        self.Priority = template.Priority
+        self.Priority = template.BuilderPriority
 
         -- cache evaluation
         self.EvaluatedAtTick = -1

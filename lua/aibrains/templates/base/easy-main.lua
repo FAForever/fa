@@ -1,5 +1,5 @@
 BaseTemplateMain = AIBaseTemplate {
-    BaseTemplateName = 'Easy AI - Main base',
+    BaseTemplateName = 'Easy AI - Main base v1',
     EngineerManager = {
         BuilderGroupTemplates = {},
         BuilderGroupTemplatesNonCheating = {},
@@ -10,7 +10,7 @@ BaseTemplateMain = AIBaseTemplate {
     },
     FactoryManager = {
         BuilderGroupTemplates = {
-            import("/lua/aibrains/templates/builder-groups/builder-groups-easy-structure.lua").BuilderGroupsFactories
+            rawget(import("/lua/aibrains/templates/builder-groups/builder-groups-easy-structure.lua"), 'BuilderGroupsFactories')
         },
         BuilderGroupTemplatesNonCheating = {},
     }

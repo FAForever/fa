@@ -108,7 +108,6 @@ AIFactoryManager = Class(BuilderManager) {
             }
         }
 
-        self:AddBuilderType('Any')
         self.Trash:Add(ForkThread(self.UpdateFactoryThread, self))
     end,
 
@@ -132,7 +131,7 @@ AIFactoryManager = Class(BuilderManager) {
                 factoryBeingBuiltCount[tech] = count
                 total = total + count
             end
-            WaitTicks(6)
+            WaitTicks(10)
         end
     end,
 
@@ -230,7 +229,7 @@ AIFactoryManager = Class(BuilderManager) {
     OnUnitStopBuilding = function(self, unit, built)
         local blueprint = unit.Blueprint
         if blueprint.CategoriesHash['STRUCTURE'] and blueprint.CategoriesHash['FACTORY'] then
-            self:DelayOrder(unit, 'Any', 10)
+            -- self:DelayOrder(unit, 'Any', 10)
         end
     end,
 
@@ -301,6 +300,7 @@ AIFactoryManager = Class(BuilderManager) {
     ---@param factory Unit
     ---@param builderType AIBuilderType
     AssignOrder = function(self, factory, builderType)
+        error("AssignOrder")
         local factoryCache = FactoryCache
         factoryCache[1] = factory
 

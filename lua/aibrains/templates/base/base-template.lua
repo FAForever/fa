@@ -26,13 +26,7 @@ AIBaseTemplate = function(spec)
         WARN('Base builder template excluded for missing field "BaseTemplateName": ', reprs(spec))
         return nil
     end
-
-    -- required field
-    if not spec.BuilderGroupTemplates then
-        WARN('Base builder template excluded for missing field "BuilderGroupTemplates": ', reprs(spec))
-        return nil
-    end
-
+    
     -- default value
     if not spec.EngineerManager then
         spec.EngineerManager = {}

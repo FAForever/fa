@@ -4,11 +4,11 @@ UpgradeToTech2LandHQ = AIBuilderTemplate {
     BuilderConditions = {},
     BuilderType = 'TECH1',
     BuilderFaction = 'Any',
+    BuilderPriority = 400,
     BuilderData = {
         UseUpgradeToBlueprintField = true,
     },
 
-    Priority = 400,
 }
 
 UpgradeToTech3LandHQ = AIBuilderTemplate {
@@ -21,5 +21,5 @@ UpgradeToTech3LandHQ = AIBuilderTemplate {
         UseUpgradeToBlueprintField = true,
     },
 
-    Priority = 400,
+    BuilderPriority = 400,
 }
