@@ -34,6 +34,8 @@ local WeakValues = { __mode = 'v' }
 ---@field EngineerCount AIEngineerManagerCount      # Recomputed every 10 ticks
 AIEngineerManager = Class(AIBuilderManager) {
 
+    ManagerType = "EngineerManager",
+
     ---@param self AIEngineerManager
     ---@param brain AIBrain
     ---@param base AIBase

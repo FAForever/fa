@@ -11,7 +11,7 @@ local TableDeepCopy = table.deepcopy
 
 ---@class AIBuilder
 ---@field BuilderConditions AIBuilderCondition[]       # Converted conditions from the builder template
----@field BuilderData table                            # Converted data from the builder template
+---@field BuilderData AIBuilderData                            # Converted data from the builder template
 ---@field DisabledUntilTick number      # Allows us to temporarily disable builders
 ---@field EvaluatedAtTick number        # Allows us to cache evaluation results
 ---@field EvaluatedStatus boolean       # Allows us to cache evaluation results

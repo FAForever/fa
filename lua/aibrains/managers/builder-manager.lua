@@ -32,6 +32,8 @@ end
 ---@field Trash TrashBag                            # Trashbag of this manager
 AIBuilderManager = ClassSimple {
 
+    ManagerType = "BuilderManager",
+
     ---@param self AIBuilderManager
     ---@param brain AIBrain
     Create = function(self, brain, base, locationType)
@@ -113,15 +115,22 @@ AIBuilderManager = ClassSimple {
 
     --- Retrieves the highest builder that is valid with the given parameters
     ---@param self AIBuilderManager
-    ---@param builderType BuilderType
     ---@param platoon AIPlatoon
     ---@param unit Unit
     ---@return AIBuilder?
-    GetHighestBuilder = function(self, builderType, platoon, unit)
-        local builderData = self.BuilderData[builderType]
+    GetHighestBuilder = function(self, platoon, unit)
+        LOG("GetHighestBuilder")
+        local unitType = 'RESOURCE' -- todo
+        local builderData = self.BuilderData[unitType]
         if not builderData then
-            error('*BUILDERMANAGER ERROR: Invalid builder type - ' .. builderType)
+            reprsl(self.BuilderData)
+            return nil
         end
+
+        -- used to quickly reject builders
+        local unitTech = unit.Blueprint.TechCategory
+        local unitLayer = unit.Blueprint.LayerCategory
+        local unitFaction = unit.Blueprint.FactionCategory
 
         local tick = GetGameTick()
         local brain = self.Brain
@@ -134,6 +143,28 @@ AIBuilderManager = ClassSimple {
         local builders = builderData.Builders
         for k in builders do
             local builder = builders[k] --[[@as AIBuilder]]
+            local builderTemplate = builder.Template
+
+            -- check tech requirement
+            local builderTech = builderTemplate.BuilderTech
+            if builderTech and builderTech != unitTech then
+                SPEW(" - Invalid tech")
+                continue
+            end
+
+            -- check layer requirement
+            local builderLayer = builderTemplate.BuilderLayer
+            if builderLayer and builderLayer != unitLayer then
+                SPEW(" - Invalid layer")
+                continue
+            end
+
+            -- check faction requirement
+            local builderFaction = builderTemplate.BuilderFaction
+            if builderFaction and builderFaction != unitFaction then
+                SPEW(" - Invalid faction")
+                continue
+            end
 
             -- builders with no priority are ignored
             local priority = builder.Priority

@@ -4,8 +4,6 @@
 
 local BuilderManager = import("/lua/aibrains/managers/builder-manager.lua").AIBuilderManager
 
-local AIPlatoonSimpleStructure = import("/lua/aibrains/platoons/platoon-simple-structure.lua").AIPlatoonSimpleStructure
-
 local TableGetSize = table.getsize
 
 local WeakValues = { __mode = 'v' }
@@ -28,6 +26,8 @@ local WeakValues = { __mode = 'v' }
 ---@field StructureCount AIStructureManagerCounts               # Recomputed every 10 ticks
 ---@field StructureBeingBuiltCount AIStructureManagerCounts     # Recomputed every 10 ticks
 AIStructureManager = Class(BuilderManager) {
+
+    ManagerType = "StructureManager",
 
     ---@param self AIStructureManager
     ---@param brain AIBrain
@@ -131,7 +131,6 @@ AIStructureManager = Class(BuilderManager) {
     ---@param builder Unit
     ---@param layer Layer
     OnUnitStopBeingBuilt = function(self, unit, builder, layer)
-        LOG( "OnUnitStopBeingBuilt")
         local blueprint = unit.Blueprint
         if blueprint.CategoriesHash['STRUCTURE'] then
             local tech = blueprint.TechCategory
@@ -140,13 +139,12 @@ AIStructureManager = Class(BuilderManager) {
             self.Structures[tech][id] = unit
 
             -- create the platoon and start the behavior
-            LOG("Creating the platoon!")
             local brain = self.Brain
             local platoon = brain:MakePlatoon('', '') --[[@as AIPlatoonSimpleStructure]]
             platoon.Brain = self.Brain
             platoon.Base = self.Base
             
-            setmetatable(platoon, AIPlatoonSimpleStructure)
+            setmetatable(platoon, import("/lua/aibrains/platoons/platoon-simple-structure.lua").AIPlatoonSimpleStructure)
             brain:AssignUnitsToPlatoon(platoon, {unit}, 'Unassigned', 'None')
             ChangeState(platoon, platoon.Start)
         end

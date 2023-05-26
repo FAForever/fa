@@ -234,14 +234,12 @@ AIBrain = Class(StandardBrain, EconomyComponent) {
     ---@param builder Unit
     ---@param layer Layer
     OnUnitStopBeingBuilt = function(self, unit, builder, layer)
-        LOG("OnUnitStopBeingBuilt")
         local baseIdentifier = unit.AIBaseManager
         if not baseIdentifier then
             baseIdentifier = self:FindNearestBaseIdentifier(unit:GetPosition())
             unit.AIBaseManager = baseIdentifier
         end
 
-        LOG(baseIdentifier)
         local managers = self.BuilderManagers[baseIdentifier]
         if managers then
             managers:OnUnitStopBeingBuilt(unit, builder, layer)
