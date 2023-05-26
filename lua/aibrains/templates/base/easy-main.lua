@@ -5,13 +5,14 @@ BaseTemplateMain = AIBaseTemplate {
         BuilderGroupTemplatesNonCheating = {},
     },
     StructureManager = {
-        BuilderGroupTemplates = {},
+        BuilderGroupTemplates = {
+            rawget(import("/lua/aibrains/templates/builder-groups/builder-groups-easy-structure.lua"), 'BuilderGroupsFactories'),
+            rawget(import("/lua/aibrains/templates/builder-groups/builder-groups-easy-structure.lua"), 'BuilderGroupsResources')
+        },
         BuilderGroupTemplatesNonCheating = {},
     },
     FactoryManager = {
-        BuilderGroupTemplates = {
-            rawget(import("/lua/aibrains/templates/builder-groups/builder-groups-easy-structure.lua"), 'BuilderGroupsFactories')
-        },
+        BuilderGroupTemplates = {},
         BuilderGroupTemplatesNonCheating = {},
     }
 }

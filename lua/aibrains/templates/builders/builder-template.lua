@@ -1,5 +1,7 @@
 ---@declare-global
 
+---@alias AIBuilderLayer 'LAND' | 'NAVAL' | 'AIR'
+---@alias AIBuilderTech 'TECH1' | 'TECH2' | 'TECH3' | 'EXPERIMENTAL'
 ---@alias AIBuilderFactions 'ANY' | 'AEON' | 'CYBRAN' | 'SERAPHIM' | 'UEF'
 ---@alias AIBuilderTypes 'GATE' | ('TECH1' | 'TECH1LAND' | 'TECH1AIR' | 'TECH1NAVAL') | ('TECH2' | 'TECH2LAND' | 'TECH2AIR' | 'TECH2NAVAL') | ('TECH3'  | 'TECH3LAND'  | 'TECH3AIR'  | 'TECH3NAVAL') | ('EXPERIMENTAL' | 'EXPERIMENTALLAND' | 'EXPERIMENTALAIR' | 'EXPERIMENTALNAVAL')
 
@@ -26,8 +28,10 @@
 ---@field BuilderInstanceCount number
 ---@field BuilderInstances table
 ---@field BuilderName string
----@field BuilderType AIBuilderTypes
----@field BuilderFaction AIBuilderFactions
+---@field BuilderType string                        # Used to filter builders for a given unit
+---@field BuilderFaction FactionCategory | nil    # Used to quickly reject builders for a given unit
+---@field BuilderLayer LayerCategory | nil         # Used to quickly reject builders for a given unit
+---@field BuilderTech TechCategory | nil           # Used to quickly reject builders for a given unit
 ---@field BuilderPriority number
 ---@field BuilderPriorityFunction? fun(brain: AIBrain, base: AIBase)
 
@@ -69,11 +73,6 @@ AIBuilderTemplate = function(spec)
     if not spec.BuilderType then
         WARN('Builder excluded for missing field "BuilderType": ', reprs(spec))
         return nil
-    end
-
-    -- default value
-    if not spec.BuilderFaction then
-        spec.BuilderFaction = 'ANY'
     end
 
     -- default value
