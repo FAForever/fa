@@ -591,8 +591,8 @@ float3 ComputeNormal( sampler2D source, float2 uv, float3x3 rotationMatrix)
     return normalize( mul( normal, rotationMatrix));
 }
 
-float3 ApplyWaterColor(NORMALMAPPED_VERTEX vertex, float3 color) {
-    float4 waterColor = tex1D(WaterRampSampler, -vertex.depth.x / (surfaceElevation - abyssElevation));
+float3 ApplyWaterColor(float depth, float3 color) {
+    float4 waterColor = tex1D(WaterRampSampler, -depth / (surfaceElevation - abyssElevation));
     return lerp(color, waterColor.rgb, waterColor.w);
 }
 
@@ -2238,6 +2238,7 @@ float4 VertexNormalPS_HighFidelity( VERTEXNORMAL_VERTEX vertex,
 
     float alpha = mirrored ? 0.5 : vertex.material.g * albedo.a;
     float3 color = vertex.color.rgb * albedo.rgb * light;
+    color = ApplyWaterColor(vertex.depth.x, color);
 
 #ifdef DIRECT3D10
     if( alphaTestEnable )
@@ -2433,7 +2434,7 @@ float4 NormalMappedPS_02( NORMALMAPPED_VERTEX vertex,
     float emissive = glowMultiplier * specular.b * 0.02;
 
   float3 color = (albedo.rgb * 0.125) + ( emissive.r + (light * albedo.rgb) ) + phongMultiplicative + (phongAdditive);
-  color = ApplyWaterColor(vertex, color);
+  color = ApplyWaterColor(vertex.depth.x, color);
 
   float alpha = mirrored ? 0.5 : ( glow ? ( specular.b + glowMinimum ) : ( vertex.material.g * albedo.a )) + (phongAdditive * 0.13);
     //float alpha = mirrored ? 0.5 : ( glow ? ( specular.b + glowMinimum ) : ( vertex.material.g * albedo.a ));
@@ -2591,7 +2592,7 @@ float4 WreckagePS( NORMALMAPPED_VERTEX vertex) : COLOR0
     else
         color *= specular.b * 2;
 
-    color = ApplyWaterColor(vertex, color);
+    color = ApplyWaterColor(vertex.depth.x, color);
 
     return float4( color, glowMinimum );
 }
@@ -2622,6 +2623,7 @@ float4 NormalMappedTerrainPS( NORMALMAPPED_VERTEX vertex ) : COLOR
     float alpha = mirrored ? 0.5 : glowMinimum;
 
     float3 color = light * albedo.rgb;
+    color = ApplyWaterColor(vertex.depth.x, color);
 
     return float4(color,alpha);
 }
@@ -2881,7 +2883,7 @@ float4 AeonPS_02( NORMALMAPPED_VERTEX vertex, uniform bool hiDefShadows) : COLOR
     float alpha = mirrored ? 0.5 : specular.b + glowMinimum + (pow(specular.a * 1.5, 2) * 0.07 * (1.4 - teamColGlowCompensation)) + ((phongMultiplicativeGlow + phongAdditiveGlow) * 0.05);
     //alpha = 0;
     //color = light;
-    color = ApplyWaterColor(vertex, color);
+    color = ApplyWaterColor(vertex.depth.x, color);
 
     return float4( color, alpha );
 }
@@ -3027,7 +3029,7 @@ float4 UnitFalloffPS_02( NORMALMAPPED_VERTEX vertex, uniform bool hiDefShadows) 
     float mask = saturate( saturate(specular.b * 2) - diffuse.a );
     color *= 1 - mask;
     color += specular.b * 2 * mask;
-    color = ApplyWaterColor(vertex, color);
+    color = ApplyWaterColor(vertex.depth.x, color);
 
     // Bloom is only rendered where alpha > 0
     float teamColorGlow = (vertex.color.r + vertex.color.g + vertex.color.b) / 3;
@@ -3473,7 +3475,7 @@ float4 NormalMappedInsectPS_02( NORMALMAPPED_VERTEX vertex, uniform bool hiDefSh
 
     //Finish it
     float3 color = (albedo.rgb * 0.125) + emissive + (light * albedo.rgb) + (phongAdditive) + phongMultiplicative;
-    color = ApplyWaterColor(vertex, color);
+    color = ApplyWaterColor(vertex.depth.x, color);
 
     float alpha = mirrored ? 0.5 : specular.b + glowMinimum + (phongAdditive * 0.04);
     //color = phongAdditive;
