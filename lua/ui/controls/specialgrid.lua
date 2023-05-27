@@ -9,6 +9,10 @@ local TableGetN = table.getn
 
 ---@class SpecialGrid : Group
 SpecialGrid = ClassUI(Group) {
+
+    ---@param self SpecialGrid
+    ---@param parent Control
+    ---@param isVertical boolean
     __init = function(self, parent, isVertical)
         Group.__init(self, parent)
         self.top = 1
@@ -28,17 +32,26 @@ SpecialGrid = ClassUI(Group) {
 
     CreateElement = function()
     end,
-    
+
+    ---@param control Control
+    ---@param type type
     SetControlToType = function(control, type)
     end,
-    
+
+    ---@param control Control
+    ---@param vertical boolean
     SetToVertical = function(control, vertical)
         control.top = 1
         control._vertical = vertical
         control:ClearItems()
         control:CalcVisible()
     end,
-    
+
+    ---@param self SpecialGrid
+    ---@param scrollmin number
+    ---@param scrollmax number
+    ---@param pagemin number
+    ---@param pagemax number
     SetupScrollControls = function(self, scrollmin, scrollmax, pagemin, pagemax)
         if scrollmin then
             self._scrollMin = scrollmin
@@ -67,7 +80,8 @@ SpecialGrid = ClassUI(Group) {
             end
         end
     end,
-    
+
+    ---@param self SpecialGrid
     CalcVisible = function(self)
         local maxItemWidth = 0
         local itemIndex = 1
@@ -145,20 +159,25 @@ SpecialGrid = ClassUI(Group) {
             end
         end
     end,
-    
+
+    ---@param self SpecialGrid
     ClearItems = function(self)
         for i, item in self.Items do
             item:Destroy()
             self.Items[i] = nil
         end
     end,
-    
+
+    ---@param self SpecialGrid
+    ---@param lines number
     ScrollLines = function(self, lines)
         local top = self.top
         self.top = math.max(1, math.min(top + lines, (TableGetN(self.DisplayData) - TableGetN(self.Items))+1))
         self:CalcVisible()
     end,
-    
+
+    ---@param self SpecialGrid
+    ---@param newData any
     Refresh = function(self, newData)
         self.top = 1
         self.DisplayData = newData

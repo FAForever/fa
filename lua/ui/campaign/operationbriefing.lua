@@ -1,11 +1,8 @@
---*****************************************************************************
---* File: lua/modules/ui/campaign/operationbriefing.lua
---* Author: Chris Blackwell, Evan Pongress
---* Summary: campaign operations view
---*
---* Copyright � 2005 Gas Powered Games, Inc.  All rights reserved.
---*****************************************************************************
-
+-- File: lua/modules/ui/campaign/operationbriefing.lua
+-- Author: Chris Blackwell, Evan Pongress
+-- Summary: campaign operations view
+-- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--------------------------------------------------------------------
 local UIUtil = import("/lua/ui/uiutil.lua")
 local MenuCommon = import("/lua/ui/menus/menucommon.lua")
 local LayoutHelpers = import("/lua/maui/layouthelpers.lua")

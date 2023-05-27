@@ -557,3 +557,7 @@ end
 AIPlatoonSimpleRaidBehavior = function()
     SimCallback({Func = 'AIPlatoonSimpleRaidBehavior', Args = {}}, true)
 end
+
+AIPlatoonSimpleStructureBehavior = function()
+    SimCallback({Func = 'AIPlatoonSimpleStructureBehavior', Args = {}}, true)
+end

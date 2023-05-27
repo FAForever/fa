@@ -893,10 +893,6 @@ keyActions = {
 
     ['toggle_navui'] = {action = 'UI_Lua import("/lua/ui/game/navgenerator.lua").OpenWindow()',
         category = 'ai', order = 24},
-    ['toggle_platoon_behavior_silo'] = {action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").AssignPlatoonBehaviorSilo()',
-        category = 'ai', order = 24},
-    ['toggle_platoon_simple_raid'] = {action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").AIPlatoonSimpleRaidBehavior()',
-        category = 'ai', order = 24},
     ['toggle_ai_reclaim_grid_ui'] = {action = 'UI_Lua import("/lua/ui/game/gridreclaim.lua").OpenWindow()',
         category = 'ai', order = 24},
     ['toggle_ai_presence_grid_ui'] = {action = 'UI_Lua import("/lua/ui/game/gridpresence.lua").OpenWindow()',
@@ -904,6 +900,14 @@ keyActions = {
     ['toggle_ai_recon_grid_ui'] = {action = 'UI_Lua import("/lua/ui/game/gridrecon.lua").OpenWindow()',
         category = 'ai', order = 24},
     ['toggle_ai_economy_ui'] = {action = 'UI_Lua import("/lua/ui/game/AIBrainEconomyData.lua").OpenWindow()',
+        category = 'ai', order = 24},
+
+    ['toggle_platoon_behavior_silo'] = {action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").AssignPlatoonBehaviorSilo()',
+        category = 'ai', order = 24},
+    ['toggle_platoon_simple_raid'] = {action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").AIPlatoonSimpleRaidBehavior()',
+        category = 'ai', order = 24},
+
+    ['toggle_platoon_simple_structure'] = {action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").AIPlatoonSimpleStructureBehavior()',
         category = 'ai', order = 24},
     
 }
