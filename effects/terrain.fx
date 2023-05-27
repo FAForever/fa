@@ -1845,13 +1845,13 @@ float4 TerrainPBRNormalsPS ( VS_OUTPUT inV ) : COLOR
     float4 stratum5Normal = sampleNormal(Stratum5NormalSampler, position, Stratum5AlbedoTile, rotationMask);
     float4 stratum6Normal = sampleNormal(Stratum6NormalSampler, position, Stratum6AlbedoTile, rotationMask);
 
-    float stratum0Height = sampleHeight(position, 2 * Stratum0NormalTile, 0.6 * Stratum0NormalTile, 1).x;
-    float stratum1Height = sampleHeight(position, 2 * Stratum1NormalTile, 0.6 * Stratum1NormalTile, 2).x;
-    float stratum2Height = sampleHeight(position, 2 * Stratum2NormalTile, 0.6 * Stratum2NormalTile, 3).x;
-    float stratum3Height = sampleHeight(position, 2 * Stratum3NormalTile, 0.6 * Stratum3NormalTile, 0).y;
-    float stratum4Height = sampleHeight(position, 2 * Stratum4NormalTile, 0.6 * Stratum4NormalTile, 1).y;
-    float stratum5Height = sampleHeight(position, 2 * Stratum5NormalTile, 0.6 * Stratum5NormalTile, 2).y;
-    float stratum6Height = sampleHeight(position, 2 * Stratum6NormalTile, 0.6 * Stratum6NormalTile, 3).y;
+    float stratum0Height = sampleHeight(position, Stratum0AlbedoTile, Stratum0NormalTile, 1).x;
+    float stratum1Height = sampleHeight(position, Stratum1AlbedoTile, Stratum1NormalTile, 2).x;
+    float stratum2Height = sampleHeight(position, Stratum2AlbedoTile, Stratum2NormalTile, 3).x;
+    float stratum3Height = sampleHeight(position, Stratum3AlbedoTile, Stratum3NormalTile, 0).y;
+    float stratum4Height = sampleHeight(position, Stratum4AlbedoTile, Stratum4NormalTile, 1).y;
+    float stratum5Height = sampleHeight(position, Stratum5AlbedoTile, Stratum5NormalTile, 2).y;
+    float stratum6Height = sampleHeight(position, Stratum6AlbedoTile, Stratum6NormalTile, 3).y;
 
     float4 normal = lowerNormal;
     normal = splatBlendNormal(normal, stratum0Normal, 1.0, stratum0Height, mask0.x);
@@ -1886,13 +1886,13 @@ float4 TerrainPBRAlbedoPS ( VS_OUTPUT inV) : COLOR
     float4 stratum5Albedo = sampleAlbedo(Stratum5AlbedoSampler, position, Stratum5AlbedoTile, rotationMask);
     float4 stratum6Albedo = sampleAlbedo(Stratum6AlbedoSampler, position, Stratum6AlbedoTile, rotationMask);
 
-    float stratum0Height = sampleHeight(position, 2 * Stratum0NormalTile, 0.6 * Stratum0NormalTile, 1).x;
-    float stratum1Height = sampleHeight(position, 2 * Stratum1NormalTile, 0.6 * Stratum1NormalTile, 2).x;
-    float stratum2Height = sampleHeight(position, 2 * Stratum2NormalTile, 0.6 * Stratum2NormalTile, 3).x;
-    float stratum3Height = sampleHeight(position, 2 * Stratum3NormalTile, 0.6 * Stratum3NormalTile, 0).y;
-    float stratum4Height = sampleHeight(position, 2 * Stratum4NormalTile, 0.6 * Stratum4NormalTile, 1).y;
-    float stratum5Height = sampleHeight(position, 2 * Stratum5NormalTile, 0.6 * Stratum5NormalTile, 2).y;
-    float stratum6Height = sampleHeight(position, 2 * Stratum6NormalTile, 0.6 * Stratum6NormalTile, 3).y;
+    float stratum0Height = sampleHeight(position, Stratum0AlbedoTile, Stratum0NormalTile, 1).x;
+    float stratum1Height = sampleHeight(position, Stratum1AlbedoTile, Stratum1NormalTile, 2).x;
+    float stratum2Height = sampleHeight(position, Stratum2AlbedoTile, Stratum2NormalTile, 3).x;
+    float stratum3Height = sampleHeight(position, Stratum3AlbedoTile, Stratum3NormalTile, 0).y;
+    float stratum4Height = sampleHeight(position, Stratum4AlbedoTile, Stratum4NormalTile, 1).y;
+    float stratum5Height = sampleHeight(position, Stratum5AlbedoTile, Stratum5NormalTile, 2).y;
+    float stratum6Height = sampleHeight(position, Stratum6AlbedoTile, Stratum6NormalTile, 3).y;
 
     // store roughness in albedo so we get the roughness splatting for free
     lowerAlbedo.a    = sampleRoughness(position, LowerAlbedoTile,    0, rotationMask).x;
