@@ -2339,6 +2339,7 @@ float4 NormalMappedPS( NORMALMAPPED_VERTEX vertex,
 
     float emissive = glowMultiplier * specular.b;
     float3 color = albedo.rgb * ( emissive.r + light + phongMultiplicative) + phongAdditive;
+    color = ApplyWaterColor(vertex.depth.x, color);
 
     float alpha = mirrored ? 0.5 : ( glow ? ( specular.b + glowMinimum ) : ( vertex.material.g * albedo.a ));
 
