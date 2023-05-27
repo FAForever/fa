@@ -1,30 +1,16 @@
 local AIPlatoon = import("/lua/aibrains/platoons/platoon-base.lua").AIPlatoon
-local NavUtils = import("/lua/sim/navutils.lua")
-local MarkerUtils = import("/lua/sim/markerutilities.lua")
 
 -- upvalue scope for performance
-local Random = Random
 local IsDestroyed = IsDestroyed
 
-local TableGetn = table.getn
 local TableEmpty = table.empty
 
---- Table of stringified categories to help determine
-local UnitTypeOrder = {
-    'FACTORY',
-    'MASSEXTRACTION',
-    'ENERGYPRODUCTION',
-    'RADAR',
-    'SONAR',
-    'MASSSTORAGE',
-    'ENERGYSTORAGE',
-    'SHIELD',
-}
+local StructureBuilderTypes = import("/lua/aibrains/managers/structure-manager.lua").StructureBuilderTypes
 
 ---@class AIPlatoonSimpleStructure : AIPlatoon
 ---@field Base AIBase
 ---@field Brain EasyAIBrain
----@field BuilderType 'FACTORY' | 'SHIELD' | 'MASSEXTRACTION' | 'ENERGYPRODUCTION' | 'RADAR' | 'SONAR' | 'MASSSTORAGE' | 'ENERGYSTORAGE' | 'SHIELD'
+---@field BuilderType AIStructureBuilderTypes
 ---@field Builder AIBuilder | nil
 AIPlatoonSimpleStructure = Class(AIPlatoon) {
 
@@ -61,7 +47,7 @@ AIPlatoonSimpleStructure = Class(AIPlatoon) {
 
             -- determine unit type
             local categoriesHashed = units[1].Blueprint.CategoriesHash
-            for k, category in UnitTypeOrder do
+            for k, category in StructureBuilderTypes do
                 if categoriesHashed[category] then
                     self.BuilderType = category
                     break

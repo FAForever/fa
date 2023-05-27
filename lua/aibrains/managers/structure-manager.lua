@@ -8,6 +8,21 @@ local TableGetSize = table.getsize
 
 local WeakValues = { __mode = 'v' }
 
+--- Table of stringified categories to help determine
+---@type AIStructureBuilderTypes[]
+StructureBuilderTypes = {
+    'FACTORY',
+    'MASSEXTRACTION',
+    'ENERGYPRODUCTION',
+    'RADAR',
+    'SONAR',
+    'MASSSTORAGE',
+    'ENERGYSTORAGE',
+    'SHIELD',
+}
+
+---@alias AIStructureBuilderTypes 'FACTORY' | 'MASSEXTRACTION' | 'ENERGYPRODUCTION' | 'RADAR' | 'SONAR' | 'MASSSTORAGE' | 'ENERGYSTORAGE' | 'SHIELD'
+
 ---@class AIStructureManagerReferences 
 ---@field TECH1 table<EntityId, Unit>
 ---@field TECH2 table<EntityId, Unit>
@@ -21,6 +36,7 @@ local WeakValues = { __mode = 'v' }
 ---@field EXPERIMENTAL number
 
 ---@class AIStructureManager : AIBuilderManager
+---@field BuilderData table<AIStructureBuilderTypes, AIBuilderManagerData>   # Array table of builders
 ---@field Structures AIStructureManagerReferences
 ---@field StructuresBeingBuilt AIStructureManagerReferences     
 ---@field StructureCount AIStructureManagerCounts               # Recomputed every 10 ticks

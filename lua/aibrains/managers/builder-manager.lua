@@ -16,7 +16,7 @@ local function BuilderSortLambda(a, b)
     return a.Priority > b.Priority
 end
 
----@class AIBuilderManagerDataData
+---@class AIBuilderManagerData
 ---@field Builders AIBuilder[]
 ---@field NeedSort boolean
 
@@ -26,7 +26,7 @@ end
 ---@field Identifier string
 ---@field Brain AIBrain         # A reference to the brain that this manager belongs to
 ---@field Base AIBase           # A reference to the base that this manager belongs to
----@field BuilderData table<string, AIBuilderManagerDataData>   # Array table of builders
+---@field BuilderData table<string, AIBuilderManagerData>   # Array table of builders
 ---@field BuilderLookup table<string, AIBuilder>    # Hash table of builders
 ---@field BuilderThread? thread                     # Thread that runs the loop, does not exist when the manager is not active
 ---@field Trash TrashBag                            # Trashbag of this manager
