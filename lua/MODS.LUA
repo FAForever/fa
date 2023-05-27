@@ -192,13 +192,16 @@ The pattern for overriding a class method called `Method` in a class called `Cls
 Adding custom units
 ----------
 
-If an active sim mod has any .bp files defining units, they will be automatically included during
-blueprint loading. The blueprint id will be determined from the source file name if not specified.
+If an active sim mod has any .bp files, they will be automatically be run during blueprint loading
+to register any blueprint definitions inside. The ID of the blueprint can be specified by the
+`BlueprintId` field, but if absent, it will default to the source filename (lowercased) without the
+suffix (e.g. `"_unit.bp"`).
 
-If the blueprint contains a `BlueprintId` field matching the ID of an existing unit
-(e.g. `BlueprintId = "uel0001"`) then the mod's blueprint will replace the original. If the
-`Merge = true` flag is set in the mod blueprint, it will be merged with the original and can
-override some fields while leaving others intact (possibly also changed by other mods).
+If the blueprint ID ends up matching the ID of an existing unit, then the mod's blueprint will
+replace the one currently there unless the `Merge = true` flag is set in the blueprint. This will
+make the blueprint only add or override the fields it defines (including nested tables - the entire
+subtable isn't replaced in this mode), leaving the rest intact (which could possibly also have been
+changed by other mods).
 
 
 ----------
