@@ -864,5 +864,5 @@ Callbacks.GridPresenceDebugDisable = import("/lua/ai/gridpresence.lua").DisableD
 Callbacks.AIBrainEconomyDebugEnable = import("/lua/aibrains/components/economy.lua").EnableDebugging
 Callbacks.AIBrainEconomyDebugDisable = import("/lua/aibrains/components/economy.lua").DisableDebugging
 
-Callbacks.AIPlatoonSiloTacticalBehavior = import("/lua/aibrains/platoons/platoon-silo.lua").DebugAssignToUnits
 Callbacks.AIPlatoonSimpleRaidBehavior = import("/lua/aibrains/platoons/platoon-simple-raid.lua").DebugAssignToUnits
+Callbacks.AIPlatoonSimpleStructureBehavior = import("/lua/aibrains/platoons/platoon-simple-structure.lua").DebugAssignToUnits

@@ -189,14 +189,14 @@ BuilderGroup {
     Builder {
         BuilderName = 'T1 Radar Engineer',
         PlatoonTemplate = 'EngineerBuilder',
-        Priority = 930,
+        Priority = 950,
         BuilderConditions = {
             --DUNCAN - commented out
             --{ UCBC, 'EngineerLessAtLocation', { 'LocationType', 1, categories.ENGINEER - categories.COMMAND - categories.TECH1 } },
             { UCBC, 'UnitsLessAtLocation', { 'LocationType', 1, (categories.RADAR + categories.OMNI) * categories.STRUCTURE}},
             { EBC, 'GreaterThanEconIncomeOverTime',  { 0.5, 15 } },
             { IBC, 'BrainNotLowPowerMode', {} },
-            { EBC, 'GreaterThanEconEfficiencyCombined', { 0.7, 1.2 }}, --DUNCAN - was 0.9,1.2
+            { EBC, 'GreaterThanEconEfficiencyCombined', { 0.7, 1.05 }}, --DUNCAN - was 0.9,1.2
         },
         BuilderType = 'Any',
         BuilderData = {

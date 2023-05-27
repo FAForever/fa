@@ -26,11 +26,6 @@ doscript '/lua/system/GlobalBuilderTemplate.lua'
 doscript '/lua/system/GlobalBuilderGroup.lua'
 doscript '/lua/system/GlobalBaseTemplate.lua'
 
--- load builder systems
-doscript '/lua/aibrains/templates/base/base-template.lua'
-doscript '/lua/aibrains/templates/builder-groups/builder-group-template.lua'
-doscript '/lua/aibrains/templates/builder-groups/builder-template.lua'
-
 GameOverListeners = {}
 WaitTicks = coroutine.yield
 
