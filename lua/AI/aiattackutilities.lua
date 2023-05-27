@@ -7,6 +7,7 @@
 ------------------------------------------------------------------------------------------------------------------------
 
 local ScenarioUtils = import("/lua/sim/scenarioutilities.lua")
+local TransportUtils = import("/lua/ai/transportutilities.lua")
 local AIUtils = import("/lua/ai/aiutilities.lua")
 local SUtils = import("/lua/ai/sorianutilities.lua")
 
@@ -643,13 +644,14 @@ function AIPlatoonSquadAttackVector(aiBrain, platoon, bAggro)
         local usedTransports = false
         local position = platoon:GetPlatoonPosition()
         if (not path and reason == 'NoPath') or bNeedTransports then
-            usedTransports = SendPlatoonWithTransportsNoCheck(aiBrain, platoon, attackPos, true)
+            
+            usedTransports = TransportUtils.SendPlatoonWithTransports(aiBrain, platoon, attackPos, 1, true)
         -- Require transports over 500 away
         elseif VDist2Sq(position[1], position[3], attackPos[1], attackPos[3]) > 512*512 then
-            usedTransports = SendPlatoonWithTransportsNoCheck(aiBrain, platoon, attackPos, true)
+            usedTransports = TransportUtils.SendPlatoonWithTransports(aiBrain, platoon, attackPos, 1, true)
         -- use if possible at 250
         elseif VDist2Sq(position[1], position[3], attackPos[1], attackPos[3]) > 256*256 then
-            usedTransports = SendPlatoonWithTransportsNoCheck(aiBrain, platoon, attackPos, false)
+            usedTransports = TransportUtils.SendPlatoonWithTransports(aiBrain, platoon, attackPos, 1, false)
         end
 
         if not usedTransports then

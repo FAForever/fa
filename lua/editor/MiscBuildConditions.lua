@@ -206,8 +206,7 @@ end
 ---@return true | nil
 function ArmyNeedsTransports(aiBrain)
     if aiBrain then
-        local needTransports = aiBrain.NeedTransports
-        if needTransports and needTransports > 0 and aiBrain:GetNoRushTicks() <= 0 then
+        if aiBrain.NeedTransports and aiBrain:GetNoRushTicks() <= 0 then
             return true
         end
     end
