@@ -561,3 +561,16 @@ end
 AIPlatoonSimpleStructureBehavior = function()
     SimCallback({Func = 'AIPlatoonSimpleStructureBehavior', Args = {}}, true)
 end
+
+StoreCameraPosition = function()
+    local camera = GetCamera('WorldCamera')
+    local settings = camera:SaveSettings()
+    Prefs.SetToCurrentProfile('DebugCameraPosition', settings)
+end
+
+RestoreCameraPosition = function ()
+    -- ConExecute('cam_Free 1')
+    local camera = GetCamera('WorldCamera')
+    local settings = Prefs.GetFromCurrentProfile('DebugCameraPosition') --[[@as UserCameraSettings]]
+    camera:MoveTo(settings.Focus, { settings.Heading, settings.Pitch, 0}, settings.Zoom, 0)
+end
