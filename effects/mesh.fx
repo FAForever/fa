@@ -3484,6 +3484,13 @@ float4 NormalMappedInsectPS_02( NORMALMAPPED_VERTEX vertex, uniform bool hiDefSh
     return float4( color, alpha);
 }
 
+float shieldWaterAbsorption(float depth) {
+    float factor = 1.0;
+    if (depth < 0) factor = 0.6;
+    factor *= 1 - tex1D(WaterRampSampler, (-depth / (surfaceElevation - abyssElevation))).w;
+    return factor;
+}
+
 /// ShieldPS
 ///
 ///
@@ -3527,6 +3534,7 @@ float4 ShieldPS( EFFECT_VERTEX vertex ) : COLOR
 
     // Add in our alpha channel to mask UV pinching at the top of the sphere
     color.a *= colorMask.a;// * 0.75;
+    color.a *= shieldWaterAbsorption(vertex.depth.x);
 
     return color;
 }
@@ -3598,6 +3606,7 @@ float4 ShieldCybranPS( EFFECT_VERTEX vertex, uniform float alpha ) : COLOR
 
     // Alpha
     alpha += (albedo.r + albedo2.r) * 0.2;
+    alpha *= shieldWaterAbsorption(vertex.depth.x);
 
     return float4(finalColor, alpha);
 }
@@ -3653,6 +3662,8 @@ float4 ShieldAeonPS( EFFECT_NORMALMAPPED_VERTEX vertex ) : COLOR
     finalColor = lerp( colorMod1, finalColor, vertex.material.y);
 
     float alpha = 0.707 * ((environment.r + environment.g + environment.b) * 0.25) + terrainBand.r;
+    alpha *= shieldWaterAbsorption(vertex.depth.x);
+
     return float4( lerp( colorMod1, finalColor, vertex.material.y), alpha);
 }
 
@@ -3711,6 +3722,7 @@ float4 ShieldSeraphimPS( EFFECT_NORMALMAPPED_VERTEX vertex ) : COLOR
 
     ///Compute the final translucency value.
     float alpha = m *( dp2 * 0.3 + channel_color )*1.75;
+    alpha *= shieldWaterAbsorption(vertex.depth.x);
 
     // Multiples(0.425,0.76274,1.0) are to give a blue tint. The dot product of the normal and the world up vector is squared
     // so that the blue and whitish color fade off in an exponential gradient.
@@ -6571,7 +6583,7 @@ technique ShieldCybran_MedFidelity
     pass P0
     {
         AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGBA )
-        RasterizerState( Rasterizer_Cull_CW )
+        RasterizerState( Rasterizer_Cull_None )
         DepthState( Depth_Enable_LessEqual_Write_None )
 
         VertexShader = compile vs_1_1 FourUVTexShiftScaleVS( 1,1,2,1, -0.01,0, -0.002,0, 0,0.0012, 0.001,-0.0015 );
@@ -6581,7 +6593,7 @@ technique ShieldCybran_MedFidelity
     {
         AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGBA )
         DepthState( Depth_Enable_LessEqual_Write_None )
-        RasterizerState( Rasterizer_Cull_CW )
+        RasterizerState( Rasterizer_Cull_None )
 
         VertexShader = compile vs_1_1 ShieldPositionNormalOffsetVS( 0.01, 1,1,4,1, 0.01,0, -0.002,0, 0,0.0012, 0.001,-0.003 );
         PixelShader = compile ps_2_0 ShieldCybranPS(0.17);
@@ -6601,7 +6613,7 @@ technique ShieldCybran_LowFidelity
     pass P0
     {
         AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGBA )
-        RasterizerState( Rasterizer_Cull_CW )
+        RasterizerState( Rasterizer_Cull_None )
         DepthState( Depth_Enable_LessEqual_Write_None )
 
         VertexShader = compile vs_1_1 ThreeUVTexShiftScaleLoFiVS( 1,2,1, 0,0, 0,0.002, 0.001,-0.003 );
@@ -6624,7 +6636,7 @@ technique ShieldAeon_MedFidelity
     pass P0
     {
         AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGBA )
-        RasterizerState( Rasterizer_Cull_CW )
+        RasterizerState( Rasterizer_Cull_None )
         DepthState( Depth_Enable_LessEqual_Write_None )
 
         VertexShader = compile vs_1_1 ShieldNormalVS( 1,12,8,3, 0,0, 0,0.032, 0.012,-0.032, 0,0.0012 );
@@ -6645,7 +6657,7 @@ technique ShieldAeon_LowFidelity
     pass P0
     {
         AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGBA )
-        RasterizerState( Rasterizer_Cull_CW )
+        RasterizerState( Rasterizer_Cull_None )
         DepthState( Depth_Enable_LessEqual_Write_None )
 
         VertexShader = compile vs_1_1 ThreeUVTexShiftScaleLoFiVS( 1,12,8, 0,0, 0,0.032, 0.012,-0.032 );
@@ -6672,7 +6684,7 @@ technique ShieldSeraphim_MedFidelity
     {
         AlphaState( AlphaBlend_SrcAlpha_One_Write_RGB )
 
-        RasterizerState( Rasterizer_Cull_CW )
+        RasterizerState( Rasterizer_Cull_None )
         DepthState( Depth_Enable_LessEqual_Write_None )
 
         VertexShader = compile vs_1_1 ShieldNormalVS(5,1,1,11, -0.00153,-0.0159, 0,0, 0.003,-0.0045, -0.005,-0.045 );
@@ -6696,7 +6708,7 @@ technique ShieldSeraphim_LowFidelity
     {
         AlphaState( AlphaBlend_SrcAlpha_One_Write_RGB )
 
-        RasterizerState( Rasterizer_Cull_CW )
+        RasterizerState( Rasterizer_Cull_None )
         DepthState( Depth_Enable_LessEqual_Write_None )
 
         VertexShader = compile vs_1_1 ThreeUVTexShiftScaleLoFiVS( 1,12,8, 0,0, 0,0.032, 0.012,-0.032 );
