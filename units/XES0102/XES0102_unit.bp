@@ -294,7 +294,7 @@ UnitBlueprint {
             FiringRandomness = 0,
             FiringTolerance = 15,
             Label = 'AntiTorpedo',
-            MaxRadius = 30,
+            MaxRadius = 25,
             MinRadius = 10,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
