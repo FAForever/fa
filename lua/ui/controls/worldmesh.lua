@@ -20,9 +20,9 @@
 -- SetFractionHealthParameter(float param)
 -- SetLifetimeParameter(float param)
 --  The parameter functions set values that can be accessed by the shader
-
 ---@class WorldMesh : moho.world_mesh_methods
 WorldMesh = ClassUI(moho.world_mesh_methods) {
+    ---@param self WorldMesh
     __init = function(self)
         InternalCreateWorldMesh(self)
     end,

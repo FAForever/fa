@@ -921,6 +921,8 @@ StructureUnit = ClassUnit(Unit) {
 ---@field BuildEffectBones string[]
 FactoryUnit = ClassUnit(StructureUnit) {
 
+    RollOffAnimationRate = 10,
+
     ---@param self FactoryUnit
     OnCreate = function(self)
         StructureUnit.OnCreate(self)
@@ -1145,7 +1147,7 @@ FactoryUnit = ClassUnit(StructureUnit) {
         local bp = self.Blueprint
         local bpAnim = bp.Display.AnimationFinishBuildLand
         if bpAnim and EntityCategoryContains(categories.LAND, unitBeingBuilt) then
-            self.RollOffAnim = CreateAnimator(self):PlayAnim(bpAnim)
+            self.RollOffAnim = CreateAnimator(self):PlayAnim(bpAnim):SetRate(self.RollOffAnimationRate)
             self.Trash:Add(self.RollOffAnim)
             WaitTicks(1)
             WaitFor(self.RollOffAnim)
@@ -1265,7 +1267,7 @@ FactoryUnit = ClassUnit(StructureUnit) {
     ---@param self FactoryUnit
     PlayFxRollOffEnd = function(self)
         if self.RollOffAnim then
-            self.RollOffAnim:SetRate(-1)
+            self.RollOffAnim:SetRate(-1 * self.RollOffAnimationRate)
             WaitFor(self.RollOffAnim)
             self.RollOffAnim:Destroy()
             self.RollOffAnim = nil

@@ -20,30 +20,38 @@ local NavigateDistanceThresholdSquared = 20 * 20
 ---@field OpportunityToRaid Vector | nil
 AIPlatoonSimpleRaidBehavior = Class(AIPlatoon) {
 
+    PlatoonName = 'SimpleRaidBehavior',
+
     Start = State {
+
+        StateName = 'Start',
+
         --- Initial state of any state machine
         ---@param self AIPlatoonSimpleRaidBehavior
         Main = function(self)
             -- requires expansion markers
             if not import("/lua/sim/markerutilities/expansions.lua").IsGenerated() then
-                WARN("AI simple raid behavior requires generated expansion markers")
-                self:ChangeState('Error')
+                self:LogWarning('requires generated expansion markers')
+                self:ChangeState(self.Error)
                 return
             end
 
             -- requires navigational mesh
             if not NavUtils.IsGenerated() then
-                WARN("AI simple raid behavior requires navigational mesh")
-                self:ChangeState('Error')
+                self:LogWarning('requires generated navigational mesh')
+                self:ChangeState(self.Error)
                 return
             end
 
-            self:ChangeState('Searching')
+            self:ChangeState(self.Searching)
             return
         end,
     },
 
     Searching = State {
+
+        StateName = 'Searching',
+
         --- The platoon searches for a target
         ---@param self AIPlatoonSimpleRaidBehavior
         Main = function(self)
@@ -82,8 +90,8 @@ AIPlatoonSimpleRaidBehavior = Class(AIPlatoon) {
 
                 -- something odd happened: there are no expansions with a matching label
                 if candidateCount == 0 then
-                    WARN(string.format("AI simple raid behavior expansion error: no expansion markers on navigational label (%d)", label))
-                    self:ChangeState('Error')
+                    self:LogWarning(string.format('no expansions found on label %d', label))
+                    self:ChangeState(self.Error)
                     return
                 end
 
@@ -103,14 +111,17 @@ AIPlatoonSimpleRaidBehavior = Class(AIPlatoon) {
                 return
             else
                 -- something odd happened: try again with another unit
-                WARN(string.format("AI simple raid behavior label error: %s", error))
-                self:ChangeState('Searching')
+                self:LogWarning(string.format('no label found', label))
+                self:ChangeState(self.Searching)
                 return
             end
         end,
     },
 
     Navigating = State {
+
+        StateName = 'Navigating',
+
         --- The platoon navigates towards a target, picking up oppertunities as it finds them
         ---@param self AIPlatoonSimpleRaidBehavior
         Main = function(self)
@@ -121,8 +132,8 @@ AIPlatoonSimpleRaidBehavior = Class(AIPlatoon) {
             -- sanity check
             local destination = self.LocationToRaid
             if not destination then
-                WARN(string.format("AI simple raid behavior Navigating error: no location defined to Navigating to"))
-                self:ChangeState('Searching')
+                self:LogWarning(string.format('no destination to navigate to'))
+                self:ChangeState(self.Searching)
                 return
             end
 
@@ -149,14 +160,14 @@ AIPlatoonSimpleRaidBehavior = Class(AIPlatoon) {
 
                 -- something odd happened: no direction found
                 if not waypoint then
-                    WARN(string.format("AI simple raid behavior error: unable to find a path"))
-                    self:ChangeState('Searching')
+                    self:LogWarning(string.format('no path found'))
+                    self:ChangeState(self.Searching)
                     return
                 end
 
                 -- we're near the destination, better start raiding it!
                 if waypoint == destination then
-                    self:ChangeState('RaidingTarget')
+                    self:ChangeState(self.RaidingTarget)
                     return
                 end
 
@@ -211,7 +222,7 @@ AIPlatoonSimpleRaidBehavior = Class(AIPlatoon) {
                                 local threat = brain:GetThreatAtPosition(cache, 0, true, 'AntiSurface')
                                 if threat == 0 then
                                     self.OpportunityToRaid = { info[1], GetSurfaceHeight(info[1], info[2]), info[2] }
-                                    self:ChangeState('RaidingOpportunity')
+                                    self:ChangeState(self.RaidingOpportunity)
                                     return
                                 end
                             end
@@ -228,6 +239,9 @@ AIPlatoonSimpleRaidBehavior = Class(AIPlatoon) {
     },
 
     RaidingTarget = State {
+
+        StateName = 'RaidingTarget',
+
         --- The platoon raids the target
         ---@param self AIPlatoonSimpleRaidBehavior
         Main = function(self)
@@ -236,8 +250,8 @@ AIPlatoonSimpleRaidBehavior = Class(AIPlatoon) {
             -- sanity check
             local location = self.LocationToRaid
             if not location then
-                WARN(string.format("AI simple raid behavior error: no location to raid"))
-                self:ChangeState('Searching')
+                self:LogWarning(string.format('no location to raid'))
+                self:ChangeState(self.Searching)
                 return
             end
 
@@ -249,7 +263,7 @@ AIPlatoonSimpleRaidBehavior = Class(AIPlatoon) {
                 -- check if there is something to raid
                 local opportunity = brain:GetThreatAtPosition(location, 0, true, 'Economy')
                 if opportunity == 0 then
-                    self:ChangeState('Searching')
+                    self:ChangeState(self.Searching)
                     return
                 end
 
@@ -261,7 +275,7 @@ AIPlatoonSimpleRaidBehavior = Class(AIPlatoon) {
                     if threatTable and not TableEmpty(threatTable) then
                         local info = threatTable[Random(1, TableGetn(threatTable))]
                         self.ThreatToEvade = { info[1], GetSurfaceHeight(info[1], info[2]), info[2] }
-                        self:ChangeState('Retreating')
+                        self:ChangeState(self.Retreating)
                         return
                     end
                 end
@@ -278,6 +292,9 @@ AIPlatoonSimpleRaidBehavior = Class(AIPlatoon) {
     },
 
     RaidingOpportunity = State {
+
+        StateName = 'RaidingOpportunity',
+
         --- The platoon raids the opportunity it walked into
         ---@param self AIPlatoonSimpleRaidBehavior
         Main = function(self)
@@ -286,8 +303,8 @@ AIPlatoonSimpleRaidBehavior = Class(AIPlatoon) {
             -- sanity check
             local location = self.OpportunityToRaid
             if not location then
-                WARN(string.format("AI simple raid behavior error: no opportunity to raid"))
-                self:ChangeState('Navigating')
+                self:LogWarning(string.format('no opportunity to raid'))
+                self:ChangeState(self.Navigating)
                 return
             end
 
@@ -318,7 +335,7 @@ AIPlatoonSimpleRaidBehavior = Class(AIPlatoon) {
                 -- check for opportunities
                 local opportunity = brain:GetThreatAtPosition(location, 0, true, 'Economy')
                 if opportunity == 0 then
-                    self:ChangeState('Navigating')
+                    self:ChangeState(self.Navigating)
                     return
                 end
 
@@ -330,7 +347,7 @@ AIPlatoonSimpleRaidBehavior = Class(AIPlatoon) {
                     if threatTable and not TableEmpty(threatTable) then
                         local info = threatTable[Random(1, TableGetn(threatTable))]
                         self.ThreatToEvade = { info[1], GetSurfaceHeight(info[1], info[2]), info[2] }
-                        self:ChangeState('Retreating')
+                        self:ChangeState(self.Retreating)
                         return
                     end
                 end
@@ -340,8 +357,8 @@ AIPlatoonSimpleRaidBehavior = Class(AIPlatoon) {
                     -- setup attack units
                     local attackOffset, error = NavUtils.RandomDirectionFrom('Land', location, 10, 8)       -- TODO: remove magic numbers
                     if not attackOffset then
-                        WARN(string.format("AI simple raid behavior error: no alternative directions found because of %s", tostring(error)))
-                        self:ChangeState('Error')
+                        self:LogWarning(string.format('no alternative directions found to evade'))
+                        self:ChangeState(self.Error)
                         return
                     end
 
@@ -354,6 +371,9 @@ AIPlatoonSimpleRaidBehavior = Class(AIPlatoon) {
     },
 
     Retreating = State {
+
+        StateName = "Retreating",
+
         --- The platoon retreats from a threat
         ---@param self AIPlatoonSimpleRaidBehavior
         Main = function(self)
@@ -362,8 +382,8 @@ AIPlatoonSimpleRaidBehavior = Class(AIPlatoon) {
             -- sanity check
             local location = self.ThreatToEvade
             if not location then
-                WARN(string.format("AI simple raid behavior error: no opportunity to raid"))
-                self:ChangeState('Navigating')
+                self:LogWarning(string.format('no threat to evade'))
+                self:ChangeState(self.Navigating)
                 return
             end
 
@@ -394,9 +414,9 @@ AIPlatoonSimpleRaidBehavior = Class(AIPlatoon) {
                     local dz = position[3] - wz
                     if dx * dx + dz * dz < NavigateDistanceThresholdSquared then
                         if self.RetreatCount < 3 then
-                            self:ChangeState('Navigating')
+                            self:ChangeState(self.Navigating)
                         else
-                            self:ChangeState('Searching')
+                            self:ChangeState(self.Searching)
                         end
                         return
                     end
@@ -415,7 +435,6 @@ AIPlatoonSimpleRaidBehavior = Class(AIPlatoon) {
     ---@param self AIPlatoon
     ---@param units Unit[]
     OnUnitsAddedToAttackSquad = function(self, units)
-        LOG("OnUnitsAddedToAttackSquad")
         local cache = { false }
         local count = TableGetn(units)
 
@@ -434,7 +453,6 @@ AIPlatoonSimpleRaidBehavior = Class(AIPlatoon) {
     ---@param self AIPlatoon
     ---@param units Unit[]
     OnUnitsAddedToScoutSquad = function(self, units)
-        LOG("OnUnitsAddedToScoutSquad")
         local cache = { false }
         local attacks = self:GetSquadUnits('Attack')
         local count = TableGetn(attacks)
@@ -449,24 +467,6 @@ AIPlatoonSimpleRaidBehavior = Class(AIPlatoon) {
         for k, scout in units do 
             scout:SetFireState(1)
         end
-    end,
-
-    ---@param self AIPlatoon
-    ---@param units Unit[]
-    OnUnitsAddedToArtillerySquad = function(self, units)
-        WARN("AI simple raid behavior error: artillery squad is unsupported")
-    end,
-
-    ---@param self AIPlatoon
-    ---@param units Unit[]
-    OnUnitsAddedToSupportSquad = function(self, units)
-        WARN("AI simple raid behavior error: support squad is unsupported")
-    end,
-
-    ---@param self AIPlatoon
-    ---@param units Unit[]
-    OnUnitsAddedToGuardSquad = function(self, units)
-        WARN("AI simple raid behavior error: guard squad is unsupported")
     end,
 }
 

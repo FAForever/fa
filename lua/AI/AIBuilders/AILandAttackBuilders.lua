@@ -50,8 +50,8 @@ BuilderGroup {
         PlatoonTemplate = 'T1LandDFBot',
         Priority = 825, --DUNCAN - was 925
         BuilderConditions = {
-            { UCBC, 'FactoryLessAtLocation', { 'LocationType', 1, categories.FACTORY * ( categories.TECH2 + categories.TECH3 ) }},
             { MIBC, 'LessThanGameTime', { 240 } }, --DUNCAN - was 300
+            { UCBC, 'FactoryLessAtLocation', { 'LocationType', 1, categories.FACTORY * ( categories.TECH2 + categories.TECH3 ) }},
             --{ UCBC, 'FactoryLessAtLocation', { 'LocationType', 2, 'MOBILE LAND DIRECTFIRE' } },
             --{ EBC, 'GreaterThanEconEfficiencyOverTime', { 0.8, 1.05 }},
             --{ IBC, 'BrainNotLowPowerMode', {} },
@@ -63,6 +63,7 @@ BuilderGroup {
        PlatoonTemplate = 'T1LandDFBot',
        Priority = 825, --DUNCAN - was 925
        BuilderConditions = {
+        { MIBC, 'LessThanGameTime', { 360 } }, --DUNCAN - was 300
         { UCBC, 'HaveLessThanUnitsWithCategory', { 8, categories.MOBILE * categories.LAND * categories.TECH1 * categories.BOT - categories.ENGINEER - categories.ANTIAIR } },
         { UCBC, 'HaveLessThanUnitsWithCategory', { 1, categories.FACTORY * (categories.TECH2 + categories.TECH3) } },
         { UCBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.TRANSPORTFOCUS * categories.TECH1 } },
@@ -81,7 +82,7 @@ BuilderGroup {
             { UCBC, 'HaveLessThanUnitsWithCategory', { 150, categories.MOBILE * categories.LAND * categories.TECH1 - categories.ENGINEER - categories.ANTIAIR } },
             { UCBC, 'FactoryLessAtLocation', { 'LocationType', 1, categories.FACTORY * ( categories.TECH2 + categories.TECH3 ) }},
             --{ UCBC, 'UnitsLessAtLocation', { 'LocationType', 2, 'MOBILE LAND DIRECTFIRE' } },
-            { EBC, 'GreaterThanEconEfficiencyOverTime', { 0.6, 1.05 }},
+            { EBC, 'GreaterThanEconEfficiencyOverTime', { 0.6, 1.0 }},
             --{ IBC, 'BrainNotLowPowerMode', {} },
         },
         BuilderType = 'Land',
@@ -96,7 +97,7 @@ BuilderGroup {
             { UCBC, 'HaveLessThanUnitsWithCategory', { 150, categories.MOBILE * categories.LAND * categories.TECH1 - categories.ENGINEER - categories.ANTIAIR } },
             { UCBC, 'FactoryLessAtLocation', { 'LocationType', 1, categories.FACTORY * categories.LAND * categories.TECH3 }},
             { IBC, 'BrainNotLowPowerMode', {} },
-            { EBC, 'GreaterThanEconEfficiencyOverTime', { 0.6, 1.05 }},
+            { EBC, 'GreaterThanEconEfficiencyOverTime', { 0.6, 1.0 }},
         },
         BuilderType = 'Land',
     },
@@ -110,7 +111,7 @@ BuilderGroup {
             { UCBC, 'HaveLessThanUnitsWithCategory', { 150, categories.MOBILE * categories.LAND * categories.TECH1 - categories.ENGINEER - categories.ANTIAIR  } },
             { UCBC, 'FactoryGreaterAtLocation', { 'LocationType', 0, categories.FACTORY * categories.LAND * categories.TECH3 }},
             { IBC, 'BrainNotLowPowerMode', {} },
-            { EBC, 'GreaterThanEconEfficiencyOverTime', { 0.6, 1.05 }},
+            { EBC, 'GreaterThanEconEfficiencyOverTime', { 0.6, 1.0 }},
             { UCBC, 'UnitCapCheckLess', { .8 } }, --DUNCAN - added
         },
         BuilderType = 'Land',
@@ -123,10 +124,10 @@ BuilderGroup {
         BuilderConditions = {
             { UCBC, 'HaveLessThanUnitsWithCategory', { 150, categories.MOBILE * categories.LAND * categories.TECH1 - categories.ENGINEER - categories.ANTIAIR } },
             --{ UCBC, 'LocationFactoriesBuildingLess', { 'LocationType', 1, 'INDIRECTFIRE LAND MOBILE' } },
-            { UCBC, 'HaveUnitRatio', { 0.3, categories.LAND * categories.INDIRECTFIRE * categories.MOBILE, '<=', categories.LAND * categories.DIRECTFIRE * categories.MOBILE}},
+            { UCBC, 'HaveUnitRatio', { 0.3, categories.LAND * categories.INDIRECTFIRE * categories.MOBILE - categories.BOT, '<=', categories.LAND * categories.DIRECTFIRE * categories.MOBILE}},
             { UCBC, 'FactoryLessAtLocation', { 'LocationType', 1, categories.FACTORY * categories.LAND * categories.TECH3 }},
             --{ IBC, 'BrainNotLowPowerMode', {} },
-            { EBC, 'GreaterThanEconEfficiencyOverTime', { 0.6, 1.05 }},
+            { EBC, 'GreaterThanEconEfficiencyOverTime', { 0.6, 1.0 }},
             { UCBC, 'UnitCapCheckLess', { .8 } }, --DUNCAN - added
         },
         BuilderType = 'Land',
@@ -148,7 +149,7 @@ BuilderGroup {
             { UCBC, 'HaveUnitRatio', { 0.1, categories.LAND * categories.ANTIAIR, '<=', categories.LAND * categories.DIRECTFIRE}},
             { UCBC, 'LocationFactoriesBuildingLess', { 'LocationType', 1, categories.LAND * categories.ANTIAIR * categories.MOBILE } },
             --{ UCBC, 'UnitsLessAtLocation', { 'LocationType', 2, 'ANTIAIR' } },
-            { EBC, 'GreaterThanEconEfficiencyOverTime', { 0.6, 1.05 }},
+            { EBC, 'GreaterThanEconEfficiencyOverTime', { 0.6, 1.0 }},
         },
         BuilderType = 'Land',
     },
@@ -163,7 +164,7 @@ BuilderGroup {
             { UCBC, 'LocationFactoriesBuildingLess', { 'LocationType', 1, categories.LAND * categories.ANTIAIR * categories.MOBILE } },
             { UCBC, 'FactoryLessAtLocation', { 'LocationType', 1, categories.FACTORY * categories.LAND * ( categories.TECH2 + categories.TECH3 ) }},
             { UCBC, 'HaveLessThanUnitsWithCategory', { 4, categories.FACTORY * categories.LAND * categories.TECH3 }},
-            { EBC, 'GreaterThanEconEfficiencyOverTime', { 0.6, 1.05 }},
+            { EBC, 'GreaterThanEconEfficiencyOverTime', { 0.6, 1.0 }},
         },
         BuilderType = 'Land',
     },
@@ -185,7 +186,7 @@ BuilderGroup {
             { UCBC, 'HaveLessThanUnitsWithCategory', { 150, categories.MOBILE * categories.LAND * categories.TECH1 - categories.ENGINEER - categories.ANTIAIR } },
             { TBC, 'EnemyThreatGreaterThanValueAtBase', { 'LocationType', 0, 'Land' } },
             { IBC, 'BrainNotLowPowerMode', {} },
-            { EBC, 'GreaterThanEconEfficiencyOverTime', { 0.7, 1.05 }},
+            { EBC, 'GreaterThanEconEfficiencyOverTime', { 0.6, 1.0 }},
             { UCBC, 'LocationFactoriesBuildingLess', { 'LocationType', 2, categories.DIRECTFIRE * categories.LAND * categories.MOBILE } },
         },
         BuilderType = 'Land',
