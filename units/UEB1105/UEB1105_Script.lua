@@ -10,7 +10,7 @@
 local TEnergyStorageUnit = import("/lua/terranunits.lua").TEnergyStorageUnit
 
 ---@class UEB1105 : TEnergyStorageUnit
-UEB1105 = Class(TEnergyStorageUnit) {
+UEB1105 = ClassUnit(TEnergyStorageUnit) {
 
     OnCreate = function(self)
         TEnergyStorageUnit.OnCreate(self)

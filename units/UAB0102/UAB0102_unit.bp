@@ -69,6 +69,10 @@ UnitBlueprint {
             '<LOC ability_upgradable>Upgradeable',
         },
         AnimationUpgrade = '/units/uab0102/uab0102_aupgrade.sca',
+        AnimationUpgradeTable = {
+            uab0202 = '/units/uab0102/uab0102_aupgrade.sca',
+            zab9502 = '/units/uab0102/uab0102_aopen_sup.sca'
+        },
         BuildAttachBone = 'Attachpoint',
         DamageEffects = {
             {

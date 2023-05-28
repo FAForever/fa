@@ -11,6 +11,6 @@
 local CConstructionUnit = import("/lua/cybranunits.lua").CConstructionUnit
 
 ---@class URL0309 : CConstructionUnit
-URL0309 = Class(CConstructionUnit) {}
+URL0309 = ClassUnit(CConstructionUnit) {}
 
 TypeClass = URL0309

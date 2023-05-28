@@ -19,12 +19,12 @@ local DefaultBeamWeapon = WeaponFile.DefaultBeamWeapon
 local EffectTemplate = import("/lua/effecttemplates.lua")
 
 ---@class AIFBallisticMortarWeapon : DefaultProjectileWeapon
-AIFBallisticMortarWeapon = Class(DefaultProjectileWeapon) {
+AIFBallisticMortarWeapon = ClassWeapon(DefaultProjectileWeapon) {
     FxMuzzleFlash = EffectTemplate.AIFBallisticMortarFlash02,
 }
 
 ---@class ADFReactonCannon : DefaultProjectileWeapon
-ADFReactonCannon = Class(DefaultProjectileWeapon) {
+ADFReactonCannon = ClassWeapon(DefaultProjectileWeapon) {
     FxMuzzleFlash = {'/effects/emitters/reacton_cannon_muzzle_charge_01_emit.bp',
         '/effects/emitters/reacton_cannon_muzzle_charge_02_emit.bp',
         '/effects/emitters/reacton_cannon_muzzle_charge_03_emit.bp',
@@ -35,7 +35,7 @@ ADFReactonCannon = Class(DefaultProjectileWeapon) {
 }
 
 ---@class ADFOverchargeWeapon : OverchargeWeapon
-ADFOverchargeWeapon = Class(WeaponFile.OverchargeWeapon) {
+ADFOverchargeWeapon = ClassWeapon(WeaponFile.OverchargeWeapon) {
     FxMuzzleFlash = EffectTemplate.ACommanderOverchargeFlash01,
     DesiredWeaponLabel = 'RightDisruptor'
 }
@@ -43,7 +43,7 @@ ADFOverchargeWeapon = Class(WeaponFile.OverchargeWeapon) {
 ---@class ADFTractorClaw : Weapon
 ---@field TractorTrash TrashBag
 ---@field RunningTractorThread boolean
-ADFTractorClaw = Class(Weapon) {
+ADFTractorClaw = ClassWeapon(Weapon) {
 
     VacuumFx = EffectTemplate.ACollossusTractorBeamVacuum01,
     TractorFx = EffectTemplate.ATractorAmbient,
@@ -93,7 +93,7 @@ ADFTractorClaw = Class(Weapon) {
     OnFire = function(self)
         -- only tractor one target at a time
         if self.RunningTractorThread then
-            self:ForkThread(self.OnInvalidTargetThread)
+            self.Trash:Add(ForkThread(self.OnInvalidTargetThread,self))
             return
         end
 
@@ -106,13 +106,13 @@ ADFTractorClaw = Class(Weapon) {
         -- only tractor actual units
         local target = self:GetUnitBehindTarget(blipOrUnit)
         if not target then
-            self:ForkThread(self.OnInvalidTargetThread)
+            self.Trash:Add(ForkThread(self.OnInvalidTargetThread,self))
             return
         end
 
         -- only tract units that are not being tracted at the moment
         if target.Tractored then
-            self:ForkThread(self.OnInvalidTargetThread)
+            self.Trash:Add(ForkThread(self.OnInvalidTargetThread,self))
             return
         end
 
@@ -128,7 +128,7 @@ ADFTractorClaw = Class(Weapon) {
     OnInvalidTargetThread = function(self)
         self:ResetTarget()
         self:SetEnabled(false)
-        WaitSeconds(0.4)
+        WaitTicks(5)
         if not IsDestroyed(self) then
             self:SetEnabled(true)
         end
@@ -137,7 +137,7 @@ ADFTractorClaw = Class(Weapon) {
     --- Attempts to retrieve the unit behind the target, can return false if the blip is too far away from the unit due to jamming
     ---@param self ADFTractorClaw
     ---@param blip Blip | Unit
-    ---@return Unit | boolean
+    ---@return Blip | Unit | false
     GetUnitBehindTarget = function(self, blip)
         if IsUnit(blip) then
             -- return the unit
@@ -213,15 +213,25 @@ ADFTractorClaw = Class(Weapon) {
             slider:SetSpeed(velocity)
             slider:SetGoal(0, 0, 0)
 
-            trash:Add(CreateRotator(target, 0, 'x', nil, 0, 15 + Random(0, 45), 20 + Random(0, 80)))
-            trash:Add(CreateRotator(target, 0, 'y', nil, 0, 15 + Random(0, 15), 20 + Random(0, 80)))
-            trash:Add(CreateRotator(target, 0, 'z', nil, 0, 15 + Random(0, 45), 20 + Random(0, 80)))
+            local rotatorA = CreateRotator(target, 0, 'x', nil, 0, 15 + Random(0, 45), 20 + Random(0, 80))
+            trash:Add(rotatorA)
+
+            local rotatorB = CreateRotator(target, 0, 'y', nil, 0, 15 + Random(0, 15), 20 + Random(0, 80))
+            trash:Add(rotatorB)
+
+            local rotatorC = CreateRotator(target, 0, 'z', nil, 0, 15 + Random(0, 45), 20 + Random(0, 80))
+            trash:Add(rotatorC)
 
             WaitTicks(1)
             WaitFor(slider)
 
             -- we're at the arm, do destruction effects
             if (not IsDestroyed(target)) and (not IsDestroyed(unit)) and (not IsDestroyed(self)) then
+
+                -- stop rotating
+                rotatorA:SetGoal(0)
+                rotatorB:SetGoal(0)
+                rotatorC:SetGoal(0)
 
                 -- create crush effect
                 for k, effect in self.CrushFx do
@@ -232,11 +242,9 @@ ADFTractorClaw = Class(Weapon) {
                 CreateLightParticle(unit, muzzle, self.Army, 1, 4, 'glow_02', 'ramp_blue_16')
                 WaitTicks(1)
 
-                if not IsDestroyed(unit) then 
-                    
+                if not IsDestroyed(unit) then
 
-                    target.CanTakeDamage = true
-                    while not IsDestroyed(target) and not IsDestroyed(unit) and target:GetHealth() >= 730 do
+                    while not IsDestroyed(target) and not IsDestroyed(unit) and not unit.Dead and target:GetHealth() >= 730 do
                         Damage(unit, bonePosition, target, 729, "Normal")
                         Explosion.CreateScalableUnitExplosion(target, 1, true)
                         WaitTicks(11)
@@ -249,15 +257,15 @@ ADFTractorClaw = Class(Weapon) {
                     unit:DetachAll(muzzle)
                     slider:Destroy()
 
-                    -- remove the shield, if it is there
-                    if target.MyShield then
-                        target.MyShield:TurnOff()
-                    end
-
                     -- create thread to take into account the fall
-                    self:ForkThread(self.TargetFallThread, target, trash, muzzle)
-                    self:ResetTarget()
-                else 
+                    if not IsDestroyed(self) then
+                        self:ResetTarget()
+                        self:ForkThread(self.TargetFallThread, target, trash, muzzle)
+                    else
+                        self:MakeVulnerable(target)
+                        trash:Destroy()
+                    end
+                else
                     self:MakeVulnerable(target)
                     trash:Destroy()
                 end
@@ -283,7 +291,7 @@ ADFTractorClaw = Class(Weapon) {
 
         -- clean up the effects once the unit starts falling
         if not IsDestroyed(self) then
-            self:ForkThread(self.TrashDelayedDestroyThread, trash)
+            self.Trash:Add(ForkThread(self.TrashDelayedDestroyThread, self, trash))
         end
 
         -- if the unit is magically already destroyed, then just return - nothing we can do,
@@ -293,29 +301,31 @@ ADFTractorClaw = Class(Weapon) {
         end
 
         -- air units drop on their own
-        if target.Blueprint.CategoriesHash.AIR then
+        if target.Blueprint.CategoriesHash["AIR"] then
             target:Kill()
         -- assist land units with a natural drop
-        else 
+        else
             -- let it create the wreck, with the rotator manipulators attached
             target.PlayDeathAnimation = false
             target.DestructionExplosionWaitDelayMin = 0
             target.DestructionExplosionWaitDelayMax = 0
 
-            -- create a projectile that matches the velocity / orientation 
-            local vx, vy, vz = target:GetVelocity()
+            -- create a projectile to help identify when the unit is on the terrain
             local projectile = target:CreateProjectileAtBone('/effects/entities/ADFTractorFall01/ADFTractorFall01_proj.bp', 0)
-            projectile:SetVelocity(10 * vx, 10 * vy, 10 * vz)
-            Warp(projectile, target:GetPosition(), target:GetOrientation())
 
-            -- happens when the projectile is created underwater
-            if IsDestroyed(projectile) then
-                target:Kill()
+            -- is not defined when the projectile is created underwater
+            if not projectile.Blueprint then
+                Explosion.CreateScalableUnitExplosion(target, 0, true)
+                target:Destroy()
+                return
             end
 
+            -- match velocity and orientation of unit
+            local vx, vy, vz = target:GetVelocity()
+            projectile:SetVelocity(10 * vx, 10 * vy, 10 * vz)
+            Warp(projectile, target:GetPosition(), target:GetOrientation())
             projectile.OnImpact = function(projectile)
                 if not IsDestroyed(target) then
-                    target.CanTakeDamage = true
                     target:Kill()
 
                     CreateLightParticle(target, 0, self.Army, 4, 2, 'glow_02', 'ramp_blue_16')
@@ -343,8 +353,6 @@ ADFTractorClaw = Class(Weapon) {
     MakeImmune = function (self, target)
         if not IsDestroyed(target) then
             target:SetDoNotTarget(true)
-            target.CanTakeDamage = false
-            target.DisallowCollisions = true
         end
     end,
 
@@ -353,17 +361,14 @@ ADFTractorClaw = Class(Weapon) {
     MakeVulnerable = function (self, target)
         if not IsDestroyed(target) then
             target:SetDoNotTarget(false)
-            target.CanTakeDamage = true
-            target.DisallowCollisions = false
             target.Tractored = nil
         end
     end,
 }
 
 ---@class ADFTractorClawStructure : DefaultBeamWeapon
-ADFTractorClawStructure = Class(DefaultBeamWeapon) {
+ADFTractorClawStructure = ClassWeapon(DefaultBeamWeapon) {
     BeamType = TractorClawCollisionBeam,
-    FxMuzzleFlash = {},
 }
 
 local CategoriesChronoDampener = categories.MOBILE - (categories.COMMAND + categories.EXPERIMENTAL + categories.AIR)
@@ -468,49 +473,47 @@ ADFChronoDampener = Class(DefaultProjectileWeapon) {
 }
 
 ---@class ADFQuadLaserLightWeapon : DefaultProjectileWeapon
-ADFQuadLaserLightWeapon = Class(DefaultProjectileWeapon) {
+ADFQuadLaserLightWeapon = ClassWeapon(DefaultProjectileWeapon) {
     FxMuzzleFlash = {'/effects/emitters/flash_04_emit.bp'},
 }
 
 ---@class ADFLaserLightWeapon : DefaultProjectileWeapon
-ADFLaserLightWeapon = Class(DefaultProjectileWeapon) {
+ADFLaserLightWeapon = ClassWeapon(DefaultProjectileWeapon) {
     FxMuzzleFlash = {'/effects/emitters/flash_04_emit.bp'},
 }
 
 ---@class ADFSonicPulsarWeapon : DefaultProjectileWeapon
-ADFSonicPulsarWeapon = Class(DefaultProjectileWeapon) {
+ADFSonicPulsarWeapon = ClassWeapon(DefaultProjectileWeapon) {
     FxMuzzleFlash = {'/effects/emitters/flash_02_emit.bp'},
     FxMuzzleFlashScale = 0.5,
 }
 
 ---@class ADFLaserHeavyWeapon : DefaultProjectileWeapon
-ADFLaserHeavyWeapon = Class(DefaultProjectileWeapon) {
-    FxChargeMuzzleFlash = {},
-}
+ADFLaserHeavyWeapon = ClassWeapon(DefaultProjectileWeapon) {}
 
 ---@class ADFGravitonProjectorWeapon : DefaultProjectileWeapon
-ADFGravitonProjectorWeapon = Class(DefaultProjectileWeapon) {
+ADFGravitonProjectorWeapon = ClassWeapon(DefaultProjectileWeapon) {
     FxMuzzleFlash = EffectTemplate.AGravitonBolterMuzzleFlash01,
 }
 
 ---@class ADFDisruptorCannonWeapon : DefaultProjectileWeapon
-ADFDisruptorCannonWeapon = Class(DefaultProjectileWeapon) {
+ADFDisruptorCannonWeapon = ClassWeapon(DefaultProjectileWeapon) {
     FxMuzzleFlash = EffectTemplate.ADisruptorCannonMuzzle01,
 }
 
 ---@class ADFDisruptorWeapon : DefaultProjectileWeapon
-ADFDisruptorWeapon = Class(DefaultProjectileWeapon) {
+ADFDisruptorWeapon = ClassWeapon(DefaultProjectileWeapon) {
     FxMuzzleFlash = EffectTemplate.ASDisruptorCannonMuzzle01,
     FxChargeMuzzleFlash = EffectTemplate.ASDisruptorCannonChargeMuzzle01,
 }
 
 ---@class ADFCannonQuantumWeapon : DefaultProjectileWeapon
-ADFCannonQuantumWeapon = Class(DefaultProjectileWeapon) {
+ADFCannonQuantumWeapon = ClassWeapon(DefaultProjectileWeapon) {
     FxMuzzleFlash = EffectTemplate.AQuantumCannonMuzzle01,
 }
 
 ---@class ADFCannonOblivionWeapon : DefaultProjectileWeapon
-ADFCannonOblivionWeapon = Class(DefaultProjectileWeapon) {
+ADFCannonOblivionWeapon = ClassWeapon(DefaultProjectileWeapon) {
     FxChargeMuzzleFlash = {
         '/effects/emitters/oblivion_cannon_flash_01_emit.bp',
         '/effects/emitters/oblivion_cannon_flash_02_emit.bp',
@@ -519,13 +522,13 @@ ADFCannonOblivionWeapon = Class(DefaultProjectileWeapon) {
 }
 
 ---@class ADFCannonOblivionWeapon02 : DefaultProjectileWeapon
-ADFCannonOblivionWeapon02 = Class(DefaultProjectileWeapon) {
+ADFCannonOblivionWeapon02 = ClassWeapon(DefaultProjectileWeapon) {
     FxMuzzleFlash = EffectTemplate.AOblivionCannonMuzzleFlash02,
     FxChargeMuzzleFlash = EffectTemplate.AOblivionCannonChargeMuzzleFlash02,
 }
 
 ---@class ADFCannonOblivionWeapon03 : DefaultProjectileWeapon
-ADFCannonOblivionWeapon03 = Class(DefaultProjectileWeapon) {
+ADFCannonOblivionWeapon03 = ClassWeapon(DefaultProjectileWeapon) {
     FxChargeMuzzleFlash = {
         '/effects/emitters/oblivion_cannon_flash_04_emit.bp',
         '/effects/emitters/oblivion_cannon_flash_05_emit.bp',
@@ -534,46 +537,17 @@ ADFCannonOblivionWeapon03 = Class(DefaultProjectileWeapon) {
 }
 
 ---@class AIFMortarWeapon : DefaultProjectileWeapon
-AIFMortarWeapon = Class(DefaultProjectileWeapon) {
-    FxMuzzleFlash = {},
-}
+AIFMortarWeapon = ClassWeapon(DefaultProjectileWeapon) {}
 
 ---@class AIFBombGravitonWeapon : DefaultProjectileWeapon
-AIFBombGravitonWeapon = Class(DefaultProjectileWeapon) {}
+AIFBombGravitonWeapon = ClassWeapon(DefaultProjectileWeapon) {}
 
 ---@class AIFArtilleryMiasmaShellWeapon : DefaultProjectileWeapon
-AIFArtilleryMiasmaShellWeapon = Class(DefaultProjectileWeapon) {
-    FxMuzzleFlash = {},
-
-    ---@param self AIFArtilleryMiasmaShellWeapon
-    ---@param bone Bone
-    ---@return Projectile
-    CreateProjectileForWeapon = function(self, bone)
-        local proj = self:CreateProjectile(bone)
-        local damageTable = self:GetDamageTable()
-        local blueprint = self:GetBlueprint()
-        local data = {
-            Instigator = self.unit,
-            Damage = blueprint.DoTDamage,
-            Duration = blueprint.DoTDuration,
-            Frequency = blueprint.DoTFrequency,
-            Radius = blueprint.DamageRadius,
-            Type = 'Normal',
-            DamageFriendly = blueprint.DamageFriendly,
-        }
-
-        if proj and not proj:BeenDestroyed() then
-            proj:PassDamageData(damageTable)
-            proj:PassData(data)
-        end
-
-        return proj
-    end,
-}
+AIFArtilleryMiasmaShellWeapon = ClassWeapon(DefaultProjectileWeapon) {}
 
 ---@class AIFArtillerySonanceShellWeapon : DefaultProjectileWeapon
-AIFArtillerySonanceShellWeapon = Class(DefaultProjectileWeapon) {
-    FxMuzzleFlash = {
+AIFArtillerySonanceShellWeapon = ClassWeapon(DefaultProjectileWeapon) {
+    FxChargeMuzzleFlash = {
         '/effects/emitters/aeon_sonance_muzzle_01_emit.bp',
         '/effects/emitters/aeon_sonance_muzzle_02_emit.bp',
         '/effects/emitters/aeon_sonance_muzzle_03_emit.bp',
@@ -581,120 +555,39 @@ AIFArtillerySonanceShellWeapon = Class(DefaultProjectileWeapon) {
 }
 
 ---@class AIFBombQuarkWeapon : DefaultProjectileWeapon
-AIFBombQuarkWeapon = Class(DefaultProjectileWeapon) {
+AIFBombQuarkWeapon = ClassWeapon(DefaultProjectileWeapon) {
     FxMuzzleFlash = {'/effects/emitters/antiair_muzzle_fire_02_emit.bp', },
 }
 
 ---@class AANDepthChargeBombWeapon : DefaultProjectileWeapon
-AANDepthChargeBombWeapon = Class(DefaultProjectileWeapon) {
+AANDepthChargeBombWeapon = ClassWeapon(DefaultProjectileWeapon) {
     FxMuzzleFlash = {'/effects/emitters/antiair_muzzle_fire_02_emit.bp', },
-
-    ---@param self AANDepthChargeBombWeapon
-    ---@param bone Bone
-    ---@return Projectile
-    CreateProjectileForWeapon = function(self, bone)
-        local proj = self:CreateProjectile(bone)
-        local damageTable = self:GetDamageTable()
-        local blueprint = self:GetBlueprint()
-        local data = {
-            Army = self.unit.Army,
-            Instigator = self.unit,
-            StartRadius = blueprint.DOTStartRadius,
-            EndRadius = blueprint.DOTEndRadius,
-            DOTtype = blueprint.DOTtype,
-            Damage = blueprint.DoTDamage,
-            Duration = blueprint.DoTDuration,
-            Frequency = blueprint.DoTFrequency,
-            Type = 'Normal',
-        }
-
-        if proj and not proj:BeenDestroyed() then
-            proj:PassDamageData(damageTable)
-            proj:PassData(data)
-        end
-
-        return proj
-    end,
 }
 
 ---@class AANDepthChargeBombWeapon02 : DefaultProjectileWeapon
-AANDepthChargeBombWeapon02 = Class(DefaultProjectileWeapon) {
+AANDepthChargeBombWeapon02 = ClassWeapon(DefaultProjectileWeapon) {
     FxMuzzleFlash = {'/effects/emitters/antiair_muzzle_fire_01_emit.bp', },
-
-    ---@param self AANDepthChargeBombWeapon02
-    ---@param bone Bone
-    ---@return Projectile
-    CreateProjectileForWeapon = function(self, bone)
-        local proj = self:CreateProjectile(bone)
-        local damageTable = self:GetDamageTable()
-        local blueprint = self:GetBlueprint()
-        local data = {
-            Army = self.unit.Army,
-            Instigator = self.unit,
-            StartRadius = blueprint.DOTStartRadius,
-            EndRadius = blueprint.DOTEndRadius,
-            DOTtype = blueprint.DOTtype,
-            Damage = blueprint.DoTDamage,
-            Duration = blueprint.DoTDuration,
-            Frequency = blueprint.DoTFrequency,
-            Type = 'Normal',
-        }
-
-        if proj and not proj:BeenDestroyed() then
-            proj:PassDamageData(damageTable)
-            proj:PassData(data)
-        end
-
-        return proj
-    end,
 }
 
 ---@class AANTorpedoCluster : DefaultProjectileWeapon
-AANTorpedoCluster = Class(DefaultProjectileWeapon) {
+AANTorpedoCluster = ClassWeapon(DefaultProjectileWeapon) {
     FxMuzzleFlash = {'/effects/emitters/aeon_torpedocluster_flash_01_emit.bp', },
-
-    ---@param self AANTorpedoCluster
-    ---@param bone Bone
-    ---@return Projectile
-    CreateProjectileForWeapon = function(self, bone)
-        local proj = self:CreateProjectile(bone)
-        local damageTable = self:GetDamageTable()
-        local blueprint = self:GetBlueprint()
-        local data = {
-            Army = self.unit.Army,
-            Instigator = self.unit,
-            StartRadius = blueprint.DOTStartRadius,
-            EndRadius = blueprint.DOTEndRadius,
-            DOTtype = blueprint.DOTtype,
-            Damage = blueprint.DoTDamage,
-            Duration = blueprint.DoTDuration,
-            Frequency = blueprint.DoTFrequency,
-            Type = 'Normal',
-        }
-
-        if proj and not proj:BeenDestroyed() then
-            proj:PassDamageData(damageTable)
-            proj:PassData(data)
-        end
-
-        return proj
-    end,
 }
 
 ---@class AIFSmartCharge : DefaultProjectileWeapon
-AIFSmartCharge = Class(DefaultProjectileWeapon) {
+AIFSmartCharge = ClassWeapon(DefaultProjectileWeapon) {
 
     ---@param self AIFSmartCharge
     ---@param muzzle string
     CreateProjectileAtMuzzle = function(self, muzzle)
         local proj = DefaultProjectileWeapon.CreateProjectileAtMuzzle(self, muzzle)
-        local tbl = self:GetBlueprint().DepthCharge
+        local tbl = self.Blueprint.DepthCharge
         proj:AddDepthCharge(tbl)
     end,
 }
 
 ---@class AANChronoTorpedoWeapon : DefaultProjectileWeapon
-AANChronoTorpedoWeapon = Class(DefaultProjectileWeapon) {
+AANChronoTorpedoWeapon = ClassWeapon(DefaultProjectileWeapon) {
     FxMuzzleFlash = {
         '/effects/emitters/default_muzzle_flash_01_emit.bp',
         '/effects/emitters/default_muzzle_flash_02_emit.bp',
@@ -703,34 +596,30 @@ AANChronoTorpedoWeapon = Class(DefaultProjectileWeapon) {
 }
 
 ---@class AIFQuasarAntiTorpedoWeapon : DefaultProjectileWeapon
-AIFQuasarAntiTorpedoWeapon = Class(DefaultProjectileWeapon) {
+AIFQuasarAntiTorpedoWeapon = ClassWeapon(DefaultProjectileWeapon) {
     FxMuzzleFlash = EffectTemplate.AQuasarAntiTorpedoFlash,
 }
 
 ---@class AKamikazeWeapon : KamikazeWeapon
-AKamikazeWeapon = Class(KamikazeWeapon) {
-    FxMuzzleFlash = {},
-}
+AKamikazeWeapon = ClassWeapon(KamikazeWeapon) {}
 
 ---@class AIFQuantumWarhead : DefaultProjectileWeapon
-AIFQuantumWarhead = Class(DefaultProjectileWeapon) {
-}
+AIFQuantumWarhead = ClassWeapon(DefaultProjectileWeapon) {}
 
 ---@class ACruiseMissileWeapon : DefaultProjectileWeapon
-ACruiseMissileWeapon = Class(DefaultProjectileWeapon) {
+ACruiseMissileWeapon = ClassWeapon(DefaultProjectileWeapon) {
     FxMuzzleFlash = {'/effects/emitters/aeon_missile_launch_01_emit.bp', },
 }
 
 ---@class ADFLaserHighIntensityWeapon : DefaultProjectileWeapon
-ADFLaserHighIntensityWeapon = Class(DefaultProjectileWeapon) {
+ADFLaserHighIntensityWeapon = ClassWeapon(DefaultProjectileWeapon) {
     FxMuzzleFlash = EffectTemplate.AHighIntensityLaserFlash01,
 }
 
 ---@class AAATemporalFizzWeapon : DefaultProjectileWeapon
-AAATemporalFizzWeapon = Class(DefaultProjectileWeapon) {
+AAATemporalFizzWeapon = ClassWeapon(DefaultProjectileWeapon) {
     FxChargeEffects = {'/effects/emitters/temporal_fizz_muzzle_charge_01_emit.bp', },
     FxMuzzleFlash = {'/effects/emitters/temporal_fizz_muzzle_flash_01_emit.bp', },
-    ChargeEffectMuzzles = {},
 
     ---@param self AAATemporalFizzWeapon
     PlayFxRackSalvoChargeSequence = function(self)
@@ -744,46 +633,46 @@ AAATemporalFizzWeapon = Class(DefaultProjectileWeapon) {
 }
 
 ---@class AAASonicPulseBatteryWeapon : DefaultProjectileWeapon
-AAASonicPulseBatteryWeapon = Class(DefaultProjectileWeapon) {
+AAASonicPulseBatteryWeapon = ClassWeapon(DefaultProjectileWeapon) {
     FxMuzzleFlash = {'/effects/emitters/sonic_pulse_muzzle_flash_01_emit.bp', },
 }
 
 ---@class AAAZealotMissileWeapon : DefaultProjectileWeapon
-AAAZealotMissileWeapon = Class(DefaultProjectileWeapon) {
+AAAZealotMissileWeapon = ClassWeapon(DefaultProjectileWeapon) {
     FxMuzzleFlash = EffectTemplate.CZealotLaunch01,
 }
 
 ---@class AAAZealot02MissileWeapon : DefaultProjectileWeapon
-AAAZealot02MissileWeapon = Class(DefaultProjectileWeapon) {
+AAAZealot02MissileWeapon = ClassWeapon(DefaultProjectileWeapon) {
     FxMuzzleFlash = {'/effects/emitters/flash_04_emit.bp'},
 }
 
 ---@class AAALightDisplacementAutocannonMissileWeapon : DefaultProjectileWeapon
-AAALightDisplacementAutocannonMissileWeapon = Class(DefaultProjectileWeapon) {
+AAALightDisplacementAutocannonMissileWeapon = ClassWeapon(DefaultProjectileWeapon) {
     FxMuzzleFlash = EffectTemplate.ALightDisplacementAutocannonMissileMuzzleFlash,
 }
 
 ---@class AAAAutocannonQuantumWeapon : DefaultProjectileWeapon
-AAAAutocannonQuantumWeapon = Class(DefaultProjectileWeapon) {
+AAAAutocannonQuantumWeapon = ClassWeapon(DefaultProjectileWeapon) {
     FxMuzzleFlash = {'/effects/emitters/quantum_displacement_cannon_flash_01_emit.bp', },
 
 }
 
 ---@class AIFMissileTacticalSerpentineWeapon : DefaultProjectileWeapon
-AIFMissileTacticalSerpentineWeapon = Class(DefaultProjectileWeapon) {
+AIFMissileTacticalSerpentineWeapon = ClassWeapon(DefaultProjectileWeapon) {
     FxMuzzleFlash = {'/effects/emitters/aeon_missile_launch_02_emit.bp', },
 }
 
 ---@class AIFMissileTacticalSerpentine02Weapon : DefaultProjectileWeapon
-AIFMissileTacticalSerpentine02Weapon = Class(DefaultProjectileWeapon) {
+AIFMissileTacticalSerpentine02Weapon = ClassWeapon(DefaultProjectileWeapon) {
     FxMuzzleFlash = EffectTemplate.ASerpFlash01,
 }
 
 ---@class AQuantumBeamGenerator : DefaultBeamWeapon
-AQuantumBeamGenerator = Class(DefaultBeamWeapon) {
+AQuantumBeamGenerator = ClassWeapon(DefaultBeamWeapon) {
     BeamType = QuantumBeamGeneratorCollisionBeam,
 
-    FxUpackingChargeEffects = {},
+    FxUpackingChargeEffects = import("/lua/effecttemplates.lua").NoEffects,
     FxUpackingChargeEffectScale = 1,
 
     ---@param self AQuantumBeamGenerator
@@ -799,27 +688,27 @@ AQuantumBeamGenerator = Class(DefaultBeamWeapon) {
 }
 
 ---@class AAMSaintWeapon : DefaultProjectileWeapon
-AAMSaintWeapon = Class(DefaultProjectileWeapon) {
+AAMSaintWeapon = ClassWeapon(DefaultProjectileWeapon) {
     FxMuzzleFlash = EffectTemplate.ASaintLaunch01,
 }
 
 ---@class AAMWillOWisp : DefaultProjectileWeapon
-AAMWillOWisp = Class(DefaultProjectileWeapon) {
+AAMWillOWisp = ClassWeapon(DefaultProjectileWeapon) {
     FxMuzzleFlash = EffectTemplate.AAntiMissileFlareFlash,
 }
 
 ---@class ADFPhasonLaser : DefaultBeamWeapon
-ADFPhasonLaser = Class(DefaultBeamWeapon) {
+ADFPhasonLaser = ClassWeapon(DefaultBeamWeapon) {
     BeamType = CollisionBeamFile.PhasonLaserCollisionBeam,
-    FxMuzzleFlash = {},
-    FxChargeMuzzleFlash = {},
+    FxMuzzleFlash = import("/lua/effecttemplates.lua").NoEffects,
+    FxChargeMuzzleFlash = import("/lua/effecttemplates.lua").NoEffects,
     FxUpackingChargeEffects = EffectTemplate.CMicrowaveLaserCharge01,
     FxUpackingChargeEffectScale = 1,
 
     ---@param self ADFPhasonLaser
     PlayFxWeaponUnpackSequence = function(self)
         if not self.ContBeamOn then
-            local bp = self:GetBlueprint()
+            local bp = self.Blueprint
             for _, v in self.FxUpackingChargeEffects do
                 for i, j in bp.RackBones[self.CurrentRackSalvoNumber].MuzzleBones do
                     CreateAttachedEmitter(self.unit, j, self.unit.Army, v):ScaleEmitter(self.FxUpackingChargeEffectScale)
@@ -831,22 +720,32 @@ ADFPhasonLaser = Class(DefaultBeamWeapon) {
 }
 
 ---@class ADFQuantumAutogunWeapon : DefaultProjectileWeapon
-ADFQuantumAutogunWeapon = Class(DefaultProjectileWeapon) {
+ADFQuantumAutogunWeapon = ClassWeapon(DefaultProjectileWeapon) {
     FxMuzzleFlash = EffectTemplate.Aeon_DualQuantumAutoGunMuzzleFlash,
 }
 
 ---@class ADFHeavyDisruptorCannonWeapon : DefaultProjectileWeapon
-ADFHeavyDisruptorCannonWeapon = Class(DefaultProjectileWeapon) {
+ADFHeavyDisruptorCannonWeapon = ClassWeapon(DefaultProjectileWeapon) {
     FxMuzzleFlash = EffectTemplate.Aeon_HeavyDisruptorCannonMuzzleFlash,
     FxChargeMuzzleFlash = EffectTemplate.Aeon_HeavyDisruptorCannonMuzzleCharge,
 }
 
 ---@class AIFQuanticArtillery : DefaultProjectileWeapon
-AIFQuanticArtillery = Class(DefaultProjectileWeapon) {
+AIFQuanticArtillery = ClassWeapon(DefaultProjectileWeapon) {
     FxMuzzleFlash = EffectTemplate.Aeon_QuanticClusterMuzzleFlash,
     FxChargeMuzzleFlash = EffectTemplate.Aeon_QuanticClusterChargeMuzzleFlash,
 }
 
+--- AEON DESTROYER PROJECTILE
+---@class ASDCannonOblivionNaval : DefaultProjectileWeapon
+ADFCannonOblivionNaval = Class(DefaultProjectileWeapon) {
+    FxMuzzleFlash = {
+        '/effects/emitters/oblivion_cannon_naval_01_emit.bp',  -- Stream effect
+        '/effects/emitters/oblivion_cannon_naval_02_emit.bp',  -- Gas effect
+        '/effects/emitters/oblivion_cannon_naval_03_emit.bp',  -- Sparkle effect
+        '/effects/emitters/oblivion_cannon_naval_04_emit.bp',  -- Sphere effect
+    },
+}
 
 -- kept for mod backwards compatibility
 local PhasonLaserCollisionBeam = CollisionBeamFile.PhasonLaserCollisionBeam

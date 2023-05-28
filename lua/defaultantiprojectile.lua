@@ -13,9 +13,9 @@ local GetRandomFloat = import("/lua/utilities.lua").GetRandomFloat
 ---@class FlareSpec
 ---@field Army Army
 ---@field Owner string
----@field Radius number
----@field OffsetMult number
----@field RedirectCat EntityCategory
+---@field Radius number defaults to `5`
+---@field OffsetMult number defaults to `0`
+---@field RedirectCat UnparsedCategory defaults to `"MISSILE"`
 
 ---@class DepthChargeSpec
 ---@field Army Army

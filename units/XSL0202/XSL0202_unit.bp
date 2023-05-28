@@ -243,7 +243,6 @@ UnitBlueprint {
         TurnRadius = 2,
         TurnRate = 45,
     },
-    ResolvePath = true,
     SelectionSizeX = 0.55,
     SelectionSizeZ = 0.5,
     SelectionThickness = 0.7,

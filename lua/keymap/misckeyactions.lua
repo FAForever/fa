@@ -17,7 +17,6 @@ function lockZoom()
     end
 end
 
-
 function airNoTransports()
     UISelectionByCategory("AIR + MOBILE", false, false, false, false) SelectUnits(EntityCategoryFilterDown(categories.ALLUNITS - categories.TRANSPORTATION, GetSelectedUnits()))
 end
@@ -524,16 +523,29 @@ function SelectHighestEngineerAndAssist()
     end
 end
 
-function LoadIntoTransports()
-
-    local selection = GetSelectedUnits()
-    if selection then
-
-        local transports = EntityCategoryFilterDown(categories.TRANSPORTATION, selection)
-        local others = EntityCategoryFilterDown(categories.LAND + categories.MOBILE, selection)
-        if transports[1] and others[1] then
-            SimCallback({Func= 'LoadIntoTransports', Args = { }}, true)
-            SelectUnits(transports)
-        end
+local hardMoveEnabled = false
+function ToggleHardMove()
+    ---@type WorldView
+    local view = import('/lua/ui/game/worldview.lua').viewLeft
+    if hardMoveEnabled then
+        import('/lua/ui/game/commandmode.lua').RestoreCommandMode()
+        view:SetDefaultSelectTolerance()
+        view:DefaultCursor()
+        hardMoveEnabled = false
+    else
+        import('/lua/ui/game/commandmode.lua').CacheAndClearCommandMode()
+        view:SetIgnoreSelectTolerance()
+        view:OverrideCursor('RULEUCC_Move')
+        hardMoveEnabled = true
     end
 end
+
+-- untoggle hard move when we have no units selected
+import("/lua/ui/game/gamemain.lua").ObserveSelection:AddObserver(
+    function(selectionInfo)
+        if hardMoveEnabled and table.getn(selectionInfo.newSelection) == 0 then
+            ToggleHardMove()
+        end
+    end,
+    'KeyActionHardMove'
+)

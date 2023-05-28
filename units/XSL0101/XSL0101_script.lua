@@ -4,14 +4,17 @@
 -- Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
+---@alias SelenBuffType "SELENCLOAKBONUS"
+---@alias SelenBuffName "SelenCloakVisionDebuff"
+
 local SWalkingLandUnit = import("/lua/seraphimunits.lua").SWalkingLandUnit
 local SDFPhasicAutoGunWeapon = import("/lua/seraphimweapons.lua").SDFPhasicAutoGunWeapon
 local Buff = import("/lua/sim/buff.lua")
 
 ---@class XSL0101 : SWalkingLandUnit
-XSL0101 = Class(SWalkingLandUnit) {
+XSL0101 = ClassUnit(SWalkingLandUnit) {
     Weapons = {
-        LaserTurret = Class(SDFPhasicAutoGunWeapon) {
+        LaserTurret = ClassWeapon(SDFPhasicAutoGunWeapon) {
             OnWeaponFired = function(self)
                 if not self.unit.WaitingForCloak then
                     self.unit:RevealUnit()
@@ -83,7 +86,7 @@ XSL0101 = Class(SWalkingLandUnit) {
             self:EnableUnitIntel('ToggleBit8', 'Cloak')
 
             if not Buffs['SelenCloakVisionDebuff'] then
-               BuffBlueprint {
+                BuffBlueprint {
                     Name = 'SelenCloakVisionDebuff',
                     DisplayName = 'SelenCloakVisionDebuff',
                     BuffType = 'SELENCLOAKBONUS',

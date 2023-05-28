@@ -11,7 +11,7 @@
 local ATransportBeaconUnit = import("/lua/aeonunits.lua").ATransportBeaconUnit
 
 ---@class UAB5102 : ATransportBeaconUnit
-UAB5102 = Class(ATransportBeaconUnit) {
+UAB5102 = ClassUnit(ATransportBeaconUnit) {
 }
 
 TypeClass = UAB5102

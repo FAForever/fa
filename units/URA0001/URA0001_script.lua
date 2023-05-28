@@ -14,7 +14,7 @@ local DeprecatedWarnings = { }
 -- Kept after --3335 for backwards compatibility. Use URA0001O, URA0002O or URA0003O instead.
 
 ---@class URA0001 : CAirUnit
-URA0001 = Class(CAirUnit) {
+URA0001 = ClassUnit(CAirUnit) {
     spawnedBy = nil,
 
     OnCreate = function(self)

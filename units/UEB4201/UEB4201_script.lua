@@ -12,9 +12,9 @@ local TStructureUnit = import("/lua/terranunits.lua").TStructureUnit
 local TAMPhalanxWeapon = import("/lua/terranweapons.lua").TAMPhalanxWeapon
 
 ---@class UEB4201 : TStructureUnit
-UEB4201 = Class(TStructureUnit) {
+UEB4201 = ClassUnit(TStructureUnit) {
     Weapons = {
-        Turret01 = Class(TAMPhalanxWeapon) {
+        Turret01 = ClassWeapon(TAMPhalanxWeapon) {
                 PlayFxWeaponUnpackSequence = function(self)
                     if not self.SpinManip then 
                         self.SpinManip = CreateRotator(self.unit, 'Turret_Barrel_B01', 'z', nil, 270, 180, 60)

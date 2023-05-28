@@ -279,7 +279,7 @@ UnitBlueprint {
             AutoInitiateAttackCommand = true,
             BallisticArc = 'RULEUBA_None',
             CollideFriendly = false,
-            Damage = 375,
+            Damage = 300,
             DamageType = 'Normal',
             DisplayName = 'Angler Torpedo',
             FireTargetLayerCapsTable = {
@@ -315,7 +315,7 @@ UnitBlueprint {
             RackSalvoReloadTime = 0,
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
-            RateOfFire = 0.1,--0.08
+            RateOfFire = 0.1,
             TargetPriorities = {
                 'CRUISER',
                 '(NAVAL * TECH2 * SHIELD)',

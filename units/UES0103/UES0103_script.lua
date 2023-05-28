@@ -13,12 +13,10 @@ local TDFGaussCannonWeapon = import("/lua/terranweapons.lua").TDFGaussCannonWeap
 local Entity = import("/lua/sim/entity.lua").Entity
 
 ---@class UES0103 : TSeaUnit
-UES0103 = Class(TSeaUnit) {
+UES0103 = ClassUnit(TSeaUnit) {
     Weapons = {
-        MainGun = Class(TDFGaussCannonWeapon) {
-        },
-        AAGun = Class(TAALinkedRailgun) {
-        },
+        MainGun = ClassWeapon(TDFGaussCannonWeapon) {},
+        AAGun = ClassWeapon(TAALinkedRailgun) {},
     },
 
     OnStopBeingBuilt = function(self,builder,layer)

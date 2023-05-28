@@ -12,10 +12,10 @@ local ASeaUnit = import("/lua/aeonunits.lua").ASeaUnit
 local AAASonicPulseBatteryWeapon = import("/lua/aeonweapons.lua").AAASonicPulseBatteryWeapon
 
 ---@class UAS0102 : ASeaUnit
-UAS0102 = Class(ASeaUnit) {
+UAS0102 = ClassUnit(ASeaUnit) {
 
     Weapons = {
-        MainGun = Class(AAASonicPulseBatteryWeapon) {},
+        MainGun = ClassWeapon(AAASonicPulseBatteryWeapon) {},
     },
     
 }

@@ -12,38 +12,28 @@ local TAirToAirLinkedRailgun = TWeapons.TAirToAirLinkedRailgun
 
 
 ---@class UEA0305 : TAirUnit
-UEA0305 = Class(TAirUnit) {
-    
+UEA0305 = ClassUnit(TAirUnit) {
+
     EngineRotateBones = {'Jet_Front', 'Jet_Back',},
     BeamExhaustCruise = '/effects/emitters/gunship_thruster_beam_01_emit.bp',
     BeamExhaustIdle = '/effects/emitters/gunship_thruster_beam_02_emit.bp',
-    
+
     Weapons = {
-        Plasma01 = Class(TDFHeavyPlasmaCannonWeapon) {},
-        Plasma02 = Class(TDFHeavyPlasmaCannonWeapon) {},
-        AAGun = Class(TAirToAirLinkedRailgun) {},
+        Plasma01 = ClassWeapon(TDFHeavyPlasmaCannonWeapon) {},
+        Plasma02 = ClassWeapon(TDFHeavyPlasmaCannonWeapon) {},
+        AAGun = ClassWeapon(TAirToAirLinkedRailgun) {},
     },
-    
+
     OnStopBeingBuilt = function(self,builder,layer)
         TAirUnit.OnStopBeingBuilt(self,builder,layer)
         self:SetMaintenanceConsumptionActive()
-        self.EngineManipulators = {}
 
         -- create the engine thrust manipulators
-        for key, value in self.EngineRotateBones do
-            table.insert(self.EngineManipulators, CreateThrustController(self, 'Thruster', value))
+        for _, bone in self.EngineRotateBones do
+            local controller = CreateThrustController(self, 'Thruster', bone)
+            controller:SetThrustingParam(-0.0, 0.0, -0.25, 0.25, -0.1, 1, 1.0, 0.25 )
+            self.Trash:Add(controller)
         end
-
-        -- set up the thursting arcs for the engines
-        for key,value in self.EngineManipulators do
-            --                          XMAX, XMIN, YMAX,YMIN, ZMAX,ZMIN, TURNMULT, TURNSPEED
-            value:SetThrustingParam( -0.0, 0.0, -0.25, 0.25, -0.1, 1, 1.0,      0.25 )
-        end
-
-        for k, v in self.EngineManipulators do
-            self.Trash:Add(v)
-        end
-
     end,
 
 }

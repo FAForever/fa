@@ -5,7 +5,7 @@ local TMissileCruiseProjectile = import("/lua/terranprojectiles.lua").TMissileCr
 local Explosion = import("/lua/defaultexplosions.lua")
 local EffectTemplate = import("/lua/effecttemplates.lua")
 
-TIFMissileCruiseCDR = Class(TMissileCruiseProjectile) {
+TIFMissileCruiseCDR = ClassProjectile(TMissileCruiseProjectile) {
 
     FxAirUnitHitScale = 1.65,
     FxLandHitScale = 1.65,
@@ -24,16 +24,15 @@ TIFMissileCruiseCDR = Class(TMissileCruiseProjectile) {
     OnCreate = function(self)
         TMissileCruiseProjectile.OnCreate(self)
         self:SetCollisionShape('Sphere', 0, 0, 0, 2)
-        self.MoveThread = self:ForkThread(self.MovementThread)
+        self.MoveThread = self.Trash:Add(ForkThread(self.MovementThread,self))
     end,
 
     MovementThread = function(self)
-        self.WaitTime = 0.1
         self:SetTurnRate(8)
-        WaitSeconds(0.3)
+        WaitTicks(4)
         while not self:BeenDestroyed() do
             self:SetTurnRateByDist()
-            WaitSeconds(self.WaitTime)
+            WaitTicks(2)
         end
     end,
 
@@ -42,16 +41,16 @@ TIFMissileCruiseCDR = Class(TMissileCruiseProjectile) {
         --Get the nuke as close to 90 deg as possible
         if dist > 50 then
             --Freeze the turn rate as to prevent steep angles at long distance targets
-            WaitSeconds(2)
+            WaitTicks(21)
             self:SetTurnRate(20)
         elseif dist > 30 and dist <= 150 then
             -- Increase check intervals
             self:SetTurnRate(30)
-            WaitSeconds(1.5)
+            WaitTicks(16)
             self:SetTurnRate(30)
         elseif dist > 10 and dist <= 30 then
             -- Further increase check intervals
-            WaitSeconds(0.3)
+            WaitTicks(4)
             self:SetTurnRate(50)
         elseif dist > 0 and dist <= 10 then
             -- Further increase check intervals

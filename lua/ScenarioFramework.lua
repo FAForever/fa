@@ -23,11 +23,10 @@
 ---@field [3] string cue
 ---@field [4] string faction
 
-
+local SyncVoice = import("/lua/simsyncutils.lua").SyncVoice
 local CategoryToString = import("/lua/sim/categoryutils.lua").ToString
 local Cinematics = import("/lua/cinematics.lua")
 local Game = import("/lua/game.lua")
-local ScenarioPlatoonAI = import("/lua/scenarioplatoonai.lua")
 local ScenarioUtils = import("/lua/sim/scenarioutilities.lua")
 local SimCamera = import("/lua/simcamera.lua").SimCamera
 local SimUIVars = import("/lua/sim/simuistate.lua")
@@ -683,7 +682,7 @@ function PlayDialogue()
                     local text = dialogue.text
                     local vid = dialogue.vid
                     if not vid and bank and cue then
-                        table.insert(Sync.Voice, {Cue = cue, Bank = bank})
+                        SyncVoice({Cue = cue, Bank = bank})
                         if not delay then
                             WaitSeconds(5)
                         end
@@ -729,9 +728,9 @@ end
 ---
 function PlayUnlockDialogue()
     if Random(1, 2) == 1 then
-        table.insert(Sync.Voice, {Bank = 'XGG', Cue = 'Computer_Computer_UnitRevalation_01370'})
+        SyncVoice({Bank = 'XGG', Cue = 'Computer_Computer_UnitRevalation_01370'})
     else
-        table.insert(Sync.Voice, {Bank = 'XGG', Cue = 'Computer_Computer_UnitRevalation_01372'})
+        SyncVoice({Bank = 'XGG', Cue = 'Computer_Computer_UnitRevalation_01372'})
     end
 end
 
@@ -797,7 +796,7 @@ end
 --- Plays an XACT sound if needed--currently all VOs are videos
 ---@param voSound SoundBlueprint
 function PlayVoiceOver(voSound)
-    table.insert(Sync.Voice, voSound)
+    SyncVoice(voSound)
 end
 
 --- Sets enhancement restrictions from the names of the enhancements you do not want the player to build
@@ -939,23 +938,32 @@ end
 function FakeTeleportUnits(units, killUnits)
     IssueStop(units)
     IssueClearCommands(units)
+
     for _, unit in units do
-        unit.CanBeKilled = false
-        unit:PlayTeleportChargeEffects(unit:GetPosition(), unit:GetOrientation())
-        unit:PlayUnitSound('GateCharge')
+        if not IsDestroyed(unit) then
+            unit.CanBeKilled = false
+            unit:PlayTeleportChargeEffects(unit:GetPosition(), unit:GetOrientation())
+            unit:PlayUnitSound('GateCharge')
+        end
     end
+
     WaitSeconds(2)
 
     for _, unit in units do
-        unit:CleanupTeleportChargeEffects()
-        unit:PlayTeleportOutEffects()
-        unit:PlayUnitSound('GateOut')
+        if not IsDestroyed(unit) then
+            unit:CleanupTeleportChargeEffects()
+            unit:PlayTeleportOutEffects()
+            unit:PlayUnitSound('GateOut')
+        end
     end
+
     WaitSeconds(1)
 
     if killUnits then
         for _, unit in units do
-            unit:Destroy()
+            if not IsDestroyed(unit) then
+                unit:Destroy()
+            end
         end
     end
 end
@@ -1068,6 +1076,12 @@ function RemoveRestriction(army, categories, isSilent)
         -- Remove scenario restriction from game restrictions
         Game.RemoveRestriction(categories, army)
         Sync.Restrictions = Game.GetRestrictions()
+
+        ---@type AIBrain
+        local brain = ArmyBrains[army]
+        if brain then
+            brain:ReEvaluateHQSupportFactoryRestrictions()
+        end
     end
 end
 
@@ -1237,7 +1251,7 @@ function SetPlayableArea(rect, voFlag)
     SetPlayableRect(x0, y0, x1, y1)
     if voFlag then
         ForkThread(PlayableRectCameraThread, rect)
-        table.insert(Sync.Voice, {Cue = 'Computer_Computer_MapExpansion_01380', Bank = 'XGG'})
+        SyncVoice({Cue = 'Computer_Computer_MapExpansion_01380', Bank = 'XGG'})
     end
 
     import("/lua/simsync.lua").SyncPlayableRect(rect)
@@ -1461,11 +1475,11 @@ function PlatoonAttackWithTransportsThread(platoon, landingChain, attackChain, i
     end
 
     local landingLocs = ScenarioUtils.ChainToPositions(landingChain)
-    local landingLocation = landingLocs[Random(1, table.getn(landingLocs))]
+    local landingLocation = table.random(landingLocs)
 
     if instant then
         AttachUnitsToTransports(units, transports)
-        if moveChain and not ScenarioPlatoonAI.MoveAlongRoute(platoon, ScenarioUtils.ChainToPositions(moveChain)) then
+        if moveChain and not import("/lua/scenarioplatoonai.lua").MoveAlongRoute(platoon, ScenarioUtils.ChainToPositions(moveChain)) then
             return
         end
         IssueTransportUnload(transports, landingLocation)
@@ -1675,13 +1689,8 @@ function DetermineBestAttackLocation(attackingBrain, targetBrain, relationship, 
     return attackLocation
 end
 
---- Returns a random entry from an array
----@generic T
----@param array T[]
----@return T
-function GetRandomEntry(array)
-    return array[Random(1, table.getn(array))]
-end
+
+GetRandomEntry = table.random
 
 ---
 ---@param brain AIBrain

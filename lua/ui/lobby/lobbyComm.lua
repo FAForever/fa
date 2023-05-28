@@ -48,7 +48,7 @@ function GetDefaultPlayerOptions(playerName)
 end
 
 ---@class DiscoveryService : moho.discovery_service_methods
-DiscoveryService = Class(moho.discovery_service_methods) {
+DiscoveryService = ClassUI(moho.discovery_service_methods) {
     RemoveGame = function(self, index)
         LOG('DiscoveryService.RemoveGame(' .. tostring(index) .. ')')
     end,
@@ -74,7 +74,7 @@ end
 ---@field Type string
 
 ---@class LobbyComm : moho.lobby_methods
-LobbyComm = Class(moho.lobby_methods) {
+LobbyComm = ClassUI(moho.lobby_methods) {
 
     --  General events you should override
     Hosting = function(self) end,

@@ -5,7 +5,7 @@ local lazyvar = import("/lua/lazyvar.lua")
 -- negative true means for horizontal bars they will grow right to left, for vertical they will grow top to bottom
 
 ---@class StatusBar : Bitmap
-StatusBar = Class(Bitmap) {
+StatusBar = ClassUI(Bitmap) {
     __init = function(self, parent, rangeMin, rangeMax, vertical, negative, background, bar, stretchTextures, debugname)
         Bitmap.__init(self, parent, background)
         self:SetName(debugname or "statusbar")

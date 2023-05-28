@@ -104,18 +104,18 @@ UnitBlueprint {
         },
         AnimationWalk = '/units/del0204/del0204_awalk.sca',
         AnimationWalkRate = 3.2,
-        AttackReticuleSize = 3,
+        AttackReticleSize = 3,
         Mesh = {
             IconFadeInZoom = 130,
             LODs = {
                 {
                     LODCutoff = 100,
-                    ShaderName = 'Insect',
+                    ShaderName = 'Unit',
                 },
                 {
                     AlbedoName = 'del0204_lod1_albedo.dds',
                     LODCutoff = 215,
-                    ShaderName = 'Insect',
+                    ShaderName = 'Unit',
                     SpecularName = 'del0204_lod1_specteam.dds',
                 },
             },

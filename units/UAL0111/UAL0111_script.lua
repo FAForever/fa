@@ -12,9 +12,9 @@ local ALandUnit = import("/lua/aeonunits.lua").ALandUnit
 local AIFMissileTacticalSerpentineWeapon = import("/lua/aeonweapons.lua").AIFMissileTacticalSerpentineWeapon
 
 ---@class UAL0111 : ALandUnit
-UAL0111 = Class(ALandUnit) {
+UAL0111 = ClassUnit(ALandUnit) {
     Weapons = {
-        MissileRack = Class(AIFMissileTacticalSerpentineWeapon) {},
+        MissileRack = ClassWeapon(AIFMissileTacticalSerpentineWeapon) {},
     },
 }
 

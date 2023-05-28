@@ -17,10 +17,10 @@ local CAAAutocannon = cWeapons.CAAAutocannon
 local CEMPAutoCannon = cWeapons.CEMPAutoCannon
 
 ---@class URA0104 : AirTransport
-URA0104 = Class(AirTransport) {
+URA0104 = ClassUnit(AirTransport) {
     Weapons = {
-        AAAutocannon = Class(CAAAutocannon) {},
-        EMPCannon = Class(CEMPAutoCannon) {},
+        AAAutocannon = ClassWeapon(CAAAutocannon) {},
+        EMPCannon = ClassWeapon(CEMPAutoCannon) {},
     },
 
     AirDestructionEffectBones = { 'Left_Exhaust', 'Right_Exhaust', 'Char04', 'Char03', 'Char02', 'Char01',

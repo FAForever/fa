@@ -11,7 +11,7 @@
 local TLandUnit = import("/lua/terranunits.lua").TLandUnit
 
 ---@class OPC1002 : TLandUnit
-OPC1002 = Class(TLandUnit) {
+OPC1002 = ClassUnit(TLandUnit) {
 }
 
 TypeClass = OPC1002

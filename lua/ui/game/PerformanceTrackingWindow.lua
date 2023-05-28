@@ -3,12 +3,12 @@ local Window = import("/lua/maui/window.lua")
 local Group = import("/lua/maui/group.lua")
 
 ---@class PerformanceGraph : Group
-local PerformanceGraph = Class(Group) {
+local PerformanceGraph = ClassUI(Group) {
 
 }
 
 ---@class PerformanceWindow : Window
-local PerformanceWindow = Class(Window) {
+local PerformanceWindow = ClassUI(Window) {
 
     __init = function(self, parent) 
         Window.__init(self, parent, "PerformanceWindow")

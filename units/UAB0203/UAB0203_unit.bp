@@ -88,14 +88,18 @@ UnitBlueprint {
             IconFadeInZoom = 130,
             LODs = {
                 {
+                    AlbedoName = '/units/uab0103/UAB0103_Albedo.dds',
+                    NormalsName = '/units/uab0103/UAB0103_NormalsTS.dds',
+                    SpecularName = '/units/uab0103/UAB0103_SpecTeam.dds',
                     LODCutoff = 200,
                     ShaderName = 'Aeon',
                 },
                 {
-                    AlbedoName = 'uab0203_lod1_albedo.dds',
+                    AlbedoName = '/units/uab0103/UAB0103_lod1_Albedo.dds',
+                    NormalsName = '/units/uab0103/UAB0103_lod1_NormalsTS.dds',
+                    SpecularName = '/units/uab0103/UAB0103_lod1_SpecTeam.dds',
                     LODCutoff = 600,
                     ShaderName = 'Aeon',
-                    SpecularName = 'uab0203_lod1_specteam.dds',
                 },
             },
         },

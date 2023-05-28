@@ -1,11 +1,7 @@
---
 -- Terran CDR Nuke
---
 
 local TIFMissileNuke = import("/lua/terranprojectiles.lua").TIFMissileNuke
-
-TIFMissileNukeCDR = Class(TIFMissileNuke) {
-
+TIFMissileNukeCDR = ClassProjectile(TIFMissileNuke) {
     BeamName = '/effects/emitters/missile_exhaust_fire_beam_06_emit.bp',
     InitialEffects = {'/effects/emitters/nuke_munition_launch_trail_02_emit.bp',},
     LaunchEffects = {
@@ -13,7 +9,6 @@ TIFMissileNukeCDR = Class(TIFMissileNuke) {
         '/effects/emitters/nuke_munition_launch_trail_05_emit.bp',
     },
     ThrustEffects = {'/effects/emitters/nuke_munition_launch_trail_04_emit.bp',},
-
     OnCreate = function(self)
         TIFMissileNuke.OnCreate(self)
         self.effectEntityPath = '/effects/Entities/UEFNukeEffectController02/UEFNukeEffectController02_proj.bp'
@@ -24,25 +19,20 @@ TIFMissileNukeCDR = Class(TIFMissileNuke) {
         if EntityCategoryContains(categories.AEON * categories.PROJECTILE * categories.ANTIMISSILE * categories.TECH_TWO, TargetEntity) then
             self:Destroy()
         else
-
             TIFMissileNuke.OnImpact(self, TargetType, TargetEntity)
         end
     end,
 
-    
     -- Tactical nuke has different flight path
     MovementThread = function(self)
-        local target = self:GetTrackingTarget()
-        local launcher = self:GetLauncher()
         self:CreateEffects(self.InitialEffects, self.Army, 1)
-        self.WaitTime = 0.1
         self:SetTurnRate(8)
-        WaitSeconds(0.3)
+        WaitTicks(4)
         self:CreateEffects(self.LaunchEffects, self.Army, 1)
         self:CreateEffects(self.ThrustEffects, self.Army, 1)
         while not self:BeenDestroyed() do
             self:SetTurnRateByDist()
-            WaitSeconds(self.WaitTime)
+            WaitTicks(2)
         end
     end,
 
@@ -52,7 +42,6 @@ TIFMissileNukeCDR = Class(TIFMissileNuke) {
                 DamageArea(instigator, pos, self.Radius, self.Damage, (damageType or 'Nuke'), true, true)
             end
         end
-
         self.InnerRing.DoNukeDamage = nukeDamage
         self.OuterRing.DoNukeDamage = nukeDamage
         TIFMissileNuke.DoDamage(self, instigator, DamageData, targetEntity)
@@ -62,16 +51,16 @@ TIFMissileNukeCDR = Class(TIFMissileNuke) {
         local dist = self:GetDistanceToTarget()
         if dist > 50 then
             -- Freeze the turn rate as to prevent steep angles at long distance targets
-            WaitSeconds(2)
+            WaitTicks(21)
             self:SetTurnRate(20)
         elseif dist > 128 and dist <= 213 then
             -- Increase check intervals
             self:SetTurnRate(30)
-            WaitSeconds(1.5)
+            WaitTicks(16)
             self:SetTurnRate(30)
         elseif dist > 43 and dist <= 107 then
             -- Further increase check intervals
-            WaitSeconds(0.3)
+            WaitTicks(4)
             self:SetTurnRate(75)
         elseif dist > 0 and dist <= 43 then
             -- Further increase check intervals

@@ -12,9 +12,9 @@ local AStructureUnit = import("/lua/aeonunits.lua").AStructureUnit
 local AANChronoTorpedoWeapon = import("/lua/aeonweapons.lua").AANChronoTorpedoWeapon
 
 ---@class UAB2109 : AStructureUnit
-UAB2109 = Class(AStructureUnit) {
+UAB2109 = ClassUnit(AStructureUnit) {
     Weapons = {
-        Turret01 = Class(AANChronoTorpedoWeapon) {},
+        Turret01 = ClassWeapon(AANChronoTorpedoWeapon) {},
     },
 	OnCreate = function(self)
 		AStructureUnit.OnCreate(self)

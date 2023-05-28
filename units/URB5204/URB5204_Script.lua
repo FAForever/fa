@@ -10,7 +10,7 @@
 local CConcreteStructureUnit = import("/lua/cybranunits.lua").CConcreteStructureUnit
 
 ---@class URB5204 : CConcreteStructureUnit
-URB5204 = Class(CConcreteStructureUnit) {
+URB5204 = ClassUnit(CConcreteStructureUnit) {
 }
 
 

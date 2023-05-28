@@ -10,7 +10,7 @@
 local AEnergyCreationUnit = import("/lua/aeonunits.lua").AEnergyCreationUnit
 
 ---@class UAB1301 : AEnergyCreationUnit
-UAB1301 = Class(AEnergyCreationUnit) {
+UAB1301 = ClassUnit(AEnergyCreationUnit) {
     AmbientEffects = 'AT3PowerAmbient',
     
     OnStopBeingBuilt = function(self, builder, layer)

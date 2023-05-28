@@ -470,6 +470,17 @@ function GetAIPlayerData(name, AIPersonality, slot)
     if not AIColor then
         AIColor = GetAvailableColor()
     end
+
+    -- retrieve properties from AI table
+    local baseAI = false
+    local requiresNavMesh = false
+    for k, entry in aitypes do 
+        if entry.key == AIPersonality then
+            requiresNavMesh = requiresNavMesh or entry.requiresNavMesh
+            baseAI = baseAI or entry.baseAI
+        end
+    end
+
     return PlayerData(
         {
             OwnerID = hostID,
@@ -479,6 +490,10 @@ function GetAIPlayerData(name, AIPersonality, slot)
             AIPersonality = AIPersonality,
             PlayerColor = AIColor,
             ArmyColor = AIColor,
+
+            -- properties from AI table
+            RequiresNavMesh = requiresNavMesh,
+            BaseAI = baseAI
         }
 )
 end
@@ -2222,6 +2237,15 @@ local function UpdateGame()
             ShowMapPositions(GUI.mapView, scenarioInfo)
             ConfigureMapListeners(GUI.mapView, scenarioInfo)
 
+            -- Briefing button takes priority over the patch notes if the map has a briefing
+            if scenarioInfo.hasBriefing then
+                GUI.briefingButton:Show()
+                GUI.patchnotesButton:Hide()
+            else
+                GUI.briefingButton:Hide()
+                GUI.patchnotesButton:Show()
+            end
+
             -- contains information that is available during blueprint loading
             local preGameData = {}
 
@@ -2328,6 +2352,7 @@ local function UpdateGame()
         local notReady = not playerOptions.Ready
 
         UIUtil.setEnabled(GUI.becomeObserver, notReady)
+        UIUtil.setEnabled(GUI.briefingButton, notReady)
         -- This button is enabled for all non-host players to view the configuration, and for the
         -- host to select presets (rather confusingly, one object represents both potential buttons)
         UIUtil.setEnabled(GUI.restrictedUnitsOrPresetsBtn, not isHost or notReady)
@@ -3166,7 +3191,7 @@ function CreateUI(maxPlayers)
     else
         tooltipText['body'] = LOC("<LOC lobui_0771>Left click ACU icon to move yourself.")
     end
-    Tooltip.AddControlTooltip(GUI.mapPanel, tooltipText, 0,198)
+    Tooltip.AddControlTooltip(GUI.mapPanel, tooltipText)
 
     GUI.optionsPanel = Group(GUI.panel, "optionsPanel") -- ORANGE Square in Screenshoot
     LayoutHelpers.AtLeftTopIn(GUI.optionsPanel, GUI.panel, 813, 325)
@@ -3210,6 +3235,18 @@ function CreateUI(maxPlayers)
     LayoutHelpers.AtHorizontalCenterIn(GUI.patchnotesButton, GUI.optionsPanel, -55)
     GUI.patchnotesButton.OnClick = function(self, event)
         Changelog.Changelog(GUI)
+    end
+
+    -- Create mission briefing button
+    local briefingButton = UIUtil.CreateButtonWithDropshadow(GUI.optionsPanel, '/BUTTON/medium/', "Briefing")
+    GUI.briefingButton = briefingButton
+    LayoutHelpers.AtBottomIn(GUI.briefingButton, GUI.optionsPanel, -51)
+    LayoutHelpers.AtHorizontalCenterIn(GUI.briefingButton, GUI.optionsPanel, -55)
+    briefingButton.OnClick = function(self, modifiers)
+        GUI.briefing = Group(GUI)
+        GUI.briefing.Depth:Set(function() return GUI.Depth() + 20 end)
+        LayoutHelpers.FillParent(GUI.briefing, GUI)
+        import('/lua/ui/campaign/operationbriefing.lua').CreateUI(GUI.briefing, gameInfo.GameOptions.ScenarioFile)
     end
 
     -- A buton that, for the host, is "game options", but for everyone else shows a ready-only mod
@@ -4277,7 +4314,7 @@ function CreateUI(maxPlayers)
             WaitSeconds(1)
         end
     end)
-    if true then
+    if false then
         import("/lua/ui/events/SnowFlake.lua"). CreateSnowFlakes(GUI)
     end
 end
@@ -4788,10 +4825,11 @@ function ConfigureMapListeners(mapCtrl, scenario)
         local marker = mapCtrl.startPositions[inSlot]
 
         marker.OnRollover = function(self, state)
+            local slotName = GUI.slots[slot].name
             if state == 'enter' then
-                GUI.slots[slot].name.HandleEvent(self, {Type='MouseEnter'})
+                slotName:HandleEvent({Type = 'MouseEnter'})
             elseif state == 'exit' then
-                GUI.slots[slot].name.HandleEvent(self, {Type='MouseExit'})
+                slotName:HandleEvent({Type = 'MouseExit'})
             end
         end
 

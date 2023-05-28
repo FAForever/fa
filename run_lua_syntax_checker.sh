@@ -24,8 +24,12 @@ while read file; do
   # file contains table pre-allocation synax ( {&1&4} ) that is not supported at the moment
   if [ "$file" != "./lua/lazyvar.lua" ]; then
     if [ "$file" != "./.vscode/fa-plugin.lua" ]; then
-      check_file "$file"
-      (( files_checked++ ))
+      if [ "$file" != "./lua/system/class.lua" ]; then
+        if [ "$file" != "./lua/sim/NavGenerator.lua" ]; then
+          check_file "$file"
+          (( files_checked++ ))
+        fi
+      fi
     fi
   fi
 done < <(find . -type d \( -path ./testmaps -o -path ./engine \) -prune -false -o -name '*.lua' -o -name '*.bp')

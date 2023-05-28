@@ -15,7 +15,7 @@ local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
 -- self-harm long enough to finish writing this class so we can call this a solved problem and never
 -- look in this file ever again.
 ---@class TextArea : ItemList
-TextArea = Class(ItemList) {
+TextArea = ClassUI(ItemList) {
     __init = function(self, parent, width, height)
         ItemList.__init(self, parent)
 

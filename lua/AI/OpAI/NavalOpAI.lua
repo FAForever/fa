@@ -1,26 +1,20 @@
 --***************************************************************************
---*
 --**  File     :  /lua/ai/OpAI/NavalOpAI.lua
 --**
 --**  Summary  : OpAI that reacts to certain defaulted events
-----**
+--**
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
-local AIUtils = import("/lua/ai/aiutilities.lua")
-local ScenarioFramework = import("/lua/scenarioframework.lua")
-local ScenarioUtils = import("/lua/sim/scenarioutilities.lua")
-local ScenarioPlatoonAI = import("/lua/scenarioplatoonai.lua")
 local OpAI = import("/lua/ai/opai/baseopai.lua").OpAI
-
 local GenerateNavalOSB = import("/lua/ai/opai/generatenaval.lua")
-
-local UCBC = '/lua/editor/UnitCountBuildConditions.lua'
-local BMBC = '/lua/editor/BaseManagerBuildConditions.lua'
-local MIBC = '/lua/editor/MiscBuildConditions.lua'
-local BMPT = '/lua/ai/opai/BaseManagerPlatoonThreads.lua'
 
 ---@class NavalOpAI : OpAI
 NavalOpAI = Class(OpAI) {
+    ---@param self AIBrain
+    ---@param brain AIBrain
+    ---@param location string
+    ---@param name string
+    ---@param data number
     Create = function(self, brain, location, name, data)
         local bManager = brain.BaseManagers[location]
         
@@ -49,8 +43,24 @@ NavalOpAI = Class(OpAI) {
     end,
 }
 
+---@param brain AIBrain
+---@param location string
+---@param name string
+---@param data number
+---@return unknown
 function CreateNavalAI(brain, location, name, data)
     local navalAI = NavalOpAI()
     navalAI:Create(brain, location, name, data)
     return navalAI
 end
+
+-- Kept for Mod Support
+local AIUtils = import("/lua/ai/aiutilities.lua")
+local ScenarioFramework = import("/lua/scenarioframework.lua")
+local ScenarioUtils = import("/lua/sim/scenarioutilities.lua")
+local ScenarioPlatoonAI = import("/lua/scenarioplatoonai.lua")
+
+local UCBC = '/lua/editor/unitcountbuildconditions.lua'
+local BMBC = '/lua/editor/basemanagerbuildconditions.lua'
+local MIBC = '/lua/editor/miscbuildconditions.lua'
+local BMPT = '/lua/ai/opai/basemanagerplatoonthreads.lua'

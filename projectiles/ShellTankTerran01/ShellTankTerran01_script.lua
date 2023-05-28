@@ -1,20 +1,17 @@
---
 -- script for projectile TankShell
---
 local Projectile = import("/lua/sim/projectile.lua").Projectile
-ShellTankTerran01 = Class(Projectile) {
+ShellTankTerran01 = ClassProjectile(Projectile) {
     FxUnitHitScale = 1,
-    FxImpactUnit = {},
+    FxImpactUnit = import("/lua/effecttemplates.lua").NoEffects,
     FxLandHitScale = 1,
-    FxImpactLand = {},
+    FxImpactLand = import("/lua/effecttemplates.lua").NoEffects,
     FxWaterHitScale = 1,
-    FxImpactWater = {},
+    FxImpactWater = import("/lua/effecttemplates.lua").NoEffects,
     FxUnderWaterHitScale = 0.25,
-    FxImpactUnderWater = {},
     FxAirUnitHitScale = 1,
-    FxImpactAirUnit = {},
+    FxImpactAirUnit = import("/lua/effecttemplates.lua").NoEffects,
     FxNoneHitScale = 1,
-    FxImpactNone = {},
+    FxImpactNone = import("/lua/effecttemplates.lua").NoEffects,
     FxImpactLandScorch = false,
     FxImpactLandScorchScale = 1.0,
 
@@ -28,7 +25,7 @@ ShellTankTerran01 = Class(Projectile) {
 
     OnCreate = function(self)
         Projectile.OnCreate(self)
-        self:ForkThread(self.Thread)
+        self.Trash:Add(ForkThread(self.Thread,self))
     end,
 
     Thread = function(self)
@@ -37,19 +34,14 @@ ShellTankTerran01 = Class(Projectile) {
             WaitTicks(Random(3,4))
 
             local x, y, z = unpack(self:GetPosition())
-            --y = y - 1
-            --local offsetx = Random(1.0, 2.0) - 1
-            --x = x + offsetx
             MetaImpact(self, Vector(x, y, z), 2, 2)
-            local army = self:GetArmy()
+            local army = self.Army
             for k, v in self.FxMeta do
-                CreateEmitterAtEntity(self,army,v):ScaleEmitter(0.4)--:OffsetEmitter(0, 0, offsetx)
+                CreateEmitterAtEntity(self,army,v):ScaleEmitter(0.4)
             end
             self:ShakeCamera(5, 1, 0, 0.1)
             CreateSplat(self:GetPosition(),0,'scorch_001_albedo', 1, 1, 200, 500, army)
         end
     end,
 }
-
 TypeClass = ShellTankTerran01
-

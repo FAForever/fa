@@ -293,7 +293,6 @@ UnitBlueprint {
             },
             AutoInitiateAttackCommand = true,
             BallisticArc = 'RULEUBA_LowArc',
-            ChargeDelay = 0.5,
             CollideFriendly = false,
             Damage = 140,
             DamageType = 'Normal',

@@ -10,7 +10,7 @@
 local CSeaUnit = import("/lua/cybranunits.lua").CSeaUnit
 
 ---@class URB3302 : CSeaUnit
-URB3302 = Class(CSeaUnit) {
+URB3302 = ClassUnit(CSeaUnit) {
     OnStopBeingBuilt = function(self, builder, layer)
         CSeaUnit.OnStopBeingBuilt(self, builder, layer)
         --enable sonar economy

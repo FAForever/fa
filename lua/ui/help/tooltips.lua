@@ -622,9 +622,27 @@ Tooltips = {
         title = "<LOC OPTIONS_0115>Always Render Strategic Icons",
         description = "<LOC OPTIONS_0116>Strategic icons are always shown, regardless of zoom distance",
     },
+    options_camera_shake_intensity = {
+        title = "<LOC OPTIONS_CAMERA_SHAKE_TITLE>Adjust shake intensity of camera",
+        description = "<LOC OPTIONS_CAMERA_SHAKE_DESCRIPTION>Adjusts the shake intensity: 0% is no shaking at all and 100% is the default shake behavior. \r\nLarge explosions and units can shake the camera to improve immersion, but practically it can be annoying.",
+    },
     options_uvd_format = {
         title = "<LOC OPTIONS_0107>Construction Tooltip Information",
         description = "<LOC OPTIONS_0118>Shows full, partial or no description when the unit icon is moused over",
+    },
+    options_assist_to_upgrade = {
+        title = "<LOC ASSIST_TO_UPGRADE_TITLE>Assist to Upgrade",
+        description = "<LOC ASSIST_TO_UPGRADE_DESCRIPTION>When enabled structures automatically queue and pause their upgrade when you issue an assist order",
+    },
+
+    options_alt_to_force_attack_move = {
+        title = "<LOC ALT_TO_FORCE_ATTACK_MOVE_TITLE>Hold alt to force attack move",
+        description = "<LOC ALT_TO_FORCE_ATTACK_MOVE_TITLE>When enabled holding alt will always turn orders into an attack move order"
+    },
+
+    options_assist_to_unpause = {
+        title = "<LOC ASSIST_TO_UNPAUSE_TITLE>Assist to Unpause",
+        description = "<LOC ASSIST_TO_UNPAUSE_DESCRIPTION>When enabled structures automatically unpause as engineers start assisting it.",
     },
     options_mp_taunt_head = {
         title = "<LOC OPTIONS_0119>MP Taunt Head",
@@ -973,11 +991,11 @@ Tooltips = {
         title = '<LOC OPTIONS_0291>Reclaim Batching',
         description = '<LOC OPTIONS_0292>Combines nearby reclaim labels as you zoom out. Does not work properly with reclaim labels scaled 30% or more.\r\n\r\nSignificantly improves performance. Recommended for lower end systems.',
     },
-    options_selection_sets_add_behavior = {
+    options_steal_from_other_control_groups = {
         title = "<LOC OPTIONS_0293>Unique Control Groups",
         description = "<LOC OPTIONS_0294>When on, a unit can only be part of one control group. A unit will be transferred from any previously assigned control groups to the new control group.",
     },
-    options_selection_sets_production_behavior = {
+    options_add_to_factory_control_group = {
         title= "<LOC OPTIONS_0295>Transitive Control Groups of Factories",
         description= "<LOC OPTIONS_0296>When on, a unit inherits the control group of the factory it is produced by."
     },
@@ -994,8 +1012,12 @@ Tooltips = {
         description = "<LOC OPTIONS_0302>Shows a splash damage indicator when an attack command is possible, usually when you attempt to ground-fire with a unit with splash damage, like a bomber.\r\n\r\nDoes not interfere with how the attack command is processed, this is merely a visual change.",
     },
     options_cursor_depth_scanning = {
-        title = "<LOC OPTIONS_0303>Depth Scanning",
-        description = "<LOC OPTIONS_0304>Visualizes the height difference between the water surface and the ocean floor on the cursor cursor.",
+        title = "<LOC WATER_DEPTH_ASSISTANCE_TITLE>Water depth indication",
+        description = "<LOC WATER_DEPTH_ASSISTANCE_DESCRIPTION>When enabled, adds visual elements to visualize the offset between the water surface and the ocean floor at the position of the cursor.",
+    },
+    options_cursor_hover_scanning = {
+        title = "<LOC PLANE_HEIGHT_ASSISTANCE_TITLE>Plane height indication",
+        description = "<LOC WATER_DEPTH_ASSISTANCE_DESCRIPTION>When enabled, adds visual elements to visualize the offset between the terrain surface and the (expected) height of the selected air unit at the position of the cursor. \r\nIs only applied when you have one unit selected.",
     },
     options_share_mouse = {
         title = '<LOC OPTIONS_0305>Show Player Cursor Locations for Observers',

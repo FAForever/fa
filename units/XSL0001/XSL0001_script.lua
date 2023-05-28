@@ -7,6 +7,24 @@
 --**
 --**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
+
+---@alias SeraphimACUEnhancementBuffType
+---| "ACUUPGRADEDMG"
+---| "COMMANDERAURA"
+---| "COMMANDERAURAFORSELF"
+---| "ACUBUILDRATE"
+
+---@alias SeraphimACUEnhancementBuffName      # BuffType
+---| "SeraphimACUDamageStabilization"         # ACUUPGRADEDMG
+---| "SeraphimACUDamageStabilizationAdv"      # ACUUPGRADEDMG
+---| "SeraphimACUAdvancedRegenAura"           # COMMANDERAURA
+---| "SeraphimACUAdvancedRegenAuraSelfBuff"   # COMMANDERAURAFORSELF
+---| "SeraphimACURegenAura"                   # COMMANDERAURA
+---| "SeraphimACURegenAuraSelfBuff"           # COMMANDERAURAFORSELF
+---| "SeraphimACUT2BuildRate"                 # ACUBUILDRATE
+---| "SeraphimACUT3BuildRate"                 # ACUBUILDRATE
+
+
 local ACUUnit = import("/lua/defaultunits.lua").ACUUnit
 local Buff = import("/lua/sim/buff.lua")
 local SWeapons = import("/lua/seraphimweapons.lua")
@@ -18,18 +36,18 @@ local SIFLaanseTacticalMissileLauncher = SWeapons.SIFLaanseTacticalMissileLaunch
 local AIUtils = import("/lua/ai/aiutilities.lua")
 
 ---@class XSL0001 : ACUUnit
-XSL0001 = Class(ACUUnit) {
+XSL0001 = ClassUnit(ACUUnit) {
     Weapons = {
-        DeathWeapon = Class(DeathNukeWeapon) {},
-        ChronotronCannon = Class(SDFChronotronCannonWeapon) {},
-        Missile = Class(SIFLaanseTacticalMissileLauncher) {
+        DeathWeapon = ClassWeapon(DeathNukeWeapon) {},
+        ChronotronCannon = ClassWeapon(SDFChronotronCannonWeapon) {},
+        Missile = ClassWeapon(SIFLaanseTacticalMissileLauncher) {
             OnCreate = function(self)
                 SIFLaanseTacticalMissileLauncher.OnCreate(self)
                 self:SetWeaponEnabled(false)
             end,
         },
-        OverCharge = Class(SDFChronotronOverChargeCannonWeapon) {},
-        AutoOverCharge = Class(SDFChronotronOverChargeCannonWeapon) {},
+        OverCharge = ClassWeapon(SDFChronotronOverChargeCannonWeapon) {},
+        AutoOverCharge = ClassWeapon(SDFChronotronOverChargeCannonWeapon) {},
     },
 
     __init = function(self)

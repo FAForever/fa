@@ -12,9 +12,9 @@ local SStructureUnit = import("/lua/seraphimunits.lua").SStructureUnit
 local SDFUltraChromaticBeamGenerator = import("/lua/seraphimweapons.lua").SDFUltraChromaticBeamGenerator
 
 ---@class XSB2301 : SStructureUnit
-XSB2301 = Class(SStructureUnit) {
+XSB2301 = ClassUnit(SStructureUnit) {
     Weapons = {
-        MainGun = Class(SDFUltraChromaticBeamGenerator) {}
+        MainGun = ClassWeapon(SDFUltraChromaticBeamGenerator) {}
     },
 }
 

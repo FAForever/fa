@@ -1,5 +1,5 @@
 --**************************************************************************************************
---** Copyleft  2022 Forged Alliance Forever - shared under the GPL V3 license
+--** Shared under the MIT license
 --**************************************************************************************************
 --
 -- Color library for Moho Lua (based on LuaPlus 5.0)
@@ -281,9 +281,9 @@ end
 --- number is greater than 1, it is divided by 255. If the number is exactly 1, it is presumed to be
 --- `1.0` (the most common case) unless at least one other component is greater than 1. This means
 --- that `RGBtoFloat(1, 1, 1)` will return `1.0, 1.0, 1.0` instead of `1/255, 1/255, 1/255`.
----@param red any
----@param green any
----@param blue any
+---@param red number
+---@param green number
+---@param blue number
 ---@return number
 ---@return number
 ---@return number

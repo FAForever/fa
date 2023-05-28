@@ -179,7 +179,6 @@ UnitBlueprint {
         },
         UnitName = '<LOC xab3301_name>Eye of Rhianne',
         UnitWeight = 1,
-        UpgradesFrom = 'uab3201',
     },
     Intel = {
         ReactivateTime = 10,

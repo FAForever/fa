@@ -3,8 +3,8 @@
 ---@class moho.item_list_methods : moho.control_methods
 local CMauiItemList = {}
 
----
-function CMauiItemList:AddItem()
+---@param text LocalizedString
+function CMauiItemList:AddItem(text)
 end
 
 ---
@@ -39,7 +39,7 @@ end
 function CMauiItemList:GetRowHeight()
 end
 
----
+--- Returns the index of the currently selected item, using 0-based counting
 ---@return number
 function CMauiItemList:GetSelection()
 end
@@ -71,10 +71,10 @@ function CMauiItemList:ScrollToTop()
 end
 
 ---
----@param foreground string
----@param background string
----@param selectedForeground string
----@param selectedBackground string
+---@param foreground Color
+---@param background Color
+---@param selectedForeground Color
+---@param selectedBackground Color
 function CMauiItemList:SetNewColors(foreground, background, selectedForeground, selectedBackground)
 end
 

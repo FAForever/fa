@@ -190,28 +190,22 @@ UnitBlueprint {
             AboveWaterTargetsOnly = true,
             ArtilleryShieldBlocks = true,
             Audio = {
+                BarrelLoop = Sound {
+                    Bank = 'XSB',
+                    Cue = 'XSB2303_Turret_Artillery_Loop',
+                    LodCutoff = 'Weapon_LodCutoff',
+                },
+                BarrelStart = Sound {
+                    Bank = 'XSB',
+                    Cue = 'XSB2303_Turret_Artillery_Start',
+                    LodCutoff = 'Weapon_LodCutoff',
+                },
                 Fire = Sound {
                     Bank = 'XSB_Weapon',
                     Cue = 'XSB2303_Zthuthaam_Cannon',
                     LodCutoff = 'Weapon_LodCutoff',
                 },
-            },
-            BarrelStart = {
-                Fire = Sound {
-                    Bank = 'XSB',
-                    Cue = 'XSB2303_Turret_Artillery_Start',
-                    LodCutoff = 'Weapon_LodCutoff',
-                },
-            },
-            BarrelLoop = {
-                Fire = Sound {
-                    Bank = 'XSB',
-                    Cue = 'XSB2303_Turret_Artillery_Loop',
-                    LodCutoff = 'Weapon_LodCutoff',
-                },
-            },
-            MuzzleChargeStart = {
-                Fire = Sound {
+                MuzzleChargeStart = Sound {
                     Bank = 'XSB_Weapon',
                     Cue = 'XSB2303_Charge',
                     LodCutoff = 'Weapon_LodCutoff',
@@ -236,7 +230,6 @@ UnitBlueprint {
             MaxRadius = 128,
             MinRadius = 50,
             MuzzleChargeDelay = 1,
-            MuzzleSalvoChargeDelay = 0,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
             MuzzleVelocity = 26.13,

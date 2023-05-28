@@ -3,7 +3,7 @@ local Group = import("/lua/maui/group.lua").Group
 
 --- A Group for arranging controls horizontally in fixed-width columns.
 ---@class ColumnLayout : Group
-ColumnLayout = Class(Group) {
+ColumnLayout = ClassUI(Group) {
     --- Create a new ColumnLayout
     --
     -- @param positions A list of values representing the x co-ordinate of the leftmost pixel of

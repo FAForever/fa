@@ -23,10 +23,10 @@ local debugInterface = false
 --- A bit of a hack, but allows us to keep track of whether the changelog is open or not. The lobby
 -- is (almost aggressively) trying to keep control of the keyboard on the chat box to prevent hotkeys
 -- from working :sad:
-isOpen = false 
+isOpen = false
 
 ---@class Changelog : Group
-Changelog = Class(Group) {
+Changelog = ClassUI(Group) {
 
     __init = function(self, parent)
         Group.__init(self, parent)

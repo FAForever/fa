@@ -10,10 +10,26 @@ local explosion = import("/lua/defaultexplosions.lua")
 local EffectUtil = import("/lua/effectutilities.lua")
 local EffectTemplate = import("/lua/effecttemplates.lua")
 local ScenarioUtils = import("/lua/sim/scenarioutilities.lua")
+local TerrainUtils = import("/lua/sim/terrainutils.lua")
 local Buff = import("/lua/sim/buff.lua")
 local AdjacencyBuffs = import("/lua/sim/adjacencybuffs.lua")
 local FireState = import("/lua/game.lua").FireState
 local ScenarioFramework = import("/lua/scenarioframework.lua")
+local Quaternion = import("/lua/shared/quaternions.lua").Quaternion
+
+local MathAbs = math.abs
+
+local FactionToTarmacIndex = {
+    UEF = 1,
+    AEON = 2,
+    CYBRAN = 3,
+    SERAPHIM = 4,
+    NOMADS = 5,
+}
+
+local GetTarmac = import("/lua/tarmacs.lua").GetTarmacType
+local TreadComponent = import("/lua/defaultcomponents.lua").TreadComponent
+
 
 local RolloffUnitTable = { nil }
 local RolloffPositionTable = { 0, 0, 0 }
@@ -24,12 +40,20 @@ local GameHasAIs = ScenarioInfo.GameHasAIs
 -- compute once and store as upvalue for performance
 local StructureUnitRotateTowardsEnemiesLand = categories.STRUCTURE + categories.LAND + categories.NAVAL
 local StructureUnitRotateTowardsEnemiesArtillery = categories.ARTILLERY * (categories.TECH2 + categories.TECH3 + categories.EXPERIMENTAL)
-local StructureUnitOnStartBeingBuiltRotateBuildings = categories.STRUCTURE * (categories.DIRECTFIRE + categories.INDIRECTFIRE) * (categories.DEFENSE + categories.ARTILLERY)
+local StructureUnitOnStartBeingBuiltRotateBuildings = categories.STRUCTURE * (categories.DIRECTFIRE + categories.INDIRECTFIRE) * (categories.DEFENSE + (categories.ARTILLERY - (categories.TECH3 + categories.EXPERIMENTAL)))
+
+---@class StructureTarmacBag
+---@field Decals TrashBag
+---@field Orientation number
+---@field CurrentBP UnitBlueprintTarmac
+---@field Lifetime number
+---@field OwnedByEntity EntityId
 
 -- STRUCTURE UNITS
 ---@class StructureUnit : Unit
----@field AdjacentUnits? Unit[] 
-StructureUnit = Class(Unit) {
+---@field AdjacentUnits? Unit[]
+---@field TarmacBag StructureTarmacBag
+StructureUnit = ClassUnit(Unit) {
     LandBuiltHiddenBones = {'Floatation'},
     MinConsumptionPerSecondEnergy = 1,
     MinWeaponRequiresEnergy = 0,
@@ -45,9 +69,52 @@ StructureUnit = Class(Unit) {
     OnCreate = function(self)
         Unit.OnCreate(self)
         self:HideLandBones()
-        self.FxBlinkingLightsBag = {}
-        if self.Layer == 'Land' and self.Blueprint.Physics.FlattenSkirt then
+        self.FxBlinkingLightsBag = { }
+
+        local layer = self.Layer
+        local blueprint = self.Blueprint
+        local physicsBlueprint = blueprint.Physics
+        local flatten = physicsBlueprint.FlattenSkirt
+        if flatten then
             self:FlattenSkirt()
+        end
+
+        -- check for terrain orientation
+        if not (
+                physicsBlueprint.AltitudeToTerrain or
+                physicsBlueprint.StandUpright
+            ) and (flatten or physicsBlueprint.AlwaysAlignToTerrain)
+            and (layer == 'Land' or layer == 'Seabed')
+        then
+            -- rotate structure to match terrain gradient
+            local a1, a2 = TerrainUtils.GetTerrainSlopeAnglesDegrees(
+                self:GetPosition(),
+                blueprint.Footprint.SizeX or physicsBlueprint.SkirtSizeX,
+                blueprint.Footprint.SizeZ or physicsBlueprint.SkirtSizeZ
+            )
+
+            -- do not orientate structures that are on flat ground
+            if a1 != 0 or a2 != 0 then
+                -- quaternion magic incoming, be prepared! Note that the yaw axis is inverted, but then
+                -- re-inverted again by multiplying it with the original orientation
+                local quatSlope = Quaternion.fromAngle(0, 0 - a2,-1 * a1)
+                local quatOrient = setmetatable(self:GetOrientation(), Quaternion)
+                local quat = quatOrient * quatSlope
+                self:SetOrientation(quat, true)
+
+                -- technically obsolete, but as this is part of an integration we don't want to break
+                -- the mod package that it originates from. Originates from the BrewLan mod suite
+                self.TerrainSlope = {}
+            end
+        end
+
+        -- create decal below structure
+        if flatten and not self:HasTarmac() and blueprint.General.FactionName ~= "Seraphim" then
+            if self.TarmacBag then
+                self:CreateTarmac(true, true, true, self.TarmacBag.Orientation, self.TarmacBag.CurrentBP)
+            else
+                self:CreateTarmac(true, true, true, false, false)
+            end
         end
     end,
 
@@ -117,12 +184,13 @@ StructureUnit = Class(Unit) {
         local rad = math.atan2(target.location[1] - pos[1], target.location[3] - pos[3])
         local degrees = rad * (180 / math.pi)
 
-        -- some buildings can only take 90 degree angles
         if EntityCategoryContains(StructureUnitRotateTowardsEnemiesArtillery, self) then
-            degrees = math.floor((degrees + 45) / 90) * 90
+            degrees = math.floor((degrees + 90) / 180) * 180
         end
 
-        self:SetRotation(degrees)
+        local rotator = CreateRotator(self, 0, 'y', degrees, nil, nil)
+        rotator:SetPrecedence(1)
+        self.Trash:Add(rotator)
     end,
 
     ---@param self StructureUnit
@@ -131,17 +199,9 @@ StructureUnit = Class(Unit) {
     OnStartBeingBuilt = function(self, builder, layer)
         Unit.OnStartBeingBuilt(self, builder, layer)
 
+        -- rotate weaponry towards enemy
         if EntityCategoryContains(StructureUnitOnStartBeingBuiltRotateBuildings, self) then
             self:RotateTowardsEnemy()
-        end
-
-        local bp = self.Blueprint
-        if bp.Physics.FlattenSkirt and not self:HasTarmac() and bp.General.FactionName ~= "Seraphim" then
-            if self.TarmacBag then
-                self:CreateTarmac(true, true, true, self.TarmacBag.Orientation, self.TarmacBag.CurrentBP)
-            else
-                self:CreateTarmac(true, true, true, false, false)
-            end
         end
     end,
 
@@ -157,132 +217,223 @@ StructureUnit = Class(Unit) {
         end
 
         self:PlayActiveAnimation()
-
-        -- remove land bones if the structure has them
-        self:HideLandBones()
-    end,
-
-    ---@param self StructureUnit
-    OnFailedToBeBuilt = function(self)
-        Unit.OnFailedToBeBuilt(self)
-        self:DestroyTarmac()
     end,
 
     ---@param self StructureUnit
     FlattenSkirt = function(self)
-        local x, y, z = self:GetPositionXYZ()
         local x0, z0, x1, z1 = self:GetSkirtRect()
-        x0, z0, x1, z1 = math.floor(x0), math.floor(z0), math.ceil(x1), math.ceil(z1)
-        FlattenMapRect(x0, z0, x1 - x0, z1 - z0, y)
+        import('/lua/sim/TerrainUtils.lua').FlattenGradientMapRect(x0, z0, x1 - x0, z1 - z0)
     end,
 
     ---@param self StructureUnit
     ---@param albedo string
     ---@param normal string
     ---@param glow string
-    ---@param orientation number
-    ---@param specTarmac string
+    ---@param orientation? number
+    ---@param tarmac? UnitBlueprintTarmac
     ---@param lifeTime number
     ---@return boolean
-    CreateTarmac = function(self, albedo, normal, glow, orientation, specTarmac, lifeTime)
-        if self.Layer ~= 'Land' then return end
-        local tarmac
-        local bp = self.Blueprint.Display.Tarmacs
-        if not specTarmac then
-            if bp and not table.empty(bp) then
-                local num = Random(1, table.getn(bp))
-                tarmac = bp[num]
-            else
-                return false
-            end
-        else
-            tarmac = specTarmac
+    CreateTarmac = function(self, albedo, normal, glow, orientation, tarmac, lifeTime)
+        self.Trash:Add(
+            ForkThread(
+                self.CreateTarmacThread,
+                self,
+                albedo,
+                normal,
+                glow, 
+                orientation,
+                tarmac,
+                lifeTime
+            )
+        )
+    end,
+
+    ---@param self StructureUnit
+    ---@param albedo string
+    ---@param normal string
+    ---@param glow string
+    ---@param orientation? number
+    ---@param tarmac? UnitBlueprintTarmac
+    ---@param lifeTime number
+    CreateTarmacThread = function(self, albedo, normal, glow, orientation, tarmac, lifeTime)
+        -- hold up one tick to allow upgrades to pass the tarmac bag
+        WaitTicks(1)
+
+        -- upgrades pass the tarmac bag, in which case we take ownership and do nothing
+        if self:HasTarmac() then
+            self.TarmacBag.OwnedByEntity = self.EntityId
+            return
         end
 
+        -- no tarmacs underwater
+        if self.Layer ~= 'Land' then
+            return
+        end
+
+        -- bring into local scope for performance
+        local CreateDecal = CreateDecal
+        local GetTarmac = GetTarmac
+        local TableEmpty = table.empty
+        local TableRandom = table.random
+
+        -- determine tarmac to place
+        if not tarmac then
+            local tarmacBlueprints = self.Blueprint.Display.Tarmacs
+            if tarmacBlueprints and not TableEmpty(tarmacBlueprints) then
+                tarmac = TableRandom(tarmacBlueprints)
+            else
+                return
+            end
+        end
+
+        -- determine lod cutoff
+        local meshBlueprint = self.Blueprint.Display.Mesh
+        local cutoffOthers = meshBlueprint.LODs[1].LODCutoff
+        local cutoffAlbedo = meshBlueprint.LODs[2].LODCutoff
+        if not cutoffAlbedo then
+            cutoffAlbedo = cutoffOthers
+            cutoffOthers = 0.4 * cutoffOthers
+        else
+            cutoffOthers = 0.8 * cutoffOthers
+        end
+
+        -- take into account the fading of the decal
+        cutoffAlbedo = 1.1 * cutoffAlbedo
+        cutoffOthers = 1.1 * cutoffOthers
+
+        -- determine orientation
+        if not orientation then
+            if tarmac.Orientations and not TableEmpty(tarmac.Orientations) then
+                orientation = TableRandom(tarmac.Orientations)
+                -- convert to radians
+                orientation = (0.01745 * orientation)
+            else
+                orientation = 0
+            end
+        end
+
+        -- determine size
         local w = tarmac.Width
         local l = tarmac.Length
-        local fadeout = tarmac.FadeOut
 
-        local x, y, z = self:GetPositionXYZ()
+        -- determine faction
+        local factionIndex  = FactionToTarmacIndex[self.Blueprint.FactionCategory]
 
-        -- I'm disabling this for now since there are so many things wrong with it
-        local orient = orientation
-        if not orientation then
-            if tarmac.Orientations and not table.empty(tarmac.Orientations) then
-                orient = tarmac.Orientations[Random(1, table.getn(tarmac.Orientations))]
-                orient = (0.01745 * orient)
-            else
-                orient = 0
-            end
-        end
-
-        if not self.TarmacBag then
-            self.TarmacBag = {
-                Decals = {},
-                Orientation = orient,
-                CurrentBP = tarmac,
-            }
-        end
-
-        local GetTarmac = import("/lua/tarmacs.lua").GetTarmacType
-
-        local terrain = GetTerrainType(x, z)
-        local terrainName
+        -- determine terrain name for tarmacs based on terrain type
+        local position = self:GetPosition()
+        local terrain = GetTerrainType(position[1], position[3])
+        local terrainName = ''
         if terrain then
             terrainName = terrain.Name
         end
 
-        -- Players and AI can build buildings outside of their faction. Get the *building's* faction to determine the correct tarrain-specific tarmac
-        local factionTable = {e = 1, a = 2, r = 3, s = 4}
-        local faction  = factionTable[string.sub(self.UnitId, 2, 2)]
+        -- create a new bag
+        self.TarmacBag = {
+            Decals = TrashBag(),
+            OwnedByEntity = self.EntityId,
+            Orientation = orientation,
+            CurrentBP = tarmac,
+            Lifetime = cutoffOthers,
+        }
+        local bag = self.TarmacBag.Decals
+
+        -- create albedo tarmac, note that it may have a 2nd texture for specular properties
         if albedo and tarmac.Albedo then
             local albedo2 = tarmac.Albedo2
             if albedo2 then
-                albedo2 = albedo2 .. GetTarmac(faction, terrain)
+                albedo2 = albedo2 .. GetTarmac(factionIndex, terrain)
             end
 
-            local tarmacHndl = CreateDecal(self:GetPosition(), orient, tarmac.Albedo .. GetTarmac(faction, terrainName) , albedo2 or '', 'Albedo', w, l, fadeout, lifeTime or 0, self.Army, 0)
-            table.insert(self.TarmacBag.Decals, tarmacHndl)
+            local handle = CreateDecal(
+                position,
+                orientation,
+                tarmac.Albedo .. GetTarmac(factionIndex, terrainName),
+                albedo2 or '',
+                'Albedo',
+                w,
+                l,
+                cutoffAlbedo, 
+                lifeTime or 0,
+                self.Army,
+                0
+            )
+
+            bag:Add(handle)
             if tarmac.RemoveWhenDead then
-                self.Trash:Add(tarmacHndl)
+                self.Trash:Add(handle)
             end
         end
 
+        -- create normals tarmac, note not the usual normals shader
         if normal and tarmac.Normal then
-            local tarmacHndl = CreateDecal(self:GetPosition(), orient, tarmac.Normal .. GetTarmac(faction, terrainName), '', 'Alpha Normals', w, l, fadeout, lifeTime or 0, self.Army, 0)
+            local handle = CreateDecal(
+                position,
+                orientation,
+                tarmac.Normal .. GetTarmac(factionIndex, terrainName),
+                '',
+                'Alpha Normals',
+                w,
+                l,
+                cutoffOthers,
+                lifeTime or 0,
+                self.Army,
+                0
+            )
 
-            table.insert(self.TarmacBag.Decals, tarmacHndl)
+            bag:Add(handle)
             if tarmac.RemoveWhenDead then
-                self.Trash:Add(tarmacHndl)
+                self.Trash:Add(handle)
             end
         end
 
+        -- create glow tarmacs, not used by the base game
         if glow and tarmac.Glow then
-            local tarmacHndl = CreateDecal(self:GetPosition(), orient, tarmac.Glow .. GetTarmac(faction, terrainName), '', 'Glow', w, l, fadeout, lifeTime or 0, self.Army, 0)
+            local handle = CreateDecal(
+                position,
+                orientation,
+                tarmac.Glow .. GetTarmac(factionIndex, terrainName),
+                '',
+                'Glow',
+                w,
+                l,
+                cutoffOthers,
+                lifeTime or 0,
+                self.Army,
+                0
+            )
 
-            table.insert(self.TarmacBag.Decals, tarmacHndl)
+            bag:Add(handle)
             if tarmac.RemoveWhenDead then
-                self.Trash:Add(tarmacHndl)
+                self.Trash:Add(handle)
             end
         end
     end,
 
     ---@param self StructureUnit
     DestroyTarmac = function(self)
-        if not self.TarmacBag then return end
-
-        for k, v in self.TarmacBag.Decals do
-            v:Destroy()
+        -- no bag to clean up
+        local bag = self.TarmacBag
+        if not bag then
+            return
         end
 
-        self.TarmacBag.Orientation = nil
-        self.TarmacBag.CurrentBP = nil
+        -- not our responsibility to clean up
+        if not bag.OwnedByEntity == self.EntityId then
+            return
+        end
+
+        -- ok, clean the bag
+        bag.Decals:Destroy()
     end,
 
     ---@param self StructureUnit
     HasTarmac = function(self)
-        if not self.TarmacBag then return false end
-        return not table.empty(self.TarmacBag.Decals)
+        local bag = self.TarmacBag
+        if not bag then
+            return false
+        end
+
+        return not bag.Decals:Empty()
     end,
 
     ---@param self StructureUnit
@@ -290,7 +441,7 @@ StructureUnit = Class(Unit) {
         for _, v in self.FxBlinkingLightsBag do
             v:Destroy()
         end
-        self.FxBlinkingLightsBag = {}
+        self.FxBlinkingLightsBag = { }
     end,
 
     ---@param self StructureUnit
@@ -363,14 +514,19 @@ StructureUnit = Class(Unit) {
 
     UpgradingState = State {
         Main = function(self)
-            self:DestroyTarmac()
             self:PlayUnitSound('UpgradeStart')
             self:DisableDefaultToggleCaps()
 
+            -- give ownership of tarmac bag
+            local unitBuilding = self.UnitBeingBuilt
+            if self.TarmacBag then
+                local tarmacBag = self.TarmacBag
+                tarmacBag.OwnedByEntity = unitBuilding.EntityId
+                unitBuilding.TarmacBag = tarmacBag
+            end
+
             local animation = self:GetUpgradeAnimation(self.UnitBeingBuilt)
             if animation then
-
-                local unitBuilding = self.UnitBeingBuilt
                 self.AnimatorUpgradeManip = CreateAnimator(self)
                 self.Trash:Add(self.AnimatorUpgradeManip)
                 local fractionOfComplete = 0
@@ -405,13 +561,16 @@ StructureUnit = Class(Unit) {
             Unit.OnFailedToBuild(self)
             self:EnableDefaultToggleCaps()
 
+            if self.TarmacBag then
+                self.TarmacBag.OwnedByEntity = self.EntityId
+            end
+
             if self.AnimatorUpgradeManip then
                 self.AnimatorUpgradeManip:Destroy()
             end
 
             self:PlayUnitSound('UpgradeFailed')
             self:PlayActiveAnimation()
-            self:CreateTarmac(true, true, true, self.TarmacBag.Orientation, self.TarmacBag.CurrentBP)
             ChangeState(self, self.IdleState)
         end,
     },
@@ -482,7 +641,6 @@ StructureUnit = Class(Unit) {
 
     ---@param self StructureUnit
     PlayActiveAnimation = function(self)
-
     end,
 
     ---@param self StructureUnit
@@ -499,12 +657,14 @@ StructureUnit = Class(Unit) {
         end
 
         Unit.OnKilled(self, instigator, type, overkillRatio)
-        -- Adding into OnKilled the ability to destroy the tarmac but put a new one down that looks exactly like it but
-        -- will time out over the time spec'd or 300 seconds.
-        local orient = self.TarmacBag.Orientation
-        local currentBP = self.TarmacBag.CurrentBP
+
+        -- re-create tarmac bag, but with a life time
+        local bag = self.TarmacBag
+        local orient = bag.Orientation
+        local currentBP = bag.CurrentBP
+        local lifetime = bag.Lifetime
         self:DestroyTarmac()
-        self:CreateTarmac(true, true, true, orient, currentBP, currentBP.DeathLifetime or 300)
+        self:CreateTarmac(true, true, true, orient, currentBP, lifetime or 300)
     end,
 
     ---@param self StructureUnit
@@ -721,7 +881,7 @@ StructureUnit = Class(Unit) {
 ---@field BuildingUnit boolean
 ---@field BuildBoneRotator moho.RotateManipulator
 ---@field BuildEffectBones string[]
-FactoryUnit = Class(StructureUnit) {
+FactoryUnit = ClassUnit(StructureUnit) {
 
     ---@param self FactoryUnit
     OnCreate = function(self)
@@ -734,6 +894,8 @@ FactoryUnit = Class(StructureUnit) {
 
         -- Save build effect bones for faster access when creating build effects
         self.BuildBoneRotator = CreateRotator(self, self.Blueprint.Display.BuildAttachBone or 0, 'y', 0, 10000)
+        self.BuildBoneRotator:SetPrecedence(1000)
+
         self.Trash:Add(self.BuildBoneRotator)
         self.BuildEffectBones = self.Blueprint.General.BuildBones.BuildEffectBones
         self.BuildingUnit = false
@@ -744,7 +906,7 @@ FactoryUnit = Class(StructureUnit) {
     ---@return string?
     ToSupportFactoryIdentifier = function(self)
         local hashedCategories = self.Blueprint.CategoriesHash
-        local identifier = self.Blueprint.BlueprintId --[[@as string]]
+        local identifier = self.Blueprint.BlueprintId
         local faction = identifier:sub(2, 2)
         local layer = identifier:sub(7, 7)
 
@@ -775,7 +937,7 @@ FactoryUnit = Class(StructureUnit) {
     ---@param self FactoryUnit
     ToHQFactoryIdentifier = function(self)
         local hashedCategories = self.Blueprint.CategoriesHash
-        local identifier = self.Blueprint.BlueprintId --[[@as string]]
+        local identifier = self.Blueprint.BlueprintId
         local faction = identifier:sub(1, 3)
         local layer = identifier:sub(7, 7)
 
@@ -797,7 +959,7 @@ FactoryUnit = Class(StructureUnit) {
         -- anything else can not upgrade
         return nil
     end,
-    
+
     ---@param self FactoryUnit
     DestroyUnitBeingBuilt = function(self)
         if self.UnitBeingBuilt and not self.UnitBeingBuilt.Dead and self.UnitBeingBuilt:GetFractionComplete() < 1 then
@@ -816,8 +978,8 @@ FactoryUnit = Class(StructureUnit) {
         if self.Blueprint.CategoriesHash["RESEARCH"] and self:GetFractionComplete() == 1.0 then
 
             -- update internal state
-            self.Brain:RemoveHQ(self.factionCategory, self.layerCategory, self.techCategory)
-            self.Brain:SetHQSupportFactoryRestrictions(self.factionCategory, self.layerCategory)
+            self.Brain:RemoveHQ(self.Blueprint.FactionCategory, self.Blueprint.LayerCategory, self.Blueprint.TechCategory)
+            self.Brain:SetHQSupportFactoryRestrictions(self.Blueprint.FactionCategory, self.Blueprint.LayerCategory)
 
             -- update all units affected by this
             local affected = self.Brain:GetListOfUnits(categories.SUPPORTFACTORY - categories.EXPERIMENTAL, false)
@@ -892,8 +1054,8 @@ FactoryUnit = Class(StructureUnit) {
 
         if self.Blueprint.CategoriesHash["RESEARCH"] then
             -- update internal state
-            self.Brain:AddHQ(self.factionCategory, self.layerCategory, self.techCategory)
-            self.Brain:SetHQSupportFactoryRestrictions(self.factionCategory, self.layerCategory)
+            self.Brain:AddHQ(self.Blueprint.FactionCategory, self.Blueprint.LayerCategory, self.Blueprint.TechCategory)
+            self.Brain:SetHQSupportFactoryRestrictions(self.Blueprint.FactionCategory, self.Blueprint.LayerCategory)
 
             -- update all units affected by this
             local affected = self.Brain:GetListOfUnits(categories.SUPPORTFACTORY - categories.EXPERIMENTAL, false)
@@ -1088,7 +1250,7 @@ FactoryUnit = Class(StructureUnit) {
         size = size * size
         local unitPosition, dx, dz, d
         local buildPosition = self:GetPosition(self.Blueprint.Display.BuildAttachBone or 0)
-        repeat 
+        repeat
             unitPosition = self.UnitBeingBuilt:GetPosition()
             dx = buildPosition[1] - unitPosition[1]
             dz = buildPosition[3] - unitPosition[3]
@@ -1124,15 +1286,23 @@ FactoryUnit = Class(StructureUnit) {
     BuildingState = State {
         ---@param self FactoryUnit
         Main = function(self)
+            -- to help prevent a 1-tick rotation on most units
+            local hasEnhancements = self.UnitBeingBuilt.Blueprint.Enhancements
+            if not hasEnhancements then
+                self.UnitBeingBuilt:HideBone(0, true)
+            end
+
             local spin = self:CalculateRollOffPoint()
             self.BuildBoneRotator:SetGoal(spin)
-
-            WaitTicks(1)
-
-            local bone = self.Blueprint.Display.BuildAttachBone or 0
-            self:DetachAll(bone)
-            self.UnitBeingBuilt:AttachBoneTo(-2, self, bone)
+            self.UnitBeingBuilt:AttachBoneTo(-2, self, self.Blueprint.Display.BuildAttachBone or 0)
             self:StartBuildFx(self.UnitBeingBuilt)
+
+            -- prevents a 1-tick rotating visual 'glitch' of unit
+            -- as it is being attached and the rotator is applied
+            WaitTicks(3)
+            if not hasEnhancements then
+                self.UnitBeingBuilt:ShowBone(0, true)
+            end
         end,
     },
 
@@ -1146,15 +1316,15 @@ FactoryUnit = Class(StructureUnit) {
 
 -- AIR FACTORY UNITS
 ---@class AirFactoryUnit : FactoryUnit
-AirFactoryUnit = Class(FactoryUnit) {}
+AirFactoryUnit = ClassUnit(FactoryUnit) {}
 
 -- AIR STAGING PLATFORMS UNITS
 ---@class AirStagingPlatformUnit : StructureUnit
-AirStagingPlatformUnit = Class(StructureUnit) { }
+AirStagingPlatformUnit = ClassUnit(StructureUnit) { }
 
 -- ENERGY CREATION UNITS
 ---@class ConcreteStructureUnit : StructureUnit
-ConcreteStructureUnit = Class(StructureUnit) {
+ConcreteStructureUnit = ClassUnit(StructureUnit) {
     ---@param self ConcreteStructureUnit
     OnCreate = function(self)
         StructureUnit.OnCreate(self)
@@ -1164,19 +1334,19 @@ ConcreteStructureUnit = Class(StructureUnit) {
 
 -- ENERGY CREATION UNITS
 ---@class EnergyCreationUnit : StructureUnit
-EnergyCreationUnit = Class(StructureUnit) { }
+EnergyCreationUnit = ClassUnit(StructureUnit) { }
 
 -- ENERGY STORAGE UNITS
 ---@class EnergyStorageUnit : StructureUnit
-EnergyStorageUnit = Class(StructureUnit) { }
+EnergyStorageUnit = ClassUnit(StructureUnit) { }
 
 -- LAND FACTORY UNITS
 ---@class LandFactoryUnit : FactoryUnit
-LandFactoryUnit = Class(FactoryUnit) {}
+LandFactoryUnit = ClassUnit(FactoryUnit) {}
 
 -- MASS COLLECTION UNITS
 ---@class MassCollectionUnit : StructureUnit
-MassCollectionUnit = Class(StructureUnit) {
+MassCollectionUnit = ClassUnit(StructureUnit) {
 
     ---@param self MassCollectionUnit
     OnConsumptionActive = function(self)
@@ -1289,7 +1459,7 @@ MassCollectionUnit = Class(StructureUnit) {
 
 -- MASS FABRICATION UNITS
 ---@class MassFabricationUnit : StructureUnit
-MassFabricationUnit = Class(StructureUnit) {
+MassFabricationUnit = ClassUnit(StructureUnit) {
 
     ---@param self MassFabricationUnit
     ---@param bit number
@@ -1372,11 +1542,18 @@ MassFabricationUnit = Class(StructureUnit) {
 
 -- MASS STORAGE UNITS
 ---@class MassStorageUnit : StructureUnit
-MassStorageUnit = Class(StructureUnit) { }
+MassStorageUnit = ClassUnit(StructureUnit) { }
 
 -- RADAR UNITS
 ---@class RadarUnit : StructureUnit
-RadarUnit = Class(StructureUnit) {
+RadarUnit = ClassUnit(StructureUnit) {
+
+    OnCreate = function(self)
+        StructureUnit.OnCreate(self)
+
+        -- keep track of radars
+        self.Brain.Radars[self.Blueprint.TechCategory][self.EntityId] = self
+    end,
 
     ---@param self RadarUnit
     ---@param builder Unit
@@ -1386,22 +1563,36 @@ RadarUnit = Class(StructureUnit) {
         self:SetMaintenanceConsumptionActive()
     end,
 
+    OnKilled = function (self, instigator, type, overkillRatio)
+        StructureUnit.OnKilled(self, instigator, type, overkillRatio)
+
+        -- keep track of radars
+        self.Brain.Radars[self.Blueprint.TechCategory][self.EntityId] = nil
+    end,
+
+    OnDestroy = function (self)
+        StructureUnit.OnDestroy(self)
+
+        -- keep track of radars
+        self.Brain.Radars[self.Blueprint.TechCategory][self.EntityId] = nil
+    end,
+
     ---@param self RadarUnit
-    OnIntelDisabled = function(self)
-        StructureUnit.OnIntelDisabled(self)
+    OnIntelDisabled = function(self, intel)
+        StructureUnit.OnIntelDisabled(self, intel)
         self:DestroyIdleEffects()
     end,
 
     ---@param self RadarUnit
-    OnIntelEnabled = function(self)
-        StructureUnit.OnIntelEnabled(self)
+    OnIntelEnabled = function(self, intel)
+        StructureUnit.OnIntelEnabled(self, intel)
         self:CreateIdleEffects()
     end,
 }
 
 -- RADAR JAMMER UNITS
 ---@class RadarJammerUnit : StructureUnit
-RadarJammerUnit = Class(StructureUnit) {
+RadarJammerUnit = ClassUnit(StructureUnit) {
 
     -- Shut down intel while upgrading
     ---@param self RadarJammerUnit
@@ -1442,8 +1633,8 @@ RadarJammerUnit = Class(StructureUnit) {
     end,
 
     ---@param self RadarJammerUnit
-    OnIntelEnabled = function(self)
-        StructureUnit.OnIntelEnabled(self)
+    OnIntelEnabled = function(self, intel)
+        StructureUnit.OnIntelEnabled(self, intel)
         if self.IntelEffects and not self.IntelFxOn then
             self.IntelEffectsBag = {}
             self:CreateTerrainTypeEffects(self.IntelEffects, 'FXIdle', self.Layer, nil, self.IntelEffectsBag)
@@ -1452,8 +1643,8 @@ RadarJammerUnit = Class(StructureUnit) {
     end,
 
     ---@param self RadarJammerUnit
-    OnIntelDisabled = function(self)
-        StructureUnit.OnIntelDisabled(self)
+    OnIntelDisabled = function(self, intel)
+        StructureUnit.OnIntelDisabled(self, intel)
         EffectUtil.CleanupEffectBag(self, 'IntelEffectsBag')
         self.IntelFxOn = false
     end,
@@ -1461,7 +1652,7 @@ RadarJammerUnit = Class(StructureUnit) {
 
 -- SONAR UNITS
 ---@class SonarUnit : StructureUnit
-SonarUnit = Class(StructureUnit) {
+SonarUnit = ClassUnit(StructureUnit) {
 
     ---@param self SonarUnit
     ---@param builder Unit
@@ -1513,7 +1704,7 @@ SonarUnit = Class(StructureUnit) {
 
 -- SEA FACTORY UNITS
 ---@class SeaFactoryUnit : FactoryUnit
-SeaFactoryUnit = Class(FactoryUnit) {
+SeaFactoryUnit = ClassUnit(FactoryUnit) {
 
     ---@param self SeaFactoryUnit
     DestroyUnitBeingBuilt = function(self)
@@ -1524,7 +1715,6 @@ SeaFactoryUnit = Class(FactoryUnit) {
 
     ---@param self SeaFactoryUnit
     CalculateRollOffPoint = function(self)
-
         -- backwards compatible, don't try and fix mods that rely on the old logic
         if not self.Blueprint.Physics.ComputeRollOffPoint then
             return FactoryUnit.CalculateRollOffPoint(self)
@@ -1585,11 +1775,11 @@ SeaFactoryUnit = Class(FactoryUnit) {
 
 -- SHIELD STRCUTURE UNITS
 ---@class ShieldStructureUnit : StructureUnit
-ShieldStructureUnit = Class(StructureUnit) { }
+ShieldStructureUnit = ClassUnit(StructureUnit) { }
 
 -- TRANSPORT BEACON UNITS
 ---@class TransportBeaconUnit : StructureUnit
-TransportBeaconUnit = Class(StructureUnit) {
+TransportBeaconUnit = ClassUnit(StructureUnit) {
 
     FxTransportBeacon = {'/effects/emitters/red_beacon_light_01_emit.bp'},
     FxTransportBeaconScale = 0.5,
@@ -1614,24 +1804,51 @@ TransportBeaconUnit = Class(StructureUnit) {
 
 -- WALL STRCUTURE UNITS
 ---@class WallStructureUnit : StructureUnit
-WallStructureUnit = Class(StructureUnit) { }
+WallStructureUnit = ClassUnit(StructureUnit) { }
 
 -- QUANTUM GATE UNITS
 ---@class QuantumGateUnit : FactoryUnit
-QuantumGateUnit = Class(FactoryUnit) { }
+QuantumGateUnit = ClassUnit(FactoryUnit) { }
 
 -- MOBILE UNITS
----@class MobileUnit : Unit
-MobileUnit = Class(Unit) {
+---@class MobileUnit : Unit, TreadComponent
+MobileUnit = ClassUnit(Unit, TreadComponent) {
 
-    -- Added for engymod. When created, units must re-check their build restrictions
     ---@param self MobileUnit
     OnCreate = function(self)
         Unit.OnCreate(self)
+        TreadComponent.OnCreate(self)
+
         self:SetFireState(FireState.GROUND_FIRE)
+
+        self.MovementEffectsBag = TrashBag()
+        self.TopSpeedEffectsBag = TrashBag()
+        self.BeamExhaustEffectsBag = TrashBag()
     end,
 
-    ---comment
+    DestroyAllTrashBags = function(self)
+        Unit.DestroyAllTrashBags(self)
+
+        self.MovementEffectsBag:Destroy()
+        self.TopSpeedEffectsBag:Destroy()
+        self.BeamExhaustEffectsBag:Destroy()
+
+        -- only exists if unit is transported
+        if self.TransportBeamEffectsBag then
+            self.TransportBeamEffectsBag:Destroy()
+        end
+    end,
+
+    CreateMovementEffects = function(self, effectsBag, typeSuffix, terrainType)
+        Unit.CreateMovementEffects(self, effectsBag, typeSuffix, terrainType)
+        TreadComponent.CreateMovementEffects(self)
+    end,
+
+    DestroyMovementEffects = function(self)
+        Unit.DestroyMovementEffects(self)
+        TreadComponent.DestroyMovementEffects(self)
+    end,
+
     ---@param self MobileUnit
     ---@param instigator Unit
     ---@param type string
@@ -1645,13 +1862,12 @@ MobileUnit = Class(Unit) {
         end
     end,
 
-    ---comment
     ---@param self MobileUnit
     ---@param builder Unit
     ---@param layer Layer
     StartBeingBuiltEffects = function(self, builder, layer)
         Unit.StartBeingBuiltEffects(self, builder, layer)
-        if self.factionCategory == 'UEF' then
+        if self.Blueprint.FactionCategory == 'UEF' then
             EffectUtil.CreateUEFUnitBeingBuiltEffects(self, builder, self.OnBeingBuiltEffectsBag)
         end
     end,
@@ -1695,7 +1911,7 @@ MobileUnit = Class(Unit) {
 
 -- WALKING LAND UNITS
 ---@class WalkingLandUnit : MobileUnit
-WalkingLandUnit = Class(MobileUnit) {
+WalkingLandUnit = ClassUnit(MobileUnit) {
     WalkingAnim = nil,
     WalkingAnimRate = 1,
     IdleAnim = false,
@@ -1746,7 +1962,7 @@ WalkingLandUnit = Class(MobileUnit) {
 -- SUB UNITS
 -- These units typically float under the water and have wake when they move
 ---@class SubUnit : MobileUnit
-SubUnit = Class(MobileUnit) {
+SubUnit = ClassUnit(MobileUnit) {
     -- Use default spark effect until underwater damaged states are made
     FxDamage1 = { EffectTemplate.DamageSparks01 },
     FxDamage2 = { EffectTemplate.DamageSparks01 },
@@ -1772,7 +1988,7 @@ SubUnit = Class(MobileUnit) {
 
 -- AIR UNITS
 ---@class AirUnit : MobileUnit
-AirUnit = Class(MobileUnit) {
+AirUnit = ClassUnit(MobileUnit) {
     -- Contrails
     ContrailEffects = {'/effects/emitters/contrail_polytrail_01_emit.bp', },
     BeamExhaustCruise = '/effects/emitters/air_move_trail_beam_03_emit.bp',
@@ -1917,11 +2133,11 @@ AirUnit = Class(MobileUnit) {
     ---@param scale number
     CreateUnitAirDestructionEffects = function(self, scale)
         local scale = explosion.GetAverageBoundingXZRadius(self)
-        local size = self.Size
+        local blueprint = self.Blueprint
         explosion.CreateDefaultHitExplosion(self, scale)
 
         if self.ShowUnitDestructionDebris then
-            explosion.CreateDebrisProjectiles(self, scale, {size.SizeX, size.SizeY, size.SizeZ})
+            explosion.CreateDebrisProjectiles(self, scale, {blueprint.SizeX, blueprint.SizeY, blueprint.SizeZ})
         end
     end,
 
@@ -1968,9 +2184,7 @@ AirUnit = Class(MobileUnit) {
             proj:Start(self, 0)
             self.Trash:Add(proj)
 
-            if self.totalDamageTaken > 0 and not self.veterancyDispersed then
-                self:VeterancyDispersal(not instigator or not IsUnit(instigator))
-            end
+            self:VeterancyDispersal()
         else
             MobileUnit.OnKilled(self, instigator, type, overkillRatio)
         end
@@ -1999,7 +2213,7 @@ AirUnit = Class(MobileUnit) {
 
 --- Mixin transports (air, sea, space, whatever). Sellotape onto concrete transport base classes as desired.
 local slotsData = {}
----@class BaseTransport 
+---@class BaseTransport
 BaseTransport = ClassSimple {
 
     ---@param self BaseTransport
@@ -2085,7 +2299,7 @@ BaseTransport = ClassSimple {
 
 --- Base class for air transports.
 ---@class AirTransport: AirUnit, BaseTransport
-AirTransport = Class(AirUnit, BaseTransport) {
+AirTransport = ClassUnit(AirUnit, BaseTransport) {
 
     ---@param self AirTransport
     OnTransportAborted = function(self)
@@ -2168,13 +2382,12 @@ AirTransport = Class(AirUnit, BaseTransport) {
     end,
 }
 
--- LAND UNITS
 ---@class LandUnit : MobileUnit
-LandUnit = Class(MobileUnit) {}
+LandUnit = ClassUnit(MobileUnit) {}
 
 --  CONSTRUCTION UNITS
 ---@class ConstructionUnit : MobileUnit
-ConstructionUnit = Class(MobileUnit) {
+ConstructionUnit = ClassUnit(MobileUnit) {
 
     ---@param self ConstructionUnit
     OnCreate = function(self)
@@ -2184,8 +2397,7 @@ ConstructionUnit = Class(MobileUnit) {
 
         -- Save build effect bones for faster access when creating build effects
         self.BuildEffectBones = bp.General.BuildBones.BuildEffectBones
-
-        self.EffectsBag = {}
+        
         if bp.General.BuildBones then
             self:SetupBuildBones()
         end
@@ -2233,6 +2445,7 @@ ConstructionUnit = Class(MobileUnit) {
         else
             MobileUnit.OnStartBuild(self, unitBeingBuilt, order)
         end
+
         -- Fix up info on the unit id from the blueprint and see if it matches the 'UpgradeTo' field in the BP.
         self.UnitBeingBuilt = unitBeingBuilt
         self.UnitBuildOrder = order
@@ -2319,7 +2532,7 @@ ConstructionUnit = Class(MobileUnit) {
 -- SEA UNITS
 -- These units typically float on the water and have wake when they move
 ---@class SeaUnit : MobileUnit
-SeaUnit = Class(MobileUnit){
+SeaUnit = ClassUnit(MobileUnit){
     DeathThreadDestructionWaitTime = 0,
     ShowUnitDestructionDebris = false,
     PlayEndestructionEffects = false,
@@ -2336,7 +2549,7 @@ SeaUnit = Class(MobileUnit){
 
 --- Base class for aircraft carriers.
 ---@class AircraftCarrier : SeaUnit
-AircraftCarrier = Class(SeaUnit, BaseTransport) {
+AircraftCarrier = ClassUnit(SeaUnit, BaseTransport) {
 
     ---@param self AircraftCarrier
     ---@param instigator Unit
@@ -2351,10 +2564,10 @@ AircraftCarrier = Class(SeaUnit, BaseTransport) {
 
 -- HOVERING LAND UNITS
 ---@class HoverLandUnit : MobileUnit
-HoverLandUnit = Class(MobileUnit) { }
+HoverLandUnit = ClassUnit(MobileUnit) { }
 
 ---@class SlowHoverLandUnit : HoverLandUnit
-SlowHoverLandUnit = Class(HoverLandUnit) {
+SlowHoverLandUnit = ClassUnit(HoverLandUnit) {
 
     ---@param self SlowHoverLandUnit
     ---@param new string
@@ -2379,10 +2592,10 @@ SlowHoverLandUnit = Class(HoverLandUnit) {
 
 -- AMPHIBIOUS LAND UNITS
 ---@class AmphibiousLandUnit : MobileUnit
-AmphibiousLandUnit = Class(MobileUnit) { }
+AmphibiousLandUnit = ClassUnit(MobileUnit) { }
 
 ---@class SlowAmphibiousLandUnit : AmphibiousLandUnit
-SlowAmphibiousLandUnit = Class(AmphibiousLandUnit) {
+SlowAmphibiousLandUnit = ClassUnit(AmphibiousLandUnit) {
 
     ---@param self SlowAmphibiousLandUnit
     ---@param new string
@@ -2403,7 +2616,7 @@ SlowAmphibiousLandUnit = Class(AmphibiousLandUnit) {
 
 --- Base class for command units.
 ---@class CommandUnit : WalkingLandUnit
-CommandUnit = Class(WalkingLandUnit) {
+CommandUnit = ClassUnit(WalkingLandUnit) {
     DeathThreadDestructionWaitTime = 2,
 
     ---@param self CommandUnit
@@ -2607,7 +2820,7 @@ CommandUnit = Class(WalkingLandUnit) {
 }
 
 ---@class ACUUnit : CommandUnit
-ACUUnit = Class(CommandUnit) {
+ACUUnit = ClassUnit(CommandUnit) {
     -- The "commander under attack" warnings.
     ---@param self ACUUnit
     ---@param bpShield any
@@ -2714,6 +2927,21 @@ ACUUnit = Class(CommandUnit) {
                 WARN('Teamkill detected')
                 Sync.Teamkill = {killTime = GetGameTimeSeconds(), instigator = instigator.Army, victim = self.Army}
             end
+
+            -- prepare sync
+            local sync = Sync
+            local events = sync.Events or { }
+            sync.Events = events
+            local acuDestroyed = events.ACUDestroyed or { }
+            events.ACUDestroyed = acuDestroyed
+
+            -- sync the event
+            table.insert(acuDestroyed, {
+                Timestamp = GetGameTimeSeconds(),
+                InstigatorArmy = instigator.Army,
+                KilledArmy = self.Army
+            })
+
         end
         ArmyBrains[self.Army].CommanderKilledBy = (instigator or self).Army
     end,
@@ -2798,12 +3026,12 @@ ACUUnit = Class(CommandUnit) {
 
 -- SHIELD HOVER UNITS
 ---@class ShieldHoverLandUnit : HoverLandUnit
-ShieldHoverLandUnit = Class(HoverLandUnit) {}
+ShieldHoverLandUnit = ClassUnit(HoverLandUnit) {}
 
 -- SHIELD LAND UNITS
 ---@class ShieldLandUnit : LandUnit
-ShieldLandUnit = Class(LandUnit) {}
+ShieldLandUnit = ClassUnit(LandUnit) {}
 
 -- SHIELD SEA UNITS
 ---@class ShieldSeaUnit : SeaUnit
-ShieldSeaUnit = Class(SeaUnit) {}
+ShieldSeaUnit = ClassUnit(SeaUnit) {}

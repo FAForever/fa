@@ -18,6 +18,9 @@ LayerColors = {
 ---@field Position Vector 
 ---@field Layer NavLayers
 
+---@class NavDebugGetLabelMetadataState
+---@field Id number
+
 ---@class NavDebugPathToState
 ---@field Origin Vector 
 ---@field Destination Vector 
@@ -95,6 +98,10 @@ end
 ---@param label number
 ---@return string
 function LabelToColor(label)
+    if label == -1 then
+        return 'ff0000'
+    end
+
     local r = string.format("%x", math.mod(math.sin(label) * 256 + 512, 256) ^ 0)
     local g = string.format("%x", math.mod(math.sin(label + 2) * 256 + 512, 256) ^ 0)
     local b = string.format("%x", math.mod(math.cos(label) * 256 + 512, 256) ^ 0)

@@ -28,6 +28,7 @@ local Window = import("/lua/maui/window.lua").Window
 local Group = import("/lua/maui/group.lua").Group
 local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
 local Combo = import("/lua/ui/controls/combo.lua").Combo
+local Edit = import("/lua/maui/edit.lua").Edit
 
 local Shared = import("/lua/shared/navgenerator.lua")
 
@@ -37,7 +38,7 @@ local DebugInterface = false
 ---@alias NavUIStates 'overview' | 'actions'
 
 ---@class NavUIOverview : Group
-NavUIOverview = Class(Group) {
+NavUIOverview = ClassUI(Group) {
     __init = function(self, parent) 
         Group.__init(self, parent, 'NavUIOverview')
     end
@@ -45,7 +46,7 @@ NavUIOverview = Class(Group) {
 
 ---@class NavUIPathTo : Group
 ---@field State NavDebugGetLabelState
-NavUIGetLabel = Class(Group) {
+NavUIGetLabel = ClassUI(Group) {
     __init = function (self, parent)
         local name = 'NavUIGetLabel'
         Group.__init(self, parent, name)
@@ -80,7 +81,7 @@ NavUIGetLabel = Class(Group) {
                 "build",
                 {
                     -- default information required
-                    name = 'ual0105',
+                    name = 'uaa0101',
 
                     --- 
                     ---@param mode CommandModeDataBuild
@@ -138,7 +139,6 @@ NavUIGetLabel = Class(Group) {
             function(Sync)
                 if Sync.NavDebugGetLabel then
                     local data = Sync.NavDebugGetLabel
-
                     if data.Label then
                         self.Title:SetText(string.format('Debug \'GetLabel\': %s', tostring(data.Label)))
                     else
@@ -151,8 +151,103 @@ NavUIGetLabel = Class(Group) {
 }
 
 ---@class NavUIPathTo : Group
+---@field State NavDebugGetLabelState
+NavUIGetLabelMetadata = ClassUI(Group) {
+    __init = function (self, parent)
+        local name = 'NavUIGetLabelMetadata'
+        Group.__init(self, parent, name)
+
+        self.State = { Id = 1.0 }
+
+        self.Background = LayoutHelpers.LayoutFor(Bitmap(self))
+            :Fill(self)
+            :Color('77000000')
+            :DisableHitTest(true)
+            :End()
+
+        self.Title = LayoutHelpers.LayoutFor(UIUtil.CreateText(self, 'Debug \'GetLabelMetadata\'', 10, UIUtil.bodyFont))
+            :AtLeftTopIn(self, 10, 10)
+            :Over(self, 1)
+            :End() --[[@as Text]]
+
+        self.ButtonPosition = LayoutHelpers.LayoutFor(UIUtil.CreateButtonWithDropshadow(self, '/BUTTON/medium/', "Query for label"))
+            :AtLeftBottomIn(self.Background, -5, 5)
+            :Over(self, 1)
+            :End()
+
+        self.ButtonPosition.OnClick = function()
+            SimCallback({ Func = 'NavDebugGetLabelMetadata', Args = self.State })
+        end
+
+        self.LabelLayer = LayoutHelpers.LayoutFor(UIUtil.CreateText(self, 'For layer:', 10, UIUtil.bodyFont))
+            :RightOf(self.ButtonPosition)
+            :Top(function() return self.ButtonPosition.Top() - LayoutHelpers.ScaleNumber(4) end)
+            :Over(self, 1)
+        :End()
+
+        self.Edit = LayoutHelpers.LayoutFor(Edit(self))
+            :RightOf(self.ButtonPosition)
+            :Top(function() return self.ButtonPosition.Top() + LayoutHelpers.ScaleNumber(14) end)
+            :Width(50)
+            :Height(20)
+            :End() --[[@as Edit]]
+
+        self.Edit.OnTextChanged = function (_, new, old)
+            self.State.Id = tonumber(new) or -1
+        end
+
+        self.Group = LayoutHelpers.LayoutFor(Group(self))
+            :Left(function() return self.Edit.Right() + LayoutHelpers.ScaleNumber(10) end)
+            :Right(function() return self.Background.Right() - LayoutHelpers.ScaleNumber(10) end)
+            :Top(function() return self.Background.Top() + LayoutHelpers.ScaleNumber(10) end)
+            :Bottom(function() return self.Background.Bottom() - LayoutHelpers.ScaleNumber(10) end)
+            :End() --[[@as Group]]
+
+        self.TextArea = LayoutHelpers.LayoutFor(UIUtil.CreateText(self, 'Area: ', 10, UIUtil.bodyFont))
+            :Left(function() return self.Group.Left() + LayoutHelpers.ScaleNumber(10) end)
+            :Top(function() return self.Group.Top() + LayoutHelpers.ScaleNumber(14) end)
+            :End() --[[@as Text]]
+
+        self.TextLayer = LayoutHelpers.LayoutFor(UIUtil.CreateText(self, 'Layer: ', 10, UIUtil.bodyFont))
+            :Left(function() return self.Group.Left() + LayoutHelpers.ScaleNumber(10) end)
+            :Top(function() return self.TextArea.Bottom() + LayoutHelpers.ScaleNumber(4) end)
+            :End() --[[@as Text]]
+
+        self.TextNumberOfExtractors = LayoutHelpers.LayoutFor(UIUtil.CreateText(self, 'Number of extractors: ', 10, UIUtil.bodyFont))
+            :Left(function() return self.Group.Left() + LayoutHelpers.ScaleNumber(100) end)
+            :Top(function() return self.Group.Top() + LayoutHelpers.ScaleNumber(14) end)
+            :End() --[[@as Text]]
+
+        self.TextNumberOfHydrocarbons = LayoutHelpers.LayoutFor(UIUtil.CreateText(self, 'Number of hydrocarbons: ', 10, UIUtil.bodyFont))
+            :Left(function() return self.Group.Left() + LayoutHelpers.ScaleNumber(100) end)
+            :Top(function() return self.TextNumberOfExtractors.Bottom() + LayoutHelpers.ScaleNumber(4) end)
+            :End() --[[@as Text]]
+
+        AddOnSyncCallback(
+            function(Sync)
+                if Sync.NavDebugGetLabelMetadata then
+                    local response = Sync.NavDebugGetLabelMetadata
+
+                    ---@type NavLabelMetadata
+                    local data = response.data
+                    if data then
+                        self.Title:SetText(string.format('Debug \'GetLabelMetadata\': %s', 'ok'))
+                        self.TextArea:SetText(string.format('Area: %f', data.Area))
+                        self.TextLayer:SetText(string.format('Layer: %s', data.Layer))
+                        self.TextNumberOfExtractors:SetText(string.format('Number of extractors: %d', data.NumberOfExtractors))
+                        self.TextNumberOfHydrocarbons:SetText(string.format('Number of hydrocarbons: %d', data.NumberOfHydrocarbons))
+                    else 
+                        self.Title:SetText(string.format('Debug \'GetLabelMetadata\': %s', response.msg))
+                    end
+                end
+            end, name
+        )
+    end,
+}
+
+---@class NavUIPathTo : Group
 ---@field State NavDebugCanPathToState
-NavUIPathTo = Class(Group) {
+NavUIPathTo = ClassUI(Group) {
     __init = function (self, parent)
         local name = 'NavUIPathTo'
         Group.__init(self, parent, name)
@@ -187,7 +282,7 @@ NavUIPathTo = Class(Group) {
                 "build",
                 {
                     -- default information required
-                    name = 'ual0105',
+                    name = 'uaa0101',
 
                     --- 
                     ---@param mode CommandModeDataBuild
@@ -216,7 +311,7 @@ NavUIPathTo = Class(Group) {
                 "build",
                 {
                     -- default information required
-                    name = 'ual0105',
+                    name = 'uaa0101',
 
                     --- 
                     ---@param mode CommandModeDataBuild
@@ -270,26 +365,12 @@ NavUIPathTo = Class(Group) {
             self.State.Destination = nil
             SimCallback({Func = 'NavDebugPathTo', Args = self.State})
         end
-
-        -- AddOnSyncCallback(
-        --     function(Sync)
-        --         if Sync.NavCanPathToDebug then
-        --             local data = Sync.NavCanPathToDebug
-
-        --             if data.Ok then
-        --                 self.Title:SetText(string.format('Debug \'CanPathTo\': %s', tostring(data.Ok)))
-        --             else 
-        --                 self.Title:SetText(string.format('Debug \'CanPathTo\': %s (%s)', tostring(data.Ok), data.Msg))
-        --             end
-        --         end
-        --     end, name
-        -- )
     end,
 }
 
 ---@class NavUICanPathTo : Group
 ---@field State NavDebugCanPathToState
-NavUICanPathTo = Class(Group) {
+NavUICanPathTo = ClassUI(Group) {
     __init = function (self, parent)
         local name = 'NavUICanPathTo'
         Group.__init(self, parent, name)
@@ -325,7 +406,7 @@ NavUICanPathTo = Class(Group) {
                 "build",
                 {
                     -- default information required
-                    name = 'ual0105',
+                    name = 'uaa0101',
 
                     --- 
                     ---@param mode CommandModeDataBuild
@@ -354,7 +435,7 @@ NavUICanPathTo = Class(Group) {
                 "build",
                 {
                     -- default information required
-                    name = 'ual0105',
+                    name = 'uaa0101',
 
                     --- 
                     ---@param mode CommandModeDataBuild
@@ -427,7 +508,7 @@ NavUICanPathTo = Class(Group) {
 }
 
 ---@class NavUILayerStatistics : Group
-NavUILayerStatistics = Class(Group) {
+NavUILayerStatistics = ClassUI(Group) {
     __init = function(self, parent, layer)
         local name = 'NavUILayerStatistics - ' .. tostring(layer)
         Group.__init(self, parent, 'NavUILayerStatistics - ' .. tostring(layer))
@@ -495,8 +576,14 @@ NavUILayerStatistics = Class(Group) {
         self.ToggleLabelGrid.OnClick = function()
             SimCallback({ Func = 'NavToggleScanLabels', Args = { Layer = layer }}, false)
         end
-    
 
+        -- tell sim to send the known stats
+        SimCallback({
+            Func = "NavDebugStatisticsToUI",
+            Args = { }
+        })
+
+        -- list to sim sending us stats
         AddOnSyncCallback(
             function(Sync)
                 if Sync.NavLayerData then
@@ -515,7 +602,7 @@ NavUILayerStatistics = Class(Group) {
 }
 
 ---@class NavUIActions : Group
-NavUIActions = Class(Group) {
+NavUIActions = ClassUI(Group) {
     __init = function(self, parent) 
         Group.__init(self, parent, 'NavUIActions')
 
@@ -618,6 +705,13 @@ NavUIActions = Class(Group) {
             :Bottom(function() return self.NavUIPathTo.Bottom() + LayoutHelpers.ScaleNumber(85) end)
             :End()
 
+        self.NavUIGetLabelMetadata = LayoutHelpers.LayoutFor(NavUIGetLabelMetadata(self))
+            :Left(function() return self.BodyDebug.Left() + LayoutHelpers.ScaleNumber(10) end)
+            :Right(function() return self.BodyDebug.Right() - LayoutHelpers.ScaleNumber(10) end)
+            :Top(function() return self.NavUIGetLabel.Bottom() + LayoutHelpers.ScaleNumber(10) end)
+            :Bottom(function() return self.NavUIGetLabel.Bottom() + LayoutHelpers.ScaleNumber(85) end)
+            :End()
+
         self.Debug:DisableHitTest(true)
         if not DebugInterface then
             self.Debug:Hide()
@@ -626,7 +720,7 @@ NavUIActions = Class(Group) {
 }
 
 ---@class NavUI : Window
-NavUI = Class(Window) {
+NavUI = ClassUI(Window) {
 
     __init = function(self, parent)
 
