@@ -112,7 +112,7 @@ UnitBlueprint {
     Economy = {
         BuildCostEnergy = 3600,
         BuildCostMass = 450,
-        BuildTime = 450,
+        BuildTime = 675,
         RebuildBonusIds = {
             'xsb2109',
         },
@@ -204,7 +204,7 @@ UnitBlueprint {
             },
             BallisticArc = 'RULEUBA_None',
             CollideFriendly = false,
-            Damage = 115,
+            Damage = 120,
             DamageType = 'Normal',
             DisplayName = 'Uall Cavitation Torpedo Launcher',
             FireTargetLayerCapsTable = {

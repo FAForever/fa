@@ -97,7 +97,7 @@ UnitBlueprint {
     Economy = {
         BuildCostEnergy = 3600,
         BuildCostMass = 450,
-        BuildTime = 450,
+        BuildTime = 675,
         RebuildBonusIds = {
             'ueb2109',
         },
@@ -190,7 +190,7 @@ UnitBlueprint {
             },
             BallisticArc = 'RULEUBA_None',
             CollideFriendly = false,
-            Damage = 175,
+            Damage = 180,
             DamageType = 'Normal',
             DisplayName = 'Angler Torpedo',
             FireTargetLayerCapsTable = {
