@@ -201,17 +201,17 @@ URL0402 = ClassUnit(CWalkingLandUnit) {
         self:CreateExplosionDebris(army)
         self:CreateExplosionDebris(army)
 
-        WaitTicks(10)
+        WaitTicks(9)
 
         CreateDeathExplosion(self, 'Center_Turret', 1.5)
         self:CreateDamageEffects('Center_Turret_B01', army)
         self:CreateDamageEffects('Center_Turret_Barrel', army)
 
-        WaitTicks(10)
+        WaitTicks(9)
         self:CreateFirePlumes(army, { 'Right_Leg01_B01', 'Right_Leg03_B01', 'Left_Leg03_B01', }, 0.5)
-        WaitTicks(3)
+        WaitTicks(2)
         self:CreateDeathExplosionDustRing()
-        WaitTicks(4)
+        WaitTicks(3)
 
         self:ShakeCamera(50, 5, 0, 1)
         CreateDeathExplosion(self, 'Left_Turret_Muzzle', 1)
@@ -245,7 +245,7 @@ URL0402 = ClassUnit(CWalkingLandUnit) {
         end
 
         DamageRing(self, { x, y, z }, 0.1, 3, 1, 'Force', true)
-        WaitTicks(5)
+        WaitTicks(4)
         CreateDeathExplosion(self, 'Center_Turret', 2)
 
         -- Finish up force ring to push trees
@@ -256,17 +256,17 @@ URL0402 = ClassUnit(CWalkingLandUnit) {
         CreateDeathExplosion(self, 'Left_Projectile01', 2)
         self:CreateFirePlumes(army, { 'Left_Projectile01' }, -1)
         self:CreateDamageEffects('Right_Turret', army)
-        WaitTicks(5)
+        WaitTicks(4)
 
         CreateDeathExplosion(self, 'Left_Leg0' .. Random(1, 3) .. '_B0' .. Random(1, 3), 0.25)
         self:CreateDamageEffects('Right_Leg01_B03', army)
-        WaitTicks(5)
+        WaitTicks(4)
         CreateDeathExplosion(self, 'Left_Turret_Muzzle', 1)
         self:CreateExplosionDebris(army)
 
         CreateDeathExplosion(self, 'Right_Leg0' .. Random(1, 3) .. '_B0' .. Random(1, 3), 0.25)
         self:CreateDamageEffects('Right_Projectile0' .. Random(1, 2), army)
-        WaitTicks(5)
+        WaitTicks(4)
 
         CreateDeathExplosion(self, 'Left_Leg0' .. Random(1, 3) .. '_B0' .. Random(1, 3), 0.25)
         CreateDeathExplosion(self, 'Left_Projectile01', 2)
