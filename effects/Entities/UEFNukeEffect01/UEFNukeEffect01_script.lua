@@ -24,13 +24,13 @@ UEFNukeEffect01 = Class(NullShell) {
 		self:SetScaleVelocity(scaleChange, scaleChange, scaleChange)
 		self:SetVelocity(0, 0.25, 0)
 
-		WaitTicks(41)
+		WaitTicks(40)
 		scaleChange = -0.01 * scale
 		self:SetScaleVelocity(scaleChange, 12 * scaleChange, scaleChange)
 		self:SetVelocity(0, 3, 0)
 		self:SetBallisticAcceleration(-0.5)
 
-		WaitTicks(51)
+		WaitTicks(50)
 		scaleChange = -0.1 * scale
 		self:SetScaleVelocity(scaleChange, scaleChange, scaleChange)
 

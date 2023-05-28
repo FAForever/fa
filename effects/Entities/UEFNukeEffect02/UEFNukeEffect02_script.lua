@@ -21,7 +21,7 @@ UEFNukeEffect02 = Class(NullShell) {
 	EffectThread = function(self)
 		local army = self.Army
 
-		WaitTicks(41)
+		WaitTicks(40)
 		for k, v in EffectTemplate.TNukeHeadEffects01 do
 			CreateEmitterOnEntity(self, army, v)
 		end

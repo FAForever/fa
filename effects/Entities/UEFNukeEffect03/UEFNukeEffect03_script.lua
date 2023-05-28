@@ -24,7 +24,7 @@ UEFNukeEffect03 = Class(NullShell) {
 			CreateAttachedEmitter(self, -1, army, v)
 		end
 
-		WaitSeconds(6)
+		WaitTicks(60)
 		for k, v in EffectTemplate.TNukeHeadEffects02 do
 			CreateAttachedEmitter(self, -1, army, v)
 		end

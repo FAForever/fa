@@ -16,7 +16,7 @@ UEFNukeEffectController01 = Class(NullShell) {
 
         -- Create full-screen glow flash
         CreateLightParticle(self, -1, army, 35, 4, 'glow_02', 'ramp_red_02')
-        WaitTicks(3)
+        WaitTicks(2)
         CreateLightParticle(self, -1, army, 80, 20, 'glow_03', 'ramp_fire_06')
 
         -- Create initial fireball dome effect
@@ -38,7 +38,7 @@ UEFNukeEffectController01 = Class(NullShell) {
         self:ForkThread(self.CreateHeadConvectionSpinners)
         self:ForkThread(self.CreateFlavorPlumes)
 
-        WaitTicks(6)
+        WaitTicks(5)
 
         CreateLightParticle(self, -1, army, 300, 250, 'glow_03', 'ramp_nuke_04')
 
@@ -83,7 +83,7 @@ UEFNukeEffectController01 = Class(NullShell) {
             table.insert(projectiles, proj)
         end
 
-        WaitTicks(31)
+        WaitTicks(30)
 
         -- Slow projectiles down to normal speed
         for k, v in projectiles do
@@ -119,7 +119,7 @@ UEFNukeEffectController01 = Class(NullShell) {
                     xVec, yVec, zVec):SetVelocity(velocity))
         end
 
-        WaitTicks(31)
+        WaitTicks(30)
 
         -- Slow projectiles down to normal speed
         for k, v in projectiles do
@@ -144,7 +144,7 @@ UEFNukeEffectController01 = Class(NullShell) {
             table.insert(projectiles, proj)
         end
 
-        WaitTicks(11)
+        WaitTicks(10)
         for i = 0, (sides - 1) do
             local x = math.sin(i * angle)
             local z = math.cos(i * angle)
