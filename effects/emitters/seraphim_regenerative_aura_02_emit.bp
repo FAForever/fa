@@ -14,7 +14,7 @@ EmitterBlueprint {
 	EmitIfVisible = true,
 	CatchupEmit = true,
 	CreateIfVisible = false,
-	SnapToWaterline = true,
+	SnapToWaterline = false,
 	OnlyEmitOnWater = false,
 	ParticleResistance = false,
 	InterpolateEmission = true,
