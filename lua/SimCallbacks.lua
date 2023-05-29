@@ -782,68 +782,8 @@ Callbacks.iMapToggleThreat = function(data)
     import("/lua/sim/maputilities.lua").iMapToggleThreat(data.Identifier)
 end
 
-Callbacks.SelectHighestEngineerAndAssist = function(data, selection)
-    if selection then
-
-        local noACU = EntityCategoryFilterDown(categories.ALLUNITS - categories.COMMAND, selection)
-
-        ---@type Unit
-        local target = GetEntityById(data.TargetId)
-
-        IssueClearCommands(noACU)
-        IssueGuard(noACU, target)
-    end
-end
-
----@class CargoSlots
----@field Large number 
----@field Medium number 
----@field Small number
-
----@type CargoSlots[]
-local GetCargoSlotsCache = {}
-
----@param unit Unit
----@return CargoSlots
-local function GetCargoSlots(unit)
-
-    -- try the cache first
-    if GetCargoSlotsCache[unit.UnitId] then 
-        return GetCargoSlotsCache[unit.UnitId]
-    end
-
-    ---@type CargoSlots
-    local slots = {
-        Large = 0,
-        Medium = 0,
-        Small = 0,
-    }
-
-    -- based on attachment points
-    for i = 1, unit:GetBoneCount() do
-        if unit:GetBoneName(i) ~= nil then
-            if string.find(unit:GetBoneName(i), 'Attachpoint_Lrg') then
-                slots.Large = slots.Large + 1
-            elseif string.find(unit:GetBoneName(i), 'Attachpoint_Med') then
-                slots.Medium = slots.Medium + 1
-            elseif string.find(unit:GetBoneName(i), 'Attachpoint') then
-                slots.Small = slots.Small + 1
-            end
-        end
-    end
-
-    -- based on blueprint definitions
-    slots.Large = math.min(slots.Large, unit.Blueprint.Transport.SlotsLarge or slots.Large)
-    slots.Medium = math.min(slots.Medium, unit.Blueprint.Transport.SlotsMedium or slots.Medium)
-    slots.Small = math.min(slots.Small, unit.Blueprint.Transport.SlotsSmall or slots.Small)
-
-    -- cache it and return
-    GetCargoSlotsCache[unit.UnitId] = slots
-    return slots
-end
-
-Callbacks.NavEnableDebugging = import("/lua/sim/NavDebug.lua").EnableDebugging
-Callbacks.NavDisableDebugging = import("/lua/sim/NavDebug.lua").DisableDebugging
+Callbacks.NavEnableDebugging = import("/lua/sim/navdebug.lua").EnableDebugging
+Callbacks.NavDisableDebugging = import("/lua/sim/navdebug.lua").DisableDebugging
 Callbacks.NavToggleScanLayer = import("/lua/sim/navdebug.lua").ToggleScanLayer
 Callbacks.NavToggleScanLabels = import("/lua/sim/navdebug.lua").ToggleScanLabels
 Callbacks.NavDebugStatisticsToUI = import("/lua/sim/navdebug.lua").StatisticsToUI

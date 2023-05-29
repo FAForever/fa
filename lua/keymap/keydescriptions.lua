@@ -168,7 +168,6 @@ keyDescriptions = {
     ['toggle_build_mode'] = '<LOC key_desc_0102>Toggles keyboard build command mode on and off',
     ['toggle_reclaim_labels'] = '<LOC key_desc_0103>Toggles reclaim labels on and off',
     ['select_upgrading_extractors'] = '<LOC key_desc_select_upgrading_extractors>Select all extractors that are upgrading',
-    ['filter_highest_engineer_and_assist'] = '<LOC key_desc_filter_highest_engineer_and_assist>Filter the selection to the most advanced engineer, all other engineers assist that engineer',
     ['select_all_radars'] = '<LOC key_desc_select_all_radars>Select all radars',
     ['decrease_game_speed'] = '<LOC key_desc_0079>Decrease game speed',
     ['increase_game_speed'] = '<LOC key_desc_0080>Increase game speed',
@@ -496,7 +495,6 @@ keyDescriptions = {
     ['t3_support_air_factory'] = '<LOC key_desc_0386>build T3 Support Air Factory',
     ['t3_support_naval_factory'] = '<LOC key_desc_0387>build T3 Support Naval Factory',
 
-    ['recheck_targets_of_weapons'] = 'Recheck targets of weapons of selected units',
     ['set_target_priority'] = 'Set weapon target priorities to the type of unit that you hover over with the mouse',
     ['set_default_target_priority'] = 'Set weapon target priorities of selected units to their defaults',
 
