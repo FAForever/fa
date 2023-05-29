@@ -9,7 +9,7 @@
 --- itself. The system in place is what we have however. The descriptions
 --- of key actions can be found in `/lua/keymap/keydescriptions.lua`
 
---- Regular key actions can be found in `/lua/keymap/keyactions.lua`
+--- Debug key actions can be found in `/lua/keymap/debugKeyactions.lua`
 
 ---@class UIKeyAction
 ---@field action string
