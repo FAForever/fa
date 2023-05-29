@@ -96,7 +96,7 @@ BuilderGroup {
         BuilderConditions = {
             { IBC, 'BrainNotLowPowerMode', {} },
             { UCBC, 'FactoryCapCheck', { 'LocationType', 'Air' } },
-            { EBC, 'GreaterThanEconEfficiencyCombined', { 1.0, 1.1} },
+            { EBC, 'GreaterThanEconEfficiencyCombined', { 1.05, 1.1} },
             { UCBC, 'FactoryLessAtLocation', { 'LocationType', 3, categories.AIR } },
             { UCBC, 'UnitCapCheckLess', { .8 } },
             { EBC, 'MassToFactoryRatioBaseCheck', { 'LocationType' } },
@@ -119,7 +119,7 @@ BuilderGroup {
         BuilderConditions = {
             { IBC, 'BrainNotLowPowerMode', {} },
             { UCBC, 'FactoryCapCheck', { 'LocationType', 'Land' } },
-            { EBC, 'GreaterThanEconEfficiencyCombined', { 1.0, 1.1} },
+            { EBC, 'GreaterThanEconEfficiencyCombined', { 1.05, 1.1} },
             { UCBC, 'FactoryLessAtLocation', { 'LocationType', 3, categories.LAND } },
             { UCBC, 'UnitCapCheckLess', { .8 } },
             { EBC, 'MassToFactoryRatioBaseCheck', { 'LocationType' } },
@@ -147,7 +147,7 @@ BuilderGroup {
     Builder {
         BuilderName = 'T1 Land Factory Primary Builder',
         PlatoonTemplate = 'T123EngineerBuilder',
-        Priority = 1000,
+        Priority = 925,
         BuilderConditions = {
             { IBC, 'BrainNotLowPowerMode', {} },
             { UCBC, 'FactoryCapCheck', { 'LocationType', 'Land' } },
@@ -174,7 +174,7 @@ BuilderGroup {
         BuilderConditions = {
             { IBC, 'BrainNotLowPowerMode', {} },
             { UCBC, 'FactoryCapCheck', { 'LocationType', 'Land' } },
-            { EBC, 'GreaterThanEconEfficiencyCombined', { 0.85, 1.0 } },
+            { EBC, 'GreaterThanEconEfficiencyCombined', { 0.85, 0.85 } },
             { MIBC, 'PathToEnemy', { 'LocationType', 'Land' }},
             { UCBC, 'FactoryLessAtLocation', { 'MAIN', 4, categories.STRUCTURE * categories.FACTORY * categories.LAND }},
             { UCBC, 'UnitCapCheckLess', { .8 } },
@@ -220,7 +220,7 @@ BuilderGroup {
         Priority = 900,
         BuilderConditions = {
             { UCBC, 'FactoryCapCheck', { 'LocationType', 'Land' } },
-            { EBC, 'GreaterThanEconEfficiencyCombined', { 0.8, 1.0 } },
+            { EBC, 'GreaterThanEconEfficiencyCombined', { 0.85, 1.0 } },
             { UCBC, 'ForcePathLimit', {'LocationType', categories.FACTORY * categories.LAND, 'Land', 2}},
             { UCBC, 'UnitCapCheckLess', { .8 } },
             { EBC, 'MassToFactoryRatioBaseCheck', { 'LocationType' } },
@@ -242,7 +242,7 @@ BuilderGroup {
     Builder {
         BuilderName = 'T1 Air Factory Primary Builder',
         PlatoonTemplate = 'T123EngineerBuilder',
-        Priority = 1000,
+        Priority = 925,
         BuilderConditions = {
             { IBC, 'BrainNotLowPowerMode', {} },
             { UCBC, 'FactoryCapCheck', { 'LocationType', 'Air' } },
@@ -290,7 +290,7 @@ BuilderGroup {
         PlatoonTemplate = 'CommanderBuilder',
         Priority = 900,
         BuilderConditions = {
-            { EBC, 'GreaterThanEconEfficiencyCombined', { 0.8, 1.0 } },
+            { EBC, 'GreaterThanEconEfficiencyCombined', { 0.85, 1.0 } },
             { UCBC, 'FactoryCapCheck', { 'LocationType', 'Air' } },
             { UCBC, 'UnitCapCheckLess', { .8 } },
             { EBC, 'MassToFactoryRatioBaseCheck', { 'LocationType' } },

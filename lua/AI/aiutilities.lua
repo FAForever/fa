@@ -471,17 +471,17 @@ end
 ---@param threatType string
 ---@return table
 function AIGetMarkersAroundLocation(aiBrain, markerType, pos, radius, threatMin, threatMax, threatRings, threatType)
-    local markers = AIGetMarkerLocations(aiBrain, markerType)
+    local markers = import("/lua/sim/markerutilities.lua").GetMarkersByType(markerType)
     local returnMarkers = {}
     for _, v in markers do
-        local dist = VDist2(pos[1], pos[3], v.Position[1], v.Position[3])
+        local dist = VDist2(pos[1], pos[3], v.position[1], v.position[3])
         if dist < radius then
             if not threatMin then
-                table.insert(returnMarkers, v)
+                table.insert(returnMarkers, { Name = v.Name, Position = v.position })
             else
-                local threat = aiBrain:GetThreatAtPosition(v.Position, threatRings, true, threatType or 'Overall')
+                local threat = aiBrain:GetThreatAtPosition(v.position, threatRings, true, threatType or 'Overall')
                 if threat >= threatMin and threat <= threatMax then
-                    table.insert(returnMarkers, v)
+                    table.insert(returnMarkers, { Name = v.Name, Position = v.position })
                 end
             end
         end
@@ -620,7 +620,7 @@ function AIFindStartLocationNeedsEngineer(aiBrain, locationType, radius, tMin, t
 
     local validPos = AIGetMarkersAroundLocation(aiBrain, 'Large Expansion Area', pos, radius, tMin, tMax, tRings, tType)
 
-    local positions = AIGetMarkersAroundLocation(aiBrain, 'Blank Marker', pos, radius, tMin, tMax, tRings, tType)
+    local positions = AIGetMarkersAroundLocation(aiBrain, 'Spawn', pos, radius, tMin, tMax, tRings, tType)
     local startX, startZ = aiBrain:GetArmyStartPos()
     for _, v in positions do
         if string.sub(v.Name, 1, 5) == 'ARMY_' then
@@ -2077,6 +2077,7 @@ function EngineerMoveWithSafePath(aiBrain, unit, destination)
     if not destination then
         return false
     end
+    local TransportUtils = import("/lua/ai/transportutilities.lua")
     local pos = unit:GetPosition()
     -- don't check a path if we are in build range
     if VDist2(pos[1], pos[3], destination[1], destination[3]) < 14 then
@@ -2094,8 +2095,8 @@ function EngineerMoveWithSafePath(aiBrain, unit, destination)
         end
 
         -- Skip the last move... we want to return and do a build
-        bUsedTransports = AIAttackUtils.SendPlatoonWithTransportsNoCheck(aiBrain, unit.PlatoonHandle, destination, needTransports, true, false)
-
+        -- needTransports need to fix this
+        bUsedTransports = TransportUtils.SendPlatoonWithTransports(aiBrain, unit.PlatoonHandle, destination, 1, true)
         if bUsedTransports then
             return true
         elseif VDist2Sq(pos[1], pos[3], destination[1], destination[3]) > 512 * 512 then
@@ -3257,6 +3258,7 @@ function CanBuildOnLocalMassPoints(aiBrain, engPos, distance)
     -- the BorderWarning is used to tell the AI that the mass marker is too close to the map border
     local pointDistance = distance * distance
     local massMarkers = import("/lua/sim/markerutilities.lua").GetMarkersByType('Mass')
+    local NavUtils = import("/lua/sim/navutils.lua")
     local validMassMarkers = {}
     for _, v in massMarkers do
         if v.type == 'Mass' then
@@ -3265,7 +3267,7 @@ function CanBuildOnLocalMassPoints(aiBrain, engPos, distance)
                 massBorderWarn = true
             end 
             local mexDistance = VDist2Sq( v.position[1],v.position[3], engPos[1], engPos[3] )
-            if mexDistance < pointDistance and aiBrain:CanBuildStructureAt('ueb1103', v.position) then
+            if mexDistance < pointDistance and aiBrain:CanBuildStructureAt('ueb1103', v.position) and NavUtils.CanPathTo('Amphibious', engPos, v.position) then
                 table.insert(validMassMarkers, {Position = v.position, Distance = mexDistance , MassSpot = v, BorderWarning = massBorderWarn})
             end
         end

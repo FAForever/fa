@@ -1,10 +1,8 @@
---*****************************************************************************
---* File: lua/modules/ui/controls/worldview.lua
---* Summary: World view control
---*
---* Copyright © 2008 Gas Powered Games, Inc.  All rights reserved.
---*****************************************************************************
-
+---------------------------------------------------------------------
+-- File: lua/modules/ui/controls/worldview.lua
+-- Summary: World view control
+-- Copyright © 2008 Gas Powered Games, Inc.  All rights reserved.
+---------------------------------------------------------------------
 local UIUtil = import("/lua/ui/uiutil.lua")
 local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
 local Control = import("/lua/maui/control.lua").Control
@@ -216,6 +214,8 @@ WorldView = ClassUI(moho.UIWorldView, Control) {
     PingThreads = {},
     AutoBuild = false,
 
+    ---@param self WorldView
+    ---@param spec any
     __post_init = function(self, spec)
 
         --- Contains cursor textures
@@ -292,9 +292,9 @@ WorldView = ClassUI(moho.UIWorldView, Control) {
         end
     end,
 
-
     --- Only accept move and attack move commands, ignore everything else
     ---@param self any
+    ---@param enabled boolean
     EnableIgnoreMode = function(self, enabled)
         if enabled then
             ConExecute("ui_CommandClickScale 0")

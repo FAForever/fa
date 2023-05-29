@@ -1,5 +1,5 @@
 
-local Builder = import("/lua/aibrains/templates/builder-groups/builder.lua")
+local Builder = import("/lua/aibrains/templates/builders/builder.lua")
 
 -- upvalue scope for performance
 local TableSort = table.sort
@@ -26,11 +26,13 @@ end
 ---@field Identifier string
 ---@field Brain AIBrain         # A reference to the brain that this manager belongs to
 ---@field Base AIBase           # A reference to the base that this manager belongs to
----@field BuilderData table<AIBuilderType, AIBuilderManagerDataData>   # Array table of builders
+---@field BuilderData table<string, AIBuilderManagerDataData>   # Array table of builders
 ---@field BuilderLookup table<string, AIBuilder>    # Hash table of builders
 ---@field BuilderThread? thread                     # Thread that runs the loop, does not exist when the manager is not active
 ---@field Trash TrashBag                            # Trashbag of this manager
 AIBuilderManager = ClassSimple {
+
+    ManagerName = "BuilderManager",
 
     ---@param self AIBuilderManager
     ---@param brain AIBrain
@@ -72,19 +74,20 @@ AIBuilderManager = ClassSimple {
     -- Once a task is found it can be assigned. This abstract manager does not do that, it
     -- is merely an abstraction to interact with the various builders.
 
-    --- Adds a builder type to this manager
-    ---@param self AIBuilderManager
-    ---@param type BuilderType
-    AddBuilderType = function(self, type)
-        self.BuilderData[type] = { Builders = {}, NeedSort = false }
-    end,
-
     --- Adds a builder to the manager, usually this function is overwritten by the managers that inherit this builder
     ---@param self AIBuilderManager
-    ---@param template AIBuilderTemplate
-    ---@param builderType BuilderType
-    AddBuilder = function(self, template, builderType)
-        local builder = Builder.CreateBuilder(self.Brain, self.Base, template)
+    ---@param builderTemplate AIBuilderTemplate
+    AddBuilder = function(self, builderTemplate)
+        -- create the type as necessary
+        local builderType = builderTemplate.BuilderType
+        if not self.BuilderData[builderTemplate.BuilderType] then
+            self.BuilderData[builderType] = { Builders = {}, NeedSort = false }
+        end
+
+        SPEW("Registered builder: " .. builderTemplate.BuilderName)
+
+        -- add the instanced builder
+        local builder = Builder.CreateBuilder(self.Brain, self.Base, builderTemplate)
         self:AddInstancedBuilder(builder, builderType)
     end,
 
@@ -93,19 +96,8 @@ AIBuilderManager = ClassSimple {
     ---@param builder AIBuilder
     ---@param builderType? BuilderType
     AddInstancedBuilder = function(self, builder, builderType)
-        builderType = builderType or builder:GetBuilderType()
-
-        -- can't proceed without a builder type that we support
-        local builderName = builder:GetBuilderName()
+        local builderName = builder.Template.BuilderName
         local builderDataType = self.BuilderData[builderType]
-        if not builderDataType then
-            WARN('[' ..
-                string.gsub(debug.getinfo(1).source, ".*\\(.*.lua)", "%1") ..
-                ', line:' ..
-                debug.getinfo(1).currentline ..
-                '] *BUILDERMANAGER ERROR: No BuilderData for builder: ' .. tostring(builderName))
-            return
-        end
 
         -- register the builder
         builderDataType.NeedSort = true
@@ -123,15 +115,19 @@ AIBuilderManager = ClassSimple {
 
     --- Retrieves the highest builder that is valid with the given parameters
     ---@param self AIBuilderManager
-    ---@param builderType BuilderType
     ---@param platoon AIPlatoon
     ---@param unit Unit
     ---@return AIBuilder?
-    GetHighestBuilder = function(self, builderType, platoon, unit)
-        local builderData = self.BuilderData[builderType]
+    GetHighestBuilder = function(self, platoon, unit, unitType)
+        local builderData = self.BuilderData[unitType]
         if not builderData then
-            error('*BUILDERMANAGER ERROR: Invalid builder type - ' .. builderType)
+            return nil
         end
+
+        -- used to quickly reject builders
+        local unitTech = unit.Blueprint.TechCategory
+        local unitLayer = unit.Blueprint.LayerCategory
+        local unitFaction = unit.Blueprint.FactionCategory
 
         local tick = GetGameTick()
         local brain = self.Brain
@@ -144,6 +140,25 @@ AIBuilderManager = ClassSimple {
         local builders = builderData.Builders
         for k in builders do
             local builder = builders[k] --[[@as AIBuilder]]
+            local builderTemplate = builder.Template
+
+            -- check tech requirement
+            local builderTech = builderTemplate.BuilderTech
+            if builderTech and builderTech != unitTech then
+                continue
+            end
+
+            -- check layer requirement
+            local builderLayer = builderTemplate.BuilderLayer
+            if builderLayer and builderLayer != unitLayer then
+                continue
+            end
+
+            -- check faction requirement
+            local builderFaction = builderTemplate.BuilderFaction
+            if builderFaction and builderFaction != unitFaction then
+                continue
+            end
 
             -- builders with no priority are ignored
             local priority = builder.Priority
@@ -219,6 +234,7 @@ AIBuilderManager = ClassSimple {
 
                 WaitTicks(6)
             end
+            WaitTicks(1)
         end
     end,
 
