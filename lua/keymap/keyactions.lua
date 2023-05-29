@@ -891,6 +891,12 @@ keyActions = {
     ['test_2'] = {action = 'UI_Lua import("/lua/usercamera.lua").Test2()',
         category = 'camera', order = 11,},
 
+    ['store_camera_settings'] = {action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").StoreCameraPosition()',
+    category = 'debug', order = 11,},
+
+    ['restore_camera_settings'] = {action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").RestoreCameraPosition()',
+    category = 'debug', order = 11,},
+
     ['toggle_navui'] = {action = 'UI_Lua import("/lua/ui/game/navgenerator.lua").OpenWindow()',
         category = 'ai', order = 24},
     ['toggle_ai_reclaim_grid_ui'] = {action = 'UI_Lua import("/lua/ui/game/gridreclaim.lua").OpenWindow()',
