@@ -1,11 +1,17 @@
--- This file outlines the interaction between the 'command' (Bound to a key) and the behaviour of that command
--- format is:
---  key - The string referenced by a bound key
---  action - The console command to execute when the key is pressed
---  category - The category to list this action under in the key assign dialog
---  order - The sort order to list this action under its category
---  keyRepeat - A boolean flag that dictates when an action is one that can be held to extend its effect (eg - Zoom)
 
+--- A key action allows a user to bind key bindings to an action. The format 
+--- of a key action is defined in the 'UIKeyAction' annotation class. Key
+--- actions are defined in tables. The key of a key action acts as an
+--- identifier. The same identifier is used to assign a description to the
+--- key action
+
+--- In an ideal world that description would be part of the key action
+--- itself. The system in place is what we have however. The descriptions
+--- of key actions can be found in `/lua/keymap/keydescriptions.lua`
+
+--- Regular key actions can be found in `/lua/keymap/keyactions.lua`
+
+---@type table<string, UIKeyAction>
 local keyActionsDebug = {
     ['toggle_map_utilities_window'] = {
         action = 'UI_Lua import("/lua/ui/game/maputilities.lua").OpenWindow()',
@@ -217,6 +223,7 @@ local keyActionsDebug = {
     },
 }
 
+---@type table<string, UIKeyAction>
 local keyActionsDebugAI = {
     ['toggle_navui'] = {
         action = 'UI_Lua import("/lua/ui/game/navgenerator.lua").OpenWindow()',
@@ -252,6 +259,7 @@ local keyActionsDebugAI = {
     },
 }
 
+---@type table<string, UIKeyAction>
 debugKeyActions = table.combine(
     keyActionsDebug,
     keyActionsDebugAI
