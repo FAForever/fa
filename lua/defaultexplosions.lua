@@ -953,7 +953,9 @@ end
 ---@param entity BoneObject
 ---@param army Army
 ---@param bones Bone[]
-CreateFirePlumes = function(entity, army, bones)
+---@param yOffset number | nil
+CreateFirePlumes = function(entity, army, bones, yOffset)
+    yOffset = yOffset or 0
     local ex, ey, ez = entity:GetPositionXYZ()
     for _, vBone in bones do
         -- determine local offset
@@ -967,7 +969,7 @@ CreateFirePlumes = function(entity, army, bones)
         local vz = id * dz + Random() * 0.6 - 0.3
 
         -- create the projectile and the plume
-        local projectile = entity:CreateProjectile('/effects/entities/DestructionFirePlume01/DestructionFirePlume01_proj.bp', dx, dy, dz, vx, vy, vz)
+        local projectile = entity:CreateProjectile('/effects/entities/DestructionFirePlume01/DestructionFirePlume01_proj.bp', dx, dy + yOffset, dz, vx, vy, vz)
         projectile:SetBallisticAcceleration(-1 - Random())
         projectile:SetVelocity(1 + 3 * Random())
         CreateEmitterOnEntity(projectile, army, '/effects/emitters/destruction_explosion_fire_plume_02_emit.bp')
@@ -980,9 +982,10 @@ local CreateFirePlumeCache = { }
 ---@param entity BoneObject
 ---@param army Army
 ---@param bone Bone
-CreateFirePlume = function(entity, army, bone)
+---@param yOffset number | nil
+CreateFirePlume = function(entity, army, bone, yOffset)
     CreateFirePlumeCache[1] = bone
-    CreateFirePlumes(entity, army, CreateFirePlumeCache)
+    CreateFirePlumes(entity, army, CreateFirePlumeCache, yOffset)
 end
 
 --- Creates basic large-sized debris / dirt as emitters
@@ -1012,6 +1015,18 @@ end
 CreateSmallDebrisEmitters = function(entity, army, bone)
     for _, effect in EffectTemplate.ExplosionDebrisSml01 do
         CreateAttachedEmitter(entity, bone, army, effect)
+    end
+end
+
+--- Creates basic damage effect emitters
+---@param self BoneObject
+---@param bone Bone
+---@param army Army
+---@param scale number | nil
+CreateDamageEmitters = function(self, bone, army, scale)
+    scale = scale or 1.0
+    for k, v in EffectTemplate.DamageFireSmoke01 do
+        CreateAttachedEmitter(self, bone, army, v):ScaleEmitter(1.5)
     end
 end
 
