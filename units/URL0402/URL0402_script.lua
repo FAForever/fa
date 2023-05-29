@@ -157,7 +157,7 @@ URL0402 = ClassUnit(CWalkingLandUnit) {
         local CreateDefaultHitExplosionAtBone = explosion.CreateDefaultHitExplosionAtBone
         local CreateDamageEmitters = explosion.CreateDamageEmitters
 
-        -- carefully matches the death animation
+        -- matches the death animation
         self:PlayUnitSound('Destroyed')
 
         explosion.CreateFlash(self, 'Center_Turret', 4.5, army)
@@ -182,6 +182,8 @@ URL0402 = ClassUnit(CWalkingLandUnit) {
         CreateFirePlumes(self, army, { 'Right_Leg01_B01', 'Right_Leg03_B01', 'Left_Leg03_B01', }, 0.5)
 
         WaitTicks(5)
+
+        -- this is where the spiderbot impacts with the ground
 
         self:ShakeCamera(50, 5, 0, 1)
         CreateDefaultHitExplosionAtBone(self, 'Left_Turret_Muzzle', 1)
@@ -260,6 +262,23 @@ URL0402 = ClassUnit(CWalkingLandUnit) {
     ---@deprecated
     ---@param self URL0402
     CreateDeathExplosionDustRing = function(self)
+        local blanketSides = 18
+        local blanketAngle = (2 * math.pi) / blanketSides
+        local blanketStrength = 1
+        local blanketVelocity = 2.8
+
+        for i = 0, (blanketSides - 1) do
+            local blanketX = math.sin(i * blanketAngle)
+            local blanketZ = math.cos(i * blanketAngle)
+
+            local Blanketparts = self:CreateProjectile(
+                '/effects/entities/DestructionDust01/DestructionDust01_proj.bp',
+                blanketX, 1.5,
+                blanketZ + 4,
+                blanketX, 0,
+                blanketZ
+            ):SetVelocity(blanketVelocity):SetAcceleration(-0.3)
+        end
     end,
 
     ---@deprecated
