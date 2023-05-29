@@ -57,12 +57,12 @@ UnitBlueprint {
                 {
                     LODCutoff = 120,
                     Scrolling = true,
-                    ShaderName = 'Unit',
+                    ShaderName = 'Insect',
                 },
                 {
                     AlbedoName = 'xrc8109_albedo.dds',
                     LODCutoff = 300,
-                    ShaderName = 'Unit',
+                    ShaderName = 'Insect',
                     SpecularName = 'xrc8109_specteam.dds',
                 },
             },

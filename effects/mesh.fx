@@ -3470,15 +3470,14 @@ float4 NormalMappedInsectPS_02( NORMALMAPPED_VERTEX vertex, uniform bool hiDefSh
     light = light * 1.2;
     float phongAmount = saturate( dot( reflect( sunDirection, normal), -vertex.viewDirection));
     float3 phongAdditive = pow( phongAmount, 3) * specular.g * light * 0.5;
-    float3 phongMultiplicative = (phongAmount * environment * specular.r * light * 2);
+    float3 phongMultiplicative = (phongAmount * environment * specular.r * light * 0.2);
   
     float emissive = glowMultiplier * specular.b;
 
     //Finish it
     float3 color = (albedo.rgb * 0.125) + emissive + (light * albedo.rgb) + (phongAdditive) + phongMultiplicative;
+    
     color = ApplyWaterColor(vertex.depth.x, color);
-
-    float alpha = mirrored ? 0.5 : specular.b + glowMinimum + (phongAdditive * 0.04);
     //color = phongAdditive;
     //alpha = 0;
     return float4( color, alpha);
@@ -9556,7 +9555,7 @@ float4 PBR_Cybran(NORMALMAPPED_VERTEX vertex, float teamColorFactor, uniform boo
     float4 albedo = tex2D( albedoSampler, vertex.texcoord0.xy);
     float4 specular = tex2D( specularSampler, vertex.texcoord0.xy);
 
-    float metallic = saturate((pow(specular.r, 0.7) + specular.g * 0.2 - specular.a * 0.5) * 4.37);
+    float metallic = saturate(specular.r + saturate(specular.g - 0.1) * 0.87 - specular.a * 2.2);
     float roughness = lerp(0.8 * (1 - specular.g), lerp(0.5, 0.25, specular.g), metallic);
 
     albedo.rgb = min(lerp(albedo.rgb, albedo.rgb * 2.3, pow(metallic, 2.5)), float3(1, 1, 1));
@@ -9566,7 +9565,7 @@ float4 PBR_Cybran(NORMALMAPPED_VERTEX vertex, float teamColorFactor, uniform boo
     float emission = pow(max(specular.b - 0.04, 0.0), 0.5);
     color = ApplyWaterColorExponentially(vertex, color, emission * albedo);
 
-    float alpha = mirrored ? 0.5 : emission + glowMinimum;
+    float alpha = mirrored ? 0.5 : min(emission + glowMinimum, 0.3);
 
     return float4(color, alpha);
 }
