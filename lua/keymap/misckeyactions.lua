@@ -464,10 +464,6 @@ function findPriority(bpID)
     end
 end
 
-function RecheckTargetsOfWeapons()
-    SimCallback({Func = 'RecheckTargetsOfWeapons', Args = { }}, true)
-end
-
 function SelectAllUpgradingExtractors()
 
     -- by default, hide playing the selection sound
