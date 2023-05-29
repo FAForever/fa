@@ -508,5 +508,8 @@ keyDescriptions = {
     ['toggle_ai_economy_ui'] = 'Toggle the debugging UI for the economy brain data',
 
     ['toggle_platoon_behavior_silo'] = 'Applies the simple silo AI behavior to your selection',
-    ['toggle_platoon_simple_raid'] = 'Applies the simple raid AI behavior to your selection'
+    ['toggle_platoon_simple_raid'] = 'Applies the simple raid AI behavior to your selection',
+
+    ['store_camera_settings'] = 'Store the current camera settings in the preference file',
+    ['restore_camera_settings'] = 'Apply the camera settings stored in the preference file',
 }
