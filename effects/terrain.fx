@@ -481,9 +481,12 @@ float3 PBR(VS_OUTPUT inV, float3 albedo, float3 n, float roughness) {
     // See https://blog.selfshadow.com/publications/s2013-shading-course/
 
     float4 position = TerrainScale * inV.mTexWT;
-    float mapShadow = 1 - tex2D(UpperAlbedoSampler, position.xy).z; // 1 where sun is, 0 where shadow is
-    float shadow = tex2D(ShadowSampler, inV.mShadow.xy).g; // 1 where sun is, 0 where shadow is
-    shadow = shadow * mapShadow;
+    float shadow = 1;
+    if (ShadowsEnabled == 1) {
+        float mapShadow = 1 - tex2D(UpperAlbedoSampler, position.xy).z; // 1 where sun is, 0 where shadow is
+        shadow = tex2D(ShadowSampler, inV.mShadow.xy).g; // 1 where sun is, 0 where shadow is
+        shadow *= mapShadow;
+    }
 
     float3 v = normalize(-inV.mViewDirection);
     float3 F0 = float3(0.04, 0.04, 0.04);
