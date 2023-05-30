@@ -220,6 +220,10 @@ local keyActionsSelectionQuickSelect = {
         action = 'UI_SelectByCategory +nearest +idle ENGINEER',
         category = 'selection',
     },
+    ['select_idle_t1_engineer'] = {
+        action = 'UI_SelectByCategory +nearest +idle ENGINEER TECH1',
+        category = 'selection',
+    },
     ['cycle_engineers'] = {
         action = 'UI_Lua import("/lua/ui/game/avatars.lua").GetEngineerGeneric()',
         category = 'selection',
