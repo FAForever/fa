@@ -36,12 +36,6 @@ ProjectileBlueprint {
     },
     General = {
         Category = 'Anti Air',
-        EntityCategory = {
-            'AEON',
-            'PROJECTILE',
-            'ANTIAIR',
-            'MISSILE',
-        },
         Faction = 'Aeon',
         TechLevel = 3,
         Weapon = 'Zealot AA Missile',
