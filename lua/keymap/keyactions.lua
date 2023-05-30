@@ -1,5 +1,4 @@
-
---- A key action allows a user to bind key bindings to an action. The format 
+--- A key action allows a user to bind key bindings to an action. The format
 --- of a key action is defined in the 'UIKeyAction' annotation class. Key
 --- actions are defined in tables. The key of a key action acts as an
 --- identifier. The same identifier is used to assign a description to the
@@ -129,11 +128,11 @@ local keyActionsCamera = {
     },
     ['zoom_in'] = {
         action = 'UI_Lua import("/lua/ui/game/zoomslider.lua").ZoomIn(.02)',
-        category = 'camera', 
+        category = 'camera',
     },
     ['zoom_out'] = {
         action = 'UI_Lua import("/lua/ui/game/zoomslider.lua").ZoomOut(.02)',
-        category = 'camera', 
+        category = 'camera',
     },
     ['zoom_in_fast'] = {
         action = 'UI_Lua import("/lua/ui/game/zoomslider.lua").ZoomIn(.08)',
@@ -1486,10 +1485,6 @@ local keyActionsOrders = {
         action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").toggleScript("Weapon")',
         category = 'orders',
     },
-    ['recheck_targets_of_weapons'] = {
-        action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").RecheckTargetsOfWeapons()',
-        category = 'orders',
-    },
     ['toggle_jamming'] = {
         action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").toggleScript("Jamming")',
         category = 'orders',
@@ -1766,10 +1761,7 @@ local keyActionsUI = {
 
 ---@type table<string, UIKeyAction>
 local keyActionsMisc = {
-    ['filter_highest_engineer_and_assist'] = {
-        action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").SelectHighestEngineerAndAssist()',
-        category = 'selection',
-    },
+
 }
 
 ---@type table<string, UIKeyAction>
