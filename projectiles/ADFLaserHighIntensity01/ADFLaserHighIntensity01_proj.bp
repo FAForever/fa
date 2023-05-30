@@ -26,11 +26,6 @@ ProjectileBlueprint {
     },
     General = {
         Category = 'Direct Fire',
-        EntityCategory = {
-            'AEON',
-            'PROJECTILE',
-            'DIRECTFIRE',
-        },
         Faction = 'Aeon',
         Weapon = 'High Intensity Laser',
     },

@@ -27,13 +27,6 @@ ProjectileBlueprint {
     },
     General = {
         Category = 'Anti Navy',
-        EntityCategory = {
-            'AEON',
-            'PROJECTILE',
-            'ANTINAVY',
-            'TORPEDO',
-            'NOSPLASHDAMAGE',
-        },
         Faction = 'Aeon',
         Weapon = 'Chrono Torpedo',
     },
