@@ -21,7 +21,6 @@ ProjectileBlueprint {
         'PROJECTILE',
         'ANTINAVY',
         'TORPEDO',
-        'NOSPLASHDAMAGE',
     },
     Display = {
         CameraFollowTimeout = 2,
@@ -55,5 +54,6 @@ ProjectileBlueprint {
         TrackTarget = true,
         TurnRate = 230,
         VelocityAlign = true,
+        UseGravity = true,
     },
 }

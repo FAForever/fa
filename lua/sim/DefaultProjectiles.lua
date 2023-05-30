@@ -450,11 +450,19 @@ OnWaterEntryEmitterProjectile = ClassProjectile(Projectile) {
     end,
 
     ---@param self OnWaterEntryEmitterProjectile
-    ---@param TargetType string
-    ---@param TargetEntity Unit
-    OnImpact = function(self, TargetType, TargetEntity)
-        Projectile.OnImpact(self, TargetType, TargetEntity)
-        KillThread(self.TTT1)
+    ---@param targetType string
+    ---@param targetEntity Unit | Prop
+    OnImpact = function(self, targetType, targetEntity)
+        -- we only fix this for projectiles that are supposed to go into the water
+        local px, py, pz = self:GetPositionXYZ()
+        local surfaceHeight = GetSurfaceHeight(px, pz)
+        if py <= surfaceHeight - 0.1 then
+            if targetType == 'Terrain' then
+                targetType = 'Underwater'
+            end
+        end
+
+        Projectile.OnImpact(self, targetType, targetEntity)
     end,
 }
 
@@ -464,7 +472,6 @@ OnWaterEntryEmitterProjectile = ClassProjectile(Projectile) {
 
 -- upvalued for performance
 local CreateEmitterAtBone = CreateEmitterAtBone
-local CreateEmitterAtEntity = CreateEmitterAtEntity
 local GetTerrainType = GetTerrainType
 
 -- upvalued read-only values

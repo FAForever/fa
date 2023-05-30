@@ -440,6 +440,7 @@ TTorpedoShipProjectile = ClassProjectile(OnWaterEntryEmitterProjectile) {
     FxTrails = {'/effects/emitters/torpedo_underwater_wake_01_emit.bp',},
     TrailDelay = 0,
     FxUnitHitScale = 1.25,
+    FxImpactLand = EffectTemplate.TGaussCannonHit01,
     FxImpactUnit = EffectTemplate.TTorpedoHitUnit01,
     FxImpactProp = EffectTemplate.TTorpedoHitUnit01,
     FxImpactUnderWater = EffectTemplate.TTorpedoHitUnitUnderwater01,
@@ -449,28 +450,33 @@ TTorpedoShipProjectile = ClassProjectile(OnWaterEntryEmitterProjectile) {
     ---@param inWater? boolean
     OnCreate = function(self, inWater)
         OnWaterEntryEmitterProjectile.OnCreate(self)
+
         -- if we are starting in the water then immediately switch to tracking in water and
         -- create underwater trail effects
         if inWater == true then
-            self:TrackTarget(true):StayUnderwater(true)
-            self:OnEnterWater(self)
+            self:SetWaterParameters()
         end
     end,
 
     ---@param self TTorpedoShipProjectile
     OnEnterWater = function(self)
         OnWaterEntryEmitterProjectile.OnEnterWater(self)
-        self:SetCollisionShape('Sphere', 0, 0, 0, 1.0)
-        self:SetMaxSpeed(20)
-        self:SetAcceleration(5)
-        self:SetTurnRate(180)
-        self.Trash:Add(ForkThread(self.MovementThread,self))
+        self:SetWaterParameters()
     end,
 
     ---@param self TTorpedoShipProjectile
     MovementThread = function(self)
         WaitTicks(1)
         self:SetVelocity(3)
+    end,
+
+    ---@param self TTorpedoShipProjectile
+    SetWaterParameters = function(self)
+        self:SetCollisionShape('Sphere', 0, 0, 0, 1.0)
+        self:SetMaxSpeed(20)
+        self:SetAcceleration(5)
+        self:SetTurnRate(140)
+        self.Trash:Add(ForkThread(self.MovementThread,self))
     end,
 }
 

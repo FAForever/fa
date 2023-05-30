@@ -416,6 +416,8 @@ Projectile = ClassProjectile(moho.projectile_methods) {
         local impactEffects
         local impactEffectsScale = 1
 
+        LOG(targetType)
+
         if targetType == 'Terrain' then
             impactEffects = self.FxImpactLand
             impactEffectsScale = self.FxLandHitScale
