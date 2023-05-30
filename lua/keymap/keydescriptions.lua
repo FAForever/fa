@@ -154,6 +154,7 @@ keyDescriptions = {
     ['rename'] = '<LOC key_desc_0064>Rename the selected unit',
     ['goto_engineer'] = '<LOC key_desc_0066>Go to the nearest idle Engineer',
     ['select_idle_engineer'] = '<LOC key_desc_0067>Select the nearest idle Engineer',
+    ['select_idle_t1_engineer'] = '<LOC key_desc_0067>Select the nearest idle tech 1 Engineer',
     ['cycle_engineers'] = '<LOC key_desc_0068>Cycle through all Engineers',
     ['goto_commander'] = '<LOC key_desc_0069>Go to your ACU',
     ['select_commander'] = '<LOC key_desc_0070>Select your ACU',
