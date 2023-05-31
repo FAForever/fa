@@ -1799,10 +1799,10 @@ float4 splatBlendNormal(float4 n1, float4 n2, float t1height, float t2height, fl
 float4 atlas2D(sampler2D s, float2 uv, float2 offset) {
     // We need to manually provide the derivatives.
     // See https://forum.unity.com/threads/tiling-textures-within-an-atlas-by-wrapping-uvs-within-frag-shader-getting-artifacts.535793/
-    float2 uv_ddx = ddx(uv);
-    float2 uv_ddy = ddy(uv);
-    uv.x = frac(uv.x) / 2 + offset.x;
-    uv.y = frac(uv.y) / 2 + offset.y;
+    float2 uv_ddx = ddx(uv) / 4;
+    float2 uv_ddy = ddy(uv) / 4;
+    uv.x = frac(uv.x) / 4 + offset.x + 0.125;
+    uv.y = frac(uv.y) / 4 + offset.y + 0.125;
     return tex2Dgrad(s, uv, uv_ddx, uv_ddy);
 }
 
