@@ -817,7 +817,7 @@ BuilderGroup {
                 --{ UCBC, 'HaveLessThanUnitsWithCategory', { 1, categories.TECH2 * categories.MOBILE * categories.LAND - categories.ENGINEER } },
             },
         BuilderData = {
-            StateMachine = 'AIPlatoonSimpleRaidBehavior',
+            StateMachine = 'AIPlatoonAdaptiveRaidBehavior',
             MarkerType = 'Mass',
             MoveFirst = 'Random',
             MoveNext = 'Threat',
@@ -847,7 +847,7 @@ BuilderGroup {
                 --{ UCBC, 'HaveLessThanUnitsWithCategory', { 1, categories.TECH2 * categories.MOBILE * categories.LAND - categories.ENGINEER } },
             },
         BuilderData = {
-            StateMachine = 'AIPlatoonSimpleRaidBehavior',
+            StateMachine = 'AIPlatoonAdaptiveRaidBehavior',
             MarkerType = 'Mass',
             MoveFirst = 'Random',
             MoveNext = 'Threat',
@@ -881,7 +881,7 @@ BuilderGroup {
                 --{ UCBC, 'HaveLessThanUnitsWithCategory', { 1, categories.TECH2 * categories.MOBILE * categories.LAND - categories.ENGINEER } },
             },
         BuilderData = {
-            StateMachine = 'AIPlatoonSimpleRaidBehavior',
+            StateMachine = 'AIPlatoonAdaptiveRaidBehavior',
             MarkerType = 'Start Location',
             MoveFirst = 'Closest',
             MoveNext = 'None', --DUNCAN - was guard base

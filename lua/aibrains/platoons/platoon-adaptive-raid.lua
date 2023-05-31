@@ -2,6 +2,7 @@
 local AIPlatoon = import("/lua/aibrains/platoons/platoon-base.lua").AIPlatoon
 local NavUtils = import("/lua/sim/navutils.lua")
 local MarkerUtils = import("/lua/sim/markerutilities.lua")
+local AIAttackUtils = import("/lua/ai/aiattackutilities.lua")
 
 -- upvalue scope for performance
 local Random = Random
@@ -13,21 +14,21 @@ local TableEmpty = table.empty
 -- constants
 local NavigateDistanceThresholdSquared = 20 * 20
 
----@class AIPlatoonSimpleRaidBehavior : AIPlatoon
+---@class AIPlatoonAdaptiveRaidBehavior : AIPlatoon
 ---@field RetreatCount number 
 ---@field ThreatToEvade Vector | nil
 ---@field LocationToRaid Vector | nil
 ---@field OpportunityToRaid Vector | nil
-AIPlatoonSimpleRaidBehavior = Class(AIPlatoon) {
+AIPlatoonAdaptiveRaidBehavior = Class(AIPlatoon) {
 
-    PlatoonName = 'SimpleRaidBehavior',
+    PlatoonName = 'AdaptiveRaidBehavior',
 
     Start = State {
 
         StateName = 'Start',
 
         --- Initial state of any state machine
-        ---@param self AIPlatoonSimpleRaidBehavior
+        ---@param self AIPlatoonAdaptiveRaidBehavior
         Main = function(self)
             -- requires expansion markers
             if not import("/lua/sim/markerutilities/expansions.lua").IsGenerated() then
@@ -53,7 +54,7 @@ AIPlatoonSimpleRaidBehavior = Class(AIPlatoon) {
         StateName = 'Searching',
 
         --- The platoon searches for a target
-        ---@param self AIPlatoonSimpleRaidBehavior
+        ---@param self AIPlatoonAdaptiveRaidBehavior
         Main = function(self)
             -- reset state
             self.LocationToRaid = nil
@@ -123,7 +124,7 @@ AIPlatoonSimpleRaidBehavior = Class(AIPlatoon) {
         StateName = 'Navigating',
 
         --- The platoon navigates towards a target, picking up oppertunities as it finds them
-        ---@param self AIPlatoonSimpleRaidBehavior
+        ---@param self AIPlatoonAdaptiveRaidBehavior
         Main = function(self)
             -- reset state
             self.OpportunityToRaid = nil
@@ -201,11 +202,12 @@ AIPlatoonSimpleRaidBehavior = Class(AIPlatoon) {
                                 local info = threatTable[Random(1, TableGetn(threatTable))]
                                 self.ThreatToEvade = { info[1], GetSurfaceHeight(info[1], info[2]), info[2] }
                                 DrawCircle(self.ThreatToEvade, 5, 'ff0000')
+                                LOG('We are going to retreat, enemy threat '..threat..' our threat '..platoonThreat..' position status '..positionStatus)
                                 self:ChangeState(self.Retreating)
                                 return
                             end
-                        else
-                            LOG('Threat and we need to attack then since it is allied, status '..positionStatus)
+                        elseif positionStatus then
+                            LOG('We are going to attack, enemy threat '..threat..' our threat '..platoonThreat..' position status '..positionStatus)
                         end
                     end
 
@@ -243,7 +245,7 @@ AIPlatoonSimpleRaidBehavior = Class(AIPlatoon) {
         StateName = 'RaidingTarget',
 
         --- The platoon raids the target
-        ---@param self AIPlatoonSimpleRaidBehavior
+        ---@param self AIPlatoonAdaptiveRaidBehavior
         Main = function(self)
             local brain = self:GetBrain()
 
@@ -296,7 +298,7 @@ AIPlatoonSimpleRaidBehavior = Class(AIPlatoon) {
         StateName = 'RaidingOpportunity',
 
         --- The platoon raids the opportunity it walked into
-        ---@param self AIPlatoonSimpleRaidBehavior
+        ---@param self AIPlatoonAdaptiveRaidBehavior
         Main = function(self)
             local brain = self:GetBrain()
 
@@ -344,11 +346,18 @@ AIPlatoonSimpleRaidBehavior = Class(AIPlatoon) {
                 local threat = brain:GetThreatAtPosition(position, 1, true, 'AntiSurface')
                 if threat > 0 then
                     local threatTable = brain:GetThreatsAroundPosition(position, 1, true, 'AntiSurface')
-                    if threatTable and not TableEmpty(threatTable) then
-                        local info = threatTable[Random(1, TableGetn(threatTable))]
-                        self.ThreatToEvade = { info[1], GetSurfaceHeight(info[1], info[2]), info[2] }
-                        self:ChangeState(self.Retreating)
-                        return
+                    local platoonThreat = self:CalculatePlatoonThreatAroundPosition('Surface', categories.MOBILE * categories.DIRECTFIRE - categories.SCOUT, position, 30)
+                    local positionStatus = brain.GridPresence:GetInferredStatus(position)
+                    if positionStatus != 'Allied' or platoonThreat * 2 < threat then
+                        if threatTable and not TableEmpty(threatTable) then
+                            local info = threatTable[Random(1, TableGetn(threatTable))]
+                            self.ThreatToEvade = { info[1], GetSurfaceHeight(info[1], info[2]), info[2] }
+                            DrawCircle(self.ThreatToEvade, 5, 'ff0000')
+                            self:ChangeState(self.Retreating)
+                            return
+                        end
+                    else
+                        LOG('Threat and we need to attack then since it is allied, status '..positionStatus)
                     end
                 end
 
@@ -375,7 +384,7 @@ AIPlatoonSimpleRaidBehavior = Class(AIPlatoon) {
         StateName = "Retreating",
 
         --- The platoon retreats from a threat
-        ---@param self AIPlatoonSimpleRaidBehavior
+        ---@param self AIPlatoonAdaptiveRaidBehavior
         Main = function(self)
             local brain = self:GetBrain()
 
@@ -470,7 +479,7 @@ AIPlatoonSimpleRaidBehavior = Class(AIPlatoon) {
     end,
 }
 
----@param data { Behavior: 'AIBehaviorTacticalSimple' }
+---@param data { Behavior: 'AIPlatoonAdaptiveRaidBehavior' }
 ---@param units Unit[]
 DebugAssignToUnits = function(data, units)
     if units and not TableEmpty(units) then
@@ -482,8 +491,8 @@ DebugAssignToUnits = function(data, units)
 
         -- create the platoon
         local brain = units[1].Brain
-        local platoon = brain:MakePlatoon('', '') --[[@as AIPlatoonSimpleRaidBehavior]]
-        setmetatable(platoon, AIPlatoonSimpleRaidBehavior)
+        local platoon = brain:MakePlatoon('', '') --[[@as AIPlatoonAdaptiveRaidBehavior]]
+        setmetatable(platoon, AIPlatoonAdaptiveRaidBehavior)
 
         -- assign units to squads
         local scouts = EntityCategoryFilterDown(categories.SCOUT, units)
@@ -496,7 +505,7 @@ DebugAssignToUnits = function(data, units)
     end
 end
 
----@param data { Behavior: 'AIBehaviorTacticalSimple' }
+---@param data { Behavior: 'AIPlatoonAdaptiveRaidBehavior' }
 ---@param units Unit[]
 AssignToUnitsMachine = function(data, platoon, units)
     if units and not TableEmpty(units) then
@@ -506,7 +515,7 @@ AssignToUnitsMachine = function(data, platoon, units)
         import("/lua/sim/navutils.lua").Generate()
         import("/lua/sim/markerutilities.lua").GenerateExpansionMarkers()
         -- create the platoon
-        setmetatable(platoon, AIPlatoonSimpleRaidBehavior)
+        setmetatable(platoon, AIPlatoonAdaptiveRaidBehavior)
         local count = TableGetn(platoon:GetSquadUnits('Attack'))
         local scouts = platoon:GetSquadUnits('Scout')
         if scouts then

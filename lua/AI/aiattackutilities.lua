@@ -1516,6 +1516,31 @@ function AIFindUnitRadiusThreat(aiBrain, alliance, priTable, position, radius, t
     end
 end
 
+GetSurfaceThreatAtPosition = function(aiBrain, position, range )
+                
+    local IMAPblocks = aiBrain.IMAPConfig.Rings or 1
+    local TESTUNITS = categories.ALLUNITS - categories.FACTORY - categories.ECONOMIC - categories.SHIELD - categories.WALL
+    local sfake = aiBrain:GetThreatAtPosition(position, IMAPblocks, true, 'AntiSurface' )
+    surthreat = 0
+    local eunits = aiBrain:GetUnitsAroundPoint(TESTUNITS, position, range,  'Enemy')
+    if eunits then
+        for _,u in eunits do
+            if not u.Dead then
+                Defense = u.Blueprint.Defense
+                surthreat = surthreat + Defense.SurfaceThreatLevel
+            end
+        end
+    end
+    
+    -- if there is IMAP threat and it's greater than what we actually see
+    -- use the sum of both * .5
+    if sfake > 0 and sfake > surthreat then
+        surthreat = (surthreat + sfake) * .5
+    end
+    
+    return surthreat
+end
+
 --------------------------------------------------------------------------------------------------------------------------------------------------
 ----Below this line are Sorian AI exclusive functions added for sorian AI
 --------------------------------------------------------------------------------------------------------------------------------------------------

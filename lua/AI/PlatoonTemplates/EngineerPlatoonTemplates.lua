@@ -202,6 +202,15 @@ PlatoonTemplate {
     },
 }
 
+PlatoonTemplate {
+    Name = 'StateMachineEngineerT1',
+    Plan = 'StateMachineAI',
+    GlobalSquads = {
+        { categories.ENGINEER * categories.TECH1 - categories.COMMAND, 1, 1, 'support', 'None' },
+    },
+
+}
+
 -- Factory built Engineers below
 
 PlatoonTemplate {
