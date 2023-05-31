@@ -4921,9 +4921,12 @@ Platoon = Class(moho.platoon_methods) {
     StateMachineAI = function(self)
         local machineType = self.PlatoonData.StateMachine
 
-        if machineType == 'AIPlatoonSimpleRaidBehavior' then
+        if machineType == 'AIPlatoonAdaptiveRaidBehavior' then
             LOG('Starting State Raid')
-            import("/lua/aibrains/platoons/platoon-simple-raid.lua").AssignToUnitsMachine({ }, self, self:GetPlatoonUnits())
+            import("/lua/aibrains/platoons/platoon-adaptive-raid.lua").AssignToUnitsMachine({ }, self, self:GetPlatoonUnits())
+        elseif machineType == 'AIPlatoonAdaptiveReclaimBehavior' then
+            LOG('Starting State Reclaim')
+            import("/lua/aibrains/platoons/platoon-adaptive-reclaim.lua").AssignToUnitsMachine({ }, self, self:GetPlatoonUnits())
         end
 
         WaitTicks(50)

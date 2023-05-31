@@ -1327,7 +1327,7 @@ BuilderGroup {
     },
     Builder {
         BuilderName = 'T1 Engineer Reclaim',
-        PlatoonTemplate = 'T1EngineerGridReclaimer',
+        PlatoonTemplate = 'StateMachineEngineerT1',
         Priority = 1000,
         InstanceCount = 2,
         BuilderConditions = {
@@ -1337,12 +1337,13 @@ BuilderGroup {
         BuilderData = {
             LocationType = 'LocationType',
             SearchType   = 'MAIN',
+            StateMachine = 'AIPlatoonAdaptiveReclaimBehavior',
         },
         BuilderType = 'Any',
     },
     Builder {
         BuilderName = 'T1 Engineer Reclaim Excess',
-        PlatoonTemplate = 'T1EngineerGridReclaimer',
+        PlatoonTemplate = 'StateMachineEngineerT1',
         Priority = 3, --DUNCAN - was 1
         InstanceCount = 10,
         BuilderConditions = {
@@ -1351,6 +1352,7 @@ BuilderGroup {
             },
         BuilderData = {
             LocationType = 'LocationType',
+            StateMachine = 'AIPlatoonAdaptiveReclaimBehavior',
         },
         BuilderType = 'Any',
     },
