@@ -33,8 +33,6 @@ AIPlatoonAdaptiveReclaimBehavior = Class(AIPlatoon) {
                     self.SearchRadius = 16
                 end
             end
-            
-            LOG('Search Radius is '..repr(self.SearchRadius))
             if not brain.GridReclaim then
                 self:LogWarning('requires reclaim grid to be generated and running')
                 self:ChangeState(self.Error)
@@ -51,7 +49,6 @@ AIPlatoonAdaptiveReclaimBehavior = Class(AIPlatoon) {
             self.MovementLayer = 'Air'
             for _, v in self:GetPlatoonUnits() do
                 if not v.Dead then
-                    LOG('MotionType for unit is '..repr(v.Blueprint.Physics.MotionType))
                     local mType = v.Blueprint.Physics.MotionType
                     if (mType == 'RULEUMT_AmphibiousFloating' or mType == 'RULEUMT_Hover' or mType == 'RULEUMT_Amphibious') and (self.MovementLayer == 'Air' or self.MovementLayer == 'Water') then
                         LOG('Setting movement layer to Amphibious')
@@ -69,7 +66,6 @@ AIPlatoonAdaptiveReclaimBehavior = Class(AIPlatoon) {
             end
 
             self:ChangeState(self.Searching)
-            return
         end,
     },
 
@@ -115,6 +111,7 @@ AIPlatoonAdaptiveReclaimBehavior = Class(AIPlatoon) {
                     end
                 end
                 searchLoop = searchLoop + 1
+                LOG('Search loop is '..searchLoop..' out of a possible '..searchRadius)
             end
             if reclaimTargetX and reclaimTargetZ then
                 local brainCell = brainGridInstance:ToCellFromGridSpace(reclaimTargetX, reclaimTargetZ)
@@ -124,6 +121,11 @@ AIPlatoonAdaptiveReclaimBehavior = Class(AIPlatoon) {
                 self.LocationToReclaim = reclaimGridInstance:ToWorldSpace(reclaimTargetX, reclaimTargetZ)
                 self:ChangeState(self.Navigating)
             else
+                if self.SearchRadius < 8 then
+                    self.SearchRadius = 8
+                    LOG('No reclaim found, extending search range to 8')
+                    self:ChangeState(self.Searching)
+                end
                 self:LogWarning(string.format('no reclaim target found'))
                 self:ChangeState(self.Error)
             end
@@ -201,10 +203,11 @@ AIPlatoonAdaptiveReclaimBehavior = Class(AIPlatoon) {
                             end
                         end
                         if not IsDestroyed(eng) then
-                            local extractorAction = AIUtils.EngLocalExtractorBuild(brain, eng)
-                            if extractorAction then
-                                -- Statemachine switch to evaluating next action to take
-                                IssueMove({eng}, waypoint)
+                            local bool,markers=AIUtils.CanBuildOnLocalMassPoints(brain, eng:GetPosition(), 25)
+                            if bool then
+                                self.MassPointTable = markers
+                                self:ChangeState(self.BuilderStructure)
+                                return
                             end
                         end
                     end
@@ -231,6 +234,41 @@ AIPlatoonAdaptiveReclaimBehavior = Class(AIPlatoon) {
                 -- always wait
                 WaitTicks(1)
             end
+        end,
+    },
+
+    BuilderStructure = State {
+
+        StateName = 'BuilderStructure',
+
+        --- The platoon avoids danger or attempts to reclaim if they are too close to avoid
+        ---@param self AIPlatoonAdaptiveReclaimBehavior
+        Main = function(self)
+            if not self.MassPointTable then
+                self:ChangeState(self.Error)
+            end
+            LOG('Attempting to build a mass point or two')
+            local eng = self:GetPlatoonUnits()[1]
+            local brain = self:GetBrain()
+            IssueClearCommands({eng})
+            local factionIndex = brain:GetFactionIndex()
+            local buildingTmplFile = import('/lua/BuildingTemplates.lua')
+            local buildingTmpl = buildingTmplFile[('BuildingTemplates')][factionIndex]
+            local whatToBuild = brain:DecideWhatToBuild(eng, 'T1Resource', buildingTmpl)
+            for _,massMarker in self.MassPointTable do
+                AIUtils.EngineerTryReclaimCaptureArea(brain, eng, massMarker.Position, 2)
+                AIUtils.EngineerTryRepair(brain, eng, whatToBuild, massMarker.Position)
+                if massMarker.BorderWarning then
+                    IssueBuildMobile({eng}, massMarker.Position, whatToBuild, {})
+                else
+                    brain:BuildStructure(eng, whatToBuild, {massMarker.Position[1], massMarker.Position[3], 0}, false)
+                end
+            end
+            while eng and not eng.Dead and (0<table.getn(eng:GetCommandQueue()) or eng:IsUnitState('Building') or eng:IsUnitState("Moving")) do
+                coroutine.yield(20)
+            end
+            self.MassPointTable = nil
+            self:ChangeState(self.Searching)
         end,
     },
 
