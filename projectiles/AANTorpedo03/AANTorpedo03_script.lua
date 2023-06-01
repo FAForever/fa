@@ -1,14 +1,17 @@
---
--- Terran Torpedo Bomb
---
+------------------------------------------------------------------------------------------------
+-- File     :  /data/projectiles/AANTorpedoClusterSplit01/AANTorpedoClusterSplit01_script.lua
+-- Author(s):  Gordon Duclos
+-- Summary  :  Aeon Torpedo Cluster Projectile script, XAA0306
+-- Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
+-------------------------------------------------------------------------------------------------
+local ATorpedoCluster = import("/lua/aeonprojectiles.lua").ATorpedoCluster
+local VisionMarkerOpti = import("/lua/sim/vizmarker.lua").VisionMarkerOpti
 
-local TTorpedoShipProjectile = import("/lua/terranprojectiles.lua").TTorpedoShipProjectile
----@class TANAnglerTorpedo06: TTorpedoShipProjectile
-TANAnglerTorpedo06 = ClassProjectile(TTorpedoShipProjectile) {
+AANTorpedoCluster01 = ClassProjectile(ATorpedoCluster) {
 
     ---@param self TANAnglerTorpedo06
     OnEnterWater = function(self)
-        TTorpedoShipProjectile.OnEnterWater(self)
+        ATorpedoCluster.OnEnterWater(self)
 
         -- set the magnitude of the velocity to something tiny to really make that water
         -- impact slow it down. We need this to prevent torpedo's striking the bottom
@@ -32,4 +35,4 @@ TANAnglerTorpedo06 = ClassProjectile(TTorpedoShipProjectile) {
         end
     end,
 }
-TypeClass = TANAnglerTorpedo06
+TypeClass = AANTorpedoCluster01

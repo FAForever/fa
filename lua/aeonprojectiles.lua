@@ -106,18 +106,6 @@ ADepthChargeProjectile = ClassProjectile(OnWaterEntryEmitterProjectile) {
     FxImpactProp = EffectTemplate.ADepthChargeHitUnit01,
     FxImpactUnderWater = EffectTemplate.ADepthChargeHitUnderWaterUnit01,
 
-    ---@param self ADepthChargeProjectile
-    ---@param tbl table
-    AddDepthCharge = function(self, tbl)
-        if not tbl then return end
-        if not tbl.Radius then return end
-        self.MyDepthCharge = DepthCharge {
-            Owner = self,
-            Radius = tbl.Radius or 10,
-        }
-        self.Trash:Add(self.MyDepthCharge)
-    end,
-
     OnEnterWater = function(self)
         OnWaterEntryEmitterProjectile.OnEnterWater(self)
         self:SetMaxSpeed(20)
@@ -125,8 +113,8 @@ ADepthChargeProjectile = ClassProjectile(OnWaterEntryEmitterProjectile) {
         self:SetTurnRate(180)
         self:SetVelocity(0.5)
 
-        if self.EnterWaterMovementThread then
-            self.Trash:Add(ForkThread(self.EnterWaterMovementThread, self))
+        if self.MovementThread then
+            self.Trash:Add(ForkThread(self.MovementThread, self))
         end
     end,
 }

@@ -289,7 +289,7 @@ UnitBlueprint {
             MuzzleSalvoDelay = 0.6,
             MuzzleSalvoSize = 3,
             MuzzleVelocity = 0,
-            ProjectileId = '/projectiles/AANDepthCharge03/AANDepthCharge03_proj.bp',
+            ProjectileId = '/projectiles/AANTorpedo03/AANTorpedo03_proj.bp',
             ProjectileLifetime = 20,
             ProjectilesPerOnFire = 3,
             RackBones = {

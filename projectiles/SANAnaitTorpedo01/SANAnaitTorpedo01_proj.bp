@@ -41,11 +41,14 @@ ProjectileBlueprint {
         Acceleration = 5,
         DestroyOnWater = false,
         InitialSpeed = 5,
-        MaxSpeed = 18,
+        MaxSpeed = 15,
         StayUnderwater = true,
         TrackTarget = true,
-        TurnRate = 230,
+        TurnRate = 180,
         UseGravity = false,
         VelocityAlign = true,
+
+        -- these parameters make the path of the torpedo feel unique
+        AccelerationRange = 2,
     },
 }

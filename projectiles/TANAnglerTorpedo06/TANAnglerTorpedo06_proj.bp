@@ -45,9 +45,14 @@ ProjectileBlueprint {
         Lifetime = 20,
         MaxSpeed = 14,
         StayUnderwater = true,
+        RealisticOrdinance = true,
         TrackTarget = false,
-        TurnRate = 230,
+        TurnRate = 180,
         VelocityAlign = true,
         UseGravity = true,
+
+        -- these parameters make the path of the torpedo feel unique
+        MaxZigZag = 1,
+        ZigZagFrequency = 0.4,
     },
 }

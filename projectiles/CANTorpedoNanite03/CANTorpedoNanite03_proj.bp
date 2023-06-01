@@ -21,7 +21,6 @@ ProjectileBlueprint {
         'PROJECTILE',
         'ANTINAVY',
         'TORPEDO',
-        'NOSPLASHDAMAGE',
     },
     Defense = {
         Health = 1,
@@ -65,9 +64,11 @@ ProjectileBlueprint {
         MaxSpeed = 14,
         MaxZigZag = 0.5,
         StayUnderwater = true,
-        TrackTarget = true,
+        RealisticOrdinance = true,
+        TrackTarget = false,
         TurnRate = 230,
         VelocityAlign = true,
+        UseGravity = true,
         ZigZagFrequency = 1,
     },
 }

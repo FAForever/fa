@@ -362,7 +362,7 @@ OnWaterEntryEmitterProjectile = ClassProjectile(Projectile) {
     FxTrailOffset = 0,
     PolyTrail = '',
     PolyTrailOffset = 0,
-    TrailDelay = 5,
+    TrailDelay = 2,
     EnterWaterSound = 'Torpedo_Enter_Water_01',
     FxEnterWater= {
         '/effects/emitters/water_splash_ripples_ring_01_emit.bp',
@@ -407,6 +407,10 @@ OnWaterEntryEmitterProjectile = ClassProjectile(Projectile) {
     EnterWaterThread = function(self)
         WaitTicks(self.TrailDelay)
 
+        if IsDestroyed(self) then
+            return
+        end
+
         local army = self.Army
         local fxTrails = self.FxTrails
         local fxTrailScale = self.FxTrailScale
@@ -445,7 +449,6 @@ OnWaterEntryEmitterProjectile = ClassProjectile(Projectile) {
         self:SetStayUpright(false)
         self:TrackTarget(true)
         self:StayUnderwater(true)
-        self:SetVelocity(0.5)
         self.Trash:Add(ForkThread(self.EnterWaterThread, self))
     end,
 
