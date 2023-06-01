@@ -41,6 +41,9 @@ ProjectileBlueprint {
     Interface = {
         HelpText = 0,
     },
+    DoNotCollideList = {
+        'TORPEDO',
+    },
     Physics = {
         Acceleration = 0,
         DestroyOnWater = false,

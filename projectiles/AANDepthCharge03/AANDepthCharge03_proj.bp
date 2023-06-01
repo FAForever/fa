@@ -41,6 +41,9 @@ ProjectileBlueprint {
         StrategicIconSize = 1,
         UniformScale = 0.45,
     },
+    DoNotCollideList = {
+        'TORPEDO',
+    },
     General = {
         Category = 'Anti Navy',
         Faction = 'Aeon',
