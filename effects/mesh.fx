@@ -5131,7 +5131,26 @@ technique NormalMappedTerrain
 /// Unit
 ///
 /// Basic unit techniques.
+technique Unit_HighFidelity
+<
+    string abstractTechnique = "Unit";
+    int fidelity = FIDELITY_HIGH;
 
+    string cartographicTechnique = "CartographicUnit";
+    string depthTechnique = "Depth";
+    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
+    int parameter = PARAM_FRACTIONCOMPLETE;
+>
+{
+    pass P0
+    {
+        RasterizerState( Rasterizer_Cull_CW )
+
+        VertexShader = compile vs_1_1 NormalMappedVS();
+        //PixelShader = compile ps_2_a NormalMappedPS(true,true,true, false,0,0 );
+        PixelShader = compile ps_2_a NormalMappedPS_02(true,true,true,false,0,0 );
+    }
+}
 
 technique Unit_MedFidelity
 <
@@ -10077,26 +10096,5 @@ technique PBR_SeraphimBuild
 
         VertexShader = compile vs_1_1 SeraphimBuildVS();
         PixelShader = compile ps_3_0 PBR_SeraphimBuildPS(true);
-    }
-}
-
-technique Unit_HighFidelity
-<
-    string abstractTechnique = "Unit";
-    int fidelity = FIDELITY_HIGH;
-
-    string cartographicTechnique = "CartographicUnit";
-    string depthTechnique = "Depth";
-    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
-    int parameter = PARAM_FRACTIONCOMPLETE;
->
-{
-    pass P0
-    {
-        RasterizerState( Rasterizer_Cull_CW )
-
-        VertexShader = compile vs_1_1 NormalMappedVS();
-        //PixelShader = compile ps_2_a NormalMappedPS(true,true,true, false,0,0 );
-        PixelShader = compile ps_3_0 PBR_UEF_PS(true,true,false,0,0 );
     }
 }
