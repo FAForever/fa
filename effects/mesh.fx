@@ -9213,10 +9213,13 @@ float3 PBR_PS(
     float3 v = normalize(vertex.viewDirection);
     float3 reflection = reflect(-v, n);
 
+    // We can't use texCUBElod so we need to use a workaround
     float lod = roughness * 10;
-    float3 env_reflection = texCUBElod(environmentSampler, float4(reflection, lod));
+    float scale = exp2(lod);
+    float3 env_reflection = texCUBEgrad(environmentSampler, reflection, float3(scale/256, 0, 0), float3(0, scale/256, 0));
     // This should be convolved into a proper irradiance map, but we will settle for lod 5 for now
-    float3 env_irradiance = texCUBElod(environmentSampler, float4(n, 5));
+    scale = exp2(5);
+    float3 env_irradiance = texCUBEgrad(environmentSampler, n, float3(scale/256, 0, 0), float3(0, scale/256, 0));
 
     float2 envBRDFlookuptexture = tex2D(anisotropicSampler, float2(dot(n, v), 1 - roughness)).rg;
     // We don't have good ao textures to counteract fresnel highlights showing in unplausible places,
@@ -9667,7 +9670,7 @@ technique PBR_UEF
         RasterizerState(Rasterizer_Cull_CW)
 
         VertexShader = compile vs_1_1 NormalMappedVS();
-        PixelShader = compile ps_3_0 PBR_UEF_PS(true, true, false, 0, 0);
+        PixelShader = compile ps_2_a PBR_UEF_PS(true, true, false, 0, 0);
     }
 }
 
@@ -9691,7 +9694,7 @@ technique PBR_UEF_Navy
         RasterizerState(Rasterizer_Cull_CW)
 
         VertexShader = compile vs_1_1 NormalMappedVS();
-        PixelShader = compile ps_3_0 PBR_UEF_PS(true, true, false, 0, 0);
+        PixelShader = compile ps_2_a PBR_UEF_PS(true, true, false, 0, 0);
     }
 }
 
@@ -9711,7 +9714,7 @@ technique PBR_Aeon
         RasterizerState( Rasterizer_Cull_CW )
 
         VertexShader = compile vs_1_1 NormalMappedVS();
-        PixelShader = compile ps_3_0 PBR_AeonPS(true);
+        PixelShader = compile ps_2_a PBR_AeonPS(true);
     }
 }
 
@@ -9733,7 +9736,7 @@ technique PBR_Aeon_Navy
         RasterizerState( Rasterizer_Cull_CW )
 
         VertexShader = compile vs_1_1 NormalMappedVS();
-        PixelShader = compile ps_3_0 PBR_AeonPS(true);
+        PixelShader = compile ps_2_a PBR_AeonPS(true);
     }
 }
 
@@ -9753,7 +9756,7 @@ technique PBR_AeonCZAR
         RasterizerState( Rasterizer_Cull_CW )
 
         VertexShader = compile vs_1_1 NormalMappedVS();
-        PixelShader = compile ps_3_0 PBR_AeonCZARPS(true);
+        PixelShader = compile ps_2_a PBR_AeonCZARPS(true);
     }
 }
 
@@ -9773,7 +9776,7 @@ technique PBR_Cybran
         RasterizerState( Rasterizer_Cull_CW )
 
         VertexShader = compile vs_1_1 NormalMappedVS();
-        PixelShader = compile ps_3_0 PBR_CybranPS(true);
+        PixelShader = compile ps_2_a PBR_CybranPS(true);
     }
 }
 
@@ -9795,7 +9798,7 @@ technique PBR_Cybran_Navy
         RasterizerState( Rasterizer_Cull_CW )
 
         VertexShader = compile vs_1_1 NormalMappedVS();
-        PixelShader = compile ps_3_0 PBR_CybranPS(true);
+        PixelShader = compile ps_2_a PBR_CybranPS(true);
     }
 }
 
@@ -9817,7 +9820,7 @@ technique PBR_Seraphim
         RasterizerState( Rasterizer_Cull_CW )
 
         VertexShader = compile vs_1_1 UnitFalloffVS();
-        PixelShader = compile ps_3_0 PBR_SeraphimPS(true);
+        PixelShader = compile ps_2_a PBR_SeraphimPS(true);
     }
 }
 
@@ -9841,7 +9844,7 @@ technique PBR_Seraphim_Navy
         RasterizerState( Rasterizer_Cull_CW )
 
         VertexShader = compile vs_1_1 UnitFalloffVS();
-        PixelShader = compile ps_3_0 PBR_SeraphimPS(true);
+        PixelShader = compile ps_2_a PBR_SeraphimPS(true);
     }
 }
 
@@ -9863,7 +9866,7 @@ technique PBR_PhaseShield
         RasterizerState( Rasterizer_Cull_CW )
 
         VertexShader = compile vs_1_1 NormalMappedVS();
-        PixelShader = compile ps_3_0 PBR_UEF_PS(true, true, false, 0, 0);
+        PixelShader = compile ps_2_a PBR_UEF_PS(true, true, false, 0, 0);
     }
     pass P1
     {
@@ -9892,7 +9895,7 @@ technique PBR_AeonPhaseShield
         RasterizerState( Rasterizer_Cull_CW )
 
         VertexShader = compile vs_1_1 NormalMappedVS();
-        PixelShader = compile ps_3_0 PBR_AeonPS(true);
+        PixelShader = compile ps_2_a PBR_AeonPS(true);
     }
     pass P1
     {
@@ -9921,7 +9924,7 @@ technique PBR_CybranPhaseShield
         RasterizerState( Rasterizer_Cull_CW )
 
         VertexShader = compile vs_1_1 NormalMappedVS();
-        PixelShader = compile ps_3_0 PBR_CybranPS(true);
+        PixelShader = compile ps_2_a PBR_CybranPS(true);
     }
     pass P1
     {
@@ -9951,7 +9954,7 @@ technique PBR_SeraphimPersonalShield
         RasterizerState( Rasterizer_Cull_CW )
 
         VertexShader = compile vs_1_1 UnitFalloffVS();
-        PixelShader = compile ps_3_0 PBR_SeraphimPS(true);
+        PixelShader = compile ps_2_a PBR_SeraphimPS(true);
     }
     pass P1
     {
@@ -9981,7 +9984,7 @@ technique PBR_UEFBuild
         RasterizerState( Rasterizer_Cull_CW )
 
         VertexShader = compile vs_1_1 NormalMappedVS();
-        PixelShader = compile ps_3_0 PBR_UEFBuildPS(true);
+        PixelShader = compile ps_2_a PBR_UEFBuildPS(true);
     }
     pass P1
     {
@@ -10009,7 +10012,7 @@ technique PBR_AeonBuild
         AlphaState( AlphaBlend_Disable_Write_RGB )
 
         VertexShader = compile vs_1_1 AeonBuildVS(0.0);
-        PixelShader = compile ps_3_0 PBR_AeonBuildPS(true);
+        PixelShader = compile ps_2_a PBR_AeonBuildPS(true);
     }
     pass P1
     {
@@ -10017,7 +10020,7 @@ technique PBR_AeonBuild
         RasterizerState( Rasterizer_Cull_CW )
 
         VertexShader = compile vs_1_1 AeonBuildVS(0);
-        PixelShader = compile ps_3_0 PBR_AeonBuildOverlayPS();
+        PixelShader = compile ps_2_a PBR_AeonBuildOverlayPS();
     }
 }
 
@@ -10037,7 +10040,7 @@ technique PBR_AeonBuildPuddle
         RasterizerState( Rasterizer_Cull_CW )
 
         VertexShader = compile vs_1_1 NormalMappedVS();
-        PixelShader = compile ps_3_0 PBR_AeonBuildPuddlePS(true);
+        PixelShader = compile ps_2_a PBR_AeonBuildPuddlePS(true);
     }
 }
 
@@ -10058,7 +10061,7 @@ technique PBR_CybranBuild
         RasterizerState( Rasterizer_Cull_CW )
 
         VertexShader = compile vs_1_1 NormalMappedVS();
-        PixelShader = compile ps_3_0 PBR_CybranBuildPS(true);
+        PixelShader = compile ps_2_a PBR_CybranBuildPS(true);
     }
     pass P1
     {
@@ -10088,6 +10091,6 @@ technique PBR_SeraphimBuild
         RasterizerState( Rasterizer_Cull_CW )
 
         VertexShader = compile vs_1_1 SeraphimBuildVS();
-        PixelShader = compile ps_3_0 PBR_SeraphimBuildPS(true);
+        PixelShader = compile ps_2_a PBR_SeraphimBuildPS(true);
     }
 }
