@@ -592,8 +592,12 @@ float3 ComputeNormal( sampler2D source, float2 uv, float3x3 rotationMatrix)
 }
 
 float3 ApplyWaterColor(float depth, float3 color) {
-    float4 waterColor = tex1D(WaterRampSampler, -depth / (surfaceElevation - abyssElevation));
-    return lerp(color, waterColor.rgb, waterColor.w);
+    if (surfaceElevation > 0) {
+        float4 waterColor = tex1D(WaterRampSampler, -depth / (surfaceElevation - abyssElevation));
+        color = lerp(color, waterColor.rgb, waterColor.w);
+    } 
+    return color;
+    
 }
 
 ///////////////////////////////////////
@@ -9288,22 +9292,25 @@ float3 PBR_PS(
 }
 
 float3 ApplyWaterColorExponentially(NORMALMAPPED_VERTEX vertex, float3 color, float3 emission) {
-    float4 waterColor = tex1D(WaterRampSampler, -vertex.depth.x / (surfaceElevation - abyssElevation));
-    float3 v = normalize(vertex.viewDirection);
-    float3 up = float3(0,1,0);
-    // To simplify, we assume that the light enters vertically into the water,
-    // this is the length that the light travels underwater back to the camera
-    float oneOverCosV = 1 / max(dot(up, v), 0.0001);
-    // light gets absorbed exponentially
-    float waterAbsorption = saturate(exp(-waterColor.w * (1 + oneOverCosV)));
-    // when the mesh emits light, then the path from the surface to the mesh doesn't apply
-    float emissionAbsorption = saturate(exp(-waterColor.w * oneOverCosV));
-    // darken the color first to simulate the light absorption on the way in and out
-    color *= waterAbsorption;
-    // lerp in the watercolor to simulate the scattered light from the dirty water
-    color = lerp(waterColor.rgb, color, waterAbsorption);
-    // similarly tune down the emission light
-    color += emission * emissionAbsorption;
+    // the constants go crazy when water is disabled on the map
+    if (surfaceElevation > 0) {
+        float4 waterColor = tex1D(WaterRampSampler, -vertex.depth.x / (surfaceElevation - abyssElevation));
+        float3 v = normalize(vertex.viewDirection);
+        float3 up = float3(0,1,0);
+        // To simplify, we assume that the light enters vertically into the water,
+        // this is the length that the light travels underwater back to the camera
+        float oneOverCosV = 1 / max(dot(up, v), 0.0001);
+        // light gets absorbed exponentially
+        float waterAbsorption = saturate(exp(-waterColor.w * (1 + oneOverCosV)));
+        // when the mesh emits light, then the path from the surface to the mesh doesn't apply
+        float emissionAbsorption = saturate(exp(-waterColor.w * oneOverCosV));
+        // darken the color first to simulate the light absorption on the way in and out
+        color *= waterAbsorption;
+        // lerp in the watercolor to simulate the scattered light from the dirty water
+        color = lerp(waterColor.rgb, color, waterAbsorption);
+        // similarly tune down the emission light
+        color += emission * emissionAbsorption;
+    }
     return color;
 }
 
