@@ -8,32 +8,27 @@
     typedef float4 position_t;
 #endif
 
-// defined by the editor
-float Time;
-
+// defined by the engine
 float4x4 ViewMatrix;
 float4x4 ProjMatrix;
+float3 HalfAngle;
+float3 CameraPosition;
+float3 CameraDirection;
+float4x4 ShadowMatrix;
+texture ShadowTexture;
+
+// defined by game settings or console commands
+int ShadowsEnabled;
+float ShadowSize;
 
 // defined in the editor
+float3 ShadowFillColor = float3(0,0,0);
+float Time;
 float LightingMultiplier;
 float3 SunDirection;
 float3 SunAmbience;
 float3 SunColor;
-float3 HalfAngle;
-float3 CameraPosition;
-float3 CameraDirection;
 float4 SpecularColor;
-
-// defined by the engine
-int ShadowsEnabled;
-float ShadowSize;
-float4x4 ShadowMatrix;
-texture ShadowTexture;
-
-// defined in the editor
-float3 ShadowFillColor = float3(0,0,0);
-
-// defined in the editor
 texture WaterRamp;
 float WaterElevation;
 float WaterElevationDeep;
@@ -121,6 +116,7 @@ texture DecalMaskTexture;
 float DecalAlpha;
 
 // defined by the engine, used to generate texture coordinates
+// this is basically 1/mapresolution
 float4 TerrainScale; 
 
 // scale of Y coordinate as it's 16-bit
