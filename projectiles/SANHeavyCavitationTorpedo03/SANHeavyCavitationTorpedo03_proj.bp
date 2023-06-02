@@ -41,11 +41,11 @@ ProjectileBlueprint {
         HelpText = 0,
     },
     Physics = {
-        Acceleration = 10,
+        Acceleration = 5,
         DestroyOnWater = false,
         InitialSpeed = 5,
         Lifetime = 10,
-        MaxSpeed = 12,
+        MaxSpeed = 15,
         StayUnderwater = true,
         TrackTarget = false,
         TurnRate = 180,
