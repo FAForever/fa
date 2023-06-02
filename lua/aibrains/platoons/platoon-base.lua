@@ -30,6 +30,7 @@ AIPlatoon = Class(moho.platoon_methods) {
 
     ---@param self AIPlatoon
     OnDestroy = function(self)
+        self:LogDebug("OnDestroy")
         self.Trash:Destroy()
     end,
 
@@ -411,7 +412,7 @@ AIPlatoon = Class(moho.platoon_methods) {
     ---@param self AIPlatoon
     LogReference = function(self)
         local platoonName = self.PlatoonName
-        return string.format("(%s) %s", tostring(self), platoonName)
+        return string.format("(%s) %s", tostring(self):sub(9, 17), platoonName)
     end,
 
     ---@param self AIPlatoon
