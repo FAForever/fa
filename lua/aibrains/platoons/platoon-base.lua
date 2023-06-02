@@ -23,7 +23,6 @@ AIPlatoon = Class(moho.platoon_methods) {
     ---@param self AIPlatoon
     ---@param plan string
     OnCreate = function(self, plan)
-        LOG("OnCreate")
         self.Trash = TrashBag()
         self.Brain = self:GetBrain()
         self.TrashState = TrashBag()
@@ -31,13 +30,11 @@ AIPlatoon = Class(moho.platoon_methods) {
 
     ---@param self AIPlatoon
     OnDestroy = function(self)
-        LOG("OnDestroy")
         self.Trash:Destroy()
     end,
 
     ---@param self AIPlatoon
     OnUnitsAddedToPlatoon = function(self)
-        LOG("OnUnitsAddedToPlatoon")
         local units = self:GetPlatoonUnits()
         self.Units = units
         for k, unit in units do
@@ -47,6 +44,32 @@ AIPlatoon = Class(moho.platoon_methods) {
 
     -----------------------------------------------------------------
     -- platoon functions
+
+    --- Computes the most restrictive layer. The result should be cached
+    ---@param self AIPlatoon
+    ---@return NavLayers
+    GetNavigationalLayer = function(self)
+        local layer = 'Air'
+        local units = self:GetPlatoonUnits()
+        for _, unit in units do
+            if not (unit.Dead or IsDestroyed(unit)) then
+                local mType = v.Blueprint.Physics.MotionType
+                if (mType == 'RULEUMT_AmphibiousFloating' or mType == 'RULEUMT_Hover' or mType == 'RULEUMT_Amphibious') and (layer == 'Air' or layer == 'Water') then
+                    layer = 'Amphibious'
+                elseif (mType == 'RULEUMT_Water' or mType == 'RULEUMT_SurfacingSub') and (layer ~= 'Water') then
+                    layer = 'Water'
+                    break   --Nothing more restrictive than water, since there should be no mixed land/water platoons
+                elseif mType == 'RULEUMT_Air' and layer == 'Air' then
+                    layer = 'Air'
+                elseif (mType == 'RULEUMT_Biped' or mType == 'RULEUMT_Land') and layer ~= 'Land' then
+                    layer = 'Land'
+                    break   --Nothing more restrictive than land, since there should be no mixed land/water platoons
+                end
+            end
+        end
+
+        return layer
+    end,
 
     ---@param self AIPlatoon
     ---@param units Unit[] | nil
@@ -388,7 +411,7 @@ AIPlatoon = Class(moho.platoon_methods) {
     LogDebug = function(self, message)
         local platoonName = self.PlatoonName
         local stateName = self.StateName
-        SPEW(string.format("%s - %s: %s", platoonName, stateName, message))
+        SPEW(string.format("(%d) %s - %s: %s", self.Brain:GetArmyIndex(), platoonName, stateName, message))
     end,
 
     --- 
@@ -396,7 +419,7 @@ AIPlatoon = Class(moho.platoon_methods) {
     LogWarning = function(self, message)
         local platoonName = self.PlatoonName
         local stateName = self.StateName
-        WARN(string.format("%s - %s: %s", platoonName, stateName, message))
+        WARN(string.format("(%d) %s - %s: %s", self.Brain:GetArmyIndex(), platoonName, stateName, message))
     end,
 
 }
