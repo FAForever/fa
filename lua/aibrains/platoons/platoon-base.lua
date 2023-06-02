@@ -411,7 +411,7 @@ AIPlatoon = Class(moho.platoon_methods) {
     ---@param self AIPlatoon
     LogReference = function(self)
         local platoonName = self.PlatoonName
-        return string.format("(%d) (%s) %s", self:GetBrain():GetArmyIndex(), tostring(self), platoonName)
+        return string.format("(%s) %s", tostring(self), platoonName)
     end,
 
     ---@param self AIPlatoon
