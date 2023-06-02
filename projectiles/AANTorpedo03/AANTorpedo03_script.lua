@@ -9,6 +9,13 @@ local VisionMarkerOpti = import("/lua/sim/vizmarker.lua").VisionMarkerOpti
 
 AANTorpedoCluster01 = ClassProjectile(ATorpedoCluster) {
 
+    FxTrail = import("/lua/effecttemplates.lua").ATorpedoPolyTrails01,
+
+    OnCreate = function(self, inWater)
+        ATorpedoCluster.OnCreate(self, inWater)
+        CreateTrail(self, -1, self.Army, import("/lua/effecttemplates.lua").ATorpedoPolyTrails01)
+    end,
+
     ---@param self TANAnglerTorpedo06
     OnEnterWater = function(self)
         ATorpedoCluster.OnEnterWater(self)
