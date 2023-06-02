@@ -39,6 +39,8 @@ AIPlatoon = Class(moho.platoon_methods) {
         self.Units = units
         for k, unit in units do
             unit.AIPlatoonReference = self
+            LOG(self:LogReference())
+            unit:SetCustomName(self:LogReference())
         end
     end,
 
@@ -53,7 +55,7 @@ AIPlatoon = Class(moho.platoon_methods) {
         local units = self:GetPlatoonUnits()
         for _, unit in units do
             if not (unit.Dead or IsDestroyed(unit)) then
-                local mType = v.Blueprint.Physics.MotionType
+                local mType = unit.Blueprint.Physics.MotionType
                 if (mType == 'RULEUMT_AmphibiousFloating' or mType == 'RULEUMT_Hover' or mType == 'RULEUMT_Amphibious') and (layer == 'Air' or layer == 'Water') then
                     layer = 'Amphibious'
                 elseif (mType == 'RULEUMT_Water' or mType == 'RULEUMT_SurfacingSub') and (layer ~= 'Water') then
@@ -406,20 +408,25 @@ AIPlatoon = Class(moho.platoon_methods) {
     -----------------------------------------------------------------
     -- debugging
 
-    ---
     ---@param self AIPlatoon
-    LogDebug = function(self, message)
+    LogReference = function(self)
         local platoonName = self.PlatoonName
-        local stateName = self.StateName
-        SPEW(string.format("(%d) %s - %s: %s", self.Brain:GetArmyIndex(), platoonName, stateName, message))
+        return string.format("(%d) (%s) %s", self:GetBrain():GetArmyIndex(), tostring(self), platoonName)
     end,
 
-    --- 
+    ---@param self AIPlatoon
+    LogDebug = function(self, message)
+
+        local stateName = self.StateName
+        local logReference = self:LogReference()
+        SPEW(string.format("%s - %s: %s", logReference, stateName, message))
+    end,
+
     ---@param self AIPlatoon
     LogWarning = function(self, message)
-        local platoonName = self.PlatoonName
         local stateName = self.StateName
-        WARN(string.format("(%d) %s - %s: %s", self.Brain:GetArmyIndex(), platoonName, stateName, message))
+        local logReference = self:LogReference()
+        WARN(string.format("%s - %s: %s", logReference, stateName, message))
     end,
 
 }

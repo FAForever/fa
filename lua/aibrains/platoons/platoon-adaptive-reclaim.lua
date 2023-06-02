@@ -104,7 +104,7 @@ AIPlatoonAdaptiveReclaimBehavior = Class(AIPlatoon) {
                 end
 
                 searchLoop = searchLoop + 1
-                LOG('Search loop is ' .. searchLoop .. ' out of a possible ' .. searchRadius)
+                self:LogDebug('Search loop is ' .. searchLoop .. ' out of a possible ' .. searchRadius)
             end
             if reclaimTargetX and reclaimTargetZ then
                 local brainCell = brainGridInstance:ToCellFromGridSpace(reclaimTargetX, reclaimTargetZ)
@@ -414,9 +414,13 @@ AssignToUnitsMachine = function(data, platoon, units)
                 end
             end
         end
+
         if platoon.PlatoonData.SearchType == 'MAIN' then
             platoon.SearchRadius = platoon:GetBrain().IMAPConfig.Rings
         end
+
+        -- TODO: to be removed until we have a better system to populate the platoons
+        platoon:OnUnitsAddedToPlatoon()
 
         -- start the behavior
         ChangeState(platoon, platoon.Start)
