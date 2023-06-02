@@ -1761,8 +1761,7 @@ float4 splatBlendNormal(float4 n1, float4 n2, float t1height, float t2height, fl
 }
 
 /* # Sample a 2D 2x2 texture atlas # */
-// sadly, we get bleeding from the neighboring tiles. We need to be careful with texture changes at the borders
-// Enabling anisotropic filtering fixes the bleeding
+/* To prevent bleeding from the neighboring tiles, we need to work with padding */
 float4 atlas2D(sampler2D s, float2 uv, uniform float2 offset) {
     uv.x = frac(uv.x) / 4 + offset.x + 0.125;
     uv.y = frac(uv.y) / 4 + offset.y + 0.125;
