@@ -661,12 +661,6 @@ CTorpedoShipProjectile = ClassProjectile(OnWaterEntryEmitterProjectile) {
     OnEnterWater = function(self)
         OnWaterEntryEmitterProjectile.OnEnterWater(self)
         self:SetCollisionShape('Sphere', 0, 0, 0, 1.0)
-        self:SetMaxSpeed(20)
-        self:SetAcceleration(5)
-        self:SetTurnRate(180)
-        self:SetVelocity(0.5)
-        
-        self.Trash:Add(ForkThread(self.MovementThread,self))
     end,
 
     ---@param self TTorpedoShipProjectile

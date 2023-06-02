@@ -584,7 +584,7 @@ ATorpedoShipProjectile = ClassProjectile(OnWaterEntryEmitterProjectile) {
     ---@param self ATorpedoShipProjectile
     ---@param inWater boolean
     OnCreate = function(self,inWater)
-        OnWaterEntryEmitterProjectile.OnCreate(self,inWater)
+        OnWaterEntryEmitterProjectile.OnCreate(self, inWater)
         -- if we are starting in the water then immediately switch to tracking in water
         if inWater == true then
             self:TrackTarget(true):StayUnderwater(true)

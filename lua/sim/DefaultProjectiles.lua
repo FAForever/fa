@@ -449,7 +449,14 @@ OnWaterEntryEmitterProjectile = ClassProjectile(Projectile) {
         self:SetStayUpright(false)
         self:TrackTarget(true)
         self:StayUnderwater(true)
+
+        -- adds the effects after a delay
         self.Trash:Add(ForkThread(self.EnterWaterThread, self))
+
+        -- adjusts the velocity / acceleration, used for torpedo bombers
+        if self.MovementThread then
+            self.Trash:Add(ForkThread(self.MovementThread, self))
+        end
     end,
 
     ---@param self OnWaterEntryEmitterProjectile
