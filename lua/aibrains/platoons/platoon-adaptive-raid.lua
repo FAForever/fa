@@ -44,6 +44,9 @@ AIPlatoonAdaptiveRaidBehavior = Class(AIPlatoon) {
                 return
             end
 
+            -- Set the movement layer for pathing, included for mods where water or air based engineers may exist
+            self.MovementLayer = self:GetNavigationalLayer()
+
             self:ChangeState(self.Searching)
             return
         end,

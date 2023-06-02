@@ -25,6 +25,7 @@ AIPlatoonAdaptiveReclaimBehavior = Class(AIPlatoon) {
         ---@param self AIPlatoonAdaptiveReclaimBehavior
         Main = function(self)
             local brain = self:GetBrain()
+            
             if not self.SearchRadius then
                 local maxMapDimension = math.max(ScenarioInfo.size[1],ScenarioInfo.size[2])
                 if maxMapDimension == 256 then
@@ -33,37 +34,24 @@ AIPlatoonAdaptiveReclaimBehavior = Class(AIPlatoon) {
                     self.SearchRadius = 16
                 end
             end
+
             if not brain.GridReclaim then
                 self:LogWarning('requires reclaim grid to be generated and running')
                 self:ChangeState(self.Error)
                 return
             end
+
             self.CellSize = brain.GridReclaim.CellSize * brain.GridReclaim.CellSize
+
             -- requires navigational mesh
             if not NavUtils.IsGenerated() then
                 self:LogWarning('requires generated navigational mesh')
                 self:ChangeState(self.Error)
                 return
             end
+
             -- Set the movement layer for pathing, included for mods where water or air based engineers may exist
-            self.MovementLayer = 'Air'
-            for _, v in self:GetPlatoonUnits() do
-                if not v.Dead then
-                    local mType = v.Blueprint.Physics.MotionType
-                    if (mType == 'RULEUMT_AmphibiousFloating' or mType == 'RULEUMT_Hover' or mType == 'RULEUMT_Amphibious') and (self.MovementLayer == 'Air' or self.MovementLayer == 'Water') then
-                        LOG('Setting movement layer to Amphibious')
-                        self.MovementLayer = 'Amphibious'
-                    elseif (mType == 'RULEUMT_Water' or mType == 'RULEUMT_SurfacingSub') and (self.MovementLayer ~= 'Water') then
-                        self.MovementLayer = 'Water'
-                        break   --Nothing more restrictive than water, since there should be no mixed land/water platoons
-                    elseif mType == 'RULEUMT_Air' and self.MovementLayer == 'Air' then
-                        self.MovementLayer = 'Air'
-                    elseif (mType == 'RULEUMT_Biped' or mType == 'RULEUMT_Land') and self.MovementLayer ~= 'Land' then
-                        self.MovementLayer = 'Land'
-                        break   --Nothing more restrictive than land, since there should be no mixed land/water platoons
-                    end
-                end
-            end
+            self.MovementLayer = self:GetNavigationalLayer()
 
             self:ChangeState(self.Searching)
         end,
