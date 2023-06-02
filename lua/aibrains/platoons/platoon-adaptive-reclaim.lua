@@ -89,9 +89,11 @@ AIPlatoonAdaptiveReclaimBehavior = Class(AIPlatoon) {
                     local cell = cells[k] --[[@as AIGridReclaimCell]]
                     local centerOfCell = reclaimGridInstance:ToWorldSpace(cell.X, cell.Z)
                     local maxEngineers = math.min(math.ceil(cell.TotalMass / 500), 8)
+
                     -- make sure we can path to it and it doesnt have high threat e.g Point Defense
-                    if NavUtils.CanPathTo(self.MovementLayer, engPos, centerOfCell) and
-                        brain:GetThreatAtPosition(centerOfCell, 0, true, 'AntiSurface') < 10 then
+                    if  NavUtils.CanPathToCell(self.MovementLayer, engPos, centerOfCell) and
+                        brain:GetThreatAtPosition(centerOfCell, 0, true, 'AntiSurface') < 10
+                    then
                         local brainCell = brainGridInstance:ToCellFromGridSpace(cell.X, cell.Z)
                         local engineersInCell = brainGridInstance:CountReclaimingEngineers(brainCell)
                         if engineersInCell < maxEngineers then
@@ -100,6 +102,7 @@ AIPlatoonAdaptiveReclaimBehavior = Class(AIPlatoon) {
                         end
                     end
                 end
+
                 searchLoop = searchLoop + 1
                 LOG('Search loop is ' .. searchLoop .. ' out of a possible ' .. searchRadius)
             end
