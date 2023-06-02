@@ -22,11 +22,13 @@ local EconomyComponent = import("/lua/aibrains/components/economy.lua").AIBrainE
 ---@field GridRecon AIGridRecon
 ---@field BuilderManagers table<LocationType, AIBase>
 
+---@class AIBrainAdaptive : BaseAIBrain, AIBrainEconomyComponent
 AIBrain = Class(BaseAIBrainClass, EconomyComponent) {
 
     SkirmishSystems = true,
+
     --- Called after `SetupSession` but before `BeginSession` - no initial units, props or resources exist at this point
-    ---@param self AIBrain
+    ---@param self AIBrainAdaptive
     ---@param planName string
     OnCreateAI = function(self, planName)
         BaseAIBrainClass.OnCreateAI(self, planName)

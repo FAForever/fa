@@ -417,7 +417,6 @@ AIPlatoon = Class(moho.platoon_methods) {
 
     ---@param self AIPlatoon
     LogDebug = function(self, message)
-
         local stateName = self.StateName
         local logReference = self:LogReference()
         SPEW(string.format("%s - %s: %s", logReference, stateName, message))
