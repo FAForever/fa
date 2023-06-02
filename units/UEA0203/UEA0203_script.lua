@@ -10,11 +10,11 @@ local AirTransport = import("/lua/defaultunits.lua").AirTransport
 local TDFRiotWeapon = import("/lua/terranweapons.lua").TDFRiotWeapon
 
 ---@class UEA0203 : AirTransport
-UEA0203 = Class(AirTransport) {
+UEA0203 = ClassUnit(AirTransport) {
     EngineRotateBones = {'Jet_Front', 'Jet_Back',},
 
     Weapons = {
-        Turret01 = Class(TDFRiotWeapon) {},
+        Turret01 = ClassWeapon(TDFRiotWeapon) {},
     },
 
     OnStopBeingBuilt = function(self,builder,layer)

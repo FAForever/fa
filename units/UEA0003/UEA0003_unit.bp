@@ -130,7 +130,6 @@ UnitBlueprint {
         BuildableCategory = {
             'BUILTBYTIER3ENGINEER UEF',
         },
-        NaturalProducer = true,
     },
     Footprint = {
         MaxSlope = 0.25,

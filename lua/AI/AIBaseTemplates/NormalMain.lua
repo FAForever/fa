@@ -73,7 +73,7 @@ BaseBuilderTemplate {
     },
     BaseSettings = {
         FactoryCount = {
-            Land = 1,
+            Land = 2,
             Air = 1,
             Sea = 0,
             Gate = 1,
@@ -85,8 +85,8 @@ BaseBuilderTemplate {
             SCU = 1,
         },
         MassToFactoryValues = {
-            T1Value = 6,
-            T2Value = 15,
+            T1Value = 5,
+            T2Value = 14,
             T3Value = 22.5
         },
     },

@@ -196,7 +196,6 @@ UnitBlueprint {
             'BUILTBYTIER1ENGINEER AEON',
         },
         MaxBuildDistance = 5,
-        NeedToFaceTargetToBuild = false,
         SacrificeEnergyMult = 0.6,
         SacrificeMassMult = 0.6,
         StorageEnergy = 0,

@@ -849,6 +849,8 @@ function CreateUI()
                     lobby.CreateLobby('None', 0, playerName, nil, nil, topLevelGroup, function() MenuShow() SetEscapeHandle(ButtonExit) end)
                     lobby.HostGame(playerName .. "'s Skirmish", scenarioFileName, true)
                 end
+                StopAmbient()
+                StopMusic()
                 local lastScenario = Prefs.GetFromCurrentProfile('LastScenario') or UIUtil.defaultScenario
                 StartLobby(lastScenario)
             end)

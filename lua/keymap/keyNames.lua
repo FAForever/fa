@@ -157,6 +157,7 @@ keyNames = {
     ['DC'] = 'Backslash',
     ['DD'] = 'RightBracket',
     ['DE'] = 'Quote',
+    ['DF'] = 'Backtick',
     ['E5'] = 'ImeProcess',
     ['E7'] = 'UnicodePacket',
     ['F6'] = 'Attn',

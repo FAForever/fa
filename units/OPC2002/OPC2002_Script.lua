@@ -10,7 +10,7 @@
 local HoverLandUnit = import("/lua/defaultunits.lua").HoverLandUnit
 
 ---@class OPC2002 : HoverLandUnit
-OPC2002 = Class(HoverLandUnit) {
+OPC2002 = ClassUnit(HoverLandUnit) {
     
     OnStopBeingBuilt = function(self, builder, layer)
         HoverLandUnit.OnStopBeingBuilt(self, builder, layer)

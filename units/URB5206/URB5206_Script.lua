@@ -10,7 +10,7 @@
 local Unit = import("/lua/sim/unit.lua").Unit
 
 ---@class URB5206 : Unit
-URB5206 = Class(Unit) {
+URB5206 = ClassUnit(Unit) {
 
     OnCreate = function(self)
         Unit.OnCreate(self)

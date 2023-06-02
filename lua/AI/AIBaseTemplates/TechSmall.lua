@@ -21,7 +21,6 @@ BaseBuilderTemplate {
         'T2EngineerBuilders',
         'T3EngineerBuilders',
         'EngineerFactoryConstruction',
-        'EngineerFactoryConstructionLandHigherPriority',
 
         -- Engineer Support buildings
         'EngineeringSupportBuilder',

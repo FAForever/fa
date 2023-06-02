@@ -9,7 +9,7 @@
 local SAirUnit = import("/lua/seraphimunits.lua").SAirUnit
 
 ---@class XSC9011 : SAirUnit
-XSC9011 = Class(SAirUnit) {
+XSC9011 = ClassUnit(SAirUnit) {
 }
 
 

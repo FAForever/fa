@@ -13,10 +13,10 @@ local AAMSaintWeapon = import("/lua/aeonweapons.lua").AAMSaintWeapon
 local nukeFiredOnGotTarget = false
 
 ---@class UAB4302 : AStructureUnit
-UAB4302 = Class(AStructureUnit) {
+UAB4302 = ClassUnit(AStructureUnit) {
 
     Weapons = {
-        MissileRack = Class(AAMSaintWeapon) {
+        MissileRack = ClassWeapon(AAMSaintWeapon) {
             IdleState = State(AAMSaintWeapon.IdleState) {
                 OnGotTarget = function(self)
                     local bp = self:GetBlueprint()

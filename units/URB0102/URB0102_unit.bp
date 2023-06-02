@@ -78,6 +78,10 @@ UnitBlueprint {
         AnimationBuild = '/units/urb0102/urb0102_abuild.sca',
         AnimationFinishBuildLand = '/units/urb0102/urb0102_aplatform.sca',
         AnimationUpgrade = '/units/urb0102/urb0102_aupgrade.sca',
+        AnimationUpgradeTable = {
+            urb0202 = '/units/urb0102/URB0102_aupgrade.sca',
+            zrb9502 = '/units/urb0102/URB0102_aupgrade_sup.sca'
+        },
         BuildAttachBone = 'Build_Point',
         Mesh = {
             IconFadeInZoom = 130,

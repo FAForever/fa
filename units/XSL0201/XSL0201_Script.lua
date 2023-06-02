@@ -12,9 +12,9 @@ local SLandUnit = import("/lua/seraphimunits.lua").SLandUnit
 local SDFOhCannon = import("/lua/seraphimweapons.lua").SDFOhCannon
 
 ---@class XSL0201 : SLandUnit
-XSL0201 = Class(SLandUnit) {
+XSL0201 = ClassUnit(SLandUnit) {
     Weapons = {
-        MainGun = Class(SDFOhCannon) {}
+        MainGun = ClassWeapon(SDFOhCannon) {}
     },
 }
 TypeClass = XSL0201

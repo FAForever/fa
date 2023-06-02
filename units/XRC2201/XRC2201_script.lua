@@ -1,10 +1,7 @@
---****************************************************************************
---** 
---**  File     :  /cdimage/units/XRC2201/XRC2201_script.lua 
---** 
---** 
---**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
---****************************************************************************
+--------------------------------------------------------------------------------
+-- File :  /cdimage/units/XRC2201/XRC2201_script.lua 
+-- Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
+--------------------------------------------------------------------------------
 local CCivilianStructureUnit = import("/lua/cybranunits.lua").CCivilianStructureUnit
 local Util = import("/lua/utilities.lua")
 local RandomFloat = Util.GetRandomFloat
@@ -14,7 +11,7 @@ local EffectTemplate = import("/lua/effecttemplates.lua")
 local utilities = import("/lua/utilities.lua")
 
 ---@class XRC2201 : CCivilianStructureUnit
-XRC2201 = Class(CCivilianStructureUnit) {
+XRC2201 = ClassUnit(CCivilianStructureUnit) {
 
     OnCreate = function(self, builder, layer)      
         CCivilianStructureUnit.OnCreate(self)

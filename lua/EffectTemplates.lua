@@ -11,6 +11,11 @@
 EmtBpPath = '/effects/emitters/'
 EmitterTempEmtBpPath = '/effects/emitters/temp/'
 
+NoEffects = { }
+DefaultPolyTrailOffset1 = { 0 }
+DefaultPolyTrailOffset2 = { 0, 0 }
+DefaultPolyTrailOffset3 = { 0, 0, 0 }
+
 -- For gatling gun cooldown
 WeaponSteam01 = {
     EmtBpPath .. 'weapon_mist_01_emit.bp',
@@ -797,6 +802,13 @@ AChronoDampener = {
     EmtBpPath .. 'aeon_chrono_dampener_04_emit.bp',
 }
 
+AChronoDampenerLarge = {
+    EmtBpPath .. 'aeon_chrono_dampener_large_01_emit.bp',
+    EmtBpPath .. 'aeon_chrono_dampener_large_02_emit.bp',
+    EmtBpPath .. 'aeon_chrono_dampener_large_03_emit.bp',
+    EmtBpPath .. 'aeon_chrono_dampener_large_04_emit.bp',
+}
+
 ACommanderOverchargeFlash01 = {
     EmtBpPath .. 'aeon_commander_overcharge_flash_01_emit.bp',
     EmtBpPath .. 'aeon_commander_overcharge_flash_02_emit.bp',
@@ -1354,8 +1366,8 @@ CCorsairMissileUnitHit01 = {
     EmtBpPath .. 'cybran_corsair_missile_hit_ring.bp',
     EmtBpPath .. 'unit_shrapnel_hit_01_emit.bp',
 }
-CCorsairMissileFxTrails01 = {}
-CCorsairMissilePolyTrail01= EmtBpPath .. 'cybran_corsair_missile_polytrail_01_emit.bp'
+CCorsairMissileFxTrails01 = NoEffects
+CCorsairMissilePolyTrail01 = EmtBpPath .. 'cybran_corsair_missile_polytrail_01_emit.bp'
 
 
 

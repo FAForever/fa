@@ -29,9 +29,7 @@ local LobbyComm = import("/lua/ui/lobby/lobbycomm.lua")
 local Tooltip = import("/lua/ui/game/tooltip.lua")
 local Mods = import("/lua/mods.lua")
 local FactionData = import("/lua/factions.lua")
-local Text = import("/lua/maui/text.lua").Text
 local TextArea = import("/lua/ui/controls/textarea.lua").TextArea
-local Border = import("/lua/ui/controls/border.lua").Border
 
 local utils = import("/lua/system/utils.lua")
 
@@ -53,7 +51,6 @@ local aitypes
 local AIKeys = {}
 local AIStrings = {}
 local AITooltips = {}
-
 
 
 
@@ -473,6 +470,17 @@ function GetAIPlayerData(name, AIPersonality, slot)
     if not AIColor then
         AIColor = GetAvailableColor()
     end
+
+    -- retrieve properties from AI table
+    local baseAI = false
+    local requiresNavMesh = false
+    for k, entry in aitypes do 
+        if entry.key == AIPersonality then
+            requiresNavMesh = requiresNavMesh or entry.requiresNavMesh
+            baseAI = baseAI or entry.baseAI
+        end
+    end
+
     return PlayerData(
         {
             OwnerID = hostID,
@@ -482,6 +490,10 @@ function GetAIPlayerData(name, AIPersonality, slot)
             AIPersonality = AIPersonality,
             PlayerColor = AIColor,
             ArmyColor = AIColor,
+
+            -- properties from AI table
+            RequiresNavMesh = requiresNavMesh,
+            BaseAI = baseAI
         }
 )
 end
@@ -2225,6 +2237,15 @@ local function UpdateGame()
             ShowMapPositions(GUI.mapView, scenarioInfo)
             ConfigureMapListeners(GUI.mapView, scenarioInfo)
 
+            -- Briefing button takes priority over the patch notes if the map has a briefing
+            if scenarioInfo.hasBriefing then
+                GUI.briefingButton:Show()
+                GUI.patchnotesButton:Hide()
+            else
+                GUI.briefingButton:Hide()
+                GUI.patchnotesButton:Show()
+            end
+
             -- contains information that is available during blueprint loading
             local preGameData = {}
 
@@ -2308,14 +2329,12 @@ local function UpdateGame()
 
             -- PREFETCHING --
 
-            -- we can't prefetch in combination with PreGameData as the prefs file
-            -- is not updated accordingly, as a result when it is retrieved in
-            -- blueprints.lua it may use the old values. As it is more relevant
-            -- to have custom icon support over having a slightly faster loading
-            -- time we skip the prefetching
+            -- Note that the PreGameData is not properly updated,
+            -- hence we can not rely on mod and / or lobby option
+            -- changes to be present.
 
-            -- local mods = Mods.GetGameMods(gameInfo.GameMods)
-            -- PrefetchSession(scenarioInfo.map, mods, true)
+            local mods = Mods.GetGameMods(gameInfo.GameMods)
+            PrefetchSession(scenarioInfo.map, mods, true)
 
         else
             AlertHostMapMissing()
@@ -2333,6 +2352,7 @@ local function UpdateGame()
         local notReady = not playerOptions.Ready
 
         UIUtil.setEnabled(GUI.becomeObserver, notReady)
+        UIUtil.setEnabled(GUI.briefingButton, notReady)
         -- This button is enabled for all non-host players to view the configuration, and for the
         -- host to select presets (rather confusingly, one object represents both potential buttons)
         UIUtil.setEnabled(GUI.restrictedUnitsOrPresetsBtn, not isHost or notReady)
@@ -3171,7 +3191,7 @@ function CreateUI(maxPlayers)
     else
         tooltipText['body'] = LOC("<LOC lobui_0771>Left click ACU icon to move yourself.")
     end
-    Tooltip.AddControlTooltip(GUI.mapPanel, tooltipText, 0,198)
+    Tooltip.AddControlTooltip(GUI.mapPanel, tooltipText)
 
     GUI.optionsPanel = Group(GUI.panel, "optionsPanel") -- ORANGE Square in Screenshoot
     LayoutHelpers.AtLeftTopIn(GUI.optionsPanel, GUI.panel, 813, 325)
@@ -3215,6 +3235,18 @@ function CreateUI(maxPlayers)
     LayoutHelpers.AtHorizontalCenterIn(GUI.patchnotesButton, GUI.optionsPanel, -55)
     GUI.patchnotesButton.OnClick = function(self, event)
         Changelog.Changelog(GUI)
+    end
+
+    -- Create mission briefing button
+    local briefingButton = UIUtil.CreateButtonWithDropshadow(GUI.optionsPanel, '/BUTTON/medium/', "Briefing")
+    GUI.briefingButton = briefingButton
+    LayoutHelpers.AtBottomIn(GUI.briefingButton, GUI.optionsPanel, -51)
+    LayoutHelpers.AtHorizontalCenterIn(GUI.briefingButton, GUI.optionsPanel, -55)
+    briefingButton.OnClick = function(self, modifiers)
+        GUI.briefing = Group(GUI)
+        GUI.briefing.Depth:Set(function() return GUI.Depth() + 20 end)
+        LayoutHelpers.FillParent(GUI.briefing, GUI)
+        import('/lua/ui/campaign/operationbriefing.lua').CreateUI(GUI.briefing, gameInfo.GameOptions.ScenarioFile)
     end
 
     -- A buton that, for the host, is "game options", but for everyone else shows a ready-only mod
@@ -4282,6 +4314,9 @@ function CreateUI(maxPlayers)
             WaitSeconds(1)
         end
     end)
+    if false then
+        import("/lua/ui/events/SnowFlake.lua"). CreateSnowFlakes(GUI)
+    end
 end
 
 function setupChatEdit(chatPanel)
@@ -4790,10 +4825,11 @@ function ConfigureMapListeners(mapCtrl, scenario)
         local marker = mapCtrl.startPositions[inSlot]
 
         marker.OnRollover = function(self, state)
+            local slotName = GUI.slots[slot].name
             if state == 'enter' then
-                GUI.slots[slot].name.HandleEvent(self, {Type='MouseEnter'})
+                slotName:HandleEvent({Type = 'MouseEnter'})
             elseif state == 'exit' then
-                GUI.slots[slot].name.HandleEvent(self, {Type='MouseExit'})
+                slotName:HandleEvent({Type = 'MouseExit'})
             end
         end
 
@@ -6282,7 +6318,7 @@ end
 
 function ShowLobbyOptionsDialog()
     local dialogContent = Group(GUI)
-    LayoutHelpers.SetDimensions(dialogContent, 420, 260)
+    LayoutHelpers.SetDimensions(dialogContent, 420, 310)
 
     local dialog = Popup(GUI, dialogContent)
     GUI.lobbyOptionsDialog = dialog
@@ -6344,6 +6380,30 @@ function ShowLobbyOptionsDialog()
             GUI.chatPanel:ScrollToBottom()
         end
     end
+    if true then
+        --snowflakes count
+        local currentSnowFlakesCount = Prefs.GetFromCurrentProfile('SnowFlakesCount') or 100
+        local slider_SnowFlakes_Count_TEXT = UIUtil.CreateText(dialogContent,'Snowflakes count '.. currentSnowFlakesCount, 14, 'Arial', true)
+        LayoutHelpers.AtRightTopIn(slider_SnowFlakes_Count_TEXT, dialogContent, 27, 202)
+
+        -- slider for changing chat font size
+        local slider_SnowFlakes_Count = Slider(dialogContent, false, 100, 1000,
+            UIUtil.SkinnableFile('/slider02/slider_btn_up.dds'),
+            UIUtil.SkinnableFile('/slider02/slider_btn_over.dds'),
+            UIUtil.SkinnableFile('/slider02/slider_btn_down.dds'),
+            UIUtil.SkinnableFile('/slider02/slider-back_bmp.dds'))
+            LayoutHelpers.AtRightTopIn(slider_SnowFlakes_Count, dialogContent, 20, 222)
+        slider_SnowFlakes_Count:SetValue(currentSnowFlakesCount)
+        slider_SnowFlakes_Count.OnValueChanged = function(self, newValue)
+            local sliderValue = math.floor(newValue)
+            slider_SnowFlakes_Count_TEXT:SetText('Snowflakes count '.. sliderValue)
+            Prefs.SetToCurrentProfile('SnowFlakesCount', sliderValue)
+            import("/lua/ui/events/SnowFlake.lua").Clear()
+            import("/lua/ui/events/SnowFlake.lua").CreateSnowFlakes(GUI, sliderValue)
+        end
+    end
+
+
     --
     local cbox_WindowedLobby = UIUtil.CreateCheckbox(dialogContent, '/CHECKBOX/', LOC("<LOC lobui_0402>Windowed mode"))
     LayoutHelpers.AtRightTopIn(cbox_WindowedLobby, dialogContent, 20, 42)

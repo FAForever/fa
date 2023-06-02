@@ -107,6 +107,8 @@ local function MakeLocalPlayerInfo(name)
     result.DEV = tonumber(GetCommandLineArg("/deviation", 1)[1]) or ""
     result.MEAN = tonumber(GetCommandLineArg("/mean", 1)[1]) or ""
     result.NG = tonumber(GetCommandLineArg("/numgames", 1)[1]) or ""
+    result.DIV = (GetCommandLineArg("/division", 1)[1]) or ""
+    result.SUBDIV = (GetCommandLineArg("/subdivision", 1)[1]) or ""
     result.PL = math.floor(result.MEAN - 3 * result.DEV)
     LOG('Local player info: ' .. repr(result))
     return result
@@ -209,9 +211,11 @@ local function CheckForLaunch()
     end
 
     local allRatings = {}
+    local allDivisions = {}
     for k,v in gameInfo.PlayerOptions do
         if v.Human and v.PL then
             allRatings[v.PlayerName] = v.PL
+            allDivisions[v.PlayerName]= v.DIV .. v.SUBDIV
             -- Initialize peer launch statuses
             peerLaunchStatuses[v.OwnerID] = false
         end
@@ -219,6 +223,7 @@ local function CheckForLaunch()
     -- We don't need to wait for a launch status from ourselves
     peerLaunchStatuses[localPlayerID] = nil
     gameInfo.GameOptions['Ratings'] = allRatings
+    gameInfo.GameOptions['Divisions'] = allDivisions
 
     LOG("Host launching game.")
     lobbyComm:BroadcastData({ Type = 'Launch', GameInfo = gameInfo })
@@ -237,6 +242,9 @@ end
 
 
 local function CreateUI()
+
+    LOG("Don't mind me x2")
+
     if currentDialog ~= false then
         MenuCommon.MenuCleanup()
         currentDialog:Destroy()
@@ -248,7 +256,7 @@ local function CreateUI()
 
     local background = MenuCommon.SetupBackground(GetFrame(0))
 
-    SetDialog(parent, "<LOC lobui_0201>Setting up automatch...", "<LOC _Cancel>", ExitApplication)
+    SetDialog(parent, "<LOC lobui_0201>Setting up automatch...")
 
     -- construct the connection status GUI and position it right below the dialog
     connectionStatusGUI = ConnectionStatus(GetFrame(0))
@@ -296,7 +304,7 @@ local function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayer
     end
 
     lobbyComm.DataReceived = function(self, data)
-        LOG('DATA RECEIVED: ', repr(data))
+        LOG('DATA RECEIVED: ', reprsl(data))
 
         if data.Type == 'LaunchStatus' then
             peerLaunchStatuses[data.SenderID] = data.Status
@@ -311,15 +319,26 @@ local function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayer
         else
             --  Non-Host Messages
             if data.Type == 'Launch' then
-                LOG(repr(data.GameInfo))
+                -- The client compares the game options with those of the host. They both look like the local 'gameInfo' as defined 
+                -- above, but the host adds these fields upon launch (see: CheckForLaunch) so that we can display them on the scoreboard. 
+                -- A client won't have this information attached, and therefore we remove it manually here
                 local hostOptions = table.copy(data.GameInfo.GameOptions)
-                -- The host options contain some extra data that we don't care about
                 hostOptions['Ratings'] = nil
                 hostOptions['ScenarioFile'] = nil
+                hostOptions['Divisions'] = nil
+
                 -- This is a sanity check so we don't accidentally launch games
                 -- with the wrong game settings because the host is using a
                 -- client that doesn't support game options for matchmaker.
                 if not table.equal(gameInfo.GameOptions, hostOptions) then
+                    WARN("Game options missmatch!")
+
+                    LOG("Client settings: ")
+                    reprsl(gameInfo.GameOptions)
+
+                    LOG("Host settings: ")
+                    reprsl(hostOptions)
+
                     SetDialog(parent, Strings.LaunchRejected, "<LOC _Exit>", CleanupAndExit)
 
                     self:BroadcastData({ Type = 'LaunchStatus', Status = 'Rejected' })
@@ -388,15 +407,9 @@ function CreateLobby(protocol, localPort, desiredPlayerName, localPlayerUID, nat
     if not parent then parent = UIUtil.CreateScreenGroup(GetFrame(0), "CreateLobby ScreenGroup") end
     -- don't parent background to screen group so it doesn't get destroyed until we leave the menus
     local background = MenuCommon.SetupBackground(GetFrame(0))
-    local function OnAbort()
-        MenuCommon.MenuCleanup()
-        parent:Destroy()
-        parent = false
-        ExitApplication()
-    end
 
     -- construct the initial dialog
-    SetDialog(parent, Strings.TryingToConnect, Strings.AbortConnect, OnAbort)
+    SetDialog(parent, Strings.TryingToConnect)
 
     InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, natTraversalProvider)
 

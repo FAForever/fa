@@ -8,7 +8,7 @@
 local TConstructionUnit = import("/lua/terranunits.lua").TConstructionUnit
 
 ---@class UEA0001 : TConstructionUnit
-UEA0001 = Class(TConstructionUnit) {
+UEA0001 = ClassUnit(TConstructionUnit) {
     Parent = nil,
 
     OnScriptBitSet = function(self, bit)

@@ -15,10 +15,10 @@ local TAirUnit = import("/lua/terranunits.lua").TAirUnit
 local TANTorpedoAngler = import("/lua/terranweapons.lua").TANTorpedoAngler
 
 ---@class UEA0302 : TAirUnit
-UEA0302 = Class(TAirUnit) {
+UEA0302 = ClassUnit(TAirUnit) {
 -- Disabling for now, while Design decides whether they want this functionality
 --    Weapons = {
---        BuoyLauncher = Class(TANTorpedoAngler) {
+--        BuoyLauncher = ClassWeapon(TANTorpedoAngler) {
 --            FiringMuzzleBones = {'Projectile',},
 --        },
 --    },

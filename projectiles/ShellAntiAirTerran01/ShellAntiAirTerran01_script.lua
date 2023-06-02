@@ -1,6 +1,4 @@
---
 -- Terran Anti Air basic projectile
---
-ShellAntiAirTerran01 = Class(import("/lua/terranprojectiles.lua").TAALightFragmentationProjectile) { }
 
+ShellAntiAirTerran01 = ClassProjectile(import("/lua/terranprojectiles.lua").TAALightFragmentationProjectile) { }
 TypeClass = ShellAntiAirTerran01

@@ -13,9 +13,9 @@ local CANNaniteTorpedoWeapon = import("/lua/cybranweapons.lua").CANNaniteTorpedo
 
 
 ---@class URB2109 : CStructureUnit
-URB2109 = Class(CStructureUnit) {
+URB2109 = ClassUnit(CStructureUnit) {
     Weapons = {
-        Turret01 = Class(CANNaniteTorpedoWeapon) {},
+        Turret01 = ClassWeapon(CANNaniteTorpedoWeapon) {},
     },
 }
 

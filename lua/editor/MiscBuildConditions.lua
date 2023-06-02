@@ -12,19 +12,19 @@
 local AIUtils = import("/lua/ai/aiutilities.lua")
 
 
----@param aiBrain any unused
+---@param aiBrain AIBrain unused
 ---@return boolean
 function True(aiBrain)
     return true
 end
 
----@param aiBrain any unused
+---@param aiBrain AIBrain unused
 ---@return boolean
 function False(aiBrain)
     return false
 end
 
----@param aiBrain any unused
+---@param aiBrain AIBrain unused
 ---@param higherThan number
 ---@param lowerThan number
 ---@param minNumber number
@@ -46,7 +46,7 @@ function IsAIBrainLayerPref(aiBrain, layerPref)
     end
 end
 
----@param aiBrain any unused
+---@param aiBrain AIBrain unused
 ---@param num number
 ---@return true | nil
 function MissionNumber(aiBrain, num)
@@ -56,7 +56,7 @@ function MissionNumber(aiBrain, num)
     end
 end
 
----@param aiBrain any unused
+---@param aiBrain AIBrain unused
 ---@param num number
 ---@return true | nil
 function MissionNumberGreaterOrEqual(aiBrain, num)
@@ -66,7 +66,7 @@ function MissionNumberGreaterOrEqual(aiBrain, num)
     end
 end
 
----@param aiBrain any unused
+---@param aiBrain AIBrain unused
 ---@param num number
 ---@return true | nil
 function MissionNumberLessOrEqual(aiBrain, num)
@@ -76,7 +76,7 @@ function MissionNumberLessOrEqual(aiBrain, num)
     end
 end
 
----@param aiBrain any unused
+---@param aiBrain AIBrain unused
 ---@param varName string
 ---@return true | nil
 function CheckScenarioInfoVarTable(aiBrain, varName)
@@ -85,14 +85,14 @@ function CheckScenarioInfoVarTable(aiBrain, varName)
     end
 end
 
----@param aiBrain any unused
+---@param aiBrain AIBrain unused
 ---@param varName string
 ---@return boolean
 function CheckScenarioInfoVarTableFalse(aiBrain, varName)
     return not ScenarioInfo.VarTable[varName]
 end
 
----@param aiBrain any unused
+---@param aiBrain AIBrain unused
 ---@param diffLevel number
 ---@return true | nil
 function DifficultyEqual(aiBrain, diffLevel)
@@ -102,7 +102,7 @@ function DifficultyEqual(aiBrain, diffLevel)
     end
 end
 
----@param aiBrain any unused
+---@param aiBrain AIBrain unused
 ---@param diffLevel number
 ---@return true | nil
 function DifficultyGreaterOrEqual(aiBrain, diffLevel)
@@ -112,7 +112,7 @@ function DifficultyGreaterOrEqual(aiBrain, diffLevel)
     end
 end
 
----@param aiBrain any unused
+---@param aiBrain AIBrain unused
 ---@param diffLevel number
 ---@return true | nil
 function DifficultyLessOrEqual(aiBrain, diffLevel)
@@ -122,7 +122,7 @@ function DifficultyLessOrEqual(aiBrain, diffLevel)
     end
 end
 
----@param aiBrain any unused
+---@param aiBrain AIBrain unused
 ---@param chainName string
 ---@return true | nil
 function MarkerChainExists(aiBrain, chainName)
@@ -277,7 +277,7 @@ function NotPreBuilt(aiBrain)
     return not aiBrain.PreBuilt
 end
 
----@param aiBrain any unused
+---@param aiBrain AIBrain unused
 ---@param mapname string
 ---@param check boolean
 ---@return boolean
@@ -307,7 +307,7 @@ function IsIsland(aiBrain, check)
     end
 end
 
----@param aiBrain any unused
+---@param aiBrain AIBrain unused
 ---@param sizeX number
 ---@param sizeZ number
 ---@return true | nil
@@ -318,7 +318,7 @@ function MapGreaterThan(aiBrain, sizeX, sizeZ)
     end
 end
 
----@param aiBrain any unused
+---@param aiBrain AIBrain unused
 ---@param sizeX number
 ---@param sizeZ number
 ---@return true | nil
@@ -329,6 +329,33 @@ function MapLessThan(aiBrain, sizeX, sizeZ)
     end
 end
 
+--- Buildcondition to check pathing to current enemy 
+--- Note this requires the CanPathToCurrentEnemy thread to be running
+---@param aiBrain AIBrain
+---@param locationType string
+---@param pathType string
+---@return boolean
+function PathToEnemy(aiBrain, locationType, pathType)
+    local currentEnemy = aiBrain:GetCurrentEnemy()
+    if not currentEnemy then
+        return true
+    end
+    local enemyIndex = aiBrain:GetCurrentEnemy():GetArmyIndex()
+    local selfIndex = aiBrain:GetArmyIndex()
+    if aiBrain.CanPathToEnemy[selfIndex][enemyIndex][locationType] == pathType then
+        return true
+    end
+    return false
+end
+
+---@param aiBrain AIBrain
+---@return boolean
+function WaterMassMarkersPresent(aiBrain)
+    if aiBrain.IntelData.WaterMassMarkersPresent then
+        return true
+    end
+    return false
+end
 
 -- unused imports kept for mod support
 local Utils = import("/lua/utilities.lua")

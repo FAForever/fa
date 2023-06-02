@@ -400,7 +400,7 @@ Manager = {
             error('TRIGGER MANAGER ERROR: No StatName defined for EconStats trigger named- ' .. spec.Name, 2)
             return false
         elseif not params.EconType then
-            errro('TRIGGER MANAGER ERROR: No EconType defined for EconStats trigger named- ' .. spec.Name, 2)
+            error('TRIGGER MANAGER ERROR: No EconType defined for EconStats trigger named- ' .. spec.Name, 2)
             return false
         elseif not params.Number then
             error('TRIGGER MANAGER ERROR: No Number defined for EconStats trigger named- ' .. spec.Name, 2)

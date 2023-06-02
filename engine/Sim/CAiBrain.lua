@@ -37,7 +37,7 @@ end
 
 --- Order a unit to build a structure
 ---@param builder Unit
----@param blueprintID string
+---@param blueprintID UnitId
 ---@param buildLocation Vector
 ---@param buildRelative boolean if true, the location is used as an offset to the builders current location
 function CAiBrain:BuildStructure(builder, blueprintID, buildLocation, buildRelative)
@@ -45,7 +45,7 @@ end
 
 --- Order a factory to build a unit
 ---@param builder Unit
----@param unitToBuild string BlueprintId, as an example: `uel0303`
+---@param unitToBuild UnitId BlueprintId, as an example: `uel0303`
 ---@param count number
 function CAiBrain:BuildUnit(builder, unitToBuild, count)
 end
@@ -292,7 +292,7 @@ function CAiBrain:GetNumPlatoonsTemplateNamed()
 end
 
 --- TODO.
----@return Number
+---@return number
 function CAiBrain:GetNumPlatoonsWithAI()
 end
 

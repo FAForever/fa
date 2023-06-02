@@ -1,5 +1,4 @@
 UnitBlueprint {
-    ResolvePath = true,
     AI = {
         GuardScanRadius = 26, -- Same as other T1 scouts (UEF & Cybran), this scout will suicide into T1 tanks because it's weapon range is too small and changing it would have too big of an impact on the gameplay
     },

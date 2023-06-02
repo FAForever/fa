@@ -46,7 +46,7 @@ UnitBlueprint {
         'LAND',
         'TECH1',
         'SCOUT',
-        'COUNTERINTELLIGENCE',
+        'INTELLIGENCE',
         'DIRECTFIRE',
         'VISIBLETORECON',
         'RECLAIMABLE',

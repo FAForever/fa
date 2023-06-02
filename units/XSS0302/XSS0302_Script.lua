@@ -13,19 +13,16 @@ local SAAOlarisCannonWeapon = SeraphimWeapons.SAAOlarisCannonWeapon
 local SIFInainoWeapon = SeraphimWeapons.SIFInainoWeapon
 
 ---@class XSS0302 : SSeaUnit
-XSS0302 = Class(SSeaUnit) {
-    FxDamageScale = 2,
-    DestructionTicks = 400,
-
+XSS0302 = ClassUnit(SSeaUnit) {
     Weapons = {
-        BackTurret = Class(SDFHeavyQuarnonCannon) {},
-        FrontTurret = Class(SDFHeavyQuarnonCannon) {},
-        MidTurret = Class(SDFHeavyQuarnonCannon) {},
-        AntiMissileLeft = Class(SAMElectrumMissileDefense) {},
-        AntiMissileRight = Class(SAMElectrumMissileDefense) {},
-        AntiAirLeft = Class(SAAOlarisCannonWeapon) {},
-        AntiAirRight = Class(SAAOlarisCannonWeapon) {},
-        InainoMissiles = Class(SIFInainoWeapon) {},
+        BackTurret = ClassWeapon(SDFHeavyQuarnonCannon) {},
+        FrontTurret = ClassWeapon(SDFHeavyQuarnonCannon) {},
+        MidTurret = ClassWeapon(SDFHeavyQuarnonCannon) {},
+        AntiMissileLeft = ClassWeapon(SAMElectrumMissileDefense) {},
+        AntiMissileRight = ClassWeapon(SAMElectrumMissileDefense) {},
+        AntiAirLeft = ClassWeapon(SAAOlarisCannonWeapon) {},
+        AntiAirRight = ClassWeapon(SAAOlarisCannonWeapon) {},
+        InainoMissiles = ClassWeapon(SIFInainoWeapon) {},
     },
 }
 

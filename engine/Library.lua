@@ -1,3 +1,6 @@
+--**************************************************************************************************
+--** Shared under the MIT license
+--**************************************************************************************************
 ---@meta
 
 -- This file annotates the differences that our distribution of the Lua standard libary has with
@@ -45,6 +48,11 @@ end
 ---@param path FileName
 ---@return Module
 function import(path)
+end
+
+---@param path FileName
+---@return Module
+function lazyimport(path)
 end
 
 --- Print a message to the moho logger, this shouldn't be used in production code

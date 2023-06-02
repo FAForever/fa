@@ -52,7 +52,7 @@ local DEFAULT_MAPPING = {
 
 -- Represents player data using the magic of lazy variables.
 ---@class WatchedPlayerData : PlayerData, WatchedValueTable
-PlayerData = Class(WatchedValueTable) {
+PlayerData = ClassUI(WatchedValueTable) {
     -- Create a new PlayerData object for the given player name.
     __init = function(self, initialMapping)
         local mapping = table.assimilate(initialMapping, DEFAULT_MAPPING)

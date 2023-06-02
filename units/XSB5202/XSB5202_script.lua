@@ -12,7 +12,7 @@ local SeraphimAirStagePlat02 = import("/lua/effecttemplates.lua").SeraphimAirSta
 local SeraphimAirStagePlat01 = import("/lua/effecttemplates.lua").SeraphimAirStagePlat01
 
 ---@class XSB5202 : SAirStagingPlatformUnit
-XSB5202 = Class(SAirStagingPlatformUnit) {
+XSB5202 = ClassUnit(SAirStagingPlatformUnit) {
     OnStopBeingBuilt = function(self,builder,layer)
         for k, v in SeraphimAirStagePlat02 do
             CreateAttachedEmitter(self, 'XSB5202', self.Army, v)

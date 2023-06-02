@@ -34,6 +34,8 @@ local BuilderSlicePeriod = 6
 ---@param buildEffectBones string[] The effect bones of the builder
 ---@param buildEffectsBag TrashBag The effects bag of the builder
 function CreateDefaultBuildBeams(builder, unitBeingBuilt, buildEffectBones, buildEffectsBag)
+    WaitTicks(1)
+
     local ProjectileSetVelocity = ProjectileSetVelocity
     local WaitTicks = WaitTicks
 
@@ -81,6 +83,8 @@ end
 ---@param buildEffectBones string[] The effect bones of the builder
 ---@param buildEffectsBag TrashBag The effects bag of the builder
 function CreateUEFBuildSliceBeams(builder, unitBeingBuilt, buildEffectBones, buildEffectsBag)
+    WaitTicks(1)
+    
     -- store as locals for performance
     local UnitGetFractionComplete = UnitGetFractionComplete
     local ProjectileSetVelocity = ProjectileSetVelocity
@@ -257,6 +261,8 @@ end
 --- @param buildEffectBones string[] The effect bones of the builder
 --- @param buildEffectsBag TrashBag The effects bag of the builder
 function CreateUEFCommanderBuildSliceBeams(builder, unitBeingBuilt, buildEffectBones, buildEffectsBag)
+    WaitTicks(1)
+    
     -- localize for optimal access
     local Warp = Warp
     local WaitTicks = WaitTicks

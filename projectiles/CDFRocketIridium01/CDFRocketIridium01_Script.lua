@@ -3,7 +3,5 @@
 --
 
 local CIridiumRocketProjectile = import("/lua/cybranprojectiles.lua").CIridiumRocketProjectile
-
-CDFRocketIridium01 = Class(CIridiumRocketProjectile) { }
-
+CDFRocketIridium01 = ClassProjectile(CIridiumRocketProjectile) { }
 TypeClass = CDFRocketIridium01

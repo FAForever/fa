@@ -240,7 +240,7 @@ UnitBlueprint {
     },
     Intel = {
         VisionRadius = 50,
-        WaterVisionradius = 50,
+        --WaterVisionRadius = 50,
     },
     Interface = {
         HelpText = '<LOC xsl0401_help>Experimental Assault Bot',

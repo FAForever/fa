@@ -1,12 +1,11 @@
---****************************************************************************
---**
---**  File     :  /effects/Entities/SCUDeath01/SCUDeath01_script.lua
---**  Author(s):  Gordon Duclos
---**
---**  Summary  :  SCU Death Explosion
---**
---**  Copyright © 2005,2006 Gas Powered Games, Inc.  All rights reserved.
---****************************************************************************
+------------------------------------------------------------------------------
+----  File     :  /effects/Entities/SCUDeath01/SCUDeath01_script.lua
+----  Author(s):  Gordon Duclos
+----
+----  Summary  :  SCU Death Explosion
+----
+----  Copyright © 2005,2006 Gas Powered Games, Inc.  All rights reserved.
+------------------------------------------------------------------------------
 
 local NullShell = import("/lua/sim/defaultprojectiles.lua").NullShell
 local EffectTemplate = import("/lua/effecttemplates.lua")
@@ -18,18 +17,18 @@ SCUDeath01 = Class(NullShell) {
     OnCreate = function(self)
         NullShell.OnCreate(self)
         local myBlueprint = self:GetBlueprint()
-            
+
         -- Play the "NukeExplosion" sound
         if myBlueprint.Audio.NukeExplosion then
             self:PlaySound(myBlueprint.Audio.NukeExplosion)
         end
-		
+
 		-- Create thread that spawns and controls effects
         self:ForkThread(self.EffectThread)
     end,
-     
+
     PassDamageData = function(self, damageData)
-        NullShell.PassDamageData(self, damageData)
+        NullShell.PassMetaDamage(self, damageData)
         local instigator = self:GetLauncher()
         if instigator == nil then
             instigator = self
@@ -38,7 +37,7 @@ SCUDeath01 = Class(NullShell) {
         -- Do Damage
         self:DoDamage( instigator, self.DamageData, nil )  
     end,
-    
+
     OnImpact = function(self, targetType, targetEntity)
         self:Destroy()
     end,
@@ -69,7 +68,7 @@ SCUDeath01 = Class(NullShell) {
         WaitSeconds(0.1)
         DamageRing(self, position, 0.1, 15, 1, 'Force', true)
     end,
-    
+
     CreateOuterRingWaveSmokeRing = function(self)
         local sides = 10
         local angle = (2*math.pi) / sides
@@ -83,16 +82,14 @@ SCUDeath01 = Class(NullShell) {
             local proj =  self:CreateProjectile('/effects/entities/SCUDeathShockwave01/SCUDeathShockwave01_proj.bp', X * OffsetMod , 2, Z * OffsetMod, X, 0, Z)
                 :SetVelocity(velocity)
             table.insert( projectiles, proj )
-        end  
-        
+        end
+
         WaitSeconds( 3 )
 
         -- Slow projectiles down to normal speed
         for k, v in projectiles do
             v:SetAcceleration(-0.45)
-        end         
-    end,    
+        end
+    end,
 }
-
 TypeClass = SCUDeath01
-

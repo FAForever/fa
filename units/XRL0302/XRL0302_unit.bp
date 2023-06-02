@@ -222,7 +222,6 @@ UnitBlueprint {
             DamageRadius = 6.5,
             DamageType = 'FireBeetleExplosion',
             DisplayName = 'Suicide',
-            FireOnSelfDestruct = true,
             FireTargetLayerCapsTable = {
                 Land = 'Land|Water|Seabed',
                 Water = 'Land|Water|Seabed',
@@ -241,7 +240,6 @@ UnitBlueprint {
         },
         {
             AboveWaterTargetsOnly = true,
-            Accurate = true,
             BallisticArc = 'RULEUBA_None',
             CollideFriendly = false,
             Damage = 1100,
@@ -254,7 +252,6 @@ UnitBlueprint {
                 Land = 'Air|Land|Seabed|Water',
                 Water = 'Air|Land|Water',
             },
-            FireOnSelfDestruct = true,
             FireOnDeath = true,
             FiringTolerance = 2,
             IgnoreIfDisabled = true,

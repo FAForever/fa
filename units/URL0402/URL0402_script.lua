@@ -20,17 +20,28 @@ local CANTorpedoLauncherWeapon = CybranWeaponsFile.CANTorpedoLauncherWeapon
 local Entity = import("/lua/sim/entity.lua").Entity
 
 ---@class URL0402 : CWalkingLandUnit
-URL0402 = Class(CWalkingLandUnit) {
+URL0402 = ClassUnit(CWalkingLandUnit) {
     WalkingAnimRate = 1.2,
 
     Weapons = {
-        MainGun = Class(CDFHeavyMicrowaveLaserGenerator) {},
-        RightLaserTurret = Class(CDFElectronBolterWeapon) {},
-        LeftLaserTurret = Class(CDFElectronBolterWeapon) {},
-        RightAntiAirMissile = Class(CAAMissileNaniteWeapon) {},
-        LeftAntiAirMissile = Class(CAAMissileNaniteWeapon) {},
-        Torpedo = Class(CANTorpedoLauncherWeapon) {},
+        MainGun = ClassWeapon(CDFHeavyMicrowaveLaserGenerator) {},
+        RightLaserTurret = ClassWeapon(CDFElectronBolterWeapon) {},
+        LeftLaserTurret = ClassWeapon(CDFElectronBolterWeapon) {},
+        RightAntiAirMissile = ClassWeapon(CAAMissileNaniteWeapon) {},
+        LeftAntiAirMissile = ClassWeapon(CAAMissileNaniteWeapon) {},
+        Torpedo = ClassWeapon(CANTorpedoLauncherWeapon) {},
     },
+
+    OnCreate = function(self)
+        CWalkingLandUnit.OnCreate(self)
+        self.AmbientExhaustEffectsBag = self.AmbientExhaustEffectsBag or TrashBag()
+        self.Trash:Add(self.AmbientExhaustEffectsBag)
+    end,
+
+    DestroyAllTrashBags = function(self)
+        CWalkingLandUnit.DestroyAllTrashBags(self)
+        self.AmbientExhaustEffectsBag:Destroy()
+    end,
 
     OnStartBeingBuilt = function(self, builder, layer)
         CWalkingLandUnit.OnStartBeingBuilt(self, builder, layer)
@@ -88,22 +99,16 @@ URL0402 = Class(CWalkingLandUnit) {
         if self:GetFractionComplete() ~= 1 then
             return
         end
-        if self.AmbientEffectThread ~= nil then
-           self.AmbientEffectThread:Destroy()
-        end
-        if self.AmbientExhaustEffectsBag then
-            EffectUtil.CleanupEffectBag(self, 'AmbientExhaustEffectsBag')
-        end
 
-        self.AmbientEffectThread = nil
-        self.AmbientExhaustEffectsBag = {}
+        self.AmbientExhaustEffectsBag = self.AmbientExhaustEffectsBag or TrashBag()
+        self.AmbientExhaustEffectsBag:Destroy()
         if layer == 'Land' then
-            self.AmbientEffectThread = self:ForkThread(self.UnitLandAmbientEffectThread)
+            self.AmbientExhaustEffectsBag:Add(ForkThread(self.UnitLandAmbientEffectThread, self))
         elseif layer == 'Seabed' then
             local army = self.Army
-            for kE, vE in self.AmbientSeabedExhaustEffects do
-                for kB, vB in self.AmbientExhaustBones do
-                    table.insert(self.AmbientExhaustEffectsBag, CreateAttachedEmitter(self, vB, army, vE))
+            for _, vE in self.AmbientSeabedExhaustEffects do
+                for _, vB in self.AmbientExhaustBones do
+                    self.AmbientExhaustEffectsBag:Add(CreateAttachedEmitter(self, vB, army, vE))
                 end
             end
         end
@@ -113,9 +118,9 @@ URL0402 = Class(CWalkingLandUnit) {
         while not self.Dead do
             local army = self.Army
 
-            for kE, vE in self.AmbientLandExhaustEffects do
-                for kB, vB in self.AmbientExhaustBones do
-                    table.insert(self.AmbientExhaustEffectsBag, CreateAttachedEmitter(self, vB, army, vE))
+            for _, vE in self.AmbientLandExhaustEffects do
+                for _, vB in self.AmbientExhaustBones do
+                    self.AmbientExhaustEffectsBag:Add(CreateAttachedEmitter(self, vB, army, vE))
                 end
             end
 
@@ -127,20 +132,6 @@ URL0402 = Class(CWalkingLandUnit) {
     end,
 
     OnKilled = function(self, inst, type, okr)
-        if self.AmbientExhaustEffectsBag then
-            EffectUtil.CleanupEffectBag(self, 'AmbientExhaustEffectsBag')
-        end
-        if not self.Dead then
-            local wep = self:GetWeapon(1)
-            if wep.Beams then
-                if wep.Audio.BeamLoop and wep.Beams[1].Beam then
-                    wep.Beams[1].Beam:SetAmbientSound(nil, nil)
-                end
-                for k, v in wep.Beams do
-                    v.Beam:Disable()
-                end
-            end
-        end
         CWalkingLandUnit.OnKilled(self, inst, type, okr)
     end,
 

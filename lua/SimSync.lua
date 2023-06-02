@@ -1,7 +1,18 @@
 ---@declare-global
 -- The global sync table is copied to the user layer every time the main and sim threads are
 -- synchronized on the sim beat (which is like a tick but happens even when the game is paused)
-Sync = {}
+
+Sync = { }
+
+local SyncDefaults = {
+    UnitData = true,
+    ReleaseIds = true,
+    Reclaim = true,
+}
+
+for k, value in SyncDefaults do
+    Sync[k] = { }
+end
 
 -- UnitData that has been synced. We keep a separate copy of this so when we change
 -- focus army we can resync the data.
@@ -10,34 +21,21 @@ UnitData = {}
 SimUnitEnhancements = {}
 
 function ResetSyncTable()
-    Sync = {
-        -- A list of camera control operations that we'd like the user layer to perform.
-        CameraRequests = {},
-        Sounds = {},
-        Voice = {},
-        AIChat = {},
+    local sync = Sync
+    for k, v in sync do
+        -- clean up persistent tables
+        local defaultTable = SyncDefaults[k]
+        if defaultTable then
+            local innerTable = sync[k]
+            for l, o in innerTable do
+                innerTable[l] = nil
+            end
 
-        -- Table of army indices set to "victory" or "defeat".
-        -- It's the user layer's job to determine if any UI needs to be shown
-        -- for the focus army.
-        GameResult = {},
-
-        -- Player to player queries that can affect the Sim
-        PlayerQueries = {},
-        QueryResults = {},
-
-        -- Contain operation data when op is complete
-        OperationComplete = nil,
-
-        UnitData = {},
-        ReleaseIds = {},
-
-        -- contains the current score for each army
-        Score = {},
-        ScoreAccum = {},
-
-        Reclaim = {}
-    }
+        -- clean up everything else
+        else
+            sync[k] = nil
+        end
+    end
 end
 
 function AddUnitEnhancement(unit, enhancement, slot)
@@ -125,12 +123,12 @@ end
 function NoteFocusArmyChanged(new, old)
     --LOG('NoteFocusArmyChanged(new=' .. repr(new) .. ', old=' .. repr(old) .. ')')
     import("/lua/simping.lua").OnArmyChange()
+    import("/lua/sim/recall.lua").OnArmyChange()
     for entityID, data in UnitData do
         if new == -1 or data.OwnerArmy == new then
             Sync.UnitData[entityID] = data.Data
         elseif old == -1 or data.OwnerArmy == old then
             Sync.ReleaseIds[entityID] = true
-        else
         end
     end
     SyncUnitEnhancements()

@@ -20,10 +20,6 @@ local UpdateReclaim = reclaim.UpdateReclaim
 local sendEnhancementMessage = import("/lua/ui/notify/notify.lua").sendEnhancementMessage
 local SetPlayableArea = reclaim.SetPlayableArea
 
---- Whether or not a game result (for rated games) has been seen already. Note that messing with
--- this value with mods is forbidden.
-local hasSeenResult = false
-
 local SyncCallbacks = { }
 
 function AddOnSyncCallback(cb, identifier)
@@ -37,6 +33,73 @@ end
 -- Here's an opportunity for user side script to examine the Sync table for the new tick
 function OnSync()
 
+    -- better access pattern (global -> local)
+    local Sync = Sync
+    local PreviousSync = PreviousSync
+
+    -- Game <-> server communication
+
+    -- Adjusting the behavior of this part of the sync is strictly forbidden and is considered
+    -- game manipulation and / or rating manipulation. See also the in-game rules:
+    -- - https://www.faforever.com/rules
+
+    if not SessionIsReplay() then
+
+        -- Send the defeat / victory / draw game results over to the server
+        if Sync.GameResult then
+            for _, gameResult in Sync.GameResult do
+                local armyIndex, result = unpack(gameResult)
+                SPEW(string.format("(%s) Sending game result: %s %s", tostring(GameTick()), armyIndex, result))
+                GpgNetSend('GameResult', armyIndex, result)
+            end
+        end
+
+        -- Send the (unit) statistics over to the server
+        if Sync.StatsToSend then
+            local json = import("/lua/system/dkson.lua").json.encode({ stats = Sync.StatsToSend })
+            GpgNetSend('JsonStats', json)
+            Sync.StatsToSend = nil
+        end
+
+        -- Send potential team kill events to the server
+        if Sync.Teamkill then
+            local armies, clients = GetArmiesTable().armiesTable, GetSessionClients()
+            local victim, instigator = Sync.Teamkill.victim, Sync.Teamkill.instigator
+            local data = {time=Sync.Teamkill.killTime, victim={}, instigator={}}
+
+            for k, army in {victim=victim, instigator=instigator} do
+                data[k].name = armies[army] and armies[army].nickname or "-"
+                data[k].id = clients[army] and clients[army].uid or 0
+            end
+
+            GpgNetSend('TeamkillHappened', data.time, data.victim.id, data.victim.name,  data.instigator.id, data.instigator.name)
+            WARN(string.format("TEAMKILL: %s KILLED BY %s, TIME: %s", data.victim.name, data.instigator.name, data.time))
+
+            if GetFocusArmy() == victim then
+                import("/lua/ui/dialogs/teamkill.lua").CreateDialog(data)
+            end
+        end
+
+        -- Informs the server to enforce the rating of the game
+        if Sync.EnforceRating then
+            GpgNetSend('EnforceRating')
+        end
+
+        -- Informs the server that the game has ended
+        if Sync.GameEnded then
+            GpgNetSend('GameEnded')
+        end
+    end
+
+    if Sync.GameResult then
+        for _, gameResult in Sync.GameResult do
+            local armyIndex, result = unpack(gameResult)
+            import("/lua/ui/game/gameresult.lua").DoGameResult(armyIndex, result)
+        end
+    end
+
+    -- sync callbacks
+
     for k, callback in SyncCallbacks do 
         local ok, msg = pcall(callback, Sync)
 
@@ -46,6 +109,8 @@ function OnSync()
             WARN(msg)
         end
     end
+
+    -- everything else
 
     if Sync.ArmyTransfer then 
         local army = GetFocusArmy()
@@ -84,13 +149,17 @@ function OnSync()
         UnitData = table.merged(UnitData,Sync.UnitData)
     end
 
-    for id, v in Sync.ReleaseIds do
-        UnitData[id] = nil
+    if Sync.ReleaseIds then 
+        for id, v in Sync.ReleaseIds do
+            UnitData[id] = nil
+        end
     end
 
     --Play Sounds
-    for k, v in Sync.Sounds do
-        PlaySound(Sound{ Bank=v.Bank, Cue=v.Cue })
+    if Sync.Sounds then
+        for k, v in Sync.Sounds do
+            PlaySound(Sound{ Bank=v.Bank, Cue=v.Cue })
+        end
     end
 
     if Sync.ToggleGamePanels then
@@ -140,17 +209,16 @@ function OnSync()
         import("/lua/ui/game/worldview.lua").MarkStartPositions(Sync.StartPositions)
     end
 
-    if Sync.LobbyOptions then 
-        import("/lua/ui/game/gamemain.lua").LobbyOptions = table.deepcopy(Sync.LobbyOptions)
-    end
-
     if Sync.MassFabs then
         import("/lua/ui/game/massfabs.lua").Update(table.deepcopy(Sync.MassFabs))
     end
 
-    import("/lua/usercamera.lua").ProcessCameraRequests(Sync.CameraRequests)
+    if Sync.CameraRequests then 
+        import("/lua/usercamera.lua").ProcessCameraRequests(Sync.CameraRequests)
+    end
 
     if Sync.FocusArmyChanged then
+        import("/lua/ui/game/massfabs.lua").FocusArmyChanged()
         import("/lua/ui/game/avatars.lua").FocusArmyChanged()
         import("/lua/ui/game/multifunction.lua").FocusArmyChanged()
         import("/lua/ui/notify/notify.lua").focusArmyChanged()
@@ -184,9 +252,11 @@ function OnSync()
     end
 
     --Play Voices
-    if not import("/lua/ui/game/missiontext.lua").IsHeadPlaying() then
-        for k, v in Sync.Voice do
-            PlayVoice(Sound{ Bank=v.Bank, Cue=v.Cue }, true)
+    if Sync.Voice then
+        if not import("/lua/ui/game/missiontext.lua").IsHeadPlaying() then
+            for k, v in Sync.Voice do
+                PlayVoice(Sound{ Bank=v.Bank, Cue=v.Cue }, true)
+            end
         end
     end
 
@@ -228,7 +298,7 @@ function OnSync()
         import("/lua/ui/game/ping.lua").MaxMarkers = Sync.MaxPingMarkers
     end
 
-    if not table.empty(Sync.Score) then
+    if Sync.Score and not table.empty(Sync.Score) then
         import("/lua/ui/game/score.lua").currentScores = Sync.Score
     end
 
@@ -398,66 +468,8 @@ function OnSync()
         import("/lua/ui/game/gamemain.lua").SimChangeCameraZoom(Sync.ChangeCameraZoom)
     end
 
-    if not table.empty(Sync.ScoreAccum) then
+    if Sync.ScoreAccum and not table.empty(Sync.ScoreAccum) then
         LOG("Score data received!")
         import("/lua/ui/dialogs/hotstats.lua").scoreData = Sync.ScoreAccum
-    end
-
-    -- Game <-> server communications
-
-    -- Adjusting the behavior of this part of the sync is strictly forbidden and is considered
-    -- game manipulation and / or rating manipulation. See also the in-game rules:
-    -- - https://www.faforever.com/rules
-
-    --- Processes game results to adjust UI capabilities
-    for _, gameResult in Sync.GameResult do
-        local armyIndex, result = unpack(gameResult)
-        import("/lua/ui/game/gameresult.lua").DoGameResult(armyIndex, result)
-    end
-
-    if not SessionIsReplay() then
-
-        --- Sends the defeat / victory / draw game results over to the server
-        for _, gameResult in Sync.GameResult do
-            local armyIndex, result = unpack(gameResult)
-            SPEW(string.format("(%s) Sending game result: %s %s", tostring(GameTick()), armyIndex, result))
-            GpgNetSend('GameResult', armyIndex, result)
-        end
-
-        --- Sends the (unit) statistics over to the server
-        if Sync.StatsToSend then
-            local json = import("/lua/system/dkson.lua").json.encode({ stats = Sync.StatsToSend })
-            GpgNetSend('JsonStats', json)
-            Sync.StatsToSend = nil
-        end
-
-        --- Sends potential team kill events to the server
-        if Sync.Teamkill then
-            local armies, clients = GetArmiesTable().armiesTable, GetSessionClients()
-            local victim, instigator = Sync.Teamkill.victim, Sync.Teamkill.instigator
-            local data = {time=Sync.Teamkill.killTime, victim={}, instigator={}}
-
-            for k, army in {victim=victim, instigator=instigator} do
-                data[k].name = armies[army] and armies[army].nickname or "-"
-                data[k].id = clients[army] and clients[army].uid or 0
-            end
-
-            GpgNetSend('TeamkillHappened', data.time, data.victim.id, data.victim.name,  data.instigator.id, data.instigator.name)
-            WARN(string.format("TEAMKILL: %s KILLED BY %s, TIME: %s", data.victim.name, data.instigator.name, data.time))
-
-            if GetFocusArmy() == victim then
-                import("/lua/ui/dialogs/teamkill.lua").CreateDialog(data)
-            end
-        end
-
-        --- Informs the server to enforce the rating of the game
-        if Sync.EnforceRating then
-            GpgNetSend('EnforceRating')
-        end
-
-        --- Informs the server that the game has ended
-        if Sync.GameEnded then
-            GpgNetSend('GameEnded')
-        end
     end
 end

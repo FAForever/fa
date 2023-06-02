@@ -14,12 +14,12 @@ local CANNaniteTorpedoWeapon = import("/lua/cybranweapons.lua").CANNaniteTorpedo
 local CIFSmartCharge = import("/lua/cybranweapons.lua").CIFSmartCharge
 
 ---@class XRL0305 : CWalkingLandUnit
-XRL0305 = Class(CWalkingLandUnit)
+XRL0305 = ClassUnit(CWalkingLandUnit)
 {
     Weapons = {
-        Disintigrator = Class(CDFHeavyDisintegratorWeapon) {},
-        Torpedo = Class(CANNaniteTorpedoWeapon) {},
-        AntiTorpedo = Class(CIFSmartCharge) {},
+        Disintigrator = ClassWeapon(CDFHeavyDisintegratorWeapon) {},
+        Torpedo = ClassWeapon(CANNaniteTorpedoWeapon) {},
+        AntiTorpedo = ClassWeapon(CIFSmartCharge) {},
     },
 }
 TypeClass = XRL0305
