@@ -136,10 +136,11 @@ AIPlatoon = Class(moho.platoon_methods) {
 
         ---@param self AIPlatoon
         Main = function(self)
-
             -- tell the developer that something went wrong
             while not IsDestroyed(self) do
-                DrawCircle(self:GetPlatoonPosition(), 10, 'ff0000')
+                if GetFocusArmy() == self:GetBrain():GetArmyIndex() then
+                    DrawCircle(self:GetPlatoonPosition(), 10, 'ff0000')
+                end
                 WaitTicks(1)
             end
         end,
