@@ -271,7 +271,7 @@ UnitBlueprint {
             AutoInitiateAttackCommand = true,
             BallisticArc = 'RULEUBA_None',
             CollideFriendly = false,
-            Damage = 250,--375
+            Damage = 200,
             DamageType = 'Normal',
             DisplayName = 'Harmonic Depth Charge',
             EffectiveRadius = 19,
@@ -284,14 +284,14 @@ UnitBlueprint {
             HeadingArcCenter = 0,
             HeadingArcRange = 30,
             Label = 'Bomb',
-            MaxRadius = 35,--42
+            MaxRadius = 35,
             MinRadius = 4,
-            MuzzleSalvoDelay = 0.6,--1.8
-            MuzzleSalvoSize = 3,--2
-            MuzzleVelocity = 0,--14
+            MuzzleSalvoDelay = 0.6,
+            MuzzleSalvoSize = 3,
+            MuzzleVelocity = 0,
             ProjectileId = '/projectiles/AANDepthCharge03/AANDepthCharge03_proj.bp',
             ProjectileLifetime = 20,
-            ProjectilesPerOnFire = 3,--2
+            ProjectilesPerOnFire = 3,
             RackBones = {
                 {
                     MuzzleBones = {
@@ -308,7 +308,7 @@ UnitBlueprint {
             RackSalvoReloadTime = 0,
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
-            RateOfFire = 0.1,--0.08
+            RateOfFire = 0.1,
             TargetPriorities = {
                 'CRUISER',
                 '(NAVAL * TECH2 * SHIELD)',
