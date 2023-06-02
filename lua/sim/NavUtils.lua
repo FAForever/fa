@@ -158,8 +158,8 @@ end
 
 ---@param grid NavGrid
 ---@param position Vector
----@return CompressedLabelTreeLeaf?
----@return 'OutsideMap'?
+---@return CompressedLabelTreeLeaf | nil
+---@return 'OutsideMap' | nil
 local function FindLeaf(grid, position)
     -- check position argument
     local leaf = grid:FindLeafXZ(position[1], position[3])
@@ -196,6 +196,19 @@ local function FindLeaf(grid, position)
     end
 
     return leaf
+end
+
+---@param grid NavGrid
+---@param position Vector
+---@return CompressedLabelTreeRoot | nil
+---@return 'OutsideMap' | nil
+local function FindRoot(grid, position)
+    local root = grid:FindRootXZ(position[1], position[3])
+    if not root then
+        return nil, 'OutsideMap'
+    end
+
+    return root
 end
 
 --- Returns true when you can path from the origin to the destination
@@ -245,6 +258,51 @@ function CanPathTo(layer, origin, destination)
     end
 
     if originLeaf.Label == destinationLeaf.Label then
+        return true
+    else
+        return false, 'Unpathable'
+    end
+end
+
+--- A more generous version of `CanPathTo`. Returns true when the root cell of the destination has a label that matches the origin. Is in general less accurate
+---@param layer NavLayers
+---@param origin Vector
+---@param destination Vector
+---@return boolean?
+---@return ('SystemError' | 'NotGenerated' | 'InvalidLayer' | 'OutsideMap' | 'OriginOutsideMap' | 'OriginUnpathable' | 'DestinationOutsideMap' | 'Unpathable')?
+function CanPathToCell (layer, origin, destination)
+    -- check if generated
+    if not NavGenerator.IsGenerated() then
+        return nil, 'NotGenerated'
+    end
+
+    -- check layer argument
+    local grid = FindGrid(layer)
+    if not grid then
+        return nil, 'InvalidLayer'
+    end
+
+    -- check origin argument
+    local originLeaf = FindLeaf(grid, origin)
+    if not originLeaf then
+        return nil, 'OriginOutsideMap'
+    end
+
+    if originLeaf.Label == -1 then
+        return nil, 'OriginUnpathable'
+    end
+
+    if originLeaf.Label == 0 then
+        return nil, 'SystemError'
+    end
+
+    -- check destination argument
+    local destinationRoot = FindRoot(grid, destination)
+    if not destinationRoot then
+        return nil, 'DestinationOutsideMap'
+    end
+
+    if destinationRoot.Labels[originLeaf.Label] then
         return true
     else
         return false, 'Unpathable'
