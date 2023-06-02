@@ -25,9 +25,9 @@ AIPlatoonAdaptiveReclaimBehavior = Class(AIPlatoon) {
         ---@param self AIPlatoonAdaptiveReclaimBehavior
         Main = function(self)
             local brain = self:GetBrain()
-            
+
             if not self.SearchRadius then
-                local maxMapDimension = math.max(ScenarioInfo.size[1],ScenarioInfo.size[2])
+                local maxMapDimension = math.max(ScenarioInfo.size[1], ScenarioInfo.size[2])
                 if maxMapDimension == 256 then
                     self.SearchRadius = 8
                 else
@@ -54,6 +54,7 @@ AIPlatoonAdaptiveReclaimBehavior = Class(AIPlatoon) {
             self.MovementLayer = self:GetNavigationalLayer()
 
             self:ChangeState(self.Searching)
+            return
         end,
     },
 
@@ -77,8 +78,8 @@ AIPlatoonAdaptiveReclaimBehavior = Class(AIPlatoon) {
             local searchLoop = 0
             local reclaimTargetX, reclaimTargetZ
             local engPos = eng:GetPosition()
-            local gx, gz = reclaimGridInstance:ToGridSpace(engPos[1],engPos[3])
-            while searchLoop < searchRadius and (not (reclaimTargetX and reclaimTargetZ)) do 
+            local gx, gz = reclaimGridInstance:ToGridSpace(engPos[1], engPos[3])
+            while searchLoop < searchRadius and (not (reclaimTargetX and reclaimTargetZ)) do
                 WaitTicks(1)
 
                 -- retrieve a list of cells with some mass value
@@ -89,7 +90,8 @@ AIPlatoonAdaptiveReclaimBehavior = Class(AIPlatoon) {
                     local centerOfCell = reclaimGridInstance:ToWorldSpace(cell.X, cell.Z)
                     local maxEngineers = math.min(math.ceil(cell.TotalMass / 500), 8)
                     -- make sure we can path to it and it doesnt have high threat e.g Point Defense
-                    if NavUtils.CanPathTo(self.MovementLayer, engPos, centerOfCell) and brain:GetThreatAtPosition(centerOfCell, 0, true, 'AntiSurface') < 10 then
+                    if NavUtils.CanPathTo(self.MovementLayer, engPos, centerOfCell) and
+                        brain:GetThreatAtPosition(centerOfCell, 0, true, 'AntiSurface') < 10 then
                         local brainCell = brainGridInstance:ToCellFromGridSpace(cell.X, cell.Z)
                         local engineersInCell = brainGridInstance:CountReclaimingEngineers(brainCell)
                         if engineersInCell < maxEngineers then
@@ -99,23 +101,26 @@ AIPlatoonAdaptiveReclaimBehavior = Class(AIPlatoon) {
                     end
                 end
                 searchLoop = searchLoop + 1
-                LOG('Search loop is '..searchLoop..' out of a possible '..searchRadius)
+                LOG('Search loop is ' .. searchLoop .. ' out of a possible ' .. searchRadius)
             end
             if reclaimTargetX and reclaimTargetZ then
                 local brainCell = brainGridInstance:ToCellFromGridSpace(reclaimTargetX, reclaimTargetZ)
                 -- Assign engineer to cell
-                self.CellAssigned = {reclaimTargetX, reclaimTargetZ}
+                self.CellAssigned = { reclaimTargetX, reclaimTargetZ }
                 brainGridInstance:AddReclaimingEngineer(brainCell, eng)
                 self.LocationToReclaim = reclaimGridInstance:ToWorldSpace(reclaimTargetX, reclaimTargetZ)
                 self:ChangeState(self.Navigating)
+                return
             else
                 if self.SearchRadius < 8 then
                     self.SearchRadius = 8
                     LOG('No reclaim found, extending search range to 8')
                     self:ChangeState(self.Searching)
+                    return
                 end
                 self:LogWarning(string.format('no reclaim target found'))
                 self:ChangeState(self.Error)
+                return
             end
         end,
 
@@ -167,7 +172,7 @@ AIPlatoonAdaptiveReclaimBehavior = Class(AIPlatoon) {
                 end
 
 
-                IssueMove({eng}, waypoint)
+                IssueMove({ eng }, waypoint)
                 local engStuckCount = 0
                 local Lastdist
                 local dist = VDist3Sq(eng:GetPosition(), destination)
@@ -176,9 +181,11 @@ AIPlatoonAdaptiveReclaimBehavior = Class(AIPlatoon) {
                 -- Statemachine switch for engineer moving to location
                 while not IsDestroyed(eng) and dist > cellSize do
                     WaitTicks(25)
-                    if brain:GetNumUnitsAroundPoint(categories.LAND * categories.MOBILE, eng:GetPosition(), 45, 'Enemy') > 0 then
+                    if brain:GetNumUnitsAroundPoint(categories.LAND * categories.MOBILE, eng:GetPosition(), 45, 'Enemy')
+                        > 0 then
                         -- Statemachine switch to avoiding/reclaiming danger
                         self:ChangeState(self.Retreating)
+                        return
                     else
                         -- Jip discussed potentially getting navmesh to return mass points along the path rather than this.
                         -- Potential Statemachine switch to building extractors
@@ -187,11 +194,11 @@ AIPlatoonAdaptiveReclaimBehavior = Class(AIPlatoon) {
                             if reclaimAction then
                                 WaitTicks(45)
                                 -- Statemachine switch to evaluating next action to take
-                                IssueMove({eng}, waypoint)
+                                IssueMove({ eng }, waypoint)
                             end
                         end
                         if not IsDestroyed(eng) then
-                            local bool,markers=AIUtils.CanBuildOnLocalMassPoints(brain, eng:GetPosition(), 25)
+                            local bool, markers = AIUtils.CanBuildOnLocalMassPoints(brain, eng:GetPosition(), 25)
                             if bool then
                                 self.MassPointTable = markers
                                 self:ChangeState(self.BuilderStructure)
@@ -234,29 +241,33 @@ AIPlatoonAdaptiveReclaimBehavior = Class(AIPlatoon) {
         Main = function(self)
             if not self.MassPointTable then
                 self:ChangeState(self.Error)
+                return
             end
+
             LOG('Attempting to build a mass point or two')
             local eng = self:GetPlatoonUnits()[1]
             local brain = self:GetBrain()
-            IssueClearCommands({eng})
+            IssueClearCommands({ eng })
             local factionIndex = brain:GetFactionIndex()
             local buildingTmplFile = import('/lua/BuildingTemplates.lua')
             local buildingTmpl = buildingTmplFile[('BuildingTemplates')][factionIndex]
             local whatToBuild = brain:DecideWhatToBuild(eng, 'T1Resource', buildingTmpl)
-            for _,massMarker in self.MassPointTable do
+            for _, massMarker in self.MassPointTable do
                 AIUtils.EngineerTryReclaimCaptureArea(brain, eng, massMarker.Position, 2)
                 AIUtils.EngineerTryRepair(brain, eng, whatToBuild, massMarker.Position)
                 if massMarker.BorderWarning then
-                    IssueBuildMobile({eng}, massMarker.Position, whatToBuild, {})
+                    IssueBuildMobile({ eng }, massMarker.Position, whatToBuild, {})
                 else
-                    brain:BuildStructure(eng, whatToBuild, {massMarker.Position[1], massMarker.Position[3], 0}, false)
+                    brain:BuildStructure(eng, whatToBuild, { massMarker.Position[1], massMarker.Position[3], 0 }, false)
                 end
             end
-            while eng and not eng.Dead and (0<table.getn(eng:GetCommandQueue()) or eng:IsUnitState('Building') or eng:IsUnitState("Moving")) do
+            while eng and not eng.Dead and
+                (0 < table.getn(eng:GetCommandQueue()) or eng:IsUnitState('Building') or eng:IsUnitState("Moving")) do
                 coroutine.yield(20)
             end
             self.MassPointTable = nil
             self:ChangeState(self.Searching)
+            return
         end,
     },
 
@@ -275,12 +286,13 @@ AIPlatoonAdaptiveReclaimBehavior = Class(AIPlatoon) {
             local action = false
             for _, unit in enemyUnits do
                 local enemyUnitPos = unit:GetPosition()
-                if EntityCategoryContains(categories.SCOUT + categories.ENGINEER * (categories.TECH1 + categories.TECH2) - categories.COMMAND, unit) then
+                if EntityCategoryContains(categories.SCOUT + categories.ENGINEER * (categories.TECH1 + categories.TECH2)
+                    - categories.COMMAND, unit) then
                     if VDist2Sq(engPos[1], engPos[3], enemyUnitPos[1], enemyUnitPos[3]) < 144 then
                         if unit and not IsDestroyed(unit) and unit:GetFractionComplete() == 1 then
                             if VDist2Sq(engPos[1], engPos[3], enemyUnitPos[1], enemyUnitPos[3]) < 156 then
-                                IssueClearCommands({eng})
-                                IssueReclaim({eng}, unit)
+                                IssueClearCommands({ eng })
+                                IssueReclaim({ eng }, unit)
                                 action = true
                                 break
                             end
@@ -290,15 +302,15 @@ AIPlatoonAdaptiveReclaimBehavior = Class(AIPlatoon) {
                     if VDist2Sq(engPos[1], engPos[3], enemyUnitPos[1], enemyUnitPos[3]) < 81 then
                         if unit and not IsDestroyed(unit) and unit:GetFractionComplete() == 1 then
                             if VDist2Sq(engPos[1], engPos[3], enemyUnitPos[1], enemyUnitPos[3]) < 156 then
-                                IssueClearCommands({eng})
-                                IssueReclaim({eng}, unit)
+                                IssueClearCommands({ eng })
+                                IssueReclaim({ eng }, unit)
                                 action = true
                                 break
                             end
                         end
                     else
-                        IssueClearCommands({eng})
-                        IssueMove({eng}, AIUtils.ShiftPosition(enemyUnitPos, engPos, 50, false))
+                        IssueClearCommands({ eng })
+                        IssueMove({ eng }, AIUtils.ShiftPosition(enemyUnitPos, engPos, 50, false))
                         coroutine.yield(60)
                         action = true
                     end
@@ -322,9 +334,9 @@ AIPlatoonAdaptiveReclaimBehavior = Class(AIPlatoon) {
             local reclaimPos = self.LocationToReclaim
             local action = false
             local time = 0
-            IssueClearCommands({eng})
+            IssueClearCommands({ eng })
             while time < 30 do
-                IssueAggressiveMove({eng}, reclaimPos)
+                IssueAggressiveMove({ eng }, reclaimPos)
                 time = time + 1
                 WaitTicks(50)
                 local engPos = eng:GetPosition()
@@ -333,23 +345,27 @@ AIPlatoonAdaptiveReclaimBehavior = Class(AIPlatoon) {
                     local actionTaken = AIUtils.EngAvoidLocalDanger(brain, eng)
                     if actionTaken then
                         -- Statemachine switch to evaluating next action to take
-                        IssueAggressiveMove({eng}, reclaimPos)
+                        IssueAggressiveMove({ eng }, reclaimPos)
                     end
                 end
-                if reclaimGridInstance.Cells[reclaimTargetX][reclaimTargetZ].TotalMass < 10  or brain:GetEconomyStoredRatio('MASS') > 0.95 then
+                if reclaimGridInstance.Cells[reclaimTargetX][reclaimTargetZ].TotalMass < 10 or
+                    brain:GetEconomyStoredRatio('MASS') > 0.95 then
                     break
                 end
-                if VDist3Sq(engPos, reclaimPos) < 4 and reclaimGridInstance.Cells[reclaimTargetX][reclaimTargetZ].TotalMass > 5 then
+                if VDist3Sq(engPos, reclaimPos) < 4 and
+                    reclaimGridInstance.Cells[reclaimTargetX][reclaimTargetZ].TotalMass > 5 then
                     for _, v in reclaimGridInstance.Cells[reclaimTargetX][reclaimTargetZ].Reclaim do
                         if IsProp(v) and v.MaxMassReclaim > 0 then
                             reclaimPos = v:GetPosition()
-                            IssueClearCommands({eng})
+                            IssueClearCommands({ eng })
                             break
                         end
                     end
                 end
             end
+
             self:ChangeState(self.Searching)
+            return
         end,
     },
 
@@ -381,7 +397,7 @@ AssignToUnitsMachine = function(data, platoon, units)
                     eng.ReclaimInProgress = nil
                     eng.CaptureInProgress = nil
                     if eng:IsPaused() then
-                        eng:SetPaused( false )
+                        eng:SetPaused(false)
                     end
                     if not eng.Dead and eng.BuilderManagerData then
                         if eng.BuilderManagerData.EngineerManager then
@@ -389,8 +405,8 @@ AssignToUnitsMachine = function(data, platoon, units)
                         end
                     end
                     if not eng.Dead then
-                        IssueStop({eng})
-                        IssueClearCommands({eng})
+                        IssueStop({ eng })
+                        IssueClearCommands({ eng })
                     end
                 end
             end
