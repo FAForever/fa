@@ -500,8 +500,6 @@ end
 ---@param units Unit[]
 AssignToUnitsMachine = function(data, platoon, units)
     if units and not TableEmpty(units) then
-        LOG('Assigning Units to new platoon')
-
         -- meet platoon requirements
         import("/lua/sim/navutils.lua").Generate()
         import("/lua/sim/markerutilities.lua").GenerateExpansionMarkers()
@@ -520,6 +518,3 @@ AssignToUnitsMachine = function(data, platoon, units)
         ChangeState(platoon, platoon.Start)
     end
 end
-
-
-

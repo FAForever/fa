@@ -264,7 +264,7 @@ function CanPathTo(layer, origin, destination)
     end
 end
 
---- A more generous version of `CanPathTo`. Returns true when the root cell of the destination has a label that matches the origin. Is in general less accurate
+--- A more generous version of `CanPathTo`. Returns true when the root cell of the destination has a label that matches the label of the origin. Is in general less accurate
 ---@param layer NavLayers
 ---@param origin Vector
 ---@param destination Vector

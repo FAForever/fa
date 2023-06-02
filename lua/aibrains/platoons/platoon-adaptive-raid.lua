@@ -528,6 +528,9 @@ AssignToUnitsMachine = function(data, platoon, units)
             end
         end
 
+        -- TODO: to be removed until we have a better system to populate the platoons
+        platoon:OnUnitsAddedToPlatoon()
+
         -- start the behavior
         ChangeState(platoon, platoon.Start)
     end
