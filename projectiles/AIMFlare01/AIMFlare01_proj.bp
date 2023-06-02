@@ -29,11 +29,6 @@ ProjectileBlueprint {
     },
     General = {
         Category = 'Defense',
-        EntityCategory = {
-            'AEON',
-            'PROJECTILE',
-            'ANTIMISSILE',
-        },
         Faction = 'Aeon',
         Weapon = 'Will O Wisp Anti Missile',
     },

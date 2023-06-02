@@ -26,11 +26,6 @@ ProjectileBlueprint {
     },
     General = {
         Category = 'Anti Air',
-        EntityCategory = {
-            'CYBRAN',
-            'PROJECTILE',
-            'ANTIAIR',
-        },
         Faction = 'Cybran',
         TechLevel = 2,
         Weapon = 'Electron Flak',

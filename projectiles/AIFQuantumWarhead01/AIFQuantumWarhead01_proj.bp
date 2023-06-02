@@ -55,14 +55,6 @@ ProjectileBlueprint {
     },
     General = {
         Category = 'Missile',
-        EntityCategory = {
-            'AEON',
-            'PROJECTILE',
-            'INDIRECTFIRE',
-            'STRATEGIC',
-            'MISSILE',
-            'NOSPLASHDAMAGE',
-        },
         Faction = 'Aeon',
     },
     Interface = {
