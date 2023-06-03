@@ -8,7 +8,7 @@ local TableGetSize = table.getsize
 
 local WeakValues = { __mode = 'v' }
 
----@class AIStructureManagerReferences 
+---@class AIStructureManagerReferences
 ---@field TECH1 table<EntityId, Unit>
 ---@field TECH2 table<EntityId, Unit>
 ---@field TECH3 table<EntityId, Unit>
@@ -22,9 +22,10 @@ local WeakValues = { __mode = 'v' }
 
 ---@class AIStructureManager : AIBuilderManager
 ---@field Structures AIStructureManagerReferences
----@field StructuresBeingBuilt AIStructureManagerReferences     
+---@field StructuresBeingBuilt AIStructureManagerReferences
 ---@field StructureCount AIStructureManagerCounts               # Recomputed every 10 ticks
 ---@field StructureBeingBuiltCount AIStructureManagerCounts     # Recomputed every 10 ticks
+---@field GeneratedThreat { Surface: number, Air: number, Economy: number, Sub: number }
 AIStructureManager = Class(BuilderManager) {
 
     ManagerName = "StructureManager",
@@ -64,12 +65,42 @@ AIStructureManager = Class(BuilderManager) {
             EXPERIMENTAL = 0,
         }
 
+        self.GeneratedThreat = {
+            Surface = 0,
+            Air = 0,
+            Economy = 0,
+            Sub = 0,
+        }
+
         -- TODO: refactor this to base class?
         self.Trash:Add(ForkThread(self.UpdateStructureThread, self))
     end,
 
     --------------------------------------------------------------------------------------------
     -- manager interface
+
+    --- Computes the surface, air and economy threat of the provided list of units
+    ---@param self AIStructureManager
+    ---@param units table<EntityId, Unit>
+    ComputeThreat = function(self, units)
+        local surfaceThreat = 0
+        local airThreat = 0
+        local economyThreat = 0
+        local subThreat = 0
+        for _, unit in units do
+            ---@type number
+            local fraction = unit:GetFractionComplete()
+
+            ---@type UnitBlueprintDefense
+            blueprintDefense = unit.Blueprint.Defense
+            airThreat = airThreat + fraction * blueprintDefense.AirThreatLevel
+            surfaceThreat = surfaceThreat + fraction * blueprintDefense.SurfaceThreatLevel
+            economyThreat = economyThreat + fraction * blueprintDefense.EconomyThreatLevel
+            subThreat = subThreat + fraction * blueprintDefense.SubThreatLevel
+        end
+
+        return surfaceThreat, airThreat, economyThreat, subThreat
+    end,
 
     ---@param self AIStructureManager
     UpdateStructureThread = function(self)
@@ -90,6 +121,75 @@ AIStructureManager = Class(BuilderManager) {
                 StructureBeingBuiltCount[tech] = count
                 total = total + count
             end
+
+            -- compute total base threat
+            local generatedThreat = self.GeneratedThreat
+            local accumulatedSurfaceThreat = 0
+            local accumulatedAirThreat = 0
+            local accumulatedEconomyThreat = 0
+            local accumulatedSubThreat = 0
+
+            local surfaceThreat = 0
+            local airThreat = 0
+            local economyThreat = 0
+            local subThreat = 0
+
+            -- threat of finished structures
+            surfaceThreat, airThreat, economyThreat = self:ComputeThreat(self.Structures.TECH1)
+            accumulatedSurfaceThreat = accumulatedSurfaceThreat + surfaceThreat
+            accumulatedAirThreat = accumulatedAirThreat + airThreat
+            accumulatedEconomyThreat = accumulatedEconomyThreat + economyThreat
+            accumulatedSubThreat = accumulatedSubThreat + subThreat
+
+            surfaceThreat, airThreat, economyThreat = self:ComputeThreat(self.Structures.TECH2)
+            accumulatedSurfaceThreat = accumulatedSurfaceThreat + surfaceThreat
+            accumulatedAirThreat = accumulatedAirThreat + airThreat
+            accumulatedEconomyThreat = accumulatedEconomyThreat + economyThreat
+            accumulatedSubThreat = accumulatedSubThreat + subThreat
+
+            surfaceThreat, airThreat, economyThreat = self:ComputeThreat(self.Structures.TECH3)
+            accumulatedSurfaceThreat = accumulatedSurfaceThreat + surfaceThreat
+            accumulatedAirThreat = accumulatedAirThreat + airThreat
+            accumulatedEconomyThreat = accumulatedEconomyThreat + economyThreat
+            accumulatedSubThreat = accumulatedSubThreat + subThreat
+
+            surfaceThreat, airThreat, economyThreat = self:ComputeThreat(self.Structures.EXPERIMENTAL)
+            accumulatedSurfaceThreat = accumulatedSurfaceThreat + surfaceThreat
+            accumulatedAirThreat = accumulatedAirThreat + airThreat
+            accumulatedEconomyThreat = accumulatedEconomyThreat + economyThreat
+            accumulatedSubThreat = accumulatedSubThreat + subThreat
+
+            -- threat of unfinished structures
+            surfaceThreat, airThreat, economyThreat = self:ComputeThreat(self.StructuresBeingBuilt.TECH1)
+            accumulatedSurfaceThreat = accumulatedSurfaceThreat + surfaceThreat
+            accumulatedAirThreat = accumulatedAirThreat + airThreat
+            accumulatedEconomyThreat = accumulatedEconomyThreat + economyThreat
+            accumulatedSubThreat = accumulatedSubThreat + subThreat
+
+            surfaceThreat, airThreat, economyThreat = self:ComputeThreat(self.StructuresBeingBuilt.TECH2)
+            accumulatedSurfaceThreat = accumulatedSurfaceThreat + surfaceThreat
+            accumulatedAirThreat = accumulatedAirThreat + airThreat
+            accumulatedEconomyThreat = accumulatedEconomyThreat + economyThreat
+            accumulatedSubThreat = accumulatedSubThreat + subThreat
+
+            surfaceThreat, airThreat, economyThreat = self:ComputeThreat(self.StructuresBeingBuilt.TECH3)
+            accumulatedSurfaceThreat = accumulatedSurfaceThreat + surfaceThreat
+            accumulatedAirThreat = accumulatedAirThreat + airThreat
+            accumulatedEconomyThreat = accumulatedEconomyThreat + economyThreat
+            accumulatedSubThreat = accumulatedSubThreat + subThreat
+
+            surfaceThreat, airThreat, economyThreat = self:ComputeThreat(self.StructuresBeingBuilt.EXPERIMENTAL)
+            accumulatedSurfaceThreat = accumulatedSurfaceThreat + surfaceThreat
+            accumulatedAirThreat = accumulatedAirThreat + airThreat
+            accumulatedEconomyThreat = accumulatedEconomyThreat + economyThreat
+            accumulatedSubThreat = accumulatedSubThreat + subThreat
+
+            -- gather the threat
+            generatedThreat.Surface = accumulatedSurfaceThreat
+            generatedThreat.Economy = accumulatedEconomyThreat
+            generatedThreat.Air = accumulatedAirThreat
+            generatedThreat.Sub = accumulatedSubThreat
+
             WaitTicks(10)
         end
     end,
@@ -129,9 +229,9 @@ AIStructureManager = Class(BuilderManager) {
             local platoon = brain:MakePlatoon('', '') --[[@as AIPlatoonSimpleStructure]]
             platoon.Brain = self.Brain
             platoon.Base = self.Base
-            
+
             setmetatable(platoon, import("/lua/aibrains/platoons/platoon-simple-structure.lua").AIPlatoonSimpleStructure)
-            brain:AssignUnitsToPlatoon(platoon, {unit}, 'Unassigned', 'None')
+            brain:AssignUnitsToPlatoon(platoon, { unit }, 'Unassigned', 'None')
             ChangeState(platoon, platoon.Start)
         end
     end,
