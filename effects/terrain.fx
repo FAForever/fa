@@ -1757,7 +1757,9 @@ float4 splatBlendNormal(float4 n1, float4 n2, float t2height, float opacity, uni
     float ma = max(height1, height2) - blurriness;
     float factor1 = max(height1 - ma, 0);
     float factor2 = max(height2 - ma, 0);
-    return normalize(float4((n1.xy * factor1 + n2.xy * factor2) / (factor1 + factor2), n1.z, 0));
+    float factor1modified = pow(factor1 / (factor1 + factor2), 0.5);
+    float factor2modified = pow(factor2 / (factor1 + factor2), 0.5);
+    return normalize(float4((n1.xy * factor1modified + n2.xy * factor2modified), n1.z, 0));
 }
 
 /* # Sample a 2D 2x2 texture atlas # */
