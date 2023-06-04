@@ -47,15 +47,14 @@ UnitBlueprint {
         'OVERLAYSONAR',
         'OVERLAYANTINAVY',
         'SORTDEFENSE',
-        'COUNTERINTELLIGENCE',
         'INSIGNIFICANTUNIT',
     },
     Defense = {
         AirThreatLevel = 0,
         ArmorType = 'Structure',
         EconomyThreatLevel = 17,
-        Health = 11000,
-        MaxHealth = 11000,
+        Health = 7000,
+        MaxHealth = 7000,
         RegenRate = 0,
         SubThreatLevel = 0,
         SurfaceThreatLevel = 0,
@@ -65,7 +64,6 @@ UnitBlueprint {
         Abilities = {
             '<LOC ability_sonar>Sonar',
             '<LOC ability_torpedo>Torpedoes',
-            '<LOC ability_personalstealth>Personal Stealth',
         },
         AnimationDeploy = '/units/xrb2308/xrb2308_aopen.sca',
         IdleEffects = {
@@ -127,7 +125,7 @@ UnitBlueprint {
     Economy = {
         BuildCostEnergy = 25000,
         BuildCostMass = 3000,
-        BuildTime = 4097,
+        BuildTime = 2050,
         RebuildBonusIds = {
             'xrb2308',
         },
@@ -162,9 +160,9 @@ UnitBlueprint {
         UnitWeight = 1,
     },
     Intel = {
-        RadarStealth = true,
+        RadarStealth = false,
         SonarRadius = 42,
-        SonarStealth = true,
+        SonarStealth = false,
         VisionRadius = 20,
         WaterVisionRadius = 45,
     },
@@ -232,7 +230,7 @@ UnitBlueprint {
             },
             FiringTolerance = 2,
             Label = 'Turret01',
-            MaxRadius = 80,
+            MaxRadius = 70,
             MuzzleSalvoDelay = 0.6,
             MuzzleSalvoSize = 6,
             MuzzleVelocity = 5,

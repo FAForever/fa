@@ -479,7 +479,7 @@ UnitBlueprint {
             },
             FiringTolerance = 5,
             Label = 'PhalanxGun',
-            MaxRadius = 50,
+            MaxRadius = 31,
             MinRadius = 2,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
