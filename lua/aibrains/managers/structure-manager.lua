@@ -8,6 +8,11 @@ local TableGetSize = table.getsize
 
 local WeakValues = { __mode = 'v' }
 
+---@class AIStructureManagerDebugInfo
+---@field Structures { TECH1: EntityId[], TECH2: EntityId[], TECH3: EntityId[], EXPERIMENTAL: EntityId[] }
+---@field StructuresBeingBuilt { TECH1: EntityId[], TECH2: EntityId[], TECH3: EntityId[], EXPERIMENTAL: EntityId[] }
+---@field GeneratedThreat { Surface: number, Air: number, Economy: number, Sub: number }
+
 ---@class AIStructureManagerReferences
 ---@field TECH1 table<EntityId, Unit>
 ---@field TECH2 table<EntityId, Unit>
@@ -21,6 +26,7 @@ local WeakValues = { __mode = 'v' }
 ---@field EXPERIMENTAL number
 
 ---@class AIStructureManager : AIBuilderManager
+---@field DebugInfo AIStructureManagerDebugInfo
 ---@field Structures AIStructureManagerReferences
 ---@field StructuresBeingBuilt AIStructureManagerReferences
 ---@field StructureCount AIStructureManagerCounts               # Recomputed every 10 ticks
@@ -221,6 +227,8 @@ AIStructureManager = Class(BuilderManager) {
         if blueprint.CategoriesHash['STRUCTURE'] then
             local tech = blueprint.TechCategory
             local id = unit.EntityId
+
+            LOG("Switched!")
             self.StructuresBeingBuilt[tech][id] = nil
             self.Structures[tech][id] = unit
 
@@ -279,6 +287,79 @@ AIStructureManager = Class(BuilderManager) {
     RemoveUnit = function(self, unit)
         self:OnUnitDestroyed(unit)
     end,
+
+    ---------------------------------------------------------------------------
+    --#region Debug functionality
+
+    ---@param self AIStructureManager
+    ---@return AIStructureManagerDebugInfo
+    GetDebugInfo = function(self)
+        local info = self.DebugInfo
+        if not info then
+
+            ---@type AIStructureManagerDebugInfo
+            info = { }
+            self.DebugInfo = info
+
+            info.GeneratedThreat = { }
+            info.Structures = {
+                TECH1 = { },
+                TECH2 = { },
+                TECH3 = { },
+                EXPERIMENTAL = { },
+            }
+
+            info.StructuresBeingBuilt = {
+                TECH1 = { },
+                TECH2 = { },
+                TECH3 = { },
+                EXPERIMENTAL = { },
+            }
+        end
+
+        -- copy over generated threat
+        local generatedThreatInfo = info.GeneratedThreat
+        generatedThreatInfo.Air = self.GeneratedThreat.Air
+        generatedThreatInfo.Sub = self.GeneratedThreat.Sub
+        generatedThreatInfo.Economy = self.GeneratedThreat.Economy
+        generatedThreatInfo.Surface = self.GeneratedThreat.Surface
+
+        -- copy over entity ids of structures
+        for tech, data in self.Structures do
+            local units = info.Structures[tech]
+            local total = table.getn(units) + 1
+            local head = 1
+
+            for k, _ in data do
+                units[head] = k
+                head = head + 1
+            end
+
+            for k = head, total do
+                units[k] = nil
+            end
+        end
+
+        -- copy over entity ids of structures being built
+        for tech, data in self.StructuresBeingBuilt do
+            local units = info.StructuresBeingBuilt[tech]
+            local total = table.getn(units) + 1
+            local head = 1
+
+            for k, _ in data do
+                units[head] = k
+                head = head + 1
+            end
+
+            for k = head, total do
+                units[k] = nil
+            end
+        end
+
+        return info
+    end,
+
+    --#endregion
 }
 
 ---@param brain AIBrain
