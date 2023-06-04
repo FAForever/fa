@@ -148,8 +148,8 @@ function CreateWreckage(bp, position, orientation, mass, energy, time, deathHitB
     sz = sz * 0.5
 
     -- set health
-    EntitySetMaxHealth(prop, bp.Defense.Health * (bp.Wreckage.HealthMult or 1))
-    EntitySetHealth(prop, nil, bp.Defense.Health * (bp.Wreckage.HealthMult or 1))
+    prop:SetMaxHealth(bp.Defense.Health * (bp.Wreckage.HealthMult or 1))
+    prop:SetHealth(nil, bp.Defense.Health * (bp.Wreckage.HealthMult or 1))
 
     -- set collision box and reclaim values, the latter depends on the health of the wreck
     prop:SetPropCollision('Box', cx, cy, cz, sx, sy, sz)
