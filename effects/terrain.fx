@@ -1742,6 +1742,15 @@ technique LowFidelityLighting
 
 /* # Blending techniques # */
 
+float splatLerp(float t1, float t2, float t2height, float opacity, uniform float blurriness) {
+    float height1 = 1 + blurriness;
+    float height2 = t2height + opacity;
+    float ma = max(height1, height2) - blurriness;
+    float factor1 = max(height1 - ma, 0);
+    float factor2 = max(height2 - ma, 0);
+    return (t1 * factor1 + t2 * factor2) / (factor1 + factor2);
+}
+
 float4 splatLerp(float4 t1, float4 t2, float t2height, float opacity, uniform float blurriness = 0.2) {
     float height1 = 1 + blurriness;
     float height2 = t2height + opacity;
@@ -1794,9 +1803,18 @@ float4 sampleAlbedo(sampler2D s, float4 position, uniform float2 scale, uniform 
     return splatLerp(albedo, albedoRotated, 0.5, mask, 0.03);
 }
 
-float2 sampleHeight(float4 position, uniform float2 nearScale, uniform float2 farScale, uniform float2 offset) {
+float sampleHeight(float4 position, uniform float2 nearScale, uniform float2 farScale, uniform float2 offset, float mask, uniform bool firstBatch) {
+    float2x2 rotationMatrix = float2x2(float2(0.866, -0.5), float2(0.5, 0.866));
     float2 heightNear = atlas2D(Stratum7AlbedoSampler, position.xy * nearScale.xy, offset).xz;
-    float2 heightFar  = atlas2D(Stratum7AlbedoSampler, position.xy * farScale.xy, offset).xz;
+    float2 heightNearRotated = atlas2D(Stratum7AlbedoSampler, mul(position.xy, rotationMatrix) * nearScale.xy, offset).xz;
+    float heightFar;
+    if (firstBatch) {
+        heightNear = splatLerp(heightNear.x, heightNearRotated.x, 0.5, mask, 0.03);
+        heightFar = atlas2D(Stratum7AlbedoSampler, position.xy * farScale.xy, offset).x;
+    } else {
+        heightNear = splatLerp(heightNear.y, heightNearRotated.y, 0.5, mask, 0.03);
+        heightFar = atlas2D(Stratum7AlbedoSampler, position.xy * farScale.xy, offset).z;
+    }
     return (heightNear + heightFar) / 2;
 }
 
@@ -1809,16 +1827,11 @@ float4 computeStratum(
     uniform float2 farScale, 
     float stratumMask, 
     uniform float2 offset, 
-    uniform bool otherLayer
+    uniform bool firstBatch
 ) 
 {
-    float4 stratumAlbedo = sampleAlbedo(StratumAlbedoSampler, position, nearScale, offset, otherLayer, rotationMask);
-    float stratumHeight;
-    if (otherLayer) {
-        stratumHeight = sampleHeight(position, nearScale, farScale, offset).y;
-    } else {
-        stratumHeight = sampleHeight(position, nearScale, farScale, offset).x;
-    }
+    float4 stratumAlbedo = sampleAlbedo(StratumAlbedoSampler, position, nearScale, offset, firstBatch, rotationMask);
+    float stratumHeight = sampleHeight(position, nearScale, farScale, offset, rotationMask, firstBatch);
     return splatLerp(albedo, stratumAlbedo, stratumHeight, stratumMask);
 }
 
@@ -1858,13 +1871,13 @@ float4 TerrainPBRNormalsPS ( VS_OUTPUT inV ) : COLOR
     float4 stratum5Normal = sampleNormal(Stratum5NormalSampler, position, Stratum5AlbedoTile, rotationMask);
     float4 stratum6Normal = sampleNormal(Stratum6NormalSampler, position, Stratum6AlbedoTile, rotationMask);
 
-    float stratum0Height = sampleHeight(position, Stratum0AlbedoTile, Stratum0NormalTile, float2(0.5, 0.0)).x;
-    float stratum1Height = sampleHeight(position, Stratum1AlbedoTile, Stratum1NormalTile, float2(0.0, 0.5)).x;
-    float stratum2Height = sampleHeight(position, Stratum2AlbedoTile, Stratum2NormalTile, float2(0.5, 0.5)).x;
-    float stratum3Height = sampleHeight(position, Stratum3AlbedoTile, Stratum3NormalTile, float2(0.0, 0.0)).y;
-    float stratum4Height = sampleHeight(position, Stratum4AlbedoTile, Stratum4NormalTile, float2(0.5, 0.0)).y;
-    float stratum5Height = sampleHeight(position, Stratum5AlbedoTile, Stratum5NormalTile, float2(0.0, 0.5)).y;
-    float stratum6Height = sampleHeight(position, Stratum6AlbedoTile, Stratum6NormalTile, float2(0.5, 0.5)).y;
+    float stratum0Height = sampleHeight(position, Stratum0AlbedoTile, Stratum0NormalTile, float2(0.5, 0.0), rotationMask, true);
+    float stratum1Height = sampleHeight(position, Stratum1AlbedoTile, Stratum1NormalTile, float2(0.0, 0.5), rotationMask, true);
+    float stratum2Height = sampleHeight(position, Stratum2AlbedoTile, Stratum2NormalTile, float2(0.5, 0.5), rotationMask, true);
+    float stratum3Height = sampleHeight(position, Stratum3AlbedoTile, Stratum3NormalTile, float2(0.0, 0.0), rotationMask, false);
+    float stratum4Height = sampleHeight(position, Stratum4AlbedoTile, Stratum4NormalTile, float2(0.5, 0.0), rotationMask, false);
+    float stratum5Height = sampleHeight(position, Stratum5AlbedoTile, Stratum5NormalTile, float2(0.0, 0.5), rotationMask, false);
+    float stratum6Height = sampleHeight(position, Stratum6AlbedoTile, Stratum6NormalTile, float2(0.5, 0.5), rotationMask, false);
 
     float4 normal = lowerNormal;
     normal = splatBlendNormal(normal, stratum0Normal, stratum0Height, mask0.x);
@@ -1890,17 +1903,17 @@ float4 TerrainPBRAlbedoPS ( VS_OUTPUT inV) : COLOR
     float4 mask1 = tex2D(UtilitySamplerB, position.xy);
     float rotationMask = tex2D(UpperAlbedoSampler, position.xy * 7).w;
 
-    float4 albedo = sampleAlbedo(LowerAlbedoSampler, position, LowerAlbedoTile, float2(0.0, 0.0), false, rotationMask);
+    float4 albedo = sampleAlbedo(LowerAlbedoSampler, position, LowerAlbedoTile, float2(0.0, 0.0), true, rotationMask);
 
-    albedo = computeStratum(albedo, position, rotationMask, Stratum0AlbedoSampler, Stratum0AlbedoTile.xy, Stratum0NormalTile.xy, mask0.x, float2(0.5, 0.0), false);
-    albedo = computeStratum(albedo, position, rotationMask, Stratum1AlbedoSampler, Stratum1AlbedoTile.xy, Stratum1NormalTile.xy, mask0.y, float2(0.0, 0.5), false);
-    albedo = computeStratum(albedo, position, rotationMask, Stratum2AlbedoSampler, Stratum2AlbedoTile.xy, Stratum2NormalTile.xy, mask0.z, float2(0.5, 0.5), false);
+    albedo = computeStratum(albedo, position, rotationMask, Stratum0AlbedoSampler, Stratum0AlbedoTile.xy, Stratum0NormalTile.xy, mask0.x, float2(0.5, 0.0), true);
+    albedo = computeStratum(albedo, position, rotationMask, Stratum1AlbedoSampler, Stratum1AlbedoTile.xy, Stratum1NormalTile.xy, mask0.y, float2(0.0, 0.5), true);
+    albedo = computeStratum(albedo, position, rotationMask, Stratum2AlbedoSampler, Stratum2AlbedoTile.xy, Stratum2NormalTile.xy, mask0.z, float2(0.5, 0.5), true);
     // We use the specularcolor to save register slots as the Tiles only have one 
     // float of actual data, but use four and we are pretty tight on register slots
-    albedo = computeStratum(albedo, position, rotationMask, Stratum3AlbedoSampler, Stratum3AlbedoTile.xy, SpecularColor.xx,      mask0.w, float2(0.0, 0.0), true);
-    albedo = computeStratum(albedo, position, rotationMask, Stratum4AlbedoSampler, Stratum4AlbedoTile.xy, SpecularColor.yy,      mask1.x, float2(0.5, 0.0), true);
-    albedo = computeStratum(albedo, position, rotationMask, Stratum5AlbedoSampler, Stratum5AlbedoTile.xy, SpecularColor.zz,      mask1.y, float2(0.0, 0.5), true);
-    albedo = computeStratum(albedo, position, rotationMask, Stratum6AlbedoSampler, Stratum6AlbedoTile.xy, SpecularColor.ww,      mask1.z, float2(0.5, 0.5), true);
+    albedo = computeStratum(albedo, position, rotationMask, Stratum3AlbedoSampler, Stratum3AlbedoTile.xy, SpecularColor.xx,      mask0.w, float2(0.0, 0.0), false);
+    albedo = computeStratum(albedo, position, rotationMask, Stratum4AlbedoSampler, Stratum4AlbedoTile.xy, SpecularColor.yy,      mask1.x, float2(0.5, 0.0), false);
+    albedo = computeStratum(albedo, position, rotationMask, Stratum5AlbedoSampler, Stratum5AlbedoTile.xy, SpecularColor.zz,      mask1.y, float2(0.0, 0.5), false);
+    albedo = computeStratum(albedo, position, rotationMask, Stratum6AlbedoSampler, Stratum6AlbedoTile.xy, SpecularColor.ww,      mask1.z, float2(0.5, 0.5), false);
 
     // We need to add 0.01 as the reflection disappears at 0
     float roughness = saturate(albedo.a * mask1.w * 2 + 0.01);
