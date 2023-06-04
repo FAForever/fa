@@ -122,7 +122,27 @@ AIPlatoonAdaptiveReclaimBehavior = Class(AIPlatoon) {
                     return
                 end
                 self:LogWarning(string.format('no reclaim target found'))
-                self:ChangeState(self.Error)
+                local closestManager 
+                local returnPos
+                if eng.BuilderManagerData.EngineerManager.Location then
+                    returnPos = eng.BuilderManagerData.EngineerManager.Location
+                end
+                if not returnPos then
+                    for _,v in brain.BuilderManagers do
+                        local basePos = v.EngineerManager:GetLocationCoords()
+                        if not closestManager or (VDist3Sq(engPos, basePos) < closestManager and NavUtils.CanPathTo('Amphibious', engPos, basePos)) then
+                            returnPos = basePos
+                        end
+                    end
+                end
+                if returnPos and VDist3Sq(engPos, returnPos) < 6400 then
+                    self:ExitStateMachine()
+                elseif returnPos then
+                    self.LocationToReclaim = returnPos
+                    self:ChangeState(self.Navigating)
+                else
+                    self:ChangeState(self.Error)
+                end
                 return
             end
         end,
@@ -319,6 +339,8 @@ AIPlatoonAdaptiveReclaimBehavior = Class(AIPlatoon) {
                     end
                 end
             end
+            self:ChangeState(self.Searching)
+            return
         end,
     },
 
