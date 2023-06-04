@@ -322,9 +322,10 @@ AIBrain = Class(StandardBrain, EconomyComponent) {
 
     ---------------------------------------------------------------------------
     --#region Legacy functionality
-    --- All functions below solely exist because the code is too tightly coupled. We can't
-    --- remove them without drastically changing how the code base works. We can't do that
-    --- because it would break mod compatibility
+    
+    -- All functions below solely exist because the code is too tightly coupled. We can't
+    -- remove them without drastically changing how the code base works. We can't do that
+    -- because it would break mod compatibility
 
     ---@deprecated
     ---@param self AIBrain

@@ -233,6 +233,10 @@ local keyActionsDebugAI = {
         action = 'UI_Lua import("/lua/ui/game/aibaseinfo.lua").OpenWindow()',
         category = 'ai'
     },
+    ['toggle_ai_platoon_ui'] = {
+        action = 'UI_Lua import("/lua/ui/game/aiplatooninfo.lua").OpenWindow()',
+        category = 'ai'
+    },
     ['toggle_ai_reclaim_grid_ui'] = {
         action = 'UI_Lua import("/lua/ui/game/gridreclaim.lua").OpenWindow()',
         category = 'ai'
