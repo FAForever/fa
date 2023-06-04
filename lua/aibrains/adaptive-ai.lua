@@ -1606,8 +1606,10 @@ AIBrain = Class(StandardBrain, EconomyComponent) {
                     local unit = units[1]
                     if unit.AIPlatoonReference then
                         Sync.AIPlatoonInfo = {
-                            Info = unit.AIPlatoonReference:GetDebugInfo(),
+                            PlatoonInfo = unit.AIPlatoonReference:GetDebugInfo(),
                             EntityId = unit.EntityId,
+                            BlueprintId = unit.Blueprint.BlueprintId,
+                            Position = unit:GetPosition(),
                         }
                     end
                 end

@@ -8,7 +8,9 @@ local TableGetn = table.getn
 
 ---@class AIPlatoonDebugInfo
 ---@field EntityId EntityId
----@field Info { DebugMessages: string[] } 
+---@field BlueprintId BlueprintId
+---@field Position Vector
+---@field PlatoonInfo { DebugMessages: string[], PlatoonName: string, StateName: string } 
 
 ---@class AIPlatoonState : State
 ---@field StateName string
@@ -45,7 +47,7 @@ AIPlatoon = Class(moho.platoon_methods) {
         self.Units = units
         for k, unit in units do
             unit.AIPlatoonReference = self
-            unit:SetCustomName(self:LogReference())
+            unit:SetCustomName(self.PlatoonName)
         end
     end,
 
@@ -451,21 +453,15 @@ AIPlatoon = Class(moho.platoon_methods) {
     --#region Debug functionality
 
     ---@param self AIPlatoon
-    LogReference = function(self)
-        local platoonName = self.PlatoonName
-        return string.format("(%s) %s", tostring(self):sub(9, 17), platoonName)
-    end,
-
-    ---@param self AIPlatoon
     LogDebug = function(self, message)
         self.DebugMessages = self.DebugMessages or { }
-        table.insert(self.DebugMessages, message)
+        table.insert(self.DebugMessages, string.format("%d - %s", GetGameTick(), message))
     end,
 
     ---@param self AIPlatoon
     LogWarning = function(self, message)
         self.DebugMessages = self.DebugMessages or { }
-        table.insert(self.DebugMessages, message)
+        table.insert(self.DebugMessages, string.format("%d - %s", GetGameTick(), message))
     end,
 
     ---@param self AIPlatoon
