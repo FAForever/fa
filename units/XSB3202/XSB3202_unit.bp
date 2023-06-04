@@ -61,8 +61,8 @@ UnitBlueprint {
         AirThreatLevel = 0,
         ArmorType = 'Structure',
         EconomyThreatLevel = 4,
-        Health = 1000,
-        MaxHealth = 1000,
+        Health = 1400,
+        MaxHealth = 1400,
         RegenRate = 0,
         SubThreatLevel = 0,
         SurfaceThreatLevel = 0,
@@ -122,9 +122,9 @@ UnitBlueprint {
         UniformScale = 0.05,
     },
     Economy = {
-        BuildCostEnergy = 6000,
+        BuildCostEnergy = 9600,
         BuildCostMass = 400,
-        BuildTime = 600,
+        BuildTime = 2120,
         MaintenanceConsumptionPerSecondEnergy = 200,
     },
     Footprint = {
@@ -168,6 +168,7 @@ UnitBlueprint {
         UpgradesFrom = 'xsb3102',
     },
     Intel = {
+        ReactivateTime = 10,
         ShowIntelOnSelect = true,
         SonarRadius = 350,
         VisionRadius = 25,
