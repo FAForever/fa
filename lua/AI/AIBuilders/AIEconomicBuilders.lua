@@ -595,7 +595,7 @@ BuilderGroup {
         Priority = 875,
         BuilderConditions = {
             { EBC, 'GreaterThanEconEfficiencyCombined', { 0.5, 0.5 }}, --DUNCAN - was 0.8 mass check
-            { EBC, 'LessThanEconEfficiencyOverTime', { 2.0, 1.3 }},
+            { EBC, 'LessThanEnergyTrendOverTime', { 10.0 } },
             { UCBC, 'EngineerLessAtLocation', { 'LocationType', 1, categories.ENGINEER * ( categories.TECH2 + categories.TECH3 ) } },
         },
         BuilderType = 'Any',
@@ -1609,16 +1609,17 @@ BuilderGroup {
     },
     Builder {
         BuilderName = 'T2 Engineer Reclaim Excess',
-        PlatoonTemplate = 'T2EngineerGridReclaimer',
+        PlatoonTemplate = 'StateMachineEngineerT2',
         Priority = 2, --DUNCAN - was 1
         InstanceCount = 10,
         BuilderConditions = {
-                { EBC, 'LessThanEconStorageRatio', { 0.75, 2.0}},
+                { EBC, 'LessThanEconStorageRatio', { 0.50, 2.0}},
                 { MIBC, 'ReclaimAvailableInGrid', { 'LocationType', true}},
             },
         BuilderData = {
             LocationType = 'LocationType',
             ReclaimTime = 30,
+            StateMachine = 'AIPlatoonAdaptiveReclaimBehavior',
         },
         BuilderType = 'Any',
     },
@@ -1763,16 +1764,17 @@ BuilderGroup {
     -- =========================
     Builder {
         BuilderName = 'T3 Engineer Reclaim Excess',
-        PlatoonTemplate = 'T3EngineerGridReclaimer',
+        PlatoonTemplate = 'StateMachineEngineerT3',
         Priority = 0, --DUNCAN - was 1
         InstanceCount = 2, --DUNCAN - was 10
         BuilderConditions = {
-            { EBC, 'LessThanEconStorageRatio', { 0.75, 2.0}},
+            { EBC, 'LessThanEconStorageRatio', { 0.35, 2.0}},
             { MIBC, 'ReclaimAvailableInGrid', { 'LocationType', true}},
         },
         BuilderData = {
             LocationType = 'LocationType',
             ReclaimTime = 10,
+            StateMachine = 'AIPlatoonAdaptiveReclaimBehavior',
         },
         BuilderType = 'Any',
     },
@@ -2556,7 +2558,7 @@ BuilderGroup {
         InstanceCount = 1,
         BuilderConditions = {
             { EBC, 'GreaterThanEconEfficiencyCombined', { 0.6, 0.1 }},
-            { EBC, 'LessThanEnergyTrendOverTime', { 10.0 } },
+            { EBC, 'LessThanEnergyTrendOverTime', { 15.0 } },
             { UCBC, 'HaveLessThanUnitsWithCategory', { 1, categories.ENERGYPRODUCTION * (categories.TECH2 + categories.TECH3) }},
         },
         BuilderType = 'Any',
@@ -2575,7 +2577,7 @@ BuilderGroup {
         Priority = 1000,
         InstanceCount = 1,
         BuilderConditions = {
-            { EBC, 'GreaterThanEconEfficiencyCombined', { 0.7, 0.1 }},
+            { EBC, 'GreaterThanEconEfficiencyCombined', { 0.75, 0.1 }},
             { EBC, 'LessThanEnergyTrendOverTime', { 25.0 } },
             { UCBC, 'HaveLessThanUnitsWithCategory', { 1, categories.ENERGYPRODUCTION * (categories.TECH2 + categories.TECH3) }},
         },

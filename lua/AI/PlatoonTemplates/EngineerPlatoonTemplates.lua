@@ -160,7 +160,22 @@ PlatoonTemplate {
     GlobalSquads = {
         { categories.ENGINEER * categories.TECH1 - categories.COMMAND, 1, 1, 'support', 'None' },
     },
+}
 
+PlatoonTemplate {
+    Name = 'StateMachineEngineerT2',
+    Plan = 'StateMachineAI',
+    GlobalSquads = {
+        { categories.ENGINEER * categories.TECH2 - categories.COMMAND, 1, 1, 'support', 'None' },
+    },
+}
+
+PlatoonTemplate {
+    Name = 'StateMachineEngineerT3',
+    Plan = 'StateMachineAI',
+    GlobalSquads = {
+        { categories.ENGINEER * categories.TECH3 - categories.COMMAND, 1, 1, 'support', 'None' },
+    },
 }
 
 -- Factory built Engineers below
