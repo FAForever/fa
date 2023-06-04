@@ -763,7 +763,6 @@ UnitBlueprint {
                 },
             },
             BallisticArc = 'RULEUBA_LowArc',
-            ChargeDelay = 0.3,
             CollideFriendly = false,
             Damage = 300,
             DamageType = 'Normal',

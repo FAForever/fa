@@ -10,11 +10,11 @@ local TIFSmallYieldNuclearBombWeapon = import("/lua/terranweapons.lua").TIFSmall
 local TAirToAirLinkedRailgun = import("/lua/terranweapons.lua").TAirToAirLinkedRailgun
 
 ---@class UEA0304 : TAirUnit
-UEA0304 = Class(TAirUnit) {
+UEA0304 = ClassUnit(TAirUnit) {
     Weapons = {
-        Bomb = Class(TIFSmallYieldNuclearBombWeapon) {},
-        LinkedRailGun1 = Class(TAirToAirLinkedRailgun) {},
-        LinkedRailGun2 = Class(TAirToAirLinkedRailgun) {},
+        Bomb = ClassWeapon(TIFSmallYieldNuclearBombWeapon) {},
+        LinkedRailGun1 = ClassWeapon(TAirToAirLinkedRailgun) {},
+        LinkedRailGun2 = ClassWeapon(TAirToAirLinkedRailgun) {},
     },
 
     OnStopBeingBuilt = function(self,builder,layer)
@@ -23,12 +23,11 @@ UEA0304 = Class(TAirUnit) {
         self:SetScriptBit('RULEUTC_JammingToggle', true)
     end,
     
-    
     OnDamage = function(self, instigator, amount, vector, damageType)
-        if instigator and instigator:GetBlueprint().CategoriesHash.STRATEGICBOMBER and instigator.Army == self.Army then
+        if instigator and instigator.Army == self.Army and instigator.Blueprint.CategoriesHash.STRATEGICBOMBER then
             return
         end
-        
+
         TAirUnit.OnDamage(self, instigator, amount, vector, damageType)
     end,
 }

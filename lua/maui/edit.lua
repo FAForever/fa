@@ -35,7 +35,7 @@ local AddUnicodeCharToEditText = import("/lua/utf.lua").AddUnicodeCharToEditText
 local ScaleNumber = import("/lua/maui/layouthelpers.lua").ScaleNumber
 
 ---@class Edit : moho.edit_methods, Control, InternalObject
-Edit = Class(moho.edit_methods, Control) {
+Edit = ClassUI(moho.edit_methods, Control) {
 
     __init = function(self, parent, debugname)
         InternalCreateEdit(self, parent)

@@ -171,7 +171,7 @@ UnitBlueprint {
     LifeBarOffset = 0.55,
     LifeBarSize = 1,
     Physics = {
-        BackupDistance = 5,
+        --BackUpDistance = 5,
         BankingSlope = 0,
         BuildOnLayerCaps = {
             LAYER_Air = false,
@@ -231,7 +231,6 @@ UnitBlueprint {
                 },
             },
             BallisticArc = 'RULEUBA_LowArc',
-            ChargeDelay = 0,
             CollideFriendly = false,
             Damage = 125,
             DamageType = 'Normal',

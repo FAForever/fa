@@ -291,7 +291,7 @@ function CategoriesBeingBuilt(aiBrain, baseName, catTable)
 end
 
 ---@param aiBrain ArmiesTable
----@param level integer
+---@param level number
 ---@param baseName string
 ---@return boolean
 function HighestFactoryLevel(aiBrain, level, baseName)
@@ -319,8 +319,8 @@ function HighestFactoryLevel(aiBrain, level, baseName)
 end
 
 ---@param aiBrain AIBrain
----@param techLevel integer
----@param engQuantity integer
+---@param techLevel number
+---@param engQuantity number
 ---@param pType string
 ---@param baseName string
 ---@return boolean
@@ -397,7 +397,7 @@ function UnfinishedBuildingsCheck(aiBrain, baseName)
 end
 
 ---@param aiBrain AIBrain
----@param level integer
+---@param level number
 ---@param baseName string
 ---@param type string
 ---@return boolean

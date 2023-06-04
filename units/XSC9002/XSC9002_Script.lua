@@ -9,7 +9,7 @@ local SStructureUnit = import("/lua/seraphimunits.lua").SStructureUnit
 local SSJammerCrystalAmbient = import("/lua/effecttemplates.lua").SJammerCrystalAmbient
 
 ---@class XSC9002 : SStructureUnit
-XSC9002 = Class(SStructureUnit) {
+XSC9002 = ClassUnit(SStructureUnit) {
     OnCreate = function(self, builder, layer)
         -- Place emitters on certain light bones on the mesh.
         for _, v in SSJammerCrystalAmbient do

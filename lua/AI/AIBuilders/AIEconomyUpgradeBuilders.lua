@@ -12,15 +12,15 @@ local BuildingTmpl = 'BuildingTemplates'
 local BaseTmpl = 'BaseTemplates'
 local ExBaseTmpl = 'ExpansionBaseTemplates'
 local Adj2x2Tmpl = 'Adjacency2x2'
-local UCBC = '/lua/editor/UnitCountBuildConditions.lua'
-local MIBC = '/lua/editor/MiscBuildConditions.lua'
-local MABC = '/lua/editor/MarkerBuildConditions.lua'
-local IBC = '/lua/editor/InstantBuildConditions.lua'
-local OAUBC = '/lua/editor/OtherArmyUnitCountBuildConditions.lua'
-local EBC = '/lua/editor/EconomyBuildConditions.lua'
-local PCBC = '/lua/editor/PlatoonCountBuildConditions.lua'
-local SAI = '/lua/ScenarioPlatoonAI.lua'
-local TBC = '/lua/editor/ThreatBuildConditions.lua'
+local UCBC = '/lua/editor/unitcountbuildconditions.lua'
+local MIBC = '/lua/editor/miscbuildconditions.lua'
+local MABC = '/lua/editor/markerbuildconditions.lua'
+local IBC = '/lua/editor/instantbuildconditions.lua'
+local OAUBC = '/lua/editor/otherarmyunitcountbuildconditions.lua'
+local EBC = '/lua/editor/economybuildconditions.lua'
+local PCBC = '/lua/editor/platooncountbuildconditions.lua'
+local SAI = '/lua/scenarioplatoonai.lua'
+local TBC = '/lua/editor/threatbuildconditions.lua'
 local PlatoonFile = '/lua/platoon.lua'
 
 ---@alias BuilderGroupsEconomicUpgrade 'ExtractorUpgrades' | 'Time Exempt Extractor Upgrades Expansion' | 'Time Exempt Extractor Upgrades' | 'SpeedExtractorUpgrades' | 'T1BalancedUpgradeBuilders' | 'T2BalancedUpgradeBuilders' | 'T1BalancedUpgradeBuildersExpansion' | 'T2BalancedUpgradeBuildersExpansion' | 'T1SpeedUpgradeBuilders' | 'T2SpeedUpgradeBuilders' | 'T1SpeedUpgradeBuildersExpansions' | 'T2SpeedUpgradeBuildersExpansions' | 'T1SlowUpgradeBuilders' | 'T2SlowUpgradeBuilders' | 'T1NavalUpgradeBuilders' | 'T2NavalUpgradeBuilders'
@@ -439,15 +439,15 @@ BuilderGroup {
         Priority = 200,
         InstanceCount = 1,
         BuilderConditions = {
-                { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, categories.FACTORY * ( categories.TECH2 + categories.TECH3 ) } },
-                { UCBC, 'FactoryGreaterAtLocation', { 'LocationType', 1, categories.FACTORY * categories.LAND }},
-                { UCBC, 'HaveGreaterThanUnitsWithCategory', { 1, categories.MASSEXTRACTION * ( categories.TECH2 + categories.TECH3 )}},
-                { UCBC, 'HaveGreaterThanUnitsWithCategory', { 3, categories.FACTORY * categories.TECH2}},
-                { UCBC, 'LocationFactoriesBuildingLess', { 'LocationType', 1, categories.FACTORY * ( categories.TECH2 + categories.TECH3 ) } },
+                { IBC, 'BrainNotLowPowerMode', {} },
                 { EBC, 'GreaterThanEconIncomeOverTime',  { 6.0, 75}},
                 { EBC, 'GreaterThanEconEfficiencyCombined', { 0.85, 1.4} },
-                { IBC, 'BrainNotLowPowerMode', {} },
-                { UCBC, 'HaveGreaterThanUnitsWithCategory', { 1, categories.FACTORY * categories.TECH2}},
+                { UCBC, 'FactoryGreaterAtLocation', { 'LocationType', 1, categories.FACTORY * categories.LAND }},
+                { UCBC, 'HaveGreaterThanUnitsWithCategory', { 1, categories.MASSEXTRACTION * ( categories.TECH2 + categories.TECH3 )}},
+                { UCBC, 'HaveGreaterThanUnitsWithCategory', { 3, categories.FACTORY * (categories.TECH2 + categories.TECH3)}},
+                { UCBC, 'LocationFactoriesBuildingLess', { 'LocationType', 1, categories.FACTORY * ( categories.TECH2 + categories.TECH3 ) } },
+                { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, categories.FACTORY * ( categories.TECH2 + categories.TECH3 ) } },
+                
             },
         BuilderType = 'Any',
     },
@@ -464,7 +464,7 @@ BuilderGroup {
                 { UCBC, 'LocationFactoriesBuildingLess', { 'LocationType', 1, categories.FACTORY * ( categories.TECH2 + categories.TECH3 ) } },
                 { UCBC, 'HaveGreaterThanUnitsWithCategory', { 3, categories.FACTORY * categories.TECH2}},
                 { EBC, 'GreaterThanEconIncomeOverTime',  { 5.5, 75}},
-                { IBC, 'BrainNotLowPowerMode', {} },
+                
                 { EBC, 'GreaterThanEconEfficiencyCombined', { 0.85, 1.4} },
                 { UCBC, 'HaveGreaterThanUnitsWithCategory', { 1, categories.FACTORY * categories.TECH2}},
             },

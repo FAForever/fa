@@ -2147,7 +2147,7 @@ function CreateIntelTriggers(unit, objective, isAlreadyLocated)
     if objective.OnUnitGiven then
         Triggers.CreateUnitGivenTrigger(objective.OnUnitGiven, unit)
     end
-    if objective.OnUnitGiven then
+    if objective.OnUnitLocated then
         if isAlreadyLocated then
             return true
         else

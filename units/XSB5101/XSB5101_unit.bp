@@ -105,6 +105,7 @@ UnitBlueprint {
         },
     },
     General = {
+        AlwaysAlignToTerrain = true,
         CapCost = 0.1,
         Category = 'Defense',
         Classification = 'RULEUC_MiscSupport',

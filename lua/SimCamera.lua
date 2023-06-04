@@ -10,8 +10,14 @@
 --
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 
-SingleEvent = import("/lua/system/singleevent.lua").SingleEvent
+---@class SimCameraEvent
+---@field Name string
+---@field Type string
+---@field Exec string
 
+local SyncCameraRequest = import("/lua/SimSyncUtils.lua").SyncCameraRequest
+
+SingleEvent = import("/lua/system/singleevent.lua").SingleEvent
 -- Name / Object table for cameras
 Cameras = {}
 
@@ -45,7 +51,7 @@ SimCamera = Class(SingleEvent) {
             Time = seconds or 0,
             Callback = self.Callback
         }
-        table.insert( Sync.CameraRequests, request )
+        SyncCameraRequest(request)
     end,
 
     MoveToMarker = function(self,marker,seconds)
@@ -57,7 +63,7 @@ SimCamera = Class(SingleEvent) {
             Time = seconds or 0,
             Callback = self.Callback
         }
-        table.insert( Sync.CameraRequests, request )
+        SyncCameraRequest(request)
     end,
 
     SyncPlayableRect = function(self,rectRegion)
@@ -68,7 +74,7 @@ SimCamera = Class(SingleEvent) {
             Region = rectRegion,
         }
         LOG('Request: ',repr(request))
-        table.insert( Sync.CameraRequests, request )
+        SyncCameraRequest(request)
     end,
 
     SnapToMarker = function(self,marker)
@@ -78,7 +84,7 @@ SimCamera = Class(SingleEvent) {
             Type = 'CAMERA_SNAP',
             Marker = marker,
         }
-        table.insert( Sync.CameraRequests, request )
+        SyncCameraRequest(request)
     end,
 
     TrackEntities = function(self, units, zoom, seconds)
@@ -94,7 +100,7 @@ SimCamera = Class(SingleEvent) {
         for k,v in units do
             table.insert( request.Ents, v:GetEntityId() )
         end
-        table.insert( Sync.CameraRequests, request )
+        SyncCameraRequest(request)
     end,
 
     NoseCam = function(self, ent, pitchAdjust, zoom, seconds, transition)
@@ -119,7 +125,7 @@ SimCamera = Class(SingleEvent) {
                 Zoom = zoom,
                 Callback = self.Callback
             }
-            table.insert( Sync.CameraRequests, request )
+            SyncCameraRequest(request)
         else
             error( '*CAMERA ERROR: Nose Cam not given valid unit or unit does not have a blip', 2 )
         end
@@ -133,7 +139,7 @@ SimCamera = Class(SingleEvent) {
             Data = accModeName,
             Callback = self.Callback
         }
-        table.insert( Sync.CameraRequests, request )
+        SyncCameraRequest(request)
     end,
 
     SetZoom = function(self,zoom,seconds)
@@ -145,7 +151,7 @@ SimCamera = Class(SingleEvent) {
             Time = seconds or 0,
             Callback = self.Callback
         }
-        table.insert( Sync.CameraRequests, request )
+        SyncCameraRequest(request)
     end,
 
     SpinAroundUnit = function(self, location, unitHeading, headingRate )
@@ -161,7 +167,7 @@ SimCamera = Class(SingleEvent) {
             HeadingRate = headingRate,
             Callback = self.Callback
         }
-        table.insert( Sync.CameraRequests, request )
+        SyncCameraRequest(request)
     end,
 
     Spin = function(self,headingRate,zoomRate)
@@ -171,41 +177,34 @@ SimCamera = Class(SingleEvent) {
             HeadingRate = headingRate,
             ZoomRate = zoomRate,
         }
-        table.insert( Sync.CameraRequests, request )
+        SyncCameraRequest(request)
     end,
 
     HoldRotation = function(self)
-        --LOG('Camera:HoldRotation')
-        table.insert( Sync.CameraRequests, { Name = self.CameraName, Exec = 'HoldRotation' } )
+        SyncCameraRequest({ Name = self.CameraName, Exec = 'HoldRotation' })
     end,
 
     RevertRotation = function(self)
-        --LOG('Camera:RevertRotation')
-        table.insert( Sync.CameraRequests, { Name = self.CameraName, Exec = 'RevertRotation' } )
+        SyncCameraRequest( { Name = self.CameraName, Exec = 'RevertRotation' } )
     end,
 
     UseGameClock = function(self)
-        --LOG('Camera:UseGameClock')
-        table.insert( Sync.CameraRequests, { Name = self.CameraName, Exec = 'UseGameClock' } )
+        SyncCameraRequest( { Name = self.CameraName, Exec = 'UseGameClock' } )
     end,
 
     UseSystemClock = function(self)
-        --LOG('Camera:UseSystemClock')
-        table.insert( Sync.CameraRequests, { Name = self.CameraName, Exec = 'UseSystemClock' } )
+        SyncCameraRequest( { Name = self.CameraName, Exec = 'UseSystemClock' } )
     end,
 
     EnableEaseInOut = function(self)
-        --LOG('Camera:EnableEaseInOut')
-        table.insert( Sync.CameraRequests, { Name = self.CameraName, Exec = 'EnableEaseInOut' } )
+        SyncCameraRequest( { Name = self.CameraName, Exec = 'EnableEaseInOut' } )
     end,
 
     DisableEaseInOut = function(self)
-        --LOG('Camera:DisableEaseInOut')
-        table.insert( Sync.CameraRequests, { Name = self.CameraName, Exec = 'DisableEaseInOut' } )
+        SyncCameraRequest( { Name = self.CameraName, Exec = 'DisableEaseInOut' } )
     end,
 
     Reset = function(self)
-        --LOG('Camera:Reset')
-        table.insert( Sync.CameraRequests, {Name=self.CameraName, Exec='Reset'} )
+        SyncCameraRequest( {Name=self.CameraName, Exec='Reset'} )
     end,
 }

@@ -11,7 +11,6 @@ TShellPhalanxProjectile = Class(MultiPolyTrailProjectile) {
     FxImpactProp = EffectTemplate.TRiotGunHitUnit01,
     FxImpactNone = EffectTemplate.FireCloudSml01,
     FxImpactLand = EffectTemplate.TRiotGunHit01,
-    FxImpactUnderWater = {},
     FxImpactProjectile = EffectTemplate.TMissileHit02,
     FxProjectileHitScale = 1.0,
 }

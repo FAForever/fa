@@ -12,10 +12,10 @@ local TWalkingLandUnit = import("/lua/terranunits.lua").TWalkingLandUnit
 local TDFIonizedPlasmaCannon = TerranWeaponFile.TDFIonizedPlasmaCannon
 
 ---@class XEL0305 : TWalkingLandUnit
-XEL0305 = Class(TWalkingLandUnit) {
+XEL0305 = ClassUnit(TWalkingLandUnit) {
 
     Weapons = {
-        PlasmaCannon01 = Class(TDFIonizedPlasmaCannon) {},
+        PlasmaCannon01 = ClassWeapon(TDFIonizedPlasmaCannon) {},
     },
 
 }

@@ -11,7 +11,7 @@
 local SSonarUnit = import("/lua/seraphimunits.lua").SSonarUnit
 
 ---@class XSB3102 : SSonarUnit
-XSB3102 = Class(SSonarUnit) {
+XSB3102 = ClassUnit(SSonarUnit) {
     TimedSonarTTIdleEffects = {
         {
             Bones = {

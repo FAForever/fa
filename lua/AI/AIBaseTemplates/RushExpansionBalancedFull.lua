@@ -20,7 +20,7 @@ BaseBuilderTemplate {
         'T1EngineerBuilders',
         'T2EngineerBuilders',
         'T3EngineerBuilders',
-        'EngineerFactoryConstruction',
+        'EngineerFactoryConstructionExpansion',
         'LandInitialFactoryConstruction',
 
         -- Build Mass low pri at this base
@@ -28,11 +28,6 @@ BaseBuilderTemplate {
 
         -- Build some power, but not much
         'EngineerEnergyBuildersExpansions',
-
-        -- ==== EXPANSION ==== --
-        --DUNCAN - expansions dont build more expansions!
-        --'EngineerExpansionBuildersFull',
-        --'EngineerExpansionBuildersSmall',
 
         -- ==== DEFENSES ==== --
         'T1LightDefenses',

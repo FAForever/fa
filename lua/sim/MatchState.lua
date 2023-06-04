@@ -1,3 +1,9 @@
+--**************************************************************************************************
+--** Shared under the MIT license
+--**************************************************************************************************
+
+local SyncGameResult = import("/lua/simsyncutils.lua").SyncGameResult
+
 local Conditions = {
     demoralization = categories.COMMAND,
     domination = categories.STRUCTURE + categories.ENGINEER - categories.WALL,
@@ -128,7 +134,7 @@ local function MatchStateThread()
                 SPEW("Matchstate - defeated: " .. brain.Nickname)
 
                 -- communicate to the server that this brain has been defeated
-                table.insert(Sync.GameResult, { k, "defeat -10" })
+                SyncGameResult({ k, "defeat -10" })
 
                 -- stop considering it a brain that is still alive
                 aliveBrains[k] = nil
@@ -156,7 +162,7 @@ local function MatchStateThread()
                     SPEW("Matchstate - drawed: " .. brain.Nickname)
 
                     -- communicate to the server that this brain has been defeated
-                    table.insert(Sync.GameResult, { k, "draw 0" })
+                    SyncGameResult({ k, "draw 0" })
 
                     -- stop considering it a brain that is still alive
                     aliveBrains[k] = nil
@@ -187,7 +193,7 @@ local function MatchStateThread()
                     SPEW("Matchstate - won: " .. brain.Nickname)
 
                     -- communicate to the server that this brain has been defeated
-                    table.insert(Sync.GameResult, { k, "victory 10" })
+                    SyncGameResult({ k, "victory 10" })
 
                     -- stop considering it a brain that is still alive
                     aliveBrains[k] = nil
@@ -208,4 +214,6 @@ local function MatchStateThread()
 
 end
 
-ForkThread(MatchStateThread)
+function Setup()
+    ForkThread(MatchStateThread)
+end

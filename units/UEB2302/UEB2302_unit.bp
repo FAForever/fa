@@ -93,7 +93,7 @@ UnitBlueprint {
         UniformScale = 0.04,
     },
     Economy = {
-        BuildCostEnergy = 900000,
+        BuildCostEnergy = 1350000,
         BuildCostMass = 72000,
         BuildTime = 115000,
         RebuildBonusIds = {
@@ -211,7 +211,7 @@ UnitBlueprint {
             DamageType = 'Normal',
             DisplayName = 'Anti Matter Artillery',
             EnergyDrainPerSecond = 4000,
-            EnergyRequired = 8000,
+            EnergyRequired = 16000,
             FireTargetLayerCapsTable = {
                 Land = 'Land|Water|Seabed',
                 Water = 'Land|Water|Seabed',

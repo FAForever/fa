@@ -277,17 +277,7 @@ FactoryBuilderManager = Class(BuilderManager) {
     ---@param self FactoryBuilderManager
     ---@param factory Unit
     FactoryDestroyed = function(self, factory)
-        local guards = factory:GetGuards()
         local factoryDestroyed = false
-        for k,v in guards do
-            if not v.Dead and v.AssistPlatoon then
-                if self.Brain:PlatoonExists(v.AssistPlatoon) then
-                    v.AssistPlatoon:ForkThread(v.AssistPlatoon.EconAssistBody)
-                else
-                    v.AssistPlatoon = nil
-                end
-            end
-        end
         for k,v in self.FactoryList do
             if IsDestroyed(v) then
                 self.FactoryList[k] = nil
@@ -310,16 +300,6 @@ FactoryBuilderManager = Class(BuilderManager) {
     ---@param bType string
     ---@param time number
     DelayBuildOrder = function(self,factory,bType,time)
-        local guards = factory:GetGuards()
-        for k,v in guards do
-            if not v.Dead and v.AssistPlatoon then
-                if self.Brain:PlatoonExists(v.AssistPlatoon) then
-                    v.AssistPlatoon:ForkThread(v.AssistPlatoon.EconAssistBody)
-                else
-                    v.AssistPlatoon = nil
-                end
-            end
-        end
         if factory.DelayThread then
             return
         end
@@ -558,7 +538,9 @@ FactoryBuilderManager = Class(BuilderManager) {
         -- Use factory location if no other rally or if rally point is far away
         if not rally or VDist2(rally[1], rally[3], position[1], position[3]) > 75 then
             -- DUNCAN - added to try and vary the rally points.
-            position = AIUtils.RandomLocation(position[1],position[3])
+            local locationType = self.LocationType
+            local factoryPos = self.Brain.BuilderManagers[locationType].Position
+            position = AIUtils.ShiftPosition(factoryPos, self.Brain.MapCenterPoint, 25)
             rally = position
         end
 

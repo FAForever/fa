@@ -163,6 +163,10 @@ UnitBlueprint {
         TeleportMassMod = 1,
         TeleportTimeMod = 0.01,
     },
+    Footprint = {
+        SizeX = 1,
+        SizeZ = 1,
+    },
     General = {
         Category = 'Direct Fire',
         Classification = 'RULEUC_MilitaryVehicle',
@@ -411,7 +415,6 @@ UnitBlueprint {
         },
         {
             AboveWaterTargetsOnly = true,
-            Accurate = true,
             BallisticArc = 'RULEUBA_None',
             CollideFriendly = false,
             Damage = 1,
@@ -448,7 +451,7 @@ UnitBlueprint {
             WeaponCategory = 'Direct Fire',
         },
     },
-    SecondsBeforeChargeKicksIn = 4,
+    SecondsBeforeChargeKicksIn = 3,
     SecondsBeforeExplosionWhenCharging = 6,
     Wreckage = {
         Blueprint = '/props/DefaultWreckage/DefaultWreckage_prop.bp',

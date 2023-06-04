@@ -4,7 +4,7 @@
 local TArtilleryProjectile = import("/lua/terranprojectiles.lua").TArtilleryProjectile
 local EffectTemplate = import("/lua/effecttemplates.lua")
 
-TIFFragmentationSensorShell02 = Class(TArtilleryProjectile) {    
+TIFFragmentationSensorShell02 = ClassProjectile(TArtilleryProjectile) {    
     FxTrails     = EffectTemplate.TFragmentationSensorShellTrail,
     FxImpactUnit = EffectTemplate.TFragmentationSensorShellHit,
     FxImpactLand = EffectTemplate.TFragmentationSensorShellHit,

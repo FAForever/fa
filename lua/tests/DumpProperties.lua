@@ -62,8 +62,8 @@ function dump(bp, file)
         file:write(' Build Time:  ',bp.Economy.BuildTime,' \n')
         file:write(' Min Build Time:  ',bp.Economy.MinBuildTime,' \n')
         
-        file:write(' Max Energy Use:  ',bp.Economy.MaxEnergyUse,' \n')
-        file:write(' Max Mass Use:  ',bp.Economy.MaxMassUse,' \n')
+        file:write(' Max Energy:  ',bp.Economy.MaxEnergy,' \n')
+        file:write(' Max Mass:  ',bp.Economy.MaxMass,' \n')
         file:write(' Storage Energy:  ',bp.Economy.StorageEnergy,' \n')
         file:write(' Storage Mass:  ',bp.Economy.StorageMass,' \n')
         

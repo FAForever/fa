@@ -116,7 +116,7 @@ UnitBlueprint {
             '<LOC ability_aa>Anti-Air',
             '<LOC ability_radar>Radar',
         },
-        AttackReticuleSize = 3,
+        AttackReticleSize = 3,
         LayerChangeEffects = {
             AirLand = {
                 Effects = {

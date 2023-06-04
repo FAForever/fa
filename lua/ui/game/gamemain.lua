@@ -58,9 +58,6 @@ gameUIHidden = false
 PostScoreVideo = false
 IsSavedGame = false
 
--- Lobby options as set by the host in the lobby
-LobbyOptions = false
-
 -- The focus army as set at the start of the game. Allows us to detect whether someone was originally an observer or a player
 OriginalFocusArmy = -1
 
@@ -92,6 +89,7 @@ function SetLayout(layout)
     import("/lua/ui/game/controlgroups.lua").SetLayout()
     import("/lua/ui/game/chat.lua").SetLayout()
     import("/lua/ui/game/minimap.lua").SetLayout()
+    import("/lua/ui/game/massfabs.lua").SetLayout()
     import("/lua/ui/game/recall.lua").SetLayout()
 end
 
@@ -162,9 +160,10 @@ function CreateUI(isReplay)
     import("/lua/ui/game/cursor/depth.lua")
     import("/lua/ui/game/cursor/hover.lua")
 
-    -- casting tools 
+    -- casting tools
 
     import("/lua/ui/game/casting/mouse.lua")
+    import("/lua/ui/game/casting/painting.lua")
 
     -- overwrite some globals for performance / safety
 
@@ -183,14 +182,22 @@ function CreateUI(isReplay)
     -- prevents the nvidia stuttering bug with their more recent drivers
     ConExecute('d3d_WindowsCursor on')
 
+    -- tweak networking parameters
+    ConExecute('net_MinResendDelay 100')
+    ConExecute('net_MaxResendDelay 1000')
+
+    ConExecute('net_MaxSendRate 8192')
+    ConExecute('net_MaxBacklog 8192')
+
+    ConExecute('net_SendDelay 5')
+    ConExecute('net_AckDelay 5')
+
     -- enable experimental graphics
     if  Prefs.GetFromCurrentProfile('options.fidelity') >= 2 and
         Prefs.GetFromCurrentProfile('options.experimental_graphics') == 1
     then
         ForkThread(function()
             WaitSeconds(1.0)
-
-            LOG("Experimental graphics enabled, use at your own risk: ")
 
             if Prefs.GetFromCurrentProfile('options.level_of_detail') == 2 then
                 -- allow meshes and effects to be seen from further away
@@ -204,6 +211,7 @@ function CreateUI(isReplay)
             end
         end)
     end
+
     local focusArmy = GetFocusArmy()
 
     -- keep track of the original focus army
@@ -562,6 +570,7 @@ ObserveSelection = import("/lua/shared/observable.lua").Create()
 local hotkeyLabelsOnSelectionChanged = false
 local upgradeTab = false
 function OnSelectionChanged(oldSelection, newSelection, added, removed)
+
     if ignoreSelection then
         return
     end
@@ -596,7 +605,7 @@ function OnSelectionChanged(oldSelection, newSelection, added, removed)
             return
         end
 
-        -- This bit is for the Hotbuild labels. See the buildActionUpgrade() function in hotbuild.lua for a bit more 
+        -- This bit is for the Hotbuild labels. See the buildActionUpgrade() function in hotbuild.lua for a bit more
         -- documentation
         local bp = newSelection[1]:GetBlueprint()
         local upgradesTo = nil
@@ -610,9 +619,9 @@ function OnSelectionChanged(oldSelection, newSelection, added, removed)
                 end
                 local nextSuccessiveUpgrade = __blueprints[upgr].General.UpgradesTo
                 while nextSuccessiveUpgrade do
-                    -- Note: Should we ever add a structure that has different upgrade path choices on a non-base 
-                    -- version of the structure, e.g. different choices for the 4th cybran shield upgrade or something 
-                    -- like it, the way we find the correct icon to put the hotbuild upgrade keybind label using this 
+                    -- Note: Should we ever add a structure that has different upgrade path choices on a non-base
+                    -- version of the structure, e.g. different choices for the 4th cybran shield upgrade or something
+                    -- like it, the way we find the correct icon to put the hotbuild upgrade keybind label using this
                     -- while loop will break. As there currently is no such structure in the game, and I don't know how
                     -- the general case of finding that correct icon should work in such an imaginary case, I'll leave
                     -- it at this, currently working, code.
@@ -646,6 +655,16 @@ function OnSelectionChanged(oldSelection, newSelection, added, removed)
     if not isOldSelection then
         import("/lua/ui/game/selection.lua").PlaySelectionSound(added)
         import("/lua/ui/game/rallypoint.lua").OnSelectionChanged(newSelection)
+        if Prefs.GetFromCurrentProfile('options.repeatbuild') == 'On' then
+            local factories = EntityCategoryFilterDown(categories.STRUCTURE * categories.FACTORY, added) -- find all newly selected factories
+            for _, factory in factories do
+                if not factory.HasBeenSelected then
+                    factory:ProcessInfo('SetRepeatQueue','true')
+                    factory.HasBeenSelected = true
+                end
+            end
+        end
+
     end
 
     if newSelection then

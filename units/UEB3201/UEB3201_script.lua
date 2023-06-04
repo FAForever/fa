@@ -10,16 +10,20 @@
 local TRadarUnit = import("/lua/terranunits.lua").TRadarUnit
 
 ---@class UEB3201 : TRadarUnit
-UEB3201 = Class(TRadarUnit) {
+---@field UpperRotator? moho.RotateManipulator
+UEB3201 = ClassUnit(TRadarUnit) {
 
-    OnIntelDisabled = function(self)
-        TRadarUnit.OnIntelDisabled(self)
-        self.UpperRotator:SetTargetSpeed(0)
+    ---@param self UEB3201
+    OnIntelDisabled = function(self, intel)
+        TRadarUnit.OnIntelDisabled(self, intel)
+        if self.UpperRotator then
+            self.UpperRotator:SetTargetSpeed(0)
+        end 
     end,
 
-
-    OnIntelEnabled = function(self)
-        TRadarUnit.OnIntelEnabled(self)
+    ---@param self UEB3201
+    OnIntelEnabled = function(self, intel)
+        TRadarUnit.OnIntelEnabled(self, intel)
         if not self.UpperRotator then
             self.UpperRotator = CreateRotator(self, 'Upper_Array', 'z')
             self.Trash:Add(self.UpperRotator)

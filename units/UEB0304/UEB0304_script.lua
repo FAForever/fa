@@ -10,7 +10,7 @@
 local TQuantumGateUnit = import("/lua/terranunits.lua").TQuantumGateUnit
 
 ---@class UEB0304 : TQuantumGateUnit
-UEB0304 = Class(TQuantumGateUnit) {
+UEB0304 = ClassUnit(TQuantumGateUnit) {
     GateEffectVerticalOffset = 0.35,
     GateEffectScale = 0.42,
 

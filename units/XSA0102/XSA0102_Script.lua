@@ -12,9 +12,9 @@ local SeraphimWeapons = import("/lua/seraphimweapons.lua")
 local SAAShleoCannonWeapon = SeraphimWeapons.SAAShleoCannonWeapon
 
 ---@class XSA0102 : SAirUnit
-XSA0102 = Class(SAirUnit) {
+XSA0102 = ClassUnit(SAirUnit) {
     Weapons = {
-        SonicPulseBattery = Class(SAAShleoCannonWeapon) {},
+        SonicPulseBattery = ClassWeapon(SAAShleoCannonWeapon) {},
     },
 }
 

@@ -8,7 +8,7 @@
 local TConstructionUnit = import("/lua/terranunits.lua").TConstructionUnit
 
 ---@class XEA3204 : TConstructionUnit
-XEA3204 = Class(TConstructionUnit) {
+XEA3204 = ClassUnit(TConstructionUnit) {
     OnCreate = function(self)
         TConstructionUnit.OnCreate(self)
         self.docked = true

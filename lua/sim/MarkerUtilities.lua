@@ -1,3 +1,7 @@
+--**************************************************************************************************
+--** Shared under the MIT license
+--**************************************************************************************************
+
 -----------------------------------------------------------------
 -- File     : /lua/sim/MarkerUtilities.lua
 -- Summary  : Aim of this file is to work with markers without
@@ -20,19 +24,53 @@
 local StringSplit = import("/lua/system/utils.lua").StringSplit
 local TableDeepCopy = table.deepcopy
 
+---@alias MarkerType 'Mass' | 'Hydrocarbon' | 'Spawn' | 'Air Path Node' | 'Land Path Node' | 'Water Path Node' | 'Ampibious Path Node' | 'Transport Marker' | 'Naval Area' | 'Naval Link' | 'Rally Point' | 'Large Expansion Area' | 'Expansion Area' | 'Protected Experimental Construction'
+
 ---@class MarkerData
 ---@field size number
 ---@field resource boolean
 ---@field type string
 ---@field orientation Vector
 ---@field position Vector
----@field color Color | nil 
----@field adjacentTo string         # used by old pathing markers to identify the neighbors
----@field NavLayer NavLayers        # Navigational layer that this marker is on, only defined for resources
----@field NavLabel number | nil     # Navigational label of the graph this marker is on, only defined for resources and when AIs are in-game
+---@field Name string              # Unique name for marker
+---@field color? Color
+---@field adjacentTo? string
+---@field NavLayer? NavLayers       # Navigational layer that this marker is on, only defined for resources
+---@field NavLabel? number | nil    # Navigational label of the graph this marker is on, only defined for resources and when AIs are in-game
 
---- Contains all the markers that are part of the map, including markers of chains
-local AllMarkers = Scenario.MasterChain._MASTERCHAIN_.Markers
+---@class MarkerResource : MarkerData
+---@field NavLayer NavLayers 
+---@field NavLabel number
+-- ---@field Island MarkerIsland
+
+---@class MarkerExpansion : MarkerData
+---@field NavLabel number
+-- ---@field Island MarkerIsland
+---@field Extractors MarkerResource[]
+-- ---@field Hydrocarbons MarkerResource[]
+
+-- ---@class MarkerIsland
+-- ---@field NavLabel number
+-- ---@field Expansions MarkerExpansion[]
+-- ---@field Extractors MarkerResource[]
+-- ---@field Hydrocarbons MarkerResource[]
+
+-- easier access to all markers and all chains
+---@type table<string, MarkerData>
+local AllMarkers
+
+---@type table<string, MarkerChain>
+local AllChains
+
+--- Represents a cache of markers to prevent re-populating tables
+local MarkerCache = {
+    Mass = { Count = 0, Markers = {} },
+    Hydrocarbon = { Count = 0, Markers = {} },
+    Spawn = { Count = 0, Markers = {} },
+}
+
+--- Represents a cache of chains to prevent re-populating tables
+local ChainCache = {}
 
 ---@return MarkerData[]
 function GetAllMarkers()
@@ -46,24 +84,6 @@ function GetMarker(name)
     return AllMarkers[name]
 end
 
---- Represents a cache of markers to prevent re-populating tables
-local MarkerCache = {}
-
--- Pre-enable the caching of resource markers, to support adaptive maps
-MarkerCache["Mass"] = { Count = 0, Markers = {} }
-MarkerCache["Hydrocarbon"] = { Count = 0, Markers = {} }
-
---- Retrieves all markers of a given type. This is a shallow copy,
--- which means the reference is copied but the values are not. If you
--- need a copy with unique values use GetMarkerByTypeDeep instead.
--- Common marker types are:
--- - "Mass", "Hydrocarbon"
--- - "Air Path Node", "Land Path Node", "Water Path Node", "Amphibious Path Node"
--- - "Transport Marker", "Naval Area", "Naval Link", "Rally Point", "Expansion Area"
--- - "Protected Experimental Construction"
--- The list is not limited to these marker types - any marker that has a 'type' property
--- can be cached. You can find them in the <map>_save.lua file.
----@param type string The type of marker to retrieve.
 ---@return MarkerData[]
 ---@return number
 function GetMarkersByType(type)
@@ -81,6 +101,7 @@ function GetMarkersByType(type)
     -- find all the relevant markers
     for k, marker in AllMarkers do
         if marker.type == type then
+            marker.Name = k
             ms[n] = marker
             n = n + 1
         end
@@ -100,47 +121,49 @@ function GetMarkersByType(type)
     return cache.Markers, cache.Count
 end
 
---- Retrieves all markers of a given type. This is a deep copy
--- and involves a lot of additional allocations. Do not use this
--- unless you strictly need to.
----@param type string
----@return MarkerData[]
----@return number
-function GetMarkersByTypeDeep(type)
-    local markers, number = GetMarkersByType(type)
-    return TableDeepCopy(markers), number
+---@param type MarkerType
+---@param markers any
+function OverwriteMarkerByType(type, markers)
+    local ms = {}
+    local n = 1
+
+    for k, marker in markers do
+        marker.Name = k
+        ms[n] = marker
+        n = n + 1
+    end
+
+    MarkerCache[type] = {
+        Count = n - 1,
+        Markers = ms
+    }
 end
 
 --- Flushes the cache of a certain type. Does not remove
 -- existing references.
----@param type string The type to flush.
+---@param type MarkerType The type to flush.
 function FlushMarkerCacheByType(type)
 
     -- give developer a warning, you can't do this
-    if type == "Mass" or type == "Hydrocarbon" then
+    if type == "Mass" or type == "Hydrocarbon" or type == "Spawn" then
         WARN("Unable to flush resource markers from the cache - it can cause issues for adaptive maps.")
         return
     end
 
-    MarkerCache[type] = false
+    MarkerCache[type] = nil
 end
 
 --- Flushes the entire marker cache. Does not remove existing references.
 function FlushMarkerCache()
 
-    -- copy over mass / hydro for consistency with adaptive maps
+    -- copy over for consistency
     local cache = {}
     cache.Mass = MarkerCache.Mass
     cache.Hydrocarbon = MarkerCache.Hydrocarbon
+    cache.Spawn = MarkerCache.Spawn
 
     MarkerCache = cache
 end
-
---- Contains all the chains that are part of the map
-local AllChains = Scenario.Chains
-
---- Represents a cache of chains to prevent re-populating tables
-local ChainCache = {}
 
 --- Retrieves a chain of markers. Throws an error if the chain
 -- does not exist. This is a shallow copy, which means the
@@ -236,6 +259,22 @@ local DebugMarkerSuspend = {}
 ---@param type MarkerChain The type of markers you wish to debug.
 function ToggleDebugMarkersByType(type)
 
+    local count = 0
+    for k, brain in ArmyBrains do
+        if brain.BrainType == "Human" then
+            count = count + 1
+        end
+    end
+
+    local onePlayer = count <= 1
+    local cheatsEnabled = CheatsEnabled()
+
+    -- prevent it from working
+    if not (cheatsEnabled or onePlayer) then
+        WARN("Unable to debug AI grid: cheats are disabled or there is more than one player")
+        return
+    end
+
     SPEW("Toggled type to debug: " .. type)
 
     -- get the thread if it exists
@@ -256,9 +295,8 @@ function ToggleDebugMarkersByType(type)
                     end
 
                     -- draw out all markers
-                    local markers, count = GetMarkersByType(type)
-                    for k = 1, count do
-                        local marker = markers[k]
+                    local markers = GetMarkersByType(type)
+                    for k, marker in markers do
                         DrawCircle(marker.position, marker.size or 1, marker.color or 'ffffffff')
 
                         if marker.NavLabel then
@@ -272,6 +310,12 @@ function ToggleDebugMarkersByType(type)
                                 if neighbour then
                                     DrawLine(marker.position, neighbour.position, marker.color or 'ffffffff')
                                 end
+                            end
+                        end
+
+                        if marker.Extractors then
+                            for _, neighbour in marker.Extractors do
+                                DrawLine(marker.position, neighbour.position, neighbour.color or 'ffffffff')
                             end
                         end
                     end
@@ -325,6 +369,22 @@ local DebugChainSuspend = {}
 -- to check for errors. Can be toggled on and off by calling it again.
 ---@param name MarkerChain The name of the chain you wish to debug.
 function ToggleDebugChainByName(name)
+
+    local count = 0
+    for k, brain in ArmyBrains do
+        if brain.BrainType == "Human" then
+            count = count + 1
+        end
+    end
+
+    local onePlayer = count <= 1
+    local cheatsEnabled = CheatsEnabled()
+
+    -- prevent it from working
+    if not (cheatsEnabled or onePlayer) then
+        WARN("Unable to debug AI grid: cheats are disabled or there is more than one player")
+        return
+    end
 
     SPEW("Toggled chain to debug: " .. name)
 
@@ -382,9 +442,22 @@ function ToggleDebugChainByName(name)
     DebugChainThreads[name] = thread
 end
 
-do
+function Setup()
+    AllMarkers = Scenario.MasterChain._MASTERCHAIN_.Markers
+    AllChains = Scenario.Chains
 
-    -- hook to cache markers created on the fly by crazy rush type of games
+    -- prepare spawn markers
+    local armies = table.hash(ListArmies())
+    for k, marker in AllMarkers do
+        if armies[k] then
+            marker.Name = k
+            marker.size = 50
+            MarkerCache["Spawn"].Count = MarkerCache["Spawn"].Count + 1
+            MarkerCache["Spawn"].Markers[MarkerCache["Spawn"].Count] = marker
+        end
+    end
+    
+    -- hook to catch created resources
     local OldCreateResourceDeposit = _G.CreateResourceDeposit
     _G.CreateResourceDeposit = function(type, x, y, z, size)
 
@@ -438,6 +511,11 @@ do
 
         -- make sure cache exists
         local markers, count = GetMarkersByType(type)
+
+        -- add name
+        marker.Name = string.format("%s %d", type, count + 1)
+
+        -- add to cache
         MarkerCache[type].Count = count + 1
         MarkerCache[type].Markers[count + 1] = marker
     end

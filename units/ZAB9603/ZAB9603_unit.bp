@@ -74,7 +74,7 @@ UnitBlueprint {
                 Effects = {
                     {
                         Bones = {
-                            'UAB0303',
+                            'ZAB9603',
                         },
                         Scale = 3,
                         Type = 'SeaIdle01',
@@ -86,14 +86,18 @@ UnitBlueprint {
             IconFadeInZoom = 130,
             LODs = {
                 {
+                    AlbedoName = '/units/uab0103/UAB0103_Albedo.dds',
+                    NormalsName = '/units/uab0103/UAB0103_NormalsTS.dds',
+                    SpecularName = '/units/uab0103/UAB0103_SpecTeam.dds',
                     LODCutoff = 200,
                     ShaderName = 'Aeon',
                 },
                 {
-                    AlbedoName = 'zab9603_lod1_albedo.dds',
+                    AlbedoName = '/units/uab0103/UAB0103_lod1_Albedo.dds',
+                    NormalsName = '/units/uab0103/UAB0103_lod1_NormalsTS.dds',
+                    SpecularName = '/units/uab0103/UAB0103_lod1_SpecTeam.dds',
                     LODCutoff = 600,
                     ShaderName = 'Aeon',
-                    SpecularName = 'zab9603_lod1_specteam.dds',
                 },
             },
         },

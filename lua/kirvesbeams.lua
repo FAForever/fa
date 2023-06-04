@@ -6,14 +6,14 @@ local Util = import("/lua/utilities.lua")
 
 ---@class EmptyCollisionBeam : CollisionBeam
 EmptyCollisionBeam = Class(CollisionBeam) {
-    FxImpactUnit = {},
-    FxImpactLand = {},--EffectTemplate.DefaultProjectileLandImpact,
+    FxImpactUnit = import("/lua/effecttemplates.lua").NoEffects,
+    FxImpactLand = import("/lua/effecttemplates.lua").NoEffects,--EffectTemplate.DefaultProjectileLandImpact,
     FxImpactWater = EffectTemplate.DefaultProjectileWaterImpact,
     FxImpactUnderWater = EffectTemplate.DefaultProjectileUnderWaterImpact,
-    FxImpactAirUnit = {},
-    FxImpactProp = {},
-    FxImpactShield = {},
-    FxImpactNone = {},
+    FxImpactAirUnit = import("/lua/effecttemplates.lua").NoEffects,
+    FxImpactProp = import("/lua/effecttemplates.lua").NoEffects,
+    FxImpactShield = import("/lua/effecttemplates.lua").NoEffects,
+    FxImpactNone = import("/lua/effecttemplates.lua").NoEffects,
 }
 
 ---@class TargetingCollisionBeam : EmptyCollisionBeam

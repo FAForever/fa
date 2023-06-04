@@ -11,7 +11,7 @@
 local ARadarJammerUnit = import("/lua/aeonunits.lua").ARadarJammerUnit
 
 ---@class UAB4203 : ARadarJammerUnit
-UAB4203 = Class(ARadarJammerUnit) {
+UAB4203 = ClassUnit(ARadarJammerUnit) {
     IntelEffects = {
 		{
 			Bones = {

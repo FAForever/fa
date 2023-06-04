@@ -14,9 +14,9 @@ local WeaponFile = import("/lua/sim/defaultweapons.lua")
 local DefaultProjectileWeapon = WeaponFile.DefaultProjectileWeapon
 
 ---@class UXL0021 : TLandUnit
-UXL0021 = Class(TLandUnit) {
+UXL0021 = ClassUnit(TLandUnit) {
     Weapons = {
-        MainGun = Class(DefaultProjectileWeapon) {
+        MainGun = ClassWeapon(DefaultProjectileWeapon) {
             TurretBone = 'Turret',
             BarrelBone = 'Turret_Barrel',
             MuzzleBone = 'Turret_Muzzle',
@@ -27,7 +27,6 @@ UXL0021 = Class(TLandUnit) {
     KickupBones = {},
     DestructionPartsLowToss = {'Turret', 'Turret_Barrel', 'Turret_Muzzle'},
     DestructionPartsChassisToss = {'UEL0103',},
-    DestructionTicks = 75,
 }
 
 TypeClass = UXL0021

@@ -324,7 +324,6 @@ UnitBlueprint {
         },
         MaxBuildDistance = 10,
         NaturalProducer = true,
-        NeedToFaceTargetToBuild = false,
         ProductionPerSecondEnergy = 20,
         ProductionPerSecondMass = 1,
         StorageEnergy = 3900,

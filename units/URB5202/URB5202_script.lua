@@ -11,7 +11,7 @@
 local CAirStagingPlatformUnit = import("/lua/cybranunits.lua").CAirStagingPlatformUnit
 
 ---@class URB5202 : CAirStagingPlatformUnit
-URB5202 = Class(CAirStagingPlatformUnit) {
+URB5202 = ClassUnit(CAirStagingPlatformUnit) {
 }
 
 TypeClass = URB5202
