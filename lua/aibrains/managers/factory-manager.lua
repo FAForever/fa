@@ -21,6 +21,8 @@ local MapFactionCategory = {
     NOMADS = 'Nomads'
 }
 
+---@class AIFactoryManagerDebugInfo
+
 ---@class AIFactoryTemplate : PlatoonTemplateFactionalSpec[]
 ---@field [1] string    # Name of platoon template
 ---@field [2] string    # Always ''
@@ -340,6 +342,23 @@ AIFactoryManager = Class(BuilderManager) {
 
     --------------------------------------------------------------------------------------------
     -- factory conditions interface
+
+    ---------------------------------------------------------------------------
+    --#region Debug functionality
+
+    ---@param self AIFactoryManager
+    ---@return AIFactoryManagerDebugInfo
+    GetDebugInfo = function(self)
+        local info = self.DebugInfo
+        if not info then
+            info = { }
+            self.DebugInfo = info
+        end
+
+        return info
+    end,
+
+    --#endregion
 
 
 }

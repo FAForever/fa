@@ -12,14 +12,21 @@ local Debug = true
 --- name of expansion marker of the base
 --- | string
 
+---@class AIBaseDebugInfo
+---@field Position Vector
+---@field Layer NavLayers
+---@field Managers { EngineerManagerDebugInfo: AIEngineerManagerDebugInfo, StructureManagerDebugInfo: AIStructureManagerDebugInfo, FactoryManagerDebugInfo: AIFactoryManagerDebugInfo }
+
 ---@class AIBase
 ---@field Brain AIBrain
 ---@field BuilderHandles table
+---@field DebugInfo AIBaseDebugInfo
 ---@field FactoryManager AIFactoryManager
 ---@field EngineerManager AIEngineerManager
 ---@field StructureManager AIStructureManager
 ---@field Position Vector
 ---@field Radius number
+---@field Layer NavLayers
 AIBase = ClassSimple {
 
     ---@param self AIBase
@@ -168,6 +175,31 @@ AIBase = ClassSimple {
         self.EngineerManager:OnUnitStopBuilding(unit, built)
         self.StructureManager:OnUnitStopBuilding(unit, built)
     end,
+
+    ---------------------------------------------------------------------------
+    --#region Debug functionality
+
+    ---@param self AIBase
+    ---@return AIBaseDebugInfo
+    GetDebugInfo = function(self)
+        local info = self.DebugInfo
+        if not info then
+            info = { }
+            self.DebugInfo = info
+
+            info.Managers = info.Managers or { }
+            info.Position = self.Position
+            info.Layer = self.Layer
+        end
+
+        info.Managers.EngineerManagerDebugInfo = self.EngineerManager:GetDebugInfo()
+        info.Managers.FactoryManagerDebugInfo = self.FactoryManager:GetDebugInfo()
+        info.Managers.StructureManagerDebugInfo = self.StructureManager:GetDebugInfo()
+
+        return info
+    end,
+
+    --#endregion
 }
 
 ---@param brain AIBrain
