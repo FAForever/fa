@@ -132,7 +132,7 @@ UnitBlueprint {
     Economy = {
         BuildCostEnergy = 9000,
         BuildCostMass = 1080,
-        BuildTime = 1467,
+        BuildTime = 2201,
         RebuildBonusIds = {
             'xsb2205',
         },
@@ -229,7 +229,7 @@ UnitBlueprint {
             },
             BallisticArc = 'RULEUBA_None',
             CollideFriendly = false,
-            Damage = 201,
+            Damage = 242,
             DamageType = 'Normal',
             DisplayName = 'Heavy Cavitation Torpedo Cluster',
             FireTargetLayerCapsTable = {
