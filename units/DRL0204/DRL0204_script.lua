@@ -9,9 +9,9 @@
 --****************************************************************************
 
 ---@class DRL0204 : CWalkingLandUnit
-DRL0204 = Class(import('/lua/cybranunits.lua').CWalkingLandUnit) {
+DRL0204 = ClassUnit(import("/lua/cybranunits.lua").CWalkingLandUnit) {
     Weapons = {
-        RocketBackpack = Class(import('/lua/cybranweapons.lua').CDFRocketIridiumWeapon02) {},
+        RocketBackpack = ClassWeapon(import("/lua/cybranweapons.lua").CDFRocketIridiumWeapon02) {},
     },
 }
 TypeClass = DRL0204

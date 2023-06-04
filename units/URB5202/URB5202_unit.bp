@@ -100,7 +100,7 @@ UnitBlueprint {
     Economy = {
         BuildCostEnergy = 2100,
         BuildCostMass = 175,
-        BuildTime = 450,
+        BuildTime = 350,
         RebuildBonusIds = {
             'urb5202',
         },
@@ -131,7 +131,7 @@ UnitBlueprint {
             },
         },
         SelectionPriority = 5,
-        TechLevel = 'RULEUTL_Advanced',
+        TechLevel = 'RULEUTL_Basic',
         UnitWeight = 1,
     },
     Interface = {

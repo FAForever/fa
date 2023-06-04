@@ -7,10 +7,10 @@
 --** 
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
-local TCivilianStructureUnit = import('/lua/terranunits.lua').TCivilianStructureUnit
+local TCivilianStructureUnit = import("/lua/terranunits.lua").TCivilianStructureUnit
 
 ---@class UEC1501 : TCivilianStructureUnit
-UEC1501 = Class(TCivilianStructureUnit) {
+UEC1501 = ClassUnit(TCivilianStructureUnit) {
 	
 	EffectBones01 = {
 		'Smoke_Left01', 'Smoke_Left02', 'Smoke_Left03', 'Smoke_Left04',	'Smoke_Left_05',					

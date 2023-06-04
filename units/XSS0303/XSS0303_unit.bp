@@ -195,8 +195,8 @@ UnitBlueprint {
     Intel = {
         RadarRadius = 200,
         SonarRadius = 40,
-        VisionRadius = 85,
-        WaterVisionRadius = 36,
+        VisionRadius = 100,
+        WaterVisionRadius = 100,
     },
     Interface = {
         HelpText = '<LOC xss0303_help>Aircraft Carrier',

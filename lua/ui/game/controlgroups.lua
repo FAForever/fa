@@ -4,18 +4,18 @@
 --* Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
-local UIUtil = import('/lua/ui/uiutil.lua')
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local GameMain = import('/lua/ui/game/gamemain.lua')
-local Group = import('/lua/maui/group.lua').Group
-local Button = import('/lua/maui/button.lua').Button
-local Checkbox = import('/lua/maui/checkbox.lua').Checkbox
-local Movie = import('/lua/maui/movie.lua').Movie
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local GameCommon = import('/lua/ui/game/gamecommon.lua')
-local Announcement = import('/lua/ui/game/announcement.lua').CreateAnnouncement
-local Selection = import('/lua/ui/game/selection.lua')
-local Tooltip = import('/lua/ui/game/tooltip.lua')
+local UIUtil = import("/lua/ui/uiutil.lua")
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local GameMain = import("/lua/ui/game/gamemain.lua")
+local Group = import("/lua/maui/group.lua").Group
+local Button = import("/lua/maui/button.lua").Button
+local Checkbox = import("/lua/maui/checkbox.lua").Checkbox
+local Movie = import("/lua/maui/movie.lua").Movie
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+local GameCommon = import("/lua/ui/game/gamecommon.lua")
+local Announcement = import("/lua/ui/game/announcement.lua").CreateAnnouncement
+local Selection = import("/lua/ui/game/selection.lua")
+local Tooltip = import("/lua/ui/game/tooltip.lua")
 
 controls = {
     groups = {},
@@ -60,7 +60,7 @@ function CreateUI(mapGroup)
     controls.container:Hide()
     SetLayout()
     for i, v in validGroups do
-        import('/lua/ui/game/selection.lua').ApplySelectionSet(i)
+        import("/lua/ui/game/selection.lua").ApplySelectionSet(i)
     end
 end
 
@@ -168,7 +168,7 @@ end
 
 function ToggleControlGroups(state)
     -- disable when in Screen Capture mode
-    if import('/lua/ui/game/gamemain.lua').gameUIHidden then
+    if import("/lua/ui/game/gamemain.lua").gameUIHidden then
         return
     end
 

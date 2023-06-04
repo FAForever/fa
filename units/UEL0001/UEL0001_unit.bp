@@ -1,5 +1,6 @@
 UnitBlueprint {
     AI = {
+        InitialAutoMode = true,
         GuardRadius = 10,
         GuardScanRadius = 31.5, -- Hardcoded to keep a sensible 'attack while assisting'/stop far away ratio
         TargetBones = {
@@ -343,7 +344,6 @@ UnitBlueprint {
         },
         MaxBuildDistance = 10,
         NaturalProducer = true,
-        NeedToFaceTargetToBuild = false,
         ProductionPerSecondEnergy = 20,
         ProductionPerSecondMass = 1,
         StorageEnergy = 3900,

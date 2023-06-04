@@ -16,10 +16,10 @@
 ---@field icon string unit id
 
 
-local Prefs = import('/lua/user/prefs.lua')
+local Prefs = import("/lua/user/prefs.lua")
 ---@type BuildTemplate[]
 local templates = Prefs.GetFromCurrentProfile('build_templates_factory') or {}
-local UIUtil = import('/lua/ui/uiutil.lua')
+local UIUtil = import("/lua/ui/uiutil.lua")
 
 -- Utils
 function GetInitialName()
@@ -53,7 +53,7 @@ function CreateBuildTemplate(buildQueue)
         PlaySound(Sound({Bank = 'Interface', Cue = 'UI_Tab_Click_02'}))
         table.insert(templates, {templateData = buildQueue, name = GetInitialName(), icon = GetInitialIcon(buildQueue)})
         Prefs.SetToCurrentProfile('build_templates_factory', templates)
-        import('/lua/ui/game/construction.lua').RefreshUI()
+        import("/lua/ui/game/construction.lua").RefreshUI()
     else
         PlaySound(Sound({Cue = 'UI_Menu_Error_01', Bank = 'Interface',}))
     end

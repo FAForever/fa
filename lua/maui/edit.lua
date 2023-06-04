@@ -30,12 +30,12 @@
 -- SetDropShadow(bool)
 -- AcquireFocus()
 
-local Control = import('/lua/maui/control.lua').Control
-local AddUnicodeCharToEditText = import('/lua/UTF.lua').AddUnicodeCharToEditText
-local ScaleNumber = import('/lua/maui/layouthelpers.lua').ScaleNumber
+local Control = import("/lua/maui/control.lua").Control
+local AddUnicodeCharToEditText = import("/lua/utf.lua").AddUnicodeCharToEditText
+local ScaleNumber = import("/lua/maui/layouthelpers.lua").ScaleNumber
 
 ---@class Edit : moho.edit_methods, Control, InternalObject
-Edit = Class(moho.edit_methods, Control) {
+Edit = ClassUI(moho.edit_methods, Control) {
 
     __init = function(self, parent, debugname)
         InternalCreateEdit(self, parent)
@@ -43,7 +43,7 @@ Edit = Class(moho.edit_methods, Control) {
             self:SetName(debugname)
         end
 
-        local LazyVar = import('/lua/lazyvar.lua')
+        local LazyVar = import("/lua/lazyvar.lua")
         self._lockFontChanges = false
         self._font = {_family = LazyVar.Create(), _pointsize = LazyVar.Create()}
         self._font._family.OnDirty = function(var)

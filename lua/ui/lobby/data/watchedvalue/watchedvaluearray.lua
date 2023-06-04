@@ -1,4 +1,4 @@
-local WatchedValueTable = import('/lua/ui/lobby/data/watchedvalue/watchedvaluetable.lua').WatchedValueTable
+local WatchedValueTable = import("/lua/ui/lobby/data/watchedvalue/watchedvaluetable.lua").WatchedValueTable
 
 --- A WatchedValueTable with integral keys. Note that `false` is indistinguishable from `nil` in this
 -- structure, because Lua.

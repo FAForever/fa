@@ -1,6 +1,6 @@
 
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local Dragger = import('/lua/maui/dragger.lua').Dragger
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+local Dragger = import("/lua/maui/dragger.lua").Dragger
 
 ---@alias MauiCheckboxState "normal" | "over" | "disabled"
 
@@ -22,7 +22,7 @@ local Dragger = import('/lua/maui/dragger.lua').Dragger
 ---
 ---@field mRolloverCue? string
 ---@field mClickCue? string
-Checkbox = Class(Bitmap) {
+Checkbox = ClassUI(Bitmap) {
     ---@param self MauiCheckbox
     ---@param parent Control
     ---@param normalUnchecked FileName

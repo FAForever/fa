@@ -6,18 +6,18 @@
 --* Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
-local UIUtil = import('/lua/ui/uiutil.lua')
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local EffectHelpers = import('/lua/maui/effecthelpers.lua')
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local Button = import('/lua/maui/button.lua').Button
-local Group = import('/lua/maui/group.lua').Group
-local Prefs = import('/lua/user/prefs.lua')
-local Tooltip = import('/lua/ui/game/tooltip.lua')
-local MapUtil = import('/lua/ui/maputil.lua')
-local Movie = import('/lua/maui/movie.lua').Movie
-local Mods = import('/lua/mods.lua')
-local GetVersion = import('/lua/version.lua').GetVersion
+local UIUtil = import("/lua/ui/uiutil.lua")
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local EffectHelpers = import("/lua/maui/effecthelpers.lua")
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+local Button = import("/lua/maui/button.lua").Button
+local Group = import("/lua/maui/group.lua").Group
+local Prefs = import("/lua/user/prefs.lua")
+local Tooltip = import("/lua/ui/game/tooltip.lua")
+local MapUtil = import("/lua/ui/maputil.lua")
+local Movie = import("/lua/maui/movie.lua").Movie
+local Mods = import("/lua/mods.lua")
+local GetVersion = import("/lua/version.lua").GetVersion
 
 local mapErrorDialog = false
 
@@ -48,12 +48,12 @@ end
 function CreateUI()
 
     UIUtil.SetCurrentSkin('uef')
-    import('/lua/ui/game/gamemain.lua').supressExitDialog = false
+    import("/lua/ui/game/gamemain.lua").supressExitDialog = false
     local mainMenu = {}
 
     -- this should be shown if there are no profiles
     if not GetPreference("profile.current") then
-        profileDlg = import('/lua/ui/dialogs/profile.lua').CreateDialog(function()
+        profileDlg = import("/lua/ui/dialogs/profile.lua").CreateDialog(function()
             CreateUI()
         end)
         return
@@ -192,7 +192,7 @@ function CreateUI()
     LayoutHelpers.AtBottomIn(scrollingBG, border)
 
     -- legal text
-    local legalText = UIUtil.CreateText(botBorderLeft, LOC(import('/lua/ui/help/eula.lua').LEGAL_TEXT), 9, UIUtil.bodyFont)
+    local legalText = UIUtil.CreateText(botBorderLeft, LOC(import("/lua/ui/help/eula.lua").LEGAL_TEXT), 9, UIUtil.bodyFont)
     legalText:SetColor('ffa5a5a5')
     legalText.Depth:Set(function() return botBorderLeft.Depth() - 1 end)
     scrollingBG.Depth:Set(function() return legalText.Depth() - 1 end)
@@ -333,7 +333,7 @@ function CreateUI()
         LayoutHelpers.AtBottomIn(headTestBtn, border, 50)
         headTestBtn.OnClick = function()
             parent:Destroy()
-            import('/lua/ui/campaign/_head_test.lua').CreateUI()
+            import("/lua/ui/campaign/_head_test.lua").CreateUI()
         end
     end
 
@@ -492,7 +492,7 @@ function CreateUI()
         mainMenu.profile.OnClick = function(self)
             MenuHide(function()
                 if not profileDlg then
-                    profileDlg = import('/lua/ui/dialogs/profile.lua').CreateDialog(function()
+                    profileDlg = import("/lua/ui/dialogs/profile.lua").CreateDialog(function()
                         SetNameToCurrentProfile()
                         profileDlg = nil
                         MenuShow()
@@ -744,7 +744,7 @@ function CreateUI()
     end
 
     function SetEscapeHandle(action)
-        import('/lua/ui/uimain.lua').SetEscapeHandler(function() action() end)
+        import("/lua/ui/uimain.lua").SetEscapeHandler(function() action() end)
     end
 
     function MenuHide(callback)
@@ -806,8 +806,8 @@ function CreateUI()
                         StopMusic()
                         parent:Destroy()
                         LaunchSinglePlayerSession(
-                            import('/lua/SinglePlayerLaunch.lua').SetupCampaignSession(
-                                import('/lua/ui/maputil.lua').LoadScenario('/maps/X1CA_TUT/X1CA_TUT_scenario.lua'),
+                            import("/lua/singleplayerlaunch.lua").SetupCampaignSession(
+                                import("/lua/ui/maputil.lua").LoadScenario('/maps/X1CA_TUT/X1CA_TUT_scenario.lua'),
                                 2, nil, nil, true
                             )
                         )
@@ -823,7 +823,7 @@ function CreateUI()
             MenuAnimation(false, function()
                 StopMusic()
                 parent:Destroy()
-                import('/lua/ui/campaign/selectcampaign.lua').CreateUI()
+                import("/lua/ui/campaign/selectcampaign.lua").CreateUI()
             end)
         end)
     end
@@ -836,7 +836,7 @@ function CreateUI()
 
     function ButtonLAN()
         MenuHide(function()
-            import('/lua/ui/lobby/gameselect.lua').CreateUI(topLevelGroup, function() MenuShow() SetEscapeHandle(ButtonExit) end)
+            import("/lua/ui/lobby/gameselect.lua").CreateUI(topLevelGroup, function() MenuShow() SetEscapeHandle(ButtonExit) end)
         end)
     end
 
@@ -845,10 +845,12 @@ function CreateUI()
             MenuHide(function()
                 local function StartLobby(scenarioFileName)
                     local playerName = Prefs.GetCurrentProfile().Name or "Unknown"
-                    local lobby = import('/lua/ui/lobby/lobby.lua')
+                    local lobby = import("/lua/ui/lobby/lobby.lua")
                     lobby.CreateLobby('None', 0, playerName, nil, nil, topLevelGroup, function() MenuShow() SetEscapeHandle(ButtonExit) end)
                     lobby.HostGame(playerName .. "'s Skirmish", scenarioFileName, true)
                 end
+                StopAmbient()
+                StopMusic()
                 local lastScenario = Prefs.GetFromCurrentProfile('LastScenario') or UIUtil.defaultScenario
                 StartLobby(lastScenario)
             end)
@@ -857,7 +859,7 @@ function CreateUI()
 
     function ButtonReplay()
         MenuHide(function()
-            import('/lua/ui/dialogs/replay.lua').CreateDialog(topLevelGroup, true, function() MenuShow() SetEscapeHandle(ButtonBack) end)
+            import("/lua/ui/dialogs/replay.lua").CreateDialog(topLevelGroup, true, function() MenuShow() SetEscapeHandle(ButtonBack) end)
         end)
     end
 
@@ -868,13 +870,13 @@ function CreateUI()
                 MenuShow()
                 SetEscapeHandle(ButtonBack)
             end
-            import('/lua/ui/dialogs/modmanager.lua').CreateDialog(topLevelGroup, false, OnOk)
+            import("/lua/ui/dialogs/modmanager.lua").CreateDialog(topLevelGroup, false, OnOk)
         end)
     end
 
     function ButtonOptions()
         MenuHide(function()
-            import('/lua/ui/dialogs/options.lua').CreateDialog(topLevelGroup, function() MenuShow() SetEscapeHandle(ButtonExit) end)
+            import("/lua/ui/dialogs/options.lua").CreateDialog(topLevelGroup, function() MenuShow() SetEscapeHandle(ButtonExit) end)
         end)
     end
 
@@ -886,12 +888,12 @@ function CreateUI()
 
     function ButtonCredits()
         parent:Destroy()
-        import('/lua/ui/menus/credits.lua').CreateDialog(function() import('/lua/ui/menus/main.lua').CreateUI() end)
+        import("/lua/ui/menus/credits.lua").CreateDialog(function() import("/lua/ui/menus/main.lua").CreateUI() end)
     end
 
     function ButtonEULA()
         MenuHide(function()
-            import('/lua/ui/menus/eula.lua').CreateEULA(topLevelGroup, function() MenuShow() SetEscapeHandle(ButtonBack) end)
+            import("/lua/ui/menus/eula.lua").CreateEULA(topLevelGroup, function() MenuShow() SetEscapeHandle(ButtonBack) end)
         end)
     end
 

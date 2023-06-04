@@ -6,11 +6,11 @@
 --* Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
-local UIUtil = import('/lua/ui/uiutil.lua')
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local Group = import('/lua/maui/group.lua').Group
-local Popup = import('/lua/ui/controls/popups/popup.lua').Popup
-local TextArea = import('/lua/ui/controls/textarea.lua').TextArea
+local UIUtil = import("/lua/ui/uiutil.lua")
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local Group = import("/lua/maui/group.lua").Group
+local Popup = import("/lua/ui/controls/popups/popup.lua").Popup
+local TextArea = import("/lua/ui/controls/textarea.lua").TextArea
 
 local dialog = false
 local doesntCare = false

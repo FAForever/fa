@@ -8,10 +8,10 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local TMassCollectionUnit = import('/lua/terranunits.lua').TMassCollectionUnit
+local TMassCollectionUnit = import("/lua/terranunits.lua").TMassCollectionUnit
 
 ---@class UEB1103 : TMassCollectionUnit
-UEB1103 = Class(TMassCollectionUnit) {
+UEB1103 = ClassUnit(TMassCollectionUnit) {
 
     OnStartBuild = function(self, unitBeingBuilt, order)
         TMassCollectionUnit.OnStartBuild(self, unitBeingBuilt, order)

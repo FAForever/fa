@@ -7,10 +7,10 @@
 --**
 --**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
-local EffectTemplate = import('/lua/EffectTemplates.lua')
-local RandomInt = import('/lua/utilities.lua').GetRandomInt
+local EffectTemplate = import("/lua/effecttemplates.lua")
+local RandomInt = import("/lua/utilities.lua").GetRandomInt
 
-SBOOhwalliBombEffect04 = Class(import('/lua/sim/defaultprojectiles.lua').EmitterProjectile) {
+SBOOhwalliBombEffect04 = Class(import("/lua/sim/defaultprojectiles.lua").EmitterProjectile) {
 	FxTrails = EffectTemplate.SOhwalliBombHitRingProjectileFxTrails04,
 }
 TypeClass = SBOOhwalliBombEffect04

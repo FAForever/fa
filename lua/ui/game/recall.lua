@@ -1,13 +1,19 @@
-local Dragger = import("/lua/maui/dragger.lua").Dragger
-local Group = import("/lua/maui/group.lua").Group
+--**************************************************************************************************
+--** Shared under the MIT license
+--**************************************************************************************************
+
 local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
-local Lazyvar = import("/lua/lazyvar.lua").Create
 local NinePatch = import("/lua/ui/controls/ninepatch.lua")
 local Prefs = import("/lua/user/prefs.lua")
-local Tooltip = import('/lua/ui/game/tooltip.lua')
+local Tooltip = import("/lua/ui/game/tooltip.lua")
 local UIUtil = import("/lua/ui/uiutil.lua")
 
+local Dragger = import("/lua/maui/dragger.lua").Dragger
+local Group = import("/lua/maui/group.lua").Group
+
+local Lazyvar = import("/lua/lazyvar.lua").Create
 local Layouter = LayoutHelpers.ReusedLayoutFor
+
 
 -- seconds to see recall voting results
 local reviewResultsDuration = 5
@@ -48,12 +54,18 @@ function SetLayout()
     panel.Top:Set(panel.parent.Top() - panel:TotalHeight())
 end
 
+function ToggleControl()
+    if panel and not panel.collapseArrow:IsDisabled() then
+        panel.collapseArrow:ToggleCheck()
+    end
+end
+
 function RequestHandler(data)
     if data.CannotRequest ~= nil then
-        import('/lua/ui/game/diplomacy.lua').UpdateCannotRequestRecall(data.CannotRequest)
+        import("/lua/ui/game/diplomacy.lua").SetCannotRequestRecallReason(data.CannotRequest)
     end
     if data.Open then
-        panel:StartVote(data.Blocks, data.Open, data.CanVote)
+        panel:StartVote(data.Blocks, data.Open, data.CanVote, data.StartTime)
     end
     local accept, veto = data.Accept, data.Veto
     if accept or veto then
@@ -61,11 +73,13 @@ function RequestHandler(data)
     end
     if data.Close ~= nil then
         panel:CloseVote(data.Close)
+    elseif data.Cancel then
+        panel:CancelVote()
     end
 end
 
 ---@class RecallPanel : NinePatch
-RecallPanel = Class(NinePatch.NinePatch) {
+RecallPanel = ClassUI(NinePatch.NinePatch) {
     DefaultWidth = 320,
 
     __init = function(self, parent)
@@ -91,7 +105,7 @@ RecallPanel = Class(NinePatch.NinePatch) {
     end;
 
     Layout = function(self)
-        Layouter(self.collapseArrow)
+        local collapseArrow = Layouter(self.collapseArrow)
             :Top(self.t.Top() - 7)
             :AtHorizontalCenterIn(self)
             :Over(self, 10)
@@ -134,10 +148,11 @@ RecallPanel = Class(NinePatch.NinePatch) {
             :AtHorizontalCenterIn(progressBarBG)
             :Top(progressBarBG.Top)
             :Bottom(progressBarBG.Bottom)
-            :Width(function() return (self.Width() - LayoutHelpers.ScaleNumber(16)) end)
+            :Width(function() return self.Width() - LayoutHelpers.ScaleNumber(16) end)
             :Over(progressBarBG, 10)
             :End()
 
+        Tooltip.AddCheckboxTooltip(collapseArrow, "voting_collapse")
         Tooltip.AddButtonTooltip(buttonAccept, "dip_recall_request_accept")
         Tooltip.AddButtonTooltip(buttonVeto, "dip_recall_request_veto")
     end;
@@ -211,11 +226,11 @@ RecallPanel = Class(NinePatch.NinePatch) {
                 end
             end
         end
-        -- self.collapseArrow.OnHide = function(collapse, hide)
-        --     if hide ~= collapse:IsDisabled() then
-        --         return true
-        --     end
-        -- end
+        self.collapseArrow.OnHide = function(collapse, hide)
+            if hide ~= collapse:IsDisabled() then
+                return true
+            end
+        end
 
         local function ShowForVote(button, hide)
             return not hide and not self.canVote()
@@ -227,7 +242,7 @@ RecallPanel = Class(NinePatch.NinePatch) {
                 Args = {
                     From = GetFocusArmy(),
                     Vote = true,
-                }
+                },
             })
             self:SetCanVote(false)
         end
@@ -238,7 +253,7 @@ RecallPanel = Class(NinePatch.NinePatch) {
                 Args = {
                     From = GetFocusArmy(),
                     Vote = false,
-                }
+                },
             })
             self:SetCanVote(false)
         end
@@ -257,12 +272,11 @@ RecallPanel = Class(NinePatch.NinePatch) {
         end
     end;
 
-    StartVote = function(self, blocks, duration, canVote)
-        SPEW("Recall voting!")
+    StartVote = function(self, blocks, duration, canVote, startingTime)
         self.duration = duration
-        self.startTime:Set(GetGameTimeSeconds())
+        self.startTime:Set(startingTime or GetGameTimeSeconds())
         self:SetCanVote(canVote)
-        self:LayoutBlocks(blocks) -- can depend on `canVote`
+        self:LayoutBlocks(blocks) -- can depend on `canVote`, so put after it
         self.collapseArrow:Enable()
         self.collapseArrow:Show()
         self.collapseArrow:SetCheck(false)
@@ -286,6 +300,16 @@ RecallPanel = Class(NinePatch.NinePatch) {
                 self.reviewResultsThread = nil
             end, self)
         end
+    end;
+
+    CancelVote = function(self)
+        self:SetCanVote(false)
+        self.startTime:Set(-9999) -- make sure the OnFrame animation ends
+        if self.reviewResultsThread then
+            KillThread(self.reviewResultsThread)
+            self.reviewResultsThread = nil
+        end
+        self:OnResultsReviewed()
     end;
 
     CloseVote = function(self, accepted)
@@ -377,6 +401,7 @@ RecallPanel = Class(NinePatch.NinePatch) {
             if time >= dur then
                 self.startTime:Set(-9999)
                 self.progressBar.Width:Set(0)
+                self.progressBar:Hide()
             else
                 self.progressBar.Width:Set((1 - time / dur) * nominalWidth)
             end
@@ -394,21 +419,24 @@ RecallPanel = Class(NinePatch.NinePatch) {
     end;
 
     OnVoteAccepted = function(self)
-        import('/lua/ui/game/announcement.lua').CreateAnnouncement(LOC("<LOC diplomacy_0021>The recall vote was accepted."))
+        import("/lua/ui/game/announcement.lua").CreateAnnouncement(LOC("<LOC diplomacy_0021>The recall vote was accepted."))
         self.label:SetText(LOC("<LOC diplomacy_0023>Recalling..."))
     end;
 
     OnVoteVetoed = function(self)
-        import('/lua/ui/game/announcement.lua').CreateAnnouncement(LOC("<LOC diplomacy_0022>The recall vote was vetoed."))
+        import("/lua/ui/game/announcement.lua").CreateAnnouncement(LOC("<LOC diplomacy_0022>The recall vote was vetoed."))
         self.label:SetText(LOC("<LOC diplomacy_0024>Not ready for recall"))
     end;
 
     OnHide = function(self, hide)
-        local supress = import('/lua/ui/game/gamecommon.lua').SupressShowingWhenRestoringUI(self, hide)
+        local supress = import("/lua/ui/game/gamecommon.lua").SupressShowingWhenRestoringUI(self, hide)
         local collapse = self.collapseArrow
         if collapse then
             if supress or collapse:IsDisabled() then
                 collapse:Hide()
+                if not hide then
+                    supress = true
+                end
             else
                 collapse:Show()
             end

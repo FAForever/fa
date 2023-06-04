@@ -20,6 +20,62 @@ local TableGetn = table.getn
 local TableRemove = table.remove 
 local TableSort = table.sort
 
+--- Determines the size in bytes of the given element
+---@param element any
+---@param ignore table<string, boolean>     # List of key names to ignore of all (referenced) tables
+---@return integer
+function ToBytes(element, ignore)
+
+    -- has no allocated bytes
+    if element == nil then
+        return 0
+    end
+
+    -- applies to tables and strings, to prevent counting them multiple times
+    local seen = { }
+
+    -- prepare stack to prevent recursion
+    local allocatedSize = 0
+    local stack = { element }
+    local head = 2
+
+    while head > 1 do
+
+        head = head - 1
+        local value = stack[head]
+        stack[head] = nil
+
+        local size = debug.allocatedsize(value)
+
+        -- size of usual value
+        if size == 0 then
+            allocatedSize = allocatedSize + 8
+
+        -- size of string
+        elseif type(value) ~= 'table' then
+            if not seen[value] then
+                seen[value] = true
+                allocatedSize = allocatedSize + size
+            end
+
+        -- size of table
+        else
+            if not seen[value] then
+                allocatedSize = allocatedSize + size
+                seen[value] = true
+                for k, v in value do
+                    if not ignore[k] then
+                        stack[head] = v
+                        head = head + 1
+                    end
+                end
+            end
+        end
+    end
+
+    return allocatedSize
+end
+
 --- RandomIter(table) returns a function that when called, returns a pseudo-random element of the supplied table.
 --- Each element of the table will be returned once. This is essentially for "shuffling" sets.
 function RandomIter(someSet)
@@ -180,6 +236,7 @@ end
 --- table.cat(t1, t2) performs a shallow "merge" of t1 and t2, where t1 and t2
 --- are expected to be numerically keyed (existing keys are discarded).
 --- e.g. table.cat({1, 2, 3}, {'A', 'House', 3.14})  ->  {1, 2, 3, 'A', 'House', 3.14}
+---@return table
 function table.cat(t1, t2)
     -- handling nil tables before lopping
     if not t1 then return table.copy(t2) end
@@ -541,6 +598,16 @@ function table.unique(t)
     return unique
 end
 
+
+---Returns a random entry from an array
+---@generic T
+---@param array T[]
+---@return T
+function table.random(array)
+    return array[Random(1, TableGetn(array))]
+end
+
+
 -- Lua 5.0 implementation of the Lua 5.1 function string.match
 -- Returns a regex match
 -- optional param init defines where to start searching. Can be negative to search from the end.
@@ -610,7 +677,7 @@ end
 function StringSplitCamel(str)
     local first = str:sub(1, 1)
     local split = first .. str:sub(2):gsub("[A-Z]", StringPrepend)
-    return split:gsub("^.", string.upper)
+    return (split:gsub("^.", string.upper))
 end
 
 --- Reverses order of letters for specified string

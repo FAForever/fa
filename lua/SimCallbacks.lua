@@ -12,11 +12,11 @@
 ---@field Func string
 ---@field Args table
 
-local SimUtils = import('/lua/simutils.lua')
-local SimPing = import('/lua/simping.lua')
-local SimTriggers = import('/lua/scenariotriggers.lua')
-local SUtils = import('/lua/ai/sorianutilities.lua')
-local ScenarioFramework = import('/lua/scenarioframework.lua')
+local SimUtils = import("/lua/simutils.lua")
+local SimPing = import("/lua/simping.lua")
+local SimTriggers = import("/lua/scenariotriggers.lua")
+local SUtils = import("/lua/ai/sorianutilities.lua")
+local ScenarioFramework = import("/lua/scenarioframework.lua")
 
 -- upvalue table operations for performance
 local TableInsert = table.insert
@@ -24,8 +24,6 @@ local TableEmpty = table.empty
 local TableGetn = table.getn
 local TableRemove = table.remove
 local TableMerged = table.merged
-
-local MathAbs = math.abs
 
 -- upvalue globals for performance
 local type = type
@@ -63,7 +61,7 @@ function DoCallback(name, data, units)
 end
 
 --- Common utility function to retrieve the actual units.
-local function SecureUnits(units)
+function SecureUnits(units)
     local secure = {}
     if units and type(units) ~= 'table' then
         units = {units}
@@ -211,9 +209,6 @@ Callbacks.CapStructure = function(data, units)
     -- check if we're allowed to mess with this structure
     if not OkayToMessWithArmy(structure.Army) then return end
 
-    -- we can't cap an extractor that is on the ocean floor
-    if structure.Layer == 'Seabed' then return end
-
     -- check if we have units
     local units = EntityCategoryFilterDown(CategoriesEngineer, SecureUnits(units))
     if not units[1] then return end
@@ -233,7 +228,7 @@ Callbacks.CapStructure = function(data, units)
         -- make sure we're allowed to mess with this unit, if not we exclude
         if unit.Army and OkayToMessWithArmy(unit.Army) then 
             -- compute blueprint id
-            local faction = unit.factionCategory
+            local faction = unit.Blueprint.FactionCategory
             local blueprintID = ConstructBlueprintID(faction, data.id)
 
             -- check if this unit can build it
@@ -340,7 +335,7 @@ Callbacks.CapStructure = function(data, units)
             -- determine build location using cached value
             buildLocation[1] = cx + location[1]
             buildLocation[3] = cz + location[2]
-            buildLocation[2] = GetSurfaceHeight(buildLocation[1], buildLocation[3])
+            buildLocation[2] = GetTerrainHeight(buildLocation[1], buildLocation[3])
 
             -- check all skirts manually as brain:CanBuildStructureAt(...) is unreliable when structures have been upgraded
             local freeToBuild = true
@@ -377,67 +372,113 @@ Callbacks.CapStructure = function(data, units)
     end
 end
 
-Callbacks.SpawnAndSetVeterancyUnit = function(data)
-    if not CheatsEnabled() then return end
-    for bpId in data.bpId do
-        for i = 1, data.count do
-            local unit = CreateUnitHPR(bpId, data.army, data.pos[1], data.pos[2], data.pos[3], 0, 0, 0)
-            if data.veterancy > 0 then
-                for vetLvl = 1, data.veterancy do
-                    unit:SetVeterancy(vetLvl)
-                end
-            end
+local SpawnedMeshes = {}
+
+local function SpawnUnitMesh(id, x, y, z, pitch, yaw, roll)
+    local bp = __blueprints[id]
+    local bpD = bp.Display
+    if __blueprints[bpD.MeshBlueprint] then
+        SPEW("Spawning mesh of "..id)
+        local entity = import('/lua/sim/Entity.lua').Entity()
+        if bp.CollisionOffsetY and bp.CollisionOffsetY < 0 then
+            y = y-bp.CollisionOffsetY
         end
+        entity:SetPosition(Vector(x,y,z), true)
+        entity:SetMesh(bpD.MeshBlueprint)
+        entity:SetDrawScale(bpD.UniformScale)
+        entity:SetVizToAllies'Intel'
+        entity:SetVizToNeutrals'Intel'
+        entity:SetVizToEnemies'Intel'
+        table.insert(SpawnedMeshes, entity)
+        return entity
+    else
+        SPEW("Can\' spawn mesh of "..id.." no mesh found")
     end
 end
 
-Callbacks.BoxFormationSpawn = function(data)
+local function SetWorldCameraToUnitIconAngle(location, zoom)
+    local sx = 1/6
+    local th = 1 + (location[2] - GetSurfaceHeight(location[1], location[3]))
+    -- Note: The maths for setting zoom is kinda all over the place, and is just 'good enough' for what I used it for.
+    --_ALERT(location[2], GetSurfaceHeight(location[1], location[3]), th)
+    --_ALERT(zoom, th)
+    Sync.CameraRequests = Sync.CameraRequests or { }
+    table.insert( Sync.CameraRequests, {
+        Name = 'WorldCamera',
+        Type = 'CAMERA_UNIT_SPIN',
+        Marker = {
+            orientation = VECTOR3(math.pi*(1+sx), math.pi*sx, 0),
+            position = location,
+            zoom = FLOAT(zoom*th),
+        },
+        HeadingRate = 0,
+        Callback = {
+            Func = 'OnCameraFinish',
+            Args = 'WorldCamera',
+        }
+    })
+end
+
+Callbacks.ClearSpawnedMeshes = function()
     if not CheatsEnabled() then return end
 
-    local unitbp = __blueprints[data.bpId]
-
-    local function FootprintSize(axe)
-        axe = axe == 'x' and 'SizeX' or 'SizeZ'
-        return unitbp.Footprint
-        and unitbp.Footprint[axe]
-        or unitbp[axe]
-        or 1
+    for i, v in SpawnedMeshes do
+        v:Destroy()
     end
+    SpawnedMeshes = {}
+end
 
-    local function RoundToSkirt(axe, val)
-        return unitbp.Physics.MotionType ~= 'RULEUMT_None'
-        and val
-        or math.floor(val) + (math.mod(FootprintSize(axe),2) == 1 and 0.5 or 0)
-    end
+Callbacks.CheatBoxSpawnProp = function(data)
+    if not CheatsEnabled() then return end
 
-    local posX = (data.pos[1])
-    local posZ = (data.pos[3])
-    local offsetX = 1.2 * (unitbp.Footprint.SizeX or 1)
-    local offsetZ = 1.2 * (unitbp.Footprint.SizeZ or 1)
+    local offsetX = data.bpId.SizeX or 1
+    local offsetZ = data.bpId.SizeZ or 1
 
-    if unitbp.Physics.MotionType == 'RULEUMT_None' then
-        offsetX = math.ceil(unitbp.Physics.SkirtSizeX or FootprintSize('x'))
-        offsetZ = math.ceil(unitbp.Physics.SkirtSizeZ or FootprintSize('y'))
-    end
+    local squareX = math.ceil(math.sqrt(data.count or 1))
+    local squareZ = math.ceil((data.count or 1)/squareX)
 
-    local squareX = math.ceil(math.sqrt(data.count))
-    local squareZ = math.ceil(data.count/squareX)
     local startOffsetX = (squareX-1) * 0.5 * offsetX
     local startOffsetZ = (squareZ-1) * 0.5 * offsetZ
 
-    for i = 1, data.count do
-        local x = RoundToSkirt('x', posX - startOffsetX + math.mod(i,squareX) * offsetX)
-        local z = RoundToSkirt('z', posZ - startOffsetZ + math.mod(math.floor(i/squareX), squareZ) * offsetZ)
-        local unit = CreateUnitHPR(data.bpId, data.army, x, GetTerrainHeight(x,z), z, 0, data.yaw or 0, 0)
-
-        -- dummy units do not have this function
-        if unit.SetVeterancy then 
-            unit:SetVeterancy(data.veterancy)
+    for i = 1, (data.count or 1) do
+        local x = data.pos[1] - startOffsetX + math.mod(i,squareX) * offsetX
+        local z = data.pos[3] - startOffsetZ + math.mod(math.floor(i/squareX), squareZ) * offsetZ
+        if data.rand and data.rand ~= 0 then
+            x = (x - data.rand*0.5) + data.rand*Random()
+            z = (z - data.rand*0.5) + data.rand*Random()
+            if math.mod(data.yaw or 0, 360) == 0 then
+                data.yaw = 360*Random()
+            end
         end
+        CreatePropHPR(data.bpId, x, GetTerrainHeight(x,z), z, data.yaw or 0, 0, 0)--blueprint, x, y, z, heading, pitch, roll
+    end
+end
 
-        -- only structures have this function
-        if unit.CreateTarmac and __blueprints[data.bpId].Display and __blueprints[data.bpId].Display.Tarmacs then
+Callbacks.CheatSpawnUnit = function(data)
+    if not CheatsEnabled() then return end
+
+    local pos = data.pos
+    if data.MeshOnly then
+        SpawnUnitMesh(data.bpId, pos[1], pos[2], pos[3], 0, data.yaw, 0)
+    else
+        local unit = CreateUnitHPR(data.bpId, data.army, pos[1], pos[2], pos[3], 0, data.yaw, 0)
+        local unitbp = __blueprints[data.bpId]
+        if data.CreateTarmac and unit.CreateTarmac and unitbp.Display and unitbp.Display.Tarmacs then
             unit:CreateTarmac(true,true,true,false,false)
+        end
+        if data.UnitIconCameraMode then
+            local size = math.max(
+                (unitbp.SizeX or 1),
+                (unitbp.SizeY or 1) * 3,
+                (unitbp.SizeZ or 1),
+                (unitbp.Physics.SkirtSizeX or 1),
+                (unitbp.Physics.SkirtSizeZ or 1)
+            ) + math.abs(unitbp.CollisionOffsetY or 0)
+            local dist = size / math.tan(60 --[[* (9/16)]] * 0.5 * ((math.pi*2)/360))
+            SetWorldCameraToUnitIconAngle(pos, dist)
+        end
+        if data.veterancy and data.veterancy ~= 0 and unit.SetVeterancy then
+            unit:SetVeterancy(data.veterancy)
         end
     end
 end
@@ -465,15 +506,15 @@ Callbacks.UpdateMarker = SimPing.UpdateMarker
 
 Callbacks.FactionSelection = ScenarioFramework.OnFactionSelect
 
-Callbacks.ToggleSelfDestruct = import('/lua/selfdestruct.lua').ToggleSelfDestruct
+Callbacks.ToggleSelfDestruct = import("/lua/selfdestruct.lua").ToggleSelfDestruct
 
-Callbacks.MarkerOnScreen = import('/lua/simcameramarkers.lua').MarkerOnScreen
+Callbacks.MarkerOnScreen = import("/lua/simcameramarkers.lua").MarkerOnScreen
 
-Callbacks.SimDialogueButtonPress = import('/lua/simdialogue.lua').OnButtonPress
+Callbacks.SimDialogueButtonPress = import("/lua/simdialogue.lua").OnButtonPress
 
 Callbacks.AIChat = SUtils.FinishAIChat
 
-Callbacks.DiplomacyHandler = import('/lua/simdiplomacy.lua').DiplomacyHandler
+Callbacks.DiplomacyHandler = import("/lua/simdiplomacy.lua").DiplomacyHandler
 
 Callbacks.Rebuild = function(data, units)
     local wreck = GetEntityById(data.entity)
@@ -487,7 +528,7 @@ Callbacks.Rebuild = function(data, units)
     wreck:Rebuild(units)
 end
 
---Callbacks.GetUnitHandle = import('/lua/debugai.lua').GetHandle
+--Callbacks.GetUnitHandle = import("/lua/debugai.lua").GetHandle
 
 function Callbacks.OnMovieFinished(name)
     ScenarioInfo.DialogueFinished[name] = true
@@ -525,19 +566,19 @@ Callbacks.OnControlGroupAssign = function(units)
     end
 end
 
-local SimCamera = import('/lua/simcamera.lua')
+local SimCamera = import("/lua/simcamera.lua")
 
 Callbacks.OnCameraFinish = SimCamera.OnCameraFinish
 
-local SimPlayerQuery = import('/lua/simplayerquery.lua')
+local SimPlayerQuery = import("/lua/simplayerquery.lua")
 
 Callbacks.OnPlayerQuery = SimPlayerQuery.OnPlayerQuery
 
 Callbacks.OnPlayerQueryResult = SimPlayerQuery.OnPlayerQueryResult
 
-Callbacks.PingGroupClick = import('/lua/simpinggroup.lua').OnClickCallback
+Callbacks.PingGroupClick = import("/lua/simpinggroup.lua").OnClickCallback
 
-Callbacks.GiveOrders = import('/lua/spreadattack.lua').GiveOrders
+Callbacks.GiveOrders = import("/lua/spreadattack.lua").GiveOrders
 
 Callbacks.ValidateAssist = function(data, units)
     units = SecureUnits(units)
@@ -586,7 +627,7 @@ Callbacks.FlagShield = function(data, units)
     end
 end
 
-Callbacks.WeaponPriorities = import('/lua/weaponpriorities.lua').SetWeaponPriorities
+Callbacks.WeaponPriorities = import("/lua/weaponpriorities.lua").SetWeaponPriorities
 
 Callbacks.ToggleDebugChainByName = function (data, units)
     LOG("ToggleDebugChainByName")
@@ -740,3 +781,72 @@ end
 Callbacks.iMapToggleThreat = function(data)
     import("/lua/sim/maputilities.lua").iMapToggleThreat(data.Identifier)
 end
+
+Callbacks.SelectHighestEngineerAndAssist = function(data, selection)
+    if selection then
+
+        local noACU = EntityCategoryFilterDown(categories.ALLUNITS - categories.COMMAND, selection)
+
+        ---@type Unit
+        local target = GetEntityById(data.TargetId)
+
+        IssueClearCommands(noACU)
+        IssueGuard(noACU, target)
+    end
+end
+
+---@class CargoSlots
+---@field Large number 
+---@field Medium number 
+---@field Small number
+
+---@type CargoSlots[]
+local GetCargoSlotsCache = {}
+
+---@param unit Unit
+---@return CargoSlots
+local function GetCargoSlots(unit)
+
+    -- try the cache first
+    if GetCargoSlotsCache[unit.UnitId] then 
+        return GetCargoSlotsCache[unit.UnitId]
+    end
+
+    ---@type CargoSlots
+    local slots = {
+        Large = 0,
+        Medium = 0,
+        Small = 0,
+    }
+
+    -- based on attachment points
+    for i = 1, unit:GetBoneCount() do
+        if unit:GetBoneName(i) ~= nil then
+            if string.find(unit:GetBoneName(i), 'Attachpoint_Lrg') then
+                slots.Large = slots.Large + 1
+            elseif string.find(unit:GetBoneName(i), 'Attachpoint_Med') then
+                slots.Medium = slots.Medium + 1
+            elseif string.find(unit:GetBoneName(i), 'Attachpoint') then
+                slots.Small = slots.Small + 1
+            end
+        end
+    end
+
+    -- based on blueprint definitions
+    slots.Large = math.min(slots.Large, unit.Blueprint.Transport.SlotsLarge or slots.Large)
+    slots.Medium = math.min(slots.Medium, unit.Blueprint.Transport.SlotsMedium or slots.Medium)
+    slots.Small = math.min(slots.Small, unit.Blueprint.Transport.SlotsSmall or slots.Small)
+
+    -- cache it and return
+    GetCargoSlotsCache[unit.UnitId] = slots
+    return slots
+end
+
+Callbacks.NavToggleScanLayer = import("/lua/sim/navdebug.lua").ToggleScanLayer
+Callbacks.NavToggleScanLabels = import("/lua/sim/navdebug.lua").ToggleScanLabels
+Callbacks.NavDebugStatisticsToUI = import("/lua/sim/navdebug.lua").StatisticsToUI
+Callbacks.NavDebugCanPathTo = import("/lua/sim/navdebug.lua").CanPathTo
+Callbacks.NavDebugPathTo = import("/lua/sim/navdebug.lua").PathTo
+Callbacks.NavDebugGetLabel = import("/lua/sim/navdebug.lua").GetLabel
+Callbacks.NavDebugGetLabelMetadata = import("/lua/sim/navdebug.lua").GetLabelMeta
+Callbacks.NavGenerate = import("/lua/sim/navgenerator.lua").Generate

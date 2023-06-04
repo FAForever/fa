@@ -8,13 +8,13 @@
 --**
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
-local AIUtils = import('/lua/ai/aiutilities.lua')
-local ScenarioFramework = import('/lua/scenarioframework.lua')
-local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
-local Utils = import('/lua/utilities.lua')
+local AIUtils = import("/lua/ai/aiutilities.lua")
+local ScenarioFramework = import("/lua/scenarioframework.lua")
+local ScenarioUtils = import("/lua/sim/scenarioutilities.lua")
+local Utils = import("/lua/utilities.lua")
 
 ---@param aiBrain AIBrain
----@param numReq integer
+---@param numReq number
 ---@param category EntityCategory
 ---@param idleReq boolean
 ---@return boolean
@@ -36,7 +36,7 @@ function HaveEqualToUnitsWithCategory(aiBrain, numReq, category, idleReq)
 end
 
 ---@param aiBrain AIBrain
----@param numReq integer
+---@param numReq number
 ---@param category EntityCategory
 ---@param idleReq boolean
 ---@return boolean
@@ -58,7 +58,7 @@ function HaveGreaterThanUnitsWithCategory(aiBrain, numReq, category, idleReq)
 end
 
 ---@param aiBrain AIBrain
----@param numReq integer
+---@param numReq number
 ---@param category EntityCategory
 ---@param idleReq boolean
 ---@return boolean
@@ -80,9 +80,9 @@ function HaveLessThanUnitsWithCategory(aiBrain, numReq, category, idleReq)
 end
 
 ---@param aiBrain AIBrain
----@param numReq integer
+---@param numReq number
 ---@param category EntityCategory
----@param area string
+---@param area Area
 ---@return boolean
 function HaveLessThanUnitsWithCategoryInArea(aiBrain, numReq, category, area)
     local numUnits = ScenarioFramework.NumCatUnitsInArea(category, ScenarioUtils.AreaToRect(area), aiBrain)
@@ -95,18 +95,16 @@ end
 ---@param aiBrain AIBrain
 ---@param baseName string
 ---@param category EntityCategory
----@param num integer
+---@param num number
 ---@return boolean
 function NumUnitsLessNearBase(aiBrain, baseName, category, num)
-    if brain.BaseTemplates[baseName].Location == nil then
+    if aiBrain.BaseTemplates[baseName].Location == nil then
         return false
     else
-        local unitList = brain:GetUnitsAroundPoint(category,
-                                                   brain.BaseTemplates[baseName].Location,
-                                                   brain.BaseTemplates[baseName].Radius, 'Ally')
+        local unitList = aiBrain:GetUnitsAroundPoint(category,aiBrain.BaseTemplates[baseName].Location,aiBrain.BaseTemplates[baseName].Radius, 'Ally')
         local count = 0
         for i,unit in unitList do
-            if unit:GetAIBrain() == brain then
+            if unit:GetAIBrain() == aiBrain then
                 count = count + 1
             end
         end
@@ -234,7 +232,7 @@ function HaveGreaterThanVarTableUnitsWithCategoryInArea(aiBrain, varName, catego
 end
 
 ---@param aiBrain AIBrain
----@param numReq integer
+---@param numReq number
 ---@param category EntityCategory
 ---@param constructionCat EntityCategory
 ---@return boolean
@@ -263,7 +261,7 @@ function HaveGreaterThanUnitsInCategoryBeingBuilt(aiBrain, numReq, category, con
 end
 
 ---@param aiBrain AIBrain
----@param numunits integer
+---@param numunits number
 ---@param category EntityCategory
 ---@return boolean
 function HaveLessThanUnitsInCategoryBeingBuilt(aiBrain, numunits, category)
@@ -301,18 +299,17 @@ end
 
 ---@param aiBrain AIBrain
 ---@param markerType string
----@param markerRadius integer
+---@param markerRadius number
 ---@param locationType string
----@param locationRadius integer
----@param unitCount integer
----@param unitCategory EntityCategory
----@param threatMin integer
----@param threatMax integer
----@param threatRings integer
+---@param locationRadius number
+---@param unitCount number
+---@param unitCategory string
+---@param threatMin number
+---@param threatMax number
+---@param threatRings number
 ---@param threatType string
 ---@return boolean
-function HaveLessThanUnitsAroundMarkerCategory(aiBrain, markerType, markerRadius, locationType, locationRadius,
-    unitCount, unitCategory, threatMin, threatMax, threatRings, threatType)
+function HaveLessThanUnitsAroundMarkerCategory(aiBrain, markerType, markerRadius, locationType, locationRadius,unitCount, unitCategory, threatMin, threatMax, threatRings, threatType)
     local pos = aiBrain:PBMGetLocationCoords(locationType)
     if not pos then
         return false
@@ -330,10 +327,10 @@ end
 
 ---@param aiBrain AIBrain
 ---@param locationType string
----@param locationRadius integer
----@param threatMin integer
----@param threatMax integer
----@param threatRings integer
+---@param locationRadius number
+---@param threatMin number
+---@param threatMax number
+---@param threatRings number
 ---@param threatType string
 ---@return boolean
 function StartLocationNeedsEngineer(aiBrain, locationType, locationRadius, threatMin, threatMax, threatRings, threatType)
@@ -346,10 +343,10 @@ end
 
 ---@param aiBrain AIBrain
 ---@param locationType string
----@param locationRadius integer
----@param threatMin integer
----@param threatMax integer
----@param threatRings integer
+---@param locationRadius number
+---@param threatMin number
+---@param threatMax number
+---@param threatRings number
 ---@param threatType string
 ---@return boolean
 function StartLocationsFull(aiBrain, locationType, locationRadius, threatMin, threatMax, threatRings, threatType)
@@ -362,10 +359,10 @@ end
 
 ---@param aiBrain AIBrain
 ---@param locationType string
----@param locationRadius integer
----@param threatMin integer
----@param threatMax integer
----@param threatRings integer
+---@param locationRadius number
+---@param threatMin number
+---@param threatMax number
+---@param threatRings number
 ---@param threatType string
 ---@return boolean
 function ExpansionAreaNeedsEngineer(aiBrain, locationType, locationRadius, threatMin, threatMax, threatRings, threatType)
@@ -378,10 +375,10 @@ end
 
 ---@param aiBrain AIBrain
 ---@param locationType string
----@param locationRadius integer
----@param threatMin integer
----@param threatMax integer
----@param threatRings integer
+---@param locationRadius number
+---@param threatMin number
+---@param threatMax number
+---@param threatRings number
 ---@param threatType string
 ---@return boolean
 function NavalAreaNeedsEngineer(aiBrain, locationType, locationRadius, threatMin, threatMax, threatRings, threatType)
@@ -394,10 +391,10 @@ end
 
 ---@param aiBrain AIBrain
 ---@param locationType string
----@param locationRadius integer
----@param threatMin integer
----@param threatMax integer
----@param threatRings integer
+---@param locationRadius number
+---@param threatMin number
+---@param threatMax number
+---@param threatRings number
 ---@param threatType string
 ---@return boolean
 function NavalAreasFull(aiBrain, locationType, locationRadius, threatMin, threatMax, threatRings, threatType)
@@ -410,13 +407,13 @@ end
 
 ---@param aiBrain AIBrain
 ---@param locationType string
----@param locationRadius integer
+---@param locationRadius number
 ---@param category EntityCategory
----@param markerRadius integer
----@param unitMax integer
----@param threatMin integer
----@param threatMax integer
----@param threatRings integer
+---@param markerRadius number
+---@param unitMax number
+---@param threatMin number
+---@param threatMax number
+---@param threatRings number
 ---@param threatType string
 ---@return boolean
 function DefensivePointNeedsStructure(aiBrain, locationType, locationRadius, category, markerRadius, unitMax, threatMin, threatMax, threatRings, threatType)
@@ -429,13 +426,13 @@ end
 
 ---@param aiBrain AIBrain
 ---@param locationType string
----@param locationRadius integer
+---@param locationRadius number
 ---@param category EntityCategory
----@param markerRadius integer
----@param unitMax integer
----@param threatMin integer 
----@param threatMax integer 
----@param threatRings integer
+---@param markerRadius number
+---@param unitMax number
+---@param threatMin number 
+---@param threatMax number 
+---@param threatRings number
 ---@param threatType string
 ---@return boolean
 function NavalDefensivePointNeedsStructure(aiBrain, locationType, locationRadius, category, markerRadius, unitMax, threatMin, threatMax, threatRings, threatType)
@@ -448,12 +445,12 @@ end
 
 ---@param aiBrain AIBrain
 ---@param locationType string
----@param locationRadius integer
----@param unitCount integer
+---@param locationRadius number
+---@param unitCount number
 ---@param unitCategory EntityCategory
----@param threatMin integer
----@param threatMax integer
----@param threatRings integer
+---@param threatMin number
+---@param threatMax number
+---@param threatRings number
 ---@param threatType string
 ---@return boolean
 function HaveAreaWithUnitsFewWalls(aiBrain, locationType, locationRadius, unitCount, unitCategory, threatMin, threatMax, threatRings, threatType)
@@ -489,7 +486,7 @@ end
 
 ---@param aiBrain AIBrain
 ---@param greater boolean
----@param numReq integer
+---@param numReq number
 ---@param category EntityCategory
 ---@param alliance string
 ---@return boolean
@@ -526,7 +523,7 @@ end
 
 ---@param aiBrain AIBrain
 ---@param locationType string
----@param unitCount integer
+---@param unitCount number
 ---@param unitCategory EntityCategory
 ---@param compareType string
 ---@return boolean
@@ -546,7 +543,7 @@ end
 
 ---@param aiBrain AIBrain
 ---@param locationType string
----@param unitCount integer
+---@param unitCount number
 ---@param unitCategory EntityCategory
 ---@return boolean
 function UnitsLessAtLocation(aiBrain, locationType, unitCount, unitCategory)
@@ -555,7 +552,7 @@ end
 
 ---@param aiBrain AIBrain
 ---@param locationType string
----@param unitCount integer
+---@param unitCount number
 ---@param unitCategory EntityCategory
 ---@return boolean
 function UnitsGreaterAtLocation(aiBrain, locationType, unitCount, unitCategory)
@@ -568,7 +565,7 @@ end
 
 ---@param aiBrain AIBrain
 ---@param locationType string
----@param unitCount integer
+---@param unitCount number
 ---@param unitCategory EntityCategory
 ---@param compareType string
 ---@return boolean
@@ -589,7 +586,7 @@ end
 
 ---@param aiBrain AIBrain
 ---@param locationType string
----@param unitCount integer
+---@param unitCount number
 ---@param unitCategory EntityCategory
 ---@return boolean
 function PoolLessAtLocation(aiBrain, locationType, unitCount, unitCategory)
@@ -598,7 +595,7 @@ end
 
 ---@param aiBrain AIBrain
 ---@param locationType string
----@param unitCount integer
+---@param unitCount number
 ---@param unitCategory EntityCategory
 ---@return boolean
 function PoolGreaterAtLocation(aiBrain, locationType, unitCount, unitCategory)
@@ -611,7 +608,7 @@ end
 
 ---@param aiBrain AIBrain
 ---@param locationType string
----@param unitCount integer
+---@param unitCount number
 ---@param unitCategory EntityCategory
 ---@param compareType string
 ---@return boolean
@@ -631,7 +628,7 @@ end
 
 ---@param aiBrain AIBrain
 ---@param locationType string
----@param unitCount integer
+---@param unitCount number
 ---@param unitCategory EntityCategory
 ---@return boolean
 function EngineerLessAtLocation(aiBrain, locationType, unitCount, unitCategory)
@@ -640,7 +637,7 @@ end
 
 ---@param aiBrain AIBrain
 ---@param locationType string
----@param unitCount integer
+---@param unitCount number
 ---@param unitCategory EntityCategory
 ---@return boolean
 function EngineerGreaterAtLocation(aiBrain, locationType, unitCount, unitCategory)
@@ -653,7 +650,7 @@ end
 
 ---@param aiBrain AIBrain
 ---@param locationType string
----@param unitCount integer
+---@param unitCount number
 ---@param unitCategory EntityCategory
 ---@param compareType string
 ---@return boolean
@@ -673,7 +670,7 @@ end
 
 ---@param aiBrain AIBrain
 ---@param locationType string
----@param unitCount integer
+---@param unitCount number
 ---@param unitCategory EntityCategory
 ---@return boolean
 function FactoryLessAtLocation(aiBrain, locationType, unitCount, unitCategory)
@@ -682,7 +679,7 @@ end
 
 ---@param aiBrain AIBrain
 ---@param locationType string
----@param unitCount integer
+---@param unitCount number
 ---@param unitCategory EntityCategory
 ---@return boolean
 function FactoryGreaterAtLocation(aiBrain, locationType, unitCount, unitCategory)
@@ -742,7 +739,7 @@ end
 
 ---@param aiBrain AIBrain
 ---@param locationType string
----@param unitCount integer
+---@param unitCount number
 ---@param unitCategory EntityCategory
 ---@param compareType string
 ---@param builderCat EntityCategory
@@ -767,7 +764,7 @@ end
 
 ---@param aiBrain AIBrain
 ---@param locationType string
----@param unitCount integer
+---@param unitCount number
 ---@param unitCategory EntityCategory
 ---@param builderCat EntityCategory
 ---@return boolean
@@ -777,7 +774,7 @@ end
 
 ---@param aiBrain AIBrain
 ---@param locationType string
----@param unitCount integer
+---@param unitCount number
 ---@param unitCategory EntityCategory
 ---@param builderCat EntityCategory
 ---@return boolean
@@ -791,7 +788,7 @@ end
 
 ---@param aiBrain AIBrain
 ---@param locationType string
----@param unitCount integer
+---@param unitCount number
 ---@param unitCategory EntityCategory
 ---@param compareType string
 ---@param facCat EntityCategory
@@ -818,7 +815,7 @@ end
 
 ---@param aiBrain AIBrain
 ---@param locationType string
----@param unitCount integer
+---@param unitCount number
 ---@param unitCategory EntityCategory
 ---@param facCat EntityCategory
 ---@return boolean
@@ -828,7 +825,7 @@ end
 
 ---@param aiBrain AIBrain
 ---@param locationType string
----@param unitCount integer
+---@param unitCount number
 ---@param unitCategory EntityCategory
 ---@param facCat EntityCategory
 ---@return boolean
@@ -842,7 +839,7 @@ end
 
 ---@param aiBrain AIBrain
 ---@param locationType string
----@param unitCount integer
+---@param unitCount number
 ---@param unitCategory EntityCategory
 ---@param compareType string
 ---@param engCat EntityCategory
@@ -867,21 +864,21 @@ function LocationEngineersBuildingComparison(aiBrain, locationType, unitCount, u
     return CompareBody(numUnits, unitCount, compareType)
 end
 
----@param aiBrain any
----@param locationType any
----@param unitCount any
----@param unitCategory any
----@param engCat any
+---@param aiBrain AIBrain
+---@param locationType string
+---@param unitCount number
+---@param unitCategory EntityCategory
+---@param engCat EntityCategory
 ---@return boolean
 function LocationEngineersBuildingLess(aiBrain, locationType, unitCount, unitCategory, engCat)
     return LocationEngineersBuildingComparison(aiBrain, locationType, unitCount, unitCategory, '<', engCat)
 end
 
----@param aiBrain any
----@param locationType any
----@param unitCount any
----@param unitCategory any
----@param engCat any
+---@param aiBrain AIBrain
+---@param locationType string
+---@param unitCount number
+---@param unitCategory EntityCategory
+---@param engCat EntityCategory
 ---@return boolean
 function LocationEngineersBuildingGreater(aiBrain, locationType, unitCount, unitCategory, engCat)
     return LocationEngineersBuildingComparison(aiBrain, locationType, unitCount, unitCategory, '>', engCat)
@@ -919,7 +916,7 @@ end
 
 ---@param aiBrain AIBrain
 ---@param locationType string
----@param unitCount integer
+---@param unitCount number
 ---@param unitCategory EntityCategory
 ---@param engCat EntityCategory
 ---@return boolean
@@ -929,7 +926,7 @@ end
 
 ---@param aiBrain AIBrain
 ---@param locationType string
----@param unitCount integer
+---@param unitCount number
 ---@param unitCategory EntityCategory
 ---@param engCat EntityCategory
 ---@return boolean
@@ -979,7 +976,7 @@ end
 
 ---@param aiBrain AIBrain
 ---@param locationType string
----@param techLevel integer
+---@param techLevel number
 ---@return boolean
 function EngineerCapCheck(aiBrain, locationType, techLevel)
     local catCheck = false
@@ -1014,7 +1011,7 @@ end
 ---@param aiBrain AIBrain
 ---@param locationType string
 ---@param category EntityCategory
----@param radius integer
+---@param radius number
 ---@param testUnit Unit
 ---@return boolean
 function AdjacencyCheck(aiBrain, locationType, category, radius, testUnit)
@@ -1143,12 +1140,12 @@ end
 ---@param locationType string
 ---@param unitType string
 ---@param category EntityCategory
----@param factionIndex integer
+---@param factionIndex number
 ---@return boolean
 function CheckUnitRange(aiBrain, locationType, unitType, category, factionIndex)
 
     -- Find the unit's blueprint
-    local template = import('/lua/BuildingTemplates.lua').BuildingTemplates[factionIndex or aiBrain:GetFactionIndex()]
+    local template = import("/lua/buildingtemplates.lua").BuildingTemplates[factionIndex or aiBrain:GetFactionIndex()]
     local buildingId = false
     for k,v in template do
         if v[1] == unitType then
@@ -1192,10 +1189,10 @@ end
 ---@param aiBrain AIBrain
 ---@param unitCategory EntityCategory
 ---@param compareType string
----@param large unknown
----@param small unknown
----@param naval unknown
----@return unknown
+---@param large any
+---@param small any
+---@param naval any
+---@return any
 function UnitToExpansionsValue(aiBrain, unitCategory, compareType, large, small, naval)
     local needCount = aiBrain:GetManagerCount('Start Location') * large
 
@@ -1217,14 +1214,14 @@ end
 ---@param large any
 ---@param small any
 ---@param naval any
----@return unknown
+---@return any
 function UnitsGreaterThanExpansionValue(aiBrain, unitCategory, large, small, naval)
     return UnitToExpansionsValue(aiBrain, unitCategory, '>=', large, small, naval)
 end
 
 ---comment
 ---@param aiBrain AIBrain
----@return unknown
+---@return any
 function ExpansionBaseCheck(aiBrain)
     -- Removed automatic setting of Land-Expasions-allowed. We have a Game-Option for this.
     local checkNum = tonumber(ScenarioInfo.Options.LandExpansionsAllowed) or 3
@@ -1233,7 +1230,7 @@ end
 
 ---comment
 ---@param aiBrain AIBrain
----@return unknown
+---@return any
 function NavalBaseCheck(aiBrain)
     -- Removed automatic setting of naval-Expasions-allowed. We have a Game-Option for this.
     local checkNum = tonumber(ScenarioInfo.Options.NavalExpansionsAllowed) or 2
@@ -1244,8 +1241,8 @@ end
 ---comment
 ---@param aiBrain AIBrain
 ---@param compareType string
----@param checkNum integer
----@return unknown
+---@param checkNum number
+---@return any
 function ExpansionBaseCount(aiBrain, compareType, checkNum)
        local expBaseCount = aiBrain:GetManagerCount('Start Location')
        expBaseCount = expBaseCount + aiBrain:GetManagerCount('Expansion Area')
@@ -1259,16 +1256,16 @@ end
 --- added to limit naval bases.
 ---@param aiBrain AIBrain
 ---@param compareType string
----@param checkNum integer
----@return unknown
+---@param checkNum number
+---@return any
 function NavalBaseCount(aiBrain, compareType, checkNum)
        local expBaseCount = aiBrain:GetManagerCount('Naval Area')
        --LOG('*AI DEBUG: Naval base count is ' .. expBaseCount .. ' checkNum is ' .. checkNum)
        return CompareBody(expBaseCount, checkNum, compareType)
 end
 
----@param numOne integer
----@param numTwo integer
+---@param numOne number
+---@param numTwo number
 ---@param compareType string
 ---@return boolean
 function CompareBody(numOne, numTwo, compareType)
@@ -1315,15 +1312,15 @@ end
 --- moved here from Markerbuildconditions so its evaluated instantly.
 ---@param aiBrain AIBrain
 ---@param locationType string
----@param radius integer
+---@param radius number
 ---@param markerType string
----@param tMin integer
----@param tMax integer
----@param tRings integer
+---@param tMin number
+---@param tMax number
+---@param tRings number
 ---@param tType string
----@param maxUnits integer
+---@param maxUnits number
 ---@param unitCat EntityCategory
----@param markerRadius integer
+---@param markerRadius number
 ---@return boolean
 function CanBuildFirebase(aiBrain, locationType, radius, markerType, tMin, tMax, tRings, tType, maxUnits, unitCat, markerRadius)
     local ref, refName = AIUtils.AIFindFirebaseLocation(aiBrain, locationType, radius, markerType, tMin, tMax, tRings, tType, maxUnits, unitCat, markerRadius)
@@ -1402,7 +1399,7 @@ end
 
 ---@param aiBrain AIBrain
 ---@param Unit Unit
----@return integer
+---@return number
 function GetGuards(aiBrain, Unit)
     local engs = aiBrain:GetUnitsAroundPoint(categories.ENGINEER, Unit:GetPosition(), 10, 'Ally')
     local count = 0
@@ -1429,6 +1426,52 @@ end
 function CheckBuildPlattonDelay(aiBrain, PlatoonName)
     if aiBrain.DelayEqualBuildPlattons[PlatoonName] and aiBrain.DelayEqualBuildPlattons[PlatoonName] > GetGameTimeSeconds() then
         return false
+    end
+    return true
+end
+
+--- Buildcondition to limit the number of factories 
+---@param aiBrain AIBrain
+---@param locationType string
+---@param unitCategory EntityCategory
+---@param pathType string
+---@param unitCount number
+---@return boolean
+function ForcePathLimit(aiBrain, locationType, unitCategory, pathType, unitCount)
+    local currentEnemy = aiBrain:GetCurrentEnemy()
+    if not currentEnemy then
+        return true
+    end
+    local enemyIndex = aiBrain:GetCurrentEnemy():GetArmyIndex()
+    local selfIndex = aiBrain:GetArmyIndex()
+    if aiBrain.CanPathToEnemy[selfIndex][enemyIndex][locationType] ~= pathType and FactoryComparisonAtLocation(aiBrain, locationType, unitCount, unitCategory, '>=') then
+        return false
+    end
+    return true
+end
+
+--- Buildcondition to decide if radars should upgrade based on other radar locations.
+---@param aiBrain AIBrain
+---@param locationType string
+---@param radarTech string
+---@return boolean
+function ShouldUpgradeRadar(aiBrain, locationType, radarTech)
+
+    -- loop over radars that are one tech higher
+    local basePos = aiBrain.BuilderManagers[locationType].Position
+    local otherRadars = aiBrain.Radars[radarTech]
+    for _, other in otherRadars do
+        -- determine if we're too close to higher tech radars
+        local range = other.Blueprint.Intel.RadarRadius
+        if range then
+            local squared = 0.64 * (range * range)
+            local ox, _, oz = other:GetPositionXYZ()
+            local dx = ox - basePos[1]
+            local dz = oz - basePos[3]
+            if dx * dx + dz * dz < squared then
+                return false
+            end
+        end
     end
     return true
 end

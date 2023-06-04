@@ -8,13 +8,13 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local TStructureUnit = import('/lua/terranunits.lua').TStructureUnit
-local TANTorpedoLandWeapon = import('/lua/terranweapons.lua').TANTorpedoLandWeapon
+local TStructureUnit = import("/lua/terranunits.lua").TStructureUnit
+local TANTorpedoLandWeapon = import("/lua/terranweapons.lua").TANTorpedoLandWeapon
 
 ---@class UEB2109 : TStructureUnit
-UEB2109 = Class(TStructureUnit) {
+UEB2109 = ClassUnit(TStructureUnit) {
     Weapons = {
-        Turret01 = Class(TANTorpedoLandWeapon) {},
+        Turret01 = ClassWeapon(TANTorpedoLandWeapon) {},
     },
 }
 

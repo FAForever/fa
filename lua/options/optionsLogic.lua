@@ -1,6 +1,6 @@
 -- options logic code
 
-local Prefs = import('/lua/user/prefs.lua')
+local Prefs = import("/lua/user/prefs.lua")
 
 -- contains the current options data
 local options
@@ -11,7 +11,7 @@ local optionItemMap
 -- returns the options table with any adjustments needed
 function GetOptionsData()
     if not options then
-        options = import('options.lua').options
+        options = import("/lua/options/options.lua").options
         
         -- build option item map
         optionItemMap = {}

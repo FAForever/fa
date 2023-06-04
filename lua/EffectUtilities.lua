@@ -5,9 +5,9 @@
 -- Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
-local util = import('utilities.lua')
-local Entity = import('/lua/sim/Entity.lua').Entity
-local EffectTemplate = import('/lua/EffectTemplates.lua')
+local util = import("/lua/utilities.lua")
+local Entity = import("/lua/sim/entity.lua").Entity
+local EffectTemplate = import("/lua/effecttemplates.lua")
 
 local AttachBeamEntityToEntity = AttachBeamEntityToEntity
 local CreateAttachedEmitter = CreateAttachedEmitter
@@ -360,11 +360,11 @@ function CreateCybranFactoryBuildEffects(builder, unitBeingBuilt, buildBones, bu
 end
 
 
-CreateSeraphimUnitEngineerBuildingEffects = import("/lua/EffectUtilitiesSeraphim.lua").CreateSeraphimUnitEngineerBuildingEffects
-CreateSeraphimFactoryBuildingEffects = import("/lua/EffectUtilitiesSeraphim.lua").CreateSeraphimFactoryBuildingEffects
-CreateSeraphimBuildThread = import("/lua/EffectUtilitiesSeraphim.lua").CreateSeraphimBuildThread
-CreateSeraphimBuildBaseThread = import("/lua/EffectUtilitiesSeraphim.lua").CreateSeraphimBuildBaseThread
-CreateSeraphimExperimentalBuildBaseThread = import("/lua/EffectUtilitiesSeraphim.lua").CreateSeraphimExperimentalBuildBaseThread
+CreateSeraphimUnitEngineerBuildingEffects = import("/lua/effectutilitiesseraphim.lua").CreateSeraphimUnitEngineerBuildingEffects
+CreateSeraphimFactoryBuildingEffects = import("/lua/effectutilitiesseraphim.lua").CreateSeraphimFactoryBuildingEffects
+CreateSeraphimBuildThread = import("/lua/effectutilitiesseraphim.lua").CreateSeraphimBuildThread
+CreateSeraphimBuildBaseThread = import("/lua/effectutilitiesseraphim.lua").CreateSeraphimBuildBaseThread
+CreateSeraphimExperimentalBuildBaseThread = import("/lua/effectutilitiesseraphim.lua").CreateSeraphimExperimentalBuildBaseThread
 
 --- Creates the adjacency beams between structures
 ---@param unit Unit
@@ -724,7 +724,14 @@ function CreateAdjacencyBeams(unit, adjacentUnit, adjacencyBeamsBag)
             node.entity:SetOrientation(OrientFromDir(vec), true)
         end
         if beamEffect then
-            local beam = AttachBeamEntityToEntity(node.entity, -1, nodeList[i + 1].entity, -1, unitArmy, beamEffect)
+            local beam
+            local categoriesHash = adjacentUnit.Blueprint.CategoriesHash
+            if categoriesHash["MASSSTORAGE"] or categoriesHash["ENERGYSTORAGE"] then
+                beam = AttachBeamEntityToEntity(node.entity, -1, nodeList[i + 1].entity, -1, unitArmy, beamEffect)
+            else
+                beam = AttachBeamEntityToEntity(nodeList[i + 1].entity, -1, node.entity, -1, unitArmy, beamEffect)
+            end
+
             TrashBagAdd(infoTrash, beam)
             TrashBagAdd(unitTrash, beam)
         end
@@ -1472,10 +1479,10 @@ end
 
 --- Optimized functions --
 
-local EffectUtilitiesOpti = import('/lua/EffectUtilitiesOpti.lua')
-local EffectUtilitiesUEF = import('/lua/EffectUtilitiesUEF.lua')
-local EffectUtilitiesGeneric = import('/lua/EffectUtilitiesGeneric.lua')
-local EffectUtilitiesAeon = import('/lua/EffectUtilitiesAeon.lua')
+local EffectUtilitiesOpti = import("/lua/effectutilitiesopti.lua")
+local EffectUtilitiesUEF = import("/lua/effectutilitiesuef.lua")
+local EffectUtilitiesGeneric = import("/lua/effectutilitiesgeneric.lua")
+local EffectUtilitiesAeon = import("/lua/effectutilitiesaeon.lua")
 
 CreateCybranEngineerBuildEffectsOpti = EffectUtilitiesOpti.CreateCybranEngineerBuildEffects
 CreateCybranBuildBeamsOpti = EffectUtilitiesOpti.CreateCybranBuildBeams

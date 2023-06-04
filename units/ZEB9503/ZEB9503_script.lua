@@ -8,10 +8,10 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local TSeaFactoryUnit = import('/lua/terranunits.lua').TSeaFactoryUnit
+local TSeaFactoryUnit = import("/lua/terranunits.lua").TSeaFactoryUnit
 
 ---@class ZEB9503 : TSeaFactoryUnit
-ZEB9503 = Class(TSeaFactoryUnit) {
+ZEB9503 = ClassUnit(TSeaFactoryUnit) {
     OnCreate = function(self)
         TSeaFactoryUnit.OnCreate(self)
         self.BuildPointSlider = CreateSlider(self, self:GetBlueprint().Display.BuildAttachBone or 0, -5, 0, 0, -1)

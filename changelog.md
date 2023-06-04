@@ -1,6 +1,1515 @@
 
 Some sections of the changelog are available in other languages such as [French](changelog-fr.md) or [Russian](changelog-ru.md)
 
+# Game version 3757 (20th of May, 2023)
+
+## Balance
+
+- (#4796) Air Staging Facility
+    When they were moved from tech 2 to tech 1 their build time was not reduced accordingly. The build time is now reduced from 450 to 350. For a tech 1 engineer, it takes 70 seconds to build.
+
+- (#4442, #4938) Claws of Galactic Colossus
+    Previously the claws would instantaneously destroy the unit upon arrival. This matched the old behavior, but with the bug fixes of the claws it was only slightly too strong.
+
+    A unit now receives 730 damage per second upon arriving at the claw. Combining both claws and the beam the colossus has a maximum damage per second of 2460, which matches the old situation.
+
+- (#3918) Chrono Dampener
+    The chrono dampener received several buffs over the past year. With this patch we nerf it by changing how the Chrono Dampener behaves.
+
+    The old behavior applies the same stun on all units over a large radius every 5.0 seconds. The stun duration was 3.5 seconds.
+
+    The new behavior applies a diminishing stun based on the distance of the unit to the ACU over a large radius every 5.0 seconds. The stun is applied in slices of 0.4 seconds. There are 10 slices. Units that are on top of the ACU receive all slices, and are therefore stunned for 4.0 seconds. Units at the outer edge of the radius receive only a single slice and are therefore stunned for 0.4 seconds.
+
+## Contributors
+
+- Jip (#4442, #4938, #3918)
+- SpikeyNoob (#4442, #4938, #3918)
+- Basilisk3 (#4796)
+
+# Game version 3756 (18th of March, 2023)
+
+Hopefully this is the last hotfix for now. Includes various fixes of recent and longstanding bugs.
+
+Jip
+
+## Features
+
+- (#4770) Overhaul of the cheat menu
+    The menu now inherits from the Window class, as a result it can be moved around and rescaled. Units
+    can now be dragged into the game, instead of the old box spawn formation. Includes a section to
+    spawn in props, meshes and a new section to preview and spawn in entire templates.
+
+    This was long over due. The new cheat window is completely configurable, note the little wench next to the title.
+
+## Bug fixes
+
+- (#4805) Fix orientation of structures being applied multiple times after gifting or capturing
+
+- (#4793) Fix disabling of the tabs (in the center) when you are in a replay and your focus army is defeated
+
+- (#4806) Fix lingering draggers around window controls such as the chat and console window
+
+- (#4807) Add a check before applying a platoon function to fix a co-op problem
+
+- (#4804, #4813) Fix various options not listening to the game settings
+    This includes the following options:
+
+     - Options for the water depth indicator
+     - Options for the plane height indicator
+     - Toggle for rendering mouse positions when observing
+
+- (#4809) Re-order the sync in an attempt to mitigate 'unknown results' of ladder games
+
+- (#4812) Fix overcharge damage not scaling with your power supply
+
+## Other changes
+
+- (#4795) Lobby option to share unit cap now defaults to share the unit cap to all allies
+
+- (#4800) Auto-hide the mass fab panel when you change to the observers view
+
+- (#4789) Forward the old ACU-kill event to the UI layer
+
+## Contributors
+
+- Balthazar (#4770)
+
+- Jip (#4805, #4793, #4806, #4807, #4795, #4800, #4770, #4789, #4804, #4809, #4812)
+
+- Rigomate (#4789)
+
+# Game version 3755 (5th of March, 2023)
+
+## Bug fixes
+
+- (#4786) Revert the network parameters back to their usual values
+
+## Contributors
+
+Jip (#4786)
+
+# Game version 3754 (5th of March, 2023)
+
+See the patch notes of 3751 for the full patch notes.
+
+We would like to remind people that we're always open to feedback. Specifically for the changes surrounding the factories we made a few topics for you to give feedback on the various line ups. You can find them here:
+
+- https://forum.faforever.com/topic/5790/redesign-of-all-hq-and-support-factories
+
+If you can't click on that link then navigate to `General Discussion -> Suggestions` on the forums. The overview topic is pinned at the top.
+
+At the moment there is a game-breaking issue with Nomads. The maintainer has been informed.
+
+With kind regards,
+
+Jip
+
+## Features
+
+- (#4745, #4779, #4781) Tweaking of network parameters in an attempt to reduce lag
+
+## Bug fixes
+
+- (#4755, #4783) Fix various issues with build mode
+
+- (#4756) Fix extractors not aligning with the terrain
+
+- (#4743) Fix civilians not being revealed
+
+- (#4752) Fix auto balance button when no faction is selected
+
+- (#4757) Fix hot build not being reset after a build order
+
+- (#4759) Fix beam weapons continiously restarting as they ground fire
+    This also fixes the bug where beam weapons that are firing on the ground apply the damage twice
+
+- (#4763) Fix veterancy triggering before death weapons do
+
+- (#4771) Fix a typo in `CreateIntelTriggers`
+
+- (#4777) Fix a bug where reclaiming props with no value could prevent the ACU from shooting
+
+- (#4778) Fix tractor beams from making units invulnerable
+
+- (#4768) Fix orientation of structures with pre-defined orientations (from the editor)
+
+- (#4782) Fix cursor not changing when you manually issue an attack order
+
+- (#4719) Fix significant weapon delay on the anti air gun of the Sky Slammer, Siren and Bouncer
+
+- (#4784) Fix units receiving full vet after being transferred
+
+## AI
+
+We would like to remind people that there are various mods that provide different AI experiences. We can highly recommend you to download them from the vault and give them a spin.
+
+A short list of AIs we recommend at this point:
+
+- M27: made by Maudlin
+- RNGAI, as made by Relent0r
+- Sorian Edit, as made by Marlo
+- Uveso AI, as made by Uveso
+- Dilli Dalli, as made by Softles
+- Swarm AI, as made by Azraeel
+
+And not to forget the AI that ships with the Total Annihilation mod that is maintained by Dragun.
+
+- (#4674) Fix base AI logic running with AIs from the vault
+
+## Navigational mesh
+
+The navigational mesh is an abstract representation of a map. The AI can use that representation to gain an understanding of what the map 'looks like'. The navigational mesh is generated at the start of the map and works on any map.  
+
+- (#4761) Fix labels being culled even though they have resources
+
+- (#4762) Introduce a search threshold when searching for a valid leaf
+
+- (#4776) Fix navigational mesh being able to be generated multiple times
+
+- (#4780) Fix order of execution so that expansion markers are properly generated
+
+## Physics Based Rendering (PBR)
+
+We're slowly but surely preparing the game for a significant visual improvement. This is a long term project that is going to consume hundreds of hours. We're hoping to find additional contributors that have an interesting in creating (and fixing) meshes and textures. If you have that interest and/or experience and you'd like to help out then you can introduce yourself in the dedicated channels in the official Discord channel!
+
+- (#4713) Fix animation problems with the Cybran air factory line up
+
+## Other changes
+
+- (#4758) Add division icon for the unlisted 'division'
+
+## Contributors
+
+RabidPope (#4719)
+Relentor (#4674)
+Rowey (#4752)
+Jip (#4745, #4756, #4743, #4757, #4759, #4761, #4763, #4762, #4778, #4777, #4776, #4768, #4780, #4782, #4719)
+Wotan (#4745)
+SlinkingAnt (#4755, #4783)
+4z0t (#4771, #4758)
+
+# Game version 3753 (25th of February, 2023)
+
+See the patch notes of 3751 for the full patch notes.
+
+## Bug fixes
+
+- (#4741) Fix build preview of underwater storages
+
+- (#4739) Fix Aloha being ignored by tactical missile defenses
+
+- (#4740) Fix reclaim values of wreckages
+
+- (acc6893) Enforce UTF8 encoding of preference file
+    We weren't entirely aware that we stopped enforcing the encoding of the preference file. As a result a lot of people encountered issues. We hope by enforcing it again that those issues are resolved
+
+## Contributors
+
+- Jip (#4741, #4739, #4740)
+- KionX (acc6893)
+
+# Game version 3752 (25th of February, 2023)
+
+See the patch notes of 3751 for the full patch notes.
+
+## Bug fixes
+
+- (#4736) Attempt at fixing the autolobby options missmatch
+
+## Contributors
+
+- Jip (#4736)
+- Sheikah (#4736)
+
+# Game version 3751 (25th of February, 2023)
+
+In this first development update of 2023, we introduce three month's work of bugfixes, quality of life changes, and assorted improvements. It is, by far, the most exciting patch we've released so far. While the full changes are detailed below, a quick summary of those changes we think you'll find most important:
+
+- We've changed how structures interact with the terrain. Previously, structures built on uneven ground could create terrain deformations. On some maps, this resulted in changes to the terrain that prevented the player from placing neighboring structures and created pathing issues for units. With this update, buildings deform the terrain less and may be placed at a slight angle. 
+
+- We've introduced a new series of hotkeys that will make it easier to select and micromanage your units. 
+
+- The process of managing your mex upgrades will now be easier than ever thanks to several small features. You can now choose to have mexes automatically queue an upgrade and (un)pause extractors when you order engineers to assist them.
+
+- Several smaller quality of life changes have been made to existing features, such as no more empty reclaim orders and preventing ground attack orders from snapping to props or units. You can read more about all these changes in the 'Features' section.
+
+In future updates, we'll be shifting our focus to improving the AI we ship with FAF. So far, we've been working on a navigational mesh that can help the AI understand any map you throw at it. The task ahead is to extend this with additional features to help the AI understand specifics about a map. You can read what we've achieved this patch in the 'AI' and 'Navigational mesh' sections.
+
+And last, but certainly not least: this patch contains the largest performance improvement to date; the game is on average 10% to 20% faster in comparison to the last developers patch! This is exciting because with this patch the average game no longer slows down. We've been running tests and a CPU as cheap as a Ryzen 3600 can now run up to 6000 units without slowing down. We find this is extremely exciting: the game is nearing the point where you can just enjoy playing the originally intended experience in real-time!
+
+With appreciation towards all the contributors that made this patch possible,
+
+Jip
+
+## Features
+
+- (#4584, #4607, #4615, #4636, #4714, #4724) Improve terrain structure interactions
+    Instead of flattening the ground below structures, they now slightly tilt to reduce terrain deformation.
+
+- (#4474) Ground attack now ignores all props/units
+    You can now assign a ground attack exactly where you clicked without it accidentally snapping to props or units
+
+- (3dd620c) Prevent being able to issue 'empty' reclaim orders
+    It is now impossible to create a reclaim order with no prop or unit attached to it
+
+- (#4474) Move command mode no longer creates patrol orders by accident
+    When you specifically issue move commands using the hotkey (usually 'm') or by clicking on the move command button it now ignores the 'convert to patrol' functionality
+
+- (3dd620c) Remove the use of CTRL to issue commands with formations
+    When you hold control units first move towards each other and create a formation before they would go to where you told them to. This is a hidden feature of the engine and often players were not aware. We patched this out because often people use the same key for hotkeys, after which players (usually accidentally) would issue a formation order instead of a regular move or attack move order. You can still create formation orders by holding the right mouse button
+
+- (#4510) Add a game option to set the zoom threshold at which reclaim values are grouped together in the reclaim-overlay
+
+- (#4586) Add game option to tweak the camera shake multiplier
+    When set to zero it will entirely remove shaking from the game. Additionally, the default shake multiplier is now set to 0.5 (instead of 1.0)
+
+- (#4577) Add game option to upgrade and pause tech 1 extractors when you issue an assist order
+    A small quality of life feature that reduces the use of a few hotkeys
+
+- (#4577, #4620) Add game option to unpause tech 1 extractors as engineers start assisting
+    A small quality of life feature that reduces the need to check up on your extractors
+
+- (#4587) Add hotkeys to divide your current selection into subgroups
+    There is a separate hotkey to tab through the subgroups. This feature significantly improves your ability to manage and micro larger chunks of units
+
+    As a few examples of divisions:
+     - Divide your selection by tech level
+     - Divide your selection into groups of 5
+     - Divide your selection over those nearest and furthest from your mouse location
+     - Divide your selection into two equally sized groups
+
+    For UI mod authors: the changes introduces a framework that allows you to define additional ways to split a selection into subgroups.
+
+- (#4626) Allow mass storages to be built underwater
+
+- (#4490) Add mission briefings to the lobby for all campaigns that ship with Supreme Commander
+    When you are in a co-op lobby the patch notes button is replaced with a briefings button. There you can see the briefing of a map. Only original campaign maps support this feature at the moment.
+
+- (#4689, #4690, #4691) Add hotkey that resembles the 'hard move' functionality introduced by Strogo
+    For those unware: it allows you to continiously issue move orders without queueing them and without accidentally converting them to patrol orders. This is particularly useful for ASF battles
+
+- (#4095) Adds a partial share game option
+    An alternative variant of full share. While structures and engineers are transferred, all other mobile units are lost.
+
+- (#4463) Add a new key binding to select naval units, excluding sonar structures
+
+## AI
+
+This update adresses several long-standing issues that affected the custom AI that FAF introduces. Further developments and improvements of the AI will remain our focus in future updates.
+
+Additionally, we would like to remind people that there are various mods that provide different AI experiences. We can highly recommend you to download them from the vault and give them a spin too.
+
+A short list of AIs we recommend at this point:
+
+- M27: made by Maudlin
+- RNGAI, as made by Relent0r
+- Sorian Edit, as made by Marlo
+- Uveso AI, as made by Uveso
+- Dilli Dalli, as made by Softles
+- Swarm AI, as made by Azraeel
+
+And not to forget the AI that ships with the Total Annihilation mod that is maintained by Dragun.
+
+- (#4413, #4419, #4450)  Tunes the economic assesments of the AI.
+    Throughout the game the AI constantly tries to balance his decisions and those decisions depend on various conditions. These conditions can be tweaked and that is exactly what we did here.
+
+- (#4445, #4447, #4455, #4462, #4461, #4460, #4454, #4475, #4505)
+    General tuning and bug fixing of the AIs. This involves all sorts of improvements, such as fixing a bug causing the AI to hoard units in their base and improving their use of naval units.
+
+- (#4386) Separately keep track of radar structures for AIs
+    These are interesting and often vulnerable targets for the AI. By keeping track of them separately it can interact with them more easily.
+
+    Better guard those radars from now on!
+
+- (#4412) Add logic to prevent prematurely disbanding a platoon
+    A platoon is a group of units that is acting according to some logic that describes the behavior of the platoon. When a platoon disbands it returns to base to receive a new order. We fixed platoons disbanding too soon due to a bug.
+
+- (#4682) AI has been upgraded to make better use of experimentals.
+
+- (#4436, #4450) Improve consistency of builders used by the AI
+    A builder is not an engineer, but a set of conditions that the AI uses to determine what to build. These conditions depend on the status of the AI (do I need additional factories given my income?) and the status of the enemy (should I produce more interceptors?)
+
+    These are tweakable and that is what we did here.
+
+- (#4525) Allow AIx multipliers that are lower than 1.0
+    Some people asked for this feature and here it is - for new players you can lower the multiplier to below 1.0
+
+## Navigational mesh
+
+The navigational mesh is an abstract representation of a map. The AI can use that representation to gain an understanding of what the map 'looks like'. The navigational mesh is generated at the start of the map and works on any map.  
+
+We're looking for people with an interest in computer science to add features to add many other functions that allow the AI to understand. One example of such a feature is the ability to generate expansions markers: points of interest for the AI when it would like to build an expansion. And we'd like to add so much more so much more so that an AI can understand and properly play on any map. The navigational mesh is only use by the AI and only runs when there are AIs in-game.
+
+- (#4432) Add label utilities
+    Allows the AI to understand the value of an area, such as a plateau.
+
+- (#4485, #4495) Only load in the navigational mesh as requested
+    Entirely skip the generation of the navigational mesh when it is not used. This prevents allocation a few megabytes to store the navigational mesh in memory
+
+- (#4555, #4559, #4561) Improve retrieval of (nearest) leaf for path finding
+    This is an improvement to a macro feature (what is the general path from A to B?) and not a micro feature (how should I move this unit?). It is now more consistent, such that if a unit is remotely able to navigate to some place it will always have a label assigned to it.
+
+- (#4569) Add generation of expansion markers
+    These markers are generated for each map. The AI can now identify sane expansion locations on any map
+
+## Bug fixes
+
+- (#4483, #4482, #4496, #4499, #4508, #4519, #4546, #4550, #4580, #4599, #4600, #4605, #4606, #4608, #4631, #4638, #4668, #4669, #4671, #4667, #4672, #4678, #4683, #4692, #4727)
+    General bug fixes that are too small to mention. These are usually introduced during the development environment and caught during testing.
+
+- (#4438) Fix Seraphim torpedo bomber being able to apply damage twice
+
+- (#4453) Fix the marker manager being unable to detect spawn markers
+
+- (#4481) Fix UI scaling of lobby messages
+
+- (#4488) Fix UI scaling of lobby map preview tooltips
+
+- (#4500) Fix and improve option keys
+
+- (#4588) Fix the charge icon of the loyalist
+
+- (#4593) Fix the Lighting Tank being unable to fire at targets on water
+
+- (#4617) Fix a bug where the construction menu would consistently reset
+
+- (#4622) Fix wrong LODs for Cybran shields
+
+- (#4623) Fix removing restrictions breaking the HQ system
+    This was most notable during co-op
+
+- (#4634) Fix the charge animation of the Emissary
+
+- (#4635, #4639) Fix the direction of adjacency beams for factories
+
+- (#4633) Fix various units being refracted when rendered in front of water
+
+- (#4697) Fix a bug where neutral armies could view the entire map
+
+- (#4699, #4715) Fix the jumping and rotating of units as they start being built
+
+- (#4694) Fix offset of LOD1 of the CZAR
+
+- (#4716) Fix a bug with the creation of templates with 1x1 or 3x3 structures
+    The old method of creating templates would create gaps, the new implementation allows you to make proper templates with any structure size
+
+- (#4725) Fix a bug where tech 2 and tech 3 Aeon engineers can not move backwards  
+
+- (#4726) Fix a bug where damage indicators linger on and remain visible
+
+- (#4730) Fix a bug where using recall could make your ACU immune to damage
+
+- (55ddea) Fix a bug where pausing a unit would also stop updating the work progression
+    Often noticeable when assisting paused structures
+
+## Performance
+
+We've been consistently improving the performance of the game by re-implementing features and in general by reducing the overhead of functionality. This section may not be as interesting for the average reader, but we add it anyway as good performance is an important aspect of the general user experience.
+
+- (#4399) Improve performance of the heap data structure by 60%
+    The heap data structure is used during path finding for AIs
+
+- (#4417) Reduce run-time parsing of categories for AIs
+    Replaces all string literals with their respective categories
+
+- (#4376) Reduce overhead of the objective arrow
+    Reduces memory usage of certain aspects of co-op missions
+
+- (#4421) Lower case all imports of build conditions
+    These are imported during run-time as they are processed, by having them as lower case characters we prevent a string operation to turn them into lower case characters during run time
+
+- (#4150, #4444, #4489, #4512, #4512, #4557, #4680, #4681)
+    Remove fields on instance tables to reduce memory usage. In Lua the hash part of tables grow by factors  of two. It can be quite beneficial to refactor the code to remove a few fields as it can prevent the average unit to hit the threshold. As an example:
+
+    - (1) A unit with 33 fields in its instance table will have space for up to 63 fields
+    - (2) A unit with 30 fields in its instance table will have space for up to 31 fields
+
+    Where the table occupies 64 * 20 = 1280 bytes in the first example and only 32 * 20 = 640 bytes in the second example.
+
+- (#4426, #4483, #4503) Separate AI and player logic
+    AI initialisation is now only performed when there is an AI in the game. For a game with no AIs these procedures are skipped which saves several dozens of megabytes worth of memory
+
+- (#4451) Reduce overhead of passing regeneration values to UI
+    These values are no longer passed via the sync, but attached to the state of the unit instead
+
+- (#4466, #4492, #4597, 3dd620c, 9c9dda3) Reduce traffic between the sim and the UI layers
+    Every bit of data we send to the UI is (deep) copied and usually thrown away afterwards. This involves a lot of memory management and that is the most expensive type of logic that a computer can run these days.
+
+- (#4517, #4534, #4532, #4533, #4531, #4528, #4529, #4530, #4582, #4552, #4585, #4549, #4596, #4611)
+    Reduce overhead of projectiles and weapons. The primary change is to reduce the amount of table trashing. An example is the use of a table within the scope of a function: it is allocated and then immediately ready to be de-allocated, which is a waste of performance and a hurdle for the garbage collector.
+
+- (#4539, #4540) Reduce overhead of class instantiation
+    Reduces the overhead of all instantiations such as the creation of effects, decals, projectiles, internal data structures and more. This is a significant boost to the performance overall
+
+- (#4536, #4556) Reduce memory footprint of navigational mesh by 50% to 95%
+    With thanks to #4523 we can now reliably measure the impact of changes, and as a result we managed to increase our awareness of what is expensive.
+
+- (#4640, #4663) Reduce overhead of unit treads
+    The new implementation is a lot more memory aware and reduces the amount of table trashing
+
+- (#4657) Reduce overhead of builder conditions of AI
+
+- (#4558) Replace legacy trashbags with the TrashBag class
+
+- (#4576, 4679, #4703, #4711) Reduce overhead of unit intel management
+    The new implementation is a lot more memory aware and drastically reduces the memory footprint of the average unit
+
+- (#4675) Dynamically compute LOD thresholds for units
+    The larger the unit the longer it remains in view. These values where all over the place. These changes create a consistent experience for players
+
+- (#4686, #4703, #4712) Reduce overhead of passing veterancy state to UI
+    The old implementation could cause stutters due to excessive copying of tables when syncing
+
+- (#4686) Fix memory leak with the veterancy system
+    The old implementation would keep a reference alive to essentially every unit in the game that ever received or did damage to another unit. This would create a directional graph of references with the ACUs being the spills. As a result there is a significant build up of memory as the game progresses
+
+- (fd41dce) The game can now use up to 4 gigabytes of memory, instead of just 3 gigabytes
+    Due to an assembly patch the game can now use an additional gigabyte of memory. In combination with all the other memory improvements mentioned this should prevent all cases of where players run out of memory
+
+## Physics Based Rendering (PBR)
+
+We're slowly but surely preparing the game for a significant visual improvement. This is a long term project that is going to consume hundreds of hours. We're hoping to find additional contributors that have an interesting in creating (and fixing) meshes and textures.
+
+If you have that interest and/or experience and you'd like to help out then you can introduce yourself in the dedicated channels in the official Discord channel!
+
+- (#4247) Introduces shaders for Physics Based Rendering (PBR)
+    The shaders are not used yet but the code is ready to run
+
+- (#4443, #4673) Fix existing cube maps and prepare them for PBR
+    Adds a blur to the mip maps to mimic roughness of the surface
+
+- (#4456) Re-create the Cybran land factories
+
+- (#4469) Re-create the Cybran naval factories
+
+- (#4501, #4664, #4665) Re-create the Cybran air factories
+
+- (#4501) Re-create the Aeon air factories
+
+- (#4479, #4613) Re-create the Aeon land factories
+
+- (#4521) Re-create the Aeon naval factories
+
+- (#4471) Fix localisation and colors of default fields of combo
+
+## Other
+
+- (#4317, #4476, #4320, #4515, #4502, #4504, #4517, #4547, #4513, #4603, #4322, #4677)
+    All the annotation work that has been merged in. We have an extension that allows you (a developer) to gain basic intellisense support in the repository. This has been, and still is a massive improvement to the workflow of those that work on the game (in)directly.
+
+- (#4468) Fix terrain-type depending mesh selection of structures
+    This feature is not used, but technically it allows you to change the (textures) of a structure depending on the terrain type it resides on. As an example: a factory on snow would have snow on it
+
+- (#4303, #4604) Add or improve Chinese translation
+
+- (#4487) Improve the test functionality of movies
+
+- (#4523, #4658) Introduce function to determine size of table in memory
+    Allows us to estimate the size of a table in memory
+
+- (#4512) Fix firing sequence of the UEF Cruiser
+    This is a visual fix and does not impact gameplay.
+
+- (#4538) Reduce code duplication by introducing 'table.random'
+
+- (#4263) Add division icons
+
+- (#4395) Add MIT licenses to various FAF-introduced files
+
+- (#4659) Add a russian translation for the balance patch
+
+- (#4688) Add a code of conduct to the repository
+
+- (#4731) Fix the auto balance button in the lobby being too large
+
+- (3e34599) Remove logging of console commands
+
+## Mod incompatibility
+
+There appears to be an issue with the UI mod 'Supreme Economy v2.3'. We've notified the maintainer.
+
+## Contributors
+
+- Rowey (#4317, #4320, #4517, #4515, #4517, #4534, #4532, #4533, #4531, #4528, #4529, #4530, #4547, #4582, #4552, #4588, #4549, #4603, #4322, #4627, #4626, #4657, #4731)
+- 4z0t (#4376, #4437, #4472, #4484, #4538)
+- Relent0r (#4413, #4417, #4412, #4419, #4435, #4436, #4445, #4447, #4450, #4455, #4462, #4461, #4460, #4454, #4475, #4505, #4682)
+- BlackYps (#4247, #4443, #4667, #4673)
+- Blodir (#4247)
+- Zjonn (#4399)
+- MadMax (#4443, #4456, #4469, #4486, #4501, #4501, #4521, #4613, #4622, #4664, #4665, #4694)
+- Jip (#4247, 4421, 4386, #4453, #4432, #4444, #4451, #4475, #4426, #4466, #4474, #4483, #4485, #4482, #4492, #4496, #4495, #4489, #4503, #4500, #4512, #4523, #4539, #4540, #4546, #4510, #4536, #4555, #4556, #4557, #4559, #4561, #4560, #4580, #4581, #4585, #4590, #4591, #4596, #4597, #4598, #4599, #4600, #4605, #4586, #4606, #4607, #4577, #4611, #4608, #4587, #4611, #4615, #4617, #4612, #4620, #4623, #4631, #4635, #4634, #4633, #4636, #4640, #4658, #4639, #4639, #4663, #4638, #4558, #4576, #4668, #4669, #4672, #4677, #4675, #4679, #4680, #4569, #4681, #4686, #4689, #4688, #4690, #4691, #4692, #4697, #4699, #4711, #4703, #4712, #4714)
+ xXEddieXxx (#4438, #4463)
+- speed2 (#4448, #4487, #4488, #4508, #4490)
+- hdt80bro (#4471, #4476, #4550, #4513, #4395)
+- Yuchenjimmy (#4303, #4604)
+- Penguin (#4095, #4491)
+- Haifron (#4499, #4526, #4519, #4504, #4593)
+- Balthazar (#4479, #4716)
+- Senex-x (#4659)
+- MostLostNoob (#4669)
+- maudlin27 (#4671)
+- KionX (3e34599, 9c9dda3, fd41dce, 55ddea)
+- BlueAmulet (fd41dce)
+
+At last I'd like to thank Phong for consistently hosting games on the FAF Develop game type. I've watched almost all his games to track down bugs that would otherwise go unnoticed. And my thanks to Prohibitorum for proof reading the changelogs.
+
+# Game version 3750 (28th of January, 2023)
+
+## Land
+
+### T2 Land
+
+T2 land is much slower than T1 and T3 which doesn't allow it to adequately cover the map, raid, and defend against attacks, especially on bigger maps. The meta in team games is to generally either completely skip T2 or go all in. These changes hope to make T2 more viable in team games and 1vs1. Another advantage in increasing the MS of T2 land is how they will interact with Rambo ACUs, especially in 1vs1. Currently, Rambo ACUs are extremely strong and even if you have more army value it's very difficult to press your advantage since if you are the one engaging the enemy gets at least 2-3 OCs for free. With the MS changes it should allow the player with more army to more easily punish the opponent for miss positioning their ACU or being overly aggressive/borderline suicidal.
+
+Increase of 0.1 Movement Speed to all Flaks, MMLs, Range Bots, and Main battle tanks.
+
+Rhino gets a buff of 0.2 (and so does Cybran flak) as it's currently comparatively weak to its T2 counterparts and Cybran needs a buff during its T2 stage.
+
+Hover tanks don't get a movement speed increase as they are already very fast and we don't feel like this change is necessary for them. Perhaps they will get some other small tweaks next patch.
+
+**Asylum (Aeon T2 mobile shield)**
+
+* EnergyMaintenanceCost: 45 > 55
+
+Aeon t2 land has become arguably the best with a combination of powerful tanks, cheap shields, and the strongest ACU. This minor nerf aims at reducing the strength a little bit.
+
+### Titan and Loyalist
+
+* BuildTime: 2160 > 2400
+
+The Titan and Loyalist build-time buffs from patch 3725 are reverted to make it harder to snowball out of control with a T3 land rush.
+
+**Titan**
+
+* HP 2600 > 2400
+
+**Loyalist**
+
+* The Loyalist's ability will no longer disable weapons and the charge will kick in 1 second faster
+
+After T3 rebalance Titans with their fast recharging shields became a bit too oppressive and they are currently stronger than loyalists. A small HP nerf should put the unit in the right place while not taking away from its specialty of constantly dashing in and out and letting its shield recharge.
+Loyalists' ability has been underwhelming and thus it's getting a well-deserved buff, we hope this will be enough to make mixing in Loyalists in your army in later stages a more viable option instead of being a gimmick that is rarely used.
+
+### Sniper bots
+
+Sniper bots get an overall nerf to make it harder to snowball out of control. With the energy cost nerf specifically we aim at delaying the first few snipers from hitting the field immediately after a player gets T3 Land.
+
+**Usha-Ah**
+
+* Mass Cost: 880 > 960
+* Energy Cost: 9700 > 15.360
+* BuildTime: 4500 > 5400
+
+The snipe mode icon is changed to make the difference between the snipe mode and normal mode easier to see.
+
+**Sprite Striker**
+
+* Mass Cost: 800 > 880
+* Energy Cost: 8900 > 14.080
+* BuildTime: 4500 > 4950
+
+## Air
+
+### Air Experimentals
+
+Air experimentals were always extremely cheap in energy cost compared to t3 air. This led to the ability to build air t4’s without any power setup like is required for t3 air and thus became a relatively cheesy way to win games. With this change, the e cost is more streamlined with t3 air.
+
+We also reduce the crash damage of air T4s. Their ability to kill heavily shielded targets by simply dying and hitting them provided the defending player with little counter-play. They still deal a considerable amount of damage to not break the immersion of the game but these values will be further reduced if deemed necessary.
+
+**Ahwassa**
+
+* Energy Cost: 780.000 > 1.920.000
+* DamageRadius: 20 > 19
+* Crash damage 10.000 > 7000
+
+In addition to the energy cost nerf the ahwassa gets a small nerf to its AoE considering its dominance compared to the other air T4s.
+
+**CZAR**
+
+* Energy Cost: 731.250 > 1.530.000
+* Crash damage 10.000 > 7000
+
+**Soulripper**
+
+* Energy Cost: 480.000 > 952.000
+* Crash damage 7000 > 5000
+
+### SoulRipper Mini-rework:
+A decrease of roughly 15% across the board. The goal is to make the SR a more viable option and further establish it as the value over time air experimental. With the lower cost, it will be easier for the player to justify investing in the SR
+and slowly leverage a small-medium advantage he had in the air.
+
+In addition to the stat changes we also increase the movement speed by 1 and give it 75 hp regen per second.
+
+HP: 90.000 > 75.000
+Regen Rate: 0 > 75
+Mass Cost: 34.000 > 29.000
+Energy Cost: 952.000 > 812000
+BuiltTime: 56.250 > 48.000
+DPS: 1535 > 1368.3 
+
+The decrease in hp is slightly larger than the decrease in DPS meaning the SR will be a bit less tanky but will pack a bigger punch relative to its cost.
+
+### Strategic Bombers
+
+All strategic bombers have their elevation reduced. This will make them easier to hit by non-homing AA which should greatly increase the effectiveness of T1 AA and T2 Flak (although that will now hit rarely instead of never) which should make the early strats a lot less oppressive since now every play will be able to build a unit that will at least partially counter the strat.
+
+* Elevation: 20 -> 14
+
+### T3 UEF Air
+
+Added jamming for Spy Planes and Strategic Bombers allowing for more counter-intel capabilities. The scouts will have their jamming on by default and for free while the Strats will have theirs off by default and it will cost 25e/s to run (same as the T3 gunship). These changes should allow UEF air players to trick their opponents by including Air scouts in their mix and artificially inflating the size of their ASF cloud. It will also make the Air scouts harder to shoot down by static AA/ASF and buff unscouted strat runs.
+
+### T2 Air crash damage
+
+**Notha**
+
+For some reason Notha had different crash damage than other T2 Fighter bombers
+
+* Crash damage 25 -> 200
+
+**T2 Transports**
+
+T2 transports had lower crash damage than T1 (100). These changes will also nerf arty drops since now if the transports die and land on top of them it will kill all of the arties.
+
+* Crash damage 25 -> 250
+
+## Navy
+
+For a long time, Aeon frigates were absolute garbage while their Destro's were insanely good while Cybran had the exact opposite with OP frigate and weak destroyer. These changes redistribute the power of those factions while retaining the units' unique traits and further enhancing them by adjusting the ranges of the frigate. We hope it will also introduce more micro potential in frigate fights, especially with Cybran vs Aeon.
+
+Bulwark gets a mini-rework to establish it as a T2 support vessel instead of a unit that is mainly used during the T3 stage with Battlecruisers and Battleships. This should help UEF's notoriously weak T2 stage while making their T3 one less oppressive.
+
+However, with the changes to Bulwark UEF Battleships are left out to dry. We are making them slightly less clunky so that hopefully they can dodge at least some shot if you micro them.
+
+Tempest has been very powerful for a long time and it's getting a well-deserved nerf. It will cost a bit more, and you will need more BP/infrastructure ready to build one. It won't be able to act like a quick mass dump after spamming destroyers and skipping T3 Navy completely.
+
+### Frigates
+
+
+**Aeon**
+
+* Mass Cost: 290 > 280
+* Energy Cost: 2900 > 2800
+* Built Time: 1450 > 1400
+* Range: 31 > 33
+
+**Cybran**
+
+* Mass Cost: 250> 260
+* Energy Cost: 2500> 2600
+* Built Time: 1250> 1300
+* Range: 28 > 26
+
+### Destroyers
+
+
+**UEF**
+
+The valiant has always been one of the weakest destroyers. With this change, we hope to give it more of a tank role that fights at a short range.
+
+* HP: 7200 > 8000
+
+**Cybran**
+
+Salem has always been extremely squishy compared to other destroyers. It will still have the least hp but will now be able to survive a few more shots.
+The TurretYawRange of salems is again slightly increased to improve the handling and micro potential.
+
+* HP: 6050 > 6500
+* TurretYawRange: 140 > 145
+
+**Aeon**
+
+Exodus was one of the 2 higher-range destroyers yet it had the highest HP of all. This was necessary due to how weak the Aeon frigate was but this kind of balance made Aeon really bad at T1 and extremely oppressive at T2 where they spammed destroyers only. With the buffs to their frigate, we can finally tune down Exodus a bit. We are reducing its HP to punish Aeon players for letting their destroyers get into range of their enemy and reducing the max range down to 70 to allow shorter-range destroyers to get into range more easily. This will also mean that the Cybran destroyer will now outrange the Exodus and thus have some edge over them.
+
+* HP: 7500 > 7200
+* Range: 80 > 70
+
+### Bulwark Mini-rework
+
+
+Decrease of roughly 1/3 in the stats to allow UEF players to get them out during the T2 stage to support their navy without having to worry about having fewer destroyers and dying immediately to an enemy push.
+
+* Mass Cost: 1300 > 900
+* Energy Cost: 13.000 > 9000
+* Build Time: 5200 > 3600
+* Maintenance Cost: 150 e/s > 100 e/s
+* HP of the unit: 750 > 550
+* Shield HP: 8000 > 5500
+* Shield Recharge Time: 40 > 30
+
+### Battleships
+
+
+**UEF**
+
+With the changes to the bulwark Summit will struggle against the other Battleships since it's the slowest one by far and is not able to dodge shots. It used to rely on Shield Boats to just tank all of that damage but that won't work to such a degree anymore. We are increasing its Movement Speed and Turn Rate slightly to make it less clunky and allow UEF players to micro their Battleships
+
+* Movement Speed: 2.5 > 2.75
+* Turn Rate: 25 > 27.5
+
+Acceleration and Break speed were adjusted accordingly
+
+### Experimentals
+
+
+**Tempest**
+
+Tempest is an extremely powerful unit in the right hands. It was a common sight to see them with 20k+ mass killed while the Battleships had < 5k. With a relatively cheap mass cost and especially build time cost it was easy to rush with an ACU/T3 engineer and some T1 BP. If micro'ed properly enemy could never kill one without fully committing to a naval engagement thus allowing Tempests to gain a lot of value over time. These changes will hopefully make the unit more balance and force the Aeon players to have more BP in order to build a tempest.
+
+* Mass Cost: 22.000 > 24.000
+* Build Time: 28.800 > 38.400
+
+## Engineers
+
+Engineer pathfinding is one of the most frustrating things in FAF. With the changes to their Turn rate, Back up distance, and Acceleration/Deaccelaration we hope to finally alleviate those issues. These changes will also make engineers more micro'able, especially in the early stages of the game eg. vs T1 bombers. If you want to read more take a look at this [PR ](https://github.com/FAForever/fa/pull/4571) that Jip made.
+
+We are also buffing the efficiency of higher-tech engineers. They will now get more bp while having the same cost.
+
+* T1 engineers 10.4 mass/bp
+* T2 engineers 10 mass/bp
+* T3 engineers 9.6 mass/bp
+
+**Sparky (UEF T2 Field Engineer)**
+
+* Allow Sparkies to build intelligence structures(radars, sonars, stealth generators)
+* Allow Sparkies to build T1 factories
+
+This small buff should make Sparkies easier and nicer to use by not requiring players to find the nearest T1 engineer on the frontline to construct a radar or a factory. We hope these changes will encourage more aggressive usage of the Sparky on the frontlines and in drops.
+
+## Buildings
+### Hives & Kennels
+
+Hives have been the dominant engineer station forever now, they have many advantages over Kennels and are extremely dominant in the super-late game. These changes are meant to bring the Hives more in line with the Kennels without making them a non-viable option if you quickly want some concentrated, albeit less efficient, bp in your base in the mid to early late-game. Hives will now get less efficient the higher tech of the Hive you get, this is meant to reduce their strength as an insanely compact, high bp that is easy to shield. You will now have to pay more to have a more concentrated, higher HP, higher range BP. 
+We are also reducing the HP of engineering stations to make them a bit easier to snipe and to emphasize protecting your BP more.
+
+### Hives
+
+Hives have 3 different levels, I will denote them T1, T2, and T3 for clarity's sake.
+
+**T1 Hive**
+
+* BP: 25 > 20
+* Energy Cost: 1750 > 2100
+
+**T2 Hive**
+
+* HP: 1.250 > 1000
+* BP: 50> 37
+* Energy Cost: 4.083,33> 4.200
+
+**T3 Hive**
+
+* HP: 2.750 > 2.000
+* BP: 75 > 50
+* Energy Cost: 6.416,66> 6.300
+
+### Kennels
+
+Kennels have 2 different levels, I will denote them T2 and T3.
+
+**T2 Kennel**
+
+* Mass Cost: 550 -> 525
+* Energy Cost: 2.750 > 2.625
+* Build Time: 1.100 -> 1.000
+
+**T3 Kennel**
+
+* HP: 3.000 > 2.500
+* Build Rate: 20 > 30
+
+**Kennel Drone**
+
+* HP: 6 > 50
+* Mass Cost: 250 > 100
+* BuildTime: 750 > 500
+* Elevation 2 > 3
+
+With these changes, it will be less punishing to lose the drones as they will rebuild faster and at a much lower cost. The elevation increase should make the drones less prone to random AoE attacks landing on the base.
+
+### T2 PD
+
+The economy Stats of a lot of units are all over the place currently with ratios between factions being close but not the same for no apparent reason (Take the Sera and Aeon PD which have the same cost but Sera randomly costs 26 more BT).  We normalized the stats and adjusted the values slightly.
+
+**UEF**
+
+* BuildTime: 664 > 675
+* Energy Cost: 3600 > 3780
+
+**Aeon**
+
+* BuiltTime: 701 > 675
+* Mass Cost: 528 > 540
+* Energy Cost: 3648 > 3780
+
+**Sera**
+
+* BuiltTime: 727> 675
+* Mass Cost: 528 > 540
+* Energy Cost: 3648 > 3780
+
+**Cybran**
+
+* Energy Cost: 3400 > 3360
+
+### T2 static Artillery
+
+T2 static artilleries shouldn't be able to consistently hit small single targets. That's why we are increasing the firing randomness of all arties by 0.25. Aeon artillery gets a small buff as it's currently the most underwhelming one. We also normalized the unit economy stats and made a few small tweaks.
+
+**UEF**
+
+* Mass Cost: 1890 > 1900
+* Energy Cost: 13500 > 13585
+* Firing Randomness: 2 > 2.25
+
+**Aeon**
+
+* Mass Cost: 2079> 2080
+* Energy Cost: 14850> 14872
+* Firing Randomness: 1.5 > 1.75
+* Damage Radius: 2 > 2.25
+
+**Sera**
+
+* Mass Cost: 1995> 2000
+* Energy Cost: 14250> 14300
+* Firing Randomness: 1.5 > 1.75
+
+**Cybran**
+
+* Energy Cost: 12000> 12012
+* Firing Randomness: 2.5> 2.75
+
+### Nukes
+
+
+Nukes are extremely strong and can be very oppressive, especially in team games. In almost every game in an early late-game, it's a good idea to make a nuke. Its relatively low cost combined with having potential for game-ending damage while always being able to find value even if the enemy has adequate defenses in place makes it a no-brainer. Not to mention that it will force out SMDs, and not just 1, depending on the map it can be up to 4 which already makes the nuke worth it without even killing anything.
+
+The small mass cost increase and higher energy cost are supposed to make it more expensive and delay the 1st nuke by requiring more E infrastructure to set up. You will no longer be able to get T3, make 2 T3 pgens, and a nuke launcher immediately afterward. Additionally, the E cost of the missile itself is increased (The Launcher will now drain 5k instead of 4.5k E/sec), this will also increase the importance of adjacency while discouraging heavy assisting.
+
+### Nuclear warheads
+
+* Energy Cost: 1.350.000 -> 1.500.000
+
+### Nuke Silos
+
+* Mass Cost: 15.000 > 16.500
+* Energy Cost: 210.000 > 412.500
+
+### Nuke Subs
+
+**Aeon, UEF**
+
+* Mass Cost: 9000 > 9.500
+* Energy Cost: 80.000 > 152.000
+
+**Cybran**
+
+* Mass Cost: 10.000 > 10.500
+* Energy Cost: 80.000 > 152.000
+
+### T3 Static Artillery
+
+Energy cost nerfs follow in the steps of Air experimentals and nukes. The E cost increase is meant to force players to set up proper energy infrastructure before making artillery instead of being able to dump all of their mass extremely fast. The E maintenance cost increase is meant to create a real operational cost, especially when a player has multiple artilleries.
+
+Increase E cost of all artilleries 1.5 times and double energy required to fire.
+
+**UEF**
+
+* Energy Cost: 900.000 > 1.350.000
+* Energy Required to Fire: 8.000 > 16.000
+
+**Aeon**
+
+* Energy Cost: 915.000 > 1.372.500
+* Energy Required to Fire: 8.500 > 17.000
+
+**Sera**
+
+* Energy Cost: 885.000 > 1.327.500
+* Energy Required to Fire: 7.500 > 15.000
+
+**Cybran**
+
+* Energy Cost: 870.000 > 1.305.000
+* Energy Required to Fire: 7.000 > 14.000
+
+## Mechanics
+
+* All ACUs and SACUs that can make tac missiles will start construction by default instead of having to manually enable it.
+
+* Loyalists will no longer redirect Billy Nukes
+
+## Fixes
+
+* Fixed the icon of the Heavy Shield upgrade for Aeon ACU
+
+* Fixed the damage of UEF and Sera T1 Artillery. They dealt 2 less damage than intended since the way that units break tree groups was changed some time ago.
+
+* Adjust the hitbox of Sera Sniper so that MMLs can hit it properly
+
+## Contributors
+
+* Balance Team
+* Jip
+* Penguin
+
+# Game version 3748 (16th of November, 2022)
+
+## Bug fixes
+
+- (#4414) Revert changes to prefetching of assets
+    We thought we understood how prefetching worked, but we were wrong. As a result some
+    people ran out of memory. That results in an application crash.
+
+    We reverted the changes.
+
+## Contributors
+
+- Jip (#4414)
+
+
+# Game version 3747 (15th of November, 2022)
+
+## Features
+
+- (#4377, #4380) Improve reclaim overview
+    Adjusts the colors, scaling and depth to better represent what is valuable.
+
+- (#4387) Add toggle to enable / disable always showing splash damage
+    It is off by default, you can find the toggle in the game options -> interface -> cursor features
+
+- (#4393) Paint feature for observers
+    Observers can now paint on the map and other observers can view each others paintings. Useful for
+    casting to communicate to your viewers and fellow casters.
+
+    Works by pressing the `ALT` key, can be adjusted in the game options.
+
+    This feature also works in replays.
+
+- (#4391) Improve rendering quality of water
+    Slightly adjusts how water looks like in-game to make it look better overall
+
+- (#4390, #4409) Add in missing tooltips for game options
+    All the game options should now have a consistent tooltip.
+
+- (#4385) Change default aix multiplier values
+    Especially the AIs that can be found in the vault become complete beasts when they have
+    twice the resources and build time. The default multiplier is now set to 1.5
+
+    Note that you can change the AI multipliers in the lobby options
+
+- (#4406) Prefetch session and unit assets
+    Decreases the loading time when launching through the lobby. Assets of units are loaded
+    as you play to reduce stuttering of the game.
+
+    This is an experimental change.
+
+- (#4405) Tweak network parameters
+    Reduce the amount of lag that players experience by reducing the delay when messages are send.
+
+    This is an experimental change.
+
+## Bug fixes
+
+- (#4379) Fix weapon priorities not working for units that can snipe
+
+- (#4367) Fix the UEF factory unit build animations
+
+- (#4367) Fix the cheat window build preview hanging around
+
+- (#4370) Fix the resource sharing panel
+    The 'resources' button is now available again in the diplomacy panel
+
+- (#4306) Fix SubtractCurrentEngineer and formatting in base manager
+
+- (#4388) Revert accidental footprint changes of Titan, Loya and Ilsa
+
+- (#4375) Fix TMDs trying to shoot down missiles that are too nearby
+    They now have a minimal firing range, it prevents them from trying to hit missiles
+    that they can't find a firing solution regardless
+
+- (#4398) Fix and update recall feature
+    In particular, fixes a few glitches that people could apply to influence the results.
+
+- (#4407) Scenario Framework GetRandomEntry fix
+
+- (#4408) Slightly reduce mods manager size
+    Fixes the overlap of the last mod in the list with the search bar
+
+## Other changes
+
+- (#4366) Add slight transparent background to changelog
+
+- (#4369) Add guard for validation of LayoutHelpers
+    It would otherwise spam the logs, causing a delay
+
+## Contributors
+
+- ErikMekkes (#4379)
+- Relent0r (#4385)
+- BlackYps (#4391)
+- 4z0t (#4306, #4407)
+- Hdt80bro (#4377, #4370, #4369, #4398, #4409)
+- Jip (#4348, #4367, #4366, #4380, #4387, #4389, #4393, #4390, #4406, #4405, #4408, #4375, #4388)
+
+# Game version 3746 (6th of November, 2022)
+
+I'd like to show my appreciation to those that made a friendly report on what was broken. We tackled
+the majority of the issues, with the exception of the resource button in the diplomacy tab. We disabled
+that for now.
+
+As an alternative you can also share resources via the scoreboard. The default scoreboard supports
+this too by ctrl / shift clicking on the resources of an ally. See also the tooltips.
+
+I was also informed that the author of Economy Manager released a patch, it is now compatible again. For
+those that use the range ring preview you can download a UI mod called 'Build Range Preview' made by Sheikah.
+
+With thanks to 4z0t and Sheikah for their help in writing this hotfix,
+
+With kind regards,
+
+Jip
+
+## Features
+
+- (#4358) Allow reclaim overview to be customizeable
+    You can now enable / disable batching via the game options. It is part of the
+    interface section. You can also scale the text of the labels. Note that
+    excessive scaling doesn't work properly with batching.
+
+    It is highly recommended to enable batching for low-end systems.
+
+## Bug fixes
+
+- (#4348) Fix attack ping cursor being stuck
+    Occured when you tried to issue an attack ping.
+
+- (#4353) Update Nomad shaders to the latest version
+    As part of a series of steps to remove shaders from the Nomads repository. We can't
+    update our shaders unless we update theirs too. Instead, we now migrate the Nomads
+    shaders into the base repository and remove the version in Nomads.
+
+    This should fix graphics issues that people are experiencing.
+
+- (#4354) Fix cursor for text message
+    Occured when you tried to issue a text ping
+
+- (#4354) Fix decals not showing for strategic launcher
+
+- (#4352) Re-introduce the zoom pop hotkey
+    This was removed on accident
+
+- (#4355) Rating now shows properly on the scoreboard again
+
+- (#4359, #4363) Fix hotbuild being unable to reset the cycle properly
+
+- (#4361) Fix error when spawning in units
+
+- (#4362) Fix air units not sinking
+    This was not related to the patch, but we included it anyhow. Transports would sometimes be unable to sink
+    properly, especially when they are landed on water.
+
+## Contributors
+
+- 4z0t (#4363)
+- Jip (#4348, #4353, #4354, #4352, #4355, #4359, #4362, #4361, #4358)
+
+# Game version 3745 (6th of November, 2022)
+
+And there it is, the last major patch of the year!
+
+This patch was ambitious. The purpose was to introduce modern features into the game, while at
+the same time make the game easier to customize to your liking. Some of the patch can be
+immediately applied by players, like the extended features on control groups, camera recall
+functionality and the improved performance of the reclaim overview. Other features are not
+immediately visible but are a major step forward, like the navigational mesh we generate for
+the map you're playing on for AIs.
+
+Previous patches primarily made changes in the code directly related to the simulation. This
+patch also includes changes to the code surrounding the user interface. Also refers to UI
+code or UI mods. It was not possible to do this patch without causing incompatibility with
+some of the UI mods that are out there. We introduced a list of incompatible mods at the
+end of this changelog. Authors can update their mod, bump the version number and the game
+should automatically make it available again.
+
+As a minor note to the authors of UI mods: it is better to have many small UI mods that each
+add in a single feature, then it is to have one large UI mod that adds in many features. One
+example is Economy Manager - a mod often used by players - is no longer compatible because
+one of its dozen features is incompatible:the command feedback no longer triggers with Economy
+Manager enabled. Long story short: keep the UI mods small and simple, as people can enable
+any number of them.
+
+And as this year ends I'd like to show my personal appreciation to some contributors and community
+members. I'll start off with hdt80bro, who has been working on the repository for the past few
+months. His extensive knowledge and motivation was visible in our discussions and above all in his
+code changes. We're lucky to have him. Next to that I'd like to thank Madmax for always being
+there when I needed essentially anything. Whenever I needed a tester, Madmax is usually there
+ready to help confirm the stability of it. And of course there is Rowey - always ready to assist
+with his friendly character. Rowey has pushed the FAF Youtube that increased exposure on the development
+of this game, like being there when we were producing the game development series. a lot of the videos
+on game development. And last I'd like to thank Sprouto - creator of the LOUD community - for being an
+inspiration to what he managed to achieve with LOUD. Every time we talk I learn something new and I am
+looking forward to our next conversation.
+
+And like that, a new year of development will start. And with a new year we'll take a new route
+to how we'll further develop this game. Instead of having a 'game team' - that introduces an arbitrary
+boundary between contributors - we'll move towards how other projects are managed: by creating a clear,
+properly scoped backlog of issues that contributors can pick up. Anyone can add and discuss issues in
+the backlog. Once an issue is accepted it is added to a milestone. Milestones allow us to steer contributors
+towards a common vision. They make it immediately clear when you can expect your changes to be live.  Alas -
+there's too much to tell and too little room in this changelog. For those interested, we'll soon make a post
+on the forums and release the new contribution guidelines on the repository.
+
+With appreciation towards all the contributors that made this patch possible,
+
+Jip
+
+## Features
+
+- (#4119) Extend functionality of control groups
+    Adds in modern features into how control groups work. This includes:
+
+    - the 'stealing' units from other control groups (like in Starcraft II)
+    - being able to toggle the control group inheritance of factories
+    - allow you to adjust the behavior of the camera when you double tap
+    - allow you to adjust the double tap interval
+
+    And on top of that we've introduced various new hotkeys that interact with
+    control groups.
+
+    You can find the settings in the game options. You can find the additional
+    hotkeys in the hotkeys menu.
+
+- (#4124, #4331) Improve cursor / command behaviors
+    Acts as an integration of the 'Random UI improvements' mod of Strogo. This includes:
+
+    - disabled reclaim cursor when you can't issue reclaim orders due to camera distance
+    - manual tactical / nuke launchers no longer attach to units, and instead always
+        target the ground
+    - area of effect preview when you try to issue an attack order
+    - allow you to adjust the selection threshold, particular useful for 2K+ displays or
+        when watching replays
+
+    You can find the settings in the game options.
+
+- (#4124) Extend camera features
+    Acts as an integration of Additional Camera Stuff. This includes:
+
+    - Allows you to retrieve up to 9 camera locations
+    - Allows you to restore the previous camera position
+
+    You can find the additional hotkeys in the hotkeys menu.
+
+- (#4188, #4190, #4191) Allow observers to view mouse position of players in-game
+    In particular useful for casters. The feature does not work with replays or live games
+    (that are replays too). In order for it to work you need to be an observer in the game,
+    as it starts. The information is not stored in the replay either.
+
+- (#4203, #4204, #4212, #4234, #4244) Introduce recall
+    Adds in a recall feature. Similar to a the 'concede' feature that other games provide,
+    it allows you to cast a team vote on whether you want to recall as a team. When you
+    are with two or less alive players it requires all alive players of the same team to
+    agree. When you are with three or more alive players it requires all but one
+    of the alive players of the team to agree.
+
+    Was introduced because people got frustrated with the Fullshare mode in combination
+    with the limitated player base size.
+
+- (#4219) Add in successive upgrades hotkeys for Hotbuild
+    Allows you to easily queue the upgrade of an upgrade using Hotbuild.
+
+- (#4232) Add batching of reclaim labels
+    Reclaim labels are batched as you zoom out. As a result they remain readable.
+
+- (#4241, #4334) Add coloring of reclaim labels
+    Reclaim labels are colored based on their value.
+
+- (#4175) Add PBR blender nodes for rendering of units  
+    This acts as a step-up towards introducing PBR-based shaders. It is used to check the
+    textures / assets of units and acts as an inspiration to the shader implementation.
+
+- (#4131) Introduced of shared armies
+    Allows you to play as one army, where you all share control over the same units. This
+    used to be a standalone executable and is now integrated with the base game.
+
+    You can find these settings in the lobby options. Note that when applied the game
+    is no longer rated.
+
+- (#4254) Improve text markers
+    When you create a text marker it is also send to the chat with camera coordinates
+    attached. This allows you to jump to text markers.
+
+    Based on a forum post.
+
+- (#4253) Attempt at fixing engineer behavior for Seraphim air factories
+    Engineers constructed by the Seraphim air factories get teleported instead of
+    'tractored' off the factory. This was the only factory that made it impossible
+    to select the engineer during roll off. Attempting to make the unit selectable during
+    tractoring introduced a pile of issues.
+
+    Therefore now all Seraphim air factories are magicians until we find better effects.
+
+    Based on a forum post.
+
+- (#4249) Add in a hotkey to select intelligence structures
+
+    Based on a suggestion by a user.
+
+- (#4249) Add in a hotkey to filter your selection to the engineer with the highest tech
+    All other engineers in your old selection will assist the selected engineer
+
+    Based on a suggestion by a user.
+
+- (#4266) Improve pathing surrounding props
+    Only large props (the size of a frigate or larger) block pathing.
+
+    Previously a lot of props blocked pathing, in particular small rocks. This introduced a
+    lot of noise in the occupancy layers, where it isn't clear that this noise exists. Especially
+    when you are zoomed out, being unable to see the rocks.
+
+    The noise caused units to behave strange, suddenly stop, circle around, etc. By removing
+    this noise we indirectly improve pathing a lot.
+
+- (#4270, #4282, #4285, #4298, #4312, #4313, #4308) Introduce generated navigational mesh to interpret maps
+    This feature is technically involved. The idea is similar to the marker generator that has
+    been part of the Uveso AI for a few years now, but instead of markers we work with
+    areas. The navigational mesh can be used by AIs to understand and interact with the map.
+
+    The feature is based on compression via quad trees that compress the pathing information. We use
+    the leafs of the quad tree to create a graph. This graph is initially used for just pathfinding,
+    but we can use the graph for so much more.
+
+    All the code related to this feature is licensed using the MIT license. We're improving
+    it in collaboration with the AI developers. We try to convert their requests into an
+    algorithm that computes the answer. The algorithm needs to be simple, yet efficient as there
+    is essentially no budget to perform computationally expensive algorithms.
+
+    We're open to new contributors to help maintain and expand this exciting new feature of FAF.
+
+- (#4287, #4328) Adjust factory behavior when building and finished building a unit
+    Drastically reduces the time it can take for a unit to roll off the building pad of a factory. The
+    production of a new unit starts the moment the build pad is clear. Also allows units to rotate to
+    the correct roll off point right before being finished.
+
+    Tech 1 tanks, artillery and labs have one second additional build time to compensate for the
+    reduction of roll off time.
+
+- (#4307) Re-organize game options
+    Adds in headers and groups various options together. A few options have been renamed. Others have
+    been removed. The game options menu is a lot more organised now.
+
+## Bug fixes
+
+- (#4338) Fix remote code exploit
+    It was possible to inject arbitrary code into the simulation via a UI mod. This would
+    not be able to affect your system, but it would allow you to run any code in the simulation
+    and have that code run for all players involved.
+
+    It is highly appreciated that this was brought to our attention discretely.
+
+- (#4205) Fix typo with missile callbacks for AIs
+
+- (#4225, E#13) Fix Harbingers preference to reclaim instead of attacking during an attack move
+    They now attack move as you'd expect, instead of notoriously reclaiming the nearest tree.
+
+- (#4248, #4337) Fix issues with Tractor Claws of the Colossus
+    Air units are now destroyed as soon as they reach the claw and the beam of the colossus
+    is now less likely to try and attack units that are being tractored.
+
+- (#4201) Fix footprint and collision box of Ythotha
+    The Ythotha is no longer afraid of walls and can again happily crush them.
+
+- (#4202) Fix duration of death animations of structures
+    It now matches the time it has always taken for factories to be destroyed.
+
+- (#4250) Fix missing meshes and normals of various units
+    Including the Summit, that now again looks a lot better.
+
+- (#4207, 4230) Fix props corrupting bomber weapon state
+
+- (#4260) Add the BlueprintId to `Blueprint.CategoriesHash`
+
+- (#4171) Fix scaling issue with new mod manager
+
+- (#4262) Fix teleportation glitches
+    No more teleporting Cybran ACU with a cloak upgrade.
+
+- (#4264) Fix a glitch with an Atlantis and a gunship with its cargo
+    No more invincible units through this weird glitch.
+
+- (#4291) Allow turrets to rotate to the nearest threat again
+    This was broken by the previous patch, it now functions as expected again.
+
+- (#4329) Fix collision size of Titans, Loyalists and Ilshahovs for beam weapons
+    Beam weapons (in particular, the Seraphim tech 2 point defense) should now more
+    reliably hit these specific units.
+
+- Properly populate `AdjacentUnits` of structures
+    Useful for AIs to quickly determine adjacent units. Only units that provide an
+    adjacency bonus are tracked.
+
+## Performance
+
+- (#4180) Improve performance of AI economy conditions
+
+- (#4284) Improve performance of AI builder conditions
+
+- (#4237) Improve performance by changing `self.Fun(self, ...)` to `self:Fun(...)`
+    This was initially considered an improvement to performance. With the recent
+    improvements to the benchmarking tools we found out that this isn't strictly
+    the case. Therefore we are reverting it back to the more-readable format.
+
+- (#4232, #4242, #4241, #4243) Improve performance of reclaim labels
+    Drastically improves the performance of reclaim labels.
+
+    A lot of UI mods adjusted the behavior of reclaim labels. Usually they did this
+    by using destructive hooks. That makes it impossible for us to push through
+    these improvements. UI mods that apply destructive hooks to `reclaim.lua`
+    have been deprecated. Their authors are highly encouraged to update their mods
+    and are recommended to use soft hooks instead.
+
+- (#4325) Clean up and improve performance of imports
+
+## Campaign / AI
+
+- (#4265, #4268, #4271, #4305, #4300, #4294) Improve AI behavior and performance of the base game
+    Including, but not limited to:
+
+    - use alternative move functions that reduce formation issues
+    - implement eco-over-time to better guage the economic situation
+    - fix ACU behavior where it is unable to finish structures
+    - fix various issues with commands not being cleared properly
+    - fix factory manager not cleaning up destroyed factories
+    - introduction of pathing build conditions (using navigational mesh)
+
+- (#4304) Add HQ support functions for AIs
+
+- (#4309, #4310, #4319, #4311) Clean up of various build conditions
+
+## Annotations
+
+(#4172, #4186, #4176, #4174, #4183, #4235, #4227, #4238, #4025, #4229, #4069)
+
+We're batching all pull requests with regards to annotations into one entry. That
+doesn't make the work less meaningful - the introductions of annotations is what
+Typescript is for Javascript: a completely new and improved approach to development.
+
+You can find the plugin by searching for `fa-lua-vscode-extension` in the `FAForever`
+Github group, as found here: https://github.com/FAForever
+
+## Other changes
+
+- (#4214) Adjust order of lobby options for less scrolling
+
+- (#4226) Introduce initialization decoupled layouter design pattern
+    Improves the layouter UI pattern that was introduced since the last patch
+
+- (#4228, #4246) Add key action localization directives
+    Allows us to add in keys that are used for a hotkey to a description. Useful
+    for tooltips and the loading screen tips.
+
+- (#4256) Allow debugging drawing tools to function properly in AI games
+    These are often used by AI developers to debug their code.
+
+- (#4257) Allow easier testing on deploy/fafdevelop
+    All files in `/devdata` are now loaded when playing on the `FAF Develop` game type
+
+- (#4217) Add new and improve existing loading tips
+
+- (#4274) Update description of Fullshare gamemode
+
+- (#4280, #4281, #4323) Improve workflow for testing
+    Allows us to write better tests for engine-oblivious functionality
+
+- (#4279) Add or improve translations for traditional chinese
+
+- (#4269) UI Framework: introduction of the set and support classes
+
+- (#4289) Speed up checking when a player is defeated
+    In an attempt to match the old time taken to determine when a player is defeated.
+
+    Based on a forum post.
+
+- (#4299) Fix energy storage large strategic icon in construction menu
+
+- (#4290) Allow hovering over the Ythotha storm
+    Allows you to see veterancy statistics, to finally settle the debate how useful the storm is
+
+    Based on a forum post.
+
+- (#4301) Introduce color library
+    Allows us to easily convert numbers into colors as RGB, HSL or HSV.
+
+- (#4321, #4332) Deprecate mods by version number
+    Previously we could only deprecate mods by its name, regardless of its version. We can
+    now also include the version, allowing an author to update the mod and have it
+    automatically 'undeprecate' by doing so.
+
+- (#4326) Create initial tests for NavDatastructures.lua
+
+## Contributors
+
+- 4z0t (#4232, #4242, #4171, #4269, #4309, #4310, #4319, #4311)
+- Penguin5 (#4214, #4217)
+- Relent0r (#4180, #4205, #4265, #4268, #4271, #4284, #4305, #4294)
+- hdt80bro (#4172, #4186, #4176, #4174, #4203, #4204, #4183, #4184, #4185, #4236, #4225, #4234,
+    #4226, #4237, #4228, #4227, #4238, #4280, #4270, #4229, #4069, #4301, #4321, #4325, #4217,
+    #4334, #4207)
+- Rowey (#4172, #4176, #4174, #4183, #4184, #4185, #4235, #4236, #4238)
+- Jip (#4119, #4124#4188, #4190, #4191, #4212, #4205, #4232, #4241, #4243, #4244, #4248, #4250,
+    #4253, #4260, #4254, #4262, #4249, #4025, #4267, #4266, #4264, #4281, #4270, #4282, #4285,
+    #4286, #4292, #4290, #4304, #4298, #4312, #4313, #4308, #4291, #4287, #4328, #4329, #4307,
+    #4331, #4332, #4327, #4334, #4338, #4336, #4201, #4202, 4230)
+- iczero (#4338)
+- FemtoZetta (#4274)
+- KionX (#4131, #4255)
+- CheeseBerry (#4219)
+- BlackYps (#4175)
+- YuchenJimmy (#4279)
+- xXEddieXxx (#4299)
+- Zjonn (#4323, #4326)
+- ErikMekkes (#4321)
+
+And with thanks to Fichom for creating various textures scattered over the pull requests.
+
+## List of incompatible mods
+
+```lua
+-- you can find the most recent list here: https://github.com/FAForever/fa/blob/deploy/fafdevelop/init_fafdevelop.lua#L70
+-- mods that are deprecated, based on mod folder name
+deprecatedMods["simspeed++"] = true
+deprecatedMods["#quality of performance 2022"] = true
+deprecatedMods["em"] = "11"
+
+-- as per #4119 the control groups (called selection sets in code) are completely overhauled
+-- and extended feature-wise, because of that these mods are no longer viable / broken / integrated
+deprecatedMods["group_split"] = "0.1"
+deprecatedMods["Control Group Zoom Mod"] = "2"
+deprecatedMods["additionalControlGroupStuff"] = true
+
+-- as per #4124 the cursor and command interactions are complete overhauled and extended feature-wise,
+-- because of that these mods are no longer viable / broken / integrated
+deprecatedMods["additionalCameraStuff"] = "3"
+deprecatedMods["RUI"] = "1.0"
+
+-- as per #4232 the reclaim view is completely overhauled
+deprecatedMods["Advanced Reclaim&Selection Info"] = "1"
+deprecatedMods["AdvancedReclaimInfo"] = "1"
+deprecatedMods["BetterReclaimView"] = "2"
+deprecatedMods["disableReclaimUI"] = "2"
+deprecatedMods["DynamicReclaimGrouping"] = "1"
+deprecatedMods["EzReclaim"] = "1.0"
+deprecatedMods["OnScreenReclaimCounter"] = "8"
+deprecatedMods["ORV"] = "1"
+deprecatedMods["SmartReclaimSupport"] = "3"
+deprecatedMods["DrimsUIPack"] = "3"
+deprecatedMods["Rheclaim"] = "2"
+```
+
+Note that mods like Quality of Performance are no longer required - they barely have impact on the
+performance of the simulation these days.
+
 # Game version 3744 (25th of August, 2022)
 
 The maintainers of Nomads have resolved the issues with tactical and strategical defenses! They should

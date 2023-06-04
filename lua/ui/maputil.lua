@@ -70,8 +70,8 @@
 ---@field PlayableAreaHeight number
 
 
-local OutdatedMaps = import('/etc/faf/mapblacklist.lua').MapBlacklist
-local Utils = import('/lua/system/utils.lua')
+local OutdatedMaps = import("/etc/faf/mapblacklist.lua").MapBlacklist
+local Utils = import("/lua/system/utils.lua")
 
 -- load a scenario based on a scenario file name
 ---@param scenName string
@@ -105,6 +105,16 @@ function LoadScenario(scenName)
         doscript(optionsFileName, optionsEnv)
         if optionsEnv.options ~= nil then
             env.ScenarioInfo.options = optionsEnv.options
+        end
+    end
+
+    -- Check if the map has mission briefing data
+    local stringsFileName = string.sub(scenName, 1, string.len(scenName) - string.len("scenario.lua")) .. "strings.lua"
+    if DiskGetFileInfo(stringsFileName) then
+        local stringsEnv = {}
+        doscript(stringsFileName, stringsEnv)
+        if stringsEnv.BriefingData ~= nil then
+            env.ScenarioInfo.hasBriefing = true
         end
     end
 

@@ -8,11 +8,11 @@
 --**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local AAirUnit = import('/lua/aeonunits.lua').AAirUnit
-local AAAAutocannonQuantumWeapon = import('/lua/aeonweapons.lua').AAALightDisplacementAutocannonMissileWeapon
+local AAirUnit = import("/lua/aeonunits.lua").AAirUnit
+local AAAAutocannonQuantumWeapon = import("/lua/aeonweapons.lua").AAALightDisplacementAutocannonMissileWeapon
 
 ---@class XAA0202 : AAirUnit
-XAA0202 = Class(AAirUnit) {
+XAA0202 = ClassUnit(AAirUnit) {
     Weapons = {
         AutoCannon1 = AAAAutocannonQuantumWeapon,
     },

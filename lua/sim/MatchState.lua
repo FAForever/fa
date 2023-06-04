@@ -1,3 +1,9 @@
+--**************************************************************************************************
+--** Shared under the MIT license
+--**************************************************************************************************
+
+local SyncGameResult = import("/lua/simsyncutils.lua").SyncGameResult
+
 local Conditions = {
     demoralization = categories.COMMAND,
     domination = categories.STRUCTURE + categories.ENGINEER - categories.WALL,
@@ -26,7 +32,7 @@ local function CollectDefeatedBrains(aliveBrains, condition, delay)
     local defeatedBrains = { }
     for k, brain in aliveBrains do
         local criticalUnits = brain:GetListOfUnits(condition)
-        if criticalUnits then
+        if (not brain:IsDefeated()) and (criticalUnits) then
             -- critical units found, make sure they all exist properly
             local oneCriticalUnitAlive = false
             for _, unit in criticalUnits do
@@ -95,7 +101,7 @@ local function MatchStateThread()
     local aliveBrains = { }
     for _, brain in ArmyBrains do
         local index = brain:GetArmyIndex()
-        if not ArmyIsCivilian(index) then
+        if (not ArmyIsCivilian(index)) and (not ArmyIsOutOfGame(index)) then
             aliveBrains[index] = brain
         end
     end
@@ -103,15 +109,13 @@ local function MatchStateThread()
     -- keep scanning the gamestate for changes in alliances and brain state
     while true do
         -- check for defeat
-        local defeatedBrains = CollectDefeatedBrains(aliveBrains, condition, 4)
+        local defeatedBrains = CollectDefeatedBrains(aliveBrains, condition, 1)
         local defeatedBrainsCount = table.getsize(defeatedBrains)
         if defeatedBrainsCount > 0 then
 
             -- take into account cascading effects
             local lastDefeatedBrainsCount
-            repeat 
-                WaitTicks(4)
-
+            repeat
                 lastDefeatedBrainsCount = defeatedBrainsCount
 
                 -- re-compute the defeated brains until it no longer increases
@@ -127,9 +131,10 @@ local function MatchStateThread()
 
                 -- process on defeat logic of brain
                 brain:OnDefeat()
+                SPEW("Matchstate - defeated: " .. brain.Nickname)
 
                 -- communicate to the server that this brain has been defeated
-                table.insert(Sync.GameResult, { k, "defeat -10" })
+                SyncGameResult({ k, "defeat -10" })
 
                 -- stop considering it a brain that is still alive
                 aliveBrains[k] = nil
@@ -154,9 +159,10 @@ local function MatchStateThread()
 
                     -- process on draw logic of brain
                     brain:OnDraw()
+                    SPEW("Matchstate - drawed: " .. brain.Nickname)
 
                     -- communicate to the server that this brain has been defeated
-                    table.insert(Sync.GameResult, { k, "draw 0" })
+                    SyncGameResult({ k, "draw 0" })
 
                     -- stop considering it a brain that is still alive
                     aliveBrains[k] = nil
@@ -167,7 +173,7 @@ local function MatchStateThread()
             end
 
             -- check for win
-            local win = true 
+            local win = true
             for k, brain in aliveBrains do
                 for l, _ in aliveBrains do
                     if k ~= l then
@@ -184,9 +190,10 @@ local function MatchStateThread()
 
                     -- process on draw logic of brain
                     brain:OnVictory()
+                    SPEW("Matchstate - won: " .. brain.Nickname)
 
                     -- communicate to the server that this brain has been defeated
-                    table.insert(Sync.GameResult, { k, "victory 10" })
+                    SyncGameResult({ k, "victory 10" })
 
                     -- stop considering it a brain that is still alive
                     aliveBrains[k] = nil
@@ -202,9 +209,11 @@ local function MatchStateThread()
             break
         end
 
-        WaitTicks(10)
+        WaitTicks(4)
     end
 
 end
 
-ForkThread(MatchStateThread)
+function Setup()
+    ForkThread(MatchStateThread)
+end

@@ -5,36 +5,36 @@
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
-local UIUtil = import('/lua/ui/uiutil.lua')
+local UIUtil = import("/lua/ui/uiutil.lua")
 local DiskGetFileInfo = UIUtil.DiskGetFileInfo
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local Group = import('/lua/maui/group.lua').Group
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local SpecialGrid = import('/lua/ui/controls/specialgrid.lua').SpecialGrid
-local Checkbox = import('/lua/maui/checkbox.lua').Checkbox
-local Button = import('/lua/maui/button.lua').Button
-local FixableButton = import('/lua/maui/button.lua').FixableButton
-local Edit = import('/lua/maui/edit.lua').Edit
-local StatusBar = import('/lua/maui/statusbar.lua').StatusBar
-local GameCommon = import('/lua/ui/game/gamecommon.lua')
-local GameMain = import('/lua/ui/game/gamemain.lua')
-local RadioGroup = import('/lua/maui/mauiutil.lua').RadioGroup
-local Tooltip = import('/lua/ui/game/tooltip.lua')
-local TooltipInfo = import('/lua/ui/help/tooltips.lua').Tooltips
-local Prefs = import('/lua/user/prefs.lua')
-local EnhanceCommon = import('/lua/enhancementcommon.lua')
-local Templates = import('/lua/ui/game/build_templates.lua')
-local BuildMode = import('/lua/ui/game/buildmode.lua')
-local UnitViewDetail = import('/lua/ui/game/unitviewDetail.lua')
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local Group = import("/lua/maui/group.lua").Group
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+local SpecialGrid = import("/lua/ui/controls/specialgrid.lua").SpecialGrid
+local Checkbox = import("/lua/maui/checkbox.lua").Checkbox
+local Button = import("/lua/maui/button.lua").Button
+local FixableButton = import("/lua/maui/button.lua").FixableButton
+local Edit = import("/lua/maui/edit.lua").Edit
+local StatusBar = import("/lua/maui/statusbar.lua").StatusBar
+local GameCommon = import("/lua/ui/game/gamecommon.lua")
+local GameMain = import("/lua/ui/game/gamemain.lua")
+local RadioGroup = import("/lua/maui/mauiutil.lua").RadioGroup
+local Tooltip = import("/lua/ui/game/tooltip.lua")
+local TooltipInfo = import("/lua/ui/help/tooltips.lua").Tooltips
+local Prefs = import("/lua/user/prefs.lua")
+local EnhanceCommon = import("/lua/enhancementcommon.lua")
+local Templates = import("/lua/ui/game/build_templates.lua")
+local BuildMode = import("/lua/ui/game/buildmode.lua")
+local UnitViewDetail = import("/lua/ui/game/unitviewdetail.lua")
 local options = Prefs.GetFromCurrentProfile('options')
-local Effect = import('/lua/maui/effecthelpers.lua')
-local TemplatesFactory = import('/lua/ui/templates_factory.lua')
-local straticonsfile = import('/lua/ui/game/straticons.lua')
-local Select = import('/lua/ui/game/selection.lua')
-local Factions = import('/lua/factions.lua').Factions
-local FactionInUnitBpToKey = import('/lua/factions.lua').FactionInUnitBpToKey
-local SetIgnoreSelection = import('/lua/ui/game/gamemain.lua').SetIgnoreSelection
-local EnhancementQueueFile = import('/lua/ui/notify/enhancementqueue.lua')
+local Effect = import("/lua/maui/effecthelpers.lua")
+local TemplatesFactory = import("/lua/ui/templates_factory.lua")
+local straticonsfile = import("/lua/ui/game/straticons.lua")
+local Select = import("/lua/ui/game/selection.lua")
+local Factions = import("/lua/factions.lua").Factions
+local FactionInUnitBpToKey = import("/lua/factions.lua").FactionInUnitBpToKey
+local SetIgnoreSelection = import("/lua/ui/game/gamemain.lua").SetIgnoreSelection
+local EnhancementQueueFile = import("/lua/ui/notify/enhancementqueue.lua")
 local getEnhancementQueue = EnhancementQueueFile.getEnhancementQueue
 
 local modifiedCommandQueue = {}
@@ -63,7 +63,7 @@ local modified = false -- If false then buttonrelease will increase buildcount i
 local dragLock = false -- To disable quick successive drags, which doubles the units in the queue
 
 -- locals for Keybind labels in build queue
-local hotkeyLabel_addLabel = import('/lua/keymap/hotkeylabelsUI.lua').addLabel
+local hotkeyLabel_addLabel = import("/lua/keymap/hotkeylabelsui.lua").addLabel
 local idRelations = {}
 local upgradeKey = false
 local upgradesTo = false
@@ -81,11 +81,11 @@ end
 
 if options.gui_draggable_queue ~= 0 then
     -- Add gameparent handleevent for if the drag ends outside the queue window
-    local gameParent = import('gamemain.lua').GetGameParent()
+    local gameParent = import("/lua/ui/game/gamemain.lua").GetGameParent()
     local oldGameParentHandleEvent = gameParent.HandleEvent
     gameParent.HandleEvent = function(self, event)
         if event.Type == 'ButtonRelease' then
-            import('/lua/ui/game/construction.lua').ButtonReleaseCallback()
+            import("/lua/ui/game/construction.lua").ButtonReleaseCallback()
         end
         oldGameParentHandleEvent(self, event)
     end
@@ -117,7 +117,7 @@ local previousTabSize = nil
 local activeTab = nil
 local showBuildIcons = false
 
-controls = import('/lua/ui/controls.lua').Get()
+controls = import("/lua/ui/controls.lua").Get()
 controls.tabs = controls.tabs or {}
 
 local constructionTabs = {'t1', 't2', 't3', 't4', 'templates'}
@@ -408,7 +408,9 @@ function CreateTabs(type)
             local numActive = 0
             for _, tab in controls.tabs do
                 if sortedOptions[tab.ID] and not table.empty(sortedOptions[tab.ID]) then
-                    numActive = numActive + 1
+                    if tab.ID != 'templates' then
+                        numActive = numActive + 1
+                    end
                 end
             end
             previousTabSize = numActive
@@ -431,7 +433,7 @@ function CreateTabs(type)
     elseif type == 'enhancement' then
         local selection = sortedOptions.selection
         local enhancements = selection[1]:GetBlueprint().Enhancements
-        local enhCommon = import('/lua/enhancementcommon.lua')
+        local enhCommon = import("/lua/enhancementcommon.lua")
         local enhancementPrefixes = {Back = 'b-', LCH = 'la-', RCH = 'ra-'}
         local newTabs = {}
         if enhancements.Slots then
@@ -489,7 +491,11 @@ function CreateTabs(type)
     for _, tab in controls.tabs do
         if sortedOptions[tab.ID] and not table.empty(sortedOptions[tab.ID]) then
             tab:Enable()
-            numActive = numActive + 1
+
+            if tab.ID != 'templates' then
+                numActive = numActive + 1
+            end
+
             if defaultTabOrder[tab.ID] then
                 if not defaultTab or defaultTabOrder[tab.ID] < defaultTabOrder[defaultTab.ID] then
                     defaultTab = tab
@@ -1413,7 +1419,7 @@ function OnClickHandler(button, modifiers)
             else
                 if itembp.Physics.MotionType == 'RULEUMT_None' or EntityCategoryContains(categories.NEEDMOBILEBUILD, item.id) then
                     -- Stationary means it needs to be placed, so go in to build mobile mode
-                    import('/lua/ui/game/commandmode.lua').StartCommandMode(buildCmd, {name = item.id})
+                    import("/lua/ui/game/commandmode.lua").StartCommandMode(buildCmd, {name = item.id})
                 else
                     -- If the item to build can move, it must be built by a factory
                     -- TODO - what about mobile factories?
@@ -1479,14 +1485,14 @@ function OnClickHandler(button, modifiers)
                 end
             end
         else
-            import('/lua/ui/game/commandmode.lua').StartCommandMode('build', {name = item.template.templateData[3][1]})
+            import("/lua/ui/game/commandmode.lua").StartCommandMode('build', {name = item.template.templateData[3][1]})
             SetActiveBuildTemplate(item.template.templateData)
         end
 
         if options.gui_template_rotator ~= 0 then
             local item = button.Data
             local activeTemplate = item.template.templateData
-            local worldview = import('/lua/ui/game/worldview.lua').viewLeft
+            local worldview = import("/lua/ui/game/worldview.lua").viewLeft
             local oldHandleEvent = worldview.HandleEvent
             worldview.HandleEvent = function(self, event)
                 if event.Type == 'ButtonPress' then
@@ -1924,7 +1930,7 @@ function CreateExtraControls(controlType)
                 break
             end
             if i == 1 then
-                local factions = import('/lua/factions.lua').Factions
+                local factions = import("/lua/factions.lua").Factions
                 for _, factionData in factions do
                     if v:IsInCategory(factionData.Category) then
                         faction = factionData.Category
@@ -1957,7 +1963,7 @@ function updateCommandQueue()
     OnQueueChanged(currentCommandQueue)
 end
 
-local insertIntoTableLowestTechFirst = import('/lua/ui/game/selectionsort.lua').insertIntoTableLowestTechFirst
+local insertIntoTableLowestTechFirst = import("/lua/ui/game/selectionsort.lua").insertIntoTableLowestTechFirst
 function FormatData(unitData, type)
     local retData = {}
     if type == 'construction' then
@@ -2001,7 +2007,7 @@ function FormatData(unitData, type)
         table.insert(sortedUnits, EntityCategoryFilterDown(miscCats, unitData))
 
         -- Get function for checking for restricted units
-        local IsRestricted = import('/lua/game.lua').IsRestricted
+        local IsRestricted = import("/lua/game.lua").IsRestricted
 
         -- This section adds the arrows in for a build icon which is an upgrade from the
         -- selected unit. If there is an upgrade chain, it will display them split by arrows.

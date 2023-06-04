@@ -31,6 +31,8 @@ local function PostProcessProjectile(projectile)
         end
     end
 
+    projectile.CategoriesHash[projectile.BlueprintId] = true
+
     -- create hash tables for quick lookup
     projectile.DoNotCollideListCount = 0
     projectile.DoNotCollideListHash = {}

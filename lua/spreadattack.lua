@@ -1,16 +1,13 @@
 ------------------------------------------------------------------------
---                                                                    --
 -- File           : /mod/TestCommandHook/spreadattack.lua             --
 -- Author         : Magic Power                                       --
---                                                                    --
 -- Summary  : Hooks an ingame key and spreads the attack orders given --
---                                                                    --
 ------------------------------------------------------------------------
 
+local TableGetN = table.getn
 
 -- This table contains a shadow copy of a subset of the real orders.
 ShadowOrders = {}
-
 
 -----------------------------------------
 -- Function MakeShadowCopyOrders(command)
@@ -111,10 +108,10 @@ function FixOrders(unit)
         end
     end
 
-    local numOrders = table.getn(unitOrders)
+    local numOrders = TableGetN(unitOrders)
 
     -- We can't trust the shadow orders if commands were added without getting a copy.
-    if numOrders < table.getn(filteredQueue) then
+    if numOrders < TableGetN(filteredQueue) then
         WARN("Spreadattack: Command queue is longer than the shadow order list.")
         return
     end
@@ -230,7 +227,7 @@ function FixOrders(unit)
                             match = j
                             priority = false
                             lastMatchQueueIndex = j
-                            lastMatchIndex = table.getn(Matches) + 1
+                            lastMatchIndex = TableGetN(Matches) + 1
                             break
                         end
                     end
@@ -242,7 +239,7 @@ function FixOrders(unit)
                     if numDeletedOrders <= 0 then
                         break
                     end
-                    for i = table.getn(Matches), 1, -1 do
+                    for i = TableGetN(Matches), 1, -1 do
                         if Matches[i].Priority == priority then
                             table.remove(Matches, i)
                             table.remove(unitOrders, i + orderIndex - 1)
@@ -352,7 +349,7 @@ function SpreadAttack()
             -- Unit 1: 1, 4, 7, ?, ?, ?, ?, ?
             -- Unit 2: 2, 5, 8, ?, ?, ?, ?, ?
             -- Unit 3: 3, 6, ?, ?, ?, ?, ?, ?
-            local unitCount = table.getn(curSelection)
+            local unitCount = TableGetN(curSelection)
             local numOrders = endAction - beginAction + 1
             -- "and 1 or 0" is lua's ugly alternative to the ternary operator. Same as (...) ? 1 : 0
             local stableTargetNum = math.floor(numOrders / unitCount) + ((math.mod(numOrders, unitCount) >= index) and 1 or 0)

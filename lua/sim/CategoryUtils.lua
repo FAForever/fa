@@ -8,8 +8,8 @@
 -- There's not really any error handling. In the presence of malformed category expressions the
 -- behaviour is undefined, possibly resulting in native-code crashes due to invalid calls to the
 -- native category classes.
----@param categoryExpression any
----@return number|nil
+---@param categoryExpression string
+---@return EntityCategory | nil
 function ParseEntityCategoryProperly(categoryExpression)
     local tokens = {}
 
@@ -50,6 +50,12 @@ function ParseEntityCategoryProperly(categoryExpression)
             currentIdentifier = currentIdentifier .. c
         end
     end)
+    
+    -- gsub tokenizer stops before end of string character, without a chance to add the last currentidentifier as a token. So need to check once at the end if there is a remaining identifier.
+    if currentIdentifier ~= "" then
+        table.insert(tokens, currentIdentifier)
+    end
+
 
     local numTokens = table.getn(tokens)
 
@@ -154,7 +160,6 @@ function ParseEntityCategoryProperly(categoryExpression)
 
         return currentCategory
     end
-
     return _parseSubexpression(1, numTokens)
 end
 -- converts specified category expression to a string

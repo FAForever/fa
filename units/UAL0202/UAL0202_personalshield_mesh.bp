@@ -11,7 +11,7 @@ MeshBlueprint {
             LODCutoff = 195,
             
             Scrolling = true,
-            ShaderName = 'PhaseShield',
+            ShaderName = 'AeonPhaseShield',
         },
     },
 }

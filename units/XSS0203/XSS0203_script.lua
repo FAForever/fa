@@ -6,20 +6,20 @@
 --**
 --**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
-local SSubUnit = import('/lua/seraphimunits.lua').SSubUnit
-local SWeapons = import('/lua/seraphimweapons.lua')
+local SSubUnit = import("/lua/seraphimunits.lua").SSubUnit
+local SWeapons = import("/lua/seraphimweapons.lua")
 
 local SANUallCavitationTorpedo = SWeapons.SANUallCavitationTorpedo
 local SDFOhCannon = SWeapons.SDFOhCannon02
 local SDFAjelluAntiTorpedoDefense = SWeapons.SDFAjelluAntiTorpedoDefense
 
 ---@class XSS0203 : SSubUnit
-XSS0203 = Class(SSubUnit) {
+XSS0203 = ClassUnit(SSubUnit) {
     DeathThreadDestructionWaitTime = 0,
     Weapons = {
-        Torpedo01 = Class(SANUallCavitationTorpedo) {},
-        Cannon = Class(SDFOhCannon) {},
-        AntiTorpedo = Class(SDFAjelluAntiTorpedoDefense) {},
+        Torpedo01 = ClassWeapon(SANUallCavitationTorpedo) {},
+        Cannon = ClassWeapon(SDFOhCannon) {},
+        AntiTorpedo = ClassWeapon(SDFAjelluAntiTorpedoDefense) {},
     },
 
     OnStopBeingBuilt = function(self,builder,layer)

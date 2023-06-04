@@ -4,10 +4,10 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local BuilderManager = import('/lua/sim/BuilderManager.lua').BuilderManager
-local SUtils = import('/lua/AI/sorianutilities.lua')
-local AIUtils = import('/lua/ai/aiutilities.lua')
-local Builder = import('/lua/sim/Builder.lua')
+local BuilderManager = import("/lua/sim/buildermanager.lua").BuilderManager
+local SUtils = import("/lua/ai/sorianutilities.lua")
+local AIUtils = import("/lua/ai/aiutilities.lua")
+local Builder = import("/lua/sim/builder.lua")
 
 local TableGetn = table.getn
 
@@ -190,7 +190,7 @@ EngineerManager = Class(BuilderManager) {
     ---@param pauseVal number
     ---@param unitCheckFunc any
     ---@param category EntityCategory
-    ---@return boolean
+    ---@return number | true
     DisableMassGroup = function(self, group, econ, pauseVal, unitCheckFunc, category)
         for k,v in group.Units do
             if not v.Unit.Dead and not EntityCategoryContains(categories.COMMAND, v.Unit) and (not unitCheckFunc or unitCheckFunc(v.Unit, econ, pauseVal, category)) then
@@ -226,7 +226,7 @@ EngineerManager = Class(BuilderManager) {
     ---@param pauseVal number
     ---@param unitCheckFunc any
     ---@param category EntityCategory
-    ---@return boolean
+    ---@return number | true
     DisableEnergyGroup = function(self, group, econ, pauseVal, unitCheckFunc, category)
         for k,v in group.Units do
             if not v.Unit.Dead and not EntityCategoryContains(categories.COMMAND, v.Unit) and (not unitCheckFunc or unitCheckFunc(v.Unit, econ, pauseVal, category)) then
@@ -313,11 +313,12 @@ EngineerManager = Class(BuilderManager) {
     ---@param unit Unit
     ---@param econ any unused
     ---@param pauseVal number
-    ---@return boolean
+    ---@return number | true
     MassDrainCheck = function(unit, econ, pauseVal)
         if econ.MassIncome > econ.MassRequestOverTime then
             return true
         end
+        return pauseVal
     end,
 
     -- Builder based functions
@@ -356,7 +357,7 @@ EngineerManager = Class(BuilderManager) {
                         unit.BuilderManagerData.EngineerManager:RemoveUnit(unit)
                     end
 
-                    import('/lua/scenariotriggers.lua').CreateUnitDestroyedTrigger(deathFunction, unit)
+                    import("/lua/scenariotriggers.lua").CreateUnitDestroyedTrigger(deathFunction, unit)
 
                     local newlyCapturedFunction = function(unit, captor)
                         local aiBrain = captor:GetAIBrain()
@@ -369,7 +370,7 @@ EngineerManager = Class(BuilderManager) {
                         end
                     end
 
-                    import('/lua/scenariotriggers.lua').CreateUnitCapturedTrigger(nil, newlyCapturedFunction, unit)
+                    import("/lua/scenariotriggers.lua").CreateUnitCapturedTrigger(nil, newlyCapturedFunction, unit)
 
                     if EntityCategoryContains(categories.ENGINEER - categories.STATIONASSISTPOD, unit) then
                         local unitConstructionFinished = function(unit, finishedUnit)
@@ -380,7 +381,7 @@ EngineerManager = Class(BuilderManager) {
                                                         engManager:UnitConstructionFinished(unit, finishedUnit)
                                                     end
                         end
-                        import('/lua/ScenarioTriggers.lua').CreateUnitBuiltTrigger(unitConstructionFinished, unit, categories.ALLUNITS)
+                        import("/lua/scenariotriggers.lua").CreateUnitBuiltTrigger(unitConstructionFinished, unit, categories.ALLUNITS)
 
                     end
                 end
@@ -496,7 +497,7 @@ EngineerManager = Class(BuilderManager) {
                 return self.Brain:DecideWhatToBuild(engineer, buildingType, self.Brain.CustomFactions[faction])
             end
         else
-            return self.Brain:DecideWhatToBuild(engineer, buildingType, import('/lua/BuildingTemplates.lua').BuildingTemplates[faction])
+            return self.Brain:DecideWhatToBuild(engineer, buildingType, import("/lua/buildingtemplates.lua").BuildingTemplates[faction])
         end
     end,
 
@@ -556,7 +557,7 @@ EngineerManager = Class(BuilderManager) {
                 if buildBp.CategoriesHash[z] then
                     count = count + 1
                 end
-                if table.getn(buildingTypes) == count then found = true end
+                if TableGetn(buildingTypes) == count then found = true end
                 if found then break end
             end
 
@@ -605,18 +606,6 @@ EngineerManager = Class(BuilderManager) {
     ---@param self EngineerManager
     ---@param unit Unit
     RemoveUnit = function(self, unit)
-        local guards = unit:GetGuards()
-        for k,v in guards do
-            if not v.Dead and v.AssistPlatoon then
-                if self.Brain.Sorian and self.Brain:PlatoonExists(v.AssistPlatoon) then
-                    v.AssistPlatoon:ForkThread(v.AssistPlatoon.SorianEconAssistBody)
-                elseif self.Brain:PlatoonExists(v.AssistPlatoon) then
-                    v.AssistPlatoon:ForkThread(v.AssistPlatoon.EconAssistBody)
-                else
-                    v.AssistPlatoon = nil
-                end
-            end
-        end
 
         local found = false
         for k,v in self.ConsumptionUnits do
@@ -671,25 +660,13 @@ EngineerManager = Class(BuilderManager) {
 
     ---@param self EngineerManager
     ---@param unit Unit
-    ---@param finishedUnit boolean
+    ---@param finishedUnit Unit
     UnitConstructionFinished = function(self, unit, finishedUnit)
         if EntityCategoryContains(categories.FACTORY * categories.STRUCTURE, finishedUnit) and finishedUnit:GetAIBrain():GetArmyIndex() == self.Brain:GetArmyIndex() then
             self.Brain.BuilderManagers[self.LocationType].FactoryManager:AddFactory(finishedUnit)
         end
         if finishedUnit:GetAIBrain():GetArmyIndex() == self.Brain:GetArmyIndex() then
             self:AddUnit(finishedUnit)
-        end
-        local guards = unit:GetGuards()
-        for k,v in guards do
-            if not v.Dead and v.AssistPlatoon then
-                if self.Brain.Sorian and self.Brain:PlatoonExists(v.AssistPlatoon) then
-                    v.AssistPlatoon:ForkThread(v.AssistPlatoon.SorianEconAssistBody)
-                elseif self.Brain:PlatoonExists(v.AssistPlatoon) then
-                    v.AssistPlatoon:ForkThread(v.AssistPlatoon.EconAssistBody)
-                else
-                    v.AssistPlatoon = nil
-                end
-            end
         end
     end,
 
@@ -768,7 +745,7 @@ EngineerManager = Class(BuilderManager) {
     ---@param unit Unit
     AssignEngineerTask = function(self, unit)
         --LOG('+ AssignEngineerTask')
-        if unit.UnitBeingAssist or unit.UnitBeingBuilt then
+        if unit.UnitBeingAssist or unit.UnitBeingBuilt or unit.UnitBeingBuiltBehavior or unit.Combat then
             self:DelayAssign(unit, 50)
             return
         end
@@ -825,7 +802,7 @@ EngineerManager = Class(BuilderManager) {
 
             if builder:GetPlatoonAddBehaviors() then
                 for pafk, pafv in builder:GetPlatoonAddBehaviors() do
-                    hndl:ForkThread(import('/lua/ai/AIBehaviors.lua')[pafv])
+                    hndl:ForkThread(import("/lua/ai/aibehaviors.lua")[pafv])
                 end
             end
 
@@ -889,4 +866,4 @@ end
 
 
 -- kept for mod backwards compatibility
-local AIBuildUnits = import('/lua/ai/aibuildunits.lua')
+local AIBuildUnits = import("/lua/ai/aibuildunits.lua")

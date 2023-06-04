@@ -6,13 +6,13 @@
 --* Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
-local UIUtil = import('/lua/ui/uiutil.lua')
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local Group = import('/lua/maui/group.lua').Group
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local GameMain = import('/lua/ui/game/gamemain.lua')
+local UIUtil = import("/lua/ui/uiutil.lua")
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local Group = import("/lua/maui/group.lua").Group
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+local GameMain = import("/lua/ui/game/gamemain.lua")
 
-local SessionClients = import("/lua/ui/override/SessionClients.lua")
+local SessionClients = import("/lua/ui/override/sessionclients.lua")
 
 local GUI = {
     slots = {},

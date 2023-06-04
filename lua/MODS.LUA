@@ -223,7 +223,7 @@ Mod initialization issues
 
 ---@alias uidSet table<string, true>
 
-local SetUtils = import('/lua/system/setutils.lua')
+local SetUtils = import("/lua/system/setutils.lua")
 
 -- Table of all mods found on disk, indexed by id
 local _mod_cache = nil

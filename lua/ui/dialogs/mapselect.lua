@@ -6,18 +6,18 @@
 --* Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
-local UIUtil = import('/lua/ui/uiutil.lua')
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local ItemList = import('/lua/maui/itemlist.lua').ItemList
-local Edit = import('/lua/maui/edit.lua').Edit
-local Group = import('/lua/maui/group.lua').Group
-local ResourceMapPreview = import('/lua/ui/controls/resmappreview.lua').ResourceMapPreview
-local Popup = import('/lua/ui/controls/popups/popup.lua').Popup
-local MapUtil = import('/lua/ui/maputil.lua')
-local Combo = import('/lua/ui/controls/combo.lua').Combo
-local Tooltip = import('/lua/ui/game/tooltip.lua')
-local Prefs = import('/lua/user/prefs.lua')
+local UIUtil = import("/lua/ui/uiutil.lua")
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+local ItemList = import("/lua/maui/itemlist.lua").ItemList
+local Edit = import("/lua/maui/edit.lua").Edit
+local Group = import("/lua/maui/group.lua").Group
+local ResourceMapPreview = import("/lua/ui/controls/resmappreview.lua").ResourceMapPreview
+local Popup = import("/lua/ui/controls/popups/popup.lua").Popup
+local MapUtil = import("/lua/ui/maputil.lua")
+local Combo = import("/lua/ui/controls/combo.lua").Combo
+local Tooltip = import("/lua/ui/game/tooltip.lua")
+local Prefs = import("/lua/user/prefs.lua")
 
 local scenarios = nil
 local selectedScenario = nil
@@ -520,7 +520,7 @@ function CreateDialog(selectBehavior, exitBehavior, over, singlePlayer, defaultS
     end
     restrictedUnitsButton.OnClick = function(self, modifiers)
         mapList:AbandonKeyboardFocus()
-        import('/lua/ui/lobby/UnitsManager.lua').CreateDialog(dialogContent,
+        import("/lua/ui/lobby/unitsmanager.lua").CreateDialog(dialogContent,
             restrictedCategories,
             function(rc)
                 restrictedCategories = rc
@@ -537,7 +537,7 @@ function CreateDialog(selectBehavior, exitBehavior, over, singlePlayer, defaultS
     Tooltip.AddButtonTooltip(modButton, "Lobby_Mods")
     modButton.OnClick = function(self, modifiers)
         -- direct import allows data caching in ModsManager
-        import('/lua/ui/lobby/ModsManager.lua').CreateDialog(dialogContent, true, availableMods, OnModsChanged)
+        import("/lua/ui/lobby/modsmanager.lua").CreateDialog(dialogContent, true, availableMods, OnModsChanged)
     end
     dialogContent.modButton = modButton
 
@@ -701,9 +701,9 @@ function RefreshOptions(skipRefresh)
     -- it also means it's a flag that tells you this is the first time the dialog has been opened
     -- so we'll use this flag to reset the options sources so they can set up for multiplayer
     if skipRefresh then
-        OptionSource[1] = {title = "<LOC uilobby_0001>Team Options", options = import('/lua/ui/lobby/lobbyOptions.lua').teamOptions}
-        OptionSource[2] = {title = "<LOC uilobby_0002>Game Options", options = import('/lua/ui/lobby/lobbyOptions.lua').globalOpts}
-        OptionSource[3] = {title = "<LOC uilobby_0003>AI Options", options = import('/lua/ui/lobby/lobbyOptions.lua').AIOpts}
+        OptionSource[1] = {title = "<LOC uilobby_0001>Team Options", options = import("/lua/ui/lobby/lobbyoptions.lua").teamOptions}
+        OptionSource[2] = {title = "<LOC uilobby_0002>Game Options", options = import("/lua/ui/lobby/lobbyoptions.lua").globalOpts}
+        OptionSource[3] = {title = "<LOC uilobby_0003>AI Options", options = import("/lua/ui/lobby/lobbyoptions.lua").AIOpts}
     end
     OptionSource[4] = {title = "<LOC lobui_0164>Advanced", options = advOptions or {}}
 
@@ -911,7 +911,7 @@ function SetupOptionsPanel(parent, curOptions)
                 end
                 --
                 if optData.default then realDefValue = optData.default end
-                line.combo:AddItems(itemArray, defValue, realDefValue, true) -- For all (true for enable (default) label)
+                line.combo:AddItems(itemArray, defValue, realDefValue)
                 line.combo.OnClick = function(self, index, text)
                     local value = optData.values[index].key
                     if value == nil then value = optData.values[index] end
@@ -990,7 +990,7 @@ function SetDescription(scen)
     description:AddItem("")
     if scen.description then
         local textBoxWidth = description.Width()
-        local wrapped = import('/lua/maui/text.lua').WrapText(LOC(scen.description), textBoxWidth,
+        local wrapped = import("/lua/maui/text.lua").WrapText(LOC(scen.description), textBoxWidth,
             function(curText) return description:GetStringAdvance(curText) end)
         for i, line in wrapped do
             description:AddItem(line)
@@ -1070,7 +1070,7 @@ function GUI_OldMap(over)
     local dialogContent = Group(GUI)
     LayoutHelpers.SetDimensions(dialogContent, 1000, 100)
 
-    local ChangelogData = import('/lua/ui/lobby/changelogData.lua')
+    local ChangelogData = import("/lua/ui/lobby/changelogdata.lua")
     local OldMapPopup = Popup(GUI, dialogContent)
     OldMapPopup.OnClosed = function()
         Prefs.SetToCurrentProfile('LobbyChangelog', ChangelogData.last_version)
@@ -1098,11 +1098,11 @@ function mapIsOutdated()
 end
 
 -- kept for mod backwards compatibility
-local Scrollbar = import('/lua/maui/scrollbar.lua').Scrollbar
-local Text = import('/lua/maui/text.lua').Text
-local MultiLineText = import('/lua/maui/multilinetext.lua').MultiLineText
-local Button = import('/lua/maui/button.lua').Button
-local MenuCommon = import('/lua/ui/menus/menucommon.lua')
-local MainMenu = import('/lua/ui/menus/main.lua')
-local Mods = import('/lua/mods.lua')
-local ModManager = import('/lua/ui/lobby/ModsManager.lua')
+local Scrollbar = import("/lua/maui/scrollbar.lua").Scrollbar
+local Text = import("/lua/maui/text.lua").Text
+local MultiLineText = import("/lua/maui/multilinetext.lua").MultiLineText
+local Button = import("/lua/maui/button.lua").Button
+local MenuCommon = import("/lua/ui/menus/menucommon.lua")
+local MainMenu = import("/lua/ui/menus/main.lua")
+local Mods = import("/lua/mods.lua")
+local ModManager = import("/lua/ui/lobby/modsmanager.lua")

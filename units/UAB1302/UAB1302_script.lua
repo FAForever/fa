@@ -8,10 +8,10 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local AMassCollectionUnit = import('/lua/aeonunits.lua').AMassCollectionUnit
+local AMassCollectionUnit = import("/lua/aeonunits.lua").AMassCollectionUnit
 
 ---@class UAB1302 : AMassCollectionUnit
-UAB1302 = Class(AMassCollectionUnit) {
+UAB1302 = ClassUnit(AMassCollectionUnit) {
 
     OnCreate = function(self)
         AMassCollectionUnit.OnCreate(self)

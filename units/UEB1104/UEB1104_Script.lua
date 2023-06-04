@@ -7,10 +7,10 @@
 --**
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
-local TMassFabricationUnit = import('/lua/terranunits.lua').TMassFabricationUnit
+local TMassFabricationUnit = import("/lua/terranunits.lua").TMassFabricationUnit
 
 ---@class UEB1104 : TMassFabricationUnit
-UEB1104 = Class(TMassFabricationUnit) {
+UEB1104 = ClassUnit(TMassFabricationUnit) {
 
     DestructionPartsLowToss = {'B01','B02',},
     DestructionPartsChassisToss = {'UEB1104'},

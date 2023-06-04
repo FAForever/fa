@@ -7,10 +7,10 @@
 --**
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
-local Unit = import('/lua/sim/Unit.lua').Unit
+local Unit = import("/lua/sim/unit.lua").Unit
 
 ---@class OPE6003 : Unit
-OPE6003 = Class(Unit) {
+OPE6003 = ClassUnit(Unit) {
 }
 
 TypeClass = OPE6003

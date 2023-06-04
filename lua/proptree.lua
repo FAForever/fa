@@ -6,11 +6,11 @@
 --**
 --**  Copyright 2006 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
-local Prop = import('/lua/sim/Prop.lua').Prop
-local FireEffects = import('/lua/EffectTemplates.lua').TreeBurning01
-local ApplyWindDirection = import('/lua/EffectUtilities.lua').ApplyWindDirection
-local CreateScorchMarkSplat = import('/lua/defaultexplosions.lua').CreateScorchMarkSplat
-local GetRandomFloat = import('/lua/utilities.lua').GetRandomFloat
+local Prop = import("/lua/sim/prop.lua").Prop
+local FireEffects = import("/lua/effecttemplates.lua").TreeBurning01
+local ApplyWindDirection = import("/lua/effectutilities.lua").ApplyWindDirection
+local CreateScorchMarkSplat = import("/lua/defaultexplosions.lua").CreateScorchMarkSplat
+local GetRandomFloat = import("/lua/utilities.lua").GetRandomFloat
 
 local BurningTrees = 0
 local MaximumBurningTrees = 150
@@ -38,6 +38,9 @@ local EffectOffsetEmitter = EffectMethods.OffsetEmitter
 local EffectSetEmitterCurveParam = EffectMethods.SetEmitterCurveParam
 
 ---@class Tree : Prop
+---@field Fallen? boolean
+---@field Burning? boolean
+---@field NoBurn? boolean
 Tree = Class(Prop) {
 
     ---@param self Tree
@@ -55,7 +58,7 @@ Tree = Class(Prop) {
     ---@param other Projectile
     ---@return boolean
     OnCollisionCheck = function(self, other)
-        return not self.Dead
+        return not self.Fallen
     end,
 
     --- Collision check with units
@@ -66,14 +69,18 @@ Tree = Class(Prop) {
     ---@param nz number
     ---@param depth number
     OnCollision = function(self, other, nx, ny, nz, depth)
-        if not self.Dead then 
-            if not self.Fallen then 
-                -- change internal state
-                self.Fallen = true
-                TrashAdd(self.Trash, ForkThread(self.FallThread, self, nx, ny, nz, depth))
-                self:PlayUprootingEffect(other)
-            end
+        if self.Fallen then
+            return
         end
+
+        if self:BeenDestroyed() then
+            return
+        end
+
+        -- change internal state
+        self.Fallen = true
+        TrashAdd(self.Trash, ForkThread(self.FallThread, self, nx, ny, nz, depth))
+        self:PlayUprootingEffect(other)
     end,
 
     --- When damaged in some fashion - note that the tree can only be destroyed by disintegrating 
@@ -84,45 +91,46 @@ Tree = Class(Prop) {
     ---@param direction number
     ---@param type DamageType
     OnDamage = function(self, instigator, amount, direction, type)
-        if not self.Dead then 
+        if self:BeenDestroyed() then
+            return
+        end
 
-            local canFall = not self.Fallen 
-            local canBurn = (not self.Burning) and (not self.NoBurn)
+        local canFall = not self.Fallen 
+        local canBurn = (not self.Burning) and (not self.NoBurn)
 
-            if type == 'Disintegrate' or type == "Reclaimed" then
-                -- we just got obliterated
-                EntityDestroy(self)
+        if type == 'Disintegrate' or type == "Reclaimed" then
+            -- we just got obliterated
+            EntityDestroy(self)
 
-            elseif type == 'Force' or type == "TreeForce" then
-                if canFall then 
-                    -- change internal state
-                    self.NoBurn = true
-                    self.Fallen = true
-                    TrashAdd(self.Trash, ForkThread(self.FallThread, self, direction[1], direction[2], direction[3], 0.5))
+        elseif type == 'Force' or type == "TreeForce" then
+            if canFall then 
+                -- change internal state
+                self.NoBurn = true
+                self.Fallen = true
+                TrashAdd(self.Trash, ForkThread(self.FallThread, self, direction[1], direction[2], direction[3], 0.5))
 
-                    -- change the mesh
-                    EntitySetMesh(self, self.Blueprint.Display.MeshBlueprintWrecked)
-                end
-
-            elseif type == 'Nuke' and canBurn then
-                -- slight chance we catch fire
-                if Random(1, 250) < 5 then
-                    self:Burn()
-                end
-
-            elseif (type == 'Fire' or type == 'TreeFire') and canBurn then 
-
-                -- fire type damage, slightly higher odds to catch fire
-                if Random(1, 35) <= 2 then
-                    self:Burn()
-                end
+                -- change the mesh
+                EntitySetMesh(self, self.Blueprint.Display.MeshBlueprintWrecked)
             end
-            
-            if (type ~= 'Force') and (type ~= 'Fire') and canBurn and canFall then 
-                -- any damage type but force can cause a burn
-                if Random(1, 20) <= 1 then
-                    self:Burn()
-                end
+
+        elseif type == 'Nuke' and canBurn then
+            -- slight chance we catch fire
+            if Random(1, 250) < 5 then
+                self:Burn()
+            end
+
+        elseif (type == 'Fire' or type == 'TreeFire') and canBurn then 
+
+            -- fire type damage, slightly higher odds to catch fire
+            if Random(1, 35) <= 2 then
+                self:Burn()
+            end
+        end
+        
+        if (type ~= 'Force') and (type ~= 'Fire') and canBurn and canFall then 
+            -- any damage type but force can cause a burn
+            if Random(1, 20) <= 1 then
+                self:Burn()
             end
         end
     end,
@@ -142,7 +150,6 @@ Tree = Class(Prop) {
     ---@param dz number
     ---@param depth number
     FallThread = function(self, dx, dy, dz, depth)
-
         -- make it fall down
         local motor = self:FallDown()
         motor:Whack(dx, dy, dz, depth, true)
@@ -179,7 +186,7 @@ Tree = Class(Prop) {
         local trash = self.Trash
         local position = self.CachePosition
 
-        local effect = false 
+        local effect
         local effects = { }
         local effectsHead = 1
 
@@ -267,8 +274,7 @@ TreeGroup = Class(Prop) {
     ---@param other string
     ---@return boolean
     OnCollisionCheck = function(self, other)
-        self:Breakup()
-        return false
+        return true
     end,
 
     --- Break when colliding with something / someone
@@ -295,15 +301,15 @@ TreeGroup = Class(Prop) {
     ---@param amount number
     ---@param direction Vector
     ---@param type DamageType
-    ---@return Tree[]
-    Breakup = function(self, instigator, amount, direction, type)
+    ---@return (Tree[])?
+    Breakup = function(self)
         -- can't do much when we're destroyed
         if EntityBeenDestroyed(self) then
             return
         end
 
         -- a group with a single prop type in it
-        if self.blueprint.SingleTreeBlueprint then
+        if self.Blueprint.SingleTreeBlueprint then
             return SplitProp(self, self.Blueprint.SingleTreeBlueprint)
         -- a group with multiple prop types in it
         else 

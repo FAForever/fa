@@ -9,7 +9,7 @@
 doscript '/lua/userInit.lua'
 
 -- Add UI-only mods to the list of mods to use
-for i,m in ipairs(import('/lua/Mods.lua').GetUiMods()) do
+for i,m in ipairs(import("/lua/mods.lua").GetUiMods()) do
     table.insert(__active_mods, m)
 end
 

@@ -1,16 +1,16 @@
-local UIUtil = import('/lua/ui/uiutil.lua')
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local Group = import('/lua/maui/group.lua').Group
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local GameCommon = import('/lua/ui/game/gamecommon.lua')
-local ItemList = import('/lua/maui/itemlist.lua').ItemList
-local Prefs = import('/lua/user/prefs.lua')
+local UIUtil = import("/lua/ui/uiutil.lua")
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local Group = import("/lua/maui/group.lua").Group
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+local GameCommon = import("/lua/ui/game/gamecommon.lua")
+local ItemList = import("/lua/maui/itemlist.lua").ItemList
+local Prefs = import("/lua/user/prefs.lua")
 local options = Prefs.GetFromCurrentProfile('options')
-local UnitDescriptions = import('/lua/ui/help/unitdescription.lua').Description
-local WrapText = import('/lua/maui/text.lua').WrapText
-local armorDefinition = import('/lua/armordefinition.lua').armordefinition
+local UnitDescriptions = import("/lua/ui/help/unitdescription.lua").Description
+local WrapText = import("/lua/maui/text.lua").WrapText
+local armorDefinition = import("/lua/armordefinition.lua").armordefinition
 
-local controls = import('/lua/ui/controls.lua').Get()
+local controls = import("/lua/ui/controls.lua").Get()
 
 View = controls.View or false
 MapView = controls.MapView or false
@@ -65,7 +65,7 @@ function CheckFormat()
 end
 
 function ShowView(showUpKeep, enhancement, showecon, showShield)
-    import('/lua/ui/game/unitview.lua').ShowROBox(false, false)
+    import("/lua/ui/game/unitview.lua").ShowROBox(false, false)
     View:Show()
 
     View.UpkeepGroup:SetHidden(not showUpKeep)
@@ -114,7 +114,7 @@ function ShowEnhancement(bp, bpID, iconID, iconPrefix, userUnit)
     local showUpKeep = false
     local time, energy, mass
     if bp.Icon ~= nil and not string.find(bp.Name, 'Remove') then
-        time, energy, mass = import('/lua/game.lua').GetConstructEconomyModel(userUnit, bp)
+        time, energy, mass = import("/lua/game.lua").GetConstructEconomyModel(userUnit, bp)
         time = math.max(time, 1)
         showUpKeep = DisplayResources(bp, time, energy, mass)
         View.TimeStat.Value:SetFont(UIUtil.bodyFont, 14)
@@ -688,9 +688,9 @@ function Show(bp, builderUnit, bpID)
         local time, energy, mass
 
         if performUpgrade then
-            time, energy, mass = import('/lua/game.lua').GetConstructEconomyModel(builderUnit, bp.Economy, builderBp.Economy)
+            time, energy, mass = import("/lua/game.lua").GetConstructEconomyModel(builderUnit, bp.Economy, builderBp.Economy)
         else
-            time, energy, mass = import('/lua/game.lua').GetConstructEconomyModel(builderUnit, bp.Economy)
+            time, energy, mass = import("/lua/game.lua").GetConstructEconomyModel(builderUnit, bp.Economy)
         end
 
         time = math.max(time, 1)

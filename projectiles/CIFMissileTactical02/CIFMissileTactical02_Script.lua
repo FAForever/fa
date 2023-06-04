@@ -4,9 +4,9 @@
 -- with a higher arc and distance based adjusting trajectory. Splits into child projectile 
 -- if it takes enough damage.
 -- 
-local CLOATacticalMissileProjectile = import('/lua/cybranprojectiles.lua').CLOATacticalMissileProjectile
+local CLOATacticalMissileProjectile = import("/lua/cybranprojectiles.lua").CLOATacticalMissileProjectile
 
-CIFMissileTactical02 = Class(CLOATacticalMissileProjectile) {
+CIFMissileTactical02 = ClassProjectile(CLOATacticalMissileProjectile) {
 
     NumChildMissiles = 3,
     FxWaterHitScale = 1.65,
@@ -15,21 +15,20 @@ CIFMissileTactical02 = Class(CLOATacticalMissileProjectile) {
         CLOATacticalMissileProjectile.OnCreate(self)
         self:SetCollisionShape('Sphere', 0, 0, 0, 2.0)
         self.Split = false
-        self.MovementTurnLevel = 1
-        self:ForkThread( self.MovementThread )        
+        self.Trash:Add(ForkThread( self.MovementThread,self ))
     end,
-    
+
     OnImpact = function(self, targetType, targetEntity)
         CreateLightParticle( self, -1, self.Army, 3, 7, 'glow_03', 'ramp_fire_11' )
-        
+
         -- if I collide with terrain dont split
         if targetType != 'Projectile' then
             self.Split = true
         end
-        
+
         CLOATacticalMissileProjectile.OnImpact(self, targetType, targetEntity)
     end,
-    
+
     OnDamage = function(self, instigator, amount, vector, damageType)
         if not self.Split and (amount >= self:GetHealth()) then
             self.Split = true
@@ -50,19 +49,18 @@ CIFMissileTactical02 = Class(CLOATacticalMissileProjectile) {
                 local proj = self:CreateChildProjectile(ChildProjectileBP)
                 proj:SetVelocity(xVec,yVec,zVec)
                 proj:SetVelocity(velocity)
-                proj:PassDamageData(self.DamageData)
+                proj.DamageData = self.DamageData
             end
         end
         CLOATacticalMissileProjectile.OnDamage(self, instigator, amount, vector, damageType)
     end,
 
     MovementThread = function(self)
-        self.WaitTime = 0.1
         self:SetTurnRate(8)
-        WaitSeconds(0.3)
+        WaitTicks(4)
         while not self:BeenDestroyed() do
             self:SetTurnRateByDist()
-            WaitSeconds(self.WaitTime)
+            WaitTicks(2)
         end
     end,
 
@@ -71,16 +69,16 @@ CIFMissileTactical02 = Class(CLOATacticalMissileProjectile) {
         -- Get the nuke as close to 90 deg as possible
         if dist > 50 then
             -- Freeze the turn rate as to prevent steep angles at long distance targets
-            WaitSeconds(2)
+            WaitTicks(21)
             self:SetTurnRate(20)
         elseif dist > 64 and dist <= 107 then
             -- Increase check intervals
             self:SetTurnRate(30)
-            WaitSeconds(1.5)
+            WaitTicks(16)
             self:SetTurnRate(30)
         elseif dist > 21 and dist <= 64 then
             -- Further increase check intervals
-            WaitSeconds(0.3)
+            WaitTicks(4)
             self:SetTurnRate(50)
         elseif dist > 0 and dist <= 21 then
             -- Further increase check intervals            

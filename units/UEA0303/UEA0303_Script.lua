@@ -8,14 +8,14 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local TAirUnit = import('/lua/terranunits.lua').TAirUnit
-local TAAGinsuRapidPulseWeapon = import('/lua/terranweapons.lua').TAAGinsuRapidPulseWeapon
+local TAirUnit = import("/lua/terranunits.lua").TAirUnit
+local TAAGinsuRapidPulseWeapon = import("/lua/terranweapons.lua").TAAGinsuRapidPulseWeapon
 
 ---@class UEA0303 : TAirUnit
-UEA0303 = Class(TAirUnit) {
+UEA0303 = ClassUnit(TAirUnit) {
     Weapons = {
-        RightBeam = Class(TAAGinsuRapidPulseWeapon) {},
-        LeftBeam = Class(TAAGinsuRapidPulseWeapon) {},
+        RightBeam = ClassWeapon(TAAGinsuRapidPulseWeapon) {},
+        LeftBeam = ClassWeapon(TAAGinsuRapidPulseWeapon) {},
     },
 }
 

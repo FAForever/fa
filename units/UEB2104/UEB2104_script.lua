@@ -7,14 +7,14 @@
 --**
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
-local TStructureUnit = import('/lua/terranunits.lua').TStructureUnit
-local TAALinkedRailgun = import('/lua/terranweapons.lua').TAALinkedRailgun
+local TStructureUnit = import("/lua/terranunits.lua").TStructureUnit
+local TAALinkedRailgun = import("/lua/terranweapons.lua").TAALinkedRailgun
 
 
 ---@class UEB2104 : TStructureUnit
-UEB2104 = Class(TStructureUnit) {
+UEB2104 = ClassUnit(TStructureUnit) {
     Weapons = {
-        AAGun = Class(TAALinkedRailgun) {},
+        AAGun = ClassWeapon(TAALinkedRailgun) {},
     },
 }
 

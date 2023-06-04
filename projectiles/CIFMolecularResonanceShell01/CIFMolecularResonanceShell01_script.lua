@@ -1,12 +1,9 @@
---
 -- Cybran T2 Artillery Projectile : urb2303
---
 
-local CIFMolecularResonanceShell = import('/lua/cybranprojectiles.lua').CIFMolecularResonanceShell
-CIFMolecularResonanceShell01 = Class(CIFMolecularResonanceShell) {
+local CIFMolecularResonanceShell = import("/lua/cybranprojectiles.lua").CIFMolecularResonanceShell
+CIFMolecularResonanceShell01 = ClassProjectile(CIFMolecularResonanceShell) {
 	OnImpact = function(self, targetType, targetEntity)       
 		CIFMolecularResonanceShell.OnImpact(self, targetType, targetEntity)  
-
         -- make it flashy!
         CreateLightParticle( self, -1, self.Army, 24, 5, 'glow_03', 'ramp_red_10' )
         CreateLightParticle( self, -1, self.Army, 8, 16, 'glow_03', 'ramp_antimatter_02' )
@@ -22,5 +19,4 @@ CIFMolecularResonanceShell01 = Class(CIFMolecularResonanceShell) {
         end
     end,
 }
-
 TypeClass = CIFMolecularResonanceShell01

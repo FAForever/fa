@@ -7,10 +7,10 @@
 --**
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
-local AEnergyCreationUnit = import('/lua/aeonunits.lua').AEnergyCreationUnit
+local AEnergyCreationUnit = import("/lua/aeonunits.lua").AEnergyCreationUnit
 
 ---@class UAB1201 : AEnergyCreationUnit
-UAB1201 = Class(AEnergyCreationUnit) {
+UAB1201 = ClassUnit(AEnergyCreationUnit) {
     AmbientEffects = 'AT2PowerAmbient',
 
     OnStopBeingBuilt = function(self, builder, layer)

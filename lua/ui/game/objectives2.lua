@@ -14,18 +14,18 @@
 --    targets = { blipId1, Vector(10,10,10), blipId2, ... }   -- objective is a list of target unit(s) and/or location(s)
 -- }
 
-local UIUtil = import('/lua/ui/uiutil.lua')
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local GameMain = import('/lua/ui/game/gamemain.lua')
-local Group = import('/lua/maui/group.lua').Group
-local Button = import('/lua/maui/button.lua').Button
-local Checkbox = import('/lua/maui/checkbox.lua').Checkbox
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local GameCommon = import('/lua/ui/game/gamecommon.lua')
-local Announcement = import('/lua/ui/game/announcement.lua').CreateAnnouncement
-local cmdMode = import('/lua/ui/game/commandmode.lua')
-local UIPing = import('/lua/ui/game/ping.lua')
-local Tooltip = import('/lua/ui/game/tooltip.lua')
+local UIUtil = import("/lua/ui/uiutil.lua")
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local GameMain = import("/lua/ui/game/gamemain.lua")
+local Group = import("/lua/maui/group.lua").Group
+local Button = import("/lua/maui/button.lua").Button
+local Checkbox = import("/lua/maui/checkbox.lua").Checkbox
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+local GameCommon = import("/lua/ui/game/gamecommon.lua")
+local Announcement = import("/lua/ui/game/announcement.lua").CreateAnnouncement
+local cmdMode = import("/lua/ui/game/commandmode.lua")
+local UIPing = import("/lua/ui/game/ping.lua")
+local Tooltip = import("/lua/ui/game/tooltip.lua")
 
 local gameSpeed = 0
 local lastUnitWarning = 0
@@ -38,7 +38,7 @@ local needsSquadLayoutPostNIS = false
 local preCreationQueue = {}
 local preCreationWaitThread = false
 
-controls = import('/lua/ui/controls.lua').Get()
+controls = import("/lua/ui/controls.lua").Get()
 controls.objItems = controls.objItems or {}
 
 function CreateUI(inParent)
@@ -120,7 +120,7 @@ end
 
 function _OnBeat()
     controls.time:SetText(string.format("%s (%+d / %+d)", GetGameTime(), gameSpeed, GetSimRate()))
-    local scoreData = import('/lua/ui/game/score.lua').currentScores
+    local scoreData = import("/lua/ui/game/score.lua").currentScores
     local armyId = GetFocusArmy()
     if scoreData[armyId].general then
         SetUnitText(scoreData[armyId].general.currentunits, scoreData[armyId].general.currentcap)
@@ -137,7 +137,7 @@ function SetUnitText(current, cap)
     if current == cap then
         if (not lastUnitWarning or GameTime() - lastUnitWarning > 60) and not unitWarningUsed then
             LOG('>>>>>>>>>>> current: ', current, ' cap: ', cap)
-            import('/lua/ui/game/announcement.lua').CreateAnnouncement(LOC('<LOC score_0002>Unit Cap Reached'), controls.units)
+            import("/lua/ui/game/announcement.lua").CreateAnnouncement(LOC('<LOC score_0002>Unit Cap Reached'), controls.units)
             lastUnitWarning = GameTime()
             unitWarningUsed = true
         end
@@ -437,7 +437,7 @@ function UpdateObjectiveItems(skipAnnounce)
 end
 
 function LayoutObjectiveItems()
-    if import('/lua/ui/game/gamemain.lua').IsNISMode() then
+    if import("/lua/ui/game/gamemain.lua").IsNISMode() then
         needsObjectiveLayoutPostNIS = true
         return
     end
@@ -569,7 +569,7 @@ function CreateTooltip(parentControl, objData, container)
         controls.tooltip.Width:Set(function() return math.max(LayoutHelpers.ScaleNumber(180), controls.tooltip.text.title.Width()) end)
 
         local curLine = 1
-        local wrapped = import('/lua/maui/text.lua').WrapText(LOC(objData.description) or '', controls.tooltip.Width(),
+        local wrapped = import("/lua/maui/text.lua").WrapText(LOC(objData.description) or '', controls.tooltip.Width(),
             function(curText) return controls.tooltip.text.desc[1]:GetStringAdvance(curText) end)
         for index, line in wrapped do
             local i = index
@@ -660,7 +660,7 @@ function AddPingGroups(groupData, onload)
             end
             local modeData = {
                 name="RULEUCC_Script",
-                cursor=cursor,
+                Cursor=cursor,
                 pingtype=self.Data.Type,
                 groupID=self.Data.ID,
             }
@@ -704,7 +704,7 @@ function RemovePingGroups(removeData, onload)
 end
 
 function LayoutSquads()
-    if import('/lua/ui/game/gamemain.lua').IsNISMode() then
+    if import("/lua/ui/game/gamemain.lua").IsNISMode() then
         needsSquadLayoutPostNIS = true
         return
     end
@@ -752,7 +752,7 @@ end
 
 function ToggleObjectives(state)
     -- disable when in Screen Capture mode
-    if import('/lua/ui/game/gamemain.lua').gameUIHidden then
+    if import("/lua/ui/game/gamemain.lua").gameUIHidden then
         return
     end
 

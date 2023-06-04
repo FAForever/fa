@@ -1,11 +1,11 @@
-local UIUtil = import('/lua/ui/uiutil.lua')
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local Group = import('/lua/maui/group.lua').Group
-local Text = import('/lua/maui/text.lua').Text
-local ItemList = import('/lua/maui/itemlist.lua').ItemList
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local Edit = import('/lua/maui/edit.lua').Edit
-local Prefs = import('/lua/user/prefs.lua')
+local UIUtil = import("/lua/ui/uiutil.lua")
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local Group = import("/lua/maui/group.lua").Group
+local Text = import("/lua/maui/text.lua").Text
+local ItemList = import("/lua/maui/itemlist.lua").ItemList
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+local Edit = import("/lua/maui/edit.lua").Edit
+local Prefs = import("/lua/user/prefs.lua")
 
 -- maximum accepted file name size
 maxFilenameSize = 30
@@ -138,7 +138,7 @@ function IsFilenameInvalid(filename)
 end
 
 ---@class FilePicker : Group
-FilePicker = Class(Group) {
+FilePicker = ClassUI(Group) {
     __init = function(self, parent, fileType, onlyShowMine, selectAction, debugName)
         Group.__init(self, parent)
         self:SetName(debugName or "FilePicker")

@@ -7,11 +7,11 @@
 -- **  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -- ****************************************************************************
 
-local SAirUnit = import('/lua/seraphimunits.lua').SAirUnit
-local VisionMarker = import('/lua/sim/VizMarker.lua').VisionMarkerOpti
+local SAirUnit = import("/lua/seraphimunits.lua").SAirUnit
+local VisionMarker = import("/lua/sim/vizmarker.lua").VisionMarkerOpti
 
 ---@class XSA0101 : SAirUnit
-XSA0101 = Class(SAirUnit) {
+XSA0101 = ClassUnit(SAirUnit) {
     OnImpact = function(self, with, other)
         SAirUnit.OnImpact(self, with, other)
 

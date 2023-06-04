@@ -29,7 +29,7 @@
 ---@field RevealCivilians 'No' | 'Yes'
 ---@field RandomMap 'Off' | 'Official' | 'All'
 ---@field Score 'no' | 'yes'
----@field Share 'FullShare' | 'ShareUntilDeath' | 'TransferToKiller' | 'Defectors' | 'CivilianDeserter'
+---@field Share 'FullShare' | 'ShareUntilDeath' | 'PartialShare' | 'TransferToKiller' | 'Defectors' | 'CivilianDeserter'
 ---@field ShareUnitCap 'none' | 'allies' | 'all'
 ---@field Timeouts '0' | '3'| '-1'
 ---@field UnitCap '125' | '250' | '375' | '500' | '625' | '750' | '875' | '1000' | '1250' | '1500'
@@ -161,6 +161,30 @@ teamOptions =
             },
         },
     },
+
+    {
+        default = 1,
+        label = "<LOC lobui_CAName>Army control",
+        help = "<LOC lobui_CADesc>Allows you to adjust how teams and armies co-operate with each other. Ranging from the default Supreme Commander experience to one army, shared by the entire team.",
+        key = 'CommonArmy',
+        values = {
+            {
+                text = "<LOC at_Default>Default",
+                help = "<LOC lobui_CADDesc>Each player has their own army and their own resources. Allied players can not issue commands to your army. This is the default Supreme Commander experience.",
+                key = 'Off'
+            },
+            {
+                text = "<LOC lobui_CAUnion>Multiple armies, union control",
+                help = "<LOC lobui_CAUDesc>Each player has their own army and their own resources. Allied players can switch focus to your army and to issue commands.",
+                key = 'Union'
+            },
+            {
+                text = "<LOC lobui_CACommon>Single army, union control",
+                help = "<LOC lobui_CACDesc>Each team is one army. All units and resources are shared, all team members can issue commands.",
+                key = 'Common'
+            }
+        }
+    },
 }
 
 ---@type ScenarioOption[]
@@ -173,13 +197,18 @@ globalOpts = {
          values = {
              {
                  text = "<LOC lobui_0742>Full Share",
-                 help = "<LOC lobui_0743>Your units will be transferred to your highest scoring ally when you die. Previously transferred units will stay where they are.",
+                 help = "<LOC lobui_0743>Your units will be transferred to your highest rated ally when you die. Previously transferred units will stay where they are.",
                  key = 'FullShare',
              },
              {
                  text = "<LOC lobui_0744>Share Until Death",
                  help = "<LOC lobui_0745>All units you have built this game will be destroyed when you die, except those captured by the enemy.",
                  key = 'ShareUntilDeath',
+             },
+             {
+                 text = "<LOC lobui_0796>Partial Share",
+                 help = "<LOC lobui_0797>Your buildings and engineers will be transferred to your highest rated ally when you die.  Your other units will be destroyed when you die, except those captured by the enemy.",
+                 key = 'PartialShare',
              },
              {
                  text = "<LOC lobui_0762>Traitors",
@@ -247,7 +276,7 @@ globalOpts = {
     },
 
     {
-        default = 1,
+        default = 2,
         label = "<LOC lobui_0434>Share Unit Cap at Death",
         help = "<LOC lobui_0435>Enable this to share unitcap when a player dies",
         key = 'ShareUnitCap',
@@ -573,6 +602,7 @@ AIOpts = {
         value_text = "%s",
         value_help = "<LOC aisettings_0003>Cheat multiplier of %s",
         values = {
+            '0.5', '0.6', '0.7', '0.8', '0.9',
             '1.0', '1.1', '1.2', '1.3', '1.4', '1.5', '1.6', '1.7', '1.8', '1.9',
             '2.0', '2.1', '2.2', '2.3', '2.4', '2.5', '2.6', '2.7', '2.8', '2.9', '3.0', '3.1', '3.2', '3.3', '3.4', '3.5', '3.6', '3.7', '3.8', '3.9',
             '4.0', '4.1', '4.2', '4.3', '4.4', '4.5', '4.6', '4.7', '4.8', '4.9', '5.0', '5.1', '5.2', '5.3', '5.4', '5.5', '5.6', '5.7', '5.8', '5.9',
@@ -586,6 +616,7 @@ AIOpts = {
         value_text = "%s",
         value_help = "<LOC aisettings_0056>Build multiplier of %s",
         values = {
+            '0.5', '0.6', '0.7', '0.8', '0.9',
             '1.0', '1.1', '1.2', '1.3', '1.4', '1.5', '1.6', '1.7', '1.8', '1.9',
             '2.0', '2.1', '2.2', '2.3', '2.4', '2.5', '2.6', '2.7', '2.8', '2.9', '3.0', '3.1', '3.2', '3.3', '3.4', '3.5', '3.6', '3.7', '3.8', '3.9',
             '4.0', '4.1', '4.2', '4.3', '4.4', '4.5', '4.6', '4.7', '4.8', '4.9', '5.0', '5.1', '5.2', '5.3', '5.4', '5.5', '5.6', '5.7', '5.8', '5.9',

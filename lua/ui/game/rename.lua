@@ -1,4 +1,4 @@
-local UIUtil = import('/lua/ui/uiutil.lua')
+local UIUtil = import("/lua/ui/uiutil.lua")
 
 local dialog = false
 

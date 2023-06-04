@@ -5,7 +5,7 @@
 --* Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
-local UIUtil = import('/lua/ui/uiutil.lua')
+local UIUtil = import("/lua/ui/uiutil.lua")
 
 local sessionInfo = SessionGetScenarioInfo()
 
@@ -44,7 +44,7 @@ function DoGameResult(armyIndex, result)
 
     -- If it's someone else, announce it and stop.
     if armyIndex ~= GetFocusArmy() then
-        import('/lua/ui/game/score.lua').ArmyAnnounce(armyIndex, LOCF(OtherArmyResultStrings[result], armies[armyIndex].nickname))
+        import("/lua/ui/game/score.lua").ArmyAnnounce(armyIndex, LOCF(OtherArmyResultStrings[result], armies[armyIndex].nickname))
         return
     end
 
@@ -55,13 +55,13 @@ function DoGameResult(armyIndex, result)
         PlaySound(Sound({Bank = 'Interface', Cue = 'UI_END_Game_Fail'}))
     end
 
-    local tabs = import('/lua/ui/game/tabs.lua')
+    local tabs = import("/lua/ui/game/tabs.lua")
     tabs.OnGameOver()
     tabs.TabAnnouncement('main', LOC(MyArmyResultStrings[result]))
     --For disable ping buttons
-    import('/lua/ui/game/multifunction.lua').FocusArmyChanged()
+    import("/lua/ui/game/multifunction.lua").FocusArmyChanged()
 
-    local score = import('/lua/ui/dialogs/score.lua')
+    local score = import("/lua/ui/dialogs/score.lua")
     tabs.AddModeText("<LOC _Score>", function()
         UIUtil.QuickDialog(GetFrame(0),
             "<LOC EXITDLG_0003>Are you sure you'd like to exit?",

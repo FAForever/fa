@@ -10,7 +10,7 @@ function ToggleZoomPop()
    local zoomRatio = (cam:GetTargetZoom() / cam:GetMaxZoom()) -- 0.5 is a good level for 'zoomed most of the way out'
 
    if zoomRatio > 0.4 then
-      local zoom = import('/lua/user/prefs.lua').GetFromCurrentProfile('options').gui_zoom_pop_distance
+      local zoom = import("/lua/user/prefs.lua").GetFromCurrentProfile('options').gui_zoom_pop_distance
       if zoom == nil then
          zoom = 80
       end

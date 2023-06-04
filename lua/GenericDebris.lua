@@ -5,8 +5,8 @@
 --**
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
-local BaseGenericDebris = import('/lua/sim/DefaultProjectiles.lua').BaseGenericDebris
-local EffectTemplates = import('/lua/EffectTemplates.lua')
+local BaseGenericDebris = import("/lua/sim/defaultprojectiles.lua").BaseGenericDebris
+local EffectTemplates = import("/lua/effecttemplates.lua")
 
 ---@class GenericDebris : BaseGenericDebris
 GenericDebris = Class( BaseGenericDebris ){

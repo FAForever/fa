@@ -8,25 +8,19 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local TerranWeaponFile = import('/lua/terranweapons.lua')
-local TWalkingLandUnit = import('/lua/terranunits.lua').TWalkingLandUnit
+local TerranWeaponFile = import("/lua/terranweapons.lua")
+local TWalkingLandUnit = import("/lua/terranunits.lua").TWalkingLandUnit
 local TDFHeavyPlasmaCannonWeapon = TerranWeaponFile.TDFHeavyPlasmaCannonWeapon
 local TSAMLauncher = TerranWeaponFile.TSAMLauncher
 
 ---@class UEL0303 : TWalkingLandUnit
-UEL0303 = Class(TWalkingLandUnit) {
+UEL0303 = ClassUnit(TWalkingLandUnit) {
 
     Weapons = {
-        HeavyPlasma01 = Class(TDFHeavyPlasmaCannonWeapon) {
-            DisabledFiringBones = {
-                'Torso', 'ArmR_B02', 'Barrel_R', 'ArmR_B03', 'ArmR_B04',
-                'ArmL_B02', 'Barrel_L', 'ArmL_B03', 'ArmL_B04',
-            },
-        },
-        AntiAirMissiles = Class(TSAMLauncher) {
+        HeavyPlasma01 = ClassWeapon(TDFHeavyPlasmaCannonWeapon) {
+            DisabledFiringBones = { 'Torso' },
         },
     },
-    
 }
 
 TypeClass = UEL0303

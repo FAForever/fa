@@ -4,7 +4,7 @@
 -- ScrollBar:ScrollLines(float lines)
 -- ScrollBar:ScrollPages(float pages)
 
-local Control = import('/lua/maui/control.lua').Control
+local Control = import("/lua/maui/control.lua").Control
 
 ---@alias ScrollAxis "Horz" | "Vert"
 
@@ -20,7 +20,7 @@ ScrollAxis = {
 ---@field _tb LazyVar<FileName>
 ---@field UpButton? Button
 ---@field DownButton? Button
-Scrollbar = Class(moho.scrollbar_methods, Control) {
+Scrollbar = ClassUI(moho.scrollbar_methods, Control) {
     ---@param self Scrollbar
     ---@param parent Control
     ---@param axis ScrollAxis
@@ -31,7 +31,7 @@ Scrollbar = Class(moho.scrollbar_methods, Control) {
             self:SetName(debugname)
         end
 
-        local LazyVar = import('/lua/lazyvar.lua').Create
+        local LazyVar = import("/lua/lazyvar.lua").Create
         self._bg = LazyVar()
         self._tm = LazyVar()
         self._tt = LazyVar()

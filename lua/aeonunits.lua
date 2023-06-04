@@ -10,42 +10,24 @@
 ----------------------------------------------------------------------------
 -- AEON DEFAULT UNITS
 ----------------------------------------------------------------------------
-local DefaultUnitsFile = import('defaultunits.lua')
+local DefaultUnitsFile = import("/lua/defaultunits.lua")
 local FactoryUnit = DefaultUnitsFile.FactoryUnit
-local AirFactoryUnit = DefaultUnitsFile.AirFactoryUnit
-local AirStagingPlatformUnit = DefaultUnitsFile.AirStagingPlatformUnit
-local AirUnit = DefaultUnitsFile.AirUnit
-local ConcreteStructureUnit = DefaultUnitsFile.ConcreteStructureUnit
 local ConstructionUnit = DefaultUnitsFile.ConstructionUnit
 local EnergyCreationUnit = DefaultUnitsFile.EnergyCreationUnit
-local EnergyStorageUnit = DefaultUnitsFile.EnergyStorageUnit
 local LandFactoryUnit = DefaultUnitsFile.LandFactoryUnit
-local MassCollectionUnit = DefaultUnitsFile.MassCollectionUnit
-local MassFabricationUnit = DefaultUnitsFile.MassFabricationUnit
-local MassStorageUnit = DefaultUnitsFile.MassStorageUnit
-local RadarUnit = DefaultUnitsFile.RadarUnit
 local SeaFactoryUnit = DefaultUnitsFile.SeaFactoryUnit
-local ShieldHoverLandUnit = DefaultUnitsFile.ShieldHoverLandUnit
-local ShieldLandUnit = DefaultUnitsFile.ShieldLandUnit
 local ShieldStructureUnit = DefaultUnitsFile.ShieldStructureUnit
-local SonarUnit = DefaultUnitsFile.SonarUnit
-local StructureUnit = DefaultUnitsFile.StructureUnit
-local QuantumGateUnit = DefaultUnitsFile.QuantumGateUnit
 local RadarJammerUnit = DefaultUnitsFile.RadarJammerUnit
-local TransportBeaconUnit = DefaultUnitsFile.TransportBeaconUnit
-local WalkingLandUnit = DefaultUnitsFile.WalkingLandUnit
-local WallStructureUnit = DefaultUnitsFile.WallStructureUnit
 
-local EffectTemplate = import('/lua/EffectTemplates.lua')
-local EffectUtil = import('/lua/EffectUtilities.lua')
+local EffectTemplate = import("/lua/effecttemplates.lua")
+local EffectUtil = import("/lua/effectutilities.lua")
 local CreateAeonFactoryBuildingEffects = EffectUtil.CreateAeonFactoryBuildingEffects
-
 
 ---------------------------------------------------------------
 --  FACTORIES
 ---------------------------------------------------------------
 ---@class AFactoryUnit : FactoryUnit
-AFactoryUnit = Class(FactoryUnit) {
+AFactoryUnit = ClassUnit(FactoryUnit) {
 
     ---@param self AFactoryUnit
     ---@param unitBeingBuilt Unit
@@ -59,16 +41,16 @@ AFactoryUnit = Class(FactoryUnit) {
         -- When factory is paused take some action
         if self:IsUnitState('Building') and self.UnitBeingBuilt then
             self:StopUnitAmbientSound('ConstructLoop')
-            StructureUnit.StopBuildingEffects(self, self.UnitBeingBuilt)
+            FactoryUnit.StopBuildingEffects(self, self.UnitBeingBuilt)
         end
-        StructureUnit.OnPaused(self)
+        FactoryUnit.OnPaused(self)
     end,
 
     ---@param self AFactoryUnit
     OnUnpaused = function(self)
         FactoryUnit.OnUnpaused(self)
         if self:IsUnitState('Building') and self.UnitBeingBuilt then
-            StructureUnit.StopBuildingEffects(self, self.UnitBeingBuilt)
+            FactoryUnit.StopBuildingEffects(self, self.UnitBeingBuilt)
             self:StartBuildFx(self:GetFocusUnit())
         end
     end,
@@ -78,50 +60,35 @@ AFactoryUnit = Class(FactoryUnit) {
 --  AIR STRUCTURES
 ---------------------------------------------------------------
 ---@class AAirFactoryUnit : AirFactoryUnit
-AAirFactoryUnit = Class(AirFactoryUnit) {
-
-    ---@param self AAirFactoryUnit
-    ---@param unitBeingBuilt Unit
-    StartBuildFx = function(self, unitBeingBuilt)
-        AFactoryUnit.StartBuildFx(self, unitBeingBuilt)
-    end,
-
-    ---@param self AAirFactoryUnit
-    OnPaused = function(self)
-        AFactoryUnit.OnPaused(self)
-    end,
-
-    ---@param self AAirFactoryUnit
-    OnUnpaused = function(self)
-        AFactoryUnit.OnUnpaused(self)
-    end,
+AAirFactoryUnit = ClassUnit(DefaultUnitsFile.AirFactoryUnit) {
+    StartBuildFx = AFactoryUnit.StartBuildFx,
+    OnPaused = AFactoryUnit.OnPaused,
+    OnUnpaused = AFactoryUnit.OnUnpaused,
 }
 
 ---------------------------------------------------------------
 --  AIR UNITS
 ---------------------------------------------------------------
 ---@class AAirUnit : AirUnit
-AAirUnit = Class(AirUnit) {}
+AAirUnit = ClassUnit(DefaultUnitsFile.AirUnit) {}
 
 ---------------------------------------------------------------
 --  AIR STAGING STRUCTURES
 ---------------------------------------------------------------
 ---@class AAirStagingPlatformUnit : AirStagingPlatformUnit
-AAirStagingPlatformUnit = Class(AirStagingPlatformUnit) {}
+AAirStagingPlatformUnit = ClassUnit(DefaultUnitsFile.AirStagingPlatformUnit) {}
 
 ---------------------------------------------------------------
 --  WALL  STRUCTURES
 ---------------------------------------------------------------
 ---@class AConcreteStructureUnit : ConcreteStructureUnit
-AConcreteStructureUnit = Class(ConcreteStructureUnit) {
-    AdjacencyBeam = false,
-}
+AConcreteStructureUnit = ClassUnit(DefaultUnitsFile.ConcreteStructureUnit) {}
 
 ---------------------------------------------------------------
 --  Construction Units
 ---------------------------------------------------------------
 ---@class AConstructionUnit : ConstructionUnit
-AConstructionUnit = Class(ConstructionUnit) {
+AConstructionUnit = ClassUnit(ConstructionUnit) {
 
     ---@param self AConstructionUnit
     ---@param unitBeingBuilt Unit
@@ -135,14 +102,7 @@ AConstructionUnit = Class(ConstructionUnit) {
 --  ENERGY CREATION UNITS
 ---------------------------------------------------------------
 ---@class AEnergyCreationUnit : EnergyCreationUnit
-AEnergyCreationUnit = Class(EnergyCreationUnit) {
-
-    ---@param self AEnergyCreationUnit
-    OnCreate = function(self)
-        EnergyCreationUnit.OnCreate(self)
-        self.NumUsedAdjacentUnits = 0
-    end,
-
+AEnergyCreationUnit = ClassUnit(EnergyCreationUnit) {
     ---@param self AEnergyCreationUnit
     ---@param builder Unit
     ---@param layer Layer
@@ -160,83 +120,65 @@ AEnergyCreationUnit = Class(EnergyCreationUnit) {
 -- ENERGY STORAGE STRUCTURES
 ---------------------------------------------------------------
 ---@class AEnergyStorageUnit : EnergyStorageUnit
-AEnergyStorageUnit = Class(EnergyStorageUnit) {}
+AEnergyStorageUnit = ClassUnit(DefaultUnitsFile.EnergyStorageUnit) {}
 
 ---------------------------------------------------------------
 --  HOVERING LAND UNITS
 ---------------------------------------------------------------
 ---@class AHoverLandUnit : HoverLandUnit
-AHoverLandUnit = Class(DefaultUnitsFile.HoverLandUnit) {
-    FxHoverScale = 1,
-    HoverEffects = nil,
-    HoverEffectBones = nil,
-}
+AHoverLandUnit = ClassUnit(DefaultUnitsFile.HoverLandUnit) {}
 
 ---------------------------------------------------------------
 --  LAND FACTORY STRUCTURES
 ---------------------------------------------------------------
 ---@class ALandFactoryUnit : LandFactoryUnit
-ALandFactoryUnit = Class(LandFactoryUnit) {
-
-
-    ---@param self ALandFactoryUnit
-    ---@param unitBeingBuilt Unit
-    StartBuildFx = function(self, unitBeingBuilt)
-        AFactoryUnit.StartBuildFx(self, unitBeingBuilt)
-    end,
-
-    ---@param self ALandFactoryUnit
-    OnPaused = function(self)
-        AFactoryUnit.OnPaused(self)
-    end,
-
-    ---@param self ALandFactoryUnit
-    OnUnpaused = function(self)
-        AFactoryUnit.OnUnpaused(self)
-    end,
+ALandFactoryUnit = ClassUnit(LandFactoryUnit) {
+    StartBuildFx = AFactoryUnit.StartBuildFx,
+    OnPaused = AFactoryUnit.OnPaused,
+    OnUnpaused = AFactoryUnit.OnUnpaused,
 }
 
 ---------------------------------------------------------------
 --  LAND UNITS
 ---------------------------------------------------------------
 ---@class ALandUnit : LandUnit
-ALandUnit = Class(DefaultUnitsFile.LandUnit) {}
+ALandUnit = ClassUnit(DefaultUnitsFile.LandUnit) {}
 
 ---------------------------------------------------------------
 --  MASS COLLECTION UNITS
 ---------------------------------------------------------------
 ---@class AMassCollectionUnit : MassCollectionUnit
-AMassCollectionUnit = Class(MassCollectionUnit) {}
+AMassCollectionUnit = ClassUnit(DefaultUnitsFile.MassCollectionUnit) {}
 
 ---------------------------------------------------------------
 --  MASS FABRICATION STRUCTURES
 ---------------------------------------------------------------
 ---@class AMassFabricationUnit : MassFabricationUnit
-AMassFabricationUnit = Class(MassFabricationUnit) {}
+AMassFabricationUnit = ClassUnit(DefaultUnitsFile.MassFabricationUnit) {}
 
 ---------------------------------------------------------------
 --  MASS STORAGE UNITS
 ---------------------------------------------------------------
 ---@class AMassStorageUnit : MassStorageUnit
-AMassStorageUnit = Class(MassStorageUnit) {}
+AMassStorageUnit = ClassUnit(DefaultUnitsFile.MassStorageUnit) {}
 
 ---------------------------------------------------------------
 --  RADAR STRUCTURES
 ---------------------------------------------------------------
 ---@class ARadarUnit : RadarUnit
-ARadarUnit = Class(RadarUnit) {}
+ARadarUnit = ClassUnit(DefaultUnitsFile.RadarUnit) {}
 
 ---------------------------------------------------------------
 --  RADAR STRUCTURES
 ---------------------------------------------------------------
 ---@class ASonarUnit : SonarUnit
-ASonarUnit = Class(SonarUnit) {}
+ASonarUnit = ClassUnit(DefaultUnitsFile.SonarUnit) {}
 
 ---------------------------------------------------------------
 --  SEA FACTORY STRUCTURES
 ---------------------------------------------------------------
 ---@class ASeaFactoryUnit : SeaFactoryUnit
-ASeaFactoryUnit = Class(SeaFactoryUnit) {
+ASeaFactoryUnit = ClassUnit(SeaFactoryUnit) {
 
     ---@param self ASeaFactoryUnit
     ---@param unitBeingBuilt Unit
@@ -245,40 +187,34 @@ ASeaFactoryUnit = Class(SeaFactoryUnit) {
         unitBeingBuilt.Trash:Add(thread)
     end,
 
-    ---@param self ASeaFactoryUnit
-    OnPaused = function(self)
-        AFactoryUnit.OnPaused(self)
-    end,
-
-    ---@param self ASeaFactoryUnit
-    OnUnpaused = function(self)
-        AFactoryUnit.OnUnpaused(self)
-    end,
+    OnPaused = AFactoryUnit.OnPaused,
+    OnUnpaused = AFactoryUnit.OnUnpaused,
 }
 
 ---------------------------------------------------------------
 --  SEA UNITS
 ---------------------------------------------------------------
 ---@class ASeaUnit : SeaUnit
-ASeaUnit = Class(DefaultUnitsFile.SeaUnit) {}
+ASeaUnit = ClassUnit(DefaultUnitsFile.SeaUnit) {}
 
 ---------------------------------------------------------------
 --  SHIELD LAND UNITS
 ---------------------------------------------------------------
 ---@class AShieldHoverLandUnit : ShieldHoverLandUnit
-AShieldHoverLandUnit = Class(ShieldHoverLandUnit) {}
+AShieldHoverLandUnit = ClassUnit(DefaultUnitsFile.ShieldHoverLandUnit) {}
 
 ---------------------------------------------------------------
 --  SHIELD LAND UNITS
 ---------------------------------------------------------------
 ---@class AShieldLandUnit : ShieldLandUnit
-AShieldLandUnit = Class(ShieldLandUnit) {}
+AShieldLandUnit = ClassUnit(DefaultUnitsFile.ShieldLandUnit) {}
 
 ---------------------------------------------------------------
 --  SHIELD STRUCTURES
 ---------------------------------------------------------------
 ---@class AShieldStructureUnit : ShieldStructureUnit
-AShieldStructureUnit = Class(ShieldStructureUnit) {
+---@field Rotator? moho.RotateManipulator
+AShieldStructureUnit = ClassUnit(ShieldStructureUnit) {
     RotateSpeed = 60,
 
     ---@param self AShieldStructureUnit
@@ -305,52 +241,51 @@ AShieldStructureUnit = Class(ShieldStructureUnit) {
 --  STRUCTURES
 ---------------------------------------------------------------
 ---@class AStructureUnit : StructureUnit
-AStructureUnit = Class(StructureUnit) {}
+AStructureUnit = ClassUnit(DefaultUnitsFile.StructureUnit) {}
 
 ---------------------------------------------------------------
 --  SUBMARINE UNITS
 ---------------------------------------------------------------
 ---@class ASubUnit : SubUnit
-ASubUnit = Class(DefaultUnitsFile.SubUnit) {
-    IdleSubBones = {},
-    IdleSubEffects = {}
-}
+ASubUnit = ClassUnit(DefaultUnitsFile.SubUnit) {}
 
 ---------------------------------------------------------------
 --  TRANSPORT BEACON UNITS
 ---------------------------------------------------------------
 ---@class ATransportBeaconUnit : TransportBeaconUnit
-ATransportBeaconUnit = Class(TransportBeaconUnit) {}
+ATransportBeaconUnit = ClassUnit(DefaultUnitsFile.TransportBeaconUnit) {}
 
 ---------------------------------------------------------------
 --  WALKING LAND UNITS
 ---------------------------------------------------------------
 ---@class AWalkingLandUnit : WalkingLandUnit
-AWalkingLandUnit = Class(WalkingLandUnit) {}
+AWalkingLandUnit = ClassUnit(DefaultUnitsFile.WalkingLandUnit) {}
 
 ---------------------------------------------------------------
 --  WALL  STRUCTURES
 ---------------------------------------------------------------
 ---@class AWallStructureUnit : WallStructureUnit
-AWallStructureUnit = Class(WallStructureUnit) {}
+AWallStructureUnit = ClassUnit(DefaultUnitsFile.WallStructureUnit) {}
 
 ---------------------------------------------------------------
 --  CIVILIAN STRUCTURES
 ---------------------------------------------------------------
 ---@class ACivilianStructureUnit : AStructureUnit
-ACivilianStructureUnit = Class(AStructureUnit) {}
+ACivilianStructureUnit = ClassUnit(AStructureUnit) {}
 
 ---------------------------------------------------------------
 --  QUANTUM GATE UNITS
 ---------------------------------------------------------------
 ---@class AQuantumGateUnit : QuantumGateUnit
-AQuantumGateUnit = Class(QuantumGateUnit) {}
+AQuantumGateUnit = ClassUnit(DefaultUnitsFile.QuantumGateUnit) {}
 
 ---------------------------------------------------------------
 --  RADAR JAMMER UNITS
 ---------------------------------------------------------------
 ---@class ARadarJammerUnit : RadarJammerUnit
-ARadarJammerUnit = Class(RadarJammerUnit) {
+---@field Rotator? moho.RotateManipulator
+---@field OpenAnim? moho.AnimationManipulator
+ARadarJammerUnit = ClassUnit(RadarJammerUnit) {
     RotateSpeed = 60,
 
     ---@param self ARadarJammerUnit
@@ -373,8 +308,8 @@ ARadarJammerUnit = Class(RadarJammerUnit) {
     end,
 
     ---@param self ARadarJammerUnit
-    OnIntelEnabled = function(self)
-        RadarJammerUnit.OnIntelEnabled(self)
+    OnIntelEnabled = function(self, intel)
+        RadarJammerUnit.OnIntelEnabled(self, intel)
         if self.OpenAnim then
             self.OpenAnim:SetRate(1)
         end
@@ -387,8 +322,8 @@ ARadarJammerUnit = Class(RadarJammerUnit) {
     end,
 
     ---@param self ARadarJammerUnit
-    OnIntelDisabled = function(self)
-        RadarJammerUnit.OnIntelDisabled(self)
+    OnIntelDisabled = function(self, intel)
+        RadarJammerUnit.OnIntelDisabled(self, intel)
         if self.OpenAnim then
             self.OpenAnim:SetRate(-1)
         end

@@ -16,19 +16,31 @@ local UnitMethods = moho.unit_methods
 local UnitGetVelocity = UnitMethods.GetVelocity
 local UnitGetTargetEntity = UnitMethods.GetTargetEntity
 
-local Weapon = import('/lua/sim/Weapon.lua').Weapon
-local CollisionBeam = import('/lua/sim/CollisionBeam.lua').CollisionBeam
+local Weapon = import("/lua/sim/weapon.lua").Weapon
+local CollisionBeam = import("/lua/sim/collisionbeam.lua").CollisionBeam
 
-local MathMax = math.max
-local MathMin = math.min
+local MathClamp = math.clamp
+
+---@class WeaponSalvoData
+---@field target? Unit | Prop   if absent, will use `targetpos` instead
+---@field targetpos Vector      stores the last location of the target, or the ground fire location
+---@field lastAccel number      stores the last acceleration that was used
+---@field usestore? boolean     a flag that indicates if the target was lost
 
 -- Most weapons derive from this class, including beam weapons later in this file
----@class DefaultProjectileWeapon: Weapon
-DefaultProjectileWeapon = Class(Weapon) {
+---@class DefaultProjectileWeapon : Weapon
+---@field RecoilManipulators? TrashBag
+---@field CurrentSalvoNumber number
+---@field CurrentRackSalvoNumber number
+---@field CurrentSalvoData? WeaponSalvoData
+---@field AdjustedSalvoDelay? number if the weapon blueprint requests a trajectory fix, this is set to the effective duration of the salvo in ticks used to calculate projectile spread
+---@field DropBombShortRatio? number if the weapon blueprint requests a trajectory fix, this is set to the ratio of the distance to the target that the projectile is launched short to
+---@field SalvoSpreadStart? number   if the weapon blueprint requests a trajectory fix, this is set to the value that centers the projectile spread for `CurrentSalvoNumber` shot on the optimal target position
+DefaultProjectileWeapon = ClassWeapon(Weapon) {
 
-    FxRackChargeMuzzleFlash = {},
+    FxRackChargeMuzzleFlash = import("/lua/effecttemplates.lua").NoEffects,
     FxRackChargeMuzzleFlashScale = 1,
-    FxChargeMuzzleFlash = {},
+    FxChargeMuzzleFlash = import("/lua/effecttemplates.lua").NoEffects,
     FxChargeMuzzleFlashScale = 1,
     FxMuzzleFlash = {
         '/effects/emitters/default_muzzle_flash_01_emit.bp',
@@ -72,7 +84,9 @@ DefaultProjectileWeapon = Class(Weapon) {
         local rof = self:GetWeaponRoF()
         -- Calculate recoil speed so that it finishes returning just as the next shot is ready
         if rackRecoilDist ~= 0 then
-            self.RecoilManipulators = {}
+            self.RecoilManipulators = TrashBag()
+            self.Trash:Add(self.RecoilManipulators)
+
             local dist = rackRecoilDist
             local telescopeRecoilDist = rackBones[1].TelescopeRecoilDistance
             if telescopeRecoilDist and math.abs(telescopeRecoilDist) > math.abs(dist) then
@@ -114,7 +128,7 @@ DefaultProjectileWeapon = Class(Weapon) {
         if bp.FixBombTrajectory then
             local dropShort = bp.DropBombShort
             if dropShort then
-                self.DropBombShortRatio = MathMax(0, MathMin(1 - dropShort, 1))
+                self.DropBombShortRatio = MathClamp(1 - dropShort, 0, 1)
             end
             if muzzleSalvoSize > 1 then
                 -- center the spread on the target
@@ -181,121 +195,149 @@ DefaultProjectileWeapon = Class(Weapon) {
             return 4.75
         end
 
+        local UnitGetVelocity = UnitGetVelocity
+        local VDist2 = VDist2
         -- Get projectile position and velocity
         -- velocity will need to be multiplied by 10 due to being returned /tick instead of /s
         local projPosX, projPosY, projPosZ = EntityGetPositionXYZ(projectile)
         local projVelX,    _    , projVelZ = UnitGetVelocity(launcher)
 
-        local target = UnitGetTargetEntity(launcher)
-
         local targetPos
-        local targetVelX, targetVelZ
-        if target then
-            -- target is a unit / prop
-            targetPos = EntityGetPosition(target)
-            targetVelX, _, targetVelZ = UnitGetVelocity(target)
-        else
-            -- target is a position i.e. attack ground
-            targetPos = self:GetCurrentTargetPos()
-            targetVelX, targetVelZ = 0, 0
-        end
+        local targetVelX, targetVelZ = 0, 0
 
         local data = self.CurrentSalvoData
 
         -- if it's the first time...
         if not data then
-            local salvoSize = self.Blueprint.MuzzleSalvoSize
-            -- and there's going to be a second time
-            if salvoSize > 1 then
-                -- calculate & cache a couple things only the first time
-                data = {
-                    lastAccel = 4.75,
-                    targetpos = targetPos,
-                }
-                self.CurrentSalvoData = data
-            else
+            -- setup target (which won't change mid-bombing run)
+            local target = UnitGetTargetEntity(launcher)
+            if target then -- target is a unit / prop
+                targetPos = EntityGetPosition(target)
+            else -- target is a position i.e. attack ground
+                targetPos = self:GetCurrentTargetPos()
+            end
+
+            -- and there's not going to be a second time
+            if self.Blueprint.MuzzleSalvoSize <= 1 then
+                -- do the calculation but skip any cache or salvo logic
                 if not targetPos then
                     return 4.75
                 end
-                local targetPosX, targetPosZ = targetPos[1], targetPos[3]
-                -- otherwise, do the same calculation but skip any cache or salvo logic
-                if target.Dead then
-                    return 4.75
+                if target and not target.IsProp then
+                    targetVelX, _, targetVelZ = UnitGetVelocity(target)
                 end
+                local targetPosX, targetPosZ = targetPos[1], targetPos[3]
                 local distVel = VDist2(projVelX, projVelZ, targetVelX, targetVelZ)
                 if distVel == 0 then
                     return 4.75
                 end
                 local distPos = VDist2(projPosX, projPosZ, targetPosX, targetPosZ)
-                local dropShort = self.DropBombShortRatio
-                if dropShort then
-                    distPos = distPos * dropShort
+                do
+                    local dropShort = self.DropBombShortRatio
+                    if dropShort then
+                        distPos = distPos * dropShort
+                    end
                 end
                 if distPos == 0 then
                     return 4.75
                 end
                 local time = distPos / distVel
-                local targetNewPosX = targetPosX + time * targetVelX
-                local targetNewPosZ = targetPosZ + time * targetVelZ
-                local targetNewPosY = GetSurfaceHeight(targetNewPosX, targetNewPosZ)
-                return 200 * (projPosY - targetNewPosY) / (time*time)
+                projPosY = projPosY - GetSurfaceHeight(targetPosX + time * targetVelX, targetPosZ + time * targetVelZ)
+                return 200 * projPosY / (time*time)
+            else -- otherwise, calculate & cache a couple things the first time only
+                data = {
+                    lastAccel = 4.75,
+                    targetpos = targetPos,
+                }
+                if target then
+                    if target.Dead then
+                        data.usestore = true
+                    else
+                        data.target = target
+                    end
+                end
+                self.CurrentSalvoData = data
             end
-        elseif targetPos then
-            data.targetpos = targetPos
-        else
-            targetPos = data.targetpos
+        else -- if it's a successive bomb drop, get the targeting data
+            local target = data.target
+            if target then
+                if target.Dead then -- if the unit is destroyed, use the last known position
+                    data.target = nil
+                    data.usestore = true -- flag that we lost the target
+                    targetPos = data.targetpos
+                else
+                    if not target.IsProp then
+                        targetVelX, _, targetVelZ = UnitGetVelocity(target)
+                    end
+                    targetPos = EntityGetPosition(target)
+                    data.targetpos = targetPos
+                end
+            else
+                targetPos = data.targetpos
+            end
         end
+        if not targetPos then
+            -- put the bomb cluster in free-fall
+            local GetSurfaceHeight = GetSurfaceHeight
+            local MathSqrt = math.sqrt
+            local spread = self.AdjustedSalvoDelay * (self.SalvoSpreadStart + self.CurrentSalvoNumber)
+            -- nominal acceleration is 4.75; however, bomb clusters adjust the time it takes to land
+            -- so we convert the acceleration to time to add the spread and convert back:
+            -- h = unitY - surfaceY         =>  h2 = 0.5 * (unitY - surfaceHeight(unitX, unitZ))
+            -- t = sqrt(2 h / a) + spread   =>  t = sqrt(4 / 4.75 * h2) + spread
+            -- a = 0.5 h / t^2              =>  a = h2 / t^2
+            local halfHeight = 0.5 * (projPosY - GetSurfaceHeight(projPosX, projPosZ))
+            if halfHeight < 0.01 then return 4.75 end
+            local time = MathSqrt(0.842105263158 * halfHeight) + spread
 
-        -- check if we lost the target (or if we previously did; regaining a target mid-run shouldn't
-        -- suddenly divert some of the bombs)
-        if target.Dead or data.usestore or not targetPos then
-            -- use same acceleration as last bomb
-            data.usestore = true
-            return data.lastAccel
+            -- now that we know roughly when we'll land, we can find a better guess for where
+            -- we'll land, and thus guess the true falling height better as well
+            halfHeight = 0.5 * (projPosY - GetSurfaceHeight(projPosX + time * projVelX, projPosX + time * projVelX))
+            time = MathSqrt(0.842105263158 * halfHeight) + spread
+
+            local acc = halfHeight / (time*time)
+            data.lastAccel = acc
+            return acc
         end
-
-        local targetPosX, targetPosZ = targetPos[1], targetPos[3]
 
         -- calculate flat (exclude y-axis) distance and velocity between projectile and target
         -- velocity will eventually need to multiplied by 10 due to being per tick instead of per second
         local distVel = VDist2(projVelX, projVelZ, targetVelX, targetVelZ)
         if distVel == 0 then
+            data.lastAccel = 4.75
             return 4.75
         end
+        local targetPosX, targetPosZ = targetPos[1], targetPos[3]
+
+        -- calculate the distance for this particular bomb
         local distPos = VDist2(projPosX, projPosZ, targetPosX, targetPosZ)
-
-        local dropShort = self.DropBombShortRatio
-        if dropShort then
-            distPos = distPos * dropShort
-        end
-
-        -- calculate the position for this particular bomb
-        -- (centers the individual bomb release positions around the optimal position)
-        distPos = distPos + self.AdjustedSalvoDelay * distVel * (self.SalvoSpreadStart + self.CurrentSalvoNumber)
-        if distPos == 0 then
-            return 4.75
+        do
+            local dropShort = self.DropBombShortRatio
+            if dropShort then
+                distPos = distPos * dropShort
+            end
         end
 
         -- how many ticks until the bomb hits the target in xz-space
-        local time = distPos / distVel
+        local time = distPos / distVel + self.AdjustedSalvoDelay * (self.SalvoSpreadStart + self.CurrentSalvoNumber)
+        if time == 0 then
+            data.lastAccel = 4.75
+            return 4.75
+        end
 
         -- find out where the target will be at that point in time (it could be moving)
         -- (time and velocity being in ticks cancel out)
-        local targetNewPosX = targetPosX + time * targetVelX
-        local targetNewPosZ = targetPosZ + time * targetVelZ
-        -- what is the height at that future position
-        local targetNewPosY = GetSurfaceHeight(targetNewPosX, targetNewPosZ)
+        -- what is the height difference at that future position
+        projPosY = projPosY - GetSurfaceHeight(targetPosX + time * targetVelX, targetPosZ + time * targetVelZ)
 
-        -- The basic formula for displacement over time is x = v0*t + 0.5*a*t^2
-        -- x: displacement, v0: initial velocity, a: acceleration, t: time
-        -- v0 is zero due to projectiles not inheriting y-speed of bomber
+        -- The basic formula for displacement over time is h = 0.5 * a * t^2
+        -- h: displacement, a: acceleration, t: time
         -- now we can calculate what acceleration we need to make it hit the target in the y-axis
-        -- a = 2 * (1/t)^2 * x
+        -- a = 2 * h / t^2
 
         -- also convert time from ticks to seconds (multiply by 10, twice)
-        local acc = 200 * (projPosY - targetNewPosY) / (time*time)
+        local acc = 200 * projPosY / (time*time)
 
-        -- store last acceleration in case target dies in the middle of carpet bomb run
         data.lastAccel = acc
         return acc
     end,
@@ -494,7 +536,7 @@ DefaultProjectileWeapon = Class(Weapon) {
             self.UnpackAnimator = unpackAnimator
             unpackAnimator:PlayAnim(unpackAnimation):SetRate(0)
             unpackAnimator:SetPrecedence(bp.WeaponUnpackAnimatorPrecedence or 0)
-            self.TrashManipulators:Add(unpackAnimator)
+            self.Trash:Add(unpackAnimator)
         end
         if unpackAnimator then
             unpackAnimator:SetRate(bp.WeaponUnpackAnimationRate)
@@ -526,21 +568,22 @@ DefaultProjectileWeapon = Class(Weapon) {
     PlayRackRecoil = function(self, rackList)
         local bp = self.Blueprint
         local rackRecoilDist = bp.RackRecoilDistance
+
+        ---@type TrashBag
+        local recoilManipulatorBag = self.RecoilManipulators
         for _, rack in rackList do
             local telescopeBone = rack.TelescopeBone
             local tmpSldr = CreateSlider(self.unit, rack.RackBone)
-            table.insert(self.RecoilManipulators, tmpSldr)
             tmpSldr:SetPrecedence(11)
             tmpSldr:SetGoal(0, 0, rackRecoilDist)
             tmpSldr:SetSpeed(-1)
-            self.TrashManipulators:Add(tmpSldr)
+            recoilManipulatorBag:Add(tmpSldr)
             if telescopeBone then
                 tmpSldr = CreateSlider(self.unit, telescopeBone)
-                table.insert(self.RecoilManipulators, tmpSldr)
                 tmpSldr:SetPrecedence(11)
                 tmpSldr:SetGoal(0, 0, rack.TelescopeRecoilDistance or rackRecoilDist)
                 tmpSldr:SetSpeed(-1)
-                self.TrashManipulators:Add(tmpSldr)
+                recoilManipulatorBag:Add(tmpSldr)
             end
         end
         self:ForkThread(self.PlayRackRecoilReturn, rackList)
@@ -581,12 +624,8 @@ DefaultProjectileWeapon = Class(Weapon) {
     -- Destroy the sliders which cause weapon visual recoil
     ---@param self DefaultProjectileWeapon
     DestroyRecoilManips = function(self)
-        local manips = self.RecoilManipulators
-        if manips then
-            for _, manip in manips do
-                manip:Destroy()
-            end
-            self.RecoilManipulators = {}
+        if self.RecoilManipulators then
+            self.RecoilManipulators:Destroy()
         end
     end,
 
@@ -613,6 +652,7 @@ DefaultProjectileWeapon = Class(Weapon) {
     -- Sends the weapon to DeadState, probably called by the Owner
     ---@param self DefaultProjectileWeapon
     OnDestroy = function(self)
+        Weapon.OnDestroy(self)
         ChangeState(self, self.DeadState)
     end,
 
@@ -827,7 +867,6 @@ DefaultProjectileWeapon = Class(Weapon) {
                 unit:SetWorkProgress(1 - clockTime / totalTime)
                 clockTime = clockTime - 1
                 WaitSeconds(0.1)
-
             end
         end,
 
@@ -955,6 +994,7 @@ DefaultProjectileWeapon = Class(Weapon) {
                         end
                     end
                 end
+                self.CurrentSalvoData = nil -- once the salvo is done, reset the data
                 self:PlayFxRackReloadSequence()
                 local currentRackSalvoNumber = self.CurrentRackSalvoNumber
                 if currentRackSalvoNumber <= rackBoneCount then
@@ -1127,7 +1167,7 @@ DefaultProjectileWeapon = Class(Weapon) {
 }
 
 ---@class KamikazeWeapon : Weapon
-KamikazeWeapon = Class(Weapon) {
+KamikazeWeapon = ClassWeapon(Weapon) {
     ---@param self KamikazeWeapon
     OnFire = function(self)
         local unit = self.unit
@@ -1139,7 +1179,7 @@ KamikazeWeapon = Class(Weapon) {
 }
 
 ---@class BareBonesWeapon : Weapon
-BareBonesWeapon = Class(Weapon) {
+BareBonesWeapon = ClassWeapon(Weapon) {
     Data = {},
 
     ---@param self BareBonesWeapon
@@ -1154,7 +1194,7 @@ BareBonesWeapon = Class(Weapon) {
 }
 
 ---@class OverchargeWeapon : DefaultProjectileWeapon
-OverchargeWeapon = Class(DefaultProjectileWeapon) {
+OverchargeWeapon = ClassWeapon(DefaultProjectileWeapon) {
     NeedsUpgrade = false,
     AutoMode = false,
     AutoThread = nil,
@@ -1358,7 +1398,10 @@ OverchargeWeapon = Class(DefaultProjectileWeapon) {
 }
 
 ---@class DefaultBeamWeapon : DefaultProjectileWeapon
-DefaultBeamWeapon = Class(DefaultProjectileWeapon) {
+---@field DisableBeamThreadInstance? thread
+---@field Beams { Beam: CollisionBeam, Muzzle: string, Destroyables: table}[]
+---@field BeamStarted boolean
+DefaultBeamWeapon = ClassWeapon(DefaultProjectileWeapon) {
     BeamType = CollisionBeam,
 
     ---@param self DefaultBeamWeapon
@@ -1392,10 +1435,17 @@ DefaultBeamWeapon = Class(DefaultProjectileWeapon) {
                 }
                 local beamTable = {Beam = beam, Muzzle = muzzle, Destroyables = {}}
                 table.insert(self.Beams, beamTable)
-                self.TrashProjectiles:Add(beam)
+                self.Trash:Add(beam)
                 beam:SetParentWeapon(self)
                 beam:Disable()
             end
+        end
+    end,
+
+    OnDestroy = function(self)
+        DefaultProjectileWeapon.OnDestroy(self)
+        for k, info in self.Beams do
+            info.Beam:Destroy()
         end
     end,
 
@@ -1426,37 +1476,47 @@ DefaultBeamWeapon = Class(DefaultProjectileWeapon) {
     ---@param muzzle string
     PlayFxBeamStart = function(self, muzzle)
         local bp = self.Blueprint
-        local beam
-        self.BeamDestroyables = {}
 
+        -- find beam that matches the muzzle
+        local beam
         for _, v in self.Beams do
             if v.Muzzle == muzzle then
                 beam = v.Beam
+                break
             end
         end
+
+        -- edge case: no beam that matches the muzzle
         if not beam then
             error('*ERROR: We have a beam created that does not coincide with a muzzle bone.  Internal Error, aborting beam weapon.', 2)
             return
         end
 
-        if beam:IsEnabled() then return end
+        -- edge case: we're already enabled
+        if beam:IsEnabled() then
+            return
+        end
+
+        -- enable the beam
         beam:Enable()
-        self.TrashProjectiles:Add(beam)
 
-        -- Deal with continuous and non-continuous beams
+        -- non-continious beams that just end
         if bp.BeamLifetime > 0 then
-            self:ForkThread(self.BeamLifetimeThread, beam, bp.BeamLifetime or 1)    -- Non-continuous only
-        end
-        if bp.BeamLifetime == 0 then
-            self.HoldFireThread = self:ForkThread(self.WatchForHoldFire, beam)      -- Continuous only
+            self:ForkThread(self.BeamLifetimeThread, beam, bp.BeamLifetime or 1)
         end
 
+        -- continious beams
+        if bp.BeamLifetime == 0 then
+            self.HoldFireThread = self:ForkThread(self.WatchForHoldFire, beam)
+        end
+
+        -- manage audio of the beam
         local audio = bp.Audio
         local beamStart = audio.BeamStart
-        -- Deal with beam audio cues
         if beamStart then
             self:PlaySound(beamStart)
         end
+
         local beamLoop = audio.BeamLoop
         if beamLoop then
             -- should be `beam.Beam` but `PlayFxBeamEnd` wouldn't get enough muzzle info to stop the sound
@@ -1465,30 +1525,39 @@ DefaultBeamWeapon = Class(DefaultProjectileWeapon) {
                 b:SetAmbientSound(beamLoop, nil)
             end
         end
+
         self.BeamStarted = true
     end,
 
-    -- Kill the beam if hold fire is requested
     ---@param self DefaultBeamWeapon
-    ---@param beam CollisionBeam
-    WatchForHoldFire = function(self, beam)
-        local unit = self.unit
-        local hasTargetPrev = true
-        while not (IsDestroyed(self) or IsDestroyed(unit)) do
-
-            local hasTarget = self:GetCurrentTarget() != nil
-            if   -- check for hold fire
-                (unit:GetFireState() == 1) or
-                 -- check if we have a target still, relevant for beam weapons that work indefinitely
-                (not (hasTarget or hasTargetPrev))
-            then
-                self.BeamStarted = false
-                self:PlayFxBeamEnd(beam)
+    OnGotTarget = function (self)
+        DefaultProjectileWeapon.OnGotTarget(self)
+        local blueprint = self.Blueprint
+        if blueprint.BeamLifetime == 0 then
+            local disableBeamThread = self.DisableBeamThreadInstance
+            if disableBeamThread then
+                disableBeamThread:Destroy()
             end
-
-            hasTargetPrev = hasTarget
-            WaitSeconds(0.5)
         end
+    end,
+
+    ---@param self DefaultBeamWeapon
+    OnLostTarget = function(self)
+        DefaultProjectileWeapon.OnLostTarget(self)
+        if self.Blueprint.BeamLifetime == 0 then
+            local thread = ForkThread(self.DisableBeamThread, self)
+            self.Trash:Add(thread)
+            self.DisableBeamThreadInstance = thread
+        end
+    end,
+
+    ---@param self DefaultBeamWeapon
+    DisableBeamThread = function(self)
+        WaitTicks(11)
+        for _, info in self.Beams do
+            self:PlayFxBeamEnd(info.Beam)
+        end
+        self.DisableBeamThreadInstance = nil
     end,
 
     -- Force the beam to last the proper amount of time
@@ -1534,6 +1603,7 @@ DefaultBeamWeapon = Class(DefaultProjectileWeapon) {
             end
             self.BeamStarted = false
         end
+
         local thread = self.HoldFireThread
         if thread then
             KillThread(thread)
@@ -1554,13 +1624,11 @@ DefaultBeamWeapon = Class(DefaultProjectileWeapon) {
 
     ---@param self DefaultBeamWeapon
     OnHaltFire = function(self)
-        for _, beam in self.Beams do
-            -- Only halt fire on the beams that are currently enabled
-            local b = beam.Beam
-            if not b:IsEnabled() then
-                continue
+        for _, info in self.Beams do
+            local b = info.Beam
+            if b:IsEnabled() then
+                self:PlayFxBeamEnd(b)
             end
-            self:PlayFxBeamEnd(b)
         end
     end,
 
@@ -1617,11 +1685,18 @@ DefaultBeamWeapon = Class(DefaultProjectileWeapon) {
         end
         return true
     end,
+
+    -- Kill the beam if hold fire is requested
+    ---@deprecated
+    ---@param self DefaultBeamWeapon
+    ---@param beam CollisionBeam
+    WatchForHoldFire = function(self, beam)
+    end,
 }
 
-local NukeDamage = import('/lua/sim/NukeDamage.lua').NukeAOE
+local NukeDamage = import("/lua/sim/nukedamage.lua").NukeAOE
 ---@class DeathNukeWeapon : BareBonesWeapon
-DeathNukeWeapon = Class(BareBonesWeapon) {
+DeathNukeWeapon = ClassWeapon(BareBonesWeapon) {
 
     ---@param self DeathNukeWeapon
     OnFire = function(self)
@@ -1658,7 +1733,7 @@ DeathNukeWeapon = Class(BareBonesWeapon) {
 }
 
 ---@class SCUDeathWeapon : BareBonesWeapon
-SCUDeathWeapon = Class(BareBonesWeapon) {
+SCUDeathWeapon = ClassWeapon(BareBonesWeapon) {
     ---@param self SCUDeathWeapon
     OnFire = function(self)
     end,
@@ -1672,4 +1747,4 @@ SCUDeathWeapon = Class(BareBonesWeapon) {
 }
 
 -- kept for mod backwards compatibility
-local XZDist = import('/lua/utilities.lua').XZDistanceTwoVectors
+local XZDist = import("/lua/utilities.lua").XZDistanceTwoVectors

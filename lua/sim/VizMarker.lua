@@ -7,7 +7,7 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local Entity = import('/lua/sim/Entity.lua').Entity
+local Entity = import("/lua/sim/entity.lua").Entity
 
 ---@class VizMarkerSpec
 ---@field X number

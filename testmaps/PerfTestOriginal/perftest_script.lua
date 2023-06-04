@@ -5,11 +5,11 @@
 -- Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
-local ScenarioFramework = import('/lua/scenarioframework.lua')
-local ScenarioStrings = import('/lua/ScenarioStrings.lua')
-local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
-local Cinematics = import('/lua/cinematics.lua')
-local Utilities = import('/lua/Utilities.lua')
+local ScenarioFramework = import("/lua/scenarioframework.lua")
+local ScenarioStrings = import("/lua/scenariostrings.lua")
+local ScenarioUtils = import("/lua/sim/scenarioutilities.lua")
+local Cinematics = import("/lua/cinematics.lua")
+local Utilities = import("/lua/utilities.lua")
 
 function OnPopulate(scenario)
     ScenarioUtils.InitializeScenarioArmies()

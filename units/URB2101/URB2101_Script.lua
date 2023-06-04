@@ -8,15 +8,15 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local CStructureUnit = import('/lua/cybranunits.lua').CStructureUnit
-local CDFLaserHeavyWeapon = import('/lua/cybranweapons.lua').CDFLaserHeavyWeapon
+local CStructureUnit = import("/lua/cybranunits.lua").CStructureUnit
+local CDFLaserHeavyWeapon = import("/lua/cybranweapons.lua").CDFLaserHeavyWeapon
 
 
 ---@class URB2101 : CStructureUnit
-URB2101 = Class(CStructureUnit) {
+URB2101 = ClassUnit(CStructureUnit) {
 
     Weapons = {
-        MainGun = Class(CDFLaserHeavyWeapon) {}
+        MainGun = ClassWeapon(CDFLaserHeavyWeapon) {}
     },
 }
 

@@ -7,10 +7,10 @@
 --**
 --**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
-local NullShell = import('/lua/sim/defaultprojectiles.lua').NullShell
-local RandomFloat = import('/lua/utilities.lua').GetRandomFloat
-local RandomInt = import('/lua/utilities.lua').GetRandomInt
-local EffectTemplate = import('/lua/EffectTemplates.lua')
+local NullShell = import("/lua/sim/defaultprojectiles.lua").NullShell
+local RandomFloat = import("/lua/utilities.lua").GetRandomFloat
+local RandomInt = import("/lua/utilities.lua").GetRandomInt
+local EffectTemplate = import("/lua/effecttemplates.lua")
 
 local BaseRingRiftEffects = {
 	'/effects/Entities/SBOOhwalliBombEffect03/SBOOhwalliBombEffect03_proj.bp',

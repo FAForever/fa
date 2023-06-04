@@ -9,14 +9,14 @@
 --****************************************************************************
 
 --changed from SLandUnit
-local SHoverLandUnit = import('/lua/seraphimunits.lua').SHoverLandUnit
-local SAAOlarisCannonWeapon = import('/lua/seraphimweapons.lua').SAAOlarisCannonWeapon
-local SlowHover = import('/lua/defaultunits.lua').SlowHoverLandUnit
+local SHoverLandUnit = import("/lua/seraphimunits.lua").SHoverLandUnit
+local SAAOlarisCannonWeapon = import("/lua/seraphimweapons.lua").SAAOlarisCannonWeapon
+local SlowHover = import("/lua/defaultunits.lua").SlowHoverLandUnit
 
 --changed from SLandUnit
-XSL0205 = Class(SHoverLandUnit, SlowHover) {
+XSL0205 = ClassUnit(SHoverLandUnit, SlowHover) {
     Weapons = {
-        AAGun = Class(SAAOlarisCannonWeapon) {},
+        AAGun = ClassWeapon(SAAOlarisCannonWeapon) {},
     },
 }
 TypeClass = XSL0205

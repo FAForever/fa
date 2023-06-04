@@ -7,10 +7,10 @@
 ----**
 ----**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 ----****************************************************************************
-local CShieldStructureUnit = import('/lua/cybranunits.lua').CShieldStructureUnit
+local CShieldStructureUnit = import("/lua/cybranunits.lua").CShieldStructureUnit
 
 ---@class URB4204 : CShieldStructureUnit
-URB4204 = Class(CShieldStructureUnit) {
+URB4204 = ClassUnit(CShieldStructureUnit) {
     ShieldEffects = {
         '/effects/emitters/cybran_shield_02_generator_01_emit.bp',
         '/effects/emitters/cybran_shield_02_generator_02_emit.bp',

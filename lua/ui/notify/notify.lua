@@ -1,15 +1,15 @@
 -- This file contains all functions governing the integrated Notify mod, which sends messages to allies
 -- when you order and complete ACU upgrades
 
-local Prefs = import('/lua/user/prefs.lua')
-local FindClients = import('/lua/ui/game/chat.lua').FindClients
-local defaultMessages = import('/lua/ui/notify/defaultmessages.lua').defaultMessages
-local AddChatCommand = import('/lua/ui/notify/commands.lua').AddChatCommand
-local NotifyOverlay = import('/lua/ui/notify/notifyoverlay.lua')
+local Prefs = import("/lua/user/prefs.lua")
+local FindClients = import("/lua/ui/game/chat.lua").FindClients
+local defaultMessages = import("/lua/ui/notify/defaultmessages.lua").defaultMessages
+local AddChatCommand = import("/lua/ui/notify/commands.lua").AddChatCommand
+local NotifyOverlay = import("/lua/ui/notify/notifyoverlay.lua")
 
 local toggleOverlay = NotifyOverlay.toggleOverlay
-local factions = import('/lua/factions.lua').FactionIndexMap
-local UTF =  import('/lua/UTF.lua')
+local factions = import("/lua/factions.lua").FactionIndexMap
+local UTF =  import("/lua/utf.lua")
 
 local categoriesDisabled = {}
 local messages
@@ -95,7 +95,7 @@ function processIncomingMessage(sender, msg)
         return true
     end
 
-    if import('/lua/ui/game/gamemain.lua').IsNISMode() or categoriesDisabled.All or categoriesDisabled[category] or factions[category] and categoriesDisabled['acus'] then
+    if import("/lua/ui/game/gamemain.lua").IsNISMode() or categoriesDisabled.All or categoriesDisabled[category] or factions[category] and categoriesDisabled['acus'] then
         return false
     end
 

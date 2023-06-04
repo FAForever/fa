@@ -5,12 +5,12 @@
 ----* Copyright © 2008 Gas Powered Games, Inc.  All rights reserved.
 ----*****************************************************************************
 
-local UIUtil = import('/lua/ui/uiutil.lua')
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local Group = import('/lua/maui/group.lua').Group
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local Button = import('/lua/maui/button.lua').Button
-local MultiLineText = import('/lua/maui/multilinetext.lua').MultiLineText
+local UIUtil = import("/lua/ui/uiutil.lua")
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local Group = import("/lua/maui/group.lua").Group
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+local Button = import("/lua/maui/button.lua").Button
+local MultiLineText = import("/lua/maui/multilinetext.lua").MultiLineText
 
 local dialogues = {}
 
@@ -146,16 +146,16 @@ function CreateSimDialogue(newDialogues)
         dlg.Width:Set(dlg.text.Width)
         dlg.SetPosition = function(self, position)
             if position == 'left' then
-                LayoutHelpers.AtLeftTopIn(self, import('/lua/ui/game/borders.lua').GetMapGroup(), 40, 170)
+                LayoutHelpers.AtLeftTopIn(self, import("/lua/ui/game/borders.lua").GetMapGroup(), 40, 170)
                 LayoutHelpers.ResetRight(self)
                 LayoutHelpers.ResetBottom(self)
             elseif position == 'right' then
-                LayoutHelpers.AtRightIn(self, import('/lua/ui/game/borders.lua').GetMapGroup(), 40)
-                LayoutHelpers.AtBottomIn(self, import('/lua/ui/game/borders.lua').GetMapGroup(), 160)
+                LayoutHelpers.AtRightIn(self, import("/lua/ui/game/borders.lua").GetMapGroup(), 40)
+                LayoutHelpers.AtBottomIn(self, import("/lua/ui/game/borders.lua").GetMapGroup(), 160)
                 LayoutHelpers.ResetLeft(self)
                 LayoutHelpers.ResetTop(self)
             else
-                LayoutHelpers.AtCenterIn(self, import('/lua/ui/game/borders.lua').GetMapGroup())
+                LayoutHelpers.AtCenterIn(self, import("/lua/ui/game/borders.lua").GetMapGroup())
                 LayoutHelpers.ResetRight(self)
                 LayoutHelpers.ResetBottom(self)
             end

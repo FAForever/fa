@@ -5,14 +5,14 @@
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
-local TStructureUnit = import('/lua/terranunits.lua').TStructureUnit
-local TIFCruiseMissileLauncher = import('/lua/terranweapons.lua').TIFCruiseMissileLauncher
-local EffectTemplate = import('/lua/EffectTemplates.lua')
+local TStructureUnit = import("/lua/terranunits.lua").TStructureUnit
+local TIFCruiseMissileLauncher = import("/lua/terranweapons.lua").TIFCruiseMissileLauncher
+local EffectTemplate = import("/lua/effecttemplates.lua")
 
 ---@class UEB2108 : TStructureUnit
-UEB2108 = Class(TStructureUnit) {
+UEB2108 = ClassUnit(TStructureUnit) {
     Weapons = {
-        CruiseMissile = Class(TIFCruiseMissileLauncher) {
+        CruiseMissile = ClassWeapon(TIFCruiseMissileLauncher) {
             FxMuzzleFlash = EffectTemplate.TIFCruiseMissileLaunchBuilding,
         },
     },

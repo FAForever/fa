@@ -20,7 +20,7 @@ BaseBuilderTemplate {
         'T1EngineerBuilders',
         'T2EngineerBuilders',
         'T3EngineerBuilders',
-        'EngineerFactoryConstruction',
+        'EngineerFactoryConstructionExpansion',
         'LandInitialFactoryConstruction',
 
         -- Build Mass low pri at this base
@@ -28,11 +28,6 @@ BaseBuilderTemplate {
 
         -- Build some power, but not much
         'EngineerEnergyBuildersExpansions',
-
-        -- ==== EXPANSION ==== --
-        --DUNCAN - expansions dont build more expansions!
-        --'EngineerExpansionBuildersFull',
-        --'EngineerExpansionBuildersSmall',
 
         -- ==== DEFENSES ==== --
         'T1LightDefenses',
@@ -134,7 +129,7 @@ BaseBuilderTemplate {
         end
 
         local threatCutoff = 10 -- value of overall threat that determines where enemy bases are
-        local distance = import('/lua/ai/AIUtilities.lua').GetThreatDistance(aiBrain, location, threatCutoff)
+        local distance = import("/lua/ai/aiutilities.lua").GetThreatDistance(aiBrain, location, threatCutoff)
         if not distance or distance > 1000 then
             return 50
         elseif distance > 500 then

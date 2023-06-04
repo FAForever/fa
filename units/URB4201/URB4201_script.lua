@@ -8,14 +8,14 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local CStructureUnit = import('/lua/cybranunits.lua').CStructureUnit
-local CAMZapperWeapon = import('/lua/cybranweapons.lua').CAMZapperWeapon
+local CStructureUnit = import("/lua/cybranunits.lua").CStructureUnit
+local CAMZapperWeapon = import("/lua/cybranweapons.lua").CAMZapperWeapon
 
 ---@class URB4201 : CStructureUnit
-URB4201 = Class(CStructureUnit) {
+URB4201 = ClassUnit(CStructureUnit) {
     
     Weapons = {
-        Turret01 = Class(CAMZapperWeapon) {},
+        Turret01 = ClassWeapon(CAMZapperWeapon) {},
     },
 
     OnStopBeingBuilt = function(self,builder,layer)

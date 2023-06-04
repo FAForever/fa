@@ -1,15 +1,11 @@
---****************************************************************************
---**
---**  File     :  /data/projectiles/SIFThunthoArtilleryShell01/SIFThunthoArtilleryShell01_script.lua
---**  Author(s):  Gordon Duclos, Aaron Lundquist
---**
---**  Summary  :  Thuntho Artillery Shell Projectile script, XSL0103
---**
---**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
---****************************************************************************
+-- File     :  /data/projectiles/SIFThunthoArtilleryShell01/SIFThunthoArtilleryShell01_script.lua
+-- Author(s):  Gordon Duclos, Aaron Lundquist
+-- Summary  :  Thuntho Artillery Shell Projectile script, XSL0103
+-- Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
+---------------------------------------------------------------------------------------------------
 
-local SThunthoArtilleryShell = import('/lua/seraphimprojectiles.lua').SThunthoArtilleryShell
-local SThunderStormCannonProjectileSplitFx = import('/lua/EffectTemplates.lua').SThunderStormCannonProjectileSplitFx 
+local SThunthoArtilleryShell = import("/lua/seraphimprojectiles.lua").SThunthoArtilleryShell
+local SThunderStormCannonProjectileSplitFx = import("/lua/effecttemplates.lua").SThunderStormCannonProjectileSplitFx 
 
 -- upvalue for performance
 local CreateTrail = CreateTrail
@@ -27,8 +23,7 @@ local ProjectileCreateChildProjectile = _G.moho.projectile_methods.CreateChildPr
 local ProjectileSetVelocity = _G.moho.projectile_methods.SetVelocity
 local ProjectileGetVelocity = _G.moho.projectile_methods.GetVelocity
 
-SIFThunthoArtilleryShell01 = Class(SThunthoArtilleryShell) {
-
+SIFThunthoArtilleryShell01 = ClassProjectile(SThunthoArtilleryShell) {
     OnImpact = function(self, TargetType, TargetEntity) 
 
         -- the split fx
@@ -37,19 +32,19 @@ SIFThunthoArtilleryShell01 = Class(SThunthoArtilleryShell) {
         -- Create several other projectiles in a dispersal pattern
         local bp = self.Blueprint.Physics
         local numProjectiles = bp.Fragments
-        
+
         -- Randomization of the spread
         -- 1 / 2 * pi = 0.159235669
         local angle = 0.159235669 * numProjectiles
         local angleInitial = angle * Random()
         local angleVariation = angle * 0.8   
-        
+
         -- retrieve the current velocity
         local vx, vy, vz = ProjectileGetVelocity(self)
         local xVec = 0
         local yVec = vy
         local zVec = 0
-    
+
         -- Launch projectiles at semi-random angles away from split location
         for i = 0, numProjectiles - 1 do
 
@@ -64,11 +59,10 @@ SIFThunthoArtilleryShell01 = Class(SThunthoArtilleryShell) {
             ProjectileSetVelocity(proj, 18)
 
             -- just copy the damage data
-            proj.DamageData = self.DamageData                        
+            proj.DamageData = self.DamageData
         end
-        
+
         EntityDestroy(self)
     end
 }
-
 TypeClass = SIFThunthoArtilleryShell01

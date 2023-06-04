@@ -6,8 +6,8 @@
 --**
 --**  Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
-local Prefs = import('/lua/user/prefs.lua')
-local AIChatS = import('/lua/AIChatSorian.lua')
+local Prefs = import("/lua/user/prefs.lua")
+local AIChatS = import("/lua/aichatsorian.lua")
 
 local taunts = {
     {text = '<LOC XGG_MP1_010_010>[{i Hall}]: You will not stop the UEF!', bank = 'XGG', cue = 'XGG_Hall__04566'},
@@ -120,7 +120,7 @@ local function RecieveTaunt(sender, msg)
         if taunt then
             StopSound(prevHandle)
             prevHandle = PlayVoice(Sound({Cue = taunt.cue, Bank = taunt.bank}))
-            import('/lua/ui/game/chat.lua').ReceiveChat(sender, {Chat = true, text = LOC(taunt.text), to = "all"})
+            import("/lua/ui/game/chat.lua").ReceiveChat(sender, {Chat = true, text = LOC(taunt.text), to = "all"})
         end
     end
 end
@@ -131,17 +131,17 @@ function RecieveAITaunt(sender, msg)
         if taunt and msg.aisender then
             StopSound(prevHandle)
             prevHandle = PlayVoice(Sound({Cue = taunt.cue, Bank = taunt.bank}))
-            import('/lua/ui/game/chat.lua').ReceiveChat(sender, {Chat = true, text = LOC(taunt.text), to = "all", aisender = msg.aisender})
+            import("/lua/ui/game/chat.lua").ReceiveChat(sender, {Chat = true, text = LOC(taunt.text), to = "all", aisender = msg.aisender})
         elseif taunt then
             StopSound(prevHandle)
             prevHandle = PlayVoice(Sound({Cue = taunt.cue, Bank = taunt.bank}))
-            import('/lua/ui/game/chat.lua').ReceiveChat(sender, {Chat = true, text = LOC(taunt.text), to = "all"})
+            import("/lua/ui/game/chat.lua").ReceiveChat(sender, {Chat = true, text = LOC(taunt.text), to = "all"})
         end
     end
 end
 
 function Init()
-    import('/lua/ui/game/gamemain.lua').RegisterChatFunc(RecieveTaunt, 'Taunt')
+    import("/lua/ui/game/gamemain.lua").RegisterChatFunc(RecieveTaunt, 'Taunt')
 end
 function SendTaunt(tauntIndex, sender)
     if sender then

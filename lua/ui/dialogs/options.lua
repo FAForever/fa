@@ -6,18 +6,18 @@
 --* Copyright 2006 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
-local UIUtil = import('/lua/ui/uiutil.lua')
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local Button = import('/lua/maui/button.lua').Button
-local MenuCommon = import('/lua/ui/menus/menucommon.lua')
-local Group = import('/lua/maui/group.lua').Group
-local Grid = import('/lua/maui/grid.lua').Grid
-local Slider = import('/lua/maui/slider.lua').Slider
-local Combo = import('/lua/ui/controls/combo.lua').Combo
-local IntegerSlider = import('/lua/maui/slider.lua').IntegerSlider
-local OptionsLogic = import('/lua/options/optionslogic.lua')
-local Tooltip = import('/lua/ui/game/tooltip.lua')
+local UIUtil = import("/lua/ui/uiutil.lua")
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+local Button = import("/lua/maui/button.lua").Button
+local MenuCommon = import("/lua/ui/menus/menucommon.lua")
+local Group = import("/lua/maui/group.lua").Group
+local Grid = import("/lua/maui/grid.lua").Grid
+local Slider = import("/lua/maui/slider.lua").Slider
+local Combo = import("/lua/ui/controls/combo.lua").Combo
+local IntegerSlider = import("/lua/maui/slider.lua").IntegerSlider
+local OptionsLogic = import("/lua/options/optionslogic.lua")
+local Tooltip = import("/lua/ui/game/tooltip.lua")
 
 -- this will hold the working set of options, which won't be valid until applied
 local currentOptionsSet = nil
@@ -468,8 +468,8 @@ function CreateDialog(over, exitBehavior)
     local defaultTab = false
 
     -- get the tab data
-    local options = import('/lua/options/options.lua').options
-    local optionsOrder = import('/lua/options/options.lua').optionsOrder
+    local options = import("/lua/options/options.lua").options
+    local optionsOrder = import("/lua/options/options.lua").optionsOrder
 
     for index, key in optionsOrder do
         tabData = options[key]
@@ -544,4 +544,4 @@ function OnNISBegin()
 end
 
 -- kept for mod backwards compatibility
-local Text = import('/lua/maui/text.lua').Text
+local Text = import("/lua/maui/text.lua").Text

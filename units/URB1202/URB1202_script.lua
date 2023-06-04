@@ -8,10 +8,10 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local CMassCollectionUnit = import('/lua/cybranunits.lua').CMassCollectionUnit
+local CMassCollectionUnit = import("/lua/cybranunits.lua").CMassCollectionUnit
 
 ---@class URB1202 : CMassCollectionUnit
-URB1202 = Class(CMassCollectionUnit) {
+URB1202 = ClassUnit(CMassCollectionUnit) {
     OnStartBuild = function(self, unitBeingBuilt, order)
         CMassCollectionUnit.OnStartBuild(self, unitBeingBuilt, order)
         if not self.AnimationManipulator then return end

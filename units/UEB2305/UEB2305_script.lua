@@ -5,13 +5,13 @@
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
-local TStructureUnit = import('/lua/terranunits.lua').TStructureUnit
-local TIFStrategicMissileWeapon = import('/lua/terranweapons.lua').TIFStrategicMissileWeapon
+local TStructureUnit = import("/lua/terranunits.lua").TStructureUnit
+local TIFStrategicMissileWeapon = import("/lua/terranweapons.lua").TIFStrategicMissileWeapon
 
 ---@class UEB2305 : TStructureUnit
-UEB2305 = Class(TStructureUnit) {
+UEB2305 = ClassUnit(TStructureUnit) {
     Weapons = {
-        NukeMissiles = Class(TIFStrategicMissileWeapon) {},
+        NukeMissiles = ClassWeapon(TIFStrategicMissileWeapon) {},
     },
 }
 

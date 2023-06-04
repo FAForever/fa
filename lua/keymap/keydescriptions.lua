@@ -10,6 +10,20 @@ keyDescriptions = {
     ['cap_frame'] = '<LOC key_desc_0003>Take a screen shot',
     ['show_fps'] = "<LOC key_desc_0131>Toggle the display of frames rendered per second",
 
+    ['split_next'] = '<LOC key_split_next>Select the next subgroup, or the original selection if there is no next subgroup',
+    ['split_mouse_axis'] = '<LOC key_split_mouse_axis>Divides a selection by the line through your mouse position and the center of the selection',
+    ['split_mouse_axis_orthogonal'] = '<LOC key_split_mouse_axis_orthogonal>Divides a selection orthogonally to the line from your mouse position to the center of the selection',
+    ['split_major_axis'] = '<LOC key_split_major_axis>Divides a selection over the major axis of the selected units',
+    ['split_minor_axis'] = '<LOC key_split_minor_axis>Divides a selection over the minor axis of the selected units',
+    ['split_tech'] = '<LOC key_split_major_axis>Divides a selection over experimentals, SACUs, tech 3, tech 2 and tech 1 units',
+    ['split_layer'] = '<LOC key_split_minor_axis>Divides a selection over land, naval and air units',
+    ['split_engineer_tech'] = '<LOC key_split_minor_axis>Divides a selection over SACUs, tech 3, tech 2 and tech 1 engineers',
+    ['split_into_groups_1'] = '<LOC key_split_subgroups_1>Divides a selection over subgroups of 1 unit',
+    ['split_into_groups_2'] = '<LOC key_split_subgroups_2>Divides a selection over subgroups of 2 units',
+    ['split_into_groups_4'] = '<LOC key_split_subgroups_4>Divides a selection over subgroups of 4 units',
+    ['split_into_groups_8'] = '<LOC key_split_subgroups_8>Divides a selection over subgroups of 8 units',
+    ['split_into_groups_16'] = '<LOC key_split_subgroups_16>Divides a selection over subgroups of 16 units',
+
     ['revert_selection_set'] = 'Restore selection to the one before recalling a control group',
 
     ['group1'] = '<LOC key_desc_0004>Recall Group 1',
@@ -118,6 +132,7 @@ keyDescriptions = {
     ['launch_tactical'] = '<LOC key_desc_0054>Launch a Tactical Missile',
     ['overcharge'] = '<LOC key_desc_0055>Overcharge',
     ['move'] = '<LOC key_desc_0065>Move',
+    ['move_hard'] = '<LOC KEY_MOVE_HARD>Move order that you can consistently issue without queueing',
     ['nuke'] = '<LOC key_desc_0063>Nuke',
     ['mode'] = '<LOC key_desc_0101>Cycle through all of the available fire states.',
     ['dock'] = '<LOC key_desc_0405>Dock',
@@ -152,7 +167,9 @@ keyDescriptions = {
     ['select_nearest_naval_factory'] = '<LOC key_desc_0078>Select the nearest Naval Factory',
     ['toggle_build_mode'] = '<LOC key_desc_0102>Toggles keyboard build command mode on and off',
     ['toggle_reclaim_labels'] = '<LOC key_desc_0103>Toggles reclaim labels on and off',
-
+    ['select_upgrading_extractors'] = '<LOC key_desc_select_upgrading_extractors>Select all extractors that are upgrading',
+    ['filter_highest_engineer_and_assist'] = '<LOC key_desc_filter_highest_engineer_and_assist>Filter the selection to the most advanced engineer, all other engineers assist that engineer',
+    ['select_all_radars'] = '<LOC key_desc_select_all_radars>Select all radars',
     ['decrease_game_speed'] = '<LOC key_desc_0079>Decrease game speed',
     ['increase_game_speed'] = '<LOC key_desc_0080>Increase game speed',
     ['reset_game_speed'] = '<LOC key_desc_0081>Reset game speed to 0 (Normal Speed)',
@@ -324,6 +341,7 @@ keyDescriptions = {
     ['select_air_no_transport'] = '<LOC key_desc_0253>Select air but no transports',
     ['select_air_transport'] = '<LOC key_desc_0254>Select only transports',
     ['lock_zoom'] = '<LOC key_desc_0255>Lock the zoom to current level',
+    ['select_naval_no_mobile_sonar'] = 'Select all Naval units without sonar platforms',
 
     -- Hotbuild
     ['builders'] = '<LOC key_desc_0256>build builders (factories, Quantum Gate & T1 engineers)',
@@ -479,4 +497,6 @@ keyDescriptions = {
     ['t3_support_naval_factory'] = '<LOC key_desc_0387>build T3 Support Naval Factory',
 
     ['recheck_targets_of_weapons'] = 'Recheck targets of weapons of selected units',
+    ['set_target_priority'] = 'Set weapon target priorities to the type of unit that you hover over with the mouse',
+    ['set_default_target_priority'] = 'Set weapon target priorities of selected units to their defaults',
 }

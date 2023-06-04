@@ -19,9 +19,6 @@ PropBlueprint {
     Interface = {
         HelpText = 'Marker for general use',
     },
-    Physics = {
-        BlockPath = true,
-    },
     SizeX = 1,
     SizeY = 1,
     SizeZ = 1,

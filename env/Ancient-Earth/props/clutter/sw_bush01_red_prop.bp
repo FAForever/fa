@@ -27,9 +27,6 @@ PropBlueprint {
     Interface = {
         HelpText = 'Small Bush - Swamp',
     },
-    Physics = {
-        BlockPath = true,
-    },
     SizeX = 0.5,
     SizeY = 0.25,
     SizeZ = 0.5,

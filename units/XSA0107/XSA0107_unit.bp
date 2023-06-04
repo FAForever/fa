@@ -1,14 +1,11 @@
 UnitBlueprint {
     AI = {
         BeaconName = 'XSB5102',
-        TargetBones = {
-            'XSA0107',
-        },
     },
     Air = {
-        AutoLandTime = 1,
-        BankFactor = 0.1,
-        BankForward = false,
+        AutoLandTime = 2,
+        BankFactor = 0.2,
+        BankForward = true,
         CanFly = true,
         CirclingDirChange = false,
         CirclingElevationChangeRatio = 0.25,
@@ -18,16 +15,16 @@ UnitBlueprint {
         CirclingTurnMult = 1,
         KLift = 2,
         KLiftDamping = 2,
-        KMove = 0.95,
+        KMove = 2,
         KMoveDamping = 2,
         KRoll = 1,
         KRollDamping = 1,
-        KTurn = 1,
-        KTurnDamping = 4,
-        LiftFactor = 8,
+        KTurn = 2,
+        KTurnDamping = 2,
+        LiftFactor = 2,
         MaxAirspeed = 10,
         StartTurnDistance = 10,
-        TransportHoverHeight = 6,
+        TransportHoverHeight = 4,
     },
     Audio = {
         AirUnitWaterImpact = Sound {
@@ -114,7 +111,7 @@ UnitBlueprint {
         'TRANSPORTFOCUS',
         'CANNOTUSEAIRSTAGING',
     },
-    CollisionOffsetY = -0.1,
+    CollisionOffsetY = -0.25,
     CollisionOffsetZ = 1.5,
     Defense = {
         AirThreatLevel = 4,

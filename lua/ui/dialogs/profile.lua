@@ -6,13 +6,13 @@
 --* Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
-local UIUtil = import('/lua/ui/uiutil.lua')
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local Edit = import('/lua/maui/edit.lua').Edit
-local ItemList = import('/lua/maui/itemlist.lua').ItemList
-local Tooltip = import('/lua/ui/game/tooltip.lua')
-local Prefs = import('/lua/user/prefs.lua')
+local UIUtil = import("/lua/ui/uiutil.lua")
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+local Edit = import("/lua/maui/edit.lua").Edit
+local ItemList = import("/lua/maui/itemlist.lua").ItemList
+local Tooltip = import("/lua/ui/game/tooltip.lua")
+local Prefs = import("/lua/user/prefs.lua")
 
 function CreateDialog(exitBehavior)
     local function AnyProfilesDefined(parent)
@@ -46,7 +46,7 @@ function CreateDialog(exitBehavior)
     optionsButton.OnClick = function(self, modifiers)
         if not AnyProfilesDefined(panel) then return end
         panel:Hide()
-        import('/lua/ui/dialogs/options.lua').CreateDialog(GetFrame(0), function() panel:Show() end)
+        import("/lua/ui/dialogs/options.lua").CreateDialog(GetFrame(0), function() panel:Show() end)
     end
 
     local createButton = UIUtil.CreateButtonStd(panel, '/scx_menu/small-btn/small', "<LOC PROFILE_0004>Create", 16, 2)
@@ -104,7 +104,7 @@ function CreateDialog(exitBehavior)
         profileList:SetSelection(row)
         SetPreference("profile.current", row + 1)
 
-        import('/lua/options/OptionsLogic.lua').Repopulate()
+        import("/lua/options/optionslogic.lua").Repopulate()
     end
 
     createButton.OnClick = function(self)
@@ -157,7 +157,7 @@ function CreateDialog(exitBehavior)
     okButton.OnClick = function(self)
         if not AnyProfilesDefined(panel) then return end
 
-        local OptionsLogic = import('/lua/options/OptionsLogic.lua')
+        local OptionsLogic = import("/lua/options/optionslogic.lua")
 
         -- set up a restart dialog in case it's needed
         local function OptionRestartFunc(proceedFunc, cancelFunc)
@@ -245,7 +245,7 @@ function CreationDialog(parent, callback)
             return
         else
             -- since the profile name will make a directory for save games and replays, it needs to be validated
-            local filepicker = import('/lua/ui/controls/filepicker.lua')
+            local filepicker = import("/lua/ui/controls/filepicker.lua")
             local err = filepicker.IsFilenameInvalid(name)
 
             if err == 'invalidchars' or err == 'invalidlast' or err == 'invalidname' then
@@ -311,4 +311,4 @@ function CreationDialog(parent, callback)
 end
 
 -- kept for mod backwards compatibility
-local Button = import('/lua/maui/button.lua').Button
+local Button = import("/lua/maui/button.lua").Button

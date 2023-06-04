@@ -1,7 +1,7 @@
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local UIUtil = import('/lua/ui/uiutil.lua')
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local Group = import('/lua/maui/group.lua').Group
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+local UIUtil = import("/lua/ui/uiutil.lua")
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local Group = import("/lua/maui/group.lua").Group
 
 ---@class Checkbox : Group
 ---@field checkBmp Bitmap
@@ -15,7 +15,7 @@ local Group = import('/lua/maui/group.lua').Group
 ---@field uncheckedStates ControlStateMap<FileName>
 ---@field mRolloverCue string
 ---@field mClickCue string
-Checkbox = Class(Group) {
+Checkbox = ClassUI(Group) {
     ---@param self Checkbox
     ---@param parent Control
     ---@param normalUnchecked Lazy<FileName>

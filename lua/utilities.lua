@@ -212,7 +212,7 @@ function GetRandomOffset(sx, sy, sz, scalar)
     sy = sy * scalar
     sz = sz * scalar
     local x = Random() * sx - (sx * 0.5)
-    local y = Random() * sy
+    local y = Random() * sy - (sy * 0.5)
     local z = Random() * sz - (sz * 0.5)
 
     return x, y, z
