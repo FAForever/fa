@@ -257,7 +257,7 @@ XRL0403 = ClassUnit(CWalkingLandUnit) {
         self:CreateDamageEffects('Left_Leg02_B02', army)
         explosion.CreateFlash(self, 'Right_Leg01_B01', 3.2, army)
 
-        self:CreateWreckage(0.1)
+        self:CreateWreckage(0)
         self:ShakeCamera(3, 2, 0, 0.15)
         self:Destroy()
     end,

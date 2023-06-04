@@ -1546,6 +1546,24 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         local pos = self:GetPosition()
         local layer = self.Layer
 
+        -- Reduce the mass value based on the tech tier
+        -- by default we reduce the mass value 2 times by 90% for a total of 81%
+        local mass_tech_mult = 0.9
+        local tech_category = bp.TechCategory
+
+        -- We reduce the mass value based on tech category
+        if tech_category == 'TECH1' then
+            mass_tech_mult = 0.9
+        elseif tech_category == 'TECH2' then
+            mass_tech_mult = 0.8
+        elseif tech_category == 'TECH3' then
+            mass_tech_mult = 0.7
+        elseif tech_category == 'EXPERIMENTAL' then
+            mass_tech_mult = 0.6
+        end
+        
+        mass = mass * mass_tech_mult
+
         -- Reduce the mass value of submerged wrecks
         if layer == 'Water' or layer == 'Sub' then
             mass = mass * 0.5
