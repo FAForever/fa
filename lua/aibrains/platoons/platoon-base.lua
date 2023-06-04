@@ -6,11 +6,16 @@ local IsDestroyed = IsDestroyed
 
 local TableGetn = table.getn
 
+---@class AIPlatoonDebugInfo
+---@field EntityId EntityId
+---@field Info { DebugMessages: string[] } 
+
 ---@class AIPlatoonState : State
 ---@field StateName string
 
 ---@class AIPlatoon : moho.platoon_methods
 ---@field BuilderData table
+---@field DebugMessages string[]
 ---@field Units Unit[]
 ---@field Brain moho.aibrain_methods
 ---@field Trash TrashBag
@@ -40,7 +45,6 @@ AIPlatoon = Class(moho.platoon_methods) {
         self.Units = units
         for k, unit in units do
             unit.AIPlatoonReference = self
-            LOG(self:LogReference())
             unit:SetCustomName(self:LogReference())
         end
     end,
@@ -442,8 +446,8 @@ AIPlatoon = Class(moho.platoon_methods) {
 
     end,
 
-    -----------------------------------------------------------------
-    -- debugging
+    ---------------------------------------------------------------------------
+    --#region Debug functionality
 
     ---@param self AIPlatoon
     LogReference = function(self)
@@ -453,16 +457,32 @@ AIPlatoon = Class(moho.platoon_methods) {
 
     ---@param self AIPlatoon
     LogDebug = function(self, message)
-        local stateName = self.StateName
-        local logReference = self:LogReference()
-        SPEW(string.format("%s - %s: %s", logReference, stateName, message))
+        self.DebugMessages = self.DebugMessages or { }
+        table.insert(self.DebugMessages, message)
     end,
 
     ---@param self AIPlatoon
     LogWarning = function(self, message)
-        local stateName = self.StateName
-        local logReference = self:LogReference()
-        WARN(string.format("%s - %s: %s", logReference, stateName, message))
+        self.DebugMessages = self.DebugMessages or { }
+        table.insert(self.DebugMessages, message)
     end,
 
+    ---@param self AIPlatoon
+    ---@return AIPlatoonDebugInfo
+    GetDebugInfo = function(self)
+        local info = self.DebugInfo
+        if not info then
+            ---@type AIPlatoonDebugInfo
+            info = { }
+            self.DebugInfo = info
+        end
+
+        info.PlatoonName = self.PlatoonName
+        info.StateName = self.StateName
+        info.DebugMessages = self.DebugMessages
+
+        return info
+    end,
+
+    --#endregion
 }
