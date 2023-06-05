@@ -95,9 +95,9 @@ AIPlatoonAdaptiveReclaimBehavior = Class(AIPlatoon) {
                     local maxEngineers = math.min(math.ceil(cell.TotalMass / 500), 8)
 
                     -- make sure we can path to it and it doesnt have high threat e.g Point Defense
-                    if NavUtils.CanPathToCell(self.MovementLayer, engPos, centerOfCell) and
-                        brain:GetThreatAtPosition(centerOfCell, imapRadius, true, 'AntiSurface') < 10
-                    then
+                    if NavUtils.CanPathToCell(self.MovementLayer, engPos, centerOfCell) 
+                        and brain:GetThreatAtPosition(centerOfCell, imapRadius, true, 'AntiSurface') < 10 then
+
                         local brainCell = brainGridInstance:ToCellFromGridSpace(cell.X, cell.Z)
                         local engineersInCell = brainGridInstance:CountReclaimingEngineers(brainCell)
                         if engineersInCell < maxEngineers then
@@ -110,7 +110,7 @@ AIPlatoonAdaptiveReclaimBehavior = Class(AIPlatoon) {
                 end
 
                 searchLoop = searchLoop + 1
-                if searchLoop > searchRadius and (not (reclaimTargetX and reclaimTargetZ)) and TableGetn(pathFailTable) > 0 then
+                if searchLoop == searchRadius and (not (reclaimTargetX and reclaimTargetZ)) and TableGetn(pathFailTable) > 0 then
                     LOG('Loop failed and we have unpathable reclaim')
                     local closestReclaimDistance
                     local closestReclaim
@@ -291,7 +291,7 @@ AIPlatoonAdaptiveReclaimBehavior = Class(AIPlatoon) {
                 return
             end
 
-            LOG('Attempting to build a mass point or two')
+            self:LogDebug('Attempting to build a mass point or two')
             local eng = self:GetPlatoonUnits()[1]
             local brain = self:GetBrain()
             IssueClearCommands({ eng })
@@ -445,7 +445,6 @@ AIPlatoonAdaptiveReclaimBehavior = Class(AIPlatoon) {
 ---@param units Unit[]
 AssignToUnitsMachine = function(data, platoon, units)
     if units and not TableEmpty(units) then
-        LOG('Assigning Units to new platoon')
 
         -- meet platoon requirements
         import("/lua/sim/navutils.lua").Generate()
