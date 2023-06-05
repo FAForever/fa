@@ -27,7 +27,10 @@ local WeakValues = { __mode = 'v' }
 ---@field SUBCOMMANDER number
 ---@field COMMAND number
 
+---@class AIEngineerManagerDebugInfo
+
 ---@class AIEngineerManager : AIBuilderManager
+---@field DebugInfo AIEngineerManagerDebugInfo
 ---@field Engineers AIEngineerManagerReferences
 ---@field EngineersBeingBuilt AIEngineerManagerReferences     
 ---@field EngineerTotalCount number                 # Recomputed every 10 ticks
@@ -286,6 +289,24 @@ AIEngineerManager = Class(AIBuilderManager) {
         -- TODO: replace 'Any' with 'ReclaimTask'
         return self:GetHighestBuilder('Any', platoon, unit)
     end,
+
+
+    ---------------------------------------------------------------------------
+    --#region Debug functionality
+
+    ---@param self AIEngineerManager
+    ---@return AIEngineerManagerDebugInfo
+    GetDebugInfo = function(self)
+        local info = self.DebugInfo
+        if not info then
+            info = { }
+            self.DebugInfo = info
+        end
+
+        return info
+    end,
+
+    --#endregion
 }
 
 ---@param brain AIBrain
