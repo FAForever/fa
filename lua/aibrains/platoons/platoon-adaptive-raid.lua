@@ -2,6 +2,7 @@
 local AIPlatoon = import("/lua/aibrains/platoons/platoon-base.lua").AIPlatoon
 local NavUtils = import("/lua/sim/navutils.lua")
 local MarkerUtils = import("/lua/sim/markerutilities.lua")
+local TransportUtils = import("/lua/ai/transportutilities.lua")
 local AIAttackUtils = import("/lua/ai/aiattackutilities.lua")
 
 -- upvalue scope for performance
@@ -82,26 +83,42 @@ AIPlatoonAdaptiveRaidBehavior = Class(AIPlatoon) {
                 local expansions, count = MarkerUtils.GetMarkersByType('Expansion Area')
                 ---@type MarkerData[]
                 local candidates = { }
+                local unpathableCandidates = { }
                 local candidateCount = 0
+                local unpathableCandidateCount = 0
                 for k = 1, count do
                     local expansion = expansions[k]
                     if expansion.NavLabel == label then
                         candidates[candidateCount + 1] = expansion
                         candidateCount = candidateCount + 1
+                    elseif not NavUtils.CanPathTo(self.MovementLayer, position, expansion.position) then
+                        unpathableCandidates[unpathableCandidateCount + 1] = expansion
+                        unpathableCandidateCount = unpathableCandidateCount + 1
                     end
                 end
                 -- END OF TODO
 
                 -- something odd happened: there are no expansions with a matching label
-                if candidateCount == 0 then
+                if candidateCount == 0 and unpathableCandidateCount == 0 then
                     self:LogWarning(string.format('no expansions found on label %d', label))
                     self:ChangeState(self.Error)
                     return
                 end
 
                 -- pick random expansion that we can Navigating to
-                local selectionNumber = Random(1, candidateCount)
-                local expansion = candidates[selectionNumber]
+                local selectionNumber
+                local expansion
+                if candidateCount > 0 then
+                    selectionNumber = Random(1, candidateCount)
+                    expansion = candidates[selectionNumber]
+                elseif unpathableCandidateCount > 0 then
+                    selectionNumber = Random(1, unpathableCandidateCount)
+                    expansion = unpathableCandidates[selectionNumber]
+                end
+                if unpathableCandidateCount > 0 then
+                    LOG('unpathableCandidateCount '..unpathableCandidateCount)
+                    LOG('Current raid position is '..repr(expansion.position))
+                end
                 self.LocationToRaid = expansion.position
                 if self.LocationToRaid then
                     LOG('Location to raid is '..repr(self.LocationToRaid))
@@ -147,6 +164,12 @@ AIPlatoonAdaptiveRaidBehavior = Class(AIPlatoon) {
             local brain = self:GetBrain()
             if not brain.GridPresence then
                 WARN('GridPresence does not exist, unable to detect conflict line')
+            end
+
+            if not NavUtils.CanPathToCell(self.MovementLayer, self:GetPlatoonPosition(), destination) then
+                LOG('Raid platoon is going to use transport')
+                self:ChangeState(self.Transporting)
+                return
             end
 
             while not IsDestroyed(self) do
@@ -240,6 +263,26 @@ AIPlatoonAdaptiveRaidBehavior = Class(AIPlatoon) {
                 -- always wait
                 WaitTicks(1)
             end
+        end,
+    },
+
+    Transporting = State {
+
+        StateName = 'Transporting',
+
+        --- The platoon avoids danger or attempts to reclaim if they are too close to avoid
+        ---@param self AIPlatoonAdaptiveRaidBehavior
+        Main = function(self)
+            local brain = self:GetBrain()
+            local usedTransports = TransportUtils.SendPlatoonWithTransports(brain, self, self.LocationToRaid, 1, false)
+            if usedTransports then
+                LOG('Raid Platoon used transports')
+                self:ChangeState(self.Navigating)
+            else
+                LOG('Raid Platoon didnt use transports')
+                self:ChangeState(self.Searching)
+            end
+            return
         end,
     },
 
