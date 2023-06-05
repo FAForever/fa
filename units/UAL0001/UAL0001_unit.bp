@@ -390,9 +390,45 @@ UnitBlueprint {
             Slot = 'Back',
         },
         CrysalisBeam = {
-            BuildCostEnergy = 15000,
-            BuildCostMass = 500,
-            BuildTime = 500,
+            BuildCostEnergy = 10500,
+            BuildCostMass = 350,
+            BuildTime = 350,
+            Icon = 'cba',
+            Name = '<LOC enhancements_0004>Enhanced Quantum Disruptor',
+            NewMaxRadius = 30,
+            Slot = 'LCH',
+            ShowBones = {
+                'Left_Upgrade',
+            },
+            UpgradeUnitAmbientBones = {
+                'UAL0001',
+            },
+            UpgradeEffectBones = {
+                'Left_Turret',
+                'Left_Upgrade',
+            },
+        },
+        CrysalisBeamRemove = {
+            BuildCostEnergy = 1,
+            BuildCostMass = 1,
+            BuildTime = 0.1,
+            Icon = 'cba',
+            HideBones = {
+                'Left_Upgrade',
+            },
+            Name = '<LOC enhancements_0005>Remove Enhanced Quantum Disruptor',
+            Prerequisite = 'CrysalisBeam',
+            RemoveEnhancements = {
+                'CrysalisBeam',
+                'CrysalisBeamRemove',
+            },
+            Slot = 'LCH',
+        },
+        AdvancedCrysalisBeam = {
+            BuildCostEnergy = 20000,
+            BuildCostMass = 750,
+            BuildTime = 750,
+            Prerequisite = 'CrysalisBeam',
             Icon = 'cba',
             Name = '<LOC enhancements_0004>Enhanced Quantum Disruptor',
             NewMaxRadius = 35,
@@ -408,7 +444,7 @@ UnitBlueprint {
                 'Left_Upgrade',
             },
         },
-        CrysalisBeamRemove = {
+        AdvancedCrysalisBeamRemove = {
             BuildCostEnergy = 1,
             BuildCostMass = 1,
             BuildTime = 0.1,
