@@ -48,8 +48,8 @@ UnitBlueprint {
         AirThreatLevel = 0,
         ArmorType = 'Structure',
         EconomyThreatLevel = 3,
-        Health = 1400,
-        MaxHealth = 1400,
+        Health = 800,
+        MaxHealth = 800,
         RegenRate = 0,
         SubThreatLevel = 0,
         SurfaceThreatLevel = 0,
@@ -92,10 +92,10 @@ UnitBlueprint {
         UniformScale = 0.02,
     },
     Economy = {
-        BuildCostEnergy = 3600,
-        BuildCostMass = 150,--120
+        BuildCostEnergy = 7200,
+        BuildCostMass = 300,
         BuildRate = 15,
-        BuildTime = 845,
+        BuildTime = 1680,
         BuildableCategory = {
             'ues0305',
         },
@@ -147,7 +147,7 @@ UnitBlueprint {
     Intel = {
         ReactivateTime = 10,
         ShowIntelOnSelect = true,
-        SonarRadius = 230,
+        SonarRadius = 290,
         VisionRadius = 25,
     },
     Interface = {

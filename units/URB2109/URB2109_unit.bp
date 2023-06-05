@@ -97,7 +97,7 @@ UnitBlueprint {
     Economy = {
         BuildCostEnergy = 3600,
         BuildCostMass = 450,
-        BuildTime = 450,
+        BuildTime = 675,
         RebuildBonusIds = {
             'urb2109',
         },
@@ -186,7 +186,7 @@ UnitBlueprint {
             },
             BallisticArc = 'RULEUBA_None',
             CollideFriendly = false,
-            Damage = 25,
+            Damage = 30,
             DamageType = 'Normal',
             DisplayName = 'Nanite Torpedo',
             DoTPulses = 5,

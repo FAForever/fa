@@ -282,7 +282,7 @@
             },
             FiringRandomness = 0,
             FiringTolerance = 0,
-            FixedSpreadRadius = 80,
+            FixedSpreadRadius = 70,
             Label = 'Gun01',
             LeadTarget = true,
             MaxRadius = 4000,
