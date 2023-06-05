@@ -182,7 +182,7 @@ UnitBlueprint {
     Intel = {
         OmniRadius = 200,
         RadarRadius = 600,
-        ReactivateTime = 5,
+        ReactivateTime = 6,
         ShowIntelOnSelect = true,
         VisionRadius = 30,
     },
