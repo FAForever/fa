@@ -414,7 +414,6 @@ AIPlatoon = Class(moho.platoon_methods) {
         local brain = self:GetBrain()
         local platUnits = self:GetPlatoonUnits()
         if platUnits then
-            local platoonCount = 0
             for _, unit in platUnits do
                 if unit.Blueprint.CategoriesHash.ENGINEER then
                     unit.PlatoonHandle = nil

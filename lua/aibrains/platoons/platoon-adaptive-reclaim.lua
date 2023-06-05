@@ -1,12 +1,14 @@
 local AIPlatoon = import("/lua/aibrains/platoons/platoon-base.lua").AIPlatoon
 local NavUtils = import("/lua/sim/navutils.lua")
 local MarkerUtils = import("/lua/sim/markerutilities.lua")
+local TransportUtils = import("/lua/ai/transportutilities.lua")
 local AIUtils = import("/lua/ai/aiutilities.lua")
 
 local IsDestroyed = IsDestroyed
 
 local TableGetn = table.getn
 local TableEmpty = table.empty
+local TableInsert = table.insert
 
 -- I'm up to navigating. Specifically the reclaim check.
 
@@ -79,6 +81,8 @@ AIPlatoonAdaptiveReclaimBehavior = Class(AIPlatoon) {
             local reclaimTargetX, reclaimTargetZ
             local engPos = eng:GetPosition()
             local gx, gz = reclaimGridInstance:ToGridSpace(engPos[1], engPos[3])
+            local imapRadius = brain.IMAPConfig.Rings or 0
+            local pathFailTable = {}
             while searchLoop < searchRadius and (not (reclaimTargetX and reclaimTargetZ)) do
                 WaitTicks(1)
 
@@ -91,8 +95,8 @@ AIPlatoonAdaptiveReclaimBehavior = Class(AIPlatoon) {
                     local maxEngineers = math.min(math.ceil(cell.TotalMass / 500), 8)
 
                     -- make sure we can path to it and it doesnt have high threat e.g Point Defense
-                    if  NavUtils.CanPathToCell(self.MovementLayer, engPos, centerOfCell) and
-                        brain:GetThreatAtPosition(centerOfCell, 0, true, 'AntiSurface') < 10
+                    if NavUtils.CanPathToCell(self.MovementLayer, engPos, centerOfCell) and
+                        brain:GetThreatAtPosition(centerOfCell, imapRadius, true, 'AntiSurface') < 10
                     then
                         local brainCell = brainGridInstance:ToCellFromGridSpace(cell.X, cell.Z)
                         local engineersInCell = brainGridInstance:CountReclaimingEngineers(brainCell)
@@ -100,10 +104,25 @@ AIPlatoonAdaptiveReclaimBehavior = Class(AIPlatoon) {
                             reclaimTargetX, reclaimTargetZ = cell.X, cell.Z
                             break
                         end
+                    elseif brain:GetThreatAtPosition(centerOfCell, imapRadius, true, 'AntiSurface') < 10 then
+                        TableInsert(pathFailTable, { center = centerOfCell, x = cell.X, z = cell.Z })
                     end
                 end
 
                 searchLoop = searchLoop + 1
+                if searchLoop > searchRadius and (not (reclaimTargetX and reclaimTargetZ)) and TableGetn(pathFailTable) > 0 then
+                    LOG('Loop failed and we have unpathable reclaim')
+                    local closestReclaimDistance
+                    local closestReclaim
+                    for _, v in pathFailTable do
+                        local distance = VDist3Sq(engPos, v.center)
+                        if not closestReclaim or distance < closestReclaimDistance then
+                            closestReclaim = v
+                            closestReclaimDistance = distance
+                            reclaimTargetX, reclaimTargetZ = v.x, v.z
+                        end
+                    end
+                end
                 self:LogDebug('Search loop is ' .. searchLoop .. ' out of a possible ' .. searchRadius)
             end
             if reclaimTargetX and reclaimTargetZ then
@@ -173,6 +192,11 @@ AIPlatoonAdaptiveReclaimBehavior = Class(AIPlatoon) {
 
             if not brain.GridPresence then
                 WARN('GridPresence does not exist, unable to detect conflict line')
+            end
+            if not NavUtils.CanPathToCell(self.MovementLayer, eng:GetPosition(), destination) then
+                LOG('Reclaim engineer is going to use transport')
+                self:ChangeState(self.Transporting)
+                return
             end
 
             while not IsDestroyed(self) do
@@ -390,6 +414,26 @@ AIPlatoonAdaptiveReclaimBehavior = Class(AIPlatoon) {
             end
 
             self:ChangeState(self.Searching)
+            return
+        end,
+    },
+
+    Transporting = State {
+
+        StateName = 'Transporting',
+
+        --- The platoon avoids danger or attempts to reclaim if they are too close to avoid
+        ---@param self AIPlatoonAdaptiveReclaimBehavior
+        Main = function(self)
+            local brain = self:GetBrain()
+            local usedTransports = TransportUtils.SendPlatoonWithTransports(brain, self, self.LocationToReclaim, 1, false)
+            if usedTransports then
+                LOG('Engineer used transports')
+                self:ChangeState(self.Navigating)
+            else
+                LOG('Engineer didnt use transports')
+                self:ChangeState(self.Searching)
+            end
             return
         end,
     },
