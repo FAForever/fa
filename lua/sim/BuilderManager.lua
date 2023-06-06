@@ -452,10 +452,6 @@ BuilderManager = ClassSimple {
     --- debug functionality
 
     DebugThread = function(self)
-        while true do
-            WaitTicks(1)
-            DrawCircle(self.Location, self.Radius, 'ffffff')
-        end
     end,
 
     --------------------------------------------------------------------------------------------
