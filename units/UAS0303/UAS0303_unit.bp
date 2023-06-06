@@ -381,8 +381,8 @@ UnitBlueprint {
         {
             Audio = {
                 Fire = Sound {
-                    Bank = 'UASWeapon',
-                    Cue = 'UAS4201_Anti_Missile',
+                    Bank = 'UALWeapon',
+                    Cue = 'UAB4201_Anti_Missile',
                     LodCutoff = 'Weapon_LodCutoff',
                 },
             },
