@@ -396,6 +396,8 @@ StructureUnit = ClassUnit(Unit) {
                 0
             )
 
+            LOG(tarmac.Albedo .. GetTarmac(factionIndex, terrainName))
+
             bag:Add(handle)
             if tarmac.RemoveWhenDead then
                 self.Trash:Add(handle)
