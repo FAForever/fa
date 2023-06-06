@@ -390,8 +390,8 @@ UnitBlueprint {
             Slot = 'Back',
         },
         CrysalisBeam = {
-            BuildCostEnergy = 10500,
-            BuildCostMass = 350,
+            BuildCostEnergy = 6000,
+            BuildCostMass = 300,
             BuildTime = 350,
             Icon = 'cba',
             Name = '<LOC enhancements_0004>Quantum Disruptor',
@@ -425,9 +425,9 @@ UnitBlueprint {
             Slot = 'LCH',
         },
         AdvancedCrysalisBeam = {
-            BuildCostEnergy = 20000,
-            BuildCostMass = 750,
-            BuildTime = 750,
+            BuildCostEnergy = 31000,
+            BuildCostMass = 900,
+            BuildTime = 1100,
             Prerequisite = 'CrysalisBeam',
             Icon = 'cba',
             Name = '<LOC enhancements_0004>Enhanced Quantum Disruptor',
