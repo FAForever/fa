@@ -53,7 +53,7 @@ local function CalculateLODOfUnit(unit)
 
             -- https://www.desmos.com/calculator (x * x)
             local factor = (lk / ln) * (lk / ln)
-            local LODCutoff = factor * lod + 50
+            local LODCutoff = factor * lod + 40
             -- LOG(string.format("(%s) / %d: %d -> %d", unit.BlueprintId, k, data.LODCutoff, LODCutoff))
             data.LODCutoff = LODCutoff
         end
