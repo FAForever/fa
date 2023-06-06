@@ -116,17 +116,14 @@ AIPlatoonAdaptiveRaidBehavior = Class(AIPlatoon) {
                     expansion = unpathableCandidates[selectionNumber]
                 end
                 if unpathableCandidateCount > 0 then
-                    LOG('unpathableCandidateCount '..unpathableCandidateCount)
-                    LOG('Current raid position is '..repr(expansion.position))
+                    self:LogDebug(string.format('unpathableCandidateCount '..unpathableCandidateCount))
+                    self:LogDebug(string.format('Current raid position is '..repr(expansion.position)))
                 end
                 self.LocationToRaid = expansion.position
                 if self.LocationToRaid then
-                    LOG('Location to raid is '..repr(self.LocationToRaid))
+                    self:LogDebug(string.format('Location to raid is '..repr(self.LocationToRaid)))
                 else
-                    LOG('Location to raid is nil')
-                    LOG(repr(expansion))
-                    LOG('Selection was '..selectionNumber)
-                    LOG('candidates '..repr(candidates))
+                    self:LogDebug(string.format('Location to raid is nil'))
                 end
                 self:ChangeState(self.Navigating)
                 return
@@ -167,7 +164,7 @@ AIPlatoonAdaptiveRaidBehavior = Class(AIPlatoon) {
             end
 
             if not NavUtils.CanPathToCell(self.MovementLayer, self:GetPlatoonPosition(), destination) then
-                LOG('Raid platoon is going to use transport')
+                self:LogDebug(string.format('Raid platoon is going to use transport'))
                 self:ChangeState(self.Transporting)
                 return
             end
@@ -228,12 +225,12 @@ AIPlatoonAdaptiveRaidBehavior = Class(AIPlatoon) {
                                 local info = threatTable[Random(1, TableGetn(threatTable))]
                                 self.ThreatToEvade = { info[1], GetSurfaceHeight(info[1], info[2]), info[2] }
                                 DrawCircle(self.ThreatToEvade, 5, 'ff0000')
-                                LOG('We are going to retreat, enemy threat '..threat..' our threat '..platoonThreat..' position status '..positionStatus)
+                                self:LogDebug(string.format('We are going to retreat, enemy threat '..threat..' our threat '..platoonThreat..' position status '..positionStatus))
                                 self:ChangeState(self.Retreating)
                                 return
                             end
                         elseif positionStatus then
-                            LOG('We are going to attack, enemy threat '..threat..' our threat '..platoonThreat..' position status '..positionStatus)
+                            self:LogDebug(string.format('We are going to attack, enemy threat '..threat..' our threat '..platoonThreat..' position status '..positionStatus))
                         end
                     end
 
@@ -276,10 +273,10 @@ AIPlatoonAdaptiveRaidBehavior = Class(AIPlatoon) {
             local brain = self:GetBrain()
             local usedTransports = TransportUtils.SendPlatoonWithTransports(brain, self, self.LocationToRaid, 1, false)
             if usedTransports then
-                LOG('Raid Platoon used transports')
+                self:LogDebug(string.format('Raid Platoon used transports'))
                 self:ChangeState(self.Navigating)
             else
-                LOG('Raid Platoon didnt use transports')
+                self:LogDebug(string.format('Raid Platoon didnt use transports'))
                 self:ChangeState(self.Searching)
             end
             return
@@ -403,7 +400,7 @@ AIPlatoonAdaptiveRaidBehavior = Class(AIPlatoon) {
                             return
                         end
                     else
-                        LOG('Threat and we need to attack then since it is allied, status '..positionStatus)
+                        self:LogDebug(string.format('Threat and we need to attack then since it is allied, status '..positionStatus))
                     end
                 end
 
@@ -529,7 +526,6 @@ AIPlatoonAdaptiveRaidBehavior = Class(AIPlatoon) {
 ---@param units Unit[]
 DebugAssignToUnits = function(data, units)
     if units and not TableEmpty(units) then
-        LOG('Assigning Units to new platoon')
 
         -- meet platoon requirements
         import("/lua/sim/navutils.lua").Generate()
@@ -555,7 +551,6 @@ end
 ---@param units Unit[]
 AssignToUnitsMachine = function(data, platoon, units)
     if units and not TableEmpty(units) then
-        LOG('Assigning Units to new platoon')
 
         -- meet platoon requirements
         import("/lua/sim/navutils.lua").Generate()

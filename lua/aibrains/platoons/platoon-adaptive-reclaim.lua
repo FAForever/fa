@@ -111,7 +111,7 @@ AIPlatoonAdaptiveReclaimBehavior = Class(AIPlatoon) {
 
                 searchLoop = searchLoop + 1
                 if searchLoop == searchRadius and (not (reclaimTargetX and reclaimTargetZ)) and TableGetn(pathFailTable) > 0 then
-                    LOG('Loop failed and we have unpathable reclaim')
+                    self:LogDebug(string.format('Loop failed and we have unpathable reclaim'))
                     local closestReclaimDistance
                     local closestReclaim
                     for _, v in pathFailTable do
@@ -136,7 +136,7 @@ AIPlatoonAdaptiveReclaimBehavior = Class(AIPlatoon) {
             else
                 if self.SearchRadius < 8 then
                     self.SearchRadius = 8
-                    LOG('No reclaim found, extending search range to 8')
+                    self:LogDebug(string.format('No reclaim found, extending search range to 8'))
                     self:ChangeState(self.Searching)
                     return
                 end
@@ -194,7 +194,7 @@ AIPlatoonAdaptiveReclaimBehavior = Class(AIPlatoon) {
                 WARN('GridPresence does not exist, unable to detect conflict line')
             end
             if not NavUtils.CanPathToCell(self.MovementLayer, eng:GetPosition(), destination) then
-                LOG('Reclaim engineer is going to use transport')
+                self:LogDebug(string.format('Reclaim engineer is going to use transport'))
                 self:ChangeState(self.Transporting)
                 return
             end
@@ -426,12 +426,12 @@ AIPlatoonAdaptiveReclaimBehavior = Class(AIPlatoon) {
         ---@param self AIPlatoonAdaptiveReclaimBehavior
         Main = function(self)
             local brain = self:GetBrain()
-            local usedTransports = TransportUtils.SendPlatoonWithTransports(brain, self, self.LocationToReclaim, 1, false)
+            local usedTransports = TransportUtils.SendPlatoonWithTransports(brain, self, self.LocationToReclaim, 3, false)
             if usedTransports then
-                LOG('Engineer used transports')
+                self:LogDebug(string.format('Engineer used transports'))
                 self:ChangeState(self.Navigating)
             else
-                LOG('Engineer didnt use transports')
+                self:LogDebug(string.format('Engineer tried but didnt use transports'))
                 self:ChangeState(self.Searching)
             end
             return
