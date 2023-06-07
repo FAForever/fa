@@ -23,12 +23,12 @@ ProjectileBlueprint {
         'TACTICAL',
         'TACTICALNUKE',
         'MISSILE',
-        'NOSPLASHDAMAGE',
     },
     Defense = {
         Health = 4,
         MaxHealth = 4,
     },
+    DesiredShooterCap = 4,
     Display = {
         CameraFollowTimeout = 2,
         CameraFollowsProjectile = true,

@@ -533,6 +533,7 @@ UnitBlueprint {
             DamageType = 'Normal',
             DepthCharge = {
                 Radius = 13,
+                ProjectilesToDeflect = 3,
             },
             DisplayName = 'Smart Charge AntiTorpedo',
             FireTargetLayerCapsTable = {
