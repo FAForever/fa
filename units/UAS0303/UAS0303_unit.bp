@@ -401,8 +401,8 @@ UnitBlueprint {
                 OffsetMult = 1.33,
                 Radius = 15,
             },
-            Label = 'AnitMissile',
-            MaxRadius = 20;
+            Label = 'AntiMissile',
+            MaxRadius = 20,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
             MuzzleVelocity = 15,
@@ -414,7 +414,7 @@ UnitBlueprint {
                         'Projectile',
                     },
                     RackBone = 'Projectile',
-                }
+                },
             },
             RackFireTogether = false,
             RackRecoilDistance = 0,
@@ -424,7 +424,7 @@ UnitBlueprint {
             RackSalvoSize = 1,
             RangeCategory = 'UWRC_Countermeasure',
             RateOfFire = 0.2,
-            TargetRestrictDisallow = 'UNTARGETABLE, STRATEGIC',
+            TargetRestrictDisallow = 'UNTARGETABLE,STRATEGIC',
             TargetRestrictOnlyAllow = 'TACTICAL,MISSILE',
             TargetType = 'RULEWTT_Projectile',
             Turreted = false,

@@ -15,7 +15,7 @@ UAS0303 = ClassUnit(AircraftCarrier) {
     Weapons = {
         AntiAirMissiles01 = ClassWeapon(AAAZealotMissileWeapon) {},
         AntiAirMissiles02 = ClassWeapon(AAAZealotMissileWeapon) {},
-        AnitMissile = ClassWeapon(AAMWillOWisp) {},
+        AntiMissile = ClassWeapon(AAMWillOWisp) {},
     },
 
     BuildAttachBone = 'UAS0303',
