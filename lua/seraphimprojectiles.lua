@@ -370,8 +370,8 @@ SAnaitTorpedo = ClassProjectile(MultiPolyTrailProjectile) {
     ---@param self SAnaitTorpedo
     ---@param inWater boolean
     OnCreate = function(self, inWater)
-        self:SetCollisionShape('Sphere', 0, 0, 0, 1.0)
         MultiPolyTrailProjectile.OnCreate(self, inWater)
+        self:SetCollisionShape('Sphere', 0, 0, 0, 1.0)
     end,
 }
 
@@ -389,8 +389,8 @@ SHeavyCavitationTorpedo = ClassProjectile(MultiPolyTrailProjectile) {
     ---@param self SAnaitTorpedo
     ---@param inWater boolean
     OnCreate = function(self, inWater)
-        self:SetCollisionShape('Sphere', 0, 0, 0, 1.0)
         MultiPolyTrailProjectile.OnCreate(self, inWater)
+        self:SetCollisionShape('Sphere', 0, 0, 0, 1.0)
     end,
 }
 
@@ -405,8 +405,8 @@ SUallCavitationTorpedo = ClassProjectile(SinglePolyTrailProjectile) {
     ---@param self SAnaitTorpedo
     ---@param inWater boolean
     OnCreate = function(self, inWater)
-        self:SetCollisionShape('Sphere', 0, 0, 0, 1.0)
         SinglePolyTrailProjectile.OnCreate(self, inWater)
+        self:SetCollisionShape('Sphere', 0, 0, 0, 1.0)
     end,
 }
 

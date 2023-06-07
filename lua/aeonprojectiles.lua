@@ -582,11 +582,8 @@ ATorpedoShipProjectile = ClassProjectile(OnWaterEntryEmitterProjectile) {
     OnCreate = function(self,inWater)
         OnWaterEntryEmitterProjectile.OnCreate(self, inWater)
         -- if we are starting in the water then immediately switch to tracking in water
-        if inWater == true then
-            self:TrackTarget(true):StayUnderwater(true)
-            self:OnEnterWater(self)
-        else
-            self:TrackTarget(false)
+        if inWater then
+            self:SetCollisionShape('Sphere', 0, 0, 0, 1.0)
         end
     end,
 
@@ -609,8 +606,8 @@ ATorpedoSubProjectile = ClassProjectile(EmitterProjectile) {
     FxImpactProjectileUnderWater = EffectTemplate.DefaultProjectileUnderWaterImpact,
     FxNoneHitScale = 1,
     OnCreate = function(self, inWater)
-        self:SetCollisionShape('Sphere', 0, 0, 0, 1.0)
         EmitterProjectile.OnCreate(self, inWater)
+        self:SetCollisionShape('Sphere', 0, 0, 0, 1.0)
     end,
 }
 

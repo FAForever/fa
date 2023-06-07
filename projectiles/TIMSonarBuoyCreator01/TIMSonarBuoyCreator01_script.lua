@@ -15,15 +15,6 @@ TIMSonarBuoyCreator01 = ClassProjectile(TTorpedoShipProjectile) {
         '/effects/emitters/destruction_water_splash_wash_01_emit.bp',
         '/effects/emitters/destruction_water_splash_plume_01_emit.bp',
     },
-
-    ---@param self TIMSonarBuoyCreator01
-	OnCreate = function(self)
-		TTorpedoShipProjectile.OnCreate(self)
-		-- creates collision shape on creation since that's how it used to work
-		-- before collision shapes got moved to creation OnEnterWater for torpedos
-		-- to prevent them from being shot out of the sky
-		self:SetCollisionShape('Sphere', 0, 0, 0, 1.0)
-	end,
 	
     OnEnterWater = function(self)
         for i in self.FxExitWaterEmitter do --splash

@@ -16,7 +16,6 @@ CANTorpedoNanite03 = ClassProjectile(CTorpedoShipProjectile) {
     ---@param self CANTorpedoNanite03
     OnEnterWater = function(self)
         CTorpedoShipProjectile.OnEnterWater(self)
-        self:SetCollisionShape('Sphere', 0, 0, 0, 1.0)
 
         -- set the magnitude of the velocity to something tiny to really make that water
         -- impact slow it down. We need this to prevent torpedo's striking the bottom

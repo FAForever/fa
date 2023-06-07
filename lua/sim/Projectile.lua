@@ -515,11 +515,6 @@ Projectile = ClassProjectile(moho.projectile_methods) {
         if trackTarget then
             self:SetLifetime(onLostTargetLifetime)
         end
-
-        local originalTarget = self.OriginalTarget
-        if originalTarget and not (originalTarget.Dead or IsDestroyed(originalTarget)) then
-            self:SetNewTarget(originalTarget)
-        end
     end,
 
     -- Lua functionality

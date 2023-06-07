@@ -439,31 +439,15 @@ TTorpedoShipProjectile = ClassProjectile(OnWaterEntryEmitterProjectile) {
     OnCreate = function(self, inWater)
         OnWaterEntryEmitterProjectile.OnCreate(self)
 
-        -- if we are starting in the water then immediately switch to tracking in water and
-        -- create underwater trail effects
-        if inWater == true then
-            self:SetWaterParameters()
+        if inWater then
+            self:SetCollisionShape('Sphere', 0, 0, 0, 1.0)
         end
     end,
 
     ---@param self TTorpedoShipProjectile
     OnEnterWater = function(self)
         OnWaterEntryEmitterProjectile.OnEnterWater(self)
-        self:SetWaterParameters()
-    end,
-
-    ---@param self TTorpedoShipProjectile
-    MovementThread = function(self)
-    end,
-
-    ---@param self TTorpedoShipProjectile
-    SetWaterParameters = function(self)
         self:SetCollisionShape('Sphere', 0, 0, 0, 1.0)
-        -- self:SetMaxSpeed(20)
-        -- self:SetAcceleration(5)
-        -- self:SetTurnRate(140)
-        -- self:SetVelocity(10)
-        self.Trash:Add(ForkThread(self.MovementThread,self))
     end,
 }
 
