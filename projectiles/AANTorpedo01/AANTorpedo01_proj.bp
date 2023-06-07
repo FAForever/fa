@@ -51,12 +51,13 @@ ProjectileBlueprint {
         MaxSpeed = 15,
         StayUnderwater = true,
         TrackTarget = true,
-        TurnRate = 180,
+        TurnRate = 190,
         VelocityAlign = true,
 
         -- these parameters make the path of the torpedo feel unique
         AccelerationRange = 2,
         MaxZigZag = 1,
         ZigZagFrequency = 0.4,
+        TurnRateRange = 10,
     },
 }

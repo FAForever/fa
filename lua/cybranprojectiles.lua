@@ -651,9 +651,9 @@ CTorpedoShipProjectile = ClassProjectile(OnWaterEntryEmitterProjectile) {
     ---@param inWater boolean
     OnCreate = function(self, inWater)
         OnWaterEntryEmitterProjectile.OnCreate(self, inWater)
+
         if inWater == true then
-            self:TrackTarget(true):StayUnderwater(true)
-            self:OnEnterWater(self)
+            self:SetCollisionShape('Sphere', 0, 0, 0, 1.0)
         end
     end,
 
@@ -661,12 +661,6 @@ CTorpedoShipProjectile = ClassProjectile(OnWaterEntryEmitterProjectile) {
     OnEnterWater = function(self)
         OnWaterEntryEmitterProjectile.OnEnterWater(self)
         self:SetCollisionShape('Sphere', 0, 0, 0, 1.0)
-    end,
-
-    ---@param self TTorpedoShipProjectile
-    MovementThread = function(self)
-        WaitTicks(1)
-        self:SetVelocity(3)
     end,
 }
 

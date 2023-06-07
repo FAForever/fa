@@ -112,10 +112,6 @@ ADepthChargeProjectile = ClassProjectile(OnWaterEntryEmitterProjectile) {
         self:SetAcceleration(5)
         self:SetTurnRate(180)
         self:SetVelocity(0.5)
-
-        if self.MovementThread then
-            self.Trash:Add(ForkThread(self.MovementThread, self))
-        end
     end,
 }
 

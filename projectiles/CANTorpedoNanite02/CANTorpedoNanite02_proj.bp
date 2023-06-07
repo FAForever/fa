@@ -61,6 +61,7 @@ ProjectileBlueprint {
 
         -- these parameters make the path of the torpedo feel unique
         AccelerationRange = 2,
+        TurnRateRange = 10,
         MaxZigZag = 1,
         ZigZagFrequency = 0.4,
     },

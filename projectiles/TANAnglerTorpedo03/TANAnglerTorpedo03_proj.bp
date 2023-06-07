@@ -43,7 +43,7 @@ ProjectileBlueprint {
         MaxSpeed = 18,
         StayUnderwater = true,
         TrackTarget = true,
-        TurnRate = 180,
+        TurnRate = 165,
         VelocityAlign = true,
         UseGravity = true,
 
@@ -51,5 +51,6 @@ ProjectileBlueprint {
         AccelerationRange = 2,
         MaxZigZag = 1,
         ZigZagFrequency = 0.4,
+        TurnRateRange = 10,
     },
 }
