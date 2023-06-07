@@ -15,17 +15,20 @@ Several (but not all) of the restrictions include:
  * If you upload the mod to the vault, you MUST follow the vault rules:
    https://wiki.faforever.com/en/Vault-Rules
     * In particular, make sure you have the right to distribute the content of the mod you are
-      uploading. Require other mods when available to avoid copying others' work.
+      uploading. Require other mods when reasonable to avoid copying others' work.
  * Mods are not able to modify the lobby (since mods are only fully loaded after the game launches).
     * However, you can provide AI lobby options (see below).
- * All of a mod's files are mounted behind the mod directory to avoid naming conflicts or accidental
-   file replacement. Outside of lua scripting (which can always hook original and FAF files), this
-   means that files are never replaced 
+ * All of a mod's files (except sounds) are mounted behind the mod directory to avoid naming
+   conflicts or accidental file replacement. Outside of lua scripting (which can always hook
+   original and FAF files), this means that only sound files can ever be replaced.
     * In practice, since the location a resource such as a texture points to can be changed by a lua
       file, this only really affects shaders, which are accessed by the game engine directly and
-      cannot be modded under the FAF framework.
+      cannot be modded under the FAF framework, and movies, which will not be in the correct
+      directory to be read.
+    * Sounds are still mounted directly to `/sounds` and can override files or cause conflicts.
     * Note that mods can still have all kinds of logical conflicts, such overriding the same
       function or blueprint.
+ * Maps cannot be included in mods.
 
 
 ----------
@@ -35,54 +38,52 @@ Mod info file
 Each mod has a `mod_info.lua` file which contains various bits of info:
 
     -- Required name to use for this mod. This is what is displayed in the Lobby, after undergoing
-	-- title-casing. Do NOT add version information here - keep this the exactly same when you
+    -- title-casing. Do NOT add version information here - keep this the exactly same when you
     -- update what you consider to be the same mod as the FAF client will uses this to auto-update
     -- mods (based on the most recent `uid` - the version number does not matter and is only used
     -- for display purposes).
     name = "Happy mod"
-  
-    -- Optional integer version to use for this mod (please only increment) to indicate to humans
-    -- the most current version. Decimals are not supported. If updating the mod, make sure to
-    -- change the `uid` as that is what the FAF client actually uses and leave the name exactly the
-    -- same.
+
+    -- Required integer version to use for this mod (please only increment) to indicate the most
+    -- current version. Decimals are not supported. If updating the mod, make sure to change the
+    -- `uid` (as the FAF client requires that) and leave the name exactly the same.
     version = 4
 
-    -- Optional copyright info. If absent, the mod author is presumed to maintain full ownership of
-    -- the mod. Invisible in-game but shown in the FAF client.
+    -- Optional copyright info. Invisible in-game but shown in the FAF client.
     copyright = "Copyright © 2023, Someone"
 
     -- Optional text displayed in the mods manager and FAF client
     description = "A long description of happy mod and why it will make you happy"
 
     -- Required name(s) of author(s). Shows up as `"UNKNOWN"` if left blank. Will be begin to be
-    -- truncated in-game if over 20 characters. Make sure this reflects who is uploading the mod to
-    -- the vault (if applicable) as well as all contributors whose work is present.
+    -- truncated in-game if over 20 characters. Make sure this reflects all contributors whose work
+    -- is present.
     author = "Joe"
-    
+
     -- Optional URL to anywhere author likes. Will show up in the mods manager if valid.
     url = "https://www.faforever.com"
-    
+
     -- Optional URL to anywhere author likes. Will show up in the mods manager if valid.
     github = "https://github.com/FAForever"
 
-    -- Uniquely identify this mod. This defaults to the mod's name, but that's not a very safe way
-	-- to keep mods differentiated. I'd recommend using a GUID or Guaranteed Unique ID.
+    -- Uniquely identifies this mod. This defaults to the mod's name, but that's not a very safe way
+    -- to keep mods differentiated. It's recommended to use a GUID, or Guaranteed Unique ID.
     -- Every new version of a mod should get a new GUID so that mods which rely on the old version
     -- can select it appropriately, and so that the FAF client can keep track.
-    -- The following webpages allow you to generate a GUID online (as of  April 2023)
+    -- The following webpages allow you to generate a GUID online (as of June 2023)
     --   http://www.somacon.com/p113.php
     --   http://www.famkruithof.net/uuid/uuidgen
     uid = "B019FBEE-E411-11DB-AFAE-13D355D89593"
 
-    -- Flag for whether to list this mod in the mod manager window, where the player can select it.
+    -- Flag for whether to list this mod in the mods manager window, where the player can select it.
     -- An example where you would set it to false is library mod supplying functions, textures, and
     -- props for use by other mods. Those mods indicate that they require this one, and it is
     -- automatically loaded when they are. Note that unselectable mods can still be loaded.
     selectable = true
 
     -- Setting enabled to false causes a mod to never be loaded. Provides an easy way to disable a
-    -- mod during development or for dummy mod packs that nest other mods inside directly (please
-    -- use the requires mechanism instead however). The default is true.
+    -- mod during development or for dummy mod packs that nest other mods inside for distribution.
+    -- The default is true.
     enabled = true
 
     -- A simple form of preventing conflicting mods. If a mod has `exclusive`, then no other mod can
@@ -101,45 +102,45 @@ Each mod has a `mod_info.lua` file which contains various bits of info:
     -- Note that this is unrelated to the `mod_icons.lua` file explained below.
     icon = "mod_icon.dds"
 
-	-- Optionally indicates that this mod only works if another mod is also present. Does not affect
+    -- Optionally indicates that this mod only works if another mod is also present. Does not affect
     -- mod loading order.
     -- It might be nice if you add a comment after each UID to denote the name of the mod so mere
     -- mortals can maintain your list :)
     requires = {
         "fec58b30-0036-4b9e-9995-fe2d6fe4c6e9",     -- Chris' Whacky Mod
-        "18e391bc-67aa-49fb-8a5f-34efec2d1c2c",     -- Jeffs Cool Mod
-        "61d2cb50-08ac-46ba-b261-3c3e3372aef0",     -- Teds Dumb Mod
+        "18e391bc-67aa-49fb-8a5f-34efec2d1c2c",     -- Jeff's Cool Mod
+        "61d2cb50-08ac-46ba-b261-3c3e3372aef0",     -- Ted's Dumb Mod
     }
 
-	-- Optional table which will map the required UID's to friendly names so the user of the mod can
-	-- determine what they are missing.
+    -- Optional table which will map the required UID's to friendly names so the user of the mod can
+    -- determine what they are missing.
     requiresNames = {
-        ["fec58b30-0036-4b9e-9995-fe2d6fe4c6e9"] = "Chris' Whacky Mod v123",
+        ["fec58b30-0036-4b9e-9995-fe2d6fe4c6e9"] = "Chris' Whacky Mod", -- v123
         ["18e391bc-67aa-49fb-8a5f-34efec2d1c2c"] = "Jeff's Cool Mod",
         ["61d2cb50-08ac-46ba-b261-3c3e3372aef0"] = "Ted's Dumb Mod",
     }
     
-	-- Optionally indicates any other mods that this mod is known to conflict with; the game will
-	-- refuse to enable both of them at the same time. You do not need to add old versions of your
+    -- Optionally indicates any other mods that this mod is known to conflict with; the game will
+    -- refuse to enable both of them at the same time. You do not need to add old versions of your
     -- mod here (unless you'd like to be extra careful); the client determines mods with the same
     -- name to be the same mod and auto-updates them. Same format as `requires`.
     conflicts = {
     }
 
-	-- Optional list of other mod UID's. If this mod happens to be active at the same time as any of
-	-- the named other mods, it will be applied before them. Same format as `requires`.
+    -- Optional list of other mod UID's. If this mod happens to be active at the same time as any of
+    -- the named other mods, it will be applied before them. Same format as `requires`.
     before = {
     }
 
-	-- Optional list of other mod UID's. If this mod happens to be active at the same time as any of
-	-- the named other mods, it will be applied after them. If you do not supply an `after` list,
-	-- the `requires` list will be used in its place (if present). Same format as `requires`.
+    -- Optional list of other mod UID's. If this mod happens to be active at the same time as any of
+    -- the named other mods, it will be applied after them. If you do not supply an `after` list,
+    -- the `requires` list will be used in its place (if present). Same format as `requires`.
     after = {
     }
 
 
 `location` also gets filled in before initialization (in case you want to use it for relative paths)
-to the full path to the mod_info file and the directory containing it. It is also set afterwards as
+to the full path of the mod_info file and the directory containing it. It is also set afterwards as
 well, so changing this has no affect.
 
 There are a couple other fields that a mod can specify - it's best to leave them alone.
@@ -149,11 +150,11 @@ There are a couple other fields that a mod can specify - it's best to leave them
 Script Hooking
 ----------
 
-A mod can also contain a `/hook` folder, which contains files named the same way, matching the
-structure of the game's main data folder. After any script file is loaded, we check in the active
-mods to see if they define a hook of the same name; if so, we run the hook in the same environment
-as the original script. This allows hooks to tweak or replace individual functions, classes, or
-other data while still using the rest of the original code in the file.
+A mod can also contain a `/hook` folder, which can contain script files matching the structure of
+the game's main data folder. After any script file is loaded, each active mod is checked to see if
+it defines a hook of the same name; if so, the file is concatenated to the end of the script before
+it is run. This allows hooks to tweak or replace individual functions, classes, or other data while
+still using the rest of the original code in the file.
 
 The pattern for overriding a function called `Fn` is
 
@@ -161,13 +162,13 @@ The pattern for overriding a function called `Fn` is
     do
         local oldFn = Fn
         function Fn(arguments)
-			-- preserve original behavior or another mod's changes
-			oldFn(arguments)
-			
-			-- now we do our modifications
-			-- ...
-		end
-	end
+            -- preserve original behavior or another mod's changes
+            oldFn(arguments)
+
+            -- now we do our modifications
+            -- ...
+        end
+    end
 
 The pattern for overriding a class method called `Method` in a class called `Cls` is
 
@@ -192,11 +193,11 @@ The pattern for overriding a class method called `Method` in a class called `Cls
 Blueprints
 ----------
 
-If an active sim mod has any .bp files, they will be automatically be run during blueprint loading
-to register all blueprint definitions inside. The ID of the blueprint can be specified by the
-`BlueprintId` field, but if absent, it will default to the source filename (lowercased) without the
-suffix (e.g. `"_unit.bp"`). For multiple blueprints in a file, be sure to specify each
-`BlueprintId`.
+If an active sim mod has any .bp files, they will be automatically ran during blueprint loading to
+register all blueprint definitions inside. The ID of the blueprint can be specified by the
+`BlueprintId` field, but if absent, it will default to the file source (lowercased). For unit
+blueprints, the source is shortened to the filename without the suffix (e.g. `"_unit.bp"`) in that
+case. If you have multiple blueprints in a file, be sure to specify each `BlueprintId`.
 
 If the blueprint ID ends up matching the ID of an existing blueprint, then the mod's blueprint will
 replace the one currently there unless the `Merge = true` flag is set in the blueprint. This will
@@ -221,15 +222,15 @@ this, so that other mods' changes aren't overridden:
     do
         local oldModBlueprints = ModBlueprints
         function ModBlueprints(all_bps)
-			-- preserve original behavior or another mod's changes
-			oldModBlueprints(all_bps)
-			
-			-- now we do our modifications
-			for _, unitBp in all_bps.Unit do
-				-- some systematic change to each `unitBp`
-			end
-		end
-	end
+            -- preserve original behavior or another mod's changes
+            oldModBlueprints(all_bps)
+
+            -- now we do our modifications
+            for id, unitBp in all_bps.Unit do
+                -- some systematic change to each `unitBp`
+            end
+        end
+    end
 
 
 ----------
