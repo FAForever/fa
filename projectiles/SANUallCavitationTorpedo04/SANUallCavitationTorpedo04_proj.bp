@@ -22,6 +22,11 @@ ProjectileBlueprint {
         'ANTINAVY',
         'TORPEDO',
     },
+    Defense =  {
+        MaxHealth = 1,
+        Health = 1,
+    },
+    DesiredShooterCap = 1,
     Display = {
         ImpactEffects = {
             Type = 'Small01',

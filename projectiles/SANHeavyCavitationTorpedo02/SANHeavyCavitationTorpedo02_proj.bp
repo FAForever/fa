@@ -25,6 +25,7 @@ ProjectileBlueprint {
     Defense = {
         Health = 1,
     },
+    DesiredShooterCap = 1,
     Display = {
         ImpactEffects = {
             Type = 'Small01',

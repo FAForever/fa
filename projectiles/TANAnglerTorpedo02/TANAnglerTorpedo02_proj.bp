@@ -17,6 +17,11 @@ ProjectileBlueprint {
         'ANTINAVY',
         'TORPEDO',
     },
+    Defense = {
+        MaxHealth = 1,
+        Health = 1,
+    },
+    DesiredShooterCap = 1,
     Display = {
         MeshBlueprint = '/projectiles/TANAnglerTorpedo01/TANAnglerTorpedo01_mesh.bp',
         StrategicIconSize = 1,

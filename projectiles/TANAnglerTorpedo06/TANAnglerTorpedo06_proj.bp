@@ -23,6 +23,11 @@ ProjectileBlueprint {
         'TORPEDO',
         'NOSPLASHDAMAGE',
     },
+    Defense = {
+        MaxHealth = 1,
+        Health = 1,
+    },
+    DesiredShooterCap = 1,
     Display = {
         CameraFollowTimeout = 2,
         CameraFollowsProjectile = true,

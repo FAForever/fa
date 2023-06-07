@@ -20,6 +20,7 @@ ProjectileBlueprint {
     Defense = {
         Health = 1,
     },
+    DesiredShooterCap = 1,
     Display = {
         Mesh = {
             LODs = {

@@ -18,8 +18,10 @@ ProjectileBlueprint {
         'TORPEDO',
     },
     Defense = {
+        MaxHealth = 1,
         Health = 1,
     },
+    DesiredShooterCap = 1,
     Display = {
         Mesh = {
             LODs = {
