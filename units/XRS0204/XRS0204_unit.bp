@@ -365,6 +365,11 @@ UnitBlueprint {
             WeaponCategory = 'Anti Navy',
         },
         {
+            -- sim-performance related values
+            TargetCheckInterval = 1.0,
+            AlwaysRecheckTarget = false,
+            TrackingRadius = 1.0,
+
             Audio = {
                 Fire = Sound {
                     Bank = 'XRS_Weapon',
@@ -378,6 +383,7 @@ UnitBlueprint {
             DamageType = 'Normal',
             DepthCharge = {
                 Radius = 5,
+                ProjectilesToDeflect = 3,
             },
             DisplayName = 'Anti-Torpedo Flare',
             FireTargetLayerCapsTable = {

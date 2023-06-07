@@ -136,18 +136,6 @@ TDepthChargeProjectile = ClassProjectile(OnWaterEntryEmitterProjectile) {
         self:TrackTarget(false)
         self:StayUnderwater(true)
     end,
-
-    ---@param self TDepthChargeProjectile
-    ---@param tbl table
-    AddDepthCharge = function(self, tbl)
-        if not tbl then return end
-        if not tbl.Radius then return end
-        self.MyDepthCharge = DepthCharge {
-            Owner = self,
-            Radius = tbl.Radius or 10,
-        }
-        self.Trash:Add(self.MyDepthCharge)
-    end,
 }
 
 ---  TERRAN GAUSS CANNON PROJECTILES

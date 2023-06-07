@@ -727,18 +727,6 @@ CDepthChargeProjectile = ClassProjectile(OnWaterEntryEmitterProjectile) {
         self:SetVelocity(0, -0.25, 0)
         self:SetVelocity(0.25)
     end,
-
-    ---@param self CDepthChargeProjectile
-    ---@param tbl table
-    AddDepthCharge = function(self, tbl)
-        if not tbl then return end
-        if not tbl.Radius then return end
-        self.MyDepthCharge = DepthCharge {
-            Owner = self,
-            Radius = tbl.Radius or 10,
-        }
-        self.Trash:Add(self.MyDepthCharge)
-    end,
 }
 
 --------------------------------------------------------------------------

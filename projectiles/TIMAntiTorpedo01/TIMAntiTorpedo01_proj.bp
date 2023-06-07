@@ -16,6 +16,10 @@ ProjectileBlueprint {
         'PROJECTILE',
         'ANTITORPEDO',
     },
+    Defense = {
+        MaxHealth = 500,
+        Health = 500,
+    },
     Display = {
         Mesh = {
             LODs = {
