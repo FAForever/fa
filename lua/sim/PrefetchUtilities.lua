@@ -81,11 +81,11 @@ function CreatePrefetchSetFromBlueprints(ids)
     end
 
     local count = 0
-    count = count + table.getsize(PrefetchInfo.Set.d3d_textures)
-    count = count + table.getsize(PrefetchInfo.Set.batch_textures)
-    count = count + table.getsize(PrefetchInfo.Set.models)
-    count = count + table.getsize(PrefetchInfo.Set.anims)
-    LOG(string.format("Prefetching %d files", count))
+    count = count + table.getsize(set.d3d_textures)
+    count = count + table.getsize(set.batch_textures)
+    count = count + table.getsize(set.models)
+    count = count + table.getsize(set.anims)
+    SPEW(string.format("Prefetching %d files", count))
 
-    return PrefetchInfo.Set
+    return set
 end
