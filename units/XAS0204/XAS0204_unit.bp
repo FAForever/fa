@@ -359,6 +359,11 @@ UnitBlueprint {
             WeaponCategory = 'Anti Navy',
         },
         {
+            -- sim-performance related values
+            TargetCheckInterval = 1.0,
+            AlwaysRecheckTarget = false,
+            TrackingRadius = 1.0,
+
             Audio = {
                 Fire = Sound {
                     Bank = 'XAS_Weapon',

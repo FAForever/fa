@@ -352,6 +352,11 @@ UnitBlueprint {
             WeaponCategory = 'Anti Navy',
         },
         {
+            -- sim-performance related values
+            TargetCheckInterval = 1.0,
+            AlwaysRecheckTarget = false,
+            TrackingRadius = 1.0,
+
             BallisticArc = 'RULEUBA_None',
             CollideFriendly = false,
             Damage = 2,

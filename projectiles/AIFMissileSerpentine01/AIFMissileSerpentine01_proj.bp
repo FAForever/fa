@@ -22,12 +22,12 @@ ProjectileBlueprint {
         'INDIRECTFIRE',
         'TACTICAL',
         'MISSILE',
-        'NOSPLASHDAMAGE',
     },
     Defense = {
         Health = 2,
         MaxHealth = 2,
     },
+    DesiredShooterCap = 2,
     Display = {
         CameraFollowTimeout = 2,
         CameraFollowsProjectile = true,

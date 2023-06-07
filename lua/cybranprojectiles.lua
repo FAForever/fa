@@ -651,9 +651,9 @@ CTorpedoShipProjectile = ClassProjectile(OnWaterEntryEmitterProjectile) {
     ---@param inWater boolean
     OnCreate = function(self, inWater)
         OnWaterEntryEmitterProjectile.OnCreate(self, inWater)
+
         if inWater == true then
-            self:TrackTarget(true):StayUnderwater(true)
-            self:OnEnterWater(self)
+            self:SetCollisionShape('Sphere', 0, 0, 0, 1.0)
         end
     end,
 
@@ -661,18 +661,6 @@ CTorpedoShipProjectile = ClassProjectile(OnWaterEntryEmitterProjectile) {
     OnEnterWater = function(self)
         OnWaterEntryEmitterProjectile.OnEnterWater(self)
         self:SetCollisionShape('Sphere', 0, 0, 0, 1.0)
-        self:SetMaxSpeed(20)
-        self:SetAcceleration(5)
-        self:SetTurnRate(180)
-        self:SetVelocity(0.5)
-        
-        self.Trash:Add(ForkThread(self.MovementThread,self))
-    end,
-
-    ---@param self TTorpedoShipProjectile
-    MovementThread = function(self)
-        WaitTicks(1)
-        self:SetVelocity(3)
     end,
 }
 
@@ -732,18 +720,6 @@ CDepthChargeProjectile = ClassProjectile(OnWaterEntryEmitterProjectile) {
         self:SetMaxSpeed(1)
         self:SetVelocity(0, -0.25, 0)
         self:SetVelocity(0.25)
-    end,
-
-    ---@param self CDepthChargeProjectile
-    ---@param tbl table
-    AddDepthCharge = function(self, tbl)
-        if not tbl then return end
-        if not tbl.Radius then return end
-        self.MyDepthCharge = DepthCharge {
-            Owner = self,
-            Radius = tbl.Radius or 10,
-        }
-        self.Trash:Add(self.MyDepthCharge)
     end,
 }
 

@@ -579,10 +579,14 @@ AIFSmartCharge = ClassWeapon(DefaultProjectileWeapon) {
 
     ---@param self AIFSmartCharge
     ---@param muzzle string
+    ---@return Projectile
     CreateProjectileAtMuzzle = function(self, muzzle)
         local proj = DefaultProjectileWeapon.CreateProjectileAtMuzzle(self, muzzle)
-        local tbl = self.Blueprint.DepthCharge
-        proj:AddDepthCharge(tbl)
+        local blueprint = self.Blueprint.DepthCharge
+        if blueprint then
+            proj:AddDepthCharge(blueprint)
+        end
+        return proj
     end,
 }
 
