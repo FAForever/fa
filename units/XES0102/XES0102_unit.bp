@@ -301,7 +301,7 @@ UnitBlueprint {
             MuzzleSalvoSize = 1,
             MuzzleVelocity = 5,
             ProjectileId = '/projectiles/TIMAntiTorpedo01/TIMAntiTorpedo01_proj.bp',
-            ProjectileLifetime = 2.5,
+            ProjectileLifetime = 6,
             RackBones = {
                 {
                     MuzzleBones = {

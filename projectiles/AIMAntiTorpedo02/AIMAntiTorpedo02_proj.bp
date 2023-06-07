@@ -34,7 +34,7 @@ ProjectileBlueprint {
         MaxSpeed = 30,
         StayUnderwater = true,
         TrackTarget = true,
-        TurnRate = 720,
+        TurnRate = 540,
         UseGravity = false,
         VelocityAlign = true,
     },
