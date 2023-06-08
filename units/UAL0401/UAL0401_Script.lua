@@ -45,7 +45,7 @@ UAL0401 = ClassUnit(AWalkingLandUnit) {
 
     OnCreate = function(self, spec)
         AWalkingLandUnit.OnCreate(self, spec)
-        self.Trash:Add(ForkThread(self.AdjustWeaponsThread,self))
+        self.Trash:Add(ForkThread(self.AdjustWeaponsThread, self))
     end,
 
     AdjustWeaponsThread = function(self)
@@ -111,17 +111,25 @@ UAL0401 = ClassUnit(AWalkingLandUnit) {
         explosion.CreateDefaultHitExplosionAtBone(self, 'Torso', 4.0)
         explosion.CreateDebrisProjectiles(self, explosion.GetAverageBoundingXYZRadius(self),
             { self.Blueprint.SizeX, self.Blueprint.SizeY, self.Blueprint.SizeZ })
-        WaitTicks(2)
+        WaitTicks(1)
         explosion.CreateDefaultHitExplosionAtBone(self, 'Right_Leg_B02', 1.0)
-        WaitTicks(2)
+        WaitTicks(1)
         explosion.CreateDefaultHitExplosionAtBone(self, 'Right_Leg_B01', 1.0)
-        WaitTicks(2)
+        WaitTicks(1)
         explosion.CreateDefaultHitExplosionAtBone(self, 'Left_Arm_B02', 1.0)
-        WaitTicks(4)
+        WaitTicks(3)
         explosion.CreateDefaultHitExplosionAtBone(self, 'Right_Arm_B01', 1.0)
         explosion.CreateDefaultHitExplosionAtBone(self, 'Right_Leg_B01', 1.0)
-        WaitTicks(36)
+
+        WaitTicks(15)
+        explosion.CreateDefaultHitExplosionAtBone(self, 'Right_Leg_B01', 1.0)
+        explosion.CreateDefaultHitExplosionAtBone(self, 'Right_Leg_B02', 1.0)
+        explosion.CreateDefaultHitExplosionAtBone(self, 'Left_Leg_B01', 1.0)
+        explosion.CreateDefaultHitExplosionAtBone(self, 'Left_Leg_B02', 1.0)
+        WaitTicks(38)
         explosion.CreateDefaultHitExplosionAtBone(self, 'Torso', 5.0)
+        explosion.CreateDefaultHitExplosionAtBone(self, 'Left_Arm_B02', 1.0)
+        explosion.CreateDefaultHitExplosionAtBone(self, 'Right_Arm_B01', 1.0)
         if self.DeathAnimManip then
             WaitFor(self.DeathAnimManip)
         end

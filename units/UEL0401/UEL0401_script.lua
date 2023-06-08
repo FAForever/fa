@@ -13,13 +13,31 @@ local TAALinkedRailgun = WeaponsFile.TAALinkedRailgun
 local TANTorpedoAngler = WeaponsFile.TANTorpedoAngler
 local EffectTemplate = import("/lua/effecttemplates.lua")
 local EffectUtil = import("/lua/effectutilities.lua")
-local CreateUEFBuildSliceBeams = EffectUtil.CreateUEFBuildSliceBeams
+
+local DefaultExplosions = import("/lua/defaultexplosions.lua")
 
 ---@class UEL0401 : TMobileFactoryUnit
 UEL0401 = ClassUnit(TMobileFactoryUnit) {
     PrepareToBuildAnimRate = 5,
     BuildAttachBone = 'Build_Attachpoint',
     RollOffBones = {'Arm_Right03_Build_Emitter', 'Arm_Left03_Build_Emitter', },
+
+    ExplosionBones = {
+        'Turret_Right01',
+        'Turret_Right02',
+        'Turret_Left01',
+        'Turret_Left02',
+        'Wheel_Right01',
+        'Wheel_Right02',
+        'Wheel_Left01',
+        'Wheel_Left02',
+        'Turret_Left_AA',
+        'Turret_Right_AA',
+        'Attachpoint01',
+        'Attachpoint02',
+        'Attachpoint03',
+        'Bay_Cover',
+    },
 
     Weapons = {
         RightTurret01 = ClassWeapon(TDFGaussCannonWeapon) {},
@@ -158,6 +176,111 @@ UEL0401 = ClassUnit(TMobileFactoryUnit) {
             v:Destroy()
         end
         self.ReleaseEffectsBag = {}
+    end,
+
+    ---@param self UEL0401
+    ---@param overkillRatio number
+    ---@param instigator Unit
+    DeathThread = function(self, overkillRatio, instigator)
+
+        self:PlayUnitSound('Destroyed')
+
+        -- transform data
+        local explosionBones = { }
+        local explosionBoneCount = table.getn(self.ExplosionBones)
+
+        if instigator then
+            -- if there is an instigator, favor exploding bits that are near the instigator
+            local ix, iy, iz = instigator:GetPositionXYZ()
+            for k, bone in self.ExplosionBones do
+                local bonePosition = self:GetPosition(bone)
+                local dx = bonePosition[1] - ix
+                local dy = bonePosition[2] - iy
+                local dz = bonePosition[3] - iz
+                local distance = dx * dx + dy * dy + dz * dz
+                explosionBones[k] =  {
+                    Distance = distance,
+                    BoneName = bone,
+                    Position = bonePosition
+                }
+            end
+
+            -- sort the order
+            table.sort(explosionBones, function(e1, e2) return e1.Distance < e2.Distance end)
+        else
+            -- if there is no instigator (self destruct, for example) then take a random direction
+            for k, bone in self.ExplosionBones do
+                local bonePosition = self:GetPosition(bone)
+                explosionBones[k] =  {
+                    Distance = 0,
+                    BoneName = bone,
+                    Position = bonePosition
+                }
+            end
+
+            -- shuffle the order
+            for k = explosionBoneCount, 1, -1 do
+                local j = (Random(1, k)) ^ 0;
+                local value = explosionBones[j];
+                explosionBones[j] = explosionBones[k];
+                explosionBones[k] = value;
+            end
+        end
+
+        -- create a few random sparks
+        CreateAttachedEmitter(self, -1, self.Army, '/effects/emitters/explosion_fire_sparks_02_emit.bp')
+
+        -- create explosions that gradually move away from the instigator
+        self:PlayUnitSound('Destroyed')
+        for k = 1, 2 do
+            local index = Random(1, 3)
+            local bone = explosionBones[index]
+            DamageArea(self, bone.Position, 2, 1, "TreeFire", false, false)
+            DefaultExplosions.CreateDefaultHitExplosionAtBone(self, bone.BoneName, 1.0)
+            DefaultExplosions.CreateFirePlume(self, self.Army, bone.BoneName)
+            DefaultExplosions.CreateSmallDebrisEmitters(self, self.Army, bone.BoneName)
+            DefaultExplosions.CreateDebrisProjectiles(self, 0.2, { self.Blueprint.SizeX, self.Blueprint.SizeY, self.Blueprint.SizeZ })
+        end
+
+        WaitTicks(1)
+        self:PlayUnitSound('Destroyed')
+        for k = 1, 3 do
+            local index = Random(2, 5)
+            local bone = explosionBones[index]
+            DamageArea(self, bone.Position, 3, 1, "TreeFire", false, false)
+            DefaultExplosions.CreateDefaultHitExplosionAtBone(self, bone.BoneName, 1.0)
+            DefaultExplosions.CreateFirePlume(self, self.Army, bone.BoneName)
+            DefaultExplosions.CreateSmallDebrisEmitters(self, self.Army, bone.BoneName)
+            DefaultExplosions.CreateDebrisProjectiles(self, 0.2, { self.Blueprint.SizeX, self.Blueprint.SizeY, self.Blueprint.SizeZ })
+        end
+
+        WaitTicks(1)
+        self:PlayUnitSound('Destroyed')
+        DefaultExplosions.CreateScalableUnitExplosion(self)
+        for k = 1, 3 do
+            local index = Random(3, 7)
+            local bone = explosionBones[index]
+            DamageArea(self, bone.Position, 4, 1, "TreeForce", false, false)
+            DefaultExplosions.CreateDefaultHitExplosionAtBone(self, bone.BoneName, 1.0)
+            DefaultExplosions.CreateFirePlume(self, self.Army, bone.BoneName)
+            DefaultExplosions.CreateSmallDebrisEmitters(self, self.Army, bone.BoneName)
+            DefaultExplosions.CreateDebrisProjectiles(self, 0.2, { self.Blueprint.SizeX, self.Blueprint.SizeY, self.Blueprint.SizeZ })
+        end
+
+        WaitTicks(1)
+        self:PlayUnitSound('Destroyed')
+        DefaultExplosions.CreateScalableUnitExplosion(self)
+        for k = 1, 5 do
+            local index = Random(4, explosionBoneCount)
+            local bone = explosionBones[index]
+            DamageArea(self, bone.Position, 5, 1, "TreeForce", false, false)
+            DefaultExplosions.CreateDefaultHitExplosionAtBone(self, bone.BoneName, 1.0)
+            DefaultExplosions.CreateFirePlume(self, self.Army, bone.BoneName)
+            DefaultExplosions.CreateSmallDebrisEmitters(self, self.Army, bone.BoneName)
+            DefaultExplosions.CreateDebrisProjectiles(self, 0.2, { self.Blueprint.SizeX, self.Blueprint.SizeY, self.Blueprint.SizeZ })
+        end
+
+        self:DestroyUnit(overkillRatio)
     end,
 }
 

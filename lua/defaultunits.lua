@@ -330,14 +330,14 @@ StructureUnit = ClassUnit(Unit) {
         local cutoffAlbedo = meshBlueprint.LODs[2].LODCutoff
         if not cutoffAlbedo then
             cutoffAlbedo = cutoffOthers
-            cutoffOthers = 0.4 * cutoffOthers
+            cutoffOthers = 0.3 * cutoffOthers
         else
             cutoffOthers = 0.8 * cutoffOthers
         end
 
-        -- take into account the fading of the decal
-        cutoffAlbedo = 1.1 * cutoffAlbedo
-        cutoffOthers = 1.1 * cutoffOthers
+        -- reduce the LOD for performance
+        cutoffAlbedo = 0.75 * cutoffAlbedo
+        cutoffOthers = 0.75 * cutoffOthers
 
         -- determine orientation
         if not orientation then
