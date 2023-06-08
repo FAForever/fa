@@ -634,13 +634,14 @@ OverchargeProjectile = ClassSimple {
             damage = math.min(damage, idealDamage)
             damage = math.max(data.minDamage, damage)
             -- prevents radars blinks if there is less than 5k e in storage when OC hits the target
-            if energyAvailable < 5000 then
+            if energyAvailable < 7500 then
                 damage = energyLimitDamage
-            end
+            end   
         end
-
+        LOG("damage:", damage)
         -- Turn the final damage into energy
         local drain = self:DamageAsEnergy(damage)
+
 
         self.DamageData.DamageAmount = damage
 
