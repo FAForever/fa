@@ -4,23 +4,29 @@
 ---@class FileName: string, stringlib
 ---@operator concat(FileName | string): FileName
 
----@class Quaternion
----@field [1] number    # y
----@field [2] number    # z
----@field [3] number    # x
----@field [4] number    # w
-
----@class Vector
----@field [1] number    # x
----@field [2] number    # y (up)
----@field [3] number    # z
----@field x number      # east/west
----@field y number      # up/down
----@field z number      # north/south
-
----@class Vector2
+---@class VectorBase
 ---@field [1] number    # x
 ---@field [2] number    # y
+---@field x number
+---@field y number
+
+---@class Quaternion : VectorBase
+---@operator mul(Quaternion): Quaternion
+---@operator mul(Vector): Quaternion
+---@operator mul(number): Quaternion
+---@field [3] number    # z
+---@field [4] number    # w
+---@field z number
+
+---@class Vector : VectorBase
+---@operator mul(Quaternion): Quaternion
+---@operator mul(Vector): Vector
+---@operator mul(number): Vector
+---@field [3] number    # z
+---@field z number
+
+---@class Vector2 : VectorBase
+---@operator mul(number): Vector2
 
 --- A point-to-point based rectangle, where the first point is usually in the top left corner
 ---@class Rectangle
