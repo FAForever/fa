@@ -900,3 +900,103 @@ function CreateTimer()
          end
     }
 end
+
+local vector_metatable = getmetatable(Vector2(0, 0))
+
+Quaternion = function(w, x, y, z)
+    return setmetatable({w, x, y, z}, vector_metatable)
+end
+
+---@overload fun(a: Quaternion, b: Vector): Quaternion   rotation composition
+---@overload fun(a: Quaternion, b: number): Quaternion   scaling
+---@overload fun(a: Vector, b: Quaternion): Quaternion   rotation composition
+---@overload fun(a: Vector, b: Vector): Vector           cross product
+---@overload fun(a: Vector, b: number): Vector           scaling
+---@overload fun(a: Vector2, b: number): Vector2         scaling
+---@param a Quaternion
+---@param b Quaternion
+---@return Quaternion
+function vector_metatable.__mul(a, b)
+    local a3 = rawget(a, 3)
+    if type(b) == "number" then
+        if rawget(a, 4) then
+            -- Even though we could multiply each component by the scalar, scaling an orientation
+            -- doesn't make sense and would break the unit length invariant
+            error("incompatible vector type for scalar multiplication: quaternion")
+        end
+        if a3 then
+            -- Vector * Scalar
+            ---@diagnostic disable-next-line: return-type-mismatch
+            return Vector(a[1] * b, a[2] * b, a3 * b)
+        end
+        -- Vector2 * Scalar
+        ---@diagnostic disable-next-line: return-type-mismatch
+        return Vector2(a[1] * b, a[2] * b)
+    end
+
+    if getmetatable(a) ~= getmetatable(b) then
+        error("invalid argument for vector multiplication")
+    end
+    local b3 = rawget(b, 3)
+    if not a3 or not b3 then
+        error("incompatible vector type for multiplication: Vector2")
+    end
+
+    local a4 = rawget(a, 4)
+    if a4 then
+        local a1, a2 = a[1], a[2]
+        local b4 = rawget(b, 4)
+        if b4 then
+            -- Quaternion * Quaternion
+            local b1, b2 = b[1], b[2]
+            return Quaternion(
+                a1 * b1 - a2 * b2 - a3 * b3 - a4 * b4,
+                a1 * b2 + a2 * b1 + a3 * b4 - a4 * b3,
+                a1 * b3 + a3 * b1 + a4 * b2 - a2 * b4,
+                a1 * b4 + a4 * b1 + a2 * b3 - a3 * b2
+            )
+        end
+
+        -- Quaternion * Vector (Quaternion with no spin)
+        local q2, q3, q4 = b[1], b[2], b3
+        local len = q2*q2 + q3*q3 + q4*q4
+        if len ~= 1 then
+            -- normalize any vectors that might not represent a direction cosine
+            len = math.sqrt(len)
+            q2, q3, q4 = q2 / len, q3 / len, q4 / len
+        end
+        return Quaternion(
+                    - a2 * q2 - a3 * q3 - a4 * q4,
+            a1 * q2           + a3 * q4 - a4 * q3,
+            a1 * q3           + a4 * q2 - a2 * q4,
+            a1 * q4           + a2 * q3 - a3 * q2
+        )
+    end
+
+    local b1, b2, b4 = b[1], b[2], rawget(b, 4)
+    if b4 then
+        -- Vector (Quaternion with no spin) * Quaternion
+        local q2, q3, q4 = a[1], a[2], a3
+        local len = q2*q2 + q3*q3 + q4*q4
+        if len ~= 1 then
+            -- normalize any vectors that might not represent a direction cosine
+            len = math.sqrt(len)
+            q2, q3, q4 = q2 / len, q3 / len, q4 / len
+        end
+        return Quaternion(
+            -q2 * b2 - q3 * b3 - q4 * b4,
+             q2 * b1 + q3 * b4 - q4 * b3,
+             q3 * b1 + q4 * b2 - q2 * b4,
+             q4 * b1 + q2 * b3 - q3 * b2
+        )
+    end
+
+    -- Vector x Vector (cross-product)
+    local a1, a2 = a[1], a[2]
+    ---@diagnostic disable-next-line: return-type-mismatch
+    return Vector(
+        a2 * b3 - a3 * b2,
+        a3 * b1 - a1 * b3,
+        a1 * b2 - a2 * b1
+    )
+end

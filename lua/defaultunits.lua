@@ -15,7 +15,6 @@ local Buff = import("/lua/sim/buff.lua")
 local AdjacencyBuffs = import("/lua/sim/adjacencybuffs.lua")
 local FireState = import("/lua/game.lua").FireState
 local ScenarioFramework = import("/lua/scenarioframework.lua")
-local Quaternion = import("/lua/shared/quaternions.lua").Quaternion
 
 local MathAbs = math.abs
 
@@ -103,10 +102,7 @@ StructureUnit = ClassUnit(Unit) {
             if a1 != 0 or a2 != 0 then
                 -- quaternion magic incoming, be prepared! Note that the yaw axis is inverted, but then
                 -- re-inverted again by multiplying it with the original orientation
-                local quatSlope = Quaternion.fromAngle(0, 0 - a2,-1 * a1)
-                local quatOrient = setmetatable(self:GetOrientation(), Quaternion)
-                local quat = quatOrient * quatSlope
-                self:SetOrientation(quat, true)
+                self:SetOrientation(EulerToQuaternion(0, -a2, -a1) * self:GetOrientation(), true)
 
                 -- technically obsolete, but as this is part of an integration we don't want to break
                 -- the mod package that it originates from. Originates from the BrewLan mod suite
