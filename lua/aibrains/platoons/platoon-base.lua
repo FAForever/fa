@@ -289,8 +289,8 @@ AIPlatoon = Class(moho.platoon_methods) {
     ---@param self AIPlatoon
     ---@param transport Unit
     ---@param attachBone Bone
-    ---@param deattachedUnit Unit
-    OnTransportDetach = function(self, transport, attachBone, deattachedUnit)
+    ---@param detachedUnit Unit
+    OnTransportDetach = function(self, transport, attachBone, detachedUnit)
     end,
 
     --- Called as a unit (with transport capabilities) of this platoon aborts the a transport order
