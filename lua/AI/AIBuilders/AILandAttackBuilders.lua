@@ -962,17 +962,14 @@ BuilderGroup {
     -- Seek and destroy
     Builder {
         BuilderName = 'T1 Hunters',
-        PlatoonTemplate = 'HuntAttackSmall',
+        PlatoonTemplate = 'StateMachinePlatoon',
         Priority = 990,
         InstanceCount = 2,
         BuilderType = 'Any',
         BuilderData = {
             NeverGuardBases = true,
             NeverGuardEngineers = true,
-            --UseFormation = 'AttackFormation',
-            ThreatWeights = {
-                IgnoreStrongerTargetsRatio = 100.0,
-            },
+            StateMachine = 'AIPlatoonAdaptiveAttackBehavior',
         },
         BuilderConditions = {
             { MIBC, 'IsIsland', { false } }, --DUNCAN - added to stop units bunching on island maps
@@ -984,39 +981,33 @@ BuilderGroup {
     -- Seek and destroy
     Builder {
         BuilderName = 'T2 Hunters',
-        PlatoonTemplate = 'HuntAttackMedium',
+        PlatoonTemplate = 'StateMachinePlatoon',
         Priority = 990,
         InstanceCount = 2,
         BuilderType = 'Any',
         BuilderData = {
             NeverGuardBases = true,
             NeverGuardEngineers = true,
-            --UseFormation = 'AttackFormation',
-            ThreatWeights = {
-                IgnoreStrongerTargetsRatio = 100.0,
-            },
+            StateMachine = 'AIPlatoonAdaptiveAttackBehavior',
         },
         BuilderConditions = {
             { MIBC, 'IsIsland', { false } }, --DUNCAN - added to stop units bunching on island maps
             { UCBC, 'PoolLessAtLocation', { 'LocationType', 1, categories.MOBILE * categories.LAND - categories.ENGINEER - categories.TECH1 } },
-            { LandAttackCondition, { 'LocationType', 15 } },
+            { LandAttackCondition, { 'LocationType', 20 } },
         },
     },
 
     -- Seek and destroy
     Builder {
         BuilderName = 'T1 LAB Hunters',
-        PlatoonTemplate = 'LABAttack',
+        PlatoonTemplate = 'StateMachinePlatoon',
         Priority = 1000,
         InstanceCount = 4,
         BuilderType = 'Any',
         BuilderData = {
             NeverGuardBases = true,
             NeverGuardEngineers = true,
-            --UseFormation = 'AttackFormation',
-            ThreatWeights = {
-                IgnoreStrongerTargetsRatio = 100.0,
-            },
+            StateMachine = 'AIPlatoonAdaptiveAttackBehavior',
         },
         BuilderConditions = {
             { MIBC, 'IsIsland', { false } }, --DUNCAN - added to stop units bunching on island maps

@@ -4927,6 +4927,9 @@ Platoon = Class(moho.platoon_methods) {
         elseif machineType == 'AIPlatoonAdaptiveReclaimBehavior' then
             LOG('Starting State Reclaim')
             import("/lua/aibrains/platoons/platoon-adaptive-reclaim.lua").AssignToUnitsMachine({ }, self, self:GetPlatoonUnits())
+        elseif machineType == 'AIPlatoonAdaptiveAttackBehavior' then
+            LOG('Starting State Attack')
+            import("/lua/aibrains/platoons/platoon-adaptive-attack.lua").AssignToUnitsMachine({ }, self, self:GetPlatoonUnits())
         end
 
         WaitTicks(50)
