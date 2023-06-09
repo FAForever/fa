@@ -181,6 +181,7 @@ UnitBlueprint {
         UnitWeight = 1,
     },
     Intel = {
+        OmniRadius = 15,
         ReactivateTime = 10,
         RemoteViewingRadius = 25,
         VisionRadius = 15,
