@@ -147,10 +147,8 @@ function RemoteViewing(SuperClass)
             end
             if self.RemoteViewingData.IntelButton then
                 self:DisableVisibleEntity()
-                if fraction > 0 then
-                    self.RemoteViewingData.DisableCounter = self.RemoteViewingData.DisableCounter + 1
-                    self.RemoteViewingData.ResourceThread = self:ForkThread(self.EnableResourceMonitor)
-                end
+                self.RemoteViewingData.DisableCounter = self.RemoteViewingData.DisableCounter + 1
+                self.RemoteViewingData.ResourceThread = self:ForkThread(self.EnableResourceMonitor)
             end
         end,
 
