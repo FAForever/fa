@@ -638,7 +638,6 @@ OverchargeProjectile = ClassSimple {
                 damage = energyLimitDamage
             end   
         end
-        LOG("damage:", damage)
         -- Turn the final damage into energy
         local drain = self:DamageAsEnergy(damage)
 
