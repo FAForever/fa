@@ -145,6 +145,8 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
     EnergyModifier = 0,
     MassModifier = 0,
 
+
+
     ---@param self Unit
     ---@return any
     GetSync = function(self)
@@ -2729,6 +2731,9 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
     ---@param attachBone Bone
     ---@param attachedUnit Unit
     OnTransportAttach = function(self, attachBone, attachedUnit)
+        -- manual Lua callback for the unit
+        attachedUnit:OnAttachedToTransport(self, attachBone)
+
         -- awareness of event for campaign scripts
         local callbacks = self.EventCallbacks['OnTransportAttach']
         if callbacks then
@@ -2736,9 +2741,6 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
                 cb(self, attachBone, attachedUnit)
             end
         end
-
-        -- manual Lua callback for the unit
-        attachedUnit:OnAttachedToTransport(self, attachBone)
 
         -- awareness of event for AI
         local aiPlatoon = self.AIPlatoonReference
@@ -2750,23 +2752,23 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
     --- Called as this unit (with transport capabilities) deattached another unit from itself
     ---@param self Unit
     ---@param attachBone Bone
-    ---@param deattachedUnit Unit
-    OnTransportDetach = function(self, attachBone, deattachedUnit)
+    ---@param detachedUnit Unit
+    OnTransportDetach = function(self, attachBone, detachedUnit)
+        -- manual Lua callback
+        detachedUnit:OnDetachedFromTransport(self, attachBone) -- <-- this is what causes it to hang
+
         -- awareness of event for campaign scripts
         local callbacks = self.EventCallbacks['OnTransportDetach']
         if callbacks then
             for _, cb in callbacks do
-                cb(self, attachBone, deattachedUnit)
+                cb(self, attachBone, detachedUnit)
             end
         end
-
-        -- manual Lua callback
-        deattachedUnit:OnDetachedFromTransport(self, attachBone)
 
         -- awareness of event for AI
         local aiPlatoon = self.AIPlatoonReference
         if aiPlatoon then
-            aiPlatoon:OnTransportDetach(self, attachBone, deattachedUnit)
+            aiPlatoon:OnTransportDetach(self, attachBone, detachedUnit)
         end
     end,
 

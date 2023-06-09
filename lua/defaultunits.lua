@@ -2249,6 +2249,18 @@ AirUnit = ClassUnit(MobileUnit) {
 
         return MobileUnit.OnCollisionCheck(self, other, firingWeapon)
     end,
+
+    --- Invert what we do 
+    ---@param self MobileUnit
+    ---@param transport AirUnit
+    ---@param bone Bone
+    OnDetachedFromTransport = function(self, transport, bone)
+        MobileUnit.OnDetachedFromTransport(self, transport, bone)
+
+         -- Set unit immobile to prevent it to accelerating in the air, cleared in OnLayerChange
+        self:SetImmobile(false)
+        self.transportDrop = nil
+    end,
 }
 
 --- Mixin transports (air, sea, space, whatever). Sellotape onto concrete transport base classes as desired.
