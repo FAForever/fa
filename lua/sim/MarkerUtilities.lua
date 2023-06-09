@@ -276,22 +276,6 @@ local DebugMarkerSuspend = {}
 ---@param type MarkerChain The type of markers you wish to debug.
 function ToggleDebugMarkersByType(type)
 
-    local count = 0
-    for k, brain in ArmyBrains do
-        if brain.BrainType == "Human" then
-            count = count + 1
-        end
-    end
-
-    local onePlayer = count <= 1
-    local cheatsEnabled = CheatsEnabled()
-
-    -- prevent it from working
-    if not (cheatsEnabled or onePlayer) then
-        WARN("Unable to debug AI grid: cheats are disabled or there is more than one player")
-        return
-    end
-
     SPEW("Toggled type to debug: " .. type)
 
     -- get the thread if it exists
@@ -386,23 +370,7 @@ local DebugChainSuspend = {}
 -- to check for errors. Can be toggled on and off by calling it again.
 ---@param name MarkerChain The name of the chain you wish to debug.
 function ToggleDebugChainByName(name)
-
-    local count = 0
-    for k, brain in ArmyBrains do
-        if brain.BrainType == "Human" then
-            count = count + 1
-        end
-    end
-
-    local onePlayer = count <= 1
-    local cheatsEnabled = CheatsEnabled()
-
-    -- prevent it from working
-    if not (cheatsEnabled or onePlayer) then
-        WARN("Unable to debug AI grid: cheats are disabled or there is more than one player")
-        return
-    end
-
+    
     SPEW("Toggled chain to debug: " .. name)
 
     -- get the thread if it exists
