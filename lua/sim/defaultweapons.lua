@@ -145,7 +145,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
     -- This function creates the projectile, and happens when the unit is trying to fire
     -- Called from inside RackSalvoFiringState
     ---@param self DefaultProjectileWeapon
-    ---@param muzzle string
+    ---@param muzzle Bone
     ---@return Projectile
     CreateProjectileAtMuzzle = function(self, muzzle)
         local proj = self:CreateProjectileForWeapon(muzzle)

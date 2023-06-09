@@ -115,9 +115,11 @@ URL0401 = ClassUnit(CLandUnit) {
                     end
                 end
                 
-                CIFArtilleryWeapon.CreateProjectileAtMuzzle(self, muzzleIdx)
+                local projectile = CIFArtilleryWeapon.CreateProjectileAtMuzzle(self, muzzleIdx)
                 self:ForkThread(self.LaunchEffects)
                 self:ForkThread(self.RotateBarrels)
+
+                return projectile
             end,
 	RotateBarrels = function(self)
                 if not self.losttarget then

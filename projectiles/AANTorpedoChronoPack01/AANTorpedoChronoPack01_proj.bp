@@ -16,11 +16,12 @@ ProjectileBlueprint {
         'PROJECTILE',
         'ANTINAVY',
         'TORPEDO',
-        'NOSPLASHDAMAGE',
     },
     Defense = {
+        MaxHealth = 1,
         Health = 1,
     },
+    DesiredShooterCap = 1,
     Display = {
         Mesh = {
             LODs = {
@@ -35,13 +36,6 @@ ProjectileBlueprint {
     },
     General = {
         Category = 'Anti Navy',
-        EntityCategory = {
-            'AEON',
-            'PROJECTILE',
-            'ANTINAVY',
-            'TORPEDO',
-            'NOSPLASHDAMAGE',
-        },
         Faction = 'Aeon',
         Weapon = 'Chrono Torpedo',
     },
@@ -55,8 +49,13 @@ ProjectileBlueprint {
         MaxSpeed = 18,
         StayUnderwater = true,
         TrackTarget = true,
-        TurnRate = 230,
+        TurnRate = 180,
         UseGravity = false,
         VelocityAlign = true,
+
+        -- these parameters make the path of the torpedo feel unique
+        AccelerationRange = 2,
+        MaxZigZag = 1,
+        ZigZagFrequency = 0.4,
     },
 }

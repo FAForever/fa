@@ -31,8 +31,8 @@ SANHeavyCavitationTorpedo02 = ClassProjectile(SHeavyCavitationTorpedo) {
         self:SetCollideSurface(false)
     end,
 
-    OnCreate = function(self)
-        SHeavyCavitationTorpedo.OnCreate(self)
+    OnCreate = function(self, inWater)
+        SHeavyCavitationTorpedo.OnCreate(self, inWater)
         self.Trash:Add(ForkThread(self.ProjectileSplit,self))
         self.AirTrails = CreateEmitterOnEntity(self,self.Army,EffectTemplate.SHeavyCavitationTorpedoFxTrails02)
     end,
