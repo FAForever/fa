@@ -201,8 +201,8 @@ end
 function HasLocalizedVO(language)
 end
 
----@param army1 number
----@param army2 number
+---@param army1 Army
+---@param army2 Army
 ---@return boolean
 function IsAlly(army1, army2)
 end
@@ -213,14 +213,14 @@ end
 function IsDestroyed(entity)
 end
 
----@param army1 number
----@param army2 number
+---@param army1 Army
+---@param army2 Army
 ---@return boolean
 function IsEnemy(army1, army2)
 end
 
----@param army1 number
----@param army2 number
+---@param army1 Army
+---@param army2 Army
 ---@return boolean
 function IsNeutral(army1, army2)
 end

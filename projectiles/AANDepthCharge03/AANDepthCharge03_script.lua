@@ -3,37 +3,9 @@ local ADepthChargeProjectile = import("/lua/aeonprojectiles.lua").ADepthChargePr
 local VisionMarkerOpti = import("/lua/sim/vizmarker.lua").VisionMarkerOpti
 
 AANDepthCharge03 = ClassProjectile(ADepthChargeProjectile) {
-    CountdownLength = 101,
 
     OnCreate = function(self)
         ADepthChargeProjectile.OnCreate(self)
-        self.HasImpacted = false
-        self.Trash:Add(ForkThread(self.CountdownExplosion,self))
-    end,
-
-    CountdownExplosion = function(self)
-        WaitTicks(self.CountdownLength)
-        if not self.HasImpacted then
-            self:OnImpact('Underwater', nil)
-        end
-    end,
-
-    OnEnterWater = function(self)
-        ADepthChargeProjectile.OnEnterWater(self)
-        self:SetTurnRate(360)
-    end,
-
-    OnLostTarget = function(self)
-        self:SetMaxSpeed(2)
-        self:SetAcceleration(-0.6)
-        self.Trash:Add(ForkThread(self.CountdownMovement,self))
-    end,
-
-    CountdownMovement = function(self)
-        WaitTicks(31)
-        self:SetMaxSpeed(0)
-        self:SetAcceleration(0)
-        self:SetVelocity(0)
     end,
 
     OnImpact = function(self, TargetType, TargetEntity)
@@ -43,6 +15,32 @@ AANDepthCharge03 = ClassProjectile(ADepthChargeProjectile) {
         marker:UpdateDuration(5)
         marker:UpdateIntel(self.Army, 5, 'Vision', true)
         ADepthChargeProjectile.OnImpact(self, TargetType, TargetEntity)
+    end,
+
+    ---@param self TANAnglerTorpedo06
+    OnEnterWater = function(self)
+        ADepthChargeProjectile.OnEnterWater(self)
+
+        -- set the magnitude of the velocity to something tiny to really make that water
+        -- impact slow it down. We need this to prevent torpedo's striking the bottom
+        -- of a shallow pond, like in setons
+        self:SetVelocity(0)
+        self:SetAcceleration(0.5)
+    end,
+
+    --- Adjusted movement thread to gradually speed up the torpedo. It needs to slowly speed
+    --- up to prevent it from hitting the floor in relative undeep water
+    ---@param self TANAnglerTorpedo06
+    MovementThread = function(self)
+        WaitTicks(1)
+        for k = 1, 6 do
+            WaitTicks(1)
+            if not IsDestroyed(self) then
+                self:SetAcceleration(k)
+            else
+                break
+            end
+        end
     end,
 }
 TypeClass = AANDepthCharge03

@@ -44,7 +44,7 @@ local function PostProcessProjectile(projectile)
     end
 
     -- fix desired shooter cap for missiles
-    if projectile.CategoriesHash['MISSILE'] and (not projectile.CategoriesHash['STRATEGIC']) then
+    if (projectile.CategoriesHash['MISSILE'] and (not projectile.CategoriesHash['STRATEGIC'])) or projectile.CategoriesHash["TORPEDO"] then
         if not projectile.DesiredShooterCap then
             projectile.DesiredShooterCap = projectile.Defense.Health or 1
         else
