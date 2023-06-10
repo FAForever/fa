@@ -150,8 +150,8 @@ UnitBlueprint {
         UpgradesTo = 'xsb3202',
     },
     Intel = {
-        ReactivateTime = 10,
         ShowIntelOnSelect = true,
+        ReactivateTime = 2,
         SonarRadius = 180,
         VisionRadius = 20,
     },

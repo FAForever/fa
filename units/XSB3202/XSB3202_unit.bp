@@ -170,6 +170,7 @@ UnitBlueprint {
     Intel = {
         ReactivateTime = 10,
         ShowIntelOnSelect = true,
+        ReactivateTime = 4,
         SonarRadius = 350,
         VisionRadius = 25,
     },

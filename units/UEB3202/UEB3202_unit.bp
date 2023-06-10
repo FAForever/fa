@@ -145,7 +145,7 @@ UnitBlueprint {
         UpgradesTo = 'ues0305',
     },
     Intel = {
-        ReactivateTime = 10,
+        ReactivateTime = 4,
         ShowIntelOnSelect = true,
         SonarRadius = 290,
         VisionRadius = 25,

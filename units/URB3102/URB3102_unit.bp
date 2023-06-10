@@ -140,8 +140,8 @@ UnitBlueprint {
         UpgradesTo = 'urb3202',
     },
     Intel = {
-        ReactivateTime = 10,
         ShowIntelOnSelect = true,
+        ReactivateTime = 2,
         SonarRadius = 160,
         VisionRadius = 20,
     },

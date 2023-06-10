@@ -143,9 +143,9 @@ UnitBlueprint {
         UpgradesTo = 'uab3202',
     },
     Intel = {
-        ReactivateTime = 10,
         ShowIntelOnSelect = true,
         SonarRadius = 160,
+        ReactivateTime = 2,
         VisionRadius = 20,
     },
     Interface = {
