@@ -777,12 +777,15 @@ StructureUnit = ClassUnit(Unit) {
             -- edge case for missile construction: the buff doesn't apply to the missile under construction
             if adjacentUnit.Blueprint.CategoriesHash["SILO"] then
                 if adjacentUnit:IsUnitState('SiloBuildingAmmo') then
+                    local autoModeEnabled = adjacentUnit.AutoModeEnabled
                     local progress = adjacentUnit:GetWorkProgress()
                     if progress < 0.99 then
                         adjacentUnit:StopSiloBuild()
                         IssueSiloBuildTactical({adjacentUnit})
-                        adjacentUnit:SetAutoMode(true)
                         adjacentUnit:GiveNukeSiloBlocks(progress)
+                        if autoModeEnabled then
+                            adjacentUnit:SetAutoMode(true)
+                        end
                     end
                 end
             end
@@ -826,12 +829,15 @@ StructureUnit = ClassUnit(Unit) {
             -- edge case for missile construction: the buff doesn't apply to the missile under construction
             if adjacentUnit.Blueprint.CategoriesHash["SILO"] then
                 if adjacentUnit:IsUnitState('SiloBuildingAmmo') then
+                    local autoModeEnabled = adjacentUnit.AutoModeEnabled
                     local progress = adjacentUnit:GetWorkProgress()
                     if progress < 0.99 then
                         adjacentUnit:StopSiloBuild()
                         IssueSiloBuildTactical({adjacentUnit})
-                        adjacentUnit:SetAutoMode(true)
                         adjacentUnit:GiveNukeSiloBlocks(progress)
+                        if autoModeEnabled then
+                            adjacentUnit:SetAutoMode(true)
+                        end
                     end
                 end
             end

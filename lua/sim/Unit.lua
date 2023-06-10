@@ -114,6 +114,7 @@ local cUnit = moho.unit_methods
 ---@field EngineCommandCap? table<string, boolean>
 ---@field UnitBeingBuilt Unit?
 ---@field SoundEntity? Unit | Entity
+---@field AutoModeEnabled? boolean
 Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
 
     IsUnit = true,
@@ -4638,6 +4639,14 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         if IsDestroyed(transport) then
             self:Destroy()
         end
+    end,
+
+    OnAutoModeOn = function(self)
+        self.AutoModeEnabled = true
+    end,
+
+    OnAutoModeOff = function(self)
+        self.AutoModeEnabled = true
     end,
 
     -- Utility Functions
