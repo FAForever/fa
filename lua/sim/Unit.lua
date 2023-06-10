@@ -4646,7 +4646,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
     end,
 
     OnAutoModeOff = function(self)
-        self.AutoModeEnabled = true
+        self.AutoModeEnabled = false
     end,
 
     -- Utility Functions
