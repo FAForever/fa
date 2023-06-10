@@ -763,12 +763,31 @@ StructureUnit = ClassUnit(Unit) {
         adjacentUnit.AdjacentUnits[self.EntityId] = self
 
         -- apply the buffs
+        local buffApplied = false
         if self.ConsumptionActive then
             for k, v in AdjacencyBuffs[adjBuffs] do
+                buffApplied = true
                 Buff.ApplyBuff(adjacentUnit, v, self)
             end
         end
 
+        -- fix edge cases when buffs are applied
+        if buffApplied then
+
+            -- edge case for missile construction: the buff doesn't apply to the missile under construction
+            if adjacentUnit.Blueprint.CategoriesHash["SILO"] then
+                if adjacentUnit:IsUnitState('SiloBuildingAmmo') then
+                    local progress = adjacentUnit:GetWorkProgress()
+                    if progress < 0.99 then
+                        adjacentUnit:StopSiloBuild()
+                        IssueSiloBuildTactical({adjacentUnit})
+                        adjacentUnit:SetAutoMode(true)
+                        adjacentUnit:GiveNukeSiloBlocks(progress)
+                    end
+                end
+            end
+        end
+    
         -- refresh the UI
         self:RequestRefreshUI()
         adjacentUnit:RequestRefreshUI()
@@ -791,10 +810,29 @@ StructureUnit = ClassUnit(Unit) {
         end
 
         -- remove the buffs
+        local buffRemoved = false
         if adjBuffs and AdjacencyBuffs[adjBuffs] then
             for k, v in AdjacencyBuffs[adjBuffs] do
                 if Buff.HasBuff(adjacentUnit, v) then
+                    buffRemoved = true
                     Buff.RemoveBuff(adjacentUnit, v)
+                end
+            end
+        end
+
+        -- fix edge cases when buffs are removed
+        if buffRemoved then
+
+            -- edge case for missile construction: the buff doesn't apply to the missile under construction
+            if adjacentUnit.Blueprint.CategoriesHash["SILO"] then
+                if adjacentUnit:IsUnitState('SiloBuildingAmmo') then
+                    local progress = adjacentUnit:GetWorkProgress()
+                    if progress < 0.99 then
+                        adjacentUnit:StopSiloBuild()
+                        IssueSiloBuildTactical({adjacentUnit})
+                        adjacentUnit:SetAutoMode(true)
+                        adjacentUnit:GiveNukeSiloBlocks(progress)
+                    end
                 end
             end
         end
