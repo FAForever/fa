@@ -444,6 +444,10 @@ CompressedLabelTree = ClassCompressedLabelTree {
         end
     end,
 
+    Copy = function(self, other)
+
+    end,
+
     --- Generates the following neighbors, when they are valid:
     ---@param self CompressedLabelTreeLeaf
     ---@param bx number             # Location of top-left corner, in world space
@@ -900,6 +904,10 @@ end
 ---@param pzCache NavVerticalPathCache
 ---@param pCache NavPathCache
 ---@param bCache NavTerrainBlockCache
+---@return number   # minimum depth
+---@return number   # maximum depth
+---@return boolean  # all pathable
+---@return boolean  # all free of blockers
 function PopulateCaches(tCache, dCache, daCache, pxCache, pzCache, pCache, bCache, bx, bz, c)
     local MathAbs = math.abs
     local Mathmax = math.max
@@ -937,10 +945,26 @@ function PopulateCaches(tCache, dCache, daCache, pxCache, pzCache, pCache, bCach
 
     -- compute cliff walkability
     -- compute average depth
+    local allPathable = true
+    local minDepth = 0
+    local maxDepth = 0
     for z = 1, c do
         for x = 1, c do
-            pCache[z][x] = pxCache[z][x] and pzCache[z][x] and pxCache[z + 1][x] and pzCache[z][x + 1]
-            daCache[z][x] = (dCache[z][x] + dCache[z + 1][x] + dCache[z][x + 1] + dCache[z + 1][x + 1]) * 0.25
+            local pathable = pxCache[z][x] and pzCache[z][x] and pxCache[z + 1][x] and pzCache[z][x + 1]
+            pCache[z][x] = pathable
+            local depth = (dCache[z][x] + dCache[z + 1][x] + dCache[z][x + 1] + dCache[z + 1][x + 1]) * 0.25
+            daCache[z][x] = depth
+
+            -- pre-analyse the cell
+            if depth < minDepth then
+                minDepth = depth
+            end
+
+            if depth > maxDepth then
+                maxDepth = depth
+            end
+
+            allPathable = allPathable and pathable
         end
     end
 
@@ -962,13 +986,20 @@ function PopulateCaches(tCache, dCache, daCache, pxCache, pzCache, pCache, bCach
     end
 
     -- compute terrain path blockers
+    local allBlockerFree = true
     for z = 1, c do
         local absZ = bz + z
         for x = 1, c do
             local absX = bx + x
-            bCache[z][x] = (tlx <= absX and brx >= absX) and (tlz <= absZ and brz >= absZ) and (not GetTerrainType(absX, absZ).Blocking)
+            local blocked = (tlx <= absX and brx >= absX) and (tlz <= absZ and brz >= absZ) and (not GetTerrainType(absX, absZ).Blocking)
+            bCache[z][x] = blocked
+
+            -- pre-analyse the cell
+            allBlockerFree = allBlockerFree and blocked
         end
     end
+
+    return minDepth, maxDepth, allPathable, allBlockerFree
 end
 
 ---@param size number
@@ -1065,6 +1096,7 @@ local function GenerateCompressionGrids(size, threshold)
     local navAmphibious = NavGrids['Amphibious'] --[[@as NavGrid]]
     local navAir = NavGrids['Air'] --[[@as NavGrid]]
 
+    local flattenedSections = 0
     local tCache, dCache, daCache, pxCache, pzCache, pCache, bCache, rCache = InitCaches(size)
 
     for z = 0, LabelCompressionTreesPerAxis - 1 do
@@ -1078,28 +1110,105 @@ local function GenerateCompressionGrids(size, threshold)
             local labelTreeAir = CompressedLabelTree()
 
             -- pre-computing the caches is irrelevant layer-wise, so we just pick the Land layer
-            PopulateCaches(tCache, dCache, daCache, pxCache, pzCache, pCache, bCache, bx, bz, size)
+            local minDepth, maxDepth, allPathable, allBlockerFree = PopulateCaches(tCache, dCache, daCache, pxCache, pzCache, pCache, bCache, bx, bz, size)
 
-            ComputeLandPathingMatrix(size, daCache, pCache, bCache, rCache)
-            labelTreeLand:Compress(bx, bz, 0, 0, size, labelTreeLand, rCache, threshold, 'Land')
-            navLand:AddTree(z, x, labelTreeLand)
+            -- cell entirely consists of water
+            if minDepth > MinWaterDepthNaval then
+                -- flatten land
+                flattenedSections = flattenedSections + 1
+                labelTreeLand:Flatten(bx, bz, 0, 0, size, labelTreeLand, -1, 'Land')
+                navLand:AddTree(z, x, labelTreeLand)
 
-            ComputeNavalPathingMatrix(size, daCache, pCache, bCache, rCache)
-            labelTreeNaval:Compress(bx, bz, 0, 0, size, labelTreeNaval, rCache, 2 * threshold, 'Water')
-            navWater:AddTree(z, x, labelTreeNaval)
+                -- try to flatten naval / hover
+                if allBlockerFree then
+                    flattenedSections = flattenedSections + 1
+                    labelTreeNaval:Flatten(bx, bz, 0, 0, size, labelTreeNaval, 0, 'Water')
+                    navWater:AddTree(z, x, labelTreeNaval)
 
-            ComputeHoverPathingMatrix(size, daCache, pCache, bCache, rCache)
-            labelTreeHover:Compress(bx, bz, 0, 0, size, labelTreeHover, rCache, threshold, 'Hover')
-            navHover:AddTree(z, x, labelTreeHover)
+                    flattenedSections = flattenedSections + 1
+                    labelTreeHover:Flatten(bx, bz, 0, 0, size, labelTreeHover, 0, 'Hover')
+                    navHover:AddTree(z, x, labelTreeHover)
+                else
+                    ComputeNavalPathingMatrix(size, daCache, pCache, bCache, rCache)
+                    labelTreeNaval:Compress(bx, bz, 0, 0, size, labelTreeNaval, rCache, 2 * threshold, 'Water')
+                    navWater:AddTree(z, x, labelTreeNaval)
 
-            ComputeAmphPathingMatrix(size, daCache, pCache, bCache, rCache)
-            labelTreeAmph:Compress(bx, bz, 0, 0, size, labelTreeAmph, rCache, threshold, 'Amphibious')
-            navAmphibious:AddTree(z, x, labelTreeAmph)
+                    ComputeHoverPathingMatrix(size, daCache, pCache, bCache, rCache)
+                    labelTreeHover:Compress(bx, bz, 0, 0, size, labelTreeHover, rCache, threshold, 'Hover')
+                    navHover:AddTree(z, x, labelTreeHover)
+                end
 
+                -- try to flatten amphibious
+                if allPathable and allBlockerFree and maxDepth < MaxWaterDepthAmphibious then
+                    flattenedSections = flattenedSections + 1
+                    labelTreeAmph:Flatten(bx, bz, 0, 0, size, labelTreeAmph, 0, 'Amphibious')
+                    navAmphibious:AddTree(z, x, labelTreeAmph)
+                else
+                    ComputeAmphPathingMatrix(size, daCache, pCache, bCache, rCache)
+                    labelTreeAmph:Compress(bx, bz, 0, 0, size, labelTreeAmph, rCache, threshold, 'Amphibious')
+                    navAmphibious:AddTree(z, x, labelTreeAmph)
+                end
+
+            -- cell entirely consists of land
+            elseif maxDepth == 0 then
+                -- flatten naval
+                flattenedSections = flattenedSections + 1
+                labelTreeNaval:Flatten(bx, bz, 0, 0, size, labelTreeNaval, -1, 'Water')
+                navWater:AddTree(z, x, labelTreeNaval)
+
+                -- try to flatten land
+                if allPathable and allBlockerFree then
+                    flattenedSections = flattenedSections + 1
+                    labelTreeLand:Flatten(bx, bz, 0, 0, size, labelTreeLand, 0, 'Land')
+                    navLand:AddTree(z, x, labelTreeLand)
+
+                    flattenedSections = flattenedSections + 1
+                    labelTreeHover:Flatten(bx, bz, 0, 0, size, labelTreeHover, 0, 'Hover')
+                    navHover:AddTree(z, x, labelTreeHover)
+
+                    flattenedSections = flattenedSections + 1
+                    labelTreeAmph:Flatten(bx, bz, 0, 0, size, labelTreeAmph, 0, 'Amphibious')
+                    navAmphibious:AddTree(z, x, labelTreeAmph)
+                else
+                    ComputeLandPathingMatrix(size, daCache, pCache, bCache, rCache)
+                    labelTreeLand:Compress(bx, bz, 0, 0, size, labelTreeLand, rCache, threshold, 'Land')
+                    navLand:AddTree(z, x, labelTreeLand)
+
+                    ComputeHoverPathingMatrix(size, daCache, pCache, bCache, rCache)
+                    labelTreeHover:Compress(bx, bz, 0, 0, size, labelTreeHover, rCache, threshold, 'Hover')
+                    navHover:AddTree(z, x, labelTreeHover)
+
+                    ComputeAmphPathingMatrix(size, daCache, pCache, bCache, rCache)
+                    labelTreeAmph:Compress(bx, bz, 0, 0, size, labelTreeAmph, rCache, threshold, 'Amphibious')
+                    navAmphibious:AddTree(z, x, labelTreeAmph)
+                end
+
+            -- cell consists of water and land, do the usual
+            else
+                ComputeLandPathingMatrix(size, daCache, pCache, bCache, rCache)
+                labelTreeLand:Compress(bx, bz, 0, 0, size, labelTreeLand, rCache, threshold, 'Land')
+                navLand:AddTree(z, x, labelTreeLand)
+
+                ComputeNavalPathingMatrix(size, daCache, pCache, bCache, rCache)
+                labelTreeNaval:Compress(bx, bz, 0, 0, size, labelTreeNaval, rCache, 2 * threshold, 'Water')
+                navWater:AddTree(z, x, labelTreeNaval)
+
+                ComputeHoverPathingMatrix(size, daCache, pCache, bCache, rCache)
+                labelTreeHover:Compress(bx, bz, 0, 0, size, labelTreeHover, rCache, threshold, 'Hover')
+                navHover:AddTree(z, x, labelTreeHover)
+
+                ComputeAmphPathingMatrix(size, daCache, pCache, bCache, rCache)
+                labelTreeAmph:Compress(bx, bz, 0, 0, size, labelTreeAmph, rCache, threshold, 'Amphibious')
+                navAmphibious:AddTree(z, x, labelTreeAmph)
+            end
+
+            flattenedSections = flattenedSections + 1
             labelTreeAir:Flatten(bx, bz, 0, 0, size, labelTreeAir, 0, 'Air')
             navAir:AddTree(z, x, labelTreeAir)
         end
     end
+
+    SPEW(string.format("NavGenerator - Flattened %d sections", flattenedSections))
 end
 
 --- Generates graphs that we can traverse, based on the compression grids
