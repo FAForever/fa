@@ -1212,7 +1212,9 @@ local function GenerateCompressionGrids(size, threshold)
 end
 
 --- Generates graphs that we can traverse, based on the compression grids
-local function GenerateGraphs()
+---@param processAmphibious boolean
+---@param processHover boolean
+local function GenerateGraphs(processAmphibious, processHover)
     local navLand = NavGrids['Land'] --[[@as NavGrid]]
     local navWater = NavGrids['Water'] --[[@as NavGrid]]
     local navHover = NavGrids['Hover'] --[[@as NavGrid]]
@@ -1220,22 +1222,28 @@ local function GenerateGraphs()
     local navAir = NavGrids['Air'] --[[@as NavGrid]]
 
     navAir:GenerateNeighbors()
-    navLand:GenerateNeighbors()
-    navWater:GenerateNeighbors()
-    navHover:GenerateNeighbors()
-    navAmphibious:GenerateNeighbors()
-
     navAir:GenerateLabels()
-    navLand:GenerateLabels()
-    navWater:GenerateLabels()
-    navAmphibious:GenerateLabels()
-    navHover:GenerateLabels()
-
     navAir:Precompute()
+
+    navLand:GenerateNeighbors()
+    navLand:GenerateLabels()
     navLand:Precompute()
+
+    navWater:GenerateNeighbors()
+    navWater:GenerateLabels()
     navWater:Precompute()
-    navHover:Precompute()
-    navAmphibious:Precompute()
+
+    if processHover then
+        navHover:GenerateNeighbors()
+        navHover:GenerateLabels()
+        navHover:Precompute()
+    end
+
+    if processAmphibious then
+        navAmphibious:GenerateNeighbors()
+        navAmphibious:GenerateLabels()
+        navAmphibious:Precompute()
+    end
 end
 
 --- Culls generated labels that are too small and have no meaning
@@ -1278,21 +1286,25 @@ local function GenerateCullLabels()
 end
 
 --- Generates metadata for markers for quick access
-local function GenerateMarkerMetadata()
+local function GenerateMarkerMetadata(processAmphibious, processHover)
     local navLabels = NavLabels
 
     local grids = {
-        Land = NavGrids['Land'],
-        Amphibious = NavGrids['Amphibious'],
-        Hover = NavGrids['Hover'],
-
-        -- also tackled with amphibious layer 
-        -- Naval = NavGrids['Naval'],
+        NavGrids['Land'],
     }
+
+    if processAmphibious then
+        TableInsert(grids, NavGrids['Amphibious'])
+    end
+
+    if processHover then
+        TableInsert(grids, NavGrids['Hover'])
+    end
 
     local extractors = import("/lua/sim/markerutilities.lua").GetMarkersByType('Mass')
     for id, extractor in extractors do
-        for layer, grid in grids do
+        for _, grid in grids do
+            local layer = grid.Layer
             local label = grid:FindLeaf(extractor.position).Label
 
             if label > 0 then
@@ -1326,13 +1338,27 @@ local function GenerateMarkerMetadata()
 end
 
 --- Computes various fields for the root nodes
-local function GenerateRootInformation()
+local function GenerateRootInformation(processAmphibious, processHover)
 
     local cache = { }
     local size = ScenarioInfo.size[1] / LabelCompressionTreesPerAxis
     local area = ((0.01 * size) * (0.01 * size))
 
-    for _, grid in NavGrids do
+    local grids = {
+        NavGrids['Land'],
+        NavGrids['Water'],
+        NavGrids['Air'],
+    }
+
+    if processAmphibious then
+        TableInsert(grids, NavGrids['Amphibious'])
+    end
+
+    if processHover then
+        TableInsert(grids, NavGrids['Hover'])
+    end
+
+    for _, grid in grids do
         for z = 0, LabelCompressionTreesPerAxis - 1 do
             for x = 0, LabelCompressionTreesPerAxis - 1 do
                 ---@type CompressedLabelTreeRoot
@@ -1405,25 +1431,30 @@ function Generate()
     GenerateCompressionGrids(CompressionTreeSize, compressionThreshold)
     print(string.format("generated compression trees: %f", GetSystemTimeSecondsOnlyForProfileUse() - start))
 
-    GenerateGraphs()
-    print(string.format("generated neighbors and labels: %f", GetSystemTimeSecondsOnlyForProfileUse() - start))
+    local processAmphibious = true
+    if  NavLayerData['Land'].PathableLeafs == NavLayerData['Amphibious'].PathableLeafs and
+        NavLayerData['Land'].Subdivisions == NavLayerData['Amphibious'].Subdivisions and
+        NavLayerData['Land'].UnpathableLeafs == NavLayerData['Amphibious'].UnpathableLeafs
+    then
+        SPEW(string.format("NavGenerator - replacing amphibious grid with land grid to conserve memory"))
+        processAmphibious = false
 
-    GenerateMarkerMetadata()
-    print(string.format("generated marker metadata: %f", GetSystemTimeSecondsOnlyForProfileUse() - start))
+        NavGrids['Amphibious'] = NavGrids['Land']
+        NavLayerData['Amphibious'].Labels = 0
+        NavLayerData['Amphibious'].Neighbors = 0
+        NavLayerData['Amphibious'].PathableLeafs = 0
+        NavLayerData['Amphibious'].Subdivisions = 0
+        NavLayerData['Amphibious'].UnpathableLeafs = 0
+    end
 
-    GenerateCullLabels()
-    print(string.format("cleaning up generated data: %f", GetSystemTimeSecondsOnlyForProfileUse() - start))
-
-    GenerateRootInformation()
-
-    -- ditch hover / amphibious if they are identical to land
-    if  NavLayerData['Land'].Labels == NavLayerData['Hover'].Labels and
-        NavLayerData['Land'].Neighbors == NavLayerData['Hover'].Neighbors and
-        NavLayerData['Land'].PathableLeafs == NavLayerData['Hover'].PathableLeafs and
+    local processHover = true
+    if  NavLayerData['Land'].PathableLeafs == NavLayerData['Hover'].PathableLeafs and
         NavLayerData['Land'].Subdivisions == NavLayerData['Hover'].Subdivisions and
         NavLayerData['Land'].UnpathableLeafs == NavLayerData['Hover'].UnpathableLeafs
     then
-        SPEW("Hover grid equals land grid - ditching hover grid")
+        SPEW(string.format("NavGenerator - replacing hover grid with land grid to conserve memory"))
+        processHover = false
+
         NavGrids['Hover'] = NavGrids['Land']
         NavLayerData['Hover'].Labels = 0
         NavLayerData['Hover'].Neighbors = 0
@@ -1432,20 +1463,16 @@ function Generate()
         NavLayerData['Hover'].UnpathableLeafs = 0
     end
 
-    if  NavLayerData['Land'].Labels == NavLayerData['Amphibious'].Labels and
-        NavLayerData['Land'].Neighbors == NavLayerData['Amphibious'].Neighbors and
-        NavLayerData['Land'].PathableLeafs == NavLayerData['Amphibious'].PathableLeafs and
-        NavLayerData['Land'].Subdivisions == NavLayerData['Amphibious'].Subdivisions and
-        NavLayerData['Land'].UnpathableLeafs == NavLayerData['Amphibious'].UnpathableLeafs
-    then
-        SPEW("Amphibious grid equals land grid - ditching amphibious grid")
-        NavGrids['Amphibious'] = NavGrids['Land']
-        NavLayerData['Amphibious'].Labels = 0
-        NavLayerData['Amphibious'].Neighbors = 0
-        NavLayerData['Amphibious'].PathableLeafs = 0
-        NavLayerData['Amphibious'].Subdivisions = 0
-        NavLayerData['Amphibious'].UnpathableLeafs = 0
-    end
+    GenerateGraphs(processAmphibious, processHover)
+    print(string.format("generated neighbors and labels: %f", GetSystemTimeSecondsOnlyForProfileUse() - start))
+
+    GenerateMarkerMetadata(processAmphibious, processHover)
+    print(string.format("generated marker metadata: %f", GetSystemTimeSecondsOnlyForProfileUse() - start))
+
+    GenerateCullLabels()
+    print(string.format("cleaning up generated data: %f", GetSystemTimeSecondsOnlyForProfileUse() - start))
+
+    GenerateRootInformation(processAmphibious, processHover)
 
     SPEW(string.format("Generated navigational mesh in %f seconds", GetSystemTimeSecondsOnlyForProfileUse() - start))
 
