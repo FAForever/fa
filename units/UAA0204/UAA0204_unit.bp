@@ -271,7 +271,7 @@ UnitBlueprint {
             AutoInitiateAttackCommand = true,
             BallisticArc = 'RULEUBA_None',
             CollideFriendly = false,
-            Damage = 200,
+            Damage = 250,
             DamageType = 'Normal',
             DisplayName = 'Harmonic Depth Charge',
             EffectiveRadius = 19,
