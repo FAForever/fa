@@ -1474,17 +1474,6 @@ function Generate()
 
     GenerateRootInformation(processAmphibious, processHover)
 
-    -- ditch hover / amphibious if they are identical to land
-    if not processAmphibious then
-        SPEW("Hover grid equals land grid - ditching hover grid")
-
-    end
-
-    if not processHover then
-
-
-    end
-
     SPEW(string.format("Generated navigational mesh in %f seconds", GetSystemTimeSecondsOnlyForProfileUse() - start))
 
     local allocatedSizeGrids = import('/lua/system/utils.lua').ToBytes(NavGrids) / (1024 * 1024)
