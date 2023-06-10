@@ -1,16 +1,13 @@
---****************************************************************************
---**
---**  File     :  /cdimage/units/UAS0303/UAS0303_script.lua
---**  Author(s):  John Comes
---**
---**  Summary  :  Aeon Aircraft Carrier Script
---**
---**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
---****************************************************************************
+-- File     :  /cdimage/units/UAS0303/UAS0303_script.lua
+-- Author(s):  John Comes
+-- Summary  :  Aeon Aircraft Carrier Script
+-- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+---------------------------------------------------------------------
 
 local AircraftCarrier = import("/lua/defaultunits.lua").AircraftCarrier
 local WeaponsFile = import("/lua/aeonweapons.lua")
 local AAAZealotMissileWeapon = WeaponsFile.AAAZealotMissileWeapon
+local AAMWillOWisp = WeaponsFile.AAMWillOWisp
 
 ---@class UAS0303 : AircraftCarrier
 UAS0303 = ClassUnit(AircraftCarrier) {
@@ -18,6 +15,7 @@ UAS0303 = ClassUnit(AircraftCarrier) {
     Weapons = {
         AntiAirMissiles01 = ClassWeapon(AAAZealotMissileWeapon) {},
         AntiAirMissiles02 = ClassWeapon(AAAZealotMissileWeapon) {},
+        AntiMissile = ClassWeapon(AAMWillOWisp) {},
     },
 
     BuildAttachBone = 'UAS0303',
