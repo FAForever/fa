@@ -2076,10 +2076,12 @@ SubUnit = ClassUnit(MobileUnit) {
 
         if new == 'Up' or new == 'Down' then
             self:RemoveCommandCap("RULEUCC_Dive")
+            self:RequestRefreshUI()
         end
 
         if new == 'Top' or new == 'Bottom' then
             self:AddCommandCap("RULEUCC_Dive")
+            self:RequestRefreshUI()
         end
     end,
 
