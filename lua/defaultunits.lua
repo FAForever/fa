@@ -2174,6 +2174,7 @@ AirUnit = ClassUnit(MobileUnit) {
         elseif self.DeathCrashDamage > 0 then -- It was completely absorbed by a shield!
             local deathWep = self.deathWep -- Use a local copy for speed and easy reading
             DamageArea(self, self:GetPosition(), deathWep.DamageRadius, self.DeathCrashDamage, deathWep.DamageType, deathWep.DamageFriendly)
+            DamageArea(self, self:GetPosition(), deathWep.DamageRadius, 1, 'TreeForce', false)
         end
 
         if with == 'Water' then
