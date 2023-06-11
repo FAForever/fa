@@ -2064,7 +2064,25 @@ SubUnit = ClassUnit(MobileUnit) {
         self.Trash:Add(self.SoundEntity)
         Warp(self.SoundEntity, self:GetPosition())
         self.SoundEntity:AttachTo(self,-1)
+
+
     end,
+
+    ---@param self Unit
+    ---@param new string
+    ---@param old string
+    OnMotionVertEventChange = function(self, new, old)
+        MobileUnit.OnMotionVertEventChange(self, new, old)
+
+        if new == 'Up' or new == 'Down' then
+            self:RemoveCommandCap("RULEUCC_Dive")
+        end
+
+        if new == 'Top' or new == 'Bottom' then
+            self:AddCommandCap("RULEUCC_Dive")
+        end
+    end,
+
 }
 
 -- AIR UNITS
