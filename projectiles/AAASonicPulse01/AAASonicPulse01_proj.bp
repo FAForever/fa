@@ -26,11 +26,6 @@ ProjectileBlueprint {
     },
     General = {
         Category = 'Anti Air',
-        EntityCategory = {
-            'AEON',
-            'PROJECTILE',
-            'ANTIAIR',
-        },
         Faction = 'Aeon',
         TechLevel = 1,
         Weapon = 'Sonic Pulse Battery',

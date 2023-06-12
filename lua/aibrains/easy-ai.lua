@@ -1,7 +1,15 @@
-local BaseManager = import("/lua/aibrains/managers/base-manager.lua")
+
+-- load builder systems
+doscript '/lua/aibrains/templates/base/base-template.lua'
+doscript '/lua/aibrains/templates/builder-groups/builder-group-template.lua'
+doscript '/lua/aibrains/templates/builders/builder-template.lua'
 
 local StandardBrain = import("/lua/aibrain.lua").AIBrain
 local EconomyComponent = import("/lua/aibrains/components/economy.lua").AIBrainEconomyComponent
+local BaseManager = import("/lua/aibrains/managers/base-manager.lua")
+
+---@class EasyAIBrainBaseTemplates
+---@field BaseTemplateMain AIBaseTemplate
 
 ---@class EasyAIBrainManagers
 ---@field FactoryManager AIFactoryManager
@@ -18,6 +26,7 @@ local EconomyComponent = import("/lua/aibrains/components/economy.lua").AIBrainE
 ---@field TargetAIBrain AIBrain
 
 ---@class EasyAIBrain: AIBrain, AIBrainEconomyComponent
+---@field AIBaseTemplates EasyAIBrainBaseTemplates
 ---@field GridReclaim AIGridReclaim
 ---@field GridBrain AIGridBrain
 ---@field GridRecon AIGridRecon
@@ -27,28 +36,29 @@ AIBrain = Class(StandardBrain, EconomyComponent) {
     SkirmishSystems = true,
 
     --- Called after `SetupSession` but before `BeginSession` - no initial units, props or resources exist at this point
-    ---@param self AIBrain
+    ---@param self EasyAIBrain
     ---@param planName string
     OnCreateAI = function(self, planName)
         StandardBrain.OnCreateAI(self, planName)
         EconomyComponent.OnCreateAI(self)
 
-        -- load in base templates
-        -- todo
+        self:OnLoadTemplates()
+
 
         -- start initial base
         local startX, startZ = self:GetArmyStartPos()
         local main = BaseManager.CreateBaseManager(self, 'main', { startX, 0, startZ }, 60)
-        main:AddBaseTemplate('AIBaseTemplate - Easy main')
+        main:AddBaseTemplate(self.AIBaseTemplates.BaseTemplateMain)
         self.BuilderManagers = {
             MAIN = main
         }
 
+        self:ForkThread(self.GetBaseDebugInfoThread)
         self:IMAPConfiguration()
     end,
 
     --- Called after `BeginSession`, at this point all props, resources and initial units exist in the map
-    ---@param self AIBrain
+    ---@param self EasyAIBrain
     OnBeginSession = function(self)
         StandardBrain.OnBeginSession(self)
 
@@ -63,8 +73,19 @@ AIBrain = Class(StandardBrain, EconomyComponent) {
         self.GridReclaim = import("/lua/ai/gridreclaim.lua").Setup(self)
         self.GridBrain = import("/lua/ai/gridbrain.lua").Setup()
         self.GridRecon = import("/lua/ai/gridrecon.lua").Setup(self)
+        self.GridPresence = import("/lua/AI/GridPresence.lua").Setup(self)
+    end,
 
+    ---@param self EasyAIBrain
+    OnLoadTemplates = function(self)
+        self.AIBaseTemplates = self.AIBaseTemplates or { }
 
+        -- copy over templates from various files
+        local templates
+        templates = import("/lua/aibrains/templates/base/easy-main.lua")
+        for k, template in templates do
+            self.AIBaseTemplates[k] = template
+        end
     end,
 
     ---@param self EasyAIBrain
@@ -164,15 +185,14 @@ AIBrain = Class(StandardBrain, EconomyComponent) {
         return nearestManagerIdentifier
     end,
 
-    ---------------------------------------------
-    -- C hooks
+    ---------------------------------------------------------------------------
+    --#region C hooks
 
     ---@param platoon AIPlatoon
     ---@param units Unit[]
     ---@param squad PlatoonSquads
     ---@param formation UnitFormations
     AssignUnitsToPlatoon = function(self, platoon, units, squad, formation)
-        LOG("AssignUnitsToPlatoon")
         StandardBrain.AssignUnitsToPlatoon(self, platoon, units, squad, formation)
 
         if squad == 'Attack' then
@@ -188,8 +208,10 @@ AIBrain = Class(StandardBrain, EconomyComponent) {
         end
     end,
 
-    ---------------------------------------------
-    -- Unit events
+    --#endregion
+
+    ---------------------------------------------------------------------------
+    --#region Unit events
 
     --- Called by a unit as it starts being built
     ---@param self EasyAIBrain
@@ -273,9 +295,33 @@ AIBrain = Class(StandardBrain, EconomyComponent) {
         end
     end,
 
-    ----------------------------------------------------------------------------------------
-    --- legacy functionality
-    ---
+    --#endregion
+
+    ---------------------------------------------------------------------------
+    --#region Debug functionality
+
+    ---@param self EasyAIBrain
+    ---@return AIBaseDebugInfo
+    GetBaseDebugInfoThread = function(self)
+        while true do
+            if GetFocusArmy() == self:GetArmyIndex() then
+                local position = GetMouseWorldPos()
+                local identifier = self:FindNearestBaseIdentifier(position)
+                if identifier then
+                    local base = self.BuilderManagers[identifier]
+                    local info = base:GetDebugInfo()
+                    Sync.AIBaseInfo = info
+                end
+            end
+
+            WaitTicks(10)
+        end
+    end,
+
+    --#endregion
+
+    ---------------------------------------------------------------------------
+    --#region Legacy functionality
     --- All functions below solely exist because the code is too tightly coupled. We can't
     --- remove them without drastically changing how the code base works. We can't do that
     --- because it would break mod compatibility
@@ -299,5 +345,7 @@ AIBrain = Class(StandardBrain, EconomyComponent) {
     ---@param self AIBrain
     InitializePlatoonBuildManager = function(self)
     end,
+
+    --#endregion
 
 }

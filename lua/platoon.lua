@@ -11,6 +11,7 @@
 -- Platoon Lua Module                    --
 ----------------------------------------------------------------------------------
 local AIUtils = import("/lua/ai/aiutilities.lua")
+local TransportUtils = import("/lua/ai/transportutilities.lua")
 local Utilities = import("/lua/utilities.lua")
 local AIBuildStructures = import("/lua/ai/aibuildstructures.lua")
 local UpgradeTemplates = import("/lua/upgradetemplates.lua")
@@ -954,9 +955,9 @@ Platoon = Class(moho.platoon_methods) {
             if path then
                 local position = self:GetPlatoonPosition()
                 if not success or VDist2(position[1], position[3], bestMarker.position[1], bestMarker.position[3]) > 512 then
-                    usedTransports = AIAttackUtils.SendPlatoonWithTransportsNoCheck(aiBrain, self, bestMarker.position, true)
+                    usedTransports = TransportUtils.SendPlatoonWithTransports(aiBrain, self, bestMarker.position, 1, true)
                 elseif VDist2(position[1], position[3], bestMarker.position[1], bestMarker.position[3]) > 256 then
-                    usedTransports = AIAttackUtils.SendPlatoonWithTransportsNoCheck(aiBrain, self, bestMarker.position, false)
+                    usedTransports = TransportUtils.SendPlatoonWithTransports(aiBrain, self, bestMarker.position, 1, false)
                 end
                 if not usedTransports then
                     local pathLength = table.getn(path)
@@ -970,7 +971,7 @@ Platoon = Class(moho.platoon_methods) {
                 end
             elseif (not path and reason == 'NoPath') and self.MovementLayer ~= 'Water' then
                 --LOG('Guardmarker requesting transports')
-                local foundTransport = AIAttackUtils.SendPlatoonWithTransportsNoCheck(aiBrain, self, bestMarker.position, true)
+                local foundTransport = TransportUtils.SendPlatoonWithTransports(aiBrain, self, bestMarker.position, 1, true)
                 --DUNCAN - if we need a transport and we cant get one the disband
                 if not foundTransport then
                     --LOG('Guardmarker no transports')
@@ -3254,26 +3255,32 @@ Platoon = Class(moho.platoon_methods) {
     --- for a new platoon
     ---@param self Platoon
     ReturnToBaseAI = function(self)
+        if IsDestroyed(self) then
+            return
+        end
         local NavUtils = import("/lua/sim/navutils.lua")
         local aiBrain = self:GetBrain()
-
         if not aiBrain:PlatoonExists(self) or not self:GetPlatoonPosition() then
             return
         end
 
+        local NavUtils = import("/lua/sim/navutils.lua")
+        if not self.MovementLayer then
+            AIAttackUtils.GetMostRestrictiveLayer(self)
+        end
+    
         local bestBase = false
-        local bestBaseName = ""
-        local bestDistSq = 999999999
+        local bestBaseName
+        local bestDistSq
         local platPos = self:GetPlatoonPosition()
         local returnPos
-
         for baseName, base in aiBrain.BuilderManagers do
             if (self.MovementLayer == 'Water' and base.Layer ~= 'Water') or (self.MovementLayer == 'Land' and base.Layer == 'Water') then
                 continue
             end
             local distSq = VDist2Sq(platPos[1], platPos[3], base.Position[1], base.Position[3])
 
-            if distSq < bestDistSq then
+            if not bestDistSq or distSq < bestDistSq then
                 bestBase = base
                 bestBaseName = baseName
                 bestDistSq = distSq
@@ -3281,13 +3288,11 @@ Platoon = Class(moho.platoon_methods) {
         end
 
         if bestBase then
-            AIAttackUtils.GetMostRestrictiveLayer(self)
             if bestBase.FactoryManager.RallyPoint then
                 returnPos = bestBase.FactoryManager.RallyPoint
             else
                 returnPos = bestBase.Position
             end
-            -- needs to support air, land, sea
             local path, reason =  NavUtils.PathToWithThreatThreshold(self.MovementLayer, self:GetPlatoonPosition(), returnPos, aiBrain, NavUtils.ThreatFunctions.AntiSurface, 200, aiBrain.IMAPConfig.Rings)
             -- remove any formation settings to ensure a quick return to base.
             self:SetPlatoonFormationOverride('NoFormation')
@@ -3303,6 +3308,7 @@ Platoon = Class(moho.platoon_methods) {
 
             local oldDistSq = 0
             while aiBrain:PlatoonExists(self) do
+                
                 WaitTicks(100)
                 platPos = self:GetPlatoonPosition()
                 local distSq = VDist2Sq(platPos[1], platPos[3], returnPos[1], returnPos[3])
@@ -3317,8 +3323,6 @@ Platoon = Class(moho.platoon_methods) {
                 oldDistSq = distSq
             end
         end
-        -- default to returning to attacking
-        return self:AttackForceAI()
     end,
 
     -- -------------------

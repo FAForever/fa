@@ -26,11 +26,6 @@ ProjectileBlueprint {
     },
     General = {
         Category = 'Anti Air',
-        EntityCategory = {
-            'AEON',
-            'PROJECTILE',
-            'ANTIAIR',
-        },
         Faction = 'Aeon',
         TechLevel = 3,
         Weapon = 'Displacement Cannon',

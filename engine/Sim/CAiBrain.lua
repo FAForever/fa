@@ -366,6 +366,7 @@ end
 ---@param position Vector
 ---@param radius number
 ---@param alliance AllianceType
+---@return Unit[]
 function CAiBrain:GetUnitsAroundPoint(category, position, radius, alliance)
 end
 

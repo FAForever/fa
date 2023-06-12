@@ -15,11 +15,6 @@ ProjectileBlueprint {
     },
     General = {
         Category = 'Artillery',
-        EntityCategory = {
-            'UEF',
-            'PROJECTILE',
-            'INDIRECTFIRE',
-        },
         Faction = 'UEF',
     },
     Interface = {

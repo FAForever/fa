@@ -340,7 +340,7 @@ BuilderGroup {
             { MIBC, 'ArmyNeedsTransports', {} },
             { MIBC, 'MapGreaterThan', { 256, 256 }},
             { MIBC, 'LessThanGameTime', { 600 } },
-            { EBC, 'GreaterThanEconEfficiencyOverTime', { 0.6, 1.05 }},
+            { EBC, 'GreaterThanEconEfficiencyOverTime', { 0.6, 1.0 }},
             { UCBC, 'HaveLessThanUnitsWithCategory', { 1, categories.TRANSPORTFOCUS } },
             { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, categories.TRANSPORTFOCUS } },
         },
