@@ -514,7 +514,7 @@ function AINavalPlanB(aiBrain, platoon)
         if not pathable then
             continue
         end
-        local path, reason = NavUtils.PathToWithThreatThreshold(platoon.MovementLayer, platoon:GetPlatoonPosition(), marker.Position, aiBrain, NavUtils.ThreatFunctions.AntiSurface, platoon.PlatoonSurfaceThreat * 2, aiBrain.IMAPConfig.Rings)
+        local path, reason = NavUtils.PathToWithThreatThreshold(platoon.MovementLayer, platoon:GetPlatoonPosition(), marker.Position, aiBrain, NavUtils.ThreatFunctions.AntiSurface, platoon.PlatoonSurfaceThreat * 10, aiBrain.IMAPConfig.Rings)
 
         if path then
             return path, reason
@@ -552,7 +552,7 @@ function AIPlatoonNavalAttackVector(aiBrain, platoon)
     attackPos[3] != platoon.LastAttackDestination[oldPathSize][3]) then
 
         -- check if we can path to here safely... give a large threat weight to sort by threat first
-        path, reason = NavUtils.PathToWithThreatThreshold(platoon.MovementLayer, platoon:GetPlatoonPosition(), attackPos, aiBrain, NavUtils.ThreatFunctions.AntiSurface, platoon.PlatoonSurfaceThreat * 2, aiBrain.IMAPConfig.Rings)
+        path, reason = NavUtils.PathToWithThreatThreshold(platoon.MovementLayer, platoon:GetPlatoonPosition(), attackPos, aiBrain, NavUtils.ThreatFunctions.AntiSurface, platoon.PlatoonSurfaceThreat * 10, aiBrain.IMAPConfig.Rings)
 
         -- clear command queue
         platoon:Stop()
@@ -644,7 +644,7 @@ function AIPlatoonSquadAttackVector(aiBrain, platoon, bAggro)
 
         GetMostRestrictiveLayer(platoon)
         -- check if we can path to here safely... give a large threat weight to sort by threat first
-        local path, reason = NavUtils.PathToWithThreatThreshold(platoon.MovementLayer, platoon:GetPlatoonPosition(), attackPos, aiBrain, NavUtils.ThreatFunctions.AntiSurface, platoon.PlatoonSurfaceThreat * 2, aiBrain.IMAPConfig.Rings)
+        local path, reason = NavUtils.PathToWithThreatThreshold(platoon.MovementLayer, platoon:GetPlatoonPosition(), attackPos, aiBrain, NavUtils.ThreatFunctions.AntiSurface, platoon.PlatoonSurfaceThreat * 10, aiBrain.IMAPConfig.Rings)
 
         -- clear command queue
         platoon:Stop()

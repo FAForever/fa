@@ -1421,7 +1421,7 @@ ExpPathToLocation = function(aiBrain, platoon, layer, dest, aggro, pathDist)
     local cmd = false
     local platoonUnits = platoon:GetPlatoonUnits()
     platoon.PlatoonSurfaceThreat = platoon:GetPlatoonThreat('Surface', categories.ALLUNITS)
-    local path, reason = NavUtils.PathToWithThreatThreshold(layer, platoon:GetPlatoonPosition(), dest, aiBrain, NavUtils.ThreatFunctions.AntiSurface, platoon.PlatoonSurfaceThreat * 2, aiBrain.IMAPConfig.Rings)
+    local path, reason = NavUtils.PathToWithThreatThreshold(layer, platoon:GetPlatoonPosition(), dest, aiBrain, NavUtils.ThreatFunctions.AntiSurface, platoon.PlatoonSurfaceThreat * 10, aiBrain.IMAPConfig.Rings)
     if not path then
         if aggro == 'AttackMove' then
             cmd = platoon:AggressiveMoveToLocation(dest)
