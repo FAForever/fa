@@ -146,6 +146,22 @@ UEL0001 = ClassUnit(ACUUnit) {
         end
     end,
 
+    ---@param self UEL0001
+    ---@param bone Bone
+    ---@param attachee Unit
+    OnTransportAttach = function(self, bone, attachee)
+        ACUUnit.OnTransportAttach(self, bone, attachee)
+        attachee:SetDoNotTarget(true)
+    end,
+
+    ---@param self UEL0001
+    ---@param bone Bone
+    ---@param attachee Unit
+    OnTransportDetach = function(self, bone, attachee)
+        ACUUnit.OnTransportDetach(self, bone, attachee)
+        attachee:SetDoNotTarget(false)
+    end,
+
     CreateEnhancement = function(self, enh)
         ACUUnit.CreateEnhancement(self, enh)
 
