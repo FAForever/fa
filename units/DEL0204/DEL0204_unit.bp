@@ -328,7 +328,7 @@ UnitBlueprint {
             MuzzleSalvoDelay = 0.3,
             MuzzleSalvoSize = 4,
             MuzzleVelocity = 12.8,
-            --MuzzleVelocityRandom = 0.5,
+            MuzzleVelocityRandom = 0.5,
             ProjectileId = '/projectiles/TDFFragmentationGrenade01/TDFFragmentationGrenade01_proj.bp',
             ProjectileLifetimeUsesMultiplier = 1.3,
             ProjectilesPerOnFire = 3,
