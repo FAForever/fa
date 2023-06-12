@@ -1630,7 +1630,6 @@ Platoon = Class(moho.platoon_methods) {
         self:Stop()
         local aiBrain = self:GetBrain()
         local data = self.PlatoonData
-        local radius = aiBrain:PBMGetLocationRadius(data.Location)
         local categories = data.Reclaim
         local counter = 0
         local reclaimcat
@@ -2239,7 +2238,7 @@ Platoon = Class(moho.platoon_methods) {
             table.insert(baseTmplList, AIBuildStructures.AIBuildBaseTemplateFromLocation(baseTmpl, reference))
         elseif cons.Wall then
             local pos = aiBrain:PBMGetLocationCoords(cons.LocationType) or cons.Position or self:GetPlatoonPosition()
-            local radius = cons.LocationRadius or aiBrain:PBMGetLocationRadius(cons.LocationType) or 100
+            local radius = cons.LocationRadius or aiBrain.BuilderManagers[cons.LocationType].EngineerManager.Radius or 100
             relative = false
             reference = AIUtils.GetLocationNeedingWalls(aiBrain, 200, 4, 'STRUCTURE - WALLS', cons.ThreatMin, cons.ThreatMax, cons.ThreatRings)
             table.insert(baseTmplList, 'Blank')
@@ -2265,7 +2264,7 @@ Platoon = Class(moho.platoon_methods) {
 
         elseif cons.NearMarkerType and cons.ExpansionBase then
             local pos = aiBrain:PBMGetLocationCoords(cons.LocationType) or cons.Position or self:GetPlatoonPosition()
-            local radius = cons.LocationRadius or aiBrain:PBMGetLocationRadius(cons.LocationType) or 100
+            local radius = cons.LocationRadius or aiBrain.BuilderManagers[cons.LocationType].EngineerManager.Radius or 100
 
             if cons.NearMarkerType == 'Expansion Area' then
                 reference, refName = AIUtils.AIFindExpansionAreaNeedsEngineer(aiBrain, cons.LocationType,
