@@ -901,10 +901,77 @@ function CreateTimer()
     }
 end
 
+
+
 local vector_metatable = getmetatable(Vector2(0, 0))
 
-Quaternion = function(w, x, y, z)
-    return setmetatable({w, x, y, z}, vector_metatable)
+function UnsafeQuaternion(x, y, z, w)
+    return setmetatable({x, y, z, w}, vector_metatable)
+end
+
+--- Constructs a quaternion with the given components. Absent ones default to `0`.
+--- If the quaternion isn't of unit length, then it is normalized.
+---@param x? number
+---@param y? number
+---@param z? number
+---@param w? number
+---@return Quaternion
+function Quaternion(x, y, z, w)
+    x, y, z, w = x or 0, y or 0, z or 0, w or 0
+    local lenSq = x*x + y*y + z*z + w*w
+    local dif = 1 - lenSq
+    -- maximum residual to unit length from `EulerToQuaternion` magnitude squared appears to be about 3.5e-7
+    -- squaring this is easier than using `math.abs`
+    if dif*dif > 1.6e-13 then
+        -- normalize any quaternions that break the unit length invariant
+        lenSq = math.sqrt(lenSq)
+        x, y, z, w = x / lenSq, y / lenSq, z / lenSq, w / lenSq -- let any divide-by-zero fail
+    end
+    return UnsafeQuaternion(x, y, z, w)
+end
+
+
+-- In these functions, we use `z` instead of `3` when we don't know which type of vector it is
+-- because the builtin `__index` method throws a fit if it can't find the field for a Vector2
+-- (but it handles `z` fine as it knows that it maps to `3`, which happens to be nil).
+-- Similarly, we `rawget` index 4 so that non-quaternions don't crash the game.
+
+---@overload fun(self: Vector2): Vector2
+---@param self Vector
+---@return Vector
+function vector_metatable.__unm(self)
+    if rawget(self, 4) then
+        -- negative orientation???
+        error("incompatible vector type for negation: quaternion")
+    end
+
+    local newX, newY, z = -self[1], -self[2], self.z
+    if z then
+        return Vector(newX, newY, -z)
+    end
+
+    ---@diagnostic disable-next-line: return-type-mismatch
+    return Vector2(newX, newY)
+end
+
+---@overload fun(a: Vector2, b: Vector2): Vector2
+---@param a Vector
+---@param b Vector
+---@return Vector
+function vector_metatable.__add(a, b)
+    if getmetatable(a) ~= getmetatable(b) then
+        error("invalid argument for vector addition")
+    end
+
+    if rawget(a, 4) or rawget(b, 4) then
+        -- tranlating orientation???
+        error("incompatible vector type for addition: quaternion")
+    end
+
+    if not a.z ~= not b.z then
+        error("incompatible vector types for addition: Vector2 and Vector")
+    end
+    return VAdd(a, b)
 end
 
 ---@overload fun(a: Quaternion, b: Vector): Quaternion   rotation composition
@@ -917,7 +984,7 @@ end
 ---@param b Quaternion
 ---@return Quaternion
 function vector_metatable.__mul(a, b)
-    local a3 = rawget(a, 3)
+    local a3 = a.z
     if type(b) == "number" then
         if rawget(a, 4) then
             -- Even though we could multiply each component by the scalar, scaling an orientation
@@ -937,62 +1004,56 @@ function vector_metatable.__mul(a, b)
     if getmetatable(a) ~= getmetatable(b) then
         error("invalid argument for vector multiplication")
     end
-    local b3 = rawget(b, 3)
+    local b3 = b.z
     if not a3 or not b3 then
         error("incompatible vector type for multiplication: Vector2")
     end
 
-    local a4 = rawget(a, 4)
+    local a1, a2, a4 = a[1], a[2], rawget(a, 4)
+    local b1, b2, b4 = b[1], b[2], rawget(b, 4)
     if a4 then
-        local a1, a2 = a[1], a[2]
-        local b4 = rawget(b, 4)
         if b4 then
             -- Quaternion * Quaternion
-            local b1, b2 = b[1], b[2]
-            return Quaternion(
-                a1 * b1 - a2 * b2 - a3 * b3 - a4 * b4,
-                a1 * b2 + a2 * b1 + a3 * b4 - a4 * b3,
-                a1 * b3 + a3 * b1 + a4 * b2 - a2 * b4,
-                a1 * b4 + a4 * b1 + a2 * b3 - a3 * b2
+            return UnsafeQuaternion(
+                a1 * b4 + a4 * b1 - a3 * b2 + a2 * b3,
+                a2 * b4 + a3 * b1 + a4 * b2 - a1 * b3,
+                a3 * b4 - a2 * b1 + a1 * b2 + a4 * b3,
+                a4 * b4 - a1 * b1 - a2 * b2 - a3 * b3
             )
         end
 
         -- Quaternion * Vector (Quaternion with no spin)
-        local q2, q3, q4 = b[1], b[2], b3
-        local len = q2*q2 + q3*q3 + q4*q4
+        local len = b1*b1 + b2*b2 + b3*b3
         if len ~= 1 then
             -- normalize any vectors that might not represent a direction cosine
             len = math.sqrt(len)
-            q2, q3, q4 = q2 / len, q3 / len, q4 / len
+            b1, b2, b3 = b1 / len, b2 / len, b3 / len
         end
-        return Quaternion(
-                    - a2 * q2 - a3 * q3 - a4 * q4,
-            a1 * q2           + a3 * q4 - a4 * q3,
-            a1 * q3           + a4 * q2 - a2 * q4,
-            a1 * q4           + a2 * q3 - a3 * q2
+        return UnsafeQuaternion(
+             a4 * b1 - a3 * b2 + a2 * b3,
+             a3 * b1 + a4 * b2 - a1 * b3,
+            -a2 * b1 + a1 * b2 + a4 * b3,
+            -a1 * b1 - a2 * b2 - a3 * b3
         )
     end
 
-    local b1, b2, b4 = b[1], b[2], rawget(b, 4)
     if b4 then
         -- Vector (Quaternion with no spin) * Quaternion
-        local q2, q3, q4 = a[1], a[2], a3
-        local len = q2*q2 + q3*q3 + q4*q4
+        local len = a1*a1 + a2*a2 + a3*a3
         if len ~= 1 then
             -- normalize any vectors that might not represent a direction cosine
             len = math.sqrt(len)
-            q2, q3, q4 = q2 / len, q3 / len, q4 / len
+            a1, a2, a3 = a1 / len, a2 / len, a3 / len
         end
-        return Quaternion(
-            -q2 * b2 - q3 * b3 - q4 * b4,
-             q2 * b1 + q3 * b4 - q4 * b3,
-             q3 * b1 + q4 * b2 - q2 * b4,
-             q4 * b1 + q2 * b3 - q3 * b2
+        return UnsafeQuaternion(
+             a1 * b4 - a3 * b2 + a2 * b3,
+             a2 * b4 + a3 * b1 - a1 * b3,
+             a3 * b4 - a2 * b1 + a1 * b2,
+            -a1 * b1 - a2 * b2 - a3 * b3
         )
     end
 
     -- Vector x Vector (cross-product)
-    local a1, a2 = a[1], a[2]
     ---@diagnostic disable-next-line: return-type-mismatch
     return Vector(
         a2 * b3 - a3 * b2,

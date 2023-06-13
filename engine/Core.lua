@@ -22,11 +22,13 @@
 ---@operator mul(Quaternion): Quaternion
 ---@operator mul(Vector): Vector
 ---@operator mul(number): Vector
+---@operator unm: Vector
 ---@field [3] number
 ---@field z number
 
 ---@class Vector2 : VectorBase
 ---@operator mul(number): Vector2
+---@operator unm: Vector2
 
 ---@class Rectangle     # A point-to-point based rectangle, where the first point is usually in the top left corner
 ---@field x0 number
@@ -146,6 +148,12 @@ end
 ---@return Quaternion
 function EulerToQuaternion(roll, pitch, yaw)
 end
+-- {
+--     cos(roll/2) * sin(pitch/2) * cos(yaw/2) + sin(roll/2) * cos(pitch/2) * sin(yaw/2), -- y
+--     cos(roll/2) * cos(pitch/2) * sin(yaw/2) - sin(roll/2) * sin(pitch/2) * cos(yaw/2), -- z
+--     sin(roll/2) * cos(pitch/2) * cos(yaw/2) - cos(roll/2) * sin(pitch/2) * sin(yaw/2), -- x
+--     cos(roll/2) * cos(pitch/2) * cos(yaw/2) + sin(roll/2) * sin(pitch/2) * sin(yaw/2)  -- w
+-- }
 
 --- collapses all relative `/./` or `/../` directory names from a path
 ---@param fullPath FileName
@@ -436,6 +444,7 @@ function Trace(enable)
 end
 
 --- Adds vector `b` to vector `a`
+---@deprecated It is faster to compute it in Lua with `Vector`
 ---@param a Vector
 ---@param b Vector
 ---@return Vector
@@ -443,13 +452,15 @@ function VAdd(a, b)
 end
 
 --- Subtracts vector `b` from vector `a`
+---@deprecated It is faster to compute it in Lua with `Vector`
 ---@param a Vector
 ---@param b Vector
 ---@return Vector
 function VDiff(a, b)
 end
 
---- Computes the distance between two points
+--- Computes the distance between two points.
+--- It is always faster to compute it in Lua.
 ---@param x1 number
 ---@param y1 number
 ---@param x2 number
@@ -458,7 +469,8 @@ end
 function VDist2(x1, y1, x2, y2)
 end
 
---- Computes the squared distance between two points
+--- Computes the squared distance between two points.
+--- It is faster to compute it in Lua.
 ---@param x1 number
 ---@param y1 number
 ---@param x2 number
@@ -467,14 +479,15 @@ end
 function VDist2Sq(x1, y1, x2, y2)
 end
 
---- Computes the distance between the vectors `a` and `b`
+--- Computes the distance between vectors `a` and `b`
+--- It is always faster to compute it in Lua.
 ---@param a Vector
 ---@param b Vector
 ---@return number
 function VDist3(a, b)
 end
 
---- Computes the squared distance between the vectors `a` and `b`
+--- Computes the squared distance between vectors `a` and `b`
 ---@deprecated It is faster to compute it in Lua
 ---@param a Vector
 ---@param b Vector
@@ -482,28 +495,33 @@ end
 function VDist3Sq(a, b)
 end
 
---- Computes the dot product between the vectors `a` and `b`
+--- Computes the dot product between vectors `a` and `b`,
+--- or `a[1]*b[1] + a[2]*b[2] + a[3]*b[3]`
+---@deprecated It is faster to compute it in Lua
 ---@param a Vector
 ---@param b Vector
 ---@return number
 function VDot(a, b)
 end
 
---- Scales the vector `v` with the scalar `s`
+--- Scales the vector `v` by the scalar `s`
+---@deprecated It is faster to compute it in Lua with `Vector`
 ---@param v Vector
 ---@param s number
 ---@return Vector
 function VMult(v, s)
 end
 
---- Computes the vector perpendicular to the plane described by the vectors `a` and `b`
+--- Computes the component perpendicular to the XZ plane in the cross product of `a` across `b`,
+--- or `a[3] * b[1] - a[1] * b[3]`
+---@deprecated It is faster to compute it in Lua
 ---@param a Vector
 ---@param b Vector
----@return Vector
+---@return number
 function VPerpDot(a, b)
 end
 
---- Populates a new table with the corresponding meta table
+--- Creates a new 3-vector with the corresponding metatable
 ---@param x number
 ---@param y number
 ---@param z number
@@ -511,7 +529,7 @@ end
 function Vector(x, y, z)
 end
 
---- Populates a new table with the corresponding meta table
+--- Creates a new 2-vector with the corresponding metatable
 ---@param x number
 ---@param y number
 ---@return Vector2

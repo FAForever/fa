@@ -161,7 +161,9 @@ function GetAverageBoundingXYZRadiusCorrect(unit)
     return ((bp.SizeX or 1) + (bp.SizeZ or 1) + (bp.SizeY or 1)) * 0.166
 end
 
---- ??, what is the mathematics here exactly?
+---@overload fun(rotation: number): number, number, number, number
+--- Creates a quaternion from an orientation axis and rotation angle. The orientation axis defaults
+--- to up (the y-axis).
 ---@param rotation number
 ---@param x number
 ---@param y number
@@ -171,14 +173,7 @@ end
 ---@return number qz
 ---@return number qw
 function QuatFromRotation(rotation, x, y, z)
-    local angleRot, qw, qx, qy, qz, angle
-    angle = 0.00872664625 * rotation
-    angleRot = MathSin(angle)
-    qw = MathCos(angle)
-    qx = x * angleRot
-    qy = y * angleRot
-    qz = z * angleRot
-    return qx, qy, qz, qw
+    return unpack(util.QuatFromRotation(rotation, x, y, z))
 end
 
 --------------------------------------
@@ -862,29 +857,28 @@ end
 -- *****************
 
 ---@param object Unit
----@param projBP string
+---@param projBP FileName
 ---@param posX number
 ---@param posY number
 ---@param posZ number
 ---@param scale number
 ---@param scaleVelocity number
----@param Lifetime number
+---@param lifetime number
 ---@param velX number
 ---@param velY number
----@param VelZ number
+---@param velZ number
 ---@param orientRot number
 ---@param orientX number
 ---@param orientY number
 ---@param orientZ number
 ---@return Projectile
-function CreateExplosionMesh(object, projBP, posX, posY, posZ, scale, scaleVelocity, Lifetime, velX, velY, VelZ, orientRot, orientX, orientY, orientZ)
-
-    local proj = object:CreateProjectile(projBP, posX, posY, posZ, nil, nil, nil)
-    proj:SetScale(scale,scale,scale):SetScaleVelocity(scaleVelocity):SetLifetime(Lifetime):SetVelocity(velX, velY, VelZ)
-
-    local orient = {0, 0, 0, 0}
-    orient[1], orient[2], orient[3], orient[4] = QuatFromRotation(orientRot, orientX, orientY, orientZ)
-    proj:SetOrientation(orient, true)
+function CreateExplosionMesh(object, projBP, posX, posY, posZ, scale, scaleVelocity, lifetime, velX, velY, velZ, orientRot, orientX, orientY, orientZ)
+    local proj = object:CreateProjectile(projBP, posX, posY, posZ)
+    proj:SetScale(scale,scale,scale)
+        :SetScaleVelocity(scaleVelocity)
+        :SetLifetime(lifetime)
+        :SetVelocity(velX, velY, velZ)
+        :SetOrientation(QuatFromRotation(orientRot, orientX, orientY, orientZ), true)
 
     CreateEmitterAtEntity(proj, proj.Army, '/effects/emitters/destruction_explosion_smoke_10_emit.bp')
     return proj

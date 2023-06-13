@@ -88,11 +88,11 @@ local function _FormatTable(t)
 
     if IsVector(t) then
         if rawget(t, 4) then
-            return "(Quaternion { " .. t[1] .. ", " .. t[2] .. ", " .. t[3] .. ", " .. t[4] .. "})"
+            return "(Quaternion {" .. t[1] .. ", " .. t[2] .. ", " .. t[3] .. ", " .. t[4] .. "})"
         elseif t.z then
-            return "(Vector { " .. t.x .. ", " .. t.y .. ", " .. t.z .. "})"
+            return "(Vector {" .. t.x .. ", " .. t.y .. ", " .. t.z .. "})"
         else
-            return "(Vector2 { " .. t.x .. ", " .. t.y .. "})"
+            return "(Vector2 {" .. t.x .. ", " .. t.y .. "})"
         end
     end
 

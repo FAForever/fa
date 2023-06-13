@@ -1,88 +1,63 @@
-
-local GetTerrainHeight = GetTerrainHeight
-local type = type
-
-local MathMax = math.max
-local MathAtan = math.atan
+local MathAtan2 = math.atan2
 local MathDeg = math.deg
+local GetTerrainHeight = GetTerrainHeight
+local FlattenMapRect = FlattenMapRect
 
-local CacheBox = { 0, 0 }
-local CacheAngles = { 0, 0, 0, 0 }
-local CacheHeights = { 0, 0, 0, 0 }
-
---- Compute two angles in radians to match the terrain gradient
+--- Compute two angles in radians to match the terrain gradient.
 --- Copyright 2018-2022 Sean 'Balthazar' Wheeldon
 ---@param pos Vector
----@param bx number
----@param bz number
----@return number
----@return number
-function GetTerrainSlopeAngles(pos, bx, bz)
+---@param sizeX number
+---@param sizeZ number
+---@return number angleX
+---@return number angleZ
+function GetTerrainSlopeAngles(pos, sizeX, sizeZ)
+    local posX, posY, posZ = pos[1], pos[2], pos[3]
+    local lenX, lenZ = sizeX * 0.5, sizeZ * 0.5
 
-    local box = CacheBox
-    box[1], box[2] = 0.5 * bx, 0.5 * bz
+    -- Get angles, starting from the upper-left edges
+    local angleX = MathAtan2(GetTerrainHeight(posX - lenX, posZ) - posY, lenX)
+    local angleZ = MathAtan2(GetTerrainHeight(posX, posZ - lenZ) - posY, lenZ)
 
-    --Get heights
-    local heights = CacheHeights
-    heights[1] = GetTerrainHeight(pos[1]-box[1],pos[3])
-    heights[2] = GetTerrainHeight(pos[1],pos[3]-box[2])
-
-    --Get averages if its 2 squares or bigger, bearing in mind the number was halved.
-    local requireFourPoints = MathMax(box[1],box[2]) >= 1
-    if requireFourPoints then
-        heights[3] = GetTerrainHeight(pos[1]+box[1],pos[3])
-        heights[4] = GetTerrainHeight(pos[1],pos[3]+box[2])
+    -- If it has the other edges to sample, average those
+    if sizeX >= 2 then
+        local rightX = MathAtan2(GetTerrainHeight(posX + lenX, posZ) - posY, lenX)
+        angleX = (angleX - rightX) * 0.5
+    end
+    if sizeZ >= 2 then
+        local lowerZ = MathAtan2(GetTerrainHeight(posX, posZ + lenZ) - posY, lenZ)
+        angleZ = (angleZ - lowerZ) * 0.5
     end
 
-    --Subtract center height
-    for i, v in heights do
-        heights[i] = v - pos[2]
-    end
-
-    --Calculate angles
-    local angles = CacheAngles
-    for i, v in heights do
-        angles[i] = MathAtan(heights[i] / box[math.mod(i-1,2)+1])
-    end
-
-    --Condence down to average if they were calculated
-    if requireFourPoints then
-        return 0.5 * (angles[1]-angles[3]), 0.5 * (angles[2]-angles[4])
-    else
-        return angles[1], angles[2]
-    end
+    return angleX, angleZ
 end
 
---- Compute two angles in degrees to match the terrain gradient
+--- Compute two angles in degrees to match the terrain gradient.
 --- Copyright 2018-2022 Sean 'Balthazar' Wheeldon
 ---@param pos Vector Center of area
----@param bx number width
----@param bz number height
----@return number
----@return number
-function GetTerrainSlopeAnglesDegrees(pos, bx, bz)
-    local a1, a2 = GetTerrainSlopeAngles(pos, bx, bz)
-    return MathDeg(a1), MathDeg(a2)
+---@param sizeX number
+---@param sizeZ number
+---@return number angleX
+---@return number angleZ
+function GetTerrainSlopeAnglesDegrees(pos, sizeX, sizeZ)
+    local angleX, angleZ = GetTerrainSlopeAngles(pos, sizeX, sizeZ)
+    return MathDeg(angleX), MathDeg(angleZ)
 end
 
---- Flattens the terrain by interpolating between 
+--- Flattens the terrain by bilinearly interpolating between the rectangle.
 --- Copyright 2018-2022 Sean 'Balthazar' Wheeldon
 ---@param x number Top-left coordinate
 ---@param z number Top-left coordinate
 ---@param w number
 ---@param h number
-FlattenGradientMapRect = function(x,z,w,h)
-    --a1,a2
-    --b1,b2
-    local a1, a2, b1, b2 = GetTerrainHeight(x,z), GetTerrainHeight(x+w,z), GetTerrainHeight(x,z+h), GetTerrainHeight(x+w,z+h)
+function FlattenGradientMapRect(x, z, w, h)
+    local start, xHeight = GetTerrainHeight(x, z), GetTerrainHeight(x + w, z)
+    local zHeight, corner = GetTerrainHeight(x, z + h), GetTerrainHeight(x + w, z + h)
+    local xGrad = (xHeight - start) / w
+    local zGrad = (zHeight - start) / h
+    local diagGrad = (start + corner - xHeight - zHeight) / (w * h)
     for i = 0, w do
         for j = 0, h do
-            FlattenMapRect(x+i,z+j,0,0,
-                (
-                    ((a1*(w-i)+a2*(i))/w)*(h-j) +
-                    ((b1*(w-i)+b2*(i))/w)*(j)
-                )/h
-            )
+            FlattenMapRect(x + i, z + j, 0, 0, start + i*xGrad + j*zGrad + i*j*diagGrad)
         end
     end
 end

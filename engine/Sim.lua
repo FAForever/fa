@@ -670,6 +670,7 @@ end
 function GetUnitBlueprintByName(bpName)
 end
 
+---@overload fun(x1: number, z1: number, x2: number, z2: number): Unit[] | nil
 --- retrieves all units in a rectangle
 ---@param rectangle Rectangle
 ---@return Unit[] | nil

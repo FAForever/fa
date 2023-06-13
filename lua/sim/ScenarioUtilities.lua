@@ -500,22 +500,12 @@ end
 ---@param unit Unit
 ---@param needToRotate number
 function CreateWreckage(unit, needToRotate)
-    prop = unit:CreateWreckageProp(0)
+    local prop = unit:CreateWreckageProp(0)
     if needToRotate then -- Some units like naval and air need to rotate for effect like after death in game
-        local roll = 0.5 + Random() - 2 * Random(0, 1) -- Random angle +-(0.5->1.5) radian
-        local pitch = 0.5 + Random() - 2 * Random(0, 1)
+        local roll = 0.5 + Random() - 2 * Random() -- Random angle +-(0.5->1.5) radian
+        local pitch = 0.5 + Random() - 2 * Random()
         local yaw = 0
-
-        local unitRotation = unit:GetOrientation()
-        local rotation = EulerToQuaternion(roll, pitch, yaw)
-        local newOrientation = {}
-        -- mmm I`m love quaternions... =3
-        newOrientation[1] = unitRotation[4] * rotation[1] + unitRotation[1] * rotation[4] + unitRotation[2] * rotation[3] - unitRotation[3] * rotation[2]
-        newOrientation[2] = unitRotation[4] * rotation[2] + unitRotation[2] * rotation[4] + unitRotation[3] * rotation[1] - unitRotation[1] * rotation[3]
-        newOrientation[3] = unitRotation[4] * rotation[3] + unitRotation[3] * rotation[4] + unitRotation[1] * rotation[2] - unitRotation[2] * rotation[1]
-        newOrientation[4] = unitRotation[4] * rotation[4] - unitRotation[1] * rotation[1] - unitRotation[2] * rotation[2] - unitRotation[3] * rotation[3]
-
-        prop:SetOrientation(newOrientation, true)
+        prop:SetOrientation(unit:GetOrientation() * EulerToQuaternion(roll, pitch, yaw), true)
     end
     unit:Destroy()
 end
