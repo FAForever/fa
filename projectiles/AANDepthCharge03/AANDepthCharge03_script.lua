@@ -1,82 +1,46 @@
---
 -- Depth Charge Script
---
 local ADepthChargeProjectile = import("/lua/aeonprojectiles.lua").ADepthChargeProjectile
-local VizMarker = import("/lua/sim/vizmarker.lua").VizMarker
+local VisionMarkerOpti = import("/lua/sim/vizmarker.lua").VisionMarkerOpti
 
-AANDepthCharge03 = Class(ADepthChargeProjectile) {
-
-    CountdownLength = 10,
-    FxEnterWater= { '/effects/emitters/water_splash_ripples_ring_01_emit.bp',
-                    '/effects/emitters/water_splash_plume_01_emit.bp',},
-
+AANDepthCharge03 = ClassProjectile(ADepthChargeProjectile) {
 
     OnCreate = function(self)
         ADepthChargeProjectile.OnCreate(self)
-        self.HasImpacted = false
-        self:ForkThread(self.CountdownExplosion)
-    end,
-
-    CountdownExplosion = function(self)
-        WaitSeconds(self.CountdownLength)
-
-        if not self.HasImpacted then
-            self:OnImpact('Underwater', nil)
-        end
-    end,
-
-    OnEnterWater = function(self)
-        --ADepthChargeProjectile.OnEnterWater(self)
-
-        for i in self.FxEnterWater do --splash
-            CreateEmitterAtEntity(self, self.Army, self.FxEnterWater[i])
-        end
-
-        --self:SetMaxSpeed(20)
-        --self:SetVelocity(0)
-        --self:SetAcceleration(5)
-        self:TrackTarget(true)
-        self:StayUnderwater(true)
-        self:SetTurnRate(360)
-        self:SetVelocityAlign(true)
-        self:SetStayUpright(false)
-        --self:ForkThread(self.EnterWaterMovementThread)
-    end,
-
-    EnterWaterMovementThread = function(self)
-        WaitTicks(1)
-        self:SetVelocity(0.5)
-    end,
-
-    OnLostTarget = function(self)
-        self:SetMaxSpeed(2)
-        self:SetAcceleration(-0.6)
-        self:ForkThread(self.CountdownMovement)
-    end,
-
-    CountdownMovement = function(self)
-        WaitSeconds(3)
-        self:SetMaxSpeed(0)
-        self:SetAcceleration(0)
-        self:SetVelocity(0)
     end,
 
     OnImpact = function(self, TargetType, TargetEntity)
-        --LOG('Projectile impacted with: ' .. TargetType)
-        self.HasImpacted = true
-        local pos = self:GetPosition()
-        local spec = {
-            X = pos[1],
-            Z = pos[3],
-            Radius = 30,
-            LifeTime = 10,
-            Omni = false,
-            Vision = false,
-            Army = self.Army,
-        }
-        local vizEntity = VizMarker(spec)
+        local px,_,pz = self:GetPositionXYZ()
+        local marker = VisionMarkerOpti({Owner = self})
+        marker:UpdatePosition(px,pz)
+        marker:UpdateDuration(5)
+        marker:UpdateIntel(self.Army, 5, 'Vision', true)
         ADepthChargeProjectile.OnImpact(self, TargetType, TargetEntity)
     end,
-}
 
+    ---@param self TANAnglerTorpedo06
+    OnEnterWater = function(self)
+        ADepthChargeProjectile.OnEnterWater(self)
+
+        -- set the magnitude of the velocity to something tiny to really make that water
+        -- impact slow it down. We need this to prevent torpedo's striking the bottom
+        -- of a shallow pond, like in setons
+        self:SetVelocity(0)
+        self:SetAcceleration(0.5)
+    end,
+
+    --- Adjusted movement thread to gradually speed up the torpedo. It needs to slowly speed
+    --- up to prevent it from hitting the floor in relative undeep water
+    ---@param self TANAnglerTorpedo06
+    MovementThread = function(self)
+        WaitTicks(1)
+        for k = 1, 6 do
+            WaitTicks(1)
+            if not IsDestroyed(self) then
+                self:SetAcceleration(k)
+            else
+                break
+            end
+        end
+    end,
+}
 TypeClass = AANDepthCharge03

@@ -109,6 +109,7 @@ UnitBlueprint {
         Abilities = {
             '<LOC ability_omni>Omni Sensor',
             '<LOC ability_radar>Radar',
+            '<LOC ability_jamming>Jamming',
         },
         LayerChangeEffects = {
             AirLand = {
@@ -204,11 +205,25 @@ UnitBlueprint {
         TechLevel = 'RULEUTL_Secret',
         UnitName = '<LOC uea0302_name>SR90 Blackbird',
         UnitWeight = 1,
+        OrderOverrides = {
+            RULEUTC_JammingToggle = {
+                bitmapId = 'jamming',
+                helpText = 'toggle_jamming',
+            },
+        },
+        ToggleCaps = {
+            RULEUTC_JammingToggle = true,
+        },
     },
     Intel = {
         OmniRadius = 30,
         RadarRadius = 96,
         VisionRadius = 64,
+        JamRadius = {
+            Max = 25,
+            Min = 10,
+        },
+        JammerBlips = 4,
     },
     Interface = {
         HelpText = '<LOC uea0302_help>Spy Plane',
@@ -225,7 +240,7 @@ UnitBlueprint {
             LAYER_Sub = false,
             LAYER_Water = false,
         },
-        Elevation = 25,
+        Elevation = 22,
         FuelRechargeRate = 15,
         FuelUseTime = 1500,
         GroundCollisionOffset = 1.6,

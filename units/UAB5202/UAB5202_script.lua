@@ -11,7 +11,7 @@
 local AAirStagingPlatformUnit = import("/lua/aeonunits.lua").AAirStagingPlatformUnit
 
 ---@class UAB5202 : AAirStagingPlatformUnit
-UAB5202 = Class(AAirStagingPlatformUnit) {
+UAB5202 = ClassUnit(AAirStagingPlatformUnit) {
 }
 
 TypeClass = UAB5202

@@ -1,25 +1,16 @@
---****************************************************************************
---**
---**  File     :  /lua/ai/OpAI/LandAssault_EditorFunctions
---**  Author(s): Dru Staltman
---**
---**  Summary  : Generic AI Platoon Build Conditions
---**             Build conditions always return true or false
---**
---**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
---****************************************************************************
-local AIUtils = import("/lua/ai/aiutilities.lua")
+----------------------------------------------------------------------------------------------------
+-- File     :  /lua/ai/OpAI/LandAssault_EditorFunctions
+-- Author(s): Dru Staltman
+-- Summary  : Generic AI Platoon Build Conditions. Build conditions always return true or false
+-- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+----------------------------------------------------------------------------------------------------
 local ScenarioFramework = import("/lua/scenarioframework.lua")
-local ScenarioUtils = import("/lua/sim/scenarioutilities.lua")
 local ScenarioPlatoonAI = import("/lua/scenarioplatoonai.lua")
 
-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
--- function: LandAssaultChildCountDifficulty = BuildCondition   doc = "Please work function docs."
--- 
--- parameter 0: string   aiBrain     = "default_brain"     
--- parameter 1: string   master     = "default_master"
--- 
-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+---LandAssaultChildCountDifficulty = BuildCondition   doc = "Please work function docs."
+---@param aiBrain AIBrain default_brain
+---@param master string default_master
+---@return boolean
 function LandAssaultChildCountDifficulty(aiBrain, master)
     local counter = ScenarioFramework.AMPlatoonCounter(aiBrain, master)
     local d1Num = ScenarioInfo.OSPlatoonCounter[master..'_D1'] or 3
@@ -36,13 +27,10 @@ function LandAssaultChildCountDifficulty(aiBrain, master)
     end
 end
 
-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
--- function: LandAssaultMasterCountDifficulty = BuildCondition   doc = "Please work function docs."
--- 
--- parameter 0: string   aiBrain     = "default_brain"       
--- parameter 1: string   master     = "default_master"
--- 
-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+---LandAssaultMasterCountDifficulty = BuildCondition   doc = "Please work function docs."
+---@param aiBrain AIBrain
+---@param master string
+---@return boolean
 function LandAssaultMasterCountDifficulty(aiBrain, master)
     local counter = ScenarioFramework.AMPlatoonCounter(aiBrain, master)
     local d1Num = ScenarioInfo.OSPlatoonCounter[master..'_D1'] or 3
@@ -59,12 +47,8 @@ function LandAssaultMasterCountDifficulty(aiBrain, master)
     end
 end
 
-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
--- function: LandAssaultAttack = AddFunction   doc = "Please work function docs."
--- 
--- parameter 0: string   platoon     = "default_platoon"       
--- 
-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+---LandAssaultAttack = AddFunction   doc = "Please work function docs."
+---@param platoon Platoon
 function LandAssaultAttack(platoon)
     local aiBrain = platoon:GetBrain()
     local master = string.sub(platoon.PlatoonData.BuilderName, 12)
@@ -99,25 +83,18 @@ function LandAssaultAttack(platoon)
     end
 end
 
-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
--- function: LandAssaultTransport = BuildCondition   doc = "Please work function docs."
--- 
--- parameter 0: string   aiBrain     = "default_brain"       
--- parameter 1: string      tCount      = "default_transport_count"
--- 
-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+---LandAssaultTransport = BuildCondition   doc = "Please work function docs."
+---@param aiBrain AIBrain default_brain
+---@param tCount number[] default_transport_count
+---@return boolean
 function LandAssaultTransport(aiBrain, tCount)
     local transportPool = aiBrain:GetPlatoonUniquelyNamed('TransportPool')
     
     return not( transportPool and table.getn(transportPool:GetPlatoonUnits()) > 4 ) 
 end
 
-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
--- function: LandAssaultTransportThread = AddFunction   doc = "Please work function docs."
--- 
--- parameter 0: string   platoon     = "default_platoon"       
--- 
-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+--- LandAssaultTransportThread = AddFunction   doc = "Please work function docs."
+---@param platoon Platoon default_platoon
 function LandAssaultTransportThread(platoon)
     local aiBrain = platoon:GetBrain()
     local master = string.sub(platoon.PlatoonData.BuilderName, 11)
@@ -132,4 +109,3 @@ function LandAssaultTransportThread(platoon)
     end
     ScenarioPlatoonAI.TransportPool(platoon)
 end
-

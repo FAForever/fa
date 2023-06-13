@@ -8,6 +8,16 @@
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
+---@alias AeonACUEnhancementBuffType
+---| "DamageStabilization"
+---| "ACUBUILDRATE"
+
+---@alias AeonACUEnhancementBuffName          # BuffType
+---| "AeonACUChronoDampener"                  # DamageStabilization
+---| "AeonACUT2BuildRate"                     # ACUBUILDRATE
+---| "AeonACUT3BuildRate"                     # ACUBUILDRATE
+
+
 local ACUUnit = import("/lua/defaultunits.lua").ACUUnit
 local AWeapons = import("/lua/aeonweapons.lua")
 local ADFDisruptorCannonWeapon = AWeapons.ADFDisruptorCannonWeapon
@@ -18,13 +28,13 @@ local ADFChronoDampener = AWeapons.ADFChronoDampener
 local Buff = import("/lua/sim/buff.lua")
 
 ---@class UAL0001 : ACUUnit
-UAL0001 = Class(ACUUnit) {
+UAL0001 = ClassUnit(ACUUnit) {
     Weapons = {
-        DeathWeapon = Class(DeathNukeWeapon) {},
-        RightDisruptor = Class(ADFDisruptorCannonWeapon) {},
-        ChronoDampener = Class(ADFChronoDampener) {},
-        OverCharge = Class(ADFOverchargeWeapon) {},
-        AutoOverCharge = Class(ADFOverchargeWeapon) {},
+        DeathWeapon = ClassWeapon(DeathNukeWeapon) {},
+        RightDisruptor = ClassWeapon(ADFDisruptorCannonWeapon) {},
+        ChronoDampener = ClassWeapon(ADFChronoDampener) {},
+        OverCharge = ClassWeapon(ADFOverchargeWeapon) {},
+        AutoOverCharge = ClassWeapon(ADFOverchargeWeapon) {},
     },
 
     __init = function(self)
@@ -61,8 +71,8 @@ UAL0001 = Class(ACUUnit) {
             local bp = self:GetBlueprint().Enhancements[enh]
             local bpEcon = self:GetBlueprint().Economy
             if not bp then return end
-            self:SetProductionPerSecondEnergy(bp.ProductionPerSecondEnergy + bpEcon.ProductionPerSecondEnergy or 0)
-            self:SetProductionPerSecondMass(bp.ProductionPerSecondMass + bpEcon.ProductionPerSecondMass or 0)
+            self:SetProductionPerSecondEnergy((bp.ProductionPerSecondEnergy + bpEcon.ProductionPerSecondEnergy) or 0)
+            self:SetProductionPerSecondMass((bp.ProductionPerSecondMass + bpEcon.ProductionPerSecondMass) or 0)
         elseif enh == 'ResourceAllocationRemove' then
             local bpEcon = self:GetBlueprint().Economy
             self:SetProductionPerSecondEnergy(bpEcon.ProductionPerSecondEnergy or 0)
@@ -71,8 +81,8 @@ UAL0001 = Class(ACUUnit) {
             local bp = self:GetBlueprint().Enhancements[enh]
             local bpEcon = self:GetBlueprint().Economy
             if not bp then return end
-            self:SetProductionPerSecondEnergy(bp.ProductionPerSecondEnergy + bpEcon.ProductionPerSecondEnergy or 0)
-            self:SetProductionPerSecondMass(bp.ProductionPerSecondMass + bpEcon.ProductionPerSecondMass or 0)
+            self:SetProductionPerSecondEnergy((bp.ProductionPerSecondEnergy + bpEcon.ProductionPerSecondEnergy) or 0)
+            self:SetProductionPerSecondMass((bp.ProductionPerSecondMass + bpEcon.ProductionPerSecondMass) or 0)
         elseif enh == 'ResourceAllocationAdvancedRemove' then
             local bpEcon = self:GetBlueprint().Economy
             self:SetProductionPerSecondEnergy(bpEcon.ProductionPerSecondEnergy or 0)
@@ -203,12 +213,28 @@ UAL0001 = Class(ACUUnit) {
         -- Crysalis Beam
         elseif enh == 'CrysalisBeam' then
             local wep = self:GetWeaponByLabel('RightDisruptor')
-            wep:ChangeMaxRadius(bp.NewMaxRadius or 44)
+            wep:ChangeMaxRadius(bp.NewMaxRadius or 30)
             local oc = self:GetWeaponByLabel('OverCharge')
-            oc:ChangeMaxRadius(bp.NewMaxRadius or 44)
+            oc:ChangeMaxRadius(bp.NewMaxRadius or 30)
             local aoc = self:GetWeaponByLabel('AutoOverCharge')
-            aoc:ChangeMaxRadius(bp.NewMaxRadius or 44)
+            aoc:ChangeMaxRadius(bp.NewMaxRadius or 30)
         elseif enh == 'CrysalisBeamRemove' then
+            local wep = self:GetWeaponByLabel('RightDisruptor')
+            local bpDisrupt = self:GetBlueprint().Weapon[1].MaxRadius
+            wep:ChangeMaxRadius(bpDisrupt or 22)
+            local oc = self:GetWeaponByLabel('OverCharge')
+            oc:ChangeMaxRadius(bpDisrupt or 22)
+            local aoc = self:GetWeaponByLabel('AutoOverCharge')
+            aoc:ChangeMaxRadius(bpDisrupt or 22)
+        -- Advanced Cryslised Beam
+        elseif enh == 'AdvancedCrysalisBeam' then
+            local wep = self:GetWeaponByLabel('RightDisruptor')
+            wep:ChangeMaxRadius(bp.NewMaxRadius or 35)
+            local oc = self:GetWeaponByLabel('OverCharge')
+            oc:ChangeMaxRadius(bp.NewMaxRadius or 35)
+            local aoc = self:GetWeaponByLabel('AutoOverCharge')
+            aoc:ChangeMaxRadius(bp.NewMaxRadius or 35)
+        elseif enh == 'AdvancedCrysalisBeamRemove' then
             local wep = self:GetWeaponByLabel('RightDisruptor')
             local bpDisrupt = self:GetBlueprint().Weapon[1].MaxRadius
             wep:ChangeMaxRadius(bpDisrupt or 22)

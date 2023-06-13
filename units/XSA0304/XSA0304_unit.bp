@@ -190,9 +190,9 @@ UnitBlueprint {
         UniformScale = 0.08,
     },
     Economy = {
-        BuildCostEnergy = 144000,--105000
-        BuildCostMass = 2100,
-        BuildTime = 9600,
+        BuildCostEnergy = 180000,--105000
+        BuildCostMass = 1900,
+        BuildTime = 12000,
     },
     Footprint = {
         MaxSlope = 0.25,
@@ -242,7 +242,7 @@ UnitBlueprint {
             LAYER_Sub = false,
             LAYER_Water = false,
         },
-        Elevation = 20,
+        Elevation = 18,
         FuelRechargeRate = 15,
         FuelUseTime = 1500,
         GroundCollisionOffset = 2,
@@ -297,7 +297,6 @@ UnitBlueprint {
             DamageFriendly = true,
             DamageRadius = 6,
             DamageType = 'Normal',
-            Display = 'Zhanasee Strategic Bomb',
             DisplayName = 'Zhanasee Strategic Bomb',
             EffectiveRadius = 25,
             FireTargetLayerCapsTable = {
@@ -329,7 +328,7 @@ UnitBlueprint {
             RackSalvoReloadTime = 0,
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
-            RateOfFire = 0.2,
+            RateOfFire = 0.125,
             TargetPriorities = {
                 'TECH4',
                 'TECH3 STRUCTURE',

@@ -14,18 +14,18 @@ local CANNaniteTorpedoWeapon = import("/lua/cybranweapons.lua").CANNaniteTorpedo
 local CIFSmartCharge = import("/lua/cybranweapons.lua").CIFSmartCharge
 
 ---@class URS0201 : CSeaUnit
-URS0201 = Class(CSeaUnit) {
+URS0201 = ClassUnit(CSeaUnit) {
     SwitchAnims = true,
     Walking = false,
     IsWaiting = false,
 
     Weapons = {
-        ParticleGun = Class(CDFProtonCannonWeapon) {},
-        AAGun = Class(CAAAutocannon) {},
-        TorpedoR = Class(CANNaniteTorpedoWeapon) {},
-        TorpedoL = Class(CANNaniteTorpedoWeapon) {},
-        AntiTorpedoF = Class(CIFSmartCharge) {},
-        AntiTorpedoB = Class(CIFSmartCharge) {},
+        ParticleGun = ClassWeapon(CDFProtonCannonWeapon) {},
+        AAGun = ClassWeapon(CAAAutocannon) {},
+        TorpedoR = ClassWeapon(CANNaniteTorpedoWeapon) {},
+        TorpedoL = ClassWeapon(CANNaniteTorpedoWeapon) {},
+        AntiTorpedoF = ClassWeapon(CIFSmartCharge) {},
+        AntiTorpedoB = ClassWeapon(CIFSmartCharge) {},
     },
 
     OnMotionHorzEventChange = function(self, new, old)
@@ -113,6 +113,7 @@ URS0201 = Class(CSeaUnit) {
     OnKilled = function(self, instigator, type, overkillRatio)
         self.Trash:Destroy()
         self.Trash = TrashBag()
+        -- TODO: don't change the entire blueprint's death animation to make this work
         if self.Layer ~= 'Water' and not self.IsWaiting then
             self:GetBlueprint().Display.AnimationDeath = self:GetBlueprint().Display.LandAnimationDeath
         else
@@ -151,7 +152,7 @@ URS0201 = Class(CSeaUnit) {
             if self.PlayDestructionEffects then
                 self:CreateDestructionEffects(self, overkillRatio)
             end
-            self:CreateWreckage(0.1)
+            self:CreateWreckage(0)
             self:Destroy()
         else
             CSeaUnit.DeathThread(self, overkillRatio)

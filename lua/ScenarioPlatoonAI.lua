@@ -7,7 +7,7 @@
 
 local AIBuildStructures = import("/lua/ai/aibuildstructures.lua")
 local ScenarioFramework = import("/lua/scenarioframework.lua")
-local BuildingTemplates = import("/lua/buildingtemplates.lua").BuildingTemplates
+local StructureTemplates = import("/lua/buildingtemplates.lua")
 local ScenarioUtils = import("/lua/sim/scenarioutilities.lua")
 
 --- Retrieves all human brains that are hostile to the given army index
@@ -535,7 +535,7 @@ function EngineersBuildPlatoon(platoon)
     local buildingData
     local unitBeingBuilt = false
     local busy = false
-    local buildingTemplate = BuildingTemplates[aiBrain:GetFactionIndex()]
+    local buildingTemplate = StructureTemplates.BuildingTemplates[aiBrain:GetFactionIndex()]
 
     if not data.PlatoonsTable then
         error('*SCENARIO PLATOON AI ERROR: EngineersBuildPlatoon requires PlatoonsTable', 2)
@@ -1364,7 +1364,7 @@ end
 function EngineerBuildStructure(aiBrain, builder, building, brainBaseTemplate, buildingTemplate)
     local structureCategory
     if not buildingTemplate then
-        buildingTemplate = BuildingTemplates[aiBrain:GetFactionIndex()]
+        buildingTemplate = StructureTemplates.BuildingTemplates[aiBrain:GetFactionIndex()]
     end
     for _, v in buildingTemplate do
         if building == v[1] then
@@ -2027,9 +2027,9 @@ function PlatoonChooseRandomNonNegative(aiBrain, locationList, ringSize)
             table.insert(landingList, v)
         end
     end
-    local loc = landingList[Random(1, table.getn(landingList))]
+    local loc = table.random(landingList)
     if not loc then
-        loc = locationList[Random(1, table.getn(locationList))]
+        loc = table.random(locationList)
     end
     return loc
 end

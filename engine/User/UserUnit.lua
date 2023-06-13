@@ -1,6 +1,8 @@
 ---@meta
 
 ---@class UserUnit
+---@field ThreadUnpause? thread
+---@field ThreadUnpauseCandidates? table<EntityId, boolean>
 local UserUnit = {}
 
 ---@class MissileInfo
@@ -61,7 +63,7 @@ function UserUnit:GetEconData()
 end
 
 ---
----@return string
+---@return EntityId
 function UserUnit:GetEntityId()
 end
 
@@ -114,8 +116,6 @@ end
 ---@return number
 function UserUnit:GetShieldRatio()
 end
-
--- TODO was the UserUnit.GetStat method also binary patched?
 
 ---
 ---@generic T
@@ -187,9 +187,8 @@ end
 function UserUnit:IsStunned()
 end
 
----
----@param command string
----@param value string
+---@param command 'SetAutoMode' | 'SetFireState' | 'SetAutoSurfaceMode' | 'SetRepeatQueue' | 'SetPaused' | 'CustomName' | 'ToggleScriptBit' | 'PlayNoStagingPlatformsVO' | 'PlayBusyStagingPlatformsVO' 
+---@param value boolean | string
 function UserUnit:ProcessInfo(command, value)
 end
 

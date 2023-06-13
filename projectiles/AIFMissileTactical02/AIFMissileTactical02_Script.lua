@@ -1,30 +1,25 @@
---
 -- Aeon Land-Based Tactical Missile
---
+
 local AMissileSerpentineProjectile = import("/lua/aeonprojectiles.lua").AMissileSerpentineProjectile
-
-AIFMissileTactical02 = Class(AMissileSerpentineProjectile) {
-
+AIFMissileTactical02 = ClassProjectile(AMissileSerpentineProjectile) {
     OnCreate = function(self)
         AMissileSerpentineProjectile.OnCreate(self)
         self:SetCollisionShape('Sphere', 0, 0, 0, 2.0)
-        self:ForkThread( self.MovementThread )
+        self.Trash:Add(ForkThread( self.MovementThread,self ))
     end,
 
     MovementThread = function(self)
-        local army = self:GetArmy()
         self:TrackTarget(false)
         self:SetCollision(true)
-        WaitSeconds(2)
+        WaitTicks(21)
         self:SetTurnRate(5)
-        WaitSeconds(0.5)
-        self:TrackTarget(true)
+        WaitTicks(6)
         self:TrackTarget(true)
         self:SetTurnRate(10)
-        WaitSeconds(0.5)
+        WaitTicks(6)
         while not self:BeenDestroyed() do
             self:SetTurnRateByDist()
-            WaitSeconds(0.5)
+            WaitTicks(6)
         end
     end,
 

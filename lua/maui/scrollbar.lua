@@ -20,7 +20,7 @@ ScrollAxis = {
 ---@field _tb LazyVar<FileName>
 ---@field UpButton? Button
 ---@field DownButton? Button
-Scrollbar = Class(moho.scrollbar_methods, Control) {
+Scrollbar = ClassUI(moho.scrollbar_methods, Control) {
     ---@param self Scrollbar
     ---@param parent Control
     ---@param axis ScrollAxis

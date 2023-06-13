@@ -8,6 +8,6 @@
 --**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-TDFHeavyPlasmaGatlingCannon01 = Class(import("/lua/terranprojectiles.lua").THeavyPlasmaGatlingCannon) {
+TDFHeavyPlasmaGatlingCannon01 = ClassProjectile(import("/lua/terranprojectiles.lua").THeavyPlasmaGatlingCannon) {
 }
 TypeClass = TDFHeavyPlasmaGatlingCannon01

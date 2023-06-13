@@ -11,15 +11,13 @@
 local CWalkingLandUnit = import("/lua/cybranunits.lua").CWalkingLandUnit
 local CybranWeaponsFile = import("/lua/cybranweapons.lua")
 local CDFLaserHeavyWeapon = CybranWeaponsFile.CDFLaserHeavyWeapon
---local CDFRocketIridiumWeapon = CybranWeaponsFile.CDFRocketIridiumWeapon
 local EffectUtil = import("/lua/effectutilities.lua")
 
 
 ---@class URL0107 : CWalkingLandUnit
-URL0107 = Class(CWalkingLandUnit) {
+URL0107 = ClassUnit(CWalkingLandUnit) {
     Weapons = {
-        LaserArms = Class(CDFLaserHeavyWeapon) {},
-        --RocketBackpack = Class(CDFRocketIridiumWeapon) {},
+        LaserArms = ClassWeapon(CDFLaserHeavyWeapon) {},
     },
 
     OnCreate = function(self)

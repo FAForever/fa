@@ -87,14 +87,14 @@ UnitBlueprint {
         UniformScale = 0.125,
     },
     Economy = {
-        BuildCostEnergy = 544,
-        BuildCostMass = 64,
+        BuildCostEnergy = 1275,
+        BuildCostMass = 150,
         BuildRate = 14.08,
-        BuildTime = 80,
+        BuildTime = 127.5,
         BuildableCategory = {
             'urb3202',
         },
-        MaintenanceConsumptionPerSecondEnergy = 10,
+        MaintenanceConsumptionPerSecondEnergy = 20,
         RebuildBonusIds = {
             'urb3102',
             'urb3202',
@@ -141,7 +141,8 @@ UnitBlueprint {
     },
     Intel = {
         ShowIntelOnSelect = true,
-        SonarRadius = 115,
+        ReactivateTime = 2,
+        SonarRadius = 160,
         VisionRadius = 20,
     },
     Interface = {

@@ -3,7 +3,5 @@
 --
 local Projectile = import("/lua/sim/projectile.lua").Projectile
 
-AIMFactoryBlob01 = Class(Projectile) {
-}
+AIMFactoryBlob01 = ClassProjectile(Projectile) {}
 TypeClass = AIMFactoryBlob01
-

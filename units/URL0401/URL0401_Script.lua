@@ -17,10 +17,10 @@ local recoilBones = { 'Turret_Barrel_F_B02', 'Turret_Barrel_E_B02', 'Turret_Barr
 local muzzleBones = { 'Turret_Barrel_F_B03', 'Turret_Barrel_E_B03', 'Turret_Barrel_D_B03', 'Turret_Barrel_C_B03', 'Turret_Barrel_B_B03', 'Turret_Barrel_A_B03' }
 
 ---@class URL0401 : CLandUnit
-URL0401 = Class(CLandUnit) {
+URL0401 = ClassUnit(CLandUnit) {
    
     Weapons = {
-        Gun01 = Class(CIFArtilleryWeapon) {   
+        Gun01 = ClassWeapon(CIFArtilleryWeapon) {   
             
             OnCreate = function(self)
                 CIFArtilleryWeapon.OnCreate(self)
@@ -115,9 +115,11 @@ URL0401 = Class(CLandUnit) {
                     end
                 end
                 
-                CIFArtilleryWeapon.CreateProjectileAtMuzzle(self, muzzleIdx)
+                local projectile = CIFArtilleryWeapon.CreateProjectileAtMuzzle(self, muzzleIdx)
                 self:ForkThread(self.LaunchEffects)
                 self:ForkThread(self.RotateBarrels)
+
+                return projectile
             end,
 	RotateBarrels = function(self)
                 if not self.losttarget then

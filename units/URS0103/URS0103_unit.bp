@@ -255,7 +255,7 @@ UnitBlueprint {
             FiringRandomness = 0.2,
             FiringTolerance = 2,
             Label = 'ProtonCannon',
-            MaxRadius = 28,
+            MaxRadius = 26,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
             MuzzleVelocity = 30,

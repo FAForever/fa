@@ -10,9 +10,9 @@ local AIFBombQuarkWeapon = import("/lua/aeonweapons.lua").AIFBombQuarkWeapon
 
 
 ---@class UAA0304 : AAirUnit
-UAA0304 = Class(AAirUnit) {
+UAA0304 = ClassUnit(AAirUnit) {
     Weapons = {
-        Bomb = Class(AIFBombQuarkWeapon) {},
+        Bomb = ClassWeapon(AIFBombQuarkWeapon) {},
     },
     
     OnDamage = function(self, instigator, amount, vector, damageType)

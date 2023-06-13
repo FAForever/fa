@@ -12,9 +12,9 @@ local TStructureUnit = import("/lua/terranunits.lua").TStructureUnit
 local TIFArtilleryWeapon = import("/lua/terranweapons.lua").TIFArtilleryWeapon
 
 ---@class UEB2302 : TStructureUnit
-UEB2302 = Class(TStructureUnit) {
+UEB2302 = ClassUnit(TStructureUnit) {
     Weapons = {
-        MainGun = Class(TIFArtilleryWeapon) {
+        MainGun = ClassWeapon(TIFArtilleryWeapon) {
             FxMuzzleFlashScale = 3,
         }
     },

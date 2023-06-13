@@ -12,9 +12,9 @@ local AHoverLandUnit = import("/lua/aeonunits.lua").AHoverLandUnit
 local AIFMortarWeapon = import("/lua/aeonweapons.lua").AIFMortarWeapon
 
 ---@class UAL0103 : AHoverLandUnit
-UAL0103 = Class(AHoverLandUnit) {
+UAL0103 = ClassUnit(AHoverLandUnit) {
     Weapons = {
-        MainGun = Class(AIFMortarWeapon) {
+        MainGun = ClassWeapon(AIFMortarWeapon) {
             FxMuzzleFlash = {
                 '/effects/emitters/aeon_mortar_flash_01_emit.bp',
                 '/effects/emitters/aeon_mortar_flash_02_emit.bp',

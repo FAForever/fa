@@ -479,7 +479,8 @@ UnitBlueprint {
             },
             FiringTolerance = 5,
             Label = 'PhalanxGun',
-            MaxRadius = 50,
+            MaxRadius = 31,
+            MinRadius = 2,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
             MuzzleVelocity = 100,
@@ -532,6 +533,7 @@ UnitBlueprint {
             DamageType = 'Normal',
             DepthCharge = {
                 Radius = 13,
+                ProjectilesToDeflect = 3,
             },
             DisplayName = 'Smart Charge AntiTorpedo',
             FireTargetLayerCapsTable = {

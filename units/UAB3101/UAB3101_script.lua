@@ -11,14 +11,14 @@
 local ARadarUnit = import("/lua/aeonunits.lua").ARadarUnit
 
 ---@class UAB3101 : ARadarUnit
-UAB3101 = Class(ARadarUnit) {    
-    OnIntelDisabled = function(self)
-        ARadarUnit.OnIntelDisabled(self)
+UAB3101 = ClassUnit(ARadarUnit) {    
+    OnIntelDisabled = function(self, intel)
+        ARadarUnit.OnIntelDisabled(self, intel)
         self.Rotator1:SetSpinDown(true)
     end,
 
-    OnIntelEnabled = function(self)
-        ARadarUnit.OnIntelEnabled(self)
+    OnIntelEnabled = function(self, intel)
+        ARadarUnit.OnIntelEnabled(self, intel)
         if not self.Rotator1 then
             self.Rotator1 = CreateRotator(self, 'B01', 'y')
             self.Trash:Add(self.Rotator1)

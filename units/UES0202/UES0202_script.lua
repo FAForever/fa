@@ -16,15 +16,13 @@ local TAMPhalanxWeapon = WeaponFile.TAMPhalanxWeapon
 local TIFCruiseMissileLauncher = WeaponFile.TIFCruiseMissileLauncher
 
 ---@class UES0202 : TSeaUnit
-UES0202 = Class(TSeaUnit) {
-    DestructionTicks = 200,
-
+UES0202 = ClassUnit(TSeaUnit) {
     Weapons = {
-        FrontTurret01 = Class(TDFGaussCannonWeapon) {},
-        BackTurret02 = Class(TSAMLauncher) {
+        FrontTurret01 = ClassWeapon(TDFGaussCannonWeapon) {},
+        BackTurret02 = ClassWeapon(TSAMLauncher) {
             FxMuzzleFlash = EffectTemplate.TAAMissileLaunchNoBackSmoke,
         },
-        PhalanxGun01 = Class(TAMPhalanxWeapon) {
+        PhalanxGun01 = ClassWeapon(TAMPhalanxWeapon) {
             PlayFxWeaponUnpackSequence = function(self)
                 if not self.SpinManip then 
                     self.SpinManip = CreateRotator(self.unit, 'Center_Turret_Barrel', 'z', nil, 270, 180, 60)
@@ -45,58 +43,37 @@ UES0202 = Class(TSeaUnit) {
             end,
         },
         
-        CruiseMissile = Class(TIFCruiseMissileLauncher) {
-                CurrentRack = 1,
-                
-                --taken out because all this waiting causes broken rate of fire clock issues
-                --PlayFxMuzzleSequence = function(self, muzzle)
-                    --local bp = self:GetBlueprint()
-                    --self.Rotator = CreateRotator(self.unit, bp.RackBones[self.CurrentRack].RackBone, 'y', nil, 90, 90, 90)
-                    --muzzle = bp.RackBones[self.CurrentRack].MuzzleBones[1]
-                    --self.Rotator:SetGoal(90)
-                    --TIFCruiseMissileLauncher.PlayFxMuzzleSequence(self, muzzle)
-                    --WaitFor(self.Rotator)
-                    --WaitSeconds(1)
-                --end,
-                
-                CreateProjectileAtMuzzle = function(self, muzzle)
-                    muzzle = self:GetBlueprint().RackBones[self.CurrentRack].MuzzleBones[1]
-                    if self.CurrentRack >= 8 then
-                        self.CurrentRack = 1
-                    else
-                        self.CurrentRack = self.CurrentRack + 1
-                    end
-                    TIFCruiseMissileLauncher.CreateProjectileAtMuzzle(self, muzzle)
-                end,
-                
-                --taken out because all this waiting causes broken rate of fire clock issues
-                --PlayFxRackReloadSequence = function(self)
-                    --WaitSeconds(1)
-                    --self.Rotator:SetGoal(0)
-                    --WaitFor(self.Rotator)
-                    --self.Rotator:Destroy()
-                    --self.Rotator = nil
-                --end,
-            },
-    },
+        CruiseMissile = ClassWeapon(TIFCruiseMissileLauncher) {
+            OnCreate = function(self)
+                TIFCruiseMissileLauncher.OnCreate(self)
+                self.RackToUse = 1
+            end,
 
-    RadarThread = function(self)
-        local spinner = CreateRotator(self, 'Spinner04', 'x', nil, 0, 30, -45)
-        while true do
-            WaitFor(spinner)
-            spinner:SetTargetSpeed(-45)
-            WaitFor(spinner)
-            spinner:SetTargetSpeed(45)
-        end
-    end,
+            CreateProjectileAtMuzzle = function(self, muzzle)
+                muzzle = self.Blueprint.RackBones[self.RackToUse].MuzzleBones[1]
+                if self.RackToUse >= 8 then
+                    self.RackToUse = 1
+                else
+                    self.RackToUse = self.RackToUse + 1
+                end
+
+                return TIFCruiseMissileLauncher.CreateProjectileAtMuzzle(self, muzzle)
+            end,
+
+            PlayFxMuzzleSequence = function(self, muzzle)
+                muzzle = self.Blueprint.RackBones[self.RackToUse].MuzzleBones[1]
+                TIFCruiseMissileLauncher.PlayFxMuzzleSequence(self, muzzle)
+            end,
+        },
+    },
 
     OnStopBeingBuilt = function(self, builder,layer)
         TSeaUnit.OnStopBeingBuilt(self, builder,layer)
         self:ForkThread(self.RadarThread)
         self.Trash:Add(CreateRotator(self, 'Spinner01', 'y', nil, 45, 0, 0))
         self.Trash:Add(CreateRotator(self, 'Spinner03', 'y', nil, -30, 0, 0))
+        self.Trash:Add(CreateRotator(self, 'Spinner04', 'y', nil, 0, 30, -45))
     end,
-
 }
 
 TypeClass = UES0202

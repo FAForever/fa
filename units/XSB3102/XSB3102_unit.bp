@@ -96,14 +96,14 @@ UnitBlueprint {
         UniformScale = 0.05,
     },
     Economy = {
-        BuildCostEnergy = 544,
-        BuildCostMass = 64,
-        BuildRate = 13.01,
-        BuildTime = 80,
+        BuildCostEnergy = 1275,
+        BuildCostMass = 150,
+        BuildRate = 14.08,
+        BuildTime = 127.5,
         BuildableCategory = {
             'xsb3202',
         },
-        MaintenanceConsumptionPerSecondEnergy = 10,
+        MaintenanceConsumptionPerSecondEnergy = 20,
         RebuildBonusIds = {
             'xsb3102',
             'xsb3202',
@@ -151,7 +151,8 @@ UnitBlueprint {
     },
     Intel = {
         ShowIntelOnSelect = true,
-        SonarRadius = 115,
+        ReactivateTime = 2,
+        SonarRadius = 180,
         VisionRadius = 20,
     },
     Interface = {

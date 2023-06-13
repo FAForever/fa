@@ -7,8 +7,8 @@
 --**
 --**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
-local UCBC = '/lua/editor/UnitCountBuildConditions.lua'
-local EBC = '/lua/editor/EconomyBuildConditions.lua'
+local UCBC = '/lua/editor/unitcountbuildconditions.lua'
+local EBC = '/lua/editor/economybuildconditions.lua'
 
 
 -- Strategy for the game

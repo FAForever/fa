@@ -21,8 +21,12 @@ ProjectileBlueprint {
         'PROJECTILE',
         'ANTINAVY',
         'TORPEDO',
-        'NOSPLASHDAMAGE',
     },
+    Defense = {
+        MaxHealth = 1,
+        Health = 1,
+    },
+    DesiredShooterCap = 1,
     Display = {
         CameraFollowTimeout = 2,
         CameraFollowsProjectile = true,
@@ -47,13 +51,16 @@ ProjectileBlueprint {
     },
     Physics = {
         Acceleration = 5,
+        AccelerationRange = 2,
         DestroyOnWater = false,
         InitialSpeed = 3,
-        Lifetime = 7,
-        MaxSpeed = 18,
+        Lifetime = 10,
+        MaxSpeed = 15,
         StayUnderwater = true,
         TrackTarget = true,
-        TurnRate = 230,
+        TurnRate = 165,
+        TurnRateRange = 10,
         VelocityAlign = true,
+        UseGravity = true,
     },
 }

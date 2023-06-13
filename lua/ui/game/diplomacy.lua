@@ -36,14 +36,14 @@ local offerQueue = {}
 local drawOffered = false
 
 ---@type CannotRecallReason
-local cannotRequestRecall = false
+local CannotRequestRecallReason = false
 
-function CannotRequestRecall()
-    return cannotRequestRecall
+function GetCannotRequestRecallReason()
+    return CannotRequestRecallReason
 end
 
-function UpdateCannotRequestRecall(canRequest)
-    cannotRequestRecall = canRequest
+function SetCannotRequestRecallReason(canRequest)
+    CannotRequestRecallReason = canRequest
     if parent then
         BuildPlayerLines()
     end
@@ -199,7 +199,6 @@ local function LayoutMajorAlliedEntry(entry, manualShare)
     Tooltip.AddButtonTooltip(giveResourcesBtn, 'dip_give_resources')
     entry.giveResourcesBtn = giveResourcesBtn
 
-    giveResourcesBtn:Disable()
     giveResourcesBtn.OnClick = function(self, modifiers)
         CreateShareResourcesDialog(entry)
     end
@@ -380,6 +379,12 @@ end
 function BuildPlayerLines()
     local sessionOptions = SessionGetScenarioInfo().Options
     local focusArmy = GetFocusArmy()
+    if focusArmy == -1 then
+        focusArmy = import("/lua/ui/game/gamemain.lua").OriginalFocusArmy
+        if focusArmy == -1 then
+            return
+        end
+    end
 
     local group = parent.personalGroup
     if group then
@@ -417,7 +422,8 @@ function BuildPlayerLines()
 
     local belowEntry = parent
 
-    if not import("/lua/ui/campaign/campaignmanager.lua").campaignMode then
+    local reason = GetCannotRequestRecallReason()
+    if not import("/lua/ui/campaign/campaignmanager.lua").campaignMode and reason ~= "observer" then
         local personalGroup = CreateBitmapStd(parent, "/game/options-diplomacy-panel/panel-recall")
         if belowEntry == parent then
             LayoutHelpers.AtLeftTopIn(personalGroup, belowEntry, 0, 8)
@@ -432,28 +438,32 @@ function BuildPlayerLines()
             :Over(personalGroup, 5)
         personalGroup.button = recallButton
 
-        local reason = CannotRequestRecall()
         if reason then
             recallButton:Disable()
             Tooltip.AddButtonTooltip(recallButton, "dip_recall_request_dis_" .. reason)
         else
+            local function OnAcceptRecall()
+                SimCallback({
+                    Func = "SetRecallVote",
+                    Args = {
+                        From = GetFocusArmy(),
+                        Vote = true,
+                    },
+                })
+                -- preemptively expect the sim to accept our recall and disable the button so we
+                -- can't possiblely confuse the sim with more than one request
+                -- note that if--for some reason (*ahem* due to a mod maybe)--the sim *doesn't*
+                -- end up accepting it, then we'll be stuck until the sim sends a new update
+                recallButton:Disable()
+                SetCannotRequestRecallReason("active")
+                Tooltip.AddButtonTooltip(recallButton, "dip_recall_request_dis_active")
+                import("/lua/ui/game/tabs.lua").CollapseWindow()
+            end
             recallButton.OnClick = function(self, modifiers)
                 UIUtil.QuickDialog(GetFrame(0),
                     "<LOC diplomacy_0019>Are you sure you're ready to recall from battle? This will send a request to your team.",
                     "<LOC _Yes>",
-                    function()
-                        SimCallback({
-                            Func = "SetRecallVote",
-                            Args = {
-                                From = GetFocusArmy(),
-                                Vote = true,
-                            },
-                        })
-                        recallButton:Disable()
-                        cannotRequestRecall = "active"
-                        Tooltip.AddButtonTooltip(recallButton, "dip_recall_request_dis_active")
-                        import("/lua/ui/game/tabs.lua").CollapseWindow()
-                    end,
+                    OnAcceptRecall,
                     "<LOC _No>", nil, nil, nil, nil,
                     {worldCover = false, enterButton = 1, escapeButton = 2}
                 )
@@ -463,6 +473,7 @@ function BuildPlayerLines()
 
         local recallIcon = CreateBitmapStd(recallButton, "/game/recall-panel/icon-recall")
         Layouter(recallIcon)
+            --:DisableHitTest()
             :AtCenterIn(recallButton)
             :Over(recallButton, 5)
         recallButton.label = recallIcon
@@ -598,6 +609,7 @@ function CreateShareResourcesDialog(control)
         giveResGroup.Width:Set(control.Width)
         LayoutHelpers.SetHeight(giveResGroup, 90)
         LayoutHelpers.AtLeftBottomIn(giveResGroup, control)
+        control.giveResourcesGroup = giveResGroup
 
         local okBtn = UIUtil.CreateButtonStd(giveResGroup,
             '/dialogs/toggle_btn/toggle-d',

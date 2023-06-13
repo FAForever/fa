@@ -1,27 +1,35 @@
 --
 -- Terran Torpedo Bomb
 --
+
 local TTorpedoShipProjectile = import("/lua/terranprojectiles.lua").TTorpedoShipProjectile
+---@class TANAnglerTorpedo06: TTorpedoShipProjectile
+TANAnglerTorpedo06 = ClassProjectile(TTorpedoShipProjectile) {
 
-TANAnglerTorpedo06 = Class(TTorpedoShipProjectile) 
-{
-
+    ---@param self TANAnglerTorpedo06
     OnEnterWater = function(self)
-        --TTorpedoShipProjectile.OnEnterWater(self)
-        self:SetCollisionShape('Sphere', 0, 0, 0, 1.0)
-        local army = self:GetArmy()
+        TTorpedoShipProjectile.OnEnterWater(self)
 
-        for k, v in self.FxEnterWater do --splash
-            CreateEmitterAtEntity(self,army,v)
-        end
-        self:TrackTarget(true)
-        self:StayUnderwater(true)
-        self:SetTurnRate(240)
-        self:SetMaxSpeed(18)
-        --self:SetVelocity(0)
-        --self:ForkThread(self.MovementThread)
+        -- set the magnitude of the velocity to something tiny to really make that water
+        -- impact slow it down. We need this to prevent torpedo's striking the bottom
+        -- of a shallow pond, like in setons
+        self:SetVelocity(0)
+        self:SetAcceleration(0.5)
     end,
 
+    --- Adjusted movement thread to gradually speed up the torpedo. It needs to slowly speed
+    --- up to prevent it from hitting the floor in relative undeep water
+    ---@param self TANAnglerTorpedo06
+    MovementThread = function(self)
+        WaitTicks(1)
+        for k = 1, 6 do
+            WaitTicks(1)
+            if not IsDestroyed(self) then
+                self:SetAcceleration(k)
+            else
+                break
+            end
+        end
+    end,
 }
-
 TypeClass = TANAnglerTorpedo06

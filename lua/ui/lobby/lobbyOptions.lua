@@ -29,7 +29,7 @@
 ---@field RevealCivilians 'No' | 'Yes'
 ---@field RandomMap 'Off' | 'Official' | 'All'
 ---@field Score 'no' | 'yes'
----@field Share 'FullShare' | 'ShareUntilDeath' | 'TransferToKiller' | 'Defectors' | 'CivilianDeserter'
+---@field Share 'FullShare' | 'ShareUntilDeath' | 'PartialShare' | 'TransferToKiller' | 'Defectors' | 'CivilianDeserter'
 ---@field ShareUnitCap 'none' | 'allies' | 'all'
 ---@field Timeouts '0' | '3'| '-1'
 ---@field UnitCap '125' | '250' | '375' | '500' | '625' | '750' | '875' | '1000' | '1250' | '1500'
@@ -206,6 +206,11 @@ globalOpts = {
                  key = 'ShareUntilDeath',
              },
              {
+                 text = "<LOC lobui_0796>Partial Share",
+                 help = "<LOC lobui_0797>Your buildings and engineers will be transferred to your highest rated ally when you die.  Your other units will be destroyed when you die, except those captured by the enemy.",
+                 key = 'PartialShare',
+             },
+             {
                  text = "<LOC lobui_0762>Traitors",
                  help = "<LOC lobui_0763>Your units will be transferred to the control of your killer.",
                  key = 'TransferToKiller',
@@ -271,7 +276,7 @@ globalOpts = {
     },
 
     {
-        default = 1,
+        default = 2,
         label = "<LOC lobui_0434>Share Unit Cap at Death",
         help = "<LOC lobui_0435>Enable this to share unitcap when a player dies",
         key = 'ShareUnitCap',
@@ -597,6 +602,7 @@ AIOpts = {
         value_text = "%s",
         value_help = "<LOC aisettings_0003>Cheat multiplier of %s",
         values = {
+            '0.5', '0.6', '0.7', '0.8', '0.9',
             '1.0', '1.1', '1.2', '1.3', '1.4', '1.5', '1.6', '1.7', '1.8', '1.9',
             '2.0', '2.1', '2.2', '2.3', '2.4', '2.5', '2.6', '2.7', '2.8', '2.9', '3.0', '3.1', '3.2', '3.3', '3.4', '3.5', '3.6', '3.7', '3.8', '3.9',
             '4.0', '4.1', '4.2', '4.3', '4.4', '4.5', '4.6', '4.7', '4.8', '4.9', '5.0', '5.1', '5.2', '5.3', '5.4', '5.5', '5.6', '5.7', '5.8', '5.9',
@@ -610,6 +616,7 @@ AIOpts = {
         value_text = "%s",
         value_help = "<LOC aisettings_0056>Build multiplier of %s",
         values = {
+            '0.5', '0.6', '0.7', '0.8', '0.9',
             '1.0', '1.1', '1.2', '1.3', '1.4', '1.5', '1.6', '1.7', '1.8', '1.9',
             '2.0', '2.1', '2.2', '2.3', '2.4', '2.5', '2.6', '2.7', '2.8', '2.9', '3.0', '3.1', '3.2', '3.3', '3.4', '3.5', '3.6', '3.7', '3.8', '3.9',
             '4.0', '4.1', '4.2', '4.3', '4.4', '4.5', '4.6', '4.7', '4.8', '4.9', '5.0', '5.1', '5.2', '5.3', '5.4', '5.5', '5.6', '5.7', '5.8', '5.9',

@@ -139,7 +139,7 @@ UnitBlueprint {
         },
         TarmacDecal = 'Tarmacs/tarmac_aeon_2x_albedo',
         TarmacGlowDecal = 'Tarmacs/tarmac_aeon_2x_glow',
-        TechLevel = 'RULEUTL_Basic',
+        TechLevel = 'RULEUTL_Secret',
         ToggleCaps = {
             RULEUTC_IntelToggle = true,
         },
@@ -149,6 +149,7 @@ UnitBlueprint {
     },
     Intel = {
         ShowIntelOnSelect = true,
+        ReactivateTime = 6,
         SonarRadius = 450,
         VisionRadius = 32,
         WaterVisionRadius = 24,
@@ -195,6 +196,11 @@ UnitBlueprint {
     StrategicIconSortPriority = 235,
     Weapon = {
         {
+            -- sim-performance related values
+            TargetCheckInterval = 1.0,
+            AlwaysRecheckTarget = false,
+            TrackingRadius = 1.0,
+
             BallisticArc = 'RULEUBA_None',
             CollideFriendly = false,
             Damage = 1,

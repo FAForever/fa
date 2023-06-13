@@ -6,7 +6,7 @@
 ---------------------------------------------------------------------------------------------------------------
 local SExperimentalStrategicMissile = import("/lua/seraphimprojectiles.lua").SExperimentalStrategicMissile
 
-SIFExperimentalStrategicMissile01 = Class(SExperimentalStrategicMissile) {
+SIFExperimentalStrategicMissile01 = ClassProjectile(SExperimentalStrategicMissile) {
     FxSplashScale = 0.5,
 
     LaunchSound = 'Nuke_Launch',

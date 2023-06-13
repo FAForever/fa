@@ -13,9 +13,9 @@ local AANTorpedoCluster = import("/lua/aeonweapons.lua").AANTorpedoCluster
 
 
 ---@class XAA0306 : AAirUnit
-XAA0306 = Class(AAirUnit) {
+XAA0306 = ClassUnit(AAirUnit) {
     Weapons = {
-        Bomb = Class(AANTorpedoCluster) {},
+        Bomb = ClassWeapon(AANTorpedoCluster) {},
     },
 }
 

@@ -908,8 +908,8 @@ UnitBlueprint {
             DamageType = 'Overcharge',
             DisplayName = 'Overcharge Cannon',
             EnergyChargeForFirstShot = false,
-            EnergyDrainPerSecond = 5000,
-            EnergyRequired = 5000, -- Amount required to fire, use the Overcharge section to change consumption
+            EnergyDrainPerSecond = 7500,
+            EnergyRequired = 7500, -- Amount required to fire, use the Overcharge section to change consumption
             FireTargetLayerCapsTable = {
                 Land = 'Land|Water|Seabed',
                 Seabed = 'Land|Water|Seabed',
@@ -996,8 +996,8 @@ UnitBlueprint {
             DamageType = 'Overcharge',
             DisplayName = 'AutoOvercharge Cannon',
             EnergyChargeForFirstShot = false,
-            EnergyDrainPerSecond = 5000,
-            EnergyRequired = 5000, -- Amount required to fire, use the Overcharge section to change consumption
+            EnergyDrainPerSecond = 7500,
+            EnergyRequired = 7500, -- Amount required to fire, use the Overcharge section to change consumption
             FireTargetLayerCapsTable = {
                 Land = 'Land|Water|Seabed',
                 Seabed = 'Land|Water|Seabed',
@@ -1128,7 +1128,6 @@ UnitBlueprint {
             BallisticArc = 'RULEUBA_None',
             BeamCollisionDelay = 0,
             BeamLifetime = 0,
-            CanFireFromTransport = true,
             CollideFriendly = false,
             ContinuousBeam = true,
             Damage = 400,

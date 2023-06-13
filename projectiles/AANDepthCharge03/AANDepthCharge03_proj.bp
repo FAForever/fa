@@ -20,6 +20,7 @@ ProjectileBlueprint {
         'AEON',
         'PROJECTILE',
         'ANTINAVY',
+        'TORPEDO',
     },
     Defense = {
         Health = 1,
@@ -46,7 +47,7 @@ ProjectileBlueprint {
     General = {
         Category = 'Anti Navy',
         Faction = 'Aeon',
-        Weapon = 'Harmonic Depth Charge',
+        Weapon = 'Torpedo',
     },
     Interface = {
         HelpText = 0,
@@ -56,12 +57,12 @@ ProjectileBlueprint {
         DestroyOnWater = false,
         Lifetime = 20,
         MaxSpeed = 14,
-        RealisticOrdinance = true,--added
-        StayUnderwater = true,
-        StayUpright = true,
+        RealisticOrdinance = true,
+        StayUnderwater = false,
+        StayUpright = false,
         TrackTarget = false,
         TurnRate = 230,
-        UseGravity = true,--added
+        UseGravity = true,
         VelocityAlign = true,
     },
 }

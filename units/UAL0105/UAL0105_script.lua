@@ -11,7 +11,7 @@
 local AConstructionUnit = import("/lua/aeonunits.lua").AConstructionUnit
 
 ---@class UAL0105 : AConstructionUnit
-UAL0105 = Class(AConstructionUnit) {
+UAL0105 = ClassUnit(AConstructionUnit) {
 }
 
 TypeClass = UAL0105

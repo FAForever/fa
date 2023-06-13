@@ -171,7 +171,7 @@ UnitBlueprint {
     LifeBarOffset = 0.55,
     LifeBarSize = 1,
     Physics = {
-        BackupDistance = 5,
+        --BackUpDistance = 5,
         BankingSlope = 0,
         BuildOnLayerCaps = {
             LAYER_Air = false,
@@ -231,7 +231,6 @@ UnitBlueprint {
                 },
             },
             BallisticArc = 'RULEUBA_LowArc',
-            ChargeDelay = 0,
             CollideFriendly = false,
             Damage = 125,
             DamageType = 'Normal',
@@ -344,6 +343,11 @@ UnitBlueprint {
             WeaponCategory = 'Anti Navy',
         },
         {
+            -- sim-performance related values
+            TargetCheckInterval = 1.0,
+            AlwaysRecheckTarget = false,
+            TrackingRadius = 1.0,
+
             Audio = {
                 Fire = Sound {
                     Bank = 'XRL_Weapon',
@@ -357,6 +361,7 @@ UnitBlueprint {
             DamageType = 'Normal',
             DepthCharge = {
                 Radius = 5,
+                ProjectilesToDeflect = 3,
             },
             DisplayName = 'Anti-Torpedo Flare',
             EffectiveRadius = 29,

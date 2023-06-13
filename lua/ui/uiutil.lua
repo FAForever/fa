@@ -857,11 +857,18 @@ function CreateCheckbox(parent, texturePath, label, labelRight, labelSize, click
     )
 end
 
---- Creates a collapse arrow in one of the directions (note that the bottom is not supported)
+--- Creates a collapse arrow in one of the directions (note that the bottom is not supported).
+--- Note that the control passed in should be the parent of the control you want to have collapsed
+--- (so that the collapse arrow isn't hidden with it).
 ---@param parent Control
----@param position "l" | "t" | "r"
+---@param position 'l' | 't' | 'r'
 ---@return Checkbox
 function CreateCollapseArrow(parent, position)
+    -- make sure the filename will be well-formed (also, someone's going to think that `position`
+    -- is optional, so let's disillusion them of that idea)
+    if position ~= 't' and position ~= 'r' and position ~= 'l' then
+        error("Collapse arrow position must be one of: 'l', 't', 'r'", 2)
+    end
     local prefix = "/game/tab-" .. position .. "-btn/tab-"
     return Checkbox(parent,
         SkinnableFile(prefix .. "close_btn_up.dds"),

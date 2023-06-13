@@ -13,9 +13,9 @@ local TAMInterceptorWeapon = import("/lua/terranweapons.lua").TAMInterceptorWeap
 local nukeFiredOnGotTarget = false
 
 ---@class UEB4302 : TStructureUnit
-UEB4302 = Class(TStructureUnit) {
+UEB4302 = ClassUnit(TStructureUnit) {
     Weapons = {
-        AntiNuke = Class(TAMInterceptorWeapon) {
+        AntiNuke = ClassWeapon(TAMInterceptorWeapon) {
             IdleState = State(TAMInterceptorWeapon.IdleState) {
                 OnGotTarget = function(self)
                     local bp = self:GetBlueprint()

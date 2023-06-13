@@ -11,10 +11,9 @@ local TLandUnit = import("/lua/terranunits.lua").TLandUnit
 local TDFGaussCannonWeapon = import("/lua/terranweapons.lua").TDFGaussCannonWeapon
 
 ---@class UEL0202 : TLandUnit
-UEL0202 = Class(TLandUnit) {
+UEL0202 = ClassUnit(TLandUnit) {
     Weapons = {
-        FrontTurret01 = Class(TDFGaussCannonWeapon) {
-        }
+        FrontTurret01 = ClassWeapon(TDFGaussCannonWeapon) {}
     },
 }
 

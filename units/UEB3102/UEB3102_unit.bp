@@ -49,8 +49,8 @@ UnitBlueprint {
         AirThreatLevel = 0,
         ArmorType = 'Structure',
         EconomyThreatLevel = 1,
-        Health = 600,
-        MaxHealth = 600,
+        Health = 400,
+        MaxHealth = 400,
         RegenRate = 0,
         SubThreatLevel = 0,
         SurfaceThreatLevel = 0,
@@ -92,14 +92,14 @@ UnitBlueprint {
         UniformScale = 0.02,
     },
     Economy = {
-        BuildCostEnergy = 544,
-        BuildCostMass = 64,
+        BuildCostEnergy = 1275,
+        BuildCostMass = 150,
         BuildRate = 14.08,
-        BuildTime = 80,
+        BuildTime = 127.5,
         BuildableCategory = {
             'ueb3202',
         },
-        MaintenanceConsumptionPerSecondEnergy = 10,
+        MaintenanceConsumptionPerSecondEnergy = 20,
         RebuildBonusIds = {
             'ueb3102',
             'ueb3202',
@@ -145,9 +145,9 @@ UnitBlueprint {
         UpgradesTo = 'ueb3202',
     },
     Intel = {
-        ReactivateTime = 10,
+        ReactivateTime = 2,
         ShowIntelOnSelect = true,
-        SonarRadius = 115,
+        SonarRadius = 160,
         VisionRadius = 20,
     },
     Interface = {

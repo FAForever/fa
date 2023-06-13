@@ -15,14 +15,14 @@ local TANTorpedoAngler = WeaponsFile.TANTorpedoAngler
 local TIFSmartCharge = WeaponsFile.TIFSmartCharge
 
 ---@class UES0302 : TSeaUnit
-UES0302 = Class(TSeaUnit) {
+UES0302 = ClassUnit(TSeaUnit) {
     Weapons = {
-        HiroCannonFront = Class(TDFHiroPlasmaCannon) {},
-        HiroCannonBack = Class(TDFHiroPlasmaCannon) {},
-        AntiTorpedo = Class(TIFSmartCharge) {},
-        TorpedoLeft01 = Class(TANTorpedoAngler) {},
-        TorpedoRight01 = Class(TANTorpedoAngler) {},
-        PhalanxGun = Class(TAMPhalanxWeapon) {
+        HiroCannonFront = ClassWeapon(TDFHiroPlasmaCannon) {},
+        HiroCannonBack = ClassWeapon(TDFHiroPlasmaCannon) {},
+        AntiTorpedo = ClassWeapon(TIFSmartCharge) {},
+        TorpedoLeft01 = ClassWeapon(TANTorpedoAngler) {},
+        TorpedoRight01 = ClassWeapon(TANTorpedoAngler) {},
+        PhalanxGun = ClassWeapon(TAMPhalanxWeapon) {
             PlayFxWeaponUnpackSequence = function(self)
                 if not self.SpinManip then
                     self.SpinManip = CreateRotator(self.unit, 'Front_Turret01_Barrel', 'z', nil, 270, 180, 60)

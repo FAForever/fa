@@ -20,8 +20,7 @@
 -- Do global initialization and set up common global functions
 doscript '/lua/globalInit.lua'
 
-local ScenarioUtils = import("/lua/sim/scenarioutilities.lua")
-
+GameOverListeners = {}
 WaitTicks = coroutine.yield
 
 ---@param n number
@@ -215,9 +214,6 @@ function SetupSession()
     LOG('Loading script file: ', ScenarioInfo.script)
     doscript(ScenarioInfo.script, ScenarioInfo.Env)
 
-    -- Preloads AI templates from AI mods
-    AIModTemplatesPreloader()
-
     ResetSyncTable()
 end
 
@@ -226,8 +222,8 @@ end
 -- The global variable "ArmyBrains" contains an array of AI brains, one for each army.
 function OnCreateArmyBrain(index, brain, name, nickname)
 
-    ScenarioUtils.InitializeStartLocation(name)
-    ScenarioUtils.SetPlans(name)
+    import("/lua/sim/scenarioutilities.lua").InitializeStartLocation(name)
+    import("/lua/sim/scenarioutilities.lua").SetPlans(name)
 
     ArmyBrains[index] = brain
     ArmyBrains[index].Name = name
@@ -262,24 +258,40 @@ end
 -- the initial units and any other gameplay state we need.
 function BeginSession()
 
-    -- make sure the hook happens before scripts start working
-    import("/lua/sim/markerutilities.lua")
+    -- imported for side effects
+    import("/lua/sim/matchstate.lua").Setup()
+    import("/lua/sim/markerutilities.lua").Setup()
 
-    ScenarioUtils.CreateProps()
-    ScenarioUtils.CreateResources()
+    BeginSessionAI()
+    BeginSessionMapSetup()
+    BeginSessionEffects()
+    BeginSessionTeams()
 
-    -- brains can have adjusted this value by now, ready to sync
-    Sync.GameHasAIs = ScenarioInfo.GameHasAIs
-    if ScenarioInfo.GameHasAIs then
-        import("/lua/sim/navgenerator.lua").Generate()
+    import("/lua/sim/scenarioutilities.lua").CreateProps()
+    import("/lua/sim/scenarioutilities.lua").CreateResources()
+
+    BeginSessionGenerateMarkers()
+    BeginSessionGenerateNavMesh()
+
+    import("/lua/sim/score.lua").init()
+    import("/lua/sim/recall.lua").init()
+
+    -- other logic at the start of the game --
+
+    Sync.EnhanceRestrict = import("/lua/enhancementcommon.lua").GetRestricted()
+    Sync.Restrictions = import("/lua/game.lua").GetRestrictions()
+
+    if syncStartPositions then
+        Sync.StartPositions = syncStartPositions
     end
 
-    SPEW('Active mods in sim: ', repr(__active_mods))
+    -- keep track of user name for LOCs
+    local focusarmy = GetFocusArmy()
+    if focusarmy>=0 and ArmyBrains[focusarmy] then
+        LocGlobals.PlayerName = ArmyBrains[focusarmy].Nickname
+    end
 
-    -- pass options to the UI
-    Sync.LobbyOptions = ScenarioInfo.Options
-
-    GameOverListeners = {}
+    -- add on game over callbacks
     ForkThread(function()
         while not IsGameOver() do
             WaitTicks(1)
@@ -289,16 +301,89 @@ function BeginSession()
         end
     end)
 
+    -- log game time
     ForkThread(GameTimeLogger)
-    local focusarmy = GetFocusArmy()
-    if focusarmy>=0 and ArmyBrains[focusarmy] then
-        LocGlobals.PlayerName = ArmyBrains[focusarmy].Nickname
+
+    -- keep track of units off map
+    OnStartOffMapPreventionThread()
+end
+
+function BeginSessionGenerateNavMesh()
+    Sync.GameHasAIs = ScenarioInfo.GameHasAIs
+    if ScenarioInfo.GameHasAIs then
+        for k, brain in ArmyBrains do
+            if ScenarioInfo.ArmySetup[brain.Name].RequiresNavMesh then
+                import('/lua/sim/navutils.lua').Generate()
+                break
+            end
+        end
+    end
+end
+
+--- Setup for AI related logic and data
+function BeginSessionAI()
+    Sync.GameHasAIs = ScenarioInfo.GameHasAIs
+    if ScenarioInfo.GameHasAIs then
+
+
+
+        local simMods = __active_mods or {}
+        for Index, ModData in simMods do
+            ModAIFiles = DiskFindFiles(ModData.location..'/lua/AI/CustomAIs_v2', '*.lua')
+            if ModAIFiles[1] then
+                for k,file in DiskFindFiles(ModData.location..'/lua/AI/PlatoonTemplates', '*.lua') do
+                    import(file)
+                end
+                for k,file in DiskFindFiles(ModData.location..'/lua/AI/AIBuilders', '*.lua') do
+                    import(file)
+                end
+                for k,file in DiskFindFiles(ModData.location..'/lua/AI/AIBaseTemplates', '*.lua') do
+                    import(file)
+                end
+            end
+        end
+
+        for k,file in DiskFindFiles('/lua/AI/PlatoonTemplates', '*.lua') do
+            import(file)
+        end
+
+        for k,file in DiskFindFiles('/lua/AI/AIBuilders', '*.lua') do
+            import(file)
+        end
+
+        for k,file in DiskFindFiles('/lua/AI/AIBaseTemplates', '*.lua') do
+            import(file)
+        end
+    end
+end
+
+function BeginSessionGenerateMarkers()
+    Sync.GameHasAIs = ScenarioInfo.GameHasAIs
+    if ScenarioInfo.GameHasAIs then
+        for k, brain in ArmyBrains do
+            if ScenarioInfo.ArmySetup[brain.Name].RequiresNavMesh then
+                import('/lua/sim/navgenerator.lua').GenerateMarkers()
+                break
+            end
+        end
+    end
+end
+
+--- Setup for map scripts
+function BeginSessionMapSetup()
+    local ok, msg = pcall(ScenarioInfo.Env.OnPopulate, ScenarioInfo)
+    if not ok then
+        WARN(msg)
     end
 
-    -- Pass ScenarioInfo into OnPopulate() and OnStart() for backwards compatibility
-    ScenarioInfo.Env.OnPopulate(ScenarioInfo)
-    ScenarioInfo.Env.OnStart(ScenarioInfo)
+    local ok, msg = pcall(ScenarioInfo.Env.OnStart, ScenarioInfo)
+    if not ok then
+        WARN(msg)
+    end
+end
 
+--- Setup for team manangement
+function BeginSessionTeams()
     -- Look for teams
     local teams = {}
     for name,army in ScenarioInfo.ArmySetup do
@@ -311,10 +396,7 @@ function BeginSession()
     end
 
     if ScenarioInfo.Options.TeamLock == 'locked' then
-        -- Specify that the teams are locked.  Parts of the diplomacy dialog will
-        -- be disabled.
         ScenarioInfo.TeamGame = true
-        Sync.LockTeams = true
     end
 
     -- Set up the teams we found
@@ -327,7 +409,93 @@ function BeginSession()
         end
     end
 
-    -- Create any effect markers on map
+    -- setup special team options
+    if ScenarioInfo.Options.CommonArmy == 'Union' then
+        BeginSessionUnionArmy()
+    elseif ScenarioInfo.Options.CommonArmy == 'Common' then
+        BeginSessionCommonArmy()
+    end
+end
+
+--- Setup for union army, where all teams can control the units of its allies
+function BeginSessionUnionArmy()
+    local humanIndex = 0
+    for i, brain in ArmyBrains do
+        if brain.BrainType ~= 'Human' then continue end
+        for i2, _ in ArmyBrains do
+            if not IsAlly(i, i2) then continue end
+            SetCommandSource(i2 - 1, humanIndex, true)
+        end
+        humanIndex = humanIndex + 1
+    end
+end
+
+
+--- Setup for common army, where all teams are batched together into one army
+function BeginSessionCommonArmy()
+    local teams = {}
+    for name,army in ScenarioInfo.ArmySetup do
+        if army.Team > 1 then
+            if not teams[army.Team] then
+                teams[army.Team] = {}
+            end
+            table.insert(teams[army.Team],army.ArmyIndex)
+        end
+    end
+
+    local humanIndex = 0
+    local IsHuman = {}
+    for _, brain in ArmyBrains do
+        if brain.BrainType == 'Human' then
+            table.insert(IsHuman, humanIndex)
+            humanIndex = humanIndex + 1
+        else
+            table.insert(IsHuman, false)
+        end
+    end
+
+    local teamIndex = 1
+    for _, armyIndices in teams do
+        for _, i in armyIndices do
+            if ArmyBrains[i].BrainType ~= 'Human' then continue end
+            ArmyBrains[i].Nickname = 'Team ' .. tostring(teamIndex)
+            teamIndex = teamIndex + 1
+            for _, i2 in armyIndices do
+                if (i2 == i) or (not IsHuman[i2]) then continue end
+                ArmyBrains[i2].Nickname = 'Merged'
+                ArmyBrains[i2].Status = 'Defeat'
+                SetArmyOutOfGame(i2)
+                local Units = ArmyBrains[i2]:GetListOfUnits(categories.COMMAND, false, true)
+                ForkThread(function(i, i2, comm)
+                    while true do
+                        if comm then
+                            WaitTicks(1)
+                            if comm:IsUnitState('Busy') then continue end
+                            if comm:IsUnitState('UnSelectable') then continue end
+                            if comm:IsUnitState('BlockCommandQueue') then continue end
+                        end
+                        SetCommandSource(i2 - 1, IsHuman[i2], false)
+                        SetCommandSource(i - 1, IsHuman[i2], true)
+                        SetArmyUnitCap(i, GetArmyUnitCap(i) + GetArmyUnitCap(i2))
+                        Units = ArmyBrains[i2]:GetListOfUnits(categories.ALLUNITS, false, true)
+                        for _, unit in Units do
+                            ChangeUnitArmy(unit, i, true)
+                        end
+                        local v1 = ArmyBrains[i]:GetEconomyStored('MASS') + ArmyBrains[i2]:GetEconomyStored('MASS')
+                        local v2 = ArmyBrains[i]:GetEconomyStored('ENERGY') + ArmyBrains[i2]:GetEconomyStored('ENERGY')
+                        SetArmyEconomy(i, v1, v2)
+                        SetFocusArmy(i - 1)
+                        break
+                    end
+                end, i, i2, Units[1])
+            end
+            break
+        end
+    end
+end
+
+--- Setup for map effects
+function BeginSessionEffects()
     local markers = import("/lua/sim/scenarioutilities.lua").GetMarkers()
     local Entity = import("/lua/sim/entity.lua").Entity
     local EffectTemplate = import("/lua/effecttemplates.lua")
@@ -343,88 +511,9 @@ function BeginSession()
             end
         end
     end
-
-    Sync.EnhanceRestrict = import("/lua/enhancementcommon.lua").GetRestricted()
-
-    Sync.Restrictions = import("/lua/game.lua").GetRestrictions()
-
-    --for off-map prevention
-    OnStartOffMapPreventionThread()
-
-    if syncStartPositions then
-        Sync.StartPositions = syncStartPositions
-    end
-
-    import("/lua/sim/score.lua").init()
-    import("/lua/sim/recall.lua").init()
-
-    --start watching for victory conditions
-    import("/lua/sim/matchstate.lua")
-
-    if ScenarioInfo.Options.CommonArmy == 'Union' then
-        local humanIndex = 0
-        for i, brain in ArmyBrains do
-            if brain.BrainType ~= 'Human' then continue end
-            for i2, _ in ArmyBrains do
-                if not IsAlly(i, i2) then continue end
-                SetCommandSource(i2 - 1, humanIndex, true)
-            end
-            humanIndex = humanIndex + 1
-        end
-    elseif ScenarioInfo.Options.CommonArmy == 'Common' then
-        local humanIndex = 0
-        local IsHuman = {}
-        for _, brain in ArmyBrains do
-            if brain.BrainType == 'Human' then
-                table.insert(IsHuman, humanIndex)
-                humanIndex = humanIndex + 1
-            else
-                table.insert(IsHuman, false)
-            end
-        end
-        local teamIndex = 1
-        for _, armyIndices in teams do
-            for _, i in armyIndices do
-                if ArmyBrains[i].BrainType ~= 'Human' then continue end
-                ArmyBrains[i].Nickname = 'Team ' .. tostring(teamIndex)
-                teamIndex = teamIndex + 1
-                for _, i2 in armyIndices do
-                    if (i2 == i) or (not IsHuman[i2]) then continue end
-                    ArmyBrains[i2].Nickname = 'Merged'
-                    ArmyBrains[i2].Status = 'Defeat'
-                    SetArmyOutOfGame(i2)
-                    local Units = ArmyBrains[i2]:GetListOfUnits(categories.COMMAND, false, true)
-                    ForkThread(function(i, i2, comm)
-                        while true do
-                            if comm then
-                                WaitTicks(1)
-                                if comm:IsUnitState('Busy') then continue end
-                                if comm:IsUnitState('UnSelectable') then continue end
-                                if comm:IsUnitState('BlockCommandQueue') then continue end
-                            end
-                            SetCommandSource(i2 - 1, IsHuman[i2], false)
-                            SetCommandSource(i - 1, IsHuman[i2], true)
-                            SetArmyUnitCap(i, GetArmyUnitCap(i) + GetArmyUnitCap(i2))
-                            Units = ArmyBrains[i2]:GetListOfUnits(categories.ALLUNITS, false, true)
-                            for _, unit in Units do
-                                ChangeUnitArmy(unit, i, true)
-                            end
-                            local v1 = ArmyBrains[i]:GetEconomyStored('MASS') + ArmyBrains[i2]:GetEconomyStored('MASS')
-                            local v2 = ArmyBrains[i]:GetEconomyStored('ENERGY') + ArmyBrains[i2]:GetEconomyStored('ENERGY')
-                            SetArmyEconomy(i, v1, v2)
-                            SetFocusArmy(i - 1)
-                            break
-                        end
-                    end, i, i2, Units[1])
-                end
-                break
-            end
-        end
-    end
 end
 
 function GameTimeLogger()
-    local time
     while true do
         GTS = GetGameTimeSeconds()
         hours   = math.floor(GTS / 3600);
@@ -456,54 +545,10 @@ function OnPostLoad()
     end
 end
 
--- Set up list of files to prefetch
-Prefetcher = CreatePrefetchSet()
+-- these imports break cycle dependencies of import sequences of mods
 
-function DefaultPrefetchSet()
-    local set = { models = {}, anims = {}, d3d_textures = {} }
---    for k,file in DiskFindFiles('/units/', '*.scm') do
---        table.insert(set.models,file)
---    end
-
---    for k,file in DiskFindFiles('/units/', '*.sca') do
---        table.insert(set.anims,file)
---    end
-
---    for k,file in DiskFindFiles('/units/', '*.dds') do
---        table.insert(set.d3d_textures,file)
---    end
-
-    return set
-end
-
-Prefetcher:Update(DefaultPrefetchSet())
-
-function AIModTemplatesPreloader()
-    local simMods = __active_mods or {}
-    for Index, ModData in simMods do
-        ModAIFiles = DiskFindFiles(ModData.location..'/lua/AI/CustomAIs_v2', '*.lua')
-        if ModAIFiles[1] then
-            for k,file in DiskFindFiles(ModData.location..'/lua/AI/PlatoonTemplates', '*.lua') do
-                import(file)
-            end
-            for k,file in DiskFindFiles(ModData.location..'/lua/AI/AIBuilders', '*.lua') do
-                import(file)
-            end
-            for k,file in DiskFindFiles(ModData.location..'/lua/AI/AIBaseTemplates', '*.lua') do
-                import(file)
-            end
-        end
-    end
-end
-
-for k,file in DiskFindFiles('/lua/AI/PlatoonTemplates', '*.lua') do
-    import(file)
-end
-
-for k,file in DiskFindFiles('/lua/AI/AIBuilders', '*.lua') do
-    import(file)
-end
-
-for k,file in DiskFindFiles('/lua/AI/AIBaseTemplates', '*.lua') do
-    import(file)
-end
+import('/lua/scenarioframework.lua')
+import('/lua/sim/scenarioutilities.lua')
+import("/lua/ai/aiutilities.lua")
+import("/lua/ai/sorianutilities.lua")
+import("/lua/ai/aiattackutilities.lua")

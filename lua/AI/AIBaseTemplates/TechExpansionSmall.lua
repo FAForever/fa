@@ -20,9 +20,8 @@ BaseBuilderTemplate {
         'T1EngineerBuilders',
         'T2EngineerBuilders',
         'T3EngineerBuilders',
-        'EngineerFactoryConstruction',
+        'EngineerFactoryConstructionExpansion',
         'LandInitialFactoryConstruction',
-        'EngineerFactoryConstructionLandHigherPriority',
 
         -- ==== DEFENSES ==== --
         'T1BaseDefenses',

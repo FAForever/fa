@@ -20,7 +20,6 @@ ProjectileBlueprint {
         'UEF',
         'PROJECTILE',
         'ANTIAIR',
-        'MISSILE',
     },
     Display = {
         Mesh = {

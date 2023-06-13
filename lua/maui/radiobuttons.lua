@@ -5,7 +5,7 @@ local Border = import("/lua/maui/border.lua").Border
 local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
 
 ---@class RadioButtons : Group
-RadioButtons = Class(Group) {
+RadioButtons = ClassUI(Group) {
     -- title is a string that will get displayed above the group
     -- buttons is a table of strings that represent a button
     -- default is the string that will be selected on start

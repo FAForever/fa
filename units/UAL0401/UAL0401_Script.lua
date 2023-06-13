@@ -9,9 +9,7 @@ local AWalkingLandUnit = import("/lua/aeonunits.lua").AWalkingLandUnit
 local WeaponsFile = import("/lua/aeonweapons.lua")
 local ADFPhasonLaser = WeaponsFile.ADFPhasonLaser
 local ADFTractorClaw = WeaponsFile.ADFTractorClaw
-local utilities = import("/lua/utilities.lua")
 local explosion = import("/lua/defaultexplosions.lua")
-
 local CreateAeonColossusBuildingEffects = import("/lua/effectutilities.lua").CreateAeonColossusBuildingEffects
 
 -- upvalue for performance
@@ -25,11 +23,11 @@ local ZeroDegrees = Vector(0, 0, 1)
 local SignCheck = Vector(1, 0, 0)
 
 ---@class UAL0401 : AWalkingLandUnit
-UAL0401 = Class(AWalkingLandUnit) {
+UAL0401 = ClassUnit(AWalkingLandUnit) {
     Weapons = {
-        EyeWeapon = Class(ADFPhasonLaser) {
+        EyeWeapon = ClassWeapon(ADFPhasonLaser) {
             CreateProjectileAtMuzzle = function(self, muzzle)
-                ADFPhasonLaser.CreateProjectileAtMuzzle(self, muzzle)
+                local projectile = ADFPhasonLaser.CreateProjectileAtMuzzle(self, muzzle)
 
                 -- if possible, try not to fire on units that we're tractoring
                 local target = self:GetCurrentTarget()
@@ -39,10 +37,12 @@ UAL0401 = Class(AWalkingLandUnit) {
                         self:ResetTarget()
                     end
                 end
+
+                return projectile
             end,
         },
-        RightArmTractor = Class(ADFTractorClaw) {},
-        LeftArmTractor = Class(ADFTractorClaw) {},
+        RightArmTractor = ClassWeapon(ADFTractorClaw) {},
+        LeftArmTractor = ClassWeapon(ADFTractorClaw) {},
     },
 
     OnCreate = function (self, spec)
@@ -115,10 +115,9 @@ UAL0401 = Class(AWalkingLandUnit) {
     end,
 
     DeathThread = function(self, overkillRatio , instigator)
-        local size = self.Size
         self:PlayUnitSound('Destroyed')
         explosion.CreateDefaultHitExplosionAtBone(self, 'Torso', 4.0)
-        explosion.CreateDebrisProjectiles(self, explosion.GetAverageBoundingXYZRadius(self), {size.SizeX, size.SizeY, size.SizeZ})
+        explosion.CreateDebrisProjectiles(self, explosion.GetAverageBoundingXYZRadius(self), {self.Blueprint.SizeX, self.Blueprint.SizeY, self.Blueprint.SizeZ})
         WaitSeconds(2)
         explosion.CreateDefaultHitExplosionAtBone(self, 'Right_Leg_B02', 1.0)
         WaitSeconds(0.1)
@@ -179,3 +178,6 @@ UAL0401 = Class(AWalkingLandUnit) {
 }
 
 TypeClass = UAL0401
+
+-- Kept for Mod Backwards Compatability
+local Utilities = import("/lua/utilities.lua")

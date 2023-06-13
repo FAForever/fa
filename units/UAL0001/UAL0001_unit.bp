@@ -306,7 +306,6 @@ UnitBlueprint {
         },
         MaxBuildDistance = 10,
         NaturalProducer = true,
-        NeedToFaceTargetToBuild = false,
         ProductionPerSecondEnergy = 20,
         ProductionPerSecondMass = 1,
         StorageEnergy = 3900,
@@ -391,9 +390,45 @@ UnitBlueprint {
             Slot = 'Back',
         },
         CrysalisBeam = {
-            BuildCostEnergy = 15000,
-            BuildCostMass = 500,
-            BuildTime = 500,
+            BuildCostEnergy = 6000,
+            BuildCostMass = 300,
+            BuildTime = 350,
+            Icon = 'cba',
+            Name = '<LOC enhancements_0004>Quantum Disruptor',
+            NewMaxRadius = 30,
+            Slot = 'LCH',
+            ShowBones = {
+                'Left_Upgrade',
+            },
+            UpgradeUnitAmbientBones = {
+                'UAL0001',
+            },
+            UpgradeEffectBones = {
+                'Left_Turret',
+                'Left_Upgrade',
+            },
+        },
+        CrysalisBeamRemove = {
+            BuildCostEnergy = 1,
+            BuildCostMass = 1,
+            BuildTime = 0.1,
+            Icon = 'cba',
+            HideBones = {
+                'Left_Upgrade',
+            },
+            Name = '<LOC enhancements_0005>Remove Quantum Disruptor',
+            Prerequisite = 'CrysalisBeam',
+            RemoveEnhancements = {
+                'CrysalisBeam',
+                'CrysalisBeamRemove',
+            },
+            Slot = 'LCH',
+        },
+        AdvancedCrysalisBeam = {
+            BuildCostEnergy = 31000,
+            BuildCostMass = 900,
+            BuildTime = 1100,
+            Prerequisite = 'CrysalisBeam',
             Icon = 'cba',
             Name = '<LOC enhancements_0004>Enhanced Quantum Disruptor',
             NewMaxRadius = 35,
@@ -409,7 +444,7 @@ UnitBlueprint {
                 'Left_Upgrade',
             },
         },
-        CrysalisBeamRemove = {
+        AdvancedCrysalisBeamRemove = {
             BuildCostEnergy = 1,
             BuildCostMass = 1,
             BuildTime = 0.1,
@@ -960,8 +995,8 @@ UnitBlueprint {
             DamageType = 'Overcharge',
             DisplayName = 'Overcharge Cannon',
             EnergyChargeForFirstShot = false,
-            EnergyDrainPerSecond = 5000,
-            EnergyRequired = 5000, -- Amount required to fire, use the Overcharge section to change consumption
+            EnergyDrainPerSecond = 7500,
+            EnergyRequired = 7500, -- Amount required to fire, use the Overcharge section to change consumption
             FireTargetLayerCapsTable = {
                 Land = 'Land|Water|Seabed',
                 Seabed = 'Land|Water|Seabed',
@@ -1047,8 +1082,8 @@ UnitBlueprint {
             DamageType = 'Overcharge',
             DisplayName = 'AutoOvercharge Cannon',
             EnergyChargeForFirstShot = false,
-            EnergyDrainPerSecond = 5000,
-            EnergyRequired = 5000, -- Amount required to fire, use the Overcharge section to change consumption
+            EnergyDrainPerSecond = 7500,
+            EnergyRequired = 7500, -- Amount required to fire, use the Overcharge section to change consumption
             FireTargetLayerCapsTable = {
                 Land = 'Land|Water|Seabed',
                 Seabed = 'Land|Water|Seabed',
@@ -1123,13 +1158,12 @@ UnitBlueprint {
                         OnFire = true,
                     },
                     BuffType = 'STUN',
-                    Duration = 2.5,
+                    Duration = 35,          -- duration is in ticks
                     Radius = 35,
                     TargetAllow = 'MOBILE',
-                    TargetDisallow = 'EXPERIMENTAL, COMMAND',
+                    TargetDisallow = 'AIR, EXPERIMENTAL, COMMAND',
                 },
             },
-            CanFireFromTransport = true,
             CollideFriendly = false,
             Damage = 1,
             DamageRadius = 0,
@@ -1175,7 +1209,7 @@ UnitBlueprint {
             TargetPriorities = {
                 'ALLUNITS',
             },
-            TargetRestrictDisallow = 'UNTARGETABLE',
+            TargetRestrictDisallow = 'UNTARGETABLE,AIR*MOBILE',
             TurretDualManipulators = false,
             TurretPitch = 0,
             TurretPitchRange = 0,

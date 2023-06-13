@@ -90,8 +90,8 @@ UnitBlueprint {
         AirThreatLevel = 0,
         ArmorType = 'Normal',
         EconomyThreatLevel = 0,
-        Health = 400,
-        MaxHealth = 400,
+        Health = 500,
+        MaxHealth = 500,
         RegenRate = 0,
         SubThreatLevel = 3,
         SurfaceThreatLevel = 0,
@@ -352,6 +352,11 @@ UnitBlueprint {
             WeaponCategory = 'Anti Navy',
         },
         {
+            -- sim-performance related values
+            TargetCheckInterval = 1.0,
+            AlwaysRecheckTarget = false,
+            TrackingRadius = 1.0,
+
             BallisticArc = 'RULEUBA_None',
             CollideFriendly = false,
             Damage = 2,

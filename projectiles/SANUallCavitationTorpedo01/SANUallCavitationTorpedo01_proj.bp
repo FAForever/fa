@@ -21,8 +21,12 @@ ProjectileBlueprint {
         'PROJECTILE',
         'ANTINAVY',
         'TORPEDO',
-        'NOSPLASHDAMAGE', --to remove splash damage
     },
+    Defense = {
+        MaxHealth = 1,
+        Health = 1,
+    },
+    DesiredShooterCap = 1,
     Display = {
         ImpactEffects = {
             Type = 'Small01',
@@ -45,8 +49,12 @@ ProjectileBlueprint {
         MaxSpeed = 18,
         StayUnderwater = true,
         TrackTarget = true,
-        TurnRate = 230,
+        TurnRate = 200,
         UseGravity = false,
         VelocityAlign = true,
+
+        -- these parameters make the path of the torpedo feel unique
+        AccelerationRange = 2,
+        TurnRateRange = 10,
     },
 }

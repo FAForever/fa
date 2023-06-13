@@ -10,7 +10,7 @@
 local TPodTowerUnit = import("/lua/terranunits.lua").TPodTowerUnit
 
 ---@class XEB0204 : TPodTowerUnit
-XEB0204 = Class(TPodTowerUnit) {
+XEB0204 = ClassUnit(TPodTowerUnit) {
     OnStopBeingBuilt = function(self,builder,layer)
         TPodTowerUnit.OnStopBeingBuilt(self,builder,layer)
         if not self.OpenAnim then
