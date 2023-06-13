@@ -221,11 +221,19 @@ BuilderManager = ClassSimple {
 
         -- only one candidate
         if candidateNext == 2 then
+            if candidates[1].DelayEqualBuildPlattons then
+                local delay = candidates[1].DelayEqualBuildPlattons
+                self.Brain.DelayEqualBuildPlattons[delay[1]] = GetGameTime() + delay[2]
+            end
             return candidates[1]
-
         -- multiple candidates, choose one at random
         elseif candidateNext > 2 then
-            return candidates[Random(1, candidateNext - 1)]
+            local candidateSelection = candidates[Random(1, candidateNext - 1)]
+            if candidateSelection.DelayEqualBuildPlattons then
+                local delay = candidateSelection.DelayEqualBuildPlattons
+                self.Brain.DelayEqualBuildPlattons[delay[1]] = GetGameTime() + delay[2]
+            end
+            return candidateSelection
         end
     end,
 
@@ -286,7 +294,6 @@ BuilderManager = ClassSimple {
             local PlatoonName = specs[1] --[[@as string]]
             local timeThreshold = self.Brain.DelayEqualBuildPlattons[PlatoonName]
             if (not timeThreshold) or (timeThreshold < CheckDelayTime) then
-                self.Brain.DelayEqualBuildPlattons[PlatoonName] = CheckDelayTime + specs[2]
                 return false
             else
                 return true
