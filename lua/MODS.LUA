@@ -55,7 +55,7 @@ Each mod has a `mod_info.lua` file which contains various bits of info:
     -- Optional text displayed in the mods manager and FAF client
     description = "A long description of happy mod and why it will make you happy"
 
-    -- Required name(s) of author(s). Shows up as `"UNKNOWN"` if left blank. Will be begin to be
+    -- Required name(s) of author(s). Shows up as `"UNKNOWN"` if left blank. Will begin to be
     -- truncated in-game if over 20 characters. Make sure this reflects all contributors whose work
     -- is present.
     author = "Joe"
@@ -97,7 +97,7 @@ Each mod has a `mod_info.lua` file which contains various bits of info:
     ui_only = false
 
     -- Path of the icon to use for this mod in the mods manager window. The game defaults to
-    -- `"/textures/ui/common/dialogs/mod-manager/generic-icon_bmp.dds"`. The FAF client does cannot
+    -- `"/textures/ui/common/dialogs/mod-manager/generic-icon_bmp.dds"`. The FAF client cannot
     -- read `.dds` so please use `.png` or `.jpg` as both the game and client understand those.
     -- Note that this is unrelated to the `mod_icons.lua` file explained below.
     icon = "mod_icon.dds"
@@ -302,9 +302,9 @@ Strategic Icon Replacement
 ----------
 
 A UI mod can contain a `mod_icons.lua` file to specify strategic icons to replace for particular
-units. This is one of the few times a UI mod will be able to have an affect things in the simulation
-(blueprints, in this case), and as such it is done in a controlled manner (for example, the
-environment of the file is heavily restricted, and only available inside the called function).
+units. This is one of the few times a UI mod will be able to have an effect on things in the
+simulation (blueprints, in this case), and as such it is done in a controlled manner (for example,
+the environment of the file is heavily restricted, and only available inside the called function).
 
 Either a function `ScriptedIconAssignments` or a table `UnitIconAssignments` can be define (or both;
 the script is applied before the manual unit icon assignment table is). The table is a list of
