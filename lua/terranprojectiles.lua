@@ -38,6 +38,7 @@ TAAGinsuRapidPulseBeamProjectile = ClassProjectile(SingleBeamProjectile) {
     BeamName = '/effects/emitters/laserturret_munition_beam_03_emit.bp',
     FxImpactUnit = EffectTemplate.TAAGinsuHitUnit,
     FxImpactProp = EffectTemplate.TAAGinsuHitUnit,
+    FxImpactAirUnit = EffectTemplate.TAAGinsuHitLand,
     FxImpactLand = EffectTemplate.TAAGinsuHitLand,
 }
 
