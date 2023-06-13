@@ -59,7 +59,6 @@ UnitBlueprint {
         'DRAGBUILD',
         'OVERLAYDIRECTFIRE',
         'OVERLAYINDIRECTFIRE',
-        'OVERLAYOMNI',
         'CQUEMOV', --"CQUEMOV" enables the selection and move commands during construction
         'SNIPEMODE',
         'LOWSELECTPRIO',
@@ -80,7 +79,6 @@ UnitBlueprint {
         Abilities = {
             '<LOC ability_amphibious>Amphibious',
             '<LOC ability_massive>Massive',
-            '<LOC ability_omni>Omni Sensor',
             '<LOC ability_deathaoe>Volatile',
         },
         AnimationActivate = '/units/UAL0401/UAL0401_aactivate.sca',
@@ -215,7 +213,6 @@ UnitBlueprint {
         UnitWeight = 1,
     },
     Intel = {
-        OmniRadius = 50,
         VisionRadius = 50,
         WaterVisionRadius = 50,
     },
