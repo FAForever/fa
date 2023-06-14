@@ -15,7 +15,7 @@
 
 -- types commonly used in repository
 
----@class FunctionName: string
+---@alias FunctionName string
 
 ---@class BuildCondition
 ---@field [1] FileName

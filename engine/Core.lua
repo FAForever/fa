@@ -520,6 +520,7 @@ end
 function WaitFor(manipulator)
 end
 
+
 --- Runs another script file. The environment table, if given,
 --- will be used for the script's global variables.
 ---@param script FileName

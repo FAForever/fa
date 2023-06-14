@@ -7,44 +7,41 @@
 -- Highly recommending to upvalue the categories computation in both class 
 -- and table based files.
 
-local outerLoop = 1000
-local innerLoop = 100
+ModuleName = "Categories"
+BenchmarkData = {
+    Cached = "Cached function",
+    Inline = "Inline function",
+}
 
-function Cached()
-
+function Cached(outerLoop, innerLoop)
+    local timer = GetSystemTimeSecondsOnlyForProfileUse
     local unit = CreateUnit("uaa0303", 1, 0, 0, 0, 0, 0, 0, 0)
+    local start = timer()
 
-    local start = GetSystemTimeSecondsOnlyForProfileUse()
-
-    for k = 1, outerLoop do 
+    for _ = 1, outerLoop do
         local cached = (categories.AIR * categories.TECH3) + categories.EXPERIMENTAL
-        for l = 1, innerLoop do 
+        for _ = 1, innerLoop do
             EntityCategoryContains(cached, unit)
         end
     end
 
-    local final = GetSystemTimeSecondsOnlyForProfileUse()
-
+    local final = timer()
     unit:Destroy()
-
     return final - start
 end
 
-function Inline()
-
+function Inline(outerLoop, innerLoop)
+    local timer = GetSystemTimeSecondsOnlyForProfileUse
     local unit = CreateUnit("uaa0303", 1, 0, 0, 0, 0, 0, 0, 0)
-    
-    local start = GetSystemTimeSecondsOnlyForProfileUse()
+    local start = timer()
 
-    for k = 1, outerLoop do 
-        for l = 1, innerLoop do 
+    for _ = 1, outerLoop do 
+        for _ = 1, innerLoop do 
             EntityCategoryContains((categories.AIR * categories.TECH3) + categories.EXPERIMENTAL, unit)
         end
     end
 
-    local final = GetSystemTimeSecondsOnlyForProfileUse()
-
+    local final = timer()
     unit:Destroy()
-
     return final - start
 end

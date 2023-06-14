@@ -18,6 +18,10 @@ local skip = {
     Blueprint = true , Cache = true, __index = true
 }
 
+local function IsModule(t)
+    return t.__moduleinfo and true or false
+end
+
 local function IsState(t)
     return (t.__State and true) or false
 end
@@ -55,6 +59,10 @@ local function IsLazyVar(t)
 end
 
 local function _FormatHeader(t)
+    -- everything else will break with modules if it tries to read fields as non-existent global variables
+    if IsModule(t) then
+        return format("Printing information of module: %s\n", t.__moduleinfo.name)
+    end
 
     if IsVector(t) then 
         return false 
@@ -83,6 +91,9 @@ local function _FormatHeader(t)
 end
 
 local function _FormatTable(t)
+    if IsModule(t) then
+        return format("(Module: %s)", t.__moduleinfo.name)
+    end
 
     if IsVector(t) then 
         return "(Vector { " .. t.x .. ", " .. t.y .. ", " .. t.z .. "})"

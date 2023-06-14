@@ -646,10 +646,16 @@ end
 Callbacks.FindBenchmarks = function (data)
     import("/lua/sim/profiler.lua").FindBenchmarks(data.Army)
 end
+Callbacks.LoadBenchmark = function(data)
+    import("/lua/sim/profiler.lua").LoadBenchmark(data.Module, data.Benchmark)
+end
 
 -- Allows a benchmark to be run in the sim
-Callbacks.RunBenchmarks = function (data)
-    import("/lua/sim/profiler.lua").RunBenchmarks(data.Info)
+Callbacks.RunBenchmark = function(data)
+    import("/lua/sim/profiler.lua").RunBenchmark(data.Module, data.Benchmark, data.Parameters)
+end
+Callbacks.StopBenchmark = function(data)
+    import("/lua/sim/profiler.lua").StopBenchmark()
 end
 
 do

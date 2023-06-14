@@ -6,11 +6,13 @@
 local TableInsert = table.insert
 
 -- setup for a basic meta table
+---@class Observer
 local ObservableMeta = {}
 ObservableMeta.__index = ObservableMeta
 
 --- Adds an observer that is updated when the value is subject is set.
--- @param callback A function that receives the value as its first argument.
+---@param callback fun(value: any) a function that receives the value as its first argument
+---@param name? string key to set the callback to
 function ObservableMeta:AddObserver(callback, name)
     if name then
         self.Listeners[name] = callback
@@ -28,10 +30,10 @@ end
 
 --- Constructs an observable as described by the observable pattern
 function Create()
-    local observable = {}
+    local observable = {
+        Listeners = {},
+    }
     setmetatable(observable, ObservableMeta)
-
-    observable.Listeners = { }
 
     return observable
 end

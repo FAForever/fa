@@ -7651,7 +7651,7 @@ lobui_0454="Player is not connected to someone"
 lobui_0455="Connected"
 lobui_0456="Not Connected"
 lobui_0457="No connection info available"
-lobui_0458="UnKnown"
+lobui_0458="Unknown"
 lobui_0459="CPU Rating: "
 
 lobui_0545="Random Map"
@@ -8172,3 +8172,5 @@ replay_id="Replay id"
 map_version="Map version"
 
 ChangelogDescriptionIdentifier="description"
+
+debug_0000 = "Line %d:"
