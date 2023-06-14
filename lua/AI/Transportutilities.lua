@@ -1857,7 +1857,9 @@ function WatchUnitLoading( transport, units, aiBrain, UnitPlatoon)
 					if (not transport.Dead) and transport:TransportHasSpaceFor(u) then
 						IssueStop({u})
 						if reissue > 1 then
-                            LOG("*AI DEBUG "..aiBrain.Nickname.." "..UnitPlatoon.BuilderName.." "..transport.PlatoonHandle.BuilderName.." Transport"..transport.EntityId.." Warping unit "..u.EntityId.." to transport ")
+							if TransportDialog then
+                                LOG("*AI DEBUG "..aiBrain.Nickname.." "..UnitPlatoon.BuilderName.." "..transport.PlatoonHandle.BuilderName.." Transport"..transport.EntityId.." Warping unit "..u.EntityId.." to transport ")
+							end
 							Warp( u, GetPosition(transport) )
 							reissue = 0
 						end
@@ -1880,13 +1882,13 @@ function WatchUnitLoading( transport, units, aiBrain, UnitPlatoon)
 			end
 			
 			if newunits and counter > 0 then
-				if reloads > 1 then
+				if reloads > 1 and TransportDialog then
 					LOG("*AI DEBUG "..aiBrain.Nickname.." "..UnitPlatoon.BuilderName.." "..transport.PlatoonHandle.BuilderName.." Transport "..transport.EntityId.." Reloading "..counter.." units - reload "..reloads)
 				end
 				IssueStop( newunits )
 				IssueStop( {transport} )
 				local goload = safecall("Unable to IssueTransportLoad", IssueTransportLoad, newunits, transport )
-				if goload then
+				if goload and TransportDialog then
 					LOG("*AI DEBUG "..aiBrain.Nickname.." "..UnitPlatoon.BuilderName.." "..transport.PlatoonHandle.BuilderName.." Transport "..transport.EntityId.." reloads is "..reloads.." goload is "..repr(goload).." for "..transport:GetBlueprint().Description)
 				end
 			else
