@@ -45,6 +45,8 @@ local function ParsePriorities()
     return finalPriorities
 end
 
+local WeaponMethods = moho.weapon_methods
+
 ---@class Weapon : moho.weapon_methods
 ---@field AimControl? moho.AimManipulator
 ---@field AimLeft? moho.AimManipulator
@@ -62,7 +64,9 @@ end
 ---@field NumTargets number
 ---@field Trash TrashBag
 ---@field unit Unit
-Weapon = ClassWeapon(moho.weapon_methods) {
+---@field MaxRadius? number
+---@field MinRadius? number
+Weapon = ClassWeapon(WeaponMethods) {
 
     -- stored here for mods compatibility, overridden in the inner table when written to
     DamageMod = 0,
@@ -692,5 +696,36 @@ Weapon = ClassWeapon(moho.weapon_methods) {
             return
         end
         self:SetEnabled(enable)
+    end,
+
+    ---------------------------------------------------------------------------
+    --#region Properties
+
+    ---@param self Weapon
+    ---@return number
+    GetMaxRadius = function(self)
+        return self.MaxRadius or self.Blueprint.MaxRadius
+    end,
+
+    ---@param self Weapon
+    GetMinRadius = function(self)
+        return self.MinRadius or self.Blueprint.MinRadius
+    end,
+
+    ---------------------------------------------------------------------------
+    --#region Hooks
+
+    ---@param self Weapon
+    ---@param radius number
+    ChangeMaxRadius = function(self, radius)
+        WeaponMethods.ChangeMaxRadius(self, radius)
+        self.MaxRadius = radius
+    end,
+
+    ---@param self Weapon
+    ---@param radius number
+    ChangeMinRadius = function(self, radius)
+        WeaponMethods.ChangeMinRadius(self, radius)
+        self.MinRadius = radius
     end,
 }
