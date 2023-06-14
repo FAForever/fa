@@ -329,7 +329,7 @@ AIBrain = Class(StandardBrain) {
 
     ---@param self BaseAIBrain
     ---@param loc Vector
-    ---@return boolean
+    ---@return number
     PBMGetLocationRadius = function(self, loc)
         if not loc then
             return false
