@@ -456,7 +456,8 @@ UnitBlueprint {
             Prerequisite = 'CrysalisBeam',
             RemoveEnhancements = {
                 'CrysalisBeam',
-                'CrysalisBeamRemove',
+                'AdvancedCrysalisBeam',
+                'AdvancedCrysalisBeamRemove',
             },
             Slot = 'LCH',
         },
