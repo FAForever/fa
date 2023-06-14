@@ -148,7 +148,7 @@ UnitBlueprint {
         EconomyThreatLevel = 5,
         Health = 10000,
         MaxHealth = 10000,
-        RegenRate = 15,
+        RegenRate = 20,
         SubThreatLevel = 0,
         SurfaceThreatLevel = 75,
     },
@@ -368,8 +368,8 @@ UnitBlueprint {
             Icon = 'pcg',
             MaintenanceConsumptionPerSecondEnergy = 3000,
             Name = '<LOC enhancements_0079>Personal Cloaking Generator',
-            NewHealth = 15000,
-            Prerequisite = 'StealthGenerator',
+            NewHealth = 11500,
+            Prerequisite = 'SelfRepairSystem',
             Slot = 'Back',
             UpgradeUnitAmbientBones = {
                 'URL0001',
@@ -384,6 +384,7 @@ UnitBlueprint {
             Prerequisite = 'CloakingGenerator',
             RemoveEnhancements = {
                 'StealthGenerator',
+                'SelfRepairSystem',
                 'CloakingGenerator',
                 'CloakingGeneratorRemove',
             },
@@ -539,6 +540,39 @@ UnitBlueprint {
             },
             Slot = 'Back',
         },
+        SelfRepairSystem = {
+            BuildCostEnergy = 35000,
+            BuildCostMass = 1000,
+            BuildTime = 1000,
+            Icon = 'srs',
+            Name = '<LOC enhancements_0089>Nano Repair System',
+            NewRegenRate = 50,
+            NewHealth = 3500,
+            Slot = 'Back',
+            Prerequisite = 'StealthGenerator',
+            ShowBones = { 
+                'Back_Upgrade',
+            },
+            UpgradeEffectBones = {
+                'Back_Upgrade',
+            },
+        },
+        SelfRepairSystemRemove = {
+            BuildCostEnergy = 1,
+            BuildCostMass = 1,
+            BuildTime = 0.1,
+            Icon = 'srs',
+            Prerequisite = 'Nano',
+            HideBones = {
+                'Back_Upgrade',
+            },
+            RemoveEnhancements = {
+                'StealthGenerator',
+                'Nano',
+                'NanoRemove',
+            },
+            Slot = 'Back',
+        },
         Slots = {
             Back = {
                 name = '<LOC _Back>',
@@ -564,6 +598,7 @@ UnitBlueprint {
             MaintenanceConsumptionPerSecondEnergy = 50,
             Name = '<LOC enhancements_0101>Personal Stealth Generator',
             NewHealth = 2000,
+            NewRegenRate = 20,
             ShowBones = {
                 'Back_Upgrade',
             },
