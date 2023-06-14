@@ -327,6 +327,25 @@ AIBrain = Class(StandardBrain) {
         return false
     end,
 
+    ---@param self BaseAIBrain
+    ---@param loc Vector
+    ---@return number
+    PBMGetLocationRadius = function(self, loc)
+        if not loc then
+            return false
+        end
+        if self.HasPlatoonList then
+            for k, v in self.PBM.Locations do
+                if v.LocationType == loc then
+                   return v.Radius
+                end
+            end
+        elseif self.BuilderManagers[loc] then
+            return self.BuilderManagers[loc].FactoryManager.Radius
+        end
+        return false
+    end,
+
     ---SKIRMISH AI HELPER SYSTEMS
     ---@param self BaseAIBrain
     InitializeSkirmishSystems = function(self)
