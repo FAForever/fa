@@ -3,6 +3,7 @@
 #
 local AMiasmaProjectile = import('/lua/aeonprojectiles.lua').AMiasmaProjectile
 local utilities = import('/lua/utilities.lua')
+local VisionMarker = import("/lua/sim/vizmarker.lua").VisionMarkerOpti
 
 X1Mercy = Class(AMiasmaProjectile) {
 
@@ -33,7 +34,7 @@ X1Mercy = Class(AMiasmaProjectile) {
         self:ForkThread( self.SplitThread )
     end,
 
-		OnImpact = function(self, TargetType, TargetEntity)
+	OnImpact = function(self, TargetType, TargetEntity)
         AMiasmaProjectile.OnImpact(self, TargetType, TargetEntity)
 
         --WARN(tostring(TargetType) .. " - " .. tostring(TargetEntity))
@@ -46,12 +47,23 @@ X1Mercy = Class(AMiasmaProjectile) {
         elseif bp.Impact then
             self:PlaySound(bp.Impact)
         end
+        
+        --Vision for when projectile impacts
+        ---@type VisionMarkerOpti
+        local entity = VisionMarker({Owner = self})
+    
+        local px, py, pz = self:GetPositionXYZ()
+        entity:UpdatePosition(px, pz)
+        entity:UpdateIntel(self.Army, 10, 'Vision', true)
+        entity:UpdateDuration(10)
 
         -- Transplanted AIFMiasmaShell02 code
 
         local pos = self:GetPosition()
         local radius = self.DamageData.DamageRadius
         local FriendlyFire = self.DamageData.DamageFriendly and radius ~=0
+
+        
 
         DamageArea( self, pos, radius, 1, 'Force', FriendlyFire )
         DamageArea( self, pos, radius, 1, 'Force', FriendlyFire )
