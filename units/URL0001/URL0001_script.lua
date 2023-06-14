@@ -210,7 +210,8 @@ URL0001 = ClassUnit(ACUUnit, CCommandUnit) {
                 Buff.RemoveBuff(self, 'CybranACUStealthBonus')
             end
         elseif enh == 'SelfRepairSystem' then
-            if not Buff['CybranACURegenerateBonus'] then
+            LOG("SelfRepairSystem")
+            if not Buffs['CybranACURegenerateBonus'] then
                 BuffBlueprint {
                     Name = 'CybranACURegenerateBonus',
                     DisplayName = 'CybranACURegenerateBonus',
