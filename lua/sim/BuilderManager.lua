@@ -219,22 +219,23 @@ BuilderManager = ClassSimple {
             end
         end
 
-        -- only one candidate
+        -- only one builder found
+        local candidate
         if candidateNext == 2 then
-            if candidates[1].DelayEqualBuildPlattons then
-                local delay = candidates[1].DelayEqualBuildPlattons
-                self.Brain.DelayEqualBuildPlattons[delay[1]] = GetGameTimeSeconds() + delay[2]
-            end
-            return candidates[1]
-        -- multiple candidates, choose one at random
+            candidate = candidates[1]
+
+        -- multiple builders found
         elseif candidateNext > 2 then
-            local candidateSelection = candidates[Random(1, candidateNext - 1)]
-            if candidateSelection.DelayEqualBuildPlattons then
-                local delay = candidateSelection.DelayEqualBuildPlattons
-                self.Brain.DelayEqualBuildPlattons[delay[1]] = GetGameTimeSeconds() + delay[2]
-            end
-            return candidateSelection
+            candidate = candidates[Random(1, candidateNext - 1)]
         end
+
+        -- apply the builder delay
+        if candidate and candidate.DelayEqualBuildPlattons then
+            local delay = candidate.DelayEqualBuildPlattons
+            self.Brain.DelayEqualBuildPlattons[delay[1]] = GetGameTimeSeconds() + delay[2]
+        end
+
+        return candidate
     end,
 
     --- Returns true if the given builders matches the manager-specific parameters
