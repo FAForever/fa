@@ -1623,7 +1623,6 @@ Platoon = Class(moho.platoon_methods) {
         self:Stop()
         local aiBrain = self:GetBrain()
         local data = self.PlatoonData
-        local radius = aiBrain:PBMGetLocationRadius(data.Location)
         local categories = data.Reclaim
         local counter = 0
         local reclaimcat
