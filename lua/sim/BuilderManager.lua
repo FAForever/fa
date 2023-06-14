@@ -223,7 +223,7 @@ BuilderManager = ClassSimple {
         if candidateNext == 2 then
             if candidates[1].DelayEqualBuildPlattons then
                 local delay = candidates[1].DelayEqualBuildPlattons
-                self.Brain.DelayEqualBuildPlattons[delay[1]] = GetGameTime() + delay[2]
+                self.Brain.DelayEqualBuildPlattons[delay[1]] = GetGameTimeSeconds() + delay[2]
             end
             return candidates[1]
         -- multiple candidates, choose one at random
@@ -231,7 +231,7 @@ BuilderManager = ClassSimple {
             local candidateSelection = candidates[Random(1, candidateNext - 1)]
             if candidateSelection.DelayEqualBuildPlattons then
                 local delay = candidateSelection.DelayEqualBuildPlattons
-                self.Brain.DelayEqualBuildPlattons[delay[1]] = GetGameTime() + delay[2]
+                self.Brain.DelayEqualBuildPlattons[delay[1]] = GetGameTimeSeconds() + delay[2]
             end
             return candidateSelection
         end
