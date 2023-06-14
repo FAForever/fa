@@ -878,7 +878,7 @@ function CreateExplosionMesh(object, projBP, posX, posY, posZ, scale, scaleVeloc
         :SetScaleVelocity(scaleVelocity)
         :SetLifetime(lifetime)
         :SetVelocity(velX, velY, velZ)
-        :SetOrientation(QuatFromRotation(orientRot, orientX, orientY, orientZ), true)
+        :SetOrientation(util.QuatFromRotation(orientRot, orientX, orientY, orientZ), true)
 
     CreateEmitterAtEntity(proj, proj.Army, '/effects/emitters/destruction_explosion_smoke_10_emit.bp')
     return proj
