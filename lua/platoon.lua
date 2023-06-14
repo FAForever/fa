@@ -248,7 +248,7 @@ Platoon = Class(moho.platoon_methods) {
     ---@param self Platoon
     PlatoonDisband = function(self)
         if self.ArmyPool then
-            WARN('AI WARNING: Platoon trying to disband ArmyPool')
+            --WARN('AI WARNING: Platoon trying to disband ArmyPool')
             --LOG(reprsl(debug.traceback()))
             return
         end
