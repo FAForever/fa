@@ -204,14 +204,26 @@ end
 
 ---@param aiBrain AIBrain
 ---@return true | nil
-function ArmyNeedsTransports(aiBrain)
+function TransportRequested(aiBrain)
     if aiBrain then
-        if aiBrain.NeedTransports and aiBrain:GetNoRushTicks() <= 0 then
+        if aiBrain.TransportRequested and aiBrain:GetNoRushTicks() <= 0 then
             return true
         end
     end
 end
 
+-- deprecated kept for compatibility
+---@param aiBrain AIBrain
+---@return true | nil
+function ArmyNeedsTransports(aiBrain)
+    if aiBrain then
+        if aiBrain.NeedTransports > 0 and aiBrain:GetNoRushTicks() <= 0 then
+            return true
+        end
+    end
+end
+
+-- deprecated kept for compatibility
 ---@param aiBrain AIBrain
 ---@param number number
 ---@return true | nil
