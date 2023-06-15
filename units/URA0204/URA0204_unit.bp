@@ -298,7 +298,7 @@ UnitBlueprint {
             MaxRadius = 42,
             MinRadius = 4,
             MuzzleSalvoDelay = 1.8,
-            MuzzleSalvoSize = 2,
+            MuzzleSalvoSize = 3,
             MuzzleVelocity = 14,
             ProjectileId = '/projectiles/CANTorpedoNanite03/CANTorpedoNanite03_proj.bp',
             ProjectileLifetime = 20,
