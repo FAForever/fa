@@ -449,7 +449,7 @@ end
 
 function OnTabChangeLayout(type)
     local controls = import("/lua/ui/game/construction.lua").controls
-    if type ~= 'selection' then
+    if type ~= 'selection' and type ~= "RCH" and type ~= "LCH" and type ~= "Back" then
         LayoutHelpers.AtLeftIn(controls.choices, controls.minBG, 85)
         LayoutHelpers.AtRightIn(controls.choices, controls.maxBG, 49)
     end
@@ -461,6 +461,7 @@ function OnTabChangeLayout(type)
         else
             controls.extraBtn1.icon:SetTexture(controls.extraBtn1.icon.OnTexture)
         end
+        controls.extraBtn1.icon:Show()
         LayoutHelpers.AtTopIn(controls.choices, controls.minBG, 31)
         LayoutHelpers.AtLeftTopIn(controls.extraBtn1, controls.minBG, 10, 31)
     elseif type == 'selection' then
@@ -471,6 +472,7 @@ function OnTabChangeLayout(type)
         else
             controls.extraBtn1.icon:SetTexture(controls.extraBtn1.icon.OnTexture)
         end
+        controls.extraBtn1.icon:Show()
         LayoutHelpers.AtTopIn(controls.choices, controls.minBG, 4)
         LayoutHelpers.AtLeftTopIn(controls.extraBtn1, controls.minBG, 8, 4)
         LayoutHelpers.AtLeftIn(controls.choices, controls.minBG, 83)
