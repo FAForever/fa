@@ -465,7 +465,7 @@ AIBrain = Class(StandardBrain) {
         local distance, closest
         for k, v in self.BuilderManagers do
             if v.EngineerManager and v.EngineerManager:GetNumCategoryUnits('Engineers', categories.ALLUNITS) > 0
-            and v.FactoryManager and v.FactoryManager:GetNumCategoryFactories(categories.ALLUNITS) > 0 then
+            and v.FactoryManager and v.FactoryManager.LocationActive and v.FactoryManager:GetNumCategoryFactories(categories.ALLUNITS) > 0 then
                 if position and v.Position then
                     if not closest then
                         distance = VDist3(position, v.Position)
