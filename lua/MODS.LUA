@@ -12,8 +12,9 @@ able to flexibly support the modding scene, but beyond these basic managerial re
 pretty much free to do whatever they like with the game and the FAF framework.
 
 Several (but not all) of the restrictions include:
- * If you upload the mod to the vault, you MUST follow the vault rules:
-   https://wiki.faforever.com/en/Vault-Rules
+ * If you upload the mod to the vault, you MUST follow the rules:
+   https://faforever.com/rules
+   https://wiki.faforever.com/en/Development/Vault/Rules
     * In particular, make sure you have the right to distribute the content of the mod you are
       uploading. Require other mods when reasonable to avoid copying others' work.
  * Mods are not able to modify the lobby (since mods are only fully loaded after the game launches).
