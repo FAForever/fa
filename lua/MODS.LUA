@@ -40,8 +40,7 @@ Each mod has a `mod_info.lua` file which contains various bits of info:
     -- Required name to use for this mod. This is what is displayed in the Lobby, after undergoing
     -- title-casing. Do NOT add version information here - keep this the exactly same when you
     -- update what you consider to be the same mod as the FAF client will uses this to auto-update
-    -- mods (based on the most recent `uid` - the version number does not matter and is only used
-    -- for display purposes).
+    -- mods.
     name = "Happy mod"
 
     -- Required integer version to use for this mod (please only increment) to indicate the most
