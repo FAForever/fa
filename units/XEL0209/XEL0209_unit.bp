@@ -97,7 +97,7 @@ UnitBlueprint {
     CollisionOffsetZ = -0.05,
     Defense = {
         AirThreatLevel = 0,
-        ArmorType = 'Normal',
+        ArmorType = 'Engineer',
         EconomyThreatLevel = 0,
         Health = 1040,
         MaxHealth = 1040,
