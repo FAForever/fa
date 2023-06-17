@@ -108,7 +108,7 @@ UnitBlueprint {
     CollisionOffsetZ = -0.07,
     Defense = {
         AirThreatLevel = 0,
-        ArmorType = 'Light',
+        ArmorType = 'Drone',
         EconomyThreatLevel = 1,
         Health = 50,
         MaxHealth = 50,
