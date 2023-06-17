@@ -33,6 +33,7 @@
 ---| "ASF"
 ---| "Commander"
 ---| "Default"
+---| "Engineer"
 ---| "Experimental"
 ---| "ExperimentalStructure"
 ---| "Light"
@@ -108,5 +109,13 @@ armordefinition = {
         -- Armor Definition
         'Normal 1.0',
         'TacticalMissile 0.55',
+    },
+    {
+        -- Armor Type Name
+        'Engineer',
+
+        -- Armor Definition
+        'Normal 1.0',
+        'Deathnuke 0.032',
     },
 }
