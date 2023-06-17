@@ -1251,7 +1251,7 @@ function OrderEnhancement(item, clean, destroy)
 
         local doOrder = true
         local removeAlreadyOrdered = false
-        local highestPrereqIndex = 0
+        local highestPrereqIndex = table.find(prereqs, existingEnh) or 0
         if enhancementQueue[entityId] then
             for _, enhancement in enhancementQueue[entityId] do
                 if enhancement.Slot ~= slot then
@@ -1286,8 +1286,6 @@ function OrderEnhancement(item, clean, destroy)
             table.insert(orders, existingEnh .. 'Remove')
         end
         if prereqs then
-            reprsl(prereqs)
-            LOG(highestPrereqIndex)
             for k = highestPrereqIndex + 1, table.getn(prereqs) do
                 table.insert(orders, prereqs[k])
             end
