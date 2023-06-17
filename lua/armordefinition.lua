@@ -33,6 +33,7 @@
 ---| "ASF"
 ---| "Commander"
 ---| "Default"
+---| "Drone"
 ---| "Engineer"
 ---| "Experimental"
 ---| "ExperimentalStructure"
@@ -117,5 +118,13 @@ armordefinition = {
         -- Armor Definition
         'Normal 1.0',
         'Deathnuke 0.032',
+    },
+    {
+        -- Armor Type Name
+        'Drone',
+
+        -- Armor Definition
+        'Normal 1.0',
+        'Deathnuke 0',
     },
 }
