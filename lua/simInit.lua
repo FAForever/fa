@@ -379,11 +379,6 @@ function BeginSessionAI()
         for k,file in DiskFindFiles('/lua/AI/AIBaseTemplates', '*.lua') do
             import(file)
         end
-
-        -- import base templates, builder group templates and builder templates
-        for k,file in DiskFindFiles('/lua/aibrains/templates/', '*.lua') do
-            import(file)
-        end
     end
 end
 
