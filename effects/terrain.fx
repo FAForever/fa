@@ -1787,18 +1787,18 @@ float4 sampleNormal(sampler2D s, float4 position, uniform float4 scale, float ma
     return splatBlendNormal(normalize(2 * normal - 1), normalize(2 * normalRotated - 1), 0.5, mask, 0.03);
 }
 
-float4 sampleAlbedo(sampler2D s, float4 position, uniform float2 scale, uniform float2 offset, uniform bool otherLayer, float mask) {
+float4 sampleAlbedo(sampler2D s, float4 position, uniform float2 scale, uniform float2 offset, uniform bool firstBatch, float mask) {
     // 30° rotation
     float2x2 rotationMatrix = float2x2(float2(0.866, -0.5), float2(0.5, 0.866));
     float4 albedo = tex2D(s, position.xy * scale.xy);
     float4 albedoRotated = tex2D(s, mul(position.xy, rotationMatrix) * scale.xy);
     // store roughness in albedo alpha so we get the roughness splatting for free
-    if (otherLayer) {
-        albedo.a = atlas2D(Stratum7AlbedoSampler, position.xy * scale.xy, offset).w;
-        albedoRotated.a = atlas2D(Stratum7AlbedoSampler, mul(position.xy, rotationMatrix) * scale.xy, offset).w;
-    } else {
+    if (firstBatch) {
         albedo.a = atlas2D(Stratum7AlbedoSampler, position.xy * scale.xy, offset).y;
         albedoRotated.a = atlas2D(Stratum7AlbedoSampler, mul(position.xy, rotationMatrix) * scale.xy, offset).y;
+    } else {
+        albedo.a = atlas2D(Stratum7AlbedoSampler, position.xy * scale.xy, offset).w;
+        albedoRotated.a = atlas2D(Stratum7AlbedoSampler, mul(position.xy, rotationMatrix) * scale.xy, offset).w;
     }
     return splatLerp(albedo, albedoRotated, 0.5, mask, 0.03);
 }
