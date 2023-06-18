@@ -130,6 +130,8 @@ struct VS_OUTPUT
     float4 mShadow              : TEXCOORD3;
     float3 mViewDirection        : TEXCOORD4;
     float4 mTexDecal            : TEXCOORD5;
+    float4 nearScales           : TEXCOORD6;
+    float4 farScales            : TEXCOORD7;
 };
 
 struct TERRAIN_DEPTH
@@ -617,6 +619,11 @@ VS_OUTPUT TerrainVS( position_t p : POSITION0, uniform bool shadowed)
 {
     VS_OUTPUT result;
 
+    // We do this to be able to save some memory registers in the pixel shader as the Tiles only have
+    // one float of actual data, but use four and we are pretty tight on register slots sometimes.
+    result.nearScales = float4(Stratum0AlbedoTile.x, Stratum1AlbedoTile.x, Stratum2AlbedoTile.x, Stratum3AlbedoTile.x);
+    result.farScales =  float4(Stratum0NormalTile.x, Stratum1NormalTile.x, Stratum2NormalTile.x, Stratum3NormalTile.x);
+
     float4 position = float4(p);
     position.y *= HeightScale;
 
@@ -650,6 +657,9 @@ VS_OUTPUT TerrainVS( position_t p : POSITION0, uniform bool shadowed)
 VS_OUTPUT TerrainGlowVS( position_t p : POSITION0, uniform bool shadowed)
 {
     VS_OUTPUT result;
+
+    result.nearScales = float4(Stratum0AlbedoTile.x, Stratum1AlbedoTile.x, Stratum2AlbedoTile.x, Stratum3AlbedoTile.x);
+    result.farScales =  float4(Stratum0NormalTile.x, Stratum1NormalTile.x, Stratum2NormalTile.x, Stratum3NormalTile.x);
 
     float4 position = float4(p);
     position.y *= HeightScale;
@@ -692,6 +702,9 @@ VS_OUTPUT TerrainSkirtVS( position_t p : POSITION0)
 {
     VS_OUTPUT result;
 
+    result.nearScales = float4(Stratum0AlbedoTile.x, Stratum1AlbedoTile.x, Stratum2AlbedoTile.x, Stratum3AlbedoTile.x);
+    result.farScales =  float4(Stratum0NormalTile.x, Stratum1NormalTile.x, Stratum2NormalTile.x, Stratum3NormalTile.x);
+
     float4 position = float4(p);
     position.y *= HeightScale;
 
@@ -713,6 +726,9 @@ VS_OUTPUT TerrainFogVS( position_t p : POSITION0)
 {
 
     VS_OUTPUT result;
+
+    result.nearScales = float4(Stratum0AlbedoTile.x, Stratum1AlbedoTile.x, Stratum2AlbedoTile.x, Stratum3AlbedoTile.x);
+    result.farScales =  float4(Stratum0NormalTile.x, Stratum1NormalTile.x, Stratum2NormalTile.x, Stratum3NormalTile.x);
 
     float4 position = float4(p);
     position.y *= HeightScale;
@@ -1155,6 +1171,9 @@ VS_OUTPUT DecalsVS( position_t p : POSITION0, uniform bool shadowed)
 {
     VS_OUTPUT result;
 
+    result.nearScales = float4(Stratum0AlbedoTile.x, Stratum1AlbedoTile.x, Stratum2AlbedoTile.x, Stratum3AlbedoTile.x);
+    result.farScales =  float4(Stratum0NormalTile.x, Stratum1NormalTile.x, Stratum2NormalTile.x, Stratum3NormalTile.x);
+
     float4 position = float4(p);
     position.y += decalHeightOffset;
     position.y *= HeightScale;
@@ -1199,6 +1218,9 @@ VS_OUTPUT DecalsVS( position_t p : POSITION0, uniform bool shadowed)
 VS_OUTPUT DecalsVSWaterAlbedo( position_t p : POSITION0, uniform bool shadowed)
 {
     VS_OUTPUT result;
+
+    result.nearScales = float4(Stratum0AlbedoTile.x, Stratum1AlbedoTile.x, Stratum2AlbedoTile.x, Stratum3AlbedoTile.x);
+    result.farScales =  float4(Stratum0NormalTile.x, Stratum1NormalTile.x, Stratum2NormalTile.x, Stratum3NormalTile.x);
 
     float4 position = float4(p);
     position.y += decalHeightOffset;
@@ -1948,15 +1970,13 @@ float4 TerrainPBRAlbedoPS ( VS_OUTPUT inV) : COLOR
 
     float4 albedo = sampleAlbedo(LowerAlbedoSampler, position, LowerAlbedoTile, float2(0.0, 0.0), true, rotationMask);
 
-    albedo = computeStratum(albedo, position, rotationMask, Stratum0AlbedoSampler, Stratum0AlbedoTile.xy, Stratum0NormalTile.xy, mask0.x, float2(0.5, 0.0), true);
-    albedo = computeStratum(albedo, position, rotationMask, Stratum1AlbedoSampler, Stratum1AlbedoTile.xy, Stratum1NormalTile.xy, mask0.y, float2(0.0, 0.5), true);
-    albedo = computeStratum(albedo, position, rotationMask, Stratum2AlbedoSampler, Stratum2AlbedoTile.xy, Stratum2NormalTile.xy, mask0.z, float2(0.5, 0.5), true);
-    // We use the specularcolor to save register slots as the Tiles only have one 
-    // float of actual data, but use four and we are pretty tight on register slots
-    albedo = computeStratum(albedo, position, rotationMask, Stratum3AlbedoSampler, Stratum3AlbedoTile.xy, SpecularColor.xx,      mask0.w, float2(0.0, 0.0), false);
-    albedo = computeStratum(albedo, position, rotationMask, Stratum4AlbedoSampler, Stratum4AlbedoTile.xy, SpecularColor.yy,      mask1.x, float2(0.5, 0.0), false);
-    albedo = computeStratum(albedo, position, rotationMask, Stratum5AlbedoSampler, Stratum5AlbedoTile.xy, SpecularColor.zz,      mask1.y, float2(0.0, 0.5), false);
-    albedo = computeStratum(albedo, position, rotationMask, Stratum6AlbedoSampler, Stratum6AlbedoTile.xy, SpecularColor.ww,      mask1.z, float2(0.5, 0.5), false);
+    albedo = computeStratum(albedo, position, rotationMask, Stratum0AlbedoSampler, inV.nearScales.x,      inV.farScales.x,       mask0.x, float2(0.5, 0.0), true);
+    albedo = computeStratum(albedo, position, rotationMask, Stratum1AlbedoSampler, inV.nearScales.y,      inV.farScales.y,       mask0.y, float2(0.0, 0.5), true);
+    albedo = computeStratum(albedo, position, rotationMask, Stratum2AlbedoSampler, inV.nearScales.z,      inV.farScales.z,       mask0.z, float2(0.5, 0.5), true);
+    albedo = computeStratum(albedo, position, rotationMask, Stratum3AlbedoSampler, inV.nearScales.w,      inV.farScales.w,       mask0.w, float2(0.0, 0.0), false);
+    albedo = computeStratum(albedo, position, rotationMask, Stratum4AlbedoSampler, Stratum4AlbedoTile.xy, Stratum4NormalTile.xy, mask1.x, float2(0.5, 0.0), false);
+    albedo = computeStratum(albedo, position, rotationMask, Stratum5AlbedoSampler, Stratum5AlbedoTile.xy, Stratum5NormalTile.xy, mask1.y, float2(0.0, 0.5), false);
+    albedo = computeStratum(albedo, position, rotationMask, Stratum6AlbedoSampler, Stratum6AlbedoTile.xy, Stratum6NormalTile.xy, mask1.z, float2(0.5, 0.5), false);
 
     // We need to add 0.01 as the reflection disappears at 0
     float roughness = saturate(albedo.a * mask1.w * 2 + 0.01);
@@ -1967,7 +1987,7 @@ float4 TerrainPBRAlbedoPS ( VS_OUTPUT inV) : COLOR
     color = ApplyWaterColorExponentially(inV, waterDepth, color);
 
     return float4(color, 0.01f);
-    // LowerNormalTile, Stratum7AlbedoTile and Stratum3NormalTile to Stratum7NormalTile are unused now
+    // SpecularColor, LowerNormalTile, Stratum7AlbedoTile and Stratum7NormalTile are unused now
 }
 
 technique TerrainPBRNormals
@@ -2174,15 +2194,14 @@ float4 Terrain002AlbedoPS ( VS_OUTPUT inV) : COLOR
 
     float4 albedo = sampleAlbedo(LowerAlbedoSampler, position, LowerAlbedoTile, float2(0.0, 0.0), true);
 
-    albedo = computeStratum(albedo, position, Stratum0AlbedoSampler, Stratum0AlbedoTile.xy, Stratum0NormalTile.xy, mask0.x, float2(0.5, 0.0), true);
-    albedo = computeStratum(albedo, position, Stratum1AlbedoSampler, Stratum1AlbedoTile.xy, Stratum1NormalTile.xy, mask0.y, float2(0.0, 0.5), true);
-    albedo = computeStratum(albedo, position, Stratum2AlbedoSampler, Stratum2AlbedoTile.xy, Stratum2NormalTile.xy, mask0.z, float2(0.5, 0.5), true);
-    // We use the specularcolor to save register slots as the Tiles only have one 
-    // float of actual data, but use four and we are pretty tight on register slots
-    albedo = computeStratum(albedo, position, Stratum3AlbedoSampler, Stratum3AlbedoTile.xy, SpecularColor.xx,      mask0.w, float2(0.0, 0.0), false);
-    albedo = computeStratum(albedo, position, Stratum4AlbedoSampler, Stratum4AlbedoTile.xy, SpecularColor.yy,      mask1.x, float2(0.5, 0.0), false);
-    albedo = computeStratum(albedo, position, Stratum5AlbedoSampler, Stratum5AlbedoTile.xy, SpecularColor.zz,      mask1.y, float2(0.0, 0.5), false);
-    albedo = computeStratum(albedo, position, Stratum6AlbedoSampler, Stratum6AlbedoTile.xy, SpecularColor.ww,      mask1.z, float2(0.5, 0.5), false);
+    // This shader wouldn't compile because it would have to store too many variables if we didn't use this trick in the vertex shader
+    albedo = computeStratum(albedo, position, Stratum0AlbedoSampler, inV.nearScales.x,      inV.farScales.x,       mask0.x, float2(0.5, 0.0), true);
+    albedo = computeStratum(albedo, position, Stratum1AlbedoSampler, inV.nearScales.y,      inV.farScales.y,       mask0.y, float2(0.0, 0.5), true);
+    albedo = computeStratum(albedo, position, Stratum2AlbedoSampler, inV.nearScales.z,      inV.farScales.z,       mask0.z, float2(0.5, 0.5), true);
+    albedo = computeStratum(albedo, position, Stratum3AlbedoSampler, inV.nearScales.w,      inV.farScales.w,       mask0.w, float2(0.0, 0.0), false);
+    albedo = computeStratum(albedo, position, Stratum4AlbedoSampler, Stratum4AlbedoTile.xy, Stratum4NormalTile.xy, mask1.x, float2(0.5, 0.0), false);
+    albedo = computeStratum(albedo, position, Stratum5AlbedoSampler, Stratum5AlbedoTile.xy, Stratum5NormalTile.xy, mask1.y, float2(0.0, 0.5), false);
+    albedo = computeStratum(albedo, position, Stratum6AlbedoSampler, Stratum6AlbedoTile.xy, Stratum6NormalTile.xy, mask1.z, float2(0.5, 0.5), false);
 
     // We need to add 0.01 as the reflection disappears at 0
     float roughness = saturate(albedo.a * mask1.w * 2 + 0.01);
