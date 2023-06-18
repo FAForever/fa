@@ -7,15 +7,11 @@ local TableGetn = table.getn
 
 local Debug = false
 function EnableDebugging()
-    if ScenarioInfo.GameHasAIs or CheatsEnabled() then
-        Debug = true
-    end
+    Debug = true
 end
 
 function DisableDebugging()
-    if ScenarioInfo.GameHasAIs or CheatsEnabled() then
-        Debug = false
-    end
+    Debug = false
 end
 
 ---@type GridPresenceUIDebugCell
