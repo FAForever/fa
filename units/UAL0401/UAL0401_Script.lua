@@ -11,6 +11,7 @@ local ADFPhasonLaser = WeaponsFile.ADFPhasonLaser
 local ADFTractorClaw = WeaponsFile.ADFTractorClaw
 local explosion = import("/lua/defaultexplosions.lua")
 local CreateAeonColossusBuildingEffects = import("/lua/effectutilities.lua").CreateAeonColossusBuildingEffects
+local Utilities = import("/lua/utilities.lua")
 
 -- upvalue for performance
 local MathSqrt = math.sqrt
@@ -107,26 +108,32 @@ UAL0401 = ClassUnit(AWalkingLandUnit) {
     end,
 
     DeathThread = function(self, overkillRatio, instigator)
+        local bp = self.Blueprint
         self:PlayUnitSound('Destroyed')
         explosion.CreateDefaultHitExplosionAtBone(self, 'Torso', 4.0)
         explosion.CreateDebrisProjectiles(self, explosion.GetAverageBoundingXYZRadius(self),
-            { self.Blueprint.SizeX, self.Blueprint.SizeY, self.Blueprint.SizeZ })
+            {bp.SizeX, bp.SizeY, bp.SizeZ})
         WaitTicks(1)
+
         explosion.CreateDefaultHitExplosionAtBone(self, 'Right_Leg_B02', 1.0)
         WaitTicks(1)
+
         explosion.CreateDefaultHitExplosionAtBone(self, 'Right_Leg_B01', 1.0)
         WaitTicks(1)
+
         explosion.CreateDefaultHitExplosionAtBone(self, 'Left_Arm_B02', 1.0)
         WaitTicks(3)
+
         explosion.CreateDefaultHitExplosionAtBone(self, 'Right_Arm_B01', 1.0)
         explosion.CreateDefaultHitExplosionAtBone(self, 'Right_Leg_B01', 1.0)
-
         WaitTicks(15)
+
         explosion.CreateDefaultHitExplosionAtBone(self, 'Right_Leg_B01', 1.0)
         explosion.CreateDefaultHitExplosionAtBone(self, 'Right_Leg_B02', 1.0)
         explosion.CreateDefaultHitExplosionAtBone(self, 'Left_Leg_B01', 1.0)
         explosion.CreateDefaultHitExplosionAtBone(self, 'Left_Leg_B02', 1.0)
         WaitTicks(38)
+
         explosion.CreateDefaultHitExplosionAtBone(self, 'Torso', 5.0)
         explosion.CreateDefaultHitExplosionAtBone(self, 'Left_Arm_B02', 1.0)
         explosion.CreateDefaultHitExplosionAtBone(self, 'Right_Arm_B01', 1.0)
@@ -135,19 +142,13 @@ UAL0401 = ClassUnit(AWalkingLandUnit) {
         end
 
         -- only apply death damage when the unit is sufficiently build
-        local bp = self.Blueprint
         local FractionThreshold = bp.General.FractionThreshold or 0.5
         if self:GetFractionComplete() >= FractionThreshold then
-            local bp = self.Blueprint
-            local position = self:GetPosition()
-            local qx, qy, qz, qw = unpack(self:GetOrientation())
-            local a = math.atan2(2.0 * (qx * qz + qw * qy), qw * qw + qx * qx - qz * qz - qy * qy)
-            for i, numWeapons in bp.Weapon do
-                if bp.Weapon[i].Label == 'CollossusDeath' then
-                    position[3] = position[3] + 5 * math.cos(a)
-                    position[1] = position[1] + 5 * math.sin(a)
-                    DamageArea(self, position, bp.Weapon[i].DamageRadius, bp.Weapon[i].Damage, bp.Weapon[i].DamageType,
-                        bp.Weapon[i].DamageFriendly)
+            for _, weapon in bp.Weapon do
+                if weapon.Label == 'CollossusDeath' then
+                    local position = Utilities.TranslateInXZDirection(self:GetPosition(), self:GetOrientation(), 5)
+                    DamageArea(self, position, weapon.DamageRadius, weapon.Damage,
+                            weapon.DamageType, weapon.DamageFriendly)
                     break
                 end
             end
@@ -176,6 +177,3 @@ UAL0401 = ClassUnit(AWalkingLandUnit) {
     end,
 }
 TypeClass = UAL0401
-
--- Kept for Mod Backwards Compatability
-local Utilities = import("/lua/utilities.lua")

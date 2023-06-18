@@ -15,7 +15,6 @@ local Buff = import("/lua/sim/buff.lua")
 local AdjacencyBuffs = import("/lua/sim/adjacencybuffs.lua")
 local FireState = import("/lua/game.lua").FireState
 local ScenarioFramework = import("/lua/scenarioframework.lua")
-local Quaternion = import("/lua/shared/quaternions.lua").Quaternion
 
 local MathAbs = math.abs
 
@@ -93,21 +92,15 @@ StructureUnit = ClassUnit(Unit) {
             and (layer == 'Land' or layer == 'Seabed')
         then
             -- rotate structure to match terrain gradient
-            local a1, a2 = TerrainUtils.GetTerrainSlopeAnglesDegrees(
+            local roll, pitch = TerrainUtils.GetTerrainSlopeAngles(
                 self:GetPosition(),
                 blueprint.Footprint.SizeX or physicsBlueprint.SkirtSizeX,
                 blueprint.Footprint.SizeZ or physicsBlueprint.SkirtSizeZ
             )
 
             -- do not orientate structures that are on flat ground
-            if a1 != 0 or a2 != 0 then
-                -- quaternion magic incoming, be prepared! Note that the yaw axis is inverted, but then
-                -- re-inverted again by multiplying it with the original orientation
-                local quatSlope = Quaternion.fromAngle(0, 0 - a2,-1 * a1)
-                local quatOrient = setmetatable(self:GetOrientation(), Quaternion)
-                local quat = quatOrient * quatSlope
-                self:SetOrientation(quat, true)
-
+            if roll ~= 0 or pitch ~= 0 then
+                self:SetOrientation(self:GetOrientation() * EulerToQuaternion(-roll, pitch, 0), true)
                 -- technically obsolete, but as this is part of an integration we don't want to break
                 -- the mod package that it originates from. Originates from the BrewLan mod suite
                 self.TerrainSlope = {}
@@ -260,7 +253,7 @@ StructureUnit = ClassUnit(Unit) {
         x1 = 1 + (x1 ^ 0)
         z1 = 1 + (z1 ^ 0)
 
-        import('/lua/sim/TerrainUtils.lua').FlattenGradientMapRect(x0, z0, x1 - x0, z1 - z0)
+        import("/lua/sim/terrainutils.lua").FlattenGradientMapRect(x0, z0, x1 - x0, z1 - z0)
     end,
 
     ---@param self StructureUnit
