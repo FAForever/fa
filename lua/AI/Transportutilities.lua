@@ -232,7 +232,7 @@ function GetTransports( platoon, aiBrain)
         if TransportDialog then
             LOG("*AI DEBUG "..aiBrain.Nickname.." "..platoon.BuilderName.." there are no transports at all")
         end
-        aiBrain.NeedTransports = true   -- turn on need flag
+        aiBrain.TransportRequested = true   -- turn on need flag
         return false, false
     end
 
@@ -412,7 +412,7 @@ function GetTransports( platoon, aiBrain)
             if TransportDialog then
                 LOG("*AI DEBUG "..aiBrain.Nickname.." "..platoon.BuilderName.." no transports available")
             end
-            aiBrain.NeedTransports = true
+            aiBrain.TransportRequested = true
         end
 		platoon.UsingTransport = false
 		return false, false
@@ -604,7 +604,7 @@ function GetTransports( platoon, aiBrain)
 	if not CanUseTransports then
 		if not out_of_range then
 			-- let the brain know we couldn't fill a transport request by a ground platoon
-			aiBrain.NeedTransports = true
+			aiBrain.TransportRequested = true
 		end
         
         if TransportDialog then
@@ -757,7 +757,7 @@ end
 -- whenever the AI cannot find enough transports to move a platoon it sets a value on the brain indicating that need
 -- this function is run whenever a factory responds to that need and starts building them - clearing the need flag
 function ResetBrainNeedsTransport( aiBrain )
-    aiBrain.NeedTransports = nil
+    aiBrain.TransportRequested = nil
 end
 
 --  This routine should get transports on the way back to an existing base 
