@@ -383,6 +383,10 @@ ADFChronoDampener = Class(DefaultProjectileWeapon) {
     RackSalvoFiringState = State(DefaultProjectileWeapon.RackSalvoFiringState) {
         Main = function(self)
             local bp = self:GetBlueprint()
+            ---@type Unit
+            local unit = self.unit
+            local primaryWeapon = unit:GetWeaponByLabel('RightDisruptor')
+
             -- Align to a tick which is a multiple of 50
             WaitTicks(51 - math.mod(GetGameTick(), 50))
 
@@ -402,7 +406,8 @@ ADFChronoDampener = Class(DefaultProjectileWeapon) {
                 -- extract information from the buff blueprint
                 local buff = bp.Buffs[1]
                 local stunDuration = buff.Duration
-                local sliceSize = buff.Radius / slices
+                local radius = (primaryWeapon and primaryWeapon:GetMaxRadius()) or buff.Radius
+                local sliceSize = radius / slices
 
                 for i = 1, slices do
 
