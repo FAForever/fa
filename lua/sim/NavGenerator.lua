@@ -444,6 +444,10 @@ CompressedLabelTree = ClassCompressedLabelTree {
         end
     end,
 
+    Copy = function(self, other)
+
+    end,
+
     --- Generates the following neighbors, when they are valid:
     ---@param self CompressedLabelTreeLeaf
     ---@param bx number             # Location of top-left corner, in world space
@@ -900,6 +904,10 @@ end
 ---@param pzCache NavVerticalPathCache
 ---@param pCache NavPathCache
 ---@param bCache NavTerrainBlockCache
+---@return number   # minimum depth
+---@return number   # maximum depth
+---@return boolean  # all pathable
+---@return boolean  # all free of blockers
 function PopulateCaches(tCache, dCache, daCache, pxCache, pzCache, pCache, bCache, bx, bz, c)
     local MathAbs = math.abs
     local Mathmax = math.max
@@ -937,10 +945,26 @@ function PopulateCaches(tCache, dCache, daCache, pxCache, pzCache, pCache, bCach
 
     -- compute cliff walkability
     -- compute average depth
+    local allPathable = true
+    local minDepth = 0
+    local maxDepth = 0
     for z = 1, c do
         for x = 1, c do
-            pCache[z][x] = pxCache[z][x] and pzCache[z][x] and pxCache[z + 1][x] and pzCache[z][x + 1]
-            daCache[z][x] = (dCache[z][x] + dCache[z + 1][x] + dCache[z][x + 1] + dCache[z + 1][x + 1]) * 0.25
+            local pathable = pxCache[z][x] and pzCache[z][x] and pxCache[z + 1][x] and pzCache[z][x + 1]
+            pCache[z][x] = pathable
+            local depth = (dCache[z][x] + dCache[z + 1][x] + dCache[z][x + 1] + dCache[z + 1][x + 1]) * 0.25
+            daCache[z][x] = depth
+
+            -- pre-analyse the cell
+            if depth < minDepth then
+                minDepth = depth
+            end
+
+            if depth > maxDepth then
+                maxDepth = depth
+            end
+
+            allPathable = allPathable and pathable
         end
     end
 
@@ -962,13 +986,20 @@ function PopulateCaches(tCache, dCache, daCache, pxCache, pzCache, pCache, bCach
     end
 
     -- compute terrain path blockers
+    local allBlockerFree = true
     for z = 1, c do
         local absZ = bz + z
         for x = 1, c do
             local absX = bx + x
-            bCache[z][x] = (tlx <= absX and brx >= absX) and (tlz <= absZ and brz >= absZ) and (not GetTerrainType(absX, absZ).Blocking)
+            local blocked = (tlx <= absX and brx >= absX) and (tlz <= absZ and brz >= absZ) and (not GetTerrainType(absX, absZ).Blocking)
+            bCache[z][x] = blocked
+
+            -- pre-analyse the cell
+            allBlockerFree = allBlockerFree and blocked
         end
     end
+
+    return minDepth, maxDepth, allPathable, allBlockerFree
 end
 
 ---@param size number
@@ -1065,6 +1096,7 @@ local function GenerateCompressionGrids(size, threshold)
     local navAmphibious = NavGrids['Amphibious'] --[[@as NavGrid]]
     local navAir = NavGrids['Air'] --[[@as NavGrid]]
 
+    local flattenedSections = 0
     local tCache, dCache, daCache, pxCache, pzCache, pCache, bCache, rCache = InitCaches(size)
 
     for z = 0, LabelCompressionTreesPerAxis - 1 do
@@ -1078,32 +1110,111 @@ local function GenerateCompressionGrids(size, threshold)
             local labelTreeAir = CompressedLabelTree()
 
             -- pre-computing the caches is irrelevant layer-wise, so we just pick the Land layer
-            PopulateCaches(tCache, dCache, daCache, pxCache, pzCache, pCache, bCache, bx, bz, size)
+            local minDepth, maxDepth, allPathable, allBlockerFree = PopulateCaches(tCache, dCache, daCache, pxCache, pzCache, pCache, bCache, bx, bz, size)
 
-            ComputeLandPathingMatrix(size, daCache, pCache, bCache, rCache)
-            labelTreeLand:Compress(bx, bz, 0, 0, size, labelTreeLand, rCache, threshold, 'Land')
-            navLand:AddTree(z, x, labelTreeLand)
+            -- cell entirely consists of water
+            if minDepth > MinWaterDepthNaval then
+                -- flatten land
+                flattenedSections = flattenedSections + 1
+                labelTreeLand:Flatten(bx, bz, 0, 0, size, labelTreeLand, -1, 'Land')
+                navLand:AddTree(z, x, labelTreeLand)
 
-            ComputeNavalPathingMatrix(size, daCache, pCache, bCache, rCache)
-            labelTreeNaval:Compress(bx, bz, 0, 0, size, labelTreeNaval, rCache, 2 * threshold, 'Water')
-            navWater:AddTree(z, x, labelTreeNaval)
+                -- try to flatten naval / hover
+                if allBlockerFree then
+                    flattenedSections = flattenedSections + 1
+                    labelTreeNaval:Flatten(bx, bz, 0, 0, size, labelTreeNaval, 0, 'Water')
+                    navWater:AddTree(z, x, labelTreeNaval)
 
-            ComputeHoverPathingMatrix(size, daCache, pCache, bCache, rCache)
-            labelTreeHover:Compress(bx, bz, 0, 0, size, labelTreeHover, rCache, threshold, 'Hover')
-            navHover:AddTree(z, x, labelTreeHover)
+                    flattenedSections = flattenedSections + 1
+                    labelTreeHover:Flatten(bx, bz, 0, 0, size, labelTreeHover, 0, 'Hover')
+                    navHover:AddTree(z, x, labelTreeHover)
+                else
+                    ComputeNavalPathingMatrix(size, daCache, pCache, bCache, rCache)
+                    labelTreeNaval:Compress(bx, bz, 0, 0, size, labelTreeNaval, rCache, 2 * threshold, 'Water')
+                    navWater:AddTree(z, x, labelTreeNaval)
 
-            ComputeAmphPathingMatrix(size, daCache, pCache, bCache, rCache)
-            labelTreeAmph:Compress(bx, bz, 0, 0, size, labelTreeAmph, rCache, threshold, 'Amphibious')
-            navAmphibious:AddTree(z, x, labelTreeAmph)
+                    ComputeHoverPathingMatrix(size, daCache, pCache, bCache, rCache)
+                    labelTreeHover:Compress(bx, bz, 0, 0, size, labelTreeHover, rCache, threshold, 'Hover')
+                    navHover:AddTree(z, x, labelTreeHover)
+                end
 
+                -- try to flatten amphibious
+                if allPathable and allBlockerFree and maxDepth < MaxWaterDepthAmphibious then
+                    flattenedSections = flattenedSections + 1
+                    labelTreeAmph:Flatten(bx, bz, 0, 0, size, labelTreeAmph, 0, 'Amphibious')
+                    navAmphibious:AddTree(z, x, labelTreeAmph)
+                else
+                    ComputeAmphPathingMatrix(size, daCache, pCache, bCache, rCache)
+                    labelTreeAmph:Compress(bx, bz, 0, 0, size, labelTreeAmph, rCache, threshold, 'Amphibious')
+                    navAmphibious:AddTree(z, x, labelTreeAmph)
+                end
+
+            -- cell entirely consists of land
+            elseif maxDepth == 0 then
+                -- flatten naval
+                flattenedSections = flattenedSections + 1
+                labelTreeNaval:Flatten(bx, bz, 0, 0, size, labelTreeNaval, -1, 'Water')
+                navWater:AddTree(z, x, labelTreeNaval)
+
+                -- try to flatten land
+                if allPathable and allBlockerFree then
+                    flattenedSections = flattenedSections + 1
+                    labelTreeLand:Flatten(bx, bz, 0, 0, size, labelTreeLand, 0, 'Land')
+                    navLand:AddTree(z, x, labelTreeLand)
+
+                    flattenedSections = flattenedSections + 1
+                    labelTreeHover:Flatten(bx, bz, 0, 0, size, labelTreeHover, 0, 'Hover')
+                    navHover:AddTree(z, x, labelTreeHover)
+
+                    flattenedSections = flattenedSections + 1
+                    labelTreeAmph:Flatten(bx, bz, 0, 0, size, labelTreeAmph, 0, 'Amphibious')
+                    navAmphibious:AddTree(z, x, labelTreeAmph)
+                else
+                    ComputeLandPathingMatrix(size, daCache, pCache, bCache, rCache)
+                    labelTreeLand:Compress(bx, bz, 0, 0, size, labelTreeLand, rCache, threshold, 'Land')
+                    navLand:AddTree(z, x, labelTreeLand)
+
+                    ComputeHoverPathingMatrix(size, daCache, pCache, bCache, rCache)
+                    labelTreeHover:Compress(bx, bz, 0, 0, size, labelTreeHover, rCache, threshold, 'Hover')
+                    navHover:AddTree(z, x, labelTreeHover)
+
+                    ComputeAmphPathingMatrix(size, daCache, pCache, bCache, rCache)
+                    labelTreeAmph:Compress(bx, bz, 0, 0, size, labelTreeAmph, rCache, threshold, 'Amphibious')
+                    navAmphibious:AddTree(z, x, labelTreeAmph)
+                end
+
+            -- cell consists of water and land, do the usual
+            else
+                ComputeLandPathingMatrix(size, daCache, pCache, bCache, rCache)
+                labelTreeLand:Compress(bx, bz, 0, 0, size, labelTreeLand, rCache, threshold, 'Land')
+                navLand:AddTree(z, x, labelTreeLand)
+
+                ComputeNavalPathingMatrix(size, daCache, pCache, bCache, rCache)
+                labelTreeNaval:Compress(bx, bz, 0, 0, size, labelTreeNaval, rCache, 2 * threshold, 'Water')
+                navWater:AddTree(z, x, labelTreeNaval)
+
+                ComputeHoverPathingMatrix(size, daCache, pCache, bCache, rCache)
+                labelTreeHover:Compress(bx, bz, 0, 0, size, labelTreeHover, rCache, threshold, 'Hover')
+                navHover:AddTree(z, x, labelTreeHover)
+
+                ComputeAmphPathingMatrix(size, daCache, pCache, bCache, rCache)
+                labelTreeAmph:Compress(bx, bz, 0, 0, size, labelTreeAmph, rCache, threshold, 'Amphibious')
+                navAmphibious:AddTree(z, x, labelTreeAmph)
+            end
+
+            flattenedSections = flattenedSections + 1
             labelTreeAir:Flatten(bx, bz, 0, 0, size, labelTreeAir, 0, 'Air')
             navAir:AddTree(z, x, labelTreeAir)
         end
     end
+
+    SPEW(string.format("NavGenerator - Flattened %d sections", flattenedSections))
 end
 
 --- Generates graphs that we can traverse, based on the compression grids
-local function GenerateGraphs()
+---@param processAmphibious boolean
+---@param processHover boolean
+local function GenerateGraphs(processAmphibious, processHover)
     local navLand = NavGrids['Land'] --[[@as NavGrid]]
     local navWater = NavGrids['Water'] --[[@as NavGrid]]
     local navHover = NavGrids['Hover'] --[[@as NavGrid]]
@@ -1111,22 +1222,28 @@ local function GenerateGraphs()
     local navAir = NavGrids['Air'] --[[@as NavGrid]]
 
     navAir:GenerateNeighbors()
-    navLand:GenerateNeighbors()
-    navWater:GenerateNeighbors()
-    navHover:GenerateNeighbors()
-    navAmphibious:GenerateNeighbors()
-
     navAir:GenerateLabels()
-    navLand:GenerateLabels()
-    navWater:GenerateLabels()
-    navAmphibious:GenerateLabels()
-    navHover:GenerateLabels()
-
     navAir:Precompute()
+
+    navLand:GenerateNeighbors()
+    navLand:GenerateLabels()
     navLand:Precompute()
+
+    navWater:GenerateNeighbors()
+    navWater:GenerateLabels()
     navWater:Precompute()
-    navHover:Precompute()
-    navAmphibious:Precompute()
+
+    if processHover then
+        navHover:GenerateNeighbors()
+        navHover:GenerateLabels()
+        navHover:Precompute()
+    end
+
+    if processAmphibious then
+        navAmphibious:GenerateNeighbors()
+        navAmphibious:GenerateLabels()
+        navAmphibious:Precompute()
+    end
 end
 
 --- Culls generated labels that are too small and have no meaning
@@ -1169,21 +1286,25 @@ local function GenerateCullLabels()
 end
 
 --- Generates metadata for markers for quick access
-local function GenerateMarkerMetadata()
+local function GenerateMarkerMetadata(processAmphibious, processHover)
     local navLabels = NavLabels
 
     local grids = {
-        Land = NavGrids['Land'],
-        Amphibious = NavGrids['Amphibious'],
-        Hover = NavGrids['Hover'],
-
-        -- also tackled with amphibious layer 
-        -- Naval = NavGrids['Naval'],
+        NavGrids['Land'],
     }
+
+    if processAmphibious then
+        TableInsert(grids, NavGrids['Amphibious'])
+    end
+
+    if processHover then
+        TableInsert(grids, NavGrids['Hover'])
+    end
 
     local extractors = import("/lua/sim/markerutilities.lua").GetMarkersByType('Mass')
     for id, extractor in extractors do
-        for layer, grid in grids do
+        for _, grid in grids do
+            local layer = grid.Layer
             local label = grid:FindLeaf(extractor.position).Label
 
             if label > 0 then
@@ -1217,13 +1338,27 @@ local function GenerateMarkerMetadata()
 end
 
 --- Computes various fields for the root nodes
-local function GenerateRootInformation()
+local function GenerateRootInformation(processAmphibious, processHover)
 
     local cache = { }
     local size = ScenarioInfo.size[1] / LabelCompressionTreesPerAxis
     local area = ((0.01 * size) * (0.01 * size))
 
-    for _, grid in NavGrids do
+    local grids = {
+        NavGrids['Land'],
+        NavGrids['Water'],
+        NavGrids['Air'],
+    }
+
+    if processAmphibious then
+        TableInsert(grids, NavGrids['Amphibious'])
+    end
+
+    if processHover then
+        TableInsert(grids, NavGrids['Hover'])
+    end
+
+    for _, grid in grids do
         for z = 0, LabelCompressionTreesPerAxis - 1 do
             for x = 0, LabelCompressionTreesPerAxis - 1 do
                 ---@type CompressedLabelTreeRoot
@@ -1296,25 +1431,30 @@ function Generate()
     GenerateCompressionGrids(CompressionTreeSize, compressionThreshold)
     print(string.format("generated compression trees: %f", GetSystemTimeSecondsOnlyForProfileUse() - start))
 
-    GenerateGraphs()
-    print(string.format("generated neighbors and labels: %f", GetSystemTimeSecondsOnlyForProfileUse() - start))
+    local processAmphibious = true
+    if  NavLayerData['Land'].PathableLeafs == NavLayerData['Amphibious'].PathableLeafs and
+        NavLayerData['Land'].Subdivisions == NavLayerData['Amphibious'].Subdivisions and
+        NavLayerData['Land'].UnpathableLeafs == NavLayerData['Amphibious'].UnpathableLeafs
+    then
+        SPEW(string.format("NavGenerator - replacing amphibious grid with land grid to conserve memory"))
+        processAmphibious = false
 
-    GenerateMarkerMetadata()
-    print(string.format("generated marker metadata: %f", GetSystemTimeSecondsOnlyForProfileUse() - start))
+        NavGrids['Amphibious'] = NavGrids['Land']
+        NavLayerData['Amphibious'].Labels = 0
+        NavLayerData['Amphibious'].Neighbors = 0
+        NavLayerData['Amphibious'].PathableLeafs = 0
+        NavLayerData['Amphibious'].Subdivisions = 0
+        NavLayerData['Amphibious'].UnpathableLeafs = 0
+    end
 
-    GenerateCullLabels()
-    print(string.format("cleaning up generated data: %f", GetSystemTimeSecondsOnlyForProfileUse() - start))
-
-    GenerateRootInformation()
-
-    -- ditch hover / amphibious if they are identical to land
-    if  NavLayerData['Land'].Labels == NavLayerData['Hover'].Labels and
-        NavLayerData['Land'].Neighbors == NavLayerData['Hover'].Neighbors and
-        NavLayerData['Land'].PathableLeafs == NavLayerData['Hover'].PathableLeafs and
+    local processHover = true
+    if  NavLayerData['Land'].PathableLeafs == NavLayerData['Hover'].PathableLeafs and
         NavLayerData['Land'].Subdivisions == NavLayerData['Hover'].Subdivisions and
         NavLayerData['Land'].UnpathableLeafs == NavLayerData['Hover'].UnpathableLeafs
     then
-        SPEW("Hover grid equals land grid - ditching hover grid")
+        SPEW(string.format("NavGenerator - replacing hover grid with land grid to conserve memory"))
+        processHover = false
+
         NavGrids['Hover'] = NavGrids['Land']
         NavLayerData['Hover'].Labels = 0
         NavLayerData['Hover'].Neighbors = 0
@@ -1323,20 +1463,16 @@ function Generate()
         NavLayerData['Hover'].UnpathableLeafs = 0
     end
 
-    if  NavLayerData['Land'].Labels == NavLayerData['Amphibious'].Labels and
-        NavLayerData['Land'].Neighbors == NavLayerData['Amphibious'].Neighbors and
-        NavLayerData['Land'].PathableLeafs == NavLayerData['Amphibious'].PathableLeafs and
-        NavLayerData['Land'].Subdivisions == NavLayerData['Amphibious'].Subdivisions and
-        NavLayerData['Land'].UnpathableLeafs == NavLayerData['Amphibious'].UnpathableLeafs
-    then
-        SPEW("Amphibious grid equals land grid - ditching amphibious grid")
-        NavGrids['Amphibious'] = NavGrids['Land']
-        NavLayerData['Amphibious'].Labels = 0
-        NavLayerData['Amphibious'].Neighbors = 0
-        NavLayerData['Amphibious'].PathableLeafs = 0
-        NavLayerData['Amphibious'].Subdivisions = 0
-        NavLayerData['Amphibious'].UnpathableLeafs = 0
-    end
+    GenerateGraphs(processAmphibious, processHover)
+    print(string.format("generated neighbors and labels: %f", GetSystemTimeSecondsOnlyForProfileUse() - start))
+
+    GenerateMarkerMetadata(processAmphibious, processHover)
+    print(string.format("generated marker metadata: %f", GetSystemTimeSecondsOnlyForProfileUse() - start))
+
+    GenerateCullLabels()
+    print(string.format("cleaning up generated data: %f", GetSystemTimeSecondsOnlyForProfileUse() - start))
+
+    GenerateRootInformation(processAmphibious, processHover)
 
     SPEW(string.format("Generated navigational mesh in %f seconds", GetSystemTimeSecondsOnlyForProfileUse() - start))
 

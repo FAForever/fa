@@ -763,12 +763,33 @@ StructureUnit = ClassUnit(Unit) {
         adjacentUnit.AdjacentUnits[self.EntityId] = self
 
         -- apply the buffs
+        local buffApplied = false
         if self.ConsumptionActive then
             for k, v in AdjacencyBuffs[adjBuffs] do
+                buffApplied = true
                 Buff.ApplyBuff(adjacentUnit, v, self)
             end
         end
 
+        -- fix edge cases when buffs are applied
+        if buffApplied then
+
+            -- edge case for missile construction: the buff doesn't apply to the missile under construction
+            if adjacentUnit.Blueprint.CategoriesHash["SILO"] then
+                if adjacentUnit:IsUnitState('SiloBuildingAmmo') then
+                    local autoModeEnabled = adjacentUnit.AutoModeEnabled or false
+                    local progress = adjacentUnit:GetWorkProgress()
+                    if progress < 0.99 then
+                        adjacentUnit:StopSiloBuild()
+                        IssueSiloBuildTactical({adjacentUnit})
+                        adjacentUnit:GiveNukeSiloBlocks(progress)
+                        LOG(autoModeEnabled)
+                        adjacentUnit:SetAutoMode(autoModeEnabled)
+                    end
+                end
+            end
+        end
+    
         -- refresh the UI
         self:RequestRefreshUI()
         adjacentUnit:RequestRefreshUI()
@@ -791,10 +812,30 @@ StructureUnit = ClassUnit(Unit) {
         end
 
         -- remove the buffs
+        local buffRemoved = false
         if adjBuffs and AdjacencyBuffs[adjBuffs] then
             for k, v in AdjacencyBuffs[adjBuffs] do
                 if Buff.HasBuff(adjacentUnit, v) then
+                    buffRemoved = true
                     Buff.RemoveBuff(adjacentUnit, v)
+                end
+            end
+        end
+
+        -- fix edge cases when buffs are removed
+        if buffRemoved then
+
+            -- edge case for missile construction: the buff doesn't apply to the missile under construction
+            if adjacentUnit.Blueprint.CategoriesHash["SILO"] then
+                if adjacentUnit:IsUnitState('SiloBuildingAmmo') then
+                    local autoModeEnabled = adjacentUnit.AutoModeEnabled or false
+                    local progress = adjacentUnit:GetWorkProgress()
+                    if progress < 0.99 then
+                        adjacentUnit:StopSiloBuild()
+                        IssueSiloBuildTactical({adjacentUnit})
+                        adjacentUnit:GiveNukeSiloBlocks(progress)
+                        adjacentUnit:SetAutoMode(autoModeEnabled)
+                    end
                 end
             end
         end
@@ -2133,6 +2174,7 @@ AirUnit = ClassUnit(MobileUnit) {
         elseif self.DeathCrashDamage > 0 then -- It was completely absorbed by a shield!
             local deathWep = self.deathWep -- Use a local copy for speed and easy reading
             DamageArea(self, self:GetPosition(), deathWep.DamageRadius, self.DeathCrashDamage, deathWep.DamageType, deathWep.DamageFriendly)
+            DamageArea(self, self:GetPosition(), deathWep.DamageRadius, 1, 'TreeForce', false)
         end
 
         if with == 'Water' then
@@ -2248,6 +2290,18 @@ AirUnit = ClassUnit(MobileUnit) {
         end
 
         return MobileUnit.OnCollisionCheck(self, other, firingWeapon)
+    end,
+
+    --- Invert what we do 
+    ---@param self MobileUnit
+    ---@param transport AirUnit
+    ---@param bone Bone
+    OnDetachedFromTransport = function(self, transport, bone)
+        MobileUnit.OnDetachedFromTransport(self, transport, bone)
+
+         -- Set unit immobile to prevent it to accelerating in the air, cleared in OnLayerChange
+        self:SetImmobile(false)
+        self.transportDrop = nil
     end,
 }
 
