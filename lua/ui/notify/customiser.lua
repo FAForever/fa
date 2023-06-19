@@ -35,7 +35,7 @@ local notifyOptions = LazyVar.Create()
 
 function InitMessages()
     local prefsMessages = UTF.UnescapeTable(Prefs.GetFromCurrentProfile(NotifyMessages))
-    if not table.empty(prefsMessages) then
+    if prefsMessages and not table.empty(prefsMessages) then
         for catName, cat in defaultMessageTable do
             if not prefsMessages[catName] then
                 prefsMessages[catName] = cat
