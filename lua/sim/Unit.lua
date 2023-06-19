@@ -4314,6 +4314,8 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
     ---@param transport BaseTransport
     ---@param bone Bone
     OnStartTransportBeamUp = function(self, transport, bone)
+        self.TransportBeamEffectsBag = self.TransportBeamEffectsBag or TrashBag()
+
         local slot = transport.slots[bone]
         if slot then
             self:GetAIBrain():OnTransportFull()
@@ -4324,7 +4326,6 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         self:DestroyIdleEffects()
         self:DestroyMovementEffects()
 
-        self.TransportBeamEffectsBag = self.TransportBeamEffectsBag or TrashBag()
         TrashAdd(self.TransportBeamEffectsBag, AttachBeamEntityToEntity(self, -1, transport, bone, self.Army, EffectTemplate.TTransportBeam01))
         TrashAdd(self.TransportBeamEffectsBag, AttachBeamEntityToEntity(transport, bone, self, -1, self.Army, EffectTemplate.TTransportBeam02))
         TrashAdd(self.TransportBeamEffectsBag, CreateEmitterAtBone(transport, bone, self.Army, EffectTemplate.TTransportGlow01))
