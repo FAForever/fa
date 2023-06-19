@@ -1984,9 +1984,11 @@ MobileUnit = ClassUnit(Unit, TreadComponent) {
     OnDetachedFromTransport = function(self, transport, bone)
         Unit.OnDetachedFromTransport(self, transport, bone)
 
-         -- Set unit immobile to prevent it to accelerating in the air, cleared in OnLayerChange
-        self:SetImmobile(true)
-        self.transportDrop = true
+        -- Set unit immobile to prevent it to accelerating in the air, cleared in OnLayerChange
+        if not self.Blueprint.CategoriesHash["AIR"] then
+            self:SetImmobile(true)
+            self.transportDrop = true
+        end
     end,
 }
 
@@ -2290,18 +2292,6 @@ AirUnit = ClassUnit(MobileUnit) {
         end
 
         return MobileUnit.OnCollisionCheck(self, other, firingWeapon)
-    end,
-
-    --- Invert what we do 
-    ---@param self MobileUnit
-    ---@param transport AirUnit
-    ---@param bone Bone
-    OnDetachedFromTransport = function(self, transport, bone)
-        MobileUnit.OnDetachedFromTransport(self, transport, bone)
-
-         -- Set unit immobile to prevent it to accelerating in the air, cleared in OnLayerChange
-        self:SetImmobile(false)
-        self.transportDrop = nil
     end,
 }
 
@@ -2630,8 +2620,8 @@ ConstructionUnit = ClassUnit(MobileUnit) {
         -- the unit is still moving, but unaware of it (It thinks it stopped to do the command). This allows it to build on the move,
         -- as it doesn't know it's doing something bad. To fix it, we temporarily make the unit immobile when it starts construction.
         if self:IsMoving() then
-            self:SetImmobile(true)
-            self:ForkThread(function() WaitTicks(1) if not self:BeenDestroyed() then self:SetImmobile(false) end end)
+            local navigator = self:GetNavigator()
+            navigator:AbortMove()
         end
     end,
 
@@ -2643,7 +2633,6 @@ ConstructionUnit = ClassUnit(MobileUnit) {
             self.StoppedBuilding = false
             self.BuildArmManipulator:Disable()
             self.BuildingOpenAnimManip:SetRate(-(self.Blueprint.Display.AnimationBuildRate or 1))
-            self:SetImmobile(false)
         end
     end,
 }
@@ -2845,8 +2834,8 @@ CommandUnit = ClassUnit(WalkingLandUnit) {
         -- the unit is still moving, but unaware of it (It thinks it stopped to do the command). This allows it to build on the move,
         -- as it doesn't know it's doing something bad. To fix it, we temporarily make the unit immobile when it starts construction.
         if self:IsMoving() then
-            self:SetImmobile(true)
-            self:ForkThread(function() WaitTicks(1) if not self:BeenDestroyed() then self:SetImmobile(false) end end)
+            local navigator = self:GetNavigator()
+            navigator:AbortMove()
         end
     end,
 
@@ -3013,10 +3002,7 @@ ACUUnit = ClassUnit(CommandUnit) {
         self:SendNotifyMessage('started', work)
 
         -- No need to do it for AI
-        if self:GetAIBrain().BrainType == 'Human' then
-            self:SetImmobile(true)
-        end
-
+        self:SetImmobile(true)
         return true
     end,
 
