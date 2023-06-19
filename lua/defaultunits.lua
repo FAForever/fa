@@ -1936,7 +1936,6 @@ MobileUnit = ClassUnit(Unit, TreadComponent) {
         end
     end,
 
-    ---comment
     ---@param self MobileUnit
     ---@param transport AirUnit
     ---@param bone Bone
@@ -1944,8 +1943,10 @@ MobileUnit = ClassUnit(Unit, TreadComponent) {
         Unit.OnDetachedFromTransport(self, transport, bone)
 
          -- Set unit immobile to prevent it to accelerating in the air, cleared in OnLayerChange
-        self:SetImmobile(true)
-        self.transportDrop = true
+        if not self.Blueprint.CategoriesHash["AIR"] then
+            self:SetImmobile(true)
+            self.transportDrop = true
+        end
     end,
 }
 
@@ -2574,10 +2575,10 @@ ConstructionUnit = ClassUnit(MobileUnit) {
         -- This is an extremely ugly hack to get around an engine bug. If you have used a command such as OC or repair on an illegal
         -- target (An allied unit, or something at full HP, for example) while moving, the engine is tricked into a state where
         -- the unit is still moving, but unaware of it (It thinks it stopped to do the command). This allows it to build on the move,
-        -- as it doesn't know it's doing something bad. To fix it, we temporarily make the unit immobile when it starts construction.
+        -- as it doesn't know it's doing something bad. To fix it, we take the navigator and abort the move order
         if self:IsMoving() then
-            self:SetImmobile(true)
-            self:ForkThread(function() WaitTicks(1) if not self:BeenDestroyed() then self:SetImmobile(false) end end)
+            local navigator = self:GetNavigator()
+            navigator:AbortMove()
         end
     end,
 
@@ -2589,7 +2590,6 @@ ConstructionUnit = ClassUnit(MobileUnit) {
             self.StoppedBuilding = false
             self.BuildArmManipulator:Disable()
             self.BuildingOpenAnimManip:SetRate(-(self.Blueprint.Display.AnimationBuildRate or 1))
-            self:SetImmobile(false)
         end
     end,
 }
