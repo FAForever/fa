@@ -1165,7 +1165,7 @@ UnitBlueprint {
             BeamLifetime = 0,
             CollideFriendly = false,
             ContinuousBeam = true,
-            Damage = 400,
+            Damage = 300,
             DamageRadius = 0.5,
             DamageType = 'Normal',
             DisplayName = 'Heavy Microwave Laser',
