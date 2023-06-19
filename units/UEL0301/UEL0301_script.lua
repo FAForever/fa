@@ -83,6 +83,22 @@ UEL0301 = ClassUnit(CommandUnit) {
         end
     end,
 
+    ---@param self UEL0301
+    ---@param bone Bone
+    ---@param attachee Unit
+    OnTransportAttach = function(self, bone, attachee)
+        CommandUnit.OnTransportAttach(self, bone, attachee)
+        attachee:SetDoNotTarget(true)
+    end,
+
+    ---@param self UEL0301
+    ---@param bone Bone
+    ---@param attachee Unit
+    OnTransportDetach = function(self, bone, attachee)
+        CommandUnit.OnTransportDetach(self, bone, attachee)
+        attachee:SetDoNotTarget(false)
+    end,
+
     CreateEnhancement = function(self, enh)
         CommandUnit.CreateEnhancement(self, enh)
         local bp = self:GetBlueprint().Enhancements[enh]
