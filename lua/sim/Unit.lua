@@ -1566,8 +1566,8 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
 
         -- Reduce the mass value of submerged wrecks
         if layer == 'Water' or layer == 'Sub' then
-            mass = mass * 0.5
-            energy = energy * 0.5
+            mass = mass * 0.6
+            energy = energy * 0.6
         end
 
         local halfBuilt = self:GetFractionComplete() < 1
