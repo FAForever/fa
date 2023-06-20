@@ -219,7 +219,7 @@ UnitBlueprint {
     LifeBarOffset = 0.45,
     LifeBarSize = 0.8,
     Physics = {
-        AttackElevation = 4,
+        AttackElevation = 6,
         BuildOnLayerCaps = {
             LAYER_Air = true,
             LAYER_Land = false,
@@ -228,7 +228,7 @@ UnitBlueprint {
             LAYER_Sub = true,
             LAYER_Water = false,
         },
-        Elevation = 18,
+        Elevation = 12,
         FuelRechargeRate = 5,
         FuelUseTime = 600,
         GroundCollisionOffset = 1.6,
@@ -273,7 +273,6 @@ UnitBlueprint {
             Damage = 250,
             DamageType = 'Normal',
             DisplayName = 'Cavitation Cluster Torpedo',
-            EffectiveRadius = 19,
             FireTargetLayerCapsTable = {
                 Air = 'Seabed|Sub|Water',
                 Land = 'Seabed|Sub|Water',

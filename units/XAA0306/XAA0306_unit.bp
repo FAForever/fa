@@ -227,7 +227,7 @@ UnitBlueprint {
     LifeBarOffset = 0.85,
     LifeBarSize = 1.25,
     Physics = {
-        AttackElevation = 4,
+        AttackElevation = 10,
         BuildOnLayerCaps = {
             LAYER_Air = true,
             LAYER_Land = false,
@@ -236,7 +236,7 @@ UnitBlueprint {
             LAYER_Sub = true,
             LAYER_Water = false,
         },
-        Elevation = 18,
+        Elevation = 14,
         FuelRechargeRate = 15,
         FuelUseTime = 1200,
         GroundCollisionOffset = 1.6,
@@ -290,11 +290,11 @@ UnitBlueprint {
             HeadingArcCenter = 0,
             HeadingArcRange = 30,
             Label = 'Bomb',
-            MaxRadius = 32,--42
+            MaxRadius = 42,
             MinRadius = 4,
             MuzzleSalvoDelay = 0.4,
             MuzzleSalvoSize = 4,
-            MuzzleVelocity = 14,
+            MuzzleVelocity = 0,
             ProjectileId = '/projectiles/AANTorpedoCluster01/AANTorpedoCluster01_proj.bp',
             ProjectileLifetime = 30,
             ProjectilesPerOnFire = 4,
