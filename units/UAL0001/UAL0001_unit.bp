@@ -453,7 +453,7 @@ UnitBlueprint {
                 'Left_Upgrade',
             },
             Name = '<LOC enhancements_0005>Remove Enhanced Quantum Disruptor',
-            Prerequisite = 'CrysalisBeam',
+            Prerequisite = 'AdvancedCrysalisBeam',
             RemoveEnhancements = {
                 'CrysalisBeam',
                 'AdvancedCrysalisBeam',
