@@ -198,7 +198,7 @@ UnitBlueprint {
         UnitWeight = 1,
     },
     Intel = {
-        VisionRadius = 15,
+        VisionRadius = 24,
     },
     Interface = {
         HelpText = '<LOC xal0203_help>Assault Tank',
