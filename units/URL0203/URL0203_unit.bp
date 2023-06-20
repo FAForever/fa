@@ -153,8 +153,8 @@ UnitBlueprint {
         UnitWeight = 1,
     },
     Intel = {
-        VisionRadius = 15,
-        WaterVisionRadius = 20,
+        VisionRadius = 22,
+        WaterVisionRadius = 22,
     },
     Interface = {
         HelpText = '<LOC url0203_help>Amphibious Tank',

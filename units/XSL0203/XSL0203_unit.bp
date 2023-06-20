@@ -219,7 +219,7 @@ UnitBlueprint {
         UnitWeight = 1,
     },
     Intel = {
-        VisionRadius = 15,
+        VisionRadius = 20,
     },
     Interface = {
         HelpText = '<LOC xsl0203_help>Hover Tank',
