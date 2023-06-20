@@ -550,7 +550,7 @@ UnitBlueprint {
             NewHealth = 1500,
             Slot = 'Back',
             Prerequisite = 'StealthGenerator',
-            ShowBones = { 
+            ShowBones = {
                 'Back_Upgrade',
             },
             UpgradeEffectBones = {
@@ -562,14 +562,14 @@ UnitBlueprint {
             BuildCostMass = 1,
             BuildTime = 0.1,
             Icon = 'srs',
-            Prerequisite = 'Nano',
+            Prerequisite = 'SelfRepairSystem',
             HideBones = {
                 'Back_Upgrade',
             },
             RemoveEnhancements = {
                 'StealthGenerator',
-                'Nano',
-                'NanoRemove',
+                'SelfRepairSystem',
+                'SelfRepairSystememove',
             },
             Slot = 'Back',
         },
