@@ -15,7 +15,7 @@ local CIFNaniteTorpedoWeapon = import("/lua/cybranweapons.lua").CIFNaniteTorpedo
 ---@class URA0204 : CAirUnit
 URA0204 = ClassUnit(CAirUnit) {
     Weapons = {
-        Bomb = ClassWeapon(CIFNaniteTorpedoWeapon) {},
+        Torpedo = ClassWeapon(CIFNaniteTorpedoWeapon) {},
     },
 }
 

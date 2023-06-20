@@ -15,7 +15,7 @@ local SANHeavyCavitationTorpedo = SeraphimWeapons.SANHeavyCavitationTorpedo
 ---@class XSA0204 : SAirUnit
 XSA0204 = ClassUnit(SAirUnit) {
     Weapons = {
-        Bomb = ClassWeapon(SANHeavyCavitationTorpedo) {},
+        Torpedo = ClassWeapon(SANHeavyCavitationTorpedo) {},
     },
 }
 TypeClass = XSA0204
