@@ -57,10 +57,10 @@ ProjectileBlueprint {
         HelpText = 0,
     },
     Physics = {
-        Acceleration = 2,
+        Acceleration = 1.5,
         DestroyOnWater = true,
         InitialSpeed = 2,
-        MaxSpeed = 8,
+        MaxSpeed = 12,
         MaxZigZag = 5,
         TrackTarget = true,
         TrackTargetGround = true,
