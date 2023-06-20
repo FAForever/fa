@@ -282,7 +282,7 @@ UnitBlueprint {
             FiringTolerance = 6,
             HeadingArcCenter = 0,
             HeadingArcRange = 30,
-            Label = 'Torpedo',
+            Label = 'Bomb',
             MaxRadius = 42,
             MinRadius = 4,
             MuzzleSalvoDelay = 0.6,
