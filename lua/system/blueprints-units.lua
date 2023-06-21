@@ -331,6 +331,16 @@ local function PostProcessUnit(unit)
         unit.VetThresholds[4] = 4 * multiplier * (unit.Economy.BuildCostMass or 1)
         unit.VetThresholds[5] = 5 * multiplier * (unit.Economy.BuildCostMass or 1)
     end
+
+    -- Increasing the Vision Range by 15% for all units except AirScouts, Carriers and Artillery
+    local bp = unit
+    local bpIsAirScout =  bp.CategoriesHash.SCOUT and bp.CategoriesHash.AIR
+    local isCarrier = bp.CategoriesHash.AIRSTAGINGPLATFORM and bp.CategoriesHash.NAVAL
+    local isArty = bp.CategoriesHash.ARTILLERY and bp.CategoriesHash.TECH1
+    if bp.Intel.VisionRadius and not bpIsAirScout and not isCarrier and not isArty then
+        bp.Intel.VisionRadius = math.ceil(1.15*bp.Intel.VisionRadius)
+    end
+
 end
 
 --- Post-processes all units
