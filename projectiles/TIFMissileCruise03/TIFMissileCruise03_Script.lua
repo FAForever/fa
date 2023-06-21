@@ -28,44 +28,14 @@ TIFMissileCruise03 = ClassProjectile(TMissileCruiseProjectile) {
         self.MoveThread = self.Trash:Add(ForkThread(self.MovementThread,self))
     end,
 
-    MovementThread = function(self)        
-        self.Distance = self:GetDistanceToTarget()
+    MovementThread = function(self)
         self:SetTurnRate(8)
-        WaitTicks(4)        
-        while not self:BeenDestroyed() do
-            self:SetTurnRateByDist()
-            WaitTicks(2)
-        end
+        WaitTicks(4)
+        self.Distance = self:GetDistanceToTarget()
+        local turnrate = 500 / math.pow(self.Distance, 0.75)
+        self:SetTurnRate(math.min(turnrate, 170))
+        KillThread(self.MoveThread)
     end,
-
-    SetTurnRateByDist = function(self)
-        local dist = self:GetDistanceToTarget()
-        if dist > self.Distance then
-        	self:SetTurnRate(75)
-        	WaitTicks(31)
-        	self:SetTurnRate(8)
-        	self.Distance = self:GetDistanceToTarget()
-        end
-        -- Get the nuke as close to 90 deg as possible
-        if dist > 50 then        
-            -- Freeze the turn rate as to prevent steep angles at long distance targets
-            WaitTicks(21)
-            self:SetTurnRate(10)
-        elseif dist > 30 and dist <= 50 then
-						-- Increase check intervals
-						self:SetTurnRate(12)
-						WaitTicks(16)
-            self:SetTurnRate(12)
-        elseif dist > 10 and dist <= 25 then
-						-- Further increase check intervals
-                        WaitTicks(4)
-            self:SetTurnRate(50)
-				elseif dist > 0 and dist <= 10 then
-						-- Further increase check intervals            
-            self:SetTurnRate(100)   
-            KillThread(self.MoveThread)         
-        end
-    end,        
 
     GetDistanceToTarget = function(self)
         local tpos = self:GetCurrentTargetPosition()
