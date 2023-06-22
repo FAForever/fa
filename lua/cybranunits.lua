@@ -533,7 +533,7 @@ CLandFactoryUnit = ClassUnit(LandFactoryUnit) {
 
     ---@param self CLandFactoryUnit
     ---@param unitBeingBuilt Unit
-    ---@param order number
+    ---@param order any unused
     CreateBuildEffects = function(self, unitBeingBuilt, order)
         if not unitBeingBuilt then return end
         WaitSeconds(0.1)

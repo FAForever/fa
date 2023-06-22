@@ -6,6 +6,8 @@
 local VizMarker = import("/lua/sim/VizMarker.lua").VizMarker
 
 -- TODO: make sure each new instance is using a previous metatable
+---@param SuperClass any
+---@return any
 function RemoteViewing(SuperClass)
     return Class(SuperClass) {
 

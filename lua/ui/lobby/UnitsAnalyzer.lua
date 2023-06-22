@@ -64,8 +64,8 @@ CategoriesSkipped  = {
     ["urb3103"] = true,    -- Scout-Deployed Land Sensor
     ["uxl0021"] = true,    -- Test Unit Arc Projectile
     ["xec9001"] = true,    -- Wall Segment Extra
-    ["xec9003"] = true,    -- Wall Segment Extra
     ["xec9002"] = true,    -- Wall Segment Extra
+    ["xec9003"] = true,    -- Wall Segment Extra
     ["xec9004"] = true,    -- Wall Segment Extra
     ["xec9005"] = true,    -- Wall Segment Extra
     ["xec9006"] = true,    -- Wall Segment Extra
@@ -207,7 +207,7 @@ Factions = {
 
 --- Gets unit's color based on faction of given blueprint
 ---@param bp UnitBlueprint
----@return string
+---@return Color
 function GetUnitColor(bp)
     for _, faction in Factions do
         if faction.Name == bp.Faction then
@@ -219,7 +219,7 @@ end
 
 --- Gets unit's faction based on categories of given blueprint
 ---@param bp UnitBlueprint
----@return string
+---@return FactionCategory | 'UNKNOWN'
 function GetUnitFaction(bp)
     local factionCategory = nil
     local factionName = bp.General.FactionName
@@ -246,7 +246,7 @@ end
 
 --- Gets unit's localizable name of given blueprint or show warning if not found
 ---@param bp UnitBlueprint
----@return string|any
+---@return UnlocalizedString
 function GetUnitName(bp)
     local name = nil
 
@@ -265,7 +265,7 @@ function GetUnitName(bp)
 end
 
 ---@param bp UnitBlueprint
----@return string
+---@return LocalizedString
 function GetUnitTitle(bp)
     local name = nil
     if bp.General.UnitName then
@@ -321,7 +321,7 @@ end
 --- Improved version of UIUtil.UIFile() function
 ---@param bp Blueprint
 ---@param faction Faction
----@return any
+---@return FileName
 function GetImagePath(bp, faction)
     local root = ''
     local id = bp.ID or ''
@@ -401,7 +401,7 @@ end
 
 --- Unused
 ---@param text string
----@param spaces any
+---@param spaces number
 ---@return string
 local function stringPad(text, spaces)
     local len = string.len(text)

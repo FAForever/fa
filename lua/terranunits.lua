@@ -30,7 +30,7 @@ TAirFactoryUnit = ClassUnit(AirFactoryUnit) {
         WaitTicks(2)
         for _, v in self.BuildEffectBones do
             self.BuildEffectsBag:Add(CreateAttachedEmitter(self, v, self.Army, '/effects/emitters/flashing_blue_glow_01_emit.bp'))
-            self.BuildEffectsBag:Add(self.Trash:Add(ForkThread(EffectUtil.CreateDefaultBuildBeams, unitBeingBuilt, {v}, self.BuildEffectsBag,self)))
+            self.BuildEffectsBag:Add(self:ForkThread(EffectUtil.CreateDefaultBuildBeams, unitBeingBuilt, {v}, self.BuildEffectsBag))
         end
     end,
 
@@ -123,7 +123,7 @@ TConstructionUnit = ClassUnit(ConstructionUnit) {
     OnStopBeingBuilt = function(self, builder, layer)
         ConstructionUnit.OnStopBeingBuilt(self, builder, layer)
         if self.Layer == 'Water' then
-            self.TerrainLayerTransitionThread = self.Trash:Add(ForkThread(self.TransformThread, true,self))
+            self.TerrainLayerTransitionThread = self:ForkThread(self.TransformThread, true)
         end
     end,
 
@@ -149,7 +149,7 @@ TConstructionUnit = ClassUnit(ConstructionUnit) {
                 self.TerrainLayerTransitionThread = nil
             end
             if (old ~= 'None') then
-                self.TerrainLayerTransitionThread = self.Trash:Add(ForkThread(self.TransformThread, (new == 'Water'),self))
+                self.TerrainLayerTransitionThread = self:ForkThread(self.TransformThread, (new == 'Water'))
             end
         end
     end,
@@ -277,7 +277,7 @@ TSeaFactoryUnit = ClassUnit(SeaFactoryUnit) {
         WaitTicks(2)
         for _, v in self.BuildEffectBones do
             self.BuildEffectsBag:Add(CreateAttachedEmitter(self, v, self.Army, '/effects/emitters/flashing_blue_glow_01_emit.bp'))
-            self.BuildEffectsBag:Add(self.Trash:Add(ForkThread(EffectUtil.CreateDefaultBuildBeams, unitBeingBuilt, {v}, self.BuildEffectsBag,self)))
+            self.BuildEffectsBag:Add(self:ForkThread(EffectUtil.CreateDefaultBuildBeams, unitBeingBuilt, {v}, self.BuildEffectsBag))
         end
     end,
 
@@ -321,7 +321,7 @@ TSeaFactoryUnit = ClassUnit(SeaFactoryUnit) {
     ---@param self TSeaFactoryUnit
     StartArmsMoving = function(self)
         if not self.ArmsThread then
-            self.ArmsThread = self.Trash:Add(ForkThread(self.MovingArmsThread,self))
+            self.ArmsThread = self:ForkThread(self.MovingArmsThread)
         end
     end,
 

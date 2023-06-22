@@ -141,7 +141,6 @@ end
 
 CreateUnitDamagedTrigger = TriggerFile.CreateUnitDamagedTrigger
 
----
 ---@param callback any
 ---@param aiBrain AIBrain
 ---@param category EntityCategory
@@ -165,10 +164,10 @@ end
 
 --- An override for `Unit.DoTakeDamage` to hold on to the final blow and then release it
 --- on the unit once its death is unpaused
----@param self Unit
----@param instigator Unit
----@param amount number
----@param vector Vector2
+---@param self Unit The Unit
+---@param instigator Unit The Unit
+---@param amount number 
+---@param vector any unused
 ---@param damageType DamageType
 function OverrideDoDamage(self, instigator, amount, vector, damageType)
     local preAdjHealth = self:GetHealth()
@@ -208,7 +207,7 @@ end
 --- An override for `Unit.OnKilled` to make unit death pausing work
 ---@param self Unit
 ---@param instigator Unit
----@param type DamageType
+---@param type any unused
 ---@param overkillRatio number
 function OverrideKilled(self, instigator, type, overkillRatio)
     if not self.CanBeKilled then
@@ -262,7 +261,7 @@ end
 
 ---
 ---@param unit Unit
----@param army Army
+---@param army number
 ---@param triggerOnGiven boolean
 ---@return Unit
 function GiveUnitToArmy(unit, army, triggerOnGiven)
@@ -728,7 +727,6 @@ function WaitForDialogue(name)
     end
 end
 
----
 function PlayUnlockDialogue()
     if Random(1, 2) == 1 then
         SyncVoice({Bank = 'XGG', Cue = 'Computer_Computer_UnitRevalation_01370'})
@@ -744,7 +742,6 @@ function PlayTaunt(head, taunt)
     Sync.MPTaunt = {head, taunt}
 end
 
----
 ---@param text string
 function DisplayMissionText(text)
     if not Sync.MissionText then
@@ -753,7 +750,6 @@ function DisplayMissionText(text)
     table.insert(Sync.MissionText, text)
 end
 
----
 ---@param text string
 function DisplayVideoText(text)
     if not Sync.VideoText then
@@ -770,7 +766,6 @@ function PlayNIS(pathToMovie)
     end
 end
 
----
 ---@param faction string
 ---@param callback fun()
 function PlayEndGameMovie(faction, callback)
@@ -786,7 +781,6 @@ function PlayEndGameMovie(faction, callback)
     end
 end
 
----
 ---@param callback fun()
 function EndGameWaitThread(callback)
     while not ScenarioInfo.DialogueFinished['EndGameMovie'] do

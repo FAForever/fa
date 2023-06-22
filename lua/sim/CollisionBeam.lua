@@ -1,6 +1,6 @@
 -- File     :  /lua/sim/collisionbeam.lua
--- CollisionBeam is the simulation (gameplay-relevant) portion of a beam. It wraps a special effect
--- that may or may not exist depending on how the simulation is executing.
+-- Summary  : CollisionBeam is the simulation (gameplay-relevant) portion of a beam. It wraps a special effect
+--            that may or may not exist depending on how the simulation is executing.
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -------------------------------------------------------------------
 local DefaultDamage = import("/lua/sim/defaultdamage.lua")
@@ -102,7 +102,7 @@ CollisionBeam = Class(moho.CollisionBeamEntity) {
     ---@param self CollisionBeam
     ---@param instigator Unit
     ---@param damageData table
-    ---@param targetEntity? Unit
+    ---@param targetEntity? Unit|Prop
     DoDamage = function(self, instigator, damageData, targetEntity)
         local damage = damageData.DamageAmount or 0
         if damage <= 0 then return end
