@@ -232,7 +232,7 @@ function GetTransports( platoon, aiBrain)
         if TransportDialog then
             LOG("*AI DEBUG "..aiBrain.Nickname.." "..platoon.BuilderName.." there are no transports at all")
         end
-        aiBrain.NeedTransports = true   -- turn on need flag
+        aiBrain.TransportRequested = true   -- turn on need flag
         return false, false
     end
 
@@ -412,7 +412,7 @@ function GetTransports( platoon, aiBrain)
             if TransportDialog then
                 LOG("*AI DEBUG "..aiBrain.Nickname.." "..platoon.BuilderName.." no transports available")
             end
-            aiBrain.NeedTransports = true
+            aiBrain.TransportRequested = true
         end
 		platoon.UsingTransport = false
 		return false, false
@@ -604,7 +604,7 @@ function GetTransports( platoon, aiBrain)
 	if not CanUseTransports then
 		if not out_of_range then
 			-- let the brain know we couldn't fill a transport request by a ground platoon
-			aiBrain.NeedTransports = true
+			aiBrain.TransportRequested = true
 		end
         
         if TransportDialog then
@@ -757,7 +757,7 @@ end
 -- whenever the AI cannot find enough transports to move a platoon it sets a value on the brain indicating that need
 -- this function is run whenever a factory responds to that need and starts building them - clearing the need flag
 function ResetBrainNeedsTransport( aiBrain )
-    aiBrain.NeedTransports = nil
+    aiBrain.TransportRequested = nil
 end
 
 --  This routine should get transports on the way back to an existing base 
@@ -1857,7 +1857,9 @@ function WatchUnitLoading( transport, units, aiBrain, UnitPlatoon)
 					if (not transport.Dead) and transport:TransportHasSpaceFor(u) then
 						IssueStop({u})
 						if reissue > 1 then
-                            LOG("*AI DEBUG "..aiBrain.Nickname.." "..UnitPlatoon.BuilderName.." "..transport.PlatoonHandle.BuilderName.." Transport"..transport.EntityId.." Warping unit "..u.EntityId.." to transport ")
+							if TransportDialog then
+                                LOG("*AI DEBUG "..aiBrain.Nickname.." "..UnitPlatoon.BuilderName.." "..transport.PlatoonHandle.BuilderName.." Transport"..transport.EntityId.." Warping unit "..u.EntityId.." to transport ")
+							end
 							Warp( u, GetPosition(transport) )
 							reissue = 0
 						end
@@ -1880,13 +1882,13 @@ function WatchUnitLoading( transport, units, aiBrain, UnitPlatoon)
 			end
 			
 			if newunits and counter > 0 then
-				if reloads > 1 then
+				if reloads > 1 and TransportDialog then
 					LOG("*AI DEBUG "..aiBrain.Nickname.." "..UnitPlatoon.BuilderName.." "..transport.PlatoonHandle.BuilderName.." Transport "..transport.EntityId.." Reloading "..counter.." units - reload "..reloads)
 				end
 				IssueStop( newunits )
 				IssueStop( {transport} )
 				local goload = safecall("Unable to IssueTransportLoad", IssueTransportLoad, newunits, transport )
-				if goload then
+				if goload and TransportDialog then
 					LOG("*AI DEBUG "..aiBrain.Nickname.." "..UnitPlatoon.BuilderName.." "..transport.PlatoonHandle.BuilderName.." Transport "..transport.EntityId.." reloads is "..reloads.." goload is "..repr(goload).." for "..transport:GetBlueprint().Description)
 				end
 			else

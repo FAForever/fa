@@ -378,7 +378,7 @@ function CommanderThreadImproved(cdr, platoon)
                     local platoonUnits = cdr.PlatoonHandle:GetPlatoonUnits() or 1
                     -- only disband the platton if we have 1 unit, plan and buildername. (NEVER disband the armypool platoon!!!)
                     if table.getn(platoonUnits) == 1 and (not cdr.PlatoonHandle.ArmyPool) and cdr.PlatoonHandle.BuilderName then
-                        SPEW('ACU PlatoonHandle found. Builder '..cdr.PlatoonHandle.BuilderName..'. Disbanding CDR platoon!')
+                        --SPEW('ACU PlatoonHandle found. Builder '..cdr.PlatoonHandle.BuilderName..'. Disbanding CDR platoon!')
                         cdr.PlatoonHandle:PlatoonDisband()
                     end
                 end

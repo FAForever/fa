@@ -327,6 +327,25 @@ AIBrain = Class(StandardBrain) {
         return false
     end,
 
+    ---@param self BaseAIBrain
+    ---@param loc Vector
+    ---@return number
+    PBMGetLocationRadius = function(self, loc)
+        if not loc then
+            return false
+        end
+        if self.HasPlatoonList then
+            for k, v in self.PBM.Locations do
+                if v.LocationType == loc then
+                   return v.Radius
+                end
+            end
+        elseif self.BuilderManagers[loc] then
+            return self.BuilderManagers[loc].FactoryManager.Radius
+        end
+        return false
+    end,
+
     ---SKIRMISH AI HELPER SYSTEMS
     ---@param self BaseAIBrain
     InitializeSkirmishSystems = function(self)
@@ -446,7 +465,7 @@ AIBrain = Class(StandardBrain) {
         local distance, closest
         for k, v in self.BuilderManagers do
             if v.EngineerManager and v.EngineerManager:GetNumCategoryUnits('Engineers', categories.ALLUNITS) > 0
-            and v.FactoryManager and v.FactoryManager:GetNumCategoryFactories(categories.ALLUNITS) > 0 then
+            and v.FactoryManager and v.FactoryManager.LocationActive and v.FactoryManager:GetNumCategoryFactories(categories.ALLUNITS) > 0 then
                 if position and v.Position then
                     if not closest then
                         distance = VDist3(position, v.Position)
@@ -1700,21 +1719,23 @@ AIBrain = Class(StandardBrain) {
         local ux, _, uz = position[1], nil, position[3]
         local nearestManagerIdentifier = nil
         local nearestDistance = nil
-        for id, managers in self.BuilderManagers do
-            if nearestManagerIdentifier then
-                local location = managers.FactoryManager.Location
-                local dx, dz = location[1] - ux, location[3] - uz
-                local distance = dx * dx + dz * dz
-                if distance < nearestDistance then
-                    nearestDistance = distance
+        if self.BuilderManagers then
+            for id, managers in self.BuilderManagers do
+                if nearestManagerIdentifier then
+                    local location = managers.Position
+                    local dx, dz = location[1] - ux, location[3] - uz
+                    local distance = dx * dx + dz * dz
+                    if distance < nearestDistance then
+                        nearestDistance = distance
 
+                        nearestManagerIdentifier = id
+                    end
+                else
+                    local location = managers.Position
+                    local dx, dz = location[1] - ux, location[3] - uz
+                    nearestDistance = dx * dx + dz * dz
                     nearestManagerIdentifier = id
                 end
-            else
-                local location = managers.FactoryManager.Location
-                local dx, dz = location[1] - ux, location[3] - uz
-                nearestDistance = dx * dx + dz * dz
-                nearestManagerIdentifier = id
             end
         end
 
@@ -1735,7 +1756,7 @@ AIBrain = Class(StandardBrain) {
 
         -- register unit at managers of base
         local managers = self.BuilderManagers[nearestBaseIdentifier]
-        if managers then
+        if managers and managers.EngineerManager then
             managers.EngineerManager:OnUnitStartBeingBuilt(unit, builder, layer)
         end
     end,
@@ -1755,7 +1776,7 @@ AIBrain = Class(StandardBrain) {
         end
 
         local managers = self.BuilderManagers[baseIdentifier]
-        if managers then
+        if managers and managers.EngineerManager then
             managers.EngineerManager:OnUnitStopBeingBuilt(unit, builder, layer)
         end
     end,
@@ -1772,7 +1793,7 @@ AIBrain = Class(StandardBrain) {
         end
 
         local managers = self.BuilderManagers[baseIdentifier]
-        if managers then
+        if managers and managers.EngineerManager then
             managers.EngineerManager:OnUnitStopBeingBuilt(unit)
         end
     end,
@@ -1790,7 +1811,7 @@ AIBrain = Class(StandardBrain) {
         end
 
         local managers = self.BuilderManagers[baseIdentifier]
-        if managers then
+        if managers and managers.EngineerManager then
             managers.EngineerManager:OnUnitStartBuilding(unit)
         end
     end,
@@ -1808,7 +1829,7 @@ AIBrain = Class(StandardBrain) {
         end
 
         local managers = self.BuilderManagers[baseIdentifier]
-        if managers then
+        if managers and managers.EngineerManager then
             managers.EngineerManager:OnUnitStopBuilding(unit)
         end
     end,
