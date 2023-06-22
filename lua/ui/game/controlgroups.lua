@@ -133,9 +133,9 @@ function OnSelectionSetChanged(name, units, applied)
                     Selection.FactorySelection(self.name)
                 elseif event.Modifiers.Shift then
                     Selection.AppendSetToSelection(self.name)
-                elseif event.KeyCode == 1 then
+                elseif event.Modifiers.Left then
                     Selection.ApplySelectionSet(self.name)
-                elseif event.KeyCode == 3 then
+                elseif event.Modifiers.Right then
                     Selection.AppendSelectionSet(self.name)
                 end
             end
