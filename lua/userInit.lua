@@ -114,4 +114,18 @@ do
 
         oldConExecute(command)
     end
+
+    local oldConExecuteSave = ConExecuteSave
+
+    ---@param command string
+    _G.ConExecuteSave = function(command)
+        local lower = string.lower(command)
+
+        -- do not allow network changes by UI mods
+        if string.find(lower, 'net_') then
+            return
+        end
+
+        oldConExecuteSave(command)
+    end
 end
