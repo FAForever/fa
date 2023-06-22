@@ -114,6 +114,7 @@ local cUnit = moho.unit_methods
 ---@field EngineCommandCap? table<string, boolean>
 ---@field UnitBeingBuilt Unit?
 ---@field SoundEntity? Unit | Entity
+---@field AutoModeEnabled? boolean
 Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
 
     IsUnit = true,
@@ -144,6 +145,8 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
 
     EnergyModifier = 0,
     MassModifier = 0,
+
+
 
     ---@param self Unit
     ---@return any
@@ -1702,6 +1705,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
     DeathWeaponDamageThread = function(self, damageRadius, damage, damageType, damageFriendly)
         WaitSeconds(0.1)
         DamageArea(self, self:GetPosition(), damageRadius or 1, damage or 1, damageType or 'Normal', damageFriendly or false)
+        DamageArea(self, self:GetPosition(), damageRadius or 1, 1, 'TreeForce', false)
     end,
 
     ---@param self Unit
@@ -2729,6 +2733,9 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
     ---@param attachBone Bone
     ---@param attachedUnit Unit
     OnTransportAttach = function(self, attachBone, attachedUnit)
+        -- manual Lua callback for the unit
+        attachedUnit:OnAttachedToTransport(self, attachBone)
+
         -- awareness of event for campaign scripts
         local callbacks = self.EventCallbacks['OnTransportAttach']
         if callbacks then
@@ -2736,9 +2743,6 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
                 cb(self, attachBone, attachedUnit)
             end
         end
-
-        -- manual Lua callback for the unit
-        attachedUnit:OnAttachedToTransport(self, attachBone)
 
         -- awareness of event for AI
         local aiPlatoon = self.AIPlatoonReference
@@ -2750,23 +2754,23 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
     --- Called as this unit (with transport capabilities) deattached another unit from itself
     ---@param self Unit
     ---@param attachBone Bone
-    ---@param deattachedUnit Unit
-    OnTransportDetach = function(self, attachBone, deattachedUnit)
+    ---@param detachedUnit Unit
+    OnTransportDetach = function(self, attachBone, detachedUnit)
+        -- manual Lua callback
+        detachedUnit:OnDetachedFromTransport(self, attachBone) -- <-- this is what causes it to hang
+
         -- awareness of event for campaign scripts
         local callbacks = self.EventCallbacks['OnTransportDetach']
         if callbacks then
             for _, cb in callbacks do
-                cb(self, attachBone, deattachedUnit)
+                cb(self, attachBone, detachedUnit)
             end
         end
-
-        -- manual Lua callback
-        deattachedUnit:OnDetachedFromTransport(self, attachBone)
 
         -- awareness of event for AI
         local aiPlatoon = self.AIPlatoonReference
         if aiPlatoon then
-            aiPlatoon:OnTransportDetach(self, attachBone, deattachedUnit)
+            aiPlatoon:OnTransportDetach(self, attachBone, detachedUnit)
         end
     end,
 
@@ -4310,6 +4314,8 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
     ---@param transport BaseTransport
     ---@param bone Bone
     OnStartTransportBeamUp = function(self, transport, bone)
+        self.TransportBeamEffectsBag = self.TransportBeamEffectsBag or TrashBag()
+
         local slot = transport.slots[bone]
         if slot then
             self:GetAIBrain():OnTransportFull()
@@ -4320,7 +4326,6 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         self:DestroyIdleEffects()
         self:DestroyMovementEffects()
 
-        self.TransportBeamEffectsBag = self.TransportBeamEffectsBag or TrashBag()
         TrashAdd(self.TransportBeamEffectsBag, AttachBeamEntityToEntity(self, -1, transport, bone, self.Army, EffectTemplate.TTransportBeam01))
         TrashAdd(self.TransportBeamEffectsBag, AttachBeamEntityToEntity(transport, bone, self, -1, self.Army, EffectTemplate.TTransportBeam02))
         TrashAdd(self.TransportBeamEffectsBag, CreateEmitterAtBone(transport, bone, self.Army, EffectTemplate.TTransportGlow01))
@@ -4636,6 +4641,14 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         if IsDestroyed(transport) then
             self:Destroy()
         end
+    end,
+
+    OnAutoModeOn = function(self)
+        self.AutoModeEnabled = true
+    end,
+
+    OnAutoModeOff = function(self)
+        self.AutoModeEnabled = false
     end,
 
     -- Utility Functions

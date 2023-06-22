@@ -248,7 +248,7 @@ Platoon = Class(moho.platoon_methods) {
     ---@param self Platoon
     PlatoonDisband = function(self)
         if self.ArmyPool then
-            WARN('AI WARNING: Platoon trying to disband ArmyPool')
+            --WARN('AI WARNING: Platoon trying to disband ArmyPool')
             --LOG(reprsl(debug.traceback()))
             return
         end
@@ -949,7 +949,7 @@ Platoon = Class(moho.platoon_methods) {
             if path then
                 local position = self:GetPlatoonPosition()
                 if not success or VDist2(position[1], position[3], bestMarker.position[1], bestMarker.position[3]) > 512 then
-                    usedTransports = TransportUtils.SendPlatoonWithTransports(aiBrain, self, bestMarker.position, 1, true)
+                    usedTransports = TransportUtils.SendPlatoonWithTransports(aiBrain, self, bestMarker.position, 2, true)
                 elseif VDist2(position[1], position[3], bestMarker.position[1], bestMarker.position[3]) > 256 then
                     usedTransports = TransportUtils.SendPlatoonWithTransports(aiBrain, self, bestMarker.position, 1, false)
                 end
@@ -965,7 +965,7 @@ Platoon = Class(moho.platoon_methods) {
                 end
             elseif (not path and reason == 'NoPath') and self.MovementLayer ~= 'Water' then
                 --LOG('Guardmarker requesting transports')
-                local foundTransport = TransportUtils.SendPlatoonWithTransports(aiBrain, self, bestMarker.position, 1, true)
+                local foundTransport = TransportUtils.SendPlatoonWithTransports(aiBrain, self, bestMarker.position, 3, true)
                 --DUNCAN - if we need a transport and we cant get one the disband
                 if not foundTransport then
                     --LOG('Guardmarker no transports')
@@ -1623,7 +1623,6 @@ Platoon = Class(moho.platoon_methods) {
         self:Stop()
         local aiBrain = self:GetBrain()
         local data = self.PlatoonData
-        local radius = aiBrain:PBMGetLocationRadius(data.Location)
         local categories = data.Reclaim
         local counter = 0
         local reclaimcat

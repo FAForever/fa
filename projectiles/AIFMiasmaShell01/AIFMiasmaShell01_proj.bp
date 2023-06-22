@@ -37,11 +37,6 @@ ProjectileBlueprint {
     },
     General = {
         Category = 'Artillery',
-        EntityCategory = {
-            'AEON',
-            'PROJECTILE',
-            'INDIRECTFIRE',
-        },
         Faction = 'Aeon',
         TechLevel = 2,
         Weapon = 'Miasma Artillery',

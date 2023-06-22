@@ -7,9 +7,6 @@ ProjectileBlueprint {
         UniformScale = 0.005,
     },
     General = {
-        EntityCategory = {
-            'UNTARGETABLE',
-        },
     },
     Interface = {
         HelpText = 0,

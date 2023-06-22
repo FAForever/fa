@@ -330,14 +330,14 @@ StructureUnit = ClassUnit(Unit) {
         local cutoffAlbedo = meshBlueprint.LODs[2].LODCutoff
         if not cutoffAlbedo then
             cutoffAlbedo = cutoffOthers
-            cutoffOthers = 0.4 * cutoffOthers
+            cutoffOthers = 0.3 * cutoffOthers
         else
             cutoffOthers = 0.8 * cutoffOthers
         end
 
-        -- take into account the fading of the decal
-        cutoffAlbedo = 1.1 * cutoffAlbedo
-        cutoffOthers = 1.1 * cutoffOthers
+        -- reduce the LOD for performance
+        cutoffAlbedo = 0.75 * cutoffAlbedo
+        cutoffOthers = 0.75 * cutoffOthers
 
         -- determine orientation
         if not orientation then
@@ -763,12 +763,33 @@ StructureUnit = ClassUnit(Unit) {
         adjacentUnit.AdjacentUnits[self.EntityId] = self
 
         -- apply the buffs
+        local buffApplied = false
         if self.ConsumptionActive then
             for k, v in AdjacencyBuffs[adjBuffs] do
+                buffApplied = true
                 Buff.ApplyBuff(adjacentUnit, v, self)
             end
         end
 
+        -- fix edge cases when buffs are applied
+        if buffApplied then
+
+            -- edge case for missile construction: the buff doesn't apply to the missile under construction
+            if adjacentUnit.Blueprint.CategoriesHash["SILO"] then
+                if adjacentUnit:IsUnitState('SiloBuildingAmmo') then
+                    local autoModeEnabled = adjacentUnit.AutoModeEnabled or false
+                    local progress = adjacentUnit:GetWorkProgress()
+                    if progress < 0.99 then
+                        adjacentUnit:StopSiloBuild()
+                        IssueSiloBuildTactical({adjacentUnit})
+                        adjacentUnit:GiveNukeSiloBlocks(progress)
+                        LOG(autoModeEnabled)
+                        adjacentUnit:SetAutoMode(autoModeEnabled)
+                    end
+                end
+            end
+        end
+    
         -- refresh the UI
         self:RequestRefreshUI()
         adjacentUnit:RequestRefreshUI()
@@ -791,10 +812,30 @@ StructureUnit = ClassUnit(Unit) {
         end
 
         -- remove the buffs
+        local buffRemoved = false
         if adjBuffs and AdjacencyBuffs[adjBuffs] then
             for k, v in AdjacencyBuffs[adjBuffs] do
                 if Buff.HasBuff(adjacentUnit, v) then
+                    buffRemoved = true
                     Buff.RemoveBuff(adjacentUnit, v)
+                end
+            end
+        end
+
+        -- fix edge cases when buffs are removed
+        if buffRemoved then
+
+            -- edge case for missile construction: the buff doesn't apply to the missile under construction
+            if adjacentUnit.Blueprint.CategoriesHash["SILO"] then
+                if adjacentUnit:IsUnitState('SiloBuildingAmmo') then
+                    local autoModeEnabled = adjacentUnit.AutoModeEnabled or false
+                    local progress = adjacentUnit:GetWorkProgress()
+                    if progress < 0.99 then
+                        adjacentUnit:StopSiloBuild()
+                        IssueSiloBuildTactical({adjacentUnit})
+                        adjacentUnit:GiveNukeSiloBlocks(progress)
+                        adjacentUnit:SetAutoMode(autoModeEnabled)
+                    end
                 end
             end
         end
@@ -1943,9 +1984,11 @@ MobileUnit = ClassUnit(Unit, TreadComponent) {
     OnDetachedFromTransport = function(self, transport, bone)
         Unit.OnDetachedFromTransport(self, transport, bone)
 
-         -- Set unit immobile to prevent it to accelerating in the air, cleared in OnLayerChange
-        self:SetImmobile(true)
-        self.transportDrop = true
+        -- Set unit immobile to prevent it to accelerating in the air, cleared in OnLayerChange
+        if not self.Blueprint.CategoriesHash["AIR"] then
+            self:SetImmobile(true)
+            self.transportDrop = true
+        end
     end,
 }
 
@@ -2133,6 +2176,7 @@ AirUnit = ClassUnit(MobileUnit) {
         elseif self.DeathCrashDamage > 0 then -- It was completely absorbed by a shield!
             local deathWep = self.deathWep -- Use a local copy for speed and easy reading
             DamageArea(self, self:GetPosition(), deathWep.DamageRadius, self.DeathCrashDamage, deathWep.DamageType, deathWep.DamageFriendly)
+            DamageArea(self, self:GetPosition(), deathWep.DamageRadius, 1, 'TreeForce', false)
         end
 
         if with == 'Water' then
@@ -2576,8 +2620,8 @@ ConstructionUnit = ClassUnit(MobileUnit) {
         -- the unit is still moving, but unaware of it (It thinks it stopped to do the command). This allows it to build on the move,
         -- as it doesn't know it's doing something bad. To fix it, we temporarily make the unit immobile when it starts construction.
         if self:IsMoving() then
-            self:SetImmobile(true)
-            self:ForkThread(function() WaitTicks(1) if not self:BeenDestroyed() then self:SetImmobile(false) end end)
+            local navigator = self:GetNavigator()
+            navigator:AbortMove()
         end
     end,
 
@@ -2589,7 +2633,6 @@ ConstructionUnit = ClassUnit(MobileUnit) {
             self.StoppedBuilding = false
             self.BuildArmManipulator:Disable()
             self.BuildingOpenAnimManip:SetRate(-(self.Blueprint.Display.AnimationBuildRate or 1))
-            self:SetImmobile(false)
         end
     end,
 }
@@ -2791,8 +2834,8 @@ CommandUnit = ClassUnit(WalkingLandUnit) {
         -- the unit is still moving, but unaware of it (It thinks it stopped to do the command). This allows it to build on the move,
         -- as it doesn't know it's doing something bad. To fix it, we temporarily make the unit immobile when it starts construction.
         if self:IsMoving() then
-            self:SetImmobile(true)
-            self:ForkThread(function() WaitTicks(1) if not self:BeenDestroyed() then self:SetImmobile(false) end end)
+            local navigator = self:GetNavigator()
+            navigator:AbortMove()
         end
     end,
 
@@ -2959,10 +3002,7 @@ ACUUnit = ClassUnit(CommandUnit) {
         self:SendNotifyMessage('started', work)
 
         -- No need to do it for AI
-        if self:GetAIBrain().BrainType == 'Human' then
-            self:SetImmobile(true)
-        end
-
+        self:SetImmobile(true)
         return true
     end,
 

@@ -30,11 +30,6 @@ ProjectileBlueprint {
     },
     General = {
         Category = 'Artillery',
-        EntityCategory = {
-            'AEON',
-            'PROJECTILE',
-            'INDIRECTFIRE',
-        },
         Faction = 'Aeon',
         TechLevel = 1,
         Weapon = 'Concussion Artillery',

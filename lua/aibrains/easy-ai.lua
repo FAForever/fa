@@ -53,6 +53,7 @@ AIBrain = Class(StandardBrain, EconomyComponent) {
             MAIN = main
         }
 
+        self:ForkThread(self.GetBaseDebugInfoThread)
         self:IMAPConfiguration()
     end,
 
@@ -184,15 +185,14 @@ AIBrain = Class(StandardBrain, EconomyComponent) {
         return nearestManagerIdentifier
     end,
 
-    ---------------------------------------------
-    -- C hooks
+    ---------------------------------------------------------------------------
+    --#region C hooks
 
     ---@param platoon AIPlatoon
     ---@param units Unit[]
     ---@param squad PlatoonSquads
     ---@param formation UnitFormations
     AssignUnitsToPlatoon = function(self, platoon, units, squad, formation)
-        LOG("AssignUnitsToPlatoon")
         StandardBrain.AssignUnitsToPlatoon(self, platoon, units, squad, formation)
 
         if squad == 'Attack' then
@@ -208,8 +208,10 @@ AIBrain = Class(StandardBrain, EconomyComponent) {
         end
     end,
 
-    ---------------------------------------------
-    -- Unit events
+    --#endregion
+
+    ---------------------------------------------------------------------------
+    --#region Unit events
 
     --- Called by a unit as it starts being built
     ---@param self EasyAIBrain
@@ -293,9 +295,33 @@ AIBrain = Class(StandardBrain, EconomyComponent) {
         end
     end,
 
-    ----------------------------------------------------------------------------------------
-    --- legacy functionality
-    ---
+    --#endregion
+
+    ---------------------------------------------------------------------------
+    --#region Debug functionality
+
+    ---@param self EasyAIBrain
+    ---@return AIBaseDebugInfo
+    GetBaseDebugInfoThread = function(self)
+        while true do
+            if GetFocusArmy() == self:GetArmyIndex() then
+                local position = GetMouseWorldPos()
+                local identifier = self:FindNearestBaseIdentifier(position)
+                if identifier then
+                    local base = self.BuilderManagers[identifier]
+                    local info = base:GetDebugInfo()
+                    Sync.AIBaseInfo = info
+                end
+            end
+
+            WaitTicks(10)
+        end
+    end,
+
+    --#endregion
+
+    ---------------------------------------------------------------------------
+    --#region Legacy functionality
     --- All functions below solely exist because the code is too tightly coupled. We can't
     --- remove them without drastically changing how the code base works. We can't do that
     --- because it would break mod compatibility
@@ -319,5 +345,7 @@ AIBrain = Class(StandardBrain, EconomyComponent) {
     ---@param self AIBrain
     InitializePlatoonBuildManager = function(self)
     end,
+
+    --#endregion
 
 }

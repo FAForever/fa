@@ -78,9 +78,16 @@ function ShuffleStartPositions(syncNewPositions)
     end
 end
 
+Prefetcher = CreatePrefetchSet()
+
 --SetupSession will be called by the engine after ScenarioInfo is set
 --but before any armies are created.
 function SetupSession()
+
+    -- start prefetching
+    -- local template = import("/lua/sim/prefetchtemplates.lua").DefaultUnits
+    -- local prefetchData = import("/lua/sim/PrefetchUtilities.lua").CreatePrefetchSetFromBlueprints(template)
+    -- Prefetcher:Update(prefetchData)
 
     import("/lua/ai/gridreclaim.lua").Setup()
 
@@ -370,11 +377,6 @@ function BeginSessionAI()
         end
 
         for k,file in DiskFindFiles('/lua/AI/AIBaseTemplates', '*.lua') do
-            import(file)
-        end
-
-        -- import base templates, builder group templates and builder templates
-        for k,file in DiskFindFiles('/lua/aibrains/templates/', '*.lua') do
             import(file)
         end
     end
