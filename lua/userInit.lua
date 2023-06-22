@@ -99,3 +99,19 @@ local replayID = import("/lua/ui/uiutil.lua").GetReplayId()
 if replayID then
     LOG("REPLAY ID: " .. replayID)
 end
+
+do
+    local oldConExecute = ConExecute
+
+    ---@param command string
+    _G.ConExecute = function(command)
+        local lower = string.lower(command)
+
+        -- do not allow network changes by UI mods
+        if string.find(lower, 'net_') then
+            return
+        end
+
+        oldConExecute(command)
+    end
+end
