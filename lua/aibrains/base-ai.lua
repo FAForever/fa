@@ -1719,21 +1719,23 @@ AIBrain = Class(StandardBrain) {
         local ux, _, uz = position[1], nil, position[3]
         local nearestManagerIdentifier = nil
         local nearestDistance = nil
-        for id, managers in self.BuilderManagers do
-            if nearestManagerIdentifier then
-                local location = managers.Position
-                local dx, dz = location[1] - ux, location[3] - uz
-                local distance = dx * dx + dz * dz
-                if distance < nearestDistance then
-                    nearestDistance = distance
+        if self.BuilderManagers then
+            for id, managers in self.BuilderManagers do
+                if nearestManagerIdentifier then
+                    local location = managers.Position
+                    local dx, dz = location[1] - ux, location[3] - uz
+                    local distance = dx * dx + dz * dz
+                    if distance < nearestDistance then
+                        nearestDistance = distance
 
+                        nearestManagerIdentifier = id
+                    end
+                else
+                    local location = managers.Position
+                    local dx, dz = location[1] - ux, location[3] - uz
+                    nearestDistance = dx * dx + dz * dz
                     nearestManagerIdentifier = id
                 end
-            else
-                local location = managers.Position
-                local dx, dz = location[1] - ux, location[3] - uz
-                nearestDistance = dx * dx + dz * dz
-                nearestManagerIdentifier = id
             end
         end
 
