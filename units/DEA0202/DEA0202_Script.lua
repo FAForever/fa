@@ -31,16 +31,15 @@ DEA0202 = ClassUnit(TAirUnit) {
                         TIFCarpetBombWeapon.IdleState.OnGotTarget(self)
                     end
                 end,
+
                 OnFire = function(self)
-                    local unit = self.unit
-                    unit:RotateWings(self:GetCurrentTarget())
+                    self.unit:RotateWings(self:GetCurrentTarget())
                     TIFCarpetBombWeapon.IdleState.OnFire(self)
                 end,
             },
 
             OnFire = function(self)
-                local unit = self.unit
-                unit:RotateWings(self:GetCurrentTarget())
+                self.unit:RotateWings(self:GetCurrentTarget())
                 TIFCarpetBombWeapon.OnFire(self)
             end,
 
@@ -67,13 +66,16 @@ DEA0202 = ClassUnit(TAirUnit) {
     },
 
     RotateWings = function(self, target)
-        local LWingRotator = self.LWingRotator
-        local RWingRotator = self.LWingRotator
-        if not LWingRotator then
-            LWingRotator = CreateRotator(self, 'Left_Wing', 'y')
+        lWingRotator = CreateRotator(self, 'Left_Wing', 'y')
+        self.LWingRotator = lWingRotator
+
+        rWingRotator = CreateRotator(self, 'Right_Wing', 'y')
+        self.RWingRotator = rWingRotator
+
+        if not lWingRotator then
             self.Trash:Add(LWingRotator)
         end
-        if not RWingRotator then
+        if not rWingRotator then
             RWingRotator = CreateRotator(self, 'Right_Wing', 'y')
             self.Trash:Add(RWingRotator)
         end
@@ -81,22 +83,22 @@ DEA0202 = ClassUnit(TAirUnit) {
         local bomberAngle = 0
         local wingSpeed = 45
         if target and EntityCategoryContains(categories.AIR, target) then
-            if LWingRotator then
-                LWingRotator:SetSpeed(wingSpeed)
-                LWingRotator:SetGoal(-fighterAngle)
+            if lWingRotator then
+                lWingRotator:SetSpeed(wingSpeed)
+                lWingRotator:SetGoal(-fighterAngle)
             end
-            if RWingRotator then
-                RWingRotator:SetSpeed(wingSpeed)
-                RWingRotator:SetGoal(fighterAngle)
+            if rWingRotator then
+                rWingRotator:SetSpeed(wingSpeed)
+                rWingRotator:SetGoal(fighterAngle)
             end
         else
-            if LWingRotator then
-                LWingRotator:SetSpeed(wingSpeed)
-                LWingRotator:SetGoal(-bomberAngle)
+            if lWingRotator then
+                lWingRotator:SetSpeed(wingSpeed)
+                lWingRotator:SetGoal(-bomberAngle)
             end
-            if RWingRotator then
-                RWingRotator:SetSpeed(wingSpeed)
-                RWingRotator:SetGoal(bomberAngle)
+            if rWingRotator then
+                rWingRotator:SetSpeed(wingSpeed)
+                rWingRotator:SetGoal(bomberAngle)
             end
         end
     end,
