@@ -1396,8 +1396,12 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
             return
         end
 
-        local layer = self.Layer
+        -- this flag is used to skip the need of `IsDestroyed`
         self.Dead = true
+
+        local layer = self.Layer
+        local bp = self.Blueprint
+        local army = self.Army
 
         -- Units killed while being invisible because they're teleporting should show when they're killed
         if self.TeleportFx_IsInvisible then
@@ -1405,7 +1409,6 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
             self:ShowEnhancementBones()
         end
 
-        local bp = self.Blueprint
         if layer == 'Water' and bp.Physics.MotionType == 'RULEUMT_Hover' then
             self:PlayUnitSound('HoverKilledOnWater')
         elseif layer == 'Land' and bp.Physics.MotionType == 'RULEUMT_AmphibiousFloating' then
@@ -1428,8 +1431,6 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
             self.UnitBeingTeleported = nil
         end
 
-        ArmyBrains[self:GetArmy()].LastUnitKilledBy = (instigator or self):GetArmy()
-
         if self.DeathWeaponEnabled ~= false then
             self:DoDeathWeapon()
         end
@@ -1441,12 +1442,28 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         self:DisableUnitIntel('Killed')
         self:ForkThread(self.DeathThread, overkillRatio , instigator)
 
-        ArmyBrains[self.Army]:AddUnitStat(self.UnitId, "lost", 1)
+        -- awareness for traitor game mode and game statistics
+        ArmyBrains[army].LastUnitKilledBy = (instigator or self).Army
+        ArmyBrains[army]:AddUnitStat(self.UnitId, "lost", 1)
+
+        -- awareness of instigator that it killed a unit
+        if instigator then
+            instigator:OnKilledUnit(self)
+        end
 
         -- awareness of event for AI
         local aiPlatoon = self.AIPlatoonReference
         if aiPlatoon then
             aiPlatoon:OnKilled(self, instigator, type, overkillRatio)
+        end
+    end,
+
+    ---@param self Unit
+    ---@param unitKilled Unit
+    ---@param experience number | nil
+    OnKilledUnit = function (self, unitKilled, experience)
+        if experience then
+            VeterancyComponent.OnKilledUnit(self, unitKilled, experience)
         end
     end,
 
@@ -4314,6 +4331,8 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
     ---@param transport BaseTransport
     ---@param bone Bone
     OnStartTransportBeamUp = function(self, transport, bone)
+        self.TransportBeamEffectsBag = self.TransportBeamEffectsBag or TrashBag()
+
         local slot = transport.slots[bone]
         if slot then
             self:GetAIBrain():OnTransportFull()
@@ -4324,7 +4343,6 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         self:DestroyIdleEffects()
         self:DestroyMovementEffects()
 
-        self.TransportBeamEffectsBag = self.TransportBeamEffectsBag or TrashBag()
         TrashAdd(self.TransportBeamEffectsBag, AttachBeamEntityToEntity(self, -1, transport, bone, self.Army, EffectTemplate.TTransportBeam01))
         TrashAdd(self.TransportBeamEffectsBag, AttachBeamEntityToEntity(transport, bone, self, -1, self.Army, EffectTemplate.TTransportBeam02))
         TrashAdd(self.TransportBeamEffectsBag, CreateEmitterAtBone(transport, bone, self.Army, EffectTemplate.TTransportGlow01))

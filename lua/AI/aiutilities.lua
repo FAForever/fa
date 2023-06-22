@@ -2096,7 +2096,7 @@ function EngineerMoveWithSafePath(aiBrain, unit, destination)
 
         -- Skip the last move... we want to return and do a build
         -- needTransports need to fix this
-        bUsedTransports = TransportUtils.SendPlatoonWithTransports(aiBrain, unit.PlatoonHandle, destination, 1, true)
+        bUsedTransports = TransportUtils.SendPlatoonWithTransports(aiBrain, unit.PlatoonHandle, destination, 3, true)
         if bUsedTransports then
             return true
         elseif VDist2Sq(pos[1], pos[3], destination[1], destination[3]) > 512 * 512 then
