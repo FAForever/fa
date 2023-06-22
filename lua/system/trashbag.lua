@@ -40,8 +40,10 @@ TrashBag = ClassTrashBag {
     __mode = 'v',
 
     --- Adds an entity to the trash bag
+    ---@generic T : (Destroyable | thread)
     ---@param self TrashBag
-    ---@param trash Destroyable | thread
+    ---@param trash T
+    ---@return T
     Add = function(self, trash)
         -- -- Uncomment for performance testing
         -- if entity == nil then 
@@ -56,6 +58,7 @@ TrashBag = ClassTrashBag {
         -- end
 
         self[TableGetn(self) + 1] = trash
+        return trash
     end,
 
     --- Destroys all (remaining) entities in the trash bag

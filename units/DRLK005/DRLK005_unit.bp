@@ -41,7 +41,7 @@ UnitBlueprint {
             LodCutoff = 'UnitMove_LodCutoff',
         },
     },
-    BuildIconSortPriority = 30,
+    BuildIconSortPriority = 25,
     Categories = {
         'PRODUCTDL',
         'SELECTABLE',

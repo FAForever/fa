@@ -35,7 +35,7 @@ BaseBuilderTemplate {
         'ExtractorUpgrades',
 
         -- ACU Builders
-        'Default Initial ACU Builders',
+        'Easy Initial ACU Builders',
         'ACUBuilders',
         'ACUUpgrades',
                         

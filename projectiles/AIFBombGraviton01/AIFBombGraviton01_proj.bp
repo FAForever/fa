@@ -41,11 +41,6 @@ ProjectileBlueprint {
     },
     General = {
         Category = 'Bomb',
-        EntityCategory = {
-            'AEON',
-            'PROJECTILE',
-            'INDIRECTFIRE',
-        },
         Faction = 'Aeon',
         Weapon = 'Graviton Bomb',
     },

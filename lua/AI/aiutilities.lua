@@ -471,17 +471,17 @@ end
 ---@param threatType string
 ---@return table
 function AIGetMarkersAroundLocation(aiBrain, markerType, pos, radius, threatMin, threatMax, threatRings, threatType)
-    local markers = AIGetMarkerLocations(aiBrain, markerType)
+    local markers = import("/lua/sim/markerutilities.lua").GetMarkersByType(markerType)
     local returnMarkers = {}
     for _, v in markers do
-        local dist = VDist2(pos[1], pos[3], v.Position[1], v.Position[3])
+        local dist = VDist2(pos[1], pos[3], v.position[1], v.position[3])
         if dist < radius then
             if not threatMin then
-                table.insert(returnMarkers, v)
+                table.insert(returnMarkers, { Name = v.Name, Position = v.position })
             else
-                local threat = aiBrain:GetThreatAtPosition(v.Position, threatRings, true, threatType or 'Overall')
+                local threat = aiBrain:GetThreatAtPosition(v.position, threatRings, true, threatType or 'Overall')
                 if threat >= threatMin and threat <= threatMax then
-                    table.insert(returnMarkers, v)
+                    table.insert(returnMarkers, { Name = v.Name, Position = v.position })
                 end
             end
         end
@@ -620,7 +620,7 @@ function AIFindStartLocationNeedsEngineer(aiBrain, locationType, radius, tMin, t
 
     local validPos = AIGetMarkersAroundLocation(aiBrain, 'Large Expansion Area', pos, radius, tMin, tMax, tRings, tType)
 
-    local positions = AIGetMarkersAroundLocation(aiBrain, 'Blank Marker', pos, radius, tMin, tMax, tRings, tType)
+    local positions = AIGetMarkersAroundLocation(aiBrain, 'Spawn', pos, radius, tMin, tMax, tRings, tType)
     local startX, startZ = aiBrain:GetArmyStartPos()
     for _, v in positions do
         if string.sub(v.Name, 1, 5) == 'ARMY_' then
@@ -2077,6 +2077,7 @@ function EngineerMoveWithSafePath(aiBrain, unit, destination)
     if not destination then
         return false
     end
+    local TransportUtils = import("/lua/ai/transportutilities.lua")
     local pos = unit:GetPosition()
     -- don't check a path if we are in build range
     if VDist2(pos[1], pos[3], destination[1], destination[3]) < 14 then
@@ -2094,8 +2095,8 @@ function EngineerMoveWithSafePath(aiBrain, unit, destination)
         end
 
         -- Skip the last move... we want to return and do a build
-        bUsedTransports = AIAttackUtils.SendPlatoonWithTransportsNoCheck(aiBrain, unit.PlatoonHandle, destination, needTransports, true, false)
-
+        -- needTransports need to fix this
+        bUsedTransports = TransportUtils.SendPlatoonWithTransports(aiBrain, unit.PlatoonHandle, destination, 3, true)
         if bUsedTransports then
             return true
         elseif VDist2Sq(pos[1], pos[3], destination[1], destination[3]) > 512 * 512 then
@@ -3257,6 +3258,7 @@ function CanBuildOnLocalMassPoints(aiBrain, engPos, distance)
     -- the BorderWarning is used to tell the AI that the mass marker is too close to the map border
     local pointDistance = distance * distance
     local massMarkers = import("/lua/sim/markerutilities.lua").GetMarkersByType('Mass')
+    local NavUtils = import("/lua/sim/navutils.lua")
     local validMassMarkers = {}
     for _, v in massMarkers do
         if v.type == 'Mass' then
@@ -3265,7 +3267,7 @@ function CanBuildOnLocalMassPoints(aiBrain, engPos, distance)
                 massBorderWarn = true
             end 
             local mexDistance = VDist2Sq( v.position[1],v.position[3], engPos[1], engPos[3] )
-            if mexDistance < pointDistance and aiBrain:CanBuildStructureAt('ueb1103', v.position) then
+            if mexDistance < pointDistance and aiBrain:CanBuildStructureAt('ueb1103', v.position) and NavUtils.CanPathTo('Amphibious', engPos, v.position) then
                 table.insert(validMassMarkers, {Position = v.position, Distance = mexDistance , MassSpot = v, BorderWarning = massBorderWarn})
             end
         end
@@ -3351,7 +3353,7 @@ function EngFindReclaimCell(aiBrain, eng, movementLayer, searchType)
     local gx, gz = reclaimGridInstance:ToGridSpace(engPos[1],engPos[3])
     while searchLoop < searchRadius and (not (reclaimTargetX and reclaimTargetZ)) do 
         WaitTicks(1)
-        
+
         -- retrieve a list of cells with some mass value
         local cells, count = reclaimGridInstance:FilterAndSortInRadius(gx, gz, searchRadius, 10)
         -- find out if we can path to the center of the cell and check engineer maximums
@@ -3374,4 +3376,135 @@ function EngFindReclaimCell(aiBrain, eng, movementLayer, searchType)
     if reclaimTargetX and reclaimTargetZ then
         return reclaimTargetX, reclaimTargetZ
     end
+end
+
+function GetBuildLocation(aiBrain, buildingTemplate, baseTemplate, buildUnit, eng, adjacent, category, radius, relative)
+    -- This will get a build location based on the parameters
+    -- Will take into account any adjacency request
+    -- Note: borderWarning (too close to map border) will be returned, make sure your build functions can support it
+    local buildLocation = false
+    local borderWarning = false
+    local whatToBuild = aiBrain:DecideWhatToBuild(eng, buildUnit, buildingTemplate)
+    local engPos = eng:GetPosition()
+    local playableArea = ScenarioInfo.PlayableArea or {0, 0, ScenarioInfo.size[1], ScenarioInfo.size[2]}
+    local function normalposition(vec)
+        return {vec[1],GetTerrainHeight(vec[1],vec[2]),vec[2]}
+    end
+    local function heightbuildpos(vec)
+        return {vec[1],vec[2],0}
+    end
+    
+    if adjacent then
+        local unitSize = aiBrain:GetUnitBlueprint(whatToBuild).Physics
+        local testUnits  = aiBrain:GetUnitsAroundPoint(category, engPos, radius, 'Ally')
+        local index = aiBrain:GetArmyIndex()
+        local closeUnits = {}
+        for _, v in testUnits do
+            if not v.Dead and not v:IsBeingBuilt() and v:GetAIBrain():GetArmyIndex() == index then
+                table.insert(closeUnits, v)
+            end
+        end
+        local template = {}
+        table.insert(template, {})
+        table.insert(template[1], { buildUnit })
+        for _,unit in closeUnits do
+            local targetSize = unit:GetBlueprint().Physics
+            local targetPos = unit:GetPosition()
+            local differenceX=math.abs(targetSize.SkirtSizeX-unitSize.SkirtSizeX)
+            local offsetX=math.floor(differenceX/2)
+            local differenceZ=math.abs(targetSize.SkirtSizeZ-unitSize.SkirtSizeZ)
+            local offsetZ=math.floor(differenceZ/2)
+            local offsetfactory=0
+            if EntityCategoryContains(categories.FACTORY, unit) and (buildUnit=='T1LandFactory' or buildUnit=='T1AirFactory' or buildUnit=='T2SupportLandFactory' or buildUnit=='T3SupportLandFactory') then
+                offsetfactory=2
+            end
+            -- Top/bottom of unit
+            for i=-offsetX,offsetX do
+                local testPos = { targetPos[1] + (i * 1), targetPos[3]-targetSize.SkirtSizeZ/2-(unitSize.SkirtSizeZ/2)-offsetfactory, 0 }
+                local testPos2 = { targetPos[1] + (i * 1), targetPos[3]+targetSize.SkirtSizeZ/2+(unitSize.SkirtSizeZ/2)+offsetfactory, 0 }
+                -- check if the buildplace is to close to the border or inside buildable area
+                if testPos[1] > 8 and testPos[1] < ScenarioInfo.size[1] - 8 and testPos[2] > 8 and testPos[2] < ScenarioInfo.size[2] - 8 then
+                    if aiBrain:CanBuildStructureAt(whatToBuild, normalposition(testPos)) and VDist3Sq(engPos,normalposition(testPos)) < radius * radius then
+                        return heightbuildpos(testPos), whatToBuild
+                    end
+                end
+                if testPos2[1] > 8 and testPos2[1] < ScenarioInfo.size[1] - 8 and testPos2[2] > 8 and testPos2[2] < ScenarioInfo.size[2] - 8 then
+                    if aiBrain:CanBuildStructureAt(whatToBuild, normalposition(testPos2)) then
+                        if aiBrain:CanBuildStructureAt(whatToBuild, normalposition(testPos2)) and VDist3Sq(engPos,normalposition(testPos2)) < radius * radius then
+                            return heightbuildpos(testPos2), whatToBuild
+                        end
+                    end
+                end
+            end
+            -- Sides of unit
+            for i=-offsetZ,offsetZ do
+                local testPos = { targetPos[1]-targetSize.SkirtSizeX/2-(unitSize.SkirtSizeX/2)-offsetfactory, targetPos[3] + (i * 1), 0 }
+                local testPos2 = { targetPos[1]+targetSize.SkirtSizeX/2+(unitSize.SkirtSizeX/2)+offsetfactory, targetPos[3] + (i * 1), 0 }
+                if testPos[1] > 8 and testPos[1] < ScenarioInfo.size[1] - 8 and testPos[2] > 8 and testPos[2] < ScenarioInfo.size[2] - 8 then
+                    if aiBrain:CanBuildStructureAt(whatToBuild, normalposition(testPos)) and VDist3Sq(engPos,normalposition(testPos)) < radius * radius then
+                        return heightbuildpos(testPos), whatToBuild
+                    end
+                end
+                if testPos2[1] > 8 and testPos2[1] < ScenarioInfo.size[1] - 8 and testPos2[2] > 8 and testPos2[2] < ScenarioInfo.size[2] - 8 then
+                    if aiBrain:CanBuildStructureAt(whatToBuild, normalposition(testPos2)) then
+                        if aiBrain:CanBuildStructureAt(whatToBuild, normalposition(testPos2)) and VDist3Sq(engPos,normalposition(testPos2)) < radius * radius then
+                            return heightbuildpos(testPos2), whatToBuild
+                        end
+                    end
+                end
+            end
+        end
+    else
+        local location = aiBrain:FindPlaceToBuild(buildUnit, whatToBuild, baseTemplate, relative, eng, nil, engPos[1], engPos[3])
+        if location and relative then
+            local relativeLoc = {location[1] + engPos[1], location[3] + engPos[3], 0}
+            if relativeLoc[1] - playableArea[1] <= 8 or relativeLoc[1] >= playableArea[3] - 8 or relativeLoc[2] - playableArea[2] <= 8 or relativeLoc[2] >= playableArea[4] - 8 then
+                borderWarning = true
+            end
+            return relativeLoc, whatToBuild, borderWarning
+        else
+            return location, whatToBuild, borderWarning
+        end
+    end
+    return false
+end
+
+function GetResourceMarkerWithinRadius(aiBrain, pos, markerType, radius, canBuild, maxThreat, threatType)
+    local markers = import("/lua/sim/markerutilities.lua").GetMarkersByType(markerType)
+    local markerTable = {}
+    local radiusLimit = radius * radius
+    local structureID
+    if markerType == 'Hydrocarbon' then
+        structureID = 'ueb1102'
+    elseif markerType == 'Mass' then
+        structureID = 'ueb1103'
+    else
+        WARN('*AI: Warning invalid markerType passed to function GetResourceMarkerWithinRadious')
+        return
+    end
+    for k, v in markers do
+        if v.type == markerType then
+            table.insert(markerTable, {Position = v.position, Name = k, Distance = VDist2Sq(pos[1], pos[3], v.position[1], v.position[3])})
+        end
+    end
+    table.sort(markerTable, function(a,b) return a.Distance < b.Distance end)
+    for _, v in markerTable do
+        if v.Distance <= radiusLimit then
+            if canBuild then
+                if aiBrain:CanBuildStructureAt(structureID, v.Position) then
+                    if maxThreat and threatType then
+                        if aiBrain:GetThreatAtPosition(v.Position, aiBrain.IMAPConfig.Rings, true, threatType) < maxThreat then
+                            return v
+                        end
+                    else
+                        return v
+                    end
+                end
+            else
+                return v
+            end
+            
+        end
+    end
+    return false
 end
