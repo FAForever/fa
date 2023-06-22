@@ -650,7 +650,7 @@ function InitializeArmies()
     for iArmy, strArmy in tblArmy do
         local setup = armySetups[strArmy]
         if setup.Civilian then
-            if strArmy == 'ARMY_17' or strArmy == 'ARMY_09' then
+            if strArmy == 'ARMY_17' or strArmy == 'ARMY_09' or strArmy == 'ARMY_9' then
                 hostileCivilians = iArmy
                 break
             end
