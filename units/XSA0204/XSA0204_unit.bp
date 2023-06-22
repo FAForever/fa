@@ -219,7 +219,7 @@ UnitBlueprint {
     LifeBarOffset = 0.45,
     LifeBarSize = 0.8,
     Physics = {
-        AttackElevation = 4,
+        AttackElevation = 6,
         BuildOnLayerCaps = {
             LAYER_Air = true,
             LAYER_Land = false,
@@ -228,7 +228,7 @@ UnitBlueprint {
             LAYER_Sub = true,
             LAYER_Water = false,
         },
-        Elevation = 18,
+        Elevation = 12,
         FuelRechargeRate = 5,
         FuelUseTime = 600,
         GroundCollisionOffset = 1.6,
@@ -272,8 +272,7 @@ UnitBlueprint {
             CollideFriendly = false,
             Damage = 250,
             DamageType = 'Normal',
-            DisplayName = 'Heavy Cavitation Cluster Torpedo Launcher',
-            EffectiveRadius = 19,
+            DisplayName = 'Cavitation Cluster Torpedo',
             FireTargetLayerCapsTable = {
                 Air = 'Seabed|Sub|Water',
                 Land = 'Seabed|Sub|Water',
@@ -283,7 +282,7 @@ UnitBlueprint {
             HeadingArcCenter = 0,
             HeadingArcRange = 30,
             Label = 'Bomb',
-            MaxRadius = 35,
+            MaxRadius = 42,
             MinRadius = 4,
             MuzzleSalvoDelay = 0.3,
             MuzzleSalvoSize = 3,
