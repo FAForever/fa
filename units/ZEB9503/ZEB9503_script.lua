@@ -1,68 +1,75 @@
---****************************************************************************
---**
---**  File     :  /cdimage/units/ZEB9503/ZEB9503_script.lua
---**  Author(s):  David Tomandl
---**
---**  Summary  :  UEF Tier 2 Naval Factory Script
---**
---**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
---****************************************************************************
-
+-- File     :  /cdimage/units/ZEB9503/ZEB9503_script.lua
+-- Author(s):  David Tomandl
+-- Summary  :  UEF Tier 2 Naval Factory Script
+-- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+------------------------------------------------------------------
 local TSeaFactoryUnit = import("/lua/terranunits.lua").TSeaFactoryUnit
 
 ---@class ZEB9503 : TSeaFactoryUnit
 ZEB9503 = ClassUnit(TSeaFactoryUnit) {
     OnCreate = function(self)
         TSeaFactoryUnit.OnCreate(self)
-        self.BuildPointSlider = CreateSlider(self, self:GetBlueprint().Display.BuildAttachBone or 0, -5, 0, 0, -1)
+        self.BuildPointSlider = CreateSlider(self, self.Blueprint.Display.BuildAttachBone or 0, -5, 0, 0, -1)
         self.Trash:Add(self.BuildPointSlider)
     end,
 
     StartArmsMoving = function(self)
         TSeaFactoryUnit.StartArmsMoving(self)
-        if not self.ArmSlider1 then
-            self.ArmSlider1 = CreateSlider(self, 'Right_Arm')
-            self.Trash:Add(self.ArmSlider1)
+        local arm1 = self.ArmSlider1
+        local arm2 = self.ArmSlider2
+        local Trash = self.Trash
+
+        if not arm1 then
+            arm1 = CreateSlider(self, 'Right_Arm')
+            self.ArmSlider1 = arm1
+            Trash:Add(arm1)
         end
-        if not self.ArmSlider2 then
-            self.ArmSlider2 = CreateSlider(self, 'Center_Arm')
-            self.Trash:Add(self.ArmSlider2)
+        if not arm2 then
+            arm2 = CreateSlider(self, 'Center_Arm')
+            self.ArmSlider2 = arm2
+            Trash:Add(arm2)
         end
     end,
 
     MovingArmsThread = function(self)
         TSeaFactoryUnit.MovingArmsThread(self)
-        if not self.ArmSlider1 then return end
-        if not self.ArmSlider2 then return end
-        self.ArmSlider1:SetGoal(0, 0, 0)
-        self.ArmSlider1:SetSpeed(40)
-        self.ArmSlider2:SetGoal(30, 0, 0)
-        self.ArmSlider2:SetSpeed(40)
-        WaitFor(self.ArmSlider1)
+        local arm1 = self.ArmSlider1
+        local arm2 = self.ArmSlider2
+
+        if not arm1 then return end
+        if not arm2 then return end
+        arm1:SetGoal(0, 0, 0)
+        arm1:SetSpeed(40)
+        arm2:SetGoal(30, 0, 0)
+        arm2:SetSpeed(40)
+        WaitFor(arm1)
         while true do
-            self.ArmSlider1:SetGoal(15, 0, 0)
-            self.ArmSlider1:SetSpeed(40)
-            self.ArmSlider2:SetGoal(15, 0, 0)
-            self.ArmSlider2:SetSpeed(40)
-            WaitFor(self.ArmSlider1)
-            WaitFor(self.ArmSlider2)
-            self.ArmSlider1:SetGoal(0, 0, 0)
-            self.ArmSlider1:SetSpeed(40)
-            self.ArmSlider2:SetGoal(30, 0, 0)
-            self.ArmSlider2:SetSpeed(40)
-            WaitFor(self.ArmSlider1)
-            WaitFor(self.ArmSlider2)
+            arm1:SetGoal(15, 0, 0)
+            arm1:SetSpeed(40)
+            arm2:SetGoal(15, 0, 0)
+            arm2:SetSpeed(40)
+            WaitFor(arm1)
+            WaitFor(arm2)
+            arm1:SetGoal(0, 0, 0)
+            arm1:SetSpeed(40)
+            arm2:SetGoal(30, 0, 0)
+            arm2:SetSpeed(40)
+            WaitFor(arm1)
+            WaitFor(arm2)
         end
     end,
 
     StopArmsMoving = function(self)
         TSeaFactoryUnit.StopArmsMoving(self)
-        if not self.ArmSlider1 then return end
-        if not self.ArmSlider2 then return end
-        self.ArmSlider1:SetGoal(0, 0, 0)
-        self.ArmSlider2:SetGoal(0, 0, 0)
-        self.ArmSlider1:SetSpeed(40)
-        self.ArmSlider2:SetSpeed(40)
+        local arm1 = self.ArmSlider1
+        local arm2 = self.ArmSlider2
+
+        if not arm1 then return end
+        if not arm2 then return end
+        arm1:SetGoal(0, 0, 0)
+        arm2:SetGoal(0, 0, 0)
+        arm1:SetSpeed(40)
+        arm2:SetSpeed(40)
     end,
 
 

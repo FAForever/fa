@@ -154,8 +154,8 @@ UnitBlueprint {
     Intel = {
         RadarStealth = true,
         RadarStealthField = true,
-        RadarStealthFieldRadius = 20,
-        SonarStealthFieldRadius = 20,
+        RadarStealthFieldRadius = 23,
+        SonarStealthFieldRadius = 23,
         VisionRadius = 16,
     },
     Interface = {

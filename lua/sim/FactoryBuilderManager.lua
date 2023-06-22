@@ -13,8 +13,6 @@ local Builder = import("/lua/sim/builder.lua")
 
 local TableGetn = table.getn
 
-
-
 ---@class FactoryBuilderManager : BuilderManager
 ---@field Location Vector
 ---@field Radius number
@@ -473,7 +471,10 @@ FactoryBuilderManager = Class(BuilderManager) {
                 factory.Trash:Destroy()
 				return self:FactoryDestroyed(factory)
 			end
-		end
+		elseif self.Brain.TransportRequested and EntityCategoryContains(categories.TRANSPORTFOCUS - categories.uea0203, finishedUnit ) then
+            self.Brain.TransportRequested = nil
+            finishedUnit:ForkThread( import('/lua/ai/transportutilities.lua').AssignTransportToPool, finishedUnit:GetAIBrain() )
+        end
         self:AssignBuildOrder(factory, factory.BuilderManagerData.BuilderType)
     end,
 

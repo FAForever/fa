@@ -552,6 +552,7 @@ TPodTowerUnit = ClassUnit(TStructureUnit) {
     ---@param attachee Unit
     OnTransportAttach = function(self, bone, attachee)
         attachee:SetDoNotTarget(true)
+        
         self:PlayUnitSound('Close')
         self:RequestRefreshUI()
         local PodPresent = 0
@@ -576,6 +577,8 @@ TPodTowerUnit = ClassUnit(TStructureUnit) {
     ---@param bone Bone
     ---@param attachee Unit
     OnTransportDetach = function(self, bone, attachee)
+        attachee:SetDoNotTarget(false)
+
         self:PlayUnitSound('Open')
         self:RequestRefreshUI()
         if not self.OpeningAnimationStarted then

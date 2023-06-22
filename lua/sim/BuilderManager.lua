@@ -17,14 +17,6 @@ local ForkThread = ForkThread
 
 local BuilderCache = { }
 
----@alias LocationType
---- can only be applied to the main base
---- | 'MAIN'
---- can be applied by any base
---- | 'LocationType'
---- name of expansion marker of the base
---- | string
-
 ---@param a Builder
 ---@param b Builder
 local function BuilderSortLambda(a, b)
@@ -74,6 +66,7 @@ BuilderManager = ClassSimple {
         self.Active = false
         self.NumBuilders = 0
         self:SetEnabled(true)
+        self:ForkThread(self.DebugThread)
     end,
 
     ---@param self BuilderManager
@@ -226,14 +219,23 @@ BuilderManager = ClassSimple {
             end
         end
 
-        -- only one candidate
+        -- only one builder found
+        local candidate
         if candidateNext == 2 then
-            return candidates[1]
+            candidate = candidates[1]
 
-        -- multiple candidates, choose one at random
+        -- multiple builders found
         elseif candidateNext > 2 then
-            return candidates[Random(1, candidateNext - 1)]
+            candidate = candidates[Random(1, candidateNext - 1)]
         end
+
+        -- apply the builder delay
+        if candidate and candidate.DelayEqualBuildPlattons then
+            local delay = candidate.DelayEqualBuildPlattons
+            self.Brain.DelayEqualBuildPlattons[delay[1]] = GetGameTimeSeconds() + delay[2]
+        end
+
+        return candidate
     end,
 
     --- Returns true if the given builders matches the manager-specific parameters
@@ -293,7 +295,6 @@ BuilderManager = ClassSimple {
             local PlatoonName = specs[1] --[[@as string]]
             local timeThreshold = self.Brain.DelayEqualBuildPlattons[PlatoonName]
             if (not timeThreshold) or (timeThreshold < CheckDelayTime) then
-                self.Brain.DelayEqualBuildPlattons[PlatoonName] = CheckDelayTime + specs[2]
                 return false
             else
                 return true
@@ -418,6 +419,47 @@ BuilderManager = ClassSimple {
     ---@param interval number
     SetCheckInterval = function(self, interval)
         self.BuildCheckInterval = interval
+    end,
+
+    --------------------------------------------------------------------------------------------
+    -- unit events
+
+    --- Called by a unit as it starts being built
+    ---@param self BuilderManager
+    ---@param unit Unit
+    OnUnitStartBeingBuilt = function(self, unit)
+    end,
+
+    --- Called by a unit as it is finished being built
+    ---@param self BuilderManager
+    ---@param unit Unit
+    OnUnitStopBeingBuilt = function(self, unit)
+    end,
+
+    --- Called by a unit as it is destroyed
+    ---@param self BuilderManager
+    ---@param unit Unit
+    OnUnitDestroyed = function(self, unit)
+    end,
+
+    --- Called by a unit as it starts building
+    ---@param self BuilderManager
+    ---@param unit Unit
+    ---@param built Unit
+    OnUnitStartBuilding = function(self, unit, built)
+    end,
+
+    --- Called by a unit as it stops building
+    ---@param self BuilderManager
+    ---@param unit Unit
+    ---@param built Unit
+    OnUnitStopBuilding = function(self, unit, built)
+    end,
+
+    --------------------------------------------------------------------------------------------
+    --- debug functionality
+
+    DebugThread = function(self)
     end,
 
     --------------------------------------------------------------------------------------------

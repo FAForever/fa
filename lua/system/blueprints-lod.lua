@@ -10,11 +10,11 @@ local function CalculateLODOfProp(prop)
     -- give more emphasis to the x / z value as that is easier to see in the average camera angle
     local weighted = 0.40 * sx + 0.2 * sy + 0.4 * sz
     if prop.ScriptClass == 'Tree' or prop.ScriptClass == 'TreeGroup' then
-        weighted = 3
+        weighted = 2.6
     end
 
     -- https://www.desmos.com/calculator (1.1 * sqrt(100 * 500 * x))
-    local lod = 1.10 * MathSqrt(100 * 500 * weighted)
+    local lod = 0.9 * MathSqrt(100 * 500 * weighted)
 
     if prop.Display and prop.Display.Mesh and prop.Display.Mesh.LODs then
         local n = table.getn(prop.Display.Mesh.LODs)
@@ -23,7 +23,7 @@ local function CalculateLODOfProp(prop)
 
             -- https://www.desmos.com/calculator (x * x)
             local factor = (k / n) * (k / n)
-            local LODCutoff = factor * lod + 50
+            local LODCutoff = factor * lod + 10
             -- LOG(string.format("(%s) / %d: %d -> %d", unit.BlueprintId, k, data.LODCutoff, LODCutoff))
             data.LODCutoff = LODCutoff
         end
@@ -53,7 +53,7 @@ local function CalculateLODOfUnit(unit)
 
             -- https://www.desmos.com/calculator (x * x)
             local factor = (lk / ln) * (lk / ln)
-            local LODCutoff = factor * lod + 50
+            local LODCutoff = factor * lod + 40
             -- LOG(string.format("(%s) / %d: %d -> %d", unit.BlueprintId, k, data.LODCutoff, LODCutoff))
             data.LODCutoff = LODCutoff
         end

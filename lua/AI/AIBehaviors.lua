@@ -38,6 +38,8 @@ function CDRRunAway(aiBrain, cdr)
             local runSpot, prevSpot
             local plat = aiBrain:MakePlatoon('', '')
             aiBrain:AssignUnitsToPlatoon(plat, {cdr}, 'support', 'None')
+            cdr.PlatoonHandle = plat
+            cdr.PlatoonHandle.BuilderName = 'CDRRunAway'
             repeat
                 if canTeleport then
                     runSpot = AIUtils.AIFindDefensiveArea(aiBrain, cdr, category, 10000)
@@ -104,6 +106,7 @@ function CDROverCharge(aiBrain, cdr)
         and ScenarioInfo.ArmySetup[aiBrain.Name].AIPersonality ~= 'turtle'
         and ScenarioInfo.ArmySetup[aiBrain.Name].AIPersonality ~= 'defense'
         and ScenarioInfo.ArmySetup[aiBrain.Name].AIPersonality ~= 'rushnaval'
+        and not cdr.Initializing
         then
         maxRadius = 256
     end
@@ -130,6 +133,8 @@ function CDROverCharge(aiBrain, cdr)
         end
         local plat = aiBrain:MakePlatoon('', '')
         aiBrain:AssignUnitsToPlatoon(plat, {cdr}, 'support', 'None')
+        cdr.PlatoonHandle = plat
+        cdr.PlatoonHandle.BuilderName = 'CDROverCharge'
         plat:Stop()
         local priList = {
             categories.EXPERIMENTAL,
@@ -231,7 +236,9 @@ function CDROverCharge(aiBrain, cdr)
                 continueFighting = false
             end
         until not continueFighting or not aiBrain:PlatoonExists(plat)
-
+        if cdr.Initializing then
+            cdr.Initializing = false
+        end
         IssueClearCommands({cdr})
     end
 end
@@ -251,9 +258,11 @@ function CDRReturnHome(aiBrain, cdr)
     local cdrPos = cdr:GetPosition()
     local distSqAway = 1600
     local loc = cdr.CDRHome
-    if not cdr.Dead and VDist2Sq(cdrPos[1], cdrPos[3], loc[1], loc[3]) > distSqAway then
+    if not cdr.Initializing and not cdr.Dead and VDist2Sq(cdrPos[1], cdrPos[3], loc[1], loc[3]) > distSqAway then
         local plat = aiBrain:MakePlatoon('', '')
         aiBrain:AssignUnitsToPlatoon(plat, {cdr}, 'support', 'None')
+        cdr.PlatoonHandle = plat
+        cdr.PlatoonHandle.BuilderName = 'CDRReturnHome'
         repeat
             CDRRevertPriorityChange(aiBrain, cdr)
             if not aiBrain:PlatoonExists(plat) then
@@ -357,7 +366,7 @@ function CommanderThreadImproved(cdr, platoon)
         end
 
         -- Call platoon resume building deal...
-        if not cdr.Dead and cdr:IsIdleState() and not cdr.GoingHome and not cdr:IsUnitState("Moving")
+        if not cdr.Initializing and not cdr.Dead and cdr:IsIdleState() and not cdr.GoingHome and not cdr:IsUnitState("Moving")
         and not cdr:IsUnitState("Building") and not cdr:IsUnitState("Guarding")
         and not cdr:IsUnitState("Attacking") and not cdr:IsUnitState("Repairing")
         and not cdr:IsUnitState("Upgrading") and not cdr:IsUnitState("Enhancing")
@@ -368,8 +377,8 @@ function CommanderThreadImproved(cdr, platoon)
                 if cdr.PlatoonHandle then
                     local platoonUnits = cdr.PlatoonHandle:GetPlatoonUnits() or 1
                     -- only disband the platton if we have 1 unit, plan and buildername. (NEVER disband the armypool platoon!!!)
-                    if table.getn(platoonUnits) == 1 and cdr.PlatoonHandle.PlanName and cdr.PlatoonHandle.BuilderName then
-                        --SPEW('ACU PlatoonHandle found. Plan: '..cdr.PlatoonHandle.PlanName..' - Builder '..cdr.PlatoonHandle.BuilderName..'. Disbanding CDR platoon!')
+                    if table.getn(platoonUnits) == 1 and (not cdr.PlatoonHandle.ArmyPool) and cdr.PlatoonHandle.BuilderName then
+                        --SPEW('ACU PlatoonHandle found. Builder '..cdr.PlatoonHandle.BuilderName..'. Disbanding CDR platoon!')
                         cdr.PlatoonHandle:PlatoonDisband()
                     end
                 end

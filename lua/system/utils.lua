@@ -394,6 +394,21 @@ function table.reverse(t)
     return r
 end
 
+--- Combines a series of tables into one table. Returns a new table. The parameters are merged into the new table in order
+---@see `table.assimilate`
+---@param ... table[]
+---@return table
+function table.combine(...)
+    local combined = { }
+    for k = 1, arg.n do
+        for key, value in arg[k] do
+            combined[key] = value
+        end
+    end
+
+    return combined
+end
+
 --- Converts hash table to a new table with keys from 1 to size of table and the same values
 --- it is useful for preparing hash table before sorting its values
 --- table.indexize { [a] = 'one', [b] = 'two', [c] = 'three' } =>

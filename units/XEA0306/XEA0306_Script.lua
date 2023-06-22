@@ -4,7 +4,6 @@
 -- Summary  :  UEF Heavy Air Transport Script
 -- Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
-
 local explosion = import("/lua/defaultexplosions.lua")
 local util = import("/lua/utilities.lua")
 local WeaponsFile = import("/lua/terranweapons.lua")
@@ -15,7 +14,8 @@ local TDFHeavyPlasmaCannonWeapon = TWeapons.TDFHeavyPlasmaCannonWeapon
 
 ---@class XEA0306 : AirTransport
 XEA0306 = ClassUnit(AirTransport) {
-    AirDestructionEffectBones = {'FrontRight_Engine_Exhaust','FrontLeft_Engine_Exhaust','BackRight_Engine_Exhaust','BackLeft_Engine_Exhaust'},
+    AirDestructionEffectBones = { 'FrontRight_Engine_Exhaust', 'FrontLeft_Engine_Exhaust', 'BackRight_Engine_Exhaust',
+        'BackLeft_Engine_Exhaust' },
 
     ShieldEffects = {
         '/effects/emitters/terran_shield_generator_mobile_01_emit.bp',
@@ -34,7 +34,7 @@ XEA0306 = ClassUnit(AirTransport) {
         PlasmaRight = ClassWeapon(TDFHeavyPlasmaCannonWeapon) {},
     },
 
-    EngineRotateBones = {'FrontRight_Engine', 'FrontLeft_Engine', 'BackRight_Engine', 'BackLeft_Engine', },
+    EngineRotateBones = { 'FrontRight_Engine', 'FrontLeft_Engine', 'BackRight_Engine', 'BackLeft_Engine', },
 
     OnCreate = function(self)
         AirTransport.OnCreate(self)
@@ -44,8 +44,8 @@ XEA0306 = ClassUnit(AirTransport) {
         self.UnfoldAnim:SetRate(0)
     end,
 
-    OnStopBeingBuilt = function(self,builder,layer)
-        AirTransport.OnStopBeingBuilt(self,builder,layer)
+    OnStopBeingBuilt = function(self, builder, layer)
+        AirTransport.OnStopBeingBuilt(self, builder, layer)
         self.EngineManipulators = {}
 
         self.UnfoldAnim:SetRate(1)
@@ -56,7 +56,7 @@ XEA0306 = ClassUnit(AirTransport) {
         end
 
         -- set up the thursting arcs for the engines
-        for keys,values in self.EngineManipulators do
+        for keys, values in self.EngineManipulators do
             --                      XMAX,XMIN,YMAX,YMIN,ZMAX,ZMIN, TURNMULT, TURNSPEED
             values:SetThrustingParam(-0.25, 0.25, -0.75, 0.75, -0.0, 0.0, 1.0, 0.25)
         end
@@ -64,7 +64,7 @@ XEA0306 = ClassUnit(AirTransport) {
         self.LandingAnimManip = CreateAnimator(self)
         self.LandingAnimManip:SetPrecedence(0)
         self.Trash:Add(self.LandingAnimManip)
-        self.LandingAnimManip:PlayAnim(self:GetBlueprint().Display.AnimationLand):SetRate(1)
+        self.LandingAnimManip:PlayAnim(self.Blueprint.Display.AnimationLand):SetRate(1)
     end,
 
     -- When a unit attaches or detaches, tell the shield about it.
@@ -103,13 +103,14 @@ XEA0306 = ClassUnit(AirTransport) {
     AirDestructionEffectsThread = function(self)
         local numExplosions = math.floor(table.getn(self.AirDestructionEffectBones) * 0.5)
         for i = 0, numExplosions do
-            explosion.CreateDefaultHitExplosionAtBone(self, self.AirDestructionEffectBones[util.GetRandomInt(1, numExplosions)], 0.5)
+            explosion.CreateDefaultHitExplosionAtBone(self,
+                self.AirDestructionEffectBones[util.GetRandomInt(1, numExplosions)], 0.5)
             WaitSeconds(util.GetRandomFloat(0.2, 0.9))
         end
     end,
 
     GetUnitSizes = function(self)
-        local bp = self:GetBlueprint()
+        local bp = self.Blueprint
         if self:GetFractionComplete() < 1.0 then
             return bp.SizeX, bp.SizeY, bp.SizeZ * 0.5
         else
