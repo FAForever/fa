@@ -133,8 +133,10 @@ function OnSelectionSetChanged(name, units, applied)
                     Selection.FactorySelection(self.name)
                 elseif event.Modifiers.Shift then
                     Selection.AppendSetToSelection(self.name)
-                else
-                    Selection.ApplySelectionSet(self.name)
+                elseif event.KeyCode == 1 then
+					Selection.ApplySelectionSet(self.name)
+				elseif event.KeyCode == 3 then
+					Selection.AppendSelectionSet(self.name)
                 end
             end
         end
