@@ -224,7 +224,7 @@ function CreateUI(isReplay)
 
     ConExecute("Cam_Free off")
 
-    -- UI assets should be loaded fast into memory to prevent stutter
+    -- load it all fast to prevent stutters
     ConExecute('res_AfterPrefetchDelay 2')
     ConExecute('res_PrefetcherActivityDelay 1')
 
