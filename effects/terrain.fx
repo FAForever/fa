@@ -1783,7 +1783,7 @@ float4 splatLerp(float4 t1, float4 t2, float t2height, float opacity, uniform fl
     return (t1 * factor1 + t2 * factor2) / (factor1 + factor2);
 }
 
-float4 splatBlendNormal(float4 n1, float4 n2, float t2height, float opacity, uniform float blurriness = 0.2) {
+float3 splatBlendNormal(float3 n1, float3 n2, float t2height, float opacity, uniform float blurriness = 0.2) {
     float height1 = 1 + blurriness;
     float height2 = t2height + opacity;
     float ma = max(height1, height2) - blurriness;
@@ -1794,7 +1794,8 @@ float4 splatBlendNormal(float4 n1, float4 n2, float t2height, float opacity, uni
     // The value of 0.5 is just eyeballed.
     float factor1modified = pow(factor1 / (factor1 + factor2), 0.5);
     float factor2modified = pow(factor2 / (factor1 + factor2), 0.5);
-    return normalize(float4((n1.xy * factor1modified + n2.xy * factor2modified), n1.z, 0));
+    // UDN blending
+    return normalize(float3((n1.xy * factor1modified + n2.xy * factor2modified), n1.z));
 }
 
 /* # Sample a 2D 2x2 texture atlas # */
@@ -1805,11 +1806,11 @@ float4 atlas2D(sampler2D s, float2 uv, uniform float2 offset) {
     return tex2D(s, uv);
 }
 
-float4 sampleNormal(sampler2D s, float2 position, uniform float2 scale, float mask) {
+float3 sampleNormal(sampler2D s, float2 position, uniform float2 scale, float mask) {
     // 30° rotation
     float2x2 rotationMatrix = float2x2(float2(0.866, -0.5), float2(0.5, 0.866));
-    float4 normal = tex2D(s, position * scale);
-    float4 normalRotated = tex2D(s, mul(position, rotationMatrix) * scale);
+    float3 normal = tex2D(s, position * scale).rgb;
+    float3 normalRotated = tex2D(s, mul(position, rotationMatrix) * scale).rgb;
     return splatBlendNormal(normalize(2 * normal - 1), normalize(2 * normalRotated - 1), 0.5, mask, 0.03);
 }
 
@@ -1856,14 +1857,13 @@ float sampleHeight(float2 position, uniform float2 nearScale, uniform float2 far
 }
 
 float sampleHeight(float2 position, uniform float2 nearScale, uniform float2 farScale, uniform float2 offset, uniform bool firstBatch) {
-    float2 heightsNear = atlas2D(Stratum7AlbedoSampler, position * nearScale, offset).xz;
     float heightNear;
     float heightFar;
     if (firstBatch) {
-        heightNear = heightsNear.x;
+        heightNear = atlas2D(Stratum7AlbedoSampler, position * nearScale, offset).x;
         heightFar = atlas2D(Stratum7AlbedoSampler, position * farScale, offset).x;
     } else {
-        heightNear = heightsNear.y;
+        heightNear = atlas2D(Stratum7AlbedoSampler, position * nearScale, offset).z;
         heightFar = atlas2D(Stratum7AlbedoSampler, position * farScale, offset).z;
     }
     return (heightNear + heightFar) / 2;
@@ -1954,13 +1954,13 @@ float4 TerrainPBRNormalsPS ( VS_OUTPUT inV ) : COLOR
     float4 mask1 = tex2D(UtilitySamplerB, position.xy);
     float rotationMask = tex2D(UpperAlbedoSampler, position.xy * 7).w;
 
-    float4 lowerNormal    = sampleNormal(LowerNormalSampler,    position.xy, LowerAlbedoTile.xy,    rotationMask);
-    float4 stratum0Normal = sampleNormal(Stratum0NormalSampler, position.xy, Stratum0AlbedoTile.xy, rotationMask);
-    float4 stratum1Normal = sampleNormal(Stratum1NormalSampler, position.xy, Stratum1AlbedoTile.xy, rotationMask);
-    float4 stratum2Normal = sampleNormal(Stratum2NormalSampler, position.xy, Stratum2AlbedoTile.xy, rotationMask);
-    float4 stratum4Normal = sampleNormal(Stratum4NormalSampler, position.xy, Stratum4AlbedoTile.xy, rotationMask);
-    float4 stratum5Normal = sampleNormal(Stratum5NormalSampler, position.xy, Stratum5AlbedoTile.xy, rotationMask);
-    float4 stratum6Normal = sampleNormal(Stratum6NormalSampler, position.xy, Stratum6AlbedoTile.xy, rotationMask);
+    float3 lowerNormal    = sampleNormal(LowerNormalSampler,    position.xy, LowerAlbedoTile.xy,    rotationMask);
+    float3 stratum0Normal = sampleNormal(Stratum0NormalSampler, position.xy, Stratum0AlbedoTile.xy, rotationMask);
+    float3 stratum1Normal = sampleNormal(Stratum1NormalSampler, position.xy, Stratum1AlbedoTile.xy, rotationMask);
+    float3 stratum2Normal = sampleNormal(Stratum2NormalSampler, position.xy, Stratum2AlbedoTile.xy, rotationMask);
+    float3 stratum4Normal = sampleNormal(Stratum4NormalSampler, position.xy, Stratum4AlbedoTile.xy, rotationMask);
+    float3 stratum5Normal = sampleNormal(Stratum5NormalSampler, position.xy, Stratum5AlbedoTile.xy, rotationMask);
+    float3 stratum6Normal = sampleNormal(Stratum6NormalSampler, position.xy, Stratum6AlbedoTile.xy, rotationMask);
 
     float stratum0Height = sampleHeight(position.xy, Stratum0AlbedoTile.xy, Stratum0NormalTile.xy, float2(0.5, 0.0), rotationMask, true);
     float stratum1Height = sampleHeight(position.xy, Stratum1AlbedoTile.xy, Stratum1NormalTile.xy, float2(0.0, 0.5), rotationMask, true);
@@ -1969,14 +1969,14 @@ float4 TerrainPBRNormalsPS ( VS_OUTPUT inV ) : COLOR
     float stratum5Height = sampleHeight(position.xy, Stratum5AlbedoTile.xy, Stratum5NormalTile.xy, float2(0.0, 0.5), rotationMask, false);
     float stratum6Height = sampleHeight(position.xy, Stratum6AlbedoTile.xy, Stratum6NormalTile.xy, float2(0.5, 0.5), rotationMask, false);
 
-    float4 stratum3NormalXZ = normalize(tex2D(Stratum3NormalSampler, position.xz * Stratum3AlbedoTile.xy) * 2 - 1);
-    float4 stratum3NormalYZ = normalize(tex2D(Stratum3NormalSampler, position.yz * Stratum3AlbedoTile.xy) * 2 - 1);
+    float3 stratum3NormalXZ = normalize(tex2D(Stratum3NormalSampler, position.xz * Stratum3AlbedoTile.xy).rgb * 2 - 1);
+    float3 stratum3NormalYZ = normalize(tex2D(Stratum3NormalSampler, position.yz * Stratum3AlbedoTile.xy).rgb * 2 - 1);
     float2 blendWeights = pow(abs(lowerNormal.xy), 3);
     blendWeights = blendWeights / (blendWeights.x + blendWeights.y);
-    float4 stratum3Normal = stratum3NormalYZ * blendWeights.x + stratum3NormalXZ * blendWeights.y;
+    float3 stratum3Normal = stratum3NormalYZ * blendWeights.x + stratum3NormalXZ * blendWeights.y;
     float stratum3Height =  blendHeight(position, blendWeights, inV.nearScales.ww, inV.farScales.ww, float2(0.0, 0.0), false);
 
-    float4 normal = lowerNormal;
+    float3 normal = lowerNormal;
     normal = splatBlendNormal(normal, stratum0Normal, stratum0Height, mask0.x);
     normal = splatBlendNormal(normal, stratum1Normal, stratum1Height, mask0.y);
     normal = splatBlendNormal(normal, stratum2Normal, stratum2Height, mask0.z);
@@ -2193,14 +2193,14 @@ float4 Terrain002NormalsPS ( VS_OUTPUT inV ) : COLOR
     float4 mask0 = tex2D(UtilitySamplerA, position.xy);
     float4 mask1 = tex2D(UtilitySamplerB, position.xy);
 
-    float4 lowerNormal    = normalize(tex2D(LowerNormalSampler,    position.xy * LowerAlbedoTile.xy   ) * 2 - 1);
-    float4 stratum0Normal = normalize(tex2D(Stratum0NormalSampler, position.xy * Stratum0AlbedoTile.xy) * 2 - 1);
-    float4 stratum1Normal = normalize(tex2D(Stratum1NormalSampler, position.xy * Stratum1AlbedoTile.xy) * 2 - 1);
-    float4 stratum2Normal = normalize(tex2D(Stratum2NormalSampler, position.xy * Stratum2AlbedoTile.xy) * 2 - 1);
-    float4 stratum3Normal = normalize(tex2D(Stratum3NormalSampler, position.xy * Stratum3AlbedoTile.xy) * 2 - 1);
-    float4 stratum4Normal = normalize(tex2D(Stratum4NormalSampler, position.xy * Stratum4AlbedoTile.xy) * 2 - 1);
-    float4 stratum5Normal = normalize(tex2D(Stratum5NormalSampler, position.xy * Stratum5AlbedoTile.xy) * 2 - 1);
-    float4 stratum6Normal = normalize(tex2D(Stratum6NormalSampler, position.xy * Stratum6AlbedoTile.xy) * 2 - 1);
+    float3 lowerNormal    = normalize(tex2D(LowerNormalSampler,    position.xy * LowerAlbedoTile.xy   ).rgb * 2 - 1);
+    float3 stratum0Normal = normalize(tex2D(Stratum0NormalSampler, position.xy * Stratum0AlbedoTile.xy).rgb * 2 - 1);
+    float3 stratum1Normal = normalize(tex2D(Stratum1NormalSampler, position.xy * Stratum1AlbedoTile.xy).rgb * 2 - 1);
+    float3 stratum2Normal = normalize(tex2D(Stratum2NormalSampler, position.xy * Stratum2AlbedoTile.xy).rgb * 2 - 1);
+    float3 stratum3Normal = normalize(tex2D(Stratum3NormalSampler, position.xy * Stratum3AlbedoTile.xy).rgb * 2 - 1);
+    float3 stratum4Normal = normalize(tex2D(Stratum4NormalSampler, position.xy * Stratum4AlbedoTile.xy).rgb * 2 - 1);
+    float3 stratum5Normal = normalize(tex2D(Stratum5NormalSampler, position.xy * Stratum5AlbedoTile.xy).rgb * 2 - 1);
+    float3 stratum6Normal = normalize(tex2D(Stratum6NormalSampler, position.xy * Stratum6AlbedoTile.xy).rgb * 2 - 1);
 
     float stratum0Height = sampleHeight(position, Stratum0AlbedoTile, Stratum0NormalTile, float2(0.5, 0.0), true);
     float stratum1Height = sampleHeight(position, Stratum1AlbedoTile, Stratum1NormalTile, float2(0.0, 0.5), true);
@@ -2210,7 +2210,7 @@ float4 Terrain002NormalsPS ( VS_OUTPUT inV ) : COLOR
     float stratum5Height = sampleHeight(position, Stratum5AlbedoTile, Stratum5NormalTile, float2(0.0, 0.5), false);
     float stratum6Height = sampleHeight(position, Stratum6AlbedoTile, Stratum6NormalTile, float2(0.5, 0.5), false);
 
-    float4 normal = lowerNormal;
+    float3 normal = lowerNormal;
     normal = splatBlendNormal(normal, stratum0Normal, stratum0Height, mask0.x);
     normal = splatBlendNormal(normal, stratum1Normal, stratum1Height, mask0.y);
     normal = splatBlendNormal(normal, stratum2Normal, stratum2Height, mask0.z);
