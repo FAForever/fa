@@ -1756,7 +1756,7 @@ AIBrain = Class(StandardBrain) {
 
         -- register unit at managers of base
         local managers = self.BuilderManagers[nearestBaseIdentifier]
-        if managers then
+        if managers and managers.EngineerManager then
             managers.EngineerManager:OnUnitStartBeingBuilt(unit, builder, layer)
         end
     end,
@@ -1776,7 +1776,7 @@ AIBrain = Class(StandardBrain) {
         end
 
         local managers = self.BuilderManagers[baseIdentifier]
-        if managers then
+        if managers and managers.EngineerManager then
             managers.EngineerManager:OnUnitStopBeingBuilt(unit, builder, layer)
         end
     end,
@@ -1793,7 +1793,7 @@ AIBrain = Class(StandardBrain) {
         end
 
         local managers = self.BuilderManagers[baseIdentifier]
-        if managers then
+        if managers and managers.EngineerManager then
             managers.EngineerManager:OnUnitStopBeingBuilt(unit)
         end
     end,
@@ -1811,7 +1811,7 @@ AIBrain = Class(StandardBrain) {
         end
 
         local managers = self.BuilderManagers[baseIdentifier]
-        if managers then
+        if managers and managers.EngineerManager then
             managers.EngineerManager:OnUnitStartBuilding(unit)
         end
     end,
@@ -1829,7 +1829,7 @@ AIBrain = Class(StandardBrain) {
         end
 
         local managers = self.BuilderManagers[baseIdentifier]
-        if managers then
+        if managers and managers.EngineerManager then
             managers.EngineerManager:OnUnitStopBuilding(unit)
         end
     end,
