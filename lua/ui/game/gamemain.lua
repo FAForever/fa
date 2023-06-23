@@ -148,6 +148,7 @@ function OnFirstUpdate()
 end
 
 function CreateUI(isReplay)
+
     -- overwrite some globals for performance / safety
 
     import("/lua/ui/override/exit.lua")
@@ -212,7 +213,39 @@ function CreateUI(isReplay)
     OriginalFocusArmy = focusArmy
 
     ConExecute("Cam_Free off")
+
+    -- load it all fast to prevent stutters
+    ConExecute('res_AfterPrefetchDelay 2')
+    ConExecute('res_PrefetcherActivityDelay 1')
+
     local prefetchTable = { models = {}, anims = {}, d3d_textures = {}, batch_textures = {} }
+
+    prefetchTable.batch_textures = table.concatenate(
+        DiskFindFiles("/textures/ui", "*.dds")
+    )
+
+    prefetchTable.d3d_textures = table.concatenate(
+        DiskFindFiles("/textures/particles", "*.dds"),
+        DiskFindFiles("/textures/effects", "*.dds"),
+        DiskFindFiles("/projectiles", "*.dds"),
+        DiskFindFiles("/meshes/", "*.dds")
+    )
+
+    prefetchTable.models = table.concatenate(
+        DiskFindFiles("/projectiles", "*.scm"),
+        DiskFindFiles("/meshes/", "*.scm")
+    )
+
+    prefetchTable.anims = table.concatenate(
+        DiskFindFiles("/units/", "*.sca")
+    )
+
+    SPEW(string.format("Preloading %d batch textures", table.getn(prefetchTable.batch_textures)))
+    SPEW(string.format("Preloading %d d3d textures", table.getn(prefetchTable.d3d_textures)))
+    SPEW(string.format("Preloading %d models", table.getn(prefetchTable.models)))
+    SPEW(string.format("Preloading %d animations", table.getn(prefetchTable.anims)))
+
+    Prefetcher:Update(prefetchTable)
 
     -- Set up our layout change function
     UIUtil.changeLayoutFunction = SetLayout
@@ -221,8 +254,6 @@ function CreateUI(isReplay)
     if focusArmy >= 1 then
         LocGlobals.PlayerName = GetArmiesTable().armiesTable[focusArmy].nickname
     end
-
-    GameCommon.InitializeUnitIconBitmaps(prefetchTable.batch_textures)
 
     controls.gameParent = UIUtil.CreateScreenGroup(GetFrame(0), "GameMain ScreenGroup")
     gameParent = controls.gameParent
@@ -295,11 +326,6 @@ function CreateUI(isReplay)
         end
         return false
     end
-
-    Prefetcher:Update(prefetchTable)
-    -- UI assets should be loaded fast into memory to prevent stutter
-    ConExecute('res_AfterPrefetchDelay 100')
-    ConExecute('res_PrefetcherActivityDelay 1')
 
     if SessionIsReplay() then
         ForkThread(SendChat)
