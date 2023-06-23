@@ -705,9 +705,6 @@ VeterancyComponent = ClassSimple {
         self:AddVetExperience(massKilled, noLimit)
     end,
 
-    -- kept for backwards compatibility with mods, but should really not be used anymore
-
-    ---@deprecated
     ---@param self Unit | VeterancyComponent
     ---@param unitThatIsDying Unit
     OnKilledUnit = function (self, unitThatIsDying, experience)
@@ -720,6 +717,8 @@ VeterancyComponent = ClassSimple {
             self:AddVetExperience(vetWorth, false)
         end
     end,
+
+    -- kept for backwards compatibility with mods, but should really not be used anymore
 
     ---@deprecated
     ---@param self Unit | VeterancyComponent
