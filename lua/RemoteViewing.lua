@@ -15,8 +15,6 @@ function RemoteViewing(SuperClass)
             SuperClass.OnCreate(self)
             local remoteViewData = {}
             self.RemoteViewingData = remoteViewData
-
-            remoteViewData = {}
             remoteViewData.RemoteViewingFunctions = {}
             remoteViewData.DisableCounter = 0
             remoteViewData.IntelButton = true
@@ -74,8 +72,7 @@ function RemoteViewing(SuperClass)
                 return
             end
 
-            if remoteViewData.VisibleLocation and remoteViewData.DisableCounter == 0 and
-                remoteViewData.IntelButton then
+            if remoteViewData.VisibleLocation and remoteViewData.DisableCounter == 0 and remoteViewData.IntelButton then
                 local bp = self.Blueprint
                 self:SetMaintenanceConsumptionActive()
                 -- Create new visible area

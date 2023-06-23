@@ -65,13 +65,6 @@ local TrashBagAdd = TrashBag.Add
 
 --- A class to managing the build bots. Make sure to call all the relevant functions.
 ---@class CConstructionTemplate
----@field Blueprint Blueprint
----@field Dead boolean
----@field BuildBots table
----@field BuildBotsNext number
----@field Trash TrashBag
----@field Army Army
----@field BuildEffectsBag TrashBag
 CConstructionTemplate = ClassSimple {
 
     --- Prepares the values required to support bots
@@ -533,7 +526,7 @@ CLandFactoryUnit = ClassUnit(LandFactoryUnit) {
 
     ---@param self CLandFactoryUnit
     ---@param unitBeingBuilt Unit
-    ---@param order any unused
+    ---@param order string unused
     CreateBuildEffects = function(self, unitBeingBuilt, order)
         if not unitBeingBuilt then return end
         WaitSeconds(0.1)

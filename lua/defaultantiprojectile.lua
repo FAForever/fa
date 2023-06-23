@@ -44,7 +44,7 @@ Flare = Class(Entity){
     --- We only divert projectiles. The flare-projectile itself will be responsible for
     --- accepting the collision and causing the hostile projectile to impact.
     ---@param self Flare
-    ---@param other Unit|UserUnit
+    ---@param other Projectile
     ---@return boolean
     OnCollisionCheck = function(self,other)
         if EntityCategoryContains(ParseEntityCategory(self.RedirectCat), other) and self.Army ~= other.Army and IsAlly(self.Army, other.Army) == false then
@@ -60,7 +60,7 @@ DepthCharge = Class(Entity) {
     ---@param self DepthCharge
     ---@param spec DepthChargeSpec
     OnCreate = function(self, spec)
-        self.Army = self.GetArmy()
+        self.Army = self:GetArmy()
         self.Owner = spec.Owner
         self.Radius = spec.Radius
         self:SetCollisionShape('Sphere', 0, 0, 0, self.Radius)
@@ -89,7 +89,7 @@ MissileRedirect = Class(Entity) {
         ---@param self MissileRedirect
         ---@param spec MissileRedirectSpec
         OnCreate = function(self, spec)
-            self.Army = self.GetArmy()
+            self.Army = self:GetArmy()
             self.Owner = spec.Owner
             self.Radius = spec.Radius
             self.RedirectRateOfFire = spec.RedirectRateOfFire or 1

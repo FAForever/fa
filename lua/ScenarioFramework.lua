@@ -31,7 +31,7 @@ local ScenarioUtils = import("/lua/sim/scenarioutilities.lua")
 local SimCamera = import("/lua/simcamera.lua").SimCamera
 local SimUIVars = import("/lua/sim/simuistate.lua")
 local TriggerFile = import("/lua/scenariotriggers.lua")
-local VizMarker = import("/lua/sim/VizMarker.lua").VizMarker
+local VizMarker = import("/lua/sim/vizmarker.lua").VizMarker
 
 Objectives = import("/lua/simobjectives.lua")
 PingGroups = import("/lua/simpinggroup.lua")
@@ -841,7 +841,7 @@ end
 ---@param pauseAtDeath? boolean
 ---@param deathTrigger? fun(self: Unit)
 ---@param enhancements? string[]
----@return Unit|nil
+---@return CommandUnit
 function SpawnCommander(brain, unit, effect, name, pauseAtDeath, deathTrigger, enhancements)
     local ACU = ScenarioUtils.CreateArmyUnit(brain, unit)
     local bp = ACU.Blueprint

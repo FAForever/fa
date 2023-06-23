@@ -43,7 +43,7 @@ UnstablePhasonLaserCollisionBeam = Class(SCCollisionBeam) {
 
     ---@param self UnstablePhasonLaserCollisionBeam
     ---@param impactType ImpactType
-    ---@param targetEntity? Prop|Unit
+    ---@param targetEntity? Projectile
     OnImpact = function(self, impactType, targetEntity)
         CollisionBeam.OnImpact(self, impactType, targetEntity)
     end,

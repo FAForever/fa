@@ -696,7 +696,7 @@ end
 -- ============ Formation Functions =============
 -- ==============================================
 ---@param formationUnits Unit[]
----@return boolean|table
+---@return table
 function AttackFormation(formationUnits)
     local cachedResults = GetCachedResults(formationUnits, 'AttackFormation')
     if cachedResults then
@@ -754,7 +754,7 @@ function AttackFormation(formationUnits)
 end
 
 ---@param formationUnits Unit[]
----@return boolean|table
+---@return table
 function GrowthFormation(formationUnits)
     local cachedResults = GetCachedResults(formationUnits, 'GrowthFormation')
     if cachedResults then

@@ -97,7 +97,7 @@ local ScorchDecalTexturesN = TableGetn(ScorchDecalTextures)
 ---@return number
 ---@return number
 function GetUnitSizes(unit)
-    local bp = unit.Blueprint
+    local bp = unit.Blueprint or unit:GetBlueprint()
     return bp.SizeX or 0, bp.SizeY or 0, bp.SizeZ or 0
 end
 

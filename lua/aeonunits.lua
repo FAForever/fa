@@ -27,7 +27,6 @@ local CreateAeonFactoryBuildingEffects = EffectUtil.CreateAeonFactoryBuildingEff
 --  FACTORIES
 ---------------------------------------------------------------
 ---@class AFactoryUnit : FactoryUnit
----@field BuildEffectsBag TrashBag
 AFactoryUnit = ClassUnit(FactoryUnit) {
 
     ---@param self AFactoryUnit

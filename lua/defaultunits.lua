@@ -653,7 +653,7 @@ StructureUnit = ClassUnit(Unit) {
 
     ---comment
     ---@param self StructureUnit
-    ---@param unitBeingBuilt boolean
+    ---@param unitBeingBuilt Unit
     ---@param order string
     StartBuildingEffects = function(self, unitBeingBuilt, order)
         Unit.StartBuildingEffects(self, unitBeingBuilt, order)
