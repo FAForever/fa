@@ -393,8 +393,8 @@ local TechToDuration = {
 local TechToLOD = {
     TECH1 = 120,
     TECH2 = 140,
-    TECH3 = 180,
-    EXPERIMENTAL = 220,
+    TECH3 = 160,
+    EXPERIMENTAL = 200,
 }
 
 ---@class TreadComponent
