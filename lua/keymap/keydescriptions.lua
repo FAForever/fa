@@ -154,6 +154,7 @@ keyDescriptions = {
     ['rename'] = '<LOC key_desc_0064>Rename the selected unit',
     ['goto_engineer'] = '<LOC key_desc_0066>Go to the nearest idle Engineer',
     ['select_idle_engineer'] = '<LOC key_desc_0067>Select the nearest idle Engineer',
+    ['select_idle_t1_engineer'] = '<LOC key_desc_0067>Select the nearest idle tech 1 Engineer',
     ['cycle_engineers'] = '<LOC key_desc_0068>Cycle through all Engineers',
     ['goto_commander'] = '<LOC key_desc_0069>Go to your ACU',
     ['select_commander'] = '<LOC key_desc_0070>Select your ACU',
@@ -168,7 +169,6 @@ keyDescriptions = {
     ['toggle_build_mode'] = '<LOC key_desc_0102>Toggles keyboard build command mode on and off',
     ['toggle_reclaim_labels'] = '<LOC key_desc_0103>Toggles reclaim labels on and off',
     ['select_upgrading_extractors'] = '<LOC key_desc_select_upgrading_extractors>Select all extractors that are upgrading',
-    ['filter_highest_engineer_and_assist'] = '<LOC key_desc_filter_highest_engineer_and_assist>Filter the selection to the most advanced engineer, all other engineers assist that engineer',
     ['select_all_radars'] = '<LOC key_desc_select_all_radars>Select all radars',
     ['decrease_game_speed'] = '<LOC key_desc_0079>Decrease game speed',
     ['increase_game_speed'] = '<LOC key_desc_0080>Increase game speed',
@@ -496,16 +496,19 @@ keyDescriptions = {
     ['t3_support_air_factory'] = '<LOC key_desc_0386>build T3 Support Air Factory',
     ['t3_support_naval_factory'] = '<LOC key_desc_0387>build T3 Support Naval Factory',
 
-    ['recheck_targets_of_weapons'] = 'Recheck targets of weapons of selected units',
     ['set_target_priority'] = 'Set weapon target priorities to the type of unit that you hover over with the mouse',
     ['set_default_target_priority'] = 'Set weapon target priorities of selected units to their defaults',
 
     ['toggle_navui'] = 'Toggle the debugging UI for the navigational mesh',
     ['toggle_ai_reclaim_grid_ui'] = 'Toggle the debugging UI for the reclaim grid',
     ['toggle_ai_recon_grid_ui'] = 'Toggle the debugging UI for the recon grid',
+    ['toggle_ai_presence_grid_ui'] = 'Toggle the debugging UI for the presence grid',
 
     ['toggle_ai_economy_ui'] = 'Toggle the debugging UI for the economy brain data',
 
     ['toggle_platoon_behavior_silo'] = 'Applies the simple silo AI behavior to your selection',
-    ['toggle_platoon_simple_raid'] = 'Applies the simple raid AI behavior to your selection'
+    ['toggle_platoon_simple_raid'] = 'Applies the simple raid AI behavior to your selection',
+
+    ['store_camera_settings'] = 'Store the current camera settings in the preference file',
+    ['restore_camera_settings'] = 'Apply the camera settings stored in the preference file',
 }

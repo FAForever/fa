@@ -378,7 +378,7 @@ function CommanderThreadImproved(cdr, platoon)
                     local platoonUnits = cdr.PlatoonHandle:GetPlatoonUnits() or 1
                     -- only disband the platton if we have 1 unit, plan and buildername. (NEVER disband the armypool platoon!!!)
                     if table.getn(platoonUnits) == 1 and (not cdr.PlatoonHandle.ArmyPool) and cdr.PlatoonHandle.BuilderName then
-                        SPEW('ACU PlatoonHandle found. Builder '..cdr.PlatoonHandle.BuilderName..'. Disbanding CDR platoon!')
+                        --SPEW('ACU PlatoonHandle found. Builder '..cdr.PlatoonHandle.BuilderName..'. Disbanding CDR platoon!')
                         cdr.PlatoonHandle:PlatoonDisband()
                     end
                 end
@@ -1417,9 +1417,11 @@ end
 ---@param pathDist any
 ---@return boolean
 ExpPathToLocation = function(aiBrain, platoon, layer, dest, aggro, pathDist)
+    local NavUtils = import("/lua/sim/navutils.lua")
     local cmd = false
     local platoonUnits = platoon:GetPlatoonUnits()
-    local path, reason = AIAttackUtils.PlatoonGenerateSafePathTo(aiBrain, layer, platoon:GetPlatoonPosition(), dest, nil, nil, pathDist)
+    platoon.PlatoonSurfaceThreat = platoon:GetPlatoonThreat('Surface', categories.ALLUNITS)
+    local path, reason = NavUtils.PathToWithThreatThreshold(layer, platoon:GetPlatoonPosition(), dest, aiBrain, NavUtils.ThreatFunctions.AntiSurface, platoon.PlatoonSurfaceThreat * 10, aiBrain.IMAPConfig.Rings)
     if not path then
         if aggro == 'AttackMove' then
             cmd = platoon:AggressiveMoveToLocation(dest)

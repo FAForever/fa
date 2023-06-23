@@ -1,7 +1,8 @@
-
 local FactoryManager = import("/lua/aibrains/managers/factory-manager.lua")
 local EngineerManager = import("/lua/aibrains/managers/engineer-manager.lua")
 local StructureManager = import("/lua/aibrains/managers/structure-manager.lua")
+
+local Debug = true
 
 ---@alias LocationType
 --- can only be applied to the main base
@@ -11,13 +12,21 @@ local StructureManager = import("/lua/aibrains/managers/structure-manager.lua")
 --- name of expansion marker of the base
 --- | string
 
+---@class AIBaseDebugInfo
+---@field Position Vector
+---@field Layer NavLayers
+---@field Managers { EngineerManagerDebugInfo: AIEngineerManagerDebugInfo, StructureManagerDebugInfo: AIStructureManagerDebugInfo, FactoryManagerDebugInfo: AIFactoryManagerDebugInfo }
+
 ---@class AIBase
+---@field Brain AIBrain
 ---@field BuilderHandles table
+---@field DebugInfo AIBaseDebugInfo
 ---@field FactoryManager AIFactoryManager
 ---@field EngineerManager AIEngineerManager
 ---@field StructureManager AIStructureManager
 ---@field Position Vector
 ---@field Radius number
+---@field Layer NavLayers
 AIBase = ClassSimple {
 
     ---@param self AIBase
@@ -31,6 +40,7 @@ AIBase = ClassSimple {
         end
 
         -- store various properties
+        self.Brain = brain
         self.Position = location
         self.Layer = baseLayer
         self.Radius = radius
@@ -45,54 +55,70 @@ AIBase = ClassSimple {
     -- builder interface
 
     --- Adds all builders of the given base template to this base
-    --- 
+    ---
     --- For reference, see `base-template.lua` file
     ---@param self AIBase
-    ---@param baseTemplateIdentifier string
-    AddBaseTemplate = function(self, baseTemplateIdentifier)
-        local aiBaseTemplate = AIBaseTemplates[baseTemplateIdentifier]
-        if not aiBaseTemplate then
-            WARN(string.format("AI Base - Unknown base template: %s", baseTemplateIdentifier))
+    ---@param baseTemplate AIBaseTemplate
+    AddBaseTemplate = function(self, baseTemplate)
+        if Debug then
+            SPEW(string.format("Loading base template: %s for %s", baseTemplate.BaseTemplateName, self.Brain.Nickname))
         end
 
-        -- add default builders
-        local builders = aiBaseTemplate.BuilderGroupTemplates
-        if builders then
-            for _, builderGroupName in builders do
-                self:AddBuilderGroup(builderGroupName)
+        if baseTemplate.EngineerManager then
+            local builderGroups
+            builderGroups = baseTemplate.EngineerManager.BuilderGroupTemplates
+            for k = 1, table.getn(builderGroups) do
+                local builderGroup = builderGroups[k]
+                self:AddBuilderGroup(builderGroup, self.EngineerManager)
+            end
+
+            for k = 1, table.getn(baseTemplate.EngineerManager.BuilderGroupTemplatesNonCheating) do
+                local builderGroup = builderGroups[k]
+                self:AddBuilderGroup(builderGroup, self.EngineerManager)
             end
         end
 
-        -- add non-cheat builders, these may include scout-related builders
-        local nonCheatBuilders = aiBaseTemplate.BuilderGroupTemplatesNonCheating
-        if nonCheatBuilders then
-            for _, builderGroupName in nonCheatBuilders do
-                self:AddBuilderGroup(builderGroupName)
+        if baseTemplate.FactoryManager then
+            local builderGroups
+            builderGroups = baseTemplate.FactoryManager.BuilderGroupTemplates
+            for k = 1, table.getn(builderGroups) do
+                local builderGroup = builderGroups[k]
+                self:AddBuilderGroup(builderGroup, self.FactoryManager)
+            end
+
+            for k = 1, table.getn(baseTemplate.FactoryManager.BuilderGroupTemplatesNonCheating) do
+                local builderGroup = builderGroups[k]
+                self:AddBuilderGroup(builderGroup, self.FactoryManager)
+            end
+        end
+
+        if baseTemplate.StructureManager then
+            local builderGroups
+            builderGroups = baseTemplate.StructureManager.BuilderGroupTemplates
+            for k = 1, table.getn(builderGroups) do
+                local builderGroup = builderGroups[k]
+                self:AddBuilderGroup(builderGroup, self.StructureManager)
+            end
+
+            for k = 1, table.getn(baseTemplate.StructureManager.BuilderGroupTemplatesNonCheating) do
+                local builderGroup = builderGroups[k]
+                self:AddBuilderGroup(builderGroup, self.StructureManager)
             end
         end
     end,
 
-    --- Adds all builders of the given builder group to the managers of this base
-    ---
-    --- For reference, see `builder-group-template.lua` and `builder-template.lua` files
-    AddBuilderGroup = function(self, builderGroupName)
-        local aiBuilderGroupTemplate = AIBuilderGroupTemplates[builderGroupName]
-        if not aiBuilderGroupTemplate then
-            WARN(string.format("AI Base - Unknown builder group template: %s", builderGroupName))
-            return
+    ---@param self AIBase
+    ---@param builderGroupTemplate AIBuilderGroupTemplate
+    ---@param manager AIBuilderManager
+    AddBuilderGroup = function(self, builderGroupTemplate, manager)
+        if Debug then
+            SPEW("Loading builder group template: " .. builderGroupTemplate.BuilderGroupName .. " for " .. manager.ManagerName)
         end
 
-        local manager = self[aiBuilderGroupTemplate.ManagerName] --[[@as AIBuilderManager]]
-        if not manager then
-            WARN(string.format("AI Base - unknown manager: %s", aiBuilderGroupTemplate.ManagerName))
-            return
-        end
-
-        local aiBuilderTemplates = AIBuilderTemplates
-        for k = 1, table.getn(aiBuilderGroupTemplate) do
-            local identifier = aiBuilderGroupTemplate[k]
-            local builder = aiBuilderTemplates[identifier] --[[@as AIBuilderTemplate]]
-            manager:AddBuilder(builder, self.LocationType)
+        local builderTemplates = builderGroupTemplate.BuilderTemplates
+        for k = 1, table.getn(builderTemplates) do
+            local builderTemplate = builderTemplates[k]
+            manager:AddBuilder(builderTemplate)
         end
     end,
 
@@ -149,6 +175,31 @@ AIBase = ClassSimple {
         self.EngineerManager:OnUnitStopBuilding(unit, built)
         self.StructureManager:OnUnitStopBuilding(unit, built)
     end,
+
+    ---------------------------------------------------------------------------
+    --#region Debug functionality
+
+    ---@param self AIBase
+    ---@return AIBaseDebugInfo
+    GetDebugInfo = function(self)
+        local info = self.DebugInfo
+        if not info then
+            info = { }
+            self.DebugInfo = info
+
+            info.Managers = info.Managers or { }
+            info.Position = self.Position
+            info.Layer = self.Layer
+        end
+
+        info.Managers.EngineerManagerDebugInfo = self.EngineerManager:GetDebugInfo()
+        info.Managers.FactoryManagerDebugInfo = self.FactoryManager:GetDebugInfo()
+        info.Managers.StructureManagerDebugInfo = self.StructureManager:GetDebugInfo()
+
+        return info
+    end,
+
+    --#endregion
 }
 
 ---@param brain AIBrain

@@ -691,7 +691,7 @@ VeterancyComponent = ClassSimple {
     SetVeterancy = function(self, level)
         self.VetExperience = 0
         self.VetLevel = 0
-        self:AddVetExperience(self.Blueprint.VetThresholds[MathMin(level, 5)] or 0, true)
+        self:AddVetExperience(self.Blueprint.VetThresholds[MathMin(level or 0, 5)], true)
     end,
 
     ---@param self Unit | VeterancyComponent
@@ -703,9 +703,6 @@ VeterancyComponent = ClassSimple {
         self:AddVetExperience(massKilled, noLimit)
     end,
 
-    -- kept for backwards compatibility with mods, but should really not be used anymore
-
-    ---@deprecated
     ---@param self Unit | VeterancyComponent
     ---@param instigator Unit
     OnKilledUnit = function (self, unitThatIsDying, experience)
@@ -718,6 +715,8 @@ VeterancyComponent = ClassSimple {
             self:AddVetExperience(vetWorth, false)
         end
     end,
+
+    -- kept for backwards compatibility with mods, but should really not be used anymore
 
     ---@deprecated
     ---@param self Unit | VeterancyComponent

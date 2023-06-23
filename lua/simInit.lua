@@ -26,11 +26,6 @@ doscript '/lua/system/GlobalBuilderTemplate.lua'
 doscript '/lua/system/GlobalBuilderGroup.lua'
 doscript '/lua/system/GlobalBaseTemplate.lua'
 
--- load builder systems
-doscript '/lua/aibrains/templates/base/base-template.lua'
-doscript '/lua/aibrains/templates/builder-groups/builder-group-template.lua'
-doscript '/lua/aibrains/templates/builder-groups/builder-template.lua'
-
 GameOverListeners = {}
 WaitTicks = coroutine.yield
 
@@ -236,9 +231,18 @@ end
 function OnCreateArmyBrain(index, brain, name, nickname)
     -- switch out brains for non-human armies
     local info = ScenarioInfo.ArmySetup[name]
-    if (not info.Human) and (info.AIPersonality != '') then
+    if (not info.Human) then
+        local instance
         local keyToBrain = import("/lua/aibrains/index.lua").keyToBrain
-        local instance = keyToBrain[info.AIPersonality]
+        if (not info.Civilian) and (info.AIPersonality != '') then
+            -- likely a skirmish scenario
+            instance = keyToBrain[info.AIPersonality]
+        else
+            -- likely a campaign scenario
+            if ScenarioInfo.type != 'skirmish' then
+                instance = keyToBrain['campaign']
+            end
+        end
 
         if instance then
             setmetatable(brain, instance)
@@ -281,7 +285,7 @@ end
 
 -- BeginSession will be called by the engine after the armies are created (but without
 -- any units yet) and we're ready to start the game. It's responsible for setting up
--- the initial units and any other gameplay state we need.
+-- the initial units, alliances and any other gameplay state we need.
 function BeginSession()
 
     -- imported for side effects
@@ -368,11 +372,6 @@ function BeginSessionAI()
         for k,file in DiskFindFiles('/lua/AI/AIBaseTemplates', '*.lua') do
             import(file)
         end
-
-        -- import base templates, builder group templates and builder templates
-        for k,file in DiskFindFiles('/lua/aibrains/templates/', '*.lua') do
-            import(file)
-        end
     end
 end
 
@@ -391,6 +390,10 @@ end
 
 --- Setup for team manangement
 function BeginSessionTeams()
+
+    -- up until this point all armies are considered to be enemies for skirmish maps,
+    -- we correct that here by applying the team setup of the lobby
+
     -- Look for teams
     local teams = {}
     for name,army in ScenarioInfo.ArmySetup do

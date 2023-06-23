@@ -7,6 +7,7 @@
 ------------------------------------------------------------------------------------------------------------------------
 
 local ScenarioUtils = import("/lua/sim/scenarioutilities.lua")
+local TransportUtils = import("/lua/ai/transportutilities.lua")
 local AIUtils = import("/lua/ai/aiutilities.lua")
 local SUtils = import("/lua/ai/sorianutilities.lua")
 
@@ -503,7 +504,9 @@ end
 ---@return Vector[]             # A table representing the path
 function AINavalPlanB(aiBrain, platoon)
     --Get a random naval area and issue a movement thar.
+    local NavUtils = import("/lua/sim/navutils.lua")
     local navalAreas = AIUtils.AIGetMarkerLocations(aiBrain, 'Naval Area')
+    platoon.PlatoonSurfaceThreat = platoon:GetPlatoonThreat('Surface', categories.ALLUNITS)
 
     for _,marker in RandomIter(navalAreas) do
         local pathable, bestPos = CheckPlatoonPathingEx(platoon, marker.Position)
@@ -511,8 +514,7 @@ function AINavalPlanB(aiBrain, platoon)
         if not pathable then
             continue
         end
-
-        local path, reason = PlatoonGenerateSafePathTo(aiBrain, platoon.MovementLayer, platoon:GetPlatoonPosition(), marker.Position, platoon.PlatoonData.NodeWeight or 10)
+        local path, reason = NavUtils.PathToWithThreatThreshold(platoon.MovementLayer, platoon:GetPlatoonPosition(), marker.Position, aiBrain, NavUtils.ThreatFunctions.AntiSurface, platoon.PlatoonSurfaceThreat * 10, aiBrain.IMAPConfig.Rings)
 
         if path then
             return path, reason
@@ -529,8 +531,12 @@ end
 function AIPlatoonNavalAttackVector(aiBrain, platoon)
 
     GetMostRestrictiveLayer(platoon)
+    local NavUtils = import("/lua/sim/navutils.lua")
     --Engine handles whether or not we can occupy our vector now, so this should always be a valid, occupiable spot.
     local attackPos, targetPos = GetBestThreatTarget(aiBrain, platoon)
+    if not platoon.PlatoonSurfaceThreat then
+        platoon.PlatoonSurfaceThreat = platoon:GetPlatoonThreat('Surface', categories.ALLUNITS)
+    end
 
     -- if no pathable attack spot found
     --DUNCAN - removed as still need to patrol
@@ -546,7 +552,7 @@ function AIPlatoonNavalAttackVector(aiBrain, platoon)
     attackPos[3] != platoon.LastAttackDestination[oldPathSize][3]) then
 
         -- check if we can path to here safely... give a large threat weight to sort by threat first
-        path, reason = PlatoonGenerateSafePathTo(aiBrain, platoon.MovementLayer, platoon:GetPlatoonPosition(), attackPos, platoon.PlatoonData.NodeWeight or 10)
+        path, reason = NavUtils.PathToWithThreatThreshold(platoon.MovementLayer, platoon:GetPlatoonPosition(), attackPos, aiBrain, NavUtils.ThreatFunctions.AntiSurface, platoon.PlatoonSurfaceThreat * 10, aiBrain.IMAPConfig.Rings)
 
         -- clear command queue
         platoon:Stop()
@@ -585,9 +591,12 @@ end
 ---@param bAggro any            # Descriptor needed
 ---@return table                # A table of every command in every command queue for every unit in the platoon or an empty table if it fails
 function AIPlatoonSquadAttackVector(aiBrain, platoon, bAggro)
-
+    local NavUtils = import("/lua/sim/navutils.lua")
     --Engine handles whether or not we can occupy our vector now, so this should always be a valid, occupiable spot.
     local attackPos = GetBestThreatTarget(aiBrain, platoon)
+    if not platoon.PlatoonSurfaceThreat then
+        platoon.PlatoonSurfaceThreat = platoon:GetPlatoonThreat('Surface', categories.ALLUNITS)
+    end
 
     local bNeedTransports = false
     -- if no pathable attack spot found
@@ -635,7 +644,7 @@ function AIPlatoonSquadAttackVector(aiBrain, platoon, bAggro)
 
         GetMostRestrictiveLayer(platoon)
         -- check if we can path to here safely... give a large threat weight to sort by threat first
-        local path, reason = PlatoonGenerateSafePathTo(aiBrain, platoon.MovementLayer, platoon:GetPlatoonPosition(), attackPos, platoon.PlatoonData.NodeWeight or 10)
+        local path, reason = NavUtils.PathToWithThreatThreshold(platoon.MovementLayer, platoon:GetPlatoonPosition(), attackPos, aiBrain, NavUtils.ThreatFunctions.AntiSurface, platoon.PlatoonSurfaceThreat * 10, aiBrain.IMAPConfig.Rings)
 
         -- clear command queue
         platoon:Stop()
@@ -643,13 +652,13 @@ function AIPlatoonSquadAttackVector(aiBrain, platoon, bAggro)
         local usedTransports = false
         local position = platoon:GetPlatoonPosition()
         if (not path and reason == 'NoPath') or bNeedTransports then
-            usedTransports = SendPlatoonWithTransportsNoCheck(aiBrain, platoon, attackPos, true)
+            usedTransports = TransportUtils.SendPlatoonWithTransports(aiBrain, platoon, attackPos, 3, true)
         -- Require transports over 500 away
         elseif VDist2Sq(position[1], position[3], attackPos[1], attackPos[3]) > 512*512 then
-            usedTransports = SendPlatoonWithTransportsNoCheck(aiBrain, platoon, attackPos, true)
+            usedTransports = TransportUtils.SendPlatoonWithTransports(aiBrain, platoon, attackPos, 2, true)
         -- use if possible at 250
         elseif VDist2Sq(position[1], position[3], attackPos[1], attackPos[3]) > 256*256 then
-            usedTransports = SendPlatoonWithTransportsNoCheck(aiBrain, platoon, attackPos, false)
+            usedTransports = TransportUtils.SendPlatoonWithTransports(aiBrain, platoon, attackPos, 1, false)
         end
 
         if not usedTransports then
@@ -699,6 +708,7 @@ end
 function SendPlatoonWithTransports(aiBrain, platoon, destination, bRequired, bSkipLastMove, waitLonger)
 
     GetMostRestrictiveLayer(platoon)
+    local NavUtils = import("/lua/sim/navutils.lua")
 
     local units = platoon:GetPlatoonUnits()
 
@@ -820,7 +830,7 @@ function SendPlatoonWithTransports(aiBrain, platoon, destination, bRequired, bSk
         end
 
         -- path from transport drop off to end location
-        local path, reason = PlatoonGenerateSafePathTo(aiBrain, useGraph, transportLocation, destination, 200)
+        local path, reason =  NavUtils.PathToWithThreatThreshold('Air', transportLocation, destination, aiBrain, NavUtils.ThreatFunctions.AntiAir, 200, aiBrain.IMAPConfig.Rings)
         -- use the transport!
         AIUtils.UseTransports(units, platoon:GetSquadUnits('Scout'), transportLocation, platoon)
 
@@ -876,7 +886,7 @@ end
 function SendPlatoonWithTransportsNoCheck(aiBrain, platoon, destination, bRequired, bSkipLastMove)
 
     GetMostRestrictiveLayer(platoon)
-
+    local NavUtils = import("/lua/sim/navutils.lua")
     local units = platoon:GetPlatoonUnits()
 
 
@@ -1010,7 +1020,7 @@ function SendPlatoonWithTransportsNoCheck(aiBrain, platoon, destination, bRequir
         end
 
         -- path from transport drop off to end location
-        local path, reason = PlatoonGenerateSafePathTo(aiBrain, useGraph, transportLocation, destination, 200)
+        local path, reason =  NavUtils.PathToWithThreatThreshold('Air', transportLocation, destination, aiBrain, NavUtils.ThreatFunctions.AntiAir, 200, aiBrain.IMAPConfig.Rings)
         -- use the transport!
         AIUtils.UseTransports(units, platoon:GetSquadUnits('Scout'), transportLocation, platoon)
 

@@ -8,7 +8,12 @@ local TableGetSize = table.getsize
 
 local WeakValues = { __mode = 'v' }
 
----@class AIStructureManagerReferences 
+---@class AIStructureManagerDebugInfo
+---@field Structures { TECH1: EntityId[], TECH2: EntityId[], TECH3: EntityId[], EXPERIMENTAL: EntityId[] }
+---@field StructuresBeingBuilt { TECH1: EntityId[], TECH2: EntityId[], TECH3: EntityId[], EXPERIMENTAL: EntityId[] }
+---@field GeneratedThreat { Surface: number, Air: number, Economy: number, Sub: number }
+
+---@class AIStructureManagerReferences
 ---@field TECH1 table<EntityId, Unit>
 ---@field TECH2 table<EntityId, Unit>
 ---@field TECH3 table<EntityId, Unit>
@@ -21,11 +26,15 @@ local WeakValues = { __mode = 'v' }
 ---@field EXPERIMENTAL number
 
 ---@class AIStructureManager : AIBuilderManager
+---@field DebugInfo AIStructureManagerDebugInfo
 ---@field Structures AIStructureManagerReferences
----@field StructuresBeingBuilt AIStructureManagerReferences     
+---@field StructuresBeingBuilt AIStructureManagerReferences
 ---@field StructureCount AIStructureManagerCounts               # Recomputed every 10 ticks
 ---@field StructureBeingBuiltCount AIStructureManagerCounts     # Recomputed every 10 ticks
+---@field GeneratedThreat { Surface: number, Air: number, Economy: number, Sub: number }
 AIStructureManager = Class(BuilderManager) {
+
+    ManagerName = "StructureManager",
 
     ---@param self AIStructureManager
     ---@param brain AIBrain
@@ -62,7 +71,12 @@ AIStructureManager = Class(BuilderManager) {
             EXPERIMENTAL = 0,
         }
 
-        self:AddBuilderType('Any')
+        self.GeneratedThreat = {
+            Surface = 0,
+            Air = 0,
+            Economy = 0,
+            Sub = 0,
+        }
 
         -- TODO: refactor this to base class?
         self.Trash:Add(ForkThread(self.UpdateStructureThread, self))
@@ -70,6 +84,29 @@ AIStructureManager = Class(BuilderManager) {
 
     --------------------------------------------------------------------------------------------
     -- manager interface
+
+    --- Computes the surface, air and economy threat of the provided list of units
+    ---@param self AIStructureManager
+    ---@param units table<EntityId, Unit>
+    ComputeThreat = function(self, units)
+        local surfaceThreat = 0
+        local airThreat = 0
+        local economyThreat = 0
+        local subThreat = 0
+        for _, unit in units do
+            ---@type number
+            local fraction = unit:GetFractionComplete()
+
+            ---@type UnitBlueprintDefense
+            blueprintDefense = unit.Blueprint.Defense
+            airThreat = airThreat + fraction * blueprintDefense.AirThreatLevel
+            surfaceThreat = surfaceThreat + fraction * blueprintDefense.SurfaceThreatLevel
+            economyThreat = economyThreat + fraction * blueprintDefense.EconomyThreatLevel
+            subThreat = subThreat + fraction * blueprintDefense.SubThreatLevel
+        end
+
+        return surfaceThreat, airThreat, economyThreat, subThreat
+    end,
 
     ---@param self AIStructureManager
     UpdateStructureThread = function(self)
@@ -82,7 +119,7 @@ AIStructureManager = Class(BuilderManager) {
                 engineerCount[tech] = count
                 total = total + count
             end
-    
+
             local StructureBeingBuilt = self.StructuresBeingBuilt
             local StructureBeingBuiltCount = self.StructureBeingBuiltCount
             for tech, _ in StructureBeingBuiltCount do
@@ -90,7 +127,76 @@ AIStructureManager = Class(BuilderManager) {
                 StructureBeingBuiltCount[tech] = count
                 total = total + count
             end
-            WaitSeconds(1.0)
+
+            -- compute total base threat
+            local generatedThreat = self.GeneratedThreat
+            local accumulatedSurfaceThreat = 0
+            local accumulatedAirThreat = 0
+            local accumulatedEconomyThreat = 0
+            local accumulatedSubThreat = 0
+
+            local surfaceThreat = 0
+            local airThreat = 0
+            local economyThreat = 0
+            local subThreat = 0
+
+            -- threat of finished structures
+            surfaceThreat, airThreat, economyThreat = self:ComputeThreat(self.Structures.TECH1)
+            accumulatedSurfaceThreat = accumulatedSurfaceThreat + surfaceThreat
+            accumulatedAirThreat = accumulatedAirThreat + airThreat
+            accumulatedEconomyThreat = accumulatedEconomyThreat + economyThreat
+            accumulatedSubThreat = accumulatedSubThreat + subThreat
+
+            surfaceThreat, airThreat, economyThreat = self:ComputeThreat(self.Structures.TECH2)
+            accumulatedSurfaceThreat = accumulatedSurfaceThreat + surfaceThreat
+            accumulatedAirThreat = accumulatedAirThreat + airThreat
+            accumulatedEconomyThreat = accumulatedEconomyThreat + economyThreat
+            accumulatedSubThreat = accumulatedSubThreat + subThreat
+
+            surfaceThreat, airThreat, economyThreat = self:ComputeThreat(self.Structures.TECH3)
+            accumulatedSurfaceThreat = accumulatedSurfaceThreat + surfaceThreat
+            accumulatedAirThreat = accumulatedAirThreat + airThreat
+            accumulatedEconomyThreat = accumulatedEconomyThreat + economyThreat
+            accumulatedSubThreat = accumulatedSubThreat + subThreat
+
+            surfaceThreat, airThreat, economyThreat = self:ComputeThreat(self.Structures.EXPERIMENTAL)
+            accumulatedSurfaceThreat = accumulatedSurfaceThreat + surfaceThreat
+            accumulatedAirThreat = accumulatedAirThreat + airThreat
+            accumulatedEconomyThreat = accumulatedEconomyThreat + economyThreat
+            accumulatedSubThreat = accumulatedSubThreat + subThreat
+
+            -- threat of unfinished structures
+            surfaceThreat, airThreat, economyThreat = self:ComputeThreat(self.StructuresBeingBuilt.TECH1)
+            accumulatedSurfaceThreat = accumulatedSurfaceThreat + surfaceThreat
+            accumulatedAirThreat = accumulatedAirThreat + airThreat
+            accumulatedEconomyThreat = accumulatedEconomyThreat + economyThreat
+            accumulatedSubThreat = accumulatedSubThreat + subThreat
+
+            surfaceThreat, airThreat, economyThreat = self:ComputeThreat(self.StructuresBeingBuilt.TECH2)
+            accumulatedSurfaceThreat = accumulatedSurfaceThreat + surfaceThreat
+            accumulatedAirThreat = accumulatedAirThreat + airThreat
+            accumulatedEconomyThreat = accumulatedEconomyThreat + economyThreat
+            accumulatedSubThreat = accumulatedSubThreat + subThreat
+
+            surfaceThreat, airThreat, economyThreat = self:ComputeThreat(self.StructuresBeingBuilt.TECH3)
+            accumulatedSurfaceThreat = accumulatedSurfaceThreat + surfaceThreat
+            accumulatedAirThreat = accumulatedAirThreat + airThreat
+            accumulatedEconomyThreat = accumulatedEconomyThreat + economyThreat
+            accumulatedSubThreat = accumulatedSubThreat + subThreat
+
+            surfaceThreat, airThreat, economyThreat = self:ComputeThreat(self.StructuresBeingBuilt.EXPERIMENTAL)
+            accumulatedSurfaceThreat = accumulatedSurfaceThreat + surfaceThreat
+            accumulatedAirThreat = accumulatedAirThreat + airThreat
+            accumulatedEconomyThreat = accumulatedEconomyThreat + economyThreat
+            accumulatedSubThreat = accumulatedSubThreat + subThreat
+
+            -- gather the threat
+            generatedThreat.Surface = accumulatedSurfaceThreat
+            generatedThreat.Economy = accumulatedEconomyThreat
+            generatedThreat.Air = accumulatedAirThreat
+            generatedThreat.Sub = accumulatedSubThreat
+
+            WaitTicks(10)
         end
     end,
 
@@ -98,10 +204,6 @@ AIStructureManager = Class(BuilderManager) {
     -- unit events
 
     --- Called by a unit as it starts being built
-    --- 
-    --- `Time complexity: O(1)`
-    --- 
-    --- `Memory complexity: O(1)`
     ---@param self AIStructureManager
     ---@param unit Unit
     ---@param builder Unit
@@ -112,20 +214,10 @@ AIStructureManager = Class(BuilderManager) {
             local tech = blueprint.TechCategory
             local id = unit.EntityId
             self.StructuresBeingBuilt[tech][id] = unit
-
-            -- used by platoon functions to find the manager
-            local builderManagerData = unit.BuilderManagerData or { }
-            unit.BuilderManagerData = builderManagerData
-            builderManagerData.StructureManager = self
-            builderManagerData.LocationType = self.LocationType
         end
     end,
 
     --- Called by a unit as it is finished being built
-    --- 
-    --- `Time complexity: O(1)`
-    --- 
-    --- `Memory complexity: O(1)`
     ---@param self AIStructureManager
     ---@param unit Unit
     ---@param builder Unit
@@ -135,22 +227,24 @@ AIStructureManager = Class(BuilderManager) {
         if blueprint.CategoriesHash['STRUCTURE'] then
             local tech = blueprint.TechCategory
             local id = unit.EntityId
+
+            LOG("Switched!")
             self.StructuresBeingBuilt[tech][id] = nil
             self.Structures[tech][id] = unit
 
-            -- used by platoon functions to find the manager
-            local builderManagerData = unit.BuilderManagerData or { }
-            unit.BuilderManagerData = builderManagerData
-            builderManagerData.StructureManager = self
-            builderManagerData.LocationType = self.LocationType
+            -- create the platoon and start the behavior
+            local brain = self.Brain
+            local platoon = brain:MakePlatoon('', '') --[[@as AIPlatoonSimpleStructure]]
+            platoon.Brain = self.Brain
+            platoon.Base = self.Base
+
+            setmetatable(platoon, import("/lua/aibrains/platoons/platoon-simple-structure.lua").AIPlatoonSimpleStructure)
+            brain:AssignUnitsToPlatoon(platoon, { unit }, 'Unassigned', 'None')
+            ChangeState(platoon, platoon.Start)
         end
     end,
 
     --- Called by a unit as it is destroyed
-    --- 
-    --- `Time complexity: O(1)`
-    --- 
-    --- `Memory complexity: O(1)`
     ---@param self AIStructureManager
     ---@param unit Unit
     OnUnitDestroyed = function(self, unit)
@@ -168,9 +262,6 @@ AIStructureManager = Class(BuilderManager) {
     ---@param unit Unit
     ---@param built Unit
     OnUnitStartBuilding = function(self, unit, built)
-        local blueprint = unit.Blueprint
-        if blueprint.CategoriesHash['STRUCTURE'] then
-        end
     end,
 
     --- Called by a unit as it stops building
@@ -178,53 +269,97 @@ AIStructureManager = Class(BuilderManager) {
     ---@param unit Unit
     ---@param built Unit
     OnUnitStopBuilding = function(self, unit, built)
-        local blueprint = unit.Blueprint
-        if blueprint.CategoriesHash['STRUCTURE'] then
-        end
     end,
 
     --------------------------------------------------------------------------------------------
     -- unit interface
 
-    --- Add a unit to, similar to calling `OnUnitStopBeingBuilt`
-    --- 
-    --- `Time complexity: O(1)`
-    --- 
-    --- `Memory complexity: O(1)`
+    --- Add a unit, similar to calling `OnUnitStopBeingBuilt`
     ---@param self AIStructureManager
     ---@param unit Unit
     AddUnit = function(self, unit)
-        local blueprint = unit.Blueprint
-        if blueprint.CategoriesHash['STRUCTURE'] then
-            local tech = blueprint.TechCategory
-            local id = unit.EntityId
-            self.StructuresBeingBuilt[tech][id] = nil
-            self.Structures[tech][id] = unit
-
-            -- used by platoon functions to find the manager
-            local builderManagerData = unit.BuilderManagerData or { }
-            unit.BuilderManagerData = builderManagerData
-            builderManagerData.StructureManager = self
-            builderManagerData.LocationType = self.LocationType
-        end
+        self:OnUnitStopBeingBuilt(unit, nil, unit.Layer)
     end,
 
     --- Remove a unit, similar to calling `OnUnitDestroyed`
-    --- 
-    --- `Complexity: O(1)`
-    --- 
-    --- `Memory complexity: O(1)`
     ---@param self AIStructureManager
     ---@param unit Unit
     RemoveUnit = function(self, unit)
-        local blueprint = unit.Blueprint
-        if blueprint.CategoriesHash['STRUCTURE'] then
-            local tech = blueprint.TechCategory
-            local id = unit.EntityId
-            self.StructuresBeingBuilt[tech][id] = nil
-            self.Structures[tech][id] = nil
-        end
+        self:OnUnitDestroyed(unit)
     end,
+
+    ---------------------------------------------------------------------------
+    --#region Debug functionality
+
+    ---@param self AIStructureManager
+    ---@return AIStructureManagerDebugInfo
+    GetDebugInfo = function(self)
+        local info = self.DebugInfo
+        if not info then
+
+            ---@type AIStructureManagerDebugInfo
+            info = { }
+            self.DebugInfo = info
+
+            info.GeneratedThreat = { }
+            info.Structures = {
+                TECH1 = { },
+                TECH2 = { },
+                TECH3 = { },
+                EXPERIMENTAL = { },
+            }
+
+            info.StructuresBeingBuilt = {
+                TECH1 = { },
+                TECH2 = { },
+                TECH3 = { },
+                EXPERIMENTAL = { },
+            }
+        end
+
+        -- copy over generated threat
+        local generatedThreatInfo = info.GeneratedThreat
+        generatedThreatInfo.Air = self.GeneratedThreat.Air
+        generatedThreatInfo.Sub = self.GeneratedThreat.Sub
+        generatedThreatInfo.Economy = self.GeneratedThreat.Economy
+        generatedThreatInfo.Surface = self.GeneratedThreat.Surface
+
+        -- copy over entity ids of structures
+        for tech, data in self.Structures do
+            local units = info.Structures[tech]
+            local total = table.getn(units) + 1
+            local head = 1
+
+            for k, _ in data do
+                units[head] = k
+                head = head + 1
+            end
+
+            for k = head, total do
+                units[k] = nil
+            end
+        end
+
+        -- copy over entity ids of structures being built
+        for tech, data in self.StructuresBeingBuilt do
+            local units = info.StructuresBeingBuilt[tech]
+            local total = table.getn(units) + 1
+            local head = 1
+
+            for k, _ in data do
+                units[head] = k
+                head = head + 1
+            end
+
+            for k = head, total do
+                units[k] = nil
+            end
+        end
+
+        return info
+    end,
+
+    --#endregion
 }
 
 ---@param brain AIBrain

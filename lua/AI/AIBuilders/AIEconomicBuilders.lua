@@ -23,7 +23,7 @@ local SAI = '/lua/scenarioplatoonai.lua'
 local TBC = '/lua/editor/threatbuildconditions.lua'
 local PlatoonFile = '/lua/platoon.lua'
 
----@alias BuilderGroupsEconomic 'EngineerFactoryBuilders' | 'Engineer Transfers' | 'Land Rush Initial ACU Builders' | 'Balanced Rush Initial ACU Builders' | 'Air Rush Initial ACU Builders' | 'Naval Rush Initial ACU Builders' | 'Default Initial ACU Builders' | 'ACUBuilders' | 'ACUUpgrades - Gun improvements' | 'ACUUpgrades - Tech 2 Engineering' | 'ACUUpgrades - Shields' | 'ACUUpgrades' | 'T1EngineerBuilders' | 'T2EngineerBuilders' | 'T3EngineerBuilders' | 'EngineerMassBuildersHighPri' | 'EngineerMassBuilders - Naval' | 'EngineerMassBuildersLowerPri' | 'EngineerMassBuildersMidPriSingle' | 'EngineerEnergyBuilders' | 'EngineerEnergyBuildersExpansions' | 'EngineeringSupportBuilder'
+---@alias BuilderGroupsEconomic 'EngineerFactoryBuilders' | 'Engineer Transfers' | 'Land Rush Initial ACU Builders' | 'Balanced Rush Initial ACU Builders' | 'Air Rush Initial ACU Builders' | 'Naval Rush Initial ACU Builders' | 'Default Initial ACU Builders' | 'Easy Initial ACU Builders' | 'ACUBuilders' | 'ACUUpgrades - Gun improvements' | 'ACUUpgrades - Tech 2 Engineering' | 'ACUUpgrades - Shields' | 'ACUUpgrades' | 'T1EngineerBuilders' | 'T2EngineerBuilders' | 'T3EngineerBuilders' | 'EngineerMassBuildersHighPri' | 'EngineerMassBuilders - Naval' | 'EngineerMassBuildersLowerPri' | 'EngineerMassBuildersMidPriSingle' | 'EngineerEnergyBuilders' | 'EngineerEnergyBuildersExpansions' | 'EngineeringSupportBuilder'
 
 BuilderGroup {
     BuilderGroupName = 'EngineerFactoryBuilders',
@@ -453,12 +453,12 @@ BuilderGroup {
 }
 
 BuilderGroup {
-    BuilderGroupName = 'Default Initial ACU Builders',
+    BuilderGroupName = 'Easy Initial ACU Builders',
     BuildersType = 'EngineerBuilder',
 
     -- Initial builder
     Builder {
-        BuilderName = 'CDR Initial Default',
+        BuilderName = 'CDR Initial Easy',
         PlatoonAddBehaviors = { 'CommanderBehaviorImproved', },
         PlatoonTemplate = 'CommanderBuilder',
         Priority = 1000,
@@ -485,6 +485,56 @@ BuilderGroup {
                     'T1EnergyProduction',
                     'T1LandFactory',
                 }
+            }
+        }
+    },
+    Builder {
+        BuilderName = 'CDR Initial PreBuilt Easy',
+        PlatoonAddBehaviors = { 'CommanderBehaviorImproved', },
+        PlatoonTemplate = 'CommanderBuilder',
+        Priority = 1000,
+        BuilderConditions = {
+                { IBC, 'PreBuiltBase', {}},
+            },
+        InstantCheck = true,
+        BuilderType = 'Any',
+        PlatoonAddFunctions = { {SAI, 'BuildOnce'}, },
+        BuilderData = {
+            Construction = {
+                BuildStructures = {
+                    'T1EnergyProduction',
+                    'T1EnergyProduction',
+                    'T1EnergyProduction',
+                    'T1EnergyProduction',
+                    'T1EnergyProduction',
+                    'T1AirFactory',
+                    'T1EnergyProduction',
+                }
+            }
+        }
+    },
+}
+
+BuilderGroup {
+    BuilderGroupName = 'Default Initial ACU Builders',
+    BuildersType = 'EngineerBuilder',
+
+    -- Initial builder
+    Builder {
+        BuilderName = 'CDR Initial Default',
+        PlatoonAddBehaviors = { 'CommanderBehaviorImproved', },
+        PlatoonTemplate = 'CommanderInitialBuilder',
+        Priority = 1000,
+        BuilderConditions = {
+                { IBC, 'NotPreBuilt', {}},
+            },
+        InstantCheck = true,
+        BuilderType = 'Any',
+        PlatoonAddFunctions = { {SAI, 'BuildOnce'}, },
+        BuilderData = {
+            Construction = {
+                BaseTemplateFile = '/lua/AI/AIBaseTemplates/ACUBaseTemplate.lua',
+                BaseTemplate = 'ACUBaseTemplate',
             }
         }
     },
@@ -1886,7 +1936,7 @@ BuilderGroup {
     Builder {
         BuilderName = 'T1ResourceEngineer 40',
         PlatoonTemplate = 'EngineerBuilder',
-        Priority = 1005,
+        Priority = 1002,
         InstanceCount = 2,
         BuilderConditions = {
                 { MABC, 'CanBuildOnMassLessThanDistance', { 'LocationType', 40, -500, 1, 0, 'AntiSurface', 1 }},
@@ -2501,10 +2551,30 @@ BuilderGroup {
         BuilderName = 'T1 Power Engineer',
         PlatoonTemplate = 'EngineerBuilder',
         Priority = 1000,
-        InstanceCount = 2,
+        InstanceCount = 1,
+        BuilderConditions = {
+            { EBC, 'GreaterThanEconEfficiencyCombined', { 0.6, 0.1 }},
+            { EBC, 'LessThanEnergyTrendOverTime', { 10.0 } },
+            { UCBC, 'HaveLessThanUnitsWithCategory', { 1, categories.ENERGYPRODUCTION * (categories.TECH2 + categories.TECH3) }},
+        },
+        BuilderType = 'Any',
+        BuilderData = {
+            Construction = {
+                AdjacencyCategory = categories.FACTORY * categories.STRUCTURE - categories.NAVAL,
+                BuildStructures = {
+                    'T1EnergyProduction',
+                },
+            }
+        }
+    },
+    Builder {
+        BuilderName = 'T1 Power Engineer Scale',
+        PlatoonTemplate = 'EngineerBuilder',
+        Priority = 1000,
+        InstanceCount = 1,
         BuilderConditions = {
             { EBC, 'GreaterThanEconEfficiencyCombined', { 0.7, 0.1 }},
-            { EBC, 'LessThanEconEfficiencyOverTime', { 2.0, 1.35 }},
+            { EBC, 'LessThanEnergyTrendOverTime', { 25.0 } },
             { UCBC, 'HaveLessThanUnitsWithCategory', { 1, categories.ENERGYPRODUCTION * (categories.TECH2 + categories.TECH3) }},
         },
         BuilderType = 'Any',
@@ -2522,10 +2592,11 @@ BuilderGroup {
         PlatoonTemplate = 'T2EngineerBuilder',
         Priority = 950,
         BuilderConditions = {
+            { EBC, 'LessThanEnergyTrendOverTime', { 45.0 } },
+            { EBC, 'GreaterThanEconEfficiencyCombined', { 0.5, 0.1 }},
             { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, categories.ENERGYPRODUCTION * categories.TECH2}}, --DUNCAN - Added
             { UCBC, 'EngineerLessAtLocation', { 'LocationType', 1, categories.TECH3 * categories.ENGINEER }},
-            { EBC, 'GreaterThanEconEfficiencyCombined', { 0.5, 0.1 }},
-            { EBC, 'LessThanEconEfficiencyOverTime', { 2.0, 1.3 }}, --DUNCAN - Moved check from 1.7
+            
         },
         BuilderType = 'Any',
         BuilderData = {
@@ -2549,7 +2620,7 @@ BuilderGroup {
         BuilderConditions = {
             { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, categories.ENERGYPRODUCTION * (categories.TECH2 + categories.TECH3)}},
             { EBC, 'GreaterThanEconEfficiencyCombined', { 0.5, 0.1 }},
-            { EBC, 'LessThanEconEfficiencyOverTime', { 2.0, 1.3 }}, --DUNCAN - added
+            { EBC, 'LessThanEnergyTrendOverTime', { 200.0 } },
         },
         BuilderData = {
             Construction = {

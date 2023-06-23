@@ -1,11 +1,7 @@
 
 -- Override
 
-This folder contains overrides to various UI globals as they are inefficient with their current implementation. A
-
--- Memory argument
-
-s an example say we have the function `GetSessionClients`. It returns a table in a similar format to:
+This folder contains overrides to various UI globals as they are inefficient with their current implementation. As an example say we have the function `GetSessionClients`. It returns a table in a similar format to:
 
 ```lua
 {

@@ -212,9 +212,9 @@ function GetKeyActions()
         end
     end
 
-    -- remove invalid key actions
     for k,v in ret do
         if string.find(k, '-') then
+            WARN(string.format("Removed invalid key action '%s' for using '-'", k))
             ret[k] = nil
         end
     end

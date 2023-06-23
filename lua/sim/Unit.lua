@@ -114,6 +114,7 @@ local cUnit = moho.unit_methods
 ---@field EngineCommandCap? table<string, boolean>
 ---@field UnitBeingBuilt Unit?
 ---@field SoundEntity? Unit | Entity
+---@field AutoModeEnabled? boolean
 Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
 
     IsUnit = true,
@@ -144,6 +145,8 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
 
     EnergyModifier = 0,
     MassModifier = 0,
+
+
 
     ---@param self Unit
     ---@return any
@@ -197,6 +200,14 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
             -- SpecialToggleDisableFunction = false,
             -- OnAttachedToTransport = {}, -- Returns self, transport, bone
             -- OnDetachedFromTransport = {}, -- Returns self, transport, bone
+
+            -- OnTransportAttach = {}
+            -- OnTransportDetach = {}
+            -- OnTransportAborted = {}
+            -- OnTransportOrdered = {}
+            -- OnAttachedKilled = {}
+            -- OnStartTransportLoading = {}
+            -- OnStopTransportLoading = {}
         }
     end,
 
@@ -1385,8 +1396,12 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
             return
         end
 
-        local layer = self.Layer
+        -- this flag is used to skip the need of `IsDestroyed`
         self.Dead = true
+
+        local layer = self.Layer
+        local bp = self.Blueprint
+        local army = self.Army
 
         -- Units killed while being invisible because they're teleporting should show when they're killed
         if self.TeleportFx_IsInvisible then
@@ -1394,7 +1409,6 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
             self:ShowEnhancementBones()
         end
 
-        local bp = self.Blueprint
         if layer == 'Water' and bp.Physics.MotionType == 'RULEUMT_Hover' then
             self:PlayUnitSound('HoverKilledOnWater')
         elseif layer == 'Land' and bp.Physics.MotionType == 'RULEUMT_AmphibiousFloating' then
@@ -1417,8 +1431,6 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
             self.UnitBeingTeleported = nil
         end
 
-        ArmyBrains[self:GetArmy()].LastUnitKilledBy = (instigator or self):GetArmy()
-
         if self.DeathWeaponEnabled ~= false then
             self:DoDeathWeapon()
         end
@@ -1430,12 +1442,28 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         self:DisableUnitIntel('Killed')
         self:ForkThread(self.DeathThread, overkillRatio , instigator)
 
-        ArmyBrains[self.Army]:AddUnitStat(self.UnitId, "lost", 1)
+        -- awareness for traitor game mode and game statistics
+        ArmyBrains[army].LastUnitKilledBy = (instigator or self).Army
+        ArmyBrains[army]:AddUnitStat(self.UnitId, "lost", 1)
+
+        -- awareness of instigator that it killed a unit
+        if instigator then
+            instigator:OnKilledUnit(self)
+        end
 
         -- awareness of event for AI
         local aiPlatoon = self.AIPlatoonReference
         if aiPlatoon then
             aiPlatoon:OnKilled(self, instigator, type, overkillRatio)
+        end
+    end,
+
+    ---@param self Unit
+    ---@param unitKilled Unit
+    ---@param experience number | nil
+    OnKilledUnit = function (self, unitKilled, experience)
+        if experience then
+            VeterancyComponent.OnKilledUnit(self, unitKilled, experience)
         end
     end,
 
@@ -1694,6 +1722,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
     DeathWeaponDamageThread = function(self, damageRadius, damage, damageType, damageFriendly)
         WaitSeconds(0.1)
         DamageArea(self, self:GetPosition(), damageRadius or 1, damage or 1, damageType or 'Normal', damageFriendly or false)
+        DamageArea(self, self:GetPosition(), damageRadius or 1, 1, 'TreeForce', false)
     end,
 
     ---@param self Unit
@@ -2460,26 +2489,27 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
     ----------------------------------------------------------------------------------------------
     -- CONSTRUCTING - BUILDING - REPAIR
     ----------------------------------------------------------------------------------------------
+
     ---@param self Unit
     SetupBuildBones = function(self)
-        local bp = self.Blueprint
-        if not bp.General.BuildBones or
-           not bp.General.BuildBones.YawBone or
-           not bp.General.BuildBones.PitchBone or
-           not bp.General.BuildBones.AimBone then
-           return
+        local buildBones = self.Blueprint.General.BuildBones
+        if  not buildBones or
+            not buildBones.YawBone or
+            not buildBones.PitchBone or
+            not buildBones.AimBone
+        then
+            return
         end
 
-        -- Syntactical reference:
-        -- CreateBuilderArmController(unit, turretBone, [barrelBone], [aimBone])
-        -- BuilderArmManipulator:SetAimingArc(minHeading, maxHeading, headingMaxSlew, minPitch, maxPitch, pitchMaxSlew)
-        self.BuildArmManipulator = CreateBuilderArmController(self, bp.General.BuildBones.YawBone or 0 , bp.General.BuildBones.PitchBone or 0, bp.General.BuildBones.AimBone or 0)
-        self.BuildArmManipulator:SetAimingArc(-180, 180, 360, -90, 90, 360)
-        self.BuildArmManipulator:SetPrecedence(5)
-        if self.BuildingOpenAnimManip and self.BuildArmManipulator then
-            self.BuildArmManipulator:Disable()
+        local buildArmManipulator = CreateBuilderArmController(self, buildBones.YawBone or 0 , buildBones.PitchBone or 0, buildBones.AimBone or 0)
+        buildArmManipulator:SetAimingArc(-180, 180, 360, -90, 90, 360)
+        buildArmManipulator:SetPrecedence(5)
+        if self.BuildingOpenAnimManip and buildArmManipulator then
+            buildArmManipulator:Disable()
         end
-        self.Trash:Add(self.BuildArmManipulator)
+
+        self.BuildArmManipulator = buildArmManipulator
+        self.Trash:Add(buildArmManipulator)
     end,
 
     ---@param self Unit
@@ -2713,6 +2743,143 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
     ---@param oldProg number
     ---@param newProg number
     OnBuildProgress = function(self, unit, oldProg, newProg)
+    end,
+
+    --- Called as this unit (with transport capabilities) attached another unit to itself
+    ---@param self Unit
+    ---@param attachBone Bone
+    ---@param attachedUnit Unit
+    OnTransportAttach = function(self, attachBone, attachedUnit)
+        -- manual Lua callback for the unit
+        attachedUnit:OnAttachedToTransport(self, attachBone)
+
+        -- awareness of event for campaign scripts
+        local callbacks = self.EventCallbacks['OnTransportAttach']
+        if callbacks then
+            for _, cb in callbacks do
+                cb(self, attachBone, attachedUnit)
+            end
+        end
+
+        -- awareness of event for AI
+        local aiPlatoon = self.AIPlatoonReference
+        if aiPlatoon then
+            aiPlatoon:OnTransportAttach(self, attachBone, attachedUnit)
+        end
+    end,
+
+    --- Called as this unit (with transport capabilities) deattached another unit from itself
+    ---@param self Unit
+    ---@param attachBone Bone
+    ---@param detachedUnit Unit
+    OnTransportDetach = function(self, attachBone, detachedUnit)
+        -- manual Lua callback
+        detachedUnit:OnDetachedFromTransport(self, attachBone) -- <-- this is what causes it to hang
+
+        -- awareness of event for campaign scripts
+        local callbacks = self.EventCallbacks['OnTransportDetach']
+        if callbacks then
+            for _, cb in callbacks do
+                cb(self, attachBone, detachedUnit)
+            end
+        end
+
+        -- awareness of event for AI
+        local aiPlatoon = self.AIPlatoonReference
+        if aiPlatoon then
+            aiPlatoon:OnTransportDetach(self, attachBone, detachedUnit)
+        end
+    end,
+
+    --- Called as a unit (with transport capabilities) aborts the transport order
+    ---@param self Unit
+    OnTransportAborted = function(self)
+        -- awareness of event for campaign scripts
+        local callbacks = self.EventCallbacks['OnTransportAborted']
+        if callbacks then
+            for _, cb in callbacks do
+                cb(self)
+            end
+        end
+
+        -- awareness of event for AI
+        local aiPlatoon = self.AIPlatoonReference
+        if aiPlatoon then
+            aiPlatoon:OnTransportAborted(self)
+        end
+    end,
+
+    --- Called as a unit (with transport capabilities) initiates the a transport order
+    ---@param self Unit
+    OnTransportOrdered = function(self)
+        -- awareness of event for campaign scripts
+        local callbacks = self.EventCallbacks['OnTransportOrdered']
+        if callbacks then
+            for _, cb in callbacks do
+                cb(self)
+            end
+        end
+
+        -- awareness of event for AI
+        local aiPlatoon = self.AIPlatoonReference
+        if aiPlatoon then
+            aiPlatoon:OnTransportOrdered(self)
+        end
+    end,
+
+    --- Called as a unit is killed while being transported by a unit (with transport capabilities) of this platoon
+    ---@param self Unit
+    ---@param attached Unit
+    OnAttachedKilled = function(self, attached)
+        -- awareness of event for campaign scripts
+        local callbacks = self.EventCallbacks['OnAttachedKilled']
+        if callbacks then
+            for _, cb in callbacks do
+                cb(self, attached)
+            end
+        end
+
+        -- awareness of event for AI
+        local aiPlatoon = self.AIPlatoonReference
+        if aiPlatoon then
+            aiPlatoon:OnAttachedKilled(self)
+        end
+    end,
+
+    --- Called as a unit (with transport capabilities) is ready to load in units
+    ---@param self Unit
+    OnStartTransportLoading = function(self)
+        -- awareness of event for campaign scripts
+        local callbacks = self.EventCallbacks['OnStartTransportLoading']
+        if callbacks then
+            for _, cb in callbacks do
+                cb(self)
+            end
+        end
+
+        -- awareness of event for AI
+        local aiPlatoon = self.AIPlatoonReference
+        if aiPlatoon then
+            aiPlatoon:OnStartTransportLoading(self)
+        end
+    end,
+
+    --- Called as a unit (with transport capabilities) of this platoon is done loading in units
+    ---@param self Unit
+    OnStopTransportLoading = function(self)
+        -- awareness of event for campaign scripts
+        local callbacks = self.EventCallbacks['OnStopTransportLoading']
+        if callbacks then
+            for _, cb in callbacks do
+                cb(self)
+            end
+        end
+
+        -- awareness of event for AI
+        local aiPlatoon = self.AIPlatoonReference
+        if aiPlatoon then
+            aiPlatoon:OnStopTransportLoading(self)
+        end
     end,
 
     ---@param self Unit
@@ -3755,6 +3922,111 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         end
     end,
 
+    --- Adds a callback for the `OnTransportAttach` event
+    ---@param self Unit
+    ---@param fn fun(transport: Unit, attachBone: Bone,  attachedUnit: Unit)
+    ---@param id string | nil       # if provided, stores the function using the identifier as key
+    AddOnTransportAttachCallback = function(self, fn, id)
+        local callbacks = self.EventCallbacks['OnTransportAttach'] or { }
+        self.EventCallbacks['OnTransportAttach'] = callbacks
+
+        if id then
+            callbacks[id] = fn
+        else
+            table.insert(callbacks, fn)
+        end
+    end,
+
+    --- Adds a callback for the `OnTransportDetach` event
+    ---@param self Unit
+    ---@param fn fun(transport: Unit, attachBone: Bone,  deattachedUnit: Unit)
+    ---@param id string | nil       # if provided, stores the function using the identifier as key
+    AddOnTransportDetachCallback = function(self, fn, id)
+        local callbacks = self.EventCallbacks['OnTransportDetach'] or { }
+        self.EventCallbacks['OnTransportDetach'] = callbacks
+
+        if id then
+            callbacks[id] = fn
+        else
+            table.insert(callbacks, fn)
+        end
+    end,
+
+    --- Adds a callback for the `OnTransportOrdered` event
+    ---@param self Unit
+    ---@param fn fun(transport: Unit)
+    ---@param id string | nil       # if provided, stores the function using the identifier as key
+    AddOnTransportOrderedCallback = function(self, fn, id)
+        local callbacks = self.EventCallbacks['OnTransportOrdered'] or { }
+        self.EventCallbacks['OnTransportOrdered'] = callbacks
+
+        if id then
+            callbacks[id] = fn
+        else
+            table.insert(callbacks, fn)
+        end
+    end,
+
+    --- Adds a callback for the `OnTransportAborted` event
+    ---@param self Unit
+    ---@param fn fun(transport: Unit)
+    ---@param id string | nil       # if provided, stores the function using the identifier as key
+    AddOnTransportAbortedCallback = function(self, fn, id)
+        local callbacks = self.EventCallbacks['OnTransportAborted'] or { }
+        self.EventCallbacks['OnTransportAborted'] = callbacks
+
+        if id then
+            callbacks[id] = fn
+        else
+            table.insert(callbacks, fn)
+        end
+    end,
+
+    --- Adds a callback for the `OnAttachedKilled` event
+    ---@param self Unit
+    ---@param fn fun(transport: Unit, killedUnit: Unit)
+    ---@param id string | nil       # if provided, stores the function using the identifier as key
+    AddOnAttachedKilledCallback = function(self, fn, id)
+        local callbacks = self.EventCallbacks['OnAttachedKilled'] or { }
+        self.EventCallbacks['OnAttachedKilled'] = callbacks
+
+        if id then
+            callbacks[id] = fn
+        else
+            table.insert(callbacks, fn)
+        end
+    end,
+
+    --- Adds a callback for the `OnStartTransportLoading` event
+    ---@param self Unit
+    ---@param fn fun(transport: Unit)
+    ---@param id string | nil       # if provided, stores the function using the identifier as key
+    AddOnStartTransportLoadingCallback = function(self, fn, id)
+        local callbacks = self.EventCallbacks['OnStartTransportLoading'] or { }
+        self.EventCallbacks['OnStartTransportLoading'] = callbacks
+
+        if id then
+            callbacks[id] = fn
+        else
+            table.insert(callbacks, fn)
+        end
+    end,
+
+    --- Adds a callback for the `OnStopTransportLoading` event
+    ---@param self Unit
+    ---@param fn fun(transport: Unit)
+    ---@param id string | nil       # if provided, stores the function using the identifier as key
+    AddOnStopTransportLoadingCallback = function(self, fn, id)
+        local callbacks = self.EventCallbacks['OnStopTransportLoading'] or { }
+        self.EventCallbacks['OnStopTransportLoading'] = callbacks
+
+        if id then
+            callbacks[id] = fn
+        else
+            table.insert(callbacks, fn)
+        end
+    end,
+
     ---@param self Unit
     ---@param fn function
     AddProjectileDamagedCallback = function(self, fn)
@@ -4059,6 +4331,8 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
     ---@param transport BaseTransport
     ---@param bone Bone
     OnStartTransportBeamUp = function(self, transport, bone)
+        self.TransportBeamEffectsBag = self.TransportBeamEffectsBag or TrashBag()
+
         local slot = transport.slots[bone]
         if slot then
             self:GetAIBrain():OnTransportFull()
@@ -4069,7 +4343,6 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         self:DestroyIdleEffects()
         self:DestroyMovementEffects()
 
-        self.TransportBeamEffectsBag = self.TransportBeamEffectsBag or TrashBag()
         TrashAdd(self.TransportBeamEffectsBag, AttachBeamEntityToEntity(self, -1, transport, bone, self.Army, EffectTemplate.TTransportBeam01))
         TrashAdd(self.TransportBeamEffectsBag, AttachBeamEntityToEntity(transport, bone, self, -1, self.Army, EffectTemplate.TTransportBeam02))
         TrashAdd(self.TransportBeamEffectsBag, CreateEmitterAtBone(transport, bone, self.Army, EffectTemplate.TTransportGlow01))
@@ -4112,18 +4385,36 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         self:SetDoNotTarget(loading)
         self:SetReclaimable(not loading)
         self:SetCapturable(not loading)
+
+        -- awareness of event for AI
+        local aiPlatoon = self.AIPlatoonReference
+        if aiPlatoon then
+            aiPlatoon:OnStorageChange(self, loading)
+        end
     end,
 
     ---@param self Unit
     ---@param unit Unit
     OnAddToStorage = function(self, unit)
         self:OnStorageChange(true)
+
+        -- awareness of event for AI
+        local aiPlatoon = self.AIPlatoonReference
+        if aiPlatoon then
+            aiPlatoon:OnAddToStorage(self, unit)
+        end
     end,
 
     ---@param self Unit
     ---@param unit Unit
     OnRemoveFromStorage = function(self, unit)
         self:OnStorageChange(false)
+
+        -- awareness of event for AI
+        local aiPlatoon = self.AIPlatoonReference
+        if aiPlatoon then
+            aiPlatoon:OnRemoveFromStorage(self, unit)
+        end
     end,
 
     -- Animation when being dropped from a transport.
@@ -4336,7 +4627,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
     end,
 
     ---@param self Unit
-    ---@param transport BaseTransport
+    ---@param transport Unit
     ---@param bone Bone
     OnAttachedToTransport = function(self, transport, bone)
         self:MarkWeaponsOnTransport(true)
@@ -4352,7 +4643,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
     end,
 
     ---@param self Unit
-    ---@param transport BaseTransport
+    ---@param transport Unit
     ---@param bone Bone
     OnDetachedFromTransport = function(self, transport, bone)
         self.Trash:Add(ForkThread(self.OnDetachedFromTransportThread, self, transport, bone))
@@ -4367,6 +4658,14 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         if IsDestroyed(transport) then
             self:Destroy()
         end
+    end,
+
+    OnAutoModeOn = function(self)
+        self.AutoModeEnabled = true
+    end,
+
+    OnAutoModeOff = function(self)
+        self.AutoModeEnabled = false
     end,
 
     -- Utility Functions

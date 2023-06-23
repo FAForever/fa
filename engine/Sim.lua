@@ -7,7 +7,6 @@
 ---@alias Task table
 ---@alias CSimSoundManager any
 ---@alias EconomyEvent moho.EconomyEvent
----@alias AIPersonality string
 ---@alias ArmyPlans any
 
 ---@alias Faction
@@ -31,7 +30,7 @@
 ---| "Water Normals"
 
 ---@alias Object Blip | CollisionBeam | Entity | Prop | Projectile | Unit
----@alias BoneObject Projectile | Prop | Unit
+---@alias BoneObject Projectile | Prop | Unit | Entity
 ---@alias ReclaimObject Prop | Unit
 ---@alias TargetObject Prop | Unit
 

@@ -21,6 +21,11 @@ ToggleButton = ClassUI(Group) {
     --               label (optional): The string label to put on the button when in this state.
     --               tooltip (optional): A tooltip id to use when the button is in this state.
     -- @param defaultKey The key of the state the control should start in.
+    ---@param self ToggleButton
+    ---@param parent Control
+    ---@param texturePath FileName
+    ---@param states table[]
+    ---@param defaultKey string
     __init = function(self, parent, texturePath, states, defaultKey)
         Group.__init(self, parent)
 
@@ -60,6 +65,9 @@ ToggleButton = ClassUI(Group) {
     --
     -- @param stateKey The key of the state to transition to
     -- @param ignoreEvent If truthy, OnStateChanged will not be called as a result of this call.
+    ---@param self ToggleButton
+    ---@param stateKey State
+    ---@param ignoreEvent any
     SetState = function(self, stateKey, ignoreEvent)
         -- Show the appropriate button for this state.
         for k, v in self.buttonmap do
@@ -79,12 +87,14 @@ ToggleButton = ClassUI(Group) {
         end
     end,
 
+    ---@param self ToggleButton
     Disable = function(self)
         for k, v in self.buttonmap do
             v:Disable()
         end
     end,
 
+    ---@param self ToggleButton
     Enable = function(self)
         for k, v in self.buttonmap do
             v:Enable()
@@ -92,5 +102,7 @@ ToggleButton = ClassUI(Group) {
     end,
 
     --- Called when the button is moved to a new state, via clicking or a call to SetState.
+    ---@param self ToggleButton
+    ---@param newState State
     OnStateChanged = function(self, newState) end
 }
