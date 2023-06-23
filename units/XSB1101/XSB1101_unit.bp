@@ -62,14 +62,6 @@ UnitBlueprint {
         Abilities = {
             '<LOC ability_deathaoe>Volatile',
         },
-        AnimationDeath = {
-            {
-                Animation = '/units/xsb1101/xsb1101_ADeath.sca',
-                AnimationRateMax = 1,
-                AnimationRateMin = 1,
-                Weight = 100,
-            },
-        },
         DamageEffects = {
             {
                 Bone = 0,
