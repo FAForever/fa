@@ -107,7 +107,7 @@ do
     _G.ConExecute = function(command)
         local lower = string.lower(command)
 
-        -- do not allow network changes by UI mods
+        -- do not allow network changes
         if string.find(lower, 'net_') then
             return
         end
@@ -121,7 +121,7 @@ do
     _G.ConExecuteSave = function(command)
         local lower = string.lower(command)
 
-        -- do not allow network changes by UI mods
+        -- do not allow network changes
         if string.find(lower, 'net_') then
             return
         end
