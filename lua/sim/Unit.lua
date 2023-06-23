@@ -4632,7 +4632,9 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
     OnAttachedToTransport = function(self, transport, bone)
         self:MarkWeaponsOnTransport(true)
         if self:ShieldIsOn() or self.MyShield.Charging then
-            if not self.MyShield.SkipAttachmentCheck then 
+
+            local shield = self.MyShield
+            if shield and not (shield.SkipAttachmentCheck or shield.RemainEnabledWhenAttached) then
                 self:DisableShield()
             end
 
