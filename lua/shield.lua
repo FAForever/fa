@@ -133,6 +133,9 @@ end
 ---@class Shield : moho.shield_methods, Entity
 ---@field Brain AIBrain
 Shield = ClassShield(moho.shield_methods, Entity) {
+
+    RemainEnabledWhenAttached = false,
+
     __init = function(self, spec, owner)
         -- This key deviates in name from the blueprints...
         spec.Size = spec.ShieldSize
@@ -1172,6 +1175,9 @@ TransportShield = ClassShield(Shield) {
 -- grants extra health.
 ---@class PersonalShield : Shield
 PersonalShield = ClassShield(Shield){
+
+    RemainEnabledWhenAttached = true,
+
     OnCreate = function(self, spec)
         Shield.OnCreate(self, spec)
 
