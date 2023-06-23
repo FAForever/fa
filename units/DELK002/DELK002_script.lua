@@ -31,16 +31,11 @@ DELK002 = ClassUnit(TLandUnit) {
 
             PlayFxRackSalvoChargeSequence = function(self)
                 local unit = self.unit
-
                 local spin1 = self.SpinManip1
                 if not spin1 then
                     spin1 = CreateRotator(unit, 'Right_Barrel', 'z', nil, 360, 180, 60)
                     self.SpinManip1 = spin1
                     unit.Trash:Add(spin1)
-                end
-
-                if spin1 then
-                    spin1:SetTargetSpeed(500)
                 end
                 local spin2 = self.SpinManip2
                 if not spin2 then
@@ -49,6 +44,9 @@ DELK002 = ClassUnit(TLandUnit) {
                     unit.Trash:Add(spin2)
                 end
 
+                if spin1 then
+                    spin1:SetTargetSpeed(500)
+                end
                 if spin2 then
                     spin2:SetTargetSpeed(500)
                 end
