@@ -215,13 +215,17 @@ function CreateUI(isReplay)
     ConExecute("Cam_Free off")
 
     -- load it all fast to prevent stutters
-    ConExecute('res_AfterPrefetchDelay 2')
+    ConExecute('res_AfterPrefetchDelay 10')
     ConExecute('res_PrefetcherActivityDelay 1')
 
     local prefetchTable = { models = {}, anims = {}, d3d_textures = {}, batch_textures = {} }
 
     prefetchTable.batch_textures = table.concatenate(
-        DiskFindFiles("/textures/ui", "*.dds")
+        DiskFindFiles("/textures/ui/common/game/cursors", "*.dds"),
+        DiskFindFiles("/textures/ui/common/game/orders", "*.dds"),
+        DiskFindFiles("/textures/ui/common/game/selection", "*.dds"),
+        DiskFindFiles("/textures/ui/common/game/waypoints", "*.dds"),
+        DiskFindFiles("/textures/ui/common/icons", "*.dds")
     )
 
     prefetchTable.d3d_textures = table.concatenate(

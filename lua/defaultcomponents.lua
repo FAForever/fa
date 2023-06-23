@@ -385,16 +385,16 @@ IntelComponent = ClassSimple {
 local TechToDuration = {
     TECH1 = 1,
     TECH2 = 2,
-    TECH3 = 4,
-    EXPERIMENTAL = 16,
+    TECH3 = 3,
+    EXPERIMENTAL = 6,
 }
 
 ---@type table<string, number>
 local TechToLOD = {
     TECH1 = 120,
-    TECH2 = 180,
-    TECH3 = 240,
-    EXPERIMENTAL = 320,
+    TECH2 = 140,
+    TECH3 = 180,
+    EXPERIMENTAL = 220,
 }
 
 ---@class TreadComponent
