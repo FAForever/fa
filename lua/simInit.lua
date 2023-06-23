@@ -292,7 +292,7 @@ end
 
 -- BeginSession will be called by the engine after the armies are created (but without
 -- any units yet) and we're ready to start the game. It's responsible for setting up
--- the initial units and any other gameplay state we need.
+-- the initial units, alliances and any other gameplay state we need.
 function BeginSession()
 
     -- imported for side effects
