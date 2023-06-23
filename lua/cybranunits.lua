@@ -877,7 +877,7 @@ CSeaFactoryUnit = ClassUnit(SeaFactoryUnit) {
 
     ---@param self CSeaFactoryUnit
     ---@param unitBeingBuilt Unit
-    ---@param order boolean|string
+    ---@param order string
     OnStartBuild = function(self, unitBeingBuilt, order)
         SeaFactoryUnit.OnStartBuild(self, unitBeingBuilt, order)
         if order ~= 'Upgrade' then
