@@ -53,6 +53,7 @@ DRA0202 = ClassUnit(CAirUnit) {
             end,
         },
     },
+    
     OnStopBeingBuilt = function(self, builder, layer)
         CAirUnit.OnStopBeingBuilt(self, builder, layer)
         self:SetMaintenanceConsumptionInactive()
@@ -61,38 +62,31 @@ DRA0202 = ClassUnit(CAirUnit) {
     end,
 
     RotateWings = function(self, target)
-        local Lwing = self.LWingRotator
-        local Rwing = self.RWingRotator
-        local Trash = self.Trash
-        if not Lwing then
-            Lwing = CreateRotator(self, 'B01', 'x')
-            Trash:Add(Lwing)
+        local lWingRotator = self.LWingRotator
+        if not lWingRotator then
+            lWingRotator = CreateRotator(self, 'B01', 'x')
+            self.LWingRotator = lWingRotator
+            self.Trash:Add(lWingRotator)
         end
-        if not Rwing then
-            Rwing = CreateRotator(self, 'B03', 'x')
-            Trash:Add(Rwing)
+        local rWingRotator = self.RWingRotator
+        if not rWingRotator then
+            rWingRotator = CreateRotator(self, 'B03', 'x')
+            self.RWingRotator = rWingRotator
+            self.Trash:Add(rWingRotator)
         end
+        
         local fighterAngle = 0
         local bomberAngle = -90
         local wingSpeed = 45
+        
+        lWingRotator:SetSpeed(wingSpeed)
+        rWingRotator:SetSpeed(wingSpeed)
         if target and EntityCategoryContains(categories.AIR, target) then
-            if Lwing then
-                Lwing:SetSpeed(wingSpeed)
-                Lwing:SetGoal(-fighterAngle)
-            end
-            if Rwing then
-                Rwing:SetSpeed(wingSpeed)
-                Rwing:SetGoal(fighterAngle)
-            end
+            lWingRotator:SetGoal(fighterAngle)
+            rWingRotator:SetGoal(fighterAngle)
         else
-            if Lwing then
-                Lwing:SetSpeed(wingSpeed)
-                Lwing:SetGoal(-bomberAngle)
-            end
-            if Rwing then
-                Rwing:SetSpeed(wingSpeed)
-                Rwing:SetGoal(bomberAngle)
-            end
+            lWingRotator:SetGoal(bomberAngle)
+            rWingRotator:SetGoal(bomberAngle)
         end
     end,
 

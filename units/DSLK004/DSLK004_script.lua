@@ -4,7 +4,7 @@
 -- Copyright © 2008 Blade Braver!
 ------------------------------------------------------------------------------
 local SLandUnit = import("/lua/seraphimunits.lua").SLandUnit
-local CollisionBeam = import("/lua/seraphimweapons.lua").PhasonCollisionBeam2
+local PhasonCollisionBeam2 = import("/lua/seraphimweapons.lua").PhasonCollisionBeam2
 local PhasonBeam = import("/lua/seraphimweapons.lua").PhasonBeam
 
 ---@class DSLK004 : SLandUnit
@@ -12,7 +12,7 @@ DSLK004 = ClassUnit(SLandUnit) {
     Weapons = {
         PhasonBeamAir = ClassWeapon(PhasonBeam) {},
         PhasonBeamGround = ClassWeapon(PhasonBeam) {
-            BeamType = CollisionBeam,
+            BeamType = PhasonCollisionBeam2,
             FxBeamEndPointScale = 0.01,
         },
     },

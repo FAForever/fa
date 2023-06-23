@@ -32,10 +32,11 @@ DEL0204 = ClassUnit(TWalkingLandUnit)
             end,
 
             PlayFxRackSalvoChargeSequence = function(self)
-                local spinManip = self.SpinManip
                 local unit = self.unit
+                local spinManip = self.SpinManip
                 if not spinManip then
                     spinManip = CreateRotator(unit, 'Left_Arm_Barrel', 'z', nil, 270, 180, 60)
+                    self.SpinManip = spinManip
                     unit.Trash:Add(spinManip)
                 end
 
