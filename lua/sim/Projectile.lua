@@ -5,6 +5,7 @@
 --  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 ------------------------------------------------------------------
 
+local ProjectileMethods = moho.projectile_methods
 local DefaultDamage = import("/lua/sim/defaultdamage.lua")
 local Flare = import("/lua/defaultantiprojectile.lua").Flare
 
@@ -76,7 +77,7 @@ local OnImpactDestroyCategories = categories.ANTIMISSILE * categories.ALLPROJECT
 ---@field Trash TrashBag
 ---@field Launcher Unit
 ---@field DamageData table
-Projectile = ClassProjectile(moho.projectile_methods) {
+Projectile = ClassProjectile(ProjectileMethods) {
     IsProjectile = true,
     DestroyOnImpact = true,
     FxImpactTrajectoryAligned = true,
@@ -886,6 +887,18 @@ Projectile = ClassProjectile(moho.projectile_methods) {
             return nil
         end
     end,
+
+    ---------------------------------------------------------------------------
+    --#region C hooks
+
+    --- Creates a child projectile that inherits the speed, orientation and launcher of its parent
+    ---@param blueprint ProjectileBlueprint
+    ---@return Projectile
+    CreateChildProjectile = function (self, blueprint)
+        local projectile = ProjectileMethods.CreateChildProjectile(self, blueprint)
+        projectile.Launcher = self.Launcher
+        return projectile
+    end,
 }
 
 --- A dummy projectile that solely inherits what it needs. Useful for
@@ -893,7 +906,7 @@ Projectile = ClassProjectile(moho.projectile_methods) {
 ---@class DummyProjectile : moho.projectile_methods
 ---@field Blueprint ProjectileBlueprint
 ---@field Army Army
-DummyProjectile = ClassDummyProjectile(moho.projectile_methods) {
+DummyProjectile = ClassDummyProjectile(ProjectileMethods) {
     ---@param self DummyProjectile
     ---@param inWater? boolean
     OnCreate = function(self, inWater)
