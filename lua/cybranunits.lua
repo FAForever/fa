@@ -75,7 +75,7 @@ local TrashBagAdd = TrashBag.Add
 CConstructionTemplate = ClassSimple {
 
     --- Prepares the values required to support bots
-    ---@param self CConstructionTemplate
+    ---@param self Unit
     OnCreate = function(self)
         -- cache the total amount of drones
         self.BuildBotTotal = self.Blueprint.BuildBotTotal or math.min(math.ceil((10 + self:GetBuildRate()) / 15), 10)
@@ -107,7 +107,7 @@ CConstructionTemplate = ClassSimple {
 
     --- When stopping to build, send the bots back after a bit.
     ---@param self CConstructionTemplate
-    ---@param built Unit
+    ---@param built Unit Unused
     StopBuildingEffects = function(self, built)
         -- make sure we're not dead (then bots are destroyed by trashbag)
         if self.Dead then 
@@ -159,9 +159,9 @@ CConstructionTemplate = ClassSimple {
     end,
 
     --- When making build effects, try and make the bots.
-    ---@param self CConstructionTemplate
+    ---@param self Unit
     ---@param unitBeingBuilt Unit
-    ---@param order number
+    ---@param order number Unused
     ---@param stationary boolean
     CreateBuildEffects = function(self, unitBeingBuilt, order, stationary)
         -- check if the unit still exists, this can happen when: 
