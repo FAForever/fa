@@ -397,6 +397,10 @@ end
 
 --- Setup for team manangement
 function BeginSessionTeams()
+
+    -- up until this point all armies are considered to be enemies for skirmish maps,
+    -- we correct that here by applying the team setup of the lobby
+
     -- Look for teams
     local teams = {}
     for name,army in ScenarioInfo.ArmySetup do
