@@ -101,14 +101,18 @@ if replayID then
 end
 
 do
+    -- turned into upvalues for security reasons
+    local lower = string.lower
+    local find = string.find
+
     local oldConExecute = ConExecute
 
     ---@param command string
     _G.ConExecute = function(command)
-        local lower = string.lower(command)
+        local lower = lower(command)
 
         -- do not allow network changes
-        if string.find(lower, 'net_') then
+        if find(lower, 'net_') then
             return
         end
 
@@ -119,10 +123,10 @@ do
 
     ---@param command string
     _G.ConExecuteSave = function(command)
-        local lower = string.lower(command)
+        local lower = lower(command)
 
         -- do not allow network changes
-        if string.find(lower, 'net_') then
+        if find(lower, 'net_') then
             return
         end
 
