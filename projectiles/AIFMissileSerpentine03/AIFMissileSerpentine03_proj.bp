@@ -20,8 +20,6 @@ ProjectileBlueprint {
         'AEON',
         'PROJECTILE',
         'INDIRECTFIRE',
-        'TACTICAL',
-        'MISSILE',
         'NOSPLASHDAMAGE',
     },
     Defense = {
@@ -49,7 +47,7 @@ ProjectileBlueprint {
         InitialSpeed = 15,
         Lifetime = 60,
         MaxSpeed = 30,
-        MaxZigZag = 5,
+        MaxZigZag = 15,
         RotationalVelocity = 0,
         RotationalVelocityRange = 0,
         TrackTarget = true,
