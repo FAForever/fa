@@ -13,7 +13,8 @@ function RemoteViewing(SuperClass)
 
         OnCreate = function(self)
             SuperClass.OnCreate(self)
-            local remoteViewData = self.RemoteViewingData
+            local remoteViewData = {}
+            self.RemoteViewingData = remoteViewData
 
             remoteViewData = {}
             remoteViewData.RemoteViewingFunctions = {}
