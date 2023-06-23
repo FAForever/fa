@@ -510,13 +510,17 @@ function CreateWreckage(unit, needToRotate)
         local rotation = EulerToQuaternion(roll, pitch, yaw)
         local newOrientation = {}
         -- mmm I`m love quaternions... =3
-        newOrientation[1] = unitRotation[4] * rotation[1] + unitRotation[1] * rotation[4] + unitRotation[2] * rotation[3
+        newOrientation[1] = unitRotation[4] * rotation[1] + unitRotation[1] * rotation[4] +
+            unitRotation[2] * rotation[3
             ] - unitRotation[3] * rotation[2]
-        newOrientation[2] = unitRotation[4] * rotation[2] + unitRotation[2] * rotation[4] + unitRotation[3] * rotation[1
+        newOrientation[2] = unitRotation[4] * rotation[2] + unitRotation[2] * rotation[4] +
+            unitRotation[3] * rotation[1
             ] - unitRotation[1] * rotation[3]
-        newOrientation[3] = unitRotation[4] * rotation[3] + unitRotation[3] * rotation[4] + unitRotation[1] * rotation[2
+        newOrientation[3] = unitRotation[4] * rotation[3] + unitRotation[3] * rotation[4] +
+            unitRotation[1] * rotation[2
             ] - unitRotation[2] * rotation[1]
-        newOrientation[4] = unitRotation[4] * rotation[4] - unitRotation[1] * rotation[1] - unitRotation[2] * rotation[2
+        newOrientation[4] = unitRotation[4] * rotation[4] - unitRotation[1] * rotation[1] -
+            unitRotation[2] * rotation[2
             ] - unitRotation[3] * rotation[3]
 
         prop:SetOrientation(newOrientation, true)
@@ -643,14 +647,14 @@ function InitializeArmies()
     local scenarioArmies = Scenario.Armies
     local tblArmy = ListArmies()
     local shouldCreateInitial = ShouldCreateInitialArmyUnits()
-    local tblGroups = { }
+    local tblGroups = {}
 
     -- search for hostile civilian army
     local hostileCivilians
     for iArmy, strArmy in tblArmy do
         local setup = armySetups[strArmy]
         if setup.Civilian then
-            if strArmy == 'ARMY_17' or strArmy == 'ARMY_09' then
+            if strArmy == 'ARMY_17' or strArmy == 'ARMY_09' or strArmy == 'ARMY_9' then
                 hostileCivilians = iArmy
                 break
             end
@@ -681,11 +685,6 @@ function InitializeArmies()
                 SetArmyColor(strArmy, 255, 48, 48)
             end
 
-            -- setup civilian alliance
-            if hostileCivilians and (not armyIsCiv) and (civOpt == 'enemy') then
-                SetAlliance(iArmy, hostileCivilians, 'Enemy')
-            end
-
             -- setup initial armies
             if (not armyIsCiv and shouldCreateInitial) or (armyIsCiv and civOpt ~= "removed") then
                 local commander = not armyIsCiv
@@ -704,6 +703,31 @@ function InitializeArmies()
                 for _, unit in tblResult do
                     CreateWreckageUnit(unit)
                 end
+            end
+
+            -- setup (hostile) civilian alliance
+            if hostileCivilians and (not armyIsCiv) and (civOpt == 'enemy') then
+                SetAlliance(iArmy, hostileCivilians, 'Enemy')
+            end
+
+            -- turn everyone hostile by default, this is corrected for teams in `BeginSessionTeams`
+            for iEnemy, _ in tblArmy do
+
+                -- only run this logic once for each pair
+                if iEnemy >= iArmy then
+                    continue
+                end
+
+                -- by default we are enemies
+                local state = "Enemy"
+                if armyIsCiv then
+                    -- or neutral, to the neutral civilians
+                    if civOpt == "neutral" or strArmy == "NEUTRAL_CIVILIAN" then
+                        state = "Neutral"
+                    end
+                end
+
+                SetAlliance(iArmy, iEnemy, state)
             end
         end
     end

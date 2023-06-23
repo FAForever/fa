@@ -35,7 +35,7 @@ AIBrain = Class(StandardBrain, EconomyComponent) {
 
     SkirmishSystems = true,
 
-    --- Called after `SetupSession` but before `BeginSession` - no initial units, props or resources exist at this point
+    --- Called after `SetupSession` but before `BeginSession` - no initial units, props or resources exist at this point and the teams are not yet defined
     ---@param self EasyAIBrain
     ---@param planName string
     OnCreateAI = function(self, planName)
@@ -57,7 +57,7 @@ AIBrain = Class(StandardBrain, EconomyComponent) {
         self:IMAPConfiguration()
     end,
 
-    --- Called after `BeginSession`, at this point all props, resources and initial units exist in the map
+    --- Called after `BeginSession`, at this point all props, resources and initial units exist in the map and the teams are defined
     ---@param self EasyAIBrain
     OnBeginSession = function(self)
         StandardBrain.OnBeginSession(self)
