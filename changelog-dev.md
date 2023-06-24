@@ -70,9 +70,7 @@ Jip
 
 ## AI
 
-This update addresses several long-standing issues that affected the custom AI that FAF introduces. Further developments and improvements to AI will remain our focus in future updates.
-
-Additionally, we would like to remind people that there are various mods that provide different AI experiences. We can highly recommend you download them from the vault and give them a spin too.
+We would like to remind people that various mods provide different AI experiences. We can highly recommend you download them from the vault and give them a spin too.
 
 A short list of AIs we recommend at this point:
 
@@ -85,7 +83,7 @@ A short list of AIs we recommend at this point:
 
 And not to forget the AI that ships with the Total Annihilation mod that is maintained by Dragun.
 
-### Improved AI framework
+### AI - improved framework
 
 Github references: #4693, #4858, #4898, #4923, #4921, #4961, #4901, #4970, #4971, #4872, #5008, #5009, #5072, #5068, #5071, #5087, #5084, #5101, #5099, #4879, #5141, #5139
 
@@ -95,27 +93,29 @@ As a consequence of this, all AI mods need to update how they set up their AI. W
 
 One notable change is the integration done by Relent0r of the transport logic of the LOUD AI that is developed by Sprouto. Our gratitude towards Sprouto for turning the transport logic into a module and the willingness to share that with us
 
-### Improved Adaptive AI
+### AI - improved Adaptive AI
 
 Github references: #4825, #4836, #4849, #4832, #4880, #4888, #4859
 
 With this patch, the first notable improvements specifically the adaptive AI are in! It can by no means compete with AIs such as M27, but at least the AI won't bug out as often as it used to. This represents the first step in the right direction where a lot of time was put into creating a more consistent foundation.
 
-### Reclaim grid
+### AI - reclaim grid
 
 Github references: #4811, #4819, #4825, #4832, #4861, #4919
 
 The reclaim grid represents an abstract, highly efficient data structure that the AI can use to make more informed decisions based on reclaim values. Includes a UI window to visualize the data structure
 
-### Presence grid
+### AI - presence grid
 
 Github references: #4930
 
 The presence grid represents an abstract, efficient data structure that the AI can use to make more informed decisions based on what area of the map the AI thinks it controls. It divides the map into sections that are considered 'allied', 'contested' or 'hostile' while taking into account the path ability of the map. Includes a UI window to visualize the data structure
 
-### Navigational mesh
+### AI - navigational mesh
 
 Github references: #4589, #4874, #4876, #4909, #4899, #4918, #4922, #4919, #4925, #4929, #5023, #5031, #5032, #4879
+
+The navigational mesh represents an abstract, efficient data structure that the AI can use to understand how to navigate the map. It is generated at the start of each map. This developer iteration reduces the generation time. On top of that it introduces various functions that can compute interesting properties based on the navigational mesh. Includes a UI window to visualize the data structure
 
 ## Graphics
 
@@ -139,7 +139,7 @@ Github references: #4589, #4874, #4876, #4909, #4899, #4918, #4922, #4919, #4925
 
 - (#5066, #5079) Add the impact effect of the Wasp
 
-### Physics-based rendering (PBR)
+### Graphics - physics-based rendering (PBR)
 
 Github references: #4738, #4737, #4870, #4963, #4999, #5004
 
@@ -147,13 +147,13 @@ We started the path toward physics-based shaders in the first developer iteratio
 
 One notable change is the introduction of a texture channel that was missing for the majority of the Cybran units. As a result, Cybran feels less bland and bits that represent lights now also appear to emit light accordingly.
 
-### Adjustments to water
+### Graphics - adjustments to water
 
 Github references: #4900, #4931, #4895, ##4896, #4964, #5005
 
 Over time various visual artifacts related to water were introduced by FAF. Thanks to BlackYps we did not only tackle those inconsistencies but also improved the fidelity of the water in general. Units now really feel submerged in water, especially noticeable for large units (wrecks).
 
-### Terrain shaders
+### Graphics - terrain shaders
 
 Github references: #4902, #4972
 
@@ -187,7 +187,7 @@ We've learned a lot while working on the physics-based shaders for units. Empowe
 
   With that information available we now apply targeted prefetching: we prefetch all assets surrounding projectiles, effects and animations.
 
-## Other
+## Other changes
 
 - (#4787) Remove generated indices in AI tables
 
@@ -197,7 +197,7 @@ We've learned a lot while working on the physics-based shaders for units. Empowe
 
 - (#4885) Fix an inconsistency where the construction menu of the Megalith had a different order of units than the land factory
 
-- (#4912) Fix an inconsistency with the strategic icons applied to Cybran shields
+- (#4912) Fix an inconsistency where the wrong strategic icons were applied to Cybran shields
 
 - (#4973) Introduce a hotkey to store a camera position across games, useful for taking a screenshot with exactly the same angle
 
@@ -211,10 +211,6 @@ We've learned a lot while working on the physics-based shaders for units. Empowe
 - (#4960) Introduce extensive documentation on how mods work in FAF
 
 - (#5024) Add various anti-cheat guards for UI callbacks
-
-## Mod incompatibility
-
-There appears to be an issue with the UI mod 'Supreme Economy v2.3'. We've notified the maintainer.
 
 ## Contributors
 
