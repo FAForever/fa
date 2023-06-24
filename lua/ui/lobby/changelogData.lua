@@ -16,7 +16,6 @@ gamePatches = {
         version = 3758,
         name = "Developers patch",
         description = {
-            "",
             "There are a lot of goodies in this iteration! The changelog format has been adjusted to make it easier to read.",
             "It now contains less detailed information and more general descriptions. Additionally, the in-game changelog",
             "window has been enhanced. To access more readable patch notes, you can find buttons at the bottom of the",
@@ -138,7 +137,8 @@ gamePatches = {
             "",
             "Github references: #4825, #4836, #4849, #4832, #4880, #4888, #4859",
             "",
-            "With this patch, the first notable improvements specifically the adaptive AI are in! It can by no means compete with AIs such as M27, but at least the AI won't bug out as often as it used to. This represents the first step in ",
+            "With this patch, the first notable improvements specifically the adaptive AI are in! It can by no means compete with",
+            "AIs such as M27, but at least the AI won't bug out as often as it used to. This represents the first step in ",
             "the right direction where a lot of time was put into creating a more consistent foundation.",
             "",
             "### AI - reclaim grid",
