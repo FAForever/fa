@@ -11,6 +11,7 @@ local WeaponFile = import("/lua/sim/defaultweapons.lua")
 local CollisionBeamFile = import("/lua/defaultcollisionbeams.lua")
 local QuantumBeamGeneratorCollisionBeam = CollisionBeamFile.QuantumBeamGeneratorCollisionBeam
 local TractorClawCollisionBeam = CollisionBeamFile.TractorClawCollisionBeam
+local utilities = import('/lua/utilities.lua')
 local Explosion = import("/lua/defaultexplosions.lua")
 local KamikazeWeapon = WeaponFile.KamikazeWeapon
 local DefaultProjectileWeapon = WeaponFile.DefaultProjectileWeapon
@@ -137,7 +138,7 @@ ADFTractorClaw = ClassWeapon(Weapon) {
     ---@param self ADFTractorClaw
     ---@param blip Blip | Unit
     ---@return Blip | Unit | false
-        GetUnitBehindTarget = function(self, blip)
+    GetUnitBehindTarget = function(self, blip)
         if IsUnit(blip) then
             -- return the unit
             return blip
@@ -212,15 +213,25 @@ ADFTractorClaw = ClassWeapon(Weapon) {
             slider:SetSpeed(velocity)
             slider:SetGoal(0, 0, 0)
 
-            trash:Add(CreateRotator(target, 0, 'x', nil, 0, 15 + Random(0, 45), 20 + Random(0, 80)))
-            trash:Add(CreateRotator(target, 0, 'y', nil, 0, 15 + Random(0, 15), 20 + Random(0, 80)))
-            trash:Add(CreateRotator(target, 0, 'z', nil, 0, 15 + Random(0, 45), 20 + Random(0, 80)))
+            local rotatorA = CreateRotator(target, 0, 'x', nil, 0, 15 + Random(0, 45), 20 + Random(0, 80))
+            trash:Add(rotatorA)
+
+            local rotatorB = CreateRotator(target, 0, 'y', nil, 0, 15 + Random(0, 15), 20 + Random(0, 80))
+            trash:Add(rotatorB)
+
+            local rotatorC = CreateRotator(target, 0, 'z', nil, 0, 15 + Random(0, 45), 20 + Random(0, 80))
+            trash:Add(rotatorC)
 
             WaitTicks(1)
             WaitFor(slider)
 
             -- we're at the arm, do destruction effects
             if (not IsDestroyed(target)) and (not IsDestroyed(unit)) and (not IsDestroyed(self)) then
+
+                -- stop rotating
+                rotatorA:SetGoal(0)
+                rotatorB:SetGoal(0)
+                rotatorC:SetGoal(0)
 
                 -- create crush effect
                 for k, effect in self.CrushFx do
@@ -231,7 +242,14 @@ ADFTractorClaw = ClassWeapon(Weapon) {
                 CreateLightParticle(unit, muzzle, self.Army, 1, 4, 'glow_02', 'ramp_blue_16')
                 WaitTicks(1)
 
-                if not IsDestroyed(unit) then 
+                if not IsDestroyed(unit) then
+
+                    while not IsDestroyed(target) and not IsDestroyed(unit) and not unit.Dead and target:GetHealth() >= 730 do
+                        Damage(unit, bonePosition, target, 729, "Normal")
+                        Explosion.CreateScalableUnitExplosion(target, 1, true)
+                        WaitTicks(11)
+                    end
+
                     CreateLightParticle(unit, muzzle, self.Army, 4, 2, 'glow_02', 'ramp_blue_16')
                     Explosion.CreateScalableUnitExplosion(target, 3, true)
 
@@ -239,15 +257,15 @@ ADFTractorClaw = ClassWeapon(Weapon) {
                     unit:DetachAll(muzzle)
                     slider:Destroy()
 
-                    -- turn off any shields
-                    if target.MyShield then
-                        target.MyShield:TurnOff()
-                    end
-
                     -- create thread to take into account the fall
-                    self:ResetTarget()
-                    self:ForkThread(self.TargetFallThread, target, trash, muzzle)
-                else 
+                    if not IsDestroyed(self) then
+                        self:ResetTarget()
+                        self:ForkThread(self.TargetFallThread, target, trash, muzzle)
+                    else
+                        self:MakeVulnerable(target)
+                        trash:Destroy()
+                    end
+                else
                     self:MakeVulnerable(target)
                     trash:Destroy()
                 end
@@ -308,7 +326,6 @@ ADFTractorClaw = ClassWeapon(Weapon) {
             Warp(projectile, target:GetPosition(), target:GetOrientation())
             projectile.OnImpact = function(projectile)
                 if not IsDestroyed(target) then
-                    target.CanTakeDamage = true
                     target:Kill()
 
                     CreateLightParticle(target, 0, self.Army, 4, 2, 'glow_02', 'ramp_blue_16')
@@ -336,8 +353,6 @@ ADFTractorClaw = ClassWeapon(Weapon) {
     MakeImmune = function (self, target)
         if not IsDestroyed(target) then
             target:SetDoNotTarget(true)
-            target.CanTakeDamage = false
-            target.DisallowCollisions = true
         end
     end,
 
@@ -346,8 +361,6 @@ ADFTractorClaw = ClassWeapon(Weapon) {
     MakeVulnerable = function (self, target)
         if not IsDestroyed(target) then
             target:SetDoNotTarget(false)
-            target.CanTakeDamage = true
-            target.DisallowCollisions = false
             target.Tractored = nil
         end
     end,
@@ -358,10 +371,14 @@ ADFTractorClawStructure = ClassWeapon(DefaultBeamWeapon) {
     BeamType = TractorClawCollisionBeam,
 }
 
+local CategoriesChronoDampener = categories.MOBILE - (categories.COMMAND + categories.EXPERIMENTAL + categories.AIR)
+
 ---@class ADFChronoDampener : DefaultProjectileWeapon
-ADFChronoDampener = ClassWeapon(DefaultProjectileWeapon) {
-    FxMuzzleFlash = EffectTemplate.AChronoDampener,
+ADFChronoDampener = Class(DefaultProjectileWeapon) {
+    FxMuzzleFlash = EffectTemplate.AChronoDampenerLarge,
     FxMuzzleFlashScale = 0.5,
+    FxUnitStun = EffectTemplate.Aeon_HeavyDisruptorCannonMuzzleCharge,
+    FxUnitStunFlash = EffectTemplate.ADisruptorCannonMuzzle01,
 
     RackSalvoFiringState = State(DefaultProjectileWeapon.RackSalvoFiringState) {
         Main = function(self)
@@ -370,15 +387,73 @@ ADFChronoDampener = ClassWeapon(DefaultProjectileWeapon) {
             WaitTicks(51 - math.mod(GetGameTick(), 50))
 
             while true do
+
                 if bp.Audio.Fire then
                     self:PlaySound(bp.Audio.Fire)
                 end
-                self:DoOnFireBuffs()
+
                 self:PlayFxMuzzleSequence(1)
                 self:StartEconomyDrain()
                 self:OnWeaponFired()
 
-                WaitTicks(51)
+                -- some constants that need to go into blueprint
+                local slices = 10
+
+                -- extract information from the buff blueprint
+                local buff = bp.Buffs[1]
+                local stunDuration = buff.Duration
+                local sliceSize = buff.Radius / slices
+
+                for i = 1, slices do
+
+                    local radius = i * sliceSize 
+                    local targets = utilities.GetTrueEnemyUnitsInSphere(
+                        self, 
+                        self.unit:GetPosition(), 
+                        radius, 
+                        CategoriesChronoDampener
+                    )
+
+                    for k, target in targets do 
+
+                        if not target:BeenDestroyed() then 
+                            if buff.BuffType == 'STUN' then 
+                                target:SetStunned(0.1 * stunDuration / slices + 0.1)
+                            end
+                        end
+
+                        -- add initial effect
+                        if not target.InitialStunFxApplied then 
+                            for k, effect in self.FxUnitStunFlash do 
+                                local emit = CreateEmitterOnEntity(target, target.Army, effect)
+                                emit:ScaleEmitter(math.max(target.Blueprint.SizeX, target.Blueprint.SizeZ))
+                            end
+
+                            target.InitialStunFxApplied = true 
+                        end
+
+                        -- add effect on target
+                        local count = target:GetBoneCount()
+                        for k, effect in self.FxUnitStun do 
+                            local emit = CreateEmitterAtBone(
+                                target, Random(0, count - 1), target.Army, effect
+                            )
+
+                            -- scale the effect a bit
+                            emit:ScaleEmitter(0.5)
+
+                            -- change lod to match outer lod of unit
+                            local lods = target.Blueprint.Display.Mesh.LODs
+                            if lods then
+                                emit:SetEmitterParam("LODCUTOFF", lods[table.getn(lods)].LODCutoff)
+                            end
+                        end
+                    end
+
+                    WaitTicks(stunDuration / slices + 1)
+                end
+
+                WaitTicks(51 - stunDuration)
             end
         end,
 
