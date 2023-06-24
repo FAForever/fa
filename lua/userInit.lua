@@ -100,8 +100,9 @@ if replayID then
     LOG("REPLAY ID: " .. replayID)
 end
 
+
 do
-    -- turned into upvalues for security reasons
+    -- upvalues for security reasons
     local lower = string.lower
     local find = string.find
 
