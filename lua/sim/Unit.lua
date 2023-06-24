@@ -1386,7 +1386,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
 
     -- On killed: this function plays when the unit takes a mortal hit. Plays death effects and spawns wreckage, dependant on overkill
     ---@param self Unit
-    ---@param instigator Unit
+    ---@param instigator Unit | Projectile
     ---@param type string
     ---@param overkillRatio number
     OnKilled = function(self, instigator, type, overkillRatio)
@@ -1446,8 +1446,8 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         ArmyBrains[army].LastUnitKilledBy = (instigator or self).Army
         ArmyBrains[army]:AddUnitStat(self.UnitId, "lost", 1)
 
-        -- awareness of instigator that it killed a unit
-        if instigator then
+        -- awareness of instigator that it killed a unit, but it can also be a projectile or nil
+        if instigator and instigator.OnKilledUnit then
             instigator:OnKilledUnit(self)
         end
 
@@ -4632,7 +4632,9 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
     OnAttachedToTransport = function(self, transport, bone)
         self:MarkWeaponsOnTransport(true)
         if self:ShieldIsOn() or self.MyShield.Charging then
-            if not self.MyShield.SkipAttachmentCheck then 
+
+            local shield = self.MyShield
+            if shield and not (shield.SkipAttachmentCheck or shield.RemainEnabledWhenAttached) then
                 self:DisableShield()
             end
 
