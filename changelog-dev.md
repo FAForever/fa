@@ -1,6 +1,8 @@
 # Game version 3758 (24th of June, 2023)
 
+There are a lot of goodies in this iteration! The changelog format has been adjusted to make it easier to read. It now contains less detailed information and more general descriptions. Additionally, the in-game changelog window has been enhanced. To access more readable patch notes, you can find buttons at the bottom of the in-game changelog. These buttons will take you to the patch notes on GitHub or to the patch notes website 'patchnotes.faforever.com' for the respective branch. The website provides a user-friendly reading experience and may include helpful images to improve your understanding of the changes.
 
+As mentioned in the previous development iteration, our focus is now primarily on AI development. This iteration establishes the groundwork for future work in this area. Over the next few months, we will be working on improving the AI's decision-making abilities by applying and introducing additional abstractions of the game state. If you'd like to help with this then feel welcome to introduce yourself in the dev-offtopic channel on Discord!
 
 With appreciation towards all the contributors that made this patch possible,
 
@@ -30,7 +32,7 @@ Jip
 
 - (#4774) Fix variables being in global scope while they should be in the local scope
 
-- (#4862) Fix a bug where stationary launchers would end up launching missiles into the terrain
+- (#4862) Fix a bug where stationary missile launchers could end up launching missiles into the terrain
 
 - (#4863) Fix a bug where states were unable to call their base class
 
