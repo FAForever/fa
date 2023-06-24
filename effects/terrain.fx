@@ -735,7 +735,7 @@ float4 TerrainSkirtPS( VS_OUTPUT inV ) : COLOR
 float4 TerrainNormalsPS( VS_OUTPUT inV ) : COLOR
 {
     // sample all the textures we'll need
-    float4 mask = saturate(tex2D( UtilitySamplerA, inV.mTexWT * TerrainScale) * 2 - 1);
+    float4 mask = saturate(tex2D( UtilitySamplerA, inV.mTexWT * TerrainScale));
 
     float4 lowerNormal = normalize(tex2D( LowerNormalSampler, inV.mTexWT  * TerrainScale * LowerNormalTile ) * 2 - 1);
     float4 stratum0Normal = normalize(tex2D( Stratum0NormalSampler, inV.mTexWT  * TerrainScale * Stratum0NormalTile ) * 2 - 1);
@@ -756,8 +756,8 @@ float4 TerrainNormalsPS( VS_OUTPUT inV ) : COLOR
 
 float4 TerrainNormalsXP( VS_OUTPUT pixel ) : COLOR
 {
-    float4 mask0 = saturate(tex2D(UtilitySamplerA,pixel.mTexWT*TerrainScale)* 2 - 1);
-    float4 mask1 = saturate(tex2D(UtilitySamplerB,pixel.mTexWT*TerrainScale)* 2 - 1);
+    float4 mask0 = saturate(tex2D(UtilitySamplerA,pixel.mTexWT*TerrainScale));
+    float4 mask1 = saturate(tex2D(UtilitySamplerB,pixel.mTexWT*TerrainScale));
 
     float4 lowerNormal = normalize(tex2D(LowerNormalSampler,pixel.mTexWT*TerrainScale*LowerNormalTile)*2-1);
     float4 stratum0Normal = normalize(tex2D(Stratum0NormalSampler,pixel.mTexWT*TerrainScale*Stratum0NormalTile)*2-1);
@@ -794,51 +794,45 @@ float4 TerrainBasisPS( VS_OUTPUT inV ) : COLOR
 float4 TerrainBasisPSBiCubic( VS_OUTPUT inV ) : COLOR
 {
     float4 result;
-    if (UpperAlbedoTile.x * TerrainScale.x > 1000) {
-        float4 position = TerrainScale * inV.mTexWT;
-        result = (float4(1, 1, tex2D(UpperAlbedoSampler, position.xy).xy));
-        
-    } else {
-        float2 coord_source = (inV.mTexWT * TerrainScale * NormalMapScale + NormalMapOffset).xy;
-        float2 coord_hg = coord_source * size_source - float2(0.5, 0.5);
+    float2 coord_source = (inV.mTexWT * TerrainScale * NormalMapScale + NormalMapOffset).xy;
+    float2 coord_hg = coord_source * size_source - float2(0.5, 0.5);
 
-        // fetch offsets and weights from filter texture
-    #ifdef DIRECT3D10
-        // force to a 2d lookup for d3d10 since d3d10 is much stricter when enforcing
-        // 1d lookups from 2d textures
-        float3 hg_x = tex2D(BiCubicLookupSampler, float2(coord_hg.x,0)).xyz;
-        float3 hg_y = tex2D(BiCubicLookupSampler, float2(coord_hg.y,0)).xyz;
-    #else
-        float3 hg_x = tex1D(BiCubicLookupSampler, coord_hg.x).xyz;
-        float3 hg_y = tex1D(BiCubicLookupSampler, coord_hg.y).xyz;
-    #endif
+    // fetch offsets and weights from filter texture
+#ifdef DIRECT3D10
+    // force to a 2d lookup for d3d10 since d3d10 is much stricter when enforcing
+    // 1d lookups from 2d textures
+    float3 hg_x = tex2D(BiCubicLookupSampler, float2(coord_hg.x,0)).xyz;
+    float3 hg_y = tex2D(BiCubicLookupSampler, float2(coord_hg.y,0)).xyz;
+#else
+    float3 hg_x = tex1D(BiCubicLookupSampler, coord_hg.x).xyz;
+    float3 hg_y = tex1D(BiCubicLookupSampler, coord_hg.y).xyz;
+#endif
 
-        // determine linear sampling coordinates
-        float2 coord_source10 = coord_source + hg_x.x * e_x;
-        float2 coord_source00 = coord_source - hg_x.y * e_x;
-        float2 coord_source11 = coord_source10 + hg_y.x * e_y;
-        float2 coord_source01 = coord_source00 + hg_y.x * e_y;
-        coord_source10 = coord_source10 - hg_y.y * e_y;
-        coord_source00 = coord_source00 - hg_y.y * e_y;
+    // determine linear sampling coordinates
+    float2 coord_source10 = coord_source + hg_x.x * e_x;
+    float2 coord_source00 = coord_source - hg_x.y * e_x;
+    float2 coord_source11 = coord_source10 + hg_y.x * e_y;
+    float2 coord_source01 = coord_source00 + hg_y.x * e_y;
+    coord_source10 = coord_source10 - hg_y.y * e_y;
+    coord_source00 = coord_source00 - hg_y.y * e_y;
 
-        // fetch the samples from the appropriate spot on the texture
-        float4 tex_source00 = tex2D( UtilitySamplerA, coord_source00 );
-        float4 tex_source10 = tex2D( UtilitySamplerA, coord_source10 );
-        float4 tex_source01 = tex2D( UtilitySamplerA, coord_source01 );
-        float4 tex_source11 = tex2D( UtilitySamplerA, coord_source11 );
+    // fetch the samples from the appropriate spot on the texture
+    float4 tex_source00 = tex2D( UtilitySamplerA, coord_source00 );
+    float4 tex_source10 = tex2D( UtilitySamplerA, coord_source10 );
+    float4 tex_source01 = tex2D( UtilitySamplerA, coord_source01 );
+    float4 tex_source11 = tex2D( UtilitySamplerA, coord_source11 );
 
-        // weight along y direction
-        tex_source00 = lerp(tex_source00, tex_source01, hg_y.z );
-        tex_source10 = lerp(tex_source10, tex_source11, hg_y.z );
+    // weight along y direction
+    tex_source00 = lerp(tex_source00, tex_source01, hg_y.z );
+    tex_source10 = lerp(tex_source10, tex_source11, hg_y.z );
 
-        // weight along x direction
-        tex_source00 = lerp(tex_source00, tex_source10, hg_x.z );
+    // weight along x direction
+    tex_source00 = lerp(tex_source00, tex_source10, hg_x.z );
 
-        // remember we are only writing into the blue and alpha channels.
-        // we can probably optimize our lerps above by taking advantage of the fact that
-        // we only have 2 channels.
-        result = tex_source00.xxwy;
-    }
+    // remember we are only writing into the blue and alpha channels.
+    // we can probably optimize our lerps above by taking advantage of the fact that
+    // we only have 2 channels.
+    result = tex_source00.xxwy;
     return result;
 }
 
@@ -1958,6 +1952,42 @@ technique TerrainPBR <
 /* # Similar to TTerrainXP, but upperAlbedo is used for map-wide #
    # textures and we use better water color calculations         # */
 
+float4 Terrain001NormalsPS( VS_OUTPUT pixel ) : COLOR
+{
+    float4 mask0 = saturate(tex2D(UtilitySamplerA,pixel.mTexWT*TerrainScale) * 2 - 1);
+    float4 mask1 = saturate(tex2D(UtilitySamplerB,pixel.mTexWT*TerrainScale) * 2 - 1);
+
+    float4 position = TerrainScale * pixel.mTexWT;
+    float4 utility = tex2D(UpperAlbedoSampler, position.xy);
+
+    // reconstruct the y channel
+    float4 lowerNormal = float4(1, 1, 1, 1);
+    lowerNormal.xz = utility.xy * 2 - 1;
+    lowerNormal.y = sqrt(1 - dot(lowerNormal.xz,lowerNormal.xz));
+
+    float4 stratum0Normal = normalize(tex2D(Stratum0NormalSampler, pixel.mTexWT * TerrainScale * Stratum0NormalTile) * 2 - 1);
+    float4 stratum1Normal = normalize(tex2D(Stratum1NormalSampler, pixel.mTexWT * TerrainScale * Stratum1NormalTile) * 2 - 1);
+    float4 stratum2Normal = normalize(tex2D(Stratum2NormalSampler, pixel.mTexWT * TerrainScale * Stratum2NormalTile) * 2 - 1);
+    float4 stratum3Normal = normalize(tex2D(Stratum3NormalSampler, pixel.mTexWT * TerrainScale * Stratum3NormalTile) * 2 - 1);
+    float4 stratum4Normal = normalize(tex2D(Stratum4NormalSampler, pixel.mTexWT * TerrainScale * Stratum4NormalTile) * 2 - 1);
+    float4 stratum5Normal = normalize(tex2D(Stratum5NormalSampler, pixel.mTexWT * TerrainScale * Stratum5NormalTile) * 2 - 1);
+    float4 stratum6Normal = normalize(tex2D(Stratum6NormalSampler, pixel.mTexWT * TerrainScale * Stratum6NormalTile) * 2 - 1);
+    float4 stratum7Normal = normalize(tex2D(Stratum7NormalSampler, pixel.mTexWT * TerrainScale * Stratum7NormalTile) * 2 - 1);
+
+    float4 normal = lowerNormal;
+    normal = lerp(normal,stratum0Normal,mask0.x);
+    normal = lerp(normal,stratum1Normal,mask0.y);
+    normal = lerp(normal,stratum2Normal,mask0.z);
+    normal = lerp(normal,stratum3Normal,mask0.w);
+    normal = lerp(normal,stratum4Normal,mask1.x);
+    normal = lerp(normal,stratum5Normal,mask1.y);
+    normal = lerp(normal,stratum6Normal,mask1.z);
+    normal = lerp(normal,stratum7Normal,mask1.w);
+    normal.xyz = normalize( normal.xyz );
+
+    return float4( (normal.xyz * 0.5 + 0.5) , normal.w);
+}
+
 float4 Terrain001AlbedoPS ( VS_OUTPUT inV) : COLOR
 {
     float4 position = TerrainScale * inV.mTexWT;
@@ -2008,9 +2038,21 @@ float4 Terrain001AlbedoPS ( VS_OUTPUT inV) : COLOR
     return float4(albedo.rgb, 0.01f);
 }
 
+technique Terrain001Normals
+{
+    pass P0
+    {
+        AlphaState( AlphaBlend_Disable_Write_RG )
+        DepthState( Depth_Enable )
+
+        VertexShader = compile vs_1_1 TerrainVS(false);
+        PixelShader = compile ps_2_a Terrain001NormalsPS();
+    }
+}
+
 technique Terrain001 <
     string usage = "composite";
-    string normals = "TTerrainNormalsXP"; 
+    string normals = "Terrain001Normals"; 
 >
 {
     pass P0
