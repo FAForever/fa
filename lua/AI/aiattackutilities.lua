@@ -708,10 +708,8 @@ end
 function SendPlatoonWithTransports(aiBrain, platoon, destination, bRequired, bSkipLastMove, waitLonger)
 
     GetMostRestrictiveLayer(platoon)
-    local NavUtils = import("/lua/sim/navutils.lua")
 
     local units = platoon:GetPlatoonUnits()
-
 
     -- only get transports for land (or partial land) movement
     if platoon.MovementLayer == 'Land' or platoon.MovementLayer == 'Amphibious' then
@@ -830,7 +828,7 @@ function SendPlatoonWithTransports(aiBrain, platoon, destination, bRequired, bSk
         end
 
         -- path from transport drop off to end location
-        local path, reason =  NavUtils.PathToWithThreatThreshold('Air', transportLocation, destination, aiBrain, NavUtils.ThreatFunctions.AntiAir, 200, aiBrain.IMAPConfig.Rings)
+        local path, reason = PlatoonGenerateSafePathTo(aiBrain, useGraph, transportLocation, destination, 200)
         -- use the transport!
         AIUtils.UseTransports(units, platoon:GetSquadUnits('Scout'), transportLocation, platoon)
 
@@ -886,7 +884,6 @@ end
 function SendPlatoonWithTransportsNoCheck(aiBrain, platoon, destination, bRequired, bSkipLastMove)
 
     GetMostRestrictiveLayer(platoon)
-    local NavUtils = import("/lua/sim/navutils.lua")
     local units = platoon:GetPlatoonUnits()
 
 
@@ -1020,7 +1017,7 @@ function SendPlatoonWithTransportsNoCheck(aiBrain, platoon, destination, bRequir
         end
 
         -- path from transport drop off to end location
-        local path, reason =  NavUtils.PathToWithThreatThreshold('Air', transportLocation, destination, aiBrain, NavUtils.ThreatFunctions.AntiAir, 200, aiBrain.IMAPConfig.Rings)
+        local path, reason = PlatoonGenerateSafePathTo(aiBrain, useGraph, transportLocation, destination, 200)
         -- use the transport!
         AIUtils.UseTransports(units, platoon:GetSquadUnits('Scout'), transportLocation, platoon)
 
