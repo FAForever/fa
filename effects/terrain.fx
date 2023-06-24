@@ -410,11 +410,11 @@ float4 CalculateLighting( float3 inNormal, float3 inViewPosition, float3 inAlbed
     float4 color = float4( 0, 0, 0, 0 );
 
     float shadow = ( inShadows && ( 1 == ShadowsEnabled ) ) ? ComputeShadow( inShadow ) : 1;
-    if (UpperAlbedoTile.x * TerrainScale.x > 1000) {
-        float3 position = TerrainScale * inViewPosition;
-        float mapShadow = saturate(1 - tex2D(Stratum7AlbedoSampler, position.xy).b);
-        shadow = shadow * mapShadow;
-    }
+    // if (UpperAlbedoTile.x * TerrainScale.x > 1000) {
+    //     float3 position = TerrainScale * inViewPosition;
+    //     float mapShadow = saturate(1 - tex2D(Stratum7AlbedoSampler, position.xy).b);
+    //     shadow = shadow * mapShadow;
+    // }
 
     // calculate some specular
     float3 viewDirection = normalize(inViewPosition.xzy-CameraPosition);
@@ -1284,14 +1284,7 @@ float4 DecalsPS( VS_OUTPUT inV, uniform bool inShadows) : COLOR
 
     float waterDepth = tex2Dproj(UtilitySamplerC, inV.mTexWT * TerrainScale).g;
 
-    float3 color;
-    if (UpperAlbedoTile.x * TerrainScale.x > 1000) {
-        float roughness = 1 - decalSpec.r;
-        color = PBR(inV, decalAlbedo, normal, roughness);
-        color = ApplyWaterColorExponentially(inV, waterDepth, color);
-    } else {
-        color = CalculateLighting(normal, inV.mTexWT.xyz, decalAlbedo.xyz, decalSpec.r, waterDepth, inV.mShadow, inShadows).xyz;
-    }
+    float3 color = CalculateLighting(normal, inV.mTexWT.xyz, decalAlbedo.xyz, decalSpec.r, waterDepth, inV.mShadow, inShadows).xyz;
 
     return float4(color.rgb, decalAlbedo.w * decalMask.w * DecalAlpha);
 }
