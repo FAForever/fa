@@ -40,6 +40,15 @@ for cname, cls in moho do
 end
 
 export_name('Class',Class)
+export_name('ClassUI',ClassUI)
+export_name('ClassShield',ClassShield)
+export_name('ClassProjectile',ClassProjectile)
+export_name('ClassDummyProjectile',ClassDummyProjectile)
+export_name('ClassUnit',ClassUnit)
+export_name('ClassDummyUnit',ClassDummyUnit)
+export_name('ClassWeapon',ClassWeapon)
+export_name('ClassTrashBag',ClassTrashBag)
+
 export_name('State',State)
 
 export_name('__serialize_name_for_object',__serialize_name_for_object)
