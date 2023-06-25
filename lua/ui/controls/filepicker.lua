@@ -625,14 +625,16 @@ FilePicker = ClassUI(Group) {
 
         self._currentDir = filesData.directory
         self._currentExt = filesData.extension
-
         self._currentFiles = {}
 
         if (self._onlyMineCheckbox == nil) or self._onlyMineCheckbox:IsChecked() then
-            local curProfileName = Prefs.GetCurrentProfile().Name
-            if filesData.files[curProfileName] then
-                for index, file in filesData.files[curProfileName] do
-                    table.insert(self._currentFiles, {curProfileName, file})
+            -- find the current profile in a case insensitive manner
+            local curProfileName = string.lower(Prefs.GetCurrentProfile().Name)
+            for id, files in filesData.files do
+                if string.lower(id) == curProfileName then
+                    for index, file in files do
+                        table.insert(self._currentFiles, {curProfileName, file})
+                    end
                 end
             end
         else
