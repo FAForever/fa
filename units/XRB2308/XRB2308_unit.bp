@@ -60,8 +60,8 @@ UnitBlueprint {
         AirThreatLevel = 0,
         ArmorType = 'Structure',
         EconomyThreatLevel = 17,
-        Health = 11000,
-        MaxHealth = 11000,
+        Health = 9000,
+        MaxHealth = 9000,
         RegenRate = 0,
         SubThreatLevel = 0,
         SurfaceThreatLevel = 0,
@@ -71,7 +71,6 @@ UnitBlueprint {
         Abilities = {
             '<LOC ability_sonar>Sonar',
             '<LOC ability_torpedo>Torpedoes',
-            '<LOC ability_personalstealth>Personal Stealth',
         },
         AnimationDeploy = '/units/xrb2308/xrb2308_aopen.sca',
         IdleEffects = {
@@ -120,7 +119,7 @@ UnitBlueprint {
     Economy = {
         BuildCostEnergy = 25000,
         BuildCostMass = 3000,
-        BuildTime = 4097,
+        BuildTime = 4100,
         RebuildBonusIds = {
             'xrb2308',
         },
@@ -225,7 +224,7 @@ UnitBlueprint {
             },
             FiringTolerance = 2,
             Label = 'Turret01',
-            MaxRadius = 80,
+            MaxRadius = 70,
             MuzzleSalvoDelay = 0.6,
             MuzzleSalvoSize = 6,
             MuzzleVelocity = 5,
@@ -255,14 +254,8 @@ UnitBlueprint {
             RangeCategory = 'UWRC_AntiNavy',
             RateOfFire = 0.25,
             TargetPriorities = {
-                'SUBMERSIBLE',
-                'LIGHTBOAT TECH2',
-                '(STRUCTURE * DEFENSE - ANTIMISSILE - ANTIAIR)',
-                '(TECH2 * MOBILE * NAVAL - CRUISER)',
-                'MOBILE ANTINAVY',
-                'MOBILE TECH3',
-                'MOBILE TECH2',
-                'MOBILE TECH1',
+                'MOBILE',
+                '(STRUCTURE * DEFENSE - ANTIMISSILE)',
                 'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE, HOVER',
