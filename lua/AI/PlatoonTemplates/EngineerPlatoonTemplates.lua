@@ -26,14 +26,6 @@ PlatoonTemplate {
 }
 
 PlatoonTemplate {
-    Name = 'CommanderInitialBuilder',
-    Plan = 'CommanderInitialBOAI',
-    GlobalSquads = {
-        { categories.COMMAND, 1, 1, 'support', 'None' }
-    },
-}
-
-PlatoonTemplate {
     Name = 'CommanderEnhance',
     Plan = 'EnhanceAI',
     GlobalSquads = {
@@ -58,45 +50,12 @@ PlatoonTemplate {
 }
 
 PlatoonTemplate {
-    Name = 'EngineerDrop',
-    Plan = 'EngineerDropAI',
-    GlobalSquads = {
-        { categories.ENGINEER * categories.TECH1, 6, 6, 'support', 'None' }
-    },
-}
-
-PlatoonTemplate {
     Name = 'T1EngineerReclaimer',
     Plan = 'ReclaimAI',
     GlobalSquads = {
         { categories.ENGINEER * categories.TECH1, 1, 1, 'support', 'None' }
     },
 }
-
-PlatoonTemplate {
-    Name = 'T1EngineerGridReclaimer',
-    Plan = 'ReclaimGridAI',
-    GlobalSquads = {
-        { categories.ENGINEER * categories.TECH1, 1, 1, 'support', 'None' }
-    },
-}
-
-PlatoonTemplate {
-    Name = 'T2EngineerGridReclaimer',
-    Plan = 'ReclaimGridAI',
-    GlobalSquads = {
-        { categories.ENGINEER * categories.TECH2, 1, 1, 'support', 'None' }
-    },
-}
-
-PlatoonTemplate {
-    Name = 'T3EngineerGridReclaimer',
-    Plan = 'ReclaimGridAI',
-    GlobalSquads = {
-        { categories.ENGINEER * categories.TECH3, 1, 1, 'support', 'None' }
-    },
-}
-
 
 PlatoonTemplate {
     Name = 'T2EngineerAssist',
@@ -159,14 +118,6 @@ PlatoonTemplate {
     Plan = 'TransferAI',
     GlobalSquads = {
         { categories.ENGINEER * categories.TECH3 - categories.ENGINEERSTATION, 1, 1, 'support', 'none' },
-    },
-}
-
-PlatoonTemplate {
-    Name = 'T123EngineerBuilder',
-    Plan = 'EngineerBuildAI',
-    GlobalSquads = {
-        { categories.ENGINEER * (categories.TECH1 + categories.TECH2 + categories.TECH3) - categories.ENGINEERSTATION - categories.COMMAND, 1, 1, 'support', 'none' },
     },
 }
 
