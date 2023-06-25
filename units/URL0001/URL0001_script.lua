@@ -185,6 +185,9 @@ URL0001 = ClassUnit(ACUUnit, CCommandUnit) {
             if Buff.HasBuff(self, 'CybranACURegenerateBonus') then
                 Buff.RemoveBuff(self, 'CybranACUCloakBonus')
             end
+            if Buff.HasBuff(self, 'CybranACURegenerateBonus') then
+                Buff.RemoveBuff(self, 'CybranACURegenerateBonus')
+            end
             if Buff.HasBuff(self, 'CybranACUStealthBonus') then
                 Buff.RemoveBuff(self, 'CybranACUStealthBonus')
             end

@@ -569,7 +569,7 @@ UnitBlueprint {
             RemoveEnhancements = {
                 'StealthGenerator',
                 'SelfRepairSystem',
-                'SelfRepairSystememove',
+                'SelfRepairSystemRemove',
             },
             Slot = 'Back',
         },
