@@ -4478,7 +4478,6 @@ Platoon = Class(moho.platoon_methods) {
         eng.Initializing = true
         -- Small note on the base template file. This is using a custom one so the acu doesnt try to select 
         -- a build location that causes it to move from its spawn position. But there are maps where it wont quite work and he'll move.
-        local templateKey = 'BaseTemplates'
         if factionIndex < 5 then
             templateKey = 'ACUBaseTemplate'
             baseTmplFile = import(self.PlatoonData.Construction.BaseTemplateFile or '/lua/BaseTemplates.lua')
