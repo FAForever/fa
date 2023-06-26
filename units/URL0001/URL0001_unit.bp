@@ -545,7 +545,7 @@ UnitBlueprint {
             BuildCostMass = 1600,
             BuildTime = 1000,
             Icon = 'srs',
-            Name = '<LOC enhancements_0089>Nano Repair System',
+            Name = '<LOC enhancements_0150>Self-Repair System',
             NewRegenRate = 70,
             NewHealth = 1500,
             Slot = 'Back',
@@ -563,6 +563,7 @@ UnitBlueprint {
             BuildTime = 0.1,
             Icon = 'srs',
             Prerequisite = 'SelfRepairSystem',
+            Name = '<LOC enhancements_0151>Remove Self-Repair System',
             HideBones = {
                 'Back_Upgrade',
             },

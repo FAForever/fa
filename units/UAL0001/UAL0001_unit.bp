@@ -394,7 +394,7 @@ UnitBlueprint {
             BuildCostMass = 300,
             BuildTime = 350,
             Icon = 'cba',
-            Name = '<LOC enhancements_0004>Quantum Disruptor',
+            Name = '<LOC enhancements_0152>Quantum Disruptor',
             NewMaxRadius = 30,
             Slot = 'LCH',
             ShowBones = {
@@ -416,7 +416,7 @@ UnitBlueprint {
             HideBones = {
                 'Left_Upgrade',
             },
-            Name = '<LOC enhancements_0005>Remove Quantum Disruptor',
+            Name = '<LOC enhancements_0153>Remove Quantum Disruptor',
             Prerequisite = 'CrysalisBeam',
             RemoveEnhancements = {
                 'CrysalisBeam',
@@ -430,7 +430,7 @@ UnitBlueprint {
             BuildTime = 1100,
             Prerequisite = 'CrysalisBeam',
             Icon = 'cba',
-            Name = '<LOC enhancements_0004>Enhanced Quantum Disruptor',
+            Name = '<LOC enhancements_0154>Enhanced Quantum Disruptor',
             NewMaxRadius = 35,
             Slot = 'LCH',
             ShowBones = {
@@ -452,7 +452,7 @@ UnitBlueprint {
             HideBones = {
                 'Left_Upgrade',
             },
-            Name = '<LOC enhancements_0005>Remove Enhanced Quantum Disruptor',
+            Name = '<LOC enhancements_0155>Remove Enhanced Quantum Disruptor',
             Prerequisite = 'AdvancedCrysalisBeam',
             RemoveEnhancements = {
                 'CrysalisBeam',
