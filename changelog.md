@@ -1,6 +1,45 @@
 
 Some sections of the changelog are available in other languages such as [French](changelog-fr.md) or [Russian](changelog-ru.md)
 
+# Game version 3760 (27th of June, 2023)
+
+See the patch notes of 3758 for all the details of the second development iteration.
+
+We would like to remind people that we're always open to feedback. You can get in touch with us through the forums, Discord and of course through GitHub to discuss the patch.
+
+With thanks to those that took the time to report bugs,
+
+Jip
+
+## Bug fixes
+
+- (#5153) Fix a bug with AI being buggy in the featured mod Nomads
+
+- (#5159) Remove the rehost functionality
+
+  The rehost functionality has been broken for quite a long time. It would not properly restart the 
+  game with the correct mods and previously private lobbies would become public. We've not managed to 
+  fix it for quite some time and it confuses those who use it. Therefore we've decided to remove it 
+  until we can find a proper fix.
+
+  You can still 'rehost' the usual way, and in that case, your mods will work too.
+
+- (#5158) Fix a bug with the Cybran destroyer being stuck in the transition animation
+
+- (#5155) Fix a bug where abandoned armies would not be defeated
+
+- (#5155) Fix a bug in the campaign/co-op where naval rally points were ignored
+
+- (#5155) Fix a bug in the campaign/co-op where the army brain was missing certain functions
+
+- (#5148) Fix a bug with the in-game file picker for replays
+
+## Contributors
+
+- Jip (#5159, #5158, #5155, #5148)
+- Relent0r (#5153)
+
+
 # Game version 3758 (24th of June, 2023)
 
 There are a lot of goodies in this iteration! The changelog format has been adjusted to make it easier to read. It now contains less detailed information and more general descriptions. Additionally, the in-game changelog window has been enhanced. To access more readable patch notes, you can find buttons at the bottom of the in-game changelog. These buttons will take you to the patch notes on GitHub or to the patch notes website 'patchnotes.faforever.com' for the respective branch. The website provides a user-friendly reading experience and may include helpful images to improve your understanding of the changes.
