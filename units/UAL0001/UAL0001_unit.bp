@@ -429,7 +429,7 @@ UnitBlueprint {
             BuildCostMass = 900,
             BuildTime = 1100,
             Prerequisite = 'CrysalisBeam',
-            Icon = 'cba',
+            Icon = 'ecba',
             Name = '<LOC enhancements_0154>Enhanced Quantum Disruptor',
             NewMaxRadius = 35,
             Slot = 'LCH',
@@ -448,7 +448,7 @@ UnitBlueprint {
             BuildCostEnergy = 1,
             BuildCostMass = 1,
             BuildTime = 0.1,
-            Icon = 'cba',
+            Icon = 'ecba',
             HideBones = {
                 'Left_Upgrade',
             },
