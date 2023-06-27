@@ -1,14 +1,23 @@
-# Game version 3758 (24th of June, 2023)
+# Game version 3760 (27th of June, 2023)
 
+See the patch notes of 3758 for all the details of the second development iteration.
 
+We would like to remind people that we're always open to feedback. You can get in touch with us through the forums, Discord and of course through GitHub to discuss the patch.
+
+With thanks to those that took the time to report bugs,
 
 Jip
 
 ## Bug fixes
 
-- (#5159) Disable the rehost functionality
+- (#5153) Fix a bug with AI being buggy in the featured mod Nomads
 
-  The rehost functionality has been broken for quite a long time. It would not properly restart the game with the correct mods and previously private lobbies would become public. We've not managed to fix it for quite some time and as it confuses those who use it and therefore we've decided to disable it.
+- (#5159) Remove the rehost functionality
+
+  The rehost functionality has been broken for quite a long time. It would not properly restart the 
+  game with the correct mods and previously private lobbies would become public. We've not managed to 
+  fix it for quite some time and it confuses those who use it. Therefore we've decided to remove it 
+  until we can find a proper fix.
 
   You can still 'rehost' the usual way, and in that case, your mods will work too.
 
@@ -20,10 +29,9 @@ Jip
 
 - (#5155) Fix a bug in the campaign/co-op where the army brain was missing certain functions
 
-- (#5148) Fix a bug with the file picker
-
-  This refers to the in-game file picker that is used when loading up a save game or replay
+- (#5148) Fix a bug with the in-game file picker for replays
 
 ## Contributors
 
-- Jip (#5159, #5158, #5155)
+- Jip (#5159, #5158, #5155, #5148)
+- Relent0r (#5153)
