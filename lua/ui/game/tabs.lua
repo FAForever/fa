@@ -199,12 +199,12 @@ local menus = {
             },
         },
         gpgnet = {
-            {
-                action = 'RehostGame',
-                label = '<LOC _Rehost_Game>Rehost Game',
-                tooltip = 'esc_rehost',
-                hideWhenRanked = true,
-            },
+            -- {
+            --     action = 'RehostGame',
+            --     label = '<LOC _Rehost_Game>Rehost Game',
+            --     tooltip = 'esc_rehost',
+            --     hideWhenRanked = true,
+            -- },
             {
                 action = 'ShowObj',
                 label='<LOC _Show_Scenario_Info>Scenario',
