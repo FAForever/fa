@@ -576,6 +576,19 @@ globalOpts = {
             },
         },
     },
+    {
+        default = 1,
+        label = "<LOC aireplace_0001>AI Replacement",
+        help = "<LOC aireplace_0002>Toggle AI Replacement if a player disconnects.",
+        key = 'AIReplacement',
+        values = {
+            {
+                text = "<LOC _Off>Off",
+                help = "<LOC aireplace_0004>A disconnected player will cause the destruction of their units based on share conditions.",
+                key = 'Off',
+            },
+        },
+    },
 }
 
 ---@type ScenarioOption[]
