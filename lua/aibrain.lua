@@ -1172,7 +1172,9 @@ AIBrain = Class(AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerCom
     end,
 
     AbandonedByPlayer = function(self)
-        self:OnDefeat()
+        if not IsGameOver() then
+            self:OnDefeat()
+        end
     end,
 
     ---@param self AIBrain
