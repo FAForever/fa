@@ -63,10 +63,19 @@ AIBrain = Class(StandardBrain) {
         self.IgnoreArmyCaps = false
     end,
 
-    --- Called after `SetupSession` but before `BeginSession` - no initial units, props or resources exist at this point
-    ---@param self AIBrain
+    --- Called after `BeginSession`, at this point all props, resources and initial units exist in the map and the teams are defined
+    ---@param self EasyAIBrain
     OnBeginSession = function(self)
         StandardBrain.OnBeginSession(self)
+
+        -- requires navigational mesh
+        import("/lua/sim/NavUtils.lua").Generate()
+
+        -- requires these datastructures to understand the game
+        self.GridReclaim = import("/lua/ai/gridreclaim.lua").Setup(self)
+        self.GridBrain = import("/lua/ai/gridbrain.lua").Setup()
+        self.GridRecon = import("/lua/ai/gridrecon.lua").Setup(self)
+        self.GridPresence = import("/lua/AI/GridPresence.lua").Setup(self)
     end,
 
     ---@param self EasyAIBrain
@@ -1689,6 +1698,33 @@ AIBrain = Class(StandardBrain) {
             self:DisbandPlatoon(platoon)
         end
         return returnPlatoon
+    end,
+
+    IMAPConfiguration = function(self)
+        -- Used to configure imap values, used for setting threat ring sizes depending on map size to try and get a somewhat decent radius
+        local maxmapdimension = math.max(ScenarioInfo.size[1],ScenarioInfo.size[2])
+
+        if maxmapdimension == 256 then
+            self.IMAPConfig.OgridRadius = 22.5
+            self.IMAPConfig.IMAPSize = 32
+            self.IMAPConfig.Rings = 2
+        elseif maxmapdimension == 512 then
+            self.IMAPConfig.OgridRadius = 22.5
+            self.IMAPConfig.IMAPSize = 32
+            self.IMAPConfig.Rings = 2
+        elseif maxmapdimension == 1024 then
+            self.IMAPConfig.OgridRadius = 45.0
+            self.IMAPConfig.IMAPSize = 64
+            self.IMAPConfig.Rings = 1
+        elseif maxmapdimension == 2048 then
+            self.IMAPConfig.OgridRadius = 89.5
+            self.IMAPConfig.IMAPSize = 128
+            self.IMAPConfig.Rings = 0
+        else
+            self.IMAPConfig.OgridRadius = 180.0
+            self.IMAPConfig.IMAPSize = 256
+            self.IMAPConfig.Rings = 0
+        end
     end,
 
     ----------------------------------------------------------------------------------------
