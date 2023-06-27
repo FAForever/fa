@@ -1171,6 +1171,12 @@ AIBrain = Class(AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerCom
         end
     end,
 
+    AbandonedByPlayer = function(self)
+        if not IsGameOver() then
+            self:OnDefeat()
+        end
+    end,
+
     ---@param self AIBrain
     RecallAllCommanders = function(self)
         local commandCat = categories.COMMAND + categories.SUBCOMMANDER
