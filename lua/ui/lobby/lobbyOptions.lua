@@ -15,7 +15,6 @@
 ---@field TeamLock 'locked' | 'unlocked'
 ---@field TeamSpawn 'fixed' | 'random' | 'balanced' | 'balanced_flex' | 'random_reveal' | 'balanced_reveal' | 'balanced_reveal_mirrored' | 'balanced_flex_reveal'
 ---
----@field AIReplacement 'Off' | 'On'
 ---@field AllowObservers boolean
 ---@field CheatsEnabled 'false' | 'true'
 ---@field CivilianAlliance 'enemy' | 'neutral' | 'removed'
@@ -574,24 +573,6 @@ globalOpts = {
                 text = "<LOC _No>No",
                 help = "<LOC lobui_0795>No manual sharing of units",
                 key = 'none',
-            },
-        },
-    },
-    {
-        default = 2,
-        label = "<LOC aireplace_0001>AI Replacement",
-        help = "<LOC aireplace_0002>Toggle AI Replacement if a player disconnects.",
-        key = 'AIReplacement',
-        values = {
-            {
-                text = "<LOC _On>On",
-                help = "<LOC aireplace_0003>If a player disconnects and the ACU is still active, an AI will be created to take control of units that belonged to the player who disconnected.",
-                key = 'On',
-            },
-            {
-                text = "<LOC _Off>Off",
-                help = "<LOC aireplace_0004>A disconnected player will cause the destruction of their units based on share conditions.",
-                key = 'Off',
             },
         },
     },
