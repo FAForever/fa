@@ -26,6 +26,7 @@ local NavUtils = import("/lua/sim/navutils.lua")
 local Enabled = false
 
 function Enable()
+    NavUtils.Generate()
     Enabled = true
 end
 
