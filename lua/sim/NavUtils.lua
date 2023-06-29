@@ -639,6 +639,7 @@ local DirectionsFromFound = { }
 ---@param layer NavLayers
 ---@param origin Vector
 ---@param distance number
+---@param sizeThreshold number
 ---@return Vector[] | nil
 ---@return number | ('NotGenerated' | 'OutsideMap' | 'NoResults')
 function DirectionsFrom(layer, origin, distance, sizeThreshold)
