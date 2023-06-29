@@ -45,11 +45,11 @@ NavUI = ClassUI(Window) {
 
         -- prepare base class
 
-        Window.__init(self, parent, "NavUtils - Directions From", false, false, false, true, false, "NavDirectionsFrom01", {
+        Window.__init(self, parent, "NavUtils - Directions From", false, false, false, true, false, "NavDirectionsFrom02", {
             Left = 10,
             Top = 300,
             Right = 330,
-            Bottom = 600
+            Bottom = 460
         })
 
         self.State = {
