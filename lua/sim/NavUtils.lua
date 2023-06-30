@@ -1147,7 +1147,6 @@ function DirectionTo(layer, origin, destination, distance)
         local dz = waypoint[3] - lastWaypoint[3]
         local d = math.sqrt(dx * dx + dz * dz)
 
-        DrawCircle({waypoint[1], GetSurfaceHeight(waypoint[1], waypoint[3]), waypoint[3]}, 2, 'ffffff')
         if d + taken < distance then
             taken = taken + d
             lastWaypoint = waypoint
