@@ -912,6 +912,78 @@ Callbacks.NavDebugUpdateDirectionsFrom = function(data, units)
     import("/lua/sim/navdebug/directionsfrom.lua").Update(data)
 end
 
+Callbacks.NavDebugUpdateRandomDirectionFrom = function(data, units)
+    if not PassesAIAntiCheatCheck() then
+        return
+    end
+
+    import("/lua/sim/navdebug/randomdirectionfrom.lua").Update(data)
+end
+
+Callbacks.NavDebugEnableRandomDirectionFrom = function(data, units)
+    if not PassesAIAntiCheatCheck() then
+        return
+    end
+
+    import("/lua/sim/navdebug/randomdirectionfrom.lua").Enable()
+end
+
+Callbacks.NavDebugDisableRandomDirectionFrom = function(data, units)
+    if not PassesAIAntiCheatCheck() then
+        return
+    end
+
+    import("/lua/sim/navdebug/randomdirectionfrom.lua").Disable()
+end
+
+Callbacks.NavDebugUpdateRetreatDirectionFrom = function(data, units)
+    if not PassesAIAntiCheatCheck() then
+        return
+    end
+
+    import("/lua/sim/navdebug/retreatdirectionfrom.lua").Update(data)
+end
+
+Callbacks.NavDebugEnableRetreatDirectionFrom = function(data, units)
+    if not PassesAIAntiCheatCheck() then
+        return
+    end
+
+    import("/lua/sim/navdebug/retreatdirectionfrom.lua").Enable()
+end
+
+Callbacks.NavDebugDisableRetreatDirectionFrom = function(data, units)
+    if not PassesAIAntiCheatCheck() then
+        return
+    end
+
+    import("/lua/sim/navdebug/retreatdirectionfrom.lua").Disable()
+end
+
+Callbacks.NavDebugUpdateDirectionTo = function(data, units)
+    if not PassesAIAntiCheatCheck() then
+        return
+    end
+
+    import("/lua/sim/navdebug/directionto.lua").Update(data)
+end
+
+Callbacks.NavDebugEnableDirectionTo = function(data, units)
+    if not PassesAIAntiCheatCheck() then
+        return
+    end
+
+    import("/lua/sim/navdebug/directionto.lua").Enable()
+end
+
+Callbacks.NavDebugDisableDirectionTo = function(data, units)
+    if not PassesAIAntiCheatCheck() then
+        return
+    end
+
+    import("/lua/sim/navdebug/directionto.lua").Disable()
+end
+
 Callbacks.NavDebugGetLabelMetadata = function(data, units)
     if not PassesAIAntiCheatCheck() then
         return

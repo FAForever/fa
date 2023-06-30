@@ -22,7 +22,7 @@
 
 local NavUtils = import("/lua/sim/navutils.lua")
 
----@class NavDebugDirectionsFromState
+---@class NavDebugRandomDirectionFromState
 ---@field Layer NavLayers
 ---@field Distance number
 ---@field Threshold number
@@ -43,7 +43,7 @@ function Disable()
 end
 
 --- Updates the state of the debugging functionality
----@param data NavDebugDirectionsFromState
+---@param data NavDebugRandomDirectionFromState
 function Update(data)
     State = data
 end
@@ -57,15 +57,13 @@ function DebugThread()
             local distance = State.Distance
             local threshold = State.Threshold
             if layer and origin and distance and threshold then
-                local directions, error = NavUtils.DirectionsFrom(layer, origin, distance, threshold)
-                if directions then
-                    DrawCircle(origin, 10, 'ffffff')
-                    for k, direction in directions do
-                        DrawLinePop(origin, direction, 'ffffff')
-                    end
+                local direction, error = NavUtils.RandomDirectionFrom(layer, origin, distance, threshold)
+                if direction then
+                    DrawCircle(origin, 2, 'ffffff')
+                    DrawLinePop(origin, direction, 'ffffff')
                 else
-                    DrawCircle(origin, 10, 'ff0000')
-                    WARN("NavDirectionsFrom - " .. error)
+                    DrawCircle(origin, 2, 'ff0000')
+                    WARN("NavRandomDirectionFrom - " .. error)
                 end
             end
         end
