@@ -40,7 +40,7 @@ UINavUtilsDirectionTo = ClassUI(Window) {
             Left = 10,
             Top = 300,
             Right = 330,
-            Bottom = 460
+            Bottom = 430
         })
 
         self.State = {
