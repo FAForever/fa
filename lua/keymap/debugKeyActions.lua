@@ -241,6 +241,10 @@ local keyActionsDebugAI = {
         action = 'UI_Lua import("/lua/ui/game/NavDebug/RetreatDirectionFrom.lua").OpenWindow()',
         category = 'ai'
     },
+    ['toggle_ai_nav_direction_to'] = {
+        action = 'UI_Lua import("/lua/ui/game/NavDebug/DirectionTo.lua").OpenWindow()',
+        category = 'ai'
+    },
     ['toggle_ai_base_ui'] = {
         action = 'UI_Lua import("/lua/ui/game/aibaseinfo.lua").OpenWindow()',
         category = 'ai'

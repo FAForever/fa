@@ -515,4 +515,5 @@ keyDescriptions = {
     ['toggle_ai_nav_directions_from'] = 'NavUtils - Toggle to visualize output of DirectionsFrom ',
     ['toggle_ai_nav_random_direction_from'] = 'NavUtils - Toggle to visualize output of RandomDirectionFrom ',
     ['toggle_ai_nav_retreat_direction_from'] = 'NavUtils - Toggle to visualize output of RetreatDirectionFrom ',
+    ['toggle_ai_nav_direction_to'] = 'NavUtils - Toggle to visualize output of DirectionTo',
 }

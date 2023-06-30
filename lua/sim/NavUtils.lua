@@ -1156,7 +1156,6 @@ function DirectionTo(layer, origin, destination, distance)
             output[1] = factor * waypoint[1] + (1 - factor) * lastWaypoint[1]
             output[3] = factor * waypoint[3] + (1 - factor) * lastWaypoint[3]
             output[2] = GetSurfaceHeight(output[1], output[3])
-            DrawCircle(output, 10, 'ffffff')
             break
         end
 

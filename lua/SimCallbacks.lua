@@ -904,6 +904,14 @@ Callbacks.NavDebugDisableDirectionsFrom = function(data, units)
     import("/lua/sim/navdebug/directionsfrom.lua").Disable()
 end
 
+Callbacks.NavDebugUpdateDirectionsFrom = function(data, units)
+    if not PassesAIAntiCheatCheck() then
+        return
+    end
+
+    import("/lua/sim/navdebug/directionsfrom.lua").Update(data)
+end
+
 Callbacks.NavDebugUpdateRandomDirectionFrom = function(data, units)
     if not PassesAIAntiCheatCheck() then
         return
@@ -952,12 +960,28 @@ Callbacks.NavDebugDisableRetreatDirectionFrom = function(data, units)
     import("/lua/sim/navdebug/retreatdirectionfrom.lua").Disable()
 end
 
-Callbacks.NavDebugUpdateDirectionsFrom = function(data, units)
+Callbacks.NavDebugUpdateDirectionTo = function(data, units)
     if not PassesAIAntiCheatCheck() then
         return
     end
 
-    import("/lua/sim/navdebug/directionsfrom.lua").Update(data)
+    import("/lua/sim/navdebug/directionto.lua").Update(data)
+end
+
+Callbacks.NavDebugEnableDirectionTo = function(data, units)
+    if not PassesAIAntiCheatCheck() then
+        return
+    end
+
+    import("/lua/sim/navdebug/directionto.lua").Enable()
+end
+
+Callbacks.NavDebugDisableDirectionTo = function(data, units)
+    if not PassesAIAntiCheatCheck() then
+        return
+    end
+
+    import("/lua/sim/navdebug/directionto.lua").Disable()
 end
 
 Callbacks.NavDebugGetLabelMetadata = function(data, units)
