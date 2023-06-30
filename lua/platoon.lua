@@ -4454,7 +4454,7 @@ Platoon = Class(moho.platoon_methods) {
         -- The small build logic code loop should be put into a utility function rather than repeating it.
 
         local aiBrain = self:GetBrain()
-        local buildingTmpl, buildingTmplFile, baseTmplFile, baseTmplDefault
+        local buildingTmpl, buildingTmplFile, baseTmplFile, baseTmplDefault, templateKey
         local whatToBuild
         local hydroPresent = false
         local buildLocation = false
@@ -4478,7 +4478,13 @@ Platoon = Class(moho.platoon_methods) {
         eng.Initializing = true
         -- Small note on the base template file. This is using a custom one so the acu doesnt try to select 
         -- a build location that causes it to move from its spawn position. But there are maps where it wont quite work and he'll move.
-        baseTmplFile = import(self.PlatoonData.Construction.BaseTemplateFile or '/lua/BaseTemplates.lua')
+        if factionIndex < 5 then
+            templateKey = 'ACUBaseTemplate'
+            baseTmplFile = import(self.PlatoonData.Construction.BaseTemplateFile or '/lua/BaseTemplates.lua')
+        else
+            templateKey = 'BaseTemplates'
+            baseTmplFile = import('/lua/BaseTemplates.lua')
+        end
         baseTmplDefault = import('/lua/BaseTemplates.lua')
         buildingTmplFile = import(self.PlatoonData.Construction.BuildingTemplateFile or '/lua/BuildingTemplates.lua')
         buildingTmpl = buildingTmplFile[('BuildingTemplates')][factionIndex]
@@ -4516,13 +4522,13 @@ Platoon = Class(moho.platoon_methods) {
         -- Check if we spawned in water. In which case we want a naval factory first up, and hope for the best.
         local inWater = GetTerrainHeight(engPos[1], engPos[3]) < GetSurfaceHeight(engPos[1], engPos[3])
         if inWater then
-            buildLocation, whatToBuild, borderWarning = AIUtils.GetBuildLocation(aiBrain, buildingTmpl, baseTmplFile['ACUBaseTemplate'][factionIndex], 'T1SeaFactory', eng, false, nil, nil, true)
+            buildLocation, whatToBuild, borderWarning = AIUtils.GetBuildLocation(aiBrain, buildingTmpl, baseTmplFile[templateKey][factionIndex], 'T1SeaFactory', eng, false, nil, nil, true)
         else
             -- If our personality is rushair then we will go air first else land.
             if personality ==  'rushair' then
-                buildLocation, whatToBuild, borderWarning = AIUtils.GetBuildLocation(aiBrain, buildingTmpl, baseTmplFile['ACUBaseTemplate'][factionIndex], 'T1AirFactory', eng, false, nil, nil, true)
+                buildLocation, whatToBuild, borderWarning = AIUtils.GetBuildLocation(aiBrain, buildingTmpl, baseTmplFile[templateKey][factionIndex], 'T1AirFactory', eng, false, nil, nil, true)
             else
-                buildLocation, whatToBuild, borderWarning = AIUtils.GetBuildLocation(aiBrain, buildingTmpl, baseTmplFile['ACUBaseTemplate'][factionIndex], 'T1LandFactory', eng, false, nil, nil, true)
+                buildLocation, whatToBuild, borderWarning = AIUtils.GetBuildLocation(aiBrain, buildingTmpl, baseTmplFile[templateKey][factionIndex], 'T1LandFactory', eng, false, nil, nil, true)
             end
         end
         if borderWarning and buildLocation and whatToBuild then

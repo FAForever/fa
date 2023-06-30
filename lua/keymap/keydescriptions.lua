@@ -511,6 +511,7 @@ keyDescriptions = {
 
     ['store_camera_settings'] = 'Store the current camera settings in the preference file',
     ['restore_camera_settings'] = 'Apply the camera settings stored in the preference file',
+
     ['toggle_ai_nav_directions_from'] = 'NavUtils - Toggle to visualize output of DirectionsFrom ',
     ['toggle_ai_nav_random_direction_from'] = 'NavUtils - Toggle to visualize output of RandomDirectionFrom ',
     ['toggle_ai_nav_retreat_direction_from'] = 'NavUtils - Toggle to visualize output of RetreatDirectionFrom ',
