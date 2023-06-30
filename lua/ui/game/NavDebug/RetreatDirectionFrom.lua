@@ -32,21 +32,21 @@ local Shared = import("/lua/shared/navgenerator.lua")
 
 local Instance = nil
 
----@class UINavUtilsDirectionsFrom : Window
----@field State NavDebugDirectionsFromState
-UINavUtilsDirectionsFrom = ClassUI(Window) {
+---@class UINavUtilsRetreatDirectionFrom : Window
+---@field State NavDebugRetreatDirectionFromState
+UINavUtilsRetreatDirectionFrom = ClassUI(Window) {
     __init = function(self, parent)
-        Window.__init(self, parent, "NavUtils - Directions From", false, false, false, true, false, "NavDirectionsFrom02", {
+        Window.__init(self, parent, "NavUtils - Retreat Direction From", false, false, false, true, false, "NavRetreatDirectionFrom02", {
             Left = 10,
             Top = 300,
             Right = 330,
-            Bottom = 460
+            Bottom = 430
         })
 
         self.State = {
             Layer = 'Land',
             Distance = 30,
-            Threshold = 4,
+            ToEvade = nil,
         }
 
         do
@@ -66,7 +66,7 @@ UINavUtilsDirectionsFrom = ClassUI(Window) {
             self.State.Layer = Shared.Layers[1]
             self.ComboLayer.OnClick = function(combo, index, text)
                 self.State.Layer = Shared.Layers[index]
-                SimCallback({Func = 'NavDebugUpdateDirectionsFrom', Args = self.State })
+                SimCallback({Func = 'NavDebugUpdateRetreatDirectionFrom', Args = self.State })
             end
         end
 
@@ -79,7 +79,7 @@ UINavUtilsDirectionsFrom = ClassUI(Window) {
             self.Distance.OnValueChanged = function(slider, value)
                 self.LabelDistance:SetText(string.format("Distance: %d", value))
                 self.State.Distance = value
-                SimCallback({Func = 'NavDebugUpdateDirectionsFrom', Args = self.State })
+                SimCallback({Func = 'NavDebugUpdateRetreatDirectionFrom', Args = self.State })
             end
 
             self.LabelDistance = LayoutHelpers.LayoutFor(UIUtil.CreateText(self, 'Distance: 0', 10, UIUtil.bodyFont))
@@ -91,30 +91,42 @@ UINavUtilsDirectionsFrom = ClassUI(Window) {
         end
 
         do
-            self.Threshold = LayoutHelpers.LayoutFor(IntegerSlider(self, false, 1, 128, 1))
-                :Below(self.Distance, 10)
-                :Over(self, 10)
-                :End()
+            self.ButtonOrigin = LayoutHelpers.LayoutFor(UIUtil.CreateButtonWithDropshadow(self, '/BUTTON/medium/', "To evade"))
+            :RightOf(self.LabelLayer, 60)
+            :Over(self, 10)
+            :End()
 
-            self.Threshold.OnValueChanged = function(slider, value)
-                self.LabelThreshold:SetText(string.format("Cell size threshold: %d", value))
-                self.State.Threshold = value
-                SimCallback({Func = 'NavDebugUpdateDirectionsFrom', Args = self.State })
+            self.ButtonOrigin.OnClick = function()
+
+                -- make sure we have nothing selected
+                local selection = GetSelectedUnits()
+                SelectUnits(nil);
+
+                -- enables command mode for spawning units
+                import("/lua/ui/game/commandmode.lua").StartCommandMode(
+                    "build",
+                    {
+                        -- default information required
+                        name = 'uaa0101',
+
+                        --- 
+                        ---@param mode CommandModeDataBuild
+                        ---@param command any
+                        callback = function(mode, command)
+                            self.State.ToEvade = command.Target.Position
+                            SimCallback({Func = 'NavDebugUpdateRetreatDirectionFrom', Args = self.State})
+                            SelectUnits(selection)
+                        end,
+                    }
+                )
             end
-
-            self.LabelThreshold = LayoutHelpers.LayoutFor(UIUtil.CreateText(self, 'Cell size threshold: 0', 10, UIUtil.bodyFont))
-                :Above(self.Threshold)
-                :Over(self, 10)
-                :End()
-
-            self.Threshold:SetValue(self.State.Threshold)
         end
 
         self:SetAlpha(0.8)
     end,
 
     OnClose = function(self)
-        SimCallback({Func = 'NavDebugDisableDirectionsFrom', Args = { }})
+        SimCallback({Func = 'NavDebugDisableRetreatDirectionFrom', Args = { }})
         self:Hide()
     end,
 }
@@ -123,11 +135,11 @@ function OpenWindow()
     if Instance then
         Instance:Show()
     else
-        Instance = UINavUtilsDirectionsFrom(GetFrame(0))
+        Instance = UINavUtilsRetreatDirectionFrom(GetFrame(0))
         Instance:Show()
     end
 
-    SimCallback({Func = 'NavDebugEnableDirectionsFrom', Args = { }})
+    SimCallback({Func = 'NavDebugEnableRetreatDirectionFrom', Args = { }})
 end
 
 function CloseWindow()

@@ -929,66 +929,80 @@ function RetreatDirectionFrom(layer, origin, threat, distance)
     while not PathToHeap:IsEmpty() do
         local leaf = PathToHeap:ExtractMin() --[[@as CompressedLabelTreeLeaf]]
 
-        -- do not look into the direction of the threat when we found something else
-        if head > 1 and leaf.TotalCosts > 0 then
-            continue
-        end
-
-        -- distance threshold for when we accept a leaf
-        local px = leaf.px
-        local pz = leaf.pz
-
-        local dx = px - ox
-        local dz = pz - oz
-
-        local d2 = dx * dx + dz * dz
-
-        if d2 > distance * distance then
-            if not found[leaf] then
-                found[leaf] = true
-                candidates[head] = leaf
-                head = head + 1
-            end
-
-            continue
-        end
-
         -- add neighbors of leaf that is too close to the origin
-        for k = 1, TableGetn(leaf) do
-            local neighbor = leaf[k]
-            if neighbor.Label > 0 and neighbor.Seen != seenIdentifier then
+        if leaf.AcquiredCosts < distance then
+            for k = 1, TableGetn(leaf) do
+                local neighbor = leaf[k]
+                if neighbor.Label > 0 and neighbor.Seen != seenIdentifier then
 
-                px = neighbor.px
-                pz = neighbor.pz
+                    px = neighbor.px
+                    pz = neighbor.pz
 
-                dx = px - ox
-                dz = pz - oz
+                    dx = px - ox
+                    dz = pz - oz
 
-                neighbor.From = leaf
-                neighbor.Seen = seenIdentifier
-                neighbor.AcquiredCosts = 0
-                neighbor.TotalCosts = tx * dx + tz * dz
+                    neighbor.From = leaf
+                    neighbor.Seen = seenIdentifier
+                    neighbor.AcquiredCosts = leaf.AcquiredCosts + leaf:DistanceTo(neighbor)
+                    neighbor.TotalCosts = tx * dx + tz * dz
 
-                PathToHeap:Insert(neighbor)
+                    PathToHeap:Insert(neighbor)
+                end
             end
+        else
+            found[leaf] = true
+            candidates[head] = leaf
+            head = head + 1
         end
     end
 
-    -- convert to a series of positions
     if head <= 1 then
         return nil, 'NoResults'
     end
 
-    -- retrieve a random candidate
-    local candidate = candidates[Random(1, TableGetn(candidates))]
+    -- find best retreat direction
+    local lowest = 1000
+    local result = candidates[1]
 
-    local px = candidate.px
-    local pz = candidate.pz
+    for k, candidate in candidates do
+        local px = candidate.px
+        local pz = candidate.pz
+
+        local dx = px - ox
+        local dz = pz - oz
+
+        local d = math.sqrt(dx * dx + dz * dz)
+        local di = 1 / d
+
+        local nx = di * dx
+        local nz = di * dz
+
+        local radians = nx * tx + nz * tz
+
+        if 0.6 * d < distance then
+
+            DrawCircle({candidate.px, GetSurfaceHeight(candidate.px, candidate.pz), candidate.pz}, 2, 'ffffff')
+
+            if radians < lowest then
+                lowest = radians
+                result = candidate
+            end
+        end
+
+    end
+
+    -- try to match the intended distance as best as we can
+    local px = result.px
+    local pz = result.pz
 
     local dx = px - ox
     local dz = pz - oz
 
     local d = math.sqrt(dx * dx + dz * dz)
+
+    if d < distance then
+        distance = d
+    end
 
     local x = ox + distance / d * dx
     local z = oz + distance / d * dz

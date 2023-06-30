@@ -32,11 +32,11 @@ local Shared = import("/lua/shared/navgenerator.lua")
 
 local Instance = nil
 
----@class UINavUtilsDirectionsFrom : Window
----@field State NavDebugDirectionsFromState
-UINavUtilsDirectionsFrom = ClassUI(Window) {
+---@class UINavUtilsRandomDirectionFrom : Window
+---@field State NavDebugRandomDirectionFromState
+UINavUtilsRandomDirectionFrom = ClassUI(Window) {
     __init = function(self, parent)
-        Window.__init(self, parent, "NavUtils - Directions From", false, false, false, true, false, "NavDirectionsFrom02", {
+        Window.__init(self, parent, "NavUtils - Random Direction From", false, false, false, true, false, "NavRandomDirectionFrom02", {
             Left = 10,
             Top = 300,
             Right = 330,
@@ -66,7 +66,7 @@ UINavUtilsDirectionsFrom = ClassUI(Window) {
             self.State.Layer = Shared.Layers[1]
             self.ComboLayer.OnClick = function(combo, index, text)
                 self.State.Layer = Shared.Layers[index]
-                SimCallback({Func = 'NavDebugUpdateDirectionsFrom', Args = self.State })
+                SimCallback({Func = 'NavDebugUpdateRandomDirectionFrom', Args = self.State })
             end
         end
 
@@ -79,7 +79,7 @@ UINavUtilsDirectionsFrom = ClassUI(Window) {
             self.Distance.OnValueChanged = function(slider, value)
                 self.LabelDistance:SetText(string.format("Distance: %d", value))
                 self.State.Distance = value
-                SimCallback({Func = 'NavDebugUpdateDirectionsFrom', Args = self.State })
+                SimCallback({Func = 'NavDebugUpdateRandomDirectionFrom', Args = self.State })
             end
 
             self.LabelDistance = LayoutHelpers.LayoutFor(UIUtil.CreateText(self, 'Distance: 0', 10, UIUtil.bodyFont))
@@ -99,7 +99,7 @@ UINavUtilsDirectionsFrom = ClassUI(Window) {
             self.Threshold.OnValueChanged = function(slider, value)
                 self.LabelThreshold:SetText(string.format("Cell size threshold: %d", value))
                 self.State.Threshold = value
-                SimCallback({Func = 'NavDebugUpdateDirectionsFrom', Args = self.State })
+                SimCallback({Func = 'NavDebugUpdateRandomDirectionFrom', Args = self.State })
             end
 
             self.LabelThreshold = LayoutHelpers.LayoutFor(UIUtil.CreateText(self, 'Cell size threshold: 0', 10, UIUtil.bodyFont))
@@ -114,7 +114,7 @@ UINavUtilsDirectionsFrom = ClassUI(Window) {
     end,
 
     OnClose = function(self)
-        SimCallback({Func = 'NavDebugDisableDirectionsFrom', Args = { }})
+        SimCallback({Func = 'NavDebugDisableRandomDirectionFrom', Args = { }})
         self:Hide()
     end,
 }
@@ -123,11 +123,11 @@ function OpenWindow()
     if Instance then
         Instance:Show()
     else
-        Instance = UINavUtilsDirectionsFrom(GetFrame(0))
+        Instance = UINavUtilsRandomDirectionFrom(GetFrame(0))
         Instance:Show()
     end
 
-    SimCallback({Func = 'NavDebugEnableDirectionsFrom', Args = { }})
+    SimCallback({Func = 'NavDebugEnableRandomDirectionFrom', Args = { }})
 end
 
 function CloseWindow()
