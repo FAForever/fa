@@ -980,15 +980,11 @@ function RetreatDirectionFrom(layer, origin, threat, distance)
         local radians = nx * tx + nz * tz
 
         if 0.6 * d < distance then
-
-            DrawCircle({candidate.px, GetSurfaceHeight(candidate.px, candidate.pz), candidate.pz}, 2, 'ffffff')
-
             if radians < lowest then
                 lowest = radians
                 result = candidate
             end
         end
-
     end
 
     -- try to match the intended distance as best as we can
