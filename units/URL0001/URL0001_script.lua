@@ -110,6 +110,8 @@ URL0001 = ClassUnit(ACUUnit, CCommandUnit) {
     CreateEnhancement = function(self, enh)
         ACUUnit.CreateEnhancement(self, enh)
 
+        LOG(enh)
+
         local bp = self.Blueprint.Enhancements[enh]
         if enh == 'Teleporter' then
             self:AddCommandCap('RULEUCC_Teleport')
@@ -176,6 +178,16 @@ URL0001 = ClassUnit(ACUUnit, CCommandUnit) {
                 Buff.ApplyBuff(self, 'CybranACURegenerateBonus')
             end
         elseif enh == 'SelfRepairSystemRemove' then
+            -- remove prerequisites
+            self:RemoveToggleCap('RULEUTC_CloakToggle')
+            self:DisableUnitIntel('Enhancement', 'RadarStealth')
+            self:DisableUnitIntel('Enhancement', 'SonarStealth')
+            self.StealthEnh = nil
+            if Buff.HasBuff(self, 'CybranACUStealthBonus') then
+                Buff.RemoveBuff(self, 'CybranACUStealthBonus')
+            end
+
+            -- remove repair system
             if Buff.HasBuff(self, 'CybranACURegenerateBonus') then
                 Buff.RemoveBuff(self, 'CybranACURegenerateBonus')
             end
@@ -203,6 +215,19 @@ URL0001 = ClassUnit(ACUUnit, CCommandUnit) {
                 Buff.ApplyBuff(self, 'CybranACUCloakBonus')
             end
         elseif enh == 'CloakingGeneratorRemove' then
+            -- remove prerequisites
+            self:RemoveToggleCap('RULEUTC_CloakToggle')
+            self:DisableUnitIntel('Enhancement', 'RadarStealth')
+            self:DisableUnitIntel('Enhancement', 'SonarStealth')
+            self.StealthEnh = nil
+            if Buff.HasBuff(self, 'CybranACUStealthBonus') then
+                Buff.RemoveBuff(self, 'CybranACUStealthBonus')
+            end
+            if Buff.HasBuff(self, 'CybranACURegenerateBonus') then
+                Buff.RemoveBuff(self, 'CybranACURegenerateBonus')
+            end
+
+            -- remove cloak
             self:RemoveToggleCap('RULEUTC_CloakToggle')
             self:DisableUnitIntel('Enhancement', 'Cloak')
             self.CloakEnh = nil
