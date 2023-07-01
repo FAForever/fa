@@ -410,11 +410,11 @@ float4 CalculateLighting( float3 inNormal, float3 inViewPosition, float3 inAlbed
     float4 color = float4( 0, 0, 0, 0 );
 
     float shadow = ( inShadows && ( 1 == ShadowsEnabled ) ) ? ComputeShadow( inShadow ) : 1;
-    // if (UpperAlbedoTile.x * TerrainScale.x > 1000) {
-    //     float3 position = TerrainScale * inViewPosition;
-    //     float mapShadow = saturate(1 - tex2D(Stratum7AlbedoSampler, position.xy).b);
-    //     shadow = shadow * mapShadow;
-    // }
+    if (UpperAlbedoTile.x < 1.0) {
+        float3 position = TerrainScale * inViewPosition;
+        float mapShadow = saturate(1 - tex2D(Stratum7AlbedoSampler, position.xy).b);
+        shadow = shadow * mapShadow;
+    }
 
     // calculate some specular
     float3 viewDirection = normalize(inViewPosition.xzy-CameraPosition);
@@ -794,45 +794,51 @@ float4 TerrainBasisPS( VS_OUTPUT inV ) : COLOR
 float4 TerrainBasisPSBiCubic( VS_OUTPUT inV ) : COLOR
 {
     float4 result;
-    float2 coord_source = (inV.mTexWT * TerrainScale * NormalMapScale + NormalMapOffset).xy;
-    float2 coord_hg = coord_source * size_source - float2(0.5, 0.5);
+    if (UpperAlbedoTile.x < 1.0) {
+        float4 position = TerrainScale * inV.mTexWT;
+        result = (float4(1, 1, tex2D(UpperAlbedoSampler, position.xy).xy));
 
-    // fetch offsets and weights from filter texture
-#ifdef DIRECT3D10
-    // force to a 2d lookup for d3d10 since d3d10 is much stricter when enforcing
-    // 1d lookups from 2d textures
-    float3 hg_x = tex2D(BiCubicLookupSampler, float2(coord_hg.x,0)).xyz;
-    float3 hg_y = tex2D(BiCubicLookupSampler, float2(coord_hg.y,0)).xyz;
-#else
-    float3 hg_x = tex1D(BiCubicLookupSampler, coord_hg.x).xyz;
-    float3 hg_y = tex1D(BiCubicLookupSampler, coord_hg.y).xyz;
-#endif
+    } else {
+        float2 coord_source = (inV.mTexWT * TerrainScale * NormalMapScale + NormalMapOffset).xy;
+        float2 coord_hg = coord_source * size_source - float2(0.5, 0.5);
 
-    // determine linear sampling coordinates
-    float2 coord_source10 = coord_source + hg_x.x * e_x;
-    float2 coord_source00 = coord_source - hg_x.y * e_x;
-    float2 coord_source11 = coord_source10 + hg_y.x * e_y;
-    float2 coord_source01 = coord_source00 + hg_y.x * e_y;
-    coord_source10 = coord_source10 - hg_y.y * e_y;
-    coord_source00 = coord_source00 - hg_y.y * e_y;
+        // fetch offsets and weights from filter texture
+    #ifdef DIRECT3D10
+        // force to a 2d lookup for d3d10 since d3d10 is much stricter when enforcing
+        // 1d lookups from 2d textures
+        float3 hg_x = tex2D(BiCubicLookupSampler, float2(coord_hg.x,0)).xyz;
+        float3 hg_y = tex2D(BiCubicLookupSampler, float2(coord_hg.y,0)).xyz;
+    #else
+        float3 hg_x = tex1D(BiCubicLookupSampler, coord_hg.x).xyz;
+        float3 hg_y = tex1D(BiCubicLookupSampler, coord_hg.y).xyz;
+    #endif
 
-    // fetch the samples from the appropriate spot on the texture
-    float4 tex_source00 = tex2D( UtilitySamplerA, coord_source00 );
-    float4 tex_source10 = tex2D( UtilitySamplerA, coord_source10 );
-    float4 tex_source01 = tex2D( UtilitySamplerA, coord_source01 );
-    float4 tex_source11 = tex2D( UtilitySamplerA, coord_source11 );
+        // determine linear sampling coordinates
+        float2 coord_source10 = coord_source + hg_x.x * e_x;
+        float2 coord_source00 = coord_source - hg_x.y * e_x;
+        float2 coord_source11 = coord_source10 + hg_y.x * e_y;
+        float2 coord_source01 = coord_source00 + hg_y.x * e_y;
+        coord_source10 = coord_source10 - hg_y.y * e_y;
+        coord_source00 = coord_source00 - hg_y.y * e_y;
 
-    // weight along y direction
-    tex_source00 = lerp(tex_source00, tex_source01, hg_y.z );
-    tex_source10 = lerp(tex_source10, tex_source11, hg_y.z );
+        // fetch the samples from the appropriate spot on the texture
+        float4 tex_source00 = tex2D( UtilitySamplerA, coord_source00 );
+        float4 tex_source10 = tex2D( UtilitySamplerA, coord_source10 );
+        float4 tex_source01 = tex2D( UtilitySamplerA, coord_source01 );
+        float4 tex_source11 = tex2D( UtilitySamplerA, coord_source11 );
 
-    // weight along x direction
-    tex_source00 = lerp(tex_source00, tex_source10, hg_x.z );
+        // weight along y direction
+        tex_source00 = lerp(tex_source00, tex_source01, hg_y.z );
+        tex_source10 = lerp(tex_source10, tex_source11, hg_y.z );
 
-    // remember we are only writing into the blue and alpha channels.
-    // we can probably optimize our lerps above by taking advantage of the fact that
-    // we only have 2 channels.
-    result = tex_source00.xxwy;
+        // weight along x direction
+        tex_source00 = lerp(tex_source00, tex_source10, hg_x.z );
+
+        // remember we are only writing into the blue and alpha channels.
+        // we can probably optimize our lerps above by taking advantage of the fact that
+        // we only have 2 channels.
+        result = tex_source00.xxwy;
+    }
     return result;
 }
 
@@ -1284,7 +1290,14 @@ float4 DecalsPS( VS_OUTPUT inV, uniform bool inShadows) : COLOR
 
     float waterDepth = tex2Dproj(UtilitySamplerC, inV.mTexWT * TerrainScale).g;
 
-    float3 color = CalculateLighting(normal, inV.mTexWT.xyz, decalAlbedo.xyz, decalSpec.r, waterDepth, inV.mShadow, inShadows).xyz;
+    float3 color;
+    if (UpperAlbedoTile.x < 1.0) {
+        float roughness = 1 - decalSpec.r;
+        color = PBR(inV, decalAlbedo, normal, roughness);
+        color = ApplyWaterColorExponentially(inV, waterDepth, color);
+    } else {
+        color = CalculateLighting(normal, inV.mTexWT.xyz, decalAlbedo.xyz, decalSpec.r, waterDepth, inV.mShadow, inShadows).xyz;
+    }
 
     return float4(color.rgb, decalAlbedo.w * decalMask.w * DecalAlpha);
 }
@@ -1950,14 +1963,7 @@ float4 Terrain001NormalsPS( VS_OUTPUT pixel ) : COLOR
     float4 mask0 = saturate(tex2D(UtilitySamplerA,pixel.mTexWT*TerrainScale) * 2 - 1);
     float4 mask1 = saturate(tex2D(UtilitySamplerB,pixel.mTexWT*TerrainScale) * 2 - 1);
 
-    float4 position = TerrainScale * pixel.mTexWT;
-    float4 utility = tex2D(UpperAlbedoSampler, position.xy);
-
-    // reconstruct the y channel
-    float4 lowerNormal = float4(1, 1, 1, 1);
-    lowerNormal.xz = utility.xy * 2 - 1;
-    lowerNormal.y = sqrt(1 - dot(lowerNormal.xz,lowerNormal.xz));
-
+    float4 lowerNormal    = normalize(tex2D(LowerNormalSampler,    pixel.mTexWT * TerrainScale * LowerNormalTile)    * 2 - 1);
     float4 stratum0Normal = normalize(tex2D(Stratum0NormalSampler, pixel.mTexWT * TerrainScale * Stratum0NormalTile) * 2 - 1);
     float4 stratum1Normal = normalize(tex2D(Stratum1NormalSampler, pixel.mTexWT * TerrainScale * Stratum1NormalTile) * 2 - 1);
     float4 stratum2Normal = normalize(tex2D(Stratum2NormalSampler, pixel.mTexWT * TerrainScale * Stratum2NormalTile) * 2 - 1);
