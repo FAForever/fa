@@ -701,6 +701,7 @@ function HandleUnitWithBuildPresets(bps, all_bps)
             tempBp.BlueprintId = string.lower(tempBp.BlueprintId .. '_' .. name)
             tempBp.BuildIconSortPriority = preset.BuildIconSortPriority or tempBp.BuildIconSortPriority or 0
             tempBp.General.UnitName = preset.UnitName or tempBp.General.UnitName
+            tempBp.Interface = tempBp.Interface or { }
             tempBp.Interface.HelpText = preset.HelpText or tempBp.Interface.HelpText
             tempBp.Description = preset.Description or tempBp.Description
             tempBp.CategoriesHash['ISPREENHANCEDUNIT'] = true
