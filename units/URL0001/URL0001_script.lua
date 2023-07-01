@@ -176,18 +176,8 @@ URL0001 = ClassUnit(ACUUnit, CCommandUnit) {
                 Buff.ApplyBuff(self, 'CybranACURegenerateBonus')
             end
         elseif enh == 'SelfRepairSystemRemove' then
-            self:RemoveToggleCap('RULEUTC_CloakToggle')
-            self:DisableUnitIntel('Enhancement', 'RadarStealth')
-            self:DisableUnitIntel('Enhancement', 'SonarStealth')
-            self.StealthEnh = nil
-            if Buff.HasBuff(self, 'CybranACURegenerateBonus') then
-                Buff.RemoveBuff(self, 'CybranACUCloakBonus')
-            end
             if Buff.HasBuff(self, 'CybranACURegenerateBonus') then
                 Buff.RemoveBuff(self, 'CybranACURegenerateBonus')
-            end
-            if Buff.HasBuff(self, 'CybranACUStealthBonus') then
-                Buff.RemoveBuff(self, 'CybranACUStealthBonus')
             end
         elseif enh == 'CloakingGenerator' then
             if not bp then return end
@@ -214,18 +204,10 @@ URL0001 = ClassUnit(ACUUnit, CCommandUnit) {
             end
         elseif enh == 'CloakingGeneratorRemove' then
             self:RemoveToggleCap('RULEUTC_CloakToggle')
-            self:DisableUnitIntel('Enhancement', 'RadarStealth')
-            self:DisableUnitIntel('Enhancement', 'SonarStealth')
             self:DisableUnitIntel('Enhancement', 'Cloak')
             self.CloakEnh = nil
             if Buff.HasBuff(self, 'CybranACUCloakBonus') then
                 Buff.RemoveBuff(self, 'CybranACUCloakBonus')
-            end
-            if Buff.HasBuff(self, 'CybranACURegenerateBonus') then
-                Buff.RemoveBuff(self, 'CybranACURegenerateBonus')
-            end
-            if Buff.HasBuff(self, 'CybranACUStealthBonus') then
-                Buff.RemoveBuff(self, 'CybranACUStealthBonus')
             end
         elseif enh == 'ResourceAllocation' then
             local bpEcon = self.Blueprint.Economy
