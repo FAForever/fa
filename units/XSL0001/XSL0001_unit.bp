@@ -277,7 +277,7 @@ UnitBlueprint{
             RegenCeilingT3 = 120,
             RegenCeilingT4 = 240,
             RegenFloor = 15,
-            RegenPerSecond = 0.01111111111,
+            RegenPerSecond = 0.04,
             Slot = "LCH",
             UnitCategory = "BUILTBYTIER3FACTORY, BUILTBYQUANTUMGATE, NEEDMOBILEBUILD",
             UpgradeEffectBones = {
