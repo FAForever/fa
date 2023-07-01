@@ -79,11 +79,6 @@ NavPathToHeap = ClassSimple {
 
     ---@param self NavPathToHeap
     Clear = function(self)
-        local heap = self.Heap
-
-        for k = 1, self.HeapSize do
-            heap[k] = nil
-        end
         self.HeapSize = 0
     end,
 
@@ -129,7 +124,7 @@ NavPathToHeap = ClassSimple {
 
             -- if there is a right child, compare its value with the left one
             -- if right is smaller, then assign min = right. Else, keep min on left.
-            if heap[right] and (heap[right].TotalCosts < heap[left].TotalCosts) then
+            if right <= heapSize and (heap[right].TotalCosts < heap[left].TotalCosts) then
                 min = right
             end
 

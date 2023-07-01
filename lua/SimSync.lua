@@ -5,6 +5,7 @@
 Sync = { }
 
 local SyncDefaults = {
+    AIBrainData = true,
     UnitData = true,
     ReleaseIds = true,
     Reclaim = true,

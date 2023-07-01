@@ -75,14 +75,20 @@ StructureUnit = ClassUnit(Unit) {
         local blueprint = self.Blueprint
         local physicsBlueprint = blueprint.Physics
         local flatten = physicsBlueprint.FlattenSkirt
+        local horizontalSkirt = physicsBlueprint.HorizontalSkirt
         if flatten then
-            self:FlattenSkirt()
+            if horizontalSkirt then
+                self:FlattenSkirtHorizontally()
+            else
+                self:FlattenSkirt()
+            end
         end
 
         -- check for terrain orientation
         if not (
                 physicsBlueprint.AltitudeToTerrain or
-                physicsBlueprint.StandUpright
+                physicsBlueprint.StandUpright or
+                horizontalSkirt
             ) and (flatten or physicsBlueprint.AlwaysAlignToTerrain)
             and (layer == 'Land' or layer == 'Seabed')
         then
@@ -220,8 +226,40 @@ StructureUnit = ClassUnit(Unit) {
     end,
 
     ---@param self StructureUnit
+    FlattenSkirtHorizontally = function(self)
+        local x0, z0, x1, z1 = self:GetSkirtRect()
+
+        -- floor them
+        x0 = x0 ^ 0
+        z0 = z0 ^ 0
+
+        -- ceil them
+        x1 = 1 + (x1 ^ 0)
+        z1 = 1 + (z1 ^ 0)
+
+        -- compute average elevation and flatten
+        local elevation = 0.25 * (
+            GetTerrainHeight(x0, z0) +
+            GetTerrainHeight(x1, z0) +
+            GetTerrainHeight(x0, z1) +
+            GetTerrainHeight(x1, z1)
+        )
+
+        FlattenMapRect(x0, z0, x1 - x0, z1 - z0, elevation)
+    end,
+
+    ---@param self StructureUnit
     FlattenSkirt = function(self)
         local x0, z0, x1, z1 = self:GetSkirtRect()
+
+        -- floor them
+        x0 = x0 ^ 0
+        z0 = z0 ^ 0
+
+        -- ceil them
+        x1 = 1 + (x1 ^ 0)
+        z1 = 1 + (z1 ^ 0)
+
         import('/lua/sim/TerrainUtils.lua').FlattenGradientMapRect(x0, z0, x1 - x0, z1 - z0)
     end,
 
@@ -292,14 +330,14 @@ StructureUnit = ClassUnit(Unit) {
         local cutoffAlbedo = meshBlueprint.LODs[2].LODCutoff
         if not cutoffAlbedo then
             cutoffAlbedo = cutoffOthers
-            cutoffOthers = 0.4 * cutoffOthers
+            cutoffOthers = 0.3 * cutoffOthers
         else
             cutoffOthers = 0.8 * cutoffOthers
         end
 
-        -- take into account the fading of the decal
-        cutoffAlbedo = 1.1 * cutoffAlbedo
-        cutoffOthers = 1.1 * cutoffOthers
+        -- reduce the LOD for performance
+        cutoffAlbedo = 0.75 * cutoffAlbedo
+        cutoffOthers = 0.75 * cutoffOthers
 
         -- determine orientation
         if not orientation then
@@ -725,12 +763,33 @@ StructureUnit = ClassUnit(Unit) {
         adjacentUnit.AdjacentUnits[self.EntityId] = self
 
         -- apply the buffs
+        local buffApplied = false
         if self.ConsumptionActive then
             for k, v in AdjacencyBuffs[adjBuffs] do
+                buffApplied = true
                 Buff.ApplyBuff(adjacentUnit, v, self)
             end
         end
 
+        -- fix edge cases when buffs are applied
+        if buffApplied then
+
+            -- edge case for missile construction: the buff doesn't apply to the missile under construction
+            if adjacentUnit.Blueprint.CategoriesHash["SILO"] then
+                if adjacentUnit:IsUnitState('SiloBuildingAmmo') then
+                    local autoModeEnabled = adjacentUnit.AutoModeEnabled or false
+                    local progress = adjacentUnit:GetWorkProgress()
+                    if progress < 0.99 then
+                        adjacentUnit:StopSiloBuild()
+                        IssueSiloBuildTactical({adjacentUnit})
+                        adjacentUnit:GiveNukeSiloBlocks(progress)
+                        LOG(autoModeEnabled)
+                        adjacentUnit:SetAutoMode(autoModeEnabled)
+                    end
+                end
+            end
+        end
+    
         -- refresh the UI
         self:RequestRefreshUI()
         adjacentUnit:RequestRefreshUI()
@@ -753,10 +812,30 @@ StructureUnit = ClassUnit(Unit) {
         end
 
         -- remove the buffs
+        local buffRemoved = false
         if adjBuffs and AdjacencyBuffs[adjBuffs] then
             for k, v in AdjacencyBuffs[adjBuffs] do
                 if Buff.HasBuff(adjacentUnit, v) then
+                    buffRemoved = true
                     Buff.RemoveBuff(adjacentUnit, v)
+                end
+            end
+        end
+
+        -- fix edge cases when buffs are removed
+        if buffRemoved then
+
+            -- edge case for missile construction: the buff doesn't apply to the missile under construction
+            if adjacentUnit.Blueprint.CategoriesHash["SILO"] then
+                if adjacentUnit:IsUnitState('SiloBuildingAmmo') then
+                    local autoModeEnabled = adjacentUnit.AutoModeEnabled or false
+                    local progress = adjacentUnit:GetWorkProgress()
+                    if progress < 0.99 then
+                        adjacentUnit:StopSiloBuild()
+                        IssueSiloBuildTactical({adjacentUnit})
+                        adjacentUnit:GiveNukeSiloBlocks(progress)
+                        adjacentUnit:SetAutoMode(autoModeEnabled)
+                    end
                 end
             end
         end
@@ -882,6 +961,8 @@ StructureUnit = ClassUnit(Unit) {
 ---@field BuildBoneRotator moho.RotateManipulator
 ---@field BuildEffectBones string[]
 FactoryUnit = ClassUnit(StructureUnit) {
+
+    RollOffAnimationRate = 10,
 
     ---@param self FactoryUnit
     OnCreate = function(self)
@@ -1107,7 +1188,7 @@ FactoryUnit = ClassUnit(StructureUnit) {
         local bp = self.Blueprint
         local bpAnim = bp.Display.AnimationFinishBuildLand
         if bpAnim and EntityCategoryContains(categories.LAND, unitBeingBuilt) then
-            self.RollOffAnim = CreateAnimator(self):PlayAnim(bpAnim)
+            self.RollOffAnim = CreateAnimator(self):PlayAnim(bpAnim):SetRate(self.RollOffAnimationRate)
             self.Trash:Add(self.RollOffAnim)
             WaitTicks(1)
             WaitFor(self.RollOffAnim)
@@ -1227,7 +1308,7 @@ FactoryUnit = ClassUnit(StructureUnit) {
     ---@param self FactoryUnit
     PlayFxRollOffEnd = function(self)
         if self.RollOffAnim then
-            self.RollOffAnim:SetRate(-1)
+            self.RollOffAnim:SetRate(-1 * self.RollOffAnimationRate)
             WaitFor(self.RollOffAnim)
             self.RollOffAnim:Destroy()
             self.RollOffAnim = nil
@@ -1903,9 +1984,11 @@ MobileUnit = ClassUnit(Unit, TreadComponent) {
     OnDetachedFromTransport = function(self, transport, bone)
         Unit.OnDetachedFromTransport(self, transport, bone)
 
-         -- Set unit immobile to prevent it to accelerating in the air, cleared in OnLayerChange
-        self:SetImmobile(true)
-        self.transportDrop = true
+        -- Set unit immobile to prevent it to accelerating in the air, cleared in OnLayerChange
+        if not self.Blueprint.CategoriesHash["AIR"] then
+            self:SetImmobile(true)
+            self.transportDrop = true
+        end
     end,
 }
 
@@ -2093,6 +2176,7 @@ AirUnit = ClassUnit(MobileUnit) {
         elseif self.DeathCrashDamage > 0 then -- It was completely absorbed by a shield!
             local deathWep = self.deathWep -- Use a local copy for speed and easy reading
             DamageArea(self, self:GetPosition(), deathWep.DamageRadius, self.DeathCrashDamage, deathWep.DamageType, deathWep.DamageFriendly)
+            DamageArea(self, self:GetPosition(), deathWep.DamageRadius, 1, 'TreeForce', false)
         end
 
         if with == 'Water' then
@@ -2229,8 +2313,6 @@ BaseTransport = ClassSimple {
                 unit.attachmentBone = i
             end
         end
-
-        unit:OnAttachedToTransport(self, attachBone)
     end,
 
     ---@param self BaseTransport
@@ -2241,7 +2323,6 @@ BaseTransport = ClassSimple {
         self:RequestRefreshUI()
         self.slots[unit.attachmentBone] = nil
         unit.attachmentBone = nil
-        unit:OnDetachedFromTransport(self, attachBone)
     end,
 
     -- When one of our attached units gets killed, detach it
@@ -2260,12 +2341,10 @@ BaseTransport = ClassSimple {
         self:GetAIBrain().loadingTransport = self
     end,
 
-    ---comment
-    ---@param ... BaseTransport
-    OnStopTransportLoading = function(...)
+    ---@param self BaseTransport
+    OnStopTransportLoading = function(self)
     end,
 
-    ---comment
     ---@param self BaseTransport
     DestroyedOnTransport = function(self)
     end,
@@ -2300,20 +2379,50 @@ BaseTransport = ClassSimple {
 --- Base class for air transports.
 ---@class AirTransport: AirUnit, BaseTransport
 AirTransport = ClassUnit(AirUnit, BaseTransport) {
-
-    ---@param self AirTransport
-    OnTransportAborted = function(self)
-    end,
-
-    ---@param self AirTransport
-    OnTransportOrdered = function(self)
-    end,
-
     ---@param self AirTransport
     OnCreate = function(self)
         AirUnit.OnCreate(self)
         self.slots = {}
         self.transData = {}
+    end,
+
+    ---@param self AirTransport
+    ---@param attachBone Bone
+    ---@param unit Unit
+    OnTransportAttach = function(self, attachBone, unit)
+        AirUnit.OnTransportAttach(self, attachBone, unit)
+        BaseTransport.OnTransportAttach(self, attachBone, unit)
+    end,
+
+    ---@param self AirTransport
+    ---@param attachBone Bone
+    ---@param unit Unit
+    OnTransportDetach = function(self, attachBone, unit)
+        AirUnit.OnTransportDetach(self, attachBone, unit)
+        BaseTransport.OnTransportDetach(self, attachBone, unit)
+    end,
+
+    OnAttachedKilled = function(self, attached)
+        AirUnit.OnAttachedKilled(self, attached)
+        BaseTransport.OnAttachedKilled(self, attached)
+    end,
+
+    ---@param self AirTransport
+    OnStartTransportLoading = function(self)
+        AirUnit.OnStartTransportLoading(self)
+        BaseTransport.OnStartTransportLoading(self)
+    end,
+
+    ---@param self AirTransport
+    OnStopTransportLoading = function(self)
+        AirUnit.OnStopTransportLoading(self)
+        BaseTransport.OnStopTransportLoading(self)
+    end,
+
+    ---@param self AirTransport
+    DestroyedOnTransport = function(self)
+        -- AirUnit.DestroyedOnTransport(self)
+        BaseTransport.DestroyedOnTransport(self)
     end,
 
     ---@param self AirTransport
@@ -2511,8 +2620,8 @@ ConstructionUnit = ClassUnit(MobileUnit) {
         -- the unit is still moving, but unaware of it (It thinks it stopped to do the command). This allows it to build on the move,
         -- as it doesn't know it's doing something bad. To fix it, we temporarily make the unit immobile when it starts construction.
         if self:IsMoving() then
-            self:SetImmobile(true)
-            self:ForkThread(function() WaitTicks(1) if not self:BeenDestroyed() then self:SetImmobile(false) end end)
+            local navigator = self:GetNavigator()
+            navigator:AbortMove()
         end
     end,
 
@@ -2524,7 +2633,6 @@ ConstructionUnit = ClassUnit(MobileUnit) {
             self.StoppedBuilding = false
             self.BuildArmManipulator:Disable()
             self.BuildingOpenAnimManip:SetRate(-(self.Blueprint.Display.AnimationBuildRate or 1))
-            self:SetImmobile(false)
         end
     end,
 }
@@ -2548,8 +2656,46 @@ SeaUnit = ClassUnit(MobileUnit){
 }
 
 --- Base class for aircraft carriers.
----@class AircraftCarrier : SeaUnit
+---@class AircraftCarrier : SeaUnit, BaseTransport
 AircraftCarrier = ClassUnit(SeaUnit, BaseTransport) {
+    ---@param self AircraftCarrier
+    ---@param attachBone Bone
+    ---@param unit Unit
+    OnTransportAttach = function(self, attachBone, unit)
+        SeaUnit.OnTransportAttach(self, attachBone, unit)
+        BaseTransport.OnTransportAttach(self, attachBone, unit)
+    end,
+
+    ---@param self AircraftCarrier
+    ---@param attachBone Bone
+    ---@param unit Unit
+    OnTransportDetach = function(self, attachBone, unit)
+        SeaUnit.OnTransportDetach(self, attachBone, unit)
+        BaseTransport.OnTransportDetach(self, attachBone, unit)
+    end,
+
+    OnAttachedKilled = function(self, attached)
+        SeaUnit.OnAttachedKilled(self, attached)
+        BaseTransport.OnAttachedKilled(self, attached)
+    end,
+
+    ---@param self AircraftCarrier
+    OnStartTransportLoading = function(self)
+        SeaUnit.OnStartTransportLoading(self)
+        BaseTransport.OnStartTransportLoading(self)
+    end,
+
+    ---@param self AircraftCarrier
+    OnStopTransportLoading = function(self)
+        SeaUnit.OnStopTransportLoading(self)
+        BaseTransport.OnStopTransportLoading(self)
+    end,
+
+    ---@param self AircraftCarrier
+    DestroyedOnTransport = function(self)
+        -- SeaUnit.DestroyedOnTransport(self)
+        BaseTransport.DestroyedOnTransport(self)
+    end,
 
     ---@param self AircraftCarrier
     ---@param instigator Unit
@@ -2688,8 +2834,8 @@ CommandUnit = ClassUnit(WalkingLandUnit) {
         -- the unit is still moving, but unaware of it (It thinks it stopped to do the command). This allows it to build on the move,
         -- as it doesn't know it's doing something bad. To fix it, we temporarily make the unit immobile when it starts construction.
         if self:IsMoving() then
-            self:SetImmobile(true)
-            self:ForkThread(function() WaitTicks(1) if not self:BeenDestroyed() then self:SetImmobile(false) end end)
+            local navigator = self:GetNavigator()
+            navigator:AbortMove()
         end
     end,
 
@@ -2856,10 +3002,7 @@ ACUUnit = ClassUnit(CommandUnit) {
         self:SendNotifyMessage('started', work)
 
         -- No need to do it for AI
-        if self:GetAIBrain().BrainType == 'Human' then
-            self:SetImmobile(true)
-        end
-
+        self:SetImmobile(true)
         return true
     end,
 

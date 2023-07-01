@@ -20,7 +20,7 @@ end
 --- Orders platoon to attack mote to target position..
 -- If squad is specified, attack moves only with the squad.
 ---@param position Vector Table with position {x, y, z}.
----@param squad PlatoonSquadType
+---@param squad PlatoonSquadType?
 ---@return PlatoonCommand
 function CPlatoon:AggressiveMoveToLocation(position, squad)
 end
@@ -31,30 +31,33 @@ end
 function CPlatoon:CalculatePlatoonThreat(threatType, category)
 end
 
----@param threatType BrainThreatType Examples: 'AntiSurface', 'AntiAir', 'Overall'.
----@param category EntityCategory Unit's category, example: categories.TECH2 .
----@param position Vector Table with position {x, y, z}.
----@param radius number Radius in game units.
+---@param threatType BrainThreatType
+---@param category EntityCategory
+---@param position Vector
+---@param radius number
 ---@return number
 function CPlatoon:CalculatePlatoonThreatAroundPosition(threatType, category, position, radius)
 end
 
---- Returns true if squad can attack target unit.
+--- Returns true if squad can attack target unit. As an example: can this platoon attack a bomber?
 ---@param squad PlatoonSquadType
----@param target Unit Unit to check.
+---@param target Unit
 ---@return boolean
 function CPlatoon:CanAttackTarget(squad, target)
 end
 
---- TODO.
+---@deprecated
 ---@return boolean
 function CPlatoon:CanConsiderFormingPlatoon()
 end
 
 --- TODO.
 -- Example: local formIt = poolPlatoon:CanFormPlatoon(template, personality:GetPlatoonSize(), self.Location, radius)
----@return boolean
-function CPlatoon:CanFormPlatoon()
+---@param template table
+---@param size number
+---@param location Vector
+---@param radius number
+function CPlatoon:CanFormPlatoon(template, size, location, radius)
 end
 
 --- Destroys the platoon including all its units.
@@ -84,6 +87,7 @@ end
 
 --- TODO.
 -- Needs 4 parametrs.
+---@deprecated
 function CPlatoon:FindClosestUnitToBase()
 end
 
@@ -105,6 +109,7 @@ end
 --- Finds prioritized unit to attack for squad.
 -- Uses priorities set by SetPrioritizedTargetList function.
 -- Used for TMLs to find a pick a target in their range
+---@see `SetPrioritizedTargetList`
 ---@param squad PlatoonSquadType
 ---@param alliance AllianceType
 ---@param canAttack boolean true/false if the squad has to be able to attack the unit.
@@ -121,16 +126,18 @@ function CPlatoon:FormPlatoon()
 end
 
 --- TODO.
+---@return string
 function CPlatoon:GetAIPlan()
 end
 
 --- Returns army brain of the platoon.
+---@return AIBrain
 function CPlatoon:GetBrain()
 end
 
 --- Returns number representing faction.
 -- 1 UEF, 2 Aeon, 3 Cybran, 4 Seraphim.
--- @return Number 1-4
+---@return number
 function CPlatoon:GetFactionIndex()
 end
 
@@ -146,8 +153,8 @@ end
 function CPlatoon:GetPlatoonLifetimeStats()
 end
 
---- Returns platoon position
--- @return Table with position {x, y, z}.
+--- Computes the average platoon position, returns {0,0,0} if the platoon has no units
+---@return Vector
 function CPlatoon:GetPlatoonPosition()
 end
 
@@ -157,8 +164,8 @@ end
 function CPlatoon:GetPlatoonUniqueName()
 end
 
---- Returns list of units in theh platoon.
--- @return Table containing units.
+--- Returns list of units in the platoon
+---@return Unit[]
 function CPlatoon:GetPlatoonUnits()
 end
 
@@ -228,7 +235,7 @@ end
 -- If squad is specified, moves only the squad.
 ---@param position Vector Table with position {x, y, z}.
 ---@param useTransports boolean true/false
----@param squad PlatoonSquadType
+---@param squad PlatoonSquadType?
 ---@return PlatoonCommand
 function CPlatoon:MoveToLocation(position, useTransports, squad)
 end
@@ -237,7 +244,7 @@ end
 -- If squad is specified, move only with the squad.
 ---@param target Unit Unit to move to.
 ---@param useTransports boolean true/false
----@param squad PlatoonSquadType
+---@param squad PlatoonSquadType?
 ---@return PlatoonCommand
 function CPlatoon:MoveToTarget(target, useTransports, squad)
 end
@@ -278,7 +285,7 @@ end
 --- Orders platoon to stop, cancels all commands.
 -- If squad is specified, stops only the squad.
 -- Cancels all commands.
----@param squad PlatoonSquadType
+---@param squad PlatoonSquadType?
 function CPlatoon:Stop(squad)
 end
 

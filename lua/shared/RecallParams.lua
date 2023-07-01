@@ -15,7 +15,7 @@ TeamVoteCooldown = 1 * 60 * 10
 VoteTime = 30 * 10
 
 function RecallRequestAccepted(acceptanceVotes, totalVotes)
-    if totalVotes <= 2 then
+    if totalVotes <= 3 then
         return acceptanceVotes >= totalVotes
     else
         return acceptanceVotes >= (totalVotes - 1)

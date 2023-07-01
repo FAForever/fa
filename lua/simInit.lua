@@ -20,6 +20,16 @@
 -- Do global initialization and set up common global functions
 doscript '/lua/globalInit.lua'
 
+-- replace with assembly implementations
+table.getsize = table.getsize2 or table.getsize
+table.empty = table.empty2 or table.empty
+
+-- load legacy builder systems
+doscript '/lua/system/GlobalPlatoonTemplate.lua'
+doscript '/lua/system/GlobalBuilderTemplate.lua'
+doscript '/lua/system/GlobalBuilderGroup.lua'
+doscript '/lua/system/GlobalBaseTemplate.lua'
+
 GameOverListeners = {}
 WaitTicks = coroutine.yield
 
@@ -38,7 +48,7 @@ doscript '/lua/SimHooks.lua'
 -- Set up the sync table and some globals for use by scenario functions
 doscript '/lua/SimSync.lua'
 
-local syncStartPositions = false -- This is held here because the Sync table is cleared between SetupSession() and BeginSession()
+local syncStartPositions = false -- This is held here because the Sync table iFBlobas cleared between SetupSession() and BeginSession()
 
 function ShuffleStartPositions(syncNewPositions)
     local markers = ScenarioInfo.Env.Scenario.MasterChain._MASTERCHAIN_.Markers
@@ -76,17 +86,13 @@ end
 --but before any armies are created.
 function SetupSession()
 
+    import("/lua/ai/gridreclaim.lua").Setup()
+
     ScenarioInfo.TriggerManager = import("/lua/triggermanager.lua").Manager
     TriggerManager = ScenarioInfo.TriggerManager
 
     -- assume there are no AIs
     ScenarioInfo.GameHasAIs = false
-
-    -- if the AI replacement is on then there may be AIs
-    if ScenarioInfo.Options.AIReplacement == 'On' then
-        ScenarioInfo.GameHasAIs = true
-        SPEW("Detected ai replacement option being enabled: enabling AI functionality")
-    end
 
     -- if we're doing a campaign / special map then there may be AIs
     if ScenarioInfo.type ~= 'skirmish' then
@@ -221,6 +227,25 @@ end
 -- use it to store off various useful bits of info.
 -- The global variable "ArmyBrains" contains an array of AI brains, one for each army.
 function OnCreateArmyBrain(index, brain, name, nickname)
+    -- switch out brains for non-human armies
+    local info = ScenarioInfo.ArmySetup[name]
+    if (not info.Human) then
+        local instance
+        local keyToBrain = import("/lua/aibrains/index.lua").keyToBrain
+        if (not info.Civilian) and (info.AIPersonality != '') then
+            -- likely a skirmish scenario
+            instance = keyToBrain[info.AIPersonality]
+        else
+            -- likely a campaign scenario
+            if ScenarioInfo.type != 'skirmish' then
+                instance = keyToBrain['campaign']
+            end
+        end
+
+        if instance then
+            setmetatable(brain, instance)
+        end
+    end
 
     import("/lua/sim/scenarioutilities.lua").InitializeStartLocation(name)
     import("/lua/sim/scenarioutilities.lua").SetPlans(name)
@@ -228,6 +253,9 @@ function OnCreateArmyBrain(index, brain, name, nickname)
     ArmyBrains[index] = brain
     ArmyBrains[index].Name = name
     ArmyBrains[index].Nickname = nickname
+    ArmyBrains[index].AI = info.AI
+    ArmyBrains[index].Human = info.Human
+    ArmyBrains[index].Civilian = info.Civilian
     ScenarioInfo.PlatoonHandles[index] = {}
     ScenarioInfo.UnitGroups[index] = {}
     ScenarioInfo.UnitNames[index] = {}
@@ -255,7 +283,7 @@ end
 
 -- BeginSession will be called by the engine after the armies are created (but without
 -- any units yet) and we're ready to start the game. It's responsible for setting up
--- the initial units and any other gameplay state we need.
+-- the initial units, alliances and any other gameplay state we need.
 function BeginSession()
 
     -- imported for side effects
@@ -269,9 +297,6 @@ function BeginSession()
 
     import("/lua/sim/scenarioutilities.lua").CreateProps()
     import("/lua/sim/scenarioutilities.lua").CreateResources()
-
-    BeginSessionGenerateMarkers()
-    BeginSessionGenerateNavMesh()
 
     import("/lua/sim/score.lua").init()
     import("/lua/sim/recall.lua").init()
@@ -306,17 +331,10 @@ function BeginSession()
 
     -- keep track of units off map
     OnStartOffMapPreventionThread()
-end
 
-function BeginSessionGenerateNavMesh()
-    Sync.GameHasAIs = ScenarioInfo.GameHasAIs
-    if ScenarioInfo.GameHasAIs then
-        for k, brain in ArmyBrains do
-            if ScenarioInfo.ArmySetup[brain.Name].RequiresNavMesh then
-                import('/lua/sim/navutils.lua').Generate()
-                break
-            end
-        end
+    -- trigger event for brains
+    for k, brain in ArmyBrains do
+        brain:OnBeginSession()
     end
 end
 
@@ -324,9 +342,6 @@ end
 function BeginSessionAI()
     Sync.GameHasAIs = ScenarioInfo.GameHasAIs
     if ScenarioInfo.GameHasAIs then
-
-
-
         local simMods = __active_mods or {}
         for Index, ModData in simMods do
             ModAIFiles = DiskFindFiles(ModData.location..'/lua/AI/CustomAIs_v2', '*.lua')
@@ -343,6 +358,7 @@ function BeginSessionAI()
             end
         end
 
+        -- import legacy templates, builder groups and builders
         for k,file in DiskFindFiles('/lua/AI/PlatoonTemplates', '*.lua') do
             import(file)
         end
@@ -353,18 +369,6 @@ function BeginSessionAI()
 
         for k,file in DiskFindFiles('/lua/AI/AIBaseTemplates', '*.lua') do
             import(file)
-        end
-    end
-end
-
-function BeginSessionGenerateMarkers()
-    Sync.GameHasAIs = ScenarioInfo.GameHasAIs
-    if ScenarioInfo.GameHasAIs then
-        for k, brain in ArmyBrains do
-            if ScenarioInfo.ArmySetup[brain.Name].RequiresNavMesh then
-                import('/lua/sim/navgenerator.lua').GenerateMarkers()
-                break
-            end
         end
     end
 end
@@ -384,6 +388,10 @@ end
 
 --- Setup for team manangement
 function BeginSessionTeams()
+
+    -- up until this point all armies are considered to be enemies for skirmish maps,
+    -- we correct that here by applying the team setup of the lobby
+
     -- Look for teams
     local teams = {}
     for name,army in ScenarioInfo.ArmySetup do

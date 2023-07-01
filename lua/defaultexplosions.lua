@@ -879,7 +879,7 @@ end
 ---@return Projectile
 function CreateExplosionMesh(object, projBP, posX, posY, posZ, scale, scaleVelocity, Lifetime, velX, velY, VelZ, orientRot, orientX, orientY, orientZ)
 
-    proj = object:CreateProjectile(projBP, posX, posY, posZ, nil, nil, nil)
+    local proj = object:CreateProjectile(projBP, posX, posY, posZ, nil, nil, nil)
     proj:SetScale(scale,scale,scale):SetScaleVelocity(scaleVelocity):SetLifetime(Lifetime):SetVelocity(velX, velY, VelZ)
 
     local orient = {0, 0, 0, 0}
@@ -941,3 +941,93 @@ function OldCreateWreckageEffects(object)
         CreateEmitterAtEntity(object, object.Army, v):SetEmitterParam('LIFETIME', GetRandomFloat(100, 1000))
     end
 end
+
+
+
+----------------------------------------------------------------
+-- Modern explosion effects
+
+--#region 
+
+--- Creates various fire plumes at bones that move away from the origin of the entity
+---@param entity BoneObject
+---@param army Army
+---@param bones Bone[]
+---@param yOffset number | nil
+CreateFirePlumes = function(entity, army, bones, yOffset)
+    yOffset = yOffset or 0
+    local ex, ey, ez = entity:GetPositionXYZ()
+    for _, vBone in bones do
+        -- determine local offset
+        local bx, by, bz = entity:GetPositionXYZ(vBone)
+        local dx, dy, dz = bx - ex, by - ey, bz - ez
+
+        -- determine velocity and make it a bit random
+        local id = 1 / math.sqrt(dx * dx + dy * dy + dz * dz)
+        local vx = id * dx + Random() * 0.6 - 0.3
+        local vy = id * dy + Random() * 0.3
+        local vz = id * dz + Random() * 0.6 - 0.3
+
+        -- create the projectile and the plume
+        local projectile = entity:CreateProjectile('/effects/entities/DestructionFirePlume01/DestructionFirePlume01_proj.bp', dx, dy + yOffset, dz, vx, vy, vz)
+        projectile:SetBallisticAcceleration(-1 - Random())
+        projectile:SetVelocity(1 + 3 * Random())
+        CreateEmitterOnEntity(projectile, army, '/effects/emitters/destruction_explosion_fire_plume_02_emit.bp')
+    end
+end
+
+local CreateFirePlumeCache = { }
+
+--- Creates a single fire plume at a bone that moves away from the origin of the entity
+---@param entity BoneObject
+---@param army Army
+---@param bone Bone
+---@param yOffset number | nil
+CreateFirePlume = function(entity, army, bone, yOffset)
+    CreateFirePlumeCache[1] = bone
+    CreateFirePlumes(entity, army, CreateFirePlumeCache, yOffset)
+end
+
+--- Creates basic large-sized debris / dirt as emitters
+---@param entity BoneObject
+---@param army Army
+---@param bone Bone
+CreateLargeDebrisEmitters  = function(entity, army, bone)
+    for _, effect in EffectTemplate.ExplosionDebrisLrg01 do
+        CreateAttachedEmitter(entity, bone, army, effect)
+    end
+end
+
+--- Creates basic medium-sized debris / dirt as emitters
+---@param entity BoneObject
+---@param army Army
+---@param bone Bone
+CreateMediumDebrisEmitters = function(entity, army, bone)
+    for _, effect in EffectTemplate.ExplosionDebrisMed01 do
+        CreateAttachedEmitter(entity, bone, army, effect)
+    end
+end
+
+--- Creates basic small-sized debris / dirt as emitters
+---@param entity BoneObject
+---@param army Army
+---@param bone Bone
+CreateSmallDebrisEmitters = function(entity, army, bone)
+    for _, effect in EffectTemplate.ExplosionDebrisSml01 do
+        CreateAttachedEmitter(entity, bone, army, effect)
+    end
+end
+
+--- Creates basic damage effect emitters
+---@param self BoneObject
+---@param bone Bone
+---@param army Army
+---@param scale number | nil
+CreateDamageEmitters = function(self, bone, army, scale)
+    scale = scale or 1.0
+    for k, v in EffectTemplate.DamageFireSmoke01 do
+        CreateAttachedEmitter(self, bone, army, v):ScaleEmitter(1.5)
+    end
+end
+
+--#endregion

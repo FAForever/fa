@@ -109,6 +109,26 @@ function safecall(msg, fn, ...)
     end
 end
 
+--- table.empty(t) returns true iff t has no keys/values.
+---@param t table
+---@return boolean
+function table.empty(t)
+    if type(t) ~= 'table' then return true end
+    return next(t) == nil
+end
+
+--- Returns actual size of a table, including string keys
+---@param t table
+---@return number
+function table.getsize(t)
+    if type(t) ~= 'table' then return 0 end
+    local size = 0
+    for k, v in t do
+        size = size + 1
+    end
+    return size
+end
+
 --- table.copy(t) returns a shallow copy of t.
 function table.copy(t)
     if not t then return end -- prevents looping over nil table
@@ -363,21 +383,6 @@ function sortedpairs(t, comp)
     end
 end
 
---- Returns actual size of a table, including string keys
-function table.getsize(t)
-    -- handling nil table like empty tables so that no need to check
-    -- for nil table and then size of table:
-    -- if t and not table.empty(t) then
-    -- do some thing
-    -- end
-    if type(t) ~= 'table' then return 0 end
-    local size = 0
-    for k, v in t do
-        size = size + 1
-    end
-    return size
-end
-
 --- Returns a table with keys and values from t reversed.
 --- e.g. table.inverse {'one','two','three'} => {one=1, two=2, three=3}
 ---      table.inverse {foo=17, bar=100}     => {[17]=foo, [100]=bar}
@@ -398,11 +403,26 @@ function table.reverse(t)
     if not t then return {} end -- prevents looping over nil table
     local r = {}
     local items = table.indexize(t) -- convert from hash table
-    local itemsCount = table.getsize(t)
+    local itemsCount = table.getn(t)
     for k, v in ipairs(items) do
         r[itemsCount + 1 - k] = v
     end
     return r
+end
+
+--- Combines a series of tables into one table. Returns a new table. The parameters are merged into the new table in order
+---@see `table.assimilate`
+---@param ... table[]
+---@return table
+function table.combine(...)
+    local combined = { }
+    for k = 1, arg.n do
+        for key, value in arg[k] do
+            combined[key] = value
+        end
+    end
+
+    return combined
 end
 
 --- Converts hash table to a new table with keys from 1 to size of table and the same values
@@ -474,12 +494,6 @@ function table.map(fn, t)
         r[k] = fn(v)
     end
     return r
-end
-
---- table.empty(t) returns true iff t has no keys/values.
-function table.empty(t)
-    if type(t) ~= 'table' then return true end
-    return next(t) == nil
 end
 
 --- table.shuffle(t) returns a shuffled table

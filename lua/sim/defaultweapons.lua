@@ -1034,7 +1034,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
         end,
 
         OnLostTarget = function(self)
-            Weapon.OnLostTarget(self)
+            self.__base.OnLostTarget(self)
             if self.Blueprint.WeaponUnpacks then
                 ChangeState(self, self.WeaponPackingState)
             end

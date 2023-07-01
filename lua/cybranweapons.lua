@@ -49,20 +49,6 @@ CDFOverchargeWeapon = ClassWeapon(OverchargeWeapon) {
 ---@class CDFHeavyMicrowaveLaserGeneratorCom : DefaultBeamWeapon
 CDFHeavyMicrowaveLaserGeneratorCom = ClassWeapon(DefaultBeamWeapon) {
     BeamType = CollisionBeamFile.MicrowaveLaserCollisionBeam02,
-    FxUpackingChargeEffects = EffectTemplate.CMicrowaveLaserCharge01,
-    FxUpackingChargeEffectScale = 1,
-
-    ---@param self CDFHeavyMicrowaveLaserGeneratorCom
-    PlayFxWeaponUnpackSequence = function(self)
-        if not self:EconomySupportsBeam() then return end
-        local bp = self.Blueprint
-        for k, v in self.FxUpackingChargeEffects do
-            for ek, ev in bp.RackBones[self.CurrentRackSalvoNumber].MuzzleBones do
-                CreateAttachedEmitter(self.unit, ev, self.unit.Army, v):ScaleEmitter(self.FxUpackingChargeEffectScale)
-            end
-        end
-        DefaultBeamWeapon.PlayFxWeaponUnpackSequence(self)
-    end,
 }
 
 --- SPIDER BOT WEAPON!
@@ -75,48 +61,32 @@ CDFHeavyMicrowaveLaserGenerator = ClassWeapon(DefaultBeamWeapon) {
     ---@param self CDFHeavyMicrowaveLaserGenerator
     ---@param muzzle string
     PlayFxBeamStart = function(self, muzzle)
+        DefaultBeamWeapon.PlayFxBeamStart(self, muzzle)
 
         -- create rotator if it doesn't exist
-        if not self.RotatorManip then
-            self.RotatorManip = CreateRotator(self.unit, 'Center_Turret_Barrel', 'z')
-            self.unit.Trash:Add(self.RotatorManip)
+        local rotator = self.RotatorManip
+        if not rotator then
+            local unit = self.unit
+            rotator = CreateRotator(unit, 'Center_Turret_Barrel', 'z')
+            unit.Trash:Add(rotator)
+            self.RotatorManip = rotator
         end
 
         -- set their respective properties when firing
-        self.RotatorManip:SetTargetSpeed(500)
-        self.RotatorManip:SetAccel(200)
-
-        DefaultBeamWeapon.PlayFxBeamStart(self, muzzle)
+        rotator:SetTargetSpeed(500)
+        rotator:SetAccel(200)
     end,
 
     ---@param self CDFHeavyMicrowaveLaserGenerator
     ---@param beam string
     PlayFxBeamEnd = function(self, beam)
+        DefaultBeamWeapon.PlayFxBeamEnd(self, beam)
 
         -- if it exists, then stop rotating
-        if self.RotatorManip then
-            self.RotatorManip:SetTargetSpeed(0)
-            self.RotatorManip:SetAccel(90)
-        end
-
-        DefaultBeamWeapon.PlayFxBeamEnd(self, beam)
-    end,
-
-
-    ---@param self CDFHeavyMicrowaveLaserGenerator
-    PlayFxWeaponUnpackSequence = function(self)
-
-        if not self.ContBeamOn then
-            local bp = self.Blueprint
-            for k, v in self.FxUpackingChargeEffects do
-                for ek, ev in bp.RackBones[self.CurrentRackSalvoNumber].MuzzleBones do
-                    CreateAttachedEmitter(self.unit, ev, self.unit.Army, v):ScaleEmitter(self.FxUpackingChargeEffectScale)
-                end
-            end
-            if self.RotatorManip then
-                self.RotatorManip:SetTargetSpeed(179)
-            end
-            DefaultBeamWeapon.PlayFxWeaponUnpackSequence(self)
+        local rotator = self.RotatorManip
+        if rotator then
+            rotator:SetTargetSpeed(0)
+            rotator:SetAccel(90)
         end
     end,
 }

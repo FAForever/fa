@@ -7,6 +7,7 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
+-- Note some mods will replace this file, any new templates that need to be added should be added to LandPlatoonNewTemplates.lua
 -- ==== Global Form platoons ==== --
 PlatoonTemplate {
     Name = 'LandAttack',
@@ -83,7 +84,6 @@ PlatoonTemplate {
     GlobalSquads = {
         --DUNCAN - was 15 to 25
         { categories.MOBILE * categories.LAND - categories.EXPERIMENTAL - categories.ENGINEER, 5, 25, 'Attack', 'none' },
-        { categories.ENGINEER - categories.COMMAND, 1, 1, 'Attack', 'none' },
     },
 }
 PlatoonTemplate {

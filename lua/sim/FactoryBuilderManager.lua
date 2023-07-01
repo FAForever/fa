@@ -14,6 +14,14 @@ local Builder = import("/lua/sim/builder.lua")
 local TableGetn = table.getn
 
 ---@class FactoryBuilderManager : BuilderManager
+---@field Location Vector
+---@field Radius number
+---@field LocationType LocationType
+---@field RallyPoint Vector | false
+---@field LocationActive boolean
+---@field RandomSamePriority boolean
+---@field PlatoonListEmpty boolean
+---@field UseCenterPoint boolean
 FactoryBuilderManager = Class(BuilderManager) {
     ---@param self FactoryBuilderManager
     ---@param brain AIBrain
@@ -23,7 +31,7 @@ FactoryBuilderManager = Class(BuilderManager) {
     ---@param useCenterPoint boolean
     ---@return boolean
     Create = function(self, brain, lType, location, radius, useCenterPoint)
-        BuilderManager.Create(self,brain)
+        BuilderManager.Create(self,brain, lType, location, radius)
 
         if not lType or not location or not radius then
             error('*FACTORY BUILDER MANAGER ERROR: Invalid parameters; requires locationType, location, and radius')
@@ -35,9 +43,11 @@ FactoryBuilderManager = Class(BuilderManager) {
             self:AddBuilderType(v)
         end
 
-        self.Location = location
-        self.Radius = radius
-        self.LocationType = lType
+        -- backwards compatibility for mods
+        self.Location = self.Location or location
+        self.Radius = self.Radius or radius
+        self.LocationType = self.LocationType or lType
+
         self.RallyPoint = false
 
         self.FactoryList = {}
@@ -92,8 +102,8 @@ FactoryBuilderManager = Class(BuilderManager) {
     end,
 
     ---@param self FactoryBuilderManager
-    ---@param builderData table
-    ---@param locationType string
+    ---@param builderData BuilderSpec
+    ---@param locationType LocationType
     ---@return boolean
     AddBuilder = function(self, builderData, locationType)
         local newBuilder = Builder.CreateFactoryBuilder(self.Brain, builderData, locationType)
@@ -108,7 +118,7 @@ FactoryBuilderManager = Class(BuilderManager) {
     end,
 
     ---@param self FactoryBuilderManager
-    ---@return Platoon
+    ---@return boolean
     HasPlatoonList = function(self)
         return self.PlatoonListEmpty
     end,
@@ -456,21 +466,25 @@ FactoryBuilderManager = Class(BuilderManager) {
             self.Brain.BuilderManagers[self.LocationType].EngineerManager:AddUnit(finishedUnit)
         elseif EntityCategoryContains(categories.FACTORY * categories.STRUCTURE, finishedUnit ) then
 			if finishedUnit:GetFractionComplete() == 1 then
-				self:AddFactory(finishedUnit )			
+				self:AddFactory(finishedUnit )
 				factory.Dead = true
                 factory.Trash:Destroy()
 				return self:FactoryDestroyed(factory)
 			end
-		end
+		elseif self.Brain.TransportPool and EntityCategoryContains(categories.TRANSPORTFOCUS - categories.uea0203, finishedUnit ) then
+            self.Brain.TransportRequested = nil
+            finishedUnit:ForkThread( import('/lua/ai/transportutilities.lua').AssignTransportToPool, finishedUnit:GetAIBrain() )
+        end
         self:AssignBuildOrder(factory, factory.BuilderManagerData.BuilderType)
     end,
 
     -- Check if given factory can build the builder
     ---@param self FactoryBuilderManager
-    ---@param builder Unit
-    ---@param params any
+    ---@param builder Builder
+    ---@param params FactoryUnit[]
     ---@return boolean
-    BuilderParamCheck = function(self,builder,params)
+    BuilderParamCheck = function(self, builder, params)
+
         -- params[1] is factory, no other params
         local template = self:GetFactoryTemplate(builder:GetPlatoonTemplate(), params[1])
         if not template then

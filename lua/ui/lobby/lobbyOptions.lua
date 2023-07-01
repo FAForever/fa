@@ -15,7 +15,6 @@
 ---@field TeamLock 'locked' | 'unlocked'
 ---@field TeamSpawn 'fixed' | 'random' | 'balanced' | 'balanced_flex' | 'random_reveal' | 'balanced_reveal' | 'balanced_reveal_mirrored' | 'balanced_flex_reveal'
 ---
----@field AIReplacement 'Off' | 'On'
 ---@field AllowObservers boolean
 ---@field CheatsEnabled 'false' | 'true'
 ---@field CivilianAlliance 'enemy' | 'neutral' | 'removed'
@@ -72,6 +71,11 @@ teamOptions =
                 text = "<LOC lobui_0092>Fixed",
                 help = "<LOC lobui_0093>Spawn everyone in fixed locations (determined by slot)",
                 key = 'fixed',
+            },
+            {
+                text = "<LOC lobui_0444>Autobalance",
+                help = "<LOC lobui_0625>Players will be put into two equally-sized teams that are mirrored and balanced using both base rating and uncertainty",
+                key = 'penguin_autobalance',
             },
             {
                 text = "<LOC lobui_0094>Random - Unbalanced",
@@ -573,16 +577,11 @@ globalOpts = {
         },
     },
     {
-        default = 2,
+        default = 1,
         label = "<LOC aireplace_0001>AI Replacement",
         help = "<LOC aireplace_0002>Toggle AI Replacement if a player disconnects.",
         key = 'AIReplacement',
         values = {
-            {
-                text = "<LOC _On>On",
-                help = "<LOC aireplace_0003>If a player disconnects and the ACU is still active, an AI will be created to take control of units that belonged to the player who disconnected.",
-                key = 'On',
-            },
             {
                 text = "<LOC _Off>Off",
                 help = "<LOC aireplace_0004>A disconnected player will cause the destruction of their units based on share conditions.",

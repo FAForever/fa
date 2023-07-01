@@ -197,6 +197,7 @@ UnitBlueprint {
         },
         DragCoefficient = 0.2,
         FlattenSkirt = true,
+        HorizontalSkirt = true,
         MaxSteerForce = 0,
         MeshExtentsX = 2.1,
         MeshExtentsY = 1,

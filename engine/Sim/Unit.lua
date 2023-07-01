@@ -309,7 +309,8 @@ end
 --- This is the method to call for both SML's and SMD's.
 ---@see GiveTacticalSiloAmmo() # for tactical missiles
 ---@param amount number
-function Unit:GiveNukeSiloAmmo(amount)
+---@param inBlocks? boolean
+function Unit:GiveNukeSiloAmmo(amount, inBlocks)
 end
 
 --- Adds tactical missiles to the unit

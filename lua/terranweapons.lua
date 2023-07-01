@@ -103,20 +103,6 @@ TDFIonizedPlasmaCannon = ClassWeapon(DefaultProjectileWeapon) {
 TDFHiroPlasmaCannon = ClassWeapon(DefaultBeamWeapon) {
     BeamType = CollisionBeams.TDFHiroCollisionBeam,
     FxMuzzleFlash = import("/lua/effecttemplates.lua").NoEffects,
-    FxUpackingChargeEffectScale = 1,
-
-    ---@param self TDFHiroPlasmaCannon
-    PlayFxWeaponUnpackSequence = function(self)
-        if not self.ContBeamOn then
-            local bp = self.Blueprint
-            for k, v in self.FxUpackingChargeEffects do
-                for ek, ev in bp.RackBones[self.CurrentRackSalvoNumber].MuzzleBones do
-                    CreateAttachedEmitter(self.unit, ev, self.unit.Army, v):ScaleEmitter(self.FxUpackingChargeEffectScale)
-                end
-            end
-            DefaultBeamWeapon.PlayFxWeaponUnpackSequence(self)
-        end
-    end,
 }
 
 ---@class TAAFlakArtilleryCannon : DefaultProjectileWeapon
@@ -244,8 +230,11 @@ TAMPhalanxWeapon = ClassWeapon(DefaultProjectileWeapon) {
     ---@param muzzle Bone
     PlayFxMuzzleSequence = function(self, muzzle)
         DefaultProjectileWeapon.PlayFxMuzzleSequence(self, muzzle)
+        local unit = self.unit
+        local turrentBonePitch = self.Blueprint.TurretBonePitch
+        local army = self.Army
         for k, v in self.FxShellEject do
-            CreateAttachedEmitter(self.unit, self.Blueprint.TurretBonePitch, self.unit.Army, v)
+            CreateAttachedEmitter(unit, turrentBonePitch, army, v)
         end
     end,
 }
@@ -253,19 +242,6 @@ TAMPhalanxWeapon = ClassWeapon(DefaultProjectileWeapon) {
 ---@class TOrbitalDeathLaserBeamWeapon : DefaultBeamWeapon
 TOrbitalDeathLaserBeamWeapon = ClassWeapon(DefaultBeamWeapon) {
     BeamType = OrbitalDeathLaserCollisionBeam,
-    FxUpackingChargeEffects = import("/lua/effecttemplates.lua").NoEffects,
-    FxUpackingChargeEffectScale = 1,
-
-    ---@param self TOrbitalDeathLaserBeamWeapon
-    PlayFxWeaponUnpackSequence = function(self)
-        local bp = self.Blueprint
-        for k, v in self.FxUpackingChargeEffects do
-            for ek, ev in bp.RackBones[self.CurrentRackSalvoNumber].MuzzleBones do
-                CreateAttachedEmitter(self.unit, ev, self.unit.Army, v):ScaleEmitter(self.FxUpackingChargeEffectScale)
-            end
-        end
-        DefaultBeamWeapon.PlayFxWeaponUnpackSequence(self)
-    end,
 }
 
 -- Kept for Mod backwards compatibility

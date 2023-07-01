@@ -204,15 +204,26 @@ end
 
 ---@param aiBrain AIBrain
 ---@return true | nil
-function ArmyNeedsTransports(aiBrain)
+function TransportRequested(aiBrain)
     if aiBrain then
-        local needTransports = aiBrain.NeedTransports
-        if needTransports and needTransports > 0 and aiBrain:GetNoRushTicks() <= 0 then
+        if aiBrain.TransportRequested and aiBrain:GetNoRushTicks() <= 0 then
             return true
         end
     end
 end
 
+-- deprecated kept for compatibility
+---@param aiBrain AIBrain
+---@return true | nil
+function ArmyNeedsTransports(aiBrain)
+    if aiBrain then
+        if aiBrain.NeedTransports > 0 and aiBrain:GetNoRushTicks() <= 0 then
+            return true
+        end
+    end
+end
+
+-- deprecated kept for compatibility
 ---@param aiBrain AIBrain
 ---@param number number
 ---@return true | nil
@@ -355,6 +366,34 @@ function WaterMassMarkersPresent(aiBrain)
         return true
     end
     return false
+end
+
+---@param aiBrain BaseAIBrain
+---@param locationType string
+---@return true | nil
+function ReclaimAvailableInGrid(aiBrain, locationType, mapSearch)
+    -- this condition won't work without a reference to the reclaim grid
+    local gridReclaim = aiBrain.GridReclaim
+    if not gridReclaim then
+        WARN(string.format("Build condition ('ReclaimAvailableInGrid') requires a reference to the reclaim grid in the brain (of %s)", aiBrain.Nickname))
+        return false
+    end
+    
+    -- this condition won't work without a reference to the engineer manager
+    local manager = aiBrain.BuilderManagers[locationType].EngineerManager --[[@type EngineerManager]]
+    if not manager then
+        return false
+    end
+    local rings = 3
+    if mapSearch then rings = 8 end
+    -- no need to reclaim when there's nothing around us to reclaim
+    local bx, bz = gridReclaim:ToGridSpace(manager.Location[1], manager.Location[3])
+    local maximumCell = gridReclaim:MaximumInRadius(bx, bz, rings)
+    if maximumCell.TotalMass < 10 then
+        return false
+    end
+
+    return true
 end
 
 -- unused imports kept for mod support

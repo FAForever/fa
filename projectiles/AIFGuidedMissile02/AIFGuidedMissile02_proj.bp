@@ -28,18 +28,11 @@ ProjectileBlueprint {
     DesiredShooterCap = 1,
     Display = {
         CameraFollowsProjectile = true,
-
-        -- ----MeshBlueprint = '/units/DAA0206/DAA0206_mesh.bp',
         StrategicIconSize = 1,
         UniformScale = 0.045,
     },
     General = {
         Category = 'Anti Air',
-        EntityCategory = {
-            'AEON',
-            'PROJECTILE',
-            'MISSILE',
-        },
         Faction = 'Aeon',
         TechLevel = 3,
         Weapon = 'Guided Missile',

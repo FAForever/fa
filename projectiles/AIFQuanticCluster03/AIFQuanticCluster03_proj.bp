@@ -15,11 +15,6 @@ ProjectileBlueprint {
     },
     General = {
         Category = 'Artillery',
-        EntityCategory = {
-            'AEON',
-            'PROJECTILE',
-            'INDIRECTFIRE',
-        },
         Faction = 'AEON',
     },
     Interface = {

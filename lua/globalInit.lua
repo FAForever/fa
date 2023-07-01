@@ -31,12 +31,6 @@ InitialRegistration = true
 doscript '/lua/system/BuffBlueprints.lua'
 import("/lua/sim/buffdefinitions.lua")
 
--- load AI builder systems
-doscript '/lua/system/GlobalPlatoonTemplate.lua'
-doscript '/lua/system/GlobalBuilderTemplate.lua'
-doscript '/lua/system/GlobalBuilderGroup.lua'
-doscript '/lua/system/GlobalBaseTemplate.lua'
-
 EmptyTable = {}
 setmetatable(EmptyTable, {__newindex = function()
     WARN("Attempt to set field of the empty table")

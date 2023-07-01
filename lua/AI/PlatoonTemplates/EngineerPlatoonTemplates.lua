@@ -7,6 +7,7 @@
 --  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 ----------------------------------------------------------------------------
 
+-- Note some mods will replace this file, any new templates that need to be added should be added to EngineerPlatoonNewTemplates.lua
 -- Engineer platoons to be formed
 
 PlatoonTemplate {
@@ -46,14 +47,6 @@ PlatoonTemplate {
     Plan = 'EngineerBuildAI',
     GlobalSquads = {
         { categories.ENGINEER * categories.TECH1, 1, 1, 'support', 'None' }
-    },
-}
-
-PlatoonTemplate {
-    Name = 'EngineerDrop',
-    Plan = 'EngineerDropAI',
-    GlobalSquads = {
-        { categories.ENGINEER * categories.TECH1, 6, 6, 'support', 'None' }
     },
 }
 
@@ -126,14 +119,6 @@ PlatoonTemplate {
     Plan = 'TransferAI',
     GlobalSquads = {
         { categories.ENGINEER * categories.TECH3 - categories.ENGINEERSTATION, 1, 1, 'support', 'none' },
-    },
-}
-
-PlatoonTemplate {
-    Name = 'T123EngineerBuilder',
-    Plan = 'EngineerBuildAI',
-    GlobalSquads = {
-        { categories.ENGINEER - categories.ENGINEERSTATION - categories.COMMAND, 1, 1, 'support', 'none' },
     },
 }
 

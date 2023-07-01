@@ -20,40 +20,34 @@ XRB2309 = ClassUnit(CStructureUnit) {
         CStructureUnit.OnStopBeingBuilt(self, builder, layer)
         self:StartSinkingFromBuild()
 
-        -- Add inital sinking effects
-        self.Trash:Add(CreateAttachedEmitter(self, 'xrb2308', self.Army, '/effects/emitters/tt_water02_footfall01_01_emit.bp'):ScaleEmitter(1.4)) -- One-off
-        self.Trash:Add(CreateAttachedEmitter(self, 'xrb2308', self.Army, '/effects/emitters/tt_snowy01_landing01_01_emit.bp'):ScaleEmitter(1.5)) -- One-off
-
+        self.Trash:Add(CreateAttachedEmitter(self, 'xrb2308', self.Army,
+            '/effects/emitters/tt_water02_footfall01_01_emit.bp'):ScaleEmitter(1.4))
+        self.Trash:Add(CreateAttachedEmitter(self, 'xrb2308', self.Army,
+            '/effects/emitters/tt_snowy01_landing01_01_emit.bp'):ScaleEmitter(1.5))
         ChangeState(self, self.IdleState)
     end,
 
     StartSinkingFromBuild = function(self)
-        -- do not start sinking when unit is below water surface already
         local position = self:GetPosition()
         if GetSurfaceHeight(position[1], position[3]) > position[2] then return end
 
-        -- Add sinking effect for the duration of the sinking
-        self.Trash:Add(CreateAttachedEmitter(self, 'xrb2308', self.Army, '/effects/emitters/tt_water_submerge02_01_emit.bp'):ScaleEmitter(1.5)) -- Continuous
-
-        -- Create sinker projectile
+        self.Trash:Add(CreateAttachedEmitter(self, 'xrb2308', self.Army,
+            '/effects/emitters/tt_water_submerge02_01_emit.bp'):ScaleEmitter(1.5))
         local bone = 0
         local proj = self:CreateProjectileAtBone('/projectiles/Sinker/Sinker_proj.bp', bone)
         self.sinkProjectile = proj
 
-        -- Start the sinking after a delay of the given number of seconds, attaching to a given bone and entity.
-        proj:SetLocalAngularVelocity(0, 0, 0) -- Change this to make it rotate some while sinking
+        proj:SetLocalAngularVelocity(0, 0, 0)
         proj:Start(0, self, bone)
         proj:SetBallisticAcceleration(-0.75)
-
         self.Trash:Add(proj)
-        self.Depthwatcher = self:ForkThread(self.DepthWatcher)
+        self.Depthwatcher = self.Trash:Add(ForkThread(self.DepthWatcher,self))
     end,
 
-    -- Sink to the bottom, or to a pre-set depth
     DepthWatcher = function(self)
         self.sinkingFromBuild = true
 
-        local sinkFor = 3.4 -- Use this to set the depth - Basic maths required
+        local sinkFor = 3.4
         while self.sinkProjectile and sinkFor > 0 do
             WaitTicks(1)
             sinkFor = sinkFor - 0.1
@@ -62,12 +56,11 @@ XRB2309 = ClassUnit(CStructureUnit) {
         local bottom = true
         if not self.Dead then
             if self.sinkProjectile then
-                bottom = false -- We must have timed out
+                bottom = false
                 self.sinkProjectile:Destroy()
                 self.sinkProjectile = nil
             end
 
-            -- Stop the unit's momentum
             self:SetPosition(self:GetPosition(), true)
             self:FinalAnimation()
         end
@@ -76,27 +69,24 @@ XRB2309 = ClassUnit(CStructureUnit) {
         self.Bottom = bottom
     end,
 
-    -- Do the deploy animation
     FinalAnimation = function(self)
-        local bp = self:GetBlueprint()
+        local bp = self.Blueprint
         local bpAnim = bp.Display.AnimationDeploy
 
         self.OpenAnim = CreateAnimator(self)
         self.OpenAnim:PlayAnim(bpAnim)
         self.Trash:Add(self.OpenAnim)
         self:PlaySound(bp.Audio.Deploy)
-        
+
         local pos = self:GetPosition()
-        
-        for _,army in self.SpottedByArmy or {} do
-            VizMarker({X = pos[1], Z = pos[3], Radius = 4, LifeTime = 0.3, Army = army, Vision = true,})
-        end  
+
+        for _, army in self.SpottedByArmy or {} do
+            VizMarker({ X = pos[1], Z = pos[3], Radius = 4, LifeTime = 0.3, Army = army, Vision = true, })
+        end
     end,
 
     DeathThread = function(self, overkillRatio, instigator)
-        local bp = self:GetBlueprint()
-
-        -- Add an initial death explosion
+        local bp = self.Blueprint
         local army = self.Army
         self.Trash:Add(CreateAttachedEmitter(self, 'xrb2308', army, '/effects/emitters/flash_03_emit.bp'):ScaleEmitter(2))
         self.Trash:Add(CreateAttachedEmitter(self, 'xrb2308', army, '/effects/emitters/flash_04_emit.bp'):ScaleEmitter(2))
@@ -104,30 +94,22 @@ XRB2309 = ClassUnit(CStructureUnit) {
         self:DestroyAllDamageEffects()
         self:PlaySound(bp.Audio.Destroyed)
 
-        -- Here down is near-shadowing the function, all to change the entity subset. Dumb, right?
         local isNaval = true
-        local shallSink = true -- This unit should definitely sink, no need to check cats.
+        local shallSink = true
 
         WaitSeconds(utilities.GetRandomFloat(self.DestructionExplosionWaitDelayMin, self.DestructionExplosionWaitDelayMax))
 
-        -- BOOM!
         if self.PlayDestructionEffects then
             self:CreateDestructionEffects(overkillRatio)
         end
 
-        -- Flying bits of metal and whatnot. More bits for more overkill.
         if self.ShowUnitDestructionDebris and overkillRatio then
             self:CreateUnitDestructionDebris(true, true, overkillRatio > 2)
         end
 
         self.DisallowCollisions = true
-
-        -- Bubbles and stuff coming off the sinking wreck.
-        self:ForkThread(self.SinkDestructionEffects)
-
-        -- Avoid slightly ugly need to propagate this through callback hell...
+        self.Trash:Add(ForkThread(self.SinkDestructionEffects,self))
         self.overkillRatio = overkillRatio
-
         local this = self
         self:StartSinking(
             function()
@@ -136,14 +118,13 @@ XRB2309 = ClassUnit(CStructureUnit) {
         )
     end,
 
-    -- Called from unit.lua DeathThread
     StartSinking = function(self, callback)
-        if not self.sinkingFromBuild and self.Bottom then -- We don't want to sink at death if we're on the seabed
-            self:ForkThread(callback)
-        elseif self.sinkingFromBuild then -- If still sinking, set the destruction callback for impact
+        if not self.sinkingFromBuild and self.Bottom then
+            self.Trash:Add(ForkThread(callback,self))
+        elseif self.sinkingFromBuild then
             self.sinkProjectile.callback = callback
             return
-        else -- Unit is static and floating. Use normal destruction params
+        else
             CStructureUnit.StartSinking(self, callback)
         end
     end,

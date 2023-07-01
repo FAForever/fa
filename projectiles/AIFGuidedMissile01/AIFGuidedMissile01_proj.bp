@@ -18,11 +18,6 @@ ProjectileBlueprint {
     DesiredShooterCap = 1,
     General = {
         Category = 'Anti Air',
-        EntityCategory = {
-            'AEON',
-            'PROJECTILE',
-            'MISSILE',
-        },
         Faction = 'Aeon',
         TechLevel = 3,
         Weapon = 'Guided Missile',

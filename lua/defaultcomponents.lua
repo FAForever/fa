@@ -13,15 +13,21 @@ ShieldEffectsComponent = ClassSimple {
 
     ---@param self ShieldEffectsComponent
     OnCreate = function(self)
-        self.ShieldEffectsBag = TrashBag()
-        self.Trash:Add(self.ShieldEffectsBag)
+        local bag = TrashBag()
+        self.ShieldEffectsBag = bag
+        self.Trash:Add(bag)
     end,
 
     ---@param self ShieldEffectsComponent
     OnShieldEnabled = function(self)
-        self.ShieldEffectsBag:Destroy()
-        for _, v in self.ShieldEffects do
-            self.ShieldEffectsBag:Add(CreateAttachedEmitter(self, self.ShieldEffectsBone, self.Army, v):ScaleEmitter(self.ShieldEffectsScale))
+        local bag = self.ShieldEffectsBag
+        local bone = self.ShieldEffectsBone
+        local scale = self.ShieldEffectsScale
+        local army = self.Army
+
+        bag:Destroy()
+        for _, effect in self.ShieldEffects do
+            bag:Add(CreateAttachedEmitter(self, bone, army, effect):ScaleEmitter(scale))
         end
     end,
 
@@ -379,16 +385,16 @@ IntelComponent = ClassSimple {
 local TechToDuration = {
     TECH1 = 1,
     TECH2 = 2,
-    TECH3 = 4,
-    EXPERIMENTAL = 16,
+    TECH3 = 3,
+    EXPERIMENTAL = 6,
 }
 
 ---@type table<string, number>
 local TechToLOD = {
     TECH1 = 120,
-    TECH2 = 180,
-    TECH3 = 240,
-    EXPERIMENTAL = 320,
+    TECH2 = 140,
+    TECH3 = 160,
+    EXPERIMENTAL = 200,
 }
 
 ---@class TreadComponent
@@ -685,7 +691,7 @@ VeterancyComponent = ClassSimple {
     SetVeterancy = function(self, level)
         self.VetExperience = 0
         self.VetLevel = 0
-        self:AddVetExperience(self.Blueprint.VetThresholds[MathMin(level, 5)] or 0, true)
+        self:AddVetExperience(self.Blueprint.VetThresholds[MathMin(level or 0, 5)], true)
     end,
 
     ---@param self Unit | VeterancyComponent
@@ -697,9 +703,6 @@ VeterancyComponent = ClassSimple {
         self:AddVetExperience(massKilled, noLimit)
     end,
 
-    -- kept for backwards compatibility with mods, but should really not be used anymore
-
-    ---@deprecated
     ---@param self Unit | VeterancyComponent
     ---@param instigator Unit
     OnKilledUnit = function (self, unitThatIsDying, experience)
@@ -712,6 +715,8 @@ VeterancyComponent = ClassSimple {
             self:AddVetExperience(vetWorth, false)
         end
     end,
+
+    -- kept for backwards compatibility with mods, but should really not be used anymore
 
     ---@deprecated
     ---@param self Unit | VeterancyComponent

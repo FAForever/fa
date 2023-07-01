@@ -28,12 +28,6 @@ ProjectileBlueprint {
     },
     General = {
         Category = 'Anti Air',
-        EntityCategory = {
-            'CYBRAN',
-            'PROJECTILE',
-            'ANTIAIR',
-            'MISSILE',
-        },
         Faction = 'Cybran',
         TechLevel = 3,
         Weapon = 'Nanite Missile System',

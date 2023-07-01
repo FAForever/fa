@@ -16,14 +16,6 @@ Wreckage = Class(Prop) {
     IsWreckage = true,
 
     ---@param self Wreckage
-    OnCreate = function(self)
-        self.Trash = TrashBag()
-        self.EntityId = self:GetEntityId()
-        self.Blueprint = self:GetBlueprint()
-        self.CachePosition = self:GetPosition()
-    end,
-
-    ---@param self Wreckage
     ---@param instigator Unit
     ---@param amount number
     ---@param vector Vector
