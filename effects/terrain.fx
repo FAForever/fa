@@ -1908,7 +1908,7 @@ float blendHeight(float4 position, float2 blendWeights, uniform float2 nearscale
 // | U  | normal.x      normal.z        shadow     sampling direction  | 
 
 
-/* similar to Terrain002 but aditionally uses rotated sampling of all textures to break up repetition patterns */
+/* similar to Terrain101 but aditionally uses rotated sampling of all textures to break up repetition patterns */
 /* and uses vertical texture sampling for cliff textures in stratum3 */
 float4 TerrainPBRNormalsPS ( VS_OUTPUT inV ) : COLOR
 {
@@ -2168,7 +2168,7 @@ technique Terrain002 <
 }
 
 /* Uses roughness maps for PBR rendering and height maps for texture splatting  */
-float4 Terrain002NormalsPS ( VS_OUTPUT inV ) : COLOR
+float4 Terrain101NormalsPS ( VS_OUTPUT inV ) : COLOR
 {
     float4 position = TerrainScale * inV.mTexWT;
 
@@ -2204,7 +2204,7 @@ float4 Terrain002NormalsPS ( VS_OUTPUT inV ) : COLOR
     return float4( 0.5 + 0.5 * normal.rgb, 1);
 }
 
-float4 Terrain002AlbedoPS ( VS_OUTPUT inV) : COLOR
+float4 Terrain101AlbedoPS ( VS_OUTPUT inV) : COLOR
 {
     // height is now in the z coordinate
     float4 position = TerrainScale * inV.mTexWT;
@@ -2253,7 +2253,7 @@ float4 Terrain002AlbedoPS ( VS_OUTPUT inV) : COLOR
     return float4(color, 0.01f);
 }
 
-technique Terrain002Normals
+technique Terrain101Normals
 {
     pass P0
     {
@@ -2261,13 +2261,13 @@ technique Terrain002Normals
         DepthState( Depth_Enable )
 
         VertexShader = compile vs_1_1 TerrainVS(false);
-        PixelShader = compile ps_2_a Terrain002NormalsPS();
+        PixelShader = compile ps_2_a Terrain101NormalsPS();
     }
 }
 
-technique Terrain002 <
+technique Terrain101 <
     string usage = "composite";
-    string normals = "Terrain002Normals";
+    string normals = "Terrain101Normals";
 >
 {
     pass P0
@@ -2276,6 +2276,6 @@ technique Terrain002 <
         DepthState( Depth_Enable )
 
         VertexShader = compile vs_1_1 TerrainVS(true);
-        PixelShader = compile ps_2_a Terrain002AlbedoPS();
+        PixelShader = compile ps_2_a Terrain101AlbedoPS();
     }
 }
