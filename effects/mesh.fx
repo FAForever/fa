@@ -2252,6 +2252,514 @@ float4 FlatPS( FLAT_VERTEX vertex,
     return float4( color.rgb, alpha);
 }
 
+
+/////////////////////////////////////////////////
+// Physically Based Rendering
+/////////////////////////////////////////////////
+
+const float PI = 3.14159265359;
+
+float mapRange(float value, float min1, float max1, float min2, float max2)
+{
+    // Convert the current value to a percentage
+    float perc = (value - min1) / (max1 - min1);
+    // Do the same operation backwards with min2 and max2
+    return perc * (max2 - min2) + min2;
+}
+
+float logisticFn(float x, float x0, float k, float L, float m)
+{
+    float denom = 1 + pow(2.71828, -k * (m * x - x0));
+    return L / denom;
+}
+
+float3 FresnelSchlick(float hDotN, float3 F0)
+{
+    return F0 + (1.0 - F0) * pow(1.0 - hDotN, 5.0);
+}
+
+float3 FresnelSchlickRoughness(float cosTheta, float3 F0, float roughness)
+{
+    return F0 + (max(float3(1.0, 1.0, 1.0) - roughness, F0) - F0) * pow(clamp(1.0 - cosTheta, 0.0, 1.0), 5.0);
+} 
+
+float NormalDistribution(float3 n, float3 h, float roughness)
+{
+    float a2 = roughness*roughness;
+    float nDotH = max(dot(n, h), 0.0);
+    float nDotH2 = nDotH*nDotH;
+
+    float num = a2;
+    float denom = nDotH2 * (a2 - 1.0) + 1.0;
+    denom = PI * denom * denom;
+
+    return num / denom;
+}
+
+float GeometrySchlick(float nDotV, float roughness)
+{
+    float r = (roughness + 1.0);
+    float k = (r*r) / 8.0;
+
+    float num = nDotV;
+    float denom = nDotV * (1.0 - k) + k;
+
+    return num / denom;
+}
+
+float GeometrySmith(float3 n, float nDotV, float3 l, float roughness)
+{
+    float nDotL = max(dot(n, l), 0.0);
+    float gs2 = GeometrySchlick(nDotV, roughness);
+    float gs1 = GeometrySchlick(nDotL, roughness);
+
+    return gs1 * gs2;
+}
+
+float3 PBR_PS(
+    NORMALMAPPED_VERTEX vertex,
+    float3 albedo,
+    float metallic,
+    float roughness,
+    float3 n,
+    uniform bool hiDefShadows,
+    // Common material specular values:
+    // water: .02
+    // plastic: .03-.05
+    // most materials: .04
+    // diamond: .17
+    // Not used for metals
+    float facingSpecular = .04,
+    float ao = 1
+) : COLOR0
+{
+    // See https://blog.selfshadow.com/publications/s2013-shading-course/
+
+    float3 v = normalize(vertex.viewDirection);
+    float3 reflection = reflect(-v, n);
+
+    // We can't use texCUBElod so we need to use a workaround
+    float lod = roughness * 10;
+    float scale = exp2(lod);
+    float3 env_reflection = texCUBEgrad(environmentSampler, reflection, float3(scale/256, 0, 0), float3(0, scale/256, 0));
+    // This should be convolved into a proper irradiance map, but we will settle for lod 5 for now
+    scale = exp2(5);
+    float3 env_irradiance = texCUBEgrad(environmentSampler, n, float3(scale/256, 0, 0), float3(0, scale/256, 0));
+
+    float2 envBRDFlookuptexture = tex2D(anisotropicSampler, float2(dot(n, v), 1 - roughness)).rg;
+    // We don't have good ao textures to counteract fresnel highlights showing in unplausible places,
+    // so we have to tune them down a bit across the board.
+    envBRDFlookuptexture.g *= 0.5;
+
+    //////////////////////////////
+    // Compute sun light
+    //
+
+    // specular reflections of dielectrics mostly disappear underwater
+    if (vertex.depth.x < 0) {
+        facingSpecular = facingSpecular * 0.05;
+    }
+    float3 F0 = lerp(float3(facingSpecular, facingSpecular, facingSpecular), albedo, metallic);
+    float3 l = sunDirection;
+    float3 h = normalize(v + l);
+    float nDotL = max(dot(n, l), 0.0);
+    // Normal maps can cause an angle > 90° between n and v which would
+    // cause artifacts if we don't take some countermeasures
+    float nDotV = abs(dot(n, v)) + 0.001;
+
+    float shadow = ComputeShadow(vertex.shadow, hiDefShadows);
+    float3 sunLight = sunDiffuse * lightMultiplier * shadow;
+
+    // Cook-Torrance BRDF
+    float3 F = FresnelSchlick(max(dot(h, v), 0.0), F0);
+    float NDF = NormalDistribution(n, h, roughness);
+    float G = GeometrySmith(n, nDotV, l, roughness);
+
+    // For point lights we need to multiply with Pi
+    float3 numerator = PI * NDF * G * F;
+    // add 0.0001 to avoid division by zero
+    float denominator = 4.0 * nDotV * nDotL + 0.0001;
+    float3 reflected = numerator / denominator;
+    
+    float3 kD = float3(1.0, 1.0, 1.0) - F;
+    kD *= 1.0 - metallic;	
+
+    float3 refracted = kD * albedo;
+    float3 irradiance = sunLight * nDotL;
+    float3 color = (refracted + reflected) * irradiance;
+
+    //////////////////////////////
+    // Compute environment light
+    //
+    float3 kS = FresnelSchlickRoughness(nDotV, F0, roughness);
+    kD = float3(1.0, 1.0, 1.0) - kS;
+    kD *= 1.0 - metallic;
+
+    // We need to do this to stay consistent with ComputeLight()
+    float3 shadowColor = (1 - (sunDiffuse * shadow * nDotL + sunAmbient)) * shadowFill;
+    float3 ambient = sunAmbient * lightMultiplier + shadowColor;
+
+    // As maps were not created with this shader in mind we need to do some tuning to match
+    // the shadows of the terrain. This is very non-physical and uses empirical values.
+    float shadowCorrection = saturate((ambient.r + ambient.g + ambient.b) / 3);
+    shadowCorrection = lerp(shadowCorrection, 1, shadow * nDotL);
+    env_irradiance *= shadowCorrection;
+    env_reflection *= shadowCorrection;
+    env_irradiance += ambient * 0.5;
+    env_reflection += ambient * 0.15;
+
+    float3 diffuse = env_irradiance * albedo;
+    float3 specular = env_reflection * (kS * envBRDFlookuptexture.r + envBRDFlookuptexture.g);
+    color += (kD * diffuse + specular) * ao;
+
+    return color;
+}
+
+
+float4 PBR_UEF(NORMALMAPPED_VERTEX vertex, float teamColorFactor, uniform bool hiDefShadows) : COLOR0
+{
+    float3x3 rotationMatrix = float3x3(vertex.binormal, vertex.tangent, vertex.normal);
+    float3 normal = ComputeNormal(normalsSampler, vertex.texcoord0.zw, rotationMatrix);
+    float4 albedo = tex2D(albedoSampler, vertex.texcoord0.xy);
+    float4 specular = tex2D(specularSampler, vertex.texcoord0.xy);
+
+    // try to extract some ambient occlusion information from the albedo
+    // unfortunately the albedos have lots of baked in lighting so
+    // we have to keep the effect slight
+    float ao = .5 + logisticFn(length(albedo.rgb) / sqrt(3), .1, 40, .5, 2);
+
+    float teamcolor = min(pow(specular.a * 1.1, 0.6), 1);
+    float metallic = max(1 - teamcolor * 2.2, 0);
+
+    albedo.rgb = lerp(albedo.rgb, albedo.rgb * 1.9, metallic);
+    albedo.rgb = lerp(albedo.rgb, vertex.color.rgb * 0.6, teamColorFactor * teamcolor);
+
+    float planeCockpitMask = saturate((specular.r - 0.65) * 3);
+    albedo.rgb += planeCockpitMask;
+
+    float roughness = specular.g * 0.6 + 0.35 + saturate(pow(specular.a * 3.7, 0.6)) * 0.3;
+    roughness += planeCockpitMask - specular.b * 3;
+    roughness = saturate(1 - roughness);
+
+    float3 color = PBR_PS(vertex, albedo.rgb, metallic, roughness, normal, hiDefShadows, .04, ao);
+    float emission = specular.b * 0.8;
+    color = ApplyWaterColor(vertex.depth.x, vertex.viewDirection, color, emission * albedo);
+
+    // The glowminimum is required to make the unit behave properly with the water shader.
+    // If the alpha channel is 0 somewhere, those parts will show as water refractions even
+    // if they are above the water line. See https://github.com/FAForever/fa/issues/4696
+    float alphaGlow = mirrored ? 0.5 : emission + glowMinimum;
+    return float4(color, alphaGlow);
+}
+
+float4 PBR_UEF_PS(NORMALMAPPED_VERTEX vertex,
+                uniform bool maskAlbedo,
+                uniform bool hiDefShadows,
+                uniform bool alphaTestEnable,
+                uniform int alphaFunc,
+                uniform int alphaRef ) : COLOR0
+{
+    if (1 == mirrored) clip(vertex.depth.x);
+
+    float teamColorFactor = 1;
+    return PBR_UEF(vertex, teamColorFactor, hiDefShadows);
+}
+
+float4 PBR_UEFBuildPS( NORMALMAPPED_VERTEX vertex, uniform bool hiDefShadows) : COLOR0
+{
+    if ( 1 == mirrored ) clip(vertex.depth);
+
+    float4 texcoord = vertex.texcoord0;
+    float4 texcoord2 = texcoord * 5;
+    texcoord2.y += vertex.material.x * 0.062;
+    float4 secondary = tex2D( secondarySampler, texcoord2.xy * 10);
+
+    float teamColorFactor = (vertex.material.y >= 0.90) ? (vertex.material.y - 0.9) * 10 : 0.0;
+    float3 color = PBR_UEF(vertex, teamColorFactor, hiDefShadows).rgb;
+
+    float1 t = min(max(frac( 0.02 * time), 0.35), 0.7);
+    float3 current = lerp(color+secondary.rgb,float3(0,0,1),t);
+    float3 outColor = lerp(current, color, vertex.material.y);
+
+    return float4(outColor, max(vertex.material.y, 0.5));
+}
+
+float4 PBR_Aeon(NORMALMAPPED_VERTEX vertex, float teamColorFactor, uniform bool hiDefShadows) : COLOR0
+{
+    if ( 1 == mirrored ) clip(vertex.depth.x);
+
+    float3x3 rotationMatrix = float3x3(vertex.binormal, vertex.tangent, vertex.normal);
+    float3 normal = ComputeNormal(normalsSampler, vertex.texcoord0.zw, rotationMatrix);
+    float3 albedo = tex2D( albedoSampler, vertex.texcoord0.xy).rgb;
+    float4 specular = tex2D( specularSampler, vertex.texcoord0.xy);
+    float fullTeamColor = saturate(specular.a * 2.5);
+
+    float metallic = 0;
+    if (specular.r < 0.4)
+        metallic = saturate(mapRange(specular.r, 0.2267, 0.3643, 0, 1));
+    else
+        metallic = min(max(mapRange(specular.r, 0.4129, 0.5384, 1, 0), 0.3), 1);
+    metallic = saturate(metallic - fullTeamColor);
+
+    if (specular.g < 0.45)
+        specular.g = 0.022 * (exp(6 * specular.g) - 1) + 0.023 + specular.a * 0.2;
+    else
+        specular.g = 0.762 * specular.g - 0.014;
+    float teamcolorBorder = saturate(mapRange(specular.a, 0.54, 0.6, 0, 1));
+    float darkAreas = saturate(saturate(mapRange(specular.r, 0.3, 0.44, 1, 0)) - length(albedo));
+    float roughness = lerp(specular.g, 0.03, teamcolorBorder);
+    roughness = saturate(roughness + darkAreas);
+
+    albedo *= (specular.r + 0.3) * 1.25;
+    albedo = pow(albedo, (1 - metallic * 0.95));
+    albedo = lerp(albedo, vertex.color.rgb * specular.a * 0.4, teamColorFactor * fullTeamColor);
+
+    float specularAmount = lerp(0.08, 0, darkAreas);
+    specularAmount = lerp(specularAmount, 0.04, fullTeamColor);
+
+    float3 color = PBR_PS(vertex, albedo, metallic, roughness, normal, hiDefShadows, specularAmount);
+    float3 emission = specular.b + specular.a * vertex.color.rgb * 0.5;
+    color = ApplyWaterColor(vertex.depth.x, vertex.viewDirection, color, emission);
+     
+    float alpha = mirrored ? 0.5 : specular.b + glowMinimum + specular.a * 0.13;
+
+    return float4(color, alpha);
+}
+
+float4 PBR_AeonPS(NORMALMAPPED_VERTEX vertex, uniform bool hiDefShadows) : COLOR0
+{
+    float teamColorFactor = 1;
+    return PBR_Aeon(vertex, teamColorFactor, hiDefShadows);
+}
+
+float4 PBR_AeonBuildPS(NORMALMAPPED_VERTEX vertex, uniform bool hiDefShadows) : COLOR0
+{
+    float teamColorFactor = (vertex.material.y >= 0.90) ? (vertex.material.y - 0.9) * 10 : 0.0;
+    return PBR_Aeon(vertex, teamColorFactor, hiDefShadows);
+}
+
+float4 PBR_AeonBuildPuddlePS(NORMALMAPPED_VERTEX vertex, uniform bool hiDefShadows) : COLOR0
+{
+    if ( 1 == mirrored ) clip(vertex.depth.x);
+
+    float2 texcoord = vertex.texcoord0.xy;
+    texcoord.x -= vertex.material.x * 0.002;
+    texcoord.y += vertex.material.x * 0.0042;
+
+    float3x3 rotationMatrix = float3x3( vertex.binormal, vertex.tangent, vertex.normal);
+    float3 normal = ComputeNormal( normalsSampler, texcoord, rotationMatrix);
+    float3 albedo = tex2D( albedoSampler, texcoord ).rgb;
+    float4 specular = tex2D( specularSampler, texcoord );
+
+    float metallic = 1;
+    float roughness = specular.g;
+
+    float3 color = PBR_PS(vertex, albedo, metallic, roughness, normal, hiDefShadows);
+
+    float alpha = mirrored ? 0.5 : specular.b + glowMinimum;
+
+    return float4(color, alpha);
+}
+
+float4 PBR_AeonBuildOverlayPS( NORMALMAPPED_VERTEX vertex) : COLOR0
+{
+    // Diffuse texture
+    float4 texcoord = vertex.texcoord0;
+    texcoord.y += vertex.material.x * 0.00162;
+    texcoord.x -= vertex.material.x * 0.001;
+    float4 mask1 = tex2D( secondarySampler, texcoord * 2);
+
+    float4 texcoord2 = vertex.texcoord0;
+    texcoord2.y -= vertex.material.x * 0.00162;
+    float4 mask2 = tex2D( secondarySampler, texcoord2 * 2);
+
+    float3 diffuse = mask1.rrr - mask2.ggg + mask1.ggg * mask2.rrr;
+    diffuse = lerp( diffuse, float3(0.5,0.5,0.5), 0.75);
+
+    // Custom normal mapping
+    float3x3 rotationMatrix = float3x3( vertex.binormal, vertex.tangent, vertex.normal );
+    float3 normal = tex2D( normalsSampler, vertex.texcoord0.zw ).gaa;
+    normal = lerp( normal, tex2D( secondarySampler, vertex.texcoord0 * 7 ).baa, 0.5);
+    normal = lerp( normal, diffuse, 0.5);
+    normal = 2 * normal - 1;
+    normal.z = sqrt( 1 - normal.x*normal.x - normal.y*normal.y );
+    normal = normalize( mul( normal, rotationMatrix));
+
+    float metallic = 1;
+    float roughness = 0.15;
+    float3 color = PBR_PS(vertex, diffuse, metallic, roughness, normal, true);
+
+    // Fade out 95% complete
+    float percentComplete = vertex.material.y;
+    float alpha = (percentComplete >= 0.95) ? (1.0 - ((percentComplete - 0.95) * 20)) * (color.r * 2) : color.r * 2;
+
+    return float4( color, alpha );
+}
+
+float4 PBR_AeonCZARPS( NORMALMAPPED_VERTEX vertex, uniform bool hiDefShadows) : COLOR0
+{
+    if ( 1 == mirrored ) clip(vertex.depth.x);
+
+    float3x3 rotationMatrix = float3x3(vertex.binormal, vertex.tangent, vertex.normal);
+    float3 normal = ComputeNormal(normalsSampler, vertex.texcoord0.zw, rotationMatrix);
+    float4 albedo = tex2D( albedoSampler, vertex.texcoord0.xy);
+    float4 specular = tex2D( specularSampler, vertex.texcoord0.xy);
+
+    float metallic = saturate((specular.r - 0.02) * 4 - specular.a * 5);
+
+    albedo.rgb *= 1 + metallic;
+    // We need to make the dark areas darker
+    // Should find something that offers more control over the result
+    float x = albedo.r;
+    albedo.rgb = (pow(x, 3) - 3 * pow(x, 2) + 3 * x) * albedo.rgb;
+
+    albedo.rgb = lerp(albedo.rgb, vertex.color.rgb * 0.8, specular.a);
+
+    if (specular.g < 0.45)
+        specular.g = 0.022 * (exp(6 * specular.g) - 1) + 0.023 + specular.a * 0.2;
+    else
+        specular.g = 0.762 * specular.g - 0.014;
+    float teamcolorBorder = saturate(mapRange(specular.a, 0.54, 0.6, 0, 1));
+    float darkAreas = 0;
+    if (specular.r < 0.18)
+        darkAreas = saturate(0.7 - pow(specular.r, 0.6));
+    float roughness = lerp(specular.g, 0.03, teamcolorBorder);
+    roughness = max(roughness, darkAreas);
+
+    float specularAmount = lerp(0.08, 0, darkAreas);
+    specularAmount = lerp(specularAmount, 0.04, saturate(specular.a * 3));
+
+    float3 color = PBR_PS(vertex, albedo.rgb, metallic, roughness, normal, hiDefShadows, specularAmount);
+
+    float emission = specular.b + (pow(specular.a, 2) * 0.13);
+    color += emission * albedo.rgb;
+
+    float2 texcoord = vertex.texcoord0.xy * 60;
+    texcoord.x -= vertex.material.x * 0.16;
+    texcoord.y -= vertex.material.x * 0.01;
+    float2 texcoord2 = vertex.texcoord0.xy * 30;
+    texcoord2.x += vertex.material.x * 0.08;
+    texcoord2.y -= vertex.material.x * 0.005;
+    float3 secondary = tex2D( secondarySampler, texcoord );
+    float3 secondary2 = tex2D( secondarySampler, texcoord2 );
+    color += float3(0.2,0.7,1) * (secondary.b + secondary2.g )* (1-albedo.a);
+
+    float alpha = mirrored ? 0.5 : specular.b + ((secondary.b + secondary2.g ) * (1-albedo.a)) + glowMinimum;
+    return float4(color, alpha);
+}
+
+float4 PBR_Cybran(NORMALMAPPED_VERTEX vertex, float teamColorFactor, uniform bool hiDefShadows) : COLOR0
+{
+    if ( 1 == mirrored ) clip(vertex.depth);
+
+    float3x3 rotationMatrix = float3x3(vertex.binormal, vertex.tangent, vertex.normal);
+    float3 normal = ComputeNormal(normalsSampler, vertex.texcoord0.zw, rotationMatrix);
+    float4 albedo = tex2D( albedoSampler, vertex.texcoord0.xy);
+    float4 specular = tex2D( specularSampler, vertex.texcoord0.xy);
+
+    float metallic = saturate(specular.r + saturate(specular.g - 0.1) * 0.87 - specular.a * 2.2);
+    float roughness = lerp(0.8 * (1 - specular.g), lerp(0.5, 0.25, specular.g), metallic);
+
+    albedo.rgb = min(lerp(albedo.rgb, albedo.rgb * 2.3, pow(metallic, 2.5)), float3(1, 1, 1));
+    albedo.rgb = lerp(albedo.rgb, vertex.color.rgb, teamColorFactor * specular.a);
+
+    float3 color = PBR_PS(vertex, albedo.rgb, metallic, roughness, normal, hiDefShadows);
+    float emission = pow(max(specular.b - 0.04, 0.0), 0.5);
+    color = ApplyWaterColor(vertex.depth.x, vertex.viewDirection, color, emission * albedo);
+
+    float alpha = mirrored ? 0.5 : min(emission + glowMinimum, 0.3);
+
+    return float4(color, alpha);
+}
+
+float4 PBR_CybranPS(NORMALMAPPED_VERTEX vertex, uniform bool hiDefShadows) : COLOR0
+{
+    float teamColorFactor = 1;
+    return PBR_Cybran(vertex, teamColorFactor, hiDefShadows);
+}
+
+float4 PBR_CybranBuildPS(NORMALMAPPED_VERTEX vertex, uniform bool hiDefShadows) : COLOR0
+{
+    float teamColorFactor = (vertex.material.y >= 0.90) ? (vertex.material.y - 0.9) * 10 : 0.0;
+    float4 color = PBR_Cybran(vertex, teamColorFactor, hiDefShadows);
+
+    // Adjust the transparency of the unit so that it is 40% visible, until the unit is 70% complete
+    float alpha = (vertex.material.y >= 0.7) ? 0.4 + (0.6 * ((vertex.material.y - 0.7) * 3.33)) : 0.4;
+
+    return float4(color.rgb, alpha);
+}
+
+float4 PBR_Seraphim(
+    NORMALMAPPED_VERTEX vertex,
+    float4 albedo,
+    float4 specular,
+    float3 normal,
+    uniform bool hiDefShadows) : COLOR0
+{
+    float NdotV = saturate(dot(normalize(vertex.viewDirection), normal));
+    NdotV = 2 * pow(NdotV, 6) - 2 * NdotV + 1.5;
+    float3 teamColor = NdotV * vertex.color.rgb;
+	
+    // There are also white highlights in the albedo texture in some models
+    float3 whiteness = saturate(albedo.rgb - float3 (0.4,0.4,0.4));
+
+    albedo.rgb = (albedo.bbg + float3(0.4, 0.43, 0.47)) * 0.8;
+    albedo.rgb = lerp(albedo.rgb, teamColor, albedo.a);
+
+    float metallic = 1;
+    float roughness = saturate((1 - pow(specular.g, 0.5) + 0.3) * 0.7);
+
+    float3 color = PBR_PS(vertex, albedo.rgb, metallic, roughness, normal, hiDefShadows);
+    color = lerp(color, teamColor * 0.5, albedo.a - 0.2);
+    float3 emission = saturate(specular.b - 0.1) + teamColor * albedo.a + whiteness * 1.5;
+
+    // Substitute all the computations on pure glowing parts with the
+    // pure brightness texture to get rid of reflections and shadows
+    float mask = saturate(saturate(specular.b * 2) - albedo.a);
+    color = lerp(color, specular.b * 2, mask);
+
+    color = ApplyWaterColor(vertex.depth.x, vertex.viewDirection, color, emission * albedo);
+
+    // Bloom is only rendered where alpha > 0
+    float teamColorGlow = (vertex.color.r + vertex.color.g + vertex.color.b) / 3;
+    teamColorGlow = albedo.a * (1 - teamColorGlow) * 0.06;
+    float alpha = mirrored ? 0.5 : saturate(specular.b - 0.1) * 0.4 + teamColorGlow + whiteness * 0.1 + glowMinimum;
+    
+    return float4(color, alpha);
+}
+
+float4 PBR_SeraphimPS(NORMALMAPPED_VERTEX vertex, uniform bool hiDefShadows) : COLOR0
+{
+    if ( 1 == mirrored ) clip(vertex.depth.x);
+
+    float3x3 rotationMatrix = float3x3( vertex.binormal, vertex.tangent, vertex.normal);
+    float3 normal = ComputeNormal( normalsSampler, vertex.texcoord0.zw, rotationMatrix);
+    float4 albedo = tex2D( albedoSampler, vertex.texcoord0.xy);
+    float4 specular = tex2D( specularSampler, vertex.texcoord0.xy);
+
+    return PBR_Seraphim(vertex, albedo, specular, normal, hiDefShadows);
+}
+
+float4 PBR_SeraphimBuildPS(NORMALMAPPED_VERTEX vertex, uniform bool hiDefShadows) : COLOR0
+{
+    if ( 1 == mirrored ) clip(vertex.depth.x);
+
+    float4 texcoord = vertex.texcoord0;
+    texcoord.y += vertex.material.x * 0.005;
+    float buildFractionMul = (vertex.material.y - 0.9) * 10;
+    float4 uvaddress = tex2D( secondarySampler, texcoord * 0.5 ) * 0.03;
+    float2 texcoord2 = vertex.texcoord0.xy + lerp( uvaddress.rb, 0, buildFractionMul );
+
+    float3x3 rotationMatrix = float3x3( vertex.binormal, vertex.tangent, vertex.normal);
+    float3 normal = ComputeNormal( normalsSampler, vertex.texcoord0.zw + lerp( uvaddress.rb, 0, buildFractionMul ), rotationMatrix);
+    float4 albedo = tex2D( albedoSampler, texcoord2);
+    float4 specular = tex2D( specularSampler, texcoord2);
+
+    float3 color = PBR_Seraphim(vertex, albedo, specular, normal, hiDefShadows).rgb;
+
+    return float4(color, max(vertex.material.y, 0.25));
+}
+
 /// VertexNormalPS_HighFidelity
 ///
 /// Lighting using vertex normals only.
@@ -2382,53 +2890,6 @@ float4 NormalMappedPS( NORMALMAPPED_VERTEX vertex,
     if( alphaTestEnable )
         AlphaTestD3D10( alpha, alphaFunc, alphaRef );
 #endif
-    return float4( color.rgb, alpha );
-}
-
-/// New UEF PS
-float4 NormalMappedPS_02( NORMALMAPPED_VERTEX vertex,
-                       uniform bool maskAlbedo,
-                       uniform bool glow,
-                       uniform bool hiDefShadows,
-                       uniform bool alphaTestEnable,
-                       uniform int alphaFunc,
-                       uniform int alphaRef ) : COLOR0
-{
-    if ( 1 == mirrored ) clip(vertex.depth.x);
-
-  float3x3 rotationMatrix = float3x3( vertex.binormal, vertex.tangent, vertex.normal);
-  float3 normal = ComputeNormal( normalsSampler, vertex.texcoord0.zw, rotationMatrix);
-  float dotLightNormal = dot(sunDirection,normal);
-
-  float4 albedo = tex2D( albedoSampler, vertex.texcoord0.xy);
-  float4 specular = tex2D( specularSampler, vertex.texcoord0.xy);
-    float3 environment = texCUBE( environmentSampler, reflect( -vertex.viewDirection, normal));
-
-  if ( maskAlbedo )
-    albedo.rgb = lerp( vertex.color.rgb, albedo.rgb, 1 - specular.a );
-  else
-    albedo.rgb = albedo.rgb * vertex.color.rgb;
-  float3 light = ComputeLight_02( dotLightNormal, ComputeShadow( vertex.shadow, hiDefShadows));
-  //light = light * (0.9 - (light * 0.125));
-  //float3 lightpow = (light.r + light.g + light.b) / 3;
-  //light = light * lightpow;
-    float phongAmount = saturate( dot( reflect( sunDirection, normal), -vertex.viewDirection));
-    float3 phongAdditive = NormalMappedPhongCoeff * pow( phongAmount, 12) * specular.g * light * 1.4;
-    float3 phongMultiplicative = environment * specular.r * light * 0.5;
-
-    float emissive = glowMultiplier * specular.b * 0.02;
-
-  float3 color = (albedo.rgb * 0.125) + ( emissive.r + (light * albedo.rgb) ) + phongMultiplicative + (phongAdditive);
-  color = ApplyWaterColor(vertex.depth.x, vertex.viewDirection, color);
-
-  float alpha = mirrored ? 0.5 : ( glow ? ( specular.b + glowMinimum ) : ( vertex.material.g * albedo.a )) + (phongAdditive * 0.13);
-    //float alpha = mirrored ? 0.5 : ( glow ? ( specular.b + glowMinimum ) : ( vertex.material.g * albedo.a ));
-  //color = phongMultiplicative;
-
-    #ifdef DIRECT3D10
-    if( alphaTestEnable )
-        AlphaTestD3D10( alpha, alphaFunc, alphaRef );
-  #endif
     return float4( color.rgb, alpha );
 }
 
@@ -2829,50 +3290,6 @@ float4 AeonPS( NORMALMAPPED_VERTEX vertex, uniform bool hiDefShadows) : COLOR0
     return float4( color, alpha );
 }
 
-//NewAeonPS
-float4 AeonPS_02( NORMALMAPPED_VERTEX vertex, uniform bool hiDefShadows) : COLOR0
-{
-    if ( 1 == mirrored ) clip(vertex.depth.x);
-
-    float3x3 rotationMatrix = float3x3( vertex.binormal, vertex.tangent, vertex.normal);
-    float3 normal = ComputeNormal( normalsSampler, vertex.texcoord0.zw, rotationMatrix);
-    float dotLightNormal = dot(sunDirection,normal);
-
-    float4 albedo = tex2D( albedoSampler, vertex.texcoord0.xy);
-    float4 specular = tex2D( specularSampler, vertex.texcoord0.xy);
-    float3 environment = texCUBE( environmentSampler, reflect( -vertex.viewDirection, normal));
-
-    //albedo.rgb = (0.8 * specular.r) -  albedo.rgb;
-
-    // Calculate lighting and shadows
-    float3 light = ComputeLight_02( dotLightNormal, ComputeShadow( vertex.shadow, hiDefShadows));
-
-    light = (light * 0.5) * pow((1 - specular.a), 8);
-    //light = light * (0.8 - (light * 0.125));
-    //float3 lightpow = (light.r + light.g + light.b) / 3;
-    //light = light * lightpow * lightpow * lightpow;
-
-    // Calculate Specular and Reflection
-    float3 reflection = reflect( sunDirection, normal);
-    float phongAmount = saturate( dot( reflection, -vertex.viewDirection));
-    float3 phongAdditive = AeonPhongCoeff * pow( phongAmount, 5) * light *  specular.g * pow((1 - (specular.a * 0.5) ), 8) * 2;
-    float3 phongMultiplicative = specular.r * light * environment * (1 - specular.a) * 1.2;
-    float phongMultiplicativeGlow = (phongMultiplicative.r + phongMultiplicative.g + phongMultiplicative.b)/3;
-    float phongAdditiveGlow = (phongAdditive.r + phongAdditive.g + phongAdditive.b)/3;
-
-    // Does the rest of the stuff
-    float emissive = glowMultiplier * specular.b;
-    float3 color = (albedo.rgb * 0.125) + (emissive + (light * albedo.rgb)) + phongAdditive + phongMultiplicative;
-    color += vertex.color.rgb * specular.a;
-    float teamColGlowCompensation = ((vertex.color.r + vertex.color.g + vertex.color.b) / 3);
-    float alpha = mirrored ? 0.5 : specular.b + glowMinimum + (pow(specular.a * 1.5, 2) * 0.07 * (1.4 - teamColGlowCompensation)) + ((phongMultiplicativeGlow + phongAdditiveGlow) * 0.05);
-    //alpha = 0;
-    //color = light;
-    color = ApplyWaterColor(vertex.depth.x, vertex.viewDirection, color);
-
-    return float4( color, alpha );
-}
-
 /// AeonCZARPS
 ///
 ///
@@ -2922,6 +3339,7 @@ float4 AeonCZARPS( NORMALMAPPED_VERTEX vertex, uniform bool hiDefShadows) : COLO
 /// - Similar to unit shader, with the exception that it uses the diffuse texture alpha
 ///   channel to mask area's in which the view dependant lookup texture is sampled.
 ///   Only works in Medium and High fidelity.
+///   Used for Seraphim units
 ///
 float4 UnitFalloffPS( NORMALMAPPED_VERTEX vertex, uniform bool hiDefShadows) : COLOR0
 {
@@ -2962,68 +3380,6 @@ float4 UnitFalloffPS( NORMALMAPPED_VERTEX vertex, uniform bool hiDefShadows) : C
     return float4( color, alpha );
 }
 
-//New SeraPS
-float4 UnitFalloffPS_02( NORMALMAPPED_VERTEX vertex, uniform bool hiDefShadows) : COLOR0
-{
-    if ( 1 == mirrored ) clip(vertex.depth.x);
-
-    float3x3 rotationMatrix = float3x3( vertex.binormal, vertex.tangent, vertex.normal);
-    float3 normal = ComputeNormal( normalsSampler, vertex.texcoord0.zw, rotationMatrix);
-    float dotLightNormal = dot(sunDirection,normal);
-
-    float4 diffuse = tex2D( albedoSampler, vertex.texcoord0.xy);
-    float4 specular = tex2D( specularSampler, vertex.texcoord0.xy);
-    float3 environment = texCUBE( environmentSampler, reflect( -vertex.viewDirection, normal));
-
-    // Calculate lookup texture for falloff ramp
-    float NdotV = saturate(dot( normalize(vertex.viewDirection), normal ));
-    float4 fallOff = tex2D( falloffSampler, float2(pow(1 - NdotV, 0.6),vertex.material.x));
-
-    // Calculate lighting and shadows
-    float shadow = ComputeShadow( vertex.shadow, hiDefShadows);
-    float3 light = sunDiffuse * saturate( dotLightNormal ) * shadow + sunAmbient;
-    // Normalizes the light to 1 for consistent results across different maps
-    float correction = sunDiffuse.g + sunAmbient.g; 
-    light = light / correction + ( 1 - light / correction ) * shadowFill * 0.5;
-
-    // Calculate specular highlights of the sun
-    float3 reflection = reflect( sunDirection, normal);
-    float specularAmount = saturate( dot( reflection, -vertex.viewDirection));
-    float3 phongAdditive = pow( specularAmount, 9) * specular.g * shadow * sunDiffuse * 0.7;
-    phongAdditive *= (diffuse.g + 1);
-
-    // Calculate environment map reflection
-    float reflectivity = saturate(specular.r * 2.5); // Reduce artifacts of texture
-    environment *= reflectivity * fallOff.a * light;
-    
-    // This gives almost the same result as the ramp in fallOff.rgb, but we will use this,
-    // because it produces consistent results with different player colors
-    NdotV = 2 * pow(NdotV, 6) - 2 * NdotV + 1.5;
-    float3 teamColor = NdotV * vertex.color.rgb;
-	
-    // There are also white highlights in the diffuse texture in some models
-    float3 whiteness = light * saturate(diffuse.rgb - float3 (0.4,0.4,0.4));
-    
-    // Combine all previous computations
-    float3 color = (diffuse.rgb + float3 (0.25,0.35,0.45)) * light * (1 - diffuse.a) * 0.65;
-    color += phongAdditive + environment;
-    color += (teamColor * diffuse.a) + whiteness;
-    
-    // Substitute all the computations on pure glowing parts with the pure brightness texture
-    // to get rid of reflections and shadows
-    float mask = saturate( saturate(specular.b * 2) - diffuse.a );
-    color *= 1 - mask;
-    color += specular.b * 2 * mask;
-    color = ApplyWaterColor(vertex.depth.x, vertex.viewDirection, color);
-
-    // Bloom is only rendered where alpha > 0
-    float teamColorGlow = (vertex.color.r + vertex.color.g + vertex.color.b) / 3;
-    teamColorGlow = diffuse.a * (1 - teamColorGlow) * 0.06;
-    float alpha = mirrored ? 0.5 : specular.b * 0.4 + teamColorGlow;
-    
-    return float4( color, alpha );
-}
-
 float4 LowFiUnitFalloffPS( NORMALMAPPED_VERTEX vertex) : COLOR0
 {
     if ( 1 == mirrored ) clip(vertex.depth.x);
@@ -3055,10 +3411,6 @@ float4 LowFiUnitFalloffPS( NORMALMAPPED_VERTEX vertex) : COLOR0
 ///
 float4 AeonBuildPS( NORMALMAPPED_VERTEX vertex, uniform bool hiDefShadows) : COLOR0
 {
-
-    // +, -, /, * = 1
-    // pow = 4
-
     if ( 1 == mirrored ) clip(vertex.depth.x);
 
     float3x3 rotationMatrix = float3x3( vertex.binormal, vertex.tangent, vertex.normal);
@@ -3092,7 +3444,6 @@ float4 AeonBuildPS( NORMALMAPPED_VERTEX vertex, uniform bool hiDefShadows) : COL
     float alpha = mirrored ? 0.5 : specular.b + glowMinimum + (pow(specular.a * 1.5, 2) * 0.07 * (1.4 - teamColGlowCompensation)) + ((phongMultiplicativeGlow + phongAdditiveGlow) * 0.05);
 
     return float4( color, alpha );
-
 }
 
 float4 AeonBuildOverlayPS( NORMALMAPPED_VERTEX vertex) : COLOR0
@@ -3429,40 +3780,6 @@ float4 NormalMappedInsectPS( NORMALMAPPED_VERTEX vertex, uniform bool hiDefShado
 
     float alpha = mirrored ? 0.5 : specular.b + glowMinimum;
 
-    return float4( color, alpha);
-}
-
-//New CybranPS
-float4 NormalMappedInsectPS_02( NORMALMAPPED_VERTEX vertex, uniform bool hiDefShadows) : COLOR0
-{
-    if ( 1 == mirrored ) clip(vertex.depth);
-
-    float3x3 rotationMatrix = float3x3( vertex.binormal, vertex.tangent, vertex.normal);
-    float3 normal = ComputeNormal( normalsSampler, vertex.texcoord0.zw, rotationMatrix);
-    float dotLightNormal = dot(sunDirection,normal);
-
-    //Textures'n Stuff
-    float4 albedo = tex2D( albedoSampler, vertex.texcoord0.xy);
-    float4 specular = tex2D( specularSampler, vertex.texcoord0.xy);
-    float3 environment = texCUBE( environmentSampler, reflect( -vertex.viewDirection, normal));
-
-    albedo.rgb = lerp( vertex.color.rgb, albedo.rgb, 1 - specular.a );
-
-    //Lighting, Specularity and Reflection
-    float shadow = ComputeShadow( vertex.shadow, hiDefShadows);
-    float3 light = ComputeLight_02( dotLightNormal, ComputeShadow( vertex.shadow, hiDefShadows));
-    light = light * 1.2;
-    float phongAmount = saturate( dot( reflect( sunDirection, normal), -vertex.viewDirection));
-    float3 phongAdditive = pow( phongAmount, 3) * specular.g * light * 0.5;
-    float3 phongMultiplicative = (phongAmount * environment * specular.r * light * 0.2);
-  
-    float emissive = glowMultiplier * specular.b;
-
-    //Finish it
-    float3 color = (albedo.rgb * 0.125) + emissive + (light * albedo.rgb) + (phongAdditive) + phongMultiplicative;
-    float alpha = mirrored ? 0.5 : min(specular.b, 0.3) + glowMinimum + (phongAdditive * 0.04);
-
-    color = ApplyWaterColor(vertex.depth.x, vertex.viewDirection, color);
     return float4( color, alpha);
 }
 
@@ -5182,8 +5499,7 @@ technique Unit_HighFidelity
         RasterizerState( Rasterizer_Cull_CW )
 
         VertexShader = compile vs_1_1 NormalMappedVS();
-        //PixelShader = compile ps_2_a NormalMappedPS(true,true,true, false,0,0 );
-        PixelShader = compile ps_2_a NormalMappedPS_02(true,true,true,false,0,0 );
+        PixelShader = compile ps_2_a PBR_UEF_PS(true,true,false,0,0 );
     }
 }
 
@@ -5203,7 +5519,6 @@ technique Unit_MedFidelity
         RasterizerState( Rasterizer_Cull_CW )
 
         VertexShader = compile vs_1_1 NormalMappedVS();
-        //PixelShader = compile ps_2_0 NormalMappedPS(true,true,false, false,0,0 );
         PixelShader = compile ps_2_a NormalMappedPS(true,true,true, false,0,0 );
     }
 }
@@ -5226,6 +5541,30 @@ technique Unit_LowFidelity
 
         VertexShader = compile vs_1_1 VertexNormalVS();
         PixelShader = compile ps_2_0 ColorMaskPS_LowFidelity();
+    }
+}
+
+// The ship variants are supposed to use a mirrored environment
+// texture to emulate the water surface reflecting the sky.
+technique PBR_UEF_Navy
+<
+    string abstractTechnique = "PBR_UEF_Navy";
+    int fidelity = FIDELITY_HIGH;
+
+    string cartographicTechnique = "CartographicUnit";
+    string depthTechnique = "Depth";
+    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
+    int parameter = PARAM_FRACTIONCOMPLETE;
+    
+    string environment = "<water>";
+>
+{
+    pass P0
+    {
+        RasterizerState(Rasterizer_Cull_CW)
+
+        VertexShader = compile vs_1_1 NormalMappedVS();
+        PixelShader = compile ps_2_a PBR_UEF_PS(true, true, false, 0, 0);
     }
 }
 
@@ -5606,8 +5945,7 @@ technique Insect_HighFidelity
         RasterizerState( Rasterizer_Cull_CW )
 
         VertexShader = compile vs_1_1 NormalMappedVS();
-        //PixelShader = compile ps_2_a NormalMappedInsectPS(true);
-        PixelShader = compile ps_2_a NormalMappedInsectPS_02(true);
+        PixelShader = compile ps_2_a PBR_CybranPS(true);
     }
 }
 
@@ -5653,6 +5991,28 @@ technique Insect_LowFidelity
     }
 }
 
+technique PBR_Cybran_Navy
+<
+    string abstractTechnique = "PBR_Cybran_Navy";
+    int fidelity = FIDELITY_HIGH;
+
+    string cartographicTechnique = "CartographicUnit";
+    string depthTechnique = "Depth";
+    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
+    int parameter = PARAM_FRACTIONCOMPLETE;
+            
+    string environment = "<water>";
+>
+{
+    pass P0
+    {
+        RasterizerState( Rasterizer_Cull_CW )
+
+        VertexShader = compile vs_1_1 NormalMappedVS();
+        PixelShader = compile ps_2_a PBR_CybranPS(true);
+    }
+}
+
 /// Aeon
 ///
 ///
@@ -5665,8 +6025,6 @@ technique Aeon_HighFidelity
     string depthTechnique = "Depth";
     int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
     int parameter = PARAM_FRACTIONCOMPLETE;
-
-        string environment = "<aeon>";
 >
 {
     pass P0
@@ -5674,8 +6032,7 @@ technique Aeon_HighFidelity
         RasterizerState( Rasterizer_Cull_CW )
 
         VertexShader = compile vs_1_1 NormalMappedVS();
-        //PixelShader = compile ps_2_a AeonPS(true);
-        PixelShader = compile ps_2_a AeonPS_02(true);
+        PixelShader = compile ps_2_a PBR_AeonPS(true);
     }
 }
 
@@ -5695,7 +6052,6 @@ technique Aeon_MedFidelity
         RasterizerState( Rasterizer_Cull_CW )
 
         VertexShader = compile vs_1_1 NormalMappedVS();
-        //PixelShader = compile ps_2_0 AeonPS(false);
         PixelShader = compile ps_2_a AeonPS(true);
     }
 }
@@ -5721,6 +6077,28 @@ technique Aeon_LowFidelity
     }
 }
 
+technique PBR_Aeon_Navy
+<
+    string abstractTechnique = "PBR_Aeon_Navy";
+    int fidelity = FIDELITY_HIGH;
+
+    string cartographicTechnique = "CartographicUnit";
+    string depthTechnique = "Depth";
+    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
+    int parameter = PARAM_FRACTIONCOMPLETE;
+        
+    string environment = "<water>";
+>
+{
+    pass P0
+    {
+        RasterizerState( Rasterizer_Cull_CW )
+
+        VertexShader = compile vs_1_1 NormalMappedVS();
+        PixelShader = compile ps_2_a PBR_AeonPS(true);
+    }
+}
+
 /// Seraphim
 ///
 ///
@@ -5735,9 +6113,6 @@ technique Seraphim_HighFidelity
 
     int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
     int parameter = PARAM_FRACTIONCOMPLETE;
-
-    string environment = "<seraphim>";
-
 >
 {
     pass P0
@@ -5745,8 +6120,7 @@ technique Seraphim_HighFidelity
         RasterizerState( Rasterizer_Cull_CW )
 
         VertexShader = compile vs_1_1 UnitFalloffVS();
-        //PixelShader = compile ps_2_a UnitFalloffPS(true);
-        PixelShader = compile ps_2_a UnitFalloffPS_02(true);
+        PixelShader = compile ps_2_a PBR_SeraphimPS(true);
     }
 }
 
@@ -5769,8 +6143,7 @@ technique Seraphim_MedFidelity
         RasterizerState( Rasterizer_Cull_CW )
 
         VertexShader = compile vs_1_1 UnitFalloffVS();
-        //PixelShader = compile ps_2_0 UnitFalloffPS(false);
-        PixelShader = compile ps_2_a UnitFalloffPS_02(true);
+        PixelShader = compile ps_2_0 UnitFalloffPS(false);
     }
 }
 
@@ -5797,6 +6170,30 @@ technique Seraphim_LowFidelity
     }
 }
 
+technique PBR_Seraphim_Navy
+<
+    string abstractTechnique = "PBR_Seraphim_Navy";
+    int fidelity = FIDELITY_HIGH;
+
+
+    string cartographicTechnique = "CartographicUnit";
+    string depthTechnique = "Depth";
+
+    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
+    int parameter = PARAM_FRACTIONCOMPLETE;
+            
+    string environment = "<water>";
+>
+{
+    pass P0
+    {
+        RasterizerState( Rasterizer_Cull_CW )
+
+        VertexShader = compile vs_1_1 UnitFalloffVS();
+        PixelShader = compile ps_2_a PBR_SeraphimPS(true);
+    }
+}
+
 
 /// AeonCZAR
 ///
@@ -5817,7 +6214,7 @@ technique AeonCZAR_HighFidelity
         RasterizerState( Rasterizer_Cull_CW )
 
         VertexShader = compile vs_1_1 NormalMappedVS();
-        PixelShader = compile ps_2_a AeonCZARPS(true);
+        PixelShader = compile ps_2_a PBR_AeonCZARPS(true);
     }
 }
 
@@ -5881,7 +6278,7 @@ technique AeonBuild_HighFidelity
         AlphaState( AlphaBlend_Disable_Write_RGB )
 
         VertexShader = compile vs_1_1 AeonBuildVS(0.0);
-        PixelShader = compile ps_2_a AeonBuildPS(true);
+        PixelShader = compile ps_2_a PBR_AeonBuildPS(true);
     }
     pass P1
     {
@@ -5889,7 +6286,7 @@ technique AeonBuild_HighFidelity
         RasterizerState( Rasterizer_Cull_CW )
 
         VertexShader = compile vs_1_1 AeonBuildVS(0);
-        PixelShader = compile ps_2_0 AeonBuildOverlayPS();
+        PixelShader = compile ps_2_a PBR_AeonBuildOverlayPS();
     }
 }
 
@@ -6040,7 +6437,7 @@ technique AeonBuildPuddle_HighFidelity
         RasterizerState( Rasterizer_Cull_CW )
 
         VertexShader = compile vs_1_1 NormalMappedVS();
-        PixelShader = compile ps_2_a AeonBuildPuddlePS(true);
+        PixelShader = compile ps_2_a PBR_AeonBuildPuddlePS(true);
     }
 }
 
@@ -6104,7 +6501,7 @@ technique CybranBuild_HighFidelity
         RasterizerState( Rasterizer_Cull_CW )
 
         VertexShader = compile vs_1_1 NormalMappedVS();
-        PixelShader = compile ps_2_a CybranBuildPS(true);
+        PixelShader = compile ps_2_a PBR_CybranBuildPS(true);
     }
     pass P1
     {
@@ -6176,6 +6573,28 @@ technique CybranBuild_LowFidelity
 /// Seraphim Build
 ///
 ///
+technique SeraphimBuild_HighFidelity
+<
+    string abstractTechnique = "SeraphimBuild";
+    int fidelity = FIDELITY_HIGH;
+
+    string cartographicTechnique = "CartographicBuild";
+    string depthTechnique = "SeraphimBuildDepth";
+
+    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
+    int parameter = PARAM_FRACTIONCOMPLETE;
+>
+{
+    pass P0
+    {
+        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGB )
+        RasterizerState( Rasterizer_Cull_CW )
+
+        VertexShader = compile vs_1_1 SeraphimBuildVS();
+        PixelShader = compile ps_2_a PBR_SeraphimBuildPS(true);
+    }
+}
+
 technique SeraphimBuild_MedFidelity
 <
     string abstractTechnique = "SeraphimBuild";
@@ -6240,7 +6659,7 @@ technique UEFBuild_HighFidelity
         RasterizerState( Rasterizer_Cull_CW )
 
         VertexShader = compile vs_1_1 NormalMappedVS();
-        PixelShader = compile ps_2_a UEFBuildHiFiPS(true);
+        PixelShader = compile ps_2_a PBR_UEFBuildPS(true);
     }
     pass P1
     {
@@ -6721,7 +7140,7 @@ technique SeraphimStunned_LowFidelity
     }
 }
 
-/// Phase Shield
+/// Personal Shields
 ///
 ///
 technique PhaseShield_HighFidelity
@@ -6741,14 +7160,14 @@ technique PhaseShield_HighFidelity
         RasterizerState( Rasterizer_Cull_CW )
 
         VertexShader = compile vs_1_1 NormalMappedVS();
-        PixelShader = compile ps_2_a NormalMappedPS(true,true,true, false,0,0 );
+        PixelShader = compile ps_2_a PBR_UEF_PS(true, true, false, 0, 0);
     }
     pass P1
     {
         AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGBA )
         RasterizerState( Rasterizer_Cull_CW )
 
-        VertexShader = compile vs_1_1 PositionNormalOffsetVS(0.05);
+        VertexShader = compile vs_1_1 PositionNormalOffsetVS(0.02);
         PixelShader = compile ps_2_0 PhaseShieldPS();
     }
 }
@@ -6770,14 +7189,14 @@ technique AeonPhaseShield_HighFidelity
         RasterizerState( Rasterizer_Cull_CW )
 
         VertexShader = compile vs_1_1 NormalMappedVS();
-        PixelShader = compile ps_2_a NormalMappedPS(true,true,true, false,0,0 );
+        PixelShader = compile ps_2_a PBR_AeonPS(true);
     }
     pass P1
     {
         AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGBA )
         RasterizerState( Rasterizer_Cull_CW )
 
-        VertexShader = compile vs_1_1 PositionNormalOffsetVS(0.05);
+        VertexShader = compile vs_1_1 PositionNormalOffsetVS(0.02);
         PixelShader = compile ps_2_0 AeonPhaseShieldPS();
     }
 }
@@ -6799,15 +7218,45 @@ technique CybranPhaseShield_HighFidelity
         RasterizerState( Rasterizer_Cull_CW )
 
         VertexShader = compile vs_1_1 NormalMappedVS();
-        PixelShader = compile ps_2_a NormalMappedPS(true,true,true, false,0,0 );
+        PixelShader = compile ps_2_a PBR_CybranPS(true);
     }
     pass P1
     {
         AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGBA )
         RasterizerState( Rasterizer_Cull_CW )
 
-        VertexShader = compile vs_1_1 PositionNormalOffsetVS(0.05);
+        VertexShader = compile vs_1_1 PositionNormalOffsetVS(0.02);
         PixelShader = compile ps_2_0 CybranPhaseShieldPS();
+    }
+}
+
+technique SeraphimPersonalShield_HighFidelity
+<
+    string abstractTechnique = "SeraphimPersonalShield";
+    int fidelity = FIDELITY_HIGH;
+
+    string cartographicTechnique = "CartographicUnit";
+    string depthTechnique = "Depth";
+    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
+
+    int parameter = PARAM_LIFETIME;
+>
+{
+    pass P0
+    {
+        AlphaState( AlphaBlend_Disable_Write_RGBA )
+        RasterizerState( Rasterizer_Cull_CW )
+
+        VertexShader = compile vs_1_1 UnitFalloffVS();
+        PixelShader = compile ps_2_a PBR_SeraphimPS(true);
+    }
+    pass P1
+    {
+        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGBA )
+        RasterizerState( Rasterizer_Cull_CW )
+
+        VertexShader = compile vs_1_1 PositionNormalOffsetVS(0.02);
+        PixelShader = compile ps_2_0 SeraphimPhaseShieldPS();
     }
 }
 
@@ -6831,8 +7280,7 @@ technique SeraphimPersonalShield_MedFidelity
         RasterizerState( Rasterizer_Cull_CW )
 
         VertexShader = compile vs_1_1 UnitFalloffVS();
-        //PixelShader = compile ps_2_a UnitFalloffPS(true);
-        PixelShader = compile ps_2_a UnitFalloffPS_02(true);
+        PixelShader = compile ps_2_a UnitFalloffPS(true);
     }
     pass P1
     {
@@ -9107,956 +9555,5 @@ technique TACloak_LowFidelity
 
         VertexShader = compile vs_1_1 VertexNormalVS();
         PixelShader = compile ps_2_0 TACloakPS(true,false,false, false,0,0 );
-    }
-}
-
-
-
-/////////////////////////////////////////////////
-// Physically Based Rendering
-/////////////////////////////////////////////////
-
-const float PI = 3.14159265359;
-
-float mapRange(float value, float min1, float max1, float min2, float max2)
-{
-    // Convert the current value to a percentage
-    float perc = (value - min1) / (max1 - min1);
-    // Do the same operation backwards with min2 and max2
-    return perc * (max2 - min2) + min2;
-}
-
-float logisticFn(float x, float x0, float k, float L, float m)
-{
-    float denom = 1 + pow(2.71828, -k * (m * x - x0));
-    return L / denom;
-}
-
-float3 FresnelSchlick(float hDotN, float3 F0)
-{
-    return F0 + (1.0 - F0) * pow(1.0 - hDotN, 5.0);
-}
-
-float3 FresnelSchlickRoughness(float cosTheta, float3 F0, float roughness)
-{
-    return F0 + (max(float3(1.0, 1.0, 1.0) - roughness, F0) - F0) * pow(clamp(1.0 - cosTheta, 0.0, 1.0), 5.0);
-} 
-
-float NormalDistribution(float3 n, float3 h, float roughness)
-{
-    float a2 = roughness*roughness;
-    float nDotH = max(dot(n, h), 0.0);
-    float nDotH2 = nDotH*nDotH;
-
-    float num = a2;
-    float denom = nDotH2 * (a2 - 1.0) + 1.0;
-    denom = PI * denom * denom;
-
-    return num / denom;
-}
-
-float GeometrySchlick(float nDotV, float roughness)
-{
-    float r = (roughness + 1.0);
-    float k = (r*r) / 8.0;
-
-    float num = nDotV;
-    float denom = nDotV * (1.0 - k) + k;
-
-    return num / denom;
-}
-
-float GeometrySmith(float3 n, float nDotV, float3 l, float roughness)
-{
-    float nDotL = max(dot(n, l), 0.0);
-    float gs2 = GeometrySchlick(nDotV, roughness);
-    float gs1 = GeometrySchlick(nDotL, roughness);
-
-    return gs1 * gs2;
-}
-
-float3 PBR_PS(
-    NORMALMAPPED_VERTEX vertex,
-    float3 albedo,
-    float metallic,
-    float roughness,
-    float3 n,
-    uniform bool hiDefShadows,
-    // Common material specular values:
-    // water: .02
-    // plastic: .03-.05
-    // most materials: .04
-    // diamond: .17
-    // Not used for metals
-    float facingSpecular = .04,
-    float ao = 1
-) : COLOR0
-{
-    // See https://blog.selfshadow.com/publications/s2013-shading-course/
-
-    float3 v = normalize(vertex.viewDirection);
-    float3 reflection = reflect(-v, n);
-
-    // We can't use texCUBElod so we need to use a workaround
-    float lod = roughness * 10;
-    float scale = exp2(lod);
-    float3 env_reflection = texCUBEgrad(environmentSampler, reflection, float3(scale/256, 0, 0), float3(0, scale/256, 0));
-    // This should be convolved into a proper irradiance map, but we will settle for lod 5 for now
-    scale = exp2(5);
-    float3 env_irradiance = texCUBEgrad(environmentSampler, n, float3(scale/256, 0, 0), float3(0, scale/256, 0));
-
-    float2 envBRDFlookuptexture = tex2D(anisotropicSampler, float2(dot(n, v), 1 - roughness)).rg;
-    // We don't have good ao textures to counteract fresnel highlights showing in unplausible places,
-    // so we have to tune them down a bit across the board.
-    envBRDFlookuptexture.g *= 0.5;
-
-    //////////////////////////////
-    // Compute sun light
-    //
-
-    // specular reflections of dielectrics mostly disappear underwater
-    if (vertex.depth.x < 0) {
-        facingSpecular = facingSpecular * 0.05;
-    }
-    float3 F0 = lerp(float3(facingSpecular, facingSpecular, facingSpecular), albedo, metallic);
-    float3 l = sunDirection;
-    float3 h = normalize(v + l);
-    float nDotL = max(dot(n, l), 0.0);
-    // Normal maps can cause an angle > 90° between n and v which would
-    // cause artifacts if we don't take some countermeasures
-    float nDotV = abs(dot(n, v)) + 0.001;
-
-    float shadow = ComputeShadow(vertex.shadow, hiDefShadows);
-    float3 sunLight = sunDiffuse * lightMultiplier * shadow;
-
-    // Cook-Torrance BRDF
-    float3 F = FresnelSchlick(max(dot(h, v), 0.0), F0);
-    float NDF = NormalDistribution(n, h, roughness);
-    float G = GeometrySmith(n, nDotV, l, roughness);
-
-    // For point lights we need to multiply with Pi
-    float3 numerator = PI * NDF * G * F;
-    // add 0.0001 to avoid division by zero
-    float denominator = 4.0 * nDotV * nDotL + 0.0001;
-    float3 reflected = numerator / denominator;
-    
-    float3 kD = float3(1.0, 1.0, 1.0) - F;
-    kD *= 1.0 - metallic;	
-
-    float3 refracted = kD * albedo;
-    float3 irradiance = sunLight * nDotL;
-    float3 color = (refracted + reflected) * irradiance;
-
-    //////////////////////////////
-    // Compute environment light
-    //
-    float3 kS = FresnelSchlickRoughness(nDotV, F0, roughness);
-    kD = float3(1.0, 1.0, 1.0) - kS;
-    kD *= 1.0 - metallic;
-
-    // We need to do this to stay consistent with ComputeLight()
-    float3 shadowColor = (1 - (sunDiffuse * shadow * nDotL + sunAmbient)) * shadowFill;
-    float3 ambient = sunAmbient * lightMultiplier + shadowColor;
-
-    // As maps were not created with this shader in mind we need to do some tuning to match
-    // the shadows of the terrain. This is very non-physical and uses empirical values.
-    float shadowCorrection = saturate((ambient.r + ambient.g + ambient.b) / 3);
-    shadowCorrection = lerp(shadowCorrection, 1, shadow * nDotL);
-    env_irradiance *= shadowCorrection;
-    env_reflection *= shadowCorrection;
-    env_irradiance += ambient * 0.5;
-    env_reflection += ambient * 0.15;
-
-    float3 diffuse = env_irradiance * albedo;
-    float3 specular = env_reflection * (kS * envBRDFlookuptexture.r + envBRDFlookuptexture.g);
-    color += (kD * diffuse + specular) * ao;
-
-    return color;
-}
-
-
-
-float4 PBR_UEF(NORMALMAPPED_VERTEX vertex, float teamColorFactor, uniform bool hiDefShadows) : COLOR0
-{
-    float3x3 rotationMatrix = float3x3(vertex.binormal, vertex.tangent, vertex.normal);
-    float3 normal = ComputeNormal(normalsSampler, vertex.texcoord0.zw, rotationMatrix);
-    float4 albedo = tex2D(albedoSampler, vertex.texcoord0.xy);
-    float4 specular = tex2D(specularSampler, vertex.texcoord0.xy);
-
-    // try to extract some ambient occlusion information from the albedo
-    // unfortunately the albedos have lots of baked in lighting so
-    // we have to keep the effect slight
-    float ao = .5 + logisticFn(length(albedo.rgb) / sqrt(3), .1, 40, .5, 2);
-
-    float teamcolor = min(pow(specular.a * 1.1, 0.6), 1);
-    float metallic = max(1 - teamcolor * 2.2, 0);
-
-    albedo.rgb = lerp(albedo.rgb, albedo.rgb * 1.9, metallic);
-    albedo.rgb = lerp(albedo.rgb, vertex.color.rgb * 0.6, teamColorFactor * teamcolor);
-
-    float planeCockpitMask = saturate((specular.r - 0.65) * 3);
-    albedo.rgb += planeCockpitMask;
-
-    float roughness = specular.g * 0.6 + 0.35 + saturate(pow(specular.a * 3.7, 0.6)) * 0.3;
-    roughness += planeCockpitMask - specular.b * 3;
-    roughness = saturate(1 - roughness);
-
-    float3 color = PBR_PS(vertex, albedo.rgb, metallic, roughness, normal, hiDefShadows, .04, ao);
-    float emission = specular.b * 0.8;
-    color = ApplyWaterColor(vertex.depth.x, vertex.viewDirection, color, emission * albedo);
-
-    // The glowminimum is required to make the unit behave properly with the water shader.
-    // If the alpha channel is 0 somewhere, those parts will show as water refractions even
-    // if they are above the water line. See https://github.com/FAForever/fa/issues/4696
-    float alphaGlow = mirrored ? 0.5 : emission + glowMinimum;
-    return float4(color, alphaGlow);
-}
-
-float4 PBR_UEF_PS(NORMALMAPPED_VERTEX vertex,
-                uniform bool maskAlbedo,
-                uniform bool hiDefShadows,
-                uniform bool alphaTestEnable,
-                uniform int alphaFunc,
-                uniform int alphaRef ) : COLOR0
-{
-    if (1 == mirrored) clip(vertex.depth.x);
-
-    float teamColorFactor = 1;
-    return PBR_UEF(vertex, teamColorFactor, hiDefShadows);
-}
-
-float4 PBR_UEFBuildPS( NORMALMAPPED_VERTEX vertex, uniform bool hiDefShadows) : COLOR0
-{
-    if ( 1 == mirrored ) clip(vertex.depth);
-
-    float4 texcoord = vertex.texcoord0;
-    float4 texcoord2 = texcoord * 5;
-    texcoord2.y += vertex.material.x * 0.062;
-    float4 secondary = tex2D( secondarySampler, texcoord2.xy * 10);
-
-    float teamColorFactor = (vertex.material.y >= 0.90) ? (vertex.material.y - 0.9) * 10 : 0.0;
-    float3 color = PBR_UEF(vertex, teamColorFactor, hiDefShadows).rgb;
-
-    float1 t = min(max(frac( 0.02 * time), 0.35), 0.7);
-    float3 current = lerp(color+secondary.rgb,float3(0,0,1),t);
-    float3 outColor = lerp(current, color, vertex.material.y);
-
-    return float4(outColor, max(vertex.material.y, 0.5));
-}
-
-float4 PBR_Aeon(NORMALMAPPED_VERTEX vertex, float teamColorFactor, uniform bool hiDefShadows) : COLOR0
-{
-    if ( 1 == mirrored ) clip(vertex.depth.x);
-
-    float3x3 rotationMatrix = float3x3(vertex.binormal, vertex.tangent, vertex.normal);
-    float3 normal = ComputeNormal(normalsSampler, vertex.texcoord0.zw, rotationMatrix);
-    float3 albedo = tex2D( albedoSampler, vertex.texcoord0.xy).rgb;
-    float4 specular = tex2D( specularSampler, vertex.texcoord0.xy);
-    float fullTeamColor = saturate(specular.a * 2.5);
-
-    float metallic = 0;
-    if (specular.r < 0.4)
-        metallic = saturate(mapRange(specular.r, 0.2267, 0.3643, 0, 1));
-    else
-        metallic = min(max(mapRange(specular.r, 0.4129, 0.5384, 1, 0), 0.3), 1);
-    metallic = saturate(metallic - fullTeamColor);
-
-    if (specular.g < 0.45)
-        specular.g = 0.022 * (exp(6 * specular.g) - 1) + 0.023 + specular.a * 0.2;
-    else
-        specular.g = 0.762 * specular.g - 0.014;
-    float teamcolorBorder = saturate(mapRange(specular.a, 0.54, 0.6, 0, 1));
-    float darkAreas = saturate(saturate(mapRange(specular.r, 0.3, 0.44, 1, 0)) - length(albedo));
-    float roughness = lerp(specular.g, 0.03, teamcolorBorder);
-    roughness = saturate(roughness + darkAreas);
-
-    albedo *= (specular.r + 0.3) * 1.25;
-    albedo = pow(albedo, (1 - metallic * 0.95));
-    albedo = lerp(albedo, vertex.color.rgb * specular.a * 0.4, teamColorFactor * fullTeamColor);
-
-    float specularAmount = lerp(0.08, 0, darkAreas);
-    specularAmount = lerp(specularAmount, 0.04, fullTeamColor);
-
-    float3 color = PBR_PS(vertex, albedo, metallic, roughness, normal, hiDefShadows, specularAmount);
-    float3 emission = specular.b + specular.a * vertex.color.rgb * 0.5;
-    color = ApplyWaterColor(vertex.depth.x, vertex.viewDirection, color, emission);
-     
-    float alpha = mirrored ? 0.5 : specular.b + glowMinimum + specular.a * 0.13;
-
-    return float4(color, alpha);
-}
-
-float4 PBR_AeonPS(NORMALMAPPED_VERTEX vertex, uniform bool hiDefShadows) : COLOR0
-{
-    float teamColorFactor = 1;
-    return PBR_Aeon(vertex, teamColorFactor, hiDefShadows);
-}
-
-float4 PBR_AeonBuildPS(NORMALMAPPED_VERTEX vertex, uniform bool hiDefShadows) : COLOR0
-{
-    float teamColorFactor = (vertex.material.y >= 0.90) ? (vertex.material.y - 0.9) * 10 : 0.0;
-    return PBR_Aeon(vertex, teamColorFactor, hiDefShadows);
-}
-
-float4 PBR_AeonBuildPuddlePS(NORMALMAPPED_VERTEX vertex, uniform bool hiDefShadows) : COLOR0
-{
-    if ( 1 == mirrored ) clip(vertex.depth.x);
-
-    float2 texcoord = vertex.texcoord0.xy;
-    texcoord.x -= vertex.material.x * 0.002;
-    texcoord.y += vertex.material.x * 0.0042;
-
-    float3x3 rotationMatrix = float3x3( vertex.binormal, vertex.tangent, vertex.normal);
-    float3 normal = ComputeNormal( normalsSampler, texcoord, rotationMatrix);
-    float3 albedo = tex2D( albedoSampler, texcoord ).rgb;
-    float4 specular = tex2D( specularSampler, texcoord );
-
-    float metallic = 1;
-    float roughness = specular.g;
-
-    float3 color = PBR_PS(vertex, albedo, metallic, roughness, normal, hiDefShadows);
-
-    float alpha = mirrored ? 0.5 : specular.b + glowMinimum;
-
-    return float4(color, alpha);
-}
-
-float4 PBR_AeonBuildOverlayPS( NORMALMAPPED_VERTEX vertex) : COLOR0
-{
-    // Diffuse texture
-    float4 texcoord = vertex.texcoord0;
-    texcoord.y += vertex.material.x * 0.00162;
-    texcoord.x -= vertex.material.x * 0.001;
-    float4 mask1 = tex2D( secondarySampler, texcoord * 2);
-
-    float4 texcoord2 = vertex.texcoord0;
-    texcoord2.y -= vertex.material.x * 0.00162;
-    float4 mask2 = tex2D( secondarySampler, texcoord2 * 2);
-
-    float3 diffuse = mask1.rrr - mask2.ggg + mask1.ggg * mask2.rrr;
-    diffuse = lerp( diffuse, float3(0.5,0.5,0.5), 0.75);
-
-    // Custom normal mapping
-    float3x3 rotationMatrix = float3x3( vertex.binormal, vertex.tangent, vertex.normal );
-    float3 normal = tex2D( normalsSampler, vertex.texcoord0.zw ).gaa;
-    normal = lerp( normal, tex2D( secondarySampler, vertex.texcoord0 * 7 ).baa, 0.5);
-    normal = lerp( normal, diffuse, 0.5);
-    normal = 2 * normal - 1;
-    normal.z = sqrt( 1 - normal.x*normal.x - normal.y*normal.y );
-    normal = normalize( mul( normal, rotationMatrix));
-
-    float metallic = 1;
-    float roughness = 0.15;
-    float3 color = PBR_PS(vertex, diffuse, metallic, roughness, normal, true);
-
-    // Fade out 95% complete
-    float percentComplete = vertex.material.y;
-    float alpha = (percentComplete >= 0.95) ? (1.0 - ((percentComplete - 0.95) * 20)) * (color.r * 2) : color.r * 2;
-
-    return float4( color, alpha );
-}
-
-float4 PBR_AeonCZARPS( NORMALMAPPED_VERTEX vertex, uniform bool hiDefShadows) : COLOR0
-{
-    if ( 1 == mirrored ) clip(vertex.depth.x);
-
-    float3x3 rotationMatrix = float3x3(vertex.binormal, vertex.tangent, vertex.normal);
-    float3 normal = ComputeNormal(normalsSampler, vertex.texcoord0.zw, rotationMatrix);
-    float4 albedo = tex2D( albedoSampler, vertex.texcoord0.xy);
-    float4 specular = tex2D( specularSampler, vertex.texcoord0.xy);
-
-    float metallic = saturate((specular.r - 0.02) * 4 - specular.a * 5);
-
-    albedo.rgb *= 1 + metallic;
-    // We need to make the dark areas darker
-    // Should find something that offers more control over the result
-    float x = albedo.r;
-    albedo.rgb = (pow(x, 3) - 3 * pow(x, 2) + 3 * x) * albedo.rgb;
-
-    albedo.rgb = lerp(albedo.rgb, vertex.color.rgb * 0.8, specular.a);
-
-    if (specular.g < 0.45)
-        specular.g = 0.022 * (exp(6 * specular.g) - 1) + 0.023 + specular.a * 0.2;
-    else
-        specular.g = 0.762 * specular.g - 0.014;
-    float teamcolorBorder = saturate(mapRange(specular.a, 0.54, 0.6, 0, 1));
-    float darkAreas = 0;
-    if (specular.r < 0.18)
-        darkAreas = saturate(0.7 - pow(specular.r, 0.6));
-    float roughness = lerp(specular.g, 0.03, teamcolorBorder);
-    roughness = max(roughness, darkAreas);
-
-    float specularAmount = lerp(0.08, 0, darkAreas);
-    specularAmount = lerp(specularAmount, 0.04, saturate(specular.a * 3));
-
-    float3 color = PBR_PS(vertex, albedo.rgb, metallic, roughness, normal, hiDefShadows, specularAmount);
-
-    float emission = specular.b + (pow(specular.a, 2) * 0.13);
-    color += emission * albedo.rgb;
-
-    float2 texcoord = vertex.texcoord0.xy * 60;
-    texcoord.x -= vertex.material.x * 0.16;
-    texcoord.y -= vertex.material.x * 0.01;
-    float2 texcoord2 = vertex.texcoord0.xy * 30;
-    texcoord2.x += vertex.material.x * 0.08;
-    texcoord2.y -= vertex.material.x * 0.005;
-    float3 secondary = tex2D( secondarySampler, texcoord );
-    float3 secondary2 = tex2D( secondarySampler, texcoord2 );
-    color += float3(0.2,0.7,1) * (secondary.b + secondary2.g )* (1-albedo.a);
-
-    float alpha = mirrored ? 0.5 : specular.b + ((secondary.b + secondary2.g ) * (1-albedo.a)) + glowMinimum;
-    return float4(color, alpha);
-}
-
-float4 PBR_Cybran(NORMALMAPPED_VERTEX vertex, float teamColorFactor, uniform bool hiDefShadows) : COLOR0
-{
-    if ( 1 == mirrored ) clip(vertex.depth);
-
-    float3x3 rotationMatrix = float3x3(vertex.binormal, vertex.tangent, vertex.normal);
-    float3 normal = ComputeNormal(normalsSampler, vertex.texcoord0.zw, rotationMatrix);
-    float4 albedo = tex2D( albedoSampler, vertex.texcoord0.xy);
-    float4 specular = tex2D( specularSampler, vertex.texcoord0.xy);
-
-    float metallic = saturate(specular.r + saturate(specular.g - 0.1) * 0.87 - specular.a * 2.2);
-    float roughness = lerp(0.8 * (1 - specular.g), lerp(0.5, 0.25, specular.g), metallic);
-
-    albedo.rgb = min(lerp(albedo.rgb, albedo.rgb * 2.3, pow(metallic, 2.5)), float3(1, 1, 1));
-    albedo.rgb = lerp(albedo.rgb, vertex.color.rgb, teamColorFactor * specular.a);
-
-    float3 color = PBR_PS(vertex, albedo.rgb, metallic, roughness, normal, hiDefShadows);
-    float emission = pow(max(specular.b - 0.04, 0.0), 0.5);
-    color = ApplyWaterColor(vertex.depth.x, vertex.viewDirection, color, emission * albedo);
-
-    float alpha = mirrored ? 0.5 : min(emission + glowMinimum, 0.3);
-
-    return float4(color, alpha);
-}
-
-float4 PBR_CybranPS(NORMALMAPPED_VERTEX vertex, uniform bool hiDefShadows) : COLOR0
-{
-    float teamColorFactor = 1;
-    return PBR_Cybran(vertex, teamColorFactor, hiDefShadows);
-}
-
-float4 PBR_CybranBuildPS(NORMALMAPPED_VERTEX vertex, uniform bool hiDefShadows) : COLOR0
-{
-    float teamColorFactor = (vertex.material.y >= 0.90) ? (vertex.material.y - 0.9) * 10 : 0.0;
-    float4 color = PBR_Cybran(vertex, teamColorFactor, hiDefShadows);
-
-    // Adjust the transparency of the unit so that it is 40% visible, until the unit is 70% complete
-    float alpha = (vertex.material.y >= 0.7) ? 0.4 + (0.6 * ((vertex.material.y - 0.7) * 3.33)) : 0.4;
-
-    return float4(color.rgb, alpha);
-}
-
-float4 PBR_Seraphim(
-    NORMALMAPPED_VERTEX vertex,
-    float4 albedo,
-    float4 specular,
-    float3 normal,
-    uniform bool hiDefShadows) : COLOR0
-{
-    float NdotV = saturate(dot(normalize(vertex.viewDirection), normal));
-    NdotV = 2 * pow(NdotV, 6) - 2 * NdotV + 1.5;
-    float3 teamColor = NdotV * vertex.color.rgb;
-	
-    // There are also white highlights in the albedo texture in some models
-    float3 whiteness = saturate(albedo.rgb - float3 (0.4,0.4,0.4));
-
-    albedo.rgb = (albedo.bbg + float3(0.4, 0.43, 0.47)) * 0.8;
-    albedo.rgb = lerp(albedo.rgb, teamColor, albedo.a);
-
-    float metallic = 1;
-    float roughness = saturate((1 - pow(specular.g, 0.5) + 0.3) * 0.7);
-
-    float3 color = PBR_PS(vertex, albedo.rgb, metallic, roughness, normal, hiDefShadows);
-    color = lerp(color, teamColor * 0.5, albedo.a - 0.2);
-    float3 emission = saturate(specular.b - 0.1) + teamColor * albedo.a + whiteness * 1.5;
-
-    // Substitute all the computations on pure glowing parts with the
-    // pure brightness texture to get rid of reflections and shadows
-    float mask = saturate(saturate(specular.b * 2) - albedo.a);
-    color = lerp(color, specular.b * 2, mask);
-
-    color = ApplyWaterColor(vertex.depth.x, vertex.viewDirection, color, emission * albedo);
-
-    // Bloom is only rendered where alpha > 0
-    float teamColorGlow = (vertex.color.r + vertex.color.g + vertex.color.b) / 3;
-    teamColorGlow = albedo.a * (1 - teamColorGlow) * 0.06;
-    float alpha = mirrored ? 0.5 : saturate(specular.b - 0.1) * 0.4 + teamColorGlow + whiteness * 0.1 + glowMinimum;
-    
-    return float4(color, alpha);
-}
-
-float4 PBR_SeraphimPS(NORMALMAPPED_VERTEX vertex, uniform bool hiDefShadows) : COLOR0
-{
-    if ( 1 == mirrored ) clip(vertex.depth.x);
-
-    float3x3 rotationMatrix = float3x3( vertex.binormal, vertex.tangent, vertex.normal);
-    float3 normal = ComputeNormal( normalsSampler, vertex.texcoord0.zw, rotationMatrix);
-    float4 albedo = tex2D( albedoSampler, vertex.texcoord0.xy);
-    float4 specular = tex2D( specularSampler, vertex.texcoord0.xy);
-
-    return PBR_Seraphim(vertex, albedo, specular, normal, hiDefShadows);
-}
-
-float4 PBR_SeraphimBuildPS(NORMALMAPPED_VERTEX vertex, uniform bool hiDefShadows) : COLOR0
-{
-    if ( 1 == mirrored ) clip(vertex.depth.x);
-
-    float4 texcoord = vertex.texcoord0;
-    texcoord.y += vertex.material.x * 0.005;
-    float buildFractionMul = (vertex.material.y - 0.9) * 10;
-    float4 uvaddress = tex2D( secondarySampler, texcoord * 0.5 ) * 0.03;
-    float2 texcoord2 = vertex.texcoord0.xy + lerp( uvaddress.rb, 0, buildFractionMul );
-
-    float3x3 rotationMatrix = float3x3( vertex.binormal, vertex.tangent, vertex.normal);
-    float3 normal = ComputeNormal( normalsSampler, vertex.texcoord0.zw + lerp( uvaddress.rb, 0, buildFractionMul ), rotationMatrix);
-    float4 albedo = tex2D( albedoSampler, texcoord2);
-    float4 specular = tex2D( specularSampler, texcoord2);
-
-    float3 color = PBR_Seraphim(vertex, albedo, specular, normal, hiDefShadows).rgb;
-
-    return float4(color, max(vertex.material.y, 0.25));
-}
-
-technique PBR_UEF
-<
-    string abstractTechnique = "PBR_UEF";
-    int fidelity = FIDELITY_HIGH;
-
-    string cartographicTechnique = "CartographicUnit";
-    string depthTechnique = "Depth";
-    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
-    int parameter = PARAM_FRACTIONCOMPLETE;
->
-{
-    pass P0
-    {
-        RasterizerState(Rasterizer_Cull_CW)
-
-        VertexShader = compile vs_1_1 NormalMappedVS();
-        PixelShader = compile ps_2_a PBR_UEF_PS(true, true, false, 0, 0);
-    }
-}
-
-// The ship variants are supposed to use a mirrored environment
-// texture to emulate the water surface reflecting the sky.
-technique PBR_UEF_Navy
-<
-    string abstractTechnique = "PBR_UEF_Navy";
-    int fidelity = FIDELITY_HIGH;
-
-    string cartographicTechnique = "CartographicUnit";
-    string depthTechnique = "Depth";
-    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
-    int parameter = PARAM_FRACTIONCOMPLETE;
-    
-    string environment = "<water>";
->
-{
-    pass P0
-    {
-        RasterizerState(Rasterizer_Cull_CW)
-
-        VertexShader = compile vs_1_1 NormalMappedVS();
-        PixelShader = compile ps_2_a PBR_UEF_PS(true, true, false, 0, 0);
-    }
-}
-
-technique PBR_Aeon
-<
-    string abstractTechnique = "PBR_Aeon";
-    int fidelity = FIDELITY_HIGH;
-
-    string cartographicTechnique = "CartographicUnit";
-    string depthTechnique = "Depth";
-    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
-    int parameter = PARAM_FRACTIONCOMPLETE;
->
-{
-    pass P0
-    {
-        RasterizerState( Rasterizer_Cull_CW )
-
-        VertexShader = compile vs_1_1 NormalMappedVS();
-        PixelShader = compile ps_2_a PBR_AeonPS(true);
-    }
-}
-
-technique PBR_Aeon_Navy
-<
-    string abstractTechnique = "PBR_Aeon_Navy";
-    int fidelity = FIDELITY_HIGH;
-
-    string cartographicTechnique = "CartographicUnit";
-    string depthTechnique = "Depth";
-    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
-    int parameter = PARAM_FRACTIONCOMPLETE;
-        
-    string environment = "<water>";
->
-{
-    pass P0
-    {
-        RasterizerState( Rasterizer_Cull_CW )
-
-        VertexShader = compile vs_1_1 NormalMappedVS();
-        PixelShader = compile ps_2_a PBR_AeonPS(true);
-    }
-}
-
-technique PBR_AeonCZAR
-<
-    string abstractTechnique = "PBR_AeonCZAR";
-    int fidelity = FIDELITY_HIGH;
-
-    string cartographicTechnique = "CartographicUnit";
-    string depthTechnique = "Depth";
-    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
-    int parameter = PARAM_FRACTIONCOMPLETE;
->
-{
-    pass P0
-    {
-        RasterizerState( Rasterizer_Cull_CW )
-
-        VertexShader = compile vs_1_1 NormalMappedVS();
-        PixelShader = compile ps_2_a PBR_AeonCZARPS(true);
-    }
-}
-
-technique PBR_Cybran
-<
-    string abstractTechnique = "PBR_Cybran";
-    int fidelity = FIDELITY_HIGH;
-
-    string cartographicTechnique = "CartographicUnit";
-    string depthTechnique = "Depth";
-    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
-    int parameter = PARAM_FRACTIONCOMPLETE;
->
-{
-    pass P0
-    {
-        RasterizerState( Rasterizer_Cull_CW )
-
-        VertexShader = compile vs_1_1 NormalMappedVS();
-        PixelShader = compile ps_2_a PBR_CybranPS(true);
-    }
-}
-
-technique PBR_Cybran_Navy
-<
-    string abstractTechnique = "PBR_Cybran_Navy";
-    int fidelity = FIDELITY_HIGH;
-
-    string cartographicTechnique = "CartographicUnit";
-    string depthTechnique = "Depth";
-    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
-    int parameter = PARAM_FRACTIONCOMPLETE;
-            
-    string environment = "<water>";
->
-{
-    pass P0
-    {
-        RasterizerState( Rasterizer_Cull_CW )
-
-        VertexShader = compile vs_1_1 NormalMappedVS();
-        PixelShader = compile ps_2_a PBR_CybranPS(true);
-    }
-}
-
-technique PBR_Seraphim
-<
-    string abstractTechnique = "PBR_Seraphim";
-    int fidelity = FIDELITY_HIGH;
-
-
-    string cartographicTechnique = "CartographicUnit";
-    string depthTechnique = "Depth";
-
-    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
-    int parameter = PARAM_FRACTIONCOMPLETE;
->
-{
-    pass P0
-    {
-        RasterizerState( Rasterizer_Cull_CW )
-
-        VertexShader = compile vs_1_1 UnitFalloffVS();
-        PixelShader = compile ps_2_a PBR_SeraphimPS(true);
-    }
-}
-
-technique PBR_Seraphim_Navy
-<
-    string abstractTechnique = "PBR_Seraphim_Navy";
-    int fidelity = FIDELITY_HIGH;
-
-
-    string cartographicTechnique = "CartographicUnit";
-    string depthTechnique = "Depth";
-
-    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
-    int parameter = PARAM_FRACTIONCOMPLETE;
-            
-    string environment = "<water>";
->
-{
-    pass P0
-    {
-        RasterizerState( Rasterizer_Cull_CW )
-
-        VertexShader = compile vs_1_1 UnitFalloffVS();
-        PixelShader = compile ps_2_a PBR_SeraphimPS(true);
-    }
-}
-
-// Personal shields
-technique PBR_PhaseShield
-<
-    string abstractTechnique = "PBR_PhaseShield";
-    int fidelity = FIDELITY_HIGH;
-
-    string cartographicTechnique = "CartographicShield";
-    string depthTechnique = "Depth";
-    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
-    int parameter = PARAM_UNUSED;
->
-{
-    pass P0
-    {
-        AlphaState( AlphaBlend_Disable_Write_RGBA )
-        RasterizerState( Rasterizer_Cull_CW )
-
-        VertexShader = compile vs_1_1 NormalMappedVS();
-        PixelShader = compile ps_2_a PBR_UEF_PS(true, true, false, 0, 0);
-    }
-    pass P1
-    {
-        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGBA )
-        RasterizerState( Rasterizer_Cull_CW )
-
-        VertexShader = compile vs_1_1 PositionNormalOffsetVS(0.02);
-        PixelShader = compile ps_2_0 PhaseShieldPS();
-    }
-}
-
-technique PBR_AeonPhaseShield
-<
-    string abstractTechnique = "PBR_AeonPhaseShield";
-    int fidelity = FIDELITY_HIGH;
-
-    string cartographicTechnique = "CartographicShield";
-    string depthTechnique = "Depth";
-    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
-    int parameter = PARAM_UNUSED;
->
-{
-    pass P0
-    {
-        AlphaState( AlphaBlend_Disable_Write_RGBA )
-        RasterizerState( Rasterizer_Cull_CW )
-
-        VertexShader = compile vs_1_1 NormalMappedVS();
-        PixelShader = compile ps_2_a PBR_AeonPS(true);
-    }
-    pass P1
-    {
-        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGBA )
-        RasterizerState( Rasterizer_Cull_CW )
-
-        VertexShader = compile vs_1_1 PositionNormalOffsetVS(0.02);
-        PixelShader = compile ps_2_0 AeonPhaseShieldPS();
-    }
-}
-
-technique PBR_CybranPhaseShield
-<
-    string abstractTechnique = "PBR_CybranPhaseShield";
-    int fidelity = FIDELITY_HIGH;
-
-    string cartographicTechnique = "CartographicShield";
-    string depthTechnique = "Depth";
-    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
-    int parameter = PARAM_UNUSED;
->
-{
-    pass P0
-    {
-        AlphaState( AlphaBlend_Disable_Write_RGBA )
-        RasterizerState( Rasterizer_Cull_CW )
-
-        VertexShader = compile vs_1_1 NormalMappedVS();
-        PixelShader = compile ps_2_a PBR_CybranPS(true);
-    }
-    pass P1
-    {
-        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGBA )
-        RasterizerState( Rasterizer_Cull_CW )
-
-        VertexShader = compile vs_1_1 PositionNormalOffsetVS(0.02);
-        PixelShader = compile ps_2_0 CybranPhaseShieldPS();
-    }
-}
-
-technique PBR_SeraphimPersonalShield
-<
-    string abstractTechnique = "PBR_SeraphimPersonalShield";
-    int fidelity = FIDELITY_HIGH;
-
-    string cartographicTechnique = "CartographicUnit";
-    string depthTechnique = "Depth";
-    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
-
-    int parameter = PARAM_LIFETIME;
->
-{
-    pass P0
-    {
-        AlphaState( AlphaBlend_Disable_Write_RGBA )
-        RasterizerState( Rasterizer_Cull_CW )
-
-        VertexShader = compile vs_1_1 UnitFalloffVS();
-        PixelShader = compile ps_2_a PBR_SeraphimPS(true);
-    }
-    pass P1
-    {
-        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGBA )
-        RasterizerState( Rasterizer_Cull_CW )
-
-        VertexShader = compile vs_1_1 PositionNormalOffsetVS(0.02);
-        PixelShader = compile ps_2_0 SeraphimPhaseShieldPS();
-    }
-}
-
-// Build techniques
-technique PBR_UEFBuild
-<
-    string abstractTechnique = "PBR_UEFBuild";
-    int fidelity = FIDELITY_HIGH;
-
-    string cartographicTechnique = "CartographicBuild";
-    string depthTechnique = "Depth";
-    int renderStage = STAGE_DEPTH + STAGE_PREWATER + STAGE_PREEFFECT;
-    int parameter = PARAM_FRACTIONCOMPLETE;
->
-{
-    pass P0
-    {
-        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGB )
-        RasterizerState( Rasterizer_Cull_CW )
-
-        VertexShader = compile vs_1_1 NormalMappedVS();
-        PixelShader = compile ps_2_a PBR_UEFBuildPS(true);
-    }
-    pass P1
-    {
-        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGBA )
-        RasterizerState( Rasterizer_Cull_CW )
-
-        VertexShader = compile vs_1_1 EffectVertexNormalHiFiVS( 16.0, 8.0, 0.0192, 0.0176, -0.0122, -0.0122 );
-        PixelShader = compile ps_2_0 UEFBuildOverlayHiFiPS();
-    }
-}
-
-technique PBR_AeonBuild
-<
-    string abstractTechnique = "PBR_AeonBuild";
-    int fidelity = FIDELITY_HIGH;
-
-    string cartographicTechnique = "CartographicBuild";
-    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
-    int parameter = PARAM_FRACTIONCOMPLETE;
->
-{
-    pass P0
-    {
-        RasterizerState( Rasterizer_Cull_CW )
-        AlphaState( AlphaBlend_Disable_Write_RGB )
-
-        VertexShader = compile vs_1_1 AeonBuildVS(0.0);
-        PixelShader = compile ps_2_a PBR_AeonBuildPS(true);
-    }
-    pass P1
-    {
-        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGB )
-        RasterizerState( Rasterizer_Cull_CW )
-
-        VertexShader = compile vs_1_1 AeonBuildVS(0);
-        PixelShader = compile ps_2_a PBR_AeonBuildOverlayPS();
-    }
-}
-
-technique PBR_AeonBuildPuddle
-<
-    string abstractTechnique = "PBR_AeonBuildPuddle";
-    int fidelity = FIDELITY_HIGH;
-
-    string depthTechnique = "Depth";
-    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
-    int parameter = PARAM_FRACTIONCOMPLETE;
->
-{
-    pass P0
-    {
-        AlphaState( AlphaBlend_Disable_Write_RGBA )
-        RasterizerState( Rasterizer_Cull_CW )
-
-        VertexShader = compile vs_1_1 NormalMappedVS();
-        PixelShader = compile ps_2_a PBR_AeonBuildPuddlePS(true);
-    }
-}
-
-technique PBR_CybranBuild
-<
-    string abstractTechnique = "PBR_CybranBuild";
-    int fidelity = FIDELITY_HIGH;
-
-    string cartographicTechnique = "CartographicBuild";
-    string depthTechnique = "Depth";
-    int renderStage = STAGE_DEPTH + STAGE_PREWATER + STAGE_PREEFFECT;
-    int parameter = PARAM_FRACTIONCOMPLETE;
->
-{
-    pass P0
-    {
-        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGB )
-        RasterizerState( Rasterizer_Cull_CW )
-
-        VertexShader = compile vs_1_1 NormalMappedVS();
-        PixelShader = compile ps_2_a PBR_CybranBuildPS(true);
-    }
-    pass P1
-    {
-        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGBA )
-        RasterizerState( Rasterizer_Cull_CW )
-
-        VertexShader = compile vs_1_1 EffectVertexNormalLoFiVS( 14, 4, 0, 0, -0.008, 0.008 );
-        PixelShader = compile ps_2_0 CybranBuildOverlayPS();
-    }
-}
-
-technique PBR_SeraphimBuild
-<
-    string abstractTechnique = "PBR_SeraphimBuild";
-    int fidelity = FIDELITY_HIGH;
-
-    string cartographicTechnique = "CartographicBuild";
-    string depthTechnique = "SeraphimBuildDepth";
-
-    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
-    int parameter = PARAM_FRACTIONCOMPLETE;
->
-{
-    pass P0
-    {
-        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGB )
-        RasterizerState( Rasterizer_Cull_CW )
-
-        VertexShader = compile vs_1_1 SeraphimBuildVS();
-        PixelShader = compile ps_2_a PBR_SeraphimBuildPS(true);
     }
 }
