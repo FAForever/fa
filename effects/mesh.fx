@@ -2385,57 +2385,6 @@ float4 NormalMappedPS( NORMALMAPPED_VERTEX vertex,
     return float4( color.rgb, alpha );
 }
 
-/// NomadsNormalMappedPS
-///
-/// Lighting using normal maps
-float4 NomadsNormalMappedPS( NORMALMAPPED_VERTEX vertex,
-                       uniform bool maskAlbedo,
-                       uniform bool glow,
-                       uniform bool hiDefShadows,
-                       uniform bool alphaTestEnable,
-                       uniform int alphaFunc,
-                       uniform int alphaRef ) : COLOR0
-{
-    if ( 1 == mirrored ) clip(vertex.depth.x);
-
-    float3x3 rotationMatrix = float3x3( vertex.binormal, vertex.tangent, vertex.normal);
-    float3 normal = ComputeNormal( normalsSampler, vertex.texcoord0.zw, rotationMatrix);
-    float dotLightNormal = dot(sunDirection,normal);
-
-    float4 albedo = tex2D( albedoSampler, vertex.texcoord0.xy);
-    float4 specular = tex2D( specularSampler, vertex.texcoord0.xy);
-    float3 environment = texCUBE( environmentSampler, reflect( -vertex.viewDirection, normal));
-
-    if ( maskAlbedo )
-        albedo.rgb = lerp( vertex.color.rgb, albedo.rgb, 1 - specular.a );
-    else
-        albedo.rgb = albedo.rgb * vertex.color.rgb;
-
-    float phongAmount = saturate( dot( reflect( sunDirection, normal), -vertex.viewDirection));
-    float3 phongAdditive = NormalMappedPhongCoeff * pow( phongAmount, 2) * specular.g;
-    float3 phongMultiplicative = float3( 2 * environment * specular.r);
-
-    float3 light = ComputeLight( dotLightNormal, ComputeShadow( vertex.shadow, hiDefShadows));
-
-    float emissive = glowMultiplier * specular.b;
-    float3 color = albedo.rgb * ( emissive.r + light + phongMultiplicative) + phongAdditive;
-
-    float alpha = mirrored ? 0.5 : ( glow ? ( specular.b + glowMinimum ) : ( vertex.material.g * albedo.a ));
-
-#ifdef DIRECT3D10
-    if( alphaTestEnable )
-        AlphaTestD3D10( alpha, alphaFunc, alphaRef );
-#endif
-
-    //increasing the alpha creates more glow
-    alpha = alpha * 1.5;
-
-    //subtracting the alpha from the color cancels out the oversaturation created when the glowy parts of the frame are blurred and added to the frame
-    color.rgb = color.rgb - (float3(alpha, alpha, alpha) * 0.4);
-
-    return float4( color.rgb, alpha );
-}
-
 /// New UEF PS
 float4 NormalMappedPS_02( NORMALMAPPED_VERTEX vertex,
                        uniform bool maskAlbedo,
@@ -3829,6 +3778,54 @@ float4 PhaseShieldPS( VERTEXNORMAL_VERTEX vertex ) : COLOR
     return (baseshellcolor  + electricity) * glowpulse;
 }
 
+float4 AeonPhaseShieldPS( VERTEXNORMAL_VERTEX vertex ) : COLOR
+{
+    float2 tc1 = vertex.texcoord0.xy * 2;
+    tc1.x += 0.005 * vertex.material.x;
+    tc1.y += 0.02 * vertex.material.x;
+    float4 lookup = tex2D( lookupSampler, tc1);
+
+    float2 tc2 = vertex.texcoord0.xy * 8;
+    tc2.y += 0.02 * vertex.material.x;
+    tc2.x -= 0.02 * vertex.material.x;
+    float4 lookup2 = tex2D( lookupSampler, tc2);
+
+    float2 tc3 = vertex.texcoord0.xy * 0.03 ;
+    tc3.x -= 0.001 * vertex.material.x;
+    float4 lookup3 = tex2D( lookupSampler, tc3);
+
+    float electricity = lookup.r * lookup2.b * 0.75;
+    float4 baseshellcolor = float4( 0.4, 1, 0.6, 0.8);
+    float4 glowpulse = float4(lookup3.ggg, min(lookup3.g, 0.65) + electricity );
+
+    return (baseshellcolor + electricity) * glowpulse;
+}
+
+float4 CybranPhaseShieldPS( VERTEXNORMAL_VERTEX vertex ) : COLOR
+{
+    float2 tc1 = vertex.texcoord0.xy * 2;
+    tc1.x += 0.1 * vertex.material.x;
+    tc1.y += 0.5 * vertex.material.x;
+    float4 lookup = tex2D( lookupSampler, tc1);
+
+    float2 tc2 = vertex.texcoord0.xy * 8;
+    tc2.y += 0.5 * vertex.material.x;
+    tc2.x -= 0.5 * vertex.material.x;
+    float4 lookup2 = tex2D( lookupSampler, tc2);
+
+    float2 tc3 = vertex.texcoord0.xy * 0.001 ;
+    tc3.x -= 0.001 * vertex.material.x;
+    tc3.y  = 4;
+    float4 lookup3 = tex2D( lookupSampler, tc3);
+
+    float electricity =  lookup.r * lookup2.b * 2;
+    float4 baseshellcolor = float4( 1, 0.1, 0.2, 0.9);
+    float4 glowpulse = float4(lookup3.ggg, min(lookup3.g, 0.8) + electricity );
+
+    return (baseshellcolor + electricity) * glowpulse;
+}
+
+
 float4 SeraphimPhaseShieldPS( VERTEXNORMAL_VERTEX vertex ) : COLOR
 {
     float2 tc1 = vertex.texcoord0.xy * 0.5;
@@ -3850,6 +3847,11 @@ float4 SeraphimPhaseShieldPS( VERTEXNORMAL_VERTEX vertex ) : COLOR
     float4 glowpulse = float4(lookup3.ggg, min(lookup3.g, 0.65) + electricity );
 
     return (baseshellcolor  + electricity) * glowpulse;
+}
+
+float4 StunnedUnit( VERTEXNORMAL_VERTEX vertex ) : COLOR
+{
+    return float4( 0, 0, 0, 0.66 );
 }
 
 /// EffectPS
@@ -6396,6 +6398,329 @@ technique Wreckage_LowFidelity
     }
 };
 
+technique UnitStunned_HighFidelity
+<
+    string abstractTechnique = "UnitStunned";
+    int fidelity = FIDELITY_HIGH;
+
+    string cartographicTechnique = "CartographicUnit";
+    string depthTechnique = "Depth";
+    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
+    int parameter = PARAM_FRACTIONCOMPLETE;
+>
+{
+    pass P0
+    {
+        RasterizerState( Rasterizer_Cull_CW )
+
+        VertexShader = compile vs_1_1 NormalMappedVS();
+        PixelShader = compile ps_2_a NormalMappedPS(true,true,true, false,0,0 );
+    }
+    pass P1
+    {
+        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGB )
+        RasterizerState( Rasterizer_Cull_CW )
+
+        VertexShader = compile vs_1_1 NormalMappedVS();
+        PixelShader = compile ps_2_a StunnedUnit();
+    }
+}
+
+technique UnitStunned_MedFidelity
+<
+    string abstractTechnique = "UnitStunned";
+    int fidelity = FIDELITY_MEDIUM;
+
+    string cartographicTechnique = "CartographicUnit";
+    string depthTechnique = "Depth";
+    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
+    int parameter = PARAM_FRACTIONCOMPLETE;
+>
+{
+    pass P0
+    {
+        RasterizerState( Rasterizer_Cull_CW )
+
+        VertexShader = compile vs_1_1 NormalMappedVS();
+        PixelShader = compile ps_2_a NormalMappedPS(true,true,false, false,0,0 );
+    }
+    pass P1
+    {
+        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGB )
+        RasterizerState( Rasterizer_Cull_CW )
+
+        VertexShader = compile vs_1_1 NormalMappedVS();
+        PixelShader = compile ps_2_a StunnedUnit();
+    }
+}
+
+technique UnitStunned_LowFidelity
+<
+    string abstractTechnique = "UnitStunned";
+    int fidelity = FIDELITY_LOW;
+
+    string cartographicTechnique = "CartographicUnit";
+    string depthTechnique = "Depth";
+    int renderStage = STAGE_DEPTH + STAGE_PREWATER + STAGE_PREEFFECT;
+    int parameter = PARAM_FRACTIONCOMPLETE;
+>
+{
+    pass P0
+    {
+        AlphaState( AlphaBlend_Disable_Write_RGB )
+        RasterizerState( Rasterizer_Cull_CW )
+
+        VertexShader = compile vs_1_1 VertexNormalVS();
+        PixelShader = compile ps_2_0 ColorMaskPS_LowFidelity();
+    }
+}
+
+technique InsectStunned_HighFidelity
+<
+    string abstractTechnique = "InsectStunned";
+    int fidelity = FIDELITY_HIGH;
+
+    string cartographicTechnique = "CartographicUnit";
+    string depthTechnique = "Depth";
+    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
+    int parameter = PARAM_FRACTIONCOMPLETE;
+>
+{
+    pass P0
+    {
+        RasterizerState( Rasterizer_Cull_CW )
+
+        VertexShader = compile vs_1_1 NormalMappedVS();
+        PixelShader = compile ps_2_a NormalMappedInsectPS(true);
+    }
+    pass P1
+    {
+        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGB )
+        RasterizerState( Rasterizer_Cull_CW )
+
+        VertexShader = compile vs_1_1 NormalMappedVS();
+        PixelShader = compile ps_2_a StunnedUnit();
+    }
+}
+
+technique InsectStunned_MedFidelity
+<
+    string abstractTechnique = "InsectStunned";
+    int fidelity = FIDELITY_MEDIUM;
+
+    string cartographicTechnique = "CartographicUnit";
+    string depthTechnique = "Depth";
+    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
+    int parameter = PARAM_FRACTIONCOMPLETE;
+>
+{
+    pass P0
+    {
+        RasterizerState( Rasterizer_Cull_CW )
+
+        VertexShader = compile vs_1_1 NormalMappedVS();
+        PixelShader = compile ps_2_0 NormalMappedInsectPS(false);
+    }
+    pass P1
+    {
+        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGB )
+        RasterizerState( Rasterizer_Cull_CW )
+
+        VertexShader = compile vs_1_1 NormalMappedVS();
+        PixelShader = compile ps_2_a StunnedUnit();
+    }
+}
+
+technique InsectStunned_LowFidelity
+<
+    string abstractTechnique = "InsectStunned";
+    int fidelity = FIDELITY_LOW;
+
+    string cartographicTechnique = "CartographicUnit";
+    string depthTechnique = "Depth";
+    int renderStage = STAGE_DEPTH + STAGE_PREWATER + STAGE_PREEFFECT;
+    int parameter = PARAM_FRACTIONCOMPLETE;
+>
+{
+    pass P0
+    {
+        AlphaState( AlphaBlend_Disable_Write_RGB )
+        RasterizerState( Rasterizer_Cull_CW )
+
+        VertexShader = compile vs_1_1 VertexNormalVS();
+        PixelShader = compile ps_2_0 ColorMaskPS_LowFidelity();
+    }
+}
+
+technique AeonStunned_HighFidelity
+<
+    string abstractTechnique = "AeonStunned";
+    int fidelity = FIDELITY_HIGH;
+
+    string cartographicTechnique = "CartographicUnit";
+    string depthTechnique = "Depth";
+    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
+    int parameter = PARAM_FRACTIONCOMPLETE;
+
+        string environment = "<aeon>";
+>
+{
+    pass P0
+    {
+        RasterizerState( Rasterizer_Cull_CW )
+
+        VertexShader = compile vs_1_1 NormalMappedVS();
+        PixelShader = compile ps_2_a AeonPS(true);
+    }
+    pass P1
+    {
+        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGB )
+        RasterizerState( Rasterizer_Cull_CW )
+
+        VertexShader = compile vs_1_1 NormalMappedVS();
+        PixelShader = compile ps_2_a StunnedUnit();
+    }
+}
+
+technique AeonStunned_MedFidelity
+<
+    string abstractTechnique = "AeonStunned";
+    int fidelity = FIDELITY_MEDIUM;
+
+    string cartographicTechnique = "CartographicUnit";
+    string depthTechnique = "Depth";
+    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
+    int parameter = PARAM_FRACTIONCOMPLETE;
+>
+{
+    pass P0
+    {
+        RasterizerState( Rasterizer_Cull_CW )
+
+        VertexShader = compile vs_1_1 NormalMappedVS();
+        PixelShader = compile ps_2_0 AeonPS(false);
+    }
+    pass P1
+    {
+        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGB )
+        RasterizerState( Rasterizer_Cull_CW )
+
+        VertexShader = compile vs_1_1 NormalMappedVS();
+        PixelShader = compile ps_2_a StunnedUnit();
+    }
+}
+
+technique AeonStunned_LowFidelity
+<
+    string abstractTechnique = "AeonStunned";
+    int fidelity = FIDELITY_LOW;
+
+    string cartographicTechnique = "CartographicUnit";
+    string depthTechnique = "Depth";
+    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
+    int parameter = PARAM_FRACTIONCOMPLETE;
+>
+{
+    pass P0
+    {
+        AlphaState( AlphaBlend_Disable_Write_RGB )
+        RasterizerState( Rasterizer_Cull_CW )
+
+        VertexShader = compile vs_1_1 VertexNormalVS();
+        PixelShader = compile ps_2_0 ColorMaskPS_LowFidelity();
+    }
+}
+
+/// Seraphim
+///
+///
+technique SeraphimStunned_HighFidelity
+<
+    string abstractTechnique = "SeraphimStunned";
+    int fidelity = FIDELITY_HIGH;
+
+
+    string cartographicTechnique = "CartographicUnit";
+    string depthTechnique = "Depth";
+
+    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
+    int parameter = PARAM_FRACTIONCOMPLETE;
+
+    string environment = "<seraphim>";
+
+>
+{
+    pass P0
+    {
+        RasterizerState( Rasterizer_Cull_CW )
+
+        VertexShader = compile vs_1_1 UnitFalloffVS();
+        PixelShader = compile ps_2_a UnitFalloffPS(true);
+    }
+    pass P1
+    {
+        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGB )
+        RasterizerState( Rasterizer_Cull_CW )
+
+        VertexShader = compile vs_1_1 NormalMappedVS();
+        PixelShader = compile ps_2_a StunnedUnit();
+    }
+}
+
+technique SeraphimStunned_MedFidelity
+<
+    string abstractTechnique = "SeraphimStunned";
+    int fidelity = FIDELITY_MEDIUM;
+
+    string cartographicTechnique = "CartographicUnit";
+    string depthTechnique = "Depth";
+
+    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
+    int parameter = PARAM_FRACTIONCOMPLETE;
+
+    string environment = "<seraphim>";
+>
+{
+    pass P0
+    {
+        RasterizerState( Rasterizer_Cull_CW )
+
+        VertexShader = compile vs_1_1 UnitFalloffVS();
+        PixelShader = compile ps_2_0 UnitFalloffPS(false);
+    }
+    pass P1
+    {
+        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGB )
+        RasterizerState( Rasterizer_Cull_CW )
+
+        VertexShader = compile vs_1_1 NormalMappedVS();
+        PixelShader = compile ps_2_a StunnedUnit();
+    }
+}
+
+technique SeraphimStunned_LowFidelity
+<
+    string abstractTechnique = "SeraphimStunned";
+    int fidelity = FIDELITY_LOW;
+
+    string cartographicTechnique = "CartographicUnit";
+    string depthTechnique = "Depth";
+
+    string environment = "<seraphim>";
+
+    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
+    int parameter = PARAM_FRACTIONCOMPLETE;
+>
+{
+    pass P0
+    {
+        RasterizerState( Rasterizer_Cull_CW )
+
+        VertexShader = compile vs_1_1 NormalMappedVS();
+        PixelShader = compile ps_2_0 LowFiUnitFalloffPS();
+    }
+}
+
 /// Phase Shield
 ///
 ///
@@ -6428,9 +6753,64 @@ technique PhaseShield_HighFidelity
     }
 }
 
-/// SeraphimPersonalShield
-///
-///
+technique AeonPhaseShield_HighFidelity
+<
+    string abstractTechnique = "AeonPhaseShield";
+    int fidelity = FIDELITY_HIGH;
+
+    string cartographicTechnique = "CartographicShield";
+    string depthTechnique = "Depth";
+    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
+    int parameter = PARAM_UNUSED;
+>
+{
+    pass P0
+    {
+        AlphaState( AlphaBlend_Disable_Write_RGBA )
+        RasterizerState( Rasterizer_Cull_CW )
+
+        VertexShader = compile vs_1_1 NormalMappedVS();
+        PixelShader = compile ps_2_a NormalMappedPS(true,true,true, false,0,0 );
+    }
+    pass P1
+    {
+        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGBA )
+        RasterizerState( Rasterizer_Cull_CW )
+
+        VertexShader = compile vs_1_1 PositionNormalOffsetVS(0.05);
+        PixelShader = compile ps_2_0 AeonPhaseShieldPS();
+    }
+}
+
+technique CybranPhaseShield_HighFidelity
+<
+    string abstractTechnique = "CybranPhaseShield";
+    int fidelity = FIDELITY_HIGH;
+
+    string cartographicTechnique = "CartographicShield";
+    string depthTechnique = "Depth";
+    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
+    int parameter = PARAM_UNUSED;
+>
+{
+    pass P0
+    {
+        AlphaState( AlphaBlend_Disable_Write_RGBA )
+        RasterizerState( Rasterizer_Cull_CW )
+
+        VertexShader = compile vs_1_1 NormalMappedVS();
+        PixelShader = compile ps_2_a NormalMappedPS(true,true,true, false,0,0 );
+    }
+    pass P1
+    {
+        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGBA )
+        RasterizerState( Rasterizer_Cull_CW )
+
+        VertexShader = compile vs_1_1 PositionNormalOffsetVS(0.05);
+        PixelShader = compile ps_2_0 CybranPhaseShieldPS();
+    }
+}
+
 technique SeraphimPersonalShield_MedFidelity
 <
     string abstractTechnique = "SeraphimPersonalShield";
@@ -6464,9 +6844,6 @@ technique SeraphimPersonalShield_MedFidelity
     }
 }
 
-/// SeraphimPersonalShield
-///
-///
 technique SeraphimPersonalShield_LowFidelity
 <
     string abstractTechnique = "SeraphimPersonalShield";
@@ -7121,9 +7498,17 @@ technique GlassAlpha_LowFidelity
 }
 
 
-//------------------------------------------------------------------------------
-/////////////////////////     BEGIN CUSTOM SHADERS     /////////////////////////
-//------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------
+/////////////////////////     BEGIN CUSTOM FACTION SHADERS     /////////////////////////
+//--------------------------------------------------------------------------------------
+
+
+///////////////////////////////////////
+///
+/// Nomads
+///
+///////////////////////////////////////
+
 
 // STRUCTS
 
@@ -7260,54 +7645,6 @@ sampler3D NoiseCubeSampler = sampler_state
 
 // PIXEL SHADERS ---------------------------------------------------------------------------------------------
 
-// Aeon phase shield
-float4 AeonPhaseShieldPS( VERTEXNORMAL_VERTEX vertex ) : COLOR
-{
-    float2 tc1 = vertex.texcoord0.xy * 2;
-    tc1.x += 0.005 * vertex.material.x;
-    tc1.y += 0.02 * vertex.material.x;
-    float4 lookup = tex2D( lookupSampler, tc1);
-
-    float2 tc2 = vertex.texcoord0.xy * 8;
-    tc2.y += 0.02 * vertex.material.x;
-    tc2.x -= 0.02 * vertex.material.x;
-    float4 lookup2 = tex2D( lookupSampler, tc2);
-
-    float2 tc3 = vertex.texcoord0.xy * 0.03 ;
-    tc3.x -= 0.001 * vertex.material.x;
-    float4 lookup3 = tex2D( lookupSampler, tc3);
-
-    float electricity = lookup.r * lookup2.b * 0.75;
-    float4 baseshellcolor = float4( 0.4, 1, 0.6, 0.8);
-    float4 glowpulse = float4(lookup3.ggg, min(lookup3.g, 0.65) + electricity );
-
-    return (baseshellcolor + electricity) * glowpulse;
-}
-
-float4 CybranPhaseShieldPS( VERTEXNORMAL_VERTEX vertex ) : COLOR
-{
-    float2 tc1 = vertex.texcoord0.xy * 2;
-    tc1.x += 0.1 * vertex.material.x;
-    tc1.y += 0.5 * vertex.material.x;
-    float4 lookup = tex2D( lookupSampler, tc1);
-
-    float2 tc2 = vertex.texcoord0.xy * 8;
-    tc2.y += 0.5 * vertex.material.x;
-    tc2.x -= 0.5 * vertex.material.x;
-    float4 lookup2 = tex2D( lookupSampler, tc2);
-
-    float2 tc3 = vertex.texcoord0.xy * 0.001 ;
-    tc3.x -= 0.001 * vertex.material.x;
-    tc3.y  = 4;
-    float4 lookup3 = tex2D( lookupSampler, tc3);
-
-    float electricity =  lookup.r * lookup2.b * 2;
-    float4 baseshellcolor = float4( 1, 0.1, 0.2, 0.9);
-    float4 glowpulse = float4(lookup3.ggg, min(lookup3.g, 0.8) + electricity );
-
-    return (baseshellcolor + electricity) * glowpulse;
-}
-
 // The factory build rect
 float4 NomadsFactoryBuildHologramPS( NOMADSBUILD_VERTEX vertex ) : COLOR0
 {
@@ -7316,11 +7653,6 @@ float4 NomadsFactoryBuildHologramPS( NOMADSBUILD_VERTEX vertex ) : COLOR0
     float alpha = 0.22;
 
     return float4(holo, alpha);
-}
-
-float4 StunnedUnit( VERTEXNORMAL_VERTEX vertex ) : COLOR
-{
-    return float4( 0, 0, 0, 0.66 );
 }
 
 //TODO: merge the two nomads build shaders together by using a bool.
@@ -7446,6 +7778,54 @@ float4 NomadsBuildPS( NORMALMAPPED_VERTEX vertex,
     return color;
 }
 
+float4 NomadsNormalMappedPS( NORMALMAPPED_VERTEX vertex,
+                       uniform bool maskAlbedo,
+                       uniform bool glow,
+                       uniform bool hiDefShadows,
+                       uniform bool alphaTestEnable,
+                       uniform int alphaFunc,
+                       uniform int alphaRef ) : COLOR0
+{
+    if ( 1 == mirrored ) clip(vertex.depth.x);
+
+    float3x3 rotationMatrix = float3x3( vertex.binormal, vertex.tangent, vertex.normal);
+    float3 normal = ComputeNormal( normalsSampler, vertex.texcoord0.zw, rotationMatrix);
+    float dotLightNormal = dot(sunDirection,normal);
+
+    float4 albedo = tex2D( albedoSampler, vertex.texcoord0.xy);
+    float4 specular = tex2D( specularSampler, vertex.texcoord0.xy);
+    float3 environment = texCUBE( environmentSampler, reflect( -vertex.viewDirection, normal));
+
+    if ( maskAlbedo )
+        albedo.rgb = lerp( vertex.color.rgb, albedo.rgb, 1 - specular.a );
+    else
+        albedo.rgb = albedo.rgb * vertex.color.rgb;
+
+    float phongAmount = saturate( dot( reflect( sunDirection, normal), -vertex.viewDirection));
+    float3 phongAdditive = NormalMappedPhongCoeff * pow( phongAmount, 2) * specular.g;
+    float3 phongMultiplicative = float3( 2 * environment * specular.r);
+
+    float3 light = ComputeLight( dotLightNormal, ComputeShadow( vertex.shadow, hiDefShadows));
+
+    float emissive = glowMultiplier * specular.b;
+    float3 color = albedo.rgb * ( emissive.r + light + phongMultiplicative) + phongAdditive;
+
+    float alpha = mirrored ? 0.5 : ( glow ? ( specular.b + glowMinimum ) : ( vertex.material.g * albedo.a ));
+
+#ifdef DIRECT3D10
+    if( alphaTestEnable )
+        AlphaTestD3D10( alpha, alphaFunc, alphaRef );
+#endif
+
+    //increasing the alpha creates more glow
+    alpha = alpha * 1.5;
+
+    //subtracting the alpha from the color cancels out the oversaturation created when the glowy parts of the frame are blurred and added to the frame
+    color.rgb = color.rgb - (float3(alpha, alpha, alpha) * 0.4);
+
+    return float4( color.rgb, alpha );
+}
+
 /// Nomads powered armor
 ///
 float4 NomadsPowerArmorPS( VERTEXNORMAL_VERTEX vertex ) : COLOR
@@ -7544,68 +7924,6 @@ float4 ShieldNomadsLoFiPS( LOFIEFFECT_VERTEX vertex ) : COLOR
 }
 
 // TECHNIQUES ------------------------------------------------------------------------------------------
-
-technique AeonPhaseShield_HighFidelity
-<
-    string abstractTechnique = "AeonPhaseShield";
-    int fidelity = FIDELITY_HIGH;
-
-    string cartographicTechnique = "CartographicShield";
-    string depthTechnique = "Depth";
-    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
-    int parameter = PARAM_UNUSED;
->
-{
-    pass P0
-    {
-        AlphaState( AlphaBlend_Disable_Write_RGBA )
-        RasterizerState( Rasterizer_Cull_CW )
-
-        VertexShader = compile vs_1_1 NormalMappedVS();
-        PixelShader = compile ps_2_a NormalMappedPS(true,true,true, false,0,0 );
-    }
-    pass P1
-    {
-        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGBA )
-        RasterizerState( Rasterizer_Cull_CW )
-
-        VertexShader = compile vs_1_1 PositionNormalOffsetVS(0.05);
-        PixelShader = compile ps_2_0 AeonPhaseShieldPS();
-    }
-}
-
-technique CybranPhaseShield_HighFidelity
-<
-    string abstractTechnique = "CybranPhaseShield";
-    int fidelity = FIDELITY_HIGH;
-
-    string cartographicTechnique = "CartographicShield";
-    string depthTechnique = "Depth";
-    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
-    int parameter = PARAM_UNUSED;
->
-{
-    pass P0
-    {
-        AlphaState( AlphaBlend_Disable_Write_RGBA )
-        RasterizerState( Rasterizer_Cull_CW )
-
-        VertexShader = compile vs_1_1 NormalMappedVS();
-        PixelShader = compile ps_2_a NormalMappedPS(true,true,true, false,0,0 );
-    }
-    pass P1
-    {
-        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGBA )
-        RasterizerState( Rasterizer_Cull_CW )
-
-        VertexShader = compile vs_1_1 PositionNormalOffsetVS(0.05);
-        PixelShader = compile ps_2_0 CybranPhaseShieldPS();
-    }
-}
-
-
-// ====================================================================================================================================================================
-// All nomads shader techniques
 
 technique NOMADSBuildUnit_MediumFidelity
 <
@@ -8309,17 +8627,19 @@ technique ShieldNomadsStealth_LowFidelity
 }
 
 
-/////////////////////
-// TA Build Shader //
-/////////////////////
+///////////////////////////////////////
+///
+/// Total Annihilation
+///
+///////////////////////////////////////
 
 // Original Shader by Armoured Fish, version 1.2 (10th Feb 2008)
 // Ported to Forged Alliance by Raevn
 
+
 //////////////////
 //STRUCTS
 //////////////////
-
 
 
 struct TABUILD_VERTEX
@@ -8791,379 +9111,6 @@ technique TACloak_LowFidelity
 }
 
 
-// Old build shader with scanline effect, pulsing glow,  noise
-// This might come in handy at some point if we want these in the new shader
-
-//float4 NomadsBuildOldPS( ORANGEHOLO_VERTEX vertex,
-//                       uniform bool hiDefShadows ) : COLOR0
-//{
-////    if ( 1 == mirrored ) clip(vertex.depth.x);
-//
-//    //if (sin(vertex.localPos.y*720) > 0 ) discard;
-//
-//    float3x3 rotationMatrix = float3x3( vertex.binormal, vertex.tangent, vertex.normal);
-//    float3 normal = ComputeNormal( normalsSampler, vertex.texcoord0.zw, rotationMatrix);
-//    float dotLightNormal = dot(sunDirection,normal);
-//
-//    float4 albedo = tex2D( albedoSampler, vertex.texcoord0.xy);
-//    float4 specular = tex2D( specularSampler, vertex.texcoord0.xy);
-//    float3 environment = texCUBE( environmentSampler, reflect( -vertex.viewDirection, normal));
-//
-//    float2 texcoord = vertex.texcoord0.xy * 0.5;
-//    texcoord.x += 0.1 * vertex.material.x;
-//    texcoord.y += 0.1 * vertex.material.x;
-//    float4 lookup = tex2D( lookupSampler, texcoord);
-//
-//    float4 noisy = 1 - (0.5 * lookup);
-//
-//
-//    float3 light = ComputeLight( dotLightNormal, ComputeShadow( vertex.shadow, hiDefShadows));
-//
-//    float3 color = float3(1.0, 0.5, 0);
-//
-//    color *= light;
-//    color *= noisy;
-//
-//    float alpha = (0.3 + 0.1*sin(vertex.material.x / 4));
-//    alpha *= noisy;
-//    alpha *= 1 + 0.4*sin(vertex.localPos.y*1080);
-//    return float4( color.rgb, alpha );
-//}
-
-// Glow overlay for nomad build shader
-//float4 NomadBuildGlowPS( FLAT_VERTEX vertex ) : COLOR0
-//{
-//
-//    float3 color = float3(1.0f, 0.5f, 0.0f);
-//    float alpha = 0.2f * (1.0f - vertex.material.y);
-//    return float4( color.rgb, alpha );
-//}
-
-// ====================================================================================================================================================================
-// Stock faction stunned techniques
-
-technique UnitStunned_HighFidelity
-<
-    string abstractTechnique = "UnitStunned";
-    int fidelity = FIDELITY_HIGH;
-
-    string cartographicTechnique = "CartographicUnit";
-    string depthTechnique = "Depth";
-    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
-    int parameter = PARAM_FRACTIONCOMPLETE;
->
-{
-    pass P0
-    {
-        RasterizerState( Rasterizer_Cull_CW )
-
-        VertexShader = compile vs_1_1 NormalMappedVS();
-        PixelShader = compile ps_2_a NormalMappedPS(true,true,true, false,0,0 );
-    }
-    pass P1
-    {
-        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGB )
-        RasterizerState( Rasterizer_Cull_CW )
-
-        VertexShader = compile vs_1_1 NormalMappedVS();
-        PixelShader = compile ps_2_a StunnedUnit();
-    }
-}
-
-technique UnitStunned_MedFidelity
-<
-    string abstractTechnique = "UnitStunned";
-    int fidelity = FIDELITY_MEDIUM;
-
-    string cartographicTechnique = "CartographicUnit";
-    string depthTechnique = "Depth";
-    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
-    int parameter = PARAM_FRACTIONCOMPLETE;
->
-{
-    pass P0
-    {
-        RasterizerState( Rasterizer_Cull_CW )
-
-        VertexShader = compile vs_1_1 NormalMappedVS();
-        PixelShader = compile ps_2_a NormalMappedPS(true,true,false, false,0,0 );
-    }
-    pass P1
-    {
-        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGB )
-        RasterizerState( Rasterizer_Cull_CW )
-
-        VertexShader = compile vs_1_1 NormalMappedVS();
-        PixelShader = compile ps_2_a StunnedUnit();
-    }
-}
-
-technique UnitStunned_LowFidelity
-<
-    string abstractTechnique = "UnitStunned";
-    int fidelity = FIDELITY_LOW;
-
-    string cartographicTechnique = "CartographicUnit";
-    string depthTechnique = "Depth";
-    int renderStage = STAGE_DEPTH + STAGE_PREWATER + STAGE_PREEFFECT;
-    int parameter = PARAM_FRACTIONCOMPLETE;
->
-{
-    pass P0
-    {
-        AlphaState( AlphaBlend_Disable_Write_RGB )
-        RasterizerState( Rasterizer_Cull_CW )
-
-        VertexShader = compile vs_1_1 VertexNormalVS();
-        PixelShader = compile ps_2_0 ColorMaskPS_LowFidelity();
-    }
-}
-
-technique InsectStunned_HighFidelity
-<
-    string abstractTechnique = "InsectStunned";
-    int fidelity = FIDELITY_HIGH;
-
-    string cartographicTechnique = "CartographicUnit";
-    string depthTechnique = "Depth";
-    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
-    int parameter = PARAM_FRACTIONCOMPLETE;
->
-{
-    pass P0
-    {
-        RasterizerState( Rasterizer_Cull_CW )
-
-        VertexShader = compile vs_1_1 NormalMappedVS();
-        PixelShader = compile ps_2_a NormalMappedInsectPS(true);
-    }
-    pass P1
-    {
-        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGB )
-        RasterizerState( Rasterizer_Cull_CW )
-
-        VertexShader = compile vs_1_1 NormalMappedVS();
-        PixelShader = compile ps_2_a StunnedUnit();
-    }
-}
-
-technique InsectStunned_MedFidelity
-<
-    string abstractTechnique = "InsectStunned";
-    int fidelity = FIDELITY_MEDIUM;
-
-    string cartographicTechnique = "CartographicUnit";
-    string depthTechnique = "Depth";
-    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
-    int parameter = PARAM_FRACTIONCOMPLETE;
->
-{
-    pass P0
-    {
-        RasterizerState( Rasterizer_Cull_CW )
-
-        VertexShader = compile vs_1_1 NormalMappedVS();
-        PixelShader = compile ps_2_0 NormalMappedInsectPS(false);
-    }
-    pass P1
-    {
-        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGB )
-        RasterizerState( Rasterizer_Cull_CW )
-
-        VertexShader = compile vs_1_1 NormalMappedVS();
-        PixelShader = compile ps_2_a StunnedUnit();
-    }
-}
-
-technique InsectStunned_LowFidelity
-<
-    string abstractTechnique = "InsectStunned";
-    int fidelity = FIDELITY_LOW;
-
-    string cartographicTechnique = "CartographicUnit";
-    string depthTechnique = "Depth";
-    int renderStage = STAGE_DEPTH + STAGE_PREWATER + STAGE_PREEFFECT;
-    int parameter = PARAM_FRACTIONCOMPLETE;
->
-{
-    pass P0
-    {
-        AlphaState( AlphaBlend_Disable_Write_RGB )
-        RasterizerState( Rasterizer_Cull_CW )
-
-        VertexShader = compile vs_1_1 VertexNormalVS();
-        PixelShader = compile ps_2_0 ColorMaskPS_LowFidelity();
-    }
-}
-
-technique AeonStunned_HighFidelity
-<
-    string abstractTechnique = "AeonStunned";
-    int fidelity = FIDELITY_HIGH;
-
-    string cartographicTechnique = "CartographicUnit";
-    string depthTechnique = "Depth";
-    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
-    int parameter = PARAM_FRACTIONCOMPLETE;
-
-        string environment = "<aeon>";
->
-{
-    pass P0
-    {
-        RasterizerState( Rasterizer_Cull_CW )
-
-        VertexShader = compile vs_1_1 NormalMappedVS();
-        PixelShader = compile ps_2_a AeonPS(true);
-    }
-    pass P1
-    {
-        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGB )
-        RasterizerState( Rasterizer_Cull_CW )
-
-        VertexShader = compile vs_1_1 NormalMappedVS();
-        PixelShader = compile ps_2_a StunnedUnit();
-    }
-}
-
-technique AeonStunned_MedFidelity
-<
-    string abstractTechnique = "AeonStunned";
-    int fidelity = FIDELITY_MEDIUM;
-
-    string cartographicTechnique = "CartographicUnit";
-    string depthTechnique = "Depth";
-    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
-    int parameter = PARAM_FRACTIONCOMPLETE;
->
-{
-    pass P0
-    {
-        RasterizerState( Rasterizer_Cull_CW )
-
-        VertexShader = compile vs_1_1 NormalMappedVS();
-        PixelShader = compile ps_2_0 AeonPS(false);
-    }
-    pass P1
-    {
-        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGB )
-        RasterizerState( Rasterizer_Cull_CW )
-
-        VertexShader = compile vs_1_1 NormalMappedVS();
-        PixelShader = compile ps_2_a StunnedUnit();
-    }
-}
-
-technique AeonStunned_LowFidelity
-<
-    string abstractTechnique = "AeonStunned";
-    int fidelity = FIDELITY_LOW;
-
-    string cartographicTechnique = "CartographicUnit";
-    string depthTechnique = "Depth";
-    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
-    int parameter = PARAM_FRACTIONCOMPLETE;
->
-{
-    pass P0
-    {
-        AlphaState( AlphaBlend_Disable_Write_RGB )
-        RasterizerState( Rasterizer_Cull_CW )
-
-        VertexShader = compile vs_1_1 VertexNormalVS();
-        PixelShader = compile ps_2_0 ColorMaskPS_LowFidelity();
-    }
-}
-
-/// Seraphim
-///
-///
-technique SeraphimStunned_HighFidelity
-<
-    string abstractTechnique = "SeraphimStunned";
-    int fidelity = FIDELITY_HIGH;
-
-
-    string cartographicTechnique = "CartographicUnit";
-    string depthTechnique = "Depth";
-
-    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
-    int parameter = PARAM_FRACTIONCOMPLETE;
-
-    string environment = "<seraphim>";
-
->
-{
-    pass P0
-    {
-        RasterizerState( Rasterizer_Cull_CW )
-
-        VertexShader = compile vs_1_1 UnitFalloffVS();
-        PixelShader = compile ps_2_a UnitFalloffPS(true);
-    }
-    pass P1
-    {
-        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGB )
-        RasterizerState( Rasterizer_Cull_CW )
-
-        VertexShader = compile vs_1_1 NormalMappedVS();
-        PixelShader = compile ps_2_a StunnedUnit();
-    }
-}
-
-technique SeraphimStunned_MedFidelity
-<
-    string abstractTechnique = "SeraphimStunned";
-    int fidelity = FIDELITY_MEDIUM;
-
-    string cartographicTechnique = "CartographicUnit";
-    string depthTechnique = "Depth";
-
-    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
-    int parameter = PARAM_FRACTIONCOMPLETE;
-
-    string environment = "<seraphim>";
->
-{
-    pass P0
-    {
-        RasterizerState( Rasterizer_Cull_CW )
-
-        VertexShader = compile vs_1_1 UnitFalloffVS();
-        PixelShader = compile ps_2_0 UnitFalloffPS(false);
-    }
-    pass P1
-    {
-        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGB )
-        RasterizerState( Rasterizer_Cull_CW )
-
-        VertexShader = compile vs_1_1 NormalMappedVS();
-        PixelShader = compile ps_2_a StunnedUnit();
-    }
-}
-
-technique SeraphimStunned_LowFidelity
-<
-    string abstractTechnique = "SeraphimStunned";
-    int fidelity = FIDELITY_LOW;
-
-    string cartographicTechnique = "CartographicUnit";
-    string depthTechnique = "Depth";
-
-    string environment = "<seraphim>";
-
-    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
-    int parameter = PARAM_FRACTIONCOMPLETE;
->
-{
-    pass P0
-    {
-        RasterizerState( Rasterizer_Cull_CW )
-
-        VertexShader = compile vs_1_1 NormalMappedVS();
-        PixelShader = compile ps_2_0 LowFiUnitFalloffPS();
-    }
-}
 
 /////////////////////////////////////////////////
 // Physically Based Rendering
