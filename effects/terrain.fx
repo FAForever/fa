@@ -534,6 +534,17 @@ float3 PBR(VS_OUTPUT inV, float3 albedo, float3 n, float roughness) {
     // In the future we could write another shader that does exactly this, so
     // mappers can choose to use that if they want to make a shiny map.
 
+    // used textures:
+    // lowerAlbedo
+    // Albedo stratum 0-7
+    // upperAlbedo
+    // NormalTexture
+    // ShadowTexture
+    // UtilityTextureA
+    // UtilityTextureB
+    // UtilityTextureC
+    // WaterRamp
+
     return color;
 }
 
