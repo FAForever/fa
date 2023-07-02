@@ -6838,7 +6838,7 @@ technique UnitStunned_HighFidelity
         RasterizerState( Rasterizer_Cull_CW )
 
         VertexShader = compile vs_1_1 NormalMappedVS();
-        PixelShader = compile ps_2_a NormalMappedPS(true,true,true, false,0,0 );
+        PixelShader = compile ps_2_a PBR_UEF_PS(true,true, false,0,0 );
     }
     pass P1
     {
@@ -6915,7 +6915,7 @@ technique InsectStunned_HighFidelity
         RasterizerState( Rasterizer_Cull_CW )
 
         VertexShader = compile vs_1_1 NormalMappedVS();
-        PixelShader = compile ps_2_a NormalMappedInsectPS(true);
+        PixelShader = compile ps_2_a PBR_CybranPS(true);
     }
     pass P1
     {
@@ -6985,8 +6985,6 @@ technique AeonStunned_HighFidelity
     string depthTechnique = "Depth";
     int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
     int parameter = PARAM_FRACTIONCOMPLETE;
-
-        string environment = "<aeon>";
 >
 {
     pass P0
@@ -6994,7 +6992,7 @@ technique AeonStunned_HighFidelity
         RasterizerState( Rasterizer_Cull_CW )
 
         VertexShader = compile vs_1_1 NormalMappedVS();
-        PixelShader = compile ps_2_a AeonPS(true);
+        PixelShader = compile ps_2_a PBR_AeonPS(true);
     }
     pass P1
     {
@@ -7069,9 +7067,6 @@ technique SeraphimStunned_HighFidelity
 
     int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
     int parameter = PARAM_FRACTIONCOMPLETE;
-
-    string environment = "<seraphim>";
-
 >
 {
     pass P0
@@ -7079,7 +7074,7 @@ technique SeraphimStunned_HighFidelity
         RasterizerState( Rasterizer_Cull_CW )
 
         VertexShader = compile vs_1_1 UnitFalloffVS();
-        PixelShader = compile ps_2_a UnitFalloffPS(true);
+        PixelShader = compile ps_2_a PBR_SeraphimPS(true);
     }
     pass P1
     {
