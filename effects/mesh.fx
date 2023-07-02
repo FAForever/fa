@@ -304,6 +304,7 @@ struct VERTEXNORMAL_VERTEX
     float4 position : POSITION0;
     float3 normal : TEXCOORD3;
     float4 texcoord0 : TEXCOORD0;
+    float3 viewDirection : TEXCOORD5;
     float4 shadow : TEXCOORD2;
     float4 color : COLOR0;
     float4 material : TEXCOORD1;
@@ -591,13 +592,31 @@ float3 ComputeNormal( sampler2D source, float2 uv, float3x3 rotationMatrix)
     return normalize( mul( normal, rotationMatrix));
 }
 
-float3 ApplyWaterColor(float depth, float3 color) {
+float3 ApplyWaterColor(float depth, float3 viewDirection, float3 color, float3 emission = float3(0, 0, 0)) {
+    // disable the whole thing on land-only maps
     if (surfaceElevation > 0) {
         float4 waterColor = tex1D(WaterRampSampler, -depth / (surfaceElevation - abyssElevation));
-        color = lerp(color, waterColor.rgb, waterColor.w);
+        // we use lightMultiplier as a switch to match it with the terrain shader coloration
+        if (lightMultiplier > 2.1) {
+            float3 up = float3(0,1,0);
+            // To simplify, we assume that the light enters vertically into the water,
+            // this is the length that the light travels underwater back to the camera
+            float oneOverCosV = 1 / max(dot(up, normalize(viewDirection)), 0.0001);
+            // light gets absorbed exponentially
+            float waterAbsorption = saturate(exp(-waterColor.w * (1 + oneOverCosV)));
+            // when the mesh emits light, then the path from the surface to the mesh doesn't apply
+            float emissionAbsorption = saturate(exp(-waterColor.w * oneOverCosV));
+            // darken the color first to simulate the light absorption on the way in and out
+            color *= waterAbsorption;
+            // lerp in the watercolor to simulate the scattered light from the dirty water
+            color = lerp(waterColor.rgb, color, waterAbsorption);
+            // similarly tune down the emission light
+            color += emission * emissionAbsorption;
+        } else {
+            color = lerp(color, waterColor.rgb, waterColor.w);
+        }
     } 
     return color;
-    
 }
 
 ///////////////////////////////////////
@@ -941,6 +960,9 @@ VERTEXNORMAL_VERTEX VertexNormalVS(
     vertex.position = mul( float4(position,1), worldMatrix);
     vertex.depth = vertex.position.y - surfaceElevation;
     vertex.shadow = ComputeShadowTexcoord( vertex.position);
+
+    vertex.viewDirection = -mul(viewMatrix, mul( vertex.position, viewMatrix));
+    vertex.viewDirection = normalize(vertex.viewDirection);
     vertex.position = mul( vertex.position, mul( viewMatrix, projMatrix));
 
     vertex.texcoord0 = ( anim.w > 0.5 ) ? ComputeScrolledTexcoord( texcoord0, material) : texcoord0;
@@ -2227,6 +2249,8 @@ float4 FlatPS( FLAT_VERTEX vertex,
 /// VertexNormalPS_HighFidelity
 ///
 /// Lighting using vertex normals only.
+/// Used by props, mainly some rocks.
+/// And the lod1 of many trees apparently. Kinda weird.
 float4 VertexNormalPS_HighFidelity( VERTEXNORMAL_VERTEX vertex,
                         		    uniform bool hiDefShadows,
                         		    uniform bool alphaTestEnable,
@@ -2242,7 +2266,7 @@ float4 VertexNormalPS_HighFidelity( VERTEXNORMAL_VERTEX vertex,
 
     float alpha = mirrored ? 0.5 : vertex.material.g * albedo.a;
     float3 color = vertex.color.rgb * albedo.rgb * light;
-    color = ApplyWaterColor(vertex.depth.x, color);
+    color = ApplyWaterColor(vertex.depth.x, vertex.viewDirection, color);
 
 #ifdef DIRECT3D10
     if( alphaTestEnable )
@@ -2312,6 +2336,7 @@ float4 ClutterPS( CLUTTER_VERTEX vertex,
 /// NormalMappedPS
 ///
 /// Lighting using normal maps.
+/// Used by some props, mostly trees
 float4 NormalMappedPS( NORMALMAPPED_VERTEX vertex,
                        uniform bool maskAlbedo,
                        uniform bool glow,
@@ -2343,7 +2368,7 @@ float4 NormalMappedPS( NORMALMAPPED_VERTEX vertex,
 
     float emissive = glowMultiplier * specular.b;
     float3 color = albedo.rgb * ( emissive.r + light + phongMultiplicative) + phongAdditive;
-    color = ApplyWaterColor(vertex.depth.x, color);
+    color = ApplyWaterColor(vertex.depth.x, vertex.viewDirection, color);
 
     float alpha = mirrored ? 0.5 : ( glow ? ( specular.b + glowMinimum ) : ( vertex.material.g * albedo.a ));
 
@@ -2439,7 +2464,7 @@ float4 NormalMappedPS_02( NORMALMAPPED_VERTEX vertex,
     float emissive = glowMultiplier * specular.b * 0.02;
 
   float3 color = (albedo.rgb * 0.125) + ( emissive.r + (light * albedo.rgb) ) + phongMultiplicative + (phongAdditive);
-  color = ApplyWaterColor(vertex.depth.x, color);
+  color = ApplyWaterColor(vertex.depth.x, vertex.viewDirection, color);
 
   float alpha = mirrored ? 0.5 : ( glow ? ( specular.b + glowMinimum ) : ( vertex.material.g * albedo.a )) + (phongAdditive * 0.13);
     //float alpha = mirrored ? 0.5 : ( glow ? ( specular.b + glowMinimum ) : ( vertex.material.g * albedo.a ));
@@ -2597,7 +2622,7 @@ float4 WreckagePS( NORMALMAPPED_VERTEX vertex) : COLOR0
     else
         color *= specular.b * 2;
 
-    color = ApplyWaterColor(vertex.depth.x, color);
+    color = ApplyWaterColor(vertex.depth.x, vertex.viewDirection, color);
 
     return float4( color, glowMinimum );
 }
@@ -2613,7 +2638,7 @@ float4 WreckagePS_LowFidelity(VERTEXNORMAL_VERTEX vertex) : COLOR0
 
 /// NormalMappedTerrainPS
 ///
-///
+/// Used by some props, mostly rocks and ice floes
 float4 NormalMappedTerrainPS( NORMALMAPPED_VERTEX vertex ) : COLOR
 {
     if ( 1 == mirrored ) clip( vertex.depth.x);
@@ -2628,7 +2653,7 @@ float4 NormalMappedTerrainPS( NORMALMAPPED_VERTEX vertex ) : COLOR
     float alpha = mirrored ? 0.5 : glowMinimum;
 
     float3 color = light * albedo.rgb;
-    color = ApplyWaterColor(vertex.depth.x, color);
+    color = ApplyWaterColor(vertex.depth.x, vertex.viewDirection, color);
 
     return float4(color,alpha);
 }
@@ -2888,7 +2913,7 @@ float4 AeonPS_02( NORMALMAPPED_VERTEX vertex, uniform bool hiDefShadows) : COLOR
     float alpha = mirrored ? 0.5 : specular.b + glowMinimum + (pow(specular.a * 1.5, 2) * 0.07 * (1.4 - teamColGlowCompensation)) + ((phongMultiplicativeGlow + phongAdditiveGlow) * 0.05);
     //alpha = 0;
     //color = light;
-    color = ApplyWaterColor(vertex.depth.x, color);
+    color = ApplyWaterColor(vertex.depth.x, vertex.viewDirection, color);
 
     return float4( color, alpha );
 }
@@ -3034,7 +3059,7 @@ float4 UnitFalloffPS_02( NORMALMAPPED_VERTEX vertex, uniform bool hiDefShadows) 
     float mask = saturate( saturate(specular.b * 2) - diffuse.a );
     color *= 1 - mask;
     color += specular.b * 2 * mask;
-    color = ApplyWaterColor(vertex.depth.x, color);
+    color = ApplyWaterColor(vertex.depth.x, vertex.viewDirection, color);
 
     // Bloom is only rendered where alpha > 0
     float teamColorGlow = (vertex.color.r + vertex.color.g + vertex.color.b) / 3;
@@ -3482,7 +3507,7 @@ float4 NormalMappedInsectPS_02( NORMALMAPPED_VERTEX vertex, uniform bool hiDefSh
     float3 color = (albedo.rgb * 0.125) + emissive + (light * albedo.rgb) + (phongAdditive) + phongMultiplicative;
     float alpha = mirrored ? 0.5 : min(specular.b, 0.3) + glowMinimum + (phongAdditive * 0.04);
 
-    color = ApplyWaterColor(vertex.depth.x, color);
+    color = ApplyWaterColor(vertex.depth.x, vertex.viewDirection, color);
     return float4( color, alpha);
 }
 
@@ -9294,28 +9319,7 @@ float3 PBR_PS(
     return color;
 }
 
-float3 ApplyWaterColorExponentially(NORMALMAPPED_VERTEX vertex, float3 color, float3 emission) {
-    // the constants go crazy when water is disabled on the map
-    if (surfaceElevation > 0) {
-        float4 waterColor = tex1D(WaterRampSampler, -vertex.depth.x / (surfaceElevation - abyssElevation));
-        float3 v = normalize(vertex.viewDirection);
-        float3 up = float3(0,1,0);
-        // To simplify, we assume that the light enters vertically into the water,
-        // this is the length that the light travels underwater back to the camera
-        float oneOverCosV = 1 / max(dot(up, v), 0.0001);
-        // light gets absorbed exponentially
-        float waterAbsorption = saturate(exp(-waterColor.w * (1 + oneOverCosV)));
-        // when the mesh emits light, then the path from the surface to the mesh doesn't apply
-        float emissionAbsorption = saturate(exp(-waterColor.w * oneOverCosV));
-        // darken the color first to simulate the light absorption on the way in and out
-        color *= waterAbsorption;
-        // lerp in the watercolor to simulate the scattered light from the dirty water
-        color = lerp(waterColor.rgb, color, waterAbsorption);
-        // similarly tune down the emission light
-        color += emission * emissionAbsorption;
-    }
-    return color;
-}
+
 
 float4 PBR_UEF(NORMALMAPPED_VERTEX vertex, float teamColorFactor, uniform bool hiDefShadows) : COLOR0
 {
@@ -9344,7 +9348,7 @@ float4 PBR_UEF(NORMALMAPPED_VERTEX vertex, float teamColorFactor, uniform bool h
 
     float3 color = PBR_PS(vertex, albedo.rgb, metallic, roughness, normal, hiDefShadows, .04, ao);
     float emission = specular.b * 0.8;
-    color = ApplyWaterColorExponentially(vertex, color, emission * albedo);
+    color = ApplyWaterColor(vertex.depth.x, vertex.viewDirection, color, emission * albedo);
 
     // The glowminimum is required to make the unit behave properly with the water shader.
     // If the alpha channel is 0 somewhere, those parts will show as water refractions even
@@ -9420,7 +9424,7 @@ float4 PBR_Aeon(NORMALMAPPED_VERTEX vertex, float teamColorFactor, uniform bool 
 
     float3 color = PBR_PS(vertex, albedo, metallic, roughness, normal, hiDefShadows, specularAmount);
     float3 emission = specular.b + specular.a * vertex.color.rgb * 0.5;
-    color = ApplyWaterColorExponentially(vertex, color, emission);
+    color = ApplyWaterColor(vertex.depth.x, vertex.viewDirection, color, emission);
      
     float alpha = mirrored ? 0.5 : specular.b + glowMinimum + specular.a * 0.13;
 
@@ -9566,7 +9570,7 @@ float4 PBR_Cybran(NORMALMAPPED_VERTEX vertex, float teamColorFactor, uniform boo
 
     float3 color = PBR_PS(vertex, albedo.rgb, metallic, roughness, normal, hiDefShadows);
     float emission = pow(max(specular.b - 0.04, 0.0), 0.5);
-    color = ApplyWaterColorExponentially(vertex, color, emission * albedo);
+    color = ApplyWaterColor(vertex.depth.x, vertex.viewDirection, color, emission * albedo);
 
     float alpha = mirrored ? 0.5 : min(emission + glowMinimum, 0.3);
 
@@ -9619,7 +9623,7 @@ float4 PBR_Seraphim(
     float mask = saturate(saturate(specular.b * 2) - albedo.a);
     color = lerp(color, specular.b * 2, mask);
 
-    color = ApplyWaterColorExponentially(vertex, color, emission * albedo);
+    color = ApplyWaterColor(vertex.depth.x, vertex.viewDirection, color, emission * albedo);
 
     // Bloom is only rendered where alpha > 0
     float teamColorGlow = (vertex.color.r + vertex.color.g + vertex.color.b) / 3;
