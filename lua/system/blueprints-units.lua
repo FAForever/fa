@@ -1,3 +1,12 @@
+-- upvalue for performance
+local TableFind = table.find
+local TableGetn = table.getn
+
+local MathMax = math.max
+local MathFloor = math.floor
+
+local StringFind = string.find
+
 local BlueprintNameToIntel = {
     Cloak = 'Cloak',
     CloakField = 'CloakField',
@@ -29,6 +38,46 @@ local TechToVetMultipliers = {
     EXPERIMENTAL = 2,
     COMMAND = 2,
 }
+
+---@param weapon WeaponBlueprint
+local function CalculatedDamage(weapon)
+    local ProjectileCount = MathMax(1, TableGetn(weapon.RackBones[1].MuzzleBones or {'nehh'}), weapon.MuzzleSalvoSize or 1)
+    if weapon.RackFireTogether then
+        ProjectileCount = ProjectileCount * MathMax(1, TableGetn(weapon.RackBones or {'nehh'}))
+    end
+    return ((weapon.Damage or 0) + (weapon.NukeInnerRingDamage or 0)) * ProjectileCount * (weapon.DoTPulses or 1)
+end
+
+---@param weapon WeaponBlueprint
+---@return number
+local function CalculatedDPS(weapon)
+    -- Base values
+    local ProjectileCount
+    if weapon.MuzzleSalvoDelay == 0 then
+        ProjectileCount = MathMax(1, TableGetn(weapon.RackBones[1].MuzzleBones or {'nehh'}))
+    else
+        ProjectileCount = (weapon.MuzzleSalvoSize or 1)
+    end
+    if weapon.RackFireTogether then
+        ProjectileCount = ProjectileCount * MathMax(1, TableGetn(weapon.RackBones or {'nehh'}))
+    end
+    -- Game logic rounds the timings to the nearest tick --  MathMax(0.1, 1 / (weapon.RateOfFire or 1)) for unrounded values
+    local DamageInterval = MathFloor((MathMax(0.1, 1 / (weapon.RateOfFire or 1)) * 10) + 0.5) / 10 + ProjectileCount * (MathMax(weapon.MuzzleSalvoDelay or 0, weapon.MuzzleChargeDelay or 0) * (weapon.MuzzleSalvoSize or 1))
+    local Damage = ((weapon.Damage or 0) + (weapon.NukeInnerRingDamage or 0)) * ProjectileCount * (weapon.DoTPulses or 1)
+
+    -- Beam calculations.
+    if weapon.BeamLifetime and weapon.BeamLifetime == 0 then
+        -- Unending beam. Interval is based on collision delay only.
+        DamageInterval = 0.1 + (weapon.BeamCollisionDelay or 0)
+    elseif weapon.BeamLifetime and weapon.BeamLifetime > 0 then
+        -- Uncontinuous beam. Interval from start to next start.
+        DamageInterval = DamageInterval + weapon.BeamLifetime
+        -- Damage is calculated as a single glob, beam weapons are typically underappreciated
+        Damage = Damage * (weapon.BeamLifetime / (0.1 + (weapon.BeamCollisionDelay or 0)))
+    end
+
+    return Damage / DamageInterval or 0
+end
 
 --- Post process a unit
 ---@param unit UnitBlueprint
@@ -330,6 +379,68 @@ local function PostProcessUnit(unit)
         unit.VetThresholds[3] = 3 * multiplier * (unit.Economy.BuildCostMass or 1)
         unit.VetThresholds[4] = 4 * multiplier * (unit.Economy.BuildCostMass or 1)
         unit.VetThresholds[5] = 5 * multiplier * (unit.Economy.BuildCostMass or 1)
+    end
+
+    -- Pre-compute weak secondary weapons
+
+    local weapons = unit.Weapon
+    if weapons then
+        LOG(unit.BlueprintId .. " - " .. unit.Description)
+
+        -- determine total dps per category
+        local damagePerRangeCategory = {
+            UWRC_DirectFire = 0,
+            UWRC_IndirectFire = 0,
+            UWRC_AntiAir = 0,
+            UWRC_AntiNavy = 0,
+            UWRC_Countermeasure = 0,
+        }
+
+        for k, weapon in weapons do
+            local dps = CalculatedDPS(weapon)
+            if weapon.RangeCategory then
+                damagePerRangeCategory[weapon.RangeCategory] = damagePerRangeCategory[weapon.RangeCategory] + dps
+            else
+                if weapon.WeaponCategory != 'Death' then
+                    -- WARN("Invalid weapon on " .. unit.BlueprintId)
+                end
+            end
+        end
+
+        local array = {
+            {
+                RangeCategory = "UWRC_DirectFire",
+                Damage = damagePerRangeCategory["UWRC_DirectFire"]
+            },
+            {
+                RangeCategory = "UWRC_IndirectFire",
+                Damage = damagePerRangeCategory["UWRC_IndirectFire"]
+            },
+            {
+                RangeCategory = "UWRC_AntiAir",
+                Damage = damagePerRangeCategory["UWRC_AntiAir"]
+            }
+            ,
+            {
+                RangeCategory = "UWRC_AntiNavy",
+                Damage = damagePerRangeCategory["UWRC_AntiNavy"]
+            }
+            ,
+            {
+                RangeCategory = "UWRC_Countermeasure",
+                Damage = damagePerRangeCategory["UWRC_Countermeasure"]
+            }
+        }
+
+        table.sort(array, function(e1, e2) return e1.Damage > e2.Damage end)
+
+        local factor = array[1].Damage
+
+        for category, damage in damagePerRangeCategory do
+            if damage > 0 and damage < 0.2 * factor then
+                LOG(" - Weak in: " .. category)
+            end
+        end
     end
 end
 
