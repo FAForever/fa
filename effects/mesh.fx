@@ -2723,7 +2723,7 @@ float4 PBR_Seraphim(
     // Bloom is only rendered where alpha > 0
     float teamColorGlow = (vertex.color.r + vertex.color.g + vertex.color.b) / 3;
     teamColorGlow = albedo.a * (1 - teamColorGlow) * 0.06;
-    float alpha = mirrored ? 0.5 : saturate(specular.b - 0.1) * 0.4 + teamColorGlow + whiteness * 0.1 + glowMinimum;
+    float alpha = mirrored ? 0.5 : saturate(specular.b - 0.1) * 0.4 + teamColorGlow + whiteness.r * 0.1 + glowMinimum;
     
     return float4(color, alpha);
 }
@@ -3396,7 +3396,7 @@ float4 LowFiUnitFalloffPS( NORMALMAPPED_VERTEX vertex) : COLOR0
     float highlight = pow(saturate(dot(reflected,sunDirection)),5);
 
     float dotLightNormal = dot(sunDirection,normal);
-    float3 light = ComputeLight(dotLightNormal,sunDirection);
+    float3 light = ComputeLight(dotLightNormal, 1);
     float3 color = diffuse.rgb * light + highlight.rrr;
 
     return float4(color.rgb,0);
