@@ -10,6 +10,13 @@ UnitBlueprint {
         'HIGHPRIAIR',
         'SPECIALLOWPRI', 
         'SPECIALHIGHPRI',
+
+        -- removed per #5169
+        'OVERLAYANTIAIR',
+        'OVERLAYANTINAVY',
+        'OVERLAYDEFENSE',
+        'OVERLAYDIRECTFIRE',
+        'OVERLAYINDIRECTFIRE',
     },
     CollisionOffsetY = -0.5,
     Defense = {
