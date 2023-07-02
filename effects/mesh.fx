@@ -3371,10 +3371,15 @@ float4 UnitFalloffPS( NORMALMAPPED_VERTEX vertex, uniform bool hiDefShadows) : C
     float3 light = sunDiffuse * saturate( dotLightNormal ) * shadow + sunAmbient;
     light = light + ( 1 - light ) * shadowFill;
 
+    // This gives almost the same result as the ramp in fallOff.rgb, but we will use this,
+    // because it produces consistent results with different player colors
+    NdotV = 2 * pow(NdotV, 6) - 2 * NdotV + 1.5;
+    float3 teamColor = NdotV * vertex.color.rgb;
+
     // Determine our final output color
     float3 color = diffuse.rgb * light;
     color += environment + phongAdditive;
-    color += (fallOff.rgb * diffuse.a);
+    color += (teamColor.rgb * diffuse.a);
 
     float alpha = mirrored ? 0.5 : specular.b + glowMinimum;
     return float4( color, alpha );
