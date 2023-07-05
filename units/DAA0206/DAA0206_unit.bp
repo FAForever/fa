@@ -131,7 +131,7 @@ UnitBlueprint{
         AttackElevation = 0.5,
         Elevation = 12,
         FuelRechargeRate = 0,
-        FuelUseTime = 110,
+        FuelUseTime = 400,
         GroundCollisionOffset = -0.25,
         MaxSpeed = 13,
         MeshExtentsX = 1.5,
@@ -151,7 +151,7 @@ UnitBlueprint{
     StrategicIconSortPriority = 55,
     Transport = {
         AirClass = true,
-        TransportClass = 10,
+        TransportClass = 1,
     },
     Weapon = {
         {
@@ -163,7 +163,7 @@ UnitBlueprint{
             CollideFriendly = true,
             Damage = 30,
             DamageFriendly = true,
-            DamageRadius = 7,
+            DamageRadius = 7.5,
             DamageType = "Normal",
             DisplayName = "Kamikaze",
             DoTPulses = 20,
