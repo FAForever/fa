@@ -209,6 +209,51 @@ StructureUnit = ClassUnit(Unit) {
         if EntityCategoryContains(StructureUnitOnStartBeingBuiltRotateBuildings, self) then
             self:RotateTowardsEnemy()
         end
+
+        -- knock over trees
+        if layer == 'Land' then
+            local CreateLightParticle = CreateLightParticle
+
+            local army = self.Army
+            local position = self:GetPosition()
+            local blueprint = self.Blueprint
+            local blueprintPhysics = blueprint.Physics
+
+            -- matches what we do for build effects
+            local radius = math.max(
+                blueprintPhysics.MeshExtentsX or blueprint.SizeX or 0,
+                blueprintPhysics.MeshExtentsY or blueprint.SizeY or 0,
+                blueprintPhysics.MeshExtentsZ or blueprint.SizeZ or 0
+            )
+
+            -- apply twice to break tree groups
+            DamageArea(self, position, radius, 1, 'TreeForce', false, false)
+            DamageArea(self, position, radius, 1, 'TreeForce', false, false)
+
+            -- create a flash when the structure starts
+            CreateLightParticle( self, -1, army, 2 * radius, 22, 'glow_03', 'ramp_antimatter_02' )
+
+            -- includes units, need to filter those out
+            local entities = GetReclaimablesInRect(Rect(
+                position[1] - radius, position[3] - radius, position[1] + radius, position[3] + radius
+            ))
+
+            if entities then
+                for k, prop in entities do
+                    -- take out props that may linger around when building starts
+                    if prop.IsProp and not prop.Blueprint.CategoriesHash['OBSTRUCTSBUILDING'] then
+                        local center = prop:GetPosition()
+                        local dx = position[1] - center[1]
+                        local dz = position[3] - center[3]
+                        local d = dx * dx + dz * dz
+                        if d < radius * radius then
+                            CreateLightParticleIntel(prop, -1, army, 2, 6, 'glow_02', 'ramp_flare_02')
+                            prop:Destroy()
+                        end
+                    end
+                end
+            end
+        end
     end,
 
     ---@param self StructureUnit
