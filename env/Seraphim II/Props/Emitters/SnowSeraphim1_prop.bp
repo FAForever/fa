@@ -12,10 +12,6 @@ PropBlueprint {
         },
         UniformScale = 0,
     },
-    Economy = {
-        ReclaimEnergyMax = '',
-        ReclaimMassMax = '',
-    },
     Interface = {
         HelpText = 'Tundra blowing snow',
     },
