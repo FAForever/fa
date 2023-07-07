@@ -180,7 +180,7 @@ UnitBlueprint{
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
             MuzzleVelocity = 18,
-            ProjectileId = "/projectiles/X1Mercy_proj/X1Mercy_proj.bp",
+            ProjectileId = "/projectiles/AIFGuidedMissile01/AIFGuidedMissile01_proj.bp",
             ProjectileLifetime = 10,
             ProjectilesPerOnFire = 1,
             RackBones = {
