@@ -7,7 +7,12 @@
 local EffectTemplate = import("/lua/effecttemplates.lua")
 local RandomFloat = import("/lua/utilities.lua").GetRandomFloat
 
+---@class AIFQuanticCluster02 : AQuantumCluster
 AIFQuanticCluster02 = ClassProjectile(import("/lua/aeonprojectiles.lua").AQuantumCluster) {
+
+    ---@param self AIFQuanticCluster02
+    ---@param TargetType string unused
+    ---@param TargetEntity Unit unused
     OnImpact = function(self, TargetType, TargetEntity)
 
         local FxFragEffect = EffectTemplate.TFragmentationSensorShellFrag

@@ -3,14 +3,17 @@
 --
 local AMissileSerpentineProjectile = import("/lua/aeonprojectiles.lua").AMissileSerpentineProjectile
 
+---@class AIFMissileTactical01: AMissileSerpentineProjectile
 AIFMissileTactical01 = ClassProjectile(AMissileSerpentineProjectile) {
 
+    ---@param self AIFMissileTactical01
     OnCreate = function(self)
         AMissileSerpentineProjectile.OnCreate(self)
         self:SetCollisionShape('Sphere', 0, 0, 0, 2.0)
         self.Trash:Add(ForkThread( self.MovementThread,self ))
     end,
 
+    ---@param self AIFMissileTactical01
     MovementThread = function(self)
         self:SetTurnRate(8)
         WaitTicks(4)
@@ -20,6 +23,7 @@ AIFMissileTactical01 = ClassProjectile(AMissileSerpentineProjectile) {
         end
     end,
 
+    ---@param self AIFMissileTactical01
     SetTurnRateByDist = function(self)
         local dist = self:GetDistanceToTarget()
         --Get the nuke as close to 90 deg as possible
@@ -43,6 +47,7 @@ AIFMissileTactical01 = ClassProjectile(AMissileSerpentineProjectile) {
         end
     end,
 
+    ---@param self AIFMissileTactical01
     GetDistanceToTarget = function(self)
         local tpos = self:GetCurrentTargetPosition()
         local mpos = self:GetPosition()

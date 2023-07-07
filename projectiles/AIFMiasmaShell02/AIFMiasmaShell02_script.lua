@@ -8,5 +8,7 @@
 --  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 ------------------------------------------------------------
 local AMiasmaProjectile02 = import("/lua/aeonprojectiles.lua").AMiasmaProjectile02
+
+---@class AIFMiasmaShell02: AMiasmaProjectile02
 AIFMiasmaShell02 = ClassProjectile(AMiasmaProjectile02) { }
 TypeClass = AIFMiasmaShell02

@@ -1,5 +1,4 @@
 -- Aeon quantum 'bolt'
-
-local AQuantumCannonProjectile = import("/lua/aeonprojectiles.lua").AQuantumCannonProjectile
-ADFQuantumCannon01 = ClassProjectile(AQuantumCannonProjectile) {}
+---@class ADFQuantumCannon01: AQuantumCannonProjectile
+ADFQuantumCannon01 = ClassProjectile(import("/lua/aeonprojectiles.lua").AQuantumCannonProjectile) {}
 TypeClass = ADFQuantumCannon01

@@ -1,13 +1,18 @@
 -- Aeon Land-Based Tactical Missile
 
 local AMissileSerpentineProjectile = import("/lua/aeonprojectiles.lua").AMissileSerpentineProjectile
+
+---@class AIFMissileTactical02: AMissileSerpentineProjectile
 AIFMissileTactical02 = ClassProjectile(AMissileSerpentineProjectile) {
+
+    ---@param self AIFMissileTactical02
     OnCreate = function(self)
         AMissileSerpentineProjectile.OnCreate(self)
         self:SetCollisionShape('Sphere', 0, 0, 0, 2.0)
         self.Trash:Add(ForkThread( self.MovementThread,self ))
     end,
 
+    ---@param self AIFMissileTactical02
     MovementThread = function(self)
         self:TrackTarget(false)
         self:SetCollision(true)
@@ -23,6 +28,7 @@ AIFMissileTactical02 = ClassProjectile(AMissileSerpentineProjectile) {
         end
     end,
 
+    ---@param self AIFMissileTactical02
     SetTurnRateByDist = function(self)
         local dist = self:GetDistanceToTarget()
         if dist > 125 and self.MovementTurnLevel < 2 then
@@ -40,6 +46,7 @@ AIFMissileTactical02 = ClassProjectile(AMissileSerpentineProjectile) {
         end
     end,
 
+    ---@param self AIFMissileTactical02
     GetDistanceToTarget = function(self)
         local tpos = self:GetCurrentTargetPosition()
         local mpos = self:GetPosition()
