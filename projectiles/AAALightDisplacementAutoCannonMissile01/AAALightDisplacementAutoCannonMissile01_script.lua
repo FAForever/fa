@@ -1,6 +1,4 @@
--- Aeon Anti Air Missile
-
--- xaa0202
-local AAALightDisplacementAutocannonMissileProjectile = import("/lua/aeonprojectiles.lua").AAALightDisplacementAutocannonMissileProjectile
-AAALightDisplacementAutocannonMissile= Class(AAALightDisplacementAutocannonMissileProjectile) { }
+-- Aeon Anti Air Missile | xaa0202
+---@class AAALightDisplacementAutocannonMissile: AAALightDisplacementAutocannonMissileProjectile
+AAALightDisplacementAutocannonMissile= Class(import("/lua/aeonprojectiles.lua").AAALightDisplacementAutocannonMissileProjectile) { }
 TypeClass = AAALightDisplacementAutocannonMissile

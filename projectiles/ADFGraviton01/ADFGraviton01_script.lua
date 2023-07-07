@@ -1,5 +1,4 @@
 -- Aeon sonic 'bolt'
-
-local AGravitonProjectile = import("/lua/aeonprojectiles.lua").AGravitonProjectile
-ADFGraviton01 = ClassProjectile(AGravitonProjectile) {}
+---@class ADFGraviton01: AGravitonProjectile
+ADFGraviton01 = ClassProjectile(import("/lua/aeonprojectiles.lua").AGravitonProjectile) {}
 TypeClass = ADFGraviton01

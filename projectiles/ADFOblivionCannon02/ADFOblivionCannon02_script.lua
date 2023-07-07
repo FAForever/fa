@@ -1,4 +1,4 @@
 -- Aeon quantum 'bolt'
-local AOblivionCannonProjectile = import("/lua/aeonprojectiles.lua").AOblivionCannonProjectile
-ADFOblivionCannon02 = ClassProjectile(AOblivionCannonProjectile) {}
+---@class ADFOblivionCannon02: AOblivionCannonProjectile
+ADFOblivionCannon02 = ClassProjectile(import("/lua/aeonprojectiles.lua").AOblivionCannonProjectile) {}
 TypeClass = ADFOblivionCannon02

@@ -1,5 +1,4 @@
 -- Aeon laser 'bolt'
-
-local AHighIntensityLaserProjectile = import("/lua/aeonprojectiles.lua").AHighIntensityLaserProjectile
-ADFLaserHighIntensity01 = ClassProjectile(AHighIntensityLaserProjectile) {}
+---@class ADFLaserHighIntensity01: AHighIntensityLaserProjectile
+ADFLaserHighIntensity01 = ClassProjectile(import("/lua/aeonprojectiles.lua").AHighIntensityLaserProjectile) {}
 TypeClass = ADFLaserHighIntensity01

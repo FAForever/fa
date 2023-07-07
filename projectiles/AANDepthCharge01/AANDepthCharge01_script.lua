@@ -1,16 +1,19 @@
 -- Depth Charge Script
 local ADepthChargeProjectile = import("/lua/aeonprojectiles.lua").ADepthChargeProjectile
-local VisionMarkerOpti = import("/lua/sim/VizMarker.lua").VisionMarkerOpti
+local VisionMarkerOpti = import("/lua/sim/vizmarker.lua").VisionMarkerOpti
 
+---@class AANDepthCharge01: ADepthChargeProjectile
 AANDepthCharge01 = ClassProjectile(ADepthChargeProjectile) {
     CountdownLengthInTicks = 101,
 
+    ---@param self AANDepthCharge01
     OnCreate = function(self)
         ADepthChargeProjectile.OnCreate(self)
         self.HasImpacted = false
         self.Trash:Add(ForkThread(self.CountdownExplosion, self))
     end,
 
+    ---@param self AANDepthCharge01
     CountdownExplosion = function(self)
         WaitTicks(self.CountdownLengthInTicks)
         if not self.HasImpacted then
@@ -18,6 +21,7 @@ AANDepthCharge01 = ClassProjectile(ADepthChargeProjectile) {
         end
     end,
 
+    ---@param self AANDepthCharge01
     OnEnterWater = function(self)
         ADepthChargeProjectile.OnEnterWater(self)
         self:SetMaxSpeed(20)
@@ -26,12 +30,14 @@ AANDepthCharge01 = ClassProjectile(ADepthChargeProjectile) {
         self:SetTurnRate(180)
     end,
 
+    ---@param self AANDepthCharge01
     OnLostTarget = function(self)
         self:SetMaxSpeed(2)
         self:SetAcceleration(-0.6)
         self.Trash:Add(ForkThread(self.CountdownMovement, self))
     end,
 
+    ---@param self AANDepthCharge01
     CountdownMovement = function(self)
         WaitTicks(31)
         self:SetMaxSpeed(0)
@@ -39,6 +45,9 @@ AANDepthCharge01 = ClassProjectile(ADepthChargeProjectile) {
         self:SetVelocity(0)
     end,
 
+    ---@param self AANDepthCharge01
+    ---@param TargetType string
+    ---@param TargetEntity Unit
     OnImpact = function(self, TargetType, TargetEntity)
         local px, _, pz = self:GetPositionXYZ()
         local marker = VisionMarkerOpti({Owner = self})

@@ -5,6 +5,6 @@
 -- Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------------------------------------------------------
 
-local AAALightDisplacementAutocannonMissileProjectile = import("/lua/aeonprojectiles.lua").AAALightDisplacementAutocannonMissileProjectile
-AAALightDisplacementAutoCannon01 = ClassProjectile(AAALightDisplacementAutocannonMissileProjectile) { }
+---@class AAALightDisplacementAutoCannon01: AAALightDisplacementAutocannonMissileProjectile
+AAALightDisplacementAutoCannon01 = ClassProjectile(import("/lua/aeonprojectiles.lua").AAALightDisplacementAutocannonMissileProjectile) { }
 TypeClass = AAALightDisplacementAutoCannon01

@@ -1,6 +1,4 @@
-
 -- Sub-Based Torpedo Script
-
-local ATorpedoSubProjectile = import("/lua/aeonprojectiles.lua").ATorpedoSubProjectile
-AANTorpedo01 = ClassProjectile(ATorpedoSubProjectile) {}
+---@class AANTorpedo01: ATorpedoSubProjectile
+AANTorpedo01 = ClassProjectile(import("/lua/aeonprojectiles.lua").ATorpedoSubProjectile) {}
 TypeClass = AANTorpedo01
