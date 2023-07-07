@@ -212,7 +212,13 @@ StructureUnit = ClassUnit(Unit) {
 
         -- procedure to remove props that do not obstruct the building
         local blueprint = self.Blueprint
-        if layer == 'Land' and blueprint.General.UpgradesFrom != builder.Blueprint.BlueprintId then
+        if 
+            -- do not apply for naval factories
+            layer == 'Land' and
+
+            -- do not apply to upgrades
+            blueprint.General.UpgradesFrom != builder.Blueprint.BlueprintId
+        then
             local CreateLightParticle = CreateLightParticle
 
             local army = self.Army
