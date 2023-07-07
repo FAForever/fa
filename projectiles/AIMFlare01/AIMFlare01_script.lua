@@ -7,7 +7,10 @@
 local Flare = import("/lua/defaultantiprojectile.lua").Flare
 local AIMFlareProjectile = import("/lua/aeonprojectiles.lua").AIMFlareProjectile
 
+---@class AIMFlare01: AIMFlareProjectile
 AIMFlare01 = ClassProjectile(AIMFlareProjectile) {
+
+    ---@param self AIMFlare01
     OnCreate = function(self)
         AIMFlareProjectile.OnCreate(self)
         self.MyShield = Flare {
@@ -18,7 +21,11 @@ AIMFlare01 = ClassProjectile(AIMFlareProjectile) {
         self:TrackTarget(false)
         self:SetVelocity(0, -1, 0)
     end,
+
     -- We only destroy when we hit the ground/water.
+    ---@param self AIMFlare01
+    ---@param type string
+    ---@param other Unit
     OnImpact = function(self,type,other)
         if type == 'Terrain' or type == 'Water' then
             AIMFlareProjectile.OnImpact(self,type,other)

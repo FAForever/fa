@@ -8,7 +8,10 @@
 import("/lua/utilities.lua")
 CAANanoDartProjectile = import("/lua/cybranprojectiles.lua").CAANanoDartProjectile02
 
+---@class CAANanoDart04: CAANanoDartProjectile
 CAANanoDart04 = ClassProjectile(CAANanoDartProjectile) {
+
+    ---@param self CAANanoDart04
     OnCreate = function(self)
         CAANanoDartProjectile.OnCreate(self)
         --Set the orientation of this thing to facing the target from the beginning.
@@ -20,6 +23,7 @@ CAANanoDart04 = ClassProjectile(CAANanoDartProjectile) {
         self.Trash:Add(ForkThread(self.UpdateThread,self))
    end,
 
+    ---@param self CAANanoDart04
     UpdateThread = function(self)
         self:SetMaxSpeed(50)                --Immediately go to max speed.
         WaitTicks(3)                   --Wait for a small amount of time

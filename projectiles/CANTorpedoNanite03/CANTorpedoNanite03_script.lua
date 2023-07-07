@@ -9,5 +9,7 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 local CTorpedoShipProjectile = import("/lua/cybranprojectiles.lua").CTorpedoShipProjectile
+
+---@class CANTorpedoNanite03: CTorpedoShipProjectile
 CANTorpedoNanite03 = ClassProjectile(CTorpedoShipProjectile) { }
 TypeClass = CANTorpedoNanite03

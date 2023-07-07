@@ -8,10 +8,12 @@ local NullShell = import("/lua/sim/defaultprojectiles.lua").NullShell
 local RandomFloat = import("/lua/utilities.lua").GetRandomFloat
 local EffectTemplate = import("/lua/effecttemplates.lua")
 
+---@class AIFQuantumWarhead02 : NullShell
 AIFQuantumWarhead02 = ClassProjectile(NullShell) {
     NormalEffects = {'/effects/emitters/quantum_warhead_01_emit.bp',},
     CloudFlareEffects = EffectTemplate.CloudFlareEffects01,
 
+    ---@param self AIFQuantumWarhead02
     EffectThread = function(self)
         CreateLightParticle(self, -1, self.Army, 200, 200, 'beam_white_01', 'ramp_quantum_warhead_flash_01')
 
@@ -24,6 +26,8 @@ AIFQuantumWarhead02 = ClassProjectile(NullShell) {
         end
     end,
 
+    ---@param self AIFQuantumWarhead02
+    ---@param army number
     ShakeAndBurnMe = function(self, army)
         self:ShakeCamera(75, 3, 0, 10)
         WaitTicks(6)
@@ -35,6 +39,8 @@ AIFQuantumWarhead02 = ClassProjectile(NullShell) {
         self:ShakeCamera(75, 1, 0, 15)
     end,
 
+    ---@param self AIFQuantumWarhead02
+    ---@param army number unused
     InnerCloudFlares = function(self, army)
         local numFlares = 50
         local angle = (2*math.pi) / numFlares
@@ -70,6 +76,7 @@ AIFQuantumWarhead02 = ClassProjectile(NullShell) {
         CreateEmitterAtEntity(self, army, '/effects/emitters/quantum_warhead_ring_01_emit.bp')
     end,
 
+    ---@param self AIFQuantumWarhead02
     DistortionField = function(self)
         local proj = self:CreateProjectile('/effects/QuantumWarhead/QuantumWarheadEffect01_proj.bp')
         local scale = proj.Blueprint.Display.UniformScale
