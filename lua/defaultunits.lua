@@ -200,7 +200,7 @@ StructureUnit = ClassUnit(Unit) {
     end,
 
     ---@param self StructureUnit
-    ---@param builder Builder
+    ---@param builder Unit
     ---@param layer Layer
     OnStartBeingBuilt = function(self, builder, layer)
         Unit.OnStartBeingBuilt(self, builder, layer)
@@ -210,13 +210,13 @@ StructureUnit = ClassUnit(Unit) {
             self:RotateTowardsEnemy()
         end
 
-        -- knock over trees
-        if layer == 'Land' then
+        -- procedure to remove props that do not obstruct the building
+        local blueprint = self.Blueprint
+        if layer == 'Land' and blueprint.General.UpgradesFrom != builder.Blueprint.BlueprintId then
             local CreateLightParticle = CreateLightParticle
 
             local army = self.Army
             local position = self:GetPosition()
-            local blueprint = self.Blueprint
             local blueprintPhysics = blueprint.Physics
 
             -- matches what we do for build effects
