@@ -1,9 +1,8 @@
---
 -- CDFProtonCannon03
---
 local CDFProtonCannonProjectile = import("/lua/cybranprojectiles.lua").CDFProtonCannonProjectile
 local EffectTemplate = import("/lua/effecttemplates.lua")
 
+---@class CDFProtonCannon03 : CDFProtonCannonProjectile
 CDFProtonCannon03 = ClassProjectile(CDFProtonCannonProjectile) {
 
     FxTrails = EffectTemplate.CProtonCannonFXTrail02,

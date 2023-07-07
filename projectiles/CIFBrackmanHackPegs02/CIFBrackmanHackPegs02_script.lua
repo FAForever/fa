@@ -9,7 +9,12 @@ local RandomInt = import("/lua/utilities.lua").GetRandomInt
 local EffectTemplate = import("/lua/effecttemplates.lua")
 
 --This one should just like be something kind of new compared to the older version
+---@class CIFBrackmanHackPegs02 : CDFBrackmanHackPegProjectile02
 CIFBrackmanHackPegs02 = ClassProjectile(import("/lua/cybranprojectiles.lua").CDFBrackmanHackPegProjectile02) {
+
+    ---@param self CIFBrackmanHackPegs02
+    ---@param TargetType string unused
+    ---@param TargetEntity Unit unused
     OnImpact = function(self, TargetType, TargetEntity)
         self:SetVelocity(0)
         self:SetBallisticAcceleration(0)
@@ -20,10 +25,13 @@ CIFBrackmanHackPegs02 = ClassProjectile(import("/lua/cybranprojectiles.lua").CDF
 		end
     end,
 
+    ---@param self CIFBrackmanHackPegs02
+    ---@param NewPosition Vector
     SetTargetPosition= function(self, NewPosition) 
         TargetPos= NewPosition
     end,
 
+    ---@param self CIFBrackmanHackPegs02
     WaitingForDeath = function(self)
         local WaitTime
         local PrimaryHackProjectiles = {
