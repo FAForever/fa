@@ -156,7 +156,7 @@ UnitBlueprint{
     Physics = {
         BankingSlope = 0,
         DragCoefficient = 0.2,
-        LandSpeedMultiplier = 1,
+        SniperModeSpeedMultiplier = 0.75,
         MaxAcceleration = 2.4,
         MaxBrake = 2.4,
         MaxSpeed = 2.4,

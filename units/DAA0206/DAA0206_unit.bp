@@ -131,7 +131,7 @@ UnitBlueprint{
         AttackElevation = 0.5,
         Elevation = 12,
         FuelRechargeRate = 0,
-        FuelUseTime = 110,
+        FuelUseTime = 400,
         GroundCollisionOffset = -0.25,
         MaxSpeed = 13,
         MeshExtentsX = 1.5,
@@ -151,7 +151,7 @@ UnitBlueprint{
     StrategicIconSortPriority = 55,
     Transport = {
         AirClass = true,
-        TransportClass = 10,
+        TransportClass = 1,
     },
     Weapon = {
         {
@@ -161,9 +161,9 @@ UnitBlueprint{
             },
             BallicsticArc = "RULEUBA_None",
             CollideFriendly = true,
-            Damage = 30,
+            Damage = 79,
             DamageFriendly = true,
-            DamageRadius = 7,
+            DamageRadius = 7.5,
             DamageType = "Normal",
             DisplayName = "Kamikaze",
             DoTPulses = 20,
@@ -180,7 +180,7 @@ UnitBlueprint{
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
             MuzzleVelocity = 18,
-            ProjectileId = "/projectiles/X1Mercy_proj/X1Mercy_proj.bp",
+            ProjectileId = "/projectiles/AIFGuidedMissile01/AIFGuidedMissile01_proj.bp",
             ProjectileLifetime = 10,
             ProjectilesPerOnFire = 1,
             RackBones = {
