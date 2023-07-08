@@ -4,5 +4,8 @@
 -- Summary  :  Aeon Quantum Autogun Projectile script, XAL0203
 -- Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --------------------------------------------------------------------------------------
-ADFQuatumAutoGun01 = ClassProjectile(import("/lua/aeonprojectiles.lua").AQuantumAutogun) {}
+local AQuantumAutogun = import("/lua/aeonprojectiles.lua").AQuantumAutogun
+
+---@class ADFQuatumAutoGun01: AQuantumAutogun
+ADFQuatumAutoGun01 = ClassProjectile(AQuantumAutogun) {}
 TypeClass = ADFQuatumAutoGun01

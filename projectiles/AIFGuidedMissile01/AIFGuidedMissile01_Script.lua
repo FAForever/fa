@@ -8,7 +8,10 @@ local AGuidedMissileProjectile = import("/lua/aeonprojectiles.lua").AGuidedMissi
 local RandF = import("/lua/utilities.lua").GetRandomFloat
 local EffectTemplate = import("/lua/effecttemplates.lua")
 
+---@class AIFGuidedMissile: AGuidedMissileProjectile
 AIFGuidedMissile = ClassProjectile(AGuidedMissileProjectile) {
+
+    ---@param self AIFGuidedMissile
     OnCreate = function(self)
 		AGuidedMissileProjectile.OnCreate(self)
         local launcher = self.Launcher
@@ -18,6 +21,7 @@ AIFGuidedMissile = ClassProjectile(AGuidedMissileProjectile) {
 		self.Trash:Add(ForkThread( self.SplitThread,self ))
     end,
 
+    ---@param self AIFGuidedMissile
     SplitThread = function(self)
         ------Create/play the split effects.
 		for k,v in EffectTemplate.AMercyGuidedMissileSplit do

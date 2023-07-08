@@ -5,7 +5,13 @@
 -- Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 ------------------------------------------------------------------------------------------
 local ADisruptorProjectile = import("/lua/aeonprojectiles.lua").AShieldDisruptorProjectile
+
+---@class ADFShieldDisruptor01: ADisruptorProjectile
 ADFShieldDisruptor01 = ClassProjectile(ADisruptorProjectile) {
+
+    ---@param self ADFShieldDisruptor01
+    ---@param TargetType string
+    ---@param TargetEntity Unit
     OnImpact = function(self, TargetType, TargetEntity)
         ADisruptorProjectile.OnImpact(self, TargetType, TargetEntity)
         if TargetType ~= 'Shield' then

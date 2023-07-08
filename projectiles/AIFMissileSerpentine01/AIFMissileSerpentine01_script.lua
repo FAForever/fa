@@ -1,13 +1,17 @@
--- Aeon Serpentine Missile
-
 local AMissileSerpentineProjectile = import("/lua/aeonprojectiles.lua").AMissileSerpentineProjectile
+
+-- Aeon Serpentine Missile
+---@class AIFMissileSerpentine01: AMissileSerpentineProjectile
 AIFMissileSerpentine01 = ClassProjectile(AMissileSerpentineProjectile) {
+
+    ---@param self AIFMissileSerpentine01
     OnCreate = function(self)
         AMissileSerpentineProjectile.OnCreate(self)
         self:SetCollisionShape('Sphere', 0, 0, 0, 2)
         self.MoveThread = self.Trash:Add(ForkThread(self.MovementThread,self))
     end,
 
+    ---@param self AIFMissileSerpentine01
     MovementThread = function(self)
         self.Distance = self:GetDistanceToTarget()
         self:SetTurnRate(8)
@@ -18,6 +22,7 @@ AIFMissileSerpentine01 = ClassProjectile(AMissileSerpentineProjectile) {
         end
     end,
 
+    ---@param self AIFMissileSerpentine01
     SetTurnRateByDist = function(self)
         local dist = self:GetDistanceToTarget()
         if dist > self.Distance then
@@ -42,6 +47,7 @@ AIFMissileSerpentine01 = ClassProjectile(AMissileSerpentineProjectile) {
         end
     end,
 
+    ---@param self AIFMissileSerpentine01
     GetDistanceToTarget = function(self)
         local tpos = self:GetCurrentTargetPosition()
         local mpos = self:GetPosition()
