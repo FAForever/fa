@@ -1,6 +1,6 @@
--- Aeon quantum 'bolt'
 local AQuantumCannonProjectile = import("/lua/aeonprojectiles.lua").AQuantumCannonProjectile
 
+-- Aeon quantum 'bolt'
 ---@class ADFQuantumCannon02: AQuantumCannonProjectile
 ADFQuantumCannon02 = ClassProjectile(AQuantumCannonProjectile) {
     FxTrails = {

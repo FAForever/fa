@@ -6,9 +6,10 @@
 ----------------------------------------------------------------------------------------
 local EffectTemplate = import("/lua/effecttemplates.lua")
 local RandomFloat = import("/lua/utilities.lua").GetRandomFloat
+local AIFQuanticCluster01 = import("/lua/aeonprojectiles.lua").AIFQuanticCluster01
 
 ---@class AIFQuanticCluster01 : AQuantumCluster
-AIFQuanticCluster01 = ClassProjectile(import("/lua/aeonprojectiles.lua").AQuantumCluster) {
+AIFQuanticCluster01 = ClassProjectile(AIFQuanticCluster01) {
 
     ---@param self AIFQuanticCluster01
     ---@param TargetType string unused

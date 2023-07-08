@@ -1,7 +1,6 @@
--- Serpentine Missile 03
-
 local AMissileSerpentine02Projectile = import("/lua/aeonprojectiles.lua").AMissileSerpentine02Projectile
 
+-- Serpentine Missile 03
 ---@class AIFMissileTactical02: AMissileSerpentine02Projectile
 AIFMissileTactical02 = ClassProjectile(AMissileSerpentine02Projectile) {
 
