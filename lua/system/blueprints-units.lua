@@ -48,9 +48,12 @@ local function CalculatedDamage(weapon)
     return ((weapon.Damage or 0) + (weapon.NukeInnerRingDamage or 0)) * ProjectileCount * (weapon.DoTPulses or 1)
 end
 
+--- Determines the expected Damage Per Second (dps) of the weapon
 ---@param weapon WeaponBlueprint
 ---@return number
-local function CalculatedDPS(weapon)
+local function DetermineWeaponDPS(weapon)
+    --- With thanks to Sean 'Balthazar' Wheeldon
+
     -- Base values
     local ProjectileCount
     if weapon.MuzzleSalvoDelay == 0 then
@@ -76,7 +79,32 @@ local function CalculatedDPS(weapon)
         Damage = Damage * (weapon.BeamLifetime / (0.1 + (weapon.BeamCollisionDelay or 0)))
     end
 
-    return Damage / DamageInterval or 0
+    return (Damage / DamageInterval) or 0
+end
+
+--- Determines the expected weapon category
+---@param weapon WeaponBlueprint
+---@return WeaponRangeCategory?
+local function DetermineWeaponCategory(weapon)
+    --- With thanks to Sean 'Balthazar' Wheeldon
+
+    if weapon.RangeCategory == 'UWRC_AntiAir' or weapon.TargetRestrictOnlyAllow == 'AIR' or StringFind(weapon.WeaponCategory or 'nope', 'Anti Air') then
+        return 'UWRC_AntiAir'
+    end
+
+    if weapon.RangeCategory == 'UWRC_AntiNavy' or StringFind(weapon.WeaponCategory or 'nope', 'Anti Navy') then
+        return 'UWRC_AntiNavy'
+    end
+
+    if weapon.RangeCategory == 'UWRC_DirectFire' or StringFind(weapon.WeaponCategory or 'nope', 'Direct Fire') then
+        return 'UWRC_DirectFire'
+    end
+
+    if weapon.RangeCategory == 'UWRC_IndirectFire' or StringFind(weapon.WeaponCategory or 'nope', 'Artillery') then
+        return 'UWRC_IndirectFire'
+    end
+
+    return nil
 end
 
 --- Post process a unit
@@ -397,8 +425,9 @@ local function PostProcessUnit(unit)
         }
 
         for k, weapon in weapons do
-            local dps = CalculatedDPS(weapon)
-            if weapon.RangeCategory then
+            local dps = DetermineWeaponDPS(weapon)
+            local category = DetermineWeaponCategory(weapon)
+            if category then
                 damagePerRangeCategory[weapon.RangeCategory] = damagePerRangeCategory[weapon.RangeCategory] + dps
             else
                 if weapon.WeaponCategory != 'Death' then
