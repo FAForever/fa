@@ -476,7 +476,7 @@ local function PostProcessUnit(unit)
                     LOG(" - Overlay for: " .. category)
                 end
 
-                if damage < 0.2 * factor then
+                if (not unit.CategoriesHash['COMMAND']) and damage < 0.2 * factor then
                     local cat = category .. "WEAK"
                     table.insert(unit.Categories, cat)
                     unit.CategoriesHash[cat] = true
