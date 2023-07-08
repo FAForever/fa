@@ -89,19 +89,19 @@ local function DetermineWeaponCategory(weapon)
     --- With thanks to Sean 'Balthazar' Wheeldon
 
     if weapon.RangeCategory == 'UWRC_AntiAir' or weapon.TargetRestrictOnlyAllow == 'AIR' or StringFind(weapon.WeaponCategory or 'nope', 'Anti Air') then
-        return 'UWRC_AntiAir'
+        return 'ANTIAIR'
     end
 
     if weapon.RangeCategory == 'UWRC_AntiNavy' or StringFind(weapon.WeaponCategory or 'nope', 'Anti Navy') then
-        return 'UWRC_AntiNavy'
+        return 'ANTINAVY'
     end
 
     if weapon.RangeCategory == 'UWRC_DirectFire' or StringFind(weapon.WeaponCategory or 'nope', 'Direct Fire') then
-        return 'UWRC_DirectFire'
+        return 'DIRECTFIRE'
     end
 
     if weapon.RangeCategory == 'UWRC_IndirectFire' or StringFind(weapon.WeaponCategory or 'nope', 'Artillery') then
-        return 'UWRC_IndirectFire'
+        return 'INDIRECTFIRE'
     end
 
     return nil
@@ -417,10 +417,10 @@ local function PostProcessUnit(unit)
 
         -- determine total dps per category
         local damagePerRangeCategory = {
-            UWRC_DirectFire = 0,
-            UWRC_IndirectFire = 0,
-            UWRC_AntiAir = 0,
-            UWRC_AntiNavy = 0,
+            DIRECTFIRE = 0,
+            INDIRECTFIRE = 0,
+            ANTIAIR = 0,
+            ANTINAVY = 0,
             UWRC_Countermeasure = 0,
         }
 
@@ -428,7 +428,7 @@ local function PostProcessUnit(unit)
             local dps = DetermineWeaponDPS(weapon)
             local category = DetermineWeaponCategory(weapon)
             if category then
-                damagePerRangeCategory[weapon.RangeCategory] = damagePerRangeCategory[weapon.RangeCategory] + dps
+                damagePerRangeCategory[category] = damagePerRangeCategory[category] + dps
             else
                 if weapon.WeaponCategory != 'Death' then
                     -- WARN("Invalid weapon on " .. unit.BlueprintId)
@@ -438,21 +438,21 @@ local function PostProcessUnit(unit)
 
         local array = {
             {
-                RangeCategory = "UWRC_DirectFire",
-                Damage = damagePerRangeCategory["UWRC_DirectFire"]
+                RangeCategory = "DIRECTFIRE",
+                Damage = damagePerRangeCategory["DIRECTFIRE"]
             },
             {
-                RangeCategory = "UWRC_IndirectFire",
-                Damage = damagePerRangeCategory["UWRC_IndirectFire"]
+                RangeCategory = "INDIRECTFIRE",
+                Damage = damagePerRangeCategory["INDIRECTFIRE"]
             },
             {
-                RangeCategory = "UWRC_AntiAir",
-                Damage = damagePerRangeCategory["UWRC_AntiAir"]
+                RangeCategory = "ANTIAIR",
+                Damage = damagePerRangeCategory["ANTIAIR"]
             }
             ,
             {
-                RangeCategory = "UWRC_AntiNavy",
-                Damage = damagePerRangeCategory["UWRC_AntiNavy"]
+                RangeCategory = "ANTINAVY",
+                Damage = damagePerRangeCategory["ANTINAVY"]
             }
             ,
             {
@@ -466,8 +466,23 @@ local function PostProcessUnit(unit)
         local factor = array[1].Damage
 
         for category, damage in damagePerRangeCategory do
-            if damage > 0 and damage < 0.2 * factor then
-                LOG(" - Weak in: " .. category)
+            if damage > 0 then
+
+                local cat = "OVERLAY" .. category
+                if not unit.CategoriesHash[cat] then
+                    table.insert(unit.Categories, cat)
+                    unit.CategoriesHash[cat] = true
+                    unit.CategoriesCount = unit.CategoriesCount + 1
+                    LOG(" - Overlay for: " .. category)
+                end
+
+                if damage < 0.2 * factor then
+                    local cat = category .. "WEAK"
+                    table.insert(unit.Categories, cat)
+                    unit.CategoriesHash[cat] = true
+                    unit.CategoriesCount = unit.CategoriesCount + 1
+                    LOG(" - Weak in: " .. category)
+                end
             end
         end
     end
