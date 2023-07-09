@@ -1,8 +1,6 @@
---
--- AA Missile for Cybrans
---
 local CAAMissileNaniteProjectile = import("/lua/cybranprojectiles.lua").CAAMissileNaniteProjectile03
 
+-- AA Missile for Cybrans
 ---@class CAAMissileNanite03: CAAMissileNaniteProjectile
 CAAMissileNanite03 = ClassProjectile(CAAMissileNaniteProjectile) {
 
@@ -23,7 +21,7 @@ CAAMissileNanite03 = ClassProjectile(CAAMissileNaniteProjectile) {
 
     ---@param self CAAMissileNanite03
     ---@param TargetType string
-    ---@param TargetEntity Unit
+    ---@param TargetEntity Unit|nil
     OnImpact = function(self, TargetType, TargetEntity)
         CAAMissileNaniteProjectile.OnImpact(self, TargetType, TargetEntity)
     end,

@@ -1,7 +1,6 @@
+local CAANanoDartProjectile = import("/lua/cybranprojectiles.lua").CAANanoDartProjectile
+
 -- Cybran Anti Air Projectile
-
-CAANanoDartProjectile = import("/lua/cybranprojectiles.lua").CAANanoDartProjectile
-
 ---@class CAANanoDart01: CAANanoDartProjectile
 CAANanoDart01 = ClassProjectile(CAANanoDartProjectile) {
 
@@ -25,5 +24,4 @@ CAANanoDart01 = ClassProjectile(CAANanoDartProjectile) {
 
     end,
 }
-
 TypeClass = CAANanoDart01

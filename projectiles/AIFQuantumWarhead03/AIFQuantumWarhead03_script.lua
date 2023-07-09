@@ -1,8 +1,6 @@
---
--- Aeon Quantum Distortion Warhead, nuke launched
---
 local AQuantumWarheadProjectile = import("/lua/aeonprojectiles.lua").AQuantumWarheadProjectile
 
+-- Aeon Quantum Distortion Warhead, nuke launched
 ---@class AIFQuantumWarhead03: AQuantumWarheadProjectile
 AIFQuantumWarhead03 = ClassProjectile(AQuantumWarheadProjectile) {
     Beams = {'/effects/emitters/aeon_nuke_exhaust_beam_02_emit.bp',},

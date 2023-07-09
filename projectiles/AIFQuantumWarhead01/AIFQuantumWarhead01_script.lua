@@ -1,6 +1,6 @@
--- Aeon Quantum Distortion Warhead
 local AQuantumWarheadProjectile = import("/lua/aeonprojectiles.lua").AQuantumWarheadProjectile
 
+-- Aeon Quantum Distortion Warhead
 ---@class AIFQuantumWarhead01: AQuantumWarheadProjectile
 AIFQuantumWarhead01 = ClassProjectile(AQuantumWarheadProjectile) {
 

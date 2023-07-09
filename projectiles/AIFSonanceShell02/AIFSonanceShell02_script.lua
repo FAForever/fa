@@ -1,8 +1,7 @@
--- Aeon T3 Static Artillery Projectile : uab2302
-
 local AArtilleryProjectile = import("/lua/aeonprojectiles.lua").AArtilleryProjectile
 local EffectTemplate = import("/lua/effecttemplates.lua")
 
+-- Aeon T3 Static Artillery Projectile : uab2302
 ---@class AIFSonanceShell02: AArtilleryProjectile
 AIFSonanceShell02 = ClassProjectile(AArtilleryProjectile) {
     FxTrails = EffectTemplate.ASonanceWeaponFXTrail02,

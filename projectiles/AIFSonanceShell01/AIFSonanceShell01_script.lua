@@ -1,9 +1,7 @@
--- Aeon T3 Mobile Artillery Projectile : ual0304
-
-
 local AArtilleryProjectile = import("/lua/aeonprojectiles.lua").AArtilleryProjectile
 local EffectTemplate = import("/lua/effecttemplates.lua")
 
+-- Aeon T3 Mobile Artillery Projectile : ual0304
 ---@class AIFSonanceShell01: AArtilleryProjectile
 AIFSonanceShell01 = ClassProjectile(AArtilleryProjectile) {
 
