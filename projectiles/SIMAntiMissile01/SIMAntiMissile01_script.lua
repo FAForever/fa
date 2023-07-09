@@ -1,6 +1,6 @@
---
+local SIMAntiMissile = import("/lua/seraphimprojectiles.lua").SIMAntiMissile01
+
 -- Seraphim Anti Tactical
---
-local SIMAntiMissile01 = import("/lua/seraphimprojectiles.lua").SIMAntiMissile01
-SIMAntiMissile01 = ClassProjectile(SIMAntiMissile01) {}
+---@class SIMAntiMissile01 : SIMAntiMissile01
+SIMAntiMissile01 = ClassProjectile(SIMAntiMissile) {}
 TypeClass = SIMAntiMissile01

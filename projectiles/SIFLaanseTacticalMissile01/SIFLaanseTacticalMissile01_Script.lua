@@ -5,13 +5,17 @@
 ---------------------------------------------------------------------------------------------------
 local SLaanseTacticalMissile = import("/lua/seraphimprojectiles.lua").SLaanseTacticalMissile
 
+---@class SIFLaanseTacticalMissile01 : SLaanseTacticalMissile
 SIFLaanseTacticalMissile01 = ClassProjectile(SLaanseTacticalMissile) {
+
+    ---@param self SIFLaanseTacticalMissile01
     OnCreate = function(self)
         SLaanseTacticalMissile.OnCreate(self)
         self:SetCollisionShape('Sphere', 0, 0, 0, 2)
         self.MoveThread = self:ForkThread(self.MovementThread)
     end,
 
+    ---@param self SIFLaanseTacticalMissile01
     MovementThread = function(self)
         self.Distance = self:GetDistanceToTarget()
         self:SetTurnRate(8)
@@ -22,6 +26,7 @@ SIFLaanseTacticalMissile01 = ClassProjectile(SLaanseTacticalMissile) {
         end
     end,
 
+    ---@param self SIFLaanseTacticalMissile01
     SetTurnRateByDist = function(self)
         local dist = self:GetDistanceToTarget()
         if dist > self.Distance then
@@ -47,6 +52,7 @@ SIFLaanseTacticalMissile01 = ClassProjectile(SLaanseTacticalMissile) {
         end
     end,        
 
+    ---@param self SIFLaanseTacticalMissile01
     GetDistanceToTarget = function(self)
         local tpos = self:GetCurrentTargetPosition()
         local mpos = self:GetPosition()

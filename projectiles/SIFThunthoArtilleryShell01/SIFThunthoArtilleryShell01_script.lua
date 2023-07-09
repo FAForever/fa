@@ -23,7 +23,12 @@ local ProjectileCreateChildProjectile = _G.moho.projectile_methods.CreateChildPr
 local ProjectileSetVelocity = _G.moho.projectile_methods.SetVelocity
 local ProjectileGetVelocity = _G.moho.projectile_methods.GetVelocity
 
+---@class SIFThunthoArtilleryShell01 : SThunthoArtilleryShell
 SIFThunthoArtilleryShell01 = ClassProjectile(SThunthoArtilleryShell) {
+
+    ---@param self SIFThunthoArtilleryShell01
+    ---@param TargetType string unused
+    ---@param TargetEntity Unit unused
     OnImpact = function(self, TargetType, TargetEntity) 
 
         -- the split fx

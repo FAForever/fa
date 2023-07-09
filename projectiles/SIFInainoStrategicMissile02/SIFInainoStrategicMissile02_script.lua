@@ -6,6 +6,7 @@
 ---------------------------------------------------------------------------------------------------
 local SIFInainoStrategicMissile = import("/lua/seraphimprojectiles.lua").SIFInainoStrategicMissile
 
+---@class SIFInainoStrategicMissile02 : SIFInainoStrategicMissile
 SIFInainoStrategicMissile02 = ClassProjectile(SIFInainoStrategicMissile) {
     FxSplashScale = 0.5,
     FxTrails = import("/lua/effecttemplates.lua").NoEffects,
@@ -27,6 +28,7 @@ SIFInainoStrategicMissile02 = ClassProjectile(SIFInainoStrategicMissile) {
         '/effects/emitters/seraphim_inaino_fxtrails_02_emit.bp',
     },
 
+    ---@param self SIFInainoStrategicMissile02
     OnCreate = function(self)
         SIFInainoStrategicMissile.OnCreate(self)
         self.effectEntityPath = '/effects/entities/InainoEffectController01/InainoEffectController01_proj.bp'
