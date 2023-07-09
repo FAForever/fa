@@ -3,5 +3,9 @@
 -- Summary  :  Blazar AA AutoCannon Projectile script, XSA0303
 -- Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------------------------------
-SAABlazarAutoCannon01 = ClassProjectile(import("/lua/seraphimprojectiles.lua").SBlazarAAAutoCannon02) {}
+local SBlazarAAAutoCannon02 = import('/lua/seraphimprojectiles.lua').SBlazarAAAutoCannon02
+
+--- Blazar AA AutoCannon Projectile script, XSA0303
+---@class SAABlazarAutoCannon01 : SBlazarAAAutoCannon02
+SAABlazarAutoCannon01 = ClassProjectile(SBlazarAAAutoCannon02) {}
 TypeClass = SAABlazarAutoCannon01

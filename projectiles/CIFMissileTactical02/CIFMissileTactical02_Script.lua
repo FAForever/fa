@@ -1,16 +1,16 @@
--- 
--- URS0304 : cybran nuke sub
+local CLOATacticalMissileProjectile = import("/lua/cybranprojectiles.lua").CLOATacticalMissileProjectile
+
+-- ## URS0304 : cybran nuke sub
 -- Cybran "Loa" Tactical Missile, structure unit and sub launched variant of this projectile,
 -- with a higher arc and distance based adjusting trajectory. Splits into child projectile 
 -- if it takes enough damage.
--- 
-local CLOATacticalMissileProjectile = import("/lua/cybranprojectiles.lua").CLOATacticalMissileProjectile
-
+---@class CIFMissileTactical02 : CLOATacticalMissileProjectile
 CIFMissileTactical02 = ClassProjectile(CLOATacticalMissileProjectile) {
 
     NumChildMissiles = 3,
     FxWaterHitScale = 1.65,
 
+    ---@param self CIFMissileTactical02
     OnCreate = function(self)
         CLOATacticalMissileProjectile.OnCreate(self)
         self:SetCollisionShape('Sphere', 0, 0, 0, 2.0)
@@ -18,6 +18,9 @@ CIFMissileTactical02 = ClassProjectile(CLOATacticalMissileProjectile) {
         self.Trash:Add(ForkThread( self.MovementThread,self ))
     end,
 
+    ---@param self CIFMissileTactical02
+    ---@param targetType string
+    ---@param targetEntity Unit
     OnImpact = function(self, targetType, targetEntity)
         CreateLightParticle( self, -1, self.Army, 3, 7, 'glow_03', 'ramp_fire_11' )
 
@@ -29,6 +32,11 @@ CIFMissileTactical02 = ClassProjectile(CLOATacticalMissileProjectile) {
         CLOATacticalMissileProjectile.OnImpact(self, targetType, targetEntity)
     end,
 
+    ---@param self CIFMissileTactical02
+    ---@param instigator Unit
+    ---@param amount number
+    ---@param vector Vector
+    ---@param damageType string
     OnDamage = function(self, instigator, amount, vector, damageType)
         if not self.Split and (amount >= self:GetHealth()) then
             self.Split = true
@@ -55,6 +63,7 @@ CIFMissileTactical02 = ClassProjectile(CLOATacticalMissileProjectile) {
         CLOATacticalMissileProjectile.OnDamage(self, instigator, amount, vector, damageType)
     end,
 
+    ---@param self CIFMissileTactical02 
     MovementThread = function(self)
         self:SetTurnRate(8)
         WaitTicks(4)
@@ -64,6 +73,7 @@ CIFMissileTactical02 = ClassProjectile(CLOATacticalMissileProjectile) {
         end
     end,
 
+    ---@param self CIFMissileTactical02
     SetTurnRateByDist = function(self)
         local dist = self:GetDistanceToTarget()
         -- Get the nuke as close to 90 deg as possible
@@ -87,6 +97,7 @@ CIFMissileTactical02 = ClassProjectile(CLOATacticalMissileProjectile) {
         end
     end,        
 
+    ---@param self CIFMissileTactical02
     GetDistanceToTarget = function(self)
         local tpos = self:GetCurrentTargetPosition()
         local mpos = self:GetPosition()
@@ -94,6 +105,7 @@ CIFMissileTactical02 = ClassProjectile(CLOATacticalMissileProjectile) {
         return dist
     end,
 
+    ---@param self CIFMissileTactical02
     OnExitWater = function(self)
         CLOATacticalMissileProjectile.OnExitWater(self)
         self:SetDestroyOnWater(true)

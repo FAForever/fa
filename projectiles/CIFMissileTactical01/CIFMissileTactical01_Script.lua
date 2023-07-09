@@ -1,11 +1,13 @@
--- URL0111 : cybran MML
--- Cybran "Loa" Tactical Missile, mobile unit launcher variant of this missile, lower and straighter trajectory. 
--- Splits into child projectile if it takes enough damage.
-
 local CLOATacticalMissileProjectile = import("/lua/cybranprojectiles.lua").CLOATacticalMissileProjectile
 
+--- ## URL0111 : cybran MML
+--- Cybran "Loa" Tactical Missile, mobile unit launcher variant of this missile, lower and straighter trajectory. 
+--- Splits into child projectile if it takes enough damage.
+---@class CIFMissileTactical01 : CLOATacticalMissileProjectile
 CIFMissileTactical01 = ClassProjectile(CLOATacticalMissileProjectile) {
     NumChildMissiles = 3,
+
+    ---@param self CIFMissileTactical01
     OnCreate = function(self)
         CLOATacticalMissileProjectile.OnCreate(self)
         self:SetCollisionShape('Sphere', 0, 0, 0, 2)
@@ -13,6 +15,7 @@ CIFMissileTactical01 = ClassProjectile(CLOATacticalMissileProjectile) {
         self.MoveThread = self.Trash:Add(ForkThread(self.MovementThread,self))
     end,
 
+    ---@param self CIFMissileTactical01
     MovementThread = function(self)
         self.Distance = self:GetDistanceToTarget()
         self:SetTurnRate(8)
@@ -23,6 +26,7 @@ CIFMissileTactical01 = ClassProjectile(CLOATacticalMissileProjectile) {
         end
     end,
 
+    ---@param self CIFMissileTactical01
     SetTurnRateByDist = function(self)
         local dist = self:GetDistanceToTarget()
         if dist > self.Distance then
@@ -48,6 +52,7 @@ CIFMissileTactical01 = ClassProjectile(CLOATacticalMissileProjectile) {
         end
     end,
 
+    ---@param self CIFMissileTactical01
     GetDistanceToTarget = function(self)
         local tpos = self:GetCurrentTargetPosition()
         local mpos = self:GetPosition()
@@ -55,6 +60,9 @@ CIFMissileTactical01 = ClassProjectile(CLOATacticalMissileProjectile) {
         return dist
     end,
 
+    ---@param self CIFMissileTactical01
+    ---@param targetType string
+    ---@param targetEntity Unit
     OnImpact = function(self, targetType, targetEntity)       
         CreateLightParticle( self, -1, self.Army, 3, 7, 'glow_03', 'ramp_fire_11' )
         -- if it collide with terrain dont split
@@ -65,6 +73,11 @@ CIFMissileTactical01 = ClassProjectile(CLOATacticalMissileProjectile) {
         CLOATacticalMissileProjectile.OnImpact(self, targetType, targetEntity)
     end,
 
+    ---@param self CIFMissileTactical01
+    ---@param instigator Unit
+    ---@param amount number
+    ---@param vector Vector
+    ---@param damageType string
     OnDamage = function(self, instigator, amount, vector, damageType)
         if not self.Split and (amount >= self:GetHealth()) then
             self.Split = true
