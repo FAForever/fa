@@ -3,5 +3,8 @@
 -- Summary  :  Heavy Phasic Autogun Projectile script, XSA0104
 -- Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --------------------------------------------------------------------------------------------
-SDFHeavyPhasicAutogun01 = ClassProjectile(import("/lua/seraphimprojectiles.lua").SHeavyPhasicAutogun) {}
+local SHeavyPhasicAutogun = import('/lua/seraphimprojectiles.lua').SHeavyPhasicAutogun
+
+---@class SDFHeavyPhasicAutogun01 : SHeavyPhasicAutogun
+SDFHeavyPhasicAutogun01 = ClassProjectile(SHeavyPhasicAutogun) {}
 TypeClass = SDFHeavyPhasicAutogun01

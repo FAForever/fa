@@ -3,5 +3,8 @@
 -- Summary  :  Phasic Autogun Projectile script, XSL0101
 -- Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 ------------------------------------------------------------------------------------
-SDFPhasicAutogun01 = ClassProjectile(import("/lua/seraphimprojectiles.lua").SPhasicAutogun) {}
+local SPhasicAutogun = import('/lua/seraphimprojectiles.lua').SPhasicAutogun
+
+---@class SDFPhasicAutogun01 : SPhasicAutogun
+SDFPhasicAutogun01 = ClassProjectile(SPhasicAutogun) {}
 TypeClass = SDFPhasicAutogun01

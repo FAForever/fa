@@ -3,5 +3,8 @@
 -- Summary  :  Aire-au Bolter Projectile script, XSL0303
 -- Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 ---------------------------------------------------------------------------------
-SDFAireauBolter02 = ClassProjectile(import("/lua/seraphimprojectiles.lua").SAireauBolter) {}
+local SDFAireauBolter = import('/lua/seraphimprojectiles.lua').SDFAireauBolter
+
+---@class SDFAireauBolter02 : SDFAireauBolter
+SDFAireauBolter02 = ClassProjectile(SDFAireauBolter) {}
 TypeClass = SDFAireauBolter02

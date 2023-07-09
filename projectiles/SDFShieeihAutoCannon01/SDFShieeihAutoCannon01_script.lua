@@ -3,5 +3,8 @@
 -- Summary  :  Shie-eih Auto-Cannon Projectile script, XSS0103
 -- Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --------------------------------------------------------------------------------------------
-SDFShieeihAutoCannon01 = ClassProjectile(import("/lua/seraphimprojectiles.lua").SShriekerAutoCannon) {}
+local SShriekerAutoCannon = import('/lua/seraphimprojectiles.lua').SShriekerAutoCannon
+
+---@class SDFShieeihAutoCannon01 : SShriekerAutoCannon
+SDFShieeihAutoCannon01 = ClassProjectile(SShriekerAutoCannon) {}
 TypeClass = SDFShieeihAutoCannon01
