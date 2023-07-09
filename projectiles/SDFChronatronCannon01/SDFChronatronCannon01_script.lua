@@ -6,8 +6,14 @@
 local SChronatronCannon = import("/lua/seraphimprojectiles.lua").SChronatronCannon
 local ChronatronBlastAttackAOE = import("/lua/effecttemplates.lua").SChronatronCannonBlastAttackAOE 
 
+---@class SDFChronatronCannon01 : SChronatronCannon
 SDFChronatronCannon01 = ClassProjectile(SChronatronCannon) {
 	FxImpactTrajectoryAligned = false,
+
+	---@param self SDFChronatronCannon01
+	---@param army number
+	---@param EffectTable table
+	---@param EffectScale number
     CreateImpactEffects = function( self, army, EffectTable, EffectScale )
 		local launcher = self.Launcher
 		if launcher and launcher:HasEnhancement( 'BlastAttack' ) then

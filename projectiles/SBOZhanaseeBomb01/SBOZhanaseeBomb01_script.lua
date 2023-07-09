@@ -5,7 +5,12 @@
 -------------------------------------------------------------------------------
 local SZhanaseeBombProjectile = import("/lua/seraphimprojectiles.lua").SZhanaseeBombProjectile
 
+---@class SBOZhanaseeBombProjectile01 : SZhanaseeBombProjectile
 SBOZhanaseeBombProjectile01 = ClassProjectile(SZhanaseeBombProjectile){
+
+    ---@param self SBOZhanaseeBombProjectile01
+    ---@param targetType string
+    ---@param targetEntity Unit
     OnImpact = function(self, targetType, targetEntity)        
 		SZhanaseeBombProjectile.OnImpact(self, targetType, targetEntity) 
         CreateLightParticle(self, -1, self.Army, 26, 5, 'sparkle_white_add_08', 'ramp_white_24' )

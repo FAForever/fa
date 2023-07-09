@@ -7,7 +7,11 @@
 local Projectile = import("/lua/sim/projectile.lua").Projectile
 local VectorCached = Vector(0, 0, 0)
 
+---@class ShieldCollider : Projectile
 ShieldCollider = ClassProjectile(Projectile) {
+
+    ---@param self ShieldCollider
+    ---@param inWater? boolean
     OnCreate = function(self, inWater)
         Projectile.OnCreate(self)
 
@@ -23,12 +27,18 @@ ShieldCollider = ClassProjectile(Projectile) {
             self:OnImpact('Water', nil)
         end
     end,
+
     -- Shields only detect projectiles, so we attach one to keep track of the unit.
+    ---@param self ShieldCollider
+    ---@param parent any
+    ---@param bone Bone
     Start = function(self, parent, bone)
         self.PlaneBone = bone
         self.Plane = parent
         self:StartFalling()
     end,
+
+    ---@param self ShieldCollider
     StartFalling = function(self)
         local vx, vy, vz = self.Plane:GetVelocity()
         -- For now we just follow the plane along, not attaching so it can rotate
@@ -36,6 +46,8 @@ ShieldCollider = ClassProjectile(Projectile) {
         Warp(self, self.Plane:GetPosition(self.PlaneBone), self.Plane:GetOrientation())
     end,
 
+    ---@param self ShieldCollider
+    ---@param other any
     OnCollisionCheck = function(self, other)
         -- We intercept this just incase the projectile collides with something it shouldn't
         WARN('Shield collision projectile checking collision! Fix me!')
@@ -44,6 +56,7 @@ ShieldCollider = ClassProjectile(Projectile) {
         Projectile.OnCollisionCheck(self, other)
     end,
 
+    ---@param self ShieldCollider
     OnDestroy = function(self)
         self:DetachAll('anchor') -- If our projectile is getting destroyed we never want to have anything attached
         if self.Trash then
@@ -51,11 +64,15 @@ ShieldCollider = ClassProjectile(Projectile) {
         end
     end,
 
+    ---@param self ShieldCollider
     OnEnterWater = function(self)
         self:OnImpact('Water', nil)
     end,
 
     -- Destroy the sinking unit when it hits the ground.
+    ---@param self ShieldCollider
+    ---@param targetType string
+    ---@param targetEntity Unit
     OnImpact = function(self, targetType, targetEntity)
         if self and not self:BeenDestroyed() and self.Plane and not self.Plane:BeenDestroyed() then
             if targetType == 'Terrain' or targetType == 'Water' then
@@ -131,6 +148,9 @@ ShieldCollider = ClassProjectile(Projectile) {
     end,
 
     -- Lets do some maths that will make the units bounce off shields
+    ---@param self ShieldCollider
+    ---@param shield Shield unsued 
+    ---@param vector Vector
     ShieldBounce = function(self, shield, vector)
         local bp = self.Plane.Blueprint
         local volume = bp.SizeX * bp.SizeY * bp.SizeZ -- We will use this to *guess* how much force to apply

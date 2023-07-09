@@ -3,7 +3,10 @@
 -- Summary  :  Aire-au Bolter Projectile script, XSL0202
 -- Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --------------------------------------------------------------------------------
-SDFAireauBolter = ClassProjectile(import("/lua/seraphimprojectiles.lua").SAireauBolter) {
+local SDFAireauBolter = import('/lua/seraphimprojectiles.lua').SDFAireauBolter
+
+---@class SDFAireauBolter01 : SDFAireauBolter
+SDFAireauBolter01 = ClassProjectile(SDFAireauBolter) {
     FxAirUnitHitScale =  0.75,
     FxLandHitScale =  0.75,
     FxNoneHitScale =  0.75,
@@ -14,4 +17,4 @@ SDFAireauBolter = ClassProjectile(import("/lua/seraphimprojectiles.lua").SAireau
     FxOnKilledScale = 0.75,
     FxTrailScale =  0.75,
 }
-TypeClass = SDFAireauBolter
+TypeClass = SDFAireauBolter01

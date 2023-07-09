@@ -3,5 +3,8 @@
 -- Summary  :  Light Chronatron Cannon Projectile script, XSL0301
 -- Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------------------------------------------
-SDFLightChronatronCannon01 = ClassProjectile(import("/lua/seraphimprojectiles.lua").SLightChronatronCannon) {}
+local SLightChronatronCannon = import('/lua/seraphimprojectiles.lua').SLightChronatronCannon
+
+---@class SDFLightChronatronCannon01 : SLightChronatronCannon
+SDFLightChronatronCannon01 = ClassProjectile(SLightChronatronCannon) {}
 TypeClass = SDFLightChronatronCannon01
