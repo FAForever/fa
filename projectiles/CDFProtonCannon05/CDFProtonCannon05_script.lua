@@ -6,7 +6,13 @@
 ------------------------------------------------------------------------------
 
 local CDFHvyProtonCannonProjectile = import("/lua/cybranprojectiles.lua").CDFHvyProtonCannonProjectile
+
+---@class CDFProtonCannon05 : CDFHvyProtonCannonProjectile
 CDFProtonCannon05 = ClassProjectile(CDFHvyProtonCannonProjectile) {
+
+	---@param self CDFProtonCannon05
+	---@param TargetType string
+	---@param TargetEntity Unit
 	OnImpact = function(self, TargetType, TargetEntity) 
 		self:ShakeCamera( 15, 0.25, 0, 0.2 )
 		CDFHvyProtonCannonProjectile.OnImpact (self, TargetType, TargetEntity)

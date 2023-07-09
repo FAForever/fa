@@ -9,7 +9,12 @@ local EffectTemplate = import("/lua/effecttemplates.lua")
 local CDFBrackmanHackPegProjectile01 = import("/lua/cybranprojectiles.lua").CDFBrackmanHackPegProjectile01
 local RandomFloat = import("/lua/utilities.lua").GetRandomFloat
 
+---@class CIFBrackmanHackPegs01 : CDFBrackmanHackPegProjectile01
 CIFBrackmanHackPegs01 = ClassProjectile(CDFBrackmanHackPegProjectile01) {
+
+    ---@param self CIFBrackmanHackPegs01
+    ---@param TargetType string unused
+    ---@param TargetEntity Unit unused
     OnImpact = function(self, TargetType, TargetEntity) 
         local FxFragEffect = EffectTemplate.CBrackmanCrabPegPodSplit01 
         local ChildProjectileBP = '/projectiles/CIFBrackmanHackPegs02/CIFBrackmanHackPegs02_proj.bp'  

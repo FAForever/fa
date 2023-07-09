@@ -1,9 +1,13 @@
---
--- Cybran disintegrator laser
---
 local CDisintegratorLaserProjectile = import("/lua/cybranprojectiles.lua").CDisintegratorLaserProjectile
 
+-- Cybran disintegrator laser
+---@class CDFLaserDisintegrator03 : CDisintegratorLaserProjectile
 CDFLaserDisintegrator03 = ClassProjectile(CDisintegratorLaserProjectile) {
+
+    ---@param self CDFLaserDisintegrator03
+    ---@param army number
+    ---@param EffectTable table
+    ---@param EffectScale number
     CreateImpactEffects = function(self, army, EffectTable, EffectScale)
         local launcher = self.Launcher
         if launcher and launcher:HasEnhancement('EMPCharge') then
@@ -13,6 +17,4 @@ CDFLaserDisintegrator03 = ClassProjectile(CDisintegratorLaserProjectile) {
         CDisintegratorLaserProjectile.CreateImpactEffects(self, army, EffectTable, EffectScale)
     end,
 }
-
 TypeClass = CDFLaserDisintegrator03
-
