@@ -1,7 +1,6 @@
--- Cybran Scathis Projectile : url0401
-
 local CArtilleryProtonProjectile = import("/lua/cybranprojectiles.lua").CArtilleryProtonProjectile
 
+-- Cybran Scathis Projectile : url0401
 ---@class CIFArtilleryProton03 : CArtilleryProtonProjectile
 CIFArtilleryProton03 = ClassProjectile(CArtilleryProtonProjectile) {
     FxLandHitScale = 1.6,

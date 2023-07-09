@@ -1,6 +1,6 @@
--- CDFProtonCannon01
 local CDFProtonCannonProjectile = import("/lua/cybranprojectiles.lua").CDFProtonCannonProjectile
 
+-- CDFProtonCannon01
 ---@class CDFProtonCannon01 : CDFProtonCannonProjectile
 CDFProtonCannon01 = ClassProjectile(CDFProtonCannonProjectile) {
 

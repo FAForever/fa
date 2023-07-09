@@ -1,8 +1,6 @@
---
--- Cybran disintegrator laser
---
 local CDisintegratorLaserProjectile = import("/lua/cybranprojectiles.lua").CDisintegratorLaserProjectile
 
+-- Cybran disintegrator laser
 ---@class CDFLaserDisintegrator03 : CDisintegratorLaserProjectile
 CDFLaserDisintegrator03 = ClassProjectile(CDisintegratorLaserProjectile) {
 
@@ -19,6 +17,4 @@ CDFLaserDisintegrator03 = ClassProjectile(CDisintegratorLaserProjectile) {
         CDisintegratorLaserProjectile.CreateImpactEffects(self, army, EffectTable, EffectScale)
     end,
 }
-
 TypeClass = CDFLaserDisintegrator03
-

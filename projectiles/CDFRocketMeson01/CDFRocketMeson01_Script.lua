@@ -1,8 +1,6 @@
---
--- Cybran Dumbfire Rocket "The tadpole"
---
 local CRocketProjectile = import("/lua/cybranprojectiles.lua").CRocketProjectile
 
+-- Cybran Dumbfire Rocket "The tadpole"
 ---@class CDFRocketMeson01 : CRocketProjectile
 CDFRocketMeson01 = ClassProjectile(CRocketProjectile) {
     PolyTrail = '/effects/emitters/default_polytrail_06_emit.bp',

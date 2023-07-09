@@ -1,8 +1,6 @@
---
--- script for projectile CDFTrackerProjectile
---
 local CDFTrackerProjectile = import("/lua/cybranprojectiles.lua").CDFTrackerProjectile
 
+-- script for projectile CDFTrackerProjectile
 ---@class CDFTracker01 : CDFTrackerProjectile
 CDFTracker01 = ClassProjectile(CDFTrackerProjectile) {
 

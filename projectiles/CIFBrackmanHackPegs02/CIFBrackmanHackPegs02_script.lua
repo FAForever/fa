@@ -7,10 +7,11 @@
 local TargetPos
 local RandomInt = import("/lua/utilities.lua").GetRandomInt
 local EffectTemplate = import("/lua/effecttemplates.lua")
+local CDFBrackmanHackPegProjectile02 = import("/lua/cybranprojectiles.lua").CDFBrackmanHackPegProjectile02
 
---This one should just like be something kind of new compared to the older version
+--- This one should just like be something kind of new compared to the older version
 ---@class CIFBrackmanHackPegs02 : CDFBrackmanHackPegProjectile02
-CIFBrackmanHackPegs02 = ClassProjectile(import("/lua/cybranprojectiles.lua").CDFBrackmanHackPegProjectile02) {
+CIFBrackmanHackPegs02 = ClassProjectile(CDFBrackmanHackPegProjectile02) {
 
     ---@param self CIFBrackmanHackPegs02
     ---@param TargetType string unused
