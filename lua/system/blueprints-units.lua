@@ -457,8 +457,8 @@ local function PostProcessUnit(unit)
                 Damage = damagePerRangeCategory["ANTINAVY"]
             },
             {
-                RangeCategory = "UWRC_Countermeasure",
-                Damage = damagePerRangeCategory["UWRC_Countermeasure"]
+                RangeCategory = "COUNTERMEASURE",
+                Damage = damagePerRangeCategory["COUNTERMEASURE"]
             }
         }
 
@@ -474,8 +474,14 @@ local function PostProcessUnit(unit)
                     unit.CategoriesCount = unit.CategoriesCount + 1
                 end
 
-                local cat = category .. "WEAK"
-                if not (category == 'COUNTERMEASURE' or unit.CategoriesHash['COMMAND'] or unit.CategoriesHash[cat]) and damage < 0.2 * factor then
+                local cat = "WEAK" .. category
+                if not (
+                        category == 'COUNTERMEASURE' or
+                        unit.CategoriesHash['COMMAND'] or
+                        unit.CategoriesHash['STRATEGIC'] or
+                        unit.CategoriesHash[cat]
+                    ) and damage < 0.2 * factor
+                then
                     table.insert(unit.Categories, cat)
                     unit.CategoriesHash[cat] = true
                     unit.CategoriesCount = unit.CategoriesCount + 1
