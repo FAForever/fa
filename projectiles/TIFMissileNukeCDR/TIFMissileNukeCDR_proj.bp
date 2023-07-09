@@ -23,6 +23,7 @@ ProjectileBlueprint {
         'TACTICAL',
         'TACTICALNUKE',
         'MISSILE',
+        'NOSPLASHDAMAGE'
     },
     Defense = {
         Health = 4,
