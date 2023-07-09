@@ -1,4 +1,6 @@
+local TMissileAAProjectile = import("/lua/terranprojectiles.lua").TMissileAAProjectile
+
 -- script for projectile Missile
-TMissileAAProjectile = import("/lua/terranprojectiles.lua").TMissileAAProjectile
+---@class MissileJetTerran01 : TMissileAAProjectile
 MissileJetTerran01 = ClassProjectile(TMissileAAProjectile) {}
 TypeClass = MissileJetTerran01

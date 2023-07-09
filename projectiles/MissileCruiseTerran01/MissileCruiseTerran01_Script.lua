@@ -1,7 +1,7 @@
--- script for projectile Missile
-
 local Projectile = import("/lua/sim/projectile.lua").Projectile
 
+-- script for projectile Missile
+---@class MissileCruiseTerran01 : Projectile
 MissileCruiseTerran01 = ClassProjectile(Projectile) {
     MissileExhaust = {},
 
@@ -37,6 +37,7 @@ MissileCruiseTerran01 = ClassProjectile(Projectile) {
         '/effects/emitters/missile_hit_fire_01_emit.bp',
     },
 
+    ---@param self MissileCruiseTerran01
     OnCreate = function(self)
         Projectile.OnCreate(self)
         self:SetCollisionShape('Sphere', 0, 0, 0, 1.0)
@@ -52,6 +53,7 @@ MissileCruiseTerran01 = ClassProjectile(Projectile) {
         self.Trash:Add(ForkThread(self.CruiseMissileThread,self))
     end,
 
+    ---@param self MissileCruiseTerran01
     CruiseMissileThread = function(self)
         self:TrackTarget(false)
         WaitTicks(41)
@@ -81,6 +83,9 @@ MissileCruiseTerran01 = ClassProjectile(Projectile) {
         self:SetAcceleration(25)
     end,
 
+    ---@param self MissileCruiseTerran01
+    ---@param TargetType string
+    ---@param TargetEntity Unit
     OnImpact = function(self, TargetType, TargetEntity)
         for i in self.trails do
             self.trails[i]:Destroy()

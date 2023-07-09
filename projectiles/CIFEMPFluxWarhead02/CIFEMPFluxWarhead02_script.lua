@@ -7,6 +7,7 @@
 local NullShell = import("/lua/sim/defaultprojectiles.lua").NullShell
 local RandomFloat = import("/lua/utilities.lua").GetRandomFloat
 
+---@class CIFEMPFluxWarhead02 : NullShell
 CIFEMPFluxWarhead02 = ClassProjectile(NullShell) {
     -- Effects attached to moving nuke projectile plume
     PlumeEffects = {'/effects/emitters/empfluxwarhead_concussion_ring_02_emit.bp',
@@ -20,6 +21,7 @@ CIFEMPFluxWarhead02 = ClassProjectile(NullShell) {
 
     PlumeVelocityScale = 0.1,
 
+    ---@param self CIFEMPFluxWarhead02
     EffectThread = function(self)
         -- Light and Camera Shake
         CreateLightParticle(self, -1, self.Army, 200, 200, 'beam_white_01', 'ramp_red_09')
@@ -44,6 +46,8 @@ CIFEMPFluxWarhead02 = ClassProjectile(NullShell) {
         self.Trash:Add(ForkThread(self.EmitterEffectsThread, self, self.Plumeproj))
     end,
 
+    ---@param self CIFEMPFluxWarhead02
+    ---@param plume Projectile
     EmitterEffectsThread = function(self, plume)
         for k, v in self.PlumeEffects do
             CreateAttachedEmitter(plume, -1, self.Army, v)
@@ -56,6 +60,7 @@ CIFEMPFluxWarhead02 = ClassProjectile(NullShell) {
         self:StarCloudDispersal()
     end,
 
+    ---@param self CIFEMPFluxWarhead02
     StarCloudDispersal = function(self)
         local numProjectiles = 5
         local angle = (2*math.pi) / numProjectiles
@@ -84,6 +89,8 @@ CIFEMPFluxWarhead02 = ClassProjectile(NullShell) {
         end
     end,
 
+    ---@param self CIFEMPFluxWarhead02
+    ---@param plume Projectile
     PlumeVelocityThread = function(self, plume)
         plume:SetVelocity(0,5.35 * self.PlumeVelocityScale,0)
         WaitTicks(6)
@@ -94,6 +101,9 @@ CIFEMPFluxWarhead02 = ClassProjectile(NullShell) {
         plume:SetVelocity(0,27 * self.PlumeVelocityScale,0)
     end,
 
+    ---@param self CIFEMPFluxWarhead02 unused
+    ---@param plume Projectile
+    ---@param scale number
     PlumeThread = function(self, plume, scale)
 
         -- Anim Time : 1.0 sec
