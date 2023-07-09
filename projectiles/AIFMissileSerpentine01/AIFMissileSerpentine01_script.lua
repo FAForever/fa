@@ -28,14 +28,16 @@ AIFMissileSerpentine01 = ClassProjectile(AMissileSerpentineProjectile) {
 						-- Increase check intervals
 						self:SetTurnRate(12)
 						WaitTicks(16)
-            self:SetTurnRate(36)
+            self:SetTurnRate(45)
         elseif dist > 20 and dist <= 35 then
 						-- Further increase check intervals
                         WaitTicks(4)
             self:SetTurnRate(60)
-				elseif dist > 0 and dist <= 20 then
+				elseif dist >5 and dist <= 20 then
 						-- Further increase check intervals            
             self:SetTurnRate(100)   
+                elseif dist>0 and dist <=5 then
+                    self:SetTurnRate(150)
             KillThread(self.MoveThread)         
         end
     end,

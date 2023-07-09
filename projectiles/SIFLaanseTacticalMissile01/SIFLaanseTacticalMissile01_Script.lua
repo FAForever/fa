@@ -45,7 +45,7 @@ SIFLaanseTacticalMissile01 = ClassProjectile(SLaanseTacticalMissile) {
             self:SetTurnRate(68)
 				elseif dist > 0 and dist <= 10 then
 						-- Further increase check intervals            
-            self:SetTurnRate(100)   
+            self:SetTurnRate(150)   
             KillThread(self.MoveThread)         
         end
     end,        

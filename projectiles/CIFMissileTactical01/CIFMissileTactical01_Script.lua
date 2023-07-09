@@ -42,14 +42,16 @@ CIFMissileTactical01 = ClassProjectile(CLOATacticalMissileProjectile) {
 						-- Increase check intervals
 						self:SetTurnRate(18)
 						WaitTicks(8)
-            self:SetTurnRate(18)
+            self:SetTurnRate(34)
         elseif dist > 10 and dist <= 25 then
 						-- Further increase check intervals
                         WaitTicks(2)
             self:SetTurnRate(68)
-				elseif dist > 0 and dist <= 10 then
+				elseif dist > 5 and dist <= 10 then
 						-- Further increase check intervals            
-            self:SetTurnRate(100)   
+            self:SetTurnRate(100)  
+                elseif dist>0 and dist <=5 then
+                    self:SetTurnRate(150)
             KillThread(self.MoveThread)         
         end
     end,
