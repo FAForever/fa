@@ -1,6 +1,6 @@
---
--- Terran Anti Air artillery projectile
---
-TAAArtillery01 = ClassProjectile(import("/lua/terranprojectiles.lua").TAALightFragmentationProjectile) { }
+local TAAArtillery01 = import("/lua/terranprojectiles.lua").TAALightFragmentationProjectile
 
+-- Terran Anti Air artillery projectile
+---@class TAAArtillery01 : TAALightFragmentationProjectile
+TAAArtillery01 = ClassProjectile(TAAArtillery01) { }
 TypeClass = TAAArtillery01

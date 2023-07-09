@@ -1,10 +1,10 @@
---
--- Terran Torpedo Bomb
---
 local TTorpedoShipProjectile = import("/lua/terranprojectiles.lua").TTorpedoShipProjectile
 
-TANAnglerTorpedo01 = ClassProjectile(TTorpedoShipProjectile) 
-{
+-- Terran Torpedo Bomb
+---@class TANAnglerTorpedo01 : TTorpedoShipProjectile
+TANAnglerTorpedo01 = ClassProjectile(TTorpedoShipProjectile){
+
+    ---@param self TANAnglerTorpedo01
     OnEnterWater = function(self)
         TTorpedoShipProjectile.OnEnterWater(self)
         self:SetCollisionShape('Sphere', 0, 0, 0, 1.0)
@@ -16,5 +16,4 @@ TANAnglerTorpedo01 = ClassProjectile(TTorpedoShipProjectile)
         self:ForkThread(self.MovementThread)
     end,
 }
-
 TypeClass = TANAnglerTorpedo01

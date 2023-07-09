@@ -3,5 +3,8 @@
 -- Summary  :  Zthuthaam Artillery Shell Projectile script, XSL0301
 -- Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --------------------------------------------------------------------------------------------------------
-SIFZthuthaamArtilleryShell01 = ClassProjectile(import("/lua/seraphimprojectiles.lua").SZthuthaamArtilleryShell) {}
+local SZthuthaamArtilleryShell = import("/lua/seraphimprojectiles.lua").SZthuthaamArtilleryShell
+
+---@class SIFZthuthaamArtilleryShell01 : SZthuthaamArtilleryShell
+SIFZthuthaamArtilleryShell01 = ClassProjectile(SZthuthaamArtilleryShell) {}
 TypeClass = SIFZthuthaamArtilleryShell01

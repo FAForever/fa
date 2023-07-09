@@ -4,13 +4,18 @@
 -- Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 ---------------------------------------------------------------------------------------------------
 local SLaanseTacticalMissile = import("/lua/seraphimprojectiles.lua").SLaanseTacticalMissile
+
+---@class SIFLaanseTacticalMissile03 : SLaanseTacticalMissile
 SIFLaanseTacticalMissile03 = ClassProjectile(SLaanseTacticalMissile) {
+
+    ---@param self SIFLaanseTacticalMissile03
     OnCreate = function(self)
         SLaanseTacticalMissile.OnCreate(self)
         self:SetCollisionShape('Sphere', 0, 0, 0, 2.0)
         self.Trash:Add(ForkThread( self.MovementThread,self ))
     end,
 
+    ---@param self SIFLaanseTacticalMissile03
     MovementThread = function(self)
         self:SetTurnRate(8)
         WaitTicks(4)
@@ -20,6 +25,7 @@ SIFLaanseTacticalMissile03 = ClassProjectile(SLaanseTacticalMissile) {
         end
     end,
 
+    ---@param self SIFLaanseTacticalMissile03
     SetTurnRateByDist = function(self)
         local dist = self:GetDistanceToTarget()
         --Get the nuke as close to 90 deg as possible
@@ -43,6 +49,7 @@ SIFLaanseTacticalMissile03 = ClassProjectile(SLaanseTacticalMissile) {
         end
     end,
 
+    ---@param self SIFLaanseTacticalMissile03
     GetDistanceToTarget = function(self)
         local tpos = self:GetCurrentTargetPosition()
         local mpos = self:GetPosition()
