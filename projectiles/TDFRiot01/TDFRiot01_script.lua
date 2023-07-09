@@ -1,9 +1,8 @@
---
+local TShellRiotProjectile = import("/lua/terranprojectiles.lua").TShellRiotProjectile
+
 -- Terran Riot basic projectile
---
-TDFRiot01 = ClassProjectile(import("/lua/terranprojectiles.lua").TShellRiotProjectile) {
+---@class TDFRiot01 : TShellRiotProjectile
+TDFRiot01 = ClassProjectile(TShellRiotProjectile) {
 	FxImpactTrajectoryAligned = false,
 }
-
 TypeClass = TDFRiot01
-
