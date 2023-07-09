@@ -8,6 +8,7 @@ local SHeavyCavitationTorpedo = import("/lua/seraphimprojectiles.lua").SHeavyCav
 local RandomFloat = import("/lua/utilities.lua").GetRandomFloat
 local EffectTemplate = import("/lua/effecttemplates.lua")
 
+---@class SANHeavyCavitationTorpedo01: SHeavyCavitationTorpedo
 SANHeavyCavitationTorpedo01 = ClassProjectile(SHeavyCavitationTorpedo) {
     FxSplashScale = 0.4,
     FxEnterWaterEmitter = {
@@ -15,6 +16,7 @@ SANHeavyCavitationTorpedo01 = ClassProjectile(SHeavyCavitationTorpedo) {
         '/effects/emitters/destruction_water_splash_wash_01_emit.bp',
     },
 
+    ---@param self SANHeavyCavitationTorpedo01
     OnEnterWater = function(self)
         SHeavyCavitationTorpedo.OnEnterWater(self)
 
@@ -27,6 +29,8 @@ SANHeavyCavitationTorpedo01 = ClassProjectile(SHeavyCavitationTorpedo) {
         self.Trash:Add(ForkThread(self.ProjectileSplit,self))
     end,
 
+    ---@param self SANHeavyCavitationTorpedo01
+    ---@param inWater? boolean
     OnCreate = function(self,inWater)
         SHeavyCavitationTorpedo.OnCreate(self,inWater)
         -- if we are starting in the water then immediately switch to tracking in water
@@ -35,6 +39,7 @@ SANHeavyCavitationTorpedo01 = ClassProjectile(SHeavyCavitationTorpedo) {
         self:SetCollisionShape('Sphere', 0, 0, 0, 0.1)
     end,
 
+    ---@param self SANHeavyCavitationTorpedo01
     ProjectileSplit = function(self)
         WaitTicks(2)
         local ChildProjectileBP = '/projectiles/SANHeavyCavitationTorpedo04/SANHeavyCavitationTorpedo04_proj.bp'

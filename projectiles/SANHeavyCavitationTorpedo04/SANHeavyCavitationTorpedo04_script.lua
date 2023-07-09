@@ -6,7 +6,10 @@
 local SHeavyCavitationTorpedo = import("/lua/seraphimprojectiles.lua").SHeavyCavitationTorpedo
 local EffectTemplate = import("/lua/effecttemplates.lua")
 
+---@class SANHeavyCavitationTorpedo04: SHeavyCavitationTorpedo
 SANHeavyCavitationTorpedo04 = ClassProjectile(SHeavyCavitationTorpedo) {
+
+    ---@param self SANHeavyCavitationTorpedo04
     OnCreate = function(self)
         SHeavyCavitationTorpedo.OnCreate(self)
         self:SetCollisionShape('Sphere', 0, 0, 0, 0.1)
@@ -14,6 +17,7 @@ SANHeavyCavitationTorpedo04 = ClassProjectile(SHeavyCavitationTorpedo) {
         CreateEmitterOnEntity(self, self.Army, EffectTemplate.SHeavyCavitationTorpedoFxTrails)
     end,
 
+    ---@param self SANHeavyCavitationTorpedo04
     PauseUntilTrack = function(self)
         local distance = self:GetDistanceToTarget()
         local turnrate = 360
@@ -26,6 +30,7 @@ SANHeavyCavitationTorpedo04 = ClassProjectile(SHeavyCavitationTorpedo) {
         self:SetTurnRate(turnrate)
     end,
 
+    ---@param self SANHeavyCavitationTorpedo04
     GetDistanceToTarget = function(self)
         local tpos = self:GetCurrentTargetPosition()
         local mpos = self:GetPosition()

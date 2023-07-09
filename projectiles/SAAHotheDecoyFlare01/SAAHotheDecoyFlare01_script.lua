@@ -6,7 +6,10 @@
 local Flare = import("/lua/defaultantiprojectile.lua").Flare
 local SAAHotheFlareProjectile = import("/lua/seraphimprojectiles.lua").SAAHotheFlareProjectile
 
+---@class SAAHotheDecoyFlare01: SAAHotheFlareProjectile
 SAAHotheDecoyFlare01 = ClassProjectile(SAAHotheFlareProjectile) {
+
+    ---@param self SAAHotheDecoyFlare01
     OnCreate = function(self)
         SAAHotheFlareProjectile.OnCreate(self)
         self.MyShield = Flare {

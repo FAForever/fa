@@ -3,5 +3,8 @@
 -- Summary  :  Uall Cavitation Torpedo Projectile script, XSS0203
 -- Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 ----------------------------------------------------------------------------------------------------
-SANUallCavitationTorpedo02 = ClassProjectile(import("/lua/seraphimprojectiles.lua").SUallCavitationTorpedo) {}
+local SUallCavitationTorpedo = import("/lua/seraphimprojectiles.lua").SUallCavitationTorpedo
+
+---@class SANUallCavitationTorpedo02: SUallCavitationTorpedo
+SANUallCavitationTorpedo02 = ClassProjectile(SUallCavitationTorpedo) {}
 TypeClass = SANUallCavitationTorpedo02

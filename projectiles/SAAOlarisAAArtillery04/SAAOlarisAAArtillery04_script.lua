@@ -3,5 +3,8 @@
 -- Summary  :  Olaris AA Artillery Projectile script, XSS0202
 -- Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 -------------------------------------------------------------------------------------------
-SAAOlarisAAArtillery04 = ClassProjectile(import("/lua/seraphimprojectiles.lua").SOlarisAAArtillery) {}
+local SOlarisAAArtillery = import("/lua/seraphimprojectiles.lua").SOlarisAAArtillery
+
+---@class SAAOlarisAAArtillery04: SOlarisAAArtillery
+SAAOlarisAAArtillery04 = ClassProjectile(SOlarisAAArtillery) {}
 TypeClass = SAAOlarisAAArtillery04

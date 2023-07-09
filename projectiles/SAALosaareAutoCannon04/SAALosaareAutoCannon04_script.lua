@@ -3,5 +3,8 @@
 -- Summary  :  Losaare AA AutoCannon Projectile script, XSB2304
 -- Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 ------------------------------------------------------------------------------------------
-SAAlosaareAutoCannon04 = ClassProjectile(import("/lua/seraphimprojectiles.lua").SLosaareAAAutoCannon) {}
+
+local SLosaareAAAutoCannon = import('/lua/seraphimprojectiles.lua').SLosaareAAAutoCannon
+
+SAAlosaareAutoCannon04 = ClassProjectile(SLosaareAAAutoCannon) {}
 TypeClass = SAAlosaareAutoCannon04
