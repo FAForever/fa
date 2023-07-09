@@ -1,7 +1,6 @@
---
+local TTorpedoSubProjectile = import("/lua/terranprojectiles.lua").TAAGinsuRapidPulseBeamProjectile
+
 -- Terran Riot basic projectile
---
-TDFGinsu01 = ClassProjectile(import("/lua/terranprojectiles.lua").TAAGinsuRapidPulseBeamProjectile) { }
-
+---@class TDFGinsu01 : TAAGinsuRapidPulseBeamProjectile
+TDFGinsu01 = ClassProjectile(TTorpedoSubProjectile) { }
 TypeClass = TDFGinsu01
-

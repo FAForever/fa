@@ -1,6 +1,3 @@
---
--- Terran Fragmentation/Sensor Shells
---
 local TArtilleryProjectile = import("/lua/terranprojectiles.lua").TArtilleryProjectile
 local VisionMarkerOpti = import("/lua/sim/vizmarker.lua").VisionMarkerOpti
 
@@ -12,7 +9,13 @@ local MathCos = math.cos
 
 local TFragmentationSensorShellFrag = import("/lua/effecttemplates.lua").TFragmentationSensorShellFrag 
 
+-- Terran Fragmentation/Sensor Shells
+---@class TIFFragmentationSensorShell01 : TArtilleryProjectile
 TIFFragmentationSensorShell01 = ClassProjectile(TArtilleryProjectile) {
+
+    ---@param self TIFFragmentationSensorShell01
+    ---@param TargetType string unused
+    ---@param TargetEntity Unit unused
     OnImpact = function(self, TargetType, TargetEntity)
         -- the split fx
         CreateEmitterAtEntity( self, self.Army, TFragmentationSensorShellFrag[1])
