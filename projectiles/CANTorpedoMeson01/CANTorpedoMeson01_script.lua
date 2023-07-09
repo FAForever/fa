@@ -2,6 +2,7 @@
 
 local CTorpedoShipProjectile = import("/lua/cybranprojectiles.lua").CTorpedoShipProjectile
 
+---@class CANTorpedoMeson01: CTorpedoShipProjectile
 CANTorpedoMeson01 = ClassProjectile(CTorpedoShipProjectile) {
     FxSplashScale = 1,
 
@@ -11,6 +12,7 @@ CANTorpedoMeson01 = ClassProjectile(CTorpedoShipProjectile) {
         '/effects/emitters/destruction_water_splash_plume_01_emit.bp',
     },
 
+    ---@param self CANTorpedoMeson01
     OnEnterWater = function(self)
         CTorpedoShipProjectile.OnEnterWater(self)
         
@@ -23,6 +25,7 @@ CANTorpedoMeson01 = ClassProjectile(CTorpedoShipProjectile) {
         self.Trash:Add(ForkThread(self.SpinUpThread))
     end,
 
+    ---@param self CANTorpedoMeson01
 	SpinUpThread = function(self)
         WaitTicks(21)
         self:TrackTarget(false)

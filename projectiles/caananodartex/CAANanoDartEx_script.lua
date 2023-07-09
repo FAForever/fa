@@ -1,11 +1,16 @@
+local CAANanoDartProjectile = import("/lua/cybranprojectiles.lua").CAANanoDartProjectile
+
 -- Cybran Anti Air Projectile
-CAANanoDartProjectile = import("/lua/cybranprojectiles.lua").CAANanoDartProjectile
+---@class CAANanoDart01: CAANanoDartProjectile
 CAANanoDart01 = ClassProjectile(CAANanoDartProjectile) {
-   OnCreate = function(self)
+
+    ---@param self CAANanoDart01
+    OnCreate = function(self)
         CAANanoDartProjectile.OnCreate(self)
         self.Trash:Add(ForkThread(self.UpdateThread,self))
    end,
 
+   ---@param self CAANanoDart01
     UpdateThread = function(self)
         WaitTicks(4)
         self:SetMaxSpeed(6)
