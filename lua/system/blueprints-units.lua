@@ -104,6 +104,10 @@ local function DetermineWeaponCategory(weapon)
         return 'INDIRECTFIRE'
     end
 
+    if weapon.RangeCategory == 'UWRC_Countermeasure' or StringFind(weapon.WeaponCategory or 'nope', 'Defense') then
+        return 'COUNTERMEASURE'
+    end
+
     return nil
 end
 
@@ -420,7 +424,7 @@ local function PostProcessUnit(unit)
             INDIRECTFIRE = 0,
             ANTIAIR = 0,
             ANTINAVY = 0,
-            -- UWRC_Countermeasure = 0,
+            COUNTERMEASURE = 0,
         }
 
         for k, weapon in weapons do
@@ -447,17 +451,15 @@ local function PostProcessUnit(unit)
             {
                 RangeCategory = "ANTIAIR",
                 Damage = damagePerRangeCategory["ANTIAIR"]
-            }
-            ,
+            },
             {
                 RangeCategory = "ANTINAVY",
                 Damage = damagePerRangeCategory["ANTINAVY"]
+            },
+            {
+                RangeCategory = "UWRC_Countermeasure",
+                Damage = damagePerRangeCategory["UWRC_Countermeasure"]
             }
-            -- ,
-            -- {
-            --     RangeCategory = "UWRC_Countermeasure",
-            --     Damage = damagePerRangeCategory["UWRC_Countermeasure"]
-            -- }
         }
 
         table.sort(array, function(e1, e2) return e1.Damage > e2.Damage end)
@@ -473,7 +475,7 @@ local function PostProcessUnit(unit)
                 end
 
                 local cat = category .. "WEAK"
-                if not (unit.CategoriesHash['COMMAND'] or unit.CategoriesHash[cat]) and damage < 0.2 * factor then
+                if not (category == 'COUNTERMEASURE' or unit.CategoriesHash['COMMAND'] or unit.CategoriesHash[cat]) and damage < 0.2 * factor then
                     table.insert(unit.Categories, cat)
                     unit.CategoriesHash[cat] = true
                     unit.CategoriesCount = unit.CategoriesCount + 1
