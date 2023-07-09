@@ -1,8 +1,6 @@
--- Terran Land-based torpedo
-
 local TTorpedoShipProjectile = import("/lua/terranprojectiles.lua").TTorpedoShipProjectile
 
---- Unused
+-- Terran Land-based torpedo - Unused
 ---@class TorpedoShipTerran02 : TTorpedoShipProjectile
 TorpedoShipTerran02 = ClassProjectile(TTorpedoShipProjectile) {
     FxSplashScale = 1,
@@ -25,5 +23,4 @@ TorpedoShipTerran02 = ClassProjectile(TTorpedoShipProjectile) {
         self:SetVelocity(3)
     end,
 }
-
 TypeClass = TorpedoShipTerran02

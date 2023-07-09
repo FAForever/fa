@@ -1,8 +1,7 @@
---
--- Terran Sub-Launched Cruise Missile
---
 local TMissileCruiseSubProjectile = import("/lua/terranprojectiles.lua").TMissileCruiseSubProjectile
 
+-- Terran Sub-Launched Cruise Missile
+---@class TIFMissileCruise02: TMissileCruiseSubProjectile
 TIFMissileCruise02 = ClassProjectile(TMissileCruiseSubProjectile) {
 
 	FxAirUnitHitScale = 1.65,
@@ -17,12 +16,14 @@ TIFMissileCruise02 = ClassProjectile(TMissileCruiseSubProjectile) {
     FxWaterHitScale = 1.65,
     FxOnKilledScale = 1.65,
 
+    ---@param self TIFMissileCruise02
     OnCreate = function(self)
         TMissileCruiseSubProjectile.OnCreate(self)
         self:SetCollisionShape('Sphere', 0, 0, 0, 2.0)
         self.Trash:Add(ForkThread( self.MovementThread,self ))
     end,
 
+    ---@param self TIFMissileCruise02
     MovementThread = function(self)        
         self:SetTurnRate(8)
         WaitTicks(4)        
@@ -32,6 +33,7 @@ TIFMissileCruise02 = ClassProjectile(TMissileCruiseSubProjectile) {
         end
     end,
 
+    ---@param self TIFMissileCruise02
     SetTurnRateByDist = function(self)
         local dist = self:GetDistanceToTarget()
         --Get the nuke as close to 90 deg as possible
@@ -55,13 +57,15 @@ TIFMissileCruise02 = ClassProjectile(TMissileCruiseSubProjectile) {
         end
     end,        
 
+    ---@param self TIFMissileCruise02
     GetDistanceToTarget = function(self)
         local tpos = self:GetCurrentTargetPosition()
         local mpos = self:GetPosition()
         local dist = VDist2(mpos[1], mpos[3], tpos[1], tpos[3])
         return dist
     end,
-    
+
+    ---@param self TIFMissileCruise02
     OnExitWater = function(self)
         TMissileCruiseSubProjectile.OnExitWater(self)
         self:SetDestroyOnWater(true)
