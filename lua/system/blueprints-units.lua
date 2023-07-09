@@ -409,11 +409,10 @@ local function PostProcessUnit(unit)
         unit.VetThresholds[5] = 5 * multiplier * (unit.Economy.BuildCostMass or 1)
     end
 
-    -- Pre-compute weak secondary weapons
+    -- Pre-compute weak secondary weapons and weapon overlays
 
     local weapons = unit.Weapon
     if weapons then
-        LOG(unit.BlueprintId .. " - " .. unit.Description)
 
         -- determine total dps per category
         local damagePerRangeCategory = {
@@ -421,7 +420,7 @@ local function PostProcessUnit(unit)
             INDIRECTFIRE = 0,
             ANTIAIR = 0,
             ANTINAVY = 0,
-            UWRC_Countermeasure = 0,
+            -- UWRC_Countermeasure = 0,
         }
 
         for k, weapon in weapons do
@@ -454,34 +453,30 @@ local function PostProcessUnit(unit)
                 RangeCategory = "ANTINAVY",
                 Damage = damagePerRangeCategory["ANTINAVY"]
             }
-            ,
-            {
-                RangeCategory = "UWRC_Countermeasure",
-                Damage = damagePerRangeCategory["UWRC_Countermeasure"]
-            }
+            -- ,
+            -- {
+            --     RangeCategory = "UWRC_Countermeasure",
+            --     Damage = damagePerRangeCategory["UWRC_Countermeasure"]
+            -- }
         }
 
         table.sort(array, function(e1, e2) return e1.Damage > e2.Damage end)
-
         local factor = array[1].Damage
 
         for category, damage in damagePerRangeCategory do
             if damage > 0 then
-
                 local cat = "OVERLAY" .. category
                 if not unit.CategoriesHash[cat] then
                     table.insert(unit.Categories, cat)
                     unit.CategoriesHash[cat] = true
                     unit.CategoriesCount = unit.CategoriesCount + 1
-                    LOG(" - Overlay for: " .. category)
                 end
 
-                if (not unit.CategoriesHash['COMMAND']) and damage < 0.2 * factor then
-                    local cat = category .. "WEAK"
+                local cat = category .. "WEAK"
+                if not (unit.CategoriesHash['COMMAND'] or unit.CategoriesHash[cat]) and damage < 0.2 * factor then
                     table.insert(unit.Categories, cat)
                     unit.CategoriesHash[cat] = true
                     unit.CategoriesCount = unit.CategoriesCount + 1
-                    LOG(" - Weak in: " .. category)
                 end
             end
         end

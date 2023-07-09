@@ -218,6 +218,8 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         -- cache often accessed values into inner table
         self.Blueprint = bp
 
+        reprsl(bp.Categories)
+
         -- cache engine calls
         self.EntityId = self:GetEntityId()
         self.Army = self:GetArmy()
