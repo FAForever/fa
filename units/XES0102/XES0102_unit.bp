@@ -27,8 +27,8 @@ UnitBlueprint{
     },
     Defense = {
         ArmorType = "Normal",
-        Health = 1575,
-        MaxHealth = 1575,
+        Health = 1750,
+        MaxHealth = 1750,
         SubThreatLevel = 10,
     },
     Display = {
@@ -115,7 +115,7 @@ UnitBlueprint{
     Intel = {
         SonarRadius = 35,
         VisionRadius = 32,
-        WaterVisionRadius = 45,
+        WaterVisionRadius = 55,
     },
     LifeBarHeight = 0.075,
     LifeBarOffset = 0.7,
