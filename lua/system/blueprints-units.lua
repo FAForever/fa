@@ -489,6 +489,22 @@ local function PostProcessUnit(unit)
             end
         end
     end
+
+    -- add the defense overlay to shields
+    if unit.Defense.Shield and unit.Defense.Shield.ShieldSize > 0 then
+        local cat = "OVERLAYDEFENSE"
+        if not unit.CategoriesHash[cat] then
+            table.insert(unit.Categories, cat)
+            unit.CategoriesHash[cat] = true
+            unit.CategoriesCount = unit.CategoriesCount + 1
+        end
+    end
+
+    -- Populate help text field when applicable
+    if not (unit.Interface and unit.Interface.HelpText) then
+        unit.Interface = unit.Interface or { }
+        unit.Interface.HelpText = unit.Description or "" --[[@as string]]
+    end
 end
 
 --- Post-processes all units

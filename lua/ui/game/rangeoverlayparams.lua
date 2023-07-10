@@ -89,7 +89,7 @@ RangeOverlayParams = {
     Defense = {
         key = 'defense',
         Label = '<LOC range_0002>Countermeasure',
-        Categories = categories.OVERLAYCOUNTERMEASURE,
+        Categories = categories.OVERLAYCOUNTERMEASURE + categories.OVERLAYDEFENSE,
         NormalColor = glowMilNormal..'ff8a2c',
         SelectColor = glowMilSelect..'ffa053',
         RolloverColor = glowMilOver..'ffa963',
@@ -135,7 +135,6 @@ RangeOverlayParams = {
         Type = 1,
         Tooltip = "overlay_misc",
     },
-
 
     AllIntel = {
         key = 'allintel',
