@@ -52,8 +52,8 @@ defaultMessages = {
         RateOfFire = "Gun (Speed&Range)",
         DamageStabilization = "Nano-Repair",
         DamageStabilizationAdvanced = "Advanced Nano-Repair",
-        RegenAura = "Regen Aura",
-        AdvancedRegenAura = "Advanced Regen Aura",
+        RegenAura = "Restoration Field",
+        AdvancedRegenAura = "Rapid Restoration Field",
     },
     nomads = {
         ResourceAllocation = "RAS",
