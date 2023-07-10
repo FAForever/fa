@@ -53,16 +53,18 @@ TIFMissileCruise03 = ClassProjectile(TMissileCruiseProjectile) {
             self:SetTurnRate(14)
         elseif dist > 30 and dist <= 50 then
 						-- Increase check intervals
-						self:SetTurnRate(18)
+						self:SetTurnRate(20)
 						WaitTicks(8)
             self:SetTurnRate(18)
-        elseif dist > 10 and dist <= 25 then
+        elseif dist > 15 and dist <= 25 then
 						-- Further increase check intervals
                         WaitTicks(2)
-            self:SetTurnRate(68)
-				elseif dist > 0 and dist <= 10 then
+            self:SetTurnRate(40)
+		elseif dist > 5 and dist <= 15 then
 						-- Further increase check intervals            
-            self:SetTurnRate(100)   
+                        self:SetTurnRate(100)
+        elseif dist > 0 and dist<= 5 then
+                        self:SetTurnRate(150)   
             KillThread(self.MoveThread)         
         end
     end,        
