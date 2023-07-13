@@ -352,6 +352,7 @@ categories = {
 ---| "NOSPLASHDAMAGE"
 ---| "NUKE"
 ---| "NUKESUB"
+---| "OBSTRUCTSBUILDING"
 ---| "OMNI"
 ---| "OPERATION"
 ---| "OPTICS"
