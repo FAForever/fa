@@ -3488,8 +3488,10 @@ float4 NormalMappedInsectPS_02( NORMALMAPPED_VERTEX vertex, uniform bool hiDefSh
 
 float shieldWaterAbsorption(float depth) {
     float factor = 1.0;
-    if (depth < 0) factor = 0.6;
-    factor *= 1 - tex1D(WaterRampSampler, (-depth / (surfaceElevation - abyssElevation))).w;
+    if (surfaceElevation > 0) {
+        if (depth < 0) factor = 0.6;
+        factor *= 1 - tex1D(WaterRampSampler, (-depth / (surfaceElevation - abyssElevation))).w;
+    }
     return factor;
 }
 
