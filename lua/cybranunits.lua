@@ -578,6 +578,14 @@ CLandUnit = ClassUnit(DefaultUnitsFile.LandUnit) {}
 ---@field AnimationManipulator moho.AnimationManipulator
 CMassCollectionUnit = ClassUnit(MassCollectionUnit) {
 
+    OnStartBuild = function(self, unitBeingBuilt, order)
+        MassCollectionUnit.OnStartBuild(self, unitBeingBuilt, order)
+        if not self.AnimationManipulator then return end
+        self.AnimationManipulator:SetRate(0)
+        self.AnimationManipulator:Destroy()
+        self.AnimationManipulator = nil
+    end,
+
     ---@param self CMassCollectionUnit
     PlayActiveAnimation = function(self)
         MassCollectionUnit.PlayActiveAnimation(self)
