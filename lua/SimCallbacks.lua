@@ -1080,7 +1080,21 @@ Callbacks.AIPlatoonSimpleStructureBehavior = function(data, units)
         return
     end
 
-    import("/lua/aibrains/platoons/platoon-simple-structure.lua").DebugAssignToUnits(data, units)
+    for k, unit in units do
+        local commands = unit:GetCommandQueue();
+        IssueClearCommands({unit})
+
+        local shuffled = table.shuffle(commands)
+        for k, command in shuffled do
+            IssueBuildMobile({unit}, {command.x, command.y, command.z}, command.blueprintId, {})
+
+            -- if k > 3 then
+            --     break
+            -- end
+        end
+    end
+
+    -- import("/lua/aibrains/platoons/platoon-simple-structure.lua").DebugAssignToUnits(data, units)
 end
 
 --#endregion
