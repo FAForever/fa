@@ -10,10 +10,6 @@ local DefaultProjectileWeapon = import("/lua/sim/defaultweapons.lua").DefaultPro
 
 ---@class DAA0206 : AAirUnit
 DAA0206 = ClassUnit(AAirUnit) {
-    --ContrailEffects = {
-    --    '/effects/emitters/contrail_ser_ohw_polytrail_01_emit.bp',
-    --},
-
     Weapons = {
         Suicide = ClassWeapon(DefaultProjectileWeapon) {}
     },

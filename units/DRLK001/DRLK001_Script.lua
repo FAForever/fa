@@ -7,26 +7,24 @@ local CWalkingLandUnit = import("/lua/cybranunits.lua").CWalkingLandUnit
 local CybranWeaponsFile = import("/lua/cybranweapons.lua")
 local CAANanoDartWeapon = CybranWeaponsFile.CAANanoDartWeapon
 local TargetingLaser = import("/lua/kirvesweapons.lua").TargetingLaser
-local Effects = import("/lua/effecttemplates.lua")
 
 ---@class DRLK001 : CWalkingLandUnit
 DRLK001 = ClassUnit(CWalkingLandUnit) {
     Weapons = {
         TargetPainter = ClassWeapon(TargetingLaser) {
-            FxMuzzleFlash = {'/effects/emitters/particle_cannon_muzzle_02_emit.bp'}, 
+            FxMuzzleFlash = { '/effects/emitters/particle_cannon_muzzle_02_emit.bp' },
         },
-        
-	AAGun = ClassWeapon(CAANanoDartWeapon) {
-            IdleState = State (CAANanoDartWeapon.IdleState) {
+
+        AAGun = ClassWeapon(CAANanoDartWeapon) {
+            IdleState = State(CAANanoDartWeapon.IdleState) {
                 OnGotTarget = function(self)
                     CAANanoDartWeapon.IdleState.OnGotTarget(self)
 
                     -- copy over heading / pitch from ground gun to aa gun
                     local unit = self.unit
-                    local aa = unit:GetWeaponManipulatorByLabel('AAGun') --[[@as moho.AimManipulator]]
-                    local ground = unit:GetWeaponManipulatorByLabel('GroundGun') --[[@as moho.AimManipulator]]
+                    local aa = unit:GetWeaponManipulatorByLabel('AAGun')
+                    local ground = unit:GetWeaponManipulatorByLabel('GroundGun')
                     aa:SetHeadingPitch(ground:GetHeadingPitch())
-
                     unit:SetWeaponEnabledByLabel('GroundGun', false)
                 end,
             },
@@ -36,13 +34,11 @@ DRLK001 = ClassUnit(CWalkingLandUnit) {
 
                 -- copy over heading / pitch from aa gun to ground gun
                 local unit = self.unit
-                local aa = unit:GetWeaponManipulatorByLabel('AAGun') --[[@as moho.AimManipulator]]
-                local ground = unit:GetWeaponManipulatorByLabel('GroundGun') --[[@as moho.AimManipulator]]
+                local aa = unit:GetWeaponManipulatorByLabel('AAGun')
+                local ground = unit:GetWeaponManipulatorByLabel('GroundGun')
                 ground:SetHeadingPitch(aa:GetHeadingPitch())
-
                 -- reset heading / pitch of aa gun to prevent twitching
                 aa:SetHeadingPitch(0, 0)
-
                 unit:SetWeaponEnabledByLabel('GroundGun', true)
             end,
         },
@@ -50,3 +46,6 @@ DRLK001 = ClassUnit(CWalkingLandUnit) {
     },
 }
 TypeClass = DRLK001
+
+-- Kept for mod support
+local Effects = import("/lua/effecttemplates.lua")

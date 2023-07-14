@@ -5,11 +5,9 @@
 -----------------------------------------------------
 local TLandUnit = import("/lua/terranunits.lua").TLandUnit
 local TWeapons = import("/lua/terranweapons.lua")
-local TDFPlasmaCannonWeapon = TWeapons.TDFPlasmaCannonWeapon
 local TAAPhalanxWeapon = import("/lua/kirvesweapons.lua").TAAPhalanxWeapon
 local EffectUtils = import("/lua/effectutilities.lua")
 local Effects = import("/lua/effecttemplates.lua")
-
 
 ---@class DELK002 : TLandUnit
 DELK002 = ClassUnit(TLandUnit) {
@@ -17,49 +15,62 @@ DELK002 = ClassUnit(TLandUnit) {
         GatlingCannon = ClassWeapon(TAAPhalanxWeapon)
         {
             PlayFxWeaponPackSequence = function(self)
-                if self.SpinManip1 then
-                    self.SpinManip1:SetTargetSpeed(0)
+                local spin1 = self.SpinManip1
+                local spin2 = self.SpinManip2
+                local unit = self.unit
+                if spin1 then
+                    spin1:SetTargetSpeed(0)
                 end
-                if self.SpinManip2 then
-                    self.SpinManip2:SetTargetSpeed(0)
+                if spin2 then
+                    spin2:SetTargetSpeed(0)
                 end
-                EffectUtils.CreateBoneEffectsOpti(self.unit, 'Left_Muzzle', self.unit.Army, Effects.WeaponSteam01)
-                EffectUtils.CreateBoneEffectsOpti(self.unit, 'Right_Muzzle', self.unit.Army, Effects.WeaponSteam01)
+                EffectUtils.CreateBoneEffectsOpti(unit, 'Left_Muzzle', unit.Army, Effects.WeaponSteam01)
+                EffectUtils.CreateBoneEffectsOpti(unit, 'Right_Muzzle', unit.Army, Effects.WeaponSteam01)
                 TAAPhalanxWeapon.PlayFxWeaponPackSequence(self)
             end,
 
             PlayFxRackSalvoChargeSequence = function(self)
-                if not self.SpinManip1 then
-                    self.SpinManip1 = CreateRotator(self.unit, 'Right_Barrel', 'z', nil, 360, 180, 60)
-                    self.unit.Trash:Add(self.SpinManip1)
+                local unit = self.unit
+                local spin1 = self.SpinManip1
+                if not spin1 then
+                    spin1 = CreateRotator(unit, 'Right_Barrel', 'z', nil, 360, 180, 60)
+                    self.SpinManip1 = spin1
+                    unit.Trash:Add(spin1)
+                end
+                local spin2 = self.SpinManip2
+                if not spin2 then
+                    spin2 = CreateRotator(unit, 'Left_Barrel', 'z', nil, 360, 180, 60)
+                    self.SpinManip2 = spin2
+                    unit.Trash:Add(spin2)
                 end
 
-                if self.SpinManip1 then
-                    self.SpinManip1:SetTargetSpeed(500)
+                if spin1 then
+                    spin1:SetTargetSpeed(500)
                 end
-                if not self.SpinManip2 then
-                    self.SpinManip2 = CreateRotator(self.unit, 'Left_Barrel', 'z', nil, 360, 180, 60)
-                    self.unit.Trash:Add(self.SpinManip2)
-                end
-
-                if self.SpinManip2 then
-                    self.SpinManip2:SetTargetSpeed(500)
+                if spin2 then
+                    spin2:SetTargetSpeed(500)
                 end
                 TAAPhalanxWeapon.PlayFxRackSalvoChargeSequence(self)
             end,
 
             PlayFxRackSalvoReloadSequence = function(self)
-                if self.SpinManip1 then
-                    self.SpinManip1:SetTargetSpeed(200)
+                local spin1 = self.SpinManip1
+                local spin2 = self.SpinManip2
+                local unit = self.unit
+                if spin1 then
+                    spin1:SetTargetSpeed(200)
                 end
-                if self.SpinManip2 then
-                    self.SpinManip2:SetTargetSpeed(200)
+                if spin2 then
+                    spin2:SetTargetSpeed(200)
                 end
-                EffectUtils.CreateBoneEffectsOpti(self.unit, 'Left_Muzzle', self.unit.Army, Effects.WeaponSteam01)
-                EffectUtils.CreateBoneEffectsOpti(self.unit, 'Right_Muzzle', self.unit.Army, Effects.WeaponSteam01)
+                EffectUtils.CreateBoneEffectsOpti(unit, 'Left_Muzzle', unit.Army, Effects.WeaponSteam01)
+                EffectUtils.CreateBoneEffectsOpti(unit, 'Right_Muzzle', unit.Army, Effects.WeaponSteam01)
                 TAAPhalanxWeapon.PlayFxRackSalvoChargeSequence(self)
             end,
         },
     },
 }
 TypeClass = DELK002
+
+--- Move For Mod Support
+local TDFPlasmaCannonWeapon = TWeapons.TDFPlasmaCannonWeapon

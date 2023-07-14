@@ -17,33 +17,43 @@ local Effects = import("/lua/effecttemplates.lua")
 DEL0204 = ClassUnit(TWalkingLandUnit)
 {
     Weapons = {
-        GatlingCannon = ClassWeapon(TDFPlasmaCannonWeapon) 
+        GatlingCannon = ClassWeapon(TDFPlasmaCannonWeapon)
         {
+
             PlayFxWeaponPackSequence = function(self)
-                if self.SpinManip then
-                    self.SpinManip:SetTargetSpeed(0)
+                local spinManip = self.SpinManip
+                local unit = self.unit
+                if spinManip then
+                    spinManip:SetTargetSpeed(0)
                 end
-                EffectUtils.CreateBoneEffectsOpti(self.unit, 'Left_Arm_Barrel_Muzzle', self.unit.Army, Effects.WeaponSteam01)
+                EffectUtils.CreateBoneEffectsOpti(unit, 'Left_Arm_Barrel_Muzzle', unit.Army,
+                    Effects.WeaponSteam01)
                 TDFPlasmaCannonWeapon.PlayFxWeaponPackSequence(self)
             end,
 
             PlayFxRackSalvoChargeSequence = function(self)
-                if not self.SpinManip then 
-                    self.SpinManip = CreateRotator(self.unit, 'Left_Arm_Barrel', 'z', nil, 270, 180, 60)
-                    self.unit.Trash:Add(self.SpinManip)
+                local unit = self.unit
+                local spinManip = self.SpinManip
+                if not spinManip then
+                    spinManip = CreateRotator(unit, 'Left_Arm_Barrel', 'z', nil, 270, 180, 60)
+                    self.SpinManip = spinManip
+                    unit.Trash:Add(spinManip)
                 end
 
-                if self.SpinManip then
-                    self.SpinManip:SetTargetSpeed(500)
+                if spinManip then
+                    spinManip:SetTargetSpeed(500)
                 end
                 TDFPlasmaCannonWeapon.PlayFxRackSalvoChargeSequence(self)
-            end,            
+            end,
 
             PlayFxRackSalvoReloadSequence = function(self)
-                if self.SpinManip then
-                    self.SpinManip:SetTargetSpeed(200)
+                local spinManip = self.SpinManip
+                local unit = self.unit
+                if spinManip then
+                    spinManip:SetTargetSpeed(200)
                 end
-                self.ExhaustEffects = EffectUtils.CreateBoneEffectsOpti(self.unit, 'Left_Arm_Barrel_Muzzle', self.unit.Army, Effects.WeaponSteam01)
+                self.ExhaustEffects = EffectUtils.CreateBoneEffectsOpti(unit, 'Left_Arm_Barrel_Muzzle',
+                    unit.Army, Effects.WeaponSteam01)
                 TDFPlasmaCannonWeapon.PlayFxRackSalvoChargeSequence(self)
             end,
         },
