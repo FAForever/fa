@@ -1462,11 +1462,11 @@ local keyActionsOrders = {
         category = 'orders',
     },
     ['spreadattack'] = {
-        action = 'UI_Lua import("/lua/spreadattack.lua").SpreadAttack()',
+        action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").DistributeOrders()',
         category = 'orders',
     },
     ['shift_spreadattack'] = {
-        action = 'UI_Lua import("/lua/spreadattack.lua").SpreadAttack()',
+        action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").DistributeOrders()',
         category = 'orders',
     },
     ['set_target_priority'] = {

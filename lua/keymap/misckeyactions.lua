@@ -521,6 +521,11 @@ import("/lua/ui/game/gamemain.lua").ObserveSelection:AddObserver(
     'KeyActionHardMove'
 )
 
+DistributeOrders = function()
+    LOG("DistributeOrders")
+    SimCallback({Func = 'DistributeOrders', Args = { }}, true)
+end
+
 AssignPlatoonBehaviorSilo = function()
     SimCallback({Func = 'AIPlatoonSiloTacticalBehavior', Args = { Behavior = 'AIBehaviorTacticalSimple' }}, true)
 end

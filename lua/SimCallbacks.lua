@@ -595,6 +595,174 @@ do
     end
 end
 
+do
+
+    local toSimCommand = {
+        false, --  1 "Stop
+        IssueMove, --  2 "Move
+        false, --  3 "Dive
+        IssueMove, --  4 "FormMove
+        false, --  5 "BuildSiloTactical
+        false, --  6 "BuildSiloNuke"
+        false, --  7 "BuildFactory"
+        IssueBuildMobile, --  8 "BuildMobile"
+        IssueGuard, --  9 "BuildAssist"
+        IssueAttack, --  10 "Attack
+        IssueAttack, --  11 "FormAttack
+        IssueNuke, --  12 "Nuke
+        IssueTactical, --  13 "Tactical
+        IssueTeleport, --  14 "Teleport
+        IssueGuard, --  15 "Guard
+        false, --  16 "Patrol
+        false, --  17 "Ferry
+        false, --  18 "FormPatrol
+        IssueReclaim, --  19 "Reclaim
+        IssueRepair, --  20 "Repair
+        IssueCapture, --  21 "Capture
+        false, --  22 "TransportLoadUnits
+        false, --  23 "TransportReverseLoadUnits
+        IssueTransportUnload, --  24 "TransportUnloadUnits
+        false, --  25 "TransportUnloadSpecificUnits
+        false, --  26 "DetachFromTransport
+        false, --  27 "Upgrade
+        false, --  28 "Script
+        false, --  29 "AssistCommander
+        false, --  30 "KillSelf
+        false, --  31 "DestroySelf
+        false, --  32 "Sacrifice
+        false, --  33 "Pause
+        false, --  34 "OverCharge
+        IssueAggressiveMove, --  35 "AggressiveMove
+        IssueAggressiveMove, --  36 "FormAggressiveMove
+        false, --  37 "AssistMove
+        false, --  38 "SpecialAction
+        false, --  39 "Dock
+    }
+
+    local requiresEntity = {
+        false, --  1 "Stop
+        false, --  2 "Move
+        false, --  3 "Dive
+        false, --  4 "FormMove
+        false, --  5 "BuildSiloTactical
+        false, --  6 "BuildSiloNuke"
+        false, --  7 "BuildFactory"
+        false, --  8 "BuildMobile"
+        false, --  9 "BuildAssist"
+        false, --  10 "Attack
+        false, --  11 "FormAttack
+        false, --  12 "Nuke
+        false, --  13 "Tactical
+        false, --  14 "Teleport
+        true, --  15 "Guard
+        false, --  16 "Patrol
+        false, --  17 "Ferry
+        false, --  18 "FormPatrol
+        true, --  19 "Reclaim
+        true, --  20 "Repair
+        true, --  21 "Capture
+        false, --  22 "TransportLoadUnits
+        false, --  23 "TransportReverseLoadUnits
+        false, --  24 "TransportUnloadUnits
+        false, --  25 "TransportUnloadSpecificUnits
+        false, --  26 "DetachFromTransport
+        false, --  27 "Upgrade
+        false, --  28 "Script
+        false, --  29 "AssistCommander
+        false, --  30 "KillSelf
+        false, --  31 "DestroySelf
+        false, --  32 "Sacrifice
+        false, --  33 "Pause
+        false, --  34 "OverCharge
+        false, --  35 "AggressiveMove
+        false, --  36 "FormAggressiveMove
+        false, --  37 "AssistMove
+        false, --  38 "SpecialAction
+        false, --  39 "Dock
+    }
+
+    ---@param data any
+    ---@param units Unit[]
+    Callbacks.DistributeOrders = function(data, units)
+        LOG("DistributeOrders")
+        local units = SecureUnits(units)
+        if not (units and units[1]) then
+            return
+        end
+
+        -- bundle the orders
+        local groups = {}
+        local orders = units[1]:GetCommandQueue()
+        for k, order in orders do
+            -- find the last group
+            local group = groups[table.getn(groups)]
+            if not group then
+                group = {}
+                table.insert(groups, group)
+            end
+
+            -- edge case: group has no orders, so we add this order and call it a day
+            if not group[1] then
+                table.insert(group, order)
+                -- usual case: check if the current group is of the same type of order, if so add to the group otherwise create a new group
+            else
+                if group[1].commandType == order.commandType then
+                    table.insert(group, order)
+                else
+                    table.insert(groups, { order })
+                end
+            end
+        end
+
+        -- clear existing orders
+        IssueClearCommands(units)
+
+        -- assign orders in an interleaved fashion
+        for offset, unit in units do
+            for k, group in groups do
+                local count = table.getn(group)
+                local index = math.mod(offset, count) + 1
+                local order = group[index]
+                local callback = toSimCommand[order.commandType]
+                if callback then
+                    local candidate = GetEntityById(order.targetId)
+                    if candidate then
+                        local target
+
+                        -- props are always valid
+                        if IsProp(candidate) then
+                            target = candidate
+                        else
+                            -- units are only valid in certain cases
+                            if IsUnit(candidate) then
+                                -- our own and allied units are always valid
+                                if candidate.Army == unit.Army or IsAllied(candidate.Army, unit.Army) then
+                                    target = candidate
+
+                                -- enemy units are only valid if we've ever seen them
+                                elseif candidate:GetBlip(unit.Army):IsSeenEver() then
+                                    target = candidate
+                                end
+                            end
+                        end
+
+                        -- at this point we need a valid target
+                        if target then
+                            callback({ unit }, target)
+                        end
+                    else
+                        -- at this point we may need an entity, so we check and bail if we do need one
+                        if not requiresEntity[order.commandType] then
+                            callback({ unit }, { order.x, order.y, order.z })
+                        end
+                    end
+                end
+            end
+        end
+    end
+
+end
+
 -------------------------------------------------------------------------------
 --@region Development / debug related functionality
 
