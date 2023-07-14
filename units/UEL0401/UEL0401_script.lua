@@ -59,11 +59,12 @@ UEL0401 = ClassUnit(TMobileFactoryUnit, ExternalFactoryComponent) {
 
     OnCreate = function(self)
         TMobileFactoryUnit.OnCreate(self)
-        ExternalFactoryComponent.OnCreate(self)
+
     end,
 
     OnStopBeingBuilt = function(self, builder, layer)
         TMobileFactoryUnit.OnStopBeingBuilt(self, builder, layer)
+        ExternalFactoryComponent.OnStopBeingBuilt(self, builder, layer)
         self.PrepareToBuildManipulator = CreateAnimator(self)
         self.PrepareToBuildManipulator:PlayAnim(self:GetBlueprint().Display.AnimationBuild, false):SetRate(0)
         self.ReleaseEffectsBag = {}
@@ -79,13 +80,13 @@ UEL0401 = ClassUnit(TMobileFactoryUnit, ExternalFactoryComponent) {
     ---@param self UEL0401
     OnPaused = function(self)
         TMobileFactoryUnit.OnPaused(self)
-            self.ExternalFactory:SetPaused(true)
+        ExternalFactoryComponent.OnPaused(self)
     end,
 
     ---@param self UEL0401
     OnUnpaused = function(self)
         TMobileFactoryUnit.OnUnpaused(self)
-        self.ExternalFactory:SetPaused(false)
+        ExternalFactoryComponent.OnUnpaused(self)
     end,
 
     -- This unit needs to not be allowed to build while underwater
@@ -113,9 +114,7 @@ UEL0401 = ClassUnit(TMobileFactoryUnit, ExternalFactoryComponent) {
         Main = function(self)
             self.PrepareToBuildManipulator:SetRate(-self.PrepareToBuildAnimRate)
             self:DetachAll(self.BuildAttachBone)
-
-            self.ExternalFactory:SetBusy(false)
-            self.ExternalFactory:SetBlockCommandQueue(false)
+            self.OnIdle()
         end,
     },
 

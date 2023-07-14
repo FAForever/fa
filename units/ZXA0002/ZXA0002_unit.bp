@@ -10,7 +10,8 @@ UnitBlueprint {
         'SORTCONSTRUCTION',
         'MOBILEFACTORY',
         'DRAGBUILD',
-        'SHOWQUEUE'
+        'SHOWQUEUE',
+        'EXTERNALFACTORYUNIT'
     },
     CollisionOffsetY = -0.5,
     Defense = {

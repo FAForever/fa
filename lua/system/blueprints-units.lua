@@ -518,10 +518,20 @@ function PostProcessUnitWithExternalFactory(allBlueprints, unit)
 
     -- replace properties of external factory
     efBlueprint.Economy = { BuildRate = unit.Economy.BuildRate, BuildableCategory = unit.Economy.BuildableCategory }
+    efBlueprint.General.Icon = unit.General.Icon
+    efBlueprint.General.FactionName = unit.General.FactionName
+    efBlueprint.FactionCategory = unit.FactionCategory
+    efBlueprint.LayerCategory = unit.FactionCategory
+    efBlueprint.TechCategory = unit.FactionCategory
     efBlueprint.BlueprintId = efBlueprintId
     efBlueprint.BaseBlueprintId = unit.BlueprintId
     efBlueprint.ScriptClass = 'ExternalFactoryUnit'
     efBlueprint.ScriptModule = '/lua/defaultunits.lua'
+
+    efBlueprint.CategoriesHash[efBlueprint.FactionCategory] = true
+    efBlueprint.CategoriesHash[efBlueprint.TechCategory] = true
+    efBlueprint.CategoriesHash[efBlueprint.LayerCategory] = true
+    efBlueprint.Categories = table.unhash(efBlueprint.CategoriesHash)
 
     -- remove properties of the seed unit
     unit.CategoriesHash['FACTORY'] = nil
