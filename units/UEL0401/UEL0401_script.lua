@@ -14,13 +14,15 @@ local TANTorpedoAngler = WeaponsFile.TANTorpedoAngler
 local EffectTemplate = import("/lua/effecttemplates.lua")
 local EffectUtil = import("/lua/effectutilities.lua")
 
+local ExternalFactoryComponent = import("/lua/defaultcomponents.lua").ExternalFactoryComponent
 local DefaultExplosions = import("/lua/defaultexplosions.lua")
 
----@class UEL0401 : TMobileFactoryUnit
-UEL0401 = ClassUnit(TMobileFactoryUnit) {
+---@class UEL0401 : TMobileFactoryUnit, ExternalFactoryComponent
+UEL0401 = ClassUnit(TMobileFactoryUnit, ExternalFactoryComponent) {
     PrepareToBuildAnimRate = 5,
     BuildAttachBone = 'Build_Attachpoint',
-    RollOffBones = {'Arm_Right03_Build_Emitter', 'Arm_Left03_Build_Emitter', },
+    FactoryAttachBone = 'Ramp',
+    RollOffBones = { 'Arm_Right03_Build_Emitter', 'Arm_Left03_Build_Emitter', },
 
     ExplosionBones = {
         'Turret_Right01',
@@ -55,6 +57,11 @@ UEL0401 = ClassUnit(TMobileFactoryUnit) {
         Torpedo = ClassWeapon(TANTorpedoAngler) {},
     },
 
+    OnCreate = function(self)
+        TMobileFactoryUnit.OnCreate(self)
+        ExternalFactoryComponent.OnCreate(self)
+    end,
+
     OnStopBeingBuilt = function(self, builder, layer)
         TMobileFactoryUnit.OnStopBeingBuilt(self, builder, layer)
         self.PrepareToBuildManipulator = CreateAnimator(self)
@@ -67,6 +74,18 @@ UEL0401 = ClassUnit(TMobileFactoryUnit) {
     OnFailedToBuild = function(self)
         TMobileFactoryUnit.OnFailedToBuild(self)
         ChangeState(self, self.IdleState)
+    end,
+
+    ---@param self UEL0401
+    OnPaused = function(self)
+        TMobileFactoryUnit.OnPaused(self)
+            self.ExternalFactory:SetPaused(true)
+    end,
+
+    ---@param self UEL0401
+    OnUnpaused = function(self)
+        TMobileFactoryUnit.OnUnpaused(self)
+        self.ExternalFactory:SetPaused(false)
     end,
 
     -- This unit needs to not be allowed to build while underwater
@@ -90,10 +109,13 @@ UEL0401 = ClassUnit(TMobileFactoryUnit) {
             ChangeState(self, self.BuildingState)
         end,
 
+        ---@param self UEL0401
         Main = function(self)
             self.PrepareToBuildManipulator:SetRate(-self.PrepareToBuildAnimRate)
             self:DetachAll(self.BuildAttachBone)
-            self:SetBusy(false)
+
+            self.ExternalFactory:SetBusy(false)
+            self.ExternalFactory:SetBlockCommandQueue(false)
         end,
     },
 
@@ -144,8 +166,8 @@ UEL0401 = ClassUnit(TMobileFactoryUnit) {
             if not unitBuilding.Dead then
                 unitBuilding:DetachFrom(true)
                 self:DetachAll(self.BuildAttachBone)
-                local  worldPos = self:CalculateWorldPositionFromRelative({0, 0, -15})
-                IssueMoveOffFactory({unitBuilding}, worldPos)
+                local worldPos = self:CalculateWorldPositionFromRelative({ 0, 0, -15 })
+                IssueMoveOffFactory({ unitBuilding }, worldPos)
             end
 
             self:DestroyRollOffEffects()
@@ -171,6 +193,7 @@ UEL0401 = ClassUnit(TMobileFactoryUnit) {
         end
     end,
 
+    ---@param self UEL0401
     DestroyRollOffEffects = function(self)
         for k, v in self.ReleaseEffectsBag do
             v:Destroy()
@@ -186,7 +209,7 @@ UEL0401 = ClassUnit(TMobileFactoryUnit) {
         self:PlayUnitSound('Destroyed')
 
         -- transform data
-        local explosionBones = { }
+        local explosionBones = {}
         local explosionBoneCount = table.getn(self.ExplosionBones)
 
         if instigator then
@@ -198,7 +221,7 @@ UEL0401 = ClassUnit(TMobileFactoryUnit) {
                 local dy = bonePosition[2] - iy
                 local dz = bonePosition[3] - iz
                 local distance = dx * dx + dy * dy + dz * dz
-                explosionBones[k] =  {
+                explosionBones[k] = {
                     Distance = distance,
                     BoneName = bone,
                     Position = bonePosition
@@ -211,7 +234,7 @@ UEL0401 = ClassUnit(TMobileFactoryUnit) {
             -- if there is no instigator (self destruct, for example) then take a random direction
             for k, bone in self.ExplosionBones do
                 local bonePosition = self:GetPosition(bone)
-                explosionBones[k] =  {
+                explosionBones[k] = {
                     Distance = 0,
                     BoneName = bone,
                     Position = bonePosition
@@ -239,7 +262,8 @@ UEL0401 = ClassUnit(TMobileFactoryUnit) {
             DefaultExplosions.CreateDefaultHitExplosionAtBone(self, bone.BoneName, 1.0)
             DefaultExplosions.CreateFirePlume(self, self.Army, bone.BoneName)
             DefaultExplosions.CreateSmallDebrisEmitters(self, self.Army, bone.BoneName)
-            DefaultExplosions.CreateDebrisProjectiles(self, 0.2, { self.Blueprint.SizeX, self.Blueprint.SizeY, self.Blueprint.SizeZ })
+            DefaultExplosions.CreateDebrisProjectiles(self, 0.2,
+                { self.Blueprint.SizeX, self.Blueprint.SizeY, self.Blueprint.SizeZ })
         end
 
         WaitTicks(1)
@@ -251,7 +275,8 @@ UEL0401 = ClassUnit(TMobileFactoryUnit) {
             DefaultExplosions.CreateDefaultHitExplosionAtBone(self, bone.BoneName, 1.0)
             DefaultExplosions.CreateFirePlume(self, self.Army, bone.BoneName)
             DefaultExplosions.CreateSmallDebrisEmitters(self, self.Army, bone.BoneName)
-            DefaultExplosions.CreateDebrisProjectiles(self, 0.2, { self.Blueprint.SizeX, self.Blueprint.SizeY, self.Blueprint.SizeZ })
+            DefaultExplosions.CreateDebrisProjectiles(self, 0.2,
+                { self.Blueprint.SizeX, self.Blueprint.SizeY, self.Blueprint.SizeZ })
         end
 
         WaitTicks(1)
@@ -264,7 +289,8 @@ UEL0401 = ClassUnit(TMobileFactoryUnit) {
             DefaultExplosions.CreateDefaultHitExplosionAtBone(self, bone.BoneName, 1.0)
             DefaultExplosions.CreateFirePlume(self, self.Army, bone.BoneName)
             DefaultExplosions.CreateSmallDebrisEmitters(self, self.Army, bone.BoneName)
-            DefaultExplosions.CreateDebrisProjectiles(self, 0.2, { self.Blueprint.SizeX, self.Blueprint.SizeY, self.Blueprint.SizeZ })
+            DefaultExplosions.CreateDebrisProjectiles(self, 0.2,
+                { self.Blueprint.SizeX, self.Blueprint.SizeY, self.Blueprint.SizeZ })
         end
 
         WaitTicks(1)
@@ -277,7 +303,8 @@ UEL0401 = ClassUnit(TMobileFactoryUnit) {
             DefaultExplosions.CreateDefaultHitExplosionAtBone(self, bone.BoneName, 1.0)
             DefaultExplosions.CreateFirePlume(self, self.Army, bone.BoneName)
             DefaultExplosions.CreateSmallDebrisEmitters(self, self.Army, bone.BoneName)
-            DefaultExplosions.CreateDebrisProjectiles(self, 0.2, { self.Blueprint.SizeX, self.Blueprint.SizeY, self.Blueprint.SizeZ })
+            DefaultExplosions.CreateDebrisProjectiles(self, 0.2,
+                { self.Blueprint.SizeX, self.Blueprint.SizeY, self.Blueprint.SizeZ })
         end
 
         self:DestroyUnit(overkillRatio)

@@ -3178,3 +3178,105 @@ ShieldLandUnit = ClassUnit(LandUnit) {}
 -- SHIELD SEA UNITS
 ---@class ShieldSeaUnit : SeaUnit
 ShieldSeaUnit = ClassUnit(SeaUnit) {}
+
+---@class ExternalFactoryUnit : Unit
+ExternalFactoryUnit = ClassUnit(Unit) {
+
+    ---@param self ExternalFactoryUnit
+    OnCreate = function(self)
+        Unit.OnCreate(self)
+
+        -- help us understand where this thing is
+        self:ForkThread(function()
+            while true do
+                WaitTicks(1)
+                DrawCircle(self:GetPosition(), 10, 'ffffff')
+                end
+            end
+        )
+    end,
+
+    OnDestroy = function(self)
+        Unit.OnDestroy(self)
+    end,
+
+    SetParent = function(self, parent)
+        self.Parent = parent
+    end,
+
+    OnStartBuild = function(self, unitbuilding, order)
+        Unit.OnStartBuild(self, unitbuilding, order)
+        self.Parent:OnStartBuild(unitbuilding, order)
+        self.UnitBeingBuilt = unitbuilding
+    end,
+
+    OnStopBuild = function(self, unitBeingBuilt)
+        Unit.OnStopBuild(self, unitBeingBuilt)
+        self.Parent:OnStopBuild(unitBeingBuilt)
+        self.UnitBeingBuilt = nil
+
+        -- block building until our creator tells us to continue
+        self:SetBusy(true)
+        self:SetBlockCommandQueue(true)
+    end,
+
+    OnFailedToBuild = function(self)
+        Unit.OnFailedToBuild(self)
+        self.Parent:OnFailedToBuild()
+        self.UnitBeingBuilt = nil
+
+        -- block building until our creator tells us to continue
+        self:SetBusy(true)
+        self:SetBlockCommandQueue(true)
+    end,
+
+    OnDelayBuildThread = function(self)
+        self:SetBusy(true)
+        self:SetBlockCommandQueue(true)
+
+        WaitSeconds(4)
+
+        self:SetBusy(false)
+        self:SetBlockCommandQueue(false)
+    end,
+
+    OnPaused = function(self)
+        Unit.OnPaused(self)
+    end,
+
+    OnUnpaused = function(self)
+        Unit.OnUnpaused(self)
+    end,
+
+    CalculateRollOffPoint = function(self)
+        return self.Parent:CalculateRollOffPoint()
+    end,
+
+    RolloffBody = function(self)
+        self.Parent:RolloffBody()
+    end,
+
+    RollOffUnit = function(self)
+        self.Parent:RollOffUnit()
+    end,
+
+    StartBuildFx = function(self, unitBeingBuilt)
+        self.Parent:StartBuildFx(unitBeingBuilt)
+    end,
+
+    StopBuildFx = function(self)
+        self.Parent:StopBuildFx()
+    end,
+
+    PlayFxRollOff = function(self)
+        self.Parent:StopBuPlayFxRollOffildFx()
+    end,
+
+    PlayFxRollOffEnd = function(self)
+        self.Parent:PlayFxRollOffEnd()
+    end,
+
+    IdleState = FactoryUnit.IdleState,
+    BuildingState = FactoryUnit.BuildingState,
+    RollingOffState = FactoryUnit.RollingOffState,
+}

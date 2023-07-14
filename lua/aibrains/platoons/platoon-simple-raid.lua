@@ -48,66 +48,66 @@ AIPlatoonSimpleRaidBehavior = Class(AIPlatoon) {
         end,
     },
 
-    Searching = State {
+Searching = State {
 
-        StateName = 'Searching',
+    StateName = 'Searching',
 
-        --- The platoon searches for a target
-        ---@param self AIPlatoonSimpleRaidBehavior
-        Main = function(self)
-            -- reset state
-            self.LocationToRaid = nil
-            self.OpportunityToRaid = nil
-            self.ThreatToEvade = nil
-            self.RetreatCount = 0
+    --- The platoon searches for a target
+    ---@param self AIPlatoonSimpleRaidBehavior
+    Main = function(self)
+        -- reset state
+        self.LocationToRaid = nil
+        self.OpportunityToRaid = nil
+        self.ThreatToEvade = nil
+        self.RetreatCount = 0
 
-            self:Stop()
+        self:Stop()
 
-            -- pick random unit
-            local units, unitCount = self:GetPlatoonUnits()
-            local unit = units[Random(1, unitCount)]
+        -- pick random unit
+        local units, unitCount = self:GetPlatoonUnits()
+        local unit = units[Random(1, unitCount)]
 
-            -- determine navigational label of that unit
-            local position = unit:GetPosition()
-            local label, error = NavUtils.GetLabel('Land', position)
+        -- determine navigational label of that unit
+        local position = unit:GetPosition()
+        local label, error = NavUtils.GetLabel('Land', position)
 
-            if label then
-                
-                -- TODO
-                -- this should be cached, part of the marker utilities
-                local expansions, count = MarkerUtils.GetMarkersByType('Expansion Area')
-                ---@type MarkerData[]
-                local candidates = { }
-                local candidateCount = 0
-                for k = 1, count do
-                    local expansion = expansions[k]
-                    if expansion.NavLabel == label then
-                        candidates[candidateCount + 1] = expansion
-                        candidateCount = candidateCount + 1
-                    end
+        if label then
+            
+            -- TODO
+            -- this should be cached, part of the marker utilities
+            local expansions, count = MarkerUtils.GetMarkersByType('Expansion Area')
+            ---@type MarkerData[]
+            local candidates = { }
+            local candidateCount = 0
+            for k = 1, count do
+                local expansion = expansions[k]
+                if expansion.NavLabel == label then
+                    candidates[candidateCount + 1] = expansion
+                    candidateCount = candidateCount + 1
                 end
-                -- END OF TODO
+            end
+            -- END OF TODO
 
-                -- something odd happened: there are no expansions with a matching label
-                if candidateCount == 0 then
-                    self:LogWarning(string.format('no expansions found on label %d', label))
-                    self:ChangeState(self.Error)
-                    return
-                end
-
-                -- pick random expansion that we can Navigating to
-                local expansion = candidates[Random(1, count)]
-                self.LocationToRaid = expansion.position
-                self:ChangeState(self.Navigating)
-                return
-            else
-                -- something odd happened: try again with another unit
-                self:LogWarning(string.format('no label found', label))
-                self:ChangeState(self.Searching)
+            -- something odd happened: there are no expansions with a matching label
+            if candidateCount == 0 then
+                self:LogWarning(string.format('no expansions found on label %d', label))
+                self:ChangeState(self.Error)
                 return
             end
-        end,
-    },
+
+            -- pick random expansion that we can Navigating to
+            local expansion = candidates[Random(1, count)]
+            self.LocationToRaid = expansion.position
+            self:ChangeState(self.Navigating)
+            return
+        else
+            -- something odd happened: try again with another unit
+            self:LogWarning(string.format('no label found', label))
+            self:ChangeState(self.Searching)
+            return
+        end
+    end,
+},
 
     Navigating = State {
 

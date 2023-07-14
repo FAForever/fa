@@ -507,10 +507,41 @@ local function PostProcessUnit(unit)
     end
 end
 
+---@param allBlueprints BlueprintsTable
+---@param unit UnitBlueprint
+function PostProcessUnitWithExternalFactory(allBlueprints, unit)
+    -- create a new unit that represents the external factory
+    ---@type UnitBlueprint
+    local efBlueprint = table.deepcopy(allBlueprints.Unit["zxa0002"])
+    local efBlueprintId = string.lower(unit.BlueprintId .. "ef")
+    allBlueprints.Unit[efBlueprintId] = efBlueprint
+
+    -- replace properties of external factory
+    efBlueprint.Economy = { BuildRate = unit.Economy.BuildRate, BuildableCategory = unit.Economy.BuildableCategory }
+    efBlueprint.BlueprintId = efBlueprintId
+    efBlueprint.BaseBlueprintId = unit.BlueprintId
+    efBlueprint.ScriptClass = 'ExternalFactoryUnit'
+    efBlueprint.ScriptModule = '/lua/defaultunits.lua'
+
+    -- remove properties of the seed unit
+    unit.CategoriesHash['FACTORY'] = nil
+    unit.CategoriesHash['CONSTRUCTION'] = nil
+    unit.Categories = table.unhash(unit.CategoriesHash)
+    unit.Economy.BuildRate = nil
+    unit.Economy.BuildableCategory = nil
+end
+
 --- Post-processes all units
+---@param allBlueprints BlueprintsTable
 ---@param units UnitBlueprint[]
-function PostProcessUnits(units)
+function PostProcessUnits(allBlueprints, units)
     for _, unit in units do
         PostProcessUnit(unit)
+    end
+
+    for _, unit in units do
+        if unit.CategoriesHash['EXTERNALFACTORY'] then
+            PostProcessUnitWithExternalFactory(allBlueprints, unit)
+        end
     end
 end

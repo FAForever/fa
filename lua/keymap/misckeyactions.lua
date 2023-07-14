@@ -545,3 +545,12 @@ RestoreCameraPosition = function ()
     local settings = Prefs.GetFromCurrentProfile('DebugCameraPosition') --[[@as UserCameraSettings]]
     camera:MoveTo(settings.Focus, { settings.Heading, settings.Pitch, 0}, settings.Zoom, 0)
 end
+
+SelectExternalFactory = function()
+    local selection = GetSelectedUnits()
+    if selection then
+        local unit = selection[1]
+        reprsl(GetAssistingUnitsList(selection))
+        SelectUnits(GetAssistingUnitsList(selection))
+    end
+end

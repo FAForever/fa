@@ -749,3 +749,37 @@ VeterancyComponent = ClassSimple {
         return fractionComplete * unitMass * vetMult + cargoMass
     end,
 }
+
+---@class ExternalFactoryComponent
+---@field ExternalFactory ExternalFactoryUnit
+ExternalFactoryComponent = ClassSimple {
+
+    FactoryAttachBone = false,
+
+        ---@param self Unit | ExternalFactoryComponent
+    OnCreate = function(self)
+        local blueprint = self.Blueprint
+        if not self.FactoryAttachBone then
+            error(string.format("%s is not setup for an external factory: the unit does not have a field 'BuildAttachBone'", blueprint.BlueprintId))
+        end
+
+        if not blueprint.CategoriesHash['EXTERNALFACTORY'] then
+            error(string.format("%s is not setup for an external factory: the unit does not have a 'EXTERNALFACTORY' category", blueprint.BlueprintId))
+        end
+
+        local blueprintIdExternalFactory = blueprint.BlueprintId .. 'ef'
+        if not __blueprints[blueprintIdExternalFactory] then
+            error(string.format("%s is not setup for an external factory: the external factory blueprint is not setup", blueprint.BlueprintId))
+        end
+
+        -- create the factory somewhere completely unrelated
+        local position = self:GetPosition('Ramp')
+        self.ExternalFactory = CreateUnitHPR(blueprintIdExternalFactory, self.Army, position[1], position[2], position[3], 0, 0, 0) --[[@as ExternalFactoryUnit]]
+        self:DetachAll('Ramp')
+        self.ExternalFactory:AttachTo(self, self.FactoryAttachBone)
+        self.ExternalFactory:SetCreator(self)
+        self.ExternalFactory:SetParent(self)
+        self.Trash:Add(self.ExternalFactory)
+    end,
+
+}
