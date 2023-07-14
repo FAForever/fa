@@ -13,7 +13,6 @@ UnitBlueprint {
         'SHOWQUEUE',
         'EXTERNALFACTORYUNIT'
     },
-    CollisionOffsetY = -0.5,
     Defense = {
         Health = 100000,
         MaxHealth = 100000,
@@ -32,7 +31,8 @@ UnitBlueprint {
                 },
             },
         },
-        PlaceholderMeshName = 'UXA0010',
+
+        -- makes it easier to select
         UniformScale = 1.6,
     },
     Economy = {
@@ -44,8 +44,8 @@ UnitBlueprint {
     },
     General = {
         CapCost = 0,
-        Category = 'Utility',
-        Classification = 'RULEUC_MilitaryAircraft',
+        Category = '',
+        Classification = 'RULEUC_Factory',
         CommandCaps = {
             RULEUCC_Guard = true,
             RULEUCC_Move = true,
