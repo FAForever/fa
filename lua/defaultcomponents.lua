@@ -798,6 +798,8 @@ ExternalFactoryComponent = ClassSimple {
 
     ---@param self Unit | ExternalFactoryComponent
     OnIdle = function(self)
+        LOG("OnIdle")
+        LOG(self.ExternalFactory)
         if self.ExternalFactory then
             self.ExternalFactory:SetBusy(false)
             self.ExternalFactory:SetBlockCommandQueue(false)

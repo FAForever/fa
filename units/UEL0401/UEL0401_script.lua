@@ -114,7 +114,7 @@ UEL0401 = ClassUnit(TMobileFactoryUnit, ExternalFactoryComponent) {
         Main = function(self)
             self.PrepareToBuildManipulator:SetRate(-self.PrepareToBuildAnimRate)
             self:DetachAll(self.BuildAttachBone)
-            self.OnIdle()
+            self.OnIdle(self)
         end,
     },
 
