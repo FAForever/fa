@@ -21,7 +21,7 @@ local DefaultExplosions = import("/lua/defaultexplosions.lua")
 UEL0401 = ClassUnit(TMobileFactoryUnit, ExternalFactoryComponent) {
     PrepareToBuildAnimRate = 5,
     BuildAttachBone = 'Build_Attachpoint',
-    FactoryAttachBone = 'Ramp',
+    FactoryAttachBone = 'ExternalFactoryPoint',
     RollOffBones = { 'Arm_Right03_Build_Emitter', 'Arm_Left03_Build_Emitter', },
 
     ExplosionBones = {
