@@ -606,8 +606,6 @@ local function ScriptButtonInitFunction(control, unitList)
 end
 
 local function DroneBehavior(self, modifiers)
-    reprsl(self)
-    reprsl(debug.traceback())
     if modifiers.Left then
         SelectUnits({self._unit})
     end
@@ -1264,7 +1262,6 @@ local function CreateAltOrders(availableOrders, availableToggles, units)
             podUnits['DroneR'] = Pods[2]
         elseif table.getn(PodStagingPlatforms) == 1 then
             assistingUnits = GetAssistingUnitsList(PodStagingPlatforms)
-            reprsl(assistingUnits)
             podUnits['DroneL'] = assistingUnits[1]
             podUnits['DroneR'] = assistingUnits[2]
         end
