@@ -775,7 +775,6 @@ ExternalFactoryComponent = ClassSimple {
         -- create the factory somewhere completely unrelated
         local position = self:GetPosition(self.FactoryAttachBone)
         self.ExternalFactory = CreateUnitHPR(blueprintIdExternalFactory, self.Army, position[1], position[2], position[3], 0, 0, 0) --[[@as ExternalFactoryUnit]]
-        self:DetachAll(self.FactoryAttachBone)
         self.ExternalFactory:AttachTo(self, self.FactoryAttachBone)
         self.ExternalFactory:SetCreator(self)
         self.ExternalFactory:SetParent(self)
@@ -798,11 +797,26 @@ ExternalFactoryComponent = ClassSimple {
 
     ---@param self Unit | ExternalFactoryComponent
     OnIdle = function(self)
-        LOG("OnIdle")
-        LOG(self.ExternalFactory)
         if self.ExternalFactory then
             self.ExternalFactory:SetBusy(false)
             self.ExternalFactory:SetBlockCommandQueue(false)
+        end
+    end,
+
+    ---@param self Unit | ExternalFactoryComponent
+    ---@param new Layer
+    ---@param old Layer
+    OnLayerChange = function(self, new, old)
+        if self.ExternalFactory then
+            if new == 'Land' then
+                self.ExternalFactory:RestoreBuildRestrictions()
+                self.ExternalFactory:RequestRefreshUI()
+            elseif new == 'Seabed' then
+                self.ExternalFactory:AddBuildRestriction(categories.ALLUNITS)
+                self.ExternalFactory:RequestRefreshUI()
+
+                IssueClearCommands({self.ExternalFactory})
+            end
         end
     end,
 

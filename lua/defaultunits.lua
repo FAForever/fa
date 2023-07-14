@@ -200,7 +200,7 @@ StructureUnit = ClassUnit(Unit) {
     end,
 
     ---@param self StructureUnit
-    ---@param builder Builder
+    ---@param builder Unit
     ---@param layer Layer
     OnStartBeingBuilt = function(self, builder, layer)
         Unit.OnStartBeingBuilt(self, builder, layer)
@@ -212,7 +212,7 @@ StructureUnit = ClassUnit(Unit) {
     end,
 
     ---@param self StructureUnit
-    ---@param builder Builder
+    ---@param builder Unit
     ---@param layer Layer
     OnStopBeingBuilt = function(self, builder, layer)
         Unit.OnStopBeingBuilt(self, builder, layer)
@@ -3185,19 +3185,16 @@ ExternalFactoryUnit = ClassUnit(Unit) {
     ---@param self ExternalFactoryUnit
     OnCreate = function(self)
         Unit.OnCreate(self)
-
-        -- help us understand where this thing is
-        self:ForkThread(function()
-            while true do
-                WaitTicks(1)
-                DrawCircle(self:GetPosition(), 10, 'ffffff')
-                end
-            end
-        )
+        self:HideBone(0, true)
     end,
 
     SetParent = function(self, parent)
         self.Parent = parent
+    end,
+
+    OnLayerChange = function(self, new, old)
+        Unit.OnLayerChange(self, new, old)
+        LOG("OnLayerChange: " .. new .. " -> " .. old)
     end,
 
     OnStartBuild = function(self, unitbuilding, order)

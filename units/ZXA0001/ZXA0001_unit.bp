@@ -4,6 +4,7 @@ UnitBlueprint {
         'REPAIR',
         'ENGINEER',
         'INVULNERABLE',
+        'INSIGNIFICANTUNIT',
 
         -- backwards compatible priorities for mods 
         'HIGHPRIAIR',

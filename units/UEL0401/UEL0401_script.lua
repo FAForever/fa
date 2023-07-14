@@ -18,6 +18,9 @@ local ExternalFactoryComponent = import("/lua/defaultcomponents.lua").ExternalFa
 local DefaultExplosions = import("/lua/defaultexplosions.lua")
 
 ---@class UEL0401 : TMobileFactoryUnit, ExternalFactoryComponent
+---@field UnitBeingBuilt Unit | nil
+---@field AttachmentSliderManip moho.SlideManipulator
+---@field PrepareToBuildManipulator moho.AnimationManipulator
 UEL0401 = ClassUnit(TMobileFactoryUnit, ExternalFactoryComponent) {
     PrepareToBuildAnimRate = 5,
     BuildAttachBone = 'Build_Attachpoint',
@@ -57,11 +60,22 @@ UEL0401 = ClassUnit(TMobileFactoryUnit, ExternalFactoryComponent) {
         Torpedo = ClassWeapon(TANTorpedoAngler) {},
     },
 
+    ---@param self UEL0401
     OnCreate = function(self)
         TMobileFactoryUnit.OnCreate(self)
-
+        local blueprint = self.Blueprint
+        self.BuildEffectBones = blueprint.General.BuildBones.BuildEffectBones
+        if blueprint.General.BuildBones then
+            self:SetupBuildBones()
+        end
+        if blueprint.Display.AnimationBuild then
+            self.BuildingOpenAnim = blueprint.Display.AnimationBuild
+        end
     end,
 
+    ---@param self UEL0401
+    ---@param builder Unit
+    ---@param layer Layer
     OnStopBeingBuilt = function(self, builder, layer)
         TMobileFactoryUnit.OnStopBeingBuilt(self, builder, layer)
         ExternalFactoryComponent.OnStopBeingBuilt(self, builder, layer)
@@ -72,8 +86,27 @@ UEL0401 = ClassUnit(TMobileFactoryUnit, ExternalFactoryComponent) {
         ChangeState(self, self.IdleState)
     end,
 
+    ---@param self UEL0401
+    ---@param unitBeingBuilt Unit
+    ---@param order string
+    OnStartBuild = function(self, unitBeingBuilt, order)
+        TMobileFactoryUnit.OnStartBuild(self, unitBeingBuilt, order)
+        self.UnitBeingBuilt = unitBeingBuilt
+        self.UnitBuildOrder = order
+        self.BuildingUnit = true
+    end,
+
+    ---@param self UEL0401
+    ---@param unitBeingBuilt Unit
+    OnStopBuild = function(self, unitBeingBuilt)
+        TMobileFactoryUnit.OnStopBuild(self, unitBeingBuilt)
+        self.BuildingUnit = false
+    end,
+
+    ---@param self UEL0401
     OnFailedToBuild = function(self)
         TMobileFactoryUnit.OnFailedToBuild(self)
+        self.BuildingUnit = false
         ChangeState(self, self.IdleState)
     end,
 
@@ -89,23 +122,32 @@ UEL0401 = ClassUnit(TMobileFactoryUnit, ExternalFactoryComponent) {
         ExternalFactoryComponent.OnUnpaused(self)
     end,
 
-    -- This unit needs to not be allowed to build while underwater
-    -- Additionally, if it goes underwater while building it needs to cancel the current order
+    ---@param self UEL0401
+    ---@param new Layer
+    ---@param old Layer
     OnLayerChange = function(self, new, old)
         TMobileFactoryUnit.OnLayerChange(self, new, old)
-        if new == 'Land' then
-            self:RestoreBuildRestrictions()
-            self:RequestRefreshUI()
-        elseif new == 'Seabed' then
-            self:AddBuildRestriction(categories.ALLUNITS)
-            self:RequestRefreshUI()
+        ExternalFactoryComponent.OnLayerChange(self, new, old)
+        if self.ExternalFactory then
+            if new == 'Land' then
+                self.ExternalFactory:RestoreBuildRestrictions()
+                self.ExternalFactory:RequestRefreshUI()
+            elseif new == 'Seabed' then
+                self.ExternalFactory:AddBuildRestriction(categories.ALLUNITS)
+                self.ExternalFactory:RequestRefreshUI()
+            end
         end
     end,
 
     IdleState = State {
-        OnStartBuild = function(self, unitBuilding, order)
-            TMobileFactoryUnit.OnStartBuild(self, unitBuilding, order)
-            self.UnitBeingBuilt = unitBuilding
+    ---@param self UEL0401
+    ---@param unitBeingBuilt Unit
+    ---@param order string
+        OnStartBuild = function(self, unitBeingBuilt, order)
+            TMobileFactoryUnit.OnStartBuild(self, unitBeingBuilt, order)
+            self.UnitBeingBuilt = unitBeingBuilt
+            self.UnitBuildOrder = order
+            self.BuildingUnit = true
             self.PrepareToBuildManipulator:SetRate(self.PrepareToBuildAnimRate)
             ChangeState(self, self.BuildingState)
         end,
@@ -119,33 +161,35 @@ UEL0401 = ClassUnit(TMobileFactoryUnit, ExternalFactoryComponent) {
     },
 
     BuildingState = State {
+        ---@param self UEL0401
         Main = function(self)
             local unitBuilding = self.UnitBeingBuilt
-            self.PrepareToBuildManipulator:SetRate(self.PrepareToBuildAnimRate)
-            local bone = self.BuildAttachBone
-            self:DetachAll(bone)
-            if not self.UnitBeingBuilt.Dead then
-                unitBuilding:AttachBoneTo(-2, self, bone)
-                local unitHeight = unitBuilding:GetBlueprint().SizeY
-                self.AttachmentSliderManip:SetGoal(0, unitHeight, 0)
-                self.AttachmentSliderManip:SetSpeed(-1)
-                unitBuilding:HideBone(0, true)
+            if unitBuilding then
+                self.PrepareToBuildManipulator:SetRate(self.PrepareToBuildAnimRate)
+                local bone = self.BuildAttachBone
+                self:DetachAll(bone)
+                if not self.UnitBeingBuilt.Dead then
+                    unitBuilding:AttachBoneTo(-2, self, bone)
+                    local unitHeight = unitBuilding:GetBlueprint().SizeY
+                    self.AttachmentSliderManip:SetGoal(0, unitHeight, 0)
+                    self.AttachmentSliderManip:SetSpeed(-1)
+                    unitBuilding:HideBone(0, true)
+                end
+                WaitFor(self.PrepareToBuildManipulator)
+                unitBuilding:ShowBone(0, true)
             end
-            WaitSeconds(3)
-            unitBuilding:ShowBone(0, true)
-            WaitFor(self.PrepareToBuildManipulator)
-            local unitBuilding = self.UnitBeingBuilt
-            self.UnitDoneBeingBuilt = false
         end,
 
+        ---@param self UEL0401
+        ---@param unitBeingBuilt Unit
         OnStopBuild = function(self, unitBeingBuilt)
             TMobileFactoryUnit.OnStopBuild(self, unitBeingBuilt)
-
             ChangeState(self, self.RollingOffState)
         end,
     },
 
     RollingOffState = State {
+        ---@param self UEL0401
         Main = function(self)
             local unitBuilding = self.UnitBeingBuilt
             if not unitBuilding.Dead then
@@ -171,6 +215,7 @@ UEL0401 = ClassUnit(TMobileFactoryUnit, ExternalFactoryComponent) {
         end,
     },
 
+    ---@param self UEL0401
     CreateRollOffEffects = function(self)
         local army = self.Army
         local unitB = self.UnitBeingBuilt
