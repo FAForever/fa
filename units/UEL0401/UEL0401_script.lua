@@ -165,9 +165,6 @@ UEL0401 = ClassUnit(TMobileFactoryUnit, ExternalFactoryComponent) {
 
             if not unitBuilding.Dead then
                 unitBuilding:DetachFrom(true)
-                self:DetachAll(self.BuildAttachBone)
-                local worldPos = self:CalculateWorldPositionFromRelative({ 0, 0, -15 })
-                IssueMoveOffFactory({ unitBuilding }, worldPos)
             end
 
             self:DestroyRollOffEffects()

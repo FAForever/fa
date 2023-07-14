@@ -3196,10 +3196,6 @@ ExternalFactoryUnit = ClassUnit(Unit) {
         )
     end,
 
-    OnDestroy = function(self)
-        Unit.OnDestroy(self)
-    end,
-
     SetParent = function(self, parent)
         self.Parent = parent
     end,
@@ -3228,24 +3224,6 @@ ExternalFactoryUnit = ClassUnit(Unit) {
         -- block building until our creator tells us to continue
         self:SetBusy(true)
         self:SetBlockCommandQueue(true)
-    end,
-
-    OnDelayBuildThread = function(self)
-        self:SetBusy(true)
-        self:SetBlockCommandQueue(true)
-
-        WaitSeconds(4)
-
-        self:SetBusy(false)
-        self:SetBlockCommandQueue(false)
-    end,
-
-    OnPaused = function(self)
-        Unit.OnPaused(self)
-    end,
-
-    OnUnpaused = function(self)
-        Unit.OnUnpaused(self)
     end,
 
     CalculateRollOffPoint = function(self)
