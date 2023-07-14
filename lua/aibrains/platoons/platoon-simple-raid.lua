@@ -1,4 +1,3 @@
-
 local AIPlatoon = import("/lua/aibrains/platoons/platoon-base.lua").AIPlatoon
 local NavUtils = import("/lua/sim/navutils.lua")
 local MarkerUtils = import("/lua/sim/markerutilities.lua")
@@ -14,7 +13,7 @@ local TableEmpty = table.empty
 local NavigateDistanceThresholdSquared = 20 * 20
 
 ---@class AIPlatoonSimpleRaidBehavior : AIPlatoon
----@field RetreatCount number 
+---@field RetreatCount number
 ---@field ThreatToEvade Vector | nil
 ---@field LocationToRaid Vector | nil
 ---@field OpportunityToRaid Vector | nil
@@ -48,66 +47,66 @@ AIPlatoonSimpleRaidBehavior = Class(AIPlatoon) {
         end,
     },
 
-Searching = State {
+    Searching = State {
 
-    StateName = 'Searching',
+        StateName = 'Searching',
 
-    --- The platoon searches for a target
-    ---@param self AIPlatoonSimpleRaidBehavior
-    Main = function(self)
-        -- reset state
-        self.LocationToRaid = nil
-        self.OpportunityToRaid = nil
-        self.ThreatToEvade = nil
-        self.RetreatCount = 0
+        --- The platoon searches for a target
+        ---@param self AIPlatoonSimpleRaidBehavior
+        Main = function(self)
+            -- reset state
+            self.LocationToRaid = nil
+            self.OpportunityToRaid = nil
+            self.ThreatToEvade = nil
+            self.RetreatCount = 0
 
-        self:Stop()
+            self:Stop()
 
-        -- pick random unit
-        local units, unitCount = self:GetPlatoonUnits()
-        local unit = units[Random(1, unitCount)]
+            -- pick random unit
+            local units, unitCount = self:GetPlatoonUnits()
+            local unit = units[Random(1, unitCount)]
 
-        -- determine navigational label of that unit
-        local position = unit:GetPosition()
-        local label, error = NavUtils.GetLabel('Land', position)
+            -- determine navigational label of that unit
+            local position = unit:GetPosition()
+            local label, error = NavUtils.GetLabel('Land', position)
 
-        if label then
-            
-            -- TODO
-            -- this should be cached, part of the marker utilities
-            local expansions, count = MarkerUtils.GetMarkersByType('Expansion Area')
-            ---@type MarkerData[]
-            local candidates = { }
-            local candidateCount = 0
-            for k = 1, count do
-                local expansion = expansions[k]
-                if expansion.NavLabel == label then
-                    candidates[candidateCount + 1] = expansion
-                    candidateCount = candidateCount + 1
+            if label then
+
+                -- TODO
+                -- this should be cached, part of the marker utilities
+                local expansions, count = MarkerUtils.GetMarkersByType('Expansion Area')
+                ---@type MarkerData[]
+                local candidates = {}
+                local candidateCount = 0
+                for k = 1, count do
+                    local expansion = expansions[k]
+                    if expansion.NavLabel == label then
+                        candidates[candidateCount + 1] = expansion
+                        candidateCount = candidateCount + 1
+                    end
                 end
-            end
-            -- END OF TODO
+                -- END OF TODO
 
-            -- something odd happened: there are no expansions with a matching label
-            if candidateCount == 0 then
-                self:LogWarning(string.format('no expansions found on label %d', label))
-                self:ChangeState(self.Error)
+                -- something odd happened: there are no expansions with a matching label
+                if candidateCount == 0 then
+                    self:LogWarning(string.format('no expansions found on label %d', label))
+                    self:ChangeState(self.Error)
+                    return
+                end
+
+                -- pick random expansion that we can Navigating to
+                local expansion = candidates[Random(1, count)]
+                self.LocationToRaid = expansion.position
+                self:ChangeState(self.Navigating)
+                return
+            else
+                -- something odd happened: try again with another unit
+                self:LogWarning(string.format('no label found', label))
+                self:ChangeState(self.Searching)
                 return
             end
-
-            -- pick random expansion that we can Navigating to
-            local expansion = candidates[Random(1, count)]
-            self.LocationToRaid = expansion.position
-            self:ChangeState(self.Navigating)
-            return
-        else
-            -- something odd happened: try again with another unit
-            self:LogWarning(string.format('no label found', label))
-            self:ChangeState(self.Searching)
-            return
-        end
-    end,
-},
+        end,
+    },
 
     Navigating = State {
 
@@ -154,7 +153,7 @@ Searching = State {
                     return
                 end
 
-                -- navigate towards waypoint 
+                -- navigate towards waypoint
                 local dx = origin[1] - waypoint[1]
                 local dz = origin[3] - waypoint[3]
                 local d = math.sqrt(dx * dx + dz * dz)
@@ -289,7 +288,7 @@ Searching = State {
 
             -- tell attack units to attack
             local attackCommand
-            local attackOffset, error = NavUtils.RandomDirectionFrom('Land', location, 32, 4)       -- TODO: remove magic numbers'
+            local attackOffset, error = NavUtils.RandomDirectionFrom('Land', location, 32, 4) -- TODO: remove magic numbers'
             if not attackOffset then
                 attackCommand = self:AggressiveMoveToLocation(location, 'Attack')
             else
@@ -297,7 +296,7 @@ Searching = State {
             end
 
             -- tell scout units to patrol for threats
-            local scoutOffsets, countOrError = NavUtils.DirectionsFrom('Land', location, 32, 4)    -- TODO: remove magic numbers
+            local scoutOffsets, countOrError = NavUtils.DirectionsFrom('Land', location, 32, 4) -- TODO: remove magic numbers
             if not scoutOffsets then
                 self:Patrol(location, 'Scout')
             else
@@ -332,7 +331,7 @@ Searching = State {
                 -- check if our command is still going
                 if not self:IsCommandsActive(attackCommand) then
                     -- setup attack units
-                    local attackOffset, error = NavUtils.RandomDirectionFrom('Land', location, 10, 8)       -- TODO: remove magic numbers
+                    local attackOffset, error = NavUtils.RandomDirectionFrom('Land', location, 10, 8) -- TODO: remove magic numbers
                     if not attackOffset then
                         self:LogWarning(string.format('no alternative directions found to evade'))
                         self:ChangeState(self.Error)
@@ -441,7 +440,7 @@ Searching = State {
             end
         end
 
-        for k, scout in units do 
+        for k, scout in units do
             scout:SetFireState(1)
         end
     end,
@@ -471,6 +470,3 @@ DebugAssignToUnits = function(data, units)
         ChangeState(platoon, platoon.Start)
     end
 end
-
-
-
