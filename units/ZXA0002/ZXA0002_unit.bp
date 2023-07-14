@@ -17,7 +17,7 @@ UnitBlueprint {
         Health = 100000,
         MaxHealth = 100000,
     },
-    Description = 'Dummy Drone',
+    Description = 'Mobile Factory',
     Display = {
         Mesh = {
             IconFadeInZoom = 175,
