@@ -597,88 +597,247 @@ end
 
 do
 
-    local toSimCommand = {
-        false, --  1 "Stop
-        IssueMove, --  2 "Move
-        false, --  3 "Dive
-        IssueMove, --  4 "FormMove
-        false, --  5 "BuildSiloTactical
-        false, --  6 "BuildSiloNuke"
-        false, --  7 "BuildFactory"
-        IssueBuildMobile, --  8 "BuildMobile"
-        IssueGuard, --  9 "BuildAssist"
-        IssueAttack, --  10 "Attack
-        IssueAttack, --  11 "FormAttack
-        IssueNuke, --  12 "Nuke
-        IssueTactical, --  13 "Tactical
-        IssueTeleport, --  14 "Teleport
-        IssueGuard, --  15 "Guard
-        false, --  16 "Patrol
-        false, --  17 "Ferry
-        false, --  18 "FormPatrol
-        IssueReclaim, --  19 "Reclaim
-        IssueRepair, --  20 "Repair
-        IssueCapture, --  21 "Capture
-        false, --  22 "TransportLoadUnits
-        false, --  23 "TransportReverseLoadUnits
-        IssueTransportUnload, --  24 "TransportUnloadUnits
-        false, --  25 "TransportUnloadSpecificUnits
-        false, --  26 "DetachFromTransport
-        false, --  27 "Upgrade
-        false, --  28 "Script
-        false, --  29 "AssistCommander
-        false, --  30 "KillSelf
-        false, --  31 "DestroySelf
-        false, --  32 "Sacrifice
-        false, --  33 "Pause
-        false, --  34 "OverCharge
-        IssueAggressiveMove, --  35 "AggressiveMove
-        IssueAggressiveMove, --  36 "FormAggressiveMove
-        false, --  37 "AssistMove
-        false, --  38 "SpecialAction
-        false, --  39 "Dock
-    }
-
-    local requiresEntity = {
-        false, --  1 "Stop
-        false, --  2 "Move
-        false, --  3 "Dive
-        false, --  4 "FormMove
-        false, --  5 "BuildSiloTactical
-        false, --  6 "BuildSiloNuke"
-        false, --  7 "BuildFactory"
-        false, --  8 "BuildMobile"
-        false, --  9 "BuildAssist"
-        false, --  10 "Attack
-        false, --  11 "FormAttack
-        false, --  12 "Nuke
-        false, --  13 "Tactical
-        false, --  14 "Teleport
-        true, --  15 "Guard
-        false, --  16 "Patrol
-        false, --  17 "Ferry
-        false, --  18 "FormPatrol
-        true, --  19 "Reclaim
-        true, --  20 "Repair
-        true, --  21 "Capture
-        false, --  22 "TransportLoadUnits
-        false, --  23 "TransportReverseLoadUnits
-        false, --  24 "TransportUnloadUnits
-        false, --  25 "TransportUnloadSpecificUnits
-        false, --  26 "DetachFromTransport
-        false, --  27 "Upgrade
-        false, --  28 "Script
-        false, --  29 "AssistCommander
-        false, --  30 "KillSelf
-        false, --  31 "DestroySelf
-        false, --  32 "Sacrifice
-        false, --  33 "Pause
-        false, --  34 "OverCharge
-        false, --  35 "AggressiveMove
-        false, --  36 "FormAggressiveMove
-        false, --  37 "AssistMove
-        false, --  38 "SpecialAction
-        false, --  39 "Dock
+    local CommandInfo = {
+        {
+            -- 1, Stop
+            Callback = false,
+            RequiresEntity = false,
+            Redundancy = 1,
+        },
+        {
+            -- 2, Move
+            Callback = IssueMove,
+            RequiresEntity = false,
+            Redundancy = 1,
+        },
+        {
+            -- 3, Dive
+            Callback = false,
+            RequiresEntity = false,
+            Redundancy = 1,
+        },
+        {
+            -- 4, FormMove
+            Callback = IssueMove,
+            RequiresEntity = false,
+            Redundancy = 1,
+        },
+        {
+            -- 5, BuildSiloTactical
+            Callback = false,
+            RequiresEntity = false,
+            Redundancy = 1,
+        },
+        {
+            -- 6, BuildSiloNuke
+            Callback = false,
+            RequiresEntity = false,
+            Redundancy = 1,
+        },
+        {
+            -- 7, BuildFactory
+            Callback = false,
+            RequiresEntity = false,
+            Redundancy = 1,
+        },
+        {
+            -- 8, BuildMobile
+            Callback = IssueBuildMobile,
+            RequiresEntity = false,
+            Redundancy = 1,
+        },
+        {
+            -- 9, BuildAssist
+            Callback = IssueGuard,
+            RequiresEntity = true,
+            Redundancy = 1,
+        },
+        {
+            -- 10, Attack
+            Callback = IssueAttack,
+            RequiresEntity = false,
+            Redundancy = 3,
+        },
+        {
+            -- 11, FormAttack
+            Callback = IssueAttack,
+            RequiresEntity = false,
+            Redundancy = 3,
+        },
+        {
+            -- 12, Nuke
+            Callback = IssueNuke,
+            RequiresEntity = false,
+            Redundancy = 1,
+        },
+        {
+            -- 14, Tactical
+            Callback = IssueTactical,
+            RequiresEntity = false,
+            Redundancy = 1,
+        },
+        {
+            -- 14, Teleport
+            Callback = IssueTeleport,
+            RequiresEntity = false,
+            Redundancy = 1,
+        },
+        {
+            -- 15, Guard
+            Callback = IssueGuard,
+            RequiresEntity = true,
+            Redundancy = 1,
+        },
+        {
+            -- 15, Guard
+            Callback = IssueGuard,
+            RequiresEntity = true,
+            Redundancy = 1,
+        },
+        {
+            -- 16, Patrol
+            Callback = nil,
+            RequiresEntity = false,
+            Redundancy = 1,
+        },
+        {
+            -- 17, Ferry
+            Callback = nil,
+            RequiresEntity = false,
+            Redundancy = 1,
+        },
+        {
+            -- 18, FormPatrol
+            Callback = nil,
+            RequiresEntity = false,
+            Redundancy = 1,
+        },
+        {
+            -- 19, Reclaim
+            Callback = IssueReclaim,
+            RequiresEntity = true,
+            Redundancy = 1,
+        },
+        {
+            -- 20, Repair
+            Callback = IssueRepair,
+            RequiresEntity = true,
+            Redundancy = 1,
+        },
+        {
+            -- 21, Capture
+            Callback = IssueCapture,
+            RequiresEntity = true,
+            Redundancy = 1,
+        },
+        {
+            -- 22, TransportLoadUnits
+            Callback = nil,
+            RequiresEntity = false,
+            Redundancy = 1,
+        },
+        {
+            -- 23, TransportReverseLoadUnits
+            Callback = nil,
+            RequiresEntity = false,
+            Redundancy = 1,
+        },
+        {
+            -- 24, TransportUnloadUnits
+            Callback = IssueTransportUnload,
+            RequiresEntity = false,
+            Redundancy = 1,
+        },
+        {
+            -- 25, TransportUnloadSpecificUnits
+            Callback = nil,
+            RequiresEntity = false,
+            Redundancy = 1,
+        },
+        {
+            -- 26, DetachFromTransport
+            Callback = nil,
+            RequiresEntity = false,
+            Redundancy = 1,
+        },
+        {
+            -- 27, Upgrade
+            Callback = nil,
+            RequiresEntity = false,
+            Redundancy = 1,
+        },
+        {
+            -- 28, Script
+            Callback = nil,
+            RequiresEntity = false,
+            Redundancy = 1,
+        },
+        {
+            -- 29, AssistCommander
+            Callback = IssueGuard,
+            RequiresEntity = true,
+            Redundancy = 1,
+        },
+        {
+            -- 30, KillSelf
+            Callback = nil,
+            RequiresEntity = false,
+            Redundancy = 1,
+        },
+        {
+            -- 31, DestroySelf
+            Callback = nil,
+            RequiresEntity = false,
+            Redundancy = 1,
+        },
+        {
+            -- 32, Sacrifice
+            Callback = IssueSacrifice,
+            RequiresEntity = true,
+            Redundancy = 1,
+        },
+        {
+            -- 33, Pause
+            Callback = nil,
+            RequiresEntity = false,
+            Redundancy = 1,
+        },
+        {
+            -- 34, OverCharge
+            Callback = nil,
+            RequiresEntity = false,
+            Redundancy = 1,
+        },
+        {
+            -- 35, AggressiveMove
+            Callback = IssueAggressiveMove,
+            RequiresEntity = false,
+            Redundancy = 1,
+        },
+        {
+            -- 36, FormAggressiveMove
+            Callback = IssueAggressiveMove,
+            RequiresEntity = false,
+            Redundancy = 1,
+        },
+        {
+            -- 37, AssistMove
+            Callback = nil,
+            RequiresEntity = false,
+            Redundancy = 1,
+        },
+        {
+            -- 38, SpecialAction
+            Callback = nil,
+            RequiresEntity = false,
+            Redundancy = 1,
+        },
+        {
+            -- 39, Dock
+            Callback = nil,
+            RequiresEntity = false,
+            Redundancy = 1,
+        },
     }
 
     ---@param data any
@@ -720,42 +879,46 @@ do
         -- assign orders in an interleaved fashion
         for offset, unit in units do
             for k, group in groups do
+                local commandInfo = CommandInfo[group[1].commandType]
+                local callback = commandInfo.Callback
                 local count = table.getn(group)
-                local index = math.mod(offset, count) + 1
-                local order = group[index]
-                local callback = toSimCommand[order.commandType]
                 if callback then
-                    local candidate = GetEntityById(order.targetId)
-                    if candidate then
-                        local target
+                    for redundancy = 1, math.min(count, commandInfo.Redundancy) do
+                        local index = math.mod(offset + redundancy, count) + 1
+                        local order = group[index]
+                        local candidate = order.targetId and GetEntityById(order.targetId)
+                        if candidate then
+                            local target
 
-                        -- props are always valid
-                        if IsProp(candidate) then
-                            target = candidate
-                        else
-                            -- units are only valid in certain cases
-                            if IsUnit(candidate) then
-                                -- our own and allied units are always valid
-                                if candidate.Army == unit.Army or IsAllied(candidate.Army, unit.Army) then
-                                    target = candidate
+                            -- props are always valid
+                            if IsProp(candidate) then
+                                target = candidate
+                            else
+                                -- units are only valid in certain cases
+                                if IsUnit(candidate) then
+                                    -- our own and allied units are always valid
+                                    if candidate.Army == unit.Army or IsAllied(candidate.Army, unit.Army) then
+                                        target = candidate
 
-                                -- enemy units are only valid if we've ever seen them
-                                elseif candidate:GetBlip(unit.Army):IsSeenEver() then
-                                    target = candidate
+                                        -- enemy units are only valid if we've ever seen them
+                                    elseif candidate:GetBlip(unit.Army):IsSeenEver() then
+                                        target = candidate
+                                    end
                                 end
                             end
-                        end
 
-                        -- at this point we need a valid target
-                        if target then
-                            callback({ unit }, target)
-                        end
-                    else
-                        -- at this point we may need an entity, so we check and bail if we do need one
-                        if not requiresEntity[order.commandType] then
-                            callback({ unit }, { order.x, order.y, order.z })
+                            -- at this point we need a valid target
+                            if target then
+                                callback({ unit }, target)
+                            end
+                        else
+                            -- at this point we may need an entity, so we check and bail if we do need one
+                            if not commandInfo.RequiresEntity then
+                                callback({ unit }, { order.x, order.y, order.z })
+                            end
                         end
                     end
+
                 end
             end
         end
