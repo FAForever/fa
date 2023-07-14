@@ -1,7 +1,7 @@
 UnitBlueprint {
     Categories = {
-        'TECH3',
         'STRUCTURE',
+        'TECH3',
         'FACTORY',
         'CONSTRUCTION',
         'SELECTABLE',
@@ -15,14 +15,8 @@ UnitBlueprint {
     },
     CollisionOffsetY = -0.5,
     Defense = {
-        AirThreatLevel = 0,
-        ArmorType = 'Light',
-        EconomyThreatLevel = 1,
         Health = 100000,
         MaxHealth = 100000,
-        RegenRate = 0,
-        SubThreatLevel = 0,
-        SurfaceThreatLevel = 0,
     },
     Description = 'Dummy Drone',
     Display = {
@@ -30,11 +24,10 @@ UnitBlueprint {
             IconFadeInZoom = 175,
             LODs = {
                 {
-                    AlbedoName = '/Units/UEA0001/UEA0001_Albedo.dds',
-                    LODCutoff = 150,
-                    MeshName = '/Units/UEA0001/UEA0001_lod0.scm',
-                    NormalsName = '/Units/UEA0001/UEA0001_normalsTS.dds',
                     ShaderName = 'Unit',
+                    MeshName = '/Units/UEA0001/UEA0001_lod0.scm',
+                    AlbedoName = '/Units/UEA0001/UEA0001_Albedo.dds',
+                    NormalsName = '/Units/UEA0001/UEA0001_normalsTS.dds',
                     SpecularName = '/Units/UEA0001/UEA0001_SpecTeam.dds',
                 },
             },
@@ -48,9 +41,6 @@ UnitBlueprint {
         MaxBuildDistance = 10000,
         BuildRate = 0,
         BuildTime = 400,
-        BuildableCategory = {
-            'ALLUNITS',
-        },
     },
     General = {
         CapCost = 0,
@@ -60,35 +50,23 @@ UnitBlueprint {
             RULEUCC_Guard = true,
             RULEUCC_Move = true,
             RULEUCC_Patrol = true,
+            RULEUCC_Pause = true,
             RULEUCC_RetaliateToggle = true,
             RULEUCC_Stop = true,
         },
-        FactionName = 'UEF',
-        Icon = 'air',
-        OrderOverrides = {
-            DroneL = {
-                bitmapId = 'drone',
-                helpText = 'drone_SACU',
-            },
-            RULEUTC_WeaponToggle = {
-                bitmapId = 'dronerebuild',
-                helpText = 'drone_rebuild',
-            },
-        },
         SelectionPriority = 6,
         TechLevel = 'RULEUTL_Experimental',
-        ToggleCaps = {
-            RULEUTC_WeaponToggle = false,
-        },
         UnitName = 'Mobile Factory',
         UnitWeight = 1,
     },
     Intel = {
         VisionRadius = 0,
+        WaterVisionRadius = 0,
     },
     LifeBarHeight = 0.075,
     LifeBarOffset = 0.25,
     LifeBarSize = 0.3,
+    LifeBarRender = false,
     Physics = {
         BuildOnLayerCaps = {
             LAYER_Air = true,
@@ -113,22 +91,4 @@ UnitBlueprint {
     SizeX = 0,
     SizeY = 0,
     SizeZ = 0,
-    Transport = {
-        AirClass = true,
-        TransportClass = 5,
-    },
-    Wreckage = {
-        Blueprint = '/props/DefaultWreckage/DefaultWreckage_prop.bp',
-        EnergyMult = 0,
-        HealthMult = 0.9,
-        MassMult = 0.9,
-        ReclaimTimeMultiplier = 1,
-        WreckageLayers = {
-            Air = false,
-            Land = true,
-            Seabed = false,
-            Sub = false,
-            Water = false,
-        },
-    },
 }
