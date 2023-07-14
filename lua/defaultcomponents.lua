@@ -773,9 +773,9 @@ ExternalFactoryComponent = ClassSimple {
         end
 
         -- create the factory somewhere completely unrelated
-        local position = self:GetPosition('Ramp')
+        local position = self:GetPosition(self.FactoryAttachBone)
         self.ExternalFactory = CreateUnitHPR(blueprintIdExternalFactory, self.Army, position[1], position[2], position[3], 0, 0, 0) --[[@as ExternalFactoryUnit]]
-        self:DetachAll('Ramp')
+        self:DetachAll(self.FactoryAttachBone)
         self.ExternalFactory:AttachTo(self, self.FactoryAttachBone)
         self.ExternalFactory:SetCreator(self)
         self.ExternalFactory:SetParent(self)
