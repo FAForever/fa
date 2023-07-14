@@ -59,7 +59,6 @@ UnitBlueprint{
         "UEF",
         "VISIBLETORECON",
         "EXTERNALFACTORY",
-        "PODSTAGINGPLATFORM",
     },
     Defense = {
         AirThreatLevel = 11,
@@ -241,10 +240,6 @@ UnitBlueprint{
         FactionName = "UEF",
         Icon = "amph",
         OrderOverrides = {
-            -- ExternalFactory = {
-            --     bitmapId = "drone",
-            --     helpText = "drone",
-            -- },
             RULEUCC_Transport = {
                 bitmapId = "deploy",
                 helpText = "deploy",
@@ -254,7 +249,7 @@ UnitBlueprint{
                 helpText = "toggle_shield_dome",
             },
         },
-        ToggleCaps = { RULEUTC_ShieldToggle = true, RULEUTC_WeaponToggle = true, },
+        ToggleCaps = { RULEUTC_ShieldToggle = true },
         UnitName = "<LOC uel0401_name>Fatboy",
     },
     Intel = {

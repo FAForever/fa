@@ -756,8 +756,8 @@ ExternalFactoryComponent = ClassSimple {
 
     FactoryAttachBone = false,
 
-        ---@param self Unit | ExternalFactoryComponent
-    OnCreate = function(self)
+    ---@param self Unit | ExternalFactoryComponent
+    OnStopBeingBuilt = function(self, builder, layer)
         local blueprint = self.Blueprint
         if not self.FactoryAttachBone then
             error(string.format("%s is not setup for an external factory: the unit does not have a field 'BuildAttachBone'", blueprint.BlueprintId))
@@ -780,6 +780,28 @@ ExternalFactoryComponent = ClassSimple {
         self.ExternalFactory:SetCreator(self)
         self.ExternalFactory:SetParent(self)
         self.Trash:Add(self.ExternalFactory)
+    end,
+
+    ---@param self Unit | ExternalFactoryComponent
+    OnPaused = function(self)
+        if self.ExternalFactory then
+            self.ExternalFactory:SetPaused(true)
+        end
+    end,
+
+    ---@param self Unit | ExternalFactoryComponent
+    OnUnpaused = function(self)
+        if self.ExternalFactory then
+            self.ExternalFactory:SetPaused(false)
+        end
+    end,
+
+    ---@param self Unit | ExternalFactoryComponent
+    OnIdle = function(self)
+        if self.ExternalFactory then
+            self.ExternalFactory:SetBusy(false)
+            self.ExternalFactory:SetBlockCommandQueue(false)
+        end
     end,
 
 }
