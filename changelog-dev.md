@@ -1,37 +1,40 @@
-# Game version 3760 (27th of June, 2023)
+# Game version 3761 (27th of June, 2023)
 
-See the patch notes of 3758 for all the details of the second development iteration.
+This patch primarily aims to allow for a more varied amount of strategies to be viable in the form of increased raiding potential, nerfing imbalanced units and adding new ways to use other units.
 
-We would like to remind people that we're always open to feedback. You can get in touch with us through the forums, Discord and of course through GitHub to discuss the patch.
+This changelog is just a snippet of the total changelog. In this balance update, more than a hundred units have been tweaked in some fashion. You can read the complete changelog by clicking on the 'Beta Balance' button below. This snippet only includes bug fixes and unit reworks.
 
-With thanks to those that took the time to report bugs,
-
-Jip
+The Balance Team
 
 ## Bug fixes
 
-- (#5153) Fix a bug with AI being buggy in the featured mod Nomads
+- (#5222) Fix a resource glitch that allows the Megalith to produce units for free
 
-- (#5159) Remove the rehost functionality
+- (#5221) Fix a bug with the animation of the Cybran extractors not stopping when upgrading
 
-  The rehost functionality has been broken for quite a long time. It would not properly restart the 
-  game with the correct mods and previously private lobbies would become public. We've not managed to 
-  fix it for quite some time and it confuses those who use it. Therefore we've decided to remove it 
-  until we can find a proper fix.
+- (#5220) Fix a bug where the Wailer (Tech 3 Cybran gunship) would half its damage output
 
-  You can still 'rehost' the usual way, and in that case, your mods will work too.
+  This bug occurs when the Wailer would engage a ground target and an air target at the same time. The damage output of the air-to-ground weapons would be reduced by half
 
-- (#5158) Fix a bug with the Cybran destroyer being stuck in the transition animation
+## Unit reworks
 
-- (#5155) Fix a bug where abandoned armies would not be defeated
+- (#4985, #5194, #5175) Rework the Mercy
 
-- (#5155) Fix a bug in the campaign/co-op where naval rally points were ignored
+  The mercy has been completely reworked. The role of the unit is changed from being a sniper to area denial
 
-- (#5155) Fix a bug in the campaign/co-op where the army brain was missing certain functions
-
-- (#5148) Fix a bug with the in-game file picker for replays
+  With thanks to Deribus for the initial idea and implementation.
 
 ## Contributors
 
-- Jip (#5159, #5158, #5155, #5148)
-- Relent0r (#5153)
+- Terminal
+- Farmsletje
+- Tagada
+- SpikeyNoob
+- Rowey
+- Blodir
+- Turinturambar
+- RabidPope
+- Basilisk3
+- Hdt80bro
+- Jip
+- 4z0t
