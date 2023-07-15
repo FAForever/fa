@@ -8104,7 +8104,7 @@ xss0304_help="U-Boot-Jäger"
 xss0304_name="Yathsou"
 
 loadingtip_0000="Kurzhinweis"
-loadingtip_0001="Mindestens ein Energiespeicher und 5000 Energie sind erforderlich um die Überladung Funktion der Kommandoeinheit zu nutzen"
+loadingtip_0001="Mindestens ein Energiespeicher und 7500 Energie sind erforderlich um die Überladung Funktion der Kommandoeinheit zu nutzen"
 loadingtip_0002="Baue immer Energiespeicher an einem Ort wo die Explosion bei der Vernichtung des Speichers keinen Schaden anrichten kann"
 loadingtip_0003="Die Überladung Funktion der Kommandoeinheit verursacht 12 000 Schaden an Einheiten, 400 Schaden an andere Kommandoeinheiten und 800 Schaden an Gebäuden"
 loadingtip_0004="Baue keine Massefabriktoren wenn du nicht jeden T2 Masseextraktor auf T3 aufgewertet hast"
