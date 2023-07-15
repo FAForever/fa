@@ -598,241 +598,235 @@ end
 do
 
     local CommandInfo = {
-        {
+        [1] = {
             -- 1, Stop
             Callback = false,
             RequiresEntity = false,
             Redundancy = 1,
         },
-        {
+        [2] = {
             -- 2, Move
             Callback = IssueMove,
             RequiresEntity = false,
             Redundancy = 1,
         },
-        {
+        [3] = {
             -- 3, Dive
             Callback = false,
             RequiresEntity = false,
             Redundancy = 1,
         },
-        {
+        [4] = {
             -- 4, FormMove
             Callback = IssueMove,
             RequiresEntity = false,
             Redundancy = 1,
         },
-        {
+        [5] = {
             -- 5, BuildSiloTactical
             Callback = false,
             RequiresEntity = false,
             Redundancy = 1,
         },
-        {
+        [6] = {
             -- 6, BuildSiloNuke
             Callback = false,
             RequiresEntity = false,
             Redundancy = 1,
         },
-        {
+        [7] = {
             -- 7, BuildFactory
             Callback = false,
             RequiresEntity = false,
             Redundancy = 1,
         },
-        {
+        [8] = {
             -- 8, BuildMobile
             Callback = IssueBuildMobile,
             RequiresEntity = false,
             Redundancy = 1,
         },
-        {
+        [9] = {
             -- 9, BuildAssist
             Callback = IssueGuard,
             RequiresEntity = true,
             Redundancy = 1,
         },
-        {
+        [10] = {
             -- 10, Attack
             Callback = IssueAttack,
             RequiresEntity = false,
             Redundancy = 3,
         },
-        {
+        [11] = {
             -- 11, FormAttack
             Callback = IssueAttack,
             RequiresEntity = false,
             Redundancy = 3,
         },
-        {
+        [12] = {
             -- 12, Nuke
             Callback = IssueNuke,
             RequiresEntity = false,
             Redundancy = 1,
         },
-        {
-            -- 14, Tactical
+        [13] = {
+            -- 13, Tactical
             Callback = IssueTactical,
             RequiresEntity = false,
             Redundancy = 1,
         },
-        {
+        [14] = {
             -- 14, Teleport
             Callback = IssueTeleport,
             RequiresEntity = false,
             Redundancy = 1,
         },
-        {
+        [15] = {
             -- 15, Guard
             Callback = IssueGuard,
             RequiresEntity = true,
             Redundancy = 1,
         },
-        {
-            -- 15, Guard
-            Callback = IssueGuard,
-            RequiresEntity = true,
-            Redundancy = 1,
-        },
-        {
+        [16] = {
             -- 16, Patrol
             Callback = nil,
             RequiresEntity = false,
             Redundancy = 1,
         },
-        {
+        [17] = {
             -- 17, Ferry
             Callback = nil,
             RequiresEntity = false,
             Redundancy = 1,
         },
-        {
+        [18] = {
             -- 18, FormPatrol
             Callback = nil,
             RequiresEntity = false,
             Redundancy = 1,
         },
-        {
+        [19] = {
             -- 19, Reclaim
             Callback = IssueReclaim,
             RequiresEntity = true,
             Redundancy = 1,
         },
-        {
+        [20] = {
             -- 20, Repair
             Callback = IssueRepair,
             RequiresEntity = true,
             Redundancy = 1,
         },
-        {
+        [21] = {
             -- 21, Capture
             Callback = IssueCapture,
             RequiresEntity = true,
             Redundancy = 1,
         },
-        {
+        [22] = {
             -- 22, TransportLoadUnits
             Callback = nil,
             RequiresEntity = false,
             Redundancy = 1,
         },
-        {
+        [23] = {
             -- 23, TransportReverseLoadUnits
             Callback = nil,
             RequiresEntity = false,
             Redundancy = 1,
         },
-        {
+        [24] = {
             -- 24, TransportUnloadUnits
             Callback = IssueTransportUnload,
             RequiresEntity = false,
             Redundancy = 1,
         },
-        {
+        [25] = {
             -- 25, TransportUnloadSpecificUnits
             Callback = nil,
             RequiresEntity = false,
             Redundancy = 1,
         },
-        {
+        [26] = {
             -- 26, DetachFromTransport
             Callback = nil,
             RequiresEntity = false,
             Redundancy = 1,
         },
-        {
+        [27] = {
             -- 27, Upgrade
             Callback = nil,
             RequiresEntity = false,
             Redundancy = 1,
         },
-        {
+        [28] = {
             -- 28, Script
             Callback = nil,
             RequiresEntity = false,
             Redundancy = 1,
         },
-        {
+        [29] = {
             -- 29, AssistCommander
             Callback = IssueGuard,
             RequiresEntity = true,
             Redundancy = 1,
         },
-        {
+        [30] = {
             -- 30, KillSelf
             Callback = nil,
             RequiresEntity = false,
             Redundancy = 1,
         },
-        {
+        [31] = {
             -- 31, DestroySelf
             Callback = nil,
             RequiresEntity = false,
             Redundancy = 1,
         },
-        {
+        [32] = {
             -- 32, Sacrifice
             Callback = IssueSacrifice,
             RequiresEntity = true,
             Redundancy = 1,
         },
-        {
+        [33] = {
             -- 33, Pause
             Callback = nil,
             RequiresEntity = false,
             Redundancy = 1,
         },
-        {
+        [34] = {
             -- 34, OverCharge
             Callback = nil,
             RequiresEntity = false,
             Redundancy = 1,
         },
-        {
+        [35] = {
             -- 35, AggressiveMove
             Callback = IssueAggressiveMove,
             RequiresEntity = false,
             Redundancy = 1,
         },
-        {
+        [36] = {
             -- 36, FormAggressiveMove
             Callback = IssueAggressiveMove,
             RequiresEntity = false,
             Redundancy = 1,
         },
-        {
+        [37] = {
             -- 37, AssistMove
             Callback = nil,
             RequiresEntity = false,
             Redundancy = 1,
         },
-        {
+        [38] = {
             -- 38, SpecialAction
             Callback = nil,
             RequiresEntity = false,
             Redundancy = 1,
         },
-        {
+        [39] = {
             -- 39, Dock
             Callback = nil,
             RequiresEntity = false,

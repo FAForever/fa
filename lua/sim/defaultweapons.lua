@@ -1406,6 +1406,7 @@ DefaultBeamWeapon = ClassWeapon(DefaultProjectileWeapon) {
 
     ---@param self DefaultBeamWeapon
     OnCreate = function(self)
+        LOG("OnCreate")
         DefaultProjectileWeapon.OnCreate(self)
 
         self.Beams = {}
@@ -1443,6 +1444,7 @@ DefaultBeamWeapon = ClassWeapon(DefaultProjectileWeapon) {
     end,
 
     OnDestroy = function(self)
+        LOG("OnDestroy")
         DefaultProjectileWeapon.OnDestroy(self)
         for k, info in self.Beams do
             info.Beam:Destroy()
@@ -1453,6 +1455,7 @@ DefaultBeamWeapon = ClassWeapon(DefaultProjectileWeapon) {
     ---@param self DefaultBeamWeapon
     ---@param muzzle string
     CreateProjectileAtMuzzle = function(self, muzzle)
+        LOG("CreateProjectileAtMuzzle")
         local enabled = false
         for _, beam in self.Beams do
             if beam.Muzzle == muzzle and beam.Beam:IsEnabled() then
@@ -1476,6 +1479,7 @@ DefaultBeamWeapon = ClassWeapon(DefaultProjectileWeapon) {
     ---@param muzzle string
     PlayFxBeamStart = function(self, muzzle)
         local bp = self.Blueprint
+        LOG("PlayFxBeamStart")
 
         -- find beam that matches the muzzle
         local beam
@@ -1494,6 +1498,7 @@ DefaultBeamWeapon = ClassWeapon(DefaultProjectileWeapon) {
 
         -- edge case: we're already enabled
         if beam:IsEnabled() then
+            LOG("Already enabled!")
             return
         end
 
