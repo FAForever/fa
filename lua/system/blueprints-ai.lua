@@ -204,7 +204,7 @@ function SetUnitThreatValues(unitBPs)
                 local surfaceMult = 0.1
 
                 -- determines if we apply dps to economic or anti surface threat
-                local blockedByArtilleryShield = weapon.ArtilleryShieldBlocks and not mobileUnit
+                local blockedByArtilleryShield = weapon.ArtilleryShieldBlocks and (not mobileUnit or weapon.MinRadius > 80)
 
                 -- Anti air
                 if weapon.RangeCategory == 'UWRC_AntiAir' or weapon.TargetRestrictOnlyAllow == 'AIR' or StringFind(weapon.WeaponCategory or 'nope', 'Anti Air') then
