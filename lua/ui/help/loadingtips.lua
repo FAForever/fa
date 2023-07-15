@@ -64,7 +64,7 @@ Tips = {
     "<LOC loadingtip_0067>Manually reclaiming can be useful during very early in the match when you have nothing better to do",
     "<LOC loadingtip_0068>Attack-Move orders are preferable to Patrol orders in most situations so that you know when the orders are completed",
     "<LOC loadingtip_0070>Fight battles in spots where you can easily reclaim the wreckage and the enemy cannot",
-    "<LOC loadingtip_0071>Wreckage can yield up to 81% of a unit’s mass cost, depending on unit teir",
+    "<LOC loadingtip_0071>Wreckage can yield up to 81% of a unit’s mass cost, depending on unit tier",
     "<LOC loadingtip_0072>It can be worthwhile to reclaim your old low-tech units or badly damaged high-tech ones to get additional mass",
     "<LOC loadingtip_0073>Think about value and opportunity costs (e.g. would you rather have ~16 T1 tanks or 1 T2 Mass Extractor?)",
     "<LOC loadingtip_0074>Low-tech units often do more damage per cost, but have less health per cost compared to higher-tech units",
