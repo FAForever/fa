@@ -997,7 +997,9 @@ BaseManager = ClassSimple {
         end
     end,
 
-    -- Determines if a specific unit needs upgrades, returns name of upgrade if needed
+    --- Determines if a specific unit needs upgrades, returns name of upgrade if needed
+    --- Works with up to 3-level enhancement paths
+    --- TODO: Make a check that can deal with any number of prerequisites, like a 4-5-6 level enhancement path, example: ('Shield -> 'ShieldHeavy' -> 'ShieldVeryHeavy' ->'ShieldUltraHeavy' -> 'ShieldUltraBigHeavy')
     ---@param self BaseManager
     ---@param unit Unit
     ---@param unitType string
@@ -1023,27 +1025,38 @@ BaseManager = ClassSimple {
         if not allEnhancements then
             return false
         end
-
+			
         for _, upgradeName in upgradeTable do
             -- Find the upgrade in the unit's bp
             local bpUpgrade = allEnhancements[upgradeName]
             if bpUpgrade then
                 if not unit:HasEnhancement(upgradeName) then
-                    -- If we already have upgarde at that slot, remove it first
-                    if SimUnitEnhancements and SimUnitEnhancements[unit.EntityId] and
-                        SimUnitEnhancements[unit.EntityId][bpUpgrade.Slot] then
-                        return SimUnitEnhancements[unit.EntityId][bpUpgrade.Slot] .. 'Remove'
-                        -- Check for required upgrades
+                    -- Check if we already have an enhancement on the slot our desired enhancement wants to occupy
+                    if SimUnitEnhancements and SimUnitEnhancements[unit.EntityId] and SimUnitEnhancements[unit.EntityId][bpUpgrade.Slot] then
+                        -- Account for 3-level enhancements, like the Cybran ACU's recent *Stealth -> Self-Repair -> Cloak* enhancement path, if we want 'Cloak', check for 'Stealth' 
+                        -- Check for the prerequisite's prerequisite, and return it
+                        if bpUpgrade.Prerequisite and allEnhancements[bpUpgrade.Prerequisite].Prerequisite and (SimUnitEnhancements[unit.EntityId][bpUpgrade.Slot] == allEnhancements[bpUpgrade.Prerequisite].Prerequisite) then
+                            return bpUpgrade.Prerequisite
+                        -- If it's a direct prerequisite enhancement, return upgrade name
+                        elseif bpUpgrade.Prerequisite and (SimUnitEnhancements[unit.EntityId][bpUpgrade.Slot] == bpUpgrade.Prerequisite) then
+                            return upgradeName
+                        -- It's not a prerequisite, remove the enhancement
+                        else
+                            return SimUnitEnhancements[unit.EntityId][bpUpgrade.Slot] .. 'Remove'
+                        end
+                    -- Check if our desired enhancement's prerequisite has any prerequisites, and return its name (Prerequisiteception)
+                    elseif bpUpgrade.Prerequisite and allEnhancements[bpUpgrade.Prerequisite].Prerequisite and not unit:HasEnhancement(allEnhancements[bpUpgrade.Prerequisite].Prerequisite) then
+                        return allEnhancements[bpUpgrade.Prerequisite].Prerequisite
+                    -- Check if our desired enhancement has any prerequisites, and return its name
                     elseif bpUpgrade.Prerequisite and not unit:HasEnhancement(bpUpgrade.Prerequisite) then
                         return bpUpgrade.Prerequisite
-                        -- No requirement and stop available, return upgrade name
+                    -- No requirement and no enhancement occupying our desired slot, return the upgrade name
                     else
                         return upgradeName
                     end
                 end
             else
-                error('*Base Manager Error: ' ..
-                    self.BaseName .. ', enhancement: ' .. upgradeName .. ' was not found in the unit\'s bp.')
+                error('*Base Manager Error: ' .. self.BaseName .. ', enhancement: ' .. upgradeName .. ' was not found in the unit\'s bp.')
             end
         end
 
@@ -1072,12 +1085,8 @@ BaseManager = ClassSimple {
                 for k, v in self.UpgradeTable do
                     local unit = ScenarioInfo.UnitNames[armyIndex][v.UnitName]
                     if unit and not unit.Dead then
-                        -- Cybran engie stations are never in 'Idle' state but in 'AssistingCommander' state
-                        -- Factories are not in Idle state when assisting other factories (so gotta une unit.UnitBeingBuilt to make sure they're not building anything),
-                        -- so if the basemanager grabs the factory for assisting before this upgrade thread, then it would never get upgraded
-                        if unit.UnitId ~= v.FinalUnit and
-                            (unit:IsIdleState() or unit:IsUnitState('AssistingCommander') or not unit.UnitBeingBuilt) and
-                            not unit:IsBeingBuilt() then
+                        -- Structure upgrading should take priority, so the check for unit.UnitBeingBuilt is not needed. This check is a lot more reliable to get factories to upgrade
+                        if unit.UnitId ~= v.FinalUnit and not unit:IsBeingBuilt() and not unit:IsUnitState('Upgrading') then
                             self:ForkThread(self.BaseManagerUpgrade, unit, v.UnitName)
                         end
                     end
