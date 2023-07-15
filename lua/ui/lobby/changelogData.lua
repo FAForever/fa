@@ -44,7 +44,7 @@ gamePatches = {
             "  The mercy has been completely reworked. The role of the unit is changed from being a sniper to area ",
             "  denial. It now deals damage over time over a large area",
             "",
-            "  With thanks to Deribus for the initial idea and implementation.",
+            "  With thanks to Deribus for the initial idea and implementation",
             "",
             "## Contributors",
             "",
