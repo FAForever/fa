@@ -127,6 +127,8 @@ function SetUnitThreatValues(unitBPs)
             cache.HealthThreat = bp.Defense.MaxHealth * 0.01
         end
 
+        local mobileUnit = bp.CategoriesHash.MOBILE
+
         if bp.Defense.Shield then
             local shield = bp.Defense.Shield                                               -- ShieldProjectionRadius entirely only for the Pillar of Prominence
             local shieldarea = (shield.ShieldProjectionRadius or shield.ShieldSize or 0) * (shield.ShieldProjectionRadius or shield.ShieldSize or 0) * math.pi
@@ -202,7 +204,7 @@ function SetUnitThreatValues(unitBPs)
                 local surfaceMult = 0.1
 
                 -- determines if we apply dps to economic or anti surface threat
-                local blockedByArtilleryShield = weapon.ArtilleryShieldBlocks
+                local blockedByArtilleryShield = weapon.ArtilleryShieldBlocks and not mobileUnit
 
                 -- Anti air
                 if weapon.RangeCategory == 'UWRC_AntiAir' or weapon.TargetRestrictOnlyAllow == 'AIR' or StringFind(weapon.WeaponCategory or 'nope', 'Anti Air') then
