@@ -1911,7 +1911,7 @@ BaseManager = ClassSimple {
             PlatoonType = 'Any',
             RequiresConstruction = false,
             LocationType = self.BaseName,
-            PlatoonAIFunction = { '/lua/ai/opai/BaseManagerPlatoonThreads.lua', 'BaseManagerTMLAI' },
+            PlatoonAIFunction = { '/lua/ai/opai/BaseManagerPlatoonThreads.lua', 'BaseManagerTMLPlatoon' },
             BuildConditions = {
                 { BMBC, 'BaseActive', { self.BaseName } },
                 { BMBC, 'TMLsEnabled', { self.BaseName } },
@@ -1932,7 +1932,7 @@ BaseManager = ClassSimple {
             PlatoonType = 'Any',
             RequiresConstruction = false,
             LocationType = self.BaseName,
-            PlatoonAIFunction = { '/lua/ai/opai/BaseManagerPlatoonThreads.lua', 'BaseManagerNukeAI' },
+            PlatoonAIFunction = { '/lua/ai/opai/BaseManagerPlatoonThreads.lua', 'BaseManagerNukePlatoon' },
             BuildConditions = {
                 { BMBC, 'BaseActive', { self.BaseName } },
                 { BMBC, 'NukesEnabled', { self.BaseName } },
