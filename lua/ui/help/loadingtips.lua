@@ -77,7 +77,7 @@ Tips = {
     "<LOC loadingtip_0083>Having a positive attitude can help you to play better, learn more, and have more fun",
     "<LOC loadingtip_0084>You can learn a lot from analyzing replays",
     "<LOC loadingtip_0085>Remember to have fun—winning can be enjoyable, but it isn’t everything!",
-    "<LOC loadingtip_0087>You can ask for gameplay advice and replay on the FAF Discord",
+    "<LOC loadingtip_0087>You can ask for gameplay advice and replay reviews on the FAF Discord",
     "<LOC loadingtip_0088>The FAF wiki has useful guides that can teach you how to get better at Supreme Commander",
     "<LOC loadingtip_0089>Scale your economy (mass income, energy income, and build power) over time",
     "<LOC loadingtip_0090>Mass-producing lower-tech units is often very effective, but don’t forget to transition to higher-tech units",

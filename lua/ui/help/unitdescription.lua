@@ -166,6 +166,7 @@ Description = {
     ['url0001'] = "<LOC Unit_Description_0304> Armored Commander is a combination of barracks and command center. Contains all the blueprints necessary to build a basic army from scratch. Upgradeable with combat enhancements, advanced engineering suits, resource allocation system, and teleporting.",
     ['url0001-ras'] = "<LOC Unit_Description_0106> Increases ACU's resource generation.",
     ['url0001-pcg'] = "<LOC Unit_Description_0107> Cloaks the ACU from optical sensors and increases maximum health. Can be detected by Omni Sensors. Requires Energy to run.",
+    ['url0001-srs'] = "<LOC Unit_Description_0465_faf>Massively increases the rate at which the ACU repairs its armour.",
     ['url0001-psg'] = "<LOC Unit_Description_0108> Hides the ACU from radar. Requires Energy to run.",
     ['url0001-pqt'] = "<LOC Unit_Description_0109> Adds teleporter. Requires considerable Energy to activate.",
     ['url0001-aes'] = "<LOC Unit_Description_0110> Expands the number of available schematics and increases the ACU's build speed and maximum health.",
@@ -173,7 +174,6 @@ Description = {
     ['url0001-acu'] = "<LOC Unit_Description_0112> Increases main cannon's rate of fire and range. Also increases range of the Molecular Ripper and Overcharge.",
     ['url0001-mlg'] = "<LOC Unit_Description_0113> ACU can generate a beam laser that sweeps over enemy units. Range of the beam increases with Gun Range.",
     ['url0001-ntt'] = "<LOC Unit_Description_0114> Equips the ACU with a standard Cybran Nanite torpedo tube and sonar.",
-    ['url0001-srs'] = "<LOC Unit_Description_0500> Add a Self-Repair System to greatly improve the ACU's HP Regeneration.",
 
     -- CYBRAN -- Support Commander Units/Upgrades
     ['url0301'] = "<LOC Unit_Description_0115> A multi-purpose construction, repair, capture and reclamation unit. Equivalent to a Tech 3 Engineer.",
@@ -328,7 +328,8 @@ Description = {
     ['ual0001'] = "<LOC Unit_Description_0305> Armored Commander is a combination of barracks and command center. Contains all the blueprints necessary to build a basic army from scratch. Upgradeable with combat enhancements, advanced engineering suits, resource allocation system, and teleporting.",
     ['ual0001-aes'] = "<LOC Unit_Description_0156> Expands the number of available schematics and increases the ACU's build speed and maximum health.",
     ['ual0001-cd'] = "<LOC Unit_Description_0157> Creates a Quantum Stasis Field around the ACU. Immobilizes enemy units within its radius. High Energy Consumption. Range of the Field Adapts with the range of the Gun",
-    ['ual0001-cba'] = "<LOC Unit_Description_0502> Enhances the ACU's Quantum Disruptor beam with additional range.",
+    ['ual0001-cba'] = "<LOC Unit_Description_0158>Increases the range of the ACU's main cannon and that of Overcharge.",
+    ['ual0001-ecba'] = "<LOC Unit_Description_0466_faf>Massively increases the range of the ACU's main cannon and that of Overcharge.",
     ['ual0001-ess'] = "<LOC Unit_Description_0159> Greatly expands the range of the standard on-board ACU sensor systems.",
     ['ual0001-ees'] = "<LOC Unit_Description_0160> Replaces the Tech 2 Engineering Suite. Expands the number of available schematics and further increases the ACU's build speed and maximum health.",
     ['ual0001-hsa'] = "<LOC Unit_Description_0161> Rapidly cools the Quantum Disruptor beam. Increases rate of fire.",
@@ -337,7 +338,6 @@ Description = {
     ['ual0001-ptsg'] = "<LOC Unit_Description_0164> Creates a protective shield around the ACU. Requires Energy to run.",
     ['ual0001-phtsg'] = "<LOC Unit_Description_0165> Enhances the protective shield around the ACU. Requires Energy to run.",
     ['ual0001-pqt'] = "<LOC Unit_Description_0166> Adds teleporter. Requires considerable Energy to activate.",
-    ['ual0001-ecba'] = "<LOC Unit_Description_0501> Enhances the ACU's Quantum Disruptor beam with even more range.",
 
     -- AEON -- Support Commander Units/Upgrades
     ['ual0301'] = "<LOC Unit_Description_0167> A multi-purpose construction, repair, capture and reclamation unit. Equivalent to a Tech 3 Engineer.",
