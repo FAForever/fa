@@ -204,7 +204,7 @@ function SetUnitThreatValues(unitBPs)
                 local surfaceMult = 0.1
 
                 -- determines if we apply dps to economic or anti surface threat
-                local blockedByArtilleryShield = weapon.ArtilleryShieldBlocks and (not mobileUnit or weapon.MinRadius > 80)
+                local weaponIsEconomicThreat = (weapon.DamageType == 'Nuke' or weapon.ArtilleryShieldBlocks) and (not mobileUnit or weapon.MinRadius > 80)
 
                 -- Anti air
                 if weapon.RangeCategory == 'UWRC_AntiAir' or weapon.TargetRestrictOnlyAllow == 'AIR' or StringFind(weapon.WeaponCategory or 'nope', 'Anti Air') then
@@ -219,7 +219,7 @@ function SetUnitThreatValues(unitBPs)
                 -- Direct fire or artillery
                 elseif weapon.RangeCategory == 'UWRC_DirectFire' or StringFind(weapon.WeaponCategory or 'nope', 'Direct Fire')
                         or weapon.RangeCategory == 'UWRC_IndirectFire' or StringFind(weapon.WeaponCategory or 'nope', 'Artillery') then
-                    if blockedByArtilleryShield then
+                    if weaponIsEconomicThreat then
                         cache.EconomyThreatLevel = cache.EconomyThreatLevel + dps * econMult
                     else
                         cache.SurfaceThreatLevel = cache.SurfaceThreatLevel + dps * surfaceMult
