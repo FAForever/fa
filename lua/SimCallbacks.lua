@@ -599,235 +599,235 @@ do
 
     local CommandInfo = {
         [1] = {
-            -- 1, Stop
+            --Type = " Stop",
             Callback = false,
             RequiresEntity = false,
             Redundancy = 1,
         },
         [2] = {
-            -- 2, Move
+            Type = "Move",
             Callback = IssueMove,
             RequiresEntity = false,
             Redundancy = 1,
         },
         [3] = {
-            -- 3, Dive
+            Type = "Dive",
             Callback = false,
             RequiresEntity = false,
             Redundancy = 1,
         },
         [4] = {
-            -- 4, FormMove
+            Type = "FormMove",
             Callback = IssueMove,
             RequiresEntity = false,
             Redundancy = 1,
         },
         [5] = {
-            -- 5, BuildSiloTactical
+            Type = "BuildSiloTactical",
             Callback = false,
             RequiresEntity = false,
             Redundancy = 1,
         },
         [6] = {
-            -- 6, BuildSiloNuke
+            Type = "BuildSiloNuke",
             Callback = false,
             RequiresEntity = false,
             Redundancy = 1,
         },
         [7] = {
-            -- 7, BuildFactory
+            Type = "BuildFactory",
             Callback = false,
             RequiresEntity = false,
             Redundancy = 1,
         },
         [8] = {
-            -- 8, BuildMobile
+            Type = "BuildMobile",
             Callback = IssueBuildMobile,
             RequiresEntity = false,
             Redundancy = 1,
         },
         [9] = {
-            -- 9, BuildAssist
+            Type = "BuildAssist",
             Callback = IssueGuard,
             RequiresEntity = true,
             Redundancy = 1,
         },
         [10] = {
-            -- 10, Attack
+            Type = "Attack",
             Callback = IssueAttack,
             RequiresEntity = false,
             Redundancy = 3,
         },
         [11] = {
-            -- 11, FormAttack
+            Type = "FormAttack",
             Callback = IssueAttack,
             RequiresEntity = false,
             Redundancy = 3,
         },
         [12] = {
-            -- 12, Nuke
+            Type = "Nuke",
             Callback = IssueNuke,
             RequiresEntity = false,
             Redundancy = 1,
         },
         [13] = {
-            -- 13, Tactical
+            Type = "Tactical",
             Callback = IssueTactical,
             RequiresEntity = false,
             Redundancy = 1,
         },
         [14] = {
-            -- 14, Teleport
+            Type = "Teleport",
             Callback = IssueTeleport,
             RequiresEntity = false,
             Redundancy = 1,
         },
         [15] = {
-            -- 15, Guard
+            Type = "Guard",
             Callback = IssueGuard,
             RequiresEntity = true,
             Redundancy = 1,
         },
         [16] = {
-            -- 16, Patrol
-            Callback = nil,
+            Type = "Patrol",
+            Callback = IssuePatrol,
             RequiresEntity = false,
-            Redundancy = 1,
+            Redundancy = 3,
         },
         [17] = {
-            -- 17, Ferry
+            Type = "Ferry",
             Callback = nil,
             RequiresEntity = false,
             Redundancy = 1,
         },
         [18] = {
-            -- 18, FormPatrol
-            Callback = nil,
+            Type = "FormPatrol",
+            Callback = IssuePatrol,
             RequiresEntity = false,
-            Redundancy = 1,
+            Redundancy = 3,
         },
         [19] = {
-            -- 19, Reclaim
+            Type = "Reclaim",
             Callback = IssueReclaim,
             RequiresEntity = true,
             Redundancy = 1,
         },
         [20] = {
-            -- 20, Repair
+            Type = "Repair",
             Callback = IssueRepair,
             RequiresEntity = true,
             Redundancy = 1,
         },
         [21] = {
-            -- 21, Capture
+            Type = "Capture",
             Callback = IssueCapture,
             RequiresEntity = true,
             Redundancy = 1,
         },
         [22] = {
-            -- 22, TransportLoadUnits
+            Type = "TransportLoadUnits",
             Callback = nil,
             RequiresEntity = false,
             Redundancy = 1,
         },
         [23] = {
-            -- 23, TransportReverseLoadUnits
+            Type = "TransportReverseLoadUnits",
             Callback = nil,
             RequiresEntity = false,
             Redundancy = 1,
         },
         [24] = {
-            -- 24, TransportUnloadUnits
+            Type = "TransportUnloadUnits",
             Callback = IssueTransportUnload,
             RequiresEntity = false,
             Redundancy = 1,
         },
         [25] = {
-            -- 25, TransportUnloadSpecificUnits
+            Type = "TransportUnloadSpecificUnits",
             Callback = nil,
             RequiresEntity = false,
             Redundancy = 1,
         },
         [26] = {
-            -- 26, DetachFromTransport
+            Type = "DetachFromTransport",
             Callback = nil,
             RequiresEntity = false,
             Redundancy = 1,
         },
         [27] = {
-            -- 27, Upgrade
+            Type = "Upgrade",
             Callback = nil,
             RequiresEntity = false,
             Redundancy = 1,
         },
         [28] = {
-            -- 28, Script
+            Type = "Script",
             Callback = nil,
             RequiresEntity = false,
             Redundancy = 1,
         },
         [29] = {
-            -- 29, AssistCommander
+            Type = "AssistCommander",
             Callback = IssueGuard,
             RequiresEntity = true,
             Redundancy = 1,
         },
         [30] = {
-            -- 30, KillSelf
+            Type = "KillSelf",
             Callback = nil,
             RequiresEntity = false,
             Redundancy = 1,
         },
         [31] = {
-            -- 31, DestroySelf
+            Type = "DestroySelf",
             Callback = nil,
             RequiresEntity = false,
             Redundancy = 1,
         },
         [32] = {
-            -- 32, Sacrifice
+            Type = "Sacrifice",
             Callback = IssueSacrifice,
             RequiresEntity = true,
             Redundancy = 1,
         },
         [33] = {
-            -- 33, Pause
+            Type = "Pause",
             Callback = nil,
             RequiresEntity = false,
             Redundancy = 1,
         },
         [34] = {
-            -- 34, OverCharge
+            Type = "OverCharge",
             Callback = nil,
             RequiresEntity = false,
             Redundancy = 1,
         },
         [35] = {
-            -- 35, AggressiveMove
+            Type = "AggressiveMove",
             Callback = IssueAggressiveMove,
             RequiresEntity = false,
             Redundancy = 1,
         },
         [36] = {
-            -- 36, FormAggressiveMove
+            Type = "FormAggressiveMove",
             Callback = IssueAggressiveMove,
             RequiresEntity = false,
             Redundancy = 1,
         },
         [37] = {
-            -- 37, AssistMove
+            Type = "AssistMove",
             Callback = nil,
             RequiresEntity = false,
             Redundancy = 1,
         },
         [38] = {
-            -- 38, SpecialAction
+            Type = "SpecialAction",
             Callback = nil,
             RequiresEntity = false,
             Redundancy = 1,
         },
         [39] = {
-            -- 39, Dock
+            Type = "Dock",
             Callback = nil,
             RequiresEntity = false,
             Redundancy = 1,
@@ -890,14 +890,18 @@ do
                             else
                                 -- units are only valid in certain cases
                                 if IsUnit(candidate) then
-                                    -- our own and allied units are always valid
-                                    if candidate.Army == unit.Army or IsAllied(candidate.Army, unit.Army) then
-                                        target = candidate
+                                    target = candidate
 
-                                        -- enemy units are only valid if we've ever seen them
-                                    elseif candidate:GetBlip(unit.Army):IsSeenEver() then
-                                        target = candidate
-                                    end
+                                    LOG(target)
+                                    DrawCircle(target:GetPosition(), 10, 'ffffff')
+                                    -- -- our own and allied units are always valid
+                                    -- if candidate.Army == unit.Army or IsAlly(candidate.Army, unit.Army) then
+                                    --     target = candidate
+
+                                    --     -- enemy units are only valid if we've ever seen them
+                                    -- elseif candidate:GetBlip(unit.Army):IsSeenEver(unit.Army) then
+                                    --     target = candidate
+                                    -- end
                                 end
                             end
 
@@ -907,7 +911,9 @@ do
                             end
                         else
                             -- at this point we may need an entity, so we check and bail if we do need one
-                            if not commandInfo.RequiresEntity then
+                            if commandInfo.Type == 'BuildMobile' then
+                                callback({ unit }, { order.x, order.y, order.z }, order.blueprintId, {})
+                            elseif not commandInfo.RequiresEntity then
                                 callback({ unit }, { order.x, order.y, order.z })
                             end
                         end
