@@ -154,7 +154,7 @@ URL0001 = ClassUnit(ACUUnit, CCommandUnit) {
             if Buff.HasBuff(self, 'CybranACUStealthBonus') then
                 Buff.RemoveBuff(self, 'CybranACUStealthBonus')
             end
-        elseif enh == 'SelfRepairSystem' then
+        elseif enh == 'FAF_SelfRepairSystem' then
             if not Buffs['CybranACURegenerateBonus'] then
                 BuffBlueprint {
                     Name = 'CybranACURegenerateBonus',
@@ -177,7 +177,7 @@ URL0001 = ClassUnit(ACUUnit, CCommandUnit) {
             if not Buff.HasBuff(self, 'CybranACURegenerateBonus') then
                 Buff.ApplyBuff(self, 'CybranACURegenerateBonus')
             end
-        elseif enh == 'SelfRepairSystemRemove' then
+        elseif enh == 'FAF_SelfRepairSystemRemove' then
             -- remove prerequisites
             self:RemoveToggleCap('RULEUTC_CloakToggle')
             self:DisableUnitIntel('Enhancement', 'RadarStealth')
