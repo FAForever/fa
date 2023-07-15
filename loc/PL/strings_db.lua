@@ -2279,6 +2279,7 @@ Unit_Description_0461=" Mobile Anti-Air unit. Armed with a high-speed missiles, 
 Unit_Description_0462=" Mobile Anti-Air unit. Armed with a high-speed missiles, excellent against enemy gunships or air-fighters. Capable of switching weapon to anti-land attack but with smaller damage."
 Unit_Description_0463=" Mobile Anti-Air unit. Armed with a high-impact projectiles, excellent against enemy gunships or air-fighters."
 Unit_Description_0464=" Mobile Anti-Air unit. Armed with a long-range lasers, excellent against enemy gunships or air-fighters. Capable of switching weapon to anti-land attack but with smaller damage."
+Unit_Description_0465_faf="Wyposażenie to znacznie zwiększa prędkość, z jaką OJD naprawia samą siebie. Jest to dobry wybór dla dowódców, którzy wykorzystują OJD do działań ofensywnych."
 Unit_Description_s082=" Constructs Tech 2 Land units. Upgradeable to T3 Factory if at least one T3 Land Factory HQ exists."
 Unit_Description_s083=" Constructs Tech 2 Air units. Upgradeable to T3 Factory if at least one T3 Air Factory HQ exists."
 Unit_Description_s084=" Constructs Tech 2 Naval units. Upgradeable to T3 Factory if at least one T3 Naval Factory HQ exists."

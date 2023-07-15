@@ -1595,7 +1595,7 @@ Unit_Description_0111="Replaces the Tech 2 engineering Suite. Grants Tech 3 and 
 Unit_Description_0112="Doubles the main cannon's Rate-Of-Fire, and increases the range of all the ACU's weaponry."
 Unit_Description_0113="Enhances the ACU with Microwave Laser weapon with unbelievable firepower."
 Unit_Description_0114="Enhances the ACU with a torpedo weapon and sonar sensor."
-Unit_Description_0465_faf="Greatly increases the speed at which the ACU repairs itself."
+Unit_Description_0465_faf="Massively increases the rate at which the ACU repairs its armour."
 
 -- CYBRAN -- Support Commander Units/Upgrades
 Unit_Description_0115="A highly versatile combat and engineering unit useful on late-stage battlefields."

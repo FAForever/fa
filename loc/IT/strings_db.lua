@@ -1595,6 +1595,7 @@ Unit_Description_0299="Sistema sonar con un raggio medio. Rileva e individua le 
 Unit_Description_0300="Genera un campo mimetico. Nasconde le unità e le strutture all'interno del proprio raggio operativo. Viene contrastato dai sensori ottici e Omni."
 Unit_Description_0301="Sistema sonar con un raggio eccezionale. Rileva e individua le unità navali. Equipaggiato con lanciacariche antisiluro."
 Unit_Description_0302="Sistema di intelligence di alto profilo. Fornisce una copertura massima da radar e sonar. Contrasta i sistemi di intelligence nemici."
+Unit_Description_0465_faf="Riduce considerevolmente i tempi di autoriparazione dell'UCC."
 _About="Informazioni"
 _Accept="Accetta"
 _Address="Indirizzo"

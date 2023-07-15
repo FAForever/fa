@@ -2278,6 +2278,7 @@ Unit_Description_0461=" Mobile Luftabwehr. Bewaffnet mit hochgeschwindigkeits Ra
 Unit_Description_0462=" Mobile Luftabwehr. Bewaffnet mit hochgeschwindigkeits Raketen, ausgezeichnet gegen feindliche Kampfhubschraubern oder Jagdflugzeuge. Fähig die waffe, mit vermindertem Schaden, auf Bodenangriff umzuschalten."
 Unit_Description_0463=" Mobile Luftabwehr. Bewaffnet mit hochwirksamen Geschossen, ausgezeichnet gegen feindliche Kampfhubschraubern oder Jagdflugzeuge."
 Unit_Description_0464=" Mobile Luftabwehr. Bewaffnet mit hochgeschwindigkeits Lasern, ausgezeichnet gegen feindliche Kampfhubschraubern oder Jagdflugzeuge. Fähig die waffe, mit vermindertem Schaden, auf Bodenangriff umzuschalten."
+Unit_Description_0465_faf="Erhöht die Geschwindigkeit, mit der die ACU sich selbst repariert, erheblich."
 Unit_Description_s082="Baut Tech 2 Landeinheiten. Aufrüstbar zur T3 Fabrik, falls mindestens eine Tech 3 Land HQ Fabrik existiert."
 Unit_Description_s083="Baut Tech 2 Lufteinheiten. Aufrüstbar zur T3 Fabrik, falls mindestens eine Tech 3 Luft HQ Fabrik existiert."
 Unit_Description_s084="Baut Tech 2 Marineeinheiten. Aufrüstbar zur T3 Fabrik, falls mindestens eine Tech 3 See HQ Fabrik existiert."

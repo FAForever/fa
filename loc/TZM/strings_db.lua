@@ -1593,6 +1593,7 @@ Unit_Description_0299="Système sonar de portée moyenne. Permet de détecter et
 Unit_Description_0300="Génère un champ de furtivité. Masque les unités et les structures dans sa zone d'effet. Peut être contré par des capteurs optiques ou par des omni-capteurs."
 Unit_Description_0301="Système sonar de portée supérieure. Permet de détecter et de suivre les unités navales. Il est armé de lanceurs anti-torpilles."
 Unit_Description_0302="Système de surveillance très élaboré. Fournit une couverture radar et sonar optimale. Contre les systèmes de renseignement ennemis."
+Unit_Description_0465_faf="Améliore grandement la vitesse d'autoréparation de l'UBC."
 _About="Infos"
 _Accept="Accepter"
 _Address="Adresse"

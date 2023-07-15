@@ -2264,6 +2264,7 @@ Unit_Description_0461=" Unidad Móvil Antiaérea. Equipada con un cañón de fue
 Unit_Description_0462=" Unidad Móvil Antiaérea. Equipada con un cañón de fuego rápido, excelente contra cañoneras enemigas o cazas. Es capaz de cambiar su modo de ataque a antiterrestre pero con menor daño."
 Unit_Description_0463=" Unidad Móvil Antiaérea. Equipada con un cañón de fuego rápido, excelente contra cañoneras enemigas o cazas."
 Unit_Description_0464=" Unidad Móvil Antiaérea. Equipada con un cañón de fuego rápido, excelente contra cañoneras enemigas o cazas. Es capaz de cambiar su modo de ataque a antiterrestre pero con menor daño."
+Unit_Description_0465_faf="Aumenta considerablemente el índice de autorreparación de la UCB."
 Unit_Description_s082="Construye Unidades Terrestres T2. Actualizable a Fábrica T3 si existe por lo menos una Fábrica Terrestre HQ T3."
 Unit_Description_s083="Construye Unidades Aéreas T2. Actualizable a Fábrica T3 si existe por lo menos una Fábrica Aérea HQ T3."
 Unit_Description_s084="Construye Unidades Navales T2. Actualizable a Fábrica T3 si existe por lo menos una Fábrica Naval HQ T3."
