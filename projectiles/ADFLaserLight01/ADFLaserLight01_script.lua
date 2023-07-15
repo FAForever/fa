@@ -1,5 +1,4 @@
 -- Aeon laser 'bolt'
-
-local ALightLaserProjectile = import("/lua/aeonprojectiles.lua").ALightLaserProjectile
-ADFLaserLight01 = ClassProjectile(ALightLaserProjectile) {}
+---@class ADFLaserLight01: ALightLaserProjectile
+ADFLaserLight01 = ClassProjectile(import("/lua/aeonprojectiles.lua").ALightLaserProjectile) {}
 TypeClass = ADFLaserLight01

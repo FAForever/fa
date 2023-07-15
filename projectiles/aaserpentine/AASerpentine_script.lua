@@ -1,4 +1,6 @@
+local AMissileAAProjectile = import('/lua/aeonprojectiles.lua').AMissileAAProjectile
+
 -- Aeon Anti Air Missile
-local AMissileAAProjectile = import("/lua/aeonprojectiles.lua").AMissileAAProjectile
+---@class AASerpentine: AMissileAAProjectile
 AASerpentine = ClassProjectile(AMissileAAProjectile) {}
 TypeClass = AASerpentine
