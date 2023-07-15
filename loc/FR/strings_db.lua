@@ -7803,7 +7803,7 @@ aisettings_0151="Non"
 aisettings_0152="Vision standard"
 
 loadingtip_0000="Astuce"
-loadingtip_0001="La surcharge de l'UBC nécéssite 5 000 d'énergie. Il faut au moins 1 stockage d'énergie pour l'utiliser."
+loadingtip_0001="La surcharge de l'UBC nécéssite 7 500 d'énergie. Il faut au moins 1 stockage d'énergie pour l'utiliser."
 loadingtip_0002="Construisez chaque stockage d'énergie de façon à ce que sa destruction n'endommage aucun autre bâtiment."
 loadingtip_0003="La surchage de l'UBC inflige 400 points de dégâts à un autre UBC, 800 aux bâtiments."
 loadingtip_0004="Ne construisez pas de fabricateur de masse avant d'avoir complètement amélioré tous vos extracteurs."

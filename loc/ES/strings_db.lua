@@ -8234,7 +8234,7 @@ xss0304_help="Cazasubmarinos"
 xss0304_name="Yathsou"
 
 loadingtip_0000="Sugerencia rapida"
-loadingtip_0001="Se requiere al menos UN Almacenaje de Energia y 5000 de energía para que el ACU dispare el Cañon Sobrecargado"
+loadingtip_0001="Se requiere al menos UN Almacenaje de Energia y 7500 de energía para que el ACU dispare el Cañon Sobrecargado"
 loadingtip_0002="Siempre construye los Almacenajes de Energía en un lugar aislado donde no destruya nada si es destruido"
 loadingtip_0003="El daño producido por la Sobrecarga del ACU es de 12.000 a cualquier unidad 400 a otro ACU y 800 a las estructuras"
 loadingtip_0004="No construyas los Productores de Masa a menos que hayas hecho Mejorado cada Extractor de Masa T2 a T3"
