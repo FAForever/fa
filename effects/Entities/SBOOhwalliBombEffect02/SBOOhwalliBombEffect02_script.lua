@@ -1,12 +1,8 @@
---****************************************************************************
---**
---**  File     :  /data/projectiles/SBOKhamaseenBombEffect02/SBOKhamaseenBombEffect02_script.lua
---**  Author(s):  Greg Kohne
---**
---**  Summary  :  Ohwalli Strategic Bomb effect script, non-damaging
---**
---**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
---****************************************************************************
+-- File     :  /data/projectiles/SBOKhamaseenBombEffect02/SBOKhamaseenBombEffect02_script.lua
+-- Author(s):  Greg Kohne
+-- Summary  :  Ohwalli Strategic Bomb effect script, non-damaging
+-- Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
+------------------------------------------------------------------------------
 local EffectTemplate = import("/lua/effecttemplates.lua")
 
 SBOOhwalliBombEffect02 = Class(import("/lua/sim/defaultprojectiles.lua").EmitterProjectile) {
