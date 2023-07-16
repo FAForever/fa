@@ -19,8 +19,8 @@ EmitterBlueprint {
 	InterpolateEmission = true,
 	TextureStripcount = 1.00,
 	SortOrder = -99.00,
-	Texture = '/textures/particles/water_ripple_alpha_04.dds',
-	RampTexture = '/textures/particles/ramp_water_06.dds',
+	Texture = [[/textures/particles/water_ripple_alpha_05.dds]],
+	RampTexture = [[/textures/particles/ramp_water_02.dds]],
 	XDirectionCurve = {
 		XRange = 1.00,
 		Keys = {
@@ -42,7 +42,7 @@ EmitterBlueprint {
 	EmitRateCurve = {
 		XRange = 1.00,
 		Keys = {
-			{ x=0.037,y=1.200,z=0.000 },
+			{ x=0.037,y=0.700,z=0.000 },
 		},
 	},
 	LifetimeCurve = {
@@ -102,19 +102,19 @@ EmitterBlueprint {
 	StartSizeCurve = {
 		XRange = 1.00,
 		Keys = {
-			{ x=0.500,y=0.750,z=0.320 },
+			{ x=0.500,y=0.400,z=0.100 },
 		},
 	},
 	EndSizeCurve = {
 		XRange = 1.00,
 		Keys = {
-			{ x=0.504,y=1.000,z=0.250 },
+			{ x=0.504,y=0.600,z=0.150 },
 		},
 	},
 	InitialRotationCurve = {
 		XRange = 1.00,
 		Keys = {
-			{ x=0.500,y=90.000,z=0.000 },
+			{ x=0.500,y=180.000,z=360.000 },
 		},
 	},
 	RotationRateCurve = {
