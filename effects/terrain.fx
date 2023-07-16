@@ -1973,10 +1973,7 @@ technique TerrainPBR <
     }
 }
 
-/* # Similar to TTerrainXP, but upperAlbedo is used for map-wide #
-   # textures and we use better water color calculations         # */
-
-float4 Terrain001NormalsPS( VS_OUTPUT pixel ) : COLOR
+float4 Terrain002NormalsPS( VS_OUTPUT pixel ) : COLOR
 {
     float4 mask0 = saturate(tex2D(UtilitySamplerA,pixel.mTexWT*TerrainScale) * 2 - 1);
     float4 mask1 = saturate(tex2D(UtilitySamplerB,pixel.mTexWT*TerrainScale) * 2 - 1);
@@ -2055,7 +2052,25 @@ float4 Terrain001AlbedoPS ( VS_OUTPUT inV) : COLOR
     return float4(albedo.rgb, 0.01f);
 }
 
-technique Terrain001Normals
+/* # Similar to TTerrainXP, but upperAlbedo is used for map-wide #
+   # textures and we use better water color calculations.        #
+   # It is designed to be a drop-in replacement for TTerrainXP.  # */
+technique Terrain001 <
+    string usage = "composite";
+    string normals = "TTerrainNormalsXP"; 
+>
+{
+    pass P0
+    {
+        AlphaState( AlphaBlend_Disable_Write_RGBA )
+        DepthState( Depth_Enable )
+
+        VertexShader = compile vs_1_1 TerrainVS(true);
+        PixelShader = compile ps_2_a Terrain001AlbedoPS();
+    }
+}
+
+technique Terrain002Normals
 {
     pass P0
     {
@@ -2063,13 +2078,15 @@ technique Terrain001Normals
         DepthState( Depth_Enable )
 
         VertexShader = compile vs_1_1 TerrainVS(false);
-        PixelShader = compile ps_2_a Terrain001NormalsPS();
+        PixelShader = compile ps_2_a Terrain002NormalsPS();
     }
 }
 
-technique Terrain001 <
+/* # Very similar to Terrain001, but makes the used value ranges #
+   # in the texture masks consistent between normal and albedo.  # */
+technique Terrain002 <
     string usage = "composite";
-    string normals = "Terrain001Normals"; 
+    string normals = "Terrain002Normals"; 
 >
 {
     pass P0
