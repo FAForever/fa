@@ -4,7 +4,7 @@
 -- Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 ----------------------------------------------------------------------------------------------------
 local SLightChronatronCannonOverCharge = import("/lua/seraphimprojectiles.lua").SLightChronatronCannonOverCharge
-local OverchargeProjectile = import("/lua/sim/DefaultProjectiles.lua").OverchargeProjectile
+local OverchargeProjectile = import("/lua/sim/defaultprojectiles.lua").OverchargeProjectile
 
 SDFLightChronatronCannon02 = ClassProjectile(SLightChronatronCannonOverCharge, OverchargeProjectile) {
     OnImpact = function(self, targetType, targetEntity)

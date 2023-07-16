@@ -5,45 +5,53 @@
 -- * Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -- ==========================================================================================
 
-local presetsRestrictions = {}
--- NOTE this table has the following internal structure and it is generated/cached in GetPresetsData()
---   presetKey = {
---      key          = "presetKey",
---      name         = "localized name that will display in title of tooltip",
---      tooltip      = "tooltipID that will display in context of tooltip",
---      Icon         = "/textures/path/icon_name.dds",
---      categories   = "CATEGORY1 * CATEGORY2 + unitID", -- set using Expressions[presetKey]
---      enhancements = { "EnhancementName1", "EnhancementName2"},  -- set using Enhancements[presetKey]
---   }
--- --------------------------------------------------------------------------------------------
--- TODO fix categories for units:
--- add AIR, TECH, UEF to /units/uea0001_unit.bp Engineering Drone
 
--- TODO for next version of Units Manager:
--- use Categories of Weapon (see projectile blueprints) to restrict units
--- -------------------------------------------------------------------------------------------
+
+
+--- ### NOTE this table has the following internal structure and it is generated/cached in GetPresetsData()
+--- ```lua
+---   presetKey = {
+---      key          = "presetKey",
+---      name         = "localized name that will display in title of tooltip",
+---      tooltip      = "tooltipID that will display in context of tooltip",
+---      Icon         = "/textures/path/icon_name.dds",
+---      categories   = "CATEGORY1 * CATEGORY2 + unitID", -- set using Expressions[presetKey]
+---      enhancements = { "EnhancementName1", "EnhancementName2"},  -- set using Enhancements[presetKey]
+---   }
+--- ```
+--- --------------------------------------------------------------------------------------------
+--- TODO fix categories for units:
+--- add AIR, TECH, UEF to /units/uea0001_unit.bp Engineering Drone
+---
+--- TODO for next version of Units Manager:
+--- use Categories of Weapon (see projectile blueprints) to restrict units
+--- -------------------------------------------------------------------------------------------
+local presetsRestrictions = {}
+
 
 --- defines expressions in single place for celerity and re-usability purpose in CreatePresets()
+---
+---
+--- NOTE use this process for defining new expressions that will restrict units in game and mods (units packs):
+--- 1. Try using blueprint's categories only:                  "(TECH3 * NAVAL)"
+--- 2. Try using blueprint's categories and unit IDs:          "(TECH3 * NAVAL) - xss0202"
+--- 3. Try using list of multiple unit IDs:                    "dalk003 + delk002"
+--- 4. Try using blueprint's categories and enhancement names:  "(SUBCOMMANDER * ResourceAllocation) - SCUs with RAS preset
+--- You can get the UnitID here : http://content.faforever.com/faf/unitsDB/
+----------------------------------------------------------------------------------------------------------------------------
+--- NOTE that categories must be in UPPER case, blueprint IDs in lower case, and enhancement names in CamelCase
+--- both categories and blueprint IDs can be used together or individually but
+--- they need to be separated by the following operation symbols:
+--- ```md
+--- `*`  Intersection = CATEGORY1 and CATEGORY2 and ID1 and ID2
+--- `+`  Union        = CATEGORY1 or CATEGORY2 or ID1 or ID2
+--- `-`  Subtraction  = CATEGORY1 and not CATEGORY2
+--- `()` Parenthesis  = (CATEGORY1 and CATEGORY2) or CATEGORY3
+--- ```
+------------------------------------------------------------------------------------------------------------------------------
+--- NOTE the following expression were carefully defined and each used category has a purpose!
+--- be careful when editing them or you may brake restriction system in FA game
 Expressions = {
-
--- NOTE use this process for defining new expressions that will restrict units in game and mods (units packs):
--- 1. Try using blueprint's categories only:                  "(TECH3 * NAVAL)"
--- 2. Try using blueprint's categories and unit IDs:          "(TECH3 * NAVAL) - xss0202"
--- 3. Try using list of multiple unit IDs:                    "dalk003 + delk002"
--- 4. Try using blueprint's categories and enhancement names:  "(SUBCOMMANDER * ResourceAllocation) - SCUs with RAS preset
--- You can get the UnitID here : http://content.faforever.com/faf/unitsDB/
-
--- NOTE that categories must be in UPPER case, blueprint IDs in lower case, and enhancement names in CamelCase
--- both categories and blueprint IDs can be used together or individually but
--- they need to be separated by the following operation symbols:
--- '*'  Intersection = CATEGORY1 and CATEGORY2 and ID1 and ID2
--- '+'  Union        = CATEGORY1 or CATEGORY2 or ID1 or ID2
--- '-'  Subtraction  = CATEGORY1 and not CATEGORY2
--- '()' Parenthesis  = (CATEGORY1 and CATEGORY2) or CATEGORY3
-
--- NOTE the following expression were carefully defined and each used category has a purpose!
--- be careful when editing them or you may brake restriction system in FA game
-
     -- excluding engineers, economy, and factories because players will not progress to higher tech levels
     T1          = "(TECH1 - (MOBILE * ENGINEER) - (STRUCTURE * FACTORY) - ECONOMIC)",
     T2          = "(TECH2 - (MOBILE * ENGINEER) - (STRUCTURE * FACTORY) - ECONOMIC + (TECH2 * CRABEGG))",
@@ -344,6 +352,7 @@ local function CreatePreset(key, tooltip, name, icon)
         presetsRestrictions[key] = preset
     end
 end
+
 --- Creates restriction preset from a list of restriction presets
 --- by merging all category expressions and enhancements in passed preset keys
 --- Note unit and enhancement restrictions will be combined when presetsKeys has the same key

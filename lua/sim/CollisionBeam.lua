@@ -1,20 +1,25 @@
--- ****************************************************************************
--- **
--- **  File     :  /lua/sim/collisionbeam.lua
--- **  Author(s):
--- **
--- **  Summary  :
--- **
--- **  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
--- ****************************************************************************
---
--- CollisionBeam is the simulation (gameplay-relevant) portion of a beam. It wraps a special effect
--- that may or may not exist depending on how the simulation is executing.
---
+-- File     :  /lua/sim/collisionbeam.lua
+-- Summary  : CollisionBeam is the simulation (gameplay-relevant) portion of a beam. It wraps a special effect
+--            that may or may not exist depending on how the simulation is executing.
+-- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+-------------------------------------------------------------------
 local DefaultDamage = import("/lua/sim/defaultdamage.lua")
 local ScenarioFramework = import("/lua/scenarioframework.lua")
 
 ---@class CollisionBeam : moho.CollisionBeamEntity
+---@field Trash TrashBag
+---@field BeamEffectsBag TrashBag
+---@field Army Army
+---@field Weapon Weapon
+---@field unit Unit
+---@field TerrainEffectsBag TrashBag
+---@field DamageTable table
+---@field DamageData table
+---@field FxImpactWater any
+---@field FxImpactUnderWater any
+---@field FxImpactAirUnit any
+---@field FxImpactLand any
+---@field FxImpactUnit any
 CollisionBeam = Class(moho.CollisionBeamEntity) {
 
     FxBeam = import("/lua/effecttemplates.lua").NoEffects,
@@ -97,7 +102,7 @@ CollisionBeam = Class(moho.CollisionBeamEntity) {
     ---@param self CollisionBeam
     ---@param instigator Unit
     ---@param damageData table
-    ---@param targetEntity? Unit | Prop
+    ---@param targetEntity? Unit|Prop
     DoDamage = function(self, instigator, damageData, targetEntity)
         local damage = damageData.DamageAmount or 0
         if damage <= 0 then return end
@@ -154,7 +159,7 @@ CollisionBeam = Class(moho.CollisionBeamEntity) {
             AttachBeamToEntity(fxBeam, self, 0, self.Army)
 
             -- collide on start if it's a continuous beam
-            local weaponBlueprint = self.Weapon:GetBlueprint()
+            local weaponBlueprint = self.Weapon.Blueprint
             local bCollideOnStart = weaponBlueprint.BeamLifetime <= 0
             self:SetBeamFx(fxBeam, bCollideOnStart)
 
@@ -352,7 +357,7 @@ CollisionBeam = Class(moho.CollisionBeamEntity) {
 
     ---@param self CollisionBeam
     SetDamageTable = function(self)
-        local weaponBlueprint = self.Weapon:GetBlueprint()
+        local weaponBlueprint = self.Weapon.Blueprint
         self.DamageTable = {}
         self.DamageTable.DamageRadius = weaponBlueprint.DamageRadius
         self.DamageTable.DamageAmount = weaponBlueprint.Damage
@@ -384,7 +389,7 @@ CollisionBeam = Class(moho.CollisionBeamEntity) {
     ---@param self CollisionBeam
     ---@param fn function
     ---@param ... any
-    ---@return thread
+    ---@return  nil | thread
     ForkThread = function(self, fn, ...)
         if fn then
             local thread = ForkThread(fn, self, unpack(arg))

@@ -1,17 +1,9 @@
--- ****************************************************************************
--- **
--- **  File     :  /cdimage/lua/formations.lua
--- **  Author(s):
--- **
--- **  Summary  :
--- **
--- **  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
--- ****************************************************************************
---
--- Basic create formation scripts
+-- File     :  /cdimage/lua/formations.lua
+-- Summary  : Basic create formation scripts
+-- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+-----------------------------------------------------------------
 
 ---@alias UnitFormations 'AttackFormation' | 'GrowthFormation' | 'NoFormation' | 'None' | 'none'
-
 
 SurfaceFormations = {
     'AttackFormation',
@@ -1453,7 +1445,7 @@ function GetLargeAirPositions(unitsList, airBlock)
     return results
 end
 
----@param chevronPos Vector
+---@param chevronPos number
 ---@param currCol number
 ---@param formationLen number
 ---@return number xPos

@@ -5,7 +5,7 @@
 -- Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 ---------------------------------------------------------------------------------------
 local ATorpedoCluster = import("/lua/aeonprojectiles.lua").ATorpedoCluster
-local VisionMarkerOpti = import("/lua/sim/vizmarker.lua").VisionMarkerOpti
+local VisionMarkerOpti = import("/lua/sim/VizMarker.lua").VisionMarkerOpti
 
 -- upvalue scope for performance
 local CreateTrail = CreateTrail

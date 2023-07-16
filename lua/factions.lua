@@ -1,11 +1,15 @@
 -- Call these in your scripts where you need them
 
+
+---@param AllowedMods table
+---@return any
 function GetFactions(AllowedMods)
     -- AllowedMods  -> a table of currently enabled mods, keyed by mod ID. Ignore if not used
     -- returns a list of factions. All 4 of the original factions are included plus all enabled custom factions.
     return GetCustomFactions(OrgFactions(), AllowedMods)
 end
 
+---@return table
 function GetNewFactionAINames()
     -- Gets a name for AI players
     local ainames = {}
@@ -15,6 +19,8 @@ function GetNewFactionAINames()
     return ainames
 end
 
+---@param offset number
+---@return table
 function GetNewFactionAIPlans(offset)
     -- Gets an AI plan for computer players. Offset is the key with which the table should begin, counting up from
     -- that value + 1.
@@ -38,6 +44,9 @@ end
 
 NewFactionAiData = {}
 
+---@param FactionsTable table
+---@param AllowedMods table
+---@return table
 function GetCustomFactions(FactionsTable, AllowedMods)
     if not FactionsTable or type(FactionsTable) ~= 'table' then
         FactionsTable = {}
@@ -68,6 +77,8 @@ function GetCustomFactions(FactionsTable, AllowedMods)
     return FactionsTable
 end
 
+---@param AllowedMods table
+---@return table<string, true>
 function GetSelectedMods(AllowedMods)
     -- We need an array with it's keys being mod uids and the values being true. but this function can be called
     -- while loading the game which means /lua/mods.lua.GetSelectedMods() doesn't work. In that case we look in
@@ -93,6 +104,9 @@ function GetSelectedMods(AllowedMods)
     return mods
 end
 
+---@param tbl table
+---@param keys any
+---@return boolean
 function TableHasKeys(tbl, keys)
     for _, k in keys do
         if not tbl[k] then
@@ -102,6 +116,7 @@ function TableHasKeys(tbl, keys)
     return true
 end
 
+---@return table
 function OrgFactions()
     return {
     {

@@ -7,7 +7,7 @@ local Util = import("/lua/utilities.lua")
 ---@class EmptyCollisionBeam : CollisionBeam
 EmptyCollisionBeam = Class(CollisionBeam) {
     FxImpactUnit = import("/lua/effecttemplates.lua").NoEffects,
-    FxImpactLand = import("/lua/effecttemplates.lua").NoEffects,--EffectTemplate.DefaultProjectileLandImpact,
+    FxImpactLand = import("/lua/effecttemplates.lua").NoEffects,
     FxImpactWater = EffectTemplate.DefaultProjectileWaterImpact,
     FxImpactUnderWater = EffectTemplate.DefaultProjectileUnderWaterImpact,
     FxImpactAirUnit = import("/lua/effecttemplates.lua").NoEffects,
@@ -43,7 +43,7 @@ UnstablePhasonLaserCollisionBeam = Class(SCCollisionBeam) {
 
     ---@param self UnstablePhasonLaserCollisionBeam
     ---@param impactType ImpactType
-    ---@param targetEntity Projectile
+    ---@param targetEntity? Projectile
     OnImpact = function(self, impactType, targetEntity)
         CollisionBeam.OnImpact(self, impactType, targetEntity)
     end,
@@ -70,7 +70,7 @@ UnstablePhasonLaserCollisionBeam2 = Class(SCCollisionBeam) {
 
     ---@param self UnstablePhasonLaserCollisionBeam
     ---@param impactType ImpactType
-    ---@param targetEntity Projectile
+    ---@param targetEntity Prop|Unit?
     OnImpact = function(self, impactType, targetEntity)
         if impactType == 'Terrain' then
             if self.Scorching == nil then

@@ -560,6 +560,6 @@ THiroLaser = ClassProjectile(SinglePolyTrailProjectile) {
 
 -- kept for mod backwards compatability
 local RandomFloat = import('/lua/utilities.lua').GetRandomFloat
-local util = import('utilities.lua')
+local util = import('/lua/utilities.lua')
 local Explosion = import('defaultexplosions.lua')
 local Projectile = import('/lua/sim/projectile.lua').Projectile

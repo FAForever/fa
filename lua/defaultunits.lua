@@ -705,13 +705,13 @@ StructureUnit = ClassUnit(Unit) {
     ---comment
     ---@param self StructureUnit
     ---@param unitBeingBuilt Unit
-    ---@param order table
+    ---@param order string
     StartBuildingEffects = function(self, unitBeingBuilt, order)
         Unit.StartBuildingEffects(self, unitBeingBuilt, order)
     end,
 
     ---@param self StructureUnit
-    ---@param unitBeingBuilt Unit
+    ---@param unitBeingBuilt boolean
     StopBuildingEffects = function(self, unitBeingBuilt)
         Unit.StopBuildingEffects(self, unitBeingBuilt)
     end,

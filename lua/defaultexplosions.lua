@@ -97,7 +97,7 @@ local ScorchDecalTexturesN = TableGetn(ScorchDecalTextures)
 ---@return number
 ---@return number
 function GetUnitSizes(unit)
-    local bp = unit:GetBlueprint()
+    local bp = unit.Blueprint or unit:GetBlueprint()
     return bp.SizeX or 0, bp.SizeY or 0, bp.SizeZ or 0
 end
 
@@ -108,7 +108,7 @@ end
 ---@return number
 ---@return number
 function GetUnitMeshExtents(unit)
-    local bp = unit.Blueprint or unit:GetBlueprint()
+    local bp = unit.Blueprint
     return bp.Physics.MeshExtentsX or bp.SizeX or 0, bp.Physics.MeshExtentsY or bp.SizeY or 0, bp.Physics.MeshExtentsZ or bp.SizeZ or 0
 end
 
@@ -128,7 +128,7 @@ end
 ---@param unit Unit The unit to get the diameter of.
 ---@return number
 function GetAverageBoundingXZRadius(unit)
-    local bp = unit:GetBlueprint()
+    local bp = unit.Blueprint
     return ((bp.SizeX or 0) + (bp.SizeZ or 0)) * 0.5
 end
 
@@ -137,7 +137,7 @@ end
 ---@param unit Unit The unit to get the radius of.
 ---@return number
 function GetAverageBoundingXZRadiusCorrect(unit)
-    local bp = unit:GetBlueprint()
+    local bp = unit.Blueprint
     return ((bp.SizeX or 1) + (bp.SizeZ or 1)) * 0.25
 end
 
@@ -157,7 +157,7 @@ end
 ---@param unit Unit The unit to get the radius of.
 ---@return number
 function GetAverageBoundingXYZRadiusCorrect(unit)
-    local bp = unit:GetBlueprint()
+    local bp = unit.Blueprint
     return ((bp.SizeX or 1) + (bp.SizeZ or 1) + (bp.SizeY or 1)) * 0.166
 end
 
@@ -819,10 +819,10 @@ function CreateFirePlume(object, scale)
 end
 
 ---@param object Unit
----@param projectile string
+---@param projectile FileName
 ---@param minnumber integer
 ---@param maxnumber integer
----@param effect string
+---@param effect FileName
 ---@param fxscalemin number
 ---@param fxscalemax number
 ---@param gravitymin number
@@ -862,7 +862,7 @@ end
 -- *****************
 
 ---@param object Unit
----@param projBP string
+---@param projBP FileName
 ---@param posX number
 ---@param posY number
 ---@param posZ number

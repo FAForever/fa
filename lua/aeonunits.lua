@@ -32,8 +32,7 @@ AFactoryUnit = ClassUnit(FactoryUnit) {
     ---@param self AFactoryUnit
     ---@param unitBeingBuilt Unit
     StartBuildFx = function(self, unitBeingBuilt)
-        local thread = self:ForkThread(CreateAeonFactoryBuildingEffects, unitBeingBuilt, self.BuildEffectBones, 'Attachpoint', self.BuildEffectsBag)
-        unitBeingBuilt.Trash:Add(thread)
+        self.Trash:Add(ForkThread(CreateAeonFactoryBuildingEffects,self, unitBeingBuilt, self.BuildEffectBones, 'Attachpoint', self.BuildEffectsBag))
     end,
 
     ---@param self AFactoryUnit
@@ -88,6 +87,7 @@ AConcreteStructureUnit = ClassUnit(DefaultUnitsFile.ConcreteStructureUnit) {}
 --  Construction Units
 ---------------------------------------------------------------
 ---@class AConstructionUnit : ConstructionUnit
+---@field BuildEffectsBag TrashBag
 AConstructionUnit = ClassUnit(ConstructionUnit) {
 
     ---@param self AConstructionUnit
@@ -102,6 +102,7 @@ AConstructionUnit = ClassUnit(ConstructionUnit) {
 --  ENERGY CREATION UNITS
 ---------------------------------------------------------------
 ---@class AEnergyCreationUnit : EnergyCreationUnit
+---@field AmbientEffects any
 AEnergyCreationUnit = ClassUnit(EnergyCreationUnit) {
     ---@param self AEnergyCreationUnit
     ---@param builder Unit
@@ -178,13 +179,13 @@ ASonarUnit = ClassUnit(DefaultUnitsFile.SonarUnit) {}
 --  SEA FACTORY STRUCTURES
 ---------------------------------------------------------------
 ---@class ASeaFactoryUnit : SeaFactoryUnit
+---@field BuildEffectsBag TrashBag
 ASeaFactoryUnit = ClassUnit(SeaFactoryUnit) {
 
     ---@param self ASeaFactoryUnit
     ---@param unitBeingBuilt Unit
     StartBuildFx = function(self, unitBeingBuilt)
-        local thread = self:ForkThread(CreateAeonFactoryBuildingEffects, unitBeingBuilt, self.BuildEffectBones, 'Attachpoint01', self.BuildEffectsBag)
-        unitBeingBuilt.Trash:Add(thread)
+        self.Trash:Add(ForkThread(CreateAeonFactoryBuildingEffects,self, unitBeingBuilt, self.BuildEffectBones, 'Attachpoint01', self.BuildEffectsBag))
     end,
 
     OnPaused = AFactoryUnit.OnPaused,
@@ -293,7 +294,7 @@ ARadarJammerUnit = ClassUnit(RadarJammerUnit) {
     ---@param layer Layer
     OnStopBeingBuilt = function(self, builder, layer)
         RadarJammerUnit.OnStopBeingBuilt(self, builder, layer)
-        local bp = self:GetBlueprint()
+        local bp = self.Blueprint
         local bpAnim = bp.Display.AnimationOpen
         if not bpAnim then return end
         if not self.OpenAnim then

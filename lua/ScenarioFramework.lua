@@ -41,9 +41,7 @@ PingGroups = import("/lua/simpinggroup.lua")
 ---@field Armies string[] names of armies in team
 ---@field LastRecallVoteTime number game tick of last recall vote
 
-
 local PauseUnitDeathActive = false
-
 
 --- Causes the game to exit immediately
 function ExitGame()
@@ -143,7 +141,6 @@ end
 
 CreateUnitDamagedTrigger = TriggerFile.CreateUnitDamagedTrigger
 
----
 ---@param callback any
 ---@param aiBrain AIBrain
 ---@param category EntityCategory
@@ -167,10 +164,10 @@ end
 
 --- An override for `Unit.DoTakeDamage` to hold on to the final blow and then release it
 --- on the unit once its death is unpaused
----@param self Unit
----@param instigator Unit
----@param amount number
----@param vector any
+---@param self Unit The Unit
+---@param instigator Unit The Unit
+---@param amount number 
+---@param vector any unused
 ---@param damageType DamageType
 function OverrideDoDamage(self, instigator, amount, vector, damageType)
     local preAdjHealth = self:GetHealth()
@@ -193,6 +190,11 @@ function OverrideDoDamage(self, instigator, amount, vector, damageType)
         end
     end
 end
+
+---@param self Unit
+---@param instigator Unit
+---@param damageType DamageType
+---@param excessDamageRatio number
 function UnlockAndKillUnitThread(self, instigator, damageType, excessDamageRatio)
     self:DoUnitCallbacks('OnKilled')
     while PauseUnitDeathActive do
@@ -205,7 +207,7 @@ end
 --- An override for `Unit.OnKilled` to make unit death pausing work
 ---@param self Unit
 ---@param instigator Unit
----@param type any
+---@param type any unused
 ---@param overkillRatio number
 function OverrideKilled(self, instigator, type, overkillRatio)
     if not self.CanBeKilled then
@@ -725,7 +727,6 @@ function WaitForDialogue(name)
     end
 end
 
----
 function PlayUnlockDialogue()
     if Random(1, 2) == 1 then
         SyncVoice({Bank = 'XGG', Cue = 'Computer_Computer_UnitRevalation_01370'})
@@ -741,7 +742,6 @@ function PlayTaunt(head, taunt)
     Sync.MPTaunt = {head, taunt}
 end
 
----
 ---@param text string
 function DisplayMissionText(text)
     if not Sync.MissionText then
@@ -750,7 +750,6 @@ function DisplayMissionText(text)
     table.insert(Sync.MissionText, text)
 end
 
----
 ---@param text string
 function DisplayVideoText(text)
     if not Sync.VideoText then
@@ -767,7 +766,6 @@ function PlayNIS(pathToMovie)
     end
 end
 
----
 ---@param faction string
 ---@param callback fun()
 function PlayEndGameMovie(faction, callback)
@@ -783,7 +781,6 @@ function PlayEndGameMovie(faction, callback)
     end
 end
 
----
 ---@param callback fun()
 function EndGameWaitThread(callback)
     while not ScenarioInfo.DialogueFinished['EndGameMovie'] do
@@ -847,7 +844,7 @@ end
 ---@return CommandUnit
 function SpawnCommander(brain, unit, effect, name, pauseAtDeath, deathTrigger, enhancements)
     local ACU = ScenarioUtils.CreateArmyUnit(brain, unit)
-    local bp = ACU:GetBlueprint()
+    local bp = ACU.Blueprint
     local bonesToHide = bp.WarpInEffect.HideBones
     local delay = 0
 
@@ -980,7 +977,7 @@ end
 ---@param callback fun()
 ---@param bonesToHide Bone[]
 function FakeGateInUnit(unit, callback, bonesToHide)
-    local bp = unit:GetBlueprint()
+    local bp = unit.Blueprint
 
     if EntityCategoryContains(categories.COMMAND + categories.SUBCOMMANDER, unit) then
         unit:HideBone(0, true)

@@ -677,7 +677,7 @@ AQuantumBeamGenerator = ClassWeapon(DefaultBeamWeapon) {
 
     ---@param self AQuantumBeamGenerator
     PlayFxWeaponUnpackSequence = function(self)
-        local bp = self:GetBlueprint()
+        local bp = self.Blueprint
         for _, v in self.FxUpackingChargeEffects do
             for i, j in bp.RackBones[self.CurrentRackSalvoNumber].MuzzleBones do
                 CreateAttachedEmitter(self.unit, j, self.unit.Army, v):ScaleEmitter(self.FxUpackingChargeEffectScale)

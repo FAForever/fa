@@ -68,10 +68,10 @@ local TrashBagAdd = TrashBag.Add
 CConstructionTemplate = ClassSimple {
 
     --- Prepares the values required to support bots
-    ---@param self CConstructionTemplate
+    ---@param self Unit
     OnCreate = function(self)
         -- cache the total amount of drones
-        self.BuildBotTotal = self:GetBlueprint().BuildBotTotal or math.min(math.ceil((10 + self:GetBuildRate()) / 15), 10)
+        self.BuildBotTotal = self.Blueprint.BuildBotTotal or math.min(math.ceil((10 + self:GetBuildRate()) / 15), 10)
     end,
 
     --- When dying, destroy everything.
@@ -100,7 +100,7 @@ CConstructionTemplate = ClassSimple {
 
     --- When stopping to build, send the bots back after a bit.
     ---@param self CConstructionTemplate
-    ---@param built Unit
+    ---@param built Unit Unused
     StopBuildingEffects = function(self, built)
         -- make sure we're not dead (then bots are destroyed by trashbag)
         if self.Dead then 
@@ -152,9 +152,9 @@ CConstructionTemplate = ClassSimple {
     end,
 
     --- When making build effects, try and make the bots.
-    ---@param self CConstructionTemplate
+    ---@param self Unit
     ---@param unitBeingBuilt Unit
-    ---@param order number
+    ---@param order number Unused
     ---@param stationary boolean
     CreateBuildEffects = function(self, unitBeingBuilt, order, stationary)
         -- check if the unit still exists, this can happen when: 
@@ -274,6 +274,7 @@ CConstructionTemplate = ClassSimple {
 --- The build bot class for drones. It removes a lot of
 -- the basic functionality of a unit to save on performance.
 ---@class CBuildBotUnit : DummyUnit
+---@field Trash TrashBag
 CBuildBotUnit = ClassDummyUnit(DummyUnit) {
 
     -- Keep track of the builder that made the bot
@@ -348,6 +349,7 @@ CBuildBotUnit = ClassDummyUnit(DummyUnit) {
 
 -- AIR FACTORY STRUCTURES
 ---@class CAirFactoryUnit : AirFactoryUnit
+---@field BuildEffectsBag TrashBag
 CAirFactoryUnit = ClassUnit(AirFactoryUnit) {
 
     ---@param self CAirFactoryUnit
@@ -356,7 +358,7 @@ CAirFactoryUnit = ClassUnit(AirFactoryUnit) {
     CreateBuildEffects = function(self, unitBeingBuilt, order)
         if not unitBeingBuilt then return end
         WaitTicks(2)
-        EffectUtil.CreateCybranFactoryBuildEffects(self, unitBeingBuilt, self:GetBlueprint().General.BuildBones, self.BuildEffectsBag)
+        EffectUtil.CreateCybranFactoryBuildEffects(self, unitBeingBuilt, self.Blueprint.General.BuildBones, self.BuildEffectsBag)
     end,
 
     ---@param self CAirFactoryUnit
@@ -367,7 +369,7 @@ CAirFactoryUnit = ClassUnit(AirFactoryUnit) {
         -- Start build process
         if not self.BuildAnimManip then
             self.BuildAnimManip = CreateAnimator(self)
-            self.BuildAnimManip:PlayAnim(self:GetBlueprint().Display.AnimationBuild, true):SetRate(0)
+            self.BuildAnimManip:PlayAnim(self.Blueprint.Display.AnimationBuild, true):SetRate(0)
             self.Trash:Add(self.BuildAnimManip)
         end
         self.BuildAnimManip:SetRate(1)
@@ -519,15 +521,16 @@ CEnergyStorageUnit = ClassUnit(EnergyStorageUnit) {}
 
 -- LAND FACTORY STRUCTURES
 ---@class CLandFactoryUnit : LandFactoryUnit
+---@field BuildEffectsBag table
 CLandFactoryUnit = ClassUnit(LandFactoryUnit) {
 
     ---@param self CLandFactoryUnit
     ---@param unitBeingBuilt Unit
-    ---@param order number
+    ---@param order string unused
     CreateBuildEffects = function(self, unitBeingBuilt, order)
         if not unitBeingBuilt then return end
         WaitSeconds(0.1)
-        EffectUtil.CreateCybranFactoryBuildEffects(self, unitBeingBuilt, self:GetBlueprint().General.BuildBones, self.BuildEffectsBag)
+        EffectUtil.CreateCybranFactoryBuildEffects(self, unitBeingBuilt, self.Blueprint.General.BuildBones, self.BuildEffectsBag)
     end,
 
     ---@param self CLandFactoryUnit
@@ -540,7 +543,7 @@ CLandFactoryUnit = ClassUnit(LandFactoryUnit) {
         -- Start build process
         if not self.BuildAnimManip then
             self.BuildAnimManip = CreateAnimator(self)
-            self.BuildAnimManip:PlayAnim(self:GetBlueprint().Display.AnimationBuild, true):SetRate(0)
+            self.BuildAnimManip:PlayAnim(self.Blueprint.Display.AnimationBuild, true):SetRate(0)
             self.Trash:Add(self.BuildAnimManip)
         end
 
@@ -835,6 +838,7 @@ CSonarUnit = ClassUnit(DefaultUnitsFile.SonarUnit) {}
 
 -- SEA FACTORY STRUCTURES
 ---@class CSeaFactoryUnit : SeaFactoryUnit
+---@field BuildEffectsBag table
 CSeaFactoryUnit = ClassUnit(SeaFactoryUnit) {
 
     ---@param self CSeaFactoryUnit
@@ -866,7 +870,7 @@ CSeaFactoryUnit = ClassUnit(SeaFactoryUnit) {
 
     ---@param self CSeaFactoryUnit
     ---@param unitBeingBuilt Unit
-    ---@param order number
+    ---@param order string
     OnStartBuild = function(self, unitBeingBuilt, order)
         SeaFactoryUnit.OnStartBuild(self, unitBeingBuilt, order)
         if order ~= 'Upgrade' then
@@ -875,7 +879,7 @@ CSeaFactoryUnit = ClassUnit(SeaFactoryUnit) {
     end,
 
     ---@param self CSeaFactoryUnit
-    ---@param unitBuilding boolean
+    ---@param unitBuilding Unit
     OnStopBuild = function(self, unitBuilding)
         SeaFactoryUnit.OnStopBuild(self, unitBuilding)
         if not self.Dead and self:GetFractionComplete() == 1 then
@@ -961,7 +965,7 @@ CConstructionEggUnit = ClassUnit(CStructureUnit) {
     ---@param layer Layer
     OnStopBeingBuilt = function(self, builder, layer)
         LandFactoryUnit.OnStopBeingBuilt(self, builder, layer)
-        local bp = self:GetBlueprint()
+        local bp = self.Blueprint
         local buildUnit = bp.Economy.BuildUnit
         local pos = self:GetPosition()
         local aiBrain = self:GetAIBrain()
@@ -975,7 +979,7 @@ CConstructionEggUnit = ClassUnit(CStructureUnit) {
         self:ForkThread(function()
                 self.OpenAnimManip = CreateAnimator(self)
                 self.Trash:Add(self.OpenAnimManip)
-                self.OpenAnimManip:PlayAnim(self:GetBlueprint().Display.AnimationOpen, false):SetRate(0.1)
+                self.OpenAnimManip:PlayAnim(self.Blueprint.Display.AnimationOpen, false):SetRate(0.1)
                 self:PlaySound(bp.Audio['EggOpen'])
 
                 WaitFor(self.OpenAnimManip)
@@ -1013,7 +1017,7 @@ CConstructionStructureUnit = ClassUnit(CStructureUnit, CConstructionTemplate) {
         CStructureUnit.OnCreate(self)
         CConstructionTemplate.OnCreate(self)
 
-        local bp = self:GetBlueprint()
+        local bp = self.Blueprint
 
         -- Construction stuff
         if bp.General.BuildBones then

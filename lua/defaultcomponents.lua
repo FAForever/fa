@@ -42,6 +42,8 @@ ShieldEffectsComponent = ClassSimple {
 IntelComponent = ClassSimple {
 
     ---@param self IntelComponent | Unit
+    ---@param builder Unit
+    ---@param layer Layer
     OnStopBeingBuilt = function(self, builder, layer)
         local intelBlueprint = self.Blueprint.Intel
         if intelBlueprint and intelBlueprint.State then
@@ -704,7 +706,7 @@ VeterancyComponent = ClassSimple {
     end,
 
     ---@param self Unit | VeterancyComponent
-    ---@param instigator Unit
+    ---@param unitThatIsDying Unit
     OnKilledUnit = function (self, unitThatIsDying, experience)
         if not experience then
             return
