@@ -343,6 +343,13 @@ VS_OUT FixedFuncVS( VS_IN In )
     return Out;
 }
 
+bool IsExperimentalShader() {
+    // The tile value basically says how often the texture gets repeated on the map.
+    // A value less than one doesn't make sense under normal conditions, so it is
+    // relatively save to use it as our switch.
+    return UpperAlbedoTile.x < 1.0;
+}
+
 // sample a texture that is another buffer the same size as the one
 // we are rendering into and with the viewport setup the same way.
 float4 SampleScreen(sampler inSampler, float4 inTex)
@@ -410,7 +417,7 @@ float4 CalculateLighting( float3 inNormal, float3 inViewPosition, float3 inAlbed
     float4 color = float4( 0, 0, 0, 0 );
 
     float shadow = ( inShadows && ( 1 == ShadowsEnabled ) ) ? ComputeShadow( inShadow ) : 1;
-    if (UpperAlbedoTile.x < 1.0) {
+    if (IsExperimentalShader()) {
         float3 position = TerrainScale * inViewPosition;
         float mapShadow = saturate(1 - tex2D(Stratum7AlbedoSampler, position.xy).b);
         shadow = shadow * mapShadow;
@@ -805,7 +812,7 @@ float4 TerrainBasisPS( VS_OUTPUT inV ) : COLOR
 float4 TerrainBasisPSBiCubic( VS_OUTPUT inV ) : COLOR
 {
     float4 result;
-    if (UpperAlbedoTile.x < 1.0) {
+    if (IsExperimentalShader()) {
         float4 position = TerrainScale * inV.mTexWT;
         result = (float4(1, 1, tex2D(UpperAlbedoSampler, position.xy).xy));
 
@@ -1302,7 +1309,7 @@ float4 DecalsPS( VS_OUTPUT inV, uniform bool inShadows) : COLOR
     float waterDepth = tex2Dproj(UtilitySamplerC, inV.mTexWT * TerrainScale).g;
 
     float3 color;
-    if (UpperAlbedoTile.x < 1.0) {
+    if (IsExperimentalShader()) {
         float roughness = 1 - decalSpec.r;
         color = PBR(inV, decalAlbedo, normal, roughness);
         color = ApplyWaterColorExponentially(inV, waterDepth, color);
