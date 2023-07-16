@@ -1,15 +1,11 @@
---
--- Terran Land-Based Cruise Missile : UEL0111 (UEF T2 MML)
---
-
 local TMissileCruiseProjectile = import("/lua/terranprojectiles.lua").TMissileCruiseProjectile
 local EffectTemplate = import("/lua/effecttemplates.lua")
 
+---@class TIFMissileCruise03: TMissileCruiseProjectile
 TIFMissileCruise03 = ClassProjectile(TMissileCruiseProjectile) {
 
     FxTrails = EffectTemplate.TMissileExhaust01,
     FxTrailOffset = -0.85,
-    
     FxAirUnitHitScale = 0.65,
     FxLandHitScale = 0.65,
     FxNoneHitScale = 0.65,
@@ -21,13 +17,15 @@ TIFMissileCruise03 = ClassProjectile(TMissileCruiseProjectile) {
     FxUnitHitScale = 0.65,
     FxWaterHitScale = 0.65,
     FxOnKilledScale = 0.65,
-    
+
+    ---@param self TIFMissileCruise03
     OnCreate = function(self)
         TMissileCruiseProjectile.OnCreate(self)
         self:SetCollisionShape('Sphere', 0, 0, 0, 2)        
         self.MoveThread = self.Trash:Add(ForkThread(self.MovementThread,self))
     end,
 
+    ---@param self TIFMissileCruise03
     MovementThread = function(self)        
         self.Distance = self:GetDistanceToTarget()
         self:SetTurnRate(8)
@@ -38,6 +36,7 @@ TIFMissileCruise03 = ClassProjectile(TMissileCruiseProjectile) {
         end
     end,
 
+    ---@param self TIFMissileCruise03
     SetTurnRateByDist = function(self)
         local dist = self:GetDistanceToTarget()
         if dist > self.Distance then
@@ -67,6 +66,7 @@ TIFMissileCruise03 = ClassProjectile(TMissileCruiseProjectile) {
         end
     end,        
 
+    ---@param self TIFMissileCruise03
     GetDistanceToTarget = function(self)
         local tpos = self:GetCurrentTargetPosition()
         local mpos = self:GetPosition()

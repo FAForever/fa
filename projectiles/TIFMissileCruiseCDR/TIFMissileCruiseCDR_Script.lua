@@ -1,10 +1,9 @@
---
--- Terran Land-Based Cruise Missile
---
 local TMissileCruiseProjectile = import("/lua/terranprojectiles.lua").TMissileCruiseProjectile02
 local Explosion = import("/lua/defaultexplosions.lua")
 local EffectTemplate = import("/lua/effecttemplates.lua")
 
+-- Terran Land-Based Cruise Missile
+---@class TIFMissileCruiseCDR : TMissileCruiseProjectile
 TIFMissileCruiseCDR = ClassProjectile(TMissileCruiseProjectile) {
 
     FxAirUnitHitScale = 1.65,
@@ -21,12 +20,14 @@ TIFMissileCruiseCDR = ClassProjectile(TMissileCruiseProjectile) {
 
     FxTrails = EffectTemplate.TMissileExhaust01,
 
+    ---@param self TIFMissileCruiseCDR
     OnCreate = function(self)
         TMissileCruiseProjectile.OnCreate(self)
         self:SetCollisionShape('Sphere', 0, 0, 0, 2)
         self.MoveThread = self.Trash:Add(ForkThread(self.MovementThread,self))
     end,
 
+    ---@param self TIFMissileCruiseCDR
     MovementThread = function(self)
         self:SetTurnRate(8)
         WaitTicks(4)
@@ -36,6 +37,7 @@ TIFMissileCruiseCDR = ClassProjectile(TMissileCruiseProjectile) {
         end
     end,
 
+    ---@param self TIFMissileCruiseCDR
     SetTurnRateByDist = function(self)
         local dist = self:GetDistanceToTarget()
         --Get the nuke as close to 90 deg as possible
@@ -59,6 +61,7 @@ TIFMissileCruiseCDR = ClassProjectile(TMissileCruiseProjectile) {
         end
     end,
 
+    ---@param self TIFMissileCruiseCDR
     GetDistanceToTarget = function(self)
         local tpos = self:GetCurrentTargetPosition()
         local mpos = self:GetPosition()
@@ -66,6 +69,7 @@ TIFMissileCruiseCDR = ClassProjectile(TMissileCruiseProjectile) {
         return dist
     end,
 
+    ---@param self TIFMissileCruiseCDR
     OnEnterWater = function(self)
         TMissileCruiseProjectile.OnEnterWater(self)
         self:SetDestroyOnWater(true)
