@@ -61,6 +61,9 @@ UnitBlueprint{
         "LOWSELECTPRIO",
         "MOBILE",
         "NEEDMOBILEBUILD",
+        "OVERLAYANTIAIR",
+        "OVERLAYDIRECTFIRE",
+        "PRODUCTSC1",
         "RECLAIMABLE",
         "SELECTABLE",
         "SHOWATTACKRETICLE",
@@ -71,9 +74,11 @@ UnitBlueprint{
     Defense = {
         AirThreatLevel = 24,
         ArmorType = "Experimental",
+        EconomyThreatLevel = 0,
         Health = 75000,
         MaxHealth = 75000,
         RegenRate = 75,
+        SubThreatLevel = 0,
         SurfaceThreatLevel = 243,
     },
     Display = {
@@ -162,11 +167,17 @@ UnitBlueprint{
     General = {
         CommandCaps = {
             RULEUCC_Attack = true,
+            RULEUCC_CallTransport = false,
+            RULEUCC_Capture = false,
             RULEUCC_Guard = true,
             RULEUCC_Move = true,
+            RULEUCC_Nuke = false,
             RULEUCC_Patrol = true,
+            RULEUCC_Reclaim = false,
+            RULEUCC_Repair = false,
             RULEUCC_RetaliateToggle = true,
             RULEUCC_Stop = true,
+            RULEUCC_Transport = false,
         },
         FactionName = "Cybran",
         Icon = "air",
@@ -187,6 +198,14 @@ UnitBlueprint{
     LifeBarOffset = 3.25,
     LifeBarSize = 6.5,
     Physics = {
+        BuildOnLayerCaps = {
+            LAYER_Air = true,
+            LAYER_Land = false,
+            LAYER_Orbit = false,
+            LAYER_Seabed = false,
+            LAYER_Sub = false,
+            LAYER_Water = false,
+        },
         Elevation = 12,
         MaxSpeed = 0.5,
         MotionType = "RULEUMT_Air",
@@ -623,6 +642,7 @@ UnitBlueprint{
         MassMult = 0.9,
         ReclaimTimeMultiplier = 1,
         WreckageLayers = {
+            Air = false,
             Land = true,
             Seabed = true,
             Sub = true,

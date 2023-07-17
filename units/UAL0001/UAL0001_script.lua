@@ -227,14 +227,14 @@ UAL0001 = ClassUnit(ACUUnit) {
             local aoc = self:GetWeaponByLabel('AutoOverCharge')
             aoc:ChangeMaxRadius(bpDisrupt or 22)
         -- Advanced Cryslised Beam
-        elseif enh == 'FAF_CrysalisBeamAdvanced' then
+        elseif enh == 'AdvancedCrysalisBeam' then
             local wep = self:GetWeaponByLabel('RightDisruptor')
             wep:ChangeMaxRadius(bp.NewMaxRadius or 35)
             local oc = self:GetWeaponByLabel('OverCharge')
             oc:ChangeMaxRadius(bp.NewMaxRadius or 35)
             local aoc = self:GetWeaponByLabel('AutoOverCharge')
             aoc:ChangeMaxRadius(bp.NewMaxRadius or 35)
-        elseif enh == 'FAF_CrysalisBeamAdvancedRemove' then
+        elseif enh == 'AdvancedCrysalisBeamRemove' then
             local wep = self:GetWeaponByLabel('RightDisruptor')
             local bpDisrupt = self:GetBlueprint().Weapon[1].MaxRadius
             wep:ChangeMaxRadius(bpDisrupt or 22)

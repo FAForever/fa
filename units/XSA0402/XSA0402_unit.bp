@@ -64,6 +64,8 @@ UnitBlueprint{
         "LOWSELECTPRIO",
         "MOBILE",
         "NEEDMOBILEBUILD",
+        "OVERLAYANTIAIR",
+        "PRODUCTFA",
         "RECLAIMABLE",
         "SELECTABLE",
         "SERAPHIM",
@@ -74,9 +76,11 @@ UnitBlueprint{
     Defense = {
         AirThreatLevel = 180,
         ArmorType = "Experimental",
+        EconomyThreatLevel = 0,
         Health = 52000,
         MaxHealth = 52000,
         RegenRate = 25,
+        SubThreatLevel = 0,
         SurfaceThreatLevel = 110,
     },
     Display = {
@@ -152,11 +156,17 @@ UnitBlueprint{
     General = {
         CommandCaps = {
             RULEUCC_Attack = true,
+            RULEUCC_CallTransport = false,
+            RULEUCC_Capture = false,
             RULEUCC_Guard = true,
             RULEUCC_Move = true,
+            RULEUCC_Nuke = false,
             RULEUCC_Patrol = true,
+            RULEUCC_Reclaim = false,
+            RULEUCC_Repair = false,
             RULEUCC_RetaliateToggle = true,
             RULEUCC_Stop = true,
+            RULEUCC_Transport = false,
         },
         FactionName = "Seraphim",
         Icon = "air",
@@ -167,6 +177,14 @@ UnitBlueprint{
     LifeBarOffset = 8.5,
     LifeBarSize = 13,
     Physics = {
+        BuildOnLayerCaps = {
+            LAYER_Air = true,
+            LAYER_Land = false,
+            LAYER_Orbit = false,
+            LAYER_Seabed = false,
+            LAYER_Sub = false,
+            LAYER_Water = false,
+        },
         Elevation = 25,
         MaxSpeed = 0.5,
         MeshExtentsX = 27,
@@ -524,6 +542,7 @@ UnitBlueprint{
         MassMult = 0.9,
         ReclaimTimeMultiplier = 1,
         WreckageLayers = {
+            Air = false,
             Land = true,
             Seabed = true,
             Sub = true,

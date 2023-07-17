@@ -18,6 +18,8 @@ UnitBlueprint{
         "CQUEMOV",
         "DEFENSE",
         "DRAGBUILD",
+        "OVERLAYDEFENSE",
+        "PRODUCTSC1",
         "RECLAIMABLE",
         "SELECTABLE",
         "SHIELD",
@@ -29,10 +31,12 @@ UnitBlueprint{
         "VISIBLETORECON",
     },
     Defense = {
+        AirThreatLevel = 0,
         ArmorType = "Structure",
-        EconomyThreatLevel = 2,
+        EconomyThreatLevel = 8,
         Health = 250,
         MaxHealth = 250,
+        RegenRate = 0,
         Shield = {
             ImpactEffects = "UEFShieldHit01",
             ImpactMesh = "/effects/entities/ShieldSection01/ShieldSection01_mesh",
@@ -47,6 +51,8 @@ UnitBlueprint{
             ShieldSize = 26,
             ShieldVerticalOffset = -3,
         },
+        SubThreatLevel = 0,
+        SurfaceThreatLevel = 0,
     },
     Display = {
         Abilities = {
@@ -101,8 +107,19 @@ UnitBlueprint{
     },
     General = {
         CommandCaps = {
+            RULEUCC_Attack = false,
+            RULEUCC_CallTransport = false,
+            RULEUCC_Capture = false,
+            RULEUCC_Guard = false,
+            RULEUCC_Move = false,
+            RULEUCC_Nuke = false,
+            RULEUCC_Patrol = false,
             RULEUCC_Pause = true,
+            RULEUCC_Reclaim = false,
+            RULEUCC_Repair = false,
+            RULEUCC_RetaliateToggle = false,
             RULEUCC_Stop = true,
+            RULEUCC_Transport = false,
         },
         FactionName = "UEF",
         Icon = "land",
@@ -123,6 +140,14 @@ UnitBlueprint{
     LifeBarSize = 2.5,
     Physics = {
         BankingSlope = 0,
+        BuildOnLayerCaps = {
+            LAYER_Air = false,
+            LAYER_Land = true,
+            LAYER_Orbit = false,
+            LAYER_Seabed = false,
+            LAYER_Sub = false,
+            LAYER_Water = false,
+        },
         DragCoefficient = 0.2,
         FlattenSkirt = true,
         MaxSteerForce = 0,
@@ -150,6 +175,12 @@ UnitBlueprint{
         HealthMult = 0.9,
         MassMult = 0.9,
         ReclaimTimeMultiplier = 1,
-        WreckageLayers = { Land = true },
+        WreckageLayers = {
+            Air = false,
+            Land = true,
+            Seabed = false,
+            Sub = false,
+            Water = false,
+        },
     },
 }

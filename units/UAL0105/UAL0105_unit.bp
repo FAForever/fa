@@ -28,6 +28,7 @@ UnitBlueprint{
         "LAND",
         "MOBILE",
         "PATROLHELPER",
+        "PRODUCTSC1",
         "RECLAIM",
         "RECLAIMABLE",
         "REPAIR",
@@ -37,10 +38,14 @@ UnitBlueprint{
         "VISIBLETORECON",
     },
     Defense = {
+        AirThreatLevel = 0,
         ArmorType = "Normal",
         EconomyThreatLevel = 9,
         Health = 120,
         MaxHealth = 120,
+        RegenRate = 0,
+        SubThreatLevel = 0,
+        SurfaceThreatLevel = 0,
     },
     Display = {
         Abilities = {
@@ -133,16 +138,20 @@ UnitBlueprint{
     },
     General = {
         CommandCaps = {
+            RULEUCC_Attack = false,
             RULEUCC_CallTransport = true,
             RULEUCC_Capture = true,
             RULEUCC_Guard = true,
             RULEUCC_Move = true,
+            RULEUCC_Nuke = false,
             RULEUCC_Patrol = true,
             RULEUCC_Pause = true,
             RULEUCC_Reclaim = true,
             RULEUCC_Repair = true,
+            RULEUCC_RetaliateToggle = false,
             RULEUCC_Sacrifice = true,
             RULEUCC_Stop = true,
+            RULEUCC_Transport = false,
         },
         ConstructionBar = true,
         FactionName = "Aeon",
@@ -156,6 +165,14 @@ UnitBlueprint{
     Physics = {
         BackUpDistance = 8,
         BankingSlope = 0.5,
+        BuildOnLayerCaps = {
+            LAYER_Air = false,
+            LAYER_Land = true,
+            LAYER_Orbit = false,
+            LAYER_Seabed = false,
+            LAYER_Sub = false,
+            LAYER_Water = false,
+        },
         DragCoefficient = 0.2,
         Elevation = 0.5,
         MaxAcceleration = 3.8,
@@ -196,6 +213,7 @@ UnitBlueprint{
         MassMult = 0.9,
         ReclaimTimeMultiplier = 1,
         WreckageLayers = {
+            Air = false,
             Land = true,
             Seabed = true,
             Sub = true,

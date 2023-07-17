@@ -46,6 +46,7 @@ UnitBlueprint{
         "HIGHALTAIR",
         "MOBILE",
         "OVERLAYSONAR",
+        "PRODUCTFA",
         "RECLAIMABLE",
         "SELECTABLE",
         "SERAPHIM",
@@ -54,10 +55,14 @@ UnitBlueprint{
         "VISIBLETORECON",
     },
     Defense = {
+        AirThreatLevel = 0,
         ArmorType = "Light",
+        EconomyThreatLevel = 0,
         Health = 840,
         MaxHealth = 840,
+        RegenRate = 0,
         SubThreatLevel = 8,
+        SurfaceThreatLevel = 0,
     },
     Display = {
         Abilities = {
@@ -135,12 +140,17 @@ UnitBlueprint{
         CommandCaps = {
             RULEUCC_Attack = true,
             RULEUCC_CallTransport = true,
+            RULEUCC_Capture = false,
             RULEUCC_Dock = true,
             RULEUCC_Guard = true,
             RULEUCC_Move = true,
+            RULEUCC_Nuke = false,
             RULEUCC_Patrol = true,
+            RULEUCC_Reclaim = false,
+            RULEUCC_Repair = false,
             RULEUCC_RetaliateToggle = true,
             RULEUCC_Stop = true,
+            RULEUCC_Transport = false,
         },
         FactionName = "Seraphim",
         Icon = "air",
@@ -155,6 +165,14 @@ UnitBlueprint{
     LifeBarSize = 0.8,
     Physics = {
         AttackElevation = 6,
+        BuildOnLayerCaps = {
+            LAYER_Air = true,
+            LAYER_Land = false,
+            LAYER_Orbit = false,
+            LAYER_Seabed = false,
+            LAYER_Sub = true,
+            LAYER_Water = false,
+        },
         Elevation = 12,
         FuelRechargeRate = 5,
         FuelUseTime = 600,
@@ -267,6 +285,7 @@ UnitBlueprint{
         MassMult = 0.9,
         ReclaimTimeMultiplier = 1,
         WreckageLayers = {
+            Air = false,
             Land = true,
             Seabed = true,
             Sub = true,

@@ -21,6 +21,7 @@ UnitBlueprint{
         "CQUEMOV",
         "INTELLIGENCE",
         "OVERLAYSONAR",
+        "PRODUCTSC1",
         "RECLAIMABLE",
         "SELECTABLE",
         "SHOWQUEUE",
@@ -33,9 +34,13 @@ UnitBlueprint{
         "VISIBLETORECON",
     },
     Defense = {
+        AirThreatLevel = 0,
         ArmorType = "Structure",
         Health = 400,
         MaxHealth = 400,
+        RegenRate = 0,
+        SubThreatLevel = 0,
+        SurfaceThreatLevel = 0,
     },
     Display = {
         Abilities = {
@@ -85,7 +90,21 @@ UnitBlueprint{
     },
     Footprint = { MinWaterDepth = 1.5 },
     General = {
-        CommandCaps = { RULEUCC_Pause = true },
+        CommandCaps = {
+            RULEUCC_Attack = false,
+            RULEUCC_CallTransport = false,
+            RULEUCC_Capture = false,
+            RULEUCC_Guard = false,
+            RULEUCC_Move = false,
+            RULEUCC_Nuke = false,
+            RULEUCC_Patrol = false,
+            RULEUCC_Pause = true,
+            RULEUCC_Reclaim = false,
+            RULEUCC_Repair = false,
+            RULEUCC_RetaliateToggle = false,
+            RULEUCC_Stop = false,
+            RULEUCC_Transport = false,
+        },
         FactionName = "UEF",
         Icon = "sea",
         OrderOverrides = {
@@ -110,7 +129,14 @@ UnitBlueprint{
     LifeBarSize = 0.75,
     Physics = {
         BankingSlope = 0,
-        BuildOnLayerCaps = { LAYER_Water = true },
+        BuildOnLayerCaps = {
+            LAYER_Air = false,
+            LAYER_Land = false,
+            LAYER_Orbit = false,
+            LAYER_Seabed = false,
+            LAYER_Sub = false,
+            LAYER_Water = true,
+        },
         DragCoefficient = 0.2,
         MaxSteerForce = 0,
         MeshExtentsOffsetY = -1.2,
@@ -140,6 +166,12 @@ UnitBlueprint{
         HealthMult = 0.9,
         MassMult = 0.9,
         ReclaimTimeMultiplier = 1,
-        WreckageLayers = {},
+        WreckageLayers = {
+            Air = false,
+            Land = false,
+            Seabed = false,
+            Sub = false,
+            Water = false,
+        },
     },
 }

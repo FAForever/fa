@@ -49,6 +49,10 @@ UnitBlueprint{
         "CANNOTUSEAIRSTAGING",
         "CANTRANSPORTCOMMANDER",
         "MOBILE",
+        "OVERLAYANTIAIR",
+        "OVERLAYDEFENSE",
+        "OVERLAYDIRECTFIRE",
+        "PRODUCTFA",
         "RECLAIMABLE",
         "SELECTABLE",
         "SHIELD",
@@ -61,10 +65,12 @@ UnitBlueprint{
         "VISIBLETORECON",
     },
     Defense = {
-        AirThreatLevel = 27,
+        AirThreatLevel = 18,
         ArmorType = "Light",
+        EconomyThreatLevel = 0,
         Health = 4500,
         MaxHealth = 4500,
+        RegenRate = 0,
         Shield = {
             ImpactEffects = "UEFShieldHit01",
             ImpactMesh = "/effects/entities/ShieldSection01/ShieldSection01_mesh",
@@ -81,7 +87,8 @@ UnitBlueprint{
             ShieldVerticalOffset = -1,
             TransportShield = true,
         },
-        SurfaceThreatLevel = 6,
+        SubThreatLevel = 0,
+        SurfaceThreatLevel = 18,
     },
     Display = {
         Abilities = {
@@ -163,10 +170,15 @@ UnitBlueprint{
     General = {
         CommandCaps = {
             RULEUCC_Attack = true,
+            RULEUCC_CallTransport = false,
+            RULEUCC_Capture = false,
             RULEUCC_Ferry = true,
             RULEUCC_Guard = true,
             RULEUCC_Move = true,
+            RULEUCC_Nuke = false,
             RULEUCC_Patrol = true,
+            RULEUCC_Reclaim = false,
+            RULEUCC_Repair = false,
             RULEUCC_RetaliateToggle = true,
             RULEUCC_Stop = true,
             RULEUCC_Transport = true,
@@ -188,6 +200,14 @@ UnitBlueprint{
     LifeBarOffset = 3.6,
     LifeBarSize = 2,
     Physics = {
+        BuildOnLayerCaps = {
+            LAYER_Air = true,
+            LAYER_Land = false,
+            LAYER_Orbit = false,
+            LAYER_Seabed = false,
+            LAYER_Sub = false,
+            LAYER_Water = false,
+        },
         Elevation = 10,
         FuelRechargeRate = 70,
         FuelUseTime = 800,
@@ -215,6 +235,7 @@ UnitBlueprint{
         SlotsMedium = 12,
         TransportClass = 10,
     },
+    UseOOBTestZoom = 200,
     Veteran = {
         Level1 = 12,
         Level2 = 24,
@@ -697,6 +718,7 @@ UnitBlueprint{
         MassMult = 0.9,
         ReclaimTimeMultiplier = 1,
         WreckageLayers = {
+            Air = false,
             Land = true,
             Seabed = true,
             Sub = true,

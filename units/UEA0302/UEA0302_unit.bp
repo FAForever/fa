@@ -44,6 +44,7 @@ UnitBlueprint{
         "MOBILE",
         "OVERLAYOMNI",
         "OVERLAYRADAR",
+        "PRODUCTSC1",
         "RADAR",
         "RECLAIMABLE",
         "SCOUT",
@@ -54,9 +55,14 @@ UnitBlueprint{
         "VISIBLETORECON",
     },
     Defense = {
+        AirThreatLevel = 0.1,
         ArmorType = "Light",
+        EconomyThreatLevel = 0,
         Health = 1150,
         MaxHealth = 1150,
+        RegenRate = 0,
+        SubThreatLevel = 0,
+        SurfaceThreatLevel = 0,
     },
     Display = {
         Abilities = {
@@ -131,12 +137,19 @@ UnitBlueprint{
     },
     General = {
         CommandCaps = {
+            RULEUCC_Attack = false,
             RULEUCC_CallTransport = true,
+            RULEUCC_Capture = false,
             RULEUCC_Dock = true,
             RULEUCC_Guard = true,
             RULEUCC_Move = true,
+            RULEUCC_Nuke = false,
             RULEUCC_Patrol = true,
+            RULEUCC_Reclaim = false,
+            RULEUCC_Repair = false,
+            RULEUCC_RetaliateToggle = false,
             RULEUCC_Stop = true,
+            RULEUCC_Transport = false,
         },
         FactionName = "UEF",
         Icon = "air",
@@ -163,6 +176,14 @@ UnitBlueprint{
     LifeBarOffset = 0.8,
     LifeBarSize = 1.25,
     Physics = {
+        BuildOnLayerCaps = {
+            LAYER_Air = true,
+            LAYER_Land = false,
+            LAYER_Orbit = false,
+            LAYER_Seabed = false,
+            LAYER_Sub = false,
+            LAYER_Water = false,
+        },
         Elevation = 22,
         FuelRechargeRate = 15,
         FuelUseTime = 1500,
@@ -209,6 +230,7 @@ UnitBlueprint{
         MassMult = 0.9,
         ReclaimTimeMultiplier = 1,
         WreckageLayers = {
+            Air = false,
             Land = true,
             Seabed = true,
             Sub = true,
