@@ -1,6 +1,7 @@
 PropBlueprint {
     Categories = {
         'RECLAIMABLE',
+        'OBSTRUCTSBUILDING'
     },
     Display = {
         Mesh = {
@@ -17,7 +18,6 @@ PropBlueprint {
         UniformScale = 0.035,
     },
     Economy = {
-        ReclaimEnergyMax = '',
         ReclaimMassMax = 60,
         ReclaimTime = 5,
     },

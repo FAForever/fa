@@ -38,6 +38,9 @@ AIBrain = Class(StandardBrain) {
         self.PlatoonNameCounter = {}
         self.PlatoonNameCounter['AttackForce'] = 0
         self.RepeatExecution = true
+
+        self.FactoryAssistList = {}
+        self.DelayEqualBuildPlattons = {}
     end,
 
     --- Called after `SetupSession` but before `BeginSession` - no initial units, props or resources exist at this point
