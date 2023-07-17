@@ -252,7 +252,7 @@ UnitBlueprint{
                 },
             },
             RackRecoilDistance = 0,
-            RangeCategory = "UWRC_InDirectFire",
+            RangeCategory = "UWRC_IndirectFire",
             TargetRestrictDisallow = "UNTARGETABLE AIR",
         },
     },
