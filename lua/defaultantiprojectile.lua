@@ -19,8 +19,9 @@ local GetRandomFloat = import("/lua/utilities.lua").GetRandomFloat
 
 ---@class DepthChargeSpec
 ---@field Army Army
----@field Owner string
+---@field Owner Projectile
 ---@field Radius number
+---@field ProjectilesToDeflect number
 
 ---@class MissileRedirectSpec
 ---@field Army Army
@@ -59,6 +60,10 @@ Flare = Class(Entity){
 }
 
 ---@class DepthCharge : Entity
+---@field Army Army
+---@field Owner Projectile
+---@field Radius number
+---@field ProjectilesToDeflect number
 DepthCharge = Class(Entity) {
 
     ---@param self DepthCharge
@@ -67,6 +72,7 @@ DepthCharge = Class(Entity) {
         self.Army = self:GetArmy()
         self.Owner = spec.Owner
         self.Radius = spec.Radius
+        self.ProjectilesToDeflect = spec.ProjectilesToDeflect or 3
         self:SetCollisionShape('Sphere', 0, 0, 0, self.Radius)
         self:SetDrawScale(self.Radius)
         self:AttachTo(spec.Owner, -1)
@@ -78,12 +84,21 @@ DepthCharge = Class(Entity) {
     ---@param other Projectile
     ---@return boolean
     OnCollisionCheck = function(self,other)
-        if EntityCategoryContains(categories.TORPEDO, other) and self.Army ~= other.Army and IsAlly(self.Army, other.Army) == false then
-            other:SetNewTarget(self.Owner)
+        if self.ProjectilesToDeflect > 0 then
+            if self.Army ~= other.Army and IsEnemy(self.Army, other.Army) then
+                if other.Blueprint.CategoriesHash["TORPEDO"] then
+                    self.ProjectilesToDeflect = self.ProjectilesToDeflect - 1
+
+                    other:SetNewTarget(self.Owner)
+                end
+            end
         end
+
         return false
     end,
 }
+
+
 
 ---@class MissileRedirect : Entity
 MissileRedirect = Class(Entity) {

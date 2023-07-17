@@ -89,7 +89,7 @@ Tooltips = {
     },
     overcharge = {
         title = "<LOC tooltipui0016>Overcharge",
-        description = "<LOC tooltipui0017>Needs 5000 energy in storage to activate. Right click to toggle auto-fire",
+        description = "<LOC tooltipui0017>Needs 7500 energy in storage to activate. Right click to toggle auto-fire",
         keyID = "overcharge",
     },
     transport = {
