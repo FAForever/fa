@@ -265,15 +265,15 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         end
 
         -- for syncing data to UI
-        self:GetStat("HitpointsRegeneration", bp.Defense.RegenRate)
-        self:SetStat("HitpointsRegeneration", bp.Defense.RegenRate)
+        self:UpdateUIStatistic("HitpointsRegeneration", bp.Defense.RegenRate)
+        self:UpdateUIStatistic("HitpointsRegeneration", bp.Defense.RegenRate)
 
         -- add support for keeping track of reclaim statistics
         if self.Blueprint.General.CommandCapsHash['RULEUCC_Reclaim'] then
             self.ReclaimedMass = 0
             self.ReclaimedEnergy = 0
-            self:GetStat("ReclaimedMass", 0)
-            self:GetStat("ReclaimedEnergy", 0)
+            self:UpdateUIStatistic("ReclaimedMass", 0)
+            self:UpdateUIStatistic("ReclaimedEnergy", 0)
         end
 
         -- add support for automated jamming reset
@@ -821,8 +821,8 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
             end
 
             -- update UI
-            self:SetStat('ReclaimedMass', self.ReclaimedMass)
-            self:SetStat('ReclaimedEnergy', self.ReclaimedEnergy)
+            self:UpdateUIStatistic('ReclaimedMass', self.ReclaimedMass)
+            self:UpdateUIStatistic('ReclaimedEnergy', self.ReclaimedEnergy)
         end
 
         -- reset reclaiming state
@@ -4252,7 +4252,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
     ---@param value number
     SetRegen = function(self, value)
         self:SetRegenRate(value)
-        self:SetStat("HitpointsRegeneration", value)
+        self:UpdateUIStatistic("HitpointsRegeneration", value)
     end,
 
     -------------------------------------------------------------------------------------------
@@ -4766,12 +4766,6 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
 
     --- Use `unit:UpdateUIStatistic` instead
     ---@deprecated
-    GetStat = function(self)
-        -- this hides the c implementation
-    end,
-
-    --- Use `unit:UpdateUIStatistic` instead
-    ---@deprecated
     SetStat = function(self)
         -- this hides the c implementation
     end,
@@ -4828,7 +4822,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
             self.EngineCommandCap = { }
         end
 
-        self.EngineCommandCap[capName] = true 
+        self.EngineCommandCap[capName] = true
         cUnit.AddCommandCap(self, capName)
     end,
 
@@ -4840,7 +4834,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         if self.EngineCommandCap then
             self.EngineCommandCap[capName] = nil
         end
-         
+
         cUnit.RemoveCommandCap(self, capName)
     end,
 

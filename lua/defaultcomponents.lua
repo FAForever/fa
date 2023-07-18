@@ -538,8 +538,8 @@ VeterancyComponent = ClassSimple {
 
         -- optionally, these fields are defined too to inform UI of our veterancy status
         if blueprint.VetEnabled then
-            self:SetStat('VetLevel', self:GetStat('VetLevel', 0).Value)
-            self:SetStat('VetExperience', self:GetStat('VetExperience', 0).Value)
+            self:UpdateUIStatistic('VetLevel', 0)
+            self:UpdateUIStatistic('VetExperience', 0)
             self.VetExperience = 0
             self.VetLevel = 0
         end
@@ -596,7 +596,7 @@ VeterancyComponent = ClassSimple {
         if currLevel > 4 then
             currExperience = currExperience + experience
             self.VetExperience = currExperience
-            self:SetStat('VetExperience', currExperience)
+            self:UpdateUIStatistic('VetExperience', currExperience)
             return
         end
 
@@ -611,7 +611,7 @@ VeterancyComponent = ClassSimple {
 
             currExperience = currExperience + experience
             self.VetExperience = currExperience
-            self:SetStat('VetExperience', currExperience)
+            self:UpdateUIStatistic('VetExperience', currExperience)
 
             while currLevel < 5 and upperThreshold and upperThreshold <= experience do
                 self:AddVetLevel()
@@ -627,7 +627,7 @@ VeterancyComponent = ClassSimple {
 
             currExperience = currExperience + experience
             self.VetExperience = currExperience
-            self:SetStat('VetExperience', currExperience)
+            self:UpdateUIStatistic('VetExperience', currExperience)
 
             if upperThreshold <= currExperience then
                 self:AddVetLevel()
@@ -645,7 +645,7 @@ VeterancyComponent = ClassSimple {
 
         local nextLevel = self.VetLevel + 1
         self.VetLevel = nextLevel
-        self:SetStat('VetLevel', nextLevel)
+        self:UpdateUIStatistic('VetLevel', nextLevel)
 
         -- shared across all units
         Buff.ApplyBuff(self, 'VeterancyMaxHealth' .. nextLevel)
