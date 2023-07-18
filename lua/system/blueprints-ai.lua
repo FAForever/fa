@@ -40,7 +40,7 @@ local function TakeIntoAccountBuildrate(bp)
     return not TableFind(bp.Economy.BuildableCategory or {'nahh'}, bp.General.UpgradesTo or 'nope') and not bp.Economy.BuildableCategory[2]
 end
 
----@param weapon Weapon
+---@param weapon WeaponBlueprint
 local function CalculatedDamage(weapon)
     local ProjectileCount = MathMax(1, TableGetn(weapon.RackBones[1].MuzzleBones or {'nehh'}), weapon.MuzzleSalvoSize or 1)
     if weapon.RackFireTogether then
@@ -49,7 +49,8 @@ local function CalculatedDamage(weapon)
     return ((weapon.Damage or 0) + (weapon.NukeInnerRingDamage or 0)) * ProjectileCount * (weapon.DoTPulses or 1)
 end
 
----@param weapon Weapon
+---@param weapon WeaponBlueprint
+---@return number
 local function CalculatedDPS(weapon)
     -- Base values
     local ProjectileCount

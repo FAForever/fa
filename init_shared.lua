@@ -59,7 +59,6 @@ local function FindFilesWithExtension(dir, extension, prepend, files)
     for k, file in IoDir(dir .. "/*") do
         if not (file == '.' or file == '..') then
             if StringSub(file, -3) == extension then
-                LOG(prepend .. "/" .. file)
                 TableInsert(files, prepend .. "/" .. file)
             end
             FindFilesWithExtension(dir .. "/" .. file, extension, prepend .. "/" .. file, files)

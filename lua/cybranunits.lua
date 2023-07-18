@@ -578,6 +578,14 @@ CLandUnit = ClassUnit(DefaultUnitsFile.LandUnit) {}
 ---@field AnimationManipulator moho.AnimationManipulator
 CMassCollectionUnit = ClassUnit(MassCollectionUnit) {
 
+    OnStartBuild = function(self, unitBeingBuilt, order)
+        MassCollectionUnit.OnStartBuild(self, unitBeingBuilt, order)
+        if not self.AnimationManipulator then return end
+        self.AnimationManipulator:SetRate(0)
+        self.AnimationManipulator:Destroy()
+        self.AnimationManipulator = nil
+    end,
+
     ---@param self CMassCollectionUnit
     PlayActiveAnimation = function(self)
         MassCollectionUnit.PlayActiveAnimation(self)
@@ -961,10 +969,15 @@ CConstructionEggUnit = ClassUnit(CStructureUnit) {
     ---@param layer Layer
     OnStopBeingBuilt = function(self, builder, layer)
         LandFactoryUnit.OnStopBeingBuilt(self, builder, layer)
+
+        -- prevent the unit from being reclaimed
+        self:SetReclaimable(false)
+
         local bp = self:GetBlueprint()
         local buildUnit = bp.Economy.BuildUnit
         local pos = self:GetPosition()
         local aiBrain = self:GetAIBrain()
+
 
         self.Spawn = CreateUnitHPR(
             buildUnit,
@@ -972,6 +985,7 @@ CConstructionEggUnit = ClassUnit(CStructureUnit) {
             pos[1], pos[2], pos[3],
             0, 0, 0
         )
+
         self:ForkThread(function()
                 self.OpenAnimManip = CreateAnimator(self)
                 self.Trash:Add(self.OpenAnimManip)

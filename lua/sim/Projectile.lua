@@ -8,6 +8,7 @@
 local ProjectileMethods = moho.projectile_methods
 local DefaultDamage = import("/lua/sim/defaultdamage.lua")
 local Flare = import("/lua/defaultantiprojectile.lua").Flare
+local DepthCharge = import("/lua/defaultantiprojectile.lua").DepthCharge
 
 local TableGetn = table.getn
 
@@ -156,10 +157,10 @@ Projectile = ClassProjectile(ProjectileMethods) {
         -- torpedoes can only be taken down by anti torpedo
         if selfHashedCategories['TORPEDO'] then
             if otherHashedCategories["ANTITORPEDO"] then
-                return alliedCheck
+                return other.OriginalTarget == self
             else
                 return false
-            end
+            end 
         end
 
         -- missiles can only be taken down by anti missiles
@@ -515,6 +516,11 @@ Projectile = ClassProjectile(ProjectileMethods) {
         if trackTarget then
             self:SetLifetime(onLostTargetLifetime)
         end
+
+        local originalTarget = self.OriginalTarget
+        if originalTarget and not (originalTarget.Dead or IsDestroyed(originalTarget)) then
+            self:SetNewTarget(originalTarget)
+        end
     end,
 
     -- Lua functionality
@@ -738,6 +744,19 @@ Projectile = ClassProjectile(ProjectileMethods) {
         end
 
         self.Trash:Add(self.MyFlare)
+    end,
+
+    ---@param self TDepthChargeProjectile
+    ---@param blueprint WeaponBlueprintDepthCharge
+    AddDepthCharge = function(self, blueprint)
+        if not blueprint then return end
+        if not blueprint.Radius then return end
+        self.MyDepthCharge = DepthCharge {
+            Owner = self,
+            Radius = blueprint.Radius or 10,
+            DepthCharge = blueprint.ProjectilesToDeflect
+        }
+        self.Trash:Add(self.MyDepthCharge)
     end,
 
     --- Called by Lua to create the impact effects

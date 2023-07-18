@@ -1,105 +1,77 @@
-UnitBlueprint {
+UnitBlueprint{
+    Description = "<LOC ueb0301_desc>Land Factory HQ",
     AI = {
         TargetBones = {
-            'Target01',
-            'Target02',
-            'Target03',
-            'UEB0301',
+            "Target01",
+            "Target02",
+            "Target03",
+            "UEB0301",
         },
     },
     Audio = {
-        Construct = Sound {
-            Bank = 'UEB',
-            Cue = 'UEB0301_Construct_Start',
-            LodCutoff = 'UnitMove_LodCutoff',
-        },
-        ConstructLoop = Sound {
-            Bank = 'UEB',
-            Cue = 'UEB0301_Construct_Loop',
-            LodCutoff = 'UnitMove_LodCutoff',
-        },
-        DeathExplosion = Sound {
-            Bank = 'UELDestroy',
-            Cue = 'UEB_Destroy_Lrg_PreDestroy',
-            LodCutoff = 'UnitMove_LodCutoff',
-        },
-        Destroyed = Sound {
-            Bank = 'UELDestroy',
-            Cue = 'UEB_Destroy_Huge',
-            LodCutoff = 'UnitMove_LodCutoff',
-        },
-        DoneBeingBuilt = Sound {
-            Bank = 'UEB',
-            Cue = 'UEB0301_Activate',
-            LodCutoff = 'UnitMove_LodCutoff',
-        },
-        UISelection = Sound {
-            Bank = 'Interface',
-            Cue = 'UEF_Select_Factory',
-            LodCutoff = 'UnitMove_LodCutoff',
-        },
+        Construct      = Sound { Bank = 'UEB',        Cue = 'UEB0301_Construct_Start',    LodCutoff = 'UnitMove_LodCutoff' },
+        ConstructLoop  = Sound { Bank = 'UEB',        Cue = 'UEB0301_Construct_Loop',     LodCutoff = 'UnitMove_LodCutoff' },
+        DeathExplosion = Sound { Bank = 'UELDestroy', Cue = 'UEB_Destroy_Lrg_PreDestroy', LodCutoff = 'UnitMove_LodCutoff' },
+        Destroyed      = Sound { Bank = 'UELDestroy', Cue = 'UEB_Destroy_Huge',           LodCutoff = 'UnitMove_LodCutoff' },
+        DoneBeingBuilt = Sound { Bank = 'UEB',        Cue = 'UEB0301_Activate',           LodCutoff = 'UnitMove_LodCutoff' },
+        UISelection    = Sound { Bank = 'Interface',  Cue = 'UEF_Select_Factory',         LodCutoff = 'UnitMove_LodCutoff' },
     },
     BuildIconSortPriority = 40,
     Categories = {
-        'PRODUCTSC1',
-        'SELECTABLE',
-        'BUILTBYTIER2FACTORY',
-        'UEF',
-        'STRUCTURE',
-        'LAND',
-        'TECH3',
-        'CONSTRUCTION',
-        'FACTORY',
-        'RALLYPOINT',
-        'DRAGBUILD',
-        'CONSTRUCTIONSORTDOWN',
-        'SIZE16',
-        'VISIBLETORECON',
-        'RECLAIMABLE',
-        'SHOWQUEUE',
-        'SORTCONSTRUCTION',
-        'RESEARCH',
+        "BUILTBYTIER2FACTORY",
+        "CONSTRUCTION",
+        "CONSTRUCTIONSORTDOWN",
+        "DRAGBUILD",
+        "FACTORY",
+        "LAND",
+        "PRODUCTSC1",
+        "RALLYPOINT",
+        "RECLAIMABLE",
+        "RESEARCH",
+        "SELECTABLE",
+        "SHOWQUEUE",
+        "SIZE16",
+        "SORTCONSTRUCTION",
+        "STRUCTURE",
+        "TECH3",
+        "UEF",
+        "VISIBLETORECON",
     },
     Defense = {
         AirThreatLevel = 0,
-        ArmorType = 'Structure',
-        EconomyThreatLevel = 49,
+        ArmorType = "Structure",
+        EconomyThreatLevel = 500,
         Health = 16000,
         MaxHealth = 16000,
         RegenRate = 0,
         SubThreatLevel = 0,
         SurfaceThreatLevel = 0,
     },
-    Description = '<LOC ueb0301_desc>Land Factory HQ',
     Display = {
-        BuildAttachBone = 'Attachpoint',
+        BuildAttachBone = "Attachpoint",
         Mesh = {
             IconFadeInZoom = 130,
             LODs = {
                 {
                     LODCutoff = 200,
-                    ShaderName = 'Unit',
+                    ShaderName = "Unit",
                 },
                 {
-                    AlbedoName = 'ueb0301_lod1_albedo.dds',
                     LODCutoff = 500,
-                    ShaderName = 'Unit',
-                    SpecularName = 'ueb0301_lod1_specteam.dds',
+                    ShaderName = "Unit",
+                    AlbedoName = "ueb0301_lod1_albedo.dds",
+                    SpecularName = "ueb0301_lod1_specteam.dds",
                 },
             },
         },
-        PlaceholderMeshName = 'UXB0007',
-        SpawnRandomRotation = false,
         Tarmacs = {
             {
-                Albedo = 'Tarmacs/Tar12x_01_albedo',
+                Albedo = "Tarmacs/Tar12x_01_albedo",
                 DeathLifetime = 300,
                 FadeOut = 150,
                 Length = 12.8,
-                Normal = 'Tarmacs/Tar12x_01_normals',
-                Orientations = {
-                    0,
-                },
+                Normal = "Tarmacs/Tar12x_01_normals",
+                Orientations = { 0 },
                 RemoveWhenDead = false,
                 Width = 12.8,
             },
@@ -111,16 +83,14 @@ UnitBlueprint {
         BuildCostMass = 5220,
         BuildRate = 90,
         BuildTime = 12100,
-        DifferentialUpgradeCostCalculation = true,
-        RebuildBonusIds = {
-            'ueb0301',
-        },
         BuildableCategory = {
-            'BUILTBYTIER3FACTORY UEF MOBILE CONSTRUCTION',
-            'BUILTBYTIER3FACTORY UEF STRUCTURE LAND',
-            'BUILTBYTIER3FACTORY UEF MOBILE LAND',
-            'BUILTBYLANDTIER3FACTORY UEF MOBILE CONSTRUCTION',
+            "BUILTBYTIER3FACTORY UEF MOBILE CONSTRUCTION",
+            "BUILTBYTIER3FACTORY UEF STRUCTURE LAND",
+            "BUILTBYTIER3FACTORY UEF MOBILE LAND",
+            "BUILTBYLANDTIER3FACTORY UEF MOBILE CONSTRUCTION",
         },
+        DifferentialUpgradeCostCalculation = true,
+        RebuildBonusIds = { "ueb0301" },
         StorageEnergy = 0,
         StorageMass = 320,
     },
@@ -131,13 +101,11 @@ UnitBlueprint {
     General = {
         BuildBones = {
             BuildEffectBones = {
-                'Muzzle01',
-                'Muzzle02',
-                'Muzzle03',
+                "Muzzle01",
+                "Muzzle02",
+                "Muzzle03",
             },
         },
-        Category = 'Factory',
-        Classification = 'RULEUC_Factory',
         CommandCaps = {
             RULEUCC_Attack = false,
             RULEUCC_CallTransport = false,
@@ -154,20 +122,13 @@ UnitBlueprint {
             RULEUCC_Transport = false,
         },
         ConstructionBar = true,
-        FactionName = 'UEF',
-        Icon = 'land',
+        FactionName = "UEF",
+        Icon = "land",
         SelectionPriority = 5,
-        TechLevel = 'RULEUTL_Secret',
-        UnitWeight = 1,
-        UpgradesFrom = 'ueb0201',
-    UpgradesFromBase = 'ueb0101',
+        UpgradesFrom = "ueb0201",
+        UpgradesFromBase = "ueb0101",
     },
-    Intel = {
-        VisionRadius = 20,
-    },
-    Interface = {
-        HelpText = '<LOC ueb0301_help>Land Factory HQ. Builds units and enables tech for normal land factories',
-    },
+    Intel = { VisionRadius = 20 },
     LifeBarHeight = 0.075,
     LifeBarOffset = 2.5,
     LifeBarSize = 4.75,
@@ -185,229 +146,39 @@ UnitBlueprint {
         FlattenSkirt = true,
         MaxSteerForce = 0,
         MinSpeedPercent = 0,
-        MotionType = 'RULEUMT_None',
+        MotionType = "RULEUMT_None",
         RaisedPlatforms = {
+            --X,     Z,     height -- Offsets from center
 
-            -- Platform 1
-            -- TopLeft Offset From Center
-            -1.1,
+            -1.1,  -1.6,  0.5,     --Top left
+            1.1,   -1.6,  0.5,     --Top right
+            -1.1,  1.9,   0.5,     --Bottom left
+            1.1,   1.9,   0.5,     --Bottom right
 
-            -- x
-            -1.6,
+            -1.7,  -1.6,  0.45,    --Top left
+            -1.1,  -1.6,  0.45,    --Top right
+            -1.7,  1.9,   0.45,    --Bottom left
+            -1.1,  1.9,   0.45,    --Bottom right
 
-            -- z
-            0.5,
+            1.1,   -1.6,  0.45,    --Top left
+            1.7,   -1.6,  0.45,    --Top right
+            1.1,   1.9,   0.45,    --Bottom left
+            1.7,   1.9,   0.45,    --Bottom right
 
-            -- height
-            -- TopRight Offset From Center
-            1.1,
+            -2.5,  -1.6,  0,       --Top left
+            -1.7,  -1.6,  0.45,    --Top right
+            -2.5,  1.9,   0,       --Bottom left
+            -1.7,  1.9,   0.45,    --Bottom right
 
-            -- x
-            -1.6,
-
-            -- z
-            0.5,
-
-            -- height
-            -- BottomLeft Offset From Center
-            -1.1,
-
-            -- x
-            1.9,
-
-            -- z
-            0.5,
-
-            -- height
-            -- BottomRight Offset From Center
-            1.1,
-
-            -- x
-            1.9,
-
-            -- z
-            0.5,
-
-            -- height
-            -- Platform 2
-            -- TopLeft Offset From Center
-            -1.7,
-
-            -- x
-            -1.6,
-
-            -- z
-            0.45,
-
-            -- height
-            -- TopRight Offset From Center
-            -1.1,
-
-            -- x
-            -1.6,
-
-            -- z
-            0.45,
-
-            -- height
-            -- BottomLeft Offset From Center
-            -1.7,
-
-            -- x
-            1.9,
-
-            -- z
-            0.45,
-
-            -- height
-            -- BottomRight Offset From Center
-            -1.1,
-
-            -- x
-            1.9,
-
-            -- z
-            0.45,
-
-            -- height
-            -- Platform 3
-            -- TopLeft Offset From Center
-            1.1,
-
-            -- x
-            -1.6,
-
-            -- z
-            0.45,
-
-            -- height
-            -- TopRight Offset From Center
-            1.7,
-
-            -- x
-            -1.6,
-
-            -- z
-            0.45,
-
-            -- height
-            -- BottomLeft Offset From Center
-            1.1,
-
-            -- x
-            1.9,
-
-            -- z
-            0.45,
-
-            -- height
-            -- BottomRight Offset From Center
-            1.7,
-
-            -- x
-            1.9,
-
-            -- z
-            0.45,
-
-            -- height
-            -- Platform 4
-            -- TopLeft Offset From Center
-            -2.5,
-
-            -- x
-            -1.6,
-
-            -- z
-            0,
-
-            -- height
-            -- TopRight Offset From Center
-            -1.7,
-
-            -- x
-            -1.6,
-
-            -- z
-            0.45,
-
-            -- height
-            -- BottomLeft Offset From Center
-            -2.5,
-
-            -- x
-            1.9,
-
-            -- z
-            0,
-
-            -- height
-            -- BottomRight Offset From Center
-            -1.7,
-
-            -- x
-            1.9,
-
-            -- z
-            0.45,
-
-            -- height
-            -- Platform 5
-            -- TopLeft Offset From Center
-            1.7,
-
-            -- x
-            -1.6,
-
-            -- z
-            0.45,
-
-            -- height
-            -- TopRight Offset From Center
-            2.5,
-
-            -- x
-            -1.6,
-
-            -- z
-            0,
-
-            -- height
-            -- BottomLeft Offset From Center
-            1.7,
-
-            -- x
-            1.9,
-
-            -- z
-            0.45,
-
-            -- height
-            -- BottomRight Offset From Center
-            2.5,
-
-            -- x
-            1.9,
-
-            -- z
-            0,
+            1.7,   -1.6,  0.45,    --Top left
+            2.5,   -1.6,  0,       --Top right
+            1.7,   1.9,   0.45,    --Bottom left
+            2.5,   1.9,   0,       --Bottom right
         },
         RollOffPoints = {
-            {
-                UnitSpin = 90,
-                X = 3,
-                Y = 0,
-                Z = 0,
-            },
-            {
-                UnitSpin = -90,
-                X = -3,
-                Y = 0,
-                Z = 0,
-            },
+            { UnitSpin = 90,    X = 3,     Y = 0,     Z = 0 },
+            { UnitSpin = -90,   X = -3,    Y = 0,     Z = 0 },
         },
-
-        -- height
         SkirtOffsetX = -1.5,
         SkirtOffsetZ = -1.5,
         SkirtSizeX = 8,
@@ -417,15 +188,13 @@ UnitBlueprint {
     SelectionSizeX = 3.2,
     SelectionSizeZ = 3.3,
     SelectionThickness = 0.3,
-
-    -- height
     SizeX = 4.8,
     SizeY = 0.6,
     SizeZ = 4.8,
-    StrategicIconName = 'icon_factoryhq3_land',
+    StrategicIconName = "icon_factoryhq3_land",
     StrategicIconSortPriority = 210,
     Wreckage = {
-        Blueprint = '/props/DefaultWreckage/DefaultWreckage_prop.bp',
+        Blueprint = "/props/DefaultWreckage/DefaultWreckage_prop.bp",
         EnergyMult = 0,
         HealthMult = 0.9,
         MassMult = 0.9,

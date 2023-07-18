@@ -20,7 +20,6 @@ ProjectileBlueprint {
         'AEON',
         'PROJECTILE',
         'ANTIAIR',
-        'MISSILE',
     },
     Display = {
         Mesh = {
