@@ -21,6 +21,8 @@ UnitBlueprint{
         "HOVER",
         "LAND",
         "MOBILE",
+        "OVERLAYDEFENSE",
+        "PRODUCTSC1",
         "RECLAIMABLE",
         "SELECTABLE",
         "SHIELD",
@@ -28,9 +30,12 @@ UnitBlueprint{
         "VISIBLETORECON",
     },
     Defense = {
+        AirThreatLevel = 0,
         ArmorType = "Normal",
+        EconomyThreatLevel = 0,
         Health = 100,
         MaxHealth = 100,
+        RegenRate = 0,
         Shield = {
             ImpactEffects = "AeonShieldHit01",
             ImpactMesh = "/effects/entities/ShieldSection01/ShieldSection01_mesh",
@@ -46,6 +51,8 @@ UnitBlueprint{
             ShieldSpillOverDamageMod = 0.3,
             ShieldVerticalOffset = -3,
         },
+        SubThreatLevel = 0,
+        SurfaceThreatLevel = 9,
     },
     Display = {
         Abilities = {
@@ -117,11 +124,19 @@ UnitBlueprint{
     },
     General = {
         CommandCaps = {
+            RULEUCC_Attack = false,
             RULEUCC_CallTransport = true,
+            RULEUCC_Capture = false,
             RULEUCC_Guard = true,
             RULEUCC_Move = true,
+            RULEUCC_Nuke = false,
             RULEUCC_Patrol = true,
+            RULEUCC_Pause = false,
+            RULEUCC_Reclaim = false,
+            RULEUCC_Repair = false,
+            RULEUCC_RetaliateToggle = false,
             RULEUCC_Stop = true,
+            RULEUCC_Transport = false,
         },
         ExcludeFromVeterancy = true,
         FactionName = "Aeon",
@@ -141,6 +156,14 @@ UnitBlueprint{
     LifeBarSize = 0.8,
     Physics = {
         BankingSlope = 0.5,
+        BuildOnLayerCaps = {
+            LAYER_Air = false,
+            LAYER_Land = true,
+            LAYER_Orbit = false,
+            LAYER_Seabed = false,
+            LAYER_Sub = false,
+            LAYER_Water = false,
+        },
         DragCoefficient = 0.2,
         Elevation = 0.25,
         MaxAcceleration = 4,
@@ -200,6 +223,7 @@ UnitBlueprint{
         MassMult = 0.9,
         ReclaimTimeMultiplier = 1,
         WreckageLayers = {
+            Air = false,
             Land = true,
             Seabed = true,
             Sub = true,

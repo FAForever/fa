@@ -11,7 +11,7 @@ UnitBlueprint {
         'SPECIALLOWPRI', 
         'SPECIALHIGHPRI',
 
-        -- removed per #5169
+        -- generated via blueprint loading per #5169
         'OVERLAYANTIAIR',
         'OVERLAYANTINAVY',
         'OVERLAYDEFENSE',

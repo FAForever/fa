@@ -22,6 +22,7 @@ UnitBlueprint{
         "NEEDMOBILEBUILD",
         "OVERLAYCOUNTERINTEL",
         "OVERLAYSONAR",
+        "PRODUCTSC1",
         "RECLAIMABLE",
         "SELECTABLE",
         "SONAR",
@@ -30,9 +31,13 @@ UnitBlueprint{
         "VISIBLETORECON",
     },
     Defense = {
+        AirThreatLevel = 0,
         ArmorType = "Normal",
         Health = 1200,
         MaxHealth = 1200,
+        RegenRate = 0,
+        SubThreatLevel = 0.1,
+        SurfaceThreatLevel = 0.1,
     },
     Display = {
         Abilities = {
@@ -99,10 +104,19 @@ UnitBlueprint{
     },
     General = {
         CommandCaps = {
+            RULEUCC_Attack = false,
+            RULEUCC_CallTransport = false,
+            RULEUCC_Capture = false,
             RULEUCC_Guard = true,
             RULEUCC_Move = true,
+            RULEUCC_Nuke = false,
             RULEUCC_Patrol = true,
+            RULEUCC_Pause = false,
+            RULEUCC_Reclaim = false,
+            RULEUCC_Repair = false,
+            RULEUCC_RetaliateToggle = false,
             RULEUCC_Stop = true,
+            RULEUCC_Transport = false,
         },
         FactionName = "Cybran",
         Icon = "sea",
@@ -131,6 +145,14 @@ UnitBlueprint{
     Physics = {
         BackUpDistance = 0,
         BankingSlope = 0,
+        BuildOnLayerCaps = {
+            LAYER_Air = false,
+            LAYER_Land = false,
+            LAYER_Orbit = false,
+            LAYER_Seabed = false,
+            LAYER_Sub = false,
+            LAYER_Water = true,
+        },
         CatchUpAcc = 10,
         DragCoefficient = 0.2,
         MaxAcceleration = 4.5,
@@ -158,6 +180,12 @@ UnitBlueprint{
         HealthMult = 0.9,
         MassMult = 0.9,
         ReclaimTimeMultiplier = 1,
-        WreckageLayers = { Water = true },
+        WreckageLayers = {
+            Air = false,
+            Land = false,
+            Seabed = false,
+            Sub = false,
+            Water = true,
+        },
     },
 }

@@ -32,9 +32,12 @@ UnitBlueprint{
         "MOBILE",
         "NAVAL",
         "NAVALCARRIER",
+        "OVERLAYANTIAIR",
+        "OVERLAYDEFENSE",
         "OVERLAYMISC",
         "OVERLAYRADAR",
         "OVERLAYSONAR",
+        "PRODUCTSC1",
         "RECLAIMABLE",
         "SELECTABLE",
         "SHOWQUEUE",
@@ -47,6 +50,9 @@ UnitBlueprint{
         EconomyThreatLevel = 840,
         Health = 22000,
         MaxHealth = 22000,
+        RegenRate = 0,
+        SubThreatLevel = 0,
+        SurfaceThreatLevel = 0,
     },
     Display = {
         Abilities = {
@@ -130,10 +136,15 @@ UnitBlueprint{
     General = {
         CommandCaps = {
             RULEUCC_Attack = true,
+            RULEUCC_CallTransport = false,
+            RULEUCC_Capture = false,
             RULEUCC_Guard = true,
             RULEUCC_Move = true,
+            RULEUCC_Nuke = false,
             RULEUCC_Patrol = true,
             RULEUCC_Pause = true,
+            RULEUCC_Reclaim = false,
+            RULEUCC_Repair = false,
             RULEUCC_RetaliateToggle = true,
             RULEUCC_Stop = true,
             RULEUCC_Transport = true,
@@ -161,6 +172,14 @@ UnitBlueprint{
     Physics = {
         BackUpDistance = 10,
         BankingSlope = 0,
+        BuildOnLayerCaps = {
+            LAYER_Air = false,
+            LAYER_Land = false,
+            LAYER_Orbit = false,
+            LAYER_Seabed = false,
+            LAYER_Sub = false,
+            LAYER_Water = true,
+        },
         CatchUpAcc = 10,
         DragCoefficient = 0.2,
         MaxAcceleration = 3,

@@ -51,6 +51,7 @@ UnitBlueprint{
         "HIGHALTAIR",
         "MOBILE",
         "OVERLAYSONAR",
+        "PRODUCTFA",
         "RECLAIMABLE",
         "SELECTABLE",
         "SNIPEMODE",
@@ -58,10 +59,14 @@ UnitBlueprint{
         "VISIBLETORECON",
     },
     Defense = {
+        AirThreatLevel = 0,
         ArmorType = "Light",
+        EconomyThreatLevel = 0,
         Health = 3750,
         MaxHealth = 3750,
+        RegenRate = 0,
         SubThreatLevel = 20,
+        SurfaceThreatLevel = 0,
     },
     Display = {
         Abilities = {
@@ -139,12 +144,17 @@ UnitBlueprint{
         CommandCaps = {
             RULEUCC_Attack = true,
             RULEUCC_CallTransport = true,
+            RULEUCC_Capture = false,
             RULEUCC_Dock = true,
             RULEUCC_Guard = true,
             RULEUCC_Move = true,
+            RULEUCC_Nuke = false,
             RULEUCC_Patrol = true,
+            RULEUCC_Reclaim = false,
+            RULEUCC_Repair = false,
             RULEUCC_RetaliateToggle = true,
             RULEUCC_Stop = true,
+            RULEUCC_Transport = false,
         },
         FactionName = "Aeon",
         Icon = "air",
@@ -159,6 +169,14 @@ UnitBlueprint{
     LifeBarSize = 1.25,
     Physics = {
         AttackElevation = 10,
+        BuildOnLayerCaps = {
+            LAYER_Air = true,
+            LAYER_Land = false,
+            LAYER_Orbit = false,
+            LAYER_Seabed = false,
+            LAYER_Sub = true,
+            LAYER_Water = false,
+        },
         Elevation = 14,
         FuelRechargeRate = 15,
         FuelUseTime = 1200,
@@ -276,6 +294,7 @@ UnitBlueprint{
         MassMult = 0.9,
         ReclaimTimeMultiplier = 1,
         WreckageLayers = {
+            Air = false,
             Land = true,
             Seabed = true,
             Sub = true,

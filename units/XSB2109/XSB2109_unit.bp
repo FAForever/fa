@@ -22,7 +22,9 @@ UnitBlueprint{
         "CQUEMOV",
         "DEFENSE",
         "DRAGBUILD",
+        "OVERLAYANTINAVY",
         "OVERLAYSONAR",
+        "PRODUCTFA",
         "RECLAIMABLE",
         "SELECTABLE",
         "SERAPHIM",
@@ -34,10 +36,13 @@ UnitBlueprint{
         "VISIBLETORECON",
     },
     Defense = {
+        AirThreatLevel = 0,
         ArmorType = "Structure",
         Health = 1650,
         MaxHealth = 1650,
+        RegenRate = 0,
         SubThreatLevel = 9,
+        SurfaceThreatLevel = 0,
     },
     Display = {
         Abilities = {
@@ -91,8 +96,17 @@ UnitBlueprint{
     General = {
         CommandCaps = {
             RULEUCC_Attack = true,
+            RULEUCC_CallTransport = false,
+            RULEUCC_Capture = false,
+            RULEUCC_Guard = false,
+            RULEUCC_Move = false,
+            RULEUCC_Nuke = false,
+            RULEUCC_Patrol = false,
+            RULEUCC_Reclaim = false,
+            RULEUCC_Repair = false,
             RULEUCC_RetaliateToggle = true,
             RULEUCC_Stop = true,
+            RULEUCC_Transport = false,
         },
         FactionName = "Seraphim",
         Icon = "sea",
@@ -109,7 +123,14 @@ UnitBlueprint{
     LifeBarSize = 0.9,
     Physics = {
         BankingSlope = 0,
-        BuildOnLayerCaps = { LAYER_Water = true },
+        BuildOnLayerCaps = {
+            LAYER_Air = false,
+            LAYER_Land = false,
+            LAYER_Orbit = false,
+            LAYER_Seabed = false,
+            LAYER_Sub = false,
+            LAYER_Water = true,
+        },
         DragCoefficient = 0.2,
         MaxSteerForce = 0,
         MeshExtentsX = 1,
@@ -211,6 +232,7 @@ UnitBlueprint{
         MassMult = 0.9,
         ReclaimTimeMultiplier = 1,
         WreckageLayers = {
+            Air = false,
             Land = true,
             Seabed = true,
             Sub = true,

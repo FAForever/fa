@@ -46,6 +46,9 @@ UnitBlueprint{
         "CANNOTUSEAIRSTAGING",
         "CANTRANSPORTCOMMANDER",
         "MOBILE",
+        "OVERLAYANTIAIR",
+        "OVERLAYDIRECTFIRE",
+        "PRODUCTSC1",
         "RECLAIMABLE",
         "SELECTABLE",
         "SNIPEMODE",
@@ -58,10 +61,13 @@ UnitBlueprint{
         "VISIBLETORECON",
     },
     Defense = {
-        AirThreatLevel = 5,
+        AirThreatLevel = 5.5,
         ArmorType = "Light",
+        EconomyThreatLevel = 0,
         Health = 1675,
         MaxHealth = 1675,
+        RegenRate = 0,
+        SubThreatLevel = 0,
         SurfaceThreatLevel = 2,
     },
     Display = {
@@ -142,10 +148,15 @@ UnitBlueprint{
     General = {
         CommandCaps = {
             RULEUCC_Attack = true,
+            RULEUCC_CallTransport = false,
+            RULEUCC_Capture = false,
             RULEUCC_Ferry = true,
             RULEUCC_Guard = true,
             RULEUCC_Move = true,
+            RULEUCC_Nuke = false,
             RULEUCC_Patrol = true,
+            RULEUCC_Reclaim = false,
+            RULEUCC_Repair = false,
             RULEUCC_RetaliateToggle = true,
             RULEUCC_Stop = true,
             RULEUCC_Transport = true,
@@ -160,6 +171,14 @@ UnitBlueprint{
     LifeBarOffset = 3,
     LifeBarSize = 2,
     Physics = {
+        BuildOnLayerCaps = {
+            LAYER_Air = true,
+            LAYER_Land = false,
+            LAYER_Orbit = false,
+            LAYER_Seabed = false,
+            LAYER_Sub = false,
+            LAYER_Water = false,
+        },
         Elevation = 10,
         FuelRechargeRate = 70,
         FuelUseTime = 800,
@@ -185,6 +204,7 @@ UnitBlueprint{
         Class3AttachSize = 4,
         TransportClass = 10,
     },
+    UseOOBTestZoom = 200,
     Veteran = {
         Level1 = 3,
         Level2 = 6,
@@ -447,6 +467,7 @@ UnitBlueprint{
         MassMult = 0.9,
         ReclaimTimeMultiplier = 1,
         WreckageLayers = {
+            Air = false,
             Land = true,
             Seabed = true,
             Sub = true,

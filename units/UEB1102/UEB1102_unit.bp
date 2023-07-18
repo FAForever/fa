@@ -16,6 +16,7 @@ UnitBlueprint{
         "ECONOMIC",
         "ENERGYPRODUCTION",
         "HYDROCARBON",
+        "PRODUCTSC1",
         "RECLAIMABLE",
         "SELECTABLE",
         "SIZE12",
@@ -26,10 +27,14 @@ UnitBlueprint{
         "VISIBLETORECON",
     },
     Defense = {
+        AirThreatLevel = 0,
         ArmorType = "Structure",
         EconomyThreatLevel = 28,
         Health = 1800,
         MaxHealth = 1800,
+        RegenRate = 0,
+        SubThreatLevel = 0,
+        SurfaceThreatLevel = 0,
     },
     Display = {
         Abilities = { "<LOC ability_amphibious>Amphibious" },
@@ -75,6 +80,20 @@ UnitBlueprint{
         SizeZ = 3,
     },
     General = {
+        CommandCaps = {
+            RULEUCC_Attack = false,
+            RULEUCC_CallTransport = false,
+            RULEUCC_Capture = false,
+            RULEUCC_Guard = false,
+            RULEUCC_Move = false,
+            RULEUCC_Nuke = false,
+            RULEUCC_Patrol = false,
+            RULEUCC_Reclaim = false,
+            RULEUCC_Repair = false,
+            RULEUCC_RetaliateToggle = false,
+            RULEUCC_Stop = false,
+            RULEUCC_Transport = false,
+        },
         FactionName = "UEF",
         Icon = "amph",
         SelectionPriority = 5,
@@ -86,8 +105,12 @@ UnitBlueprint{
     Physics = {
         BankingSlope = 0,
         BuildOnLayerCaps = {
+            LAYER_Air = false,
             LAYER_Land = true,
+            LAYER_Orbit = false,
             LAYER_Seabed = true,
+            LAYER_Sub = false,
+            LAYER_Water = false,
         },
         BuildRestriction = "RULEUBR_OnHydrocarbonDeposit",
         DragCoefficient = 0.2,
@@ -121,8 +144,11 @@ UnitBlueprint{
         MassMult = 0.9,
         ReclaimTimeMultiplier = 1,
         WreckageLayers = {
+            Air = false,
             Land = true,
             Seabed = true,
+            Sub = false,
+            Water = false,
         },
     },
 }

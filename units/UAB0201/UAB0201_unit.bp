@@ -23,6 +23,7 @@ UnitBlueprint{
         "DRAGBUILD",
         "FACTORY",
         "LAND",
+        "PRODUCTSC1",
         "RALLYPOINT",
         "RECLAIMABLE",
         "RESEARCH",
@@ -35,10 +36,14 @@ UnitBlueprint{
         "VISIBLETORECON",
     },
     Defense = {
+        AirThreatLevel = 0,
         ArmorType = "Structure",
         EconomyThreatLevel = 208,
         Health = 6400,
         MaxHealth = 6400,
+        RegenRate = 0,
+        SubThreatLevel = 0,
+        SurfaceThreatLevel = 0,
     },
     Display = {
         Abilities = { "<LOC ability_upgradable>Upgradeable" },
@@ -125,6 +130,7 @@ UnitBlueprint{
     LifeBarSize = 4.5,
     Physics = {
         BankingSlope = 0,
+        BuildOnLayerCaps = { LAYER_Land = true },
         DragCoefficient = 0.2,
         FlattenSkirt = true,
         MaxSteerForce = 0,

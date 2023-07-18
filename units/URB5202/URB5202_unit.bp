@@ -24,6 +24,7 @@ UnitBlueprint{
         "CYBRAN",
         "DRAGBUILD",
         "OVERLAYMISC",
+        "PRODUCTSC1",
         "RECLAIMABLE",
         "SELECTABLE",
         "SIZE12",
@@ -34,10 +35,14 @@ UnitBlueprint{
         "VISIBLETORECON",
     },
     Defense = {
+        AirThreatLevel = 0,
         ArmorType = "Structure",
         EconomyThreatLevel = 4,
         Health = 500,
         MaxHealth = 500,
+        RegenRate = 0,
+        SubThreatLevel = 0,
+        SurfaceThreatLevel = 0,
     },
     Display = {
         Abilities = { "<LOC ability_airstaging>Air Staging" },
@@ -77,7 +82,20 @@ UnitBlueprint{
         RebuildBonusIds = { "urb5202" },
     },
     General = {
-        CommandCaps = { RULEUCC_Transport = true },
+        CommandCaps = {
+            RULEUCC_Attack = false,
+            RULEUCC_CallTransport = false,
+            RULEUCC_Capture = false,
+            RULEUCC_Guard = false,
+            RULEUCC_Move = false,
+            RULEUCC_Nuke = false,
+            RULEUCC_Patrol = false,
+            RULEUCC_Reclaim = false,
+            RULEUCC_Repair = false,
+            RULEUCC_RetaliateToggle = false,
+            RULEUCC_Stop = false,
+            RULEUCC_Transport = true,
+        },
         FactionName = "Cybran",
         Icon = "land",
         OrderOverrides = {
@@ -93,6 +111,14 @@ UnitBlueprint{
     LifeBarSize = 3.5,
     Physics = {
         BankingSlope = 0,
+        BuildOnLayerCaps = {
+            LAYER_Air = false,
+            LAYER_Land = true,
+            LAYER_Orbit = false,
+            LAYER_Seabed = false,
+            LAYER_Sub = false,
+            LAYER_Water = false,
+        },
         DragCoefficient = 0.2,
         FlattenSkirt = true,
         MaxSteerForce = 0,
@@ -126,6 +152,12 @@ UnitBlueprint{
         HealthMult = 0.9,
         MassMult = 0.9,
         ReclaimTimeMultiplier = 1,
-        WreckageLayers = { Land = true },
+        WreckageLayers = {
+            Air = false,
+            Land = true,
+            Seabed = false,
+            Sub = false,
+            Water = false,
+        },
     },
 }

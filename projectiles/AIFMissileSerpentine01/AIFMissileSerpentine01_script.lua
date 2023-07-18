@@ -5,7 +5,7 @@ AIFMissileSerpentine01 = ClassProjectile(AMissileSerpentineProjectile) {
     OnCreate = function(self)
         AMissileSerpentineProjectile.OnCreate(self)
         self:SetCollisionShape('Sphere', 0, 0, 0, 2)
-        self.MoveThread = self.Trash:Add(ForkThread(self.MovementThread,self))
+        self.MoveThread = self.Trash:Add(ForkThread(self.MovementThread, self))
     end,
 
     MovementThread = function(self)
@@ -20,25 +20,25 @@ AIFMissileSerpentine01 = ClassProjectile(AMissileSerpentineProjectile) {
 
     SetTurnRateByDist = function(self)
         local dist = self:GetDistanceToTarget()
-        if dist > 50 then        
+        if dist > 50 then
             -- Freeze the turn rate as to prevent steep angles at long distance targets
             WaitTicks(21)
             self:SetTurnRate(8)
         elseif dist > 35 and dist <= 70 then
-						-- Increase check intervals
-						self:SetTurnRate(12)
-						WaitTicks(16)
+            -- Increase check intervals
+            self:SetTurnRate(12)
+            WaitTicks(16)
             self:SetTurnRate(45)
         elseif dist > 20 and dist <= 35 then
-						-- Further increase check intervals
-                        WaitTicks(4)
+            -- Further increase check intervals
+            WaitTicks(4)
             self:SetTurnRate(60)
-				elseif dist >5 and dist <= 20 then
-						-- Further increase check intervals            
-            self:SetTurnRate(100)   
-                elseif dist>0 and dist <=5 then
-                    self:SetTurnRate(150)
-            KillThread(self.MoveThread)         
+        elseif dist > 5 and dist <= 20 then
+            -- Further increase check intervals
+            self:SetTurnRate(100)
+        elseif dist > 0 and dist <= 5 then
+            self:SetTurnRate(150)
+            KillThread(self.MoveThread)
         end
     end,
 
