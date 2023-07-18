@@ -4747,6 +4747,22 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         cUnit.GiveNukeSiloAmmo(self, blocks, true)
     end,
 
+    GetCommandQueue = function(self)
+        local queue = cUnit.GetCommandQueue(self)
+        if queue then
+            for k, order in queue do
+                if order.targetId then
+                    local targetId = tonumber(order.targetId)
+                    if targetId then
+                        order.target = GetEntityById(targetId)
+                    end
+                end
+            end
+        end
+
+        return queue
+    end,
+
     --- Stuns the unit, if it isn't set to be immune by the flag unit.ImmuneToStun
     ---@param self Unit A reference to the unit itself, automatically set when you use the ':' notation
     ---@param duration number Stun duration in seconds

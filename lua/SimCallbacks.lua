@@ -920,29 +920,27 @@ do
                         local index = math.mod(offset + redundancy, count) + 1
                         local order = group[index]
                         local getById = commandInfo.GetReference
-                        local candidate = order.targetId and getById and getById(order.targetId)
-                        if candidate then
+                        local candidate = order.target
+                        if candidate  then
                             local target
-
                             -- props are always valid
                             if IsProp(candidate) then
                                 target = candidate
-                            else
-                                -- units are only valid in certain cases
-                                if IsUnit(candidate) then
-                                    target = candidate
 
-                                    LOG(target)
-                                    DrawCircle(target:GetPosition(), 10, 'ffffff')
-                                    -- -- our own and allied units are always valid
-                                    -- if candidate.Army == unit.Army or IsAlly(candidate.Army, unit.Army) then
-                                    --     target = candidate
+                            -- units are only valid in certain cases
+                            elseif IsUnit(candidate) then
+                                target = candidate
 
-                                    --     -- enemy units are only valid if we've ever seen them
-                                    -- elseif candidate:GetBlip(unit.Army):IsSeenEver(unit.Army) then
-                                    --     target = candidate
-                                    -- end
-                                end
+                                LOG(target)
+                                DrawCircle(target:GetPosition(), 10, 'ffffff')
+                                -- -- our own and allied units are always valid
+                                -- if candidate.Army == unit.Army or IsAlly(candidate.Army, unit.Army) then
+                                --     target = candidate
+
+                                --     -- enemy units are only valid if we've ever seen them
+                                -- elseif candidate:GetBlip(unit.Army):IsSeenEver(unit.Army) then
+                                --     target = candidate
+                                -- end
                             end
 
                             -- at this point we need a valid target
