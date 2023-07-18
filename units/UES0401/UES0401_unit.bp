@@ -376,8 +376,16 @@ UnitBlueprint{
             ProjectilesPerOnFire = 1,
             RackBones = {
                 {
-                    MuzzleBones = { "Upgrade_Weapon_Point01" },
-                    RackBone = "Upgrade_Weapon_Point01",
+                    MuzzleBones = {
+                        "Front_Right_Turret_Muzzle_Left01",
+                        "Front_Right_Turret_Muzzle_Left02",
+                        "Front_Right_Turret_Muzzle_Left03",
+                        "Front_Right_Turret_Muzzle_Right01",
+                        "Front_Right_Turret_Muzzle_Right02",
+                        "Front_Right_Turret_Muzzle_Right03",
+
+                    },
+                    RackBone = "Front_Right_Turret_Barrel",
                 },
             },
             RackFireTogether = false,
@@ -432,8 +440,15 @@ UnitBlueprint{
             ProjectilesPerOnFire = 1,
             RackBones = {
                 {
-                    MuzzleBones = { "Upgrade_Weapon_Point02" },
-                    RackBone = "Upgrade_Weapon_Point02",
+                    MuzzleBones = {
+                        "Back_Right_Turret_Muzzle_Left01",
+                        "Back_Right_Turret_Muzzle_Left02",
+                        "Back_Right_Turret_Muzzle_Left03",
+                        "Back_Right_Turret_Muzzle_Right01",
+                        "Back_Right_Turret_Muzzle_Right02",
+                        "Back_Right_Turret_Muzzle_Right03",
+                    },
+                    RackBone = "Back_Right_Turret_Barrel",
                 },
             },
             RackFireTogether = false,
@@ -488,8 +503,15 @@ UnitBlueprint{
             ProjectilesPerOnFire = 1,
             RackBones = {
                 {
-                    MuzzleBones = { "Upgrade_Weapon_Point03" },
-                    RackBone = "Upgrade_Weapon_Point03",
+                    MuzzleBones = {
+                        "Front_Left_Turret_Muzzle_Left01",
+                        "Front_Left_Turret_Muzzle_Left02",
+                        "Front_Left_Turret_Muzzle_Left03",
+                        "Front_Left_Turret_Muzzle_Right01",
+                        "Front_Left_Turret_Muzzle_Right02",
+                        "Front_Left_Turret_Muzzle_Right03",
+                    },
+                    RackBone = "Front_Left_Turret_Barrel",
                 },
             },
             RackFireTogether = false,
@@ -544,8 +566,15 @@ UnitBlueprint{
             ProjectilesPerOnFire = 1,
             RackBones = {
                 {
-                    MuzzleBones = { "Upgrade_Weapon_Point04" },
-                    RackBone = "Upgrade_Weapon_Point04",
+                    MuzzleBones = {
+                        "Back_Left_Turret_Muzzle_Left01",
+                        "Back_Left_Turret_Muzzle_Left02",
+                        "Back_Left_Turret_Muzzle_Left03",
+                        "Back_Left_Turret_Muzzle_Right01",
+                        "Back_Left_Turret_Muzzle_Right02",
+                        "Back_Left_Turret_Muzzle_Right03",
+                    },
+                    RackBone = "Back_Left_Turret_Barrel",
                 },
             },
             RackFireTogether = false,

@@ -34,7 +34,7 @@ UES0401 = ClassUnit(AircraftCarrier) {
         AircraftCarrier.OnCreate(self)
         self.OpenAnimManips = {}
         self.OpenAnimManips[1] = CreateAnimator(self):PlayAnim('/units/ues0401/ues0401_aopen.sca'):SetRate(-1)
-        for i = 2, 6 do
+        for i = 2, 3 do
             self.OpenAnimManips[i] = CreateAnimator(self):PlayAnim('/units/ues0401/ues0401_aopen0' .. i .. '.sca'):SetRate(-1)
         end
 
