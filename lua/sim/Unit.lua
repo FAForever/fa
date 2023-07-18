@@ -166,7 +166,6 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
     -------------------------------------------------------------------------------------------
     ---@param self Unit
     OnPreCreate = function(self)
-
         -- Each unit has a sync table to replicate values to the global sync table to be copied to the user layer at sync time.
         self.Sync = {}
         self.Sync.id = self:GetEntityId()
@@ -4752,10 +4751,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         if queue then
             for k, order in queue do
                 if order.targetId then
-                    local targetId = tonumber(order.targetId)
-                    if targetId then
-                        order.target = GetEntityById(targetId)
-                    end
+                    order.target = GetEntityById(order.targetId)
                 end
             end
         end

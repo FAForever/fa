@@ -913,46 +913,25 @@ do
         for offset, unit in units do
             for k, group in groups do
                 local commandInfo = CommandInfo[group[1].commandType]
-                local callback = commandInfo.Callback
+                local issueCommand = commandInfo.Callback
                 local count = table.getn(group)
-                if callback then
+                if issueCommand then
                     for redundancy = 1, math.min(count, commandInfo.Redundancy) do
                         local index = math.mod(offset + redundancy, count) + 1
                         local order = group[index]
-                        local getById = commandInfo.GetReference
                         local candidate = order.target
                         if candidate  then
-                            local target
-                            -- props are always valid
-                            if IsProp(candidate) then
-                                target = candidate
-
-                            -- units are only valid in certain cases
-                            elseif IsUnit(candidate) then
-                                target = candidate
-
-                                LOG(target)
-                                DrawCircle(target:GetPosition(), 10, 'ffffff')
-                                -- -- our own and allied units are always valid
-                                -- if candidate.Army == unit.Army or IsAlly(candidate.Army, unit.Army) then
-                                --     target = candidate
-
-                                --     -- enemy units are only valid if we've ever seen them
-                                -- elseif candidate:GetBlip(unit.Army):IsSeenEver(unit.Army) then
-                                --     target = candidate
-                                -- end
-                            end
-
+                            target = candidate
                             -- at this point we need a valid target
                             if target then
-                                callback({ unit }, target)
+                                issueCommand({ unit }, target)
                             end
                         else
                             -- at this point we may need an entity, so we check and bail if we do need one
                             if commandInfo.Type == 'BuildMobile' then
-                                callback({ unit }, { order.x, order.y, order.z }, order.blueprintId, {})
+                                issueCommand({ unit }, { order.x, order.y, order.z }, order.blueprintId, {})
                             elseif not commandInfo.RequiresEntity then
-                                callback({ unit }, { order.x, order.y, order.z })
+                                issueCommand({ unit }, { order.x, order.y, order.z })
                             end
                         end
                     end

@@ -522,7 +522,6 @@ import("/lua/ui/game/gamemain.lua").ObserveSelection:AddObserver(
 )
 
 DistributeOrders = function()
-    LOG("DistributeOrders")
     SimCallback({Func = 'DistributeOrders', Args = { }}, true)
 end
 
