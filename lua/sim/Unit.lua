@@ -4764,6 +4764,33 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         cUnit.GiveNukeSiloAmmo(self, blocks, true)
     end,
 
+    --- Use `unit:UpdateUIStatistic` instead
+    ---@deprecated
+    GetStat = function(self)
+        -- this hides the c implementation
+    end,
+
+    --- Use `unit:UpdateUIStatistic` instead
+    ---@deprecated
+    SetStat = function(self)
+        -- this hides the c implementation
+    end,
+
+    --- Updates a statistic that you can retrieve on the UI side using `userunit:GetStat`.
+    --- Relies on an assembly patch to be functional, without it this setup causes the game to crash.
+    ---@param self Unit
+    ---@param key string
+    ---@param value number
+    UpdateUIStatistic = function(self, key, value)
+        -- With thanks to 4z0t the `SetStat` function no longer hard-crashes when the value doesn't exist. Instead, it returns 'true' 
+        -- when the stat doesn't exist. If it doesn't exist then we can use `GetStat` to initialize it. This makes no sense, therefore
+        -- we have this new function to hide the magic
+        local needsSetup = cUnit.SetStat(self, key, value)
+        if needsSetup then
+            cUnit.GetStat(self, key, value)
+        end
+    end,
+
     --- Stuns the unit, if it isn't set to be immune by the flag unit.ImmuneToStun
     ---@param self Unit A reference to the unit itself, automatically set when you use the ':' notation
     ---@param duration number Stun duration in seconds
