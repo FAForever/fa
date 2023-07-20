@@ -513,30 +513,34 @@ function PostProcessUnitWithExternalFactory(allBlueprints, unit)
     -- create a new unit that represents the external factory
     ---@type UnitBlueprint
     local efBlueprint = table.deepcopy(allBlueprints.Unit["zxa0002"])
-    local efBlueprintId = string.lower(unit.BlueprintId .. "ef")
-    allBlueprints.Unit[efBlueprintId] = efBlueprint
 
-    -- replace properties of external factory
-    efBlueprint.Economy = { BuildRate = unit.Economy.BuildRate, BuildableCategory = unit.Economy.BuildableCategory }
-    efBlueprint.General.Icon = unit.General.Icon
-    efBlueprint.General.FactionName = unit.General.FactionName
-    efBlueprint.General.UnitName = unit.General.UnitName
-    efBlueprint.FactionCategory = unit.FactionCategory
-    efBlueprint.LayerCategory = unit.LayerCategory
-    efBlueprint.BlueprintId = efBlueprintId
-    efBlueprint.BaseBlueprintId = unit.BlueprintId
-    efBlueprint.ScriptClass = 'ExternalFactoryUnit'
-    efBlueprint.ScriptModule = '/lua/defaultunits.lua'
-    efBlueprint.CategoriesHash[unit.FactionCategory] = true
-    efBlueprint.CategoriesHash[unit.LayerCategory] = true
-    efBlueprint.Categories = table.unhash(efBlueprint.CategoriesHash)
+    -- not available when reloading using program argument 'EnableDiskWatch'
+    if efBlueprint then
+        local efBlueprintId = string.lower(unit.BlueprintId .. "ef")
+        allBlueprints.Unit[efBlueprintId] = efBlueprint
 
-    -- remove properties of the seed unit
-    unit.CategoriesHash['FACTORY'] = nil
-    unit.CategoriesHash['CONSTRUCTION'] = nil
-    unit.Categories = table.unhash(unit.CategoriesHash)
-    unit.Economy.BuildRate = nil
-    unit.Economy.BuildableCategory = nil
+        -- replace properties of external factory
+        efBlueprint.Economy = { BuildRate = unit.Economy.BuildRate, BuildableCategory = unit.Economy.BuildableCategory }
+        efBlueprint.General.Icon = unit.General.Icon
+        efBlueprint.General.FactionName = unit.General.FactionName
+        efBlueprint.General.UnitName = unit.General.UnitName
+        efBlueprint.FactionCategory = unit.FactionCategory
+        efBlueprint.LayerCategory = unit.LayerCategory
+        efBlueprint.BlueprintId = efBlueprintId
+        efBlueprint.BaseBlueprintId = unit.BlueprintId
+        efBlueprint.ScriptClass = 'ExternalFactoryUnit'
+        efBlueprint.ScriptModule = '/lua/defaultunits.lua'
+        efBlueprint.CategoriesHash[unit.FactionCategory] = true
+        efBlueprint.CategoriesHash[unit.LayerCategory] = true
+        efBlueprint.Categories = table.unhash(efBlueprint.CategoriesHash)
+
+        -- remove properties of the seed unit
+        unit.CategoriesHash['FACTORY'] = nil
+        unit.CategoriesHash['CONSTRUCTION'] = nil
+        unit.Categories = table.unhash(unit.CategoriesHash)
+        unit.Economy.BuildRate = nil
+        unit.Economy.BuildableCategory = nil
+    end
 end
 
 --- Post-processes all units

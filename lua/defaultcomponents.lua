@@ -1,4 +1,5 @@
 local Buff = import("/lua/sim/buff.lua")
+local Entity = import("/lua/sim/Entity.lua").Entity
 
 ---@class ShieldEffectsComponent : Unit
 ---@field Trash TrashBag
@@ -774,8 +775,15 @@ ExternalFactoryComponent = ClassSimple {
 
         -- create the factory somewhere completely unrelated
         local position = self:GetPosition(self.FactoryAttachBone)
+
+        -- we need to put an entity in between so that we can always click-select the 
+        -- factory. The 'CARRIER' category can prevent us from clicking on attached units
+        local entity = Entity({Owner = self})
+        self.Trash:Add(entity)
+        entity:AttachTo(self, self.FactoryAttachBone)
+
         self.ExternalFactory = CreateUnitHPR(blueprintIdExternalFactory, self.Army, position[1], position[2], position[3], 0, 0, 0) --[[@as ExternalFactoryUnit]]
-        self.ExternalFactory:AttachTo(self, self.FactoryAttachBone)
+        self.ExternalFactory:AttachTo(entity, -1)
         self.ExternalFactory:SetCreator(self)
         self.ExternalFactory:SetParent(self)
         self.Trash:Add(self.ExternalFactory)
