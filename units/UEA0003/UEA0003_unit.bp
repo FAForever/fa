@@ -152,7 +152,7 @@ UnitBlueprint {
             RULEUCC_Guard = true,
             RULEUCC_Move = true,
             RULEUCC_Nuke = false,
-            RULEUCC_Patrol = false,
+            RULEUCC_Patrol = true,
             RULEUCC_Pause = true,
             RULEUCC_Reclaim = true,
             RULEUCC_Repair = true,

@@ -101,6 +101,7 @@ UnitBlueprint {
         'AIR',
         'TECH1',
         'TRANSPORTATION',
+        "CANLANDONWATER",
         'VISIBLETORECON',
         'RECLAIMABLE',
         'TRANSPORTFOCUS',
