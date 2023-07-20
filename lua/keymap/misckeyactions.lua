@@ -558,13 +558,13 @@ function SelectHighestEngineerAndAssist()
 
         if next(sACUs) then
             SimCallback({Func= 'SelectHighestEngineerAndAssist', Args = { TargetId = sACUs[1]:GetEntityId() }}, true)
-            SelectUnits({sACUs})
+            SelectUnits(sACUs)
         elseif next(tech3) then
             SimCallback({Func= 'SelectHighestEngineerAndAssist', Args = { TargetId = tech3[1]:GetEntityId() }}, true)
-            SelectUnits({tech3})
+            SelectUnits(tech3)
         elseif next(tech2) then
             SimCallback({Func= 'SelectHighestEngineerAndAssist', Args = { TargetId = tech2[1]:GetEntityId() }}, true)
-            SelectUnits({tech2})
+            SelectUnits(tech2)
         else
             -- do nothing
         end
