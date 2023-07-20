@@ -760,7 +760,7 @@ ExternalFactoryComponent = ClassSimple {
     OnStopBeingBuilt = function(self, builder, layer)
         local blueprint = self.Blueprint
         if not self.FactoryAttachBone then
-            error(string.format("%s is not setup for an external factory: the unit does not have a field 'BuildAttachBone'", blueprint.BlueprintId))
+            error(string.format("%s is not setup for an external factory: the unit does not have a field 'FactoryAttachBone'", blueprint.BlueprintId))
         end
 
         if not blueprint.CategoriesHash['EXTERNALFACTORY'] then
