@@ -551,7 +551,6 @@ function SelectHighestEngineerAndAssist()
 
     if selection then
 
-        local tech1 = EntityCategoryFilterDown(categories.TECH1 - categories.COMMAND, selection)
         local tech2 = EntityCategoryFilterDown(categories.TECH2 - categories.COMMAND, selection)
         local tech3 = EntityCategoryFilterDown(categories.TECH3 - categories.COMMAND, selection)
         local sACUs = EntityCategoryFilterDown(categories.SUBCOMMANDER - categories.COMMAND, selection)
