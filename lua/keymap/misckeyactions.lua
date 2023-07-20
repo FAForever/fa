@@ -546,22 +546,55 @@ RestoreCameraPosition = function ()
     camera:MoveTo(settings.Focus, { settings.Heading, settings.Pitch, 0}, settings.Zoom, 0)
 end
 
+function CalcTableLength(tbl)
+    tbl_size = 0
+    for _ in pairs(tbl) do tbl_size = tbl_size + 1 end
+    return tbl_size
+end
+
+function GetMajorityFaction(units)
+    local faction_categories = {categories.UEF, categories.CYBRAN, categories.AEON, categories.SERAPHIM}
+
+    local units_factions = {}
+    for i, faction_category in faction_categories do
+        table.insert(units_factions,EntityCategoryFilterDown(faction_category, units))
+    end
+
+    local faction_nr = 0
+    local nr_of_units = 0
+    for i, u in units_factions do
+        nr_of_units_for_that_faction = CalcTableLength(u)
+        if nr_of_units_for_that_faction > nr_of_units then
+            nr_of_units = nr_of_units_for_that_faction
+            faction_nr = i
+        end
+    end
+
+    return units_factions[faction_nr]
+end
+
 function SelectHighestEngineerAndAssist()
     local selection = GetSelectedUnits()
 
     if selection then
 
+        local tech1 = EntityCategoryFilterDown(categories.TECH1 - categories.COMMAND, selection)
         local tech2 = EntityCategoryFilterDown(categories.TECH2 - categories.COMMAND, selection)
         local tech3_and_sACUs = EntityCategoryFilterDown((categories.SUBCOMMANDER + categories.TECH3) - categories.COMMAND, selection)
 
+        local highest_tech_engies_and_sacus_of_majority_faction = nil
         if next(tech3_and_sACUs) then
-            SimCallback({Func= 'SelectHighestEngineerAndAssist', Args = { TargetId = tech3_and_sACUs[1]:GetEntityId() }}, true)
-            SelectUnits(tech3_and_sACUs)
+            highest_tech_engies_and_sacus_of_majority_faction = GetMajorityFaction(tech3_and_sACUs)
         elseif next(tech2) then
-            SimCallback({Func= 'SelectHighestEngineerAndAssist', Args = { TargetId = tech2[1]:GetEntityId() }}, true)
-            SelectUnits(tech2)
+            highest_tech_engies_and_sacus_of_majority_faction = GetMajorityFaction(tech2)
+        elseif next(tech1) then
+            highest_tech_engies_and_sacus_of_majority_faction = GetMajorityFaction(tech1)
         else
             -- do nothing
+        end
+        if highest_tech_engies_and_sacus_of_majority_faction then
+            SimCallback({Func= 'SelectHighestEngineerAndAssist', Args = { TargetId = highest_tech_engies_and_sacus_of_majority_faction[1]:GetEntityId() }}, true)
+            SelectUnits(highest_tech_engies_and_sacus_of_majority_faction)
         end
     end
 end
