@@ -162,6 +162,7 @@ UES0401 = ClassUnit(AircraftCarrier, ExternalFactoryComponent) {
             local unitBuilding = self.UnitBeingBuilt
             local bone = self.BuildAttachBone
             self:DetachAll(bone)
+            unitBuilding:AttachTo(self, bone)
             unitBuilding:HideBone(0, true)
             self.UnitDoneBeingBuilt = false
         end,
