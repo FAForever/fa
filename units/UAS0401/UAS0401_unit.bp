@@ -49,6 +49,7 @@ UnitBlueprint{
         "SNIPEMODE",
         "SUBMERSIBLE",
         "VISIBLETORECON",
+        "EXTERNALFACTORY",
     },
     Defense = {
         ArmorType = "Experimental",

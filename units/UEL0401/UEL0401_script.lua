@@ -140,9 +140,9 @@ UEL0401 = ClassUnit(TMobileFactoryUnit, ExternalFactoryComponent) {
     end,
 
     IdleState = State {
-    ---@param self UEL0401
-    ---@param unitBeingBuilt Unit
-    ---@param order string
+        ---@param self UEL0401
+        ---@param unitBeingBuilt Unit
+        ---@param order string
         OnStartBuild = function(self, unitBeingBuilt, order)
             TMobileFactoryUnit.OnStartBuild(self, unitBeingBuilt, order)
             self.UnitBeingBuilt = unitBeingBuilt
