@@ -58,6 +58,7 @@ UnitBlueprint{
         "SUBMERSIBLE",
         "UEF",
         "VISIBLETORECON",
+        "EXTERNALFACTORY"
     },
     Defense = {
         AirThreatLevel = 56,
