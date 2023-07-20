@@ -39,7 +39,7 @@ URL0001 = ClassUnit(ACUUnit, CCommandUnit) {
 
             SetOnTransport = function(self, transportstate)
                 CDFHeavyMicrowaveLaserGeneratorCom.SetOnTransport(self, transportstate)
-                self.Trash:Add(ForkThread(self.OnTransportWatch, self))
+                self.Trash:Add(ForkThread(self.OnTransportWatch,self))
             end,
 
             OnTransportWatch = function(self)
@@ -95,7 +95,7 @@ URL0001 = ClassUnit(ACUUnit, CCommandUnit) {
         self:DisableUnitIntel('Enhancement', 'Sonar')
         self:HideBone('Back_Upgrade', true)
         self:HideBone('Right_Upgrade', true)
-        self.Trash:Add(ForkThread(self.GiveInitialResources, self))
+        self.Trash:Add(ForkThread(self.GiveInitialResources,self))
     end,
 
     OnStartBuild = function(self, unitBeingBuilt, order)
@@ -108,16 +108,8 @@ URL0001 = ClassUnit(ACUUnit, CCommandUnit) {
     CreateEnhancement = function(self, enh)
         ACUUnit.CreateEnhancement(self, enh)
         if enh == 'Teleporter' then
-
-
-            reprsl(self:SetStat("Test", 4))
-            reprsl(self:GetStat("Test", 4))
-            reprsl(self:SetStat("Test", 4))
-            reprsl(self:GetStat("Test", 0))
-
             self:AddCommandCap('RULEUCC_Teleport')
         elseif enh == 'TeleporterRemove' then
-            reprsl(self:GetStat("Test", 0))
             RemoveUnitEnhancement(self, 'Teleporter')
             RemoveUnitEnhancement(self, 'TeleporterRemove')
             self:RemoveCommandCap('RULEUCC_Teleport')

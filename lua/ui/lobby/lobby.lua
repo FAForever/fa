@@ -6321,7 +6321,6 @@ function RefreshLobbyBackground(faction)
     if GUI.background then
         GUI.background:Destroy()
     end
-    LobbyBackground = 1
     if LobbyBackground == 1 then -- Factions
         faction = faction or GetSanitisedLastFaction()
         if FACTION_NAMES[faction] then
