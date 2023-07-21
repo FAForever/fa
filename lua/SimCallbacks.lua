@@ -677,6 +677,7 @@ do
             RequiresEntity = false,
             Redundancy = 3,
             ApplyAllOrders = true,
+            BatchOrders = true,
         },
         [11] = {
             Type = "FormAttack",
@@ -923,42 +924,92 @@ do
         -- assign orders in an interleaved fashion
         local offset = 0
         local unitCount = table.getn(units)
-        for _, unit in units do
-            for k, group in groups do
-                local orderCount = table.getn(group)
+        for k, group in groups do
 
-                -- extract info on how to apply these orders
-                local commandInfo = CommandInfo[group[1].commandType]
-                local issueOrder = commandInfo.Callback
-                local redundantOrders = commandInfo.Redundancy
-                local applyAllOrders = commandInfo.ApplyAllOrders
+            local orderCount = table.getn(group)
 
-                if issueOrder then
+            -- extract info on how to apply these orders
+            local commandInfo = CommandInfo[group[1].commandType]
+            local issueOrder = commandInfo.Callback
+            local redundantOrders = commandInfo.Redundancy
+            local applyAllOrders = commandInfo.ApplyAllOrders
+            local batchOrders = commandInfo.BatchOrders
 
-                    -- increase redundancy to guarantee all orders are applied at least once
-                    if applyAllOrders and (unitCount * redundantOrders < orderCount) then
-                        redundantOrders = math.ceil(orderCount / (unitCount * redundantOrders))
+            -- increase redundancy to guarantee all orders are applied at least once
+            if applyAllOrders and (unitCount * redundantOrders < orderCount) then
+                redundantOrders = math.ceil(orderCount / (unitCount * redundantOrders))
+            end
+
+            if issueOrder then
+                if batchOrders then
+                    LOG("Batching orders")
+
+                    -- prepare orders
+                    for _, order in group do
+                        order.Entity = order.target
+                        order.Location = { order.x, order.y, order.z }
                     end
 
-                    -- apply orders
-                    for redundancy = 1, math.min(orderCount, redundantOrders) do
-                        local order = group[math.mod(offset, orderCount) + 1]
-                        local candidate = order.target
-                        if candidate then
-                            issueOrder({ unit }, candidate)
-                            offset = offset + 1
-                        else
-                            -- at this point we may need an entity, so we check and bail if we do need one
-                            if commandInfo.Type == 'BuildMobile' then
-                                issueOrder({ unit }, { order.x, order.y, order.z }, order.blueprintId, {})
-                                offset = offset + 1
+                    local unitsPerBatch = math.ceil(unitCount / orderCount)
+                    local redundancy = orderCount
+                    LOG(string.format("Units per batch: %d", unitsPerBatch))
+                    LOG(string.format("Redundancy: %d", redundancy))
+                    local ordersApplied =  0
+                    -- issue orders
+                    for b = 1, redundancy do
+                        for o, _ in group do
+                            -- give an offset to each order
+                            local order = group[math.mod(o + b, orderCount) + 1]
+
+                            -- compute the batch of units
+                            local batch = { }
+                            for k = 1, unitsPerBatch do
+                                local unit = units[k + (b - 1) * unitsPerBatch]
+                                if unit then
+                                    table.insert(batch, unit)
+                                end
+                            end
+
+                            LOG(string.format("Apply order at: (%s)", repru(order.Location)))
+                            for k, unit in batch do
+                                LOG(unit.EntityId)
+                            end
+
+                            ordersApplied = ordersApplied + 1
+
+                            if order.Entity then
+                                issueOrder(batch, order.Entity)
+                            elseif commandInfo.Type == 'BuildMobile' then
+                                issueOrder(batch, order.Location, order.blueprintId, {})
                             elseif not commandInfo.RequiresEntity then
-                                issueOrder({ unit }, { order.x, order.y, order.z })
-                                offset = offset + 1
+                                issueOrder(batch, order.Location)
                             end
                         end
                     end
 
+                    LOG(string.format("Orders applied: %d", ordersApplied))
+                else
+                    -- apply individual orders
+                    for _, unit in units do
+                        -- apply orders
+                        for redundancy = 1, math.min(orderCount, redundantOrders) do
+                            local order = group[math.mod(offset, orderCount) + 1]
+                            local candidate = order.target
+                            if candidate then
+                                issueOrder({ unit }, candidate)
+                                offset = offset + 1
+                            else
+                                -- at this point we may need an entity, so we check and bail if we do need one
+                                if commandInfo.Type == 'BuildMobile' then
+                                    issueOrder({ unit }, { order.x, order.y, order.z }, order.blueprintId, {})
+                                    offset = offset + 1
+                                elseif not commandInfo.RequiresEntity then
+                                    issueOrder({ unit }, { order.x, order.y, order.z })
+                                    offset = offset + 1
+                                end
+                            end
+                        end
+                    end
                 end
             end
         end
