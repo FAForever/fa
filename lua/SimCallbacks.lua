@@ -521,7 +521,25 @@ Callbacks.FlagShield = function(data, units)
     end
 end
 
+-------------------------------------------------------------------------------
+--#region Advanced orders
+
 Callbacks.WeaponPriorities = import("/lua/weaponpriorities.lua").SetWeaponPriorities
+
+---@param data any
+---@param selection any
+Callbacks.SelectHighestEngineerAndAssist = function(data, selection)
+    if selection then
+        -- check for cheats
+        local target = GetUnitById(data.TargetId) --[[@as Unit]]
+        if not target or not target.Army then return end
+        if not OkayToMessWithArmy(target.Army) then return end
+
+        local noACU = EntityCategoryFilterDown(categories.ALLUNITS - categories.COMMAND, selection)
+        IssueClearCommands(noACU)
+        IssueGuard(noACU, target)
+    end
+end
 
 do
     -- upvalue for performance
@@ -1016,8 +1034,10 @@ do
     end
 end
 
+--#endregion
+
 -------------------------------------------------------------------------------
---@region Development / debug related functionality
+--#region Development / debug related functionality
 
 --- An anti cheat check that passes when there is only 1 player or cheats are enabled
 ---@return boolean
@@ -1050,8 +1070,6 @@ local PassesAIAntiCheatCheck = function()
     -- allow when cheats are enabled
     return PassesAntiCheatCheck()
 end
-
-
 
 local SpawnedMeshes = {}
 

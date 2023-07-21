@@ -43,26 +43,28 @@ TIFMissileCruise03 = ClassProjectile(TMissileCruiseProjectile) {
         if dist > self.Distance then
         	self:SetTurnRate(75)
         	WaitTicks(31)
-        	self:SetTurnRate(8)
+        	self:SetTurnRate(10)
         	self.Distance = self:GetDistanceToTarget()
         end
-        -- Get the nuke as close to 90 deg as possible
+        --Get the nuke as close to 90 deg as possible
         if dist > 50 then        
             -- Freeze the turn rate as to prevent steep angles at long distance targets
-            WaitTicks(21)
-            self:SetTurnRate(10)
+            WaitTicks(13)
+            self:SetTurnRate(14)
         elseif dist > 30 and dist <= 50 then
 						-- Increase check intervals
-						self:SetTurnRate(12)
-						WaitTicks(16)
-            self:SetTurnRate(12)
-        elseif dist > 10 and dist <= 25 then
+						self:SetTurnRate(20)
+						WaitTicks(8)
+            self:SetTurnRate(18)
+        elseif dist > 15 and dist <= 25 then
 						-- Further increase check intervals
-                        WaitTicks(4)
-            self:SetTurnRate(50)
-				elseif dist > 0 and dist <= 10 then
+                        WaitTicks(2)
+            self:SetTurnRate(40)
+		elseif dist > 5 and dist <= 15 then
 						-- Further increase check intervals            
-            self:SetTurnRate(100)   
+                        self:SetTurnRate(100)
+        elseif dist > 0 and dist<= 5 then
+                        self:SetTurnRate(150)   
             KillThread(self.MoveThread)         
         end
     end,        
