@@ -597,11 +597,20 @@ end
 
 do
 
+    ---@class DistributeOrderInfo
+    ---@field Type string                   # Describes the intended order, used during debugging
+    ---@field Callback function | false     # Function that matches the intended order
+    ---@field RequiresEntity boolean        # Flag that indicates this order requires an entity and should be skipped otherwise
+    ---@field ApplyAllOrders boolean        # Flag that indicates we want to apply all orders
+    ---@field Redundancy number             # Flag that indicates the default redundancy for each group of orders
+
+    --- The order of this list is determined in the engine, see also the files in:
+    --- - https://github.com/FAForever/FA-Binary-Patches/pull/22
+    ---@type DistributeOrderInfo[]
     local CommandInfo = {
         [1] = {
             Type = "Stop",
             Callback = false,
-            GetReference = false,
             RequiresEntity = false,
             Redundancy = 1,
             ApplyAllOrders = false,
@@ -609,7 +618,6 @@ do
         [2] = {
             Type = "Move",
             Callback = IssueMove,
-            GetReference = false,
             RequiresEntity = false,
             Redundancy = 1,
             ApplyAllOrders = false,
@@ -617,7 +625,6 @@ do
         [3] = {
             Type = "Dive",
             Callback = false,
-            GetReference = false,
             RequiresEntity = false,
             Redundancy = 1,
             ApplyAllOrders = false,
@@ -625,7 +632,6 @@ do
         [4] = {
             Type = "FormMove",
             Callback = IssueMove,
-            GetReference = false,
             RequiresEntity = false,
             Redundancy = 1,
             ApplyAllOrders = false,
@@ -633,7 +639,6 @@ do
         [5] = {
             Type = "BuildSiloTactical",
             Callback = false,
-            GetReference = false,
             RequiresEntity = false,
             Redundancy = 1,
             ApplyAllOrders = false,
@@ -641,7 +646,6 @@ do
         [6] = {
             Type = "BuildSiloNuke",
             Callback = false,
-            GetReference = false,
             RequiresEntity = false,
             Redundancy = 1,
             ApplyAllOrders = false,
@@ -649,7 +653,6 @@ do
         [7] = {
             Type = "BuildFactory",
             Callback = false,
-            GetReference = false,
             RequiresEntity = false,
             Redundancy = 1,
             ApplyAllOrders = false,
@@ -657,7 +660,6 @@ do
         [8] = {
             Type = "BuildMobile",
             Callback = IssueBuildMobile,
-            GetReference = false,
             RequiresEntity = false,
             Redundancy = 1,
             ApplyAllOrders = true,
@@ -665,7 +667,6 @@ do
         [9] = {
             Type = "BuildAssist",
             Callback = IssueGuard,
-            GetReference = GetUnitById,
             RequiresEntity = true,
             Redundancy = 1,
             ApplyAllOrders = true,
@@ -673,7 +674,6 @@ do
         [10] = {
             Type = "Attack",
             Callback = IssueAttack,
-            GetReference = GetEntityById,
             RequiresEntity = false,
             Redundancy = 3,
             ApplyAllOrders = true,
@@ -681,7 +681,6 @@ do
         [11] = {
             Type = "FormAttack",
             Callback = IssueAttack,
-            GetReference = GetEntityById,
             RequiresEntity = false,
             Redundancy = 3,
             ApplyAllOrders = true,
@@ -689,7 +688,6 @@ do
         [12] = {
             Type = "Nuke",
             Callback = IssueNuke,
-            GetReference = GetEntityById,
             RequiresEntity = false,
             Redundancy = 1,
             ApplyAllOrders = true,
@@ -697,7 +695,6 @@ do
         [13] = {
             Type = "Tactical",
             Callback = IssueTactical,
-            GetReference = GetEntityById,
             RequiresEntity = false,
             Redundancy = 1,
             ApplyAllOrders = true,
@@ -705,7 +702,6 @@ do
         [14] = {
             Type = "Teleport",
             Callback = IssueTeleport,
-            GetReference = false,
             RequiresEntity = false,
             Redundancy = 1,
             ApplyAllOrders = false,
@@ -713,7 +709,6 @@ do
         [15] = {
             Type = "Guard",
             Callback = IssueGuard,
-            GetReference = GetUnitById,
             RequiresEntity = true,
             Redundancy = 1,
             ApplyAllOrders = true,
@@ -721,7 +716,6 @@ do
         [16] = {
             Type = "Patrol",
             Callback = IssuePatrol,
-            GetReference = false,
             RequiresEntity = false,
             Redundancy = 3,
             ApplyAllOrders = true,
@@ -729,7 +723,6 @@ do
         [17] = {
             Type = "Ferry",
             Callback = nil,
-            GetReference = false,
             RequiresEntity = false,
             Redundancy = 1,
             ApplyAllOrders = false,
@@ -737,7 +730,6 @@ do
         [18] = {
             Type = "FormPatrol",
             Callback = IssuePatrol,
-            GetReference = false,
             RequiresEntity = false,
             Redundancy = 3,
             ApplyAllOrders = true,
@@ -745,7 +737,6 @@ do
         [19] = {
             Type = "Reclaim",
             Callback = IssueReclaim,
-            GetReference = GetEntityById,
             RequiresEntity = true,
             Redundancy = 1,
             ApplyAllOrders = true,
@@ -753,7 +744,6 @@ do
         [20] = {
             Type = "Repair",
             Callback = IssueRepair,
-            GetReference = GetUnitById,
             RequiresEntity = true,
             Redundancy = 1,
             ApplyAllOrders = true,
@@ -761,7 +751,6 @@ do
         [21] = {
             Type = "Capture",
             Callback = IssueCapture,
-            GetReference = GetUnitById,
             RequiresEntity = true,
             Redundancy = 1,
             ApplyAllOrders = true,
@@ -769,7 +758,6 @@ do
         [22] = {
             Type = "TransportLoadUnits",
             Callback = nil,
-            GetReference = false,
             RequiresEntity = false,
             Redundancy = 1,
             ApplyAllOrders = false,
@@ -777,7 +765,6 @@ do
         [23] = {
             Type = "TransportReverseLoadUnits",
             Callback = nil,
-            GetReference = false,
             RequiresEntity = false,
             Redundancy = 1,
             ApplyAllOrders = false,
@@ -785,7 +772,6 @@ do
         [24] = {
             Type = "TransportUnloadUnits",
             Callback = IssueTransportUnload,
-            GetReference = false,
             RequiresEntity = false,
             Redundancy = 1,
             ApplyAllOrders = false,
@@ -793,7 +779,6 @@ do
         [25] = {
             Type = "TransportUnloadSpecificUnits",
             Callback = nil,
-            GetReference = false,
             RequiresEntity = false,
             Redundancy = 1,
             ApplyAllOrders = false,
@@ -801,7 +786,6 @@ do
         [26] = {
             Type = "DetachFromTransport",
             Callback = nil,
-            GetReference = false,
             RequiresEntity = false,
             Redundancy = 1,
             ApplyAllOrders = false,
@@ -809,7 +793,6 @@ do
         [27] = {
             Type = "Upgrade",
             Callback = nil,
-            GetReference = false,
             RequiresEntity = false,
             Redundancy = 1,
             ApplyAllOrders = false,
@@ -817,7 +800,6 @@ do
         [28] = {
             Type = "Script",
             Callback = nil,
-            GetReference = false,
             RequiresEntity = false,
             Redundancy = 1,
             ApplyAllOrders = false,
@@ -825,7 +807,6 @@ do
         [29] = {
             Type = "AssistCommander",
             Callback = IssueGuard,
-            GetReference = GetUnitById,
             RequiresEntity = true,
             Redundancy = 1,
             ApplyAllOrders = true,
@@ -833,14 +814,12 @@ do
         [30] = {
             Type = "KillSelf",
             Callback = nil,
-            GetReference = false,
             RequiresEntity = false,
             Redundancy = 1,
             ApplyAllOrders = false,
         },
         [31] = {
             Type = "DestroySelf",
-            GetReference = false,
             Callback = nil,
             RequiresEntity = false,
             Redundancy = 1,
@@ -849,7 +828,6 @@ do
         [32] = {
             Type = "Sacrifice",
             Callback = IssueSacrifice,
-            GetReference = GetUnitById,
             RequiresEntity = true,
             Redundancy = 1,
             ApplyAllOrders = false,
@@ -857,7 +835,6 @@ do
         [33] = {
             Type = "Pause",
             Callback = nil,
-            GetReference = false,
             RequiresEntity = false,
             Redundancy = 1,
             ApplyAllOrders = false,
@@ -865,7 +842,6 @@ do
         [34] = {
             Type = "OverCharge",
             Callback = nil,
-            GetReference = false,
             RequiresEntity = false,
             Redundancy = 1,
             ApplyAllOrders = false,
@@ -873,7 +849,6 @@ do
         [35] = {
             Type = "AggressiveMove",
             Callback = IssueAggressiveMove,
-            GetReference = false,
             RequiresEntity = false,
             Redundancy = 1,
             ApplyAllOrders = true,
@@ -881,7 +856,6 @@ do
         [36] = {
             Type = "FormAggressiveMove",
             Callback = IssueAggressiveMove,
-            GetReference = false,
             RequiresEntity = false,
             Redundancy = 1,
             ApplyAllOrders = true,
@@ -889,7 +863,6 @@ do
         [37] = {
             Type = "AssistMove",
             Callback = nil,
-            GetReference = false,
             RequiresEntity = false,
             Redundancy = 1,
             ApplyAllOrders = true,
@@ -897,7 +870,6 @@ do
         [38] = {
             Type = "SpecialAction",
             Callback = nil,
-            GetReference = false,
             RequiresEntity = false,
             Redundancy = 1,
             ApplyAllOrders = false,
@@ -905,17 +877,17 @@ do
         [39] = {
             Type = "Dock",
             Callback = nil,
-            GetReference = false,
             RequiresEntity = false,
             Redundancy = 1,
             ApplyAllOrders = false,
         },
     }
 
+    --- Processes the orders and re-distributes them over the units
     ---@param data any
     ---@param units Unit[]
     Callbacks.DistributeOrders = function(data, units)
-        LOG("DistributeOrders")
+        -- prevent cheating
         local units = SecureUnits(units)
         if not (units and units[1]) then
             return
@@ -991,7 +963,6 @@ do
             end
         end
     end
-
 end
 
 -------------------------------------------------------------------------------
