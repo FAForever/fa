@@ -970,10 +970,10 @@ do
                                 end
                             end
 
-                            LOG(string.format("Apply order at: (%s)", repru(order.Location)))
-                            for k, unit in batch do
-                                LOG(unit.EntityId)
-                            end
+                            -- LOG(string.format("Apply order at: (%s)", repru(order.Location)))
+                            -- for k, unit in batch do
+                            --     LOG(unit.EntityId)
+                            -- end
 
                             ordersApplied = ordersApplied + 1
 
