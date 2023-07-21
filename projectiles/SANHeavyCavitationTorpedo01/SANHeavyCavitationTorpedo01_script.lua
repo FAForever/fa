@@ -21,9 +21,6 @@ SANHeavyCavitationTorpedo01 = ClassProjectile(SHeavyCavitationTorpedo) {
         self.AirTrails:Destroy()
         CreateEmitterOnEntity(self,self.Army,EffectTemplate.SHeavyCavitationTorpedoFxTrails)
 
-        self:TrackTarget(true):StayUnderwater(true)
-        self:SetCollideSurface(false)
-        self:SetTurnRate(360)
         self.Trash:Add(ForkThread(self.ProjectileSplit,self))
     end,
 

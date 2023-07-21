@@ -20,11 +20,13 @@ ProjectileBlueprint {
         'AEON',
         'PROJECTILE',
         'ANTINAVY',
-        'NOSPLASHDAMAGE',
+        'TORPEDO',
+        'NOSPLASHDAMAGE'
     },
     Defense = {
         Health = 1,
     },
+    DesiredShooterCap = 1,
     Display = {
         CameraFollowTimeout = 2,
         CameraFollowsProjectile = true,
@@ -45,6 +47,9 @@ ProjectileBlueprint {
         Category = 'Anti Navy',
         Faction = 'Aeon',
         Weapon = 'Torpedo Cluster',
+        EntityCategory = {
+            'TORPEDO'
+        },
     },
     Interface = {
         HelpText = 0,
@@ -54,10 +59,11 @@ ProjectileBlueprint {
         DestroyOnWater = false,
         Lifetime = 30,
         MaxSpeed = 20,
-        RealisticOrdinance = false,
+        RealisticOrdinance = true,
         StayUpright = true,
         TrackTarget = false,
-        TurnRate = 360,
+        TurnRate = 190,
+        TurnRateRange = 10,
         VelocityAlign = true,
     },
 }

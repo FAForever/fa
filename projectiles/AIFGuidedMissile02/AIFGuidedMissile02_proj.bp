@@ -21,6 +21,11 @@ ProjectileBlueprint {
         'PROJECTILE',
         'MISSILE',
     },
+    Defense = {
+        MaxHealth = 1,
+        Health = 1,
+    },
+    DesiredShooterCap = 1,
     Display = {
         CameraFollowsProjectile = true,
         StrategicIconSize = 1,

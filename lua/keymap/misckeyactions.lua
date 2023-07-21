@@ -545,3 +545,27 @@ RestoreCameraPosition = function ()
     local settings = Prefs.GetFromCurrentProfile('DebugCameraPosition') --[[@as UserCameraSettings]]
     camera:MoveTo(settings.Focus, { settings.Heading, settings.Pitch, 0}, settings.Zoom, 0)
 end
+
+function SelectHighestEngineerAndAssist()
+    local selection = GetSelectedUnits()
+
+    if selection then
+
+        local tech2 = EntityCategoryFilterDown(categories.TECH2 - categories.COMMAND, selection)
+        local tech3 = EntityCategoryFilterDown(categories.TECH3 - categories.COMMAND, selection)
+        local sACUs = EntityCategoryFilterDown(categories.SUBCOMMANDER - categories.COMMAND, selection)
+
+        if next(sACUs) then
+            SimCallback({Func= 'SelectHighestEngineerAndAssist', Args = { TargetId = sACUs[1]:GetEntityId() }}, true)
+            SelectUnits(sACUs)
+        elseif next(tech3) then
+            SimCallback({Func= 'SelectHighestEngineerAndAssist', Args = { TargetId = tech3[1]:GetEntityId() }}, true)
+            SelectUnits(tech3)
+        elseif next(tech2) then
+            SimCallback({Func= 'SelectHighestEngineerAndAssist', Args = { TargetId = tech2[1]:GetEntityId() }}, true)
+            SelectUnits(tech2)
+        else
+            -- do nothing
+        end
+    end
+end

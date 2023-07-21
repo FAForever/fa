@@ -114,6 +114,7 @@ categories = {
     NAVAL = categoryValue,
     NEEDMOBILEBUILD = categoryValue,
     NOFORMATION = categoryValue,
+    --- Prevents splash damage being applied to the entity
     NOSPLASHDAMAGE = categoryValue,
     NUKE = categoryValue,
     NUKESUB = categoryValue,
@@ -351,6 +352,7 @@ categories = {
 ---| "NOSPLASHDAMAGE"
 ---| "NUKE"
 ---| "NUKESUB"
+---| "OBSTRUCTSBUILDING"
 ---| "OMNI"
 ---| "OPERATION"
 ---| "OPTICS"

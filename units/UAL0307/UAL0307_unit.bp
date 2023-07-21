@@ -1,75 +1,46 @@
-UnitBlueprint {
-    AI = {
-        GuardScanRadius = 28, -- allow mobile shield to keep a distance when on attack move
-    },
+UnitBlueprint{
+    Description = "<LOC ual0307_desc>Mobile Shield Generator",
+    AI = { GuardScanRadius = 28 },
     Audio = {
-        AmbientMove = Sound {
-            Bank = 'UAL',
-            Cue = 'UAL0307_Move_Loop',
-            LodCutoff = 'UnitMove_LodCutoff',
-        },
-        Destroyed = Sound {
-            Bank = 'UALDestroy',
-            Cue = 'UAL_Destroy_Land',
-            LodCutoff = 'UnitMove_LodCutoff',
-        },
-        ShieldOff = Sound {
-            Bank = 'UAL',
-            Cue = 'UAL0307_Shield_Activate',
-            LodCutoff = 'UnitMove_LodCutoff',
-        },
-        ShieldOn = Sound {
-            Bank = 'UAL',
-            Cue = 'UAL0307_Shield_Activate',
-            LodCutoff = 'UnitMove_LodCutoff',
-        },
-        StartMove = Sound {
-            Bank = 'UAL',
-            Cue = 'UAL0307_Move_Start',
-            LodCutoff = 'UnitMove_LodCutoff',
-        },
-        StopMove = Sound {
-            Bank = 'UAL',
-            Cue = 'UAL0307_Move_Stop',
-            LodCutoff = 'UnitMove_LodCutoff',
-        },
-        UISelection = Sound {
-            Bank = 'Interface',
-            Cue = 'Aeon_Select_Vehicle',
-            LodCutoff = 'UnitMove_LodCutoff',
-        },
+        AmbientMove = Sound { Bank = 'UAL',        Cue = 'UAL0307_Move_Loop',       LodCutoff = 'UnitMove_LodCutoff' },
+        Destroyed   = Sound { Bank = 'UALDestroy', Cue = 'UAL_Destroy_Land',        LodCutoff = 'UnitMove_LodCutoff' },
+        ShieldOff   = Sound { Bank = 'UAL',        Cue = 'UAL0307_Shield_Activate', LodCutoff = 'UnitMove_LodCutoff' },
+        ShieldOn    = Sound { Bank = 'UAL',        Cue = 'UAL0307_Shield_Activate', LodCutoff = 'UnitMove_LodCutoff' },
+        StartMove   = Sound { Bank = 'UAL',        Cue = 'UAL0307_Move_Start',      LodCutoff = 'UnitMove_LodCutoff' },
+        StopMove    = Sound { Bank = 'UAL',        Cue = 'UAL0307_Move_Stop',       LodCutoff = 'UnitMove_LodCutoff' },
+        UISelection = Sound { Bank = 'Interface',  Cue = 'Aeon_Select_Vehicle',     LodCutoff = 'UnitMove_LodCutoff' },
     },
     BuildIconSortPriority = 50,
     Categories = {
-        'PRODUCTSC1',
-        'SELECTABLE',
-        'BUILTBYTIER2FACTORY',
-        'BUILTBYTIER3FACTORY',
-        'AEON',
-        'MOBILE',
-        'LAND',
-        'TECH2',
-        'SHIELD',
-        'DEFENSE',
-        'HOVER',
-        'VISIBLETORECON',
-        'RECLAIMABLE',
-        'OVERLAYDEFENSE',
-        'DUMMYGSRWEAPON',
-        'DIESTOOCDEPLETINGSHIELD',
+        "AEON",
+        "BUILTBYTIER2FACTORY",
+        "BUILTBYTIER3FACTORY",
+        "DEFENSE",
+        "DIESTOOCDEPLETINGSHIELD",
+        "DUMMYGSRWEAPON",
+        "HOVER",
+        "LAND",
+        "MOBILE",
+        "OVERLAYDEFENSE",
+        "PRODUCTSC1",
+        "RECLAIMABLE",
+        "SELECTABLE",
+        "SHIELD",
+        "TECH2",
+        "VISIBLETORECON",
     },
     Defense = {
         AirThreatLevel = 0,
-        ArmorType = 'Normal',
+        ArmorType = "Normal",
         EconomyThreatLevel = 0,
         Health = 100,
         MaxHealth = 100,
         RegenRate = 0,
         Shield = {
-            ImpactEffects = 'AeonShieldHit01',
-            ImpactMesh = '/effects/entities/ShieldSection01/ShieldSection01_mesh',
-            Mesh = '/effects/entities/AeonShield01/AeonShield01_mesh',
-            MeshZ = '/effects/entities/Shield01/Shield01z_mesh',
+            ImpactEffects = "AeonShieldHit01",
+            ImpactMesh = "/effects/entities/ShieldSection01/ShieldSection01_mesh",
+            Mesh = "/effects/entities/AeonShield01/AeonShield01_mesh",
+            MeshZ = "/effects/entities/Shield01/Shield01z_mesh",
             RegenAssistMult = 60,
             ShieldEnergyDrainRechargeTime = 5,
             ShieldMaxHealth = 3500,
@@ -83,26 +54,19 @@ UnitBlueprint {
         SubThreatLevel = 0,
         SurfaceThreatLevel = 9,
     },
-    Description = '<LOC ual0307_desc>Mobile Shield Generator',
     Display = {
         Abilities = {
-            '<LOC ability_hover>Hover',
-            '<LOC ability_shielddome>Shield Dome',
+            "<LOC ability_hover>Hover",
+            "<LOC ability_shielddome>Shield Dome",
         },
-        AnimationOpen = '/units/UAL0307/UAL0307_aopen.sca',
+        AnimationOpen = "/units/UAL0307/UAL0307_aopen.sca",
         IdleEffects = {
             Land = {
                 Effects = {
                     {
-                        Bones = {
-                            'UAL0307',
-                        },
-                        Offset = {
-                            0,
-                            -0.25,
-                            0,
-                        },
-                        Type = 'AeonGroundFX01',
+                        Bones = { "UAL0307" },
+                        Offset = { 0, -0.25, 0 },
+                        Type = "AeonGroundFX01",
                     },
                 },
             },
@@ -113,13 +77,13 @@ UnitBlueprint {
                 {
                     LODCutoff = 100,
                     Scrolling = true,
-                    ShaderName = 'Aeon',
+                    ShaderName = "Aeon",
                 },
                 {
-                    AlbedoName = 'ual0307_lod1_albedo.dds',
                     LODCutoff = 215,
-                    ShaderName = 'Aeon',
-                    SpecularName = 'ual0307_lod1_specteam.dds',
+                    ShaderName = "Aeon",
+                    AlbedoName = "ual0307_lod1_albedo.dds",
+                    SpecularName = "ual0307_lod1_specteam.dds",
                 },
             },
         },
@@ -127,38 +91,26 @@ UnitBlueprint {
             Land = {
                 Effects = {
                     {
-                        Bones = {
-                            'UAL0307',
-                        },
-                        Type = 'GroundKickup01',
+                        Bones = { "UAL0307" },
+                        Type = "GroundKickup01",
                     },
                     {
-                        Bones = {
-                            'UAL0307',
-                        },
-                        Offset = {
-                            0,
-                            -0.25,
-                            0,
-                        },
-                        Type = 'AeonGroundFX01',
+                        Bones = { "UAL0307" },
+                        Offset = { 0, -0.25, 0 },
+                        Type = "AeonGroundFX01",
                     },
                 },
             },
             Water = {
                 Effects = {
                     {
-                        Bones = {
-                            'UAL0307',
-                        },
+                        Bones = { "UAL0307" },
                         Scale = 0.3,
-                        Type = 'BackWake',
+                        Type = "BackWake",
                     },
                 },
             },
         },
-        PlaceholderMeshName = 'UXL0009',
-        SpawnRandomRotation = true,
         UniformScale = 0.5,
     },
     Economy = {
@@ -171,8 +123,6 @@ UnitBlueprint {
         TeleportTimeMod = 0.01,
     },
     General = {
-        Category = 'Utility',
-        Classification = 'RULEUC_MilitaryVehicle',
         CommandCaps = {
             RULEUCC_Attack = false,
             RULEUCC_CallTransport = true,
@@ -188,28 +138,19 @@ UnitBlueprint {
             RULEUCC_Stop = true,
             RULEUCC_Transport = false,
         },
-        FactionName = 'Aeon',
-        Icon = 'amph',
+        ExcludeFromVeterancy = true,
+        FactionName = "Aeon",
+        Icon = "amph",
         OrderOverrides = {
             RULEUTC_ShieldToggle = {
-                bitmapId = 'shield-dome',
-                helpText = 'toggle_shield_dome',
+                bitmapId = "shield-dome",
+                helpText = "toggle_shield_dome",
             },
         },
-        TechLevel = 'RULEUTL_Advanced',
-        ToggleCaps = {
-            RULEUTC_ShieldToggle = true,
-        },
-        UnitName = '<LOC ual0307_name>Asylum',
-        UnitWeight = 1,
-        ExcludeFromVeterancy = true,
+        ToggleCaps = { RULEUTC_ShieldToggle = true },
+        UnitName = "<LOC ual0307_name>Asylum",
     },
-    Intel = {
-        VisionRadius = 20,
-    },
-    Interface = {
-        HelpText = '<LOC ual0307_help>Mobile Shield Generator',
-    },
+    Intel = { VisionRadius = 20 },
     LifeBarHeight = 0.075,
     LifeBarOffset = 0.3,
     LifeBarSize = 0.8,
@@ -234,7 +175,7 @@ UnitBlueprint {
         MeshExtentsY = 0.65,
         MeshExtentsZ = 1,
         MinSpeedPercent = 0,
-        MotionType = 'RULEUMT_Hover',
+        MotionType = "RULEUMT_Hover",
         RotateBodyWhileMoving = true,
         RotateOnSpot = true,
         RotateOnSpotThreshold = 0.1,
@@ -250,39 +191,33 @@ UnitBlueprint {
     SizeX = 0.8,
     SizeY = 0.5,
     SizeZ = 0.8,
-    StrategicIconName = 'icon_land2_shield',
+    StrategicIconName = "icon_land2_shield",
     StrategicIconSortPriority = 125,
-    Transport = {
-        TransportClass = 2,
-    },
+    Transport = { TransportClass = 2 },
     Weapon = {
-        { -- special dummy weapon to make the unit stop a certain distance away
+        {
             Damage = 0,
             DamageFriendly = false,
-            FireTargetLayerCapsTable = { --what the unit will stop for
-                Land = 'Land|Water',
-                Water = 'Land|Water',
+            FireTargetLayerCapsTable = {
+                Land = "Land|Water",
+                Water = "Land|Water",
             },
             MaxRadius = 26,
             RackBones = {
                 {
-                    MuzzleBones = {
-                        'Turret', -- when moving to new unit, update these to something that exists on the unit
-                    },
-                    RackBone = 'Turret',
+                    MuzzleBones = { "Turret" },
+                    RackBone = "Turret",
                 },
             },
             RateOfFire = 0.5,
-            TargetPriorities = {
-                'ALLUNITS',
-            },
-            TargetRestrictDisallow = 'UNTARGETABLE',
-            Turreted = false,
             SlavedToBody = false,
+            TargetPriorities = { "ALLUNITS" },
+            TargetRestrictDisallow = "UNTARGETABLE",
+            Turreted = false,
         },
     },
     Wreckage = {
-        Blueprint = '/props/DefaultWreckage/DefaultWreckage_prop.bp',
+        Blueprint = "/props/DefaultWreckage/DefaultWreckage_prop.bp",
         EnergyMult = 0,
         HealthMult = 0.9,
         MassMult = 0.9,
@@ -290,9 +225,9 @@ UnitBlueprint {
         WreckageLayers = {
             Air = false,
             Land = true,
-            Seabed = true, --from false
-            Sub = true, --from false
-            Water = true, --from false
+            Seabed = true,
+            Sub = true,
+            Water = true,
         },
     },
 }
