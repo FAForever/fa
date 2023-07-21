@@ -70,11 +70,11 @@ UnitBlueprint {
     Physics = {
         BuildOnLayerCaps = {
             LAYER_Air = true,
-            LAYER_Land = false,
-            LAYER_Orbit = false,
-            LAYER_Seabed = false,
-            LAYER_Sub = false,
-            LAYER_Water = false,
+            LAYER_Land = true,
+            LAYER_Orbit = true,
+            LAYER_Seabed = true,
+            LAYER_Sub = true,
+            LAYER_Water = true,
         },
         MotionType = "RULEUMT_None",
     },
@@ -83,7 +83,15 @@ UnitBlueprint {
         SizeX = 0,
         SizeZ = 0,
     },
+
+    SelectionMeshScaleX = 1.0,
+    SelectionMeshScaleY = 3.0,
+    SelectionMeshScaleZ = 1.0,
+    SelectionMeshUseTopAmount  = 0.0,
+    SelectionYOffset  = 0,
+
     SelectionSizeX = 3.6,
+    SelectionSizeY = 0,
     SelectionSizeZ = 1.8,
     SelectionCenterOffsetZ = 2.25,
     SelectionThickness = 0.3,
