@@ -318,17 +318,6 @@ URL0402 = ClassUnit(CWalkingLandUnit) {
         end
     end,
 
-    OnMotionHorzEventChange = function(self, new, old)
-        CWalkingLandUnit.OnMotionHorzEventChange(self, new, old)
-
-        if (old == 'Stopped') then
-            local bpDisplay = self:GetBlueprint().Display
-            if bpDisplay.AnimationWalk and self.Animator then
-                self.Animator:SetDirectionalAnim(true)
-                self.Animator:SetRate(bpDisplay.AnimationWalkRate)
-            end
-         end
-    end,	
 }
 
 TypeClass = URL0402
