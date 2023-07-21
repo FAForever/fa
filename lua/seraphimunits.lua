@@ -605,7 +605,6 @@ SEnergyBallUnit = ClassUnit(SHoverLandUnit) {
                 WaitTicks(2)
                 self.timeAlive = self.timeAlive + .1
 
-                LOG("Firing!")
                 weapon:FireWeapon()
 
                 WaitSeconds(beamLifetime)
