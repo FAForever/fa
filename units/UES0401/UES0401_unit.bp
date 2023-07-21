@@ -135,6 +135,12 @@ UnitBlueprint{
                     LODCutoff = 800,
                     ShaderName = "Unit",
                 },
+                {
+                    LODCutoff = 300,
+                    ShaderName = "Unit",
+                    AlbedoName = "ues0401_lod1_albedo.dds",
+                    SpecularName = "ues0401_lod1_specteam.dds",
+                },
             },
         },
         MotionChangeEffects = {
