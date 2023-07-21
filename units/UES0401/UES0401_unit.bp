@@ -397,7 +397,8 @@ UnitBlueprint{
                 {
                     MuzzleBones = {"Front_Right_Turret_Muzzle_Right02"},
                     RackBone = "Front_Right_Turret_Barrel",
-                },{
+                },
+                {
                     MuzzleBones = {"Front_Right_Turret_Muzzle_Left03"},
                     RackBone = "Front_Right_Turret_Barrel",
                 },
@@ -566,7 +567,8 @@ UnitBlueprint{
                 {
                     MuzzleBones = {"Front_Left_Turret_Muzzle_Right02"},
                     RackBone = "Front_Left_Turret_Barrel",
-                },{
+                },
+                {
                     MuzzleBones = {"Front_Left_Turret_Muzzle_Left03"},
                     RackBone = "Front_Left_Turret_Barrel",
                 },
