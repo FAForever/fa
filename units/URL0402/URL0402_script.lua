@@ -317,7 +317,6 @@ URL0402 = ClassUnit(CWalkingLandUnit) {
             CreateAttachedEmitter(self, bone, army, v):ScaleEmitter(1.5)
         end
     end,
-
 }
 
 TypeClass = URL0402
