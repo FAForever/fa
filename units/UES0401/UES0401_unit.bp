@@ -375,7 +375,7 @@ UnitBlueprint{
             FiringTolerance = 150,
             Label = "MissileRack01",
             MaxRadius = 100,
-            MuzzleSalvoDelay = 0.2,
+            MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 6,
             MuzzleVelocity = 30,
             ProjectileId = "/projectiles/TAAMissileFlayer01/TAAMissileFlayer01_proj.bp",
@@ -383,15 +383,26 @@ UnitBlueprint{
             ProjectilesPerOnFire = 1,
             RackBones = {
                 {
-                    MuzzleBones = {
-                        "Front_Right_Turret_Muzzle_Left01",
-                        "Front_Right_Turret_Muzzle_Right02",
-                        "Front_Right_Turret_Muzzle_Left03",
-                        "Front_Right_Turret_Muzzle_Right01",
-                        "Front_Right_Turret_Muzzle_Left02",
-                        "Front_Right_Turret_Muzzle_Right03",
-
-                    },
+                    MuzzleBones = {"Front_Right_Turret_Muzzle_Left01"},
+                    RackBone = "Front_Right_Turret_Barrel",
+                },
+                {
+                    MuzzleBones = {"Front_Right_Turret_Muzzle_Right01"},
+                    RackBone = "Front_Right_Turret_Barrel",
+                },
+                {
+                    MuzzleBones = {"Front_Right_Turret_Muzzle_Left02"},
+                    RackBone = "Front_Right_Turret_Barrel",
+                },
+                {
+                    MuzzleBones = {"Front_Right_Turret_Muzzle_Right02"},
+                    RackBone = "Front_Right_Turret_Barrel",
+                },{
+                    MuzzleBones = {"Front_Right_Turret_Muzzle_Left03"},
+                    RackBone = "Front_Right_Turret_Barrel",
+                },
+                {
+                    MuzzleBones = {"Front_Right_Turret_Muzzle_Right03"},
                     RackBone = "Front_Right_Turret_Barrel",
                 },
             },
@@ -447,7 +458,7 @@ UnitBlueprint{
             FiringTolerance = 100,
             Label = "MissileRack02",
             MaxRadius = 100,
-            MuzzleSalvoDelay = 0.2,
+            MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 6,
             MuzzleVelocity = 30,
             PrefersPrimaryWeaponTarget = true,
@@ -456,14 +467,27 @@ UnitBlueprint{
             ProjectilesPerOnFire = 1,
             RackBones = {
                 {
-                    MuzzleBones = {
-                        "Back_Right_Turret_Muzzle_Left01",
-                        "Back_Right_Turret_Muzzle_Right02",
-                        "Back_Right_Turret_Muzzle_Left03",
-                        "Back_Right_Turret_Muzzle_Right01",
-                        "Back_Right_Turret_Muzzle_Left02",
-                        "Back_Right_Turret_Muzzle_Right03",
-                    },
+                    MuzzleBones = {"Back_Right_Turret_Muzzle_Left01"},
+                    RackBone = "Back_Right_Turret_Barrel",
+                },
+                {
+                    MuzzleBones = {"Back_Right_Turret_Muzzle_Right01"},
+                    RackBone = "Back_Right_Turret_Barrel",
+                },
+                {
+                    MuzzleBones = {"Back_Right_Turret_Muzzle_Left02"},
+                    RackBone = "Back_Right_Turret_Barrel",
+                },
+                {
+                    MuzzleBones = {"Back_Right_Turret_Muzzle_Right02"},
+                    RackBone = "Back_Right_Turret_Barrel",
+                },
+                {
+                    MuzzleBones = {"Back_Right_Turret_Muzzle_Left03"},
+                    RackBone = "Back_Right_Turret_Barrel",
+                },
+                {
+                    MuzzleBones = {"Back_Right_Turret_Muzzle_Right03"},
                     RackBone = "Back_Right_Turret_Barrel",
                 },
             },
@@ -519,7 +543,7 @@ UnitBlueprint{
             FiringTolerance = 100,
             Label = "MissileRack03",
             MaxRadius = 100,
-            MuzzleSalvoDelay = 0.2,
+            MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 6,
             MuzzleVelocity = 30,
             PrefersPrimaryWeaponTarget = true,
@@ -528,14 +552,26 @@ UnitBlueprint{
             ProjectilesPerOnFire = 1,
             RackBones = {
                 {
-                    MuzzleBones = {
-                        "Front_Left_Turret_Muzzle_Left01",
-                        "Front_Left_Turret_Muzzle_Right02",
-                        "Front_Left_Turret_Muzzle_Left03",
-                        "Front_Left_Turret_Muzzle_Right01",
-                        "Front_Left_Turret_Muzzle_Left02",
-                        "Front_Left_Turret_Muzzle_Right03",
-                    },
+                    MuzzleBones = {"Front_Left_Turret_Muzzle_Left01"},
+                    RackBone = "Front_Left_Turret_Barrel",
+                },
+                {
+                    MuzzleBones = {"Front_Left_Turret_Muzzle_Right01"},
+                    RackBone = "Front_Left_Turret_Barrel",
+                },
+                {
+                    MuzzleBones = {"Front_Left_Turret_Muzzle_Left02"},
+                    RackBone = "Front_Left_Turret_Barrel",
+                },
+                {
+                    MuzzleBones = {"Front_Left_Turret_Muzzle_Right02"},
+                    RackBone = "Front_Left_Turret_Barrel",
+                },{
+                    MuzzleBones = {"Front_Left_Turret_Muzzle_Left03"},
+                    RackBone = "Front_Left_Turret_Barrel",
+                },
+                {
+                    MuzzleBones = {"Front_Left_Turret_Muzzle_Right03"},
                     RackBone = "Front_Left_Turret_Barrel",
                 },
             },
@@ -591,7 +627,7 @@ UnitBlueprint{
             FiringTolerance = 100,
             Label = "MissileRack04",
             MaxRadius = 100,
-            MuzzleSalvoDelay = 0.2,
+            MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 6,
             MuzzleVelocity = 30,
             PrefersPrimaryWeaponTarget = true,
@@ -600,14 +636,27 @@ UnitBlueprint{
             ProjectilesPerOnFire = 1,
             RackBones = {
                 {
-                    MuzzleBones = {
-                        "Back_Left_Turret_Muzzle_Left01",
-                        "Back_Left_Turret_Muzzle_Right02",
-                        "Back_Left_Turret_Muzzle_Left03",
-                        "Back_Left_Turret_Muzzle_Right01",
-                        "Back_Left_Turret_Muzzle_Left02",
-                        "Back_Left_Turret_Muzzle_Right03",
-                    },
+                    MuzzleBones = {"Back_Left_Turret_Muzzle_Left01"},
+                    RackBone = "Back_Left_Turret_Barrel",
+                },
+                {
+                    MuzzleBones = {"Back_Left_Turret_Muzzle_Right01"},
+                    RackBone = "Back_Left_Turret_Barrel",
+                },
+                {
+                    MuzzleBones = {"Back_Left_Turret_Muzzle_Left02"},
+                    RackBone = "Back_Left_Turret_Barrel",
+                },
+                {
+                    MuzzleBones = {"Back_Left_Turret_Muzzle_Right02"},
+                    RackBone = "Back_Left_Turret_Barrel",
+                },
+                {
+                    MuzzleBones = {"Back_Left_Turret_Muzzle_Left03"},
+                    RackBone = "Back_Left_Turret_Barrel",
+                },
+                {
+                    MuzzleBones = {"Back_Left_Turret_Muzzle_Right03"},
                     RackBone = "Back_Left_Turret_Barrel",
                 },
             },
