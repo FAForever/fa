@@ -604,6 +604,7 @@ do
             GetReference = false,
             RequiresEntity = false,
             Redundancy = 1,
+            ApplyAllOrders = false,
         },
         [2] = {
             Type = "Move",
@@ -611,6 +612,7 @@ do
             GetReference = false,
             RequiresEntity = false,
             Redundancy = 1,
+            ApplyAllOrders = false,
         },
         [3] = {
             Type = "Dive",
@@ -618,6 +620,7 @@ do
             GetReference = false,
             RequiresEntity = false,
             Redundancy = 1,
+            ApplyAllOrders = false,
         },
         [4] = {
             Type = "FormMove",
@@ -625,6 +628,7 @@ do
             GetReference = false,
             RequiresEntity = false,
             Redundancy = 1,
+            ApplyAllOrders = false,
         },
         [5] = {
             Type = "BuildSiloTactical",
@@ -632,6 +636,7 @@ do
             GetReference = false,
             RequiresEntity = false,
             Redundancy = 1,
+            ApplyAllOrders = false,
         },
         [6] = {
             Type = "BuildSiloNuke",
@@ -639,6 +644,7 @@ do
             GetReference = false,
             RequiresEntity = false,
             Redundancy = 1,
+            ApplyAllOrders = false,
         },
         [7] = {
             Type = "BuildFactory",
@@ -646,6 +652,7 @@ do
             GetReference = false,
             RequiresEntity = false,
             Redundancy = 1,
+            ApplyAllOrders = false,
         },
         [8] = {
             Type = "BuildMobile",
@@ -653,6 +660,7 @@ do
             GetReference = false,
             RequiresEntity = false,
             Redundancy = 1,
+            ApplyAllOrders = true,
         },
         [9] = {
             Type = "BuildAssist",
@@ -660,6 +668,7 @@ do
             GetReference = GetUnitById,
             RequiresEntity = true,
             Redundancy = 1,
+            ApplyAllOrders = true,
         },
         [10] = {
             Type = "Attack",
@@ -667,6 +676,7 @@ do
             GetReference = GetEntityById,
             RequiresEntity = false,
             Redundancy = 3,
+            ApplyAllOrders = true,
         },
         [11] = {
             Type = "FormAttack",
@@ -674,6 +684,7 @@ do
             GetReference = GetEntityById,
             RequiresEntity = false,
             Redundancy = 3,
+            ApplyAllOrders = true,
         },
         [12] = {
             Type = "Nuke",
@@ -681,6 +692,7 @@ do
             GetReference = GetEntityById,
             RequiresEntity = false,
             Redundancy = 1,
+            ApplyAllOrders = true,
         },
         [13] = {
             Type = "Tactical",
@@ -688,6 +700,7 @@ do
             GetReference = GetEntityById,
             RequiresEntity = false,
             Redundancy = 1,
+            ApplyAllOrders = true,
         },
         [14] = {
             Type = "Teleport",
@@ -695,6 +708,7 @@ do
             GetReference = false,
             RequiresEntity = false,
             Redundancy = 1,
+            ApplyAllOrders = false,
         },
         [15] = {
             Type = "Guard",
@@ -702,6 +716,7 @@ do
             GetReference = GetUnitById,
             RequiresEntity = true,
             Redundancy = 1,
+            ApplyAllOrders = true,
         },
         [16] = {
             Type = "Patrol",
@@ -709,6 +724,7 @@ do
             GetReference = false,
             RequiresEntity = false,
             Redundancy = 3,
+            ApplyAllOrders = true,
         },
         [17] = {
             Type = "Ferry",
@@ -716,6 +732,7 @@ do
             GetReference = false,
             RequiresEntity = false,
             Redundancy = 1,
+            ApplyAllOrders = false,
         },
         [18] = {
             Type = "FormPatrol",
@@ -723,6 +740,7 @@ do
             GetReference = false,
             RequiresEntity = false,
             Redundancy = 3,
+            ApplyAllOrders = true,
         },
         [19] = {
             Type = "Reclaim",
@@ -730,6 +748,7 @@ do
             GetReference = GetEntityById,
             RequiresEntity = true,
             Redundancy = 1,
+            ApplyAllOrders = true,
         },
         [20] = {
             Type = "Repair",
@@ -737,6 +756,7 @@ do
             GetReference = GetUnitById,
             RequiresEntity = true,
             Redundancy = 1,
+            ApplyAllOrders = true,
         },
         [21] = {
             Type = "Capture",
@@ -744,6 +764,7 @@ do
             GetReference = GetUnitById,
             RequiresEntity = true,
             Redundancy = 1,
+            ApplyAllOrders = true,
         },
         [22] = {
             Type = "TransportLoadUnits",
@@ -751,6 +772,7 @@ do
             GetReference = false,
             RequiresEntity = false,
             Redundancy = 1,
+            ApplyAllOrders = false,
         },
         [23] = {
             Type = "TransportReverseLoadUnits",
@@ -758,6 +780,7 @@ do
             GetReference = false,
             RequiresEntity = false,
             Redundancy = 1,
+            ApplyAllOrders = false,
         },
         [24] = {
             Type = "TransportUnloadUnits",
@@ -765,6 +788,7 @@ do
             GetReference = false,
             RequiresEntity = false,
             Redundancy = 1,
+            ApplyAllOrders = false,
         },
         [25] = {
             Type = "TransportUnloadSpecificUnits",
@@ -772,6 +796,7 @@ do
             GetReference = false,
             RequiresEntity = false,
             Redundancy = 1,
+            ApplyAllOrders = false,
         },
         [26] = {
             Type = "DetachFromTransport",
@@ -779,6 +804,7 @@ do
             GetReference = false,
             RequiresEntity = false,
             Redundancy = 1,
+            ApplyAllOrders = false,
         },
         [27] = {
             Type = "Upgrade",
@@ -786,6 +812,7 @@ do
             GetReference = false,
             RequiresEntity = false,
             Redundancy = 1,
+            ApplyAllOrders = false,
         },
         [28] = {
             Type = "Script",
@@ -793,6 +820,7 @@ do
             GetReference = false,
             RequiresEntity = false,
             Redundancy = 1,
+            ApplyAllOrders = false,
         },
         [29] = {
             Type = "AssistCommander",
@@ -800,6 +828,7 @@ do
             GetReference = GetUnitById,
             RequiresEntity = true,
             Redundancy = 1,
+            ApplyAllOrders = true,
         },
         [30] = {
             Type = "KillSelf",
@@ -807,6 +836,7 @@ do
             GetReference = false,
             RequiresEntity = false,
             Redundancy = 1,
+            ApplyAllOrders = false,
         },
         [31] = {
             Type = "DestroySelf",
@@ -814,6 +844,7 @@ do
             Callback = nil,
             RequiresEntity = false,
             Redundancy = 1,
+            ApplyAllOrders = false,
         },
         [32] = {
             Type = "Sacrifice",
@@ -821,6 +852,7 @@ do
             GetReference = GetUnitById,
             RequiresEntity = true,
             Redundancy = 1,
+            ApplyAllOrders = false,
         },
         [33] = {
             Type = "Pause",
@@ -828,6 +860,7 @@ do
             GetReference = false,
             RequiresEntity = false,
             Redundancy = 1,
+            ApplyAllOrders = false,
         },
         [34] = {
             Type = "OverCharge",
@@ -835,6 +868,7 @@ do
             GetReference = false,
             RequiresEntity = false,
             Redundancy = 1,
+            ApplyAllOrders = false,
         },
         [35] = {
             Type = "AggressiveMove",
@@ -842,6 +876,7 @@ do
             GetReference = false,
             RequiresEntity = false,
             Redundancy = 1,
+            ApplyAllOrders = true,
         },
         [36] = {
             Type = "FormAggressiveMove",
@@ -849,6 +884,7 @@ do
             GetReference = false,
             RequiresEntity = false,
             Redundancy = 1,
+            ApplyAllOrders = true,
         },
         [37] = {
             Type = "AssistMove",
@@ -856,6 +892,7 @@ do
             GetReference = false,
             RequiresEntity = false,
             Redundancy = 1,
+            ApplyAllOrders = true,
         },
         [38] = {
             Type = "SpecialAction",
@@ -863,6 +900,7 @@ do
             GetReference = false,
             RequiresEntity = false,
             Redundancy = 1,
+            ApplyAllOrders = false,
         },
         [39] = {
             Type = "Dock",
@@ -870,6 +908,7 @@ do
             GetReference = false,
             RequiresEntity = false,
             Redundancy = 1,
+            ApplyAllOrders = false,
         },
     }
 
@@ -910,28 +949,40 @@ do
         IssueClearCommands(units)
 
         -- assign orders in an interleaved fashion
-        for offset, unit in units do
+        local offset = 0
+        local unitCount = table.getn(units)
+        for _, unit in units do
             for k, group in groups do
+                local orderCount = table.getn(group)
+
+                -- extract info on how to apply these orders
                 local commandInfo = CommandInfo[group[1].commandType]
-                local issueCommand = commandInfo.Callback
-                local count = table.getn(group)
-                if issueCommand then
-                    for redundancy = 1, math.min(count, commandInfo.Redundancy) do
-                        local index = math.mod(offset + redundancy, count) + 1
-                        local order = group[index]
+                local issueOrder = commandInfo.Callback
+                local redundantOrders = commandInfo.Redundancy
+                local applyAllOrders = commandInfo.ApplyAllOrders
+
+                if issueOrder then
+
+                    -- increase redundancy to guarantee all orders are applied at least once
+                    if applyAllOrders and (unitCount * redundantOrders < orderCount) then
+                        redundantOrders = math.ceil(orderCount / (unitCount * redundantOrders))
+                    end
+
+                    -- apply orders
+                    for redundancy = 1, math.min(orderCount, redundantOrders) do
+                        local order = group[math.mod(offset, orderCount) + 1]
                         local candidate = order.target
-                        if candidate  then
-                            target = candidate
-                            -- at this point we need a valid target
-                            if target then
-                                issueCommand({ unit }, target)
-                            end
+                        if candidate then
+                            issueOrder({ unit }, candidate)
+                            offset = offset + 1
                         else
                             -- at this point we may need an entity, so we check and bail if we do need one
                             if commandInfo.Type == 'BuildMobile' then
-                                issueCommand({ unit }, { order.x, order.y, order.z }, order.blueprintId, {})
+                                issueOrder({ unit }, { order.x, order.y, order.z }, order.blueprintId, {})
+                                offset = offset + 1
                             elseif not commandInfo.RequiresEntity then
-                                issueCommand({ unit }, { order.x, order.y, order.z })
+                                issueOrder({ unit }, { order.x, order.y, order.z })
+                                offset = offset + 1
                             end
                         end
                     end
