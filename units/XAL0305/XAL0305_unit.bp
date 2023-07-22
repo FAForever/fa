@@ -86,7 +86,7 @@ UnitBlueprint{
             IconFadeInZoom = 130,
             LODs = {
                 {
-                    LODCutoff = 240,
+                    LODCutoff = 100,
                     Scrolling = true,
                     ShaderName = "Aeon",
                 },
