@@ -166,7 +166,6 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
     -------------------------------------------------------------------------------------------
     ---@param self Unit
     OnPreCreate = function(self)
-
         -- Each unit has a sync table to replicate values to the global sync table to be copied to the user layer at sync time.
         self.Sync = {}
         self.Sync.id = self:GetEntityId()
@@ -4762,6 +4761,19 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         local total = 10 * (buildTime / buildRate)
         local blocks = math.ceil(fraction * total)
         cUnit.GiveNukeSiloAmmo(self, blocks, true)
+    end,
+
+    GetCommandQueue = function(self)
+        local queue = cUnit.GetCommandQueue(self)
+        if queue then
+            for k, order in queue do
+                if order.targetId then
+                    order.target = GetEntityById(order.targetId)
+                end
+            end
+        end
+
+        return queue
     end,
 
     --- Stuns the unit, if it isn't set to be immune by the flag unit.ImmuneToStun
