@@ -581,12 +581,9 @@ AIBrain = Class(StandardBrain) {
             position[1] = position[1] / TableGetn(factories)
             position[3] = position[3] / TableGetn(factories)
             if not rallyLoc and not location.UseCenterPoint then
-                local pnt
-                if not markerType then
-                    pnt = AIUtils.AIGetClosestMarkerLocation(self, 'Rally Point', position[1], position[3])
-                else
-                    pnt = AIUtils.AIGetClosestMarkerLocation(self, markerType, position[1], position[3])
-                end
+                -- Get the specified marker type, or fall back to the default 'Rally Point'
+                local pnt = AIUtils.AIGetClosestMarkerLocation(self, markerType, position[1], position[3]) or AIUtils.AIGetClosestMarkerLocation(self, 'Rally Point', position[1], position[3])
+                
                 if pnt and TableGetn(pnt) == 3 then
                     rally = Vector(pnt[1], pnt[2], pnt[3])
                 end
@@ -1728,6 +1725,182 @@ AIBrain = Class(StandardBrain) {
             self.IMAPConfig.IMAPSize = 256
             self.IMAPConfig.Rings = 0
         end
+    end,
+
+    --- Enemy picker thread
+    ---@param self CampaignAIBrain
+    PickEnemy = function(self)
+        while true do
+            self:PickEnemyLogic()
+            WaitSeconds(120)
+        end
+    end,
+	
+	---@param self CampaignAIBrain
+    ---@param strengthTable table
+    ---@return boolean
+    GetAllianceEnemy = function(self, strengthTable)
+        local returnEnemy = false
+        local myIndex = self:GetArmyIndex()
+        local highStrength = strengthTable[myIndex].Strength
+        for k, v in strengthTable do
+            -- It's an enemy, ignore
+            if k ~= myIndex and not v.Enemy and not ArmyIsCivilian(k) and not v.Brain:IsDefeated() then
+                -- Ally too weak
+                if v.Strength < highStrength then
+                    continue
+                end
+                -- If the brain has an enemy, it's our new enemy
+                local enemy = v.Brain:GetCurrentEnemy()
+                if enemy then
+                    highStrength = v.Strength
+                    returnEnemy = v.Brain:GetCurrentEnemy()
+                end
+            end
+        end
+        return returnEnemy
+    end,
+	
+	---@param self CampaignAIBrain
+    GetStartVector3f = function(self)
+        local startX, startZ = self:GetArmyStartPos()
+        return {startX, 0, startZ}
+    end,
+	
+	--- The main function for the enemy picker thread
+	--- We call this function in map script, so the resource sharing enabling won't mess up existing missions
+	---@param self CampaignAIBrain
+    PickEnemyLogic = function(self)
+        local armyStrengthTable = {}
+        local selfIndex = self:GetArmyIndex()
+        for _, v in ArmyBrains do
+            local insertTable = {
+                Enemy = true,
+                Strength = 0,
+                Position = false,
+                Brain = v,
+            }
+            local armyIndex = v:GetArmyIndex()
+            -- Share resources with friends but don't regard their strength
+            if IsAlly(selfIndex, armyIndex) then
+                self:SetResourceSharing(true)
+                insertTable.Enemy = false
+            elseif not IsEnemy(selfIndex, armyIndex) then
+                insertTable.Enemy = false
+            end
+
+            if insertTable.Enemy then
+                insertTable.Position, insertTable.Strength = self:GetHighestThreatPosition(self.IMAPConfig.Rings, true, 'Structures', armyIndex)
+            else
+                local startX, startZ = v:GetArmyStartPos()
+                local ecoStructures = self:GetUnitsAroundPoint(categories.STRUCTURE * (categories.MASSEXTRACTION + categories.MASSPRODUCTION), {startX, 0 ,startZ}, 120, 'Ally')
+                local ecoThreat = 0
+                for _, v in ecoStructures do
+                    ecoThreat = ecoThreat + v.Blueprint.Defense.EconomyThreatLevel
+                end
+                insertTable.Position = {startX, 0, startZ}
+                insertTable.Strength = ecoThreat
+            end
+            armyStrengthTable[armyIndex] = insertTable
+        end
+
+        local allyEnemy = self:GetAllianceEnemy(armyStrengthTable)
+        if allyEnemy  then
+            self:SetCurrentEnemy(allyEnemy)
+        else
+            local findEnemy = false
+            if not self:GetCurrentEnemy() then
+                findEnemy = true
+            else
+                local cIndex = self:GetCurrentEnemy():GetArmyIndex()
+                -- If our enemy has been defeated or has less than 20 strength, we need a new enemy
+                if self:GetCurrentEnemy():IsDefeated() or armyStrengthTable[cIndex].Strength < 20 then
+                    findEnemy = true
+                end
+            end
+            if findEnemy then
+                local enemyStrength = false
+                local enemy = false
+
+                for k, v in armyStrengthTable do
+                    -- Dont' target self and ignore allies
+                    if k ~= selfIndex and v.Enemy and not v.Brain:IsDefeated() then
+                        
+                        -- If we have a better candidate; ignore really weak enemies
+                        if enemy and v.Strength < 20 then
+                            continue
+                        end
+
+                        -- The closer targets are worth more because then we get their mass spots
+                        local distanceWeight = 0.1
+                        local distance = VDist3(self:GetStartVector3f(), v.Position)
+                        local threatWeight = (1 / (distance * distanceWeight)) * v.Strength
+
+                        if not enemy or threatWeight > enemyStrength then
+                            enemy = v.Brain
+                        end
+                    end
+                end
+
+                if enemy then
+                    self:SetCurrentEnemy(enemy)
+                end
+            end
+        end
+    end,
+	
+	--- Utility function, for getting rid of nil table entries.
+    ---@param self CampaignAIBrain
+    ---@param oldtable table
+    ---@return table
+    RebuildTable = function(self, oldtable)
+        local temptable = {}
+        for k, v in oldtable do
+            if v ~= nil then
+                if type(k) == 'string' then
+                    temptable[k] = v
+                else
+                    table.insert(temptable, v)
+                end
+            end
+        end
+        return temptable
+    end,
+	
+	--- Returns the closest PBM build location to the given position, or nil
+	---@param self CampaignAIBrain
+    ---@param position Vector
+    ---@return Vector
+    PBMFindClosestBuildLocation = function(self, position)
+        local distance, closest
+        for k, v in self.PBM.Locations do
+            if position then
+                if not closest then
+                    distance = VDist3(position, v.Location)
+                    closest = v.Location
+                else
+                    local tempDist = VDist3(position, v.Location)
+                    if tempDist < distance then
+                        distance = tempDist
+                        closest = v.Location
+                    end
+                end
+            end
+        end
+        return closest
+    end,
+	
+	--- Utility function, returns existing platoon with name, or creates it
+    ---@param self CampaignAIBrain
+    ---@param name string
+    ---@return Platoon
+    GetPlatoonUniquelyNamedOrMake = function(self, name)
+        local platoon = self:GetPlatoonUniquelyNamed(name)
+        if not platoon then
+            platoon = self:MakePlatoon("", "")
+            platoon:UniquelyNamePlatoon(name)
+        end
+        return platoon
     end,
 
     ----------------------------------------------------------------------------------------
