@@ -1,15 +1,8 @@
 # Game version 3761 (27th of June, 2023)
 
+<intro>
 
-The main objective of this patch is to enhance the viability of a diverse range of strategies by 
-boosting raiding capabilities, balancing overpowered units, and introducing novel ways to utilize 
-existing units.
-
-This changelog is just a snippet of the total changelog. In this balance update, more than a hundred
-units have been tweaked in some fashion. You can read the complete changelog by clicking on the 'Beta
-Balance' button below. This snippet only includes bug fixes and unit reworks.
-
-The Balance Team
+Jip
 
 ## Features
 
@@ -30,8 +23,6 @@ The Balance Team
   There is now a 10 seconds delay before destroying the units of a recalled team. This delay prevents the units from being destroyed if the game would end.
 
 - (#5247) Re-introduce a hotkey that allows you to easily filter engineers
-
-
 
 ## AI
 
@@ -57,6 +48,9 @@ The Balance Team
 
 - (#5245) Fix a bug where the idle animation of the Seraphim tech 2 extractor does not stop when upgrading
 
+## Graphics
+
+- (#5171) Add or fix existing LODs of various Aeon units
 
 ## Performance
 
@@ -64,7 +58,7 @@ The Balance Team
 
 ## Other changes
 
-- (#5156, #5164) Add more debug utilities for the Navigational mesh
+- (#5156, #5164) Add more debug utilities for the Navigational Mesh
 
 ## Contributors
 
@@ -72,4 +66,5 @@ The Balance Team
 - BlackYps (#5162)
 - Relent0r (#5234)
 - Basilisk3 (#5250)
+- MadMax (#5171)
 - Jip (#5156, #5164, #5197, #5219, #5245, #5247)
