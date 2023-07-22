@@ -620,6 +620,7 @@ float3 ApplyWaterColor(float depth, float3 viewDirection, float3 color, float3 e
             color += emission * emissionAbsorption;
         } else {
             color = lerp(color, waterColor.rgb, waterColor.w);
+            color += emission;
         }
     } 
     return color;
@@ -2693,9 +2694,7 @@ float4 PBR_AeonCZARPS( NORMALMAPPED_VERTEX vertex, uniform bool hiDefShadows) : 
     specularAmount = lerp(specularAmount, 0.04, saturate(specular.a * 3));
 
     float3 color = PBR(vertex, albedo.rgb, metallic, roughness, normal, hiDefShadows, specularAmount);
-
-    float emission = specular.b + (pow(specular.a, 2) * 0.13);
-    color += emission * albedo.rgb;
+    float3 emission = (specular.b + (pow(specular.a, 2) * 0.13)) * albedo.rgb;
 
     float2 texcoord = vertex.texcoord0.xy * 60;
     texcoord.x -= vertex.material.x * 0.16;
@@ -2705,7 +2704,8 @@ float4 PBR_AeonCZARPS( NORMALMAPPED_VERTEX vertex, uniform bool hiDefShadows) : 
     texcoord2.y -= vertex.material.x * 0.005;
     float3 secondary = tex2D( secondarySampler, texcoord );
     float3 secondary2 = tex2D( secondarySampler, texcoord2 );
-    color += float3(0.2,0.7,1) * (secondary.b + secondary2.g )* (1-albedo.a);
+    emission += float3(0.2,0.7,1) * (secondary.b + secondary2.g )* (1-albedo.a);
+    color = ApplyWaterColor(vertex.depth.x, vertex.viewDirection, color, emission);
 
     float alpha = mirrored ? 0.5 : specular.b + ((secondary.b + secondary2.g ) * (1-albedo.a)) + glowMinimum;
     return float4(color, alpha);
