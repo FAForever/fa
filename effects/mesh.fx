@@ -5549,30 +5549,6 @@ technique Unit_LowFidelity
     }
 }
 
-// The ship variants are supposed to use a mirrored environment
-// texture to emulate the water surface reflecting the sky.
-technique PBR_UEF_Navy
-<
-    string abstractTechnique = "PBR_UEF_Navy";
-    int fidelity = FIDELITY_HIGH;
-
-    string cartographicTechnique = "CartographicUnit";
-    string depthTechnique = "Depth";
-    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
-    int parameter = PARAM_FRACTIONCOMPLETE;
-    
-    string environment = "<water>";
->
-{
-    pass P0
-    {
-        RasterizerState(Rasterizer_Cull_CW)
-
-        VertexShader = compile vs_1_1 NormalMappedVS();
-        PixelShader = compile ps_2_a PBR_UEF_PS(true, true, false, 0, 0);
-    }
-}
-
 /// AlphaFade
 ///
 ///
@@ -5996,28 +5972,6 @@ technique Insect_LowFidelity
     }
 }
 
-technique PBR_Cybran_Navy
-<
-    string abstractTechnique = "PBR_Cybran_Navy";
-    int fidelity = FIDELITY_HIGH;
-
-    string cartographicTechnique = "CartographicUnit";
-    string depthTechnique = "Depth";
-    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
-    int parameter = PARAM_FRACTIONCOMPLETE;
-            
-    string environment = "<water>";
->
-{
-    pass P0
-    {
-        RasterizerState( Rasterizer_Cull_CW )
-
-        VertexShader = compile vs_1_1 NormalMappedVS();
-        PixelShader = compile ps_2_a PBR_CybranPS(true);
-    }
-}
-
 /// Aeon
 ///
 ///
@@ -6079,28 +6033,6 @@ technique Aeon_LowFidelity
 
         VertexShader = compile vs_1_1 VertexNormalVS();
         PixelShader = compile ps_2_0 ColorMaskPS_LowFidelity();
-    }
-}
-
-technique PBR_Aeon_Navy
-<
-    string abstractTechnique = "PBR_Aeon_Navy";
-    int fidelity = FIDELITY_HIGH;
-
-    string cartographicTechnique = "CartographicUnit";
-    string depthTechnique = "Depth";
-    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
-    int parameter = PARAM_FRACTIONCOMPLETE;
-        
-    string environment = "<water>";
->
-{
-    pass P0
-    {
-        RasterizerState( Rasterizer_Cull_CW )
-
-        VertexShader = compile vs_1_1 NormalMappedVS();
-        PixelShader = compile ps_2_a PBR_AeonPS(true);
     }
 }
 
@@ -6175,30 +6107,6 @@ technique Seraphim_LowFidelity
     }
 }
 
-technique PBR_Seraphim_Navy
-<
-    string abstractTechnique = "PBR_Seraphim_Navy";
-    int fidelity = FIDELITY_HIGH;
-
-
-    string cartographicTechnique = "CartographicUnit";
-    string depthTechnique = "Depth";
-
-    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
-    int parameter = PARAM_FRACTIONCOMPLETE;
-            
-    string environment = "<water>";
->
-{
-    pass P0
-    {
-        RasterizerState( Rasterizer_Cull_CW )
-
-        VertexShader = compile vs_1_1 UnitFalloffVS();
-        PixelShader = compile ps_2_a PBR_SeraphimPS(true);
-    }
-}
-
 
 /// AeonCZAR
 ///
@@ -6261,6 +6169,279 @@ technique AeonCZAR_LowFidelity
 
         VertexShader = compile vs_1_1 VertexNormalVS();
         PixelShader = compile ps_2_0 ColorMaskPS_LowFidelity();
+    }
+}
+
+
+// The navy variants are supposed to use a mirrored environment
+// texture to emulate the water surface reflecting the sky.
+technique UEFNavy_HighFidelity
+<
+    string abstractTechnique = "UEFNavy";
+    int fidelity = FIDELITY_HIGH;
+
+    string cartographicTechnique = "CartographicUnit";
+    string depthTechnique = "Depth";
+    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
+    int parameter = PARAM_FRACTIONCOMPLETE;
+
+    string environment = "<water>";
+>
+{
+    pass P0
+    {
+        RasterizerState(Rasterizer_Cull_CW)
+
+        VertexShader = compile vs_1_1 NormalMappedVS();
+        PixelShader = compile ps_2_a PBR_UEF_PS(true, true, false, 0, 0);
+    }
+}
+
+technique UEFNavy_MedFidelity
+<
+    string abstractTechnique = "UEFNavy";
+    int fidelity = FIDELITY_MEDIUM;
+
+    string cartographicTechnique = "CartographicUnit";
+    string depthTechnique = "Depth";
+    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
+    int parameter = PARAM_FRACTIONCOMPLETE;
+    
+    string environment = "<water>";
+>
+{
+    pass P0
+    {
+        RasterizerState( Rasterizer_Cull_CW )
+
+        VertexShader = compile vs_1_1 NormalMappedVS();
+        PixelShader = compile ps_2_a NormalMappedPS(true,true,true, false,0,0 );
+    }
+}
+
+technique UEFNavy_LowFidelity
+<
+    string abstractTechnique = "UEFNavy";
+    int fidelity = FIDELITY_LOW;
+
+    string cartographicTechnique = "CartographicUnit";
+    string depthTechnique = "Depth";
+    int renderStage = STAGE_DEPTH + STAGE_PREWATER + STAGE_PREEFFECT;
+    int parameter = PARAM_FRACTIONCOMPLETE;
+    
+    string environment = "<water>";
+>
+{
+    pass P0
+    {
+        AlphaState( AlphaBlend_Disable_Write_RGB )
+        RasterizerState( Rasterizer_Cull_CW )
+
+        VertexShader = compile vs_1_1 VertexNormalVS();
+        PixelShader = compile ps_2_0 ColorMaskPS_LowFidelity();
+    }
+}
+
+technique CybranNavy_HighFidelity
+<
+    string abstractTechnique = "CybranNavy";
+    int fidelity = FIDELITY_HIGH;
+
+    string cartographicTechnique = "CartographicUnit";
+    string depthTechnique = "Depth";
+    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
+    int parameter = PARAM_FRACTIONCOMPLETE;
+
+    string environment = "<water>";
+>
+{
+    pass P0
+    {
+        RasterizerState( Rasterizer_Cull_CW )
+
+        VertexShader = compile vs_1_1 NormalMappedVS();
+        PixelShader = compile ps_2_a PBR_CybranPS(true);
+    }
+}
+
+technique CybranNavy_MedFidelity
+<
+    string abstractTechnique = "CybranNavy";
+    int fidelity = FIDELITY_MEDIUM;
+
+    string cartographicTechnique = "CartographicUnit";
+    string depthTechnique = "Depth";
+    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
+    int parameter = PARAM_FRACTIONCOMPLETE;
+
+    string environment = "<water>";
+>
+{
+    pass P0
+    {
+        RasterizerState( Rasterizer_Cull_CW )
+
+        VertexShader = compile vs_1_1 NormalMappedVS();
+        PixelShader = compile ps_2_a NormalMappedInsectPS(true);
+    }
+}
+
+technique CybranNavy_LowFidelity
+<
+    string abstractTechnique = "CybranNavy";
+    int fidelity = FIDELITY_LOW;
+
+    string cartographicTechnique = "CartographicUnit";
+    string depthTechnique = "Depth";
+    int renderStage = STAGE_DEPTH + STAGE_PREWATER + STAGE_PREEFFECT;
+    int parameter = PARAM_FRACTIONCOMPLETE;
+
+    string environment = "<water>";
+>
+{
+    pass P0
+    {
+        AlphaState( AlphaBlend_Disable_Write_RGB )
+        RasterizerState( Rasterizer_Cull_CW )
+
+        VertexShader = compile vs_1_1 VertexNormalVS();
+        PixelShader = compile ps_2_0 ColorMaskPS_LowFidelity();
+    }
+}
+
+technique AeonNavy_HighFidelity
+<
+    string abstractTechnique = "AeonNavy";
+    int fidelity = FIDELITY_HIGH;
+
+    string cartographicTechnique = "CartographicUnit";
+    string depthTechnique = "Depth";
+    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
+    int parameter = PARAM_FRACTIONCOMPLETE;
+        
+    string environment = "<water>";
+>
+{
+    pass P0
+    {
+        RasterizerState( Rasterizer_Cull_CW )
+
+        VertexShader = compile vs_1_1 NormalMappedVS();
+        PixelShader = compile ps_2_a PBR_AeonPS(true);
+    }
+}
+
+technique AeonNavy_MedFidelity
+<
+    string abstractTechnique = "AeonNavy";
+    int fidelity = FIDELITY_MEDIUM;
+
+    string cartographicTechnique = "CartographicUnit";
+    string depthTechnique = "Depth";
+    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
+    int parameter = PARAM_FRACTIONCOMPLETE;
+            
+    string environment = "<water>";
+>
+{
+    pass P0
+    {
+        RasterizerState( Rasterizer_Cull_CW )
+
+        VertexShader = compile vs_1_1 NormalMappedVS();
+        PixelShader = compile ps_2_a AeonPS(true);
+    }
+}
+
+technique AeonNavy_LowFidelity
+<
+    string abstractTechnique = "AeonNavy";
+    int fidelity = FIDELITY_LOW;
+
+    string cartographicTechnique = "CartographicUnit";
+    string depthTechnique = "Depth";
+    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
+    int parameter = PARAM_FRACTIONCOMPLETE;
+            
+    string environment = "<water>";
+>
+{
+    pass P0
+    {
+        AlphaState( AlphaBlend_Disable_Write_RGB )
+        RasterizerState( Rasterizer_Cull_CW )
+
+        VertexShader = compile vs_1_1 VertexNormalVS();
+        PixelShader = compile ps_2_0 ColorMaskPS_LowFidelity();
+    }
+}
+
+technique SeraphimNavy_HighFidelity
+<
+    string abstractTechnique = "SeraphimNavy";
+    int fidelity = FIDELITY_HIGH;
+
+    string cartographicTechnique = "CartographicUnit";
+    string depthTechnique = "Depth";
+
+    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
+    int parameter = PARAM_FRACTIONCOMPLETE;
+            
+    string environment = "<water>";
+>
+{
+    pass P0
+    {
+        RasterizerState( Rasterizer_Cull_CW )
+
+        VertexShader = compile vs_1_1 UnitFalloffVS();
+        PixelShader = compile ps_2_a PBR_SeraphimPS(true);
+    }
+}
+
+technique SeraphimNavy_MedFidelity
+<
+    string abstractTechnique = "SeraphimNavy";
+    int fidelity = FIDELITY_MEDIUM;
+
+    string cartographicTechnique = "CartographicUnit";
+    string depthTechnique = "Depth";
+
+    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
+    int parameter = PARAM_FRACTIONCOMPLETE;
+
+    string environment = "<water>";
+>
+{
+    pass P0
+    {
+        RasterizerState( Rasterizer_Cull_CW )
+
+        VertexShader = compile vs_1_1 UnitFalloffVS();
+        PixelShader = compile ps_2_0 UnitFalloffPS(false);
+    }
+}
+
+technique SeraphimNavy_LowFidelity
+<
+    string abstractTechnique = "SeraphimNavy";
+    int fidelity = FIDELITY_LOW;
+
+    string cartographicTechnique = "CartographicUnit";
+    string depthTechnique = "Depth";
+
+    string environment = "<water>";
+
+    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
+    int parameter = PARAM_FRACTIONCOMPLETE;
+>
+{
+    pass P0
+    {
+        RasterizerState( Rasterizer_Cull_CW )
+
+        VertexShader = compile vs_1_1 NormalMappedVS();
+        PixelShader = compile ps_2_0 LowFiUnitFalloffPS();
     }
 }
 
