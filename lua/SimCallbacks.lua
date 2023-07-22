@@ -143,28 +143,42 @@ local skirtSize1 = {
     { { -1, 0 }, { -1, 1 }, { 0, 1 }, { 1, 1 }, { 1, 0 }, { 1, -1 }, { 0, -1 }, { -1, -1 }, },
 }
 
---- Templates for units with a skirtSize of 1 such as radars and mass extractors
+--- Templates for units with a skirtSize of 2 such as radars and mass extractors
 local skirtSize2 = {
-    -- inner layer for storages
+    -- inner layer for storages (skirt 2)
     { { 2, 0 }, { 0, 2 }, { -2, 0 }, { 0, -2 }, },
 
-    -- outer layer for fabricators
+    -- outer layer for fabricators (skirt 2)
     { { -2, 2 }, { 2, 2 }, { 2, -2 }, { -2, -2 }, { -4, 0 }, { 0, 4 }, { 4, 0 }, { 0, -4 }, },
 }
 
---- Templates for units with a skirtSize of 3 such as fabricators
+--- Templates for units with a skirtSize of 6 such as fabricators
 local skirtSize6 = {
-    -- inner layer for storages
+    -- inner layer for mass storages (skirt 2)
     { { -2, 4 }, { 0, 4 }, { 2, 4 }, { 4, 2 }, { 4, 0 }, { 4, -2 }, { 2, -4 }, { 0, -4 }, { -2, -4 }, { -4, -2 },
         { -4, 0 },
         { -4, 2 }, },
+}
+
+--- Templates for units with a skirtSize of 8 such as T4 Arty Mavor
+local skirtSize8 = {
+    -- inner layer for T3 pgens (skirt 8)
+    { { 0, 8 }, { 0, -8 }, { 8, 0 }, { -8, 0 } },
+}
+
+--- Templates for units with a skirtSize of 10 such as T4 Arty Salvation
+local skirtSize10 = {
+    -- inner layer for T3 pgens (skirt 8)
+    { { -1, 9 }, { 1, -9 }, { 9, 1 }, { -9, -1 } },
 }
 
 --- Easy to use table for direct skirtSize size -> template conversion
 local skirtSizes = {
     [1] = skirtSize1,
     [2] = skirtSize2,
-    [6] = skirtSize6
+    [6] = skirtSize6,
+    [8] = skirtSize8,
+    [10] = skirtSize10
 }
 
 --- Computes the n'th layer of a previous layer.
