@@ -587,12 +587,14 @@ SEnergyBallUnit = ClassUnit(SHoverLandUnit) {
             while true do
                 local location = self:GetPosition()
                 local targets = aiBrain:GetUnitsAroundPoint(categories.LAND - categories.UNTARGETABLE, location, weaponMaxRange)
+
                 local filteredUnits = {}
                 for k, v in targets do
                     if VDist3(location, v:GetPosition()) >= weaponMinRange and v ~= self then
                         table.insert(filteredUnits, v)
                     end
                 end
+
                 local target = table.random(filteredUnits)
                 if target then
                     weapon:SetTargetEntity(target)
@@ -600,8 +602,9 @@ SEnergyBallUnit = ClassUnit(SHoverLandUnit) {
                     weapon:SetTargetGround({location[1] + Random(-20, 20), location[2], location[3] + Random(-20, 20)})
                 end
                 -- Wait a tick to let the target update awesomely.
-                WaitSeconds(.1)
+                WaitTicks(2)
                 self.timeAlive = self.timeAlive + .1
+
                 weapon:FireWeapon()
 
                 WaitSeconds(beamLifetime)

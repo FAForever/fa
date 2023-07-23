@@ -143,28 +143,42 @@ local skirtSize1 = {
     { { -1, 0 }, { -1, 1 }, { 0, 1 }, { 1, 1 }, { 1, 0 }, { 1, -1 }, { 0, -1 }, { -1, -1 }, },
 }
 
---- Templates for units with a skirtSize of 1 such as radars and mass extractors
+--- Templates for units with a skirtSize of 2 such as radars and mass extractors
 local skirtSize2 = {
-    -- inner layer for storages
+    -- inner layer for storages (skirt 2)
     { { 2, 0 }, { 0, 2 }, { -2, 0 }, { 0, -2 }, },
 
-    -- outer layer for fabricators
+    -- outer layer for fabricators (skirt 2)
     { { -2, 2 }, { 2, 2 }, { 2, -2 }, { -2, -2 }, { -4, 0 }, { 0, 4 }, { 4, 0 }, { 0, -4 }, },
 }
 
---- Templates for units with a skirtSize of 3 such as fabricators
+--- Templates for units with a skirtSize of 6 such as fabricators
 local skirtSize6 = {
-    -- inner layer for storages
+    -- inner layer for mass storages (skirt 2)
     { { -2, 4 }, { 0, 4 }, { 2, 4 }, { 4, 2 }, { 4, 0 }, { 4, -2 }, { 2, -4 }, { 0, -4 }, { -2, -4 }, { -4, -2 },
         { -4, 0 },
         { -4, 2 }, },
+}
+
+--- Templates for units with a skirtSize of 8 such as T4 Arty Mavor
+local skirtSize8 = {
+    -- inner layer for T3 pgens (skirt 8)
+    { { 0, 8 }, { 0, -8 }, { 8, 0 }, { -8, 0 } },
+}
+
+--- Templates for units with a skirtSize of 10 such as T4 Arty Salvation
+local skirtSize10 = {
+    -- inner layer for T3 pgens (skirt 8)
+    { { -1, 9 }, { 1, -9 }, { 9, 1 }, { -9, -1 } },
 }
 
 --- Easy to use table for direct skirtSize size -> template conversion
 local skirtSizes = {
     [1] = skirtSize1,
     [2] = skirtSize2,
-    [6] = skirtSize6
+    [6] = skirtSize6,
+    [8] = skirtSize8,
+    [10] = skirtSize10
 }
 
 --- Computes the n'th layer of a previous layer.
@@ -521,7 +535,25 @@ Callbacks.FlagShield = function(data, units)
     end
 end
 
+-------------------------------------------------------------------------------
+--#region Advanced orders
+
 Callbacks.WeaponPriorities = import("/lua/weaponpriorities.lua").SetWeaponPriorities
+
+---@param data any
+---@param selection any
+Callbacks.SelectHighestEngineerAndAssist = function(data, selection)
+    if selection then
+        -- check for cheats
+        local target = GetUnitById(data.TargetId) --[[@as Unit]]
+        if not target or not target.Army then return end
+        if not OkayToMessWithArmy(target.Army) then return end
+
+        local noACU = EntityCategoryFilterDown(categories.ALLUNITS - categories.COMMAND, selection)
+        IssueClearCommands(noACU)
+        IssueGuard(noACU, target)
+    end
+end
 
 do
     -- upvalue for performance
@@ -595,8 +627,431 @@ do
     end
 end
 
+do
+
+    ---@class DistributeOrderInfo
+    ---@field Type string                   # Describes the intended order, used during debugging
+    ---@field Callback function | false     # Function that matches the intended order
+    ---@field RequiresEntity boolean        # Flag that indicates this order requires an entity and should be skipped otherwise
+    ---@field ApplyAllOrders boolean        # Flag that indicates we want to apply all orders
+    ---@field Redundancy number             # Flag that indicates the default redundancy for each group of orders
+
+    --- The order of this list is determined in the engine, see also the files in:
+    --- - https://github.com/FAForever/FA-Binary-Patches/pull/22
+    ---@type DistributeOrderInfo[]
+    local CommandInfo = {
+        [1] = {
+            Type = "Stop",
+            Callback = false,
+            RequiresEntity = false,
+            Redundancy = 1,
+            ApplyAllOrders = false,
+        },
+        [2] = {
+            Type = "Move",
+            Callback = IssueMove,
+            RequiresEntity = false,
+            Redundancy = 1,
+            ApplyAllOrders = false,
+        },
+        [3] = {
+            Type = "Dive",
+            Callback = false,
+            RequiresEntity = false,
+            Redundancy = 1,
+            ApplyAllOrders = false,
+        },
+        [4] = {
+            Type = "FormMove",
+            Callback = IssueMove,
+            RequiresEntity = false,
+            Redundancy = 1,
+            ApplyAllOrders = false,
+        },
+        [5] = {
+            Type = "BuildSiloTactical",
+            Callback = false,
+            RequiresEntity = false,
+            Redundancy = 1,
+            ApplyAllOrders = false,
+        },
+        [6] = {
+            Type = "BuildSiloNuke",
+            Callback = false,
+            RequiresEntity = false,
+            Redundancy = 1,
+            ApplyAllOrders = false,
+        },
+        [7] = {
+            Type = "BuildFactory",
+            Callback = false,
+            RequiresEntity = false,
+            Redundancy = 1,
+            ApplyAllOrders = false,
+        },
+        [8] = {
+            Type = "BuildMobile",
+            Callback = IssueBuildMobile,
+            RequiresEntity = false,
+            Redundancy = 1,
+            ApplyAllOrders = true,
+        },
+        [9] = {
+            Type = "BuildAssist",
+            Callback = IssueGuard,
+            RequiresEntity = true,
+            Redundancy = 1,
+            ApplyAllOrders = true,
+        },
+        [10] = {
+            Type = "Attack",
+            Callback = IssueAttack,
+            RequiresEntity = false,
+            Redundancy = 3,
+            ApplyAllOrders = true,
+            BatchOrders = true,
+        },
+        [11] = {
+            Type = "FormAttack",
+            Callback = IssueAttack,
+            RequiresEntity = false,
+            Redundancy = 3,
+            ApplyAllOrders = true,
+        },
+        [12] = {
+            Type = "Nuke",
+            Callback = IssueNuke,
+            RequiresEntity = false,
+            Redundancy = 1,
+            ApplyAllOrders = true,
+        },
+        [13] = {
+            Type = "Tactical",
+            Callback = IssueTactical,
+            RequiresEntity = false,
+            Redundancy = 1,
+            ApplyAllOrders = true,
+        },
+        [14] = {
+            Type = "Teleport",
+            Callback = IssueTeleport,
+            RequiresEntity = false,
+            Redundancy = 1,
+            ApplyAllOrders = false,
+        },
+        [15] = {
+            Type = "Guard",
+            Callback = IssueGuard,
+            RequiresEntity = true,
+            Redundancy = 1,
+            ApplyAllOrders = true,
+        },
+        [16] = {
+            Type = "Patrol",
+            Callback = IssuePatrol,
+            RequiresEntity = false,
+            Redundancy = 3,
+            ApplyAllOrders = true,
+        },
+        [17] = {
+            Type = "Ferry",
+            Callback = nil,
+            RequiresEntity = false,
+            Redundancy = 1,
+            ApplyAllOrders = false,
+        },
+        [18] = {
+            Type = "FormPatrol",
+            Callback = IssuePatrol,
+            RequiresEntity = false,
+            Redundancy = 3,
+            ApplyAllOrders = true,
+        },
+        [19] = {
+            Type = "Reclaim",
+            Callback = IssueReclaim,
+            RequiresEntity = true,
+            Redundancy = 1,
+            ApplyAllOrders = true,
+        },
+        [20] = {
+            Type = "Repair",
+            Callback = IssueRepair,
+            RequiresEntity = true,
+            Redundancy = 1,
+            ApplyAllOrders = true,
+        },
+        [21] = {
+            Type = "Capture",
+            Callback = IssueCapture,
+            RequiresEntity = true,
+            Redundancy = 1,
+            ApplyAllOrders = true,
+        },
+        [22] = {
+            Type = "TransportLoadUnits",
+            Callback = nil,
+            RequiresEntity = false,
+            Redundancy = 1,
+            ApplyAllOrders = false,
+        },
+        [23] = {
+            Type = "TransportReverseLoadUnits",
+            Callback = nil,
+            RequiresEntity = false,
+            Redundancy = 1,
+            ApplyAllOrders = false,
+        },
+        [24] = {
+            Type = "TransportUnloadUnits",
+            Callback = IssueTransportUnload,
+            RequiresEntity = false,
+            Redundancy = 1,
+            ApplyAllOrders = false,
+        },
+        [25] = {
+            Type = "TransportUnloadSpecificUnits",
+            Callback = nil,
+            RequiresEntity = false,
+            Redundancy = 1,
+            ApplyAllOrders = false,
+        },
+        [26] = {
+            Type = "DetachFromTransport",
+            Callback = nil,
+            RequiresEntity = false,
+            Redundancy = 1,
+            ApplyAllOrders = false,
+        },
+        [27] = {
+            Type = "Upgrade",
+            Callback = nil,
+            RequiresEntity = false,
+            Redundancy = 1,
+            ApplyAllOrders = false,
+        },
+        [28] = {
+            Type = "Script",
+            Callback = nil,
+            RequiresEntity = false,
+            Redundancy = 1,
+            ApplyAllOrders = false,
+        },
+        [29] = {
+            Type = "AssistCommander",
+            Callback = IssueGuard,
+            RequiresEntity = true,
+            Redundancy = 1,
+            ApplyAllOrders = true,
+        },
+        [30] = {
+            Type = "KillSelf",
+            Callback = nil,
+            RequiresEntity = false,
+            Redundancy = 1,
+            ApplyAllOrders = false,
+        },
+        [31] = {
+            Type = "DestroySelf",
+            Callback = nil,
+            RequiresEntity = false,
+            Redundancy = 1,
+            ApplyAllOrders = false,
+        },
+        [32] = {
+            Type = "Sacrifice",
+            Callback = IssueSacrifice,
+            RequiresEntity = true,
+            Redundancy = 1,
+            ApplyAllOrders = false,
+        },
+        [33] = {
+            Type = "Pause",
+            Callback = nil,
+            RequiresEntity = false,
+            Redundancy = 1,
+            ApplyAllOrders = false,
+        },
+        [34] = {
+            Type = "OverCharge",
+            Callback = nil,
+            RequiresEntity = false,
+            Redundancy = 1,
+            ApplyAllOrders = false,
+        },
+        [35] = {
+            Type = "AggressiveMove",
+            Callback = IssueAggressiveMove,
+            RequiresEntity = false,
+            Redundancy = 1,
+            ApplyAllOrders = true,
+        },
+        [36] = {
+            Type = "FormAggressiveMove",
+            Callback = IssueAggressiveMove,
+            RequiresEntity = false,
+            Redundancy = 1,
+            ApplyAllOrders = true,
+        },
+        [37] = {
+            Type = "AssistMove",
+            Callback = nil,
+            RequiresEntity = false,
+            Redundancy = 1,
+            ApplyAllOrders = true,
+        },
+        [38] = {
+            Type = "SpecialAction",
+            Callback = nil,
+            RequiresEntity = false,
+            Redundancy = 1,
+            ApplyAllOrders = false,
+        },
+        [39] = {
+            Type = "Dock",
+            Callback = nil,
+            RequiresEntity = false,
+            Redundancy = 1,
+            ApplyAllOrders = false,
+        },
+    }
+
+    --- Processes the orders and re-distributes them over the units
+    ---@param data any
+    ---@param units Unit[]
+    Callbacks.DistributeOrders = function(data, units)
+        -- prevent cheating
+        local units = SecureUnits(units)
+        if not (units and units[1]) then
+            return
+        end
+
+        -- bundle the orders
+        local groups = {}
+        local orders = units[1]:GetCommandQueue()
+        for k, order in orders do
+            -- find the last group
+            local group = groups[table.getn(groups)]
+            if not group then
+                group = {}
+                table.insert(groups, group)
+            end
+
+            -- edge case: group has no orders, so we add this order and call it a day
+            if not group[1] then
+                table.insert(group, order)
+                -- usual case: check if the current group is of the same type of order, if so add to the group otherwise create a new group
+            else
+                if group[1].commandType == order.commandType then
+                    table.insert(group, order)
+                else
+                    table.insert(groups, { order })
+                end
+            end
+        end
+
+        -- clear existing orders
+        IssueClearCommands(units)
+
+        -- assign orders in an interleaved fashion
+        local offset = 0
+        local unitCount = table.getn(units)
+        for k, group in groups do
+
+            local orderCount = table.getn(group)
+
+            -- extract info on how to apply these orders
+            local commandInfo = CommandInfo[group[1].commandType]
+            local issueOrder = commandInfo.Callback
+            local redundantOrders = commandInfo.Redundancy
+            local applyAllOrders = commandInfo.ApplyAllOrders
+            local batchOrders = commandInfo.BatchOrders
+
+            -- increase redundancy to guarantee all orders are applied at least once
+            if applyAllOrders and (unitCount * redundantOrders < orderCount) then
+                redundantOrders = math.ceil(orderCount / (unitCount * redundantOrders))
+            end
+
+            if issueOrder then
+                if batchOrders then
+                    LOG("Batching orders")
+
+                    -- prepare orders
+                    for _, order in group do
+                        order.Entity = order.target
+                        order.Location = { order.x, order.y, order.z }
+                    end
+
+                    local unitsPerBatch = math.ceil(unitCount / orderCount)
+                    local redundancy = orderCount
+                    LOG(string.format("Units per batch: %d", unitsPerBatch))
+                    LOG(string.format("Redundancy: %d", redundancy))
+                    local ordersApplied =  0
+                    -- issue orders
+                    for b = 1, redundancy do
+                        for o, _ in group do
+                            -- give an offset to each order
+                            local order = group[math.mod(o + b, orderCount) + 1]
+
+                            -- compute the batch of units
+                            local batch = { }
+                            for k = 1, unitsPerBatch do
+                                local unit = units[k + (b - 1) * unitsPerBatch]
+                                if unit then
+                                    table.insert(batch, unit)
+                                end
+                            end
+
+                            -- LOG(string.format("Apply order at: (%s)", repru(order.Location)))
+                            -- for k, unit in batch do
+                            --     LOG(unit.EntityId)
+                            -- end
+
+                            ordersApplied = ordersApplied + 1
+
+                            if order.Entity then
+                                issueOrder(batch, order.Entity)
+                            elseif commandInfo.Type == 'BuildMobile' then
+                                issueOrder(batch, order.Location, order.blueprintId, {})
+                            elseif not commandInfo.RequiresEntity then
+                                issueOrder(batch, order.Location)
+                            end
+                        end
+                    end
+
+                    LOG(string.format("Orders applied: %d", ordersApplied))
+                else
+                    -- apply individual orders
+                    for _, unit in units do
+                        -- apply orders
+                        for redundancy = 1, math.min(orderCount, redundantOrders) do
+                            local order = group[math.mod(offset, orderCount) + 1]
+                            local candidate = order.target
+                            if candidate then
+                                issueOrder({ unit }, candidate)
+                                offset = offset + 1
+                            else
+                                -- at this point we may need an entity, so we check and bail if we do need one
+                                if commandInfo.Type == 'BuildMobile' then
+                                    issueOrder({ unit }, { order.x, order.y, order.z }, order.blueprintId, {})
+                                    offset = offset + 1
+                                elseif not commandInfo.RequiresEntity then
+                                    issueOrder({ unit }, { order.x, order.y, order.z })
+                                    offset = offset + 1
+                                end
+                            end
+                        end
+                    end
+                end
+            end
+        end
+    end
+end
+
+--#endregion
+
 -------------------------------------------------------------------------------
---@region Development / debug related functionality
+--#region Development / debug related functionality
 
 --- An anti cheat check that passes when there is only 1 player or cheats are enabled
 ---@return boolean
@@ -629,8 +1084,6 @@ local PassesAIAntiCheatCheck = function()
     -- allow when cheats are enabled
     return PassesAntiCheatCheck()
 end
-
-
 
 local SpawnedMeshes = {}
 

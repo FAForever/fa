@@ -11,7 +11,7 @@
 local AircraftCarrier = import("/lua/defaultunits.lua").AircraftCarrier
 local CybranWeaponsFile = import("/lua/cybranweapons.lua")
 local CAAAutocannon = CybranWeaponsFile.CAAAutocannon
-local CAMZapperWeapon = CybranWeaponsFile.CAMZapperWeapon
+local CAMZapperWeapon = CybranWeaponsFile.CAMZapperWeapon03
 local loading = false
 
 ---@class URS0303 : AircraftCarrier
