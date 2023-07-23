@@ -52,6 +52,7 @@ CategoriesSkipped  = {
     ["NOFORMATION"] = true,
     ["UNSELECTABLE"] = true,
     ["UNTARGETABLE"] = true,
+    ["UNSPAWNABLE"] = true,
     ["zxa0001"] = true,    -- Dummy unit for gifting unfinished buildings
     ["uab5103"] = true,    -- Aeon Quantum Gate Beacon
     ["uab5204"] = true,    -- Concrete
@@ -492,11 +493,13 @@ end
 -- Get specs for a weapon with projectiles
 function GetWeaponProjectile(bp, weapon)
 
+    -- note we cannot use global __blueprints variable here because it is created on SIM side 
+    -- when the game is being loaded so we using local blueprints variable created in this file
     local split = 1
-    local projPhysics = __blueprints[weapon.ProjectileId].Physics
+    local projPhysics = blueprints[weapon.ProjectileId].Physics
     while projPhysics do
         split = split * (projPhysics.Fragments or 1)
-        projPhysics = __blueprints[projPhysics.FragmentId].Physics
+        projPhysics = blueprints[projPhysics.FragmentId].Physics
     end
     weapon.Multi = split
 
