@@ -16,6 +16,17 @@ local function PostProcessProp(prop)
         end
     end
 
+    -- an little bit of an odd hack to guarantee wrecks block construction sites. The file that wrecks use is here:
+    -- - /props/DefaultWreckage/DefaultWreckage_prop.bp
+    -- 
+    -- but we do not distribute the `props` folder, which means that everything that is in there is ignored in production
+    -- therefore we try and catch all wreck related props here
+    if prop.ScriptClass == "Wreckage" and prop.ScriptModule == '/lua/wreckage.lua' then
+        LOG(prop.BlueprintId)
+        table.insert(prop.Categories, 'OBSTRUCTSBUILDING')
+        prop.CategoriesHash['OBSTRUCTSBUILDING'] = true
+    end
+
     -- check for props that should block pathing
     if not (prop.ScriptClass == "Tree" or prop.ScriptClass == "TreeGroup") and prop.CategoriesHash['RECLAIMABLE'] then
         if prop.Economy and prop.Economy.ReclaimMassMax and prop.Economy.ReclaimMassMax > 0 and not prop.CategoriesHash['OBSTRUCTSBUILDING'] then
