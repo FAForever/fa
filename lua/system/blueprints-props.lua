@@ -22,7 +22,6 @@ local function PostProcessProp(prop)
     -- but we do not distribute the `props` folder, which means that everything that is in there is ignored in production
     -- therefore we try and catch all wreck related props here
     if prop.ScriptClass == "Wreckage" and prop.ScriptModule == '/lua/wreckage.lua' then
-        LOG(prop.BlueprintId)
         table.insert(prop.Categories, 'OBSTRUCTSBUILDING')
         prop.CategoriesHash['OBSTRUCTSBUILDING'] = true
     end
