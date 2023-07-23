@@ -3,11 +3,10 @@ ProjectileBlueprint {
         'AEON',
         'PROJECTILE',
         'MISSILE',
+        'NOSPLASHDAMAGE'
     },
     Display = {
         CameraFollowsProjectile = true,
-
-        -- ----MeshBlueprint = '/units/DAA0206/DAA0206_mesh.bp',
         StrategicIconSize = 2,
         UniformScale = 0.09,
     },

@@ -20,6 +20,7 @@ ProjectileBlueprint {
         'AEON',
         'PROJECTILE',
         'MISSILE',
+        'NOSPLASHDAMAGE'
     },
     Defense = {
         MaxHealth = 1,
@@ -49,7 +50,8 @@ ProjectileBlueprint {
         MaxSpeed = 35,
         MaxZigZag = 10,
         TrackTarget = false,
-        TurnRate = 180,
+        TurnRate = 40,
+        TurnRateRange = 10,
         UseGravity = false,
         VelocityAlign = true,
         ZigZagFrequency = 0.2,
