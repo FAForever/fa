@@ -386,6 +386,14 @@ function CapStructure(command)
                 pStructure1 = nil
                 pStructure2 = nil
 
+            -- if we have a T3 Air Factory, create T3 pgens around it
+            elseif structure:IsInCategory('AIR') and structure:IsInCategory('FACTORY') and isTech3 then
+                SimCallback({ Func = 'CapStructure', Args = { target = command.Target.EntityId, layer = 1, id = "b1301" } }, true)
+                -- reset state
+                structure = nil
+                pStructure1 = nil
+                pStructure2 = nil
+
             -- if we have a radar, create T1 pgens around it
             elseif structure:IsInCategory('RADAR')
                 and (
