@@ -1,76 +1,38 @@
-# Game version 3762 (22th of July, 2023)
+# Game version 3763 (23th of July, 2023)
 
 See the patch notes of 3762 and 3758 for the full patch notes.
+
+There was a misconception with the distribution of files and as a result, wrecks would be removed in 
+the release branch when you build on top of them. It was fun while it lasted ^^
 
 Jip
 
 ## Features
 
-- (#5197, #16) Small props and trees are ignored when building
+- (#5262) Introduce the ability to cap additional structures
 
-  You can now build on top of logs, bushes, cacti, (fallen) trees and tree groups. This is a quality-of-life change to 
-  prevent your ACU or your engineers from delaying your build order because there is an invisible prop (due to Level of 
-  Details (LODs)) 'blocking' your construction site. This can significantly delay the construction. Instead, the 
-  before-mentioned props are destroyed when you start the construction.
+  You can now also cap the following structures:
 
-  To be specific, the following props will still block your construction site:
+  - Tech 3 air factories with tech 3 power generators
+  - Tech 3 or experimental artillery with tech 3 power generators
 
-  - Any wreck, regardless of mass value
-  - Any rock, regardless of mass value
-  - Any non-tree prop of significant (>= 10) mass value in general
-
-  For the next patch, the goal is to allow you to entirely rely on the reclaim overview to manage your expectations of 
-  whether the construction site is blocked by props.
-
-- (#5246) Do not immediately destroy units of teams that recall
-
-  There was a suggestion on the forum to be able to review the final game state when a team recalls. With this delay, the 
-  units are preserved in the final game state, yet still destroyed when you play FFA-like setups
-
-- (#5247) Re-introduce a hotkey that allows you to filter your selection and assist the highest tech engineers of your 
-selection
-
-## AI
-
-- (#5234) Fix a bug where nuke launchers did not generate the correct threat
-
-  They were categorized by AI as a unit with excessive surface threat, instead of economic threat. As a result, the AI would 
-  essentially never attack a base with a nuke launcher in it
-
-- (#5234) Fix a bug where mobile artillery and missile launchers did not generate the correct threat
-
-  They were categorized by the AI as units with economic threat instead of surface threat. As a result, the AI would 
-  recognize them as bulky engineers instead of something more dangerous
-
-- (#5156, #5164) Add additional debug utilities for the Navigational Mesh
+  To use these you need the game option 'Automate Structure Ringing' to be on 'Full Suite'
 
 ## Bug fixes
 
-- (#5218) Fix a bug when trying to give a unit a veterancy of 0
+- (#5266) Fix wrecks being removed when constructing on top of them
 
-  A few campaign maps did this and the bug prevented the scripts to continue
+- (#5265) Fix the UI scaling of the unit cheat menu
 
-- (#5219, #5236) Fix a bug in campaign maps related to missing categories
+- (#5237) Fix the visuals and damage output of the Mercy
 
-- (#5219, #5236) Fix a bug with the unit restrictions menu related to missing categories
+  The visuals can now be seen when you're zoomed out and the Mercy deals exactly 600 area damage at the 
+  center of the target
 
-- (#5162) Fix shield visibility on land-only maps
-
-- (#5245) Fix a bug where the idle animation of the Seraphim tech 2 extractor does not stop when upgrading
-
-## Graphics
-
-- (#5171) Add or fix existing LODs of various Aeon units
-
-## Performance
-
-- (#5250) Reduce the performance impact of the AA weaponry of Seraphim frigates
+- (#5191) Fix the size of the zapper on the Cybran Aircraft Carrier
 
 ## Contributors
 
-- 4z0t (#16)
-- BlackYps (#5162)
-- Relent0r (#5234)
-- Basilisk3 (#5250)
-- MadMax (#5171)
-- Jip (#5156, #5164, #5197, #5219, #5245, #5247)
+- Jip (#5265, #5266, #5237)
+- MadMax (#5191)
+- Hussar (#5262)
