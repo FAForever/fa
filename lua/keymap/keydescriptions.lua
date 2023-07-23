@@ -169,7 +169,6 @@ keyDescriptions = {
     ['toggle_build_mode'] = '<LOC key_desc_0102>Toggles keyboard build command mode on and off',
     ['toggle_reclaim_labels'] = '<LOC key_desc_0103>Toggles reclaim labels on and off',
     ['select_upgrading_extractors'] = '<LOC key_desc_select_upgrading_extractors>Select all extractors that are upgrading',
-    ['filter_highest_engineer_and_assist'] = '<LOC key_desc_filter_highest_engineer_and_assist>Filter the selection to the most advanced engineer, all other engineers assist that engineer',
     ['select_all_radars'] = '<LOC key_desc_select_all_radars>Select all radars',
     ['decrease_game_speed'] = '<LOC key_desc_0079>Decrease game speed',
     ['increase_game_speed'] = '<LOC key_desc_0080>Increase game speed',
@@ -517,4 +516,8 @@ keyDescriptions = {
     ['toggle_ai_nav_random_direction_from'] = 'NavUtils - Toggle to visualize output of RandomDirectionFrom ',
     ['toggle_ai_nav_retreat_direction_from'] = 'NavUtils - Toggle to visualize output of RetreatDirectionFrom ',
     ['toggle_ai_nav_direction_to'] = 'NavUtils - Toggle to visualize output of DirectionTo',
+
+    ['filter_highest_engineer_and_assist'] = '<LOC key_desc_filter_highest_engineer_and_assist>Filter the selection to the most advanced engineer, all other engineers assist that engineer',
+    ['distribute_orders'] = '<LOC key_desc_distribute_orders>Distribute orders of the selected units',
+    ['shift_distribute_orders'] = '<LOC key_desc_distribute_orders>Distribute orders of the selected units',
 }
