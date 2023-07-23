@@ -1,4 +1,5 @@
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
+local UIScale = LayoutHelpers.GetPixelScaleFactor()
 local Group = import('/lua/maui/group.lua').Group
 local Text = import('/lua/maui/text.lua').Text
 local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
@@ -689,9 +690,9 @@ function CreateNameFilter(data)
     local group = Group(windowGroup)
     group.Width:Set(dialog.Width)
     if data.choices and data.choices[1] and table.getn(data.choices) > FilterColumnCount then
-        group.Height:Set(30 + math.floor((table.getn(data.choices)-1)/FilterColumnCount) * 25)
+        LayoutHelpers.SetHeight(group, 30 + math.floor((table.getn(data.choices)-1)/FilterColumnCount) * 25)
     else
-        group.Height:Set(30)
+        LayoutHelpers.SetHeight(group, 30)
     end
 
     group.check = UIUtil.CreateCheckboxStd(group, '/dialogs/check-box_btn/radio')
@@ -778,8 +779,8 @@ function CreateNameFilter(data)
         group.edit:SetBackgroundColor('ff333333')
         group.edit:SetHighlightForegroundColor(UIUtil.highlightColor)
         group.edit:SetHighlightBackgroundColor("880085EF")
-        group.edit.Width:Set((FilterColumnCount-2)*82+15)
-        group.edit.Height:Set(15)
+        LayoutHelpers.SetWidth(group.edit, (FilterColumnCount-2)*82+15)
+        LayoutHelpers.SetHeight(group.edit, 15)
         group.edit:SetText(filterSet[data.key].editText or '')
         group.edit:SetFont(UIUtil.bodyFont, 12)
         group.edit:SetMaxChars(20)
@@ -837,10 +838,10 @@ end
 
 function CreateWindowContentGroup(parent)
     local windowGroup = Group(parent:GetClientGroup())
-    windowGroup.Bottom:Set(function() return parent.Bottom()-WindowBorderThickness end)
-    windowGroup.Right:Set(function() return parent.Right()-WindowBorderThickness end)
-    windowGroup.Left:Set(function() return parent.Left()+WindowBorderThickness end)
-    windowGroup.Top:Set(function() return parent.Top()+WindowHeaderThickness end)
+    windowGroup.Bottom:Set(function() return parent.Bottom()-WindowBorderThickness * UIScale end)
+    windowGroup.Right:Set(function() return parent.Right()-WindowBorderThickness * UIScale end)
+    windowGroup.Left:Set(function() return parent.Left()+WindowBorderThickness * UIScale end)
+    windowGroup.Top:Set(function() return parent.Top()+WindowHeaderThickness * UIScale end)
     return windowGroup
 end
 
@@ -930,8 +931,8 @@ function CreateDialog()
         element:SetBackgroundColor('ff333333')
         element:SetHighlightForegroundColor(UIUtil.highlightColor)
         element:SetHighlightBackgroundColor("880085EF")
-        element.Width:Set(30)
-        element.Height:Set(15)
+        LayoutHelpers.SetWidth(element, 30)
+        LayoutHelpers.SetHeight(element, 15)
         element:SetFont(UIUtil.bodyFont, 12)
         element:SetMaxChars(4)
         element:SetText(data.default)
@@ -1176,7 +1177,7 @@ function CreateDialog()
 
     local function CreateArmySelectionSlot(parent, index, armyData)
         local group = Bitmap(parent)
-        group.Height:Set(armyData.height or 30)
+        group.Height:Set(armyData.height or (30 * UIScale))
         group.Width:Set(armyData.width or function() return parent.Width() / TeamColumnCount end)
 
         local icon, iconBG
@@ -1186,8 +1187,8 @@ function CreateDialog()
             name:DisableHitTest()
         else
             iconBG = Bitmap(group)
-            iconBG.Width:Set(30)
-            iconBG.Height:Set(30)
+            LayoutHelpers.SetWidth(iconBG, 30)
+            LayoutHelpers.SetHeight(iconBG, 30)
             iconBG:SetSolidColor(armyData.color)
             LayoutHelpers.AtLeftTopIn(iconBG, group)
             iconBG:DisableHitTest()
@@ -1289,7 +1290,7 @@ function CreateDialog()
     armiesGroup.Height:Set(function() return lowestControl.Bottom() - armiesGroup.armySlots[1].Top() end)
 
     local filterSetCombo = import('/lua/ui/controls/combo.lua').Combo(windowGroup, 14, 10, nil, nil, "UI_Tab_Click_01", "UI_Tab_Rollover_01")
-    filterSetCombo.Width:Set(function() return windowGroup.Width()-254 end)
+    filterSetCombo.Width:Set(function() return windowGroup.Width() - (254 * UIScale) end)
     LayoutHelpers.Below(filterSetCombo, armiesGroup, 5)
     filterSetCombo.OnClick = function(self, index, text, skipUpdate)
         SetFilters(self.keyMap[index])
@@ -1386,7 +1387,7 @@ function CreateDialog()
     -- UNIT LIST
     windowGroup.unitList = Group(windowGroup)
     windowGroup.unitList.Height:Set(function() return footerGroup.Top() - filterGroups[table.getn(filterGroups)].Bottom() end)
-    windowGroup.unitList.Width:Set(function() return windowGroup.Width() - 40 end)
+    windowGroup.unitList.Width:Set(function() return windowGroup.Width() - 40 * UIScale end)
     LayoutHelpers.Below(windowGroup.unitList, filterGroups[table.getn(filterGroups)])
     LayoutHelpers.AtHorizontalCenterIn(windowGroup.unitList, windowGroup, -15)
 
@@ -1479,10 +1480,9 @@ function CreateDialog()
             end
         end
 
-        mouseover.Left:Set(x+20)
-        mouseover.Top:Set(y+20)
-        mouseover.Height:Set(300)
-        mouseover.Width:Set(300)
+        mouseover.Left:Set(x+20  * UIScale)
+        mouseover.Top:Set(y+20 * UIScale)
+        LayoutHelpers.SetDimensions(mouseover.img, 300, 300)
         mouseover.Depth:Set(GetFrame(0):GetTopmostDepth() + 1)
     end
     local function CreateElementMouseover(unitData,x,y)
@@ -1491,8 +1491,7 @@ function CreateDialog()
         mouseover:SetSolidColor('dd115511')
 
         mouseover.img = Bitmap(mouseover)
-        mouseover.img.Width:Set(40)
-        mouseover.img.Height:Set(40)
+        LayoutHelpers.SetDimensions(mouseover.img, 40, 40)
         LayoutHelpers.AtLeftTopIn(mouseover.img, mouseover, 2,2)
 
         SetUnitImage(mouseover.img, unitData)
@@ -1509,10 +1508,10 @@ function CreateDialog()
         LayoutHelpers.AtLeftIn(mouseover.desc, mouseover, 44)
         LayoutHelpers.AtBottomIn(mouseover.desc, mouseover, 5)
 
-        mouseover.Left:Set(x+20)
-        mouseover.Top:Set(y+20)
-        mouseover.Height:Set(function() return mouseover.img.Height() + 4 end)
-        mouseover.Width:Set(function() return mouseover.img.Width() + math.max(mouseover.name.Width(), mouseover.desc.Width()) + 8 end)
+        mouseover.Left:Set(x+20 * UIScale)
+        mouseover.Top:Set(y+20 * UIScale)
+        mouseover.Height:Set(function() return mouseover.img.Height() + 4 * UIScale end)
+        mouseover.Width:Set(function() return mouseover.img.Width() + math.max(mouseover.name.Width(), mouseover.desc.Width()) + 8 * UIScale end)
         mouseover.Depth:Set(GetFrame(0):GetTopmostDepth() + 1)
     end
     local MouseOverElement = {
@@ -1522,8 +1521,8 @@ function CreateDialog()
     }
     local function MoveMouseover(x,y)
         if mouseover then
-            mouseover.Left:Set(x+20)
-            mouseover.Top:Set(y+20)
+            mouseover.Left:Set(x+20 * UIScale)
+            mouseover.Top:Set(y+20 * UIScale)
         end
     end
     local function DestroyMouseover()
@@ -1554,7 +1553,7 @@ function CreateDialog()
             windowGroup.unitEntries[index] = Bitmap(windowGroup.unitList)
             windowGroup.unitEntries[index].Left:Set(windowGroup.unitList.Left)
             windowGroup.unitEntries[index].Right:Set(windowGroup.unitList.Right)
-            windowGroup.unitEntries[index].Height:Set(16)
+            windowGroup.unitEntries[index].Height:Set(16 * UIScale)
             windowGroup.unitEntries[index].HandleEvent = function(self, event)
                 if event.Type == 'MouseEnter' then
                     if MouseOverElement[DialogMode] then
@@ -1601,8 +1600,8 @@ function CreateDialog()
             LayoutHelpers.AtLeftTopIn(windowGroup.unitEntries[index].id2, windowGroup.unitEntries[index], (DialogMode == 'templates' and 50 or 100) + (options.spawn_menu_show_icons and 18 or 2))
             if options.spawn_menu_show_icons then
                 windowGroup.unitEntries[index].img = Bitmap(windowGroup.unitEntries[index])
-                windowGroup.unitEntries[index].img.Height:Set(16)
-                windowGroup.unitEntries[index].img.Width:Set(16)
+                windowGroup.unitEntries[index].img.Height:Set(16 * UIScale)
+                windowGroup.unitEntries[index].img.Width:Set(16 * UIScale)
                 LayoutHelpers.AtLeftTopIn(windowGroup.unitEntries[index].img, windowGroup.unitEntries[index])
             end
         end
@@ -1758,11 +1757,11 @@ function NameSet(callback)
     nameDialog.Depth:Set(GetFrame(0):GetTopmostDepth() + 10)
 
     local label = UIUtil.CreateText(nameDialog, "Name your filter set:", 16, UIUtil.buttonFont)
-    label.Left:Set(function() return nameDialog.Left() + 35 end)
-    label.Top:Set(function() return nameDialog.Top() + 30 end)
+    label.Left:Set(function() return nameDialog.Left() + 35 * UIScale end)
+    label.Top:Set(function() return nameDialog.Top() + 30 * UIScale end)
 
     local cancelButton = UIUtil.CreateButtonStd(nameDialog, '/widgets02/small', "<LOC _CANCEL>", 12)
-    cancelButton.Top:Set(function() return nameDialog.Top() + 112 end)
+    cancelButton.Top:Set(function() return nameDialog.Top() + 112 * UIScale end)
     cancelButton.Left:Set(function() return nameDialog.Left() + (((nameDialog.Width() / 4) * 1) - (cancelButton.Width() / 2)) end)
     cancelButton.OnClick = function(self, modifiers)
         nameDialog:Destroy()
@@ -1772,14 +1771,14 @@ function NameSet(callback)
     --TODO this should be in layout
     local nameEdit = Edit(nameDialog)
     LayoutHelpers.AtLeftTopIn(nameEdit, nameDialog, 35, 60)
-    nameEdit.Width:Set(283)
+    nameEdit.Width:Set(283 * UIScale)
     nameEdit.Height:Set(nameEdit:GetFontHeight())
     nameEdit:ShowBackground(false)
     nameEdit:AcquireFocus()
     UIUtil.SetupEditStd(nameEdit, UIUtil.fontColor, nil, nil, nil, UIUtil.bodyFont, 16, 30)
 
     local okButton = UIUtil.CreateButtonStd(nameDialog, '/widgets02/small', "<LOC _OK>", 12)
-    okButton.Top:Set(function() return nameDialog.Top() + 112 end)
+    okButton.Top:Set(function() return nameDialog.Top() + 112 * UIScale end)
     okButton.Left:Set(function() return nameDialog.Left() + (((nameDialog.Width() / 4) * 3) - (okButton.Width() / 2)) end)
     okButton.OnClick = function(self, modifiers)
         local newName = nameEdit:GetText()
@@ -1828,7 +1827,7 @@ function CreateDebugConfig()
     )
     debugConfig:SetWindowAlpha((options.spawn_menu_alpha or 80)/100)
     debugConfig.Depth:Set(GetFrame(0):GetTopmostDepth() + 1)
-    debugConfig.Width:Set(300)
+    debugConfig.Width:Set(300 * UIScale)
 
     debugConfig.OnClose = function(self)
         debugConfig:Destroy()
@@ -1966,8 +1965,8 @@ function CreateTemplateOptionsMenu(button)
             end
             for iconType, _ in contents do
                 local bmp = Bitmap(group, '/textures/ui/common/icons/units/'..iconType..'_icon.dds')
-                bmp.Height:Set(30)
-                bmp.Width:Set(30)
+                bmp.Height:Set(30 * UIScale)
+                bmp.Width:Set(30 * UIScale)
                 bmp.ID = iconType
                 table.insert(controls, bmp)
             end
