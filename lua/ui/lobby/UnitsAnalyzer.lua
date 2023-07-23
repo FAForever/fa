@@ -52,6 +52,7 @@ CategoriesSkipped  = {
     ["NOFORMATION"] = true,
     ["UNSELECTABLE"] = true,
     ["UNTARGETABLE"] = true,
+    ["DUMMYUNIT"] = true,
     ["zxa0001"] = true,    -- Dummy unit for gifting unfinished buildings
     ["uab5103"] = true,    -- Aeon Quantum Gate Beacon
     ["uab5204"] = true,    -- Concrete
@@ -491,14 +492,19 @@ end
 
 -- Get specs for a weapon with projectiles
 function GetWeaponProjectile(bp, weapon)
+    -- Multipliers is needed to properly calculate split projectiles.
+    -- Unfortunately these numbers hard-coded here are not available in the blueprint,
+    -- but specified in the .lua files for corresponding projectiles.
+    local multipliers = {
+        -- Lobo
+        ['/projectiles/TIFFragmentationSensorShell01/TIFFragmentationSensorShell01_proj.bp'] = 4,
+        -- Zthuee
+        ['/projectiles/SIFThunthoArtilleryShell01/SIFThunthoArtilleryShell01_proj.bp'] = 5
+    }
 
-    local split = 1
-    local projPhysics = __blueprints[weapon.ProjectileId].Physics
-    while projPhysics do
-        split = split * (projPhysics.Fragments or 1)
-        projPhysics = __blueprints[projPhysics.FragmentId].Physics
+    if weapon.ProjectileId then
+       weapon.Multi = multipliers[weapon.ProjectileId] or 1
     end
-    weapon.Multi = split
 
     -- NOTE that weapon.ProjectilesPerOnFire is not used at all in FA game
     if weapon.MuzzleSalvoSize > 1 then

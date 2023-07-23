@@ -891,6 +891,8 @@ local function SpawnMenuDummyChanges(all_bps)
                     Categories = {
                         'DRAGBUILD',
                         'UNSPAWNABLE',
+                        'INSIGNIFICANTUNIT',
+                        'DUMMYUNIT',
                     },
                     Display = {
                         BuildMeshBlueprint = '/meshes/game/nil_mesh',
