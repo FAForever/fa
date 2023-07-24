@@ -932,13 +932,16 @@ do
         -----------------------------------------------------------------------
         -- bundle the orders
 
+        ---@type table<EntityId, boolean>
+        local seen = { }
+
         ---@type number | nil
         local px = nil
 
         ---@type number | nil
         local pz = nil
 
-        local groups = {}
+        local groups = {{}}
         local orders = units[1]:GetCommandQueue()
         for k, order in orders do
 
@@ -952,20 +955,34 @@ do
 
             -- find the last group
             local group = groups[table.getn(groups)]
-            if not group then
-                group = {}
-                table.insert(groups, group)
+
+            -- try and remove duplicated orders
+            local targetId = order.targetId
+            if targetId then
+                if seen[targetId] then
+                    continue
+                end
+                seen[targetId] = true
             end
 
-            -- edge case: group has no orders, so we add this order and call it a day
+            -- edge case: group has no orders, so we add this order and 
+            -- call it a day
             if not group[1] then
                 table.insert(group, order)
-                -- usual case: check if the current group is of the same type of order, if so add to the group otherwise create a new group
+                -- usual case: check if the current group is of the same 
+                -- type of order, if so add to the group otherwise create 
+                -- a new group
             else
                 if group[1].commandType == order.commandType then
                     table.insert(group, order)
                 else
                     table.insert(groups, { order })
+
+                    -- the 'seen' table is per group of orders
+                    seen = { }
+                    if targetId then
+                        seen[targetId] = true
+                    end
                 end
             end
         end
@@ -977,22 +994,24 @@ do
         -- the order is defined by the entityId, which is essentially random in 
         -- the average case
 
-        for _, unit in units do
-            local ux, _, uz = unit:GetPositionXYZ()
-            local dx = ux - px
-            local dz = uz - pz
-            unit.DistributeOrdersDistance = dx * dx + dz * dz
-        end
-
-        table.sort(
-            units,
-            function(a, b)
-                return a.DistributeOrdersDistance < b.DistributeOrdersDistance
+        if px and pz then
+            for _, unit in units do
+                local ux, _, uz = unit:GetPositionXYZ()
+                local dx = ux - px
+                local dz = uz - pz
+                unit.DistributeOrdersDistance = dx * dx + dz * dz
             end
-        )
 
-        for _, unit in units do
-            unit.DistributeOrdersDistance = nil
+            table.sort(
+                units,
+                function(a, b)
+                    return a.DistributeOrdersDistance < b.DistributeOrdersDistance
+                end
+            )
+
+            for _, unit in units do
+                unit.DistributeOrdersDistance = nil
+            end
         end
 
         -----------------------------------------------------------------------
