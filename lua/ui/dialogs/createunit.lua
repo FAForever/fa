@@ -1081,12 +1081,12 @@ function CreateDialog()
         -- cheating in, is reset in EndCommandMode of '/lua/ui/game/commandmode.lua'
         local selection = GetSelectedUnits()
         SelectUnits(nil);
-            -- using user provided count of units or defaulting to creating 1 unit
+
         local commandModeData  = {
             cheat = true,
             name = id,
             army = currentArmy,
-
+            -- using user provided count of units or defaulting to creating 1 unit
             count = dialogData.inputCount and dialogData.inputCount:GetValue() or 1,
             vet = dialogData.inputVet and dialogData.inputVet:GetValue() or 0,
             yaw = (dialogData.inputYaw and dialogData.inputYaw:GetValue() or 0) / 57.295779513,
