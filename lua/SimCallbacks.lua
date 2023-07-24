@@ -941,7 +941,7 @@ do
         ---@type number | nil
         local pz = nil
 
-        local groups = {}
+        local groups = {{}}
         local orders = units[1]:GetCommandQueue()
         for k, order in orders do
 
@@ -955,32 +955,36 @@ do
 
             -- find the last group
             local group = groups[table.getn(groups)]
-            if not group then
-                group = {}
-                seen = { }
-                table.insert(groups, group)
-            end
 
             -- try and remove duplicated orders
-            if not seen[order.targetId] then
-                seen[order.targetId] = true
+            local targetId = order.targetId
+            if targetId then
+                if seen[targetId] then
+                    LOG("Skipping an order!")
+                    continue
+                end
+                seen[targetId] = true
+            end
 
-                -- edge case: group has no orders, so we add this order and 
-                -- call it a day
-                if not group[1] then
+            -- edge case: group has no orders, so we add this order and 
+            -- call it a day
+            if not group[1] then
+                table.insert(group, order)
+                -- usual case: check if the current group is of the same 
+                -- type of order, if so add to the group otherwise create 
+                -- a new group
+            else
+                if group[1].commandType == order.commandType then
                     table.insert(group, order)
-                    -- usual case: check if the current group is of the same 
-                    -- type of order, if so add to the group otherwise create 
-                    -- a new group
                 else
-                    if group[1].commandType == order.commandType then
-                        table.insert(group, order)
-                    else
-                        table.insert(groups, { order })
+                    table.insert(groups, { order })
+
+                    -- the 'seen' table is per group of orders
+                    seen = { }
+                    if targetId then
+                        seen[targetId] = true
                     end
                 end
-            else
-                LOG("Skipping an order!")
             end
         end
 
