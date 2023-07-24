@@ -982,7 +982,8 @@ function CreateDialog()
 
     local NumberInputFields = {
         units = {
-            {label='Count', name = 'Count',     default=1,   check=math.max},
+            -- creating input fields for count, vet, and rotation
+            {label='Count', name = 'Count',     default=1,   check=math.max, max=200},
             {label='Vet',   name = 'Veterancy', default=0,   check=math.max, max=5},
             {label='Yaw',   name = 'Rotation',  default=360, check=math.mod},
         },
@@ -1008,7 +1009,6 @@ function CreateDialog()
 
     if NumberInputFields[DialogMode] then
         for i, inputdata in NumberInputFields[DialogMode] do
-
             local textlabel = UIUtil.CreateText(footerGroup, inputdata.name..':', 12, UIUtil.bodyFont)
             local inputfield
             if options.spawn_menu_footer_text_input then
@@ -1023,7 +1023,6 @@ function CreateDialog()
             else--if inputdata.type == 'slider' then
                 inputfield = Group(footerGroup)
                 LayoutHelpers.SetHeight(inputfield, 30)
-
                 local slider = IntegerSlider(inputfield, false,
                     inputdata.default==1 and 1 or 0, math.max(inputdata.max or 10, inputdata.default), inputdata.default==360 and 15 or 1,
                     UIUtil.SkinnableFile('/slider02/slider_btn_up.dds'),
@@ -1055,7 +1054,6 @@ function CreateDialog()
             end
 
             SetFooterHeighest(textlabel)
-            -- SetFooterHeighest(inputfield)
             footerGroup['input'..inputdata.label] = inputfield
         end
     end
@@ -1083,7 +1081,7 @@ function CreateDialog()
         -- cheating in, is reset in EndCommandMode of '/lua/ui/game/commandmode.lua'
         local selection = GetSelectedUnits()
         SelectUnits(nil);
-
+            -- using user provided count of units or defaulting to creating 1 unit
         local commandModeData  = {
             cheat = true,
             name = id,
@@ -1214,7 +1212,7 @@ function CreateDialog()
         local armyName = ''
         if armyData.observer then
             icon:SetTexture(UIUtil.UIFile('/widgets/faction-icons-alpha_bmp/observer_ico.dds'))
-            armyName = LOC('<LOC lobui_0295>Neutral') --NEUTRAL'
+            armyName = LOC('<LOC lobui_0295>Neutral')
             armyLabel = LOC('<LOC score_0003>Observer')
         elseif armyData.civilian then
             icon:SetSolidColor('aaaaaaaa')
