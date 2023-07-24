@@ -933,7 +933,7 @@ do
         -- bundle the orders
 
         ---@type table<EntityId, boolean>
-        local seen = { }
+        local seen = {}
 
         ---@type number | nil
         local px = nil
@@ -941,7 +941,7 @@ do
         ---@type number | nil
         local pz = nil
 
-        local groups = {{}}
+        local groups = { {} }
         local orders = units[1]:GetCommandQueue()
         for k, order in orders do
 
@@ -965,12 +965,12 @@ do
                 seen[targetId] = true
             end
 
-            -- edge case: group has no orders, so we add this order and 
+            -- edge case: group has no orders, so we add this order and
             -- call it a day
             if not group[1] then
                 table.insert(group, order)
-                -- usual case: check if the current group is of the same 
-                -- type of order, if so add to the group otherwise create 
+                -- usual case: check if the current group is of the same
+                -- type of order, if so add to the group otherwise create
                 -- a new group
             else
                 if group[1].commandType == order.commandType then
@@ -979,7 +979,7 @@ do
                     table.insert(groups, { order })
 
                     -- the 'seen' table is per group of orders
-                    seen = { }
+                    seen = {}
                     if targetId then
                         seen[targetId] = true
                     end
@@ -990,8 +990,8 @@ do
         -----------------------------------------------------------------------
         -- sorting units
 
-        -- we sort the selection to make the order more intuitive. By default 
-        -- the order is defined by the entityId, which is essentially random in 
+        -- we sort the selection to make the order more intuitive. By default
+        -- the order is defined by the entityId, which is essentially random in
         -- the average case
 
         if px and pz then
@@ -1022,14 +1022,17 @@ do
         -----------------------------------------------------------------------
         -- assign orders
 
+        local dummyUnitTable = {}
+        local dummyVectorTable = {}
+
         local offset = 0
         local unitCount = table.getn(units)
         for k, group in groups do
 
             local orderCount = table.getn(group)
-
             -- extract info on how to apply these orders
             local commandInfo = CommandInfo[group[1].commandType]
+            local commandType = commandInfo.Type
             local issueOrder = commandInfo.Callback
             local redundantOrders = commandInfo.Redundancy
             local applyAllOrders = commandInfo.ApplyAllOrders
@@ -1041,7 +1044,24 @@ do
             end
 
             if issueOrder then
-                if batchOrders then
+                -- special snowflake implementation for the mobile build order. There's
+                -- many ways to break the game when distributing this order therefore
+                -- we limit the functionality to make it as least game breaking as possible
+                if commandType == 'BuildMobile' then
+                    LOG("Mobile build orders")
+                    for _, unit in units do
+                        dummyUnitTable[1] = unit
+                        for redundancy = 1, math.min(orderCount, redundantOrders) do
+                            local order = group[math.mod(offset, orderCount) + 1]
+                            dummyVectorTable[1] = order.x
+                            dummyVectorTable[2] = order.y
+                            dummyVectorTable[3] = order.z
+
+                            issueOrder(dummyUnitTable, dummyVectorTable, order.blueprintId, {})
+                            offset = offset + 1
+                        end
+                    end
+                elseif batchOrders then
                     LOG("Batching orders")
 
                     -- prepare orders
@@ -1100,10 +1120,7 @@ do
                                 offset = offset + 1
                             else
                                 -- at this point we may need an entity, so we check and bail if we do need one
-                                if commandInfo.Type == 'BuildMobile' then
-                                    issueOrder({ unit }, { order.x, order.y, order.z }, order.blueprintId, {})
-                                    offset = offset + 1
-                                elseif not commandInfo.RequiresEntity then
+                                if not commandInfo.RequiresEntity then
                                     issueOrder({ unit }, { order.x, order.y, order.z })
                                     offset = offset + 1
                                 end
