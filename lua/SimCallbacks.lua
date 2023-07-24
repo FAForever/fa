@@ -920,6 +920,9 @@ do
     ---@param data any
     ---@param units Unit[]
     Callbacks.DistributeOrders = function(data, units)
+
+        local start = GetSystemTimeSecondsOnlyForProfileUse()
+
         -- prevent cheating
         local units = SecureUnits(units)
         if not (units and units[1]) then
@@ -970,8 +973,9 @@ do
         -----------------------------------------------------------------------
         -- sorting units
 
-        -- we sort the selection to make the order more intuitive. By default the order is defined by
-        -- the entityId, which is essentially random in the average case
+        -- we sort the selection to make the order more intuitive. By default 
+        -- the order is defined by the entityId, which is essentially random in 
+        -- the average case
 
         for _, unit in units do
             local ux, _, uz = unit:GetPositionXYZ()
@@ -1090,6 +1094,8 @@ do
                 end
             end
         end
+
+        LOG(string.format("Processing time: %f", GetSystemTimeSecondsOnlyForProfileUse() - start))
     end
 end
 
