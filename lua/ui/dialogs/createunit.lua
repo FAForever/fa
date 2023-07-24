@@ -12,7 +12,15 @@ local options = getOptions()
 local DummyUnitID = 'ura0001'
 local DialogMode = options.spawn_menu_main_mode or 'units' --or 'props' or 'templates'
 local currentArmy = GetFocusArmy()
-local NumArmies = GetArmiesTable().numArmies
+
+-- combining army tables with an observer to simplify logic for creating army selectors
+local ArmiesAndObserver = table.copy(GetArmiesTable().armiesTable)
+table.insert(ArmiesAndObserver, {
+    name = 'NEUTRAL',
+    nickname = '<LOC tooltipui0149>Observer',
+    observer = true, civilian = true, color = 'FF727272',
+})
+local NumArmies = table.getsize(ArmiesAndObserver)
 
 local WindowBorderThickness = 10
 local WindowHeaderThickness = 30
@@ -546,19 +554,19 @@ GetNameFilters = {
                             return HasCat(unitID, 'SORTINTEL')
                         end,
                     },
-                    {
-                        title = 'Other',
-                        key = 'othersort',
-                        sortFunc = function(unitID)
-                            return HasCat(unitID, 'SORTOTHER') or not (
-                                HasCat(unitID, 'SORTCONSTRUCTION') or
-                                HasCat(unitID, 'SORTECONOMY') or
-                                HasCat(unitID, 'SORTDEFENSE') or
-                                HasCat(unitID, 'SORTSTRATEGIC') or
-                                HasCat(unitID, 'SORTINTEL')
-                            )
-                        end,
-                    },
+                    -- { -- this sort does not affect unit list at all
+                    --     title = 'Other',
+                    --     key = 'othersort',
+                    --     sortFunc = function(unitID)
+                    --         return HasCat(unitID, 'SORTOTHER') or not (
+                    --             HasCat(unitID, 'SORTCONSTRUCTION') or
+                    --             HasCat(unitID, 'SORTECONOMY') or
+                    --             HasCat(unitID, 'SORTDEFENSE') or
+                    --             HasCat(unitID, 'SORTSTRATEGIC') or
+                    --             HasCat(unitID, 'SORTINTEL')
+                    --         )
+                    --     end,
+                    -- },
                 },
             })
         end
@@ -857,7 +865,6 @@ function CreateDialog()
 
     -- Configurable values
     local TeamGridCellMinWidth = getOptions().spawn_menu_team_column_min_width or 145
-    local ObserveButtonWidth = 45
     local DefaultHeight = 450
     local DefaultWidth = FilterHeaderWidth + FilterWidth * 5
     local MinWidth = FilterHeaderWidth + FilterWidth * 3
@@ -904,7 +911,7 @@ function CreateDialog()
 
     FilterColumnCount = math.floor((windowGroup.Width()-FilterHeaderWidth)/FilterWidth)
 
-    UpdateTeamGridCounts(math.floor((windowGroup.Width()-ObserveButtonWidth)/TeamGridCellMinWidth))
+    UpdateTeamGridCounts(math.floor((windowGroup.Width())/TeamGridCellMinWidth))
 
     EscThread = ForkThread(function()
         while dialog or debugConfig do
@@ -975,6 +982,7 @@ function CreateDialog()
 
     local NumberInputFields = {
         units = {
+            {label='Count', name = 'Count',     default=1,   check=math.max},
             {label='Vet',   name = 'Veterancy', default=0,   check=math.max, max=5},
             {label='Yaw',   name = 'Rotation',  default=360, check=math.mod},
         },
@@ -1000,13 +1008,22 @@ function CreateDialog()
 
     if NumberInputFields[DialogMode] then
         for i, inputdata in NumberInputFields[DialogMode] do
+
             local textlabel = UIUtil.CreateText(footerGroup, inputdata.name..':', 12, UIUtil.bodyFont)
             local inputfield
             if options.spawn_menu_footer_text_input then
                 inputfield = numImputSettings(Edit(footerGroup), textlabel, inputdata)
+                if i == 1 then
+                    LayoutHelpers.AtBottomIn(textlabel, footerGroup, 10)
+                    LayoutHelpers.AtLeftIn(textlabel, footerGroup, 5)
+                else
+                    local previousInput = footerGroup['input'..NumberInputFields[DialogMode][i-1].label]
+                    LayoutHelpers.RightOf(textlabel, previousInput, 25)
+                end
             else--if inputdata.type == 'slider' then
                 inputfield = Group(footerGroup)
                 LayoutHelpers.SetHeight(inputfield, 30)
+
                 local slider = IntegerSlider(inputfield, false,
                     inputdata.default==1 and 1 or 0, math.max(inputdata.max or 10, inputdata.default), inputdata.default==360 and 15 or 1,
                     UIUtil.SkinnableFile('/slider02/slider_btn_up.dds'),
@@ -1018,23 +1035,27 @@ function CreateDialog()
                 slider._currentValue:Set(inputdata.default)
                 local value = UIUtil.CreateText(inputfield, slider:GetValue(), 12, "Arial")
                 LayoutHelpers.RightOf(inputfield, textlabel)
-                LayoutHelpers.RightOf(slider, textlabel)
-                LayoutHelpers.RightOf(value, slider)
+                LayoutHelpers.Below(slider, textlabel, 5)
+                LayoutHelpers.RightOf(value, textlabel, 10)
                 LayoutHelpers.SetWidth(inputfield, slider.Width()+30)
                 slider.OnValueChanged = function(self, newValue)
                     value:SetText(newValue)
                 end
                 inputfield.GetValue = function() return slider:GetValue() end
+
+                if i == 1 then
+                    LayoutHelpers.AtBottomIn(textlabel, footerGroup, 30)
+                    LayoutHelpers.AtLeftIn(textlabel, footerGroup, 5)
+                    LayoutHelpers.AtLeftIn(inputfield, footerGroup, 5)
+                else
+                    local previousInput = footerGroup['input'..NumberInputFields[DialogMode][i-1].label]
+                    LayoutHelpers.RightOf(textlabel, previousInput, 5)
+                    LayoutHelpers.RightOf(inputfield, previousInput, 5)
+                end
             end
 
-            if i == 1 then
-                LayoutHelpers.AtBottomIn(textlabel, footerGroup, 10)
-                LayoutHelpers.AtLeftIn(textlabel, footerGroup, 5)
-            else
-                LayoutHelpers.RightOf(textlabel, footerGroup['input'..NumberInputFields[DialogMode][i-1].label], 5)
-            end
             SetFooterHeighest(textlabel)
-            SetFooterHeighest(inputfield)
+            -- SetFooterHeighest(inputfield)
             footerGroup['input'..inputdata.label] = inputfield
         end
     end
@@ -1068,7 +1089,7 @@ function CreateDialog()
             name = id,
             army = currentArmy,
 
-            count = dialogData.inputCount and dialogData.inputCount:GetValue() or 0,
+            count = dialogData.inputCount and dialogData.inputCount:GetValue() or 1,
             vet = dialogData.inputVet and dialogData.inputVet:GetValue() or 0,
             yaw = (dialogData.inputYaw and dialogData.inputYaw:GetValue() or 0) / 57.295779513,
             rand = dialogData.inputRand and dialogData.inputRand:GetValue() or 0,
@@ -1175,79 +1196,84 @@ function CreateDialog()
         return name:sub(1, math.floor(charLimitEst))
     end
 
-    local function CreateArmySelectionSlot(parent, index, armyData)
+    local function CreateArmySelectionSlot(parent, armyData)
         local group = Bitmap(parent)
         group.Height:Set(armyData.height or (30 * UIScale))
         group.Width:Set(armyData.width or function() return parent.Width() / TeamColumnCount end)
+        group:SetSolidColor('FF000000')
 
-        local icon, iconBG
+        local iconBG = Bitmap(group)
+        LayoutHelpers.SetWidth(iconBG, 30)
+        LayoutHelpers.SetHeight(iconBG, 30)
+        iconBG:SetSolidColor(armyData.color)
+        LayoutHelpers.AtLeftTopIn(iconBG, group)
+        iconBG:DisableHitTest()
+
+        local icon = Bitmap(iconBG)
+        local armyLabel = ''
+        local armyName = ''
         if armyData.observer then
-            local name = UIUtil.CreateText(group, armyData.name, 12, UIUtil.bodyFont)
-            LayoutHelpers.AtCenterIn(name, group)
-            name:DisableHitTest()
-        else
-            iconBG = Bitmap(group)
-            LayoutHelpers.SetWidth(iconBG, 30)
-            LayoutHelpers.SetHeight(iconBG, 30)
-            iconBG:SetSolidColor(armyData.color)
-            LayoutHelpers.AtLeftTopIn(iconBG, group)
-            iconBG:DisableHitTest()
-
-            icon = Bitmap(iconBG)
-            if armyData.civilian then
-                icon:SetSolidColor('aaaaaaaa')
-            else
-                icon:SetTexture(UIUtil.UIFile(UIUtil.GetFactionIcon(armyData.faction)))
-            end
-            LayoutHelpers.FillParent(icon, iconBG)
-            icon:DisableHitTest()
-
-            -- Army name
-            local name = UIUtil.CreateText(group, CompressNickname(armyData.nickname, group.Width()-30), 12, UIUtil.bodyFont)
-            LayoutHelpers.RightOf(name, icon, 2)
-            LayoutHelpers.AtTopIn(name, group)
-            name:SetColor('ffffffff')
-            name:DisableHitTest()
-
-            local army = UIUtil.CreateText(group, CompressArmyName(armyData.name, group.Width()-30), 12, UIUtil.bodyFont)
-            LayoutHelpers.Below(army, name)
-            army:DisableHitTest()
+            icon:SetTexture(UIUtil.UIFile('/widgets/faction-icons-alpha_bmp/observer_ico.dds'))
+            armyName = LOC('<LOC lobui_0295>Neutral') --NEUTRAL'
+            armyLabel = LOC('<LOC score_0003>Observer')
+        elseif armyData.civilian then
+            icon:SetSolidColor('aaaaaaaa')
+            armyLabel = StringCapitalize(armyData.nickname)
+            armyName = armyData.name == 'NEUTRAL_CIVILIAN' and LOC('<LOC lobui_0295>Neutral') or armyData.name
+        else -- human or AI army
+            armyLabel = CompressNickname(armyData.nickname, group.Width()-50)
+            armyName = CompressArmyName(armyData.name, group.Width()-50)
+            icon:SetTexture(UIUtil.UIFile(UIUtil.GetFactionIcon(armyData.faction)))
         end
+        LayoutHelpers.FillParent(icon, iconBG)
+        icon:DisableHitTest()
+
+        -- Army identifier
+        local name = UIUtil.CreateText(group, armyLabel, 12, UIUtil.bodyFont)
+        LayoutHelpers.RightOf(name, icon, 2)
+        LayoutHelpers.AtTopIn(name, group)
+        name:SetColor('ffffffff')
+        name:DisableHitTest()
+
+        -- Army index or army type, e.g. civilian
+        local army = UIUtil.CreateText(group, string.upper(armyName), 12, UIUtil.bodyFont)
+        LayoutHelpers.Below(army, name)
+        army:DisableHitTest()
 
         group.HandleEvent = function(self, event)
             if event.Type == 'MouseEnter' then
-                if currentArmy == index then
+                if currentArmy == armyData.index then
                     self:SetSolidColor('cc00cc00')
                 else
                     self:SetSolidColor('77007700')
                 end
             elseif event.Type == 'MouseExit' then
-                if currentArmy == index then
+                if currentArmy == armyData.index then
                     self:SetSolidColor('aa00aa00')
                 else
-                    self:SetSolidColor('00000000')
+                    self:SetSolidColor('FF000000')
                 end
             elseif event.Type == 'ButtonPress' then
-                currentArmy = index
+                currentArmy = armyData.index
                 for i, v in parent.armySlots do
-                    if i == index then
+                    if i == armyData.index then
                         v:SetSolidColor('aa00aa00')
                     else
-                        v:SetSolidColor('00000000')
+                        v:SetSolidColor('FF000000')
                     end
                 end
             elseif event.Type == 'ButtonDClick' then
                 ConExecute('SetFocusArmy '..tostring(currentArmy-1))
             end
         end
-        if index == currentArmy then
+        if armyData.index == currentArmy then
             group:SetSolidColor('aa00aa00')
         end
         return group
     end
 
     local armiesGroup = Group(windowGroup)
-    armiesGroup.Width:Set(function() return windowGroup.Width()-ObserveButtonWidth end)
+    armiesGroup.Width:Set(function() return windowGroup.Width() end)
     LayoutHelpers.AtLeftTopIn(armiesGroup, windowGroup)
 
     local function IsColumnHead(teamI)
@@ -1262,8 +1288,10 @@ function CreateDialog()
     armiesGroup.armySlots = {}
     local lowestControl
     local WorkingColumnHead = 1
-    for i, val in GetArmiesTable().armiesTable do
-        armiesGroup.armySlots[i] = CreateArmySelectionSlot(armiesGroup, i, val)
+
+    for i, army in ArmiesAndObserver do
+        army.index = army.observer and 0 or i -- army index or 0 for observer
+        armiesGroup.armySlots[i] = CreateArmySelectionSlot(armiesGroup, army)
         if i == 1 then
             LayoutHelpers.AtLeftTopIn(armiesGroup.armySlots[i],armiesGroup)
             lowestControl = armiesGroup.armySlots[i]
@@ -1278,14 +1306,6 @@ function CreateDialog()
             lowestControl = armiesGroup.armySlots[i]
         end
     end
-    local observeButton = CreateArmySelectionSlot(armiesGroup, 0, {
-        name = '<LOC tooltipui0149>Observe',
-        observer = true,
-        width = ObserveButtonWidth,
-        height = TeamRowsCount * 30,
-    })
-    table.insert(armiesGroup.armySlots, observeButton)
-    LayoutHelpers.RightOf(observeButton, armiesGroup)
 
     armiesGroup.Height:Set(function() return lowestControl.Bottom() - armiesGroup.armySlots[1].Top() end)
 
@@ -1393,7 +1413,8 @@ function CreateDialog()
 
     windowGroup.unitEntries = {}
 
-    UIUtil.CreateVertScrollbarFor(windowGroup.unitList)
+    -- using verical scrollbar that matches theme or rest of window
+    UIUtil.CreateLobbyVertScrollbar(windowGroup.unitList, 15, 1, 1)
 
     local LineColors = {
         Up = '00000000', Sel_Up = 'ff447744',

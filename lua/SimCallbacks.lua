@@ -1180,24 +1180,27 @@ Callbacks.CheatSpawnUnit = function(data)
     if data.MeshOnly then
         SpawnUnitMesh(data.bpId, pos[1], pos[2], pos[3], 0, data.yaw, 0)
     else
-        local unit = CreateUnitHPR(data.bpId, data.army, pos[1], pos[2], pos[3], 0, data.yaw, 0)
-        local unitbp = __blueprints[data.bpId]
-        if data.CreateTarmac and unit.CreateTarmac and unitbp.Display and unitbp.Display.Tarmacs then
-            unit:CreateTarmac(true, true, true, false, false)
-        end
-        if data.UnitIconCameraMode then
-            local size = math.max(
-                (unitbp.SizeX or 1),
-                (unitbp.SizeY or 1) * 3,
-                (unitbp.SizeZ or 1),
-                (unitbp.Physics.SkirtSizeX or 1),
-                (unitbp.Physics.SkirtSizeZ or 1)
-            ) + math.abs(unitbp.CollisionOffsetY or 0)
-            local dist = size / math.tan(60 --[[* (9/16)]] * 0.5 * ((math.pi * 2) / 360))
-            SetWorldCameraToUnitIconAngle(pos, dist)
-        end
-        if data.veterancy and data.veterancy ~= 0 and unit.SetVeterancy then
-            unit:SetVeterancy(data.veterancy)
+        -- allow creating multiple units to make it easier to test specific scenarios
+        for i = 1, (data.count or 1) do
+            local unit = CreateUnitHPR(data.bpId, data.army, pos[1], pos[2], pos[3], 0, data.yaw, 0)
+            local unitbp = __blueprints[data.bpId]
+            if data.CreateTarmac and unit.CreateTarmac and unitbp.Display and unitbp.Display.Tarmacs then
+                unit:CreateTarmac(true, true, true, false, false)
+            end
+            if data.UnitIconCameraMode then
+                local size = math.max(
+                    (unitbp.SizeX or 1),
+                    (unitbp.SizeY or 1) * 3,
+                    (unitbp.SizeZ or 1),
+                    (unitbp.Physics.SkirtSizeX or 1),
+                    (unitbp.Physics.SkirtSizeZ or 1)
+                ) + math.abs(unitbp.CollisionOffsetY or 0)
+                local dist = size / math.tan(60 --[[* (9/16)]] * 0.5 * ((math.pi * 2) / 360))
+                SetWorldCameraToUnitIconAngle(pos, dist)
+            end
+            if data.veterancy and data.veterancy ~= 0 and unit.SetVeterancy then
+                unit:SetVeterancy(data.veterancy)
+            end
         end
     end
 end
