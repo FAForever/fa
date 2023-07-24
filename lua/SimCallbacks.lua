@@ -960,7 +960,6 @@ do
             local targetId = order.targetId
             if targetId then
                 if seen[targetId] then
-                    LOG("Skipping an order!")
                     continue
                 end
                 seen[targetId] = true
