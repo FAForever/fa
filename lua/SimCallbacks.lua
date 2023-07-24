@@ -926,10 +926,27 @@ do
             return
         end
 
+        -----------------------------------------------------------------------
         -- bundle the orders
+
+        ---@type number | nil
+        local px = nil
+
+        ---@type number | nil
+        local pz = nil
+
         local groups = {}
         local orders = units[1]:GetCommandQueue()
         for k, order in orders do
+
+            -- find the first order that represents a position
+            local ox = order.x
+            local oz = order.z
+            if (not px) and (ox > 0) and (oz > 0) then
+                px = ox
+                pz = oz
+            end
+
             -- find the last group
             local group = groups[table.getn(groups)]
             if not group then
@@ -950,10 +967,38 @@ do
             end
         end
 
+        -----------------------------------------------------------------------
+        -- sorting units
+
+        -- we sort the selection to make the order more intuitive. By default the order is defined by
+        -- the entityId, which is essentially random in the average case
+
+        for _, unit in units do
+            local ux, _, uz = unit:GetPositionXYZ()
+            local dx = ux - px
+            local dz = uz - pz
+            unit.DistributeOrdersDistance = dx * dx + dz * dz
+        end
+
+        table.sort(
+            units,
+            function(a, b)
+                return a.DistributeOrdersDistance < b.DistributeOrdersDistance
+            end
+        )
+
+        for _, unit in units do
+            unit.DistributeOrdersDistance = nil
+        end
+
+        -----------------------------------------------------------------------
         -- clear existing orders
+
         IssueClearCommands(units)
 
-        -- assign orders in an interleaved fashion
+        -----------------------------------------------------------------------
+        -- assign orders
+
         local offset = 0
         local unitCount = table.getn(units)
         for k, group in groups do
@@ -986,7 +1031,7 @@ do
                     local redundancy = orderCount
                     LOG(string.format("Units per batch: %d", unitsPerBatch))
                     LOG(string.format("Redundancy: %d", redundancy))
-                    local ordersApplied =  0
+                    local ordersApplied = 0
                     -- issue orders
                     for b = 1, redundancy do
                         for o, _ in group do
@@ -994,7 +1039,7 @@ do
                             local order = group[math.mod(o + b, orderCount) + 1]
 
                             -- compute the batch of units
-                            local batch = { }
+                            local batch = {}
                             for k = 1, unitsPerBatch do
                                 local unit = units[k + (b - 1) * unitsPerBatch]
                                 if unit then
