@@ -1001,12 +1001,27 @@ function ReturnTransportsToPool(platoon, data)
     local aiBrain = platoon:GetBrain()
     local transports = platoon:GetSquadUnits('Scout')
 
+    -- Default transport platoon to grab from
+    local poolName = 'TransportPool'
+    local BaseName = data.BaseName
+
+    -- If base name is specified in platoon data, use that instead
+    if BaseName then 
+        poolName = BaseName .. '_TransportPool'
+    end
+
+    local tPool = aiBrain:GetPlatoonUniquelyNamed(poolName)
+    if not tPool then
+        tPool = aiBrain:MakePlatoon('', '')
+        tPool:UniquelyNamePlatoon(poolName)
+    end
+    
     if table.empty(transports) then
         return
     end
 
     for _, unit in transports do
-        aiBrain:AssignUnitsToPlatoon('TransportPool', {unit}, 'Scout', 'None')
+        aiBrain:AssignUnitsToPlatoon(tPool, {unit}, 'Scout', 'None')
     end
 
     -- If a route or chain was given, reverse it on return
