@@ -416,6 +416,7 @@ local function DiveOrderBehavior(self, modifiers)
                 end
             end
         end
+
         -- If we have selected submerged and surfaced SUB's, let all surfaced SUB's dive.
         if submergedSUB and surfacedSUB then
             local SurfacedSubs = {}
@@ -1187,6 +1188,7 @@ local function CreateCommonOrders(availableOrders, init)
 
         local orderCheckbox = AddOrder(orderInfo, orderInfo.preferredSlot, true)
         orderCheckbox._order = key
+        LOG(key)
         orderCheckbox._toggleState = 0
 
         if not init and orderInfo.initialStateFunc then

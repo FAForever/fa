@@ -1357,6 +1357,14 @@ local keyActionsOrders = {
         action = 'UI_Lua import("/lua/ui/game/orders.lua").ToggleDiveOrder()',
         category = 'orders',
     },
+    ['dive_all'] = {
+        action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").DiveAll()',
+        category = 'orders',
+    },
+    ['surface_all'] = {
+        action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").SurfaceAll()',
+        category = 'orders',
+    },
     ['ferry'] = {
         action = 'StartCommandMode order RULEUCC_Ferry',
         category = 'orders',
