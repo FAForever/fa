@@ -681,6 +681,45 @@ function GetItems(mode)
     end
 end
 
+function GetUnitDescription(id)
+    local bp = __blueprints[id]
+    local info = ''
+    if bp.CategoriesHash.TECH1 then info = 'T1 ' end
+    if bp.CategoriesHash.TECH2 then info = 'T2 ' end
+    if bp.CategoriesHash.TECH3 then info = 'T3 ' end
+    if bp.CategoriesHash.EXPERIMENTAL then info = 'T4 ' end
+    info = info .. LOC(bp.Description)
+    -- removing faction name because we aready have faction icon in the list
+    info = info:gsub("UEF ", "")
+    info = info:gsub("Aeon ", "")
+    info = info:gsub("Cybran ", "")
+    info = info:gsub("Seraphim ", "")
+    return info
+end
+
+function SetUnitFactionIcon(id, bitmap, background)
+    local bp = __blueprints[id]
+    local faction = false
+    local color = false
+    if bp.CategoriesHash then
+        if bp.CategoriesHash.UEF then faction = 0 color = 'ff00c1ff' end
+        if bp.CategoriesHash.AEON then faction = 1 color = 'ff89d300' end
+        if bp.CategoriesHash.CYBRAN then faction = 2 color = 'ffff0000' end
+        if bp.CategoriesHash.SERAPHIM then faction = 3 color = 'FFFFBF00' end
+        if bp.CategoriesHash.NOMADS then faction = 4 color = 'FFFF7200' end
+    end
+
+    if bitmap and faction and color then
+        local icon = UIUtil.UIFile(UIUtil.GetFactionIcon(faction))
+        bitmap:SetAlpha(1, false)
+        bitmap:SetTexture(icon)
+        background:SetSolidColor(color)
+    else
+        bitmap:SetAlpha(0, false)
+        background:SetSolidColor('transparent')
+    end
+end
+
 function CreateNameFilter(data)
     local group = Group(windowGroup)
     group.Width:Set(dialog.Width)
@@ -1495,22 +1534,26 @@ function CreateDialog()
         if mouseover then mouseover:Destroy() end
         mouseover = Bitmap(windowGroup)
         mouseover:SetSolidColor('dd115511')
-
         mouseover.img = Bitmap(mouseover)
         LayoutHelpers.SetDimensions(mouseover.img, 40, 40)
         LayoutHelpers.AtLeftTopIn(mouseover.img, mouseover, 2,2)
 
         SetUnitImage(mouseover.img, unitData)
 
-        mouseover.name = UIUtil.CreateText(mouseover,
-            DialogMode == 'units' and __blueprints[unitData].Description or
-            __blueprints[unitData].Interface and
-            __blueprints[unitData].Interface.HelpText,
-            14, UIUtil.bodyFont
-        )
+        local bp = __blueprints[unitData]
+        local info = ''
+        if DialogMode == 'units' then
+            local level = GetUnitDescription(unitData)
+            info = level --and (level .. ' ') or ''
+            -- info = info .. LOC(bp.Description)
+        else
+            info = bp.Interface and bp.Interface.HelpText
+        end
+
+        mouseover.name = UIUtil.CreateText(mouseover, info, 14, UIUtil.bodyFont)
         LayoutHelpers.RightOf(mouseover.name, mouseover.img, 2)
 
-        mouseover.desc = UIUtil.CreateText(mouseover, __blueprints[unitData].General.UnitName or unitData, 14, UIUtil.bodyFont)
+        mouseover.desc = UIUtil.CreateText(mouseover, bp.General.UnitName or unitData, 14, UIUtil.bodyFont)
         LayoutHelpers.AtLeftIn(mouseover.desc, mouseover, 44)
         LayoutHelpers.AtBottomIn(mouseover.desc, mouseover, 5)
 
@@ -1557,6 +1600,7 @@ function CreateDialog()
 
         local function CreateElement(index)
             windowGroup.unitEntries[index] = Bitmap(windowGroup.unitList)
+            local unitEnrty = windowGroup.unitEntries[index]
             windowGroup.unitEntries[index].Left:Set(windowGroup.unitList.Left)
             windowGroup.unitEntries[index].Right:Set(windowGroup.unitList.Right)
             windowGroup.unitEntries[index].Height:Set(16 * UIScale)
@@ -1610,6 +1654,20 @@ function CreateDialog()
                 windowGroup.unitEntries[index].img.Width:Set(16 * UIScale)
                 LayoutHelpers.AtLeftTopIn(windowGroup.unitEntries[index].img, windowGroup.unitEntries[index])
             end
+
+            unitEnrty.factionBG = Bitmap(unitEnrty)
+            unitEnrty.factionBG.Height:Set(16 * UIScale)
+            unitEnrty.factionBG.Width:Set(16 * UIScale)
+            unitEnrty.factionBG:SetSolidColor('red')
+            LayoutHelpers.LeftOf(unitEnrty.factionBG, unitEnrty.id2 , 5)
+
+            unitEnrty.factionIcon = Bitmap(unitEnrty.factionBG)
+            -- unitEnrty.factionIcon:SetSolidColor('FFEF2B2B')
+            unitEnrty.factionIcon.Height:Set(16 * UIScale)
+            unitEnrty.factionIcon.Width:Set(16 * UIScale)
+            -- unitEnrty.faction:SetTexture(UIUtil.UIFile(UIUtil.GetFactionIcon(0)))
+            LayoutHelpers.LeftOf(unitEnrty.factionIcon, unitEnrty.id2 , 5)
+            -- LayoutHelpers.AtLeftTopIn(unitEnrty.faction, unitEnrty.faction)
         end
 
         CreateElement(1)
@@ -1683,6 +1741,7 @@ function CreateDialog()
                 for id, no in structs do
                     str=str..' - '..id..' ×'..no
                 end
+
                 line.id:SetText(td[1]..'×'..td[2])
                 line.id2:SetText(str)
                 if options.spawn_menu_show_icons then
@@ -1690,10 +1749,12 @@ function CreateDialog()
                 end
             elseif DialogMode == 'units' then
                 line.id:SetText(data.id:sub(1, 15)..(data.id:len()>15 and '…' or ''))--format('%s %5s %s', data.id, ' ', data.desc))
-                line.id2:SetText(data.desc)
+                -- line.id2:SetText(data.desc)
+                line.id2:SetText(GetUnitDescription(data.id))
                 if options.spawn_menu_show_icons then
                     SetUnitImage(line.img, data.id, true)
                 end
+                SetUnitFactionIcon(data.id, line.factionIcon, line.factionBG)
             elseif DialogMode == 'props' then
                 line.id:SetText(data.id:match('([^/]*)_prop%.bp') or data.id:sub(-24, -9) or data.id)--format('%s %5s %s', data.id, ' ', data.desc))
                 line.id2:SetText(__blueprints[data.id].Interface.HelpText or '[no text]')
