@@ -1453,6 +1453,14 @@ local keyActionsOrders = {
         action = 'UI_Lua import("/lua/ui/game/construction.lua").ToggleUnitPause()',
         category = 'orders',
     },
+    ['pause_unit_all'] = {
+        action = 'UI_Lua import("/lua/ui/game/construction.lua").ToggleUnitPauseAll()',
+        category = 'orders',
+    },
+    ['unpause_unit_all'] = {
+        action = 'UI_Lua import("/lua/ui/game/construction.lua").ToggleUnitUnpauseAll()',
+        category = 'orders',
+    },
     ['mode'] = {
         action = 'UI_Lua import("/lua/ui/game/orders.lua").CycleRetaliateStateUp()',
         category = 'orders',
