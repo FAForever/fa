@@ -1361,7 +1361,7 @@ local keyActionsOrders = {
         action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").DiveAll()',
         category = 'orders',
     },
-    ['surface_all'] = {
+    ['undive_all'] = {
         action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").SurfaceAll()',
         category = 'orders',
     },
