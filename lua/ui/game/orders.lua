@@ -1188,7 +1188,6 @@ local function CreateCommonOrders(availableOrders, init)
 
         local orderCheckbox = AddOrder(orderInfo, orderInfo.preferredSlot, true)
         orderCheckbox._order = key
-        LOG(key)
         orderCheckbox._toggleState = 0
 
         if not init and orderInfo.initialStateFunc then
