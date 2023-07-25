@@ -4769,6 +4769,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
             for k, order in queue do
                 if order.targetId then
                     order.target = GetEntityById(order.targetId)
+                    order.x, order.y, order.z = moho.entity_methods.GetPositionXYZ(target)
                 end
             end
         end
