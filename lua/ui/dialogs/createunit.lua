@@ -554,19 +554,6 @@ GetNameFilters = {
                             return HasCat(unitID, 'SORTINTEL')
                         end,
                     },
-                    -- { -- this sort does not affect unit list at all
-                    --     title = 'Other',
-                    --     key = 'othersort',
-                    --     sortFunc = function(unitID)
-                    --         return HasCat(unitID, 'SORTOTHER') or not (
-                    --             HasCat(unitID, 'SORTCONSTRUCTION') or
-                    --             HasCat(unitID, 'SORTECONOMY') or
-                    --             HasCat(unitID, 'SORTDEFENSE') or
-                    --             HasCat(unitID, 'SORTSTRATEGIC') or
-                    --             HasCat(unitID, 'SORTINTEL')
-                    --         )
-                    --     end,
-                    -- },
                 },
             })
         end
@@ -983,7 +970,7 @@ function CreateDialog()
     local NumberInputFields = {
         units = {
             -- creating input fields for count, vet, and rotation
-            {label='Count', name = 'Count',     default=1,   check=math.max, max=200},
+            {label='Count', name = 'Count',     default=1,   check=math.max},
             {label='Vet',   name = 'Veterancy', default=0,   check=math.max, max=5},
             {label='Yaw',   name = 'Rotation',  default=360, check=math.mod},
         },
