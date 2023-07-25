@@ -694,6 +694,7 @@ function GetUnitDescription(id)
     info = info:gsub("Aeon ", "")
     info = info:gsub("Cybran ", "")
     info = info:gsub("Seraphim ", "")
+    info = info:gsub("Experimental ", "")
     return info
 end
 
