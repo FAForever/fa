@@ -920,48 +920,119 @@ do
     ---@param data any
     ---@param units Unit[]
     Callbacks.DistributeOrders = function(data, units)
+
+        local start = GetSystemTimeSecondsOnlyForProfileUse()
+
         -- prevent cheating
         local units = SecureUnits(units)
         if not (units and units[1]) then
             return
         end
 
+        -----------------------------------------------------------------------
         -- bundle the orders
-        local groups = {}
+
+        ---@type table<EntityId, boolean>
+        local seen = {}
+
+        ---@type number | nil
+        local px = nil
+
+        ---@type number | nil
+        local pz = nil
+
+        local groups = { {} }
         local orders = units[1]:GetCommandQueue()
         for k, order in orders do
-            -- find the last group
-            local group = groups[table.getn(groups)]
-            if not group then
-                group = {}
-                table.insert(groups, group)
+
+            -- find the first order that represents a position
+            local ox = order.x
+            local oz = order.z
+            if (not px) and (ox > 0) and (oz > 0) then
+                px = ox
+                pz = oz
             end
 
-            -- edge case: group has no orders, so we add this order and call it a day
+            -- find the last group
+            local group = groups[table.getn(groups)]
+
+            -- try and remove duplicated orders
+            local targetId = order.targetId
+            if targetId then
+                if seen[targetId] then
+                    continue
+                end
+                seen[targetId] = true
+            end
+
+            -- edge case: group has no orders, so we add this order and
+            -- call it a day
             if not group[1] then
                 table.insert(group, order)
-                -- usual case: check if the current group is of the same type of order, if so add to the group otherwise create a new group
+                -- usual case: check if the current group is of the same
+                -- type of order, if so add to the group otherwise create
+                -- a new group
             else
                 if group[1].commandType == order.commandType then
                     table.insert(group, order)
                 else
                     table.insert(groups, { order })
+
+                    -- the 'seen' table is per group of orders
+                    seen = {}
+                    if targetId then
+                        seen[targetId] = true
+                    end
                 end
             end
         end
 
+        -----------------------------------------------------------------------
+        -- sorting units
+
+        -- we sort the selection to make the order more intuitive. By default
+        -- the order is defined by the entityId, which is essentially random in
+        -- the average case
+
+        if px and pz then
+            for _, unit in units do
+                local ux, _, uz = unit:GetPositionXYZ()
+                local dx = ux - px
+                local dz = uz - pz
+                unit.DistributeOrdersDistance = dx * dx + dz * dz
+            end
+
+            table.sort(
+                units,
+                function(a, b)
+                    return a.DistributeOrdersDistance < b.DistributeOrdersDistance
+                end
+            )
+
+            for _, unit in units do
+                unit.DistributeOrdersDistance = nil
+            end
+        end
+
+        -----------------------------------------------------------------------
         -- clear existing orders
+
         IssueClearCommands(units)
 
-        -- assign orders in an interleaved fashion
+        -----------------------------------------------------------------------
+        -- assign orders
+
+        local dummyUnitTable = {}
+        local dummyVectorTable = {}
+
         local offset = 0
         local unitCount = table.getn(units)
         for k, group in groups do
 
             local orderCount = table.getn(group)
-
             -- extract info on how to apply these orders
             local commandInfo = CommandInfo[group[1].commandType]
+            local commandType = commandInfo.Type
             local issueOrder = commandInfo.Callback
             local redundantOrders = commandInfo.Redundancy
             local applyAllOrders = commandInfo.ApplyAllOrders
@@ -973,7 +1044,24 @@ do
             end
 
             if issueOrder then
-                if batchOrders then
+                -- special snowflake implementation for the mobile build order. There's
+                -- many ways to break the game when distributing this order therefore
+                -- we limit the functionality to make it as least game breaking as possible
+                if commandType == 'BuildMobile' then
+                    LOG("Mobile build orders")
+                    for _, unit in units do
+                        dummyUnitTable[1] = unit
+                        for redundancy = 1, math.min(orderCount, redundantOrders) do
+                            local order = group[math.mod(offset, orderCount) + 1]
+                            dummyVectorTable[1] = order.x
+                            dummyVectorTable[2] = order.y
+                            dummyVectorTable[3] = order.z
+
+                            issueOrder(dummyUnitTable, dummyVectorTable, order.blueprintId, {})
+                            offset = offset + 1
+                        end
+                    end
+                elseif batchOrders then
                     LOG("Batching orders")
 
                     -- prepare orders
@@ -986,7 +1074,7 @@ do
                     local redundancy = orderCount
                     LOG(string.format("Units per batch: %d", unitsPerBatch))
                     LOG(string.format("Redundancy: %d", redundancy))
-                    local ordersApplied =  0
+                    local ordersApplied = 0
                     -- issue orders
                     for b = 1, redundancy do
                         for o, _ in group do
@@ -994,7 +1082,7 @@ do
                             local order = group[math.mod(o + b, orderCount) + 1]
 
                             -- compute the batch of units
-                            local batch = { }
+                            local batch = {}
                             for k = 1, unitsPerBatch do
                                 local unit = units[k + (b - 1) * unitsPerBatch]
                                 if unit then
@@ -1032,10 +1120,7 @@ do
                                 offset = offset + 1
                             else
                                 -- at this point we may need an entity, so we check and bail if we do need one
-                                if commandInfo.Type == 'BuildMobile' then
-                                    issueOrder({ unit }, { order.x, order.y, order.z }, order.blueprintId, {})
-                                    offset = offset + 1
-                                elseif not commandInfo.RequiresEntity then
+                                if not commandInfo.RequiresEntity then
                                     issueOrder({ unit }, { order.x, order.y, order.z })
                                     offset = offset + 1
                                 end
@@ -1045,6 +1130,8 @@ do
                 end
             end
         end
+
+        LOG(string.format("Processing time: %f", GetSystemTimeSecondsOnlyForProfileUse() - start))
     end
 end
 
