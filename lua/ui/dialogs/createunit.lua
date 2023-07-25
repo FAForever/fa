@@ -1600,12 +1600,11 @@ function CreateDialog()
         end
 
         local function CreateElement(index)
-            windowGroup.unitEntries[index] = Bitmap(windowGroup.unitList)
-            local unitEnrty = windowGroup.unitEntries[index]
-            windowGroup.unitEntries[index].Left:Set(windowGroup.unitList.Left)
-            windowGroup.unitEntries[index].Right:Set(windowGroup.unitList.Right)
-            windowGroup.unitEntries[index].Height:Set(16 * UIScale)
-            windowGroup.unitEntries[index].HandleEvent = function(self, event)
+            local unitSelector = Bitmap(windowGroup.unitList)
+            unitSelector.Left:Set(windowGroup.unitList.Left)
+            unitSelector.Right:Set(windowGroup.unitList.Right)
+            unitSelector.Height:Set(16 * UIScale)
+            unitSelector.HandleEvent = function(self, event)
                 if event.Type == 'MouseEnter' then
                     if MouseOverElement[DialogMode] then
                         MouseOverElement[DialogMode](self.unitID, event.MouseX, event.MouseY)
@@ -1645,27 +1644,29 @@ function CreateDialog()
                 end
             end
 
-            windowGroup.unitEntries[index].id = UIUtil.CreateText(windowGroup.unitEntries[index], '', 11, UIUtil.bodyFont)
-            LayoutHelpers.AtLeftTopIn(windowGroup.unitEntries[index].id, windowGroup.unitEntries[index], options.spawn_menu_show_icons and 18 or 2)
-            windowGroup.unitEntries[index].id2 = UIUtil.CreateText(windowGroup.unitEntries[index], '', 12, UIUtil.bodyFont)
-            LayoutHelpers.AtLeftTopIn(windowGroup.unitEntries[index].id2, windowGroup.unitEntries[index], (DialogMode == 'templates' and 50 or 100) + (options.spawn_menu_show_icons and 36 or 18))
+            unitSelector.id = UIUtil.CreateText(unitSelector, '', 11, UIUtil.bodyFont)
+            LayoutHelpers.AtLeftTopIn(unitSelector.id, unitSelector, options.spawn_menu_show_icons and 18 or 2)
+            unitSelector.id2 = UIUtil.CreateText(unitSelector, '', 12, UIUtil.bodyFont)
+            LayoutHelpers.AtLeftTopIn(unitSelector.id2, unitSelector, (DialogMode == 'templates' and 50 or 100) + (options.spawn_menu_show_icons and 36 or 18))
             if options.spawn_menu_show_icons then
-                windowGroup.unitEntries[index].img = Bitmap(windowGroup.unitEntries[index])
-                windowGroup.unitEntries[index].img.Height:Set(16 * UIScale)
-                windowGroup.unitEntries[index].img.Width:Set(16 * UIScale)
-                LayoutHelpers.AtLeftTopIn(windowGroup.unitEntries[index].img, windowGroup.unitEntries[index])
+                unitSelector.img = Bitmap(unitSelector)
+                unitSelector.img.Height:Set(16 * UIScale)
+                unitSelector.img.Width:Set(16 * UIScale)
+                LayoutHelpers.AtLeftTopIn(unitSelector.img, unitSelector)
             end
 
-            unitEnrty.factionBG = Bitmap(unitEnrty)
-            unitEnrty.factionBG.Height:Set(16 * UIScale)
-            unitEnrty.factionBG.Width:Set(16 * UIScale)
-            unitEnrty.factionBG:SetSolidColor('red')
-            LayoutHelpers.LeftOf(unitEnrty.factionBG, unitEnrty.id2, 2)
+            unitSelector.factionBG = Bitmap(unitSelector)
+            unitSelector.factionBG.Height:Set(16 * UIScale)
+            unitSelector.factionBG.Width:Set(16 * UIScale)
+            unitSelector.factionBG:SetSolidColor('red')
+            LayoutHelpers.LeftOf(unitSelector.factionBG, unitSelector.id2, 2)
 
-            unitEnrty.factionIcon = Bitmap(unitEnrty.factionBG)
-            unitEnrty.factionIcon.Height:Set(16 * UIScale)
-            unitEnrty.factionIcon.Width:Set(16 * UIScale)
-            LayoutHelpers.LeftOf(unitEnrty.factionIcon, unitEnrty.id2, 2)
+            unitSelector.factionIcon = Bitmap(unitSelector.factionBG)
+            unitSelector.factionIcon.Height:Set(16 * UIScale)
+            unitSelector.factionIcon.Width:Set(16 * UIScale)
+            LayoutHelpers.LeftOf(unitSelector.factionIcon, unitSelector.id2, 2)
+            -- storing the unit selector for access in rest of UI
+            windowGroup.unitEntries[index] = unitSelector
         end
 
         CreateElement(1)
