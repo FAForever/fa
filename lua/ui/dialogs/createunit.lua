@@ -1659,15 +1659,12 @@ function CreateDialog()
             unitEnrty.factionBG.Height:Set(16 * UIScale)
             unitEnrty.factionBG.Width:Set(16 * UIScale)
             unitEnrty.factionBG:SetSolidColor('red')
-            LayoutHelpers.LeftOf(unitEnrty.factionBG, unitEnrty.id2 , 5)
+            LayoutHelpers.LeftOf(unitEnrty.factionBG, unitEnrty.id2, 2)
 
             unitEnrty.factionIcon = Bitmap(unitEnrty.factionBG)
-            -- unitEnrty.factionIcon:SetSolidColor('FFEF2B2B')
             unitEnrty.factionIcon.Height:Set(16 * UIScale)
             unitEnrty.factionIcon.Width:Set(16 * UIScale)
-            -- unitEnrty.faction:SetTexture(UIUtil.UIFile(UIUtil.GetFactionIcon(0)))
-            LayoutHelpers.LeftOf(unitEnrty.factionIcon, unitEnrty.id2 , 5)
-            -- LayoutHelpers.AtLeftTopIn(unitEnrty.faction, unitEnrty.faction)
+            LayoutHelpers.LeftOf(unitEnrty.factionIcon, unitEnrty.id2, 2)
         end
 
         CreateElement(1)
