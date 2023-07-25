@@ -916,6 +916,50 @@ do
         },
     }
 
+    --- Constructs `l` batches of roughly even size such that when combined they sum up to `h` 
+    ---@param h number          # Higher number
+    ---@param l number          # Lower number 
+    ---@param cache number[]    # Table with as many elements as `l`, such as `{3, 3, 2, 2}` when `h = 10` and `l = 4`
+    ---@return number[]
+    local function ComputeBatchCounts(h, l, cache)
+
+        -- clear out the cache
+        for k, _ in cache do
+            cache[k] = nil
+        end
+
+        local processed = 0
+        for k = 1, l do
+            local count = math.ceil(h / l)
+            cache[k] = count
+            h = h - count
+            l = l - 1
+        end
+
+        return cache
+    end
+
+    --- Populates a small batch of units
+    ---@param start number  # Start index, element is included in the output
+    ---@param count number  # Number of elements to include
+    ---@param array Unit[]  # Array to take elements from
+    ---@param cache Unit[]  # Cache to store the elements in
+    ---@return Unit[]
+    local function PopulateBatch(start, count, array, cache)
+        -- clear out the cache
+        for k, _ in cache do
+            cache[k] = nil
+        end
+
+        local head = 1
+        for k = start, start + count do
+            cache[head] = array[k]
+            head = head + 1
+        end
+
+        return cache
+    end
+
     --- Processes the orders and re-distributes them over the units
     ---@param data any
     ---@param units Unit[]
@@ -1022,15 +1066,26 @@ do
         -----------------------------------------------------------------------
         -- assign orders
 
+        ---@type number[]
+        local dummyBatches = {}
+
+        ---@type Unit[]
+        local dummyBatchTable = {}
+
+        ---@type table
         local dummyEmptyTable = {}
+
+        ---@type { [1]: Unit }
         local dummyUnitTable = {}
+
+        ---@type { [1]: number, [2]: number, [3]: number }
         local dummyVectorTable = {}
 
         local offset = 0
         local unitCount = table.getn(units)
         for k, group in groups do
-
             local orderCount = table.getn(group)
+
             -- extract info on how to apply these orders
             local commandInfo = CommandInfo[group[1].commandType]
             local commandType = commandInfo.Type
@@ -1045,7 +1100,7 @@ do
             end
 
             if issueOrder then
-                
+
                 -- special snowflake implementation for the mobile build order. There's
                 -- many ways to break the game when distributing this order therefore
                 -- we limit the functionality to make it as least game breaking as possible
@@ -1067,56 +1122,44 @@ do
                             dummyVectorTable[2] = order.y
                             dummyVectorTable[3] = order.z
                             issueOrder(dummyUnitTable, dummyVectorTable, order.blueprintId, dummyEmptyTable)
-                            offset = offset + 1
                         end
                     elseif orderCount > unitCount then
 
                         -- this is the usual case, we look over the units and assign each unit
                         -- to multiple orders
 
-                        local ordersProcessed = 0
-                        local ordersRemaining = orderCount
-                        local unitsRemaining = unitCount
-                        for k, unit in units do
-                            dummyUnitTable[1] = unit
-
-                            local count = math.ceil(ordersRemaining / unitsRemaining)
-                            for k = 1, count do
-                                local order = group[ordersProcessed + k]
+                        local start = 1
+                        local batches = ComputeBatchCounts(orderCount, unitCount, dummyBatches)
+                        for k, batch in batches do
+                            dummyUnitTable[1] = units[k]
+                            local orderBatch = PopulateBatch(start, batch - 1, group, dummyBatchTable)
+                            start = start + batch
+                            for _, order in orderBatch do
                                 dummyVectorTable[1] = order.x
                                 dummyVectorTable[2] = order.y
                                 dummyVectorTable[3] = order.z
                                 issueOrder(dummyUnitTable, dummyVectorTable, order.blueprintId, dummyEmptyTable)
                             end
-
-                            -- update state
-                            ordersProcessed = ordersProcessed + count
-                            ordersRemaining = ordersRemaining - count
-                            unitsRemaining = unitsRemaining - 1
                         end
                     else
 
                         -- this is an odd case, we look over the orders and assign multiple
                         -- units the same order
 
-                        local unitsProcessed = 0
-                        local unitsRemaining = unitCount
-                        local ordersRemaining = orderCount
-                        for k, order in group do
+                        local start = 1
+                        local batches = ComputeBatchCounts(unitCount, orderCount, dummyBatches)
+                        for k, batch in batches do
+                            local order = group[k]
                             dummyVectorTable[1] = order.x
                             dummyVectorTable[2] = order.y
                             dummyVectorTable[3] = order.z
 
-                            local count = math.ceil(unitsRemaining / ordersRemaining)
-                            for k = 1, count do
-                                dummyUnitTable[1] = units[unitsProcessed + k]
+                            local unitBatch = PopulateBatch(start, batch - 1, units, dummyBatchTable)
+                            start = start + batch
+                            for _, unit in unitBatch do
+                                dummyUnitTable[1] = unit
                                 issueOrder(dummyUnitTable, dummyVectorTable, order.blueprintId, dummyEmptyTable)
                             end
-
-                            -- update state
-                            unitsProcessed = unitsProcessed + count
-                            unitsRemaining = unitsRemaining - count
-                            ordersRemaining = ordersRemaining - 1
                         end
                     end
                 elseif batchOrders then
