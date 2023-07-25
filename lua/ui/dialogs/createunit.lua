@@ -1648,7 +1648,7 @@ function CreateDialog()
             windowGroup.unitEntries[index].id = UIUtil.CreateText(windowGroup.unitEntries[index], '', 11, UIUtil.bodyFont)
             LayoutHelpers.AtLeftTopIn(windowGroup.unitEntries[index].id, windowGroup.unitEntries[index], options.spawn_menu_show_icons and 18 or 2)
             windowGroup.unitEntries[index].id2 = UIUtil.CreateText(windowGroup.unitEntries[index], '', 12, UIUtil.bodyFont)
-            LayoutHelpers.AtLeftTopIn(windowGroup.unitEntries[index].id2, windowGroup.unitEntries[index], (DialogMode == 'templates' and 50 or 100) + (options.spawn_menu_show_icons and 18 or 2))
+            LayoutHelpers.AtLeftTopIn(windowGroup.unitEntries[index].id2, windowGroup.unitEntries[index], (DialogMode == 'templates' and 50 or 100) + (options.spawn_menu_show_icons and 36 or 18))
             if options.spawn_menu_show_icons then
                 windowGroup.unitEntries[index].img = Bitmap(windowGroup.unitEntries[index])
                 windowGroup.unitEntries[index].img.Height:Set(16 * UIScale)
