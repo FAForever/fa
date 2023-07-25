@@ -117,7 +117,7 @@ end
 function UserUnit:GetShieldRatio()
 end
 
---- Retrieves a statistic that is assigned to a unit by the sim call `unit:UpdateUIStatistic`. Returns the default
+--- Retrieves a statistic that is assigned to a unit by the sim call `unit:UpdateStat`. Returns the default
 --- when the value does not exist
 ---@param name string
 ---@param defaultVal? number

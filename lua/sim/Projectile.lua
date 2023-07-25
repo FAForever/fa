@@ -250,7 +250,7 @@ Projectile = ClassProjectile(ProjectileMethods) {
 
             -- keep track of the number of intercepted missiles
             if not IsDestroyed(instigator) then
-                instigator:UpdateUIStatistic('KILLS', instigator:GetStat('KILLS', 0).Value + 1)
+                instigator:UpdateStat('KILLS', instigator:GetStat('KILLS', 0).Value + 1)
             end
         end
 

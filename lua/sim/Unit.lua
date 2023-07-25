@@ -265,15 +265,15 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         end
 
         -- for syncing data to UI
-        self:UpdateUIStatistic("HitpointsRegeneration", bp.Defense.RegenRate)
-        self:UpdateUIStatistic("HitpointsRegeneration", bp.Defense.RegenRate)
+        self:UpdateStat("HitpointsRegeneration", bp.Defense.RegenRate)
+        self:UpdateStat("HitpointsRegeneration", bp.Defense.RegenRate)
 
         -- add support for keeping track of reclaim statistics
         if self.Blueprint.General.CommandCapsHash['RULEUCC_Reclaim'] then
             self.ReclaimedMass = 0
             self.ReclaimedEnergy = 0
-            self:UpdateUIStatistic("ReclaimedMass", 0)
-            self:UpdateUIStatistic("ReclaimedEnergy", 0)
+            self:UpdateStat("ReclaimedMass", 0)
+            self:UpdateStat("ReclaimedEnergy", 0)
         end
 
         -- add support for automated jamming reset
@@ -821,8 +821,8 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
             end
 
             -- update UI
-            self:UpdateUIStatistic('ReclaimedMass', self.ReclaimedMass)
-            self:UpdateUIStatistic('ReclaimedEnergy', self.ReclaimedEnergy)
+            self:UpdateStat('ReclaimedMass', self.ReclaimedMass)
+            self:UpdateStat('ReclaimedEnergy', self.ReclaimedEnergy)
         end
 
         -- reset reclaiming state
@@ -4252,7 +4252,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
     ---@param value number
     SetRegen = function(self, value)
         self:SetRegenRate(value)
-        self:UpdateUIStatistic("HitpointsRegeneration", value)
+        self:UpdateStat("HitpointsRegeneration", value)
     end,
 
     -------------------------------------------------------------------------------------------
@@ -4764,7 +4764,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         cUnit.GiveNukeSiloAmmo(self, blocks, true)
     end,
 
-    --- Use `unit:UpdateUIStatistic` instead
+    --- Use `unit:UpdateStat` instead
     ---@deprecated
     SetStat = function(self)
         -- this hides the c implementation
@@ -4775,7 +4775,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
     ---@param self Unit
     ---@param key string
     ---@param value number
-    UpdateUIStatistic = function(self, key, value)
+    UpdateStat = function(self, key, value)
         -- With thanks to 4z0t the `SetStat` function no longer hard-crashes when the value doesn't exist. Instead, it returns 'true' 
         -- when the stat doesn't exist. If it doesn't exist then we can use `GetStat` to initialize it. This makes no sense, therefore
         -- we have this new function to hide the magic
