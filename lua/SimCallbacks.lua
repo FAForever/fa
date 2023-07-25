@@ -1022,6 +1022,7 @@ do
         -----------------------------------------------------------------------
         -- assign orders
 
+        local dummyEmptyTable = {}
         local dummyUnitTable = {}
         local dummyVectorTable = {}
 
@@ -1044,21 +1045,78 @@ do
             end
 
             if issueOrder then
+                
                 -- special snowflake implementation for the mobile build order. There's
                 -- many ways to break the game when distributing this order therefore
                 -- we limit the functionality to make it as least game breaking as possible
+
+                -- assuming that the user didn't do something odd, the order of the order
+                -- table and the unit table match up: the 1st unit is close to the 1st
+                -- order, the 2nd unit is close to the 2nd order, etc
+
                 if commandType == 'BuildMobile' then
-                    LOG("Mobile build orders")
-                    for _, unit in units do
-                        dummyUnitTable[1] = unit
-                        for redundancy = 1, math.min(orderCount, redundantOrders) do
-                            local order = group[math.mod(offset, orderCount) + 1]
+                    if orderCount == unitCount then
+
+                        -- this case is simple: assing each unit an order
+
+                        for k, _ in units do
+                            local unit = units[k]
+                            local order = group[k]
+                            dummyUnitTable[1] = unit
+                            dummyVectorTable[1] = order.x
+                            dummyVectorTable[2] = order.y
+                            dummyVectorTable[3] = order.z
+                            issueOrder(dummyUnitTable, dummyVectorTable, order.blueprintId, dummyEmptyTable)
+                            offset = offset + 1
+                        end
+                    elseif orderCount > unitCount then
+
+                        -- this is the usual case, we look over the units and assign each unit
+                        -- to multiple orders
+
+                        local ordersProcessed = 0
+                        local ordersRemaining = orderCount
+                        local unitsRemaining = unitCount
+                        for k, unit in units do
+                            dummyUnitTable[1] = unit
+
+                            local count = math.ceil(ordersRemaining / unitsRemaining)
+                            for k = 1, count do
+                                local order = group[ordersProcessed + k]
+                                dummyVectorTable[1] = order.x
+                                dummyVectorTable[2] = order.y
+                                dummyVectorTable[3] = order.z
+                                issueOrder(dummyUnitTable, dummyVectorTable, order.blueprintId, dummyEmptyTable)
+                            end
+
+                            -- update state
+                            ordersProcessed = ordersProcessed + count
+                            ordersRemaining = ordersRemaining - count
+                            unitsRemaining = unitsRemaining - 1
+                        end
+                    else
+
+                        -- this is an odd case, we look over the orders and assign multiple
+                        -- units the same order
+
+                        local unitsProcessed = 0
+                        local unitsRemaining = unitCount
+                        local ordersRemaining = orderCount
+                        for k, order in group do
                             dummyVectorTable[1] = order.x
                             dummyVectorTable[2] = order.y
                             dummyVectorTable[3] = order.z
 
-                            issueOrder(dummyUnitTable, dummyVectorTable, order.blueprintId, {})
-                            offset = offset + 1
+                            local count = math.ceil(unitsRemaining / ordersRemaining)
+                            for k = 1, count do
+                                dummyUnitTable[1] = units[unitsProcessed + k]
+                                issueOrder(dummyUnitTable, dummyVectorTable, order.blueprintId, dummyEmptyTable)
+                            end
+
+                            -- update state
+                            unitsProcessed = unitsProcessed + count
+                            unitsRemaining = unitsRemaining - count
+                            ordersRemaining = ordersRemaining - 1
                         end
                     end
                 elseif batchOrders then
