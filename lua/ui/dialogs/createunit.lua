@@ -730,21 +730,28 @@ function GetUnitDescription(id)
     return info
 end
 
-function SetUnitFactionIcon(id, bitmap, background)
-    local bp = __blueprints[id]
-    local faction = false
-    local color = false
-    if bp.CategoriesHash then
-        if bp.CategoriesHash.UEF then faction = 0 color = 'ff00c1ff' end
-        if bp.CategoriesHash.AEON then faction = 1 color = 'ff89d300' end
-        if bp.CategoriesHash.CYBRAN then faction = 2 color = 'ffff0000' end
-        if bp.CategoriesHash.SERAPHIM then faction = 3 color = 'FFFFBF00' end
-        if bp.CategoriesHash.NOMADS then faction = 4 color = 'FFFF7200' end
-    end
+local FactionData = {
+    { color = 'ff00c1ff', name = 'UEF', icon = UIUtil.UIFile(UIUtil.GetFactionIcon(0)) },
+    { color = 'ff89d300', name = 'AEON', icon = UIUtil.UIFile(UIUtil.GetFactionIcon(1)) },
+    { color = 'ffff0000', name = 'CYBRAN', icon = UIUtil.UIFile(UIUtil.GetFactionIcon(2)) },
+    { color = 'FFFFBF00', name = 'SERAPHIM', icon = UIUtil.UIFile(UIUtil.GetFactionIcon(3)) },
+}
 
-    if bitmap and faction and color then
-        bitmap:SetTexture(UIUtil.UIFile(UIUtil.GetFactionIcon(faction)))
-        background:SetSolidColor(color)
+function GetUnitFactionInfo(id)
+    local bp = __blueprints[id]
+    if bp and bp.CategoriesHash then
+        for k, faction in FactionData do
+            if bp.CategoriesHash[faction.name] then return faction end
+        end
+    end
+    return { color = false, icon = false }
+end
+
+function SetUnitFactionIcon(id, bitmap, background)
+    local faction = GetUnitFactionInfo(id)
+    if bitmap and faction.icon and faction.color then
+        bitmap:SetTexture(faction.icon)
+        background:SetSolidColor(faction.color)
         background:SetAlpha(1, true)
     else
         background:SetAlpha(0, true)
@@ -1564,36 +1571,56 @@ function CreateDialog()
     end
     local function CreateElementMouseover(unitData,x,y)
         if mouseover then mouseover:Destroy() end
+
+        local faction = GetUnitFactionInfo(unitData)
         mouseover = Bitmap(windowGroup)
-        mouseover:SetSolidColor('dd115511')
-        mouseover.img = Bitmap(mouseover)
-        LayoutHelpers.SetDimensions(mouseover.img, 40, 40)
-        LayoutHelpers.AtLeftTopIn(mouseover.img, mouseover, 2,2)
+        mouseover:SetSolidColor('DD111111')
+        
+        mouseover.fill = Bitmap(mouseover)
+        mouseover.fill:SetSolidColor(faction.color or 'DD232323')
+        mouseover.fill:SetAlpha(0.15, false)
+
+        local iconSize = 45
+        mouseover.bg = Bitmap(mouseover.fill)
+        LayoutHelpers.SetDimensions(mouseover.bg, iconSize, iconSize)
+        LayoutHelpers.AtLeftTopIn(mouseover.bg, mouseover, 6, 2)
+        LayoutHelpers.AtVerticalCenterIn(mouseover.bg, mouseover)
+
+        mouseover.img = Bitmap(mouseover.bg)
+        LayoutHelpers.SetDimensions(mouseover.img, iconSize, iconSize)
+        LayoutHelpers.AtLeftTopIn(mouseover.img, mouseover, 6, 2)
+        LayoutHelpers.AtVerticalCenterIn(mouseover.img, mouseover)
 
         SetUnitImage(mouseover.img, unitData)
+        SetBackgroundImage(mouseover.bg, unitData)
 
         local bp = __blueprints[unitData]
         local info = ''
         if DialogMode == 'units' then
-            local level = GetUnitDescription(unitData)
-            info = level --and (level .. ' ') or ''
-            -- info = info .. LOC(bp.Description)
+            info = string.gsub(GetUnitDescription(unitData), "^%s*(.-)%s*$", "%1")
         else
             info = bp.Interface and bp.Interface.HelpText
         end
 
-        mouseover.name = UIUtil.CreateText(mouseover, info, 14, UIUtil.bodyFont)
-        LayoutHelpers.RightOf(mouseover.name, mouseover.img, 2)
+        mouseover.name = UIUtil.CreateText(mouseover.fill, info, 14, UIUtil.bodyFont)
+        mouseover.name:SetColor(faction.color or 'DDD8D8D8')
+        mouseover.name:SetAlpha(0.85, false)
+        LayoutHelpers.RightOf(mouseover.name, mouseover.img, 4)
+        LayoutHelpers.AtTopIn(mouseover.name, mouseover, 8)
 
-        mouseover.desc = UIUtil.CreateText(mouseover, bp.General.UnitName or unitData, 14, UIUtil.bodyFont)
-        LayoutHelpers.AtLeftIn(mouseover.desc, mouseover, 44)
-        LayoutHelpers.AtBottomIn(mouseover.desc, mouseover, 5)
+        mouseover.desc = UIUtil.CreateText(mouseover.fill, string.upper(unitData), 14, UIUtil.bodyFont)
+        mouseover.desc:SetColor(faction.color or 'DDD8D8D8')
+        mouseover.desc:SetAlpha(0.85, false)
+        LayoutHelpers.RightOf(mouseover.desc, mouseover.img, 4)
+        LayoutHelpers.Below(mouseover.desc, mouseover.name, 6)
 
         mouseover.Left:Set(x+20 * UIScale)
         mouseover.Top:Set(y+20 * UIScale)
-        mouseover.Height:Set(function() return mouseover.img.Height() + 4 * UIScale end)
-        mouseover.Width:Set(function() return mouseover.img.Width() + math.max(mouseover.name.Width(), mouseover.desc.Width()) + 8 * UIScale end)
+        mouseover.Height:Set(function() return mouseover.img.Height() + 10 * UIScale end)
+        mouseover.Width:Set(function() return mouseover.img.Width() + math.max(mouseover.name.Width(), mouseover.desc.Width()) + 15 * UIScale end)
         mouseover.Depth:Set(GetFrame(0):GetTopmostDepth() + 1)
+
+        LayoutHelpers.FillParent(mouseover.fill, mouseover)
     end
     local MouseOverElement = {
         units = CreateElementMouseover,
