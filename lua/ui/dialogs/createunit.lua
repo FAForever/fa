@@ -716,13 +716,11 @@ function SetUnitFactionIcon(id, bitmap, background)
     end
 
     if bitmap and faction and color then
-        local icon = UIUtil.UIFile(UIUtil.GetFactionIcon(faction))
-        bitmap:SetAlpha(1, false)
-        bitmap:SetTexture(icon)
+        bitmap:SetTexture(UIUtil.UIFile(UIUtil.GetFactionIcon(faction)))
         background:SetSolidColor(color)
+        background:SetAlpha(1, true)
     else
-        bitmap:SetAlpha(0, false)
-        background:SetSolidColor('transparent')
+        background:SetAlpha(0, true)
     end
 end
 
@@ -1751,6 +1749,7 @@ function CreateDialog()
                 if options.spawn_menu_show_icons then
                     SetUnitImage(line.img, data.id.icon, true)
                 end
+                line.factionBG:SetAlpha(0, true)
             elseif DialogMode == 'units' then
                 line.id:SetText(data.id:sub(1, 15)..(data.id:len()>15 and '…' or ''))--format('%s %5s %s', data.id, ' ', data.desc))
                 -- line.id2:SetText(data.desc)
@@ -1765,6 +1764,7 @@ function CreateDialog()
                 if options.spawn_menu_show_icons then
                     SetUnitImage(line.img, data.id, true)
                 end
+                line.factionBG:SetAlpha(0, true)
             end
         end
         for i, v in windowGroup.unitEntries do
