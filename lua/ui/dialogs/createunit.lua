@@ -1648,10 +1648,10 @@ function CreateDialog()
                 end
             end
 
-            unitSelector.id = UIUtil.CreateText(unitSelector, '', 11, UIUtil.bodyFont)
-            LayoutHelpers.AtLeftTopIn(unitSelector.id, unitSelector, options.spawn_menu_show_icons and 18 or 2)
-            unitSelector.id2 = UIUtil.CreateText(unitSelector, '', 12, UIUtil.bodyFont)
-            LayoutHelpers.AtLeftTopIn(unitSelector.id2, unitSelector, (DialogMode == 'templates' and 50 or 100) + (options.spawn_menu_show_icons and 36 or 18))
+            unitSelector.id = UIUtil.CreateText(unitSelector, '', 12, 'Arial')
+            LayoutHelpers.AtLeftTopIn(unitSelector.id, unitSelector, options.spawn_menu_show_icons and 22 or 2)
+            unitSelector.desc = UIUtil.CreateText(unitSelector, '', 12, UIUtil.bodyFont)
+            LayoutHelpers.AtLeftTopIn(unitSelector.desc, unitSelector, (DialogMode == 'templates' and 50 or 120) + (options.spawn_menu_show_icons and 36 or 18))
             if options.spawn_menu_show_icons then
                 unitSelector.imageBG = Bitmap(unitSelector)
                 unitSelector.imageBG.Height:Set(16 * UIScale)
@@ -1668,12 +1668,12 @@ function CreateDialog()
             unitSelector.factionBG.Height:Set(16 * UIScale)
             unitSelector.factionBG.Width:Set(16 * UIScale)
             unitSelector.factionBG:SetSolidColor('red')
-            LayoutHelpers.LeftOf(unitSelector.factionBG, unitSelector.id2, 2)
+            LayoutHelpers.LeftOf(unitSelector.factionBG, unitSelector.desc, 2)
 
             unitSelector.factionIcon = Bitmap(unitSelector.factionBG)
             unitSelector.factionIcon.Height:Set(16 * UIScale)
             unitSelector.factionIcon.Width:Set(16 * UIScale)
-            LayoutHelpers.LeftOf(unitSelector.factionIcon, unitSelector.id2, 2)
+            LayoutHelpers.LeftOf(unitSelector.factionIcon, unitSelector.desc, 2)
             -- storing the unit selector for access in rest of UI
             windowGroup.unitEntries[index] = unitSelector
         end
@@ -1751,16 +1751,16 @@ function CreateDialog()
                 end
 
                 line.id:SetText(td[1]..'×'..td[2])
-                line.id2:SetText(str)
+                line.desc:SetText(str)
                 if options.spawn_menu_show_icons then
                     SetUnitImage(line.img, data.id.icon, true)
                 end
                 line.factionBG:SetAlpha(0, true)
                 line.imageBG:SetAlpha(0, false)
             elseif DialogMode == 'units' then
-                line.id:SetText(data.id:sub(1, 15)..(data.id:len()>15 and '…' or ''))--format('%s %5s %s', data.id, ' ', data.desc))
-                -- line.id2:SetText(data.desc)
-                line.id2:SetText(GetUnitDescription(data.id))
+                local unitID =  data.id:sub(1, 3) .. ' ' .. data.id:sub(4, 14) .. (data.id:len() > 14 and '…' or '')
+                line.id:SetText(string.upper(unitID))
+                line.desc:SetText(GetUnitDescription(data.id))
                 if options.spawn_menu_show_icons then
                     SetUnitImage(line.img, data.id, true)
                     SetBackgroundImage(line.imageBG, data.id)
@@ -1768,7 +1768,7 @@ function CreateDialog()
                 SetUnitFactionIcon(data.id, line.factionIcon, line.factionBG)
             elseif DialogMode == 'props' then
                 line.id:SetText(data.id:match('([^/]*)_prop%.bp') or data.id:sub(-24, -9) or data.id)--format('%s %5s %s', data.id, ' ', data.desc))
-                line.id2:SetText(__blueprints[data.id].Interface.HelpText or '[no text]')
+                line.desc:SetText(__blueprints[data.id].Interface.HelpText or '[no text]')
                 if options.spawn_menu_show_icons then
                     SetUnitImage(line.img, data.id, true)
                 end
