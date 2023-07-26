@@ -630,6 +630,9 @@ end
 do
 
     ---@class DistributeOrderInfo
+    ---@field BatchOrders boolean
+    ---@field FullRedundancy boolean
+    ---
     ---@field Type string                   # Describes the intended order, used during debugging
     ---@field Callback function | false     # Function that matches the intended order
     ---@field RequiresEntity boolean        # Flag that indicates this order requires an entity and should be skipped otherwise
@@ -653,6 +656,7 @@ do
             RequiresEntity = false,
             Redundancy = 1,
             ApplyAllOrders = false,
+            BatchOrders = true,
         },
         [3] = {
             Type = "Dive",
@@ -710,6 +714,7 @@ do
             Redundancy = 3,
             ApplyAllOrders = true,
             BatchOrders = true,
+            FullRedundancy = true,
         },
         [11] = {
             Type = "FormAttack",
@@ -744,7 +749,9 @@ do
             Callback = IssueGuard,
             RequiresEntity = true,
             Redundancy = 1,
-            ApplyAllOrders = true,
+            ApplyAllOrders = false,
+            BatchOrders = true,
+            FullRedundancy = true,
         },
         [16] = {
             Type = "Patrol",
@@ -773,6 +780,8 @@ do
             RequiresEntity = true,
             Redundancy = 1,
             ApplyAllOrders = true,
+            BatchOrders = true,
+            FullRedundancy = true,
         },
         [20] = {
             Type = "Repair",
@@ -780,6 +789,8 @@ do
             RequiresEntity = true,
             Redundancy = 1,
             ApplyAllOrders = true,
+            BatchOrders = true,
+            FullRedundancy = true,
         },
         [21] = {
             Type = "Capture",
@@ -787,6 +798,8 @@ do
             RequiresEntity = true,
             Redundancy = 1,
             ApplyAllOrders = true,
+            BatchOrders = true,
+            FullRedundancy = true,
         },
         [22] = {
             Type = "TransportLoadUnits",
@@ -916,6 +929,61 @@ do
         },
     }
 
+    --- Constructs `l` batches of roughly even size such that when combined they sum up to `h`.
+    --- As an example, the output is `{3, 3, 2, 2}` when `h = 10` and `l = 4`. The cache parameter
+    --- allows us to re-use memory
+    ---@param h number          # Higher number
+    ---@param l number          # Lower number 
+    ---@param cache number[]    # Table with as many elements as `l`, such as 
+    ---@return number[]
+    local function ComputeBatchCounts(h, l, cache)
+
+        -- clear out the cache
+        for k, _ in cache do
+            cache[k] = nil
+        end
+
+        for k = 1, l do
+            local count = math.ceil(h / l)
+            cache[k] = count
+            h = h - count
+            l = l - 1
+        end
+
+        return cache
+    end
+
+    --- Populates a small batch of units. The cache parameter allows us to re-use memory
+    ---@param start number  # Start index, element is included in the output
+    ---@param count number  # Number of elements to include
+    ---@param array Unit[]  # Array to take elements from
+    ---@param cache Unit[]  # Cache to store the elements in
+    ---@return Unit[]
+    local function PopulateBatch(start, count, array, cache)
+        -- clear out the cache
+        for k, _ in cache do
+            cache[k] = nil
+        end
+
+        local head = 1
+        for k = start, start + count do
+            cache[head] = array[k]
+            head = head + 1
+        end
+
+        return cache
+    end
+
+    ---@param order any
+    ---@param cache Vector
+    ---@return Vector
+    local function PopulateLocation(order, cache)
+        cache[1] = order.x
+        cache[2] = order.y
+        cache[3] = order.z
+        return cache
+    end
+
     --- Processes the orders and re-distributes them over the units
     ---@param data any
     ---@param units Unit[]
@@ -946,6 +1014,7 @@ do
         for k, order in orders do
 
             -- find the first order that represents a position
+
             local ox = order.x
             local oz = order.z
             if (not px) and (ox > 0) and (oz > 0) then
@@ -1022,14 +1091,26 @@ do
         -----------------------------------------------------------------------
         -- assign orders
 
+        ---@type number[]
+        local dummyBatches = {}
+
+        ---@type Unit[]
+        local dummyBatchTable = {}
+
+        ---@type table
+        local dummyEmptyTable = {}
+
+        ---@type { [1]: Unit }
         local dummyUnitTable = {}
+
+        ---@type { [1]: number, [2]: number, [3]: number }
         local dummyVectorTable = {}
 
         local offset = 0
         local unitCount = table.getn(units)
         for k, group in groups do
-
             local orderCount = table.getn(group)
+
             -- extract info on how to apply these orders
             local commandInfo = CommandInfo[group[1].commandType]
             local commandType = commandInfo.Type
@@ -1037,6 +1118,7 @@ do
             local redundantOrders = commandInfo.Redundancy
             local applyAllOrders = commandInfo.ApplyAllOrders
             local batchOrders = commandInfo.BatchOrders
+            local fullRedundancy = commandInfo.FullRedundancy
 
             -- increase redundancy to guarantee all orders are applied at least once
             if applyAllOrders and (unitCount * redundantOrders < orderCount) then
@@ -1044,70 +1126,155 @@ do
             end
 
             if issueOrder then
+
                 -- special snowflake implementation for the mobile build order. There's
                 -- many ways to break the game when distributing this order therefore
                 -- we limit the functionality to make it as least game breaking as possible
+
+                -- assuming that the user didn't do something odd, the order of the order
+                -- table and the unit table match up: the 1st unit is close to the 1st
+                -- order, the 2nd unit is close to the 2nd order, etc
+
                 if commandType == 'BuildMobile' then
-                    LOG("Mobile build orders")
-                    for _, unit in units do
-                        dummyUnitTable[1] = unit
-                        for redundancy = 1, math.min(orderCount, redundantOrders) do
-                            local order = group[math.mod(offset, orderCount) + 1]
+                    if orderCount == unitCount then
+
+                        -- this case is simple: assing each unit an order
+
+                        for k, _ in units do
+                            local unit = units[k]
+                            local order = group[k]
+                            dummyUnitTable[1] = unit
+                            dummyVectorTable[1] = order.x
+                            dummyVectorTable[2] = order.y
+                            dummyVectorTable[3] = order.z
+                            issueOrder(dummyUnitTable, dummyVectorTable, order.blueprintId, dummyEmptyTable)
+                        end
+                    elseif orderCount > unitCount then
+
+                        -- this is the usual case, we look over the units and assign each unit
+                        -- to multiple orders
+
+                        local start = 1
+                        local batches = ComputeBatchCounts(orderCount, unitCount, dummyBatches)
+                        for k, batch in batches do
+                            dummyUnitTable[1] = units[k]
+                            local orderBatch = PopulateBatch(start, batch - 1, group, dummyBatchTable)
+                            start = start + batch
+                            for _, order in orderBatch do
+                                dummyVectorTable[1] = order.x
+                                dummyVectorTable[2] = order.y
+                                dummyVectorTable[3] = order.z
+                                issueOrder(dummyUnitTable, dummyVectorTable, order.blueprintId, dummyEmptyTable)
+                            end
+                        end
+                    else
+
+                        -- this is an odd case, we look over the orders and assign multiple
+                        -- units the same order
+
+                        local start = 1
+                        local batches = ComputeBatchCounts(unitCount, orderCount, dummyBatches)
+                        for k, batch in batches do
+                            local order = group[k]
                             dummyVectorTable[1] = order.x
                             dummyVectorTable[2] = order.y
                             dummyVectorTable[3] = order.z
 
-                            issueOrder(dummyUnitTable, dummyVectorTable, order.blueprintId, {})
-                            offset = offset + 1
+                            local unitBatch = PopulateBatch(start, batch - 1, units, dummyBatchTable)
+                            start = start + batch
+                            for _, unit in unitBatch do
+                                dummyUnitTable[1] = unit
+                                issueOrder(dummyUnitTable, dummyVectorTable, order.blueprintId, dummyEmptyTable)
+                            end
                         end
                     end
                 elseif batchOrders then
                     LOG("Batching orders")
 
-                    -- prepare orders
-                    for _, order in group do
-                        order.Entity = order.target
-                        order.Location = { order.x, order.y, order.z }
-                    end
-
-                    local unitsPerBatch = math.ceil(unitCount / orderCount)
-                    local redundancy = orderCount
-                    LOG(string.format("Units per batch: %d", unitsPerBatch))
-                    LOG(string.format("Redundancy: %d", redundancy))
                     local ordersApplied = 0
-                    -- issue orders
-                    for b = 1, redundancy do
-                        for o, _ in group do
-                            -- give an offset to each order
-                            local order = group[math.mod(o + b, orderCount) + 1]
+                    if fullRedundancy then
 
-                            -- compute the batch of units
-                            local batch = {}
-                            for k = 1, unitsPerBatch do
-                                local unit = units[k + (b - 1) * unitsPerBatch]
-                                if unit then
-                                    table.insert(batch, unit)
+                        -- in this case we want to introduce as much redundancy as possible
+
+                        LOG(" - Full redundancy")
+
+                        -- prepare orders
+                        for _, order in group do
+                            order.Entity = order.target
+                            order.Location = { order.x, order.y, order.z }
+                        end
+
+                        local unitsPerBatch = math.ceil(unitCount / orderCount)
+                        local redundancy = orderCount
+                        LOG(string.format(" - Units per batch: %d", unitsPerBatch))
+                        LOG(string.format(" - Redundancy: %d", redundancy))
+
+                        -- issue orders
+                        for b = 1, redundancy do
+                            for o, _ in group do
+                                -- give an offset to each order
+                                local order = group[math.mod(o + b, orderCount) + 1]
+
+                                -- compute the batch of units
+                                local batch = {}
+                                for k = 1, unitsPerBatch do
+                                    local unit = units[k + (b - 1) * unitsPerBatch]
+                                    if unit then
+                                        table.insert(batch, unit)
+                                    end
+                                end
+
+                                -- LOG(string.format("Apply order at: (%s)", repru(order.Location)))
+                                -- for k, unit in batch do
+                                --     LOG(unit.EntityId)
+                                -- end
+
+                                ordersApplied = ordersApplied + 1
+
+                                if order.Entity then
+                                    issueOrder(batch, order.Entity)
+                                elseif commandInfo.Type == 'BuildMobile' then
+                                    issueOrder(batch, order.Location, order.blueprintId, {})
+                                elseif not commandInfo.RequiresEntity then
+                                    issueOrder(batch, order.Location)
                                 end
                             end
+                        end
+                    else
+                        LOG(" - No redundancy")
 
-                            -- LOG(string.format("Apply order at: (%s)", repru(order.Location)))
-                            -- for k, unit in batch do
-                            --     LOG(unit.EntityId)
-                            -- end
+                        if orderCount >= unitCount then
 
-                            ordersApplied = ordersApplied + 1
+                            -- strange situation where we have more orders than units
 
-                            if order.Entity then
-                                issueOrder(batch, order.Entity)
-                            elseif commandInfo.Type == 'BuildMobile' then
-                                issueOrder(batch, order.Location, order.blueprintId, {})
-                            elseif not commandInfo.RequiresEntity then
-                                issueOrder(batch, order.Location)
+                            local start = 1
+                            local batches = ComputeBatchCounts(orderCount, unitCount, dummyBatches)
+                            for k, batch in batches do
+                                dummyUnitTable[1] = units[k]
+                                local orderBatch = PopulateBatch(start, batch - 1, group, dummyBatchTable)
+                                start = start + batch
+                                for _, order in orderBatch do
+                                    issueOrder(dummyUnitTable, order.target or PopulateLocation(order, dummyVectorTable))
+                                    ordersApplied = ordersApplied + 1
+                                end
+                            end
+                        else
+
+                            -- usual situation where we have equal or more orders than units
+
+                            local start = 1
+                            local batches = ComputeBatchCounts(unitCount, orderCount, dummyBatches)
+                            for k, batch in batches do
+                                local order = group[k]
+                                local unitBatch = PopulateBatch(start, batch - 1, units, dummyBatchTable)
+                                start = start + batch
+                                issueOrder(unitBatch, order.target or PopulateLocation(order, dummyVectorTable))
+                                ordersApplied = ordersApplied + 1
                             end
                         end
                     end
 
-                    LOG(string.format("Orders applied: %d", ordersApplied))
+                    LOG(string.format(" - Orders applied: %d", ordersApplied))
                 else
                     -- apply individual orders
                     for _, unit in units do
