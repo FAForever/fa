@@ -1469,6 +1469,7 @@ function CreateDialog()
             air = '/textures/ui/common/icons/units/air_up.dds',
         }
         bitmap:SetTexture(textures[GetLayerGroup(id)])
+        bitmap:SetAlpha(1, false)
     end
     local function GetUnitSkirtSizes(id)
         local bp = __blueprints[id]
@@ -1652,7 +1653,12 @@ function CreateDialog()
             unitSelector.id2 = UIUtil.CreateText(unitSelector, '', 12, UIUtil.bodyFont)
             LayoutHelpers.AtLeftTopIn(unitSelector.id2, unitSelector, (DialogMode == 'templates' and 50 or 100) + (options.spawn_menu_show_icons and 36 or 18))
             if options.spawn_menu_show_icons then
-                unitSelector.img = Bitmap(unitSelector)
+                unitSelector.imageBG = Bitmap(unitSelector)
+                unitSelector.imageBG.Height:Set(16 * UIScale)
+                unitSelector.imageBG.Width:Set(16 * UIScale)
+                LayoutHelpers.AtLeftTopIn(unitSelector.imageBG, unitSelector)
+
+                unitSelector.img = Bitmap(unitSelector.imageBG)
                 unitSelector.img.Height:Set(16 * UIScale)
                 unitSelector.img.Width:Set(16 * UIScale)
                 LayoutHelpers.AtLeftTopIn(unitSelector.img, unitSelector)
@@ -1750,12 +1756,14 @@ function CreateDialog()
                     SetUnitImage(line.img, data.id.icon, true)
                 end
                 line.factionBG:SetAlpha(0, true)
+                line.imageBG:SetAlpha(0, false)
             elseif DialogMode == 'units' then
                 line.id:SetText(data.id:sub(1, 15)..(data.id:len()>15 and '…' or ''))--format('%s %5s %s', data.id, ' ', data.desc))
                 -- line.id2:SetText(data.desc)
                 line.id2:SetText(GetUnitDescription(data.id))
                 if options.spawn_menu_show_icons then
                     SetUnitImage(line.img, data.id, true)
+                    SetBackgroundImage(line.imageBG, data.id)
                 end
                 SetUnitFactionIcon(data.id, line.factionIcon, line.factionBG)
             elseif DialogMode == 'props' then
@@ -1765,6 +1773,7 @@ function CreateDialog()
                     SetUnitImage(line.img, data.id, true)
                 end
                 line.factionBG:SetAlpha(0, true)
+                line.imageBG:SetAlpha(0, false)
             end
         end
         for i, v in windowGroup.unitEntries do
