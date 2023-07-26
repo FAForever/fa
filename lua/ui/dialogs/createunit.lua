@@ -683,14 +683,18 @@ end
 
 function GetUnitDescription(id)
     local bp = __blueprints[id]
-    local info = ''
-    if bp.CategoriesHash.TECH1 then info = 'T1 ' end
-    if bp.CategoriesHash.TECH2 then info = 'T2 ' end
-    if bp.CategoriesHash.TECH3 then info = 'T3 ' end
-    if bp.CategoriesHash.EXPERIMENTAL then info = 'T4 ' end
-    if bp.Description then
-        info = info .. LOC(bp.Description)
+    local info = '    ' -- defaulting to no tech level for civilans
+    if not bp.CategoriesHash.CIVILIAN and not bp.CategoriesHash.OPERATION then
+        if bp.CategoriesHash.TECH1 then info = 'T1'
+        elseif bp.CategoriesHash.TECH2 then info = 'T2'
+        elseif bp.CategoriesHash.TECH3 then info = 'T3'
+        elseif bp.CategoriesHash.EXPERIMENTAL then info = 'T4' end
     end
+
+    if bp.Description then
+        info = info .. ' ' .. LOC(bp.Description)
+    end
+
     if bp.General.UnitName then
         info = info .. ' (' .. LOC(bp.General.UnitName) .. ')'
     end
