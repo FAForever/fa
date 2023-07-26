@@ -219,22 +219,14 @@ function SourceListTabs()
                 title = '<LOC spawn_filter_civilans>Civilans',
                 key = 'civ',
                 sortFunc = function(unitID, modloc)
-                    local bp = __blueprints[unitID]
-                    return bp.CategoriesHash.CIVILIAN
-                        or bp.CategoriesHash.OPERATION
-                        or bp.CategoriesHash.INSIGNIFICANTUNIT
-                        or bp.CategoriesHash.UNTARGETABLE
+                    return not IsUnitPlayable(unitID)
                 end,
             },
             {
                 title = '<LOC spawn_filter_playable>Playable',
                 key = 'play',
                 sortFunc = function(unitID, modloc)
-                    local bp = __blueprints[unitID]
-                    return not bp.CategoriesHash.CIVILIAN
-                       and not bp.CategoriesHash.OPERATION
-                       and not bp.CategoriesHash.INSIGNIFICANTUNIT
-                       and not bp.CategoriesHash.UNTARGETABLE
+                    return IsUnitPlayable(unitID)
                 end,
             }
         }
@@ -703,10 +695,18 @@ function GetItems(mode)
     end
 end
 
+function IsUnitPlayable(unitID)
+    local bp = __blueprints[unitID]
+    return not bp.CategoriesHash.CIVILIAN
+       and not bp.CategoriesHash.OPERATION
+       and not bp.CategoriesHash.INSIGNIFICANTUNIT
+       and not bp.CategoriesHash.UNTARGETABLE
+end
+
 function GetUnitDescription(id)
     local bp = __blueprints[id]
     local info = '    ' -- defaulting to no tech level for civilans
-    if not bp.CategoriesHash.CIVILIAN and not bp.CategoriesHash.OPERATION then
+    if IsUnitPlayable(id) then
         if bp.CategoriesHash.TECH1 then info = 'T1'
         elseif bp.CategoriesHash.TECH2 then info = 'T2'
         elseif bp.CategoriesHash.TECH3 then info = 'T3'
@@ -739,7 +739,7 @@ local FactionData = {
 
 function GetUnitFactionInfo(id)
     local bp = __blueprints[id]
-    if bp and bp.CategoriesHash then
+    if bp and bp.CategoriesHash and IsUnitPlayable(id) then
         for k, faction in FactionData do
             if bp.CategoriesHash[faction.name] then return faction end
         end
