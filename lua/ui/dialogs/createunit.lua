@@ -214,6 +214,28 @@ function SourceListTabs()
                 sortFunc = function(unitID, modloc)
                     return string.sub(__blueprints[unitID].Source, 1, 7) == "/units/" and string.sub(unitID, 1, 1) ~= 'u' and string.sub(unitID, 1, 1) ~= 'x' and string.sub(unitID, 1, 1) ~= 'o'
                 end,
+            },
+            {
+                title = '<LOC spawn_filter_civilans>Civilans',
+                key = 'civ',
+                sortFunc = function(unitID, modloc)
+                    local bp = __blueprints[unitID]
+                    return bp.CategoriesHash.CIVILIAN
+                        or bp.CategoriesHash.OPERATION
+                        or bp.CategoriesHash.INSIGNIFICANTUNIT
+                        or bp.CategoriesHash.UNTARGETABLE
+                end,
+            },
+            {
+                title = '<LOC spawn_filter_playable>Playable',
+                key = 'play',
+                sortFunc = function(unitID, modloc)
+                    local bp = __blueprints[unitID]
+                    return not bp.CategoriesHash.CIVILIAN
+                       and not bp.CategoriesHash.OPERATION
+                       and not bp.CategoriesHash.INSIGNIFICANTUNIT
+                       and not bp.CategoriesHash.UNTARGETABLE
+                end,
             }
         }
     else
@@ -822,9 +844,9 @@ function CreateNameFilter(data)
         group.edit:SetHighlightForegroundColor(UIUtil.highlightColor)
         group.edit:SetHighlightBackgroundColor("880085EF")
         group.edit.Width:Set((FilterColumnCount-(2 * UIScale))*82)
-        LayoutHelpers.SetHeight(group.edit, 15)
+        LayoutHelpers.SetHeight(group.edit, 17)
         group.edit:SetText(filterSet[data.key].editText or '')
-        group.edit:SetFont(UIUtil.bodyFont, 12)
+        group.edit:SetFont(UIUtil.bodyFont, 15)
         group.edit:SetMaxChars(20)
         LayoutHelpers.AtLeftIn(group.edit, group, 95)
         LayoutHelpers.AtVerticalCenterIn(group.edit, group)
