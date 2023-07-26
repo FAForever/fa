@@ -688,7 +688,12 @@ function GetUnitDescription(id)
     if bp.CategoriesHash.TECH2 then info = 'T2 ' end
     if bp.CategoriesHash.TECH3 then info = 'T3 ' end
     if bp.CategoriesHash.EXPERIMENTAL then info = 'T4 ' end
-    info = info .. LOC(bp.Description)
+    if bp.Description then
+        info = info .. LOC(bp.Description)
+    end
+    if bp.General.UnitName then
+        info = info .. ' (' .. LOC(bp.General.UnitName) .. ')'
+    end
     -- removing faction name because we aready have faction icon in the list
     info = info:gsub("UEF ", "")
     info = info:gsub("Aeon ", "")
