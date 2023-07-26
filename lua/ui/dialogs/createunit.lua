@@ -718,7 +718,8 @@ function GetUnitDescription(id)
     end
 
     if bp.General.UnitName then
-        info = info .. ' (' .. LOC(bp.General.UnitName) .. ')'
+        local name = LOC(bp.General.UnitName)
+        info = info .. (name == '' and '' or (' (' .. name .. ')'))
     end
     -- removing faction name because we aready have faction icon in the list
     info = info:gsub("UEF ", "")
