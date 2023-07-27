@@ -533,6 +533,9 @@ function PostProcessUnitWithExternalFactory(allBlueprints, unit)
         efBlueprint.CategoriesHash[unit.FactionCategory] = true
         efBlueprint.CategoriesHash[unit.LayerCategory] = true
         efBlueprint.Categories = table.unhash(efBlueprint.CategoriesHash)
+        efBlueprint.SelectionSizeX = 0.95 * unit.SelectionSizeX
+        efBlueprint.SelectionSizeZ = 0.25 * unit.SelectionSizeZ
+        efBlueprint.SelectionCenterOffsetZ = 0.35 * unit.SelectionSizeZ
 
         -- remove properties of the seed unit
         unit.CategoriesHash['FACTORY'] = nil
