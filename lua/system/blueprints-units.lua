@@ -541,7 +541,7 @@ function PostProcessUnitWithExternalFactory(allBlueprints, unit)
         unit.CategoriesHash['FACTORY'] = nil
         unit.CategoriesHash['CONSTRUCTION'] = nil
         unit.Categories = table.unhash(unit.CategoriesHash)
-        unit.Economy.BuildRate = nil
+        unit.Economy.BuildRate = 0
         unit.Economy.BuildableCategory = nil
     end
 end

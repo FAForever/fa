@@ -1081,8 +1081,8 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
                 if focus:IsUnitState('SiloBuildingAmmo') then
                     local siloBuildRate = focus:GetBuildRate() or 1
                     time, energy, mass = focus:GetBuildCosts(focus.SiloProjectile)
-                    energy = (energy / siloBuildRate) * (self:GetBuildRate() or 1)
-                    mass = (mass / siloBuildRate) * (self:GetBuildRate() or 1)
+                    energy = (energy / siloBuildRate) * (self:GetBuildRate() or 0)
+                    mass = (mass / siloBuildRate) * (self:GetBuildRate() or 0)
                 else
                     time, energy, mass = self:GetBuildCosts(focus:GetBlueprint())
                     if self:IsUnitState('Repairing') and focus.isFinishedUnit then
@@ -1092,8 +1092,8 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
                 end
             end
 
-            energy = math.max(1, energy * (self.EnergyBuildAdjMod or 1))
-            mass = math.max(1, mass * (self.MassBuildAdjMod or 1))
+            energy = math.max(0, energy * (self.EnergyBuildAdjMod or 1))
+            mass = math.max(0, mass * (self.MassBuildAdjMod or 1))
             energy_rate = energy / time
             mass_rate = mass / time
         end
