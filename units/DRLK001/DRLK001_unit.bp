@@ -31,6 +31,7 @@ UnitBlueprint{
         "SELECTABLE",
         "TECH3",
         "VISIBLETORECON",
+        "WEAKDIRECTFIRE",
     },
     Defense = {
         AirThreatLevel = 33,
