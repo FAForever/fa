@@ -11,10 +11,12 @@ local TSAMLauncher = import("/lua/terranweapons.lua").TSAMLauncher
 local EffectUtil = import("/lua/effectutilities.lua")
 local CreateBuildCubeThread = EffectUtil.CreateBuildCubeThread
 
----@class UES0401 : AircraftCarrier
-UES0401 = ClassUnit(AircraftCarrier) {
-    BuildAttachBone = 'UES0401',
+local ExternalFactoryComponent = import("/lua/defaultcomponents.lua").ExternalFactoryComponent
 
+---@class UES0401 : AircraftCarrier, ExternalFactoryComponent
+UES0401 = ClassUnit(AircraftCarrier, ExternalFactoryComponent) {
+    BuildAttachBone = 'Attachpoint08',
+    FactoryAttachBone = 'ExternalFactoryPoint',
     Weapons = {
         Torpedo01 = ClassWeapon(TANTorpedoAngler) {},
         Torpedo02 = ClassWeapon(TANTorpedoAngler) {},
@@ -34,7 +36,7 @@ UES0401 = ClassUnit(AircraftCarrier) {
         AircraftCarrier.OnCreate(self)
         self.OpenAnimManips = {}
         self.OpenAnimManips[1] = CreateAnimator(self):PlayAnim('/units/ues0401/ues0401_aopen.sca'):SetRate(-1)
-        for i = 2, 6 do
+        for i = 2, 3 do
             self.OpenAnimManips[i] = CreateAnimator(self):PlayAnim('/units/ues0401/ues0401_aopen0' .. i .. '.sca'):SetRate(-1)
         end
 
@@ -45,6 +47,16 @@ UES0401 = ClassUnit(AircraftCarrier) {
         if self.Layer == 'Water' then
             self:PlayAllOpenAnims(true)
         end
+    end,
+
+    OnPaused = function(self)
+        AircraftCarrier.OnPaused(self)
+        ExternalFactoryComponent.OnPaused(self)
+    end,
+
+    OnUnpaused = function(self)
+        AircraftCarrier.OnUnpaused(self)
+        ExternalFactoryComponent.OnUnpaused(self)
     end,
 
     StartBeingBuiltEffects = function(self, builder, layer)
@@ -108,6 +120,7 @@ UES0401 = ClassUnit(AircraftCarrier) {
 
     OnStopBeingBuilt = function(self,builder,layer)
         AircraftCarrier.OnStopBeingBuilt(self,builder,layer)
+        ExternalFactoryComponent.OnStopBeingBuilt(self, builder, layer)
         ChangeState(self, self.IdleState)
 
         if not self.SinkSlider then -- Setup the slider and get blueprint values
@@ -123,10 +136,18 @@ UES0401 = ClassUnit(AircraftCarrier) {
         ChangeState(self, self.IdleState)
     end,
 
+    ---@param self UEL0401
+    ---@param new Layer
+    ---@param old Layer
+    OnLayerChange = function(self, new, old)
+        AircraftCarrier.OnLayerChange(self, new, old)
+    end,
+
     IdleState = State {
         Main = function(self)
             self:DetachAll(self.BuildAttachBone)
             self:SetBusy(false)
+            self.OnIdle(self)
         end,
 
         OnStartBuild = function(self, unitBuilding, order)
@@ -141,6 +162,7 @@ UES0401 = ClassUnit(AircraftCarrier) {
             local unitBuilding = self.UnitBeingBuilt
             local bone = self.BuildAttachBone
             self:DetachAll(bone)
+            unitBuilding:AttachTo(self, bone)
             unitBuilding:HideBone(0, true)
             self.UnitDoneBeingBuilt = false
         end,
