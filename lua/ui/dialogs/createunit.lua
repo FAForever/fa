@@ -12,7 +12,15 @@ local options = getOptions()
 local DummyUnitID = 'ura0001'
 local DialogMode = options.spawn_menu_main_mode or 'units' --or 'props' or 'templates'
 local currentArmy = GetFocusArmy()
-local NumArmies = GetArmiesTable().numArmies
+
+-- combining army tables with an observer to simplify logic for creating army selectors
+local ArmiesAndObserver = table.copy(GetArmiesTable().armiesTable)
+table.insert(ArmiesAndObserver, {
+    name = 'NEUTRAL',
+    nickname = '<LOC tooltipui0149>Observer',
+    observer = true, civilian = true, color = 'FF727272',
+})
+local NumArmies = table.getsize(ArmiesAndObserver)
 
 local WindowBorderThickness = 10
 local WindowHeaderThickness = 30
@@ -205,6 +213,20 @@ function SourceListTabs()
                 key = 'dlc',
                 sortFunc = function(unitID, modloc)
                     return string.sub(__blueprints[unitID].Source, 1, 7) == "/units/" and string.sub(unitID, 1, 1) ~= 'u' and string.sub(unitID, 1, 1) ~= 'x' and string.sub(unitID, 1, 1) ~= 'o'
+                end,
+            },
+            {
+                title = '<LOC spawn_filter_civilans>Civilans',
+                key = 'civ',
+                sortFunc = function(unitID, modloc)
+                    return not IsUnitPlayable(unitID)
+                end,
+            },
+            {
+                title = '<LOC spawn_filter_playable>Playable',
+                key = 'play',
+                sortFunc = function(unitID, modloc)
+                    return IsUnitPlayable(unitID)
                 end,
             }
         }
@@ -546,19 +568,6 @@ GetNameFilters = {
                             return HasCat(unitID, 'SORTINTEL')
                         end,
                     },
-                    {
-                        title = 'Other',
-                        key = 'othersort',
-                        sortFunc = function(unitID)
-                            return HasCat(unitID, 'SORTOTHER') or not (
-                                HasCat(unitID, 'SORTCONSTRUCTION') or
-                                HasCat(unitID, 'SORTECONOMY') or
-                                HasCat(unitID, 'SORTDEFENSE') or
-                                HasCat(unitID, 'SORTSTRATEGIC') or
-                                HasCat(unitID, 'SORTINTEL')
-                            )
-                        end,
-                    },
                 },
             })
         end
@@ -686,6 +695,69 @@ function GetItems(mode)
     end
 end
 
+function IsUnitPlayable(unitID)
+    local bp = __blueprints[unitID]
+    return not bp.CategoriesHash.CIVILIAN
+       and not bp.CategoriesHash.OPERATION
+       and not bp.CategoriesHash.INSIGNIFICANTUNIT
+       and not bp.CategoriesHash.UNTARGETABLE
+end
+
+function GetUnitDescription(id)
+    local bp = __blueprints[id]
+    local info = '    ' -- defaulting to no tech level for civilans
+    if IsUnitPlayable(id) then
+        if bp.CategoriesHash.TECH1 then info = 'T1'
+        elseif bp.CategoriesHash.TECH2 then info = 'T2'
+        elseif bp.CategoriesHash.TECH3 then info = 'T3'
+        elseif bp.CategoriesHash.EXPERIMENTAL then info = 'T4' end
+    end
+
+    if bp.Description then
+        info = info .. ' ' .. LOC(bp.Description)
+    end
+
+    if bp.General.UnitName then
+        local name = LOC(bp.General.UnitName)
+        info = info .. (name == '' and '' or (' (' .. name .. ')'))
+    end
+    -- removing faction name because we aready have faction icon in the list
+    info = info:gsub("UEF ", "")
+    info = info:gsub("Aeon ", "")
+    info = info:gsub("Cybran ", "")
+    info = info:gsub("Seraphim ", "")
+    info = info:gsub("Experimental ", "")
+    return info
+end
+
+local FactionData = {
+    { color = 'ff00c1ff', name = 'UEF', icon = UIUtil.UIFile(UIUtil.GetFactionIcon(0)) },
+    { color = 'ff89d300', name = 'AEON', icon = UIUtil.UIFile(UIUtil.GetFactionIcon(1)) },
+    { color = 'ffff0000', name = 'CYBRAN', icon = UIUtil.UIFile(UIUtil.GetFactionIcon(2)) },
+    { color = 'FFFFBF00', name = 'SERAPHIM', icon = UIUtil.UIFile(UIUtil.GetFactionIcon(3)) },
+}
+
+function GetUnitFactionInfo(id)
+    local bp = __blueprints[id]
+    if bp and bp.CategoriesHash and IsUnitPlayable(id) then
+        for k, faction in FactionData do
+            if bp.CategoriesHash[faction.name] then return faction end
+        end
+    end
+    return { color = false, icon = false }
+end
+
+function SetUnitFactionIcon(id, bitmap, background)
+    local faction = GetUnitFactionInfo(id)
+    if bitmap and faction.icon and faction.color then
+        bitmap:SetTexture(faction.icon)
+        background:SetSolidColor(faction.color)
+        background:SetAlpha(1, true)
+    else
+        background:SetAlpha(0, true)
+    end
+end
+
 function CreateNameFilter(data)
     local group = Group(windowGroup)
     group.Width:Set(dialog.Width)
@@ -780,9 +852,9 @@ function CreateNameFilter(data)
         group.edit:SetHighlightForegroundColor(UIUtil.highlightColor)
         group.edit:SetHighlightBackgroundColor("880085EF")
         group.edit.Width:Set((FilterColumnCount-(2 * UIScale))*82)
-        LayoutHelpers.SetHeight(group.edit, 15)
+        LayoutHelpers.SetHeight(group.edit, 17)
         group.edit:SetText(filterSet[data.key].editText or '')
-        group.edit:SetFont(UIUtil.bodyFont, 12)
+        group.edit:SetFont(UIUtil.bodyFont, 15)
         group.edit:SetMaxChars(20)
         LayoutHelpers.AtLeftIn(group.edit, group, 95)
         LayoutHelpers.AtVerticalCenterIn(group.edit, group)
@@ -857,7 +929,6 @@ function CreateDialog()
 
     -- Configurable values
     local TeamGridCellMinWidth = getOptions().spawn_menu_team_column_min_width or 145
-    local ObserveButtonWidth = 45
     local DefaultHeight = 450
     local DefaultWidth = FilterHeaderWidth + FilterWidth * 5
     local MinWidth = FilterHeaderWidth + FilterWidth * 3
@@ -904,7 +975,7 @@ function CreateDialog()
 
     FilterColumnCount = math.floor((windowGroup.Width()-FilterHeaderWidth)/FilterWidth)
 
-    UpdateTeamGridCounts(math.floor((windowGroup.Width()-ObserveButtonWidth)/TeamGridCellMinWidth))
+    UpdateTeamGridCounts(math.floor((windowGroup.Width())/TeamGridCellMinWidth))
 
     EscThread = ForkThread(function()
         while dialog or debugConfig do
@@ -975,6 +1046,8 @@ function CreateDialog()
 
     local NumberInputFields = {
         units = {
+            -- creating input fields for count, vet, and rotation
+            {label='Count', name = 'Count',     default=1,   check=math.max},
             {label='Vet',   name = 'Veterancy', default=0,   check=math.max, max=5},
             {label='Yaw',   name = 'Rotation',  default=360, check=math.mod},
         },
@@ -1004,6 +1077,13 @@ function CreateDialog()
             local inputfield
             if options.spawn_menu_footer_text_input then
                 inputfield = numImputSettings(Edit(footerGroup), textlabel, inputdata)
+                if i == 1 then
+                    LayoutHelpers.AtBottomIn(textlabel, footerGroup, 10)
+                    LayoutHelpers.AtLeftIn(textlabel, footerGroup, 5)
+                else
+                    local previousInput = footerGroup['input'..NumberInputFields[DialogMode][i-1].label]
+                    LayoutHelpers.RightOf(textlabel, previousInput, 25)
+                end
             else--if inputdata.type == 'slider' then
                 inputfield = Group(footerGroup)
                 LayoutHelpers.SetHeight(inputfield, 30)
@@ -1018,23 +1098,26 @@ function CreateDialog()
                 slider._currentValue:Set(inputdata.default)
                 local value = UIUtil.CreateText(inputfield, slider:GetValue(), 12, "Arial")
                 LayoutHelpers.RightOf(inputfield, textlabel)
-                LayoutHelpers.RightOf(slider, textlabel)
-                LayoutHelpers.RightOf(value, slider)
+                LayoutHelpers.Below(slider, textlabel, 5)
+                LayoutHelpers.RightOf(value, textlabel, 10)
                 LayoutHelpers.SetWidth(inputfield, slider.Width()+30)
                 slider.OnValueChanged = function(self, newValue)
                     value:SetText(newValue)
                 end
                 inputfield.GetValue = function() return slider:GetValue() end
+
+                if i == 1 then
+                    LayoutHelpers.AtBottomIn(textlabel, footerGroup, 30)
+                    LayoutHelpers.AtLeftIn(textlabel, footerGroup, 5)
+                    LayoutHelpers.AtLeftIn(inputfield, footerGroup, 5)
+                else
+                    local previousInput = footerGroup['input'..NumberInputFields[DialogMode][i-1].label]
+                    LayoutHelpers.RightOf(textlabel, previousInput, 5)
+                    LayoutHelpers.RightOf(inputfield, previousInput, 5)
+                end
             end
 
-            if i == 1 then
-                LayoutHelpers.AtBottomIn(textlabel, footerGroup, 10)
-                LayoutHelpers.AtLeftIn(textlabel, footerGroup, 5)
-            else
-                LayoutHelpers.RightOf(textlabel, footerGroup['input'..NumberInputFields[DialogMode][i-1].label], 5)
-            end
             SetFooterHeighest(textlabel)
-            SetFooterHeighest(inputfield)
             footerGroup['input'..inputdata.label] = inputfield
         end
     end
@@ -1067,8 +1150,8 @@ function CreateDialog()
             cheat = true,
             name = id,
             army = currentArmy,
-
-            count = dialogData.inputCount and dialogData.inputCount:GetValue() or 0,
+            -- using user provided count of units or defaulting to creating 1 unit
+            count = dialogData.inputCount and dialogData.inputCount:GetValue() or 1,
             vet = dialogData.inputVet and dialogData.inputVet:GetValue() or 0,
             yaw = (dialogData.inputYaw and dialogData.inputYaw:GetValue() or 0) / 57.295779513,
             rand = dialogData.inputRand and dialogData.inputRand:GetValue() or 0,
@@ -1175,79 +1258,84 @@ function CreateDialog()
         return name:sub(1, math.floor(charLimitEst))
     end
 
-    local function CreateArmySelectionSlot(parent, index, armyData)
+    local function CreateArmySelectionSlot(parent, armyData)
         local group = Bitmap(parent)
         group.Height:Set(armyData.height or (30 * UIScale))
         group.Width:Set(armyData.width or function() return parent.Width() / TeamColumnCount end)
+        group:SetSolidColor('FF000000')
 
-        local icon, iconBG
+        local iconBG = Bitmap(group)
+        LayoutHelpers.SetWidth(iconBG, 30)
+        LayoutHelpers.SetHeight(iconBG, 30)
+        iconBG:SetSolidColor(armyData.color)
+        LayoutHelpers.AtLeftTopIn(iconBG, group)
+        iconBG:DisableHitTest()
+
+        local icon = Bitmap(iconBG)
+        local armyLabel = ''
+        local armyName = ''
         if armyData.observer then
-            local name = UIUtil.CreateText(group, armyData.name, 12, UIUtil.bodyFont)
-            LayoutHelpers.AtCenterIn(name, group)
-            name:DisableHitTest()
-        else
-            iconBG = Bitmap(group)
-            LayoutHelpers.SetWidth(iconBG, 30)
-            LayoutHelpers.SetHeight(iconBG, 30)
-            iconBG:SetSolidColor(armyData.color)
-            LayoutHelpers.AtLeftTopIn(iconBG, group)
-            iconBG:DisableHitTest()
-
-            icon = Bitmap(iconBG)
-            if armyData.civilian then
-                icon:SetSolidColor('aaaaaaaa')
-            else
-                icon:SetTexture(UIUtil.UIFile(UIUtil.GetFactionIcon(armyData.faction)))
-            end
-            LayoutHelpers.FillParent(icon, iconBG)
-            icon:DisableHitTest()
-
-            -- Army name
-            local name = UIUtil.CreateText(group, CompressNickname(armyData.nickname, group.Width()-30), 12, UIUtil.bodyFont)
-            LayoutHelpers.RightOf(name, icon, 2)
-            LayoutHelpers.AtTopIn(name, group)
-            name:SetColor('ffffffff')
-            name:DisableHitTest()
-
-            local army = UIUtil.CreateText(group, CompressArmyName(armyData.name, group.Width()-30), 12, UIUtil.bodyFont)
-            LayoutHelpers.Below(army, name)
-            army:DisableHitTest()
+            icon:SetTexture(UIUtil.UIFile('/widgets/faction-icons-alpha_bmp/observer_ico.dds'))
+            armyName = LOC('<LOC lobui_0295>Neutral')
+            armyLabel = LOC('<LOC score_0003>Observer')
+        elseif armyData.civilian then
+            icon:SetSolidColor('aaaaaaaa')
+            armyLabel = StringCapitalize(armyData.nickname)
+            armyName = armyData.name == 'NEUTRAL_CIVILIAN' and LOC('<LOC lobui_0295>Neutral') or armyData.name
+        else -- human or AI army
+            armyLabel = CompressNickname(armyData.nickname, group.Width()-50)
+            armyName = CompressArmyName(armyData.name, group.Width()-50)
+            icon:SetTexture(UIUtil.UIFile(UIUtil.GetFactionIcon(armyData.faction)))
         end
+        LayoutHelpers.FillParent(icon, iconBG)
+        icon:DisableHitTest()
+
+        -- Army identifier
+        local name = UIUtil.CreateText(group, armyLabel, 12, UIUtil.bodyFont)
+        LayoutHelpers.RightOf(name, icon, 2)
+        LayoutHelpers.AtTopIn(name, group)
+        name:SetColor('ffffffff')
+        name:DisableHitTest()
+
+        -- Army index or army type, e.g. civilian
+        local army = UIUtil.CreateText(group, string.upper(armyName), 12, UIUtil.bodyFont)
+        LayoutHelpers.Below(army, name)
+        army:DisableHitTest()
 
         group.HandleEvent = function(self, event)
             if event.Type == 'MouseEnter' then
-                if currentArmy == index then
+                if currentArmy == armyData.index then
                     self:SetSolidColor('cc00cc00')
                 else
                     self:SetSolidColor('77007700')
                 end
             elseif event.Type == 'MouseExit' then
-                if currentArmy == index then
+                if currentArmy == armyData.index then
                     self:SetSolidColor('aa00aa00')
                 else
-                    self:SetSolidColor('00000000')
+                    self:SetSolidColor('FF000000')
                 end
             elseif event.Type == 'ButtonPress' then
-                currentArmy = index
+                currentArmy = armyData.index
                 for i, v in parent.armySlots do
-                    if i == index then
+                    if i == armyData.index then
                         v:SetSolidColor('aa00aa00')
                     else
-                        v:SetSolidColor('00000000')
+                        v:SetSolidColor('FF000000')
                     end
                 end
             elseif event.Type == 'ButtonDClick' then
                 ConExecute('SetFocusArmy '..tostring(currentArmy-1))
             end
         end
-        if index == currentArmy then
+        if armyData.index == currentArmy then
             group:SetSolidColor('aa00aa00')
         end
         return group
     end
 
     local armiesGroup = Group(windowGroup)
-    armiesGroup.Width:Set(function() return windowGroup.Width()-ObserveButtonWidth end)
+    armiesGroup.Width:Set(function() return windowGroup.Width() end)
     LayoutHelpers.AtLeftTopIn(armiesGroup, windowGroup)
 
     local function IsColumnHead(teamI)
@@ -1262,8 +1350,10 @@ function CreateDialog()
     armiesGroup.armySlots = {}
     local lowestControl
     local WorkingColumnHead = 1
-    for i, val in GetArmiesTable().armiesTable do
-        armiesGroup.armySlots[i] = CreateArmySelectionSlot(armiesGroup, i, val)
+
+    for i, army in ArmiesAndObserver do
+        army.index = army.observer and 0 or i -- army index or 0 for observer
+        armiesGroup.armySlots[i] = CreateArmySelectionSlot(armiesGroup, army)
         if i == 1 then
             LayoutHelpers.AtLeftTopIn(armiesGroup.armySlots[i],armiesGroup)
             lowestControl = armiesGroup.armySlots[i]
@@ -1278,14 +1368,6 @@ function CreateDialog()
             lowestControl = armiesGroup.armySlots[i]
         end
     end
-    local observeButton = CreateArmySelectionSlot(armiesGroup, 0, {
-        name = '<LOC tooltipui0149>Observe',
-        observer = true,
-        width = ObserveButtonWidth,
-        height = TeamRowsCount * 30,
-    })
-    table.insert(armiesGroup.armySlots, observeButton)
-    LayoutHelpers.RightOf(observeButton, armiesGroup)
 
     armiesGroup.Height:Set(function() return lowestControl.Bottom() - armiesGroup.armySlots[1].Top() end)
 
@@ -1393,7 +1475,8 @@ function CreateDialog()
 
     windowGroup.unitEntries = {}
 
-    UIUtil.CreateVertScrollbarFor(windowGroup.unitList)
+    -- using verical scrollbar that matches theme or rest of window
+    UIUtil.CreateLobbyVertScrollbar(windowGroup.unitList, 15, 1, 1)
 
     local LineColors = {
         Up = '00000000', Sel_Up = 'ff447744',
@@ -1420,6 +1503,7 @@ function CreateDialog()
             air = '/textures/ui/common/icons/units/air_up.dds',
         }
         bitmap:SetTexture(textures[GetLayerGroup(id)])
+        bitmap:SetAlpha(1, false)
     end
     local function GetUnitSkirtSizes(id)
         local bp = __blueprints[id]
@@ -1487,32 +1571,56 @@ function CreateDialog()
     end
     local function CreateElementMouseover(unitData,x,y)
         if mouseover then mouseover:Destroy() end
-        mouseover = Bitmap(windowGroup)
-        mouseover:SetSolidColor('dd115511')
 
-        mouseover.img = Bitmap(mouseover)
-        LayoutHelpers.SetDimensions(mouseover.img, 40, 40)
-        LayoutHelpers.AtLeftTopIn(mouseover.img, mouseover, 2,2)
+        local faction = GetUnitFactionInfo(unitData)
+        mouseover = Bitmap(windowGroup)
+        mouseover:SetSolidColor('DD111111')
+        
+        mouseover.fill = Bitmap(mouseover)
+        mouseover.fill:SetSolidColor(faction.color or 'DD232323')
+        mouseover.fill:SetAlpha(0.15, false)
+
+        local iconSize = 45
+        mouseover.bg = Bitmap(mouseover.fill)
+        LayoutHelpers.SetDimensions(mouseover.bg, iconSize, iconSize)
+        LayoutHelpers.AtLeftTopIn(mouseover.bg, mouseover, 6, 2)
+        LayoutHelpers.AtVerticalCenterIn(mouseover.bg, mouseover)
+
+        mouseover.img = Bitmap(mouseover.bg)
+        LayoutHelpers.SetDimensions(mouseover.img, iconSize, iconSize)
+        LayoutHelpers.AtLeftTopIn(mouseover.img, mouseover, 6, 2)
+        LayoutHelpers.AtVerticalCenterIn(mouseover.img, mouseover)
 
         SetUnitImage(mouseover.img, unitData)
+        SetBackgroundImage(mouseover.bg, unitData)
 
-        mouseover.name = UIUtil.CreateText(mouseover,
-            DialogMode == 'units' and __blueprints[unitData].Description or
-            __blueprints[unitData].Interface and
-            __blueprints[unitData].Interface.HelpText,
-            14, UIUtil.bodyFont
-        )
-        LayoutHelpers.RightOf(mouseover.name, mouseover.img, 2)
+        local bp = __blueprints[unitData]
+        local info = ''
+        if DialogMode == 'units' then
+            info = string.gsub(GetUnitDescription(unitData), "^%s*(.-)%s*$", "%1")
+        else
+            info = bp.Interface and bp.Interface.HelpText
+        end
 
-        mouseover.desc = UIUtil.CreateText(mouseover, __blueprints[unitData].General.UnitName or unitData, 14, UIUtil.bodyFont)
-        LayoutHelpers.AtLeftIn(mouseover.desc, mouseover, 44)
-        LayoutHelpers.AtBottomIn(mouseover.desc, mouseover, 5)
+        mouseover.name = UIUtil.CreateText(mouseover.fill, info, 14, UIUtil.bodyFont)
+        mouseover.name:SetColor(faction.color or 'DDD8D8D8')
+        mouseover.name:SetAlpha(0.85, false)
+        LayoutHelpers.RightOf(mouseover.name, mouseover.img, 4)
+        LayoutHelpers.AtTopIn(mouseover.name, mouseover, 8)
+
+        mouseover.desc = UIUtil.CreateText(mouseover.fill, string.upper(unitData), 14, UIUtil.bodyFont)
+        mouseover.desc:SetColor(faction.color or 'DDD8D8D8')
+        mouseover.desc:SetAlpha(0.85, false)
+        LayoutHelpers.RightOf(mouseover.desc, mouseover.img, 4)
+        LayoutHelpers.Below(mouseover.desc, mouseover.name, 6)
 
         mouseover.Left:Set(x+20 * UIScale)
         mouseover.Top:Set(y+20 * UIScale)
-        mouseover.Height:Set(function() return mouseover.img.Height() + 4 * UIScale end)
-        mouseover.Width:Set(function() return mouseover.img.Width() + math.max(mouseover.name.Width(), mouseover.desc.Width()) + 8 * UIScale end)
+        mouseover.Height:Set(function() return mouseover.img.Height() + 10 * UIScale end)
+        mouseover.Width:Set(function() return mouseover.img.Width() + math.max(mouseover.name.Width(), mouseover.desc.Width()) + 15 * UIScale end)
         mouseover.Depth:Set(GetFrame(0):GetTopmostDepth() + 1)
+
+        LayoutHelpers.FillParent(mouseover.fill, mouseover)
     end
     local MouseOverElement = {
         units = CreateElementMouseover,
@@ -1550,11 +1658,11 @@ function CreateDialog()
         end
 
         local function CreateElement(index)
-            windowGroup.unitEntries[index] = Bitmap(windowGroup.unitList)
-            windowGroup.unitEntries[index].Left:Set(windowGroup.unitList.Left)
-            windowGroup.unitEntries[index].Right:Set(windowGroup.unitList.Right)
-            windowGroup.unitEntries[index].Height:Set(16 * UIScale)
-            windowGroup.unitEntries[index].HandleEvent = function(self, event)
+            local unitSelector = Bitmap(windowGroup.unitList)
+            unitSelector.Left:Set(windowGroup.unitList.Left)
+            unitSelector.Right:Set(windowGroup.unitList.Right)
+            unitSelector.Height:Set(16 * UIScale)
+            unitSelector.HandleEvent = function(self, event)
                 if event.Type == 'MouseEnter' then
                     if MouseOverElement[DialogMode] then
                         MouseOverElement[DialogMode](self.unitID, event.MouseX, event.MouseY)
@@ -1594,16 +1702,34 @@ function CreateDialog()
                 end
             end
 
-            windowGroup.unitEntries[index].id = UIUtil.CreateText(windowGroup.unitEntries[index], '', 11, UIUtil.bodyFont)
-            LayoutHelpers.AtLeftTopIn(windowGroup.unitEntries[index].id, windowGroup.unitEntries[index], options.spawn_menu_show_icons and 18 or 2)
-            windowGroup.unitEntries[index].id2 = UIUtil.CreateText(windowGroup.unitEntries[index], '', 12, UIUtil.bodyFont)
-            LayoutHelpers.AtLeftTopIn(windowGroup.unitEntries[index].id2, windowGroup.unitEntries[index], (DialogMode == 'templates' and 50 or 100) + (options.spawn_menu_show_icons and 18 or 2))
+            unitSelector.id = UIUtil.CreateText(unitSelector, '', 12, 'Arial')
+            LayoutHelpers.AtLeftTopIn(unitSelector.id, unitSelector, options.spawn_menu_show_icons and 22 or 2)
+            unitSelector.desc = UIUtil.CreateText(unitSelector, '', 12, UIUtil.bodyFont)
+            LayoutHelpers.AtLeftTopIn(unitSelector.desc, unitSelector, (DialogMode == 'templates' and 50 or 120) + (options.spawn_menu_show_icons and 36 or 18))
             if options.spawn_menu_show_icons then
-                windowGroup.unitEntries[index].img = Bitmap(windowGroup.unitEntries[index])
-                windowGroup.unitEntries[index].img.Height:Set(16 * UIScale)
-                windowGroup.unitEntries[index].img.Width:Set(16 * UIScale)
-                LayoutHelpers.AtLeftTopIn(windowGroup.unitEntries[index].img, windowGroup.unitEntries[index])
+                unitSelector.imageBG = Bitmap(unitSelector)
+                unitSelector.imageBG.Height:Set(16 * UIScale)
+                unitSelector.imageBG.Width:Set(16 * UIScale)
+                LayoutHelpers.AtLeftTopIn(unitSelector.imageBG, unitSelector)
+
+                unitSelector.img = Bitmap(unitSelector.imageBG)
+                unitSelector.img.Height:Set(16 * UIScale)
+                unitSelector.img.Width:Set(16 * UIScale)
+                LayoutHelpers.AtLeftTopIn(unitSelector.img, unitSelector)
             end
+
+            unitSelector.factionBG = Bitmap(unitSelector)
+            unitSelector.factionBG.Height:Set(16 * UIScale)
+            unitSelector.factionBG.Width:Set(16 * UIScale)
+            unitSelector.factionBG:SetSolidColor('red')
+            LayoutHelpers.LeftOf(unitSelector.factionBG, unitSelector.desc, 2)
+
+            unitSelector.factionIcon = Bitmap(unitSelector.factionBG)
+            unitSelector.factionIcon.Height:Set(16 * UIScale)
+            unitSelector.factionIcon.Width:Set(16 * UIScale)
+            LayoutHelpers.LeftOf(unitSelector.factionIcon, unitSelector.desc, 2)
+            -- storing the unit selector for access in rest of UI
+            windowGroup.unitEntries[index] = unitSelector
         end
 
         CreateElement(1)
@@ -1677,23 +1803,31 @@ function CreateDialog()
                 for id, no in structs do
                     str=str..' - '..id..' ×'..no
                 end
+
                 line.id:SetText(td[1]..'×'..td[2])
-                line.id2:SetText(str)
+                line.desc:SetText(str)
                 if options.spawn_menu_show_icons then
                     SetUnitImage(line.img, data.id.icon, true)
                 end
+                line.factionBG:SetAlpha(0, true)
+                line.imageBG:SetAlpha(0, false)
             elseif DialogMode == 'units' then
-                line.id:SetText(data.id:sub(1, 15)..(data.id:len()>15 and '…' or ''))--format('%s %5s %s', data.id, ' ', data.desc))
-                line.id2:SetText(data.desc)
+                local unitID =  data.id:sub(1, 3) .. ' ' .. data.id:sub(4, 14) .. (data.id:len() > 14 and '…' or '')
+                line.id:SetText(string.upper(unitID))
+                line.desc:SetText(GetUnitDescription(data.id))
                 if options.spawn_menu_show_icons then
                     SetUnitImage(line.img, data.id, true)
+                    SetBackgroundImage(line.imageBG, data.id)
                 end
+                SetUnitFactionIcon(data.id, line.factionIcon, line.factionBG)
             elseif DialogMode == 'props' then
                 line.id:SetText(data.id:match('([^/]*)_prop%.bp') or data.id:sub(-24, -9) or data.id)--format('%s %5s %s', data.id, ' ', data.desc))
-                line.id2:SetText(__blueprints[data.id].Interface.HelpText or '[no text]')
+                line.desc:SetText(__blueprints[data.id].Interface.HelpText or '[no text]')
                 if options.spawn_menu_show_icons then
                     SetUnitImage(line.img, data.id, true)
                 end
+                line.factionBG:SetAlpha(0, true)
+                line.imageBG:SetAlpha(0, false)
             end
         end
         for i, v in windowGroup.unitEntries do
