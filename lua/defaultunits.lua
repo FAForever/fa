@@ -233,8 +233,8 @@ StructureUnit = ClassUnit(Unit) {
             )
 
             -- apply twice to break tree groups
-            DamageArea(self, position, radius, 1, 'TreeForce', false, false)
-            DamageArea(self, position, radius, 1, 'TreeForce', false, false)
+            DamageArea(self, position, 0.75 * radius, 1, 'TreeForce', false, false)
+            DamageArea(self, position, 0.75 * radius, 1, 'TreeForce', false, false)
 
             -- create a flash when the structure starts
             CreateLightParticle( self, -1, army, 2 * radius, 22, 'glow_03', 'ramp_antimatter_02' )

@@ -1357,6 +1357,22 @@ local keyActionsOrders = {
         action = 'UI_Lua import("/lua/ui/game/orders.lua").ToggleDiveOrder()',
         category = 'orders',
     },
+    ['dive_all'] = {
+        action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").DiveAll()',
+        category = 'orders',
+    },
+    ['undive_all'] = {
+        action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").SurfaceAll()',
+        category = 'orders',
+    },
+    ['shift_dive_all'] = {
+        action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").DiveAll()',
+        category = 'orders',
+    },
+    ['shift_undive_all'] = {
+        action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").SurfaceAll()',
+        category = 'orders',
+    },
     ['ferry'] = {
         action = 'StartCommandMode order RULEUCC_Ferry',
         category = 'orders',
@@ -1451,6 +1467,14 @@ local keyActionsOrders = {
     },
     ['pause_unit'] = {
         action = 'UI_Lua import("/lua/ui/game/construction.lua").ToggleUnitPause()',
+        category = 'orders',
+    },
+    ['pause_unit_all'] = {
+        action = 'UI_Lua import("/lua/ui/game/construction.lua").ToggleUnitPauseAll()',
+        category = 'orders',
+    },
+    ['unpause_unit_all'] = {
+        action = 'UI_Lua import("/lua/ui/game/construction.lua").ToggleUnitUnpauseAll()',
         category = 'orders',
     },
     ['mode'] = {
