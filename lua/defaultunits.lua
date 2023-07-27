@@ -3189,7 +3189,7 @@ ExternalFactoryUnit = ClassUnit(Unit) {
     ---@param self ExternalFactoryUnit
     OnCreate = function(self)
         Unit.OnCreate(self)
-        -- self:HideBone(0, true)
+        self:HideBone(0, true)
     end,
 
     ---@param self ExternalFactoryUnit
