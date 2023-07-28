@@ -220,6 +220,7 @@ function SourceListTabs()
             },
             {
                 title = '<LOC spawn_filter_civilans>Civilans',
+                tooltip = '<LOC spawn_filter_civilans_tip>Toogle civilan units',
                 key = 'civ',
                 sortFunc = function(unitID, modloc)
                     return not IsUnitPlayable(unitID)
@@ -227,6 +228,7 @@ function SourceListTabs()
             },
             {
                 title = '<LOC spawn_filter_playable>Playable',
+                tooltip = '<LOC spawn_filter_playable_tip>Toogle units playable in the game',
                 key = 'play',
                 sortFunc = function(unitID, modloc)
                     return IsUnitPlayable(unitID)
@@ -280,12 +282,14 @@ function FactionListTabs(FindFunc)
         table.insert(flisticle, {
             title = faction.DisplayName,
             key = key,
+            tooltip = '<LOC spawn_filter_'.. faction.Category ..'_tip>Toogle ' .. faction.Category .. ' units',
             sortFunc = FindFunc
         })
     end
 
     table.insert(flisticle, {
         title = '<LOC spawn_filter_other_faction>Other',
+        tooltip = '<LOC spawn_filter_other_tip>Toogle units from other factions',
         key = 'otherfaction',
         sortFunc = function(unitID)
             for i, cat in allFactionCats do
@@ -304,21 +308,25 @@ function TypeListTabs()
         list = {
             {
                 title = '<LOC spawn_filter_land>Land',
+                tooltip = '<LOC spawn_filter_land_tip>Toogle Land units',
                 key = 'land',
                 sortFunc = function(unitID) return HasCat(unitID, 'LAND') end,
             },
             {
                 title = '<LOC spawn_filter_air>Air',
+                tooltip = '<LOC spawn_filter_land_tip>Toogle Land units',
                 key = 'air',
                 sortFunc = function(unitID) return HasCat(unitID, 'AIR') end,
             },
             {
                 title = '<LOC spawn_filter_naval>Naval',
+                tooltip = '<LOC spawn_filter_naval_tip>Toogle Naval units',
                 key = 'naval',
                 sortFunc = function(unitID) return HasCat(unitID, 'NAVAL') end,
             },
             {
                 title = '<LOC spawn_filter_amph>Amphibious',
+                tooltip = '<LOC spawn_filter_amph_tip>Toogle Amphibious units',
                 key = 'amph',
                 sortFunc = function(unitID)
                     return HasCat(unitID, 'AMPHIBIOUS') or HasCat(unitID, 'HOVER')
@@ -326,6 +334,7 @@ function TypeListTabs()
             },
             {
                 title = '<LOC spawn_filter_structure>Base',
+                tooltip = '<LOC spawn_filter_structure_tip>Toogle Base structures',
                 key = 'base',
                 sortFunc = function(unitID)
                     return __blueprints[unitID].Physics.MotionType == 'RULEUMT_None'
@@ -556,6 +565,7 @@ GetNameFilters = {
                     {
                         title = 'Construction',
                         key = 'const',
+                        tooltip = '<LOC spawn_filter_const>Toogle construction units',
                         sortFunc = function(unitID)
                             return HasCat(unitID, 'SORTCONSTRUCTION')
                         end,
@@ -563,13 +573,15 @@ GetNameFilters = {
                     {
                         title = 'Economy',
                         key = 'eco',
+                        tooltip = '<LOC spawn_filter_eco>Toogle Economy units',
                         sortFunc = function(unitID)
                             return HasCat(unitID, 'SORTECONOMY')
                         end,
                     },
                     {
                         title = 'Defense',
-                        key = 'fence',
+                        key = 'defence',
+                        tooltip = '<LOC spawn_filter_defence>Toogle Defense units',
                         sortFunc = function(unitID)
                             return HasCat(unitID, 'SORTDEFENSE')
                         end,
@@ -577,13 +589,15 @@ GetNameFilters = {
                     {
                         title = 'Strategic',
                         key = 'strat',
+                        tooltip = '<LOC spawn_filter_strat>Toogle Strategic units',
                         sortFunc = function(unitID)
                             return HasCat(unitID, 'SORTSTRATEGIC')
                         end,
                     },
                     {
                         title = 'Intel',
-                        key = 'inside',
+                        key = 'intel',
+                        tooltip = '<LOC spawn_filter_intel>Toogle Intel units',
                         sortFunc = function(unitID)
                             return HasCat(unitID, 'SORTINTEL')
                         end,
@@ -601,7 +615,7 @@ GetNameFilters = {
                         {
                             title = '',
                             key = 'spawnable',
-                            tooltip = '<LOC spawn_filter_spawnable>Toogle spawnable units in the list of units',
+                            tooltip = '<LOC spawn_filter_spawnable>Toogle spawnable units',
                             sortFunc = function(unitID)
                                 return not HasCat(unitID, 'UNSPAWNABLE')
                             end,
@@ -609,7 +623,7 @@ GetNameFilters = {
                         {
                             title = '',
                             key = 'unspawnable',
-                            tooltip = '<LOC spawn_filter_dummy>Toogle dummy units in the list of units',
+                            tooltip = '<LOC spawn_filter_dummy>Toogle dummy units',
                             sortFunc = function(unitID)
                                 return HasCat(unitID, 'UNSPAWNABLE')
                             end,
@@ -652,6 +666,7 @@ GetNameFilters = {
                     {
                         title = 'Land',
                         key = 'bland',
+                        tooltip = '<LOC spawn_filter_land>Toogle Land units',
                         sortFunc = function(template)
                             local td = template.templateData
                             for i = 3, table.getn(td) do
@@ -666,6 +681,7 @@ GetNameFilters = {
                     {
                         title = 'Water',
                         key = 'bsea',
+                        tooltip = '<LOC spawn_filter_water>Toogle Naval units',
                         sortFunc = function(template)
                             local td = template.templateData
                             for i = 3, table.getn(td) do
@@ -680,6 +696,7 @@ GetNameFilters = {
                     {
                         title = 'Both',
                         key = 'bboth',
+                        tooltip = '<LOC spawn_filter_water>Toogle Amphibious units',
                         sortFunc = function(template)
                             local td = template.templateData
                             for i = 3, table.getn(td) do
