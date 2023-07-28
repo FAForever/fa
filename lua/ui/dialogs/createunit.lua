@@ -25,11 +25,13 @@ local NumArmies = table.getsize(ArmiesAndObserver)
 local WindowBorderThickness = 10
 local WindowHeaderThickness = 30
 
-local dialog, nameDialog, defaultEditField, windowGroup, debugConfig
+local dialog, nameDialog, windowGroup, debugConfig
 local EscThread
 local ChosenCreation, FilterColumnCount, TeamColumnCount, TeamRowsCount
 local activeFilters, activeFilterTypes, specialFilterControls, filterSet = {}, {}, {}, {}
 local UnitList = {}
+
+local searchText = ''
 
 function RefreshUI()
     if dialog then
@@ -845,15 +847,16 @@ function CreateNameFilter(data)
             group.items[index]:SetCheck(filterSet[data.key].choices[v.key])
             if activeFilters[data.key] == nil then activeFilters[data.key] = {} end
         end
-    else
+    else -- search box filter
         group.edit = Edit(group)
+        group.edit:AbandonFocus()
         group.edit:SetForegroundColor(UIUtil.fontColor)
         group.edit:SetBackgroundColor('ff333333')
         group.edit:SetHighlightForegroundColor(UIUtil.highlightColor)
         group.edit:SetHighlightBackgroundColor("880085EF")
         group.edit.Width:Set((FilterColumnCount-(2 * UIScale))*82)
         LayoutHelpers.SetHeight(group.edit, 17)
-        group.edit:SetText(filterSet[data.key].editText or '')
+        group.edit:SetText(filterSet[data.key].editText or searchText)
         group.edit:SetFont(UIUtil.bodyFont, 15)
         group.edit:SetMaxChars(20)
         LayoutHelpers.AtLeftIn(group.edit, group, 95)
@@ -863,12 +866,20 @@ function CreateNameFilter(data)
         group.edit.sortFunc = data.sortFunc
 
         group.edit.OnTextChanged = function(self, new, old)
+            -- initialize search box to previus search term when it was not intialized to prevent keymapping messing with it
+            if not group.edit.isInitialized then
+                group.edit.isInitialized = true
+                group.edit:SetText(searchText)
+                return
+            end
+
             if new == '' then
                 activeFilters[self.key][self.filterKey] = nil
                 if group.check:IsChecked() then
                     group.check:SetCheck(false)
                 end
             else
+                searchText = new
                 filterSet[self.key].editText = new
                 activeFilters[self.key][self.filterKey] = self.sortFunc
                 if not group.check:IsChecked() then
@@ -878,7 +889,7 @@ function CreateNameFilter(data)
             RefreshList()
         end
 
-        defaultEditField = group.edit
+        dialog.searchBox = group.edit
 
         specialFilterControls[data.key] = group.edit
     end
@@ -923,6 +934,7 @@ function CreateDialog()
         return
     end
 
+
     -- Helper values, changing these will break stuff, not configure stuff
     local FilterWidth = 83
     local FilterHeaderWidth = 90
@@ -954,6 +966,7 @@ function CreateDialog()
     dialog:SetWindowAlpha((options.spawn_menu_alpha or 80)/100)
     dialog.Depth:Set(GetFrame(0):GetTopmostDepth() + 1)
     dialog:SetMinimumResize(MinWidth+WindowBorderThickness+WindowBorderThickness, DefaultHeight+WindowHeaderThickness+WindowBorderThickness)
+    dialog.isPopulated = false -- tracking status of dialog populated by UI elements
 
     dialog.OnClose = function(self)
         dialog:Destroy()
@@ -1844,8 +1857,11 @@ function CreateDialog()
             control:ScrollLines(nil, event.WheelRotation > 0 and -3 or 3)
         end
     end
-    defaultEditField:AcquireFocus()
+
     RefreshList()
+
+    dialog.searchBox:AcquireFocus()
+    dialog.isPopulated = true -- populated by all UI elements
 end
 
 function RefreshList()
