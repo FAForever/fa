@@ -4,6 +4,7 @@ local Group = import('/lua/maui/group.lua').Group
 local Text = import('/lua/maui/text.lua').Text
 local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
 local IntegerSlider = import('/lua/maui/slider.lua').IntegerSlider
+local Tooltip = import("/lua/ui/game/tooltip.lua")
 local UIUtil = import('/lua/ui/uiutil.lua')
 local Edit = import('/lua/maui/edit.lua').Edit
 local getOptions = function() return import('/lua/user/prefs.lua').GetFromCurrentProfile('options') end
@@ -600,6 +601,7 @@ GetNameFilters = {
                         {
                             title = '',
                             key = 'spawnable',
+                            tooltip = '<LOC spawn_filter_spawnable>Toogle spawnable units in the list of units',
                             sortFunc = function(unitID)
                                 return not HasCat(unitID, 'UNSPAWNABLE')
                             end,
@@ -607,6 +609,7 @@ GetNameFilters = {
                         {
                             title = '',
                             key = 'unspawnable',
+                            tooltip = '<LOC spawn_filter_dummy>Toogle dummy units in the list of units',
                             sortFunc = function(unitID)
                                 return HasCat(unitID, 'UNSPAWNABLE')
                             end,
@@ -816,7 +819,12 @@ function CreateNameFilter(data)
             local index = i
             group.items[index] = UIUtil.CreateCheckboxStd(group, data.key == 'spawnable' and '/dialogs/check-box_btn/radio' or '/dialogs/toggle_btn/toggle')
             if index == 1 then
-                LayoutHelpers.AtLeftTopIn(group.items[index], group, 95)
+                if data.key == 'spawnable' then
+                    LayoutHelpers.AtTopIn(group.items[index], group.label, 4)
+                    LayoutHelpers.RightOf(group.items[index], group.label)
+                else
+                    LayoutHelpers.AtLeftTopIn(group.items[index], group, 95)
+                end
             elseif index < FilterColumnCount+1 then
                 LayoutHelpers.RightOf(group.items[index], group.items[index-1])
             else
@@ -835,7 +843,6 @@ function CreateNameFilter(data)
             group.items[index].key = data.key
             group.items[index].OnCheck = function(self, checked)
                 filterSet[self.key].choices[self.filterKey] = checked
-                self.label:SetColor(UIUtil.fontColor)
                 if checked then
                     if not group.check:IsChecked() then
                         group.check:SetCheck(true)
@@ -863,6 +870,11 @@ function CreateNameFilter(data)
             end
             group.items[index]:SetCheck(filterSet[data.key].choices[v.key])
             if activeFilters[data.key] == nil then activeFilters[data.key] = {} end
+
+            group.items[index].label:SetColor(UIUtil.fontColor)
+            if v.tooltip then
+                Tooltip.AddControlTooltip(group.items[index], { text = v.tooltip })
+            end
         end
     else -- search box filter
         group.edit = Edit(group)
@@ -914,21 +926,13 @@ function CreateNameFilter(data)
     group.check.OnCheck = function(self, checked)
         activeFilterTypes[self.key] = checked
         filterSet[data.key].value = checked
-        local labelColor = 'ff555555'
-        if checked then
-            labelColor = UIUtil.fontColor
-        end
         if group.items then
             for i, v in group.items do
                 if not checked then
                     v:SetCheck(false, true)
                 end
-                v.label:SetColor(labelColor)
             end
-        else
-
         end
-        group.label:SetColor(labelColor)
         RefreshList()
     end
     group.check:SetCheck(filterSet[data.key].value)
@@ -2224,7 +2228,6 @@ function CreateTemplateOptionsMenu(button)
 
         if data.disabledFunc and data.disabledFunc() then
             bg:Disable()
-            bg.label:SetColor('ff777777')
         end
 
         return bg
