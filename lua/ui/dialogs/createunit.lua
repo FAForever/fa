@@ -455,8 +455,20 @@ function SearchInUnit(id, text)
         categories = string.lower(table.concat(bp.Categories, ', '))
     end
 
+    local weapons = ''
+    for _, w in bp.Weapon or {} do
+        if  w.Label and w.WeaponCategory and w.WeaponCategory ~= "Death" then
+            weapons = weapons .. w.Label .. ','
+        end
+    end
+    weapons = string.lower(weapons)
+
     text = string.lower(text)
-    return string.find(id, text) or string.find(desc, text) or string.find(name, text) or string.find(categories, text)
+    return string.find(id, text)
+        or string.find(desc, text)
+        or string.find(name, text)
+        or string.find(categories, text)
+        or string.find(weapons, text)
 end
 
 function SearchInProp(id, text)
