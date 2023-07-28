@@ -83,6 +83,14 @@ SyncMeta = {
     end,
 }
 
+---@class UnitCommand
+---@field x number
+---@field y number
+---@field z number
+---@field targetId? EntityId
+---@field target? Entity
+---@field commandType string 
+
 ---@class AIUnitProperties
 ---@field AIPlatoonReference AIPlatoon
 ---@field AIBaseManager LocationType
@@ -4763,6 +4771,8 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         cUnit.GiveNukeSiloAmmo(self, blocks, true)
     end,
 
+    ---@param self Unit
+    ---@return UnitCommand[]
     GetCommandQueue = function(self)
         local queue = cUnit.GetCommandQueue(self)
         if queue then
