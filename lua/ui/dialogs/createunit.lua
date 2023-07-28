@@ -936,6 +936,7 @@ function CreateNameFilter(data)
         end
 
         dialog.searchBox = group.edit
+        Tooltip.AddControlTooltip(dialog.searchBox , { text = '<LOC spawn_filter_search>Search units by name, category, or weapon name'})
 
         specialFilterControls[data.key] = group.edit
     end
