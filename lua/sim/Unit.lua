@@ -4769,9 +4769,11 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
             for k, order in queue do
                 if order.targetId then
                     local target = GetEntityById(order.targetId)
-                    order.target = target
-                    -- take position of the entity, used to sort the units
-                    order.x, order.y, order.z = moho.entity_methods.GetPositionXYZ(target)
+                    if target and IsEntity(target) then
+                        order.target = target
+                        -- take position of the entity, used to sort the units
+                        order.x, order.y, order.z = moho.entity_methods.GetPositionXYZ(target)
+                    end
                 end
             end
         end
