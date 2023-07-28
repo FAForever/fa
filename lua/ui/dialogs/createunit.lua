@@ -450,8 +450,13 @@ function SearchInUnit(id, text)
     local bp = __blueprints[id]
     local desc = string.lower(LOC(bp.Description or ''))
     local name = string.lower(LOC(bp.General.UnitName or ''))
+    local categories = ''
+    if bp.Categories then
+        categories = string.lower(table.concat(bp.Categories, ', '))
+    end
+
     text = string.lower(text)
-    return string.find(id, text) or string.find(desc, text) or string.find(name, text)
+    return string.find(id, text) or string.find(desc, text) or string.find(name, text) or string.find(categories, text)
 end
 
 function SearchInProp(id, text)
