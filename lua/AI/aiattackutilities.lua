@@ -212,7 +212,7 @@ function GetBestThreatTarget(aiBrain, platoon, bSkipPathability)
 
     -- Need to use overall so we can get all the threat points on the map and then filter from there
     -- if a specific threat is used, it will only report back threat locations of that type
-    local enemyIndex = nil
+    local enemyIndex = -1
     if aiBrain:GetCurrentEnemy() and TargetCurrentEnemy then
         enemyIndex = aiBrain:GetCurrentEnemy():GetArmyIndex()
     end
