@@ -88,6 +88,8 @@ gamePatches = {
             "",
             "- (#5287) Sanitize the anti-surface threat value of ACUs",
             "",
+            "- (#5292) Fix a bug where Seraphim torpedo bombers can trick torpedo defenses",
+            "",
             "## Other changes",
             "",
             "- (#5283) Add platoon form callbacks for conditional builds",
@@ -95,7 +97,7 @@ gamePatches = {
             "## Contributors",
             "",
             "- HUSSAR (#5264, #5269)",
-            "- Jip (#5274, #5275, #5282, #5277, #5276, #5285, #5291, #5290)",
+            "- Jip (#5274, #5275, #5282, #5277, #5276, #5285, #5291, #5290, #5292)",
             "- Relent0r (#5287)",
             "- speed2 (#5283)",
         }
