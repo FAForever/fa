@@ -746,7 +746,7 @@ function CreateNameFilter(data)
         group.edit:SetHighlightForegroundColor(UIUtil.highlightColor)
         group.edit:SetHighlightBackgroundColor("880085EF")
         group.edit.Width:Set(windowGroup.Width() - FilterHeaderWidth - (20 * UIScale) )
-        LayoutHelpers.SetHeight(group.edit, 17)
+        LayoutHelpers.SetHeight(group.edit, 20)
         group.edit:SetText(filterSet[data.key].editText or searchText)
         group.edit:SetFont(UIUtil.bodyFont, 15)
         group.edit:SetMaxChars(20)
@@ -755,6 +755,19 @@ function CreateNameFilter(data)
         group.edit.filterKey = data.key
         group.edit.key = data.key
         group.edit.sortFunc = data.sortFunc
+
+        group.hint = UIUtil.CreateText(group.edit, '', 12, UIUtil.bodyFont)
+        group.hint:SetColor('FF7C7C7C')
+        LayoutHelpers.AtCenterIn(group.hint, group.edit, 2)
+        group.hint:DisableHitTest()
+
+        if DialogMode == 'units' then
+            group.hint:SetText(string.upper(LOC("<LOC spawn_search_hint_units>type unit ID, name, category, or weapon name")))
+        elseif DialogMode == 'templates' then
+            group.hint:SetText(string.upper(LOC("<LOC spawn_search_hint_templates>type name or type of templates")))
+        elseif DialogMode == 'props' then
+            group.hint:SetText(string.upper(LOC("<LOC spawn_search_hint_props>type name of props")))
+        end
 
         group.edit.OnTextChanged = function(self, new, old)
             -- initialize search box to previus search term when it was not intialized to prevent keymapping messing with it
@@ -765,11 +778,13 @@ function CreateNameFilter(data)
             end
 
             if new == '' then
+                group.hint:SetAlpha(1, false)
                 activeFilters[self.key][self.filterKey] = nil
                 if group.check:IsChecked() then
                     group.check:SetCheck(false)
                 end
             else
+                group.hint:SetAlpha(0, false)
                 searchText = new
                 filterSet[self.key].editText = new
                 activeFilters[self.key][self.filterKey] = self.sortFunc
