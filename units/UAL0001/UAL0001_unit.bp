@@ -69,7 +69,7 @@ UnitBlueprint{
         RegenRate = 10,
         SkipDynamicThreatCalculations = true,
         SubThreatLevel = 0,
-        SurfaceThreatLevel = 765,
+        SurfaceThreatLevel = 45,
     },
     Display = {
         Abilities = {
