@@ -24,7 +24,7 @@ SANHeavyCavitationTorpedo02 = ClassProjectile(SHeavyCavitationTorpedo) {
 
     OnEnterWater = function(self)
         SHeavyCavitationTorpedo.OnEnterWater(self)
-        self:SetCollisionShape('Sphere', 0, 0, 0, 0.1)
+        self:SetCollisionShape('Sphere', 0, 0, 0, 0.5)
 
         self.AirTrails:Destroy()
         CreateEmitterOnEntity(self,self.Army,EffectTemplate.SHeavyCavitationTorpedoFxTrails)
