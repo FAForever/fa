@@ -193,14 +193,6 @@ function SourceListTabs()
     return list
 end
 
--- function HasCat(id, cat)
---     if __blueprints[id].CategoriesHash then
---         return __blueprints[id].CategoriesHash[cat]
---     elseif  __blueprints[id].Categories then
---         return table.find(__blueprints[id].Categories, cat)
---     end
--- end
-
 function GetUnitFactionFilter(SearchFunc)
     local filter = { key = 'faction' }
     filter.display = '<LOC spawn_filter_faction>Faction'
@@ -430,7 +422,7 @@ function GetPropFolderFilters()
     for folder in folders do
         specialFilterControls[folder] = folder
         table.insert(list, {
-            title = string.sub(string.gsub(folder, '%b//', ''),1,-2),
+            display = string.sub(string.gsub(folder, '%b//', ''),1,-2),
             key = folder,
             sortFunc = function(ID, folder) 
                 return folder == string.sub(ID, 1, string.len(folder)) 
@@ -454,7 +446,7 @@ function GetPropsTypeFilters()
     for propType in propTypes do
         specialFilterControls[propType] = propType
         table.insert(list, {
-            title = propType,
+            display = propType, tooltip = 'Toggle ' .. propType .. ' props',
             key = propType,
             sortFunc = function(id, propType)
                 return propType == Logic.GetPropType(id)
@@ -567,12 +559,12 @@ GetNameFilters = {
         return {
             SearchInputFilter(),
             {
-                title = 'Type',
+                display = 'Type',
                 key = 'propType',
                 choices = GetPropsTypeFilters(),
             },
             {
-                title = 'Folder',
+                display = 'Folder',
                 key = 'sourcefolder',
                 choices = GetPropFolderFilters(),
             },
@@ -581,25 +573,21 @@ GetNameFilters = {
     templates = function()
         return {
             SearchInputFilter(),
+            GetUnitFactionFilter(function(template, cat)
+                local td = template.templateData
+                for i = 3, table.getn(td) do
+                    if not Logic.HasCategory(td[i][1], cat) then return --[[true]] end
+                end
+                return true
+            end),
             {
-                display = '<LOC spawn_filter_faction>Faction',
-                key = 'faction',
-                choices = GetUnitFactionFilter(function(template, cat)
-                    local td = template.templateData
-                    for i = 3, table.getn(td) do
-                        if not Logic.HasCategoryCat(td[i][1], cat) then return --[[true]] end
-                    end
-                    return true
-                end),
-            },
-            {
-                title = 'Build layer',
+                display = '<LOC spawn_filter_layer>Build layer',
                 key = 'layer',
                 choices = {
                     {
-                        title = 'Land',
                         key = 'bland',
-                        tooltip = '<LOC spawn_filter_land>Toggle Land units',
+                        display = '<LOC spawn_filter_layer_land>Land',
+                        tooltip = '<LOC spawn_filter_layer_land_tip>Toggle Land templates',
                         sortFunc = function(template)
                             local td = template.templateData
                             for i = 3, table.getn(td) do
@@ -612,9 +600,9 @@ GetNameFilters = {
                         end,
                     },
                     {
-                        title = 'Water',
                         key = 'bsea',
-                        tooltip = '<LOC spawn_filter_water>Toggle Naval units',
+                        display = '<LOC spawn_filter_layer_naval>Naval',
+                        tooltip = '<LOC spawn_filter_layer_naval_tip>Toggle Naval templates',
                         sortFunc = function(template)
                             local td = template.templateData
                             for i = 3, table.getn(td) do
@@ -627,9 +615,9 @@ GetNameFilters = {
                         end,
                     },
                     {
-                        title = 'Both',
                         key = 'bboth',
-                        tooltip = '<LOC spawn_filter_water>Toggle Amphibious units',
+                        display = '<LOC spawn_filter_layer_both>Both',
+                        tooltip = '<LOC spawn_filter_layer_both_tip>Toggle land and sea templates',
                         sortFunc = function(template)
                             local td = template.templateData
                             for i = 3, table.getn(td) do
@@ -646,7 +634,6 @@ GetNameFilters = {
         }
     end,
 }
- 
 
 function SetUnitFactionIcon(id, bitmap, background)
     local faction = Logic.GetUnitFactionInfo(id)
@@ -697,6 +684,7 @@ function CreateNameFilter(data)
         for i, v in data.choices do
             local index = i
             group.items[index] = UIUtil.CreateCheckboxStd(group, '/dialogs/toggle_btn/toggle')
+
             if index == 1 then
                 LayoutHelpers.AtLeftTopIn(group.items[index], group, 95)
             elseif index < FilterColumnCount+1 then
@@ -1722,8 +1710,9 @@ function CreateDialog()
                 if options.spawn_menu_show_icons then
                     SetUnitImage(line.img, data.id.icon, true)
                 end
-                line.factionBG:SetAlpha(0, true)
-                line.imageBG:SetAlpha(0, false)
+                if line.factionBG then line.factionBG:SetAlpha(0, true) end
+                if line.imageBG then line.imageBG:SetAlpha(0, false) end
+
             elseif DialogMode == 'units' then
                 line.id:SetText(Logic.GetUnitIdentifier(data.id, true))
                 line.desc:SetText(Logic.GetUnitDescription(data.id))
@@ -1738,8 +1727,8 @@ function CreateDialog()
                 if options.spawn_menu_show_icons then
                     SetUnitImage(line.img, data.id, true)
                 end
-                line.factionBG:SetAlpha(0, true)
-                line.imageBG:SetAlpha(0, false)
+                if line.factionBG then line.factionBG:SetAlpha(0, true) end
+                if line.imageBG then line.imageBG:SetAlpha(0, false) end
             end
         end
         for i, v in windowGroup.unitEntries do
