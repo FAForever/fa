@@ -26,6 +26,10 @@ local NumArmies = table.getsize(ArmiesAndObserver)
 local WindowBorderThickness = 10
 local WindowHeaderThickness = 30
 
+-- Helper values, changing these will break stuff, not configure stuff
+local FilterWidth = 83 * UIScale
+local FilterHeaderWidth = 90 * UIScale
+
 local dialog, nameDialog, windowGroup, debugConfig
 local EscThread
 local ChosenCreation, FilterColumnCount, TeamColumnCount, TeamRowsCount
@@ -199,6 +203,7 @@ function SourceListTabs()
         listicle = {
             {
                 title = '<LOC spawn_filter_sc1>SC',
+                tooltip = '<LOC spawn_filter_sc1_tip>Toggle SC orginal units',
                 key = 'sc1',
                 sortFunc = function(unitID, modloc)
                     return string.sub(__blueprints[unitID].Source, 1, 8) == "/units/u"
@@ -206,6 +211,7 @@ function SourceListTabs()
             },
             {
                 title = '<LOC spawn_filter_scx1>SC-FA',
+                tooltip = '<LOC spawn_filter_scx1_tip>Toggle FA updated units',
                 key = 'scx1',
                 sortFunc = function(unitID, modloc)
                     return string.sub(__blueprints[unitID].Source, 1, 8) == "/units/x"
@@ -213,6 +219,7 @@ function SourceListTabs()
             },
             {
                 title = '<LOC spawn_filter_dlc>SC Patch',
+                tooltip = '<LOC spawn_filter_dlc_tip>Toggle SC patched units',
                 key = 'dlc',
                 sortFunc = function(unitID, modloc)
                     return string.sub(__blueprints[unitID].Source, 1, 7) == "/units/" and string.sub(unitID, 1, 1) ~= 'u' and string.sub(unitID, 1, 1) ~= 'x' and string.sub(unitID, 1, 1) ~= 'o'
@@ -220,7 +227,7 @@ function SourceListTabs()
             },
             {
                 title = '<LOC spawn_filter_civilans>Civilans',
-                tooltip = '<LOC spawn_filter_civilans_tip>Toogle civilan units',
+                tooltip = '<LOC spawn_filter_civilans_tip>Toggle civilan units',
                 key = 'civ',
                 sortFunc = function(unitID, modloc)
                     return not IsUnitPlayable(unitID)
@@ -228,7 +235,7 @@ function SourceListTabs()
             },
             {
                 title = '<LOC spawn_filter_playable>Playable',
-                tooltip = '<LOC spawn_filter_playable_tip>Toogle units playable in the game',
+                tooltip = '<LOC spawn_filter_playable_tip>Toggle units playable in the game',
                 key = 'play',
                 sortFunc = function(unitID, modloc)
                     return IsUnitPlayable(unitID)
@@ -282,14 +289,14 @@ function FactionListTabs(FindFunc)
         table.insert(flisticle, {
             title = faction.DisplayName,
             key = key,
-            tooltip = '<LOC spawn_filter_'.. faction.Category ..'_tip>Toogle ' .. faction.Category .. ' units',
+            tooltip = '<LOC spawn_filter_'.. faction.Category ..'_tip>Toggle ' .. faction.Category .. ' units',
             sortFunc = FindFunc
         })
     end
 
     table.insert(flisticle, {
         title = '<LOC spawn_filter_other_faction>Other',
-        tooltip = '<LOC spawn_filter_other_tip>Toogle units from other factions',
+        tooltip = '<LOC spawn_filter_other_tip>Toggle units from other factions',
         key = 'otherfaction',
         sortFunc = function(unitID)
             for i, cat in allFactionCats do
@@ -308,25 +315,25 @@ function TypeListTabs()
         list = {
             {
                 title = '<LOC spawn_filter_land>Land',
-                tooltip = '<LOC spawn_filter_land_tip>Toogle Land units',
+                tooltip = '<LOC spawn_filter_land_tip>Toggle Land units',
                 key = 'land',
                 sortFunc = function(unitID) return HasCat(unitID, 'LAND') end,
             },
             {
                 title = '<LOC spawn_filter_air>Air',
-                tooltip = '<LOC spawn_filter_land_tip>Toogle Land units',
+                tooltip = '<LOC spawn_filter_air_tip>Toggle Air units',
                 key = 'air',
                 sortFunc = function(unitID) return HasCat(unitID, 'AIR') end,
             },
             {
                 title = '<LOC spawn_filter_naval>Naval',
-                tooltip = '<LOC spawn_filter_naval_tip>Toogle Naval units',
+                tooltip = '<LOC spawn_filter_naval_tip>Toggle Naval units',
                 key = 'naval',
                 sortFunc = function(unitID) return HasCat(unitID, 'NAVAL') end,
             },
             {
                 title = '<LOC spawn_filter_amph>Amphibious',
-                tooltip = '<LOC spawn_filter_amph_tip>Toogle Amphibious units',
+                tooltip = '<LOC spawn_filter_amph_tip>Toggle Amphibious units',
                 key = 'amph',
                 sortFunc = function(unitID)
                     return HasCat(unitID, 'AMPHIBIOUS') or HasCat(unitID, 'HOVER')
@@ -334,7 +341,7 @@ function TypeListTabs()
             },
             {
                 title = '<LOC spawn_filter_structure>Base',
-                tooltip = '<LOC spawn_filter_structure_tip>Toogle Base structures',
+                tooltip = '<LOC spawn_filter_structure_tip>Toggle Base structures',
                 key = 'base',
                 sortFunc = function(unitID)
                     return __blueprints[unitID].Physics.MotionType == 'RULEUMT_None'
@@ -345,6 +352,7 @@ function TypeListTabs()
         list = {
             {
                 title = '<LOC spawn_filter_land>Land',
+                tooltip = '<LOC spawn_filter_land_tip>Toggle Land units',
                 key = 'land',
                 sortFunc = function(unitID)
                     local MT = __blueprints[unitID].Physics.MotionType
@@ -353,6 +361,7 @@ function TypeListTabs()
             },
             {
                 title = '<LOC spawn_filter_surface>Surface',
+                tooltip = '<LOC spawn_filter_surface_tip>Toggle Surface units',
                 key = 'surface',
                 sortFunc = function(unitID)
                     local MT = __blueprints[unitID].Physics.MotionType
@@ -361,6 +370,7 @@ function TypeListTabs()
             },
             {
                 title = '<LOC spawn_filter_naval>Naval',
+                tooltip = '<LOC spawn_filter_naval_tip>Toggle Naval units',
                 key = 'naval',
                 sortFunc = function(unitID)
                     local MT = __blueprints[unitID].Physics.MotionType
@@ -376,6 +386,7 @@ function TypeListTabs()
             },
             {
                 title = '<LOC spawn_filter_structure>Base',
+                tooltip = '<LOC spawn_filter_structure_tip>Toggle Base structures',
                 key = 'base',
                 sortFunc = function(unitID)
                     return __blueprints[unitID].Physics.MotionType == 'RULEUMT_None'
@@ -404,6 +415,7 @@ function TechListTabs()
     local list = {
         {
             title = '<LOC CONSTRUCT_0000>T1',
+            tooltip = '<LOC spawn_filter_t1_tip>Toggle T1 units',
             key = 't1',
             sortFunc = function(unitID)
                 return HasCat(unitID, 'TECH1')
@@ -411,6 +423,7 @@ function TechListTabs()
         },
         {
             title = '<LOC CONSTRUCT_0001>T2',
+            tooltip = '<LOC spawn_filter_t2_tip>Toggle T2 units',
             key = 't2',
             sortFunc = function(unitID)
                 return HasCat(unitID, 'TECH2')
@@ -418,6 +431,7 @@ function TechListTabs()
         },
         {
             title = '<LOC CONSTRUCT_0002>T3',
+            tooltip = '<LOC spawn_filter_t3_tip>Toggle T3 units',
             key = 't3',
             sortFunc = function(unitID)
                 return HasCat(unitID, 'TECH3')
@@ -425,6 +439,7 @@ function TechListTabs()
         },
         {
             title = '<LOC CONSTRUCT_0003>Exp.',
+            tooltip = '<LOC spawn_filter_t4_tip>Toggle T4 units',
             key = 't4',
             sortFunc = function(unitID)
                 return HasCat(unitID, 'EXPERIMENTAL')
@@ -433,7 +448,8 @@ function TechListTabs()
     }
     if getOptions().spawn_menu_notech_filter then
         table.insert(list, 1, {
-            title = '<LOC spawn_filter_notech>No Tech',
+            title = '<LOC spawn_filter_t0>No Tech',
+            tooltip = '<LOC spawn_filter_t0_tip>Toggle units no Tech Level',
             key = 'civ',
             sortFunc = function(unitID)
                 return not (HasCat(unitID, 'TECH1') or HasCat(unitID, 'TECH2')
@@ -565,7 +581,7 @@ GetNameFilters = {
                     {
                         title = 'Construction',
                         key = 'const',
-                        tooltip = '<LOC spawn_filter_const>Toogle construction units',
+                        tooltip = '<LOC spawn_filter_const>Toggle construction units',
                         sortFunc = function(unitID)
                             return HasCat(unitID, 'SORTCONSTRUCTION')
                         end,
@@ -573,7 +589,7 @@ GetNameFilters = {
                     {
                         title = 'Economy',
                         key = 'eco',
-                        tooltip = '<LOC spawn_filter_eco>Toogle Economy units',
+                        tooltip = '<LOC spawn_filter_eco>Toggle Economy units',
                         sortFunc = function(unitID)
                             return HasCat(unitID, 'SORTECONOMY')
                         end,
@@ -581,7 +597,7 @@ GetNameFilters = {
                     {
                         title = 'Defense',
                         key = 'defence',
-                        tooltip = '<LOC spawn_filter_defence>Toogle Defense units',
+                        tooltip = '<LOC spawn_filter_defence>Toggle Defense units',
                         sortFunc = function(unitID)
                             return HasCat(unitID, 'SORTDEFENSE')
                         end,
@@ -589,7 +605,7 @@ GetNameFilters = {
                     {
                         title = 'Strategic',
                         key = 'strat',
-                        tooltip = '<LOC spawn_filter_strat>Toogle Strategic units',
+                        tooltip = '<LOC spawn_filter_strat>Toggle Strategic units',
                         sortFunc = function(unitID)
                             return HasCat(unitID, 'SORTSTRATEGIC')
                         end,
@@ -597,7 +613,7 @@ GetNameFilters = {
                     {
                         title = 'Intel',
                         key = 'intel',
-                        tooltip = '<LOC spawn_filter_intel>Toogle Intel units',
+                        tooltip = '<LOC spawn_filter_intel>Toggle Intel units',
                         sortFunc = function(unitID)
                             return HasCat(unitID, 'SORTINTEL')
                         end,
@@ -615,7 +631,7 @@ GetNameFilters = {
                         {
                             title = '',
                             key = 'spawnable',
-                            tooltip = '<LOC spawn_filter_spawnable>Toogle spawnable units',
+                            tooltip = '<LOC spawn_filter_spawnable>Toggle spawnable units',
                             sortFunc = function(unitID)
                                 return not HasCat(unitID, 'UNSPAWNABLE')
                             end,
@@ -623,7 +639,7 @@ GetNameFilters = {
                         {
                             title = '',
                             key = 'unspawnable',
-                            tooltip = '<LOC spawn_filter_dummy>Toogle dummy units',
+                            tooltip = '<LOC spawn_filter_dummy>Toggle dummy units',
                             sortFunc = function(unitID)
                                 return HasCat(unitID, 'UNSPAWNABLE')
                             end,
@@ -666,7 +682,7 @@ GetNameFilters = {
                     {
                         title = 'Land',
                         key = 'bland',
-                        tooltip = '<LOC spawn_filter_land>Toogle Land units',
+                        tooltip = '<LOC spawn_filter_land>Toggle Land units',
                         sortFunc = function(template)
                             local td = template.templateData
                             for i = 3, table.getn(td) do
@@ -681,7 +697,7 @@ GetNameFilters = {
                     {
                         title = 'Water',
                         key = 'bsea',
-                        tooltip = '<LOC spawn_filter_water>Toogle Naval units',
+                        tooltip = '<LOC spawn_filter_water>Toggle Naval units',
                         sortFunc = function(template)
                             local td = template.templateData
                             for i = 3, table.getn(td) do
@@ -696,7 +712,7 @@ GetNameFilters = {
                     {
                         title = 'Both',
                         key = 'bboth',
-                        tooltip = '<LOC spawn_filter_water>Toogle Amphibious units',
+                        tooltip = '<LOC spawn_filter_water>Toggle Amphibious units',
                         sortFunc = function(template)
                             local td = template.templateData
                             for i = 3, table.getn(td) do
@@ -898,7 +914,7 @@ function CreateNameFilter(data)
 
             group.items[index].label:SetColor(UIUtil.fontColor)
             if v.tooltip then
-                Tooltip.AddControlTooltip(group.items[index], { text = v.tooltip })
+                Tooltip.AddControlTooltip(group.items[index], { text = ' '.. LOC(v.tooltip) .. ' ' })
             end
         end
     else -- search box filter
@@ -908,7 +924,7 @@ function CreateNameFilter(data)
         group.edit:SetBackgroundColor('ff333333')
         group.edit:SetHighlightForegroundColor(UIUtil.highlightColor)
         group.edit:SetHighlightBackgroundColor("880085EF")
-        group.edit.Width:Set((FilterColumnCount-(2 * UIScale))*82)
+        group.edit.Width:Set(windowGroup.Width() - FilterHeaderWidth - FilterWidth - FilterWidth)
         LayoutHelpers.SetHeight(group.edit, 17)
         group.edit:SetText(filterSet[data.key].editText or searchText)
         group.edit:SetFont(UIUtil.bodyFont, 15)
@@ -944,7 +960,7 @@ function CreateNameFilter(data)
         end
 
         dialog.searchBox = group.edit
-        Tooltip.AddControlTooltip(dialog.searchBox, { text = '<LOC spawn_filter_search>Search units by name, category, or weapon name'})
+        Tooltip.AddControlTooltip(dialog.searchBox._fg, { text = '<LOC spawn_filter_search>Search units by name, category, or weapon name'})
 
         specialFilterControls[data.key] = group.edit
     end
@@ -980,11 +996,6 @@ function CreateDialog()
         dialog:OnClose()
         return
     end
-
-
-    -- Helper values, changing these will break stuff, not configure stuff
-    local FilterWidth = 83 * UIScale
-    local FilterHeaderWidth = 90 * UIScale
 
     -- Configurable values
     local TeamGridCellMinWidth = getOptions().spawn_menu_team_column_min_width or 145
