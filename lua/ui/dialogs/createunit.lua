@@ -10,6 +10,9 @@ local Edit = import('/lua/maui/edit.lua').Edit
 local getOptions = function() return import('/lua/user/prefs.lua').GetFromCurrentProfile('options') end
 local options = getOptions()
 
+-- this module provides most of logic for working with blueprints of units an props
+local Logic = import('/lua/ui/dialogs/createunit.logic.lua')
+
 local DummyUnitID = 'ura0001'
 local DialogMode = options.spawn_menu_main_mode or 'units' --or 'props' or 'templates'
 local currentArmy = GetFocusArmy()
@@ -46,6 +49,7 @@ function RefreshUI()
 end
 
 function ClearFilters()
+    searchText = ''
     activeFilters, activeFilterTypes, specialFilterControls, filterSet = {}, {}, {}, {}
     RefreshUI()
 end
@@ -55,73 +59,8 @@ function UpdateTeamGridCounts(columns)
     TeamRowsCount = math.ceil(NumArmies/TeamColumnCount)
 end
 
---[[
-TODO: LOC: only partially done. Done so far:
-spawn_filter_faction	"Faction"
-spawn_filter_source	"Source"
-spawn_filter_type	"Type"
-spawn_filter_tech	"Tech Level"
-
-spawn_filter_sc1	"SC"
-spawn_filter_scx1	"SC-FA"
-spawn_filter_dlc	"SC Patch"
-spawn_filter_vanilla	"Core Game"
-spawn_filter_other_faction	"Other"
-
-spawn_filter_land	"Land"
-spawn_filter_air	"Air"
-spawn_filter_naval	"Naval"
-spawn_filter_amph	"Amphibious"
-spawn_filter_structure	"Base"
-spawn_filter_surface	"Surface"
-spawn_filter_rnd	"Research"
-spawn_filter_notech	"No Tech"
-spawn_filter_search	"Search"
-]]
-
-function GetLayerGroup(id)
-    local bp = __blueprints[id]
-    if bp.Physics then
-        if bp.Physics.MotionType == 'RULEUMT_None' then
-            local cap = bp.Physics.BuildOnLayerCaps
-            local caps = {
-                Land   = 'land',
-                Water  = 'sea',
-                Sub    = 'sea',
-                Seabed = 'sea',
-                Air    = 'air',
-            }
-            if caps[cap] then
-                return caps[cap]
-            elseif tonumber(cap) then
-                cap = math.mod(tostring(cap), 16) --You're not an aircraft, get over yourself.
-
-                -- An odd number has some combination of land with sea/sub/water -so amph
-                -- An even number has some combination of sea/sub/water, so sea
-                -- 1 isn't possible, that would be "Land"
-                -- An aside: To whichever engine programmer had it use words for powers of 2, WHY?
-                if math.mod(cap, 2) == 1 and cap > 1 then
-                    return 'amph'
-                elseif cap >= 2 then
-                    return 'sea'
-                end
-            end
-        else
-            local RULEUMT = {
-                RULEUMT_Air                = 'air',
-                RULEUMT_Amphibious         = 'amph',
-                RULEUMT_AmphibiousFloating = 'amph',
-                RULEUMT_Biped              = 'land',
-                RULEUMT_Land               = 'land',
-                RULEUMT_Hover              = 'amph',
-                RULEUMT_Water              = 'sea',
-                RULEUMT_SurfacingSub       = 'sea',
-            }
-            return RULEUMT[bp.Physics.MotionType] or 'land'--the "or" should never matter, but just in case.
-        end
-    end
-    _ALERT("Can't identify layers for unit ", id, bp.Physics and bp.Physics.BuildOnLayerCaps, type(bp.Physics.BuildOnLayerCaps)) --We should never get here
-    return 'land'
+function StringTrim(str)
+    return string.gsub(str, "^%s*(.-)%s*$", "%1")
 end
 
 function SourceListTabs()
@@ -197,12 +136,12 @@ function SourceListTabs()
         end
     end
 
-    local listicle
+    local list
 
     if getOptions().spawn_menu_split_sources then
-        listicle = {
+        list = {
             {
-                title = '<LOC spawn_filter_sc1>SC',
+                display = '<LOC spawn_filter_sc1>SC',
                 tooltip = '<LOC spawn_filter_sc1_tip>Toggle SC orginal units',
                 key = 'sc1',
                 sortFunc = function(unitID, modloc)
@@ -210,7 +149,7 @@ function SourceListTabs()
                 end,
             },
             {
-                title = '<LOC spawn_filter_scx1>SC-FA',
+                display = '<LOC spawn_filter_scx1>SC-FA',
                 tooltip = '<LOC spawn_filter_scx1_tip>Toggle FA updated units',
                 key = 'scx1',
                 sortFunc = function(unitID, modloc)
@@ -218,34 +157,18 @@ function SourceListTabs()
                 end,
             },
             {
-                title = '<LOC spawn_filter_dlc>SC Patch',
+                display = '<LOC spawn_filter_dlc>SC Patch',
                 tooltip = '<LOC spawn_filter_dlc_tip>Toggle SC patched units',
                 key = 'dlc',
                 sortFunc = function(unitID, modloc)
                     return string.sub(__blueprints[unitID].Source, 1, 7) == "/units/" and string.sub(unitID, 1, 1) ~= 'u' and string.sub(unitID, 1, 1) ~= 'x' and string.sub(unitID, 1, 1) ~= 'o'
                 end,
             },
-            {
-                title = '<LOC spawn_filter_civilans>Civilans',
-                tooltip = '<LOC spawn_filter_civilans_tip>Toggle civilan units',
-                key = 'civ',
-                sortFunc = function(unitID, modloc)
-                    return not IsUnitPlayable(unitID)
-                end,
-            },
-            {
-                title = '<LOC spawn_filter_playable>Playable',
-                tooltip = '<LOC spawn_filter_playable_tip>Toggle units playable in the game',
-                key = 'play',
-                sortFunc = function(unitID, modloc)
-                    return IsUnitPlayable(unitID)
-                end,
-            }
         }
     else
-        listicle = {
+        list = {
             {
-                title = '<LOC spawn_filter_vanilla>Core Game',
+                display = '<LOC spawn_filter_vanilla>Core Game',
                 key = 'vanilla',
                 sortFunc = function(unitID, modloc)
                     return string.sub(__blueprints[unitID].Source, 1, 7) == "/units/"
@@ -259,7 +182,7 @@ function SourceListTabs()
             if ShouldGiveTab(mod) then
                 local key = string.gsub(string.lower(mod.name),"%s+", "_")
                 specialFilterControls[key] = mod.location
-                table.insert(listicle, {
+                table.insert(list, {
                     title = titleFit(mod.name),
                     key = key,
                     sortFunc = function(unitID, modloc) return modloc..'/' == string.sub(__blueprints[unitID].Source, 1, (modloc):len()+1) end,
@@ -267,138 +190,130 @@ function SourceListTabs()
             end
         end
     end
-    return listicle
+    return list
 end
 
-function HasCat(id, cat)
-    if __blueprints[id].CategoriesHash then
-        return __blueprints[id].CategoriesHash[cat]
-    elseif  __blueprints[id].Categories then
-        return table.find(__blueprints[id].Categories, cat)
-    end
-end
+-- function HasCat(id, cat)
+--     if __blueprints[id].CategoriesHash then
+--         return __blueprints[id].CategoriesHash[cat]
+--     elseif  __blueprints[id].Categories then
+--         return table.find(__blueprints[id].Categories, cat)
+--     end
+-- end
 
-function FactionListTabs(FindFunc)
-    local flisticle = {}
+function GetUnitFactionFilter(SearchFunc)
+    local filter = { key = 'faction' }
+    filter.display = '<LOC spawn_filter_faction>Faction'
+    filter.choices = {}
     local allFactionCats = {}
 
     for i, faction in import('/lua/factions.lua').Factions do
         local key = 'faction'..faction.Category
         specialFilterControls[key] = faction.Category
         table.insert(allFactionCats, faction.Category)
-        table.insert(flisticle, {
-            title = faction.DisplayName,
+        table.insert(filter.choices, {
             key = key,
-            tooltip = '<LOC spawn_filter_'.. faction.Category ..'_tip>Toggle ' .. faction.Category .. ' units',
-            sortFunc = FindFunc
+            display = '<LOC spawn_filter_faction_'.. faction.Category .. '>' .. faction.Category,
+            tooltip = '<LOC spawn_filter_faction_'.. faction.Category .. '_tip>Toggle ' .. faction.Category .. ' units',
+            sortFunc = SearchFunc or Logic.HasCategory
         })
     end
 
-    table.insert(flisticle, {
-        title = '<LOC spawn_filter_other_faction>Other',
-        tooltip = '<LOC spawn_filter_other_tip>Toggle units from other factions',
+    table.insert(filter.choices, {
+        display = '<LOC spawn_filter_faction_other>Other',
+        tooltip = '<LOC spawn_filter_faction_other_tip>Toggle units from other factions',
         key = 'otherfaction',
         sortFunc = function(unitID)
             for i, cat in allFactionCats do
-                if FindFunc(unitID, cat) then return end
+                if SearchFunc then 
+                    if SearchFunc(unitID, cat) then return end
+                else
+                    if Logic.HasCategory(unitID, cat) then return end
+                end
             end
             return true
         end,
     })
 
-    return flisticle
+    return filter
 end
 
-function TypeListTabs()
-    local list
+function GetUnitTypeFilter()
+    local filter = { key = 'type' } 
     if getOptions().spawn_menu_type_filter_mode == 'category' then
-        list = {
+        filter.display = '<LOC spawn_filter_type>Type'
+        filter.choices = {
             {
-                title = '<LOC spawn_filter_land>Land',
-                tooltip = '<LOC spawn_filter_land_tip>Toggle Land units',
+                display = '<LOC spawn_filter_category_land>Land',
+                tooltip = '<LOC spawn_filter_category_land_tip>Toggle Land units',
                 key = 'land',
-                sortFunc = function(unitID) return HasCat(unitID, 'LAND') end,
+                sortFunc = Logic.IsLand,
             },
             {
-                title = '<LOC spawn_filter_air>Air',
-                tooltip = '<LOC spawn_filter_air_tip>Toggle Air units',
+                display = '<LOC spawn_filter_category_air>Air',
+                tooltip = '<LOC spawn_filter_category_air_tip>Toggle Air units',
                 key = 'air',
-                sortFunc = function(unitID) return HasCat(unitID, 'AIR') end,
+                sortFunc = Logic.IsAir,
             },
             {
-                title = '<LOC spawn_filter_naval>Naval',
-                tooltip = '<LOC spawn_filter_naval_tip>Toggle Naval units',
+                display = '<LOC spawn_filter_category_naval>Naval',
+                tooltip = '<LOC spawn_filter_category_naval_tip>Toggle Naval units',
                 key = 'naval',
-                sortFunc = function(unitID) return HasCat(unitID, 'NAVAL') end,
+                sortFunc = Logic.IsNaval,
             },
             {
-                title = '<LOC spawn_filter_amph>Amphibious',
-                tooltip = '<LOC spawn_filter_amph_tip>Toggle Amphibious units',
+                display = '<LOC spawn_filter_category_amph>Amphibious',
+                tooltip = '<LOC spawn_filter_category_amph_tip>Toggle Amphibious units',
                 key = 'amph',
-                sortFunc = function(unitID)
-                    return HasCat(unitID, 'AMPHIBIOUS') or HasCat(unitID, 'HOVER')
-                end,
+                sortFunc = Logic.IsAmphibious
             },
             {
-                title = '<LOC spawn_filter_structure>Base',
-                tooltip = '<LOC spawn_filter_structure_tip>Toggle Base structures',
+                display = '<LOC spawn_filter_category_structure>Base',
+                tooltip = '<LOC spawn_filter_category_structure_tip>Toggle base structures',
                 key = 'base',
-                sortFunc = function(unitID)
-                    return __blueprints[unitID].Physics.MotionType == 'RULEUMT_None'
-                end,
+                sortFunc = Logic.IsStructure
             },
         }
     else
-        list = {
+        filter.display = '<LOC spawn_filter_type>Type'
+        filter.choices = {
             {
-                title = '<LOC spawn_filter_land>Land',
-                tooltip = '<LOC spawn_filter_land_tip>Toggle Land units',
+                display = '<LOC spawn_filter_move_land>Land',
+                tooltip = '<LOC spawn_filter_move_land_tip>Toggleunits that move only on land or seabed',
                 key = 'land',
-                sortFunc = function(unitID)
-                    local MT = __blueprints[unitID].Physics.MotionType
-                    return (MT == 'RULEUMT_Amphibious' or MT == 'RULEUMT_Land') and __blueprints[unitID].ScriptClass ~= 'ResearchItem'
-                end,
+                sortFunc = Logic.IsMotionLand
             },
             {
-                title = '<LOC spawn_filter_surface>Surface',
-                tooltip = '<LOC spawn_filter_surface_tip>Toggle Surface units',
-                key = 'surface',
-                sortFunc = function(unitID)
-                    local MT = __blueprints[unitID].Physics.MotionType
-                    return MT == 'RULEUMT_AmphibiousFloating' or MT == 'RULEUMT_Hover'
-                end,
-            },
-            {
-                title = '<LOC spawn_filter_naval>Naval',
-                tooltip = '<LOC spawn_filter_naval_tip>Toggle Naval units',
-                key = 'naval',
-                sortFunc = function(unitID)
-                    local MT = __blueprints[unitID].Physics.MotionType
-                    return MT == 'RULEUMT_Water' or MT == 'RULEUMT_SurfacingSub'
-                end,
-            },
-            {
-                title = '<LOC spawn_filter_air>Air',
+                display = '<LOC spawn_filter_move_air>Air',
+                tooltip = '<LOC spawn_filter_move_air_tip>Toggle units that move only in air',
                 key = 'air',
-                sortFunc = function(unitID)
-                    return __blueprints[unitID].Physics.MotionType == 'RULEUMT_Air'
-                end,
+                sortFunc = Logic.IsMotionAir,
             },
             {
-                title = '<LOC spawn_filter_structure>Base',
-                tooltip = '<LOC spawn_filter_structure_tip>Toggle Base structures',
-                key = 'base',
-                sortFunc = function(unitID)
-                    return __blueprints[unitID].Physics.MotionType == 'RULEUMT_None'
-                end,
+                display = '<LOC spawn_filter_move_water>Water',
+                tooltip = '<LOC spawn_filter_move_water_tip>Toggle units that move only in water',
+                key = 'water',
+                sortFunc = Logic.IsMotionWater,
+            },
+            {
+                display = '<LOC spawn_filter_move_hover>Hover',
+                tooltip = '<LOC spawn_filter_move_hover_tip>Toggle units that hover on land or water',
+                key = 'hover',
+                sortFunc = Logic.IsMotionHover
+            },
+            {
+                display = '<LOC spawn_filter_move_stationary>Stationary',
+                tooltip = '<LOC spawn_filter_move_stationary_tip>Toggle units that do not move',
+                key = 'stationary',
+                sortFunc = Logic.IsMotionNone,
             },
         }
     end
 
     for i, mod in __active_mods do
         if mod.showresearch then
-            table.insert(list, {
-                title = '<LOC spawn_filter_rnd>Research',
+            table.insert(filter.choices, {
+                display = '<LOC spawn_filter_rnd>Research',
                 key = 'rnd',
                 sortFunc = function(unitID)
                     return __blueprints[unitID].ScriptClass == 'ResearchItem'
@@ -407,69 +322,45 @@ function TypeListTabs()
             break
         end
     end
-
-    return list
+    return filter
 end
 
-function TechListTabs()
-    local list = {
+function GetUnitTechFilter()
+    local filter = { key = 'tech' }
+    filter.display = '<LOC spawn_filter_tech>Tech Level'
+    filter.choices = {
         {
-            title = '<LOC CONSTRUCT_0000>T1',
-            tooltip = '<LOC spawn_filter_t1_tip>Toggle T1 units',
-            key = 't1',
-            sortFunc = function(unitID)
-                return HasCat(unitID, 'TECH1')
-            end,
-        },
-        {
-            title = '<LOC CONSTRUCT_0001>T2',
-            tooltip = '<LOC spawn_filter_t2_tip>Toggle T2 units',
-            key = 't2',
-            sortFunc = function(unitID)
-                return HasCat(unitID, 'TECH2')
-            end,
-        },
-        {
-            title = '<LOC CONSTRUCT_0002>T3',
-            tooltip = '<LOC spawn_filter_t3_tip>Toggle T3 units',
-            key = 't3',
-            sortFunc = function(unitID)
-                return HasCat(unitID, 'TECH3')
-            end,
-        },
-        {
-            title = '<LOC CONSTRUCT_0003>Exp.',
-            tooltip = '<LOC spawn_filter_t4_tip>Toggle T4 units',
-            key = 't4',
-            sortFunc = function(unitID)
-                return HasCat(unitID, 'EXPERIMENTAL')
-            end,
-        },
-    }
-    if getOptions().spawn_menu_notech_filter then
-        table.insert(list, 1, {
-            title = '<LOC spawn_filter_t0>No Tech',
+            display = '<LOC spawn_filter_t0>No Tech',
             tooltip = '<LOC spawn_filter_t0_tip>Toggle units no Tech Level',
             key = 'civ',
-            sortFunc = function(unitID)
-                return not (HasCat(unitID, 'TECH1') or HasCat(unitID, 'TECH2')
-                or HasCat(unitID, 'TECH3') or HasCat(unitID, 'EXPERIMENTAL'))
-            end,
-        })
-    end
-    --[[
-    if getOptions().spawn_menu_paragon_filter then
-        table.insert(list, {
-            title = 'ACU+',
-            key = 'acu',
-            sortFunc = function(unitID)
-                return HasCat(unitID, 'COMMAND') -- Show ACU's
-                or string.find(unitID, 'l0301_Engineer') -- Show SCU's
-                or string.find(unitID, 'xab1401') -- Show Paragon
-            end,
-        })
-    end]]
-    return list
+            sortFunc = Logic.IsTech0,
+        },
+        {
+            display = '<LOC CONSTRUCT_0000>T1',
+            tooltip = '<LOC spawn_filter_t1_tip>Toggle T1 units',
+            key = 't1',
+            sortFunc = Logic.IsTech1,
+        },
+        {
+            display = '<LOC CONSTRUCT_0001>T2',
+            tooltip = '<LOC spawn_filter_t2_tip>Toggle T2 units',
+            key = 't2',
+            sortFunc = Logic.IsTech2,
+        },
+        {
+            display = '<LOC CONSTRUCT_0002>T3',
+            tooltip = '<LOC spawn_filter_t3_tip>Toggle T3 units',
+            key = 't3',
+            sortFunc = Logic.IsTech3,
+        },
+        {
+            display = '<LOC CONSTRUCT_0003>Exp.',
+            tooltip = '<LOC spawn_filter_t4_tip>Toggle T4 units',
+            key = 't4',
+            sortFunc = Logic.IsTech4,
+        },
+    }
+    return filter
 end
 
 function SearchInUnit(id, text)
@@ -506,7 +397,7 @@ end
 
 function SearchInputFilter()
     return {
-        title = '<LOC spawn_filter_search>Search',
+        display = '<LOC spawn_filter_search>Search',
         key = 'custominput',
         sortFunc = function(input, text)
             if DialogMode == 'units' then
@@ -524,8 +415,8 @@ function SearchInputFilter()
     }
 end
 
-function FolderListTabs()
-    local listicle, folders = {}, {}
+function GetPropFolderFilters()
+    local list, folders = {}, {}
 
     for id, bp in __blueprints do
         if 'prop.bp' == string.sub(id, -7) then
@@ -538,115 +429,137 @@ function FolderListTabs()
 
     for folder in folders do
         specialFilterControls[folder] = folder
-        table.insert(listicle, {
+        table.insert(list, {
             title = string.sub(string.gsub(folder, '%b//', ''),1,-2),
             key = folder,
-            sortFunc = function(ID, folder) return folder == string.sub(ID, 1, string.len(folder)) end
+            sortFunc = function(ID, folder) 
+                return folder == string.sub(ID, 1, string.len(folder)) 
+            end
         })
     end
 
-    return listicle
+    return list
+end
+
+function GetPropsTypeFilters()
+    local list, propTypes = {}, {}
+
+    for id, bp in __blueprints do
+        if 'prop.bp' == string.sub(id, -7) then
+            local propType = Logic.GetPropType(id)
+            propTypes[propType] = true
+        end
+    end
+
+    for propType in propTypes do
+        specialFilterControls[propType] = propType
+        table.insert(list, {
+            title = propType,
+            key = propType,
+            sortFunc = function(id, propType)
+                return propType == Logic.GetPropType(id)
+            end
+        })
+    end
+
+    return list
 end
 
 GetNameFilters = {
     units = function()
         local filters = {
             SearchInputFilter(),
-            {
-                title = '<LOC spawn_filter_faction>Faction',
-                key = 'faction',
-                choices = FactionListTabs(HasCat),
-            },
-            {
-                title = '<LOC spawn_filter_source>Source',
-                key = 'mod',
-                choices = SourceListTabs(),
-            },
-            {
-                title = '<LOC spawn_filter_type>Type',
-                key = 'type',
-                choices = TypeListTabs(),
-            },
-            {
-                title = '<LOC spawn_filter_tech>Tech Level',
-                key = 'tech',
-                choices = TechListTabs(),
-            },
+            GetUnitFactionFilter(),
+            GetUnitTypeFilter(),
+            GetUnitTechFilter(),
         }
-        if getOptions().spawn_menu_filter_menu_sort  then
+        if getOptions().spawn_menu_filter_build_menu ~= false then
             table.insert(filters, {
-                title = 'Menu Sort',
+                display = '<LOC spawn_filter_build_menu>Build Menu',
                 key = 'sort',
                 choices = {
                     {
-                        title = 'Construction',
                         key = 'const',
-                        tooltip = '<LOC spawn_filter_const>Toggle construction units',
-                        sortFunc = function(unitID)
-                            return HasCat(unitID, 'SORTCONSTRUCTION')
-                        end,
+                        display = '<LOC spawn_filter_build_const>Construction',
+                        tooltip = '<LOC spawn_filter_build_const_tip>Toggle construction units',
+                        sortFunc = Logic.IsConstruction,
                     },
                     {
-                        title = 'Economy',
                         key = 'eco',
-                        tooltip = '<LOC spawn_filter_eco>Toggle Economy units',
-                        sortFunc = function(unitID)
-                            return HasCat(unitID, 'SORTECONOMY')
-                        end,
+                        display = '<LOC spawn_filter_build_eco>Economy',
+                        tooltip = '<LOC spawn_filter_build_eco>_tipToggle Economy units',
+                        sortFunc = Logic.IsEconomy,
                     },
                     {
-                        title = 'Defense',
                         key = 'defence',
-                        tooltip = '<LOC spawn_filter_defence>Toggle Defense units',
-                        sortFunc = function(unitID)
-                            return HasCat(unitID, 'SORTDEFENSE')
-                        end,
+                        display = '<LOC spawn_filter_build_defence>Defense',
+                        tooltip = '<LOC spawn_filter_build_defence_tip>Toggle Defense units',
+                        sortFunc = Logic.IsDefense,
                     },
                     {
-                        title = 'Strategic',
                         key = 'strat',
-                        tooltip = '<LOC spawn_filter_strat>Toggle Strategic units',
-                        sortFunc = function(unitID)
-                            return HasCat(unitID, 'SORTSTRATEGIC')
-                        end,
+                        display = '<LOC spawn_filter_build_strat>Strategic',
+                        tooltip = '<LOC spawn_filter_build_strat_tip>Toggle Strategic units',
+                        sortFunc = Logic.IsStrategic,
                     },
                     {
-                        title = 'Intel',
                         key = 'intel',
-                        tooltip = '<LOC spawn_filter_intel>Toggle Intel units',
-                        sortFunc = function(unitID)
-                            return HasCat(unitID, 'SORTINTEL')
-                        end,
+                        display = '<LOC spawn_filter_build_intel>Intel',
+                        tooltip = '<LOC spawn_filter_build_intel_tip>Toggle Intel units',
+                        sortFunc = Logic.IsIntel,
                     },
                 },
             })
         end
 
-        if categories.UNSPAWNABLE then
-            table.insert(filters, 2,
+        if getOptions().spawn_menu_filter_visibility ~= false then
+            table.insert(filters,
                 {
-                    title = 'Visibility',
+                    display = '<LOC spawn_filter_vis>Visibility',
                     key = 'spawnable',
                     choices = {
                         {
-                            title = '',
                             key = 'spawnable',
-                            tooltip = '<LOC spawn_filter_spawnable>Toggle spawnable units',
-                            sortFunc = function(unitID)
-                                return not HasCat(unitID, 'UNSPAWNABLE')
-                            end,
+                            display = '<LOC spawn_filter_vis_spawnable>Spawnable',
+                            tooltip = '<LOC spawn_filter_vis_spawnable_tip>Toggle spawnable units',
+                            sortFunc = Logic.IsSpawnable,
                         },
                         {
-                            title = '',
                             key = 'unspawnable',
-                            tooltip = '<LOC spawn_filter_dummy>Toggle dummy units',
-                            sortFunc = function(unitID)
-                                return HasCat(unitID, 'UNSPAWNABLE')
-                            end,
+                            display = '<LOC spawn_filter_vis_dummy>Dummy',
+                            tooltip = '<LOC spawn_filter_vis_dummy_tip>Toggle dummy units',
+                            sortFunc = Logic.IsDummy,
                         },
+                        {
+                            key = 'civilain',
+                            display = '<LOC spawn_filter_vis_civilain>Civilain',
+                            tooltip = '<LOC spawn_filter_vis_civilain_tip>Toggle civilain units',
+                            sortFunc = Logic.IsCivilain,
+                        },
+                        {
+                            key = 'playable',
+                            display = '<LOC spawn_filter_vis_playable>Playable',
+                            tooltip = '<LOC spawn_filter_vis_playable_tip>Toggle units playable in the game',
+                            sortFunc = Logic.IsUnitPlayable,
+                        },
+                        {
+                            key = 'testing',
+                            display = '<LOC spawn_filter_vis_playable>Testing',
+                            tooltip = '<LOC spawn_filter_vis_playable_tip>Toggle units for testing: ACU, SCU, Paragon',
+                            sortFunc = Logic.IsUnitTesting,
+                        }
                     }
                 }
             )
+        end
+
+        if getOptions().spawn_menu_filter_source ~= false then
+            table.insert(filters,
+            {
+                display = '<LOC spawn_filter_source>Source',
+                key = 'mod',
+                choices = SourceListTabs(),
+            })
         end
         return filters
     end,
@@ -654,9 +567,14 @@ GetNameFilters = {
         return {
             SearchInputFilter(),
             {
+                title = 'Type',
+                key = 'propType',
+                choices = GetPropsTypeFilters(),
+            },
+            {
                 title = 'Folder',
                 key = 'sourcefolder',
-                choices = FolderListTabs(),
+                choices = GetPropFolderFilters(),
             },
         }
     end,
@@ -664,13 +582,12 @@ GetNameFilters = {
         return {
             SearchInputFilter(),
             {
-                title = '<LOC spawn_filter_faction>Faction',
+                display = '<LOC spawn_filter_faction>Faction',
                 key = 'faction',
-                choices = FactionListTabs(function(template, cat)
-                    --if HasCat(template.icon, cat) then return true end
+                choices = GetUnitFactionFilter(function(template, cat)
                     local td = template.templateData
                     for i = 3, table.getn(td) do
-                        if not HasCat(td[i][1], cat) then return --[[true]] end
+                        if not Logic.HasCategoryCat(td[i][1], cat) then return --[[true]] end
                     end
                     return true
                 end),
@@ -687,7 +604,7 @@ GetNameFilters = {
                             local td = template.templateData
                             for i = 3, table.getn(td) do
                                 local id = td[i][1]
-                                if GetLayerGroup(id) == 'sea' then
+                                if Logic.GetLayerGroup(id) == 'sea' then
                                     return
                                 end
                             end
@@ -702,7 +619,7 @@ GetNameFilters = {
                             local td = template.templateData
                             for i = 3, table.getn(td) do
                                 local id = td[i][1]
-                                if GetLayerGroup(id) == 'land' then
+                                if Logic.GetLayerGroup(id) == 'land' then
                                     return
                                 end
                             end
@@ -717,7 +634,7 @@ GetNameFilters = {
                             local td = template.templateData
                             for i = 3, table.getn(td) do
                                 local id = td[i][1]
-                                if GetLayerGroup(id) == 'land' or GetLayerGroup(id) == 'sea' then
+                                if Logic.GetLayerGroup(id) == 'land' or Logic.GetLayerGroup(id) == 'sea' then
                                     return
                                 end
                             end
@@ -729,91 +646,10 @@ GetNameFilters = {
         }
     end,
 }
-
-function GetItems(mode)
-    if mode == 'units' then
-        return EntityCategoryGetUnitList(categories.ALLUNITS)
-    elseif mode == 'props' then
-        local props = {}
-        for id, bp in __blueprints do
-            if string.find(id, 'prop.bp') then
-                table.insert(props, id)
-            end
-        end
-        return props
-    elseif mode == 'templates' then
-        local temp = import('/lua/user/prefs.lua').GetFromCurrentProfile('build_templates')
-        for i, template in temp do
-            template.templateID = i -- Implicit most places, but ocasionally needed, such as by CreateTemplateOptionsMenu
-        end
-        return temp
-    end
-end
-
-function IsUnitPlayable(unitID)
-    local bp = __blueprints[unitID]
-    return not bp.CategoriesHash.CIVILIAN
-       and not bp.CategoriesHash.OPERATION
-       and not bp.CategoriesHash.INSIGNIFICANTUNIT
-       and not bp.CategoriesHash.UNTARGETABLE
-end
-
-function GetUnitDescription(id)
-    local bp = __blueprints[id]
-    local info = '    ' -- defaulting to no tech level for civilans
-    if IsUnitPlayable(id) then
-        if bp.CategoriesHash.TECH1 then info = 'T1'
-        elseif bp.CategoriesHash.TECH2 then info = 'T2'
-        elseif bp.CategoriesHash.TECH3 then info = 'T3'
-        elseif bp.CategoriesHash.EXPERIMENTAL then info = 'T4' end
-    end
-
-    if bp.Description then
-        info = info .. ' ' .. LOC(bp.Description)
-    end
-
-    if bp.CategoriesHash.SUPPORTFACTORY then
-        info = info .. ' (Support)'
-    elseif bp.General.UnitName and not bp.CategoriesHash.ECONOMIC and not bp.CategoriesHash.FACTORY then
-        local name = LOC(bp.General.UnitName)
-        info = info .. (name == '' and '' or (' (' .. name .. ')'))
-    end
-    -- removing faction name because we aready have faction icon in the list
-    info = info:gsub("UEF ", "")
-    info = info:gsub("Aeon ", "")
-    info = info:gsub("Cybran ", "")
-    info = info:gsub("Seraphim ", "")
-    info = info:gsub("Experimental ", "")
-    return info
-end
-
-function GetUnitIdentifier(id, abbrivate)
-    if abbrivate and id:len() > 14 then
-        return string.upper(id:sub(1, 3) .. ' ' .. id:sub(4, 14)) .. '…'
-    else
-        return string.upper(id:sub(1, 3) .. ' ' .. id:sub(4))
-    end
-end
-
-local FactionData = {
-    { color = 'ff00c1ff', name = 'UEF', icon = UIUtil.UIFile(UIUtil.GetFactionIcon(0)) },
-    { color = 'ff89d300', name = 'AEON', icon = UIUtil.UIFile(UIUtil.GetFactionIcon(1)) },
-    { color = 'ffff0000', name = 'CYBRAN', icon = UIUtil.UIFile(UIUtil.GetFactionIcon(2)) },
-    { color = 'FFFFBF00', name = 'SERAPHIM', icon = UIUtil.UIFile(UIUtil.GetFactionIcon(3)) },
-}
-
-function GetUnitFactionInfo(id)
-    local bp = __blueprints[id]
-    if bp and bp.CategoriesHash and IsUnitPlayable(id) then
-        for k, faction in FactionData do
-            if bp.CategoriesHash[faction.name] then return faction end
-        end
-    end
-    return { color = false, icon = false }
-end
+ 
 
 function SetUnitFactionIcon(id, bitmap, background)
-    local faction = GetUnitFactionInfo(id)
+    local faction = Logic.GetUnitFactionInfo(id)
     if bitmap and faction.icon and faction.color then
         bitmap:SetTexture(faction.icon)
         background:SetSolidColor(faction.color)
@@ -848,7 +684,7 @@ function CreateNameFilter(data)
         activeFilters[data.key] = {}
     end
 
-    group.label = UIUtil.CreateText(group, data.title, 14, UIUtil.bodyFont)
+    group.label = UIUtil.CreateText(group, data.display, 14, UIUtil.bodyFont)
     LayoutHelpers.RightOf(group.label, group.check)
     if data.choices and data.choices[1] and table.getn(data.choices) > FilterColumnCount then
         LayoutHelpers.AtTopIn(group.label, group, 7)
@@ -860,14 +696,9 @@ function CreateNameFilter(data)
         group.items = {}
         for i, v in data.choices do
             local index = i
-            group.items[index] = UIUtil.CreateCheckboxStd(group, data.key == 'spawnable' and '/dialogs/check-box_btn/radio' or '/dialogs/toggle_btn/toggle')
+            group.items[index] = UIUtil.CreateCheckboxStd(group, '/dialogs/toggle_btn/toggle')
             if index == 1 then
-                if data.key == 'spawnable' then
-                    LayoutHelpers.AtTopIn(group.items[index], group.label, 4)
-                    LayoutHelpers.RightOf(group.items[index], group.label)
-                else
-                    LayoutHelpers.AtLeftTopIn(group.items[index], group, 95)
-                end
+                LayoutHelpers.AtLeftTopIn(group.items[index], group, 95)
             elseif index < FilterColumnCount+1 then
                 LayoutHelpers.RightOf(group.items[index], group.items[index-1])
             else
@@ -877,7 +708,7 @@ function CreateNameFilter(data)
                 LayoutHelpers.AtTopIn(group.items[index], group)
             end
 
-            group.items[index].label = UIUtil.CreateText(group.items[index], v.title, 10, UIUtil.bodyFont)
+            group.items[index].label = UIUtil.CreateText(group.items[index], v.display, 10, UIUtil.bodyFont)
             LayoutHelpers.AtCenterIn(group.items[index].label, group.items[index])
             group.items[index].label:DisableHitTest()
 
@@ -926,7 +757,7 @@ function CreateNameFilter(data)
         group.edit:SetBackgroundColor('ff333333')
         group.edit:SetHighlightForegroundColor(UIUtil.highlightColor)
         group.edit:SetHighlightBackgroundColor("880085EF")
-        group.edit.Width:Set(windowGroup.Width() - FilterHeaderWidth - FilterWidth - FilterWidth)
+        group.edit.Width:Set(windowGroup.Width() - FilterHeaderWidth - (20 * UIScale) )
         LayoutHelpers.SetHeight(group.edit, 17)
         group.edit:SetText(filterSet[data.key].editText or searchText)
         group.edit:SetFont(UIUtil.bodyFont, 15)
@@ -1285,7 +1116,7 @@ function CreateDialog()
                             choiceControl:SetCheck(filterTable[key].choices[choiceControl.filterKey])
                         end
                     end
-                else
+                elseif filterTable[key].editText ~= nil then
                     groupControls.edit:SetText(filterTable[key].editText)
                 end
             end
@@ -1444,17 +1275,23 @@ function CreateDialog()
 
     armiesGroup.Height:Set(function() return lowestControl.Bottom() - armiesGroup.armySlots[1].Top() end)
 
-    local filterSetCombo = import('/lua/ui/controls/combo.lua').Combo(windowGroup, 14, 10, nil, nil, "UI_Tab_Click_01", "UI_Tab_Rollover_01")
-    filterSetCombo.Width:Set(function() return windowGroup.Width() - (254 * UIScale) end)
-    LayoutHelpers.Below(filterSetCombo, armiesGroup, 5)
-    filterSetCombo.OnClick = function(self, index, text, skipUpdate)
+    local filterPresetLabel = UIUtil.CreateText(windowGroup, 'Filter Preset', 14, UIUtil.bodyFont)
+    LayoutHelpers.Below(filterPresetLabel, armiesGroup, 5)
+    LayoutHelpers.AtLeftIn(filterPresetLabel, windowGroup, 5)
+    filterPresetLabel.Width:Set(function() return FilterHeaderWidth end)
+
+    local filterPresetCombo = import('/lua/ui/controls/combo.lua').Combo(windowGroup, 14, 10, nil, nil, "UI_Tab_Click_01", "UI_Tab_Rollover_01")
+    LayoutHelpers.Below(filterPresetCombo, armiesGroup, 10)
+    LayoutHelpers.RightOf(filterPresetCombo, filterPresetLabel, 10)
+    filterPresetCombo.Width:Set(function() return 2 * FilterWidth - (20 * UIScale) end)
+    filterPresetCombo.OnClick = function(self, index, text, skipUpdate)
         SetFilters(self.keyMap[index])
     end
 
     local function RefreshFilterList(defName)
-        filterSetCombo:ClearItems()
-        filterSetCombo.itemArray = {}
-        filterSetCombo.keyMap = {}
+        filterPresetCombo:ClearItems()
+        filterPresetCombo.itemArray = {}
+        filterPresetCombo.keyMap = {}
         local CurrentFilterSets = GetPreference('CreateUnitFilters')
         if CurrentFilterSets and not table.empty(CurrentFilterSets) then
             local index = 1
@@ -1463,11 +1300,11 @@ function CreateDialog()
                 if filterName == defName then
                     default = index
                 end
-                filterSetCombo.itemArray[index] = ('%s'):format(filterName)
-                filterSetCombo.keyMap[index] = filter
+                filterPresetCombo.itemArray[index] = ('%s'):format(filterName)
+                filterPresetCombo.keyMap[index] = filter
                 index = index + 1
             end
-            filterSetCombo:AddItems(filterSetCombo.itemArray, default)
+            filterPresetCombo:AddItems(filterPresetCombo.itemArray, default)
         end
     end
 
@@ -1482,10 +1319,11 @@ function CreateDialog()
         return btn
     end
 
-    local saveFilterSet = CreatePressButton 'Save Filter'
-    LayoutHelpers.RightOf(saveFilterSet, filterSetCombo)
-    LayoutHelpers.AtVerticalCenterIn(saveFilterSet, filterSetCombo)
-    saveFilterSet.OnClick = function(self, modifiers)
+    local filterSaveButton = CreatePressButton 'Save'
+    LayoutHelpers.Below(filterSaveButton, armiesGroup, 5)
+    LayoutHelpers.RightOf(filterSaveButton, filterPresetCombo, 10)
+    Tooltip.AddControlTooltip(filterSaveButton, { text = ' Save current filter as preset ' })
+    filterSaveButton.OnClick = function(self, modifiers)
         NameSet(function(name)
             local newFilterListing = {}
             if GetPreference('CreateUnitFilters') then
@@ -1499,13 +1337,14 @@ function CreateDialog()
         end)
     end
 
-    local delFilterSet = CreatePressButton 'Delete Filter'
-    LayoutHelpers.RightOf(delFilterSet, saveFilterSet)
-    LayoutHelpers.AtVerticalCenterIn(delFilterSet, filterSetCombo)
-    delFilterSet.OnClick = function(self, modifiers)
-        local index = filterSetCombo:GetItem()
+    local filterDeleteButton = CreatePressButton 'Delete'
+    LayoutHelpers.Below(filterDeleteButton, armiesGroup, 5)
+    LayoutHelpers.RightOf(filterDeleteButton, filterSaveButton)
+    Tooltip.AddControlTooltip(filterDeleteButton, { text = ' Delete current filter preset ' })
+    filterDeleteButton.OnClick = function(self, modifiers)
+        local index = filterPresetCombo:GetItem()
         if index >= 1 then
-            local delName = filterSetCombo.itemArray[index]
+            local delName = filterPresetCombo.itemArray[index]
             local oldFilterSets = GetPreference('CreateUnitFilters')
             if oldFilterSets[delName] then
                 oldFilterSets[delName] = nil
@@ -1515,10 +1354,11 @@ function CreateDialog()
        end
     end
 
-    local clearFilterButton = CreatePressButton('Clear Filters')
-    LayoutHelpers.Below(clearFilterButton, armiesGroup, 5)
-    LayoutHelpers.RightOf(clearFilterButton, delFilterSet, 9)
-    clearFilterButton.OnClick = ClearFilters
+    local filterClearButton = CreatePressButton('Clear All')
+    LayoutHelpers.Below(filterClearButton, armiesGroup, 5)
+    LayoutHelpers.RightOf(filterClearButton, filterDeleteButton)
+    Tooltip.AddControlTooltip(filterClearButton, { text = ' Clear all filters' })
+    filterClearButton.OnClick = ClearFilters
 
     RefreshFilterList()
 
@@ -1528,12 +1368,12 @@ function CreateDialog()
         local index = filtIndex
         filterGroups[index] = CreateNameFilter(filter)
         if filtIndex == 1 then
-            LayoutHelpers.Below(filterGroups[index], filterSetCombo)
+            LayoutHelpers.Below(filterGroups[index], filterPresetCombo)
             LayoutHelpers.AtLeftIn(filterGroups[index], windowGroup)
-        elseif categories.UNSPAWNABLE and filter.key == 'spawnable' then
-            LayoutHelpers.RightOf(filterGroups[index], filterGroups[1], -170)
-        elseif categories.UNSPAWNABLE and nameFilters[filtIndex-1].key == 'spawnable' then
-            LayoutHelpers.Below(filterGroups[index], filterGroups[1])
+        -- elseif categories.UNSPAWNABLE and filter.key == 'spawnable' then
+        --     LayoutHelpers.RightOf(filterGroups[index], filterGroups[1], -170)
+        -- elseif categories.UNSPAWNABLE and nameFilters[filtIndex-1].key == 'spawnable' then
+        --     LayoutHelpers.Below(filterGroups[index], filterGroups[1])
         else
             LayoutHelpers.Below(filterGroups[index], filterGroups[index-1])
         end
@@ -1575,7 +1415,7 @@ function CreateDialog()
             amph = '/textures/ui/common/icons/units/amph_up.dds',
             air = '/textures/ui/common/icons/units/air_up.dds',
         }
-        bitmap:SetTexture(textures[GetLayerGroup(id)])
+        bitmap:SetTexture(textures[Logic.GetLayerGroup(id)])
         bitmap:SetAlpha(1, false)
     end
     local function GetUnitSkirtSizes(id)
@@ -1645,7 +1485,7 @@ function CreateDialog()
     local function CreateElementMouseover(unitData,x,y)
         if mouseover then mouseover:Destroy() end
 
-        local faction = GetUnitFactionInfo(unitData)
+        local faction = Logic.GetUnitFactionInfo(unitData)
         mouseover = Bitmap(windowGroup)
         mouseover:SetSolidColor('DD111111')
         
@@ -1670,7 +1510,7 @@ function CreateDialog()
         local bp = __blueprints[unitData]
         local info = ''
         if DialogMode == 'units' then
-            info = string.gsub(GetUnitDescription(unitData), "^%s*(.-)%s*$", "%1")
+            info = StringTrim(Logic.GetUnitDescription(unitData))
         else
             info = bp.Interface and bp.Interface.HelpText
         end
@@ -1681,7 +1521,7 @@ function CreateDialog()
         LayoutHelpers.RightOf(mouseover.name, mouseover.img, 4)
         LayoutHelpers.AtTopIn(mouseover.name, mouseover, 8)
 
-        mouseover.desc = UIUtil.CreateText(mouseover.fill, GetUnitIdentifier(unitData, false), 14, UIUtil.bodyFont)
+        mouseover.desc = UIUtil.CreateText(mouseover.fill, Logic.GetUnitIdentifier(unitData, false), 14, UIUtil.bodyFont)
         mouseover.desc:SetColor(faction.color or 'DDD8D8D8')
         mouseover.desc:SetAlpha(0.85, false)
         LayoutHelpers.RightOf(mouseover.desc, mouseover.img, 4)
@@ -1776,19 +1616,19 @@ function CreateDialog()
             end
 
             unitSelector.id = UIUtil.CreateText(unitSelector, '', 12, 'Arial')
-            LayoutHelpers.AtLeftTopIn(unitSelector.id, unitSelector, options.spawn_menu_show_icons and 22 or 2)
+            LayoutHelpers.AtLeftTopIn(unitSelector.id, unitSelector, options.spawn_menu_show_icons and 25 or 5)
             unitSelector.desc = UIUtil.CreateText(unitSelector, '', 12, UIUtil.bodyFont)
             LayoutHelpers.AtLeftTopIn(unitSelector.desc, unitSelector, (DialogMode == 'templates' and 50 or 120) + (options.spawn_menu_show_icons and 36 or 18))
             if options.spawn_menu_show_icons then
                 unitSelector.imageBG = Bitmap(unitSelector)
                 unitSelector.imageBG.Height:Set(16 * UIScale)
                 unitSelector.imageBG.Width:Set(16 * UIScale)
-                LayoutHelpers.AtLeftTopIn(unitSelector.imageBG, unitSelector)
+                LayoutHelpers.AtLeftTopIn(unitSelector.imageBG, unitSelector, 2)
 
                 unitSelector.img = Bitmap(unitSelector.imageBG)
                 unitSelector.img.Height:Set(16 * UIScale)
                 unitSelector.img.Width:Set(16 * UIScale)
-                LayoutHelpers.AtLeftTopIn(unitSelector.img, unitSelector)
+                LayoutHelpers.AtLeftTopIn(unitSelector.img, unitSelector, 2)
             end
 
             unitSelector.factionBG = Bitmap(unitSelector)
@@ -1885,16 +1725,16 @@ function CreateDialog()
                 line.factionBG:SetAlpha(0, true)
                 line.imageBG:SetAlpha(0, false)
             elseif DialogMode == 'units' then
-                line.id:SetText(GetUnitIdentifier(data.id, true))
-                line.desc:SetText(GetUnitDescription(data.id))
+                line.id:SetText(Logic.GetUnitIdentifier(data.id, true))
+                line.desc:SetText(Logic.GetUnitDescription(data.id))
                 if options.spawn_menu_show_icons then
                     SetUnitImage(line.img, data.id, true)
                     SetBackgroundImage(line.imageBG, data.id)
                 end
                 SetUnitFactionIcon(data.id, line.factionIcon, line.factionBG)
             elseif DialogMode == 'props' then
-                line.id:SetText(data.id:match('([^/]*)_prop%.bp') or data.id:sub(-24, -9) or data.id)--format('%s %5s %s', data.id, ' ', data.desc))
-                line.desc:SetText(__blueprints[data.id].Interface.HelpText or '[no text]')
+                line.id:SetText(Logic.GetPropIdentifier(data.id))
+                line.desc:SetText(Logic.GetPropDescription(data.id))
                 if options.spawn_menu_show_icons then
                     SetUnitImage(line.img, data.id, true)
                 end
@@ -1926,10 +1766,11 @@ end
 function RefreshList()
     if not windowGroup.unitList then return end
     UnitList = {}
-    local totalList = GetItems(DialogMode)
+    local totalList = Logic.GetBlueprintsFor(DialogMode)
     for i, v in totalList do
         local allValid = true
         for filterType, filters in activeFilters do
+
             if activeFilterTypes[filterType] then
                 local valid = false
                 for filterIndex, filter in filters do
@@ -2059,9 +1900,11 @@ function CreateDebugConfig()
         {style = 'configtoggle', name = 'Ignore terrain blocking (disables preview)', prefid = 'spawn_menu_force_dummy_spawn'},
 
         {style = 'title',        name = 'Unit spawn filter settings:' },
-        {style = 'configtoggle', name = 'Split core game source filter', refresh = true, prefid = 'spawn_menu_split_sources', },
-        {style = 'configtoggle', name = 'Include menu-sort filters',     refresh = true, prefid = 'spawn_menu_filter_menu_sort', },
-        {style = 'configtoggle', name = 'Include no-tech filter',        refresh = true, prefid = 'spawn_menu_notech_filter', },
+        {style = 'configtoggle', name = 'Include build-menu filters',     refresh = true, prefid = 'spawn_menu_filter_build_menu', check = function() return options.spawn_menu_filter_build_menu ~= false end },
+        {style = 'configtoggle', name = 'Include visibility filters',     refresh = true, prefid = 'spawn_menu_filter_visibility', check = function() return options.spawn_menu_filter_visibility ~= false end },
+        {style = 'configtoggle', name = 'Include source filters',         refresh = true, prefid = 'spawn_menu_filter_source', check = function() return options.spawn_menu_filter_source ~= false end },
+        {style = 'configtoggle', name = 'Split core game source filter',  refresh = true, prefid = 'spawn_menu_split_sources', check = function() return options.spawn_menu_split_sources ~= false end },
+        -- {style = 'configtoggle', name = 'Include no-tech filter',        refresh = true, prefid = 'spawn_menu_notech_filter', },
         --{style = 'configtoggle', name = 'Include ACU/Paragon filter',    refresh = true, prefid = 'spawn_menu_paragon_filter', },
         {style = 'toggle',       name = 'Filter Type by motion type',    refresh = true, prefid = 'spawn_menu_type_filter_mode', check = function() return options.spawn_menu_type_filter_mode == 'motion' end,   activate = function() return 'motion'   end },
         {style = 'toggle',       name = 'Filter Type by category',       refresh = true, prefid = 'spawn_menu_type_filter_mode', check = function() return options.spawn_menu_type_filter_mode == 'category' end, activate = function() return 'category' end },
