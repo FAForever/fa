@@ -73,10 +73,20 @@ NavGrids = {}
 ---@type table<number, NavLabelMetadata>
 NavLabels = {}
 
+---@type table<number, CompressedLabelTreeNode | CompressedLabelTreeLeaf>
+NavCells = {}
+
 local Generated = false
 ---@return boolean
 function IsGenerated()
     return Generated
+end
+
+local CellIdentifier = 0
+---@return number
+local function GenerateCellIdentifier()
+    CellIdentifier = CellIdentifier + 1
+    return CellIdentifier
 end
 
 local LabelIdentifier = 0
@@ -289,7 +299,10 @@ NavGrid = ClassNavGrid {
 
 local FactoryCompressedLabelTree = {
     __call = function(self, layer, treeSize)
-        return setmetatable({&3 &4}, self)
+        local instance = {&3 &4}
+        setmetatable(instance, self)
+        instance:OnCreate(layer, treeSize)
+        return instance
     end
 }
 
@@ -332,11 +345,19 @@ local CompressedLabelTree
 
 --- A simplified quad tree that acts as a compression of the pathing capabilities of a section of the heightmap
 ---@class CompressedLabelTreeNode
+---@field Identifier number
 ---@field [1] CompressedLabelTreeNode?
 ---@field [2] CompressedLabelTreeNode?
 ---@field [3] CompressedLabelTreeNode?
 ---@field [4] CompressedLabelTreeNode?
 CompressedLabelTree = ClassCompressedLabelTree {
+
+    ---@param self CompressedLabelTreeNode | CompressedLabelTreeLeaf
+    OnCreate = function(self)
+        local identifier = GenerateCellIdentifier()
+        NavCells[identifier] = self
+        self.Identifier = identifier
+    end,
 
     --- Compresses the cache using a quad tree, significantly reducing the amount of data stored. At this point
     --- the label cache only exists of 0s and -1s
@@ -495,10 +516,11 @@ CompressedLabelTree = ClassCompressedLabelTree {
             -- DrawCircle({x, GetSurfaceHeight(x, z1Outside), z1Outside}, 0.5, 'ff0000')
             local neighbor = root:FindLeafXZ(x, z1Outside)
             if neighbor then
+                local identifier = neighbor.Identifier
                 k = k + neighbor.Size - 1
-                if not seen[neighbor] then
-                    seen[neighbor] = true
-                    TableInsert(self, neighbor)
+                if not seen[identifier] then
+                    seen[identifier] = true
+                    TableInsert(self, identifier)
                 end
             else
                 break
@@ -511,10 +533,11 @@ CompressedLabelTree = ClassCompressedLabelTree {
             -- DrawCircle({x, GetSurfaceHeight(x, z2Outside), z2Outside}, 0.5, 'ff0000')
             local neighbor = root:FindLeafXZ(x, z2Outside)
             if neighbor then
+                local identifier = neighbor.Identifier
                 k = k + neighbor.Size - 1
-                if not seen[neighbor] then
-                    seen[neighbor] = true
-                    TableInsert(self, neighbor)
+                if not seen[identifier] then
+                    seen[identifier] = true
+                    TableInsert(self, identifier)
                 end
             else
                 break
@@ -527,10 +550,11 @@ CompressedLabelTree = ClassCompressedLabelTree {
             -- DrawCircle({x1Outside, GetSurfaceHeight(x1Outside, z), z}, 0.5, 'ff0000')
             local neighbor = root:FindLeafXZ(x1Outside, z)
             if neighbor then
+                local identifier = neighbor.Identifier
                 k = k + neighbor.Size - 1
-                if not seen[neighbor] then
-                    seen[neighbor] = true
-                    TableInsert(self, neighbor)
+                if not seen[identifier] then
+                    seen[identifier] = true
+                    TableInsert(self, identifier)
                 end
             else
                 break
@@ -543,10 +567,11 @@ CompressedLabelTree = ClassCompressedLabelTree {
             -- DrawCircle({x2Outside, GetSurfaceHeight(x2Outside, z), z}, 0.5, 'ff0000')
             local neighbor = root:FindLeafXZ(x2Outside, z)
             if neighbor then
+                local identifier = neighbor.Identifier
                 k = k + neighbor.Size - 1
-                if not seen[neighbor] then
-                    seen[neighbor] = true
-                    TableInsert(self, neighbor)
+                if not seen[identifier] then
+                    seen[identifier] = true
+                    TableInsert(self, identifier)
                 end
             else
                 break
@@ -562,12 +587,13 @@ CompressedLabelTree = ClassCompressedLabelTree {
         local neighbor = root:FindLeafXZ(x1Outside, z1Outside)
         -- DrawCircle({x1Outside, GetSurfaceHeight(x1Outside, z1Outside), z1Outside}, 0.5, 'ff0000')
         if neighbor and not seen[neighbor] then
-            seen[neighbor] = true
+            local identifier = neighbor.Identifier
+            seen[identifier] = true
             a = root:FindLeafXZ(x1Outside + 1, z1Outside)
             b = root:FindLeafXZ(x1Outside, z1Outside + 1)
 
             if a and b and (a.Label == 0 or b.Label == 0) then
-                TableInsert(self, neighbor)
+                TableInsert(self, identifier)
             end
         end
 
@@ -575,12 +601,13 @@ CompressedLabelTree = ClassCompressedLabelTree {
         neighbor = root:FindLeafXZ(x2Outside, z1Outside)
         -- DrawCircle({x2Outside, GetSurfaceHeight(x2Outside, z1Outside), z1Outside}, 0.5, 'ff0000')
         if neighbor and not seen[neighbor] then
-            seen[neighbor] = true
+            local identifier = neighbor.Identifier
+            seen[identifier] = true
             a = root:FindLeafXZ(x2Outside - 1, z1Outside)
             b = root:FindLeafXZ(x2Outside, z1Outside + 1)
 
             if a and b and (a.Label == 0 or b.Label == 0) then
-                TableInsert(self, neighbor)
+                TableInsert(self, identifier)
             end
         end
 
@@ -588,12 +615,13 @@ CompressedLabelTree = ClassCompressedLabelTree {
         -- DrawCircle({x1Outside, GetSurfaceHeight(x1Outside, z2Outside), z2Outside}, 0.5, 'ff0000')
         neighbor = root:FindLeafXZ(x1Outside, z2Outside)
         if neighbor and not seen[neighbor] then
-            seen[neighbor] = true
+            local identifier = neighbor.Identifier
+            seen[identifier] = true
             a = root:FindLeafXZ(x1Outside + 1, z2Outside)
             b = root:FindLeafXZ(x1Outside, z2Outside - 1)
 
             if a and b and (a.Label == 0 or b.Label == 0) then
-                TableInsert(self, neighbor)
+                TableInsert(self, identifier)
             end
         end
 
@@ -601,12 +629,13 @@ CompressedLabelTree = ClassCompressedLabelTree {
         -- DrawCircle({x2Outside, GetSurfaceHeight(x2Outside, z2Outside), z2Outside}, 0.5, 'ff0000')
         neighbor = root:FindLeafXZ(x2Outside, z2Outside)
         if neighbor and not seen[neighbor] then
-            seen[neighbor] = true
+            local identifier = neighbor.Identifier
+            seen[identifier] = true
             a = root:FindLeafXZ(x2Outside - 1, z2Outside)
             b = root:FindLeafXZ(x2Outside, z2Outside - 1)
 
             if a and b and (a.Label == 0 or b.Label == 0) then
-                TableInsert(self, neighbor)
+                TableInsert(self, identifier)
             end
         end
 
@@ -646,7 +675,7 @@ CompressedLabelTree = ClassCompressedLabelTree {
 
                 -- add our pathable neighbors to the stack
                 for k = 1, table.getn(self) do
-                    local neighbor = self[k]
+                    local neighbor = NavCells[self[k]]
                     if neighbor.Label == 0 then
                         stack[free] = neighbor
                         free = free + 1
@@ -670,7 +699,7 @@ CompressedLabelTree = ClassCompressedLabelTree {
 
                     -- add unlabelled neighbors
                     for k = 1, table.getn(other) do
-                        local neighbor = other[k]
+                        local neighbor = NavCells[other[k]]
                         if neighbor.Label == 0 then
                             stack[free] = neighbor
                             free = free + 1
@@ -1481,6 +1510,9 @@ function Generate()
 
     SPEW(string.format("Allocated megabytes for navigational mesh: %f", allocatedSizeGrids))
     SPEW(string.format("Allocated megabytes for labels: %f", allocatedSizeLabels))
+    SPEW(string.format("Number of labels: %f", LabelIdentifier))
+    SPEW(string.format("Number of cells: %f", CellIdentifier))
+    SPEW(reprs(NavLayerData))
 
     Sync.NavLayerData = NavLayerData
     Generated = true

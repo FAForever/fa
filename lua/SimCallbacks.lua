@@ -1009,7 +1009,10 @@ do
         ---@type number | nil
         local pz = nil
 
+        ---@type UnitCommand[][]
         local groups = { {} }
+
+        ---@type UnitCommand[]
         local orders = units[1]:GetCommandQueue()
         for k, order in orders do
 
