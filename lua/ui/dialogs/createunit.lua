@@ -769,6 +769,14 @@ function GetUnitDescription(id)
     return info
 end
 
+function GetUnitIdentifier(id, abbrivate)
+    if abbrivate and id:len() > 14 then
+        return string.upper(id:sub(1, 3) .. ' ' .. id:sub(4, 14)) .. '…'
+    else
+        return string.upper(id:sub(1, 3) .. ' ' .. id:sub(4))
+    end
+end
+
 local FactionData = {
     { color = 'ff00c1ff', name = 'UEF', icon = UIUtil.UIFile(UIUtil.GetFactionIcon(0)) },
     { color = 'ff89d300', name = 'AEON', icon = UIUtil.UIFile(UIUtil.GetFactionIcon(1)) },
@@ -936,7 +944,7 @@ function CreateNameFilter(data)
         end
 
         dialog.searchBox = group.edit
-        Tooltip.AddControlTooltip(dialog.searchBox , { text = '<LOC spawn_filter_search>Search units by name, category, or weapon name'})
+        Tooltip.AddControlTooltip(dialog.searchBox, { text = '<LOC spawn_filter_search>Search units by name, category, or weapon name'})
 
         specialFilterControls[data.key] = group.edit
     end
@@ -975,14 +983,14 @@ function CreateDialog()
 
 
     -- Helper values, changing these will break stuff, not configure stuff
-    local FilterWidth = 83
-    local FilterHeaderWidth = 90
+    local FilterWidth = 83 * UIScale
+    local FilterHeaderWidth = 90 * UIScale
 
     -- Configurable values
     local TeamGridCellMinWidth = getOptions().spawn_menu_team_column_min_width or 145
     local DefaultHeight = 450
     local DefaultWidth = FilterHeaderWidth + FilterWidth * 5
-    local MinWidth = FilterHeaderWidth + FilterWidth * 3
+    local MinWidth = FilterHeaderWidth + FilterWidth * 2
 
     local DefaultWindowLocation = {
         Top = 50,
@@ -1660,7 +1668,7 @@ function CreateDialog()
         LayoutHelpers.RightOf(mouseover.name, mouseover.img, 4)
         LayoutHelpers.AtTopIn(mouseover.name, mouseover, 8)
 
-        mouseover.desc = UIUtil.CreateText(mouseover.fill, string.upper(unitData), 14, UIUtil.bodyFont)
+        mouseover.desc = UIUtil.CreateText(mouseover.fill, GetUnitIdentifier(unitData, false), 14, UIUtil.bodyFont)
         mouseover.desc:SetColor(faction.color or 'DDD8D8D8')
         mouseover.desc:SetAlpha(0.85, false)
         LayoutHelpers.RightOf(mouseover.desc, mouseover.img, 4)
@@ -1864,8 +1872,7 @@ function CreateDialog()
                 line.factionBG:SetAlpha(0, true)
                 line.imageBG:SetAlpha(0, false)
             elseif DialogMode == 'units' then
-                local unitID =  data.id:sub(1, 3) .. ' ' .. data.id:sub(4, 14) .. (data.id:len() > 14 and '…' or '')
-                line.id:SetText(string.upper(unitID))
+                line.id:SetText(GetUnitIdentifier(data.id, true))
                 line.desc:SetText(GetUnitDescription(data.id))
                 if options.spawn_menu_show_icons then
                     SetUnitImage(line.img, data.id, true)
