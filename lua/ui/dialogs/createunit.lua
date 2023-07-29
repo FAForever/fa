@@ -361,7 +361,16 @@ function SearchInUnit(id, text)
     local name = string.lower(LOC(bp.General.UnitName or ''))
     local categories = ''
     if bp.Categories then
-        categories = string.lower(table.concat(bp.Categories, ', '))
+        -- skipping some categories that are not applicable to searching for units
+        categories = {}
+        for _, c in bp.Categories do
+            if not string.find(c, 'BUILTBY') and -- BUILTBYTIER3FACTORY
+               not string.find(c, 'OVERLAY') and -- OVERLAYSONAR
+               not string.find(c, 'SORT') then -- SORTDEFENSE
+                table.insert(categories, c)
+            end
+        end
+        categories = string.lower(table.concat(categories, ', '))
     end
 
     local weapons = ''
@@ -758,7 +767,7 @@ function CreateNameFilter(data)
 
         group.hint = UIUtil.CreateText(group.edit, '', 12, UIUtil.bodyFont)
         group.hint:SetColor('FF7C7C7C')
-        LayoutHelpers.AtCenterIn(group.hint, group.edit, 2)
+        LayoutHelpers.AtCenterIn(group.hint, group.edit)
         group.hint:DisableHitTest()
 
         if DialogMode == 'units' then
