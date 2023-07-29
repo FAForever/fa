@@ -772,7 +772,9 @@ function GetUnitDescription(id)
         info = info .. ' ' .. LOC(bp.Description)
     end
 
-    if bp.General.UnitName then
+    if bp.CategoriesHash.SUPPORTFACTORY then
+        info = info .. ' (Support)'
+    elseif bp.General.UnitName and not bp.CategoriesHash.ECONOMIC and not bp.CategoriesHash.FACTORY then
         local name = LOC(bp.General.UnitName)
         info = info .. (name == '' and '' or (' (' .. name .. ')'))
     end
