@@ -92,7 +92,6 @@ StructureUnit = ClassUnit(Unit) {
             ) and (flatten or physicsBlueprint.AlwaysAlignToTerrain)
             and (layer == 'Land' or layer == 'Seabed')
         then
-            LOG("OnCreate - SetOrientation")
             -- rotate structure to match terrain gradient
             local a1, a2 = TerrainUtils.GetTerrainSlopeAnglesDegrees(
                 self:GetPosition(),
