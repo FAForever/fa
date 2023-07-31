@@ -1303,6 +1303,8 @@ do
 
         LOG(string.format("Processing time: %f", GetSystemTimeSecondsOnlyForProfileUse() - start))
     end
+
+    
 end
 
 --#endregion
