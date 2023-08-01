@@ -491,7 +491,7 @@ function return_value(periode,player,path)
     end
     if val==nil then val=0 end
     if path.fac_mul != nil then val=val*path.fac_mul end
-    return val
+    return math.log(val)
 end
 
 function page_graph(parent)
