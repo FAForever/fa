@@ -610,3 +610,270 @@ SurfaceAll = function()
         IssueUnitCommand(submergedUnits, "UNITCOMMAND_Dive")
     end
 end
+
+
+
+local PredefinedTemplates = {
+    {
+        TriggersOn = categories.MASSEXTRACTION,
+        Description = "",
+        templateData = {
+            0,
+            0,
+            {
+                'uab1202',
+                34135,
+                0,
+                0
+            },
+            {
+                'uab1106',
+                33986,
+                2,
+                0
+            },
+            {
+                'uab1106',
+                33993,
+                -2,
+                0
+            },
+            {
+                'uab1106',
+                34000,
+                0,
+                -2
+            },
+            {
+                'uab1106',
+                34008,
+                0,
+                2
+            },
+        }
+    },
+
+    {
+        TriggersOn = categories.AIR * categories.FACTORY,
+        templateData = {
+            0,
+            0,
+            {
+                'uab0102',
+                8980,
+                2,
+                2
+            },
+            {
+                'uab1101',
+                9005,
+                -1,
+                7
+            },
+            {
+                'uab1101',
+                9012,
+                1,
+                7
+            },
+            {
+                'uab1101',
+                9020,
+                3,
+                7
+            },
+            {
+                'uab1101',
+                9027,
+                5,
+                7
+            }
+        },
+        name = 'Air Factory',
+        icon = 'uab0102'
+    },
+    {
+        TriggersOn = categories.AIR * categories.FACTORY,
+        templateData = {
+            10,
+            8,
+            {
+                'uab0102',
+                8980,
+                2,
+                2
+            },
+            {
+                'uab1101',
+                9035,
+                -3,
+                5
+            },
+            {
+                'uab1101',
+                9042,
+                -3,
+                3
+            },
+            {
+                'uab1101',
+                9050,
+                -3,
+                1
+            },
+            {
+                'uab1101',
+                9057,
+                -3,
+                -1
+            }
+        },
+        name = 'Air Factory',
+        icon = 'uab0102'
+    },
+    {
+        TriggersOn = categories.AIR * categories.FACTORY,
+        templateData = {
+            8,
+            10,
+            {
+                'uab0102',
+                8980,
+                2,
+                2
+            },
+            {
+                'uab1101',
+                9096,
+                5,
+                -3
+            },
+            {
+                'uab1101',
+                9104,
+                3,
+                -3
+            },
+            {
+                'uab1101',
+                9111,
+                1,
+                -3
+            },
+            {
+                'uab1101',
+                9119,
+                -1,
+                -3
+            }
+        },
+        name = 'Air Factory',
+        icon = 'uab0102'
+    },
+    {
+        TriggersOn = categories.AIR * categories.FACTORY,
+        templateData = {
+            0,
+            0,
+            {
+                'uab0102',
+                8980,
+                2,
+                2
+            },
+            {
+                'uab1101',
+                9066,
+                7,
+                -1
+            },
+            {
+                'uab1101',
+                9074,
+                7,
+                1
+            },
+            {
+                'uab1101',
+                9081,
+                7,
+                3
+            },
+            {
+                'uab1101',
+                9089,
+                7,
+                5
+            }
+        },
+        name = 'Air Factory',
+        icon = 'uab0102'
+    }
+}
+
+
+local CycleTemplateId = ''
+local CycleTemplateStep = 1
+
+CycleTemplates = function()
+
+    local CommandMode = import("/lua/ui/game/commandmode.lua")
+    CommandMode.AddStartBehavior(function() end, 'CycleTemplates')
+    CommandMode.AddEndBehavior(function() end, 'CycleTemplates')
+
+    print("Cycle templates")
+    -- SavePreferences()
+
+    local start = GetSystemTimeSeconds()
+    local info = GetRolloverInfo()
+    if info and info.blueprintId and info.userUnit then
+        reprsl(info)
+
+        local blueprintId = info.blueprintId:sub(3)
+        LOG(blueprintId)
+        -- local templates = import("/lua/ui/game/build_templates.lua").GetTemplates()
+
+        -- reset when hovering over a new unit type
+        if CycleTemplateId != blueprintId then
+            CycleTemplateStep = 1
+        end
+        CycleTemplateId = blueprintId
+
+        -- reset when exceeding number of templates
+        local count = table.getn(PredefinedTemplates)
+        if CycleTemplateStep > count then
+            CycleTemplateStep = 1
+        end
+
+        LOG(count)
+
+        for k = CycleTemplateStep, count do
+            local template = PredefinedTemplates[k]
+            CycleTemplateStep = CycleTemplateStep + 1
+            if EntityCategoryContains(template.TriggersOn, info.userUnit) then
+                import("/lua/ui/game/commandmode.lua").StartCommandMode('build', {name = template.templateData[3][1]})
+                SetActiveBuildTemplate(template.templateData)
+                return
+            end
+        end
+
+        -- for k, template in templates do
+        --     -- reprsl(template)
+        --     local targetId = template.templateData[3][1]:sub(3)
+
+        --     if targetId == blueprintId then
+        --         import("/lua/ui/game/commandmode.lua").StartCommandMode('build', {name = template.templateData[3][1]})
+        --         SetActiveBuildTemplate(template.templateData)
+        --         return
+        --     end
+        -- end
+    end
+
+    LOG("Time taken: " .. GetSystemTimeSeconds() - start)
+
+    -- local templates = 
+
+    -- import("/lua/ui/game/commandmode.lua").StartCommandMode('build', {name = item.template.templateData[3][1]})
+    -- SetActiveBuildTemplate(item.template.templateData)
+
+end

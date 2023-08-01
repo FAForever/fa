@@ -1590,11 +1590,15 @@ local keyActionsOrdersAdvanced = {
     },
     ['distribute_orders'] = {
         action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").DistributeOrders()',
-        category = 'orders',
+        category = 'ordersAdvanced',
     },
     ['shift_distribute_orders'] = {
         action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").DistributeOrders()',
-        category = 'orders',
+        category = 'ordersAdvanced',
+    },
+    ['cycle_templates'] = {
+        action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").CycleTemplates()',
+        category = 'ordersAdvanced',
     },
 }
 
