@@ -59,7 +59,6 @@ local function FindFilesWithExtension(dir, extension, prepend, files)
     for k, file in IoDir(dir .. "/*") do
         if not (file == '.' or file == '..') then
             if StringSub(file, -3) == extension then
-                LOG(prepend .. "/" .. file)
                 TableInsert(files, prepend .. "/" .. file)
             end
             FindFilesWithExtension(dir .. "/" .. file, extension, prepend .. "/" .. file, files)
@@ -535,28 +534,28 @@ end
 
 -- END OF COPY --
 
--- -- minimum viable shader version - should be bumped to the next release version when we change the shaders
--- local minimumShaderVersion = 3745
+-- minimum viable shader version - should be bumped to the next release version when we change the shaders
+local minimumShaderVersion = 3759
 
--- -- look for unviable shaders and remove them
--- local shaderCache = SHGetFolderPath('LOCAL_APPDATA') .. 'Gas Powered Games/Supreme Commander Forged Alliance/cache'
--- for k, file in IoDir(shaderCache .. '/*') do
---     if file != '.' and file != '..' then 
---         local version = tonumber(string.sub(file, -4))
---         if not version or version < minimumShaderVersion then 
---             LOG("Removed incompatible shader: " .. file)
---             os.remove(shaderCache .. '/' .. file)
---         end
---     end
--- end
-
--- Clears out the shader cache as it takes a release to reset the shaders
+-- look for unviable shaders and remove them
 local shaderCache = SHGetFolderPath('LOCAL_APPDATA') .. 'Gas Powered Games/Supreme Commander Forged Alliance/cache'
 for k, file in IoDir(shaderCache .. '/*') do
     if file != '.' and file != '..' then 
-        os.remove(shaderCache .. '/' .. file)
+        local version = tonumber(string.sub(file, -4))
+        if not version or version < minimumShaderVersion then 
+            LOG("Removed incompatible shader: " .. file)
+            os.remove(shaderCache .. '/' .. file)
+        end
     end
 end
+
+-- Clears out the shader cache as it takes a release to reset the shaders
+-- local shaderCache = SHGetFolderPath('LOCAL_APPDATA') .. 'Gas Powered Games/Supreme Commander Forged Alliance/cache'
+-- for k, file in IoDir(shaderCache .. '/*') do
+--     if file != '.' and file != '..' then 
+--         os.remove(shaderCache .. '/' .. file)
+--     end
+-- end
 
 -- typical FAF packages
 local allowedAssetsNxy = { }

@@ -253,11 +253,20 @@ IntelComponent = ClassSimple {
 
             --- display progress
             for k = 1, ticks do
-                self:SetWorkProgress((k / ticks))
+
+                -- prevent changing work progress when we are doing work (such as an enhancement)
+                if not self.WorkItem then
+                    self:SetWorkProgress((k / ticks))
+                end
+
                 WaitTicks(1)
             end
 
-            self:SetWorkProgress(-1)
+            -- prevent changing work progress when we are doing work (such as an enhancement)
+            if not self.WorkItem then
+                self:SetWorkProgress(-1)
+            end
+
             self:OnIntelRecharged()
         end
     end,
@@ -691,7 +700,7 @@ VeterancyComponent = ClassSimple {
     SetVeterancy = function(self, level)
         self.VetExperience = 0
         self.VetLevel = 0
-        self:AddVetExperience(self.Blueprint.VetThresholds[MathMin(level or 0, 5)], true)
+        self:AddVetExperience(self.Blueprint.VetThresholds[MathMin(level or 0, 5)] or 0, true)
     end,
 
     ---@param self Unit | VeterancyComponent

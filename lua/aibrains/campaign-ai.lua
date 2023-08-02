@@ -11,12 +11,12 @@ local StandardBrain = import("/lua/aibrain.lua").AIBrain
 
 --- A basic campaign brain. Contains all the functionality that a campaign brain requires. This
 --- brain is a 'blunt' copy of the functionality that is required to run various campaign maps.
----@class EasyAIBrain: AIBrain
+---@class CampaignAIBrain: AIBrain
 ---@field PBM AiPlatoonBuildManager
 AIBrain = Class(StandardBrain) {
 
     --- Called after `SetupSession` but before `BeginSession` - no initial units, props or resources exist at this point
-    ---@param self AIBrain
+    ---@param self CampaignAIBrain
     ---@param planName string
     OnCreateAI = function(self, planName)
         StandardBrain.OnCreateAI(self, planName)
@@ -38,10 +38,13 @@ AIBrain = Class(StandardBrain) {
         self.PlatoonNameCounter = {}
         self.PlatoonNameCounter['AttackForce'] = 0
         self.RepeatExecution = true
+
+        self.FactoryAssistList = {}
+        self.DelayEqualBuildPlattons = {}
     end,
 
     --- Called after `SetupSession` but before `BeginSession` - no initial units, props or resources exist at this point
-    ---@param self AIBrain
+    ---@param self CampaignAIBrain
     ---@param planName string
     CreateBrainShared = function(self, planName)
         StandardBrain.CreateBrainShared(self, planName)
@@ -63,10 +66,19 @@ AIBrain = Class(StandardBrain) {
         self.IgnoreArmyCaps = false
     end,
 
-    --- Called after `SetupSession` but before `BeginSession` - no initial units, props or resources exist at this point
-    ---@param self AIBrain
+    --- Called after `BeginSession`, at this point all props, resources and initial units exist in the map and the teams are defined
+    ---@param self EasyAIBrain
     OnBeginSession = function(self)
         StandardBrain.OnBeginSession(self)
+
+        -- requires navigational mesh
+        import("/lua/sim/NavUtils.lua").Generate()
+
+        -- requires these datastructures to understand the game
+        self.GridReclaim = import("/lua/ai/gridreclaim.lua").Setup(self)
+        self.GridBrain = import("/lua/ai/gridbrain.lua").Setup()
+        self.GridRecon = import("/lua/ai/gridrecon.lua").Setup(self)
+        self.GridPresence = import("/lua/AI/GridPresence.lua").Setup(self)
     end,
 
     ---@param self EasyAIBrain
@@ -85,7 +97,7 @@ AIBrain = Class(StandardBrain) {
     ----------------------------------------------------------------------------------------
     --- campaign functionality
 
-    ---@param self BaseAIBrain
+    ---@param self CampaignAIBrain
     ---@param planName FileName
     ---@return string[]|nil
     ImportScenarioArmyPlans = function(self, planName)
@@ -96,7 +108,7 @@ AIBrain = Class(StandardBrain) {
         end
     end,
 
-    ---@param self BaseAIBrain
+    ---@param self CampaignAIBrain
     InitialAIThread = function(self)
         -- delay the AI so it can't reclaim the start area before it's cleared from the ACU landing blast.
         WaitTicks(30)
@@ -104,7 +116,7 @@ AIBrain = Class(StandardBrain) {
         self.ExecuteThread = self:ForkThread(self.ExecuteAIThread)
     end,
 
-    ---@param self BaseAIBrain
+    ---@param self CampaignAIBrain
     EvaluateAIThread = function(self)
         local personality = self:GetPersonality()
         local factionIndex = self:GetFactionIndex()
@@ -120,7 +132,7 @@ AIBrain = Class(StandardBrain) {
         end
     end,
 
-    ---@param self BaseAIBrain
+    ---@param self CampaignAIBrain
     EvaluateAIPlanList = function(self)
         local factionIndex = self:GetFactionIndex()
         local bestPlan = nil
@@ -143,7 +155,7 @@ AIBrain = Class(StandardBrain) {
         end
     end,
 
-    ---@param self BaseAIBrain
+    ---@param self CampaignAIBrain
     ExecuteAIThread = function(self)
         local personality = self:GetPersonality()
 
@@ -156,7 +168,7 @@ AIBrain = Class(StandardBrain) {
         end
     end,
 
-    ---@param self BaseAIBrain
+    ---@param self CampaignAIBrain
     ---@param planName FileName
     ---@return number
     EvaluatePlan = function(self, planName)
@@ -169,22 +181,22 @@ AIBrain = Class(StandardBrain) {
         end
     end,
 
-    ---@param self BaseAIBrain
+    ---@param self CampaignAIBrain
     ExecutePlan = function(self)
         self.CurrentPlanScript.ExecutePlan(self)
     end,
 
-    ---@param self BaseAIBrain
+    ---@param self CampaignAIBrain
     SetRepeatExecution = function(self, repeatEx)
         self.RepeatExecution = repeatEx
     end,
 
-    ---@param self BaseAIBrain
+    ---@param self CampaignAIBrain
     GetCurrentPlanScript = function(self)
         return self.CurrentPlanScript
     end,
 
-    ---@param self BaseAIBrain
+    ---@param self CampaignAIBrain
     ---@param bestPlan string
     SetCurrentPlan = function(self, bestPlan)
         if not bestPlan then
@@ -197,7 +209,7 @@ AIBrain = Class(StandardBrain) {
         end
     end,
 
-    ---@param self BaseAIBrain
+    ---@param self CampaignAIBrain
     CalculateLayerPreference = function(self)
         local personality = self:GetPersonality()
         local factionIndex = self:GetFactionIndex()
@@ -225,20 +237,20 @@ AIBrain = Class(StandardBrain) {
         end
     end,
 
-    ---@param self BaseAIBrain
+    ---@param self CampaignAIBrain
     ---@param attackDataTable table
     InitializeAttackManager = function(self, attackDataTable)
         self.AttackManager = import("/lua/ai/attackmanager.lua").AttackManager(self, attackDataTable)
         self.AttackData = self.AttackManager
     end,
 
-    ---@param self BaseAIBrain
+    ---@param self CampaignAIBrain
     ---@param spec any
     AMAddPlatoon = function(self, spec)
         self.AttackManager:AddPlatoon(spec)
     end,
 
-    ---@param self BaseAIBrain
+    ---@param self CampaignAIBrain
     AMPauseAttackManager = function(self)
         self.AttackManager:PauseAttackManager()
     end,
@@ -247,7 +259,7 @@ AIBrain = Class(StandardBrain) {
     ---### New PlatoonBuildManager
     ---This system is meant to be able to give some data about the platoon you want and have them
     ---built and formed into platoons at will.
-    ---@param self BaseAIBrain
+    ---@param self CampaignAIBrain
     InitializePlatoonBuildManager = function(self)
         if not self.PBM then
             ---@class AiPlatoonBuildManager
@@ -293,7 +305,7 @@ AIBrain = Class(StandardBrain) {
     end,
 
 
-    ---@param self BaseAIBrain
+    ---@param self CampaignAIBrain
     ---@param enable boolean
     PBMSetEnabled = function(self, enable)
         if not self.PBMThread and enable then
@@ -330,7 +342,7 @@ AIBrain = Class(StandardBrain) {
     ---}
     ---},
     --- ```
-    ---@param self BaseAIBrain
+    ---@param self CampaignAIBrain
     ---@param pltnTable PlatoonTable
     PBMAddPlatoon = function(self, pltnTable)
         if not pltnTable.PlatoonTemplate then
@@ -399,7 +411,7 @@ AIBrain = Class(StandardBrain) {
         self.HasPlatoonList = true
     end,
 
-    ---@param self BaseAIBrain
+    ---@param self CampaignAIBrain
     ---@param builderName string
     PBMRemoveBuilder = function(self, builderName)
         for pType, builders in self.PBM.Platoons do
@@ -415,7 +427,7 @@ AIBrain = Class(StandardBrain) {
 
     --- Function to clear all the platoon lists so you can feed it a bunch more.
     --- - formPlatoons - Gives you the option to form all the platoons in the list before its cleaned up so that you don't have units hanging around.
-    ---@param self BaseAIBrain
+    ---@param self CampaignAIBrain
     ---@param formPlatoons? Platoon
     PBMClearPlatoonList = function(self, formPlatoons)
         if formPlatoons then
@@ -436,7 +448,7 @@ AIBrain = Class(StandardBrain) {
         }
     end,
 
-    ---@param self BaseAIBrain
+    ---@param self CampaignAIBrain
     ---@param location string
     ---@return boolean
     PBMFormAllPlatoons = function(self, location)
@@ -449,13 +461,13 @@ AIBrain = Class(StandardBrain) {
         end
     end,
 
-    ---@param self BaseAIBrain
+    ---@param self CampaignAIBrain
     ---@return boolean
     PBMHasPlatoonList = function(self)
         return self.HasPlatoonList
     end,
 
-    ---@param self BaseAIBrain
+    ---@param self CampaignAIBrain
     PBMResetPrimaryFactories = function(self)
         for _, v in self.PBM.Locations do
             v.PrimaryFactories.Air = nil
@@ -466,7 +478,7 @@ AIBrain = Class(StandardBrain) {
     end,
 
     ---Goes through the location areas, finds the factories, sets a primary then tells all the others to guard.
-    ---@param self BaseAIBrain
+    ---@param self CampaignAIBrain
     PBMSetPrimaryFactories = function(self)
         for _, v in self.PBM.Locations do
             local factories = self:GetAvailableFactories(v.Location, v.Radius)
@@ -528,13 +540,13 @@ AIBrain = Class(StandardBrain) {
             if not v.RallyPoint or table.empty(v.RallyPoint) then
                 self:PBMSetRallyPoint(airFactories, v, nil)
                 self:PBMSetRallyPoint(landFactories, v, nil)
-                self:PBMSetRallyPoint(seaFactories, v, nil)
+                self:PBMSetRallyPoint(seaFactories, v, nil, "Naval Rally Point")
                 self:PBMSetRallyPoint(gates, v, nil)
             end
         end
     end,
 
-    ---@param self BaseAIBrain
+    ---@param self CampaignAIBrain
     ---@param factories Unit
     ---@param primary Unit
     PBMAssistGivenFactory = function(self, factories, primary)
@@ -549,7 +561,7 @@ AIBrain = Class(StandardBrain) {
         end
     end,
 
-    ---@param self BaseAIBrain
+    ---@param self CampaignAIBrain
     ---@param factories Unit
     ---@param location Vector
     ---@param rallyLoc Vector
@@ -597,7 +609,7 @@ AIBrain = Class(StandardBrain) {
         return true
     end,
 
-    ---@param self BaseAIBrain
+    ---@param self CampaignAIBrain
     ---@param factory Unit
     ---@param location Vector
     ---@return boolean
@@ -640,7 +652,7 @@ AIBrain = Class(StandardBrain) {
         end
     end,
 
-    ---@param self BaseAIBrain
+    ---@param self CampaignAIBrain
     ---@param factories Unit
     ---@param primary Unit[]
     ---@return boolean
@@ -666,7 +678,7 @@ AIBrain = Class(StandardBrain) {
     end,
 
     ---Picks the first tech 3, tech 2 or tech 1 factory to make primary
-    ---@param self BaseAIBrain
+    ---@param self CampaignAIBrain
     ---@param factories Unit
     ---@return Unit
     PBMGetPrimaryFactory = function(self, factories)
@@ -680,7 +692,7 @@ AIBrain = Class(StandardBrain) {
         end
     end,
 
-    ---@param self BaseAIBrain
+    ---@param self CampaignAIBrain
     ---@param platoon Platoon
     ---@return number
     PBMGetPriority = function(self, platoon)
@@ -697,7 +709,7 @@ AIBrain = Class(StandardBrain) {
         end
     end,
 
-    ---@param self BaseAIBrain
+    ---@param self CampaignAIBrain
     ---@param platoon Platoon
     ---@param amount number
     ---@return boolean
@@ -724,7 +736,7 @@ AIBrain = Class(StandardBrain) {
         end
     end,
 
-    ---@param self BaseAIBrain
+    ---@param self CampaignAIBrain
     ---@param platoon Platoon
     ---@param amount number
     ---@return boolean
@@ -752,7 +764,7 @@ AIBrain = Class(StandardBrain) {
     end,
 
     ---Adds a new build location
-    ---@param self BaseAIBrain
+    ---@param self CampaignAIBrain
     ---@param loc Vector
     ---@param radius number
     ---@param locType string
@@ -792,7 +804,7 @@ AIBrain = Class(StandardBrain) {
         end
     end,
 
-    ---@param self BaseAIBrain
+    ---@param self CampaignAIBrain
     ---@param locationName string
     ---@return boolean
     PBMGetLocation = function(self, locationName)
@@ -806,7 +818,7 @@ AIBrain = Class(StandardBrain) {
         return false
     end,
 
-    ---@param self BaseAIBrain
+    ---@param self CampaignAIBrain
     ---@param loc Vector
     ---@return Vector | false
     PBMGetLocationCoords = function(self, loc)
@@ -829,7 +841,7 @@ AIBrain = Class(StandardBrain) {
         return false
     end,
 
-    ---@param self BaseAIBrain
+    ---@param self CampaignAIBrain
     ---@param loc Vector
     ---@return boolean
     PBMGetLocationRadius = function(self, loc)
@@ -848,7 +860,7 @@ AIBrain = Class(StandardBrain) {
         return false
     end,
 
-    ---@param self BaseAIBrain
+    ---@param self CampaignAIBrain
     ---@param location Vector
     ---@return boolean
     PBMGetLocationFactories = function(self, location)
@@ -863,7 +875,7 @@ AIBrain = Class(StandardBrain) {
         return false
     end,
 
-    ---@param self BaseAIBrain
+    ---@param self CampaignAIBrain
     ---@param location Vector
     ---@return FactoryUnit[] | false
     PBMGetAllFactories = function(self, location)
@@ -892,7 +904,7 @@ AIBrain = Class(StandardBrain) {
     --- Removes a build location based on it area
     --- IF either is nil, then it will do the other.
     --- This way you can remove all of one type or all of one rectangle
-    ---@param self BaseAIBrain
+    ---@param self CampaignAIBrain
     ---@param loc Vector
     ---@param locType string
     PBMRemoveBuildLocation = function(self, loc, locType)
@@ -904,7 +916,7 @@ AIBrain = Class(StandardBrain) {
     end,
 
     --- Sort platoon list
-    ---@param self BaseAIBrain
+    ---@param self CampaignAIBrain
     ---@param platoonType PlatoonType
     ---@return boolean
     PBMSortPlatoonsViaPriority = function(self, platoonType)
@@ -932,23 +944,23 @@ AIBrain = Class(StandardBrain) {
         self.PBM.NeedSort[platoonType] = false
     end,
 
-    ---@param self BaseAIBrain
+    ---@param self CampaignAIBrain
     ---@param interval number
     PBMSetCheckInterval = function(self, interval)
         self.PBM.BuildCheckInterval = interval
     end,
 
-    ---@param self BaseAIBrain
+    ---@param self CampaignAIBrain
     PBMEnableRandomSamePriority = function(self)
         self.PBM.RandomSamePriority = true
     end,
 
-    ---@param self BaseAIBrain
+    ---@param self CampaignAIBrain
     PBMDisableRandomSamePriority = function(self)
         self.PBM.RandomSamePriority = false
     end,
 
-    ---@param self BaseAIBrain
+    ---@param self CampaignAIBrain
     PBMCheckBusyFactories = function(self)
         local busyPlat = self:GetPlatoonUniquelyNamed('BusyFactories')
         if not busyPlat then
@@ -977,13 +989,13 @@ AIBrain = Class(StandardBrain) {
         self:AssignUnitsToPlatoon(busyPlat, poolTransfer, 'Unassigned', 'None')
     end,
 
-    ---@param self BaseAIBrain
+    ---@param self CampaignAIBrain
     PBMUnlockStartThread = function(self)
         WaitSeconds(1)
         ScenarioInfo.PBMStartLock = false
     end,
 
-    ---@param self BaseAIBrain
+    ---@param self CampaignAIBrain
     PBMUnlockStart = function(self)
         while ScenarioInfo.PBMStartLock do
             WaitTicks(1)
@@ -994,7 +1006,7 @@ AIBrain = Class(StandardBrain) {
         self:ForkThread(self.PBMUnlockStartThread)
     end,
 
-    ---@param self BaseAIBrain
+    ---@param self CampaignAIBrain
     ---@param builderData table
     ---@return boolean
     PBMHandleAvailable = function(self, builderData)
@@ -1009,7 +1021,7 @@ AIBrain = Class(StandardBrain) {
         return false
     end,
 
-    ---@param self BaseAIBrain
+    ---@param self CampaignAIBrain
     ---@param platoon Platoon
     ---@param builderData table
     ---@return boolean
@@ -1034,7 +1046,7 @@ AIBrain = Class(StandardBrain) {
         return false
     end,
 
-    ---@param self BaseAIBrain
+    ---@param self CampaignAIBrain
     ---@param platoon Platoon
     ---@return boolean
     PBMRemoveHandle = function(self, platoon)
@@ -1053,7 +1065,7 @@ AIBrain = Class(StandardBrain) {
         end
     end,
 
-    ---@param self BaseAIBrain
+    ---@param self CampaignAIBrain
     ---@param builder Unit
     ---@return boolean
     PBMSetHandleBuilding = function(self, builder)
@@ -1072,7 +1084,7 @@ AIBrain = Class(StandardBrain) {
         return false
     end,
 
-    ---@param self BaseAIBrain
+    ---@param self CampaignAIBrain
     ---@param builder Unit
     ---@return boolean
     PBMCheckHandleBuilding = function(self, builder)
@@ -1088,7 +1100,7 @@ AIBrain = Class(StandardBrain) {
         return false
     end,
 
-    ---@param self BaseAIBrain
+    ---@param self CampaignAIBrain
     ---@param builder Unit
     ---@return boolean
     PBMSetBuildingHandleFalse = function(self, builder)
@@ -1105,7 +1117,7 @@ AIBrain = Class(StandardBrain) {
         return false
     end,
 
-    ---@param self BaseAIBrain
+    ---@param self CampaignAIBrain
     ---@param builder Unit
     ---@return integer
     PBMNumHandlesAvailable = function(self, builder)
@@ -1120,7 +1132,7 @@ AIBrain = Class(StandardBrain) {
 
 
     -- Main building and forming platoon thread for the Platoon Build Manager
-    ---@param self BaseAIBrain
+    ---@param self CampaignAIBrain
     PlatoonBuildManagerThread = function(self)
         local personality = self:GetPersonality()
         local armyIndex = self:GetArmyIndex()
@@ -1241,7 +1253,7 @@ AIBrain = Class(StandardBrain) {
 
     --- ## Form platoons
     --- Extracted as it's own function so you can call this to try and form platoons to clean up the pool
-    ---@param self BaseAIBrain
+    ---@param self CampaignAIBrain
     ---@param requireBuilding boolean `true` = platoon must have `'BUILDING'` has its handle, `false` = it'll form any platoon it can
     ---@param platoonType PlatoonType Platoontype is just `'Air'/'Land'/'Sea'`, those are found in the platoon build manager table template.
     ---@param location Vector Location/Radius are where to do this.  If they aren't specified they will grab from anywhere.
@@ -1381,7 +1393,7 @@ AIBrain = Class(StandardBrain) {
 
     --- Get the primary factory with the lowest order count
     --- This is used for the 'Any' platoon type so we can find any primary factory to build from.
-    ---@param self BaseAIBrain
+    ---@param self CampaignAIBrain
     ---@param location Vector
     ---@return Vector
     GetLowestOrderPrimaryFactory = function(self, location)
@@ -1401,7 +1413,7 @@ AIBrain = Class(StandardBrain) {
     end,
 
     ---Set number of units to be built as the number of factories in a location
-    ---@param self BaseAIBrain
+    ---@param self CampaignAIBrain
     ---@param template any
     ---@param location Vector
     ---@param pType PlatoonType
@@ -1484,7 +1496,7 @@ AIBrain = Class(StandardBrain) {
         return retTemplate
     end,
 
-    ---@param self BaseAIBrain
+    ---@param self CampaignAIBrain
     ---@param platoon Platoon
     ---@param factories Unit
     ---@param location Vector
@@ -1523,7 +1535,7 @@ AIBrain = Class(StandardBrain) {
         end
     end,
 
-    ---@param self BaseAIBrain
+    ---@param self CampaignAIBrain
     ---@param location Vector
     ---@param pType PlatoonType
     ---@return integer
@@ -1560,7 +1572,7 @@ AIBrain = Class(StandardBrain) {
         return numFactories
     end,
 
-    ---@param self BaseAIBrain
+    ---@param self CampaignAIBrain
     ---@param platoon any
     PBMPlatoonTimeOutThread = function(self, platoon)
         local minWait = 5 -- 240 CAMPAIGNS
@@ -1572,7 +1584,7 @@ AIBrain = Class(StandardBrain) {
         self:PBMSetBuildingHandleFalse(platoon)
     end,
 
-    ---@param self BaseAIBrain
+    ---@param self CampaignAIBrain
     ---@param platoonTemplate any
     ---@param factory Unit
     ---@return boolean
@@ -1585,7 +1597,7 @@ AIBrain = Class(StandardBrain) {
         return true
     end,
 
-    ---@param self BaseAIBrain
+    ---@param self CampaignAIBrain
     ---@param platoon Platoon
     PBMPlatoonDestroyed = function(self, platoon)
         self:PBMRemoveHandle(platoon)
@@ -1594,7 +1606,7 @@ AIBrain = Class(StandardBrain) {
         end
     end,
 
-    ---@param self BaseAIBrain
+    ---@param self CampaignAIBrain
     ---@param bCs table
     ---@param index number
     ---@return boolean
@@ -1658,14 +1670,14 @@ AIBrain = Class(StandardBrain) {
         return true
     end,
 
-    ---@param self BaseAIBrain
+    ---@param self CampaignAIBrain
     PBMClearBuildConditionsCache = function(self)
         for k, v in self.PBM.BuildConditionsTable do
             v.Cached[self:GetArmyIndex()] = false
         end
     end,
 
-    ---@param self BaseAIBrain
+    ---@param self CampaignAIBrain
     ---@param platoonList Platoon[]
     ---@param ai BaseAIBrain
     ---@return nil|Platoon
@@ -1689,6 +1701,33 @@ AIBrain = Class(StandardBrain) {
             self:DisbandPlatoon(platoon)
         end
         return returnPlatoon
+    end,
+
+    IMAPConfiguration = function(self)
+        -- Used to configure imap values, used for setting threat ring sizes depending on map size to try and get a somewhat decent radius
+        local maxmapdimension = math.max(ScenarioInfo.size[1],ScenarioInfo.size[2])
+
+        if maxmapdimension == 256 then
+            self.IMAPConfig.OgridRadius = 22.5
+            self.IMAPConfig.IMAPSize = 32
+            self.IMAPConfig.Rings = 2
+        elseif maxmapdimension == 512 then
+            self.IMAPConfig.OgridRadius = 22.5
+            self.IMAPConfig.IMAPSize = 32
+            self.IMAPConfig.Rings = 2
+        elseif maxmapdimension == 1024 then
+            self.IMAPConfig.OgridRadius = 45.0
+            self.IMAPConfig.IMAPSize = 64
+            self.IMAPConfig.Rings = 1
+        elseif maxmapdimension == 2048 then
+            self.IMAPConfig.OgridRadius = 89.5
+            self.IMAPConfig.IMAPSize = 128
+            self.IMAPConfig.Rings = 0
+        else
+            self.IMAPConfig.OgridRadius = 180.0
+            self.IMAPConfig.IMAPSize = 256
+            self.IMAPConfig.Rings = 0
+        end
     end,
 
     ----------------------------------------------------------------------------------------

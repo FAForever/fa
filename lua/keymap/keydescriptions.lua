@@ -112,6 +112,8 @@ keyDescriptions = {
     ['select_naval'] = '<LOC key_desc_0048>Select all Naval units',
     ['cap_frames'] = '<LOC key_desc_0050>Capture Frames',
     ['pause_unit'] = '<LOC key_desc_0056>Pause',
+    ['pause_unit_all'] = '<LOC key_pause_unit_all>Pause all units in the selection',
+    ['unpause_unit_all'] = '<LOC key_unpause_unit_all>Unpause all units in the selection',
     ['suicide'] = '<LOC key_desc_0057>Self-Destruct',
     ['select_land'] = '<LOC key_desc_0058>Select all Land units',
     ['select_all_units_of_same_type'] = '<LOC key_desc_0059>Select all units similar to those selected',
@@ -126,6 +128,10 @@ keyDescriptions = {
     ['stop'] = '<LOC key_desc_0047>Stop and cancel all Orders',
     ['soft_stop'] = '<LOC key_desc_0378>Stop and cancel all factory orders except the current one',
     ['dive'] = '<LOC key_desc_0049>Dive',
+    ['dive_all'] = '<LOC key_dive_all>Submerge all units in the selection',
+    ['undive_all'] = '<LOC key_surface_all>Surface all units in the selection',
+    ['shift_dive_all'] = '<LOC key_dive_all>Submerge all units in the selection',
+    ['shift_undive_all'] = '<LOC key_surface_all>Surface all units in the selection',
     ['ferry'] = '<LOC key_desc_0051>Ferry',
     ['guard'] = '<LOC key_desc_0052>Assist',
     ['transport'] = '<LOC key_desc_0053>Transport',
@@ -511,4 +517,13 @@ keyDescriptions = {
 
     ['store_camera_settings'] = 'Store the current camera settings in the preference file',
     ['restore_camera_settings'] = 'Apply the camera settings stored in the preference file',
+
+    ['toggle_ai_nav_directions_from'] = 'NavUtils - Toggle to visualize output of DirectionsFrom ',
+    ['toggle_ai_nav_random_direction_from'] = 'NavUtils - Toggle to visualize output of RandomDirectionFrom ',
+    ['toggle_ai_nav_retreat_direction_from'] = 'NavUtils - Toggle to visualize output of RetreatDirectionFrom ',
+    ['toggle_ai_nav_direction_to'] = 'NavUtils - Toggle to visualize output of DirectionTo',
+
+    ['filter_highest_engineer_and_assist'] = '<LOC key_desc_filter_highest_engineer_and_assist>Filter the selection to the most advanced engineer, all other engineers assist that engineer',
+    ['distribute_orders'] = '<LOC key_desc_distribute_orders>Distribute orders of the selected units',
+    ['shift_distribute_orders'] = '<LOC key_desc_distribute_orders>Distribute orders of the selected units',
 }

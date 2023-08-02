@@ -803,6 +803,13 @@ AChronoDampener = {
     EmtBpPath .. 'aeon_chrono_dampener_04_emit.bp',
 }
 
+AChronoDampenerLarge = {
+    EmtBpPath .. 'aeon_chrono_dampener_large_01_emit.bp',
+    EmtBpPath .. 'aeon_chrono_dampener_large_02_emit.bp',
+    EmtBpPath .. 'aeon_chrono_dampener_large_03_emit.bp',
+    EmtBpPath .. 'aeon_chrono_dampener_large_04_emit.bp',
+}
+
 ACommanderOverchargeFlash01 = {
     EmtBpPath .. 'aeon_commander_overcharge_flash_01_emit.bp',
     EmtBpPath .. 'aeon_commander_overcharge_flash_02_emit.bp',

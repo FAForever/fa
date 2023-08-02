@@ -27,7 +27,7 @@ UAL0401 = ClassUnit(AWalkingLandUnit) {
     Weapons = {
         EyeWeapon = ClassWeapon(ADFPhasonLaser) {
             CreateProjectileAtMuzzle = function(self, muzzle)
-                ADFPhasonLaser.CreateProjectileAtMuzzle(self, muzzle)
+                local projectile = ADFPhasonLaser.CreateProjectileAtMuzzle(self, muzzle)
 
                 -- if possible, try not to fire on units that we're tractoring
                 local target = self:GetCurrentTarget()
@@ -37,6 +37,8 @@ UAL0401 = ClassUnit(AWalkingLandUnit) {
                         self:ResetTarget()
                     end
                 end
+
+                return projectile
             end,
         },
         RightArmTractor = ClassWeapon(ADFTractorClaw) {},

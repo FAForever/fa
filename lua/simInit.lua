@@ -20,6 +20,10 @@
 -- Do global initialization and set up common global functions
 doscript '/lua/globalInit.lua'
 
+-- replace with assembly implementations
+table.getsize = table.getsize2 or table.getsize
+table.empty = table.empty2 or table.empty
+
 -- load legacy builder systems
 doscript '/lua/system/GlobalPlatoonTemplate.lua'
 doscript '/lua/system/GlobalBuilderTemplate.lua'
@@ -89,12 +93,6 @@ function SetupSession()
 
     -- assume there are no AIs
     ScenarioInfo.GameHasAIs = false
-
-    -- if the AI replacement is on then there may be AIs
-    if ScenarioInfo.Options.AIReplacement == 'On' then
-        ScenarioInfo.GameHasAIs = true
-        SPEW("Detected ai replacement option being enabled: enabling AI functionality")
-    end
 
     -- if we're doing a campaign / special map then there may be AIs
     if ScenarioInfo.type ~= 'skirmish' then

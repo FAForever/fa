@@ -83,6 +83,14 @@ SyncMeta = {
     end,
 }
 
+---@class UnitCommand
+---@field x number
+---@field y number
+---@field z number
+---@field targetId? EntityId
+---@field target? Entity
+---@field commandType string 
+
 ---@class AIUnitProperties
 ---@field AIPlatoonReference AIPlatoon
 ---@field AIBaseManager LocationType
@@ -166,7 +174,6 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
     -------------------------------------------------------------------------------------------
     ---@param self Unit
     OnPreCreate = function(self)
-
         -- Each unit has a sync table to replicate values to the global sync table to be copied to the user layer at sync time.
         self.Sync = {}
         self.Sync.id = self:GetEntityId()
@@ -1492,7 +1499,6 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
     ---@param firingWeapon Weapon The weapon that the projectile originates from
     ---@return boolean
     OnCollisionCheck = function(self, other, firingWeapon)
-
         -- bail out immediately
         if self.DisallowCollisions then
             return false
@@ -1625,10 +1631,28 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         local pos = self:GetPosition()
         local layer = self.Layer
 
+        -- Reduce the mass value based on the tech tier
+        -- by default we reduce the mass value 2 times by 90% for a total of 81%
+        local mass_tech_mult = 0.9
+        local tech_category = bp.TechCategory
+
+        -- We reduce the mass value based on tech category
+        if tech_category == 'TECH1' then
+            mass_tech_mult = 0.9
+        elseif tech_category == 'TECH2' then
+            mass_tech_mult = 0.8
+        elseif tech_category == 'TECH3' then
+            mass_tech_mult = 0.7
+        elseif tech_category == 'EXPERIMENTAL' then
+            mass_tech_mult = 0.6
+        end
+        
+        mass = mass * mass_tech_mult
+
         -- Reduce the mass value of submerged wrecks
         if layer == 'Water' or layer == 'Sub' then
-            mass = mass * 0.5
-            energy = energy * 0.5
+            mass = mass * 0.6
+            energy = energy * 0.6
         end
 
         local halfBuilt = self:GetFractionComplete() < 1
@@ -4745,6 +4769,26 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         local total = 10 * (buildTime / buildRate)
         local blocks = math.ceil(fraction * total)
         cUnit.GiveNukeSiloAmmo(self, blocks, true)
+    end,
+
+    ---@param self Unit
+    ---@return UnitCommand[]
+    GetCommandQueue = function(self)
+        local queue = cUnit.GetCommandQueue(self)
+        if queue then
+            for k, order in queue do
+                if order.targetId then
+                    local target = GetEntityById(order.targetId)
+                    if target and IsEntity(target) then
+                        order.target = target
+                        -- take position of the entity, used to sort the units
+                        order.x, order.y, order.z = moho.entity_methods.GetPositionXYZ(target)
+                    end
+                end
+            end
+        end
+
+        return queue
     end,
 
     --- Stuns the unit, if it isn't set to be immune by the flag unit.ImmuneToStun

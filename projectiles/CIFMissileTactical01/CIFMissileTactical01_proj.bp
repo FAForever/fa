@@ -22,12 +22,13 @@ ProjectileBlueprint {
         'INDIRECTFIRE',
         'TACTICAL',
         'MISSILE',
-        'NOSPLASHDAMAGE',
+        'NOSPLASHDAMAGE'
     },
     Defense = {
         Health = 1,
         MaxHealth = 1,
     },
+    DesiredShooterCap = 1,
     Display = {
         CameraFollowTimeout = 2,
         CameraFollowsProjectile = true,
@@ -62,10 +63,10 @@ ProjectileBlueprint {
         HelpText = 0,
     },
     Physics = {
-        Acceleration = 3,
+        Acceleration = 9,
         DestroyOnWater = true,
         InitialSpeed = 3,
-        MaxSpeed = 12,
+        MaxSpeed = 18,
         RotationalVelocity = 0,
         RotationalVelocityRange = 0,
         TrackTarget = true,

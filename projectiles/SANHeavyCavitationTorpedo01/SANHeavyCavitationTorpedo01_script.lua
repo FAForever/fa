@@ -21,9 +21,6 @@ SANHeavyCavitationTorpedo01 = ClassProjectile(SHeavyCavitationTorpedo) {
         self.AirTrails:Destroy()
         CreateEmitterOnEntity(self,self.Army,EffectTemplate.SHeavyCavitationTorpedoFxTrails)
 
-        self:TrackTarget(true):StayUnderwater(true)
-        self:SetCollideSurface(false)
-        self:SetTurnRate(360)
         self.Trash:Add(ForkThread(self.ProjectileSplit,self))
     end,
 
@@ -32,7 +29,7 @@ SANHeavyCavitationTorpedo01 = ClassProjectile(SHeavyCavitationTorpedo) {
         -- if we are starting in the water then immediately switch to tracking in water
         self:TrackTarget(false)
         self.AirTrails = CreateEmitterOnEntity(self,self.Army,EffectTemplate.SHeavyCavitationTorpedoFxTrails02)
-        self:SetCollisionShape('Sphere', 0, 0, 0, 0.1)
+        self:SetCollisionShape('Sphere', 0, 0, 0, 0.5)
     end,
 
     ProjectileSplit = function(self)

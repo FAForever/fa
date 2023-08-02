@@ -11,7 +11,7 @@ local ItemList = import("/lua/maui/itemlist.lua").ItemList
 local data = import("/lua/ui/lobby/changelogdata.lua")
 
 --- Test if we should display the changelog of the new game version.
--- @return true/false
+---@return boolean
 function OpenChangelog()
     local LastChangelogVersion = Prefs.GetFromCurrentProfile('LobbyChangelog') or 0
     return LastChangelogVersion < data.last_version
@@ -97,13 +97,6 @@ Changelog = ClassUI(Group) {
         LayoutHelpers.AtVerticalCenterIn(self.HeaderSubtitle, self.Header)
         self.HeaderSubtitle.Right:Set(function() return self.HeaderEscapeButton.Left() - LayoutHelpers.ScaleNumber(20) end)
 
-        self.HeaderDivider = Bitmap(self.CommonUI)
-        self.HeaderDivider:SetSolidColor("99ffffff")
-        self.HeaderDivider.Left:Set(function() return self.Header.Left() + LayoutHelpers.ScaleNumber(10) end)
-        self.HeaderDivider.Top:Set(function() return self.Header.Bottom() - 1 end)
-        self.HeaderDivider.Right:Set(function() return self.Header.Right() - LayoutHelpers.ScaleNumber(10) end)
-        self.HeaderDivider.Bottom:Set( self.Header.Bottom)
-
         -- footer
 
         self.Footer = Group(self.CommonUI)
@@ -117,36 +110,36 @@ Changelog = ClassUI(Group) {
         LayoutHelpers.FillParent(self.FooterDebug, self.Footer)
 
         self.FooterGithubButton = UIUtil.CreateButtonWithDropshadow(self.Footer, '/BUTTON/medium/', "Github")
-        LayoutHelpers.AtVerticalCenterIn(self.FooterGithubButton, self.Footer, 2)
+        LayoutHelpers.AtVerticalCenterIn(self.FooterGithubButton, self.Footer)
         LayoutHelpers.DepthOverParent(self.FooterGithubButton, self.Footer, 5)
         self.FooterGithubButton.Left:Set(function() return self.Footer.Left() - LayoutHelpers.ScaleNumber(10) end)
         self.FooterGithubButton.OnClick = function()
-            OpenURL('http://github.com/FAForever/fa/blob/develop/changelog.md')
+            OpenURL('http://github.com/FAForever/fa/releases')
         end
 
-        self.FooterDiscordButton = UIUtil.CreateButtonWithDropshadow(self.Footer, '/BUTTON/medium/', "Report bug")
-        LayoutHelpers.AtVerticalCenterIn(self.FooterDiscordButton, self.Footer, 2)
+        self.FooterBetaBalanceButton = UIUtil.CreateButtonWithDropshadow(self.Footer, '/BUTTON/medium/', "Beta Balance")
+        LayoutHelpers.AtVerticalCenterIn(self.FooterBetaBalanceButton, self.Footer)
+        LayoutHelpers.DepthOverParent(self.FooterBetaBalanceButton, self.Footer, 5)
+        self.FooterBetaBalanceButton.Left:Set(function() return self.FooterGithubButton.Right() - LayoutHelpers.ScaleNumber(20) end)
+        self.FooterBetaBalanceButton.OnClick = function()
+            OpenURL('http://patchnotes.faforever.com/fafbeta')
+        end
+
+        self.FooterDevelopButton = UIUtil.CreateButtonWithDropshadow(self.Footer, '/BUTTON/medium/', "FAF Develop")
+        LayoutHelpers.AtVerticalCenterIn(self.FooterDevelopButton, self.Footer)
+        LayoutHelpers.DepthOverParent(self.FooterDevelopButton, self.Footer, 5)
+        self.FooterDevelopButton.Left:Set(function() return self.FooterBetaBalanceButton.Right() - LayoutHelpers.ScaleNumber(20) end)
+        self.FooterDevelopButton.OnClick = function()
+            OpenURL('http://patchnotes.faforever.com/fafdevelop')
+        end
+
+        self.FooterDiscordButton = UIUtil.CreateButtonWithDropshadow(self.Footer, '/BUTTON/medium/', "Report a bug")
+        LayoutHelpers.AtVerticalCenterIn(self.FooterDiscordButton, self.Footer)
         LayoutHelpers.DepthOverParent(self.FooterDiscordButton, self.Footer, 5)
-        self.FooterDiscordButton.Left:Set(function() return self.FooterGithubButton.Right() - LayoutHelpers.ScaleNumber(20) end)
+        self.FooterDiscordButton.Left:Set(function() return self.Footer.Right() - LayoutHelpers.ScaleNumber(170) end)
         self.FooterDiscordButton.OnClick = function()
-            OpenURL('http://github.com/FAForever/fa/wiki/how-to:-report-a-bug')
+            OpenURL('http://discord.gg/pK94Dk9hNz')
         end
-
-        self.FooterPatchNotesButton = UIUtil.CreateButtonWithDropshadow(self.Footer, '/BUTTON/medium/', "Balance notes")
-        LayoutHelpers.AtVerticalCenterIn(self.FooterPatchNotesButton, self.Footer, 2)
-        LayoutHelpers.DepthOverParent(self.FooterPatchNotesButton, self.Footer, 5)
-        self.FooterPatchNotesButton.Right:Set(function() return self.Footer.Right() - LayoutHelpers.ScaleNumber(220) end)
-        self.FooterPatchNotesButton:Disable()
-        self.FooterPatchNotesButton.OnClick = function()
-            OpenURL('http://github.com/FAForever/fa/blob/develop/changelog.md')
-        end
-
-        self.FooterDivider = Bitmap(self.CommonUI)
-        self.FooterDivider:SetSolidColor("99ffffff")
-        self.FooterDivider.Left:Set(function() return self.Footer.Left() + LayoutHelpers.ScaleNumber(10) end)
-        self.FooterDivider.Top:Set(function() return self.Footer.Top() - 1 end)
-        self.FooterDivider.Right:Set(function() return self.Footer.Right() - LayoutHelpers.ScaleNumber(10) end)
-        self.FooterDivider.Bottom:Set(self.Footer.Top)
 
         -- content
 
@@ -226,15 +219,6 @@ Changelog = ClassUI(Group) {
     PopulateWithPatch = function(self, index)
         local patch = data.gamePatches[index + 1]
         if patch then 
-            if patch.hasPrettyPatchnotes then 
-                self.FooterPatchNotesButton:Enable()
-                self.FooterPatchNotesButton.OnClick = function()
-                    OpenURL(string.format('http://patchnotes.faforever.com/%s.html', patch.version))
-                end
-            else 
-                self.FooterPatchNotesButton:Disable()
-            end
-
             self.ContentPatchesList:SetSelection(index)
             self.HeaderSubtitle:SetText(patch.name)
             self.ContentNotesList:DeleteAllItems()
