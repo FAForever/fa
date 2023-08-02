@@ -136,7 +136,7 @@ function OnSelectionSetChanged(name, units, applied)
                 elseif event.Modifiers.Left then
                     Selection.ApplySelectionSet(self.name)
                 elseif event.Modifiers.Right then
-                    Selection.AppendSelectionSet(self.name)
+                    Selection.AppendSelectionToSet(self.name)
                 end
             end
         end
