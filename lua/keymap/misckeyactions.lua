@@ -521,6 +521,11 @@ import("/lua/ui/game/gamemain.lua").ObserveSelection:AddObserver(
     'KeyActionHardMove'
 )
 
+DistributeOrders = function()
+    print("Distributing orders")
+    SimCallback({Func = 'DistributeOrders', Args = { }}, true)
+end
+
 AssignPlatoonBehaviorSilo = function()
     SimCallback({Func = 'AIPlatoonSiloTacticalBehavior', Args = { Behavior = 'AIBehaviorTacticalSimple' }}, true)
 end
@@ -567,5 +572,41 @@ function SelectHighestEngineerAndAssist()
         else
             -- do nothing
         end
+    end
+end
+
+local function SeparateDiveStatus(units)
+    local dummyUnitTable = { }
+    local categoriesSubmersible = categories.SUBMERSIBLE
+
+    local submergedUnits = { }
+    local surfacedUnits = { }
+
+    for k, unit in units do
+        dummyUnitTable[1] = unit
+        local status = GetIsSubmerged(dummyUnitTable)
+        if status == -1 then
+            table.insert(submergedUnits, unit)
+        elseif status == 1 then
+            table.insert(surfacedUnits, unit)
+        end
+    end
+
+    return submergedUnits, surfacedUnits
+end
+
+DiveAll = function()
+    print("Dive all")
+    local submergedUnits, surfacedUnits = SeparateDiveStatus(GetSelectedUnits())
+    if not table.empty(surfacedUnits) then
+        IssueUnitCommand(surfacedUnits, "UNITCOMMAND_Dive")
+    end
+end
+
+SurfaceAll = function()
+    print("Surface all")
+    local submergedUnits, surfacedUnits = SeparateDiveStatus(GetSelectedUnits())
+    if not table.empty(submergedUnits) then
+        IssueUnitCommand(submergedUnits, "UNITCOMMAND_Dive")
     end
 end

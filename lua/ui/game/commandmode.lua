@@ -78,15 +78,31 @@ local startBehaviors = {}
 local endBehaviors = {}
 
 --- Callback triggers when command mode starts
---- @param behavior function<CommandMode, CommandModeData>
-function AddStartBehavior(behavior)
-    TableInsert(startBehaviors, behavior)
+---@param behavior fun(mode: CommandMode, data: CommandModeData)
+---@param identifier? string
+function AddStartBehavior(behavior, identifier)
+    if identifier then
+        if startBehaviors[identifier] then
+            WARN("Overwriting command mode start behavior: " .. identifier)
+        end
+        startBehaviors[identifier] = behavior
+    else
+        TableInsert(startBehaviors, behavior)
+    end
 end
 
 --- Callback triggers when command mode ends
---- @param behavior function<CommandMode, CommandModeData>
-function AddEndBehavior(behavior)
-    TableInsert(endBehaviors, behavior)
+---@param behavior fun(mode: CommandMode, data: CommandModeData)
+---@param identifier? string
+function AddEndBehavior(behavior, identifier)
+    if identifier then
+        if endBehaviors[identifier] then
+            WARN("Overwriting command mode end behavior: " .. identifier)
+        end
+        endBehaviors[identifier] = behavior
+    else
+        TableInsert(endBehaviors, behavior)
+    end
 end
 
 --- usually changing selection ends the command mode, this allows us to ignore that
@@ -190,7 +206,6 @@ end
 -- @param pos The position of the feedback animation.
 -- @param type The type of feedback animation.
 function AddCommandFeedbackByType(pos, type)
-
     if commandMeshResources[type] == nil then
         return false;
     else
@@ -267,6 +282,7 @@ function CapStructure(command)
     local isTech1 = structure:IsInCategory('TECH1')
     local isTech2 = structure:IsInCategory('TECH2')
     local isTech3 = structure:IsInCategory('TECH3')
+    local isTech4 = structure:IsInCategory('EXPERIMENTAL')
 
     -- only run logic for structures
     if structure:IsInCategory('STRUCTURE') then
@@ -302,8 +318,7 @@ function CapStructure(command)
 
                 structure.RingStoragesStamp = gametime
 
-                SimCallback({ Func = 'CapStructure', Args = { target = command.Target.EntityId, layer = 1, id = "b1106" } }
-                    , true)
+                SimCallback({ Func = 'CapStructure', Args = { target = command.Target.EntityId, layer = 1, id = "b1106" } }, true)
 
                 -- only clear state if we can't make fabricators
                 if (isTech1 and isUpgrading) or (isTech2 and not isUpgrading) then
@@ -325,8 +340,7 @@ function CapStructure(command)
 
                 structure.RingFabsStamp = gametime
 
-                SimCallback({ Func = 'CapStructure', Args = { target = command.Target.EntityId, layer = 2, id = "b1104" } }
-                    , true)
+                SimCallback({ Func = 'CapStructure', Args = { target = command.Target.EntityId, layer = 2, id = "b1104" } }, true)
 
                 -- reset state
                 structure = nil
@@ -347,27 +361,47 @@ function CapStructure(command)
 
             structure.RingStamp = gametime
 
-            -- if we have a t3 fabricator, create storages around it
+            -- if we have a T3 fabricator, create storages around it
             if structure:IsInCategory('MASSFABRICATION') and isTech3 then
-                SimCallback({ Func = 'CapStructure', Args = { target = command.Target.EntityId, layer = 1, id = "b1106" } }
-                    , true)
-
+                SimCallback({ Func = 'CapStructure', Args = { target = command.Target.EntityId, layer = 1, id = "b1106" } }, true)
                 -- reset state
                 structure = nil
                 pStructure1 = nil
                 pStructure2 = nil
 
-                -- if we have a t2 artillery, create t1 pgens around it
+            -- if we have a T2 fabricator, create storages around it
+            elseif structure:IsInCategory('MASSFABRICATION') and isTech2 then
+                SimCallback({ Func = 'CapStructure', Args = { target = command.Target.EntityId, layer = 1, id = "b1106" } }, true)
+                -- reset state
+                structure = nil
+                pStructure1 = nil
+                pStructure2 = nil
+
+            -- if we have a T2 artillery, create T1 pgens around it
             elseif structure:IsInCategory('ARTILLERY') and isTech2 then
-                SimCallback({ Func = 'CapStructure', Args = { target = command.Target.EntityId, layer = 1, id = "b1101" } }
-                    , true)
-
+                SimCallback({ Func = 'CapStructure', Args = { target = command.Target.EntityId, layer = 1, id = "b1101" } }, true)
                 -- reset state
                 structure = nil
                 pStructure1 = nil
                 pStructure2 = nil
 
-                -- if we have a radar, create t1 pgens around it
+            -- if we have a T3 artillery, create T3 pgens around it
+            elseif structure:IsInCategory('ARTILLERY') and isTech3 then
+                SimCallback({ Func = 'CapStructure', Args = { target = command.Target.EntityId, layer = 1, id = "b1301" } }, true)
+                -- reset state
+                structure = nil
+                pStructure1 = nil
+                pStructure2 = nil
+
+            -- if we have a T4 artillery, create T3 pgens around it
+            elseif structure:IsInCategory('ARTILLERY') and isTech4 then
+                SimCallback({ Func = 'CapStructure', Args = { target = command.Target.EntityId, layer = 1, id = "b1301" } }, true)
+                -- reset state
+                structure = nil
+                pStructure1 = nil
+                pStructure2 = nil
+
+            -- if we have a radar, create T1 pgens around it
             elseif structure:IsInCategory('RADAR')
                 and (
                 (isTech1 and isUpgrading and isDoubleTapped and isShiftDown)
@@ -376,19 +410,15 @@ function CapStructure(command)
                 )
                 or structure:IsInCategory('OMNI')
             then
-                SimCallback({ Func = 'CapStructure', Args = { target = command.Target.EntityId, layer = 1, id = "b1101" } }
-                    , true)
-
+                SimCallback({ Func = 'CapStructure', Args = { target = command.Target.EntityId, layer = 1, id = "b1101" } }, true)
                 -- reset state
                 structure = nil
                 pStructure1 = nil
                 pStructure2 = nil
 
-                -- if we have a t1 point defense, create walls around it
+            -- if we have a T1 point defense, create walls around it
             elseif structure:IsInCategory('DIRECTFIRE') and isTech1 then
-                SimCallback({ Func = 'CapStructure', Args = { target = command.Target.EntityId, layer = 1, id = "b5101" } }
-                    , true)
-
+                SimCallback({ Func = 'CapStructure', Args = { target = command.Target.EntityId, layer = 1, id = "b5101" } }, true)
                 -- reset state
                 structure = nil
                 pStructure1 = nil

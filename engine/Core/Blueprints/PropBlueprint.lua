@@ -9,10 +9,6 @@
 ---@field Physics PropBlueprintPhysics
 ---@field ScriptClass PropType Class name for this prop
 ---@field ScriptModule FileName File to find class in
----
---- auto-generated field if this is a blueprint from a unit wreckage
----@field UnitWreckage? boolean
-
 
 ---@class PropBlueprintDefense
 --- max health value for the prop

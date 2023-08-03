@@ -145,7 +145,7 @@ function Unit:GetCargo()
 end
 
 --- Returns table of commands queued up for this unit
----@return OrderInfo[]
+---@return { }
 function Unit:GetCommandQueue()
 end
 

@@ -1900,6 +1900,22 @@ function ToggleUnitPause()
     end
 end
 
+function ToggleUnitPauseAll()
+    if controls.selectionTab:IsChecked() or controls.constructionTab:IsChecked() then
+        controls.extraBtn2:ToggleCheck(false)
+    else
+        SetPaused(sortedOptions.selection, true)
+    end
+end
+
+function ToggleUnitUnpauseAll()
+    if controls.selectionTab:IsChecked() or controls.constructionTab:IsChecked() then
+        controls.extraBtn2:OnCheck(true)
+    else
+        SetPaused(sortedOptions.selection, false)
+    end
+end
+
 function CreateExtraControls(controlType)
     local SetupPauseButton = function()
         Tooltip.AddCheckboxTooltip(controls.extraBtn2, 'construction_pause')
