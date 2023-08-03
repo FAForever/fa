@@ -841,11 +841,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
             WaitSeconds(5)
 
             -- Check if there is a better target nearby
-            if self.Blueprint.WeaponUnpacks then
-               --Do nothing
-            else
-               self:ResetTarget()
-            end
+            self:ResetTarget()
         end,
 
         OnFire = function(self)
