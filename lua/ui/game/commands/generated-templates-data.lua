@@ -195,7 +195,7 @@ CapT2ArtilleryWithPower = {
 
 CapT3FabricatorWithStorages = {
     Name = 'Storages',
-    TriggersOnHover = categories.STRUCTHRE * categories.MASSFABRICATION * categories.TECH3,
+    TriggersOnHover = categories.STRUCTURE * categories.MASSFABRICATION * categories.TECH3,
     TriggersOnSelection = categories.TECH2 + categories.TECH3 + categories.COMMAND,
     TemplateData = {
         0,
@@ -277,7 +277,7 @@ CapT3FabricatorWithStorages = {
 
 CapT3ArtilleryWithPower = {
     Name = 'Power generators',
-    TriggersOnHover = categories.STRUCTHRE * categories.ARTILLERY * (categories.TECH3 + categories.EXPERIMENTAL),
+    TriggersOnHover = categories.STRUCTURE * categories.ARTILLERY * (categories.TECH3 + categories.EXPERIMENTAL),
     TriggersOnSelection = categories.TECH3 + categories.COMMAND,
     TemplateData = {
         0,
