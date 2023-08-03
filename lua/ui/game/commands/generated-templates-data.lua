@@ -2,7 +2,7 @@
 ---@field Name string                           # Printed on screen when cycling build templates
 ---@field TriggersOnHover EntityCategory        # Selection filter based on the categories of the unit we're hovering over
 ---@field TriggersOnSelection EntityCategory    # selection filter based on the categories of the units in our selection
----@field CopyUnit boolean                      # When true, copies the blueprint id of the unit we're hovering over into the first unit of the build template 
+---@field CopyUnit boolean                      # When true, copies the blueprint id of the unit we're hovering over into the first unit of the build template
 ---@field TemplateData BuildTemplate            # A regular build template, except that it is written in Pascal Case
 ---@field Order? number                         # Allows you to sort the templates
 ---@field SortTemplate? boolean                 # When true, sorts the buildings based on the distance to the average position of your selection
@@ -44,7 +44,7 @@ CapExtractorWithStorages = {
 
 ---@type GenerativeBuildTemplate
 CapExtractorWithFabs = {
-    Name = 'Storages and  fabricators',
+    Name = 'Storages and fabricators',
     TriggersOnHover = categories.MASSEXTRACTION * categories.TECH2,
     TriggersOnSelection = categories.TECH2 + categories.TECH3,
     TemplateData = {
@@ -129,7 +129,6 @@ CapRadarWithPower = {
     Name = 'Power generators',
     TriggersOnHover = (categories.RADAR + categories.OMNI) * categories.STRUCTURE,
     TriggersOnSelection = categories.TECH1 + categories.TECH2 + categories.TECH3 + categories.COMMAND,
-    CopyUnit = false,
     TemplateData = {
         0,
         0,
@@ -164,7 +163,6 @@ CapT2ArtilleryWithPower = {
     Name = 'Power generators',
     TriggersOnHover = categories.ARTILLERY * categories.STRUCTURE * categories.TECH2,
     TriggersOnSelection = categories.TECH1 + categories.TECH2 + categories.TECH3 + categories.COMMAND,
-    CopyUnit = false,
     TemplateData = {
         0,
         0,
@@ -195,166 +193,182 @@ CapT2ArtilleryWithPower = {
     }
 }
 
----@type GenerativeBuildTemplate
-Test01 = {
-    Name = 'Test01',
-    TriggersOnHover = categories.AIR * categories.FACTORY,
-    TriggersOnSelection = categories.TECH1 + categories.TECH2 + categories.TECH3 + categories.COMMAND,
+CapT3FabricatorWithStorages = {
+    Name = 'Storages',
+    TriggersOnHover = categories.STRUCTHRE * categories.MASSFABRICATION * categories.TECH3,
+    TriggersOnSelection = categories.TECH2 + categories.TECH3 + categories.COMMAND,
     TemplateData = {
         0,
         0,
         {
-            'uab0102',
-            8980,
+            'uab1106',
+            2605,
+            -2,
+            4
+        },
+        {
+            'uab1106',
+            2621,
+            0,
+            4
+        },
+        {
+            'uab1106',
+            2636,
             2,
+            4
+        },
+        {
+            'uab1106',
+            2651,
+            4,
             2
         },
         {
-            'uab1101',
-            9005,
-            -1,
-            7
+            'uab1106',
+            2666,
+            4,
+            0
         },
         {
-            'uab1101',
-            9012,
-            1,
-            7
+            'uab1106',
+            2680,
+            4,
+            -2
         },
         {
-            'uab1101',
-            9020,
-            3,
-            7
+            'uab1106',
+            2695,
+            2,
+            -4
         },
         {
-            'uab1101',
-            9027,
-            5,
-            7
+            'uab1106',
+            2710,
+            0,
+            -4
+        },
+        {
+            'uab1106',
+            2724,
+            -2,
+            -4
+        },
+        {
+            'uab1106',
+            2738,
+            -4,
+            -2
+        },
+        {
+            'uab1106',
+            2753,
+            -4,
+            0
+        },
+        {
+            'uab1106',
+            2767,
+            -4,
+            2
         }
     },
 }
 
----@type GenerativeBuildTemplate
-Test02 = {
-    Name = 'Test02',
-    TriggersOnHover = categories.AIR * categories.FACTORY,
-    TriggersOnSelection = categories.TECH1 + categories.TECH2 + categories.TECH3 + categories.COMMAND,
-    TemplateData = {
-        10,
-        8,
-        {
-            'uab0102',
-            8980,
-            2,
-            2
-        },
-        {
-            'uab1101',
-            9035,
-            -3,
-            5
-        },
-        {
-            'uab1101',
-            9042,
-            -3,
-            3
-        },
-        {
-            'uab1101',
-            9050,
-            -3,
-            1
-        },
-        {
-            'uab1101',
-            9057,
-            -3,
-            -1
-        }
-    },
-}
-
----@type GenerativeBuildTemplate
-Test03 = {
-    Name = 'Test03',
-    TriggersOnHover = categories.AIR * categories.FACTORY,
-    TriggersOnSelection = categories.TECH1 + categories.TECH2 + categories.TECH3 + categories.COMMAND,
-    TemplateData = {
-        8,
-        10,
-        {
-            'uab0102',
-            8980,
-            2,
-            2
-        },
-        {
-            'uab1101',
-            9096,
-            5,
-            -3
-        },
-        {
-            'uab1101',
-            9104,
-            3,
-            -3
-        },
-        {
-            'uab1101',
-            9111,
-            1,
-            -3
-        },
-        {
-            'uab1101',
-            9119,
-            -1,
-            -3
-        }
-    },
-}
-
----@type GenerativeBuildTemplate
-Test04 = {
-    Name = 'Test04',
-    TriggersOnHover = categories.AIR * categories.FACTORY,
-    TriggersOnSelection = categories.TECH1 + categories.TECH2 + categories.TECH3 + categories.COMMAND,
+CapT3ArtilleryWithPower = {
+    Name = 'Power generators',
+    TriggersOnHover = categories.STRUCTHRE * categories.ARTILLERY * (categories.TECH3 + categories.EXPERIMENTAL),
+    TriggersOnSelection = categories.TECH3 + categories.COMMAND,
     TemplateData = {
         0,
         0,
         {
-            'uab0102',
-            8980,
-            2,
+            'uab1301',
+            5352,
+            10,
             2
         },
         {
-            'uab1101',
-            9066,
-            7,
-            -1
+            'uab1301',
+            5369,
+            2,
+            10
         },
         {
-            'uab1101',
-            9074,
-            7,
-            1
+            'uab1301',
+            5385,
+            -6,
+            2
         },
         {
-            'uab1101',
-            9081,
-            7,
-            3
-        },
-        {
-            'uab1101',
-            9089,
-            7,
-            5
+            'uab1301',
+            5408,
+            2,
+            -6
         }
+    },
+}
+
+CapAirWithPowerRight = {
+    Name = 'Power generators - right',
+    TriggersOnHover = categories.AIR * categories.TECH3 * categories.STRUCTURE,
+    TriggersOnSelection = categories.TECH3 + categories.COMMAND,
+    TemplateData = {
+        0,
+        0,
+        {
+            'uab1301',
+            5352,
+            10,
+            2
+        },
+    },
+}
+
+CapAirWithPowerLeft = {
+    Name = 'Power generators - left',
+    TriggersOnHover = categories.AIR * categories.TECH3 * categories.STRUCTURE,
+    TriggersOnSelection = categories.TECH3 + categories.COMMAND,
+    TemplateData = {
+        0,
+        0,
+        {
+            'uab1301',
+            5385,
+            -6,
+            2
+        },
+    },
+}
+
+CapAirWithPowerTop = {
+    Name = 'Power generators - top',
+    TriggersOnHover = categories.AIR * categories.TECH3 * categories.STRUCTURE,
+    TriggersOnSelection = categories.TECH3 + categories.COMMAND,
+    TemplateData = {
+        0,
+        0,
+        {
+            'uab1301',
+            5408,
+            2,
+            -6
+        }
+    },
+}
+
+CapAirWithPowerBottom = {
+    Name = 'Power generators - bottom',
+    TriggersOnHover = categories.AIR * categories.TECH3 * categories.STRUCTURE,
+    TriggersOnSelection = categories.TECH3 + categories.COMMAND,
+    TemplateData = {
+        0,
+        0,
+        {
+            'uab1301',
+            5369,
+            2,
+            10
+        },
     },
 }
