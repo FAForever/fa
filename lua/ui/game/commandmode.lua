@@ -78,15 +78,31 @@ local startBehaviors = {}
 local endBehaviors = {}
 
 --- Callback triggers when command mode starts
---- @param behavior function<CommandMode, CommandModeData>
-function AddStartBehavior(behavior)
-    TableInsert(startBehaviors, behavior)
+---@param behavior fun(mode: CommandMode, data: CommandModeData)
+---@param identifier? string
+function AddStartBehavior(behavior, identifier)
+    if identifier then
+        if startBehaviors[identifier] then
+            WARN("Overwriting command mode start behavior: " .. identifier)
+        end
+        startBehaviors[identifier] = behavior
+    else
+        TableInsert(startBehaviors, behavior)
+    end
 end
 
 --- Callback triggers when command mode ends
---- @param behavior function<CommandMode, CommandModeData>
-function AddEndBehavior(behavior)
-    TableInsert(endBehaviors, behavior)
+---@param behavior fun(mode: CommandMode, data: CommandModeData)
+---@param identifier? string
+function AddEndBehavior(behavior, identifier)
+    if identifier then
+        if endBehaviors[identifier] then
+            WARN("Overwriting command mode end behavior: " .. identifier)
+        end
+        endBehaviors[identifier] = behavior
+    else
+        TableInsert(endBehaviors, behavior)
+    end
 end
 
 --- usually changing selection ends the command mode, this allows us to ignore that
@@ -190,7 +206,6 @@ end
 -- @param pos The position of the feedback animation.
 -- @param type The type of feedback animation.
 function AddCommandFeedbackByType(pos, type)
-
     if commandMeshResources[type] == nil then
         return false;
     else
