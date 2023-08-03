@@ -1596,8 +1596,8 @@ local keyActionsOrdersAdvanced = {
         action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").DistributeOrders()',
         category = 'ordersAdvanced',
     },
-    ['cycle_templates'] = {
-        action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").CycleTemplates()',
+    ['cycle_generated_templates'] = {
+        action = 'UI_Lua import("/lua/ui/game/commands/generated-templates.lua").Cycle()',
         category = 'ordersAdvanced',
     },
 }

@@ -55,7 +55,7 @@ function OnCommandGraphShow(show)
 --    end
 end
 
-function OnCommandDragBegin()
+function OnCommandDragBegin(...)
 --    local worldView = import("/lua/ui/game/worldview.lua").view
 --    worldView:OnCommandDragBegin()
 --

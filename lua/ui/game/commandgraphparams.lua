@@ -27,7 +27,7 @@ CommandGraphParams = {
         waypoint_highlight_color = 'ffffffff',
         waypoint_scale = 1,
         waypoint_selected_scale = 1,
-        waypoint_highlight_scale = 1,
+        waypoint_highlight_scale = 2,
 
         arrowhead_cap_offset = -0.1,
     },
