@@ -206,8 +206,6 @@ end
 -- @param pos The position of the feedback animation.
 -- @param type The type of feedback animation.
 function AddCommandFeedbackByType(pos, type)
-
-    LOG(type)
     if commandMeshResources[type] == nil then
         return false;
     else

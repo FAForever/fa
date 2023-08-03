@@ -16,8 +16,7 @@ commandMeshResources = {
 	Reclaim = { '/meshes/game/Reclaim_lod0.scm', '/meshes/game/Reclaim_albedo.dds' },
 	Repair = { '/meshes/game/Repair_lod0.scm', '/meshes/game/Repair_albedo.dds' },
 	Sacrifice = { '/meshes/game/Sacrifice_lod0.scm', '/meshes/game/Sacrifice_albedo.dds' },
-	Teleport = { '/meshes/game/Teleport_lod0.scm', '/meshes/game/Teleport_albedo.dds' },	
-	Script = { '/meshes/game/Patrol_lod0.scm', '/meshes/game/Patrol_albedo.dds' },
+	Teleport = { '/meshes/game/Teleport_lod0.scm', '/meshes/game/Teleport_albedo.dds' },
 }
 
 rallyMeshes = {
