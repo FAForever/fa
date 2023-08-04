@@ -76,29 +76,6 @@ local FindFactionPrefix = function(units)
     return nil
 end
 
----@param units UserUnit[]
----@return 'BUILTBYTIER1ENGINEER' | 'BUILTBYTIER2ENGINEER' | 'BUILTBYTIER3ENGINEER' | nil
-local FindBuildableTech = function(units)
-    local unitCount = table.getn(units)
-
-    local tech3Count = table.getn(EntityCategoryFilterDown(categories.TECH3 * categories.ENGINEER, units))
-    if tech3Count == unitCount then
-        return 'BUILTBYTIER3ENGINEER'
-    end
-
-    local tech2Count = table.getn(EntityCategoryFilterDown(categories.TECH2 * categories.ENGINEER, units))
-    if tech2Count == unitCount then
-        return 'BUILTBYTIER2ENGINEER'
-    end
-
-    local tech1Count = table.getn(EntityCategoryFilterDown(categories.TECH1 * categories.ENGINEER, units))
-    if tech1Count == unitCount then
-        return 'BUILTBYTIER1ENGINEER'
-    end
-
-    return nil
-end
-
 Cycle = function()
 
     -- SavePreferences()
