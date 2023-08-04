@@ -1,7 +1,6 @@
 ---@class GenerativeBuildTemplate
 ---@field Name string                           # Printed on screen when cycling build templates
 ---@field TriggersOnHover EntityCategory        # Selection filter based on the categories of the unit we're hovering over
----@field TriggersOnSelection EntityCategory    # selection filter based on the categories of the units in our selection
 ---@field CopyUnit boolean                      # When true, copies the blueprint id of the unit we're hovering over into the first unit of the build template
 ---@field TemplateData BuildTemplate            # A regular build template, except that it is written in Pascal Case
 ---@field Order? number                         # Allows you to sort the templates
@@ -11,7 +10,6 @@
 CapExtractorWithStorages = {
     Name = 'Storages',
     TriggersOnHover = categories.MASSEXTRACTION,
-    TriggersOnSelection = categories.TECH1 + categories.TECH2 + categories.TECH3 + categories.COMMAND,
     TemplateData = {
         0,
         0,
@@ -45,8 +43,7 @@ CapExtractorWithStorages = {
 ---@type GenerativeBuildTemplate
 CapExtractorWithFabs = {
     Name = 'Storages and fabricators',
-    TriggersOnHover = categories.MASSEXTRACTION * categories.TECH2,
-    TriggersOnSelection = categories.TECH2 + categories.TECH3,
+    TriggersOnHover = categories.MASSEXTRACTION * (categories.TECH2 + categories.TECH3),
     TemplateData = {
         10,
         10,
@@ -128,7 +125,6 @@ CapExtractorWithFabs = {
 CapRadarWithPower = {
     Name = 'Power generators',
     TriggersOnHover = (categories.RADAR + categories.OMNI) * categories.STRUCTURE,
-    TriggersOnSelection = categories.TECH1 + categories.TECH2 + categories.TECH3 + categories.COMMAND,
     TemplateData = {
         0,
         0,
@@ -195,8 +191,7 @@ CapT2ArtilleryWithPower = {
 
 CapT3FabricatorWithStorages = {
     Name = 'Storages',
-    TriggersOnHover = categories.STRUCTHRE * categories.MASSFABRICATION * categories.TECH3,
-    TriggersOnSelection = categories.TECH2 + categories.TECH3 + categories.COMMAND,
+    TriggersOnHover = categories.STRUCTURE * categories.MASSFABRICATION * categories.TECH3,
     TemplateData = {
         0,
         0,
@@ -277,8 +272,7 @@ CapT3FabricatorWithStorages = {
 
 CapT3ArtilleryWithPower = {
     Name = 'Power generators',
-    TriggersOnHover = categories.STRUCTHRE * categories.ARTILLERY * (categories.TECH3 + categories.EXPERIMENTAL),
-    TriggersOnSelection = categories.TECH3 + categories.COMMAND,
+    TriggersOnHover = categories.STRUCTURE * categories.ARTILLERY * (categories.TECH3 + categories.EXPERIMENTAL),
     TemplateData = {
         0,
         0,
@@ -312,7 +306,6 @@ CapT3ArtilleryWithPower = {
 CapAirWithPowerRight = {
     Name = 'Power generators - right',
     TriggersOnHover = categories.AIR * categories.TECH3 * categories.STRUCTURE,
-    TriggersOnSelection = categories.TECH3 + categories.COMMAND,
     TemplateData = {
         0,
         0,
@@ -328,7 +321,6 @@ CapAirWithPowerRight = {
 CapAirWithPowerLeft = {
     Name = 'Power generators - left',
     TriggersOnHover = categories.AIR * categories.TECH3 * categories.STRUCTURE,
-    TriggersOnSelection = categories.TECH3 + categories.COMMAND,
     TemplateData = {
         0,
         0,
@@ -344,7 +336,6 @@ CapAirWithPowerLeft = {
 CapAirWithPowerTop = {
     Name = 'Power generators - top',
     TriggersOnHover = categories.AIR * categories.TECH3 * categories.STRUCTURE,
-    TriggersOnSelection = categories.TECH3 + categories.COMMAND,
     TemplateData = {
         0,
         0,
@@ -360,7 +351,6 @@ CapAirWithPowerTop = {
 CapAirWithPowerBottom = {
     Name = 'Power generators - bottom',
     TriggersOnHover = categories.AIR * categories.TECH3 * categories.STRUCTURE,
-    TriggersOnSelection = categories.TECH3 + categories.COMMAND,
     TemplateData = {
         0,
         0,
