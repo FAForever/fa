@@ -76,29 +76,6 @@ local FindFactionPrefix = function(units)
     return nil
 end
 
----@param units UserUnit[]
----@return 'BUILTBYTIER1ENGINEER' | 'BUILTBYTIER2ENGINEER' | 'BUILTBYTIER3ENGINEER' | nil
-local FindBuildableTech = function(units)
-    local unitCount = table.getn(units)
-
-    local tech3Count = table.getn(EntityCategoryFilterDown(categories.TECH3 * categories.ENGINEER, units))
-    if tech3Count == unitCount then
-        return 'BUILTBYTIER3ENGINEER'
-    end
-
-    local tech2Count = table.getn(EntityCategoryFilterDown(categories.TECH2 * categories.ENGINEER, units))
-    if tech2Count == unitCount then
-        return 'BUILTBYTIER2ENGINEER'
-    end
-
-    local tech1Count = table.getn(EntityCategoryFilterDown(categories.TECH1 * categories.ENGINEER, units))
-    if tech1Count == unitCount then
-        return 'BUILTBYTIER1ENGINEER'
-    end
-
-    return nil
-end
-
 Cycle = function()
 
     -- SavePreferences()
@@ -111,11 +88,12 @@ Cycle = function()
         local selectedUnits = GetSelectedUnits()
         if selectedUnits then
             local selectedUnitCount = table.getn(selectedUnits)
+            local _, _, buildableCategories = GetUnitCommandData(selectedUnits)
+            local buildableUnits = table.hash(EntityCategoryGetUnitList(buildableCategories))
 
-            -- sanity check for only engineers in the selection
-            local tech = FindBuildableTech(selectedUnits)
-            if not tech then
-                print("No templates for " .. tostring(tech))
+            -- sanity check if we can build anything at all
+            if table.empty(buildableUnits) then
+                print("No templates available")
                 return
             end
 
@@ -141,9 +119,7 @@ Cycle = function()
                 local generativeTemplate = PredefinedTemplates[k]
 
                 -- basic validation provided by the author of the template
-                if  EntityCategoryContains(generativeTemplate.TriggersOnHover, userUnit) and
-                    EntityCategoryFilterOut(generativeTemplate.TriggersOnSelection, selectedUnits)
-                then
+                if  EntityCategoryContains(generativeTemplate.TriggersOnHover, userUnit) then
                     -- copy the unit we're hovering over into the first unit in the template
                     if generativeTemplate.CopyUnit then
                         generativeTemplate.TemplateData[3][1] = info.blueprintId
@@ -157,7 +133,7 @@ Cycle = function()
                         local templateUnitBlueprintId = prefix .. templateUnit[1]:sub(3)
                         local templateUnitBlueprint = __blueprints[templateUnitBlueprintId]
                         if templateUnitBlueprint then
-                            if templateUnitBlueprint.CategoriesHash[tech] then
+                            if buildableUnits[templateUnitBlueprintId] then
                                 templateUnit[1] = templateUnitBlueprintId
                             else
                                 allUnitsBuildable = false
