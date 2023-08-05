@@ -482,7 +482,7 @@ function AdjustValueScale(val)
 end
 
 function ReverseScaling(val)
-    LOG('Val pre reverse='..val..'; expected val post reversal='..(val * val)..'; scaled value of this='..AdjustValueScale((val * val)))
+    --LOG('Val pre reverse='..val..'; expected val post reversal='..(val * val)..'; scaled value of this='..AdjustValueScale((val * val)))
     return val * val
 end
 
@@ -709,12 +709,12 @@ function create_graph(parent,path,x1,y1,x2,y2)
     end
     --LOG(maxvalue)
     --arranging the highest value to be nice to see
-    LOG('Max value pre adjust='..maxvalue)
+    --LOG('Max value pre adjust='..maxvalue)
     --maxvalue=arrange(maxvalue*1.02)
     maxvalue = math.ceil(AdjustValueScale(ReverseScaling(maxvalue)*1.05))
     -- calculate the scale factor on y
     local factor=(y2-y1)/maxvalue
-    LOG('max value post adjust='..maxvalue..'; factor='..factor..'; y2='..y2..'; y1='..y1)
+    --LOG('max value post adjust='..maxvalue..'; factor='..factor..'; y2='..y2..'; y1='..y1)
     --LOG("Value the highest:",maxvalue,"   final time saved:",scoreInterval*data_nbr,"   scale factor on y:",factor)
     -- drawing the axies/quadrillage
     local j=1
