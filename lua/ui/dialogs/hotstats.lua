@@ -486,6 +486,26 @@ function ReverseScaling(val)
     return val * val
 end
 
+function FormatNumber(number)
+    local sString = tostring(number)
+    local sNewString = ''
+    --LOG('sString len='..string.len(sString))
+    local iCurCount = 0
+    for iChar = string.len(sString), 1, -1 do
+        iCurCount = iCurCount + 1
+        sNewString = string.sub(sString, iChar, iChar)..sNewString
+        if iCurCount >= 3 then
+            iCurCount = 0
+            if iChar > 1 then
+                sNewString = ','..sNewString
+            end
+
+        end
+    end
+
+    return sNewString
+end
+
 -- if periode=0 then return the current value
 function return_value(periode,player,path)
     local val
@@ -711,7 +731,7 @@ function create_graph(parent,path,x1,y1,x2,y2)
         quadrillage_horiz[j]:SetSolidColor("white")
         quadrillage_horiz[j].Depth:Set(grp.Depth)
 
-        quadrillage_horiz[j].title_label=UIUtil.CreateText(grp,math.floor(ReverseScaling((j-1)/(nbr_quadrillage_horiz-2)*maxvalue)), 14, UIUtil.titleFont) --Do the exponentional to reverse the logarithmix for the y axis, i.e. want to show what the actual score is on the axis
+        quadrillage_horiz[j].title_label=UIUtil.CreateText(grp,FormatNumber(math.floor(ReverseScaling((j-1)/(nbr_quadrillage_horiz-2)*maxvalue))), 14, UIUtil.titleFont) --Do the exponentional to reverse the logarithmix for the y axis, i.e. want to show what the actual score is on the axis
         quadrillage_horiz[j].title_label.Right:Set(parent.Left() + x1 -8)
         quadrillage_horiz[j].title_label.Bottom:Set(parent.Top() +y2 - (y2-y1)*((tmp-1)/(nbr_quadrillage_horiz-2))+1)
         quadrillage_horiz[j].title_label:SetColor("white")
@@ -843,7 +863,7 @@ function create_graph(parent,path,x1,y1,x2,y2)
         for index, dat in player do
             value_graph_label[dat.index]={}
             val=math.floor(ReverseScaling(return_value(periode,dat.index,path))) --This is the value label that gets shown on the graph for each player, e.g. for the winner this will be the end-game high score achieved (not sure if this is the highest value at any point in the game or just the score at the end of the game)
-            value_graph_label[dat.index].title_label=UIUtil.CreateText(grp,val, 14, UIUtil.titleFont)
+            value_graph_label[dat.index].title_label=UIUtil.CreateText(grp,FormatNumber(val), 14, UIUtil.titleFont)
             value_graph_label[dat.index].title_label.Right:Set(x-1)
             value_graph_label[dat.index].title_label.Bottom:Set(line[dat.index].y-1)
             value_graph_label[dat.index].title_label:SetColor(dat.color)
@@ -866,7 +886,7 @@ function create_graph(parent,path,x1,y1,x2,y2)
                 infoText = false
             end
             if posX()>x1 and posX()<x2 and posY()>y1 and posY()<y2 then
-                local  value = tps_format((posX()-x1)/(x2-x1)*scoreInterval*data_nbr) .. " / " .. math.floor(ReverseScaling((y2-posY())/factor)) --This is the value that gets shown when we hover the mouse over any point in the graph, so want to do exponentional to reverse the logarithmic so we see the actual value
+                local  value = tps_format((posX()-x1)/(x2-x1)*scoreInterval*data_nbr) .. " / " .. FormatNumber(math.floor(ReverseScaling((y2-posY())/factor))) --This is the value that gets shown when we hover the mouse over any point in the graph, so want to do exponentional to reverse the logarithmic so we see the actual value
                 infoText = UIUtil.CreateText(grp,value, 14, UIUtil.titleFont)
                 infoText.Left:Set(function() return posX()-(infoText.Width()/2) end)
                 infoText.Bottom:Set(function() return posY()-7 end)
