@@ -1,12 +1,9 @@
 
 ---@class ContextBasedTemplate
----@field Name string                           # Printed on screen when cycling build templates
----@field TriggersOnHover EntityCategory        # Selection filter based on the categories of the unit we're hovering over
----@field TriggersOnEmptySpace boolean
+---@field Name string                           # Printed on screen when cycling the templates
 ---@field TemplateData BuildTemplate            # A regular build template, except that it is written in Pascal Case
--- ---@field CopyUnit boolean                   # When true, copies the blueprint id of the unit we're hovering over into the first unit of the build template
--- ---@field Order? number                      # Allows you to sort the templates
--- ---@field SortTemplate? boolean              # When true, sorts the buildings based on the distance to the average position of your selection
+---@field TriggersOnHover? EntityCategory       # When defined, includes this template when the unit the mouse is hovering over matches the categories
+---@field TriggersOnEmptySpace? boolean         # When true, includes this template when the mouse does not hover over a unit
 
 ---@type ContextBasedTemplate
 CapExtractorWithStorages = {
