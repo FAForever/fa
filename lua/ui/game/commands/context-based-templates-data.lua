@@ -1,11 +1,12 @@
+
 ---@class ContextBasedTemplate
 ---@field Name string                           # Printed on screen when cycling build templates
 ---@field TriggersOnHover EntityCategory        # Selection filter based on the categories of the unit we're hovering over
 ---@field TriggersOnEmptySpace boolean
----@field CopyUnit boolean                      # When true, copies the blueprint id of the unit we're hovering over into the first unit of the build template
 ---@field TemplateData BuildTemplate            # A regular build template, except that it is written in Pascal Case
----@field Order? number                         # Allows you to sort the templates
----@field SortTemplate? boolean                 # When true, sorts the buildings based on the distance to the average position of your selection
+-- ---@field CopyUnit boolean                   # When true, copies the blueprint id of the unit we're hovering over into the first unit of the build template
+-- ---@field Order? number                      # Allows you to sort the templates
+-- ---@field SortTemplate? boolean              # When true, sorts the buildings based on the distance to the average position of your selection
 
 ---@type ContextBasedTemplate
 CapExtractorWithStorages = {
@@ -123,6 +124,7 @@ CapExtractorWithFabs = {
     },
 }
 
+---@type ContextBasedTemplate
 CapRadarWithPower = {
     Name = 'Power generators',
     TriggersOnHover = (categories.RADAR + categories.OMNI) * categories.STRUCTURE,
@@ -156,6 +158,7 @@ CapRadarWithPower = {
     }
 }
 
+---@type ContextBasedTemplate
 CapT2ArtilleryWithPower = {
     Name = 'Power generators',
     TriggersOnHover = categories.ARTILLERY * categories.STRUCTURE * categories.TECH2,
@@ -190,6 +193,7 @@ CapT2ArtilleryWithPower = {
     }
 }
 
+---@type ContextBasedTemplate
 CapT3FabricatorWithStorages = {
     Name = 'Storages',
     TriggersOnHover = categories.STRUCTURE * categories.MASSFABRICATION * categories.TECH3,
@@ -271,6 +275,7 @@ CapT3FabricatorWithStorages = {
     },
 }
 
+---@type ContextBasedTemplate
 CapT3ArtilleryWithPower = {
     Name = 'Power generators',
     TriggersOnHover = categories.STRUCTURE * categories.ARTILLERY * (categories.TECH3 + categories.EXPERIMENTAL),
@@ -304,6 +309,7 @@ CapT3ArtilleryWithPower = {
     },
 }
 
+---@type ContextBasedTemplate
 CapAirWithPowerRight = {
     Name = 'Power generators - right',
     TriggersOnHover = categories.AIR * categories.TECH3 * categories.STRUCTURE,
@@ -319,6 +325,7 @@ CapAirWithPowerRight = {
     },
 }
 
+---@type ContextBasedTemplate
 CapAirWithPowerLeft = {
     Name = 'Power generators - left',
     TriggersOnHover = categories.AIR * categories.TECH3 * categories.STRUCTURE,
@@ -334,6 +341,7 @@ CapAirWithPowerLeft = {
     },
 }
 
+---@type ContextBasedTemplate
 CapAirWithPowerTop = {
     Name = 'Power generators - top',
     TriggersOnHover = categories.AIR * categories.TECH3 * categories.STRUCTURE,
@@ -349,6 +357,7 @@ CapAirWithPowerTop = {
     },
 }
 
+---@type ContextBasedTemplate
 CapAirWithPowerBottom = {
     Name = 'Power generators - bottom',
     TriggersOnHover = categories.AIR * categories.TECH3 * categories.STRUCTURE,
@@ -364,6 +373,7 @@ CapAirWithPowerBottom = {
     },
 }
 
+---@type ContextBasedTemplate
 PointDefense = {
     Name = "Point defense",
     TriggersOnEmptySpace = true,

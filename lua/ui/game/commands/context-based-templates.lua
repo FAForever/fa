@@ -76,6 +76,7 @@ local function ValidateTemplate(template, buildableUnits, prefix)
     return allUnitsExist and allUnitsBuildable
 end
 
+--- Provides a sense of order to the chosen templates
 ---@param a ContextBasedTemplate
 ---@param b ContextBasedTemplate
 local function SortTemplates(a, b)
@@ -111,12 +112,13 @@ Cycle = function()
         end
         ContextBasedTemplateId = blueprintId
 
-        -- gather all templates that are applicable. We need to do this each time because the
-        -- selection may have changed
+
 
         -- compute blueprint prefix
         local prefix = selectedUnits[1]:GetBlueprint().BlueprintId:sub(1, 2)
 
+        -- gather all templates that are applicable. We need to do this each time because the
+        -- selection may have changed
         ContextBasedTemplates = { }
         ContextBasedTemplateCount = 0
         for k = 1, table.getn(Templates) do
