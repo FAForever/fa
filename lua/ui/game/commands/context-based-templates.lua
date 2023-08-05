@@ -131,7 +131,7 @@ Cycle = function()
         -- - we replace the unit IDs in the template so that it becomes faction independant
         -- - we filter the templates to only keep those that we want to place given the context, and that we can build given the selection of engineers
 
-        -- a bit of a hack to retrieve the faction prefixprefix
+        -- a bit of a hack to retrieve the faction prefix
         local prefix = selectedUnits[1]:GetBlueprint().BlueprintId:sub(1, 2)
 
         ContextBasedTemplates = { }
