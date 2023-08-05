@@ -838,14 +838,13 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
             end
 
             -- To prevent weapon getting stuck targeting something out of fire range but withing tracking radius
-            WaitSeconds(5)
+            WaitSeconds((1/self.Blueprint.RateOfFire) + 2)
 
             -- Check if there is a better target nearby
-            if self.Blueprint.WeaponUnpacks then
-               --Do nothing
-            else
-               self:ResetTarget()
-            end
+
+            
+            self:ResetTarget()
+            
         end,
 
         OnFire = function(self)
