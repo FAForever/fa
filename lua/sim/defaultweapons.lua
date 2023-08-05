@@ -840,9 +840,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
             -- To prevent weapon getting stuck targeting something out of fire range but withing tracking radius
             WaitSeconds((1/self.Blueprint.RateOfFire) + 2)
 
-            -- Check if there is a better target nearby
-
-            
+            -- Check if there is a better target nearby            
             self:ResetTarget()
             
         end,
