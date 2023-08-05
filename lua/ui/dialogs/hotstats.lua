@@ -691,7 +691,7 @@ function create_graph(parent,path,x1,y1,x2,y2)
     --arranging the highest value to be nice to see
     LOG('Max value pre adjust='..maxvalue)
     --maxvalue=arrange(maxvalue*1.02)
-    maxvalue = math.ceil(AdjustValueScale(ReverseScaling(maxvalue)*1.02))
+    maxvalue = math.ceil(AdjustValueScale(ReverseScaling(maxvalue)*1.05))
     -- calculate the scale factor on y
     local factor=(y2-y1)/maxvalue
     LOG('max value post adjust='..maxvalue..'; factor='..factor..'; y2='..y2..'; y1='..y1)
