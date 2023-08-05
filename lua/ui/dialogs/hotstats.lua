@@ -679,9 +679,12 @@ function create_graph(parent,path,x1,y1,x2,y2)
     end
     --LOG(maxvalue)
     --arranging the highest value to be nice to see
-    maxvalue=arrange(maxvalue*1.02)
+    --LOG('Max value pre adjust='..maxvalue)
+    --maxvalue=arrange(maxvalue*1.02)
+    maxvalue = math.ceil(maxvalue)
     -- calculate the scale factor on y
     local factor=(y2-y1)/maxvalue
+    --LOG('max value post adjust='..maxvalue..'; factor='..factor..'; y2='..y2..'; y1='..y1)
     --LOG("Value the highest:",maxvalue,"   final time saved:",scoreInterval*data_nbr,"   scale factor on y:",factor)
     -- drawing the axies/quadrillage
     local j=1
