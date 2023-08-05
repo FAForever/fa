@@ -8,7 +8,7 @@ local Debug = true
 local oldSpew = _G.SPEW
 local SPEW = function(msg)
     if Debug then
-        oldSpew(string.format("Contextual templates: %s", tostring(msg)))
+        oldSpew(string.format("Context based templates: %s", tostring(msg)))
     end
 end
 
@@ -29,12 +29,12 @@ for k, template in RawTemplates do
     if type(template) == "table" then
         if template.TriggersOnHover or template.TriggersOnEmptySpace then
             table.insert(Templates, template)
-            LOG(string.format("Found template: %s with name %s", tostring(k), tostring(template.Name)))
+            SPEW(string.format("Found template: %s with name %s", tostring(k), tostring(template.Name)))
         end
     end
 end
 
-SPEW(string.format("Found %d contextual templates", table.getn(Templates)))
+SPEW(string.format("Found %d templates", table.getn(Templates)))
 
 --#endregion
 

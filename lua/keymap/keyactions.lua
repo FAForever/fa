@@ -411,6 +411,14 @@ local keyActionsSelectionQuickSelect = {
         action = 'UI_SelectByCategory NAVAL BATTLESHIP',
         category = 'selection',
     },
+    ['select_air_no_transport'] = {
+        action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").airNoTransports()',
+        category = 'selection',
+    },
+    ['select_air_transport'] = {
+        action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").airTransports()',
+        category = 'selection', order = 65,
+    },
 }
 
 ---@type table<string, UIKeyAction>
@@ -1493,10 +1501,6 @@ local keyActionsOrders = {
         action = 'UI_Lua import("/lua/spreadattack.lua").SpreadAttack()',
         category = 'orders',
     },
-    ['set_target_priority'] = {
-        action = 'UI_LUA import("/lua/keymap/misckeyactions.lua").SetWeaponPrioritiesToUnitType()',
-        category = 'orders',
-    },
     ['set_default_target_priority'] = {
         action = 'UI_LUA import("/lua/keymap/misckeyactions.lua").SetDefaultWeaponPriorities()',
         category = 'orders',
@@ -1573,21 +1577,10 @@ local keyActionsOrders = {
         action = 'UI_Lua import("/lua/ui/game/orders.lua").Dock(false)',
         category = 'orders',
     },
-    ['select_air_no_transport'] = {
-        action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").airNoTransports()',
-        category = 'selection',
-    },
-    ['select_air_transport'] = {
-        action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").airTransports()',
-        category = 'selection', order = 65,
-    },
 }
 
-local keyActionsOrdersAdvanced = {
-    ['filter_highest_engineer_and_assist'] = {
-        action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").SelectHighestEngineerAndAssist()',
-        category = 'ordersQueueBased',
-    },
+local keyActionsOrdersQueueBased = {
+
     ['distribute_orders'] = {
         action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").DistributeOrders()',
         category = 'ordersQueueBased',
@@ -1599,10 +1592,18 @@ local keyActionsOrdersAdvanced = {
 
 }
 
-local keyactionsOrdersAdvancedBuild = {
+local keyactionsOrdersContextBased = {
+    ['filter_highest_engineer_and_assist'] = {
+        action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").SelectHighestEngineerAndAssist()',
+        category = 'ordersContextBased',
+    },
     ['cycle_context_based_templates'] = {
         action = 'UI_Lua import("/lua/ui/game/commands/context-based-templates.lua").Cycle()',
-        category = 'ordersAdvancedBuild',
+        category = 'ordersContextBased',
+    },
+    ['set_target_priority'] = {
+        action = 'UI_LUA import("/lua/keymap/misckeyactions.lua").SetWeaponPrioritiesToUnitType()',
+        category = 'orders',
     },
 }
 
@@ -1822,8 +1823,8 @@ keyActions = table.combine(
     keyActionsHotBuildAlternative,
     keyActionsHotBuildExtra,
     keyActionsOrders,
-    keyActionsOrdersAdvanced,
-    keyactionsOrdersAdvancedBuild,
+    keyActionsOrdersQueueBased,
+    keyactionsOrdersContextBased,
     keyActionsGame,
     keyActionsChat,
     keyActionsUI,
