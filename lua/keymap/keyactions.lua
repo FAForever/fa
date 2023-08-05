@@ -1603,7 +1603,7 @@ local keyactionsOrdersContextBased = {
     },
     ['set_target_priority'] = {
         action = 'UI_LUA import("/lua/keymap/misckeyactions.lua").SetWeaponPrioritiesToUnitType()',
-        category = 'orders',
+        category = 'ordersContextBased',
     },
 }
 
