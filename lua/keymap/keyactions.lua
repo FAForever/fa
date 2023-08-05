@@ -1597,7 +1597,7 @@ local keyActionsOrdersAdvanced = {
         category = 'ordersAdvanced',
     },
     ['cycle_generated_templates'] = {
-        action = 'UI_Lua import("/lua/ui/game/commands/generated-templates.lua").Cycle()',
+        action = 'UI_Lua import("/lua/ui/game/commands/context-based-templates.lua").Cycle()',
         category = 'ordersAdvanced',
     },
 }

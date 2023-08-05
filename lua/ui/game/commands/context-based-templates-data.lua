@@ -1,4 +1,4 @@
----@class GenerativeBuildTemplate
+---@class ContextBasedTemplate
 ---@field Name string                           # Printed on screen when cycling build templates
 ---@field TriggersOnHover EntityCategory        # Selection filter based on the categories of the unit we're hovering over
 ---@field TriggersOnEmptySpace boolean
@@ -7,7 +7,7 @@
 ---@field Order? number                         # Allows you to sort the templates
 ---@field SortTemplate? boolean                 # When true, sorts the buildings based on the distance to the average position of your selection
 
----@type GenerativeBuildTemplate
+---@type ContextBasedTemplate
 CapExtractorWithStorages = {
     Name = 'Storages',
     TriggersOnHover = categories.MASSEXTRACTION,
@@ -41,7 +41,7 @@ CapExtractorWithStorages = {
     }
 }
 
----@type GenerativeBuildTemplate
+---@type ContextBasedTemplate
 CapExtractorWithFabs = {
     Name = 'Storages and fabricators',
     TriggersOnHover = categories.MASSEXTRACTION * (categories.TECH2 + categories.TECH3),
