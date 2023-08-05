@@ -8,7 +8,8 @@ keyCategories = {
     ['selectionSubgroups'] = "<LOC keymap_selection_fragments>Selection - Subgroups",
     ['camera'] = "<LOC keymap_category_0025>Camera",
     ['orders'] = "<LOC keymap_category_0036>Orders",
-    ['ordersAdvanced'] = "<LOC keymap_orders_advanced>Orders - Advanced",
+    ['ordersQueueBased'] = "<LOC keymap_orders_advanced>Orders - Queue-based orders",
+    ['ordersAdvancedBuild'] = "<LOC keymap_orders_advanced>Orders - Advanced build orders",
     ['game'] = "<LOC keymap_category_0079>Game",
     ['chat'] = "<LOC keymap_category_0087>Chat",
     ['debug'] = "<LOC keymap_category_0088>Debug",
@@ -23,7 +24,8 @@ keyCategories = {
 
 keyCategoryOrder = {
     'orders',
-    'ordersAdvanced',
+    'ordersQueueBased',
+    'ordersAdvancedBuild',
     'selection',
     'selectionQuickSelect',
     'selectionControlGroups',

@@ -1586,19 +1586,23 @@ local keyActionsOrders = {
 local keyActionsOrdersAdvanced = {
     ['filter_highest_engineer_and_assist'] = {
         action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").SelectHighestEngineerAndAssist()',
-        category = 'ordersAdvanced',
+        category = 'ordersQueueBased',
     },
     ['distribute_orders'] = {
         action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").DistributeOrders()',
-        category = 'ordersAdvanced',
+        category = 'ordersQueueBased',
     },
     ['shift_distribute_orders'] = {
         action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").DistributeOrders()',
-        category = 'ordersAdvanced',
+        category = 'ordersQueueBased',
     },
-    ['cycle_generated_templates'] = {
+
+}
+
+local keyactionsOrdersAdvancedBuild = {
+    ['cycle_context_based_templates'] = {
         action = 'UI_Lua import("/lua/ui/game/commands/context-based-templates.lua").Cycle()',
-        category = 'ordersAdvanced',
+        category = 'ordersAdvancedBuild',
     },
 }
 
@@ -1819,6 +1823,7 @@ keyActions = table.combine(
     keyActionsHotBuildExtra,
     keyActionsOrders,
     keyActionsOrdersAdvanced,
+    keyactionsOrdersAdvancedBuild,
     keyActionsGame,
     keyActionsChat,
     keyActionsUI,
