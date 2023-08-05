@@ -867,7 +867,6 @@ end
 -- Given an UserUnit that is adjacent to a given blueprint, does it yield a
 -- bonus? Used by the UI to draw extra info
 function OnDetectAdjacencyBonus(userUnit, otherBp)
-    -- fixme: todo
     return true
 end
 
