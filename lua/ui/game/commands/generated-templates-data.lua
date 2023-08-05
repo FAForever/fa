@@ -1,6 +1,7 @@
 ---@class GenerativeBuildTemplate
 ---@field Name string                           # Printed on screen when cycling build templates
 ---@field TriggersOnHover EntityCategory        # Selection filter based on the categories of the unit we're hovering over
+---@field TriggersOnEmptySpace boolean
 ---@field CopyUnit boolean                      # When true, copies the blueprint id of the unit we're hovering over into the first unit of the build template
 ---@field TemplateData BuildTemplate            # A regular build template, except that it is written in Pascal Case
 ---@field Order? number                         # Allows you to sort the templates
@@ -360,5 +361,68 @@ CapAirWithPowerBottom = {
             2,
             10
         },
+    },
+}
+
+PointDefense = {
+    Name = "Point defense",
+    TriggersOnEmptySpace = true,
+    TemplateData = {
+        3,
+        3,
+        {
+            'uab2101',
+            4646,
+            0,
+            0
+        },
+        {
+            'uab5101',
+            4749,
+            -1,
+            -1
+        },
+        {
+            'uab5101',
+            4753,
+            0,
+            -1
+        },
+        {
+            'uab5101',
+            4757,
+            1,
+            -1
+        },
+        {
+            'uab5101',
+            4761,
+            1,
+            0
+        },
+        {
+            'uab5101',
+            4765,
+            1,
+            1
+        },
+        {
+            'uab5101',
+            4769,
+            0,
+            1
+        },
+        {
+            'uab5101',
+            4773,
+            -1,
+            1
+        },
+        {
+            'uab5101',
+            4777,
+            -1,
+            0
+        }
     },
 }

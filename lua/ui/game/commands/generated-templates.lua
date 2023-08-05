@@ -2,9 +2,10 @@
 ---@type boolean
 local Debug = true
 
-local LOG = function(msg)
+local oldSpew = _G.SPEW
+local SPEW = function(msg)
     if Debug then
-        SPEW(string.format("Generated templates: %s", tostring(msg)))
+        oldSpew(string.format("Generated templates: %s", tostring(msg)))
     end
 end
 
@@ -15,7 +16,7 @@ local Templates = import("/lua/ui/game/commands/generated-templates-data.lua")
 local PredefinedTemplates = { }
 for k, template in Templates do
     if type(template) == "table" then
-        if template.TriggersOnHover then
+        if template.TriggersOnHover or template.TriggersOnEmptySpace then
             table.insert(PredefinedTemplates, template)
             LOG(string.format("Found template: %s with name %s", tostring(k), tostring(template.Name)))
         end
@@ -49,6 +50,7 @@ CommandMode.AddEndBehavior(
     'CycleTemplates'
 )
 
+--- Retrieves the faction prefix of the provided units
 ---@param units UserUnit[]
 ---@return 'ua' | 'ue' | 'ur' | 'xs' | nil
 local FindFactionPrefix = function(units)
@@ -76,109 +78,124 @@ local FindFactionPrefix = function(units)
     return nil
 end
 
-Cycle = function()
-
-    -- SavePreferences()
-
-    local start = GetSystemTimeSeconds()
-    local info = GetRolloverInfo()
-    local userUnit = info.userUnit
-    local blueprintId = info.blueprintId
-    if info and blueprintId and userUnit then
-        local selectedUnits = GetSelectedUnits()
-        if selectedUnits then
-            local selectedUnitCount = table.getn(selectedUnits)
-            local _, _, buildableCategories = GetUnitCommandData(selectedUnits)
-            local buildableUnits = table.hash(EntityCategoryGetUnitList(buildableCategories))
-
-            -- sanity check if we can build anything at all
-            if table.empty(buildableUnits) then
-                print("No templates available")
-                return
+--- Validates the template in-place, returns whether the process succeeded
+---@param generativeTemplate GenerativeBuildTemplate
+---@param buildableUnits table<BlueprintId, boolean>
+---@param prefix 'ua' | 'ue' | 'ur' | 'xs'
+---@return boolean
+local function ValidateTemplate(generativeTemplate, buildableUnits, prefix)
+    local allUnitsExist = true
+    local allUnitsBuildable = true
+    for l = 3, table.getn(generativeTemplate.TemplateData) do
+        local templateUnit = generativeTemplate.TemplateData[l]
+        local templateUnitBlueprintId = prefix .. templateUnit[1]:sub(3)
+        local templateUnitBlueprint = __blueprints[templateUnitBlueprintId]
+        if templateUnitBlueprint then
+            if buildableUnits[templateUnitBlueprintId] then
+                templateUnit[1] = templateUnitBlueprintId
+            else
+                allUnitsBuildable = false
             end
-
-            -- sanity check for only engineers of the same faction
-            local prefix = FindFactionPrefix(selectedUnits)
-            if not prefix then
-                print("No templates for " .. prefix)
-                return
-            end
-
-            -- reset when hovering over a new unit type
-            if CycleTemplateId != blueprintId then
-                CycleTemplateStep = 1
-                LOG("Reset by blueprint id!")
-            end
-            CycleTemplateId = blueprintId
-
-            -- gather all templates that are applicable. We need to do this each time because the
-            -- selection may have changed
-            CycleTemplates = { }
-            CycleTemplateCount = 0
-            for k = 1, table.getn(PredefinedTemplates) do
-                local generativeTemplate = PredefinedTemplates[k]
-
-                -- basic validation provided by the author of the template
-                if  EntityCategoryContains(generativeTemplate.TriggersOnHover, userUnit) then
-                    -- copy the unit we're hovering over into the first unit in the template
-                    if generativeTemplate.CopyUnit then
-                        generativeTemplate.TemplateData[3][1] = info.blueprintId
-                    end
-
-                    -- replace the faction prefix and do advanced validation to check if we can actually build the unit
-                    local allUnitsExist = true
-                    local allUnitsBuildable = true
-                    for l = 3, table.getn(generativeTemplate.TemplateData) do
-                        local templateUnit = generativeTemplate.TemplateData[l]
-                        local templateUnitBlueprintId = prefix .. templateUnit[1]:sub(3)
-                        local templateUnitBlueprint = __blueprints[templateUnitBlueprintId]
-                        if templateUnitBlueprint then
-                            if buildableUnits[templateUnitBlueprintId] then
-                                templateUnit[1] = templateUnitBlueprintId
-                            else
-                                allUnitsBuildable = false
-                            end
-                        else
-                            allUnitsExist = false
-                        end
-                    end
-
-                    -- check if we can build all of the units
-                    if allUnitsExist and allUnitsBuildable then
-                        table.insert(CycleTemplates, generativeTemplate)
-                        CycleTemplateCount = CycleTemplateCount + 1
-                    end
-                end
-            end
-
-            if CycleTemplateCount == 0 then
-                print("No templates available")
-                return
-            end
-
-            -- reset when exceeding number of templates
-            local count = table.getn(CycleTemplates)
-            if CycleTemplateStep > count then
-                CycleTemplateStep = 1
-                LOG("Reset by count!")
-            end
-
-            -- prepare the template
-            local template = CycleTemplates[CycleTemplateStep]
-            if template then
-                -- start the template command mode
-                import("/lua/ui/game/commandmode.lua").SetIgnoreSelection(true)
-                import("/lua/ui/game/commandmode.lua").StartCommandMode('build', {name = template.TemplateData[3][1]})
-                import("/lua/ui/game/commandmode.lua").SetIgnoreSelection(false)
-                SetActiveBuildTemplate(template.TemplateData)
-
-                -- tell the user the name of the template
-                print(string.format("(%d/%d) %s", CycleTemplateStep, CycleTemplateCount, tostring(template.Name)))
-            end
-
-            CycleTemplateStep = CycleTemplateStep + 1
+        else
+            allUnitsExist = false
         end
     end
 
-    LOG("Time taken: " .. GetSystemTimeSeconds() - start)
+    return allUnitsExist and allUnitsBuildable
+end
+
+---@param a GenerativeBuildTemplate
+---@param b GenerativeBuildTemplate
+local function SortTemplates(a, b)
+    return a.Name < b.Name
+end
+
+Cycle = function()
+
+    local start = GetSystemTimeSeconds()
+
+    local info = GetRolloverInfo()
+    local userUnit = info.userUnit
+    local blueprintId = info.blueprintId
+    if not info then
+        blueprintId = "EmptySpace"
+    end
+
+    local selectedUnits = GetSelectedUnits()
+    if selectedUnits then
+        local selectedUnitCount = table.getn(selectedUnits)
+        local _, _, buildableCategories = GetUnitCommandData(selectedUnits)
+        local buildableUnits = table.hash(EntityCategoryGetUnitList(buildableCategories))
+
+        -- sanity check if we can build anything at all
+        if table.empty(buildableUnits) then
+            print("No templates available")
+            return
+        end
+
+        -- sanity check for only engineers of the same faction
+        local prefix = FindFactionPrefix(selectedUnits)
+        if not prefix then
+            print("No templates for " .. prefix)
+            return
+        end
+
+        -- reset when hovering over a new unit type
+        if CycleTemplateId != blueprintId then
+            CycleTemplateStep = 1
+            SPEW("Reset by blueprint id!")
+        end
+        CycleTemplateId = blueprintId
+
+        -- gather all templates that are applicable. We need to do this each time because the
+        -- selection may have changed
+        CycleTemplates = { }
+        CycleTemplateCount = 0
+        for k = 1, table.getn(PredefinedTemplates) do
+            -- check if we can build the template
+            local generativeTemplate = PredefinedTemplates[k]
+            local valid = ValidateTemplate(generativeTemplate, buildableUnits, prefix)
+            if valid then
+                if  -- check of template meets contextual conditions
+                    (userUnit and generativeTemplate.TriggersOnHover and EntityCategoryContains(generativeTemplate.TriggersOnHover, userUnit)) or
+                    (not userUnit and generativeTemplate.TriggersOnEmptySpace)
+                then
+                    table.insert(CycleTemplates, generativeTemplate)
+                    CycleTemplateCount = CycleTemplateCount + 1
+                end
+            end
+        end
+
+        -- inform the user and bail out
+        if CycleTemplateCount == 0 then
+            print("No templates available")
+            return
+        end
+
+        -- sort the templates on some criteria to make order consistent
+        table.sort(CycleTemplates, SortTemplates)
+
+        -- reset when exceeding number of templates
+        local count = table.getn(CycleTemplates)
+        if CycleTemplateStep > count then
+            CycleTemplateStep = 1
+            SPEW("Reset by count!")
+        end
+
+        local template = CycleTemplates[CycleTemplateStep]
+        if template then
+            -- start the template command mode
+            import("/lua/ui/game/commandmode.lua").SetIgnoreSelection(true)
+            import("/lua/ui/game/commandmode.lua").StartCommandMode('build', {name = template.TemplateData[3][1]})
+            import("/lua/ui/game/commandmode.lua").SetIgnoreSelection(false)
+            SetActiveBuildTemplate(template.TemplateData)
+
+            -- tell the user the name of the template
+            print(string.format("(%d/%d) %s", CycleTemplateStep, CycleTemplateCount, tostring(template.Name)))
+        end
+
+        CycleTemplateStep = CycleTemplateStep + 1
+    end
+
+    SPEW("Time taken: " .. GetSystemTimeSeconds() - start)
 end
