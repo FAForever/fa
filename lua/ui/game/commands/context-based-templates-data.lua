@@ -1,7 +1,7 @@
 
 ---@class ContextBasedTemplate
 ---@field Name string                           # Printed on screen when cycling the templates
----@field TemplateData BuildTemplate            # A regular build template, except that it is written in Pascal Case
+---@field TemplateData BuildTemplate            # A regular build template, except that it is written in Pascal Case and usually the first unit is removed
 ---@field TriggersOnHover? EntityCategory       # When defined, includes this template when the unit the mouse is hovering over matches the categories
 ---@field TriggersOnEmptySpace? boolean         # When true, includes this template when the mouse does not hover over a unit
 
