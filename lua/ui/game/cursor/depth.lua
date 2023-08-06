@@ -5,6 +5,7 @@ local WorldMesh = import("/lua/ui/controls/worldmesh.lua").WorldMesh
 local meshSphere = '/env/Common/Props/sphere_lod0.scm'
 
 local MeshOnTerrain = nil
+local MeshOnTerrainRed = nil
 local MeshesInBetween = { }
 local MaxMeshesInbetweenCount = 8
 local MeshFadeDistance = 300
@@ -111,8 +112,17 @@ local function DepthScanningThread()
         UniformScale = 0.3,
         LODCutoff = MeshFadeDistance
     })
-
+    MeshOnTerrainRed = WorldMesh()
+    MeshOnTerrainRed:SetMesh({
+        MeshName = meshSphere,
+        TextureName = '/meshes/game/Attack_albedo.dds',
+        ShaderName = 'FakeRings',
+        UniformScale = 0.3,
+        LODCutoff = MeshFadeDistance
+    })
+    
     Trash:Add(MeshOnTerrain)
+    Trash:Add(MeshOnTerrainRed)
 
     -- allocate intermediate bits
     for k = 1, MaxMeshesInbetweenCount do
@@ -171,11 +181,20 @@ local function DepthScanningThread()
             -- update visibility terrain mesh
             transparency = ComputeTransparency(camera, MeshFadeDistance, elevation, position[2])
             if transparency > 0.05 then
-                MeshOnTerrain:SetHidden(false)
-                MeshOnTerrain:SetStance(location)
-                MeshOnTerrain:SetFractionCompleteParameter(transparency)
+                if (position[2] - elevation) > 1.5 then
+                    MeshOnTerrain:SetHidden(false)
+                    MeshOnTerrain:SetStance(location)
+                    MeshOnTerrain:SetFractionCompleteParameter(transparency)
+                    MeshOnTerrainRed:SetHidden(true)
+                else
+                    MeshOnTerrainRed:SetHidden(false)
+                    MeshOnTerrainRed:SetStance(location)
+                    MeshOnTerrainRed:SetFractionCompleteParameter(transparency)
+                    MeshOnTerrain:SetHidden(true)
+                end
             else
                 MeshOnTerrain:SetHidden(true)
+                MeshOnTerrainRed:SetHidden(true)
             end
 
             -- update visiblity intermediate dots
@@ -195,6 +214,7 @@ local function DepthScanningThread()
         else
             -- hide them
             MeshOnTerrain:SetHidden(true)
+            MeshOnTerrainRed:SetHidden(true)
             for k = 1, MaxMeshesInbetweenCount do
                 MeshesInBetween[k]:SetHidden(true)
             end
