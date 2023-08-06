@@ -1,4 +1,24 @@
 
+-- performance related imports
+local type = type
+local import = import
+local print = print
+
+local GetRolloverInfo = GetRolloverInfo
+local GetSelectedUnits = GetSelectedUnits
+local GetUnitCommandData = GetUnitCommandData
+local EntityCategoryGetUnitList = EntityCategoryGetUnitList
+local SetActiveBuildTemplate = SetActiveBuildTemplate
+local ClearBuildTemplates = ClearBuildTemplates
+
+local TableInsert = table.insert
+local TableSort = table.sort
+local TableGetn = table.getn
+local TableEmpty = table.empty
+local TableHash = table.hash
+
+local StringFormat = string.format
+
 -------------------------------------------------------------------------------
 --#region Debugging
 
@@ -8,7 +28,7 @@ local Debug = true
 local oldSpew = _G.SPEW
 local SPEW = function(msg)
     if Debug then
-        oldSpew(string.format("Context based templates: %s", tostring(msg)))
+        oldSpew(StringFormat("Context based templates: %s", tostring(msg)))
     end
 end
 
@@ -28,13 +48,13 @@ local Templates = { }
 for k, template in RawTemplates do
     if type(template) == "table" then
         if template.TriggersOnHover or template.TriggersOnEmptySpace then
-            table.insert(Templates, template)
-            SPEW(string.format("Found template: %s with name %s", tostring(k), tostring(template.Name)))
+            TableInsert(Templates, template)
+            SPEW(StringFormat("Found template: %s with name %s", tostring(k), tostring(template.Name)))
         end
     end
 end
 
-SPEW(string.format("Found %d templates", table.getn(Templates)))
+SPEW(StringFormat("Found %d templates", table.getn(Templates)))
 
 --#endregion
 
@@ -71,7 +91,7 @@ CommandMode.AddEndBehavior(
 local function ValidateTemplate(template, buildableUnits, prefix)
     local allUnitsExist = true
     local allUnitsBuildable = true
-    for l = 3, table.getn(template.TemplateData) do
+    for l = 3, TableGetn(template.TemplateData) do
         local templateUnit = template.TemplateData[l]
         local templateUnitBlueprintId = prefix .. templateUnit[1]:sub(3)
         local templateUnitBlueprint = __blueprints[templateUnitBlueprintId]
@@ -109,12 +129,12 @@ Cycle = function()
     end
 
     local selectedUnits = GetSelectedUnits()
-    if selectedUnits and not table.empty(selectedUnits) then
+    if selectedUnits and not TableEmpty(selectedUnits) then
         local _, _, buildableCategories = GetUnitCommandData(selectedUnits)
-        local buildableUnits = table.hash(EntityCategoryGetUnitList(buildableCategories))
+        local buildableUnits = TableHash(EntityCategoryGetUnitList(buildableCategories))
 
         -- early exit
-        if table.empty(buildableUnits) then
+        if TableEmpty(buildableUnits) then
             print("No templates available")
             return
         end
@@ -136,7 +156,7 @@ Cycle = function()
 
         ContextBasedTemplates = { }
         ContextBasedTemplateCount = 0
-        for k = 1, table.getn(Templates) do
+        for k = 1, TableGetn(Templates) do
             local template = Templates[k]
             local valid = ValidateTemplate(template, buildableUnits, prefix)
             if valid then
@@ -144,7 +164,7 @@ Cycle = function()
                     (userUnit and template.TriggersOnHover and EntityCategoryContains(template.TriggersOnHover, userUnit)) or
                     (not userUnit and template.TriggersOnEmptySpace)
                 then
-                    table.insert(ContextBasedTemplates, template)
+                    TableInsert(ContextBasedTemplates, template)
                     ContextBasedTemplateCount = ContextBasedTemplateCount + 1
                 end
             end
@@ -157,10 +177,10 @@ Cycle = function()
         end
 
         -- sort the templates on some criteria to make order consistent
-        table.sort(ContextBasedTemplates, SortTemplates)
+        TableSort(ContextBasedTemplates, SortTemplates)
 
         -- wrap around when exceeding number of templates
-        local count = table.getn(ContextBasedTemplates)
+        local count = TableGetn(ContextBasedTemplates)
         if ContextBasedTemplateStep > count then
             ContextBasedTemplateStep = 1
             SPEW("Reset by count!")
@@ -174,7 +194,7 @@ Cycle = function()
             import("/lua/ui/game/commandmode.lua").SetIgnoreSelection(false)
             SetActiveBuildTemplate(template.TemplateData)
 
-            print(string.format("(%d/%d) %s", ContextBasedTemplateStep, ContextBasedTemplateCount, tostring(template.Name)))
+            print(StringFormat("(%d/%d) %s", ContextBasedTemplateStep, ContextBasedTemplateCount, template.Name))
         end
 
         ContextBasedTemplateStep = ContextBasedTemplateStep + 1
