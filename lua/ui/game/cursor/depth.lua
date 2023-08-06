@@ -118,14 +118,24 @@ local function DepthScanningThread()
     for k = 1, MaxMeshesInbetweenCount do
 
         local bit = WorldMesh()
-        bit:SetMesh({
-            MeshName = meshSphere,
-            TextureName = '/meshes/game/Assist_albedo.dds',
-            ShaderName = 'FakeRings',
-            UniformScale = 0.15,
-            LODCutoff = MeshFadeDistance
-        })
-
+        if k == 2 then
+            bit:SetMesh({
+                MeshName = meshSphere,
+                TextureName = '/meshes/game/map-border_squ_cybran_a_SpecTeam.dds',
+                ShaderName = 'FakeRings',
+                UniformScale = 0.15,
+                LODCutoff = MeshFadeDistance
+            })
+        else
+            bit:SetMesh({
+                MeshName = meshSphere,
+                TextureName = '/meshes/game/Assist_albedo.dds',
+                ShaderName = 'FakeRings',
+                UniformScale = 0.15,
+                LODCutoff = MeshFadeDistance
+            })
+        end
+        
         MeshesInBetween[k] = bit
         Trash:Add(bit)
     end
