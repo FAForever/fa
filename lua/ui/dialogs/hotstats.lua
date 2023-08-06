@@ -366,8 +366,9 @@ function create_graph_bar(parent,name,x1,y1,x2,y2,data_previous)
                             chartInfoText:Destroy()
                             chartInfoText = false
                         end
-                        local  value = math.floor(return_value(0,player,path) + 0.5)
-                        chartInfoText = UIUtil.CreateText(self,value, 14, UIUtil.titleFont)
+                        local iBaseValue = return_value(0,player,path)
+                        local  value = math.floor(iBaseValue + 0.5)
+                        chartInfoText = UIUtil.CreateText(self,math.floor(ReverseScaling(iBaseValue)), 14, UIUtil.titleFont) --Couldnt figure out when this actually takes effect - mouseover graph is in a separate section
                         chartInfoText.Left:Set(function() return posX()-(chartInfoText.Width()/2) end)
                         chartInfoText.Bottom:Set(function() return posY()-7 end)
                         chartInfoText.Depth:Set(GetFrame(0):GetTopmostDepth() + 1)
@@ -476,6 +477,34 @@ function makeKMG(int)
     return (math.floor(int/1000000000)).."."..(math.floor((int/1000000000)-math.floor(int/1000000000))*10).." G"
 end
 
+function AdjustValueScale(val)
+    return math.sqrt(val)
+end
+
+function ReverseScaling(val)
+    return val * val
+end
+
+function FormatNumber(number)
+    local sString = tostring(number)
+    local sNewString = ''
+    --LOG('sString len='..string.len(sString))
+    local iCurCount = 0
+    for iChar = string.len(sString), 1, -1 do
+        iCurCount = iCurCount + 1
+        sNewString = string.sub(sString, iChar, iChar)..sNewString
+        if iCurCount >= 3 then
+            iCurCount = 0
+            if iChar > 1 then
+                sNewString = ','..sNewString
+            end
+
+        end
+    end
+
+    return sNewString
+end
+
 -- if periode=0 then return the current value
 function return_value(periode,player,path)
     local val
@@ -491,8 +520,9 @@ function return_value(periode,player,path)
     end
     if val==nil then val=0 end
     if path.fac_mul != nil then val=val*path.fac_mul end
-    return val
+    return AdjustValueScale(val)
 end
+
 
 function page_graph(parent)
     --LOG("PAGE_GRAPH called")
@@ -678,16 +708,19 @@ function create_graph(parent,path,x1,y1,x2,y2)
     end
     --LOG(maxvalue)
     --arranging the highest value to be nice to see
-    maxvalue=arrange(maxvalue*1.02)
+    --LOG('Max value pre adjust='..maxvalue)
+    --maxvalue=arrange(maxvalue*1.02)
+    maxvalue = math.ceil(AdjustValueScale(ReverseScaling(maxvalue)*1.05))
     -- calculate the scale factor on y
     local factor=(y2-y1)/maxvalue
+    --LOG('max value post adjust='..maxvalue..'; factor='..factor..'; y2='..y2..'; y1='..y1)
     --LOG("Value the highest:",maxvalue,"   final time saved:",scoreInterval*data_nbr,"   scale factor on y:",factor)
     -- drawing the axies/quadrillage
     local j=1
     local quadrillage_horiz={}
     local nbr_quadrillage_horiz=6 -- how many horizontal axies
     local nbr_quadrillage_vertical=8 -- how many vertical axies
-    while j<nbr_quadrillage_horiz do
+    while j<nbr_quadrillage_horiz do --i.e. this is the y axis, showing score or other value
         local tmp=j
         quadrillage_horiz[j]=Bitmap(grp)
         quadrillage_horiz[j].Left:Set(function() return parent.Left() + x1 +1 end)
@@ -697,7 +730,7 @@ function create_graph(parent,path,x1,y1,x2,y2)
         quadrillage_horiz[j]:SetSolidColor("white")
         quadrillage_horiz[j].Depth:Set(grp.Depth)
 
-        quadrillage_horiz[j].title_label=UIUtil.CreateText(grp,math.floor((j-1)/(nbr_quadrillage_horiz-2)*maxvalue), 14, UIUtil.titleFont)
+        quadrillage_horiz[j].title_label=UIUtil.CreateText(grp,FormatNumber(math.floor(ReverseScaling((j-1)/(nbr_quadrillage_horiz-2)*maxvalue))), 14, UIUtil.titleFont) --Reverse the scaled value for the y axis, i.e. want to show what the actual score is on the axis
         quadrillage_horiz[j].title_label.Right:Set(parent.Left() + x1 -8)
         quadrillage_horiz[j].title_label.Bottom:Set(parent.Top() +y2 - (y2-y1)*((tmp-1)/(nbr_quadrillage_horiz-2))+1)
         quadrillage_horiz[j].title_label:SetColor("white")
@@ -705,7 +738,7 @@ function create_graph(parent,path,x1,y1,x2,y2)
     end
     local j=1
     local quadrillage_vertical={}
-    while j<nbr_quadrillage_vertical do
+    while j<nbr_quadrillage_vertical do --i.e. this is the x axis, showing time
         local tmp=j
         quadrillage_vertical[j]=Bitmap(grp)
         quadrillage_vertical[j].Left:Set(function() return parent.Left()+x1 + ((x2-x1))*((tmp-1)/(nbr_quadrillage_vertical-2))+1  end)
@@ -828,8 +861,8 @@ function create_graph(parent,path,x1,y1,x2,y2)
         local value_graph_label={}
         for index, dat in player do
             value_graph_label[dat.index]={}
-            val=math.floor(return_value(periode,dat.index,path))
-            value_graph_label[dat.index].title_label=UIUtil.CreateText(grp,val, 14, UIUtil.titleFont)
+            val=math.floor(ReverseScaling(return_value(periode,dat.index,path))) --This is the value label that gets shown on the graph for each player, e.g. for the winner this will be the end-game high score achieved (not sure if this is the highest value at any point in the game or just the score at the end of the game)
+            value_graph_label[dat.index].title_label=UIUtil.CreateText(grp,FormatNumber(val), 14, UIUtil.titleFont)
             value_graph_label[dat.index].title_label.Right:Set(x-1)
             value_graph_label[dat.index].title_label.Bottom:Set(line[dat.index].y-1)
             value_graph_label[dat.index].title_label:SetColor(dat.color)
@@ -852,7 +885,7 @@ function create_graph(parent,path,x1,y1,x2,y2)
                 infoText = false
             end
             if posX()>x1 and posX()<x2 and posY()>y1 and posY()<y2 then
-                local  value = tps_format((posX()-x1)/(x2-x1)*scoreInterval*data_nbr) .. " / " .. math.floor(((y2-posY())/factor))
+                local  value = tps_format((posX()-x1)/(x2-x1)*scoreInterval*data_nbr) .. " / " .. FormatNumber(math.floor(ReverseScaling((y2-posY())/factor))) --This is the value that gets shown when we hover the mouse over any point in the graph, so want to reverse the scaled value so we see the actual value
                 infoText = UIUtil.CreateText(grp,value, 14, UIUtil.titleFont)
                 infoText.Left:Set(function() return posX()-(infoText.Width()/2) end)
                 infoText.Bottom:Set(function() return posY()-7 end)

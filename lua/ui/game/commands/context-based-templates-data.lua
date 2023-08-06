@@ -1,17 +1,16 @@
----@class GenerativeBuildTemplate
+---@class ContextBasedTemplate
 ---@field Name string                           # Printed on screen when cycling build templates
 ---@field TriggersOnHover EntityCategory        # Selection filter based on the categories of the unit we're hovering over
----@field TriggersOnSelection EntityCategory    # selection filter based on the categories of the units in our selection
----@field CopyUnit boolean                      # When true, copies the blueprint id of the unit we're hovering over into the first unit of the build template 
+---@field TriggersOnEmptySpace boolean
+---@field CopyUnit boolean                      # When true, copies the blueprint id of the unit we're hovering over into the first unit of the build template
 ---@field TemplateData BuildTemplate            # A regular build template, except that it is written in Pascal Case
 ---@field Order? number                         # Allows you to sort the templates
 ---@field SortTemplate? boolean                 # When true, sorts the buildings based on the distance to the average position of your selection
 
----@type GenerativeBuildTemplate
+---@type ContextBasedTemplate
 CapExtractorWithStorages = {
     Name = 'Storages',
     TriggersOnHover = categories.MASSEXTRACTION,
-    TriggersOnSelection = categories.TECH1 + categories.TECH2 + categories.TECH3 + categories.COMMAND,
     TemplateData = {
         0,
         0,
@@ -42,11 +41,10 @@ CapExtractorWithStorages = {
     }
 }
 
----@type GenerativeBuildTemplate
+---@type ContextBasedTemplate
 CapExtractorWithFabs = {
-    Name = 'Storages and  fabricators',
-    TriggersOnHover = categories.MASSEXTRACTION * categories.TECH2,
-    TriggersOnSelection = categories.TECH2 + categories.TECH3,
+    Name = 'Storages and fabricators',
+    TriggersOnHover = categories.MASSEXTRACTION * (categories.TECH2 + categories.TECH3),
     TemplateData = {
         10,
         10,
@@ -128,8 +126,6 @@ CapExtractorWithFabs = {
 CapRadarWithPower = {
     Name = 'Power generators',
     TriggersOnHover = (categories.RADAR + categories.OMNI) * categories.STRUCTURE,
-    TriggersOnSelection = categories.TECH1 + categories.TECH2 + categories.TECH3 + categories.COMMAND,
-    CopyUnit = false,
     TemplateData = {
         0,
         0,
@@ -164,7 +160,6 @@ CapT2ArtilleryWithPower = {
     Name = 'Power generators',
     TriggersOnHover = categories.ARTILLERY * categories.STRUCTURE * categories.TECH2,
     TriggersOnSelection = categories.TECH1 + categories.TECH2 + categories.TECH3 + categories.COMMAND,
-    CopyUnit = false,
     TemplateData = {
         0,
         0,
@@ -195,166 +190,239 @@ CapT2ArtilleryWithPower = {
     }
 }
 
----@type GenerativeBuildTemplate
-Test01 = {
-    Name = 'Test01',
-    TriggersOnHover = categories.AIR * categories.FACTORY,
-    TriggersOnSelection = categories.TECH1 + categories.TECH2 + categories.TECH3 + categories.COMMAND,
+CapT3FabricatorWithStorages = {
+    Name = 'Storages',
+    TriggersOnHover = categories.STRUCTURE * categories.MASSFABRICATION * categories.TECH3,
     TemplateData = {
         0,
         0,
         {
-            'uab0102',
-            8980,
+            'uab1106',
+            2605,
+            -2,
+            4
+        },
+        {
+            'uab1106',
+            2621,
+            0,
+            4
+        },
+        {
+            'uab1106',
+            2636,
             2,
+            4
+        },
+        {
+            'uab1106',
+            2651,
+            4,
             2
         },
         {
-            'uab1101',
-            9005,
-            -1,
-            7
+            'uab1106',
+            2666,
+            4,
+            0
         },
         {
-            'uab1101',
-            9012,
-            1,
-            7
+            'uab1106',
+            2680,
+            4,
+            -2
         },
         {
-            'uab1101',
-            9020,
-            3,
-            7
+            'uab1106',
+            2695,
+            2,
+            -4
         },
         {
-            'uab1101',
-            9027,
-            5,
-            7
+            'uab1106',
+            2710,
+            0,
+            -4
+        },
+        {
+            'uab1106',
+            2724,
+            -2,
+            -4
+        },
+        {
+            'uab1106',
+            2738,
+            -4,
+            -2
+        },
+        {
+            'uab1106',
+            2753,
+            -4,
+            0
+        },
+        {
+            'uab1106',
+            2767,
+            -4,
+            2
         }
     },
 }
 
----@type GenerativeBuildTemplate
-Test02 = {
-    Name = 'Test02',
-    TriggersOnHover = categories.AIR * categories.FACTORY,
-    TriggersOnSelection = categories.TECH1 + categories.TECH2 + categories.TECH3 + categories.COMMAND,
+CapT3ArtilleryWithPower = {
+    Name = 'Power generators',
+    TriggersOnHover = categories.STRUCTURE * categories.ARTILLERY * (categories.TECH3 + categories.EXPERIMENTAL),
     TemplateData = {
-        10,
-        8,
+        0,
+        0,
         {
-            'uab0102',
-            8980,
-            2,
+            'uab1301',
+            5352,
+            10,
             2
         },
         {
-            'uab1101',
-            9035,
-            -3,
-            5
+            'uab1301',
+            5369,
+            2,
+            10
         },
         {
-            'uab1101',
-            9042,
-            -3,
-            3
+            'uab1301',
+            5385,
+            -6,
+            2
         },
         {
-            'uab1101',
-            9050,
-            -3,
+            'uab1301',
+            5408,
+            2,
+            -6
+        }
+    },
+}
+
+CapAirWithPowerRight = {
+    Name = 'Power generators - right',
+    TriggersOnHover = categories.AIR * categories.TECH3 * categories.STRUCTURE,
+    TemplateData = {
+        0,
+        0,
+        {
+            'uab1301',
+            5352,
+            10,
+            2
+        },
+    },
+}
+
+CapAirWithPowerLeft = {
+    Name = 'Power generators - left',
+    TriggersOnHover = categories.AIR * categories.TECH3 * categories.STRUCTURE,
+    TemplateData = {
+        0,
+        0,
+        {
+            'uab1301',
+            5385,
+            -6,
+            2
+        },
+    },
+}
+
+CapAirWithPowerTop = {
+    Name = 'Power generators - top',
+    TriggersOnHover = categories.AIR * categories.TECH3 * categories.STRUCTURE,
+    TemplateData = {
+        0,
+        0,
+        {
+            'uab1301',
+            5408,
+            2,
+            -6
+        }
+    },
+}
+
+CapAirWithPowerBottom = {
+    Name = 'Power generators - bottom',
+    TriggersOnHover = categories.AIR * categories.TECH3 * categories.STRUCTURE,
+    TemplateData = {
+        0,
+        0,
+        {
+            'uab1301',
+            5369,
+            2,
+            10
+        },
+    },
+}
+
+PointDefense = {
+    Name = "Point defense",
+    TriggersOnEmptySpace = true,
+    TemplateData = {
+        3,
+        3,
+        {
+            'uab2101',
+            4646,
+            0,
+            0
+        },
+        {
+            'uab5101',
+            4749,
+            -1,
+            -1
+        },
+        {
+            'uab5101',
+            4753,
+            0,
+            -1
+        },
+        {
+            'uab5101',
+            4757,
+            1,
+            -1
+        },
+        {
+            'uab5101',
+            4761,
+            1,
+            0
+        },
+        {
+            'uab5101',
+            4765,
+            1,
             1
         },
         {
-            'uab1101',
-            9057,
-            -3,
-            -1
-        }
-    },
-}
-
----@type GenerativeBuildTemplate
-Test03 = {
-    Name = 'Test03',
-    TriggersOnHover = categories.AIR * categories.FACTORY,
-    TriggersOnSelection = categories.TECH1 + categories.TECH2 + categories.TECH3 + categories.COMMAND,
-    TemplateData = {
-        8,
-        10,
-        {
-            'uab0102',
-            8980,
-            2,
-            2
-        },
-        {
-            'uab1101',
-            9096,
-            5,
-            -3
-        },
-        {
-            'uab1101',
-            9104,
-            3,
-            -3
-        },
-        {
-            'uab1101',
-            9111,
-            1,
-            -3
-        },
-        {
-            'uab1101',
-            9119,
-            -1,
-            -3
-        }
-    },
-}
-
----@type GenerativeBuildTemplate
-Test04 = {
-    Name = 'Test04',
-    TriggersOnHover = categories.AIR * categories.FACTORY,
-    TriggersOnSelection = categories.TECH1 + categories.TECH2 + categories.TECH3 + categories.COMMAND,
-    TemplateData = {
-        0,
-        0,
-        {
-            'uab0102',
-            8980,
-            2,
-            2
-        },
-        {
-            'uab1101',
-            9066,
-            7,
-            -1
-        },
-        {
-            'uab1101',
-            9074,
-            7,
+            'uab5101',
+            4769,
+            0,
             1
         },
         {
-            'uab1101',
-            9081,
-            7,
-            3
+            'uab5101',
+            4773,
+            -1,
+            1
         },
         {
-            'uab1101',
-            9089,
-            7,
-            5
+            'uab5101',
+            4777,
+            -1,
+            0
         }
     },
 }

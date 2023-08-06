@@ -78,7 +78,7 @@ local startBehaviors = {}
 local endBehaviors = {}
 
 --- Callback triggers when command mode starts
----@param behavior fun(mode: CommandMode, data: CommandModeData)
+---@param behavior fun(mode?: CommandMode, data?: CommandModeData)
 ---@param identifier? string
 function AddStartBehavior(behavior, identifier)
     if identifier then
@@ -92,7 +92,7 @@ function AddStartBehavior(behavior, identifier)
 end
 
 --- Callback triggers when command mode ends
----@param behavior fun(mode: CommandMode, data: CommandModeData)
+---@param behavior fun(mode?: CommandMode, data?: CommandModeData)
 ---@param identifier? string
 function AddEndBehavior(behavior, identifier)
     if identifier then
