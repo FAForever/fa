@@ -6,7 +6,7 @@ local meshSphere = '/env/Common/Props/sphere_lod0.scm'
 
 local MeshOnTerrain = nil
 local MeshesInBetween = { }
-local MeshesInbetweenCount = 4
+local MaxMeshesInbetweenCount = 8
 local MeshFadeDistance = 300
 
 local Trash = TrashBag()
@@ -115,7 +115,7 @@ local function DepthScanningThread()
     Trash:Add(MeshOnTerrain)
 
     -- allocate intermediate bits
-    for k = 1, MeshesInbetweenCount do
+    for k = 1, MaxMeshesInbetweenCount do
 
         local bit = WorldMesh()
         bit:SetMesh({
@@ -169,9 +169,9 @@ local function DepthScanningThread()
             end
 
             -- update visiblity intermediate dots
-            for k = 1, MeshesInbetweenCount do
+            for k = 1, MaxMeshesInbetweenCount do
                 local bit = MeshesInBetween[k]
-                location[2] = (0.2 * k) * position[2] + (1 - 0.2 * k) * elevation
+                location[2] = position[2] + (-0.75 * k)
 
                 transparency = ComputeTransparency(camera, MeshFadeDistance, elevation, position[2])
                 if transparency > 0.05 then
@@ -185,7 +185,7 @@ local function DepthScanningThread()
         else
             -- hide them
             MeshOnTerrain:SetHidden(true)
-            for k = 1, MeshesInbetweenCount do
+            for k = 1, MaxMeshesInbetweenCount do
                 MeshesInBetween[k]:SetHidden(true)
             end
         end
