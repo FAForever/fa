@@ -83,7 +83,7 @@ local function ComputeTransparency(camera, distance, terrainHeight, surfaceHeigh
     local f1 = math.max(0, 1 - (zoom / distance))
 
     -- visibility based on terrain difference
-    local f2 = math.clamp(surfaceHeight - terrainHeight - 1, 0, 1)
+    local f2 = math.clamp(surfaceHeight - terrainHeight - 0.25, 0, 0.5)*2
     return f1 * f2
 end
 
