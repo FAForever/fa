@@ -438,7 +438,7 @@ PointDefense = {
 }
 
 ---@type ContextBasedTemplate
-ExtractorT1 = {
+T1Extractor = {
     Name = 'Extractor',
     TriggersOnMassDeposit = true,
     TemplateData = {
@@ -454,7 +454,7 @@ ExtractorT1 = {
 }
 
 ---@type ContextBasedTemplate
-ExtractorT2WithStorages = {
+T2ExtractorWithStorages = {
     Name = 'Extractor and storages',
     TriggersOnMassDeposit = true,
     TemplateData = {
@@ -494,7 +494,7 @@ ExtractorT2WithStorages = {
 }
 
 ---@type ContextBasedTemplate
-ExtractorT3WithStorages = {
+T3ExtractorWithStorages = {
     Name = 'Extractor and storages',
     TriggersOnMassDeposit = true,
     TemplateData = {
@@ -534,7 +534,7 @@ ExtractorT3WithStorages = {
 }
 
 ---@type ContextBasedTemplate
-ExtractorT3WithStoragesAndFabs = {
+T3ExtractorWithStoragesAndFabs = {
     Name = 'Extractor, storages and fabricators',
     TriggersOnMassDeposit = true,
     TemplateData = {
@@ -622,7 +622,7 @@ ExtractorT3WithStoragesAndFabs = {
 }
 
 ---@type ContextBasedTemplate
-HydrocarbonT1 = {
+T1Hydrocarbon = {
     Name = 'Hydrocarbon',
     TriggersOnHydroDeposit = true,
     TemplateData = {
