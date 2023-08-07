@@ -47,7 +47,7 @@ local Templates = { }
 
 for k, template in RawTemplates do
     if type(template) == "table" then
-        if template.TriggersOnHover or template.TriggersOnEmptySpace then
+        if template.TriggersOnUnit or template.TriggersOnLand or template.TriggersOnMassDeposit or template.TriggersOnHydroDeposit or template.TriggersOnWater then
             TableInsert(Templates, template)
             SPEW(StringFormat("Found template: %s with name %s", tostring(k), tostring(template.Name)))
         end
@@ -127,7 +127,7 @@ Cycle = function()
     if not info then
         blueprintId = "EmptySpace"
     end
-
+    local position = GetMouseWorldPos()
     local selectedUnits = GetSelectedUnits()
     if selectedUnits and not TableEmpty(selectedUnits) then
         local _, _, buildableCategories = GetUnitCommandData(selectedUnits)
@@ -154,15 +154,23 @@ Cycle = function()
         -- a bit of a hack to retrieve the faction prefix
         local prefix = selectedUnits[1]:GetBlueprint().BlueprintId:sub(1, 2)
 
+        local massDeposits = TableGetn(GetDepositsAroundPoint(position[1], position[3], 1.5, 1))
+        local hydroDeposits = TableGetn(GetDepositsAroundPoint(position[1], position[3], 3.0, 2))
+        local noDeposits = (massDeposits == 0) and (hydroDeposits == 0)
+
         ContextBasedTemplates = { }
         ContextBasedTemplateCount = 0
         for k = 1, TableGetn(Templates) do
             local template = Templates[k]
             local valid = ValidateTemplate(template, buildableUnits, prefix)
             if valid then
+                LOG(template.TriggersOnLand)
                 if  -- check conditions based on the context of the mouse
-                    (userUnit and template.TriggersOnHover and EntityCategoryContains(template.TriggersOnHover, userUnit)) or
-                    (not userUnit and template.TriggersOnEmptySpace)
+                    ((not template.TriggersOnUnit) or (userUnit and EntityCategoryContains(template.TriggersOnUnit, userUnit))) and
+                    ((not template.TriggersOnMassDeposit) or ((not userUnit) and (massDeposits > 0))) and
+                    ((not template.TriggersOnHydroDeposit) or ((not userUnit) and (hydroDeposits > 0))) and
+                    ((not template.TriggersOnLand) or ((not userUnit) and noDeposits)) and
+                    ((not template.TriggersOnWater) or ((not userUnit) and noDeposits))
                 then
                     TableInsert(ContextBasedTemplates, template)
                     ContextBasedTemplateCount = ContextBasedTemplateCount + 1
