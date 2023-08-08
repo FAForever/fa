@@ -6,6 +6,8 @@
 --* Copyright © 2006 Gas Powered Games Corp.  All rights reserved.
 --*****************************************************************************
 
+local MathSqrt = math.sqrt
+
 -- Basic settings for waypoint information
 CommandWaypointParams = {
 
@@ -22,11 +24,10 @@ CommandWaypointParams = {
 }
 
 function CalculateWaypointLineWidth(unitCount)
-    local lineWidth = math.sqrt(unitCount)
+    local lineWidth = MathSqrt(unitCount)
     if lineWidth >= 10 then
         lineWidth = 10
     end
 
---    LOG('lineWidth: ', lineWidth)
 	return ( lineWidth )
 end

@@ -526,4 +526,5 @@ keyDescriptions = {
     ['filter_highest_engineer_and_assist'] = '<LOC key_desc_filter_highest_engineer_and_assist>Filter the selection to the most advanced engineer, all other engineers assist that engineer',
     ['distribute_orders'] = '<LOC key_desc_distribute_orders>Distribute orders of the selected units',
     ['shift_distribute_orders'] = '<LOC key_desc_distribute_orders>Distribute orders of the selected units',
+    ['cycle_context_based_templates'] = '<LOC key_desc_context_based_templates>Cycle templates based on the unit that the mouse is hovering over',
 }
