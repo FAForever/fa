@@ -1,16 +1,19 @@
+
 ---@class ContextBasedTemplate
----@field Name string                           # Printed on screen when cycling build templates
----@field TriggersOnHover EntityCategory        # Selection filter based on the categories of the unit we're hovering over
----@field TriggersOnEmptySpace boolean
----@field CopyUnit boolean                      # When true, copies the blueprint id of the unit we're hovering over into the first unit of the build template
----@field TemplateData BuildTemplate            # A regular build template, except that it is written in Pascal Case
----@field Order? number                         # Allows you to sort the templates
----@field SortTemplate? boolean                 # When true, sorts the buildings based on the distance to the average position of your selection
+---@field Name string                           # Printed on screen when cycling the templates
+---@field TemplateData BuildTemplate            # A regular build template, except that it is written in Pascal Case and usually the first unit is removed
+---@field TriggersOnUnit? EntityCategory        # When defined, includes this template when the unit the mouse is hovering over matches the categories
+---@field TriggersOnLand? boolean               # When true, includes this template when the mouse is over land and not over a deposit
+---@field TriggersOnWater? boolean              # When true, includes this template when the mouse is over water and not over a deposit
+---@field TriggersOnMassDeposit? boolean        # When true, includes this template when the mouse is over a mass deposit
+---@field TriggersOnHydroDeposit? boolean       # When true, includes this template when the mouse is over a hydrocarbon deposit
+
+-- Entity categories that are considered valid: https://github.com/FAForever/fa/blob/deploy/fafdevelop/engine/Core/Categories.lua
 
 ---@type ContextBasedTemplate
 CapExtractorWithStorages = {
     Name = 'Storages',
-    TriggersOnHover = categories.MASSEXTRACTION,
+    TriggersOnUnit = categories.MASSEXTRACTION,
     TemplateData = {
         0,
         0,
@@ -44,7 +47,7 @@ CapExtractorWithStorages = {
 ---@type ContextBasedTemplate
 CapExtractorWithFabs = {
     Name = 'Storages and fabricators',
-    TriggersOnHover = categories.MASSEXTRACTION * (categories.TECH2 + categories.TECH3),
+    TriggersOnUnit = categories.MASSEXTRACTION * (categories.TECH2 + categories.TECH3),
     TemplateData = {
         10,
         10,
@@ -123,9 +126,10 @@ CapExtractorWithFabs = {
     },
 }
 
+---@type ContextBasedTemplate
 CapRadarWithPower = {
     Name = 'Power generators',
-    TriggersOnHover = (categories.RADAR + categories.OMNI) * categories.STRUCTURE,
+    TriggersOnUnit = (categories.RADAR + categories.OMNI) * categories.STRUCTURE,
     TemplateData = {
         0,
         0,
@@ -156,9 +160,10 @@ CapRadarWithPower = {
     }
 }
 
+---@type ContextBasedTemplate
 CapT2ArtilleryWithPower = {
     Name = 'Power generators',
-    TriggersOnHover = categories.ARTILLERY * categories.STRUCTURE * categories.TECH2,
+    TriggersOnUnit = categories.ARTILLERY * categories.STRUCTURE * categories.TECH2,
     TriggersOnSelection = categories.TECH1 + categories.TECH2 + categories.TECH3 + categories.COMMAND,
     TemplateData = {
         0,
@@ -190,9 +195,10 @@ CapT2ArtilleryWithPower = {
     }
 }
 
+---@type ContextBasedTemplate
 CapT3FabricatorWithStorages = {
     Name = 'Storages',
-    TriggersOnHover = categories.STRUCTURE * categories.MASSFABRICATION * categories.TECH3,
+    TriggersOnUnit = categories.STRUCTURE * categories.MASSFABRICATION * categories.TECH3,
     TemplateData = {
         0,
         0,
@@ -271,9 +277,10 @@ CapT3FabricatorWithStorages = {
     },
 }
 
+---@type ContextBasedTemplate
 CapT3ArtilleryWithPower = {
     Name = 'Power generators',
-    TriggersOnHover = categories.STRUCTURE * categories.ARTILLERY * (categories.TECH3 + categories.EXPERIMENTAL),
+    TriggersOnUnit = categories.STRUCTURE * categories.ARTILLERY * (categories.TECH3 + categories.EXPERIMENTAL),
     TemplateData = {
         0,
         0,
@@ -304,9 +311,10 @@ CapT3ArtilleryWithPower = {
     },
 }
 
+---@type ContextBasedTemplate
 CapAirWithPowerRight = {
     Name = 'Power generators - right',
-    TriggersOnHover = categories.AIR * categories.TECH3 * categories.STRUCTURE,
+    TriggersOnUnit = categories.AIR * categories.TECH3 * categories.STRUCTURE,
     TemplateData = {
         0,
         0,
@@ -319,9 +327,10 @@ CapAirWithPowerRight = {
     },
 }
 
+---@type ContextBasedTemplate
 CapAirWithPowerLeft = {
     Name = 'Power generators - left',
-    TriggersOnHover = categories.AIR * categories.TECH3 * categories.STRUCTURE,
+    TriggersOnUnit = categories.AIR * categories.TECH3 * categories.STRUCTURE,
     TemplateData = {
         0,
         0,
@@ -334,9 +343,10 @@ CapAirWithPowerLeft = {
     },
 }
 
+---@type ContextBasedTemplate
 CapAirWithPowerTop = {
     Name = 'Power generators - top',
-    TriggersOnHover = categories.AIR * categories.TECH3 * categories.STRUCTURE,
+    TriggersOnUnit = categories.AIR * categories.TECH3 * categories.STRUCTURE,
     TemplateData = {
         0,
         0,
@@ -349,9 +359,10 @@ CapAirWithPowerTop = {
     },
 }
 
+---@type ContextBasedTemplate
 CapAirWithPowerBottom = {
     Name = 'Power generators - bottom',
-    TriggersOnHover = categories.AIR * categories.TECH3 * categories.STRUCTURE,
+    TriggersOnUnit = categories.AIR * categories.TECH3 * categories.STRUCTURE,
     TemplateData = {
         0,
         0,
@@ -364,9 +375,10 @@ CapAirWithPowerBottom = {
     },
 }
 
+---@type ContextBasedTemplate
 PointDefense = {
     Name = "Point defense",
-    TriggersOnEmptySpace = true,
+    TriggersOnLand = true,
     TemplateData = {
         3,
         3,
@@ -425,4 +437,204 @@ PointDefense = {
             0
         }
     },
+}
+
+---@type ContextBasedTemplate
+T1Extractor = {
+    Name = 'Extractor',
+    TriggersOnMassDeposit = true,
+    TemplateData = {
+        0,
+        0,
+        {
+            'uab1103',
+            1,
+            0,
+            0
+        },
+    }, 
+}
+
+---@type ContextBasedTemplate
+T2ExtractorWithStorages = {
+    Name = 'Extractor and storages',
+    TriggersOnMassDeposit = true,
+    TemplateData = {
+        0,
+        0,
+        {
+            'uab1202',
+            1,
+            0,
+            0
+        },
+        {
+            'uab1106',
+            33986,
+            2,
+            0
+        },
+        {
+            'uab1106',
+            33993,
+            -2,
+            0
+        },
+        {
+            'uab1106',
+            34000,
+            0,
+            -2
+        },
+        {
+            'uab1106',
+            34008,
+            0,
+            2
+        },
+    }
+}
+
+---@type ContextBasedTemplate
+T3ExtractorWithStorages = {
+    Name = 'Extractor and storages',
+    TriggersOnMassDeposit = true,
+    TemplateData = {
+        0,
+        0,
+        {
+            'uab1302',
+            1,
+            0,
+            0
+        },
+        {
+            'uab1106',
+            33986,
+            2,
+            0
+        },
+        {
+            'uab1106',
+            33993,
+            -2,
+            0
+        },
+        {
+            'uab1106',
+            34000,
+            0,
+            -2
+        },
+        {
+            'uab1106',
+            34008,
+            0,
+            2
+        },
+    }
+}
+
+---@type ContextBasedTemplate
+T3ExtractorWithStoragesAndFabs = {
+    Name = 'Extractor, storages and fabricators',
+    TriggersOnMassDeposit = true,
+    TemplateData = {
+        0,
+        0,
+        {
+            'uab1302',
+            1,
+            0,
+            0
+        },
+        {
+            'uab1106',
+            30057,
+            -2,
+            0
+        },
+        {
+            'uab1106',
+            30070,
+            2,
+            0
+        },
+        {
+            'uab1106',
+            30083,
+            0,
+            -2
+        },
+        {
+            'uab1106',
+            30096,
+            0,
+            2
+        },
+        {
+            'uab1104',
+            30109,
+            -4,
+            0
+        },
+        {
+            'uab1104',
+            30134,
+            -2,
+            2
+        },
+        {
+            'uab1104',
+            30158,
+            0,
+            4
+        },
+        {
+            'uab1104',
+            30182,
+            2,
+            2
+        },
+        {
+            'uab1104',
+            30206,
+            4,
+            0
+        },
+        {
+            'uab1104',
+            30231,
+            2,
+            -2
+        },
+        {
+            'uab1104',
+            30255,
+            0,
+            -4
+        },
+        {
+            'uab1104',
+            30279,
+            -2,
+            -2
+        }
+    },
+}
+
+---@type ContextBasedTemplate
+T1Hydrocarbon = {
+    Name = 'Hydrocarbon',
+    TriggersOnHydroDeposit = true,
+    TemplateData = {
+        0,
+        0,
+        {
+            'uab1102',
+            1,
+            1,
+            1
+        },
+    }, 
 }
