@@ -1513,6 +1513,7 @@ function OnClickHandler(button, modifiers)
         end
 
         if options.gui_template_rotator ~= 0 then
+            LOG("Hello!")
             local item = button.Data
             local activeTemplate = item.template.templateData
             local worldview = import("/lua/ui/game/worldview.lua").viewLeft

@@ -17,6 +17,8 @@ local Prefs = import("/lua/user/prefs.lua")
 local OverchargeCanKill = import("/lua/ui/game/unitview.lua").OverchargeCanKill
 local CommandMode = import("/lua/ui/game/commandmode.lua")
 
+
+
 WorldViewParams = {
     ui_SelectTolerance = 7.0,
     ui_DisableCursorFixing = false,
@@ -906,7 +908,26 @@ WorldView = ClassUI(moho.UIWorldView, Control) {
         elseif event.Type == 'WheelRotation' then
             self.zoomed = true
         end
-        
+
+        -- template rotation feature
+        if  event.Type == 'ButtonPress' and
+            event.Modifiers.Middle and
+            Prefs.GetFromCurrentProfile('options.selection_threshold_replay') ~= 0
+        then
+            local template = GetActiveBuildTemplate()
+            if template and not table.empty(template) then
+                local temp = template[1]
+                template[1] = template[2]
+                template[2] = temp
+                for i = 3, table.getn(template) do
+                    local temp = template[i][3]
+                    template[i][3] = 0 - template[i][4]
+                    template[i][4] = temp
+                end
+                SetActiveBuildTemplate(template)
+            end
+        end
+
         return false
     end,
 
