@@ -909,7 +909,7 @@ WorldView = ClassUI(moho.UIWorldView, Control) {
             self.zoomed = true
         end
 
-        -- template rotation feature that relies on a math trick that allows for rotating 2 dimensional positions at 90 degrees, see also;
+        -- template rotation feature that relies on a math trick that allows for rotating 2 dimensional positions at 90 degrees, see also:
         -- - https://en.wikipedia.org/wiki/Rotation_matrix#Common_2D_rotations
 
         if  event.Type == 'ButtonPress' and
@@ -922,7 +922,6 @@ WorldView = ClassUI(moho.UIWorldView, Control) {
                 template[1] = template[2]
                 template[2] = temp
                 for i = 3, table.getn(template) do
-
                     local temp = template[i][3]
                     template[i][3] = -1 * template[i][4]
                     template[i][4] = temp
