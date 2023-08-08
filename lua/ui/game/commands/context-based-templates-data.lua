@@ -2,11 +2,13 @@
 ---@class ContextBasedTemplate
 ---@field Name string                           # Printed on screen when cycling the templates
 ---@field TemplateData BuildTemplate            # A regular build template, except that it is written in Pascal Case and usually the first unit is removed
----@field TriggersOnUnit? EntityCategory       # When defined, includes this template when the unit the mouse is hovering over matches the categories
----@field TriggersOnLand? boolean               # When true, includes this template when the mouse does not hover over a unit
----@field TriggersOnMassDeposit? boolean
----@field TriggersOnHydroDeposit? boolean
----@field TriggersOnWater? boolean
+---@field TriggersOnUnit? EntityCategory        # When defined, includes this template when the unit the mouse is hovering over matches the categories
+---@field TriggersOnLand? boolean               # When true, includes this template when the mouse is over land and not over a deposit
+---@field TriggersOnWater? boolean              # When true, includes this template when the mouse is over water and not over a deposit
+---@field TriggersOnMassDeposit? boolean        # When true, includes this template when the mouse is over a mass deposit
+---@field TriggersOnHydroDeposit? boolean       # When true, includes this template when the mouse is over a hydrocarbon deposit
+
+-- Entity categories that are considered valid: https://github.com/FAForever/fa/blob/deploy/fafdevelop/engine/Core/Categories.lua
 
 ---@type ContextBasedTemplate
 CapExtractorWithStorages = {
