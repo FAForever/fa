@@ -164,7 +164,6 @@ Cycle = function()
             local template = Templates[k]
             local valid = ValidateTemplate(template, buildableUnits, prefix)
             if valid then
-                LOG(template.TriggersOnLand)
                 if  -- check conditions based on the context of the mouse
                     ((not template.TriggersOnUnit) or (userUnit and EntityCategoryContains(template.TriggersOnUnit, userUnit))) and
                     ((not template.TriggersOnMassDeposit) or ((not userUnit) and (massDeposits > 0))) and
