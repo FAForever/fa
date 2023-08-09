@@ -61,11 +61,8 @@ SPEW(StringFormat("Found %d templates", table.getn(Templates)))
 ---@type ContextBasedTemplate[]
 local ContextBasedTemplates = { }
 
----@type BlueprintId
-local ContextBasedTemplateId = ''
-
 ---@type number
-local ContextBasedTemplateStep = 1
+local ContextBasedTemplateStep = 0
 
 ---@type number
 local ContextBasedTemplateCount = 1
@@ -74,9 +71,8 @@ local ContextBasedTemplateCount = 1
 local CommandMode = import("/lua/ui/game/commandmode.lua")
 CommandMode.AddEndBehavior(
     function()
-        if ContextBasedTemplateId != '' then
-            ContextBasedTemplateId = ''
-            ContextBasedTemplateStep = 1
+        if not table.empty(ContextBasedTemplates) then
+            ContextBasedTemplateStep = 0
             ClearBuildTemplates()
         end
     end,
@@ -139,14 +135,6 @@ Cycle = function()
             return
         end
 
-        -- detect changes
-        if ContextBasedTemplateId != blueprintId then
-            ContextBasedTemplateStep = 1
-            SPEW("Reset by blueprint id!")
-        end
-
-        ContextBasedTemplateId = blueprintId
-
         -- this is where we take the templates and fiddle with them:
         -- - we replace the unit IDs in the template so that it becomes faction independant
         -- - we filter the templates to only keep those that we want to place given the context, and that we can build given the selection of engineers
@@ -188,20 +176,17 @@ Cycle = function()
 
         -- wrap around when exceeding number of templates
         local count = TableGetn(ContextBasedTemplates)
-        if ContextBasedTemplateStep > count then
-            ContextBasedTemplateStep = 1
-            SPEW("Reset by count!")
-        end
+        local index = math.mod(ContextBasedTemplateStep, count) + 1
 
         -- start the command mode to allow us to build
-        local template = ContextBasedTemplates[ContextBasedTemplateStep]
+        local template = ContextBasedTemplates[index]
         if template then
             import("/lua/ui/game/commandmode.lua").SetIgnoreSelection(true)
             import("/lua/ui/game/commandmode.lua").StartCommandMode('build', {name = template.TemplateData[3][1]})
             import("/lua/ui/game/commandmode.lua").SetIgnoreSelection(false)
             SetActiveBuildTemplate(template.TemplateData)
 
-            print(StringFormat("(%d/%d) %s", ContextBasedTemplateStep, ContextBasedTemplateCount, template.Name))
+            print(StringFormat("(%d/%d) %s", index, ContextBasedTemplateCount, template.Name))
         end
 
         ContextBasedTemplateStep = ContextBasedTemplateStep + 1
