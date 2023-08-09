@@ -212,12 +212,16 @@ function GetBestThreatTarget(aiBrain, platoon, bSkipPathability)
 
     -- Need to use overall so we can get all the threat points on the map and then filter from there
     -- if a specific threat is used, it will only report back threat locations of that type
+    local threatTable = {}
     local enemyIndex = nil
     if aiBrain:GetCurrentEnemy() and TargetCurrentEnemy then
         enemyIndex = aiBrain:GetCurrentEnemy():GetArmyIndex()
     end
-
-    local threatTable = aiBrain:GetThreatsAroundPosition(platoonPosition, 16, true, 'Overall', enemyIndex)
+    if enemyIndex then
+        threatTable = aiBrain:GetThreatsAroundPosition(platoonPosition, 16, true, 'Overall', enemyIndex)
+    else
+        threatTable = aiBrain:GetThreatsAroundPosition(platoonPosition, 16, true, 'Overall')
+    end
 
     if table.empty(threatTable) then
         return false
@@ -289,8 +293,14 @@ function GetBestThreatTarget(aiBrain, platoon, bSkipPathability)
         ----------------------------------
 
         -- Determine the value of the target
-        primaryThreat = aiBrain:GetThreatAtPosition({threat[1], 0, threat[2]}, 1, true, PrimaryTargetThreatType, enemyIndex)
-        secondaryThreat = aiBrain:GetThreatAtPosition({threat[1], 0, threat[2]}, 1, true, SecondaryTargetThreatType, enemyIndex)
+        if enemyIndex then 
+            primaryThreat = aiBrain:GetThreatAtPosition({threat[1], 0, threat[2]}, 1, true, PrimaryTargetThreatType, enemyIndex)
+            secondaryThreat = aiBrain:GetThreatAtPosition({threat[1], 0, threat[2]}, 1, true, SecondaryTargetThreatType, enemyIndex)
+        else
+            primaryThreat = aiBrain:GetThreatAtPosition({threat[1], 0, threat[2]}, 1, true, PrimaryTargetThreatType)
+            secondaryThreat = aiBrain:GetThreatAtPosition({threat[1], 0, threat[2]}, 1, true, SecondaryTargetThreatType)
+        end
+
 
         baseThreat = primaryThreat + secondaryThreat
 
