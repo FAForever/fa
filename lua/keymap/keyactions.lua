@@ -1597,6 +1597,10 @@ local keyactionsOrdersContextBased = {
         action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").SelectHighestEngineerAndAssist()',
         category = 'ordersContextBased',
     },
+    ['shift_cycle_context_based_templates'] = {
+        action = 'UI_Lua import("/lua/ui/game/commands/context-based-templates.lua").Cycle()',
+        category = 'ordersContextBased',
+    },
     ['cycle_context_based_templates'] = {
         action = 'UI_Lua import("/lua/ui/game/commands/context-based-templates.lua").Cycle()',
         category = 'ordersContextBased',

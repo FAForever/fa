@@ -914,7 +914,7 @@ WorldView = ClassUI(moho.UIWorldView, Control) {
 
         if  event.Type == 'ButtonPress' and
             event.Modifiers.Middle and
-            Prefs.GetFromCurrentProfile('options.selection_threshold_replay') ~= 0
+            Prefs.GetFromCurrentProfile('options.gui_template_rotator') ~= 0
         then
             local template = GetActiveBuildTemplate()
             if template and not table.empty(template) then
