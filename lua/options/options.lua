@@ -521,6 +521,19 @@ options = {
             },
 
             {
+                title = "<LOC OPTIONS_0273>Right click to ring extractors with storages",
+                key = 'structure_capping_feature_01',
+                type = 'toggle',
+                default = "on",
+                custom = {
+                    states = {
+                        {text = "<LOC _Off>Off",    key = "off"},
+                        {text = "<LOC _Off>On",     key = "on"} -- only-storages-extractors full-suite
+                    },
+                },
+            },
+
+            {
                 title = "<LOC ASSIST_TO_UPGRADE>Hold alt to force attack move",
                 key = 'alt_to_force_attack_move',
                 type = 'toggle',

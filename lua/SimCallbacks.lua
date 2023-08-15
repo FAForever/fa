@@ -263,8 +263,37 @@ end
 
 Callbacks.WeaponPriorities = import("/lua/weaponpriorities.lua").SetWeaponPriorities
 
+---@param data { target: EntityId }
+---@param selection Unit[]
+Callbacks.RingExtractor = function(data, selection)
+    -- verify selection
+    if  (not selection) or
+        TableEmpty(selection)
+    then
+        return
+    end
+
+    -- verify we have engineers
+    local engineers = EntityCategoryFilterDown(categories.ENGINEER, selection)
+    if TableEmpty(engineers) then
+        return
+    end
+
+    -- verify the extractor
+    local extractor = GetUnitById(data.target) --[[@as Unit]]
+    if  (not extractor) or
+        (not extractor.Army) or
+        (not OkayToMessWithArmy(extractor.Army)) or
+        (not EntityCategoryContains(categories.MASSEXTRACTION, extractor))
+    then
+        return
+    end
+
+    import("/lua/sim/commands/ring-extractor.lua").RingExtractor(extractor, engineers)
+end
+
 ---@param data any
----@param selection any
+---@param selection Unit[]
 Callbacks.SelectHighestEngineerAndAssist = function(data, selection)
     if selection then
         -- check for cheats
