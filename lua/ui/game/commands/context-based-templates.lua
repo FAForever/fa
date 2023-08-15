@@ -195,15 +195,18 @@ Cycle = function()
                 local valid = ValidateTemplate(template, buildableUnits, prefix)
                 if valid then
                     if  -- check conditions based on the context of the mouse
-                        ((not template.TriggersOnLand) or ((not userUnit) and noDeposits)) and
-                        ((not template.TriggersOnWater) or ((not userUnit) and noDeposits))
+                        (template.TriggersOnLand and onLand) or
+                        (template.TriggersOnWater and (not onLand))
                     then
                         TableInsert(ContextBasedTemplates, template)
                         ContextBasedTemplateCount = ContextBasedTemplateCount + 1
                     end
                 end
             end
+        end
 
+        -- absolutely nothing available
+        if ContextBasedTemplateCount == 0 then
             print("No templates available")
             return
         end
