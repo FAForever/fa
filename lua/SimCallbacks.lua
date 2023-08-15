@@ -267,7 +267,7 @@ Callbacks.WeaponPriorities = import("/lua/weaponpriorities.lua").SetWeaponPriori
 ---@param selection Unit[]
 Callbacks.RingExtractor = function(data, selection)
     -- verify selection
-    if  (not selection) or
+    if (not selection) or
         TableEmpty(selection)
     then
         return
@@ -281,7 +281,7 @@ Callbacks.RingExtractor = function(data, selection)
 
     -- verify the extractor
     local extractor = GetUnitById(data.target) --[[@as Unit]]
-    if  (not extractor) or
+    if (not extractor) or
         (not extractor.Army) or
         (not OkayToMessWithArmy(extractor.Army)) or
         (not EntityCategoryContains(categories.MASSEXTRACTION, extractor))
@@ -685,8 +685,8 @@ do
     --- As an example, the output is `{3, 3, 2, 2}` when `h = 10` and `l = 4`. The cache parameter
     --- allows us to re-use memory
     ---@param h number          # Higher number
-    ---@param l number          # Lower number 
-    ---@param cache number[]    # Table with as many elements as `l`, such as 
+    ---@param l number          # Lower number
+    ---@param cache number[]    # Table with as many elements as `l`, such as
     ---@return number[]
     local function ComputeBatchCounts(h, l, cache)
 
@@ -953,47 +953,25 @@ do
 
                         LOG(" - Full redundancy")
 
-                        -- prepare orders
-                        for _, order in group do
-                            order.Entity = order.target
-                            order.Location = { order.x, order.y, order.z }
-                        end
+                        local start = 1
+                        local batches = ComputeBatchCounts(unitCount, orderCount, dummyBatches)
 
-                        local unitsPerBatch = math.ceil(unitCount / orderCount)
-                        local redundancy = orderCount
-                        LOG(string.format(" - Units per batch: %d", unitsPerBatch))
-                        LOG(string.format(" - Redundancy: %d", redundancy))
-
-                        -- issue orders
-                        for b = 1, redundancy do
-                            for o, _ in group do
-                                -- give an offset to each order
-                                local order = group[math.mod(o + b, orderCount) + 1]
-
-                                -- compute the batch of units
-                                local batch = {}
-                                for k = 1, unitsPerBatch do
-                                    local unit = units[k + (b - 1) * unitsPerBatch]
-                                    if unit then
-                                        table.insert(batch, unit)
-                                    end
-                                end
-
-                                -- LOG(string.format("Apply order at: (%s)", repru(order.Location)))
-                                -- for k, unit in batch do
-                                --     LOG(unit.EntityId)
-                                -- end
-
-                                ordersApplied = ordersApplied + 1
-
-                                if order.Entity then
-                                    issueOrder(batch, order.Entity)
-                                elseif commandInfo.Type == 'BuildMobile' then
-                                    issueOrder(batch, order.Location, order.blueprintId, {})
-                                elseif not commandInfo.RequiresEntity then
-                                    issueOrder(batch, order.Location)
-                                end
+                        for k, batch in batches do
+                            local direction = 1
+                            if math.mod(k, 2) == 0 then
+                                direction = -1
                             end
+
+                            for o = 1, orderCount do
+                                local index = math.mod((direction * (o - 1) + k) + orderCount, orderCount) + 1
+                                local order = group[index]
+                                local unitBatch = PopulateBatch(start, batch - 1, units, dummyBatchTable)
+                                local targetOrEntity = order.target or PopulateLocation(order, dummyVectorTable)
+                                issueOrder(unitBatch, targetOrEntity)
+                                ordersApplied = ordersApplied + 1
+                            end
+
+                            start = start + batch
                         end
                     else
                         LOG(" - No redundancy")
@@ -1056,7 +1034,7 @@ do
         LOG(string.format("Processing time: %f", GetSystemTimeSecondsOnlyForProfileUse() - start))
     end
 
-    
+
 end
 
 --#endregion
