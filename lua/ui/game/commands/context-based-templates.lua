@@ -70,8 +70,10 @@ local Templates = { }
 for k, template in RawTemplates do
     if type(template) == "table" then
         if template.TriggersOnUnit or template.TriggersOnLand or template.TriggersOnMassDeposit or template.TriggersOnHydroDeposit or template.TriggersOnWater then
-            TableInsert(Templates, template)
-            SPEW(StringFormat("Found template: %s with name %s", tostring(k), tostring(template.Name)))
+            if template.TemplateSortingOrder then
+                TableInsert(Templates, template)
+                SPEW(StringFormat("Found template: %s with name %s", tostring(k), tostring(template.Name)))
+            end
         end
     end
 end
@@ -131,7 +133,7 @@ end
 ---@param a ContextBasedTemplate
 ---@param b ContextBasedTemplate
 local function SortTemplates(a, b)
-    return a.Name < b.Name
+    return a.TemplateSortingOrder < b.TemplateSortingOrder
 end
 
 --- Enables us to cycle the templates depending on the context that the mouse provides
@@ -141,11 +143,9 @@ Cycle = function()
 
     local info = GetRolloverInfo()
     local userUnit = info.userUnit
-    local blueprintId = info.blueprintId
-    if not info then
-        blueprintId = "EmptySpace"
-    end
     local position = GetMouseWorldPos()
+    local elevation = GetMouseTerrainElevation()
+
     local selectedUnits = GetSelectedUnits()
     if selectedUnits and not TableEmpty(selectedUnits) then
         local _, _, buildableCategories = GetUnitCommandData(selectedUnits)
@@ -167,6 +167,7 @@ Cycle = function()
         local massDeposits = TableGetn(GetDepositsAroundPoint(position[1], position[3], 1.5, 1))
         local hydroDeposits = TableGetn(GetDepositsAroundPoint(position[1], position[3], 3.0, 2))
         local noDeposits = (massDeposits == 0) and (hydroDeposits == 0)
+        local onLand = elevation + 0.1 >= position[2]
 
         ContextBasedTemplates = { }
         ContextBasedTemplateCount = 0
@@ -178,8 +179,8 @@ Cycle = function()
                     ((not template.TriggersOnUnit) or (userUnit and EntityCategoryContains(template.TriggersOnUnit, userUnit))) and
                     ((not template.TriggersOnMassDeposit) or ((not userUnit) and (massDeposits > 0))) and
                     ((not template.TriggersOnHydroDeposit) or ((not userUnit) and (hydroDeposits > 0))) and
-                    ((not template.TriggersOnLand) or ((not userUnit) and noDeposits)) and
-                    ((not template.TriggersOnWater) or ((not userUnit) and noDeposits))
+                    ((not template.TriggersOnLand) or ((not userUnit) and noDeposits and onLand)) and
+                    ((not template.TriggersOnWater) or ((not userUnit) and noDeposits and (not onLand)))
                 then
                     TableInsert(ContextBasedTemplates, template)
                     ContextBasedTemplateCount = ContextBasedTemplateCount + 1
@@ -187,7 +188,24 @@ Cycle = function()
             end
         end
 
-        -- no templates to use, inform the user and bail out
+        -- no templates to use, default to those that trigger on land or water
+        if ContextBasedTemplateCount == 0 then
+            for k = 1, TableGetn(Templates) do
+                local template = Templates[k]
+                local valid = ValidateTemplate(template, buildableUnits, prefix)
+                if valid then
+                    if  -- check conditions based on the context of the mouse
+                        (template.TriggersOnLand and onLand) or
+                        (template.TriggersOnWater and (not onLand))
+                    then
+                        TableInsert(ContextBasedTemplates, template)
+                        ContextBasedTemplateCount = ContextBasedTemplateCount + 1
+                    end
+                end
+            end
+        end
+
+        -- absolutely nothing available
         if ContextBasedTemplateCount == 0 then
             print("No templates available")
             return
@@ -206,7 +224,11 @@ Cycle = function()
             import("/lua/ui/game/commandmode.lua").SetIgnoreSelection(true)
             import("/lua/ui/game/commandmode.lua").StartCommandMode('build', {name = template.TemplateData[3][1]})
             import("/lua/ui/game/commandmode.lua").SetIgnoreSelection(false)
-            SetActiveBuildTemplate(template.TemplateData)
+
+            -- only turn it into a build template when we have more than 1 unit in it
+            if TableGetn(template.TemplateData) > 3 then
+                SetActiveBuildTemplate(template.TemplateData)
+            end
 
             print(StringFormat("(%d/%d) %s", index, ContextBasedTemplateCount, template.Name))
         end

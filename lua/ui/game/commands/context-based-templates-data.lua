@@ -24,6 +24,7 @@
 ---@class ContextBasedTemplate
 ---@field Name string                           # Printed on screen when cycling the templates
 ---@field TemplateData BuildTemplate            # A regular build template, except that it is written in Pascal Case and usually the first unit is removed
+---@field TemplateSortingOrder number           # Lower numbers end up first in the queue 
 ---@field TriggersOnUnit? EntityCategory        # When defined, includes this template when the unit the mouse is hovering over matches the categories
 ---@field TriggersOnLand? boolean               # When true, includes this template when the mouse is over land and not over a deposit
 ---@field TriggersOnWater? boolean              # When true, includes this template when the mouse is over water and not over a deposit
@@ -36,6 +37,7 @@
 CapExtractorWithStorages = {
     Name = 'Storages',
     TriggersOnUnit = categories.MASSEXTRACTION,
+    TemplateSortingOrder = 100,
     TemplateData = {
         0,
         0,
@@ -70,6 +72,7 @@ CapExtractorWithStorages = {
 CapExtractorWithFabs = {
     Name = 'Storages and fabricators',
     TriggersOnUnit = categories.MASSEXTRACTION * (categories.TECH2 + categories.TECH3),
+    TemplateSortingOrder = 101,
     TemplateData = {
         10,
         10,
@@ -152,6 +155,7 @@ CapExtractorWithFabs = {
 CapRadarWithPower = {
     Name = 'Power generators',
     TriggersOnUnit = (categories.RADAR + categories.OMNI) * categories.STRUCTURE,
+    TemplateSortingOrder = 100,
     TemplateData = {
         0,
         0,
@@ -187,6 +191,7 @@ CapT2ArtilleryWithPower = {
     Name = 'Power generators',
     TriggersOnUnit = categories.ARTILLERY * categories.STRUCTURE * categories.TECH2,
     TriggersOnSelection = categories.TECH1 + categories.TECH2 + categories.TECH3 + categories.COMMAND,
+    TemplateSortingOrder = 100,
     TemplateData = {
         0,
         0,
@@ -221,6 +226,7 @@ CapT2ArtilleryWithPower = {
 CapT3FabricatorWithStorages = {
     Name = 'Storages',
     TriggersOnUnit = categories.STRUCTURE * categories.MASSFABRICATION * categories.TECH3,
+    TemplateSortingOrder = 100,
     TemplateData = {
         0,
         0,
@@ -303,6 +309,7 @@ CapT3FabricatorWithStorages = {
 CapT3ArtilleryWithPower = {
     Name = 'Power generators',
     TriggersOnUnit = categories.STRUCTURE * categories.ARTILLERY * (categories.TECH3 + categories.EXPERIMENTAL),
+    TemplateSortingOrder = 100,
     TemplateData = {
         0,
         0,
@@ -330,70 +337,6 @@ CapT3ArtilleryWithPower = {
             2,
             -6
         }
-    },
-}
-
----@type ContextBasedTemplate
-CapAirWithPowerRight = {
-    Name = 'Power generators - right',
-    TriggersOnUnit = categories.AIR * categories.TECH3 * categories.STRUCTURE,
-    TemplateData = {
-        0,
-        0,
-        {
-            'uab1301',
-            5352,
-            10,
-            2
-        },
-    },
-}
-
----@type ContextBasedTemplate
-CapAirWithPowerLeft = {
-    Name = 'Power generators - left',
-    TriggersOnUnit = categories.AIR * categories.TECH3 * categories.STRUCTURE,
-    TemplateData = {
-        0,
-        0,
-        {
-            'uab1301',
-            5385,
-            -6,
-            2
-        },
-    },
-}
-
----@type ContextBasedTemplate
-CapAirWithPowerTop = {
-    Name = 'Power generators - top',
-    TriggersOnUnit = categories.AIR * categories.TECH3 * categories.STRUCTURE,
-    TemplateData = {
-        0,
-        0,
-        {
-            'uab1301',
-            5408,
-            2,
-            -6
-        }
-    },
-}
-
----@type ContextBasedTemplate
-CapAirWithPowerBottom = {
-    Name = 'Power generators - bottom',
-    TriggersOnUnit = categories.AIR * categories.TECH3 * categories.STRUCTURE,
-    TemplateData = {
-        0,
-        0,
-        {
-            'uab1301',
-            5369,
-            2,
-            10
-        },
     },
 }
 
@@ -401,6 +344,7 @@ CapAirWithPowerBottom = {
 PointDefense = {
     Name = "Point defense",
     TriggersOnLand = true,
+    TemplateSortingOrder = 10,
     TemplateData = {
         3,
         3,
@@ -462,9 +406,111 @@ PointDefense = {
 }
 
 ---@type ContextBasedTemplate
+AirDefenseLand = {
+    Name = "Anti-air defense",
+    TriggersOnLand = true,
+    TemplateSortingOrder = 11,
+    TemplateData = {
+        3,
+        3,
+        {
+            'uab2104',
+            4646,
+            0,
+            0
+        },
+        {
+            'uab5101',
+            4749,
+            -1,
+            -1
+        },
+        {
+            'uab5101',
+            4753,
+            0,
+            -1
+        },
+        {
+            'uab5101',
+            4757,
+            1,
+            -1
+        },
+        {
+            'uab5101',
+            4761,
+            1,
+            0
+        },
+        {
+            'uab5101',
+            4765,
+            1,
+            1
+        },
+        {
+            'uab5101',
+            4769,
+            0,
+            1
+        },
+        {
+            'uab5101',
+            4773,
+            -1,
+            1
+        },
+        {
+            'uab5101',
+            4777,
+            -1,
+            0
+        }
+    },
+}
+
+
+---@type ContextBasedTemplate
+AirDefenseWater = {
+    Name = "Anti-air defense",
+    TriggersOnWater = true,
+    TemplateSortingOrder = 11,
+    TemplateData = {
+        3,
+        3,
+        {
+            'uab2104',
+            4646,
+            0,
+            0
+        },
+    },
+}
+
+
+---@type ContextBasedTemplate
+TorpedoDefense = {
+    Name = "Torpedo defense",
+    TriggersOnWater = true,
+    TemplateSortingOrder = 10,
+    TemplateData = {
+        3,
+        3,
+        {
+            'uab2109',
+            4646,
+            0,
+            0
+        },
+    },
+}
+
+---@type ContextBasedTemplate
 T1Extractor = {
     Name = 'Extractor',
     TriggersOnMassDeposit = true,
+    TemplateSortingOrder = 100,
     TemplateData = {
         0,
         0,
@@ -481,6 +527,7 @@ T1Extractor = {
 T2ExtractorWithStorages = {
     Name = 'Extractor and storages',
     TriggersOnMassDeposit = true,
+    TemplateSortingOrder = 101,
     TemplateData = {
         0,
         0,
@@ -521,6 +568,7 @@ T2ExtractorWithStorages = {
 T3ExtractorWithStorages = {
     Name = 'Extractor and storages',
     TriggersOnMassDeposit = true,
+    TemplateSortingOrder = 102,
     TemplateData = {
         0,
         0,
@@ -561,6 +609,7 @@ T3ExtractorWithStorages = {
 T3ExtractorWithStoragesAndFabs = {
     Name = 'Extractor, storages and fabricators',
     TriggersOnMassDeposit = true,
+    TemplateSortingOrder = 103,
     TemplateData = {
         0,
         0,
@@ -649,6 +698,7 @@ T3ExtractorWithStoragesAndFabs = {
 T1Hydrocarbon = {
     Name = 'Hydrocarbon',
     TriggersOnHydroDeposit = true,
+    TemplateSortingOrder = 100,
     TemplateData = {
         0,
         0,
