@@ -209,8 +209,6 @@ Callbacks.OnPlayerQueryResult = SimPlayerQuery.OnPlayerQueryResult
 
 Callbacks.PingGroupClick = import("/lua/simpinggroup.lua").OnClickCallback
 
-Callbacks.GiveOrders = import("/lua/spreadattack.lua").GiveOrders
-
 Callbacks.ValidateAssist = function(data, units)
     units = SecureUnits(units)
     local target = GetEntityById(data.target)
