@@ -46,7 +46,7 @@ local MathAtan = math.atan
 ---@alias CommandMode 'order' | 'build' | 'buildanchored' | false
 
 ---@class CommandModeDataBase
----@field cursor? CommandCap        # Similar to the field 'name' 
+---@field cursor? CommandCap        # Similar to the field 'name'
 ---@field altCursor string          # Allows for an alternative cursor
 
 ---@class CommandModeDataOrder : CommandModeDataBase
@@ -271,9 +271,81 @@ local function CheatSpawn(command, data)
     }, true)
 end
 
+--- Allows us to detect a double / triple click
+local pStructure1 = nil
+function RingExtractor(command)
+    -- retrieve the option in question, can have values: 'off', 'only-storages-extractors' and 'full-suite'
+    local option = Prefs.GetFromCurrentProfile('options.structure_capping_feature_01')
+
+    -- bail out - we're not interested
+    if option == 'off' then
+        return
+    end
+
+    -- check if we have engineers
+    local units = EntityCategoryFilterDown(categories.ENGINEER, command.Units)
+    if not units[1] then return end
+
+    -- check if we have a building that we target
+    local structure = GetUnitById(command.Target.EntityId)
+    if not structure or IsDestroyed(structure) then return end
+
+    -- various conditions written out for maintainability
+    local isShiftDown = IsKeyDown('Shift')
+    local isDoubleTapped = structure ~= nil and (pStructure1 == structure)
+    local isUpgrading = structure:GetFocus() ~= nil
+
+    local isTech1 = structure:IsInCategory('TECH1')
+    local isTech2 = structure:IsInCategory('TECH2')
+    local isTech3 = structure:IsInCategory('TECH3')
+
+    if structure:IsInCategory('STRUCTURE') then
+        if structure:IsInCategory('MASSEXTRACTION') then
+            local buildStorages =
+            (
+                (isTech1 and isUpgrading and isDoubleTapped and isShiftDown)
+                    or (isTech2 and isUpgrading and isDoubleTapped and isShiftDown)
+                    or (isTech2 and not isUpgrading)
+                    or isTech3
+                )
+
+            if buildStorages then
+
+                -- prevent consecutive calls
+                local gameTick = GameTick()
+                if structure.RingStoragesStamp then
+                    if structure.RingStoragesStamp + 5 > gameTick then
+                        return
+                    end
+                end
+
+                structure.RingStoragesStamp = gameTick
+
+                print("Ringing extractor with storages")
+                SimCallback({ Func = 'RingExtractor', Args = { target = command.Target.EntityId } }, true)
+
+                if (isTech1 and isUpgrading) or (isTech2 and not isUpgrading) then
+                    structure = nil
+                    pStructure1 = nil
+                end
+            end
+        end
+    end
+
+    -- keep track of previous structure to identify a 2nd / 3rd click
+    pStructure1 = structure
+
+    -- prevent building up state when upgrading but shift isn't pressed
+    if isUpgrading and not isShiftDown then
+        structure = nil
+        pStructure1 = nil
+    end
+end
+
 -- cached category strings for performance
 local categoriesFactories = categories.STRUCTURE * categories.FACTORY
 local categoriesShields = categories.MOBILE * categories.SHIELD
+local categoriesStructure = categories.STRUCTURE
 
 --- Upgrades a tech 1 extractor that is being assisted
 ---@param unit UserUnit
@@ -319,7 +391,7 @@ local function OnGuardUnpause(guardees, target)
         if not target.ThreadUnpause then
             local id = target:GetEntityId()
             target.ThreadUnpause = ForkThread(
-                function ()
+                function()
                     WaitSeconds(1.0)
                     local target = GetUnitById(id)
                     while target do
@@ -335,7 +407,7 @@ local function OnGuardUnpause(guardees, target)
                                         SetPaused({ target }, false)
                                         break
                                     end
-                                -- engineer is idle, died, we switch armies, ...
+                                    -- engineer is idle, died, we switch armies, ...
                                 else
                                     candidates[id] = nil
                                 end
@@ -343,8 +415,8 @@ local function OnGuardUnpause(guardees, target)
                         else
                             target.ThreadUnpauseCandidates = nil
                             target.ThreadUnpause = nil
-                            break;
-                        end
+                            break
+                            ;end
 
                         WaitSeconds(1.0)
                         target = GetUnitById(id)
@@ -354,7 +426,7 @@ local function OnGuardUnpause(guardees, target)
         end
 
         -- add these to keep track
-        target.ThreadUnpauseCandidates = target.ThreadUnpauseCandidates or { }
+        target.ThreadUnpauseCandidates = target.ThreadUnpauseCandidates or {}
         for k, guardee in guardees do
             target.ThreadUnpauseCandidates[guardee:GetEntityId()] = true
         end
@@ -423,6 +495,11 @@ function OnCommandIssued(command)
         if EntityCategoryFilterDown(categoriesShields, command.Units)[1] then
             local cb = { Func = 'FlagShield', Args = { target = command.Target.EntityId } }
             SimCallback(cb, true)
+        end
+
+        -- see if we can cap a structure
+        if EntityCategoryContains(categoriesStructure, command.Blueprint) then
+            RingExtractor(command)
         end
 
         -- called when:

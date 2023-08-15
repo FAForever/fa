@@ -339,6 +339,8 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
         local acc = 200 * projPosY / (time*time)
 
         data.lastAccel = acc
+
+        LOG("usestore: " .. tostring(data.usestore))
         return acc
     end,
 
@@ -706,6 +708,8 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
             local unit = self.unit
             if unit.Dead then return end
             unit:SetBusy(false)
+            LOG("Salvo si reset!")
+            self.CurrentSalvoData = nil -- once the salvo is done, reset the data
             self:WaitForAndDestroyManips()
 
             local bp = self.Blueprint
@@ -994,7 +998,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
                         end
                     end
                 end
-                self.CurrentSalvoData = nil -- once the salvo is done, reset the data
+
                 self:PlayFxRackReloadSequence()
                 local currentRackSalvoNumber = self.CurrentRackSalvoNumber
                 if currentRackSalvoNumber <= rackBoneCount then
