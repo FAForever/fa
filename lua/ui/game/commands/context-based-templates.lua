@@ -187,8 +187,22 @@ Cycle = function()
             end
         end
 
-        -- no templates to use, inform the user and bail out
+        -- no templates to use, default to those that trigger on land or water
         if ContextBasedTemplateCount == 0 then
+            for k = 1, TableGetn(Templates) do
+                local template = Templates[k]
+                local valid = ValidateTemplate(template, buildableUnits, prefix)
+                if valid then
+                    if  -- check conditions based on the context of the mouse
+                        ((not template.TriggersOnLand) or ((not userUnit) and noDeposits)) and
+                        ((not template.TriggersOnWater) or ((not userUnit) and noDeposits))
+                    then
+                        TableInsert(ContextBasedTemplates, template)
+                        ContextBasedTemplateCount = ContextBasedTemplateCount + 1
+                    end
+                end
+            end
+
             print("No templates available")
             return
         end
@@ -206,7 +220,11 @@ Cycle = function()
             import("/lua/ui/game/commandmode.lua").SetIgnoreSelection(true)
             import("/lua/ui/game/commandmode.lua").StartCommandMode('build', {name = template.TemplateData[3][1]})
             import("/lua/ui/game/commandmode.lua").SetIgnoreSelection(false)
-            SetActiveBuildTemplate(template.TemplateData)
+
+            -- only turn it into a build template when we have more than 1 unit in it
+            if TableGetn(template.TemplateData) > 3 then
+                SetActiveBuildTemplate(template.TemplateData)
+            end
 
             print(StringFormat("(%d/%d) %s", index, ContextBasedTemplateCount, template.Name))
         end
