@@ -1493,14 +1493,6 @@ local keyActionsOrders = {
         action = 'UI_Lua import("/lua/ui/game/confirmunitdestroy.lua").ConfirmUnitDestruction(false)',
         category = 'orders',
     },
-    ['spreadattack'] = {
-        action = 'UI_Lua import("/lua/spreadattack.lua").SpreadAttack()',
-        category = 'orders',
-    },
-    ['shift_spreadattack'] = {
-        action = 'UI_Lua import("/lua/spreadattack.lua").SpreadAttack()',
-        category = 'orders',
-    },
     ['set_default_target_priority'] = {
         action = 'UI_LUA import("/lua/keymap/misckeyactions.lua").SetDefaultWeaponPriorities()',
         category = 'orders',

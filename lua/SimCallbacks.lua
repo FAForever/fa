@@ -503,7 +503,7 @@ do
             Redundancy = 1,
             ApplyAllOrders = false,
             BatchOrders = true,
-            FullRedundancy = true,
+            FullRedundancy = false,
         },
         [16] = {
             Type = "Patrol",

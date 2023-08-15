@@ -575,9 +575,6 @@ function OnCommandIssued(command)
             AddDefaultCommandFeedbackBlips(command.Target.Position)
         end
     end
-
-    -- used by spread attack to keep track of the orders of units
-    import("/lua/spreadattack.lua").MakeShadowCopyOrders(command)
 end
 
 --- ???
