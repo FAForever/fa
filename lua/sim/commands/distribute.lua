@@ -1,4 +1,26 @@
 
+--******************************************************************************************************
+--** Copyright (c) 2022  Willem 'Jip' Wijnia
+--**
+--** Permission is hereby granted, free of charge, to any person obtaining a copy
+--** of this software and associated documentation files (the "Software"), to deal
+--** in the Software without restriction, including without limitation the rights
+--** to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+--** copies of the Software, and to permit persons to whom the Software is
+--** furnished to do so, subject to the following conditions:
+--**
+--** The above copyright notice and this permission notice shall be included in all
+--** copies or substantial portions of the Software.
+--**
+--** THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+--** IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+--** FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+--** AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+--** LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+--** OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+--** SOFTWARE.
+--******************************************************************************************************
+
 -- upvalue scope for performance
 local TableGetn = table.getn
 local TableInsert = table.insert
@@ -482,7 +504,6 @@ DistributeOrders = function(units)
     ---@type { [1]: number, [2]: number, [3]: number }
     local dummyVectorTable = {}
 
-    local offset = 0
     local unitCount = TableGetn(units)
     for k, group in groups do
         local orderCount = TableGetn(group)
@@ -630,22 +651,15 @@ DistributeOrders = function(units)
 
                 LOG(string.format(" - Orders applied: %d", ordersApplied))
             else
+                local offset = 0
                 -- apply individual orders
                 for _, unit in units do
                     -- apply orders
                     for redundancy = 1, MathMin(orderCount, redundantOrders) do
                         local order = group[MathMod(offset, orderCount) + 1]
-                        local candidate = order.target
-                        if candidate then
-                            issueOrder({ unit }, candidate)
-                            offset = offset + 1
-                        else
-                            -- at this point we may need an entity, so we check and bail if we do need one
-                            if not commandInfo.RequiresEntity then
-                                issueOrder({ unit }, { order.x, order.y, order.z })
-                                offset = offset + 1
-                            end
-                        end
+                        offset = offset + 1
+                        dummyUnitTable[1] = unit
+                        issueOrder(dummyUnitTable, order.target or PopulateLocation(order, dummyVectorTable))
                     end
                 end
             end
