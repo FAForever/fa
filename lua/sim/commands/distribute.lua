@@ -126,12 +126,36 @@ local CommandInfo = {
         BatchOrders = true,
         FullRedundancy = true,
     },
-    [22] = { Type = "TransportLoadUnits", },
+    [22] = { 
+        Type = "TransportLoadUnits",
+        BatchOrders = true,
+
+        ---@param units Unit[]
+        ---@param transport Unit
+        Callback = function(units, transport)
+            -- a little bit of a hack to make it work properly
+            IssueClearCommands({transport})
+
+            local px, py, pz = 0, 0, 0
+            for k, unit in units do
+                local ux, uy, uz = unit:GetPositionXYZ()
+                px = px + ux
+                py = py + uy
+                pz = pz + uz
+            end
+
+            local count = table.getn(units)
+            local px = px / count
+            local py = py / count
+            local pz = pz / count
+
+            IssueMove({transport}, {px, py, pz})
+            IssueTransportLoad(units, transport)
+        end,
+    },
     [23] = { Type = "TransportReverseLoadUnits", },
     [24] = {
         Type = "TransportUnloadUnits",
-        Callback = IssueTransportUnload,
-        Redundancy = 1,
     },
     [25] = { Type = "TransportUnloadSpecificUnits", },
     [26] = { Type = "DetachFromTransport", },
