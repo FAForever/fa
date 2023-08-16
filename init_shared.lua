@@ -48,13 +48,13 @@ if SetProcessPriority and GetProcessAffinityMask and SetProcessAffinityMask then
     if success then
         -- system has 6 (logical) threads or more, skip first two computing units
         if systemAffinityMask >= 63 then
-            processAffinityMask = systemAffinityMask & (processAffinityMask << 2)
+            processAffinityMask = systemAffinityMask & (systemAffinityMask << 2)
         end
 
         -- update the afinity mask
         if processAffinityMask != systemAffinityMask then
             local success = SetProcessAffinityMask(processAffinityMask);
-            if success and false then
+            if success then
                 LOG("Process - affinity set to: " .. tostring(processAffinityMask))
             else
                 LOG("Process - Failed to adjust the process affinity, this may impact your framerate")
