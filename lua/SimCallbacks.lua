@@ -389,7 +389,7 @@ do
             return
         end
 
-        import("/lua/sim/commands/distribute.lua").DistributeOrders(units)
+        import("/lua/sim/commands/distribute.lua").DistributeOrders(selection)
     end
 end
 

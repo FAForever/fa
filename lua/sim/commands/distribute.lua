@@ -359,12 +359,6 @@ DistributeOrders = function(units)
 
     local start = GetSystemTimeSecondsOnlyForProfileUse()
 
-    -- prevent cheating
-    local units = SecureUnits(units)
-    if not (units and units[1]) then
-        return
-    end
-
     -----------------------------------------------------------------------
     -- bundle the orders
 
