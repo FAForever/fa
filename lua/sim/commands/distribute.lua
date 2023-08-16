@@ -1,3 +1,13 @@
+
+-- upvalue scope for performance
+local TableGetn = table.getn
+local TableInsert = table.insert
+local TableSort = table.sort
+
+local MathCeil = math.ceil
+local MathMod = math.mod
+local MathMin = math.min
+
 ---@class DistributeOrderInfo
 ---@field BatchOrders boolean
 ---@field FullRedundancy boolean
@@ -313,7 +323,7 @@ local function ComputeBatchCounts(h, l, cache)
     end
 
     for k = 1, l do
-        local count = math.ceil(h / l)
+        local count = MathCeil(h / l)
         cache[k] = count
         h = h - count
         l = l - 1
@@ -353,7 +363,8 @@ local function PopulateLocation(order, cache)
     return cache
 end
 
---- Processes the orders and re-distributes them over the units
+--- Processes the orders and re-distributes them over the units. Assumes that all units in the
+--- selection to have the same command queue. If that is not the case then orders are lost
 ---@param units Unit[]
 DistributeOrders = function(units)
 
@@ -388,7 +399,7 @@ DistributeOrders = function(units)
         end
 
         -- find the last group
-        local group = groups[table.getn(groups)]
+        local group = groups[TableGetn(groups)]
 
         -- try and remove duplicated orders
         local targetId = order.targetId
@@ -402,15 +413,15 @@ DistributeOrders = function(units)
         -- edge case: group has no orders, so we add this order and
         -- call it a day
         if not group[1] then
-            table.insert(group, order)
+            TableInsert(group, order)
             -- usual case: check if the current group is of the same
             -- type of order, if so add to the group otherwise create
             -- a new group
         else
             if group[1].commandType == order.commandType then
-                table.insert(group, order)
+                TableInsert(group, order)
             else
-                table.insert(groups, { order })
+                TableInsert(groups, { order })
 
                 -- the 'seen' table is per group of orders
                 seen = {}
@@ -436,7 +447,7 @@ DistributeOrders = function(units)
             unit.DistributeOrdersDistance = dx * dx + dz * dz
         end
 
-        table.sort(
+        TableSort(
             units,
             function(a, b)
                 return a.DistributeOrdersDistance < b.DistributeOrdersDistance
@@ -472,9 +483,9 @@ DistributeOrders = function(units)
     local dummyVectorTable = {}
 
     local offset = 0
-    local unitCount = table.getn(units)
+    local unitCount = TableGetn(units)
     for k, group in groups do
-        local orderCount = table.getn(group)
+        local orderCount = TableGetn(group)
 
         -- extract info on how to apply these orders
         local commandInfo = CommandInfo[group[1].commandType]
@@ -487,7 +498,7 @@ DistributeOrders = function(units)
 
         -- increase redundancy to guarantee all orders are applied at least once
         if applyAllOrders and (unitCount * redundantOrders < orderCount) then
-            redundantOrders = math.ceil(orderCount / (unitCount * redundantOrders))
+            redundantOrders = MathCeil(orderCount / (unitCount * redundantOrders))
         end
 
         if issueOrder then
@@ -568,12 +579,12 @@ DistributeOrders = function(units)
 
                     for k, batch in batches do
                         local direction = 1
-                        if math.mod(k, 2) == 0 then
+                        if MathMod(k, 2) == 0 then
                             direction = -1
                         end
 
                         for o = 1, orderCount do
-                            local index = math.mod((direction * (o - 1) + k) + orderCount, orderCount) + 1
+                            local index = MathMod((direction * (o - 1) + k) + orderCount, orderCount) + 1
                             local order = group[index]
                             local unitBatch = PopulateBatch(start, batch - 1, units, dummyBatchTable)
                             local targetOrEntity = order.target or PopulateLocation(order, dummyVectorTable)
@@ -622,8 +633,8 @@ DistributeOrders = function(units)
                 -- apply individual orders
                 for _, unit in units do
                     -- apply orders
-                    for redundancy = 1, math.min(orderCount, redundantOrders) do
-                        local order = group[math.mod(offset, orderCount) + 1]
+                    for redundancy = 1, MathMin(orderCount, redundantOrders) do
+                        local order = group[MathMod(offset, orderCount) + 1]
                         local candidate = order.target
                         if candidate then
                             issueOrder({ unit }, candidate)
