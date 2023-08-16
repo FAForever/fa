@@ -108,7 +108,7 @@ defaultKeyMap = {
     ['I']                   = 'assist',
     ['T']                   = 'repair',
     ['R']                   = 'attack',
-    ['Alt-R']               = 'spreadattack',
+    ['Alt-R']               = 'distribute_orders',
     ['E']                   = 'overcharge',
     ['Tilde']               = 'toggle_repeat_build',
 
@@ -119,7 +119,7 @@ defaultKeyMap = {
     ['Shift-I']             = 'shift_assist',
     ['Shift-T']             = 'shift_repair',
     ['Shift-R']             = 'shift_attack',
-    ['Shift-Alt-R']         = 'shift_spreadattack',
+    ['Shift-Alt-R']         = 'shift_distribute_orders',
     ['Shift-E']             = 'shift_overcharge',
 
     ['Z']                   = 'alt_builders',

@@ -121,6 +121,7 @@ local cUnit = moho.unit_methods
 ---@field TerrainType TerrainType
 ---@field EngineCommandCap? table<string, boolean>
 ---@field UnitBeingBuilt Unit?
+---@field EntityBeingReclaimed Unit | Prop | nil
 ---@field SoundEntity? Unit | Entity
 ---@field AutoModeEnabled? boolean
 Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
@@ -519,6 +520,14 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
             self:SetActiveConsumptionInactive()
             self:StopUnitAmbientSound('ConstructLoop')
         end
+
+        -- When paused we reclaim at a speed of 0, with thanks to:
+        -- - https://github.com/FAForever/FA-Binary-Patches/pull/19
+        if self:IsUnitState('Reclaiming') then
+            self:StopReclaimEffects(self.EntityBeingReclaimed)
+            self:StopUnitAmbientSound('ReclaimLoop')
+            self:PlayUnitSound('StopReclaim')
+        end
     end,
 
     ---@param self Unit
@@ -526,6 +535,14 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         if self:IsUnitState('Building') or self:IsUnitState('Upgrading') or self:IsUnitState('Repairing') then
             self:SetActiveConsumptionActive()
             self:PlayUnitAmbientSound('ConstructLoop')
+        end
+
+        -- When paused we reclaim at a speed of 0, with thanks to:
+        -- - https://github.com/FAForever/FA-Binary-Patches/pull/19
+        if self.EntityBeingReclaimed then
+            self:StartReclaimEffects(self.EntityBeingReclaimed)
+            self:PlayUnitSound('StartReclaim')
+            self:PlayUnitAmbientSound('ReclaimLoop')
         end
     end,
 
@@ -761,13 +778,20 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
     ---@param self Unit
     ---@param target Unit | Prop
     OnStartReclaim = function(self, target)
+
+        -- When paused we reclaim at a speed of 0, with thanks to:
+        -- - https://github.com/FAForever/FA-Binary-Patches/pull/19
+        if not self:IsPaused() then
+            self:StartReclaimEffects(target)
+            self:PlayUnitSound('StartReclaim')
+            self:PlayUnitAmbientSound('ReclaimLoop')
+        end
+
+        self.EntityBeingReclaimed = target
         self:SetUnitState('Reclaiming', true)
         self:SetFocusEntity(target)
         self:CheckAssistersFocus()
         self:DoUnitCallbacks('OnStartReclaim', target)
-        self:StartReclaimEffects(target)
-        self:PlayUnitSound('StartReclaim')
-        self:PlayUnitAmbientSound('ReclaimLoop')
 
         -- Force me to move on to the guard properly when done
         local guard = self:GetGuardedUnit()
