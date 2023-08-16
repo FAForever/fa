@@ -787,11 +787,11 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
             self:PlayUnitAmbientSound('ReclaimLoop')
         end
 
-        self:DoUnitCallbacks('OnStartReclaim', target)
+        self.EntityBeingReclaimed = target
         self:SetUnitState('Reclaiming', true)
         self:SetFocusEntity(target)
         self:CheckAssistersFocus()
-        self.EntityBeingReclaimed = target
+        self:DoUnitCallbacks('OnStartReclaim', target)
 
         -- Force me to move on to the guard properly when done
         local guard = self:GetGuardedUnit()
