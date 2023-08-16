@@ -18,12 +18,14 @@ local skip = {
     Blueprint = true , Cache = true, __index = true
 }
 
+local MetaVector = getmetatable(Vector(0, 0, 0))
+
 local function IsState(t)
     return (t.__State and true) or false
 end
 
 local function IsVector(t)
-    return (t.x and t.y and t.z and true) or false 
+    return getmetatable(t) == MetaVector
 end
 
 local function IsUnit(t) 

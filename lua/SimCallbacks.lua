@@ -209,8 +209,6 @@ Callbacks.OnPlayerQueryResult = SimPlayerQuery.OnPlayerQueryResult
 
 Callbacks.PingGroupClick = import("/lua/simpinggroup.lua").OnClickCallback
 
-Callbacks.GiveOrders = import("/lua/spreadattack.lua").GiveOrders
-
 Callbacks.ValidateAssist = function(data, units)
     units = SecureUnits(units)
     local target = GetEntityById(data.target)
@@ -503,7 +501,7 @@ do
             Redundancy = 1,
             ApplyAllOrders = false,
             BatchOrders = true,
-            FullRedundancy = true,
+            FullRedundancy = false,
         },
         [16] = {
             Type = "Patrol",
