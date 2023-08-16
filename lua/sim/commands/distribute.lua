@@ -111,21 +111,18 @@ local CommandInfo = {
     [19] = {
         Type = "Reclaim",
         Callback = IssueReclaim,
-        Redundancy = 1,
         BatchOrders = true,
         FullRedundancy = true,
     },
     [20] = {
         Type = "Repair",
         Callback = IssueRepair,
-        Redundancy = 1,
         BatchOrders = true,
         FullRedundancy = true,
     },
     [21] = {
         Type = "Capture",
         Callback = IssueCapture,
-        Redundancy = 1,
         BatchOrders = true,
         FullRedundancy = true,
     },
@@ -380,6 +377,7 @@ DistributeOrders = function(units)
                         dummyVectorTable[2] = order.y
                         dummyVectorTable[3] = order.z
                         issueOrder(dummyUnitTable, dummyVectorTable, order.blueprintId, dummyEmptyTable)
+                        distributedOrders = distributedOrders + 1
                     end
                 elseif orderCount > unitCount then
 
@@ -397,6 +395,7 @@ DistributeOrders = function(units)
                             dummyVectorTable[2] = order.y
                             dummyVectorTable[3] = order.z
                             issueOrder(dummyUnitTable, dummyVectorTable, order.blueprintId, dummyEmptyTable)
+                            distributedOrders = distributedOrders + 1
                         end
                     end
                 else
@@ -417,21 +416,23 @@ DistributeOrders = function(units)
                         for _, unit in unitBatch do
                             dummyUnitTable[1] = unit
                             issueOrder(dummyUnitTable, dummyVectorTable, order.blueprintId, dummyEmptyTable)
+                            distributedOrders = distributedOrders + 1
                         end
                     end
                 end
             elseif batchOrders then
-                LOG("Batching orders")
-
-                local ordersApplied = 0
                 if fullRedundancy then
 
                     -- in this case we want to introduce as much redundancy as possible
 
-                    LOG(" - Full redundancy")
-
                     local start = 1
                     local batches = ComputeBatchCounts(unitCount, orderCount, dummyBatches)
+
+                    -- limit the redundancy to something sane
+                    local redundancy = orderCount
+                    if redundancy > 10 then
+                        redundancy = 10
+                    end
 
                     for k, batch in batches do
                         local direction = 1
@@ -439,20 +440,18 @@ DistributeOrders = function(units)
                             direction = -1
                         end
 
-                        for o = 1, orderCount do
+                        for o = 1, redundancy do
                             local index = MathMod((direction * (o - 1) + k) + orderCount, orderCount) + 1
                             local order = group[index]
                             local unitBatch = PopulateBatch(start, batch - 1, units, dummyBatchTable)
                             local targetOrEntity = order.target or PopulateLocation(order, dummyVectorTable)
                             issueOrder(unitBatch, targetOrEntity)
-                            ordersApplied = ordersApplied + 1
+                            distributedOrders = distributedOrders + 1
                         end
 
                         start = start + batch
                     end
                 else
-                    LOG(" - No redundancy")
-
                     if orderCount >= unitCount then
 
                         -- strange situation where we have more orders than units
@@ -465,7 +464,7 @@ DistributeOrders = function(units)
                             start = start + batch
                             for _, order in orderBatch do
                                 issueOrder(dummyUnitTable, order.target or PopulateLocation(order, dummyVectorTable))
-                                ordersApplied = ordersApplied + 1
+                                distributedOrders = distributedOrders + 1
                             end
                         end
                     else
@@ -479,12 +478,10 @@ DistributeOrders = function(units)
                             local unitBatch = PopulateBatch(start, batch - 1, units, dummyBatchTable)
                             start = start + batch
                             issueOrder(unitBatch, order.target or PopulateLocation(order, dummyVectorTable))
-                            ordersApplied = ordersApplied + 1
+                            distributedOrders = distributedOrders + 1
                         end
                     end
                 end
-
-                LOG(string.format(" - Orders applied: %d", ordersApplied))
             else
                 local offset = 0
                 -- apply individual orders
@@ -495,11 +492,13 @@ DistributeOrders = function(units)
                         offset = offset + 1
                         dummyUnitTable[1] = unit
                         issueOrder(dummyUnitTable, order.target or PopulateLocation(order, dummyVectorTable))
+                        distributedOrders = distributedOrders + 1
                     end
                 end
             end
         end
     end
 
+    LOG("Distributed " .. tostring(distributedOrders) .. " orders")
     LOG(string.format("Processing time: %f", GetSystemTimeSecondsOnlyForProfileUse() - start))
 end
