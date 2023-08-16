@@ -1,4 +1,3 @@
-
 --******************************************************************************************************
 --** Copyright (c) 2022  Willem 'Jip' Wijnia
 --**
@@ -31,303 +30,143 @@ local MathMod = math.mod
 local MathMin = math.min
 
 ---@class DistributeOrderInfo
----@field BatchOrders boolean
----@field FullRedundancy boolean
----
----@field Type string                   # Describes the intended order, used during debugging
----@field Callback function | false     # Function that matches the intended order
----@field RequiresEntity boolean        # Flag that indicates this order requires an entity and should be skipped otherwise
----@field ApplyAllOrders boolean        # Flag that indicates we want to apply all orders
----@field Redundancy number             # Flag that indicates the default redundancy for each group of orders
+---@field Callback? fun(units: Unit[], target: Vector | Entity, arg3?: any, arg4?: any)
+---@field Type string                   # Describes the intended order, useful for debugging
+---@field BatchOrders boolean           # When set, assigns orders to groups of units
+---@field FullRedundancy boolean        # When set, attempts to add full redundancy when reasonable by assigning multiple orders to each group
+---@field Redundancy number             # When set, assigns orders to individual units. Number of orders assigned is equal to the redundancy factor
 
 --- The order of this list is determined in the engine, see also the files in:
 --- - https://github.com/FAForever/FA-Binary-Patches/pull/22
 ---@type DistributeOrderInfo[]
 local CommandInfo = {
-    [1] = {
-        Type = "Stop",
-        Callback = false,
-        RequiresEntity = false,
-        Redundancy = 1,
-        ApplyAllOrders = false,
-    },
+    [1] = { Type = "Stop", },
     [2] = {
         Type = "Move",
         Callback = IssueMove,
-        RequiresEntity = false,
-        Redundancy = 1,
-        ApplyAllOrders = false,
         BatchOrders = true,
     },
-    [3] = {
-        Type = "Dive",
-        Callback = false,
-        RequiresEntity = false,
-        Redundancy = 1,
-        ApplyAllOrders = false,
-    },
+    [3] = { Type = "Dive", },
     [4] = {
         Type = "FormMove",
         Callback = IssueMove,
-        RequiresEntity = false,
-        Redundancy = 1,
-        ApplyAllOrders = false,
+        BatchOrders = true,
     },
-    [5] = {
-        Type = "BuildSiloTactical",
-        Callback = false,
-        RequiresEntity = false,
-        Redundancy = 1,
-        ApplyAllOrders = false,
-    },
-    [6] = {
-        Type = "BuildSiloNuke",
-        Callback = false,
-        RequiresEntity = false,
-        Redundancy = 1,
-        ApplyAllOrders = false,
-    },
-    [7] = {
-        Type = "BuildFactory",
-        Callback = false,
-        RequiresEntity = false,
-        Redundancy = 1,
-        ApplyAllOrders = false,
-    },
+    [5] = { Type = "BuildSiloTactical", },
+    [6] = { Type = "BuildSiloNuke", },
+    [7] = { Type = "BuildFactory", },
     [8] = {
         Type = "BuildMobile",
         Callback = IssueBuildMobile,
-        RequiresEntity = false,
         Redundancy = 1,
-        ApplyAllOrders = true,
     },
     [9] = {
         Type = "BuildAssist",
         Callback = IssueGuard,
-        RequiresEntity = true,
-        Redundancy = 1,
-        ApplyAllOrders = true,
+        BatchOrders = true,
     },
     [10] = {
         Type = "Attack",
         Callback = IssueAttack,
-        RequiresEntity = false,
-        Redundancy = 3,
-        ApplyAllOrders = true,
         BatchOrders = true,
         FullRedundancy = true,
     },
     [11] = {
         Type = "FormAttack",
         Callback = IssueAttack,
-        RequiresEntity = false,
-        Redundancy = 3,
-        ApplyAllOrders = true,
+        BatchOrders = true,
+        FullRedundancy = true,
     },
     [12] = {
         Type = "Nuke",
         Callback = IssueNuke,
-        RequiresEntity = false,
         Redundancy = 1,
-        ApplyAllOrders = true,
     },
     [13] = {
         Type = "Tactical",
         Callback = IssueTactical,
-        RequiresEntity = false,
         Redundancy = 1,
-        ApplyAllOrders = true,
     },
     [14] = {
         Type = "Teleport",
         Callback = IssueTeleport,
-        RequiresEntity = false,
         Redundancy = 1,
-        ApplyAllOrders = false,
     },
     [15] = {
         Type = "Guard",
         Callback = IssueGuard,
-        RequiresEntity = true,
-        Redundancy = 1,
-        ApplyAllOrders = false,
         BatchOrders = true,
-        FullRedundancy = true,
     },
     [16] = {
         Type = "Patrol",
         Callback = IssuePatrol,
-        RequiresEntity = false,
         Redundancy = 3,
-        ApplyAllOrders = true,
     },
-    [17] = {
-        Type = "Ferry",
-        Callback = nil,
-        RequiresEntity = false,
-        Redundancy = 1,
-        ApplyAllOrders = false,
-    },
+    [17] = { Type = "Ferry", },
     [18] = {
         Type = "FormPatrol",
         Callback = IssuePatrol,
-        RequiresEntity = false,
         Redundancy = 3,
-        ApplyAllOrders = true,
     },
     [19] = {
         Type = "Reclaim",
         Callback = IssueReclaim,
-        RequiresEntity = true,
         Redundancy = 1,
-        ApplyAllOrders = true,
         BatchOrders = true,
         FullRedundancy = true,
     },
     [20] = {
         Type = "Repair",
         Callback = IssueRepair,
-        RequiresEntity = true,
         Redundancy = 1,
-        ApplyAllOrders = true,
         BatchOrders = true,
         FullRedundancy = true,
     },
     [21] = {
         Type = "Capture",
         Callback = IssueCapture,
-        RequiresEntity = true,
         Redundancy = 1,
-        ApplyAllOrders = true,
         BatchOrders = true,
         FullRedundancy = true,
     },
-    [22] = {
-        Type = "TransportLoadUnits",
-        Callback = nil,
-        RequiresEntity = false,
-        Redundancy = 1,
-        ApplyAllOrders = false,
-    },
-    [23] = {
-        Type = "TransportReverseLoadUnits",
-        Callback = nil,
-        RequiresEntity = false,
-        Redundancy = 1,
-        ApplyAllOrders = false,
-    },
+    [22] = { Type = "TransportLoadUnits", },
+    [23] = { Type = "TransportReverseLoadUnits", },
     [24] = {
         Type = "TransportUnloadUnits",
         Callback = IssueTransportUnload,
-        RequiresEntity = false,
         Redundancy = 1,
-        ApplyAllOrders = false,
     },
-    [25] = {
-        Type = "TransportUnloadSpecificUnits",
-        Callback = nil,
-        RequiresEntity = false,
-        Redundancy = 1,
-        ApplyAllOrders = false,
-    },
-    [26] = {
-        Type = "DetachFromTransport",
-        Callback = nil,
-        RequiresEntity = false,
-        Redundancy = 1,
-        ApplyAllOrders = false,
-    },
-    [27] = {
-        Type = "Upgrade",
-        Callback = nil,
-        RequiresEntity = false,
-        Redundancy = 1,
-        ApplyAllOrders = false,
-    },
-    [28] = {
-        Type = "Script",
-        Callback = nil,
-        RequiresEntity = false,
-        Redundancy = 1,
-        ApplyAllOrders = false,
-    },
+    [25] = { Type = "TransportUnloadSpecificUnits", },
+    [26] = { Type = "DetachFromTransport", },
+    [27] = { Type = "Upgrade", },
+    [28] = { Type = "Script", },
     [29] = {
         Type = "AssistCommander",
         Callback = IssueGuard,
-        RequiresEntity = true,
-        Redundancy = 1,
-        ApplyAllOrders = true,
+        BatchOrders = true,
     },
-    [30] = {
-        Type = "KillSelf",
-        Callback = nil,
-        RequiresEntity = false,
-        Redundancy = 1,
-        ApplyAllOrders = false,
-    },
-    [31] = {
-        Type = "DestroySelf",
-        Callback = nil,
-        RequiresEntity = false,
-        Redundancy = 1,
-        ApplyAllOrders = false,
-    },
+    [30] = { Type = "KillSelf", },
+    [31] = { Type = "DestroySelf", },
     [32] = {
         Type = "Sacrifice",
         Callback = IssueSacrifice,
-        RequiresEntity = true,
-        Redundancy = 1,
-        ApplyAllOrders = false,
+        BatchOrders = true,
     },
-    [33] = {
-        Type = "Pause",
-        Callback = nil,
-        RequiresEntity = false,
-        Redundancy = 1,
-        ApplyAllOrders = false,
-    },
-    [34] = {
-        Type = "OverCharge",
-        Callback = nil,
-        RequiresEntity = false,
-        Redundancy = 1,
-        ApplyAllOrders = false,
-    },
+    [33] = { Type = "Pause", },
+    [34] = { Type = "OverCharge", },
     [35] = {
         Type = "AggressiveMove",
         Callback = IssueAggressiveMove,
-        RequiresEntity = false,
-        Redundancy = 1,
-        ApplyAllOrders = true,
+        BatchOrders = true,
     },
     [36] = {
         Type = "FormAggressiveMove",
         Callback = IssueAggressiveMove,
-        RequiresEntity = false,
-        Redundancy = 1,
-        ApplyAllOrders = true,
+        BatchOrders = true,
     },
-    [37] = {
-        Type = "AssistMove",
-        Callback = nil,
-        RequiresEntity = false,
-        Redundancy = 1,
-        ApplyAllOrders = true,
-    },
-    [38] = {
-        Type = "SpecialAction",
-        Callback = nil,
-        RequiresEntity = false,
-        Redundancy = 1,
-        ApplyAllOrders = false,
-    },
-    [39] = {
-        Type = "Dock",
-        Callback = nil,
-        RequiresEntity = false,
-        Redundancy = 1,
-        ApplyAllOrders = false,
-    },
+    [37] = { Type = "AssistMove", },
+    [38] = { Type = "SpecialAction", },
+    [39] = { Type = "Dock", },
 }
 
 --- Constructs `l` batches of roughly even size such that when combined they sum up to `h`.
@@ -504,6 +343,7 @@ DistributeOrders = function(units)
     ---@type { [1]: number, [2]: number, [3]: number }
     local dummyVectorTable = {}
 
+    local distributedOrders = 0
     local unitCount = TableGetn(units)
     for k, group in groups do
         local orderCount = TableGetn(group)
@@ -512,15 +352,10 @@ DistributeOrders = function(units)
         local commandInfo = CommandInfo[group[1].commandType]
         local commandType = commandInfo.Type
         local issueOrder = commandInfo.Callback
-        local redundantOrders = commandInfo.Redundancy
-        local applyAllOrders = commandInfo.ApplyAllOrders
+        local redundantOrders = commandInfo.Redundancy or 1
         local batchOrders = commandInfo.BatchOrders
         local fullRedundancy = commandInfo.FullRedundancy
 
-        -- increase redundancy to guarantee all orders are applied at least once
-        if applyAllOrders and (unitCount * redundantOrders < orderCount) then
-            redundantOrders = MathCeil(orderCount / (unitCount * redundantOrders))
-        end
 
         if issueOrder then
 
