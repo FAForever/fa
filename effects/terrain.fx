@@ -1333,7 +1333,7 @@ float4 DecalsPS( VS_OUTPUT inV, uniform bool inShadows) : COLOR
         float roughness = 1 - decalSpec.r;
         float4 position = TerrainScale * inV.mTexWT;
         color = PBR(inV, position, decalAlbedo, normal, roughness);
-        color = ApplyWaterColorExponentially(inV, waterDepth, color);
+        color = ApplyWaterColorExponentially(-inV.mViewDirection, waterDepth, color);
     } else {
         color = CalculateLighting(normal, inV.mTexWT.xyz, decalAlbedo.xyz, decalSpec.r, waterDepth, inV.mShadow, inShadows).xyz;
     }
@@ -2250,7 +2250,7 @@ float4 Terrain101AlbedoPS ( VS_OUTPUT inV) : COLOR
     float3 color = PBR(inV, position, albedo, normal, roughness);
 
     float waterDepth = tex2Dproj(UtilitySamplerC, position).g;
-    color = ApplyWaterColorExponentially(inV, waterDepth, color);
+    color = ApplyWaterColorExponentially(-inV.mViewDirection, waterDepth, color);
 
     return float4(color, 0.01f);
 }
