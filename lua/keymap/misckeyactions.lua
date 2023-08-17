@@ -526,6 +526,16 @@ DistributeOrders = function()
     SimCallback({Func = 'DistributeOrders', Args = { }}, true)
 end
 
+CopyOrders = function()
+    local info = GetRolloverInfo()
+    if info.userUnit then
+        print("Copy orders")
+        SimCallback({Func = 'CopyOrders', Args = { target = info.userUnit:GetEntityId() }}, true)
+    else
+        print("Can not copy orders")
+    end
+end
+
 AssignPlatoonBehaviorSilo = function()
     SimCallback({Func = 'AIPlatoonSiloTacticalBehavior', Args = { Behavior = 'AIBehaviorTacticalSimple' }}, true)
 end
