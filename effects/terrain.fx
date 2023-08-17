@@ -347,6 +347,9 @@ bool IsExperimentalShader() {
     // The tile value basically says how often the texture gets repeated on the map.
     // A value less than one doesn't make sense under normal conditions, so it is
     // relatively save to use it as our switch.
+
+    // in order to trigger this you can set the albedo scale to be bigger than the map 
+    // size. Use the value 10000 to be safe for any map
     return UpperAlbedoTile.x < 1.0;
 }
 
