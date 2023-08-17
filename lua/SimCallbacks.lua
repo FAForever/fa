@@ -388,7 +388,31 @@ do
             return
         end
 
-        import("/lua/sim/commands/distribute.lua").DistributeOrders(selection)
+        import("/lua/sim/commands/orders-distribute.lua").DistributeOrders(selection)
+    end
+end
+
+do 
+    --- Processes the orders and re-distributes them over the units
+    ---@param data any
+    ---@param selection Unit[]
+    Callbacks.CopyOrders = function(data, selection)
+        -- verify selection
+        selection = SecureUnits(selection)
+        if (not selection) or TableEmpty(selection) then
+            return
+        end
+
+        -- verify the target
+        local target = GetUnitById(data.target) --[[@as Unit]]
+        if (not target) or
+            (not target.Army) or
+            (not OkayToMessWithArmy(target.Army))
+        then
+            return
+        end
+
+        import("/lua/sim/commands/orders-copy.lua").CopyOrders(selection, target)
     end
 end
 

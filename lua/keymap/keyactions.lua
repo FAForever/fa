@@ -1609,6 +1609,16 @@ local keyactionsOrdersContextBased = {
         action = 'UI_LUA import("/lua/keymap/misckeyactions.lua").SetWeaponPrioritiesToUnitType()',
         category = 'ordersContextBased',
     },
+
+    ['copy_orders'] = {
+        action = 'UI_LUA import("/lua/keymap/misckeyactions.lua").CopyOrders()',
+        category = 'ordersContextBased',
+    },
+
+    ['shift_copy_orders'] = {
+        action = 'UI_LUA import("/lua/keymap/misckeyactions.lua").CopyOrders()',
+        category = 'ordersContextBased',
+    },
 }
 
 ---@type table<string, UIKeyAction>
