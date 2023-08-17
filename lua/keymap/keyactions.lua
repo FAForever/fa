@@ -275,6 +275,14 @@ local keyActionsSelectionQuickSelect = {
         action = 'UI_SelectByCategory +inview +idle ENGINEER',
         category = 'selection',
     },
+    ['select_all_building_eng'] = {
+        action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").SelectAllBuildingEngineers()',
+        category = 'selection',
+    },
+    ['select_all_building_eng_onscreen'] = {
+        action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").SelectAllBuildingEngineers(true)',
+        category = 'selection',
+    },
     ['select_all_land_units_onscreen'] = {
         action = 'UI_SelectByCategory +inview +excludeengineers MOBILE LAND',
         category = 'selection',

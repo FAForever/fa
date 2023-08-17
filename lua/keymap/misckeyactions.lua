@@ -610,3 +610,32 @@ SurfaceAll = function()
         IssueUnitCommand(submergedUnits, "UNITCOMMAND_Dive")
     end
 end
+
+---@param onscreen boolean
+SelectAllBuildingEngineers = function(onscreen)
+    -- make sure it is always a boolean
+    onscreen = onscreen or false
+
+    -- select engineers
+    UISelectionByCategory('ENGINEER', false, onscreen, false, false)
+
+    -- filter them in-place
+    local units = GetSelectedUnits()
+    local unitCount = table.getn(units)
+    local unitSelectedHead = 1
+    for k = 1, unitCount do
+        local unit = units[k]
+        local eco = unit:GetEconData()
+        if eco.energyRequested > 0 then
+            units[unitSelectedHead] = unit
+            unitSelectedHead = unitSelectedHead + 1
+        end
+    end
+
+    -- remove empty entries
+    for k = unitSelectedHead, unitCount do
+        units[k] =  nil
+    end
+
+    SelectUnits(units)
+end
