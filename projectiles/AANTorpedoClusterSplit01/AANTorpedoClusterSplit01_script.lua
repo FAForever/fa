@@ -25,17 +25,19 @@ AANTorpedoCluster01 = ClassProjectile(ATorpedoCluster) {
         end
     end,
 
-    OnEnterWater = function(self)
-        ATorpedoCluster.OnEnterWater(self)
-        self.Trash:Add(ForkThread(self.EnterWaterMovementThread,self))
-    end,
-
-    EnterWaterMovementThread = function(self)
-        self:SetAcceleration(2.5)
-        self:TrackTarget(true)
-        self:StayUnderwater(true)
-        self:SetTurnRate(180)
-        self:SetStayUpright(false)
+    --- Adjusted movement thread to gradually speed up the torpedo. It needs to slowly speed
+    --- up to prevent it from hitting the floor in relative undeep water
+    ---@param self TANAnglerTorpedo06
+    MovementThread = function(self)
+        WaitTicks(1)
+        for k = 1, 6 do
+            WaitTicks(1)
+            if not IsDestroyed(self) then
+                self:SetAcceleration(k)
+            else
+                break
+            end
+        end
     end,
 
     OnLostTarget = function(self)

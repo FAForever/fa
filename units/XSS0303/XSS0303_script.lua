@@ -12,6 +12,7 @@ local AircraftCarrier = import("/lua/defaultunits.lua").AircraftCarrier
 local SeraphimWeapons = import("/lua/seraphimweapons.lua")
 local SAALosaareAutoCannonWeapon = SeraphimWeapons.SAALosaareAutoCannonWeaponSeaUnit
 local SLaanseMissileWeapon = SeraphimWeapons.SLaanseMissileWeapon
+local SAMElectrumMissileDefense = SeraphimWeapons.SAMElectrumMissileDefense
 
 ---@class XSS0303 : AircraftCarrier
 XSS0303 = ClassUnit(AircraftCarrier) {
@@ -20,6 +21,7 @@ XSS0303 = ClassUnit(AircraftCarrier) {
         AntiAirRight = ClassWeapon(SAALosaareAutoCannonWeapon) {},
         AntiAirLeft = ClassWeapon(SAALosaareAutoCannonWeapon) {},
         CruiseMissiles = ClassWeapon(SLaanseMissileWeapon) {},
+        AntiMissile = ClassWeapon(SAMElectrumMissileDefense) {},
     },
 
 

@@ -348,6 +348,9 @@ bool IsExperimentalShader() {
     // The tile value basically says how often the texture gets repeated on the map.
     // A value less than one doesn't make sense under normal conditions, so it is
     // relatively save to use it as our switch.
+
+    // in order to trigger this you can set the albedo scale to be bigger than the map 
+    // size. Use the value 10000 to be safe for any map
     return UpperAlbedoTile.x < 1.0;
 }
 
@@ -396,13 +399,12 @@ float3 ApplyWaterColor( float depth, float3  inColor)
     return lerp( inColor.xyz, wcolor.xyz, wcolor.w );
 }
 
-float3 ApplyWaterColorExponentially(VS_OUTPUT inV, float waterDepth, float3 color) {
+float3 ApplyWaterColorExponentially(float3 viewDirection, float waterDepth, float3 color) {
     float4 waterColor = tex1D(WaterRampSampler, waterDepth);
-    float3 v = normalize(-inV.mViewDirection);
     float3 up = float3(0,1,0);
     // To simplify, we assume that the light enters vertically into the water,
     // this is the length that the light travels underwater back to the camera
-    float oneOverCosV = 1 / max(dot(up, v), 0.0001);
+    float oneOverCosV = 1 / max(dot(up, normalize(viewDirection)), 0.0001);
     // light gets absorbed exponentially
     float waterAbsorption = saturate(exp(-waterColor.w * (1 + oneOverCosV)));
     // darken the color first to simulate the light absorption on the way in and out
@@ -435,11 +437,11 @@ float4 CalculateLighting( float3 inNormal, float3 inViewPosition, float3 inAlbed
     light = LightingMultiplier * light + ShadowFillColor * ( 1 - light );
     color.rgb = light * inAlbedo;
 
-    // instead of calculating the fog based
-    // on the absolute depth, calculate it based
-    // on the length from that depth at this map
-    // coordinate
-    color.rgb = ApplyWaterColor( waterDepth, color );
+    if (IsExperimentalShader()) {
+        color.rgb = ApplyWaterColorExponentially(-viewDirection, waterDepth, color);
+    } else {
+        color.rgb = ApplyWaterColor( waterDepth, color );
+    }
 
     color.a = 0.01f + (specular*SpecularColor.w);
     return color;
@@ -1074,7 +1076,7 @@ technique TTerrainGlow <
         DepthState( Depth_Enable )
 
         VertexShader = compile vs_1_1 TerrainGlowVS( true );
-        PixelShader = compile ps_2_0 TerrainGlowPS( true);
+        PixelShader = compile ps_2_a TerrainGlowPS( true);
     }
 }
 
@@ -2007,7 +2009,7 @@ float4 TerrainPBRAlbedoPS ( VS_OUTPUT inV) : COLOR
     float3 color = PBR(inV, position, albedo, normal, roughness);
 
     float waterDepth = tex2Dproj(UtilitySamplerC, position).g;
-    color = ApplyWaterColorExponentially(inV, waterDepth, color);
+    color = ApplyWaterColorExponentially(-inV.mViewDirection, waterDepth, color);
 
     return float4(color, 0.01f);
     // SpecularColor, LowerNormalTile, Stratum7AlbedoTile and Stratum7NormalTile are unused now
@@ -2115,7 +2117,7 @@ float4 Terrain001AlbedoPS ( VS_OUTPUT inV) : COLOR
     albedo.rgb = light * (albedo.rgb + specular.rgb);
 
     float waterDepth = tex2Dproj(UtilitySamplerC, position).g;
-    albedo.rgb = ApplyWaterColorExponentially(inV, waterDepth, albedo.rgb);
+    albedo.rgb = ApplyWaterColorExponentially(-inV.mViewDirection, waterDepth, albedo.rgb);
 
     return float4(albedo.rgb, 0.01f);
 }

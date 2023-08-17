@@ -1204,97 +1204,120 @@ function checkBadClean(unit)
     return previousModifiedCommandQueue[1].type == 'enhancementqueue' and queue and queue[1] and not string.find(queue[1].ID, 'Remove')
 end
 
+--- Returns an array of enhancement prerequisites
+---@param enh UnitBlueprintEnhancement
+---@return Enhancement[] | nil
+function GetPrerequisites(enh)
+    local prereq = enh.Prerequisite
+    if not prereq then
+        return
+    end
+    local prereqs = {}
+    local unitEnhancements = __blueprints[enh.UnitID].Enhancements
+    repeat
+        table.insert(prereqs, prereq)
+        prereq = unitEnhancements[prereq].Prerequisite
+    until not prereq
+    -- put the enhancement base at index 1
+    local n = table.getn(prereqs)
+    for k = 1, n / 2 do
+        prereqs[k], prereqs[n - k + 1] = prereqs[n - k + 1], prereqs[k]
+    end
+    return prereqs
+end
+
 function OrderEnhancement(item, clean, destroy)
     local units = sortedOptions.selection
-    if not table.empty(units) then
-        local enhancementQueue = getEnhancementQueue()
-        
-        SetIgnoreSelection(true)
-        for _, unit in units do
-            local orders = {}
-            local cleanOrder = clean
-            local id = unit:GetEntityId()
-            local existingEnhancements = EnhanceCommon.GetEnhancements(id)
+    if table.empty(units) then
+        return
+    end
 
-            SelectUnits({unit})
+    local slot = item.enhTable.Slot
+    local enhId = item.id
+    local prereqs = GetPrerequisites(item.enhTable)
+    local enhancementQueue = getEnhancementQueue()
+    SetIgnoreSelection(true)
 
-            if clean and not EnhancementQueueFile.currentlyUpgrading(unit) then
-                enhancementQueue[id] = {}
-            end
+    for _, unit in units do
+        local entityId = unit:GetEntityId()
+        if clean and not EnhancementQueueFile.currentlyUpgrading(unit) then
+            enhancementQueue[entityId] = {}
+        end
 
-            local doOrder = true
-            local prereqAlreadyOrdered = false
-            local removeAlreadyOrdered = false
+        local existingEnh = EnhanceCommon.GetEnhancements(entityId)[slot]
+        if existingEnh == enhId then
+            continue
+        end
 
-            local slot = item.enhTable.Slot
-            local enhSlot = existingEnhancements[slot]
-            local enhTableId = item.enhTable.ID
-            local prereq = item.enhTable.Prerequisite
-
-            for _, enhancement in enhancementQueue[id] or {} do
-                local enhId = enhancement.ID
-                if enhancement.Slot == slot then
-                    if string.find(enhId, 'Remove') and enhId == (enhSlot .. 'Remove') then
-                        removeAlreadyOrdered = true
-                    elseif enhId == enhTableId or enhId ~= prereq then
-                        doOrder = false
-                        break
-                    elseif enhId == prereq then
-                        prereqAlreadyOrdered = true
-                    end
-                end
-            end
-
-            if enhSlot == enhTableId then
-                doOrder = false
-            end
-
-            if doOrder == false then
-                continue
-            end
-
-            if not removeAlreadyOrdered and enhSlot and enhSlot ~= prereq then
-                if not destroy then
+        local doOrder = true
+        local removeAlreadyOrdered = false
+        local highestPrereqIndex = table.find(prereqs, existingEnh) or 0
+        if enhancementQueue[entityId] then
+            for _, enhancement in enhancementQueue[entityId] do
+                if enhancement.Slot ~= slot then
                     continue
                 end
 
-                table.insert(orders, enhSlot .. 'Remove')
-            end
-
-            if cleanOrder and not unit:IsIdle() then
-                local cmdqueue = unit:GetCommandQueue()
-                if cmdqueue and cmdqueue[1] and cmdqueue[1].type == 'Script' then
-                    cleanOrder = false
+                local queuedEnhId = enhancement.ID
+                local prereqIndex = table.find(prereqs, queuedEnhId)
+                if prereqIndex then
+                    if prereqIndex > highestPrereqIndex then
+                        highestPrereqIndex = prereqIndex
+                    end
+                elseif existingEnh and queuedEnhId == existingEnh .. 'Remove' then
+                    removeAlreadyOrdered = true
+                elseif queuedEnhId == enhId then
+                    doOrder = false
+                    break
                 end
             end
+        end
+        if not doOrder then
+            continue
+        end
 
-            if prereq and prereq ~= enhSlot and not prereqAlreadyOrdered then
-                table.insert(orders, prereq)
+        local orders = {}
+        if not removeAlreadyOrdered and existingEnh and not table.find(prereqs, existingEnh) then
+            -- user selected "No" to replacing the enhancement
+            if not destroy then
+                continue
             end
 
-            table.insert(orders, item.id)
-
-            local first_order = true
-            for _, order in orders do
-                orderTable = {TaskName = 'EnhanceTask', Enhancement = order}
-                IssueCommand("UNITCOMMAND_Script", orderTable, cleanOrder)
-                if first_order and cleanOrder then
-                    cleanOrder = false
-                    first_order = false
-                end
+            table.insert(orders, existingEnh .. 'Remove')
+        end
+        if prereqs then
+            for k = highestPrereqIndex + 1, table.getn(prereqs) do
+                table.insert(orders, prereqs[k])
             end
+        end
+        table.insert(orders, item.id)
 
-            if unit:IsInCategory('COMMAND') then
-                local availableOrders, availableToggles, buildableCategories = GetUnitCommandData({unit})
-                OnSelection(buildableCategories, {unit}, true)
+
+        local cleanOrder = clean
+        if cleanOrder and not unit:IsIdle() and unit:GetCommandQueue()[1].type == 'Script' then
+            cleanOrder = false
+        end
+
+        local unitSel = {unit}
+        SelectUnits(unitSel)
+        for _, order in orders do
+            orderTable = {TaskName = 'EnhanceTask', Enhancement = order}
+            IssueCommand("UNITCOMMAND_Script", orderTable, cleanOrder)
+            if cleanOrder then
+                cleanOrder = false
             end
         end
 
-        SelectUnits(units)
-        SetIgnoreSelection(false)
-
-        controls.choices:Refresh(FormatData(sortedOptions[item.enhTable.Slot], item.enhTable.Slot))
+        if unit:IsInCategory('COMMAND') then
+            local _, _, buildableCategories = GetUnitCommandData(unitSel)
+            OnSelection(buildableCategories, unitSel, true)
+        end
     end
+
+    SelectUnits(units)
+    SetIgnoreSelection(false)
+
+    controls.choices:Refresh(FormatData(sortedOptions[slot], slot))
 end
 
 function OnClickHandler(button, modifiers)
@@ -1489,66 +1512,47 @@ function OnClickHandler(button, modifiers)
             SetActiveBuildTemplate(item.template.templateData)
         end
 
-        if options.gui_template_rotator ~= 0 then
-            local item = button.Data
-            local activeTemplate = item.template.templateData
-            local worldview = import("/lua/ui/game/worldview.lua").viewLeft
-            local oldHandleEvent = worldview.HandleEvent
-            worldview.HandleEvent = function(self, event)
-                if event.Type == 'ButtonPress' then
-                    if event.Modifiers.Middle then
-                        ClearBuildTemplates()
-                        local tempTemplate = table.deepcopy(activeTemplate)
-                        activeTemplate[1] = tempTemplate[2]
-                        activeTemplate[2] = tempTemplate[1]
-                        for i = 3, table.getn(activeTemplate) do
-                            local index = i
-                            activeTemplate[index][3] = 0 - tempTemplate[index][4]
-                            activeTemplate[index][4] = tempTemplate[index][3]
-                        end
-                        SetActiveBuildTemplate(activeTemplate)
-                    elseif event.Modifiers.Shift then
-                    else
-                        worldview.HandleEvent = oldHandleEvent
-                    end
-                end
-            end
-        end
     elseif item.type == 'enhancement' and button.Data.TooltipOnly == false then
         local doOrder = true
         local clean = not modifiers.Shift
         local enhancementQueue = getEnhancementQueue()
 
+        local enhId = item.id
+        local enh = item.enhTable
+        local slot = enh.Slot
+        local prereqs = GetPrerequisites(enh)
         for _, unit in sortedOptions.selection do
             local unitId = unit:GetEntityId()
-            local slot = item.enhTable.Slot
             local existingEnhancements = EnhanceCommon.GetEnhancements(unitId)
+            local existingEnh = existingEnhancements[slot]
+            if not existingEnh or table.find(prereqs, existingEnh) then
+                continue
+            end
 
-            if existingEnhancements[slot] and existingEnhancements[slot] ~= item.enhTable.Prerequisite then
-                local alreadyWarned = false
-                for _, enhancement in enhancementQueue[unitId] or {} do
-                    if enhancement.ID == (existingEnhancements[slot] .. 'Remove') then
-                        alreadyWarned = true
-                        break
-                    end
-                end
-
-                if not alreadyWarned and existingEnhancements[slot] ~= item.id then
-                    UIUtil.QuickDialog(GetFrame(0), "<LOC enhancedlg_0000>Choosing this enhancement will destroy the existing enhancement in this slot.  Are you sure?",
-                        "<LOC _Yes>",
-                        function()
-                            safecall("OrderEnhancement", OrderEnhancement, item, clean, true)
-                        end,
-                        "<LOC _No>",
-                        function()
-                            safecall("OrderEnhancement", OrderEnhancement, item, clean, false)
-                        end,
-                        nil, nil,
-                        true,  {worldCover = true, enterButton = 1, escapeButton = 2})
-
-                    doOrder = false
+            local alreadyWarned = false
+            for _, enhancement in enhancementQueue[unitId] or {} do
+                if enhancement.ID == existingEnh .. 'Remove' then
+                    alreadyWarned = true
                     break
                 end
+            end
+            if alreadyWarned then
+                continue
+            end
+
+            if existingEnh ~= enhId then
+                UIUtil.QuickDialog(GetFrame(0), "<LOC enhancedlg_0000>Choosing this enhancement will destroy the existing enhancement in this slot.  Are you sure?",
+                    "<LOC _Yes>", function()
+                        safecall("OrderEnhancement", OrderEnhancement, item, clean, true)
+                    end,
+                    "<LOC _No>", function()
+                        safecall("OrderEnhancement", OrderEnhancement, item, clean, false)
+                    end,
+                    nil, nil,
+                    true,  {worldCover = true, enterButton = 1, escapeButton = 2}
+                )
+                doOrder = false
+                break
             end
         end
 
@@ -1871,6 +1875,22 @@ function ToggleUnitPause()
     end
 end
 
+function ToggleUnitPauseAll()
+    if controls.selectionTab:IsChecked() or controls.constructionTab:IsChecked() then
+        controls.extraBtn2:ToggleCheck(false)
+    else
+        SetPaused(sortedOptions.selection, true)
+    end
+end
+
+function ToggleUnitUnpauseAll()
+    if controls.selectionTab:IsChecked() or controls.constructionTab:IsChecked() then
+        controls.extraBtn2:OnCheck(true)
+    else
+        SetPaused(sortedOptions.selection, false)
+    end
+end
+
 function CreateExtraControls(controlType)
     local SetupPauseButton = function()
         Tooltip.AddCheckboxTooltip(controls.extraBtn2, 'construction_pause')
@@ -2152,39 +2172,32 @@ function FormatData(unitData, type)
     else
         -- Enhancements
         local existingEnhancements = EnhanceCommon.GetEnhancements(sortedOptions.selection[1]:GetEntityId())
-        local slotToIconName = {
-            RCH = 'ra',
-            LCH = 'la',
-            Back = 'b',
-        }
-        local filteredEnh = {}
-        local usedEnhancements = {}
-        local restEnh = EnhanceCommon.GetRestricted()
+        local enhancementQueue
+        if table.getn(sortedOptions.selection) == 1 then
+            enhancementQueue = getEnhancementQueue()[sortedOptions.selection[1]:GetEntityId()] or {}
+        end
 
         -- Filter enhancements based on restrictions
-        for index, enhTable in unitData do
-            if not restEnh[enhTable.ID] and not string.find(enhTable.ID, 'Remove') then
-                table.insert(filteredEnh, enhTable)
+        local restEnh = EnhanceCommon.GetRestricted()
+        local filteredEnh = {}
+        local totalEnhancements = 0
+        for _, enhTable in unitData do
+            local enhId = enhTable.ID
+            if not restEnh[enhId] and not enhId:find("Remove") then
+                totalEnhancements = totalEnhancements + 1
+                filteredEnh[totalEnhancements] = enhTable
             end
         end
 
-        local function GetEnhByID(id)
-            for i, enh in filteredEnh do
-                if enh.ID == id then
+        local function FindDependency(id)
+            for _, enh in filteredEnh do
+                if enh.Prerequisite == id then
                     return enh
                 end
             end
         end
 
-        local function FindDependancy(id)
-            for i, enh in filteredEnh do
-                if enh.Prerequisite and enh.Prerequisite == id then
-                    return enh.ID
-                end
-            end
-        end
-
-        local function AddEnhancement(enhTable, disabled)
+        local function AddEnhancement(enhTable)
             local iconData = {
                 type = 'enhancement',
                 enhTable = enhTable,
@@ -2192,51 +2205,53 @@ function FormatData(unitData, type)
                 id = enhTable.ID,
                 icon = enhTable.Icon,
                 Selected = false,
-                Disabled = disabled,
+                Disabled = false,
             }
-            if existingEnhancements[enhTable.Slot] == enhTable.ID then
-                iconData.Selected = true
+            if enhancementQueue then
+                local slot = enhTable.Slot
+                if existingEnhancements[slot] == enhTable.ID then
+                    iconData.Selected = true
+                end
+                local prereqs = GetPrerequisites(enhTable)
+                for _, queuedEnh in enhancementQueue do
+                    if queuedEnh.Slot == slot and not table.find(prereqs, queuedEnh.ID) and not queuedEnh.ID:find("Remove") then
+                        iconData.Disabled = true
+                        break
+                    end
+                end
             end
             table.insert(retData, iconData)
         end
 
-        for i, enhTable in filteredEnh do
-            if not usedEnhancements[enhTable.ID] and not enhTable.Prerequisite then
-                AddEnhancement(enhTable, false)
-                usedEnhancements[enhTable.ID] = true
-                if FindDependancy(enhTable.ID) then
-                    local searching = true
-                    local curID = enhTable.ID
-                    while searching do
-                        table.insert(retData, {type = 'arrow'})
-                        local tempEnh = GetEnhByID(FindDependancy(curID))
-                        local disabled = true
-                        if existingEnhancements[enhTable.Slot] == tempEnh.Prerequisite then
-                            disabled = false
-                        end
-                        AddEnhancement(tempEnh, disabled)
-                        usedEnhancements[tempEnh.ID] = true
-                        if FindDependancy(tempEnh.ID) then
-                            curID = tempEnh.ID
-                        else
-                            searching = false
-                            if table.getsize(usedEnhancements) <= table.getsize(filteredEnh) - 1 then
-                                table.insert(retData, {type = 'spacer'})
-                            end
-                        end
-                    end
-                else
-                    if table.getsize(usedEnhancements) <= table.getsize(filteredEnh) - 1 then
-                        table.insert(retData, {type = 'spacer'})
-                    end
-                end
+        local usedEnhancements = {}
+        local totalUsed = 0
+        for _, enhTable in filteredEnh do
+            local enhId = enhTable.ID
+            if usedEnhancements[enhId] or enhTable.Prerequisite then
+                continue
+            end
+
+            AddEnhancement(enhTable)
+            usedEnhancements[enhId] = true
+
+            local curEnh = FindDependency(enhId)
+            while curEnh do
+                table.insert(retData, {type = 'arrow'})
+                AddEnhancement(curEnh)
+                usedEnhancements[curEnh.ID] = true
+                totalUsed = totalUsed + 1
+                curEnh = FindDependency(curEnh.ID)
+            end
+            if totalUsed < totalEnhancements then
+                table.insert(retData, {type = 'spacer'})
             end
         end
+
         CreateExtraControls('enhancement')
         SetSecondaryDisplay('buildQueue')
     end
-    import(UIUtil.GetLayoutFilename('construction')).OnTabChangeLayout(type)
 
+    import(UIUtil.GetLayoutFilename('construction')).OnTabChangeLayout(type)
 
     if type == 'templates' and allFactories then
         -- Replace Infinite queue with Create template
@@ -2258,25 +2273,7 @@ function FormatData(unitData, type)
         end
     end
 
-    if type == 'RCH' or type == 'Back' or type == 'LCH' then
-        local enhancementQueue = getEnhancementQueue()
-        for _, iconData in retData do
-            iconData.Disabled = false
 
-            if table.getn(sortedOptions.selection) == 1 then
-                for _, enhancement in (enhancementQueue[sortedOptions.selection[1]:GetEntityId()] or {}) do
-                    if enhancement.Slot == iconData.enhTable.Slot and enhancement.ID ~= iconData.enhTable.Prerequisite and not string.find(enhancement.ID, 'Remove') then
-                        iconData.Disabled = true
-                        break
-                    end
-                end
-            else
-                iconData.Selected = false
-            end
-        end
-
-        SetSecondaryDisplay('buildQueue')
-    end
     return retData
 end
 

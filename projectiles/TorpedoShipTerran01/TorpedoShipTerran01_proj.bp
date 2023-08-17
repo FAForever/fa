@@ -13,7 +13,7 @@ ProjectileBlueprint {
         MaxSpeed = 2,
         StayUnderwater = true,
         TrackTarget = true,
-        TurnRate = 600,
+        TurnRate = 140,
         VelocityAlign = true,
     },
 }

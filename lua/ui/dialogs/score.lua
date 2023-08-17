@@ -553,7 +553,7 @@ function CreateSkirmishScreen(victory, showCampaign, operationVictoryTable)
         },
         campaign = {
             tooltip = 'CampaignScore_Feedback',
-            url = operationVictoryTable.opData.feedbackURL,
+            url = "http://discord.gg/ayzAVr9JUV",
         },
     }
 

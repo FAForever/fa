@@ -40,7 +40,7 @@ local function TakeIntoAccountBuildrate(bp)
     return not TableFind(bp.Economy.BuildableCategory or {'nahh'}, bp.General.UpgradesTo or 'nope') and not bp.Economy.BuildableCategory[2]
 end
 
----@param weapon Weapon
+---@param weapon WeaponBlueprint
 local function CalculatedDamage(weapon)
     local ProjectileCount = MathMax(1, TableGetn(weapon.RackBones[1].MuzzleBones or {'nehh'}), weapon.MuzzleSalvoSize or 1)
     if weapon.RackFireTogether then
@@ -49,7 +49,8 @@ local function CalculatedDamage(weapon)
     return ((weapon.Damage or 0) + (weapon.NukeInnerRingDamage or 0)) * ProjectileCount * (weapon.DoTPulses or 1)
 end
 
----@param weapon Weapon
+---@param weapon WeaponBlueprint
+---@return number
 local function CalculatedDPS(weapon)
     -- Base values
     local ProjectileCount
@@ -127,6 +128,8 @@ function SetUnitThreatValues(unitBPs)
             cache.HealthThreat = bp.Defense.MaxHealth * 0.01
         end
 
+        local mobileUnit = bp.CategoriesHash.MOBILE
+
         if bp.Defense.Shield then
             local shield = bp.Defense.Shield                                               -- ShieldProjectionRadius entirely only for the Pillar of Prominence
             local shieldarea = (shield.ShieldProjectionRadius or shield.ShieldSize or 0) * (shield.ShieldProjectionRadius or shield.ShieldSize or 0) * math.pi
@@ -202,7 +205,7 @@ function SetUnitThreatValues(unitBPs)
                 local surfaceMult = 0.1
 
                 -- determines if we apply dps to economic or anti surface threat
-                local blockedByArtilleryShield = weapon.ArtilleryShieldBlocks
+                local weaponIsEconomicThreat = (weapon.DamageType == 'Nuke' or weapon.ArtilleryShieldBlocks) and (not mobileUnit or weapon.MinRadius > 80)
 
                 -- Anti air
                 if weapon.RangeCategory == 'UWRC_AntiAir' or weapon.TargetRestrictOnlyAllow == 'AIR' or StringFind(weapon.WeaponCategory or 'nope', 'Anti Air') then
@@ -217,7 +220,7 @@ function SetUnitThreatValues(unitBPs)
                 -- Direct fire or artillery
                 elseif weapon.RangeCategory == 'UWRC_DirectFire' or StringFind(weapon.WeaponCategory or 'nope', 'Direct Fire')
                         or weapon.RangeCategory == 'UWRC_IndirectFire' or StringFind(weapon.WeaponCategory or 'nope', 'Artillery') then
-                    if blockedByArtilleryShield then
+                    if weaponIsEconomicThreat then
                         cache.EconomyThreatLevel = cache.EconomyThreatLevel + dps * econMult
                     else
                         cache.SurfaceThreatLevel = cache.SurfaceThreatLevel + dps * surfaceMult

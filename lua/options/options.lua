@@ -521,6 +521,19 @@ options = {
             },
 
             {
+                title = "<LOC OPTIONS_0273>Right click to ring extractors with storages",
+                key = 'structure_capping_feature_01',
+                type = 'toggle',
+                default = "on",
+                custom = {
+                    states = {
+                        {text = "<LOC _Off>Off",    key = "off"},
+                        {text = "<LOC _Off>On",     key = "on"} -- only-storages-extractors full-suite
+                    },
+                },
+            },
+
+            {
                 title = "<LOC ASSIST_TO_UPGRADE>Hold alt to force attack move",
                 key = 'alt_to_force_attack_move',
                 type = 'toggle',
@@ -529,33 +542,6 @@ options = {
                     states = {
                         {text = "<LOC _Off>Off", key = 'Off'},
                         {text = "<LOC _On>On", key = 'On'},
-                    },
-                },
-            },
-
-            {
-                title = "<LOC OPTIONS_0273>Automated Structure Ringing",
-                key = 'structure_capping_feature_01',
-                type = 'toggle',
-                default = "off",
-                custom = {
-                    states = {
-                        {text = "<LOC _Off>Off",                                            key = "off"},
-                        {text = "<LOC _OnlyExtractors>Only mass storages and extractors",   key = "only-storages-extractors"},
-                        {text = "<LOC _FullSuite>Full suite",                               key = "full-suite"},
-                    },
-                },
-            },
-            {
-                title = "<LOC OPTIONS_0285>Automatic Extractor Selection",
-                key = 'automex',
-                type = 'toggle',
-                default = 'off',
-                custom = {
-                    states = {
-                        {text = "<LOC _Off>", key = 'off'},
-                        {text = "<LOC _OnlyT1>", key = 'onlyT1'},
-                        {text = "<LOC _MaxTech>", key = 'maxTech'},
                     },
                 },
             },
