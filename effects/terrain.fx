@@ -2138,7 +2138,7 @@ float4 Terrain001AlbedoPS ( VS_OUTPUT inV) : COLOR
     light = LightingMultiplier * light + ShadowFillColor * (1 - light);
     albedo.rgb = light * (albedo.rgb + specular.rgb);
 
-    float waterDepth = tex2Dproj(UtilitySamplerC, position).g;
+    float waterDepth = tex2D(UtilitySamplerC, coordinates).g;
     albedo.rgb = ApplyWaterColorExponentially(-inV.mViewDirection, waterDepth, albedo.rgb);
 
     return float4(albedo.rgb, 0.01f);
