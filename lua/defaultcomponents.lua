@@ -546,8 +546,12 @@ TreadComponent = ClassSimple {
 
         while true do
             while not self.CrushingSuspend do
-                for _, bone in bones do
-                    DamageArea(self, self:GetPosition(bone), radius, amount, type, damageFriendly)
+                if bones then
+                    for _, bone in bones do
+                        DamageArea(self, self:GetPosition(bone), radius, amount, type, damageFriendly)
+                    end
+                else
+                    DamageArea(self, self:GetPosition(), radius, amount, type, damageFriendly)
                 end
                 WaitTicks(interval)
             end
