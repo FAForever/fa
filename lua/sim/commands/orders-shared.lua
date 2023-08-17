@@ -20,6 +20,9 @@
 --** SOFTWARE.
 --******************************************************************************************************
 
+-- upvalue scope for performance
+local MathCeil = math.ceil
+
 ---@class DistributeOrderInfo
 ---@field Callback? fun(units: Unit[], target: Vector | Entity, arg3?: any, arg4?: any)
 ---@field Type string                   # Describes the intended order, useful for debugging

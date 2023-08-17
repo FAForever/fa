@@ -25,14 +25,13 @@ local TableGetn = table.getn
 local TableInsert = table.insert
 local TableSort = table.sort
 
-local MathCeil = math.ceil
 local MathMod = math.mod
 local MathMin = math.min
 
 local UnitQueueDataToCommand = import("/lua/sim/commands/orders-shared.lua").UnitQueueDataToCommand
 local ComputeBatchCounts = import("/lua/sim/commands/orders-shared.lua").ComputeBatchCounts
-local PopulateBatch = import("/lua/sim/commands/orders-shared.lua").ComputeBatchCounts
-local PopulateLocation = import("/lua/sim/commands/orders-shared.lua").ComputeBatchCounts
+local PopulateBatch = import("/lua/sim/commands/orders-shared.lua").PopulateBatch
+local PopulateLocation = import("/lua/sim/commands/orders-shared.lua").PopulateLocation
 
 
 --- Processes the orders and re-distributes them over the units. Assumes that all units in the
