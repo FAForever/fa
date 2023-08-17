@@ -626,7 +626,7 @@ SelectAllBuildingEngineers = function(onscreen)
     for k = 1, unitCount do
         local unit = units[k]
         local eco = unit:GetEconData()
-        if eco.energyRequested > 0 then
+        if (eco.energyRequested > 0) or (eco.massRequested > 0) then
             units[unitSelectedHead] = unit
             unitSelectedHead = unitSelectedHead + 1
         end
