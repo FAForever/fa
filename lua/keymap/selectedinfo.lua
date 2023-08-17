@@ -11,7 +11,7 @@
 ---@field maxHealth? number
 ---@field shieldRatio number
 ---@field teamColor string
----@field userUnit? Unit
+---@field userUnit? UserUnit
 ---@field workProgress number
 
 

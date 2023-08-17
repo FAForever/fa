@@ -30,7 +30,7 @@ local NavDatastructures = import("/lua/sim/navdatastructures.lua")
 local TableGetn = table.getn
 
 -------------------------------------------------------------------------------
--- Debugging functionality
+--#region Debugging functionality
 
 local Debug = false
 function EnableDebugging()
@@ -128,7 +128,7 @@ function __moduleinfo.OnDirty()
     end
 end
 
--- Debugging functionality
+--#endregion Debugging functionality
 -------------------------------------------------------------------------------
 
 --- Returns true if the navigational mesh is generated
@@ -175,9 +175,7 @@ local function FindLeaf(grid, position)
 
         -- try and find nearest valid neighbor
         for k = 1, TableGetn(leaf) do
-
-            ---@type CompressedLabelTreeLeaf
-            local neighbor = leaf[k]
+            local neighbor = NavGenerator.NavCells[leaf[k]]
             if neighbor.Label > 0 then
                 local size = 2 * neighbor.Size
                 size = size * size
@@ -196,6 +194,50 @@ local function FindLeaf(grid, position)
     end
 
     return leaf
+end
+
+---@param destination CompressedLabelTreeLeaf 
+---@return Vector[]
+---@return number   # Number of points in path
+---@return number   # Distance of path
+local function TracePath(destination)
+
+    -- local scope for performance
+    local GetSurfaceHeight = GetSurfaceHeight
+
+    ---@type number
+    local head = 1
+
+    ---@type Vector[]
+    local path = { }
+
+    ---@type number
+    local distance = 0
+
+    ---@type CompressedLabelTreeLeaf | nil
+    local leaf = destination.From
+
+    -- trace path from destination
+    while leaf and leaf.From and (leaf.From != destination) do
+        local px = leaf.px
+        local pz = leaf.pz
+        path[head] = { px, GetSurfaceHeight(px, pz), pz }
+        head = head + 1
+
+        -- keep track of distance
+        distance = distance + leaf:DistanceTo(leaf.From)
+
+        leaf = leaf.From
+    end
+
+    -- reverse the path
+    for k = 1, (0.5 * head) ^ 0 do
+        local temp = path[k]
+        path[k] = path[head - k]
+        path[head - k] = temp
+    end
+
+    return path, head - 1, distance
 end
 
 --- Returns true when you can path from the origin to the destination
@@ -314,7 +356,7 @@ function PathTo(layer, origin, destination)
 
         -- continue state
         for k = 1, TableGetn(leaf) do
-            local neighbor = leaf[k]
+            local neighbor = NavGenerator.NavCells[leaf[k]]
             if neighbor.Label > 0 and neighbor.Seen != seenIdentifier then
                 local preferLargeNeighbor = 0
                 if leaf.Size > neighbor.Size then
@@ -339,38 +381,9 @@ function PathTo(layer, origin, destination)
         return nil, 'SystemError'
     end
 
-    -- construct current path
-    local head = 1
-    local path = { }
-    local distance = 0
-    local leaf = destinationLeaf.From
-    while leaf.From and leaf.From != leaf do
+    local path, head, distance = TracePath(destinationLeaf)
 
-        -- add to path
-        path[head] = {
-            leaf.px,
-            GetSurfaceHeight(leaf.px, leaf.pz),
-            leaf.pz
-        }
-        head = head + 1
-
-        -- keep track of distance
-        distance = distance + leaf:DistanceTo(leaf.From)
-
-        -- continue down the tree
-        leaf = leaf.From
-    end
-
-    -- reverse the path
-    for k = 1, (0.5 * head) ^ 0 do
-        local temp = path[k]
-        path[k] = path[head - k]
-        path[head - k] = temp
-    end
-
-    -- add destination to the path
-    path[head] = destination
-
+    -- debugging!
     DebugRegisterPath('PathTo', path, origin, destination)
 
     -- return all the goodies!!
@@ -434,7 +447,7 @@ function PathToWithThreatThreshold(layer, origin, destination, aibrain, threatFu
 
         -- search through neighbors
         for k = 1, TableGetn(leaf) do
-            local neighbor = leaf[k]
+            local neighbor = NavGenerator.NavCells[leaf[k]]
             if neighbor.Label > 0 and neighbor.Seen != seenIdentifier then
                 local preferLargeNeighbor = 0
                 if leaf.Size > neighbor.Size then
@@ -466,37 +479,7 @@ function PathToWithThreatThreshold(layer, origin, destination, aibrain, threatFu
         return nil, 'SystemError'
     end
 
-    -- construct current path
-    local head = 1
-    local path = { }
-    local distance = 0
-    local leaf = destinationLeaf.From
-    while leaf.From and leaf.From != leaf do
-
-        -- add to path
-        path[head] = {
-            leaf.px,
-            GetSurfaceHeight(leaf.px, leaf.pz),
-            leaf.pz
-        }
-        head = head + 1
-
-        -- keep track of distance
-        distance = distance + leaf:DistanceTo(leaf.From)
-
-        -- continue down the tree
-        leaf = leaf.From
-    end
-
-    -- reverse the path
-    for k = 1, (0.5 * head) ^ 0 do
-        local temp = path[k]
-        path[k] = path[head - k]
-        path[head - k] = temp
-    end
-
-    -- add destination to the path
-    path[head] = destination
+    local path, head, distance = TracePath(destinationLeaf)
 
     DebugRegisterPath('PathToWithThreatThreshold', path, origin, destination)
 
@@ -705,7 +688,7 @@ function DirectionsFrom(layer, origin, distance, sizeThreshold)
 
         -- search neighbors for more leafs
         for k = 1, TableGetn(leaf) do
-            local neighbor = leaf[k]
+            local neighbor = NavGenerator.NavCells[leaf[k]]
             if neighbor.Label > 0 and neighbor.Seen != seenIdentifier then
                 neighbor.From = leaf
                 neighbor.Seen = seenIdentifier
@@ -827,7 +810,7 @@ function RandomDirectionFrom(layer, origin, distance, sizeThreshold)
 
         -- search neighbors for more leafs
         for k = 1, TableGetn(leaf) do
-            local neighbor = leaf[k]
+            local neighbor = NavGenerator.NavCells[leaf[k]]
             if neighbor.Label > 0 and neighbor.Seen != seenIdentifier then
                 neighbor.From = leaf
                 neighbor.Seen = seenIdentifier
@@ -932,7 +915,7 @@ function RetreatDirectionFrom(layer, origin, threat, distance)
         -- add neighbors of leaf that is too close to the origin
         if leaf.AcquiredCosts < distance then
             for k = 1, TableGetn(leaf) do
-                local neighbor = leaf[k]
+                local neighbor = NavGenerator.NavCells[leaf[k]]
                 if neighbor.Label > 0 and neighbor.Seen != seenIdentifier then
 
                     px = neighbor.px
@@ -1073,7 +1056,7 @@ function DirectionTo(layer, origin, destination, distance)
 
         -- continue state
         for k = 1, TableGetn(leaf) do
-            local neighbor = leaf[k]
+            local neighbor = NavGenerator.NavCells[leaf[k]]
             if neighbor.Label > 0 and neighbor.Seen != seenIdentifier then
                 local preferLargeNeighbor = 0
                 if leaf.Size > neighbor.Size then

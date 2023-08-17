@@ -86,7 +86,7 @@
 --- the type of damage the unit will do
 ---@field DamageType DamageType
 --- used by some projectile scripts to pass depth charge information
----@field DepthCharge? {Radius: number}
+---@field DepthCharge? WeaponBlueprintDepthCharge
 --- If true, will set the projectile launched from this weapon to detonate once it pass the height
 --- of the target it was launched at.
 --- See `moho.projectile_methods:ChangeDetonateAboveHeight(height)`
@@ -378,6 +378,10 @@
 --- if two additional flares should be created on the Z axis, each offset by
 --- `OffsetMult * Radius` for its collision center
 ---@field Stack? boolean
+
+---@class WeaponBlueprintDepthCharge
+---@field Radius number
+---@field ProjectilesToDeflect number
 
 ---@class WeaponBlueprintOvercharge
 --- flat damage applied to commanders, regardless of energy storage

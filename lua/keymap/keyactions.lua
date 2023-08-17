@@ -275,6 +275,14 @@ local keyActionsSelectionQuickSelect = {
         action = 'UI_SelectByCategory +inview +idle ENGINEER',
         category = 'selection',
     },
+    ['select_all_building_eng'] = {
+        action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").SelectAllBuildingEngineers()',
+        category = 'selection',
+    },
+    ['select_all_building_eng_onscreen'] = {
+        action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").SelectAllBuildingEngineers(true)',
+        category = 'selection',
+    },
     ['select_all_land_units_onscreen'] = {
         action = 'UI_SelectByCategory +inview +excludeengineers MOBILE LAND',
         category = 'selection',
@@ -410,6 +418,14 @@ local keyActionsSelectionQuickSelect = {
     ['select_all_battleships'] = {
         action = 'UI_SelectByCategory NAVAL BATTLESHIP',
         category = 'selection',
+    },
+    ['select_air_no_transport'] = {
+        action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").airNoTransports()',
+        category = 'selection',
+    },
+    ['select_air_transport'] = {
+        action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").airTransports()',
+        category = 'selection', order = 65,
     },
 }
 
@@ -1357,6 +1373,22 @@ local keyActionsOrders = {
         action = 'UI_Lua import("/lua/ui/game/orders.lua").ToggleDiveOrder()',
         category = 'orders',
     },
+    ['dive_all'] = {
+        action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").DiveAll()',
+        category = 'orders',
+    },
+    ['undive_all'] = {
+        action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").SurfaceAll()',
+        category = 'orders',
+    },
+    ['shift_dive_all'] = {
+        action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").DiveAll()',
+        category = 'orders',
+    },
+    ['shift_undive_all'] = {
+        action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").SurfaceAll()',
+        category = 'orders',
+    },
     ['ferry'] = {
         action = 'StartCommandMode order RULEUCC_Ferry',
         category = 'orders',
@@ -1453,24 +1485,20 @@ local keyActionsOrders = {
         action = 'UI_Lua import("/lua/ui/game/construction.lua").ToggleUnitPause()',
         category = 'orders',
     },
+    ['pause_unit_all'] = {
+        action = 'UI_Lua import("/lua/ui/game/construction.lua").ToggleUnitPauseAll()',
+        category = 'orders',
+    },
+    ['unpause_unit_all'] = {
+        action = 'UI_Lua import("/lua/ui/game/construction.lua").ToggleUnitUnpauseAll()',
+        category = 'orders',
+    },
     ['mode'] = {
         action = 'UI_Lua import("/lua/ui/game/orders.lua").CycleRetaliateStateUp()',
         category = 'orders',
     },
     ['suicide'] = {
         action = 'UI_Lua import("/lua/ui/game/confirmunitdestroy.lua").ConfirmUnitDestruction(false)',
-        category = 'orders',
-    },
-    ['spreadattack'] = {
-        action = 'UI_Lua import("/lua/spreadattack.lua").SpreadAttack()',
-        category = 'orders',
-    },
-    ['shift_spreadattack'] = {
-        action = 'UI_Lua import("/lua/spreadattack.lua").SpreadAttack()',
-        category = 'orders',
-    },
-    ['set_target_priority'] = {
-        action = 'UI_LUA import("/lua/keymap/misckeyactions.lua").SetWeaponPrioritiesToUnitType()',
         category = 'orders',
     },
     ['set_default_target_priority'] = {
@@ -1549,13 +1577,37 @@ local keyActionsOrders = {
         action = 'UI_Lua import("/lua/ui/game/orders.lua").Dock(false)',
         category = 'orders',
     },
-    ['select_air_no_transport'] = {
-        action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").airNoTransports()',
-        category = 'selection',
+}
+
+local keyActionsOrdersQueueBased = {
+
+    ['distribute_orders'] = {
+        action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").DistributeOrders()',
+        category = 'ordersQueueBased',
     },
-    ['select_air_transport'] = {
-        action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").airTransports()',
-        category = 'selection', order = 65,
+    ['shift_distribute_orders'] = {
+        action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").DistributeOrders()',
+        category = 'ordersQueueBased',
+    },
+
+}
+
+local keyactionsOrdersContextBased = {
+    ['filter_highest_engineer_and_assist'] = {
+        action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").SelectHighestEngineerAndAssist()',
+        category = 'ordersContextBased',
+    },
+    ['shift_cycle_context_based_templates'] = {
+        action = 'UI_Lua import("/lua/ui/game/commands/context-based-templates.lua").Cycle()',
+        category = 'ordersContextBased',
+    },
+    ['cycle_context_based_templates'] = {
+        action = 'UI_Lua import("/lua/ui/game/commands/context-based-templates.lua").Cycle()',
+        category = 'ordersContextBased',
+    },
+    ['set_target_priority'] = {
+        action = 'UI_LUA import("/lua/keymap/misckeyactions.lua").SetWeaponPrioritiesToUnitType()',
+        category = 'ordersContextBased',
     },
 }
 
@@ -1775,6 +1827,8 @@ keyActions = table.combine(
     keyActionsHotBuildAlternative,
     keyActionsHotBuildExtra,
     keyActionsOrders,
+    keyActionsOrdersQueueBased,
+    keyactionsOrdersContextBased,
     keyActionsGame,
     keyActionsChat,
     keyActionsUI,

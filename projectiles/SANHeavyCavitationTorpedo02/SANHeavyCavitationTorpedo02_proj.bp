@@ -20,21 +20,18 @@ ProjectileBlueprint {
         'SERAPHIM',
         'PROJECTILE',
         'ANTINAVY',
---        'TORPEDO',
-    'NOSPLASHDAMAGE',
+        'TORPEDO',
+        'NOSPLASHDAMAGE'
     },
     Defense = {
         Health = 1,
     },
+    DesiredShooterCap = 1,
     Display = {
         ImpactEffects = {
             Type = 'Small01',
         },
         StrategicIconSize = 1,
-    },
-    DoNotCollideList = {
-        'PROJECTILE',
-        'TORPEDO',
     },
     General = {
         Category = 'Anti Navy',
@@ -49,11 +46,16 @@ ProjectileBlueprint {
         Acceleration = 5,
         DestroyOnWater = false,
         InitialSpeed = 5,
+        Lifetime = 10,
         MaxSpeed = 18,
         StayUnderwater = true,
         TrackTarget = true,
-        TurnRate = 360,--230
+        TurnRate = 200,
         UseGravity = false,
         VelocityAlign = true,
+
+        -- these parameters make the path of the torpedo feel unique
+        AccelerationRange = 2,
+        TurnRateRange = 10,
     },
 }

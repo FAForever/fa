@@ -112,7 +112,7 @@ defaultKeyMap = {
     ['Shift-Q']             = 'shift_patrol',
     ['Shift-I']             = 'shift_guard',
     ['Shift-O']             = 'shift_overcharge',
-    ['Shift-Z']             = 'shift_spreadattack',
+    ['Shift-Z']             = 'shift_distribute_orders',
 
     ['W']                   = 'builders',
     ['E']                   = 'sensors',

@@ -1,5 +1,6 @@
-UnitBlueprint {
-     Air = {
+UnitBlueprint{
+    Description = "<LOC uaa0101_desc>Air Scout",
+    Air = {
         AutoLandTime = 1,
         BankFactor = 2,
         BankForward = false,
@@ -23,80 +24,39 @@ UnitBlueprint {
         Winged = true,
     },
     Audio = {
-        AirUnitWaterImpact = Sound {
-            Bank = 'Explosions',
-            Cue = 'Expl_Water_Lrg_01',
-            LodCutoff = 'UnitMove_LodCutoff',
-        },
-        AmbientMove = Sound {
-            Bank = 'UAA',
-            Cue = 'UAA0101_Move_Loop',
-            LodCutoff = 'UnitMove_LodCutoff',
-        },
-        Destroyed = Sound {
-            Bank = 'UAADestroy',
-            Cue = 'UAA_Destroy_Air',
-            LodCutoff = 'UnitMove_LodCutoff',
-        },
-        Killed = Sound {
-            Bank = 'UAADestroy',
-            Cue = 'UAA_Destroy_Air_Killed',
-            LodCutoff = 'UnitMove_LodCutoff',
-        },
-        Landing = Sound {
-            Bank = 'UAA',
-            Cue = 'UAA0101_Move_Land',
-            LodCutoff = 'UnitMove_LodCutoff',
-        },
-        Refueling = Sound {
-            Bank = 'UEA',
-            Cue = 'UEA_Repair_Refuel',
-            LodCutoff = 'UnitMove_LodCutoff',
-        },
-        StartMove = Sound {
-            Bank = 'UAA',
-            Cue = 'UAA0101_Move_Start',
-            LodCutoff = 'UnitMove_LodCutoff',
-        },
-        StopMove = Sound {
-            Bank = 'UAA',
-            Cue = 'UAA0101_Move_Stop',
-            LodCutoff = 'UnitMove_LodCutoff',
-        },
-        Thruster = Sound {
-            Bank = 'UAA',
-            Cue = 'UAA0101_Move_Thruster',
-            LodCutoff = 'UnitMove_LodCutoff',
-        },
-        UISelection = Sound {
-            Bank = 'Interface',
-            Cue = 'Aeon_Select_Air',
-            LodCutoff = 'UnitMove_LodCutoff',
-        },
+        AirUnitWaterImpact = Sound { Bank = 'Explosions', Cue = 'Expl_Water_Lrg_01',      LodCutoff = 'UnitMove_LodCutoff' },
+        AmbientMove        = Sound { Bank = 'UAA',        Cue = 'UAA0101_Move_Loop',      LodCutoff = 'UnitMove_LodCutoff' },
+        Destroyed          = Sound { Bank = 'UAADestroy', Cue = 'UAA_Destroy_Air',        LodCutoff = 'UnitMove_LodCutoff' },
+        Killed             = Sound { Bank = 'UAADestroy', Cue = 'UAA_Destroy_Air_Killed', LodCutoff = 'UnitMove_LodCutoff' },
+        Landing            = Sound { Bank = 'UAA',        Cue = 'UAA0101_Move_Land',      LodCutoff = 'UnitMove_LodCutoff' },
+        Refueling          = Sound { Bank = 'UEA',        Cue = 'UEA_Repair_Refuel',      LodCutoff = 'UnitMove_LodCutoff' },
+        StartMove          = Sound { Bank = 'UAA',        Cue = 'UAA0101_Move_Start',     LodCutoff = 'UnitMove_LodCutoff' },
+        StopMove           = Sound { Bank = 'UAA',        Cue = 'UAA0101_Move_Stop',      LodCutoff = 'UnitMove_LodCutoff' },
+        Thruster           = Sound { Bank = 'UAA',        Cue = 'UAA0101_Move_Thruster',  LodCutoff = 'UnitMove_LodCutoff' },
+        UISelection        = Sound { Bank = 'Interface',  Cue = 'Aeon_Select_Air',        LodCutoff = 'UnitMove_LodCutoff' },
     },
     BuildIconSortPriority = 20,
     Categories = {
-        'PRODUCTSC1',
-        'SELECTABLE',
-        'BUILTBYTIER1FACTORY',
-        'BUILTBYTIER2FACTORY',
-        'BUILTBYTIER3FACTORY',
-        'AEON',
-        'MOBILE',
-        'AIR',
-        'HIGHALTAIR',
-        'TECH1',
-        'INTELLIGENCE',
-        'SCOUT',
-        'VISIBLETORECON',
-        'RECLAIMABLE',
-        'OVERLAYRADAR',
-        'OVERLAYSONAR',
+        "AEON",
+        "AIR",
+        "BUILTBYTIER1FACTORY",
+        "BUILTBYTIER2FACTORY",
+        "BUILTBYTIER3FACTORY",
+        "HIGHALTAIR",
+        "INTELLIGENCE",
+        "MOBILE",
+        "OVERLAYRADAR",
+        "OVERLAYSONAR",
+        "PRODUCTSC1",
+        "RECLAIMABLE",
+        "SCOUT",
+        "SELECTABLE",
+        "TECH1",
+        "VISIBLETORECON",
     },
-    CollisionOffsetY = 0,
     Defense = {
         AirThreatLevel = 0.1,
-        ArmorType = 'Light',
+        ArmorType = "Light",
         EconomyThreatLevel = 0,
         Health = 25,
         MaxHealth = 25,
@@ -104,30 +64,25 @@ UnitBlueprint {
         SubThreatLevel = 0,
         SurfaceThreatLevel = 0,
     },
-    Description = '<LOC uaa0101_desc>Air Scout',
     Display = {
-    Abilities = {
-            '<LOC ability_radar>Radar',
-            '<LOC ability_sonar>Sonar',
-    },
+        Abilities = {
+            "<LOC ability_radar>Radar",
+            "<LOC ability_sonar>Sonar",
+        },
         LayerChangeEffects = {
             AirLand = {
                 Effects = {
                     {
-                        Bones = {
-                            'UAA0101',
-                        },
-                        Type = 'Landing01',
+                        Bones = { "UAA0101" },
+                        Type = "Landing01",
                     },
                 },
             },
             LandAir = {
                 Effects = {
                     {
-                        Bones = {
-                            'UAA0101',
-                        },
-                        Type = 'TakeOff01',
+                        Bones = { "UAA0101" },
+                        Type = "TakeOff01",
                     },
                 },
             },
@@ -137,13 +92,13 @@ UnitBlueprint {
             LODs = {
                 {
                     LODCutoff = 100,
-                    ShaderName = 'Aeon',
+                    ShaderName = "Aeon",
                 },
                 {
-                    AlbedoName = 'uaa0101_lod1_albedo.dds',
                     LODCutoff = 215,
-                    ShaderName = 'Aeon',
-                    SpecularName = 'uaa0101_lod1_specteam.dds',
+                    ShaderName = "Aeon",
+                    AlbedoName = "uaa0101_lod1_albedo.dds",
+                    SpecularName = "uaa0101_lod1_specteam.dds",
                 },
             },
         },
@@ -151,32 +106,26 @@ UnitBlueprint {
             Air = {
                 Contrails = {
                     Bones = {
-                        'Contrail_Left',
-                        'Contrail_Right',
+                        "Contrail_Left",
+                        "Contrail_Right",
                     },
                 },
                 Effects = {
                     {
-                        Bones = {
-                            0,
-                        },
-                        Type = 'TakeOff01',
+                        Bones = { 0 },
+                        Type = "TakeOff01",
                     },
                 },
             },
             Land = {
                 Effects = {
                     {
-                        Bones = {
-                            0,
-                        },
-                        Type = 'Landing01',
+                        Bones = { 0 },
+                        Type = "Landing01",
                     },
                 },
             },
         },
-        PlaceholderMeshName = 'UXA0010',
-        SpawnRandomRotation = true,
         UniformScale = 0.1,
     },
     Economy = {
@@ -190,8 +139,6 @@ UnitBlueprint {
         SizeZ = 1,
     },
     General = {
-        Category = 'Utility',
-        Classification = 'RULEUC_MilitaryAircraft',
         CommandCaps = {
             RULEUCC_Attack = false,
             RULEUCC_CallTransport = true,
@@ -207,19 +154,14 @@ UnitBlueprint {
             RULEUCC_Stop = true,
             RULEUCC_Transport = false,
         },
-        FactionName = 'Aeon',
-        Icon = 'air',
-        TechLevel = 'RULEUTL_Basic',
-        UnitName = '<LOC uaa0101_name>Mirage',
-        UnitWeight = 1,
+        FactionName = "Aeon",
+        Icon = "air",
+        UnitName = "<LOC uaa0101_name>Mirage",
     },
     Intel = {
+        RadarRadius = 65,
+        SonarRadius = 30,
         VisionRadius = 42,
-    RadarRadius = 65,
-    SonarRadius = 30,
-    },
-    Interface = {
-        HelpText = '<LOC uaa0101_help>Air Scout',
     },
     LifeBarHeight = 0.075,
     LifeBarOffset = 0.2,
@@ -235,7 +177,7 @@ UnitBlueprint {
             LAYER_Sub = false,
             LAYER_Water = false,
         },
-        Elevation = 20,
+        Elevation = 16,
         FuelRechargeRate = 5,
         FuelUseTime = 500,
         GroundCollisionOffset = 1,
@@ -246,18 +188,19 @@ UnitBlueprint {
         MeshExtentsY = 0.25,
         MeshExtentsZ = 1,
         MinSpeedPercent = 0.85,
-        MotionType = 'RULEUMT_Air',
+        MotionType = "RULEUMT_Air",
         TurnRadius = 100,
         TurnRate = 100,
     },
     SelectionSizeX = 0.55,
     SelectionSizeZ = 0.45,
     SelectionThickness = 0.68,
+    CollisionOffsetY = 0,
     SizeSphere = 2.0,
     SizeX = 0.4,
     SizeY = 0.15,
     SizeZ = 0.6,
-    StrategicIconName = 'icon_fighter1_intel',
+    StrategicIconName = "icon_fighter1_intel",
     StrategicIconSortPriority = 75,
     Transport = {
         AirClass = true,
@@ -268,16 +211,16 @@ UnitBlueprint {
             Damage = 10,
             DamageFriendly = true,
             DamageRadius = 1,
-            DamageType = 'Normal',
-            DisplayName = 'Air Crash',
+            DamageType = "Normal",
+            DisplayName = "Air Crash",
             DummyWeapon = true,
             FiringTolerance = 2,
-            Label = 'DeathImpact',
-            WeaponCategory = 'Death',
+            Label = "DeathImpact",
+            WeaponCategory = "Death",
         },
     },
     Wreckage = {
-        Blueprint = '/props/DefaultWreckage/DefaultWreckage_prop.bp',
+        Blueprint = "/props/DefaultWreckage/DefaultWreckage_prop.bp",
         EnergyMult = 0,
         HealthMult = 0.9,
         MassMult = 0.9,
@@ -285,9 +228,9 @@ UnitBlueprint {
         WreckageLayers = {
             Air = false,
             Land = true,
-            Seabed = true, --from false
-            Sub = true, --from false
-            Water = true, --from false
+            Seabed = true,
+            Sub = true,
+            Water = true,
         },
     },
 }

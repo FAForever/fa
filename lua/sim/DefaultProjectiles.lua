@@ -362,7 +362,7 @@ OnWaterEntryEmitterProjectile = ClassProjectile(Projectile) {
     FxTrailOffset = 0,
     PolyTrail = '',
     PolyTrailOffset = 0,
-    TrailDelay = 5,
+    TrailDelay = 2,
     EnterWaterSound = 'Torpedo_Enter_Water_01',
     FxEnterWater= {
         '/effects/emitters/water_splash_ripples_ring_01_emit.bp',
@@ -407,6 +407,10 @@ OnWaterEntryEmitterProjectile = ClassProjectile(Projectile) {
     EnterWaterThread = function(self)
         WaitTicks(self.TrailDelay)
 
+        if IsDestroyed(self) then
+            return
+        end
+
         local army = self.Army
         local fxTrails = self.FxTrails
         local fxTrailScale = self.FxTrailScale
@@ -445,16 +449,30 @@ OnWaterEntryEmitterProjectile = ClassProjectile(Projectile) {
         self:SetStayUpright(false)
         self:TrackTarget(true)
         self:StayUnderwater(true)
-        self:SetVelocity(0.5)
+
+        -- adds the effects after a delay
         self.Trash:Add(ForkThread(self.EnterWaterThread, self))
+
+        -- adjusts the velocity / acceleration, used for torpedo bombers
+        if self.MovementThread then
+            self.Trash:Add(ForkThread(self.MovementThread, self))
+        end
     end,
 
     ---@param self OnWaterEntryEmitterProjectile
-    ---@param TargetType string
-    ---@param TargetEntity Unit
-    OnImpact = function(self, TargetType, TargetEntity)
-        Projectile.OnImpact(self, TargetType, TargetEntity)
-        KillThread(self.TTT1)
+    ---@param targetType string
+    ---@param targetEntity Unit | Prop
+    OnImpact = function(self, targetType, targetEntity)
+        -- we only fix this for projectiles that are supposed to go into the water
+        local px, py, pz = self:GetPositionXYZ()
+        local surfaceHeight = GetSurfaceHeight(px, pz)
+        if py <= surfaceHeight - 0.1 then
+            if targetType == 'Terrain' then
+                targetType = 'Underwater'
+            end
+        end
+
+        Projectile.OnImpact(self, targetType, targetEntity)
     end,
 }
 
@@ -599,13 +617,13 @@ OverchargeProjectile = ClassSimple {
             damage = math.min(damage, idealDamage)
             damage = math.max(data.minDamage, damage)
             -- prevents radars blinks if there is less than 5k e in storage when OC hits the target
-            if energyAvailable < 5000 then
+            if energyAvailable < 7500 then
                 damage = energyLimitDamage
-            end
+            end   
         end
-
         -- Turn the final damage into energy
         local drain = self:DamageAsEnergy(damage)
+
 
         self.DamageData.DamageAmount = damage
 

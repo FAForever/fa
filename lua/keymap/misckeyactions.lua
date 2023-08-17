@@ -521,6 +521,11 @@ import("/lua/ui/game/gamemain.lua").ObserveSelection:AddObserver(
     'KeyActionHardMove'
 )
 
+DistributeOrders = function()
+    print("Distributing orders")
+    SimCallback({Func = 'DistributeOrders', Args = { }}, true)
+end
+
 AssignPlatoonBehaviorSilo = function()
     SimCallback({Func = 'AIPlatoonSiloTacticalBehavior', Args = { Behavior = 'AIBehaviorTacticalSimple' }}, true)
 end
@@ -544,4 +549,93 @@ RestoreCameraPosition = function ()
     local camera = GetCamera('WorldCamera')
     local settings = Prefs.GetFromCurrentProfile('DebugCameraPosition') --[[@as UserCameraSettings]]
     camera:MoveTo(settings.Focus, { settings.Heading, settings.Pitch, 0}, settings.Zoom, 0)
+end
+
+function SelectHighestEngineerAndAssist()
+    local selection = GetSelectedUnits()
+
+    if selection then
+
+        local tech2 = EntityCategoryFilterDown(categories.TECH2 - categories.COMMAND, selection)
+        local tech3 = EntityCategoryFilterDown(categories.TECH3 - categories.COMMAND, selection)
+        local sACUs = EntityCategoryFilterDown(categories.SUBCOMMANDER - categories.COMMAND, selection)
+
+        if next(sACUs) then
+            SimCallback({Func= 'SelectHighestEngineerAndAssist', Args = { TargetId = sACUs[1]:GetEntityId() }}, true)
+            SelectUnits(sACUs)
+        elseif next(tech3) then
+            SimCallback({Func= 'SelectHighestEngineerAndAssist', Args = { TargetId = tech3[1]:GetEntityId() }}, true)
+            SelectUnits(tech3)
+        elseif next(tech2) then
+            SimCallback({Func= 'SelectHighestEngineerAndAssist', Args = { TargetId = tech2[1]:GetEntityId() }}, true)
+            SelectUnits(tech2)
+        else
+            -- do nothing
+        end
+    end
+end
+
+local function SeparateDiveStatus(units)
+    local dummyUnitTable = { }
+    local categoriesSubmersible = categories.SUBMERSIBLE
+
+    local submergedUnits = { }
+    local surfacedUnits = { }
+
+    for k, unit in units do
+        dummyUnitTable[1] = unit
+        local status = GetIsSubmerged(dummyUnitTable)
+        if status == -1 then
+            table.insert(submergedUnits, unit)
+        elseif status == 1 then
+            table.insert(surfacedUnits, unit)
+        end
+    end
+
+    return submergedUnits, surfacedUnits
+end
+
+DiveAll = function()
+    print("Dive all")
+    local submergedUnits, surfacedUnits = SeparateDiveStatus(GetSelectedUnits())
+    if not table.empty(surfacedUnits) then
+        IssueUnitCommand(surfacedUnits, "UNITCOMMAND_Dive")
+    end
+end
+
+SurfaceAll = function()
+    print("Surface all")
+    local submergedUnits, surfacedUnits = SeparateDiveStatus(GetSelectedUnits())
+    if not table.empty(submergedUnits) then
+        IssueUnitCommand(submergedUnits, "UNITCOMMAND_Dive")
+    end
+end
+
+---@param onscreen boolean
+SelectAllBuildingEngineers = function(onscreen)
+    -- make sure it is always a boolean
+    onscreen = onscreen or false
+
+    -- select engineers
+    UISelectionByCategory('ENGINEER', false, onscreen, false, false)
+
+    -- filter them in-place
+    local units = GetSelectedUnits()
+    local unitCount = table.getn(units)
+    local unitSelectedHead = 1
+    for k = 1, unitCount do
+        local unit = units[k]
+        local eco = unit:GetEconData()
+        if (eco.energyRequested > 0) or (eco.massRequested > 0) then
+            units[unitSelectedHead] = unit
+            unitSelectedHead = unitSelectedHead + 1
+        end
+    end
+
+    -- remove empty entries
+    for k = unitSelectedHead, unitCount do
+        units[k] =  nil
+    end
+
+    SelectUnits(units)
 end

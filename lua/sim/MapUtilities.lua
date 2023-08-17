@@ -16,7 +16,7 @@ function MapResourceCheck()
     MapResourceCheckApplied = true
 
     -- get an arbitrary brain
-    local brain = ArmyBrains[playerIndex]
+    local brain = ArmyBrains[GetCurrentCommandSource()]
     local army = brain:GetArmyIndex()
     SetIgnoreArmyUnitCap(army, true)
 

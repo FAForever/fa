@@ -1,7 +1,7 @@
 --
 -- Ship-based Anti-Torpedo Script
 --
-local QuasarAntiTorpedoChargeSubProjectile = import("/lua/aeonprojectiles.lua").ATorpedoSubProjectile
+local QuasarAntiTorpedoChargeSubProjectile = import("/lua/aeonprojectiles.lua").QuasarAntiTorpedoChargeSubProjectile
 
 AIMAntiTorpedo01 = ClassProjectile(QuasarAntiTorpedoChargeSubProjectile) {
     OnLostTarget = function(self)
