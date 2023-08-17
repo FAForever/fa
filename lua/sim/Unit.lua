@@ -516,6 +516,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
 
     ---@param self Unit
     OnPaused = function(self)
+
         if self:IsUnitState('Building') or self:IsUnitState('Upgrading') or self:IsUnitState('Repairing') then
             self:SetActiveConsumptionInactive()
             self:StopUnitAmbientSound('ConstructLoop')
@@ -523,7 +524,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
 
         -- When paused we reclaim at a speed of 0, with thanks to:
         -- - https://github.com/FAForever/FA-Binary-Patches/pull/19
-        if self:IsUnitState('Reclaiming') then
+        if self.EntityBeingReclaimed and (not IsDestroyed(self.EntityBeingReclaimed)) then
             self:StopReclaimEffects(self.EntityBeingReclaimed)
             self:StopUnitAmbientSound('ReclaimLoop')
             self:PlayUnitSound('StopReclaim')
@@ -539,7 +540,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
 
         -- When paused we reclaim at a speed of 0, with thanks to:
         -- - https://github.com/FAForever/FA-Binary-Patches/pull/19
-        if self.EntityBeingReclaimed then
+        if self.EntityBeingReclaimed and (not IsDestroyed(self.EntityBeingReclaimed)) then
             self:StartReclaimEffects(self.EntityBeingReclaimed)
             self:PlayUnitSound('StartReclaim')
             self:PlayUnitAmbientSound('ReclaimLoop')
@@ -778,7 +779,6 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
     ---@param self Unit
     ---@param target Unit | Prop
     OnStartReclaim = function(self, target)
-
         -- When paused we reclaim at a speed of 0, with thanks to:
         -- - https://github.com/FAForever/FA-Binary-Patches/pull/19
         if not self:IsPaused() then
@@ -827,6 +827,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         self:StopUnitAmbientSound('ReclaimLoop')
         self:PlayUnitSound('StopReclaim')
         self:SetUnitState('Reclaiming', false)
+        self.EntityBeingReclaimed = nil
 
         if target.IsProp then
             target:UpdateReclaimLeft()
