@@ -39,6 +39,7 @@ ShieldEffectsComponent = ClassSimple {
 
 ---@class IntelComponent
 ---@field IntelStatus? UnitIntelStatus
+---@field DetectedByHooks? fun(unit: Unit, army: number)[]
 IntelComponent = ClassSimple {
 
     ---@param self IntelComponent | Unit
@@ -390,7 +391,6 @@ IntelComponent = ClassSimple {
     end,
 }
 
----@type table<string, number>
 local TechToDuration = {
     TECH1 = 1,
     TECH2 = 2,
@@ -398,7 +398,6 @@ local TechToDuration = {
     EXPERIMENTAL = 6,
 }
 
----@type table<string, number>
 local TechToLOD = {
     TECH1 = 120,
     TECH2 = 140,
@@ -407,9 +406,11 @@ local TechToLOD = {
 }
 
 ---@class TreadComponent
+---@field CrushingSuspend? boolean
+---@field CrushingThread? thread
 ---@field TreadBlueprint UnitBlueprintTreads
 ---@field TreadSuspend? boolean
----@field TreadThreads? table<number, thread>
+---@field TreadThreads? thread[]
 TreadComponent = ClassSimple {
 
     ---@param self Unit | TreadComponent
@@ -420,50 +421,57 @@ TreadComponent = ClassSimple {
     ---@param self Unit | TreadComponent
     CreateMovementEffects = function(self)
         local treads = self.TreadBlueprint
-        if treads then
-            if treads.ScrollTreads then
-                self:AddThreadScroller(1.0, treads.ScrollMultiplier or 0.2)
-            end
+        if not treads then
+            return
+        end
 
-            local treadMarks = treads.TreadMarks
-            local treadType = self.TerrainType.Treads
-            if treadMarks and treadType and treadType ~= 'None' then
-                self:CreateTreads(treadMarks)
-            end
+        if treads.ScrollTreads then
+            self:AddThreadScroller(1.0, treads.ScrollMultiplier or 0.2)
+        end
+        local treadMarks = treads.TreadMarks
+        local treadType = self.TerrainType.Treads
+        if treadMarks and treadType and treadType ~= 'None' then
+            self:CreateTreads(treadMarks)
+        end
+        if treads.Damage then
+            self:StartCrushing(treads.Damage)
         end
     end,
 
     ---@param self Unit | TreadComponent
     DestroyMovementEffects = function(self)
         local treads = self.TreadBlueprint
-        if treads then
-            if treads.ScrollTreads then
-                self:RemoveScroller()
-            end
+        if not treads then
+            return
+        end
 
-            if self.TreadThreads then
-                self.TreadSuspend = true
-            end
+        if treads.ScrollTreads then
+            self:RemoveScroller()
+        end
+        if self.TreadThreads then
+            self.TreadSuspend = true
+        end
+        if self.CrushingThread then
+            self.CrushingSuspend = true
         end
     end,
 
     ---@param self Unit | TreadComponent
-    ---@param treadsBlueprint UnitBlueprintTreadMarks
-    CreateTreads = function(self, treadsBlueprint)
+    ---@param treadMarks UnitBlueprintTreadMarks
+    CreateTreads = function(self, treadMarks)
         local treadThreads = self.TreadThreads
         if not treadThreads then
             treadThreads = {}
+            self.TreadThreads = treadThreads
 
-            for k, treadBlueprint in treadsBlueprint do
+            for k, treadBlueprint in treadMarks do
                 local thread = ForkThread(self.CreateTreadsThread, self, treadBlueprint)
                 treadThreads[k] = thread
                 self.Trash:Add(thread)
             end
-
-            self.TreadThreads = treadThreads
         else
             self.TreadSuspend = nil
-            for k, thread in treadThreads do
+            for _, thread in treadThreads do
                 ResumeThread(thread)
             end
         end
@@ -472,24 +480,21 @@ TreadComponent = ClassSimple {
     ---@param self Unit | TreadComponent
     ---@param treads UnitBlueprintTreadMarks
     CreateTreadsThread = function(self, treads)
-
-        -- to local scope for performance
+        -- trade memory for performance
         local WaitTicks = WaitTicks
         local CreateSplatOnBone = CreateSplatOnBone
         local SuspendCurrentThread = SuspendCurrentThread
 
-        local tech = self.Blueprint.TechCategory
-        local sizeX = treads.TreadMarksSizeX
-        local sizeZ = treads.TreadMarksSizeZ
-        local interval = 10 * (treads.TreadMarksInterval or 0.1)
         local treadOffset = treads.TreadOffset
         local treadBone = treads.BoneName or 0
         local treadTexture = treads.TreadMarks
-
-        local duration = treads.TreadLifeTime or TechToDuration[tech] or 1
-        local lod = TechToLOD[tech] or 120
+        local sizeX = treads.TreadMarksSizeX
+        local sizeZ = treads.TreadMarksSizeZ
+        local lod = TechToLOD[self.Blueprint.TechCategory] or 120
+        local duration = treads.TreadLifeTime or TechToDuration[self.Blueprint.TechCategory] or 1
         local army = self.Army
 
+        local interval = 10 * (treads.TreadMarksInterval or 0.1)
         -- prevent infinite loops
         if interval < 1 then
             interval = 1
@@ -502,7 +507,52 @@ TreadComponent = ClassSimple {
             end
 
             SuspendCurrentThread()
-            self.TreadSuspend = nil
+            WaitTicks(1)
+        end
+    end,
+
+    ---@param self Unit | TreadComponent
+    ---@param dmg table
+    StartCrushing = function(self, dmg)
+        if not self.CrushingThread then
+            local thread = ForkThread(self.CreateCrushingThread, self, dmg)
+            self.CrushingThread = thread
+            self.Trash:Add(thread)
+        else
+            self.CrushingSuspend = nil
+            ResumeThread(self.CrushingThread)
+        end
+    end,
+
+    ---@param self Unit | TreadComponent
+    ---@param dmg table
+    CreateCrushingThread = function(self, dmg)
+        -- trade memory for performance
+        local WaitTicks = WaitTicks
+        local DamageArea = DamageArea
+        local SuspendCurrentThread = SuspendCurrentThread
+
+        local bones = dmg.Bones
+        local radius = dmg.Radius
+        local amount = dmg.Amount
+        local type = dmg.Type
+        local damageFriendly = dmg.DamageFriendly
+
+        local interval = 10 * (dmg.PulseInterval or 0.1)
+        -- prevent infinite loops
+        if interval < 1 then
+            interval = 1
+        end
+
+        while true do
+            while not self.CrushingSuspend do
+                for _, bone in bones do
+                    DamageArea(self, self:GetPosition(bone), radius, amount, type, damageFriendly)
+                end
+                WaitTicks(interval)
+            end
+
+            SuspendCurrentThread()
             WaitTicks(1)
         end
     end,
@@ -713,7 +763,8 @@ VeterancyComponent = ClassSimple {
     end,
 
     ---@param self Unit | VeterancyComponent
-    ---@param instigator Unit
+    ---@param unitThatIsDying Unit
+    ---@param experience? number
     OnKilledUnit = function (self, unitThatIsDying, experience)
         if not experience then
             return

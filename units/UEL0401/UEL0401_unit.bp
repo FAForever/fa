@@ -191,6 +191,17 @@ UnitBlueprint{
                             TreadOffset = { 0, 0, -4.5 },
                         },
                     },
+                    Damage = {
+                        Bones = {
+                            "Wheel_Left01",
+                            "Wheel_Right01",
+                        },
+                        Amount = 2000,
+                        PulseInterval = 2,
+                        DamageFriendly = false,
+                        Radius = 1.5,
+                        Type = "ExperimentalFootfall",
+                    },
                 },
             },
             Seabed = {
