@@ -538,7 +538,7 @@ TreadComponent = ClassSimple {
         local type = dmg.Type
         local damageFriendly = dmg.DamageFriendly
 
-        local interval = 10 * (dmg.PulseInterval or 0.1)
+        local interval = 10 * (dmg.PulseInterval or 3)
         -- prevent infinite loops
         if interval < 1 then
             interval = 1
