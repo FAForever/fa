@@ -343,6 +343,16 @@ VS_OUT FixedFuncVS( VS_IN In )
     return Out;
 }
 
+bool IsExperimentalShader() {
+    // The tile value basically says how often the texture gets repeated on the map.
+    // A value less than one doesn't make sense under normal conditions, so it is
+    // relatively save to use it as our switch.
+
+    // in order to trigger this you can set the albedo scale to be bigger than the map 
+    // size. Use the value 10000 to be safe for any map
+    return UpperAlbedoTile.x < 1.0;
+}
+
 // sample a texture that is another buffer the same size as the one
 // we are rendering into and with the viewport setup the same way.
 float4 SampleScreen(sampler inSampler, float4 inTex)
@@ -388,13 +398,12 @@ float3 ApplyWaterColor( float depth, float3  inColor)
     return lerp( inColor.xyz, wcolor.xyz, wcolor.w );
 }
 
-float3 ApplyWaterColorExponentially(VS_OUTPUT inV, float waterDepth, float3 color) {
+float3 ApplyWaterColorExponentially(float3 viewDirection, float waterDepth, float3 color) {
     float4 waterColor = tex1D(WaterRampSampler, waterDepth);
-    float3 v = normalize(-inV.mViewDirection);
     float3 up = float3(0,1,0);
     // To simplify, we assume that the light enters vertically into the water,
     // this is the length that the light travels underwater back to the camera
-    float oneOverCosV = 1 / max(dot(up, v), 0.0001);
+    float oneOverCosV = 1 / max(dot(up, normalize(viewDirection)), 0.0001);
     // light gets absorbed exponentially
     float waterAbsorption = saturate(exp(-waterColor.w * (1 + oneOverCosV)));
     // darken the color first to simulate the light absorption on the way in and out
@@ -410,11 +419,11 @@ float4 CalculateLighting( float3 inNormal, float3 inViewPosition, float3 inAlbed
     float4 color = float4( 0, 0, 0, 0 );
 
     float shadow = ( inShadows && ( 1 == ShadowsEnabled ) ) ? ComputeShadow( inShadow ) : 1;
-    // if (UpperAlbedoTile.x * TerrainScale.x > 1000) {
-    //     float3 position = TerrainScale * inViewPosition;
-    //     float mapShadow = saturate(1 - tex2D(Stratum7AlbedoSampler, position.xy).b);
-    //     shadow = shadow * mapShadow;
-    // }
+    if (IsExperimentalShader()) {
+        float3 position = TerrainScale * inViewPosition;
+        float mapShadow = saturate(1 - tex2D(Stratum7AlbedoSampler, position.xy).b);
+        shadow = shadow * mapShadow;
+    }
 
     // calculate some specular
     float3 viewDirection = normalize(inViewPosition.xzy-CameraPosition);
@@ -427,11 +436,11 @@ float4 CalculateLighting( float3 inNormal, float3 inViewPosition, float3 inAlbed
     light = LightingMultiplier * light + ShadowFillColor * ( 1 - light );
     color.rgb = light * inAlbedo;
 
-    // instead of calculating the fog based
-    // on the absolute depth, calculate it based
-    // on the length from that depth at this map
-    // coordinate
-    color.rgb = ApplyWaterColor( waterDepth, color );
+    if (IsExperimentalShader()) {
+        color.rgb = ApplyWaterColorExponentially(-viewDirection, waterDepth, color);
+    } else {
+        color.rgb = ApplyWaterColor( waterDepth, color );
+    }
 
     color.a = 0.01f + (specular*SpecularColor.w);
     return color;
@@ -533,6 +542,17 @@ float3 PBR(VS_OUTPUT inV, float3 albedo, float3 n, float roughness) {
     // slot or to sacrifice water rendering.
     // In the future we could write another shader that does exactly this, so
     // mappers can choose to use that if they want to make a shiny map.
+
+    // used textures:
+    // lowerAlbedo
+    // Albedo stratum 0-7
+    // upperAlbedo
+    // NormalTexture
+    // ShadowTexture
+    // UtilityTextureA
+    // UtilityTextureB
+    // UtilityTextureC
+    // WaterRamp
 
     return color;
 }
@@ -794,45 +814,51 @@ float4 TerrainBasisPS( VS_OUTPUT inV ) : COLOR
 float4 TerrainBasisPSBiCubic( VS_OUTPUT inV ) : COLOR
 {
     float4 result;
-    float2 coord_source = (inV.mTexWT * TerrainScale * NormalMapScale + NormalMapOffset).xy;
-    float2 coord_hg = coord_source * size_source - float2(0.5, 0.5);
+    if (IsExperimentalShader()) {
+        float4 position = TerrainScale * inV.mTexWT;
+        result = (float4(1, 1, tex2D(UpperAlbedoSampler, position.xy).xy));
 
-    // fetch offsets and weights from filter texture
-#ifdef DIRECT3D10
-    // force to a 2d lookup for d3d10 since d3d10 is much stricter when enforcing
-    // 1d lookups from 2d textures
-    float3 hg_x = tex2D(BiCubicLookupSampler, float2(coord_hg.x,0)).xyz;
-    float3 hg_y = tex2D(BiCubicLookupSampler, float2(coord_hg.y,0)).xyz;
-#else
-    float3 hg_x = tex1D(BiCubicLookupSampler, coord_hg.x).xyz;
-    float3 hg_y = tex1D(BiCubicLookupSampler, coord_hg.y).xyz;
-#endif
+    } else {
+        float2 coord_source = (inV.mTexWT * TerrainScale * NormalMapScale + NormalMapOffset).xy;
+        float2 coord_hg = coord_source * size_source - float2(0.5, 0.5);
 
-    // determine linear sampling coordinates
-    float2 coord_source10 = coord_source + hg_x.x * e_x;
-    float2 coord_source00 = coord_source - hg_x.y * e_x;
-    float2 coord_source11 = coord_source10 + hg_y.x * e_y;
-    float2 coord_source01 = coord_source00 + hg_y.x * e_y;
-    coord_source10 = coord_source10 - hg_y.y * e_y;
-    coord_source00 = coord_source00 - hg_y.y * e_y;
+        // fetch offsets and weights from filter texture
+    #ifdef DIRECT3D10
+        // force to a 2d lookup for d3d10 since d3d10 is much stricter when enforcing
+        // 1d lookups from 2d textures
+        float3 hg_x = tex2D(BiCubicLookupSampler, float2(coord_hg.x,0)).xyz;
+        float3 hg_y = tex2D(BiCubicLookupSampler, float2(coord_hg.y,0)).xyz;
+    #else
+        float3 hg_x = tex1D(BiCubicLookupSampler, coord_hg.x).xyz;
+        float3 hg_y = tex1D(BiCubicLookupSampler, coord_hg.y).xyz;
+    #endif
 
-    // fetch the samples from the appropriate spot on the texture
-    float4 tex_source00 = tex2D( UtilitySamplerA, coord_source00 );
-    float4 tex_source10 = tex2D( UtilitySamplerA, coord_source10 );
-    float4 tex_source01 = tex2D( UtilitySamplerA, coord_source01 );
-    float4 tex_source11 = tex2D( UtilitySamplerA, coord_source11 );
+        // determine linear sampling coordinates
+        float2 coord_source10 = coord_source + hg_x.x * e_x;
+        float2 coord_source00 = coord_source - hg_x.y * e_x;
+        float2 coord_source11 = coord_source10 + hg_y.x * e_y;
+        float2 coord_source01 = coord_source00 + hg_y.x * e_y;
+        coord_source10 = coord_source10 - hg_y.y * e_y;
+        coord_source00 = coord_source00 - hg_y.y * e_y;
 
-    // weight along y direction
-    tex_source00 = lerp(tex_source00, tex_source01, hg_y.z );
-    tex_source10 = lerp(tex_source10, tex_source11, hg_y.z );
+        // fetch the samples from the appropriate spot on the texture
+        float4 tex_source00 = tex2D( UtilitySamplerA, coord_source00 );
+        float4 tex_source10 = tex2D( UtilitySamplerA, coord_source10 );
+        float4 tex_source01 = tex2D( UtilitySamplerA, coord_source01 );
+        float4 tex_source11 = tex2D( UtilitySamplerA, coord_source11 );
 
-    // weight along x direction
-    tex_source00 = lerp(tex_source00, tex_source10, hg_x.z );
+        // weight along y direction
+        tex_source00 = lerp(tex_source00, tex_source01, hg_y.z );
+        tex_source10 = lerp(tex_source10, tex_source11, hg_y.z );
 
-    // remember we are only writing into the blue and alpha channels.
-    // we can probably optimize our lerps above by taking advantage of the fact that
-    // we only have 2 channels.
-    result = tex_source00.xxwy;
+        // weight along x direction
+        tex_source00 = lerp(tex_source00, tex_source10, hg_x.z );
+
+        // remember we are only writing into the blue and alpha channels.
+        // we can probably optimize our lerps above by taking advantage of the fact that
+        // we only have 2 channels.
+        result = tex_source00.xxwy;
+    }
     return result;
 }
 
@@ -1038,7 +1064,7 @@ technique TTerrainGlow <
         DepthState( Depth_Enable )
 
         VertexShader = compile vs_1_1 TerrainGlowVS( true );
-        PixelShader = compile ps_2_0 TerrainGlowPS( true);
+        PixelShader = compile ps_2_a TerrainGlowPS( true);
     }
 }
 
@@ -1909,7 +1935,7 @@ float4 TerrainPBRAlbedoPS ( VS_OUTPUT inV) : COLOR
     float3 color = PBR(inV, albedo, normal, roughness);
 
     float waterDepth = tex2Dproj(UtilitySamplerC, position).g;
-    color = ApplyWaterColorExponentially(inV, waterDepth, color);
+    color = ApplyWaterColorExponentially(-inV.mViewDirection, waterDepth, color);
 
     return float4(color, 0.01f);
     // SpecularColor.rgba is unused now
@@ -1942,22 +1968,12 @@ technique TerrainPBR <
     }
 }
 
-/* # Similar to TTerrainXP, but upperAlbedo is used for map-wide #
-   # textures and we use better water color calculations         # */
-
-float4 Terrain001NormalsPS( VS_OUTPUT pixel ) : COLOR
+float4 Terrain002NormalsPS( VS_OUTPUT pixel ) : COLOR
 {
     float4 mask0 = saturate(tex2D(UtilitySamplerA,pixel.mTexWT*TerrainScale) * 2 - 1);
     float4 mask1 = saturate(tex2D(UtilitySamplerB,pixel.mTexWT*TerrainScale) * 2 - 1);
 
-    float4 position = TerrainScale * pixel.mTexWT;
-    float4 utility = tex2D(UpperAlbedoSampler, position.xy);
-
-    // reconstruct the y channel
-    float4 lowerNormal = float4(1, 1, 1, 1);
-    lowerNormal.xz = utility.xy * 2 - 1;
-    lowerNormal.y = sqrt(1 - dot(lowerNormal.xz,lowerNormal.xz));
-
+    float4 lowerNormal    = normalize(tex2D(LowerNormalSampler,    pixel.mTexWT * TerrainScale * LowerNormalTile)    * 2 - 1);
     float4 stratum0Normal = normalize(tex2D(Stratum0NormalSampler, pixel.mTexWT * TerrainScale * Stratum0NormalTile) * 2 - 1);
     float4 stratum1Normal = normalize(tex2D(Stratum1NormalSampler, pixel.mTexWT * TerrainScale * Stratum1NormalTile) * 2 - 1);
     float4 stratum2Normal = normalize(tex2D(Stratum2NormalSampler, pixel.mTexWT * TerrainScale * Stratum2NormalTile) * 2 - 1);
@@ -2026,12 +2042,30 @@ float4 Terrain001AlbedoPS ( VS_OUTPUT inV) : COLOR
     albedo.rgb = light * (albedo.rgb + specular.rgb);
 
     float waterDepth = tex2Dproj(UtilitySamplerC, position).g;
-    albedo.rgb = ApplyWaterColorExponentially(inV, waterDepth, albedo.rgb);
+    albedo.rgb = ApplyWaterColorExponentially(-inV.mViewDirection, waterDepth, albedo.rgb);
 
     return float4(albedo.rgb, 0.01f);
 }
 
-technique Terrain001Normals
+/* # Similar to TTerrainXP, but upperAlbedo is used for map-wide #
+   # textures and we use better water color calculations.        #
+   # It is designed to be a drop-in replacement for TTerrainXP.  # */
+technique Terrain001 <
+    string usage = "composite";
+    string normals = "TTerrainNormalsXP"; 
+>
+{
+    pass P0
+    {
+        AlphaState( AlphaBlend_Disable_Write_RGBA )
+        DepthState( Depth_Enable )
+
+        VertexShader = compile vs_1_1 TerrainVS(true);
+        PixelShader = compile ps_2_a Terrain001AlbedoPS();
+    }
+}
+
+technique Terrain002Normals
 {
     pass P0
     {
@@ -2039,13 +2073,15 @@ technique Terrain001Normals
         DepthState( Depth_Enable )
 
         VertexShader = compile vs_1_1 TerrainVS(false);
-        PixelShader = compile ps_2_a Terrain001NormalsPS();
+        PixelShader = compile ps_2_a Terrain002NormalsPS();
     }
 }
 
-technique Terrain001 <
+/* # Very similar to Terrain001, but makes the used value ranges #
+   # in the texture masks consistent between normal and albedo.  # */
+technique Terrain002 <
     string usage = "composite";
-    string normals = "Terrain001Normals"; 
+    string normals = "Terrain002Normals"; 
 >
 {
     pass P0
