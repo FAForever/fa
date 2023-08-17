@@ -1327,15 +1327,7 @@ float4 DecalsPS( VS_OUTPUT inV, uniform bool inShadows) : COLOR
 
     float waterDepth = tex2Dproj(UtilitySamplerC, inV.mTexWT * TerrainScale).g;
 
-    float3 color;
-    if (IsExperimentalShader()) {
-        float roughness = 1 - decalSpec.r;
-        float4 position = TerrainScale * inV.mTexWT;
-        color = PBR(inV, position, decalAlbedo, normal, roughness);
-        color = ApplyWaterColorExponentially(-inV.mViewDirection, waterDepth, color);
-    } else {
-        color = CalculateLighting(normal, inV.mTexWT.xyz, decalAlbedo.xyz, decalSpec.r, waterDepth, inV.mShadow, inShadows).xyz;
-    }
+    float3 color = CalculateLighting(normal, inV.mTexWT.xyz, decalAlbedo.xyz, decalSpec.r, waterDepth, inV.mShadow, inShadows).xyz;
 
     return float4(color.rgb, decalAlbedo.w * decalMask.w * DecalAlpha);
 }
