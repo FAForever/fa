@@ -4452,11 +4452,19 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
 
         if carrier.DisableIntelOfCargo and (not IsDestroyed(self)) then
             self:DisableUnitIntel('Cargo')
+            if self.MaintenanceConsumption then
+                self:SetMaintenanceConsumptionInactive()
+                self.EnableConsumptionWhenRemovedFromStorage = true
+            end
 
-            -- look at additional layer of transports (looking at you, Stinger)
+            -- look at additional layer of storage / cargo (looking at you, Stinger)
             if EntityCategoryContains(categories.TRANSPORTATION, self) then
                 for _, attached in self:GetCargo() do
                     attached:DisableUnitIntel('Cargo')
+                    if attached.MaintenanceConsumption then
+                        attached:SetMaintenanceConsumptionInactive()
+                        attached.EnableConsumptionWhenRemovedFromStorage = true
+                    end
                 end
             end
         end
@@ -4476,11 +4484,19 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
 
         if carrier.DisableIntelOfCargo and (not IsDestroyed(self)) then
             self:EnableUnitIntel('Cargo')
+            if self.EnableConsumptionWhenRemovedFromStorage then
+                self:SetMaintenanceConsumptionActive()
+                self.EnableConsumptionWhenRemovedFromStorage = nil
+            end
 
-            -- look at additional layer of transports (looking at you, Stinger)
+            -- look at additional layer of storage / cargo (looking at you, Stinger)
             if EntityCategoryContains(categories.TRANSPORTATION, self) then
                 for _, attached in self:GetCargo() do
                     attached:EnableUnitIntel('Cargo')
+                    if attached.EnableConsumptionWhenRemovedFromStorage then
+                        attached:SetMaintenanceConsumptionActive()
+                        attached.EnableConsumptionWhenRemovedFromStorage = nil
+                    end
                 end
             end
         end
