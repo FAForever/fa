@@ -37,7 +37,8 @@ local PopulateLocation = import("/lua/sim/commands/orders-shared.lua").PopulateL
 --- Processes the orders and re-distributes them over the units. Assumes that all units in the
 --- selection to have the same command queue. If that is not the case then orders are lost
 ---@param units Unit[]
-DistributeOrders = function(units)
+---@param target Unit
+DistributeOrders = function(units, target)
 
     local start = GetSystemTimeSecondsOnlyForProfileUse()
 
@@ -57,7 +58,8 @@ DistributeOrders = function(units)
     local groups = { {} }
 
     ---@type UnitCommand[]
-    local orders = units[1]:GetCommandQueue()
+    local orders = target:GetCommandQueue()
+
     for k, order in orders do
 
         -- find the first order that represents a position

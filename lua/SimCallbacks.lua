@@ -377,7 +377,7 @@ do
 end
 
 do
-  
+
     --- Processes the orders and re-distributes them over the units
     ---@param data any
     ---@param selection Unit[]
@@ -388,7 +388,16 @@ do
             return
         end
 
-        import("/lua/sim/commands/orders-distribute.lua").DistributeOrders(selection)
+        -- verify the target
+        local target = (data.target and GetUnitById(data.target)) --[[@as Unit]]
+        if (not target) or
+            (not target.Army) or
+            (not OkayToMessWithArmy(target.Army))
+        then
+            return
+        end
+
+        import("/lua/sim/commands/orders-distribute.lua").DistributeOrders(selection, target)
     end
 end
 
