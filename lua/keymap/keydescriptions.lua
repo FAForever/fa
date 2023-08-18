@@ -176,6 +176,8 @@ keyDescriptions = {
     ['toggle_reclaim_labels'] = '<LOC key_desc_0103>Toggles reclaim labels on and off',
     ['select_upgrading_extractors'] = '<LOC key_desc_select_upgrading_extractors>Select all extractors that are upgrading',
     ['select_all_radars'] = '<LOC key_desc_select_all_radars>Select all radars',
+    ['select_all_building_eng'] = '<LOC key_desc_select_all_building_eng>Select all engineers that are requesting resources',
+    ['select_all_building_eng_onscreen'] = '<LOC key_desc_select_all_building_eng_onscreen>Select all engineers that are requesting resources on screen',
     ['decrease_game_speed'] = '<LOC key_desc_0079>Decrease game speed',
     ['increase_game_speed'] = '<LOC key_desc_0080>Increase game speed',
     ['reset_game_speed'] = '<LOC key_desc_0081>Reset game speed to 0 (Normal Speed)',
@@ -263,8 +265,7 @@ keyDescriptions = {
     ['debug_toggle_flavah'] = "<LOC key_desc_0178>Toggle the world flavor text on/off",
     ['debug_ssmode'] = '<LOC key_desc_0001>Toggles Screen Shot mode',
     ['debug_toggle_pannels'] = '<LOC key_desc_0180>Toggle UI panels on/off',
-    ['spreadattack'] = '<LOC key_desc_0182>Spread attack',
-    ['shift_spreadattack'] = '<LOC key_desc_0183>Spread attack',
+
     ['show_objective_screen'] = '<LOC key_desc_0184>Show Scenario Options/Objectives Window',
     ['toggle_ai_screen'] = 'Toggle AI blueprint information window, requires cheats to be enabled',
     ['toggle_markers_screen'] = 'Toggle marker information window, requires cheats to be enabled',
@@ -524,6 +525,9 @@ keyDescriptions = {
     ['toggle_ai_nav_direction_to'] = 'NavUtils - Toggle to visualize output of DirectionTo',
 
     ['filter_highest_engineer_and_assist'] = '<LOC key_desc_filter_highest_engineer_and_assist>Filter the selection to the most advanced engineer, all other engineers assist that engineer',
-    ['distribute_orders'] = '<LOC key_desc_distribute_orders>Distribute orders of the selected units',
-    ['shift_distribute_orders'] = '<LOC key_desc_distribute_orders>Distribute orders of the selected units',
+    ['distribute_orders'] = '<LOC key_desc_distribute_orders>Distribute the command queue of the unit nearest to the mouse',
+    ['shift_distribute_orders'] = '<LOC key_desc_distribute_orders>Distribute the command queue of the unit nearest to the mouse',
+    ['distribute_orders_context'] = '<LOC key_desc_distribute_orders>Distribute the command queue of the unit that the mouse is hovering over',
+    ['shift_distribute_orders_context'] = '<LOC key_desc_distribute_orders>Distribute the command queue of the unit that the mouse is hovering over',
+    ['cycle_context_based_templates'] = '<LOC key_desc_context_based_templates>Cycle templates based on the unit that the mouse is hovering over',
 }

@@ -850,7 +850,7 @@ end
 
 --- Orders a group of units to guard a target
 ---@param units Unit[]
----@param target Unit
+---@param target Unit | Vector
 ---@return SimCommand
 function IssueGuard(units, target)
 end

@@ -18,7 +18,8 @@ function lockZoom()
 end
 
 function airNoTransports()
-    UISelectionByCategory("AIR + MOBILE", false, false, false, false) SelectUnits(EntityCategoryFilterDown(categories.ALLUNITS - categories.TRANSPORTATION, GetSelectedUnits()))
+    UISelectionByCategory("AIR + MOBILE", false, false, false, false)
+    SelectUnits(EntityCategoryFilterDown(categories.ALLUNITS - categories.TRANSPORTATION, GetSelectedUnits()))
 end
 
 function airTransports()
@@ -55,7 +56,7 @@ end
 -- Function to toggle things like shields etc
 -- Unit toggle rules copied from orders.lua, used for converting to the numbers needed for the togglescriptbit function
 unitToggleRules = {
-    Shield =  0,
+    Shield = 0,
     Weapon = 1,
     Jamming = 2,
     Intel = 3,
@@ -82,8 +83,8 @@ function toggleAllScript()
 end
 
 local FILTERS = {
-    Military = {"defense", "antinavy", "miscellaneous", "antiair", "directfire", "indirectfire"},
-    Intel = {"counterintel", "omni", "radar", "sonar" }
+    Military = { "defense", "antinavy", "miscellaneous", "antiair", "directfire", "indirectfire" },
+    Intel = { "counterintel", "omni", "radar", "sonar" }
 }
 
 function toggleOverlay(type)
@@ -127,7 +128,7 @@ function getGetNextFactory(factoryType)
             if currentFactoryIndex > table.getn(factoryList) then
                 currentFactoryIndex = 1
             end
-            SelectUnits({nextFac})
+            SelectUnits({ nextFac })
         end
     end
 end
@@ -229,7 +230,7 @@ function GetNearestIdleEngineerNotACU()
         end
     end
 
-    SelectUnits({idleEngineers[nearestIndex]})
+    SelectUnits({ idleEngineers[nearestIndex] })
 end
 
 function AddNearestIdleEngineersSeq()
@@ -267,10 +268,10 @@ function AddNearestIdleEngineersSeq()
         end
     end
 
-    AddSelectUnits({idleEngineers[nearestIndex]})
+    AddSelectUnits({ idleEngineers[nearestIndex] })
 end
 
-local categoryTable = {'LAND','AIR','NAVAL'}
+local categoryTable = { 'LAND', 'AIR', 'NAVAL' }
 local curFacIndex = 1
 function CycleIdleFactories()
     local idleFactories = GetIdleFactories()
@@ -300,7 +301,7 @@ function CycleIdleFactories()
     end
 
     local selection = GetSelectedUnits() or {}
-    if table.equal(selection, {factoriesList[curFacIndex]}) then
+    if table.equal(selection, { factoriesList[curFacIndex] }) then
         curFacIndex = curFacIndex + 1
         if not factoriesList[curFacIndex] then
             curFacIndex = 1
@@ -309,7 +310,7 @@ function CycleIdleFactories()
         curFacIndex = 1
     end
 
-    SelectUnits({factoriesList[curFacIndex]})
+    SelectUnits({ factoriesList[curFacIndex] })
 end
 
 local unitTypes = {
@@ -391,7 +392,8 @@ function SetWeaponPriorities(prioritiesString, name, exclusive)
         table.insert(unitIds, unit:GetEntityId())
     end
 
-    SimCallback({Func = 'WeaponPriorities', Args = {SelectedUnits = unitIds, prioritiesTable = priotable, name = name, exclusive = exclusive or false }})
+    SimCallback({ Func = 'WeaponPriorities',
+        Args = { SelectedUnits = unitIds, prioritiesTable = priotable, name = name, exclusive = exclusive or false } })
 end
 
 --- Sets selected units to target the unit (and similar units) that is hovered over
@@ -415,10 +417,10 @@ function SetDefaultWeaponPriorities()
 end
 
 local categoriesToCheck = {
-    ['tech'] = {"TECH1", "TECH2", "TECH3", "EXPERIMENTAL", 'COMMAND'},
-    ['faction'] = {"CYBRAN", "UEF", "AEON", "SERAPHIM"},
-    ['type'] = {"FACTORY", 'SCOUT', "DIRECTFIRE", 'INDIRECTFIRE', 'DEFENSE', "ANTIAIR", 'TRANSPORTATION', "ENGINEER",},
-    ['layer'] = {"NAVAL", "AIR", "LAND", "STRUCTURE"},
+    ['tech'] = { "TECH1", "TECH2", "TECH3", "EXPERIMENTAL", 'COMMAND' },
+    ['faction'] = { "CYBRAN", "UEF", "AEON", "SERAPHIM" },
+    ['type'] = { "FACTORY", 'SCOUT', "DIRECTFIRE", 'INDIRECTFIRE', 'DEFENSE', "ANTIAIR", 'TRANSPORTATION', "ENGINEER", },
+    ['layer'] = { "NAVAL", "AIR", "LAND", "STRUCTURE" },
 }
 
 --- Creates a target priority that includes the tech, faction, type, and layer of a unit
@@ -451,7 +453,8 @@ function findPriority(bpID)
             return string.format("{categories.%s}", bpID)
         end
 
-        local a = string.format("categories.%s * categories.%s * categories.%s * categories.%s", tech, faction, unitType, layer)
+        local a = string.format("categories.%s * categories.%s * categories.%s * categories.%s", tech, faction, unitType
+            , layer)
         local b = string.format("categories.%s * categories.%s * categories.%s", tech, unitType, layer)
         local c = string.format("categories.%s * categories.%s", unitType, layer)
         local d = string.format("categories.%s", layer)
@@ -476,7 +479,7 @@ function SelectAllUpgradingExtractors()
     if selection then
 
         -- try and find extractors that are upgrading
-        local upgrading = { }
+        local upgrading = {}
         for k, unit in selection do
             if unit:GetWorkProgress() > 0 then
                 table.insert(upgrading, unit)
@@ -487,7 +490,7 @@ function SelectAllUpgradingExtractors()
             SelectionUtils.EnableSelectionSound(true)
             SelectUnits(upgrading)
         end
-    else 
+    else
         SelectUnits(oldSelection)
     end
 
@@ -521,21 +524,71 @@ import("/lua/ui/game/gamemain.lua").ObserveSelection:AddObserver(
     'KeyActionHardMove'
 )
 
+--- Distributes the orders of the unit in the selection that is closest to the mouse location
 DistributeOrders = function()
-    print("Distributing orders")
-    SimCallback({Func = 'DistributeOrders', Args = { }}, true)
+    local mouse = GetMouseWorldPos()
+    local selection = GetSelectedUnits()
+    if mouse[1] and mouse[3] and selection and (not table.empty(selection)) then
+        for k, unit in selection do
+            local position = unit:GetPosition()
+            local dx = position[1] - mouse[1]
+            local dz = position[3] - mouse[3]
+            unit.DistanceToMouse = dx * dx + dz * dz
+        end
+
+        table.sort(selection,
+            function(a, b)
+                return a.DistanceToMouse < b.DistanceToMouse
+            end
+        )
+
+        local target = selection[1]
+        local orderCount = table.getn(target:GetCommandQueue())
+        if orderCount > 0 then
+            print(string.format("Distributing %d orders", orderCount))
+            SimCallback({ Func = 'DistributeOrders', Args = { target = target:GetEntityId() } }, true)
+        else
+            print("No orders to distribute")
+        end
+    else
+        print("No orders to distribute")
+    end
+end
+
+--- Distributes the orders of the unit that the mouse is hovering over
+DistributeOrdersOfMouseContext = function()
+    local target = GetRolloverInfo().userUnit
+    if target then
+        local orderCount = table.getn(target:GetCommandQueue())
+        if orderCount > 0 then
+            print(string.format("Distributing %d orders", orderCount))
+            SimCallback({ Func = 'DistributeOrders', Args = { target = target:GetEntityId() } }, true)
+        else
+            print("No orders to distribute")
+        end
+    end
+end
+
+CopyOrders = function()
+    local info = GetRolloverInfo()
+    if info.userUnit then
+        print("Copy orders")
+        SimCallback({ Func = 'CopyOrders', Args = { target = info.userUnit:GetEntityId() } }, true)
+    else
+        print("Can not copy orders")
+    end
 end
 
 AssignPlatoonBehaviorSilo = function()
-    SimCallback({Func = 'AIPlatoonSiloTacticalBehavior', Args = { Behavior = 'AIBehaviorTacticalSimple' }}, true)
+    SimCallback({ Func = 'AIPlatoonSiloTacticalBehavior', Args = { Behavior = 'AIBehaviorTacticalSimple' } }, true)
 end
 
 AIPlatoonSimpleRaidBehavior = function()
-    SimCallback({Func = 'AIPlatoonSimpleRaidBehavior', Args = {}}, true)
+    SimCallback({ Func = 'AIPlatoonSimpleRaidBehavior', Args = {} }, true)
 end
 
 AIPlatoonSimpleStructureBehavior = function()
-    SimCallback({Func = 'AIPlatoonSimpleStructureBehavior', Args = {}}, true)
+    SimCallback({ Func = 'AIPlatoonSimpleStructureBehavior', Args = {} }, true)
 end
 
 StoreCameraPosition = function()
@@ -544,11 +597,11 @@ StoreCameraPosition = function()
     Prefs.SetToCurrentProfile('DebugCameraPosition', settings)
 end
 
-RestoreCameraPosition = function ()
+RestoreCameraPosition = function()
     -- ConExecute('cam_Free 1')
     local camera = GetCamera('WorldCamera')
     local settings = Prefs.GetFromCurrentProfile('DebugCameraPosition') --[[@as UserCameraSettings]]
-    camera:MoveTo(settings.Focus, { settings.Heading, settings.Pitch, 0}, settings.Zoom, 0)
+    camera:MoveTo(settings.Focus, { settings.Heading, settings.Pitch, 0 }, settings.Zoom, 0)
 end
 
 function SelectHighestEngineerAndAssist()
@@ -561,13 +614,13 @@ function SelectHighestEngineerAndAssist()
         local sACUs = EntityCategoryFilterDown(categories.SUBCOMMANDER - categories.COMMAND, selection)
 
         if next(sACUs) then
-            SimCallback({Func= 'SelectHighestEngineerAndAssist', Args = { TargetId = sACUs[1]:GetEntityId() }}, true)
+            SimCallback({ Func = 'SelectHighestEngineerAndAssist', Args = { TargetId = sACUs[1]:GetEntityId() } }, true)
             SelectUnits(sACUs)
         elseif next(tech3) then
-            SimCallback({Func= 'SelectHighestEngineerAndAssist', Args = { TargetId = tech3[1]:GetEntityId() }}, true)
+            SimCallback({ Func = 'SelectHighestEngineerAndAssist', Args = { TargetId = tech3[1]:GetEntityId() } }, true)
             SelectUnits(tech3)
         elseif next(tech2) then
-            SimCallback({Func= 'SelectHighestEngineerAndAssist', Args = { TargetId = tech2[1]:GetEntityId() }}, true)
+            SimCallback({ Func = 'SelectHighestEngineerAndAssist', Args = { TargetId = tech2[1]:GetEntityId() } }, true)
             SelectUnits(tech2)
         else
             -- do nothing
@@ -576,11 +629,11 @@ function SelectHighestEngineerAndAssist()
 end
 
 local function SeparateDiveStatus(units)
-    local dummyUnitTable = { }
+    local dummyUnitTable = {}
     local categoriesSubmersible = categories.SUBMERSIBLE
 
-    local submergedUnits = { }
-    local surfacedUnits = { }
+    local submergedUnits = {}
+    local surfacedUnits = {}
 
     for k, unit in units do
         dummyUnitTable[1] = unit
@@ -609,4 +662,33 @@ SurfaceAll = function()
     if not table.empty(submergedUnits) then
         IssueUnitCommand(submergedUnits, "UNITCOMMAND_Dive")
     end
+end
+
+---@param onscreen boolean
+SelectAllBuildingEngineers = function(onscreen)
+    -- make sure it is always a boolean
+    onscreen = onscreen or false
+
+    -- select engineers
+    UISelectionByCategory('ENGINEER', false, onscreen, false, false)
+
+    -- filter them in-place
+    local units = GetSelectedUnits()
+    local unitCount = table.getn(units)
+    local unitSelectedHead = 1
+    for k = 1, unitCount do
+        local unit = units[k]
+        local eco = unit:GetEconData()
+        if (eco.energyRequested > 0) or (eco.massRequested > 0) then
+            units[unitSelectedHead] = unit
+            unitSelectedHead = unitSelectedHead + 1
+        end
+    end
+
+    -- remove empty entries
+    for k = unitSelectedHead, unitCount do
+        units[k] = nil
+    end
+
+    SelectUnits(units)
 end
