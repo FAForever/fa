@@ -40,13 +40,15 @@ local CreateSeraphimFactoryBuildingEffects = EffectUtil.CreateSeraphimFactoryBui
 SFactoryUnit = ClassUnit(FactoryUnit) {
     StartBuildFx = function(self, unitBeingBuilt)
         local BuildBones = self.BuildEffectBones
-        local thread = self:ForkThread(CreateSeraphimFactoryBuildingEffects, unitBeingBuilt, BuildBones, 'Attachpoint', self.BuildEffectsBag)
+        local thread = self:ForkThread(CreateSeraphimFactoryBuildingEffects, unitBeingBuilt, BuildBones, 'Attachpoint',
+            self.BuildEffectsBag)
         self.BuildEffectsBag:Add(thread)
     end,
 
     StartBuildFxUnpause = function(self, unitBeingBuilt)
         local BuildBones = self.BuildEffectBones
-        local thread = self:ForkThread(CreateSeraphimFactoryBuildingEffects, unitBeingBuilt, BuildBones, 'Attachpoint', self.BuildEffectsBag)
+        local thread = self:ForkThread(CreateSeraphimFactoryBuildingEffects, unitBeingBuilt, BuildBones, 'Attachpoint',
+            self.BuildEffectsBag)
         self.BuildEffectsBag:Add(thread)
     end,
 
@@ -101,7 +103,7 @@ SAirFactoryUnit = ClassUnit(AirFactoryUnit) {
     RollOffUnit = function(self)
         if EntityCategoryContains(categories.AIR, self.UnitBeingBuilt) then
             local spin, x, y, z = self:CalculateRollOffPoint()
-            local units = {self.UnitBeingBuilt}
+            local units = { self.UnitBeingBuilt }
             self.MoveCommand = IssueMove(units, Vector(x, y, z))
         end
     end,
@@ -119,8 +121,10 @@ SAirFactoryUnit = ClassUnit(AirFactoryUnit) {
                 unitBuilding:DetachFrom(true)
                 self:DetachAll(self.Blueprint.Display.BuildAttachBone or 0)
 
-                CreateEmitterAtBone(unitBuilding, -1, unitBuilding.Army, '/effects/emitters/seraphim_rifter_mobileartillery_hit_07_emit.bp'):OffsetEmitter(0, -1, 0)
-                CreateEmitterAtBone(unitBuilding, -1, unitBuilding.Army, '/effects/emitters/seraphim_rifter_mobileartillery_hit_07_emit.bp'):OffsetEmitter(0, -1, 0)
+                CreateEmitterAtBone(unitBuilding, -1, unitBuilding.Army,
+                    '/effects/emitters/seraphim_rifter_mobileartillery_hit_07_emit.bp'):OffsetEmitter(0, -1, 0)
+                CreateEmitterAtBone(unitBuilding, -1, unitBuilding.Army,
+                    '/effects/emitters/seraphim_rifter_mobileartillery_hit_07_emit.bp'):OffsetEmitter(0, -1, 0)
                 unitBuilding:HideBone(0, true)
             end
 
@@ -130,11 +134,16 @@ SAirFactoryUnit = ClassUnit(AirFactoryUnit) {
                 CreateLightParticle(unitBuilding, -1, unitBuilding.Army, 4, 12, 'glow_02', 'ramp_blue_22')
                 unitBuilding:ShowBone(0, true)
 
-                CreateEmitterAtBone(unitBuilding, -1, unitBuilding.Army, '/effects/emitters/seraphim_rifter_mobileartillery_hit_04_emit.bp'):OffsetEmitter(0, -1, 0)
-                CreateEmitterAtBone(unitBuilding, -1, unitBuilding.Army, '/effects/emitters/seraphim_rifter_mobileartillery_hit_05_emit.bp'):OffsetEmitter(0, -1, 0)
-                CreateEmitterAtBone(unitBuilding, -1, unitBuilding.Army, '/effects/emitters/seraphim_rifter_mobileartillery_hit_06_emit.bp'):OffsetEmitter(0, -1, 0)
-                CreateEmitterAtBone(unitBuilding, -1, unitBuilding.Army, '/effects/emitters/seraphim_rifter_mobileartillery_hit_07_emit.bp'):OffsetEmitter(0, -1, 0)
-                CreateEmitterAtBone(unitBuilding, -1, unitBuilding.Army, '/effects/emitters/seraphim_rifter_mobileartillery_hit_08_emit.bp'):OffsetEmitter(0, -1, 0)
+                CreateEmitterAtBone(unitBuilding, -1, unitBuilding.Army,
+                    '/effects/emitters/seraphim_rifter_mobileartillery_hit_04_emit.bp'):OffsetEmitter(0, -1, 0)
+                CreateEmitterAtBone(unitBuilding, -1, unitBuilding.Army,
+                    '/effects/emitters/seraphim_rifter_mobileartillery_hit_05_emit.bp'):OffsetEmitter(0, -1, 0)
+                CreateEmitterAtBone(unitBuilding, -1, unitBuilding.Army,
+                    '/effects/emitters/seraphim_rifter_mobileartillery_hit_06_emit.bp'):OffsetEmitter(0, -1, 0)
+                CreateEmitterAtBone(unitBuilding, -1, unitBuilding.Army,
+                    '/effects/emitters/seraphim_rifter_mobileartillery_hit_07_emit.bp'):OffsetEmitter(0, -1, 0)
+                CreateEmitterAtBone(unitBuilding, -1, unitBuilding.Army,
+                    '/effects/emitters/seraphim_rifter_mobileartillery_hit_08_emit.bp'):OffsetEmitter(0, -1, 0)
             end
 
             WaitTicks(8)
@@ -190,17 +199,17 @@ SAirFactoryUnit = ClassUnit(AirFactoryUnit) {
         end,
 
         OnFailedToBuild = function(self)
-           AirFactoryUnit.UpgradingState.OnFailedToBuild(self)
-           -- Failed to build, so resume rotators
-           if self.Rotator1 then
-               self.Rotator1:ClearGoal()
-               self.Rotator1:SetSpeed(5)
-           end
+            AirFactoryUnit.UpgradingState.OnFailedToBuild(self)
+            -- Failed to build, so resume rotators
+            if self.Rotator1 then
+                self.Rotator1:ClearGoal()
+                self.Rotator1:SetSpeed(5)
+            end
 
             if self.Rotator2 then
-               self.Rotator2:ClearGoal()
-               self.Rotator2:SetSpeed(5)
-           end
+                self.Rotator2:ClearGoal()
+                self.Rotator2:SetSpeed(5)
+            end
         end,
     },
 }
@@ -208,7 +217,7 @@ SAirFactoryUnit = ClassUnit(AirFactoryUnit) {
 -- AIR UNITS
 ---@class SAirUnit : AirUnit
 SAirUnit = ClassUnit(AirUnit) {
-    ContrailEffects = {'/effects/emitters/contrail_ser_polytrail_01_emit.bp'}
+    ContrailEffects = { '/effects/emitters/contrail_ser_polytrail_01_emit.bp' }
 }
 
 --  AIR STAGING STRUCTURES
@@ -234,7 +243,8 @@ SConstructionUnit = ClassUnit(ConstructionUnit) {
     end,
 
     CreateBuildEffects = function(self, unitBeingBuilt, order)
-        EffectUtil.CreateSeraphimUnitEngineerBuildingEffects(self, unitBeingBuilt, self.BuildEffectBones, self.BuildEffectsBag)
+        EffectUtil.CreateSeraphimUnitEngineerBuildingEffects(self, unitBeingBuilt, self.BuildEffectBones,
+            self.BuildEffectsBag)
     end,
 
     SetupBuildBones = function(self)
@@ -243,11 +253,17 @@ SConstructionUnit = ClassUnit(ConstructionUnit) {
         local bp = self:GetBlueprint()
         local buildbones = bp.General.BuildBones
         if self.BuildArmManipulator then
-            self.BuildArmManipulator:SetAimingArc(buildbones.YawMin or -180, buildbones.YawMax or 180, buildbones.YawSlew or 360, buildbones.PitchMin or -90, buildbones.PitchMax or 90, buildbones.PitchSlew or 360)
+            self.BuildArmManipulator:SetAimingArc(buildbones.YawMin or -180, buildbones.YawMax or 180,
+                buildbones.YawSlew or 360, buildbones.PitchMin or -90, buildbones.PitchMax or 90,
+                buildbones.PitchSlew or 360)
         end
         if bp.General.BuildBonesAlt1 then
-            self.BuildArm2Manipulator = CreateBuilderArmController(self, bp.General.BuildBonesAlt1.YawBone or 0 , bp.General.BuildBonesAlt1.PitchBone or 0, bp.General.BuildBonesAlt1.AimBone or 0)
-            self.BuildArm2Manipulator:SetAimingArc(bp.General.BuildBonesAlt1.YawMin or -180, bp.General.BuildBonesAlt1.YawMax or 180, bp.General.BuildBonesAlt1.YawSlew or 360, bp.General.BuildBonesAlt1.PitchMin or -90, bp.General.BuildBonesAlt1.PitchMax or 90, bp.General.BuildBonesAlt1.PitchSlew or 360)
+            self.BuildArm2Manipulator = CreateBuilderArmController(self, bp.General.BuildBonesAlt1.YawBone or 0,
+                bp.General.BuildBonesAlt1.PitchBone or 0, bp.General.BuildBonesAlt1.AimBone or 0)
+            self.BuildArm2Manipulator:SetAimingArc(bp.General.BuildBonesAlt1.YawMin or -180,
+                bp.General.BuildBonesAlt1.YawMax or 180, bp.General.BuildBonesAlt1.YawSlew or 360,
+                bp.General.BuildBonesAlt1.PitchMin or -90, bp.General.BuildBonesAlt1.PitchMax or 90,
+                bp.General.BuildBonesAlt1.PitchSlew or 360)
             self.BuildArm2Manipulator:SetPrecedence(5)
             if self.BuildingOpenAnimManip and self.Build2ArmManipulator then
                 self.BuildArm2Manipulator:Disable()
@@ -368,17 +384,17 @@ SLandFactoryUnit = ClassUnit(LandFactoryUnit) {
         end,
 
         OnFailedToBuild = function(self)
-           LandFactoryUnit.UpgradingState.OnFailedToBuild(self)
-           -- Failed to build, so resume rotators
-           if self.Rotator1 then
-               self.Rotator1:ClearGoal()
-               self.Rotator1:SetSpeed(5)
-           end
+            LandFactoryUnit.UpgradingState.OnFailedToBuild(self)
+            -- Failed to build, so resume rotators
+            if self.Rotator1 then
+                self.Rotator1:ClearGoal()
+                self.Rotator1:SetSpeed(5)
+            end
 
             if self.Rotator2 then
-               self.Rotator2:ClearGoal()
-               self.Rotator2:SetSpeed(5)
-           end
+                self.Rotator2:ClearGoal()
+                self.Rotator2:SetSpeed(5)
+            end
         end,
     },
 }
@@ -469,9 +485,9 @@ SSeaFactoryUnit = ClassUnit(SeaFactoryUnit) {
             end
 
             if self.Rotator2 then
-               self.Rotator2:ClearGoal()
-               self.Rotator2:SetSpeed(5)
-           end
+                self.Rotator2:ClearGoal()
+                self.Rotator2:SetSpeed(5)
+            end
         end,
     },
 }
@@ -565,14 +581,17 @@ SEnergyBallUnit = ClassUnit(SHoverLandUnit) {
             ChangeState(self, self.DeathState)
         end,
 
+        ---@param self Unit
         Main = function(self)
             local bp = self:GetBlueprint()
+            ---@type AIBrain
             local aiBrain = self:GetAIBrain()
 
             -- Queue up random moves
-            local x, y,z = unpack(self:GetPosition())
+            local x, y, z = unpack(self:GetPosition())
             for i = 1, 100 do
-                IssueMove({self}, {x + Random(-bp.MaxMoveRange, bp.MaxMoveRange), y, z + Random(-bp.MaxMoveRange, bp.MaxMoveRange)})
+                IssueMove({ self },
+                    { x + Random(-bp.MaxMoveRange, bp.MaxMoveRange), y, z + Random(-bp.MaxMoveRange, bp.MaxMoveRange) })
             end
 
             -- Weapon information
@@ -583,10 +602,13 @@ SEnergyBallUnit = ClassUnit(SHoverLandUnit) {
             local weapon = self:GetWeapon(1)
 
             self:ForkThread(self.LifeThread)
-
+            local bp = weapon.Blueprint
+            weapon:SetEnabled(false)
             while true do
                 local location = self:GetPosition()
-                local targets = aiBrain:GetUnitsAroundPoint(categories.LAND - categories.UNTARGETABLE, location, weaponMaxRange)
+                local x, y, z = self:GetPositionXYZ()
+                local targets = aiBrain:GetUnitsAroundPoint(categories.LAND - categories.UNTARGETABLE, location,
+                    weaponMaxRange)
 
                 local filteredUnits = {}
                 for k, v in targets do
@@ -595,17 +617,33 @@ SEnergyBallUnit = ClassUnit(SHoverLandUnit) {
                     end
                 end
 
+                ---@type Unit
                 local target = table.random(filteredUnits)
+                
+                --weapon:FireWeapon()
                 if target then
                     weapon:SetTargetEntity(target)
+                    --target:DoTakeDamage(self, bp.Damage, Vector(0, 0, 0), bp.DamageType)
                 else
-                    weapon:SetTargetGround({location[1] + Random(-20, 20), location[2], location[3] + Random(-20, 20)})
+                    --local pos = { location[1] + Random(-20, 20), location[2], location[3] + Random(-20, 20) }
+                    -- DamageArea(self, pos,
+                    --     2, bp.Damage, bp.DamageType, true, false)
+                    -- DrawCircle(pos, 2 / 2, "red")
                 end
+                --weapon:SetTargetGround({ location[1] + Random(-20, 20), location[2], location[3] + Random(-20, 20) })
+                -- end
                 -- Wait a tick to let the target update awesomely.
-                WaitTicks(2)
+                WaitTicks(1)
                 self.timeAlive = self.timeAlive + .1
-
                 weapon:FireWeapon()
+                if target then
+                    target:DoTakeDamage(self, bp.Damage, Vector(0, 0, 0), bp.DamageType)
+                else
+                    local pos = { location[1] + Random(-20, 20), location[2], location[3] + Random(-20, 20) }
+                    DamageArea(self, pos,
+                        2, bp.Damage, bp.DamageType, true, false)
+                    DrawCircle(pos, 2 / 2, "red")
+                end
 
                 WaitSeconds(beamLifetime)
                 DefaultBeamWeapon.PlayFxBeamEnd(weapon, weapon.Beams[1].Beam)

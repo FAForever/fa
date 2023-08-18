@@ -192,7 +192,7 @@ UnitBlueprint{
                 Land = "Land|Water|Seabed",
                 Water = "Land|Water|Seabed",
             },
-            FiringTolerance = 1,
+            FiringTolerance = 0,
             Label = "PhasonBeam",
             MaxRadius = 20,
             MinRadius = 5,
