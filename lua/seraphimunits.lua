@@ -600,13 +600,14 @@ SEnergyBallUnit = ClassUnit(SHoverLandUnit) {
             local beamLifetime = bp.Weapon[1].BeamLifetime or 1
             local reaquireTime = bp.Weapon[1].RequireTime or 0.5
             local weapon = self:GetWeapon(1)
+            local bp = weapon.Blueprint
 
             self:ForkThread(self.LifeThread)
-            local bp = weapon.Blueprint
+
             weapon:SetEnabled(false)
+
             while true do
                 local location = self:GetPosition()
-                local x, y, z = self:GetPositionXYZ()
                 local targets = aiBrain:GetUnitsAroundPoint(categories.LAND - categories.UNTARGETABLE, location,
                     weaponMaxRange)
 
@@ -619,30 +620,25 @@ SEnergyBallUnit = ClassUnit(SHoverLandUnit) {
 
                 ---@type Unit
                 local target = table.random(filteredUnits)
-                
-                --weapon:FireWeapon()
+
+                local pos 
                 if target then
                     weapon:SetTargetEntity(target)
-                    --target:DoTakeDamage(self, bp.Damage, Vector(0, 0, 0), bp.DamageType)
                 else
-                    --local pos = { location[1] + Random(-20, 20), location[2], location[3] + Random(-20, 20) }
-                    -- DamageArea(self, pos,
-                    --     2, bp.Damage, bp.DamageType, true, false)
-                    -- DrawCircle(pos, 2 / 2, "red")
+                    pos = { location[1] + Random(-20, 20), location[2], location[3] + Random(-20, 20) }
+                    weapon:SetTargetGround(pos)
                 end
-                --weapon:SetTargetGround({ location[1] + Random(-20, 20), location[2], location[3] + Random(-20, 20) })
-                -- end
+
                 -- Wait a tick to let the target update awesomely.
                 WaitTicks(1)
                 self.timeAlive = self.timeAlive + .1
+
                 weapon:FireWeapon()
                 if target then
                     target:DoTakeDamage(self, bp.Damage, Vector(0, 0, 0), bp.DamageType)
                 else
-                    local pos = { location[1] + Random(-20, 20), location[2], location[3] + Random(-20, 20) }
-                    DamageArea(self, pos,
-                        2, bp.Damage, bp.DamageType, true, false)
-                    DrawCircle(pos, 2 / 2, "red")
+                    DamageArea(self, pos, bp.DamageRadius * 20, bp.Damage, bp.DamageType, true, false)
+                    DrawCircle(pos, bp.DamageRadius * 10, "red")
                 end
 
                 WaitSeconds(beamLifetime)
