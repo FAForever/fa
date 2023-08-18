@@ -621,12 +621,10 @@ SEnergyBallUnit = ClassUnit(SHoverLandUnit) {
                 ---@type Unit
                 local target = table.random(filteredUnits)
 
-                local pos 
                 if target then
                     weapon:SetTargetEntity(target)
                 else
-                    pos = { location[1] + Random(-20, 20), location[2], location[3] + Random(-20, 20) }
-                    weapon:SetTargetGround(pos)
+                    weapon:SetTargetGround { location[1] + Random(-20, 20), location[2], location[3] + Random(-20, 20) }
                 end
 
                 -- Wait a tick to let the target update awesomely.
@@ -634,13 +632,6 @@ SEnergyBallUnit = ClassUnit(SHoverLandUnit) {
                 self.timeAlive = self.timeAlive + .1
 
                 weapon:FireWeapon()
-                if target then
-                    target:DoTakeDamage(self, bp.Damage, Vector(0, 0, 0), bp.DamageType)
-                else
-                    DamageArea(self, pos, bp.DamageRadius * 20, bp.Damage, bp.DamageType, true, false)
-                    DrawCircle(pos, bp.DamageRadius * 10, "red")
-                end
-
                 WaitSeconds(beamLifetime)
                 DefaultBeamWeapon.PlayFxBeamEnd(weapon, weapon.Beams[1].Beam)
                 WaitSeconds(reaquireTime)
