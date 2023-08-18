@@ -1580,7 +1580,6 @@ local keyActionsOrders = {
 }
 
 local keyActionsOrdersQueueBased = {
-
     ['distribute_orders'] = {
         action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").DistributeOrders()',
         category = 'ordersQueueBased',
@@ -1589,7 +1588,14 @@ local keyActionsOrdersQueueBased = {
         action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").DistributeOrders()',
         category = 'ordersQueueBased',
     },
-
+    ['distribute_orders_context'] = {
+        action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").DistributeOrdersOfMouseContext()',
+        category = 'ordersQueueBased',
+    },
+    ['shift_distribute_orders_context'] = {
+        action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").DistributeOrdersOfMouseContext()',
+        category = 'ordersQueueBased',
+    },
 }
 
 local keyactionsOrdersContextBased = {
