@@ -2346,9 +2346,8 @@ AirUnit = ClassUnit(MobileUnit) {
     end,
 }
 
---- Mixin transports (air, sea, space, whatever). Sellotape onto concrete transport base classes as desired.
-local slotsData = {}
 ---@class BaseTransport
+---@field DisableIntelOfCargo boolean
 BaseTransport = ClassSimple {
 
     ---@param self BaseTransport
@@ -2709,6 +2708,9 @@ SeaUnit = ClassUnit(MobileUnit){
 --- Base class for aircraft carriers.
 ---@class AircraftCarrier : SeaUnit, BaseTransport
 AircraftCarrier = ClassUnit(SeaUnit, BaseTransport) {
+
+    DisableIntelOfCargo = true,
+
     ---@param self AircraftCarrier
     ---@param attachBone Bone
     ---@param unit Unit

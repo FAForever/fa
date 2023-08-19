@@ -148,6 +148,8 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
     DestructionPartsLowToss = {},
     DestructionPartsChassisToss = {},
 
+    DisableIntelOfCargo = false,
+
     -- kept for backwards compatibility, these default to true
     CanTakeDamage = true,
     CanBeKilled = true,
@@ -4442,27 +4444,67 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         end
     end,
 
+    --- Called from the perspective of the unit that is added to the storage of another unit
     ---@param self Unit
-    ---@param unit Unit
-    OnAddToStorage = function(self, unit)
+    ---@param carrier Unit
+    OnAddToStorage = function(self, carrier)
         self:OnStorageChange(true)
+
+        if carrier.DisableIntelOfCargo and (not IsDestroyed(self)) then
+            self:DisableUnitIntel('Cargo')
+            if self.MaintenanceConsumption then
+                self:SetMaintenanceConsumptionInactive()
+                self.EnableConsumptionWhenRemovedFromStorage = true
+            end
+
+            -- look at additional layer of storage / cargo (looking at you, Stinger)
+            if EntityCategoryContains(categories.TRANSPORTATION, self) then
+                for _, attached in self:GetCargo() do
+                    attached:DisableUnitIntel('Cargo')
+                    if attached.MaintenanceConsumption then
+                        attached:SetMaintenanceConsumptionInactive()
+                        attached.EnableConsumptionWhenRemovedFromStorage = true
+                    end
+                end
+            end
+        end
 
         -- awareness of event for AI
         local aiPlatoon = self.AIPlatoonReference
         if aiPlatoon then
-            aiPlatoon:OnAddToStorage(self, unit)
+            aiPlatoon:OnAddToStorage(self, carrier)
         end
     end,
 
+    --- Called from the perspective of the unit that is removed from the storage of another unit
     ---@param self Unit
-    ---@param unit Unit
-    OnRemoveFromStorage = function(self, unit)
+    ---@param carrier Unit
+    OnRemoveFromStorage = function(self, carrier)
         self:OnStorageChange(false)
+
+        if carrier.DisableIntelOfCargo and (not IsDestroyed(self)) then
+            self:EnableUnitIntel('Cargo')
+            if self.EnableConsumptionWhenRemovedFromStorage then
+                self:SetMaintenanceConsumptionActive()
+                self.EnableConsumptionWhenRemovedFromStorage = nil
+            end
+
+            -- look at additional layer of storage / cargo (looking at you, Stinger)
+            if EntityCategoryContains(categories.TRANSPORTATION, self) then
+                for _, attached in self:GetCargo() do
+                    attached:EnableUnitIntel('Cargo')
+                    if attached.EnableConsumptionWhenRemovedFromStorage then
+                        attached:SetMaintenanceConsumptionActive()
+                        attached.EnableConsumptionWhenRemovedFromStorage = nil
+                    end
+                end
+            end
+        end
 
         -- awareness of event for AI
         local aiPlatoon = self.AIPlatoonReference
         if aiPlatoon then
-            aiPlatoon:OnRemoveFromStorage(self, unit)
+            aiPlatoon:OnRemoveFromStorage(self, carrier)
         end
     end,
 
