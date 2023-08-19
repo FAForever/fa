@@ -22,6 +22,7 @@
 
 -- upvalue scope for performance
 local MathCeil = math.ceil
+local TableSort = table.sort
 
 ---@class DistributeOrderInfo
 ---@field Callback? fun(units: Unit[], target: Vector | Entity, arg3?: any, arg4?: any)
@@ -213,4 +214,82 @@ function PopulateLocation(order, cache)
     cache[2] = order.y
     cache[3] = order.z
     return cache
+end
+
+---@param a Unit
+---@param b Unit
+---@return boolean
+local function SortByDistance(a, b)
+    return a.DistributeOrdersDistance < b.DistributeOrdersDistance
+end
+
+--- Sorts the unit in-place by distance to the given coordinates
+---@param units Unit[]
+---@param px number
+---@param pz number
+function SortUnitsByDistanceToPoint(units, px, pz)
+    -- compute distance
+    for _, unit in units do
+        local ux, _, uz = unit:GetPositionXYZ()
+        local dx = ux - px
+        local dz = uz - pz
+        unit.DistributeOrdersDistance = dx * dx + dz * dz
+    end
+
+    -- sort the units
+    TableSort(units,SortByDistance)
+
+    -- remove distance field
+    for _, unit in units do
+        unit.DistributeOrdersDistance = nil
+    end
+end
+
+--- Computes the average x / z coordinates of a table of units
+---@param units Unit[]
+function AveragePositionOfUnitsXZ(units)
+    local unitCount = table.getn(units)
+
+    local px = 0
+    local pz = 0
+    for k = 1, unitCount do
+        local ux, _, uz = units[k]:GetPositionXYZ()
+        px = px + ux
+        pz = pz + uz
+    end
+
+    return (px / unitCount), (pz / unitCount)
+end
+
+--- Computes the average x / z coordinates of a table of units
+---@param units Unit[]
+function AveragePositionOfUnits(units)
+    local unitCount = table.getn(units)
+
+    local px = 0
+    local pz = 0
+    for k = 1, unitCount do
+        local ux, _, uz = units[k]:GetPositionXYZ()
+        px = px + ux
+        pz = pz + uz
+    end
+
+    px = px / unitCount
+    pz = pz / unitCount
+
+    return {
+        px,
+        GetSurfaceHeight(px, pz),
+        pz
+    }
+end
+
+function PointOnUnitCircle(px, pz, radius, degrees)
+    local cx = px + radius * math.cos( (degrees + 90) * 3.14 / 180 );
+    local cz = pz + radius * math.sin( (degrees + 90) * 3.14 / 180 );
+    return {
+        cx,
+        GetSurfaceHeight(cx, cz),
+        cz
+    }
 end

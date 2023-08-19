@@ -524,8 +524,13 @@ import("/lua/ui/game/gamemain.lua").ObserveSelection:AddObserver(
     'KeyActionHardMove'
 )
 
+LoadIntoTransports = function(clearCommands)
+    print("Load into transports")
+    SimCallback({ Func = 'LoadIntoTransports', Args = { ClearCommands = clearCommands or false } }, true)
+end
+
 --- Distributes the orders of the unit in the selection that is closest to the mouse location
-DistributeOrders = function()
+DistributeOrders = function(clearCommands)
     local mouse = GetMouseWorldPos()
     local selection = GetSelectedUnits()
     if mouse[1] and mouse[3] and selection and (not table.empty(selection)) then
@@ -546,7 +551,7 @@ DistributeOrders = function()
         local orderCount = table.getn(target:GetCommandQueue())
         if orderCount > 0 then
             print(string.format("Distributing %d orders", orderCount))
-            SimCallback({ Func = 'DistributeOrders', Args = { target = target:GetEntityId() } }, true)
+            SimCallback({ Func = 'DistributeOrders', Args = { Target = target:GetEntityId(), ClearCommands = clearCommands or false } }, true)
         else
             print("No orders to distribute")
         end
@@ -556,24 +561,24 @@ DistributeOrders = function()
 end
 
 --- Distributes the orders of the unit that the mouse is hovering over
-DistributeOrdersOfMouseContext = function()
+DistributeOrdersOfMouseContext = function(clearCommands)
     local target = GetRolloverInfo().userUnit
     if target then
         local orderCount = table.getn(target:GetCommandQueue())
         if orderCount > 0 then
             print(string.format("Distributing %d orders", orderCount))
-            SimCallback({ Func = 'DistributeOrders', Args = { target = target:GetEntityId() } }, true)
+            SimCallback({ Func = 'DistributeOrders', Args = { Target = target:GetEntityId() }, ClearCommands = clearCommands or false }, true)
         else
             print("No orders to distribute")
         end
     end
 end
 
-CopyOrders = function()
+CopyOrders = function(clearCommands)
     local info = GetRolloverInfo()
     if info.userUnit then
         print("Copy orders")
-        SimCallback({ Func = 'CopyOrders', Args = { target = info.userUnit:GetEntityId() } }, true)
+        SimCallback({ Func = 'CopyOrders', Args = { Target = info.userUnit:GetEntityId(), ClearCommands = clearCommands or false } }, true)
     else
         print("Can not copy orders")
     end

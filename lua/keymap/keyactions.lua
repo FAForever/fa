@@ -1577,37 +1577,72 @@ local keyActionsOrders = {
         action = 'UI_Lua import("/lua/ui/game/orders.lua").Dock(false)',
         category = 'orders',
     },
+    ['load_transports'] = {
+        action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").LoadIntoTransports()',
+        category = 'orders',
+    },
+}
+
+local keyActionsOrdersAdvanced = {
+    ['load_transports'] = {
+        action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").LoadIntoTransports(false)',
+        category = 'ordersAdvanced',
+    },
+    ['load_transports_clear'] = {
+        action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").LoadIntoTransports(true)',
+        category = 'ordersAdvanced',
+    },
+    ['shift_load_transports'] = {
+        action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").LoadIntoTransports(false)',
+        category = 'ordersAdvanced',
+    },
+    ['shift_load_transports_clear'] = {
+        action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").LoadIntoTransports(true)',
+        category = 'ordersAdvanced',
+    },
+    ['filter_highest_engineer_and_assist'] = {
+        action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").SelectHighestEngineerAndAssist()',
+        category = 'ordersAdvanced',
+    },
+    ['shift_filter_highest_engineer_and_assist'] = {
+        action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").SelectHighestEngineerAndAssist()',
+        category = 'ordersAdvanced',
+    },
 }
 
 local keyActionsOrdersQueueBased = {
     ['distribute_orders'] = {
-        action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").DistributeOrders()',
+        action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").DistributeOrders(true)',
         category = 'ordersQueueBased',
     },
     ['shift_distribute_orders'] = {
-        action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").DistributeOrders()',
+        action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").DistributeOrders(true)',
         category = 'ordersQueueBased',
     },
     ['distribute_orders_context'] = {
-        action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").DistributeOrdersOfMouseContext()',
+        action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").DistributeOrdersOfMouseContext(false)',
         category = 'ordersQueueBased',
     },
     ['shift_distribute_orders_context'] = {
-        action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").DistributeOrdersOfMouseContext()',
+        action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").DistributeOrdersOfMouseContext(false)',
+        category = 'ordersQueueBased',
+    },
+    ['distribute_orders_context_clear'] = {
+        action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").DistributeOrdersOfMouseContext(true)',
+        category = 'ordersQueueBased',
+    },
+    ['shift_distribute_orders_context_clear'] = {
+        action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").DistributeOrdersOfMouseContext(true)',
         category = 'ordersQueueBased',
     },
 }
 
 local keyactionsOrdersContextBased = {
-    ['filter_highest_engineer_and_assist'] = {
-        action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").SelectHighestEngineerAndAssist()',
-        category = 'ordersContextBased',
-    },
-    ['shift_cycle_context_based_templates'] = {
+    ['cycle_context_based_templates'] = {
         action = 'UI_Lua import("/lua/ui/game/commands/context-based-templates.lua").Cycle()',
         category = 'ordersContextBased',
     },
-    ['cycle_context_based_templates'] = {
+    ['shift_cycle_context_based_templates'] = {
         action = 'UI_Lua import("/lua/ui/game/commands/context-based-templates.lua").Cycle()',
         category = 'ordersContextBased',
     },
@@ -1843,6 +1878,7 @@ keyActions = table.combine(
     keyActionsHotBuildAlternative,
     keyActionsHotBuildExtra,
     keyActionsOrders,
+    keyActionsOrdersAdvanced,
     keyActionsOrdersQueueBased,
     keyactionsOrdersContextBased,
     keyActionsGame,

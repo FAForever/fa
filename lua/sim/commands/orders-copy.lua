@@ -35,14 +35,15 @@ local dummyUnitTable = {}
 --- Copies the command queue of the target. Has a special snowflake implementation for build orders to prevent too many previews
 ---@param units Unit[]
 ---@param target Unit
-CopyOrders = function(units, target)
-
-    -- clear all commands
-    IssueClearCommands(units)
+CopyOrders = function(units, target, clearCommands)
 
     -- retrieve queue of target
     local unitCount = table.getn(units)
     local queue = target:GetCommandQueue()
+
+    if clearCommands then
+        IssueClearCommands(units)
+    end
 
     -- copy the orders of the target
     for _, order in queue do

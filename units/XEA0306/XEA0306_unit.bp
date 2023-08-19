@@ -233,6 +233,7 @@ UnitBlueprint{
         Class3AttachSize = 4,
         SlotsLarge = 6,
         SlotsMedium = 12,
+        SlotsSmall = 24,
         TransportClass = 10,
     },
     UseOOBTestZoom = 200,

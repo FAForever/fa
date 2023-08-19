@@ -32,13 +32,14 @@ local UnitQueueDataToCommand = import("/lua/sim/commands/orders-shared.lua").Uni
 local ComputeBatchCounts = import("/lua/sim/commands/orders-shared.lua").ComputeBatchCounts
 local PopulateBatch = import("/lua/sim/commands/orders-shared.lua").PopulateBatch
 local PopulateLocation = import("/lua/sim/commands/orders-shared.lua").PopulateLocation
+local SortUnitsByDistanceToPoint = import("/lua/sim/commands/orders-shared.lua").SortUnitsByDistanceToPoint
 
 
 --- Processes the orders and re-distributes them over the units. Assumes that all units in the
 --- selection to have the same command queue. If that is not the case then orders are lost
 ---@param units Unit[]
 ---@param target Unit
-DistributeOrders = function(units, target)
+DistributeOrders = function(units, target, clearCommands)
 
     local start = GetSystemTimeSecondsOnlyForProfileUse()
 
@@ -113,29 +114,15 @@ DistributeOrders = function(units, target)
     -- the average case
 
     if px and pz then
-        for _, unit in units do
-            local ux, _, uz = unit:GetPositionXYZ()
-            local dx = ux - px
-            local dz = uz - pz
-            unit.DistributeOrdersDistance = dx * dx + dz * dz
-        end
-
-        TableSort(
-            units,
-            function(a, b)
-                return a.DistributeOrdersDistance < b.DistributeOrdersDistance
-            end
-        )
-
-        for _, unit in units do
-            unit.DistributeOrdersDistance = nil
-        end
+        SortUnitsByDistanceToPoint(units, px, pz)
     end
 
     -----------------------------------------------------------------------
     -- clear existing orders
 
-    IssueClearCommands(units)
+    if clearCommands then
+        IssueClearCommands(units)
+    end
 
     -----------------------------------------------------------------------
     -- assign orders
@@ -167,7 +154,6 @@ DistributeOrders = function(units, target)
         local redundantOrders = commandInfo.Redundancy or 1
         local batchOrders = commandInfo.BatchOrders
         local fullRedundancy = commandInfo.FullRedundancy
-
 
         if issueOrder then
 
@@ -242,6 +228,8 @@ DistributeOrders = function(units, target)
 
                     local start = 1
                     local batches = ComputeBatchCounts(unitCount, orderCount, dummyBatches)
+
+                    reprsl(batches)
 
                     -- limit the redundancy to something sane
                     local redundancy = orderCount

@@ -525,9 +525,20 @@ keyDescriptions = {
     ['toggle_ai_nav_direction_to'] = 'NavUtils - Toggle to visualize output of DirectionTo',
 
     ['filter_highest_engineer_and_assist'] = '<LOC key_desc_filter_highest_engineer_and_assist>Filter the selection to the most advanced engineer, all other engineers assist that engineer',
-    ['distribute_orders'] = '<LOC key_desc_distribute_orders>Distribute the command queue of the unit nearest to the mouse',
-    ['shift_distribute_orders'] = '<LOC key_desc_distribute_orders>Distribute the command queue of the unit nearest to the mouse',
+    ['shift_filter_highest_engineer_and_assist'] = '<LOC key_desc_shift_filter_highest_engineer_and_assist>Filter the selection to the most advanced engineer, all other engineers assist that engineer',
+    ['distribute_orders'] = '<LOC key_desc_distribute_orders>Distribute the command queue of the unit in your selection that is nearest to the mouse',
+    ['shift_distribute_orders'] = '<LOC key_desc_shift_distribute_orders>Distribute the command queue of the unit in your selection that is nearest to the mouse',
     ['distribute_orders_context'] = '<LOC key_desc_distribute_orders>Distribute the command queue of the unit that the mouse is hovering over',
-    ['shift_distribute_orders_context'] = '<LOC key_desc_distribute_orders>Distribute the command queue of the unit that the mouse is hovering over',
+    ['shift_distribute_orders_context'] = '<LOC key_desc_shift_distribute_orders>Distribute the command queue of the unit that the mouse is hovering over',
+    ['distribute_orders_context_clear'] = '<LOC key_desc_distribute_orders_context_clear>Distribute the command queue of the unit that the mouse is hovering over. Clears the command queue',
+    ['shift_distribute_orders_context_clear'] = '<LOC key_desc_shift_distribute_orders_context_clear>Distribute the command queue of the unit that the mouse is hovering over. Clears the command queue',
     ['cycle_context_based_templates'] = '<LOC key_desc_context_based_templates>Cycle templates based on the unit that the mouse is hovering over',
+    ['shift_cycle_context_based_templates'] = '<LOC key_desc_shift_context_based_templates>Cycle templates based on the unit that the mouse is hovering over',
+
+    ['load_transports'] = '<LOC key_desc_load_transports>Load the selected units into the selected transports',
+    ['load_transports_clear'] = '<LOC key_desc_load_transports_clear>Load the selected units into the selected transports. Clears the command queue',
+    ['shift_load_transports'] = '<LOC key_desc_shift_load_transports>Load the selected units into the selected transports',
+    ['shift_load_transports_clear'] = '<LOC key_desc_shift_load_transports_clear>Load the selected units into the selected transports. Clears the command queue',
+    ['copy_orders'] = '<LOC key_desc_copy_orders>Apply the command queue of the unit that the mouse is hovering over to your selection',
+    ['shift_copy_orders'] = '<LOC key_desc_shift_copy_orders>Apply the command queue of the unit that the mouse is hovering over to your selection',
 }

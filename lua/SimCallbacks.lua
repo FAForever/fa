@@ -379,7 +379,7 @@ end
 do
 
     --- Processes the orders and re-distributes them over the units
-    ---@param data any
+    ---@param data { Target: EntityId, ClearCommands: boolean }
     ---@param selection Unit[]
     Callbacks.DistributeOrders = function(data, selection)
         -- verify selection
@@ -389,7 +389,7 @@ do
         end
 
         -- verify the target
-        local target = (data.target and GetUnitById(data.target)) --[[@as Unit]]
+        local target = (data.Target and GetUnitById(data.Target)) --[[@as Unit]]
         if (not target) or
             (not target.Army) or
             (not OkayToMessWithArmy(target.Army))
@@ -397,13 +397,13 @@ do
             return
         end
 
-        import("/lua/sim/commands/orders-distribute.lua").DistributeOrders(selection, target)
+        import("/lua/sim/commands/orders-distribute.lua").DistributeOrders(selection, target, data.ClearCommands or false)
     end
 end
 
 do 
     --- Processes the orders and re-distributes them over the units
-    ---@param data any
+    ---@param data { Target: EntityId, ClearCommands: boolean }
     ---@param selection Unit[]
     Callbacks.CopyOrders = function(data, selection)
         -- verify selection
@@ -413,7 +413,7 @@ do
         end
 
         -- verify the target
-        local target = GetUnitById(data.target) --[[@as Unit]]
+        local target = GetUnitById(data.Target) --[[@as Unit]]
         if (not target) or
             (not target.Army) or
             (not OkayToMessWithArmy(target.Army))
@@ -421,7 +421,24 @@ do
             return
         end
 
-        import("/lua/sim/commands/orders-copy.lua").CopyOrders(selection, target)
+        import("/lua/sim/commands/orders-copy.lua").CopyOrders(selection, target, data.ClearCommands or false)
+    end
+end
+
+do
+
+    ---@param data { ClearCommands: boolean }
+    ---@param selection Unit[]
+    Callbacks.LoadIntoTransports = function(data, selection)
+       -- verify selection
+       selection = SecureUnits(selection)
+       if (not selection) or TableEmpty(selection) then
+           return
+       end
+
+       local transports = EntityCategoryFilterDown(categories.TRANSPORTATION, selection)
+       local transportees = EntityCategoryFilterDown(categories.ALLUNITS - categories.TRANSPORTATION, selection)
+       local remUnits, remTransports = import("/lua/sim/commands/orders-load-in-transport.lua").LoadIntoTransports(transportees, transports, data.ClearCommands or false)
     end
 end
 
