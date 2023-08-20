@@ -58,7 +58,7 @@ UnitBlueprint{
         "DIRECTFIRE",
         "DRAGBUILD",
         "EXPERIMENTAL",
-        "FACTORY",
+        -- "FACTORY",
         "HIGHALTAIR",
         "LOWSELECTPRIO",
         "MOBILE",
@@ -136,7 +136,7 @@ UnitBlueprint{
         BuildCostMass = 45000,
         BuildRate = 180,
         BuildTime = 50625,
-        BuildableCategory = { "BUILTBYTIER3FACTORY AEON MOBILE AIR" },
+        -- BuildableCategory = { "BUILTBYTIER3FACTORY AEON MOBILE AIR" },
         MaintenanceConsumptionPerSecondEnergy = 500,
     },
     Footprint = {
