@@ -242,6 +242,11 @@ UEL0401 = ClassUnit(TMobileFactoryUnit, ExternalFactoryComponent) {
         self.ReleaseEffectsBag = {}
     end,
 
+    OnKilled = function(self, instigator, type, overkillRatio)
+        TMobileFactoryUnit.OnKilled(self, instigator, type, overkillRatio)
+        ExternalFactoryComponent.OnKilled(self, instigator, type, overkillRatio)
+    end,
+
     ---@param self UEL0401
     ---@param overkillRatio number
     ---@param instigator Unit
