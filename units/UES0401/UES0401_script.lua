@@ -30,6 +30,7 @@ UES0401 = ClassUnit(AircraftCarrier, ExternalFactoryComponent) {
 
     OnKilled = function(self, instigator, type, overkillRatio)
         AircraftCarrier.OnKilled(self, instigator, type, overkillRatio)
+        ExternalFactoryComponent.OnKilled(self, instigator, type, overkillRatio)
     end,
 
     OnCreate = function(self)

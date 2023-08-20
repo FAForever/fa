@@ -3332,6 +3332,19 @@ ExternalFactoryUnit = ClassUnit(Unit) {
     end,
 
     ---@param self ExternalFactoryUnit
+    ---@param unitBeingBuilt Unit
+    ---@param order string
+    CreateBuildEffects = function(self, unitBeingBuilt, order)
+        self.Parent:CreateBuildEffects(unitBeingBuilt, order)
+    end,
+
+    ---@param self ExternalFactoryUnit
+    ---@param unitBeingBuilt Unit
+    StopBuildingEffects = function(self, unitBeingBuilt)
+        self.Parent:StopBuildingEffects(unitBeingBuilt)
+    end,
+
+    ---@param self ExternalFactoryUnit
     StartBuildFx = function(self, unitBeingBuilt)
         self.Parent:StartBuildFx(unitBeingBuilt)
     end,
@@ -3349,6 +3362,26 @@ ExternalFactoryUnit = ClassUnit(Unit) {
     ---@param self ExternalFactoryUnit
     PlayFxRollOffEnd = function(self)
         self.Parent:PlayFxRollOffEnd()
+    end,
+
+    ---@param self FactoryUnit
+    OnPaused = function(self)
+        Unit.OnPaused(self)
+
+        -- When factory is paused take some action
+        if self:IsUnitState('Building') then
+            self:StopUnitAmbientSound('ConstructLoop')
+            self:StopBuildingEffects(self.UnitBeingBuilt)
+        end
+    end,
+
+    ---@param self FactoryUnit
+    OnUnpaused = function(self)
+        Unit.OnUnpaused(self)
+        if self:IsUnitState('Building') then
+            self:PlayUnitAmbientSound('ConstructLoop')
+            self:StartBuildingEffects(self.UnitBeingBuilt, self.UnitBuildOrder)
+        end
     end,
 
     IdleState = FactoryUnit.IdleState,

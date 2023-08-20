@@ -869,7 +869,7 @@ ExternalFactoryComponent = ClassSimple {
 
     ---@param self Unit | ExternalFactoryComponent
     OnIdle = function(self)
-        if self.ExternalFactory then
+        if self.ExternalFactory and (not IsDestroyed(self.ExternalFactory)) then
             self.ExternalFactory:SetBusy(false)
             self.ExternalFactory:SetBlockCommandQueue(false)
         end
@@ -889,6 +889,14 @@ ExternalFactoryComponent = ClassSimple {
 
                 IssueClearCommands({self.ExternalFactory})
             end
+        end
+    end,
+
+    OnKilled = function(self, instigator, type, overkillRatio)
+        if not IsDestroyed(self.ExternalFactory) then
+            self.ExternalFactory:SetBusy(true)
+            self.ExternalFactory:SetBlockCommandQueue(true)
+            self.ExternalFactory:Kill()
         end
     end,
 
