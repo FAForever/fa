@@ -317,8 +317,9 @@ function UpdateWindow(info)
         controls.ReclaimGroup:Hide()
     else
         local bp = __blueprints[info.blueprintId]
-        if DiskGetFileInfo(UIUtil.UIFile('/icons/units/' .. info.blueprintId .. '_icon.dds', true)) then
-            controls.icon:SetTexture(UIUtil.UIFile('/icons/units/' .. info.blueprintId .. '_icon.dds', true))
+        local icon = '/icons/units/' .. (bp.BaseBlueprintId or bp.BlueprintId) .. '_icon.dds'
+        if DiskGetFileInfo(UIUtil.UIFile(icon, true)) then
+            controls.icon:SetTexture(UIUtil.UIFile(icon, true))
         else
             controls.icon:SetTexture('/textures/ui/common/game/unit_view_icons/unidentified.dds')
         end

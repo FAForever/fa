@@ -161,7 +161,7 @@ UnitBlueprint{
             RULEUCC_Transport = true,
         },
         ConstructionBar = true,
-        FactionName = "Aeon",
+    FactionName = "Aeon",
         Icon = "air",
         OrderOverrides = {
             RULEUCC_Transport = {

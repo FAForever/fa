@@ -719,6 +719,10 @@ function HandleUnitWithBuildPresets(bps, all_bps)
     end
 end
 
+function HandleUnitsWithExternalFactories(bps, all_bps)
+
+end
+
 -- Assign shader and mesh for visual Cloaking FX
 ---@param bp UnitBlueprint
 function ExtractCloakMeshBlueprint(bp)
@@ -961,6 +965,7 @@ function PostModBlueprints(all_bps)
         end
         BlueprintLoaderUpdateProgress()
     end
+
     HandleUnitWithBuildPresets(preset_bps, all_bps)
 
     -- find custom strategic icons defined by ui mods, this should be the very last thing 
@@ -983,7 +988,7 @@ function PostModBlueprints(all_bps)
 
     -- post process units and projectiles for easier access to information and sanitizing some fields
     PostProcessProjectiles(all_bps.Projectile)
-    PostProcessUnits(all_bps.Unit)
+    PostProcessUnits(all_bps, all_bps.Unit)
     PostProcessProps(all_bps.Prop)
 end
 
