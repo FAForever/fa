@@ -53,6 +53,7 @@ UnitBlueprint{
         "SNIPEMODE",
         "SUBMERSIBLE",
         "VISIBLETORECON",
+        "EXTERNALFACTORY",
     },
     Defense = {
         AirThreatLevel = 0,

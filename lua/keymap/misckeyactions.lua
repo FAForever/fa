@@ -610,3 +610,12 @@ SurfaceAll = function()
         IssueUnitCommand(submergedUnits, "UNITCOMMAND_Dive")
     end
 end
+
+SelectExternalFactory = function()
+    local selection = GetSelectedUnits()
+    if selection then
+        local unit = selection[1]
+        reprsl(GetAssistingUnitsList(selection))
+        SelectUnits(GetAssistingUnitsList(selection))
+    end
+end

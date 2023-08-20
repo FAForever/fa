@@ -255,6 +255,14 @@ local keyActionsSelectionQuickSelect = {
         action = 'UI_SelectByCategory +nearest FACTORY',
         category = 'selection',
     },
+    ['select_all_mobile_factory_onscreen'] = {
+        action = 'UI_SelectByCategory +inview EXTERNALFACTORYUNIT',
+        category = 'selection',
+    },
+    ['select_nearest_mobile_factory'] = {
+        action = 'UI_SelectByCategory +nearest EXTERNALFACTORYUNIT',
+        category = 'selection',
+    },
     ['select_nearest_land_factory'] = {
         action = 'UI_SelectByCategory +nearest LAND FACTORY',
         category = 'selection',
