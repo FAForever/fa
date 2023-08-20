@@ -209,7 +209,6 @@ function ResetOrderQueue(factory)
 end
 
 function ResetOrderQueues(units)
-    LOG("ResetOrderQueues")
     local factories = EntityCategoryFilterDown((categories.SHOWQUEUE * categories.STRUCTURE) + categories.FACTORY, units)
     if factories[1] then
         Select.Hidden(function()
