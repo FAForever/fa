@@ -2247,7 +2247,7 @@ float4 Terrain003AlbedoPS ( VS_OUTPUT inV) : COLOR
     // z = normals-z
     // w = ?
     float4 utility01 = tex2D(UpperAlbedoSampler, coordinates.xy);
-    float mapShadow = utility01.r;
+    float mapShadow = utility01.a;
 
     // x = specular
     float4 utility03 = tex2D(Stratum7NormalSampler, coordinates.xy);
