@@ -702,7 +702,7 @@ SelectExternalFactory = function()
     local selection = GetSelectedUnits()
     if selection then
         local unit = selection[1]
-        reprsl(GetAssistingUnitsList(selection))
-        SelectUnits(GetAssistingUnitsList(selection))
+        reprsl(GetAttachedUnitsList(selection))
+        SelectUnits(GetAttachedUnitsList(selection))
     end
 end

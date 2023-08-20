@@ -439,6 +439,7 @@ function UIFile(filespec, checkMods)
         else
             while not found and useSkin do
                 found = currentPath .. filespec
+
                 if not DiskGetFileInfo(found) then
                     -- Check mods
                     local inmod = false
@@ -474,6 +475,7 @@ function UIFile(filespec, checkMods)
         if not found then
             -- don't print error message if "filespec" is a valid path
             if not DiskGetFileInfo(filespec) then
+                reprsl(debug.traceback())
                 SPEW('[uiutil.lua, function UIFile()] - Unable to find file:'.. origPath .. filespec)
             end
             found = filespec
