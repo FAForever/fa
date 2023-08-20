@@ -211,7 +211,7 @@ UnitBlueprint{
     Economy = {
         BuildCostEnergy = 150000,
         BuildCostMass = 12000,
-        BuildRate = 240,
+        BuildRate = 180,
         BuildTime = 20500,
         BuildableCategory = { "BUILTBYTIER3FACTORY UEF MOBILE AIR" },
     },
