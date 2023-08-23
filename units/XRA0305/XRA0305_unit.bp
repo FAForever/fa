@@ -229,7 +229,7 @@ UnitBlueprint{
             MinRadius = 2,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
-            MuzzleVelocity = 40,
+            MuzzleVelocity = 35,
             NotExclusive = true,
             ProjectileId = "/projectiles/CDFLaserDisintegrator04/CDFLaserDisintegrator04_proj.bp",
             ProjectileLifetimeUsesMultiplier = 1.15,
