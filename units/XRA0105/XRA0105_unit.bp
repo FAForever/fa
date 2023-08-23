@@ -197,7 +197,7 @@ UnitBlueprint{
             MaxRadius = 20,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
-            MuzzleVelocity = 55,
+            MuzzleVelocity = 35,
             ProjectileId = "/projectiles/CDFLaserHeavy03/CDFLaserHeavy03_proj.bp",
             ProjectileLifetimeUsesMultiplier = 1.15,
             ProjectilesPerOnFire = 1,
