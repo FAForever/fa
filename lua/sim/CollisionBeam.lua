@@ -17,15 +17,15 @@ local ScenarioFramework = import("/lua/scenarioframework.lua")
 ---@class CollisionBeam : moho.CollisionBeamEntity
 CollisionBeam = Class(moho.CollisionBeamEntity) {
 
-    FxBeam = import("/lua/effecttemplates.lua").NoEffects,
-    FxBeamStartPoint = import("/lua/effecttemplates.lua").NoEffects,
+    FxBeam = { },
+    FxBeamStartPoint = { },
     FxBeamStartPointScale = 1,
-    FxBeamEndPoint = import("/lua/effecttemplates.lua").NoEffects,
+    FxBeamEndPoint = { },
     FxBeamEndPointScale = 1,
 
-    FxImpactProp = import("/lua/effecttemplates.lua").NoEffects,
-    FxImpactShield = import("/lua/effecttemplates.lua").NoEffects,
-    FxImpactNone = import("/lua/effecttemplates.lua").NoEffects,
+    FxImpactProp = { },
+    FxImpactShield = { },
+    FxImpactNone = { },
 
     FxUnitHitScale = 1,
     FxLandHitScale = 1,

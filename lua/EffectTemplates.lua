@@ -8,13 +8,9 @@
 -- **
 -- **  Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
 -- ****************************************************************************
+
 EmtBpPath = '/effects/emitters/'
 EmitterTempEmtBpPath = '/effects/emitters/temp/'
-
-NoEffects = { }
-DefaultPolyTrailOffset1 = { 0 }
-DefaultPolyTrailOffset2 = { 0, 0 }
-DefaultPolyTrailOffset3 = { 0, 0, 0 }
 
 -- For gatling gun cooldown
 WeaponSteam01 = {

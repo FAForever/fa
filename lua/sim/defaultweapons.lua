@@ -38,9 +38,9 @@ local MathClamp = math.clamp
 ---@field SalvoSpreadStart? number   if the weapon blueprint requests a trajectory fix, this is set to the value that centers the projectile spread for `CurrentSalvoNumber` shot on the optimal target position
 DefaultProjectileWeapon = ClassWeapon(Weapon) {
 
-    FxRackChargeMuzzleFlash = import("/lua/effecttemplates.lua").NoEffects,
+    FxRackChargeMuzzleFlash = { },
     FxRackChargeMuzzleFlashScale = 1,
-    FxChargeMuzzleFlash = import("/lua/effecttemplates.lua").NoEffects,
+    FxChargeMuzzleFlash = { },
     FxChargeMuzzleFlashScale = 1,
     FxMuzzleFlash = {
         '/effects/emitters/default_muzzle_flash_01_emit.bp',

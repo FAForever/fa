@@ -5,7 +5,7 @@ DebrisBoneAttachHigh01 = ClassDummyProjectile(GenericDebris) {
     FxUnderWaterHitScale = 0.25,
     FxNoneHitScale = 0.25,
     FxLandHitScale = 0.5,
-    FxTrails = import("/lua/effecttemplates.lua").NoEffects,
+    FxTrails = { },
     FxTrailScale = 1,
 }
 TypeClass = DebrisBoneAttachHigh01

@@ -681,7 +681,7 @@ AIFMissileTacticalSerpentine02Weapon = ClassWeapon(DefaultProjectileWeapon) {
 AQuantumBeamGenerator = ClassWeapon(DefaultBeamWeapon) {
     BeamType = QuantumBeamGeneratorCollisionBeam,
 
-    FxUpackingChargeEffects = import("/lua/effecttemplates.lua").NoEffects,
+    FxUpackingChargeEffects = { },
     FxUpackingChargeEffectScale = 1,
 
     ---@param self AQuantumBeamGenerator
@@ -709,8 +709,8 @@ AAMWillOWisp = ClassWeapon(DefaultProjectileWeapon) {
 ---@class ADFPhasonLaser : DefaultBeamWeapon
 ADFPhasonLaser = ClassWeapon(DefaultBeamWeapon) {
     BeamType = CollisionBeamFile.PhasonLaserCollisionBeam,
-    FxMuzzleFlash = import("/lua/effecttemplates.lua").NoEffects,
-    FxChargeMuzzleFlash = import("/lua/effecttemplates.lua").NoEffects,
+    FxMuzzleFlash = { },
+    FxChargeMuzzleFlash = { },
     FxUpackingChargeEffects = EffectTemplate.CMicrowaveLaserCharge01,
     FxUpackingChargeEffectScale = 1,
 
