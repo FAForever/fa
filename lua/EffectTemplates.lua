@@ -1362,7 +1362,7 @@ CCorsairMissileUnitHit01 = {
     EmtBpPath .. 'cybran_corsair_missile_hit_ring.bp',
     EmtBpPath .. 'unit_shrapnel_hit_01_emit.bp',
 }
-CCorsairMissileFxTrails01 = NoEffects
+CCorsairMissileFxTrails01 = { }
 CCorsairMissilePolyTrail01 = EmtBpPath .. 'cybran_corsair_missile_polytrail_01_emit.bp'
 
 
