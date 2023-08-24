@@ -1,6 +1,6 @@
 UnitBlueprint {
     Categories = {
-        'STRUCTURE',
+        'MOBILE',
         'TECH3',
         'FACTORY',
         'CONSTRUCTION',
@@ -8,7 +8,6 @@ UnitBlueprint {
         'UNTARGETTABLE',
         'RALLYPOINT',
         'SORTCONSTRUCTION',
-        'MOBILEFACTORY',
         'DRAGBUILD',
         'SHOWQUEUE',
         'EXTERNALFACTORYUNIT'
