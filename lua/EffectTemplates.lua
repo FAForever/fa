@@ -8,7 +8,6 @@
 -- **
 -- **  Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
 -- ****************************************************************************
-
 EmtBpPath = '/effects/emitters/'
 EmitterTempEmtBpPath = '/effects/emitters/temp/'
 
@@ -4558,5 +4557,16 @@ CSGTestSpinner3 = {
     EmtBpPath .. '_test_gatecloud_07_emit.bp',
 }
 
+-------------------------------------------------------------------------------
+--#region Legacy and deprecated code
 
+-- Everything below is considered deprecated. You should not use it. Especially
+-- `NoEffects` and the three `DefaultPolyTrail` tables are dangerous. They can
+-- cause the class loader to find itself in infinite loops
 
+NoEffects = { }
+DefaultPolyTrailOffset1 = { 0 }
+DefaultPolyTrailOffset2 = { 0, 0 }
+DefaultPolyTrailOffset3 = { 0, 0, 0 }
+
+--#endregion
