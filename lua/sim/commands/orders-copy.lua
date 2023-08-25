@@ -52,7 +52,9 @@ CopyOrders = function(units, target, clearCommands, doPrint)
 
     local brain = units[1]:GetAIBrain()
 
-    -- retrieve queue of target
+    ---------------------------------------------------------------------------
+    -- retrieve the queue of the target
+
     local unitCount = table.getn(units)
     local queue = target:GetCommandQueue()
 
@@ -86,6 +88,9 @@ CopyOrders = function(units, target, clearCommands, doPrint)
             copiedOrders = copiedOrders + 1
         end
     end
+
+    ---------------------------------------------------------------------------
+    -- inform user and observers
 
     if doPrint and (GetFocusArmy() == brain:GetArmyIndex()) then
         print(string.format("Copied %d orders", tostring(copiedOrders)))

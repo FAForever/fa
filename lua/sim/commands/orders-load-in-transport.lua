@@ -394,6 +394,9 @@ LoadIntoTransports = function(units, transports, clearCommands, doPrint)
         end
     end
 
+    ---------------------------------------------------------------------------
+    -- inform user and observers
+
     if doPrint and (GetFocusArmy() == brain:GetArmyIndex()) then
         print(string.format("Loading %d units into %d transports", table.getn(transportedUnits), table.getn(transportsUsed)))
     end

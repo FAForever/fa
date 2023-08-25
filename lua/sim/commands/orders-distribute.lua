@@ -190,7 +190,7 @@ DistributeOrders = function(units, target, clearCommands, doPrint)
 
         -- try and issue the transport orders. Only apply distribution to units that are transported
         if (TableGetn(transports) > 0) and (TableGetn(unitsWithNoTransports) > 0) then
-            local transportedUnits, transportsUsed, remainingUnits, remainingTransports = LoadIntoTransports(unitsWithNoTransports, transports, true)
+            local transportedUnits, transportsUsed, remainingUnits, remainingTransports = LoadIntoTransports(unitsWithNoTransports, transports, true, true)
             units = transportedUnits
         end
 
@@ -375,6 +375,9 @@ DistributeOrders = function(units, target, clearCommands, doPrint)
             end
         end
     end
+
+    ---------------------------------------------------------------------------
+    -- inform user and observers
 
     if doPrint and (GetFocusArmy() == brain:GetArmyIndex()) then
         print(string.format("Distributed %d orders", tostring(distributedOrders)))
