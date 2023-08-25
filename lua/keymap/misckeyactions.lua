@@ -541,8 +541,8 @@ DistributeOrders = function(clearCommands)
         local validUnits = EntityCategoryFilterOut(categories.FACTORY, selection)
 
         if table.empty(validUnits) then
-            return
             print("No orders to distribute")
+            return
         end
 
         -- find nearest unit
