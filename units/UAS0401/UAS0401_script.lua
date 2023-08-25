@@ -137,40 +137,10 @@ UAS0401 = ClassUnit(ASeaUnit, ExternalFactoryComponent) {
     end,
 
     RolloffBody = function(self)
-        self.ExternalFactory:SetBusy(true)
-        self.ExternalFactory:SetBlockCommandQueue(true)
-
-        -- find out when build pad is free again
-
-        local size = 0.5 * self.UnitBeingBuilt.Blueprint.SizeX
-        if size < self.UnitBeingBuilt.Blueprint.SizeZ then
-            size = 0.5 * self.UnitBeingBuilt.Blueprint.SizeZ
-        end
-
-        size = size * size
-        local unitPosition, dx, dz, d
-        local buildPosition = self:GetPosition(self.Blueprint.Display.BuildAttachBone or 0)
-        repeat
-            unitPosition = self.UnitBeingBuilt:GetPosition()
-            dx = buildPosition[1] - unitPosition[1]
-            dz = buildPosition[3] - unitPosition[3]
-            d = dx * dx + dz * dz
-            WaitTicks(2)
-        until IsDestroyed(self.UnitBeingBuilt) or d > size
-
-        self:PlayFxRollOffEnd()
-
-        WaitSeconds(2.1)
-
-        ChangeState(self, self.IdleState)
     end,
 
     ---@param self ExternalFactoryUnit
     RollOffUnit = function(self)
-    end,
-
-    DoStopBuild = function(self)
-
     end,
 
     DiveDepthThread = function(self)
