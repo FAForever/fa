@@ -33,19 +33,41 @@ local dummyVectorTable = {}
 local dummyUnitTable = {}
 
 --- Copies the command queue of the target. Has a special snowflake implementation for build orders to prevent too many previews
----@param units Unit[]
----@param target Unit
-CopyOrders = function(units, target, clearCommands)
+---@param units Unit[]              # the units that we apply the copied orders to
+---@param target Unit               # the unit that we read the queue of
+---@param clearCommands boolean     # if true, copied orders are applied immediately
+---@param doPrint boolean           # if true, prints the total distributed orders
+CopyOrders = function(units, target, clearCommands, doPrint)
+
+    ---------------------------------------------------------------------------
+    -- defensive programming
+
+    if table.empty(units) then
+        return
+    end
+
+    if not target then
+        return
+    end
+
+    local brain = units[1]:GetAIBrain()
 
     -- retrieve queue of target
     local unitCount = table.getn(units)
     local queue = target:GetCommandQueue()
 
+    ---------------------------------------------------------------------------
+    -- clear existing orders
+
     if clearCommands then
         IssueClearCommands(units)
     end
 
-    -- copy the orders of the target
+    ---------------------------------------------------------------------------
+    -- copy the orders
+
+    local copiedOrders = 0
+
     for _, order in queue do
         local commandInfo = UnitQueueDataToCommand[order.commandType]
         local commandName = commandInfo.Type
@@ -60,6 +82,12 @@ CopyOrders = function(units, target, clearCommands)
             else
                 issueOrder(units, order.target or PopulateLocation(order, dummyVectorTable))
             end
+
+            copiedOrders = copiedOrders + 1
         end
+    end
+
+    if doPrint and (GetFocusArmy() == brain:GetArmyIndex()) then
+        print(string.format("Copied %d orders", tostring(copiedOrders)))
     end
 end

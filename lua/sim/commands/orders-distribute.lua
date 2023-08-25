@@ -33,17 +33,33 @@ local ComputeBatchCounts = import("/lua/sim/commands/orders-shared.lua").Compute
 local PopulateBatch = import("/lua/sim/commands/orders-shared.lua").PopulateBatch
 local PopulateLocation = import("/lua/sim/commands/orders-shared.lua").PopulateLocation
 local SortUnitsByDistanceToPoint = import("/lua/sim/commands/orders-shared.lua").SortUnitsByDistanceToPoint
+local LoadIntoTransports = import("/lua/sim/commands/orders-load-in-transport.lua").LoadIntoTransports
 
 
 --- Processes the orders and re-distributes them over the units. Assumes that all units in the
 --- selection to have the same command queue. If that is not the case then orders are lost
----@param units Unit[]
----@param target Unit
-DistributeOrders = function(units, target, clearCommands)
+--- 
+--- Does not support distributing orders over factories
+---@param units Unit[]              # the units that we apply the distributed orders to
+---@param target Unit               # the unit that we read the queue of
+---@param clearCommands boolean     # if true, distributed or ders are applied immediately
+---@param doPrint boolean           # if true, prints the total distributed orders
+DistributeOrders = function(units, target, clearCommands, doPrint)
 
-    local start = GetSystemTimeSecondsOnlyForProfileUse()
+    ---------------------------------------------------------------------------
+    -- defensive programming
 
-    -----------------------------------------------------------------------
+    if table.empty(units) then
+        return
+    end
+
+    if not target then
+        return
+    end
+
+    local brain = units[1]:GetAIBrain()
+
+    ---------------------------------------------------------------------------
     -- bundle the orders
 
     ---@type table<EntityId, boolean>
@@ -106,7 +122,16 @@ DistributeOrders = function(units, target, clearCommands)
         end
     end
 
-    -----------------------------------------------------------------------
+    ---------------------------------------------------------------------------
+    -- validate units
+
+    -- we only support distributing the orders of non-factory units. Factories
+    -- use separate orders that would make the logic of this function much
+    -- more complicated
+
+    units = EntityCategoryFilterDown(categories.ALLUNITS - categories.FACTORY, units)
+
+    ---------------------------------------------------------------------------
     -- sorting units
 
     -- we sort the selection to make the order more intuitive. By default
@@ -117,15 +142,66 @@ DistributeOrders = function(units, target, clearCommands)
         SortUnitsByDistanceToPoint(units, px, pz)
     end
 
-    -----------------------------------------------------------------------
+    ---------------------------------------------------------------------------
     -- clear existing orders
 
     if clearCommands then
         IssueClearCommands(units)
     end
 
-    -----------------------------------------------------------------------
-    -- assign orders
+    ---------------------------------------------------------------------------
+    -- special snowflake implementation for transport load commands
+
+    -- a special routine to make it more user friendly. What we do here is to
+    -- make sure that the load orders are applied immediately. All orders 
+    -- before the load orders are ignored. The remaining orders are distributed
+    -- over the units that end up being transported.
+
+    -- that orders before the load orders are ignored is intentional. Not only
+    -- does it help with how the engine processes load orders. A single move
+    -- order can also prevent your units from being (partially) transported
+    -- before you finished giving orders
+
+    -- there is an odd interaction when you want to distribute orders of transports
+    -- that are currently waiting for a load order. We cannot clear the command 
+    -- queue as that would cancel the load order too. Until we have better control
+    -- over what we clear from the command queue the user will have to wait until
+    -- the loading is complete before he can issue unload orders for the transports
+
+    -- find out if there are transport load orders, keep the last group
+    local indexOfTransportOrder = nil
+    for k, group in groups do
+        if UnitQueueDataToCommand[group[1].commandType].Type == 'TransportLoadUnits' then
+            indexOfTransportOrder = k
+        end
+    end
+
+    if indexOfTransportOrder then
+        -- filter out all transports
+        local unitsWithNoTransports = EntityCategoryFilterDown(categories.ALLUNITS - (categories.TRANSPORTATION + categories.AIR), units)
+
+        -- retrieve all transports we use in orders
+        local transports = { }
+        for k, order in groups[indexOfTransportOrder] do
+            if order.target and EntityCategoryContains(categories.TRANSPORTATION, order.target) then
+                TableInsert(transports, order.target)
+            end
+        end
+
+        -- try and issue the transport orders. Only apply distribution to units that are transported
+        if (TableGetn(transports) > 0) and (TableGetn(unitsWithNoTransports) > 0) then
+            local transportedUnits, transportsUsed, remainingUnits, remainingTransports = LoadIntoTransports(unitsWithNoTransports, transports, true)
+            units = transportedUnits
+        end
+
+        -- remove all orders up to and including the transport order
+        for k = 1, TableGetn(groups) do
+            groups[k] = groups[k + indexOfTransportOrder]
+        end
+    end
+
+    ---------------------------------------------------------------------------
+    -- distribute the remaining orders
 
     ---@type number[]
     local dummyBatches = {}
@@ -229,8 +305,6 @@ DistributeOrders = function(units, target, clearCommands)
                     local start = 1
                     local batches = ComputeBatchCounts(unitCount, orderCount, dummyBatches)
 
-                    reprsl(batches)
-
                     -- limit the redundancy to something sane
                     local redundancy = orderCount
                     if redundancy > 10 then
@@ -302,6 +376,7 @@ DistributeOrders = function(units, target, clearCommands)
         end
     end
 
-    LOG("Distributed " .. tostring(distributedOrders) .. " orders")
-    LOG(string.format("Processing time: %f", GetSystemTimeSecondsOnlyForProfileUse() - start))
+    if doPrint and (GetFocusArmy() == brain:GetArmyIndex()) then
+        print(string.format("Distributed %d orders", tostring(distributedOrders)))
+    end
 end
