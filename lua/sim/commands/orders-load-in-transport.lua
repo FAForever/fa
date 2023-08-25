@@ -29,7 +29,7 @@ local PointOnUnitCircle = import("/lua/sim/commands/orders-shared.lua").PointOnU
 ---@return number   # small slots
 ---@return number   # medium slots
 ---@return number   # large slots
-function GetAvailableTransportSlots( unit )
+function GetAvailableTransportSlots(unit)
     local transportBlueprint = unit.Blueprint.Transport
     if transportBlueprint then
         -- try and decipher based on values added in FAForever
@@ -45,7 +45,8 @@ function GetAvailableTransportSlots( unit )
         local class2AttachSize = transportBlueprint.Class2AttachSize
         local class3AttachSize = transportBlueprint.Class3AttachSize
         if class1Capacity and class2AttachSize and class3AttachSize then
-            return class1Capacity, math.floor(class1Capacity / class2AttachSize), math.floor(class1Capacity / class3AttachSize)
+            return class1Capacity, math.floor(class1Capacity / class2AttachSize),
+                math.floor(class1Capacity / class3AttachSize)
         end
     end
 
@@ -77,17 +78,40 @@ function SortByTransportCapacity(a, b)
     return (a.Blueprint.Transport.Class1Capacity or 0) > (b.Blueprint.Transport.Class1Capacity or 0)
 end
 
---- 
+---
 ---@param units Unit[]
 ---@param transports Unit
+---@param clearCommands boolean     # if true, transport orders are applied immediately
+---@param doPrint boolean           # if true, prints the number of units that are being transported
+---@return Unit[]   # Units that are transported
+---@return Unit[]   # Transports that are used
 ---@return Unit[]   # Remaining units that are not transported
 ---@return Unit[]   # Remaining transports that are not required
-LoadIntoTransports = function(units, transports, clearCommands)
+LoadIntoTransports = function(units, transports, clearCommands, doPrint)
+
+    ---------------------------------------------------------------------------
+    -- defensive programming
+
+    if table.empty(units) then
+        return {}, {}, units, transports
+    end
+
+    if table.empty(transports) then
+        return {}, {}, units, transports
+    end
+
+    local brain = units[1]:GetAIBrain()
+
+    ---------------------------------------------------------------------------
+    -- clear existing orders
 
     if clearCommands then
         IssueClearCommands(units)
         IssueClearCommands(transports)
     end
+
+    ---------------------------------------------------------------------------
+    -- sort transports based on class
 
     local transportCount = table.getn(transports)
 
@@ -110,8 +134,13 @@ LoadIntoTransports = function(units, transports, clearCommands)
     -- sort transport by transport capacity (largest to smallest)
     table.sort(transports, SortByTransportCapacity)
 
-    local isLoaded = { }
-    local remainingTransports = { }
+    ---------------------------------------------------------------------------
+    -- load units into transports
+
+    local isLoaded = {}
+    local transportedUnits = {}
+    local transportsUsed = {}
+    local remainingTransports = {}
     local remainingTech3Units = EntityCategoryFilterDown(categories.TECH3, units)
     local remainingTech3UnitCount = table.getn(remainingTech3Units)
     local remainingTech2Units = EntityCategoryFilterDown(categories.TECH2, units)
@@ -120,11 +149,11 @@ LoadIntoTransports = function(units, transports, clearCommands)
     local remainingTech1UnitCount = table.getn(remainingTech1Units)
 
     local unitsToLoadTech3Head = 1
-    local unitsToLoadTech3 = { }
+    local unitsToLoadTech3 = {}
     local unitsToLoadTech2Head = 1
-    local unitsToLoadTech2 = { }
+    local unitsToLoadTech2 = {}
     local unitsToLoadTech1Head = 1
-    local unitsToLoadTech1 = { }
+    local unitsToLoadTech1 = {}
 
     -- start loading in units
     for t = 1, transportCount do
@@ -132,7 +161,7 @@ LoadIntoTransports = function(units, transports, clearCommands)
         local transport = transports[t]
         local transportSmallClamps, transportMediumClamps, transportLargeClamps = GetAvailableTransportSlots(transport)
 
-        do  -- process tech 3 units
+        do -- process tech 3 units
 
             -- clear previous cargo
             for k = 1, unitsToLoadTech3Head do
@@ -166,7 +195,7 @@ LoadIntoTransports = function(units, transports, clearCommands)
                 end
 
                 if canLoad then
-                    isLoaded[unit.EntityId]= true
+                    isLoaded[unit.EntityId] = true
                     unitsToLoadTech3[unitsToLoadTech3Head] = unit
                     unitsToLoadTech3Head = unitsToLoadTech3Head + 1
                 end
@@ -189,7 +218,7 @@ LoadIntoTransports = function(units, transports, clearCommands)
             remainingTech3UnitCount = unitsHead - 1
         end
 
-        do  -- process tech 2 units
+        do -- process tech 2 units
 
             -- clear previous cargo
             for k = 1, unitsToLoadTech2Head do
@@ -223,7 +252,7 @@ LoadIntoTransports = function(units, transports, clearCommands)
                 end
 
                 if canLoad then
-                    isLoaded[unit.EntityId]= true
+                    isLoaded[unit.EntityId] = true
                     unitsToLoadTech2[unitsToLoadTech2Head] = unit
                     unitsToLoadTech2Head = unitsToLoadTech2Head + 1
                 end
@@ -246,7 +275,7 @@ LoadIntoTransports = function(units, transports, clearCommands)
             remainingTech2UnitCount = unitsHead - 1
         end
 
-        do  -- process tech 1 units
+        do -- process tech 1 units
 
             -- clear previous cargo
             for k = 1, unitsToLoadTech1Head do
@@ -306,6 +335,11 @@ LoadIntoTransports = function(units, transports, clearCommands)
         -- load in units. Units that can not load in immediately but are supposed to load in together are ordered to gather to prepare
         if (unitsToLoadTech3Head > 1) or (unitsToLoadTech2Head) or (unitsToLoadTech1Head > 1) then
             if unitsToLoadTech3Head > 1 then
+                -- keep track of units that we're transporting
+                for k = 1, unitsToLoadTech3Head - 1 do
+                    table.insert(transportedUnits, unitsToLoadTech3[k])
+                end
+
                 IssueTransportLoad(unitsToLoadTech3, transport)
             end
 
@@ -314,9 +348,18 @@ LoadIntoTransports = function(units, transports, clearCommands)
                 if unitsToLoadTech3Head > 1 then
                     local cx, cz = AveragePositionOfUnitsXZ(unitsToLoadTech2)
                     for k, unit in unitsToLoadTech2 do
-                        local point = PointOnUnitCircle(cx, cz, unitsToLoadTech2Head, (k / (unitsToLoadTech2Head - 1)) * 360)
+                        local point = PointOnUnitCircle(cx, cz, unitsToLoadTech2Head,
+                            (k / (unitsToLoadTech2Head - 1)) * 360)
                         unit:GetNavigator():SetGoal(point)
+
+                        -- keep track of units that we're transporting
+                        table.insert(transportedUnits, unit)
                     end
+                end
+
+                -- keep track of units that we're transporting
+                for k = 1, unitsToLoadTech2Head - 1 do
+                    table.insert(transportedUnits, unitsToLoadTech2[k])
                 end
 
                 IssueTransportLoad(unitsToLoadTech2, transport)
@@ -327,25 +370,37 @@ LoadIntoTransports = function(units, transports, clearCommands)
                 if (unitsToLoadTech3Head > 1) or (unitsToLoadTech2Head > 1) then
                     local cx, cz = AveragePositionOfUnitsXZ(unitsToLoadTech1)
                     for k, unit in unitsToLoadTech1 do
-                        local point = PointOnUnitCircle(cx, cz, unitsToLoadTech1Head + 4, (k / (unitsToLoadTech1Head - 1)) * 360)
+                        local point = PointOnUnitCircle(cx, cz, unitsToLoadTech1Head + 4,
+                            (k / (unitsToLoadTech1Head - 1)) * 360)
                         unit:GetNavigator():SetGoal(point)
+
+                        -- keep track of units that we're transporting
+                        table.insert(transportedUnits, unit)
                     end
                 end
+
+                -- keep track of units that we're transporting
+                for k = 1, unitsToLoadTech1Head - 1 do
+                    table.insert(transportedUnits, unitsToLoadTech1[k])
+                end
+
                 IssueTransportLoad(unitsToLoadTech1, transport)
             end
+
+            -- keep track of the transports that we're using
+            table.insert(transportsUsed, transport)
         else
             table.insert(remainingTransports, transport)
         end
     end
 
-    -- move remaining units to a circle-like position to prevent them from blocking other units
-    local remainingUnits = table.concatenate(remainingTech3Units, remainingTech2Units, remainingTech1Units)
-    -- local remainingUnitCount = table.getn(remainingUnits)
-    -- local cx, cz = AveragePositionOfUnitsXZ(remainingUnits)
-    -- for k, unit in remainingUnits do
-    --     local point = PointOnUnitCircle(cx, cz, 0.5 * remainingUnitCount + 4, (k / (remainingUnitCount - 1)) * 360)
-    --     unit:GetNavigator():SetGoal(point)
-    -- end
+    ---------------------------------------------------------------------------
+    -- inform user and observers
 
-    return remainingUnits, remainingTransports
+    if doPrint and (GetFocusArmy() == brain:GetArmyIndex()) then
+        print(string.format("Loading %d units into %d transports", table.getn(transportedUnits), table.getn(transportsUsed)))
+    end
+
+    local remainingUnits = table.concatenate(remainingTech3Units, remainingTech2Units, remainingTech1Units)
+    return transportedUnits, transportsUsed, remainingUnits, remainingTransports
 end
