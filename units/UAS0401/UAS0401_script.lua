@@ -119,7 +119,7 @@ UAS0401 = ClassUnit(ASeaUnit, ExternalFactoryComponent) {
         end
     end,
 
-    ---@param self UEL0401
+    ---@param self UAS0401
     ---@param new Layer
     ---@param old Layer
     OnLayerChange = function(self, new, old)
@@ -134,6 +134,13 @@ UAS0401 = ClassUnit(ASeaUnit, ExternalFactoryComponent) {
     OnUnpaused = function(self)
         ASeaUnit.OnUnpaused(self)
         ExternalFactoryComponent.OnUnpaused(self)
+    end,
+
+    RolloffBody = function(self)
+    end,
+
+    ---@param self ExternalFactoryUnit
+    RollOffUnit = function(self)
     end,
 
     DiveDepthThread = function(self)
@@ -190,8 +197,15 @@ UAS0401 = ClassUnit(ASeaUnit, ExternalFactoryComponent) {
             self.UnitDoneBeingBuilt = false
         end,
 
+        ---@param self UAS0401
+        ---@param unitBeingBuilt Unit
         OnStopBuild = function(self, unitBeingBuilt)
             ASeaUnit.OnStopBuild(self, unitBeingBuilt)
+
+            local blueprint = unitBeingBuilt.Blueprint
+            local distance = math.max(blueprint.SizeX, blueprint.SizeZ, 6)
+            local worldPos = self:CalculateWorldPositionFromRelative({0, 0, - 2 * distance})
+            IssueMoveOffFactory({unitBeingBuilt}, worldPos)
             ChangeState(self, self.RollingOffState)
         end,
     },
@@ -201,8 +215,6 @@ UAS0401 = ClassUnit(ASeaUnit, ExternalFactoryComponent) {
             local unitBuilding = self.UnitBeingBuilt
             unitBuilding:DetachFrom(true)
             self:DetachAll(self.BuildAttachBone)
-            local worldPos = self:CalculateWorldPositionFromRelative({0, 0, -20})
-            IssueMoveOffFactory({unitBuilding}, worldPos)
 
             WaitTicks(21)
 
