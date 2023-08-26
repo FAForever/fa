@@ -32,6 +32,29 @@ local keyword = ''
 local linesVisible = {}
 local linesCollapsed = true
 
+-- function CreateLinkButton(parent, url, iconPath, description)
+--     local btn = Bitmap(parent) 
+--     btn.url = url
+-- --    btn:SetSolidColor('FFFF0B0B') -- #FFFF0B0B
+--     btn:SetTexture(iconPath) 
+--     btn:SetAlpha(0.5, false)
+--     btn.Depth:Set(function() return popup.Depth() + 100 end)
+--     btn:EnableHitTest()
+--     btn.HandleEvent = function(self, event) 
+--         if event.Type == 'MouseEnter' then
+--             self:SetAlpha(1.0, false)
+--         elseif event.Type == 'MouseExit' then
+--             self:SetAlpha(0.5, false)
+--         elseif event.Type == 'ButtonPress' or event.Type == 'ButtonDClick' then
+--             Links.open(self.url)
+--         end
+--         return true 
+--     end
+--     -- AddTooltip(btn, 'Open URL', description, 400, nil, nil, 'right')
+
+--     return btn
+-- end
+
 -- store info about current state of key categories and preserve their state between FormatData() calls
 local keyGroups = {}
 for order, category in keyCategoryOrder do
@@ -428,6 +451,24 @@ function CreateLine()
         body = '<LOC key_binding_0011>Toggle visibility of all actions for this category of keys'
     })
 
+    line.wikiButton = UIUtil.CreateBitmap(line, '/textures/ui/common/mods/mod_url_website.dds')
+    LayoutHelpers.SetDimensions(line.wikiButton, 20, 20)
+
+    -- LayoutHelpers.AtVerticalCenterIn(line.assignKeyButton, line)
+    LayoutHelpers.RightOf(line.wikiButton, line.key, 4)
+    LayoutHelpers.AtVerticalCenterIn(line.wikiButton, line.key)
+    line.wikiButton:SetAlpha(0.5)
+    line.wikiButton.HandleEvent = function(self, event) 
+        if event.Type == 'MouseEnter' then
+            self:SetAlpha(1.0, false)
+        elseif event.Type == 'MouseExit' then
+            self:SetAlpha(0.5, false)
+        elseif event.Type == 'ButtonPress' or event.Type == 'ButtonDClick' then
+            OpenURL(self.url)
+        end
+        return true 
+    end
+
     line.assignKeyButton = CreateToggle(line,
          '645F5E5E',  ----735F5E5E'
          'FFAEACAC',  ----FFAEACAC'
@@ -476,6 +517,7 @@ function CreateLine()
             line.toggle:Show()
             line.assignKeyButton:Hide()
             line.unbindKeyButton:Hide()
+            line.wikiButton:Hide()
             line.description:SetText(data.text)
             line.description:SetFont(UIUtil.titleFont, 16)
             line.description:SetColor(UIUtil.factionTextColor)
@@ -485,6 +527,7 @@ function CreateLine()
             line.toggle:Hide()
             line.assignKeyButton:Hide()
             line.unbindKeyButton:Hide()
+            line.wikiButton:Hide()
             line.key:SetText('')
             line.description:SetText('')
             line.statistics:SetText('')
@@ -499,6 +542,11 @@ function CreateLine()
             line.statistics:SetText('')
             line.unbindKeyButton:Show()
             line.assignKeyButton:Show()
+
+            if (data.wikiURL) then
+                line.wikiButton.url = "http://wiki.faforever.com/" .. tostring(data.wikiURL)
+                line.wikiButton:Show()
+            end
         end
     end
     return line
@@ -785,6 +833,7 @@ function CreateUI()
                 line.toggle:Hide()
                 line.assignKeyButton:Hide()
                 line.unbindKeyButton:Hide()
+                line.wikiButton:Hide()
             end
         end
         keyFilter.text:AcquireFocus()
@@ -905,6 +954,7 @@ function FormatData()
         local category = string.lower(v.category or 'none')
         local keyForAction = keyLookup[k]
 
+        -- create header if it doesn't exist
         if not keyGroups[category] then
             keyGroups[category] = {}
             keyGroups[category].actions = {}
@@ -921,6 +971,7 @@ function FormatData()
             category = category,
             order = keyGroups[category].order,
             text = KeyMapper.GetActionName(k),
+            wikiURL = v.wikiURL
         }
         table.insert(keyGroups[category].actions, data)
     end
@@ -949,6 +1000,7 @@ function FormatData()
                     order = keyGroups[category].order,
                     collapsed = keyGroups[category].collapsed,
                     id = index,
+                    wikiURL = data.wikiURL,
                     filters = { -- create filter parameters for quick searching of keys
                          key =  string.gsub(string.lower(data.keyText), ' %+ ', ' '),
                          text = string.lower(data.text or ''),
