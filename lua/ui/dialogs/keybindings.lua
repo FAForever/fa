@@ -523,6 +523,9 @@ function CreateLine()
             if (data.wikiURL) then
                 line.wikiButton.url = "http://wiki.faforever.com/" .. tostring(data.wikiURL)
                 line.wikiButton:Show()
+            else
+                line.wikiButton.url = ""
+                line.wikiButton:Hide()
             end
         end
     end
