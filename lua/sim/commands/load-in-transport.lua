@@ -20,10 +20,10 @@
 --** SOFTWARE.
 --******************************************************************************************************
 
-local AveragePositionOfUnitsXZ = import("/lua/sim/commands/orders-shared.lua").AveragePositionOfUnitsXZ
-local AveragePositionOfUnits = import("/lua/sim/commands/orders-shared.lua").AveragePositionOfUnits
-local SortUnitsByDistanceToPoint = import("/lua/sim/commands/orders-shared.lua").SortUnitsByDistanceToPoint
-local PointOnUnitCircle = import("/lua/sim/commands/orders-shared.lua").PointOnUnitCircle
+local AveragePositionOfUnitsXZ = import("/lua/sim/commands/shared.lua").AveragePositionOfUnitsXZ
+local AveragePositionOfUnits = import("/lua/sim/commands/shared.lua").AveragePositionOfUnits
+local SortUnitsByDistanceToPoint = import("/lua/sim/commands/shared.lua").SortUnitsByDistanceToPoint
+local PointOnUnitCircle = import("/lua/sim/commands/shared.lua").PointOnUnitCircle
 
 ---@param unit Unit
 ---@return number   # small slots

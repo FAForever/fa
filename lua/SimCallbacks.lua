@@ -397,7 +397,7 @@ do
             return
         end
 
-        import("/lua/sim/commands/orders-distribute.lua").DistributeOrders(selection, target, data.ClearCommands or false, true)
+        import("/lua/sim/commands/distribute-queue.lua").DistributeOrders(selection, target, data.ClearCommands or false, true)
     end
 end
 
@@ -421,7 +421,7 @@ do
             return
         end
 
-        import("/lua/sim/commands/orders-copy.lua").CopyOrders(selection, target, data.ClearCommands or false, true)
+        import("/lua/sim/commands/copy-queue.lua").CopyOrders(selection, target, data.ClearCommands or false, true)
     end
 end
 
@@ -438,7 +438,7 @@ do
 
        local transports = EntityCategoryFilterDown(categories.TRANSPORTATION, selection)
        local transportees = EntityCategoryFilterDown(categories.ALLUNITS - (categories.AIR + categories.TRANSPORTATION), selection)
-       local transportedUnits, transportsUsed, remUnits, remTransports = import("/lua/sim/commands/orders-load-in-transport.lua").LoadIntoTransports(transportees, transports, data.ClearCommands or false, true)
+       local transportedUnits, transportsUsed, remUnits, remTransports = import("/lua/sim/commands/load-in-transport.lua").LoadIntoTransports(transportees, transports, data.ClearCommands or false, true)
     end
 end
 

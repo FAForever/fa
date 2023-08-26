@@ -1630,21 +1630,11 @@ local keyActionsOrdersQueueBased = {
         wikiURL = 'Play/Game/Hotkeys/OrdersQueueManipulation#distribute-orders'
     },
     ['distribute_orders_context'] = {
-        action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").DistributeOrdersOfMouseContext(false)',
-        category = 'ordersQueueBased',
-        wikiURL = 'Play/Game/Hotkeys/OrdersQueueManipulation#distribute-orders-context'
-    },
-    ['shift_distribute_orders_context'] = {
-        action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").DistributeOrdersOfMouseContext(false)',
-        category = 'ordersQueueBased',
-        wikiURL = 'Play/Game/Hotkeys/OrdersQueueManipulation#distribute-orders-context'
-    },
-    ['distribute_orders_context_clear'] = {
         action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").DistributeOrdersOfMouseContext(true)',
         category = 'ordersQueueBased',
         wikiURL = 'Play/Game/Hotkeys/OrdersQueueManipulation#distribute-orders-context'
     },
-    ['shift_distribute_orders_context_clear'] = {
+    ['shift_distribute_orders_context'] = {
         action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").DistributeOrdersOfMouseContext(true)',
         category = 'ordersQueueBased',
         wikiURL = 'Play/Game/Hotkeys/OrdersQueueManipulation#distribute-orders-context'
