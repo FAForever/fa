@@ -23,17 +23,16 @@
 -- upvalue scope for performance
 local TableGetn = table.getn
 local TableInsert = table.insert
-local TableSort = table.sort
 
 local MathMod = math.mod
 local MathMin = math.min
 
-local UnitQueueDataToCommand = import("/lua/sim/commands/orders-shared.lua").UnitQueueDataToCommand
-local ComputeBatchCounts = import("/lua/sim/commands/orders-shared.lua").ComputeBatchCounts
-local PopulateBatch = import("/lua/sim/commands/orders-shared.lua").PopulateBatch
-local PopulateLocation = import("/lua/sim/commands/orders-shared.lua").PopulateLocation
-local SortUnitsByDistanceToPoint = import("/lua/sim/commands/orders-shared.lua").SortUnitsByDistanceToPoint
-local LoadIntoTransports = import("/lua/sim/commands/orders-load-in-transport.lua").LoadIntoTransports
+local UnitQueueDataToCommand = import("/lua/sim/commands/shared.lua").UnitQueueDataToCommand
+local ComputeBatchCounts = import("/lua/sim/commands/shared.lua").ComputeBatchCounts
+local PopulateBatch = import("/lua/sim/commands/shared.lua").PopulateBatch
+local PopulateLocation = import("/lua/sim/commands/shared.lua").PopulateLocation
+local SortUnitsByDistanceToPoint = import("/lua/sim/commands/shared.lua").SortUnitsByDistanceToPoint
+local LoadIntoTransports = import("/lua/sim/commands/load-in-transport.lua").LoadIntoTransports
 
 
 --- Processes the orders and re-distributes them over the units. Assumes that all units in the
