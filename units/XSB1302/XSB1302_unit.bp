@@ -38,14 +38,6 @@ UnitBlueprint{
     Display = {
         Abilities = { "<LOC ability_amphibious>Amphibious" },
         AnimationActivate = "/units/XSB1302/XSB1302_Apump.sca",
-        AnimationDeath = {
-            {
-                Animation = "/units/xsb1302/xsb1302_ADeath.sca",
-                AnimationRateMax = 1,
-                AnimationRateMin = 1,
-                Weight = 100,
-            },
-        },
         Mesh = {
             IconFadeInZoom = 130,
             LODs = {
