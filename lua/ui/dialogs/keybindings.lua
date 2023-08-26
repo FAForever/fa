@@ -32,29 +32,6 @@ local keyword = ''
 local linesVisible = {}
 local linesCollapsed = true
 
--- function CreateLinkButton(parent, url, iconPath, description)
---     local btn = Bitmap(parent) 
---     btn.url = url
--- --    btn:SetSolidColor('FFFF0B0B') -- #FFFF0B0B
---     btn:SetTexture(iconPath) 
---     btn:SetAlpha(0.5, false)
---     btn.Depth:Set(function() return popup.Depth() + 100 end)
---     btn:EnableHitTest()
---     btn.HandleEvent = function(self, event) 
---         if event.Type == 'MouseEnter' then
---             self:SetAlpha(1.0, false)
---         elseif event.Type == 'MouseExit' then
---             self:SetAlpha(0.5, false)
---         elseif event.Type == 'ButtonPress' or event.Type == 'ButtonDClick' then
---             Links.open(self.url)
---         end
---         return true 
---     end
---     -- AddTooltip(btn, 'Open URL', description, 400, nil, nil, 'right')
-
---     return btn
--- end
-
 -- store info about current state of key categories and preserve their state between FormatData() calls
 local keyGroups = {}
 for order, category in keyCategoryOrder do
