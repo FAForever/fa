@@ -449,6 +449,8 @@ function CreateLine()
         end
         return true
     end
+    
+    import("/lua/ui/game/tooltip.lua").AddControlTooltipManual(line.wikiButton, 'Learn more on the Wiki of FAForever', '', 0, 140, 6, 14, 14, 'left')
 
     line.assignKeyButton = CreateToggle(line,
         '645F5E5E', ----735F5E5E'
