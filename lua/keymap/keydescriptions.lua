@@ -530,10 +530,8 @@ keyDescriptions = {
     ['shift_filter_highest_engineer_and_assist'] = '<LOC key_desc_shift_filter_highest_engineer_and_assist>Filter engineers',
     ['distribute_orders'] = '<LOC key_desc_distribute_orders>Distribute orders',
     ['shift_distribute_orders'] = '<LOC key_desc_shift_distribute_orders>Distribute orders',
-    ['distribute_orders_context'] = '<LOC key_desc_distribute_orders>Distribute orders of the unit the mouse is on top of',
-    ['shift_distribute_orders_context'] = '<LOC key_desc_shift_distribute_orders>Distribute orders of the unit the mouse is on top of',
-    ['distribute_orders_context_clear'] = '<LOC key_desc_distribute_orders_context_clear>Distribute orders of the unit the mouse is on top of. Applies immediately',
-    ['shift_distribute_orders_context_clear'] = '<LOC key_desc_shift_distribute_orders_context_clear>Distribute orders of the unit the mouse is on top of. Applies immediately',
+    ['distribute_orders_context'] = '<LOC key_desc_distribute_orders>Distribute orders from the unit beneath the mouse cursor',
+    ['shift_distribute_orders_context'] = '<LOC key_desc_shift_distribute_orders>Distribute orders from the unit beneath the mouse cursor',
     ['cycle_context_based_templates'] = '<LOC key_desc_context_based_templates>Cycle templates',
     ['shift_cycle_context_based_templates'] = '<LOC key_desc_shift_context_based_templates>Cycle templates',
 
