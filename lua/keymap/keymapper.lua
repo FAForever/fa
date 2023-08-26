@@ -194,6 +194,15 @@ end
 function GetKeyActions()
     local ret = {}
 
+    -- load actions from preference file
+    local userActions = Prefs.GetFromCurrentProfile("UserKeyActions")
+    if userActions ~= nil then
+        for k,v in userActions do
+            ret[k] = v
+        end
+    end
+
+    -- load default keyactions, overwrite those in the preference when applicable
     local keyActions = import("/lua/keymap/keyactions.lua").keyActions
     local debugKeyActions = import("/lua/keymap/debugkeyactions.lua").debugKeyActions
 
@@ -203,13 +212,6 @@ function GetKeyActions()
 
     for k,v in debugKeyActions do
         ret[k] = v
-    end
-
-    local userActions = Prefs.GetFromCurrentProfile("UserKeyActions")
-    if userActions ~= nil then
-        for k,v in userActions do
-            ret[k] = v
-        end
     end
 
     for k,v in ret do
