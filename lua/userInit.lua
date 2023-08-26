@@ -156,3 +156,21 @@ do
         return 0
     end
 end
+
+do
+    local OldOpenURL = _G.OpenURL
+
+    --- Opens a URL after the user confirms the link
+    ---@param url string
+    _G.OpenURL = function(url)
+        local UIUtil = import("/lua/ui/uiutil.lua")
+
+        UIUtil.QuickDialog(
+            GetFrame(0),
+            string.format("You're about to open a browser to:\r\n\r\n%s", url),
+            'Open browser',
+            function() OldOpenURL(url) end,
+            'Cancel'
+        )
+    end
+end

@@ -378,7 +378,7 @@ DistributeOrders = function(units, target, clearCommands, doPrint)
     ---------------------------------------------------------------------------
     -- inform user and observers
 
-    if doPrint and (GetFocusArmy() == brain:GetArmyIndex()) then
+    if doPrint and (distributedOrders > 0) and (GetFocusArmy() == brain:GetArmyIndex()) then
         print(string.format("Distributed %d orders", tostring(distributedOrders)))
     end
 end

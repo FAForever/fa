@@ -228,6 +228,8 @@ Cycle = function()
             -- only turn it into a build template when we have more than 1 unit in it
             if TableGetn(template.TemplateData) > 3 then
                 SetActiveBuildTemplate(template.TemplateData)
+            else
+                ClearBuildTemplates()
             end
 
             print(StringFormat("(%d/%d) %s", index, ContextBasedTemplateCount, template.Name))
