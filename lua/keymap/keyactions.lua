@@ -1661,17 +1661,23 @@ local keyactionsOrdersContextBased = {
     ['cycle_context_based_templates'] = {
         action = 'UI_Lua import("/lua/ui/game/commands/context-based-templates.lua").Cycle()',
         category = 'ordersContextBased',
+        wikiURL = 'Play/Game/Hotkeys/OrdersMouseContext#cycle-templates'
     },
     ['shift_cycle_context_based_templates'] = {
         action = 'UI_Lua import("/lua/ui/game/commands/context-based-templates.lua").Cycle()',
         category = 'ordersContextBased',
+        wikiURL = 'Play/Game/Hotkeys/OrdersMouseContext#cycle-templates'
     },
     ['set_target_priority'] = {
         action = 'UI_LUA import("/lua/keymap/misckeyactions.lua").SetWeaponPrioritiesToUnitType()',
         category = 'ordersContextBased',
+        wikiURL = 'Play/Game/Hotkeys/OrdersMouseContext#cycle-templates'
     },
-
-
+    ['shift_set_target_priority'] = {
+        action = 'UI_LUA import("/lua/keymap/misckeyactions.lua").SetWeaponPrioritiesToUnitType()',
+        category = 'ordersContextBased',
+        wikiURL = 'Play/Game/Hotkeys/OrdersMouseContext#cycle-templates'
+    },
 }
 
 ---@type table<string, UIKeyAction>
