@@ -528,7 +528,7 @@ options = {
                 custom = {
                     states = {
                         {text = "<LOC _Off>Off",    key = "off"},
-                        {text = "<LOC _Off>On",     key = "on"} -- only-storages-extractors full-suite
+                        {text = "<LOC _On>On",     key = "on"} -- only-storages-extractors full-suite
                     },
                 },
             },

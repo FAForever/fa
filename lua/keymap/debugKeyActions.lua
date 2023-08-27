@@ -17,10 +17,6 @@ local keyActionsDebug = {
         action = 'UI_Lua import("/lua/ui/game/maputilities.lua").OpenWindow()',
         category = 'debug',
     },
-    ['test'] = {
-        action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").SelectExternalFactory()',
-        category = 'debug',
-    },
     ['toggle_ai_screen'] = {
         action = 'UI_Lua import("/lua/ui/dialogs/aiutilitiesview.lua").OpenWindow()',
         category = 'debug'

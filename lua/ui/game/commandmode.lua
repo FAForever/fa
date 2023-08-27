@@ -32,6 +32,9 @@ local TableGetN = table.getn
 local MathPi = math.pi
 local MathAtan = math.atan
 
+---@class UserCommand
+
+
 ---@class MeshInfo
 ---@field Position Vector
 ---@field Blueprint string
@@ -271,77 +274,6 @@ local function CheatSpawn(command, data)
     }, true)
 end
 
---- Allows us to detect a double / triple click
-local pStructure1 = nil
-function RingExtractor(command)
-    -- retrieve the option in question, can have values: 'off', 'only-storages-extractors' and 'full-suite'
-    local option = Prefs.GetFromCurrentProfile('options.structure_capping_feature_01')
-
-    -- bail out - we're not interested
-    if option == 'off' then
-        return
-    end
-
-    -- check if we have engineers
-    local units = EntityCategoryFilterDown(categories.ENGINEER, command.Units)
-    if not units[1] then return end
-
-    -- check if we have a building that we target
-    local structure = GetUnitById(command.Target.EntityId)
-    if not structure or IsDestroyed(structure) then return end
-
-    -- various conditions written out for maintainability
-    local isShiftDown = IsKeyDown('Shift')
-    local isDoubleTapped = structure ~= nil and (pStructure1 == structure)
-    local isUpgrading = structure:GetFocus() ~= nil
-
-    local isTech1 = structure:IsInCategory('TECH1')
-    local isTech2 = structure:IsInCategory('TECH2')
-    local isTech3 = structure:IsInCategory('TECH3')
-
-    if structure:IsInCategory('STRUCTURE') then
-        if structure:IsInCategory('MASSEXTRACTION') then
-            local buildStorages =
-            (
-                (isTech1 and isUpgrading and isDoubleTapped and isShiftDown)
-                    or (isTech2 and isUpgrading and isDoubleTapped and isShiftDown)
-                    or (isTech2 and not isUpgrading)
-                    or isTech3
-                )
-
-            if buildStorages then
-
-                -- prevent consecutive calls
-                local gameTick = GameTick()
-                if structure.RingStoragesStamp then
-                    if structure.RingStoragesStamp + 5 > gameTick then
-                        return
-                    end
-                end
-
-                structure.RingStoragesStamp = gameTick
-
-                print("Ringing extractor with storages")
-                SimCallback({ Func = 'RingExtractor', Args = { target = command.Target.EntityId } }, true)
-
-                if (isTech1 and isUpgrading) or (isTech2 and not isUpgrading) then
-                    structure = nil
-                    pStructure1 = nil
-                end
-            end
-        end
-    end
-
-    -- keep track of previous structure to identify a 2nd / 3rd click
-    pStructure1 = structure
-
-    -- prevent building up state when upgrading but shift isn't pressed
-    if isUpgrading and not isShiftDown then
-        structure = nil
-        pStructure1 = nil
-    end
-end
-
 -- cached category strings for performance
 local categoriesFactories = categories.STRUCTURE * categories.FACTORY
 local categoriesShields = categories.MOBILE * categories.SHIELD
@@ -445,6 +377,8 @@ end
 
 --- Called by the engine when a new command has been issued by the player.
 -- @param command Information surrounding the command that has been issued, such as its CommandType or its Target.
+---@param command UserCommand
+---@return boolean
 function OnCommandIssued(command)
 
     -- if we're trying to upgrade hives then this allows us to force the upgrade to happen immediately
@@ -499,7 +433,7 @@ function OnCommandIssued(command)
 
         -- see if we can cap a structure
         if EntityCategoryContains(categoriesStructure, command.Blueprint) then
-            RingExtractor(command)
+            import("/lua/ui/game/commands/ring-extractor.lua").RingExtractor(command)
         end
 
         -- called when:
