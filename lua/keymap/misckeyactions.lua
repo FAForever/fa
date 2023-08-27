@@ -460,7 +460,6 @@ function findPriority(bpID)
         local d = string.format("categories.%s", layer)
 
         local priorities = string.format("{categories.%s, %s, %s, %s, %s}", bpID, a, b, c, d)
-        reprsl(priorities)
         return priorities
     else
         -- go to defaults, not sure what happened here but unit id is unknown
