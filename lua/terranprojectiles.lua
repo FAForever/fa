@@ -143,7 +143,7 @@ TDepthChargeProjectile = ClassProjectile(OnWaterEntryEmitterProjectile) {
 ---@class TDFGeneralGaussCannonProjectile : MultiPolyTrailProjectile
 TDFGeneralGaussCannonProjectile = ClassProjectile(MultiPolyTrailProjectile) {
     PolyTrails = EffectTemplate.TGaussCannonPolyTrail,
-    PolyTrailOffset = import("/lua/effecttemplates.lua").DefaultPolyTrailOffset2,
+    PolyTrailOffset = { 0, 0 },
     FxTrailOffset = 0,
 }
 
@@ -205,7 +205,7 @@ TDFBigLandGaussCannonProjectile = ClassProjectile(TDFGeneralGaussCannonProjectil
 THeavyPlasmaCannonProjectile = ClassProjectile(MultiPolyTrailProjectile) {
     FxTrails = EffectTemplate.TPlasmaCannonHeavyMunition,
     RandomPolyTrails = 1,
-    PolyTrailOffset = import("/lua/effecttemplates.lua").DefaultPolyTrailOffset3,
+    PolyTrailOffset = { 0, 0, 0 },
     PolyTrails = EffectTemplate.TPlasmaCannonHeavyPolyTrails,
     FxImpactUnit = EffectTemplate.TPlasmaCannonHeavyHitUnit01,
     FxImpactProp = EffectTemplate.TPlasmaCannonHeavyHitUnit01,
@@ -230,7 +230,7 @@ TIFSmallYieldNuclearBombProjectile = ClassProjectile(EmitterProjectile) {
 ---@class TLaserBotProjectile : MultiPolyTrailProjectile
 TLaserBotProjectile = ClassProjectile(MultiPolyTrailProjectile) {
     PolyTrails = EffectTemplate.TLaserPolytrail01,
-    PolyTrailOffset = import("/lua/effecttemplates.lua").DefaultPolyTrailOffset3,
+    PolyTrailOffset = { 0, 0, 0 },
     FxTrails = EffectTemplate.TLaserFxtrail01,
     FxImpactUnit = EffectTemplate.TLaserHitUnit02,
     FxImpactProp = EffectTemplate.TLaserHitUnit02,

@@ -89,8 +89,8 @@ local PhasonCollisionBeam2 = ClassWeapon(PhasonCollisionBeam) {
 
 local PhasonBeam = ClassWeapon(DefaultBeamWeapon) {
     BeamType = PhasonCollisionBeam,
-    FxMuzzleFlash = import("/lua/effecttemplates.lua").NoEffects,
-    FxChargeMuzzleFlash = import("/lua/effecttemplates.lua").NoEffects,
+    FxMuzzleFlash = { },
+    FxChargeMuzzleFlash = { },
     FxUpackingChargeEffects = EffectTemplate.CMicrowaveLaserCharge01,
     FxUpackingChargeEffectScale = 0.2,
 }

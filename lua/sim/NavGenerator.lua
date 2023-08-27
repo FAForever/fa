@@ -1433,7 +1433,7 @@ function Generate()
     NavLayerData = Shared.CreateEmptyNavLayerData()
 
     ---@type number
-    local MapSize = ScenarioInfo.size[1]
+    local MapSize = math.max(ScenarioInfo.size[1], ScenarioInfo.size[2])
 
     ---@type number
     local CompressionTreeSize = MapSize / LabelCompressionTreesPerAxis

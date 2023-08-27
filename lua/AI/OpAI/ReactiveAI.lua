@@ -93,7 +93,7 @@ ReactiveAI = Class(OpAI) {
         AirRetaliation = {
             ExperimentalAir = { 
                 OpAI = 'AirAttacks', 
-                Children = { 'AirSuperiority', 'FighterBombers', 'Interceptors', },
+                Children = { 'AirSuperiority', 'CombatFighters', 'Interceptors', },
                 Priority = 1200,
                 ChildCount = 4,
                 PlatoonAIFunction = { '/lua/ScenarioPlatoonAI.lua', 'CategoryHunterPlatoonAI' },
@@ -107,7 +107,7 @@ ReactiveAI = Class(OpAI) {
             },
             ExperimentalLand = { 
                 OpAI = 'AirAttacks', 
-                Children = { 'HeavyGunships', 'Gunships', 'Bombers', 'FighterBombers', },
+                Children = { 'HeavyGunships', 'Gunships', 'Bombers', 'CombatFighters', },
                 Priority = 1200,
                 ChildCount = 3,
                 PlatoonAIFunction = { '/lua/ScenarioPlatoonAI.lua', 'CategoryHunterPlatoonAI' },
@@ -163,7 +163,7 @@ ReactiveAI = Class(OpAI) {
            },
             MassedAir = { 
                 OpAI = 'AirAttacks', 
-                Children = { 'AirSuperiority', 'FighterBomber', 'Interceptors', },
+                Children = { 'AirSuperiority', 'CombatFighters', 'Interceptors', },
                 ChildCount = 4,
                 Priority = 1200,
                 PlatoonAIFunction = { '/lua/ScenarioPlatoonAI.lua', 'CategoryHunterPlatoonAI' },

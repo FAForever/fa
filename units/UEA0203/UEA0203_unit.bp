@@ -194,6 +194,9 @@ UnitBlueprint{
         AirClass = true,
         Class1Capacity = 1,
         ClassGenericUpTo = 2,
+        SlotsSmall = 1,
+        SlotsMedium = 1,
+        SlotsLarge = 0,
         TransportClass = 1,
     },
     Veteran = {

@@ -524,29 +524,48 @@ import("/lua/ui/game/gamemain.lua").ObserveSelection:AddObserver(
     'KeyActionHardMove'
 )
 
+LoadIntoTransports = function(clearCommands)
+    print("Load units into transports")
+    SimCallback({ Func = 'LoadIntoTransports', Args = { ClearCommands = clearCommands or false } }, true)
+end
+
 --- Distributes the orders of the unit in the selection that is closest to the mouse location
-DistributeOrders = function()
+DistributeOrders = function(clearCommands)
     local mouse = GetMouseWorldPos()
     local selection = GetSelectedUnits()
     if mouse[1] and mouse[3] and selection and (not table.empty(selection)) then
-        for k, unit in selection do
+
+        -- we only support distributing the orders of non-factory units. Factories
+        -- use separate orders that would make the logic of this function much
+        -- more complicated
+        local validUnits = EntityCategoryFilterOut(categories.FACTORY, selection)
+
+        if table.empty(validUnits) then
+            print("No orders to distribute")
+            return
+        end
+
+        -- find nearest unit
+        local nearestUnit = validUnits[1]
+        local shortestDistance = 4096 * 4096
+        for k, unit in validUnits do
             local position = unit:GetPosition()
             local dx = position[1] - mouse[1]
             local dz = position[3] - mouse[3]
-            unit.DistanceToMouse = dx * dx + dz * dz
+            local distance = dx * dx + dz * dz
+
+            if distance < shortestDistance then
+                nearestUnit = unit
+                shortestDistance = distance
+            end
         end
 
-        table.sort(selection,
-            function(a, b)
-                return a.DistanceToMouse < b.DistanceToMouse
-            end
-        )
-
-        local target = selection[1]
-        local orderCount = table.getn(target:GetCommandQueue())
-        if orderCount > 0 then
-            print(string.format("Distributing %d orders", orderCount))
-            SimCallback({ Func = 'DistributeOrders', Args = { target = target:GetEntityId() } }, true)
+        -- determine if there are orders to distribute
+        local queue = nearestUnit:GetCommandQueue()
+        local queueCount = table.getn(queue)
+        if queueCount > 0 then
+            print(string.format("Distributing orders"))
+            SimCallback({ Func = 'DistributeOrders', Args = { Target = nearestUnit:GetEntityId(), ClearCommands = clearCommands or false } }, true)
         else
             print("No orders to distribute")
         end
@@ -556,24 +575,24 @@ DistributeOrders = function()
 end
 
 --- Distributes the orders of the unit that the mouse is hovering over
-DistributeOrdersOfMouseContext = function()
+DistributeOrdersOfMouseContext = function(clearCommands)
     local target = GetRolloverInfo().userUnit
     if target then
         local orderCount = table.getn(target:GetCommandQueue())
         if orderCount > 0 then
-            print(string.format("Distributing %d orders", orderCount))
-            SimCallback({ Func = 'DistributeOrders', Args = { target = target:GetEntityId() } }, true)
+            print(string.format("Distributing orders", orderCount))
+            SimCallback({ Func = 'DistributeOrders', Args = { Target = target:GetEntityId() }, ClearCommands = clearCommands or false }, true)
         else
             print("No orders to distribute")
         end
     end
 end
 
-CopyOrders = function()
+CopyOrders = function(clearCommands)
     local info = GetRolloverInfo()
     if info.userUnit then
-        print("Copy orders")
-        SimCallback({ Func = 'CopyOrders', Args = { target = info.userUnit:GetEntityId() } }, true)
+        print("Copying orders")
+        SimCallback({ Func = 'CopyOrders', Args = { Target = info.userUnit:GetEntityId(), ClearCommands = clearCommands or false } }, true)
     else
         print("Can not copy orders")
     end
@@ -691,4 +710,13 @@ SelectAllBuildingEngineers = function(onscreen)
     end
 
     SelectUnits(units)
+end
+
+SelectExternalFactory = function()
+    local selection = GetSelectedUnits()
+    if selection then
+        local unit = selection[1]
+        reprsl(GetAttachedUnitsList(selection))
+        SelectUnits(GetAttachedUnitsList(selection))
+    end
 end

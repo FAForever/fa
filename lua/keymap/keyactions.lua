@@ -255,6 +255,14 @@ local keyActionsSelectionQuickSelect = {
         action = 'UI_SelectByCategory +nearest FACTORY',
         category = 'selection',
     },
+    ['select_all_mobile_factory_onscreen'] = {
+        action = 'UI_SelectByCategory +inview EXTERNALFACTORYUNIT',
+        category = 'selection',
+    },
+    ['select_nearest_mobile_factory'] = {
+        action = 'UI_SelectByCategory +nearest EXTERNALFACTORYUNIT',
+        category = 'selection',
+    },
     ['select_nearest_land_factory'] = {
         action = 'UI_SelectByCategory +nearest LAND FACTORY',
         category = 'selection',
@@ -1577,53 +1585,98 @@ local keyActionsOrders = {
         action = 'UI_Lua import("/lua/ui/game/orders.lua").Dock(false)',
         category = 'orders',
     },
+    ['load_transports'] = {
+        action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").LoadIntoTransports()',
+        category = 'orders',
+    },
+}
+
+local keyActionsOrdersAdvanced = {
+    ['load_transports'] = {
+        action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").LoadIntoTransports(false)',
+        category = 'ordersAdvanced',
+        wikiURL = 'Play/Game/Hotkeys/OrdersAdvanced#load-into-transports'
+    },
+    ['load_transports_clear'] = {
+        action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").LoadIntoTransports(true)',
+        category = 'ordersAdvanced',
+        wikiURL = 'Play/Game/Hotkeys/OrdersAdvanced#load-into-transports'
+    },
+    ['shift_load_transports'] = {
+        action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").LoadIntoTransports(false)',
+        category = 'ordersAdvanced',
+        wikiURL = 'Play/Game/Hotkeys/OrdersAdvanced#load-into-transports'
+    },
+    ['shift_load_transports_clear'] = {
+        action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").LoadIntoTransports(true)',
+        category = 'ordersAdvanced',
+        wikiURL = 'Play/Game/Hotkeys/OrdersAdvanced#load-into-transports'
+    },
+    ['filter_highest_engineer_and_assist'] = {
+        action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").SelectHighestEngineerAndAssist()',
+        category = 'ordersAdvanced',
+        wikiURL = 'Play/Game/Hotkeys/OrdersAdvanced#filter-engineers'
+    },
+    ['shift_filter_highest_engineer_and_assist'] = {
+        action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").SelectHighestEngineerAndAssist()',
+        category = 'ordersAdvanced',
+        wikiURL = 'Play/Game/Hotkeys/OrdersAdvanced#filter-engineers'
+    },
 }
 
 local keyActionsOrdersQueueBased = {
     ['distribute_orders'] = {
-        action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").DistributeOrders()',
+        action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").DistributeOrders(true)',
         category = 'ordersQueueBased',
+        wikiURL = 'Play/Game/Hotkeys/OrdersQueueManipulation#distribute-orders'
     },
     ['shift_distribute_orders'] = {
-        action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").DistributeOrders()',
+        action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").DistributeOrders(true)',
         category = 'ordersQueueBased',
+        wikiURL = 'Play/Game/Hotkeys/OrdersQueueManipulation#distribute-orders'
     },
     ['distribute_orders_context'] = {
-        action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").DistributeOrdersOfMouseContext()',
+        action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").DistributeOrdersOfMouseContext(true)',
         category = 'ordersQueueBased',
+        wikiURL = 'Play/Game/Hotkeys/OrdersQueueManipulation#distribute-orders'
     },
     ['shift_distribute_orders_context'] = {
-        action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").DistributeOrdersOfMouseContext()',
+        action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").DistributeOrdersOfMouseContext(true)',
         category = 'ordersQueueBased',
+        wikiURL = 'Play/Game/Hotkeys/OrdersQueueManipulation#distribute-orders'
+    },
+    ['copy_orders'] = {
+        action = 'UI_LUA import("/lua/keymap/misckeyactions.lua").CopyOrders()',
+        category = 'ordersQueueBased',
+        wikiURL = 'Play/Game/Hotkeys/OrdersQueueManipulation#copy-orders'
+    },
+    ['shift_copy_orders'] = {
+        action = 'UI_LUA import("/lua/keymap/misckeyactions.lua").CopyOrders()',
+        category = 'ordersQueueBased',
+        wikiURL = 'Play/Game/Hotkeys/OrdersQueueManipulation#copy-orders'
     },
 }
 
 local keyactionsOrdersContextBased = {
-    ['filter_highest_engineer_and_assist'] = {
-        action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").SelectHighestEngineerAndAssist()',
+    ['cycle_context_based_templates'] = {
+        action = 'UI_Lua import("/lua/ui/game/commands/context-based-templates.lua").Cycle()',
         category = 'ordersContextBased',
+        wikiURL = 'Play/Game/Hotkeys/OrdersMouseContext#cycle-templates'
     },
     ['shift_cycle_context_based_templates'] = {
         action = 'UI_Lua import("/lua/ui/game/commands/context-based-templates.lua").Cycle()',
         category = 'ordersContextBased',
-    },
-    ['cycle_context_based_templates'] = {
-        action = 'UI_Lua import("/lua/ui/game/commands/context-based-templates.lua").Cycle()',
-        category = 'ordersContextBased',
+        wikiURL = 'Play/Game/Hotkeys/OrdersMouseContext#cycle-templates'
     },
     ['set_target_priority'] = {
         action = 'UI_LUA import("/lua/keymap/misckeyactions.lua").SetWeaponPrioritiesToUnitType()',
         category = 'ordersContextBased',
+        wikiURL = 'Play/Game/Hotkeys/OrdersMouseContext#cycle-templates'
     },
-
-    ['copy_orders'] = {
-        action = 'UI_LUA import("/lua/keymap/misckeyactions.lua").CopyOrders()',
+    ['shift_set_target_priority'] = {
+        action = 'UI_LUA import("/lua/keymap/misckeyactions.lua").SetWeaponPrioritiesToUnitType()',
         category = 'ordersContextBased',
-    },
-
-    ['shift_copy_orders'] = {
-        action = 'UI_LUA import("/lua/keymap/misckeyactions.lua").CopyOrders()',
-        category = 'ordersContextBased',
+        wikiURL = 'Play/Game/Hotkeys/OrdersMouseContext#cycle-templates'
     },
 }
 
@@ -1843,6 +1896,7 @@ keyActions = table.combine(
     keyActionsHotBuildAlternative,
     keyActionsHotBuildExtra,
     keyActionsOrders,
+    keyActionsOrdersAdvanced,
     keyActionsOrdersQueueBased,
     keyactionsOrdersContextBased,
     keyActionsGame,

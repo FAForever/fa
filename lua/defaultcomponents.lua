@@ -1,4 +1,5 @@
 local Buff = import("/lua/sim/buff.lua")
+local Entity = import("/lua/sim/Entity.lua").Entity
 
 ---@class ShieldEffectsComponent : Unit
 ---@field Trash TrashBag
@@ -812,4 +813,91 @@ VeterancyComponent = ClassSimple {
         -- Allow units to count for more or less than their real mass if needed
         return fractionComplete * unitMass * vetMult + cargoMass
     end,
+}
+
+---@class ExternalFactoryComponent
+---@field ExternalFactory ExternalFactoryUnit
+ExternalFactoryComponent = ClassSimple {
+
+    FactoryAttachBone = false,
+
+    ---@param self Unit | ExternalFactoryComponent
+    OnStopBeingBuilt = function(self, builder, layer)
+        local blueprint = self.Blueprint
+        if not self.FactoryAttachBone then
+            error(string.format("%s is not setup for an external factory: the unit does not have a field 'FactoryAttachBone'", blueprint.BlueprintId))
+        end
+
+        if not blueprint.CategoriesHash['EXTERNALFACTORY'] then
+            error(string.format("%s is not setup for an external factory: the unit does not have a 'EXTERNALFACTORY' category", blueprint.BlueprintId))
+        end
+
+        local blueprintIdExternalFactory = blueprint.BlueprintId .. 'ef'
+        if not __blueprints[blueprintIdExternalFactory] then
+            error(string.format("%s is not setup for an external factory: the external factory blueprint is not setup", blueprint.BlueprintId))
+        end
+
+        -- create the factory somewhere completely unrelated
+        local position = self:GetPosition(self.FactoryAttachBone)
+
+        -- we need to put an entity in between so that we can always click-select the 
+        -- factory. The 'CARRIER' category can prevent us from clicking on attached units
+        local entity = Entity({Owner = self})
+        self.Trash:Add(entity)
+        entity:AttachTo(self, self.FactoryAttachBone)
+
+        self.ExternalFactory = CreateUnitHPR(blueprintIdExternalFactory, self.Army, position[1], position[2], position[3], 0, 0, 0) --[[@as ExternalFactoryUnit]]
+        self.ExternalFactory:AttachTo(entity, -1)
+        self.ExternalFactory:SetCreator(self)
+        self.ExternalFactory:SetParent(self)
+        self.Trash:Add(self.ExternalFactory)
+    end,
+
+    ---@param self Unit | ExternalFactoryComponent
+    OnPaused = function(self)
+        if self.ExternalFactory then
+            self.ExternalFactory:SetPaused(true)
+        end
+    end,
+
+    ---@param self Unit | ExternalFactoryComponent
+    OnUnpaused = function(self)
+        if self.ExternalFactory then
+            self.ExternalFactory:SetPaused(false)
+        end
+    end,
+
+    ---@param self Unit | ExternalFactoryComponent
+    OnIdle = function(self)
+        if self.ExternalFactory and (not IsDestroyed(self.ExternalFactory)) then
+            self.ExternalFactory:SetBusy(false)
+            self.ExternalFactory:SetBlockCommandQueue(false)
+        end
+    end,
+
+    ---@param self Unit | ExternalFactoryComponent
+    ---@param new Layer
+    ---@param old Layer
+    OnLayerChange = function(self, new, old)
+        if self.ExternalFactory then
+            if new == 'Land' then
+                self.ExternalFactory:RestoreBuildRestrictions()
+                self.ExternalFactory:RequestRefreshUI()
+            elseif new == 'Seabed' then
+                self.ExternalFactory:AddBuildRestriction(categories.ALLUNITS)
+                self.ExternalFactory:RequestRefreshUI()
+
+                IssueClearCommands({self.ExternalFactory})
+            end
+        end
+    end,
+
+    OnKilled = function(self, instigator, type, overkillRatio)
+        if not IsDestroyed(self.ExternalFactory) then
+            self.ExternalFactory:SetBusy(true)
+            self.ExternalFactory:SetBlockCommandQueue(true)
+            self.ExternalFactory:Kill()
+        end
+    end,
+
 }

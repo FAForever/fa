@@ -2033,53 +2033,116 @@ technique TerrainPBR <
     }
 }
 
+// ----------------------------------------------------------------------------
+//#region Terrain001 and Terrain002
+
+// Layer| Albedo stratum                                               | Normal stratum
+//      | R           | G             | B            | A               | R             | G             | B             | A            |
+//  ----            ---             ---             ---              ---             ---             ---             ---            ---
+// | L  | R             G               B              unused          | X               Y               Z               unused       |
+//  ----            ---             ---             ---              ---             ---             ---             ---            ---
+// | S0 | R             G               B              unused          | X               Y               Z               unused       |
+// | S1 | R             G               B              unused          | X               Y               Z               unused       |
+// | S2 | R             G               B              unused          | X               Y               Z               unused       |
+// | S3 | R             G               B              unused          | X               Y               Z               unused       |
+//  ----            ---             ---            ---               ---             ---             ---             ---            ---
+// | S4 | R             G               B              unused          | X               Y               Z               unused       |
+// | S5 | R             G               B              unused          | X               Y               Z               unused       |
+// | S6 | R             G               B              unused          | X               Y               Z               unused       |
+// | S7 | R             G               B              unused          | X               Y               Z               unused       |
+//  ----            ---             ---             ---              ---             ---             ---             ---            ---
+// | U  | normal.x      normal.z        unused         shadow  | 
+
+// Terrain001 and Terrain002 are similar to the usual TTerrainXP shader. They
+// are designed as a drop-in replacement that solely introduce the map-wide
+// normals and map-wide shadows
+
+// Terrain002 fixes the normals interpreting the masks different than albedo,
+// for this shader the normals also start reading at a value of 128 (0%) up to
+// 255 (100%). We choose to keep it instead of fixing the range as all editors
+// assume the values to range from 128 to 255
+
 float4 Terrain002NormalsPS( VS_OUTPUT pixel ) : COLOR
 {
-    float4 mask0 = saturate(tex2D(UtilitySamplerA,pixel.mTexWT*TerrainScale) * 2 - 1);
-    float4 mask1 = saturate(tex2D(UtilitySamplerB,pixel.mTexWT*TerrainScale) * 2 - 1);
+    float2 coordinates = pixel.mTexWT * TerrainScale;
 
-    float4 lowerNormal    = normalize(tex2D(LowerNormalSampler,    pixel.mTexWT * TerrainScale * LowerNormalTile)    * 2 - 1);
-    float4 stratum0Normal = normalize(tex2D(Stratum0NormalSampler, pixel.mTexWT * TerrainScale * Stratum0NormalTile) * 2 - 1);
-    float4 stratum1Normal = normalize(tex2D(Stratum1NormalSampler, pixel.mTexWT * TerrainScale * Stratum1NormalTile) * 2 - 1);
-    float4 stratum2Normal = normalize(tex2D(Stratum2NormalSampler, pixel.mTexWT * TerrainScale * Stratum2NormalTile) * 2 - 1);
-    float4 stratum3Normal = normalize(tex2D(Stratum3NormalSampler, pixel.mTexWT * TerrainScale * Stratum3NormalTile) * 2 - 1);
-    float4 stratum4Normal = normalize(tex2D(Stratum4NormalSampler, pixel.mTexWT * TerrainScale * Stratum4NormalTile) * 2 - 1);
-    float4 stratum5Normal = normalize(tex2D(Stratum5NormalSampler, pixel.mTexWT * TerrainScale * Stratum5NormalTile) * 2 - 1);
-    float4 stratum6Normal = normalize(tex2D(Stratum6NormalSampler, pixel.mTexWT * TerrainScale * Stratum6NormalTile) * 2 - 1);
-    float4 stratum7Normal = normalize(tex2D(Stratum7NormalSampler, pixel.mTexWT * TerrainScale * Stratum7NormalTile) * 2 - 1);
+    // - x = stratum layer 0
+    // - y = stratum layer 1
+    // - z = stratum layer 2
+    // - w = stratum layer 3
+    float4 mask0 = saturate(tex2D(UtilitySamplerA, coordinates) * 2 - 1);
 
+    // - x = stratum layer 4
+    // - y = stratum layer 5
+    // - z = stratum layer 6
+    // - w = stratum layer 7
+    float4 mask1 = saturate(tex2D(UtilitySamplerB, coordinates) * 2 - 1);
+
+    // these normals are pre-baked on top of the terrain
+    float4 lowerNormal    = normalize(tex2D(LowerNormalSampler,    coordinates * LowerNormalTile.xx)    * 2 - 1);
+    float4 stratum0Normal = normalize(tex2D(Stratum0NormalSampler, coordinates * Stratum0NormalTile.xx) * 2 - 1);
+    float4 stratum1Normal = normalize(tex2D(Stratum1NormalSampler, coordinates * Stratum1NormalTile.xx) * 2 - 1);
+    float4 stratum2Normal = normalize(tex2D(Stratum2NormalSampler, coordinates * Stratum2NormalTile.xx) * 2 - 1);
+    float4 stratum3Normal = normalize(tex2D(Stratum3NormalSampler, coordinates * Stratum3NormalTile.xx) * 2 - 1);
+    float4 stratum4Normal = normalize(tex2D(Stratum4NormalSampler, coordinates * Stratum4NormalTile.xx) * 2 - 1);
+    float4 stratum5Normal = normalize(tex2D(Stratum5NormalSampler, coordinates * Stratum5NormalTile.xx) * 2 - 1);
+    float4 stratum6Normal = normalize(tex2D(Stratum6NormalSampler, coordinates * Stratum6NormalTile.xx) * 2 - 1);
+    float4 stratum7Normal = normalize(tex2D(Stratum7NormalSampler, coordinates * Stratum7NormalTile.xx) * 2 - 1);
+
+    // blend the normals
     float4 normal = lowerNormal;
-    normal = lerp(normal,stratum0Normal,mask0.x);
-    normal = lerp(normal,stratum1Normal,mask0.y);
-    normal = lerp(normal,stratum2Normal,mask0.z);
-    normal = lerp(normal,stratum3Normal,mask0.w);
-    normal = lerp(normal,stratum4Normal,mask1.x);
-    normal = lerp(normal,stratum5Normal,mask1.y);
-    normal = lerp(normal,stratum6Normal,mask1.z);
-    normal = lerp(normal,stratum7Normal,mask1.w);
-    normal.xyz = normalize( normal.xyz );
+    normal = normalize(lerp(normal,stratum0Normal,mask0.x));
+    normal = normalize(lerp(normal,stratum1Normal,mask0.y));
+    normal = normalize(lerp(normal,stratum2Normal,mask0.z));
+    normal = normalize(lerp(normal,stratum3Normal,mask0.w));
+    normal = normalize(lerp(normal,stratum4Normal,mask1.x));
+    normal = normalize(lerp(normal,stratum5Normal,mask1.y));
+    normal = normalize(lerp(normal,stratum6Normal,mask1.z));
+    normal = normalize(lerp(normal,stratum7Normal,mask1.w));
 
     return float4( (normal.xyz * 0.5 + 0.5) , normal.w);
 }
 
 float4 Terrain001AlbedoPS ( VS_OUTPUT inV) : COLOR
 {
-    float4 position = TerrainScale * inV.mTexWT;
+    float4 coordinates = TerrainScale * inV.mTexWT;
 
-    float4 mask0 = saturate(tex2Dproj(UtilitySamplerA,position)*2-1);
-    float4 mask1 = saturate(tex2Dproj(UtilitySamplerB,position)*2-1);
-    float4 utility = tex2D(UpperAlbedoSampler, position.xy);
+    // - x = stratum layer 0
+    // - y = stratum layer 1
+    // - z = stratum layer 2
+    // - w = stratum layer 3
+    float4 mask0 = saturate(tex2Dproj(UtilitySamplerA,coordinates)*2-1);
 
-    float4 lowerAlbedo = tex2Dproj(LowerAlbedoSampler,position*LowerAlbedoTile);
-    float4 stratum0Albedo = tex2Dproj(Stratum0AlbedoSampler,position*Stratum0AlbedoTile);
-    float4 stratum1Albedo = tex2Dproj(Stratum1AlbedoSampler,position*Stratum1AlbedoTile);
-    float4 stratum2Albedo = tex2Dproj(Stratum2AlbedoSampler,position*Stratum2AlbedoTile);
-    float4 stratum3Albedo = tex2Dproj(Stratum3AlbedoSampler,position*Stratum3AlbedoTile);
-    float4 stratum4Albedo = tex2Dproj(Stratum4AlbedoSampler,position*Stratum4AlbedoTile);
-    float4 stratum5Albedo = tex2Dproj(Stratum5AlbedoSampler,position*Stratum5AlbedoTile);
-    float4 stratum6Albedo = tex2Dproj(Stratum6AlbedoSampler,position*Stratum6AlbedoTile);
-    float4 stratum7Albedo = tex2Dproj(Stratum7AlbedoSampler,position*Stratum7AlbedoTile);
+    // - x = stratum layer 4
+    // - y = stratum layer 5
+    // - z = stratum layer 6
+    // - w = stratum layer 7
+    float4 mask1 = saturate(tex2Dproj(UtilitySamplerB,coordinates)*2-1);
 
+    // x = normals-x
+    // y = normals-z
+    // z = unused
+    // w = shadows
+    float4 utility = tex2D(UpperAlbedoSampler, coordinates.xy);
+    float mapShadow = utility.w;
+
+    // disable shadows when game settings tell us to
+    if (0 == ShadowsEnabled) {
+        mapShadow = 1.0f;
+    }
+
+    // sample the albedo's
+    float4 lowerAlbedo    = tex2Dproj(LowerAlbedoSampler,    coordinates * LowerAlbedoTile);
+    float4 stratum0Albedo = tex2Dproj(Stratum0AlbedoSampler, coordinates * Stratum0AlbedoTile);
+    float4 stratum1Albedo = tex2Dproj(Stratum1AlbedoSampler, coordinates * Stratum1AlbedoTile);
+    float4 stratum2Albedo = tex2Dproj(Stratum2AlbedoSampler, coordinates * Stratum2AlbedoTile);
+    float4 stratum3Albedo = tex2Dproj(Stratum3AlbedoSampler, coordinates * Stratum3AlbedoTile);
+    float4 stratum4Albedo = tex2Dproj(Stratum4AlbedoSampler, coordinates * Stratum4AlbedoTile);
+    float4 stratum5Albedo = tex2Dproj(Stratum5AlbedoSampler, coordinates * Stratum5AlbedoTile);
+    float4 stratum6Albedo = tex2Dproj(Stratum6AlbedoSampler, coordinates * Stratum6AlbedoTile);
+    float4 stratum7Albedo = tex2Dproj(Stratum7AlbedoSampler, coordinates * Stratum7AlbedoTile);
+
+    // blend the albedo
     float4 albedo = lowerAlbedo;
     albedo = lerp(albedo,stratum0Albedo,mask0.x);
     albedo = lerp(albedo,stratum1Albedo,mask0.y);
@@ -2089,25 +2152,29 @@ float4 Terrain001AlbedoPS ( VS_OUTPUT inV) : COLOR
     albedo = lerp(albedo,stratum5Albedo,mask1.y);
     albedo = lerp(albedo,stratum6Albedo,mask1.z);
     albedo = lerp(albedo,stratum7Albedo,mask1.w);
-    albedo.rgb *= utility.w * 2;
 
-    float3 normal = normalize(2 * SampleScreen(NormalSampler,inV.mTexSS).xyz - 1);
-
-    float3 r = reflect(normalize(inV.mViewDirection), normal);
-    float3 specular = pow(saturate(dot(r, SunDirection)),80) * albedo.aaa * SpecularColor.a * SpecularColor.rgb;
-
-    float dotSunNormal = dot(SunDirection, normal);
-
-    float mapShadow = 1 - utility.z; // 1 where sun is, 0 where shadow is
+    // compute the shadows, combining the baked and dynamic shadows
     float shadow = tex2D(ShadowSampler, inV.mShadow.xy).g; // 1 where sun is, 0 where shadow is
     shadow = shadow * mapShadow;
 
+    // normalize the pre-computed normal
+    float3 normal = normalize(2 * SampleScreen(NormalSampler,inV.mTexSS).xyz - 1);
+
+    // compute specular
+    float3 r = reflect(normalize(inV.mViewDirection), normal);
+    float3 specular = pow(saturate(dot(r, SunDirection)),80) * albedo.aaa * SpecularColor.a * SpecularColor.rgb;
+
+    // compute lighting
+    float dotSunNormal = max(0, dot(SunDirection, normal));
+
+    // combine everything
     float3 light = SunColor * saturate(dotSunNormal) * shadow + SunAmbience;
     light = LightingMultiplier * light + ShadowFillColor * (1 - light);
     albedo.rgb = light * (albedo.rgb + specular.rgb);
 
-    float waterDepth = tex2Dproj(UtilitySamplerC, position).g;
-    albedo.rgb = ApplyWaterColorExponentially(-inV.mViewDirection, waterDepth, albedo.rgb);
+    // compute water ramp intensity
+    float waterDepth = tex2Dproj(UtilitySamplerC, coordinates).g;
+    albedo.rgb = ApplyWaterColorExponentially(-1 * inV.mViewDirection, waterDepth, albedo.rgb);
 
     return float4(albedo.rgb, 0.01f);
 }
@@ -2159,6 +2226,8 @@ technique Terrain002 <
     }
 }
 
+//#endregion
+
 // ----------------------------------------------------------------------------
 //#region Terrain003
 
@@ -2177,7 +2246,7 @@ technique Terrain002 <
 // | S6 | R             G               B              unused          | X               Y               Z               unused       |
 // | S7 | albedo.r      albedo.g        albedo.b       transparency    | specular        unused          unused          unused       |
 //  ----            ---             ---             ---              ---             ---             ---             ---            ---
-// | U  | normal.x      normal.z        shadow         unused  | 
+// | U  | normal.x      normal.z        unused         shadow  | 
 
 float4 UDNBlending(float4 n1, float4 n2, float factor) {
     n2.xy *= factor;
@@ -2197,7 +2266,7 @@ float4 Terrain003NormalsPS( VS_OUTPUT pixel ) : COLOR
     // - x = stratum layer 4
     // - y = stratum layer 5
     // - z = stratum layer 6
-    // - w = stratum layer 7
+    // - w = unused
     float4 mask1 = saturate(tex2D(UtilitySamplerB, coordinates) * 2 - 1);
 
     // these normals are pre-baked on top of the terrain
@@ -2209,7 +2278,6 @@ float4 Terrain003NormalsPS( VS_OUTPUT pixel ) : COLOR
     float4 stratum4Normal = normalize(tex2D(Stratum4NormalSampler, coordinates * Stratum4NormalTile.xx) * 2 - 1);
     float4 stratum5Normal = normalize(tex2D(Stratum5NormalSampler, coordinates * Stratum5NormalTile.xx) * 2 - 1);
     float4 stratum6Normal = normalize(tex2D(Stratum6NormalSampler, coordinates * Stratum6NormalTile.xx) * 2 - 1);
-    // float4 stratum7Normal = normalize(tex2D(Stratum7NormalSampler, coordinates * Stratum7NormalTile.xx) * 2 - 1);
 
     // blend the normals
     float4 normal = base;
@@ -2220,10 +2288,8 @@ float4 Terrain003NormalsPS( VS_OUTPUT pixel ) : COLOR
     normal = UDNBlending(normal,stratum4Normal,mask1.x);
     normal = UDNBlending(normal,stratum5Normal,mask1.y);
     normal = UDNBlending(normal,stratum6Normal,mask1.z);
-    // normal = lerp(normal,stratum7Normal,mask1.w);
-    normal.xyz = normalize( normal.xyz ); 
 
-    return float4( (normal.xyz * 0.5 + 0.5) , 0);
+    return float4( (normal.xyz * 0.5 + 0.5) , normal.w);
 }
 
 float4 Terrain003AlbedoPS ( VS_OUTPUT inV) : COLOR
@@ -2242,14 +2308,22 @@ float4 Terrain003AlbedoPS ( VS_OUTPUT inV) : COLOR
     // w = ??
     float4 mask1 = saturate(tex2D(UtilitySamplerB, coordinates) * 2 - 1);
 
-    // x = shadows
-    // y = normals-x
-    // z = normals-z
-    // w = ?
+    // x = normals-x
+    // y = normals-z
+    // z = unused
+    // w = shadows
     float4 utility01 = tex2D(UpperAlbedoSampler, coordinates.xy);
-    float mapShadow = utility01.r;
+    float mapShadow = utility01.w;
+
+    // disable shadows when game settings tell us to
+    if (0 == ShadowsEnabled) {
+        mapShadow = 1.0f;
+    }
 
     // x = specular
+    // y = unused
+    // z = unused
+    // w = unused
     float4 utility03 = tex2D(Stratum7NormalSampler, coordinates.xy);
     float mapSpecular = utility03.r;
 
@@ -2272,8 +2346,9 @@ float4 Terrain003AlbedoPS ( VS_OUTPUT inV) : COLOR
     albedo = lerp(albedo, stratum3Albedo, mask0.w);
     albedo = lerp(albedo, stratum4Albedo, mask1.x);
     albedo = lerp(albedo, stratum5Albedo, mask1.y);
-    // albedo = lerp(albedo, stratum6Albedo, mask1.z);
-    albedo = lerp(albedo, stratum7Albedo, 0.75 * stratum7Albedo.w);
+
+    // blend map-wide albedo
+    albedo = lerp(albedo, stratum7Albedo, stratum7Albedo.w);
 
     // compute the shadows, combining the baked and dynamic shadows
     float shadow = tex2D(ShadowSampler, inV.mShadow.xy).g; 
@@ -2284,17 +2359,17 @@ float4 Terrain003AlbedoPS ( VS_OUTPUT inV) : COLOR
 
     // compute specular
     float3 r = reflect(normalize(inV.mViewDirection), normal);
-    float3 specular = pow(saturate(dot(r, SunDirection)),20) * mapSpecular * stratum7Albedo.w * shadow * SunColor;
+    float3 specular = pow(saturate(dot(r, SunDirection)), 20) * mapSpecular * stratum7Albedo.w * shadow * SunColor;
 
     // compute lighting
-    float dotSunNormal = dot(SunDirection, normal);
+    float dotSunNormal = max(0, dot(SunDirection, normal));
 
     // combine everything
     float3 light = SunColor * saturate(dotSunNormal) * shadow + SunAmbience;
     light = LightingMultiplier * light + ShadowFillColor * (1 - light);
     albedo.rgb = light * (albedo.rgb + specular.rgb);
 
-    // compute water
+    // compute water ramp intensity
     float waterDepth = tex2D(UtilitySamplerC, coordinates).g;
     albedo.rgb = ApplyWaterColorExponentially(-1 * inV.mViewDirection, waterDepth, albedo.rgb);
 
