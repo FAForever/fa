@@ -97,8 +97,8 @@ UnitBlueprint{
         BuildTime = 600,
     },
     Footprint = {
-        SizeX = 2,
-        SizeZ = 6,
+        SizeX = 3,
+        SizeZ = 3,
     },
     General = {
         CommandCaps = {
