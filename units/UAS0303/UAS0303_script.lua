@@ -9,8 +9,12 @@ local WeaponsFile = import("/lua/aeonweapons.lua")
 local AAAZealotMissileWeapon = WeaponsFile.AAAZealotMissileWeapon
 local AAMWillOWisp = WeaponsFile.AAMWillOWisp
 
----@class UAS0303 : AircraftCarrier
-UAS0303 = ClassUnit(AircraftCarrier) {
+local ExternalFactoryComponent = import("/lua/defaultcomponents.lua").ExternalFactoryComponent
+
+---@class UAS0303 : AircraftCarrier, ExternalFactoryComponent
+UAS0303 = ClassUnit(AircraftCarrier, ExternalFactoryComponent) {
+
+    FactoryAttachBone = 'ExternalFactoryPoint',
 
     Weapons = {
         AntiAirMissiles01 = ClassWeapon(AAAZealotMissileWeapon) {},
@@ -20,8 +24,9 @@ UAS0303 = ClassUnit(AircraftCarrier) {
 
     BuildAttachBone = 'UAS0303',
 
-    OnStopBeingBuilt = function(self,builder,layer)
-        AircraftCarrier.OnStopBeingBuilt(self,builder,layer)
+    OnStopBeingBuilt = function(self, builder, layer)
+        AircraftCarrier.OnStopBeingBuilt(self, builder, layer)
+        ExternalFactoryComponent.OnStopBeingBuilt(self, builder, layer)
         ChangeState(self, self.IdleState)
     end,
 
@@ -30,10 +35,25 @@ UAS0303 = ClassUnit(AircraftCarrier) {
         ChangeState(self, self.IdleState)
     end,
 
+    OnPaused = function(self)
+        AircraftCarrier.OnPaused(self)
+        ExternalFactoryComponent.OnPaused(self)
+    end,
+
+    OnUnpaused = function(self)
+        AircraftCarrier.OnUnpaused(self)
+        ExternalFactoryComponent.OnUnpaused(self)
+    end,
+
+    OnLayerChange = function(self, new, old)
+        AircraftCarrier.OnLayerChange(self, new, old)
+    end,
+
     IdleState = State {
         Main = function(self)
             self:DetachAll(self.BuildAttachBone)
             self:SetBusy(false)
+            self:OnIdle()
         end,
 
         OnStartBuild = function(self, unitBuilding, order)
@@ -45,10 +65,12 @@ UAS0303 = ClassUnit(AircraftCarrier) {
 
     BuildingState = State {
         Main = function(self)
+            ---@type Unit
             local unitBuilding = self.UnitBeingBuilt
             self:SetBusy(true)
             local bone = self.BuildAttachBone
             self:DetachAll(bone)
+            unitBuilding:AttachTo(self, bone)
             unitBuilding:HideBone(0, true)
             self.UnitDoneBeingBuilt = false
         end,
@@ -68,9 +90,9 @@ UAS0303 = ClassUnit(AircraftCarrier) {
             if self:TransportHasAvailableStorage() then
                 self:AddUnitToStorage(unitBuilding)
             else
-                local worldPos = self:CalculateWorldPositionFromRelative({0, 0, -20})
-                IssueMoveOffFactory({unitBuilding}, worldPos)
-                unitBuilding:ShowBone(0,true)
+                local worldPos = self:CalculateWorldPositionFromRelative({ 0, 0, -20 })
+                IssueMoveOffFactory({ unitBuilding }, worldPos)
+                unitBuilding:ShowBone(0, true)
             end
             self:SetBusy(false)
             self:RequestRefreshUI()
@@ -80,4 +102,3 @@ UAS0303 = ClassUnit(AircraftCarrier) {
 }
 
 TypeClass = UAS0303
-

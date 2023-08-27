@@ -58,6 +58,7 @@ UnitBlueprint{
         "SNIPEMODE",
         "UEF",
         "VISIBLETORECON",
+        "EXTERNALFACTORY",
     },
     Defense = {
         AirThreatLevel = 11,

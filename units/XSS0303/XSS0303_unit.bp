@@ -35,6 +35,7 @@ UnitBlueprint{
         "SHOWQUEUE",
         "TECH3",
         "VISIBLETORECON",
+        "EXTERNALFACTORY",
     },
     Defense = {
         AirThreatLevel = 48,
