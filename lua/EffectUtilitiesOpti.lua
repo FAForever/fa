@@ -55,7 +55,7 @@ local CybranBuildBotBeams = {
 --- Creates the build drones for the (cybran) builder in question. Expects
 --- the builder.BuildBotTotal value to be set.
 ---@param builder Unit A Cybran builder such as an engineer, hive or commander
-function SpawnBuildBots(builder)
+function SpawnBuildBots(builder, botBlueprintId, botBone)
 
     -- kill potential return thread
     if builder.ReturnBotsThreadInstance then
@@ -76,7 +76,7 @@ function SpawnBuildBots(builder)
     end
 
     -- get information about the builder
-    local x, y, z = EntityGetPositionXYZ(builder)
+    local x, y, z = EntityGetPositionXYZ(builder, botBone or -1)
     y = y + 0.1
     local qx, qy, qz, qw = unpack(EntityGetOrientation(builder))
 
@@ -99,7 +99,7 @@ function SpawnBuildBots(builder)
             zVec = MathSqrt(1 - xVec*xVec)
 
             -- make the bot
-            local botBlueprint = CybranBuildBotBlueprints[k] or 'ura0001o'
+            local botBlueprint = botBlueprintId or CybranBuildBotBlueprints[k] or 'ura0001o'
             bot = CreateUnit(botBlueprint, builderArmy, x + xVec * vecMul, y, z + zVec * vecMul, qx, qy, qz, qw, 'Air')
 
             -- make build bots unkillable

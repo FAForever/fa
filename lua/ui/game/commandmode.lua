@@ -433,7 +433,7 @@ function OnCommandIssued(command)
 
         -- see if we can cap a structure
         if EntityCategoryContains(categoriesStructure, command.Blueprint) then
-            import("/lua/ui/game/commands/ring-extractor.lua").RingExtractor(command)
+            import("/lua/ui/game/hotkeys/ring-extractor.lua").RingExtractor(command)
         end
 
         -- called when:
