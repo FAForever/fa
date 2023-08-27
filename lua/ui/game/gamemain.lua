@@ -188,6 +188,9 @@ function CreateUI(isReplay)
     ConExecute("ren_ClipDecalLevel 4")          -- standard value of 2, causes a lot of clipping
     ConExecute("ren_DecalFadeFraction 0.25")    -- standard value of 0.5, causes decals to suddenly pop into screen
 
+    -- always try and render shadows
+    ConExecute("ren_ShadowLOD 20000")
+
     -- enable experimental graphics
     if  Prefs.GetFromCurrentProfile('options.fidelity') >= 2 and
         Prefs.GetFromCurrentProfile('options.experimental_graphics') == 1
@@ -200,7 +203,6 @@ function CreateUI(isReplay)
             end
 
             if Prefs.GetFromCurrentProfile('options.shadow_quality') == 3 then
-                ConExecute("ren_ShadowLOD 1024")
                 ConExecute("ren_ShadowSize 2048")
             end
         end)
@@ -867,7 +869,6 @@ end
 -- Given an UserUnit that is adjacent to a given blueprint, does it yield a
 -- bonus? Used by the UI to draw extra info
 function OnDetectAdjacencyBonus(userUnit, otherBp)
-    -- fixme: todo
     return true
 end
 

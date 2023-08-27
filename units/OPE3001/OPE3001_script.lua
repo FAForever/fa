@@ -12,9 +12,9 @@ local TWallStructureUnit = import("/lua/terranunits.lua").TWallStructureUnit
 
 ---@class OPE3001 : TWallStructureUnit
 OPE3001 = ClassUnit(TWallStructureUnit) {
-    FxDamage1 = import("/lua/effecttemplates.lua").NoEffects,
-    FxDamage2 = import("/lua/effecttemplates.lua").NoEffects,
-    FxDamage3 = import("/lua/effecttemplates.lua").NoEffects,
+    FxDamage1 = { },
+    FxDamage2 = { },
+    FxDamage3 = { },
 }
 
 TypeClass = OPE3001

@@ -581,12 +581,9 @@ AIBrain = Class(StandardBrain) {
             position[1] = position[1] / TableGetn(factories)
             position[3] = position[3] / TableGetn(factories)
             if not rallyLoc and not location.UseCenterPoint then
-                local pnt
-                if not markerType then
-                    pnt = AIUtils.AIGetClosestMarkerLocation(self, 'Rally Point', position[1], position[3])
-                else
-                    pnt = AIUtils.AIGetClosestMarkerLocation(self, markerType, position[1], position[3])
-                end
+                -- Get the specified marker type, or fall back to the default 'Rally Point'
+                local pnt = AIUtils.AIGetClosestMarkerLocation(self, markerType, position[1], position[3]) or AIUtils.AIGetClosestMarkerLocation(self, 'Rally Point', position[1], position[3])
+                
                 if pnt and TableGetn(pnt) == 3 then
                     rally = Vector(pnt[1], pnt[2], pnt[3])
                 end

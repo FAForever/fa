@@ -44,6 +44,7 @@ UnitBlueprint{
         "SHOWQUEUE",
         "TECH3",
         "VISIBLETORECON",
+        "EXTERNALFACTORY",
     },
     Defense = {
         AirThreatLevel = 64,
@@ -125,7 +126,7 @@ UnitBlueprint{
     Economy = {
         BuildCostEnergy = 36000,
         BuildCostMass = 3600,
-        BuildRate = 180,
+        BuildRate = 120,
         BuildTime = 10800,
         BuildableCategory = {
             "BUILTBYTIER3FACTORY CYBRAN MOBILE AIR ANTINAVY",

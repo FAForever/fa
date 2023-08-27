@@ -1,50 +1,84 @@
-# Game version 3761 (27th of June, 2023)
+# Game version 3764 (29th of July, 2023)
 
+See the patch notes of 3762 and 3758 for the full patch notes.
 
-The main objective of this patch is to enhance the viability of a diverse range of strategies by 
-boosting raiding capabilities, balancing overpowered units, and introducing novel ways to utilize 
-existing units.
+With thanks to all those that took the time to report issues and participate in feedback sessions,
 
-This changelog is just a snippet of the total changelog. In this balance update, more than a hundred
-units have been tweaked in some fashion. You can read the complete changelog by clicking on the 'Beta
-Balance' button below. This snippet only includes bug fixes and unit reworks.
+Jip
 
-The Balance Team
+## Features
+
+- (#5264) Enhancements to the unit restrictions menu
+
+  - Filters out dummy units
+  - Filters out insignificant units
+  - Fixes various bugs
+
+- (#5269) Enhancements to the unit cheat menu
+
+  - Add unit count input
+  - Add faction logo to a unit
+  - Add tech level  to a unit
+  - Improve readability of blueprint id
+  - Fix various styling issues
+
+- (#5274) Allow tree groups to block a construction site
+
+  Based on player feedback, tree groups now obstruct construction sites and are therefore reclaimed by 
+  the engineers
+
+  This is not to be confused with 'broken tree groups'. A tree group that is broken is split into 
+  individual trees. Once broken, these individual trees no longer block the construction site
+
+- (#5275) Additional hotkeys to unpause or pause all units
+
+  These new hotkeys allow you to express your intentions when (un)pausing a selection of units, 
+  especially when only a few of them need to be paused or unpaused
+
+- (#5276) Additional hotkeys to surface or submerge all units
+
+  These new hotkeys allow you to express your intentions when surfacing or submerging a selection of 
+  units, especially when only a few of them are submerged or surfaced
 
 ## Bug fixes
 
-- (#5222) Fix a resource glitch that allows the Megalith to produce units for free
+- (#5290) Resolved the issue with the navigational mesh causing crashes during the save-load sequence
 
-- (#5221) Fix a bug with the animation of the Cybran extractors not stopping when upgrading
+  Most notable when playing the campaign alone. The navigational mesh was written as a large cycle. As 
+  a consequence, once the navigational mesh was generated the save process would be unable to serialize 
+  it and crash the game
 
-- (#5220) Fix a bug where the Wailer (Tech 3 Cybran gunship) would half its damage output
+- (#5291) Fix the Ythotha storm discriminating allied units and patches of ground
 
-  This bug occurs when the Wailer would engage a ground target and an air target at the same time. The 
-  damage output of the air-to-ground weapons would be reduced by half
+  There was a bug that would prevent the Ythotha storm from firing upon allied units. As a result, the 
+  storm would only deal damage to hostile units. Now, the storm treats all units and ground patches 
+  equally, inflicting damage without bias.
 
-## Unit reworks
+- (#5277) Prevent the intel recharge thread from hijacking the work progress bar
 
-- (#4985, #5194, #5175) Rework the Mercy
+  Most notable with the Cybran ACU once he has the stealth enhancement. This prevents the chaotic 
+  behavior when multiple Lua threads are trying to claim the progress bar
 
-  The mercy has been completely reworked. The role of the unit is changed from being a sniper to area 
-  denial. It now deals damage over time over a large area
+- (#5282) Adjusted the positioning of tech 3 anti-air units in formations
 
-  With thanks to Deribus for the initial idea and implementation
+  The Bouncer and the Lightning tank have a direct fire weapon. As a result, they were considered to be 
+  a direct fire unit by the formations script. They are now recognized as anti-air units and therefore 
+  end up at the middle or the back of the formation like other anti-air units
+
+- (#5285) Remove the ability to cap Tech 3 air factories
+
+  The previous hotfix (3763) was unexpected and this change wasn't supposed to go live immediately. 
+  Regardless, we understood the feedback and are removing the behavior again
+
+- (#5287) Sanitize the anti-surface threat value of ACUs
+
+## Other changes
+
+- (#5283) Add platoon form callbacks for conditional builds
 
 ## Contributors
 
-- Terminal
-- Farmsletje
-- Tagada
-- SpikeyNoob
-- Rowey
-- Blodir
-- Turinturambar
-- RabidPope
-- Basilisk3
-- Hdt80bro
-- ComradeStryker
-- Jip
-- 4z0t
-- Deribus
-- Archsimkat
+- HUSSAR (#5264, #5269)
+- Jip (#5274, #5275, #5282, #5277, #5276, #5285, #5291, #5290)
+- Relent0r (#5287)
+- speed2 (#5283)

@@ -194,22 +194,32 @@ end
 function GetKeyActions()
     local ret = {}
 
-    local keyActions = import("/lua/keymap/keyactions.lua").keyActions
-    local debugKeyActions = import("/lua/keymap/debugkeyactions.lua").debugKeyActions
-
-    for k,v in keyActions do
-        ret[k] = v
-    end
-
-    for k,v in debugKeyActions do
-        ret[k] = v
-    end
-
+    -- load actions from preference file
     local userActions = Prefs.GetFromCurrentProfile("UserKeyActions")
     if userActions ~= nil then
         for k,v in userActions do
             ret[k] = v
         end
+    end
+
+    -- load default keyactions, overwrite those in the preference when applicable
+    local keyActions = import("/lua/keymap/keyactions.lua").keyActions
+    local debugKeyActions = import("/lua/keymap/debugkeyactions.lua").debugKeyActions
+
+    for k,v in keyActions do
+        if ret[k] and ret[k] != v.action then
+            WARN(string.format("Overwriting user key action: %s -> %s", k, ret[k].action))
+        end
+
+        ret[k] = v
+    end
+
+    for k,v in debugKeyActions do
+        if ret[k] and ret[k] != v.action then
+            WARN(string.format("Overwriting user key action: %s -> %s", k, ret[k].action))
+        end
+
+        ret[k] = v
     end
 
     for k,v in ret do

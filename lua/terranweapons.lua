@@ -91,7 +91,7 @@ TDFRiotWeapon = ClassWeapon(DefaultProjectileWeapon) {
 
 ---@class TAAGinsuRapidPulseWeapon : DefaultProjectileWeapon
 TAAGinsuRapidPulseWeapon = ClassWeapon(DefaultProjectileWeapon) {
-    FxMuzzleFlash = import("/lua/effecttemplates.lua").NoEffects,
+    FxMuzzleFlash = { },
 }
 
 ---@class TDFIonizedPlasmaCannon : DefaultProjectileWeapon
@@ -102,7 +102,7 @@ TDFIonizedPlasmaCannon = ClassWeapon(DefaultProjectileWeapon) {
 ---@class TDFHiroPlasmaCannon : DefaultBeamWeapon
 TDFHiroPlasmaCannon = ClassWeapon(DefaultBeamWeapon) {
     BeamType = CollisionBeams.TDFHiroCollisionBeam,
-    FxMuzzleFlash = import("/lua/effecttemplates.lua").NoEffects,
+    FxMuzzleFlash = { },
 }
 
 ---@class TAAFlakArtilleryCannon : DefaultProjectileWeapon
@@ -122,7 +122,7 @@ TAirToAirLinkedRailgun = ClassWeapon(DefaultProjectileWeapon) {
 
 ---@class TIFCruiseMissileUnpackingLauncher : DefaultProjectileWeapon
 TIFCruiseMissileUnpackingLauncher = ClassWeapon(DefaultProjectileWeapon) {
-    FxMuzzleFlash = import("/lua/effecttemplates.lua").NoEffects,
+    FxMuzzleFlash = { },
 }
 
 ---@class TIFCruiseMissileLauncher : DefaultProjectileWeapon

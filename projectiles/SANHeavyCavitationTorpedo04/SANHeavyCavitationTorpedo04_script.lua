@@ -9,7 +9,7 @@ local EffectTemplate = import("/lua/effecttemplates.lua")
 SANHeavyCavitationTorpedo04 = ClassProjectile(SHeavyCavitationTorpedo) {
     OnCreate = function(self)
         SHeavyCavitationTorpedo.OnCreate(self)
-        self:SetCollisionShape('Sphere', 0, 0, 0, 0.1)
+        self:SetCollisionShape('Sphere', 0, 0, 0, 0.5)
         self.Trash:Add(ForkThread(self.PauseUntilTrack, self))
         CreateEmitterOnEntity(self, self.Army, EffectTemplate.SHeavyCavitationTorpedoFxTrails)
     end,

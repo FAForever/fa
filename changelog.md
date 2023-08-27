@@ -1,6 +1,189 @@
 
 Some sections of the changelog are available in other languages such as [French](changelog-fr.md) or [Russian](changelog-ru.md)
 
+# Game version 3764 (29th of July, 2023)
+
+See the patch notes of 3762 and 3758 for the full patch notes.
+
+With thanks to all those that took the time to report issues and participate in feedback sessions,
+
+Jip
+
+## Features
+
+- (#5264) Enhancements to the unit restrictions menu
+
+  - Filters out dummy units
+  - Filters out insignificant units
+  - Fixes various bugs
+
+- (#5269) Enhancements to the unit cheat menu
+
+  - Add unit count input
+  - Add faction logo to a unit
+  - Add tech level  to a unit
+  - Improve readability of blueprint id
+  - Fix various styling issues
+
+- (#5274) Allow tree groups to block a construction site
+
+  Based on player feedback, tree groups now obstruct construction sites and are therefore reclaimed by the engineers
+
+  This is not to be confused with 'broken tree groups'. A tree group that is broken is split into individual trees. Once broken, these individual trees no longer block the construction site
+
+- (#5275) Additional hotkeys to unpause or pause all units
+
+  These new hotkeys allow you to express your intentions when (un)pausing a selection of units, especially when only a few of them need to be paused or unpaused
+
+- (#5276) Additional hotkeys to surface or submerge all units
+
+  These new hotkeys allow you to express your intentions when surfacing or submerging a selection of units, especially when only a few of them are submerged or surfaced
+
+## Bug fixes
+
+- (#5290) Resolved the issue with the navigational mesh causing crashes during the save-load sequence
+
+  Most notable when playing the campaign alone. The navigational mesh was written as a large cycle. As a consequence, once the navigational mesh was generated the save process would be unable to serialize it and crash the game
+
+- (#5291) Fix the Ythotha storm discriminating allied units and patches of ground
+
+  There was a bug that would prevent the Ythotha storm from firing upon allied units. As a result, the storm would only deal damage to hostile units. Now, the storm treats all units and ground patches equally, inflicting damage without bias.
+
+- (#5277) Prevent the intel recharge thread from hijacking the work progress bar
+
+  Most notable with the Cybran ACU once he has the stealth enhancement. This prevents the chaotic behavior when multiple Lua threads are trying to claim the progress bar
+
+- (#5282) Adjusted the positioning of tech 3 anti-air units in formations
+
+  The Bouncer and the Lightning tank have a direct fire weapon. As a result, they were considered to be a direct fire unit by the formations script. They are now recognized as anti-air units and therefore end up at the middle or the back of the formation like other anti-air units
+
+- (#5285) Remove the ability to cap Tech 3 air factories
+
+  The previous hotfix (3763) was unexpected and this change wasn't supposed to go live immediately. Regardless, we understood the feedback and are removing the behavior again
+
+- (#5287) Sanitize the anti-surface threat value of ACUs
+
+- (#5292) Fix a bug where Seraphim torpedo bombers can trick torpedo defenses
+
+## Other changes
+
+- (#5283) Add platoon form callbacks for conditional builds
+
+## Contributors
+
+- HUSSAR (#5264, #5269)
+- Jip (#5274, #5275, #5282, #5277, #5276, #5285, #5291, #5290, #5292)
+- Relent0r (#5287)
+- speed2 (#5283)
+
+# Game version 3763 (23th of July, 2023)
+
+See the patch notes of 3762 and 3758 for the full patch notes.
+
+There was a misconception with the distribution of files and as a result, wrecks would be removed in the release branch when you build on top of them. It was fun while it lasted ^^
+
+Jip
+
+## Features
+
+- (#5262) Introduce the ability to cap additional structures
+
+  You can now also cap the following structures:
+
+  - Tech 3 air factories with tech 3 power generators
+  - Tech 3 or experimental artillery with tech 3 power generators
+
+  To use these you need the game option 'Automate Structure Ringing' to be on 'Full Suite'
+
+## Bug fixes
+
+- (#5266) Fix wrecks being removed when constructing on top of them
+
+- (#5265) Fix the UI scaling of the unit cheat menu
+
+- (#5237) Fix the visuals and damage output of the Mercy
+
+  The visuals can now be seen when you're zoomed out and the Mercy deals exactly 600 area damage at the center of the target
+
+- (#5191) Fix the size of the zapper on the Cybran Aircraft Carrier
+
+## Contributors
+
+- Jip (#5265, #5266, #5237)
+- MadMax (#5191)
+- Hussar (#5262)
+
+
+# Game version 3762 (22th of July, 2023)
+
+See the patch notes of 3762 and 3758 for the full patch notes.
+
+Jip
+
+## Features
+
+- (#5197, #16) Small props and trees are ignored when building
+
+  You can now build on top of logs, bushes, cacti, (fallen) trees and tree groups. This is a quality-of-life change to prevent your ACU or your engineers from delaying your build order because there is an invisible prop (due to Level of Details (LODs)) 'blocking' your construction site. This can significantly delay the construction. Instead, the before-mentioned props are destroyed when you start the construction.
+
+  To be specific, the following props will still block your construction site:
+
+  - Any wreck, regardless of mass value
+  - Any rock, regardless of mass value
+  - Any non-tree prop of significant (>= 10) mass value in general
+
+  For the next patch, the goal is to allow you to entirely rely on the reclaim overview to manage your expectations of whether the construction site is blocked by props.
+
+- (#5246) Do not immediately destroy units of teams that recall
+
+  There was a suggestion on the forum to be able to review the final game state when a team recalls. With this delay, the units are preserved in the final game state, yet still destroyed when you play FFA-like setups
+
+- (#5247) Re-introduce a hotkey that allows you to filter your selection and assist the highest tech engineers of your selection
+
+## AI
+
+- (#5234) Fix a bug where nuke launchers did not generate the correct threat
+
+  They were categorized by AI as a unit with excessive surface threat, instead of economic threat. As a result, the AI would essentially never attack a base with a nuke launcher in it
+
+- (#5234) Fix a bug where mobile artillery and missile launchers did not generate the correct threat
+
+  They were categorized by the AI as units with economic threat instead of surface threat. As a result, the AI would recognize them as bulky engineers instead of something more dangerous
+
+- (#5156, #5164) Add additional debug utilities for the Navigational Mesh
+
+## Bug fixes
+
+- (#5218) Fix a bug when trying to give a unit a veterancy of 0
+
+  A few campaign maps did this and the bug prevented the scripts to continue
+
+- (#5219, #5236) Fix a bug in campaign maps related to missing categories
+
+- (#5219, #5236) Fix a bug with the unit restrictions menu related to missing categories
+
+- (#5162) Fix shield visibility on land-only maps
+
+- (#5245) Fix a bug where the idle animation of the Seraphim tech 2 extractor does not stop when upgrading
+
+## Graphics
+
+- (#5171) Add or fix existing LODs of various Aeon units
+
+## Performance
+
+- (#5250) Reduce the performance impact of the AA weaponry of Seraphim frigates
+
+## Contributors
+
+- 4z0t (#16)
+- BlackYps (#5162)
+- Relent0r (#5234)
+- Basilisk3 (#5250)
+- MadMax (#5171)
+- Jip (#5156, #5164, #5197, #5219, #5245, #5247)
+
+
 # Game version 3761 (27th of June, 2023)
 
 The main objective of this patch is to enhance the viability of a diverse range of strategies by boosting raiding capabilities, balancing overpowered units, and introducing novel ways to utilize existing units.

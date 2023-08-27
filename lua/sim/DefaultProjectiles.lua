@@ -71,7 +71,7 @@ EmitterProjectile = ClassProjectile(Projectile) {
 SingleBeamProjectile = ClassProjectile(EmitterProjectile) {
 
     BeamName = '/effects/emitters/default_beam_01_emit.bp',
-    FxTrails = import("/lua/effecttemplates.lua").NoEffects,
+    FxTrails = { },
 
     ---@param self SingleBeamProjectile
     OnCreate = function(self)
@@ -87,7 +87,7 @@ SingleBeamProjectile = ClassProjectile(EmitterProjectile) {
 MultiBeamProjectile = ClassProjectile(EmitterProjectile) {
 
     Beams = {'/effects/emitters/default_beam_01_emit.bp',},
-    FxTrails = import("/lua/effecttemplates.lua").NoEffects,
+    FxTrails = { },
 
     ---@param self MultiBeamProjectile
     OnCreate = function(self)
@@ -246,7 +246,7 @@ SinglePolyTrailProjectile = ClassProjectile(EmitterProjectile) {
 
     PolyTrail = '/effects/emitters/test_missile_trail_emit.bp',
     PolyTrailOffset = 0,
-    FxTrails = import("/lua/effecttemplates.lua").NoEffects,
+    FxTrails = { },
 
     ---@param self SinglePolyTrailProjectile
     OnCreate = function(self)
@@ -267,8 +267,8 @@ SinglePolyTrailProjectile = ClassProjectile(EmitterProjectile) {
 MultiPolyTrailProjectile = ClassProjectile(EmitterProjectile) {
 
     PolyTrails = {'/effects/emitters/test_missile_trail_emit.bp'},
-    PolyTrailOffset = import("/lua/effecttemplates.lua").DefaultPolyTrailOffset1,
-    FxTrails = import("/lua/effecttemplates.lua").NoEffects,
+    PolyTrailOffset = { 0 },
+    FxTrails = { },
 
     --- Count of how many are selected randomly for PolyTrail table
     RandomPolyTrails = 0,   
@@ -317,7 +317,7 @@ MultiPolyTrailProjectile = ClassProjectile(EmitterProjectile) {
 SingleCompositeEmitterProjectile = ClassProjectile(SinglePolyTrailProjectile) {
 
     BeamName = '/effects/emitters/default_beam_01_emit.bp',
-    FxTrails = import("/lua/effecttemplates.lua").NoEffects,
+    FxTrails = { },
 
     ---@param self SingleCompositeEmitterProjectile
     OnCreate = function(self)
@@ -335,10 +335,10 @@ MultiCompositeEmitterProjectile = ClassProjectile(MultiPolyTrailProjectile) {
 
     Beams = {'/effects/emitters/default_beam_01_emit.bp',},
     PolyTrails = {'/effects/emitters/test_missile_trail_emit.bp'},
-    PolyTrailOffset = import("/lua/effecttemplates.lua").DefaultPolyTrailOffset1,
+    PolyTrailOffset = { 0 },
     -- Count of how many are selected randomly for PolyTrail table
     RandomPolyTrails = 0,
-    FxTrails = import("/lua/effecttemplates.lua").NoEffects,
+    FxTrails = { },
 
     ---@param self MultiCompositeEmitterProjectile
     OnCreate = function(self)
