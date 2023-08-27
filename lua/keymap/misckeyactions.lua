@@ -460,6 +460,7 @@ function findPriority(bpID)
         local d = string.format("categories.%s", layer)
 
         local priorities = string.format("{categories.%s, %s, %s, %s, %s}", bpID, a, b, c, d)
+        reprsl(priorities)
         return priorities
     else
         -- go to defaults, not sure what happened here but unit id is unknown
@@ -529,75 +530,6 @@ LoadIntoTransports = function(clearCommands)
     SimCallback({ Func = 'LoadIntoTransports', Args = { ClearCommands = clearCommands or false } }, true)
 end
 
---- Distributes the orders of the unit in the selection that is closest to the mouse location
-DistributeOrders = function(clearCommands)
-    local mouse = GetMouseWorldPos()
-    local selection = GetSelectedUnits()
-    if mouse[1] and mouse[3] and selection and (not table.empty(selection)) then
-
-        -- we only support distributing the orders of non-factory units. Factories
-        -- use separate orders that would make the logic of this function much
-        -- more complicated
-        local validUnits = EntityCategoryFilterOut(categories.FACTORY, selection)
-
-        if table.empty(validUnits) then
-            print("No orders to distribute")
-            return
-        end
-
-        -- find nearest unit
-        local nearestUnit = validUnits[1]
-        local shortestDistance = 4096 * 4096
-        for k, unit in validUnits do
-            local position = unit:GetPosition()
-            local dx = position[1] - mouse[1]
-            local dz = position[3] - mouse[3]
-            local distance = dx * dx + dz * dz
-
-            if distance < shortestDistance then
-                nearestUnit = unit
-                shortestDistance = distance
-            end
-        end
-
-        -- determine if there are orders to distribute
-        local queue = nearestUnit:GetCommandQueue()
-        local queueCount = table.getn(queue)
-        if queueCount > 0 then
-            print(string.format("Distributing orders"))
-            SimCallback({ Func = 'DistributeOrders', Args = { Target = nearestUnit:GetEntityId(), ClearCommands = clearCommands or false } }, true)
-        else
-            print("No orders to distribute")
-        end
-    else
-        print("No orders to distribute")
-    end
-end
-
---- Distributes the orders of the unit that the mouse is hovering over
-DistributeOrdersOfMouseContext = function(clearCommands)
-    local target = GetRolloverInfo().userUnit
-    if target then
-        local orderCount = table.getn(target:GetCommandQueue())
-        if orderCount > 0 then
-            print(string.format("Distributing orders", orderCount))
-            SimCallback({ Func = 'DistributeOrders', Args = { Target = target:GetEntityId() }, ClearCommands = clearCommands or false }, true)
-        else
-            print("No orders to distribute")
-        end
-    end
-end
-
-CopyOrders = function(clearCommands)
-    local info = GetRolloverInfo()
-    if info.userUnit then
-        print("Copying orders")
-        SimCallback({ Func = 'CopyOrders', Args = { Target = info.userUnit:GetEntityId(), ClearCommands = clearCommands or false } }, true)
-    else
-        print("Can not copy orders")
-    end
-end
-
 AssignPlatoonBehaviorSilo = function()
     SimCallback({ Func = 'AIPlatoonSiloTacticalBehavior', Args = { Behavior = 'AIBehaviorTacticalSimple' } }, true)
 end
@@ -621,30 +553,6 @@ RestoreCameraPosition = function()
     local camera = GetCamera('WorldCamera')
     local settings = Prefs.GetFromCurrentProfile('DebugCameraPosition') --[[@as UserCameraSettings]]
     camera:MoveTo(settings.Focus, { settings.Heading, settings.Pitch, 0 }, settings.Zoom, 0)
-end
-
-function SelectHighestEngineerAndAssist()
-    local selection = GetSelectedUnits()
-
-    if selection then
-
-        local tech2 = EntityCategoryFilterDown(categories.TECH2 - categories.COMMAND, selection)
-        local tech3 = EntityCategoryFilterDown(categories.TECH3 - categories.COMMAND, selection)
-        local sACUs = EntityCategoryFilterDown(categories.SUBCOMMANDER - categories.COMMAND, selection)
-
-        if next(sACUs) then
-            SimCallback({ Func = 'SelectHighestEngineerAndAssist', Args = { TargetId = sACUs[1]:GetEntityId() } }, true)
-            SelectUnits(sACUs)
-        elseif next(tech3) then
-            SimCallback({ Func = 'SelectHighestEngineerAndAssist', Args = { TargetId = tech3[1]:GetEntityId() } }, true)
-            SelectUnits(tech3)
-        elseif next(tech2) then
-            SimCallback({ Func = 'SelectHighestEngineerAndAssist', Args = { TargetId = tech2[1]:GetEntityId() } }, true)
-            SelectUnits(tech2)
-        else
-            -- do nothing
-        end
-    end
 end
 
 local function SeparateDiveStatus(units)

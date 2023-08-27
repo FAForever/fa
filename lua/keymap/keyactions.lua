@@ -1585,40 +1585,36 @@ local keyActionsOrders = {
         action = 'UI_Lua import("/lua/ui/game/orders.lua").Dock(false)',
         category = 'orders',
     },
-    ['load_transports'] = {
-        action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").LoadIntoTransports()',
-        category = 'orders',
-    },
 }
 
 local keyActionsOrdersAdvanced = {
     ['load_transports'] = {
-        action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").LoadIntoTransports(false)',
+        action = 'UI_Lua import("/lua/ui/game/commands/load-in-transport.lua").LoadIntoTransports(false)',
         category = 'ordersAdvanced',
         wikiURL = 'Play/Game/Hotkeys/OrdersAdvanced#load-into-transports'
     },
     ['load_transports_clear'] = {
-        action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").LoadIntoTransports(true)',
+        action = 'UI_Lua import("/lua/ui/game/commands/load-in-transport.lua").LoadIntoTransports(true)',
         category = 'ordersAdvanced',
         wikiURL = 'Play/Game/Hotkeys/OrdersAdvanced#load-into-transports'
     },
     ['shift_load_transports'] = {
-        action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").LoadIntoTransports(false)',
+        action = 'UI_Lua import("/lua/ui/game/commands/load-in-transport.lua").LoadIntoTransports(false)',
         category = 'ordersAdvanced',
         wikiURL = 'Play/Game/Hotkeys/OrdersAdvanced#load-into-transports'
     },
     ['shift_load_transports_clear'] = {
-        action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").LoadIntoTransports(true)',
+        action = 'UI_Lua import("/lua/ui/game/commands/load-in-transport.lua").LoadIntoTransports(true)',
         category = 'ordersAdvanced',
         wikiURL = 'Play/Game/Hotkeys/OrdersAdvanced#load-into-transports'
     },
     ['filter_highest_engineer_and_assist'] = {
-        action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").SelectHighestEngineerAndAssist()',
+        action = 'UI_Lua import("/lua/ui/game/commands/filter-engineers.lua").SelectHighestEngineerAndAssist()',
         category = 'ordersAdvanced',
         wikiURL = 'Play/Game/Hotkeys/OrdersAdvanced#filter-engineers'
     },
     ['shift_filter_highest_engineer_and_assist'] = {
-        action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").SelectHighestEngineerAndAssist()',
+        action = 'UI_Lua import("/lua/ui/game/commands/filter-engineers.lua").SelectHighestEngineerAndAssist()',
         category = 'ordersAdvanced',
         wikiURL = 'Play/Game/Hotkeys/OrdersAdvanced#filter-engineers'
     },
@@ -1626,32 +1622,32 @@ local keyActionsOrdersAdvanced = {
 
 local keyActionsOrdersQueueBased = {
     ['distribute_orders'] = {
-        action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").DistributeOrders(true)',
+        action = 'UI_Lua import("/lua/ui/game/commands/distribute-queue.lua").DistributeOrders(true)',
         category = 'ordersQueueBased',
         wikiURL = 'Play/Game/Hotkeys/OrdersQueueManipulation#distribute-orders'
     },
     ['shift_distribute_orders'] = {
-        action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").DistributeOrders(true)',
+        action = 'UI_Lua import("/lua/ui/game/commands/distribute-queue.lua").DistributeOrders(true)',
         category = 'ordersQueueBased',
         wikiURL = 'Play/Game/Hotkeys/OrdersQueueManipulation#distribute-orders'
     },
     ['distribute_orders_context'] = {
-        action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").DistributeOrdersOfMouseContext(true)',
+        action = 'UI_Lua import("/lua/ui/game/commands/distribute-queue.lua").DistributeOrdersOfMouseContext(true)',
         category = 'ordersQueueBased',
         wikiURL = 'Play/Game/Hotkeys/OrdersQueueManipulation#distribute-orders'
     },
     ['shift_distribute_orders_context'] = {
-        action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").DistributeOrdersOfMouseContext(true)',
+        action = 'UI_Lua import("/lua/ui/game/commands/distribute-queue.lua").DistributeOrdersOfMouseContext(true)',
         category = 'ordersQueueBased',
         wikiURL = 'Play/Game/Hotkeys/OrdersQueueManipulation#distribute-orders'
     },
     ['copy_orders'] = {
-        action = 'UI_LUA import("/lua/keymap/misckeyactions.lua").CopyOrders()',
+        action = 'UI_LUA import("/lua/ui/game/commands/copy-queue.lua").CopyOrders()',
         category = 'ordersQueueBased',
         wikiURL = 'Play/Game/Hotkeys/OrdersQueueManipulation#copy-orders'
     },
     ['shift_copy_orders'] = {
-        action = 'UI_LUA import("/lua/keymap/misckeyactions.lua").CopyOrders()',
+        action = 'UI_LUA import("/lua/ui/game/commands/copy-queue.lua").CopyOrders()',
         category = 'ordersQueueBased',
         wikiURL = 'Play/Game/Hotkeys/OrdersQueueManipulation#copy-orders'
     },

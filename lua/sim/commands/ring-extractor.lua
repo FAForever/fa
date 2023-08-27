@@ -30,6 +30,13 @@ local TableGetn = table.getn
 ---@param engineers Unit[]
 RingExtractor = function(extractor, engineers)
 
+    ---------------------------------------------------------------------------
+    -- defensive programming
+
+    if (not extractor) or (IsDestroyed(extractor)) then
+        return
+    end
+    
     -- verify the storage
     local storage = engineers[1].Blueprint.BlueprintId:sub(1, 2) .. 'b1106'
     if (not __blueprints[storage]) or
