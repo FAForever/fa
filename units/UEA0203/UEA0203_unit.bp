@@ -274,7 +274,7 @@ UnitBlueprint {
             MaxRadius = 22,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
-            MuzzleVelocity = 40,
+            MuzzleVelocity = 35,
             ProjectileId = "/projectiles/TDFRiot01/TDFRiot01_proj.bp",
             ProjectileLifetimeUsesMultiplier = 1.15,
             ProjectilesPerOnFire = 1,
