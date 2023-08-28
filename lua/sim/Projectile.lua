@@ -12,6 +12,9 @@ local DepthCharge = import("/lua/defaultantiprojectile.lua").DepthCharge
 
 local TableGetn = table.getn
 
+local MathCos = math.cos 
+local MathSin = math.sin 
+
 -- scorch mark interaction
 local ScorchSplatTextures = {
     'scorch_001_albedo',
@@ -131,9 +134,36 @@ Projectile = ClassProjectile(ProjectileMethods) {
 
         -- do not track target, but track where the target was
         if blueprint.Physics.TrackTargetGround then
-            local pos = self:GetCurrentTargetPosition()
-            pos[2] = GetSurfaceHeight(pos[1], pos[3])
-            self:SetNewTargetGround(pos)
+            local target = self.Launcher:GetTargetEntity()
+            if target and target.IsUnit then
+                local unitBlueprint = target.Blueprint
+                local cy = unitBlueprint.CollisionOffsetY or 0
+                local sx, sy, sz = unitBlueprint.SizeX or 1, unitBlueprint.SizeY or 1, unitBlueprint.SizeZ or 1
+                local px, py, pz = target:GetPositionXYZ()
+
+                -- take into account heading
+                local heading = -1 * target:GetHeading() -- inverse heading because Supreme Commander :)
+                local mch = MathCos(heading)
+                local msh = MathSin(heading)
+
+                local fuzziness = 1.0
+                local dx = (Random() - 0.5) * fuzziness * sx
+                local dy = (Random() - 0.5) * fuzziness * sy
+                local dz = (Random() - 0.5) * fuzziness * sz
+
+                local target = {
+                    px + dx * mch - dz * msh,
+                    py + cy + 0.5 * sy + dy,
+                    pz + dx * msh + dz * mch,
+                }
+
+                DrawCircle(target, 2, 'ffffff')
+                self:SetNewTargetGround(target)
+            else
+                local pos = self:GetCurrentTargetPosition()
+                pos[2] = GetSurfaceHeight(pos[1], pos[3])
+                self:SetNewTargetGround(pos)
+            end
         end
     end,
 
