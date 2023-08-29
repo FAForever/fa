@@ -507,10 +507,56 @@ local function PostProcessUnit(unit)
     end
 end
 
+---@param allBlueprints BlueprintsTable
+---@param unit UnitBlueprint
+function PostProcessUnitWithExternalFactory(allBlueprints, unit)
+    -- create a new unit that represents the external factory
+    ---@type UnitBlueprint
+    local efBlueprint = table.deepcopy(allBlueprints.Unit["zxa0002"])
+
+    -- not available when reloading using program argument 'EnableDiskWatch'
+    if efBlueprint then
+        local efBlueprintId = string.lower(unit.BlueprintId .. "ef")
+        allBlueprints.Unit[efBlueprintId] = efBlueprint
+
+        -- replace properties of external factory
+        efBlueprint.Economy = { BuildRate = unit.Economy.BuildRate, BuildableCategory = unit.Economy.BuildableCategory }
+        efBlueprint.General.Icon = unit.General.Icon
+        efBlueprint.General.FactionName = unit.General.FactionName
+        efBlueprint.General.UnitName = unit.General.UnitName
+        efBlueprint.FactionCategory = unit.FactionCategory
+        efBlueprint.LayerCategory = unit.LayerCategory
+        efBlueprint.BlueprintId = efBlueprintId
+        efBlueprint.BaseBlueprintId = unit.BlueprintId
+        efBlueprint.ScriptClass = 'ExternalFactoryUnit'
+        efBlueprint.ScriptModule = '/lua/defaultunits.lua'
+        efBlueprint.CategoriesHash[unit.FactionCategory] = true
+        efBlueprint.CategoriesHash[unit.LayerCategory] = true
+        efBlueprint.Categories = table.unhash(efBlueprint.CategoriesHash)
+        efBlueprint.SelectionSizeX = 0.95 * unit.SelectionSizeX
+        efBlueprint.SelectionSizeZ = 0.25 * unit.SelectionSizeZ
+        efBlueprint.SelectionCenterOffsetZ = 0.35 * unit.SelectionSizeZ
+
+        -- remove properties of the seed unit
+        unit.CategoriesHash['FACTORY'] = nil
+        unit.CategoriesHash['CONSTRUCTION'] = nil
+        unit.Categories = table.unhash(unit.CategoriesHash)
+        unit.Economy.BuildRate = 0
+        unit.Economy.BuildableCategory = nil
+    end
+end
+
 --- Post-processes all units
+---@param allBlueprints BlueprintsTable
 ---@param units UnitBlueprint[]
-function PostProcessUnits(units)
+function PostProcessUnits(allBlueprints, units)
     for _, unit in units do
         PostProcessUnit(unit)
+    end
+
+    for _, unit in units do
+        if unit.CategoriesHash['EXTERNALFACTORY'] then
+            PostProcessUnitWithExternalFactory(allBlueprints, unit)
+        end
     end
 end

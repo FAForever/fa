@@ -25,6 +25,7 @@ UnitBlueprint{
         "SERAPHIM",
         "TECH3",
         "VISIBLETORECON",
+        "WEAKDIRECTFIRE",
     },
     Defense = {
         AirThreatLevel = 120,

@@ -416,6 +416,7 @@ local function DiveOrderBehavior(self, modifiers)
                 end
             end
         end
+
         -- If we have selected submerged and surfaced SUB's, let all surfaced SUB's dive.
         if submergedSUB and surfacedSUB then
             local SurfacedSubs = {}

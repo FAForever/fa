@@ -20,7 +20,8 @@ ProjectileBlueprint {
         'SERAPHIM',
         'PROJECTILE',
         'ANTINAVY',
-        'NOSPLASHDAMAGE'
+        'NOSPLASHDAMAGE',
+        'UNTARGETABLE',
     },
     Defense = {
         Health = 1,

@@ -84,17 +84,17 @@ Projectile = ClassProjectile(ProjectileMethods) {
     FxImpactTrajectoryAligned = true,
 
     -- tables used for effects
-    FxImpactAirUnit = import("/lua/effecttemplates.lua").NoEffects,
-    FxImpactLand = import("/lua/effecttemplates.lua").NoEffects,
-    FxImpactNone = import("/lua/effecttemplates.lua").NoEffects,
-    FxImpactProp = import("/lua/effecttemplates.lua").NoEffects,
-    FxImpactShield = import("/lua/effecttemplates.lua").NoEffects,
-    FxImpactWater = import("/lua/effecttemplates.lua").NoEffects,
-    FxImpactUnderWater = import("/lua/effecttemplates.lua").NoEffects,
-    FxImpactUnit = import("/lua/effecttemplates.lua").NoEffects,
-    FxImpactProjectile = import("/lua/effecttemplates.lua").NoEffects,
-    FxImpactProjectileUnderWater = import("/lua/effecttemplates.lua").NoEffects,
-    FxOnKilled = import("/lua/effecttemplates.lua").NoEffects,
+    FxImpactAirUnit = { },
+    FxImpactLand = { },
+    FxImpactNone = { },
+    FxImpactProp = { },
+    FxImpactShield = { },
+    FxImpactWater = { },
+    FxImpactUnderWater = { },
+    FxImpactUnit = { },
+    FxImpactProjectile = { },
+    FxImpactProjectileUnderWater = { },
+    FxOnKilled = { },
 
     -- scale values used for effects
     FxAirUnitHitScale = 1,

@@ -2,16 +2,16 @@
 local Projectile = import("/lua/sim/projectile.lua").Projectile
 ShellTankTerran01 = ClassProjectile(Projectile) {
     FxUnitHitScale = 1,
-    FxImpactUnit = import("/lua/effecttemplates.lua").NoEffects,
+    FxImpactUnit = { },
     FxLandHitScale = 1,
-    FxImpactLand = import("/lua/effecttemplates.lua").NoEffects,
+    FxImpactLand = { },
     FxWaterHitScale = 1,
-    FxImpactWater = import("/lua/effecttemplates.lua").NoEffects,
+    FxImpactWater = { },
     FxUnderWaterHitScale = 0.25,
     FxAirUnitHitScale = 1,
-    FxImpactAirUnit = import("/lua/effecttemplates.lua").NoEffects,
+    FxImpactAirUnit = { },
     FxNoneHitScale = 1,
-    FxImpactNone = import("/lua/effecttemplates.lua").NoEffects,
+    FxImpactNone = { },
     FxImpactLandScorch = false,
     FxImpactLandScorchScale = 1.0,
 
