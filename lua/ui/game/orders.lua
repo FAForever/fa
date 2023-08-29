@@ -636,7 +636,7 @@ local function DroneInit(self, selection)
     local lastMode = nil
     if self._pod and next(self._pod) then
         for _, pod in self._pod do
-            if not lastMode then
+            if lastMode == nil then
                 lastMode = pod:IsAutoMode()
             elseif lastMode ~= pod:IsAutoMode() then
                 mixed = true
@@ -1046,8 +1046,8 @@ local defaultOrdersTable = {
     RULEUCC_Repair = {              helpText = "repair",            bitmapId = 'repair',                preferredSlot = 14, behavior = StandardOrderBehavior},
     RULEUCC_Dock = {                helpText = "dock",              bitmapId = 'dock',                  preferredSlot = 14, behavior = DockOrderBehavior},
 
-    DroneL = {                      helpText = "drone",             bitmapId = 'unload02',              preferredSlot = 13, behavior = DroneBehavior,               initialStateFunc = DroneInit},
-    DroneR = {                      helpText = "drone",             bitmapId = 'unload02',              preferredSlot = 13, behavior = DroneBehavior,               initialStateFunc = DroneInit},
+    DroneL = {                      helpText = "drone",             bitmapId = 'unload02',              preferredSlot = 10, behavior = DroneBehavior,               initialStateFunc = DroneInit},
+    DroneR = {                      helpText = "drone",             bitmapId = 'unload02',              preferredSlot = 11, behavior = DroneBehavior,               initialStateFunc = DroneInit},
 
     -- Unit toggle rules
     RULEUTC_ShieldToggle = {        helpText = "toggle_shield",     bitmapId = 'shield',                preferredSlot = 8,  behavior = ScriptButtonOrderBehavior,   initialStateFunc = ScriptButtonInitFunction, extraInfo = 0},
@@ -1296,9 +1296,21 @@ local function CreateAltOrders(availableOrders, availableToggles, units)
             podUnits['DroneL'] = assistingUnits
         end
 
+        
         if next(assistingUnits) then
-            table.insert(availableOrders, 'DroneL')
-            assistingUnitList['DroneL'] = assistingUnits
+            if table.getn(PodStagingPlatforms) == 1 and not next(Pods) then
+                table.insert(availableOrders, 'DroneL')
+                assistingUnitList['DroneL'] = {assistingUnits[1]}
+                if table.getn(assistingUnits) > 1 then
+                    table.insert(availableOrders, 'DroneR')
+                    assistingUnitList['DroneR'] = {assistingUnits[2]}
+                    podUnits['DroneL'] = {assistingUnits[1]}
+                    podUnits['DroneR'] = {assistingUnits[2]}
+                end
+            else
+                table.insert(availableOrders, 'DroneL')
+                assistingUnitList['DroneL'] = assistingUnits
+            end
         end
     end
 
