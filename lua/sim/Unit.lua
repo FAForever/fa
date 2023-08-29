@@ -3334,6 +3334,8 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
             return
         end
 
+        LOG(string.format("%s -> %s", old, new))
+
         if new == 'Down' then
             -- Play the "landing" sound
             self:PlayUnitSound('Landing')
@@ -3619,6 +3621,8 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
     CreateIdleEffects = function(self)
         local layer = self.Layer
         local bpTable = self.Blueprint.Display.IdleEffects
+
+        LOG(layer)
         if bpTable[layer] and bpTable[layer].Effects then
             self:CreateTerrainTypeEffects(bpTable[layer].Effects, 'FXIdle',  layer, nil, self.IdleEffectsBag)
         end

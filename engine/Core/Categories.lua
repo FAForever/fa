@@ -51,6 +51,8 @@ categories = {
     CANTRANSPORTCOMMANDER = categoryValue,
     CAPTURE = categoryValue,
     CARRIER = categoryValue,
+    --- Allows the unit to land on water. Is introduced by https://github.com/FAForever/FA-Binary-Patches/pull/20
+    CANLANDONWATER = categoryValue,
     CIVILIAN = categoryValue,
     CIVILLIAN = categoryValue,
     CLOAKPRESET = categoryValue,
@@ -291,6 +293,7 @@ categories = {
 ---| "CANTRANSPORTCOMMANDER"
 ---| "CAPTURE"
 ---| "CARRIER"
+---| "CANLANDONWATER"
 ---| "CIVILIAN"
 ---| "CIVILLIAN"
 ---| "CLOAKPRESET"

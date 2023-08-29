@@ -156,8 +156,9 @@ local function PostProcessUnit(unit)
     local isLand = unit.CategoriesHash['LAND']
     local isAir = unit.CategoriesHash['AIR']
     local isBomber = unit.CategoriesHash['BOMBER']
-    local isGunship = unit.CategoriesHash['GUNSHIP']
+    local isGunship = unit.CategoriesHash['GROUNDATTACK'] and isAir and (not isBomber)
     local isTransport = unit.CategoriesHash['TRANSPORTATION']
+    local isPod = unit.CategoriesHash['POD']
 
     local isTech1 = unit.CategoriesHash['TECH1']
     local isTech2 = unit.CategoriesHash['TECH2']
@@ -223,6 +224,7 @@ local function PostProcessUnit(unit)
     if isAir and not (
         isExperimental or
             isStructure or
+            isPod or
             (isTransport and not isGunship)-- uef tech 2 gunship is also a transport :)
         ) then
         unit.Footprint = unit.Footprint or {}
@@ -505,6 +507,26 @@ local function PostProcessUnit(unit)
         unit.Interface = unit.Interface or { }
         unit.Interface.HelpText = unit.Description or "" --[[@as string]]
     end
+
+    ---------------------------------------------------------------------------
+    --#region (Re) apply the ability to land on water
+
+    -- there was a bug with Rover drones (from the kennel) when they interact
+    -- with naval factories. They would first move towards a 'free build 
+    -- location' when assisting a naval factory. As they can't land on water, 
+    -- that build location could be far away at the shore.
+
+    -- this doesn't fix the problem itself, but it does alleviate it. At least
+    -- the drones do not need to go to the shore anymore, they now look for
+    -- a 'free build location' near the naval factory on water
+
+    if isAir and (isTransport or isGunship or isPod) then
+        LOG(unit.BlueprintId)
+        table.insert(unit.Categories, "CANLANDONWATER")
+        unit.CategoriesHash["CANLANDONWATER"] = true
+    end
+
+    --#endregion
 end
 
 ---@param allBlueprints BlueprintsTable

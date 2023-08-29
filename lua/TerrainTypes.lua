@@ -192,6 +192,7 @@ TerrainTypes = {
                     EmitterBasePath .. 'aeon_t2eng_groundfx02_emit.bp',
                 },
                 Hover01 = { EmitterBasePath .. 'tt_water_hover01_01_emit.bp', },
+                SeaIdle00 = { EmitterBasePath .. 'water_idle_ripples_01_emit.bp', },
                 SeaIdle01 = { EmitterBasePath .. 'water_idle_ripples_02_emit.bp', },
                 SeaIdle02 = { EmitterBasePath .. 'water_idle_ripples_03_emit.bp', },
                 SonarBuoy01 = { EmitterBasePath .. 'water_sonarbuoyring_01_emit.bp', },
