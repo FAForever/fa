@@ -1171,6 +1171,12 @@ AIBrain = Class(AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerCom
         end
     end,
 
+    AbandonedByPlayer = function(self)
+        if not IsGameOver() then
+            self:OnDefeat()
+        end
+    end,
+
     ---@param self AIBrain
     RecallAllCommanders = function(self)
         local commandCat = categories.COMMAND + categories.SUBCOMMANDER
@@ -1313,7 +1319,6 @@ AIBrain = Class(AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerCom
         end
 
         -- This part determines the share condition
-
         local shareOption = ScenarioInfo.Options.Share
         if shareOption == 'CivilianDeserter' then
             TransferUnitsToBrain(civilians)
@@ -1321,11 +1326,16 @@ AIBrain = Class(AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerCom
             TransferUnitsToHighestBrain(enemies)
         end
 
+        -- let the average, team vs team game end first
+        WaitSeconds(10.0)
+
         -- Kill all units left over
         local tokill = self:GetListOfUnits(categories.ALLUNITS - categories.WALL, false)
         if tokill then
             for _, unit in tokill do
-                unit:Kill()
+                if not IsDestroyed(unit) then
+                    unit:Kill()
+                end
             end
         end
 

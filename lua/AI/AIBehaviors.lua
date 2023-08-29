@@ -1417,9 +1417,11 @@ end
 ---@param pathDist any
 ---@return boolean
 ExpPathToLocation = function(aiBrain, platoon, layer, dest, aggro, pathDist)
+    local NavUtils = import("/lua/sim/navutils.lua")
     local cmd = false
     local platoonUnits = platoon:GetPlatoonUnits()
-    local path, reason = AIAttackUtils.PlatoonGenerateSafePathTo(aiBrain, layer, platoon:GetPlatoonPosition(), dest, nil, nil, pathDist)
+    platoon.PlatoonSurfaceThreat = platoon:GetPlatoonThreat('Surface', categories.ALLUNITS)
+    local path, reason = NavUtils.PathToWithThreatThreshold(layer, platoon:GetPlatoonPosition(), dest, aiBrain, NavUtils.ThreatFunctions.AntiSurface, platoon.PlatoonSurfaceThreat * 10, aiBrain.IMAPConfig.Rings)
     if not path then
         if aggro == 'AttackMove' then
             cmd = platoon:AggressiveMoveToLocation(dest)

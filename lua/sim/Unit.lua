@@ -83,6 +83,14 @@ SyncMeta = {
     end,
 }
 
+---@class UnitCommand
+---@field x number
+---@field y number
+---@field z number
+---@field targetId? EntityId
+---@field target? Entity
+---@field commandType string 
+
 ---@class AIUnitProperties
 ---@field AIPlatoonReference AIPlatoon
 ---@field AIBaseManager LocationType
@@ -113,6 +121,7 @@ local cUnit = moho.unit_methods
 ---@field TerrainType TerrainType
 ---@field EngineCommandCap? table<string, boolean>
 ---@field UnitBeingBuilt Unit?
+---@field EntityBeingReclaimed Unit | Prop | nil
 ---@field SoundEntity? Unit | Entity
 ---@field AutoModeEnabled? boolean
 Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
@@ -138,6 +147,8 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
     DestructionPartsHighToss = {},
     DestructionPartsLowToss = {},
     DestructionPartsChassisToss = {},
+
+    DisableIntelOfCargo = false,
 
     -- kept for backwards compatibility, these default to true
     CanTakeDamage = true,
@@ -166,7 +177,6 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
     -------------------------------------------------------------------------------------------
     ---@param self Unit
     OnPreCreate = function(self)
-
         -- Each unit has a sync table to replicate values to the global sync table to be copied to the user layer at sync time.
         self.Sync = {}
         self.Sync.id = self:GetEntityId()
@@ -508,9 +518,18 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
 
     ---@param self Unit
     OnPaused = function(self)
+
         if self:IsUnitState('Building') or self:IsUnitState('Upgrading') or self:IsUnitState('Repairing') then
             self:SetActiveConsumptionInactive()
             self:StopUnitAmbientSound('ConstructLoop')
+        end
+
+        -- When paused we reclaim at a speed of 0, with thanks to:
+        -- - https://github.com/FAForever/FA-Binary-Patches/pull/19
+        if self.EntityBeingReclaimed and (not IsDestroyed(self.EntityBeingReclaimed)) then
+            self:StopReclaimEffects(self.EntityBeingReclaimed)
+            self:StopUnitAmbientSound('ReclaimLoop')
+            self:PlayUnitSound('StopReclaim')
         end
     end,
 
@@ -519,6 +538,14 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         if self:IsUnitState('Building') or self:IsUnitState('Upgrading') or self:IsUnitState('Repairing') then
             self:SetActiveConsumptionActive()
             self:PlayUnitAmbientSound('ConstructLoop')
+        end
+
+        -- When paused we reclaim at a speed of 0, with thanks to:
+        -- - https://github.com/FAForever/FA-Binary-Patches/pull/19
+        if self.EntityBeingReclaimed and (not IsDestroyed(self.EntityBeingReclaimed)) then
+            self:StartReclaimEffects(self.EntityBeingReclaimed)
+            self:PlayUnitSound('StartReclaim')
+            self:PlayUnitAmbientSound('ReclaimLoop')
         end
     end,
 
@@ -754,13 +781,19 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
     ---@param self Unit
     ---@param target Unit | Prop
     OnStartReclaim = function(self, target)
+        -- When paused we reclaim at a speed of 0, with thanks to:
+        -- - https://github.com/FAForever/FA-Binary-Patches/pull/19
+        if not self:IsPaused() then
+            self:StartReclaimEffects(target)
+            self:PlayUnitSound('StartReclaim')
+            self:PlayUnitAmbientSound('ReclaimLoop')
+        end
+
+        self.EntityBeingReclaimed = target
         self:SetUnitState('Reclaiming', true)
         self:SetFocusEntity(target)
         self:CheckAssistersFocus()
         self:DoUnitCallbacks('OnStartReclaim', target)
-        self:StartReclaimEffects(target)
-        self:PlayUnitSound('StartReclaim')
-        self:PlayUnitAmbientSound('ReclaimLoop')
 
         -- Force me to move on to the guard properly when done
         local guard = self:GetGuardedUnit()
@@ -796,6 +829,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         self:StopUnitAmbientSound('ReclaimLoop')
         self:PlayUnitSound('StopReclaim')
         self:SetUnitState('Reclaiming', false)
+        self.EntityBeingReclaimed = nil
 
         if target.IsProp then
             target:UpdateReclaimLeft()
@@ -1081,8 +1115,8 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
                 if focus:IsUnitState('SiloBuildingAmmo') then
                     local siloBuildRate = focus:GetBuildRate() or 1
                     time, energy, mass = focus:GetBuildCosts(focus.SiloProjectile)
-                    energy = (energy / siloBuildRate) * (self:GetBuildRate() or 1)
-                    mass = (mass / siloBuildRate) * (self:GetBuildRate() or 1)
+                    energy = (energy / siloBuildRate) * (self:GetBuildRate() or 0)
+                    mass = (mass / siloBuildRate) * (self:GetBuildRate() or 0)
                 else
                     time, energy, mass = self:GetBuildCosts(focus:GetBlueprint())
                     if self:IsUnitState('Repairing') and focus.isFinishedUnit then
@@ -1092,8 +1126,8 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
                 end
             end
 
-            energy = math.max(1, energy * (self.EnergyBuildAdjMod or 1))
-            mass = math.max(1, mass * (self.MassBuildAdjMod or 1))
+            energy = math.max(0, energy * (self.EnergyBuildAdjMod or 1))
+            mass = math.max(0, mass * (self.MassBuildAdjMod or 1))
             energy_rate = energy / time
             mass_rate = mass / time
         end
@@ -1386,7 +1420,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
 
     -- On killed: this function plays when the unit takes a mortal hit. Plays death effects and spawns wreckage, dependant on overkill
     ---@param self Unit
-    ---@param instigator Unit
+    ---@param instigator Unit | Projectile
     ---@param type string
     ---@param overkillRatio number
     OnKilled = function(self, instigator, type, overkillRatio)
@@ -1446,8 +1480,8 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         ArmyBrains[army].LastUnitKilledBy = (instigator or self).Army
         ArmyBrains[army]:AddUnitStat(self.UnitId, "lost", 1)
 
-        -- awareness of instigator that it killed a unit
-        if instigator then
+        -- awareness of instigator that it killed a unit, but it can also be a projectile or nil
+        if instigator and instigator.OnKilledUnit then
             instigator:OnKilledUnit(self)
         end
 
@@ -1492,7 +1526,6 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
     ---@param firingWeapon Weapon The weapon that the projectile originates from
     ---@return boolean
     OnCollisionCheck = function(self, other, firingWeapon)
-
         -- bail out immediately
         if self.DisallowCollisions then
             return false
@@ -1625,10 +1658,28 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         local pos = self:GetPosition()
         local layer = self.Layer
 
+        -- Reduce the mass value based on the tech tier
+        -- by default we reduce the mass value 2 times by 90% for a total of 81%
+        local mass_tech_mult = 0.9
+        local tech_category = bp.TechCategory
+
+        -- We reduce the mass value based on tech category
+        if tech_category == 'TECH1' then
+            mass_tech_mult = 0.9
+        elseif tech_category == 'TECH2' then
+            mass_tech_mult = 0.8
+        elseif tech_category == 'TECH3' then
+            mass_tech_mult = 0.7
+        elseif tech_category == 'EXPERIMENTAL' then
+            mass_tech_mult = 0.6
+        end
+        
+        mass = mass * mass_tech_mult
+
         -- Reduce the mass value of submerged wrecks
         if layer == 'Water' or layer == 'Sub' then
-            mass = mass * 0.5
-            energy = energy * 0.5
+            mass = mass * 0.6
+            energy = energy * 0.6
         end
 
         local halfBuilt = self:GetFractionComplete() < 1
@@ -4393,27 +4444,67 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         end
     end,
 
+    --- Called from the perspective of the unit that is added to the storage of another unit
     ---@param self Unit
-    ---@param unit Unit
-    OnAddToStorage = function(self, unit)
+    ---@param carrier Unit
+    OnAddToStorage = function(self, carrier)
         self:OnStorageChange(true)
+
+        if carrier.DisableIntelOfCargo and (not IsDestroyed(self)) then
+            self:DisableUnitIntel('Cargo')
+            if self.MaintenanceConsumption then
+                self:SetMaintenanceConsumptionInactive()
+                self.EnableConsumptionWhenRemovedFromStorage = true
+            end
+
+            -- look at additional layer of storage / cargo (looking at you, Stinger)
+            if EntityCategoryContains(categories.TRANSPORTATION, self) then
+                for _, attached in self:GetCargo() do
+                    attached:DisableUnitIntel('Cargo')
+                    if attached.MaintenanceConsumption then
+                        attached:SetMaintenanceConsumptionInactive()
+                        attached.EnableConsumptionWhenRemovedFromStorage = true
+                    end
+                end
+            end
+        end
 
         -- awareness of event for AI
         local aiPlatoon = self.AIPlatoonReference
         if aiPlatoon then
-            aiPlatoon:OnAddToStorage(self, unit)
+            aiPlatoon:OnAddToStorage(self, carrier)
         end
     end,
 
+    --- Called from the perspective of the unit that is removed from the storage of another unit
     ---@param self Unit
-    ---@param unit Unit
-    OnRemoveFromStorage = function(self, unit)
+    ---@param carrier Unit
+    OnRemoveFromStorage = function(self, carrier)
         self:OnStorageChange(false)
+
+        if carrier.DisableIntelOfCargo and (not IsDestroyed(self)) then
+            self:EnableUnitIntel('Cargo')
+            if self.EnableConsumptionWhenRemovedFromStorage then
+                self:SetMaintenanceConsumptionActive()
+                self.EnableConsumptionWhenRemovedFromStorage = nil
+            end
+
+            -- look at additional layer of storage / cargo (looking at you, Stinger)
+            if EntityCategoryContains(categories.TRANSPORTATION, self) then
+                for _, attached in self:GetCargo() do
+                    attached:EnableUnitIntel('Cargo')
+                    if attached.EnableConsumptionWhenRemovedFromStorage then
+                        attached:SetMaintenanceConsumptionActive()
+                        attached.EnableConsumptionWhenRemovedFromStorage = nil
+                    end
+                end
+            end
+        end
 
         -- awareness of event for AI
         local aiPlatoon = self.AIPlatoonReference
         if aiPlatoon then
-            aiPlatoon:OnRemoveFromStorage(self, unit)
+            aiPlatoon:OnRemoveFromStorage(self, carrier)
         end
     end,
 
@@ -4632,7 +4723,9 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
     OnAttachedToTransport = function(self, transport, bone)
         self:MarkWeaponsOnTransport(true)
         if self:ShieldIsOn() or self.MyShield.Charging then
-            if not self.MyShield.SkipAttachmentCheck then 
+
+            local shield = self.MyShield
+            if shield and not (shield.SkipAttachmentCheck or shield.RemainEnabledWhenAttached) then
                 self:DisableShield()
             end
 
@@ -4743,6 +4836,26 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         local total = 10 * (buildTime / buildRate)
         local blocks = math.ceil(fraction * total)
         cUnit.GiveNukeSiloAmmo(self, blocks, true)
+    end,
+
+    ---@param self Unit
+    ---@return UnitCommand[]
+    GetCommandQueue = function(self)
+        local queue = cUnit.GetCommandQueue(self)
+        if queue then
+            for k, order in queue do
+                if order.targetId then
+                    local target = GetEntityById(order.targetId)
+                    if target and IsEntity(target) then
+                        order.target = target
+                        -- take position of the entity, used to sort the units
+                        order.x, order.y, order.z = moho.entity_methods.GetPositionXYZ(target)
+                    end
+                end
+            end
+        end
+
+        return queue
     end,
 
     --- Stuns the unit, if it isn't set to be immune by the flag unit.ImmuneToStun

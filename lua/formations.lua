@@ -81,7 +81,7 @@ end
 local RemainingCategory = { 'RemainingCategory', }
 
 -- === LAND CATEGORIES ===
-local DirectFire = (categories.DIRECTFIRE - (categories.CONSTRUCTION + categories.SNIPER)) * categories.LAND
+local DirectFire = (categories.DIRECTFIRE - (categories.CONSTRUCTION + categories.SNIPER + categories.WEAKDIRECTFIRE)) * categories.LAND
 local Sniper = categories.SNIPER * categories.LAND
 local Artillery = (categories.ARTILLERY + categories.INDIRECTFIRE - categories.SNIPER) * categories.LAND
 local AntiAir = (categories.ANTIAIR - (categories.EXPERIMENTAL + categories.DIRECTFIRE + categories.SNIPER + Artillery)) * categories.LAND

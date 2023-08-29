@@ -1072,6 +1072,9 @@
 --- Maximum number of medium units this transport can carry. If larger than the number of medium
 --- slots calculated from the number hooks, that smaller number is used instead.
 ---@field SlotsMedium? integer
+--- Maximum number of small units this transport can carry. If larger than the number of small
+--- slots calculated from the number hooks, that smaller number is used instead.
+---@field SlotsSmall? integer
 --- how many internal storage slots available for the transport, in additoin to the attach points
 ---@field StorageSlots integer
 --- type of attach points required on transports

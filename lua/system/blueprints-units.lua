@@ -1,3 +1,12 @@
+-- upvalue for performance
+local TableFind = table.find
+local TableGetn = table.getn
+
+local MathMax = math.max
+local MathFloor = math.floor
+
+local StringFind = string.find
+
 local BlueprintNameToIntel = {
     Cloak = 'Cloak',
     CloakField = 'CloakField',
@@ -29,6 +38,78 @@ local TechToVetMultipliers = {
     EXPERIMENTAL = 2,
     COMMAND = 2,
 }
+
+---@param weapon WeaponBlueprint
+local function CalculatedDamage(weapon)
+    local ProjectileCount = MathMax(1, TableGetn(weapon.RackBones[1].MuzzleBones or {'nehh'}), weapon.MuzzleSalvoSize or 1)
+    if weapon.RackFireTogether then
+        ProjectileCount = ProjectileCount * MathMax(1, TableGetn(weapon.RackBones or {'nehh'}))
+    end
+    return ((weapon.Damage or 0) + (weapon.NukeInnerRingDamage or 0)) * ProjectileCount * (weapon.DoTPulses or 1)
+end
+
+--- Determines the expected Damage Per Second (dps) of the weapon
+---@param weapon WeaponBlueprint
+---@return number
+local function DetermineWeaponDPS(weapon)
+    --- With thanks to Sean 'Balthazar' Wheeldon
+
+    -- Base values
+    local ProjectileCount
+    if weapon.MuzzleSalvoDelay == 0 then
+        ProjectileCount = MathMax(1, TableGetn(weapon.RackBones[1].MuzzleBones or {'nehh'}))
+    else
+        ProjectileCount = (weapon.MuzzleSalvoSize or 1)
+    end
+    if weapon.RackFireTogether then
+        ProjectileCount = ProjectileCount * MathMax(1, TableGetn(weapon.RackBones or {'nehh'}))
+    end
+    -- Game logic rounds the timings to the nearest tick --  MathMax(0.1, 1 / (weapon.RateOfFire or 1)) for unrounded values
+    local DamageInterval = MathFloor((MathMax(0.1, 1 / (weapon.RateOfFire or 1)) * 10) + 0.5) / 10 + ProjectileCount * (MathMax(weapon.MuzzleSalvoDelay or 0, weapon.MuzzleChargeDelay or 0) * (weapon.MuzzleSalvoSize or 1))
+    local Damage = ((weapon.Damage or 0) + (weapon.NukeInnerRingDamage or 0)) * ProjectileCount * (weapon.DoTPulses or 1)
+
+    -- Beam calculations.
+    if weapon.BeamLifetime and weapon.BeamLifetime == 0 then
+        -- Unending beam. Interval is based on collision delay only.
+        DamageInterval = 0.1 + (weapon.BeamCollisionDelay or 0)
+    elseif weapon.BeamLifetime and weapon.BeamLifetime > 0 then
+        -- Uncontinuous beam. Interval from start to next start.
+        DamageInterval = DamageInterval + weapon.BeamLifetime
+        -- Damage is calculated as a single glob, beam weapons are typically underappreciated
+        Damage = Damage * (weapon.BeamLifetime / (0.1 + (weapon.BeamCollisionDelay or 0)))
+    end
+
+    return (Damage / DamageInterval) or 0
+end
+
+--- Determines the expected weapon category
+---@param weapon WeaponBlueprint
+---@return WeaponRangeCategory?
+local function DetermineWeaponCategory(weapon)
+    --- With thanks to Sean 'Balthazar' Wheeldon
+
+    if weapon.RangeCategory == 'UWRC_AntiAir' or weapon.TargetRestrictOnlyAllow == 'AIR' or StringFind(weapon.WeaponCategory or 'nope', 'Anti Air') then
+        return 'ANTIAIR'
+    end
+
+    if weapon.RangeCategory == 'UWRC_AntiNavy' or StringFind(weapon.WeaponCategory or 'nope', 'Anti Navy') then
+        return 'ANTINAVY'
+    end
+
+    if weapon.RangeCategory == 'UWRC_DirectFire' or StringFind(weapon.WeaponCategory or 'nope', 'Direct Fire') then
+        return 'DIRECTFIRE'
+    end
+
+    if weapon.RangeCategory == 'UWRC_IndirectFire' or StringFind(weapon.WeaponCategory or 'nope', 'Artillery') then
+        return 'INDIRECTFIRE'
+    end
+
+    if weapon.RangeCategory == 'UWRC_Countermeasure' or StringFind(weapon.WeaponCategory or 'nope', 'Defense') then
+        return 'COUNTERMEASURE'
+    end
+
+    return nil
+end
 
 --- Post process a unit
 ---@param unit UnitBlueprint
@@ -331,12 +412,151 @@ local function PostProcessUnit(unit)
         unit.VetThresholds[4] = 4 * multiplier * (unit.Economy.BuildCostMass or 1)
         unit.VetThresholds[5] = 5 * multiplier * (unit.Economy.BuildCostMass or 1)
     end
+
+    -- Pre-compute weak secondary weapons and weapon overlays
+
+    local weapons = unit.Weapon
+    if weapons then
+
+        -- determine total dps per category
+        local damagePerRangeCategory = {
+            DIRECTFIRE = 0,
+            INDIRECTFIRE = 0,
+            ANTIAIR = 0,
+            ANTINAVY = 0,
+            COUNTERMEASURE = 0,
+        }
+
+        for k, weapon in weapons do
+            local dps = DetermineWeaponDPS(weapon)
+            local category = DetermineWeaponCategory(weapon)
+            if category then
+                damagePerRangeCategory[category] = damagePerRangeCategory[category] + dps
+            else
+                if weapon.WeaponCategory != 'Death' then
+                    -- WARN("Invalid weapon on " .. unit.BlueprintId)
+                end
+            end
+        end
+
+        local array = {
+            {
+                RangeCategory = "DIRECTFIRE",
+                Damage = damagePerRangeCategory["DIRECTFIRE"]
+            },
+            {
+                RangeCategory = "INDIRECTFIRE",
+                Damage = damagePerRangeCategory["INDIRECTFIRE"]
+            },
+            {
+                RangeCategory = "ANTIAIR",
+                Damage = damagePerRangeCategory["ANTIAIR"]
+            },
+            {
+                RangeCategory = "ANTINAVY",
+                Damage = damagePerRangeCategory["ANTINAVY"]
+            },
+            {
+                RangeCategory = "COUNTERMEASURE",
+                Damage = damagePerRangeCategory["COUNTERMEASURE"]
+            }
+        }
+
+        table.sort(array, function(e1, e2) return e1.Damage > e2.Damage end)
+        local factor = array[1].Damage
+
+        for category, damage in damagePerRangeCategory do
+            if damage > 0 then
+                local cat = "OVERLAY" .. category
+                if not unit.CategoriesHash[cat] then
+                    table.insert(unit.Categories, cat)
+                    unit.CategoriesHash[cat] = true
+                    unit.CategoriesCount = unit.CategoriesCount + 1
+                end
+
+                local cat = "WEAK" .. category
+                if not (
+                        category == 'COUNTERMEASURE' or
+                        unit.CategoriesHash['COMMAND'] or
+                        unit.CategoriesHash['STRATEGIC'] or
+                        unit.CategoriesHash[cat]
+                    ) and damage < 0.2 * factor
+                then
+                    table.insert(unit.Categories, cat)
+                    unit.CategoriesHash[cat] = true
+                    unit.CategoriesCount = unit.CategoriesCount + 1
+                end
+            end
+        end
+    end
+
+    -- add the defense overlay to shields
+    if unit.Defense.Shield and unit.Defense.Shield.ShieldSize > 0 then
+        local cat = "OVERLAYDEFENSE"
+        if not unit.CategoriesHash[cat] then
+            table.insert(unit.Categories, cat)
+            unit.CategoriesHash[cat] = true
+            unit.CategoriesCount = unit.CategoriesCount + 1
+        end
+    end
+
+    -- Populate help text field when applicable
+    if not (unit.Interface and unit.Interface.HelpText) then
+        unit.Interface = unit.Interface or { }
+        unit.Interface.HelpText = unit.Description or "" --[[@as string]]
+    end
+end
+
+---@param allBlueprints BlueprintsTable
+---@param unit UnitBlueprint
+function PostProcessUnitWithExternalFactory(allBlueprints, unit)
+    -- create a new unit that represents the external factory
+    ---@type UnitBlueprint
+    local efBlueprint = table.deepcopy(allBlueprints.Unit["zxa0002"])
+
+    -- not available when reloading using program argument 'EnableDiskWatch'
+    if efBlueprint then
+        local efBlueprintId = string.lower(unit.BlueprintId .. "ef")
+        allBlueprints.Unit[efBlueprintId] = efBlueprint
+
+        -- replace properties of external factory
+        efBlueprint.Economy = { BuildRate = unit.Economy.BuildRate, BuildableCategory = unit.Economy.BuildableCategory }
+        efBlueprint.General.Icon = unit.General.Icon
+        efBlueprint.General.FactionName = unit.General.FactionName
+        efBlueprint.General.UnitName = unit.General.UnitName
+        efBlueprint.FactionCategory = unit.FactionCategory
+        efBlueprint.LayerCategory = unit.LayerCategory
+        efBlueprint.BlueprintId = efBlueprintId
+        efBlueprint.BaseBlueprintId = unit.BlueprintId
+        efBlueprint.ScriptClass = 'ExternalFactoryUnit'
+        efBlueprint.ScriptModule = '/lua/defaultunits.lua'
+        efBlueprint.CategoriesHash[unit.FactionCategory] = true
+        efBlueprint.CategoriesHash[unit.LayerCategory] = true
+        efBlueprint.Categories = table.unhash(efBlueprint.CategoriesHash)
+        efBlueprint.SelectionSizeX = 0.95 * unit.SelectionSizeX
+        efBlueprint.SelectionSizeZ = 0.25 * unit.SelectionSizeZ
+        efBlueprint.SelectionCenterOffsetZ = 0.35 * unit.SelectionSizeZ
+
+        -- remove properties of the seed unit
+        unit.CategoriesHash['FACTORY'] = nil
+        unit.CategoriesHash['CONSTRUCTION'] = nil
+        unit.Categories = table.unhash(unit.CategoriesHash)
+        unit.Economy.BuildRate = 0
+        unit.Economy.BuildableCategory = nil
+    end
 end
 
 --- Post-processes all units
+---@param allBlueprints BlueprintsTable
 ---@param units UnitBlueprint[]
-function PostProcessUnits(units)
+function PostProcessUnits(allBlueprints, units)
     for _, unit in units do
         PostProcessUnit(unit)
+    end
+
+    for _, unit in units do
+        if unit.CategoriesHash['EXTERNALFACTORY'] then
+            PostProcessUnitWithExternalFactory(allBlueprints, unit)
+        end
     end
 end

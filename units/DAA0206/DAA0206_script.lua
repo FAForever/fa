@@ -7,6 +7,7 @@
 
 local AAirUnit = import("/lua/aeonunits.lua").AAirUnit
 local DefaultProjectileWeapon = import("/lua/sim/defaultweapons.lua").DefaultProjectileWeapon
+local VisionMarker = import("/lua/sim/vizmarker.lua").VisionMarkerOpti
 
 ---@class DAA0206 : AAirUnit
 DAA0206 = ClassUnit(AAirUnit) {
@@ -26,6 +27,7 @@ DAA0206 = ClassUnit(AAirUnit) {
         self:GetWeapon(1).IdleState.Main = function(self) end
         self:PlayUnitSound('Killed')
 		self:PlayUnitSound('Destroyed')
+
         self:Destroy()
     end,
 }

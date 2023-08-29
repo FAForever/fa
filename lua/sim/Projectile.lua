@@ -5,8 +5,10 @@
 --  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 ------------------------------------------------------------------
 
+local ProjectileMethods = moho.projectile_methods
 local DefaultDamage = import("/lua/sim/defaultdamage.lua")
 local Flare = import("/lua/defaultantiprojectile.lua").Flare
+local DepthCharge = import("/lua/defaultantiprojectile.lua").DepthCharge
 
 local TableGetn = table.getn
 
@@ -76,23 +78,23 @@ local OnImpactDestroyCategories = categories.ANTIMISSILE * categories.ALLPROJECT
 ---@field Trash TrashBag
 ---@field Launcher Unit
 ---@field DamageData table
-Projectile = ClassProjectile(moho.projectile_methods) {
+Projectile = ClassProjectile(ProjectileMethods) {
     IsProjectile = true,
     DestroyOnImpact = true,
     FxImpactTrajectoryAligned = true,
 
     -- tables used for effects
-    FxImpactAirUnit = import("/lua/effecttemplates.lua").NoEffects,
-    FxImpactLand = import("/lua/effecttemplates.lua").NoEffects,
-    FxImpactNone = import("/lua/effecttemplates.lua").NoEffects,
-    FxImpactProp = import("/lua/effecttemplates.lua").NoEffects,
-    FxImpactShield = import("/lua/effecttemplates.lua").NoEffects,
-    FxImpactWater = import("/lua/effecttemplates.lua").NoEffects,
-    FxImpactUnderWater = import("/lua/effecttemplates.lua").NoEffects,
-    FxImpactUnit = import("/lua/effecttemplates.lua").NoEffects,
-    FxImpactProjectile = import("/lua/effecttemplates.lua").NoEffects,
-    FxImpactProjectileUnderWater = import("/lua/effecttemplates.lua").NoEffects,
-    FxOnKilled = import("/lua/effecttemplates.lua").NoEffects,
+    FxImpactAirUnit = { },
+    FxImpactLand = { },
+    FxImpactNone = { },
+    FxImpactProp = { },
+    FxImpactShield = { },
+    FxImpactWater = { },
+    FxImpactUnderWater = { },
+    FxImpactUnit = { },
+    FxImpactProjectile = { },
+    FxImpactProjectileUnderWater = { },
+    FxOnKilled = { },
 
     -- scale values used for effects
     FxAirUnitHitScale = 1,
@@ -155,10 +157,10 @@ Projectile = ClassProjectile(moho.projectile_methods) {
         -- torpedoes can only be taken down by anti torpedo
         if selfHashedCategories['TORPEDO'] then
             if otherHashedCategories["ANTITORPEDO"] then
-                return alliedCheck
+                return other.OriginalTarget == self
             else
                 return false
-            end
+            end 
         end
 
         -- missiles can only be taken down by anti missiles
@@ -514,6 +516,11 @@ Projectile = ClassProjectile(moho.projectile_methods) {
         if trackTarget then
             self:SetLifetime(onLostTargetLifetime)
         end
+
+        local originalTarget = self.OriginalTarget
+        if originalTarget and not (originalTarget.Dead or IsDestroyed(originalTarget)) then
+            self:SetNewTarget(originalTarget)
+        end
     end,
 
     -- Lua functionality
@@ -739,6 +746,19 @@ Projectile = ClassProjectile(moho.projectile_methods) {
         self.Trash:Add(self.MyFlare)
     end,
 
+    ---@param self TDepthChargeProjectile
+    ---@param blueprint WeaponBlueprintDepthCharge
+    AddDepthCharge = function(self, blueprint)
+        if not blueprint then return end
+        if not blueprint.Radius then return end
+        self.MyDepthCharge = DepthCharge {
+            Owner = self,
+            Radius = blueprint.Radius or 10,
+            DepthCharge = blueprint.ProjectilesToDeflect
+        }
+        self.Trash:Add(self.MyDepthCharge)
+    end,
+
     --- Called by Lua to create the impact effects
     ---@param self Projectile
     ---@param army number
@@ -886,6 +906,18 @@ Projectile = ClassProjectile(moho.projectile_methods) {
             return nil
         end
     end,
+
+    ---------------------------------------------------------------------------
+    --#region C hooks
+
+    --- Creates a child projectile that inherits the speed, orientation and launcher of its parent
+    ---@param blueprint ProjectileBlueprint
+    ---@return Projectile
+    CreateChildProjectile = function (self, blueprint)
+        local projectile = ProjectileMethods.CreateChildProjectile(self, blueprint)
+        projectile.Launcher = self.Launcher
+        return projectile
+    end,
 }
 
 --- A dummy projectile that solely inherits what it needs. Useful for
@@ -893,7 +925,7 @@ Projectile = ClassProjectile(moho.projectile_methods) {
 ---@class DummyProjectile : moho.projectile_methods
 ---@field Blueprint ProjectileBlueprint
 ---@field Army Army
-DummyProjectile = ClassDummyProjectile(moho.projectile_methods) {
+DummyProjectile = ClassDummyProjectile(ProjectileMethods) {
     ---@param self DummyProjectile
     ---@param inWater? boolean
     OnCreate = function(self, inWater)

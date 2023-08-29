@@ -1,6 +1,6 @@
 EmitterBlueprint {
     BlueprintId = 'watertower',
-    Lifetime = 2.00,
+    Lifetime = 1.0,
     Repeattime = 50.00,
     TextureFramecount = 1.00,
     Blendmode = 0.00,
@@ -15,7 +15,7 @@ EmitterBlueprint {
     CatchupEmit = true,
     CreateIfVisible = false,
     SnapToWaterline = true,
-    OnlyEmitOnWater = false,
+    OnlyEmitOnWater = true,
     ParticleResistance = false,
     InterpolateEmission = true,
     TextureStripcount = 1.00,
@@ -52,7 +52,7 @@ EmitterBlueprint {
     LifetimeCurve = {
         XRange = 50.00,
         Keys = {
-            { x=24.933,y=80.000,z=40.000 },
+            { x=24.933,y=20.000,z=40.000 },
         },
     },
     VelocityCurve = {

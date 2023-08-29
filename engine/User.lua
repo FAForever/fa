@@ -419,7 +419,7 @@ end
 
 --- Returns a table of strings which are the names of files in special locations (currently SaveFile, Replay)
 ---@param type string
----@return table
+---@return { extension: string, directory: string, files: table<string, string[]> }
 function GetSpecialFiles(type)
 end
 
@@ -885,7 +885,7 @@ function SessionSendChatMessage(client, message)
 end
 
 --- Set this as an active build template
----@param template BuildQueue
+---@param template BuildTemplate
 function SetActiveBuildTemplate(template)
 end
 

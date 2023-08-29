@@ -849,7 +849,7 @@ function ReturnTransportsToPool( aiBrain, units, move )
                 IssueClearCommands( {v} )
                 if VDist3( baseposition, unitposition ) > 100 then
                     -- this requests a path for the transport with a threat allowance of 20 - which is kinda steep sometimes
-					local safePath, reason = NavUtils.PathToWithThreatThreshold('Air', unitposition, baseposition, aiBrain, NavUtils.ThreatFunctions.AntiAir, 20, aiBrain.IMAPConfig.Rings)
+					local safePath, reason = NavUtils.PathToWithThreatThreshold('Air', unitposition, baseposition, aiBrain, NavUtils.ThreatFunctions.AntiAir, 50, aiBrain.IMAPConfig.Rings)
                     if safePath then
                         if TransportDialog then
                             LOG("*AI DEBUG "..aiBrain.Nickname.." "..returnpool.BuilderName.." Transport "..v.EntityId.." gets RTB path of "..repr(safePath))

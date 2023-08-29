@@ -10,6 +10,7 @@
 
 local CollisionBeam = import("/lua/sim/collisionbeam.lua").CollisionBeam
 local EffectTemplate = import("/lua/effecttemplates.lua")
+local VisionMarkerOpti = import("/lua/sim/VizMarker.lua").VisionMarkerOpti
 local Util = import("/lua/utilities.lua")
 
 -------------------------------
@@ -18,13 +19,13 @@ local Util = import("/lua/utilities.lua")
 ---@class SCCollisionBeam : CollisionBeam
 SCCollisionBeam = Class(CollisionBeam) {
     FxImpactUnit = EffectTemplate.DefaultProjectileLandUnitImpact,
-    FxImpactLand = import("/lua/effecttemplates.lua").NoEffects,-- EffectTemplate.DefaultProjectileLandImpact,
+    FxImpactLand = { },-- EffectTemplate.DefaultProjectileLandImpact,
     FxImpactWater = EffectTemplate.DefaultProjectileWaterImpact,
     FxImpactUnderWater = EffectTemplate.DefaultProjectileUnderWaterImpact,
     FxImpactAirUnit = EffectTemplate.DefaultProjectileAirUnitImpact,
-    FxImpactProp = import("/lua/effecttemplates.lua").NoEffects,
-    FxImpactShield = import("/lua/effecttemplates.lua").NoEffects,    
-    FxImpactNone = import("/lua/effecttemplates.lua").NoEffects,
+    FxImpactProp = { },
+    FxImpactShield = { },    
+    FxImpactNone = { },
 }
 
 -------------------------------
@@ -403,12 +404,22 @@ UnstablePhasonLaserCollisionBeam = Class(SCCollisionBeam) {
     OnImpact = function(self, impactType, targetEntity)
         if impactType ~= 'Shield' and impactType ~= 'Water' and impactType ~= 'Air' and impactType ~= 'UnitAir' and impactType ~= 'Projectile' then
             if self.Scorching == nil then
-                self.Scorching = self:ForkThread( self.ScorchThread )   
+                self.Scorching = self:ForkThread( self.ScorchThread )
             end
         else
             KillThread(self.Scorching)
             self.Scorching = nil
         end
+
+        -- add vision to make sure we can see the impact effect
+        local position = self:GetPosition(1)
+        if position then
+            local marker = VisionMarkerOpti({Owner = self.unit})
+            marker:UpdatePosition(position[1], position[3])
+            marker:UpdateDuration(1)
+            marker:UpdateIntel(self.Army, 4, 'Vision', true)
+        end
+
         CollisionBeam.OnImpact(self, impactType, targetEntity)
     end,
 

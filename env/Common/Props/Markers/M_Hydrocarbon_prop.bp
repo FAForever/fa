@@ -11,8 +11,8 @@ PropBlueprint {
         UniformScale = 0.1,
     },
     Economy = {
-        ReclaimEnergyMax = '',
-        ReclaimMassMax = '',
+        ReclaimEnergyMax = 0,
+        ReclaimMassMax = 0,
     },
     Interface = {
         HelpText = 'Marker for general use',

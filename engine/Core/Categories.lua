@@ -112,8 +112,11 @@ categories = {
     NANOCOMBATPRESET = categoryValue,
     NAVALCARRIER = categoryValue,
     NAVAL = categoryValue,
+
+    -- Allows this unit to be build by engineers
     NEEDMOBILEBUILD = categoryValue,
     NOFORMATION = categoryValue,
+    --- Prevents splash damage being applied to the entity
     NOSPLASHDAMAGE = categoryValue,
     NUKE = categoryValue,
     NUKESUB = categoryValue,
@@ -236,6 +239,9 @@ categories = {
     StealthGenerator = categoryValue,
     Switchback = categoryValue,
     SystemIntegrityCompensator = categoryValue,
+
+    -- Populates a dummy factory that can take over the factory aspect of the unit
+    EXTERNALFACTORY = categoryValue
 }
 
 ---@alias CategoryName
@@ -351,6 +357,7 @@ categories = {
 ---| "NOSPLASHDAMAGE"
 ---| "NUKE"
 ---| "NUKESUB"
+---| "OBSTRUCTSBUILDING"
 ---| "OMNI"
 ---| "OPERATION"
 ---| "OPTICS"

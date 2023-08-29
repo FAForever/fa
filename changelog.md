@@ -1,6 +1,528 @@
 
 Some sections of the changelog are available in other languages such as [French](changelog-fr.md) or [Russian](changelog-ru.md)
 
+# Game version 3764 (29th of July, 2023)
+
+See the patch notes of 3762 and 3758 for the full patch notes.
+
+With thanks to all those that took the time to report issues and participate in feedback sessions,
+
+Jip
+
+## Features
+
+- (#5264) Enhancements to the unit restrictions menu
+
+  - Filters out dummy units
+  - Filters out insignificant units
+  - Fixes various bugs
+
+- (#5269) Enhancements to the unit cheat menu
+
+  - Add unit count input
+  - Add faction logo to a unit
+  - Add tech level  to a unit
+  - Improve readability of blueprint id
+  - Fix various styling issues
+
+- (#5274) Allow tree groups to block a construction site
+
+  Based on player feedback, tree groups now obstruct construction sites and are therefore reclaimed by the engineers
+
+  This is not to be confused with 'broken tree groups'. A tree group that is broken is split into individual trees. Once broken, these individual trees no longer block the construction site
+
+- (#5275) Additional hotkeys to unpause or pause all units
+
+  These new hotkeys allow you to express your intentions when (un)pausing a selection of units, especially when only a few of them need to be paused or unpaused
+
+- (#5276) Additional hotkeys to surface or submerge all units
+
+  These new hotkeys allow you to express your intentions when surfacing or submerging a selection of units, especially when only a few of them are submerged or surfaced
+
+## Bug fixes
+
+- (#5290) Resolved the issue with the navigational mesh causing crashes during the save-load sequence
+
+  Most notable when playing the campaign alone. The navigational mesh was written as a large cycle. As a consequence, once the navigational mesh was generated the save process would be unable to serialize it and crash the game
+
+- (#5291) Fix the Ythotha storm discriminating allied units and patches of ground
+
+  There was a bug that would prevent the Ythotha storm from firing upon allied units. As a result, the storm would only deal damage to hostile units. Now, the storm treats all units and ground patches equally, inflicting damage without bias.
+
+- (#5277) Prevent the intel recharge thread from hijacking the work progress bar
+
+  Most notable with the Cybran ACU once he has the stealth enhancement. This prevents the chaotic behavior when multiple Lua threads are trying to claim the progress bar
+
+- (#5282) Adjusted the positioning of tech 3 anti-air units in formations
+
+  The Bouncer and the Lightning tank have a direct fire weapon. As a result, they were considered to be a direct fire unit by the formations script. They are now recognized as anti-air units and therefore end up at the middle or the back of the formation like other anti-air units
+
+- (#5285) Remove the ability to cap Tech 3 air factories
+
+  The previous hotfix (3763) was unexpected and this change wasn't supposed to go live immediately. Regardless, we understood the feedback and are removing the behavior again
+
+- (#5287) Sanitize the anti-surface threat value of ACUs
+
+- (#5292) Fix a bug where Seraphim torpedo bombers can trick torpedo defenses
+
+## Other changes
+
+- (#5283) Add platoon form callbacks for conditional builds
+
+## Contributors
+
+- HUSSAR (#5264, #5269)
+- Jip (#5274, #5275, #5282, #5277, #5276, #5285, #5291, #5290, #5292)
+- Relent0r (#5287)
+- speed2 (#5283)
+
+# Game version 3763 (23th of July, 2023)
+
+See the patch notes of 3762 and 3758 for the full patch notes.
+
+There was a misconception with the distribution of files and as a result, wrecks would be removed in the release branch when you build on top of them. It was fun while it lasted ^^
+
+Jip
+
+## Features
+
+- (#5262) Introduce the ability to cap additional structures
+
+  You can now also cap the following structures:
+
+  - Tech 3 air factories with tech 3 power generators
+  - Tech 3 or experimental artillery with tech 3 power generators
+
+  To use these you need the game option 'Automate Structure Ringing' to be on 'Full Suite'
+
+## Bug fixes
+
+- (#5266) Fix wrecks being removed when constructing on top of them
+
+- (#5265) Fix the UI scaling of the unit cheat menu
+
+- (#5237) Fix the visuals and damage output of the Mercy
+
+  The visuals can now be seen when you're zoomed out and the Mercy deals exactly 600 area damage at the center of the target
+
+- (#5191) Fix the size of the zapper on the Cybran Aircraft Carrier
+
+## Contributors
+
+- Jip (#5265, #5266, #5237)
+- MadMax (#5191)
+- Hussar (#5262)
+
+
+# Game version 3762 (22th of July, 2023)
+
+See the patch notes of 3762 and 3758 for the full patch notes.
+
+Jip
+
+## Features
+
+- (#5197, #16) Small props and trees are ignored when building
+
+  You can now build on top of logs, bushes, cacti, (fallen) trees and tree groups. This is a quality-of-life change to prevent your ACU or your engineers from delaying your build order because there is an invisible prop (due to Level of Details (LODs)) 'blocking' your construction site. This can significantly delay the construction. Instead, the before-mentioned props are destroyed when you start the construction.
+
+  To be specific, the following props will still block your construction site:
+
+  - Any wreck, regardless of mass value
+  - Any rock, regardless of mass value
+  - Any non-tree prop of significant (>= 10) mass value in general
+
+  For the next patch, the goal is to allow you to entirely rely on the reclaim overview to manage your expectations of whether the construction site is blocked by props.
+
+- (#5246) Do not immediately destroy units of teams that recall
+
+  There was a suggestion on the forum to be able to review the final game state when a team recalls. With this delay, the units are preserved in the final game state, yet still destroyed when you play FFA-like setups
+
+- (#5247) Re-introduce a hotkey that allows you to filter your selection and assist the highest tech engineers of your selection
+
+## AI
+
+- (#5234) Fix a bug where nuke launchers did not generate the correct threat
+
+  They were categorized by AI as a unit with excessive surface threat, instead of economic threat. As a result, the AI would essentially never attack a base with a nuke launcher in it
+
+- (#5234) Fix a bug where mobile artillery and missile launchers did not generate the correct threat
+
+  They were categorized by the AI as units with economic threat instead of surface threat. As a result, the AI would recognize them as bulky engineers instead of something more dangerous
+
+- (#5156, #5164) Add additional debug utilities for the Navigational Mesh
+
+## Bug fixes
+
+- (#5218) Fix a bug when trying to give a unit a veterancy of 0
+
+  A few campaign maps did this and the bug prevented the scripts to continue
+
+- (#5219, #5236) Fix a bug in campaign maps related to missing categories
+
+- (#5219, #5236) Fix a bug with the unit restrictions menu related to missing categories
+
+- (#5162) Fix shield visibility on land-only maps
+
+- (#5245) Fix a bug where the idle animation of the Seraphim tech 2 extractor does not stop when upgrading
+
+## Graphics
+
+- (#5171) Add or fix existing LODs of various Aeon units
+
+## Performance
+
+- (#5250) Reduce the performance impact of the AA weaponry of Seraphim frigates
+
+## Contributors
+
+- 4z0t (#16)
+- BlackYps (#5162)
+- Relent0r (#5234)
+- Basilisk3 (#5250)
+- MadMax (#5171)
+- Jip (#5156, #5164, #5197, #5219, #5245, #5247)
+
+
+# Game version 3761 (27th of June, 2023)
+
+The main objective of this patch is to enhance the viability of a diverse range of strategies by boosting raiding capabilities, balancing overpowered units, and introducing novel ways to utilize existing units.
+
+This changelog is just a snippet of the total changelog. In this balance update, more than a hundred units have been tweaked in some fashion. You can read the complete changelog by clicking on the 'Beta Balance' button below. This snippet only includes bug fixes and unit reworks.
+
+The Balance Team
+
+## Bug fixes
+
+- (#5222) Fix a resource glitch that allows the Megalith to produce units for free
+
+- (#5221) Fix a bug with the animation of the Cybran extractors not stopping when upgrading
+
+- (#5220) Fix a bug where the Wailer (Tech 3 Cybran gunship) would half its damage output
+
+  This bug occurs when the Wailer would engage a ground target and an air target at the same time. The damage output of the air-to-ground weapons would be reduced by half
+
+## Unit reworks
+
+- (#4985, #5194, #5175) Rework the Mercy
+
+  The mercy has been completely reworked. The role of the unit is changed from being a sniper to area denial. It now deals damage over time over a large area
+
+  With thanks to Deribus for the initial idea and implementation
+
+## Contributors
+
+- Terminal
+- Farmsletje
+- Tagada
+- SpikeyNoob
+- Rowey
+- Blodir
+- Turinturambar
+- RabidPope
+- Basilisk3
+- Hdt80bro
+- ComradeStryker
+- Jip
+- 4z0t
+- Deribus
+- Archsimkat
+
+# Game version 3760 (27th of June, 2023)
+
+See the patch notes of 3758 for all the details of the second development iteration.
+
+We would like to remind people that we're always open to feedback. You can get in touch with us through the forums, Discord and of course through GitHub to discuss the patch.
+
+With thanks to those that took the time to report bugs,
+
+Jip
+
+## Bug fixes
+
+- (#5153) Fix a bug with AI being buggy in the featured mod Nomads
+
+- (#5159) Remove the rehost functionality
+
+  The rehost functionality has been broken for quite a long time. It would not properly restart the 
+  game with the correct mods and previously private lobbies would become public. We've not managed to 
+  fix it for quite some time and it confuses those who use it. Therefore we've decided to remove it 
+  until we can find a proper fix.
+
+  You can still 'rehost' the usual way, and in that case, your mods will work too.
+
+- (#5158) Fix a bug with the Cybran destroyer being stuck in the transition animation
+
+- (#5155) Fix a bug where abandoned armies would not be defeated
+
+- (#5155) Fix a bug in the campaign/co-op where naval rally points were ignored
+
+- (#5155) Fix a bug in the campaign/co-op where the army brain was missing certain functions
+
+- (#5148) Fix a bug with the in-game file picker for replays
+
+## Contributors
+
+- Jip (#5159, #5158, #5155, #5148)
+- Relent0r (#5153)
+
+
+# Game version 3758 (24th of June, 2023)
+
+There are a lot of goodies in this iteration! The changelog format has been adjusted to make it easier to read. It now contains less detailed information and more general descriptions. Additionally, the in-game changelog window has been enhanced. To access more readable patch notes, you can find buttons at the bottom of the in-game changelog. These buttons will take you to the patch notes on GitHub or to the patch notes website 'patchnotes.faforever.com' for the respective branch. The website provides a user-friendly reading experience and may include helpful images to improve your understanding of the changes.
+
+As mentioned in the previous development iteration, our focus is now primarily on AI development. This iteration establishes the groundwork for future work in this area. Over the next few months, we will be working on improving the AI's decision-making abilities by applying and introducing additional abstractions of the game state. If you'd like to help with this then feel welcome to introduce yourself in the dev-offtopic channel on Discord!
+
+With appreciation towards all the contributors that made this patch possible,
+
+Jip
+
+## Features
+
+- (#3823) Improve the auto-balance feature by shuffling the pairs of players
+
+- (#4997) Add a hotkey to select the nearest idle tech 1 engineer
+
+- (#5040) Docked engineering drones are now ignored by anti-air weapons
+
+- (#5134) The recall feature now requires teams of three (remaining alive) players to all agree on a recall
+
+  We received complaints of people being recalled in the recently introduced 3v3 matchmaker without their consent. The recall feature was implemented when this matchmaker queue did not exist yet. As such we adjust the threshold slightly to prevent the negative aspects in the matchmaker while still allowing you to recall without the complete consent of a team in large team games
+
+- (#5133) Personal shields now remain enabled in transports
+
+  This behavior does not apply to bubble shields. This prevents the recharge cycle from being reset moving units around in transports. This specifically applies to ACUs with a personal shield enhancement
+
+## Bug fixes
+
+- (#4820) Fix 'OnGiven' callbacks not working properly, most notable in various campaign maps
+
+- (#4824) Fix the teleport delay of ACUs being too short due to a bug. They are now 25 seconds again
+
+- (#4774) Fix variables being in global scope while they should be in the local scope
+
+- (#4862) Fix a bug where stationary missile launchers could end up launching missiles into the terrain
+
+- (#4863) Fix a bug where states were unable to call their base class
+
+- (#4867, #15) Fix a bug where missile progression was not transferred when gifting a unit building a missile
+
+- (#4869) Fix a bug where tarmacs of structures would be duplicated when transferring a structure
+
+- (#4904) Fix a bug where the Cybran tech 1 land scout can gain veterancy
+
+- (#4877) Fix blocking of sound banks falsely identified as duplications
+
+- (#4928) Fix a rare bug with the veterancy system that would prevent experience distribution
+
+- (#5027) Fix a bug where the Quantum Optics Facility was being self-conscious, refusing to be turned off
+
+- (#5028) Fix a bug where engineering drones (of the UEF) would be ignored by anti-air weapons
+
+- (#5034, #15) Fix a bug where adjacency would not apply immediately to units that are building a missile
+
+- (#5089) Fix a bug where the team color options window can have multiple instances
+
+- (#5092) Fix a bug where civilians would sometimes not be revealed
+
+- (#5092, #5130) Fix a bug where the game would adjust alliances with civilians after the game has started
+
+  Most notable on scripted maps that adjust the alliance with civilians to suit the need of the map
+
+- (#5123) Fix a bug where the 'OnUnitKilled' callback did not trigger
+
+  Most notable on the 'Zone control' maps that relied on this callback to provide credits for destroying other units
+
+- (#5131) Fix a bug where projectiles would have no launcher defined
+
+- (#5136) Fix a bug where vision markers would not align with the terrain
+
+  This does not impact your intel, it fixes a visual artifact
+
+## AI
+
+We would like to remind people that various mods provide different AI experiences. We can highly recommend you download them from the vault and give them a spin too.
+
+A short list of AIs we recommend at this point:
+
+- M27: made by Maudlin
+- RNGAI, as made by Relent0r
+- Sorian Edit, as made by Marlo
+- Uveso AI, as made by Uveso
+- Dilli Dally, as made by Softles
+- Swarm AI, as made by Azraeel
+
+And not to forget the AI that ships with the Total Annihilation mod that is maintained by Dragun.
+
+### AI - improved framework
+
+Github references: #4693, #4858, #4898, #4923, #4921, #4961, #4901, #4970, #4971, #4872, #5008, #5009, #5072, #5068, #5071, #5087, #5084, #5101, #5099, #4879, #5141, #5139
+
+Before this patch, there was no 'natural' approach to creating an AI that would be entirely separate from all the other AIs. It wasn't uncommon for AIs to be (temporarily) incompatible because of this. With this new AI framework, you can create a new AI that is guaranteed to be entirely separate from other AI instances.
+
+As a consequence of this, all AI mods need to update how they set up their AI. We informed them of this months ago and helped them with these changes throughout June and we expect to see quick updates right after the patch of the AI mods that are still actively maintained.
+
+One notable change is the integration done by Relent0r of the transport logic of the LOUD AI that is developed by Sprouto. Our gratitude towards Sprouto for turning the transport logic into a module and the willingness to share that with us
+
+### AI - improved Adaptive AI
+
+Github references: #4825, #4836, #4849, #4832, #4880, #4888, #4859
+
+With this patch, the first notable improvements specifically the adaptive AI are in! It can by no means compete with AIs such as M27, but at least the AI won't bug out as often as it used to. This represents the first step in the right direction where a lot of time was put into creating a more consistent foundation.
+
+### AI - reclaim grid
+
+Github references: #4811, #4819, #4825, #4832, #4861, #4919
+
+The reclaim grid represents an abstract, highly efficient data structure that the AI can use to make more informed decisions based on reclaim values. Includes a UI window to visualize the data structure
+
+### AI - presence grid
+
+Github references: #4930
+
+The presence grid represents an abstract, efficient data structure that the AI can use to make more informed decisions based on what area of the map the AI thinks it controls. It divides the map into sections that are considered 'allied', 'contested' or 'hostile' while taking into account the path ability of the map. Includes a UI window to visualize the data structure
+
+### AI - navigational mesh
+
+Github references: #4589, #4874, #4876, #4909, #4899, #4918, #4922, #4919, #4925, #4929, #5023, #5031, #5032, #4879
+
+The navigational mesh represents an abstract, efficient data structure that the AI can use to understand how to navigate the map. It is generated at the start of each map. This developer iteration reduces the generation time. On top of that it introduces various functions that can compute interesting properties based on the navigational mesh. Includes a UI window to visualize the data structure
+
+## Graphics
+
+- (#4826) Improve the fidelity of debris of units being destroyed
+
+- (#4828) Improve the quality of the explosions of units
+
+- (#4881) Enable all props (rocks, trees) to cast and receive shadows
+
+- (#4914) Add a bloom intensity slider to the graphics settings
+
+- (#4915) Reduce decal flickering on maps with noisy heightmaps
+
+  A note to people that create maps: this engine is not built for sharp edges and in general noisy-like terrain. It doesn't just hurt gameplay but it can also introduce various visual artifacts
+
+- (#4995) Fix an inconsistency when the effects of the Seraphim regeneration field are applied to underwater units
+
+- (#4977) Improve the death animations of the Colossus, Spiderbot, Megalith and the Fatboy
+
+- (#5033) Death weapons can now knock over trees
+
+- (#5066, #5079) Add the impact effect of the Wasp
+
+### Graphics - physics-based rendering (PBR)
+
+Github references: #4738, #4737, #4870, #4963, #4999, #5004
+
+We started the path toward physics-based shaders in the first developer iteration of 2023. In this second iteration, we continue making preparations and improvements to be able to release the full potential of what this game can look like visually.
+
+One notable change is the introduction of a texture channel that was missing for the majority of the Cybran units. As a result, Cybran feels less bland and bits that represent lights now also appear to emit light accordingly.
+
+### Graphics - adjustments to water
+
+Github references: #4900, #4931, #4895, ##4896, #4964, #5005
+
+Over time various visual artifacts related to water were introduced by FAF. Thanks to BlackYps we did not only tackle those inconsistencies but also improved the fidelity of the water in general. Units now really feel submerged in water, especially noticeable for large units (wrecks).
+
+### Graphics - terrain shaders
+
+Github references: #4902, #4972
+
+We've learned a lot while working on the physics-based shaders for units. Empowered with that knowledge we'll also be tackling the terrain shaders. The direction is not yet set in stone but the first improvements are in that allow map authors to add map-wide normals and map-wide shadows that are part of the rendering pipeline of the terrain, instead of 'plastered' on top afterward!
+
+## Performance
+
+- (#4801) Reduce the overhead of the economy status bar
+
+- (#4810) Improve the performance of LazyVars by reducing table trashing
+
+- (#4831, #4835) Improve performance of shield effects by reducing table trashing
+
+- (#4624) Improve the performance of projectiles by reducing table trashing
+
+- (#4848) Improve performance of `table.getsize`, `table.empty` and `table.getn` with assembly alternatives
+
+  One notable change is that these functions now expect a table, as suggested by it being a table function
+
+- (#4853) Improve performance of the builder manager of AIs
+
+- (#5021) Further sanitize the LODs of units, props and tarmacs
+
+  In the first development iteration, we introduced a blueprint procedure to allow us to tweak the Level of Detail (LOD) of all units and props in the game. The initial parameters were too optimistic and traded in average unnecessary detail for quite a dip in performance on weaker systems
+
+- (#5124, #5132) Improve performance by prefetching assets that the game would otherwise trash again and again
+
+  To reduce the memory footprint various assets are only temporarily allocated. A common example is a unit animation. When a unit starts an animation the asset is loaded and interpreted from disk. When all animation instances are destroyed the asset is removed from memory again. Each time the asset is retrieved it involves a disk operation, and disk operations are expensive
+
+  We've experimented with prefetching before but this time is different. We found a way to see exactly what the engine is doing. As a result, we know what assets are constantly being trashed, just to load them again not long after. In a fifteen-minute replay, some assets could be reloaded up to 50 times, which is rather excessive.
+
+  With that information available we now apply targeted prefetching: we prefetch all assets surrounding projectiles, effects and animations.
+
+## Other changes
+
+- (#4787) Remove generated indices in AI tables
+
+- (#4698) Improve the wording of the recall feature
+
+- (#4654, #4643, #4847, #4651, #4651, #4850, #4865, #4652, #4655, #4968, #4868, #4993, #4998) Tidy up various scripts
+
+- (#4885) Fix an inconsistency where the construction menu of the Megalith had a different order of units than the land factory
+
+- (#4912) Fix an inconsistency where the wrong strategic icons were applied to Cybran shields
+
+- (#4973) Introduce a hotkey to store a camera position across games, useful for taking a screenshot with exactly the same angle
+
+- (#4994) Removal of the following hotkeys:
+
+  - Recheck targets of weapons of selected units
+  - Filter the selection to the most advanced engineer, all other engineers assist that engineer
+
+  The latter didn't fit in with the idea of automation. Instead, you can do this manually by using the selection subgroups functionality
+
+- (#4960) Introduce extensive documentation on how mods work in FAF
+
+- (#5024) Add various anti-cheat guards for UI callbacks
+
+## Contributors
+
+- BlackYps (#4737, #4738, #4881, ##4896, #4895, #4931 #4900, #4902, #4964, #4963, #5005, #5004, #4972)
+- 4z0t (#4787, #4820)
+- Jip (#4801, #4811, #4819, #4824, #4835, #4825, #4836, #4693, #4624, #4848, #4847, #4846, #4853, #4861, #4862, #4863, #4867, #4589, #4869, #4874, #4876, #4858, #4898, #4909, #4899, #4914, #4915, #4918, #4922, #4921, #4919, #4925, #4927, #4877, #4928, #4928, #4929, #4902, #4942, #4930, #4961, #4901, #4970, #4973, #4992, #4993, #4998, #4994, #5008, #5009, #5021, #5023, #5026, #5028, #5031, #5032, #5034, #5033, #5040, #5066, #5079, #5024, #5107, #5092, #5123, #5099, #5130, #5124, #5131, #5132, #5135, #5141)
+- Relentor (#4811, #4774, #4849, #4832, #4880, #4888, #4971, #4872, #5072, #5068, #5071, #5087, #5084, #5101, #5099, #4879, #5139)
+- Hdt80bro (#4698, #4960, #5089)
+- Scarress (#4831)
+- Rowey (#4654, #4643, #4651, #4850, #4865, #4904, #4912, #4652, #4655, #4968, #4868)
+- KionX (#4848)
+- Penguin (#3823)
+- Strogo (#15)
+- MadMax (#4885)
+- Evildrew (#4885)
+
+# Game version 3757 (20th of May, 2023)
+
+## Balance
+
+- (#4796) Air Staging Facility
+    When they were moved from tech 2 to tech 1 their build time was not reduced accordingly. The build time is now reduced from 450 to 350. For a tech 1 engineer, it takes 70 seconds to build.
+
+- (#4442, #4938) Claws of Galactic Colossus
+    Previously the claws would instantaneously destroy the unit upon arrival. This matched the old behavior, but with the bug fixes of the claws it was only slightly too strong.
+
+    A unit now receives 730 damage per second upon arriving at the claw. Combining both claws and the beam the colossus has a maximum damage per second of 2460, which matches the old situation.
+
+- (#3918) Chrono Dampener
+    The chrono dampener received several buffs over the past year. With this patch we nerf it by changing how the Chrono Dampener behaves.
+
+    The old behavior applies the same stun on all units over a large radius every 5.0 seconds. The stun duration was 3.5 seconds.
+
+    The new behavior applies a diminishing stun based on the distance of the unit to the ACU over a large radius every 5.0 seconds. The stun is applied in slices of 0.4 seconds. There are 10 slices. Units that are on top of the ACU receive all slices, and are therefore stunned for 4.0 seconds. Units at the outer edge of the radius receive only a single slice and are therefore stunned for 0.4 seconds.
+
+## Contributors
+
+- Jip (#4442, #4938, #3918)
+- SpikeyNoob (#4442, #4938, #3918)
+- Basilisk3 (#4796)
+
 # Game version 3756 (18th of March, 2023)
 
 Hopefully this is the last hotfix for now. Includes various fixes of recent and longstanding bugs.

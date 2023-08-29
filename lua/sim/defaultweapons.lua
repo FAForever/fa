@@ -38,9 +38,9 @@ local MathClamp = math.clamp
 ---@field SalvoSpreadStart? number   if the weapon blueprint requests a trajectory fix, this is set to the value that centers the projectile spread for `CurrentSalvoNumber` shot on the optimal target position
 DefaultProjectileWeapon = ClassWeapon(Weapon) {
 
-    FxRackChargeMuzzleFlash = import("/lua/effecttemplates.lua").NoEffects,
+    FxRackChargeMuzzleFlash = { },
     FxRackChargeMuzzleFlashScale = 1,
-    FxChargeMuzzleFlash = import("/lua/effecttemplates.lua").NoEffects,
+    FxChargeMuzzleFlash = { },
     FxChargeMuzzleFlashScale = 1,
     FxMuzzleFlash = {
         '/effects/emitters/default_muzzle_flash_01_emit.bp',
@@ -145,7 +145,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
     -- This function creates the projectile, and happens when the unit is trying to fire
     -- Called from inside RackSalvoFiringState
     ---@param self DefaultProjectileWeapon
-    ---@param muzzle string
+    ---@param muzzle Bone
     ---@return Projectile
     CreateProjectileAtMuzzle = function(self, muzzle)
         local proj = self:CreateProjectileForWeapon(muzzle)
@@ -706,8 +706,11 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
             local unit = self.unit
             if unit.Dead then return end
             unit:SetBusy(false)
-            self:WaitForAndDestroyManips()
 
+            -- at this point salvo is always done so reset the data
+            self.CurrentSalvoData = nil 
+
+            self:WaitForAndDestroyManips()
             local bp = self.Blueprint
             for _, rack in bp.RackBones do
                 if rack.HideMuzzle then
@@ -994,7 +997,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
                         end
                     end
                 end
-                self.CurrentSalvoData = nil -- once the salvo is done, reset the data
+
                 self:PlayFxRackReloadSequence()
                 local currentRackSalvoNumber = self.CurrentRackSalvoNumber
                 if currentRackSalvoNumber <= rackBoneCount then
