@@ -4782,6 +4782,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         local needsSetup = cUnit.SetStat(self, key, value)
         if needsSetup then
             cUnit.GetStat(self, key, value)
+            cUnit.SetStat(self, key, value)
         end
     end,
 
