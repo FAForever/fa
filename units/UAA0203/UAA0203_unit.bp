@@ -63,16 +63,6 @@ UnitBlueprint{
         SurfaceThreatLevel = 7,
     },
     Display = {
-        IdleEffects = {
-            Water = {
-                Effects = {
-                    {
-                        Bones = { "UAA0203" },
-                        Type = "SeaIdle00",
-                    },
-                },
-            },
-        },
         LayerChangeEffects = {
             AirLand = {
                 Effects = {
@@ -103,6 +93,16 @@ UnitBlueprint{
                     {
                         Bones = { "UAA0203" },
                         Type = "TakeOff01",
+                    },
+                },
+            },
+        },
+        IdleEffects = {
+            Water = {
+                Effects = {
+                    {
+                        Bones = { "UAA0203" },
+                        Type = "SeaIdleGunship01",
                     },
                 },
             },

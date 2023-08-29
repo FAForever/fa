@@ -2166,6 +2166,7 @@ AirUnit = ClassUnit(MobileUnit) {
             -- While landed, planes can only see half as far
             local vis = self.Blueprint.Intel.VisionRadius / 2
             self:SetIntelRadius('Vision', vis)
+            self:SetIntelRadius('WaterVision', 4)
 
             -- Turn off the ambient hover sound
             -- It will probably already be off, but there are some odd cases that
@@ -2176,6 +2177,7 @@ AirUnit = ClassUnit(MobileUnit) {
             local bpVision = self.Blueprint.Intel.VisionRadius
             if bpVision then
                 self:SetIntelRadius('Vision', bpVision)
+                self:SetIntelRadius('WaterVision', 0)
             else
                 self:SetIntelRadius('Vision', 0)
             end

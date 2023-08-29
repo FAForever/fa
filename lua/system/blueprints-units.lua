@@ -520,8 +520,7 @@ local function PostProcessUnit(unit)
     -- the drones do not need to go to the shore anymore, they now look for
     -- a 'free build location' near the naval factory on water
 
-    if isAir and (isTransport or isGunship or isPod) then
-        LOG(unit.BlueprintId)
+    if isAir and (isTransport or isGunship or isPod) and (not isExperimental) then
         table.insert(unit.Categories, "CANLANDONWATER")
         unit.CategoriesHash["CANLANDONWATER"] = true
     end
