@@ -4838,10 +4838,13 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         cUnit.GiveNukeSiloAmmo(self, blocks, true)
     end,
 
-    --- Use `unit:UpdateStat` instead
+    --- Updates a statistic that you can retrieve on the UI side using `userunit:GetStat`. See `unit:UpdateStat` for an alternative
     ---@deprecated
-    SetStat = function(self)
-        -- this hides the c implementation
+    ---@param self Unit
+    ---@param key string
+    ---@param value number
+    SetStat = function(self, key, value)
+        self:UpdateStat(key, value)
     end,
 
     --- Updates a statistic that you can retrieve on the UI side using `userunit:GetStat`.
