@@ -46,7 +46,7 @@ CopyOrders = function(units, target, clearCommands, doPrint)
         return
     end
 
-    if not target then
+    if (not target) or (IsDestroyed(target)) then
         return
     end
 

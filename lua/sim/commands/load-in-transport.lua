@@ -21,7 +21,6 @@
 --******************************************************************************************************
 
 local AveragePositionOfUnitsXZ = import("/lua/sim/commands/shared.lua").AveragePositionOfUnitsXZ
-local AveragePositionOfUnits = import("/lua/sim/commands/shared.lua").AveragePositionOfUnits
 local SortUnitsByDistanceToPoint = import("/lua/sim/commands/shared.lua").SortUnitsByDistanceToPoint
 local PointOnUnitCircle = import("/lua/sim/commands/shared.lua").PointOnUnitCircle
 

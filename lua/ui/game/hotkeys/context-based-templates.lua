@@ -62,7 +62,7 @@ end
 -- convert all known templates
 
 ---@type table
-local RawTemplates = import("/lua/ui/game/commands/context-based-templates-data.lua")
+local RawTemplates = import("/lua/ui/game/hotkeys/context-based-templates-data.lua")
 
 ---@type ContextBasedTemplate[]
 local Templates = { }
