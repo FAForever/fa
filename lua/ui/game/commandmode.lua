@@ -16,6 +16,8 @@ local EnhancementQueueFile = import("/lua/ui/notify/enhancementqueue.lua")
 local WorldView = import("/lua/ui/controls/worldview.lua")
 local GameMain = import("/lua/ui/game/gamemain.lua")
 
+local SynchronizedStrike = import("/lua/ui/game/syncstrike.lua").SynchronizedStrike
+
 -- upvalue globals for performance
 local IsKeyDown = IsKeyDown
 local GetUnitById = GetUnitById
@@ -377,6 +379,14 @@ local function OnGuard(guardees, unit)
     end
 end
 
+-- Called when a unit is issued a nuke or tactical launch command
+-- @param command 
+local function OnLaunchCommandIssued(command)
+    if IsKeyDown("CONTROL") then
+        SynchronizedStrike(command.Units)
+    end
+end
+
 --- Called by the engine when a new command has been issued by the player.
 -- @param command Information surrounding the command that has been issued, such as its CommandType or its Target.
 ---@param command UserCommand
@@ -388,6 +398,10 @@ function OnCommandIssued(command)
         if not IsKeyDown('Shift') then
             SimCallback({ Func = 'ImmediateHiveUpgrade', Args = { UpgradeTo = command.Blueprint } }, true)
         end
+    end
+
+    if (command.CommandType == "Tactical" or command.CommandType == "Nuke") then
+        OnLaunchCommandIssued(command)
     end
 
     -- unusual command, where we use the build interface
