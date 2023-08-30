@@ -237,7 +237,7 @@ StructureUnit = ClassUnit(Unit) {
             DamageArea(self, position, 0.75 * radius, 1, 'TreeForce', false, false)
 
             -- create a flash when the structure starts
-            CreateLightParticle( self, -1, army, 2 * radius, 22, 'glow_03', 'ramp_antimatter_02' )
+            CreateLightParticleIntel( self, -1, army, 2 * radius, 22, 'glow_03', 'ramp_antimatter_02' )
 
             -- includes units, need to filter those out
             local entities = GetReclaimablesInRect(Rect(
@@ -247,7 +247,10 @@ StructureUnit = ClassUnit(Unit) {
             if entities then
                 for k, prop in entities do
                     -- take out props that may linger around when building starts
-                    if prop.IsProp and not prop.Blueprint.CategoriesHash['OBSTRUCTSBUILDING'] then
+                    if  prop.IsProp and
+                        (not prop.Blueprint.CategoriesHash['OBSTRUCTSBUILDING'])  and
+                        (not prop.Blueprint.CategoriesHash['INVULNERABLE'])
+                    then
                         local center = prop:GetPosition()
                         local dx = position[1] - center[1]
                         local dz = position[3] - center[3]
