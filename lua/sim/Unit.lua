@@ -3334,6 +3334,8 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
             return
         end
 
+        LOG(string.format("%s -> %s", old, new))
+
         if new == 'Down' then
             -- Play the "landing" sound
             self:PlayUnitSound('Landing')
@@ -3570,6 +3572,13 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
             GetTerrainTypeEffects = self.GetTerrainTypeEffects
         end
 
+        LOG("CreateTerrainTypeEffects")
+        reprsl(effectTypeGroups)
+        reprsl(fxBlockType)
+        reprsl(layer)
+        reprsl(typeSuffix)
+        reprsl(terrainType)
+
         for _, typeGroup in effectTypeGroups do
             local bones = typeGroup.Bones
             if table.empty(bones) then
@@ -3619,6 +3628,8 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
     CreateIdleEffects = function(self)
         local layer = self.Layer
         local bpTable = self.Blueprint.Display.IdleEffects
+
+        LOG(layer)
         if bpTable[layer] and bpTable[layer].Effects then
             self:CreateTerrainTypeEffects(bpTable[layer].Effects, 'FXIdle',  layer, nil, self.IdleEffectsBag)
         end
@@ -3659,6 +3670,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         local key = old..new
         local bpTable = self.Blueprint.Display.LayerChangeEffects[key]
 
+        reprsl(bpTable)
         if bpTable then
             self:CreateTerrainTypeEffects(bpTable.Effects, 'FXLayerChange', key)
         end
