@@ -2,11 +2,6 @@ local AddBeatFunction = import("/lua/ui/game/gamemain.lua").AddBeatFunction
 local RemoveBeatFunction = import("/lua/ui/game/gamemain.lua").RemoveBeatFunction
 local FireState = import("/lua/game.lua").FireState
 
-local LogTable = import('/mods/ModDevTools/modules/LogUtils.lua').LogTable
-local LogFunc = import('/mods/ModDevTools/modules/LogUtils.lua').LogFunc
-local RetFunc = import('/mods/ModDevTools/modules/LogUtils.lua').RetFunc
-local pre = "commandmode.lua"
-
 --Upvalues for performance
 local GameTick = GameTick
 local VDist2 = VDist2
@@ -78,7 +73,12 @@ local SortByTickOnTarget = function(launchers, reverse)
     )
 end
 
-local WatcherBeat = function()
+WatcherBeat = function()
+    --if there are no more watchers in the cache, remove the beat function
+    if next(watcherCache) == nil then
+        RemoveBeatFunction(WatcherBeat)
+        return
+    end
     if not SessionIsPaused() then
         for watcher in watcherCache do
             watcher:WatchBeat()
@@ -86,7 +86,7 @@ local WatcherBeat = function()
     end
 end
 
-SynchronizedStrikeWatcher = Class() {
+local SynchronizedStrikeWatcher = Class() {
 
     __init = function(self, launcherCache)
 
@@ -98,14 +98,13 @@ SynchronizedStrikeWatcher = Class() {
         local firstReadyDelay
         local oldTickOnTarget
         
-        LogTable(launcherCache)
         firstReadyDelay = READY[launcherCache[1]:GetUnitId()]
         oldTickOnTarget = launcherCache[1].tickOnTarget + firstReadyDelay
 
-        LogTable(self.watchCache)
         --shallow copy our launchers to the watchCache and attach a waitTick value
         for _, launcher in ipairs(launcherCache) do
-            table.insert(self.watchCache, {launcher, oldTickOnTarget - launcher.tickOnTarget})
+            launcher.waitTicks = oldTickOnTarget - launcher.tickOnTarget
+            table.insert(self.watchCache, launcher)
             totalDelay = totalDelay + oldTickOnTarget - launcher.tickOnTarget
 
             --do a check in case of mixed launchers; a launcher may need proportionally more time to get ready
@@ -119,29 +118,25 @@ SynchronizedStrikeWatcher = Class() {
         launcherCache = {}
 
         --add the firstReadyDelay to the first launcher's waitTick value
-        LogTable(self.watchCache)
-        self.watchCache[1][2] = firstReadyDelay
+        self.currentLauncher = self.watchCache[1]
+        self.currentLauncher.waitTicks = firstReadyDelay
     end,
 
     WatchBeat = function(self)
         --subtract 1 from the waitTick value of the current launcher step
-        self.watchCache[self.index][2] = self.watchCache[self.index][2] - 1
+        self.currentLauncher.waitTicks = self.currentLauncher.waitTicks - 1
         
         --see if we're at or below 0, if so, set the next launcher to fire
         --while loop to catch any launchers that may have the same launch time
-        while self.watchCache[self.index][2] <= 0 do
-            local launcher = self.watchCache[self.index][1]
-            if not launcher:IsDead() then
-                SetFireState({launcher}, FireState.GROUND_FIRE)
+        while self.currentLauncher.waitTicks <= 0 do
+            self.currentLauncher.waitTicks = nil
+            if not self.currentLauncher:IsDead() then
+                SetFireState({self.currentLauncher}, FireState.GROUND_FIRE)
             end
             self.index = self.index + 1
+            self.currentLauncher = self.watchCache[self.index]
             --if our index exceeds the length of the watchCache, we're done
             if self.index > table.getn(self.watchCache) then
-                --if there are no more watchers in the cache, remove the beat function
-                if next(watcherCache) == nil then
-                    RemoveBeatFunction(WatcherBeat)
-                    return
-                end
                 watcherCache[self] = nil
                 break
             end
