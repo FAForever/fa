@@ -56,7 +56,7 @@ function IsTech4(unitID) return HasCategory(unitID, 'EXPERIMENTAL') end
 function IsTech0(unitID) return not IsTech1(unitID) and not IsTech2(unitID) and not IsTech3(unitID) and not IsTech4(unitID) end
 
 function IsSpawnable(unitID) return not HasCategory(unitID, 'UNSPAWNABLE') end
-function IsCivilain(unitID) return HasCategory(unitID, 'CIVILIAN') or HasCategory(unitID, 'OPERATION') end
+function IsCivilian(unitID) return HasCategory(unitID, 'CIVILIAN') or HasCategory(unitID, 'OPERATION') end
 function IsDummy(unitID) return HasCategory(unitID, 'DUMMYUNIT') or HasCategory(unitID, 'UNSPAWNABLE') end
 
 function IsEngineerTech3(unitID) return HasCategory(unitID, 'TECH3') and HasCategory(unitID, 'ENGINEER') and not HasCategory(unitID, 'SUBCOMMANDER') end

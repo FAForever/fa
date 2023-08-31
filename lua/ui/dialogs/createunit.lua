@@ -532,10 +532,10 @@ GetNameFilters = {
                             sortFunc = Logic.IsDummy,
                         },
                         {
-                            key = 'civilain',
-                            display = '<LOC spawn_filter_vis_civilain>Civilain',
-                            tooltip = '<LOC spawn_filter_vis_civilain_tip>Toggle civilain units',
-                            sortFunc = Logic.IsCivilain,
+                            key = 'civilian',
+                            display = '<LOC spawn_filter_vis_civilian>civilian',
+                            tooltip = '<LOC spawn_filter_vis_civilian_tip>Toggle civilian units',
+                            sortFunc = Logic.IsCivilian,
                         },
                         {
                             key = 'playable',
@@ -1332,8 +1332,9 @@ function CreateDialog()
     end
 
     local filterSaveButton = CreatePressButton 'Save'
-    LayoutHelpers.Below(filterSaveButton, armiesGroup, 5)
+    LayoutHelpers.Below(filterSaveButton, armiesGroup)
     LayoutHelpers.RightOf(filterSaveButton, filterPresetCombo, 10)
+    LayoutHelpers.AtVerticalCenterIn(filterSaveButton, filterPresetCombo)
     Tooltip.AddControlTooltip(filterSaveButton, { text = ' Save current filter as preset ' })
     filterSaveButton.OnClick = function(self, modifiers)
         NameSet(function(name)
@@ -1350,8 +1351,9 @@ function CreateDialog()
     end
 
     local filterDeleteButton = CreatePressButton 'Delete'
-    LayoutHelpers.Below(filterDeleteButton, armiesGroup, 5)
+    LayoutHelpers.Below(filterDeleteButton, armiesGroup)
     LayoutHelpers.RightOf(filterDeleteButton, filterSaveButton)
+    LayoutHelpers.AtVerticalCenterIn(filterDeleteButton, filterPresetCombo)
     Tooltip.AddControlTooltip(filterDeleteButton, { text = ' Delete current filter preset ' })
     filterDeleteButton.OnClick = function(self, modifiers)
         local index = filterPresetCombo:GetItem()
@@ -1367,8 +1369,9 @@ function CreateDialog()
     end
 
     local filterClearButton = CreatePressButton('Clear All')
-    LayoutHelpers.Below(filterClearButton, armiesGroup, 5)
+    LayoutHelpers.Below(filterClearButton, armiesGroup)
     LayoutHelpers.RightOf(filterClearButton, filterDeleteButton)
+    LayoutHelpers.AtVerticalCenterIn(filterClearButton, filterPresetCombo)
     Tooltip.AddControlTooltip(filterClearButton, { text = ' Clear all filters' })
     filterClearButton.OnClick = ClearFilters
 
