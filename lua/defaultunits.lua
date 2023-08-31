@@ -219,7 +219,7 @@ StructureUnit = ClassUnit(Unit) {
             -- do not apply to upgrades
             blueprint.General.UpgradesFrom != builder.Blueprint.BlueprintId
         then
-            local CreateLightParticle = CreateLightParticle
+            local CreateLightParticleIntel = CreateLightParticleIntel
 
             local army = self.Army
             local position = self:GetPosition()
