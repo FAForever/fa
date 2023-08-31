@@ -14,10 +14,10 @@ FLIGHT = {
 }
 
 READY = {
-    uab2108 = 36,
-    ueb2108 = 25,
-    urb2108 = 20,
-    xsb2108 = 15,
+    uab2108 = 30, --36
+    ueb2108 = 20, --25
+    urb2108 = 14, --20
+    xsb2108 = 9, --15
 }
 
 LAUNCH = {
@@ -119,7 +119,8 @@ local SynchronizedStrikeWatcher = Class() {
 
         --add the firstReadyDelay to the first launcher's waitTick value
         self.currentLauncher = self.watchCache[1]
-        self.currentLauncher.waitTicks = firstReadyDelay
+        self.currentLauncher.waitTicks = 0
+        self.watchCache[2].waitTicks = self.watchCache[2].waitTicks + firstReadyDelay
     end,
 
     WatchBeat = function(self)
