@@ -237,7 +237,12 @@ local function TracePath(destination)
         path[head - k] = temp
     end
 
-    return path, head - 1, distance
+    -- include destination into path
+    local px = destination.px
+    local pz = destination.pz
+    path[head] = { px, GetSurfaceHeight(px, pz), pz }
+
+    return path, head, distance
 end
 
 --- Returns true when you can path from the origin to the destination
