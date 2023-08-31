@@ -848,7 +848,7 @@ function SetupOptionsPanel(parent, curOptions)
         local function SetTextLine(line, data, lineID)
             local function UseSavedValue(data)
                 -- always use saved data when looking at currently hosted map
-                if string.lower(selectedScenario.file) == string.lower(curOptions.ScenarioFile) then
+                if string.lower(tostring(selectedScenario.file)) == string.lower(tostring(curOptions.ScenarioFile)) then
                     return true
                 end
                 -- otherwise, don't use saved data for advanced options
