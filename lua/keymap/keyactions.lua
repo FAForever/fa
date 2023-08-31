@@ -1621,22 +1621,22 @@ local keyActionsOrdersAdvanced = {
 }
 
 local keyActionsOrdersQueueBased = {
-    ['distribute_orders'] = {
+    ['spreadattack'] = {
         action = 'UI_Lua import("/lua/ui/game/hotkeys/distribute-queue.lua").DistributeOrders(true)',
         category = 'ordersQueueBased',
         wikiURL = 'Play/Game/Hotkeys/OrdersQueueManipulation#distribute-orders'
     },
-    ['shift_distribute_orders'] = {
+    ['shift_spreadattack'] = {
         action = 'UI_Lua import("/lua/ui/game/hotkeys/distribute-queue.lua").DistributeOrders(true)',
         category = 'ordersQueueBased',
         wikiURL = 'Play/Game/Hotkeys/OrdersQueueManipulation#distribute-orders'
     },
-    ['distribute_orders_context'] = {
+    ['spreadattack_context'] = {
         action = 'UI_Lua import("/lua/ui/game/hotkeys/distribute-queue.lua").DistributeOrdersOfMouseContext(true)',
         category = 'ordersQueueBased',
         wikiURL = 'Play/Game/Hotkeys/OrdersQueueManipulation#distribute-orders'
     },
-    ['shift_distribute_orders_context'] = {
+    ['shift_spreadattack_context'] = {
         action = 'UI_Lua import("/lua/ui/game/hotkeys/distribute-queue.lua").DistributeOrdersOfMouseContext(true)',
         category = 'ordersQueueBased',
         wikiURL = 'Play/Game/Hotkeys/OrdersQueueManipulation#distribute-orders'

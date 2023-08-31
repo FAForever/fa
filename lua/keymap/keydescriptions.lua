@@ -528,10 +528,10 @@ keyDescriptions = {
 
     ['filter_highest_engineer_and_assist'] = '<LOC key_desc_filter_highest_engineer_and_assist>Filter engineers',
     ['shift_filter_highest_engineer_and_assist'] = '<LOC key_desc_shift_filter_highest_engineer_and_assist>Filter engineers',
-    ['distribute_orders'] = '<LOC key_desc_distribute_orders>Distribute orders',
-    ['shift_distribute_orders'] = '<LOC key_desc_shift_distribute_orders>Distribute orders',
-    ['distribute_orders_context'] = '<LOC key_desc_distribute_orders>Distribute orders from the unit beneath the mouse cursor',
-    ['shift_distribute_orders_context'] = '<LOC key_desc_shift_distribute_orders>Distribute orders from the unit beneath the mouse cursor',
+    ['spreadattack'] = '<LOC key_desc_distribute_orders>Distribute orders',
+    ['shift_spreadattack'] = '<LOC key_desc_shift_distribute_orders>Distribute orders',
+    ['spreadattack_context'] = '<LOC key_desc_distribute_orders>Distribute orders from the unit beneath the mouse cursor',
+    ['shift_spreadattack_context'] = '<LOC key_desc_shift_distribute_orders>Distribute orders from the unit beneath the mouse cursor',
     ['cycle_context_based_templates'] = '<LOC key_desc_context_based_templates>Cycle templates',
     ['shift_cycle_context_based_templates'] = '<LOC key_desc_shift_context_based_templates>Cycle templates',
 
