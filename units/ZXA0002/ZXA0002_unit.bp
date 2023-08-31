@@ -1,0 +1,101 @@
+UnitBlueprint {
+    Categories = {
+        'STRUCTURE',
+        'TECH3',
+        'FACTORY',
+        'CONSTRUCTION',
+        'SELECTABLE',
+        'UNTARGETTABLE',
+        'RALLYPOINT',
+        'SORTCONSTRUCTION',
+        'DRAGBUILD',
+        'SHOWQUEUE',
+        'EXTERNALFACTORYUNIT'
+    },
+    Defense = {
+        Health = 100000,
+        MaxHealth = 100000,
+    },
+    Description = 'Mobile Factory',
+    Display = {
+        Mesh = {
+            IconFadeInZoom = 175,
+            LODs = {
+                {
+                    ShaderName = 'Unit',
+                    MeshName = '/Units/UEA0001/UEA0001_lod0.scm',
+                    AlbedoName = '/Units/UEA0001/UEA0001_Albedo.dds',
+                    NormalsName = '/Units/UEA0001/UEA0001_normalsTS.dds',
+                    SpecularName = '/Units/UEA0001/UEA0001_SpecTeam.dds',
+                },
+            },
+        },
+
+        -- makes it easier to select
+        UniformScale = 1.6,
+    },
+    Economy = {
+        BuildCostEnergy = 1600,
+        BuildCostMass = 160,
+        MaxBuildDistance = 10000,
+        BuildRate = 0,
+        BuildTime = 400,
+    },
+    General = {
+        CapCost = 0,
+        Category = '',
+        Classification = 'RULEUC_Factory',
+        CommandCaps = {
+            RULEUCC_Guard = true,
+            RULEUCC_Move = true,
+            RULEUCC_Patrol = true,
+            RULEUCC_Pause = true,
+            RULEUCC_RetaliateToggle = true,
+            RULEUCC_Stop = true,
+        },
+        SelectionPriority = 6,
+        TechLevel = 'RULEUTL_Experimental',
+        UnitName = 'Mobile Factory',
+        UnitWeight = 1,
+    },
+    Intel = {
+        VisionRadius = 0,
+        WaterVisionRadius = 0,
+    },
+    LifeBarHeight = 0.075,
+    LifeBarOffset = 0.25,
+    LifeBarSize = 0.3,
+    LifeBarRender = false,
+    Physics = {
+        BuildOnLayerCaps = {
+            LAYER_Air = true,
+            LAYER_Land = true,
+            LAYER_Orbit = true,
+            LAYER_Seabed = true,
+            LAYER_Sub = true,
+            LAYER_Water = true,
+        },
+        MotionType = "RULEUMT_None",
+    },
+    Footprint = {
+        OccupancyCaps =  0,
+        SizeX = 0,
+        SizeZ = 0,
+    },
+
+    SelectionMeshScaleX = 1.0,
+    SelectionMeshScaleY = 3.0,
+    SelectionMeshScaleZ = 1.0,
+    SelectionMeshUseTopAmount  = 0.0,
+    SelectionYOffset  = 0,
+
+    SelectionSizeX = 3.6,
+    SelectionSizeY = 0,
+    SelectionSizeZ = 1.8,
+    SelectionCenterOffsetZ = 2.25,
+    SelectionThickness = 0.3,
+    SizeSphere = 0,
+    SizeX = 0,
+    SizeY = 0,
+    SizeZ = 0,
+}

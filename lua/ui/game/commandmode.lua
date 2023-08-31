@@ -32,6 +32,9 @@ local TableGetN = table.getn
 local MathPi = math.pi
 local MathAtan = math.atan
 
+---@class UserCommand
+
+
 ---@class MeshInfo
 ---@field Position Vector
 ---@field Blueprint string
@@ -46,7 +49,7 @@ local MathAtan = math.atan
 ---@alias CommandMode 'order' | 'build' | 'buildanchored' | false
 
 ---@class CommandModeDataBase
----@field cursor? CommandCap        # Similar to the field 'name' 
+---@field cursor? CommandCap        # Similar to the field 'name'
 ---@field altCursor string          # Allows for an alternative cursor
 
 ---@class CommandModeDataOrder : CommandModeDataBase
@@ -78,7 +81,7 @@ local startBehaviors = {}
 local endBehaviors = {}
 
 --- Callback triggers when command mode starts
----@param behavior fun(mode: CommandMode, data: CommandModeData)
+---@param behavior fun(mode?: CommandMode, data?: CommandModeData)
 ---@param identifier? string
 function AddStartBehavior(behavior, identifier)
     if identifier then
@@ -92,7 +95,7 @@ function AddStartBehavior(behavior, identifier)
 end
 
 --- Callback triggers when command mode ends
----@param behavior fun(mode: CommandMode, data: CommandModeData)
+---@param behavior fun(mode?: CommandMode, data?: CommandModeData)
 ---@param identifier? string
 function AddEndBehavior(behavior, identifier)
     if identifier then
@@ -250,195 +253,6 @@ function AddDefaultCommandFeedbackBlips(pos)
     )
 end
 
---- Allows us to detect a double / triple click
-local pStructure1 = nil
-local pStructure2 = nil
-function CapStructure(command)
-
-    -- retrieve the option in question, can have values: 'off', 'only-storages-extractors' and 'full-suite'
-    local option = Prefs.GetFromCurrentProfile('options.structure_capping_feature_01')
-
-    -- bail out - we're not interested
-    if option == 'off' then
-        return
-    end
-
-    -- check if we have engineers
-    local units = EntityCategoryFilterDown(categories.ENGINEER, command.Units)
-    if not units[1] then return end
-
-    -- check if we have a building that we target
-    local structure = GetUnitById(command.Target.EntityId)
-    if not structure or IsDestroyed(structure) then return end
-
-    -- various conditions written out for maintainability
-    local isShiftDown = IsKeyDown('Shift')
-
-    local isDoubleTapped = structure ~= nil and (pStructure1 == structure)
-    local isTripleTapped = structure ~= nil and (pStructure1 == structure) and (pStructure2 == structure)
-
-    local isUpgrading = structure:GetFocus() ~= nil
-
-    local isTech1 = structure:IsInCategory('TECH1')
-    local isTech2 = structure:IsInCategory('TECH2')
-    local isTech3 = structure:IsInCategory('TECH3')
-    local isTech4 = structure:IsInCategory('EXPERIMENTAL')
-
-    -- only run logic for structures
-    if structure:IsInCategory('STRUCTURE') then
-
-        -- try and create storages and / or fabricators around it
-        if structure:IsInCategory('MASSEXTRACTION') then
-
-            -- check what type of buildings we'd like to make
-            local buildFabs =
-            option == 'full-suite'
-                and (
-                (isTech2 and isUpgrading and isTripleTapped and isShiftDown)
-                    or (isTech3 and isDoubleTapped and isShiftDown)
-                )
-
-            local buildStorages =
-            (
-                (isTech1 and isUpgrading and isDoubleTapped and isShiftDown)
-                    or (isTech2 and isUpgrading and isDoubleTapped and isShiftDown)
-                    or (isTech2 and not isUpgrading)
-                    or isTech3
-                ) and not buildFabs
-
-            if buildStorages then
-
-                -- prevent consecutive calls
-                local gametime = GetGameTimeSeconds()
-                if structure.RingStoragesStamp then
-                    if structure.RingStoragesStamp + 0.75 > gametime then
-                        return
-                    end
-                end
-
-                structure.RingStoragesStamp = gametime
-
-                SimCallback({ Func = 'CapStructure', Args = { target = command.Target.EntityId, layer = 1, id = "b1106" } }, true)
-
-                -- only clear state if we can't make fabricators
-                if (isTech1 and isUpgrading) or (isTech2 and not isUpgrading) then
-                    structure = nil
-                    pStructure1 = nil
-                    pStructure2 = nil
-                end
-            end
-
-            if buildFabs then
-
-                -- prevent consecutive calls
-                local gametime = GetGameTimeSeconds()
-                if structure.RingFabsStamp then
-                    if structure.RingFabsStamp + 0.75 > gametime then
-                        return
-                    end
-                end
-
-                structure.RingFabsStamp = gametime
-
-                SimCallback({ Func = 'CapStructure', Args = { target = command.Target.EntityId, layer = 2, id = "b1104" } }, true)
-
-                -- reset state
-                structure = nil
-                pStructure1 = nil
-                pStructure2 = nil
-            end
-
-            -- only apply these if we're interested in them
-        elseif option == 'full-suite' then
-
-            -- prevent consecutive calls
-            local gametime = GetGameTimeSeconds()
-            if structure.RingStamp then
-                if structure.RingStamp + 0.75 > gametime then
-                    return
-                end
-            end
-
-            structure.RingStamp = gametime
-
-            -- if we have a T3 fabricator, create storages around it
-            if structure:IsInCategory('MASSFABRICATION') and isTech3 then
-                SimCallback({ Func = 'CapStructure', Args = { target = command.Target.EntityId, layer = 1, id = "b1106" } }, true)
-                -- reset state
-                structure = nil
-                pStructure1 = nil
-                pStructure2 = nil
-
-            -- if we have a T2 fabricator, create storages around it
-            elseif structure:IsInCategory('MASSFABRICATION') and isTech2 then
-                SimCallback({ Func = 'CapStructure', Args = { target = command.Target.EntityId, layer = 1, id = "b1106" } }, true)
-                -- reset state
-                structure = nil
-                pStructure1 = nil
-                pStructure2 = nil
-
-            -- if we have a T2 artillery, create T1 pgens around it
-            elseif structure:IsInCategory('ARTILLERY') and isTech2 then
-                SimCallback({ Func = 'CapStructure', Args = { target = command.Target.EntityId, layer = 1, id = "b1101" } }, true)
-                -- reset state
-                structure = nil
-                pStructure1 = nil
-                pStructure2 = nil
-
-            -- if we have a T3 artillery, create T3 pgens around it
-            elseif structure:IsInCategory('ARTILLERY') and isTech3 then
-                SimCallback({ Func = 'CapStructure', Args = { target = command.Target.EntityId, layer = 1, id = "b1301" } }, true)
-                -- reset state
-                structure = nil
-                pStructure1 = nil
-                pStructure2 = nil
-
-            -- if we have a T4 artillery, create T3 pgens around it
-            elseif structure:IsInCategory('ARTILLERY') and isTech4 then
-                SimCallback({ Func = 'CapStructure', Args = { target = command.Target.EntityId, layer = 1, id = "b1301" } }, true)
-                -- reset state
-                structure = nil
-                pStructure1 = nil
-                pStructure2 = nil
-
-            -- if we have a radar, create T1 pgens around it
-            elseif structure:IsInCategory('RADAR')
-                and (
-                (isTech1 and isUpgrading and isDoubleTapped and isShiftDown)
-                    or (isTech2 and isUpgrading and isDoubleTapped and isShiftDown)
-                    or (isTech2 and not isUpgrading)
-                )
-                or structure:IsInCategory('OMNI')
-            then
-                SimCallback({ Func = 'CapStructure', Args = { target = command.Target.EntityId, layer = 1, id = "b1101" } }, true)
-                -- reset state
-                structure = nil
-                pStructure1 = nil
-                pStructure2 = nil
-
-            -- if we have a T1 point defense, create walls around it
-            elseif structure:IsInCategory('DIRECTFIRE') and isTech1 then
-                SimCallback({ Func = 'CapStructure', Args = { target = command.Target.EntityId, layer = 1, id = "b5101" } }, true)
-                -- reset state
-                structure = nil
-                pStructure1 = nil
-                pStructure2 = nil
-            end
-        end
-    end
-
-    -- keep track of previous structure to identify a 2nd / 3rd click
-    pStructure2 = pStructure1
-    pStructure1 = structure
-
-    -- prevent building up state when upgrading but shift isn't pressed
-    if isUpgrading and not isShiftDown then
-        structure = nil
-        pStructure1 = nil
-        pStructure2 = nil
-    end
-end
-
 --- Creates a callback to spawn a unit triggered by the cheat menu.
 -- @param command Command that contains the position of the click
 -- @param data A shallow copy of the modeData to make the function pure data-wise
@@ -509,7 +323,7 @@ local function OnGuardUnpause(guardees, target)
         if not target.ThreadUnpause then
             local id = target:GetEntityId()
             target.ThreadUnpause = ForkThread(
-                function ()
+                function()
                     WaitSeconds(1.0)
                     local target = GetUnitById(id)
                     while target do
@@ -525,7 +339,7 @@ local function OnGuardUnpause(guardees, target)
                                         SetPaused({ target }, false)
                                         break
                                     end
-                                -- engineer is idle, died, we switch armies, ...
+                                    -- engineer is idle, died, we switch armies, ...
                                 else
                                     candidates[id] = nil
                                 end
@@ -533,8 +347,8 @@ local function OnGuardUnpause(guardees, target)
                         else
                             target.ThreadUnpauseCandidates = nil
                             target.ThreadUnpause = nil
-                            break;
-                        end
+                            break
+                            ;end
 
                         WaitSeconds(1.0)
                         target = GetUnitById(id)
@@ -544,7 +358,7 @@ local function OnGuardUnpause(guardees, target)
         end
 
         -- add these to keep track
-        target.ThreadUnpauseCandidates = target.ThreadUnpauseCandidates or { }
+        target.ThreadUnpauseCandidates = target.ThreadUnpauseCandidates or {}
         for k, guardee in guardees do
             target.ThreadUnpauseCandidates[guardee:GetEntityId()] = true
         end
@@ -563,6 +377,8 @@ end
 
 --- Called by the engine when a new command has been issued by the player.
 -- @param command Information surrounding the command that has been issued, such as its CommandType or its Target.
+---@param command UserCommand
+---@return boolean
 function OnCommandIssued(command)
 
     -- if we're trying to upgrade hives then this allows us to force the upgrade to happen immediately
@@ -617,7 +433,7 @@ function OnCommandIssued(command)
 
         -- see if we can cap a structure
         if EntityCategoryContains(categoriesStructure, command.Blueprint) then
-            CapStructure(command)
+            import("/lua/ui/game/hotkeys/ring-extractor.lua").RingExtractor(command)
         end
 
         -- called when:
@@ -693,9 +509,6 @@ function OnCommandIssued(command)
             AddDefaultCommandFeedbackBlips(command.Target.Position)
         end
     end
-
-    -- used by spread attack to keep track of the orders of units
-    import("/lua/spreadattack.lua").MakeShadowCopyOrders(command)
 end
 
 --- ???
