@@ -80,11 +80,6 @@ end
 
 local WatcherBeat = function()
     if not SessionIsPaused() then
-        --if there are no more watchers in the cache, remove the beat function
-        if next(watcherCache) == nil then
-            RemoveBeatFunction(WatcherBeat)
-            return
-        end
         for watcher in watcherCache do
             watcher:WatchBeat()
         end
@@ -131,7 +126,7 @@ SynchronizedStrikeWatcher = Class() {
     WatchBeat = function(self)
         --subtract 1 from the waitTick value of the current launcher step
         self.watchCache[self.index][2] = self.watchCache[self.index][2] - 1
-
+        
         --see if we're at or below 0, if so, set the next launcher to fire
         --while loop to catch any launchers that may have the same launch time
         while self.watchCache[self.index][2] <= 0 do
@@ -142,6 +137,11 @@ SynchronizedStrikeWatcher = Class() {
             self.index = self.index + 1
             --if our index exceeds the length of the watchCache, we're done
             if self.index > table.getn(self.watchCache) then
+                --if there are no more watchers in the cache, remove the beat function
+                if next(watcherCache) == nil then
+                    RemoveBeatFunction(WatcherBeat)
+                    return
+                end
                 watcherCache[self] = nil
                 break
             end
@@ -149,15 +149,16 @@ SynchronizedStrikeWatcher = Class() {
     end,
 }
 
-local PreProcessLaunchers = function(launchers, launcherCache)
-    for _, launcher in launchers do
+local PreProcessLaunchers = function(command, launcherCache)
+    for _, launcher in command.Units do
         --range/distance check
-        if table.getn(launcher:GetCommandQueue()) == 1 then
-            LOG('got here')
+        if table.getn(launcher:GetCommandQueue()) == 1 and 
+           launcher:GetMissileInfo()[command.CommandType:lower() .. 'SiloStorageCount'] > 0 then
             CalculateTickOnTarget(launcher)
         else
             launcher.tickOnTarget = false
         end
+
         --add launcher to the launcherCache and set to hold fire
         if launcher.tickOnTarget then
             SetFireState({launcher}, FireState.HOLD_FIRE)
@@ -168,14 +169,11 @@ local PreProcessLaunchers = function(launchers, launcherCache)
 end
 
 
-SynchronizedStrike = function(launchers)
+SynchronizedStrike = function(command)
 
     local launcherCache = {}
-    for i in launcherCache do
-        launcherCache[i] = nil
-    end
     --calc tickOnTarget for relevant launchers and add them to the launcherCache
-    PreProcessLaunchers(launchers, launcherCache)
+    PreProcessLaunchers(command, launcherCache)
 
     --if there are no launchers in the cache, we're done
     if not next(launcherCache) then
