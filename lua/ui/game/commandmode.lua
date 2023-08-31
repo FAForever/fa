@@ -382,7 +382,8 @@ end
 -- Called when a unit is issued a nuke or tactical launch command
 -- @param command 
 local function OnLaunchCommandIssued(command)
-    if IsKeyDown("CONTROL") then
+    --Deal with the case where control is held down and a tactical missile is being launched (for now)
+    if IsKeyDown("CONTROL") and command.CommandType == "Tactical" then
         SynchronizedStrike(command.Units)
     end
 end
