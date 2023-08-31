@@ -1,4 +1,5 @@
 local Buff = import("/lua/sim/buff.lua")
+local Entity = import("/lua/sim/Entity.lua").Entity
 
 ---@class ShieldEffectsComponent : Unit
 ---@field Trash TrashBag
@@ -39,6 +40,7 @@ ShieldEffectsComponent = ClassSimple {
 
 ---@class IntelComponent
 ---@field IntelStatus? UnitIntelStatus
+---@field DetectedByHooks? fun(unit: Unit, army: number)[]
 IntelComponent = ClassSimple {
 
     ---@param self IntelComponent | Unit
@@ -390,7 +392,6 @@ IntelComponent = ClassSimple {
     end,
 }
 
----@type table<string, number>
 local TechToDuration = {
     TECH1 = 1,
     TECH2 = 2,
@@ -398,7 +399,6 @@ local TechToDuration = {
     EXPERIMENTAL = 6,
 }
 
----@type table<string, number>
 local TechToLOD = {
     TECH1 = 120,
     TECH2 = 140,
@@ -407,9 +407,11 @@ local TechToLOD = {
 }
 
 ---@class TreadComponent
+---@field CrushingSuspend? boolean
+---@field CrushingThread? thread
 ---@field TreadBlueprint UnitBlueprintTreads
 ---@field TreadSuspend? boolean
----@field TreadThreads? table<number, thread>
+---@field TreadThreads? thread[]
 TreadComponent = ClassSimple {
 
     ---@param self Unit | TreadComponent
@@ -420,50 +422,57 @@ TreadComponent = ClassSimple {
     ---@param self Unit | TreadComponent
     CreateMovementEffects = function(self)
         local treads = self.TreadBlueprint
-        if treads then
-            if treads.ScrollTreads then
-                self:AddThreadScroller(1.0, treads.ScrollMultiplier or 0.2)
-            end
+        if not treads then
+            return
+        end
 
-            local treadMarks = treads.TreadMarks
-            local treadType = self.TerrainType.Treads
-            if treadMarks and treadType and treadType ~= 'None' then
-                self:CreateTreads(treadMarks)
-            end
+        if treads.ScrollTreads then
+            self:AddThreadScroller(1.0, treads.ScrollMultiplier or 0.2)
+        end
+        local treadMarks = treads.TreadMarks
+        local treadType = self.TerrainType.Treads
+        if treadMarks and treadType and treadType ~= 'None' then
+            self:CreateTreads(treadMarks)
+        end
+        if treads.Damage then
+            self:StartCrushing(treads.Damage)
         end
     end,
 
     ---@param self Unit | TreadComponent
     DestroyMovementEffects = function(self)
         local treads = self.TreadBlueprint
-        if treads then
-            if treads.ScrollTreads then
-                self:RemoveScroller()
-            end
+        if not treads then
+            return
+        end
 
-            if self.TreadThreads then
-                self.TreadSuspend = true
-            end
+        if treads.ScrollTreads then
+            self:RemoveScroller()
+        end
+        if self.TreadThreads then
+            self.TreadSuspend = true
+        end
+        if self.CrushingThread then
+            self.CrushingSuspend = true
         end
     end,
 
     ---@param self Unit | TreadComponent
-    ---@param treadsBlueprint UnitBlueprintTreadMarks
-    CreateTreads = function(self, treadsBlueprint)
+    ---@param treadMarks UnitBlueprintTreadMarks
+    CreateTreads = function(self, treadMarks)
         local treadThreads = self.TreadThreads
         if not treadThreads then
             treadThreads = {}
+            self.TreadThreads = treadThreads
 
-            for k, treadBlueprint in treadsBlueprint do
+            for k, treadBlueprint in treadMarks do
                 local thread = ForkThread(self.CreateTreadsThread, self, treadBlueprint)
                 treadThreads[k] = thread
                 self.Trash:Add(thread)
             end
-
-            self.TreadThreads = treadThreads
         else
             self.TreadSuspend = nil
-            for k, thread in treadThreads do
+            for _, thread in treadThreads do
                 ResumeThread(thread)
             end
         end
@@ -472,24 +481,21 @@ TreadComponent = ClassSimple {
     ---@param self Unit | TreadComponent
     ---@param treads UnitBlueprintTreadMarks
     CreateTreadsThread = function(self, treads)
-
-        -- to local scope for performance
+        -- trade memory for performance
         local WaitTicks = WaitTicks
         local CreateSplatOnBone = CreateSplatOnBone
         local SuspendCurrentThread = SuspendCurrentThread
 
-        local tech = self.Blueprint.TechCategory
-        local sizeX = treads.TreadMarksSizeX
-        local sizeZ = treads.TreadMarksSizeZ
-        local interval = 10 * (treads.TreadMarksInterval or 0.1)
         local treadOffset = treads.TreadOffset
         local treadBone = treads.BoneName or 0
         local treadTexture = treads.TreadMarks
-
-        local duration = treads.TreadLifeTime or TechToDuration[tech] or 1
-        local lod = TechToLOD[tech] or 120
+        local sizeX = treads.TreadMarksSizeX
+        local sizeZ = treads.TreadMarksSizeZ
+        local lod = TechToLOD[self.Blueprint.TechCategory] or 120
+        local duration = treads.TreadLifeTime or TechToDuration[self.Blueprint.TechCategory] or 1
         local army = self.Army
 
+        local interval = 10 * (treads.TreadMarksInterval or 0.1)
         -- prevent infinite loops
         if interval < 1 then
             interval = 1
@@ -502,7 +508,56 @@ TreadComponent = ClassSimple {
             end
 
             SuspendCurrentThread()
-            self.TreadSuspend = nil
+            WaitTicks(1)
+        end
+    end,
+
+    ---@param self Unit | TreadComponent
+    ---@param dmg table
+    StartCrushing = function(self, dmg)
+        if not self.CrushingThread then
+            local thread = ForkThread(self.CreateCrushingThread, self, dmg)
+            self.CrushingThread = thread
+            self.Trash:Add(thread)
+        else
+            self.CrushingSuspend = nil
+            ResumeThread(self.CrushingThread)
+        end
+    end,
+
+    ---@param self Unit | TreadComponent
+    ---@param dmg table
+    CreateCrushingThread = function(self, dmg)
+        -- trade memory for performance
+        local WaitTicks = WaitTicks
+        local DamageArea = DamageArea
+        local SuspendCurrentThread = SuspendCurrentThread
+
+        local bones = dmg.Bones
+        local radius = dmg.Radius
+        local amount = dmg.Amount
+        local type = dmg.Type
+        local damageFriendly = dmg.DamageFriendly
+
+        local interval = 10 * (dmg.PulseInterval or 3)
+        -- prevent infinite loops
+        if interval < 1 then
+            interval = 1
+        end
+
+        while true do
+            while not self.CrushingSuspend do
+                if bones then
+                    for _, bone in bones do
+                        DamageArea(self, self:GetPosition(bone), radius, amount, type, damageFriendly)
+                    end
+                else
+                    DamageArea(self, self:GetPosition(), radius, amount, type, damageFriendly)
+                end
+                WaitTicks(interval)
+            end
+
+            SuspendCurrentThread()
             WaitTicks(1)
         end
     end,
@@ -547,8 +602,8 @@ VeterancyComponent = ClassSimple {
 
         -- optionally, these fields are defined too to inform UI of our veterancy status
         if blueprint.VetEnabled then
-            self:SetStat('VetLevel', self:GetStat('VetLevel', 0).Value)
-            self:SetStat('VetExperience', self:GetStat('VetExperience', 0).Value)
+            self:UpdateStat('VetLevel', 0)
+            self:UpdateStat('VetExperience', 0)
             self.VetExperience = 0
             self.VetLevel = 0
         end
@@ -605,7 +660,7 @@ VeterancyComponent = ClassSimple {
         if currLevel > 4 then
             currExperience = currExperience + experience
             self.VetExperience = currExperience
-            self:SetStat('VetExperience', currExperience)
+            self:UpdateStat('VetExperience', currExperience)
             return
         end
 
@@ -620,7 +675,7 @@ VeterancyComponent = ClassSimple {
 
             currExperience = currExperience + experience
             self.VetExperience = currExperience
-            self:SetStat('VetExperience', currExperience)
+            self:UpdateStat('VetExperience', currExperience)
 
             while currLevel < 5 and upperThreshold and upperThreshold <= experience do
                 self:AddVetLevel()
@@ -636,7 +691,7 @@ VeterancyComponent = ClassSimple {
 
             currExperience = currExperience + experience
             self.VetExperience = currExperience
-            self:SetStat('VetExperience', currExperience)
+            self:UpdateStat('VetExperience', currExperience)
 
             if upperThreshold <= currExperience then
                 self:AddVetLevel()
@@ -654,7 +709,7 @@ VeterancyComponent = ClassSimple {
 
         local nextLevel = self.VetLevel + 1
         self.VetLevel = nextLevel
-        self:SetStat('VetLevel', nextLevel)
+        self:UpdateStat('VetLevel', nextLevel)
 
         -- shared across all units
         Buff.ApplyBuff(self, 'VeterancyMaxHealth' .. nextLevel)
@@ -713,7 +768,8 @@ VeterancyComponent = ClassSimple {
     end,
 
     ---@param self Unit | VeterancyComponent
-    ---@param instigator Unit
+    ---@param unitThatIsDying Unit
+    ---@param experience? number
     OnKilledUnit = function (self, unitThatIsDying, experience)
         if not experience then
             return
@@ -757,4 +813,91 @@ VeterancyComponent = ClassSimple {
         -- Allow units to count for more or less than their real mass if needed
         return fractionComplete * unitMass * vetMult + cargoMass
     end,
+}
+
+---@class ExternalFactoryComponent
+---@field ExternalFactory ExternalFactoryUnit
+ExternalFactoryComponent = ClassSimple {
+
+    FactoryAttachBone = false,
+
+    ---@param self Unit | ExternalFactoryComponent
+    OnStopBeingBuilt = function(self, builder, layer)
+        local blueprint = self.Blueprint
+        if not self.FactoryAttachBone then
+            error(string.format("%s is not setup for an external factory: the unit does not have a field 'FactoryAttachBone'", blueprint.BlueprintId))
+        end
+
+        if not blueprint.CategoriesHash['EXTERNALFACTORY'] then
+            error(string.format("%s is not setup for an external factory: the unit does not have a 'EXTERNALFACTORY' category", blueprint.BlueprintId))
+        end
+
+        local blueprintIdExternalFactory = blueprint.BlueprintId .. 'ef'
+        if not __blueprints[blueprintIdExternalFactory] then
+            error(string.format("%s is not setup for an external factory: the external factory blueprint is not setup", blueprint.BlueprintId))
+        end
+
+        -- create the factory somewhere completely unrelated
+        local position = self:GetPosition(self.FactoryAttachBone)
+
+        -- we need to put an entity in between so that we can always click-select the 
+        -- factory. The 'CARRIER' category can prevent us from clicking on attached units
+        local entity = Entity({Owner = self})
+        self.Trash:Add(entity)
+        entity:AttachTo(self, self.FactoryAttachBone)
+
+        self.ExternalFactory = CreateUnitHPR(blueprintIdExternalFactory, self.Army, position[1], position[2], position[3], 0, 0, 0) --[[@as ExternalFactoryUnit]]
+        self.ExternalFactory:AttachTo(entity, -1)
+        self.ExternalFactory:SetCreator(self)
+        self.ExternalFactory:SetParent(self)
+        self.Trash:Add(self.ExternalFactory)
+    end,
+
+    ---@param self Unit | ExternalFactoryComponent
+    OnPaused = function(self)
+        if self.ExternalFactory then
+            self.ExternalFactory:SetPaused(true)
+        end
+    end,
+
+    ---@param self Unit | ExternalFactoryComponent
+    OnUnpaused = function(self)
+        if self.ExternalFactory then
+            self.ExternalFactory:SetPaused(false)
+        end
+    end,
+
+    ---@param self Unit | ExternalFactoryComponent
+    OnIdle = function(self)
+        if self.ExternalFactory and (not IsDestroyed(self.ExternalFactory)) then
+            self.ExternalFactory:SetBusy(false)
+            self.ExternalFactory:SetBlockCommandQueue(false)
+        end
+    end,
+
+    ---@param self Unit | ExternalFactoryComponent
+    ---@param new Layer
+    ---@param old Layer
+    OnLayerChange = function(self, new, old)
+        if self.ExternalFactory then
+            if new == 'Land' then
+                self.ExternalFactory:RestoreBuildRestrictions()
+                self.ExternalFactory:RequestRefreshUI()
+            elseif new == 'Seabed' then
+                self.ExternalFactory:AddBuildRestriction(categories.ALLUNITS)
+                self.ExternalFactory:RequestRefreshUI()
+
+                IssueClearCommands({self.ExternalFactory})
+            end
+        end
+    end,
+
+    OnKilled = function(self, instigator, type, overkillRatio)
+        if not IsDestroyed(self.ExternalFactory) then
+            self.ExternalFactory:SetBusy(true)
+            self.ExternalFactory:SetBlockCommandQueue(true)
+            self.ExternalFactory:Kill()
+        end
+    end,
+
 }

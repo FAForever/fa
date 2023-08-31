@@ -73,6 +73,14 @@ UnitBlueprint{
                     },
                 },
             },
+            Water = {
+                Effects = {
+                    {
+                        Bones = { "B01" },
+                        Type = "SeaIdleGunship01",
+                    },
+                },
+            },
         },
         LayerChangeEffects = {
             AirLand = {
@@ -87,6 +95,22 @@ UnitBlueprint{
                 Effects = {
                     {
                         Bones = { "URA0203" },
+                        Type = "TakeOff01",
+                    },
+                },
+            },
+            AirWater = {
+                Effects = {
+                    {
+                        Bones = { "B01" },
+                        Type = "Landing01",
+                    },
+                },
+            },
+            WaterAir = {
+                Effects = {
+                    {
+                        Bones = { "B01" },
                         Type = "TakeOff01",
                     },
                 },

@@ -92,9 +92,7 @@ defaultKeyMap = {
     ['Ctrl-Shift-S']        = 'select_nearest_naval_factory',
     ['Shift-T']             = 'create_build_template',
 
-    ['Tab']                 = 'next_cam_position',
-    ['Shift-Tab']           = 'add_cam_position',
-    ['Ctrl-Tab']            = 'rem_cam_position',
+    ['Tab']                 = 'cycle_context_based_templates',
     ['Q']                   = 'zoom_in',
     ['W']                   = 'zoom_out',
     ['Shift-Q']             = 'zoom_in_fast',
@@ -119,7 +117,7 @@ defaultKeyMap = {
     ['O']                   = 'overcharge',
     ['M']                   = 'move',
     ['N']                   = 'nuke',
-    ['G']                   = 'spreadattack',
+    ['G']                   = 'distribute_orders',
 
     ['Shift-R']             = 'shift_repair',
     ['Shift-E']             = 'shift_reclaim',
@@ -135,7 +133,7 @@ defaultKeyMap = {
     ['Shift-O']             = 'shift_overcharge',
     ['Shift-M']             = 'shift_move',
     ['Shift-N']             = 'shift_nuke',
-    ['Shift-G']             = 'shift_spreadattack',
+    ['Shift-G']             = 'shift_distribute_orders',
 
     ['B']                   = 'toggle_build_mode',
     ['Alt-R']               = 'toggle_reclaim_labels',

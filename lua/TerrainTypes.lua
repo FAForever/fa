@@ -192,6 +192,11 @@ TerrainTypes = {
                     EmitterBasePath .. 'aeon_t2eng_groundfx02_emit.bp',
                 },
                 Hover01 = { EmitterBasePath .. 'tt_water_hover01_01_emit.bp', },
+                SeaIdleGunship01 = { EmitterBasePath .. 'water_idle_ripples_gunship_01.bp', },
+                SeaIdleGunship02 = { 
+                    EmitterBasePath .. 'water_idle_ripples_gunship_01.bp',
+                    EmitterBasePath .. 'aeon_being_built_ambient_03_emit.bp' 
+                },
                 SeaIdle01 = { EmitterBasePath .. 'water_idle_ripples_02_emit.bp', },
                 SeaIdle02 = { EmitterBasePath .. 'water_idle_ripples_03_emit.bp', },
                 SonarBuoy01 = { EmitterBasePath .. 'water_sonarbuoyring_01_emit.bp', },
@@ -251,6 +256,14 @@ TerrainTypes = {
                     EmitterBasePath .. 'water_splash_ripples_ring_01_emit.bp',
                     EmitterBasePath .. 'water_splash_plume_02_emit.bp',
                 },
+            },
+        },
+        FXLayerChange = {
+            AirWater = {
+                Landing01 = { EmitterBasePath .. 'tt_water_landing01_emit.bp', },
+            },
+            WaterAir = {
+                TakeOff01 = { EmitterBasePath .. 'tt_water_takeoff_01_emit.bp', },
             },
         },
         FXMotionChange = {
@@ -1435,7 +1448,7 @@ TerrainTypes = {
                 },
                 GroundKickup03 = { EmitterBasePath .. 'tt_rocky12_groundkickup03_01_emit.bp', },
                 GroundKickup04 = { EmitterBasePath .. 'tt_rocky12_groundkickup04_01_emit.bp', },
-                Hover01 = { EmitterBasePath .. 'tt_rocky12_hover01_01_emit.bp',  },
+                Hover01 = { EmitterBasePath .. 'tt_rocky12_hover01_01_emit.bp', },
             },
         },
         Treads = 'Default',

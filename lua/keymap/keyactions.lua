@@ -255,6 +255,14 @@ local keyActionsSelectionQuickSelect = {
         action = 'UI_SelectByCategory +nearest FACTORY',
         category = 'selection',
     },
+    ['select_all_mobile_factory_onscreen'] = {
+        action = 'UI_SelectByCategory +inview EXTERNALFACTORYUNIT',
+        category = 'selection',
+    },
+    ['select_nearest_mobile_factory'] = {
+        action = 'UI_SelectByCategory +nearest EXTERNALFACTORYUNIT',
+        category = 'selection',
+    },
     ['select_nearest_land_factory'] = {
         action = 'UI_SelectByCategory +nearest LAND FACTORY',
         category = 'selection',
@@ -273,6 +281,14 @@ local keyActionsSelectionQuickSelect = {
     },
     ['select_all_idle_eng_onscreen'] = {
         action = 'UI_SelectByCategory +inview +idle ENGINEER',
+        category = 'selection',
+    },
+    ['select_all_building_eng'] = {
+        action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").SelectAllBuildingEngineers()',
+        category = 'selection',
+    },
+    ['select_all_building_eng_onscreen'] = {
+        action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").SelectAllBuildingEngineers(true)',
         category = 'selection',
     },
     ['select_all_land_units_onscreen'] = {
@@ -410,6 +426,14 @@ local keyActionsSelectionQuickSelect = {
     ['select_all_battleships'] = {
         action = 'UI_SelectByCategory NAVAL BATTLESHIP',
         category = 'selection',
+    },
+    ['select_air_no_transport'] = {
+        action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").airNoTransports()',
+        category = 'selection',
+    },
+    ['select_air_transport'] = {
+        action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").airTransports()',
+        category = 'selection', order = 65,
     },
 }
 
@@ -1485,18 +1509,6 @@ local keyActionsOrders = {
         action = 'UI_Lua import("/lua/ui/game/confirmunitdestroy.lua").ConfirmUnitDestruction(false)',
         category = 'orders',
     },
-    ['spreadattack'] = {
-        action = 'UI_Lua import("/lua/spreadattack.lua").SpreadAttack()',
-        category = 'orders',
-    },
-    ['shift_spreadattack'] = {
-        action = 'UI_Lua import("/lua/spreadattack.lua").SpreadAttack()',
-        category = 'orders',
-    },
-    ['set_target_priority'] = {
-        action = 'UI_LUA import("/lua/keymap/misckeyactions.lua").SetWeaponPrioritiesToUnitType()',
-        category = 'orders',
-    },
     ['set_default_target_priority'] = {
         action = 'UI_LUA import("/lua/keymap/misckeyactions.lua").SetDefaultWeaponPriorities()',
         category = 'orders',
@@ -1573,32 +1585,94 @@ local keyActionsOrders = {
         action = 'UI_Lua import("/lua/ui/game/orders.lua").Dock(false)',
         category = 'orders',
     },
-    ['select_air_no_transport'] = {
-        action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").airNoTransports()',
-        category = 'selection',
-    },
-    ['select_air_transport'] = {
-        action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").airTransports()',
-        category = 'selection', order = 65,
-    },
 }
 
 local keyActionsOrdersAdvanced = {
-    ['filter_highest_engineer_and_assist'] = {
-        action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").SelectHighestEngineerAndAssist()',
+    ['load_transports'] = {
+        action = 'UI_Lua import("/lua/ui/game/hotkeys/load-in-transport.lua").LoadIntoTransports(false)',
         category = 'ordersAdvanced',
+        wikiURL = 'Play/Game/Hotkeys/OrdersAdvanced#load-into-transports'
     },
-    ['distribute_orders'] = {
-        action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").DistributeOrders()',
+    ['load_transports_clear'] = {
+        action = 'UI_Lua import("/lua/ui/game/hotkeys/load-in-transport.lua").LoadIntoTransports(true)',
         category = 'ordersAdvanced',
+        wikiURL = 'Play/Game/Hotkeys/OrdersAdvanced#load-into-transports'
+    },
+    ['shift_load_transports'] = {
+        action = 'UI_Lua import("/lua/ui/game/hotkeys/load-in-transport.lua").LoadIntoTransports(false)',
+        category = 'ordersAdvanced',
+        wikiURL = 'Play/Game/Hotkeys/OrdersAdvanced#load-into-transports'
+    },
+    ['shift_load_transports_clear'] = {
+        action = 'UI_Lua import("/lua/ui/game/hotkeys/load-in-transport.lua").LoadIntoTransports(true)',
+        category = 'ordersAdvanced',
+        wikiURL = 'Play/Game/Hotkeys/OrdersAdvanced#load-into-transports'
+    },
+    ['filter_highest_engineer_and_assist'] = {
+        action = 'UI_Lua import("/lua/ui/game/hotkeys/filter-engineers.lua").SelectHighestEngineerAndAssist()',
+        category = 'ordersAdvanced',
+        wikiURL = 'Play/Game/Hotkeys/OrdersAdvanced#filter-engineers'
+    },
+    ['shift_filter_highest_engineer_and_assist'] = {
+        action = 'UI_Lua import("/lua/ui/game/hotkeys/filter-engineers.lua").SelectHighestEngineerAndAssist()',
+        category = 'ordersAdvanced',
+        wikiURL = 'Play/Game/Hotkeys/OrdersAdvanced#filter-engineers'
+    },
+}
+
+local keyActionsOrdersQueueBased = {
+    ['distribute_orders'] = {
+        action = 'UI_Lua import("/lua/ui/game/hotkeys/distribute-queue.lua").DistributeOrders(true)',
+        category = 'ordersQueueBased',
+        wikiURL = 'Play/Game/Hotkeys/OrdersQueueManipulation#distribute-orders'
     },
     ['shift_distribute_orders'] = {
-        action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").DistributeOrders()',
-        category = 'ordersAdvanced',
+        action = 'UI_Lua import("/lua/ui/game/hotkeys/distribute-queue.lua").DistributeOrders(true)',
+        category = 'ordersQueueBased',
+        wikiURL = 'Play/Game/Hotkeys/OrdersQueueManipulation#distribute-orders'
     },
-    ['cycle_generated_templates'] = {
-        action = 'UI_Lua import("/lua/ui/game/commands/generated-templates.lua").Cycle()',
-        category = 'ordersAdvanced',
+    ['distribute_orders_context'] = {
+        action = 'UI_Lua import("/lua/ui/game/hotkeys/distribute-queue.lua").DistributeOrdersOfMouseContext(true)',
+        category = 'ordersQueueBased',
+        wikiURL = 'Play/Game/Hotkeys/OrdersQueueManipulation#distribute-orders'
+    },
+    ['shift_distribute_orders_context'] = {
+        action = 'UI_Lua import("/lua/ui/game/hotkeys/distribute-queue.lua").DistributeOrdersOfMouseContext(true)',
+        category = 'ordersQueueBased',
+        wikiURL = 'Play/Game/Hotkeys/OrdersQueueManipulation#distribute-orders'
+    },
+    ['copy_orders'] = {
+        action = 'UI_LUA import("/lua/ui/game/hotkeys/copy-queue.lua").CopyOrders()',
+        category = 'ordersQueueBased',
+        wikiURL = 'Play/Game/Hotkeys/OrdersQueueManipulation#copy-orders'
+    },
+    ['shift_copy_orders'] = {
+        action = 'UI_LUA import("/lua/ui/game/hotkeys/copy-queue.lua").CopyOrders()',
+        category = 'ordersQueueBased',
+        wikiURL = 'Play/Game/Hotkeys/OrdersQueueManipulation#copy-orders'
+    },
+}
+
+local keyactionsOrdersContextBased = {
+    ['cycle_context_based_templates'] = {
+        action = 'UI_Lua import("/lua/ui/game/hotkeys/context-based-templates.lua").Cycle()',
+        category = 'ordersContextBased',
+        wikiURL = 'Play/Game/Hotkeys/OrdersMouseContext#cycle-templates'
+    },
+    ['shift_cycle_context_based_templates'] = {
+        action = 'UI_Lua import("/lua/ui/game/hotkeys/context-based-templates.lua").Cycle()',
+        category = 'ordersContextBased',
+        wikiURL = 'Play/Game/Hotkeys/OrdersMouseContext#cycle-templates'
+    },
+    ['set_target_priority'] = {
+        action = 'UI_LUA import("/lua/keymap/misckeyactions.lua").SetWeaponPrioritiesToUnitType()',
+        category = 'ordersContextBased',
+        wikiURL = 'Play/Game/Hotkeys/OrdersMouseContext#cycle-templates'
+    },
+    ['shift_set_target_priority'] = {
+        action = 'UI_LUA import("/lua/keymap/misckeyactions.lua").SetWeaponPrioritiesToUnitType()',
+        category = 'ordersContextBased',
+        wikiURL = 'Play/Game/Hotkeys/OrdersMouseContext#cycle-templates'
     },
 }
 
@@ -1819,6 +1893,8 @@ keyActions = table.combine(
     keyActionsHotBuildExtra,
     keyActionsOrders,
     keyActionsOrdersAdvanced,
+    keyActionsOrdersQueueBased,
+    keyactionsOrdersContextBased,
     keyActionsGame,
     keyActionsChat,
     keyActionsUI,

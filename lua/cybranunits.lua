@@ -65,7 +65,11 @@ local TrashBagAdd = TrashBag.Add
 
 --- A class to managing the build bots. Make sure to call all the relevant functions.
 ---@class CConstructionTemplate
+---@field BotBlueprintId? string
 CConstructionTemplate = ClassSimple {
+
+    BotBlueprintId = false,
+    BotBone = 0,
 
     --- Prepares the values required to support bots
     ---@param self CConstructionTemplate
@@ -126,7 +130,7 @@ CConstructionTemplate = ClassSimple {
 
     --- When pausing, send the bots back after a bit.
     ---@param self CConstructionTemplate
-    ---@param delay number
+    ---@param delay? number
     OnPaused = function(self, delay)
         -- delay until they move back
         delay = delay or (0.5 + 2) * Random()
@@ -165,7 +169,7 @@ CConstructionTemplate = ClassSimple {
             local builderArmy = self.Army
             local unitBeingBuiltArmy = unitBeingBuilt.Army
             if builderArmy == unitBeingBuiltArmy or ArmyBrains[builderArmy].BrainType == "Human" then
-                SpawnBuildBotsOpti(self)
+                SpawnBuildBotsOpti(self, self.BotBlueprintId, self.BotBone)
                 if stationary then 
                     CreateCybranEngineerBuildEffectsOpti(self, self.BuildEffectBones, self.BuildBots, self.BuildBotTotal, self.BuildEffectsBag)
                 end

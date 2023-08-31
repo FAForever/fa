@@ -12,6 +12,63 @@ LOG("Client version: " .. tostring(ClientVersion))
 LOG("Game version: " .. tostring(GameVersion))
 LOG("Game type: " .. tostring(GameType))
 
+-------------------------------------------------------------------------------
+--#region Adjust process affinity and prioritity
+
+-- The rendering thread appears to pin itself to the first computing unit of
+-- a computer. The first computing unit is often also used by othersoftware,
+-- including the OS. Through empirical research the framerate of the game is a
+-- lot more consistent when we do not give it access to the first computing 
+-- unit.
+
+-- That is what this section helps us do. The game functions best when it has
+-- at least four computing units available. If we detect someone has 6 or more
+-- computing units then we take the game off the first compute unit.
+
+-- Note that we can not make the distinction between real computing units and
+-- computing units that originate from technology such as hyperthreading.
+
+local SetProcessPriority = rawget(_G, "SetProcessPriority")
+local GetProcessAffinityMask = rawget(_G, "GetProcessAffinityMask")
+local SetProcessAffinityMask = rawget(_G, "SetProcessAffinityMask")
+
+if SetProcessPriority and GetProcessAffinityMask and SetProcessAffinityMask then
+
+    -- priority values can be found at:
+    -- - https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-setpriorityclass
+    local success = SetProcessPriority(0x00000080)
+    if success then
+        LOG("Process - priority set to: 'high'")
+    else
+        LOG("Process - Failed to adjust process priority, this may impact your framerate")
+    end
+
+    -- affinity values acts like a bit mask, we retrieve the mask and shift it if we think there are sufficient computing units
+    local success, processAffinityMask, systemAffinityMask = GetProcessAffinityMask();
+    if success then
+        -- system has 6 (logical) threads or more, skip first two computing units
+        if systemAffinityMask >= 63 then
+            processAffinityMask = systemAffinityMask & (systemAffinityMask << 2)
+        end
+
+        -- update the afinity mask
+        if processAffinityMask != systemAffinityMask then
+            local success = SetProcessAffinityMask(processAffinityMask);
+            if success then
+                LOG("Process - affinity set to: " .. tostring(processAffinityMask))
+            else
+                LOG("Process - Failed to adjust the process affinity, this may impact your framerate")
+            end
+        end
+    else
+        LOG("Process - Failed to retrieve the process affinity, this may impact your framerate")
+    end
+else
+    LOG("Process - Failed to find process priority and affinity related functions, this may impact your framerate")
+end
+
+--#endregion
+
 -- upvalued performance
 local StringSub = string.sub
 local StringLower = string.lower

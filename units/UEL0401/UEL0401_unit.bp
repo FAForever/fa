@@ -63,6 +63,7 @@ UnitBlueprint{
         "SNIPEMODE",
         "UEF",
         "VISIBLETORECON",
+        "EXTERNALFACTORY",
     },
     Defense = {
         AirThreatLevel = 16,
@@ -191,6 +192,19 @@ UnitBlueprint{
                             TreadOffset = { 0, 0, -4.5 },
                         },
                     },
+                    Damage = {
+                        Bones = {
+                            "Wheel_Left01",
+                            "Wheel_Right01",
+                            "Wheel_Left02",
+                            "Wheel_Right02",
+                        },
+                        Amount = 400,
+                        PulseInterval = 0.5,
+                        DamageFriendly = false,
+                        Radius = 1.2,
+                        Type = "ExperimentalFootfall",
+                    },
                 },
             },
             Seabed = {
@@ -208,7 +222,7 @@ UnitBlueprint{
     Economy = {
         BuildCostEnergy = 350000,
         BuildCostMass = 28000,
-        BuildRate = 180,
+        BuildRate = 135,
         BuildTime = 47500,
         BuildableCategory = {
             "BUILTBYTIER3FACTORY UEF MOBILE LAND",

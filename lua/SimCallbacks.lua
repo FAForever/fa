@@ -21,7 +21,6 @@ local ScenarioFramework = import("/lua/scenarioframework.lua")
 -- upvalue table operations for performance
 local TableInsert = table.insert
 local TableEmpty = table.empty
-local TableGetn = table.getn
 local TableRemove = table.remove
 local TableMerged = table.merged
 
@@ -42,10 +41,6 @@ local IssueFerry = IssueFerry
 
 -- upvalue categories for performance
 local CategoriesTransportation = categories.TRANSPORTATION
-local CategoriesEngineer = categories.ENGINEER - categories.INSIGNIFICANTUNIT
-
---- Used to warn users (mainly developers) once for invalid use of functionality
-local Warnings = {}
 
 --- List of callbacks that is being populated throughout this file
 ---@type table<string, function>
@@ -118,278 +113,6 @@ end
 Callbacks.ClearCommands = function(data, units)
     local safe = SecureUnits(data.ids or units)
     IssueClearCommands(safe)
-end
-
-local LetterArray = {
-    ["Aeon"] = "ua",
-    ["AEON"] = "ua",
-    ["UEF"] = "ue",
-    ["Cybran"] = "ur",
-    ["CYBRAN"] = "ur",
-    ["Seraphim"] = "xs",
-    ["SERAPHIM"] = "xs",
-}
-
---- Compute the faction-specific blueprint identifier
-local function ConstructBlueprintID(faction, blueprintID)
-    return LetterArray[faction] .. blueprintID
-end
-
---- Allocated once to prevent re-allocations and de-allocations
-local buildLocation = Vector(0, 0, 0)
-
---- Templates for units with a skirt size of 1, such as point defense
-local skirtSize1 = {
-    { { -1, 0 }, { -1, 1 }, { 0, 1 }, { 1, 1 }, { 1, 0 }, { 1, -1 }, { 0, -1 }, { -1, -1 }, },
-}
-
---- Templates for units with a skirtSize of 2 such as radars and mass extractors
-local skirtSize2 = {
-    -- inner layer for storages (skirt 2)
-    { { 2, 0 }, { 0, 2 }, { -2, 0 }, { 0, -2 }, },
-
-    -- outer layer for fabricators (skirt 2)
-    { { -2, 2 }, { 2, 2 }, { 2, -2 }, { -2, -2 }, { -4, 0 }, { 0, 4 }, { 4, 0 }, { 0, -4 }, },
-}
-
---- Templates for units with a skirtSize of 6 such as fabricators
-local skirtSize6 = {
-    -- inner layer for mass storages (skirt 2)
-    { { -2, 4 }, { 0, 4 }, { 2, 4 }, { 4, 2 }, { 4, 0 }, { 4, -2 }, { 2, -4 }, { 0, -4 }, { -2, -4 }, { -4, -2 },
-        { -4, 0 },
-        { -4, 2 }, },
-}
-
---- Templates for units with a skirtSize of 8 such as T4 Arty Mavor
-local skirtSize8 = {
-    -- inner layer for T3 pgens (skirt 8)
-    { { 0, 8 }, { 0, -8 }, { 8, 0 }, { -8, 0 } },
-}
-
---- Templates for units with a skirtSize of 10 such as T4 Arty Salvation
-local skirtSize10 = {
-    -- inner layer for T3 pgens (skirt 8)
-    { { -1, 9 }, { 1, -9 }, { 9, 1 }, { -9, -1 } },
-}
-
---- Easy to use table for direct skirtSize size -> template conversion
-local skirtSizes = {
-    [1] = skirtSize1,
-    [2] = skirtSize2,
-    [6] = skirtSize6,
-    [8] = skirtSize8,
-    [10] = skirtSize10
-}
-
---- Computes the n'th layer of a previous layer.
----@param skirtSize number skirt size of the unit
----@param nthLayer number nth layer we'd like to have for this unit
-local function RetrieveNthStructureLayer(skirtSize, nthLayer)
-
-    -- attempt to retrieve the right set of layers for this skirtSize
-    local layers = skirtSizes[skirtSize]
-
-    -- if we have some layers for this skirtSize
-    if layers then
-
-        -- attempt to retrieve the right layer count
-        local layer = layers[nthLayer]
-
-        -- if we have that too
-        if layer then
-
-            -- then we can return that
-            return layer
-        end
-    end
-
-    -- no structure layer available
-    local identifier = "RetrieveNthStructureLayer" .. skirtSize .. " - " .. nthLayer
-    if not Warnings[identifier] then
-        Warnings[identifier] = true
-        WARN("Attempted to retrieve a build layer for skirtSize " ..
-            skirtSize ..
-            " and layer " ..
-            nthLayer ..
-            " which is not supported. The only supported values are: skirtSize 1 with layer 1, skirtSize 2 with layer 1 and 2, skirtSize 6 with layer 0.")
-    end
-
-    -- boo
-    return false
-end
-
---- Called by the UI when right-clicking a mass extractor
-Callbacks.CapStructure = function(data, units)
-
-    -- check if we have a structure
-    -- if army is not set then the structure is not 'our' structure (e.g., we're trying to cap an allied or hostile extractor)
-    local structure = GetEntityById(data.target)
-    if (not structure) or (not structure.Army) then return end
-
-    -- check if we're allowed to mess with this structure
-    if not OkayToMessWithArmy(structure.Army) then return end
-
-    -- check if we have units
-    local units = EntityCategoryFilterDown(CategoriesEngineer, SecureUnits(units))
-    if not units[1] then return end
-
-    -- check if it is our structure
-    if structure.Army ~= units[1].Army then return end
-
-    -- check if we have buildings we want to use for capping
-    if (not data.id) or (not data.layer) then return end
-
-    -- populate faction table
-    local otherBuilders = {}
-    local buildersByFaction = {}
-
-    -- determine of all units in selection what they can build
-    for _, unit in units do
-        -- make sure we're allowed to mess with this unit, if not we exclude
-        if unit.Army and OkayToMessWithArmy(unit.Army) then
-            -- compute blueprint id
-            local faction = unit.Blueprint.FactionCategory
-            local blueprintID = ConstructBlueprintID(faction, data.id)
-
-            -- check if this unit can build it
-            if unit:CanBuild(blueprintID) then
-                buildersByFaction[faction] = buildersByFaction[faction] or {}
-                TableInsert(buildersByFaction[faction], unit)
-            else
-                TableInsert(otherBuilders, unit)
-            end
-        end
-    end
-
-    -- sanity check: find at least one engineer that can build the structure in question
-    local oneCanBuild = nil
-    for k, faction in buildersByFaction do
-        oneCanBuild = true
-    end
-
-    -- check if we have units
-    if not oneCanBuild then return end
-
-    -- find majority
-    local faction = ""
-    local builders = {}
-    for k, engineers in buildersByFaction do
-        if TableGetn(builders) < TableGetn(engineers) then
-            builders = engineers
-            faction = k
-        end
-    end
-
-    -- append the rest to other builders
-    for k, engineers in buildersByFaction do
-        if k ~= faction then
-            for k, engineer in engineers do
-                TableInsert(otherBuilders, engineer)
-            end
-        end
-    end
-
-    -- -- only keep at most six builders due to performance
-    -- local allBuilders = builders
-    -- builders = { }
-    -- for k, engineer in allBuilders do
-    --     if k < 7 then
-    --         builders[k] = engineer
-    --     else
-    --         TableInsert(otherBuilders, engineer)
-    --     end
-    -- end
-
-    -- compute / retrieve information for capping
-    local blueprintID = ConstructBlueprintID(faction, data.id)
-    local blueprint = structure:GetBlueprint()
-    local skirtSize = blueprint.Physics.SkirtSizeX
-
-    -- compute the layer locations
-    local layer = RetrieveNthStructureLayer(skirtSize, data.layer)
-
-    -- check if we got anything valid
-    if layer then
-
-        -- compute build locations and issue the capping
-        local cx, cy, cz = structure:GetPositionXYZ()
-
-        -- full extent of search rectangle for other buildings
-        local x1 = cx - (skirtSize + 10)
-        local z1 = cz - (skirtSize + 10)
-        local x2 = cx + (skirtSize + 10)
-        local z2 = cz + (skirtSize + 10)
-
-        -- find all units that may prevent us from building
-        local structures = GetUnitsInRect(x1, z1, x2, z2)
-        structures = EntityCategoryFilterDown(categories.STRUCTURE + categories.EXPERIMENTAL, structures)
-
-        -- determine offset to enlarge unit skirt to include structure we're trying to use to cap
-        -- this is a hard-coded fix to make walls work
-        local offset = 1
-        if skirtSize == 1 then
-            offset = 0.5
-        end
-
-        -- replace unit -> skirt to prevent allocating a new table
-        for k, unit in structures do
-            local blueprint = unit:GetBlueprint()
-            local px, py, pz = unit:GetPositionXYZ()
-            local sx, sz = 0.5 * blueprint.Physics.SkirtSizeX, 0.5 * blueprint.Physics.SkirtSizeZ
-            local rect = {
-                px - sx - offset, -- top left
-                pz - sz - offset, -- top left
-                px + sx + offset, -- bottom right
-                pz + sz + offset -- bottom right
-            }
-
-            structures[k] = rect
-        end
-
-        -- name convention
-        local skirts = structures
-
-        -- loop over build locations in given layer
-        for k, location in layer do
-
-            -- determine build location using cached value
-            buildLocation[1] = cx + location[1]
-            buildLocation[3] = cz + location[2]
-            buildLocation[2] = GetTerrainHeight(buildLocation[1], buildLocation[3])
-
-            -- check all skirts manually as brain:CanBuildStructureAt(...) is unreliable when structures have been upgraded
-            local freeToBuild = true
-            for k, skirt in skirts do
-                if buildLocation[1] > skirt[1] and buildLocation[1] < skirt[3] then
-                    if buildLocation[3] > skirt[2] and buildLocation[3] < skirt[4] then
-                        freeToBuild = false
-                        break
-                    end
-                end
-            end
-
-            -- issue if we can build here
-            if freeToBuild then
-                for _, builder in builders do
-                    IssueBuildMobile({ builder }, buildLocation, blueprintID, {})
-                end
-            end
-        end
-
-        -- assist for all other builders, spread over the number of actual builders
-        local t = {}
-        local builderIndex = 1
-        local builderCount = TableGetn(builders)
-        for k, builder in otherBuilders do
-            t[1] = builder
-            IssueGuard(t, builders[builderIndex])
-
-            builderIndex = builderIndex + 1
-            if builderIndex > builderCount then
-                builderIndex = 1
-            end
-        end
-    end
 end
 
 Callbacks.BreakAlliance = SimUtils.BreakAlliance
@@ -486,8 +209,6 @@ Callbacks.OnPlayerQueryResult = SimPlayerQuery.OnPlayerQueryResult
 
 Callbacks.PingGroupClick = import("/lua/simpinggroup.lua").OnClickCallback
 
-Callbacks.GiveOrders = import("/lua/spreadattack.lua").GiveOrders
-
 Callbacks.ValidateAssist = function(data, units)
     units = SecureUnits(units)
     local target = GetEntityById(data.target)
@@ -540,8 +261,36 @@ end
 
 Callbacks.WeaponPriorities = import("/lua/weaponpriorities.lua").SetWeaponPriorities
 
+---@param data { target: EntityId }
+---@param selection Unit[]
+Callbacks.RingExtractor = function(data, selection)
+    -- verify selection
+    selection = SecureUnits(selection)
+    if (not selection) or TableEmpty(selection) then
+        return
+    end
+
+    -- verify we have engineers
+    local engineers = EntityCategoryFilterDown(categories.ENGINEER, selection)
+    if TableEmpty(engineers) then
+        return
+    end
+
+    -- verify the extractor
+    local extractor = GetUnitById(data.target) --[[@as Unit]]
+    if (not extractor) or
+        (not extractor.Army) or
+        (not OkayToMessWithArmy(extractor.Army)) or
+        (not EntityCategoryContains(categories.MASSEXTRACTION, extractor))
+    then
+        return
+    end
+
+    import("/lua/sim/commands/ring-extractor.lua").RingExtractor(extractor, engineers)
+end
+
 ---@param data any
----@param selection any
+---@param selection Unit[]
 Callbacks.SelectHighestEngineerAndAssist = function(data, selection)
     if selection then
         -- check for cheats
@@ -629,682 +378,68 @@ end
 
 do
 
-    ---@class DistributeOrderInfo
-    ---@field BatchOrders boolean
-    ---@field FullRedundancy boolean
-    ---
-    ---@field Type string                   # Describes the intended order, used during debugging
-    ---@field Callback function | false     # Function that matches the intended order
-    ---@field RequiresEntity boolean        # Flag that indicates this order requires an entity and should be skipped otherwise
-    ---@field ApplyAllOrders boolean        # Flag that indicates we want to apply all orders
-    ---@field Redundancy number             # Flag that indicates the default redundancy for each group of orders
-
-    --- The order of this list is determined in the engine, see also the files in:
-    --- - https://github.com/FAForever/FA-Binary-Patches/pull/22
-    ---@type DistributeOrderInfo[]
-    local CommandInfo = {
-        [1] = {
-            Type = "Stop",
-            Callback = false,
-            RequiresEntity = false,
-            Redundancy = 1,
-            ApplyAllOrders = false,
-        },
-        [2] = {
-            Type = "Move",
-            Callback = IssueMove,
-            RequiresEntity = false,
-            Redundancy = 1,
-            ApplyAllOrders = false,
-            BatchOrders = true,
-        },
-        [3] = {
-            Type = "Dive",
-            Callback = false,
-            RequiresEntity = false,
-            Redundancy = 1,
-            ApplyAllOrders = false,
-        },
-        [4] = {
-            Type = "FormMove",
-            Callback = IssueMove,
-            RequiresEntity = false,
-            Redundancy = 1,
-            ApplyAllOrders = false,
-        },
-        [5] = {
-            Type = "BuildSiloTactical",
-            Callback = false,
-            RequiresEntity = false,
-            Redundancy = 1,
-            ApplyAllOrders = false,
-        },
-        [6] = {
-            Type = "BuildSiloNuke",
-            Callback = false,
-            RequiresEntity = false,
-            Redundancy = 1,
-            ApplyAllOrders = false,
-        },
-        [7] = {
-            Type = "BuildFactory",
-            Callback = false,
-            RequiresEntity = false,
-            Redundancy = 1,
-            ApplyAllOrders = false,
-        },
-        [8] = {
-            Type = "BuildMobile",
-            Callback = IssueBuildMobile,
-            RequiresEntity = false,
-            Redundancy = 1,
-            ApplyAllOrders = true,
-        },
-        [9] = {
-            Type = "BuildAssist",
-            Callback = IssueGuard,
-            RequiresEntity = true,
-            Redundancy = 1,
-            ApplyAllOrders = true,
-        },
-        [10] = {
-            Type = "Attack",
-            Callback = IssueAttack,
-            RequiresEntity = false,
-            Redundancy = 3,
-            ApplyAllOrders = true,
-            BatchOrders = true,
-            FullRedundancy = true,
-        },
-        [11] = {
-            Type = "FormAttack",
-            Callback = IssueAttack,
-            RequiresEntity = false,
-            Redundancy = 3,
-            ApplyAllOrders = true,
-        },
-        [12] = {
-            Type = "Nuke",
-            Callback = IssueNuke,
-            RequiresEntity = false,
-            Redundancy = 1,
-            ApplyAllOrders = true,
-        },
-        [13] = {
-            Type = "Tactical",
-            Callback = IssueTactical,
-            RequiresEntity = false,
-            Redundancy = 1,
-            ApplyAllOrders = true,
-        },
-        [14] = {
-            Type = "Teleport",
-            Callback = IssueTeleport,
-            RequiresEntity = false,
-            Redundancy = 1,
-            ApplyAllOrders = false,
-        },
-        [15] = {
-            Type = "Guard",
-            Callback = IssueGuard,
-            RequiresEntity = true,
-            Redundancy = 1,
-            ApplyAllOrders = false,
-            BatchOrders = true,
-            FullRedundancy = true,
-        },
-        [16] = {
-            Type = "Patrol",
-            Callback = IssuePatrol,
-            RequiresEntity = false,
-            Redundancy = 3,
-            ApplyAllOrders = true,
-        },
-        [17] = {
-            Type = "Ferry",
-            Callback = nil,
-            RequiresEntity = false,
-            Redundancy = 1,
-            ApplyAllOrders = false,
-        },
-        [18] = {
-            Type = "FormPatrol",
-            Callback = IssuePatrol,
-            RequiresEntity = false,
-            Redundancy = 3,
-            ApplyAllOrders = true,
-        },
-        [19] = {
-            Type = "Reclaim",
-            Callback = IssueReclaim,
-            RequiresEntity = true,
-            Redundancy = 1,
-            ApplyAllOrders = true,
-            BatchOrders = true,
-            FullRedundancy = true,
-        },
-        [20] = {
-            Type = "Repair",
-            Callback = IssueRepair,
-            RequiresEntity = true,
-            Redundancy = 1,
-            ApplyAllOrders = true,
-            BatchOrders = true,
-            FullRedundancy = true,
-        },
-        [21] = {
-            Type = "Capture",
-            Callback = IssueCapture,
-            RequiresEntity = true,
-            Redundancy = 1,
-            ApplyAllOrders = true,
-            BatchOrders = true,
-            FullRedundancy = true,
-        },
-        [22] = {
-            Type = "TransportLoadUnits",
-            Callback = nil,
-            RequiresEntity = false,
-            Redundancy = 1,
-            ApplyAllOrders = false,
-        },
-        [23] = {
-            Type = "TransportReverseLoadUnits",
-            Callback = nil,
-            RequiresEntity = false,
-            Redundancy = 1,
-            ApplyAllOrders = false,
-        },
-        [24] = {
-            Type = "TransportUnloadUnits",
-            Callback = IssueTransportUnload,
-            RequiresEntity = false,
-            Redundancy = 1,
-            ApplyAllOrders = false,
-        },
-        [25] = {
-            Type = "TransportUnloadSpecificUnits",
-            Callback = nil,
-            RequiresEntity = false,
-            Redundancy = 1,
-            ApplyAllOrders = false,
-        },
-        [26] = {
-            Type = "DetachFromTransport",
-            Callback = nil,
-            RequiresEntity = false,
-            Redundancy = 1,
-            ApplyAllOrders = false,
-        },
-        [27] = {
-            Type = "Upgrade",
-            Callback = nil,
-            RequiresEntity = false,
-            Redundancy = 1,
-            ApplyAllOrders = false,
-        },
-        [28] = {
-            Type = "Script",
-            Callback = nil,
-            RequiresEntity = false,
-            Redundancy = 1,
-            ApplyAllOrders = false,
-        },
-        [29] = {
-            Type = "AssistCommander",
-            Callback = IssueGuard,
-            RequiresEntity = true,
-            Redundancy = 1,
-            ApplyAllOrders = true,
-        },
-        [30] = {
-            Type = "KillSelf",
-            Callback = nil,
-            RequiresEntity = false,
-            Redundancy = 1,
-            ApplyAllOrders = false,
-        },
-        [31] = {
-            Type = "DestroySelf",
-            Callback = nil,
-            RequiresEntity = false,
-            Redundancy = 1,
-            ApplyAllOrders = false,
-        },
-        [32] = {
-            Type = "Sacrifice",
-            Callback = IssueSacrifice,
-            RequiresEntity = true,
-            Redundancy = 1,
-            ApplyAllOrders = false,
-        },
-        [33] = {
-            Type = "Pause",
-            Callback = nil,
-            RequiresEntity = false,
-            Redundancy = 1,
-            ApplyAllOrders = false,
-        },
-        [34] = {
-            Type = "OverCharge",
-            Callback = nil,
-            RequiresEntity = false,
-            Redundancy = 1,
-            ApplyAllOrders = false,
-        },
-        [35] = {
-            Type = "AggressiveMove",
-            Callback = IssueAggressiveMove,
-            RequiresEntity = false,
-            Redundancy = 1,
-            ApplyAllOrders = true,
-        },
-        [36] = {
-            Type = "FormAggressiveMove",
-            Callback = IssueAggressiveMove,
-            RequiresEntity = false,
-            Redundancy = 1,
-            ApplyAllOrders = true,
-        },
-        [37] = {
-            Type = "AssistMove",
-            Callback = nil,
-            RequiresEntity = false,
-            Redundancy = 1,
-            ApplyAllOrders = true,
-        },
-        [38] = {
-            Type = "SpecialAction",
-            Callback = nil,
-            RequiresEntity = false,
-            Redundancy = 1,
-            ApplyAllOrders = false,
-        },
-        [39] = {
-            Type = "Dock",
-            Callback = nil,
-            RequiresEntity = false,
-            Redundancy = 1,
-            ApplyAllOrders = false,
-        },
-    }
-
-    --- Constructs `l` batches of roughly even size such that when combined they sum up to `h`.
-    --- As an example, the output is `{3, 3, 2, 2}` when `h = 10` and `l = 4`. The cache parameter
-    --- allows us to re-use memory
-    ---@param h number          # Higher number
-    ---@param l number          # Lower number 
-    ---@param cache number[]    # Table with as many elements as `l`, such as 
-    ---@return number[]
-    local function ComputeBatchCounts(h, l, cache)
-
-        -- clear out the cache
-        for k, _ in cache do
-            cache[k] = nil
-        end
-
-        for k = 1, l do
-            local count = math.ceil(h / l)
-            cache[k] = count
-            h = h - count
-            l = l - 1
-        end
-
-        return cache
-    end
-
-    --- Populates a small batch of units. The cache parameter allows us to re-use memory
-    ---@param start number  # Start index, element is included in the output
-    ---@param count number  # Number of elements to include
-    ---@param array Unit[]  # Array to take elements from
-    ---@param cache Unit[]  # Cache to store the elements in
-    ---@return Unit[]
-    local function PopulateBatch(start, count, array, cache)
-        -- clear out the cache
-        for k, _ in cache do
-            cache[k] = nil
-        end
-
-        local head = 1
-        for k = start, start + count do
-            cache[head] = array[k]
-            head = head + 1
-        end
-
-        return cache
-    end
-
-    ---@param order any
-    ---@param cache Vector
-    ---@return Vector
-    local function PopulateLocation(order, cache)
-        cache[1] = order.x
-        cache[2] = order.y
-        cache[3] = order.z
-        return cache
-    end
-
     --- Processes the orders and re-distributes them over the units
-    ---@param data any
-    ---@param units Unit[]
-    Callbacks.DistributeOrders = function(data, units)
-
-        local start = GetSystemTimeSecondsOnlyForProfileUse()
-
-        -- prevent cheating
-        local units = SecureUnits(units)
-        if not (units and units[1]) then
+    ---@param data { Target: EntityId, ClearCommands: boolean }
+    ---@param selection Unit[]
+    Callbacks.DistributeOrders = function(data, selection)
+        -- verify selection
+        selection = SecureUnits(selection)
+        if (not selection) or TableEmpty(selection) then
             return
         end
 
-        -----------------------------------------------------------------------
-        -- bundle the orders
-
-        ---@type table<EntityId, boolean>
-        local seen = {}
-
-        ---@type number | nil
-        local px = nil
-
-        ---@type number | nil
-        local pz = nil
-
-        ---@type UnitCommand[][]
-        local groups = { {} }
-
-        ---@type UnitCommand[]
-        local orders = units[1]:GetCommandQueue()
-        for k, order in orders do
-
-            -- find the first order that represents a position
-
-            local ox = order.x
-            local oz = order.z
-            if (not px) and (ox > 0) and (oz > 0) then
-                px = ox
-                pz = oz
-            end
-
-            -- find the last group
-            local group = groups[table.getn(groups)]
-
-            -- try and remove duplicated orders
-            local targetId = order.targetId
-            if targetId then
-                if seen[targetId] then
-                    continue
-                end
-                seen[targetId] = true
-            end
-
-            -- edge case: group has no orders, so we add this order and
-            -- call it a day
-            if not group[1] then
-                table.insert(group, order)
-                -- usual case: check if the current group is of the same
-                -- type of order, if so add to the group otherwise create
-                -- a new group
-            else
-                if group[1].commandType == order.commandType then
-                    table.insert(group, order)
-                else
-                    table.insert(groups, { order })
-
-                    -- the 'seen' table is per group of orders
-                    seen = {}
-                    if targetId then
-                        seen[targetId] = true
-                    end
-                end
-            end
+        -- verify the target
+        local target = (data.Target and GetUnitById(data.Target)) --[[@as Unit]]
+        if (not target) or
+            (not target.Army) or
+            (not OkayToMessWithArmy(target.Army))
+        then
+            return
         end
 
-        -----------------------------------------------------------------------
-        -- sorting units
-
-        -- we sort the selection to make the order more intuitive. By default
-        -- the order is defined by the entityId, which is essentially random in
-        -- the average case
-
-        if px and pz then
-            for _, unit in units do
-                local ux, _, uz = unit:GetPositionXYZ()
-                local dx = ux - px
-                local dz = uz - pz
-                unit.DistributeOrdersDistance = dx * dx + dz * dz
-            end
-
-            table.sort(
-                units,
-                function(a, b)
-                    return a.DistributeOrdersDistance < b.DistributeOrdersDistance
-                end
-            )
-
-            for _, unit in units do
-                unit.DistributeOrdersDistance = nil
-            end
-        end
-
-        -----------------------------------------------------------------------
-        -- clear existing orders
-
-        IssueClearCommands(units)
-
-        -----------------------------------------------------------------------
-        -- assign orders
-
-        ---@type number[]
-        local dummyBatches = {}
-
-        ---@type Unit[]
-        local dummyBatchTable = {}
-
-        ---@type table
-        local dummyEmptyTable = {}
-
-        ---@type { [1]: Unit }
-        local dummyUnitTable = {}
-
-        ---@type { [1]: number, [2]: number, [3]: number }
-        local dummyVectorTable = {}
-
-        local offset = 0
-        local unitCount = table.getn(units)
-        for k, group in groups do
-            local orderCount = table.getn(group)
-
-            -- extract info on how to apply these orders
-            local commandInfo = CommandInfo[group[1].commandType]
-            local commandType = commandInfo.Type
-            local issueOrder = commandInfo.Callback
-            local redundantOrders = commandInfo.Redundancy
-            local applyAllOrders = commandInfo.ApplyAllOrders
-            local batchOrders = commandInfo.BatchOrders
-            local fullRedundancy = commandInfo.FullRedundancy
-
-            -- increase redundancy to guarantee all orders are applied at least once
-            if applyAllOrders and (unitCount * redundantOrders < orderCount) then
-                redundantOrders = math.ceil(orderCount / (unitCount * redundantOrders))
-            end
-
-            if issueOrder then
-
-                -- special snowflake implementation for the mobile build order. There's
-                -- many ways to break the game when distributing this order therefore
-                -- we limit the functionality to make it as least game breaking as possible
-
-                -- assuming that the user didn't do something odd, the order of the order
-                -- table and the unit table match up: the 1st unit is close to the 1st
-                -- order, the 2nd unit is close to the 2nd order, etc
-
-                if commandType == 'BuildMobile' then
-                    if orderCount == unitCount then
-
-                        -- this case is simple: assing each unit an order
-
-                        for k, _ in units do
-                            local unit = units[k]
-                            local order = group[k]
-                            dummyUnitTable[1] = unit
-                            dummyVectorTable[1] = order.x
-                            dummyVectorTable[2] = order.y
-                            dummyVectorTable[3] = order.z
-                            issueOrder(dummyUnitTable, dummyVectorTable, order.blueprintId, dummyEmptyTable)
-                        end
-                    elseif orderCount > unitCount then
-
-                        -- this is the usual case, we look over the units and assign each unit
-                        -- to multiple orders
-
-                        local start = 1
-                        local batches = ComputeBatchCounts(orderCount, unitCount, dummyBatches)
-                        for k, batch in batches do
-                            dummyUnitTable[1] = units[k]
-                            local orderBatch = PopulateBatch(start, batch - 1, group, dummyBatchTable)
-                            start = start + batch
-                            for _, order in orderBatch do
-                                dummyVectorTable[1] = order.x
-                                dummyVectorTable[2] = order.y
-                                dummyVectorTable[3] = order.z
-                                issueOrder(dummyUnitTable, dummyVectorTable, order.blueprintId, dummyEmptyTable)
-                            end
-                        end
-                    else
-
-                        -- this is an odd case, we look over the orders and assign multiple
-                        -- units the same order
-
-                        local start = 1
-                        local batches = ComputeBatchCounts(unitCount, orderCount, dummyBatches)
-                        for k, batch in batches do
-                            local order = group[k]
-                            dummyVectorTable[1] = order.x
-                            dummyVectorTable[2] = order.y
-                            dummyVectorTable[3] = order.z
-
-                            local unitBatch = PopulateBatch(start, batch - 1, units, dummyBatchTable)
-                            start = start + batch
-                            for _, unit in unitBatch do
-                                dummyUnitTable[1] = unit
-                                issueOrder(dummyUnitTable, dummyVectorTable, order.blueprintId, dummyEmptyTable)
-                            end
-                        end
-                    end
-                elseif batchOrders then
-                    LOG("Batching orders")
-
-                    local ordersApplied = 0
-                    if fullRedundancy then
-
-                        -- in this case we want to introduce as much redundancy as possible
-
-                        LOG(" - Full redundancy")
-
-                        -- prepare orders
-                        for _, order in group do
-                            order.Entity = order.target
-                            order.Location = { order.x, order.y, order.z }
-                        end
-
-                        local unitsPerBatch = math.ceil(unitCount / orderCount)
-                        local redundancy = orderCount
-                        LOG(string.format(" - Units per batch: %d", unitsPerBatch))
-                        LOG(string.format(" - Redundancy: %d", redundancy))
-
-                        -- issue orders
-                        for b = 1, redundancy do
-                            for o, _ in group do
-                                -- give an offset to each order
-                                local order = group[math.mod(o + b, orderCount) + 1]
-
-                                -- compute the batch of units
-                                local batch = {}
-                                for k = 1, unitsPerBatch do
-                                    local unit = units[k + (b - 1) * unitsPerBatch]
-                                    if unit then
-                                        table.insert(batch, unit)
-                                    end
-                                end
-
-                                -- LOG(string.format("Apply order at: (%s)", repru(order.Location)))
-                                -- for k, unit in batch do
-                                --     LOG(unit.EntityId)
-                                -- end
-
-                                ordersApplied = ordersApplied + 1
-
-                                if order.Entity then
-                                    issueOrder(batch, order.Entity)
-                                elseif commandInfo.Type == 'BuildMobile' then
-                                    issueOrder(batch, order.Location, order.blueprintId, {})
-                                elseif not commandInfo.RequiresEntity then
-                                    issueOrder(batch, order.Location)
-                                end
-                            end
-                        end
-                    else
-                        LOG(" - No redundancy")
-
-                        if orderCount >= unitCount then
-
-                            -- strange situation where we have more orders than units
-
-                            local start = 1
-                            local batches = ComputeBatchCounts(orderCount, unitCount, dummyBatches)
-                            for k, batch in batches do
-                                dummyUnitTable[1] = units[k]
-                                local orderBatch = PopulateBatch(start, batch - 1, group, dummyBatchTable)
-                                start = start + batch
-                                for _, order in orderBatch do
-                                    issueOrder(dummyUnitTable, order.target or PopulateLocation(order, dummyVectorTable))
-                                    ordersApplied = ordersApplied + 1
-                                end
-                            end
-                        else
-
-                            -- usual situation where we have equal or more orders than units
-
-                            local start = 1
-                            local batches = ComputeBatchCounts(unitCount, orderCount, dummyBatches)
-                            for k, batch in batches do
-                                local order = group[k]
-                                local unitBatch = PopulateBatch(start, batch - 1, units, dummyBatchTable)
-                                start = start + batch
-                                issueOrder(unitBatch, order.target or PopulateLocation(order, dummyVectorTable))
-                                ordersApplied = ordersApplied + 1
-                            end
-                        end
-                    end
-
-                    LOG(string.format(" - Orders applied: %d", ordersApplied))
-                else
-                    -- apply individual orders
-                    for _, unit in units do
-                        -- apply orders
-                        for redundancy = 1, math.min(orderCount, redundantOrders) do
-                            local order = group[math.mod(offset, orderCount) + 1]
-                            local candidate = order.target
-                            if candidate then
-                                issueOrder({ unit }, candidate)
-                                offset = offset + 1
-                            else
-                                -- at this point we may need an entity, so we check and bail if we do need one
-                                if not commandInfo.RequiresEntity then
-                                    issueOrder({ unit }, { order.x, order.y, order.z })
-                                    offset = offset + 1
-                                end
-                            end
-                        end
-                    end
-                end
-            end
-        end
-
-        LOG(string.format("Processing time: %f", GetSystemTimeSecondsOnlyForProfileUse() - start))
+        import("/lua/sim/commands/distribute-queue.lua").DistributeOrders(selection, target, data.ClearCommands or false, true)
     end
+end
 
-    
+do 
+    --- Processes the orders and re-distributes them over the units
+    ---@param data { Target: EntityId, ClearCommands: boolean }
+    ---@param selection Unit[]
+    Callbacks.CopyOrders = function(data, selection)
+        -- verify selection
+        selection = SecureUnits(selection)
+        if (not selection) or TableEmpty(selection) then
+            return
+        end
+
+        -- verify the target
+        local target = GetUnitById(data.Target) --[[@as Unit]]
+        if (not target) or
+            (not target.Army) or
+            (not OkayToMessWithArmy(target.Army))
+        then
+            return
+        end
+
+        import("/lua/sim/commands/copy-queue.lua").CopyOrders(selection, target, data.ClearCommands or false, true)
+    end
+end
+
+do
+
+    ---@param data { ClearCommands: boolean }
+    ---@param selection Unit[]
+    Callbacks.LoadIntoTransports = function(data, selection)
+       -- verify selection
+       selection = SecureUnits(selection)
+       if (not selection) or TableEmpty(selection) then
+           return
+       end
+
+       local transports = EntityCategoryFilterDown(categories.TRANSPORTATION, selection)
+       local transportees = EntityCategoryFilterDown(categories.ALLUNITS - (categories.AIR + categories.TRANSPORTATION), selection)
+       local transportedUnits, transportsUsed, remUnits, remTransports = import("/lua/sim/commands/load-in-transport.lua").LoadIntoTransports(transportees, transports, data.ClearCommands or false, true)
+    end
 end
 
 --#endregion
