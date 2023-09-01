@@ -359,34 +359,11 @@ function SearchInUnit(id, text)
     local bp = __blueprints[id]
     local desc = string.lower(LOC(bp.Description or ''))
     local name = string.lower(LOC(bp.General.UnitName or ''))
-    local categories = ''
-    if bp.Categories then
-        -- skipping some categories that are not applicable to searching for units
-        categories = {}
-        for _, c in bp.Categories do
-            if not string.find(c, 'BUILTBY') and -- BUILTBYTIER3FACTORY
-               not string.find(c, 'OVERLAY') and -- OVERLAYSONAR
-               not string.find(c, 'SORT') then -- SORTDEFENSE
-                table.insert(categories, c)
-            end
-        end
-        categories = string.lower(table.concat(categories, ', '))
-    end
-
-    local weapons = ''
-    for _, w in bp.Weapon or {} do
-        if  w.Label and w.WeaponCategory and w.WeaponCategory ~= "Death" then
-            weapons = weapons .. w.Label .. ','
-        end
-    end
-    weapons = string.lower(weapons)
 
     text = string.lower(text)
     return string.find(id, text)
         or string.find(desc, text)
         or string.find(name, text)
-        or string.find(categories, text)
-        or string.find(weapons, text)
 end
 
 function SearchInProp(id, text)
@@ -771,7 +748,7 @@ function CreateNameFilter(data)
         group.hint:DisableHitTest()
 
         if DialogMode == 'units' then
-            group.hint:SetText(string.upper(LOC("<LOC spawn_search_hint_units>type unit ID, name, category, or weapon name")))
+            group.hint:SetText(string.upper(LOC("<LOC spawn_search_hint_units>type unit ID or name")))
         elseif DialogMode == 'templates' then
             group.hint:SetText(string.upper(LOC("<LOC spawn_search_hint_templates>type name or type of templates")))
         elseif DialogMode == 'props' then
@@ -782,9 +759,11 @@ function CreateNameFilter(data)
             -- initialize search box to previus search term when it was not intialized to prevent keymapping messing with it
             if not group.edit.isInitialized then
                 group.edit.isInitialized = true
-                group.edit:SetText(searchText)
-                return
+                group.edit:SetText(new)
             end
+
+            searchText = new
+            filterSet[self.key].editText = new
 
             if new == '' then
                 group.hint:SetAlpha(1, false)
@@ -794,13 +773,13 @@ function CreateNameFilter(data)
                 end
             else
                 group.hint:SetAlpha(0, false)
-                searchText = new
-                filterSet[self.key].editText = new
                 activeFilters[self.key][self.filterKey] = self.sortFunc
                 if not group.check:IsChecked() then
                     group.check:SetCheck(true)
                 end
             end
+
+            
             RefreshList()
         end
 
