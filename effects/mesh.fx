@@ -378,6 +378,12 @@ struct SHIELDIMPACT_VERTEX
 ///
 ///////////////////////////////////////
 
+bool IsExperimentalShader() {
+    // lightMultiplier is one of the few variables that is driven by the map,
+    // but accessible by the mesh shader.
+    return lightMultiplier > 2.1;
+}
+
 /// ComputeMatrix
 ///
 /// Compute matrix from scale, translation, and quaternion.
@@ -596,8 +602,8 @@ float3 ApplyWaterColor(float depth, float3 viewDirection, float3 color, float3 e
     // disable the whole thing on land-only maps
     if (surfaceElevation > 0) {
         float4 waterColor = tex1D(WaterRampSampler, -depth / (surfaceElevation - abyssElevation));
-        // we use lightMultiplier as a switch to match it with the terrain shader coloration
-        if (lightMultiplier > 2.1) {
+        // we need this switch to make it consistent with the terrain shader coloration
+        if (IsExperimentalShader()) {
             float3 up = float3(0,1,0);
             // To simplify, we assume that the light enters vertically into the water,
             // this is the length that the light travels underwater back to the camera
