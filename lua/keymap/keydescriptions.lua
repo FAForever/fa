@@ -505,8 +505,8 @@ keyDescriptions = {
     ['t3_support_air_factory'] = '<LOC key_desc_0386>build T3 Support Air Factory',
     ['t3_support_naval_factory'] = '<LOC key_desc_0387>build T3 Support Naval Factory',
 
-    ['set_target_priority'] = '<LOC key_desc_set_target_priority>Set weapon target priorities to the type of unit that you hover over with the mouse',
-    ['shift_set_target_priority'] = '<LOC key_desc_shift_set_target_priority>Set weapon target priorities to the type of unit that you hover over with the mouse',
+    ['set_target_priority'] = '<LOC key_desc_set_target_priority>Prioritize unit type',
+    ['shift_set_target_priority'] = '<LOC key_desc_shift_set_target_priority>Prioritize unit type',
     ['set_default_target_priority'] = 'Set weapon target priorities of selected units to their defaults',
 
     ['toggle_navui'] = 'Toggle the debugging UI for the navigational mesh',
