@@ -262,9 +262,9 @@ TerrainTypes = {
             AirWater = {
                 Landing01 = { EmitterBasePath .. 'tt_water_landing01_emit.bp', },
             },
-            WaterAir = {
-                TakeOff01 = { EmitterBasePath .. 'tt_water_takeoff_01_emit.bp', },
-            },
+            -- WaterAir = {
+            --     TakeOff01 = { EmitterBasePath .. 'tt_water_takeoff_01_emit.bp', },
+            -- },
         },
         FXMotionChange = {
             SubBottomUp = {
