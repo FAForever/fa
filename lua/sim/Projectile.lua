@@ -80,6 +80,7 @@ local OnImpactDestroyCategories = categories.ANTIMISSILE * categories.ALLPROJECT
 ---@field Army number
 ---@field Trash TrashBag
 ---@field Launcher Unit
+---@field OriginalTarget? Unit
 ---@field DamageData table
 Projectile = ClassProjectile(ProjectileMethods) {
     IsProjectile = true,
@@ -134,36 +135,43 @@ Projectile = ClassProjectile(ProjectileMethods) {
 
         -- do not track target, but track where the target was
         if blueprint.Physics.TrackTargetGround then
-            local target = self.Launcher:GetTargetEntity()
-            if target and target.IsUnit then
-                local unitBlueprint = target.Blueprint
-                local cy = unitBlueprint.CollisionOffsetY or 0
-                local sx, sy, sz = unitBlueprint.SizeX or 1, unitBlueprint.SizeY or 1, unitBlueprint.SizeZ or 1
-                local px, py, pz = target:GetPositionXYZ()
+            self.Trash:Add(ForkThread(self.OnTrackTargetGround, self))
+        end
+    end,
 
-                -- take into account heading
-                local heading = -1 * target:GetHeading() -- inverse heading because Supreme Commander :)
-                local mch = MathCos(heading)
-                local msh = MathSin(heading)
+    --- Called by Lua during the `OnCreate` event when the blueprint field `TrackTargetGround` is set,
+    --- used by tactical missiles to track a patch of ground in the vicinity of the unit
+    ---@param self Projectile
+    OnTrackTargetGround = function(self)
+        local target = self.OriginalTarget or self:GetTrackingTarget() or self.Launcher:GetTargetEntity()
+        if target and target.IsUnit then
+            local unitBlueprint = target.Blueprint
+            local cy = unitBlueprint.CollisionOffsetY or 0
+            local sx, sy, sz = unitBlueprint.SizeX or 1, unitBlueprint.SizeY or 1, unitBlueprint.SizeZ or 1
+            local px, py, pz = target:GetPositionXYZ()
 
-                local fuzziness = 1.0
-                local dx = (Random() - 0.5) * fuzziness * sx
-                local dy = (Random() - 0.5) * fuzziness * sy
-                local dz = (Random() - 0.5) * fuzziness * sz
+            -- take into account heading
+            local heading = -1 * target:GetHeading() -- inverse heading because Supreme Commander :)
+            local mch = MathCos(heading)
+            local msh = MathSin(heading)
 
-                local target = {
-                    px + dx * mch - dz * msh,
-                    py + cy + 0.5 * sy + dy,
-                    pz + dx * msh + dz * mch,
-                }
+            local fuzziness = 1.0
+            local dx = (Random() - 0.5) * fuzziness * sx
+            local dy = (Random() - 0.5) * fuzziness * sy
+            local dz = (Random() - 0.5) * fuzziness * sz
 
-                DrawCircle(target, 2, 'ffffff')
-                self:SetNewTargetGround(target)
-            else
-                local pos = self:GetCurrentTargetPosition()
-                pos[2] = GetSurfaceHeight(pos[1], pos[3])
-                self:SetNewTargetGround(pos)
-            end
+            local target = {
+                px + dx * mch - dz * msh,
+                py + cy + 0.5 * sy + dy,
+                pz + dx * msh + dz * mch,
+            }
+
+            DrawCircle(target, 2, 'ffffff')
+            self:SetNewTargetGround(target)
+        else
+            local pos = self:GetCurrentTargetPosition()
+            pos[2] = GetSurfaceHeight(pos[1], pos[3])
+            self:SetNewTargetGround(pos)
         end
     end,
 
