@@ -67,6 +67,8 @@ A free Cybran Cookie for anyone who can explain how it works without asking the 
 - (#5367) Added the standard Cybran build effect to the Megalith.
 - (#5362) Added links to the Wiki to explain hotkeys in the key bindings menu.
 - (#5360) Sped up the death animations of a wide range of structures.
+- (#5312) Extend depth preview to help indicate when the water is deep enough for submarines
+- (#5365) Add high quality water textures that map authors can now use
 
 ## Bug fixes
 
@@ -78,6 +80,8 @@ A free Cybran Cookie for anyone who can explain how it works without asking the 
 - (#5371) Fixed invulnerable props being removed when building on top of them.
 - (#5371) Fixed light particles when building structures being visible through the fog of war.
 - (#5343) Fixed a bug that could cause the simulation to freeze.
+- (#5303) Fixed a bug that could cause weapons to reset their targets prematurely
+- (#5368) Reduce aliasing of water when anisotropic filtering is enabled through the Nvidia settings
 
 ## Contributors
 
