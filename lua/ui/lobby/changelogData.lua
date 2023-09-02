@@ -16,6 +16,7 @@ gamePatches = {
         version = 3765,
         name = "Developers patch",
         description = { 
+            "# Game version 3765 (2nd of September, 2023)",
             "",
             "The third developer's iteration contains more new features than any release in the past two years. It opens up new ways for players to ",
             "approach the game.",
@@ -31,8 +32,8 @@ gamePatches = {
             "it has been limited to its most commonly used functionality: the ability to ring extractors with storages.",
             "",
             "Lastly, any functionality that relied on the old spread attack implementation will no longer be operational. The previous ",
-            "implementation was susceptible to abuse and could even crash the game. We hope that the new implementation will better serve your needs ",
-            "as a player.",
+            "implementation was susceptible to abuse and could even crash the game. We hope that the new implementation will better serve your ",
+            "needs as a player.",
             "",
             "With appreciation towards all the contributors that made this iteration possible,",
             "",
