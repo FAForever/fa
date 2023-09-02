@@ -109,6 +109,7 @@ gamePatches = {
             "- (#5360) Sped up the death animations of a wide range of structures.",
             "- (#5312) Extend depth preview to help indicate when the water is deep enough for submarines",
             "- (#5365) Add high quality water textures that map authors can now use",
+            "- [fe6db21] Improve the Damage over Time (DOT) effects of the Mercy",
             "",
             "## Bug fixes",
             "",
