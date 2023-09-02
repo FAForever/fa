@@ -1,20 +1,20 @@
 EmitterBlueprint {
-	BlueprintId = 'X1Mercy_cloud',
+	BlueprintId = 'X2Mercy_cloud',
 	Lifetime = 100.00,
 	Repeattime = 20.00,
 	TextureFramecount = 1.00,
-	Blendmode = 3.00,
+	Blendmode = 5.00,
 	LocalVelocity = true,
 	LocalAcceleration = false,
 	Gravity = false,
 	AlignRotation = false,
 	AlignToBone = false,
-	Flat = false,
+	Flat = true,
 	LODCutoff = 300.00,
 	EmitIfVisible = true,
 	CatchupEmit = true,
 	CreateIfVisible = false,
-	SnapToWaterline = false,
+	SnapToWaterline = true,
 	OnlyEmitOnWater = false,
 	ParticleResistance = false,
 	InterpolateEmission = true,
@@ -23,8 +23,8 @@ EmitterBlueprint {
 	LowFidelity = true,
 	MedFidelity = true,
 	HighFidelity = true,
-	Texture = [[/textures/particles/cloud_smoke_alpha_09.dds]],
-	RampTexture = [[/textures/particles/ramp_miasma_01.dds]],
+	Texture = [[/textures/particles/ring_distort_01.dds]],
+	RampTexture = [[/textures/particles/testramp.dds]],
 	XDirectionCurve = {
 		XRange = 20.00,
 		Keys = {
@@ -46,15 +46,15 @@ EmitterBlueprint {
 	EmitRateCurve = {
 		XRange = 20.00,
 		Keys = {
-			{ x=0.000,y=3.000,z=0.000 },
-			{ x=19.710,y=1.500,z=0.000 },
+			{ x=0.000,y=2.000,z=0.000 },
+			{ x=19.710,y=1.000,z=0.000 },
 		},
 	},
 	LifetimeCurve = {
 		XRange = 20.00,
 		Keys = {
-			{ x=0.000,y=15.000,z=0.000 },
-			{ x=33.334,y=15.000,z=20.000 },
+			{ x=0.000,y=5.000,z=0.000 },
+			{ x=33.334,y=35.000,z=20.000 },
 		},
 	},
 	VelocityCurve = {
@@ -72,7 +72,7 @@ EmitterBlueprint {
 	YAccelCurve = {
 		XRange = 20.00,
 		Keys = {
-			{ x=10.000,y=0.010,z=0.000 },
+			{ x=10.000,y=0.000,z=0.000 },
 		},
 	},
 	ZAccelCurve = {
@@ -90,8 +90,8 @@ EmitterBlueprint {
 	SizeCurve = {
 		XRange = 20.00,
 		Keys = {
-			{ x=0.000,y=6.000,z=0.000 },
-			--{ x=20.000,y=6.000,z=0.000 },
+			{ x=0.000,y=5.000,z=0.000 },
+			{ x=20.000,y=6.000,z=0.000 },
 		},
 	},
 	XPosCurve = {
@@ -103,7 +103,7 @@ EmitterBlueprint {
 	YPosCurve = {
 		XRange = 20.00,
 		Keys = {
-			{ x=10,y=10.00,z=0.500 },
+			{ x=10.132,y=-1.500,z=1.000 },
 		},
 	},
 	ZPosCurve = {
