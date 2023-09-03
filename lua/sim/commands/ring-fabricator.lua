@@ -1,4 +1,3 @@
-
 --******************************************************************************************************
 --** Copyright (c) 2022  Willem 'Jip' Wijnia
 --**
@@ -23,14 +22,16 @@
 
 local SortUnitsByTech = import("/lua/sim/commands/shared.lua").SortUnitsByTech
 
-local BuildOffsets = { { 2, 0 }, { 0, 2 }, { -2, 0 }, { 0, -2 } }
+local AllBuildOffsets = { { -2, 2 }, { 2, 2 }, { 2, -2 }, { -2, -2 }, { -4, 0 }, { 0, 4 }, { 4, 0 }, { 0, -4 }, }
+local InnerBuildOffsets = { { -2, 2 }, { 2, 2 }, { 2, -2 }, { -2, -2 }, }
 
 -- upvalue scope for performance
 local TableGetn = table.getn
 
 ---@param extractor Unit
 ---@param engineers Unit[]
-RingExtractor = function(extractor, engineers)
+---@param allFabricators boolean
+RingExtractor = function(extractor, engineers, allFabricators)
 
     ---------------------------------------------------------------------------
     -- defensive programming
@@ -40,19 +41,16 @@ RingExtractor = function(extractor, engineers)
     end
 
     SortUnitsByTech(engineers)
-    
-    -- verify the storage
-    local storage = engineers[1].Blueprint.BlueprintId:sub(1, 2) .. 'b1106'
-    if (not __blueprints[storage]) or
-        (not engineers[1]:CanBuild(storage))
+
+    local fabricator = engineers[1].Blueprint.BlueprintId:sub(1, 2) .. 'b1104'
+    if (not __blueprints[fabricator]) or
+        (not engineers[1]:CanBuild(fabricator))
     then
         return
     end
 
-    -- split engineers by faction
-    local faction = engineers[1].Blueprint.FactionCategory
-    local engineersOfFaction = EntityCategoryFilterDown(categories[faction], engineers)
-    local engineersOther = EntityCategoryFilterDown(categories.ALLUNITS - categories[faction], engineers)
+    ---------------------------------------------------------------------------
+    -- determine all units in surroundings that may block construction
 
     local blueprint = extractor:GetBlueprint()
     local skirtSize = blueprint.Physics.SkirtSizeX
@@ -90,12 +88,22 @@ RingExtractor = function(extractor, engineers)
         skirts[k] = rect
     end
 
+    ---------------------------------------------------------------------------
+    -- build the fabricators that we can build
+
+    -- split engineers by faction
+    local faction = engineers[1].Blueprint.FactionCategory
+    local engineersOfFaction = EntityCategoryFilterDown(categories[faction], engineers)
+    local engineersOther = EntityCategoryFilterDown(categories.ALLUNITS - categories[faction], engineers)
+
     local buildLocation = {}
     local engineerTable = {}
     local emptyTable = {}
 
     -- loop over build locations in given layer
-    for k, location in BuildOffsets do
+    local offsets = (allFabricators and AllBuildOffsets) or InnerBuildOffsets
+    for k, location in offsets do
+
         buildLocation[1] = cx + location[1]
         buildLocation[3] = cz + location[2]
         buildLocation[2] = GetTerrainHeight(buildLocation[1], buildLocation[3])
@@ -111,7 +119,7 @@ RingExtractor = function(extractor, engineers)
         end
 
         if freeToBuild then
-            IssueBuildAllMobile(engineersOfFaction, buildLocation, storage, emptyTable)
+            IssueBuildAllMobile(engineersOfFaction, buildLocation, fabricator, emptyTable)
         end
     end
 

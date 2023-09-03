@@ -220,7 +220,7 @@ end
 ---@param b Unit
 ---@return boolean
 local function SortByDistance(a, b)
-    return a.DistributeOrdersDistance < b.DistributeOrdersDistance
+    return a.Distance < b.Distance
 end
 
 --- Sorts the unit in-place by distance to the given coordinates
@@ -233,7 +233,7 @@ function SortUnitsByDistanceToPoint(units, px, pz)
         local ux, _, uz = unit:GetPositionXYZ()
         local dx = ux - px
         local dz = uz - pz
-        unit.DistributeOrdersDistance = dx * dx + dz * dz
+        unit.Distance = dx * dx + dz * dz
     end
 
     -- sort the units
@@ -241,7 +241,42 @@ function SortUnitsByDistanceToPoint(units, px, pz)
 
     -- remove distance field
     for _, unit in units do
-        unit.DistributeOrdersDistance = nil
+        unit.Distance = nil
+    end
+end
+
+---@param a Unit
+---@param b Unit
+---@return boolean
+local function SortBytech(a, b)
+    return a.Blueprint.TechCategory > b.Blueprint.TechCategory
+end
+
+--- Sorts the units in-place by tech
+---@param units Unit[]
+function SortUnitsByTech(units)
+    TableSort(units,SortBytech)
+end
+
+---@param offsets {[1]: number, [2]: number}
+---@param cx number
+---@param cz number
+---@param tx number
+---@param tz number
+function SortOffsetsByDistanceToPoint(offsets, cx, cz, tx, tz)
+    -- compute distance
+    for _, offset in offsets do
+        local dx = offset[1] + cx - tx
+        local dz = offset[2] + cz - tz
+        offset.Distance = dx * dx + dz * dz
+    end
+
+    -- sort it all
+    TableSort(offsets, SortByDistance)
+
+    -- remove distance field
+    for _, offset in offsets do
+        offset.Distance = nil
     end
 end
 
