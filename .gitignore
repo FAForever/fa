@@ -22,3 +22,7 @@ textures/ui/common/BUTTON/BACKUP/
 */dds/*
 .idea
 *.DS_Store
+
+# excluding DEV files from root of repo
+fa_path.lua
+init_dev.lua
