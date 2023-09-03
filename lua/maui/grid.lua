@@ -252,19 +252,26 @@ Grid = ClassUI(Group) {
 
     _CalculateVisible = function(self)
         if not self._lines then return end -- protect against premature calls
+        if not self._lines["Vert"] then return end
+        if not self._lines["Horz"] then return end
+
+        -- saving positions of scrollbar to improve performance in the nested for loops below
+        local scrollVert = self._top["Vert"]
+        local scrollHorz = self._top["Horz"]
+
         for row = 1, self._lines["Vert"] do
             for col = 1, self._lines["Horz"] do
                 local control = self._items[row][col]
                 if not IsDestroyed(control) then
-                    if  (col >= self._top["Horz"]) and (col < self._top["Horz"] + self._visible["Horz"]()) and
-                        (row >= self._top["Vert"]) and (row < self._top["Vert"] + self._visible["Vert"]()) then
+                    if  (col >= scrollHorz) and (col < scrollHorz + self._visible["Horz"]()) and
+                        (row >= scrollVert) and (row < scrollVert + self._visible["Vert"]()) then
                         control:SetHidden(false)
                         local column = col
                         local rowumn = row
                         local horzPad = math.max(0, (self._itemWidth - control.Width()) / 2)
                         local vertPad = math.max(0, (self._itemHeight - control.Height()) / 2)
-                        control.Left:Set(function() return math.floor(((column - self._top["Horz"]) * self._itemWidth) + self.Left() + horzPad) end)
-                        control.Top:Set(function() return math.floor(((rowumn - self._top["Vert"]) * self._itemHeight) + self.Top() + vertPad) end)
+                        control.Left:Set(function() return math.floor(((column - scrollHorz) * self._itemWidth) + self.Left() + horzPad) end)
+                        control.Top:Set(function() return math.floor(((rowumn - scrollVert) * self._itemHeight) + self.Top() + vertPad) end)
                     else
                         control:SetHidden(true)
                     end
