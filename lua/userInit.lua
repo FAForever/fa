@@ -10,8 +10,8 @@ __language = GetPreference('options_overrides.language', '')
 -- Build language select options
 __installedlanguages = DiskFindFiles("/loc/", '*strings_db.lua')
 for index, language in __installedlanguages do
-    language =  string.upper(string.gsub(language, ".*/(.*)/.*","%1"))
-    __installedlanguages[index] = {text = language, key = language}
+    language = string.upper(string.gsub(language, ".*/(.*)/.*", "%1"))
+    __installedlanguages[index] = { text = language, key = language }
 end
 
 
@@ -53,7 +53,7 @@ function WaitSeconds(n)
     local wait_frames
 
     repeat
-        wait_frames = math.ceil(math.max(1, AvgFPS*0.1, n * AvgFPS))
+        wait_frames = math.ceil(math.max(1, AvgFPS * 0.1, n * AvgFPS))
         WaitFrames(wait_frames)
         elapsed_frames = elapsed_frames + wait_frames
         elapsed_time = CurrentTime() - start
@@ -64,14 +64,13 @@ function WaitSeconds(n)
     end
 end
 
-
 -- a table designed to allow communication from different user states to the front end lua state
 FrontEndData = {}
 
 -- Prefetch user side data
 Prefetcher = CreatePrefetchSet()
 
-local FileCache =  {}
+local FileCache = {}
 local oldDiskGetFileInfo = DiskGetFileInfo
 function DiskGetFileInfo(file)
     if FileCache[file] == nil then
@@ -89,7 +88,7 @@ function PrintText(textData)
     if textData then
         local data = textData
         if type(textData) == 'string' then
-            data = {text = textData, size = 14, color = 'ffffffff', duration = 5, location = 'center'}
+            data = { text = textData, size = 14, color = 'ffffffff', duration = 5, location = 'center' }
         end
         import("/lua/ui/game/textdisplay.lua").PrintToScreen(data)
     end
@@ -132,5 +131,46 @@ do
         end
 
         oldConExecuteSave(command)
+    end
+
+    --- Retrieves the terrain elevation, can be compared with the y coordinate of `GetMouseWorldPos` to determine if the mouse is above water
+    ---@return number
+    _G.GetMouseTerrainElevation = function()
+        if __EngineStats and __EngineStats.Children then
+            for _, a in __EngineStats.Children do
+                if a.Name == 'Camera' then
+                    for _, b in a.Children do
+                        if b.Name == 'Cursor' then
+                            for _, c in b.Children do
+                                if c.Name == 'Elevation' then
+                                    return c.Value
+                                end
+                            end
+                            break
+                        end
+                    end
+                end
+            end
+        end
+
+        return 0
+    end
+end
+
+do
+    local OldOpenURL = _G.OpenURL
+
+    --- Opens a URL after the user confirms the link
+    ---@param url string
+    _G.OpenURL = function(url)
+        local UIUtil = import("/lua/ui/uiutil.lua")
+
+        UIUtil.QuickDialog(
+            GetFrame(0),
+            string.format("You're about to open a browser to:\r\n\r\n%s", url),
+            'Open browser',
+            function() OldOpenURL(url) end,
+            'Cancel'
+        )
     end
 end

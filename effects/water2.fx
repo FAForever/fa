@@ -333,28 +333,17 @@ float4 HighFidelityPS( VS_OUTPUT inV,
     // for the land cutout, we multiply by a large number and then saturate
     float mask = saturate(backGroundPixels.a * 255);
 
-    // Calculate the normal we will be using for the water surface.
-	// We bias the mipmaps for higher texture quality
-    float4 W0bias = tex2Dbias( NormalSampler0, float4(inV.mLayer0, 0, -2));
-	float4 W1bias = tex2Dbias( NormalSampler1, float4(inV.mLayer1, 0, -2));
-	float4 W2bias = tex2Dbias( NormalSampler2, float4(inV.mLayer2, 0, -2));
-	float4 W3bias = tex2Dbias( NormalSampler3, float4(inV.mLayer3, 0, -2));
-
-	// Calculate the normal we will be using for the foam.
-	// We don't change the mipmaps here because that would create 
-	// too drastic visual changes from the original shader
-	float4 W0 = tex2D( NormalSampler0, inV.mLayer0 );
+    // calculate the normal we will be using for the water surface
+    float4 W0 = tex2D( NormalSampler0, inV.mLayer0 );
 	float4 W1 = tex2D( NormalSampler1, inV.mLayer1 );
 	float4 W2 = tex2D( NormalSampler2, inV.mLayer2 );
 	float4 W3 = tex2D( NormalSampler3, inV.mLayer3 );
 
     float4 sum = W0 + W1 + W2 + W3;
     float waveCrest = saturate( sum.a - waveCrestThreshold );
-
-	float4 sumBias = W0bias + W1bias + W2bias + W3bias;
     
     // scale, bias and normalize
-    float3 N = 2.0 * sumBias.xyz - 4.0;
+    float3 N = 2.0 * sum.xyz - 4.0;
     N = normalize(N.xzy); 
 
 	// flatness

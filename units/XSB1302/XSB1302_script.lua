@@ -7,6 +7,8 @@ local SMassCollectionUnit = import("/lua/seraphimunits.lua").SMassCollectionUnit
 
 ---@class XSB1302 : SMassCollectionUnit
 XSB1302 = ClassUnit(SMassCollectionUnit) {
+
+    ---@param self SMassCollectionUnit
     PlayActiveAnimation = function(self)
         SMassCollectionUnit.PlayActiveAnimation(self)
         if not self.AnimationManipulator then
@@ -16,12 +18,14 @@ XSB1302 = ClassUnit(SMassCollectionUnit) {
         self.AnimationManipulator:PlayAnim(self.Blueprint.Display.AnimationActivate, true)
     end,
 
+    ---@param self SMassCollectionUnit
     OnProductionPaused = function(self)
         SMassCollectionUnit.OnProductionPaused(self)
         if not self.AnimationManipulator then return end
         self.AnimationManipulator:SetRate(0)
     end,
 
+    ---@param self SMassCollectionUnit
     OnProductionUnpaused = function(self)
         SMassCollectionUnit.OnProductionUnpaused(self)
         if not self.AnimationManipulator then return end

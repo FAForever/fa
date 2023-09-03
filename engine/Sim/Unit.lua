@@ -83,6 +83,7 @@ end
 --- Calculates the desired world position from the supplied relative vector from the center of the unit.
 --- Used for naval factories to set rally point under them.
 ---@param vector Vector
+---@return Vector
 function Unit:CalculateWorldPositionFromRelative(vector)
 end
 

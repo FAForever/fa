@@ -76,7 +76,6 @@ UnitBlueprint{
                             "Back_Right_Exhaust",
                             "Back_Left_Exhaust",
                         },
-                        Offset = { 0, 0, 0 },
                         Type = "Landing01",
                     },
                 },
@@ -91,6 +90,60 @@ UnitBlueprint{
                             "Back_Left_Exhaust",
                         },
                         Type = "TakeOff01",
+                    },
+                },
+            },
+            AirWater = {
+                Effects = {
+                    {
+                        Bones = {
+                            "Front_Right_Engine",
+                            "Front_Left_Engine",
+                            "Back_Right_Engine",
+                            "Back_Left_Engine",
+                        },
+                        Type = "Landing01",
+                    },
+                },
+            },
+            WaterAir = {
+                Effects = {
+                    {
+                        Bones = {
+                            "Front_Right_Engine",
+                            "Front_Left_Engine",
+                            "Back_Right_Engine",
+                            "Back_Left_Engine",
+                        },
+                        Type = "TakeOff01",
+                    },
+                },
+            },
+        },
+        IdleEffects = {
+            Air = {
+                Effects = {
+                    {
+                        Bones = {
+                            "Front_Right_Exhaust",
+                            "Front_Left_Exhaust",
+                            "Back_Right_Exhaust",
+                            "Back_Left_Exhaust",
+                        },
+                        Type = "Hover02",
+                    },
+                },
+            },
+            Water = {
+                Effects = {
+                    {
+                        Bones = {
+                            "Front_Right_Engine",
+                            "Front_Left_Engine",
+                            "Back_Right_Engine",
+                            "Back_Left_Engine",
+                        },
+                        Type = "SeaIdleGunship01",
                     },
                 },
             },
@@ -191,6 +244,9 @@ UnitBlueprint{
         Class1Capacity = 6,
         Class2AttachSize = 2,
         Class3AttachSize = 4,
+        SlotsSmall = 6,
+        SlotsMedium = 2,
+        SlotsLarge = 1,
         TransportClass = 10,
     },
     UseOOBTestZoom = 200,

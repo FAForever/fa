@@ -19,13 +19,13 @@ local Util = import("/lua/utilities.lua")
 ---@class SCCollisionBeam : CollisionBeam
 SCCollisionBeam = Class(CollisionBeam) {
     FxImpactUnit = EffectTemplate.DefaultProjectileLandUnitImpact,
-    FxImpactLand = import("/lua/effecttemplates.lua").NoEffects,-- EffectTemplate.DefaultProjectileLandImpact,
+    FxImpactLand = { },-- EffectTemplate.DefaultProjectileLandImpact,
     FxImpactWater = EffectTemplate.DefaultProjectileWaterImpact,
     FxImpactUnderWater = EffectTemplate.DefaultProjectileUnderWaterImpact,
     FxImpactAirUnit = EffectTemplate.DefaultProjectileAirUnitImpact,
-    FxImpactProp = import("/lua/effecttemplates.lua").NoEffects,
-    FxImpactShield = import("/lua/effecttemplates.lua").NoEffects,    
-    FxImpactNone = import("/lua/effecttemplates.lua").NoEffects,
+    FxImpactProp = { },
+    FxImpactShield = { },    
+    FxImpactNone = { },
 }
 
 -------------------------------

@@ -52,7 +52,10 @@ AIFGuidedMissile02 = ClassProjectile(AGuidedMissileProjectile) {
         DamageArea( self, pos, 0.5 * radius, 1, 'TreeFire', FriendlyFire )
 
         local emitter = CreateEmitterAtEntity(self, self.Army, '/effects/emitters/X1Mercy_cloud_emit.bp')
-        emitter:ScaleEmitter(self.DamageData.DamageRadius / 5 * 2):SetEmitterCurveParam('EMITRATE_CURVE',self.DamageData.DamageRadius, 30):SetEmitterCurveParam('Y_POSITION_CURVE', -0.5, 1)
+        emitter:ScaleEmitter(self.DamageData.DamageRadius / 5 * 2):SetEmitterCurveParam('Y_POSITION_CURVE', 0.5, 1)
+
+        local emitter = CreateEmitterAtEntity(self, self.Army, '/effects/emitters/X2Mercy_cloud_emit.bp')
+        emitter:ScaleEmitter(self.DamageData.DamageRadius / 5 * 2):SetEmitterCurveParam('Y_POSITION_CURVE', 0.2, 1)
 
         self:Destroy()
     end,

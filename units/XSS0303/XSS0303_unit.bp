@@ -38,6 +38,7 @@ UnitBlueprint{
         "SHOWQUEUE",
         "TECH3",
         "VISIBLETORECON",
+        "EXTERNALFACTORY",
     },
     Defense = {
         AirThreatLevel = 48,
@@ -122,7 +123,7 @@ UnitBlueprint{
     Economy = {
         BuildCostEnergy = 44000,
         BuildCostMass = 4400,
-        BuildRate = 180,
+        BuildRate = 120,
         BuildTime = 13200,
         BuildableCategory = {
             "BUILTBYTIER3FACTORY SERAPHIM MOBILE AIR ANTINAVY",
