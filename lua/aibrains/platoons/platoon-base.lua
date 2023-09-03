@@ -9,11 +9,12 @@ local TableGetn = table.getn
 ---@class AIPlatoonState : State
 ---@field StateName string
 
----@class AIPlatoon : moho.platoon_methods
+---@class AIPlatoon : moho.platoon_methods, InternalObject
 ---@field BuilderData table
 ---@field Units Unit[]
 ---@field Brain moho.aibrain_methods
 ---@field Trash TrashBag
+---@field StateInfo table
 AIPlatoon = Class(moho.platoon_methods) {
 
     PlatoonName = 'PlatoonBase',
@@ -23,7 +24,7 @@ AIPlatoon = Class(moho.platoon_methods) {
     ---@param self AIPlatoon
     ---@param plan string
     OnCreate = function(self, plan)
-        LOG("OnCreate")
+        self:LogDebug("OnCreate")
         self.Trash = TrashBag()
         self.Brain = self:GetBrain()
         self.TrashState = TrashBag()
@@ -31,13 +32,13 @@ AIPlatoon = Class(moho.platoon_methods) {
 
     ---@param self AIPlatoon
     OnDestroy = function(self)
-        LOG("OnDestroy")
+        self:LogDebug("OnDestroy")
         self.Trash:Destroy()
     end,
 
     ---@param self AIPlatoon
     OnUnitsAddedToPlatoon = function(self)
-        LOG("OnUnitsAddedToPlatoon")
+        self:LogDebug("OnUnitsAddedToPlatoon")
         local units = self:GetPlatoonUnits()
         self.Units = units
         for k, unit in units do
@@ -84,12 +85,24 @@ AIPlatoon = Class(moho.platoon_methods) {
 
     ---@param self AIPlatoon
     ---@param state AIPlatoonState
-    ChangeState = function(self, state)
+    ChangeState = function(self, state, data)
         self:LogDebug(string.format('Changing state to: %s', state.StateName))
 
         WaitTicks(1)
 
         if not IsDestroyed(self) then
+            self.StateInfo = data or { }
+            ChangeState(self, state)
+        end
+    end,
+
+    ---@param self AIPlatoon
+    ---@param state AIPlatoonState
+    ChangeStateAlt = function(self, state, data)
+        self:LogDebug(string.format('Changing state to: %s', state.StateName))
+
+        if not IsDestroyed(self) then
+            self.StateInfo = data or { }
             ChangeState(self, state)
         end
     end,

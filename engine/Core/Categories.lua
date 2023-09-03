@@ -243,7 +243,8 @@ categories = {
     SystemIntegrityCompensator = categoryValue,
 
     -- Populates a dummy factory that can take over the factory aspect of the unit
-    EXTERNALFACTORY = categoryValue
+    EXTERNALFACTORY = categoryValue,
+    EXTERNALFACTORYUNIT = categoryValue,
 }
 
 ---@alias CategoryName

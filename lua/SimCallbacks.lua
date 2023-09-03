@@ -933,4 +933,12 @@ Callbacks.AIPlatoonSimpleStructureBehavior = function(data, units)
     import("/lua/aibrains/platoons/platoon-simple-structure.lua").DebugAssignToUnits(data, units)
 end
 
+Callbacks.AIPlatoonFatboyBehavior = function(data, units)
+    if not PassesAIAntiCheatCheck() then
+        return
+    end
+
+    import("/lua/aibrains/platoons/platoon-fatboy.lua").DebugAssignToUnits(data, units)
+end
+
 --#endregion

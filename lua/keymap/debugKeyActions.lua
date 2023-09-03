@@ -277,6 +277,10 @@ local keyActionsDebugAI = {
         action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").AIPlatoonSimpleStructureBehavior()',
         category = 'ai'
     },
+    ['toggle_platoon_fatboy'] = {
+        action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").AIPlatoonFatboyBehavior()',
+        category = 'ai'
+    },
 }
 
 ---@type table<string, UIKeyAction>

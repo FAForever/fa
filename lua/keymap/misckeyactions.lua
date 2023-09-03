@@ -541,6 +541,10 @@ AIPlatoonSimpleStructureBehavior = function()
     SimCallback({ Func = 'AIPlatoonSimpleStructureBehavior', Args = {} }, true)
 end
 
+AIPlatoonFatboyBehavior = function()
+    SimCallback({ Func = 'AIPlatoonFatboyBehavior', Args = {} }, true)
+end
+
 StoreCameraPosition = function()
     local camera = GetCamera('WorldCamera')
     local settings = camera:SaveSettings()
