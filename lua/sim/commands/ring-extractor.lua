@@ -107,10 +107,7 @@ RingExtractor = function(extractor, engineers)
         end
 
         if freeToBuild then
-            for _, engineer in engineersOfFaction do
-                engineerTable[1] = engineer
-                IssueBuildMobile(engineerTable, buildLocation, storage, emptyTable)
-            end
+            IssueBuildMobile(engineersOfFaction, buildLocation, storage, emptyTable)
         end
     end
 
