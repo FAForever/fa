@@ -119,7 +119,7 @@ RingExtractor = function(extractor, engineers, allFabricators)
         end
 
         if freeToBuild then
-            IssueBuildAllMobile(engineersOfFaction, buildLocation, fabricator, emptyTable)
+            local command = IssueBuildAllMobile(engineersOfFaction, buildLocation, fabricator, emptyTable)
         end
     end
 
