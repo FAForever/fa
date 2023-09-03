@@ -56,7 +56,7 @@ URS0201 = ClassUnit(CSeaUnit) {
         local bp = self.Blueprint or self:GetBlueprint()
         if new == 'Land' then
             self:DisableUnitIntel('Layer', 'Sonar')
-            self:SetSpeedMult(bp.Physics.LandSpeedMultiplier)
+            self:SetSpeedMult(bp.Physics.LandSpeedMultiplier or 1)
         elseif new == 'Water' then
             self:EnableUnitIntel('Layer', 'Sonar')
             self:SetSpeedMult(1)
