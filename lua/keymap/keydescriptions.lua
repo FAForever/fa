@@ -508,6 +508,8 @@ keyDescriptions = {
     ['set_target_priority'] = '<LOC key_desc_set_target_priority>Prioritize unit type',
     ['shift_set_target_priority'] = '<LOC key_desc_shift_set_target_priority>Prioritize unit type',
     ['set_default_target_priority'] = 'Set weapon target priorities of selected units to their defaults',
+    ['cap'] = '<LOC key_desc_cap>Cap the unit depending on the game options',
+    ['shift_cap'] = '<LOC key_desc_cap>Cap the unit depending on the game options',
 
     ['toggle_navui'] = 'Toggle the debugging UI for the navigational mesh',
     ['toggle_ai_reclaim_grid_ui'] = 'Toggle the debugging UI for the reclaim grid',

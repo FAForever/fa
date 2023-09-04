@@ -1,4 +1,3 @@
-
 --******************************************************************************************************
 --** Copyright (c) 2022  Willem 'Jip' Wijnia
 --**
@@ -35,16 +34,22 @@ RingArtilleryTech3Exp = Prefs.GetFromCurrentProfile('options.structure_ringing_a
 local pStructure1 = nil
 local pStructure2 = nil
 
----@param command UserCommand
-function RingExtractor(command)
+--- Attempts to cap a structure that we're hovering over
+---@param structure UserUnit
+---@param units UserUnit[]
+function Cap(structure, units)
+
+    ---------------------------------------------------------------------------
+    -- defensive programming
+
+    -- confirm we have an extractor
+    if (not structure) or (IsDestroyed(structure)) then
+        return
+    end
 
     -- check if we have engineers
-    local units = EntityCategoryFilterDown(categories.ENGINEER, command.Units)
+    local units = EntityCategoryFilterDown(categories.ENGINEER, units)
     if not units[1] then return end
-
-    -- check if we have a building that we target
-    local structure = GetUnitById(command.Target.EntityId)
-    if not structure or IsDestroyed(structure) then return end
 
     -- various conditions written out for maintainability
     local isShiftDown = IsKeyDown('Shift')
@@ -94,7 +99,7 @@ function RingExtractor(command)
                 structure.RingStoragesStamp = gameTick
 
                 print("Ringing extractor with storages")
-                SimCallback({ Func = 'RingWithStorages', Args = { target = command.Target.EntityId } }, true)
+                SimCallback({ Func = 'RingWithStorages', Args = { target = structure:GetEntityId() } }, true)
 
                 -- only clear state if we can't make fabricators
                 if (isTech1 and isUpgrading) or (isTech2 and not isUpgrading) then
@@ -117,7 +122,8 @@ function RingExtractor(command)
                 structure.RingFabsStamp = gameTick
 
                 print("Ringing extractor with fabricators")
-                SimCallback({ Func = 'RingWithFabricators', Args = { target = command.Target.EntityId, allFabricators = RingFabricatorsAll } }, true)
+                SimCallback({ Func = 'RingWithFabricators',
+                    Args = { target = structure:GetEntityId(), allFabricators = RingFabricatorsAll } }, true)
 
                 -- reset state
                 structure = nil
@@ -137,14 +143,15 @@ function RingExtractor(command)
             structure.RingStamp = gameTick
 
             print("Ringing with power generators")
-            SimCallback({ Func = 'RingArtilleryTech2', Args = { target = command.Target.EntityId } }, true)
+            SimCallback({ Func = 'RingArtilleryTech2', Args = { target = structure:GetEntityId() } }, true)
 
             -- reset state
             structure = nil
             pStructure1 = nil
             pStructure2 = nil
 
-        elseif RingArtilleryTech3Exp and structure:IsInCategory('ARTILLERY') and (isTech3 or isExp) and (not structure:IsInCategory('xab2307')) then
+        elseif RingArtilleryTech3Exp and structure:IsInCategory('ARTILLERY') and (isTech3 or isExp) and
+            (not structure:IsInCategory('xab2307')) then
             -- prevent consecutive calls
             local gameTick = GameTick()
             if structure.RingStamp then
@@ -156,19 +163,19 @@ function RingExtractor(command)
             structure.RingStamp = gameTick
 
             print("Ringing with power generators")
-            SimCallback({ Func = 'RingArtilleryTech3Exp', Args = { target = command.Target.EntityId } }, true)
+            SimCallback({ Func = 'RingArtilleryTech3Exp', Args = { target = structure:GetEntityId() } }, true)
 
             -- reset state
             structure = nil
             pStructure1 = nil
             pStructure2 = nil
-        elseif RingRadars   and (structure:IsInCategory('RADAR') or structure:IsInCategory('OMNI'))
-                            and ( -- checks for upgrading state
-                                (isTech1 and isUpgrading and isDoubleTapped and isShiftDown)
-                                    or (isTech2 and isUpgrading and isDoubleTapped and isShiftDown)
-                                    or (isTech2 and not isUpgrading)
-                                    or (isTech3)
-                                )
+        elseif RingRadars and (structure:IsInCategory('RADAR') or structure:IsInCategory('OMNI'))
+            and (-- checks for upgrading state
+            (isTech1 and isUpgrading and isDoubleTapped and isShiftDown)
+                or (isTech2 and isUpgrading and isDoubleTapped and isShiftDown)
+                or (isTech2 and not isUpgrading)
+                or (isTech3)
+            )
         then
             -- prevent consecutive calls
             local gameTick = GameTick()
@@ -181,7 +188,7 @@ function RingExtractor(command)
             structure.RingStamp = gameTick
 
             print("Ringing with power generators")
-            SimCallback({ Func = 'RingRadar', Args = { target = command.Target.EntityId } }, true)
+            SimCallback({ Func = 'RingRadar', Args = { target = structure:GetEntityId() } }, true)
 
             -- reset state
             structure = nil
@@ -199,5 +206,16 @@ function RingExtractor(command)
         structure = nil
         pStructure1 = nil
         pStructure2 = nil
+    end
+end
+
+--- Hotkey-shell to the capping behavior
+function CapHotkey()
+    local target = GetRolloverInfo().userUnit
+    if target then
+        local selection = GetSelectedUnits()
+        if selection and not table.empty(selection) then
+            Cap(target, selection)
+        end
     end
 end
