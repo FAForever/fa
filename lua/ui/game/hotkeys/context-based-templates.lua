@@ -98,7 +98,6 @@ CommandMode.AddEndBehavior(
         if not table.empty(ContextBasedTemplates) then
             ContextBasedTemplates = { }
             ContextBasedTemplateStep = 0
-            ClearBuildTemplates()
         end
     end,
     'ContextBasedTemplates'
