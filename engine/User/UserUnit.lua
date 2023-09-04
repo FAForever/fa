@@ -1,6 +1,6 @@
 ---@meta
 
----@class UserUnit
+---@class UserUnit: InternalObject
 ---@field ThreadUnpause? thread
 ---@field ThreadUnpauseCandidates? table<EntityId, boolean>
 local UserUnit = {}

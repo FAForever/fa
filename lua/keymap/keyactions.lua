@@ -1674,6 +1674,16 @@ local keyactionsOrdersContextBased = {
         category = 'ordersContextBased',
         wikiURL = 'Play/Game/Hotkeys/OrdersMouseContext#cycle-templates'
     },
+
+    ['cap'] = {
+        action = 'UI_LUA import("/lua/ui/game/hotkeys/capping.lua").CapHotkey()',
+        category = 'ordersContextBased',
+    },
+
+    ['shift_cap'] = {
+        action = 'UI_LUA import("/lua/ui/game/hotkeys/capping.lua").CapHotkey()',
+        category = 'ordersContextBased',
+    },
 }
 
 ---@type table<string, UIKeyAction>

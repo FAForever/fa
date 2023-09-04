@@ -433,7 +433,10 @@ function OnCommandIssued(command)
 
         -- see if we can cap a structure
         if EntityCategoryContains(categoriesStructure, command.Blueprint) then
-            import("/lua/ui/game/hotkeys/ringing.lua").RingExtractor(command)
+
+            local target = GetUnitById(command.Target.EntityId) --[[@as UserUnit]]
+            local units = command.Units --[[@as (UserUnit[])]]
+            import("/lua/ui/game/hotkeys/capping.lua").Cap(target, units)
         end
 
         -- called when:

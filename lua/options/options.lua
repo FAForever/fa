@@ -529,9 +529,9 @@ options = {
                 default = "on",
                 set = function(key, value, startup)
                     if GetCurrentUIState() == 'game' then
-                        import("/lua/ui/game/hotkeys/ringing.lua").RingStorages = value == 'on' or value == 'on-inner' or value == 'on-all'
-                        import("/lua/ui/game/hotkeys/ringing.lua").RingFabricatorsInner = value == 'on-inner'
-                        import("/lua/ui/game/hotkeys/ringing.lua").RingFabricatorsAll = value == 'on-all'
+                        import("/lua/ui/game/hotkeys/capping.lua").RingStorages = value == 'on' or value == 'on-inner' or value == 'on-all'
+                        import("/lua/ui/game/hotkeys/capping.lua").RingFabricatorsInner = value == 'on-inner'
+                        import("/lua/ui/game/hotkeys/capping.lua").RingFabricatorsAll = value == 'on-all'
                     end
                 end,
                 custom = {
@@ -553,7 +553,7 @@ options = {
                 default = "on",
                 set = function(key, value, startup)
                     if GetCurrentUIState() == 'game' then
-                        import("/lua/ui/game/hotkeys/ringing.lua").RingRadars = value == 'on'
+                        import("/lua/ui/game/hotkeys/capping.lua").RingRadars = value == 'on'
                     end
                 end,
                 custom = {
@@ -571,7 +571,7 @@ options = {
                 default = "on",
                 set = function(key, value, startup)
                     if GetCurrentUIState() == 'game' then
-                        import("/lua/ui/game/hotkeys/ringing.lua").RingArtillery = value == 'on'
+                        import("/lua/ui/game/hotkeys/capping.lua").RingArtillery = value == 'on'
                     end
                 end,
                 custom = {
@@ -589,7 +589,7 @@ options = {
                 default = "on",
                 set = function(key, value, startup)
                     if GetCurrentUIState() == 'game' then
-                        import("/lua/ui/game/hotkeys/ringing.lua").RingArtilleryT3Exp = value == 'on'
+                        import("/lua/ui/game/hotkeys/capping.lua").RingArtilleryT3Exp = value == 'on'
                     end
                 end,
                 custom = {
