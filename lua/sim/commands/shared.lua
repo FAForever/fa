@@ -52,7 +52,7 @@ UnitQueueDataToCommand = {
     [7] = { Type = "BuildFactory", },
     [8] = {
         Type = "BuildMobile",
-        Callback = IssueBuildMobile,
+        Callback = IssueBuildAllMobile,
         Redundancy = 1,
     },
     [9] = {
