@@ -580,10 +580,6 @@ function CreateDialog(over, exitBehavior)
 
     dialog.brackets = UIUtil.CreateDialogBrackets(dialog, 41, 24, 41, 24)
 
-    local title = UIUtil.CreateText(dialog, "<LOC _Options>", 24, UIUtil.titleFont)
-    LayoutHelpers.AtTopIn(title, dialog, 30)
-    LayoutHelpers.AtHorizontalCenterIn(title, dialog)
-
     if over then
         dialog.Depth:Set(GetFrame(over:GetRootFrame():GetTargetHead()):GetTopmostDepth() + 1)
     end
@@ -687,16 +683,20 @@ function CreateDialog(over, exitBehavior)
 
     dialog.fill = Bitmap(dialog)
     dialog.fill:SetSolidColor("FD000000")
-    LayoutHelpers.AtLeftTopIn(dialog.fill, dialog, 19, 60)
-    LayoutHelpers.AtRightIn(dialog.fill, dialog, 13)
+    LayoutHelpers.AtLeftTopIn(dialog.fill, dialog, 16, 30)
+    LayoutHelpers.AtRightIn(dialog.fill, dialog, 12)
     LayoutHelpers.AnchorToTop(dialog.fill, applyBtn, -5)
+
+    dialog.title = UIUtil.CreateText(dialog, "<LOC _Options>", 22, UIUtil.titleFont)
+    LayoutHelpers.AtTopIn(dialog.title, dialog.fill, 5)
+    LayoutHelpers.AtHorizontalCenterIn(dialog.title, dialog)
 
     -- set up option grid
     dialog.grid = Grid(dialog.fill, 100, optionsHeight)
-    LayoutHelpers.AtLeftTopIn(dialog.grid, dialog.fill, 10, 55)
-    LayoutHelpers.AtRightBottomIn(dialog.grid, dialog.fill, 10, 5)
+    LayoutHelpers.AtLeftTopIn(dialog.grid, dialog.fill, 10, 75)
+    LayoutHelpers.AtRightBottomIn(dialog.grid, dialog.fill, 5, 2)
 
-    dialog.scrollbar = UIUtil.CreateLobbyVertScrollbar(dialog.grid, -15, 15, 0, 0) -- L, B, T, R
+    dialog.scrollbar = UIUtil.CreateLobbyVertScrollbar(dialog.grid, -15, 5, 5, 0) -- L, B, T, R
 
     dialog.fill.HandleEvent = function(control, event)
         if dialog.scrollbar and event.Type == 'WheelRotation' then
@@ -763,12 +763,12 @@ function CreateDialog(over, exitBehavior)
     OptionsLogic.SetSummonVerifyDialogCallback(VerifyFunc)
 
     dialog.searchLabel = UIUtil.CreateText(dialog, 'Search', 17, UIUtil.titleFont)
-    LayoutHelpers.AtLeftTopIn(dialog.searchLabel, dialog, 35, 77)
+    LayoutHelpers.AtLeftTopIn(dialog.searchLabel, dialog, 35, 75)
 
     dialog.searchFill = Bitmap(dialog)
     dialog.searchFill:SetSolidColor("B93E3E3E")
-    LayoutHelpers.AtLeftTopIn(dialog.searchFill, dialog, 110, 70)
-    LayoutHelpers.AtRightIn(dialog.searchFill, dialog, 25)
+    LayoutHelpers.AtLeftTopIn(dialog.searchFill, dialog, 110, 68)
+    LayoutHelpers.AtRightIn(dialog.searchFill, dialog, 20)
     LayoutHelpers.SetHeight(dialog.searchFill, 32)
 
     dialog.searchFill.Width:Set(function() return dialog.searchFill.Right() - dialog.searchFill.Left() end)
@@ -795,6 +795,13 @@ function CreateDialog(over, exitBehavior)
     dialog.searchText:SetFont(UIUtil.titleFont, 17)
     dialog.searchText:SetMaxChars(40)
     dialog.searchText.OnTextChanged = function(self, newText, oldText)
+        -- prevent getting input from keybinding while this dialog is being created
+        if not dialog.searchText.isInitialized then
+            dialog.searchText.isInitialized = true
+            dialog.searchText:SetText('')
+            return
+        end
+
         searchKeyword = string.lower(StringTrim(newText))
         if newText == '' then
             dialog.searchHint:SetAlpha(1)
