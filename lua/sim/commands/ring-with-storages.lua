@@ -121,6 +121,4 @@ RingExtractor = function(extractor, engineers)
     -- issue assist orders for remaining engineers
 
     IssueGuard(engineersOther, engineersOfFaction[1])
-
-    LOG("Time taken: " .. tostring(GetSystemTimeSecondsOnlyForProfileUse() - start))
 end
