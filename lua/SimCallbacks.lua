@@ -263,7 +263,7 @@ Callbacks.WeaponPriorities = import("/lua/weaponpriorities.lua").SetWeaponPriori
 
 ---@param data { target: EntityId }
 ---@param selection Unit[]
-Callbacks.RingExtractor = function(data, selection)
+Callbacks.RingWithStorages = function(data, selection)
     -- verify selection
     selection = SecureUnits(selection)
     if (not selection) or TableEmpty(selection) then
@@ -286,7 +286,35 @@ Callbacks.RingExtractor = function(data, selection)
         return
     end
 
-    import("/lua/sim/commands/ring-extractor.lua").RingExtractor(extractor, engineers)
+    import("/lua/sim/commands/ring-with-storages.lua").RingExtractor(extractor, engineers)
+end
+
+---@param data { target: EntityId, allFabricators: boolean }
+---@param selection Unit[]
+Callbacks.RingWithFabricators = function(data, selection)
+    -- verify selection
+    selection = SecureUnits(selection)
+    if (not selection) or TableEmpty(selection) then
+        return
+    end
+
+    -- verify we have engineers
+    local engineers = EntityCategoryFilterDown(categories.ENGINEER, selection)
+    if TableEmpty(engineers) then
+        return
+    end
+
+    -- verify the extractor
+    local extractor = GetUnitById(data.target) --[[@as Unit]]
+    if (not extractor) or
+        (not extractor.Army) or
+        (not OkayToMessWithArmy(extractor.Army)) or
+        (not EntityCategoryContains(categories.MASSEXTRACTION, extractor))
+    then
+        return
+    end
+
+    import("/lua/sim/commands/ring-with-fabricators.lua").RingExtractor(extractor, engineers, data.allFabricators)
 end
 
 ---@param data any
