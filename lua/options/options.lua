@@ -523,7 +523,7 @@ options = {
             },
 
             {
-                title = "<LOC structure_ringing_extractor_title>Right click to ring extractors with storages",
+                title = "<LOC structure_ringing_extractor_title>Assist to cap extractors with storages",
                 key = 'structure_capping_feature_01',
                 type = 'toggle',
                 default = "on",
@@ -547,7 +547,7 @@ options = {
             },
 
             {
-                title = "<LOC structure_ringing_radar_title>Right click to ring radar with power",
+                title = "<LOC structure_ringing_radar_title>Assist to cap radar with power",
                 key = 'structure_ringing_radar',
                 type = 'toggle',
                 default = "on",
@@ -565,7 +565,7 @@ options = {
             },
 
             {
-                title = "<LOC structure_ringing_artillery_title>Right click to ring tech 2 artillery with power",
+                title = "<LOC structure_ringing_artillery_title>Assist to cap tech 2 artillery with power",
                 key = 'structure_ringing_artillery',
                 type = 'toggle',
                 default = "on",
@@ -583,7 +583,7 @@ options = {
             },
 
             {
-                title = "<LOC structure_ringing_artillery_title>Right click to ring end game artillery with power",
+                title = "<LOC structure_ringing_artillery_title>Assist to cap end game artillery with power",
                 key = 'structure_ringing_artillery_end_game',
                 type = 'toggle',
                 default = "on",
