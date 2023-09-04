@@ -317,6 +317,62 @@ Callbacks.RingWithFabricators = function(data, selection)
     import("/lua/sim/commands/ringing/ring-with-fabricators.lua").RingExtractor(extractor, engineers, data.allFabricators)
 end
 
+---@param data { target: EntityId }
+---@param selection Unit[]
+Callbacks.RingRadar = function(data, selection)
+    -- verify selection
+    selection = SecureUnits(selection)
+    if (not selection) or TableEmpty(selection) then
+        return
+    end
+
+    -- verify we have engineers
+    local engineers = EntityCategoryFilterDown(categories.ENGINEER, selection)
+    if TableEmpty(engineers) then
+        return
+    end
+
+    -- verify the extractor
+    local target = GetUnitById(data.target) --[[@as Unit]]
+    if (not target) or
+        (not target.Army) or
+        (not OkayToMessWithArmy(target.Army)) or
+        (not EntityCategoryContains((categories.RADAR + categories.OMNI) * categories.STRUCTURE, target))
+    then
+        return
+    end
+
+    import("/lua/sim/commands/ringing/ring-with-power.lua").RingWithPower(target, engineers)
+end
+
+---@param data { target: EntityId }
+---@param selection Unit[]
+Callbacks.RingArtilleryTech2 = function(data, selection)
+    -- verify selection
+    selection = SecureUnits(selection)
+    if (not selection) or TableEmpty(selection) then
+        return
+    end
+
+    -- verify we have engineers
+    local engineers = EntityCategoryFilterDown(categories.ENGINEER, selection)
+    if TableEmpty(engineers) then
+        return
+    end
+
+    -- verify the extractor
+    local target = GetUnitById(data.target) --[[@as Unit]]
+    if (not target) or
+        (not target.Army) or
+        (not OkayToMessWithArmy(target.Army)) or
+        (not EntityCategoryContains(categories.ARTILLERY * categories.TECH2 * categories.STRUCTURE, target))
+    then
+        return
+    end
+
+    import("/lua/sim/commands/ringing/ring-with-power.lua").RingWithPower(target, engineers)
+end
+
 ---@param data any
 ---@param selection Unit[]
 Callbacks.SelectHighestEngineerAndAssist = function(data, selection)

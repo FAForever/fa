@@ -523,10 +523,17 @@ options = {
             },
 
             {
-                title = "<LOC OPTIONS_0273>Right click to ring extractors with storages",
+                title = "<LOC structure_ringing_extractor_title>Right click to ring extractors with storages",
                 key = 'structure_capping_feature_01',
                 type = 'toggle',
                 default = "on",
+                set = function(key, value, startup)
+                    if GetCurrentUIState() == 'game' then
+                        import("/lua/ui/game/hotkeys/ring-extractor.lua").RingStorages = value == 'on' or value == 'on-inner' or value == 'on-all'
+                        import("/lua/ui/game/hotkeys/ring-extractor.lua").RingFabricatorsInner = value == 'on-inner'
+                        import("/lua/ui/game/hotkeys/ring-extractor.lua").RingFabricatorsAll = value == 'on-all'
+                    end
+                end,
                 custom = {
                     states = {
                         { text = "<LOC _Off>Off", key = "off" },
@@ -535,6 +542,42 @@ options = {
                             key = "on-inner" },
                         { text = "<LOC options_structure_capping_feature_03>Mass storages and all fabricators",
                             key = "on-all" },
+                    },
+                },
+            },
+
+            {
+                title = "<LOC structure_ringing_radar_title>Right click to ring radar with power",
+                key = 'structure_ringing_radar',
+                type = 'toggle',
+                default = "on",
+                set = function(key, value, startup)
+                    if GetCurrentUIState() == 'game' then
+                        import("/lua/ui/game/hotkeys/ring-extractor.lua").RingRadars = value == 'on'
+                    end
+                end,
+                custom = {
+                    states = {
+                        { text = "<LOC _Off>Off", key = "off" },
+                        { text = "<LOC _On>On", key = "on" },
+                    },
+                },
+            },
+
+            {
+                title = "<LOC structure_ringing_artillery_title>Right click to ring artillery with power",
+                key = 'structure_ringing_artillery',
+                type = 'toggle',
+                default = "on",
+                set = function(key, value, startup)
+                    if GetCurrentUIState() == 'game' then
+                        import("/lua/ui/game/hotkeys/ring-extractor.lua").RingArtillery = value == 'on'
+                    end
+                end,
+                custom = {
+                    states = {
+                        { text = "<LOC _Off>Off", key = "off" },
+                        { text = "<LOC _On>On", key = "on" },
                     },
                 },
             },
