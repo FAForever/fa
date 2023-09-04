@@ -43,15 +43,24 @@ local IssueFerry = IssueFerry
 local CategoriesTransportation = categories.TRANSPORTATION
 
 --- List of callbacks that is being populated throughout this file
----@type table<string, function>
+---@type table<string, fun(data: table, units?: Unit[])>
 local Callbacks = {}
 
+---@param name string
+---@param data table
+---@param units? Unit[]
 function DoCallback(name, data, units)
+    local start = GetSystemTimeSecondsOnlyForProfileUse()
     local fn = Callbacks[name];
     if fn then
         fn(data, units)
     else
         SPEW('No callback named: ' .. repr(name))
+    end
+
+    local timeTaken = GetSystemTimeSecondsOnlyForProfileUse() - start
+    if (timeTaken > 0.005) then
+        SPEW(string.format("Time to process %s: %f", name, timeTaken))
     end
 end
 
