@@ -529,9 +529,9 @@ options = {
                 default = "on",
                 set = function(key, value, startup)
                     if GetCurrentUIState() == 'game' then
-                        import("/lua/ui/game/hotkeys/ring-extractor.lua").RingStorages = value == 'on' or value == 'on-inner' or value == 'on-all'
-                        import("/lua/ui/game/hotkeys/ring-extractor.lua").RingFabricatorsInner = value == 'on-inner'
-                        import("/lua/ui/game/hotkeys/ring-extractor.lua").RingFabricatorsAll = value == 'on-all'
+                        import("/lua/ui/game/hotkeys/ringing.lua").RingStorages = value == 'on' or value == 'on-inner' or value == 'on-all'
+                        import("/lua/ui/game/hotkeys/ringing.lua").RingFabricatorsInner = value == 'on-inner'
+                        import("/lua/ui/game/hotkeys/ringing.lua").RingFabricatorsAll = value == 'on-all'
                     end
                 end,
                 custom = {
@@ -553,7 +553,7 @@ options = {
                 default = "on",
                 set = function(key, value, startup)
                     if GetCurrentUIState() == 'game' then
-                        import("/lua/ui/game/hotkeys/ring-extractor.lua").RingRadars = value == 'on'
+                        import("/lua/ui/game/hotkeys/ringing.lua").RingRadars = value == 'on'
                     end
                 end,
                 custom = {
@@ -565,13 +565,31 @@ options = {
             },
 
             {
-                title = "<LOC structure_ringing_artillery_title>Right click to ring artillery with power",
+                title = "<LOC structure_ringing_artillery_title>Right click to ring tech 2 artillery with power",
                 key = 'structure_ringing_artillery',
                 type = 'toggle',
                 default = "on",
                 set = function(key, value, startup)
                     if GetCurrentUIState() == 'game' then
-                        import("/lua/ui/game/hotkeys/ring-extractor.lua").RingArtillery = value == 'on'
+                        import("/lua/ui/game/hotkeys/ringing.lua").RingArtillery = value == 'on'
+                    end
+                end,
+                custom = {
+                    states = {
+                        { text = "<LOC _Off>Off", key = "off" },
+                        { text = "<LOC _On>On", key = "on" },
+                    },
+                },
+            },
+
+            {
+                title = "<LOC structure_ringing_artillery_title>Right click to ring end game artillery with power",
+                key = 'structure_ringing_artillery_end_game',
+                type = 'toggle',
+                default = "on",
+                set = function(key, value, startup)
+                    if GetCurrentUIState() == 'game' then
+                        import("/lua/ui/game/hotkeys/ringing.lua").RingArtilleryT3Exp = value == 'on'
                     end
                 end,
                 custom = {

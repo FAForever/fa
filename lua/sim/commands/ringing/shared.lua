@@ -123,26 +123,28 @@ function RingUnit(target, engineers, offsets, blueprintId)
 
     local buildLocation = BuildLocation
     local emptyTable = EmptyTable
-
     for k, offset in offsets do
         local bx = cx + offset[1]
         local bz = cz + offset[2]
 
+        buildLocation[1] = bx
+        buildLocation[3] = bz
+        buildLocation[2] = GetTerrainHeight(bx, bz)
+
         -- determine if location is free to build
-        local freeToBuild = true
-        for k = 1, buildingSkirtCount do
-            if bx > cx1[k] and bx < cx2[k] then
-                if bz > cz1[k] and bz < cz2[k] then
-                    freeToBuild = false
-                    break
+        local freeToBuild = engineers[1]:GetAIBrain():CanBuildStructureAt(blueprintId, buildLocation)
+        if freeToBuild then
+            for k = 1, buildingSkirtCount do
+                if bx > cx1[k] and bx < cx2[k] then
+                    if bz > cz1[k] and bz < cz2[k] then
+                        freeToBuild = false
+                        break
+                    end
                 end
             end
         end
 
         if freeToBuild then
-            buildLocation[1] = bx
-            buildLocation[3] = bz
-            buildLocation[2] = GetTerrainHeight(bx, bz)
             IssueBuildAllMobile(engineersOfFaction, buildLocation, blueprintId, emptyTable)
         end
     end
