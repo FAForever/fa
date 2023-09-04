@@ -543,6 +543,9 @@ function DisplayOptionsList(currentOptions)
 end
 
 function CreateDialog(over, exitBehavior)
+    -- defaulting this dialog to render over the main frame if parent is not passed
+    if over == nil then over = GetFrame(0) end
+
     currentOptionsSet = OptionsLogic.GetCurrent()
 
     local parent = nil

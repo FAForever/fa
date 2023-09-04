@@ -1874,6 +1874,10 @@ local keyActionsUI = {
         action = 'UI_Lua import("/lua/ui/game/objectivedetail.lua").ToggleDisplay()',
         category = 'ui'
     },
+    ['show_options_dialog'] = {
+        action = 'UI_Lua import("/lua/ui/dialogs/options.lua").CreateDialog()',
+        category = 'ui',
+    },
 }
 
 ---@type table<string, UIKeyAction>

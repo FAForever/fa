@@ -269,6 +269,7 @@ keyDescriptions = {
     ['debug_toggle_pannels'] = '<LOC key_desc_0180>Toggle UI panels on/off',
 
     ['show_objective_screen'] = '<LOC key_desc_0184>Show Scenario Options/Objectives Window',
+    ['show_options_dialog'] = "<LOC key_desc_show_options_dialog>Show Game/UI Options Window for changing settings",
     ['toggle_ai_screen'] = 'Toggle AI blueprint information window, requires cheats to be enabled',
     ['toggle_markers_screen'] = 'Toggle marker information window, requires cheats to be enabled',
     ['toggle_map_utilities_window'] = 'Toggle map utilities window, requires cheats to be enabled',
