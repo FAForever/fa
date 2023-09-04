@@ -92,6 +92,7 @@ function RingExtractor(command)
 
                 structure.RingStoragesStamp = gameTick
 
+                print("Ringing extractor with storages")
                 SimCallback({ Func = 'RingWithStorages', Args = { target = command.Target.EntityId } }, true)
 
                 -- only clear state if we can't make fabricators
@@ -115,8 +116,10 @@ function RingExtractor(command)
                 structure.RingFabsStamp = gameTick
 
                 if option == 'on-inner'then
+                    print("Ringing extractor with fabricators")
                     SimCallback({ Func = 'RingWithFabricators', Args = { target = command.Target.EntityId, allFabricators = false } }, true)
                 else
+                    print("Ringing extractor with fabricators")
                     SimCallback({ Func = 'RingWithFabricators', Args = { target = command.Target.EntityId, allFabricators = true } }, true)
                 end
 
