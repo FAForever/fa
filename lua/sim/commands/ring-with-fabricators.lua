@@ -22,6 +22,7 @@
 
 local SortUnitsByTech = import("/lua/sim/commands/shared.lua").SortUnitsByTech
 local FindNearestUnit = import("/lua/sim/commands/shared.lua").FindNearestUnit
+local FindBuildingSkirts = import("/lua/sim/commands/shared.lua").FindBuildingSkirts
 local SortOffsetsByDistanceToPoint = import("/lua/sim/commands/shared.lua").SortOffsetsByDistanceToPoint
 
 local InnerBuildOffsets = { { -2, 2 }, { 2, 2 }, { 2, -2 }, { -2, -2 }, }
@@ -29,10 +30,18 @@ local AllBuildOffsets = { { -2, 2 }, { 2, 2 }, { 2, -2 }, { -2, -2 }, { -4, 0 },
 
 -- upvalue scope for performance
 local IssueGuard = IssueGuard
-local GetUnitsInRect = GetUnitsInRect
 local GetTerrainHeight = GetTerrainHeight
 local EntityCategoryFilterDown = EntityCategoryFilterDown
 local IssueBuildAllMobile = IssueBuildAllMobile
+
+-- cached for performance
+local CacheX1 = { }
+local CacheZ1 = { }
+local CacheX2 = { }
+local CacheZ2 = { }
+
+local BuildLocation = { }
+local EmptyTable = { }
 
 ---@param extractor Unit
 ---@param engineers Unit[]
@@ -62,38 +71,7 @@ RingExtractor = function(extractor, engineers, allFabricators)
     local blueprint = extractor:GetBlueprint()
     local skirtSize = blueprint.Physics.SkirtSizeX
     local cx, _, cz = extractor:GetPositionXYZ()
-
-    -- we manually scan for build skirts in the surrounding area. The function brain:CanBuildStructureAt(...) does
-    -- not always return correct results: it may end up returning true after factories upgraded
-
-    local x1 = cx - (skirtSize + 10)
-    local z1 = cz - (skirtSize + 10)
-    local x2 = cx + (skirtSize + 10)
-    local z2 = cz + (skirtSize + 10)
-
-    -- find all units that may prevent us from building
-    local structures = GetUnitsInRect(x1, z1, x2, z2)
-    if not structures then
-        return
-    end
-
-    structures = EntityCategoryFilterDown(categories.STRUCTURE + categories.EXPERIMENTAL, structures)
-
-    -- populate the skirts to check
-    local skirts = {}
-    for k, unit in structures do
-        local blueprint = unit:GetBlueprint()
-        local px, _, pz = unit:GetPositionXYZ()
-        local sx, sz = 0.5 * blueprint.Physics.SkirtSizeX, 0.5 * blueprint.Physics.SkirtSizeZ
-        local rect = {
-            px - sx, -- top left
-            pz - sz, -- top left
-            px + sx, -- bottom right
-            pz + sz -- bottom right
-        }
-
-        skirts[k] = rect
-    end
+    local cx1, cz1, cx2, cz2, buildingSkirtCount = FindBuildingSkirts(cx, cz, skirtSize, CacheX1, CacheZ1, CacheX2, CacheZ2)
 
     ---------------------------------------------------------------------------
     -- filter engineers and sort offsets
@@ -112,19 +90,18 @@ RingExtractor = function(extractor, engineers, allFabricators)
     ---------------------------------------------------------------------------
     -- issue the build orders
 
-    local buildLocation = {}
-    local emptyTable = {}
+    local buildLocation = BuildLocation
+    local emptyTable = EmptyTable
 
     for k, location in offsets do
+        local bx = cx + location[1]
+        local bz = cz + location[2]
 
-        buildLocation[1] = cx + location[1]
-        buildLocation[3] = cz + location[2]
-        buildLocation[2] = GetTerrainHeight(buildLocation[1], buildLocation[3])
-
+        -- determine if location is free to build
         local freeToBuild = true
-        for _, skirt in skirts do
-            if buildLocation[1] > skirt[1] and buildLocation[1] < skirt[3] then
-                if buildLocation[3] > skirt[2] and buildLocation[3] < skirt[4] then
+        for k = 1, buildingSkirtCount do
+            if bx > cx1[k] and bx < cx2[k] then
+                if bz > cz1[k] and bz < cz2[k] then
                     freeToBuild = false
                     break
                 end
@@ -132,6 +109,9 @@ RingExtractor = function(extractor, engineers, allFabricators)
         end
 
         if freeToBuild then
+            buildLocation[1] = bx
+            buildLocation[3] = bz
+            buildLocation[2] = GetTerrainHeight(bx, bz)
             IssueBuildAllMobile(engineersOfFaction, buildLocation, fabricator, emptyTable)
         end
     end
