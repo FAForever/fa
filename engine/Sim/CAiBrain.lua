@@ -58,7 +58,7 @@ end
 function CAiBrain:CanBuildPlatoon(template, factories)
 end
 
---- Returns true if the structure can be built at the given location
+--- Returns true if the structure can be built at the given location. May return false positives
 ---@param blueprintID string As an example: `ueb0101`
 ---@param location Vector
 function CAiBrain:CanBuildStructureAt(blueprintID, location)
