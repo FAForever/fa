@@ -29,7 +29,7 @@ local pStructure2 = nil
 
 ---@param command UserCommand
 function RingExtractor(command)
-    
+
     -- retrieve the option in question, can have values: 'off', 'only-storages-extractors' and 'full-suite'
     local option = Prefs.GetFromCurrentProfile('options.structure_capping_feature_01')
 
@@ -58,17 +58,12 @@ function RingExtractor(command)
     local isTech2 = structure:IsInCategory('TECH2')
     local isTech3 = structure:IsInCategory('TECH3')
 
-
-
     -- only run logic for structures
     if structure:IsInCategory('STRUCTURE') then
-
-
 
         -- try and create storages and / or fabricators around it
         if structure:IsInCategory('MASSEXTRACTION') then
 
-            LOG(option)
             -- check what type of buildings we'd like to make
             local buildFabs =
             ((option == 'on-inner') or (option == 'on-all'))
