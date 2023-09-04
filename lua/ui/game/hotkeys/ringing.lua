@@ -29,6 +29,7 @@ RingFabricatorsInner = ringExtractorPrefs == 'on-inner'
 RingFabricatorsAll = ringExtractorPrefs == 'on-all'
 RingRadars = Prefs.GetFromCurrentProfile('options.structure_ringing_radar') == 'on'
 RingArtillery = Prefs.GetFromCurrentProfile('options.structure_ringing_artillery') == 'on'
+RingArtilleryTech3Exp = Prefs.GetFromCurrentProfile('options.structure_ringing_artillery_end_game') == 'on'
 
 --- Allows us to detect a double click
 local pStructure1 = nil
@@ -56,6 +57,7 @@ function RingExtractor(command)
     local isTech1 = structure:IsInCategory('TECH1')
     local isTech2 = structure:IsInCategory('TECH2')
     local isTech3 = structure:IsInCategory('TECH3')
+    local isExp = structure:IsInCategory('EXPERIMENTAL')
 
     -- only run logic for structures
     if structure:IsInCategory('STRUCTURE') then
@@ -136,6 +138,25 @@ function RingExtractor(command)
 
             print("Ringing with power generators")
             SimCallback({ Func = 'RingArtilleryTech2', Args = { target = command.Target.EntityId } }, true)
+
+            -- reset state
+            structure = nil
+            pStructure1 = nil
+            pStructure2 = nil
+
+        elseif RingArtilleryTech3Exp and structure:IsInCategory('ARTILLERY') and (isTech3 or isExp) then
+            -- prevent consecutive calls
+            local gameTick = GameTick()
+            if structure.RingStamp then
+                if structure.RingStamp + 5 > gameTick then
+                    return
+                end
+            end
+
+            structure.RingStamp = gameTick
+
+            print("Ringing with power generators")
+            SimCallback({ Func = 'RingArtilleryTech3Exp', Args = { target = command.Target.EntityId } }, true)
 
             -- reset state
             structure = nil
