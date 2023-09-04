@@ -298,6 +298,7 @@ end
 
 --- Computes the average x / z coordinates of a table of units
 ---@param units Unit[]
+---@return Vector
 function AveragePositionOfUnits(units)
     local unitCount = table.getn(units)
 
@@ -319,6 +320,11 @@ function AveragePositionOfUnits(units)
     }
 end
 
+---@param px number
+---@param pz number
+---@param radius number
+---@param degrees number
+---@return Vector
 function PointOnUnitCircle(px, pz, radius, degrees)
     local cx = px + radius * math.cos( (degrees + 90) * 3.14 / 180 );
     local cz = pz + radius * math.sin( (degrees + 90) * 3.14 / 180 );
@@ -327,4 +333,27 @@ function PointOnUnitCircle(px, pz, radius, degrees)
         GetSurfaceHeight(cx, cz),
         cz
     }
+end
+
+
+---@param units Unit[]
+---@param px number
+---@param pz number
+---@return Unit | nil
+function FindNearestUnit(units, px, pz)
+    local nearest = units[1]
+    local distance = 4193 * 4193
+    for k = 1, table.getn(units) do
+        local unit = units[k]
+        local ux, _, uz = unit:GetPositionXYZ()
+        local dx = px - ux
+        local dz = pz - uz
+        local d = dx * dx + dz * dz
+        if d < distance then
+            nearest = unit
+            distance = d
+        end
+    end
+
+    return nearest
 end

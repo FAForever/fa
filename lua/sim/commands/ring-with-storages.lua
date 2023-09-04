@@ -22,11 +22,17 @@
 --******************************************************************************************************
 
 local SortUnitsByTech = import("/lua/sim/commands/shared.lua").SortUnitsByTech
+local FindNearestUnit = import("/lua/sim/commands/shared.lua").FindNearestUnit
+local SortOffsetsByDistanceToPoint = import("/lua/sim/commands/shared.lua").SortOffsetsByDistanceToPoint
 
 local BuildOffsets = { { 2, 0 }, { 0, 2 }, { -2, 0 }, { 0, -2 } }
 
 -- upvalue scope for performance
-local TableGetn = table.getn
+local IssueGuard = IssueGuard
+local GetUnitsInRect = GetUnitsInRect
+local GetTerrainHeight = GetTerrainHeight
+local EntityCategoryFilterDown = EntityCategoryFilterDown
+local IssueBuildAllMobile = IssueBuildAllMobile
 
 ---@param extractor Unit
 ---@param engineers Unit[]
@@ -35,13 +41,13 @@ RingExtractor = function(extractor, engineers)
     ---------------------------------------------------------------------------
     -- defensive programming
 
+    -- confirm we have an extractor
     if (not extractor) or (IsDestroyed(extractor)) then
         return
     end
 
+    -- confirm that we have one engineer that can build the unit
     SortUnitsByTech(engineers)
-    
-    -- verify the storage
     local storage = engineers[1].Blueprint.BlueprintId:sub(1, 2) .. 'b1106'
     if (not __blueprints[storage]) or
         (not engineers[1]:CanBuild(storage))
@@ -49,10 +55,8 @@ RingExtractor = function(extractor, engineers)
         return
     end
 
-    -- split engineers by faction
-    local faction = engineers[1].Blueprint.FactionCategory
-    local engineersOfFaction = EntityCategoryFilterDown(categories[faction], engineers)
-    local engineersOther = EntityCategoryFilterDown(categories.ALLUNITS - categories[faction], engineers)
+    ---------------------------------------------------------------------------
+    -- determine all units in surroundings that may block construction
 
     local blueprint = extractor:GetBlueprint()
     local skirtSize = blueprint.Physics.SkirtSizeX
@@ -90,8 +94,24 @@ RingExtractor = function(extractor, engineers)
         skirts[k] = rect
     end
 
+    ---------------------------------------------------------------------------
+    -- filter engineers and sort offsets
+
+    local faction = engineers[1].Blueprint.FactionCategory
+    local engineersOfFaction = EntityCategoryFilterDown(categories[faction], engineers)
+    local engineersOther = EntityCategoryFilterDown(categories.ALLUNITS - categories[faction], engineers)
+
+    local offsets = BuildOffsets
+    local nearestEngineer = FindNearestUnit(engineersOfFaction, cx, cz)
+    if nearestEngineer then
+        local ex, _, ez = nearestEngineer:GetPositionXYZ()
+        SortOffsetsByDistanceToPoint(offsets, cx, cz, ex, ez)
+    end
+
+    ---------------------------------------------------------------------------
+    -- issue the build orders
+
     local buildLocation = {}
-    local engineerTable = {}
     local emptyTable = {}
 
     -- loop over build locations in given layer
@@ -115,16 +135,8 @@ RingExtractor = function(extractor, engineers)
         end
     end
 
-    -- assist for all other builders, spread over the number of actual builders
-    local builderIndex = 1
-    local builderCount = TableGetn(engineersOfFaction)
-    for _, builder in engineersOther do
-        engineerTable[1] = builder
-        IssueGuard(engineerTable, engineersOfFaction[builderIndex])
+    ---------------------------------------------------------------------------
+    -- issue assist orders for remaining engineers
 
-        builderIndex = builderIndex + 1
-        if builderIndex > builderCount then
-            builderIndex = 1
-        end
-    end
+    IssueGuard(engineersOther, engineersOfFaction[1])
 end
