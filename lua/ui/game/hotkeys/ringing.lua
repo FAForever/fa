@@ -144,7 +144,7 @@ function RingExtractor(command)
             pStructure1 = nil
             pStructure2 = nil
 
-        elseif RingArtilleryTech3Exp and structure:IsInCategory('ARTILLERY') and (isTech3 or isExp) then
+        elseif RingArtilleryTech3Exp and structure:IsInCategory('ARTILLERY') and (isTech3 or isExp) and (not structure:IsInCategory('xab2307')) then
             -- prevent consecutive calls
             local gameTick = GameTick()
             if structure.RingStamp then
