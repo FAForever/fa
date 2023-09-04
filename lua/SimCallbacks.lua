@@ -286,7 +286,7 @@ Callbacks.RingWithStorages = function(data, selection)
         return
     end
 
-    import("/lua/sim/commands/ring-with-storages.lua").RingExtractor(extractor, engineers)
+    import("/lua/sim/commands/ringing/ring-with-storages.lua").RingExtractor(extractor, engineers)
 end
 
 ---@param data { target: EntityId, allFabricators: boolean }
@@ -314,7 +314,7 @@ Callbacks.RingWithFabricators = function(data, selection)
         return
     end
 
-    import("/lua/sim/commands/ring-with-fabricators.lua").RingExtractor(extractor, engineers, data.allFabricators)
+    import("/lua/sim/commands/ringing/ring-with-fabricators.lua").RingExtractor(extractor, engineers, data.allFabricators)
 end
 
 ---@param data any

@@ -20,13 +20,8 @@
 --** SOFTWARE.
 --******************************************************************************************************
 
-local SortUnitsByTech = import("/lua/sim/commands/shared.lua").SortUnitsByTech
 local FindNearestUnit = import("/lua/sim/commands/shared.lua").FindNearestUnit
-local FindBuildingSkirts = import("/lua/sim/commands/shared.lua").FindBuildingSkirts
 local SortOffsetsByDistanceToPoint = import("/lua/sim/commands/shared.lua").SortOffsetsByDistanceToPoint
-
-local InnerBuildOffsets = { { -2, 2 }, { 2, 2 }, { 2, -2 }, { -2, -2 }, }
-local AllBuildOffsets = { { -2, 2 }, { 2, 2 }, { 2, -2 }, { -2, -2 }, { -4, 0 }, { 0, 4 }, { 4, 0 }, { 0, -4 }, }
 
 -- upvalue scope for performance
 local IssueGuard = IssueGuard
@@ -35,52 +30,88 @@ local EntityCategoryFilterDown = EntityCategoryFilterDown
 local IssueBuildAllMobile = IssueBuildAllMobile
 
 -- cached for performance
-local CacheX1 = { }
-local CacheZ1 = { }
-local CacheX2 = { }
-local CacheZ2 = { }
+local CacheX1 = {}
+local CacheZ1 = {}
+local CacheX2 = {}
+local CacheZ2 = {}
 
-local BuildLocation = { }
-local EmptyTable = { }
+local BuildLocation = {}
+local EmptyTable = {}
 
----@param extractor Unit
+-- Scan and gather build skirts in the surrounding area. This is used as an alternative 
+-- to relying on `brain:CanBuildStructureAt(...)` as it returns false positives.
+---@param cx number
+---@param cz number
+---@param skirtSize number
+---@param cx1 number[]  # re-useable array
+---@param cz1 number[]  # re-useable array
+---@param cx2 number[]  # re-useable array
+---@param cz2 number[]  # re-useable array
+---@return number[]
+---@return number[]
+---@return number[]
+---@return number[]
+---@return number
+function FindBuildingSkirts(cx, cz, skirtSize, cx1, cz1, cx2, cz2)
+
+    local x1 = cx - (skirtSize + 10)
+    local z1 = cz - (skirtSize + 10)
+    local x2 = cx + (skirtSize + 10)
+    local z2 = cz + (skirtSize + 10)
+
+    -- clear out the cache
+    for k = 1, table.getn(cx1) do
+        cx1[k] = nil
+        cz1[k] = nil
+        cx2[k] = nil
+        cz2[k] = nil
+    end
+
+    -- find all units that may prevent us from building
+    local structures = GetUnitsInRect(x1, z1, x2, z2)
+    if not structures then
+        return cx1, cz1, cx2, cz2, 0
+    end
+
+    structures = EntityCategoryFilterDown(categories.STRUCTURE + categories.EXPERIMENTAL, structures)
+
+    -- populate the skirts to check
+    local buildingSkirtCount = 0
+    for k, unit in structures do
+        local blueprint = unit:GetBlueprint()
+        local px, _, pz = unit:GetPositionXYZ()
+        local sx, sz = 0.5 * blueprint.Physics.SkirtSizeX, 0.5 * blueprint.Physics.SkirtSizeZ
+        cx1[k] = px - sx
+        cz1[k] = pz - sz
+        cx2[k] = px + sz
+        cz2[k] = pz + sz
+        buildingSkirtCount = buildingSkirtCount + 1
+    end
+
+    return cx1, cz1, cx2, cz2, buildingSkirtCount
+end
+
+---@param target Unit
 ---@param engineers Unit[]
----@param allFabricators boolean
-RingExtractor = function(extractor, engineers, allFabricators)
-
-    ---------------------------------------------------------------------------
-    -- defensive programming
-
-    -- confirm we have an extractor
-    if (not extractor) or (IsDestroyed(extractor)) then
-        return
-    end
-
-    -- confirm that we have one engineer that can build the unit
-    SortUnitsByTech(engineers)
-    local fabricator = engineers[1].Blueprint.BlueprintId:sub(1, 2) .. 'b1104'
-    if (not __blueprints[fabricator]) or
-        (not engineers[1]:CanBuild(fabricator))
-    then
-        return
-    end
-
-    ---------------------------------------------------------------------------
-    -- determine all units in surroundings that may block construction
-
-    local blueprint = extractor:GetBlueprint()
-    local skirtSize = blueprint.Physics.SkirtSizeX
-    local cx, _, cz = extractor:GetPositionXYZ()
-    local cx1, cz1, cx2, cz2, buildingSkirtCount = FindBuildingSkirts(cx, cz, skirtSize, CacheX1, CacheZ1, CacheX2, CacheZ2)
-
-    ---------------------------------------------------------------------------
-    -- filter engineers and sort offsets
-
+---@param offsets { [1]: number, [2]: number }[]
+---@param blueprintId UnitId
+function RingUnit(target, engineers, offsets, blueprintId)
     local faction = engineers[1].Blueprint.FactionCategory
     local engineersOfFaction = EntityCategoryFilterDown(categories[faction], engineers)
     local engineersOther = EntityCategoryFilterDown(categories.ALLUNITS - categories[faction], engineers)
 
-    local offsets = (allFabricators and AllBuildOffsets) or InnerBuildOffsets
+    ---------------------------------------------------------------------------
+    -- determine all units in surroundings that may block construction
+
+    local blueprint = target:GetBlueprint()
+    local skirtSize = blueprint.Physics.SkirtSizeX
+    local cx, _, cz = target:GetPositionXYZ()
+    local cx1, cz1, cx2, cz2, buildingSkirtCount = FindBuildingSkirts(cx, cz, skirtSize, CacheX1, CacheZ1, CacheX2,
+        CacheZ2)
+
+    ---------------------------------------------------------------------------
+    -- filter engineers and sort offsets
+
     local nearestEngineer = FindNearestUnit(engineersOfFaction, cx, cz)
     if nearestEngineer then
         local ex, _, ez = nearestEngineer:GetPositionXYZ()
@@ -93,9 +124,9 @@ RingExtractor = function(extractor, engineers, allFabricators)
     local buildLocation = BuildLocation
     local emptyTable = EmptyTable
 
-    for k, location in offsets do
-        local bx = cx + location[1]
-        local bz = cz + location[2]
+    for k, offset in offsets do
+        local bx = cx + offset[1]
+        local bz = cz + offset[2]
 
         -- determine if location is free to build
         local freeToBuild = true
@@ -112,7 +143,7 @@ RingExtractor = function(extractor, engineers, allFabricators)
             buildLocation[1] = bx
             buildLocation[3] = bz
             buildLocation[2] = GetTerrainHeight(bx, bz)
-            IssueBuildAllMobile(engineersOfFaction, buildLocation, fabricator, emptyTable)
+            IssueBuildAllMobile(engineersOfFaction, buildLocation, blueprintId, emptyTable)
         end
     end
 
