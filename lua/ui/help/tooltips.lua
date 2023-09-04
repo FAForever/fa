@@ -634,6 +634,10 @@ Tooltips = {
         title = "<LOC ASSIST_TO_UPGRADE_TITLE>Assist to Upgrade",
         description = "<LOC ASSIST_TO_UPGRADE_DESCRIPTION>When enabled structures automatically queue and pause their upgrade when you issue an assist order",
     },
+    options_repeatbuild = {
+        title = "<LOC OPTIONS_REAPEATBUILD_TITLE>Factories Default to Repeat Build",
+        description = "<LOC OPTIONS_REAPEATBUILD_DESCRIPTION>When enabled, factories automatically default to repeating build order that was queued in construction menu",
+    },
 
     options_alt_to_force_attack_move = {
         title = "<LOC ALT_TO_FORCE_ATTACK_MOVE_TITLE>Hold alt to force attack move",
@@ -994,6 +998,10 @@ Tooltips = {
     options_reclaim_overview_batching = {
         title = '<LOC OPTIONS_0291>Reclaim Batching',
         description = '<LOC OPTIONS_0292>Combines nearby reclaim labels as you zoom out. Does not work properly with reclaim labels scaled 30% or more.\r\n\r\nSignificantly improves performance. Recommended for lower end systems.',
+    },
+    options_reclaim_batching_distance_treshold = {
+        title = "<LOC OPTIONS_RECLAIM_BATCHING_DISTANCE_TITLE>Reclaim Batching Distance Threshold",
+        description = "<LOC OPTIONS_RECLAIM_BATCHING_DISTANCE_DESCRIPTION>Sets zoom distance at which point batching/combining of relcaim labels is performed. This applies only when above option is enabled and it increases performance even more when zooming out beyond this zoom distance.",
     },
     options_steal_from_other_control_groups = {
         title = "<LOC OPTIONS_0293>Unique Control Groups",
