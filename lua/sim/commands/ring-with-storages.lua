@@ -47,8 +47,6 @@ local BuildOffsets = { { 2, 0 }, { 0, 2 }, { -2, 0 }, { 0, -2 } }
 ---@param engineers Unit[]
 RingExtractor = function(extractor, engineers)
 
-    local start = GetSystemTimeSecondsOnlyForProfileUse()
-
     ---------------------------------------------------------------------------
     -- defensive programming
 
