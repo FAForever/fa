@@ -322,6 +322,12 @@ end
 function GetIsPaused(units)
 end
 
+--- Returns a boolean that indicates the unit is paused
+---@param unit UserUnit[]
+---@return boolean
+function GetIsPausedOfUnit(unit)
+end
+
 --- Sees if any units in the list are submerged
 ---@param units UserUnit[]
 ---@return SubmergeStatus
@@ -452,12 +458,20 @@ end
 function GetUIControlsAlpha()
 end
 
---- Given a set of units, gets the union of orders and unit categories (for determining builds)
+--- Given a set of units, gets the union of orders and unit categories (for determining builds). You can use `GetUnitCommandFromCommandCap` to convert the toggles to unit commands
 ---@param unitSet any
 ---@return string[] orders
 ---@return CommandCap[] availableToggles
 ---@return EntityCategory buildableCategories
 function GetUnitCommandData(unitSet)
+end
+
+--- Retrieves the orders, toggles and buildable categories of the given unit. You can use `GetUnitCommandFromCommandCap` to convert the toggles to unit commands
+---@param unit any
+---@return string[] orders
+---@return CommandCap[] availableToggles
+---@return EntityCategory buildableCategories
+function GetUnitCommandDataOfUnit(unit)
 end
 
 --- Givens a `RULEUCC` type command, return the equivalent `UNITCOMMAND` command.
@@ -973,10 +987,16 @@ end
 function SetOverlayFilters(list)
 end
 
---- Pause builders in this list
----@param selection UserUnit[]
----@param paused boolean
-function SetPaused(selection, paused)
+--- Pause or unpause the given units
+---@param units UserUnit[]
+---@param pause boolean
+function SetPaused(units, pause)
+end
+
+--- Pause or unpause the given unit
+---@param unit UserUnit
+---@param pause boolean
+function SetPausedOfUnit(unit, pause)
 end
 
 ---

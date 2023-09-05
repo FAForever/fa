@@ -28,8 +28,9 @@ local StringFormat = string.format
 local LOC = LOC
 local print = print
 local tostring = tostring
+local ForkThread = ForkThread
 local GetRolloverInfo = GetRolloverInfo
-local GetUnitCommandData = GetUnitCommandData
+local GetUnitCommandDataOfUnit = GetUnitCommandDataOfUnit
 local EntityCategoryGetUnitList = EntityCategoryGetUnitList
 local IssueBlueprintCommandToUnit = IssueBlueprintCommandToUnit
 
@@ -40,21 +41,25 @@ local TechCategoryToReadable = {
     EXPERIMENTAL = '(Experimental)'
 }
 
----@type { [1]: UserUnit }
-local UnitCache = { }
+---@param unit UserUnit
+local function UpgradePauseThread(unit)
+    WaitTicks(5)
+    if not IsDestroyed(unit) and unit:GetArmy() == GetFocusArmy() then
+        SetPausedOfUnit(unit, true)
+    end
+end
 
 --- Retrieves a list of buildable upgrades for the given unit
 ---@param unit UserUnit
 ---@return UnitId[]
 function GetUpgradesOfUnit(unit)
-    UnitCache[1] = unit
-    local _, _, buildableCategories = GetUnitCommandData(UnitCache)
+    local _, _, buildableCategories = GetUnitCommandDataOfUnit(unit)
     local buildableStructures = EntityCategoryGetUnitList(buildableCategories * categories.STRUCTURE)
     return buildableStructures
 end
 
 --- Attempts to issue an upgrade order to the unit we're hovering over. Favors upgrading to support factories when possible
-function UpgradeStructure()
+function UpgradeStructure(pause)
     local unit = GetRolloverInfo().userUnit
     if unit then
         local buildableStructures = GetUpgradesOfUnit(unit)
@@ -78,6 +83,12 @@ function UpgradeStructure()
                     tostring(TechCategoryToReadable[otherBlueprint.TechCategory] or "")
                 )
             )
+
+            -- paused units do not start upgrading, temporarily unpause
+            if GetIsPausedOfUnit(unit) or pause then
+                SetPausedOfUnit(unit, false)
+                ForkThread(UpgradePauseThread, unit)
+            end
         else
             local blueprint = unit:GetBlueprint()
             print(StringFormat("Unable to upgrade %s", LOC(tostring(blueprint.Description))))

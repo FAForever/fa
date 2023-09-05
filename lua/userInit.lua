@@ -46,6 +46,7 @@ end
 local AvgFPS = 10
 WaitFrames = coroutine.yield
 
+--- Waits the given number of seconds. Always waits at least one frame
 function WaitSeconds(n)
     local start = CurrentTime()
     local elapsed_frames = 0
@@ -62,6 +63,12 @@ function WaitSeconds(n)
     if elapsed_time >= 3 then
         AvgFPS = math.max(10, math.min(200, math.ceil(elapsed_frames / elapsed_time)))
     end
+end
+
+--- Waits the given number of ticks. Always waits at least one frame
+---@param ticks any
+function WaitTicks(ticks)
+    WaitSeconds (0.1 * ticks)
 end
 
 -- a table designed to allow communication from different user states to the front end lua state
@@ -176,6 +183,33 @@ do
 end
 
 do
+
+    ---@type { [1]: UserUnit }
+    local UnitsCache = { }
+
+    ---@param unit UserUnit
+    ---@param pause boolean
+    _G.SetPausedOfUnit = function(unit, pause)
+        UnitsCache[1] = unit
+        return SetPaused(UnitsCache, pause)
+    end
+
+    ---@param unit UserUnit
+    ---@return boolean
+    _G.GetIsPausedOfUnit = function(unit)
+        UnitsCache[1] = unit
+        return GetIsPaused(UnitsCache)
+    end
+
+    ---@param unit UserUnit
+    ---@return string[] orders
+    ---@return CommandCap[] availableToggles
+    ---@return EntityCategory buildableCategories
+    _G.GetUnitCommandDataOfUnit = function(unit)
+        UnitsCache[1] = unit
+        return GetUnitCommandData(UnitsCache)
+    end
+
     ---@param units UserUnit[]
     ---@param command UserUnitBlueprintCommand
     ---@param blueprintid UnitId
@@ -196,9 +230,6 @@ do
         gameMain.SetIgnoreSelection(false)
     end
 
-    ---@type { [1]: UserUnit }
-    local UnitsCache = { }
-
     ---@param unit UserUnit[]
     ---@param command UserUnitBlueprintCommand
     ---@param blueprintid UnitId
@@ -208,5 +239,4 @@ do
         UnitsCache[1] = unit
         IssueBlueprintCommandToUnits(UnitsCache, command, blueprintid, count, clear)
     end
-
 end
