@@ -621,7 +621,7 @@ end
 
 
 ---@param onscreen boolean
-SelectAllResourceConsumer = function(onscreen)
+SelectAllResourceConsumers = function(onscreen)
     -- make sure it is always a boolean
     onscreen = onscreen or false
 
