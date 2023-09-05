@@ -290,6 +290,13 @@ local keyActionsSelectionQuickSelect = {
     ['select_all_building_eng_onscreen'] = {
         action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").SelectAllBuildingEngineers(true)',
         category = 'selection',
+    },['select_all_resource_consumer'] = {
+        action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").SelectAllResourceConsumer()',
+        category = 'selection',
+    },
+    ['select_all_resource_consumer_onscreen'] = {
+        action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").SelectAllResourceConsumer(true)',
+        category = 'selection',
     },
     ['select_all_land_units_onscreen'] = {
         action = 'UI_SelectByCategory +inview +excludeengineers MOBILE LAND',
