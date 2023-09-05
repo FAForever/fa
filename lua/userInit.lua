@@ -174,3 +174,39 @@ do
         )
     end
 end
+
+do
+    ---@param units UserUnit[]
+    ---@param command UserUnitBlueprintCommand
+    ---@param blueprintid UnitId
+    ---@param count number
+    ---@param clear boolean? defaults to false
+    _G.IssueBlueprintCommandToUnits = function(units, command, blueprintid, count, clear)
+        local gameMain = import("/lua/ui/game/gamemain.lua")
+        local commandMode = import("/lua/ui/game/commandmode.lua")
+
+        -- prevents losing command mode
+        gameMain.SetIgnoreSelection(true)
+        commandMode.CacheAndClearCommandMode()
+        local oldSelection = GetSelectedUnits()
+        SelectUnits(units)
+        IssueBlueprintCommand(command, blueprintid, count, clear)
+        SelectUnits(oldSelection)
+        commandMode.RestoreCommandMode()
+        gameMain.SetIgnoreSelection(false)
+    end
+
+    ---@type { [1]: UserUnit }
+    local UnitsCache = { }
+
+    ---@param unit UserUnit[]
+    ---@param command UserUnitBlueprintCommand
+    ---@param blueprintid UnitId
+    ---@param count number
+    ---@param clear boolean? defaults to false
+    _G.IssueBlueprintCommandToUnit = function(unit, command, blueprintid, count, clear)
+        UnitsCache[1] = unit
+        IssueBlueprintCommandToUnits(UnitsCache, command, blueprintid, count, clear)
+    end
+
+end

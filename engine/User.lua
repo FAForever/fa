@@ -456,7 +456,7 @@ end
 ---@param unitSet any
 ---@return string[] orders
 ---@return CommandCap[] availableToggles
----@return EntityCategory[] buildableCategories
+---@return EntityCategory buildableCategories
 function GetUnitCommandData(unitSet)
 end
 
@@ -637,12 +637,32 @@ end
 function IsObserver(playerId)
 end
 
----
----@param command string
----@param blueprintid string
+--- Issue a factory build or upgrade command to your selection
+---@param command UserUnitBlueprintCommand
+---@param blueprintid UnitId
 ---@param count number
 ---@param clear boolean? defaults to false
 function IssueBlueprintCommand(command, blueprintid, count, clear)
+end
+
+--- Issue a factory build or upgrade command to the given units
+---@see IssueBlueprintCommand
+---@param units UserUnit[]
+---@param command UserUnitBlueprintCommand
+---@param blueprintid UnitId
+---@param count number
+---@param clear boolean? defaults to false
+function IssueBlueprintCommandToUnits(units, command, blueprintid, count, clear)
+end
+
+--- Issue a factory build or upgrade command to the given unit
+---@see IssueBlueprintCommand
+---@param unit UserUnit
+---@param command UserUnitBlueprintCommand
+---@param blueprintid UnitId
+---@param count number
+---@param clear boolean? defaults to false
+function IssueBlueprintCommandToUnit(unit, command, blueprintid, count, clear)
 end
 
 ---

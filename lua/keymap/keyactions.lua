@@ -1691,6 +1691,16 @@ local keyactionsOrdersContextBased = {
         action = 'UI_LUA import("/lua/ui/game/hotkeys/capping.lua").CapHotkey()',
         category = 'ordersContextBased',
     },
+
+    ['upgrade_structure'] = { 
+        action = 'UI_LUA import("/lua/ui/game/hotkeys/upgrade-structure.lua").UpgradeStructure()',
+        category = 'ordersContextBased',
+    },
+
+    ['shift_upgrade_structure'] = { 
+        action = 'UI_LUA import("/lua/ui/game/hotkeys/upgrade-structure.lua").UpgradeStructure()',
+        category = 'ordersContextBased',
+    }
 }
 
 ---@type table<string, UIKeyAction>
