@@ -516,8 +516,8 @@ keyDescriptions = {
     ['upgrade_structure'] = '<LOC key_desc_upgrade_structure>Upgrade a structure',
     ['shift_upgrade_structure'] = '<LOC key_desc_shift_upgrade_structure>Upgrade a structure',
 
-    ['upgrade_structure_pause'] = '<LOC key_desc_upgrade_structure_pause>Upgrade a structure and immediately pause it',
-    ['shift_upgrade_structure_pause'] = '<LOC key_desc_shift_upgrade_structure_pause>Upgrade a structure and immediately pause it',
+    ['upgrade_structure_pause'] = '<LOC key_desc_upgrade_structure_pause>Upgrade a structure and pause it',
+    ['shift_upgrade_structure_pause'] = '<LOC key_desc_shift_upgrade_structure_pause>Upgrade a structure and pause it',
 
     ['toggle_navui'] = 'Toggle the debugging UI for the navigational mesh',
     ['toggle_ai_reclaim_grid_ui'] = 'Toggle the debugging UI for the reclaim grid',

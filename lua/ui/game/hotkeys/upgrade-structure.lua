@@ -85,7 +85,7 @@ function UpgradeStructure(pause)
             )
 
             -- paused units do not start upgrading, temporarily unpause
-            if GetIsPausedOfUnit(unit) or pause then
+            if (GetIsPausedOfUnit(unit) or pause) and (not unit:GetFocus()) then
                 SetPausedOfUnit(unit, false)
                 ForkThread(UpgradePauseThread, unit)
             end
