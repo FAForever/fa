@@ -118,7 +118,7 @@ end
 ---@param newCommandMode CommandMode
 ---@param data CommandModeData
 function StartCommandMode(newCommandMode, data)
-
+    LOG("StartCommandMode")
     -- clean up previous command mode
     if commandMode then
         EndCommandMode(true)
@@ -137,7 +137,8 @@ end
 --- Called when the command mode ends and deconstructs all the data.
 ---@param isCancel boolean set when we're at the end of (a sequence of) order(s), is usually always true
 function EndCommandMode(isCancel)
-
+    LOG("EndCommandMode")
+    reprsl(debug.traceback())
     if ignoreSelection then
         return
     end
@@ -182,8 +183,12 @@ function CacheAndClearCommandMode()
 end
 
 --- Restores the cached command mode
-function RestoreCommandMode()
+---@param ignorePreviousCommands? boolean when set resets the command mode as if no commands were issued
+function RestoreCommandMode(ignorePreviousCommands)
     if cachedCommandMode and cachedModeData then
+        if ignorePreviousCommands then
+            issuedOneCommand = false
+        end
         StartCommandMode(cachedCommandMode, cachedModeData)
     end
 end

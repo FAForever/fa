@@ -220,14 +220,14 @@ do
         local commandMode = import("/lua/ui/game/commandmode.lua")
 
         -- prevents losing command mode
-        gameMain.SetIgnoreSelection(true)
         commandMode.CacheAndClearCommandMode()
+        gameMain.SetIgnoreSelection(true)
         local oldSelection = GetSelectedUnits()
         SelectUnits(units)
         IssueBlueprintCommand(command, blueprintid, count, clear)
         SelectUnits(oldSelection)
-        commandMode.RestoreCommandMode()
         gameMain.SetIgnoreSelection(false)
+        commandMode.RestoreCommandMode(true)
     end
 
     ---@param unit UserUnit[]
