@@ -5,8 +5,8 @@ local WorldMesh = import("/lua/ui/controls/worldmesh.lua").WorldMesh
 local meshSphere = '/env/Common/Props/sphere_lod0.scm'
 
 local MeshOnTerrain = nil
-local MeshesInBetween = { }
-local MeshesInbetweenCount = 4
+local MeshOnTerrainRed = nil
+local MeshInBetween = nil
 local MeshFadeDistance = 300
 
 local Trash = TrashBag()
@@ -82,7 +82,7 @@ local function ComputeTransparency(camera, distance, terrainHeight, surfaceHeigh
     local f1 = math.max(0, 1 - (zoom / distance))
 
     -- visibility based on terrain difference
-    local f2 = math.clamp(surfaceHeight - terrainHeight - 1, 0, 1)
+    local f2 = math.clamp(surfaceHeight - terrainHeight - 0.25, 0, 0.5)*2
     return f1 * f2
 end
 
@@ -111,24 +111,28 @@ local function DepthScanningThread()
         UniformScale = 0.3,
         LODCutoff = MeshFadeDistance
     })
-
+    MeshOnTerrainRed = WorldMesh()
+    MeshOnTerrainRed:SetMesh({
+        MeshName = meshSphere,
+        TextureName = '/meshes/game/Attack_albedo.dds',
+        ShaderName = 'FakeRings',
+        UniformScale = 0.3,
+        LODCutoff = MeshFadeDistance
+    })
+    
     Trash:Add(MeshOnTerrain)
+    Trash:Add(MeshOnTerrainRed)
 
-    -- allocate intermediate bits
-    for k = 1, MeshesInbetweenCount do
-
-        local bit = WorldMesh()
-        bit:SetMesh({
+    -- allocate intermediate mesh
+    MeshInBetween = WorldMesh()
+        MeshInBetween:SetMesh({
             MeshName = meshSphere,
             TextureName = '/meshes/game/Assist_albedo.dds',
             ShaderName = 'FakeRings',
             UniformScale = 0.15,
             LODCutoff = MeshFadeDistance
-        })
-
-        MeshesInBetween[k] = bit
-        Trash:Add(bit)
-    end
+            })
+        Trash:Add(MeshInBetween)
 
     -- pre-allocate all locals for performance
     local camera, position, cursor, elevation, transparency, location, info
@@ -161,33 +165,38 @@ local function DepthScanningThread()
             -- update visibility terrain mesh
             transparency = ComputeTransparency(camera, MeshFadeDistance, elevation, position[2])
             if transparency > 0.05 then
-                MeshOnTerrain:SetHidden(false)
-                MeshOnTerrain:SetStance(location)
-                MeshOnTerrain:SetFractionCompleteParameter(transparency)
+                if (position[2] - elevation) > 1.5 then
+                    MeshOnTerrain:SetHidden(false)
+                    MeshOnTerrain:SetStance(location)
+                    MeshOnTerrain:SetFractionCompleteParameter(transparency)
+                    MeshOnTerrainRed:SetHidden(true)
+                else
+                    MeshOnTerrainRed:SetHidden(false)
+                    MeshOnTerrainRed:SetStance(location)
+                    MeshOnTerrainRed:SetFractionCompleteParameter(transparency)
+                    MeshOnTerrain:SetHidden(true)
+                end
             else
                 MeshOnTerrain:SetHidden(true)
+                MeshOnTerrainRed:SetHidden(true)
             end
 
             -- update visiblity intermediate dots
-            for k = 1, MeshesInbetweenCount do
-                local bit = MeshesInBetween[k]
-                location[2] = (0.2 * k) * position[2] + (1 - 0.2 * k) * elevation
+            location[2] = position[2] - 1.5
 
-                transparency = ComputeTransparency(camera, MeshFadeDistance, elevation, position[2])
-                if transparency > 0.05 then
-                    bit:SetHidden(false)
-                    bit:SetStance(location)
-                    bit:SetFractionCompleteParameter(transparency)
-                else
-                    bit:SetHidden(true)
-                end
+            transparency = ComputeTransparency(camera, MeshFadeDistance, elevation, position[2])
+            if transparency > 0.05 then
+                MeshInBetween:SetHidden(false)
+                MeshInBetween:SetStance(location)
+                MeshInBetween:SetFractionCompleteParameter(transparency)
+            else
+                MeshInBetween:SetHidden(true)
             end
         else
             -- hide them
             MeshOnTerrain:SetHidden(true)
-            for k = 1, MeshesInbetweenCount do
-                MeshesInBetween[k]:SetHidden(true)
-            end
+            MeshOnTerrainRed:SetHidden(true)
+            MeshInBetween:SetHidden(true)
         end
 
         WaitFrames(1)

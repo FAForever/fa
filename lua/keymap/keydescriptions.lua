@@ -180,6 +180,8 @@ keyDescriptions = {
     ['select_all_radars'] = '<LOC key_desc_select_all_radars>Select all radars',
     ['select_all_building_eng'] = '<LOC key_desc_select_all_building_eng>Select all engineers that are requesting resources',
     ['select_all_building_eng_onscreen'] = '<LOC key_desc_select_all_building_eng_onscreen>Select all engineers that are requesting resources on screen',
+    ['select_all_resource_consumers'] = '<LOC key_desc_select_all_resource_consumers>Select all units that are requesting resources',
+    ['select_all_resource_consumers_onscreen'] = '<LOC key_desc_select_all_resource_consumers_onscreen>Select all units that are requesting resources on screen',
     ['decrease_game_speed'] = '<LOC key_desc_0079>Decrease game speed',
     ['increase_game_speed'] = '<LOC key_desc_0080>Increase game speed',
     ['reset_game_speed'] = '<LOC key_desc_0081>Reset game speed to 0 (Normal Speed)',
@@ -505,8 +507,11 @@ keyDescriptions = {
     ['t3_support_air_factory'] = '<LOC key_desc_0386>build T3 Support Air Factory',
     ['t3_support_naval_factory'] = '<LOC key_desc_0387>build T3 Support Naval Factory',
 
-    ['set_target_priority'] = 'Set weapon target priorities to the type of unit that you hover over with the mouse',
+    ['set_target_priority'] = '<LOC key_desc_set_target_priority>Prioritize unit type',
+    ['shift_set_target_priority'] = '<LOC key_desc_shift_set_target_priority>Prioritize unit type',
     ['set_default_target_priority'] = 'Set weapon target priorities of selected units to their defaults',
+    ['cap'] = '<LOC key_desc_cap>Cap the unit depending on the game options',
+    ['shift_cap'] = '<LOC key_desc_cap>Cap the unit depending on the game options',
 
     ['toggle_navui'] = 'Toggle the debugging UI for the navigational mesh',
     ['toggle_ai_reclaim_grid_ui'] = 'Toggle the debugging UI for the reclaim grid',
@@ -528,10 +533,10 @@ keyDescriptions = {
 
     ['filter_highest_engineer_and_assist'] = '<LOC key_desc_filter_highest_engineer_and_assist>Filter engineers',
     ['shift_filter_highest_engineer_and_assist'] = '<LOC key_desc_shift_filter_highest_engineer_and_assist>Filter engineers',
-    ['distribute_orders'] = '<LOC key_desc_distribute_orders>Distribute orders',
-    ['shift_distribute_orders'] = '<LOC key_desc_shift_distribute_orders>Distribute orders',
-    ['distribute_orders_context'] = '<LOC key_desc_distribute_orders>Distribute orders from the unit beneath the mouse cursor',
-    ['shift_distribute_orders_context'] = '<LOC key_desc_shift_distribute_orders>Distribute orders from the unit beneath the mouse cursor',
+    ['spreadattack'] = '<LOC key_desc_distribute_orders>Distribute orders',
+    ['shift_spreadattack'] = '<LOC key_desc_shift_distribute_orders>Distribute orders',
+    ['spreadattack_context'] = '<LOC key_desc_distribute_orders>Distribute orders from the unit beneath the mouse cursor',
+    ['shift_spreadattack_context'] = '<LOC key_desc_shift_distribute_orders>Distribute orders from the unit beneath the mouse cursor',
     ['cycle_context_based_templates'] = '<LOC key_desc_context_based_templates>Cycle templates',
     ['shift_cycle_context_based_templates'] = '<LOC key_desc_shift_context_based_templates>Cycle templates',
 

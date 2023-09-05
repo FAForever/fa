@@ -156,7 +156,7 @@ XRL0403 = ClassUnit(CWalkingLandUnit, CConstructionTemplate) {
             self:SetSpeedMult(1)
         elseif new == 'Seabed' then
             self:EnableUnitIntel('Layer', 'Sonar')
-            self:SetSpeedMult(self.Blueprint.Physics.WaterSpeedMultiplier)
+            self:SetSpeedMult(self.Blueprint.Physics.WaterSpeedMultiplier or 1)
         end
     end,
 

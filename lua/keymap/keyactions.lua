@@ -290,6 +290,13 @@ local keyActionsSelectionQuickSelect = {
     ['select_all_building_eng_onscreen'] = {
         action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").SelectAllBuildingEngineers(true)',
         category = 'selection',
+    },['select_all_resource_consumers'] = {
+        action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").SelectAllResourceConsumers()',
+        category = 'selection',
+    },
+    ['select_all_resource_consumers_onscreen'] = {
+        action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").SelectAllResourceConsumers(true)',
+        category = 'selection',
     },
     ['select_all_land_units_onscreen'] = {
         action = 'UI_SelectByCategory +inview +excludeengineers MOBILE LAND',
@@ -1621,22 +1628,22 @@ local keyActionsOrdersAdvanced = {
 }
 
 local keyActionsOrdersQueueBased = {
-    ['distribute_orders'] = {
+    ['spreadattack'] = {
         action = 'UI_Lua import("/lua/ui/game/hotkeys/distribute-queue.lua").DistributeOrders(true)',
         category = 'ordersQueueBased',
         wikiURL = 'Play/Game/Hotkeys/OrdersQueueManipulation#distribute-orders'
     },
-    ['shift_distribute_orders'] = {
+    ['shift_spreadattack'] = {
         action = 'UI_Lua import("/lua/ui/game/hotkeys/distribute-queue.lua").DistributeOrders(true)',
         category = 'ordersQueueBased',
         wikiURL = 'Play/Game/Hotkeys/OrdersQueueManipulation#distribute-orders'
     },
-    ['distribute_orders_context'] = {
+    ['spreadattack_context'] = {
         action = 'UI_Lua import("/lua/ui/game/hotkeys/distribute-queue.lua").DistributeOrdersOfMouseContext(true)',
         category = 'ordersQueueBased',
         wikiURL = 'Play/Game/Hotkeys/OrdersQueueManipulation#distribute-orders'
     },
-    ['shift_distribute_orders_context'] = {
+    ['shift_spreadattack_context'] = {
         action = 'UI_Lua import("/lua/ui/game/hotkeys/distribute-queue.lua").DistributeOrdersOfMouseContext(true)',
         category = 'ordersQueueBased',
         wikiURL = 'Play/Game/Hotkeys/OrdersQueueManipulation#distribute-orders'
@@ -1667,12 +1674,22 @@ local keyactionsOrdersContextBased = {
     ['set_target_priority'] = {
         action = 'UI_LUA import("/lua/keymap/misckeyactions.lua").SetWeaponPrioritiesToUnitType()',
         category = 'ordersContextBased',
-        wikiURL = 'Play/Game/Hotkeys/OrdersMouseContext#cycle-templates'
+        wikiURL = 'Play/Game/Hotkeys/OrdersMouseContext#apply-target-priorities'
     },
     ['shift_set_target_priority'] = {
         action = 'UI_LUA import("/lua/keymap/misckeyactions.lua").SetWeaponPrioritiesToUnitType()',
         category = 'ordersContextBased',
-        wikiURL = 'Play/Game/Hotkeys/OrdersMouseContext#cycle-templates'
+        wikiURL = 'Play/Game/Hotkeys/OrdersMouseContext#apply-target-priorities'
+    },
+
+    ['cap'] = {
+        action = 'UI_LUA import("/lua/ui/game/hotkeys/capping.lua").CapHotkey()',
+        category = 'ordersContextBased',
+    },
+
+    ['shift_cap'] = {
+        action = 'UI_LUA import("/lua/ui/game/hotkeys/capping.lua").CapHotkey()',
+        category = 'ordersContextBased',
     },
 }
 

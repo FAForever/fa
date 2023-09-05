@@ -1,4 +1,4 @@
-UnitBlueprint{
+UnitBlueprint {
     Description = "<LOC uea0305_desc>Heavy Gunship",
     Air = {
         AutoLandTime = 1,
@@ -22,16 +22,17 @@ UnitBlueprint{
         StartTurnDistance = 5,
     },
     Audio = {
-        AirUnitWaterImpact = Sound { Bank = 'Explosions', Cue = 'Expl_Water_Lrg_01',      LodCutoff = 'UnitMove_LodCutoff' },
-        AmbientMove        = Sound { Bank = 'UEA',        Cue = 'UEA0305_Move_Loop',      LodCutoff = 'UnitMove_LodCutoff' },
-        Destroyed          = Sound { Bank = 'UEADestroy', Cue = 'UEA_Destroy_Med',        LodCutoff = 'UnitMove_LodCutoff' },
-        Killed             = Sound { Bank = 'UEADestroy', Cue = 'UEA_Destroy_Air_Killed', LodCutoff = 'UnitMove_LodCutoff' },
-        Landing            = Sound { Bank = 'UEA',        Cue = 'UEA0305_Move_Land',      LodCutoff = 'UnitMove_LodCutoff' },
-        Refueling          = Sound { Bank = 'UEA',        Cue = 'UEA_Repair_Refuel',      LodCutoff = 'UnitMove_LodCutoff' },
-        StartMove          = Sound { Bank = 'UEA',        Cue = 'UEA0305_Move_Start',     LodCutoff = 'UnitMove_LodCutoff' },
-        StopMove           = Sound { Bank = 'UEA',        Cue = 'UEA0305_Move_Stop',      LodCutoff = 'UnitMove_LodCutoff' },
-        Thruster           = Sound { Bank = 'UEA',        Cue = 'UEA0305_Move_Thruster',  LodCutoff = 'UnitMove_LodCutoff' },
-        UISelection        = Sound { Bank = 'Interface',  Cue = 'UEF_Select_Air',         LodCutoff = 'UnitMove_LodCutoff' },
+        AirUnitWaterImpact = Sound { Bank = 'Explosions', Cue = 'Expl_Water_Lrg_01', LodCutoff = 'UnitMove_LodCutoff' },
+        AmbientMove        = Sound { Bank = 'UEA', Cue = 'UEA0305_Move_Loop', LodCutoff = 'UnitMove_LodCutoff' },
+        Destroyed          = Sound { Bank = 'UEADestroy', Cue = 'UEA_Destroy_Med', LodCutoff = 'UnitMove_LodCutoff' },
+        Killed             = Sound { Bank = 'UEADestroy', Cue = 'UEA_Destroy_Air_Killed',
+            LodCutoff = 'UnitMove_LodCutoff' },
+        Landing            = Sound { Bank = 'UEA', Cue = 'UEA0305_Move_Land', LodCutoff = 'UnitMove_LodCutoff' },
+        Refueling          = Sound { Bank = 'UEA', Cue = 'UEA_Repair_Refuel', LodCutoff = 'UnitMove_LodCutoff' },
+        StartMove          = Sound { Bank = 'UEA', Cue = 'UEA0305_Move_Start', LodCutoff = 'UnitMove_LodCutoff' },
+        StopMove           = Sound { Bank = 'UEA', Cue = 'UEA0305_Move_Stop', LodCutoff = 'UnitMove_LodCutoff' },
+        Thruster           = Sound { Bank = 'UEA', Cue = 'UEA0305_Move_Thruster', LodCutoff = 'UnitMove_LodCutoff' },
+        UISelection        = Sound { Bank = 'Interface', Cue = 'UEF_Select_Air', LodCutoff = 'UnitMove_LodCutoff' },
     },
     AverageDensity = 1,
     BuildIconSortPriority = 50,
@@ -81,6 +82,18 @@ UnitBlueprint{
                     },
                 },
             },
+            Water = {
+                Effects = {
+                    {
+                        Bones = {
+                            "UEA0305",
+                            "Exhaust05",
+                            "Exhaust07",
+                        },
+                        Type = "SeaIdleGunship01",
+                    },
+                },
+            },
         },
         LayerChangeEffects = {
             AirLand = {
@@ -113,6 +126,22 @@ UnitBlueprint{
                             "Exhaust07",
                             "Exhaust08",
                         },
+                        Type = "TakeOff01",
+                    },
+                },
+            },
+            AirWater = {
+                Effects = {
+                    {
+                        Bones = { "Turret_Down_01", "Turret_Down_02" },
+                        Type = "Landing01",
+                    },
+                },
+            },
+            WaterAir = {
+                Effects = {
+                    {
+                        Bones = { "Turret_Down_01", "Turret_Down_02" },
                         Type = "TakeOff01",
                     },
                 },
