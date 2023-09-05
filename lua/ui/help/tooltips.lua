@@ -1029,7 +1029,7 @@ Tooltips = {
     },
     options_cursor_depth_scanning = {
         title = "<LOC WATER_DEPTH_ASSISTANCE_TITLE>Water depth indication",
-        description = "<LOC WATER_DEPTH_ASSISTANCE_DESCRIPTION>When enabled, adds visual elements to visualize the water depth at the cursor, glowing red if too shallow for navy.",
+        description = "<LOC WATER_DEPTH_ASSISTANCE_DESCRIPTION>When enabled, adds visual elements to visualize the offset between the water surface and the ocean floor at the position of the cursor. A separate indicator turns red when naval units are guaranteed to not be able to path at the location due to lack of depth.",
     },
     options_cursor_hover_scanning = {
         title = "<LOC PLANE_HEIGHT_ASSISTANCE_TITLE>Plane height indication",
