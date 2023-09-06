@@ -1029,11 +1029,11 @@ Tooltips = {
     },
     options_cursor_depth_scanning = {
         title = "<LOC WATER_DEPTH_ASSISTANCE_TITLE>Water depth indication",
-        description = "<LOC WATER_DEPTH_ASSISTANCE_DESCRIPTION>When enabled, adds visual elements to visualize the offset between the water surface and the ocean floor at the position of the cursor.",
+        description = "<LOC WATER_DEPTH_ASSISTANCE_DESCRIPTION>When enabled, adds visual elements to visualize the offset between the water surface and the ocean floor at the position of the cursor. A separate indicator turns red when naval units are guaranteed to not be able to path at the location due to lack of depth.",
     },
     options_cursor_hover_scanning = {
         title = "<LOC PLANE_HEIGHT_ASSISTANCE_TITLE>Plane height indication",
-        description = "<LOC WATER_DEPTH_ASSISTANCE_DESCRIPTION>When enabled, adds visual elements to visualize the offset between the terrain surface and the (expected) height of the selected air unit at the position of the cursor. \r\nIs only applied when you have one unit selected.",
+        description = "<LOC PLANE_HEIGHT_ASSISTANCE_DESCRIPTION>When enabled, adds visual elements to visualize the offset between the terrain surface and the (expected) height of the selected air unit at the position of the cursor. \r\nIs only applied when you have one unit selected.",
     },
     options_share_mouse = {
         title = '<LOC OPTIONS_0305>Show Player Cursor Locations for Observers',
