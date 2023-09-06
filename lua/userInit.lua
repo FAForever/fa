@@ -46,6 +46,7 @@ end
 local AvgFPS = 10
 WaitFrames = coroutine.yield
 
+--- Waits the given number of seconds. Always waits at least one frame
 function WaitSeconds(n)
     local start = CurrentTime()
     local elapsed_frames = 0
@@ -62,6 +63,15 @@ function WaitSeconds(n)
     if elapsed_time >= 3 then
         AvgFPS = math.max(10, math.min(200, math.ceil(elapsed_frames / elapsed_time)))
     end
+end
+
+--- Waits the given number of ticks. Always waits at least four frames
+---@param ticks any
+function WaitTicks(ticks)
+    local start = GameTick()
+    repeat
+        WaitFrames(4)
+    until (start + ticks) <= GameTick()
 end
 
 -- a table designed to allow communication from different user states to the front end lua state
@@ -172,5 +182,64 @@ do
             function() OldOpenURL(url) end,
             'Cancel'
         )
+    end
+end
+
+do
+
+    ---@type { [1]: UserUnit }
+    local UnitsCache = { }
+
+    ---@param unit UserUnit
+    ---@param pause boolean
+    _G.SetPausedOfUnit = function(unit, pause)
+        UnitsCache[1] = unit
+        return SetPaused(UnitsCache, pause)
+    end
+
+    ---@param unit UserUnit
+    ---@return boolean
+    _G.GetIsPausedOfUnit = function(unit)
+        UnitsCache[1] = unit
+        return GetIsPaused(UnitsCache)
+    end
+
+    ---@param unit UserUnit
+    ---@return string[] orders
+    ---@return CommandCap[] availableToggles
+    ---@return EntityCategory buildableCategories
+    _G.GetUnitCommandDataOfUnit = function(unit)
+        UnitsCache[1] = unit
+        return GetUnitCommandData(UnitsCache)
+    end
+
+    ---@param units UserUnit[]
+    ---@param command UserUnitBlueprintCommand
+    ---@param blueprintid UnitId
+    ---@param count number
+    ---@param clear boolean? defaults to false
+    _G.IssueBlueprintCommandToUnits = function(units, command, blueprintid, count, clear)
+        local gameMain = import("/lua/ui/game/gamemain.lua")
+        local commandMode = import("/lua/ui/game/commandmode.lua")
+
+        -- prevents losing command mode
+        commandMode.CacheAndClearCommandMode()
+        gameMain.SetIgnoreSelection(true)
+        local oldSelection = GetSelectedUnits()
+        SelectUnits(units)
+        IssueBlueprintCommand(command, blueprintid, count, clear)
+        SelectUnits(oldSelection)
+        gameMain.SetIgnoreSelection(false)
+        commandMode.RestoreCommandMode(true)
+    end
+
+    ---@param unit UserUnit[]
+    ---@param command UserUnitBlueprintCommand
+    ---@param blueprintid UnitId
+    ---@param count number
+    ---@param clear boolean? defaults to false
+    _G.IssueBlueprintCommandToUnit = function(unit, command, blueprintid, count, clear)
+        UnitsCache[1] = unit
+        IssueBlueprintCommandToUnits(UnitsCache, command, blueprintid, count, clear)
     end
 end
