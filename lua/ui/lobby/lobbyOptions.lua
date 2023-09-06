@@ -268,7 +268,7 @@ globalOpts = {
         },
     },
     {
-        default = 8,
+        default = 10,
         label = "<LOC lobui_0102>Unit Cap",
         help = "<LOC lobui_0103>Set the maximum number of units that can be in play",
         key = 'UnitCap',
