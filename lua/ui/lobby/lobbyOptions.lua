@@ -31,7 +31,7 @@
 ---@field Share 'FullShare' | 'ShareUntilDeath' | 'PartialShare' | 'TransferToKiller' | 'Defectors' | 'CivilianDeserter'
 ---@field ShareUnitCap 'none' | 'allies' | 'all'
 ---@field Timeouts '0' | '3'| '-1'
----@field UnitCap '125' | '250' | '375' | '500' | '625' | '750' | '875' | '1000' | '1250' | '1500'
+---@field UnitCap '125' | '250' | '375' | '500' | '625' | '750' | '875' | '1000' | '1250' | '1500' | '1750' | '2000'
 ---@field UnRanked 'false' | 'true
 ---@field Victory 'demoralization' | 'domination' | 'eradication' | 'sandbox'
 ---
@@ -275,7 +275,7 @@ globalOpts = {
         value_text = "<LOC lobui_0719>%s",
         value_help = "<LOC lobui_0171>%s units per player may be in play",
         values = {
-            '125','250', '375', '500', '625', '750', '875', '1000', '1250', '1500'
+            '125', '250', '375', '500', '625', '750', '875', '1000', '1250', '1500', '1750', '2000'
         },
     },
 
