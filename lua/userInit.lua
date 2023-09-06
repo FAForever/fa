@@ -65,10 +65,13 @@ function WaitSeconds(n)
     end
 end
 
---- Waits the given number of ticks. Always waits at least one frame
+--- Waits the given number of ticks. Always waits at least four frames
 ---@param ticks any
 function WaitTicks(ticks)
-    WaitSeconds (0.1 * ticks)
+    local start = GameTick()
+    repeat
+        WaitFrames(4)
+    until (start + ticks) <= GameTick()
 end
 
 -- a table designed to allow communication from different user states to the front end lua state

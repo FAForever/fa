@@ -43,7 +43,7 @@ local TechCategoryToReadable = {
 
 ---@param unit UserUnit
 local function UpgradePauseThread(unit)
-    WaitTicks(5)
+    WaitTicks(2)
     if not IsDestroyed(unit) and unit:GetArmy() == GetFocusArmy() then
         SetPausedOfUnit(unit, true)
     end
