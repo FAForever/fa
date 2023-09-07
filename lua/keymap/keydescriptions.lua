@@ -180,6 +180,8 @@ keyDescriptions = {
     ['select_all_radars'] = '<LOC key_desc_select_all_radars>Select all radars',
     ['select_all_building_eng'] = '<LOC key_desc_select_all_building_eng>Select all engineers that are requesting resources',
     ['select_all_building_eng_onscreen'] = '<LOC key_desc_select_all_building_eng_onscreen>Select all engineers that are requesting resources on screen',
+    ['select_all_resource_consumers'] = '<LOC key_desc_select_all_resource_consumers>Select all units that are requesting resources',
+    ['select_all_resource_consumers_onscreen'] = '<LOC key_desc_select_all_resource_consumers_onscreen>Select all units that are requesting resources on screen',
     ['decrease_game_speed'] = '<LOC key_desc_0079>Decrease game speed',
     ['increase_game_speed'] = '<LOC key_desc_0080>Increase game speed',
     ['reset_game_speed'] = '<LOC key_desc_0081>Reset game speed to 0 (Normal Speed)',
@@ -508,6 +510,14 @@ keyDescriptions = {
     ['set_target_priority'] = '<LOC key_desc_set_target_priority>Prioritize unit type',
     ['shift_set_target_priority'] = '<LOC key_desc_shift_set_target_priority>Prioritize unit type',
     ['set_default_target_priority'] = 'Set weapon target priorities of selected units to their defaults',
+    ['cap'] = '<LOC key_desc_cap>Cap the unit depending on the game options',
+    ['shift_cap'] = '<LOC key_desc_cap>Cap the unit depending on the game options',
+
+    ['upgrade_structure'] = '<LOC key_desc_upgrade_structure>Upgrade a structure',
+    ['shift_upgrade_structure'] = '<LOC key_desc_shift_upgrade_structure>Upgrade a structure',
+
+    ['upgrade_structure_pause'] = '<LOC key_desc_upgrade_structure_pause>Upgrade a structure and pause it',
+    ['shift_upgrade_structure_pause'] = '<LOC key_desc_shift_upgrade_structure_pause>Upgrade a structure and pause it',
 
     ['toggle_navui'] = 'Toggle the debugging UI for the navigational mesh',
     ['toggle_ai_reclaim_grid_ui'] = 'Toggle the debugging UI for the reclaim grid',

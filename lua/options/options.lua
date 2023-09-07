@@ -83,14 +83,14 @@ local savedBgMovie = nil
 local noMovieSwitchSet = HasCommandLineArg("/nomovie")
 
 function PlayTestSound()
-    local sound = Sound{ Bank = 'Interface', Cue = 'UI_Action_MouseDown' }
+    local sound = Sound { Bank = 'Interface', Cue = 'UI_Action_MouseDown' }
     PlaySound(sound)
 end
 
 local voiceHandle = nil
 function PlayTestVoice()
     if not voiceHandle then
-        local sound = Sound{ Bank = 'XGG', Cue = 'Computer_Computer_MissileLaunch_01351' }
+        local sound = Sound { Bank = 'XGG', Cue = 'Computer_Computer_MissileLaunch_01351' }
         ForkThread(
             function()
                 WaitSeconds(0.5)
@@ -164,6 +164,7 @@ local function getMusicVolumeOption()
 
     end
 end
+
 options = {
     gameplay = {
         title = "<LOC _Gameplay>",
@@ -183,13 +184,13 @@ options = {
                 key = 'screen_edge_pans_main_view',
                 type = 'toggle',
                 default = 1,
-                set = function(key,value,startup)
+                set = function(key, value, startup)
                     ConExecute("ui_ScreenEdgeScrollView " .. tostring(value))
                 end,
                 custom = {
                     states = {
-                        {text = "<LOC _Off>", key = 0 },
-                        {text = "<LOC _On>", key = 1 },
+                        { text = "<LOC _Off>", key = 0 },
+                        { text = "<LOC _On>", key = 1 },
                     },
                 },
             },
@@ -198,7 +199,7 @@ options = {
                 key = 'wheel_sensitivity',
                 type = 'slider',
                 default = 40,
-                set = function(key,value,startup)
+                set = function(key, value, startup)
                     ConExecute("cam_ZoomAmount " .. tostring(value / 100))
                 end,
                 custom = {
@@ -212,7 +213,7 @@ options = {
                 key = 'keyboard_pan_speed',
                 type = 'slider',
                 default = 90,
-                set = function(key,value,startup)
+                set = function(key, value, startup)
                     ConExecute("ui_KeyboardPanSpeed " .. tostring(value))
                 end,
                 custom = {
@@ -226,7 +227,7 @@ options = {
                 key = 'keyboard_pan_accelerate_multiplier',
                 type = 'slider',
                 default = 4,
-                set = function(key,value,startup)
+                set = function(key, value, startup)
                     ConExecute("ui_KeyboardPanAccelerateMultiplier " .. tostring(value))
                 end,
                 custom = {
@@ -240,7 +241,7 @@ options = {
                 key = 'keyboard_rotate_speed',
                 type = 'slider',
                 default = 10,
-                set = function(key,value,startup)
+                set = function(key, value, startup)
                     ConExecute("ui_KeyboardRotateSpeed " .. tostring(value))
                 end,
                 custom = {
@@ -254,7 +255,7 @@ options = {
                 key = 'keyboard_rotate_accelerate_multiplier',
                 type = 'slider',
                 default = 2,
-                set = function(key,value,startup)
+                set = function(key, value, startup)
                     ConExecute("ui_KeyboardRotateAccelerateMultiplier " .. tostring(value))
                 end,
                 custom = {
@@ -282,13 +283,13 @@ options = {
                 key = 'arrow_keys_pan_main_view',
                 type = 'toggle',
                 default = 1,
-                set = function(key,value,startup)
+                set = function(key, value, startup)
                     ConExecute("ui_ArrowKeysScrollView " .. tostring(value))
                 end,
                 custom = {
                     states = {
-                        {text = "<LOC _Off>", key = 0 },
-                        {text = "<LOC _On>", key = 1 },
+                        { text = "<LOC _Off>", key = 0 },
+                        { text = "<LOC _On>", key = 1 },
                     },
                 },
             },
@@ -297,7 +298,7 @@ options = {
                 title = "<LOC OPTIONS_CAMERA_SHAKE>Shake intensity",
                 key = 'camera_shake_intensity',
                 type = 'slider',
-                set = function(key,value,startup)
+                set = function(key, value, startup)
                     ConExecute("cam_ShakeMult " .. tostring(0.01 * value))
                 end,
                 default = 100,
@@ -322,12 +323,12 @@ options = {
                 key = 'accept_build_templates',
                 type = 'toggle',
                 default = 'yes',
-                set = function(key,value,startup)
+                set = function(key, value, startup)
                 end,
                 custom = {
                     states = {
-                        {text = "<LOC _On>", key = 'yes' },
-                        {text = "<LOC _Off>", key = 'no' },
+                        { text = "<LOC _On>", key = 'yes' },
+                        { text = "<LOC _Off>", key = 'no' },
                     },
                 },
             },
@@ -339,8 +340,8 @@ options = {
                 default = 0,
                 custom = {
                     states = {
-                        {text = "<LOC _Off>", key = 0 },
-                        {text = "<LOC _On>", key = 1 },
+                        { text = "<LOC _Off>", key = 0 },
+                        { text = "<LOC _On>", key = 1 },
                     },
                 },
             },
@@ -352,8 +353,8 @@ options = {
                 default = 1,
                 custom = {
                     states = {
-                        {text = "<LOC _Off>", key = 0 },
-                        {text = "<LOC _On>", key = 1 },
+                        { text = "<LOC _Off>", key = 0 },
+                        { text = "<LOC _On>", key = 1 },
                     },
                 },
             },
@@ -365,8 +366,8 @@ options = {
                 default = 0,
                 custom = {
                     states = {
-                        {text = "<LOC _Off>", key = 0 },
-                        {text = "<LOC _On>", key = 1 },
+                        { text = "<LOC _Off>", key = 0 },
+                        { text = "<LOC _On>", key = 1 },
                     },
                 },
             },
@@ -378,8 +379,8 @@ options = {
                 default = 0,
                 custom = {
                     states = {
-                        {text = "<LOC _Off>", key = 0 },
-                        {text = "<LOC _On>", key = 1 },
+                        { text = "<LOC _Off>", key = 0 },
+                        { text = "<LOC _On>", key = 1 },
                     },
                 },
             },
@@ -412,8 +413,8 @@ options = {
                 default = 'Off',
                 custom = {
                     states = {
-                        {text = "<LOC _Off>Off", key = 'Off' },
-                        {text = "<LOC _On>On", key = 'On' },
+                        { text = "<LOC _Off>Off", key = 'Off' },
+                        { text = "<LOC _On>On", key = 'On' },
                     },
                 },
             },
@@ -425,8 +426,8 @@ options = {
                 default = 'Off',
                 custom = {
                     states = {
-                        {text = "<LOC _Off>Off", key = 'Off' },
-                        {text = "<LOC _On>On", key = 'On' },
+                        { text = "<LOC _Off>Off", key = 'Off' },
+                        { text = "<LOC _On>On", key = 'On' },
                     },
                 },
             },
@@ -438,10 +439,10 @@ options = {
                 default = 'translate-zoom',
                 custom = {
                     states = {
-                        {text = "<LOC selectionsets0008>Do nothing", key = 'none' },
-                        {text = "<LOC selectionsets0009>Only translate", key = 'translate' },
-                        {text = "<LOC selectionsets00010>Translate, zoom only out", key = 'translate-zoom-out-only' },
-                        {text = "<LOC selectionsets00011>Translate and zoom", key = 'translate-zoom' },
+                        { text = "<LOC selectionsets0008>Do nothing", key = 'none' },
+                        { text = "<LOC selectionsets0009>Only translate", key = 'translate' },
+                        { text = "<LOC selectionsets00010>Translate, zoom only out", key = 'translate-zoom-out-only' },
+                        { text = "<LOC selectionsets00011>Translate and zoom", key = 'translate-zoom' },
                     },
                 },
             },
@@ -487,8 +488,8 @@ options = {
                 default = 'Off',
                 custom = {
                     states = {
-                        {text = "<LOC _Off>",                                               key = 'Off'},
-                        {text = "<LOC ASSIST_TO_UPGRADE_MASS_TECH1>Only tech 1 extractors", key = 'Tech1Extractors'},
+                        { text = "<LOC _Off>", key = 'Off' },
+                        { text = "<LOC ASSIST_TO_UPGRADE_MASS_TECH1>Only tech 1 extractors", key = 'Tech1Extractors' },
                     },
                 },
             },
@@ -500,9 +501,10 @@ options = {
                 default = 'Off',
                 custom = {
                     states = {
-                        {text = "<LOC _Off>Off",                                                                key = 'Off'},
-                        {text = "<LOC _ASSIST_TO_UNPAUSE_EXTRACTORS_AND_RADARS>Only extractors and radars",     key = 'ExtractorsAndRadars'},
-                        {text = "<LOC _On>On",                                                                  key = 'On'},
+                        { text = "<LOC _Off>Off", key = 'Off' },
+                        { text = "<LOC _ASSIST_TO_UNPAUSE_EXTRACTORS_AND_RADARS>Only extractors and radars",
+                            key = 'ExtractorsAndRadars' },
+                        { text = "<LOC _On>On", key = 'On' },
                     },
                 },
             },
@@ -514,21 +516,86 @@ options = {
                 default = 'Off',
                 custom = {
                     states = {
-                        {text = "<LOC _Off>", key = 'Off'},
-                        {text = "<LOC _On>", key = 'On'},
+                        { text = "<LOC _Off>", key = 'Off' },
+                        { text = "<LOC _On>", key = 'On' },
                     },
                 },
             },
 
             {
-                title = "<LOC OPTIONS_0273>Right click to ring extractors with storages",
+                title = "<LOC structure_ringing_extractor_title>Assist to cap extractors with storages",
                 key = 'structure_capping_feature_01',
                 type = 'toggle',
                 default = "on",
+                set = function(key, value, startup)
+                    if GetCurrentUIState() == 'game' then
+                        import("/lua/ui/game/hotkeys/capping.lua").RingStorages = value == 'on' or value == 'on-inner' or value == 'on-all'
+                        import("/lua/ui/game/hotkeys/capping.lua").RingFabricatorsInner = value == 'on-inner'
+                        import("/lua/ui/game/hotkeys/capping.lua").RingFabricatorsAll = value == 'on-all'
+                    end
+                end,
                 custom = {
                     states = {
-                        {text = "<LOC _Off>Off",    key = "off"},
-                        {text = "<LOC _On>On",     key = "on"} -- only-storages-extractors full-suite
+                        { text = "<LOC _Off>Off", key = "off" },
+                        { text = "<LOC options_structure_capping_feature_01>Mass storages", key = "on" },
+                        { text = "<LOC options_structure_capping_feature_02>Mass storages and inner fabricators",
+                            key = "on-inner" },
+                        { text = "<LOC options_structure_capping_feature_03>Mass storages and all fabricators",
+                            key = "on-all" },
+                    },
+                },
+            },
+
+            {
+                title = "<LOC structure_ringing_radar_title>Assist to cap radar with power",
+                key = 'structure_ringing_radar',
+                type = 'toggle',
+                default = "on",
+                set = function(key, value, startup)
+                    if GetCurrentUIState() == 'game' then
+                        import("/lua/ui/game/hotkeys/capping.lua").RingRadars = value == 'on'
+                    end
+                end,
+                custom = {
+                    states = {
+                        { text = "<LOC _Off>Off", key = "off" },
+                        { text = "<LOC _On>On", key = "on" },
+                    },
+                },
+            },
+
+            {
+                title = "<LOC structure_ringing_artillery_title>Assist to cap tech 2 artillery with power",
+                key = 'structure_ringing_artillery',
+                type = 'toggle',
+                default = "on",
+                set = function(key, value, startup)
+                    if GetCurrentUIState() == 'game' then
+                        import("/lua/ui/game/hotkeys/capping.lua").RingArtillery = value == 'on'
+                    end
+                end,
+                custom = {
+                    states = {
+                        { text = "<LOC _Off>Off", key = "off" },
+                        { text = "<LOC _On>On", key = "on" },
+                    },
+                },
+            },
+
+            {
+                title = "<LOC structure_ringing_artillery_title>Assist to cap end game artillery with power",
+                key = 'structure_ringing_artillery_end_game',
+                type = 'toggle',
+                default = "on",
+                set = function(key, value, startup)
+                    if GetCurrentUIState() == 'game' then
+                        import("/lua/ui/game/hotkeys/capping.lua").RingArtilleryT3Exp = value == 'on'
+                    end
+                end,
+                custom = {
+                    states = {
+                        { text = "<LOC _Off>Off", key = "off" },
+                        { text = "<LOC _On>On", key = "on" },
                     },
                 },
             },
@@ -540,8 +607,8 @@ options = {
                 default = 'Off',
                 custom = {
                     states = {
-                        {text = "<LOC _Off>Off", key = 'Off'},
-                        {text = "<LOC _On>On", key = 'On'},
+                        { text = "<LOC _Off>Off", key = 'Off' },
+                        { text = "<LOC _On>On", key = 'On' },
                     },
                 },
             },
@@ -562,8 +629,8 @@ options = {
                 default = 0,
                 custom = {
                     states = {
-                        {text = "<LOC _Off>", key = 0 },
-                        {text = "<LOC _On>", key = 1 },
+                        { text = "<LOC _Off>", key = 0 },
+                        { text = "<LOC _On>", key = 1 },
                     },
                 },
             },
@@ -575,8 +642,8 @@ options = {
                 default = 0,
                 custom = {
                     states = {
-                        {text = "<LOC _Off>", key = 0 },
-                        {text = "<LOC _On>", key = 1 },
+                        { text = "<LOC _Off>", key = 0 },
+                        { text = "<LOC _On>", key = 1 },
                     },
                 },
             },
@@ -587,8 +654,8 @@ options = {
                 default = 0,
                 custom = {
                     states = {
-                        {text = "<LOC _Off>", key = 0 },
-                        {text = "<LOC _On>", key = 1 },
+                        { text = "<LOC _Off>", key = 0 },
+                        { text = "<LOC _On>", key = 1 },
                     },
                 },
             },
@@ -642,13 +709,13 @@ options = {
                 default = 'off',
                 custom = {
                     states = {
-                        {text = "<LOC _Off>Off", key = 'off'},
-                        {text = "<LOC _OnlyWhenBuilding>Only when building", key = 'building' },
-                        {text = "<LOC _CommandMode>When you issue commands", key = 'commands' },
-                        {text = "<LOC _On>On", key = 'on' },
+                        { text = "<LOC _Off>Off", key = 'off' },
+                        { text = "<LOC _OnlyWhenBuilding>Only when building", key = 'building' },
+                        { text = "<LOC _CommandMode>When you issue commands", key = 'commands' },
+                        { text = "<LOC _On>On", key = 'on' },
                     },
                 },
-                set = function(key,value,startup)
+                set = function(key, value, startup)
                     if GetCurrentUIState() == 'game' then
                         import("/lua/ui/game/cursor/depth.lua").UpdatePreferenceOption(value)
                     end
@@ -662,11 +729,11 @@ options = {
                 default = 'off',
                 custom = {
                     states = {
-                        {text = "<LOC _Off>Off", key = 'off'},
-                        {text = "<LOC _On>On", key = 'on' },
+                        { text = "<LOC _Off>Off", key = 'off' },
+                        { text = "<LOC _On>On", key = 'on' },
                     },
                 },
-                set = function(key,value,startup)
+                set = function(key, value, startup)
                     if GetCurrentUIState() == 'game' then
                         import("/lua/ui/game/cursor/hover.lua").UpdatePreferenceOption(value)
                     end
@@ -680,8 +747,8 @@ options = {
                 default = 'off',
                 custom = {
                     states = {
-                        {text = "<LOC _Off>", key = 'off'},
-                        {text = "<LOC _On>", key = 'on'},
+                        { text = "<LOC _Off>", key = 'off' },
+                        { text = "<LOC _On>", key = 'on' },
                     },
                 },
             },
@@ -708,8 +775,8 @@ options = {
                 default = false,
                 custom = {
                     states = {
-                        {text = "<LOC _On>", key = true},
-                        {text = "<LOC _Off>", key = false},
+                        { text = "<LOC _On>", key = true },
+                        { text = "<LOC _Off>", key = false },
                     },
                 },
             },
@@ -721,12 +788,12 @@ options = {
                 default = 1.0,
                 custom = {
                     states = {
-                        {text = "80%", key = 0.8,},
-                        {text = "100%", key = 1.0,},
-                        {text = "125%", key = 1.25,},
-                        {text = "150%", key = 1.5,},
-                        {text = "175%", key = 1.75,},
-                        {text = "200%", key = 2.0,},
+                        { text = "80%", key = 0.8, },
+                        { text = "100%", key = 1.0, },
+                        { text = "125%", key = 1.25, },
+                        { text = "150%", key = 1.5, },
+                        { text = "175%", key = 1.75, },
+                        { text = "200%", key = 2.0, },
                     },
                 },
             },
@@ -747,8 +814,8 @@ options = {
                 default = true,
                 custom = {
                     states = {
-                        {text = "<LOC _On>", key = true,},
-                        {text = "<LOC _Off>", key = false,},
+                        { text = "<LOC _On>", key = true, },
+                        { text = "<LOC _Off>", key = false, },
                     },
                 },
             },
@@ -757,12 +824,12 @@ options = {
                 key = 'show_attached_unit_lifebars',
                 type = 'toggle',
                 default = true,
-                set = function(key,value,startup)
+                set = function(key, value, startup)
                 end,
                 custom = {
                     states = {
-                        {text = "<LOC _Off>", key = false },
-                        {text = "<LOC _On>", key = true },
+                        { text = "<LOC _Off>", key = false },
+                        { text = "<LOC _On>", key = true },
                     },
                 },
             },
@@ -772,13 +839,13 @@ options = {
                 key = 'gui_render_enemy_lifebars',
                 type = 'toggle',
                 default = 0,
-                set = function(key,value,startup)
+                set = function(key, value, startup)
                     ConExecute("UI_ForceLifbarsOnEnemy " .. tostring(value))
                 end,
                 custom = {
                     states = {
-                        {text = "<LOC _Off>", key = 0 },
-                        {text = "<LOC _On>", key = 1 },
+                        { text = "<LOC _Off>", key = 0 },
+                        { text = "<LOC _On>", key = 1 },
                     },
                 },
             },
@@ -788,13 +855,13 @@ options = {
                 key = 'gui_render_custom_names',
                 type = 'toggle',
                 default = 0,
-                set = function(key,value,startup)
+                set = function(key, value, startup)
                     ConExecute("ui_RenderCustomNames " .. tostring(value))
                 end,
                 custom = {
                     states = {
-                        {text = "<LOC _Off>", key = 0 },
-                        {text = "<LOC _On>", key = 1 },
+                        { text = "<LOC _Off>", key = 0 },
+                        { text = "<LOC _On>", key = 1 },
                     },
                 },
             },
@@ -804,13 +871,13 @@ options = {
                 key = 'strat_icons_always_on',
                 type = 'toggle',
                 default = 0,
-                set = function(key,value,startup)
+                set = function(key, value, startup)
                     ConExecute("ui_AlwaysRenderStrategicIcons " .. tostring(value))
                 end,
                 custom = {
                     states = {
-                        {text = "<LOC _Off>", key = 0 },
-                        {text = "<LOC _On>", key = 1 },
+                        { text = "<LOC _Off>", key = 0 },
+                        { text = "<LOC _On>", key = 1 },
                     },
                 },
             },
@@ -822,8 +889,8 @@ options = {
                 default = 1,
                 custom = {
                     states = {
-                        {text = "<LOC _Off>", key = 0 },
-                        {text = "<LOC _On>", key = 1 },
+                        { text = "<LOC _Off>", key = 0 },
+                        { text = "<LOC _On>", key = 1 },
                     },
                 },
             },
@@ -868,9 +935,9 @@ options = {
                 default = 0,
                 custom = {
                     states = {
-                        {text = "<LOC _Off>", key = 0 },
-                        {text = "<LOC OPTIONS_0254>Bigger icons", key = 1 },
-                        {text = "<LOC OPTIONS_0255>Bigger icons with TechMarker", key = 2 },
+                        { text = "<LOC _Off>", key = 0 },
+                        { text = "<LOC OPTIONS_0254>Bigger icons", key = 1 },
+                        { text = "<LOC OPTIONS_0255>Bigger icons with TechMarker", key = 2 },
                     },
                 },
             },
@@ -881,8 +948,8 @@ options = {
                 default = 0,
                 custom = {
                     states = {
-                        {text = "<LOC _Off>", key = 0 },
-                        {text = "<LOC _On>", key = 1 },
+                        { text = "<LOC _Off>", key = 0 },
+                        { text = "<LOC _On>", key = 1 },
                     },
                 },
             },
@@ -893,8 +960,8 @@ options = {
                 default = true,
                 custom = {
                     states = {
-                        {text = "<LOC _On>", key = true},
-                        {text = "<LOC _Off>", key = false},
+                        { text = "<LOC _On>", key = true },
+                        { text = "<LOC _Off>", key = false },
                     },
                 },
             },
@@ -905,8 +972,8 @@ options = {
                 default = 1,
                 custom = {
                     states = {
-                        {text = "<LOC _Off>", key = 0 },
-                        {text = "<LOC _On>", key = 1 },
+                        { text = "<LOC _Off>", key = 0 },
+                        { text = "<LOC _On>", key = 1 },
                     },
                 },
             },
@@ -916,9 +983,9 @@ options = {
                 type = 'slider',
                 default = 1100,
                 custom = {
-                  min = 100,
-                  max = 5000,
-                  inc = 100,
+                    min = 100,
+                    max = 5000,
+                    inc = 100,
                 },
             },
 
@@ -938,8 +1005,8 @@ options = {
                 default = true,
                 custom = {
                     states = {
-                        {text = "<LOC _On>", key = true},
-                        {text = "<LOC _Off>", key = false},
+                        { text = "<LOC _On>", key = true },
+                        { text = "<LOC _Off>", key = false },
                     },
                 },
             },
@@ -948,7 +1015,7 @@ options = {
                 key = 'tooltip_delay',
                 type = 'slider',
                 default = 0,
-                set = function(key,value,startup)
+                set = function(key, value, startup)
                 end,
                 custom = {
                     min = 0,
@@ -961,12 +1028,12 @@ options = {
                 key = 'skin_change_on_start',
                 type = 'toggle',
                 default = 'yes',
-                set = function(key,value,startup)
+                set = function(key, value, startup)
                 end,
                 custom = {
                     states = {
-                        {text = "<LOC _On>", key = 'yes' },
-                        {text = "<LOC _Off>", key = 'no' },
+                        { text = "<LOC _On>", key = 'yes' },
+                        { text = "<LOC _Off>", key = 'no' },
                     },
                 },
             },
@@ -975,13 +1042,13 @@ options = {
                 key = 'faction_font_color',
                 type = 'toggle',
                 default = false,
-                set = function(key,value,startup)
-                    import('/lua/ui/uiutil.lua').UpdateCurrentSkin({faction_font_color = value})
+                set = function(key, value, startup)
+                    import('/lua/ui/uiutil.lua').UpdateCurrentSkin({ faction_font_color = value })
                 end,
                 custom = {
                     states = {
-                        {text = "<LOC _On>", key = true},
-                        {text = "<LOC _Off>", key = false},
+                        { text = "<LOC _On>", key = true },
+                        { text = "<LOC _Off>", key = false },
                     },
                 },
             },
@@ -992,8 +1059,8 @@ options = {
                 default = true,
                 custom = {
                     states = {
-                        {text = "<LOC _On>", key = true,},
-                        {text = "<LOC _Off>", key = false,},
+                        { text = "<LOC _On>", key = true, },
+                        { text = "<LOC _Off>", key = false, },
                     },
                 },
             },
@@ -1015,8 +1082,8 @@ options = {
                 default = 0,
                 custom = {
                     states = {
-                        {text = "<LOC _Off>", key = 0 },
-                        {text = "<LOC _On>", key = 1 },
+                        { text = "<LOC _Off>", key = 0 },
+                        { text = "<LOC _On>", key = 1 },
                     },
                 },
             },
@@ -1027,8 +1094,8 @@ options = {
                 default = 0,
                 custom = {
                     states = {
-                        {text = "<LOC _Off>", key = 0 },
-                        {text = "<LOC _On>", key = 1 },
+                        { text = "<LOC _Off>", key = 0 },
+                        { text = "<LOC _On>", key = 1 },
                     },
                 },
             },
@@ -1038,14 +1105,14 @@ options = {
                 key = 'uvd_format',
                 type = 'toggle',
                 default = 'full',
-                set = function(key,value,startup)
+                set = function(key, value, startup)
                     -- needs logic to set priority (do we really want to do this though?)
                 end,
                 custom = {
                     states = {
-                        {text = "<LOC _Full>", key = 'full'},
-                        {text = "<LOC _Limited>", key = 'limited'},
-                        {text = "<LOC _Off>", key = 'off'},
+                        { text = "<LOC _Full>", key = 'full' },
+                        { text = "<LOC _Limited>", key = 'limited' },
+                        { text = "<LOC _Off>", key = 'off' },
                     },
                 },
             },
@@ -1056,8 +1123,8 @@ options = {
                 default = 1,
                 custom = {
                     states = {
-                        {text = "<LOC _Off>", key = 0 },
-                        {text = "<LOC _On>", key = 1 },
+                        { text = "<LOC _Off>", key = 0 },
+                        { text = "<LOC _On>", key = 1 },
                     },
                 },
             },
@@ -1068,9 +1135,9 @@ options = {
                 default = 'only-obs',
                 custom = {
                     states = {
-                        {text = "<LOC _Off>Off", key = 'off' },
-                        {text = "<LOC _Obs>Only when observing", key = 'only-obs' },
-                        {text = "<LOC _Always>Always", key = 'always' },
+                        { text = "<LOC _Off>Off", key = 'off' },
+                        { text = "<LOC _Obs>Only when observing", key = 'only-obs' },
+                        { text = "<LOC _Always>Always", key = 'always' },
                     },
                 },
             },
@@ -1089,9 +1156,9 @@ options = {
                 key = 'mainmenu_bgmovie',
                 type = 'toggle',
                 default = true,
-                set = function(key,value,startup)
+                set = function(key, value, startup)
                 end,
-                init = function ()
+                init = function()
                     savedBgMovie = Prefs.GetOption("mainmenu_bgmovie")
                 end,
                 custom = {
@@ -1117,8 +1184,8 @@ options = {
                 default = true,
                 custom = {
                     states = {
-                        {text = "<LOC _On>", key = true},
-                        {text = "<LOC _Off>", key = false},
+                        { text = "<LOC _On>", key = true },
+                        { text = "<LOC _Off>", key = false },
                     },
                 },
             },
@@ -1128,12 +1195,12 @@ options = {
                 key = 'quick_exit',
                 type = 'toggle',
                 default = 'false',
-                set = function(key,value,startup)
+                set = function(key, value, startup)
                 end,
                 custom = {
                     states = {
-                        {text = "<LOC _On>", key = 'true'},
-                        {text = "<LOC _Off>", key = 'false'},
+                        { text = "<LOC _On>", key = 'true' },
+                        { text = "<LOC _Off>", key = 'false' },
                     },
                 },
             },
@@ -1143,13 +1210,13 @@ options = {
                 key = 'mp_taunt_head_enabled',
                 type = 'toggle',
                 default = 'true',
-                set = function(key,value,startup)
+                set = function(key, value, startup)
                     -- needs logic to set priority (do we really want to do this though?)
                 end,
                 custom = {
                     states = {
-                        {text = "<LOC _On>", key = 'true'},
-                        {text = "<LOC _Off>", key = 'false'},
+                        { text = "<LOC _On>", key = 'true' },
+                        { text = "<LOC _Off>", key = 'false' },
                     },
                 },
             },
@@ -1170,9 +1237,9 @@ options = {
                 default = 18,
                 custom = {
                     states = {
-                        {text = "<LOC _Off>", key = false},
-                        {text = "<LOC CTRL>Use CTRL ", key = 17},
-                        {text = "<LOC ALT>Use ALT", key = 18},
+                        { text = "<LOC _Off>", key = false },
+                        { text = "<LOC CTRL>Use CTRL ", key = 17 },
+                        { text = "<LOC ALT>Use ALT", key = 18 },
                     },
                 },
             },
@@ -1184,8 +1251,8 @@ options = {
                 default = 'off',
                 custom = {
                     states = {
-                        {text = "<LOC _On>", key = 'on'},
-                        {text = "<LOC _Off>", key = 'off'},
+                        { text = "<LOC _On>", key = 'on' },
+                        { text = "<LOC _Off>", key = 'off' },
                     },
                 },
 
@@ -1211,7 +1278,7 @@ options = {
                     -- this is a bit odd, but the value of the primary determines how to populate the value of the secondary
                     ConExecute("SC_SecondaryAdapter " .. tostring('windowed' == value))
                 end,
-                update = function(control,value)
+                update = function(control, value)
                     ConExecute("SC_SecondaryAdapter " .. tostring('windowed' == value))
                 end,
                 ignore = function(value)
@@ -1219,7 +1286,7 @@ options = {
                         return '1024,768,60'
                     end
                 end,
-                set = function(key,value,startup)
+                set = function(key, value, startup)
                     if not startup then
                         ConExecute("SC_PrimaryAdapter " .. tostring(value))
                     end
@@ -1231,7 +1298,7 @@ options = {
                         { text = "<LOC OPTIONS_0070>Windowed", key = 'windowed' },
                         -- the remaining values are populated at runtime from device caps
                         -- what follows is just an example of the data which will be encountered
-                        { text =  "1024x768(60)", key = '1024,768,60' },
+                        { text = "1024x768(60)", key = '1024,768,60' },
                         { text = "1152x864(60)", key = '1152,864,60' },
                         { text = "1280x768(60)", key = '1280,768,60' },
                         { text = "1280x800(60)", key = '1280,800,60' },
@@ -1256,7 +1323,7 @@ options = {
                         { text = "<LOC _Disabled>", key = 'disabled' },
                         -- the remaining values are populated at runtime from device caps
                         -- what follows is just an example of the data which will be encountered
-                        { text =  "1024x768(60)", key = '1024,768,60' },
+                        { text = "1024x768(60)", key = '1024,768,60' },
                         { text = "1152x864(60)", key = '1152,864,60' },
                         { text = "1280x768(60)", key = '1280,768,60' },
                         { text = "1280x800(60)", key = '1280,800,60' },
@@ -1269,13 +1336,13 @@ options = {
                 key = 'lock_fullscreen_cursor_to_window',
                 type = 'toggle',
                 default = 0,
-                set = function(key,value,startup)
+                set = function(key, value, startup)
                     ConExecute("SC_ToggleCursorClip " .. tostring(value))
                 end,
                 custom = {
                     states = {
-                        {text = "<LOC _Off>", key = 0 },
-                        {text = "<LOC _On>", key = 1 },
+                        { text = "<LOC _Off>", key = 0 },
+                        { text = "<LOC _On>", key = 1 },
                     },
                 },
             },
@@ -1284,7 +1351,7 @@ options = {
                 key = 'fidelity_presets',
                 type = 'toggle',
                 default = 4,
-                update = function(control,value)
+                update = function(control, value)
                     logic = import("/lua/options/optionslogic.lua")
 
                     aaoptions = GetAntiAliasingOptions()
@@ -1293,45 +1360,45 @@ options = {
                     aamed = 0
                     if 0 < table.getn(aaoptions) then
                         aahigh = aaoptions[table.getn(aaoptions)]
-                        aamed = aaoptions[math.ceil(table.getn(aaoptions)/2)]
+                        aamed = aaoptions[math.ceil(table.getn(aaoptions) / 2)]
                     end
 
                     if 0 == value then
-                        logic.SetValue('fidelity',0,true)
-                        logic.SetValue('shadow_quality',0,true)
-                        logic.SetValue('texture_level',2,true)
-                        logic.SetValue('antialiasing',0,true)
-                        logic.SetValue('level_of_detail',0,true)
-                        logic.SetValue('bloom_render',0,true)
-                        logic.SetValue('render_skydome',0,true)
+                        logic.SetValue('fidelity', 0, true)
+                        logic.SetValue('shadow_quality', 0, true)
+                        logic.SetValue('texture_level', 2, true)
+                        logic.SetValue('antialiasing', 0, true)
+                        logic.SetValue('level_of_detail', 0, true)
+                        logic.SetValue('bloom_render', 0, true)
+                        logic.SetValue('render_skydome', 0, true)
                     elseif 1 == value then
-                        logic.SetValue('fidelity',1,true)
-                        logic.SetValue('shadow_quality',1,true)
-                        logic.SetValue('texture_level',1,true)
-                        logic.SetValue('antialiasing',0,true)
-                        logic.SetValue('level_of_detail',1,true)
-                        logic.SetValue('bloom_render',0,true)
-                        logic.SetValue('render_skydome',1,true)
+                        logic.SetValue('fidelity', 1, true)
+                        logic.SetValue('shadow_quality', 1, true)
+                        logic.SetValue('texture_level', 1, true)
+                        logic.SetValue('antialiasing', 0, true)
+                        logic.SetValue('level_of_detail', 1, true)
+                        logic.SetValue('bloom_render', 0, true)
+                        logic.SetValue('render_skydome', 1, true)
                     elseif 2 == value then
-                        logic.SetValue('fidelity',2,true)
-                        logic.SetValue('shadow_quality',2,true)
-                        logic.SetValue('texture_level',0,true)
-                        logic.SetValue('antialiasing',aamed,true)
-                        logic.SetValue('level_of_detail',2,true)
-                        logic.SetValue('bloom_render',0,true)
-                        logic.SetValue('render_skydome',1,true)
+                        logic.SetValue('fidelity', 2, true)
+                        logic.SetValue('shadow_quality', 2, true)
+                        logic.SetValue('texture_level', 0, true)
+                        logic.SetValue('antialiasing', aamed, true)
+                        logic.SetValue('level_of_detail', 2, true)
+                        logic.SetValue('bloom_render', 0, true)
+                        logic.SetValue('render_skydome', 1, true)
                     elseif 3 == value then
-                        logic.SetValue('fidelity',2,true)
-                        logic.SetValue('shadow_quality',3,true)
-                        logic.SetValue('texture_level',0,true)
-                        logic.SetValue('antialiasing',aahigh,true)
-                        logic.SetValue('level_of_detail',2,true)
-                        logic.SetValue('bloom_render',0,true)
-                        logic.SetValue('render_skydome',1,true)
+                        logic.SetValue('fidelity', 2, true)
+                        logic.SetValue('shadow_quality', 3, true)
+                        logic.SetValue('texture_level', 0, true)
+                        logic.SetValue('antialiasing', aahigh, true)
+                        logic.SetValue('level_of_detail', 2, true)
+                        logic.SetValue('bloom_render', 0, true)
+                        logic.SetValue('render_skydome', 1, true)
                     else
                     end
                 end,
-                set = function(key,value,startup)
+                set = function(key, value, startup)
                 end,
                 custom = {
                     states = {
@@ -1348,16 +1415,16 @@ options = {
                 key = 'render_skydome',
                 type = 'toggle',
                 default = 1,
-                update = function(control,value)
-                    import("/lua/options/optionslogic.lua").SetValue('fidelity_presets',4,true)
+                update = function(control, value)
+                    import("/lua/options/optionslogic.lua").SetValue('fidelity_presets', 4, true)
                 end,
-                set = function(key,value,startup)
+                set = function(key, value, startup)
                     ConExecute("ren_Skydome " .. tostring(value))
                 end,
                 custom = {
                     states = {
-                        {text = "<LOC _Off>", key = 0 },
-                        {text = "<LOC _On>", key = 1 },
+                        { text = "<LOC _Off>", key = 0 },
+                        { text = "<LOC _On>", key = 1 },
                     },
                 },
             },
@@ -1372,8 +1439,8 @@ options = {
                 end,
                 custom = {
                     states = {
-                        {text = "<LOC _On>", key = true},
-                        {text = "<LOC _Off>", key = false},
+                        { text = "<LOC _On>", key = true },
+                        { text = "<LOC _Off>", key = false },
                     },
                 },
             },
@@ -1382,17 +1449,17 @@ options = {
                 key = 'fidelity',
                 type = 'toggle',
                 default = 1,
-                update = function(control,value)
-                    import("/lua/options/optionslogic.lua").SetValue('fidelity_presets',4,true)
+                update = function(control, value)
+                    import("/lua/options/optionslogic.lua").SetValue('fidelity_presets', 4, true)
                 end,
-                set = function(key,value,startup)
+                set = function(key, value, startup)
                     ConExecute("graphics_Fidelity " .. tostring(value))
                 end,
                 custom = {
                     states = {
-                        {text = "<LOC _Low>", key = 0},
-                        {text = "<LOC _Medium>", key = 1},
-                        {text = "<LOC _High>", key = 2},
+                        { text = "<LOC _Low>", key = 0 },
+                        { text = "<LOC _Medium>", key = 1 },
+                        { text = "<LOC _High>", key = 2 },
                     },
                 },
             },
@@ -1401,18 +1468,18 @@ options = {
                 key = 'shadow_quality',
                 type = 'toggle',
                 default = 1,
-                update = function(control,value)
-                    import("/lua/options/optionslogic.lua").SetValue('fidelity_presets',4,true)
+                update = function(control, value)
+                    import("/lua/options/optionslogic.lua").SetValue('fidelity_presets', 4, true)
                 end,
-                set = function(key,value,startup)
+                set = function(key, value, startup)
                     ConExecute("shadow_Fidelity " .. tostring(value))
                 end,
                 custom = {
                     states = {
-                        {text = "<LOC _Off>", key = 0},
-                        {text = "<LOC _Low>", key = 1},
-                        {text = "<LOC _Medium>", key = 2},
-                        {text = "<LOC _High>", key = 3},
+                        { text = "<LOC _Off>", key = 0 },
+                        { text = "<LOC _Low>", key = 1 },
+                        { text = "<LOC _Medium>", key = 2 },
+                        { text = "<LOC _High>", key = 3 },
                     },
                 },
             },
@@ -1421,23 +1488,23 @@ options = {
                 key = 'antialiasing',
                 type = 'toggle',
                 default = 0,
-                update = function(control,value)
-                    import("/lua/options/optionslogic.lua").SetValue('fidelity_presets',4,true)
+                update = function(control, value)
+                    import("/lua/options/optionslogic.lua").SetValue('fidelity_presets', 4, true)
                 end,
-                set = function(key,value,startup)
+                set = function(key, value, startup)
                     if not startup then
                         ConExecute("SC_AntiAliasingSamples " .. tostring(value))
                     end
                 end,
                 custom = {
                     states = {
-                        {text = "<LOC OPTIONS_0029>Off", key = 0},
+                        { text = "<LOC OPTIONS_0029>Off", key = 0 },
                         -- the remaining values are populated at runtime from device caps
                         -- what follows is just an example of the data which will be encountered
-                        {text =  "2", key =  2},
-                        {text =  "4", key =  4},
-                        {text =  "8", key =  8},
-                        {text = "16", key = 16},
+                        { text = "2", key = 2 },
+                        { text = "4", key = 4 },
+                        { text = "8", key = 8 },
+                        { text = "16", key = 16 },
                     },
                 },
             },
@@ -1446,10 +1513,10 @@ options = {
                 key = 'texture_level',
                 type = 'toggle',
                 default = 1,
-                update = function(control,value)
-                    import("/lua/options/optionslogic.lua").SetValue('fidelity_presets',4,true)
+                update = function(control, value)
+                    import("/lua/options/optionslogic.lua").SetValue('fidelity_presets', 4, true)
                 end,
-                set = function(key,value,startup)
+                set = function(key, value, startup)
                     ConExecute("ren_MipSkipLevels " .. tostring(value))
                 end,
                 custom = {
@@ -1465,10 +1532,10 @@ options = {
                 key = 'level_of_detail',
                 type = 'toggle',
                 default = 1,
-                update = function(control,value)
-                    import("/lua/options/optionslogic.lua").SetValue('fidelity_presets',4,true)
+                update = function(control, value)
+                    import("/lua/options/optionslogic.lua").SetValue('fidelity_presets', 4, true)
                 end,
-                set = function(key,value,startup)
+                set = function(key, value, startup)
                     ConExecute("SC_CameraScaleLOD " .. tostring(value))
                 end,
                 custom = {
@@ -1484,15 +1551,15 @@ options = {
                 key = 'vsync',
                 type = 'toggle',
                 default = 1,
-                set = function(key,value,startup)
+                set = function(key, value, startup)
                     if not startup then
                         ConExecute("SC_VerticalSync " .. tostring(value))
                     end
                 end,
                 custom = {
                     states = {
-                        {text = "<LOC _Off>", key = 0 },
-                        {text = "<LOC _On>", key = 1 },
+                        { text = "<LOC _Off>", key = 0 },
+                        { text = "<LOC _On>", key = 1 },
                     },
                 },
             },
@@ -1501,16 +1568,16 @@ options = {
                 key = 'bloom_render',
                 type = 'toggle',
                 default = 0,
-                update = function(control,value)
-                    import("/lua/options/optionslogic.lua").SetValue('fidelity_presets',4,true)
+                update = function(control, value)
+                    import("/lua/options/optionslogic.lua").SetValue('fidelity_presets', 4, true)
                 end,
-                set = function(key,value,startup)
+                set = function(key, value, startup)
                     ConExecute("ren_bloom " .. tostring(value))
                 end,
                 custom = {
                     states = {
-                        {text = "<LOC _Off>", key = 0 },
-                        {text = "<LOC _On>", key = 1 },
+                        { text = "<LOC _Off>", key = 0 },
+                        { text = "<LOC _On>", key = 1 },
                     },
                 },
             },
@@ -1534,10 +1601,10 @@ options = {
                         ConExecute("ren_BloomBlurKernelScale " .. tostring(savedBloomIntensity / 10))
                     end
                 end,
-                update = function(control,value)
+                update = function(control, value)
                     ConExecute("ren_BloomBlurKernelScale " .. tostring(value / 10))
                 end,
-                set = function(key,value,startup)
+                set = function(key, value, startup)
                     ConExecute("ren_BloomBlurKernelScale " .. tostring(value / 10))
                 end,
             },
@@ -1547,14 +1614,14 @@ options = {
                 key = 'experimental_graphics',
                 type = 'toggle',
                 default = 0,
-                update = function(control,value)
+                update = function(control, value)
                 end,
-                set = function(key,value,startup)
+                set = function(key, value, startup)
                 end,
                 custom = {
                     states = {
-                        {text = "<LOC _Off>", key = 0},
-                        {text = "<LOC _On>", key = 1},
+                        { text = "<LOC _Off>", key = 0 },
+                        { text = "<LOC _On>", key = 1 },
                     },
                 },
             },
@@ -1579,11 +1646,11 @@ options = {
                     end
                 end,
 
-                set = function(key,value,startup)
+                set = function(key, value, startup)
                     SetVolume("Global", value / 100)
-                    savedMasterVol = value/100
+                    savedMasterVol = value / 100
                 end,
-                update = function(control,value)
+                update = function(control, value)
                     SetVolume("Global", value / 100)
                 end,
                 custom = {
@@ -1609,13 +1676,13 @@ options = {
                     end
                 end,
 
-                set = function(key,value,startup)
+                set = function(key, value, startup)
                     SetVolume("World", value / 100)
                     SetVolume("Interface", value / 100)
-                    savedFXVol = value/100
+                    savedFXVol = value / 100
                 end,
 
-                update = function(control,value)
+                update = function(control, value)
                     SetVolume("World", value / 100)
                     SetVolume("Interface", value / 100)
                     PlayTestSound()
@@ -1644,11 +1711,11 @@ options = {
                     end
                 end,
 
-                set = function(key,value,startup)
+                set = function(key, value, startup)
                     SetVolume("VO", value / 100)
-                    savedVOVol = value/100
+                    savedVOVol = value / 100
                 end,
-                update = function(key,value)
+                update = function(key, value)
                     SetVolume("VO", value / 100)
                     PlayTestVoice()
                 end,

@@ -290,6 +290,13 @@ local keyActionsSelectionQuickSelect = {
     ['select_all_building_eng_onscreen'] = {
         action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").SelectAllBuildingEngineers(true)',
         category = 'selection',
+    },['select_all_resource_consumers'] = {
+        action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").SelectAllResourceConsumers()',
+        category = 'selection',
+    },
+    ['select_all_resource_consumers_onscreen'] = {
+        action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").SelectAllResourceConsumers(true)',
+        category = 'selection',
     },
     ['select_all_land_units_onscreen'] = {
         action = 'UI_SelectByCategory +inview +excludeengineers MOBILE LAND',
@@ -1667,13 +1674,43 @@ local keyactionsOrdersContextBased = {
     ['set_target_priority'] = {
         action = 'UI_LUA import("/lua/keymap/misckeyactions.lua").SetWeaponPrioritiesToUnitType()',
         category = 'ordersContextBased',
-        wikiURL = 'Play/Game/Hotkeys/OrdersMouseContext#cycle-templates'
+        wikiURL = 'Play/Game/Hotkeys/OrdersMouseContext#apply-target-priorities'
     },
     ['shift_set_target_priority'] = {
         action = 'UI_LUA import("/lua/keymap/misckeyactions.lua").SetWeaponPrioritiesToUnitType()',
         category = 'ordersContextBased',
-        wikiURL = 'Play/Game/Hotkeys/OrdersMouseContext#cycle-templates'
+        wikiURL = 'Play/Game/Hotkeys/OrdersMouseContext#apply-target-priorities'
     },
+
+    ['cap'] = {
+        action = 'UI_LUA import("/lua/ui/game/hotkeys/capping.lua").CapHotkey()',
+        category = 'ordersContextBased',
+    },
+
+    ['shift_cap'] = {
+        action = 'UI_LUA import("/lua/ui/game/hotkeys/capping.lua").CapHotkey()',
+        category = 'ordersContextBased',
+    },
+
+    ['upgrade_structure'] = { 
+        action = 'UI_LUA import("/lua/ui/game/hotkeys/upgrade-structure.lua").UpgradeStructure()',
+        category = 'ordersContextBased',
+    },
+
+    ['shift_upgrade_structure'] = { 
+        action = 'UI_LUA import("/lua/ui/game/hotkeys/upgrade-structure.lua").UpgradeStructure()',
+        category = 'ordersContextBased',
+    },
+
+    ['upgrade_structure_pause'] = { 
+        action = 'UI_LUA import("/lua/ui/game/hotkeys/upgrade-structure.lua").UpgradeStructure(true)',
+        category = 'ordersContextBased',
+    },
+
+    ['shift_upgrade_structure_pause'] = { 
+        action = 'UI_LUA import("/lua/ui/game/hotkeys/upgrade-structure.lua").UpgradeStructure(true)',
+        category = 'ordersContextBased',
+    }
 }
 
 ---@type table<string, UIKeyAction>

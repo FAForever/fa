@@ -754,7 +754,6 @@ end
 ---@param position Vector
 ---@param blueprintID string
 ---@param table number[] # A list of alternative build locations, similar to AiBrain.BuildStructure. Doesn't appear to function properly
----@return SimCommand
 function IssueBuildMobile(units, position, blueprintID, table)
 end
 
@@ -764,7 +763,6 @@ end
 ---@param position Vector
 ---@param blueprintID string
 ---@param table number[] # A list of alternative build locations, similar to AiBrain.BuildStructure. Doesn't appear to function properly
----@return SimCommand
 function IssueBuildAllMobile(units, position, blueprintID, table)
 end
 
