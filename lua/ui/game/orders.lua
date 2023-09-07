@@ -1282,23 +1282,23 @@ local function CreateAltOrders(availableOrders, availableToggles, units)
 
     local assistingUnitList = {}
     local podUnits = {}
-    local PodStagingPlatforms = EntityCategoryFilterDown(categories.PODSTAGINGPLATFORM, units)
-    local Pods = EntityCategoryFilterDown(categories.POD, units)
-    if not table.empty(units) and (not table.empty(PodStagingPlatforms) or not table.empty(Pods)) then
+    local podStagingPlatforms = EntityCategoryFilterDown(categories.PODSTAGINGPLATFORM, units)
+    local pods = EntityCategoryFilterDown(categories.POD, units)
+    if not table.empty(units) and (not table.empty(podStagingPlatforms) or not table.empty(pods)) then
         local assistingUnits = {}
-        if not table.empty(Pods) then
-            for _, pod in Pods do
+        if not table.empty(pods) then
+            for _, pod in pods do
                 table.insert(assistingUnits, pod:GetCreator())
             end
-            podUnits['DroneL'] = Pods
-        elseif not table.empty(PodStagingPlatforms) then
-            assistingUnits = GetAssistingUnitsList(PodStagingPlatforms)
+            podUnits['DroneL'] = pods
+        elseif not table.empty(podStagingPlatforms) then
+            assistingUnits = GetAssistingUnitsList(podStagingPlatforms)
             podUnits['DroneL'] = assistingUnits
         end
 
         
         if not table.empty(assistingUnits) then
-            if table.getn(PodStagingPlatforms) == 1 and table.empty(Pods) then
+            if table.getn(podStagingPlatforms) == 1 and table.empty(pods) then
                 table.insert(availableOrders, 'DroneL')
                 assistingUnitList['DroneL'] = {assistingUnits[1]}
                 if table.getn(assistingUnits) > 1 then
