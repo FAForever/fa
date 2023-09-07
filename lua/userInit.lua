@@ -162,11 +162,12 @@ do
 
     --- Opens a URL after the user confirms the link
     ---@param url string
-    _G.OpenURL = function(url)
+    _G.OpenURL = function(url, dialogParent)
         local UIUtil = import("/lua/ui/uiutil.lua")
 
+        if not dialogParent then dialogParent = GetFrame(0) end
         UIUtil.QuickDialog(
-            GetFrame(0),
+            dialogParent,
             string.format("You're about to open a browser to:\r\n\r\n%s", url),
             'Open browser',
             function() OldOpenURL(url) end,
