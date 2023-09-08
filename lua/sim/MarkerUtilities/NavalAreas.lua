@@ -129,19 +129,28 @@ function Generate()
 
     -- generate for small expansions
     for k = 1, smallExpansionCount do
-        local thresholdDistance = 30
+        local thresholdDistance = 20
+        if mapSize > 1024 then
+            thresholdDistance = 30
+        end
         GenerateForExpansion(smallExpansions[k], thresholdDistance, thresholdSize, thresholdArea)
     end
 
     -- generate for large expansions
     for k = 1, largeExpansionCount do
-        local thresholdDistance = 50
+        local thresholdDistance = 30
+        if mapSize > 1024 then
+            thresholdDistance = 50
+        end
         GenerateForExpansion(largeExpansions[k], thresholdDistance, thresholdSize, thresholdArea)
     end
 
     -- generate for spawn locations
     for k = 1, spawnCount do
-        local thresholdDistance = 70
+        local thresholdDistance = 40
+        if mapSize > 1024 then
+            thresholdDistance = 50
+        end
         GenerateForExpansion(spawns[k], thresholdDistance, thresholdSize, thresholdArea)
     end
 
