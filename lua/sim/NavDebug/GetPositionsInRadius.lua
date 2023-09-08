@@ -56,7 +56,9 @@ function DebugThread()
             local origin = GetMouseWorldPos()
             local layer = State.Layer
             if layer and origin then
-                local positions = NavUtils.GetPositionsInRadius(layer, origin, 100, 8, cache)
+                local start = GetSystemTimeSecondsOnlyForProfileUse()
+                local positions = NavUtils.GetPositionsInRadius(layer, origin, 75, 16, cache)
+                SPEW(string.format("Time taken: %f", GetSystemTimeSecondsOnlyForProfileUse() - start))
                 if positions then
                     for k, position in positions do
                         DrawCircle(position, 4, 'ffffff')

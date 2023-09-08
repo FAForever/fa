@@ -830,86 +830,49 @@ CompressedLabelTree = ClassCompressedLabelTree {
     ---@param self CompressedLabelTreeNode | CompressedLabelTreeLeaf | CompressedLabelTreeRoot
     ---@return CompressedLabelTreeLeaf[]
     ---@return number
-    FindTraversableLeaves = function(self, cache)
-        local head = 1
-        cache = cache or { }
-        cache, head = self:_FindTraversableLeaves(cache, head)
+    FindTraversableLeaves = function(self, thresholdSize, cache, cacheQueue)
 
-        -- clean up remainders
-        for k = head, table.getn(cache) do
-            cache[k] = nil
-        end
+        -- localize for performance
+        local TableGetn = table.getn
 
-        return cache, head - 1
-    end,
-
-    --- Returns all traversable leaves in a table
-    ---@param self CompressedLabelTreeNode | CompressedLabelTreeLeaf | CompressedLabelTreeRoot
-    ---@return CompressedLabelTreeLeaf[]
-    ---@return number
-    _FindTraversableLeaves = function(self, cache, head)
-        local label = self.Label
-        if not label then
-            cache, head = self[1]:_FindTraversableLeaves(cache, head)
-            cache, head = self[2]:_FindTraversableLeaves(cache, head)
-            cache, head = self[3]:_FindTraversableLeaves(cache, head)
-            cache, head = self[4]:_FindTraversableLeaves(cache, head)
-        else
-            if label > 0 then
-                cache[head] = self
-                head = head + 1
-            end
-        end
-
-        return cache, head
-    end,
-
-    ---@param self CompressedLabelTreeNode | CompressedLabelTreeRoot | CompressedLabelTreeLeaf
-    ---@param cache (CompressedLabelTreeLeaf)[]
-    FindLargestLeaves = function(self, cache)
-        ---@type (CompressedLabelTreeNode | CompressedLabelTreeRoot | CompressedLabelTreeLeaf)[]
-        cache = cache or { }
+        -- prepare (optionally) cached values
         local cacheHead = 1
-        local cacheSizeThreshold = 0
+        cache = cache or { }
 
-        local queueTail = 1
         local queueHead = 1
+        local queueTail = 1
+        local queue = cacheQueue or { }
 
-        ---@type (CompressedLabelTreeNode | CompressedLabelTreeRoot | CompressedLabelTreeLeaf)[]
-        local queue = { }
-        queue[queueHead] = self
+        -- use a breath-first search based search to find leaves
+        queue[1] = self
         queueHead = queueHead + 1
-        while queueTail < queueHead do
 
+        while queueTail < queueHead do
             local element = queue[queueTail]
             queueTail = queueTail + 1
-
-            -- we can stop searching, everything beyond this point is smaller
-            local size = element.Size
-            if cacheSizeThreshold > 0 and size and (size < cacheSizeThreshold) then
-                break
-            end
 
             local label = element.Label
             if label then
                 -- found a leaf
-                if label > 0 then
-
-                    if size >= cacheSizeThreshold then
-                        cache[cacheHead] = element
-                        cacheHead = cacheHead + 1
-                    end
+                if label > 0 and element.Size >= thresholdSize then
+                    cache[cacheHead] = element
+                    cacheHead = cacheHead + 1
                 end
             else
                 -- found a node
-                for k = 1, table.getn(element) do
-                    queue[queueHead] = NavCells[element[k]]
-                    queueHead= queueHead + 1
+                for k = 1, TableGetn(element) do
+                    queue[queueHead] = element[k]
+                    queueHead = queueHead + 1
                 end
             end
         end
 
-        return cache
+        -- clean up remainders
+        for k = cacheHead, TableGetn(cache) do
+            cache[k] = nil
+        end
+
+        return cache, cacheHead - 1
     end,
 
     --- Returns the leaf that encompasses the position, or nil if no leaf does
