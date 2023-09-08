@@ -955,6 +955,30 @@ Callbacks.NavDebugDisableDirectionTo = function(data, units)
     import("/lua/sim/navdebug/directionto.lua").Disable()
 end
 
+Callbacks.NavDebugUpdateGetPositionsInRadius = function(data, units)
+    if not PassesAIAntiCheatCheck() then
+        return
+    end
+
+    import("/lua/sim/navdebug/getpositionsinradius.lua").Update(data)
+end
+
+Callbacks.NavDebugEnableGetPositionsInRadius = function(data, units)
+    if not PassesAIAntiCheatCheck() then
+        return
+    end
+
+    import("/lua/sim/navdebug/getpositionsinradius.lua").Enable()
+end
+
+Callbacks.NavDebugDisableGetPositionsInRadius = function(data, units)
+    if not PassesAIAntiCheatCheck() then
+        return
+    end
+
+    import("/lua/sim/navdebug/getpositionsinradius.lua").Disable()
+end
+
 Callbacks.NavDebugGetLabelMetadata = function(data, units)
     if not PassesAIAntiCheatCheck() then
         return

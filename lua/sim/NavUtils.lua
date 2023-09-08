@@ -546,7 +546,7 @@ function GetLabelsofIMAP(layer, gx, gz)
     end
 
     -- check position argument
-    local root = grid:FindRootGridspaceXZ(gz - 1, gx - 1)
+    local root = grid:FindRootGridspaceXZ(gx - 1, gz - 1)
     if not root then
         return nil, 'OutsideMap'
     end
@@ -591,6 +591,107 @@ function GetTerrainLabel(layer, position)
     end
 
     return leaf.Label, nil
+end
+
+---@type { Cell: CompressedLabelTreeRoot, [1]: number, [2]: number }[]
+local GetPositionsInRadiusCandidates = {}
+
+---@param layer NavLayers
+---@param position Vector
+---@param steps number
+---@param ofLabel? number
+---@return Vector[]?
+---@return ('NotGenerated' | 'InvalidLayer' | 'OutsideMap' | 'SystemError' | 'Unpathable')?
+function GetPositionsInRadius(layer, position, steps, ofLabel)
+
+    local start = GetSystemTimeSecondsOnlyForProfileUse()
+
+    -- check if generated
+    if not NavGenerator.IsGenerated() then
+        return nil, 'NotGenerated'
+    end
+
+    -- check layer argument
+    local grid = FindGrid(layer)
+    if not grid then
+        return nil, 'InvalidLayer'
+    end
+
+    -- find candidates
+    local head = 1
+    local candidates = GetPositionsInRadiusCandidates
+    local gx, gz = grid:ToGridSpace(position)
+    if not (gx and gz) then
+        return nil, 'OutsideMap'
+    end
+
+    -- LOG(layer)
+    DrawCircle(position, 4, '999999')
+    -- LOG(string.format("(%d, %d)", gx, gz))
+    -- reprsl(grid:FindRootGridspaceXZ(gx, gz).Labels)
+
+    for lz = -2, 2 do
+        for lx = -2, 2 do
+            local neighbor = grid:FindRootGridspaceXZ(gx + lz, gz + lx)
+            if neighbor and not table.empty(neighbor.Labels) then
+                candidates[head] = candidates[head] or { }
+                candidates[head].Cell = neighbor
+                candidates[head][1] = gx + lx
+                candidates[head][2] = gz + lz
+                head = head + 1
+            end
+        end
+    end
+
+    -- find the nearest entry
+
+    -- convert to a series of positions
+    local positions = { }
+    for k = 1, head - 1 do
+        local info = candidates[k] --[[@as { Cell: CompressedLabelTreeRoot, [1]: number, [2]: number } ]]
+        local candidate = info.Cell
+        if candidate then
+            local label = candidate.Label
+
+            local px = candidate.px
+            local pz = candidate.pz
+
+            if px and pz then
+                positions[k] = {
+                    px,
+                    GetSurfaceHeight(px, pz),
+                    pz,
+                }
+            else
+
+                local leaves = candidate:FindTraversableLeaves()
+                table.sort(leaves, function (a, b)
+                    return a.Size > b.Size
+                end)
+                local largest = leaves[1]
+                if largest then
+                    local size = largest.Size
+                    for l, leave in leaves do
+                        if leave.Size >= size then
+                            local px = leave.px
+                            local pz = leave.pz
+                            positions[k] = {
+                                px,
+                                GetSurfaceHeight(px, pz),
+                                pz,
+                            }
+                        else
+                            break
+                        end
+                    end
+                end
+            end
+        end
+    end
+
+    SPEW(string.format("Time taken: %f", GetSystemTimeSecondsOnlyForProfileUse() - start))
+
+    return positions
 end
 
 --- Returns the metadata of a label.
