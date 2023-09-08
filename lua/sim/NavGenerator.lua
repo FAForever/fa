@@ -1484,13 +1484,6 @@ local function GenerateRootInformation(processAmphibious, processHover)
                 ---@type CompressedLabelTreeRoot
                 local tree = grid.Trees[z][x]
 
-                if x == 12 and z == 4 then
-                    for k, v in cache do
-                        LOG(v.Label)
-                    end
-                end
-
-
                 if not tree.Labels then
                     local leaves, count = tree:FindLeaves(cache)
 
@@ -1511,12 +1504,6 @@ local function GenerateRootInformation(processAmphibious, processHover)
                     end
 
                     tree.Labels = labels
-                end
-
-                if x == 12 and z == 4 then
-                    for k, v in cache do
-                        LOG(v.Label)
-                    end
                 end
             end
         end
