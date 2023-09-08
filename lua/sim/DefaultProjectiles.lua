@@ -19,6 +19,9 @@ local Random = Random
 local CreateTrail = CreateTrail
 local CreateEmitterOnEntity = CreateEmitterOnEntity
 local CreateBeamEmitterOnEntity = CreateBeamEmitterOnEntity
+local VDist2 = VDist2
+local MathPow = math.pow
+local MathSqrt = math.sqrt
 
 local TableGetn = table.getn
 
@@ -100,6 +103,57 @@ MultiBeamProjectile = ClassProjectile(EmitterProjectile) {
     end,
 }
 
+--- Semi-Ballistic Component
+---@class SemiBallisticComponent
+SemiBallisticComponent = ClassSimple {
+
+    --- For a projectile that starts under acceleration, 
+    --- but needs to calculate a ballistic trajectory mid-flight
+    CalculateBallisticAcceleration = function(self)
+        local ux, uy, uz = self:GetVelocity()
+        local s0 = self:GetPosition()
+        local target = self:GetCurrentTargetPosition()
+        local dist = VDist2(target[1], target[3], s0[1], s0[3])
+
+        -- we need velocity in m/s, not in m/tick
+        local ux, uy, uz = ux*10, uy*10, uz*10
+    
+        local timeToImpact = dist / MathSqrt(MathPow(ux, 2) + MathPow(uz, 2))
+        local ballisticAcceleration = (2 * ((target[2] - s0[2]) - uy * t)) / MathPow(t, 2)
+        return ballisticAcceleration, timeToImpact
+    end,
+
+}
+
+--- Tactical Missile
+---@class TacticalMissileProjectile : NullShell
+TacticalMissileComponent = ClassSimple(SemiBallisticComponent) {
+
+    -- default values
+    boostTime = 20,
+    acceleration = 3,
+    turnRate = 8,
+    maxSpeed = 12,
+
+    ---@param self TacticalMissileProjectile
+    MovementThread = function(self)
+        self:SetTurnRate(self.turnRate)
+        WaitTicks(self.boostTime)
+        local ballisticAcceleration, timeToImpact = self:CalculateBallisticAcceleration()
+        self:SetAcceleration(0)
+        self:SetBallisticAcceleration(ballisticAcceleration)
+    end,
+
+    -- maybe used for adjusting boost time or turn rate
+    -- unused for now
+    GetDistanceToTarget = function(self)
+        local tpos = self:GetCurrentTargetPosition()
+        local mpos = self:GetPosition()
+        local dist = VDist2(mpos[1], mpos[3], tpos[1], tpos[3])
+        return dist
+    end,
+
+}
 --- Nukes
 ---@class NukeProjectile : NullShell
 NukeProjectile = ClassProjectile(NullShell) {
