@@ -756,31 +756,30 @@ function CreateNameFilter(data)
         end
 
         group.edit.OnTextChanged = function(self, new, old)
-            -- initialize search box to previus search term when it was not intialized to prevent keymapping messing with it
+            -- ignoring text changes until this search box is initialized to prevent keybinding
+            -- mapped to openning this dialog, being injected as an input for search box
             if not group.edit.isInitialized then
                 group.edit.isInitialized = true
-                group.edit:SetText(new)
-            end
-
-            searchText = new
-            filterSet[self.key].editText = new
-
-            if new == '' then
-                group.hint:SetAlpha(1, false)
-                activeFilters[self.key][self.filterKey] = nil
-                if group.check:IsChecked() then
-                    group.check:SetCheck(false)
-                end
+                group.edit:SetText('')
             else
-                group.hint:SetAlpha(0, false)
-                activeFilters[self.key][self.filterKey] = self.sortFunc
-                if not group.check:IsChecked() then
+                -- ignoring empty/whitespaces strings when searching for units
+                -- because they are not clearly visibile and units might not be found, e.g. " Engineer"
+                new = StringTrim(new)
+                if new == '' then
+                    group.hint:SetAlpha(1, false)
+                    group.check:SetCheck(false)
+                    activeFilters[self.key][self.filterKey] = nil
+                else
+                    group.hint:SetAlpha(0, false)
                     group.check:SetCheck(true)
+                    activeFilters[self.key][self.filterKey] = self.sortFunc
+                    searchText = new
+                    filterSet[self.key].editText = new
                 end
+
+                RefreshList()
             end
 
-            
-            RefreshList()
         end
 
         dialog.searchBox = group.edit
