@@ -462,6 +462,7 @@ function Setup()
     for k, marker in AllMarkers do
         if armies[k] then
             marker.Name = k
+            marker.Position = marker.position
             marker.size = 50
             MarkerCache["Spawn"].Count = MarkerCache["Spawn"].Count + 1
             MarkerCache["Spawn"].Markers[MarkerCache["Spawn"].Count] = marker
@@ -549,8 +550,9 @@ function Setup()
     end
 end
 
-GenerateExpansionMarkers = import("/lua/sim/MarkerUtilities/Expansions.lua").Generate
-GenerateRallyPointMarkers = import("/lua/sim/MarkerUtilities/RallyPoints.lua").Generate
+GenerateExpansionMarkers = import("/lua/sim/markerutilities/expansions.lua").Generate
+GenerateNavalAreaMarkers = import("/lua/sim/markerutilities/navalareas.lua").Generate
+GenerateRallyPointMarkers = import("/lua/sim/markerutilities/rallypoints.lua").Generate
 
 function __moduleinfo.OnReload(newModule)
     -- add existing markers to new module

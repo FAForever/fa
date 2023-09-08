@@ -602,7 +602,7 @@ local GenericQueueCache = { }
 ---@param position Vector
 ---@param thresholdDistance number
 ---@param thresholdSize? number
----@return Vector[]?
+---@return { [1]: number, [2]: number, [3]: number, [4]: number }?
 ---@return number | ('NotGenerated' | 'InvalidLayer' | 'OutsideMap' | 'SystemError' | 'Unpathable' | 'NoData')?
 function GetPositionsInRadius(layer, position, thresholdDistance, thresholdSize, cache)
     -- check if generated
