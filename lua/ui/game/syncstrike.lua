@@ -2,22 +2,23 @@ local AddBeatFunction = import("/lua/ui/game/gamemain.lua").AddBeatFunction
 local RemoveBeatFunction = import("/lua/ui/game/gamemain.lua").RemoveBeatFunction
 local FireState = import("/lua/game.lua").FireState
 
---Upvalues for performance
+--Upvalues for performance(?)
 local GameTick = GameTick
 local VDist2 = VDist2
 
 FLIGHT = {
-    uab2108 = {27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 28, 29, 31, 31, 32, 32, 33, 34, 36, 37, 38, 38, 38, 39, 41, 42, 43, 43, 44, 45, 46, 47, 48, 49, 50, 50, 50, 53, 56, 57, 58, 59, 60, 61, 62, 80, 98, 99, 100, 100, 100, 102, 105, 106, 107, 107, 107, 112, 118, 118, 118, 118, 119, 119, 120, 120, 120, 121, 122, 122, 123, 122, 122, 123, 125, 126, 127, 127, 128, 129, 130, 130, 131, 131, 132, 133, 134, 135, 136, 136, 136, 137, 138, 137, 137, 138, 139, 139, 140, 140, 141, 142, 143, 144, 145, 145, 146, 146, 147, 147, 148, 148, 149, 150, 151, 152, 153, 154, 155, 155, 155, 156, 157, 157, 158, 158, 159, 160, 161, 162, 163, 163, 164, 165, 166, 167, 168, 168, 169, 169, 170, 170, 171, 172, 173, 173, 174, 175, 177, 177, 178, 178, 179, 179, 180, 181, 182, 183, 184, 185, 186, 186, 187, 188, 189, 189, 189, 190, 192, 193, 194, 194, 194, 195, 196, 196, 197, 198, 200, 200, 200, 201, 203, 203, 204, 204, 205, 206, 208, 208, 209, 210, 211, 211, 212, 213, 214, 214, 214, 215, 217, 218, 220, 219, 219, 220, 222, 222, 223, 224, 225, 226, 228, 228, 228, 229, 230, 231, 233, 233, 234, 234, 235, 236, 237, 237, 237, 238, 240, 241, 242, 242, 243, 244, 245, 245, 246, 247, 248, 248, 249, 250, 252, 252, 253, 253, 254, 255, 257, 258},
+    --uab2108 = {27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 28, 29, 31, 31, 32, 32, 33, 34, 36, 37, 38, 38, 38, 39, 41, 42, 43, 43, 44, 45, 46, 47, 48, 49, 50, 50, 50, 53, 56, 57, 58, 59, 60, 61, 62, 80, 98, 99, 100, 100, 100, 102, 105, 106, 107, 107, 107, 112, 118, 118, 118, 118, 119, 119, 120, 120, 120, 121, 122, 122, 123, 122, 122, 123, 125, 126, 127, 127, 128, 129, 130, 130, 131, 131, 132, 133, 134, 135, 136, 136, 136, 137, 138, 137, 137, 138, 139, 139, 140, 140, 141, 142, 143, 144, 145, 145, 146, 146, 147, 147, 148, 148, 149, 150, 151, 152, 153, 154, 155, 155, 155, 156, 157, 157, 158, 158, 159, 160, 161, 162, 163, 163, 164, 165, 166, 167, 168, 168, 169, 169, 170, 170, 171, 172, 173, 173, 174, 175, 177, 177, 178, 178, 179, 179, 180, 181, 182, 183, 184, 185, 186, 186, 187, 188, 189, 189, 189, 190, 192, 193, 194, 194, 194, 195, 196, 196, 197, 198, 200, 200, 200, 201, 203, 203, 204, 204, 205, 206, 208, 208, 209, 210, 211, 211, 212, 213, 214, 214, 214, 215, 217, 218, 220, 219, 219, 220, 222, 222, 223, 224, 225, 226, 228, 228, 228, 229, 230, 231, 233, 233, 234, 234, 235, 236, 237, 237, 237, 238, 240, 241, 242, 242, 243, 244, 245, 245, 246, 247, 248, 248, 249, 250, 252, 252, 253, 253, 254, 255, 257, 258},
+    uab2108 = {24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 25, 26, 26, 27, 27, 28, 29, 30, 30, 31, 32, 33, 33, 34, 35, 36, 36, 37, 38, 39, 39, 40, 41, 42, 45, 48, 50, 53, 53, 54, 55, 57, 68, 80, 81, 83, 89, 96, 96, 97, 97, 98, 98, 99, 99, 100, 101, 103, 103, 104, 105, 106, 109, 113, 113, 114, 114, 115, 115, 115, 115, 116, 116, 117, 117, 118, 118, 119, 119, 120, 121, 122, 122, 123, 123, 124, 124, 125, 126, 127, 127, 128, 128, 129, 129, 130, 130, 131, 131, 132, 133, 134, 134, 135, 135, 136, 137, 138, 138, 139, 139, 140, 141, 142, 142, 143, 144, 145, 145, 146, 146, 147, 148, 149, 149, 150, 151, 152, 152, 153, 154, 155, 155, 156, 157, 158, 158, 159, 160, 161, 161, 162, 163, 164, 164, 165, 166, 167, 167, 168, 169, 170, 170, 171, 172, 173, 173, 174, 175, 176, 176, 177, 178, 179, 179, 180, 181, 182, 183, 184, 184, 185, 186, 187, 187, 188, 189, 190, 190, 191, 192, 193, 194, 195, 195, 196, 197, 198, 198, 199, 200, 201, 201, 202, 203, 204, 205, 206, 206, 207, 208, 209, 209, 210, 211, 212, 213, 214, 214, 215, 216, 217, 217, 218, 219, 220, 221, 222, 222, 223, 224, 225, 225, 226, 227, 228, 229, 230, 230, 231, 232, 233, 234, 235, 235, 236, 237, 238, 238, 239, 240, 241, 242, 243, 243, 244, 245, 246, 247},
     ueb2108 = {24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 25, 26, 26, 27, 27, 28, 29, 30, 30, 31, 32, 33, 33, 34, 35, 36, 36, 37, 38, 39, 39, 40, 41, 42, 45, 48, 50, 53, 53, 54, 55, 57, 68, 80, 81, 83, 89, 96, 96, 97, 97, 98, 98, 99, 99, 100, 101, 103, 103, 104, 105, 106, 109, 113, 113, 114, 114, 115, 115, 115, 115, 116, 116, 117, 117, 118, 118, 119, 119, 120, 121, 122, 122, 123, 123, 124, 124, 125, 126, 127, 127, 128, 128, 129, 129, 130, 130, 131, 131, 132, 133, 134, 134, 135, 135, 136, 137, 138, 138, 139, 139, 140, 141, 142, 142, 143, 144, 145, 145, 146, 146, 147, 148, 149, 149, 150, 151, 152, 152, 153, 154, 155, 155, 156, 157, 158, 158, 159, 160, 161, 161, 162, 163, 164, 164, 165, 166, 167, 167, 168, 169, 170, 170, 171, 172, 173, 173, 174, 175, 176, 176, 177, 178, 179, 179, 180, 181, 182, 183, 184, 184, 185, 186, 187, 187, 188, 189, 190, 190, 191, 192, 193, 194, 195, 195, 196, 197, 198, 198, 199, 200, 201, 201, 202, 203, 204, 205, 206, 206, 207, 208, 209, 209, 210, 211, 212, 213, 214, 214, 215, 216, 217, 217, 218, 219, 220, 221, 222, 222, 223, 224, 225, 225, 226, 227, 228, 229, 230, 230, 231, 232, 233, 234, 235, 235, 236, 237, 238, 238, 239, 240, 241, 242, 243, 243, 244, 245, 246, 247},
     urb2108 = {24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 25, 26, 26, 27, 27, 28, 29, 30, 30, 31, 32, 33, 33, 34, 35, 36, 36, 37, 38, 39, 39, 40, 41, 42, 45, 48, 50, 53, 53, 54, 55, 57, 68, 80, 81, 83, 89, 96, 96, 97, 97, 98, 98, 99, 99, 100, 101, 103, 103, 104, 105, 106, 109, 113, 113, 114, 114, 115, 115, 115, 115, 116, 116, 117, 117, 118, 118, 119, 119, 120, 121, 122, 122, 123, 123, 124, 124, 125, 126, 127, 127, 128, 128, 129, 129, 130, 130, 131, 131, 132, 133, 134, 134, 135, 135, 136, 137, 138, 138, 139, 139, 140, 141, 142, 142, 143, 144, 145, 145, 146, 146, 147, 148, 149, 149, 150, 151, 152, 152, 153, 154, 155, 155, 156, 157, 158, 158, 159, 160, 161, 161, 162, 163, 164, 164, 165, 166, 167, 167, 168, 169, 170, 170, 171, 172, 173, 173, 174, 175, 176, 176, 177, 178, 179, 179, 180, 181, 182, 183, 184, 184, 185, 186, 187, 187, 188, 189, 190, 190, 191, 192, 193, 194, 195, 195, 196, 197, 198, 198, 199, 200, 201, 201, 202, 203, 204, 205, 206, 206, 207, 208, 209, 209, 210, 211, 212, 213, 214, 214, 215, 216, 217, 217, 218, 219, 220, 221, 222, 222, 223, 224, 225, 225, 226, 227, 228, 229, 230, 230, 231, 232, 233, 234, 235, 235, 236, 237, 238, 238, 239, 240, 241, 242, 243, 243, 244, 245, 246, 247},
     xsb2108 = {24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 25, 26, 26, 27, 27, 28, 29, 30, 30, 31, 32, 33, 33, 34, 35, 36, 36, 37, 38, 39, 39, 40, 41, 42, 45, 48, 50, 53, 53, 54, 55, 57, 68, 80, 81, 83, 89, 96, 96, 97, 97, 98, 98, 99, 99, 100, 101, 103, 103, 104, 105, 106, 109, 113, 113, 114, 114, 115, 115, 115, 115, 116, 116, 117, 117, 118, 118, 119, 119, 120, 121, 122, 122, 123, 123, 124, 124, 125, 126, 127, 127, 128, 128, 129, 129, 130, 130, 131, 131, 132, 133, 134, 134, 135, 135, 136, 137, 138, 138, 139, 139, 140, 141, 142, 142, 143, 144, 145, 145, 146, 146, 147, 148, 149, 149, 150, 151, 152, 152, 153, 154, 155, 155, 156, 157, 158, 158, 159, 160, 161, 161, 162, 163, 164, 164, 165, 166, 167, 167, 168, 169, 170, 170, 171, 172, 173, 173, 174, 175, 176, 176, 177, 178, 179, 179, 180, 181, 182, 183, 184, 184, 185, 186, 187, 187, 188, 189, 190, 190, 191, 192, 193, 194, 195, 195, 196, 197, 198, 198, 199, 200, 201, 201, 202, 203, 204, 205, 206, 206, 207, 208, 209, 209, 210, 211, 212, 213, 214, 214, 215, 216, 217, 217, 218, 219, 220, 221, 222, 222, 223, 224, 225, 225, 226, 227, 228, 229, 230, 230, 231, 232, 233, 234, 235, 235, 236, 237, 238, 238, 239, 240, 241, 242, 243, 243, 244, 245, 246, 247},
 }
 
 READY = {
-    uab2108 = 30, --36
-    ueb2108 = 20, --25
-    urb2108 = 14, --20
-    xsb2108 = 9, --15
+    uab2108 = 36,
+    ueb2108 = 25,
+    urb2108 = 20,
+    xsb2108 = 15,
 }
 
 LAUNCH = {
@@ -42,7 +43,7 @@ CYCLE = {
 }
 
 local watchArray = {}
-local syncCache = {{type='',launchers={}}}
+local syncCache = {}
 local syncIndex = 1
 
 local CalculateTicksToTarget = function(launcher)
@@ -55,7 +56,7 @@ local CalculateTicksToTarget = function(launcher)
     --make sure we're in range
     if FLIGHT[unitId][math.floor(range)] then
         --we can add support for multiple queued syncronized strikes here
-        return READY[unitId] + LAUNCH[unitId] + FLIGHT[unitId][math.floor(range)]
+        return CYCLE[unitId] * (table.getn(launcher:GetCommandQueue())-1) + READY[unitId] + LAUNCH[unitId] + FLIGHT[unitId][math.floor(range)]
     else
         return false
     end
@@ -78,17 +79,23 @@ end
 
 WatcherBeat = function()
 
+    LOG('WatcherBeat:' .. GameTick())
     local tick = GameTick()
     --see if the current game tick is in the watchArray
     --launchers in the fire table will get set to GROUND_FIRE
     --if they have another sync strike in their order queue, they'll also be added to the hold fire table twenty ticks later
     --launchers in the hold fire table will get set to HOLD_FIRE
     if watchArray[tick] then
-
+        LOG('watchArray tick found!')
+        LOG('there are ' .. table.getn(watchArray[tick].fire) .. ' launchers to set to fire this tick')
         for _, launcher in watchArray[tick].fire do
-            SetFireState(launcher, FireState.GROUND_FIRE)
+            LOG('setting launcher to fire:' .. launcher:GetEntityId())
+            SetFireState({launcher}, FireState.GROUND_FIRE)
             launcher.syncCount = launcher.syncCount - 1
             if launcher.syncCount > 0 then
+                if not watchArray[tick+20] then
+                    watchArray[tick+20] = {fire={},hold={}}
+                end
                 table.insert(watchArray[tick+20].hold,launcher)
             else
                 launcher.syncCount = nil
@@ -96,7 +103,7 @@ WatcherBeat = function()
         end
 
         for _, launcher in watchArray[tick].hold do
-            SetFireState(launcher, FireState.HOLD_FIRE)
+            SetFireState({launcher}, FireState.HOLD_FIRE)
         end
 
         watchArray[tick] = nil
@@ -148,11 +155,12 @@ local PreProcessLaunchers = function(subSyncCache)
     return launcherCache, maxTicksToTarget
 end
 
-SynchronizedStrike = function(subSyncCache)
+local SynchronizedStrike = function(subSyncCache)
 
     --calc tickOnTarget for relevant launchers and add them to the launcherCache
     --obtain impactTick from the return maxTicksToTargetValue
     local launcherCache, maxTicksToTarget = PreProcessLaunchers(subSyncCache)
+    local impactTick = GameTick() + maxTicksToTarget
 
     --if there are no launchers in the cache, we're done
     if table.empty(launcherCache) then
@@ -181,21 +189,23 @@ end
 
 ReleaseSyncStrike = function()
     -- releases the sync strike on top of the stack
-    SyncronizedStrike(syncCache[syncIndex])
-    table.remove(syncCache, syncIndex)
-
-    syncIndex = min(syncIndex - 1, 1)
-
+    SynchronizedStrike(syncCache[syncIndex])
+    table.remove(syncCache, 1)
+    syncIndex = syncIndex - 1
 end
 
 -- administrative overhead here to stage launchers that are passed from OnTacticalCommandIssued
-SynchronizedStrikeInprocessing = function(command)
+SynchronizedStrikeInprocess = function(command)
     local inprocessingCache = {}
+    if table.empty(syncCache) then
+        table.insert(syncCache, {type='',launchers={}})
+        syncIndex = 1
+    end
     
     for _, launcher in command.Units do
         table.insert(inprocessingCache, launcher)
-        if launcher in syncCache[syncIndex].launchers or command.CommandType ~= syncCache[syncIndex].type then
-            table.insert(syncCache, {})
+        if syncCache[syncIndex].launchers[launcher] or command.CommandType ~= syncCache[syncIndex].type then
+            table.insert(syncCache, {type='',launchers={}})
             syncIndex = syncIndex + 1
         end
     end
@@ -204,4 +214,8 @@ SynchronizedStrikeInprocessing = function(command)
     for _, launcher in inprocessingCache do
         syncCache[syncIndex].launchers[launcher] = true
     end
+
+    -- this will release whatever order comes in automatically
+    -- for testing
+    ReleaseSyncStrike()
 end
