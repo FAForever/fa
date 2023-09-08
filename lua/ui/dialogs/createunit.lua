@@ -170,6 +170,7 @@ function SourceListTabs()
             {
                 display = '<LOC spawn_filter_vanilla>Core Game',
                 key = 'vanilla',
+                tooltip = 'Toggle units from orignial FA and FAF patches',
                 sortFunc = function(unitID, modloc)
                     return string.sub(__blueprints[unitID].Source, 1, 7) == "/units/"
                 end,
@@ -183,7 +184,8 @@ function SourceListTabs()
                 local key = string.gsub(string.lower(mod.name),"%s+", "_")
                 specialFilterControls[key] = mod.location
                 table.insert(list, {
-                    title = titleFit(mod.name),
+                    display = titleFit(mod.name),
+                    tooltip = 'Toggle units from ' .. mod.name,
                     key = key,
                     sortFunc = function(unitID, modloc) return modloc..'/' == string.sub(__blueprints[unitID].Source, 1, (modloc):len()+1) end,
                 })
