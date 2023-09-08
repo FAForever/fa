@@ -598,12 +598,11 @@ local GetPositionsInRadiusCandidates = {}
 
 ---@param layer NavLayers
 ---@param position Vector
----@param steps number
----@param ofLabel? number
+---@param thresholdDistance number
+---@param thresholdSize? number
 ---@return Vector[]?
 ---@return ('NotGenerated' | 'InvalidLayer' | 'OutsideMap' | 'SystemError' | 'Unpathable')?
-function GetPositionsInRadius(layer, position, steps, ofLabel)
-
+function GetPositionsInRadius(layer, position, thresholdDistance, thresholdSize, cache)
     local start = GetSystemTimeSecondsOnlyForProfileUse()
 
     -- check if generated
@@ -625,13 +624,11 @@ function GetPositionsInRadius(layer, position, steps, ofLabel)
         return nil, 'OutsideMap'
     end
 
-    -- LOG(layer)
-    DrawCircle(position, 4, '999999')
-    -- LOG(string.format("(%d, %d)", gx, gz))
-    -- reprsl(grid:FindRootGridspaceXZ(gx, gz).Labels)
+    local sizeOfcell = NavGenerator.SizeOfCell()
+    local distanceInCells = math.ceil(thresholdDistance / sizeOfcell) + 1
 
-    for lz = -2, 2 do
-        for lx = -2, 2 do
+    for lz = -distanceInCells, distanceInCells do
+        for lx = -distanceInCells, distanceInCells do
             local neighbor = grid:FindRootGridspaceXZ(gx + lz, gz + lx)
             if neighbor and not table.empty(neighbor.Labels) then
                 candidates[head] = candidates[head] or { }
@@ -646,40 +643,31 @@ function GetPositionsInRadius(layer, position, steps, ofLabel)
     -- find the nearest entry
 
     -- convert to a series of positions
-    local positions = { }
+    local positions = cache or { }
     for k = 1, head - 1 do
         local info = candidates[k] --[[@as { Cell: CompressedLabelTreeRoot, [1]: number, [2]: number } ]]
         local candidate = info.Cell
         if candidate then
-            local label = candidate.Label
+            local leaves = candidate:FindTraversableLeaves()
 
-            local px = candidate.px
-            local pz = candidate.pz
+            table.sort(leaves, function (a, b)
+                return a.Size > b.Size
+            end)
 
-            if px and pz then
-                positions[k] = {
-                    px,
-                    GetSurfaceHeight(px, pz),
-                    pz,
-                }
-            else
-
-                local leaves = candidate:FindTraversableLeaves()
-                table.sort(leaves, function (a, b)
-                    return a.Size > b.Size
-                end)
-                local largest = leaves[1]
-                if largest then
-                    local size = largest.Size
+            local largest = leaves[1]
+            if largest then
+                local size = largest.Size
+                if size >= thresholdSize then
                     for l, leave in leaves do
                         if leave.Size >= size then
                             local px = leave.px
                             local pz = leave.pz
-                            positions[k] = {
-                                px,
-                                GetSurfaceHeight(px, pz),
-                                pz,
-                            }
+                            local position = positions[k]  or { }
+                            position[1] = px 
+                            position[2] = GetSurfaceHeight(px, pz)
+                            position[3] = pz
+                            position[4] = size
+                            positions[k] = position
                         else
                             break
                         end
@@ -687,6 +675,11 @@ function GetPositionsInRadius(layer, position, steps, ofLabel)
                 end
             end
         end
+    end
+
+    -- clean up cache
+    for k = head, table.getn(cache) do
+        cache[k] = nil
     end
 
     SPEW(string.format("Time taken: %f", GetSystemTimeSecondsOnlyForProfileUse() - start))

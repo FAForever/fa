@@ -96,6 +96,16 @@ local function GenerateLabelIdentifier()
     return LabelIdentifier
 end
 
+--- Returns the size of a cell in oGrids
+---@return number
+function SizeOfCell()
+    ---@type number
+    local MapSize = math.max(ScenarioInfo.size[1], ScenarioInfo.size[2])
+
+    ---@type number
+    return MapSize / LabelCompressionTreesPerAxis
+end
+
 -- Shared data with UI
 
 ---@type NavLayerData

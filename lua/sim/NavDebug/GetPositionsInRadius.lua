@@ -50,12 +50,13 @@ end
 
 --- Represents the debug functionality, only starts running when the file is imported
 function DebugThread()
+    local cache = { }
     while true do
         if Enabled then
             local origin = GetMouseWorldPos()
             local layer = State.Layer
             if layer and origin then
-                local positions = NavUtils.GetPositionsInRadius(layer, origin, 3, nil)
+                local positions = NavUtils.GetPositionsInRadius(layer, origin, 100, 8, cache)
                 if positions then
                     for k, position in positions do
                         DrawCircle(position, 4, 'ffffff')
