@@ -1685,13 +1685,13 @@ local keyactionsOrdersContextBased = {
     ['cap'] = {
         action = 'UI_LUA import("/lua/ui/game/hotkeys/capping.lua").HotkeyToCap(true, true)',
         category = 'ordersContextBased',
-        WikiURL = 'Play/Game/Hotkeys/OrdersMouseContext#cap-a-structure'
+        wikiURL = 'Play/Game/Hotkeys/OrdersMouseContext#cap-a-structure'
     },
 
     ['shift_cap'] = {
         action = 'UI_LUA import("/lua/ui/game/hotkeys/capping.lua").HotkeyToCap(true, false)',
         category = 'ordersContextBased',
-        WikiURL = 'Play/Game/Hotkeys/OrdersMouseContext#cap-a-structure'
+        wikiURL = 'Play/Game/Hotkeys/OrdersMouseContext#cap-a-structure'
     },
 
     ['upgrade_structure'] = { 
