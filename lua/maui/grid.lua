@@ -73,6 +73,15 @@ Grid = ClassUI(Group) {
         return self._lines["Horz"], self._lines["Vert"]
     end,
 
+    -- allow changing grid dimensions without need to re-create the whole grid
+    SetDimensions = function(self, itemWidth, itemHeight)
+        self:DeleteAndDestroyAll(true)
+        self._itemWidth = ScaleNumber(itemWidth)
+        self._itemHeight = ScaleNumber(itemHeight)
+        self._visible["Horz"]:Set(function() return math.floor(self.Width() / self._itemWidth) end)
+        self._visible["Vert"]:Set(function() return math.floor(self.Height() / self._itemHeight) end)
+    end,
+
     AppendRows = function(self, count, batch)
         if count < 1 then
             count = 1

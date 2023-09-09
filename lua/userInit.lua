@@ -172,23 +172,28 @@ do
 
     --- Opens a URL after the user confirms the link
     ---@param url string
-    _G.OpenURL = function(url)
+    _G.OpenURL = function(url, dialogParent)
         local UIUtil = import("/lua/ui/uiutil.lua")
 
-        UIUtil.QuickDialog(
-            GetFrame(0),
-            string.format("You're about to open a browser to:\r\n\r\n%s", url),
-            'Open browser',
-            function() OldOpenURL(url) end,
-            'Cancel'
-        )
+        if GetCurrentUIState() == 'game' then
+            if not dialogParent then dialogParent = GetFrame(0) end
+            UIUtil.QuickDialog(
+                dialogParent,
+                string.format("You're about to open a browser to:\r\n\r\n%s", url),
+                'Open browser',
+                function() OldOpenURL(url) end,
+                'Cancel'
+            )
+        else
+            OldOpenURL(url)
+        end
     end
 end
 
 do
 
     ---@type { [1]: UserUnit }
-    local UnitsCache = { }
+    local UnitsCache = {}
 
     ---@param unit UserUnit
     ---@param pause boolean
