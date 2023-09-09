@@ -201,6 +201,10 @@ function CreateUI(isReplay)
             if Prefs.GetFromCurrentProfile('options.level_of_detail') == 2 then
                 ConExecute("cam_SetLOD WorldCamera 0.70")
             end
+
+            if Prefs.GetFromCurrentProfile('options.shadow_quality') == 3 then
+                ConExecute("ren_ShadowSize 2048")
+            end
         end)
     end
 
