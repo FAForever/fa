@@ -109,7 +109,7 @@ SemiBallisticComponent = ClassSimple {
 
     --- For a projectile that starts under acceleration, 
     --- but needs to calculate a ballistic trajectory mid-flight
-    CalculateBallisticAcceleration = function(self)
+    CalculateBallisticAcceleration = function(self, maxSpeed)
         local ux, uy, uz = self:GetVelocity()
         local s0 = self:GetPosition()
         local target = self:GetCurrentTargetPosition()
@@ -119,8 +119,59 @@ SemiBallisticComponent = ClassSimple {
         local ux, uy, uz = ux*10, uy*10, uz*10
     
         local timeToImpact = dist / MathSqrt(MathPow(ux, 2) + MathPow(uz, 2))
-        local ballisticAcceleration = (2 * ((target[2] - s0[2]) - uy * t)) / MathPow(t, 2)
+        local ballisticAcceleration = (2 * ((target[2] - s0[2]) - uy * timeToImpact)) / MathPow(timeToImpact, 2)
+        LOG('Ballistic Acceleration: ', ballisticAcceleration)
+        LOG('Time to impact: ', timeToImpact)
+
+        -- need to do a second pass, because ballistic acceleration doesn't account for max speed
         return ballisticAcceleration, timeToImpact
+    end,
+
+    DistanceToTarget = function(self)
+        local tpos = self:GetCurrentTargetPosition()
+        local mpos = self:GetPosition()
+        return VDist2(mpos[1], mpos[3], tpos[1], tpos[3])
+    end,
+
+    ElevationAngle = function(self)
+        local vx, vy, vz = self:GetVelocity()
+        local vh = VDist2(vx, vz, 0, 0)
+        if vh == 0 then
+            -- can't divide by zero, so just return 90 degrees
+            return math.pi/2
+        end
+        return math.atan(vy / vh)
+    end,
+
+    -- as we turn from our current elevation angle to the target elevation angle,
+    -- what will our average vertical velocity be?
+    -- (we can use that number to calculate how long the turn should take)
+    AverageVerticalVelocityThroughTurn = function(self, targetAngle, currentAngle)
+        LOG('Target elevation angle: ', targetAngle*180/math.pi)
+        local averageVerticalVelocity = 1/(targetAngle-currentAngle) * (math.cos(currentAngle) - math.cos(targetAngle))
+        LOG('Average vertical velocity percentage through turn: ', averageVerticalVelocity)
+        averageVerticalVelocity = averageVerticalVelocity * self:GetCurrentSpeed()*10
+        return averageVerticalVelocity
+    end,
+
+    OptimalTurnRate = function(self, targetAngleDegrees, targetHeight)
+        local targetAngle = targetAngleDegrees * math.pi/180
+        local currentAngle = self:ElevationAngle()
+        local deltaY = targetHeight - self:GetPosition()[2]
+        if deltaY < 5 then
+            deltaY = 5
+        end
+        local turnTime = deltaY/self:AverageVerticalVelocityThroughTurn(targetAngle, currentAngle)
+        local degreesPerSecond = math.abs(targetAngle - currentAngle)/turnTime * 180/math.pi
+
+        return degreesPerSecond, turnTime
+    end,
+
+    OptimalMaxHeight = function(self, heightDistanceFactor)
+        local dist = self:DistanceToTarget()
+        local targetHeight = self:GetCurrentTargetPosition()[2]
+        local maxHeight = targetHeight + dist/heightDistanceFactor
+        return maxHeight
     end,
 
 }
@@ -129,28 +180,60 @@ SemiBallisticComponent = ClassSimple {
 ---@class TacticalMissileProjectile : NullShell
 TacticalMissileComponent = ClassSimple(SemiBallisticComponent) {
 
-    -- default values
-    boostTime = 20,
-    acceleration = 3,
-    turnRate = 8,
-    maxSpeed = 12,
+    -- default trajectory parameters
+
+    -- how long we spend in the launch phase
+    launchTicks = 6,
+
+    -- inital launch phase turn rate
+    launchTurnRate = 8,
+
+    -- each missile calculates an optimal highest point of its trajectory based on its distance to the target
+    -- this is the factor that determines how high above the target that point is, in relation to the horizontal distance
+    heightDistanceFactor = 6,
+
+    -- angle in degrees that we'll aim to be at the end of the boost phase
+    -- 90 is vertical, 0 is horizontal
+    targetFinalBoostAngle = 0,
+
+    -- we'll divide total flight time by this number to determine how long before impact we'll turn tracking back on
+    terminalPhaseTimeFactor = 5,
+
 
     ---@param self TacticalMissileProjectile
     MovementThread = function(self)
-        self:SetTurnRate(self.turnRate)
-        WaitTicks(self.boostTime)
-        local ballisticAcceleration, timeToImpact = self:CalculateBallisticAcceleration()
-        self:SetAcceleration(0)
-        self:SetBallisticAcceleration(ballisticAcceleration)
-    end,
 
-    -- maybe used for adjusting boost time or turn rate
-    -- unused for now
-    GetDistanceToTarget = function(self)
-        local tpos = self:GetCurrentTargetPosition()
-        local mpos = self:GetPosition()
-        local dist = VDist2(mpos[1], mpos[3], tpos[1], tpos[3])
-        return dist
+        -- launch
+        self:SetTurnRate(self.launchTurnRate)
+        WaitTicks(self.launchTicks)
+
+        -- boost
+        LOG('Boost phase')
+        self.boostTurnRate, self.boostTime = self:OptimalTurnRate(self.targetFinalBoostAngle, self:OptimalMaxHeight(self.heightDistanceFactor))
+        self:SetTurnRate(self.boostTurnRate)
+        WaitTicks(self.boostTime * 10)
+        
+
+        -- glide
+        LOG('Glide phase')
+        LOG('Elevation angle: ', self:ElevationAngle()*180/math.pi)
+        local ballisticAcceleration, timeToImpact = self:CalculateBallisticAcceleration()
+        self:SetBallisticAcceleration(ballisticAcceleration)
+        self:TrackTarget(false)
+        self:SetAcceleration(0)
+
+        -- turn rate sufficiently high to keep us aligned with the direction of travel during the ballistic phase
+        self:SetTurnRate(75)
+        
+        --- MaxSpeed adds a bit of "drag" to the missile during it's ballistic trajectory
+        --- wait until we're about to hit the target, then turn target tracking back on to make sure we're on the dot
+        if timeToImpact > 1 then
+            WaitTicks((timeToImpact/self.terminalPhaseTimeFactor)*10)
+        end
+
+        -- terminal
+        LOG('Terminal phase')
+        self:TrackTarget(true)
     end,
 
 }
