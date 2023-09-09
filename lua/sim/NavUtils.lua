@@ -632,7 +632,7 @@ function GetPositionsInRadius(layer, position, thresholdDistance, thresholdSize,
     end
 
     local sizeOfcell = NavGenerator.SizeOfCell()
-    local distanceInCells = math.ceil(thresholdDistance / sizeOfcell) + 1
+    local distanceInCells = math.ceil(0.5 * thresholdDistance / sizeOfcell) + 1
     for lz = -distanceInCells, distanceInCells do
         for lx = -distanceInCells, distanceInCells do
             local neighbor = FindRootGridspaceXZ(grid, gx + lz, gz + lx)
