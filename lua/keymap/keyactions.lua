@@ -1683,12 +1683,12 @@ local keyactionsOrdersContextBased = {
     },
 
     ['cap'] = {
-        action = 'UI_LUA import("/lua/ui/game/hotkeys/capping.lua").HotkeyToCap(true)',
+        action = 'UI_LUA import("/lua/ui/game/hotkeys/capping.lua").HotkeyToCap(true, true)',
         category = 'ordersContextBased',
     },
 
     ['shift_cap'] = {
-        action = 'UI_LUA import("/lua/ui/game/hotkeys/capping.lua").HotkeyToCap(true)',
+        action = 'UI_LUA import("/lua/ui/game/hotkeys/capping.lua").HotkeyToCap(true, false)',
         category = 'ordersContextBased',
     },
 

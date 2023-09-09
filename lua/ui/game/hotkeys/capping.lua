@@ -208,12 +208,8 @@ function AssistToCap(structure, units)
     end
 end
 
---- Allows us to detect a double click
-local hotkeyStructure1 = nil
-local hotkeyStructure2 = nil
-
 --- Hotkey-shell to the capping behavior
-function HotkeyToCap(ringAllFabricators)
+function HotkeyToCap(ringAllFabricators, clearCommands)
     local structure = GetRolloverInfo().userUnit
     if not structure or IsDestroyed(structure) then
         return
@@ -261,9 +257,17 @@ function HotkeyToCap(ringAllFabricators)
         end
 
         if buildStorages then
+            if clearCommands then
+                IssueUnitCommand(selection, 'Stop')
+            end
+
             print("Cap with storages")
             SimCallback({ Func = 'RingWithStorages', Args = { target = structure:GetEntityId() } }, true)
         elseif buildFabricators then
+            if clearCommands then
+                IssueUnitCommand(selection, 'Stop')
+            end
+
             print("Cap with fabricators")
             SimCallback({ Func = 'RingWithFabricators',
                 Args = { target = structure:GetEntityId(), allFabricators = ringAllFabricators } }, true)
@@ -279,6 +283,10 @@ function HotkeyToCap(ringAllFabricators)
 
         structure.RingStamp = gameTick
 
+        if clearCommands then
+            IssueUnitCommand(selection, 'Stop')
+        end
+
         print("Cap with power generators")
         SimCallback({ Func = 'RingArtilleryTech2', Args = { target = structure:GetEntityId() } }, true)
     elseif structure:IsInCategory('ARTILLERY') and (isTech3 or isExp) and (not structure:IsInCategory('xab2307')) then
@@ -292,6 +300,10 @@ function HotkeyToCap(ringAllFabricators)
 
         structure.RingStamp = gameTick
 
+        if clearCommands then
+            IssueUnitCommand(selection, 'Stop')
+        end
+
         print("Cap with power generators")
         SimCallback({ Func = 'RingArtilleryTech3Exp', Args = { target = structure:GetEntityId() } }, true)
     elseif RingRadars and (structure:IsInCategory('RADAR') or structure:IsInCategory('OMNI')) then
@@ -304,6 +316,10 @@ function HotkeyToCap(ringAllFabricators)
         end
 
         structure.RingStamp = gameTick
+
+        if clearCommands then
+            IssueUnitCommand(selection, 'Stop')
+        end
 
         print("Cap with power generators")
         SimCallback({ Func = 'RingRadar', Args = { target = structure:GetEntityId() } }, true)
