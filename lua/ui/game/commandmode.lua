@@ -438,7 +438,7 @@ function OnCommandIssued(command)
 
             local target = GetUnitById(command.Target.EntityId) --[[@as UserUnit]]
             local units = command.Units --[[@as (UserUnit[])]]
-            import("/lua/ui/game/hotkeys/capping.lua").Cap(target, units)
+            import("/lua/ui/game/hotkeys/capping.lua").AssistToCap(target, units)
         end
 
         -- called when:

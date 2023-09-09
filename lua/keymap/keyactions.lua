@@ -1683,33 +1683,39 @@ local keyactionsOrdersContextBased = {
     },
 
     ['cap'] = {
-        action = 'UI_LUA import("/lua/ui/game/hotkeys/capping.lua").CapHotkey()',
+        action = 'UI_LUA import("/lua/ui/game/hotkeys/capping.lua").HotkeyToCap(true, true)',
         category = 'ordersContextBased',
+        wikiURL = 'Play/Game/Hotkeys/OrdersMouseContext#cap-a-structure'
     },
 
     ['shift_cap'] = {
-        action = 'UI_LUA import("/lua/ui/game/hotkeys/capping.lua").CapHotkey()',
+        action = 'UI_LUA import("/lua/ui/game/hotkeys/capping.lua").HotkeyToCap(true, false)',
         category = 'ordersContextBased',
+        wikiURL = 'Play/Game/Hotkeys/OrdersMouseContext#cap-a-structure'
     },
 
     ['upgrade_structure'] = { 
         action = 'UI_LUA import("/lua/ui/game/hotkeys/upgrade-structure.lua").UpgradeStructure()',
         category = 'ordersContextBased',
+        wikiURL = '/Play/Game/Hotkeys/OrdersMouseContext#upgrade-a-structure'
     },
 
     ['shift_upgrade_structure'] = { 
         action = 'UI_LUA import("/lua/ui/game/hotkeys/upgrade-structure.lua").UpgradeStructure()',
         category = 'ordersContextBased',
+        wikiURL = '/Play/Game/Hotkeys/OrdersMouseContext#upgrade-a-structure'
     },
 
     ['upgrade_structure_pause'] = { 
         action = 'UI_LUA import("/lua/ui/game/hotkeys/upgrade-structure.lua").UpgradeStructure(true)',
         category = 'ordersContextBased',
+        wikiURL = '/Play/Game/Hotkeys/OrdersMouseContext#upgrade-a-structure'
     },
 
     ['shift_upgrade_structure_pause'] = { 
         action = 'UI_LUA import("/lua/ui/game/hotkeys/upgrade-structure.lua").UpgradeStructure(true)',
         category = 'ordersContextBased',
+        wikiURL = '/Play/Game/Hotkeys/OrdersMouseContext#upgrade-a-structure'
     }
 }
 

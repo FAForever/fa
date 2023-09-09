@@ -694,8 +694,8 @@ end
 ---
 ---@param unitList UserUnit[]
 ---@param command string
----@param string string?
----@param clear boolean?
+---@param string? string
+---@param clear? boolean
 function IssueUnitCommand(unitList, command, string, clear)
 end
 

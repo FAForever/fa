@@ -876,7 +876,11 @@ Tooltips = {
     },
     options_structure_capping_feature_01 = {
         title = "<LOC options_structure_capping_feature_01_title>Assist to cap",
-        description = "<LOC options_structure_capping_feature_01_description>Assist an extractor to cap it with storages and / or fabricators",
+        description = "<LOC options_structure_capping_feature_01_description>Assist an extractor to cap it with storages",
+    },
+    options_structure_ringing_extractors_fabs = {
+        title = "<LOC options_structure_ringing_extractors_fabs_title>Assist to cap",
+        description = "<LOC options_structure_ringing_extractors_fabs_description>Assist an extractor to cap it with 4 or 8 fabricators",
     },
     options_structure_ringing_artillery = {
         title = "<LOC options_structure_ringing_artillery_title>Assist to cap",
