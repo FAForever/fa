@@ -245,6 +245,10 @@ local keyActionsDebugAI = {
         action = 'UI_Lua import("/lua/ui/game/NavDebug/DirectionTo.lua").OpenWindow()',
         category = 'ai'
     },
+    ['toggle_ai_nav_get_positions_in_radius'] = {
+        action = 'UI_Lua import("/lua/ui/game/NavDebug/GetPositionsInRadius.lua").OpenWindow()',
+        category = 'ai'
+    },
     ['toggle_ai_base_ui'] = {
         action = 'UI_Lua import("/lua/ui/game/aibaseinfo.lua").OpenWindow()',
         category = 'ai'

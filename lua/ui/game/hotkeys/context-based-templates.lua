@@ -96,8 +96,8 @@ local CommandMode = import("/lua/ui/game/commandmode.lua")
 CommandMode.AddEndBehavior(
     function()
         if not table.empty(ContextBasedTemplates) then
+            ContextBasedTemplates = { }
             ContextBasedTemplateStep = 0
-            ClearBuildTemplates()
         end
     end,
     'ContextBasedTemplates'
