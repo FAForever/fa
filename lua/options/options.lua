@@ -529,7 +529,7 @@ options = {
                 default = "on",
                 set = function(key, value, startup)
                     if GetCurrentUIState() == 'game' then
-                        import("/lua/ui/game/hotkeys/capping.lua").RingStorages = value == 'on' or value == 'on-inner' or value == 'on-all'
+                        import("/lua/ui/game/hotkeys/capping.lua").RingStorages = value == 'on'
                     end
                 end,
                 custom = {
