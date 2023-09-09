@@ -60,7 +60,7 @@ function DoCallback(name, data, units)
 
     local timeTaken = GetSystemTimeSecondsOnlyForProfileUse() - start
     if (timeTaken > 0.005) then
-        SPEW(string.format("Time to process %s: %f", name, timeTaken))
+        SPEW(string.format("Time to process %s from %d: %f", name, timeTaken, GetCurrentCommandSource() or -2))
     end
 end
 
