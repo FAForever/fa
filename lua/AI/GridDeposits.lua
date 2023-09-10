@@ -217,7 +217,7 @@ GridDeposits = Class(Grid) {
             local resources = self:GetResourcesWithinDistance('Mass' , position, 50, 'Amphibious')
 
             for k, resource in resources do
-                DrawLinePop(resource.Position, position, 'ffffff')
+                DrawLinePop(position, resource.Position, 'ffffff')
             end
 
             WaitTicks(1)
