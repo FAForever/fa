@@ -15,8 +15,8 @@ function DisableDebugging()
 end
 
 ---@class AIGridDepositsCell : AIGridCell
----@field MassDeposits { Marker: MarkerResource }
----@field HydroDeposits { Marker: MarkerResource }
+---@field MassDeposits { Marker: MarkerResource, NavAmphLayer: number }
+---@field HydroDeposits { Marker: MarkerResource, NavAmphLayer: number }
 
 ---@class AIGridDeposits : AIGrid
 ---@field Cells AIGridDepositsCell[][]
@@ -122,6 +122,10 @@ GridDepositsInstance = false
 
 ---@return AIGridDeposits
 Setup = function()
+
+    -- requires the navigational mesh
+    NavUtils.Generate()
+
     if not GridDepositsInstance then
         GridDepositsInstance = GridDeposits() --[[@as AIGridDeposits]]
 

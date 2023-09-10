@@ -1295,3 +1295,11 @@ end
 function IsInBuildableArea(origin)
     return IsInPlayableArea(origin, 8)
 end
+
+--- Converts a world distance into grid distance
+---@param distance number
+---@return number
+function WorldDistanceToGridDistance(distance)
+    local sizeOfCell = NavGenerator.SizeOfCell()
+    return math.ceil(distance / sizeOfCell) + 1
+end

@@ -379,5 +379,9 @@ GridPresence = Class(Grid) {
 ---@param brain moho.aibrain_methods
 ---@return AIGridPresence
 Setup = function(brain)
+
+    -- requires the navigational mesh
+    NavUtils.Generate()
+
     return GridPresence(brain)
 end
