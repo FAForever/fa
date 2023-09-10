@@ -144,6 +144,14 @@ function Generate()
     end
 end
 
+--- Converts a world distance into grid distance
+---@param distance number
+---@return number
+function ToGridDistance(distance)
+    local sizeOfCell = NavGenerator.SizeOfCell()
+    return math.floor(distance / sizeOfCell) + 1
+end
+
 ---@param layer NavLayers
 ---@return NavGrid?
 ---@return 'InvalidLayer'?
@@ -631,8 +639,7 @@ function GetPositionsInRadius(layer, position, thresholdDistance, thresholdSize,
         return nil, 'OutsideMap'
     end
 
-    local sizeOfcell = NavGenerator.SizeOfCell()
-    local distanceInCells = math.ceil(0.5 * thresholdDistance / sizeOfcell) + 1
+    local distanceInCells = ToGridDistance(thresholdDistance)
     for lz = -distanceInCells, distanceInCells do
         for lx = -distanceInCells, distanceInCells do
             local neighbor = FindRootGridspaceXZ(grid, gx + lz, gz + lx)
@@ -1296,10 +1303,3 @@ function IsInBuildableArea(origin)
     return IsInPlayableArea(origin, 8)
 end
 
---- Converts a world distance into grid distance
----@param distance number
----@return number
-function ToGridDistance(distance)
-    local sizeOfCell = NavGenerator.SizeOfCell()
-    return math.floor(distance / sizeOfCell) + 1
-end
