@@ -91,6 +91,13 @@ Text = ClassUI(moho.text_methods, Control) {
         end
     end,
 
+    --- creates semitransprent shadow behind this text control with optional styling parameters
+    --- this improves visibility of the displayed tex and it works better than SetDropShadow(true) function
+    SetColorShadow = function(self, color, left, top, right, bottom, targetDepth, shadowDepth)
+        self.Shadow = import('/lua/ui/uiutil.lua').CreateBackground(self, color, left, top, right, bottom, targetDepth, shadowDepth)
+        return self.Shadow
+    end,
+
     OnDestroy = function(self)
         if self._font then
             if self._font._family then
