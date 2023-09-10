@@ -35,6 +35,7 @@ AIFGuidedMissile = ClassProjectile(AGuidedMissileProjectile) {
         local xVec = 0 
         local yVec = vy*0.8
         local zVec = 0
+        
         -- Adjust damage by number of split projectiles
         self.DamageData.DamageAmount = self.DamageData.DamageAmount / numProjectiles
 

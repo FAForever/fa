@@ -53,6 +53,7 @@ UnitBlueprint{
         "SNIPEMODE",
         "SUBMERSIBLE",
         "VISIBLETORECON",
+        "EXTERNALFACTORY",
     },
     Defense = {
         AirThreatLevel = 0,
@@ -174,7 +175,7 @@ UnitBlueprint{
     Economy = {
         BuildCostEnergy = 380000,
         BuildCostMass = 24000,
-        BuildRate = 240,
+        BuildRate = 225,
         BuildTime = 38400,
         BuildableCategory = {
             "BUILTBYTIER3FACTORY AEON MOBILE CONSTRUCTION",

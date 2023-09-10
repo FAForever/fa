@@ -92,9 +92,7 @@ defaultKeyMap = {
     ['Ctrl-Shift-S']        = 'select_nearest_naval_factory',
     ['Shift-T']             = 'create_build_template',
 
-    ['Tab']                 = 'next_cam_position',
-    ['Shift-Tab']           = 'add_cam_position',
-    ['Ctrl-Tab']            = 'rem_cam_position',
+    ['Tab']                 = 'cycle_context_based_templates',
     ['Q']                   = 'zoom_in',
     ['W']                   = 'zoom_out',
     ['Shift-Q']             = 'zoom_in_fast',

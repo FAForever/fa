@@ -487,13 +487,13 @@ AIBrain = Class(StandardBrain) {
             local seaFactories = {}
             local gates = {}
             for ek, ev in factories do
-                if EntityCategoryContains(categories.FACTORY * categories.AIR, ev) and self:PBMFactoryLocationCheck(ev, v) then
+                if EntityCategoryContains(categories.FACTORY * categories.AIR - categories.EXTERNALFACTORYUNIT, ev) and self:PBMFactoryLocationCheck(ev, v) then
                     table.insert(airFactories, ev)
-                elseif EntityCategoryContains(categories.FACTORY * categories.LAND, ev) and self:PBMFactoryLocationCheck(ev, v) then
+                elseif EntityCategoryContains(categories.FACTORY * categories.LAND - categories.EXTERNALFACTORYUNIT, ev) and self:PBMFactoryLocationCheck(ev, v) then
                     table.insert(landFactories, ev)
-                elseif EntityCategoryContains(categories.FACTORY * categories.NAVAL, ev) and self:PBMFactoryLocationCheck(ev, v) then
+                elseif EntityCategoryContains(categories.FACTORY * categories.NAVAL - categories.EXTERNALFACTORYUNIT, ev) and self:PBMFactoryLocationCheck(ev, v) then
                     table.insert(seaFactories, ev)
-                elseif EntityCategoryContains(categories.FACTORY * categories.GATE, ev) and self:PBMFactoryLocationCheck(ev, v) then
+                elseif EntityCategoryContains(categories.FACTORY * categories.GATE - categories.EXTERNALFACTORYUNIT, ev) and self:PBMFactoryLocationCheck(ev, v) then
                     table.insert(gates, ev)
                 end
             end
@@ -581,12 +581,9 @@ AIBrain = Class(StandardBrain) {
             position[1] = position[1] / TableGetn(factories)
             position[3] = position[3] / TableGetn(factories)
             if not rallyLoc and not location.UseCenterPoint then
-                local pnt
-                if not markerType then
-                    pnt = AIUtils.AIGetClosestMarkerLocation(self, 'Rally Point', position[1], position[3])
-                else
-                    pnt = AIUtils.AIGetClosestMarkerLocation(self, markerType, position[1], position[3])
-                end
+                -- Get the specified marker type, or fall back to the default 'Rally Point'
+                local pnt = AIUtils.AIGetClosestMarkerLocation(self, markerType, position[1], position[3]) or AIUtils.AIGetClosestMarkerLocation(self, 'Rally Point', position[1], position[3])
+                
                 if pnt and TableGetn(pnt) == 3 then
                     rally = Vector(pnt[1], pnt[2], pnt[3])
                 end

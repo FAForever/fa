@@ -24,8 +24,6 @@ AIFGuidedMissile02 = ClassProjectile(AGuidedMissileProjectile) {
 	OnImpact = function(self, TargetType, TargetEntity)
         AMiasmaProjectile.OnImpact(self, TargetType, TargetEntity)
 
-        --WARN(tostring(TargetType) .. " - " .. tostring(TargetEntity))
-        --Sounds for all other impacts, ie: Impact<TargetTypeName>
         local bp = self:GetBlueprint().Audio
         local snd = bp['Impact'.. TargetType]
         if snd then
@@ -41,7 +39,7 @@ AIFGuidedMissile02 = ClassProjectile(AGuidedMissileProjectile) {
     
         local px, py, pz = self:GetPositionXYZ()
         entity:UpdatePosition(px, pz)
-        entity:UpdateIntel(self.Army, 10, 'Vision', true)
+        entity:UpdateIntel(self.Army, 12, 'Vision', true)
         entity:UpdateDuration(10)
 
         -- Transplanted AIFMiasmaShell02 code
@@ -50,19 +48,14 @@ AIFGuidedMissile02 = ClassProjectile(AGuidedMissileProjectile) {
         local radius = self.DamageData.DamageRadius
         local FriendlyFire = self.DamageData.DamageFriendly and radius ~=0
 
-        
-
-        DamageArea( self, pos, radius, 1, 'Force', FriendlyFire )
-        DamageArea( self, pos, radius, 1, 'Force', FriendlyFire )
-
-        self.DamageData.DamageAmount = self.DamageData.DamageAmount - 2
-
-
-        -- One initial projectile following same directional path as the original, old code in case it breaks
-        --local child = self:CreateChildProjectile('/projectiles/AIFMiasmaShell02/AIFMiasmaShell02_proj.bp' ):SetVelocity(x,y,z):SetVelocity(speed)
+        DamageArea( self, pos, 0.5 * radius, 1, 'TreeFire', FriendlyFire )
+        DamageArea( self, pos, 0.5 * radius, 1, 'TreeFire', FriendlyFire )
 
         local emitter = CreateEmitterAtEntity(self, self.Army, '/effects/emitters/X1Mercy_cloud_emit.bp')
-        emitter:ScaleEmitter(self.DamageData.DamageRadius / 5 * 2):SetEmitterCurveParam('EMITRATE_CURVE',self.DamageData.DamageRadius * 2,20):SetEmitterCurveParam('Y_POSITION_CURVE', -0.5, 1)
+        emitter:ScaleEmitter(self.DamageData.DamageRadius / 5 * 2):SetEmitterCurveParam('Y_POSITION_CURVE', 0.5, 1)
+
+        local emitter = CreateEmitterAtEntity(self, self.Army, '/effects/emitters/X2Mercy_cloud_emit.bp')
+        emitter:ScaleEmitter(self.DamageData.DamageRadius / 5 * 2):SetEmitterCurveParam('Y_POSITION_CURVE', 0.2, 1)
 
         self:Destroy()
     end,

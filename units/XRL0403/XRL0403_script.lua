@@ -15,9 +15,14 @@ local CIFSmartCharge = CybranWeaponsFile.CIFSmartCharge
 local CAABurstCloudFlakArtilleryWeapon = CybranWeaponsFile.CAABurstCloudFlakArtilleryWeapon
 local CDFBrackmanCrabHackPegLauncherWeapon = CybranWeaponsFile.CDFBrackmanCrabHackPegLauncherWeapon
 
----@class XRL0403 : CWalkingLandUnit
-XRL0403 = ClassUnit(CWalkingLandUnit) {
+local CConstructionTemplate = import("/lua/cybranunits.lua").CConstructionTemplate
+
+---@class XRL0403 : CWalkingLandUnit, CConstructionTemplate
+XRL0403 = ClassUnit(CWalkingLandUnit, CConstructionTemplate) {
     WalkingAnimRate = 1.2,
+
+    BotBlueprintId = 'ura0001o',
+    BotBone = 'Centraltgt',
 
     Weapons = {
         ParticleGunRight = ClassWeapon(CDFHvyProtonCannonWeapon) {},
@@ -45,13 +50,47 @@ XRL0403 = ClassUnit(CWalkingLandUnit) {
         self:SetWeaponEnabledByLabel('HackPegLauncher', true)
     end,
 
-    ---@param self XRL0403
+    ---@param self XRL0403 |m
     OnCreate = function(self)
         CWalkingLandUnit.OnCreate(self)
+        CConstructionTemplate.OnCreate(self)
+
         self:SetWeaponEnabledByLabel('HackPegLauncher', false)
         if self:IsValidBone('Missile_Turret') then
             self:HideBone('Missile_Turret', true)
         end
+    end,
+
+    ---@param self CConstructionUnit
+    DestroyAllBuildEffects = function(self)
+        CWalkingLandUnit.DestroyAllBuildEffects(self)
+        CConstructionTemplate.DestroyAllBuildEffects(self)
+    end,
+
+   ---@param self CConstructionUnit
+    ---@param built boolean
+    StopBuildingEffects = function(self, built)
+        CWalkingLandUnit.StopBuildingEffects(self, built)
+        CConstructionTemplate.StopBuildingEffects(self, built)
+    end,
+
+    ---@param self CConstructionUnit
+    OnPaused = function(self)
+        CWalkingLandUnit.OnPaused(self)
+        CConstructionTemplate.OnPaused(self)
+    end,
+
+    ---@param self CConstructionUnit
+    ---@param unitBeingBuilt Unit
+    ---@param order number
+    CreateBuildEffects = function(self, unitBeingBuilt, order)
+        CConstructionTemplate.CreateBuildEffects(self, unitBeingBuilt, order, true)
+    end,
+
+    ---@param self CConstructionUnit
+    OnDestroy = function(self) 
+        CWalkingLandUnit.OnDestroy(self)
+        CConstructionTemplate.OnDestroy(self)
     end,
 
     ---@param self XRL0403
@@ -117,7 +156,7 @@ XRL0403 = ClassUnit(CWalkingLandUnit) {
             self:SetSpeedMult(1)
         elseif new == 'Seabed' then
             self:EnableUnitIntel('Layer', 'Sonar')
-            self:SetSpeedMult(self.Blueprint.Physics.WaterSpeedMultiplier)
+            self:SetSpeedMult(self.Blueprint.Physics.WaterSpeedMultiplier or 1)
         end
     end,
 

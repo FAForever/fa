@@ -209,7 +209,6 @@ function ResetOrderQueue(factory)
 end
 
 function ResetOrderQueues(units)
-    LOG("ResetOrderQueues")
     local factories = EntityCategoryFilterDown((categories.SHOWQUEUE * categories.STRUCTURE) + categories.FACTORY, units)
     if factories[1] then
         Select.Hidden(function()
@@ -1512,31 +1511,6 @@ function OnClickHandler(button, modifiers)
             SetActiveBuildTemplate(item.template.templateData)
         end
 
-        if options.gui_template_rotator ~= 0 then
-            local item = button.Data
-            local activeTemplate = item.template.templateData
-            local worldview = import("/lua/ui/game/worldview.lua").viewLeft
-            local oldHandleEvent = worldview.HandleEvent
-            worldview.HandleEvent = function(self, event)
-                if event.Type == 'ButtonPress' then
-                    if event.Modifiers.Middle then
-                        ClearBuildTemplates()
-                        local tempTemplate = table.deepcopy(activeTemplate)
-                        activeTemplate[1] = tempTemplate[2]
-                        activeTemplate[2] = tempTemplate[1]
-                        for i = 3, table.getn(activeTemplate) do
-                            local index = i
-                            activeTemplate[index][3] = 0 - tempTemplate[index][4]
-                            activeTemplate[index][4] = tempTemplate[index][3]
-                        end
-                        SetActiveBuildTemplate(activeTemplate)
-                    elseif event.Modifiers.Shift then
-                    else
-                        worldview.HandleEvent = oldHandleEvent
-                    end
-                end
-            end
-        end
     elseif item.type == 'enhancement' and button.Data.TooltipOnly == false then
         local doOrder = true
         local clean = not modifiers.Shift
@@ -1897,6 +1871,22 @@ function ToggleUnitPause()
         controls.extraBtn2:ToggleCheck()
     else
         SetPaused(sortedOptions.selection, not GetIsPaused(sortedOptions.selection))
+    end
+end
+
+function ToggleUnitPauseAll()
+    if controls.selectionTab:IsChecked() or controls.constructionTab:IsChecked() then
+        controls.extraBtn2:ToggleCheck(false)
+    else
+        SetPaused(sortedOptions.selection, true)
+    end
+end
+
+function ToggleUnitUnpauseAll()
+    if controls.selectionTab:IsChecked() or controls.constructionTab:IsChecked() then
+        controls.extraBtn2:OnCheck(true)
+    else
+        SetPaused(sortedOptions.selection, false)
     end
 end
 

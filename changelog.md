@@ -1,6 +1,390 @@
 
 Some sections of the changelog are available in other languages such as [French](changelog-fr.md) or [Russian](changelog-ru.md)
 
+# Game version 3766 (9th of September, 2023)
+
+See the patch notes of 3766 for the full patch notes.
+
+With thanks to all those that took the time to report issues,
+
+Jip
+
+## Features
+
+### Capping of a structure
+
+In the previous patch, we reduced the ability to cap structures by assisting a structure. Thanks to an assembly patch by 4z0t, the technical reasons for this reduction have been fixed. As a result, we are now reintroducing the feature with improvements.
+
+The feature now sorts the build orders by the distance to the nearest engineer relative to the structure they are assisting. This helps reduce pathfinding issues. Additionally, the feature now applies a single build order to all engineers, which reduces the framerate impact that players previously experienced.
+
+Upon release, players can enable the following assist-to-cap behaviors through the game options:
+
+- Cap an extractor with mass storages
+- Cap an extractor with 4 or 8 mass fabricators
+- Cap a radar or tech 2 artillery with tech 1 power generators
+- Cap tech 3 or experimental artillery with tech 3 power generators
+
+### Other features
+
+- (#5398) Introduces a hotkey to issue an upgrade to the structure currently under the mouse cursor
+- (#5394) Introduces a hotkey to cap the structure currently under the mouse cursor
+- (#5397) Introduces a hotkey to select all units consuming resources
+- (#5407) Introduces the generation of Naval Area markers for AIs
+
+The average AI is now more likely to construct naval factories.
+
+- (#5405) Improvements to the Mods Manager
+
+No more text bleeding, and the URL dialog is temporarily removed when you open links in the lobby.
+
+## Bug fixes
+
+- Exclude external factory unit from the unit restrictions menu
+- Fix Solace dropping the torpedo salvo way behind the target
+- Fix a bug where the build preview of templates would reset every few seconds
+
+This was a mistake on our end. With this fix, the game is more compatible with UI mods such as Eco Manager and UI Party again
+
+- (#5405) Fix the bleeding of water ramps on sharp cliffs
+
+## Contributors
+
+With thanks to the following people who contributed through coding:
+
+- Gordenwunderlich / Nex37
+- Jip
+- Hussar
+- BlackYps
+
+With thanks to the following people who contributed through binary patches:
+
+- 4z0t
+- Strogo
+- KionX
+- RTD
+
+And, last but certainly not least - with thanks to those that took part in constructive discussions:
+
+- Babel
+- Valigo
+- MostLostNoob
+- LoliNekoTrap
+
+# Game version 3765 (2nd of September, 2023)
+
+The third developer's iteration contains more new features than any release in the past two years. It opens up new ways for players to approach the game.
+
+However, some features are being left behind. One of the most notable changes is the removal of the feature that allowed players to hover over a deposit to initiate the build mode for extractors or hydrocarbon plants. This feature was computationally expensive and is no longer part of the standard FAForever experience. However, it is still available as a UI mod for those willing to accept the performance penalty. You can find the 'Hover to Build' UI mod in the vault.
+
+Another feature with reduced functionality is the ringing feature. You can now only ring extractors with storages, while all other options are integrated into the new Context-Based Templates feature. You can read more about this in the features section. This change was made because the old ringing feature was computationally expensive and could cause stutters and frame drops for players. Therefore, it has been limited to its most commonly used functionality: the ability to ring extractors with storages.
+
+Lastly, any functionality that relied on the old spread attack implementation will no longer be operational. The previous implementation was susceptible to abuse and could even crash the game. We hope that the new implementation will better serve your needs as a player.
+
+With appreciation towards all the contributors that made this iteration possible,
+
+Best regards,
+Jip
+
+## Features
+
+### Mobile Factories
+
+A long-standing functional myth has now become a part of the FAForever experience! All Tech 3 Aircraft Carriers, plus the Tempest, the Atlantis, and the Fatboy, can now build using a separate build module attached to the unit. The build module is located at the back of the unit. Clicking just over the back (on land/water) will select the build module. All factory hotkeys interact with these build modules.
+
+We're open to ideas from players on how we can further improve this feature, especially in terms of user interactions.
+
+The Megalith remains unchanged, while the CZAR temporarily loses its ability to build. We were unable to finalize it, but we hope to include it in a future patch.
+
+### Advanced orders
+
+We're enhancing existing advanced orders and introducing new ones. The most notable change is the complete reimplementation of the Spread Attack feature from the ground up. This wouldn't have been possible without the dedicated work of Strogo, RTD, and KionX.
+
+All of the mentioned orders are linked to hotkeys. In the key bindings menu, you'll find new world-wide-web icons next to hotkeys. If the world-wide-web icon is present, you can click on it to learn more about the hotkey on the FAForever wiki. We highly recommend checking out the Wiki; it even includes short videos that can explain concepts better than a thousand words ever could.
+
+The following hotkeys have been improved or added:
+
+- Distribute orders (formerly Spread Attack)
+- Distribute orders (for the unit your mouse is hovering over)
+- Copy orders (for the unit your mouse is hovering over)
+- Load into transports
+- Filter engineers
+- Cycle templates (see below: Context-based templates)
+
+### Advanced map shaders
+
+We're excited to announce the introduction of advanced map shaders that map authors can now apply to their new maps. Existing maps will remain unchanged. These new shaders enable you to incorporate properties such as shadows, ambient occlusion, normals, and albedo textures directly into the terrain. This integration makes them an integral part of the rendering pipeline, rather than applying them on top of the terrain, as decals typically do.
+
+### Context based templates
+
+An alternative use of the build templates system! With this new feature, you can cycle through build templates that adapt to the context of your selection and your mouse location. FAForever includes a set of default templates for this feature. The functionality is fully customizable, allowing you to remove existing templates or add your own to cycle through via UI mods.
+
+You can find the hotkey by searching for 'Context.' It defaults to 'Tab' for new players or those who have reset their keybindings.
+
+### Other features
+
+- (#5321) Pausing engineers will also pause reclaiming props.
+- (#5300) The score graph now uses square root scaling to make it easier to view the first few minutes.
+- (#5326) We've improved CPU resource utilization to reduce frame stuttering for CPUs with 6 or more logical cores.
+
+In practice, many CPUs have 6 or more logical cores. If we detect that your CPU has sufficient cores, we change the process affinity to ignore the first compute core. The first compute core is often used by processes, including the OS. When the game ignores the first compute core, the render thread (which is otherwise locked to the first compute core) has more room to operate and is less influenced by other processes and the OS. As a result, you'll experience fewer stutters and overall better frame times.
+
+- [9e73421](https://github.com/FAForever/FA-Binary-Patches/commit/9e734211cbec22e9ce4696cf3c9343bdda54fdf5) On average, there is a 5% performance improvement (both in simulation and UI) across the board.
+A free Cybran Cookie for anyone who can explain how it works without asking the assembly magicians.
+
+- [120d32](https://github.com/FAForever/fa/commit/120d329af238ef93d2c054b444a2f704febb6155) Added a new hotkey to load all units of your selection into the transports of your selection.
+- (#5333) Added tread crushing damage to the Fatboy.
+- (#5367) Added the standard Cybran build effect to the Megalith.
+- (#5362) Added links to the Wiki to explain hotkeys in the key bindings menu.
+- (#5360) Sped up the death animations of a wide range of structures.
+- (#5312) Extend depth preview to help indicate when the water is deep enough for submarines
+- (#5365) Add high quality water textures that map authors can now use
+- [fe6db21] Improve the Damage over Time (DOT) effects of the Mercy
+
+## Bug fixes
+
+- (#5317) Bombers with multiple projectiles are now less likely to miss their target when micromanaging them.
+- (#5294) Gifted structures now properly copy the orientation.
+- (#5335) Fixed a bug that occurred with the navigational mesh for non-square maps.
+- (#5329) Disabled intel and maintenance costs of units inside a carrier.
+- (#5374) Fixed upgrading structures losing their control groups.
+- (#5371) Fixed invulnerable props being removed when building on top of them.
+- (#5371) Fixed light particles when building structures being visible through the fog of war.
+- (#5343) Fixed a bug that could cause the simulation to freeze.
+- (#5303) Fixed a bug that could cause weapons to reset their targets prematurely
+- (#5368) Reduce aliasing of water when anisotropic filtering is enabled through the Nvidia settings
+
+## Contributors
+
+Unlike previous changelogs we no longer list the commits of each individual contributor.
+
+With thanks to the following people who contributed through coding:
+
+- RabidPope
+- Gordenwunderlich / Nex37
+- Hussar
+- BlackYps
+- Basilisk3
+- speed2
+- Grandpa Sawyer
+- Hdt80bro
+- Maudlin27
+- Relent0r
+- Jip
+- Deribus
+
+With thanks to the following people who contributed through binary patches:
+
+- 4z0t
+- Strogo
+- KionX
+- RTD
+
+With thanks to the following people who contributed through model, texture and effect changes:
+
+- MadMax
+- Deribus
+- Jip
+
+And, last but certainly not least - with thanks to those that took part in constructive discussions:
+
+- CheeseBerry
+- Tomma
+- Nex37
+- MostLostNoob
+- FemtoZetta
+- Sheikah
+- ComradeStryker
+- Resistance
+- Maudlin27
+- MadMax
+- IndexLibrorum
+- Derp
+- Deribus
+- Magge
+
+# Game version 3764 (29th of July, 2023)
+
+See the patch notes of 3762 and 3758 for the full patch notes.
+
+With thanks to all those that took the time to report issues and participate in feedback sessions,
+
+Jip
+
+## Features
+
+- (#5264) Enhancements to the unit restrictions menu
+
+  - Filters out dummy units
+  - Filters out insignificant units
+  - Fixes various bugs
+
+- (#5269) Enhancements to the unit cheat menu
+
+  - Add unit count input
+  - Add faction logo to a unit
+  - Add tech level  to a unit
+  - Improve readability of blueprint id
+  - Fix various styling issues
+
+- (#5274) Allow tree groups to block a construction site
+
+  Based on player feedback, tree groups now obstruct construction sites and are therefore reclaimed by the engineers
+
+  This is not to be confused with 'broken tree groups'. A tree group that is broken is split into individual trees. Once broken, these individual trees no longer block the construction site
+
+- (#5275) Additional hotkeys to unpause or pause all units
+
+  These new hotkeys allow you to express your intentions when (un)pausing a selection of units, especially when only a few of them need to be paused or unpaused
+
+- (#5276) Additional hotkeys to surface or submerge all units
+
+  These new hotkeys allow you to express your intentions when surfacing or submerging a selection of units, especially when only a few of them are submerged or surfaced
+
+## Bug fixes
+
+- (#5290) Resolved the issue with the navigational mesh causing crashes during the save-load sequence
+
+  Most notable when playing the campaign alone. The navigational mesh was written as a large cycle. As a consequence, once the navigational mesh was generated the save process would be unable to serialize it and crash the game
+
+- (#5291) Fix the Ythotha storm discriminating allied units and patches of ground
+
+  There was a bug that would prevent the Ythotha storm from firing upon allied units. As a result, the storm would only deal damage to hostile units. Now, the storm treats all units and ground patches equally, inflicting damage without bias.
+
+- (#5277) Prevent the intel recharge thread from hijacking the work progress bar
+
+  Most notable with the Cybran ACU once he has the stealth enhancement. This prevents the chaotic behavior when multiple Lua threads are trying to claim the progress bar
+
+- (#5282) Adjusted the positioning of tech 3 anti-air units in formations
+
+  The Bouncer and the Lightning tank have a direct fire weapon. As a result, they were considered to be a direct fire unit by the formations script. They are now recognized as anti-air units and therefore end up at the middle or the back of the formation like other anti-air units
+
+- (#5285) Remove the ability to cap Tech 3 air factories
+
+  The previous hotfix (3763) was unexpected and this change wasn't supposed to go live immediately. Regardless, we understood the feedback and are removing the behavior again
+
+- (#5287) Sanitize the anti-surface threat value of ACUs
+
+- (#5292) Fix a bug where Seraphim torpedo bombers can trick torpedo defenses
+
+## Other changes
+
+- (#5283) Add platoon form callbacks for conditional builds
+
+## Contributors
+
+- HUSSAR (#5264, #5269)
+- Jip (#5274, #5275, #5282, #5277, #5276, #5285, #5291, #5290, #5292)
+- Relent0r (#5287)
+- speed2 (#5283)
+
+# Game version 3763 (23th of July, 2023)
+
+See the patch notes of 3762 and 3758 for the full patch notes.
+
+There was a misconception with the distribution of files and as a result, wrecks would be removed in the release branch when you build on top of them. It was fun while it lasted ^^
+
+Jip
+
+## Features
+
+- (#5262) Introduce the ability to cap additional structures
+
+  You can now also cap the following structures:
+
+  - Tech 3 air factories with tech 3 power generators
+  - Tech 3 or experimental artillery with tech 3 power generators
+
+  To use these you need the game option 'Automate Structure Ringing' to be on 'Full Suite'
+
+## Bug fixes
+
+- (#5266) Fix wrecks being removed when constructing on top of them
+
+- (#5265) Fix the UI scaling of the unit cheat menu
+
+- (#5237) Fix the visuals and damage output of the Mercy
+
+  The visuals can now be seen when you're zoomed out and the Mercy deals exactly 600 area damage at the center of the target
+
+- (#5191) Fix the size of the zapper on the Cybran Aircraft Carrier
+
+## Contributors
+
+- Jip (#5265, #5266, #5237)
+- MadMax (#5191)
+- Hussar (#5262)
+
+
+# Game version 3762 (22th of July, 2023)
+
+See the patch notes of 3762 and 3758 for the full patch notes.
+
+Jip
+
+## Features
+
+- (#5197, #16) Small props and trees are ignored when building
+
+  You can now build on top of logs, bushes, cacti, (fallen) trees and tree groups. This is a quality-of-life change to prevent your ACU or your engineers from delaying your build order because there is an invisible prop (due to Level of Details (LODs)) 'blocking' your construction site. This can significantly delay the construction. Instead, the before-mentioned props are destroyed when you start the construction.
+
+  To be specific, the following props will still block your construction site:
+
+  - Any wreck, regardless of mass value
+  - Any rock, regardless of mass value
+  - Any non-tree prop of significant (>= 10) mass value in general
+
+  For the next patch, the goal is to allow you to entirely rely on the reclaim overview to manage your expectations of whether the construction site is blocked by props.
+
+- (#5246) Do not immediately destroy units of teams that recall
+
+  There was a suggestion on the forum to be able to review the final game state when a team recalls. With this delay, the units are preserved in the final game state, yet still destroyed when you play FFA-like setups
+
+- (#5247) Re-introduce a hotkey that allows you to filter your selection and assist the highest tech engineers of your selection
+
+## AI
+
+- (#5234) Fix a bug where nuke launchers did not generate the correct threat
+
+  They were categorized by AI as a unit with excessive surface threat, instead of economic threat. As a result, the AI would essentially never attack a base with a nuke launcher in it
+
+- (#5234) Fix a bug where mobile artillery and missile launchers did not generate the correct threat
+
+  They were categorized by the AI as units with economic threat instead of surface threat. As a result, the AI would recognize them as bulky engineers instead of something more dangerous
+
+- (#5156, #5164) Add additional debug utilities for the Navigational Mesh
+
+## Bug fixes
+
+- (#5218) Fix a bug when trying to give a unit a veterancy of 0
+
+  A few campaign maps did this and the bug prevented the scripts to continue
+
+- (#5219, #5236) Fix a bug in campaign maps related to missing categories
+
+- (#5219, #5236) Fix a bug with the unit restrictions menu related to missing categories
+
+- (#5162) Fix shield visibility on land-only maps
+
+- (#5245) Fix a bug where the idle animation of the Seraphim tech 2 extractor does not stop when upgrading
+
+## Graphics
+
+- (#5171) Add or fix existing LODs of various Aeon units
+
+## Performance
+
+- (#5250) Reduce the performance impact of the AA weaponry of Seraphim frigates
+
+## Contributors
+
+- 4z0t (#16)
+- BlackYps (#5162)
+- Relent0r (#5234)
+- Basilisk3 (#5250)
+- MadMax (#5171)
+- Jip (#5156, #5164, #5197, #5219, #5245, #5247)
+
+
 # Game version 3761 (27th of June, 2023)
 
 The main objective of this patch is to enhance the viability of a diverse range of strategies by boosting raiding capabilities, balancing overpowered units, and introducing novel ways to utilize existing units.

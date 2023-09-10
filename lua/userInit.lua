@@ -10,8 +10,8 @@ __language = GetPreference('options_overrides.language', '')
 -- Build language select options
 __installedlanguages = DiskFindFiles("/loc/", '*strings_db.lua')
 for index, language in __installedlanguages do
-    language =  string.upper(string.gsub(language, ".*/(.*)/.*","%1"))
-    __installedlanguages[index] = {text = language, key = language}
+    language = string.upper(string.gsub(language, ".*/(.*)/.*", "%1"))
+    __installedlanguages[index] = { text = language, key = language }
 end
 
 
@@ -46,6 +46,7 @@ end
 local AvgFPS = 10
 WaitFrames = coroutine.yield
 
+--- Waits the given number of seconds. Always waits at least one frame
 function WaitSeconds(n)
     local start = CurrentTime()
     local elapsed_frames = 0
@@ -53,7 +54,7 @@ function WaitSeconds(n)
     local wait_frames
 
     repeat
-        wait_frames = math.ceil(math.max(1, AvgFPS*0.1, n * AvgFPS))
+        wait_frames = math.ceil(math.max(1, AvgFPS * 0.1, n * AvgFPS))
         WaitFrames(wait_frames)
         elapsed_frames = elapsed_frames + wait_frames
         elapsed_time = CurrentTime() - start
@@ -64,6 +65,14 @@ function WaitSeconds(n)
     end
 end
 
+--- Waits the given number of ticks. Always waits at least four frames
+---@param ticks any
+function WaitTicks(ticks)
+    local start = GameTick()
+    repeat
+        WaitFrames(4)
+    until (start + ticks) <= GameTick()
+end
 
 -- a table designed to allow communication from different user states to the front end lua state
 FrontEndData = {}
@@ -71,7 +80,7 @@ FrontEndData = {}
 -- Prefetch user side data
 Prefetcher = CreatePrefetchSet()
 
-local FileCache =  {}
+local FileCache = {}
 local oldDiskGetFileInfo = DiskGetFileInfo
 function DiskGetFileInfo(file)
     if FileCache[file] == nil then
@@ -89,7 +98,7 @@ function PrintText(textData)
     if textData then
         local data = textData
         if type(textData) == 'string' then
-            data = {text = textData, size = 14, color = 'ffffffff', duration = 5, location = 'center'}
+            data = { text = textData, size = 14, color = 'ffffffff', duration = 5, location = 'center' }
         end
         import("/lua/ui/game/textdisplay.lua").PrintToScreen(data)
     end
@@ -132,5 +141,110 @@ do
         end
 
         oldConExecuteSave(command)
+    end
+
+    --- Retrieves the terrain elevation, can be compared with the y coordinate of `GetMouseWorldPos` to determine if the mouse is above water
+    ---@return number
+    _G.GetMouseTerrainElevation = function()
+        if __EngineStats and __EngineStats.Children then
+            for _, a in __EngineStats.Children do
+                if a.Name == 'Camera' then
+                    for _, b in a.Children do
+                        if b.Name == 'Cursor' then
+                            for _, c in b.Children do
+                                if c.Name == 'Elevation' then
+                                    return c.Value
+                                end
+                            end
+                            break
+                        end
+                    end
+                end
+            end
+        end
+
+        return 0
+    end
+end
+
+do
+    local OldOpenURL = _G.OpenURL
+
+    --- Opens a URL after the user confirms the link
+    ---@param url string
+    _G.OpenURL = function(url, dialogParent)
+        local UIUtil = import("/lua/ui/uiutil.lua")
+
+        if GetCurrentUIState() == 'game' then
+            if not dialogParent then dialogParent = GetFrame(0) end
+            UIUtil.QuickDialog(
+                dialogParent,
+                string.format("You're about to open a browser to:\r\n\r\n%s", url),
+                'Open browser',
+                function() OldOpenURL(url) end,
+                'Cancel'
+            )
+        else
+            OldOpenURL(url)
+        end
+    end
+end
+
+do
+
+    ---@type { [1]: UserUnit }
+    local UnitsCache = {}
+
+    ---@param unit UserUnit
+    ---@param pause boolean
+    _G.SetPausedOfUnit = function(unit, pause)
+        UnitsCache[1] = unit
+        return SetPaused(UnitsCache, pause)
+    end
+
+    ---@param unit UserUnit
+    ---@return boolean
+    _G.GetIsPausedOfUnit = function(unit)
+        UnitsCache[1] = unit
+        return GetIsPaused(UnitsCache)
+    end
+
+    ---@param unit UserUnit
+    ---@return string[] orders
+    ---@return CommandCap[] availableToggles
+    ---@return EntityCategory buildableCategories
+    _G.GetUnitCommandDataOfUnit = function(unit)
+        UnitsCache[1] = unit
+        return GetUnitCommandData(UnitsCache)
+    end
+
+    ---@param units UserUnit[]
+    ---@param command UserUnitBlueprintCommand
+    ---@param blueprintid UnitId
+    ---@param count number
+    ---@param clear boolean? defaults to false
+    _G.IssueBlueprintCommandToUnits = function(units, command, blueprintid, count, clear)
+        local gameMain = import("/lua/ui/game/gamemain.lua")
+        local commandMode = import("/lua/ui/game/commandmode.lua")
+
+        -- prevents losing command mode
+        commandMode.CacheAndClearCommandMode()
+        gameMain.SetIgnoreSelection(true)
+        local oldSelection = GetSelectedUnits()
+        SelectUnits(units)
+        IssueBlueprintCommand(command, blueprintid, count, clear)
+        SelectUnits(oldSelection)
+        gameMain.SetIgnoreSelection(false)
+        commandMode.RestoreCommandMode(true)
+    end
+
+    ---@param unit UserUnit[]
+    ---@param command UserUnitBlueprintCommand
+    ---@param blueprintid UnitId
+    ---@param count number
+    ---@param clear boolean? defaults to false
+    _G.IssueBlueprintCommandToUnit = function(unit, command, blueprintid, count, clear)
+        UnitsCache[1] = unit
+        IssueBlueprintCommandToUnits(UnitsCache, command, blueprintid, count, clear)
     end
 end

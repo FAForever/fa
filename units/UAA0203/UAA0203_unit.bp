@@ -80,6 +80,32 @@ UnitBlueprint{
                     },
                 },
             },
+            AirWater = {
+                Effects = {
+                    {
+                        Bones = { "UAA0203" },
+                        Type = "Landing01",
+                    },
+                },
+            },
+            WaterAir = {
+                Effects = {
+                    {
+                        Bones = { "UAA0203" },
+                        Type = "TakeOff01",
+                    },
+                },
+            },
+        },
+        IdleEffects = {
+            Water = {
+                Effects = {
+                    {
+                        Bones = { "UAA0203" },
+                        Type = "SeaIdleGunship01",
+                    },
+                },
+            },
         },
         Mesh = {
             IconFadeInZoom = 130,
@@ -87,6 +113,12 @@ UnitBlueprint{
                 {
                     LODCutoff = 120,
                     ShaderName = "Aeon",
+                },
+                {
+                    AlbedoName = 'uaa0203_lod1_albedo.dds',
+                    LODCutoff = 215,
+                    ShaderName = 'Aeon',
+                    SpecularName = 'uaa0203_lod1_specteam.dds',
                 },
             },
         },

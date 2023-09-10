@@ -875,8 +875,24 @@ Tooltips = {
         description = "<LOC OPTIONS_0217>Allows other players to send you build templates over the network",
     },
     options_structure_capping_feature_01 = {
-        title = "<LOC OPTIONS_0273>Automated Structure Ringing",
-        description = "<LOC OPTIONS_0274>Assist a structure to cap it with adjacency-friendly structures. As an example: storages surrounding a tech 2 or tech 3 mass extractor.",
+        title = "<LOC options_structure_capping_feature_01_title>Assist to cap",
+        description = "<LOC options_structure_capping_feature_01_description>Assist an extractor to cap it with storages",
+    },
+    options_structure_ringing_extractors_fabs = {
+        title = "<LOC options_structure_ringing_extractors_fabs_title>Assist to cap",
+        description = "<LOC options_structure_ringing_extractors_fabs_description>Assist an extractor to cap it with 4 or 8 fabricators",
+    },
+    options_structure_ringing_artillery = {
+        title = "<LOC options_structure_ringing_artillery_title>Assist to cap",
+        description = "<LOC options_structure_ringing_artillery_description>Assist a tech 2 artillery to cap it with tech 1 power generators",
+    },
+    options_structure_ringing_radar = {
+        title = "<LOC options_structure_ringing_radar_title>Assist to cap",
+        description = "<LOC options_structure_ringing_radar_description>Assist a radar or omni to cap it with tech 1 power generators",
+    },
+    options_structure_ringing_artillery_end_game = {
+        title = "<LOC options_structure_ringing_artillery_end_game_title>Assist to cap",
+        description = "<LOC options_structure_ringing_artillery_end_game_description>Assist an end game artillery to cap it with tech 3 power generators. Does not apply to the salvation",
     },
     options_automex = {
         title = "<LOC OPTIONS_0285>Automatic Extractor Selection",
@@ -1017,11 +1033,11 @@ Tooltips = {
     },
     options_cursor_depth_scanning = {
         title = "<LOC WATER_DEPTH_ASSISTANCE_TITLE>Water depth indication",
-        description = "<LOC WATER_DEPTH_ASSISTANCE_DESCRIPTION>When enabled, adds visual elements to visualize the offset between the water surface and the ocean floor at the position of the cursor.",
+        description = "<LOC WATER_DEPTH_ASSISTANCE_DESCRIPTION>When enabled, adds visual elements to visualize the offset between the water surface and the ocean floor at the position of the cursor. A separate indicator turns red when naval units are guaranteed to not be able to path at the location due to lack of depth.",
     },
     options_cursor_hover_scanning = {
         title = "<LOC PLANE_HEIGHT_ASSISTANCE_TITLE>Plane height indication",
-        description = "<LOC WATER_DEPTH_ASSISTANCE_DESCRIPTION>When enabled, adds visual elements to visualize the offset between the terrain surface and the (expected) height of the selected air unit at the position of the cursor. \r\nIs only applied when you have one unit selected.",
+        description = "<LOC PLANE_HEIGHT_ASSISTANCE_DESCRIPTION>When enabled, adds visual elements to visualize the offset between the terrain surface and the (expected) height of the selected air unit at the position of the cursor. \r\nIs only applied when you have one unit selected.",
     },
     options_share_mouse = {
         title = '<LOC OPTIONS_0305>Show Player Cursor Locations for Observers',
