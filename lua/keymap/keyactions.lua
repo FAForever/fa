@@ -795,6 +795,10 @@ local keyActionsHotBuild = {
         action = 'UI_Lua import("/lua/keymap/hotbuild.lua").buildAction("Templates")',
         category = 'hotbuilding',
     },
+    ['cycle_templates'] = {
+        action = 'UI_Lua import("/lua/keymap/hotbuild.lua").buildAction("Cycle_Templates")',
+        category = 'hotbuilding',
+    },
     ['engystation'] = {
         action = 'UI_Lua import("/lua/keymap/hotbuild.lua").buildAction("EngyStation")',
         category = 'hotbuilding',

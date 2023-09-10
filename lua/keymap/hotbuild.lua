@@ -9,6 +9,7 @@ local CommandMode = import("/lua/ui/game/commandmode.lua")
 local Construction = import("/lua/ui/game/construction.lua")
 local Templates = import("/lua/ui/game/build_templates.lua")
 local FactoryTemplates = import("/lua/ui/templates_factory.lua")
+local cycleTemplates = import("/lua/ui/game/hotkeys/context-based-templates.lua")
 
 local Group = import("/lua/maui/group.lua").Group
 local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
@@ -149,7 +150,7 @@ function getUnitKeyGroups()
                         LOG("!!!!! Invalid indirect building value " .. value .. " -> " .. realValue)
                     end
                 end
-            elseif value == '_upgrade' or value == '_templates' or value == '_factory_templates' then
+            elseif value == '_upgrade' or value == '_templates' or value == '_factory_templates' or value == '_cycleTemplates' then
                 table.insert(groups[name], value)
             else
                 LOG("!!!!! Invalid building value " .. value)
@@ -337,6 +338,9 @@ function buildActionBuilding(name, modifier)
 
     if table.find(allValues, "_templates") then
         return buildActionTemplate(modifier)
+    end
+    if table.find(allValues, "_cycleTemplates") then
+        return cycleTemplates.Cycle()
     end
 
     -- Reset everything that could be fading or running

@@ -365,6 +365,7 @@ keyDescriptions = {
     ['massfab'] = '<LOC key_desc_0263>build mass fabricators + T2 Bots + T2 air fighters + T2 subs',
     ['pgen'] = '<LOC key_desc_0264>build power generators + T2 Tanks + T2 Torpedo Bombers + T2 Destroyers',
     ['templates'] = '<LOC key_desc_0265>build templates + T2 Hover Tanks + T2 Gunships + T2 Cruisers',
+    ['cycle_templates'] = '<LOC key_desc_0406>cycle templates + T2 Hover Tanks + T2 Gunships + T2 Cruisers',
     ['engystation'] = '<LOC key_desc_0266>build engineers stations + T2 Mobile AA + T2 Air Transports + T2 Boats',
     ['mml'] = '<LOC key_desc_0267>build Mobile Missiles launchers + T2 Air Guided Missile (mercy)',
     ['mobileshield'] = '<LOC key_desc_0268>build T2 Mobiles Shields and mobile Stealth fields',
