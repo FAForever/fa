@@ -78,7 +78,6 @@ GridDeposits = Class(Grid) {
 
         local cell = self:ToCellFromWorldSpace(position[1], position[3])
         table.insert(cell.Deposits, { Marker = deposit, Type = 'Mass', Position = position })
-        SPEW("Registered extractor")
     end,
 
     ---@param self AIGridDeposits
@@ -101,7 +100,6 @@ GridDeposits = Class(Grid) {
 
         local cell = self:ToCellFromWorldSpace(position[1], position[3])
         table.insert(cell.Deposits, { Marker = deposit, Type = 'Hydrocarbon', Position = position })
-        SPEW("Registered hydrocarbon plant")
     end,
 
     --- Retrieves all resources that are within a given pathing distance to the provided position
@@ -110,13 +108,17 @@ GridDeposits = Class(Grid) {
     ---@param position Vector
     ---@param distance number
     ---@param layer NavLayers
-    GetResourcesWithinDistance = function(self, depositType, position, distance, layer)
-        local resources = { }
+    ---@param cache? MarkerResource[]
+    ---@return MarkerResource[]
+    ---@return number
+    GetResourcesWithinDistance = function(self, depositType, position, distance, layer, cache)
+        local head = 1
+        local resources = cache or { }
 
         local navLabel = NavUtils.GetLabel(layer, position)
 
         local gx, gz = self:ToGridSpace(position[1], position[3])
-        local gridDistance = NavUtils.WorldDistanceToGridDistance(distance)
+        local gridDistance = NavUtils.ToGridDistance(distance)
         for lx = -gridDistance, gridDistance do
             local x = gx + lx
             for lz = -gridDistance, gridDistance do
@@ -131,20 +133,30 @@ GridDeposits = Class(Grid) {
                 local deposits = cell.Deposits
                 for k = 1, table.getn(deposits) do
                     local deposit = deposits[k]
+                    local markerPosition = deposit.Position
+
+                    local dx = position[1] - markerPosition[1]
+                    local dz = position[3] - markerPosition[3]
+                    local distanceToMarker = dx * dx + dz * dz
+
+                    -- flat distance is too far away, pathing won't bring it closer
+                    if distanceToMarker > (distance * distance) then
+                        continue
+                    end
 
                     -- wrong type of resource deposit
                     if not deposit.Type == depositType then
                         continue
                     end
 
-                    local label = NavUtils.GetLabel(layer, deposit.Position)
+                    local label = NavUtils.GetLabel(layer, markerPosition)
 
                     -- wrong type of label, we can't possibly compute a distance
                     if navLabel != label then
                         continue
                     end
 
-                    local path, count, pathDistance = NavUtils.PathTo(layer, position, deposit.Position)
+                    local path, count, pathDistance = NavUtils.PathTo(layer, position, markerPosition)
 
                     -- apparently we can't reach this marker
                     if not pathDistance then
@@ -152,13 +164,19 @@ GridDeposits = Class(Grid) {
                     end
 
                     if pathDistance <= distance then
-                        table.insert(resources, deposit.Marker)
+                        resources[head] = deposit.Marker
+                        head = head + 1
                     end
                 end
             end
         end
 
-        return resources
+        -- remove remainder of the cache
+        for k = head, table.getn(resources) do
+            resources[k] = nil
+        end
+
+        return resources, head - 1
     end,
 
     --- Retrieves all resources that are within a given radius, ignoring all other factors
@@ -166,11 +184,15 @@ GridDeposits = Class(Grid) {
     ---@param depositType 'Mass' | 'Hydrocarbon'
     ---@param position Vector
     ---@param distance number
-    GetResourcesWithinRadius = function(self, depositType, position, distance)
-        local resources = { }
+    ---@param cache? MarkerResource[]
+    ---@return MarkerResource[]
+    ---@return number
+    GetResourcesWithinRadius = function(self, depositType, position, distance, cache)
+        local head = 1
+        local resources = cache or { }
 
         local gx, gz = self:ToGridSpace(position[1], position[3])
-        local gridDistance = NavUtils.WorldDistanceToGridDistance(distance)
+        local gridDistance = NavUtils.ToGridDistance(distance)
         for lx = -gridDistance, gridDistance do
             local x = gx + lx
             for lz = -gridDistance, gridDistance do
@@ -194,16 +216,22 @@ GridDeposits = Class(Grid) {
                     -- compute squared distance
                     local dx = position[1] - deposit.Position[1]
                     local dz = position[3] - deposit.Position[3]
-                    local distanceToMarker =dx * dx + dz * dz
+                    local distanceToMarker = dx * dx + dz * dz
 
                     if distanceToMarker <= (distance * distance) then
-                        table.insert(deposit.Marker, resources)
+                        resources[head] = deposit.Marker
+                        head = head + 1
                     end
                 end
             end
         end
 
-        return resources
+        -- remove remainder of the cache
+        for k = head, table.getn(resources) do
+            resources[k] = nil
+        end
+
+        return resources, head - 1
     end,
 
     ---------------------------------------------------------------------------
@@ -211,10 +239,17 @@ GridDeposits = Class(Grid) {
 
     ---@param self AIGridDeposits
     DebugUpdateThread = function(self)
+        local cache = { }
         while true do
 
             local position = GetMouseWorldPos()
-            local resources = self:GetResourcesWithinDistance('Mass' , position, 50, 'Amphibious')
+            local start = GetSystemTimeSecondsOnlyForProfileUse()
+            local resources = self:GetResourcesWithinDistance('Mass' , position, 50, 'Amphibious', cache)
+            local duration = GetSystemTimeSecondsOnlyForProfileUse() - start
+
+            if duration > 0.001 then
+                SPEW("Long time: " .. tostring(duration))
+            end
 
             for k, resource in resources do
                 DrawLinePop(position, resource.Position, 'ffffff')

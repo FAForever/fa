@@ -1299,7 +1299,7 @@ end
 --- Converts a world distance into grid distance
 ---@param distance number
 ---@return number
-function WorldDistanceToGridDistance(distance)
+function ToGridDistance(distance)
     local sizeOfCell = NavGenerator.SizeOfCell()
-    return math.ceil(distance / sizeOfCell) + 1
+    return math.floor(distance / sizeOfCell) + 1
 end

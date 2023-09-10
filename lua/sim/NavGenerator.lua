@@ -101,7 +101,7 @@ end
 function SizeOfCell()
     ---@type number
     local MapSize = math.max(ScenarioInfo.size[1], ScenarioInfo.size[2])
-
+    
     ---@type number
     return MapSize / LabelCompressionTreesPerAxis
 end
