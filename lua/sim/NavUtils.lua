@@ -546,7 +546,7 @@ function GetLabelsofIMAP(layer, gx, gz)
     end
 
     -- check position argument
-    local root = grid:FindRootGridspaceXZ(gz - 1, gx - 1)
+    local root = grid:FindRootGridspaceXZ(gx - 1, gz - 1)
     if not root then
         return nil, 'OutsideMap'
     end
@@ -591,6 +591,109 @@ function GetTerrainLabel(layer, position)
     end
 
     return leaf.Label, nil
+end
+
+---@type CompressedLabelTreeRoot[]
+local GetPositionsInRadiusCandidates = {}
+local GenericResultsCache = { }
+local GenericQueueCache = { }
+
+---@param layer NavLayers
+---@param position Vector
+---@param thresholdDistance number
+---@param thresholdSize? number
+---@return { [1]: number, [2]: number, [3]: number, [4]: number }?
+---@return number | ('NotGenerated' | 'InvalidLayer' | 'OutsideMap' | 'SystemError' | 'Unpathable' | 'NoData')?
+function GetPositionsInRadius(layer, position, thresholdDistance, thresholdSize, cache)
+    -- check if generated
+    if not NavGenerator.IsGenerated() then
+        return nil, 'NotGenerated'
+    end
+
+    -- check layer argument
+    local grid = FindGrid(layer)
+    if not grid then
+        return nil, 'InvalidLayer'
+    end
+
+    -- local scope for performance
+    local TableEmpty = table.empty
+    local TableGetn = table.getn
+    local FindRootGridspaceXZ = grid.FindRootGridspaceXZ
+
+    ---------------------------------------------------------------------------
+    -- find candidates that we can search for traversable leaves
+
+    local candidatesHead = 1
+    local candidates = GetPositionsInRadiusCandidates
+    local gx, gz = grid:ToGridSpace(position)
+    if not (gx and gz) then
+        return nil, 'OutsideMap'
+    end
+
+    local sizeOfcell = NavGenerator.SizeOfCell()
+    local distanceInCells = math.ceil(0.5 * thresholdDistance / sizeOfcell) + 1
+    for lz = -distanceInCells, distanceInCells do
+        for lx = -distanceInCells, distanceInCells do
+            local neighbor = FindRootGridspaceXZ(grid, gx + lz, gz + lx)
+            if neighbor and not TableEmpty(neighbor.Labels) then
+                candidates[candidatesHead] = neighbor
+                candidatesHead = candidatesHead + 1
+            end
+        end
+    end
+
+    -- no neighboring cells found
+    if candidatesHead == 1 then
+        return nil, 'NoData'
+    end
+
+    ---------------------------------------------------------------------------
+    -- convert candidates to positions
+
+    -- local scope for performance
+    local GetSurfaceHeight = GetSurfaceHeight
+    local FindTraversableLeaves = candidates[1].FindTraversableLeaves
+
+    -- convert to a series of positions
+    local cacheHead = 1
+    cache = cache or { }
+    for k = 1, candidatesHead - 1 do
+        local candidate = candidates[k]
+
+        -- check if we have at least one traversable leaf
+        local leaves, leafCount = FindTraversableLeaves(candidate, thresholdSize, GenericResultsCache, GenericQueueCache)
+        local largest = leaves[1]
+        if not largest then
+            continue
+        end
+
+        for l = 1, leafCount do
+            local leaf = leaves[l]
+            local px = leaf.px
+            local pz = leaf.pz
+            local size = leaf.Size
+            local position = cache[cacheHead] or { }
+            position[1] = px 
+            position[2] = GetSurfaceHeight(px, pz)
+            position[3] = pz
+            position[4] = size
+            cache[cacheHead] = position
+            cacheHead = cacheHead + 1
+        end
+    end
+
+    -- no traversable leaves found
+    if cacheHead == 1 then
+        return nil, 'NoData'
+    end
+
+    -- clean up cache
+    for k = cacheHead, TableGetn(cache) do
+        cache[k] = nil
+    end
+
+    return cache, cacheHead - 1
 end
 
 --- Returns the metadata of a label.

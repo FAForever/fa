@@ -59,7 +59,7 @@ ProjectileBlueprint {
         DestroyOnWater = false,
         Lifetime = 30,
         MaxSpeed = 20,
-        RealisticOrdinance = true,
+        RealisticOrdinance = false,
         StayUpright = true,
         TrackTarget = false,
         TurnRate = 190,

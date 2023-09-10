@@ -76,11 +76,7 @@ CopyOrders = function(units, target, clearCommands, doPrint)
         local issueOrder = commandInfo.Callback
         if issueOrder then
             if commandName == 'BuildMobile' then
-                dummyUnitTable[1] = units[1]
-                issueOrder(dummyUnitTable, PopulateLocation(order, dummyVectorTable), order.blueprintId, dummyEmptyTable)
-                if unitCount > 1 then
-                    IssueGuard(units, units[1])
-                end
+                issueOrder(units, PopulateLocation(order, dummyVectorTable), order.blueprintId, dummyEmptyTable)
             else
                 issueOrder(units, order.target or PopulateLocation(order, dummyVectorTable))
             end
