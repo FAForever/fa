@@ -1,6 +1,5 @@
 local Grid = import("/lua/ai/grid.lua").Grid
-
-local WeakValue = { __mode = 'v' }
+local NavUtils = import("/lua/sim/navutils.lua")
 
 local Debug = false
 function EnableDebugging()
@@ -16,12 +15,8 @@ function DisableDebugging()
 end
 
 ---@class AIGridDepositsCell : AIGridCell
----@field EngineersReclaiming table<EntityId, Unit>
----@field AssignedScouts { LAND: table<EntityId, Unit>, AIR: table<EntityId, Unit> } 
----@field LastScouted number
----@field ScoutPriority number
----@field MustScout boolean
----@field IntelCoverage boolean
+---@field MassDeposits { Marker: MarkerResource }
+---@field HydroDeposits { Marker: MarkerResource }
 
 ---@class AIGridDeposits : AIGrid
 ---@field Cells AIGridDepositsCell[][]
@@ -37,6 +32,8 @@ GridDeposits = Class(Grid) {
         for k = 1, cellCount do
             for l = 1, cellCount do
                 local cell = cells[k][l]
+                cell.MassDeposits = {}
+                cell.HydroDeposits = {}
             end
         end
 
@@ -63,24 +60,60 @@ GridDeposits = Class(Grid) {
         return self.Cells[gx][gz]
     end,
 
+    ---@param self AIGridDeposits
+    ---@param deposit MarkerResource
     RegisterExtractorDeposit = function(self, deposit)
+        local isResource = deposit.resource or deposit.Resource
+        if not (isResource) then
+            return
+        end
 
+        local isExtractor = (deposit.type or deposit.Type) == 'Mass'
+        if not isExtractor then
+            return
+        end
+
+        local position = deposit.position or deposit.Position
+        if not position then
+            return
+        end
+
+        local cell = self:ToCellFromWorldSpace(position[1], position[3])
+        table.insert(cell.MassDeposits, { Marker = deposit })
     end,
 
+    ---@param self AIGridDeposits
+    ---@param deposit MarkerResource
     RegisterHydrocarbonDeposit = function(self, deposit)
+        local isResource = deposit.resource or deposit.Resource
+        if not (isResource) then
+            return
+        end
 
+        local isHydrocarbon = (deposit.type or deposit.Type) == 'Hydrocarbon'
+        if not isHydrocarbon then
+            return
+        end
+
+        local position = deposit.position or deposit.Position
+        if not position then
+            return
+        end
+
+        local cell = self:ToCellFromWorldSpace(position[1], position[3])
+        table.insert(cell.HydroDeposits, { Marker = deposit })
     end,
 
     ---@param self AIGridDeposits
     ---@param position Vector
     ---@param distance number
-    GetResourcesWithinDistance = function (self, depositType, position, distance)
+    GetResourcesWithinDistance = function(self, depositType, position, distance)
     end,
 
     ---@param self AIGridDeposits
     ---@param position Vector
     ---@param distance number
-    GetResourcesWithinRadius = function (self, depositType, position, distance)
+    GetResourcesWithinRadius = function(self, depositType, position, distance)
     end,
 }
 
