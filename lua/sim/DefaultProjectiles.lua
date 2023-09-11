@@ -127,10 +127,21 @@ SemiBallisticComponent = ClassSimple {
         return ballisticAcceleration, timeToImpact
     end,
 
+    TurnRateFromDistance = function(self)
+        local dist = self:DistanceToTarget()
+        local targetVector = VDiff(self:GetCurrentTargetPosition(), self:GetPosition())
+        local ux, uy, uz = self:GetVelocity()
+        local velocityVector = Vector(ux, uy, uz)
+        local speed = self:GetCurrentSpeed() * 10
+        local theta = math.acos(VDot(targetVector, velocityVector) / (speed * dist))
+        local degreesPerSecond = 2 * math.sin(theta) * 360 * self:GetBlueprint().Physics.MaxSpeed / dist
+        return degreesPerSecond
+    end,
+
     DistanceToTarget = function(self)
         local tpos = self:GetCurrentTargetPosition()
         local mpos = self:GetPosition()
-        return VDist2(tpos, mpos)
+        return VDist3(tpos, mpos)
     end,
 
     HorizontalDistanceToTarget = function(self)
@@ -144,7 +155,11 @@ SemiBallisticComponent = ClassSimple {
         local vh = VDist2(vx, vz, 0, 0)
         if vh == 0 then
             -- can't divide by zero, so just return 90 degrees
-            return math.pi/2
+            if vy >= 0 then
+                return math.pi/2
+            else
+                return -math.pi/2
+            end
         end
         return math.atan(vy / vh)
     end,
