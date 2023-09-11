@@ -35,5 +35,8 @@
     "Lua.diagnostics.globals": [
         "ScenarioInfo"
     ],
+
+    // used for grammar checks of changelog
+    "grammarly.files.include": ["**/changelog-dev.md", "**/changelog.md", "**/*.txt"]
 }
 

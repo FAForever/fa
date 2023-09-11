@@ -146,6 +146,8 @@ function Generate()
     -- of those extractors is used as the location of
     -- the marker
 
+    local startLocations, startLocationCount = import("/lua/sim/markerutilities.lua").GetMarkersByType('Start Location')
+
     ---@type Stack
     local stack = Stack()
 
@@ -188,25 +190,47 @@ function Generate()
         center[3] = center[3] / numberOfExtractors
         center[2] = GetSurfaceHeight(center[1], center[3])
 
-        ---@type MarkerExpansion
-        local expansionMarker = {
-            position = center,
-            Extractors = extractors,
-            Hydrocarbons = { },
-            RallyPoints = { },
-            NavLabel = NavUtils.GetLabel('Land', center),
-        }
+        -- find nearest spawn location
+        local nearestStartLocation
+        local nearestStartLocationDistance
+        for k = 1, startLocationCount do 
+            local startLocation = startLocations[k]
+            local dx = startLocation.position[1] - center[1]
+            local dz = startLocation.position[3] - center[3]
+            local startLocationDistance = dx * dx + dz * dz
+            if not nearestStartLocation then
+                nearestStartLocation = startLocation
+                nearestStartLocationDistance = startLocationDistance
+            else
+                if startLocationDistance <  nearestStartLocationDistance then
+                    nearestStartLocation = startLocation
+                    nearestStartLocationDistance = startLocationDistance
+                end
+            end
+        end
 
-        if numberOfExtractors > 3 then
-            expansionMarker.size = 20
-            expansionMarker.type = 'Large Expansion Area'
-            largeExpansions[string.format("Large Expansion Area %d", largeExpansionCount + 1)] = expansionMarker
-            largeExpansionCount = largeExpansionCount + 1
-        elseif numberOfExtractors > 1 then
-            expansionMarker.size = 10
-            expansionMarker.type = 'Expansion Area'
-            smallExpansions[string.format("Expansion Area %d", smallExpansionsCount + 1)] = expansionMarker
-            smallExpansionsCount = smallExpansionsCount + 1
+        -- skip those that are too close to a spawn location
+        if nearestStartLocationDistance > 40 then
+            ---@type MarkerExpansion
+            local expansionMarker = {
+                position = center,
+                Extractors = extractors,
+                Hydrocarbons = { },
+                RallyPoints = { },
+                NavLabel = NavUtils.GetLabel('Land', center),
+            }
+
+            if numberOfExtractors > 3 then
+                expansionMarker.size = 20
+                expansionMarker.type = 'Large Expansion Area'
+                largeExpansions[string.format("Large Expansion Area %d", largeExpansionCount + 1)] = expansionMarker
+                largeExpansionCount = largeExpansionCount + 1
+            elseif numberOfExtractors > 1 then
+                expansionMarker.size = 10
+                expansionMarker.type = 'Expansion Area'
+                smallExpansions[string.format("Expansion Area %d", smallExpansionsCount + 1)] = expansionMarker
+                smallExpansionsCount = smallExpansionsCount + 1
+            end
         end
     end
 

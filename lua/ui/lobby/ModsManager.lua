@@ -11,6 +11,7 @@ local Text   = import("/lua/maui/text.lua").Text
 local Edit   = import("/lua/maui/edit.lua").Edit
 local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
 local Combo  = import("/lua/ui/controls/combo.lua").Combo
+local Grid   = import("/lua/maui/grid.lua").Grid
 
 local MultiLineText = import("/lua/maui/multilinetext.lua").MultiLineText
 local Popup = import("/lua/ui/controls/popups/popup.lua").Popup
@@ -27,8 +28,7 @@ local SetUtils = import("/lua/system/setutils.lua")
 local Links = import("/lua/system/utils.links.lua")
 
 local GUI = { 
-    isOpen = false, 
-    modListCounter = 1,
+    isOpen = false,
     modListExpandedIcon = '/textures/ui/common/mods/mod_list_expand.dds', 
     modListColapsedIcon = '/textures/ui/common/mods/mod_list_collapse.dds', 
     modFallbackIcon = '/textures/ui/common/mods/generic-icon_bmp.dds',
@@ -49,8 +49,6 @@ local modIconSize = 50
 local modInfoPosition = modIconSize + 20
 local modInfoHeight = modIconSize + 20
 local modInfoDesciptionMax = 235
--- calculates how many number of mods to show per page based on dialog height
-local modsPerPage = math.floor((dialogHeight - 100) / modInfoHeight)
 
 -- Counters for the benefit of the UI.
 local numEnabledUIMods = 0
@@ -59,7 +57,7 @@ local numEnabledSimMods = 0
 local scrollGroup
 local dialogContent
 local subtitle
-local modsDialog
+local dialog
 local modSearch = {}
 
 local callback
@@ -94,7 +92,7 @@ local mods = {
 }
 
 local modSortConfigurations = {
-    { id = 'status', name = 'Status', tooltip = 'sorts mods by activation status, type, and name' },
+    { id = 'status', name = 'Status', tooltip = 'sorts mods by activation status' },
     { id = 'type', name = 'Type', tooltip = 'sorts mods by type and name' },
     { id = 'title', name = 'Name', tooltip = 'sorts mods by name' },
     { id = 'author', name = 'Author', tooltip = 'sorts mods by author and name' },
@@ -109,7 +107,7 @@ local modBackwardDependencyMap = {}
 
 function UpdateClientModStatus()
     if GUI.isOpen then
-        modsDialog:Close()
+        dialog:Close()
         GUI.isOpen = false
     end
 end
@@ -160,6 +158,7 @@ local modsTags = {
 -- @param IsHost Is the user opening the control the host (and hence able to edit?)
 -- @param availableMods Present only if user is host. The availableMods map from lobby.lua.
 function CreateDialog(parent, isHost, availableMods, saveBehaviour)
+
     IsHost = isHost
     callback = saveBehaviour
     mods.availableToAll = availableMods
@@ -167,13 +166,19 @@ function CreateDialog(parent, isHost, availableMods, saveBehaviour)
     LoadPreferences() -- loading preference for favorite mods, mods sorting order, mod list expanded/collapsed
     LoadMods() -- loading mods before creating mod filters so they show correct count of mods
 
-    dialogHeight = GetFrame(0).Height() - LayoutHelpers.ScaleNumber(120)
-    dialogContent = Group(parent)
+    for _, tag in modsTags do
+        tag.filtered = false
+    end
+    -- dialogHeight = GetFrame(0).Height() - LayoutHelpers.ScaleNumber(120)
+    dialogHeight = GetFrame(0).Height() - LayoutHelpers.ScaleNumber(40)
+    dialogContent = Bitmap(parent)
     LayoutHelpers.SetWidth(dialogContent, dialogWidth)
     dialogContent.Height:Set(dialogHeight)
+    -- LayoutHelpers.AtTopIn(dialogContent, parent, 40)
+    -- LayoutHelpers.AtBottomIn(dialogContent, parent, 40)
 
-    modsDialog = Popup(parent, dialogContent)
-    modsDialog.OnClose = function()
+    dialog = Popup(parent, dialogContent)
+    dialog.OnClose = function()
         GUI.isOpen = false
     end
 
@@ -274,81 +279,16 @@ function CreateDialog(parent, isHost, availableMods, saveBehaviour)
     local SaveButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "<LOC _OK>OK", -1)
     LayoutHelpers.AtHorizontalCenterIn(SaveButton, dialogContent)
     LayoutHelpers.AtBottomIn(SaveButton, dialogContent, 15)
-    
+
     controlList = {}
 
     CreateFilters()
 
-    scrollGroup = Group(dialogContent)
-    LayoutHelpers.AtLeftIn(scrollGroup, dialogContent, 5)
-    LayoutHelpers.AnchorToBottom(scrollGroup, subtitle, 10)
-    LayoutHelpers.AnchorToTop(scrollGroup, modSearch.Group, 10)
-    scrollGroup.Width:Set(function() return dialogContent.Width() - LayoutHelpers.ScaleNumber(30) end)
-    scrollGroup.Height:Set(function() return scrollGroup.Bottom() - scrollGroup.Top() end)
-
-    --modsPerPage = math.floor((scrollGroup.Height() - 10) / LayoutHelpers.ScaleNumber(modInfoHeight))
-
-    UIUtil.CreateLobbyVertScrollbar(scrollGroup, 1, 0, 0, 10)
-    scrollGroup.top = 1
-    
-    scrollGroup.GetScrollValues = function(self, axis)
-        local controlsCount = table.getsize(self:GetFilteredControls())
-        return 1, controlsCount, self.top, math.min(self.top + modsPerPage - 1, controlsCount)
-    end
-
-    scrollGroup.ScrollLines = function(self, axis, delta)
-        self:ScrollSetTop(axis, self.top + math.floor(delta))
-    end
-
-    scrollGroup.ScrollPages = function(self, axis, delta)
-        self:ScrollSetTop(axis, self.top + math.floor(delta) * modsPerPage)
-    end
-
-    scrollGroup.ScrollSetTop = function(self, axis, top)
-        local controlsCount = table.getsize(self:GetFilteredControls())
-        top = math.floor(top)
-        if top == self.top then return end
-        self.top = math.max(math.min(controlsCount - modsPerPage + 1, top), 1)
-        self:CalcVisible()
-    end
-
-    scrollGroup.CalcVisible = function(self)
-        local top = self.top
-        local bottom = self.top + modsPerPage - 1
-        local visibleIndex = 1
-        local lineIndex = 1
-        for index, control in ipairs(controlList) do
-            if control.filtered then
-                control:Hide()
-            elseif visibleIndex < top or visibleIndex > bottom then
-                control:Hide()
-                visibleIndex = visibleIndex + 1
-            else
-                control:Show()
-                local c = control
-                local i = lineIndex
-                control.Top:Set(function() return self.Top() + ((i-1) * (c.Height() +2)) end)
-                visibleIndex = visibleIndex + 1
-                lineIndex = lineIndex + 1
-            end
-        end
-    end
-
-    scrollGroup.GetFilteredControls = function(self)
-        local filteredControls = {}
-        for index, control in ipairs(controlList) do
-            if not control.filtered then
-                table.insert(filteredControls, control)
-            end
-        end
-        return filteredControls
-    end
-
     SaveButton.OnClick = function(self)
         SavePreferences() -- saving favorite mods, mods sorting order, mod list expanded/collapsed
-        
+
         mods.searchKeyword = false -- clear mod search input for the next time
-        modsDialog:Close()
+        dialog:Close()
         GUI.isOpen = false
         if callback then
             mods.ui.active = SetUtils.PredicateFilter(mods.activated,
@@ -369,24 +309,43 @@ function CreateDialog(parent, isHost, availableMods, saveBehaviour)
     end
     UIUtil.MakeInputModal(dialogContent, function() SaveButton:OnClick() end, function() SaveButton:OnClick() end)
 
-    RefreshModsList()
-    
-    scrollGroup.HandleEvent = function(self, event)
-        if event.Type == 'WheelRotation' then
-            local lines = 1
-            if event.WheelRotation > 0 then
-                lines = -1
-            end
-            self:ScrollLines(nil, lines)
-            return true
-        end
+    dialog.Fill = Bitmap(dialogContent)
+    LayoutHelpers.AtLeftIn(dialog.Fill, dialogContent, 10)
+    LayoutHelpers.AtRightIn(dialog.Fill, dialogContent, 50)
+    LayoutHelpers.Below(dialog.Fill, listExpander, 10)
+    LayoutHelpers.Above(dialog.Fill, modSearch.Group, 10)
+    dialog.Fill.Height:Set(function() return dialog.Fill.Bottom() - dialog.Fill.Top() end)
 
-        return false
+    dialog.Grid = Grid(dialog.Fill, 400, modInfoHeight) -- W H
+    LayoutHelpers.AtLeftIn(dialog.Grid, dialogContent, 10)
+    LayoutHelpers.AtRightIn(dialog.Grid, dialogContent, 60)
+    LayoutHelpers.Below(dialog.Grid, listExpander, 10)
+    LayoutHelpers.Above(dialog.Grid, modSearch.Group, 10)
+
+    dialog.scrollbar = UIUtil.CreateLobbyVertScrollbar(dialog.Grid, 35, 0, 0, 0) -- L, B, T, R
+
+    dialog.Fill.HandleEvent = function(control, event)
+        if dialog.scrollbar and event.Type == 'WheelRotation' then
+            local scrollDim = { dialog.Grid:GetScrollValues('Vert') }
+            if event.WheelRotation <= 0 then -- scroll down
+                if scrollDim[2] != scrollDim[4] then -- if we can
+                    PlaySound(Sound({ Cue = 'UI_Tab_Rollover_01', Bank = 'Interface' }))
+                    dialog.scrollbar:DoScrollLines(1)
+                end
+            else -- scroll up
+                if scrollDim[1] != scrollDim[3] then -- if we can
+                    PlaySound(Sound({ Cue = 'UI_Tab_Rollover_01', Bank = 'Interface' }))
+                    dialog.scrollbar:DoScrollLines(-1)
+                end
+            end
+        end
     end
-    
+
+    RefreshModsList()
+
     GUI.isOpen = true
 
-    return modsDialog
+    return dialog
 end
 
 function OnButtonHighlight(self, event)
@@ -437,14 +396,14 @@ function CreateFilters()
     LayoutHelpers.SetDimensions(modSearch.Icon, 20, 20)
     LayoutHelpers.AtVerticalCenterIn(modSearch.Icon, modSearch.Group, 0)
     LayoutHelpers.AtLeftIn(modSearch.Icon, modSearch.Group, 6)
-    
+
     local text = LOC("<LOC key_mod_manager_search>search for mods by name or author")
     modSearch.Hint = UIUtil.CreateText(modSearch.Group, text, 17, UIUtil.titleFont)
     modSearch.Hint:SetColor('FF727171') -- #FF727171
     modSearch.Hint:DisableHitTest()
     LayoutHelpers.AtHorizontalCenterIn(modSearch.Hint, modSearch.Group)
     LayoutHelpers.AtVerticalCenterIn(modSearch.Hint, modSearch.Group, 0)
-    
+
     modSearch.Clear = UIUtil.CreateText(modSearch.Group, 'X', 17, "Arial Bold")
     modSearch.Clear:SetColor('FF8A8A8A') -- #FF8A8A8A
     modSearch.Clear:EnableHitTest()
@@ -480,36 +439,51 @@ function CreateFilters()
         if mods.searchKeyword == ' ' or string.len(mods.searchKeyword) == 0 then
            mods.searchKeyword = false
         end
-        FilterMods()
+        RefreshModsList()
     end
 end
 
+-- filters mods by search keyword and tags (mod type, blacklisted, local mods, etc)
 function FilterMods()
-    for i, control in ipairs(controlList) do
-        local mod = control.modInfo
+
+    -- building a list of current mods depending on host or client user
+    local currentMods = {}
+    currentMods = table.concatenate(currentMods, mods.sim.active)
+    currentMods = table.concatenate(currentMods, mods.ui.active)
+    if IsHost then
+        -- only host player can enable inactive SIM mods
+        currentMods = table.concatenate(currentMods, mods.sim.inactive)
+    end
+    currentMods = table.concatenate(currentMods, mods.ui.inactive)
+    currentMods = table.concatenate(currentMods, mods.disabled)
+    currentMods = table.concatenate(currentMods, mods.missingDependencies)
+    currentMods = table.concatenate(currentMods, mods.missingByOthers)
+    currentMods = table.concatenate(currentMods, mods.blacklisted)
+
+    -- filtring current mods by search keyword and tags
+    mods.filtered = {}
+    for _, modInfo in currentMods do
         -- check if a mod is filtered by a tag, GUI, SIM, etc.
         local filteredByTag = true
         for name, tag in modsTags do
-            if control.modInfo.tags[name] then
+            if modInfo.tags[name] then
                 filteredByTag = tag.filtered
             end
         end
         -- check if a mod is filtered by a keyword
         local filteredByKeyword = false
         if mods.searchKeyword then
-            if string.find(mod.keywords, mods.searchKeyword) then
+            if string.find(modInfo.keywords, mods.searchKeyword) then
                 filteredByKeyword = false
             else
                 filteredByKeyword = true
             end
         end
-        control.filtered = filteredByKeyword or filteredByTag
-
---        WARN('FilterMods ' .. ' filteredByTag ' .. tostring(filteredByTag) .. ' filteredByKeyword ' .. tostring(filteredByKeyword) .. ' ' .. repr(mod.tags) .. ' ' .. tostring(mod.title))
-           
+        local isFiltered = filteredByKeyword or filteredByTag
+        if not isFiltered then
+            table.insert(mods.filtered, modInfo)
+        end
     end
-    scrollGroup:ScrollSetTop(nil,2)
-    scrollGroup:ScrollSetTop(nil,1)
 end
 
 function CreateFilterButton(parent, tag)
@@ -559,7 +533,7 @@ function CreateFilterButton(parent, tag)
             if modsTags[self.tag] then
                modsTags[self.tag].filtered = not self.checked
             end
-            FilterMods()
+            RefreshModsList()
             return true
         elseif event.Type == 'MouseEnter' then
             self:OnRolloverEvent('enter')
@@ -639,29 +613,45 @@ function GetModAuthor(mod)
     return author
 end
 
--- Append the given list of mods to the UI, applying the given label and activeness state to each.
-function AppendMods(modlist, active, enabled, labelParam, labelSet)
-    for k, mod in modlist do
+-- display mods in the UI
+function DisplayMods()
+
+    local modsCounter = 0
+    for k, mod in mods.filtered do
         if not mod.uid or not mod.title then
             table.print(mod, 'Invalid Mod \n', WARN)
         else
-            GUI.modListCounter = GUI.modListCounter + 1
-            local label = labelParam or LOC(labelSet[k])
-            local listItem = CreateListElement(scrollGroup, mod, GUI.modListCounter)
-            if not enabled then
-                listItem.bg:Disable()
+            modsCounter = modsCounter + 1
+
+            local uid = mod.uid
+            local listItem = CreateListElement(dialog.Grid, mod, modsCounter)
+            dialog.Grid:AppendRows(1, true)
+            dialog.Grid:SetItem(listItem, 1, modsCounter, true)
+
+            local isDisabled = mods.disabled[uid] or mods.blacklisted[uid] or
+                               mods.missingByOthers[uid] or mods.missingDependencies[uid]
+            if isDisabled then
+                listItem.check:Disable()
                 listItem.name:SetColor('FF959595')   -- #FF959595 
                 listItem.author:SetColor('FF959595') -- #FF959595
             else
                 listItem.name:SetColor('FFE9ECE9')  --  #FFE9ECE9
                 listItem.author:SetColor('FFE9ECE9') -- #FFE9ECE9 
             end
-            if active then
-                LOG('ModsManager activated: ' .. GetModNameType(mod.uid))
+
+            local isActive = mods.sim.active[uid] or mods.ui.active[uid]
+            if isActive then
+                -- WARN('Mods activated: ' .. GetModNameType(uid))
+                listItem.check:SetCheck(true, true)
+                listItem:SetCheck(true)
+            else
+                listItem.check:SetCheck(false, true)
+                listItem:SetCheck(false)
             end
-            listItem.bg:SetCheck(active, true)
         end
     end
+
+    dialog.Grid:EndBatch()
 end
 
 -- load mods
@@ -704,6 +694,10 @@ function LoadMods()
         mod.author = GetModAuthor(mod)
         mod.url    = Links.validate(mod.url)
         mod.github = Links.validate(mod.github)
+        if not mod.description then
+            mod.description = mod.description or 'Mod is missing description'
+            WARN('Mod "' .. tostring(mod.title) .. '" is missing description, located in ' .. tostring(mod.location))
+        end
 
         if not mod.icon or mod.icon == '' or not DiskGetFileInfo(mod.icon) then
             mod.icon = GUI.modFallbackIcon
@@ -795,11 +789,11 @@ function LoadMods()
     -- set status and filter tags for all mods
     for uid, mod in mods.selectable do
         mod.tags = {}
-        
+
         if not mod.type then
             mod.type = 'GAME'
         end
-        
+
         if mod.type == 'GAME' or mod.type == 'UI' then
            mod.sort = mod.type 
         else
@@ -857,67 +851,72 @@ function LoadMods()
     for uid, mod in mods.ui.inactive do
         mods.ui.selecatable[uid] = mod
     end
+
+    for _, mod in mods.missingByOthers do
+        LOG('ModsManager found a mod missing by others players: ' .. mod.title .. ' - ' .. mod.location)
+    end
+    for _, mod in mods.missingDependencies do
+        LOG('ModsManager found a mod with missing dependency: ' .. mod.title .. ' - ' .. mod.location)
+    end
 end
 
--- Refreshes the mod list UI.
 function StringReplace(str, remove, add)
     local words = StringSplit(str, remove)
     return StringJoin(words, add)
 end
 
--- Refreshes the mod list UI.
+-- refresh the mod list UI based on mods filtering and sorting
 function RefreshModsList()
+
+    if mods.expanded then
+        modIconSize = 60
+        modInfoPosition = modIconSize + 20
+        modInfoHeight = modIconSize + 25
+    else
+        modIconSize = 30
+        modInfoPosition = 10
+        modInfoHeight = modIconSize + 5
+    end
+
+    local itemHeight = LayoutHelpers.ScaleNumber(modInfoHeight)
+    local itemCount = math.floor(dialogHeight / itemHeight)
+    local listHeight = itemHeight * itemCount
+    -- check if need to make adjustment to mod info height to fit list height
+    if itemCount > 10 and listHeight < dialogHeight then
+        local delta = math.ceil(dialogHeight - listHeight)
+        local adjustment = math.ceil(delta / (itemCount))
+        adjustment = LayoutHelpers.ScaleNumber(adjustment)
+        modInfoHeight = math.max(modInfoHeight, modInfoHeight + adjustment)
+
+        -- WARN('DH=' .. tostring(dialogHeight) ..
+        -- ' LH=' .. tostring(listHeight) ..
+        -- ' delta=' .. tostring(delta) ..
+        -- ' size=' .. tostring(modInfoHeight) ..
+        -- ' adjustment=' .. tostring(adjustment) )
+    end
+
+    dialog.Grid:SetDimensions(400, modInfoHeight)
+    dialog.Grid:DeleteAndDestroyAll(true)
+    dialog.Grid:AppendCols(1, true)
+
     if controlList then
         for k, v in controlList do
-            v:Destroy()
+            if v then v:Destroy() end
         end
     end
 
     controlList = {}
     controlMap = {}
-    LoadMods()
-
-    GUI.modListCounter = 0
-    if mods.expanded then
-        modIconSize = 50
-        modInfoPosition = modIconSize + 20
-        modInfoHeight = modIconSize + 22 
-    else
-        modIconSize = 25
-        modInfoPosition = 12
-        modInfoHeight = modIconSize + 8
-     end
-
-    modsScrollableHeight = modSearch.Group.Top() - subtitle.Bottom()
-    modsPerPage = math.floor((modsScrollableHeight - 10) / LayoutHelpers.ScaleNumber(modInfoHeight))
- 
-    -- Create entries for the list of interesting mods
-    AppendMods(mods.sim.active, true, true)
-    AppendMods(mods.ui.active, true, true)
-    if IsHost then
-        AppendMods(mods.sim.inactive, false, true)
-    end
-    AppendMods(mods.ui.inactive, false, true)
-    AppendMods(mods.disabled, false, false)
-
-    for uid, mod in mods.missingByOthers do
-        LOG('ModsManager others players are missing mod: ' .. mod.title .. ' - ' .. mod.location)
-    end
-    AppendMods(mods.missingByOthers, false, false, LOC('<LOC uimod_0019>Players missing mod'))
-    for uid, mod in mods.missingDependencies do
-        LOG('ModsManager is missing dependency for mod: ' .. mod.title .. ' - ' .. mod.location)
-    end
-    AppendMods(mods.missingDependencies, false, false, LOC('<LOC uimod_0020>Missing dependency'))
-    AppendMods(mods.blacklisted, false, false, nil, ModsBlacklist)
-
-    numEnabledUIMods = table.getsize(mods.ui.active)
-    numEnabledSimMods = table.getsize(mods.sim.active)
-
-    UpdateModsCounters()
 
     FilterMods()
     SortMods(mods.sortKey)
+    DisplayMods()
+
+    numEnabledUIMods = table.getsize(mods.ui.active)
+    numEnabledSimMods = table.getsize(mods.sim.active)
+    UpdateModsCounters()
 end
+
 -- Activates the mod with the given uid
 -- @param isRecursing Indicates this is a recursive call (usually pulling in dependencies), so should not prompt the user for input.
 function ActivateMod(uid, isRecursing)
@@ -957,7 +956,7 @@ function ActivateMod(uid, isRecursing)
                     -- Just quietly get on and do it if it's a recursive call.
                     doEnable()
                 else
-                    local target = controlMap[uid].bg
+                    local target = controlMap[uid].check
                     UIUtil.QuickDialog(dialogContent,
                         "<LOC uimod_0010>This mod conflicts with some of the other mods you have active. Shall we turn those mods off and this one on?",
                         "<LOC _Yes>", doEnable,
@@ -974,7 +973,10 @@ function ActivateMod(uid, isRecursing)
             end
         end
     end
-    controlMap[uid].bg:SetCheck(true, true)
+
+    if controlMap[uid] and controlMap[uid].check then
+       controlMap[uid].check:SetCheck(true, true)
+    end
 
     if mods.selectable[uid].ui_only then
         numEnabledUIMods = numEnabledUIMods + 1
@@ -997,11 +999,13 @@ function DeactivateMod(uid)
     local victims = modBackwardDependencyMap[uid]
     if victims then
         for k, v in victims do
-            DeactivateMod(k, true)
+            DeactivateMod(k)
         end
     end
 
-    controlMap[uid].bg:SetCheck(false, true)
+    if controlMap[uid] and controlMap[uid].check then
+       controlMap[uid].check:SetCheck(false, true)
+    end
 
     if mods.selectable[uid].ui_only then
         numEnabledUIMods = numEnabledUIMods - 1
@@ -1013,70 +1017,64 @@ end
 
 function SortMods(byKey)
     mods.sortKey = byKey
-    -- update highlight of sort button based on the sort key
-    for id, button in GUI.sortButtons or {} do
-        if id == byKey then
-            GUI.sortButtons[id]:SetSolidColor(UIUtil.factionTextColor)
-        else
-            GUI.sortButtons[id]:SetSolidColor('7E414141') -- '#7E414141'
-        end
-    end
-    
+
     if byKey == 'title' or byKey == 'author' or byKey == 'type' or byKey == 'version' then
         -- simple sorting by title, author, type, or version
-        table.sort(controlList, function(a,b)
-            local aSortKey = a.modInfo[byKey]
-            local bSortKey = b.modInfo[byKey]
-            if aSortKey == bSortKey then
-                return a.modInfo.title < b.modInfo.title -- sort by title if mods in same category
+        table.sort(mods.filtered, function(mod1, mod2)
+            local mod1SortValue = mod1[byKey]
+            local mod2SortValue = mod2[byKey]
+            if mod1SortValue == mod2SortValue then
+                return mod1.title < mod2.title -- sort by title if mods in same category
             elseif byKey == 'type'  then
-                return aSortKey > bSortKey -- prioritize UI/SIM mods over disabled mods
-            else 
-                return aSortKey < bSortKey -- alphabetical sort by mod title, author, version
-            end 
-        end) 
-    else 
+                return mod1SortValue > mod2SortValue -- prioritize UI/SIM mods over disabled mods
+            else
+                return mod1SortValue < mod2SortValue -- alphabetical sort by mod title, author, version
+            end
+        end)
+    else
         -- default sorting by mod's status -> mod's type -> mod's title
-        table.sort(controlList, function(a,b)
+        table.sort(mods.filtered, function(mod1, mod2)
             -- sort mods by active state, then by type and finally by name
-            if mods.activated[a.modInfo.uid] and
-               not mods.activated[b.modInfo.uid] then
+            if mods.activated[mod1.uid] and
+               not mods.activated[mod2.uid] then
                return true -- ensure activated mods are sorted higher in the list
-            elseif not mods.activated[a.modInfo.uid] and
-                       mods.activated[b.modInfo.uid] then
+            elseif not mods.activated[mod1.uid] and
+                       mods.activated[mod2.uid] then
                return false -- ensure inactivate mods are sorted lower in the list
-            elseif a.modInfo.sort == 'UI' and
-                   b.modInfo.sort == 'GAME' then
+            elseif mod1.sort == 'UI' and
+                   mod2.sort == 'GAME' then
                return true -- ensure GAME mods are sorted lower in the list
-            elseif a.modInfo.sort == 'GAME' and
-                   b.modInfo.sort == 'UI' then
+            elseif mod1.sort == 'GAME' and
+                   mod2.sort == 'UI' then
                return false -- ensure UI mods are sorted higher in the list
             else
                 -- first sort mods by their type, SIM, GUI, BLACKLISTED, LOCAL, NO_DEPENDENCY
-                if a.modInfo.sort == b.modInfo.sort then
+                if mod1.sort == mod2.sort then
                     -- secondly sort mods by status of activated/inactive mods 
-                    if a.modInfo.status ~= b.modInfo.status then
-                        return tostring(a.modInfo.status) < tostring(b.modInfo.status)
-                    elseif a.modInfo.name == b.modInfo.name then
-                        return tostring(a.modInfo.version) < tostring(b.modInfo.version)
+                    if mod1.status ~= mod2.status then
+                        return tostring(mod1.status) < tostring(mod2.status)
+                    elseif mod1.name == mod2.name then
+                        return tostring(mod1.version) < tostring(mod2.version)
                     else
                         -- lastly sort mods by their title (cleanup version of mod name)
-                        return a.modInfo.title < b.modInfo.title
+                        return mod1.title < mod2.title
                     end
                 else
-                    return a.modInfo.sort < b.modInfo.sort
+                    return mod1.sort < mod2.sort
                 end
             end
         end)
     end
-
-    scrollGroup.top = 1
-    scrollGroup:CalcVisible()
 end
 
 function CreateListElement(parent, mod, index)
     local group = Bitmap(parent)
---     group:SetSolidColor('8DDE671C') -- #8DDE671C
+
+    --creating fill for indicating if mod is actived or not
+    group.fill = Bitmap(group)
+    group.fill:DisableHitTest()
+    group.fill:SetAlpha(0.6, false)
+    LayoutHelpers.FillParentFixedBorder(group.fill, group, 2)
 
     -- changed fixed-size checkboxes to scalable checkboxes
     group.filtered = false
@@ -1087,7 +1085,7 @@ function CreateListElement(parent, mod, index)
     LayoutHelpers.SetWidth(group, dialogWidth - 40)
     LayoutHelpers.AtLeftTopIn(group, parent, 8, modInfoHeight * (index - 1))
     group.Bottom:Set(function() return group.Top() + group.Height() end)
-    
+
     -- creating a toggle for marking mods as favorite
     group.favToggle = CreateFavoriteButton(group, 25, true)
     group.favToggle.Top:Set(function() return group.Top() end)
@@ -1096,7 +1094,7 @@ function CreateListElement(parent, mod, index)
     group.favToggle.OnClick = function(self)
         if mods.favorite[mod.uid] then
            mods.favorite[mod.uid] = nil
-        else 
+        else
            mods.favorite[mod.uid] = true
         end
         self.isChecked = mods.favorite[mod.uid]
@@ -1105,68 +1103,80 @@ function CreateListElement(parent, mod, index)
     group.favToggle.isChecked = mods.favorite[mod.uid]
     group.favToggle:Update()
 
-    -- creating background checkbox for enabling/disabling a given mod
-    group.bg = Checkbox(group,
+    -- creating a checkbox for enabling/disabling a given mod
+    group.check = Checkbox(group,
         UIUtil.SkinnableFile('/MODS/blank.dds'),
-        UIUtil.SkinnableFile('/MODS/single.dds'),
-        UIUtil.SkinnableFile('/MODS/single.dds'),
-        UIUtil.SkinnableFile('/MODS/double.dds'),
-        UIUtil.SkinnableFile('/MODS/disabled.dds'),
-        UIUtil.SkinnableFile('/MODS/disabled.dds'),
+        UIUtil.SkinnableFile('/MODS/blank.dds'),
+        UIUtil.SkinnableFile('/MODS/blank.dds'),
+        UIUtil.SkinnableFile('/MODS/blank.dds'),
+        UIUtil.SkinnableFile('/MODS/blank.dds'),
+        UIUtil.SkinnableFile('/MODS/blank.dds'),
             'UI_Tab_Click_01', 'UI_Tab_Rollover_01')
-    LayoutHelpers.FillParent(group.bg, group)
-    LayoutHelpers.AnchorToRight(group.bg, group.favToggle, 5)
+    LayoutHelpers.FillParent(group.check, group)
+    LayoutHelpers.AnchorToRight(group.check, group.favToggle, 5)
+    LayoutHelpers.AnchorToRight(group.fill, group.favToggle, 5)
+    group.check:SetAlpha(0.6, false)
 
-    if mods.expanded then 
-        group.icon = Bitmap(group.bg, mod.icon)
+    group.highlight = Bitmap(group.check)
+    group.highlight:DisableHitTest()
+    group.highlight:SetAlpha(0.6, false)
+    LayoutHelpers.FillParentFixedBorder(group.highlight, group.check, 2)
+
+    if mods.expanded then
+        group.icon = Bitmap(group.check, mod.icon)
         group.icon:DisableHitTest()
         LayoutHelpers.SetDimensions(group.icon, modIconSize, modIconSize)
-        LayoutHelpers.AtLeftIn(group.icon, group.bg, 10)
-        LayoutHelpers.AtVerticalCenterIn(group.icon, group.bg)
+        LayoutHelpers.AtLeftIn(group.icon, group.check, 10)
+        LayoutHelpers.AtVerticalCenterIn(group.icon, group.check, 6)
     end
 
-    group.name = UIUtil.CreateText(group.bg, mod.title, 14, UIUtil.bodyFont)
+    group.name = UIUtil.CreateText(group.check, mod.title, 14, UIUtil.bodyFont)
     group.name:SetColor('FFE9ECE9') -- #FFE9ECE9
     group.name:DisableHitTest()
-    LayoutHelpers.AtLeftTopIn(group.name, group.bg, modInfoPosition, 8)
+    if mods.expanded then
+        LayoutHelpers.AtLeftTopIn(group.name, group.check, modInfoPosition, 8)
+    else
+        LayoutHelpers.AtLeftIn(group.name, group.check, modInfoPosition)
+        LayoutHelpers.AtVerticalCenterIn(group.name, group)
+    end
 
-    group.createdBy = UIUtil.CreateText(group.bg, ' created by ', 14, UIUtil.bodyFont)
+    group.createdBy = UIUtil.CreateText(group.check, ' created by ', 14, UIUtil.bodyFont)
     group.createdBy:DisableHitTest()
     group.createdBy:SetColor('FFA2A5A2') -- #FFA2A5A2
-    LayoutHelpers.AtTopIn(group.createdBy, group.bg, 7)
+    LayoutHelpers.AtTopIn(group.createdBy, group.check, 7)
     LayoutHelpers.RightOf(group.createdBy, group.name, 2)
-    
-    group.author = UIUtil.CreateText(group.bg, mod.author, 14, UIUtil.bodyFont)
+
+    group.author = UIUtil.CreateText(group.check, mod.author, 14, UIUtil.bodyFont)
     group.author:DisableHitTest()
     group.author:SetColor('FFE9ECE9') -- #FFE9ECE9 
-    LayoutHelpers.AtTopIn(group.author, group.bg, 7)
+    LayoutHelpers.AtTopIn(group.author, group.check, 7)
     LayoutHelpers.RightOf(group.author, group.createdBy, 2)
-    
-    if not mods.expanded then 
-        local tooltipText = mod.description .. '\n\n' .. 'Location: ' .. tostring(mod.location)
-        group.tooltip = Bitmap(group.bg)
-        group.tooltip:DisableHitTest()
-        group.tooltip:SetAlpha(0.5, false)
-        group.tooltip.Depth:Set(function() return group.name.Depth() + 2 end)
-        group.tooltip:EnableHitTest()
-        LayoutHelpers.FillParent(group.tooltip, group.bg)
-        AddTooltip(group.tooltip, mod.title, tooltipText, 420)
-    else
-        group.desc = MultiLineText(group.bg, UIUtil.bodyFont, 12, 'FFA2A5A2')
+
+    local tooltipText = mod.description .. '\n\n' .. 'Location: ' .. tostring(mod.location)
+    group.tooltip = Bitmap(group.check)
+    group.tooltip:DisableHitTest()
+    group.tooltip:SetAlpha(0.5, false)
+    group.tooltip.Depth:Set(function() return group.name.Depth() + 2 end)
+    group.tooltip:EnableHitTest()
+    LayoutHelpers.FillParent(group.tooltip, group.check)
+    AddTooltip(group.tooltip, mod.title, tooltipText, nil)
+
+    if mods.expanded then
+        group.desc = MultiLineText(group.check, UIUtil.bodyFont, 12, 'FFA2A5A2')
         group.desc:DisableHitTest()
         LayoutHelpers.AnchorToRight(group.desc, group.icon, 10)
-        group.desc.Right:Set(function() return group.bg.Right() - LayoutHelpers.ScaleNumber(5) end)
+        group.desc.Right:Set(function() return group.check.Right() - LayoutHelpers.ScaleNumber(5) end)
         group.desc.Width:Set(function() return group.desc.Right() - group.desc.Left() end)
 
-        group.desc.Top:Set(function() return group.name.Bottom() + LayoutHelpers.ScaleNumber(6) end)
-        group.desc.Bottom:Set(function() return group.bg.Bottom() - LayoutHelpers.ScaleNumber(2) end)
+        group.desc.Top:Set(function() return group.name.Bottom() + LayoutHelpers.ScaleNumber(8) end)
+        group.desc.Bottom:Set(function() return group.check.Bottom() - LayoutHelpers.ScaleNumber(8) end)
         group.desc.Height:Set(function() return group.desc.Bottom() - group.desc.Top() end)
-        
-        if not mod.description then
-            WARN('Missing mod description in "' .. tostring(mod.title) .. '" located in ' .. tostring(mod.location))
-            group.desc:SetText('MISSING MOD DECRIPTION IN \n'  .. tostring(mod.location))
+
+        local lines = StringSplit(mod.description, '\n')
+        if (table.getsize(lines) > 3) then
+            group.desc:SetText(lines[1] .. '\n' .. lines[2] .. '\n' .. lines[3])
         elseif string.len(mod.description) > modInfoDesciptionMax then
-            local description = string.sub(mod.description, 1, modInfoDesciptionMax) .. '...'
+            local description = string.sub(mod.description, 1, modInfoDesciptionMax) .. ' ...'
             group.desc:SetText(description)
         else
             group.desc:SetText(mod.description)
@@ -1174,41 +1184,46 @@ function CreateListElement(parent, mod, index)
     end
 
     local icon = modsTags[mod.type].icon or '/textures/ui/common/mods/mod_type_warning.dds'
-    group.type = Bitmap(group.bg, icon)
+    group.type = Bitmap(group.check, icon)
     group.type:DisableHitTest()
     group.type:SetAlpha(0.5, false)
     group.type.Depth:Set(function() return dialogContent.Depth() + 10000 end)
     group.type:EnableHitTest()
-    group.type.HandleEvent = function(self, event) 
+    group.type.HandleEvent = function(self, event)
         if event.Type == 'MouseEnter' then
-            self:SetAlpha(1.0, false) return true 
+            self:SetAlpha(1.0, false) return true
         elseif event.Type == 'MouseExit' then
-            self:SetAlpha(0.5, false) return true 
+            self:SetAlpha(0.5, false) return true
         end
-        return false 
+        return false
     end
-    LayoutHelpers.SetDimensions(group.type, 30, 24) 
+    LayoutHelpers.SetDimensions(group.type, 30, 24)
 
     if mod.type == 'GAME' then
-        AddTooltip(group.type, mod.status, 'This mod is changing game for all players and it will prevent ranking of the current game', 400, nil, nil, 'right')
+        AddTooltip(group.type, mod.status, 'This mod is changing game for all players and \n it will prevent ranking of the current game', 500, nil, nil, 'right')
     elseif mod.type == 'UI' then
-        AddTooltip(group.type, mod.status, 'This mod is changing only UI for current player and it will not prevent ranking of the current game', 400, nil, nil, 'right')
-    else 
+        AddTooltip(group.type, mod.status, 'This mod is changing only UI for current player \n and it will not prevent ranking of the current game', 500, nil, nil, 'right')
+    else
         AddTooltip(group.type, mod.status, nil, 200, nil, nil, 'right')
     end
 
     group.ui = mod.ui_only
-    LayoutHelpers.AtRightTopIn(group.type, group.bg, 10, 6)
+    if mods.expanded then
+        LayoutHelpers.AtRightTopIn(group.type, group, 6, 6)
+    else
+        LayoutHelpers.AtRightIn(group.type, group, 6)
+        LayoutHelpers.AtVerticalCenterIn(group.type, group)
+    end
 
     -- check if the mod has 2 website links: mod info website and Github website
     if mod.url and mod.github then  
         -- creating a link for opening a website with info about the mod
-        group.website = CreateLinkButton(group.bg, mod.url, GUI.modWebisteIcon, 'Open website with information about the mod \n' .. mod.url) 
+        group.website = CreateLinkButton(group.check, mod.url, GUI.modWebisteIcon, 'Open website with information about the mod \n' .. mod.url) 
         LayoutHelpers.SetDimensions(group.website, 20, 20)
         LayoutHelpers.LeftOf(group.website, group.type, 5)
-         
+
         -- creating a link for opening a website with source code for the mod 
-        group.github = CreateLinkButton(group.bg, mod.github, GUI.modSourceIcon, 'Open website with source code for the mod \n' .. mod.url) 
+        group.github = CreateLinkButton(group.check, mod.github, GUI.modSourceIcon, 'Open website with source code for the mod \n' .. mod.url) 
         LayoutHelpers.SetDimensions(group.github, 20, 20)
         LayoutHelpers.LeftOf(group.github, group.website, 5)
 
@@ -1216,12 +1231,12 @@ function CreateListElement(parent, mod, index)
     elseif mod.url then 
         if Links.repo(mod.url) then  
             -- creating a link for opening a website with source code for the mod 
-            group.website = CreateLinkButton(group.bg, mod.url, GUI.modSourceIcon, 'Open website with source code for the mod \n' .. mod.url)  
+            group.website = CreateLinkButton(group.check, mod.url, GUI.modSourceIcon, 'Open website with source code for the mod \n' .. mod.url)  
             LayoutHelpers.SetDimensions(group.website, 20, 20)
             LayoutHelpers.LeftOf(group.website, group.type, 5)
         else
             -- creating a link for opening a website with info about the mod
-            group.website = CreateLinkButton(group.bg, mod.url, GUI.modWebisteIcon, 'Open website with information about the mod \n' .. mod.url) 
+            group.website = CreateLinkButton(group.check, mod.url, GUI.modWebisteIcon, 'Open website with information about the mod \n' .. mod.url) 
             LayoutHelpers.SetDimensions(group.website, 20, 20)
             LayoutHelpers.LeftOf(group.website, group.type, 5)
         end
@@ -1232,7 +1247,8 @@ function CreateListElement(parent, mod, index)
 
     if IsHost or mod.ui_only then
         local uid = mod.uid
-        group.bg.OnCheck = function(self, checked)
+        group.check.OnCheck = function(self, checked)
+            group:SetCheck(checked)
             if checked then
                 LOG('ModsManager selected: ' .. GetModNameType(uid))
                 ActivateMod(uid)
@@ -1244,7 +1260,30 @@ function CreateListElement(parent, mod, index)
     else
         -- Disable all mouse interactivity with the control, but don't _disable_ it, as that alters
         -- what it looks like.
-        group.bg.HandleEvent = function() return true end
+        group.check.HandleEvent = function() return true end
+    end
+
+    group.SetCheck = function(self, isChecked)
+        if isChecked then
+            if UIUtil.GetCurrentSkinName() == 'random' then
+                group.fill:SetSolidColor('8D7D7D7D')
+            else
+                group.fill:SetSolidColor(UIUtil.factionTextColor)
+            end
+        else
+            group.fill:SetSolidColor('8D1C1C1C')
+        end
+        self.isChecked = isChecked
+    end
+
+    group.check.HandleEventOrg = group.check.HandleEvent
+    group.check.HandleEvent = function(self, event)
+        if event.Type == 'MouseEnter' then
+            group.highlight:SetSolidColor('60B5B5B5')
+        elseif event.Type == 'MouseExit' then
+            group.highlight:SetSolidColor('00B5B5B5')
+        end
+        return group.check:HandleEventOrg(event)
     end
 
     if mod.type == 'NO_DEPENDENCY' then
@@ -1266,14 +1305,13 @@ function CreateListElement(parent, mod, index)
             AddTooltip(group.type, mod.status, body, 400, nil, nil, 'right')
         end
     end
-    
+
     return group
 end
 
 function CreateLinkButton(parent, url, iconPath, description)
     local btn = Bitmap(parent) 
     btn.url = url
---    btn:SetSolidColor('FFFF0B0B') -- #FFFF0B0B
     btn:SetTexture(iconPath) 
     btn:SetAlpha(0.5, false)
     btn.Depth:Set(function() return dialogContent.Depth() + 100 end)
@@ -1284,9 +1322,9 @@ function CreateLinkButton(parent, url, iconPath, description)
         elseif event.Type == 'MouseExit' then
             self:SetAlpha(0.5, false)
         elseif event.Type == 'ButtonPress' or event.Type == 'ButtonDClick' then
-            Links.open(self.url)
+            Links.open(self.url, dialog)
         end
-        return true 
+        return true
     end
     AddTooltip(btn, 'Open URL', description, 400, nil, nil, 'right')
 
@@ -1300,7 +1338,7 @@ function CreateFavoriteButton(parent, iconSize, isCentered, isChecked)
     toggle.uncheckColor = 'ff434343' -- #ff434343
     toggle.checkedTooltip = 'Remove this mod from the list of favorite mods'
     toggle.uncheckTooltip = 'Add this mod to the list of favorite mods that you can later activate by clicking on the Star button located in top left corner of this dialog'
-    
+
     if UIUtil.GetCurrentSkinName() == 'random' then
        toggle.checkedColor = 'FFFFFF' -- #FFFFFF
     else
@@ -1309,9 +1347,10 @@ function CreateFavoriteButton(parent, iconSize, isCentered, isChecked)
 
     toggle.Icon = Bitmap(parent, GUI.modFavoriteIcon)
     toggle.Icon:DisableHitTest()
+    toggle.Icon.Depth:Set(function() return toggle.Depth() + 10 end)
     LayoutHelpers.SetDimensions(toggle.Icon, iconSize, iconSize)
     LayoutHelpers.AtLeftIn(toggle.Icon, parent, 5)
-    
+
     toggle.Fill = Bitmap(toggle.Icon)
     toggle.Fill:SetAlpha(0.9, false)
     toggle.Fill:DisableHitTest()
@@ -1324,11 +1363,10 @@ function CreateFavoriteButton(parent, iconSize, isCentered, isChecked)
     else 
         LayoutHelpers.AtTopIn(toggle.Icon, parent, 5) 
     end
-     
---    toggle:SetSolidColor('4BFAA2A2') -- '#00F7F4F4'  #4BFAA2A2
+
     toggle.Depth:Set(function() return parent.Depth() + 100 end)
     LayoutHelpers.FillParentFixedBorder(toggle, toggle.Icon, -8)
-     
+
     toggle.HandleEvent = function(self, event)
         OnButtonHighlight(self.Fill, event)
         if event.Type == 'ButtonPress' or event.Type == 'ButtonDClick' then 
@@ -1339,7 +1377,7 @@ function CreateFavoriteButton(parent, iconSize, isCentered, isChecked)
         return true
     end
     toggle:EnableHitTest()
-    
+
     toggle.Update = function(self)
         if self.isCheckable then
             if self.isChecked then

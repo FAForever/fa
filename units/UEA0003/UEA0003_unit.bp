@@ -83,6 +83,7 @@ UnitBlueprint {
         'POD',
         'REPAIR',
         'RECLAIM',
+        'PATROLHELPER',
         'ENGINEER',
         'CAPTURE',
         'VISIBLETORECON',
@@ -93,8 +94,8 @@ UnitBlueprint {
         AirThreatLevel = 0,
         ArmorType = 'Light',
         EconomyThreatLevel = 1,
-        Health = 6,
-        MaxHealth = 6,
+        Health = 50,
+        MaxHealth = 50,
         RegenRate = 0,
         SubThreatLevel = 0,
         SurfaceThreatLevel = 0,
@@ -133,8 +134,8 @@ UnitBlueprint {
     },
     Footprint = {
         MaxSlope = 0.25,
-        SizeX = 1,
-        SizeZ = 1,
+        SizeX = 0,
+        SizeZ = 0,
     },
     General = {
         BuildBones = {

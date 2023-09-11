@@ -334,16 +334,16 @@ AIPlatoon = Class(moho.platoon_methods) {
 
     --- Called as a unit (with carrier capabilities) of this platoon adds a unit to its storage
     ---@param self AIPlatoon
-    ---@param carrier Unit
     ---@param unit Unit
-    OnAddToStorage = function(self, carrier, unit)
+    ---@param carrier Unit
+    OnAddToStorage = function(self, unit, carrier)
     end,
 
     --- Called as a unit (with carrier capabilities) of this platoon removes a unit from its storage
     ---@param self AIPlatoon
-    ---@param carrier Unit
     ---@param unit Unit
-    OnRemoveFromStorage = function(self, carrier, unit)
+    ---@param carrier Unit
+    OnRemoveFromStorage = function(self, unit, carrier)
     end,
 
     -----------------------------------------------------------------

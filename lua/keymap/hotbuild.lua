@@ -491,30 +491,6 @@ function buildActionTemplate(modifier)
     ClearBuildTemplates()
     CommandMode.StartCommandMode("build", {name = cmd})
     SetActiveBuildTemplate(template.templateData)
-
-    if options.gui_template_rotator ~= 0 then
-        -- Rotating templates
-        local worldview = import("/lua/ui/game/worldview.lua").viewLeft
-        local oldHandleEvent = worldview.HandleEvent
-        worldview.HandleEvent = function(self, event)
-            if event.Type == 'ButtonPress' then
-                if event.Modifiers.Middle then
-                    ClearBuildTemplates()
-                    local tempTemplate = table.deepcopy(template.templateData)
-                    template.templateData[1] = tempTemplate[2]
-                    template.templateData[2] = tempTemplate[1]
-                    for i = 3, table.getn(template.templateData) do
-                        local index = i
-                        template.templateData[index][3] = 0 - tempTemplate[index][4]
-                        template.templateData[index][4] = tempTemplate[index][3]
-                    end
-                    SetActiveBuildTemplate(template.templateData)
-                elseif not event.Modifiers.Shift then
-                    worldview.HandleEvent = oldHandleEvent
-                end
-            end
-        end
-    end
 end
 
 function buildActionUnit(name, modifier)

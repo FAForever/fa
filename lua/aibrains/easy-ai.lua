@@ -35,7 +35,7 @@ AIBrain = Class(StandardBrain, EconomyComponent) {
 
     SkirmishSystems = true,
 
-    --- Called after `SetupSession` but before `BeginSession` - no initial units, props or resources exist at this point
+    --- Called after `SetupSession` but before `BeginSession` - no initial units, props or resources exist at this point and the teams are not yet defined
     ---@param self EasyAIBrain
     ---@param planName string
     OnCreateAI = function(self, planName)
@@ -57,17 +57,18 @@ AIBrain = Class(StandardBrain, EconomyComponent) {
         self:IMAPConfiguration()
     end,
 
-    --- Called after `BeginSession`, at this point all props, resources and initial units exist in the map
+    --- Called after `BeginSession`, at this point all props, resources and initial units exist in the map and the teams are defined
     ---@param self EasyAIBrain
     OnBeginSession = function(self)
         StandardBrain.OnBeginSession(self)
 
         -- requires navigational mesh
-        import("/lua/sim/NavUtils.lua").Generate()
+        import("/lua/sim/navutils.lua").Generate()
 
         -- requires these markers to exist
-        import("/lua/sim/MarkerUtilities.lua").GenerateExpansionMarkers()
-        import("/lua/sim/MarkerUtilities.lua").GenerateRallyPointMarkers()
+        import("/lua/sim/markerutilities.lua").GenerateExpansionMarkers()
+        import("/lua/sim/markerutilities.lua").GenerateNavalAreaMarkers()
+        import("/lua/sim/markerutilities.lua").GenerateRallyPointMarkers()
 
         -- requires these datastructures to understand the game
         self.GridReclaim = import("/lua/ai/gridreclaim.lua").Setup(self)

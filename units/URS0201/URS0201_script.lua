@@ -56,7 +56,7 @@ URS0201 = ClassUnit(CSeaUnit) {
         local bp = self.Blueprint or self:GetBlueprint()
         if new == 'Land' then
             self:DisableUnitIntel('Layer', 'Sonar')
-            self:SetSpeedMult(bp.Physics.LandSpeedMultiplier)
+            self:SetSpeedMult(bp.Physics.LandSpeedMultiplier or 1)
         elseif new == 'Water' then
             self:EnableUnitIntel('Layer', 'Sonar')
             self:SetSpeedMult(1)
@@ -66,7 +66,7 @@ URS0201 = ClassUnit(CSeaUnit) {
             if self.AT1 then
                 self.AT1:Destroy()
             end
-            self.AT1 = self.Trash:Add(ForkThread(self.TransformThread, self, new == 'Land', self))
+            self.AT1 = self.Trash:Add(ForkThread(self.TransformThread, self, new == 'Land'))
         end
     end,
 
@@ -76,8 +76,9 @@ URS0201 = ClassUnit(CSeaUnit) {
         local WaitFor = WaitFor
 
         local animManip = self.AnimManip
-        if not animManip then
+        if (not animManip) or IsDestroyed(animManip) then
             animManip = CreateAnimator(self)
+            self.Trash:Add(animManip)
             self.AnimManip = animManip
         end
 
@@ -93,7 +94,6 @@ URS0201 = ClassUnit(CSeaUnit) {
             self:SetImmobile(false)
             self.SwitchAnims = true
             self.Walking = true
-            self.Trash:Add(animManip)
         else
             self:SetImmobile(true)
             animManip:PlayAnim(self.Blueprint.Display.AnimationTransform)
@@ -105,7 +105,7 @@ URS0201 = ClassUnit(CSeaUnit) {
                 bp.CollisionOffsetZ or 0, bp.SizeX * scale, bp.SizeY * scale, bp.SizeZ * scale)
             self.IsWaiting = false
             animManip:Destroy()
-            animManip = nil
+            self.AnimManip = nil
             self:SetImmobile(false)
             self.Walking = false
         end
@@ -151,7 +151,7 @@ URS0201 = ClassUnit(CSeaUnit) {
             if self.PlayDestructionEffects then
                 self:CreateDestructionEffects(self, overkillRatio)
             end
-            self:CreateWreckage(0.1)
+            self:CreateWreckage(0)
             self:Destroy()
         else
             CSeaUnit.DeathThread(self, overkillRatio)

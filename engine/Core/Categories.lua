@@ -51,6 +51,8 @@ categories = {
     CANTRANSPORTCOMMANDER = categoryValue,
     CAPTURE = categoryValue,
     CARRIER = categoryValue,
+    --- Allows the unit to land on water. Is introduced by https://github.com/FAForever/FA-Binary-Patches/pull/20
+    CANLANDONWATER = categoryValue,
     CIVILIAN = categoryValue,
     CIVILLIAN = categoryValue,
     CLOAKPRESET = categoryValue,
@@ -112,8 +114,11 @@ categories = {
     NANOCOMBATPRESET = categoryValue,
     NAVALCARRIER = categoryValue,
     NAVAL = categoryValue,
+
+    -- Allows this unit to be build by engineers
     NEEDMOBILEBUILD = categoryValue,
     NOFORMATION = categoryValue,
+    --- Prevents splash damage being applied to the entity
     NOSPLASHDAMAGE = categoryValue,
     NUKE = categoryValue,
     NUKESUB = categoryValue,
@@ -236,6 +241,9 @@ categories = {
     StealthGenerator = categoryValue,
     Switchback = categoryValue,
     SystemIntegrityCompensator = categoryValue,
+
+    -- Populates a dummy factory that can take over the factory aspect of the unit
+    EXTERNALFACTORY = categoryValue
 }
 
 ---@alias CategoryName
@@ -285,6 +293,7 @@ categories = {
 ---| "CANTRANSPORTCOMMANDER"
 ---| "CAPTURE"
 ---| "CARRIER"
+---| "CANLANDONWATER"
 ---| "CIVILIAN"
 ---| "CIVILLIAN"
 ---| "CLOAKPRESET"
@@ -351,6 +360,7 @@ categories = {
 ---| "NOSPLASHDAMAGE"
 ---| "NUKE"
 ---| "NUKESUB"
+---| "OBSTRUCTSBUILDING"
 ---| "OMNI"
 ---| "OPERATION"
 ---| "OPTICS"

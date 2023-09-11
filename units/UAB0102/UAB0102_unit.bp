@@ -1,110 +1,59 @@
-UnitBlueprint {
+UnitBlueprint{
+    Description = "<LOC uab0102_desc>Air Factory",
     Audio = {
-        Construct = Sound {
-            Bank = 'UAB',
-            Cue = 'UAB0102_Construct_Start',
-            LodCutoff = 'UnitMove_LodCutoff',
-        },
-        ConstructLoop = Sound {
-            Bank = 'UAB',
-            Cue = 'UAB0102_Construct_Loop',
-            LodCutoff = 'UnitMove_LodCutoff',
-        },
-        DeathExplosion = Sound {
-            Bank = 'UALDestroy',
-            Cue = 'UAB_Destroy_Lrg_PreDestroy',
-            LodCutoff = 'UnitMove_LodCutoff',
-        },
-        Destroyed = Sound {
-            Bank = 'UALDestroy',
-            Cue = 'UAB_Destroy_Huge',
-            LodCutoff = 'UnitMove_LodCutoff',
-        },
-        DoneBeingBuilt = Sound {
-            Bank = 'UAB',
-            Cue = 'UAB0102_Activate',
-            LodCutoff = 'UnitMove_LodCutoff',
-        },
-        UISelection = Sound {
-            Bank = 'Interface',
-            Cue = 'Aeon_Select_Factory',
-            LodCutoff = 'UnitMove_LodCutoff',
-        },
+        Construct      = Sound { Bank = 'UAB',        Cue = 'UAB0102_Construct_Start',    LodCutoff = 'UnitMove_LodCutoff' },
+        ConstructLoop  = Sound { Bank = 'UAB',        Cue = 'UAB0102_Construct_Loop',     LodCutoff = 'UnitMove_LodCutoff' },
+        DeathExplosion = Sound { Bank = 'UALDestroy', Cue = 'UAB_Destroy_Lrg_PreDestroy', LodCutoff = 'UnitMove_LodCutoff' },
+        Destroyed      = Sound { Bank = 'UALDestroy', Cue = 'UAB_Destroy_Huge',           LodCutoff = 'UnitMove_LodCutoff' },
+        DoneBeingBuilt = Sound { Bank = 'UAB',        Cue = 'UAB0102_Activate',           LodCutoff = 'UnitMove_LodCutoff' },
+        UISelection    = Sound { Bank = 'Interface',  Cue = 'Aeon_Select_Factory',        LodCutoff = 'UnitMove_LodCutoff' },
     },
     BuildIconSortPriority = 20,
     Categories = {
-        'PRODUCTSC1',
-        'SELECTABLE',
-        'BUILTBYTIER1ENGINEER',
-        'BUILTBYTIER2ENGINEER',
-        'BUILTBYTIER3ENGINEER',
-        'BUILTBYCOMMANDER',
-        'AEON',
-        'STRUCTURE',
-        'AIR',
-        'TECH1',
-        'CONSTRUCTION',
-        'FACTORY',
-        'RALLYPOINT',
-        'DRAGBUILD',
-        'SIZE16',
-        'VISIBLETORECON',
-        'RECLAIMABLE',
-        'SHOWQUEUE',
-        'SORTCONSTRUCTION',
+        "AEON",
+        "AIR",
+        "BUILTBYCOMMANDER",
+        "BUILTBYTIER1ENGINEER",
+        "BUILTBYTIER2ENGINEER",
+        "BUILTBYTIER3ENGINEER",
+        "CONSTRUCTION",
+        "DRAGBUILD",
+        "FACTORY",
+        "PRODUCTSC1",
+        "RALLYPOINT",
+        "RECLAIMABLE",
+        "SELECTABLE",
+        "SHOWQUEUE",
+        "SIZE16",
+        "SORTCONSTRUCTION",
+        "STRUCTURE",
+        "TECH1",
+        "VISIBLETORECON",
     },
     Defense = {
         AirThreatLevel = 0,
-        ArmorType = 'Structure',
-        EconomyThreatLevel = 3,
+        ArmorType = "Structure",
+        EconomyThreatLevel = 104,
         Health = 3200,
         MaxHealth = 3200,
         RegenRate = 0,
         SubThreatLevel = 0,
         SurfaceThreatLevel = 0,
     },
-    Description = '<LOC uab0102_desc>Air Factory',
     Display = {
-        Abilities = {
-            '<LOC ability_upgradable>Upgradeable',
-        },
-        AnimationUpgrade = '/units/uab0102/uab0102_aupgrade.sca',
+        Abilities = { "<LOC ability_upgradable>Upgradeable" },
+        AnimationUpgrade = "/units/uab0102/uab0102_aupgrade.sca",
         AnimationUpgradeTable = {
-            uab0202 = '/units/uab0102/uab0102_aupgrade.sca',
-            zab9502 = '/units/uab0102/uab0102_aopen_sup.sca'
+            uab0202 = "/units/uab0102/uab0102_aupgrade.sca",
+            zab9502 = "/units/uab0102/uab0102_aopen_sup.sca",
         },
-        BuildAttachBone = 'Attachpoint',
+        BuildAttachBone = "Attachpoint",
         DamageEffects = {
-            {
-                Bone = 0,
-                OffsetX = 1.2,
-                OffsetY = 0.7,
-                OffsetZ = 0.5,
-            },
-            {
-                Bone = 0,
-                OffsetX = -1.2,
-                OffsetY = 0.7,
-                OffsetZ = 0.5,
-            },
-            {
-                Bone = 0,
-                OffsetX = -1.2,
-                OffsetY = 0.7,
-                OffsetZ = -0.5,
-            },
-            {
-                Bone = 0,
-                OffsetX = 1.2,
-                OffsetY = 0.7,
-                OffsetZ = -0.5,
-            },
-            {
-                Bone = 0,
-                OffsetX = 0,
-                OffsetY = 1.7,
-                OffsetZ = -1,
-            },
+            { Bone = 0,     OffsetX = 1.2,   OffsetY = 0.7,   OffsetZ = 0.5 },
+            { Bone = 0,     OffsetX = -1.2,  OffsetY = 0.7,   OffsetZ = 0.5 },
+            { Bone = 0,     OffsetX = -1.2,  OffsetY = 0.7,   OffsetZ = -0.5 },
+            { Bone = 0,     OffsetX = 1.2,   OffsetY = 0.7,   OffsetZ = -0.5 },
+            { Bone = 0,     OffsetX = 0,     OffsetY = 1.7,   OffsetZ = -1 },
         },
         Mesh = {
             IconFadeInZoom = 130,
@@ -112,30 +61,24 @@ UnitBlueprint {
                 {
                     LODCutoff = 200,
                     Scrolling = true,
-                    ShaderName = 'Aeon',
+                    ShaderName = "Aeon",
                 },
                 {
-                    AlbedoName = 'uab0102_lod1_albedo.dds',
                     LODCutoff = 500,
-                    ShaderName = 'Aeon',
-                    SpecularName = 'uab0102_lod1_specteam.dds',
+                    ShaderName = "Aeon",
+                    AlbedoName = "uab0102_lod1_albedo.dds",
+                    SpecularName = "uab0102_lod1_specteam.dds",
                 },
             },
         },
-        SpawnRandomRotation = true,
         Tarmacs = {
             {
-                Albedo = 'Tarmacs/Tar12x_aeon_01_albedo',
+                Albedo = "Tarmacs/Tar12x_aeon_01_albedo",
                 DeathLifetime = 300,
                 FadeOut = 150,
                 Length = 12.8,
-                Normal = 'Tarmacs/Tar12x_aeon_01_normals',
-                Orientations = {
-                    0,
-                    90,
-                    180,
-                    270,
-                },
+                Normal = "Tarmacs/Tar12x_aeon_01_normals",
+                Orientations = { 0, 90, 180, 270 },
                 RemoveWhenDead = false,
                 Width = 12.8,
             },
@@ -148,14 +91,12 @@ UnitBlueprint {
         BuildRate = 20,
         BuildTime = 300,
         BuildableCategory = {
-            'BUILTBYTIER1FACTORY AEON MOBILE CONSTRUCTION',
-            'BUILTBYTIER1FACTORY AEON STRUCTURE AIR',
-            'BUILTBYTIER1FACTORY AEON MOBILE AIR',
-            'TRANSPORTBUILTBYTIER1FACTORY AEON MOBILE AIR',
+            "BUILTBYTIER1FACTORY AEON MOBILE CONSTRUCTION",
+            "BUILTBYTIER1FACTORY AEON STRUCTURE AIR",
+            "BUILTBYTIER1FACTORY AEON MOBILE AIR",
+            "TRANSPORTBUILTBYTIER1FACTORY AEON MOBILE AIR",
         },
-        RebuildBonusIds = {
-            'uab0102',
-        },
+        RebuildBonusIds = { "uab0102" },
         StorageEnergy = 0,
         StorageMass = 80,
     },
@@ -165,12 +106,8 @@ UnitBlueprint {
     },
     General = {
         BuildBones = {
-            BuildEffectBones = {
-                'Turret_Muzzle_02',
-            },
+            BuildEffectBones = { "Turret_Muzzle_02" },
         },
-        Category = 'Factory',
-        Classification = 'RULEUC_Factory',
         CommandCaps = {
             RULEUCC_Attack = false,
             RULEUCC_CallTransport = false,
@@ -187,20 +124,13 @@ UnitBlueprint {
             RULEUCC_Transport = false,
         },
         ConstructionBar = true,
-        FactionName = 'Aeon',
-        Icon = 'air',
+        FactionName = "Aeon",
+        Icon = "air",
         SelectionPriority = 5,
-        TechLevel = 'RULEUTL_Basic',
-        UnitWeight = 1,
-        UpgradesFromBase = 'uab0102',
-        UpgradesTo = 'uab0202',
+        UpgradesFromBase = "uab0102",
+        UpgradesTo = "uab0202",
     },
-    Intel = {
-        VisionRadius = 20,
-    },
-    Interface = {
-        HelpText = '<LOC uab0102_help>Air Factory',
-    },
+    Intel = { VisionRadius = 20 },
     LifeBarHeight = 0.075,
     LifeBarOffset = 1.55,
     LifeBarSize = 4.5,
@@ -221,144 +151,28 @@ UnitBlueprint {
         MeshExtentsY = 2.5,
         MeshExtentsZ = 5,
         MinSpeedPercent = 0,
-        MotionType = 'RULEUMT_None',
+        MotionType = "RULEUMT_None",
         RaisedPlatforms = {
+            --X,     Z,     height -- Offsets from center
 
-            -- Platform 1
-            -- TopLeft Offset From Center
-            -1.4,
+            -1.4,  -1.2,  0.65,    --Top left
+            1.4,   -1.2,  0.65,    --Top right
+            -1.4,  1.5,   0.65,    --Bottom left
+            1.4,   1.5,   0.65,    --Bottom right
 
-            -- x
-            -1.2,
+            -2,    -1.2,  0,       --Top left
+            -1.4,  -1.2,  0.65,    --Top right
+            -2,    1.5,   0,       --Bottom left
+            -1.4,  1.5,   0.65,    --Bottom right
 
-            -- z
-            0.65,
-
-            -- height
-            -- TopRight Offset From Center
-            1.4,
-
-            -- x
-            -1.2,
-
-            -- z
-            0.65,
-
-            -- height
-            -- BottomLeft Offset From Center
-            -1.4,
-
-            -- x
-            1.5,
-
-            -- z
-            0.65,
-
-            -- height
-            -- BottomRight Offset From Center
-            1.4,
-
-            -- x
-            1.5,
-
-            -- z
-            0.65,
-
-            -- height
-            -- Platform 2
-            -- TopLeft Offset From Center
-            -2,
-
-            -- x
-            -1.2,
-
-            -- z
-            0,
-
-            -- height
-            -- TopRight Offset From Center
-            -1.4,
-
-            -- x
-            -1.2,
-
-            -- z
-            0.65,
-
-            -- height
-            -- BottomLeft Offset From Center
-            -2,
-
-            -- x
-            1.5,
-
-            -- z
-            0,
-
-            -- height
-            -- BottomRight Offset From Center
-            -1.4,
-
-            -- x
-            1.5,
-
-            -- z
-            0.65,
-
-            -- height
-            -- Platform 3
-            -- TopLeft Offset From Center
-            1.4,
-
-            -- x
-            -1.2,
-
-            -- z
-            0.65,
-
-            -- height
-            -- TopRight Offset From Center
-            2,
-
-            -- x
-            -1.2,
-
-            -- z
-            0,
-
-            -- height
-            -- BottomLeft Offset From Center
-            1.4,
-
-            -- x
-            1.5,
-
-            -- z
-            0.65,
-
-            -- height
-            -- BottomRight Offset From Center
-            2,
-
-            -- x
-            1.5,
-
-            -- z
-            0,
+            1.4,   -1.2,  0.65,    --Top left
+            2,     -1.2,  0,       --Top right
+            1.4,   1.5,   0.65,    --Bottom left
+            2,     1.5,   0,       --Bottom right
         },
         RollOffPoints = {
-            {
-                UnitSpin = 90,
-                X = 3,
-                Y = 0,
-                Z = 0,
-            },
-            {
-                UnitSpin = -90,
-                X = -3,
-                Y = 0,
-                Z = 0,
-            },
+            { UnitSpin = 90,    X = 3,     Y = 0,     Z = 0 },
+            { UnitSpin = -90,   X = -3,    Y = 0,     Z = 0 },
         },
         SkirtOffsetX = -1.5,
         SkirtOffsetZ = -1.5,
@@ -372,10 +186,10 @@ UnitBlueprint {
     SizeX = 3,
     SizeY = 0.7,
     SizeZ = 3,
-    StrategicIconName = 'icon_factory1_air',
+    StrategicIconName = "icon_factory1_air",
     StrategicIconSortPriority = 220,
     Wreckage = {
-        Blueprint = '/props/DefaultWreckage/DefaultWreckage_prop.bp',
+        Blueprint = "/props/DefaultWreckage/DefaultWreckage_prop.bp",
         EnergyMult = 0,
         HealthMult = 0.9,
         MassMult = 0.9,

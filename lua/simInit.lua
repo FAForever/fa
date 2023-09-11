@@ -20,6 +20,10 @@
 -- Do global initialization and set up common global functions
 doscript '/lua/globalInit.lua'
 
+-- replace with assembly implementations
+table.getsize = table.getsize2 or table.getsize
+table.empty = table.empty2 or table.empty
+
 -- load legacy builder systems
 doscript '/lua/system/GlobalPlatoonTemplate.lua'
 doscript '/lua/system/GlobalBuilderTemplate.lua'
@@ -78,16 +82,9 @@ function ShuffleStartPositions(syncNewPositions)
     end
 end
 
-Prefetcher = CreatePrefetchSet()
-
 --SetupSession will be called by the engine after ScenarioInfo is set
 --but before any armies are created.
 function SetupSession()
-
-    -- start prefetching
-    -- local template = import("/lua/sim/prefetchtemplates.lua").DefaultUnits
-    -- local prefetchData = import("/lua/sim/PrefetchUtilities.lua").CreatePrefetchSetFromBlueprints(template)
-    -- Prefetcher:Update(prefetchData)
 
     import("/lua/ai/gridreclaim.lua").Setup()
 
@@ -96,12 +93,6 @@ function SetupSession()
 
     -- assume there are no AIs
     ScenarioInfo.GameHasAIs = false
-
-    -- if the AI replacement is on then there may be AIs
-    if ScenarioInfo.Options.AIReplacement == 'On' then
-        ScenarioInfo.GameHasAIs = true
-        SPEW("Detected ai replacement option being enabled: enabling AI functionality")
-    end
 
     -- if we're doing a campaign / special map then there may be AIs
     if ScenarioInfo.type ~= 'skirmish' then
@@ -292,7 +283,7 @@ end
 
 -- BeginSession will be called by the engine after the armies are created (but without
 -- any units yet) and we're ready to start the game. It's responsible for setting up
--- the initial units and any other gameplay state we need.
+-- the initial units, alliances and any other gameplay state we need.
 function BeginSession()
 
     -- imported for side effects
@@ -397,6 +388,10 @@ end
 
 --- Setup for team manangement
 function BeginSessionTeams()
+
+    -- up until this point all armies are considered to be enemies for skirmish maps,
+    -- we correct that here by applying the team setup of the lobby
+
     -- Look for teams
     local teams = {}
     for name,army in ScenarioInfo.ArmySetup do

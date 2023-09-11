@@ -5,8 +5,9 @@ local WorldMesh = import("/lua/ui/controls/worldmesh.lua").WorldMesh
 local meshSphere = '/env/Common/Props/sphere_lod0.scm'
 
 local MeshOnTerrain = nil
+local MeshOnTerrainRed = nil
 local MeshesInBetween = { }
-local MeshesInbetweenCount = 4
+local MaxMeshesInbetweenCount = 5
 local MeshFadeDistance = 300
 
 local Trash = TrashBag()
@@ -82,7 +83,7 @@ local function ComputeTransparency(camera, distance, terrainHeight, surfaceHeigh
     local f1 = math.max(0, 1 - (zoom / distance))
 
     -- visibility based on terrain difference
-    local f2 = math.clamp(surfaceHeight - terrainHeight - 1, 0, 1)
+    local f2 = math.clamp(surfaceHeight - terrainHeight - 0.25, 0, 0.5)*2
     return f1 * f2
 end
 
@@ -111,21 +112,40 @@ local function DepthScanningThread()
         UniformScale = 0.3,
         LODCutoff = MeshFadeDistance
     })
-
+    MeshOnTerrainRed = WorldMesh()
+    MeshOnTerrainRed:SetMesh({
+        MeshName = meshSphere,
+        TextureName = '/meshes/game/Attack_albedo.dds',
+        ShaderName = 'FakeRings',
+        UniformScale = 0.3,
+        LODCutoff = MeshFadeDistance
+    })
+    
     Trash:Add(MeshOnTerrain)
+    Trash:Add(MeshOnTerrainRed)
 
     -- allocate intermediate bits
-    for k = 1, MeshesInbetweenCount do
+    for k = 1, MaxMeshesInbetweenCount do
 
         local bit = WorldMesh()
-        bit:SetMesh({
-            MeshName = meshSphere,
-            TextureName = '/meshes/game/Assist_albedo.dds',
-            ShaderName = 'FakeRings',
-            UniformScale = 0.15,
-            LODCutoff = MeshFadeDistance
-        })
-
+        if k == 2 then
+            bit:SetMesh({
+                MeshName = meshSphere,
+                TextureName = '/meshes/game/map-border_squ_cybran_a_SpecTeam.dds',
+                ShaderName = 'FakeRings',
+                UniformScale = 0.15,
+                LODCutoff = MeshFadeDistance
+            })
+        else
+            bit:SetMesh({
+                MeshName = meshSphere,
+                TextureName = '/meshes/game/Assist_albedo.dds',
+                ShaderName = 'FakeRings',
+                UniformScale = 0.15,
+                LODCutoff = MeshFadeDistance
+            })
+        end
+        
         MeshesInBetween[k] = bit
         Trash:Add(bit)
     end
@@ -161,17 +181,26 @@ local function DepthScanningThread()
             -- update visibility terrain mesh
             transparency = ComputeTransparency(camera, MeshFadeDistance, elevation, position[2])
             if transparency > 0.05 then
-                MeshOnTerrain:SetHidden(false)
-                MeshOnTerrain:SetStance(location)
-                MeshOnTerrain:SetFractionCompleteParameter(transparency)
+                if (position[2] - elevation) > 1.5 then
+                    MeshOnTerrain:SetHidden(false)
+                    MeshOnTerrain:SetStance(location)
+                    MeshOnTerrain:SetFractionCompleteParameter(transparency)
+                    MeshOnTerrainRed:SetHidden(true)
+                else
+                    MeshOnTerrainRed:SetHidden(false)
+                    MeshOnTerrainRed:SetStance(location)
+                    MeshOnTerrainRed:SetFractionCompleteParameter(transparency)
+                    MeshOnTerrain:SetHidden(true)
+                end
             else
                 MeshOnTerrain:SetHidden(true)
+                MeshOnTerrainRed:SetHidden(true)
             end
 
             -- update visiblity intermediate dots
-            for k = 1, MeshesInbetweenCount do
+            for k = 1, MaxMeshesInbetweenCount do
                 local bit = MeshesInBetween[k]
-                location[2] = (0.2 * k) * position[2] + (1 - 0.2 * k) * elevation
+                location[2] = position[2] - k*0.5 - (k-1)*0.5 - (k-1)*(k-2) * 0.05 * (position[2] - elevation) -- 1:0.5, 2:1.5, 3-5: scaled based on elevation
 
                 transparency = ComputeTransparency(camera, MeshFadeDistance, elevation, position[2])
                 if transparency > 0.05 then
@@ -185,7 +214,8 @@ local function DepthScanningThread()
         else
             -- hide them
             MeshOnTerrain:SetHidden(true)
-            for k = 1, MeshesInbetweenCount do
+            MeshOnTerrainRed:SetHidden(true)
+            for k = 1, MaxMeshesInbetweenCount do
                 MeshesInBetween[k]:SetHidden(true)
             end
         end

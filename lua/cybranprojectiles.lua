@@ -24,7 +24,7 @@ local NukeProjectile = DefaultProjectileFile.NukeProjectile
 CDFBrackmanHackPegProjectile01 = ClassProjectile(MultiPolyTrailProjectile) {
     FxImpactTrajectoryAligned = false,
     PolyTrails = EffectTemplate.CBrackmanCrabPegPodTrails,
-    PolyTrailOffset = import("/lua/effecttemplates.lua").DefaultPolyTrailOffset2,
+    PolyTrailOffset = { 0, 0 },
     FxTrailOffset = 0,
 }
 
@@ -33,7 +33,7 @@ CDFBrackmanHackPegProjectile01 = ClassProjectile(MultiPolyTrailProjectile) {
 CDFBrackmanHackPegProjectile02 = ClassProjectile(MultiPolyTrailProjectile) {
     FxImpactTrajectoryAligned = false,
     PolyTrails = EffectTemplate.CBrackmanCrabPegTrails,
-    PolyTrailOffset = import("/lua/effecttemplates.lua").DefaultPolyTrailOffset2,
+    PolyTrailOffset = { 0, 0 },
     FxImpactLand = EffectTemplate.CBrackmanCrabPegHit01,
     FxTrailOffset = 0,
 }
@@ -73,7 +73,7 @@ CDFProtonCannonProjectile = ClassProjectile(MultiPolyTrailProjectile) {
         EffectTemplate.CProtonCannonPolyTrail,
         '/effects/emitters/default_polytrail_01_emit.bp',
     },
-    PolyTrailOffset = import("/lua/effecttemplates.lua").DefaultPolyTrailOffset2,
+    PolyTrailOffset = { 0, 0 },
     FxTrails = EffectTemplate.CProtonCannonFXTrail01,
     FxImpactUnit = EffectTemplate.CProtonCannonHit01,
     FxImpactProp = EffectTemplate.CProtonCannonHit01,
@@ -89,7 +89,7 @@ CDFHvyProtonCannonProjectile = ClassProjectile(MultiPolyTrailProjectile) {
         EffectTemplate.CHvyProtonCannonPolyTrail,
         '/effects/emitters/default_polytrail_01_emit.bp',
     },
-    PolyTrailOffset = import("/lua/effecttemplates.lua").DefaultPolyTrailOffset2,
+    PolyTrailOffset = { 0, 0 },
     FxTrails = EffectTemplate.CHvyProtonCannonFXTrail01,
     FxImpactUnit = EffectTemplate.CHvyProtonCannonHitUnit,
     FxImpactProp = EffectTemplate.CHvyProtonCannonHitUnit,
@@ -241,7 +241,7 @@ CDisintegratorLaserProjectile = ClassProjectile(MultiPolyTrailProjectile) {
         '/effects/emitters/disintegrator_polytrail_05_emit.bp',
         '/effects/emitters/default_polytrail_03_emit.bp',
     },
-    PolyTrailOffset = import("/lua/effecttemplates.lua").DefaultPolyTrailOffset3,
+    PolyTrailOffset = { 0, 0, 0 },
     FxTrails = EffectTemplate.CDisintegratorFxTrails01,
     FxImpactUnit = EffectTemplate.CDisintegratorHitUnit01,
     FxImpactAirUnit = EffectTemplate.CDisintegratorHitAirUnit01,
@@ -258,7 +258,7 @@ CDisintegratorLaserProjectile02 = ClassProjectile(MultiPolyTrailProjectile) {
         '/effects/emitters/disintegrator_polytrail_05_emit.bp',
         '/effects/emitters/default_polytrail_03_emit.bp',
     },
-    PolyTrailOffset = import("/lua/effecttemplates.lua").DefaultPolyTrailOffset3,
+    PolyTrailOffset = { 0, 0, 0 },
     FxImpactUnit = EffectTemplate.CDisintegratorHitUnit01,
     FxImpactAirUnit = EffectTemplate.CDisintegratorHitAirUnit01,
     FxImpactProp = EffectTemplate.CDisintegratorHitUnit01,
@@ -273,7 +273,7 @@ CElectronBolterProjectile = ClassProjectile(MultiPolyTrailProjectile) {
         '/effects/emitters/electron_bolter_trail_02_emit.bp',
         '/effects/emitters/default_polytrail_01_emit.bp',
     },
-    PolyTrailOffset = import("/lua/effecttemplates.lua").DefaultPolyTrailOffset2,
+    PolyTrailOffset = { 0, 0 },
     FxTrails = {'/effects/emitters/electron_bolter_munition_01_emit.bp',},
     FxImpactUnit = EffectTemplate.CElectronBolterHitUnit01,
     FxImpactProp = EffectTemplate.CElectronBolterHitUnit01,
@@ -287,7 +287,7 @@ CHeavyElectronBolterProjectile = ClassProjectile(MultiPolyTrailProjectile) {
         '/effects/emitters/electron_bolter_trail_01_emit.bp',
         '/effects/emitters/default_polytrail_05_emit.bp',
     },
-    PolyTrailOffset = import("/lua/effecttemplates.lua").DefaultPolyTrailOffset2,
+    PolyTrailOffset = { 0, 0 },
     FxTrails = {'/effects/emitters/electron_bolter_munition_02_emit.bp',},
     FxImpactUnit = EffectTemplate.CElectronBolterHitUnit02,
     FxImpactProp = EffectTemplate.CElectronBolterHitUnit02,
@@ -390,7 +390,7 @@ CLaserLaserProjectile = ClassProjectile(MultiPolyTrailProjectile) {
         '/effects/emitters/cybran_laser_trail_01_emit.bp',
         '/effects/emitters/default_polytrail_02_emit.bp',
     },
-    PolyTrailOffset = import("/lua/effecttemplates.lua").DefaultPolyTrailOffset2,
+    PolyTrailOffset = { 0, 0 },
     FxImpactUnit = EffectTemplate.CLaserHitUnit01,
     FxImpactProp = EffectTemplate.CLaserHitUnit01,
     FxImpactLand = EffectTemplate.CLaserHitLand01,
@@ -402,7 +402,7 @@ CHeavyLaserProjectile = ClassProjectile(MultiPolyTrailProjectile) {
         '/effects/emitters/cybran_laser_trail_02_emit.bp',
         '/effects/emitters/default_polytrail_03_emit.bp',
     },
-    PolyTrailOffset = import("/lua/effecttemplates.lua").DefaultPolyTrailOffset2,
+    PolyTrailOffset = { 0, 0 },
     FxImpactUnit = EffectTemplate.CLaserHitUnit01,
     FxImpactProp = EffectTemplate.CLaserHitUnit01,
     FxImpactLand = EffectTemplate.CLaserHitLand01,
@@ -414,7 +414,7 @@ CHeavyLaserProjectile2 = ClassProjectile(MultiPolyTrailProjectile) {
         '/effects/emitters/hrailgunsd_polytrail_01_emit.bp',
                 '/effects/emitters/default_polytrail_02_emit.bp',
     },
-    PolyTrailOffset = import("/lua/effecttemplates.lua").DefaultPolyTrailOffset2,
+    PolyTrailOffset = { 0, 0 },
     FxUnitHitScale = 0.15,
     FxLandHitScale = 0.15,
     FxImpactUnit = EffectTemplate.CBeamHitUnit01,
@@ -615,7 +615,7 @@ CShellAAAutoCannonProjectile = ClassProjectile(MultiPolyTrailProjectile) {
         '/effects/emitters/auto_cannon_trail_01_emit.bp',
         '/effects/emitters/default_polytrail_03_emit.bp',
     },
-    PolyTrailOffset = import("/lua/effecttemplates.lua").DefaultPolyTrailOffset2,
+    PolyTrailOffset = { 0, 0 },
     FxImpactUnit = {'/effects/emitters/auto_cannon_hit_flash_01_emit.bp'},
     FxImpactProp ={'/effects/emitters/auto_cannon_hit_flash_01_emit.bp'},
     FxImpactAirUnit = {'/effects/emitters/auto_cannon_hit_flash_01_emit.bp'},
@@ -651,9 +651,9 @@ CTorpedoShipProjectile = ClassProjectile(OnWaterEntryEmitterProjectile) {
     ---@param inWater boolean
     OnCreate = function(self, inWater)
         OnWaterEntryEmitterProjectile.OnCreate(self, inWater)
+
         if inWater == true then
-            self:TrackTarget(true):StayUnderwater(true)
-            self:OnEnterWater(self)
+            self:SetCollisionShape('Sphere', 0, 0, 0, 1.0)
         end
     end,
 
@@ -661,18 +661,6 @@ CTorpedoShipProjectile = ClassProjectile(OnWaterEntryEmitterProjectile) {
     OnEnterWater = function(self)
         OnWaterEntryEmitterProjectile.OnEnterWater(self)
         self:SetCollisionShape('Sphere', 0, 0, 0, 1.0)
-        self:SetMaxSpeed(20)
-        self:SetAcceleration(5)
-        self:SetTurnRate(180)
-        self:SetVelocity(0.5)
-        
-        self.Trash:Add(ForkThread(self.MovementThread,self))
-    end,
-
-    ---@param self TTorpedoShipProjectile
-    MovementThread = function(self)
-        WaitTicks(1)
-        self:SetVelocity(3)
     end,
 }
 
@@ -733,18 +721,6 @@ CDepthChargeProjectile = ClassProjectile(OnWaterEntryEmitterProjectile) {
         self:SetVelocity(0, -0.25, 0)
         self:SetVelocity(0.25)
     end,
-
-    ---@param self CDepthChargeProjectile
-    ---@param tbl table
-    AddDepthCharge = function(self, tbl)
-        if not tbl then return end
-        if not tbl.Radius then return end
-        self.MyDepthCharge = DepthCharge {
-            Owner = self,
-            Radius = tbl.Radius or 10,
-        }
-        self.Trash:Add(self.MyDepthCharge)
-    end,
 }
 
 --------------------------------------------------------------------------
@@ -761,7 +737,7 @@ CHeavyDisintegratorPulseLaser = ClassProjectile(MultiPolyTrailProjectile) {
         '/effects/emitters/disintegrator_polytrail_03_emit.bp',
         '/effects/emitters/default_polytrail_03_emit.bp',
     },
-    PolyTrailOffset = import("/lua/effecttemplates.lua").DefaultPolyTrailOffset3,
+    PolyTrailOffset = { 0, 0, 0 },
     FxImpactUnit = EffectTemplate.CHvyDisintegratorHitUnit01,
     FxImpactProp = EffectTemplate.CHvyDisintegratorHitUnit01,
     FxImpactLand = EffectTemplate.CHvyDisintegratorHitLand01,

@@ -25,15 +25,25 @@ local TableDeepCopy = table.deepcopy
 
 ---@alias MarkerType 'Mass' | 'Hydrocarbon' | 'Spawn' | 'Start Location' | 'Air Path Node' | 'Land Path Node' | 'Water Path Node' | 'Ampibious Path Node' | 'Transport Marker' | 'Naval Area' | 'Naval Link' | 'Rally Point' | 'Large Expansion Area' | 'Expansion Area' | 'Protected Experimental Construction'
 
----@class MarkerData
----@field size number
----@field resource boolean
----@field type string
----@field orientation Vector
----@field position Vector
+---@class MarkerDataLegacy
+---@field size number           # Legacy name used by the GPG editor, same as `Size`
+---@field resource boolean      # Legacy name used by the GPG editor, same as `Resource`
+---@field type string           # Legacy name used by the GPG editor, same as `Type`
+---@field orientation Vector    # Legacy name used by the GPG editor, same as `Orientation`
+---@field position Vector       # Legacy name used by the GPG editor, same as `Position`
+---@field color? Color          # Legacy name used by the GPG editor, same as `Color`
+---@field adjacentTo? string    # Legacy name used by the Ozonex editor
+
+---@class MarkerDataModSupport
+---@field Size number           # Field exists for mod support, same as `size` 
+---@field Resource boolean      # Field exists for mod support, same as `resource` 
+---@field Type string           # Field exists for mod support, same as `type` 
+---@field Orientation Vector    # Field exists for mod support, same as `orientation` 
+---@field Position Vector       # Field exists for mod support, same as `position` 
+---@field Color? Color          # Field exists for mod support, same as `color` 
+
+---@class MarkerData : MarkerDataLegacy, MarkerDataModSupport
 ---@field Name string               # Unique name for marker
----@field color? Color
----@field adjacentTo? string
 ---@field NavLayer? NavLayers       # Navigational layer that this marker is on, only defined for resources
 ---@field NavLabel? number | nil    # Navigational label of the graph this marker is on, only defined for resources and when AIs are in-game
 
@@ -113,7 +123,15 @@ function GetMarkersByType(type)
     -- find all the relevant markers
     for k, marker in AllMarkers do
         if marker.type == type then
+            -- mod support syntax
             marker.Name = k
+            marker.Size = marker.size
+            marker.Resource = marker.resource
+            marker.Type = marker.type
+            marker.Orientation = marker.orientation
+            marker.Position = marker.position
+            marker.Color = marker.color
+
             ms[n] = marker
             n = n + 1
         end
@@ -142,7 +160,15 @@ function OverwriteMarkerByType(type, markers)
     local n = 1
 
     for k, marker in markers do
+        -- mod support syntax
         marker.Name = marker.Name or k
+        marker.Size = marker.size
+        marker.Resource = marker.resource
+        marker.Type = marker.type
+        marker.Orientation = marker.orientation
+        marker.Position = marker.position
+        marker.Color = marker.color
+
         ms[n] = marker
         n = n + 1
     end
@@ -298,10 +324,10 @@ function ToggleDebugMarkersByType(type)
                     -- draw out all markers
                     local markers = GetMarkersByType(type)
                     for k, marker in markers do
-                        DrawCircle(marker.position, marker.size or 1, marker.color or 'ffffffff')
+                        DrawCircle(marker.Position, marker.Size or 1, marker.Color or 'ffffffff')
 
                         if marker.NavLabel then
-                            DrawCircle(marker.position, (marker.size or 1) + 1, labelToColor(marker.NavLabel))
+                            DrawCircle(marker.Position, (marker.Size or 1) + 1, labelToColor(marker.NavLabel))
                         end
 
                         -- useful for pathing markers
@@ -309,14 +335,14 @@ function ToggleDebugMarkersByType(type)
                             for _, neighbour in StringSplit(marker.adjacentTo, " ") do
                                 local neighbour = AllMarkers[neighbour]
                                 if neighbour then
-                                    DrawLine(marker.position, neighbour.position, marker.color or 'ffffffff')
+                                    DrawLine(marker.Position, neighbour.Position, marker.Color or 'ffffffff')
                                 end
                             end
                         end
 
                         if marker.Extractors then
                             for _, neighbour in marker.Extractors do
-                                DrawLine(marker.position, neighbour.position, neighbour.color or 'ffffffff')
+                                DrawLine(marker.Position, neighbour.Position, neighbour.Color or 'ffffffff')
                             end
                         end
                     end
@@ -436,6 +462,7 @@ function Setup()
     for k, marker in AllMarkers do
         if armies[k] then
             marker.Name = k
+            marker.Position = marker.position
             marker.size = 50
             MarkerCache["Spawn"].Count = MarkerCache["Spawn"].Count + 1
             MarkerCache["Spawn"].Markers[MarkerCache["Spawn"].Count] = marker
@@ -472,25 +499,42 @@ function Setup()
         local marker = nil
         if type == 'Mass' then
             marker = {
+                NavLayer = layer,
+                NavLabel = label,
+
+                -- mod support syntax
+                Size = size,
+                Resource = true,
+                Type = type,
+                Orientation = orientation,
+                Position = position,
+
+                -- legacy syntax for markers
                 size = size,
                 resource = true,
                 type = type,
                 orientation = orientation,
                 position = position,
-
-                NavLayer = layer,
-                NavLabel = label,
             }
         else
             marker = {
+
+                NavLayer = layer,
+                NavLabel = label,
+
+                -- mod support syntax
+                Size = size,
+                Resource = true,
+                Type = type,
+                Orientation = orientation,
+                Position = position,
+
+                -- legacy syntax for markers
                 size = size,
                 resource = true,
                 type = type,
                 orientation = orientation,
                 position = position,
-
-                NavLayer = layer,
-                NavLabel = label,
             }
         end
 
@@ -506,8 +550,9 @@ function Setup()
     end
 end
 
-GenerateExpansionMarkers = import("/lua/sim/MarkerUtilities/Expansions.lua").Generate
-GenerateRallyPointMarkers = import("/lua/sim/MarkerUtilities/RallyPoints.lua").Generate
+GenerateExpansionMarkers = import("/lua/sim/markerutilities/expansions.lua").Generate
+GenerateNavalAreaMarkers = import("/lua/sim/markerutilities/navalareas.lua").Generate
+GenerateRallyPointMarkers = import("/lua/sim/markerutilities/rallypoints.lua").Generate
 
 function __moduleinfo.OnReload(newModule)
     -- add existing markers to new module

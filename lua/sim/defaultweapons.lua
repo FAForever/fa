@@ -38,9 +38,9 @@ local MathClamp = math.clamp
 ---@field SalvoSpreadStart? number   if the weapon blueprint requests a trajectory fix, this is set to the value that centers the projectile spread for `CurrentSalvoNumber` shot on the optimal target position
 DefaultProjectileWeapon = ClassWeapon(Weapon) {
 
-    FxRackChargeMuzzleFlash = import("/lua/effecttemplates.lua").NoEffects,
+    FxRackChargeMuzzleFlash = { },
     FxRackChargeMuzzleFlashScale = 1,
-    FxChargeMuzzleFlash = import("/lua/effecttemplates.lua").NoEffects,
+    FxChargeMuzzleFlash = { },
     FxChargeMuzzleFlashScale = 1,
     FxMuzzleFlash = {
         '/effects/emitters/default_muzzle_flash_01_emit.bp',
@@ -64,19 +64,22 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
 
         -- Make certain the weapon has essential aspects defined
         if not rackBones then
-           local strg = '*ERROR: No RackBones table specified, aborting weapon setup.  Weapon: ' .. bp.DisplayName .. ' on Unit: ' .. self.unit:GetUnitId()
-           error(strg, 2)
-           return
+            local strg = '*ERROR: No RackBones table specified, aborting weapon setup.  Weapon: ' ..
+                bp.DisplayName .. ' on Unit: ' .. self.unit:GetUnitId()
+            error(strg, 2)
+            return
         end
         if not muzzleSalvoSize then
-           local strg = '*ERROR: No MuzzleSalvoSize specified, aborting weapon setup.  Weapon: ' .. bp.DisplayName .. ' on Unit: ' .. self.unit:GetUnitId()
-           error(strg, 2)
-           return
+            local strg = '*ERROR: No MuzzleSalvoSize specified, aborting weapon setup.  Weapon: ' ..
+                bp.DisplayName .. ' on Unit: ' .. self.unit:GetUnitId()
+            error(strg, 2)
+            return
         end
         if not muzzleSalvoDelay then
-           local strg = '*ERROR: No MuzzleSalvoDelay specified, aborting weapon setup.  Weapon: ' .. bp.DisplayName .. ' on Unit: ' .. self.unit:GetUnitId()
-           error(strg, 2)
-           return
+            local strg = '*ERROR: No MuzzleSalvoDelay specified, aborting weapon setup.  Weapon: ' ..
+                bp.DisplayName .. ' on Unit: ' .. self.unit:GetUnitId()
+            error(strg, 2)
+            return
         end
 
         self.CurrentRackSalvoNumber = 1
@@ -92,10 +95,12 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
             if telescopeRecoilDist and math.abs(telescopeRecoilDist) > math.abs(dist) then
                 dist = telescopeRecoilDist
             end
-            self.RackRecoilReturnSpeed = bp.RackRecoilReturnSpeed or math.abs(dist / ((1 / rof) - (bp.MuzzleChargeDelay or 0))) * 1.25
+            self.RackRecoilReturnSpeed = bp.RackRecoilReturnSpeed or
+                math.abs(dist / ((1 / rof) - (bp.MuzzleChargeDelay or 0))) * 1.25
         end
         if rackRecoilDist ~= 0 and muzzleSalvoDelay ~= 0 then
-            local strg = '*ERROR: You can not have a RackRecoilDistance with a MuzzleSalvoDelay not equal to 0, aborting weapon setup.  Weapon: ' .. bp.DisplayName .. ' on Unit: ' .. self.unit:GetUnitId()
+            local strg = '*ERROR: You can not have a RackRecoilDistance with a MuzzleSalvoDelay not equal to 0, aborting weapon setup.  Weapon: '
+                .. bp.DisplayName .. ' on Unit: ' .. self.unit:GetUnitId()
             error(strg, 2)
             return false
         end
@@ -111,7 +116,8 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
         self.NumRackBones = numRackBones
         local totalMuzzleFiringTime = (self.NumMuzzles - 1) * muzzleSalvoDelay
         if totalMuzzleFiringTime > (1 / rof) then
-            local strg = '*ERROR: The total time to fire muzzles is longer than the RateOfFire allows, aborting weapon setup.  Weapon: ' .. bp.DisplayName .. ' on Unit: ' .. self.unit:GetUnitId()
+            local strg = '*ERROR: The total time to fire muzzles is longer than the RateOfFire allows, aborting weapon setup.  Weapon: '
+                .. bp.DisplayName .. ' on Unit: ' .. self.unit:GetUnitId()
             error(strg, 2)
             return false
         end
@@ -145,7 +151,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
     -- This function creates the projectile, and happens when the unit is trying to fire
     -- Called from inside RackSalvoFiringState
     ---@param self DefaultProjectileWeapon
-    ---@param muzzle string
+    ---@param muzzle Bone
     ---@return Projectile
     CreateProjectileAtMuzzle = function(self, muzzle)
         local proj = self:CreateProjectileForWeapon(muzzle)
@@ -182,7 +188,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
     ---@param self DefaultProjectileWeapon
     ---@param proj Projectile
     CheckBallisticAcceleration = function(self, proj)
-         -- Change projectile trajectory so it hits the target
+        -- Change projectile trajectory so it hits the target
         proj:SetBallisticAcceleration(-self:CalculateBallisticAcceleration(proj))
     end,
 
@@ -200,7 +206,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
         -- Get projectile position and velocity
         -- velocity will need to be multiplied by 10 due to being returned /tick instead of /s
         local projPosX, projPosY, projPosZ = EntityGetPositionXYZ(projectile)
-        local projVelX,    _    , projVelZ = UnitGetVelocity(launcher)
+        local projVelX, _, projVelZ = UnitGetVelocity(launcher)
 
         local targetPos
         local targetVelX, targetVelZ = 0, 0
@@ -243,7 +249,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
                 end
                 local time = distPos / distVel
                 projPosY = projPosY - GetSurfaceHeight(targetPosX + time * targetVelX, targetPosZ + time * targetVelZ)
-                return 200 * projPosY / (time*time)
+                return 200 * projPosY / (time * time)
             else -- otherwise, calculate & cache a couple things the first time only
                 data = {
                     lastAccel = 4.75,
@@ -295,7 +301,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
             halfHeight = 0.5 * (projPosY - GetSurfaceHeight(projPosX + time * projVelX, projPosX + time * projVelX))
             time = MathSqrt(0.842105263158 * halfHeight) + spread
 
-            local acc = halfHeight / (time*time)
+            local acc = halfHeight / (time * time)
             data.lastAccel = acc
             return acc
         end
@@ -336,7 +342,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
         -- a = 2 * h / t^2
 
         -- also convert time from ticks to seconds (multiply by 10, twice)
-        local acc = 200 * projPosY / (time*time)
+        local acc = 200 * projPosY / (time * time)
 
         data.lastAccel = acc
         return acc
@@ -496,15 +502,15 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
         local cameraShakeMax = bp.CameraShakeMax
         local cameraShakeMin = bp.CameraShakeMin
         local cameraShakeDuration = bp.CameraShakeDuration
-        if  cameraShakeRadius   and cameraShakeRadius > 0 and
-            cameraShakeMax      and cameraShakeMax > 0 and
-            cameraShakeMin      and cameraShakeMin >= 0 and
+        if cameraShakeRadius and cameraShakeRadius > 0 and
+            cameraShakeMax and cameraShakeMax > 0 and
+            cameraShakeMin and cameraShakeMin >= 0 and
             cameraShakeDuration and cameraShakeDuration > 0
         then
             self.unit:ShakeCamera(cameraShakeRadius, cameraShakeMax, cameraShakeMin, cameraShakeDuration)
         end
         if bp.RackRecoilDistance ~= 0 then
-            self:PlayRackRecoil({bp.RackBones[self.CurrentRackSalvoNumber]})
+            self:PlayRackRecoil({ bp.RackBones[self.CurrentRackSalvoNumber] })
         end
     end,
 
@@ -706,8 +712,11 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
             local unit = self.unit
             if unit.Dead then return end
             unit:SetBusy(false)
-            self:WaitForAndDestroyManips()
 
+            -- at this point salvo is always done so reset the data
+            self.CurrentSalvoData = nil 
+
+            self:WaitForAndDestroyManips()
             local bp = self.Blueprint
             for _, rack in bp.RackBones do
                 if rack.HideMuzzle then
@@ -757,7 +766,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
                 if bp.RackSalvoChargeTime and bp.RackSalvoChargeTime > 0 then
                     ChangeState(self, self.RackSalvoChargeState)
 
-                -- SkipReadyState used for Janus and Corsair
+                    -- SkipReadyState used for Janus and Corsair
                 elseif bp.SkipReadyState and bp.SkipReadyState then
                     ChangeState(self, self.RackSalvoFiringState)
                 else
@@ -837,11 +846,15 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
                 ChangeState(self, self.RackSalvoFiringState)
             end
 
-            -- To prevent weapon getting stuck targeting something out of fire range but withing tracking radius
-            WaitSeconds(5)
+            -- attempts to fix units being stuck on targets that are outside their current attack radius, but inside
+            -- the tracking radius. This happens when the unit is trying to fire, but it is never actually firing and
+            -- therefore the thread of this state is not destroyed
 
-            -- Check if there is a better target nearby
-            self:ResetTarget()
+            if not (IsDestroyed(unit) or IsDestroyed(self)) then
+                -- wait reload time + 2 seconds, then force the weapon to recheck its target 
+                WaitSeconds((1 / self.Blueprint.RateOfFire) + 3)
+                self:ResetTarget()
+            end
         end,
 
         OnFire = function(self)
@@ -862,8 +875,8 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
             local clockTime = math.round(10 * rof)
             local totalTime = clockTime
             while clockTime >= 0 and
-                  not self:BeenDestroyed() and
-                  not unit.Dead do
+                not self:BeenDestroyed() and
+                not unit.Dead do
                 unit:SetWorkProgress(1 - clockTime / totalTime)
                 clockTime = clockTime - 1
                 WaitSeconds(0.1)
@@ -894,7 +907,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
 
             -- Fork timer counter thread carefully
             if not self:BeenDestroyed() and
-               not unit.Dead then
+                not unit.Dead then
                 if bp.RenderFireClock and rof > 0 then
                     self:ForkThread(self.RenderClockThread, 1 / rof)
                 end
@@ -994,7 +1007,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
                         end
                     end
                 end
-                self.CurrentSalvoData = nil -- once the salvo is done, reset the data
+
                 self:PlayFxRackReloadSequence()
                 local currentRackSalvoNumber = self.CurrentRackSalvoNumber
                 if currentRackSalvoNumber <= rackBoneCount then
@@ -1002,10 +1015,10 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
                 end
             end
 
-            self:DoOnFireBuffs()    -- Found in mohodata weapon.lua
+            self:DoOnFireBuffs() -- Found in mohodata weapon.lua
             self.FirstShot = false
             self:StartEconomyDrain()
-            self:OnWeaponFired()    -- Used primarily by Overcharge
+            self:OnWeaponFired() -- Used primarily by Overcharge
 
             -- We can fire again after reaching here
             self.HaltFireOrdered = false
@@ -1172,7 +1185,8 @@ KamikazeWeapon = ClassWeapon(Weapon) {
     OnFire = function(self)
         local unit = self.unit
         local bp = self.Blueprint
-        DamageArea(unit, unit:GetPosition(), bp.DamageRadius, bp.Damage, bp.DamageType or 'Normal', bp.DamageFriendly or false)
+        DamageArea(unit, unit:GetPosition(), bp.DamageRadius, bp.Damage, bp.DamageType or 'Normal',
+            bp.DamageFriendly or false)
         unit:PlayUnitSound('Destroyed')
         unit:Destroy()
     end,
@@ -1226,7 +1240,8 @@ OverchargeWeapon = ClassWeapon(DefaultProjectileWeapon) {
     ---@return boolean
     UnitOccupied = function(self)
         local unit = self.unit
-        return (unit:IsUnitState('Upgrading') and not unit:IsUnitState('Enhancing')) or -- Don't let us shoot if we're upgrading, unless it's an enhancement task
+        return (unit:IsUnitState('Upgrading') and not unit:IsUnitState('Enhancing')) or
+            -- Don't let us shoot if we're upgrading, unless it's an enhancement task
             unit:IsUnitState('Building') or
             unit:IsUnitState('Repairing') or
             unit:IsUnitState('Reclaiming')
@@ -1413,12 +1428,14 @@ DefaultBeamWeapon = ClassWeapon(DefaultProjectileWeapon) {
         -- Ensure that the weapon blueprint is set up properly for beams
         local bp = self.Blueprint
         if not bp.BeamCollisionDelay then
-            local strg = '*ERROR: No BeamCollisionDelay specified for beam weapon, aborting setup.  Weapon: ' .. bp.DisplayName .. ' on Unit: ' .. self.unit.UnitId
+            local strg = '*ERROR: No BeamCollisionDelay specified for beam weapon, aborting setup.  Weapon: ' ..
+                bp.DisplayName .. ' on Unit: ' .. self.unit.UnitId
             error(strg, 2)
             return
         end
         if not bp.BeamLifetime then
-            local strg = '*ERROR: No BeamLifetime specified for beam weapon, aborting setup.  Weapon: ' .. bp.DisplayName .. ' on Unit: ' .. self.unit.UnitId
+            local strg = '*ERROR: No BeamLifetime specified for beam weapon, aborting setup.  Weapon: ' ..
+                bp.DisplayName .. ' on Unit: ' .. self.unit.UnitId
             error(strg, 2)
             return
         end
@@ -1427,13 +1444,13 @@ DefaultBeamWeapon = ClassWeapon(DefaultProjectileWeapon) {
         for _, rack in bp.RackBones do
             for _, muzzle in rack.MuzzleBones do
                 local beam
-                beam = self.BeamType{
+                beam = self.BeamType {
                     Weapon = self,
                     BeamBone = 0,
                     OtherBone = muzzle,
-                    CollisionCheckInterval = bp.BeamCollisionDelay * 10,    -- Why is this multiplied by 10? IceDreamer
+                    CollisionCheckInterval = bp.BeamCollisionDelay * 10, -- Why is this multiplied by 10? IceDreamer
                 }
-                local beamTable = {Beam = beam, Muzzle = muzzle, Destroyables = {}}
+                local beamTable = { Beam = beam, Muzzle = muzzle, Destroyables = {} }
                 table.insert(self.Beams, beamTable)
                 self.Trash:Add(beam)
                 beam:SetParentWeapon(self)
@@ -1488,7 +1505,8 @@ DefaultBeamWeapon = ClassWeapon(DefaultProjectileWeapon) {
 
         -- edge case: no beam that matches the muzzle
         if not beam then
-            error('*ERROR: We have a beam created that does not coincide with a muzzle bone.  Internal Error, aborting beam weapon.', 2)
+            error('*ERROR: We have a beam created that does not coincide with a muzzle bone.  Internal Error, aborting beam weapon.'
+                , 2)
             return
         end
 
@@ -1530,7 +1548,7 @@ DefaultBeamWeapon = ClassWeapon(DefaultProjectileWeapon) {
     end,
 
     ---@param self DefaultBeamWeapon
-    OnGotTarget = function (self)
+    OnGotTarget = function(self)
         DefaultProjectileWeapon.OnGotTarget(self)
         local blueprint = self.Blueprint
         if blueprint.BeamLifetime == 0 then
@@ -1612,7 +1630,7 @@ DefaultBeamWeapon = ClassWeapon(DefaultProjectileWeapon) {
 
     ---@param self DefaultBeamWeapon
     StartEconomyDrain = function(self)
-        if  not self.EconDrain and
+        if not self.EconDrain and
             self.EnergyRequired and
             self.EnergyDrainPerSecond and
             not self:EconomySupportsBeam()
@@ -1634,7 +1652,7 @@ DefaultBeamWeapon = ClassWeapon(DefaultProjectileWeapon) {
 
     -- Weapon States Section
 
-    IdleState = State (DefaultProjectileWeapon.IdleState) {
+    IdleState = State(DefaultProjectileWeapon.IdleState) {
         Main = function(self)
             DefaultProjectileWeapon.IdleState.Main(self)
             self:PlayFxBeamEnd()
@@ -1642,7 +1660,7 @@ DefaultBeamWeapon = ClassWeapon(DefaultProjectileWeapon) {
         end,
     },
 
-    WeaponPackingState = State (DefaultProjectileWeapon.WeaponPackingState) {
+    WeaponPackingState = State(DefaultProjectileWeapon.WeaponPackingState) {
         Main = function(self)
             local bp = self.Blueprint
             if bp.BeamLifetime > 0 then
@@ -1660,7 +1678,7 @@ DefaultBeamWeapon = ClassWeapon(DefaultProjectileWeapon) {
         self.ContBeamOn = false
     end,
 
-    RackSalvoFireReadyState = State (DefaultProjectileWeapon.RackSalvoFireReadyState) {
+    RackSalvoFireReadyState = State(DefaultProjectileWeapon.RackSalvoFireReadyState) {
         Main = function(self)
             if not self:EconomySupportsBeam() then
                 self:PlayFxBeamEnd()
@@ -1716,9 +1734,11 @@ DeathNukeWeapon = ClassWeapon(BareBonesWeapon) {
         end
 
         proj.InnerRing = NukeDamage()
-        proj.InnerRing:OnCreate(bp.NukeInnerRingDamage, bp.NukeInnerRingRadius, bp.NukeInnerRingTicks, bp.NukeInnerRingTotalTime)
+        proj.InnerRing:OnCreate(bp.NukeInnerRingDamage, bp.NukeInnerRingRadius, bp.NukeInnerRingTicks,
+            bp.NukeInnerRingTotalTime)
         proj.OuterRing = NukeDamage()
-        proj.OuterRing:OnCreate(bp.NukeOuterRingDamage, bp.NukeOuterRingRadius, bp.NukeOuterRingTicks, bp.NukeOuterRingTotalTime)
+        proj.OuterRing:OnCreate(bp.NukeOuterRingDamage, bp.NukeOuterRingRadius, bp.NukeOuterRingTicks,
+            bp.NukeOuterRingTotalTime)
 
         local pos = proj:GetPosition()
         local brain = launcher:GetAIBrain()

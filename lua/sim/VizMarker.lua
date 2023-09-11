@@ -141,6 +141,7 @@ VisionMarkerOpti = Class(Entity) {
     UpdatePosition = function(self, x, z)
         PositionCache[1] = x
         PositionCache[3] = z
+        PositionCache[2] = GetTerrainHeight(x, z)
         Warp(self, PositionCache)
     end,
 

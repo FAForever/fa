@@ -91,7 +91,7 @@ TDFRiotWeapon = ClassWeapon(DefaultProjectileWeapon) {
 
 ---@class TAAGinsuRapidPulseWeapon : DefaultProjectileWeapon
 TAAGinsuRapidPulseWeapon = ClassWeapon(DefaultProjectileWeapon) {
-    FxMuzzleFlash = import("/lua/effecttemplates.lua").NoEffects,
+    FxMuzzleFlash = { },
 }
 
 ---@class TDFIonizedPlasmaCannon : DefaultProjectileWeapon
@@ -102,7 +102,7 @@ TDFIonizedPlasmaCannon = ClassWeapon(DefaultProjectileWeapon) {
 ---@class TDFHiroPlasmaCannon : DefaultBeamWeapon
 TDFHiroPlasmaCannon = ClassWeapon(DefaultBeamWeapon) {
     BeamType = CollisionBeams.TDFHiroCollisionBeam,
-    FxMuzzleFlash = import("/lua/effecttemplates.lua").NoEffects,
+    FxMuzzleFlash = { },
 }
 
 ---@class TAAFlakArtilleryCannon : DefaultProjectileWeapon
@@ -122,7 +122,7 @@ TAirToAirLinkedRailgun = ClassWeapon(DefaultProjectileWeapon) {
 
 ---@class TIFCruiseMissileUnpackingLauncher : DefaultProjectileWeapon
 TIFCruiseMissileUnpackingLauncher = ClassWeapon(DefaultProjectileWeapon) {
-    FxMuzzleFlash = import("/lua/effecttemplates.lua").NoEffects,
+    FxMuzzleFlash = { },
 }
 
 ---@class TIFCruiseMissileLauncher : DefaultProjectileWeapon
@@ -163,10 +163,15 @@ TIFSmartCharge = ClassWeapon(DefaultProjectileWeapon) {
 
     ---@param self TIFSmartCharge
     ---@param muzzle Bone
+    ---@return Projectile
     CreateProjectileAtMuzzle = function(self, muzzle)
         local proj = DefaultProjectileWeapon.CreateProjectileAtMuzzle(self, muzzle)
-        local tbl = self.Blueprint.DepthCharge
-        proj:AddDepthCharge(tbl)
+        local blueprint = self.Blueprint.DepthCharge
+        if blueprint then
+            proj:AddDepthCharge(blueprint)
+        end
+
+        return proj
     end,
 }
 
@@ -186,6 +191,7 @@ TIFCarpetBombWeapon = ClassWeapon(DefaultProjectileWeapon) {
     --- Called from inside RackSalvoFiringState
     ---@param self TIFCarpetBombWeapon
     ---@param muzzle string
+    ---@return Projectile
     CreateProjectileAtMuzzle = function(self, muzzle)
         -- Adapt this function to keep the correct target lock during carpet bombing
         local data = self.CurrentSalvoData
@@ -196,7 +202,7 @@ TIFCarpetBombWeapon = ClassWeapon(DefaultProjectileWeapon) {
             end
         end
 
-        DefaultProjectileWeapon.CreateProjectileAtMuzzle(self, muzzle)
+        return DefaultProjectileWeapon.CreateProjectileAtMuzzle(self, muzzle)
     end,
 }
 

@@ -1,4 +1,4 @@
---******************************************************************************************************
+--**********************************************************************************
 --** Copyright (c) 2022  Willem 'Jip' Wijnia
 --**
 --** Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -18,7 +18,7 @@
 --** LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 --** OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 --** SOFTWARE.
---******************************************************************************************************
+--**********************************************************************************
 
 local Shared = import("/lua/shared/navgenerator.lua")
 local NavGenerator = import("/lua/sim/navgenerator.lua")
@@ -137,7 +137,7 @@ function ScanOver(mouse, layer)
                 NavGenerator.DrawSquare(over.px - h, over.pz - h, size, color, 0.2)
 
                 for k = 1, table.getn(over) do
-                    local neighbor = over[k]
+                    local neighbor = NavGenerator.NavCells[over[k]]
                     local size = neighbor.Size
                     local h = 0.5 * size
                     local color = Shared.LabelToColor(neighbor.Label)
