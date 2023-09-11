@@ -132,16 +132,45 @@ SemiBallisticComponent = ClassSimple {
         local targetVector = VDiff(self:GetCurrentTargetPosition(), self:GetPosition())
         local ux, uy, uz = self:GetVelocity()
         local velocityVector = Vector(ux, uy, uz)
-        local speed = self:GetCurrentSpeed() * 10
+        local speed = self:GetCurrentSpeed()
         local theta = math.acos(VDot(targetVector, velocityVector) / (speed * dist))
         LOG('Velocity elevation angle :', self:ElevationAngle()*180/math.pi)
         LOG('Target elevation angle :', self:ElevationAngle(targetVector)*180/math.pi)
         LOG('Distance to target: ', dist)
         LOG('Current speed: ', speed)
         LOG('Angle between target and velocity vector: ', theta)
-        local degreesPerSecond = 2 * math.sin(theta) * 360 * self:GetBlueprint().Physics.MaxSpeed / dist
+        local radius = dist/(2 * math.sin(theta))
+        LOG('radius: ', radius)
+        local arcLength = 2 * theta * radius
+        LOG('Arc length: ', arcLength)
+        local arcTime = arcLength / self:AverageSpeedOverDistance(arcLength, self:GetBlueprint().Physics.Acceleration)
+        local degreesPerSecond = 2 * theta / arcTime * ( 180 / math.pi )
         LOG('Turn rate from distance: ', degreesPerSecond)
         return degreesPerSecond
+    end,
+
+    AverageSpeedOverDistance = function(self, dist, acceleration)
+        local speed = self:GetCurrentSpeed()*10
+        local maxSpeed = self:GetBlueprint().Physics.MaxSpeed
+        LOG('acceleration: ', acceleration)
+        LOG('speed: ', speed)
+        LOG('maxSpeed: ', maxSpeed)
+        local accelerationTime = (maxSpeed - speed) / acceleration
+        local accelerationDistance = (speed + maxSpeed) / 2 * accelerationTime
+        if dist < accelerationDistance then
+            -- we'll never reach max speed
+            local timeToTarget = math.sqrt(2 * dist / acceleration)
+            local averageSpeed = dist / timeToTarget
+            LOG('Average speed over distance: ', averageSpeed)
+            return averageSpeed
+        else
+            -- we'll reach max speed
+            local remainingDistance = dist - accelerationDistance
+            local averageSpeed = (speed * accelerationDistance + maxSpeed * remainingDistance) / dist
+            LOG('Time to max speed: ', accelerationTime)
+            LOG('Average speed over distance: ', averageSpeed)
+            return averageSpeed
+        end
     end,
 
     DistanceToTarget = function(self)
@@ -157,15 +186,15 @@ SemiBallisticComponent = ClassSimple {
     end,
 
     ElevationAngle = function(self, v)
+        local vx, vy, vz
         if v then
-            LOG('Using custom vector: ', v)
-            local vx, vy, vz = v[1],v[2],v[3]
+            vx, vy, vz = v[1],v[2],v[3]
         else
-            local vx, vy, vz = self:GetVelocity()
+            vx, vy, vz = self:GetVelocity()
         end
         local vh = VDist2(vx, vz, 0, 0)
         if vh == 0 then
-            -- can't divide by zero, so just return 90 degrees
+            -- can't divide by zero, so just return 90 degrees for straight up or down
             if vy >= 0 then
                 return math.pi/2
             else
@@ -230,7 +259,7 @@ TacticalMissileComponent = ClassSimple(SemiBallisticComponent) {
     -- a higher number will result in a lower trajectory
     heightDistanceFactor = 5,
 
-    -- minimum height of the trajectory
+    -- minimum height of the trajectory above the position of the missile at the end of the launch phase
     minHeight = 2,
 
     -- angle in degrees that we'll aim to be at the end of the boost phase
