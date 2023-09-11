@@ -111,9 +111,9 @@ function LabelToColor(label)
         return 'ff0000'
     end
 
-    local r = string.format("%x", math.mod(math.sin(label) * 256 + 512, 256) ^ 0)
-    local g = string.format("%x", math.mod(math.sin(label + 2) * 256 + 512, 256) ^ 0)
-    local b = string.format("%x", math.mod(math.cos(label) * 256 + 512, 256) ^ 0)
+    local r = string.format("%x", math.floor(math.mod(math.sin(label) * 256 + 512, 256)))
+    local g = string.format("%x", math.floor(math.mod(math.sin(label + 2) * 256 + 512, 256)))
+    local b = string.format("%x", math.floor(math.mod(math.cos(label) * 256 + 512, 256)))
 
     if string.len(r) == 1 then
         r = '0' .. r

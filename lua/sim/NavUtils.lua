@@ -231,7 +231,7 @@ local function TracePath(destination)
     end
 
     -- reverse the path
-    for k = 1, (0.5 * head) ^ 0 do
+    for k = 1, math.floor(0.5 * head) do
         local temp = path[k]
         path[k] = path[head - k]
         path[head - k] = temp

@@ -284,12 +284,12 @@ StructureUnit = ClassUnit(Unit) {
         local x0, z0, x1, z1 = self:GetSkirtRect()
 
         -- floor them
-        x0 = x0 ^ 0
-        z0 = z0 ^ 0
+        x0 = math.floor(x0)
+        z0 = math.floor(z0)
 
         -- ceil them
-        x1 = 1 + (x1 ^ 0)
-        z1 = 1 + (z1 ^ 0)
+        x1 = math.ceil(x1)
+        z1 = math.ceil(z1)
 
         -- compute average elevation and flatten
         local elevation = 0.25 * (
@@ -307,12 +307,12 @@ StructureUnit = ClassUnit(Unit) {
         local x0, z0, x1, z1 = self:GetSkirtRect()
 
         -- floor them
-        x0 = x0 ^ 0
-        z0 = z0 ^ 0
+        x0 = math.floor(x0)
+        z0 = math.floor(z0)
 
         -- ceil them
-        x1 = 1 + (x1 ^ 0)
-        z1 = 1 + (z1 ^ 0)
+        x1 = math.ceil(x1)
+        z1 = math.ceil(z1)
 
         import('/lua/sim/TerrainUtils.lua').FlattenGradientMapRect(x0, z0, x1 - x0, z1 - z0)
     end,
