@@ -25,7 +25,7 @@ TIFMissileCruise01 = ClassProjectile(TMissileCruiseProjectile, TacticalMissileCo
     -- TacticalMissileComponent Trajectory Parameters
 
     -- LaunchTicks: how long we spend in the launch phase
-    LaunchTicks = 8,
+    LaunchTicks = 6,
 
     -- LaunchTurnRate: inital launch phase turn rate, gives a little turnover coming out of the tube
     LaunchTurnRate = 6,
@@ -40,7 +40,7 @@ TIFMissileCruise01 = ClassProjectile(TMissileCruiseProjectile, TacticalMissileCo
     -- MinHeight: minimum height of the highest point of the trajectory
     -- measured from the position of the missile at the end of the launch phase
     -- minRadius/2 or so is a decent value
-    MinHeight = 7,
+    MinHeight = 5,
 
     -- FinalBoostAngle: angle in degrees that we'll aim to be at the end of the boost phase
     -- 90 is vertical, 0 is horizontal
