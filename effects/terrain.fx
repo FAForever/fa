@@ -2013,7 +2013,7 @@ technique TerrainPBRNormals
         DepthState( Depth_Enable )
 
         VertexShader = compile vs_1_1 TerrainVS(false);
-        PixelShader = compile ps_3_0 TerrainPBRNormalsPS();
+        PixelShader = compile ps_2_a TerrainPBRNormalsPS();
     }
 }
 

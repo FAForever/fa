@@ -126,6 +126,60 @@ UnitBlueprint{
                     },
                 },
             },
+            AirWater = {
+                Effects = {
+                    {
+                        Bones = {
+                            "FrontRight_Engine",
+                            "FrontLeft_Engine",
+                            "BackRight_Engine",
+                            "BackLeft_Engine",
+                        },
+                        Type = "Landing01",
+                    },
+                },
+            },
+            WaterAir = {
+                Effects = {
+                    {
+                        Bones = {
+                            "FrontRight_Engine",
+                            "FrontLeft_Engine",
+                            "BackRight_Engine",
+                            "BackLeft_Engine",
+                        },
+                        Type = "TakeOff01",
+                    },
+                },
+            },
+        },
+        IdleEffects = {
+            Air = {
+                Effects = {
+                    {
+                        Bones = {
+                            "FrontRight_Engine_Exhaust",
+                            "FrontLeft_Engine_Exhaust",
+                            "BackRight_Engine_Exhaust",
+                            "BackLeft_Engine_Exhaust",
+                        },
+                        Type = "Hover02",
+                    },
+                },
+            },
+            Water = {
+                Effects = {
+                    {
+                        Bones = {
+                            "FrontRight_Engine",
+                            "FrontLeft_Engine",
+                            "BackRight_Engine",
+                            "BackLeft_Engine",
+                        },
+                        Type = "SeaIdleGunship01",
+                    },
+                },
+            },
         },
         Mesh = {
             IconFadeInZoom = 130,

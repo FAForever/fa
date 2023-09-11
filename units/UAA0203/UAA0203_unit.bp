@@ -80,6 +80,32 @@ UnitBlueprint{
                     },
                 },
             },
+            AirWater = {
+                Effects = {
+                    {
+                        Bones = { "UAA0203" },
+                        Type = "Landing01",
+                    },
+                },
+            },
+            WaterAir = {
+                Effects = {
+                    {
+                        Bones = { "UAA0203" },
+                        Type = "TakeOff01",
+                    },
+                },
+            },
+        },
+        IdleEffects = {
+            Water = {
+                Effects = {
+                    {
+                        Bones = { "UAA0203" },
+                        Type = "SeaIdleGunship01",
+                    },
+                },
+            },
         },
         Mesh = {
             IconFadeInZoom = 130,

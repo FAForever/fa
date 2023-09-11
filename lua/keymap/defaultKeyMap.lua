@@ -117,7 +117,7 @@ defaultKeyMap = {
     ['O']                   = 'overcharge',
     ['M']                   = 'move',
     ['N']                   = 'nuke',
-    ['G']                   = 'distribute_orders',
+    ['G']                   = 'spreadattack',
 
     ['Shift-R']             = 'shift_repair',
     ['Shift-E']             = 'shift_reclaim',
@@ -133,7 +133,7 @@ defaultKeyMap = {
     ['Shift-O']             = 'shift_overcharge',
     ['Shift-M']             = 'shift_move',
     ['Shift-N']             = 'shift_nuke',
-    ['Shift-G']             = 'shift_distribute_orders',
+    ['Shift-G']             = 'shift_spreadattack',
 
     ['B']                   = 'toggle_build_mode',
     ['Alt-R']               = 'toggle_reclaim_labels',

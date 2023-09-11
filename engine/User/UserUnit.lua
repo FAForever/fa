@@ -1,6 +1,6 @@
 ---@meta
 
----@class UserUnit
+---@class UserUnit: InternalObject
 ---@field ThreadUnpause? thread
 ---@field ThreadUnpauseCandidates? table<EntityId, boolean>
 local UserUnit = {}
@@ -117,11 +117,11 @@ end
 function UserUnit:GetShieldRatio()
 end
 
----
----@generic T
+--- Retrieves a statistic that is assigned to a unit by the sim call `unit:UpdateStat`. Returns the default
+--- when the value does not exist
 ---@param name string
----@param defaultVal? T
----@return {Value: T}
+---@param defaultVal? number
+---@return {Value: number}
 function UserUnit:GetStat(name, defaultVal)
 end
 
