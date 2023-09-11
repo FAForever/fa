@@ -158,11 +158,6 @@ local keyActionsCamera = {
         action = 'UI_Lua import("/lua/ui/game/zoomslider.lua").ToggleWideView()',
         category = 'camera',
     },
-
-    ['test_2'] = {
-        action = 'UI_Lua import("/lua/usercamera.lua").Test2()',
-        category = 'camera',
-    },
 }
 
 ---@type table<string, UIKeyAction>

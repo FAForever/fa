@@ -221,6 +221,10 @@ local keyActionsDebug = {
         action = 'UI_ToggleGamePanels',
         category = 'debug',
     },
+    ['debug_performance_metrics'] = {
+        action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").TogglePerformanceMetricsWindow()',
+        category = 'debug',
+    },
 }
 
 ---@type table<string, UIKeyAction>
