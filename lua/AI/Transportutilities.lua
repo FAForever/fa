@@ -1196,6 +1196,9 @@ function SendPlatoonWithTransports(aiBrain, platoon, destination, attempts, bSki
 		-- we stay in this function until we load, move and arrive or die
 		-- we'll get a false return if then entire unit platoon cannot be transported
 		-- note how we pass the IsEngineer flag -- alters the behaviour of the transport
+		if platoon.LogDebug then
+			platoon:LogDebug(string.format('Raid Platoon using transports'))
+		end
 		bUsedTransports = UseTransports( aiBrain, transportplatoon, transportLocation, platoon, IsEngineer )
 
 		-- if platoon died or we couldn't use transports -- exit
@@ -1224,7 +1227,11 @@ function SendPlatoonWithTransports(aiBrain, platoon, destination, attempts, bSki
 				v:MarkWeaponsOnTransport(v, false)
 			end
 		end
-		
+
+		if platoon.LogDebug then
+			platoon:LogDebug(string.format('Raid Platoon getting commands post drop off'))
+		end
+
 		-- set path to destination if we landed anywhere else but the destination
 		-- All platoons except engineers (which move themselves) get this behavior
 		if (not IsEngineer) and GetPlatoonPosition(platoon) != destination then
@@ -1245,7 +1252,9 @@ function SendPlatoonWithTransports(aiBrain, platoon, destination, attempts, bSki
 			end
 		end
 	end
-    
+    if platoon.LogDebug then
+		platoon:LogDebug(string.format('Raid Platoon existing transport function'))
+	end
 	return PlatoonExists( aiBrain, platoon )
     
 end

@@ -4917,6 +4917,24 @@ Platoon = Class(moho.platoon_methods) {
         eng.Initializing = false
         self:PlatoonDisband()
     end,
+
+    StateMachineAI = function(self)
+        local machineType = self.PlatoonData.StateMachine
+
+        if machineType == 'AIPlatoonAdaptiveRaidBehavior' then
+            LOG('Starting State Raid')
+            import("/lua/aibrains/platoons/platoon-adaptive-raid.lua").AssignToUnitsMachine({ }, self, self:GetPlatoonUnits())
+        elseif machineType == 'AIPlatoonAdaptiveReclaimBehavior' then
+            LOG('Starting State Reclaim')
+            import("/lua/aibrains/platoons/platoon-adaptive-reclaim.lua").AssignToUnitsMachine({ }, self, self:GetPlatoonUnits())
+        elseif machineType == 'AIPlatoonAdaptiveAttackBehavior' then
+            LOG('Starting State Attack')
+            import("/lua/aibrains/platoons/platoon-adaptive-attack.lua").AssignToUnitsMachine({ }, self, self:GetPlatoonUnits())
+        end
+
+        WaitTicks(50)
+
+    end,
 }
 
 -- backwards compatibility with mods

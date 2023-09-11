@@ -158,8 +158,8 @@ end
 
 ---@param grid NavGrid
 ---@param position Vector
----@return CompressedLabelTreeLeaf?
----@return 'OutsideMap'?
+---@return CompressedLabelTreeLeaf | nil
+---@return 'OutsideMap' | nil
 local function FindLeaf(grid, position)
     -- check position argument
     local leaf = grid:FindLeafXZ(position[1], position[3])
@@ -231,7 +231,7 @@ local function TracePath(destination)
     end
 
     -- reverse the path
-    for k = 1, math.floor(0.5 * head) do
+    for k = 1, (0.5 * head) ^ 0 do
         local temp = path[k]
         path[k] = path[head - k]
         path[head - k] = temp
@@ -292,6 +292,51 @@ function CanPathTo(layer, origin, destination)
     end
 
     if originLeaf.Label == destinationLeaf.Label then
+        return true
+    else
+        return false, 'Unpathable'
+    end
+end
+
+--- A more generous version of `CanPathTo`. Returns true when the root cell of the destination has a label that matches the label of the origin. Is in general less accurate
+---@param layer NavLayers
+---@param origin Vector
+---@param destination Vector
+---@return boolean?
+---@return ('SystemError' | 'NotGenerated' | 'InvalidLayer' | 'OutsideMap' | 'OriginOutsideMap' | 'OriginUnpathable' | 'DestinationOutsideMap' | 'Unpathable')?
+function CanPathToCell (layer, origin, destination)
+    -- check if generated
+    if not NavGenerator.IsGenerated() then
+        return nil, 'NotGenerated'
+    end
+
+    -- check layer argument
+    local grid = FindGrid(layer)
+    if not grid then
+        return nil, 'InvalidLayer'
+    end
+
+    -- check origin argument
+    local originLeaf = FindLeaf(grid, origin)
+    if not originLeaf then
+        return nil, 'OriginOutsideMap'
+    end
+
+    if originLeaf.Label == -1 then
+        return nil, 'OriginUnpathable'
+    end
+
+    if originLeaf.Label == 0 then
+        return nil, 'SystemError'
+    end
+
+    -- check destination argument
+    local destinationRoot = FindRoot(grid, destination)
+    if not destinationRoot then
+        return nil, 'DestinationOutsideMap'
+    end
+
+    if destinationRoot.Labels[originLeaf.Label] then
         return true
     else
         return false, 'Unpathable'
