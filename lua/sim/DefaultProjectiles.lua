@@ -107,6 +107,11 @@ MultiBeamProjectile = ClassProjectile(EmitterProjectile) {
 ---@class SemiBallisticComponent
 SemiBallisticComponent = ClassSimple {
 
+    --- This is called whenever we're changing our trajectory (generally twice)
+    --- It updates the generic data we need to calculate our trajectory
+    --- Avoids redundant function calls in the subordinate functions
+    --UpdateFlightState = function(self)
+    --    self.ux, self.uy, self.uz = self:GetVelocity()
     --- For a projectile that starts under acceleration, 
     --- but needs to calculate a ballistic trajectory mid-flight
     CalculateBallisticAcceleration = function(self, maxSpeed)
@@ -120,55 +125,42 @@ SemiBallisticComponent = ClassSimple {
     
         local timeToImpact = dist / MathSqrt(MathPow(ux, 2) + MathPow(uz, 2))
         local ballisticAcceleration = (2 * ((target[2] - s0[2]) - uy * timeToImpact)) / MathPow(timeToImpact, 2)
-        LOG('Ballistic Acceleration: ', ballisticAcceleration)
-        LOG('Time to impact: ', timeToImpact)
 
         -- need to do a second pass, because ballistic acceleration doesn't account for max speed
         return ballisticAcceleration, timeToImpact
     end,
 
     TurnRateFromDistance = function(self)
+
         local dist = self:DistanceToTarget()
         local targetVector = VDiff(self:GetCurrentTargetPosition(), self:GetPosition())
         local ux, uy, uz = self:GetVelocity()
         local velocityVector = Vector(ux, uy, uz)
         local speed = self:GetCurrentSpeed()
+
         local theta = math.acos(VDot(targetVector, velocityVector) / (speed * dist))
-        LOG('Velocity elevation angle :', self:ElevationAngle()*180/math.pi)
-        LOG('Target elevation angle :', self:ElevationAngle(targetVector)*180/math.pi)
-        LOG('Distance to target: ', dist)
-        LOG('Current speed: ', speed)
-        LOG('Angle between target and velocity vector: ', theta)
-        local radius = dist/(2 * math.sin(theta))
-        LOG('radius: ', radius)
-        local arcLength = 2 * theta * radius
-        LOG('Arc length: ', arcLength)
+        --local radius = dist/(2 * math.sin(theta))
+        local arcLength = 2 * theta * dist/(2 * math.sin(theta))
         local arcTime = arcLength / self:AverageSpeedOverDistance(arcLength, self:GetBlueprint().Physics.Acceleration)
+
         local degreesPerSecond = 2 * theta / arcTime * ( 180 / math.pi )
-        LOG('Turn rate from distance: ', degreesPerSecond)
         return degreesPerSecond
     end,
 
     AverageSpeedOverDistance = function(self, dist, acceleration)
         local speed = self:GetCurrentSpeed()*10
         local maxSpeed = self:GetBlueprint().Physics.MaxSpeed
-        LOG('acceleration: ', acceleration)
-        LOG('speed: ', speed)
-        LOG('maxSpeed: ', maxSpeed)
         local accelerationTime = (maxSpeed - speed) / acceleration
         local accelerationDistance = (speed + maxSpeed) / 2 * accelerationTime
         if dist < accelerationDistance then
             -- we'll never reach max speed
             local timeToTarget = math.sqrt(2 * dist / acceleration)
             local averageSpeed = dist / timeToTarget
-            LOG('Average speed over distance: ', averageSpeed)
             return averageSpeed
         else
             -- we'll reach max speed
             local remainingDistance = dist - accelerationDistance
             local averageSpeed = (speed * accelerationDistance + maxSpeed * remainingDistance) / dist
-            LOG('Time to max speed: ', accelerationTime)
-            LOG('Average speed over distance: ', averageSpeed)
             return averageSpeed
         end
     end,
@@ -194,7 +186,6 @@ SemiBallisticComponent = ClassSimple {
         end
         local vh = VDist2(vx, vz, 0, 0)
         if vh == 0 then
-            -- can't divide by zero, so just return 90 degrees for straight up or down
             if vy >= 0 then
                 return math.pi/2
             else
@@ -206,37 +197,32 @@ SemiBallisticComponent = ClassSimple {
 
     -- as we turn from our current elevation angle to the target elevation angle,
     -- what will our average vertical velocity be?
-    -- (we can use that number to calculate how long the turn should take)
+    -- (we can use that number to calculate how long the turn should take, and therefore the turn rate)
     AverageVerticalVelocityThroughTurn = function(self, targetAngle, currentAngle)
         local averageVerticalVelocity = 1/(targetAngle-currentAngle) * (math.cos(currentAngle) - math.cos(targetAngle))
-        LOG('Average vertical velocity percentage through turn: ', averageVerticalVelocity)
         averageVerticalVelocity = averageVerticalVelocity * self:GetBlueprint().Physics.MaxSpeed
         return averageVerticalVelocity
     end,
 
-    OptimalTurnRate = function(self, targetAngleDegrees, maxHeight)
+    TurnRateFromAngleAndDistance = function(self, targetAngleDegrees, maxHeight)
+
         local targetAngle = targetAngleDegrees * math.pi/180
         local currentAngle = self:ElevationAngle()
         local deltaY = maxHeight - self:GetPosition()[2]
-        --LOG('delta Y: ', deltaY)
         if deltaY < self.minHeight then
-            --LOG('trajectory below minimum')
             deltaY = self.minHeight
         end
         local turnTime = deltaY/self:AverageVerticalVelocityThroughTurn(targetAngle, currentAngle)
+
         local degreesPerSecond = math.abs(targetAngle - currentAngle)/turnTime * 180/math.pi
-        --LOG('Optimal turn rate: ', degreesPerSecond)
-        --LOG('Turn time: ', turnTime)
         return degreesPerSecond, turnTime
     end,
 
+    -- optimal highest point of the trajectory based on the heightDistanceFactor
     OptimalMaxHeight = function(self)
         local horizDist = self:HorizontalDistanceToTarget()
         local targetHeight = self:GetCurrentTargetPosition()[2]
         local maxHeight = targetHeight + horizDist/self.heightDistanceFactor
-        --LOG('Target height: ', targetHeight)
-        --LOG('Distance to target: ', horizDist)
-        --LOG('Optimal max height: ', maxHeight)
         return maxHeight
     end,
 
@@ -251,7 +237,7 @@ TacticalMissileComponent = ClassSimple(SemiBallisticComponent) {
     -- how long we spend in the launch phase
     launchTicks = 2,
 
-    -- inital launch phase turn rate
+    -- inital launch phase turn rate, gives a little turnover coming out of the tube
     launchTurnRate = 8,
 
     -- each missile calculates an optimal highest point of its trajectory based on its distance to the target
@@ -259,16 +245,13 @@ TacticalMissileComponent = ClassSimple(SemiBallisticComponent) {
     -- a higher number will result in a lower trajectory
     heightDistanceFactor = 5,
 
-    -- minimum height of the trajectory above the position of the missile at the end of the launch phase
+    -- minimum height of the high point of the trajectory
+    -- measured from the position of the missile at the end of the launch phase
     minHeight = 2,
 
     -- angle in degrees that we'll aim to be at the end of the boost phase
     -- 90 is vertical, 0 is horizontal
     targetFinalBoostAngle = 0,
-
-    -- we'll divide total flight time by this number to determine how long before impact we'll turn tracking back on
-    terminalPhaseTimeFactor = 5,
-
 
     ---@param self TacticalMissileProjectile
     MovementThread = function(self)
@@ -278,8 +261,7 @@ TacticalMissileComponent = ClassSimple(SemiBallisticComponent) {
         WaitTicks(self.launchTicks)
 
         -- boost
-        LOG('Boost phase')
-        self.boostTurnRate, self.boostTime = self:OptimalTurnRate(self.targetFinalBoostAngle, self:OptimalMaxHeight())
+        self.boostTurnRate, self.boostTime = self:TurnRateFromAngleAndDistance(self.targetFinalBoostAngle, self:OptimalMaxHeight())
         self:SetTurnRate(self.boostTurnRate)
         WaitTicks(self.boostTime * 10)
         
