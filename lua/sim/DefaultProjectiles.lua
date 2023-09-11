@@ -134,7 +134,13 @@ SemiBallisticComponent = ClassSimple {
         local velocityVector = Vector(ux, uy, uz)
         local speed = self:GetCurrentSpeed() * 10
         local theta = math.acos(VDot(targetVector, velocityVector) / (speed * dist))
+        LOG('Velocity elevation angle :', self:ElevationAngle()*180/math.pi)
+        LOG('Target elevation angle :', self:ElevationAngle(targetVector)*180/math.pi)
+        LOG('Distance to target: ', dist)
+        LOG('Current speed: ', speed)
+        LOG('Angle between target and velocity vector: ', theta)
         local degreesPerSecond = 2 * math.sin(theta) * 360 * self:GetBlueprint().Physics.MaxSpeed / dist
+        LOG('Turn rate from distance: ', degreesPerSecond)
         return degreesPerSecond
     end,
 
@@ -150,8 +156,13 @@ SemiBallisticComponent = ClassSimple {
         return VDist2(mpos[1], mpos[3], tpos[1], tpos[3])
     end,
 
-    ElevationAngle = function(self)
-        local vx, vy, vz = self:GetVelocity()
+    ElevationAngle = function(self, v)
+        if v then
+            LOG('Using custom vector: ', v)
+            local vx, vy, vz = v[1],v[2],v[3]
+        else
+            local vx, vy, vz = self:GetVelocity()
+        end
         local vh = VDist2(vx, vz, 0, 0)
         if vh == 0 then
             -- can't divide by zero, so just return 90 degrees
@@ -178,27 +189,25 @@ SemiBallisticComponent = ClassSimple {
         local targetAngle = targetAngleDegrees * math.pi/180
         local currentAngle = self:ElevationAngle()
         local deltaY = maxHeight - self:GetPosition()[2]
-        LOG('delta Y: ', deltaY)
+        --LOG('delta Y: ', deltaY)
         if deltaY < self.minHeight then
-            LOG('trajectory below minimum')
+            --LOG('trajectory below minimum')
             deltaY = self.minHeight
         end
         local turnTime = deltaY/self:AverageVerticalVelocityThroughTurn(targetAngle, currentAngle)
         local degreesPerSecond = math.abs(targetAngle - currentAngle)/turnTime * 180/math.pi
-        LOG('Optimal turn rate: ', degreesPerSecond)
-        LOG('Turn time: ', turnTime)
+        --LOG('Optimal turn rate: ', degreesPerSecond)
+        --LOG('Turn time: ', turnTime)
         return degreesPerSecond, turnTime
     end,
-
-    OptimalTerminalTurnRate
 
     OptimalMaxHeight = function(self)
         local horizDist = self:HorizontalDistanceToTarget()
         local targetHeight = self:GetCurrentTargetPosition()[2]
-        local maxHeight = targetHeight + dist/self.heightDistanceFactor
-        LOG('Target height: ', targetHeight)
-        LOG('Distance to target: ', dist)
-        LOG('Optimal max height: ', maxHeight)
+        local maxHeight = targetHeight + horizDist/self.heightDistanceFactor
+        --LOG('Target height: ', targetHeight)
+        --LOG('Distance to target: ', horizDist)
+        --LOG('Optimal max height: ', maxHeight)
         return maxHeight
     end,
 
@@ -219,7 +228,7 @@ TacticalMissileComponent = ClassSimple(SemiBallisticComponent) {
     -- each missile calculates an optimal highest point of its trajectory based on its distance to the target
     -- this is the factor that determines how high above the target that point is, in relation to the horizontal distance
     -- a higher number will result in a lower trajectory
-    heightDistanceFactor = 10,
+    heightDistanceFactor = 5,
 
     -- minimum height of the trajectory
     minHeight = 2,
@@ -249,22 +258,10 @@ TacticalMissileComponent = ClassSimple(SemiBallisticComponent) {
         -- glide
         LOG('Glide phase')
         LOG('Elevation angle: ', self:ElevationAngle()*180/math.pi)
-        local ballisticAcceleration, timeToImpact = self:CalculateBallisticAcceleration()
-        self:SetBallisticAcceleration(ballisticAcceleration)
-        self:TrackTarget(false)
         -- self:SetAcceleration(0)
 
         -- turn rate sufficiently high to keep us aligned with the direction of travel during the ballistic phase
-        self:SetTurnRate(75)
-        
-        --- MaxSpeed adds a bit of "drag" to the missile during it's ballistic trajectory
-        --- wait until we're about to hit the target, then turn target tracking back on to make sure we're on the dot
-        if timeToImpact > 1 then
-            WaitTicks(timeToImpact * (1 - 1/self.terminalPhaseTimeFactor) * 10)
-        end
-
-        -- terminal
-        self:TrackTarget(true)
+        self:SetTurnRate(self:TurnRateFromDistance())
     end,
 
 }
