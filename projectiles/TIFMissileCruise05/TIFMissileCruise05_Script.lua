@@ -3,6 +3,7 @@
 --
 
 local TMissileCruiseProjectile = import("/lua/terranprojectiles.lua").TMissileCruiseProjectile
+local TacticalMissileComponent = import('/lua/sim/DefaultProjectiles.lua').TacticalMissileComponent
 local EffectTemplate = import("/lua/effecttemplates.lua")
 
 TIFMissileCruise05 = ClassProjectile(TMissileCruiseProjectile, TacticalMissileComponent) {
@@ -46,7 +47,7 @@ TIFMissileCruise05 = ClassProjectile(TMissileCruiseProjectile, TacticalMissileCo
     -- FinalBoostAngle: angle in degrees that we'll aim to be at the end of the boost phase
     -- 90 is vertical, 0 is horizontal
     FinalBoostAngle = 0,
-    
+
     OnCreate = function(self)
         TMissileCruiseProjectile.OnCreate(self)
         self:SetCollisionShape('Sphere', 0, 0, 0, 2)
