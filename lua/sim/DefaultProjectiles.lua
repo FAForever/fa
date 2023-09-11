@@ -296,8 +296,10 @@ TacticalMissileComponent = ClassSimple(SemiBallisticComponent) {
 
         -- wait until we've allegedly hit our target, then turn tracking off
         -- (in case we miss, so we don't fly in circles forever)
-        WaitTicks(glideTime * 10)
-        self:TrackTarget(false)
+        WaitTicks((glideTime+1) * 10)
+        if not self:BeenDestroyed() then
+            self:TrackTarget(false)
+        end
     end,
 
 }
