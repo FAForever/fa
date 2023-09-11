@@ -213,7 +213,7 @@ GridPresence = Class(Grid) {
 
                     -- shuffle the order
                     for k = headA - 1, 1, -1 do
-                        local j = (Random() * (k - 1) + 1) ^ 0;
+                        local j = math.floor(Random() * (k - 1) + 1);
                         local value = iterationA[j];
                         iterationA[j] = iterationA[k];
                         iterationA[k] = value;

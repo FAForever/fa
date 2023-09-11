@@ -131,8 +131,8 @@ function Projectile:SetStayUpright(upright)
 end
 
 ---
----@param radiansPerSecond number
-function Projectile:SetTurnRate(radiansPerSecond)
+---@param degreesPerSecond number
+function Projectile:SetTurnRate(degreesPerSecond)
 end
 
 ---

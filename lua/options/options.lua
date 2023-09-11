@@ -529,19 +529,33 @@ options = {
                 default = "on",
                 set = function(key, value, startup)
                     if GetCurrentUIState() == 'game' then
-                        import("/lua/ui/game/hotkeys/capping.lua").RingStorages = value == 'on' or value == 'on-inner' or value == 'on-all'
-                        import("/lua/ui/game/hotkeys/capping.lua").RingFabricatorsInner = value == 'on-inner'
-                        import("/lua/ui/game/hotkeys/capping.lua").RingFabricatorsAll = value == 'on-all'
+                        import("/lua/ui/game/hotkeys/capping.lua").RingStorages = value == 'on'
                     end
                 end,
                 custom = {
                     states = {
                         { text = "<LOC _Off>Off", key = "off" },
-                        { text = "<LOC options_structure_capping_feature_01>Mass storages", key = "on" },
-                        { text = "<LOC options_structure_capping_feature_02>Mass storages and inner fabricators",
-                            key = "on-inner" },
-                        { text = "<LOC options_structure_capping_feature_03>Mass storages and all fabricators",
-                            key = "on-all" },
+                        { text = "<LOC _On>On", key = "on" },
+                    },
+                },
+            },
+
+            {
+                title = "<LOC structure_ringing_extractor_fabs_title>Assist to cap extractors with fabricators",
+                key = 'structure_ringing_extractors_fabs',
+                type = 'toggle',
+                default = "4",
+                set = function(key, value, startup)
+                    if GetCurrentUIState() == 'game' then
+                        import("/lua/ui/game/hotkeys/capping.lua").RingFabricatorsInner = value == "inner"
+                        import("/lua/ui/game/hotkeys/capping.lua").RingFabricatorsAll = value == "all"
+                    end
+                end,
+                custom = {
+                    states = {
+                        { text = "<LOC _Off>Off", key = "off" },
+                        { text = "<LOC structure_ringing_extractors_fabs_option_4>Up to 4 Mass Fabricators", key = "inner" },
+                        { text = "<LOC structure_ringing_extractors_fabs_option_8>Up to 8 Mass Fabricators", key = "all" },
                     },
                 },
             },

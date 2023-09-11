@@ -221,6 +221,10 @@ local keyActionsDebug = {
         action = 'UI_ToggleGamePanels',
         category = 'debug',
     },
+    ['debug_performance_metrics'] = {
+        action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").TogglePerformanceMetricsWindow()',
+        category = 'debug',
+    },
 }
 
 ---@type table<string, UIKeyAction>
@@ -243,6 +247,10 @@ local keyActionsDebugAI = {
     },
     ['toggle_ai_nav_direction_to'] = {
         action = 'UI_Lua import("/lua/ui/game/NavDebug/DirectionTo.lua").OpenWindow()',
+        category = 'ai'
+    },
+    ['toggle_ai_nav_get_positions_in_radius'] = {
+        action = 'UI_Lua import("/lua/ui/game/NavDebug/GetPositionsInRadius.lua").OpenWindow()',
         category = 'ai'
     },
     ['toggle_ai_base_ui'] = {

@@ -22,10 +22,9 @@
 
 local Prefs = import("/lua/user/prefs.lua")
 
-local ringExtractorPrefs = Prefs.GetFromCurrentProfile('options.structure_capping_feature_01')
-RingStorages = ringExtractorPrefs == 'on' or ringExtractorPrefs == 'on-inner' or ringExtractorPrefs == 'on-all'
-RingFabricatorsInner = ringExtractorPrefs == 'on-inner'
-RingFabricatorsAll = ringExtractorPrefs == 'on-all'
+RingStorages = Prefs.GetFromCurrentProfile('options.structure_capping_feature_01') == 'on'
+RingFabricatorsInner = Prefs.GetFromCurrentProfile('options.structure_ringing_extractors_fabs') == "inner"
+RingFabricatorsAll = Prefs.GetFromCurrentProfile('options.structure_ringing_extractors_fabs') == "all"
 RingRadars = Prefs.GetFromCurrentProfile('options.structure_ringing_radar') == 'on'
 RingArtillery = Prefs.GetFromCurrentProfile('options.structure_ringing_artillery') == 'on'
 RingArtilleryTech3Exp = Prefs.GetFromCurrentProfile('options.structure_ringing_artillery_end_game') == 'on'
@@ -37,7 +36,7 @@ local pStructure2 = nil
 --- Attempts to cap a structure that we're hovering over
 ---@param structure UserUnit
 ---@param units UserUnit[]
-function Cap(structure, units)
+function AssistToCap(structure, units)
 
     ---------------------------------------------------------------------------
     -- defensive programming
@@ -98,7 +97,7 @@ function Cap(structure, units)
 
                 structure.RingStoragesStamp = gameTick
 
-                print("Ringing extractor with storages")
+                print("Cap with storages")
                 SimCallback({ Func = 'RingWithStorages', Args = { target = structure:GetEntityId() } }, true)
 
                 -- only clear state if we can't make fabricators
@@ -121,7 +120,7 @@ function Cap(structure, units)
 
                 structure.RingFabsStamp = gameTick
 
-                print("Ringing extractor with fabricators")
+                print("Cap with fabricators")
                 SimCallback({ Func = 'RingWithFabricators',
                     Args = { target = structure:GetEntityId(), allFabricators = RingFabricatorsAll } }, true)
 
@@ -142,7 +141,7 @@ function Cap(structure, units)
 
             structure.RingStamp = gameTick
 
-            print("Ringing with power generators")
+            print("Cap with power generators")
             SimCallback({ Func = 'RingArtilleryTech2', Args = { target = structure:GetEntityId() } }, true)
 
             -- reset state
@@ -162,7 +161,7 @@ function Cap(structure, units)
 
             structure.RingStamp = gameTick
 
-            print("Ringing with power generators")
+            print("Cap with power generators")
             SimCallback({ Func = 'RingArtilleryTech3Exp', Args = { target = structure:GetEntityId() } }, true)
 
             -- reset state
@@ -187,7 +186,7 @@ function Cap(structure, units)
 
             structure.RingStamp = gameTick
 
-            print("Ringing with power generators")
+            print("Cap with power generators")
             SimCallback({ Func = 'RingRadar', Args = { target = structure:GetEntityId() } }, true)
 
             -- reset state
@@ -210,12 +209,119 @@ function Cap(structure, units)
 end
 
 --- Hotkey-shell to the capping behavior
-function CapHotkey()
-    local target = GetRolloverInfo().userUnit
-    if target then
-        local selection = GetSelectedUnits()
-        if selection and not table.empty(selection) then
-            Cap(target, selection)
+function HotkeyToCap(ringAllFabricators, clearCommands)
+    local structure = GetRolloverInfo().userUnit
+    if not structure or IsDestroyed(structure) then
+        return
+    end
+
+    -- only run logic when we have a selection
+    local selection = GetSelectedUnits()
+    if not selection then
+        return
+    end
+
+    -- only run logic for structures
+    if not structure:IsInCategory('STRUCTURE') then
+        return
+    end
+
+    local isTech2 = structure:IsInCategory('TECH2')
+    local isTech3 = structure:IsInCategory('TECH3')
+    local isExp = structure:IsInCategory('EXPERIMENTAL')
+
+    if structure:IsInCategory('MASSEXTRACTION') then
+
+        -- prevent consecutive calls
+        local buildStorages = true
+        local gameTick = GameTick()
+        if structure.RingStoragesStamp then
+            if structure.RingStoragesStamp + 5 > gameTick then
+                buildStorages = false
+            end
         end
+
+        structure.RingStoragesStamp = GameTick()
+
+        -- prevent consecutive calls
+        local buildFabricators = not buildStorages
+        if buildFabricators then
+            local gameTick = GameTick()
+            if structure.RingFabsStamp then
+                if structure.RingFabsStamp + 5 > gameTick then
+                    buildFabricators = false
+                end
+            end
+
+            structure.RingFabsStamp = GameTick()
+        end
+
+        if buildStorages then
+            if clearCommands then
+                IssueUnitCommand(selection, 'Stop')
+            end
+
+            print("Cap with storages")
+            SimCallback({ Func = 'RingWithStorages', Args = { target = structure:GetEntityId() } }, true)
+        elseif buildFabricators then
+            if clearCommands then
+                IssueUnitCommand(selection, 'Stop')
+            end
+
+            print("Cap with fabricators")
+            SimCallback({ Func = 'RingWithFabricators',
+                Args = { target = structure:GetEntityId(), allFabricators = ringAllFabricators } }, true)
+        end
+    elseif structure:IsInCategory('ARTILLERY') and isTech2 then
+        -- prevent consecutive calls
+        local gameTick = GameTick()
+        if structure.RingStamp then
+            if structure.RingStamp + 5 > gameTick then
+                return
+            end
+        end
+
+        structure.RingStamp = gameTick
+
+        if clearCommands then
+            IssueUnitCommand(selection, 'Stop')
+        end
+
+        print("Cap with power generators")
+        SimCallback({ Func = 'RingArtilleryTech2', Args = { target = structure:GetEntityId() } }, true)
+    elseif structure:IsInCategory('ARTILLERY') and (isTech3 or isExp) and (not structure:IsInCategory('xab2307')) then
+        -- prevent consecutive calls
+        local gameTick = GameTick()
+        if structure.RingStamp then
+            if structure.RingStamp + 5 > gameTick then
+                return
+            end
+        end
+
+        structure.RingStamp = gameTick
+
+        if clearCommands then
+            IssueUnitCommand(selection, 'Stop')
+        end
+
+        print("Cap with power generators")
+        SimCallback({ Func = 'RingArtilleryTech3Exp', Args = { target = structure:GetEntityId() } }, true)
+    elseif RingRadars and (structure:IsInCategory('RADAR') or structure:IsInCategory('OMNI')) then
+        -- prevent consecutive calls
+        local gameTick = GameTick()
+        if structure.RingStamp then
+            if structure.RingStamp + 5 > gameTick then
+                return
+            end
+        end
+
+        structure.RingStamp = gameTick
+
+        if clearCommands then
+            IssueUnitCommand(selection, 'Stop')
+        end
+
+        print("Cap with power generators")
+        SimCallback({ Func = 'RingRadar', Args = { target = structure:GetEntityId() } }, true)
     end
 end

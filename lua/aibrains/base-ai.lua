@@ -134,11 +134,12 @@ AIBrain = Class(StandardBrain) {
         StandardBrain.OnBeginSession(self)
 
         -- requires navigational mesh
-        import("/lua/sim/NavUtils.lua").Generate()
+        import("/lua/sim/navutils.lua").Generate()
 
         -- requires these markers to exist
-        import("/lua/sim/MarkerUtilities.lua").GenerateExpansionMarkers()
-        import("/lua/sim/MarkerUtilities.lua").GenerateRallyPointMarkers()
+        import("/lua/sim/markerutilities.lua").GenerateExpansionMarkers()
+        import("/lua/sim/markerutilities.lua").GenerateNavalAreaMarkers()
+        import("/lua/sim/markerutilities.lua").GenerateRallyPointMarkers()
 
         -- requires these datastructures to understand the game
         self.GridReclaim = import("/lua/ai/gridreclaim.lua").Setup(self)

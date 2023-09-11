@@ -96,6 +96,16 @@ local function GenerateLabelIdentifier()
     return LabelIdentifier
 end
 
+--- Returns the size of a cell in oGrids
+---@return number
+function SizeOfCell()
+    ---@type number
+    local MapSize = math.max(ScenarioInfo.size[1], ScenarioInfo.size[2])
+
+    ---@type number
+    return MapSize / LabelCompressionTreesPerAxis
+end
+
 -- Shared data with UI
 
 ---@type NavLayerData
@@ -177,6 +187,36 @@ NavGrid = ClassNavGrid {
 
     ---@param self NavGrid
     ---@param position Vector A position in world space
+    ---@return number?
+    ---@return number?
+    ToGridSpace = function(self, position)
+        return self:ToGridSpaceXZ(position[1], position[3])
+    end,
+
+    ---@param self NavGrid
+    ---@param x number x-coordinate, in world space
+    ---@param z number z-coordinate, in world space
+    ---@return number?
+    ---@return number?
+    ToGridSpaceXZ = function(self, x, z)
+        if x > 0 and z > 0 then
+            local size = self.TreeSize
+            local trees = self.Trees
+
+            local bx = math.floor(x / size)
+            local bz = math.floor(z / size)
+            if trees[bz][bx] then
+                return bx, bz
+            else
+                return nil, nil
+            end
+        end
+
+        return nil, nil
+    end,
+
+    ---@param self NavGrid
+    ---@param position Vector A position in world space
     ---@return CompressedLabelTreeRoot?
     FindRoot = function(self, position)
         return self:FindRootXZ(position[1], position[3])
@@ -191,8 +231,8 @@ NavGrid = ClassNavGrid {
             local size = self.TreeSize
             local trees = self.Trees
 
-            local bx = (x / size) ^ 0
-            local bz = (z / size) ^ 0
+            local bx = math.floor(x / size)
+            local bz = math.floor(z / size)
             local root = trees[bz][bx] --[[@as CompressedLabelTreeRoot]]
             return root
         end
@@ -205,7 +245,7 @@ NavGrid = ClassNavGrid {
     ---@param gz number z-coordinate, in grid space
     ---@return CompressedLabelTreeRoot?
     FindRootGridspaceXZ = function(self, gx, gz)
-        return self.Trees[gx][gz] --[[@as CompressedLabelTreeRoot]]
+        return self.Trees[gz][gx] --[[@as CompressedLabelTreeRoot]]
     end,
 
     --- Returns the leaf that encompasses the position, or nil if no leaf does
@@ -227,8 +267,8 @@ NavGrid = ClassNavGrid {
             local size = self.TreeSize
             local trees = self.Trees
 
-            local bx = (x / size) ^ 0
-            local bz = (z / size) ^ 0
+            local bx = math.floor(x / size)
+            local bz = math.floor(z / size)
             local labelTree = trees[bz][bx]
             if labelTree then
                 return labelTree:FindLeafXZ(bx * size, bz * size, 0, 0, size, x, z)
@@ -463,10 +503,6 @@ CompressedLabelTree = ClassCompressedLabelTree {
         else
             NavLayerData[layer].UnpathableLeafs = NavLayerData[layer].UnpathableLeafs + 1
         end
-    end,
-
-    Copy = function(self, other)
-
     end,
 
     --- Generates the following neighbors, when they are valid:
@@ -763,6 +799,11 @@ CompressedLabelTree = ClassCompressedLabelTree {
         cache = cache or { }
         cache, head = self:_FindLeaves(cache, head)
 
+        -- clean up remainders
+        for k = head, table.getn(cache) do
+            cache[k] = nil
+        end
+
         return cache, head - 1
     end,
 
@@ -782,6 +823,56 @@ CompressedLabelTree = ClassCompressedLabelTree {
         end
 
         return cache, head
+    end,
+
+
+    --- Returns all traversable leaves in a table
+    ---@param self CompressedLabelTreeNode | CompressedLabelTreeLeaf | CompressedLabelTreeRoot
+    ---@return CompressedLabelTreeLeaf[]
+    ---@return number
+    FindTraversableLeaves = function(self, thresholdSize, cache, cacheQueue)
+
+        -- localize for performance
+        local TableGetn = table.getn
+
+        -- prepare (optionally) cached values
+        local cacheHead = 1
+        cache = cache or { }
+
+        local queueHead = 1
+        local queueTail = 1
+        local queue = cacheQueue or { }
+
+        -- use a breath-first search based search to find leaves
+        queue[1] = self
+        queueHead = queueHead + 1
+
+        while queueTail < queueHead do
+            local element = queue[queueTail]
+            queueTail = queueTail + 1
+
+            local label = element.Label
+            if label then
+                -- found a leaf
+                if label > 0 and element.Size >= thresholdSize then
+                    cache[cacheHead] = element
+                    cacheHead = cacheHead + 1
+                end
+            else
+                -- found a node
+                for k = 1, TableGetn(element) do
+                    queue[queueHead] = element[k]
+                    queueHead = queueHead + 1
+                end
+            end
+        end
+
+        -- clean up remainders
+        for k = cacheHead, TableGetn(cache) do
+            cache[k] = nil
+        end
+
+        return cache, cacheHead - 1
     end,
 
     --- Returns the leaf that encompasses the position, or nil if no leaf does

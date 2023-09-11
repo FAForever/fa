@@ -510,8 +510,14 @@ keyDescriptions = {
     ['set_target_priority'] = '<LOC key_desc_set_target_priority>Prioritize unit type',
     ['shift_set_target_priority'] = '<LOC key_desc_shift_set_target_priority>Prioritize unit type',
     ['set_default_target_priority'] = 'Set weapon target priorities of selected units to their defaults',
-    ['cap'] = '<LOC key_desc_cap>Cap the unit depending on the game options',
-    ['shift_cap'] = '<LOC key_desc_cap>Cap the unit depending on the game options',
+    ['cap'] = '<LOC key_desc_cap>Cap a structure. Clears the command queue',
+    ['shift_cap'] = '<LOC key_desc_cap>Cap a structure',
+
+    ['upgrade_structure'] = '<LOC key_desc_upgrade_structure>Upgrade a structure',
+    ['shift_upgrade_structure'] = '<LOC key_desc_shift_upgrade_structure>Upgrade a structure',
+
+    ['upgrade_structure_pause'] = '<LOC key_desc_upgrade_structure_pause>Upgrade a structure and pause it',
+    ['shift_upgrade_structure_pause'] = '<LOC key_desc_shift_upgrade_structure_pause>Upgrade a structure and pause it',
 
     ['toggle_navui'] = 'Toggle the debugging UI for the navigational mesh',
     ['toggle_ai_reclaim_grid_ui'] = 'Toggle the debugging UI for the reclaim grid',

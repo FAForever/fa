@@ -173,11 +173,11 @@ local function NewSafeEnv()
         unpack = unpack,
         pcall = pcall,
         _VERSION = _VERSION,
-        __pow = __pow,
+        -- __pow = __pow,
 
         -- moholog-interacting functions
         _ALERT = _ALERT,
-        _TRACEBACK = _TRACEBACK,
+        -- _TRACEBACK = _TRACEBACK,
         LOG = LOG,
         SPEW = SPEW,
         WARN = WARN,

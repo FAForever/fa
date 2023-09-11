@@ -487,13 +487,13 @@ AIBrain = Class(StandardBrain) {
             local seaFactories = {}
             local gates = {}
             for ek, ev in factories do
-                if EntityCategoryContains(categories.FACTORY * categories.AIR, ev) and self:PBMFactoryLocationCheck(ev, v) then
+                if EntityCategoryContains(categories.FACTORY * categories.AIR - categories.EXTERNALFACTORYUNIT, ev) and self:PBMFactoryLocationCheck(ev, v) then
                     table.insert(airFactories, ev)
-                elseif EntityCategoryContains(categories.FACTORY * categories.LAND, ev) and self:PBMFactoryLocationCheck(ev, v) then
+                elseif EntityCategoryContains(categories.FACTORY * categories.LAND - categories.EXTERNALFACTORYUNIT, ev) and self:PBMFactoryLocationCheck(ev, v) then
                     table.insert(landFactories, ev)
-                elseif EntityCategoryContains(categories.FACTORY * categories.NAVAL, ev) and self:PBMFactoryLocationCheck(ev, v) then
+                elseif EntityCategoryContains(categories.FACTORY * categories.NAVAL - categories.EXTERNALFACTORYUNIT, ev) and self:PBMFactoryLocationCheck(ev, v) then
                     table.insert(seaFactories, ev)
-                elseif EntityCategoryContains(categories.FACTORY * categories.GATE, ev) and self:PBMFactoryLocationCheck(ev, v) then
+                elseif EntityCategoryContains(categories.FACTORY * categories.GATE - categories.EXTERNALFACTORYUNIT, ev) and self:PBMFactoryLocationCheck(ev, v) then
                     table.insert(gates, ev)
                 end
             end

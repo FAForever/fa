@@ -60,7 +60,7 @@ function DoCallback(name, data, units)
 
     local timeTaken = GetSystemTimeSecondsOnlyForProfileUse() - start
     if (timeTaken > 0.005) then
-        SPEW(string.format("Time to process %s: %f", name, timeTaken))
+        SPEW(string.format("Time to process %s from %d: %f", name, timeTaken, GetCurrentCommandSource() or -2))
     end
 end
 
@@ -953,6 +953,30 @@ Callbacks.NavDebugDisableDirectionTo = function(data, units)
     end
 
     import("/lua/sim/navdebug/directionto.lua").Disable()
+end
+
+Callbacks.NavDebugUpdateGetPositionsInRadius = function(data, units)
+    if not PassesAIAntiCheatCheck() then
+        return
+    end
+
+    import("/lua/sim/navdebug/getpositionsinradius.lua").Update(data)
+end
+
+Callbacks.NavDebugEnableGetPositionsInRadius = function(data, units)
+    if not PassesAIAntiCheatCheck() then
+        return
+    end
+
+    import("/lua/sim/navdebug/getpositionsinradius.lua").Enable()
+end
+
+Callbacks.NavDebugDisableGetPositionsInRadius = function(data, units)
+    if not PassesAIAntiCheatCheck() then
+        return
+    end
+
+    import("/lua/sim/navdebug/getpositionsinradius.lua").Disable()
 end
 
 Callbacks.NavDebugGetLabelMetadata = function(data, units)

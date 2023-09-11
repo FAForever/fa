@@ -20,7 +20,7 @@ function repo(url)
     for _, domain in validRepositories do
         if string.find(url, domain) then
             return true
-        end 
+        end
     end
     return false
 end
@@ -32,7 +32,7 @@ function validate(url)
         if validatedLinks[url] then 
             return validatedLinks[url]
         end
-        
+
         if string.find(url, 'www.') or string.find(url, 'http') then
             -- auto-convert 'https' to 'http'
             local link = string.gsub(url, "https", "http", 1)  
@@ -49,16 +49,18 @@ function validate(url)
                return link
             end
         end
-        
-    end 
+
+    end
     return false
 end
 
 --- opens web browser at given URL address, e.g. "http://forum.faforever.com"
-function open(url)
+--- @param url string representing the URL
+--- @param parent Layoutable optional parent for the open URL dialog, defaults to GetFrame(0)
+function open(url, parent)
     local validLink = validate(url)
     if validLink then
-        OpenURL(validLink)
+        OpenURL(validLink, parent)
         return true
     end
     return false

@@ -6,7 +6,8 @@ local meshSphere = '/env/Common/Props/sphere_lod0.scm'
 
 local MeshOnTerrain = nil
 local MeshOnTerrainRed = nil
-local MeshInBetween = nil
+local MeshesInBetween = { }
+local MaxMeshesInbetweenCount = 5
 local MeshFadeDistance = 300
 
 local Trash = TrashBag()
@@ -123,16 +124,31 @@ local function DepthScanningThread()
     Trash:Add(MeshOnTerrain)
     Trash:Add(MeshOnTerrainRed)
 
-    -- allocate intermediate mesh
-    MeshInBetween = WorldMesh()
-        MeshInBetween:SetMesh({
-            MeshName = meshSphere,
-            TextureName = '/meshes/game/Assist_albedo.dds',
-            ShaderName = 'FakeRings',
-            UniformScale = 0.15,
-            LODCutoff = MeshFadeDistance
+    -- allocate intermediate bits
+    for k = 1, MaxMeshesInbetweenCount do
+
+        local bit = WorldMesh()
+        if k == 2 then
+            bit:SetMesh({
+                MeshName = meshSphere,
+                TextureName = '/meshes/game/map-border_squ_cybran_a_SpecTeam.dds',
+                ShaderName = 'FakeRings',
+                UniformScale = 0.15,
+                LODCutoff = MeshFadeDistance
             })
-        Trash:Add(MeshInBetween)
+        else
+            bit:SetMesh({
+                MeshName = meshSphere,
+                TextureName = '/meshes/game/Assist_albedo.dds',
+                ShaderName = 'FakeRings',
+                UniformScale = 0.15,
+                LODCutoff = MeshFadeDistance
+            })
+        end
+        
+        MeshesInBetween[k] = bit
+        Trash:Add(bit)
+    end
 
     -- pre-allocate all locals for performance
     local camera, position, cursor, elevation, transparency, location, info
@@ -153,8 +169,8 @@ local function DepthScanningThread()
             -- move with the grid when building
             info = CommandMode.GetCommandMode()
             if info[1] == 'build' then
-                position[1] = (position[1] ^ 0) + 0.5
-                position[3] = (position[3] ^ 0) + 0.5
+                position[1] = math.floor(position[1]) + 0.5
+                position[3] = math.floor(position[3]) + 0.5
             end
 
             -- determine location on the terrain
@@ -182,21 +198,26 @@ local function DepthScanningThread()
             end
 
             -- update visiblity intermediate dots
-            location[2] = position[2] - 1.5
+            for k = 1, MaxMeshesInbetweenCount do
+                local bit = MeshesInBetween[k]
+                location[2] = position[2] - k*0.5 - (k-1)*0.5 - (k-1)*(k-2) * 0.05 * (position[2] - elevation) -- 1:0.5, 2:1.5, 3-5: scaled based on elevation
 
-            transparency = ComputeTransparency(camera, MeshFadeDistance, elevation, position[2])
-            if transparency > 0.05 then
-                MeshInBetween:SetHidden(false)
-                MeshInBetween:SetStance(location)
-                MeshInBetween:SetFractionCompleteParameter(transparency)
-            else
-                MeshInBetween:SetHidden(true)
+                transparency = ComputeTransparency(camera, MeshFadeDistance, elevation, position[2])
+                if transparency > 0.05 then
+                    bit:SetHidden(false)
+                    bit:SetStance(location)
+                    bit:SetFractionCompleteParameter(transparency)
+                else
+                    bit:SetHidden(true)
+                end
             end
         else
             -- hide them
             MeshOnTerrain:SetHidden(true)
             MeshOnTerrainRed:SetHidden(true)
-            MeshInBetween:SetHidden(true)
+            for k = 1, MaxMeshesInbetweenCount do
+                MeshesInBetween[k]:SetHidden(true)
+            end
         end
 
         WaitFrames(1)
