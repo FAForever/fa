@@ -37,7 +37,9 @@ AIPlatoon = Class(moho.platoon_methods) {
 
     ---@param self AIPlatoon
     OnDestroy = function(self)
-        self:LogDebug("OnDestroy")
+        if self.BuilderHandle then
+            self.BuilderHandle:RemoveHandle(self)
+        end
         self.Trash:Destroy()
     end,
 
@@ -49,6 +51,16 @@ AIPlatoon = Class(moho.platoon_methods) {
             unit.AIPlatoonReference = self
             unit:SetCustomName(self.PlatoonName)
         end
+    end,
+
+    PlatoonDisbandNoAssign = function(self)
+        if self.BuilderHandle then
+            self.BuilderHandle:RemoveHandle(self)
+        end
+        for k,v in self:GetPlatoonUnits() do
+            v.PlatoonHandle = nil
+        end
+        self:GetBrain():DisbandPlatoon(self)
     end,
 
     -----------------------------------------------------------------
