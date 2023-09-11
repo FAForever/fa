@@ -5,7 +5,7 @@
 local TMissileCruiseProjectile = import("/lua/terranprojectiles.lua").TMissileCruiseProjectile
 local EffectTemplate = import("/lua/effecttemplates.lua")
 
-TIFMissileCruise05 = ClassProjectile(TMissileCruiseProjectile) {
+TIFMissileCruise05 = ClassProjectile(TMissileCruiseProjectile, TacticalMissileComponent) {
 
     FxTrails = EffectTemplate.TMissileExhaust01,
     FxTrailOffset = -0.85,
@@ -22,53 +22,38 @@ TIFMissileCruise05 = ClassProjectile(TMissileCruiseProjectile) {
     FxWaterHitScale = 0.65,
     FxOnKilledScale = 0.65,
     
+
+    -- TacticalMissileComponent Trajectory Parameters
+
+    -- LaunchTicks: how long we spend in the launch phase
+    LaunchTicks = 2,
+
+    -- LaunchTurnRate: inital launch phase turn rate, gives a little turnover coming out of the tube
+    LaunchTurnRate = 6,
+
+    -- HeightDistanceFactor: each missile calculates an optimal highest point of its trajectory,
+    -- based on its distance to the target.
+    -- This is the factor that determines how high above the target that point is, in relation to the horizontal distance.
+    -- a higher number will result in a lower trajectory
+    -- 5-8 is a decent value
+    HeightDistanceFactor = 5,
+
+    -- MinHeight: minimum height of the highest point of the trajectory
+    -- measured from the position of the missile at the end of the launch phase
+    -- minRadius/2 or so is a decent value
+    MinHeight = 2,
+
+    -- FinalBoostAngle: angle in degrees that we'll aim to be at the end of the boost phase
+    -- 90 is vertical, 0 is horizontal
+    FinalBoostAngle = 0,
+    
     OnCreate = function(self)
         TMissileCruiseProjectile.OnCreate(self)
         self:SetCollisionShape('Sphere', 0, 0, 0, 2)
         self.MoveThread = self.Trash:Add(ForkThread(self.MovementThread,self))
     end,
 
-    MovementThread = function(self)        
-        self.Distance = self:GetDistanceToTarget()
-        self:SetTurnRate(8)
-        WaitTicks(4)        
-        while not self:BeenDestroyed() do
-            self:SetTurnRateByDist()
-            WaitTicks(2)
-        end
-    end,
 
-    SetTurnRateByDist = function(self)
-        local dist = self:GetDistanceToTarget()
-        if dist > self.Distance then
-        	self:SetTurnRate(50)
-        	WaitTicks(31)
-        	self:SetTurnRate(8)
-        	self.Distance = self:GetDistanceToTarget()
-        end
-        if dist > 50 then        
-            -- Freeze the turn rate as to prevent steep angles at long distance targets
-            WaitTicks(21)
-            self:SetTurnRate(10)
-        elseif dist > 30 and dist <= 50 then
-						self:SetTurnRate(12)
-						WaitTicks(16)
-            self:SetTurnRate(12)
-        elseif dist > 10 and dist <= 25 then
-            WaitTicks(4)
-            self:SetTurnRate(50)
-				elseif dist > 0 and dist <= 10 then         
-            self:SetTurnRate(100)   
-            KillThread(self.MoveThread)         
-        end
-    end,        
-
-    GetDistanceToTarget = function(self)
-        local tpos = self:GetCurrentTargetPosition()
-        local mpos = self:GetPosition()
-        local dist = VDist2(mpos[1], mpos[3], tpos[1], tpos[3])
-        return dist
-    end,
 }
 TypeClass = TIFMissileCruise05
 
