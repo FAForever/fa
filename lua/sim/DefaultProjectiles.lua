@@ -20,8 +20,15 @@ local CreateTrail = CreateTrail
 local CreateEmitterOnEntity = CreateEmitterOnEntity
 local CreateBeamEmitterOnEntity = CreateBeamEmitterOnEntity
 local VDist2 = VDist2
+local VDist3 = VDist3
 local MathPow = math.pow
 local MathSqrt = math.sqrt
+local MathAbs = math.abs
+local MathSin = math.sin
+local MathCos = math.cos
+local MathAcos = math.acos
+local MathAtan = math.atan
+local MathPi = math.pi
 
 local TableGetn = table.getn
 
@@ -128,7 +135,7 @@ SemiBallisticComponent = ClassSimple {
     --- Used for the initial part of a trajectory
     TurnRateFromAngleAndHeight = function(self)
 
-        local targetAngle = self.FinalBoostAngle * math.pi/180
+        local targetAngle = self.FinalBoostAngle * MathPi/180
         local currentAngle = self:ElevationAngle()
         local deltaY = self:OptimalMaxHeight() - self:GetPosition()[2]
         if deltaY < self.MinHeight then
@@ -136,7 +143,7 @@ SemiBallisticComponent = ClassSimple {
         end
         local turnTime = deltaY/self:AverageVerticalVelocityThroughTurn(targetAngle, currentAngle)
 
-        local degreesPerSecond = math.abs(targetAngle - currentAngle)/turnTime * 180/math.pi
+        local degreesPerSecond = MathAbs(targetAngle - currentAngle)/turnTime * 180/MathPi
         return degreesPerSecond, turnTime
     end,
 
@@ -150,9 +157,9 @@ SemiBallisticComponent = ClassSimple {
         local velocityVector = Vector(ux, uy, uz)
         local speed = self:GetCurrentSpeed()
 
-        local theta = math.acos(VDot(targetVector, velocityVector) / (speed * dist))
-        --local radius = dist/(2 * math.sin(theta))
-        local arcLength = 2 * theta * dist/(2 * math.sin(theta))
+        local theta = MathAcos(VDot(targetVector, velocityVector) / (speed * dist))
+        --local radius = dist/(2 * MathSin(theta))
+        local arcLength = 2 * theta * dist/(2 * MathSin(theta))
 
         local averageSpeed
         if speed*10 < self:GetBlueprint().Physics.MaxSpeed * 0.95 then
@@ -164,7 +171,7 @@ SemiBallisticComponent = ClassSimple {
 
         local arcTime = arcLength / averageSpeed
 
-        local degreesPerSecond = 2 * theta / arcTime * ( 180 / math.pi )
+        local degreesPerSecond = 2 * theta / arcTime * ( 180 / MathPi )
         LOG('theta: ', theta)
         LOG('dist: ', dist)
         LOG('arcLength: ', arcLength)
@@ -205,7 +212,7 @@ SemiBallisticComponent = ClassSimple {
     -- what will our average vertical velocity be?
     -- (we can use that number to calculate how long the turn should take, and therefore the turn rate)
     AverageVerticalVelocityThroughTurn = function(self, targetAngle, currentAngle)
-        local averageVerticalVelocity = 1/(targetAngle-currentAngle) * (math.cos(currentAngle) - math.cos(targetAngle))
+        local averageVerticalVelocity = 1/(targetAngle-currentAngle) * (MathCos(currentAngle) - MathCos(targetAngle))
         averageVerticalVelocity = averageVerticalVelocity * self:GetBlueprint().Physics.MaxSpeed
         return averageVerticalVelocity
     end,
@@ -233,12 +240,12 @@ SemiBallisticComponent = ClassSimple {
         local vh = VDist2(vx, vz, 0, 0)
         if vh == 0 then
             if vy >= 0 then
-                return math.pi/2
+                return MathPi/2
             else
-                return -math.pi/2
+                return -MathPi/2
             end
         end
-        return math.atan(vy / vh)
+        return MathAtan(vy / vh)
     end,
 
     -- optimal highest point of the trajectory based on the heightDistanceFactor
