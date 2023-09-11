@@ -128,11 +128,11 @@ SemiBallisticComponent = ClassSimple {
     --- Used for the initial part of a trajectory
     TurnRateFromAngleAndHeight = function(self)
 
-        local targetAngle = self.finalBoostAngle * math.pi/180
+        local targetAngle = self.FinalBoostAngle * math.pi/180
         local currentAngle = self:ElevationAngle()
         local deltaY = self:OptimalMaxHeight() - self:GetPosition()[2]
-        if deltaY < self.minHeight then
-            deltaY = self.minHeight
+        if deltaY < self.MinHeight then
+            deltaY = self.MinHeight
         end
         local turnTime = deltaY/self:AverageVerticalVelocityThroughTurn(targetAngle, currentAngle)
 
@@ -245,7 +245,7 @@ SemiBallisticComponent = ClassSimple {
     OptimalMaxHeight = function(self)
         local horizDist = self:HorizontalDistanceToTarget()
         local targetHeight = self:GetCurrentTargetPosition()[2]
-        local maxHeight = targetHeight + horizDist/self.heightDistanceFactor
+        local maxHeight = targetHeight + horizDist/self.HeightDistanceFactor
         return maxHeight
     end,
 
@@ -282,8 +282,8 @@ TacticalMissileComponent = ClassSimple(SemiBallisticComponent) {
     MovementThread = function(self)
 
         -- launch
-        self:SetTurnRate(self.launchTurnRate)
-        WaitTicks(self.launchTicks)
+        self:SetTurnRate(self.LaunchTurnRate)
+        WaitTicks(self.LaunchTicks)
 
         -- boost
         local boostTurnRate, boostTime = self:TurnRateFromAngleAndHeight()
