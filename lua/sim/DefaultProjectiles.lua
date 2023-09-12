@@ -169,41 +169,26 @@ SemiBallisticComponent = ClassSimple {
         end
 
         local arcTime = arcLength / averageSpeed
-
         local degreesPerSecond = 2 * theta / arcTime * ( 180 / MathPi )
-        LOG('theta: ', theta)
-        LOG('dist: ', dist)
-        LOG('arcLength: ', arcLength)
-        LOG('arcTime: ', arcTime)
-        LOG('degreesPerSecond: ', degreesPerSecond)
         return degreesPerSecond, arcTime
     end,
 
     -- Gives an average speed over a given distance (arc or straight)
     -- Used for a projectile that has not yet reached max speed
     AverageSpeedOverDistance = function(self, dist, acceleration)
-        LOG('')
         local speed = self:GetCurrentSpeed()*10
         local maxSpeed = self:GetBlueprint().Physics.MaxSpeed
         local accelerationDistance = (MathPow(maxSpeed,2) - MathPow(speed,2)) / (2 * acceleration)
         local averageSpeed
-        LOG('Speed: ', speed)
-        LOG('Acceleration distance: ', accelerationDistance)
         if dist < accelerationDistance then
             -- we'll never reach max speed
-            LOG('We will never reach max speed')
             local speedFinal = MathSqrt(2 * acceleration * dist + MathPow(speed,2))
-            LOG('Final speed: ', speedFinal)
             averageSpeed = (speed + speedFinal) / 2
         else
             -- we'll reach max speed
-            LOG('We will reach max speed')
             local remainingDistance = dist - accelerationDistance
             averageSpeed = ((maxSpeed + speed)/2 * accelerationDistance + maxSpeed * remainingDistance) / dist
-            LOG('Distance at max speed: ', remainingDistance)
         end
-        LOG('AverageSpeed: ', averageSpeed)
-        LOG('')
         return averageSpeed
     end,
 
@@ -262,28 +247,18 @@ SemiBallisticComponent = ClassSimple {
 TacticalMissileComponent = ClassSimple(SemiBallisticComponent) {
 
     -- TacticalMissileComponent Trajectory Parameters
-
-    -- LaunchTicks: how long we spend in the launch phase
-    -- LaunchTicks = 8,
-
-    -- LaunchTurnRate: inital launch phase turn rate, gives a little turnover coming out of the tube
-    -- LaunchTurnRate = 6,
-
-    -- HeightDistanceFactor: each missile calculates an optimal highest point of its trajectory,
+    --- LaunchTicks: how long we spend in the launch phase
+    --- LaunchTurnRate: inital launch phase turn rate, gives a little turnover coming out of the tube
+    --- HeightDistanceFactor: each missile calculates an optimal highest point of its trajectory,
     -- based on its distance to the target.
     -- This is the factor that determines how high above the target that point is, in relation to the horizontal distance.
     -- a higher number will result in a lower trajectory
     -- 5-8 is a decent value
-    -- HeightDistanceFactor = 5,
-
-    -- MinHeight: minimum height of the highest point of the trajectory
+    --- MinHeight: minimum height of the highest point of the trajectory
     -- measured from the position of the missile at the end of the launch phase
     -- minRadius/2 or so is a decent value
-    -- MinHeight = 7,
-
-    -- FinalBoostAngle: angle in degrees that we'll aim to be at the end of the boost phase
+    --- FinalBoostAngle: angle in degrees that we'll aim to be at the end of the boost phase
     -- 90 is vertical, 0 is horizontal
-    -- FinalBoostAngle = 0,
 
     maxZigZagThreshold = 1,
 
@@ -313,7 +288,6 @@ TacticalMissileComponent = ClassSimple(SemiBallisticComponent) {
             -- wait until we're just short of our target (just short of the normal glide time is a good number)
             -- then up the turn rate so we can actually get close to hitting something
             WaitTicks((glideTime-1) * 10)
-            LOG('Terminal zigzag guidance')
             self:SetTurnRate(100)
         else
             self:SetTurnRate(glideTurnRate)
@@ -326,6 +300,7 @@ TacticalMissileComponent = ClassSimple(SemiBallisticComponent) {
         end
     end,
 }
+
 --- Nukes
 ---@class NukeProjectile : NullShell
 NukeProjectile = ClassProjectile(NullShell) {
