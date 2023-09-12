@@ -14,7 +14,7 @@ AIFMissileSerpentine01 = ClassProjectile(AMissileSerpentineProjectile, TacticalM
     OnCreate = function(self)
         AMissileSerpentineProjectile.OnCreate(self)
         self:SetCollisionShape('Sphere', 0, 0, 0, 2)
-        self.MoveThread = self.Trash:Add(ForkThread(self.MovementThread, self))
+        self.MoveThread = self.Trash:Add(ForkThread(self.MovementThread,self))
     end,
 }
 TypeClass = AIFMissileSerpentine01
