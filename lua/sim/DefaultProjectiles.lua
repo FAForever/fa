@@ -29,7 +29,6 @@ local MathCos = math.cos
 local MathAcos = math.acos
 local MathAtan = math.atan
 local MathPi = math.pi
-
 local TableGetn = table.getn
 
 -- upvalue moho functions for performance
@@ -186,14 +185,14 @@ SemiBallisticComponent = ClassSimple {
         LOG('')
         local speed = self:GetCurrentSpeed()*10
         local maxSpeed = self:GetBlueprint().Physics.MaxSpeed
-        local accelerationDistance = (math.pow(maxSpeed,2) - math.pow(speed,2)) / (2 * acceleration)
+        local accelerationDistance = (MathPow(maxSpeed,2) - MathPow(speed,2)) / (2 * acceleration)
         local averageSpeed
         LOG('Speed: ', speed)
         LOG('Acceleration distance: ', accelerationDistance)
         if dist < accelerationDistance then
             -- we'll never reach max speed
             LOG('We will never reach max speed')
-            local speedFinal = math.sqrt(2 * acceleration * dist + math.pow(speed,2))
+            local speedFinal = MathSqrt(2 * acceleration * dist + MathPow(speed,2))
             LOG('Final speed: ', speedFinal)
             averageSpeed = (speed + speedFinal) / 2
         else
@@ -286,8 +285,18 @@ TacticalMissileComponent = ClassSimple(SemiBallisticComponent) {
     -- 90 is vertical, 0 is horizontal
     -- FinalBoostAngle = 0,
 
+    maxZigZagThreshold = 1,
+
     ---@param self TacticalMissileProjectile
     MovementThread = function(self)
+
+        -- are we a wiggler?
+        local zigZagger = false
+        
+        if self:GetBlueprint().Physics.MaxZigZag and
+           self:GetBlueprint().Physics.MaxZigZag > self.maxZigZagThreshold then
+            zigZagger = true
+        end
 
         -- launch
         self:SetTurnRate(self.LaunchTurnRate)
@@ -300,14 +309,26 @@ TacticalMissileComponent = ClassSimple(SemiBallisticComponent) {
         
         -- glide
         local glideTurnRate, glideTime = self:TurnRateFromDistance()
-        self:SetTurnRate(glideTurnRate)
-
-        -- wait until we've allegedly hit our target, then turn tracking off
-        -- (in case we miss, so we don't fly in circles forever)
-        WaitTicks((glideTime+1) * 10)
-        if not self:BeenDestroyed() then
-            self:TrackTarget(false)
+        if zigZagger then
+            self:SetTurnRate(75)
+            -- wait until we're just short of our target (normal glide time is a good number)
+            -- then up the turn rate so we can actually get close to hitting something
+            WaitTicks(glideTime * 10)
+            LOG('Terminal zigzag guidance')
+            self:SetTurnRate(100)
+        else
+            self:SetTurnRate(glideTurnRate)
+            -- wait until we've allegedly hit our target, then turn tracking off
+            -- (in case we miss, so we don't fly in circles forever)
+            WaitTicks((glideTime+1) * 10)
+            if not self:BeenDestroyed() then
+                self:TrackTarget(false)
+            end
         end
+
+
+
+
     end,
 
 }
