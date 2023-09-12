@@ -2,9 +2,10 @@
 -- Terran Land-Based Cruise Missile
 --
 local TMissileCruiseProjectile = import("/lua/terranprojectiles.lua").TMissileCruiseProjectile02
+local TacticalMissileComponent = import('/lua/sim/DefaultProjectiles.lua').TacticalMissileComponent
 local EffectTemplate = import("/lua/effecttemplates.lua")
 
-TIFMissileCruise01 = ClassProjectile(TMissileCruiseProjectile) {
+TIFMissileCruise01 = ClassProjectile(TMissileCruiseProjectile, TacticalMissileComponent) {
 
 	FxAirUnitHitScale = 1.65,
     FxLandHitScale = 1.65,
@@ -20,49 +21,36 @@ TIFMissileCruise01 = ClassProjectile(TMissileCruiseProjectile) {
 
     FxTrails = EffectTemplate.TMissileExhaust01,
 
+
+    -- TacticalMissileComponent Trajectory Parameters
+
+    -- LaunchTicks: how long we spend in the launch phase
+    LaunchTicks = 6,
+
+    -- LaunchTurnRate: inital launch phase turn rate, gives a little turnover coming out of the tube
+    LaunchTurnRate = 6,
+
+    -- HeightDistanceFactor: each missile calculates an optimal highest point of its trajectory,
+    -- based on its distance to the target.
+    -- This is the factor that determines how high above the target that point is, in relation to the horizontal distance.
+    -- a higher number will result in a lower trajectory
+    -- 5-8 is a decent value
+    HeightDistanceFactor = 5,
+
+    -- MinHeight: minimum height of the highest point of the trajectory
+    -- measured from the position of the missile at the end of the launch phase
+    -- minRadius/2 or so is a decent value
+    MinHeight = 5,
+
+    -- FinalBoostAngle: angle in degrees that we'll aim to be at the end of the boost phase
+    -- 90 is vertical, 0 is horizontal
+    FinalBoostAngle = 0,
+
     OnCreate = function(self)
         TMissileCruiseProjectile.OnCreate(self)
         self:SetCollisionShape('Sphere', 0, 0, 0, 2.0)
         self.Trash:Add(ForkThread( self.MovementThread,self ))
     end,
     
-    MovementThread = function(self)
-        self:SetTurnRate(8)
-        WaitTicks(4)
-        while not self:BeenDestroyed() do
-            self:SetTurnRateByDist()
-            WaitTicks(2)
-        end
-    end,
-
-    SetTurnRateByDist = function(self)
-        local dist = self:GetDistanceToTarget()
-        --Get the nuke as close to 90 deg as possible
-        if dist > 50 then        
-            --Freeze the turn rate as to prevent steep angles at long distance targets
-            WaitTicks(21)
-            self:SetTurnRate(20)
-        elseif dist > 128 and dist <= 213 then
-						-- Increase check intervals
-						self:SetTurnRate(30)
-						WaitTicks(16)
-            self:SetTurnRate(30)
-        elseif dist > 43 and dist <= 107 then
-						-- Further increase check intervals
-                        WaitTicks(4)
-            self:SetTurnRate(50)
-				elseif dist > 0 and dist <= 43 then
-						-- Further increase check intervals            
-            self:SetTurnRate(100)   
-            KillThread(self.MoveThread)         
-        end
-    end,        
-
-    GetDistanceToTarget = function(self)
-        local tpos = self:GetCurrentTargetPosition()
-        local mpos = self:GetPosition()
-        local dist = VDist2(mpos[1], mpos[3], tpos[1], tpos[3])
-        return dist
-    end,
 }
 TypeClass = TIFMissileCruise01
