@@ -247,7 +247,7 @@ UnitBlueprint{
     LifeBarOffset = 10.5,
     LifeBarSize = 6,
     Physics = {
-        BackUpDistance = 15,
+        BackUpDistance = 30,
         BankingSlope = 0,
         CatchUpAcc = 10,
         DragCoefficient = 0.2,
