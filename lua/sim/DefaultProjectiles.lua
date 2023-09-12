@@ -292,7 +292,6 @@ TacticalMissileComponent = ClassSimple(SemiBallisticComponent) {
 
         -- are we a wiggler?
         local zigZagger = false
-        
         if self:GetBlueprint().Physics.MaxZigZag and
            self:GetBlueprint().Physics.MaxZigZag > self.maxZigZagThreshold then
             zigZagger = true
@@ -311,9 +310,9 @@ TacticalMissileComponent = ClassSimple(SemiBallisticComponent) {
         local glideTurnRate, glideTime = self:TurnRateFromDistance()
         if zigZagger then
             self:SetTurnRate(75)
-            -- wait until we're just short of our target (normal glide time is a good number)
+            -- wait until we're just short of our target (just short of the normal glide time is a good number)
             -- then up the turn rate so we can actually get close to hitting something
-            WaitTicks(glideTime * 10)
+            WaitTicks((glideTime-1) * 10)
             LOG('Terminal zigzag guidance')
             self:SetTurnRate(100)
         else
@@ -325,12 +324,7 @@ TacticalMissileComponent = ClassSimple(SemiBallisticComponent) {
                 self:TrackTarget(false)
             end
         end
-
-
-
-
     end,
-
 }
 --- Nukes
 ---@class NukeProjectile : NullShell
