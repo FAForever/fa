@@ -748,14 +748,22 @@ end
 function IssueBuildFactory(units, blueprintID, count)
 end
 
---- Orders a group of units to build a unit, each unit is assigned the closest building.
---- Takes some time to process (at least 3 ticks).
+--- Orders a group of units to build a unit, the nearest unit is given the order
+--- Takes some time to apply (at least 3 ticks).
 ---@param units Unit[]
 ---@param position Vector
 ---@param blueprintID string
 ---@param table number[] # A list of alternative build locations, similar to AiBrain.BuildStructure. Doesn't appear to function properly
----@return SimCommand
 function IssueBuildMobile(units, position, blueprintID, table)
+end
+
+--- Orders a group of units to start building another unit by blueprint id
+--- Takes some time to apply (at least 3 ticks).
+---@param units Unit[]
+---@param position Vector
+---@param blueprintID string
+---@param table number[] # A list of alternative build locations, similar to AiBrain.BuildStructure. Doesn't appear to function properly
+function IssueBuildAllMobile(units, position, blueprintID, table)
 end
 
 --- Orders a group of units to capture a target, usually engineers
@@ -850,7 +858,7 @@ end
 
 --- Orders a group of units to guard a target
 ---@param units Unit[]
----@param target Unit
+---@param target Unit | Vector
 ---@return SimCommand
 function IssueGuard(units, target)
 end

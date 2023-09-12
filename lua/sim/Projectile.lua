@@ -8,6 +8,7 @@
 local ProjectileMethods = moho.projectile_methods
 local DefaultDamage = import("/lua/sim/defaultdamage.lua")
 local Flare = import("/lua/defaultantiprojectile.lua").Flare
+local DepthCharge = import("/lua/defaultantiprojectile.lua").DepthCharge
 
 local TableGetn = table.getn
 
@@ -83,17 +84,17 @@ Projectile = ClassProjectile(ProjectileMethods) {
     FxImpactTrajectoryAligned = true,
 
     -- tables used for effects
-    FxImpactAirUnit = import("/lua/effecttemplates.lua").NoEffects,
-    FxImpactLand = import("/lua/effecttemplates.lua").NoEffects,
-    FxImpactNone = import("/lua/effecttemplates.lua").NoEffects,
-    FxImpactProp = import("/lua/effecttemplates.lua").NoEffects,
-    FxImpactShield = import("/lua/effecttemplates.lua").NoEffects,
-    FxImpactWater = import("/lua/effecttemplates.lua").NoEffects,
-    FxImpactUnderWater = import("/lua/effecttemplates.lua").NoEffects,
-    FxImpactUnit = import("/lua/effecttemplates.lua").NoEffects,
-    FxImpactProjectile = import("/lua/effecttemplates.lua").NoEffects,
-    FxImpactProjectileUnderWater = import("/lua/effecttemplates.lua").NoEffects,
-    FxOnKilled = import("/lua/effecttemplates.lua").NoEffects,
+    FxImpactAirUnit = { },
+    FxImpactLand = { },
+    FxImpactNone = { },
+    FxImpactProp = { },
+    FxImpactShield = { },
+    FxImpactWater = { },
+    FxImpactUnderWater = { },
+    FxImpactUnit = { },
+    FxImpactProjectile = { },
+    FxImpactProjectileUnderWater = { },
+    FxOnKilled = { },
 
     -- scale values used for effects
     FxAirUnitHitScale = 1,
@@ -156,10 +157,10 @@ Projectile = ClassProjectile(ProjectileMethods) {
         -- torpedoes can only be taken down by anti torpedo
         if selfHashedCategories['TORPEDO'] then
             if otherHashedCategories["ANTITORPEDO"] then
-                return alliedCheck
+                return other.OriginalTarget == self
             else
                 return false
-            end
+            end 
         end
 
         -- missiles can only be taken down by anti missiles
@@ -248,9 +249,9 @@ Projectile = ClassProjectile(ProjectileMethods) {
             launcher:OnMissileIntercepted(self:GetCurrentTargetPosition(), instigator, self:GetPosition())
 
             -- keep track of the number of intercepted missiles
-            -- if not IsDestroyed(instigator) then
-            --     instigator:SetStat('KILLS', instigator:GetStat('KILLS', 0).Value + 1)
-            -- end
+            if not IsDestroyed(instigator) then
+                instigator:UpdateStat('KILLS', instigator:GetStat('KILLS', 0).Value + 1)
+            end
         end
 
         self:CreateImpactEffects(self.Army, self.FxOnKilled, self.FxOnKilledScale)
@@ -515,6 +516,11 @@ Projectile = ClassProjectile(ProjectileMethods) {
         if trackTarget then
             self:SetLifetime(onLostTargetLifetime)
         end
+
+        local originalTarget = self.OriginalTarget
+        if originalTarget and not (originalTarget.Dead or IsDestroyed(originalTarget)) then
+            self:SetNewTarget(originalTarget)
+        end
     end,
 
     -- Lua functionality
@@ -738,6 +744,19 @@ Projectile = ClassProjectile(ProjectileMethods) {
         end
 
         self.Trash:Add(self.MyFlare)
+    end,
+
+    ---@param self TDepthChargeProjectile
+    ---@param blueprint WeaponBlueprintDepthCharge
+    AddDepthCharge = function(self, blueprint)
+        if not blueprint then return end
+        if not blueprint.Radius then return end
+        self.MyDepthCharge = DepthCharge {
+            Owner = self,
+            Radius = blueprint.Radius or 10,
+            DepthCharge = blueprint.ProjectilesToDeflect
+        }
+        self.Trash:Add(self.MyDepthCharge)
     end,
 
     --- Called by Lua to create the impact effects

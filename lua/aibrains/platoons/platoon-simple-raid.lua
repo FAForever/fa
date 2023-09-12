@@ -1,4 +1,3 @@
-
 local AIPlatoon = import("/lua/aibrains/platoons/platoon-base.lua").AIPlatoon
 local NavUtils = import("/lua/sim/navutils.lua")
 local MarkerUtils = import("/lua/sim/markerutilities.lua")
@@ -14,7 +13,7 @@ local TableEmpty = table.empty
 local NavigateDistanceThresholdSquared = 20 * 20
 
 ---@class AIPlatoonSimpleRaidBehavior : AIPlatoon
----@field RetreatCount number 
+---@field RetreatCount number
 ---@field ThreatToEvade Vector | nil
 ---@field LocationToRaid Vector | nil
 ---@field OpportunityToRaid Vector | nil
@@ -72,12 +71,12 @@ AIPlatoonSimpleRaidBehavior = Class(AIPlatoon) {
             local label, error = NavUtils.GetLabel('Land', position)
 
             if label then
-                
+
                 -- TODO
                 -- this should be cached, part of the marker utilities
                 local expansions, count = MarkerUtils.GetMarkersByType('Expansion Area')
                 ---@type MarkerData[]
-                local candidates = { }
+                local candidates = {}
                 local candidateCount = 0
                 for k = 1, count do
                     local expansion = expansions[k]
@@ -154,7 +153,7 @@ AIPlatoonSimpleRaidBehavior = Class(AIPlatoon) {
                     return
                 end
 
-                -- navigate towards waypoint 
+                -- navigate towards waypoint
                 local dx = origin[1] - waypoint[1]
                 local dz = origin[3] - waypoint[3]
                 local d = math.sqrt(dx * dx + dz * dz)
@@ -289,7 +288,7 @@ AIPlatoonSimpleRaidBehavior = Class(AIPlatoon) {
 
             -- tell attack units to attack
             local attackCommand
-            local attackOffset, error = NavUtils.RandomDirectionFrom('Land', location, 32, 4)       -- TODO: remove magic numbers'
+            local attackOffset, error = NavUtils.RandomDirectionFrom('Land', location, 32, 4) -- TODO: remove magic numbers'
             if not attackOffset then
                 attackCommand = self:AggressiveMoveToLocation(location, 'Attack')
             else
@@ -297,7 +296,7 @@ AIPlatoonSimpleRaidBehavior = Class(AIPlatoon) {
             end
 
             -- tell scout units to patrol for threats
-            local scoutOffsets, countOrError = NavUtils.DirectionsFrom('Land', location, 32, 4)    -- TODO: remove magic numbers
+            local scoutOffsets, countOrError = NavUtils.DirectionsFrom('Land', location, 32, 4) -- TODO: remove magic numbers
             if not scoutOffsets then
                 self:Patrol(location, 'Scout')
             else
@@ -332,7 +331,7 @@ AIPlatoonSimpleRaidBehavior = Class(AIPlatoon) {
                 -- check if our command is still going
                 if not self:IsCommandsActive(attackCommand) then
                     -- setup attack units
-                    local attackOffset, error = NavUtils.RandomDirectionFrom('Land', location, 10, 8)       -- TODO: remove magic numbers
+                    local attackOffset, error = NavUtils.RandomDirectionFrom('Land', location, 10, 8) -- TODO: remove magic numbers
                     if not attackOffset then
                         self:LogWarning(string.format('no alternative directions found to evade'))
                         self:ChangeState(self.Error)
@@ -441,7 +440,7 @@ AIPlatoonSimpleRaidBehavior = Class(AIPlatoon) {
             end
         end
 
-        for k, scout in units do 
+        for k, scout in units do
             scout:SetFireState(1)
         end
     end,
@@ -471,6 +470,3 @@ DebugAssignToUnits = function(data, units)
         ChangeState(platoon, platoon.Start)
     end
 end
-
-
-

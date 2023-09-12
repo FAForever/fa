@@ -109,9 +109,25 @@ function safecall(msg, fn, ...)
     end
 end
 
+--- table.empty(t) returns true iff t has no keys/values.
+---@param t table
+---@return boolean
+function table.empty(t)
+    if type(t) ~= 'table' then return true end
+    return next(t) == nil
+end
+
 --- Returns actual size of a table, including string keys
-table.getsize = table.getsize2 or table.getsize
-table.empty = table.empty2 or table.empty
+---@param t table
+---@return number
+function table.getsize(t)
+    if type(t) ~= 'table' then return 0 end
+    local size = 0
+    for k, v in t do
+        size = size + 1
+    end
+    return size
+end
 
 --- table.copy(t) returns a shallow copy of t.
 function table.copy(t)

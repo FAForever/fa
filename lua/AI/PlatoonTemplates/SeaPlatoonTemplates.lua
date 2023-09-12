@@ -7,20 +7,13 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
+-- Note some mods will replace this file, any new templates that need to be added should be added to SeaPlatoonNewTemplates.lua
 -- ==== Global Form platoons ==== --
 PlatoonTemplate {
     Name = 'SeaAttack',
     Plan = 'NavalForceAI',
     GlobalSquads = {
         { categories.MOBILE * categories.NAVAL - categories.EXPERIMENTAL - categories.CARRIER - categories.NUKE, 3, 100, 'Attack', 'GrowthFormation' }
-    },
-}
-
-PlatoonTemplate {
-    Name = 'SeaRaid',
-    Plan = 'GuardMarker',
-    GlobalSquads = {
-        { categories.MOBILE * categories.NAVAL * categories.SUBMERSIBLE * categories.TECH1, 1, 3, 'Attack', 'none' }
     },
 }
 

@@ -173,11 +173,11 @@ local function NewSafeEnv()
         unpack = unpack,
         pcall = pcall,
         _VERSION = _VERSION,
-        __pow = __pow,
+        -- __pow = __pow,
 
         -- moholog-interacting functions
         _ALERT = _ALERT,
-        _TRACEBACK = _TRACEBACK,
+        -- _TRACEBACK = _TRACEBACK,
         LOG = LOG,
         SPEW = SPEW,
         WARN = WARN,
@@ -701,6 +701,7 @@ function HandleUnitWithBuildPresets(bps, all_bps)
             tempBp.BlueprintId = string.lower(tempBp.BlueprintId .. '_' .. name)
             tempBp.BuildIconSortPriority = preset.BuildIconSortPriority or tempBp.BuildIconSortPriority or 0
             tempBp.General.UnitName = preset.UnitName or tempBp.General.UnitName
+            tempBp.Interface = tempBp.Interface or { }
             tempBp.Interface.HelpText = preset.HelpText or tempBp.Interface.HelpText
             tempBp.Description = preset.Description or tempBp.Description
             tempBp.CategoriesHash['ISPREENHANCEDUNIT'] = true
@@ -716,6 +717,10 @@ function HandleUnitWithBuildPresets(bps, all_bps)
             BlueprintLoaderUpdateProgress()
         end
     end
+end
+
+function HandleUnitsWithExternalFactories(bps, all_bps)
+
 end
 
 -- Assign shader and mesh for visual Cloaking FX
@@ -836,6 +841,12 @@ function PreModBlueprints(all_bps)
             }
         end
 
+        local bpIsAirScout =  bp.CategoriesHash.SCOUT and bp.CategoriesHash.AIR
+        local isCarrier = bp.CategoriesHash.AIRSTAGINGPLATFORM and bp.CategoriesHash.NAVAL
+        local isArty = bp.CategoriesHash.ARTILLERY and bp.CategoriesHash.TECH1
+        if bp.Intel.VisionRadius and not bpIsAirScout and not isCarrier and not isArty then
+            bp.Intel.VisionRadius = math.ceil(1.15*bp.Intel.VisionRadius)
+        end
         -- Synchronize hashed categories with actual categories
         bp.Categories = table.unhash(bp.CategoriesHash)
 
@@ -954,6 +965,7 @@ function PostModBlueprints(all_bps)
         end
         BlueprintLoaderUpdateProgress()
     end
+
     HandleUnitWithBuildPresets(preset_bps, all_bps)
 
     -- find custom strategic icons defined by ui mods, this should be the very last thing 
@@ -976,7 +988,7 @@ function PostModBlueprints(all_bps)
 
     -- post process units and projectiles for easier access to information and sanitizing some fields
     PostProcessProjectiles(all_bps.Projectile)
-    PostProcessUnits(all_bps.Unit)
+    PostProcessUnits(all_bps, all_bps.Unit)
     PostProcessProps(all_bps.Prop)
 end
 

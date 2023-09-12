@@ -361,14 +361,14 @@ function AddControlTooltip(control, tooltipID, delay, width)
 end
 
 -- creates a tooltip box with specified title and description
--- @param title string displayed in tooltip header
--- @param description string displayed in tooltip body
--- @param delay number is optional milliseconds used to delay tooltip popup
--- @param width number is optional width of tooltip or it is auto calculated based on length of header/description
--- @param padding is optional space between tooltip description text and border of tooltip 
--- @param descFontSize number is optional font size for description text of tooltip 
--- @param textFontSize number is optional font size for header text of tooltip  
--- @param position string is optional string indicating position of tooltip relative to its parent: left, right, center (default)
+---@param title string displayed in tooltip header
+---@param description string displayed in tooltip body
+---@param delay number is optional milliseconds used to delay tooltip popup
+---@param width number is optional width of tooltip or it is auto calculated based on length of header/description
+---@param padding number is optional space between tooltip description text and border of tooltip 
+---@param descFontSize number is optional font size for description text of tooltip 
+---@param textFontSize number is optional font size for header text of tooltip  
+---@param position string is optional string indicating position of tooltip relative to its parent: left, right, center (default)
 function AddControlTooltipManual(control, title, description, delay, width, padding, descFontSize, textFontSize, position)
 
     if not control.oldHandleEvent then

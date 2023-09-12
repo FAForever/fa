@@ -134,11 +134,12 @@ AIBrain = Class(StandardBrain) {
         StandardBrain.OnBeginSession(self)
 
         -- requires navigational mesh
-        import("/lua/sim/NavUtils.lua").Generate()
+        import("/lua/sim/navutils.lua").Generate()
 
         -- requires these markers to exist
-        import("/lua/sim/MarkerUtilities.lua").GenerateExpansionMarkers()
-        import("/lua/sim/MarkerUtilities.lua").GenerateRallyPointMarkers()
+        import("/lua/sim/markerutilities.lua").GenerateExpansionMarkers()
+        import("/lua/sim/markerutilities.lua").GenerateNavalAreaMarkers()
+        import("/lua/sim/markerutilities.lua").GenerateRallyPointMarkers()
 
         -- requires these datastructures to understand the game
         self.GridReclaim = import("/lua/ai/gridreclaim.lua").Setup(self)
@@ -1218,47 +1219,6 @@ AIBrain = Class(StandardBrain) {
             local x, z = self:GetArmyStartPos()
             plat:MoveToLocation({x, 0, z}, false)
             self:DisbandPlatoon(plat)
-        end
-    end,
-
-    ---@param self BaseAIBrain
-    AbandonedByPlayer = function(self)
-        if not IsGameOver() then
-            if ScenarioInfo.Options.AIReplacement == 'On' then
-                ForkThread(function()
-                    local oldName = ArmyBrains[self:GetArmyIndex()].Nickname
-
-                    WaitSeconds(1)
-
-                    SUtils.AISendChat('all', ArmyBrains[self:GetArmyIndex()].Nickname, 'takingcontrol')
-
-                    -- Reassign all Army attributes to better suit the AI.
-                    self.BrainType = 'AI'
-
-                    if self.EnergyExcessThread then 
-                        KillThread(self.EnergyExcessThread)
-                    end
-
-                    self.ConditionsMonitor = BrainConditionsMonitor.CreateConditionsMonitor(self)
-                    self.NumBases = 0 -- AddBuilderManagers will increase the number
-                    self.BuilderManagers = {}
-                    self:AddBuilderManagers(self:GetStartVector3f(), 100, 'MAIN', false)
-                    SUtils.AddCustomUnitSupport(self)
-
-                    ArmyBrains[self:GetArmyIndex()].Nickname = 'CMDR Sorian..(was '..oldName..')'
-                    ScenarioInfo.ArmySetup[self.Name].AIPersonality = 'sorianadaptive'
-
-                    local cmdUnits = self:GetListOfUnits(categories.COMMAND, true)
-                    if cmdUnits then
-                        cmdUnits[1]:SetCustomName(ArmyBrains[self:GetArmyIndex()].Nickname)
-                    end
-
-                    self:InitializeSkirmishSystems()
-                    self:OnCreateAI()
-                end)
-            else -- If ScenarioInfo.Options.AIReplacement return nil or any other value, make sure the ACU explodes.
-                self:OnDefeat()
-            end
         end
     end,
 

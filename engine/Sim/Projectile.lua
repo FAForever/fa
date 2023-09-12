@@ -109,7 +109,7 @@ function Projectile:SetMaxSpeed(speed)
 end
 
 ---
----@param object Entity | Unit
+---@param object Entity | Unit | Projectile
 function Projectile:SetNewTarget(object)
 end
 
@@ -131,8 +131,8 @@ function Projectile:SetStayUpright(upright)
 end
 
 ---
----@param radiansPerSecond number
-function Projectile:SetTurnRate(radiansPerSecond)
+---@param degreesPerSecond number
+function Projectile:SetTurnRate(degreesPerSecond)
 end
 
 ---

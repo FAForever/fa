@@ -76,7 +76,7 @@ Grid = ClassSimple {
 
         local bx = 1
         if wx > 0 then
-            bx = ((wx * inverse) ^ 0) + 1
+            bx = math.floor(wx * inverse) + 1
             if bx > cellCount then
                 bx = cellCount
             end
@@ -84,7 +84,7 @@ Grid = ClassSimple {
 
         local bz = 1
         if wz > 0 then
-            bz = ((wz * inverse) ^ 0) + 1
+            bz = math.floor(wz * inverse) + 1
             if bz > cellCount then
                 bz = cellCount
             end

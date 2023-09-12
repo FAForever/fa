@@ -7,6 +7,7 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
+-- Note some mods will replace this file, any new templates that need to be added should be added to LandPlatoonNewTemplates.lua
 -- ==== Global Form platoons ==== --
 PlatoonTemplate {
     Name = 'LandAttack',

@@ -12,6 +12,64 @@ LOG("Client version: " .. tostring(ClientVersion))
 LOG("Game version: " .. tostring(GameVersion))
 LOG("Game type: " .. tostring(GameType))
 
+-------------------------------------------------------------------------------
+--#region Adjust process affinity and prioritity
+
+-- The rendering thread appears to pin itself to the first computing unit of
+-- a computer. The first computing unit is often also used by othersoftware,
+-- including the OS. Through empirical research the framerate of the game is a
+-- lot more consistent when we do not give it access to the first computing 
+-- unit.
+
+-- That is what this section helps us do. The game functions best when it has
+-- at least four computing units available. If we detect someone has 6 or more
+-- computing units then we take the game off the first compute unit.
+
+-- Note that we can not make the distinction between real computing units and
+-- computing units that originate from technology such as hyperthreading.
+
+local SetProcessPriority = rawget(_G, "SetProcessPriority")
+local GetProcessAffinityMask = rawget(_G, "GetProcessAffinityMask")
+local SetProcessAffinityMask = rawget(_G, "SetProcessAffinityMask")
+
+if SetProcessPriority and GetProcessAffinityMask and SetProcessAffinityMask then
+
+    -- priority values can be found at:
+    -- - https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-setpriorityclass
+    local success = SetProcessPriority(0x00000080)
+    if success then
+        LOG("Process - priority set to: 'high'")
+    else
+        LOG("Process - Failed to adjust process priority, this may impact your framerate")
+    end
+
+    -- affinity values acts like a bit mask, we retrieve the mask and 
+    -- shift it if we think there are sufficient computing units
+    local success, processAffinityMask, systemAffinityMask = GetProcessAffinityMask();
+    if success then
+        -- system has 6 (logical) computing units or more, skip first two computing units
+        if systemAffinityMask >= 63 then
+            processAffinityMask = systemAffinityMask & (systemAffinityMask << 2)
+        end
+
+        -- update the afinity mask
+        if processAffinityMask != systemAffinityMask then
+            local success = SetProcessAffinityMask(processAffinityMask);
+            if success then
+                LOG("Process - affinity set to: " .. tostring(processAffinityMask))
+            else
+                LOG("Process - Failed to adjust the process affinity, this may impact your framerate")
+            end
+        end
+    else
+        LOG("Process - Failed to retrieve the process affinity, this may impact your framerate")
+    end
+else
+    LOG("Process - Failed to find process priority and affinity related functions, this may impact your framerate")
+end
+
+--#endregion
+
 -- upvalued performance
 local StringSub = string.sub
 local StringLower = string.lower
@@ -59,7 +117,6 @@ local function FindFilesWithExtension(dir, extension, prepend, files)
     for k, file in IoDir(dir .. "/*") do
         if not (file == '.' or file == '..') then
             if StringSub(file, -3) == extension then
-                LOG(prepend .. "/" .. file)
                 TableInsert(files, prepend .. "/" .. file)
             end
             FindFilesWithExtension(dir .. "/" .. file, extension, prepend .. "/" .. file, files)
@@ -535,28 +592,28 @@ end
 
 -- END OF COPY --
 
--- -- minimum viable shader version - should be bumped to the next release version when we change the shaders
--- local minimumShaderVersion = 3745
+-- minimum viable shader version - should be bumped to the next release version when we change the shaders
+local minimumShaderVersion = 3759
 
--- -- look for unviable shaders and remove them
--- local shaderCache = SHGetFolderPath('LOCAL_APPDATA') .. 'Gas Powered Games/Supreme Commander Forged Alliance/cache'
--- for k, file in IoDir(shaderCache .. '/*') do
---     if file != '.' and file != '..' then 
---         local version = tonumber(string.sub(file, -4))
---         if not version or version < minimumShaderVersion then 
---             LOG("Removed incompatible shader: " .. file)
---             os.remove(shaderCache .. '/' .. file)
---         end
---     end
--- end
-
--- Clears out the shader cache as it takes a release to reset the shaders
+-- look for unviable shaders and remove them
 local shaderCache = SHGetFolderPath('LOCAL_APPDATA') .. 'Gas Powered Games/Supreme Commander Forged Alliance/cache'
 for k, file in IoDir(shaderCache .. '/*') do
     if file != '.' and file != '..' then 
-        os.remove(shaderCache .. '/' .. file)
+        local version = tonumber(string.sub(file, -4))
+        if not version or version < minimumShaderVersion then 
+            LOG("Removed incompatible shader: " .. file)
+            os.remove(shaderCache .. '/' .. file)
+        end
     end
 end
+
+-- Clears out the shader cache as it takes a release to reset the shaders
+-- local shaderCache = SHGetFolderPath('LOCAL_APPDATA') .. 'Gas Powered Games/Supreme Commander Forged Alliance/cache'
+-- for k, file in IoDir(shaderCache .. '/*') do
+--     if file != '.' and file != '..' then 
+--         os.remove(shaderCache .. '/' .. file)
+--     end
+-- end
 
 -- typical FAF packages
 local allowedAssetsNxy = { }

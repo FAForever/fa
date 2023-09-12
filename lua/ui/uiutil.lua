@@ -439,6 +439,7 @@ function UIFile(filespec, checkMods)
         else
             while not found and useSkin do
                 found = currentPath .. filespec
+                
                 if not DiskGetFileInfo(found) then
                     -- Check mods
                     local inmod = false

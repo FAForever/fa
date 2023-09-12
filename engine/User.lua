@@ -322,6 +322,12 @@ end
 function GetIsPaused(units)
 end
 
+--- Returns a boolean that indicates the unit is paused
+---@param unit UserUnit[]
+---@return boolean
+function GetIsPausedOfUnit(unit)
+end
+
 --- Sees if any units in the list are submerged
 ---@param units UserUnit[]
 ---@return SubmergeStatus
@@ -419,7 +425,7 @@ end
 
 --- Returns a table of strings which are the names of files in special locations (currently SaveFile, Replay)
 ---@param type string
----@return table
+---@return { extension: string, directory: string, files: table<string, string[]> }
 function GetSpecialFiles(type)
 end
 
@@ -452,12 +458,20 @@ end
 function GetUIControlsAlpha()
 end
 
---- Given a set of units, gets the union of orders and unit categories (for determining builds)
+--- Given a set of units, gets the union of orders and unit categories (for determining builds). You can use `GetUnitCommandFromCommandCap` to convert the toggles to unit commands
 ---@param unitSet any
 ---@return string[] orders
 ---@return CommandCap[] availableToggles
----@return EntityCategory[] buildableCategories
+---@return EntityCategory buildableCategories
 function GetUnitCommandData(unitSet)
+end
+
+--- Retrieves the orders, toggles and buildable categories of the given unit. You can use `GetUnitCommandFromCommandCap` to convert the toggles to unit commands
+---@param unit any
+---@return string[] orders
+---@return CommandCap[] availableToggles
+---@return EntityCategory buildableCategories
+function GetUnitCommandDataOfUnit(unit)
 end
 
 --- Givens a `RULEUCC` type command, return the equivalent `UNITCOMMAND` command.
@@ -637,12 +651,32 @@ end
 function IsObserver(playerId)
 end
 
----
----@param command string
----@param blueprintid string
+--- Issue a factory build or upgrade command to your selection
+---@param command UserUnitBlueprintCommand
+---@param blueprintid UnitId
 ---@param count number
 ---@param clear boolean? defaults to false
 function IssueBlueprintCommand(command, blueprintid, count, clear)
+end
+
+--- Issue a factory build or upgrade command to the given units
+---@see IssueBlueprintCommand
+---@param units UserUnit[]
+---@param command UserUnitBlueprintCommand
+---@param blueprintid UnitId
+---@param count number
+---@param clear boolean? defaults to false
+function IssueBlueprintCommandToUnits(units, command, blueprintid, count, clear)
+end
+
+--- Issue a factory build or upgrade command to the given unit
+---@see IssueBlueprintCommand
+---@param unit UserUnit
+---@param command UserUnitBlueprintCommand
+---@param blueprintid UnitId
+---@param count number
+---@param clear boolean? defaults to false
+function IssueBlueprintCommandToUnit(unit, command, blueprintid, count, clear)
 end
 
 ---
@@ -660,8 +694,8 @@ end
 ---
 ---@param unitList UserUnit[]
 ---@param command string
----@param string string?
----@param clear boolean?
+---@param string? string
+---@param clear? boolean
 function IssueUnitCommand(unitList, command, string, clear)
 end
 
@@ -885,7 +919,7 @@ function SessionSendChatMessage(client, message)
 end
 
 --- Set this as an active build template
----@param template BuildQueue
+---@param template BuildTemplate
 function SetActiveBuildTemplate(template)
 end
 
@@ -953,10 +987,16 @@ end
 function SetOverlayFilters(list)
 end
 
---- Pause builders in this list
----@param selection UserUnit[]
----@param paused boolean
-function SetPaused(selection, paused)
+--- Pause or unpause the given units
+---@param units UserUnit[]
+---@param pause boolean
+function SetPaused(units, pause)
+end
+
+--- Pause or unpause the given unit
+---@param unit UserUnit
+---@param pause boolean
+function SetPausedOfUnit(unit, pause)
 end
 
 ---

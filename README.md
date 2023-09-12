@@ -1,8 +1,4 @@
 
-FAF | FAF Develop| FAF Beta balance
- ------------ | ------------- | -----------
-[![Build](https://github.com/FAForever/fa/actions/workflows/build.yaml/badge.svg?branch=deploy%2Ffaf)](https://github.com/FAForever/fa/actions/workflows/build.yaml) | [![Build](https://github.com/FAForever/fa/actions/workflows/build.yaml/badge.svg?branch=deploy%2Ffafdevelop)](https://github.com/FAForever/fa/actions/workflows/build.yaml) | [![Build](https://github.com/FAForever/fa/actions/workflows/build.yaml/badge.svg?branch=deploy%2Ffafbeta)](https://github.com/FAForever/fa/actions/workflows/build.yaml)
-
 Read this in other languages: [English](README.md), [Russian](README-russian.md)
 
 About Forged Alliance Forever
@@ -44,7 +40,6 @@ Folder          | Description
 `meshes`        | Meshes that do not belong to props, units or projectiles. E.g. the world border
 `projectiles`   | Blueprint files, textures and meshes of projectiles
 `promotion*`    | Promotion material related to content surrounding the repository
-`props`         | Blueprint files, textures and meshes of props
 `schook`        | Legacy - the **s**upreme **c**ommander **hook** folder that was used due to licensing issues
 `scripts*`      | Scripts used to automate tasks surrounding the game repository
 `setup*`        | Development files that allow you to launch the game using the repository

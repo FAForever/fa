@@ -63,8 +63,8 @@ URL0303 = ClassUnit(CWalkingLandUnit) {
         WaitSeconds(blueprint.SecondsBeforeChargeKicksIn)
 
         self.ChargingInProgress = true
-        self:SetAccMult(blueprint.Physics.ChargeAccMult)
-        self:SetSpeedMult(blueprint.Physics.ChargeSpeedMult)
+        self:SetAccMult(blueprint.Physics.ChargeAccMult or 1)
+        self:SetSpeedMult(blueprint.Physics.ChargeSpeedMult or 1)
 
         local bufffx1 = CreateAttachedEmitter(self, 0, army, '/effects/emitters/cybran_loyalist_charge_01_emit.bp')
         local bufffx2 = CreateAttachedEmitter(self, 0, army, '/effects/emitters/cybran_loyalist_charge_02_emit.bp')

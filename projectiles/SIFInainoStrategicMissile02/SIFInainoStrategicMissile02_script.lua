@@ -8,7 +8,7 @@ local SIFInainoStrategicMissile = import("/lua/seraphimprojectiles.lua").SIFInai
 
 SIFInainoStrategicMissile02 = ClassProjectile(SIFInainoStrategicMissile) {
     FxSplashScale = 0.5,
-    FxTrails = import("/lua/effecttemplates.lua").NoEffects,
+    FxTrails = { },
 
     LaunchSound = 'Nuke_Launch',
     ExplodeSound = 'Nuke_Impact',

@@ -9,6 +9,7 @@ local AIUtils = import("/lua/ai/aiutilities.lua")
 local AMPlatoonHelperFunctions = import("/lua/editor/amplatoonhelperfunctions.lua")
 local ScenarioUtils = import("/lua/sim/scenarioutilities.lua")
 local ScenarioPlatoonAI = import("/lua/scenarioplatoonai.lua")
+local AIBehaviors = import("/lua/ai/aibehaviors.lua")
 local SUtils = import("/lua/ai/sorianutilities.lua")
 local TriggerFile = import("/lua/scenariotriggers.lua")
 local Buff = import("/lua/sim/buff.lua")
@@ -46,7 +47,7 @@ function BaseManagerEngineerPlatoonSplit(platoon)
 
                     -- Only add death callback if it hasnt been set yet
                     if not v.Subtracted then
-                        TriggerFile.CreateUnitDeathTrigger(BaseManagerSingleDestroyed, v)
+                        TriggerFile.CreateUnitDestroyedTrigger(BaseManagerSingleDestroyed, v)
                     end
 
                     -- If the base is building engineers, subtract one from the amount being built
@@ -109,7 +110,7 @@ function BaseManagerSingleEngineerPlatoon(platoon)
             -- Try to build buildings
             elseif BMBC.NeedAnyStructure(aiBrain, baseName) and bManager:GetConstructionEngineerCount() < bManager:GetConstructionEngineerMaximum() then
                 bManager:AddConstructionEngineer(unit)
-                TriggerFile.CreateUnitDeathTrigger(ConstructionUnitDeath, unit)
+                TriggerFile.CreateUnitDestroyedTrigger(ConstructionUnitDeath, unit)
                 BaseManagerEngineerThread(platoon)
                 bManager:RemoveConstructionEngineer(unit)
 
@@ -265,6 +266,7 @@ function ConditionalBuildDied(conditionalUnit)
             BuildCondition = selectedBuild.data.BuildCondition,
             PlatoonAIFunction = selectedBuild.data.PlatoonAIFunction,
             PlatoonData = selectedBuild.data.PlatoonData,
+            FormCallbacks = selectedBuild.data.FormCallbacks,
             Retry = selectedBuild.data.Retry,
             KeepAlive = true,
             Amount = 1,
@@ -290,6 +292,16 @@ function ConditionalBuildSuccessful(conditionalUnit)
         newPlatoon:ForkAIThread(import(selectedBuild.data.PlatoonAIFunction[1])[selectedBuild.data.PlatoonAIFunction[2]])
     end
 
+    if selectedBuild.data.FormCallbacks then
+        for _, callback in selectedBuild.data.FormCallbacks do
+            if type(callback) == "function" then
+                newPlatoon:ForkThread(callback)
+            else
+                newPlatoon:ForkThread(import(callback[1])[callback[2]])
+            end
+        end
+    end
+
     -- Set up a death wait thing for it to rebuild
     if bManager.ConditionalBuildData.WaitSecondsAfterDeath then
         -- If were supposed to wait a certain amount of time before building the unit again, handle that here.
@@ -299,7 +311,7 @@ function ConditionalBuildSuccessful(conditionalUnit)
         local waitTime = bManager.ConditionalBuildData.WaitSecondsAfterDeath
 
         -- Register death callback
-        TriggerFile.CreateUnitDeathTrigger(function(unit)
+        TriggerFile.CreateUnitDestroyedTrigger(function(unit)
             ForkThread(function()
                 WaitSeconds(waitTime)
                 ScenarioInfo.ConditionalBuildLocks[selectedBuild.name] = false
@@ -340,7 +352,7 @@ function AssistConditionalBuild(singleEngineerPlatoon)
     local buildIndex = bManager.ConditionalBuildData.Index
 
     -- Register death callback
-    TriggerFile.CreateUnitDeathTrigger(ConditionalBuilderDead, engineer)
+    TriggerFile.CreateUnitDestroyedTrigger(ConditionalBuilderDead, engineer)
 
     -- Increment number of units assisting
     bManager.ConditionalBuildData.IncrementAssisting()
@@ -396,7 +408,7 @@ function DoConditionalBuild(singleEngineerPlatoon)
     bManager.ConditionalBuildData.WaitSecondsAfterDeath = selectedBuild.data.WaitSecondsAfterDeath or false
 
     -- Register death callback
-    TriggerFile.CreateUnitDeathTrigger(ConditionalBuilderDead, engineer)
+    TriggerFile.CreateUnitDestroyedTrigger(ConditionalBuilderDead, engineer)
 
     -- Issue build orders
     IssueClearCommands({engineer})
@@ -504,7 +516,7 @@ function PermanentFactoryAssist(platoon)
     local assistFac = false
     local unit = platoon:GetPlatoonUnits()[1]
 
-    TriggerFile.CreateUnitDeathTrigger(PermanentAssisterDead, unit)
+    TriggerFile.CreateUnitDestroyedTrigger(PermanentAssisterDead, unit)
     while aiBrain:PlatoonExists(platoon) do
         -- Get all factories in the base manager
         local facs = bManager:GetAllBaseFactories()
@@ -540,7 +552,7 @@ function PermanentFactoryAssist(platoon)
             -- Add to the list of units that are permanently assisting in this base manager
             bManager.PermanentAssisters[unit] = true
         end
-        WaitTicks(Random(79, 181))
+        WaitTicks(Random(80, 180))
     end
 end
 
@@ -666,7 +678,7 @@ function BaseManagerAssistThread(platoon)
                 end
             end
         end
-        local waitTime = Random(5, 17)
+        local waitTime = Random(5, 20)
         WaitTicks(waitTime)
 
         counter = counter + waitTime
@@ -804,13 +816,6 @@ function BaseManagerEngineerThread(platoon)
 
     if not platoon.PlatoonData.BaseName or not aiBrain.BaseManagers[platoon.PlatoonData.BaseName] then
         error('*AI DEBUG: Missing Base Name or invalid base name for base manager engineer thread', 2)
-    end
-
-    local structurePriTable
-    if not platoon.PlatoonData.StructurePriorities then
-        structurePriTable = { 'ALLUNITS' }
-    else
-        structurePriTable = platoon.PlatoonData.StructurePriorities
     end
 
     -- If there is a construction block use the stuff from here
@@ -1112,22 +1117,39 @@ function BaseManagerScoutingAI(platoon)
     end
 end
 
+--- Assigns the units of the given platoon into new single unit platoons, and sets the 'BaseManagerTMLAI' as their platoon AI function
+--- Also copies over the platoon data, which we require to determine if the unit's BaseManager is allowed to use the TML
+---@param platoon Platoon
+function BaseManagerTMLPlatoon(platoon)
+    local aiBrain = platoon:GetBrain()
+    local TMLs = platoon:GetPlatoonUnits()
+	
+	if not aiBrain.BaseManagers[platoon.PlatoonData.BaseName] then
+        aiBrain:DisbandPlatoon(platoon)
+    end
+	
+	for _, launcher in TMLs do
+		if not launcher.Dead then
+			local launcherPlatoon = aiBrain:MakePlatoon('', '')
+            aiBrain:AssignUnitsToPlatoon(launcherPlatoon, {launcher}, 'Attack', 'None')
+            launcherPlatoon.PlatoonData = table.deepcopy(platoon.PlatoonData)
+            launcherPlatoon:ForkAIThread(BaseManagerTMLAI)
+		end
+	end
+
+	aiBrain:DisbandPlatoon(platoon)
+end
+
 ---@param platoon Platoon
 function BaseManagerTMLAI(platoon)
     local aiBrain = platoon:GetBrain()
-    local pData = platoon.PlatoonData
-    local baseName = pData.BaseName
-    local bManager = aiBrain.BaseManagers[baseName]
+	local baseName = platoon.PlatoonData.BaseName
     local unit = platoon:GetPlatoonUnits()[1]
-    unit.BaseName = baseName
 
     if not unit then return end
 
     platoon:Stop()
-    local bp = unit:GetBlueprint()
-    local weapon = bp.Weapon[1]
-    local maxRadius = weapon.MaxRadius
-    local minRadius = weapon.MinRadius
+	local maxRadius = unit.Blueprint.Weapon[1].MaxRadius
 
     local simpleTargetting = true
     if ScenarioInfo.Options.Difficulty == 3 then
@@ -1141,14 +1163,14 @@ function BaseManagerTMLAI(platoon)
         categories.EXPERIMENTAL,
         categories.ENERGYPRODUCTION,
         categories.STRUCTURE,
-        categories.TECH3 * categories.MOBILE})
+        categories.TECH3 * categories.MOBILE}
+	)
 
     while aiBrain:PlatoonExists(platoon) do
         if BMBC.TMLsEnabled(aiBrain, baseName) then
             local target = false
-            local blip = false
             while unit:GetTacticalSiloAmmoCount() < 1 or not target do
-                WaitSeconds(7)
+                WaitSeconds(5)
                 target = false
                 while not target do
                     target = platoon:FindPrioritizedUnit('Attack', 'Enemy', true, unit:GetPosition(), maxRadius)
@@ -1157,7 +1179,7 @@ function BaseManagerTMLAI(platoon)
                         break
                     end
 
-                    WaitSeconds(3)
+                    WaitSeconds(5)
 
                     if not aiBrain:PlatoonExists(platoon) then
                         return
@@ -1175,12 +1197,62 @@ function BaseManagerTMLAI(platoon)
                 end
             end
         end
-        WaitSeconds(3)
+        WaitSeconds(5)
     end
+end
+
+--- Assigns the units of the given platoon into new single unit platoons, and sets the 'BaseManagerNukeAI' as their platoon AI function
+--- Also copies over the platoon data, which we require to determine if the unit's BaseManager is allowed to use the SML
+---@param platoon Platoon
+function BaseManagerNukePlatoon(platoon)
+    local aiBrain = platoon:GetBrain()
+    local SMLs = platoon:GetPlatoonUnits()
+	
+	if not aiBrain.BaseManagers[platoon.PlatoonData.BaseName] then
+        aiBrain:DisbandPlatoon(platoon)
+    end
+	
+	for _, silo in SMLs do
+		if not silo.Dead then
+			local siloPlatoon = aiBrain:MakePlatoon('', '')
+            aiBrain:AssignUnitsToPlatoon(siloPlatoon, {silo}, 'Support', 'None')
+            siloPlatoon.PlatoonData = table.deepcopy(platoon.PlatoonData)
+            siloPlatoon:ForkAIThread(BaseManagerNukeAI)
+		end
+	end
+
+	aiBrain:DisbandPlatoon(platoon)
 end
 
 ---@param platoon Platoon
 function BaseManagerNukeAI(platoon)
+	local aiBrain = platoon:GetBrain()
+	local baseName = platoon.PlatoonData.BaseName
+    local unit = platoon:GetPlatoonUnits()[1]
+	
+	if not unit then return end
+	
+	platoon:Stop()
+	
+	unit:SetAutoMode(true)
+    while aiBrain:PlatoonExists(platoon) do
+		if BMBC.NukesEnabled(aiBrain, baseName) then
+			while unit:GetNukeSiloAmmoCount() < 1 do
+				WaitSeconds(15)
+				if not aiBrain:PlatoonExists(platoon) then
+					return
+				end
+			end
+
+			nukePos = AIBehaviors.GetHighestThreatClusterLocation(aiBrain, unit)
+			if nukePos then
+				IssueNuke({unit}, nukePos)
+				WaitSeconds(15)
+				IssueClearCommands({unit})
+			end
+		end
+		WaitSeconds(10)
+    end
 end
 
 ---@param platoon Platoon
@@ -1209,7 +1281,7 @@ function AMUnlockRatio(platoon)
     for _, v in platoon:GetPlatoonUnits() do
         if not v.Dead then
             v.PlatoonHandle = platoon
-            TriggerFile.CreateUnitDeathTrigger(callback, v)
+            TriggerFile.CreateUnitDestroyedTrigger(callback, v)
         end
     end
 end
@@ -1235,8 +1307,7 @@ function AMUnlockRatioTimer(platoon)
     for _, v in platoon:GetPlatoonUnits() do
         if not v.Dead then
             v.PlatoonHandle = platoon
-            v:AddOnKilledCallback(callback)
-            TriggerFile.CreateUnitDeathTrigger(callback, v)
+            TriggerFile.CreateUnitDestroyedTrigger(callback, v)
         end
     end
 end

@@ -500,42 +500,42 @@ function CreateSkirmishScreen(victory, showCampaign, operationVictoryTable)
     end
 
      -- Rehost button in case of failure
-    if showCampaign and not operationVictoryTable.success then
-        bg.rehostBtn = UIUtil.CreateButtonStd(bg, '/scx_menu/large-no-bracket-btn/large', "<LOC _Rehost_Game>Rehost Game", 22, 2, 0, "UI_Menu_MouseDown", "UI_Opt_Affirm_Over")
-        LayoutHelpers.LeftOf(bg.rehostBtn, bg.continueBtn, -40)
-        bg.continueBtn:UseAlphaHitTest(false)
+    -- if showCampaign and not operationVictoryTable.success then
+    --     bg.rehostBtn = UIUtil.CreateButtonStd(bg, '/scx_menu/large-no-bracket-btn/large', "<LOC _Rehost_Game>Rehost Game", 22, 2, 0, "UI_Menu_MouseDown", "UI_Opt_Affirm_Over")
+    --     LayoutHelpers.LeftOf(bg.rehostBtn, bg.continueBtn, -40)
+    --     bg.continueBtn:UseAlphaHitTest(false)
 
-        bg.rehostBtn.glow = Bitmap(bg.rehostBtn, UIUtil.UIFile('/scx_menu/large-no-bracket-btn/large_btn_glow.dds'))
-        LayoutHelpers.AtCenterIn(bg.rehostBtn.glow, bg.rehostBtn)
-        bg.rehostBtn.glow:SetAlpha(0)
-        bg.rehostBtn.glow:DisableHitTest()
+    --     bg.rehostBtn.glow = Bitmap(bg.rehostBtn, UIUtil.UIFile('/scx_menu/large-no-bracket-btn/large_btn_glow.dds'))
+    --     LayoutHelpers.AtCenterIn(bg.rehostBtn.glow, bg.rehostBtn)
+    --     bg.rehostBtn.glow:SetAlpha(0)
+    --     bg.rehostBtn.glow:DisableHitTest()
 
-        bg.rehostBtn.pulse = Bitmap(bg.rehostBtn, UIUtil.UIFile('/scx_menu/large-no-bracket-btn/large_btn_glow.dds'))
-        LayoutHelpers.AtCenterIn(bg.rehostBtn.pulse, bg.rehostBtn)
-        bg.rehostBtn.pulse:DisableHitTest()
-        bg.rehostBtn.pulse:SetAlpha(.5)
+    --     bg.rehostBtn.pulse = Bitmap(bg.rehostBtn, UIUtil.UIFile('/scx_menu/large-no-bracket-btn/large_btn_glow.dds'))
+    --     LayoutHelpers.AtCenterIn(bg.rehostBtn.pulse, bg.rehostBtn)
+    --     bg.rehostBtn.pulse:DisableHitTest()
+    --     bg.rehostBtn.pulse:SetAlpha(.5)
 
-        EffectHelpers.Pulse(bg.rehostBtn.pulse, 2, .5, 1)
+    --     EffectHelpers.Pulse(bg.rehostBtn.pulse, 2, .5, 1)
 
-        bg.rehostBtn.OnRolloverEvent = function(self, event)
-            if event == 'enter' then
-                EffectHelpers.FadeIn(self.glow, .25, 0, 1)
-                self.label:SetColor('black')
-            elseif event == 'down' then
-                self.label:SetColor('black')
-            else
-                EffectHelpers.FadeOut(self.glow, .25, 1, 0)
-                self.label:SetColor('FFbadbdb')
-            end
-        end
+    --     bg.rehostBtn.OnRolloverEvent = function(self, event)
+    --         if event == 'enter' then
+    --             EffectHelpers.FadeIn(self.glow, .25, 0, 1)
+    --             self.label:SetColor('black')
+    --         elseif event == 'down' then
+    --             self.label:SetColor('black')
+    --         else
+    --             EffectHelpers.FadeOut(self.glow, .25, 1, 0)
+    --             self.label:SetColor('FFbadbdb')
+    --         end
+    --     end
 
-        bg.rehostBtn.OnClick = function(self, modifiers)
-            ConExecute("ren_Oblivion false")
-            GpgNetSend('Rehost')
-            EscapeHandler.SafeQuit()
-        end
-        Tooltip.AddButtonTooltip(bg.rehostBtn, 'esc_rehost')
-    end
+    --     bg.rehostBtn.OnClick = function(self, modifiers)
+    --         ConExecute("ren_Oblivion false")
+    --         GpgNetSend('Rehost')
+    --         EscapeHandler.SafeQuit()
+    --     end
+    --     Tooltip.AddButtonTooltip(bg.rehostBtn, 'esc_rehost')
+    -- end
 
     UIUtil.MakeInputModal(dialog, function() bg.continueBtn:OnClick() end, function() bg.continueBtn:OnClick() end)
 
@@ -553,7 +553,7 @@ function CreateSkirmishScreen(victory, showCampaign, operationVictoryTable)
         },
         campaign = {
             tooltip = 'CampaignScore_Feedback',
-            url = operationVictoryTable.opData.feedbackURL,
+            url = "http://discord.gg/ayzAVr9JUV",
         },
     }
 

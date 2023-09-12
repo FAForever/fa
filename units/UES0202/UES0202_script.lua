@@ -57,7 +57,7 @@ UES0202 = ClassUnit(TSeaUnit) {
                     self.RackToUse = self.RackToUse + 1
                 end
 
-                TIFCruiseMissileLauncher.CreateProjectileAtMuzzle(self, muzzle)
+                return TIFCruiseMissileLauncher.CreateProjectileAtMuzzle(self, muzzle)
             end,
 
             PlayFxMuzzleSequence = function(self, muzzle)
