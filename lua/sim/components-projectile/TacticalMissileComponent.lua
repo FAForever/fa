@@ -1,26 +1,10 @@
 
 local SemiBallisticComponent = import("/lua/sim/components-projectile/semiballisticcomponent.lua").SemiBallisticComponent
 
----@class TacticalMissileProjectile : SemiBallisticComponent
+---@class TacticalMissileComponent : SemiBallisticComponent
 TacticalMissileComponent = ClassSimple(SemiBallisticComponent) {
 
-    -- TacticalMissileComponent Trajectory Parameters
-    --- LaunchTicks: how long we spend in the launch phase
-    --- LaunchTurnRate: inital launch phase turn rate, gives a little turnover coming out of the tube
-    --- HeightDistanceFactor: each missile calculates an optimal highest point of its trajectory,
-    -- based on its distance to the target.
-    -- This is the factor that determines how high above the target that point is, in relation to the horizontal distance.
-    -- a higher number will result in a lower trajectory
-    -- 5-8 is a decent value
-    --- MinHeight: minimum height of the highest point of the trajectory
-    -- measured from the position of the missile at the end of the launch phase
-    -- minRadius/2 or so is a decent value
-    --- FinalBoostAngle: angle in degrees that we'll aim to be at the end of the boost phase
-    -- 90 is vertical, 0 is horizontal
-
-    MaxZigZagThreshold = 1,
-
-    ---@param self TacticalMissileProjectile | Projectile
+    ---@param self TacticalMissileComponent | Projectile
     MovementThread = function(self)
 
         -- are we a wiggler?
