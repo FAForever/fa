@@ -1,7 +1,7 @@
 
 local SemiBallisticComponent = import("/lua/sim/components-projectile/semiballisticcomponent.lua").SemiBallisticComponent
 
----@class TacticalMissileProjectile : NullShell
+---@class TacticalMissileProjectile : SemiBallisticComponent
 TacticalMissileComponent = ClassSimple(SemiBallisticComponent) {
 
     -- TacticalMissileComponent Trajectory Parameters
@@ -18,15 +18,15 @@ TacticalMissileComponent = ClassSimple(SemiBallisticComponent) {
     --- FinalBoostAngle: angle in degrees that we'll aim to be at the end of the boost phase
     -- 90 is vertical, 0 is horizontal
 
-    maxZigZagThreshold = 1,
+    MaxZigZagThreshold = 1,
 
-    ---@param self TacticalMissileProjectile
+    ---@param self TacticalMissileProjectile | Projectile
     MovementThread = function(self)
 
         -- are we a wiggler?
         local zigZagger = false
         if self:GetBlueprint().Physics.MaxZigZag and
-           self:GetBlueprint().Physics.MaxZigZag > self.maxZigZagThreshold then
+           self:GetBlueprint().Physics.MaxZigZag > self.MaxZigZagThreshold then
             zigZagger = true
         end
 
