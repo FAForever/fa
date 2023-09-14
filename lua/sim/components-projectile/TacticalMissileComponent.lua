@@ -30,15 +30,18 @@ TacticalMissileComponent = ClassSimple(SemiBallisticComponent) {
             -- wait until we're just short of our target (just short of the normal glide time is a good number)
             -- then up the turn rate so we can actually get close to hitting something
             WaitTicks((glideTime-1) * 10)
+            -- set remaining glideTime to 1 for the miss check later, tweak this value if we end up disabling tracking too early
+            glideTime = 1
             self:SetTurnRate(100)
         else
             self:SetTurnRate(glideTurnRate)
-            -- wait until we've allegedly hit our target, then turn tracking off
-            -- (in case we miss, so we don't fly in circles forever)
-            WaitTicks((glideTime+1) * 10)
-            if not self:BeenDestroyed() then
-                self:TrackTarget(false)
-            end
+        end
+
+        -- wait until we've allegedly hit our target, then turn tracking off
+        -- (in case we miss, so we don't fly in circles forever)
+        WaitTicks((glideTime+1) * 10)
+        if not self:BeenDestroyed() then
+            self:TrackTarget(false)
         end
     end,
 }
