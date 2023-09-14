@@ -602,7 +602,7 @@ local GenericQueueCache = { }
 ---@param position Vector
 ---@param thresholdDistance number
 ---@param thresholdSize? number
----@return { [1]: number, [2]: number, [3]: number, [4]: number }?
+---@return { [1]: number, [2]: number, [3]: number }?
 ---@return number | ('NotGenerated' | 'InvalidLayer' | 'OutsideMap' | 'SystemError' | 'Unpathable' | 'NoData')?
 function GetPositionsInRadius(layer, position, thresholdDistance, thresholdSize, cache)
     -- check if generated
@@ -677,7 +677,10 @@ function GetPositionsInRadius(layer, position, thresholdDistance, thresholdSize,
             position[1] = px 
             position[2] = GetSurfaceHeight(px, pz)
             position[3] = pz
-            position[4] = size
+
+            -- this is useful information, but it causes issues with functions such as `IssueMove`
+            -- position[4] = size
+
             cache[cacheHead] = position
             cacheHead = cacheHead + 1
         end
