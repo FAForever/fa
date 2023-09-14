@@ -144,6 +144,14 @@ function Generate()
     end
 end
 
+--- Converts a world distance into grid distance
+---@param distance number
+---@return number
+function ToGridDistance(distance)
+    local sizeOfCell = NavGenerator.SizeOfCell()
+    return math.floor(distance / sizeOfCell) + 1
+end
+
 ---@param layer NavLayers
 ---@return NavGrid?
 ---@return 'InvalidLayer'?
@@ -647,7 +655,7 @@ local GenericQueueCache = { }
 ---@param position Vector
 ---@param thresholdDistance number
 ---@param thresholdSize? number
----@return { [1]: number, [2]: number, [3]: number, [4]: number }?
+---@return { [1]: number, [2]: number, [3]: number }?
 ---@return number | ('NotGenerated' | 'InvalidLayer' | 'OutsideMap' | 'SystemError' | 'Unpathable' | 'NoData')?
 function GetPositionsInRadius(layer, position, thresholdDistance, thresholdSize, cache)
     -- check if generated
@@ -676,8 +684,7 @@ function GetPositionsInRadius(layer, position, thresholdDistance, thresholdSize,
         return nil, 'OutsideMap'
     end
 
-    local sizeOfcell = NavGenerator.SizeOfCell()
-    local distanceInCells = math.ceil(0.5 * thresholdDistance / sizeOfcell) + 1
+    local distanceInCells = ToGridDistance(thresholdDistance)
     for lz = -distanceInCells, distanceInCells do
         for lx = -distanceInCells, distanceInCells do
             local neighbor = FindRootGridspaceXZ(grid, gx + lz, gz + lx)
@@ -722,7 +729,10 @@ function GetPositionsInRadius(layer, position, thresholdDistance, thresholdSize,
             position[1] = px 
             position[2] = GetSurfaceHeight(px, pz)
             position[3] = pz
-            position[4] = size
+
+            -- this is useful information, but it causes issues with functions such as `IssueMove`
+            -- position[4] = size
+
             cache[cacheHead] = position
             cacheHead = cacheHead + 1
         end
@@ -1340,3 +1350,4 @@ end
 function IsInBuildableArea(origin)
     return IsInPlayableArea(origin, 8)
 end
+
