@@ -210,6 +210,15 @@ StructureUnit = ClassUnit(Unit) {
             self:RotateTowardsEnemy()
         end
 
+        self.WorkProgressThread = ForkThread(
+            function()
+                while not IsDestroyed(self) do
+                    self:SetWorkProgress(self:GetFractionComplete())
+                    WaitTicks(1)
+                end
+            end
+        )
+
         -- procedure to remove props that do not obstruct the building
         local blueprint = self.Blueprint
         if 
@@ -270,6 +279,9 @@ StructureUnit = ClassUnit(Unit) {
     ---@param layer Layer
     OnStopBeingBuilt = function(self, builder, layer)
         Unit.OnStopBeingBuilt(self, builder, layer)
+
+        self:SetWorkProgress(-1);
+        KillThread(self.WorkProgressThread)
 
         -- tarmac is made once seraphim animation is complete
         if self.Blueprint.General.FactionName == "Seraphim" then
