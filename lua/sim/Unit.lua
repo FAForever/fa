@@ -295,26 +295,6 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         -- Flags for scripts
         self.IsCivilian = armies[self.Army] == "NEUTRAL_CIVILIAN" or nil
 
-
-        local start = GetSystemTimeSecondsOnlyForProfileUse()
-
-        for k = 1, 1000 do
-            local arr = {self}
-        end
-
-        local diff = (GetSystemTimeSecondsOnlyForProfileUse() - start) * 1000
-        LOG("New table: " .. tostring(diff))
-
-        local start = GetSystemTimeSecondsOnlyForProfileUse()
-
-        local cached = { } 
-        for k = 1, 1000 do
-            cached[1] = self
-        end
-
-        local diff = (GetSystemTimeSecondsOnlyForProfileUse() - start) * 1000
-        LOG("Reused table: " .. tostring(diff))
-
         VeterancyComponent.OnCreate(self)
     end,
 
