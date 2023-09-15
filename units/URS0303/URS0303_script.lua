@@ -100,7 +100,7 @@ URS0303 = ClassUnit(AircraftCarrier, ExternalFactoryComponent) {
                 self:AddUnitToStorage(unitBuilding)
             else
                 local worldPos = self:CalculateWorldPositionFromRelative({ 0, 0, -20 })
-                IssueMoveOffFactory({ unitBuilding }, worldPos)
+                IssueMoveOffFactoryToUnit(unitBuilding, worldPos)
                 unitBuilding:ShowBone(0, true)
             end
             self:SetBusy(false)

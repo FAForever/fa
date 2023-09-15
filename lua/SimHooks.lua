@@ -106,3 +106,24 @@ do
         oldIssueBuildMobile(units, position, blueprintID, table, true)
     end
 end
+
+do
+    ---@type { [1]: Unit }
+    local UnitsCache = {}
+
+    ---@param unit Unit
+    ---@param position Vector
+    ---@return SimCommand
+    _G.IssueMoveToUnit = function(unit, position)
+        UnitsCache[1] = unit
+        return IssueMove(UnitsCache, position)
+    end
+
+    ---@param unit Unit
+    ---@param position Vector
+    ---@return SimCommand
+    _G.IssueMoveOffFactoryToUnit = function(unit, position)
+        UnitsCache[1] = unit
+        return IssueMoveOffFactory(UnitsCache, position)
+    end
+end

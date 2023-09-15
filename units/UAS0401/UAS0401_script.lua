@@ -205,7 +205,7 @@ UAS0401 = ClassUnit(ASeaUnit, ExternalFactoryComponent) {
             local blueprint = unitBeingBuilt.Blueprint
             local distance = math.max(blueprint.SizeX, blueprint.SizeZ, 6)
             local worldPos = self:CalculateWorldPositionFromRelative({0, 0, - 2 * distance})
-            IssueMoveOffFactory({unitBeingBuilt}, worldPos)
+            IssueMoveOffFactoryToUnit(unitBeingBuilt, worldPos)
             ChangeState(self, self.RollingOffState)
         end,
     },
