@@ -877,14 +877,14 @@ end
 function IssueMove(units, position)
 end
 
---- Orders a group of units to move off a factory build site. See `IssueMoveOffFactoryToUnit` for a single unit
+--- Orders a group of units to move off a factory build site. See `IssueMoveOffFactoryToUnit` when you want to apply it to a single unit efficiently
 ---@param units Unit[]
 ---@param position Vector
 ---@return SimCommand
 function IssueMoveOffFactory(units, position)
 end
 
---- Orders a unit to move off a factory build site. See `IssueMoveOffFactory` for a group of units
+--- Orders a unit to move off a factory build site. This global is not compatible with the Steam version of the game. See `IssueMoveOffFactory` when you want to apply the order to a group of units
 ---@param units Unit[]
 ---@param position Vector
 ---@return SimCommand
