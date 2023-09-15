@@ -81,11 +81,11 @@ function CDROverChargeThread( cdr )
                         if target then
                             if aiBrain:GetEconomyStored('ENERGY') >= weapon.EnergyRequired and target and not target:IsDead() then
                                 overCharging = true
-                                IssueClearCommands({cdr})
+                                IssueToUnitClearCommands(cdr)
                                 IssueOverCharge( {cdr}, target )
                             elseif not target:IsDead() then
                                 local tarPos = target:GetPosition()
-                                IssueClearCommands( {cdr} )
+                                IssueToUnitClearCommands(cdr)
                                 IssueToUnitMove(cdr, tarPos )
                                 if cdr.CDRData and cdr.CDRData.LeashPosition then
                                     local tempPos = ScenarioUtils.MarkerToPosition(cdr.CDRData.LeashPosition)
@@ -139,7 +139,7 @@ end
 function CDRRepairBuildingUnit( cdr, plat )
     local aiBrain = cdr:GetAIBrain()
     if cdr.UnitBeingBuiltBehavior and not cdr.UnitBeingBuiltBehavior:BeenDestroyed() then
-        IssueClearCommands( {cdr} )
+        IssueToUnitClearCommands(cdr)
         IssueRepair( {cdr}, cdr.UnitBeingBuiltBehavior )
         repeat
             WaitTicks(11)

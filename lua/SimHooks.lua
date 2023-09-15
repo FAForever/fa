@@ -132,3 +132,8 @@ IssueToUnitMoveOffFactory = function(unit, position)
     UnitsCache[1] = unit
     return IssueMoveOffFactory(UnitsCache, position)
 end
+
+IssueToUnitClearCommands = function(unit)
+    UnitsCache[1] = unit
+    return IssueClearCommands(UnitsCache)
+end

@@ -591,7 +591,7 @@ StructureUnit = ClassUnit(Unit) {
                 local guards = self:GetGuards()
                 for k, guard in guards do
                     if table.getn(guard:GetCommandQueue()) == 1 then
-                        IssueClearCommands({guard})
+                        IssueToUnitClearCommands(guard)
                         IssueGuard({guard}, self)
                     end
                 end

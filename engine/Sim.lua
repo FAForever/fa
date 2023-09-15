@@ -870,14 +870,14 @@ end
 function IssueKillSelf(units)
 end
 
---- Orders a group of units to move to a position
+--- Orders a group of units to move to a position.  See `IssueToUnitMove` when you want to computationally efficiently apply it to a single unit 
 ---@param units Unit[]
 ---@param position Vector
 ---@return SimCommand
 function IssueMove(units, position)
 end
 
---- Orders a group of units to move off a factory build site. See `IssueToUnitMoveOffFactory` when you want to apply it to a single unit efficiently
+--- Orders a group of units to move off a factory build site. See `IssueToUnitMoveOffFactory` when you want to computationally efficiently apply it to a single unit
 ---@param units Unit[]
 ---@param position Vector
 ---@return SimCommand

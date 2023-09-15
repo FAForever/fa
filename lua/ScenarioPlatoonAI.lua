@@ -624,7 +624,7 @@ function EngineersBuildPlatoon(platoon)
             for strName, tblData in unitGroup do
                 if eng and aiBrain:CanBuildStructureAt(tblData.type, tblData.Position) then
                     IssueStop({eng})
-                    IssueClearCommands({eng})
+                    IssueToUnitClearCommands(eng)
                     local result = aiBrain:BuildStructure(eng, tblData.type, {tblData.Position[1], tblData.Position[3], 0}, false)
                     unitBeingBuilt = false
 
@@ -1067,7 +1067,7 @@ function StartBaseBuildUnits(eng, engTable, data, aiBrain)
             if unit then
                 if aiBrain:CanBuildStructureAt(unit.type, unit.Position) then
                     IssueStop({eng})
-                    IssueClearCommands({eng})
+                    IssueToUnitClearCommands(eng)
                     local result = aiBrain:BuildStructure(eng, unit.type, {unit.Position[1], unit.Position[3], 0}, false)
                     if result then
                         unitBeingBuilt = eng.UnitBeingBuilt
@@ -1113,7 +1113,7 @@ function StartBaseGroupOnceBuild(eng, engTable, data, aiBrain)
         for _, v in buildGroup do
             if aiBrain:CanBuildStructureAt(v.type, v.Position) then
                 IssueStop({eng})
-                IssueClearCommands({eng})
+                IssueToUnitClearCommands(eng)
                 local result = aiBrain:BuildStructure(eng, v.type, {v.Position[1], v.Position[3], 0}, false)
                 if result then
                     unitBeingBuilt = eng.UnitBeingBuilt
@@ -1403,7 +1403,7 @@ function EngineerBuildStructure(aiBrain, builder, building, brainBaseTemplate, b
                     if m > 1 then
                         if aiBrain:CanBuildStructureAt(structureCategory, {location[1], 0, location[2]}) then
                             IssueStop({builder})
-                            IssueClearCommands({builder})
+                            IssueToUnitClearCommands(euider})
                             local result = aiBrain:BuildStructure(builder, structureCategory, location, false)
                             if result then
                                 return true
@@ -1416,7 +1416,7 @@ function EngineerBuildStructure(aiBrain, builder, building, brainBaseTemplate, b
     else
         if aiBrain:FindPlaceToBuild(building, structureCategory, brainBaseTemplate, false, nil) then
             IssueStop({builder})
-            IssueClearCommands({builder})
+            IssueToUnitClearCommands(euider})
             if AIBuildStructures.AIExecuteBuildStructure(aiBrain, builder, building, builder, false,
                                                          buildingTemplate, brainBaseTemplate) then
                 return true
@@ -1653,7 +1653,7 @@ function ReorganizeEngineers(platoon, engTable)
                                 brainFacData.NumEngs = brainFacData.NumEngs + 1
                             end
                         end
-                        IssueClearCommands({moveEng})
+                        IssueToUnitClearCommands(eovEng})
                         IssueGuard({moveEng}, facLowData.Factory)
                         break
                     end
@@ -1692,7 +1692,7 @@ function EngAssist(platoon, engTable)
                         break
                     end
                 end
-                IssueClearCommands({eng})
+                IssueToUnitClearCommands(eng)
                 IssueGuard({eng}, lowFac.Factory)
                 table.remove(engTable, engNum)
             else
