@@ -884,7 +884,9 @@ end
 function IssueMoveOffFactory(units, position)
 end
 
---- Orders a unit to move off a factory build site. This global is not compatible with the Steam version of the game. See `IssueMoveOffFactory` when you want to apply the order to a group of units
+--- Orders a unit to move off a factory build site. See `IssueMoveOffFactory` when you want to apply the order to a group of units.
+---
+--- This use of this function is **not** compatible with the Steam version of the game.
 ---@param units Unit[]
 ---@param position Vector
 ---@return SimCommand
