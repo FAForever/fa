@@ -773,7 +773,7 @@ end
 function IssueCapture(units, target)
 end
 
---- Clears out all commands issued on the group of units, this happens immediately
+--- Clears out all commands issued on the group of units, this happens immediately. See `IssueToUnitClearCommands` when you want to computationally efficiently apply it to a single unit 
 ---@param units Unit[]
 ---@return SimCommand
 function IssueClearCommands(units)

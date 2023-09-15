@@ -1380,7 +1380,7 @@ end
 --- Utility Function
 --- Has an engineer build a certain type of structure using a base template
 ---@param aiBrain AIBrain
----@param builder Builder
+---@param builder Unit
 ---@param building StructureUnit
 ---@param brainBaseTemplate any
 ---@param buildingTemplate any
@@ -1403,7 +1403,7 @@ function EngineerBuildStructure(aiBrain, builder, building, brainBaseTemplate, b
                     if m > 1 then
                         if aiBrain:CanBuildStructureAt(structureCategory, {location[1], 0, location[2]}) then
                             IssueStop({builder})
-                            IssueToUnitClearCommands(euider})
+                            IssueToUnitClearCommands(builder)
                             local result = aiBrain:BuildStructure(builder, structureCategory, location, false)
                             if result then
                                 return true
@@ -1416,7 +1416,7 @@ function EngineerBuildStructure(aiBrain, builder, building, brainBaseTemplate, b
     else
         if aiBrain:FindPlaceToBuild(building, structureCategory, brainBaseTemplate, false, nil) then
             IssueStop({builder})
-            IssueToUnitClearCommands(euider})
+            IssueToUnitClearCommands(builder)
             if AIBuildStructures.AIExecuteBuildStructure(aiBrain, builder, building, builder, false,
                                                          buildingTemplate, brainBaseTemplate) then
                 return true

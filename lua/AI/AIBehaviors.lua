@@ -994,13 +994,13 @@ function FatboyChildBehavior(self, parent, base)
         local units = self:GetPlatoonUnits()
         if not base then
             -- Wrecked base. Kill AI thread
-            IssueToUnitClearCommands(nits
+            IssueClearCommands(units)
             IssueGuard(units, parent)
             return
         end
 
         if targetUnit then
-            IssueToUnitClearCommands(nits
+            IssueClearCommands(units)
             IssueAggressiveMove(units, targetUnit)
         end
 

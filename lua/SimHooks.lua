@@ -133,6 +133,11 @@ IssueToUnitMoveOffFactory = function(unit, position)
     return IssueMoveOffFactory(UnitsCache, position)
 end
 
+--- Clears out all commands issued on the unit, this happens immediately. See `IssueClearCommands` when you want to apply the order to a group of units.
+---
+--- This use of this function is **not** compatible with the Steam version of the game.
+---@param unit Unit
+---@return SimCommand
 IssueToUnitClearCommands = function(unit)
     UnitsCache[1] = unit
     return IssueClearCommands(UnitsCache)
