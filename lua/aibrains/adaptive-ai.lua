@@ -145,6 +145,7 @@ AIBrain = Class(StandardBrain, EconomyComponent) {
         self.GridReclaim = import("/lua/ai/gridreclaim.lua").Setup(self)
         self.GridBrain = import("/lua/ai/gridbrain.lua").Setup()
         self.GridRecon = import("/lua/ai/gridrecon.lua").Setup(self)
+        self.GridDeposits = import("/lua/ai/griddeposits.lua").Setup()
         self.GridPresence = import("/lua/AI/GridPresence.lua").Setup(self)
     end,
 

@@ -44,6 +44,22 @@ AIPlatoonAdaptiveRaidBehavior = Class(AIPlatoon) {
                 self:ChangeState(self.Error)
                 return
             end
+            local aiBrain = self:GetBrain()
+            if not aiBrain.GridPresence then
+                self:LogWarning('requires grid presence class setup')
+                self:ChangeState(self.Error)
+                return
+            end
+            if not aiBrain.GridPresence then
+                self:LogWarning('requires GridPresence class setup')
+                self:ChangeState(self.Error)
+                return
+            end
+            if not aiBrain.GridDeposits then
+                self:LogWarning('requires GridDeposits class setup')
+                self:ChangeState(self.Error)
+                return
+            end
 
             -- Set the movement layer for pathing, included for mods where water or air based engineers may exist
             self.MovementLayer = self:GetNavigationalLayer()
@@ -65,6 +81,7 @@ AIPlatoonAdaptiveRaidBehavior = Class(AIPlatoon) {
             self.OpportunityToRaid = nil
             self.ThreatToEvade = nil
             self.RetreatCount = 0
+            local aiBrain = self:GetBrain()
 
             self:Stop()
 
@@ -89,11 +106,15 @@ AIPlatoonAdaptiveRaidBehavior = Class(AIPlatoon) {
                 for k = 1, count do
                     local expansion = expansions[k]
                     if expansion.NavLabel == label then
-                        candidates[candidateCount + 1] = expansion
-                        candidateCount = candidateCount + 1
+                        if aiBrain.GridPresence:GetInferredStatus(position) ~= 'Allied' then
+                            candidates[candidateCount + 1] = expansion
+                            candidateCount = candidateCount + 1
+                        end
                     elseif not NavUtils.CanPathTo(self.MovementLayer, position, expansion.position) then
-                        unpathableCandidates[unpathableCandidateCount + 1] = expansion
-                        unpathableCandidateCount = unpathableCandidateCount + 1
+                        if aiBrain.GridPresence:GetInferredStatus(position) ~= 'Allied' then
+                            unpathableCandidates[unpathableCandidateCount + 1] = expansion
+                            unpathableCandidateCount = unpathableCandidateCount + 1
+                        end
                     end
                 end
                 -- END OF TODO

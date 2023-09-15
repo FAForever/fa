@@ -204,6 +204,13 @@ local function FindLeaf(grid, position)
     return leaf
 end
 
+---@param grid NavGrid
+---@param position Vector A position in world space
+---@return CompressedLabelTreeRoot?
+local FindRoot = function(grid, position)
+    return grid:FindRootXZ(position[1], position[3])
+end
+
 ---@param destination CompressedLabelTreeLeaf 
 ---@return Vector[]
 ---@return number   # Number of points in path

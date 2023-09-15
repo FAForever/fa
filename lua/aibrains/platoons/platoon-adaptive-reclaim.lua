@@ -27,6 +27,7 @@ AIPlatoonAdaptiveReclaimBehavior = Class(AIPlatoon) {
         ---@param self AIPlatoonAdaptiveReclaimBehavior
         Main = function(self)
             local brain = self:GetBrain()
+            LOG('Starting Reclaim state machine')
 
             if not self.SearchRadius then
                 local maxMapDimension = math.max(ScenarioInfo.size[1], ScenarioInfo.size[2])
@@ -141,7 +142,7 @@ AIPlatoonAdaptiveReclaimBehavior = Class(AIPlatoon) {
                     return
                 end
                 self:LogWarning(string.format('no reclaim target found'))
-                local closestManager 
+                local closestManagerDist
                 local returnPos
                 if eng.BuilderManagerData.EngineerManager.Location then
                     returnPos = eng.BuilderManagerData.EngineerManager.Location
@@ -149,12 +150,15 @@ AIPlatoonAdaptiveReclaimBehavior = Class(AIPlatoon) {
                 if not returnPos then
                     for _,v in brain.BuilderManagers do
                         local basePos = v.EngineerManager:GetLocationCoords()
-                        if not closestManager or (VDist3Sq(engPos, basePos) < closestManager and NavUtils.CanPathTo('Amphibious', engPos, basePos)) then
+                        local baseDist = VDist3Sq(engPos, basePos)
+                        if not closestManagerDist or (baseDist < closestManagerDist and NavUtils.CanPathTo('Amphibious', engPos, basePos)) then
+                            closestManagerDist = baseDist
                             returnPos = basePos
                         end
                     end
                 end
                 if returnPos and VDist3Sq(engPos, returnPos) < 6400 then
+                    LOG('Exiting Reclaim state machine')
                     self:ExitStateMachine()
                 elseif returnPos then
                     self.LocationToReclaim = returnPos
@@ -198,16 +202,17 @@ AIPlatoonAdaptiveReclaimBehavior = Class(AIPlatoon) {
                 self:ChangeState(self.Transporting)
                 return
             end
+            self:LogDebug(string.format('Reclaim engineer navigating to position '..repr(destination)))
 
             while not IsDestroyed(self) do
                 local origin = eng:GetPosition()
 
                 -- generate a direction
-                local waypoint, length = NavUtils.DirectionTo('Land', origin, destination, 60)
+                local waypoint, length = NavUtils.DirectionTo(self.MovementLayer, origin, destination, 50)
 
                 -- something odd happened: no direction found
                 if not waypoint then
-                    self:LogWarning(string.format('no path found'))
+                    self:LogWarning(string.format('No Direction waypoint returned'))
                     self:ChangeState(self.Searching)
                     return
                 end
@@ -245,7 +250,7 @@ AIPlatoonAdaptiveReclaimBehavior = Class(AIPlatoon) {
                             end
                         end
                         if not IsDestroyed(eng) then
-                            local bool, markers = AIUtils.CanBuildOnLocalMassPoints(brain, eng:GetPosition(), 25)
+                            local bool, markers = AIUtils.CanBuildOnGridMassPoints(brain, eng:GetPosition(), 35, self.MovementLayer)
                             if bool then
                                 self.MassPointTable = markers
                                 self:ChangeState(self.BuilderStructure)
