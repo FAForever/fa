@@ -884,15 +884,6 @@ end
 function IssueMoveOffFactory(units, position)
 end
 
---- Orders a unit to move off a factory build site. See `IssueMoveOffFactory` when you want to apply the order to a group of units.
----
---- This use of this function is **not** compatible with the Steam version of the game.
----@param units Unit[]
----@param position Vector
----@return SimCommand
-function IssueMoveOffFactoryToUnit(units, position)
-end
-
 --- Orders a group of units to launch a strategic missile at a position
 ---@see IssueTactical() # for tactical missiles
 ---@param units Unit[]

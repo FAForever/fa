@@ -1,6 +1,6 @@
 ---@declare-global
 
-do 
+do
     -- can only cause issues, like remote code exploit
     _G.loadstring = nil
 end
@@ -23,15 +23,15 @@ do
     _G.GetUnitsInRect = function(rtlx, tlz, brx, brz)
 
         -- try and retrieve units
-        local units 
-        if brx then 
+        local units
+        if brx then
             units = oldGetUnitsInRect(rtlx, tlz, brx, brz)
         else
             units = oldGetUnitsInRect(rtlx)
         end
 
         -- as it can return nil, check if we have any units
-        if units then 
+        if units then
             units = EntityCategoryFilterDown(CategoriesNoDummyUnits, units)
         end
 
@@ -107,23 +107,25 @@ do
     end
 end
 
-do
-    ---@type { [1]: Unit }
-    local UnitsCache = {}
 
-    ---@param unit Unit
-    ---@param position Vector
-    ---@return SimCommand
-    _G.IssueMoveToUnit = function(unit, position)
-        UnitsCache[1] = unit
-        return IssueMove(UnitsCache, position)
-    end
+---@type { [1]: Unit }
+local UnitsCache = {}
 
-    ---@param unit Unit
-    ---@param position Vector
-    ---@return SimCommand
-    _G.IssueMoveOffFactoryToUnit = function(unit, position)
-        UnitsCache[1] = unit
-        return IssueMoveOffFactory(UnitsCache, position)
-    end
+---@param unit Unit
+---@param position Vector
+---@return SimCommand
+IssueMoveToUnit = function(unit, position)
+    UnitsCache[1] = unit
+    return IssueMove(UnitsCache, position)
+end
+
+--- Orders a unit to move off a factory build site. See `IssueMoveOffFactory` when you want to apply the order to a group of units.
+---
+--- This use of this function is **not** compatible with the Steam version of the game.
+---@param unit Unit
+---@param position Vector
+---@return SimCommand
+IssueMoveOffFactoryToUnit = function(unit, position)
+    UnitsCache[1] = unit
+    return IssueMoveOffFactory(UnitsCache, position)
 end
