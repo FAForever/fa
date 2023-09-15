@@ -1,6 +1,6 @@
 local Grid = import("/lua/ai/grid.lua").Grid
 local MarkerUtilities = import("/lua/sim/MarkerUtilities.lua")
-local NavUtils = import("/lua/sim/NavUtils.lua")
+local NavUtils = import("/lua/sim/navutils.lua")
 
 -- upvalue scope for performance
 local TableGetn = table.getn
@@ -379,5 +379,9 @@ GridPresence = Class(Grid) {
 ---@param brain moho.aibrain_methods
 ---@return AIGridPresence
 Setup = function(brain)
+
+    -- requires the navigational mesh
+    NavUtils.Generate()
+
     return GridPresence(brain)
 end
