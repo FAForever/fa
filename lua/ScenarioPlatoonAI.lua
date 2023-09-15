@@ -1653,7 +1653,7 @@ function ReorganizeEngineers(platoon, engTable)
                                 brainFacData.NumEngs = brainFacData.NumEngs + 1
                             end
                         end
-                        IssueToUnitClearCommands({moveEng})
+                        IssueToUnitClearCommands(moveEng)
                         IssueGuard({moveEng}, facLowData.Factory)
                         break
                     end
