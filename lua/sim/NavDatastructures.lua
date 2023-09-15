@@ -152,8 +152,7 @@ NavPathToHeap = ClassSimple {
         local heap = self.Heap
         local index = self.HeapSize
 
-        -- math.floor(index / 2)
-        local parent = index >> 1
+        local parent = math.floor(index / 2)
         while parent >= 1 do
 
             -- if parent value is smaller than index value it means we restored correct order of the elements
@@ -169,8 +168,7 @@ NavPathToHeap = ClassSimple {
             -- and update index and parent indexes
             index = parent
 
-            -- math.floor(parent / 2)
-            parent = parent >> 1
+            parent = math.floor(parent / 2)
         end
     end,
 

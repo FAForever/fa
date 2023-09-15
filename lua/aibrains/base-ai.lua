@@ -144,6 +144,7 @@ AIBrain = Class(StandardBrain) {
         -- requires these datastructures to understand the game
         self.GridReclaim = import("/lua/ai/gridreclaim.lua").Setup(self)
         self.GridBrain = import("/lua/ai/gridbrain.lua").Setup()
+        self.GridDeposits = import("/lua/ai/griddeposits.lua").Setup()
         self.GridRecon = import("/lua/ai/gridrecon.lua").Setup(self)
     end,
 

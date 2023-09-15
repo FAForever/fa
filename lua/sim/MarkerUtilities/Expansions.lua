@@ -54,8 +54,8 @@ function Generate()
     local threshold = 400 + mapSize
 
     local function ComputeBlock(px, pz)
-        local bx = ((px * mapFactor) ^ 0) + 1
-        local bz = ((pz * mapFactor) ^ 0) + 1
+        local bx = math.floor(px * mapFactor) + 1
+        local bz = math.floor(pz * mapFactor) + 1
         return bx, bz
     end
 

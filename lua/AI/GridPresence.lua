@@ -1,6 +1,6 @@
 local Grid = import("/lua/ai/grid.lua").Grid
 local MarkerUtilities = import("/lua/sim/MarkerUtilities.lua")
-local NavUtils = import("/lua/sim/NavUtils.lua")
+local NavUtils = import("/lua/sim/navutils.lua")
 
 -- upvalue scope for performance
 local TableGetn = table.getn
@@ -213,7 +213,7 @@ GridPresence = Class(Grid) {
 
                     -- shuffle the order
                     for k = headA - 1, 1, -1 do
-                        local j = (Random() * (k - 1) + 1) ^ 0;
+                        local j = math.floor(Random() * (k - 1) + 1);
                         local value = iterationA[j];
                         iterationA[j] = iterationA[k];
                         iterationA[k] = value;
@@ -379,5 +379,9 @@ GridPresence = Class(Grid) {
 ---@param brain moho.aibrain_methods
 ---@return AIGridPresence
 Setup = function(brain)
+
+    -- requires the navigational mesh
+    NavUtils.Generate()
+
     return GridPresence(brain)
 end
