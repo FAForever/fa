@@ -89,7 +89,7 @@ XEB2402 = ClassUnit(TAirFactoryUnit) {
 
                 -- Release unit
                 self.Satellite:DetachFrom()
-                IssueMove({self.Satellite}, self:GetRallyPoint())
+                IssueToUnitMove(self.Satellite, self:GetRallyPoint())
                 self.Satellite:Open()
 
                 self.waitingForLaunch = false

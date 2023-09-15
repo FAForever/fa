@@ -668,7 +668,7 @@ function GetTransports( platoon, aiBrain)
                 
 				AssignUnitsToPlatoon( aiBrain, transportplatoon, {transport}, 'Support', 'BlockFormation')
 				IssueClearCommands({transport})
-				IssueMove( {transport}, location )
+				IssueToUnitMove(transport, location )
 
                 while neededTable.Large >= 1 and AvailableSlots.Large >= 1 do
                     neededTable.Large = neededTable.Large - 1.0
@@ -856,17 +856,17 @@ function ReturnTransportsToPool( aiBrain, units, move )
                         end
                         -- use path
                         for _,p in safePath do
-                            IssueMove( {v}, p )
+                            IssueToUnitMove(v, p )
                         end
                     else
                         if TransportDialog then
                             LOG("*AI DEBUG "..aiBrain.Nickname.." "..returnpool.BuilderName.." Transport "..v.EntityId.." no safe path for RTB -- home -- after drop - going direct")
                         end
                         -- go direct -- possibly bad
-                        IssueMove( {v}, baseposition )
+                        IssueToUnitMove(v, baseposition )
                     end
                 else
-                    IssueMove( {v}, baseposition)
+                    IssueToUnitMove(v, baseposition)
                 end
 
 				-- move the unit to the correct pool - pure transports to Transport Pool
@@ -1775,7 +1775,7 @@ function WatchUnitLoading( transport, units, aiBrain, UnitPlatoon)
 	
     -- At this point we really should safepath to the position
     -- and we should probably use a movement thread 
-	IssueMove( {transport}, GetPosition(units[1]) )
+	IssueToUnitMove(transport, GetPosition(units[1]) )
 	WaitTicks(5)
 	
 	for _,u in newunits do
@@ -2004,7 +2004,7 @@ function WatchTransportTravel( transport, destination, aiBrain, UnitPlatoon )
 				end
 
 				IssueClearCommands( {transport} )
-				IssueMove( {transport}, destination )
+				IssueToUnitMove(transport, destination )
 			end
 		
 			-- this needs some examination -- it should signal the entire transport platoon - not just itself --

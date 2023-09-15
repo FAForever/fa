@@ -2310,7 +2310,7 @@ function MoveOnMap(unit)
     end
 
     IssueClearCommands({unit})
-    IssueMove({unit}, nearestPoint)
+    IssueToUnitMove(unit, nearestPoint)
 end
 
 --- Returns if the unit's army is human

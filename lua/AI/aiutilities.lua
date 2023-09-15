@@ -2020,10 +2020,10 @@ function ReturnTransportsToPool(units, move)
             if move then
                 if safePath then
                     for _, p in safePath do
-                        IssueMove({unit}, p)
+                        IssueToUnitMove(unit, p)
                     end
                 else
-                    IssueMove({unit}, position)
+                    IssueToUnitMove(unit, position)
                 end
             end
         end
@@ -2114,7 +2114,7 @@ function EngineerMoveWithSafePath(aiBrain, unit, destination)
             -- Move to way points (but not to destination... leave that for the final command)
             for widx, waypointPath in path do
                 if pathSize ~= widx then
-                    IssueMove({unit}, waypointPath)
+                    IssueToUnitMove(unit, waypointPath)
                 end
             end
         end
@@ -3206,7 +3206,7 @@ function EngAvoidLocalDanger(aiBrain, eng)
                 end
             else
                 IssueClearCommands({eng})
-                IssueMove({eng}, ShiftPosition(enemyUnitPos, engPos, 50, false))
+                IssueToUnitMove(eng, ShiftPosition(enemyUnitPos, engPos, 50, false))
                 coroutine.yield(60)
                 action = true
             end

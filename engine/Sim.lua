@@ -877,7 +877,7 @@ end
 function IssueMove(units, position)
 end
 
---- Orders a group of units to move off a factory build site. See `IssueMoveOffFactoryToUnit` when you want to apply it to a single unit efficiently
+--- Orders a group of units to move off a factory build site. See `IssueToUnitMoveOffFactory` when you want to apply it to a single unit efficiently
 ---@param units Unit[]
 ---@param position Vector
 ---@return SimCommand

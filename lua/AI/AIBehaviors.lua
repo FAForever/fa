@@ -194,8 +194,8 @@ function CDROverCharge(aiBrain, cdr)
                         IssueOverCharge({cdr}, target)
                     elseif target and not target.Dead then -- Commander attacks even if not enough energy for overcharge
                         IssueClearCommands({cdr})
-                        IssueMove({cdr}, targetPos)
-                        IssueMove({cdr}, cdr.CDRHome)
+                        IssueToUnitMove(cdr, targetPos)
+                        IssueToUnitMove(cdr, cdr.CDRHome)
                     end
                 elseif distressLoc then
                     enemyThreat = aiBrain:GetThreatAtPosition(distressLoc, 1, true, 'AntiSurface')
@@ -206,8 +206,8 @@ function CDROverCharge(aiBrain, cdr)
                     end
                     if distressLoc and (Utilities.XZDistanceTwoVectors(distressLoc, cdrPos) < distressRange) then
                         IssueClearCommands({cdr})
-                        IssueMove({cdr}, distressLoc)
-                        IssueMove({cdr}, cdr.CDRHome)
+                        IssueToUnitMove(cdr, distressLoc)
+                        IssueToUnitMove(cdr, cdr.CDRHome)
                     end
                 end
             end
@@ -269,7 +269,7 @@ function CDRReturnHome(aiBrain, cdr)
                 return
             end
             IssueStop({cdr})
-            IssueMove({cdr}, loc)
+            IssueToUnitMove(cdr, loc)
             cdr.GoingHome = true
             WaitSeconds(7)
         until cdr.Dead or VDist2Sq(cdrPos[1], cdrPos[3], loc[1], loc[3]) <= distSqAway
@@ -891,7 +891,7 @@ function FatBoyBehavior(self)
 
             local useMove = InWaterCheck(self)
             if useMove then
-                IssueMove({experimental}, targetUnit:GetPosition())
+                IssueToUnitMove(experimental, targetUnit:GetPosition())
             else
                 IssueAttack({experimental}, targetUnit)
             end
@@ -1125,7 +1125,7 @@ function TempestBuiltUnitMoveOut(unit, platoon, position, heading)
     local counter = 0
     repeat
         IssueClearCommands({unit})
-        IssueMove({unit}, position)
+        IssueToUnitMove(unit, position)
         WaitSeconds(5)
         if unit.Dead then
             return
@@ -1159,12 +1159,12 @@ CzarBehavior = function(self)
 
             -- Move to the target without attacking. This will get it out of your base without the beam on.
             if targetUnit and VDist3(targetUnit:GetPosition(), experimental:GetPosition()) > 50 then
-                IssueMove({experimental}, targetUnit:GetPosition())
+                IssueToUnitMove(experimental, targetUnit:GetPosition())
             else
                 IssueAttack({experimental}, experimental:GetPosition())
                 WaitTicks(5)
 
-                IssueMove({experimental}, targetUnit:GetPosition())
+                IssueToUnitMove(experimental, targetUnit:GetPosition())
             end
         end
 
@@ -1178,7 +1178,7 @@ CzarBehavior = function(self)
                 IssueAttack({experimental}, experimental:GetPosition())
                 WaitTicks(5)
 
-                IssueMove({experimental}, nearCommander:GetPosition())
+                IssueToUnitMove(experimental, nearCommander:GetPosition())
                 targetUnit = nearCommander
             end
             WaitSeconds(1)
@@ -1397,14 +1397,14 @@ function CDRHideBehavior(aiBrain, cdr)
         if category then
             runPos = AIUtils.AIFindDefensiveAreaSorian(aiBrain, cdr, category, 100, runShield)
             IssueClearCommands({cdr})
-            IssueMove({cdr}, runPos)
+            IssueToUnitMove(cdr, runPos)
         end
 
         if not category or not runPos then
             local x, z = aiBrain:GetArmyStartPos()
             runPos = AIUtils.RandomLocation(x, z)
             IssueClearCommands({cdr})
-            IssueMove({cdr}, runPos)
+            IssueToUnitMove(cdr, runPos)
         end
     end
 end

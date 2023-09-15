@@ -183,7 +183,7 @@ UES0401 = ClassUnit(AircraftCarrier, ExternalFactoryComponent) {
                 self:AddUnitToStorage(unitBuilding)
             else
                 local worldPos = self:CalculateWorldPositionFromRelative({0, 0, -20})
-                IssueMoveOffFactoryToUnit(unitBuilding, worldPos)
+                IssueToUnitMoveOffFactory(unitBuilding, worldPos)
                 unitBuilding:ShowBone(0,true)
             end
 

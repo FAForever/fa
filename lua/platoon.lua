@@ -4351,7 +4351,7 @@ Platoon = Class(moho.platoon_methods) {
                 eng.CellAssigned = {reclaimTargetX, reclaimTargetZ}
                 brainGridInstance:AddReclaimingEngineer(brainCell, eng)
                 local moveLocation = reclaimGridInstance:ToWorldSpace(reclaimTargetX, reclaimTargetZ)
-                IssueMove({eng}, moveLocation)
+                IssueToUnitMove(eng, moveLocation)
                 local engStuckCount = 0
                 local Lastdist
                 local dist = VDist3Sq(eng:GetPosition(), moveLocation)
@@ -4364,7 +4364,7 @@ Platoon = Class(moho.platoon_methods) {
                         local actionTaken = AIUtils.EngAvoidLocalDanger(aiBrain, eng)
                         if actionTaken then
                             -- Statemachine switch to evaluating next action to take
-                            IssueMove({eng}, moveLocation)
+                            IssueToUnitMove(eng, moveLocation)
                         end
                     else
                         -- Jip discussed potentially getting navmesh to return mass points along the path rather than this.
@@ -4374,13 +4374,13 @@ Platoon = Class(moho.platoon_methods) {
                             if reclaimAction then
                                 WaitTicks(45)
                                 -- Statemachine switch to evaluating next action to take
-                                IssueMove({eng}, moveLocation)
+                                IssueToUnitMove(eng, moveLocation)
                             end
                         end
                         local extractorAction = AIUtils.EngLocalExtractorBuild(aiBrain, eng)
                         if extractorAction then
                             -- Statemachine switch to evaluating next action to take
-                            IssueMove({eng}, moveLocation)
+                            IssueToUnitMove(eng, moveLocation)
                         end
                     end
                     dist = VDist3Sq(eng:GetPosition(), moveLocation)
@@ -4563,7 +4563,7 @@ Platoon = Class(moho.platoon_methods) {
         elseif next(buildMassDistantPoints) then
             whatToBuild = aiBrain:DecideWhatToBuild(eng, 'T1Resource', buildingTmpl)
             for k, v in buildMassDistantPoints do
-                IssueMove({eng}, v.position )
+                IssueToUnitMove(eng, v.position )
                 while VDist2Sq(engPos[1],engPos[3],v.position[1],v.position[3]) > 165 do
                     coroutine.yield(5)
                     engPos = eng:GetPosition()
@@ -4689,7 +4689,7 @@ Platoon = Class(moho.platoon_methods) {
             if table.getn(buildMassDistantPoints) < 3 then
                 for k, v in buildMassDistantPoints do
                     if aiBrain:CanBuildStructureAt('ueb1103', v.position) then
-                        IssueMove({eng}, v.position )
+                        IssueToUnitMove(eng, v.position )
                         while VDist2Sq(engPos[1],engPos[3],v.position[1],v.position[3]) > 165 do
                             coroutine.yield(5)
                             engPos = eng:GetPosition()
@@ -4814,7 +4814,7 @@ Platoon = Class(moho.platoon_methods) {
         if hydroPresent and (closeMarkers > 0 or distantMarkers > 0) then
             engPos = eng:GetPosition()
             if VDist3Sq(engPos,closestHydro.Position) > 144 then
-                IssueMove({eng}, closestHydro.Position )
+                IssueToUnitMove(eng, closestHydro.Position )
                 while VDist3Sq(engPos,closestHydro.Position) > 100 do
                     coroutine.yield(5)
                     engPos = eng:GetPosition()

@@ -86,13 +86,13 @@ function CDROverChargeThread( cdr )
                             elseif not target:IsDead() then
                                 local tarPos = target:GetPosition()
                                 IssueClearCommands( {cdr} )
-                                IssueMove( {cdr}, tarPos )
+                                IssueToUnitMove(cdr, tarPos )
                                 if cdr.CDRData and cdr.CDRData.LeashPosition then
                                     local tempPos = ScenarioUtils.MarkerToPosition(cdr.CDRData.LeashPosition)
                                     startX = tempPos[1]
                                     startZ = tempPos[3]
                                 end
-                                IssueMove( {cdr}, {startX, 0, startZ} )
+                                IssueToUnitMove(cdr, {startX, 0, startZ} )
                             end
                         end
                     end
@@ -121,7 +121,7 @@ function CDROverChargeThread( cdr )
                     end
                     cdr.Fighting = false
                     if overCharging then
-                        IssueMove( {cdr}, {startX, 0, startZ} )
+                        IssueToUnitMove(cdr, {startX, 0, startZ} )
                     end
                 end
                 --LOG('*AI DEBUG: ARMY ', repr(aiBrain:GetArmyIndex()),  ': CDR AI DEACTIVATE - Nothing to see here!')

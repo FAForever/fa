@@ -89,9 +89,9 @@ URA0001 = ClassUnit(CAirUnit) {
     IdleState = State {
         Main = function(self)
             IssueClearCommands({self})
-            IssueMove({self}, self:GetPosition())
+            IssueToUnitMove(self, self:GetPosition())
             WaitSeconds(0.5)
-            IssueMove({self}, self.spawnedBy:GetPosition())
+            IssueToUnitMove(self, self.spawnedBy:GetPosition())
 
             local delay = 0.1
             local wait = 0
