@@ -89,7 +89,7 @@ UAL0401 = ClassUnit(AWalkingLandUnit) {
         AWalkingLandUnit.StartBeingBuiltEffects(self, builder, layer)
         CreateAeonColossusBuildingEffects(self)
         -- adjust collision box due to build animation
-        self:SetCollisionShape('Box',0.3,3.25,-0.55,self.Blueprint.SizeX * 0.5, self.Blueprint.SizeY * 0.5, (self.Blueprint.SizeZ * 0.7))
+        self:SetCollisionShape('Box',0.3,3.25,-0.65,self.Blueprint.SizeX * 0.5, self.Blueprint.SizeY * 0.5, (self.Blueprint.SizeZ * 0.7))
     end,
 
     OnStopBeingBuilt = function(self,builder,layer)
