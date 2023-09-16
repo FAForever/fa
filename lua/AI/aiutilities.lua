@@ -345,19 +345,17 @@ end
 function AIGetMarkerLocations(aiBrain, markerType)
     local markerList = {}
     if markerType == 'Start Location' then
-        local tempMarkers = AIGetMarkerLocations(aiBrain, 'Blank Marker')
+        local tempMarkers = AIGetMarkerLocations(aiBrain, 'Spawn')
         for k, v in tempMarkers do
             if string.sub(v.Name, 1, 5) == 'ARMY_' then
                 table.insert(markerList, {Position = v.Position, Name = v.Name})
             end
         end
     else
-        local markers = ScenarioUtils.GetMarkers()
+        local markers = import("/lua/sim/markerutilities.lua").GetMarkersByType(markerType)
         if markers then
             for k, v in markers do
-                if v.type == markerType then
-                    table.insert(markerList, {Position = v.position, Name = k})
-                end
+                table.insert(markerList, {Position = v.position, Name = k})
             end
         end
     end
@@ -506,7 +504,7 @@ end
 function AIGetMarkerLeastUnits(aiBrain, markerType, markerRadius, pos, posRad, unitCount, unitCat, tMin, tMax, tRings, tType)
     local markers = {}
     if markerType == 'Start Location' then
-        local tempMarkers = AIGetMarkersAroundLocation(aiBrain, 'Blank Marker', pos, posRad, tMin, tMax, tRings, tType)
+        local tempMarkers = AIGetMarkersAroundLocation(aiBrain, 'Spawn', pos, posRad, tMin, tMax, tRings, tType)
         local startX, startZ = aiBrain:GetArmyStartPos()
         for k, v in tempMarkers do
             if string.sub(v.Name, 1, 5) == 'ARMY_' and VDist2(startX, startZ, v.Position[1], v.Position[3]) > 20 then
@@ -3100,9 +3098,10 @@ function AIFindFurthestStartLocationNeedsEngineer(aiBrain, locationType, radius,
     end
 
     local validPos = AIGetMarkersAroundLocation(aiBrain, 'Large Expansion Area', pos, radius, tMin, tMax, tRings, tType)
-    local positions = AIGetMarkersAroundLocation(aiBrain, 'Blank Marker', pos, radius, tMin, tMax, tRings, tType)
+    local positions = AIGetMarkersAroundLocation(aiBrain, 'Spawn', pos, radius, tMin, tMax, tRings, tType)
     local startX, startZ = aiBrain:GetArmyStartPos()
     for _, v in positions do
+        LOG('AIFindFurthestStartLocationNeedsEngineer '..repr(v))
         if string.sub(v.Name, 1, 5) == 'ARMY_' then
             if startX ~= v.Position[1] and startZ ~= v.Position[3] then
                 table.insert(validPos, v)
