@@ -153,6 +153,8 @@ TDFGaussCannonProjectile = ClassProjectile(TDFGeneralGaussCannonProjectile) {
     FxImpactUnit = EffectTemplate.TGaussCannonHitUnit01,
     FxImpactProp = EffectTemplate.TGaussCannonHitUnit01,
     FxImpactLand = EffectTemplate.TGaussCannonHitLand01,
+    FxImpactWater = EffectTemplate.TGaussWaterSplash01,
+    FxWaterHitScale = 0.75,
 }
 
 --- (UES0201) UEF Destroyer

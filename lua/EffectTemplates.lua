@@ -1911,6 +1911,12 @@ TGaussCannonHit01 = {
     EmtBpPath .. 'gauss_cannon_hit_04_emit.bp',
     EmtBpPath .. 'gauss_cannon_hit_05_emit.bp',
 }
+
+TGaussWaterSplash01 = {
+    EmtBpPath .. 'gauss_cannon_hit_02_emit.bp',
+    EmtBpPath .. 'gauss_cannon_hit_05_emit.bp',
+}
+
 TGaussCannonHit02 = {
     EmtBpPath .. 'gauss_cannon_hit_01_emit.bp',
     EmtBpPath .. 'gauss_cannon_hit_02_emit.bp',
