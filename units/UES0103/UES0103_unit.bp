@@ -190,7 +190,7 @@ UnitBlueprint{
         TurnRadius = 10,
         TurnRate = 60,
     },
-    SelectionSizeX = 0.75,
+    SelectionSizeX = 0.65,
     SelectionSizeZ = 2.75,
     SelectionThickness = 0.25,
     CollisionOffsetY = -0.4,
