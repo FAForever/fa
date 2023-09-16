@@ -3,6 +3,7 @@ UnitBlueprint{
     AI = {
         AttackAngle = 60,
         GuardScanRadius = 40,
+        TargetBones = { 'Turret_Front', 'Turret_Back', 'Projectile01', 'Projectile02', 'Exhaust01', 'Exhaust02' }
     },
     Audio = {
         AmbientMove = Sound { Bank = 'UAS',        Cue = 'UAS0103_Move_Loop',  LodCutoff = 'UnitMove_LodCutoff' },
@@ -217,7 +218,7 @@ UnitBlueprint{
             RackBones = {
                 {
                     MuzzleBones = { "Turret_Front_Muzzle" },
-                    RackBone = "Turret_Front_Barrel",
+                    RackBone = "Turret_Front_Muzzle",
                 },
             },
             RackFireTogether = false,
@@ -276,7 +277,7 @@ UnitBlueprint{
             RackBones = {
                 {
                     MuzzleBones = { "Turret_Back_Muzzle" },
-                    RackBone = "Turret_Back",
+                    RackBone = "Turret_Back_Muzzle",
                 },
             },
             RackFireTogether = false,
