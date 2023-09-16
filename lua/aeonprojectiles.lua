@@ -365,6 +365,8 @@ AQuantumCannonProjectile = ClassProjectile(SinglePolyTrailProjectile) {
     FxImpactUnit = EffectTemplate.AQuantumDisruptorHit01,
     FxImpactProp = EffectTemplate.AQuantumDisruptorHit01,
     FxImpactLand = EffectTemplate.AQuantumDisruptorHit01,
+    FxImpactWater = EffectTemplate.AQuantumDisruptorHitWater01,
+    FxImpactWaterScale = 0.6,
 }
 
 --- AEON QUANTUM PROJECTILES
