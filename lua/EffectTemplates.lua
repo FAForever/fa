@@ -1913,8 +1913,6 @@ TGaussCannonHit01 = {
 }
 
 TGaussWaterSplash01 = {
-    EmtBpPath .. 'water_splash_ripples_ring_01_emit.bp',
-    EmtBpPath .. 'water_splash_plume_01_emit.bp',
     EmtBpPath .. 'gauss_cannon_hit_02_emit.bp',
     EmtBpPath .. 'gauss_cannon_hit_05_emit.bp',
 }
