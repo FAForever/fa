@@ -463,7 +463,8 @@ function Setup()
         if string.sub(k, 1, 5) == 'ARMY_' then
             marker.Name = k
             marker.Position = marker.position
-            marker.size = 50
+            marker.size = 25
+            marker.Size = 25
             marker.IsOccupied = (armies[k] and true) or false
             MarkerCache["Spawn"].Count = MarkerCache["Spawn"].Count + 1
             MarkerCache["Spawn"].Markers[MarkerCache["Spawn"].Count] = marker
