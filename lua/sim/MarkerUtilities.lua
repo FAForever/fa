@@ -460,10 +460,11 @@ function Setup()
     -- prepare spawn markers
     local armies = table.hash(ListArmies())
     for k, marker in AllMarkers do
-        if armies[k] then
+        if string.sub(k, 1, 5) == 'ARMY_' then
             marker.Name = k
             marker.Position = marker.position
             marker.size = 50
+            marker.IsOccupied = (armies[k] and true) or false
             MarkerCache["Spawn"].Count = MarkerCache["Spawn"].Count + 1
             MarkerCache["Spawn"].Markers[MarkerCache["Spawn"].Count] = marker
         end
