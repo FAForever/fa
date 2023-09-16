@@ -3101,7 +3101,6 @@ function AIFindFurthestStartLocationNeedsEngineer(aiBrain, locationType, radius,
     local positions = AIGetMarkersAroundLocation(aiBrain, 'Spawn', pos, radius, tMin, tMax, tRings, tType)
     local startX, startZ = aiBrain:GetArmyStartPos()
     for _, v in positions do
-        LOG('AIFindFurthestStartLocationNeedsEngineer '..repr(v))
         if string.sub(v.Name, 1, 5) == 'ARMY_' then
             if startX ~= v.Position[1] and startZ ~= v.Position[3] then
                 table.insert(validPos, v)
