@@ -1726,8 +1726,6 @@ CProtonCannonHit01 = {
 
 CProtonCannonHitWater01 = {
     EmtBpPath .. 'proton_cannon_hit_01_emit.bp',
-    EmtBpPath .. 'water_splash_ripples_ring_01_emit.bp',
-    EmtBpPath .. 'water_splash_plume_01_emit.bp',
 }
 
 CProtonCannonPolyTrail =  EmtBpPath .. 'proton_cannon_polytrail_01_emit.bp'
