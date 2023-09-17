@@ -1,6 +1,24 @@
 
 Some sections of the changelog are available in other languages such as [French](changelog-fr.md) or [Russian](changelog-ru.md)
 
+# Game version 3768 (17th of September, 2023)
+
+Please refer to the notes of versions 3765, 3766 and 3767 for the full patch notes.
+
+With gratitude to all those who took the time to report issues,
+
+Jip
+
+## Bug fixes
+
+- (#5451) Fix a breaking bug for campaign content
+
+## Contributors
+
+With thanks to the following individuals who contributed through coding:
+
+- Jip
+
 # Game version 3767 (17th of September, 2023)
 
 Please refer to the notes of versions 3765 and 3766 for the full patch notes.
