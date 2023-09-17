@@ -161,7 +161,6 @@ Projectile = ClassProjectile(ProjectileMethods) {
             sy = sy + offset
             sz = sz + offset
 
-
             local dx = (Random() - 0.5) * fuzziness * sx
             local dy = (Random() - 0.5) * fuzziness * sy
             local dz = (Random() - 0.5) * fuzziness * sz
