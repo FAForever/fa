@@ -314,6 +314,7 @@ AMissileSerpentine02Projectile = ClassProjectile(SingleCompositeEmitterProjectil
     FxImpactUnit = EffectTemplate.AMissileHit01,
     FxImpactProp = EffectTemplate.AMissileHit01,
     FxImpactLand = EffectTemplate.AMissileHit01,
+    FxImpactNone = EffectTemplate.AMissileHit01,
 
     ---@param self AMissileSerpentine02Projectile
     OnCreate = function(self)

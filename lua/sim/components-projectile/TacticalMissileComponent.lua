@@ -39,9 +39,25 @@ TacticalMissileComponent = ClassSimple(SemiBallisticComponent) {
 
         -- wait until we've allegedly hit our target, then turn tracking off
         -- (in case we miss, so we don't fly in circles forever)
+
+        self:SetLifetime((glideTime+3))
+
         WaitTicks((glideTime+1) * 10)
         if not self:BeenDestroyed() then
-            self:TrackTarget(false)
+
+            -- target the ground below us slowly turn towards the ground so that we do not fly off indefinitely
+            local position = self:GetPosition()
+            position[2] = GetSurfaceHeight(position[1], position[3])
+            self:SetNewTargetGround(position)
+
+            for k = 4, 1, -1 do
+                if IsDestroyed(self) then
+                    break
+                end
+
+                self:SetTurnRate(10 * k)
+                WaitTicks(6)
+            end
         end
     end,
 }

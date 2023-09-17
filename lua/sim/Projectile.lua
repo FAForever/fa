@@ -12,8 +12,8 @@ local DepthCharge = import("/lua/defaultantiprojectile.lua").DepthCharge
 
 local TableGetn = table.getn
 
-local MathCos = math.cos 
-local MathSin = math.sin 
+local MathCos = math.cos
+local MathSin = math.sin
 
 -- scorch mark interaction
 local ScorchSplatTextures = {
@@ -72,10 +72,9 @@ local IsAlly = IsAlly
 local ForkThread = ForkThread
 
 -- cache categories computations
-local CategoriesDoNotCollide = categories.TORPEDO + categories.MISSILE + categories.DIRECTFIRE
 local OnImpactDestroyCategories = categories.ANTIMISSILE * categories.ALLPROJECTILES
 
----@class Projectile : moho.projectile_methods
+---@class Projectile : moho.projectile_methods, InternalObject
 ---@field Blueprint ProjectileBlueprint
 ---@field Army number
 ---@field Trash TrashBag
@@ -88,17 +87,17 @@ Projectile = ClassProjectile(ProjectileMethods) {
     FxImpactTrajectoryAligned = true,
 
     -- tables used for effects
-    FxImpactAirUnit = { },
-    FxImpactLand = { },
-    FxImpactNone = { },
-    FxImpactProp = { },
-    FxImpactShield = { },
-    FxImpactWater = { },
-    FxImpactUnderWater = { },
-    FxImpactUnit = { },
-    FxImpactProjectile = { },
-    FxImpactProjectileUnderWater = { },
-    FxOnKilled = { },
+    FxImpactAirUnit = {},
+    FxImpactLand = {},
+    FxImpactNone = {},
+    FxImpactProp = {},
+    FxImpactShield = {},
+    FxImpactWater = {},
+    FxImpactUnderWater = {},
+    FxImpactUnit = {},
+    FxImpactProjectile = {},
+    FxImpactProjectileUnderWater = {},
+    FxOnKilled = {},
 
     -- scale values used for effects
     FxAirUnitHitScale = 1,
@@ -155,7 +154,14 @@ Projectile = ClassProjectile(ProjectileMethods) {
             local mch = MathCos(heading)
             local msh = MathSin(heading)
 
-            local fuzziness = self.Blueprint.TrackTargetGroundFuzziness or 0.8
+            local physics = self.Blueprint.Physics
+            local fuzziness = physics.TrackTargetGroundFuzziness or 0.8
+            local offset = physics.TrackTargetGroundOffset or 0
+            sx = sx + offset
+            sy = sy + offset
+            sz = sz + offset
+
+
             local dx = (Random() - 0.5) * fuzziness * sx
             local dy = (Random() - 0.5) * fuzziness * sy
             local dz = (Random() - 0.5) * fuzziness * sz
@@ -197,7 +203,7 @@ Projectile = ClassProjectile(ProjectileMethods) {
                 return other.OriginalTarget == self
             else
                 return false
-            end 
+            end
         end
 
         -- missiles can only be taken down by anti missiles
@@ -950,7 +956,7 @@ Projectile = ClassProjectile(ProjectileMethods) {
     --- Creates a child projectile that inherits the speed, orientation and launcher of its parent
     ---@param blueprint ProjectileBlueprint
     ---@return Projectile
-    CreateChildProjectile = function (self, blueprint)
+    CreateChildProjectile = function(self, blueprint)
         local projectile = ProjectileMethods.CreateChildProjectile(self, blueprint)
         projectile.Launcher = self.Launcher
         return projectile
