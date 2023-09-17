@@ -246,7 +246,7 @@ UnitBlueprint{
         LayerChangeOffsetHeight = -3,
         MaxAcceleration = 2.5,
         MaxSpeed = 2.5,
-        MaxSpeedReverse = 0,
+        MaxSpeedReverse = 1.25,
         MaxSteerForce = 0,
         MinSpeedPercent = 0,
         MotionType = "RULEUMT_Amphibious",
