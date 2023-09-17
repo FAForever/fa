@@ -5138,6 +5138,9 @@ local MessageHandlers = {
         Accept = function(data)
             return data.PlayerOptions.OwnerID and data.PlayerOptions.OwnerID ~= hostID and lobbyComm:IsHost()
         end,
+        Reject = function(data)
+            lobbyComm:EjectPeer(data.SenderID, "Invalid player data.")
+        end,
         Handle = function(data)
             -- try to reassign the same slot as in the last game if it's a rehosted game, otherwise give it an empty
             -- slot or move it to observer
@@ -5511,6 +5514,8 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
         -- No defined validator is taken to be always-accept.
         if not MessageHandlers[data.Type].Accept or MessageHandlers[data.Type].Accept(data) then
             MessageHandlers[data.Type].Handle(data)
+        elseif MessageHandlers[data.Type].Reject then
+            MessageHandlers[data.Type].Reject(data)
         else
             WARN("Rejected message of type " .. data.Type .. " from " .. FindNameForID(data.SenderID))
         end
