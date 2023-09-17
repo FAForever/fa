@@ -176,6 +176,8 @@ UnitBlueprint{
                 Water = "Land|Water|Seabed",
             },
             FiringTolerance = 5,
+            HeadingArcCenter = 0,
+            HeadingArcRange = 60,
             Label = "MissileRack",
             MaxRadius = 60,
             MinRadius = 4,

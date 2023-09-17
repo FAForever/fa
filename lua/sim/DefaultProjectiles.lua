@@ -19,12 +19,15 @@ local Random = Random
 local CreateTrail = CreateTrail
 local CreateEmitterOnEntity = CreateEmitterOnEntity
 local CreateBeamEmitterOnEntity = CreateBeamEmitterOnEntity
-
+local VDist2 = VDist2
 local TableGetn = table.getn
 
 -- upvalue moho functions for performance
 local IEffectScaleEmitter = _G.moho.IEffect.ScaleEmitter
 local IEffectOffsetEmitter = _G.moho.IEffect.OffsetEmitter
+
+SemiBallisticComponent = import("/lua/sim/components-projectile/semiballisticcomponent.lua").SemiBallisticComponent
+TacticalMissileComponent = import("/lua/sim/components-projectile/tacticalmissilecomponent.lua").TacticalMissileComponent
 
 -----------------------------------------------------------------
 -- Null Shell
