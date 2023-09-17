@@ -5135,7 +5135,9 @@ local MessageHandlers = {
     },
 
     AddPlayer = {
-        Accept = AmHost,
+        Accept = function(data)
+            return data.PlayerOptions.OwnerID and data.PlayerOptions.OwnerID ~= hostID and lobbyComm:IsHost()
+        end,
         Handle = function(data)
             -- try to reassign the same slot as in the last game if it's a rehosted game, otherwise give it an empty
             -- slot or move it to observer
