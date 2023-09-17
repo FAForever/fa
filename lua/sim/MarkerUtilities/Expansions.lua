@@ -136,6 +136,8 @@ local function GenerateExpansionMarkers ()
                             local dz = pz - neighbor.Marker.position[3]
                             local d = dx * dx + dz * dz
                             if d < threshold then
+
+                                
                                 instance.Neighbors[neighbor.Identifier] = neighbor
                             elseif d < 1.5 * threshold then
                                 instance.Candidates[neighbor.Identifier] = neighbor
