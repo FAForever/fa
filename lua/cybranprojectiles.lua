@@ -78,6 +78,8 @@ CDFProtonCannonProjectile = ClassProjectile(MultiPolyTrailProjectile) {
     FxImpactUnit = EffectTemplate.CProtonCannonHit01,
     FxImpactProp = EffectTemplate.CProtonCannonHit01,
     FxImpactLand = EffectTemplate.CProtonCannonHit01,
+    FxImpactWater = EffectTemplate.CProtonCannonHitWater01,
+    FxImpactWaterScale = 0.75,
     FxTrailOffset = 0,
 }
 
