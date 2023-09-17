@@ -155,7 +155,7 @@ Projectile = ClassProjectile(ProjectileMethods) {
             local mch = MathCos(heading)
             local msh = MathSin(heading)
 
-            local fuzziness = 1.0
+            local fuzziness = self.Blueprint.TrackTargetGroundFuzziness or 0.8
             local dx = (Random() - 0.5) * fuzziness * sx
             local dy = (Random() - 0.5) * fuzziness * sy
             local dz = (Random() - 0.5) * fuzziness * sz
