@@ -499,7 +499,7 @@ function AINewExpansionBase(aiBrain, baseName, position, builder, constructionDa
             aiBrain.BuilderManagers[baseName].EngineerManager:AddUnit(builder, true)
             return
         end
-
+        
         aiBrain:AddBuilderManagers(position, radius, baseName, true)
 
         -- Move the engineer to the new base managers
