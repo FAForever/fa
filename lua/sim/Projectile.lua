@@ -166,7 +166,6 @@ Projectile = ClassProjectile(ProjectileMethods) {
                 pz + dx * msh + dz * mch,
             }
 
-            DrawCircle(target, 2, 'ffffff')
             self:SetNewTargetGround(target)
         else
             local pos = self:GetCurrentTargetPosition()
