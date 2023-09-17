@@ -2,12 +2,6 @@ UnitBlueprint{
     Description = "<LOC xss0203_desc>Attack Submarine",
     AI = {
         GuardReturnRadius = 40,
-        TargetBones = {
-            "AntiTorpedo",
-            "Projectile01",
-            "Projectile02",
-            "Turret",
-        },
     },
     Audio = {
         AmbientMove    = Sound { Bank = 'XSS',            Cue = 'XSS0203_Move_Loop',   LodCutoff = 'UnitMove_LodCutoff' },

@@ -178,7 +178,7 @@ Projectile = ClassProjectile(ProjectileMethods) {
 
     --- Called by the engine when a projectile collides with a collision beam to check if the collision is valid
     ---@param self Projectile The projectile we're checking the collision for
-    ---@param firingWeapon any The weapon the beam originates from that we're checking the collision with
+    ---@param firingWeapon Weapon The weapon the beam originates from that we're checking the collision with
     ---@return boolean
     OnCollisionCheckWeapon = function(self, firingWeapon)
 
@@ -192,9 +192,9 @@ Projectile = ClassProjectile(ProjectileMethods) {
 
         local selfHashedCategories = self.Blueprint.CategoriesHash
 
-        -- specific check if we have a weapon that is defensive
-        if firingWeapon.Blueprint.WeaponCategory == 'Defense' then
-            if selfHashedCategories['TACTICAL'] or selfHashedCategories['STRATEGIC'] then
+        -- check for projectile types that require a defensive weapon to intercept
+        if selfHashedCategories['TACTICAL'] or selfHashedCategories['STRATEGIC'] or selfHashedCategories['TORPEDO'] then
+            if firingWeapon.Blueprint.WeaponCategory == 'Defense' then
                 return alliedCheck
             else
                 return false
