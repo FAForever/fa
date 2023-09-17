@@ -12,6 +12,9 @@ local DepthCharge = import("/lua/defaultantiprojectile.lua").DepthCharge
 
 local TableGetn = table.getn
 
+local MathCos = math.cos
+local MathSin = math.sin
+
 -- scorch mark interaction
 local ScorchSplatTextures = {
     'scorch_001_albedo',
@@ -69,14 +72,14 @@ local IsAlly = IsAlly
 local ForkThread = ForkThread
 
 -- cache categories computations
-local CategoriesDoNotCollide = categories.TORPEDO + categories.MISSILE + categories.DIRECTFIRE
 local OnImpactDestroyCategories = categories.ANTIMISSILE * categories.ALLPROJECTILES
 
----@class Projectile : moho.projectile_methods
+---@class Projectile : moho.projectile_methods, InternalObject
 ---@field Blueprint ProjectileBlueprint
 ---@field Army number
 ---@field Trash TrashBag
 ---@field Launcher Unit
+---@field OriginalTarget? Unit
 ---@field DamageData table
 Projectile = ClassProjectile(ProjectileMethods) {
     IsProjectile = true,
@@ -84,17 +87,17 @@ Projectile = ClassProjectile(ProjectileMethods) {
     FxImpactTrajectoryAligned = true,
 
     -- tables used for effects
-    FxImpactAirUnit = { },
-    FxImpactLand = { },
-    FxImpactNone = { },
-    FxImpactProp = { },
-    FxImpactShield = { },
-    FxImpactWater = { },
-    FxImpactUnderWater = { },
-    FxImpactUnit = { },
-    FxImpactProjectile = { },
-    FxImpactProjectileUnderWater = { },
-    FxOnKilled = { },
+    FxImpactAirUnit = {},
+    FxImpactLand = {},
+    FxImpactNone = {},
+    FxImpactProp = {},
+    FxImpactShield = {},
+    FxImpactWater = {},
+    FxImpactUnderWater = {},
+    FxImpactUnit = {},
+    FxImpactProjectile = {},
+    FxImpactProjectileUnderWater = {},
+    FxOnKilled = {},
 
     -- scale values used for effects
     FxAirUnitHitScale = 1,
@@ -131,6 +134,46 @@ Projectile = ClassProjectile(ProjectileMethods) {
 
         -- do not track target, but track where the target was
         if blueprint.Physics.TrackTargetGround then
+            self.Trash:Add(ForkThread(self.OnTrackTargetGround, self))
+        end
+    end,
+
+    --- Called by Lua during the `OnCreate` event when the blueprint field `TrackTargetGround` is set,
+    --- used by tactical missiles to track a patch of ground in the vicinity of the unit
+    ---@param self Projectile
+    OnTrackTargetGround = function(self)
+        local target = self.OriginalTarget or self:GetTrackingTarget() or self.Launcher:GetTargetEntity()
+        if target and target.IsUnit then
+            local unitBlueprint = target.Blueprint
+            local cy = unitBlueprint.CollisionOffsetY or 0
+            local sx, sy, sz = unitBlueprint.SizeX or 1, unitBlueprint.SizeY or 1, unitBlueprint.SizeZ or 1
+            local px, py, pz = target:GetPositionXYZ()
+
+            -- take into account heading
+            local heading = -1 * target:GetHeading() -- inverse heading because Supreme Commander :)
+            local mch = MathCos(heading)
+            local msh = MathSin(heading)
+
+            local physics = self.Blueprint.Physics
+            local fuzziness = physics.TrackTargetGroundFuzziness or 0.8
+            local offset = physics.TrackTargetGroundOffset or 0
+            sx = sx + offset
+            sy = sy + offset
+            sz = sz + offset
+
+
+            local dx = (Random() - 0.5) * fuzziness * sx
+            local dy = (Random() - 0.5) * fuzziness * sy
+            local dz = (Random() - 0.5) * fuzziness * sz
+
+            local target = {
+                px + dx * mch - dz * msh,
+                py + cy + 0.5 * sy + dy,
+                pz + dx * msh + dz * mch,
+            }
+
+            self:SetNewTargetGround(target)
+        else
             local pos = self:GetCurrentTargetPosition()
             pos[2] = GetSurfaceHeight(pos[1], pos[3])
             self:SetNewTargetGround(pos)
@@ -160,7 +203,7 @@ Projectile = ClassProjectile(ProjectileMethods) {
                 return other.OriginalTarget == self
             else
                 return false
-            end 
+            end
         end
 
         -- missiles can only be taken down by anti missiles
@@ -913,7 +956,7 @@ Projectile = ClassProjectile(ProjectileMethods) {
     --- Creates a child projectile that inherits the speed, orientation and launcher of its parent
     ---@param blueprint ProjectileBlueprint
     ---@return Projectile
-    CreateChildProjectile = function (self, blueprint)
+    CreateChildProjectile = function(self, blueprint)
         local projectile = ProjectileMethods.CreateChildProjectile(self, blueprint)
         projectile.Launcher = self.Launcher
         return projectile

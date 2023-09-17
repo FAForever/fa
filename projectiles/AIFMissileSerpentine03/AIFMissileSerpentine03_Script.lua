@@ -5,8 +5,8 @@ local TacticalMissileComponent = import('/lua/sim/DefaultProjectiles.lua').Tacti
 
 AIFMissileTactical02 = ClassProjectile(AMissileSerpentine02Projectile, TacticalMissileComponent) {
 
-    LaunchTicks = 6,
-    LaunchTurnRate = 6,
+    LaunchTicks = 32,
+    LaunchTurnRate = 2,
     HeightDistanceFactor = 3,
     MinHeight = 5,
     FinalBoostAngle = 0,
