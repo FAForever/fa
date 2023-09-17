@@ -1078,6 +1078,12 @@ AQuantumDisruptorHit01 = {
     EmtBpPath .. 'aeon_commander_disruptor_hit_02_emit.bp',
     EmtBpPath .. 'aeon_commander_disruptor_hit_03_emit.bp',
 }
+
+AQuantumDisruptorHitWater01 = {
+    EmtBpPath .. 'aeon_commander_disruptor_hit_01_emit.bp',
+    EmtBpPath .. 'aeon_commander_disruptor_hit_02_emit.bp',
+}
+
 AQuantumDisplacementHit01 = {
     EmtBpPath .. 'quantum_displacement_cannon_hit_01_emit.bp',
     EmtBpPath .. 'quantum_displacement_cannon_hit_02_emit.bp',
