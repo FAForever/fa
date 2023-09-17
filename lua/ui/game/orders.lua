@@ -608,22 +608,51 @@ end
 
 local function DroneBehavior(self, modifiers)
     if modifiers.Left then
-        SelectUnits({self._unit})
+        SelectUnits(self._unit)
     end
 
     if modifiers.Right then
+        if self._mixedIcon then
+            self._mixedIcon:Destroy()
+            self._mixedIcon = nil
+        end
         if self:IsChecked() then
-            self._pod:ProcessInfo('SetAutoMode', 'false')
+            for _, pod in self._pod do
+                pod:ProcessInfo('SetAutoMode', 'false')
+            end
             self:SetCheck(false)
         else
-            self._pod:ProcessInfo('SetAutoMode', 'true')
+            for _, pod in self._pod do
+                pod:ProcessInfo('SetAutoMode', 'true')
+            end
             self:SetCheck(true)
         end
     end
 end
 
 local function DroneInit(self, selection)
-    self:SetCheck(self._pod:IsAutoMode())
+
+    local mixed = false
+    local lastMode = nil
+    if self._pod and next(self._pod) then
+        for _, pod in self._pod do
+            if lastMode == nil then
+                lastMode = pod:IsAutoMode()
+            elseif lastMode ~= pod:IsAutoMode() then
+                mixed = true
+                break
+            end
+        end
+    end
+
+    if mixed then
+        self:SetCheck(false)
+        self._mixedIcon = Bitmap(self, UIUtil.UIFile('/game/orders-panel/question-mark_bmp.dds'))
+        LayoutHelpers.AtRightTopIn(self._mixedIcon, self, -2, 2)
+    else
+        self:SetCheck(lastMode)
+    end
+
 end
 
 -- Retaliate button specific behvior
@@ -1017,8 +1046,8 @@ local defaultOrdersTable = {
     RULEUCC_Repair = {              helpText = "repair",            bitmapId = 'repair',                preferredSlot = 14, behavior = StandardOrderBehavior},
     RULEUCC_Dock = {                helpText = "dock",              bitmapId = 'dock',                  preferredSlot = 14, behavior = DockOrderBehavior},
 
-    DroneL = {                      helpText = "drone",             bitmapId = 'unload02',              preferredSlot = 13, behavior = DroneBehavior,               initialStateFunc = DroneInit},
-    DroneR = {                      helpText = "drone",             bitmapId = 'unload02',              preferredSlot = 13, behavior = DroneBehavior,               initialStateFunc = DroneInit},
+    DroneL = {                      helpText = "drone",             bitmapId = 'unload02',              preferredSlot = 10, behavior = DroneBehavior,               initialStateFunc = DroneInit},
+    DroneR = {                      helpText = "drone",             bitmapId = 'unload02',              preferredSlot = 11, behavior = DroneBehavior,               initialStateFunc = DroneInit},
 
     -- Unit toggle rules
     RULEUTC_ShieldToggle = {        helpText = "toggle_shield",     bitmapId = 'shield',                preferredSlot = 8,  behavior = ScriptButtonOrderBehavior,   initialStateFunc = ScriptButtonInitFunction, extraInfo = 0},
@@ -1251,28 +1280,37 @@ local function CreateAltOrders(availableOrders, availableToggles, units)
     -- to determine where they go by using preferred slots
     AddAbilityButtons(standardOrdersTable, availableOrders, units)
 
-    local assitingUnitList = {}
+    local assistingUnitList = {}
     local podUnits = {}
-    if not table.empty(units) and (EntityCategoryFilterDown(categories.PODSTAGINGPLATFORM, units) or EntityCategoryFilterDown(categories.POD, units)) then
-        local PodStagingPlatforms = EntityCategoryFilterDown(categories.PODSTAGINGPLATFORM, units)
-        local Pods = EntityCategoryFilterDown(categories.POD, units)
+    local podStagingPlatforms = EntityCategoryFilterDown(categories.PODSTAGINGPLATFORM, units)
+    local pods = EntityCategoryFilterDown(categories.POD, units)
+    if not table.empty(units) and (not table.empty(podStagingPlatforms) or not table.empty(pods)) then
         local assistingUnits = {}
-        if table.empty(PodStagingPlatforms) and table.getn(Pods) == 1 then
-            assistingUnits[1] = Pods[1]:GetCreator()
-            podUnits['DroneL'] = Pods[1]
-            podUnits['DroneR'] = Pods[2]
-        elseif table.getn(PodStagingPlatforms) == 1 then
-            assistingUnits = GetAssistingUnitsList(PodStagingPlatforms)
-            podUnits['DroneL'] = assistingUnits[1]
-            podUnits['DroneR'] = assistingUnits[2]
+        if not table.empty(pods) then
+            for _, pod in pods do
+                table.insert(assistingUnits, pod:GetCreator())
+            end
+            podUnits['DroneL'] = pods
+        elseif not table.empty(podStagingPlatforms) then
+            assistingUnits = GetAssistingUnitsList(podStagingPlatforms)
+            podUnits['DroneL'] = assistingUnits
         end
-        if assistingUnits[1] then
-            table.insert(availableOrders, 'DroneL')
-            assitingUnitList['DroneL'] = assistingUnits[1]
-        end
-        if assistingUnits[2] then
-            table.insert(availableOrders, 'DroneR')
-            assitingUnitList['DroneR'] = assistingUnits[2]
+
+        
+        if not table.empty(assistingUnits) then
+            if table.getn(podStagingPlatforms) == 1 and table.empty(pods) then
+                table.insert(availableOrders, 'DroneL')
+                assistingUnitList['DroneL'] = {assistingUnits[1]}
+                if table.getn(assistingUnits) > 1 then
+                    table.insert(availableOrders, 'DroneR')
+                    assistingUnitList['DroneR'] = {assistingUnits[2]}
+                    podUnits['DroneL'] = {assistingUnits[1]}
+                    podUnits['DroneR'] = {assistingUnits[2]}
+                end
+            else
+                table.insert(availableOrders, 'DroneL')
+                assistingUnitList['DroneL'] = assistingUnits
+            end
         end
     end
 
@@ -1372,8 +1410,8 @@ local function CreateAltOrders(availableOrders, availableToggles, units)
                 orderCheckbox._cursor = standardOrdersTable[availOrder].cursor
             end
 
-            if assitingUnitList[availOrder] then
-                orderCheckbox._unit = assitingUnitList[availOrder]
+            if assistingUnitList[availOrder] then
+                orderCheckbox._unit = assistingUnitList[availOrder]
             end
 
             if podUnits[availOrder] then
@@ -1400,8 +1438,8 @@ local function CreateAltOrders(availableOrders, availableToggles, units)
                 orderCheckbox._script = standardOrdersTable[availToggle].script
             end
 
-            if assitingUnitList[availToggle] then
-                orderCheckbox._unit = assitingUnitList[availToggle]
+            if assistingUnitList[availToggle] then
+                orderCheckbox._unit = assistingUnitList[availToggle]
             end
 
             if orderInfo.initialStateFunc then

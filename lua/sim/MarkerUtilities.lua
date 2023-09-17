@@ -342,7 +342,13 @@ function ToggleDebugMarkersByType(type)
 
                         if marker.Extractors then
                             for _, neighbour in marker.Extractors do
-                                DrawLine(marker.Position, neighbour.Position, neighbour.Color or 'ffffffff')
+                                DrawLine(marker.Position, neighbour.Position, '3BFF55')
+                            end
+                        end
+
+                        if marker.HydrocarbonPlants then
+                            for _, neighbour in marker.HydrocarbonPlants do
+                                DrawLine(marker.Position, neighbour.Position, 'F2FF3B')
                             end
                         end
                     end

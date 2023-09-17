@@ -84,11 +84,11 @@ UnitBlueprint{
             LODs = {
                 {
                     LODCutoff = 200,
-                    ShaderName = "Aeon",
+                    ShaderName = "AeonNavy",
                 },
                 {
                     LODCutoff = 600,
-                    ShaderName = "Aeon",
+                    ShaderName = "AeonNavy",
                     AlbedoName = "xas0306_lod1_albedo.dds",
                     SpecularName = "xas0306_lod1_specteam.dds",
                 },
@@ -249,7 +249,7 @@ UnitBlueprint{
             TurretBonePitch = "Turret_Front_Barrel",
             TurretBoneYaw = "Turret_Front",
             TurretDualManipulators = false,
-            TurretPitch = 55,
+            TurretPitch = 65,
             TurretPitchRange = 0,
             TurretPitchSpeed = 15,
             TurretYaw = 0,
@@ -322,7 +322,7 @@ UnitBlueprint{
             TurretBonePitch = "Turret_Back_Barrel",
             TurretBoneYaw = "Turret_Back",
             TurretDualManipulators = false,
-            TurretPitch = 55,
+            TurretPitch = 65,
             TurretPitchRange = 0,
             TurretPitchSpeed = 15,
             TurretYaw = 0,
