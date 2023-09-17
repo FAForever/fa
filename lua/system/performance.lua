@@ -1,4 +1,3 @@
-
 --   - Children: table: 206A3EB0
 --   -    10: table: 206A3758
 --   -       Children: table: 14ECEE38
@@ -474,7 +473,7 @@ local armies = GetArmiesTable().armiesTable
 --   -    CheatsEnabled: true
 --   -    CivilianAlliance: enemy
 --   -    ClanTags: table: 1330E820
---   -       Jip: 
+--   -       Jip:
 --   -    DelayUntilNextWave: 0.5
 --   -    DisconnectionDelay02: 90
 --   -    DmgBonus: 1
@@ -533,7 +532,7 @@ local armies = GetArmiesTable().armiesTable
 --   - norushoffsetY_ARMY_3: 0
 --   - norushoffsetY_ARMY_4: 0
 --   - norushradius: 100
---   - preview: 
+--   - preview:
 --   - save: /maps/adaptive_archsimkats_valley.v0003/Adaptive_Archsimkats_Valley_save.lua
 --   - script: /maps/adaptive_archsimkats_valley.v0003/Adaptive_Archsimkats_Valley_script.lua
 --   - size: table: 13310F00
@@ -556,12 +555,44 @@ local session = SessionGetScenarioInfo()
 --   -    uid: 0
 local clients = GetSessionClients()
 
-local samples = { }
-for k = 1, 21 do 
+local samples = {}
+for k = 1, 21 do
     samples[k] = {
         Samples = 0
     }
 end
+
+---@class UIPerformanceMetrics
+---@field SkirmishWithAI UIPerformanceMetricsArray
+---@field Skirmish UIPerformanceMetricsArray
+---@field Campaign UIPerformanceMetricsArray
+
+---@class UIPerformanceMetricsArray
+---@field [1]  UIPerformanceMetricsEntry
+---@field [2]  UIPerformanceMetricsEntry
+---@field [3]  UIPerformanceMetricsEntry
+---@field [4]  UIPerformanceMetricsEntry
+---@field [5]  UIPerformanceMetricsEntry
+---@field [6]  UIPerformanceMetricsEntry
+---@field [7]  UIPerformanceMetricsEntry
+---@field [8]  UIPerformanceMetricsEntry
+---@field [9]  UIPerformanceMetricsEntry
+---@field [10] UIPerformanceMetricsEntry
+---@field [11] UIPerformanceMetricsEntry
+---@field [12] UIPerformanceMetricsEntry
+---@field [13] UIPerformanceMetricsEntry
+---@field [14] UIPerformanceMetricsEntry
+---@field [15] UIPerformanceMetricsEntry
+---@field [16] UIPerformanceMetricsEntry
+---@field [17] UIPerformanceMetricsEntry
+---@field [18] UIPerformanceMetricsEntry
+---@field [19] UIPerformanceMetricsEntry
+---@field [20] UIPerformanceMetricsEntry
+---@field [21] UIPerformanceMetricsEntry
+
+---@class UIPerformanceMetricsEntry
+---@field Samples number
+---@field UnitCount? { Min: number, Max: number}
 
 local function StoreSamples(exitType)
 
@@ -575,7 +606,7 @@ local function StoreSamples(exitType)
     -- determine game flags
     local isSkirmish = session.type == 'skirmish'
     local hasAI = false
-    for k, army in armies do 
+    for k, army in armies do
         if (not army.civilian) and (not army.human) then
             hasAI = true
             break
@@ -587,17 +618,18 @@ local function StoreSamples(exitType)
     if isSkirmish then
         if hasAI then
             identifier = 'SkirmishWithAI'
-        else 
+        else
             identifier = 'Skirmish'
         end
     end
 
     -- retrieve and update data
-    local data = GetPreference('PerformanceTrackingV2') or { }
+    ---@type UIPerformanceMetrics
+    local data = GetPreference('PerformanceTrackingV2') or {}
     local mapData = data[identifier]
-    if mapData then 
+    if mapData then
         for k = 1, 21 do
-            
+
             if samples[k].Samples > 0 then
                 if mapData[k].Samples > 0 then
                     -- combine them
@@ -613,7 +645,7 @@ local function StoreSamples(exitType)
                     mapData[k].Samples = mapData[k].Samples + samples[k].Samples
                 else
                     -- first time at this rate, just take them as ground truth
-                    mapData[k].UnitCount = { }
+                    mapData[k].UnitCount = {}
                     mapData[k].UnitCount.Min = samples[k].UnitCount.Min
                     mapData[k].UnitCount.Max = samples[k].UnitCount.Max
                     mapData[k].Samples = samples[k].Samples
@@ -622,7 +654,7 @@ local function StoreSamples(exitType)
         end
 
         mapData.Samples = mapData.Samples + 1
-    else  
+    else
         -- use as ground truth
         data[identifier] = samples
         data[identifier].Samples = 1
@@ -662,7 +694,7 @@ local function PerformanceTrackingThread()
 
         local rate = 0
         local army = armies[focusArmy]
-        for k, client in clients do 
+        for k, client in clients do
             if client.name == army.nickname then
                 rate = client.maxSP or -1
             end
@@ -691,8 +723,8 @@ local function PerformanceTrackingThread()
         if sample.Samples > 0 then
             sample.UnitCount.Min = math.min(sample.UnitCount.Min, unitCount)
             sample.UnitCount.Max = math.max(sample.UnitCount.Max, unitCount)
-        else 
-            sample.UnitCount = { }
+        else
+            sample.UnitCount = {}
             sample.UnitCount.Min = unitCount
             sample.UnitCount.Max = unitCount
         end

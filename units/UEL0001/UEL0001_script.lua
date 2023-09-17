@@ -223,13 +223,16 @@ UEL0001 = ClassUnit(ACUUnit) {
             RemoveUnitEnhancement(self, 'ShieldRemove')
             self:RemoveToggleCap('RULEUTC_ShieldToggle')
         elseif enh == 'ShieldGeneratorField' then
+            self:AddToggleCap('RULEUTC_ShieldToggle')
             self:DestroyShield()
-            self:ForkThread(function()
-                WaitTicks(1)
-                self:CreateShield(bp)
-                self:SetEnergyMaintenanceConsumptionOverride(bp.MaintenanceConsumptionPerSecondEnergy or 0)
-                self:SetMaintenanceConsumptionActive()
-            end)
+            self:ForkThread(
+                function()
+                    WaitTicks(1)
+                    self:CreateShield(bp)
+                    self:SetEnergyMaintenanceConsumptionOverride(bp.MaintenanceConsumptionPerSecondEnergy or 0)
+                    self:SetMaintenanceConsumptionActive()
+                end
+            )
         elseif enh == 'ShieldGeneratorFieldRemove' then
             self:DestroyShield()
             self:SetMaintenanceConsumptionInactive()

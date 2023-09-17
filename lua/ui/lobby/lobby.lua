@@ -5981,7 +5981,7 @@ function CPUBenchmark()
             k = i * i   --Multiplication
             l = k / j   --Division
             m = j - i   --Subtraction
-            j = i ^ 4   --Power
+            j = math.pow(i, 4)   --Power
             l = -i      --Negation
             m = {'1234567890', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', true} --Create Table
             TableInsert(m, '1234567890')     --Insert Table Value

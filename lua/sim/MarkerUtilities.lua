@@ -342,7 +342,13 @@ function ToggleDebugMarkersByType(type)
 
                         if marker.Extractors then
                             for _, neighbour in marker.Extractors do
-                                DrawLine(marker.Position, neighbour.Position, neighbour.Color or 'ffffffff')
+                                DrawLine(marker.Position, neighbour.Position, '3BFF55')
+                            end
+                        end
+
+                        if marker.HydrocarbonPlants then
+                            for _, neighbour in marker.HydrocarbonPlants do
+                                DrawLine(marker.Position, neighbour.Position, 'F2FF3B')
                             end
                         end
                     end
@@ -460,9 +466,12 @@ function Setup()
     -- prepare spawn markers
     local armies = table.hash(ListArmies())
     for k, marker in AllMarkers do
-        if armies[k] then
+        if string.sub(k, 1, 5) == 'ARMY_' then
             marker.Name = k
-            marker.size = 50
+            marker.Position = marker.position
+            marker.size = 25
+            marker.Size = 25
+            marker.IsOccupied = (armies[k] and true) or false
             MarkerCache["Spawn"].Count = MarkerCache["Spawn"].Count + 1
             MarkerCache["Spawn"].Markers[MarkerCache["Spawn"].Count] = marker
         end
@@ -549,8 +558,9 @@ function Setup()
     end
 end
 
-GenerateExpansionMarkers = import("/lua/sim/MarkerUtilities/Expansions.lua").Generate
-GenerateRallyPointMarkers = import("/lua/sim/MarkerUtilities/RallyPoints.lua").Generate
+GenerateExpansionMarkers = import("/lua/sim/markerutilities/expansions.lua").Generate
+GenerateNavalAreaMarkers = import("/lua/sim/markerutilities/navalareas.lua").Generate
+GenerateRallyPointMarkers = import("/lua/sim/markerutilities/rallypoints.lua").Generate
 
 function __moduleinfo.OnReload(newModule)
     -- add existing markers to new module

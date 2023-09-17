@@ -43,15 +43,24 @@ local IssueFerry = IssueFerry
 local CategoriesTransportation = categories.TRANSPORTATION
 
 --- List of callbacks that is being populated throughout this file
----@type table<string, function>
+---@type table<string, fun(data: table, units?: Unit[])>
 local Callbacks = {}
 
+---@param name string
+---@param data table
+---@param units? Unit[]
 function DoCallback(name, data, units)
+    local start = GetSystemTimeSecondsOnlyForProfileUse()
     local fn = Callbacks[name];
     if fn then
         fn(data, units)
     else
         SPEW('No callback named: ' .. repr(name))
+    end
+
+    local timeTaken = GetSystemTimeSecondsOnlyForProfileUse() - start
+    if (timeTaken > 0.005) then
+        SPEW(string.format("Time to process %s from %d: %f", name, timeTaken, GetCurrentCommandSource() or -2))
     end
 end
 
@@ -263,7 +272,7 @@ Callbacks.WeaponPriorities = import("/lua/weaponpriorities.lua").SetWeaponPriori
 
 ---@param data { target: EntityId }
 ---@param selection Unit[]
-Callbacks.RingExtractor = function(data, selection)
+Callbacks.RingWithStorages = function(data, selection)
     -- verify selection
     selection = SecureUnits(selection)
     if (not selection) or TableEmpty(selection) then
@@ -286,7 +295,119 @@ Callbacks.RingExtractor = function(data, selection)
         return
     end
 
-    import("/lua/sim/commands/ring-extractor.lua").RingExtractor(extractor, engineers)
+    import("/lua/sim/commands/ringing/ring-with-storages.lua").RingExtractor(extractor, engineers)
+end
+
+---@param data { target: EntityId, allFabricators: boolean }
+---@param selection Unit[]
+Callbacks.RingWithFabricators = function(data, selection)
+    -- verify selection
+    selection = SecureUnits(selection)
+    if (not selection) or TableEmpty(selection) then
+        return
+    end
+
+    -- verify we have engineers
+    local engineers = EntityCategoryFilterDown(categories.ENGINEER, selection)
+    if TableEmpty(engineers) then
+        return
+    end
+
+    -- verify the extractor
+    local extractor = GetUnitById(data.target) --[[@as Unit]]
+    if (not extractor) or
+        (not extractor.Army) or
+        (not OkayToMessWithArmy(extractor.Army)) or
+        (not EntityCategoryContains(categories.MASSEXTRACTION, extractor))
+    then
+        return
+    end
+
+    import("/lua/sim/commands/ringing/ring-with-fabricators.lua").RingExtractor(extractor, engineers, data.allFabricators)
+end
+
+---@param data { target: EntityId }
+---@param selection Unit[]
+Callbacks.RingRadar = function(data, selection)
+    -- verify selection
+    selection = SecureUnits(selection)
+    if (not selection) or TableEmpty(selection) then
+        return
+    end
+
+    -- verify we have engineers
+    local engineers = EntityCategoryFilterDown(categories.ENGINEER, selection)
+    if TableEmpty(engineers) then
+        return
+    end
+
+    -- verify the extractor
+    local target = GetUnitById(data.target) --[[@as Unit]]
+    if (not target) or
+        (not target.Army) or
+        (not OkayToMessWithArmy(target.Army)) or
+        (not EntityCategoryContains((categories.RADAR + categories.OMNI) * categories.STRUCTURE, target))
+    then
+        return
+    end
+
+    import("/lua/sim/commands/ringing/ring-with-power-tech1.lua").RingWithPower(target, engineers)
+end
+
+---@param data { target: EntityId }
+---@param selection Unit[]
+Callbacks.RingArtilleryTech2 = function(data, selection)
+    -- verify selection
+    selection = SecureUnits(selection)
+    if (not selection) or TableEmpty(selection) then
+        return
+    end
+
+    -- verify we have engineers
+    local engineers = EntityCategoryFilterDown(categories.ENGINEER, selection)
+    if TableEmpty(engineers) then
+        return
+    end
+
+    -- verify the extractor
+    local target = GetUnitById(data.target) --[[@as Unit]]
+    if (not target) or
+        (not target.Army) or
+        (not OkayToMessWithArmy(target.Army)) or
+        (not EntityCategoryContains(categories.ARTILLERY * categories.TECH2 * categories.STRUCTURE, target))
+    then
+        return
+    end
+
+    import("/lua/sim/commands/ringing/ring-with-power-tech1.lua").RingWithPower(target, engineers)
+end
+
+---@param data { target: EntityId }
+---@param selection Unit[]
+Callbacks.RingArtilleryTech3Exp = function(data, selection)
+    -- verify selection
+    selection = SecureUnits(selection)
+    if (not selection) or TableEmpty(selection) then
+        return
+    end
+
+    -- verify we have engineers
+    local engineers = EntityCategoryFilterDown(categories.ENGINEER, selection)
+    if TableEmpty(engineers) then
+        return
+    end
+
+    -- verify the extractor
+    local target = GetUnitById(data.target) --[[@as Unit]]
+    if (not target) or
+        (not target.Army) or
+        (not OkayToMessWithArmy(target.Army)) or
+        (not EntityCategoryContains(categories.ARTILLERY * (categories.TECH3 + categories.EXPERIMENTAL) * categories.STRUCTURE, target))
+    then
+        return
+    end
+
+    import("/lua/sim/commands/ringing/ring-with-power-tech3.lua").RingWithPower(target, engineers)
 end
 
 ---@param data any
@@ -832,6 +953,30 @@ Callbacks.NavDebugDisableDirectionTo = function(data, units)
     end
 
     import("/lua/sim/navdebug/directionto.lua").Disable()
+end
+
+Callbacks.NavDebugUpdateGetPositionsInRadius = function(data, units)
+    if not PassesAIAntiCheatCheck() then
+        return
+    end
+
+    import("/lua/sim/navdebug/getpositionsinradius.lua").Update(data)
+end
+
+Callbacks.NavDebugEnableGetPositionsInRadius = function(data, units)
+    if not PassesAIAntiCheatCheck() then
+        return
+    end
+
+    import("/lua/sim/navdebug/getpositionsinradius.lua").Enable()
+end
+
+Callbacks.NavDebugDisableGetPositionsInRadius = function(data, units)
+    if not PassesAIAntiCheatCheck() then
+        return
+    end
+
+    import("/lua/sim/navdebug/getpositionsinradius.lua").Disable()
 end
 
 Callbacks.NavDebugGetLabelMetadata = function(data, units)

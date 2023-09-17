@@ -158,11 +158,6 @@ local keyActionsCamera = {
         action = 'UI_Lua import("/lua/ui/game/zoomslider.lua").ToggleWideView()',
         category = 'camera',
     },
-
-    ['test_2'] = {
-        action = 'UI_Lua import("/lua/usercamera.lua").Test2()',
-        category = 'camera',
-    },
 }
 
 ---@type table<string, UIKeyAction>
@@ -289,6 +284,13 @@ local keyActionsSelectionQuickSelect = {
     },
     ['select_all_building_eng_onscreen'] = {
         action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").SelectAllBuildingEngineers(true)',
+        category = 'selection',
+    },['select_all_resource_consumers'] = {
+        action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").SelectAllResourceConsumers()',
+        category = 'selection',
+    },
+    ['select_all_resource_consumers_onscreen'] = {
+        action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").SelectAllResourceConsumers(true)',
         category = 'selection',
     },
     ['select_all_land_units_onscreen'] = {
@@ -1621,22 +1623,22 @@ local keyActionsOrdersAdvanced = {
 }
 
 local keyActionsOrdersQueueBased = {
-    ['distribute_orders'] = {
+    ['spreadattack'] = {
         action = 'UI_Lua import("/lua/ui/game/hotkeys/distribute-queue.lua").DistributeOrders(true)',
         category = 'ordersQueueBased',
         wikiURL = 'Play/Game/Hotkeys/OrdersQueueManipulation#distribute-orders'
     },
-    ['shift_distribute_orders'] = {
+    ['shift_spreadattack'] = {
         action = 'UI_Lua import("/lua/ui/game/hotkeys/distribute-queue.lua").DistributeOrders(true)',
         category = 'ordersQueueBased',
         wikiURL = 'Play/Game/Hotkeys/OrdersQueueManipulation#distribute-orders'
     },
-    ['distribute_orders_context'] = {
+    ['spreadattack_context'] = {
         action = 'UI_Lua import("/lua/ui/game/hotkeys/distribute-queue.lua").DistributeOrdersOfMouseContext(true)',
         category = 'ordersQueueBased',
         wikiURL = 'Play/Game/Hotkeys/OrdersQueueManipulation#distribute-orders'
     },
-    ['shift_distribute_orders_context'] = {
+    ['shift_spreadattack_context'] = {
         action = 'UI_Lua import("/lua/ui/game/hotkeys/distribute-queue.lua").DistributeOrdersOfMouseContext(true)',
         category = 'ordersQueueBased',
         wikiURL = 'Play/Game/Hotkeys/OrdersQueueManipulation#distribute-orders'
@@ -1667,13 +1669,49 @@ local keyactionsOrdersContextBased = {
     ['set_target_priority'] = {
         action = 'UI_LUA import("/lua/keymap/misckeyactions.lua").SetWeaponPrioritiesToUnitType()',
         category = 'ordersContextBased',
-        wikiURL = 'Play/Game/Hotkeys/OrdersMouseContext#cycle-templates'
+        wikiURL = 'Play/Game/Hotkeys/OrdersMouseContext#apply-target-priorities'
     },
     ['shift_set_target_priority'] = {
         action = 'UI_LUA import("/lua/keymap/misckeyactions.lua").SetWeaponPrioritiesToUnitType()',
         category = 'ordersContextBased',
-        wikiURL = 'Play/Game/Hotkeys/OrdersMouseContext#cycle-templates'
+        wikiURL = 'Play/Game/Hotkeys/OrdersMouseContext#apply-target-priorities'
     },
+
+    ['cap'] = {
+        action = 'UI_LUA import("/lua/ui/game/hotkeys/capping.lua").HotkeyToCap(true, true)',
+        category = 'ordersContextBased',
+        wikiURL = 'Play/Game/Hotkeys/OrdersMouseContext#cap-a-structure'
+    },
+
+    ['shift_cap'] = {
+        action = 'UI_LUA import("/lua/ui/game/hotkeys/capping.lua").HotkeyToCap(true, false)',
+        category = 'ordersContextBased',
+        wikiURL = 'Play/Game/Hotkeys/OrdersMouseContext#cap-a-structure'
+    },
+
+    ['upgrade_structure'] = { 
+        action = 'UI_LUA import("/lua/ui/game/hotkeys/upgrade-structure.lua").UpgradeStructure()',
+        category = 'ordersContextBased',
+        wikiURL = '/Play/Game/Hotkeys/OrdersMouseContext#upgrade-a-structure'
+    },
+
+    ['shift_upgrade_structure'] = { 
+        action = 'UI_LUA import("/lua/ui/game/hotkeys/upgrade-structure.lua").UpgradeStructure()',
+        category = 'ordersContextBased',
+        wikiURL = '/Play/Game/Hotkeys/OrdersMouseContext#upgrade-a-structure'
+    },
+
+    ['upgrade_structure_pause'] = { 
+        action = 'UI_LUA import("/lua/ui/game/hotkeys/upgrade-structure.lua").UpgradeStructure(true)',
+        category = 'ordersContextBased',
+        wikiURL = '/Play/Game/Hotkeys/OrdersMouseContext#upgrade-a-structure'
+    },
+
+    ['shift_upgrade_structure_pause'] = { 
+        action = 'UI_LUA import("/lua/ui/game/hotkeys/upgrade-structure.lua").UpgradeStructure(true)',
+        category = 'ordersContextBased',
+        wikiURL = '/Play/Game/Hotkeys/OrdersMouseContext#upgrade-a-structure'
+    }
 }
 
 ---@type table<string, UIKeyAction>

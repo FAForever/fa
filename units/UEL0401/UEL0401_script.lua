@@ -289,7 +289,7 @@ UEL0401 = ClassUnit(TMobileFactoryUnit, ExternalFactoryComponent) {
 
             -- shuffle the order
             for k = explosionBoneCount, 1, -1 do
-                local j = (Random(1, k)) ^ 0;
+                local j = math.floor(Random(1, k));
                 local value = explosionBones[j];
                 explosionBones[j] = explosionBones[k];
                 explosionBones[k] = value;

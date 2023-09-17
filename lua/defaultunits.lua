@@ -219,7 +219,7 @@ StructureUnit = ClassUnit(Unit) {
             -- do not apply to upgrades
             blueprint.General.UpgradesFrom != builder.Blueprint.BlueprintId
         then
-            local CreateLightParticle = CreateLightParticle
+            local CreateLightParticleIntel = CreateLightParticleIntel
 
             local army = self.Army
             local position = self:GetPosition()
@@ -232,12 +232,8 @@ StructureUnit = ClassUnit(Unit) {
                 blueprintPhysics.MeshExtentsZ or blueprint.SizeZ or 0
             )
 
-            -- apply twice to break tree groups
-            DamageArea(self, position, 0.75 * radius, 1, 'TreeForce', false, false)
-            DamageArea(self, position, 0.75 * radius, 1, 'TreeForce', false, false)
-
             -- create a flash when the structure starts
-            CreateLightParticle( self, -1, army, 2 * radius, 22, 'glow_03', 'ramp_antimatter_02' )
+            CreateLightParticleIntel( self, -1, army, 2 * radius, 22, 'glow_03', 'ramp_antimatter_02' )
 
             -- includes units, need to filter those out
             local entities = GetReclaimablesInRect(Rect(
@@ -247,7 +243,10 @@ StructureUnit = ClassUnit(Unit) {
             if entities then
                 for k, prop in entities do
                     -- take out props that may linger around when building starts
-                    if prop.IsProp and not prop.Blueprint.CategoriesHash['OBSTRUCTSBUILDING'] then
+                    if  prop.IsProp and
+                        (not prop.Blueprint.CategoriesHash['OBSTRUCTSBUILDING'])  and
+                        (not prop.Blueprint.CategoriesHash['INVULNERABLE'])
+                    then
                         local center = prop:GetPosition()
                         local dx = position[1] - center[1]
                         local dz = position[3] - center[3]
@@ -281,12 +280,12 @@ StructureUnit = ClassUnit(Unit) {
         local x0, z0, x1, z1 = self:GetSkirtRect()
 
         -- floor them
-        x0 = x0 ^ 0
-        z0 = z0 ^ 0
+        x0 = math.floor(x0)
+        z0 = math.floor(z0)
 
         -- ceil them
-        x1 = 1 + (x1 ^ 0)
-        z1 = 1 + (z1 ^ 0)
+        x1 = math.ceil(x1)
+        z1 = math.ceil(z1)
 
         -- compute average elevation and flatten
         local elevation = 0.25 * (
@@ -304,12 +303,12 @@ StructureUnit = ClassUnit(Unit) {
         local x0, z0, x1, z1 = self:GetSkirtRect()
 
         -- floor them
-        x0 = x0 ^ 0
-        z0 = z0 ^ 0
+        x0 = math.floor(x0)
+        z0 = math.floor(z0)
 
         -- ceil them
-        x1 = 1 + (x1 ^ 0)
-        z1 = 1 + (z1 ^ 0)
+        x1 = math.ceil(x1)
+        z1 = math.ceil(z1)
 
         import('/lua/sim/TerrainUtils.lua').FlattenGradientMapRect(x0, z0, x1 - x0, z1 - z0)
     end,
@@ -2117,7 +2116,27 @@ SubUnit = ClassUnit(MobileUnit) {
         self.Trash:Add(self.SoundEntity)
         Warp(self.SoundEntity, self:GetPosition())
         self.SoundEntity:AttachTo(self,-1)
+
+
     end,
+
+    ---@param self Unit
+    ---@param new string
+    ---@param old string
+    OnMotionVertEventChange = function(self, new, old)
+        MobileUnit.OnMotionVertEventChange(self, new, old)
+
+        if new == 'Up' or new == 'Down' then
+            self:RemoveCommandCap("RULEUCC_Dive")
+            self:RequestRefreshUI()
+        end
+
+        if new == 'Top' or new == 'Bottom' then
+            self:AddCommandCap("RULEUCC_Dive")
+            self:RequestRefreshUI()
+        end
+    end,
+
 }
 
 -- AIR UNITS
@@ -2166,6 +2185,7 @@ AirUnit = ClassUnit(MobileUnit) {
             -- While landed, planes can only see half as far
             local vis = self.Blueprint.Intel.VisionRadius / 2
             self:SetIntelRadius('Vision', vis)
+            self:SetIntelRadius('WaterVision', 4)
 
             -- Turn off the ambient hover sound
             -- It will probably already be off, but there are some odd cases that
@@ -2176,6 +2196,7 @@ AirUnit = ClassUnit(MobileUnit) {
             local bpVision = self.Blueprint.Intel.VisionRadius
             if bpVision then
                 self:SetIntelRadius('Vision', bpVision)
+                self:SetIntelRadius('WaterVision', 0)
             else
                 self:SetIntelRadius('Vision', 0)
             end

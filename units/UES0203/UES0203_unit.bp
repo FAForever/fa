@@ -2,10 +2,6 @@ UnitBlueprint{
     Description = "<LOC ues0203_desc>Attack Submarine",
     AI = {
         GuardReturnRadius = 30,
-        TargetBones = {
-            "Spinner",
-            "UES0203",
-        },
     },
     Audio = {
         AmbientMove    = Sound { Bank = 'UES',        Cue = 'UES0203_Move_Loop',  LodCutoff = 'UnitMove_LodCutoff' },

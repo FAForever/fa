@@ -52,7 +52,7 @@ UnitQueueDataToCommand = {
     [7] = { Type = "BuildFactory", },
     [8] = {
         Type = "BuildMobile",
-        Callback = IssueBuildMobile,
+        Callback = IssueBuildAllMobile,
         Redundancy = 1,
     },
     [9] = {
@@ -220,7 +220,7 @@ end
 ---@param b Unit
 ---@return boolean
 local function SortByDistance(a, b)
-    return a.DistributeOrdersDistance < b.DistributeOrdersDistance
+    return a.Distance < b.Distance
 end
 
 --- Sorts the unit in-place by distance to the given coordinates
@@ -233,7 +233,7 @@ function SortUnitsByDistanceToPoint(units, px, pz)
         local ux, _, uz = unit:GetPositionXYZ()
         local dx = ux - px
         local dz = uz - pz
-        unit.DistributeOrdersDistance = dx * dx + dz * dz
+        unit.Distance = dx * dx + dz * dz
     end
 
     -- sort the units
@@ -241,7 +241,42 @@ function SortUnitsByDistanceToPoint(units, px, pz)
 
     -- remove distance field
     for _, unit in units do
-        unit.DistributeOrdersDistance = nil
+        unit.Distance = nil
+    end
+end
+
+---@param a Unit
+---@param b Unit
+---@return boolean
+local function SortBytech(a, b)
+    return a.Blueprint.TechCategory > b.Blueprint.TechCategory
+end
+
+--- Sorts the units in-place by tech
+---@param units Unit[]
+function SortUnitsByTech(units)
+    TableSort(units,SortBytech)
+end
+
+---@param offsets {[1]: number, [2]: number}
+---@param cx number
+---@param cz number
+---@param tx number
+---@param tz number
+function SortOffsetsByDistanceToPoint(offsets, cx, cz, tx, tz)
+    -- compute distance
+    for _, offset in offsets do
+        local dx = offset[1] + cx - tx
+        local dz = offset[2] + cz - tz
+        offset.Distance = dx * dx + dz * dz
+    end
+
+    -- sort it all
+    TableSort(offsets, SortByDistance)
+
+    -- remove distance field
+    for _, offset in offsets do
+        offset.Distance = nil
     end
 end
 
@@ -263,6 +298,7 @@ end
 
 --- Computes the average x / z coordinates of a table of units
 ---@param units Unit[]
+---@return Vector
 function AveragePositionOfUnits(units)
     local unitCount = table.getn(units)
 
@@ -284,6 +320,11 @@ function AveragePositionOfUnits(units)
     }
 end
 
+---@param px number
+---@param pz number
+---@param radius number
+---@param degrees number
+---@return Vector
 function PointOnUnitCircle(px, pz, radius, degrees)
     local cx = px + radius * math.cos( (degrees + 90) * 3.14 / 180 );
     local cz = pz + radius * math.sin( (degrees + 90) * 3.14 / 180 );
@@ -292,4 +333,27 @@ function PointOnUnitCircle(px, pz, radius, degrees)
         GetSurfaceHeight(cx, cz),
         cz
     }
+end
+
+
+---@param units Unit[]
+---@param px number
+---@param pz number
+---@return Unit | nil
+function FindNearestUnit(units, px, pz)
+    local nearest = units[1]
+    local distance = 4193 * 4193
+    for k = 1, table.getn(units) do
+        local unit = units[k]
+        local ux, _, uz = unit:GetPositionXYZ()
+        local dx = px - ux
+        local dz = pz - uz
+        local d = dx * dx + dz * dz
+        if d < distance then
+            nearest = unit
+            distance = d
+        end
+    end
+
+    return nearest
 end

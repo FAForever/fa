@@ -3,6 +3,10 @@
 ---@class moho.projectile_methods : moho.entity_methods
 local Projectile = {}
 
+---@return ProjectileBlueprint
+function Projectile:GetBlueprint()
+end
+
 --- Change the detonate above height for the projectile, relative to the terrain
 ---@param height number
 function Projectile:ChangeDetonateAboveHeight(height)
@@ -131,8 +135,8 @@ function Projectile:SetStayUpright(upright)
 end
 
 ---
----@param radiansPerSecond number
-function Projectile:SetTurnRate(radiansPerSecond)
+---@param degreesPerSecond number
+function Projectile:SetTurnRate(degreesPerSecond)
 end
 
 ---

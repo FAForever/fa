@@ -5,9 +5,8 @@ UnitBlueprint{
         GuardReturnRadius = 30,
         TargetBones = {
             "UES0202",
-            "Back_Wake",
-            "Front_Left_Wake",
-            "Front_Right_Wake",
+            "Front_Turret01",
+            "Back_Turret01",
         },
     },
     Audio = {

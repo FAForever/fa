@@ -389,28 +389,30 @@ float ComputeShadow( float4 vShadowCoord )
 }
 
 // apply the water color
-float3 ApplyWaterColor( float depth, float3  inColor)
+float3 ApplyWaterColor(float terrainHeight, float depth, float3 inColor)
 {
-#ifdef DIRECT3D10
-    float4 wcolor = tex2D(WaterRampSampler, float2(depth,0));
-#else
-    float4 wcolor = tex1D(WaterRampSampler, depth);
-#endif
-    return lerp( inColor.xyz, wcolor.xyz, wcolor.w );
+    if (terrainHeight <= WaterElevation) {
+        float4 wcolor = tex1D(WaterRampSampler, depth);
+        inColor = lerp( inColor.xyz, wcolor.xyz, wcolor.w );
+    }
+    return inColor;
 }
 
-float3 ApplyWaterColorExponentially(float3 viewDirection, float waterDepth, float3 color) {
-    float4 waterColor = tex1D(WaterRampSampler, waterDepth);
-    float3 up = float3(0,1,0);
-    // To simplify, we assume that the light enters vertically into the water,
-    // this is the length that the light travels underwater back to the camera
-    float oneOverCosV = 1 / max(dot(up, normalize(viewDirection)), 0.0001);
-    // light gets absorbed exponentially
-    float waterAbsorption = saturate(exp(-waterColor.w * (1 + oneOverCosV)));
-    // darken the color first to simulate the light absorption on the way in and out
-    color *= waterAbsorption;
-    // lerp in the watercolor to simulate the scattered light from the dirty water
-    color = lerp(waterColor.rgb, color, waterAbsorption);
+float3 ApplyWaterColorExponentially(float3 viewDirection, float terrainHeight, float waterDepth, float3 color) {
+    // With this extra check we get rid of unwanted coloration on steep cliffs
+    if (terrainHeight <= WaterElevation) {
+        float4 waterColor = tex1D(WaterRampSampler, waterDepth);
+        float3 up = float3(0,1,0);
+        // To simplify, we assume that the light enters vertically into the water,
+        // this is the length that the light travels underwater back to the camera
+        float oneOverCosV = 1 / max(abs(dot(up, normalize(viewDirection))), 0.0001);
+        // light gets absorbed exponentially
+        float waterAbsorption = saturate(exp(-waterColor.w * (1 + oneOverCosV)));
+        // darken the color first to simulate the light absorption on the way in and out
+        color *= waterAbsorption;
+        // lerp in the watercolor to simulate the scattered light from the dirty water
+        color = lerp(waterColor.rgb, color, waterAbsorption);
+    }
     return color;
 }
 
@@ -438,9 +440,9 @@ float4 CalculateLighting( float3 inNormal, float3 inViewPosition, float3 inAlbed
     color.rgb = light * inAlbedo;
 
     if (IsExperimentalShader()) {
-        color.rgb = ApplyWaterColorExponentially(-viewDirection, waterDepth, color);
+        color.rgb = ApplyWaterColorExponentially(-viewDirection, inViewPosition.z, waterDepth, color);
     } else {
-        color.rgb = ApplyWaterColor( waterDepth, color );
+        color.rgb = ApplyWaterColor(inViewPosition.z, waterDepth, color);
     }
 
     color.a = 0.01f + (specular*SpecularColor.w);
@@ -1999,7 +2001,7 @@ float4 TerrainPBRAlbedoPS ( VS_OUTPUT inV) : COLOR
     float3 color = PBR(inV, position, albedo, normal, roughness);
 
     float waterDepth = tex2Dproj(UtilitySamplerC, position).g;
-    color = ApplyWaterColorExponentially(-inV.mViewDirection, waterDepth, color);
+    color = ApplyWaterColorExponentially(-1 * inV.mViewDirection, inV.mTexWT.z, waterDepth, color);
 
     return float4(color, 0.01f);
     // SpecularColor, LowerNormalTile, Stratum7AlbedoTile and Stratum7NormalTile are unused now
@@ -2013,7 +2015,7 @@ technique TerrainPBRNormals
         DepthState( Depth_Enable )
 
         VertexShader = compile vs_1_1 TerrainVS(false);
-        PixelShader = compile ps_3_0 TerrainPBRNormalsPS();
+        PixelShader = compile ps_2_a TerrainPBRNormalsPS();
     }
 }
 
@@ -2174,7 +2176,7 @@ float4 Terrain001AlbedoPS ( VS_OUTPUT inV) : COLOR
 
     // compute water ramp intensity
     float waterDepth = tex2Dproj(UtilitySamplerC, coordinates).g;
-    albedo.rgb = ApplyWaterColorExponentially(-1 * inV.mViewDirection, waterDepth, albedo.rgb);
+    albedo.rgb = ApplyWaterColorExponentially(-1 * inV.mViewDirection, inV.mTexWT.z, waterDepth, albedo.rgb);
 
     return float4(albedo.rgb, 0.01f);
 }
@@ -2371,7 +2373,7 @@ float4 Terrain003AlbedoPS ( VS_OUTPUT inV) : COLOR
 
     // compute water ramp intensity
     float waterDepth = tex2D(UtilitySamplerC, coordinates).g;
-    albedo.rgb = ApplyWaterColorExponentially(-1 * inV.mViewDirection, waterDepth, albedo.rgb);
+    albedo.rgb = ApplyWaterColorExponentially(-1 * inV.mViewDirection, inV.mTexWT.z, waterDepth, albedo.rgb);
 
     return float4(albedo.rgb, 0.01f);
 }
@@ -2487,7 +2489,7 @@ float4 Terrain101AlbedoPS ( VS_OUTPUT inV) : COLOR
     float3 color = PBR(inV, position, albedo, normal, roughness);
 
     float waterDepth = tex2Dproj(UtilitySamplerC, position).g;
-    color = ApplyWaterColorExponentially(-inV.mViewDirection, waterDepth, color);
+    color = ApplyWaterColorExponentially(-1 * inV.mViewDirection, inV.mTexWT.z, waterDepth, color);
 
     return float4(color, 0.01f);
 }

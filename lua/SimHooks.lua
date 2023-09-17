@@ -1,3 +1,4 @@
+---@declare-global
 
 do 
     -- can only cause issues, like remote code exploit
@@ -91,5 +92,17 @@ do
         end
 
         return oldChangeUnitArmy(unit, army)
+    end
+end
+
+do
+    -- implementation of https://github.com/FAForever/FA-Binary-Patches/pull/29
+    local oldIssueBuildMobile = _G.IssueBuildMobile
+    _G.IssueBuildMobile = function(units, position, blueprintID, table)
+        oldIssueBuildMobile(units, position, blueprintID, table, false)
+    end
+
+    _G.IssueBuildAllMobile = function(units, position, blueprintID, table)
+        oldIssueBuildMobile(units, position, blueprintID, table, true)
     end
 end

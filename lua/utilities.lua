@@ -157,7 +157,10 @@ function GetTrueEnemyUnitsInSphere(unit, position, radius, categories)
 end
 
 function GetDistanceBetweenTwoPoints(x1, y1, z1, x2, y2, z2)
-    return (math.sqrt((x1-x2)^2 + (y1-y2)^2 + (z1-z2)^2))
+    local dx = (x1-x2)
+    local dy = (y1-y2)
+    local dz = (z1-z2)
+    return (math.sqrt(dx * dx + dy * dy + dz * dz))
 end
 
 function GetDistanceBetweenTwoVectors(v1, v2)
