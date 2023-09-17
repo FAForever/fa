@@ -60,7 +60,7 @@ UnitBlueprint{
                 {
                     LODCutoff = 215,
                     Scrolling = true,
-                    ShaderName = "Insect",
+                    ShaderName = "CybranNavy",
                     MeshName = "/units/XRB2308/XRB2308_lod0.scm",
                     AlbedoName = "/units/XRB2308/XRB2308_albedo.dds",
                     NormalsName = "/units/XRB2308/XRB2308_normalsTS.dds",
@@ -68,7 +68,7 @@ UnitBlueprint{
                 },
                 {
                     LODCutoff = 215,
-                    ShaderName = "Insect",
+                    ShaderName = "CybranNavy",
                     MeshName = "/units/XRB2308/XRB2308_lod1.scm",
                     AlbedoName = "/units/XRB2308/XRB2308_albedo.dds",
                     NormalsName = "/units/XRB2308/XRB2308_normalsTS.dds",
