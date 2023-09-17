@@ -28,6 +28,7 @@ local Generated = false
 
 ---@class MarkerExpansion : MarkerData
 ---@field Extractors MarkerResource[]
+---@field HydrocarbonPlants MarkerResource[]
 ---@field RallyPoints MarkerRallyPoint[]
 
 function IsGenerated()
@@ -38,12 +39,12 @@ end
 ---@return integer
 local function GenerateExpansionMarkers ()
 
-    ---@class ExtractorNode 
+    ---@class ResourceNode 
     ---@field Identifier number
-    ---@field Extractor MarkerResource
+    ---@field Marker MarkerResource
     ---@field Seen boolean
-    ---@field Neighbors ExtractorNode[]
-    ---@field Candidates ExtractorNode[]
+    ---@field Neighbors ResourceNode[]
+    ---@field Candidates ResourceNode[]
 
     local mapSize = math.max(ScenarioInfo.size[1], ScenarioInfo.size[2])
     local mapFactor = 16 / (mapSize)
@@ -55,34 +56,34 @@ local function GenerateExpansionMarkers ()
         return bx, bz
     end
 
-    ---@type ExtractorNode[]
+    ---@type ResourceNode[]
     local structuredExtractorData = { }
 
     ---------------------------------------------------
     -- Create and populate a temporarily grid to easen
     -- the complexity of grouping the extractors
 
-    ---@type { Extractors: ExtractorNode[] }[][]
+    ---@type { ResourceNodes: ResourceNode[] }[][]
     local grid = {}
     for z = 1, 16 do
         grid[z] = {}
         for x = 1, 16 do
             grid[z][x] = {
-                Extractors = { }
+                ResourceNodes = { }
             }
         end
     end
 
     local extractors = import("/lua/sim/markerutilities.lua").GetMarkersByType('Mass')
-    for k, extractor in extractors do
-        local p = extractor.position
+    for k, resource in extractors do
+        local p = resource.position
         local px, pz = p[1], p[3]
 
         local bx, bz = ComputeBlock(px, pz)
         local cell = grid[bz][bx]
         if cell then
             local node = {
-                Extractor = extractor,
+                Marker = resource,
                 Identifier = k,
                 Seen = false,
                 Neighbors = { },
@@ -90,16 +91,36 @@ local function GenerateExpansionMarkers ()
             }
 
             table.insert(structuredExtractorData, node)
-            table.insert(cell.Extractors, node)
+            table.insert(cell.ResourceNodes, node)
         end
     end
 
+    local hydrocarbonPlants = import("/lua/sim/markerutilities.lua").GetMarkersByType('Hydrocarbon')
+    for k, resource in hydrocarbonPlants do
+        local p = resource.position
+        local px, pz = p[1], p[3]
+
+        local bx, bz = ComputeBlock(px, pz)
+        local cell = grid[bz][bx]
+        if cell then
+            local node = {
+                Marker = resource,
+                Identifier = k,
+                Seen = false,
+                Neighbors = { },
+                Candidates = { },
+            }
+
+            table.insert(structuredExtractorData, node)
+            table.insert(cell.ResourceNodes, node)
+        end
+    end
     ---------------------------------------------------
     -- find neighbouring extractors
 
     for k = 1, table.getn(structuredExtractorData) do
         local instance = structuredExtractorData[k]
-        local extractor = instance.Extractor
+        local extractor = instance.Marker
         local px,pz = extractor.position[1], extractor.position[3]
         local bx, bz = ComputeBlock(px, pz)
 
@@ -108,11 +129,11 @@ local function GenerateExpansionMarkers ()
             for lx = -2, 2 do
                 local cell = grid[bz + lz][bx + lx]
                 if cell then
-                    for k = 1, table.getn(cell.Extractors) do
-                        local neighbor = cell.Extractors[k]
-                        if neighbor != instance and neighbor.Extractor.NavLabel == instance.Extractor.NavLabel then
-                            local dx = px - neighbor.Extractor.position[1]
-                            local dz = pz - neighbor.Extractor.position[3]
+                    for k = 1, table.getn(cell.ResourceNodes) do
+                        local neighbor = cell.ResourceNodes[k]
+                        if neighbor != instance and neighbor.Marker.NavLabel == instance.Marker.NavLabel then
+                            local dx = px - neighbor.Marker.position[1]
+                            local dz = pz - neighbor.Marker.position[3]
                             local d = dx * dx + dz * dz
                             if d < threshold then
                                 instance.Neighbors[neighbor.Identifier] = neighbor
@@ -145,11 +166,18 @@ local function GenerateExpansionMarkers ()
 
         ---@type MarkerResource[]
         local extractors = { }
+        local hydrocarbonPlants = { }
 
         while not stack:Empty() do
-            ---@type ExtractorNode
+            ---@type ResourceNode
             local instance = stack:Pop()
-            table.insert(extractors, instance.Extractor)
+
+            if instance.Marker.Type == 'Mass' then
+                table.insert(extractors, instance.Marker)
+            else
+                table.insert(hydrocarbonPlants, instance.Marker)
+            end
+
             for _, neighbor in instance.Neighbors do
                 if not neighbor.Marked then
                     neighbor.Marked = true
@@ -158,7 +186,11 @@ local function GenerateExpansionMarkers ()
             end
         end
 
-        local numberOfExtractors = table.getn(extractors)
+        -----------------------------------------------------------------------
+        -- Compute center for the expansion marker
+
+        local averageCount = table.getn(extractors) + table.getn(hydrocarbonPlants)
+
         local center = { 0, 0, 0 }
         for _, extractor in extractors do
             local position = extractor.position
@@ -166,19 +198,23 @@ local function GenerateExpansionMarkers ()
             center[3] = center[3] + position[3]
         end
 
-        center[1] = center[1] / numberOfExtractors
-        center[3] = center[3] / numberOfExtractors
+        for _, extractor in hydrocarbonPlants do
+            local position = extractor.position
+            center[1] = center[1] + position[1]
+            center[3] = center[3] + position[3]
+        end
+
+        center[1] = center[1] / averageCount
+        center[3] = center[3] / averageCount
         center[2] = GetSurfaceHeight(center[1], center[3])
-
-
 
         ---@type MarkerExpansion
         local expansionMarker = {
             position = center,
             Position = center,
             Extractors = extractors,
+            HydrocarbonPlants = hydrocarbonPlants,
             RallyPoints = { },
-            NavLabel = NavUtils.GetLabel('Land', center),
         }
 
         expansions[expansionCount + 1] = expansionMarker
@@ -205,6 +241,7 @@ local function AssimilateExpansionMarkers(expansions, expansionCount)
     for k = 1, startLocationCount do
         local startLocation = startLocations[k]
         startLocation.Extractors = { }
+        startLocation.HydrocarbonPlants = { }
         startLocation.RallyPoints = { }
     end
 
@@ -238,8 +275,13 @@ local function AssimilateExpansionMarkers(expansions, expansionCount)
         -- assimilate it into the spawn location
         if math.sqrt(nearestStartLocationDistance) < threshold then
             local extractors = nearestStartLocation.Extractors
-            for k, extractor in expansion.Extractors do
-                table.insert(extractors, extractor)
+            for k, resource in expansion.Extractors do
+                table.insert(extractors, resource)
+            end
+
+            local hydrocarbonPlants = nearestStartLocation.HydrocarbonPlants
+            for k, resource in expansion.HydrocarbonPlants do
+                table.insert(hydrocarbonPlants, resource)
             end
         else
             expansions[head] = expansion
