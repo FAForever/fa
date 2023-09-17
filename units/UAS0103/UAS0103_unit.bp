@@ -218,7 +218,7 @@ UnitBlueprint{
             RackBones = {
                 {
                     MuzzleBones = { "Turret_Front_Muzzle" },
-                    RackBone = "Turret_Front_Muzzle",
+                    RackBone = "Turret_Front_Barrel",
                 },
             },
             RackFireTogether = false,
@@ -238,7 +238,7 @@ UnitBlueprint{
             },
             TargetRestrictDisallow = "UNTARGETABLE",
             TurretBoneMuzzle = "Turret_Front_Muzzle",
-            TurretBonePitch = "Turret_Front_Barrel",
+            TurretBonePitch = "Turret_Front_Pitch",
             TurretBoneYaw = "Turret_Front",
             TurretDualManipulators = false,
             TurretPitch = 10,
@@ -277,7 +277,7 @@ UnitBlueprint{
             RackBones = {
                 {
                     MuzzleBones = { "Turret_Back_Muzzle" },
-                    RackBone = "Turret_Back_Muzzle",
+                    RackBone = "Turret_Back_Barrel",
                 },
             },
             RackFireTogether = false,
@@ -297,7 +297,7 @@ UnitBlueprint{
             },
             TargetRestrictDisallow = "UNTARGETABLE",
             TurretBoneMuzzle = "Turret_Back_Muzzle",
-            TurretBonePitch = "Turret_Back_Barrel",
+            TurretBonePitch = "Turret_Back_Pitch",
             TurretBoneYaw = "Turret_Back",
             TurretDualManipulators = false,
             TurretPitch = 10,
