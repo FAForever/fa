@@ -814,6 +814,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
         WeaponAimWantEnabled = true,
 
         Main = function(self)
+
             -- We change the state on counted projectiles because we won't get another OnFire call.
             -- The second part is a hack for units with reload animations.  They have the same problem
             -- they need a RackSalvoReloadTime that's 1/RateOfFire set to avoid firing twice on the first shot
@@ -837,7 +838,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
             -- before resuming the sequence from this point
             -- Introduced to fix a bug where units with this bp flag would go straight to projectile creation
             -- from OnGotTarget, without waiting for OnFire() to be called from engine.
-            if bp.CountedProjectile or bp.AnimationReload then
+            if (unit:GetFireState() == 1) and (bp.CountedProjectile or bp.AnimationReload) then
                 while unit:GetFireState() == 1 do
                     WaitTicks(1)
 
