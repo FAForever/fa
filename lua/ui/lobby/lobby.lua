@@ -5136,7 +5136,7 @@ local MessageHandlers = {
 
     AddPlayer = {
         Accept = function(data)
-            return data.PlayerOptions.OwnerID and data.PlayerOptions.OwnerID ~= hostID and lobbyComm:IsHost()
+            return data.PlayerOptions.OwnerID and data.PlayerOptions.OwnerID == data.SenderID and lobbyComm:IsHost()
         end,
         Reject = function(data)
             lobbyComm:EjectPeer(data.SenderID, "Invalid player data.")
