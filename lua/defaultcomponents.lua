@@ -849,6 +849,7 @@ ExternalFactoryComponent = ClassSimple {
         self.ExternalFactory = CreateUnitHPR(blueprintIdExternalFactory, self.Army, position[1], position[2], position[3], 0, 0, 0) --[[@as ExternalFactoryUnit]]
         self.ExternalFactory:AttachTo(entity, -1)
         self.ExternalFactory:SetCreator(self)
+        self:SetCreator(self.ExternalFactory)
         self.ExternalFactory:SetParent(self)
         self.Trash:Add(self.ExternalFactory)
     end,
