@@ -72,7 +72,10 @@ UAL0301 = ClassUnit(CommandUnit) {
             self:SetMaintenanceConsumptionInactive()
             self:RemoveToggleCap('RULEUTC_ShieldToggle')
         elseif enh == 'ShieldHeavy' then
-            self.Trash:Add(ForkThread(self.CreateHeavyShield, bp,self))
+            self:AddToggleCap('RULEUTC_ShieldToggle')
+            self:SetEnergyMaintenanceConsumptionOverride(bp.MaintenanceConsumptionPerSecondEnergy or 0)
+            self:SetMaintenanceConsumptionActive()
+            self:CreateShield(bp)
         elseif enh == 'ShieldHeavyRemove' then
             self:DestroyShield()
             self:SetMaintenanceConsumptionInactive()
@@ -147,13 +150,6 @@ UAL0301 = ClassUnit(CommandUnit) {
             wep:AddDamageRadiusMod(bp.NewDamageRadiusMod or 0)
             wep:ChangeMaxRadius(bp.NewMaxRadius or 25)
         end
-    end,
-
-    CreateHeavyShield = function(self, bp)
-        WaitTicks(1)
-        self:CreateShield(bp)
-        self:SetEnergyMaintenanceConsumptionOverride(bp.MaintenanceConsumptionPerSecondEnergy or 0)
-        self:SetMaintenanceConsumptionActive()
     end,
 }
 

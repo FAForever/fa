@@ -171,6 +171,14 @@ XSL0301 = ClassUnit(CommandUnit) {
             wep:ChangeMaxRadius(bp.NewMaxRadius or 25)
             local aoc = self:GetWeaponByLabel('AutoOverCharge')
             aoc:ChangeMaxRadius(bp.NewMaxRadius or 25)
+        elseif enh == 'DamageEnhancement' then
+            local wep = self:GetWeaponByLabel('LightChronatronCannon')
+            wep:AddDamageRadiusMod(bp.NewDamageRadius)
+            wep:ChangeMaxRadius(bp.NewMaxRange or 30)
+        elseif enh == 'DamageEnhancementRemove' then
+            local wep = self:GetWeaponByLabel('LightChronatronCannon')
+            wep:AddDamageRadiusMod(bp.NewDamageRadius)
+            wep:ChangeMaxRadius(bp.NewMaxRange or 25)
         end
     end,
 }

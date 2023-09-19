@@ -261,8 +261,8 @@ UnitBlueprint{
         Stealth = {
             Description = "<LOC url0301_Stealth_desc>SACU (Stealth preset)",
             BuildIconSortPriority = 40,
-            Enhancements = { "StealthGenerator" },
-            HelpText = "<LOC url0301_Stealth_help>Support Armored Command Unit. Enhanced during construction with the personal stealth generator enhancement.",
+            Enhancements = { "StealthGenerator", "FocusConvertor" },
+            HelpText = "<LOC url0301_Stealth_help>Support Armored Command Unit. Enhanced during construction with the personal stealth generator and the Focus Convertor enhancements.",
             SortCategory = "SORTOTHER",
             UnitName = "<LOC url0301_Stealth_name>SACU (Stealth preset)",
         },

@@ -13,7 +13,7 @@ local TDFHeavyPlasmaCannonWeapon = TWeapons.TDFHeavyPlasmaCannonWeapon
 local SCUDeathWeapon = import("/lua/sim/defaultweapons.lua").SCUDeathWeapon
 
 ---@class UEL0301 : CommandUnit
-UEL0301 = ClassUnit(CommandUnit) {
+UEL0301 = ClassUnit(CommandUnit) { 
     IntelEffects = {
         {
             Bones = {
@@ -135,13 +135,10 @@ UEL0301 = ClassUnit(CommandUnit) {
             self:SetMaintenanceConsumptionInactive()
             self:RemoveToggleCap('RULEUTC_ShieldToggle')
         elseif enh == 'ShieldGeneratorField' then
-            self:DestroyShield()
-            self:ForkThread(function()
-                WaitTicks(1)
-                self:CreateShield(bp)
-                self:SetEnergyMaintenanceConsumptionOverride(bp.MaintenanceConsumptionPerSecondEnergy or 0)
-                self:SetMaintenanceConsumptionActive()
-            end)
+            self:AddToggleCap('RULEUTC_ShieldToggle')
+            self:SetEnergyMaintenanceConsumptionOverride(bp.MaintenanceConsumptionPerSecondEnergy or 0)
+            self:SetMaintenanceConsumptionActive()
+            self:CreateShield(bp)
         elseif enh == 'ShieldGeneratorFieldRemove' then
             self:DestroyShield()
             self:SetMaintenanceConsumptionInactive()
