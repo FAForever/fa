@@ -90,6 +90,7 @@ UAL0301 = ClassUnit(CommandUnit) {
             self:SetProductionPerSecondMass(bpEcon.ProductionPerSecondMass or 0)
             -- Engineering Focus Module
         elseif enh == 'EngineeringFocusingModule' then
+            self:AddCommandCap('RULEUCC_Sacrifice')
             if not Buffs['AeonSCUBuildRate'] then
                 BuffBlueprint {
                     Name = 'AeonSCUBuildRate',
@@ -107,6 +108,7 @@ UAL0301 = ClassUnit(CommandUnit) {
             end
             Buff.ApplyBuff(self, 'AeonSCUBuildRate')
         elseif enh == 'EngineeringFocusingModuleRemove' then
+            self:RemoveCommandCap('RULEUCC_Sacrifice')
             if Buff.HasBuff(self, 'AeonSCUBuildRate') then
                 Buff.RemoveBuff(self, 'AeonSCUBuildRate')
             end
@@ -133,22 +135,17 @@ UAL0301 = ClassUnit(CommandUnit) {
             if Buff.HasBuff(self, 'AeonSCURegenRate') then
                 Buff.RemoveBuff(self, 'AeonSCURegenRate')
             end
-            -- Sacrifice
-        elseif enh == 'Sacrifice' then
-            self:AddCommandCap('RULEUCC_Sacrifice')
-        elseif enh == 'SacrificeRemove' then
-            self:RemoveCommandCap('RULEUCC_Sacrifice')
             -- StabilitySupressant
         elseif enh == 'StabilitySuppressant' then
             local wep = self:GetWeaponByLabel('RightReactonCannon')
             wep:AddDamageMod(bp.NewDamageMod or 0)
             wep:AddDamageRadiusMod(bp.NewDamageRadiusMod or 0)
-            wep:ChangeMaxRadius(bp.NewMaxRadius or 40)
+            wep:ChangeMaxRadius(bp.NewMaxRadius or 44)
         elseif enh == 'StabilitySuppressantRemove' then
             local wep = self:GetWeaponByLabel('RightReactonCannon')
             wep:AddDamageMod(-self.Blueprint.Enhancements['RightReactonCannon'].NewDamageMod)
             wep:AddDamageRadiusMod(bp.NewDamageRadiusMod or 0)
-            wep:ChangeMaxRadius(bp.NewMaxRadius or 30)
+            wep:ChangeMaxRadius(bp.NewMaxRadius or 25)
         end
     end,
 
