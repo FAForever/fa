@@ -1763,7 +1763,7 @@ Unit_Description_0466_faf="Massively increases the range of the ACU's main canno
 
 -- AEON -- Support Commander Units/Upgrades
 Unit_Description_0167="A highly versatile combat and engineering unit useful on late-stage battlefields."
-Unit_Description_0168="Massively increases SACU build-power."
+Unit_Description_0168="Massively increases SACU build-power and Sacrifice System integration.."
 Unit_Description_0169="Increases SACU's resource generation by 10 mass per second and 1000 energy per second."
 Unit_Description_0170="Grants the Sacrifice ability, allowing the SACU to suicide itself to add its mass to another construction project instantly."
 Unit_Description_0171="Creates a protective Personal Shield around the SACU. Requires energy to run."
