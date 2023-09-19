@@ -187,12 +187,13 @@ Description = {
     ['url0301-sfs'] = "<LOC Unit_Description_0123> Hides the SACU from radar. Requires Energy to run.",
 
     -- CYBRAN -- Support Commander Presets
-    ['url0301_AntiAir'] = "<LOC url0301_AntiAir_help> Support Armored Command Unit. Enhanced during construction with the nanite missile system enhancement.",
-    ['url0301_Cloak'] = "<LOC url0301_Cloak_help> Support Armored Command Unit. Enhanced during construction with the personal cloaking generator and dis-integrator amplifier enhancements.",
-    ['url0301_Combat'] = "<LOC url0301_Combat_help> Support Armored Command Unit. Enhanced during construction with the EMP burst and dis-integrator amplifier enhancements.",
-    ['url0301_Engineer'] = "<LOC url0301_Engineer_help> Support Armored Command Unit. Enhanced during construction with the rapid fabricator enhancement.",
-    ['url0301_Rambo'] = "<LOC url0301_Rambo_help> Support Armored Command Unit. Enhanced during construction with the EMP burst, dis-integrator amplifier and nano-repair system enhancements.",
     ['url0301_RAS'] = "<LOC url0301_RAS_help> Support Armored Command Unit. Enhanced during construction with a Resource Allocation System.",
+    ['url0301_Engineer'] = "<LOC url0301_Engineer_help> Support Armored Command Unit. Enhanced during construction with the rapid fabricator enhancement.",
+    ['url0301_AdvEngineer'] = "<LOC url0301_AdvEngineer_help> Support Armored Command Unit. Enhanced during construction with the rapid fabricator enhancement.",
+    ['url0301_Combat'] = "<LOC url0301_Combat_help> Support Armored Command Unit. Enhanced during construction with the EMP burst and dis-integrator amplifier enhancements.",
+    ['url0301_AdvCombat'] = "<LOC url0301_AdvCombat_help> Support Armored Command Unit. Enhanced during construction with the EMP burst, dis-integrator amplifier and nano-repair system enhancements.",
+    ['url0301_ExpCombat'] = "<LOC url0301_ExpCombat_help> Support Armored Command Unit. Enhanced during construction with the personal cloaking generator and dis-integrator amplifier enhancements.",
+    ['url0301_SupportCombat'] = "<LOC url0301_Support_help> Support Armored Command Unit. Enhanced during construction with the nanite missile system enhancement.",
     ['url0301_Stealth'] = "<LOC url0301_Stealth_help> Support Armored Command Unit. Enhanced during construction with the personal stealth generator enhancement.",
 
     -- CYBRAN -- Land Units
