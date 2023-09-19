@@ -129,12 +129,12 @@ BuilderGroup {
     Builder {
         BuilderName = 'T2 Mass Extractor Upgrade Timeless Multiple Expansion',
         PlatoonTemplate = 'T2MassExtractorUpgrade',
-        InstanceCount = 4,
+        InstanceCount = 3,
         Priority = 200,
         BuilderConditions = {
             { IBC, 'BrainNotLowPowerMode', {} },
             { EBC, 'GreaterThanEconIncomeOverTime',  { 35, 10}},
-            { EBC, 'GreaterThanEconEfficiencyCombined', { 0.6, 1.2 }},
+            { EBC, 'GreaterThanEconEfficiencyCombined', { 0.8, 1.2 }},
             { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 3, categories.MASSEXTRACTION } },
             { UCBC, 'UnitsGreaterAtLocation', { 'MAIN', 3, categories.MASSEXTRACTION * categories.TECH3 } },
         },
@@ -184,7 +184,7 @@ BuilderGroup {
         BuilderConditions = {
             { IBC, 'BrainNotLowPowerMode', {} },
             { EBC, 'GreaterThanEconIncomeOverTime',  { 15, 10}},
-            { EBC, 'GreaterThanEconEfficiencyCombined', { 0.6, 1.2 }},
+            { EBC, 'GreaterThanEconEfficiencyCombined', { 0.8, 1.2 }},
             { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 4, categories.MASSEXTRACTION } },
         },
         FormRadius = 10000,

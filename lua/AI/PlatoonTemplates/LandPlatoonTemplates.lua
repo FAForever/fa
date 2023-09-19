@@ -184,7 +184,15 @@ PlatoonTemplate {
     },
 }
 
+PlatoonTemplate {
+    Name = 'StateMachinePlatoon',
+    Plan = 'StateMachineAI',
+    GlobalSquads = {
+        { categories.DIRECTFIRE * categories.LAND * categories.MOBILE - categories.SCOUT - categories.ENGINEER, 2, 15, 'Attack', 'None' },
+        { categories.LAND * categories.MOBILE * categories.SCOUT, 1, 2, 'Scout', 'None' }
+    },
 
+}
 -- ==== Factional Templates ==== --
 
 -- T1

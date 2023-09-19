@@ -3279,6 +3279,47 @@ function CanBuildOnLocalMassPoints(aiBrain, engPos, distance)
     end
 end
 
+---@param aiBrain AIBrain
+---@param engPos table
+---@param distance number
+---@return boolean
+---@return table
+function CanBuildOnGridMassPoints(aiBrain, engPos, distance, layer)
+    -- Checks if an engineer can build on mass points close to its location
+    -- will return a bool if it found anything and if it did then a table of mass markers
+    -- the BorderWarning is used to tell the AI that the mass marker is too close to the map border
+    local pointDistance = distance * distance
+    local depositsGrid = aiBrain.GridDeposits
+    if not depositsGrid then
+        WARN('GridDeposits class is not setup for AI')
+        return
+    end
+    local massMarkers = depositsGrid:GetResourcesWithinDistance('Mass', engPos, distance, layer)
+    local NavUtils = import("/lua/sim/navutils.lua")
+    local validMassMarkers = {}
+    for _, v in massMarkers do
+        if v.type == 'Mass' then
+            local massBorderWarn = false
+            if v.position[1] <= 8 or v.position[1] >= ScenarioInfo.size[1] - 8 or v.position[3] <= 8 or v.position[3] >= ScenarioInfo.size[2] - 8 then
+                massBorderWarn = true
+            end 
+            local mexDistance = VDist2Sq( v.position[1],v.position[3], engPos[1], engPos[3] )
+            if mexDistance < pointDistance and aiBrain:CanBuildStructureAt('ueb1103', v.position) and NavUtils.CanPathTo('Amphibious', engPos, v.position) then
+                table.insert(validMassMarkers, {Position = v.position, Distance = mexDistance , MassSpot = v, BorderWarning = massBorderWarn})
+            end
+        end
+    end
+    if table.getn(validMassMarkers) > 0 then
+        LOG('Close mass markers '..repr(validMassMarkers))
+    end
+    table.sort(validMassMarkers, function(a,b) return a.Distance < b.Distance end)
+    if table.getn(validMassMarkers) > 0 then
+        return true, validMassMarkers
+    else
+        return false
+    end
+end
+
 ---@param eng Unit
 ---@param minimumReclaim number
 ---@return boolean
