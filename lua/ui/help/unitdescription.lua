@@ -35,13 +35,13 @@ Description = {
     ['uel0301-acu'] = "<LOC Unit_Description_0023> Rapidly cools any weapon mounted onto the SACU. Increases rate of fire.",
     ['uel0301-heo'] = "<LOC Unit_Description_0024> Equips the standard SACU Heavy plasma cannon with area-of-effect damage.",
 
-    -- UEF -- Support Commander Presets
-    ['uel0301_BubbleShield'] = "<LOC uel0301_BubbleShield_help> Support Armored Command Unit. Enhanced during construction with the bubble shield generator enhancement.",
-    ['uel0301_Combat'] = "<LOC uel0301_Combat_help> Support Armored Command Unit. Enhanced during construction with the energy accelerator and heavy plasma refractor enhancements.",
-    ['uel0301_Engineer'] = "<LOC uel0301_Engineer_help> Support Armored Command Unit. Enhanced during construction with the engineering drone enhancement.",
-    ['uel0301_IntelJammer'] = "<LOC uel0301_IntelJammer_help> Support Armored Command Unit. Enhanced during construction with the radar jammer and enhanced sensor system enhancements.",
-    ['uel0301_Rambo'] = "<LOC uel0301_Rambo_help> Support Armored Command Unit. Enhanced during construction with a personal shield, energy accelerator and heavy plasma refractor enhancements.",
+    -- UEF -- Support Commander Presets   
     ['uel0301_RAS'] = "<LOC uel0301_RAS_help> Support Armored Command Unit. Enhanced during construction with a Resource Allocation System.",
+    ['uel0301_Engineer'] = "<LOC uel0301_Engineer_help> Support Armored Command Unit. Enhanced during construction with the engineering drone enhancement.",
+    ['uel0301_AdvEngineer'] = "<LOC uel0301_AdvEngineer_help> Support Armored Command Unit. Enhanced during construction with the engineering drone and resource allocation system enhancements.",
+    ['uel0301_Combat'] = "<LOC uel0301_Combat_help> Support Armored Command Unit. Enhanced during construction with the energy accelerator and heavy plasma refractor enhancements.",
+    ['uel0301_AdvCombat'] = "<LOC uel0301_AdvCombat_help> Support Armored Command Unit. Enhanced during construction with a personal shield, energy accelerator and heavy plasma refractor enhancements.",
+    ['uel0301_SupportCombat'] = "<LOC uel0301_SupportCombat_help> Support Armored Command Unit. Enhanced during construction with the bubble shield generator and Sensor Suite enhancements.",
 
     -- UEF -- Land Units
     ['uel0101'] = "<LOC Unit_Description_0025> Fast, lightly armored reconnaissance vehicle. Armed with a machine gun and a state-of-the-art sensor suite.",
