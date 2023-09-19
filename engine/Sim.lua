@@ -773,7 +773,7 @@ end
 function IssueCapture(units, target)
 end
 
---- Clears out all commands issued on the group of units, this happens immediately
+--- Clears out all commands issued on the group of units, this happens immediately. See `IssueToUnitClearCommands` when you want to computationally efficiently apply it to a single unit 
 ---@param units Unit[]
 ---@return SimCommand
 function IssueClearCommands(units)
@@ -870,14 +870,14 @@ end
 function IssueKillSelf(units)
 end
 
---- Orders a group of units to move to a position
+--- Orders a group of units to move to a position.  See `IssueToUnitMove` when you want to computationally efficiently apply it to a single unit 
 ---@param units Unit[]
 ---@param position Vector
 ---@return SimCommand
 function IssueMove(units, position)
 end
 
---- Orders a group of units to move off a factory build site
+--- Orders a group of units to move off a factory build site. See `IssueToUnitMoveOffFactory` when you want to computationally efficiently apply it to a single unit
 ---@param units Unit[]
 ---@param position Vector
 ---@return SimCommand

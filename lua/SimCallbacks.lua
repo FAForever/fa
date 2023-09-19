@@ -224,7 +224,7 @@ Callbacks.ValidateAssist = function(data, units)
     if units and target then
         for k, u in units do
             if IsEntity(u) and u.Army == target.Army and IsInvalidAssist(u, target) then
-                IssueClearCommands({ target })
+                IssueToUnitClearCommands(target)
                 return
             end
         end

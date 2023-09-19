@@ -281,7 +281,7 @@ Platoon = Class(moho.platoon_methods) {
             end
             if not v.Dead then
                 IssueStop({v})
-                IssueClearCommands({v})
+                IssueToUnitClearCommands(v)
             end
         end
         if self.AIThread then
@@ -371,7 +371,7 @@ Platoon = Class(moho.platoon_methods) {
         end
         if unit then
             IssueStop({unit})
-            IssueClearCommands({unit})
+            IssueToUnitClearCommands(unit)
             for k,v in data.Enhancement do
                 if not unit:HasEnhancement(v) then
                     local order = {
@@ -507,7 +507,7 @@ Platoon = Class(moho.platoon_methods) {
                 if nukePos then
                    IssueNuke({unit}, nukePos)
                    WaitSeconds(12)
-                   IssueClearCommands({unit})
+                   IssueToUnitClearCommands(unit)
                 end
                 WaitSeconds(1)
             end
@@ -2170,7 +2170,7 @@ Platoon = Class(moho.platoon_methods) {
         local eng
         for k, v in platoonUnits do
             if not v.Dead and EntityCategoryContains(categories.ENGINEER - categories.STATIONASSISTPOD, v) then --DUNCAN - was construction
-                IssueClearCommands({v})
+                IssueToUnitClearCommands(v)
                 if not eng then
                     eng = v
                 else
@@ -3662,7 +3662,7 @@ Platoon = Class(moho.platoon_methods) {
         end
 
         eng.ProcessBuildDone = false
-        IssueClearCommands({eng})
+        IssueToUnitClearCommands(eng)
         local commandDone = false
         local PlatoonPos
         local whatToBuild
@@ -4342,7 +4342,7 @@ Platoon = Class(moho.platoon_methods) {
         eng.Combat = true
         while aiBrain:PlatoonExists(self) do
             WaitTicks(10)
-            IssueClearCommands({eng})
+            IssueToUnitClearCommands(eng)
             -- Find a cell we want to reclaim from
             local reclaimTargetX, reclaimTargetZ = AIUtils.EngFindReclaimCell(aiBrain, eng, self.MovementLayer, searchType)
             if reclaimTargetX and reclaimTargetZ then
@@ -4351,7 +4351,7 @@ Platoon = Class(moho.platoon_methods) {
                 eng.CellAssigned = {reclaimTargetX, reclaimTargetZ}
                 brainGridInstance:AddReclaimingEngineer(brainCell, eng)
                 local moveLocation = reclaimGridInstance:ToWorldSpace(reclaimTargetX, reclaimTargetZ)
-                IssueMove({eng}, moveLocation)
+                IssueToUnitMove(eng, moveLocation)
                 local engStuckCount = 0
                 local Lastdist
                 local dist = VDist3Sq(eng:GetPosition(), moveLocation)
@@ -4364,7 +4364,7 @@ Platoon = Class(moho.platoon_methods) {
                         local actionTaken = AIUtils.EngAvoidLocalDanger(aiBrain, eng)
                         if actionTaken then
                             -- Statemachine switch to evaluating next action to take
-                            IssueMove({eng}, moveLocation)
+                            IssueToUnitMove(eng, moveLocation)
                         end
                     else
                         -- Jip discussed potentially getting navmesh to return mass points along the path rather than this.
@@ -4374,13 +4374,13 @@ Platoon = Class(moho.platoon_methods) {
                             if reclaimAction then
                                 WaitTicks(45)
                                 -- Statemachine switch to evaluating next action to take
-                                IssueMove({eng}, moveLocation)
+                                IssueToUnitMove(eng, moveLocation)
                             end
                         end
                         local extractorAction = AIUtils.EngLocalExtractorBuild(aiBrain, eng)
                         if extractorAction then
                             -- Statemachine switch to evaluating next action to take
-                            IssueMove({eng}, moveLocation)
+                            IssueToUnitMove(eng, moveLocation)
                         end
                     end
                     dist = VDist3Sq(eng:GetPosition(), moveLocation)
@@ -4400,7 +4400,7 @@ Platoon = Class(moho.platoon_methods) {
                 if dist <= gridSize then
                     -- Statemachine switch to reclaiming state
                     local time = 0
-                    IssueClearCommands({eng})
+                    IssueToUnitClearCommands(eng)
                     while time < 30 do
                         IssueAggressiveMove({eng}, moveLocation)
                         time = time + 1
@@ -4421,7 +4421,7 @@ Platoon = Class(moho.platoon_methods) {
                             for _, v in reclaimGridInstance.Cells[reclaimTargetX][reclaimTargetZ].Reclaim do
                                 if IsProp(v) and v.MaxMassReclaim > 0 then
                                     moveLocation = v:GetPosition()
-                                    IssueClearCommands({eng})
+                                    IssueToUnitClearCommands(eng)
                                     break
                                 end
                             end
@@ -4467,7 +4467,7 @@ Platoon = Class(moho.platoon_methods) {
         local eng
         for _, v in platoonUnits do
             if not v.Dead and EntityCategoryContains(categories.ENGINEER, v) then
-                IssueClearCommands({v})
+                IssueToUnitClearCommands(v)
                 if not eng then
                     eng = v
                 end
@@ -4563,7 +4563,7 @@ Platoon = Class(moho.platoon_methods) {
         elseif next(buildMassDistantPoints) then
             whatToBuild = aiBrain:DecideWhatToBuild(eng, 'T1Resource', buildingTmpl)
             for k, v in buildMassDistantPoints do
-                IssueMove({eng}, v.position )
+                IssueToUnitMove(eng, v.position )
                 while VDist2Sq(engPos[1],engPos[3],v.position[1],v.position[3]) > 165 do
                     coroutine.yield(5)
                     engPos = eng:GetPosition()
@@ -4571,7 +4571,7 @@ Platoon = Class(moho.platoon_methods) {
                         break
                     end
                 end
-                IssueClearCommands({eng})
+                IssueToUnitClearCommands(eng)
                 if v.position[1] - playableArea[1] <= 8 or v.position[1] >= playableArea[3] - 8 or v.position[3] - playableArea[2] <= 8 or v.position[3] >= playableArea[4] - 8 then
                     borderWarning = true
                 end
@@ -4689,7 +4689,7 @@ Platoon = Class(moho.platoon_methods) {
             if table.getn(buildMassDistantPoints) < 3 then
                 for k, v in buildMassDistantPoints do
                     if aiBrain:CanBuildStructureAt('ueb1103', v.position) then
-                        IssueMove({eng}, v.position )
+                        IssueToUnitMove(eng, v.position )
                         while VDist2Sq(engPos[1],engPos[3],v.position[1],v.position[3]) > 165 do
                             coroutine.yield(5)
                             engPos = eng:GetPosition()
@@ -4697,7 +4697,7 @@ Platoon = Class(moho.platoon_methods) {
                                 break
                             end
                         end
-                        IssueClearCommands({eng})
+                        IssueToUnitClearCommands(eng)
                         if v.position[1] - playableArea[1] <= 8 or v.position[1] >= playableArea[3] - 8 or v.position[3] - playableArea[2] <= 8 or v.position[3] >= playableArea[4] - 8 then
                             borderWarning = true
                         end
@@ -4749,7 +4749,7 @@ Platoon = Class(moho.platoon_methods) {
         end
         local energyCount = 3
         if not hydroPresent then
-            IssueClearCommands({eng})
+            IssueToUnitClearCommands(eng)
             if closeMarkers > 0 then
                 if closeMarkers < 4 then
                     if closeMarkers < 4 and distantMarkers > 1 then
@@ -4814,7 +4814,7 @@ Platoon = Class(moho.platoon_methods) {
         if hydroPresent and (closeMarkers > 0 or distantMarkers > 0) then
             engPos = eng:GetPosition()
             if VDist3Sq(engPos,closestHydro.Position) > 144 then
-                IssueMove({eng}, closestHydro.Position )
+                IssueToUnitMove(eng, closestHydro.Position )
                 while VDist3Sq(engPos,closestHydro.Position) > 100 do
                     coroutine.yield(5)
                     engPos = eng:GetPosition()
@@ -4823,7 +4823,7 @@ Platoon = Class(moho.platoon_methods) {
                     end
                 end
             end
-            IssueClearCommands({eng})
+            IssueToUnitClearCommands(eng)
             local assistList = AIUtils.GetAssistees(aiBrain, 'MAIN', 'Engineer', categories.HYDROCARBON, categories.ALLUNITS)
             local assistee = false
             local assistListCount = 0
@@ -4853,7 +4853,7 @@ Platoon = Class(moho.platoon_methods) {
                 assistee = bestUnit
             end
             if assistee  then
-                IssueClearCommands({eng})
+                IssueToUnitClearCommands(eng)
                 eng.UnitBeingAssist = assistee.UnitBeingBuilt or assistee.UnitBeingAssist or assistee
                 IssueGuard({eng}, eng.UnitBeingAssist)
                 coroutine.yield(30)
@@ -4863,7 +4863,7 @@ Platoon = Class(moho.platoon_methods) {
                     end
                     -- stop if our target is finished
                     if eng.UnitBeingAssist:GetFractionComplete() == 1 and not eng.UnitBeingAssist:IsUnitState('Upgrading') then
-                        IssueClearCommands({eng})
+                        IssueToUnitClearCommands(eng)
                         break
                     end
                     coroutine.yield(30)
