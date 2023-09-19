@@ -798,7 +798,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         -- Force me to move on to the guard properly when done
         local guard = self:GetGuardedUnit()
         if guard then
-            IssueClearCommands({self})
+            IssueToUnitClearCommands(self)
             IssueReclaim({self}, target)
             IssueGuard({self}, guard)
         end
@@ -2661,7 +2661,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
             end
 
             if cmd then
-                IssueClearCommands({self})
+                IssueToUnitClearCommands(self)
                 cmd({self}, focus)
                 IssueGuard({self}, guarded)
             end
@@ -2692,7 +2692,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
             WARN('Unit.OnStartBuild() Army ' ..self.Army.. ' cannot build restricted unit: ' .. (bp.Description or id))
             self:OnFailedToBuild() -- Don't use: self:OnStopBuild()
             IssueClearFactoryCommands({self})
-            IssueClearCommands({self})
+            IssueToUnitClearCommands(self)
             return false -- Report failure of OnStartBuild
         end
 
@@ -4388,7 +4388,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         local slot = transport.slots[bone]
         if slot then
             self:GetAIBrain():OnTransportFull()
-            IssueClearCommands({self})
+            IssueToUnitClearCommands(self)
             return
         end
 
@@ -4661,7 +4661,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
             Warp(self, location, orientation)
             self:PlayTeleportInEffects()
         else
-            IssueClearCommands({self})
+            IssueToUnitClearCommands(self)
         end
 
         self:SetWorkProgress(0.0)

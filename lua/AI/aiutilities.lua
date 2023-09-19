@@ -2018,10 +2018,10 @@ function ReturnTransportsToPool(units, move)
             if move then
                 if safePath then
                     for _, p in safePath do
-                        IssueMove({unit}, p)
+                        IssueToUnitMove(unit, p)
                     end
                 else
-                    IssueMove({unit}, position)
+                    IssueToUnitMove(unit, position)
                 end
             end
         end
@@ -2112,7 +2112,7 @@ function EngineerMoveWithSafePath(aiBrain, unit, destination)
             -- Move to way points (but not to destination... leave that for the final command)
             for widx, waypointPath in path do
                 if pathSize ~= widx then
-                    IssueMove({unit}, waypointPath)
+                    IssueToUnitMove(unit, waypointPath)
                 end
             end
         end
@@ -3185,7 +3185,7 @@ function EngAvoidLocalDanger(aiBrain, eng)
             if VDist2Sq(engPos[1], engPos[3], enemyUnitPos[1], enemyUnitPos[3]) < 144 then
                 if unit and not IsDestroyed(unit) and unit:GetFractionComplete() == 1 then
                     if VDist2Sq(engPos[1], engPos[3], enemyUnitPos[1], enemyUnitPos[3]) < 156 then
-                        IssueClearCommands({eng})
+                        IssueToUnitClearCommands(eng)
                         IssueReclaim({eng}, unit)
                         action = true
                         break
@@ -3196,15 +3196,15 @@ function EngAvoidLocalDanger(aiBrain, eng)
             if VDist2Sq(engPos[1], engPos[3], enemyUnitPos[1], enemyUnitPos[3]) < 81 then
                 if unit and not IsDestroyed(unit) and unit:GetFractionComplete() == 1 then
                     if VDist2Sq(engPos[1], engPos[3], enemyUnitPos[1], enemyUnitPos[3]) < 156 then
-                        IssueClearCommands({eng})
+                        IssueToUnitClearCommands(eng)
                         IssueReclaim({eng}, unit)
                         action = true
                         break
                     end
                 end
             else
-                IssueClearCommands({eng})
-                IssueMove({eng}, ShiftPosition(enemyUnitPos, engPos, 50, false))
+                IssueToUnitClearCommands(eng)
+                IssueToUnitMove(eng, ShiftPosition(enemyUnitPos, engPos, 50, false))
                 coroutine.yield(60)
                 action = true
             end
@@ -3223,7 +3223,7 @@ function EngLocalExtractorBuild(aiBrain, eng)
     local action = false
     local bool,markers=CanBuildOnLocalMassPoints(aiBrain, eng:GetPosition(), 25)
     if bool then
-        IssueClearCommands({eng})
+        IssueToUnitClearCommands(eng)
         local factionIndex = aiBrain:GetFactionIndex()
         local buildingTmplFile = import('/lua/BuildingTemplates.lua')
         local buildingTmpl = buildingTmplFile[('BuildingTemplates')][factionIndex]
@@ -3349,7 +3349,7 @@ function EngPerformReclaim(eng, minimumReclaim)
             end
         end
         if table.getn(closeReclaim) > 0 then
-            IssueClearCommands({eng})
+            IssueToUnitClearCommands(eng)
             for _, rec in closeReclaim do
                 IssueReclaim({eng}, rec)
             end
