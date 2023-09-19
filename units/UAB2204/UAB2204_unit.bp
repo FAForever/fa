@@ -178,7 +178,7 @@ UnitBlueprint{
             MaxRadius = 50,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
-            MuzzleVelocity = 35,
+            MuzzleVelocity = 40,
             ProjectileId = "/projectiles/AAAFizz01/AAAFizz01_proj.bp",
             ProjectileLifetimeUsesMultiplier = 1.25,
             ProjectilesPerOnFire = 1,
