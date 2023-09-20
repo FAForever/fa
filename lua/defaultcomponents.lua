@@ -887,7 +887,7 @@ ExternalFactoryComponent = ClassSimple {
                 self.ExternalFactory:AddBuildRestriction(categories.ALLUNITS)
                 self.ExternalFactory:RequestRefreshUI()
 
-                IssueClearCommands({self.ExternalFactory})
+                IssueToUnitClearCommands(self.ExternalFactory)
             end
         end
     end,
