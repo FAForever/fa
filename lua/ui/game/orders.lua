@@ -1057,7 +1057,7 @@ local defaultOrdersTable = {
     DroneL = {                      helpText = "drone",             bitmapId = 'unload02',              preferredSlot = 10, behavior = DroneBehavior,               initialStateFunc = DroneInit},
     DroneR = {                      helpText = "drone",             bitmapId = 'unload02',              preferredSlot = 11, behavior = DroneBehavior,               initialStateFunc = DroneInit},
 
-    ExFac = {                       helpText = "external_factory",  bitmapId = 'repair',                 preferredSlot = 10,  behavior = ExternalFactoryBehavior},
+    ExFac = {                       helpText = "external_factory",  bitmapId = 'exfac',                 preferredSlot = 10,  behavior = ExternalFactoryBehavior},
 
     -- Unit toggle rules
     RULEUTC_ShieldToggle = {        helpText = "toggle_shield",     bitmapId = 'shield',                preferredSlot = 8,  behavior = ScriptButtonOrderBehavior,   initialStateFunc = ScriptButtonInitFunction, extraInfo = 0},
