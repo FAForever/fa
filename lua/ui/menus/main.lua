@@ -836,7 +836,8 @@ function CreateUI()
 
     function ButtonLAN()
         MenuHide(function()
-            import("/lua/ui/lobby/gameselect.lua").CreateUI(topLevelGroup, function() MenuShow() SetEscapeHandle(ButtonExit) end)
+            import("/lua/ui/lobby/lobby-selection.lua").CreateLobbySelection(topLevelGroup, function() MenuShow() SetEscapeHandle(ButtonExit) end)
+
         end)
     end
 

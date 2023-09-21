@@ -78,6 +78,8 @@ function GetCurrentProfile()
 end
 
 -- Get the map last requested by the player
+---@param fieldName string
+---@return any
 function GetFromCurrentProfile(fieldName)
     local current = GetPreference('profile.current')
     if not current then return nil end

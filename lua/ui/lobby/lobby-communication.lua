@@ -5,18 +5,26 @@
 
 ---@class UILobbyCommunication : moho.lobby_methods
 ---@field Debugging boolean
+---@field OnConnectingCallbacks table<string, fun()>
 ---@field OnHostingCallbacks table<string, fun()>
 ---@field OnConnectionFailedCallbacks table<string, fun(reason: string)>
----@field OnConnectionToHostEstablishedCallbacks table<string, fun(ourID: string, hostID: string)>
+---@field OnConnectionToHostEstablishedCallbacks table<string, fun(localID: number, localName, hostID: number)>
 ---@field OnEjectedCallbacks table<string, fun(reason: string)>
 ---@field OnSystemMessageCallbacks table<string, fun(message: string)>
 ---@field OnDataReceivedCallbacks table<string, fun(message: UILobbyCommunicationData)>
 ---@field OnGameConfigRequestedCallbacks table<string, fun()>
 ---@field OnPeerDisconnectedCallbacks table<string, fun(peerName: string, peerUID: string)>
+---@field OnEstablishedPeersCallbacks table<string, fun(peerUID: string, connectedPeers: string[])>
 ---@field OnGameLaunchedCallbacks table<string, fun()>
 ---@field OnLaunchFailedCallbacks table<string, fun(reason: string)>
 LobbyCommunication = Class(moho.lobby_methods) {
 
+    HostID = -1,
+
+    LocalID = -1,
+    LocalName = "<unknown>",
+
+    OnConnectingCallbacks = { },
     OnHostingCallbacks = { },
     OnConnectionFailedCallbacks = { },
     OnConnectionToHostEstablishedCallbacks = { },
@@ -27,6 +35,7 @@ LobbyCommunication = Class(moho.lobby_methods) {
     OnPeerDisconnectedCallbacks = { },
     OnGameLaunchedCallbacks = { },
     OnLaunchFailedCallbacks = { },
+    OnEstablishedPeersCallbacks = { },
 
     ---@param self UILobbyCommunication
     ---@param callback fun()
@@ -43,6 +52,23 @@ LobbyCommunication = Class(moho.lobby_methods) {
         end
 
         self.OnHostingCallbacks[name] = callback
+    end,
+
+    ---@param self UILobbyCommunication
+    ---@param callback fun()
+    ---@param name string
+    AddOnConnectingCallback = function(self, callback, name)
+        if (not name) or type(name) != 'string' then
+            self:Warn("Ignoring callback, 'name' parameter is invalid for 'AddOnConnectingCallback'")
+            return
+        end
+
+        if (not callback) or type(callback) != 'function' then
+            self:Warn("Ignoring callback, 'callback' parameter is invalid for 'AddOnConnectingCallback'")
+            return
+        end
+
+        self.OnConnectingCallbacks[name] = callback
     end,
 
     ---@param self UILobbyCommunication
@@ -198,10 +224,41 @@ LobbyCommunication = Class(moho.lobby_methods) {
         self.OnLaunchFailedCallbacks[name] = callback
     end,
 
+    ---@param self UILobbyCommunication
+    ---@param callback fun(peerUID: string, connectedPeers: string[])
+    ---@param name string
+    AddOnEstablishedPeersCallbacks = function(self, callback, name)
+        if (not name) or type(name) != 'string' then
+            self:Warn("Ignoring callback, 'name' parameter is invalid for  'AddOnLaunchFailedCallback'")
+            return
+        end
+
+        if (not callback) or type(callback) != 'function' then
+            self:Warn("Ignoring callback, 'callback' parameter is invalid for 'AddOnLaunchFailedCallback'")
+            return
+        end
+
+        self.OnEstablishedPeersCallbacks[name] = callback
+    end,
+
+    Connecting = function(self)
+        self:Debug(string.format("Connecting()"))
+
+        for name, callback in self.OnConnectingCallbacks do
+            local ok, msg = pcall(callback)
+            if not ok then
+                self:Warn(string.format("Callback '%s' for 'Connecting' failed: \r\n %s", name, msg))
+            end
+        end
+    end,
+
     --- Engine event
     ---@param self UILobbyCommunication
     Hosting = function(self)
         self:Debug(string.format("Hosting()"))
+
+        self.LocalID = self:GetLocalPlayerID()
+        self.HostId = self:GetLocalPlayerID()
 
         for name, callback in self.OnHostingCallbacks do
             local ok, msg = pcall(callback)
@@ -227,13 +284,16 @@ LobbyCommunication = Class(moho.lobby_methods) {
 
     --- Engine event
     ---@param self UILobbyCommunication
-    ---@param ourID string
-    ---@param hostID string
-    ConnectionToHostEstablished = function(self, ourID, hostID)
-        self:Debug(string.format("ConnectionToHostEstablished(%s, %s)", tostring(ourID), tostring(hostID)))
+    ---@param localID number
+    ---@param hostID number
+    ConnectionToHostEstablished = function(self, localID, ourName, hostID)
+        self:Debug(string.format("ConnectionToHostEstablished(%s, %s, %s)", tostring(localID), tostring(ourName), tostring(hostID)))
+
+        self.LocalID = localID
+        self.HostId = hostID
 
         for name, callback in self.OnConnectionToHostEstablishedCallbacks do
-            local ok, msg = pcall(callback, ourID, hostID)
+            local ok, msg = pcall(callback, localID, hostID)
             if not ok then
                 self:Warn(string.format("Callback '%s' for 'ConnectionToHostEstablished' failed: \r\n %s", name, msg))
             end
@@ -335,6 +395,20 @@ LobbyCommunication = Class(moho.lobby_methods) {
             local ok, msg = pcall(callback, reasonKey)
             if not ok then
                 self:Warn(string.format("Callback '%s' for 'LaunchFailed' failed: \r\n %s", name, msg))
+            end
+        end
+    end,
+
+    ---@param self UILobbyCommunication
+    ---@param peerUID string # peer id that the message is about
+    ---@param connectedPeers string[] # player ids that are connected to the peer
+    EstablishedPeers = function(self, peerUID, connectedPeers)
+        self:Debug(string.format("EstablishedPeers(%s, %s)", tostring(peerUID), reprsl(connectedPeers)))
+
+        for name, callback in self.OnEstablishedPeersCallbacks do
+            local ok, msg = pcall(callback,peerUID, connectedPeers)
+            if not ok then
+                self:Warn(string.format("Callback '%s' for 'EstablishedPeers' failed: \r\n %s", name, msg))
             end
         end
     end,

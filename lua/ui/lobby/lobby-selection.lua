@@ -164,6 +164,8 @@ end
 
 function CreateUI(over, exitBehavior)
     local discovery = import("/lua/ui/lobby/lobbycomm.lua").CreateDiscoveryService()
+    local discovery = InternalCreateDiscoveryService(DiscoveryService)
+    LOG('*** DISC CREATE: ', service)
 	local parent = over
 	-- panel and title
     local panel = Bitmap(parent, UIUtil.SkinnableFile('/scx_menu/gameselect/panel_bmp.dds'))
@@ -875,4 +877,195 @@ function CreateUI(over, exitBehavior)
     ForkThread(function()
         gameList._tabs[2]:OnClick()
     end)
+end
+
+---@class UILobbySelection : Group
+---@field OnDestroyCallbacks table<string, fun()>
+---@field Panel Bitmap
+---@field PanelBrackets Group
+---@field PanelTitle Text
+---@field ButtonExit Button
+---@field ButtonCreate Button
+---@field EditName Edit
+---@field DialogError Control
+LobbySelection = Class(Group) {
+
+    OnDestroyCallbacks = { },
+
+    ---@param self UILobbySelection
+    ---@param parent Control
+    __init = function(self, parent, exitBehavior)
+        self:Debug(string.format("__init()"))
+
+        Group.__init(self, parent, 'UILobbySelection')
+        LayoutHelpers.FillParent(self, parent)
+
+        self.Panel = UIUtil.CreateBitmap(self, '/scx_menu/gameselect/panel_bmp.dds')
+        LayoutHelpers.AtCenterIn(self.Panel, self)
+
+        self.PanelBrackets = UIUtil.CreateDialogBrackets(self.Panel, 42, 32, 40, 30)
+
+        self.PanelTitle = UIUtil.CreateText(self, "<LOC GAMESEL_0000>LAN/IP Connect", 24)
+        LayoutHelpers.AtHorizontalCenterIn(self.PanelTitle, self.Panel)
+        LayoutHelpers.AtTopIn(self.PanelTitle, self.Panel, 26)
+
+        self.ButtonExit = UIUtil.CreateButtonStd(self, '/scx_menu/small-btn/small', "<LOC _Back>", 14, 0, 0, "UI_Back_MouseDown")
+        LayoutHelpers.AtLeftTopIn(self.ButtonExit, self.Panel, 15, 645)
+        LayoutHelpers.DepthOverParent(self.ButtonExit, self.Panel)
+
+        self.ButtonCreate = UIUtil.CreateButtonStd(self, '/scx_menu/large-no-bracket-btn/large', "<LOC _Create>Create", 18, 2)
+        LayoutHelpers.AtRightTopIn(self.ButtonCreate, self.Panel, -17, 645)
+        LayoutHelpers.DepthOverParent(self.ButtonCreate, self.Panel)
+
+        self.EditName = CreateEditField(self, 375, 20)
+        LayoutHelpers.AtLeftIn(self.EditName, self.Panel, 30)
+        LayoutHelpers.AtTopIn(self.EditName, self.Panel, 92)
+        LayoutHelpers.DepthOverParent(self.EditName, self.Panel)
+    end,
+
+    ---@param self UILobbySelection
+    ---@param parent Control
+    __post_init = function(self, parent)
+        self:Debug(string.format("__post_init()"))
+
+        -- escape handler event
+        import("/lua/ui/uimain.lua").SetEscapeHandler(
+            function()
+                self.ButtonExit.OnClick()
+            end
+        )
+
+        self.ButtonExit.OnClick = function(button)
+            self:Destroy()
+        end
+
+        self.ButtonExit.HandleEvent = function(button, event)
+            if event.Type == 'MouseEnter' then
+                Tooltip.CreateMouseoverDisplay(button, "mpselect_exit", nil, true)
+            elseif event.Type == 'MouseExit' then
+                Tooltip.DestroyMouseoverDisplay()
+            end
+            Button.HandleEvent(button, event)
+        end
+
+        self.ButtonCreate.OnClick = function(button)
+            local name = self.EditName:GetText()
+            if IsNameOK(name) then
+                Prefs.SetToCurrentProfile('NetName', name)
+                self:Destroy()
+
+
+                -- import("/lua/ui/lobby/gamecreate.lua").CreateUI(name)
+            else
+                if self.DialogError then
+                    self.DialogError:Destroy()
+                end
+                self.DialogError = UIUtil.ShowInfoDialog(parent, "<LOC GAMESEL_0003>Please fill in your nickname", "<LOC _OK>")
+            end
+        end
+
+        self.ButtonCreate.HandleEvent = function(button, event)
+            if event.Type == 'MouseEnter' then
+                Tooltip.CreateMouseoverDisplay(button, "mpselect_create", nil, true)
+            elseif event.Type == 'MouseExit' then
+                Tooltip.DestroyMouseoverDisplay()
+            end
+            Button.HandleEvent(button, event)
+        end
+
+        self.EditName:SetText(Prefs.GetFromCurrentProfile('NetName') or Prefs.GetFromCurrentProfile('Name'))
+        self.EditName:ShowBackground(false)
+        self.EditName.HandleEvent = function(edit, event)
+            if event.Type == 'MouseEnter' then
+                Tooltip.CreateMouseoverDisplay(edit, "mpselect_name", nil, true)
+            elseif event.Type == 'MouseExit' then
+                Tooltip.DestroyMouseoverDisplay()
+            end
+            Edit.HandleEvent(edit, event)
+        end
+
+        self.EditName.OnCharPressed = function(edit, charcode)
+            if charcode == UIUtil.VK_TAB then
+                return true
+            end
+            local charlim = edit:GetMaxChars()
+            if STR_Utf8Len(edit:GetText()) >= charlim then
+                local sound = Sound({Cue = 'UI_Menu_Error_01', Bank = 'Interface',})
+                PlaySound(sound)
+            end
+        end
+
+        self.EditName.OnEnterPressed = function(edit, text)
+            edit:AbandonFocus()
+            return true
+        end
+    end,
+
+    ---@param self UILobbySelection
+    Destroy = function(self)
+        self:Debug(string.format("Destroy()"))
+
+        for name, callback in self.OnDestroyCallbacks do
+            local ok, msg = pcall(callback)
+            if not ok then
+                self:Warn(string.format("Callback '%s' for 'RemoveGame' failed: \r\n %s", name, msg))
+            end
+        end
+
+        Group.Destroy(self)
+    end,
+
+    ---------------------------------------------------------------------------
+    --#region Callbacks
+
+    ---@param self UILobbyDiscoveryService
+    ---@param callback fun(index: number, configuration: table)
+    ---@param name string
+    AddOnDestroyCallback = function(self, callback, name)
+        if (not name) or type(name) != 'string' then
+            self:Warn("Ignoring callback, 'name' parameter is invalid for  'AddOnDestroyCallback'")
+            return
+        end
+
+        if (not callback) or type(callback) != 'function' then
+            self:Warn("Ignoring callback, 'callback' parameter is invalid for 'AddOnDestroyCallback'")
+            return
+        end
+
+        self.OnDestroyCallbacks[name] = callback
+    end,
+
+    ---------------------------------------------------------------------------
+    --#region Debugging
+
+    Debugging = true,
+
+    Debug = function(self, message)
+        if self.Debugging then
+            SPEW(string.format("UILobbySelection: %s", message))
+        end
+    end,
+
+    Log = function(self, message)
+        LOG(string.format("UILobbySelection: %s", message))
+    end,
+
+    Warn = function(self, message)
+        WARN(string.format("UILobbySelection: %s", message))
+    end,
+}
+
+---@param parent Control
+---@param exitBehavior fun()
+---@return UILobbySelection
+CreateLobbySelection = function(parent, exitBehavior)
+    local discoveryService = import("/lua/ui/lobby/lobby-discovery.lua").CreateDiscoveryService() --[[@as UILobbyDiscoveryService]]
+    local lobbySelection = LobbySelection(parent, discoveryService) --[[@as UILobbySelection]]
+    lobbySelection:AddOnDestroyCallback(exitBehavior, 'BackToMainMenu')
+    lobbySelection:AddOnDestroyCallback(
+        function()
+            discoveryService:Destroy()
+        end, 'DestroyDiscovery')
+
+    return lobbySelection
 end
