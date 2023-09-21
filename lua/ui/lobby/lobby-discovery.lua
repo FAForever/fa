@@ -41,6 +41,55 @@ LobbyDiscoveryService = ClassUI(moho.discovery_service_methods) {
     OnGameFoundCallbacks = { },
     OnGameUpdatedCallbacks = { },
 
+    ---------------------------------------------------------------------------
+    --#region Engine events
+
+    ---@param self UILobbyDiscoveryService
+    ---@param index number
+    RemoveGame = function(self, index)
+        self:Debug(string.format("RemoveGame(%s)", tostring(index)))
+
+        for name, callback in self.OnRemoveGameCallbacks do
+            local ok, msg = pcall(callback, index)
+            if not ok then
+                self:Warn(string.format("Callback '%s' for 'RemoveGame' failed: \r\n %s", name, msg))
+            end
+        end
+    end,
+
+    ---@param self UILobbyDiscoveryService
+    ---@param index number
+    ---@param gameConfig UILobbydDiscoveryInfo
+    GameFound = function(self, index, gameConfig)
+        self:Debug(string.format("GameFound(%s, %s)", tostring(index), reprs(gameConfig)))
+
+        for name, callback in self.OnGameFoundCallbacks do
+            local ok, msg = pcall(callback, index, gameConfig)
+            if not ok then
+                self:Warn(string.format("Callback '%s' for 'GameFound' failed: \r\n %s", name, msg))
+            end
+        end
+    end,
+
+    ---@param self UILobbyDiscoveryService
+    ---@param index number
+    ---@param gameConfig UILobbydDiscoveryInfo
+    GameUpdated = function(self, index, gameConfig)
+        self:Debug(string.format("GameUpdated(%s, %s)", tostring(index), reprs(gameConfig)))
+
+        for name, callback in self.OnGameUpdatedCallbacks do
+            local ok, msg = pcall(callback, index, gameConfig)
+            if not ok then
+                self:Warn(string.format("Callback '%s' for 'GameUpdated' failed: \r\n %s", name, msg))
+            end
+        end
+    end,
+
+    --#endregion
+
+    ---------------------------------------------------------------------------
+    --#region Event callbacks
+
     ---@param self UILobbyDiscoveryService
     ---@param callback fun(index: number)
     ---@param name string
@@ -92,49 +141,7 @@ LobbyDiscoveryService = ClassUI(moho.discovery_service_methods) {
         self.OnGameUpdatedCallbacks[name] = callback
     end,
 
-    --- Engine event
-    ---@param self UILobbyDiscoveryService
-    ---@param index number
-    RemoveGame = function(self, index)
-        self:Debug(string.format("RemoveGame(%s)", tostring(index)))
-
-        for name, callback in self.OnRemoveGameCallbacks do
-            local ok, msg = pcall(callback, index)
-            if not ok then
-                self:Warn(string.format("Callback '%s' for 'RemoveGame' failed: \r\n %s", name, msg))
-            end
-        end
-    end,
-
-    --- Engine event
-    ---@param self UILobbyDiscoveryService
-    ---@param index number
-    ---@param gameConfig UILobbydDiscoveryInfo
-    GameFound = function(self, index, gameConfig)
-        self:Debug(string.format("GameFound(%s, %s)", tostring(index), reprs(gameConfig)))
-
-        for name, callback in self.OnGameFoundCallbacks do
-            local ok, msg = pcall(callback, index, gameConfig)
-            if not ok then
-                self:Warn(string.format("Callback '%s' for 'GameFound' failed: \r\n %s", name, msg))
-            end
-        end
-    end,
-
-    --- Engine event
-    ---@param self UILobbyDiscoveryService
-    ---@param index number
-    ---@param gameConfig UILobbydDiscoveryInfo
-    GameUpdated = function(self, index, gameConfig)
-        self:Debug(string.format("GameUpdated(%s, %s)", tostring(index), reprs(gameConfig)))
-
-        for name, callback in self.OnGameUpdatedCallbacks do
-            local ok, msg = pcall(callback, index, gameConfig)
-            if not ok then
-                self:Warn(string.format("Callback '%s' for 'GameUpdated' failed: \r\n %s", name, msg))
-            end
-        end
-    end,
+    ---#endregion
 
     ---------------------------------------------------------------------------
     --#region Debugging
@@ -161,6 +168,7 @@ LobbyDiscoveryService = ClassUI(moho.discovery_service_methods) {
         WARN(string.format("UILobbyDiscoveryService: %s", message))
     end,
 
+    --#endregion
 }
 
 ---@return UILobbyDiscoveryService

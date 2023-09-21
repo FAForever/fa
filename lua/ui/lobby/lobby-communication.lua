@@ -228,7 +228,7 @@ LobbyCommunication = Class(moho.lobby_methods) {
     --#endregion
 
     ---------------------------------------------------------------------------
-    --#region Callbacks management
+    --#region Event callbacks
 
     ---@param self UILobbyCommunication
     ---@param callback fun()
