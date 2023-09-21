@@ -584,8 +584,8 @@ end
 ---@param localPort number
 ---@param maxConnections number
 ---@param playerName string
----@param playerUID string
----@param natTraversalProvider userdata
+---@param playerUID? string
+---@param natTraversalProvider? userdata
 ---@return LobbyComm
 function InternalCreateLobby(lobbyComClass, protocol, localPort, maxConnections, playerName, playerUID, natTraversalProvider)
 end

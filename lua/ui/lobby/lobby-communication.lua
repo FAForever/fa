@@ -1,4 +1,26 @@
 
+--******************************************************************************************************
+--** Copyright (c) 2022  Willem 'Jip' Wijnia
+--** 
+--** Permission is hereby granted, free of charge, to any person obtaining a copy
+--** of this software and associated documentation files (the "Software"), to deal
+--** in the Software without restriction, including without limitation the rights
+--** to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+--** copies of the Software, and to permit persons to whom the Software is
+--** furnished to do so, subject to the following conditions:
+--** 
+--** The above copyright notice and this permission notice shall be included in all
+--** copies or substantial portions of the Software.
+--** 
+--** THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+--** IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+--** FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+--** AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+--** LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+--** OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+--** SOFTWARE.
+--******************************************************************************************************
+
 ---@class UILobbyCommunicationData
 ---@field SenderID number
 ---@field Type string
@@ -36,6 +58,177 @@ LobbyCommunication = Class(moho.lobby_methods) {
     OnGameLaunchedCallbacks = { },
     OnLaunchFailedCallbacks = { },
     OnEstablishedPeersCallbacks = { },
+
+    ---------------------------------------------------------------------------
+    --#region Engine events
+
+    ---@param self UILobbyCommunication
+    Connecting = function(self)
+        self:Debug(string.format("Connecting()"))
+
+        for name, callback in self.OnConnectingCallbacks do
+            local ok, msg = pcall(callback)
+            if not ok then
+                self:Warn(string.format("Callback '%s' for 'Connecting' failed: \r\n %s", name, msg))
+            end
+        end
+    end,
+
+    ---@param self UILobbyCommunication
+    Hosting = function(self)
+        self:Debug(string.format("Hosting()"))
+
+        self.LocalID = self:GetLocalPlayerID()
+        self.HostId = self:GetLocalPlayerID()
+
+        for name, callback in self.OnHostingCallbacks do
+            local ok, msg = pcall(callback)
+            if not ok then
+                self:Warn(string.format("Callback '%s' for 'Hosting' failed: \r\n %s", name, msg))
+            end
+        end
+    end,
+
+    ---@param self UILobbyCommunication
+    ---@param reason string
+    ConnectionFailed = function(self, reason)
+        self:Debug(string.format("ConnectionFailed(%s)", tostring(reason)))
+
+        for name, callback in self.OnConnectionFailedCallbacks do
+            local ok, msg = pcall(callback, reason)
+            if not ok then
+                self:Warn(string.format("Callback '%s' for 'ConnectionFailed' failed: \r\n %s", name, msg))
+            end
+        end
+    end,
+
+    ---@param self UILobbyCommunication
+    ---@param localID number
+    ---@param hostID number
+    ConnectionToHostEstablished = function(self, localID, ourName, hostID)
+        self:Debug(string.format("ConnectionToHostEstablished(%s, %s, %s)", tostring(localID), tostring(ourName), tostring(hostID)))
+
+        self.LocalID = localID
+        self.HostId = hostID
+
+        for name, callback in self.OnConnectionToHostEstablishedCallbacks do
+            local ok, msg = pcall(callback, localID, hostID)
+            if not ok then
+                self:Warn(string.format("Callback '%s' for 'ConnectionToHostEstablished' failed: \r\n %s", name, msg))
+            end
+        end
+    end,
+
+    ---@param self UILobbyCommunication
+    ---@param reason string
+    Ejected = function(self, reason) 
+        self:Debug(string.format("Ejected(%s)", tostring(reason)))
+
+        for name, callback in self.OnEjectedCallbacks do
+            local ok, msg = pcall(callback, reason)
+            if not ok then
+                self:Warn(string.format("Callback '%s' for 'Ejected' failed: \r\n %s", name, msg))
+            end
+        end
+    end,
+
+    ---@param self UILobbyCommunication
+    ---@param text string
+    SystemMessage = function(self, text)
+        self:Debug(string.format("SystemMessage(%s)", tostring(text)))
+
+        for name, callback in self.OnSystemMessageCallbacks do
+            local ok, msg = pcall(callback, text)
+            if not ok then
+                self:Warn(string.format("Callback '%s' for 'SystemMessage' failed: \r\n %s", name, msg))
+            end
+        end
+    end,
+
+    ---@param self UILobbyCommunication
+    ---@param data string
+    DataReceived = function(self, data)
+        self:Debug(string.format("DataReceived(%s)", reprs(data)))
+
+        -- TODO: do some kind of checksum?
+
+        for name, callback in self.OnDataReceivedCallbacks do
+            local ok, msg = pcall(callback, data)
+            if not ok then
+                self:Warn(string.format("Callback '%s' for 'DataReceived' failed: \r\n %s", name, msg))
+            end
+        end
+    end,
+
+    ---@param self UILobbyCommunication
+    GameConfigRequested = function(self)
+        self:Debug(string.format("PeerDisconnected()"))
+
+        for name, callback in self.OnGameConfigRequestedCallbacks do
+            local ok, msg = pcall(callback)
+            if not ok then
+                self:Warn(string.format("Callback '%s' for 'GameConfigRequested' failed: \r\n %s", name, msg))
+            end
+        end
+    end,
+
+    ---@param self UILobbyCommunication
+    ---@param peerName string
+    ---@param uid string
+    PeerDisconnected = function(self, peerName, uid)
+        self:Debug(string.format("PeerDisconnected(%s, %s)", tostring(peerName), tostring(uid)))
+
+        for name, callback in self.OnPeerDisconnectedCallbacks do
+            local ok, msg = pcall(callback,peerName, uid)
+            if not ok then
+                self:Warn(string.format("Callback '%s' for 'PeerDisconnected' failed: \r\n %s", name, msg))
+            end
+        end
+    end,
+
+    ---@param self UILobbyCommunication
+    GameLaunched = function(self)
+        self:Debug("GameLaunched()")
+
+        for name, callback in self.OnGameLaunchedCallbacks do
+            local ok, msg = pcall(callback)
+            if not ok then
+                self:Warn(string.format("Callback '%s' for 'GameLaunched' failed: \r\n %s", name, msg))
+            end
+        end
+    end,
+
+    ---@param self UILobbyCommunication
+    ---@param reasonKey string
+    LaunchFailed = function(self, reasonKey)
+        self:Debug("LaunchFailed()")
+
+        for name, callback in self.OnLaunchFailedCallbacks do
+            local ok, msg = pcall(callback, reasonKey)
+            if not ok then
+                self:Warn(string.format("Callback '%s' for 'LaunchFailed' failed: \r\n %s", name, msg))
+            end
+        end
+    end,
+
+    ---@param self UILobbyCommunication
+    ---@param peerUID string # peer id that the message is about
+    ---@param connectedPeers string[] # player ids that are connected to the peer
+    EstablishedPeers = function(self, peerUID, connectedPeers)
+        self:Debug(string.format("EstablishedPeers(%s, %s)", tostring(peerUID), reprs(connectedPeers)))
+
+        for name, callback in self.OnEstablishedPeersCallbacks do
+            local ok, msg = pcall(callback,peerUID, connectedPeers)
+            if not ok then
+                self:Warn(string.format("Callback '%s' for 'EstablishedPeers' failed: \r\n %s", name, msg))
+            end
+        end
+    end,
+
+    --#endregion
+
+    ---------------------------------------------------------------------------
+    --#region Callbacks management
 
     ---@param self UILobbyCommunication
     ---@param callback fun()
@@ -241,177 +434,7 @@ LobbyCommunication = Class(moho.lobby_methods) {
         self.OnEstablishedPeersCallbacks[name] = callback
     end,
 
-    Connecting = function(self)
-        self:Debug(string.format("Connecting()"))
-
-        for name, callback in self.OnConnectingCallbacks do
-            local ok, msg = pcall(callback)
-            if not ok then
-                self:Warn(string.format("Callback '%s' for 'Connecting' failed: \r\n %s", name, msg))
-            end
-        end
-    end,
-
-    --- Engine event
-    ---@param self UILobbyCommunication
-    Hosting = function(self)
-        self:Debug(string.format("Hosting()"))
-
-        self.LocalID = self:GetLocalPlayerID()
-        self.HostId = self:GetLocalPlayerID()
-
-        for name, callback in self.OnHostingCallbacks do
-            local ok, msg = pcall(callback)
-            if not ok then
-                self:Warn(string.format("Callback '%s' for 'Hosting' failed: \r\n %s", name, msg))
-            end
-        end
-    end,
-
-    --- Engine event
-    ---@param self UILobbyCommunication
-    ---@param reason string
-    ConnectionFailed = function(self, reason)
-        self:Debug(string.format("ConnectionFailed(%s)", tostring(reason)))
-
-        for name, callback in self.OnConnectionFailedCallbacks do
-            local ok, msg = pcall(callback, reason)
-            if not ok then
-                self:Warn(string.format("Callback '%s' for 'ConnectionFailed' failed: \r\n %s", name, msg))
-            end
-        end
-    end,
-
-    --- Engine event
-    ---@param self UILobbyCommunication
-    ---@param localID number
-    ---@param hostID number
-    ConnectionToHostEstablished = function(self, localID, ourName, hostID)
-        self:Debug(string.format("ConnectionToHostEstablished(%s, %s, %s)", tostring(localID), tostring(ourName), tostring(hostID)))
-
-        self.LocalID = localID
-        self.HostId = hostID
-
-        for name, callback in self.OnConnectionToHostEstablishedCallbacks do
-            local ok, msg = pcall(callback, localID, hostID)
-            if not ok then
-                self:Warn(string.format("Callback '%s' for 'ConnectionToHostEstablished' failed: \r\n %s", name, msg))
-            end
-        end
-    end,
-
-    --- Engine event
-    ---@param self UILobbyCommunication
-    ---@param reason string
-    Ejected = function(self, reason) 
-        self:Debug(string.format("Ejected(%s)", tostring(reason)))
-
-        for name, callback in self.OnEjectedCallbacks do
-            local ok, msg = pcall(callback, reason)
-            if not ok then
-                self:Warn(string.format("Callback '%s' for 'Ejected' failed: \r\n %s", name, msg))
-            end
-        end
-    end,
-
-    --- Engine event
-    ---@param self UILobbyCommunication
-    ---@param text string
-    SystemMessage = function(self, text)
-        self:Debug(string.format("SystemMessage(%s)", tostring(text)))
-
-        for name, callback in self.OnSystemMessageCallbacks do
-            local ok, msg = pcall(callback, text)
-            if not ok then
-                self:Warn(string.format("Callback '%s' for 'SystemMessage' failed: \r\n %s", name, msg))
-            end
-        end
-    end,
-
-    --- Engine event
-    ---@param self UILobbyCommunication
-    ---@param data string
-    DataReceived = function(self, data)
-        self:Debug(string.format("DataReceived(%s)", reprs(data)))
-
-        -- TODO: do some kind of checksum?
-
-        for name, callback in self.OnDataReceivedCallbacks do
-            local ok, msg = pcall(callback, data)
-            if not ok then
-                self:Warn(string.format("Callback '%s' for 'DataReceived' failed: \r\n %s", name, msg))
-            end
-        end
-    end,
-
-    --- Engine event
-    ---@param self UILobbyCommunication
-    GameConfigRequested = function(self)
-        self:Debug(string.format("PeerDisconnected()"))
-
-        for name, callback in self.OnGameConfigRequestedCallbacks do
-            local ok, msg = pcall(callback)
-            if not ok then
-                self:Warn(string.format("Callback '%s' for 'GameConfigRequested' failed: \r\n %s", name, msg))
-            end
-        end
-    end,
-
-    --- Engine event
-    ---@param self UILobbyCommunication
-    ---@param peerName string
-    ---@param uid string
-    PeerDisconnected = function(self, peerName, uid)
-        self:Debug(string.format("PeerDisconnected(%s, %s)", tostring(peerName), tostring(uid)))
-
-        for name, callback in self.OnPeerDisconnectedCallbacks do
-            local ok, msg = pcall(callback,peerName, uid)
-            if not ok then
-                self:Warn(string.format("Callback '%s' for 'PeerDisconnected' failed: \r\n %s", name, msg))
-            end
-        end
-    end,
-
-    --- Engine event
-    ---@param self UILobbyCommunication
-    GameLaunched = function(self)
-        self:Debug("GameLaunched()")
-
-        for name, callback in self.OnGameLaunchedCallbacks do
-            local ok, msg = pcall(callback)
-            if not ok then
-                self:Warn(string.format("Callback '%s' for 'GameLaunched' failed: \r\n %s", name, msg))
-            end
-        end
-    end,
-
-    --- Engine event
-    ---@param self UILobbyCommunication
-    ---@param reasonKey string
-    LaunchFailed = function(self, reasonKey)
-        self:Debug("LaunchFailed()")
-
-        for name, callback in self.OnLaunchFailedCallbacks do
-            local ok, msg = pcall(callback, reasonKey)
-            if not ok then
-                self:Warn(string.format("Callback '%s' for 'LaunchFailed' failed: \r\n %s", name, msg))
-            end
-        end
-    end,
-
-    ---@param self UILobbyCommunication
-    ---@param peerUID string # peer id that the message is about
-    ---@param connectedPeers string[] # player ids that are connected to the peer
-    EstablishedPeers = function(self, peerUID, connectedPeers)
-        self:Debug(string.format("EstablishedPeers(%s, %s)", tostring(peerUID), reprs(connectedPeers)))
-
-        for name, callback in self.OnEstablishedPeersCallbacks do
-            local ok, msg = pcall(callback,peerUID, connectedPeers)
-            if not ok then
-                self:Warn(string.format("Callback '%s' for 'EstablishedPeers' failed: \r\n %s", name, msg))
-            end
-        end
-    end,
+    --#endregion
 
     ---------------------------------------------------------------------------
     --#region Debugging
@@ -441,7 +464,7 @@ LobbyCommunication = Class(moho.lobby_methods) {
 
 ---@param port number
 ---@param localPlayerName string
----@param localPlayerUID string
+---@param localPlayerUID? string
 ---@return UILobbyCommunication
 CreateLobbyCommunications = function(port, localPlayerName, localPlayerUID)
     return InternalCreateLobby (

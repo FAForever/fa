@@ -1,10 +1,25 @@
---*****************************************************************************
---* File: lua/modules/ui/lobby/gameselect.lua
---* Author: Chris Blackwell
---* Summary: Game selection UI
---*
---* Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
---*****************************************************************************
+
+--******************************************************************************************************
+--** Copyright (c) 2022  Willem 'Jip' Wijnia
+--** 
+--** Permission is hereby granted, free of charge, to any person obtaining a copy
+--** of this software and associated documentation files (the "Software"), to deal
+--** in the Software without restriction, including without limitation the rights
+--** to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+--** copies of the Software, and to permit persons to whom the Software is
+--** furnished to do so, subject to the following conditions:
+--** 
+--** The above copyright notice and this permission notice shall be included in all
+--** copies or substantial portions of the Software.
+--** 
+--** THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+--** IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+--** FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+--** AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+--** LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+--** OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+--** SOFTWARE.
+--******************************************************************************************************
 
 local UIUtil = import("/lua/ui/uiutil.lua")
 local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
@@ -882,7 +897,9 @@ function CreateUI(over, exitBehavior)
 end
 
 ---@class UILobbySelection : Group
+---@field LobbyDiscoveryService UILobbyDiscoveryService
 ---@field OnDestroyCallbacks table<string, fun()>
+---@field OnExitCallbacks table<string, fun()>
 ---@field Panel Bitmap
 ---@field PanelBrackets Group
 ---@field PanelTitle Text
@@ -893,15 +910,17 @@ end
 ---@field DialogError Control
 LobbySelection = Class(Group) {
 
+    LobbyDiscoveryService = false,
+
     Games = { },
     GamesSorted = { },
 
+    OnExitCallbacks = { },
     OnDestroyCallbacks = { },
 
     ---@param self UILobbySelection
     ---@param parent Control
-    ---@param discoveryService UILobbyDiscoveryService
-    __init = function(self, parent, discoveryService)
+    __init = function(self, parent)
         self:Debug(string.format("__init()"))
 
         Group.__init(self, parent, 'UILobbySelection')
@@ -947,8 +966,7 @@ LobbySelection = Class(Group) {
 
     ---@param self UILobbySelection
     ---@param parent Control
-    ---@param discoveryService UILobbyDiscoveryService
-    __post_init = function(self, parent, discoveryService)
+    __post_init = function(self, parent)
         self:Debug(string.format("__post_init()"))
 
         -- escape handler event
@@ -959,6 +977,15 @@ LobbySelection = Class(Group) {
         )
 
         self.ButtonExit.OnClick = function(button)
+            self:Debug(string.format("ButtonExit()"))
+
+            for name, callback in self.OnExitCallbacks do
+                local ok, msg = pcall(callback)
+                if not ok then
+                    self:Warn(string.format("Callback '%s' for 'ButtonExit' failed: \r\n %s", name, msg))
+                end
+            end
+
             self:Destroy()
         end
 
@@ -1035,8 +1062,18 @@ LobbySelection = Class(Group) {
             edit:AbandonFocus()
             return true
         end
+    end,
 
-        discoveryService:AddOnGameFoundCallback(
+    SetupDiscoveryService = function(self)
+        self.LobbyDiscoveryService = import("/lua/ui/lobby/lobby-discovery.lua").CreateDiscoveryService() --[[@as UILobbyDiscoveryService]]
+        self:AddOnDestroyCallback(
+            function()
+                self.LobbyDiscoveryService:Destroy()
+            end, 
+            'DestroyDiscovery'
+        )
+
+        self.DiscoveryService:AddOnGameFoundCallback(
             ---@param index number
             ---@param configuration UILobbydDiscoveryInfo
             function (index, configuration)
@@ -1046,7 +1083,7 @@ LobbySelection = Class(Group) {
             end, 'LobbySelection'
         )
 
-        discoveryService:AddOnGameUpdatedCallback(
+        self.DiscoveryService:AddOnGameUpdatedCallback(
             ---@param index number
             ---@param configuration UILobbydDiscoveryInfo
             function (index, configuration)
@@ -1056,7 +1093,7 @@ LobbySelection = Class(Group) {
             end, 'LobbySelection'
         )
 
-        discoveryService:AddOnRemoveGameCallback(
+        self.DiscoveryService:AddOnRemoveGameCallback(
             ---@param index number
             function (index)
                 self.Games[index + 1] = nil
@@ -1146,7 +1183,7 @@ LobbySelection = Class(Group) {
 
         -- validate port
         local port = tonumber(gamePort) or 0  -- default of port 0 will cause engine to choose
-        if not port or math.floor(gamePort) ~= gamePort or gamePort < 0 or gamePort > 65535 then
+        if not port or math.floor(port) ~= port or port < 0 or port > 65535 then
             self:CreateErrorDialog("<LOC GAMECREATE_0004>Please choose a name that does not contain only whitespace characters")
             return
         end
@@ -1158,27 +1195,36 @@ LobbySelection = Class(Group) {
             return
         end
 
-
-        -- modify this if you want "TCP" or "None"
-        -- no longer user selectable
-        local protocol = "UDP"
-
-
-
         local scenario = Prefs.GetFromCurrentProfile('LastScenario') or UIUtil.defaultScenario
 
         Prefs.SetToCurrentProfile('LastGameName', gameName)
-        Prefs.SetToCurrentProfile('LastGamePort', gamePort)
+        Prefs.SetToCurrentProfile('LastGamePort', port)
 
-        local lobby = import("/lua/ui/lobby/lobby.lua")
-        lobby.CreateLobby(protocol, port, playerName, nil, nil)
-        lobby.HostGame(gameName, scenario, false)
+        local lobby = import("/lua/ui/lobby/lobby.lua").CreateLobby(port, playerName, nil)
+        lobby:Host(gameName, scenario, false)
 
         self:Destroy()
     end,
 
     ---------------------------------------------------------------------------
     --#region Callbacks
+
+    ---@param self UILobbySelection
+    ---@param callback fun()
+    ---@param name string
+    AddOnExitCallback = function(self, callback, name)
+        if (not name) or type(name) != 'string' then
+            self:Warn("Ignoring callback, 'name' parameter is invalid for  'AddOnExitCallback'")
+            return
+        end
+
+        if (not callback) or type(callback) != 'function' then
+            self:Warn("Ignoring callback, 'callback' parameter is invalid for 'AddOnExitCallback'")
+            return
+        end
+
+        self.OnExitCallbacks[name] = callback
+    end,
 
     ---@param self UILobbySelection
     ---@param callback fun()
@@ -1226,14 +1272,7 @@ LobbySelection = Class(Group) {
 ---@param parent Control
 ---@param exitBehavior fun()
 ---@return UILobbySelection
-CreateLobbySelection = function(parent, exitBehavior)
-    local discoveryService = import("/lua/ui/lobby/lobby-discovery.lua").CreateDiscoveryService() --[[@as UILobbyDiscoveryService]]
-    local lobbySelection = LobbySelection(parent, discoveryService) --[[@as UILobbySelection]]
-    lobbySelection:AddOnDestroyCallback(exitBehavior, 'BackToMainMenu')
-    lobbySelection:AddOnDestroyCallback(
-        function()
-            discoveryService:Destroy()
-        end, 'DestroyDiscovery')
-
+CreateLobbySelection = function(parent)
+    local lobbySelection = LobbySelection(parent) --[[@as UILobbySelection]]
     return lobbySelection
 end

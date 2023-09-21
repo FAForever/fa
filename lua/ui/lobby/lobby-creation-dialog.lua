@@ -1,10 +1,31 @@
 
+--******************************************************************************************************
+--** Copyright (c) 2022  Willem 'Jip' Wijnia
+--** 
+--** Permission is hereby granted, free of charge, to any person obtaining a copy
+--** of this software and associated documentation files (the "Software"), to deal
+--** in the Software without restriction, including without limitation the rights
+--** to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+--** copies of the Software, and to permit persons to whom the Software is
+--** furnished to do so, subject to the following conditions:
+--** 
+--** The above copyright notice and this permission notice shall be included in all
+--** copies or substantial portions of the Software.
+--** 
+--** THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+--** IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+--** FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+--** AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+--** LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+--** OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+--** SOFTWARE.
+--******************************************************************************************************
+
 local UIUtil = import("/lua/ui/uiutil.lua")
 local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
 local Edit = import("/lua/maui/edit.lua").Edit
 local Prefs = import("/lua/user/prefs.lua")
 local Group = import("/lua/maui/group.lua").Group
-local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
 
 local function CreateEditField(parent)
     local control = Edit(parent)
@@ -35,6 +56,9 @@ end
 ---@field CheckAutoPort Checkbox
 LobbyCreationDialog = Class(Group) {
 
+    OnAcceptCallbacks = { },
+    OnCancelCallbacks = { },
+
     DefaultPort = 16010,
     ValidPorts = {
         [48] = true,
@@ -50,15 +74,13 @@ LobbyCreationDialog = Class(Group) {
         [46] = true,
     },
 
-    OnAcceptCallbacks = { },
-    OnCancelCallbacks = { },
-
     ---@param self UILobbyCreationDialog
     ---@param parent Control
     __init = function(self, parent)
         Group.__init(self, parent, 'UILobbyCreationDialog')
         self:Debug(string.format("__init()"))
 
+        LayoutHelpers.DepthOverParent(self, parent, 100)
         LayoutHelpers.AtCenterIn(self, parent)
         LayoutHelpers.SetDimensions(self, 10, 10)
 
@@ -203,6 +225,8 @@ LobbyCreationDialog = Class(Group) {
         self.OnCancelCallbacks[name] = callback
     end,
 
+    --#endregion
+
     ---------------------------------------------------------------------------
     --#region Debugging
 
@@ -227,6 +251,8 @@ LobbyCreationDialog = Class(Group) {
     Warn = function(self, message)
         WARN(string.format("UILobbyCreationDialog: %s", message))
     end,
+
+    --#endregion
 }
 
 ---@param parent Control

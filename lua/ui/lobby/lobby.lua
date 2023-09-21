@@ -1,85 +1,190 @@
 
+--******************************************************************************************************
+--** Copyright (c) 2022  Willem 'Jip' Wijnia
+--** 
+--** Permission is hereby granted, free of charge, to any person obtaining a copy
+--** of this software and associated documentation files (the "Software"), to deal
+--** in the Software without restriction, including without limitation the rights
+--** to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+--** copies of the Software, and to permit persons to whom the Software is
+--** furnished to do so, subject to the following conditions:
+--** 
+--** The above copyright notice and this permission notice shall be included in all
+--** copies or substantial portions of the Software.
+--** 
+--** THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+--** IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+--** FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+--** AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+--** LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+--** OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+--** SOFTWARE.
+--******************************************************************************************************
+
+local Prefs = import("/lua/user/prefs.lua")
+
 local UIUtil = import("/lua/ui/uiutil.lua")
 local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
 local Group = import("/lua/maui/group.lua").Group
-local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
-local Window = import("/lua/maui/window.lua").Window
-local GameMain = import("/lua/ui/game/gamemain.lua")
-local Text = import("/lua/maui/text.lua").Text
-local Edit = import("/lua/maui/edit.lua").Edit
-local Combo = import("/lua/ui/controls/combo.lua").Combo
-local ItemList = import("/lua/maui/itemlist.lua").ItemList
 
-
-
----@class UILobby
+---@class UILobby : Group
+---@field OnDestroyCallbacks table<string, fun()>
+---@field OnExitCallbacks table<string, fun()>
+---@field LobbyCommunication UILobbyCommunication
+---@field VisibleToAll Group
+---@field VisibleToHost Group
 Lobby = Class(Group) {
 
-    LobbyCommunications = nil,
-    LobbyCommStrings = nil, 
+    LobbyCommunication = false,
+    LobbyAPI = false,
 
-    ConnectedTo = {},
-    ConnectedToStatus = {},
+    OnExitCallbacks = { },
+    OnDestroyCallbacks = { },
 
-    CreateLobbyCommunications = function(self, port, localPlayerName, localPlayerUID)
-        self.LobbyCommunications = InternalCreateLobby (
-            UILobbyCommunication,
-            "UDP",
-            port,
-            8,
-            localPlayerName,
-            localPlayerUID,
-            nil
+    ---@param self UILobby
+    ---@param parent Control
+    __init = function(self, parent)
+        Group.__init(self, parent, 'UILobby')
+
+        self.VisibleToAll = Group()
+        LayoutHelpers.FillParent(self.VisibleToAll, self)
+
+        self.VisibleToHost = Group()
+        LayoutHelpers.FillParent(self.VisibleToHost, self)
+    end,
+
+    ---@param self UILobby
+    ---@param parent Control
+    __post_init = function(self, parent)
+        LayoutHelpers.FillParent(self, self:GetRootFrame())
+    end,
+
+    ---@param self UILobby
+    ---@param port number
+    ---@param localName string
+    ---@param localUID? string
+    SetupLobbyCommunication = function(self, port, localName, localUID)
+        self.LobbyCommunication = import("/lua/ui/lobby/lobby-communication.lua").CreateLobbyCommunications(
+            port, localName, localUID
         )
     end,
 
+    SetupLobbyAPI = function(self)
+        -- todo
+    end,
+
+    ---------------------------------------------------------------------------
+    --#region Connectivity
+
+    ---@param self UILobby
+    ---@param gameName string
+    ---@param gameScenario string
+    ---@param isSinglePlayer boolean
+    Host = function(self, gameName, gameScenario, isSinglePlayer)
+        if not self.LobbyCommunication then
+            self:Warn("Unable to host a lobby - lobby communications are not setup")
+            return
+        end
+
+        self.LobbyName = gameName
+        self.LobbyScenario = gameScenario
+        self.LobbySingleplayer = isSinglePlayer
+
+        self.LobbyCommunication:HostGame()
+    end,
+
+    ---@param self UILobby
+    ---@param address string
+    ---@param remoteName string
+    ---@param remoteUID string
+    Join = function(self, address, remoteName, remoteUID)
+        if not self.LobbyCommunication then
+            self:Warn("Unable to join a lobby - lobby communications are not setup")
+            return
+        end
+
+        self.LobbyCommunication:JoinGame(address, remoteName, remoteUID)
+    end,
+
+    --#endregion
+
+    ---------------------------------------------------------------------------
+    --#region Callbacks
+
+    ---@param self UILobbySelection
+    ---@param callback fun()
+    ---@param name string
+    AddOnExitCallback = function(self, callback, name)
+        if (not name) or type(name) != 'string' then
+            self:Warn("Ignoring callback, 'name' parameter is invalid for  'AddOnExitCallback'")
+            return
+        end
+
+        if (not callback) or type(callback) != 'function' then
+            self:Warn("Ignoring callback, 'callback' parameter is invalid for 'AddOnExitCallback'")
+            return
+        end
+
+        self.OnExitCallbacks[name] = callback
+    end,
+
+    ---@param self UILobbySelection
+    ---@param callback fun()
+    ---@param name string
+    AddOnDestroyCallback = function(self, callback, name)
+        if (not name) or type(name) != 'string' then
+            self:Warn("Ignoring callback, 'name' parameter is invalid for  'AddOnDestroyCallback'")
+            return
+        end
+
+        if (not callback) or type(callback) != 'function' then
+            self:Warn("Ignoring callback, 'callback' parameter is invalid for 'AddOnDestroyCallback'")
+            return
+        end
+
+        self.OnDestroyCallbacks[name] = callback
+    end,
+
+    ---------------------------------------------------------------------------
+    --#region Debugging
+
+    Debugging = true,
+
+    ---@param self UILobbyCommunication
+    ---@param message string
+    Debug = function(self, message)
+        if self.Debugging then
+            SPEW(string.format("UILobbyCommunication: %s", message))
+        end
+    end,
+
+    ---@param self UILobbyCommunication
+    ---@param message string
+    Log = function(self, message)
+        LOG(string.format("UILobbyCommunication: %s", message))
+    end,
+
+    ---@param self UILobbyCommunication
+    ---@param message string
+    Warn = function(self, message)
+        WARN(string.format("UILobbyCommunication: %s", message))
+    end,
+
+    --#endregion
 }
 
 -- Create a new unconnected lobby.
----@param protocol 'UDP' | 'TCP' | 'None'
 ---@param localPort number
----@param desiredPlayerName string
----@param localPlayerUID string
----@param natTraversalProvider any
-function CreateLobby(protocol, localPort, desiredPlayerName, localPlayerUID, natTraversalProvider)
-    LOG("CreateLobby")
-end
+---@param localName string
+---@param localUID? string
+---@return UILobby
+function CreateLobby(localPort, localName, localUID)
 
--- create the lobby as a host
----@param desiredGameName string
----@param scenarioFileName string
----@param inSinglePlayer boolean
-function HostGame(desiredGameName, scenarioFileName, inSinglePlayer)
-    LOG("HostGame")
-end
-
----@param address string
----@param asObserver boolean
----@param playerName string
----@param uid string
-function JoinGame(address, asObserver, playerName, playerUID)
-    LOG("JoinGame")
-end
-
-function ConnectToPeer(addressAndPort,name,uid)
-    LOG("ConnectToPeer")
-
-    if not string.find(addressAndPort, '127.0.0.1') then
-        LOG("ConnectToPeer (name=" .. name .. ", uid=" .. uid .. ", address=" .. addressAndPort ..")")
-    else
-        DisconnectFromPeer(uid)
-        LOG("ConnectToPeer (name=" .. name .. ", uid=" .. uid .. ", address=" .. addressAndPort ..", USE PROXY)")
-        table.insert(ConnectedWithProxy, uid)
+    if not GetPreference("profile.current") then
+        Prefs.CreateProfile("FAF_"..desiredPlayerName)
     end
-    lobbyComm:ConnectToPeer(addressAndPort,name,uid)
-end
 
-function DisconnectFromPeer(uid)
-    LOG("DisconnectFromPeer")
-    LOG("DisconnectFromPeer (uid=" .. uid ..")")
-    if wasConnected(uid) then
-        table.remove(connectedTo, uid)
-    end
-    GpgNetSend('Disconnected', string.format("%d", uid))
-    lobbyComm:DisconnectFromPeer(uid)
+    local lobby = Lobby(GetFrame(0)) --[[@as UILobby]]
+    lobby:SetupLobbyCommunication(localPort, localName, localUID)
+    return lobby
 end
