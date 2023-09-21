@@ -109,16 +109,22 @@ LobbyDiscoveryService = ClassUI(moho.discovery_service_methods) {
 
     Debugging = true,
 
+    ---@param self UILobbyDiscoveryService
+    ---@param message string
     Debug = function(self, message)
         if self.Debugging then
             SPEW(string.format("UILobbyDiscoveryService: %s", message))
         end
     end,
 
+    ---@param self UILobbyDiscoveryService
+    ---@param message string
     Log = function(self, message)
         LOG(string.format("UILobbyDiscoveryService: %s", message))
     end,
 
+    ---@param self UILobbyDiscoveryService
+    ---@param message string
     Warn = function(self, message)
         WARN(string.format("UILobbyDiscoveryService: %s", message))
     end,

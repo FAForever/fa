@@ -418,16 +418,22 @@ LobbyCommunication = Class(moho.lobby_methods) {
 
     Debugging = true,
 
+    ---@param self UILobbyCommunication
+    ---@param message string
     Debug = function(self, message)
         if self.Debugging then
             SPEW(string.format("UILobbyCommunication: %s", message))
         end
     end,
 
+    ---@param self UILobbyCommunication
+    ---@param message string
     Log = function(self, message)
         LOG(string.format("UILobbyCommunication: %s", message))
     end,
 
+    ---@param self UILobbyCommunication
+    ---@param message string
     Warn = function(self, message)
         WARN(string.format("UILobbyCommunication: %s", message))
     end,

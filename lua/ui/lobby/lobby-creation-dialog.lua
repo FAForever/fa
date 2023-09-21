@@ -6,7 +6,6 @@ local Prefs = import("/lua/user/prefs.lua")
 local Group = import("/lua/maui/group.lua").Group
 local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
 
-
 local function CreateEditField(parent)
     local control = Edit(parent)
     control:SetForegroundColor(UIUtil.fontColor)
@@ -57,8 +56,9 @@ LobbyCreationDialog = Class(Group) {
     ---@param self UILobbyCreationDialog
     ---@param parent Control
     __init = function(self, parent)
-        self:Debug(string.format("__init()"))
         Group.__init(self, parent, 'UILobbyCreationDialog')
+        self:Debug(string.format("__init()"))
+
         LayoutHelpers.AtCenterIn(self, parent)
         LayoutHelpers.SetDimensions(self, 10, 10)
 
