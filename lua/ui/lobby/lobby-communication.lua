@@ -332,7 +332,7 @@ LobbyCommunication = Class(moho.lobby_methods) {
     ---@param self UILobbyCommunication
     ---@param data string
     DataReceived = function(self, data)
-        self:Debug(string.format("DataReceived(%s)", reprsl(data)))
+        self:Debug(string.format("DataReceived(%s)", reprs(data)))
 
         -- TODO: do some kind of checksum?
 
@@ -403,7 +403,7 @@ LobbyCommunication = Class(moho.lobby_methods) {
     ---@param peerUID string # peer id that the message is about
     ---@param connectedPeers string[] # player ids that are connected to the peer
     EstablishedPeers = function(self, peerUID, connectedPeers)
-        self:Debug(string.format("EstablishedPeers(%s, %s)", tostring(peerUID), reprsl(connectedPeers)))
+        self:Debug(string.format("EstablishedPeers(%s, %s)", tostring(peerUID), reprs(connectedPeers)))
 
         for name, callback in self.OnEstablishedPeersCallbacks do
             local ok, msg = pcall(callback,peerUID, connectedPeers)

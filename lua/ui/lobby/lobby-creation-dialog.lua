@@ -18,7 +18,7 @@ local function CreateEditField(parent)
 end
 
 ---@class UILobbyCreationDialog : Group
----@field OnAcceptCallbacks table<string, fun(name: string, port: number)>
+---@field OnAcceptCallbacks table<string, fun(name: string, port: string)>
 ---@field OnCancelCallbacks table<string, fun()>
 ---@field ValidPorts table<number, boolean>
 ---@field Panel Bitmap
@@ -170,7 +170,7 @@ LobbyCreationDialog = Class(Group) {
     --#region Callbacks
 
     ---@param self UILobbyCreationDialog
-    ---@param callback fun(name: string, port: number)
+    ---@param callback fun(name: string, port: string)
     ---@param name string
     AddOnAcceptCallback = function(self, callback, name)
         if (not name) or type(name) != 'string' then

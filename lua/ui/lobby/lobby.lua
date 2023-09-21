@@ -36,17 +36,28 @@ Lobby = Class(Group) {
 }
 
 -- Create a new unconnected lobby.
+---@param protocol 'UDP' | 'TCP' | 'None'
+---@param localPort number
+---@param desiredPlayerName string
+---@param localPlayerUID string
+---@param natTraversalProvider any
 function CreateLobby(protocol, localPort, desiredPlayerName, localPlayerUID, natTraversalProvider)
     LOG("CreateLobby")
 end
 
 -- create the lobby as a host
+---@param desiredGameName string
+---@param scenarioFileName string
+---@param inSinglePlayer boolean
 function HostGame(desiredGameName, scenarioFileName, inSinglePlayer)
     LOG("HostGame")
 end
 
--- join an already existing lobby
-function JoinGame(address, asObserver, playerName, uid)
+---@param address string
+---@param asObserver boolean
+---@param playerName string
+---@param uid string
+function JoinGame(address, asObserver, playerName, playerUID)
     LOG("JoinGame")
 end
 

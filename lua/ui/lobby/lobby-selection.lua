@@ -23,6 +23,8 @@ local Tooltip = import("/lua/ui/game/tooltip.lua")
 local Combo = import("/lua/ui/controls/combo.lua").Combo
 local lobby = import("/lua/ui/lobby/lobby.lua")
 
+local LobbySelectionRow = import("/lua/ui/lobby/lobby-selection-row.lua").LobbySelectionRow
+
 local errorDialog = false
 
 local editInFocus = nil
@@ -887,14 +889,19 @@ end
 ---@field ButtonExit Button
 ---@field ButtonCreate Button
 ---@field EditName Edit
+---@field LobbySelectionRows UILobbySelectionRow[]
 ---@field DialogError Control
 LobbySelection = Class(Group) {
+
+    Games = { },
+    GamesSorted = { },
 
     OnDestroyCallbacks = { },
 
     ---@param self UILobbySelection
     ---@param parent Control
-    __init = function(self, parent, exitBehavior)
+    ---@param discoveryService UILobbyDiscoveryService
+    __init = function(self, parent, discoveryService)
         self:Debug(string.format("__init()"))
 
         Group.__init(self, parent, 'UILobbySelection')
@@ -921,11 +928,27 @@ LobbySelection = Class(Group) {
         LayoutHelpers.AtLeftIn(self.EditName, self.Panel, 30)
         LayoutHelpers.AtTopIn(self.EditName, self.Panel, 92)
         LayoutHelpers.DepthOverParent(self.EditName, self.Panel)
+
+        self.BitmapContentArea = UIUtil.CreateBitmapColor(self.Panel, '00ffffff')
+        LayoutHelpers.AtRightTopIn(self.BitmapContentArea, self.Panel, 28, 150)
+        LayoutHelpers.AtLeftBottomIn(self.BitmapContentArea, self.Panel, 24, 150)
+
+        self.LobbySelectionRows = { }
+
+        for k = 0, 4 do
+            local lobbySelectionRow = LobbySelectionRow(self.BitmapContentArea)
+            lobbySelectionRow.Height:Set(function() return 0.20 * self.BitmapContentArea.Height() end)
+            lobbySelectionRow.Width:Set(function() return self.BitmapContentArea.Width() end)
+            LayoutHelpers.AtLeftTopIn(lobbySelectionRow, self.BitmapContentArea, 0, 48 + 84 * k)
+
+            self.LobbySelectionRows[k + 1] = lobbySelectionRow
+        end
     end,
 
     ---@param self UILobbySelection
     ---@param parent Control
-    __post_init = function(self, parent)
+    ---@param discoveryService UILobbyDiscoveryService
+    __post_init = function(self, parent, discoveryService)
         self:Debug(string.format("__post_init()"))
 
         -- escape handler event
@@ -958,7 +981,13 @@ LobbySelection = Class(Group) {
                         function()
                             self.DialogCreate:Hide()
                         end,
-                        'Hide'
+                        'OnCancelHide'
+                    )
+
+                    self.DialogCreate:AddOnAcceptCallback(
+                        function (name, port)
+                            self:CreateLobby(name, port)
+                        end, 'OnAcceptCreate'
                     )
                 end
 
@@ -1006,6 +1035,35 @@ LobbySelection = Class(Group) {
             edit:AbandonFocus()
             return true
         end
+
+        discoveryService:AddOnGameFoundCallback(
+            ---@param index number
+            ---@param configuration UILobbydDiscoveryInfo
+            function (index, configuration)
+                self.Games[index+1] = configuration
+                self:SortGames()
+                self:PopulateRows()
+            end, 'LobbySelection'
+        )
+
+        discoveryService:AddOnGameUpdatedCallback(
+            ---@param index number
+            ---@param configuration UILobbydDiscoveryInfo
+            function (index, configuration)
+                self.Games[index + 1] = configuration
+                self:SortGames()
+                self:PopulateRows()
+            end, 'LobbySelection'
+        )
+
+        discoveryService:AddOnRemoveGameCallback(
+            ---@param index number
+            function (index)
+                self.Games[index + 1] = nil
+                self:SortGames()
+                self:PopulateRows()
+            end, 'LobbySelection'
+        )
     end,
 
     ---@param self UILobbySelection
@@ -1020,6 +1078,103 @@ LobbySelection = Class(Group) {
         end
 
         Group.Destroy(self)
+    end,
+
+    ---@param self UILobbySelection
+    SortGames = function(self)
+        for k, v in self.GamesSorted do
+            self.GamesSorted[k] = nil
+        end
+
+        local head = 1
+        for k, config in self.Games do
+            if not config then
+                continue
+            end
+
+            self.GamesSorted[head] = config
+            head = head + 1
+        end
+    end,
+
+    ---@param self UILobbySelection
+    PopulateRows = function(self)
+
+        local gameCount = table.getn(self.GamesSorted)
+        local rowCount = table.getn(self.LobbySelectionRows)
+
+        for k = 1, gameCount do
+            local lobbySelectionRow = self.LobbySelectionRows[k]
+            if lobbySelectionRow then
+                lobbySelectionRow:Populate(self.GamesSorted[k])
+            end
+        end
+
+        for k = gameCount + 1, rowCount do
+            local lobbySelectionRow = self.LobbySelectionRows[k]
+            if lobbySelectionRow then
+                lobbySelectionRow:Populate(nil)
+            end
+        end
+    end,
+
+    CreateErrorDialog = function(self, message)
+        if self.DialogError then
+            self.DialogError:Destroy()
+        end
+
+        self.DialogError = UIUtil.ShowInfoDialog(self, message, "<LOC _OK>")
+    end,
+
+    ---@param self UILobbySelection
+    ---@param gameName string
+    ---@param gamePort string
+    CreateLobby = function(self, gameName, gamePort)
+
+        -- validate name
+        if (not gameName) or (gameName == "") then
+            self:CreateErrorDialog("<LOC GAMECREATE_0000>Please choose a valid game name")
+            return
+        end
+
+        -- validate name
+        local gnBegin, gnEnd = string.find(gameName, "%s+")
+        if gnBegin and (gnBegin == 1 and gnEnd == string.len(gameName)) then
+            self:CreateErrorDialog("<LOC GAMECREATE_0004>Please choose a name that does not contain only whitespace characters")
+            return
+        end
+
+        -- validate port
+        local port = tonumber(gamePort) or 0  -- default of port 0 will cause engine to choose
+        if not port or math.floor(gamePort) ~= gamePort or gamePort < 0 or gamePort > 65535 then
+            self:CreateErrorDialog("<LOC GAMECREATE_0004>Please choose a name that does not contain only whitespace characters")
+            return
+        end
+
+        -- validate name
+        local playerName = self.EditName:GetText()
+        if (not playerName) or (playerName == "") then
+            self:CreateErrorDialog("<LOC GAMESEL_0003>Please fill in your nickname")
+            return
+        end
+
+
+        -- modify this if you want "TCP" or "None"
+        -- no longer user selectable
+        local protocol = "UDP"
+
+
+
+        local scenario = Prefs.GetFromCurrentProfile('LastScenario') or UIUtil.defaultScenario
+
+        Prefs.SetToCurrentProfile('LastGameName', gameName)
+        Prefs.SetToCurrentProfile('LastGamePort', gamePort)
+
+        local lobby = import("/lua/ui/lobby/lobby.lua")
+        lobby.CreateLobby(protocol, port, playerName, nil, nil)
+        lobby.HostGame(gameName, scenario, false)
+
+        self:Destroy()
     end,
 
     ---------------------------------------------------------------------------
