@@ -952,10 +952,17 @@ LobbySelection = Class(Group) {
             local name = self.EditName:GetText()
             if IsNameOK(name) then
                 Prefs.SetToCurrentProfile('NetName', name)
-                self:Destroy()
+                if not self.DialogCreate then
+                    self.DialogCreate = import("/lua/ui/lobby/lobby-creation-dialog.lua").CreateLobbyCreationDialog(self)
+                    self.DialogCreate:AddOnCancelCallback(
+                        function()
+                            self.DialogCreate:Hide()
+                        end,
+                        'Hide'
+                    )
+                end
 
-
-                -- import("/lua/ui/lobby/gamecreate.lua").CreateUI(name)
+                self.DialogCreate:Show()
             else
                 if self.DialogError then
                     self.DialogError:Destroy()
@@ -1018,8 +1025,8 @@ LobbySelection = Class(Group) {
     ---------------------------------------------------------------------------
     --#region Callbacks
 
-    ---@param self UILobbyDiscoveryService
-    ---@param callback fun(index: number, configuration: table)
+    ---@param self UILobbySelection
+    ---@param callback fun()
     ---@param name string
     AddOnDestroyCallback = function(self, callback, name)
         if (not name) or type(name) != 'string' then
@@ -1040,16 +1047,22 @@ LobbySelection = Class(Group) {
 
     Debugging = true,
 
+    ---@param self UILobbySelection
+    ---@param message string
     Debug = function(self, message)
         if self.Debugging then
             SPEW(string.format("UILobbySelection: %s", message))
         end
     end,
 
+    ---@param self UILobbySelection
+    ---@param message string
     Log = function(self, message)
         LOG(string.format("UILobbySelection: %s", message))
     end,
 
+    ---@param self UILobbySelection
+    ---@param message string
     Warn = function(self, message)
         WARN(string.format("UILobbySelection: %s", message))
     end,

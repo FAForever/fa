@@ -580,7 +580,7 @@ end
 
 --- For internal use by `CreateLobbyComm()`
 ---@param lobbyComClass fa-class
----@param protocol string
+---@param protocol "UDP" | "TCP" | "None"
 ---@param localPort number
 ---@param maxConnections number
 ---@param playerName string
