@@ -163,6 +163,7 @@ AIPlatoonAdaptiveReclaimBehavior = Class(AIPlatoon) {
                 if returnPos and VDist3Sq(engPos, returnPos) < 6400 then
                     self:LogDebug(string.format('Exiting Reclaim state machine'))
                     self:ExitStateMachine()
+                    return
                 elseif returnPos then
                     self.LocationToReclaim = returnPos
                     self:ChangeState(self.Navigating)

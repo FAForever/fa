@@ -62,7 +62,6 @@ AIPlatoonAdaptiveGuardBehavior = Class(AIPlatoon) {
         ---@param self AIPlatoonAdaptiveGuardBehavior
         Main = function(self)
             -- reset state
-            LOG('Searching Guard State Machine')
             self.LocationToAttack = nil
             self.OpportunityToRaid = nil
             self.ThreatToEvade = nil
@@ -83,7 +82,6 @@ AIPlatoonAdaptiveGuardBehavior = Class(AIPlatoon) {
                 if not self.PlatoonData.NeverGuardBases then
                     --Guard the closest least-defended base
                     local bestBase = false
-                    local bestBaseName = ""
                     local bestDistSq = 999999999
                     local bestDefense = 999999999
         
@@ -97,20 +95,21 @@ AIPlatoonAdaptiveGuardBehavior = Class(AIPlatoon) {
                                 threatType = 'StructuresNotMex'
                             end
         
-                            local baseDefense = brain:GetThreatAtPosition(base.Position, 1, true, threatType, brain:GetArmyIndex())
-                            LOG('base defense '..repr(baseDefense))
+                            local defStructures = brain:GetUnitsAroundPoint(categories.STRUCTURE * categories.DEFENSE,  base.Position, 120, 'Ally')
+                            local defThreat = 0
+                            for _, v in defStructures do
+                                defThreat = defThreat + v.Blueprint.Defense.SurfaceThreatLevel
+                            end
         
                             local distSq = VDist2Sq(MAIN.Position[1], MAIN.Position[3], base.Position[1], base.Position[3])
         
                             if baseDefense < bestDefense then
                                 bestBase = base
-                                bestBaseName = baseName
                                 bestDistSq = distSq
                                 bestDefense = baseDefense
                             elseif baseDefense == bestDefense then
                                 if distSq < bestDistSq then
                                     bestBase = base
-                                    bestBaseName = baseName
                                     bestDistSq = distSq
                                 end
                             end
@@ -123,38 +122,20 @@ AIPlatoonAdaptiveGuardBehavior = Class(AIPlatoon) {
                     end
         
                     if bestBase and bestDefense < threshold then
-                        local path, reason = NavUtils.PathToWithThreatThreshold(self.MovementLayer, self:GetPlatoonPosition(), bestBase.Position, brain, NavUtils.ThreatFunctions.AntiSurface, self.PlatoonSurfaceThreat * 10, brain.IMAPConfig.Rings)
-        
-                        IssueClearCommands(self:GetPlatoonUnits())
-        
-                        if path then
-                            local pathLength = table.getn(path)
-                            for i=1, pathLength-1 do
-                                self:MoveToLocation(path[i], false)
-                            end
-                        end
-        
-                        IssueGuard(self:GetPlatoonUnits(), bestBase.Position)
-                        --self:MoveToLocation(bestBase.Position, false)
-        
-                        --Handle base guarding logic in this loop
-                        local guardTime = 0
-                        while brain:PlatoonExists(self) do
-                            --Is the threat of this base good enough?
-                            if not forceGuardBase then
-                                local rnd = Random(13,17)
-                                WaitSeconds(rnd)
-                                guardTime = guardTime + rnd
-        
-                                if (brain:GetThreatAtPosition(bestBase.Position, 1, true, threatType, brain:GetArmyIndex()) >= threshold + self:GetPlatoonThreatEx().SurfaceThreatLevel
-                                or (self.PlatoonData.BaseGuardTimeLimit and guardTime > self.PlatoonData.BaseGuardTimeLimit)) then
-                                    --Stop guarding and guard something else.
-                                    break
-                                end
-                            else
-                                --Set to permanently guard a base, and we already received our move orders.
-                                return
-                            end
+                        self.LocationToGuard = bestBase.Position
+                        local platPos = self:GetPlatoonPosition()
+                        local guardPos = unitToGuard:GetPosition()
+                        local dx = platPos[1] - guardPos[1]
+                        local dz = platPos[3] - guardPos[3]
+                        if dx * dx + dz * dz > 3600 then
+                            self.UnitToGuard = unitToGuard
+                            self.LocationToGuard = bestBase.Position
+                            self:ChangeState(self.Navigating)
+                            return
+                        else
+                            self.LocationToGuard = bestBase.Position
+                            self:ChangeState(self.GuardBase)
+                            return
                         end
                     end
                 end
@@ -164,14 +145,15 @@ AIPlatoonAdaptiveGuardBehavior = Class(AIPlatoon) {
                     local unitToGuard = false
                     local units = brain:GetListOfUnits(categories.ENGINEER - categories.COMMAND, false)
                     for k,v in units do
-                        if v.NeedGuard and not v.BeingGuarded then
-                            unitToGuard = v
-                            v.BeingGuarded = true
+                        if v and not v.Dead then
+                            if v.NeedGuard and not v.BeingGuarded and NavUtils.CanPathTo(self.MovementLayer, position, v:GetPosition())then
+                                unitToGuard = v
+                                v.BeingGuarded = true
+                            end
                         end
                     end
         
                     if unitToGuard and not unitToGuard.Dead then
-                        LOG('FoundUnitToGuard Guard State Machine')
                         local platPos = self:GetPlatoonPosition()
                         local guardPos = unitToGuard:GetPosition()
                         local dx = platPos[1] - guardPos[1]
@@ -205,8 +187,6 @@ AIPlatoonAdaptiveGuardBehavior = Class(AIPlatoon) {
         --- The platoon navigates towards a target, picking up oppertunities as it finds them
         ---@param self AIPlatoonAdaptiveGuardBehavior
         Main = function(self)
-            -- reset state
-            LOG('Navigating Guard State Machine')
 
             -- sanity check
             local unitToGuard = self.UnitToGuard
@@ -373,7 +353,6 @@ AIPlatoonAdaptiveGuardBehavior = Class(AIPlatoon) {
         --- The platoon raids the opportunity it walked into
         ---@param self AIPlatoonAdaptiveGuardBehavior
         Main = function(self)
-            LOG('Guarding Guard State Machine')
             local brain = self:GetBrain()
             local unitToGuard = self.UnitToGuard
             if unitToGuard and not unitToGuard.Dead then
@@ -437,24 +416,47 @@ AIPlatoonAdaptiveGuardBehavior = Class(AIPlatoon) {
         ---@param self AIPlatoonAdaptiveGuardBehavior
         Main = function(self)
             local brain = self:GetBrain()
-            local baseToGuard = self.baseToGuard
-            if baseToGuard and not unitToGuard.Dead then
-
+            local baseToGuardPos = self.LocationToGuard
+            if baseToGuardPos then
                 -- sanity check
-                local location = self.OpportunityToRaid
-                IssueGuard(self:GetPlatoonUnits(), unitToGuard)
+                IssueGuard(self:GetPlatoonUnits(), baseToGuardPos)
                 local guardTime = 0
-                while brain:PlatoonExists(self) and not unitToGuard.Dead do
-                    guardTime = guardTime + 5
-                    WaitSeconds(5)
-
-                    if self.PlatoonData.EngineerGuardTimeLimit and guardTime >= self.PlatoonData.EngineerGuardTimeLimit
-                    or (not unitToGuard.Dead and unitToGuard.Layer == 'Seabed' and self.MovementLayer == 'Land') then
-                        IssueClearCommands({self:GetPlatoonUnits()})
+                local rnd = Random(13,17)
+                WaitSeconds(rnd)
+                guardTime = guardTime + rnd
+                while brain:PlatoonExists(self) do
+                    local enemyCount = brain:GetNumUnitsAroundPoint(categories.LAND * categories.MOBILE, baseToGuardPos, 120, 'Enemy')
+                    if enemyCount > 0 then
+                        local enemyUnits = brain:GetUnitsAroundPoint(categories.LAND * categories.MOBILE, baseToGuardPos, 120, 'Enemy')
+                        local closestUnit
+                        local closestDistance
+                        for _, eunit in enemyUnits do
+                            if eunit and not eunit.Dead then
+                                local ePos = eunit:GetPosition()
+                                local dx = baseToGuardPos[1] - ePos[1]
+                                local dz = baseToGuardPos[3] - ePos[3]
+                                local distance = dx * dx + dz * dz
+                                if not closestDistance or distance < closestDistance then
+                                    closestDistance = distance
+                                    closestUnit = eunit
+                                end
+                            end
+                        end
+                        if closestUnit and not closestUnit.Dead then
+                            self.TargetToAttack = closestUnit
+                            self:ChangeState(self.AttackingTarget)
+                            return
+                        end
+                        
+                    end
+                    if self:CalculatePlatoonThreatAroundPosition('Surface', categories.ALLUNITS, baseToGuardPos, 120)
+                    or (self.PlatoonData.BaseGuardTimeLimit and guardTime > self.PlatoonData.BaseGuardTimeLimit) then
                         coroutine.yield(10)
                         self:ChangeState(self.Searching)
                         return
                     end
+                    guardTime = guardTime + 5
+                    WaitTicks(50)
                 end
             else
                 IssueClearCommands({self:GetPlatoonUnits()})
