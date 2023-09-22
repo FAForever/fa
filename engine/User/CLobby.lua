@@ -81,8 +81,8 @@ end
 
 ---
 ---@param address GPGNetAddress
----@param remotePlayerName string | nil
----@param remotePlayerUID string
+---@param remotePlayerName? string | nil
+---@param remotePlayerUID? string
 function CLobby:JoinGame(address, remotePlayerName, remotePlayerUID)
 end
 

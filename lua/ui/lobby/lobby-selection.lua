@@ -47,8 +47,8 @@ local editInFocus = nil
 local MapUtil = import("/lua/ui/maputil.lua")
 local scenarios = MapUtil.EnumerateSkirmishScenarios()
 local gameOptions = {}
-gameOptions[1] = import("/lua/ui/lobby/lobbyoptions.lua").teamOptions
-gameOptions[2] = import("/lua/ui/lobby/lobbyoptions.lua").globalOpts
+gameOptions[1] = import("/lua/ui/lobby/lobby-options.lua").teamOptions
+gameOptions[2] = import("/lua/ui/lobby/lobby-options.lua").globalOpts
 
 --- A noop for the purpose of the FAF binary not containing this definition
 --
@@ -180,7 +180,6 @@ function CreateEditField(parent, width, maxChars)
 end
 
 function CreateUI(over, exitBehavior)
-    local discovery = import("/lua/ui/lobby/lobbycomm.lua").CreateDiscoveryService()
     local discovery = InternalCreateDiscoveryService(DiscoveryService)
     LOG('*** DISC CREATE: ', service)
 	local parent = over
@@ -900,14 +899,21 @@ end
 ---@field LobbyDiscoveryService UILobbyDiscoveryService
 ---@field OnDestroyCallbacks table<string, fun()>
 ---@field OnExitCallbacks table<string, fun()>
+---@field OnConnectCallbacks table<string, fun(gameAddress: string, gamePort: string)>
+---@field DebugUI Control
 ---@field Panel Bitmap
 ---@field PanelBrackets Group
 ---@field PanelTitle Text
 ---@field ButtonExit Button
+---@field ButtonConnect Button
 ---@field ButtonCreate Button
 ---@field EditName Edit
 ---@field LobbySelectionRows UILobbySelectionRow[]
 ---@field DialogError Control
+---@field EditAddress Edit
+---@field EditPort Edit
+---@field TextAddress Text
+---@field TextPort Text
 LobbySelection = Class(Group) {
 
     LobbyDiscoveryService = false,
@@ -915,6 +921,7 @@ LobbySelection = Class(Group) {
     Games = { },
     GamesSorted = { },
 
+    OnConnectCallbacks = { },
     OnExitCallbacks = { },
     OnDestroyCallbacks = { },
 
@@ -925,6 +932,10 @@ LobbySelection = Class(Group) {
 
         Group.__init(self, parent, 'UILobbySelection')
         LayoutHelpers.FillParent(self, parent)
+
+        -- can help us understand where various elements are
+        self.DebugUI = Group(self)
+        LayoutHelpers.FillParent(self.DebugUI, self)
 
         self.Panel = UIUtil.CreateBitmap(self, '/scx_menu/gameselect/panel_bmp.dds')
         LayoutHelpers.AtCenterIn(self.Panel, self)
@@ -948,17 +959,47 @@ LobbySelection = Class(Group) {
         LayoutHelpers.AtTopIn(self.EditName, self.Panel, 92)
         LayoutHelpers.DepthOverParent(self.EditName, self.Panel)
 
-        self.BitmapContentArea = UIUtil.CreateBitmapColor(self.Panel, '00ffffff')
-        LayoutHelpers.AtRightTopIn(self.BitmapContentArea, self.Panel, 28, 150)
-        LayoutHelpers.AtLeftBottomIn(self.BitmapContentArea, self.Panel, 24, 150)
+        self.ContentArea = Group(self.Panel)
+        LayoutHelpers.AtLeftBottomIn(self.ContentArea, self.Panel, 24, 150)
+        LayoutHelpers.AtRightTopIn(self.ContentArea, self.Panel, 28, 150)
+        self.ContentArea:DisableHitTest()
+
+        self.DebugContentArea = UIUtil.CreateBitmapColor(self.DebugUI, '44ffffff')
+        LayoutHelpers.FillParent(self.DebugContentArea, self.ContentArea)
+
+        -- ip address and port edit
+        self.EditAddress = CreateEditField(self.Panel, 290)
+        self.EditAddress:ShowBackground(false)
+        LayoutHelpers.AtLeftTopIn(self.EditAddress, self.Panel, 28, 615)
+
+        self.TextAddress = UIUtil.CreateText(self.Panel, "<LOC DIRCON_0001>IP Address/Hostname", 18, UIUtil.bodyFont)
+        LayoutHelpers.Above(self.TextAddress, self.EditAddress, 2)
+
+        self.EditPort = CreateEditField(self.Panel, 79, 5)
+        self.EditPort:ShowBackground(false)
+        LayoutHelpers.RightOf(self.EditPort, self.EditAddress, 15)
+
+        self.TextPort = UIUtil.CreateText(self.Panel, "<LOC _Port>", 18, UIUtil.bodyFont)
+        LayoutHelpers.Above(self.TextPort, self.EditPort, 2)
+
+        self.ButtonConnect = UIUtil.CreateButtonStd(self.Panel, '/scx_menu/small-btn/small', "<LOC _Connect>Connect", 14)
+        LayoutHelpers.RightOf(self.ButtonConnect, self.EditPort, 10)
+        LayoutHelpers.AtVerticalCenterIn(self.ButtonConnect, self.EditPort, -10)
+        Tooltip.AddButtonTooltip(self.ButtonConnect, 'mainmenu_quickipconnect')
 
         self.LobbySelectionRows = { }
-
         for k = 0, 4 do
-            local lobbySelectionRow = LobbySelectionRow(self.BitmapContentArea)
-            lobbySelectionRow.Height:Set(function() return 0.20 * self.BitmapContentArea.Height() end)
-            lobbySelectionRow.Width:Set(function() return self.BitmapContentArea.Width() end)
-            LayoutHelpers.AtLeftTopIn(lobbySelectionRow, self.BitmapContentArea, 0, 48 + 84 * k)
+            local lobbySelectionRow = LobbySelectionRow(self.ContentArea) --[[@as UILobbySelectionRow]]
+            lobbySelectionRow.Height:Set(function() return 0.19 * self.ContentArea.Height() end)
+            lobbySelectionRow.Width:Set(self.ContentArea.Width)
+            LayoutHelpers.AtLeftTopIn(lobbySelectionRow, self.ContentArea, 0, 8 + 84 * k)
+
+            lobbySelectionRow:AddOnJoinGameCallback(
+                function (gameConfig)
+                    reprsl(gameConfig)
+                    self:JoinLobby(gameConfig.Address)
+                end, 'JoinLobby'
+            )
 
             self.LobbySelectionRows[k + 1] = lobbySelectionRow
         end
@@ -968,6 +1009,20 @@ LobbySelection = Class(Group) {
     ---@param parent Control
     __post_init = function(self, parent)
         self:Debug(string.format("__post_init()"))
+
+        -- do not let the debug UI interfere with the usual UI
+        self.DebugUI.Show = function(debugUI)
+            if self.Debugging then
+                Group.Show(debugUI)
+            else
+                Group.Hide(debugUI)
+            end
+        end
+
+        self.DebugUI:DisableHitTest(true)
+        if not self.Debugging then
+            self.DebugUI:Hide()
+        end
 
         -- escape handler event
         import("/lua/ui/uimain.lua").SetEscapeHandler(
@@ -987,6 +1042,19 @@ LobbySelection = Class(Group) {
             end
 
             self:Destroy()
+        end
+
+        self.ButtonConnect.OnClick = function(button)
+            self:Debug(string.format("ButtonExit()"))
+            local address = self.EditAddress:GetText()
+            local port = self.EditPort:GetText()
+
+            for name, callback in self.OnConnectCallbacks do
+                local ok, msg = pcall(callback, address, port)
+                if not ok then
+                    self:Warn(string.format("Callback '%s' for 'ButtonConnect' failed: \r\n %s", name, msg))
+                end
+            end
         end
 
         self.ButtonExit.HandleEvent = function(button, event)
@@ -1014,6 +1082,7 @@ LobbySelection = Class(Group) {
                     self.DialogCreate:AddOnAcceptCallback(
                         function (name, port)
                             self:CreateLobby(name, port)
+                            self:Destroy()
                         end, 'OnAcceptCreate'
                     )
                 end
@@ -1062,13 +1131,41 @@ LobbySelection = Class(Group) {
             edit:AbandonFocus()
             return true
         end
+
+        self.EditAddress:SetText(Prefs.GetFromCurrentProfile('last_dc_ipaddress') or "")
+        self.EditAddress.OnCharPressed = self.EditName.OnCharPressed
+        self.EditAddress.OnEnterPressed = function(edit, text)
+            self.EditAddress:AbandonFocus()
+            self.EditPort:AcquireFocus()
+            return true
+        end
+
+        self.EditPort:SetText(Prefs.GetFromCurrentProfile('last_dc_port') or "")
+        self.EditPort.OnCharPressed = self.EditName.OnCharPressed
+        self.EditPort.OnEnterPressed = function(edit, text)
+            self.EditPort:AbandonFocus()
+            self.EditAddress:AcquireFocus()
+            return true
+        end
+
+        self:AddOnConnectCallback(
+            function (gameAddress, gamePort)
+                if gameAddress and gamePort then
+                    self:JoinLobby(string.format("%s:%s", tostring(gameAddress), (gamePort)))
+                end
+            end, 
+            'ConnectToLobby'
+        )
+
+        self:SortGames()
+        self:PopulateRows()
     end,
 
     SetupDiscoveryService = function(self)
-        self.LobbyDiscoveryService = import("/lua/ui/lobby/lobby-discovery.lua").CreateDiscoveryService() --[[@as UILobbyDiscoveryService]]
+        self.DiscoveryService = import("/lua/ui/lobby/lobby-discovery.lua").CreateDiscoveryService() --[[@as UILobbyDiscoveryService]]
         self:AddOnDestroyCallback(
             function()
-                self.LobbyDiscoveryService:Destroy()
+                self.DiscoveryService:Destroy()
             end, 
             'DestroyDiscovery'
         )
@@ -1206,6 +1303,29 @@ LobbySelection = Class(Group) {
         self:Destroy()
     end,
 
+    ---@param self UILobbySelection
+    ---@param gameAddress string
+    JoinLobby = function(self, gameAddress)
+        -- validate name
+        local playerName = self.EditName:GetText()
+        if (not playerName) or (playerName == "") then
+            self:CreateErrorDialog("<LOC GAMESEL_0003>Please fill in your nickname")
+            return
+        end
+
+        -- validate address
+        local address = ValidateIPAddress(gameAddress)
+        if not address then
+            self:CreateErrorDialog("<LOC DIRCON_0004>Invalid/unknown IP address")
+            return
+        end
+
+        local lobby = import("/lua/ui/lobby/lobby.lua").CreateLobby(0, playerName, nil)
+        lobby:Join(address)
+
+        self:Destroy()
+    end,
+
     ---------------------------------------------------------------------------
     --#region Callbacks
 
@@ -1224,6 +1344,23 @@ LobbySelection = Class(Group) {
         end
 
         self.OnExitCallbacks[name] = callback
+    end,
+
+    ---@param self UILobbySelection
+    ---@param callback fun(gameAddress: string, gamePort: string)
+    ---@param name string
+    AddOnConnectCallback = function(self, callback, name)
+        if (not name) or type(name) != 'string' then
+            self:Warn("Ignoring callback, 'name' parameter is invalid for  'OnConnectCallback'")
+            return
+        end
+
+        if (not callback) or type(callback) != 'function' then
+            self:Warn("Ignoring callback, 'callback' parameter is invalid for 'OnConnectCallback'")
+            return
+        end
+
+        self.OnConnectCallbacks[name] = callback
     end,
 
     ---@param self UILobbySelection
@@ -1274,5 +1411,6 @@ LobbySelection = Class(Group) {
 ---@return UILobbySelection
 CreateLobbySelection = function(parent)
     local lobbySelection = LobbySelection(parent) --[[@as UILobbySelection]]
+    lobbySelection:SetupDiscoveryService()
     return lobbySelection
 end

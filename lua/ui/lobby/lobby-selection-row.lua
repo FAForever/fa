@@ -38,8 +38,9 @@ for _, scenario in import("/lua/ui/maputil.lua").EnumerateSkirmishScenarios() do
     end
 end
 
-
 ---@class UILobbySelectionRow : Group
+---@field Debugging boolean
+---@field GameConfiguration? UILobbydDiscoveryInfo
 ---@field OnJoinGameCallbacks table<string, fun(gameConfig: UILobbydDiscoveryInfo)>
 ---@field OnObserveGameCallbacks table<string, fun(gameConfig: UILobbydDiscoveryInfo)>
 ---@field Panel Bitmap
@@ -49,6 +50,8 @@ end
 ---@field MapGlow Control
 ---@field MapNoPreview Text
 ---@field GameName Text
+---@field DebugUI Control
+---@field DebugFill Control
 LobbySelectionRow = Class(Group) {
 
     OnJoinGameCallbacks = { },
@@ -61,17 +64,24 @@ LobbySelectionRow = Class(Group) {
 
         Group.__init(self, parent, 'UILobbySelectionRow')
 
+        -- can help us understand where various elements are
+        self.DebugUI = Group(parent)
+        LayoutHelpers.FillParent(self.DebugUI, self)
+
+        self.DebugFill = UIUtil.CreateBitmapColor(self.DebugUI, '44ffffff')
+        LayoutHelpers.FillParent(self.DebugFill, self)
+
         self.Panel = UIUtil.CreateBitmap(self, '/scx_menu/gameselect/slot_bmp.dds')
         LayoutHelpers.AtLeftCenterIn(self.Panel, self, 260)
 
         self.ButtonJoin = UIUtil.CreateButton(self, 
-            '/scx_menu/small-short-btn/small-btn_up.dds',
+            '/scx_menu/small-short-btn/small-btn_up.dds',   
             '/scx_menu/small-short-btn/small-btn_down.dds',
             '/scx_menu/small-short-btn/small-btn_over.dds',
             '/scx_menu/small-short-btn/small-btn_dis.dds',
             '<LOC _Join>Join', 14, 0, 0
         )
-        LayoutHelpers.AtLeftBottomIn(self.ButtonJoin, self, 0, -6)
+        LayoutHelpers.AtLeftTopIn(self.ButtonJoin, self, 0, -2)
 
         self.ButtonObserve = UIUtil.CreateButton(self,
             '/scx_menu/small-short-btn/small-btn_up.dds',
@@ -80,7 +90,7 @@ LobbySelectionRow = Class(Group) {
             '/scx_menu/small-short-btn/small-btn_dis.dds',
             '<LOC _Observe>Observe', 14, 0, 0
         )
-        LayoutHelpers.AtLeftTopIn(self.ButtonObserve, self, 0, -6)
+        LayoutHelpers.AtLeftBottomIn(self.ButtonObserve, self, 0, -2)
 
         self.MapPreview = MapPreview(self.Panel)
         LayoutHelpers.SetDimensions(self.MapPreview, self.Panel.Height, self.Panel.Height)
@@ -101,11 +111,25 @@ LobbySelectionRow = Class(Group) {
     __post_init = function(self, parent)
         self:Debug(string.format("__post_init()"))
 
+        -- do not let the debug UI interfere with the usual UI
+        self.DebugUI.Show = function(debugUI)
+            if self.Debugging then
+                Group.Show(debugUI)
+            else
+                Group.Hide(debugUI)
+            end
+        end
+
+        self.DebugUI:DisableHitTest(true)
+        if not self.Debugging then
+            self.DebugUI:Hide()
+        end
+
         self.ButtonJoin.OnClick = function()
             self:Debug(string.format("ButtonJoin()"))
 
             for name, callback in self.OnJoinGameCallbacks do
-                local ok, msg = pcall(callback)
+                local ok, msg = pcall(callback, self.GameConfiguration)
                 if not ok then
                     self:Warn(string.format("Callback '%s' for 'ButtonJoin' failed: \r\n %s", name, msg))
                 end
@@ -116,7 +140,7 @@ LobbySelectionRow = Class(Group) {
             self:Debug(string.format("ButtonObserve()"))
 
             for name, callback in self.OnObserveGameCallbacks do
-                local ok, msg = pcall(callback)
+                local ok, msg = pcall(callback, self.GameConfiguration)
                 if not ok then
                     self:Warn(string.format("Callback '%s' for 'ButtonObserve' failed: \r\n %s", name, msg))
                 end
@@ -127,6 +151,7 @@ LobbySelectionRow = Class(Group) {
     ---@param self UILobbySelectionRow
     ---@param info? UILobbydDiscoveryInfo
     Populate = function(self, info)
+        self.GameConfiguration = info
         if not info then
             self:Hide()
             return
@@ -150,7 +175,7 @@ LobbySelectionRow = Class(Group) {
     end,
 
     ---------------------------------------------------------------------------
-    --#region Callbacks
+    --#region Event callbacks
 
     ---@param self UILobbySelectionRow
     ---@param callback fun(gameConfig: UILobbydDiscoveryInfo)
