@@ -91,7 +91,7 @@ AIPlatoonAdaptiveRaidBehavior = Class(AIPlatoon) {
 
             -- determine navigational label of that unit
             local position = unit:GetPosition()
-            local label, error = NavUtils.GetLabel('Land', position)
+            local label, error = NavUtils.GetLabel(self.MovementLayer, position)
 
             if label then
                 
@@ -105,7 +105,7 @@ AIPlatoonAdaptiveRaidBehavior = Class(AIPlatoon) {
                 local unpathableCandidateCount = 0
                 for k = 1, count do
                     local expansion = expansions[k]
-                    if expansion.NavLabel == label then
+                    if NavUtils.GetLabel(self.MovementLayer, expansion.position) == label then
                         if aiBrain.GridPresence:GetInferredStatus(expansion.position) ~= 'Allied' then
                             candidates[candidateCount + 1] = expansion
                             candidateCount = candidateCount + 1
@@ -127,7 +127,7 @@ AIPlatoonAdaptiveRaidBehavior = Class(AIPlatoon) {
                     local massmarkers, count = MarkerUtils.GetMarkersByType('Mass')
                     for k = 1, count do
                         local masspoint = massmarkers[k]
-                        if masspoint.NavLabel == label then
+                        if NavUtils.GetLabel(self.MovementLayer, masspoint.position) == label then
                             if aiBrain.GridPresence:GetInferredStatus(masspoint.position) ~= 'Allied' then
                                 candidates[candidateCount + 1] = masspoint
                                 candidateCount = candidateCount + 1
@@ -450,7 +450,7 @@ AIPlatoonAdaptiveRaidBehavior = Class(AIPlatoon) {
                 -- check if our command is still going
                 if not self:IsCommandsActive(attackCommand) then
                     -- setup attack units
-                    local attackOffset, error = NavUtils.RandomDirectionFrom('Land', location, 10, 8)       -- TODO: remove magic numbers
+                    local attackOffset, error = NavUtils.RandomDirectionFrom('Land', location, 20, 8)       -- TODO: remove magic numbers
                     if not attackOffset then
                         self:LogWarning(string.format('no alternative directions found to evade'))
                         self:ChangeState(self.Error)
