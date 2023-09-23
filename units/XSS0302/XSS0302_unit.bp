@@ -640,7 +640,6 @@ UnitBlueprint{
                 Fire = Sound { Bank = 'XSS_Weapon', Cue = 'XSS0302_Inaino_Missile', LodCutoff = 'Weapon_LodCutoff' },
             },
             BallisticArc = "RULEUBA_None",
-
             CollideFriendly = false,
             CountedProjectile = true,
             Damage = 0,

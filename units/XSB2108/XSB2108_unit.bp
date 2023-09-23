@@ -234,7 +234,7 @@ UnitBlueprint{
             WeaponRepackTimeout = 3,
             WeaponUnpackAnimation = "/units/xsb2108/xsb2108_aopen.sca",
             WeaponUnpackAnimationRate = 1,
-            WeaponUnpacks = false,
+            WeaponUnpacks = true,
         },
     },
     Wreckage = {
