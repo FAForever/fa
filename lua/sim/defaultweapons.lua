@@ -749,6 +749,9 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
 
         OnGotTarget = function(self)
             Weapon.OnGotTarget(self)
+
+            LOG("IdleState - OnGotTarget")
+
             local unit = self.unit
 
             if unit then
@@ -922,10 +925,11 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
         end,
 
         Main = function(self)
+            LOG("Main: " .. tostring(GetGameTick()))
             local unit = self.unit
             unit:SetBusy(true)
             self:DestroyRecoilManips()
-
+            LOG("DestroyRecoilManips: " .. tostring(GetGameTick()))
             local bp = self.Blueprint
             local rof = self:GetWeaponRoF()
             local rackBoneCount = self.NumRackBones
@@ -963,6 +967,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
                     numMuzzlesFiring = muzzleBoneCount
                 end
 
+                LOG("FixedSpreadRadius: " .. tostring(GetGameTick()))
                 if bp.FixedSpreadRadius then
                     local weaponPos = unit:GetPosition()
                     local targetPos = self:GetCurrentTargetPos()
@@ -976,6 +981,8 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
 
                 local muzzleIndex = 1
                 for i = 1, numMuzzlesFiring do
+                    LOG("numMuzzlesFiring: " .. tostring(GetGameTick()))
+
                     if self.HaltFireOrdered then
                         break
                     end
@@ -984,6 +991,8 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
                     if rackHideMuzzle then
                         unit:ShowBone(muzzle, true)
                     end
+
+
                     -- Deal with Muzzle charging sequence
                     if chargeDelay > 0 then
                         if muzzleCharge then
@@ -993,12 +1002,15 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
                         if notExclusive then
                             unit:SetBusy(false)
                         end
+                        
+                        LOG("chargeDelay: " .. tostring(GetGameTick()))
                         WaitSeconds(chargeDelay)
 
                         if notExclusive then
                             unit:SetBusy(true)
                         end
                     end
+                    LOG("PlayFxMuzzleSequence: " .. tostring(GetGameTick()))
                     self:PlayFxMuzzleSequence(muzzle)
                     if rackHideMuzzle then
                         unit:HideBone(muzzle, true)
@@ -1008,12 +1020,13 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
                     end
 
                     local proj = self:CreateProjectileAtMuzzle(muzzle)
+                    LOG("CreateProjectileAtMuzzle: " .. tostring(GetGameTick()))
 
                     -- Decrement the ammo if they are a counted projectile
                     if proj and not proj:BeenDestroyed() and countedProjectile then
                         if bp.NukeWeapon then
                             unit:NukeCreatedAtUnit()
-
+                            LOG("NukeCreatedAtUnit: " .. tostring(GetGameTick()))
                             -- Generate UI notification for automatic nuke ping
                             local launchData = {
                                 army = self.Army - 1,
@@ -1057,6 +1070,8 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
             self.FirstShot = false
             self:StartEconomyDrain()
             self:OnWeaponFired() -- Used primarily by Overcharge
+
+            LOG("OnWeaponFired: " .. tostring(GetGameTick()))
 
             -- We can fire again after reaching here
             self.HaltFireOrdered = false
