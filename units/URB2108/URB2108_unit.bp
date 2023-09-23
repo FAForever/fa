@@ -221,8 +221,8 @@ UnitBlueprint{
             TurretYawSpeed = 0,
             Turreted = false,
             WeaponCategory = "Missile",
-            WeaponRepackTimeout = 3.5,
-            WeaponUnpacks = true,
+            -- WeaponRepackTimeout = 3.5,
+            -- WeaponUnpacks = true,
         },
     },
     Wreckage = {
