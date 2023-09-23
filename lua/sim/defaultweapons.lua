@@ -1171,6 +1171,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
         WeaponWantEnabled = true,
         WeaponAimWantEnabled = true,
 
+        ---@param self DefaultProjectileWeapon
         Main = function(self)
             local unit = self.unit
             unit:SetBusy(true)
@@ -1186,6 +1187,21 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
             ChangeState(self, self.IdleState)
         end,
 
+        ---@param self DefaultProjectileWeapon
+        OnGotTarget = function(self)
+            Weapon.OnGotTarget(self)
+
+            local unit = self.unit
+            if unit then
+                unit:OnGotTarget(self)
+            end
+
+            if not self.Blueprint.ForceSingleFire then
+                ChangeState(self, self.WeaponUnpackingState)
+            end
+        end,
+
+        ---@param self DefaultProjectileWeapon
         OnFire = function(self)
             local bp = self.Blueprint
             if  -- triggers when we use the distribute orders feature to distribute TMLs / SMLs launch orders
