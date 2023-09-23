@@ -899,7 +899,6 @@ end
 ---@field LobbyDiscoveryService UILobbyDiscoveryService
 ---@field OnDestroyCallbacks table<string, fun()>
 ---@field OnExitCallbacks table<string, fun()>
----@field OnConnectCallbacks table<string, fun(gameAddress: string, gamePort: string)>
 ---@field DebugUI Control
 ---@field Panel Bitmap
 ---@field PanelBrackets Group
@@ -921,7 +920,6 @@ LobbySelection = Class(Group) {
     Games = { },
     GamesSorted = { },
 
-    OnConnectCallbacks = { },
     OnExitCallbacks = { },
     OnDestroyCallbacks = { },
 
@@ -1049,12 +1047,7 @@ LobbySelection = Class(Group) {
             local address = self.EditAddress:GetText()
             local port = self.EditPort:GetText()
 
-            for name, callback in self.OnConnectCallbacks do
-                local ok, msg = pcall(callback, address, port)
-                if not ok then
-                    self:Warn(string.format("Callback '%s' for 'ButtonConnect' failed: \r\n %s", name, msg))
-                end
-            end
+            self:JoinLobby(string.format("%s:%s", tostring(address), (port)))
         end
 
         self.ButtonExit.HandleEvent = function(button, event)
@@ -1147,15 +1140,6 @@ LobbySelection = Class(Group) {
             self.EditAddress:AcquireFocus()
             return true
         end
-
-        self:AddOnConnectCallback(
-            function (gameAddress, gamePort)
-                if gameAddress and gamePort then
-                    self:JoinLobby(string.format("%s:%s", tostring(gameAddress), (gamePort)))
-                end
-            end, 
-            'ConnectToLobby'
-        )
 
         self:SortGames()
         self:PopulateRows()
@@ -1344,23 +1328,6 @@ LobbySelection = Class(Group) {
         end
 
         self.OnExitCallbacks[name] = callback
-    end,
-
-    ---@param self UILobbySelection
-    ---@param callback fun(gameAddress: string, gamePort: string)
-    ---@param name string
-    AddOnConnectCallback = function(self, callback, name)
-        if (not name) or type(name) != 'string' then
-            self:Warn("Ignoring callback, 'name' parameter is invalid for  'OnConnectCallback'")
-            return
-        end
-
-        if (not callback) or type(callback) != 'function' then
-            self:Warn("Ignoring callback, 'callback' parameter is invalid for 'OnConnectCallback'")
-            return
-        end
-
-        self.OnConnectCallbacks[name] = callback
     end,
 
     ---@param self UILobbySelection
