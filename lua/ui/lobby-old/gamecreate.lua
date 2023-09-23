@@ -12,9 +12,6 @@ local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
 local Edit = import("/lua/maui/edit.lua").Edit
 local Prefs = import("/lua/user/prefs.lua")
 
-local unselectedCheckboxFile = UIUtil.SkinnableFile('/widgets/rad_un.dds')
-local selectedCheckboxFile = UIUtil.SkinnableFile('/widgets/rad_sel.dds')
-
 local errorDialog = false
 local defaultPort = 16010   -- this is the default port
 

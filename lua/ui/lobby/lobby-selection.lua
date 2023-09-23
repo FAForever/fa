@@ -1,10 +1,25 @@
---*****************************************************************************
---* File: lua/modules/ui/lobby/gameselect.lua
---* Author: Chris Blackwell
---* Summary: Game selection UI
---*
---* Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
---*****************************************************************************
+
+--******************************************************************************************************
+--** Copyright (c) 2022  Willem 'Jip' Wijnia
+--** 
+--** Permission is hereby granted, free of charge, to any person obtaining a copy
+--** of this software and associated documentation files (the "Software"), to deal
+--** in the Software without restriction, including without limitation the rights
+--** to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+--** copies of the Software, and to permit persons to whom the Software is
+--** furnished to do so, subject to the following conditions:
+--** 
+--** The above copyright notice and this permission notice shall be included in all
+--** copies or substantial portions of the Software.
+--** 
+--** THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+--** IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+--** FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+--** AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+--** LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+--** OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+--** SOFTWARE.
+--******************************************************************************************************
 
 local UIUtil = import("/lua/ui/uiutil.lua")
 local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
@@ -23,6 +38,8 @@ local Tooltip = import("/lua/ui/game/tooltip.lua")
 local Combo = import("/lua/ui/controls/combo.lua").Combo
 local lobby = import("/lua/ui/lobby/lobby.lua")
 
+local LobbySelectionRow = import("/lua/ui/lobby/lobby-selection-row.lua").LobbySelectionRow
+
 local errorDialog = false
 
 local editInFocus = nil
@@ -30,8 +47,8 @@ local editInFocus = nil
 local MapUtil = import("/lua/ui/maputil.lua")
 local scenarios = MapUtil.EnumerateSkirmishScenarios()
 local gameOptions = {}
-gameOptions[1] = import("/lua/ui/lobby/lobbyoptions.lua").teamOptions
-gameOptions[2] = import("/lua/ui/lobby/lobbyoptions.lua").globalOpts
+gameOptions[1] = import("/lua/ui/lobby/lobby-options.lua").teamOptions
+gameOptions[2] = import("/lua/ui/lobby/lobby-options.lua").globalOpts
 
 --- A noop for the purpose of the FAF binary not containing this definition
 --
@@ -163,7 +180,8 @@ function CreateEditField(parent, width, maxChars)
 end
 
 function CreateUI(over, exitBehavior)
-    local discovery = import("/lua/ui/lobby/lobbycomm.lua").CreateDiscoveryService()
+    local discovery = InternalCreateDiscoveryService(DiscoveryService)
+    LOG('*** DISC CREATE: ', service)
 	local parent = over
 	-- panel and title
     local panel = Bitmap(parent, UIUtil.SkinnableFile('/scx_menu/gameselect/panel_bmp.dds'))
@@ -875,4 +893,491 @@ function CreateUI(over, exitBehavior)
     ForkThread(function()
         gameList._tabs[2]:OnClick()
     end)
+end
+
+---@class UILobbySelection : Group
+---@field LobbyDiscoveryService UILobbyDiscoveryService
+---@field OnDestroyCallbacks table<string, fun()>
+---@field OnExitCallbacks table<string, fun()>
+---@field DebugUI Control
+---@field Panel Bitmap
+---@field PanelBrackets Group
+---@field PanelTitle Text
+---@field ButtonExit Button
+---@field ButtonConnect Button
+---@field ButtonCreate Button
+---@field EditName Edit
+---@field LobbySelectionRows UILobbySelectionRow[]
+---@field DialogError Control
+---@field EditAddress Edit
+---@field EditPort Edit
+---@field TextAddress Text
+---@field TextPort Text
+LobbySelection = Class(Group) {
+
+    LobbyDiscoveryService = false,
+
+    Games = { },
+    GamesSorted = { },
+
+    OnExitCallbacks = { },
+    OnDestroyCallbacks = { },
+
+    ---@param self UILobbySelection
+    ---@param parent Control
+    __init = function(self, parent)
+        self:Debug(string.format("__init()"))
+
+        Group.__init(self, parent, 'UILobbySelection')
+        LayoutHelpers.FillParent(self, parent)
+
+        -- can help us understand where various elements are
+        self.DebugUI = Group(self)
+        LayoutHelpers.FillParent(self.DebugUI, self)
+
+        self.Panel = UIUtil.CreateBitmap(self, '/scx_menu/gameselect/panel_bmp.dds')
+        LayoutHelpers.AtCenterIn(self.Panel, self)
+
+        self.PanelBrackets = UIUtil.CreateDialogBrackets(self.Panel, 42, 32, 40, 30)
+
+        self.PanelTitle = UIUtil.CreateText(self, "<LOC GAMESEL_0000>LAN/IP Connect", 24)
+        LayoutHelpers.AtHorizontalCenterIn(self.PanelTitle, self.Panel)
+        LayoutHelpers.AtTopIn(self.PanelTitle, self.Panel, 26)
+
+        self.ButtonExit = UIUtil.CreateButtonStd(self, '/scx_menu/small-btn/small', "<LOC _Back>", 14, 0, 0, "UI_Back_MouseDown")
+        LayoutHelpers.AtLeftTopIn(self.ButtonExit, self.Panel, 15, 645)
+        LayoutHelpers.DepthOverParent(self.ButtonExit, self.Panel)
+
+        self.ButtonCreate = UIUtil.CreateButtonStd(self, '/scx_menu/large-no-bracket-btn/large', "<LOC _Create>Create", 18, 2)
+        LayoutHelpers.AtRightTopIn(self.ButtonCreate, self.Panel, -17, 645)
+        LayoutHelpers.DepthOverParent(self.ButtonCreate, self.Panel)
+
+        self.EditName = CreateEditField(self, 375, 20)
+        LayoutHelpers.AtLeftIn(self.EditName, self.Panel, 30)
+        LayoutHelpers.AtTopIn(self.EditName, self.Panel, 92)
+        LayoutHelpers.DepthOverParent(self.EditName, self.Panel)
+
+        self.ContentArea = Group(self.Panel)
+        LayoutHelpers.AtLeftBottomIn(self.ContentArea, self.Panel, 24, 150)
+        LayoutHelpers.AtRightTopIn(self.ContentArea, self.Panel, 28, 150)
+        self.ContentArea:DisableHitTest()
+
+        self.DebugContentArea = UIUtil.CreateBitmapColor(self.DebugUI, '44ffffff')
+        LayoutHelpers.FillParent(self.DebugContentArea, self.ContentArea)
+
+        -- ip address and port edit
+        self.EditAddress = CreateEditField(self.Panel, 290)
+        self.EditAddress:ShowBackground(false)
+        LayoutHelpers.AtLeftTopIn(self.EditAddress, self.Panel, 28, 615)
+
+        self.TextAddress = UIUtil.CreateText(self.Panel, "<LOC DIRCON_0001>IP Address/Hostname", 18, UIUtil.bodyFont)
+        LayoutHelpers.Above(self.TextAddress, self.EditAddress, 2)
+
+        self.EditPort = CreateEditField(self.Panel, 79, 5)
+        self.EditPort:ShowBackground(false)
+        LayoutHelpers.RightOf(self.EditPort, self.EditAddress, 15)
+
+        self.TextPort = UIUtil.CreateText(self.Panel, "<LOC _Port>", 18, UIUtil.bodyFont)
+        LayoutHelpers.Above(self.TextPort, self.EditPort, 2)
+
+        self.ButtonConnect = UIUtil.CreateButtonStd(self.Panel, '/scx_menu/small-btn/small', "<LOC _Connect>Connect", 14)
+        LayoutHelpers.RightOf(self.ButtonConnect, self.EditPort, 10)
+        LayoutHelpers.AtVerticalCenterIn(self.ButtonConnect, self.EditPort, -10)
+        Tooltip.AddButtonTooltip(self.ButtonConnect, 'mainmenu_quickipconnect')
+
+        self.LobbySelectionRows = { }
+        for k = 0, 4 do
+            local lobbySelectionRow = LobbySelectionRow(self.ContentArea) --[[@as UILobbySelectionRow]]
+            lobbySelectionRow.Height:Set(function() return 0.19 * self.ContentArea.Height() end)
+            lobbySelectionRow.Width:Set(self.ContentArea.Width)
+            LayoutHelpers.AtLeftTopIn(lobbySelectionRow, self.ContentArea, 0, 8 + 84 * k)
+
+            lobbySelectionRow:AddOnJoinGameCallback(
+                function (gameConfig)
+                    reprsl(gameConfig)
+                    self:JoinLobby(gameConfig.Address)
+                end, 'JoinLobby'
+            )
+
+            self.LobbySelectionRows[k + 1] = lobbySelectionRow
+        end
+    end,
+
+    ---@param self UILobbySelection
+    ---@param parent Control
+    __post_init = function(self, parent)
+        self:Debug(string.format("__post_init()"))
+
+        -- do not let the debug UI interfere with the usual UI
+        self.DebugUI.Show = function(debugUI)
+            if self.Debugging then
+                Group.Show(debugUI)
+            else
+                Group.Hide(debugUI)
+            end
+        end
+
+        self.DebugUI:DisableHitTest(true)
+        if not self.Debugging then
+            self.DebugUI:Hide()
+        end
+
+        -- escape handler event
+        import("/lua/ui/uimain.lua").SetEscapeHandler(
+            function()
+                self.ButtonExit.OnClick()
+            end
+        )
+
+        self.ButtonExit.OnClick = function(button)
+            self:Debug(string.format("ButtonExit()"))
+
+            for name, callback in self.OnExitCallbacks do
+                local ok, msg = pcall(callback)
+                if not ok then
+                    self:Warn(string.format("Callback '%s' for 'ButtonExit' failed: \r\n %s", name, msg))
+                end
+            end
+
+            self:Destroy()
+        end
+
+        self.ButtonConnect.OnClick = function(button)
+            self:Debug(string.format("ButtonExit()"))
+            local address = self.EditAddress:GetText()
+            local port = self.EditPort:GetText()
+
+            self:JoinLobby(string.format("%s:%s", tostring(address), (port)))
+        end
+
+        self.ButtonExit.HandleEvent = function(button, event)
+            if event.Type == 'MouseEnter' then
+                Tooltip.CreateMouseoverDisplay(button, "mpselect_exit", nil, true)
+            elseif event.Type == 'MouseExit' then
+                Tooltip.DestroyMouseoverDisplay()
+            end
+            Button.HandleEvent(button, event)
+        end
+
+        self.ButtonCreate.OnClick = function(button)
+            local name = self.EditName:GetText()
+            if IsNameOK(name) then
+                Prefs.SetToCurrentProfile('NetName', name)
+                if not self.DialogCreate then
+                    self.DialogCreate = import("/lua/ui/lobby/lobby-creation-dialog.lua").CreateLobbyCreationDialog(self)
+                    self.DialogCreate:AddOnCancelCallback(
+                        function()
+                            self.DialogCreate:Hide()
+                        end,
+                        'OnCancelHide'
+                    )
+
+                    self.DialogCreate:AddOnAcceptCallback(
+                        function (name, port)
+                            self:CreateLobby(name, port)
+                            self:Destroy()
+                        end, 'OnAcceptCreate'
+                    )
+                end
+
+                self.DialogCreate:Show()
+            else
+                if self.DialogError then
+                    self.DialogError:Destroy()
+                end
+                self.DialogError = UIUtil.ShowInfoDialog(parent, "<LOC GAMESEL_0003>Please fill in your nickname", "<LOC _OK>")
+            end
+        end
+
+        self.ButtonCreate.HandleEvent = function(button, event)
+            if event.Type == 'MouseEnter' then
+                Tooltip.CreateMouseoverDisplay(button, "mpselect_create", nil, true)
+            elseif event.Type == 'MouseExit' then
+                Tooltip.DestroyMouseoverDisplay()
+            end
+            Button.HandleEvent(button, event)
+        end
+
+        self.EditName:SetText(Prefs.GetFromCurrentProfile('NetName') or Prefs.GetFromCurrentProfile('Name'))
+        self.EditName:ShowBackground(false)
+        self.EditName.HandleEvent = function(edit, event)
+            if event.Type == 'MouseEnter' then
+                Tooltip.CreateMouseoverDisplay(edit, "mpselect_name", nil, true)
+            elseif event.Type == 'MouseExit' then
+                Tooltip.DestroyMouseoverDisplay()
+            end
+            Edit.HandleEvent(edit, event)
+        end
+
+        self.EditName.OnCharPressed = function(edit, charcode)
+            if charcode == UIUtil.VK_TAB then
+                return true
+            end
+            local charlim = edit:GetMaxChars()
+            if STR_Utf8Len(edit:GetText()) >= charlim then
+                local sound = Sound({Cue = 'UI_Menu_Error_01', Bank = 'Interface',})
+                PlaySound(sound)
+            end
+        end
+
+        self.EditName.OnEnterPressed = function(edit, text)
+            edit:AbandonFocus()
+            return true
+        end
+
+        self.EditAddress:SetText(Prefs.GetFromCurrentProfile('last_dc_ipaddress') or "")
+        self.EditAddress.OnCharPressed = self.EditName.OnCharPressed
+        self.EditAddress.OnEnterPressed = function(edit, text)
+            self.EditAddress:AbandonFocus()
+            self.EditPort:AcquireFocus()
+            return true
+        end
+
+        self.EditPort:SetText(Prefs.GetFromCurrentProfile('last_dc_port') or "")
+        self.EditPort.OnCharPressed = self.EditName.OnCharPressed
+        self.EditPort.OnEnterPressed = function(edit, text)
+            self.EditPort:AbandonFocus()
+            self.EditAddress:AcquireFocus()
+            return true
+        end
+
+        self:SortGames()
+        self:PopulateRows()
+    end,
+
+    SetupDiscoveryService = function(self)
+        self.DiscoveryService = import("/lua/ui/lobby/lobby-discovery.lua").CreateDiscoveryService() --[[@as UILobbyDiscoveryService]]
+        self:AddOnDestroyCallback(
+            function()
+                self.DiscoveryService:Destroy()
+            end, 
+            'DestroyDiscovery'
+        )
+
+        self.DiscoveryService:AddOnGameFoundCallback(
+            ---@param index number
+            ---@param configuration UILobbydDiscoveryInfo
+            function (index, configuration)
+                self.Games[index+1] = configuration
+                self:SortGames()
+                self:PopulateRows()
+            end, 'LobbySelection'
+        )
+
+        self.DiscoveryService:AddOnGameUpdatedCallback(
+            ---@param index number
+            ---@param configuration UILobbydDiscoveryInfo
+            function (index, configuration)
+                self.Games[index + 1] = configuration
+                self:SortGames()
+                self:PopulateRows()
+            end, 'LobbySelection'
+        )
+
+        self.DiscoveryService:AddOnRemoveGameCallback(
+            ---@param index number
+            function (index)
+                self.Games[index + 1] = nil
+                self:SortGames()
+                self:PopulateRows()
+            end, 'LobbySelection'
+        )
+    end,
+
+    ---@param self UILobbySelection
+    Destroy = function(self)
+        self:Debug(string.format("Destroy()"))
+
+        for name, callback in self.OnDestroyCallbacks do
+            local ok, msg = pcall(callback)
+            if not ok then
+                self:Warn(string.format("Callback '%s' for 'RemoveGame' failed: \r\n %s", name, msg))
+            end
+        end
+
+        Group.Destroy(self)
+    end,
+
+    ---@param self UILobbySelection
+    SortGames = function(self)
+        for k, v in self.GamesSorted do
+            self.GamesSorted[k] = nil
+        end
+
+        local head = 1
+        for k, config in self.Games do
+            if not config then
+                continue
+            end
+
+            self.GamesSorted[head] = config
+            head = head + 1
+        end
+    end,
+
+    ---@param self UILobbySelection
+    PopulateRows = function(self)
+
+        local gameCount = table.getn(self.GamesSorted)
+        local rowCount = table.getn(self.LobbySelectionRows)
+
+        for k = 1, gameCount do
+            local lobbySelectionRow = self.LobbySelectionRows[k]
+            if lobbySelectionRow then
+                lobbySelectionRow:Populate(self.GamesSorted[k])
+            end
+        end
+
+        for k = gameCount + 1, rowCount do
+            local lobbySelectionRow = self.LobbySelectionRows[k]
+            if lobbySelectionRow then
+                lobbySelectionRow:Populate(nil)
+            end
+        end
+    end,
+
+    CreateErrorDialog = function(self, message)
+        if self.DialogError then
+            self.DialogError:Destroy()
+        end
+
+        self.DialogError = UIUtil.ShowInfoDialog(self, message, "<LOC _OK>")
+    end,
+
+    ---@param self UILobbySelection
+    ---@param gameName string
+    ---@param gamePort string
+    CreateLobby = function(self, gameName, gamePort)
+
+        -- validate name
+        if (not gameName) or (gameName == "") then
+            self:CreateErrorDialog("<LOC GAMECREATE_0000>Please choose a valid game name")
+            return
+        end
+
+        -- validate name
+        local gnBegin, gnEnd = string.find(gameName, "%s+")
+        if gnBegin and (gnBegin == 1 and gnEnd == string.len(gameName)) then
+            self:CreateErrorDialog("<LOC GAMECREATE_0004>Please choose a name that does not contain only whitespace characters")
+            return
+        end
+
+        -- validate port
+        local port = tonumber(gamePort) or 0  -- default of port 0 will cause engine to choose
+        if not port or math.floor(port) ~= port or port < 0 or port > 65535 then
+            self:CreateErrorDialog("<LOC GAMECREATE_0004>Please choose a name that does not contain only whitespace characters")
+            return
+        end
+
+        -- validate name
+        local playerName = self.EditName:GetText()
+        if (not playerName) or (playerName == "") then
+            self:CreateErrorDialog("<LOC GAMESEL_0003>Please fill in your nickname")
+            return
+        end
+
+        local scenario = Prefs.GetFromCurrentProfile('LastScenario') or UIUtil.defaultScenario
+
+        Prefs.SetToCurrentProfile('LastGameName', gameName)
+        Prefs.SetToCurrentProfile('LastGamePort', port)
+
+        local lobby = import("/lua/ui/lobby/lobby.lua").CreateLobby(port, playerName, nil)
+        lobby:Host(gameName, scenario, false)
+
+        self:Destroy()
+    end,
+
+    ---@param self UILobbySelection
+    ---@param gameAddress string
+    JoinLobby = function(self, gameAddress)
+        -- validate name
+        local playerName = self.EditName:GetText()
+        if (not playerName) or (playerName == "") then
+            self:CreateErrorDialog("<LOC GAMESEL_0003>Please fill in your nickname")
+            return
+        end
+
+        -- validate address
+        local address = ValidateIPAddress(gameAddress)
+        if not address then
+            self:CreateErrorDialog("<LOC DIRCON_0004>Invalid/unknown IP address")
+            return
+        end
+
+        local lobby = import("/lua/ui/lobby/lobby.lua").CreateLobby(0, playerName, nil)
+        lobby:Join(address)
+
+        self:Destroy()
+    end,
+
+    ---------------------------------------------------------------------------
+    --#region Callbacks
+
+    ---@param self UILobbySelection
+    ---@param callback fun()
+    ---@param name string
+    AddOnExitCallback = function(self, callback, name)
+        if (not name) or type(name) != 'string' then
+            self:Warn("Ignoring callback, 'name' parameter is invalid for  'AddOnExitCallback'")
+            return
+        end
+
+        if (not callback) or type(callback) != 'function' then
+            self:Warn("Ignoring callback, 'callback' parameter is invalid for 'AddOnExitCallback'")
+            return
+        end
+
+        self.OnExitCallbacks[name] = callback
+    end,
+
+    ---@param self UILobbySelection
+    ---@param callback fun()
+    ---@param name string
+    AddOnDestroyCallback = function(self, callback, name)
+        if (not name) or type(name) != 'string' then
+            self:Warn("Ignoring callback, 'name' parameter is invalid for  'AddOnDestroyCallback'")
+            return
+        end
+
+        if (not callback) or type(callback) != 'function' then
+            self:Warn("Ignoring callback, 'callback' parameter is invalid for 'AddOnDestroyCallback'")
+            return
+        end
+
+        self.OnDestroyCallbacks[name] = callback
+    end,
+
+    ---------------------------------------------------------------------------
+    --#region Debugging
+
+    Debugging = true,
+
+    ---@param self UILobbySelection
+    ---@param message string
+    Debug = function(self, message)
+        if self.Debugging then
+            SPEW(string.format("UILobbySelection: %s", message))
+        end
+    end,
+
+    ---@param self UILobbySelection
+    ---@param message string
+    Log = function(self, message)
+        LOG(string.format("UILobbySelection: %s", message))
+    end,
+
+    ---@param self UILobbySelection
+    ---@param message string
+    Warn = function(self, message)
+        WARN(string.format("UILobbySelection: %s", message))
+    end,
+}
+
+---@param parent Control
+---@param exitBehavior fun()
+---@return UILobbySelection
+CreateLobbySelection = function(parent)
+    local lobbySelection = LobbySelection(parent) --[[@as UILobbySelection]]
+    lobbySelection:SetupDiscoveryService()
+    return lobbySelection
 end
