@@ -686,8 +686,6 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
     ---@param self DefaultProjectileWeapon
     OnEnterState = function(self)
 
-        LOG(string.format("Changing state to: %s", tostring(self.StateName)))
-
         local weaponWantEnabled = self.WeaponWantEnabled
         local weaponIsEnabled = self.WeaponIsEnabled
         if weaponWantEnabled and not weaponIsEnabled then
@@ -750,8 +748,6 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
         OnGotTarget = function(self)
             Weapon.OnGotTarget(self)
 
-            LOG("IdleState - OnGotTarget")
-
             local unit = self.unit
 
             if unit then
@@ -776,9 +772,6 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
         end,
 
         OnFire = function(self)
-
-            LOG("IdleState - OnFire")
-
             local bp = self.Blueprint
             if bp.WeaponUnpacks then
                 ChangeState(self, self.WeaponUnpackingState)
@@ -828,7 +821,6 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
         end,
 
         OnFire = function(self)
-            LOG("RackSalvoChargeState - OnFire")
         end,
     },
 
@@ -890,12 +882,10 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
                 -- wait reload time + 2 seconds, then force the weapon to recheck its target 
                 WaitSeconds((1 / self.Blueprint.RateOfFire) + 3)
                 self:ResetTarget()
-                LOG("Reset a target!")
             end
         end,
 
         OnFire = function(self)
-            LOG("RackSalvoFireReadyState - OnFire")
             if self.WeaponCanFire then
                 ChangeState(self, self.RackSalvoFiringState)
             end
@@ -925,11 +915,9 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
         end,
 
         Main = function(self)
-            LOG("Main: " .. tostring(GetGameTick()))
             local unit = self.unit
             unit:SetBusy(true)
             self:DestroyRecoilManips()
-            LOG("DestroyRecoilManips: " .. tostring(GetGameTick()))
             local bp = self.Blueprint
             local rof = self:GetWeaponRoF()
             local rackBoneCount = self.NumRackBones
@@ -967,7 +955,6 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
                     numMuzzlesFiring = muzzleBoneCount
                 end
 
-                LOG("FixedSpreadRadius: " .. tostring(GetGameTick()))
                 if bp.FixedSpreadRadius then
                     local weaponPos = unit:GetPosition()
                     local targetPos = self:GetCurrentTargetPos()
@@ -981,8 +968,6 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
 
                 local muzzleIndex = 1
                 for i = 1, numMuzzlesFiring do
-                    LOG("numMuzzlesFiring: " .. tostring(GetGameTick()))
-
                     if self.HaltFireOrdered then
                         break
                     end
@@ -1002,15 +987,12 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
                         if notExclusive then
                             unit:SetBusy(false)
                         end
-                        
-                        LOG("chargeDelay: " .. tostring(GetGameTick()))
                         WaitSeconds(chargeDelay)
 
                         if notExclusive then
                             unit:SetBusy(true)
                         end
                     end
-                    LOG("PlayFxMuzzleSequence: " .. tostring(GetGameTick()))
                     self:PlayFxMuzzleSequence(muzzle)
                     if rackHideMuzzle then
                         unit:HideBone(muzzle, true)
@@ -1020,13 +1002,11 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
                     end
 
                     local proj = self:CreateProjectileAtMuzzle(muzzle)
-                    LOG("CreateProjectileAtMuzzle: " .. tostring(GetGameTick()))
 
                     -- Decrement the ammo if they are a counted projectile
                     if proj and not proj:BeenDestroyed() and countedProjectile then
                         if bp.NukeWeapon then
                             unit:NukeCreatedAtUnit()
-                            LOG("NukeCreatedAtUnit: " .. tostring(GetGameTick()))
                             -- Generate UI notification for automatic nuke ping
                             local launchData = {
                                 army = self.Army - 1,
@@ -1070,8 +1050,6 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
             self.FirstShot = false
             self:StartEconomyDrain()
             self:OnWeaponFired() -- Used primarily by Overcharge
-
-            LOG("OnWeaponFired: " .. tostring(GetGameTick()))
 
             -- We can fire again after reaching here
             self.HaltFireOrdered = false
@@ -1152,7 +1130,6 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
         end,
 
         OnFire = function(self)
-            LOG("RackSalvoReloadState - OnFire")
         end,
     },
 
@@ -1183,7 +1160,6 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
         end,
 
         OnFire = function(self)
-            LOG("WeaponUnpackingState - OnFire")
         end,
     },
 
@@ -1211,8 +1187,6 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
         end,
 
         OnFire = function(self)
-            LOG("WeaponPackingState - OnFire")
-
             local bp = self.Blueprint
             if  -- triggers when we use the distribute orders feature to distribute TMLs / SMLs launch orders
                 self.WeaponPackState == 'Unpacking' or
