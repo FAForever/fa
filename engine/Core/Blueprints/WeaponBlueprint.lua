@@ -139,7 +139,7 @@
 ---@field FixedSpreadRadius? number
 --- flares that this weapons launches
 ---@field Flare WeaponBlueprintFlare
---- if the weapon doesn't unpack (used for all counted projectiles)
+--- used to force packing up a weapon before being able to fire again
 ---@field ForceSingleFire? boolean
 --- controls what the weapon is allowed to target in reference to the heading of the unit
 ---@field HeadingArcCenter number
@@ -162,7 +162,10 @@
 ---@field Label string
 --- for tracking weapons, if the weapon should lead its target when aiming
 ---@field LeadTarget? boolean
---- if this weapon never fires automatically
+--- if set, requires a player to directly issue an attack / launch order for the unit to fire. Is set for all SMLs and 
+--- stationary TMLs. Requires _some_ kind of delay between the firing (such as a charge delay) or queued orders are not 
+--- registered properly by the engine and the unit will remain stuck on the first order, never firing again until the
+--- player clears the command queue and re-issues the order
 ---@field ManualFire? boolean
 --- changes the weapon range from spherical to cylindrical, where the cylinder has a height of
 --- this twice this value
