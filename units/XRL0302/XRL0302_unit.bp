@@ -1,8 +1,5 @@
 UnitBlueprint{
     Description = "<LOC xrl0302_desc>Mobile Bomb",
-    AI = {
-        TargetBones = { "torso" },
-    },
     Audio = {
         AmbientMove        = Sound { Bank = 'XRL',        Cue = 'XRL0302_Move_Loop',        LodCutoff = 'UnitMove_LodCutoff' },
         Destroyed          = Sound { Bank = 'XRL_Weapon', Cue = 'XRL0302_SelfDestructBomb', LodCutoff = 'UnitMove_LodCutoff' },
@@ -165,7 +162,7 @@ UnitBlueprint{
     SelectionThickness = 0.83,
     CollisionOffsetZ = 0.05,
     SizeX = 0.5,
-    SizeY = 0.4,
+    SizeY = 0.5,
     SizeZ = 1,
     StrategicIconName = "icon_land2_bomb",
     StrategicIconSortPriority = 135,

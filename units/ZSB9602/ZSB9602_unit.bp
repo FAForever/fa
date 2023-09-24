@@ -230,7 +230,7 @@ UnitBlueprint {
     SelectionSizeZ = 2.75,
     SelectionThickness = 0.36,
     SizeX = 4,
-    SizeY = 2.8,
+    SizeY = 3.0,
     SizeZ = 4,
     StrategicIconName = 'icon_factory3_air',
     StrategicIconSortPriority = 210,

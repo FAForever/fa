@@ -1,11 +1,5 @@
 UnitBlueprint{
     Description = "<LOC uab5101_desc>Wall Section",
-    AI = {
-        TargetBones = {
-            "Wall01",
-            "Lid",
-        },
-    },
     Audio = {
         Destroyed   = Sound { Bank = 'UALDestroy', Cue = 'UAB_Destroy_Huge',      LodCutoff = 'UnitMove_LodCutoff' },
         UISelection = Sound { Bank = 'Interface',  Cue = 'Aeon_Select_Structure', LodCutoff = 'UnitMove_LodCutoff' },

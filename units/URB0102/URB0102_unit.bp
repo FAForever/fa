@@ -2,7 +2,6 @@ UnitBlueprint{
     Description = "<LOC urb0102_desc>Air Factory",
     AI = {
         TargetBones = {
-            "URB0102",
             "B01",
             "B08",
         },

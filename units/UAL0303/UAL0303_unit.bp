@@ -1,6 +1,5 @@
 UnitBlueprint{
     Description = "<LOC ual0303_desc>Heavy Assault Bot",
-    AI = {},
     Audio = {
         AmbientMove   = Sound { Bank = 'UAL',        Cue = 'UAL0303_Move_Loop',       LodCutoff = 'UnitMove_LodCutoff' },
         Construct     = Sound { Bank = 'UAL',        Cue = 'UAL0309_Construct_Start', LodCutoff = 'UnitMove_LodCutoff' },
@@ -195,7 +194,7 @@ UnitBlueprint{
     SelectionThickness = 0.5,
     CollisionOffsetY = 0,
     SizeX = 1,
-    SizeY = 1.5,
+    SizeY = 1.7,
     SizeZ = 1.2,
     StrategicIconName = "icon_bot3_directfire",
     StrategicIconSortPriority = 115,

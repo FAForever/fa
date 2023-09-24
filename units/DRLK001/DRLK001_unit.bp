@@ -1,11 +1,5 @@
 UnitBlueprint{
     Description = "<LOC DRLK001_desc>Mobile Missile Anti-Air",
-    AI = {
-        TargetBones = {
-            "Turret01",
-            "DRLK001",
-        },
-    },
     Audio = {
         AmbientMove   = Sound { Bank = 'URL',        Cue = 'URL0107_Move_Loop',       LodCutoff = 'UnitMove_LodCutoff' },
         Construct     = Sound { Bank = 'URL',        Cue = 'URL0208_Construct_Start', LodCutoff = 'UnitMove_LodCutoff' },
@@ -155,7 +149,7 @@ UnitBlueprint{
     SelectionSizeZ = 0.9,
     SelectionThickness = 0.62,
     SizeX = 1.2,
-    SizeY = 0.6,
+    SizeY = 0.9,
     SizeZ = 1.1,
     StrategicIconName = "icon_bot3_antiair",
     StrategicIconSortPriority = 155,
