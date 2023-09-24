@@ -6,11 +6,18 @@ local IsDestroyed = IsDestroyed
 
 local TableGetn = table.getn
 
+---@class AIPlatoonDebugInfo
+---@field EntityId EntityId
+---@field BlueprintId BlueprintId
+---@field Position Vector
+---@field PlatoonInfo { DebugMessages: string[], PlatoonName: string, StateName: string } 
+
 ---@class AIPlatoonState : State
 ---@field StateName string
 
 ---@class AIPlatoon : moho.platoon_methods
 ---@field BuilderData table
+---@field DebugMessages string[]
 ---@field Units Unit[]
 ---@field Brain moho.aibrain_methods
 ---@field Trash TrashBag
@@ -23,7 +30,6 @@ AIPlatoon = Class(moho.platoon_methods) {
     ---@param self AIPlatoon
     ---@param plan string
     OnCreate = function(self, plan)
-        LOG("OnCreate")
         self.Trash = TrashBag()
         self.Brain = self:GetBrain()
         self.TrashState = TrashBag()
@@ -31,22 +37,60 @@ AIPlatoon = Class(moho.platoon_methods) {
 
     ---@param self AIPlatoon
     OnDestroy = function(self)
-        LOG("OnDestroy")
+        if self.BuilderHandle then
+            self.BuilderHandle:RemoveHandle(self)
+        end
         self.Trash:Destroy()
     end,
 
     ---@param self AIPlatoon
     OnUnitsAddedToPlatoon = function(self)
-        LOG("OnUnitsAddedToPlatoon")
         local units = self:GetPlatoonUnits()
         self.Units = units
         for k, unit in units do
             unit.AIPlatoonReference = self
+            unit:SetCustomName(self.PlatoonName)
         end
+    end,
+
+    PlatoonDisbandNoAssign = function(self)
+        if self.BuilderHandle then
+            self.BuilderHandle:RemoveHandle(self)
+        end
+        for k,v in self:GetPlatoonUnits() do
+            v.PlatoonHandle = nil
+        end
+        self:GetBrain():DisbandPlatoon(self)
     end,
 
     -----------------------------------------------------------------
     -- platoon functions
+
+    --- Computes the most restrictive layer. The result should be cached
+    ---@param self AIPlatoon
+    ---@return NavLayers
+    GetNavigationalLayer = function(self)
+        local layer = 'Air'
+        local units = self:GetPlatoonUnits()
+        for _, unit in units do
+            if not (unit.Dead or IsDestroyed(unit)) then
+                local mType = unit.Blueprint.Physics.MotionType
+                if (mType == 'RULEUMT_AmphibiousFloating' or mType == 'RULEUMT_Hover' or mType == 'RULEUMT_Amphibious') and (layer == 'Air' or layer == 'Water') then
+                    layer = 'Amphibious'
+                elseif (mType == 'RULEUMT_Water' or mType == 'RULEUMT_SurfacingSub') and (layer ~= 'Water') then
+                    layer = 'Water'
+                    break   --Nothing more restrictive than water, since there should be no mixed land/water platoons
+                elseif mType == 'RULEUMT_Air' and layer == 'Air' then
+                    layer = 'Air'
+                elseif (mType == 'RULEUMT_Biped' or mType == 'RULEUMT_Land') and layer ~= 'Land' then
+                    layer = 'Land'
+                    break   --Nothing more restrictive than land, since there should be no mixed land/water platoons
+                end
+            end
+        end
+
+        return layer
+    end,
 
     ---@param self AIPlatoon
     ---@param units Unit[] | nil
@@ -110,10 +154,11 @@ AIPlatoon = Class(moho.platoon_methods) {
 
         ---@param self AIPlatoon
         Main = function(self)
-
             -- tell the developer that something went wrong
             while not IsDestroyed(self) do
-                DrawCircle(self:GetPlatoonPosition(), 10, 'ff0000')
+                if GetFocusArmy() == self:GetBrain():GetArmyIndex() then
+                    DrawCircle(self:GetPlatoonPosition(), 10, 'ff0000')
+                end
                 WaitTicks(1)
             end
         end,
@@ -380,23 +425,72 @@ AIPlatoon = Class(moho.platoon_methods) {
         return units, head - 1
     end,
 
-    -----------------------------------------------------------------
-    -- debugging
 
-    ---
+    --- This disbands the state machine platoon and sets engineers back to a manager.
+    ---@param self AIPlatoon
+    ExitStateMachine = function(self)
+        local brain = self:GetBrain()
+        local platUnits = self:GetPlatoonUnits()
+        if platUnits then
+            for _, unit in platUnits do
+                if unit.Blueprint.CategoriesHash.ENGINEER then
+                    unit.PlatoonHandle = nil
+                    unit.AssistSet = nil
+                    unit.AssistPlatoon = nil
+                    unit.UnitBeingAssist = nil
+                    unit.ReclaimInProgress = nil
+                    unit.CaptureInProgress = nil
+                    if unit:IsPaused() then
+                        unit:SetPaused(false)
+                    end
+                    if not unit.Dead and unit.BuilderManagerData then
+                        if unit.BuilderManagerData.EngineerManager then
+                            unit.BuilderManagerData.EngineerManager:TaskFinished(unit)
+                        end
+                    end
+                    unit:SetCustomName('EngineerDisbanded')
+                end
+                if not unit.Dead then
+                    IssueStop({ unit })
+                    IssueClearCommands({ unit })
+                end
+            end
+        end
+        brain:DisbandPlatoon(self)
+
+    end,
+
+    ---------------------------------------------------------------------------
+    --#region Debug functionality
+
     ---@param self AIPlatoon
     LogDebug = function(self, message)
-        local platoonName = self.PlatoonName
-        local stateName = self.StateName
-        SPEW(string.format("%s - %s: %s", platoonName, stateName, message))
+        self.DebugMessages = self.DebugMessages or { }
+        table.insert(self.DebugMessages, string.format("%d - %s", GetGameTick(), message))
     end,
 
-    --- 
     ---@param self AIPlatoon
     LogWarning = function(self, message)
-        local platoonName = self.PlatoonName
-        local stateName = self.StateName
-        WARN(string.format("%s - %s: %s", platoonName, stateName, message))
+        self.DebugMessages = self.DebugMessages or { }
+        table.insert(self.DebugMessages, string.format("%d - %s", GetGameTick(), message))
     end,
 
+    ---@param self AIPlatoon
+    ---@return AIPlatoonDebugInfo
+    GetDebugInfo = function(self)
+        local info = self.DebugInfo
+        if not info then
+            ---@type AIPlatoonDebugInfo
+            info = { }
+            self.DebugInfo = info
+        end
+
+        info.PlatoonName = self.PlatoonName
+        info.StateName = self.StateName
+        info.DebugMessages = self.DebugMessages
+
+        return info
+    end,
+
+    --#endregion
 }

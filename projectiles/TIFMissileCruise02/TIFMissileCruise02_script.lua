@@ -2,8 +2,9 @@
 -- Terran Sub-Launched Cruise Missile
 --
 local TMissileCruiseSubProjectile = import("/lua/terranprojectiles.lua").TMissileCruiseSubProjectile
+local TacticalMissileComponent = import('/lua/sim/DefaultProjectiles.lua').TacticalMissileComponent
 
-TIFMissileCruise02 = ClassProjectile(TMissileCruiseSubProjectile) {
+TIFMissileCruise02 = ClassProjectile(TMissileCruiseSubProjectile, TacticalMissileComponent) {
 
 	FxAirUnitHitScale = 1.65,
     FxLandHitScale = 1.65,
@@ -17,49 +18,16 @@ TIFMissileCruise02 = ClassProjectile(TMissileCruiseSubProjectile) {
     FxWaterHitScale = 1.65,
     FxOnKilledScale = 1.65,
 
+    LaunchTicks = 6,
+    LaunchTurnRate = 6,
+    HeightDistanceFactor = 5,
+    MinHeight = 5,
+    FinalBoostAngle = 0,
+
     OnCreate = function(self)
         TMissileCruiseSubProjectile.OnCreate(self)
         self:SetCollisionShape('Sphere', 0, 0, 0, 2.0)
         self.Trash:Add(ForkThread( self.MovementThread,self ))
-    end,
-
-    MovementThread = function(self)        
-        self:SetTurnRate(8)
-        WaitTicks(4)        
-        while not self:BeenDestroyed() do
-            self:SetTurnRateByDist()
-            WaitTicks(2)
-        end
-    end,
-
-    SetTurnRateByDist = function(self)
-        local dist = self:GetDistanceToTarget()
-        --Get the nuke as close to 90 deg as possible
-        if dist > 50 then        
-            --Freeze the turn rate as to prevent steep angles at long distance targets
-            WaitTicks(21)
-            self:SetTurnRate(20)
-        elseif dist > 64 and dist <= 107 then
-						-- Increase check intervals
-						self:SetTurnRate(30)
-						WaitTicks(16)
-            self:SetTurnRate(30)
-        elseif dist > 21 and dist <= 53 then
-						-- Further increase check intervals
-                        WaitTicks(4)
-            self:SetTurnRate(50)
-				elseif dist > 0 and dist <= 21 then
-						-- Further increase check intervals            
-            self:SetTurnRate(100)   
-            KillThread(self.MoveThread)         
-        end
-    end,        
-
-    GetDistanceToTarget = function(self)
-        local tpos = self:GetCurrentTargetPosition()
-        local mpos = self:GetPosition()
-        local dist = VDist2(mpos[1], mpos[3], tpos[1], tpos[3])
-        return dist
     end,
     
     OnExitWater = function(self)

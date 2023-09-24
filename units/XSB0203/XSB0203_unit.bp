@@ -68,12 +68,12 @@ UnitBlueprint{
                 {
                     LODCutoff = 200,
                     LookupName = "/textures/environment/Falloff_seraphim_lookup.dds",
-                    ShaderName = "Seraphim",
+                    ShaderName = "SeraphimNavy",
                 },
                 {
                     LODCutoff = 600,
                     LookupName = "/textures/environment/Falloff_seraphim_lookup.dds",
-                    ShaderName = "Seraphim",
+                    ShaderName = "SeraphimNavy",
                     AlbedoName = "xsb0203_lod1_albedo.dds",
                     SpecularName = "xsb0203_lod1_specteam.dds",
                 },

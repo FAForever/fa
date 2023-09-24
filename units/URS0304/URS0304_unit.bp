@@ -94,11 +94,11 @@ UnitBlueprint{
             LODs = {
                 {
                     LODCutoff = 100,
-                    ShaderName = "Insect",
+                    ShaderName = "CybranNavy",
                 },
                 {
                     LODCutoff = 215,
-                    ShaderName = "Insect",
+                    ShaderName = "CybranNavy",
                     AlbedoName = "urs0304_lod1_albedo.dds",
                     SpecularName = "urs0304_lod1_specteam.dds",
                 },
@@ -451,8 +451,8 @@ UnitBlueprint{
             },
             RackFireTogether = false,
             RackRecoilDistance = 0,
-            RackReloadTimeout = 10,
-            RackSalvoChargeTime = 0,
+            RackReloadTimeout = 0,
+            RackSalvoChargeTime = 3,
             RackSalvoReloadTime = 0,
             RackSalvoSize = 1,
             RackSlavedToTurret = false,

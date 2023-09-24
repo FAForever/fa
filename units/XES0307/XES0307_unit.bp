@@ -92,7 +92,7 @@ UnitBlueprint{
             LODs = {
                 {
                     LODCutoff = 600,
-                    ShaderName = "Unit",
+                    ShaderName = "UEFNavy",
                 },
             },
         },

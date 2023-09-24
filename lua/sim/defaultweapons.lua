@@ -36,6 +36,7 @@ local MathClamp = math.clamp
 ---@field AdjustedSalvoDelay? number if the weapon blueprint requests a trajectory fix, this is set to the effective duration of the salvo in ticks used to calculate projectile spread
 ---@field DropBombShortRatio? number if the weapon blueprint requests a trajectory fix, this is set to the ratio of the distance to the target that the projectile is launched short to
 ---@field SalvoSpreadStart? number   if the weapon blueprint requests a trajectory fix, this is set to the value that centers the projectile spread for `CurrentSalvoNumber` shot on the optimal target position
+---@field WeaponPackState 'Packed' | 'Unpacked' | 'Unpacking' | 'Packing'
 DefaultProjectileWeapon = ClassWeapon(Weapon) {
 
     FxRackChargeMuzzleFlash = { },
@@ -47,6 +48,8 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
         '/effects/emitters/default_muzzle_flash_02_emit.bp',
     },
     FxMuzzleFlashScale = 1,
+
+    WeaponPackState = 'Packed',
 
     -- Called when the weapon is created, almost always when the owning unit is created
     ---@param self DefaultProjectileWeapon
@@ -546,7 +549,9 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
         end
         if unpackAnimator then
             unpackAnimator:SetRate(bp.WeaponUnpackAnimationRate)
+            self.WeaponPackState = 'Unpacking'
             WaitFor(unpackAnimator)
+            self.WeaponPackState = 'Unpacked'
         end
     end,
 
@@ -564,7 +569,10 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
             if bp.WeaponUnpackAnimation then
                 unpackAnimator:SetRate(-bp.WeaponUnpackAnimationRate)
             end
+
+            self.WeaponPackState = 'Packing'
             WaitFor(unpackAnimator)
+            self.WeaponPackState = 'Packed'
         end
     end,
 
@@ -677,6 +685,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
     -- I think this is triggered whenever the state changes to anything but DeadState
     ---@param self DefaultProjectileWeapon
     OnEnterState = function(self)
+
         local weaponWantEnabled = self.WeaponWantEnabled
         local weaponIsEnabled = self.WeaponIsEnabled
         if weaponWantEnabled and not weaponIsEnabled then
@@ -705,6 +714,9 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
 
     -- Idle state is when the weapon has no target and is done with any animations or unpacking
     IdleState = State {
+
+        StateName = 'IdleState',
+
         WeaponWantEnabled = true,
         WeaponAimWantEnabled = true,
 
@@ -735,6 +747,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
 
         OnGotTarget = function(self)
             Weapon.OnGotTarget(self)
+
             local unit = self.unit
 
             if unit then
@@ -778,6 +791,9 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
 
     -- This state is for when the weapon is charging before firing
     RackSalvoChargeState = State {
+
+        StateName = 'RackSalvoChargeState',
+
         WeaponWantEnabled = true,
         WeaponAimWantEnabled = true,
 
@@ -810,10 +826,14 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
 
     -- This state is for when the weapon is ready to fire
     RackSalvoFireReadyState = State {
+
+        StateName = 'RackSalvoFireReadyState',
+
         WeaponWantEnabled = true,
         WeaponAimWantEnabled = true,
 
         Main = function(self)
+
             -- We change the state on counted projectiles because we won't get another OnFire call.
             -- The second part is a hack for units with reload animations.  They have the same problem
             -- they need a RackSalvoReloadTime that's 1/RateOfFire set to avoid firing twice on the first shot
@@ -833,15 +853,24 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
                 self.WeaponCanFire = true
             end
 
-            -- This code has the effect of forcing a unit to wait on its firing state to change from Hold Fire
-            -- before resuming the sequence from this point
-            -- Introduced to fix a bug where units with this bp flag would go straight to projectile creation
-            -- from OnGotTarget, without waiting for OnFire() to be called from engine.
-            if bp.CountedProjectile or bp.AnimationReload then
+            -- Usually weapons with counted projectiles (TMLs, SMLs, SMDs) have a weapon unpacking / packing animation. As a result,
+            -- once they reach this state they won't receive another 'OnFire' event from the engine. To help them fire anyway we
+            -- manually force them proceed at this point
+
+            if (bp.CountedProjectile) then
+
+                -- But, as we're doing something unnatural we need to take into account the fire state. As an interesting side effect,
+                -- this bit of logic allows for the 'Sync strike' feature to function
+
+                -- prevent firing the weapon through `OnFire`
+                self.WeaponCanFire = false
+
                 while unit:GetFireState() == 1 do
                     WaitTicks(1)
-
                 end
+
+                -- now we're good and ready to fire as we see fit
+                self.WeaponCanFire = true
 
                 ChangeState(self, self.RackSalvoFiringState)
             end
@@ -849,7 +878,6 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
             -- attempts to fix units being stuck on targets that are outside their current attack radius, but inside
             -- the tracking radius. This happens when the unit is trying to fire, but it is never actually firing and
             -- therefore the thread of this state is not destroyed
-
             if not (IsDestroyed(unit) or IsDestroyed(self)) then
                 -- wait reload time + 2 seconds, then force the weapon to recheck its target 
                 WaitSeconds((1 / self.Blueprint.RateOfFire) + 3)
@@ -866,6 +894,9 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
 
     -- This state is for when the weapon is actually in the process of firing
     RackSalvoFiringState = State {
+
+        StateName = 'RackSalvoFiringState',
+
         WeaponWantEnabled = true,
         WeaponAimWantEnabled = true,
 
@@ -887,7 +918,6 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
             local unit = self.unit
             unit:SetBusy(true)
             self:DestroyRecoilManips()
-
             local bp = self.Blueprint
             local rof = self:GetWeaponRoF()
             local rackBoneCount = self.NumRackBones
@@ -946,6 +976,8 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
                     if rackHideMuzzle then
                         unit:ShowBone(muzzle, true)
                     end
+
+
                     -- Deal with Muzzle charging sequence
                     if chargeDelay > 0 then
                         if muzzleCharge then
@@ -975,7 +1007,6 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
                     if proj and not proj:BeenDestroyed() and countedProjectile then
                         if bp.NukeWeapon then
                             unit:NukeCreatedAtUnit()
-
                             -- Generate UI notification for automatic nuke ping
                             local launchData = {
                                 army = self.Army - 1,
@@ -1061,6 +1092,9 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
 
     -- This state is for when the weapon is reloading
     RackSalvoReloadState = State {
+
+        StateName = 'RackSalvoReloadState',
+
         WeaponWantEnabled = true,
         WeaponAimWantEnabled = true,
 
@@ -1101,6 +1135,9 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
 
     -- This state is for weapons which have to unpack before firing
     WeaponUnpackingState = State {
+
+        StateName = 'WeaponUnpackingState',
+
         WeaponWantEnabled = false,
         WeaponAimWantEnabled = false,
 
@@ -1128,9 +1165,13 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
 
     -- This state is for weapons which have to pack up before moving or whatever
     WeaponPackingState = State {
+
+        StateName = 'WeaponPackingState',
+
         WeaponWantEnabled = true,
         WeaponAimWantEnabled = true,
 
+        ---@param self DefaultProjectileWeapon
         Main = function(self)
             local unit = self.unit
             unit:SetBusy(true)
@@ -1146,10 +1187,10 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
             ChangeState(self, self.IdleState)
         end,
 
+        ---@param self DefaultProjectileWeapon
         OnGotTarget = function(self)
             Weapon.OnGotTarget(self)
 
-            -- Issue 43
             local unit = self.unit
             if unit then
                 unit:OnGotTarget(self)
@@ -1160,9 +1201,15 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
             end
         end,
 
+        ---@param self DefaultProjectileWeapon
         OnFire = function(self)
             local bp = self.Blueprint
-            if bp.CountedProjectile and not bp.ForceSingleFire then
+            if  -- triggers when we use the distribute orders feature to distribute TMLs / SMLs launch orders
+                self.WeaponPackState == 'Unpacking' or
+
+                -- triggers when we fired a missile but we're still waiting for the pack animation to finish
+                (bp.CountedProjectile and (not bp.ForceSingleFire))
+            then
                 ChangeState(self, self.WeaponUnpackingState)
             end
         end,
@@ -1171,6 +1218,9 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
 
     -- This state is entered only when the owner of the weapon is dead
     DeadState = State {
+
+        StateName = 'DeadState',
+
         OnEnterState = function(self)
         end,
 
