@@ -96,7 +96,7 @@ UnitBlueprint{
         BuildCostEnergy = 99400,
         BuildCostMass = 4090,
         BuildRate = 120,
-        BuildTime = 10400,
+        BuildTime = 12100,
         BuildableCategory = {
             "BUILTBYTIER3FACTORY SERAPHIM MOBILE CONSTRUCTION",
             "BUILTBYTIER3FACTORY SERAPHIM STRUCTURE AIR",
