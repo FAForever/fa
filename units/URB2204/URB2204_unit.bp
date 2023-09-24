@@ -140,9 +140,9 @@ UnitBlueprint{
     SelectionThickness = 0.6,
     CollisionOffsetY = -0.55,
     CollisionOffsetZ = -0.2,
-    SizeX = 0.4,
+    SizeX = 0.6,
     SizeY = 1.5,
-    SizeZ = 0.6,
+    SizeZ = 0.7,
     StrategicIconName = "icon_structure2_antiair",
     StrategicIconSortPriority = 200,
     Veteran = {
