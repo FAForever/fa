@@ -54,8 +54,6 @@ UnitBlueprint {
         'SORTCONSTRUCTION',
         'SUPPORTFACTORY',
     },
-    CollisionOffsetY = -1,
-    CollisionOffsetZ = 0,
     Defense = {
         AirThreatLevel = 0,
         ArmorType = 'Structure',
@@ -210,9 +208,12 @@ UnitBlueprint {
     SelectionSizeX = 2.5,
     SelectionSizeZ = 8.8,
     SelectionThickness = 0.2,
+    CollisionOffsetX = 0,
+    CollisionOffsetY = -1,
+    CollisionOffsetZ = 0,
     SizeX = 4,
-    SizeY = 3, --from 2, for beam weapons
-    SizeZ = 10,
+    SizeY = 3,
+    SizeZ = 13,
     StrategicIconName = 'icon_factory3_naval',
     StrategicIconSortPriority = 210,
     Wreckage = {

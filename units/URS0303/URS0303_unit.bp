@@ -8,8 +8,8 @@ UnitBlueprint{
         RepairConsumeMass = 0,
         StagingPlatformScanRadius = 300,
         TargetBones = {
-            "URS0303",
-            "Back_Wake",
+            "Zapper_Turret",
+            "Attachpoint",
             "Launchpoint",
         },
     },

@@ -1,8 +1,5 @@
 UnitBlueprint{
     Description = "<LOC urb2304_desc>Anti-Air SAM Launcher",
-    AI = {
-        TargetBones = { "Turret" },
-    },
     Audio = {
         Destroyed      = Sound { Bank = 'URLDestroy', Cue = 'URB_Destroy_Land',  LodCutoff = 'UnitMove_LodCutoff' },
         DoneBeingBuilt = Sound { Bank = 'URB',        Cue = 'URB2304_Activate',  LodCutoff = 'UnitMove_LodCutoff' },
@@ -128,7 +125,7 @@ UnitBlueprint{
     CollisionOffsetY = -0.75,
     SizeX = 0.6,
     SizeY = 2,
-    SizeZ = 0.3,
+    SizeZ = 0.6,
     StrategicIconName = "icon_structure3_antiair",
     StrategicIconSortPriority = 195,
     Veteran = {

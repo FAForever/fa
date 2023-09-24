@@ -138,7 +138,7 @@ UnitBlueprint{
     SelectionThickness = 0.47,
     CollisionOffsetY = -0.25,
     SizeX = 1,
-    SizeY = 1.7,
+    SizeY = 1.8,
     SizeZ = 1,
     StrategicIconName = "icon_structure2_artillery",
     StrategicIconSortPriority = 180,

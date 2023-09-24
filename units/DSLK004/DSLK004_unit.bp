@@ -1,8 +1,5 @@
 UnitBlueprint{
     Description = "<LOC dslk004_desc>Lightning Tank",
-    AI = {
-        TargetBones = { "AttachPoint" },
-    },
     Audio = {
         AmbientMove = Sound { Bank = 'XSL',            Cue = 'XSL0303_Move_Loop',    LodCutoff = 'UnitMove_LodCutoff' },
         Destroyed   = Sound { Bank = 'XSL_Destroy',    Cue = 'XSL_Destroy_Land_Lrg', LodCutoff = 'UnitMove_LodCutoff' },

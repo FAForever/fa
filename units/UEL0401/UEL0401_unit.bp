@@ -7,11 +7,9 @@ UnitBlueprint{
         RepairConsumeEnergy = 30,
         RepairConsumeMass = 0,
         StagingPlatformScanRadius = 300,
-        TargetBones = {
-            "Bay_Cover",
+        TargetBones = { 
             "Front_Core",
             "Rear_Core",
-            "Ramp",
             "Turret_Left01",
             "Turret_Left02",
             "Turret_Right01",

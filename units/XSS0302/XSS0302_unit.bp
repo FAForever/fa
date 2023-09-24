@@ -4,9 +4,12 @@ UnitBlueprint{
         AttackAngle = 60,
         GuardReturnRadius = 15,
         TargetBones = {
-            "xss0302",
             "Back_Turret01",
             "Front_Turret01",
+            "Front_Turret02",
+            "Exhaust01",
+            "Projectile01",
+            "Projectile02",
         },
     },
     Audio = {
