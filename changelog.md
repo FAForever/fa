@@ -20,6 +20,14 @@ This specifically occurred with the tech 3 strategic submarines and the tech 3 S
 
 This occurs when you issue launch orders and then distribute them. The new, distributed orders are processed and removed from the queue even though no missiles have been launched.
 
+- (#5470) Fix a bug that cause gunships to have a tough time to hit certain units.
+
+When a projectile experiences multiple collisions in a single tick, the engine does not always return the first collision. This issue frequently occurs with gunships, as they often fire from nearly vertical angles. Consequently, gunships can appear to 'hit' the terrain, even though they clearly hit the intended unit. To resolve this, we now ensure that every collision box of every unit has a minimum length of 0.5 ogrids.
+
+- (#5470) Fix a bug that allows certain units to evade beams in specific conditions
+
+Most notable the Brick no longer has the ability to evade beams.
+
 ## Contributors
 
 With thanks to the following individuals who contributed through coding:
