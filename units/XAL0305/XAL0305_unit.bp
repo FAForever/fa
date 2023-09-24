@@ -179,9 +179,9 @@ UnitBlueprint{
     SelectionSizeZ = 0.65,
     SelectionThickness = 0.8,
     CollisionOffsetY = 0,
-    SizeX = 0.95,
-    SizeY = 1.35,
-    SizeZ = 0.8,
+    SizeX = 1.1,
+    SizeY = 1.4,
+    SizeZ = 0.9,
     StrategicIconName = "icon_bot3_sniper",
     StrategicIconSortPriority = 115,
     Transport = {
