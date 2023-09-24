@@ -260,7 +260,7 @@ UnitBlueprint {
             AutoInitiateAttackCommand = true,
             BallisticArc = "RULEUBA_None",
             CollideFriendly = false,
-            Damage = 20,
+            Damage = 16,
             DamageType = "Normal",
             DisplayName = "Hells Fury Riot Gun",
             FireTargetLayerCapsTable = {
@@ -271,7 +271,7 @@ UnitBlueprint {
             FiringRandomness = 0.2,
             FiringTolerance = 2,
             Label = "Turret01",
-            MaxRadius = 18,
+            MaxRadius = 22,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
             MuzzleVelocity = 35,
