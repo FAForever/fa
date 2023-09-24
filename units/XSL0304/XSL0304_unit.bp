@@ -2,7 +2,6 @@ UnitBlueprint{
     Description = "<LOC xsl0304_desc>Mobile Heavy Artillery",
     AI = {
         NeedUnpack = true,
-        TargetBones = { "Torso" },
     },
     Audio = {
         AmbientMove = Sound { Bank = 'XSL',            Cue = 'XSL0304_Move_Loop',    LodCutoff = 'UnitMove_LodCutoff' },
@@ -172,7 +171,7 @@ UnitBlueprint{
     SelectionSizeZ = 1,
     SelectionThickness = 0.43,
     SizeX = 0.7,
-    SizeY = 0.6,
+    SizeY = 0.7,
     SizeZ = 1.0,
     StrategicIconName = "icon_land3_artillery",
     StrategicIconSortPriority = 115,

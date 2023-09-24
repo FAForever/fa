@@ -1,10 +1,11 @@
 UnitBlueprint {
     AI = {
         TargetBones = {
-            'URB0303',
+            'B13',
+            'B08',
+            'B09',
+            'B12',
             'Dock_Cover',
-            'Dock',
-            'Center_Deck_Support',
         },
     },
     Audio = {

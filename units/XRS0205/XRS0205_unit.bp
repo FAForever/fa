@@ -5,6 +5,8 @@ UnitBlueprint{
         TargetBones = {
             "point_midhigh",
             "point_midlow",
+            "Radar_B01",
+            "point_spike",
         },
     },
     Audio = {

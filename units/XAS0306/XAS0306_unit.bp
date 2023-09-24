@@ -6,7 +6,6 @@ UnitBlueprint{
         TargetBones = {
             "Turret_Front",
             "Turret_Back",
-            "XAS0306",
         },
     },
     Audio = {

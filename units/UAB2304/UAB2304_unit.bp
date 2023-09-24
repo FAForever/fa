@@ -1,8 +1,5 @@
 UnitBlueprint{
     Description = "<LOC uab2304_desc>Anti-Air SAM Launcher",
-    AI = {
-        TargetBones = { "Turret_Barrel" },
-    },
     Audio = {
         Destroyed      = Sound { Bank = 'UALDestroy', Cue = 'UAB_Destroy_Land', LodCutoff = 'UnitMove_LodCutoff' },
         DoneBeingBuilt = Sound { Bank = 'UAB',        Cue = 'UAB2304_Activate', LodCutoff = 'UnitMove_LodCutoff' },
