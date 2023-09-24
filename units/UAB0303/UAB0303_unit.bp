@@ -156,11 +156,12 @@ UnitBlueprint{
     SelectionSizeX = 2.5,
     SelectionSizeZ = 8.8,
     SelectionThickness = 0.2,
+    CollisionOffsetX = 0,
     CollisionOffsetY = -1,
     CollisionOffsetZ = 0,
     SizeX = 4,
     SizeY = 3,
-    SizeZ = 10,
+    SizeZ = 14.5,
     StrategicIconName = "icon_factoryhq3_naval",
     StrategicIconSortPriority = 210,
     Wreckage = {

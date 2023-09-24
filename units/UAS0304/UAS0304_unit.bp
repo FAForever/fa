@@ -6,6 +6,8 @@ UnitBlueprint{
         TargetBones = {
             "Muzzle_04",
             "Muzzle_05",
+            "Exhaust_01",
+            "Exhaust_02",
         },
     },
     Audio = {
