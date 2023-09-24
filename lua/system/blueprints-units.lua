@@ -287,6 +287,12 @@ local function PostProcessUnit(unit)
                         , tostring(unit.BlueprintId), tostring(0.1 * speed), tostring(speed)))
                     unit.SizeZ = 0.1 * speed
                 end
+
+                if unit.SizeY < 0.5 then
+                    WARN(string.format("Overriding the y axis of collision box of unit ( %s ), it should be atleast 0.5 to guarantee proper functioning gunships"
+                        , tostring(unit.BlueprintId), tostring(0.1 * speed), tostring(speed)))
+                    unit.SizeY = 0.5
+                end
             end
         end
     end

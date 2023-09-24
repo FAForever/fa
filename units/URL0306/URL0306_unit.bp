@@ -153,7 +153,7 @@ UnitBlueprint{
     SelectionSizeZ = 0.45,
     SelectionThickness = 0.83,
     SizeX = 0.7,
-    SizeY = 0.4,
+    SizeY = 0.5,
     SizeZ = 0.8,
     StrategicIconName = "icon_land2_counterintel",
     StrategicIconSortPriority = 125,
