@@ -65,7 +65,7 @@ UnitBlueprint{
             LODs = {
                 {
                     LODCutoff = 215,
-                    ShaderName = "Insect",
+                    ShaderName = "CybranNavy",
                 },
             },
         },

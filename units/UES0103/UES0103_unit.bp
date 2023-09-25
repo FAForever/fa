@@ -5,6 +5,7 @@ UnitBlueprint{
         TargetBones = {
             "Front_Turret",
             "Back_Turret",
+            "UES0103",
         },
     },
     Audio = {
@@ -86,11 +87,11 @@ UnitBlueprint{
             LODs = {
                 {
                     LODCutoff = 140,
-                    ShaderName = "Unit",
+                    ShaderName = "UEFNavy",
                 },
                 {
                     LODCutoff = 250,
-                    ShaderName = "Unit",
+                    ShaderName = "UEFNavy",
                     AlbedoName = "ues0103_lod1_albedo.dds",
                     SpecularName = "ues0103_lod1_specteam.dds",
                 },
@@ -195,7 +196,7 @@ UnitBlueprint{
     CollisionOffsetY = -0.4,
     SizeX = 0.6,
     SizeY = 1.1,
-    SizeZ = 4.3,
+    SizeZ = 5.1,
     StrategicIconName = "icon_ship1_intel",
     StrategicIconSortPriority = 165,
     Veteran = {

@@ -101,7 +101,7 @@ end
 function SizeOfCell()
     ---@type number
     local MapSize = math.max(ScenarioInfo.size[1], ScenarioInfo.size[2])
-
+    
     ---@type number
     return MapSize / LabelCompressionTreesPerAxis
 end
@@ -203,8 +203,8 @@ NavGrid = ClassNavGrid {
             local size = self.TreeSize
             local trees = self.Trees
 
-            local bx = (x / size) ^ 0
-            local bz = (z / size) ^ 0
+            local bx = math.floor(x / size)
+            local bz = math.floor(z / size)
             if trees[bz][bx] then
                 return bx, bz
             else
@@ -231,8 +231,8 @@ NavGrid = ClassNavGrid {
             local size = self.TreeSize
             local trees = self.Trees
 
-            local bx = (x / size) ^ 0
-            local bz = (z / size) ^ 0
+            local bx = math.floor(x / size)
+            local bz = math.floor(z / size)
             local root = trees[bz][bx] --[[@as CompressedLabelTreeRoot]]
             return root
         end
@@ -267,8 +267,8 @@ NavGrid = ClassNavGrid {
             local size = self.TreeSize
             local trees = self.Trees
 
-            local bx = (x / size) ^ 0
-            local bz = (z / size) ^ 0
+            local bx = math.floor(x / size)
+            local bz = math.floor(z / size)
             local labelTree = trees[bz][bx]
             if labelTree then
                 return labelTree:FindLeafXZ(bx * size, bz * size, 0, 0, size, x, z)

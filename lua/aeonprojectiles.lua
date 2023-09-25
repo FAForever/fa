@@ -314,6 +314,7 @@ AMissileSerpentine02Projectile = ClassProjectile(SingleCompositeEmitterProjectil
     FxImpactUnit = EffectTemplate.AMissileHit01,
     FxImpactProp = EffectTemplate.AMissileHit01,
     FxImpactLand = EffectTemplate.AMissileHit01,
+    FxImpactNone = EffectTemplate.AMissileHit01,
 
     ---@param self AMissileSerpentine02Projectile
     OnCreate = function(self)
@@ -365,6 +366,8 @@ AQuantumCannonProjectile = ClassProjectile(SinglePolyTrailProjectile) {
     FxImpactUnit = EffectTemplate.AQuantumDisruptorHit01,
     FxImpactProp = EffectTemplate.AQuantumDisruptorHit01,
     FxImpactLand = EffectTemplate.AQuantumDisruptorHit01,
+    FxImpactWater = EffectTemplate.AQuantumDisruptorHitWater01,
+    FxImpactWaterScale = 0.6,
 }
 
 --- AEON QUANTUM PROJECTILES

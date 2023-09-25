@@ -2515,7 +2515,7 @@ function ShowGameQuality()
 
     if quality > 0 then
         gameInfo.GameOptions.Quality = quality
-        GUI.GameQualityLabel:StreamText(LOCF("<LOC lobui_0418>Game quality: %s%%", quality), 20)
+        GUI.GameQualityLabel:StreamText(LOCF("<LOC lobui_0418>Game quality: %s%%", string.format("%.2f",quality)), 20)
     end
 end
 
@@ -5981,7 +5981,7 @@ function CPUBenchmark()
             k = i * i   --Multiplication
             l = k / j   --Division
             m = j - i   --Subtraction
-            j = i ^ 4   --Power
+            j = math.pow(i, 4)   --Power
             l = -i      --Negation
             m = {'1234567890', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', true} --Create Table
             TableInsert(m, '1234567890')     --Insert Table Value

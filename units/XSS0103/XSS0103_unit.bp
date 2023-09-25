@@ -1,6 +1,6 @@
 UnitBlueprint{
     Description = "<LOC xss0103_desc>Frigate",
-    AI = { GuardReturnRadius = 40 },
+    AI = { GuardReturnRadius = 40, TargetBones = { 'Front_Turret', 'Back_Turret', 'XSS0103' } },
     Audio = {
         AmbientMove = Sound { Bank = 'XSS',            Cue = 'XSS0103_Move_Loop',     LodCutoff = 'UnitMove_LodCutoff' },
         Killed      = Sound { Bank = 'XSS_Destroy',    Cue = 'XSS0103_Destroy',       LodCutoff = 'UnitMove_LodCutoff' },
@@ -84,12 +84,12 @@ UnitBlueprint{
                 {
                     LODCutoff = 140,
                     LookupName = "/textures/environment/Falloff_seraphim_lookup.dds",
-                    ShaderName = "Seraphim",
+                    ShaderName = "SeraphimNavy",
                 },
                 {
                     LODCutoff = 250,
                     LookupName = "/textures/environment/Falloff_seraphim_lookup.dds",
-                    ShaderName = "Seraphim",
+                    ShaderName = "SeraphimNavy",
                     AlbedoName = "xss0103_lod1_albedo.dds",
                     SpecularName = "xss0103_lod1_specteam.dds",
                 },
@@ -175,9 +175,9 @@ UnitBlueprint{
     SelectionSizeZ = 2.75,
     SelectionThickness = 0.24,
     CollisionOffsetY = -0.375,
-    SizeX = 0.6,
+    SizeX = 0.65,
     SizeY = 1.1,
-    SizeZ = 4.3,
+    SizeZ = 4.4,
     StrategicIconName = "icon_ship1_intel",
     StrategicIconSortPriority = 165,
     Veteran = {

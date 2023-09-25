@@ -134,7 +134,7 @@ function processIncomingMessage(sender, msg)
         elseif trigger == 'completed' then
             local time = msg.data.time
             if time then
-                msg.text = message .. LOC('<LOC notify_done>') .. ' (' .. time .. 's)'
+                msg.text = string.format("%s %s (%.2fs)", message, LOC('<LOC notify_done>'), time)
             else
                 msg.text = message .. LOC('<LOC notify_done>')
             end
@@ -214,7 +214,7 @@ function round(num, idp)
     if not idp then
         return tonumber(string.format("%." .. (idp or 0) .. "f", num))
     else
-        local mult = 10 ^ (idp or 0)
+        local mult = math.pow(10, (idp or 0))
         return math.floor(num * mult + 0.5) / mult
     end
 end
@@ -301,7 +301,7 @@ function onCompletedEnhancement(id, category, source)
         local data = ACUs[id]
         if data then
             local time = round(GetGameTimeSeconds() - data.startTime, 2)
-            msg.text = messages()[category][source] .. ' done! (' .. time .. 's)'
+            msg.text = string.format("%s %s (%.2fs)", messages()[category][source], LOC('<LOC notify_done>'), time)
             msg.data.time = time
             killWatcher(data)
         end

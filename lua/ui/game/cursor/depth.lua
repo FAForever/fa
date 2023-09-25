@@ -169,8 +169,8 @@ local function DepthScanningThread()
             -- move with the grid when building
             info = CommandMode.GetCommandMode()
             if info[1] == 'build' then
-                position[1] = (position[1] ^ 0) + 0.5
-                position[3] = (position[3] ^ 0) + 0.5
+                position[1] = math.floor(position[1]) + 0.5
+                position[3] = math.floor(position[3]) + 0.5
             end
 
             -- determine location on the terrain

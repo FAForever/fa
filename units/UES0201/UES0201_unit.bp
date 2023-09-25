@@ -5,9 +5,8 @@ UnitBlueprint{
         GuardReturnRadius = 30,
         TargetBones = {
             "UES0202",
-            "Back_Wake",
-            "Front_Left_Wake",
-            "Front_Right_Wake",
+            "Front_Turret01",
+            "Back_Turret01",
         },
     },
     Audio = {
@@ -89,11 +88,11 @@ UnitBlueprint{
             LODs = {
                 {
                     LODCutoff = 140,
-                    ShaderName = "Unit",
+                    ShaderName = "UEFNavy",
                 },
                 {
                     LODCutoff = 300,
-                    ShaderName = "Unit",
+                    ShaderName = "UEFNavy",
                     AlbedoName = "ues0201_lod1_albedo.dds",
                     SpecularName = "ues0201_lod1_specteam.dds",
                 },

@@ -232,10 +232,6 @@ StructureUnit = ClassUnit(Unit) {
                 blueprintPhysics.MeshExtentsZ or blueprint.SizeZ or 0
             )
 
-            -- apply twice to break tree groups
-            DamageArea(self, position, 0.75 * radius, 1, 'TreeForce', false, false)
-            DamageArea(self, position, 0.75 * radius, 1, 'TreeForce', false, false)
-
             -- create a flash when the structure starts
             CreateLightParticleIntel( self, -1, army, 2 * radius, 22, 'glow_03', 'ramp_antimatter_02' )
 
@@ -284,12 +280,12 @@ StructureUnit = ClassUnit(Unit) {
         local x0, z0, x1, z1 = self:GetSkirtRect()
 
         -- floor them
-        x0 = x0 ^ 0
-        z0 = z0 ^ 0
+        x0 = math.floor(x0)
+        z0 = math.floor(z0)
 
         -- ceil them
-        x1 = 1 + (x1 ^ 0)
-        z1 = 1 + (z1 ^ 0)
+        x1 = math.ceil(x1)
+        z1 = math.ceil(z1)
 
         -- compute average elevation and flatten
         local elevation = 0.25 * (
@@ -307,12 +303,12 @@ StructureUnit = ClassUnit(Unit) {
         local x0, z0, x1, z1 = self:GetSkirtRect()
 
         -- floor them
-        x0 = x0 ^ 0
-        z0 = z0 ^ 0
+        x0 = math.floor(x0)
+        z0 = math.floor(z0)
 
         -- ceil them
-        x1 = 1 + (x1 ^ 0)
-        z1 = 1 + (z1 ^ 0)
+        x1 = math.ceil(x1)
+        z1 = math.ceil(z1)
 
         import('/lua/sim/TerrainUtils.lua').FlattenGradientMapRect(x0, z0, x1 - x0, z1 - z0)
     end,
@@ -591,7 +587,7 @@ StructureUnit = ClassUnit(Unit) {
                 local guards = self:GetGuards()
                 for k, guard in guards do
                     if table.getn(guard:GetCommandQueue()) == 1 then
-                        IssueClearCommands({guard})
+                        IssueToUnitClearCommands(guard)
                         IssueGuard({guard}, self)
                     end
                 end

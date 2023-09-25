@@ -120,7 +120,7 @@ BuilderGroup {
     Builder {
         BuilderName = 'T1 Mortar',
         PlatoonTemplate = 'T1LandArtillery',
-        Priority = 830,
+        Priority = 825,
         BuilderConditions = {
             { UCBC, 'HaveLessThanUnitsWithCategory', { 150, categories.MOBILE * categories.LAND * categories.TECH1 - categories.ENGINEER - categories.ANTIAIR } },
             --{ UCBC, 'LocationFactoriesBuildingLess', { 'LocationType', 1, 'INDIRECTFIRE LAND MOBILE' } },
@@ -807,7 +807,7 @@ BuilderGroup {
     -- Hunts for mass locations with Economic threat value of no more than 2 mass extractors
     Builder {
         BuilderName = 'Mass Hunter Early Game',
-        PlatoonTemplate = 'T1MassHuntersCategory',
+        PlatoonTemplate = 'StateMachinePlatoon',
         -- Commented out as the platoon doesn't exist in AILandAttackBuilders.lua
         --PlatoonTemplate = 'EarlyGameMassHuntersCategory',
         Priority = 950,
@@ -817,6 +817,7 @@ BuilderGroup {
                 --{ UCBC, 'HaveLessThanUnitsWithCategory', { 1, categories.TECH2 * categories.MOBILE * categories.LAND - categories.ENGINEER } },
             },
         BuilderData = {
+            StateMachine = 'AIPlatoonAdaptiveRaidBehavior',
             MarkerType = 'Mass',
             MoveFirst = 'Random',
             MoveNext = 'Threat',
@@ -838,7 +839,7 @@ BuilderGroup {
     -- Used after 10, goes after mass locations of no max threat
     Builder {
         BuilderName = 'Mass Hunter Mid Game',
-        PlatoonTemplate = 'T2MassHuntersCategory',
+        PlatoonTemplate = 'StateMachinePlatoon',
         Priority = 950,
         BuilderConditions = {
                 { MIBC, 'MapCheck', { 'Seton\'s Clutch', false } },
@@ -846,6 +847,7 @@ BuilderGroup {
                 --{ UCBC, 'HaveLessThanUnitsWithCategory', { 1, categories.TECH2 * categories.MOBILE * categories.LAND - categories.ENGINEER } },
             },
         BuilderData = {
+            StateMachine = 'AIPlatoonAdaptiveRaidBehavior',
             MarkerType = 'Mass',
             MoveFirst = 'Random',
             MoveNext = 'Threat',
@@ -870,7 +872,7 @@ BuilderGroup {
     -- Also the platoon carries an engineer with it
     Builder {
         BuilderName = 'Start Location Attack',
-        PlatoonTemplate = 'StartLocationAttack',
+        PlatoonTemplate = 'StateMachinePlatoon',
         Priority = 1000, --DUNCAN - was 960
         BuilderConditions = {
                 { MIBC, 'MapCheck', { 'Seton\'s Clutch', false } },
@@ -879,6 +881,7 @@ BuilderGroup {
                 --{ UCBC, 'HaveLessThanUnitsWithCategory', { 1, categories.TECH2 * categories.MOBILE * categories.LAND - categories.ENGINEER } },
             },
         BuilderData = {
+            StateMachine = 'AIPlatoonAdaptiveRaidBehavior',
             MarkerType = 'Start Location',
             MoveFirst = 'Closest',
             MoveNext = 'None', --DUNCAN - was guard base
@@ -959,17 +962,14 @@ BuilderGroup {
     -- Seek and destroy
     Builder {
         BuilderName = 'T1 Hunters',
-        PlatoonTemplate = 'HuntAttackSmall',
+        PlatoonTemplate = 'StateMachinePlatoon',
         Priority = 990,
         InstanceCount = 2,
         BuilderType = 'Any',
         BuilderData = {
             NeverGuardBases = true,
             NeverGuardEngineers = true,
-            --UseFormation = 'AttackFormation',
-            ThreatWeights = {
-                IgnoreStrongerTargetsRatio = 100.0,
-            },
+            StateMachine = 'AIPlatoonAdaptiveAttackBehavior',
         },
         BuilderConditions = {
             { MIBC, 'IsIsland', { false } }, --DUNCAN - added to stop units bunching on island maps
@@ -981,39 +981,33 @@ BuilderGroup {
     -- Seek and destroy
     Builder {
         BuilderName = 'T2 Hunters',
-        PlatoonTemplate = 'HuntAttackMedium',
+        PlatoonTemplate = 'StateMachinePlatoon',
         Priority = 990,
         InstanceCount = 2,
         BuilderType = 'Any',
         BuilderData = {
             NeverGuardBases = true,
             NeverGuardEngineers = true,
-            --UseFormation = 'AttackFormation',
-            ThreatWeights = {
-                IgnoreStrongerTargetsRatio = 100.0,
-            },
+            StateMachine = 'AIPlatoonAdaptiveAttackBehavior',
         },
         BuilderConditions = {
             { MIBC, 'IsIsland', { false } }, --DUNCAN - added to stop units bunching on island maps
             { UCBC, 'PoolLessAtLocation', { 'LocationType', 1, categories.MOBILE * categories.LAND - categories.ENGINEER - categories.TECH1 } },
-            { LandAttackCondition, { 'LocationType', 15 } },
+            { LandAttackCondition, { 'LocationType', 20 } },
         },
     },
 
     -- Seek and destroy
     Builder {
         BuilderName = 'T1 LAB Hunters',
-        PlatoonTemplate = 'LABAttack',
+        PlatoonTemplate = 'StateMachinePlatoon',
         Priority = 1000,
         InstanceCount = 4,
         BuilderType = 'Any',
         BuilderData = {
             NeverGuardBases = true,
             NeverGuardEngineers = true,
-            --UseFormation = 'AttackFormation',
-            ThreatWeights = {
-                IgnoreStrongerTargetsRatio = 100.0,
-            },
+            StateMachine = 'AIPlatoonAdaptiveAttackBehavior',
         },
         BuilderConditions = {
             { MIBC, 'IsIsland', { false } }, --DUNCAN - added to stop units bunching on island maps

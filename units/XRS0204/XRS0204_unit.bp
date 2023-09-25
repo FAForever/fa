@@ -2,7 +2,6 @@ UnitBlueprint{
     Description = "<LOC xrs0204_desc>Submarine Killer",
     AI = {
         GuardReturnRadius = 30,
-        TargetBones = { "XRS0204" },
     },
     Audio = {
         AmbientMove    = Sound { Bank = 'XRS',        Cue = 'XRS0204_Move_Loop',     LodCutoff = 'UnitMove_LodCutoff' },
@@ -81,11 +80,11 @@ UnitBlueprint{
             LODs = {
                 {
                     LODCutoff = 100,
-                    ShaderName = "Insect",
+                    ShaderName = "CybranNavy",
                 },
                 {
                     LODCutoff = 215,
-                    ShaderName = "Insect",
+                    ShaderName = "CybranNavy",
                     AlbedoName = "xrs0204_lod1_albedo.dds",
                     SpecularName = "xrs0204_lod1_specteam.dds",
                 },
@@ -218,8 +217,8 @@ UnitBlueprint{
     SelectionSizeZ = 1.8,
     SelectionThickness = 0.37,
     CollisionOffsetY = -0.25,
-    SizeX = 0.66,
-    SizeY = 0.5,
+    SizeX = 0.7,
+    SizeY = 0.7,
     SizeZ = 3,
     StrategicIconName = "icon_sub2_antinavy",
     StrategicIconSortPriority = 165,

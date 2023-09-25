@@ -79,11 +79,11 @@ UnitBlueprint{
             LODs = {
                 {
                     LODCutoff = 100,
-                    ShaderName = "Aeon",
+                    ShaderName = "AeonNavy",
                 },
                 {
                     LODCutoff = 215,
-                    ShaderName = "Aeon",
+                    ShaderName = "AeonNavy",
                     AlbedoName = "xas0204_lod1_albedo.dds",
                     SpecularName = "xas0204_lod1_specteam.dds",
                 },
@@ -213,8 +213,8 @@ UnitBlueprint{
     CollisionOffsetX = 0.05,
     CollisionOffsetY = -0.2,
     CollisionOffsetZ = -0.01,
-    SizeX = 0.7,
-    SizeY = 0.5,
+    SizeX = 0.8,
+    SizeY = 0.7,
     SizeZ = 2.8,
     StrategicIconName = "icon_sub2_antinavy",
     StrategicIconSortPriority = 165,

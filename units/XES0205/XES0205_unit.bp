@@ -90,11 +90,11 @@ UnitBlueprint{
                 {
                     LODCutoff = 140,
                     Scrolling = true,
-                    ShaderName = "Unit",
+                    ShaderName = "UEFNavy",
                 },
                 {
                     LODCutoff = 270,
-                    ShaderName = "Unit",
+                    ShaderName = "UEFNavy",
                     AlbedoName = "xes0205_lod1_albedo.dds",
                     SpecularName = "xes0205_lod1_specteam.dds",
                 },

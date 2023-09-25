@@ -63,11 +63,11 @@ UnitBlueprint{
             LODs = {
                 {
                     LODCutoff = 50,
-                    ShaderName = "Unit",
+                    ShaderName = "UEFNavy",
                 },
                 {
                     LODCutoff = 215,
-                    ShaderName = "Unit",
+                    ShaderName = "UEFNavy",
                     AlbedoName = "ueb2109_lod1_albedo.dds",
                     SpecularName = "ueb2109_lod1_specteam.dds",
                 },

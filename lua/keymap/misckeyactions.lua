@@ -650,3 +650,7 @@ SelectAllResourceConsumers = function(onscreen)
 
     SelectUnits(units)
 end
+
+TogglePerformanceMetricsWindow = function()
+    local instance = import("/lua/ui/lobby/sim-performance-popup.lua").OpenWindow()
+end
