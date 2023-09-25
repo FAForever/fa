@@ -419,7 +419,7 @@ UnitBlueprint{
             BuildTime = 4675,
             Icon = "efm",
             Name = "<LOC enhancements_0022>Rapid Fabricator",
-            NewBuildRate = 75,
+            NewBuildRate = 65,
             Slot = "RCH",
             UpgradeUnitAmbientBones = { "UAL0301" },
         },
