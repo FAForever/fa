@@ -164,6 +164,14 @@ local function OverchargeDecalFunc()
     )
 end
 
+--- Reticle for displaying variable teleport cost information on the cursor
+---@param self WorldView
+---@field commandMode table
+---@field ePrefix Text
+---@field tPrefix Text
+---@field eText Text
+---@field tText Text
+---@field Trash TrashBag
 local Reticle = ClassUI(Group) {
     __init = function(self, parent, commandMode)
         Group.__init(self, parent)
