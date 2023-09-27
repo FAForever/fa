@@ -17,9 +17,8 @@ local Prefs = import("/lua/user/prefs.lua")
 local OverchargeCanKill = import("/lua/ui/game/unitview.lua").OverchargeCanKill
 local CommandMode = import("/lua/ui/game/commandmode.lua")
 
-local TeleportCostFunction = import("/lua/shared/teleport.lua").TeleportCostFunction
-
-
+local TeleportReticle = import("/lua/ui/controls/reticle.lua").TeleportReticle
+local TestReticle = import("/lua/ui/controls/reticle.lua").TestReticle
 
 WorldViewParams = {
     ui_SelectTolerance = 7.0,
@@ -163,59 +162,6 @@ local function OverchargeDecalFunc()
         end
     )
 end
-
---- Reticle for displaying variable teleport cost information on the cursor
----@param self WorldView
----@field commandMode table
----@field ePrefix Text
----@field tPrefix Text
----@field eText Text
----@field tText Text
----@field Trash TrashBag
-local Reticle = ClassUI(Group) {
-    __init = function(self, parent, commandMode)
-        Group.__init(self, parent)
-        self.commandMode = commandMode
-        LayoutHelpers.SetDimensions(self, 64, 64)
-        LayoutHelpers.AtLeftIn(self, parent, 0)
-        LayoutHelpers.AtTopIn(self, parent, 0)
-        self:CreateText()
-        self:SetNeedsFrameUpdate(true)
-    end,
-
-    CreateText = function(self)
-        self.Trash = TrashBag()
-        self.ePrefix = UIUtil.CreateText(self, "Eng Cost: ", 16, UIUtil.bodyFont, true)
-        self.tPrefix = UIUtil.CreateText(self, "Max Time: ", 16, UIUtil.bodyFont, true)
-        self.eText = UIUtil.CreateText(self, "eCost", 16, UIUtil.bodyFont, true)
-        self.tText = UIUtil.CreateText(self, "tCost", 16, UIUtil.bodyFont, true)
-        self.Trash:Add(self.ePrefix)
-        self.Trash:Add(self.tPrefix)
-        self.Trash:Add(self.eText)
-        self.Trash:Add(self.tText)
-        LayoutHelpers.RightOf(self.ePrefix, self, 4)
-        LayoutHelpers.RightOf(self.eText, self.ePrefix, 0)
-        LayoutHelpers.Below(self.tPrefix, self.ePrefix, 4)
-        LayoutHelpers.RightOf(self.tText, self.tPrefix, 0)
-
-        self.ePrefix:SetColor('654bc2')
-        self.tPrefix:SetColor('654bc2')
-        self.eText:SetColor('ffff00')
-    end,
-
-    OnDestroy = function(self)
-        self:SetNeedsFrameUpdate(false)
-        self.Trash:Destroy()
-    end,
-
-    OnFrame = function(self, elapsedTime)
-        self.eText:SetText(string.format('%.0f', self.commandMode[2].eCost))
-        self.tText:SetText(string.format('%.2f', self.commandMode[2].tCost))
-        local pos = GetMouseScreenPos()
-        self.Left:Set(pos[1] - self.Width()/2)
-        self.Top:Set(pos[2] - self.Height()/2)
-    end,
-}
 
 --- A dictionary that takes a command name and maps it to the respective callback of the WorldView class
 local orderToCursorCallback = {
@@ -435,6 +381,7 @@ WorldView = ClassUI(moho.UIWorldView, Control) {
         -- clean up previous cursor
         if not (self.CursorLastEvent == event) and self[self.CursorLastEvent] then
             self[self.CursorLastEvent](self, self.CursorLastIdentifier, false, false)
+            self.CursorTrash:Destroy()
         end
 
         -- attempt to create a new cursor
@@ -500,7 +447,6 @@ WorldView = ClassUI(moho.UIWorldView, Control) {
                 self.Cursor[3] = nil
                 self.Cursor[4] = nil
                 self.Cursor[5] = nil
-
                 GetCursor():Reset()
             end
         end
@@ -668,29 +614,12 @@ WorldView = ClassUI(moho.UIWorldView, Control) {
     ---@param changed boolean
     OnCursorTeleport = function(self, identifier, enabled, changed, commandData)
         if enabled then
-            local commandMode = CommandMode.GetCommandMode()
             if changed then
                 local cursor = self.Cursor
                 cursor[1], cursor[2], cursor[3], cursor[4], cursor[5] = UIUtil.GetCursor(identifier)
                 self:ApplyCursor()
-                
-                commandMode[2].reticle = Reticle(self, commandMode)
-                self.Trash:Add(commandMode[2].reticle)
-                self.CursorTrash:Add(commandMode[2].reticle)
+                CommandMode.GetCommandMode()[2].reticle = TeleportReticle(self)
             end
-
-            local mousePos = GetMouseWorldPos()
-            commandMode[2].eCost, commandMode[2].tCost = 0,0
-
-            for _, unit in GetSelectedUnits() do
-                local eCost, tCost = TeleportCostFunction(unit, mousePos)
-                commandMode[2].eCost = commandMode[2].eCost + eCost
-                if tCost > commandMode[2].tCost then
-                    commandMode[2].tCost = tCost
-                end
-            end
-        else
-            self.CursorTrash:Destroy()
         end
     end,
 
