@@ -1,5 +1,5 @@
 --******************************************************************************************************
---** Copyright (c) 2022  Charles "clyf" Lyford
+--** Copyright (c) 2022  clyf
 --**
 --** Permission is hereby granted, free of charge, to any person obtaining a copy
 --** of this software and associated documentation files (the "Software"), to deal
@@ -46,6 +46,7 @@ TeleportCostFunction = function(unit, location)
         energyCost = math.pow(dist, 2)
         time = math.log(dist)
         
+        -- clamp time to teleDelay
         if time < teleDelay then
             time = teleDelay
         end
