@@ -2018,10 +2018,10 @@ function ReturnTransportsToPool(units, move)
             if move then
                 if safePath then
                     for _, p in safePath do
-                        IssueMove({unit}, p)
+                        IssueToUnitMove(unit, p)
                     end
                 else
-                    IssueMove({unit}, position)
+                    IssueToUnitMove(unit, position)
                 end
             end
         end
@@ -2112,7 +2112,7 @@ function EngineerMoveWithSafePath(aiBrain, unit, destination)
             -- Move to way points (but not to destination... leave that for the final command)
             for widx, waypointPath in path do
                 if pathSize ~= widx then
-                    IssueMove({unit}, waypointPath)
+                    IssueToUnitMove(unit, waypointPath)
                 end
             end
         end
@@ -3185,7 +3185,7 @@ function EngAvoidLocalDanger(aiBrain, eng)
             if VDist2Sq(engPos[1], engPos[3], enemyUnitPos[1], enemyUnitPos[3]) < 144 then
                 if unit and not IsDestroyed(unit) and unit:GetFractionComplete() == 1 then
                     if VDist2Sq(engPos[1], engPos[3], enemyUnitPos[1], enemyUnitPos[3]) < 156 then
-                        IssueClearCommands({eng})
+                        IssueToUnitClearCommands(eng)
                         IssueReclaim({eng}, unit)
                         action = true
                         break
@@ -3196,15 +3196,15 @@ function EngAvoidLocalDanger(aiBrain, eng)
             if VDist2Sq(engPos[1], engPos[3], enemyUnitPos[1], enemyUnitPos[3]) < 81 then
                 if unit and not IsDestroyed(unit) and unit:GetFractionComplete() == 1 then
                     if VDist2Sq(engPos[1], engPos[3], enemyUnitPos[1], enemyUnitPos[3]) < 156 then
-                        IssueClearCommands({eng})
+                        IssueToUnitClearCommands(eng)
                         IssueReclaim({eng}, unit)
                         action = true
                         break
                     end
                 end
             else
-                IssueClearCommands({eng})
-                IssueMove({eng}, ShiftPosition(enemyUnitPos, engPos, 50, false))
+                IssueToUnitClearCommands(eng)
+                IssueToUnitMove(eng, ShiftPosition(enemyUnitPos, engPos, 50, false))
                 coroutine.yield(60)
                 action = true
             end
@@ -3223,7 +3223,7 @@ function EngLocalExtractorBuild(aiBrain, eng)
     local action = false
     local bool,markers=CanBuildOnLocalMassPoints(aiBrain, eng:GetPosition(), 25)
     if bool then
-        IssueClearCommands({eng})
+        IssueToUnitClearCommands(eng)
         local factionIndex = aiBrain:GetFactionIndex()
         local buildingTmplFile = import('/lua/BuildingTemplates.lua')
         local buildingTmpl = buildingTmplFile[('BuildingTemplates')][factionIndex]
@@ -3279,6 +3279,47 @@ function CanBuildOnLocalMassPoints(aiBrain, engPos, distance)
     end
 end
 
+---@param aiBrain AIBrain
+---@param engPos table
+---@param distance number
+---@return boolean
+---@return table
+function CanBuildOnGridMassPoints(aiBrain, engPos, distance, layer)
+    -- Checks if an engineer can build on mass points close to its location
+    -- will return a bool if it found anything and if it did then a table of mass markers
+    -- the BorderWarning is used to tell the AI that the mass marker is too close to the map border
+    local pointDistance = distance * distance
+    local depositsGrid = aiBrain.GridDeposits
+    if not depositsGrid then
+        WARN('GridDeposits class is not setup for AI')
+        return
+    end
+    local massMarkers = depositsGrid:GetResourcesWithinDistance('Mass', engPos, distance, layer)
+    local NavUtils = import("/lua/sim/navutils.lua")
+    local validMassMarkers = {}
+    for _, v in massMarkers do
+        if v.type == 'Mass' then
+            local massBorderWarn = false
+            if v.position[1] <= 8 or v.position[1] >= ScenarioInfo.size[1] - 8 or v.position[3] <= 8 or v.position[3] >= ScenarioInfo.size[2] - 8 then
+                massBorderWarn = true
+            end 
+            local mexDistance = VDist2Sq( v.position[1],v.position[3], engPos[1], engPos[3] )
+            if mexDistance < pointDistance and aiBrain:CanBuildStructureAt('ueb1103', v.position) and NavUtils.CanPathTo('Amphibious', engPos, v.position) then
+                table.insert(validMassMarkers, {Position = v.position, Distance = mexDistance , MassSpot = v, BorderWarning = massBorderWarn})
+            end
+        end
+    end
+    if table.getn(validMassMarkers) > 0 then
+        LOG('Close mass markers '..repr(validMassMarkers))
+    end
+    table.sort(validMassMarkers, function(a,b) return a.Distance < b.Distance end)
+    if table.getn(validMassMarkers) > 0 then
+        return true, validMassMarkers
+    else
+        return false
+    end
+end
+
 ---@param eng Unit
 ---@param minimumReclaim number
 ---@return boolean
@@ -3308,7 +3349,7 @@ function EngPerformReclaim(eng, minimumReclaim)
             end
         end
         if table.getn(closeReclaim) > 0 then
-            IssueClearCommands({eng})
+            IssueToUnitClearCommands(eng)
             for _, rec in closeReclaim do
                 IssueReclaim({eng}, rec)
             end

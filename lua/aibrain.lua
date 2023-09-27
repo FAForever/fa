@@ -1129,7 +1129,7 @@ AIBrain = Class(AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerCom
                             unit.PlatoonHandle:PlatoonDisbandNoAssign()
                         end
                         IssueStop({ unit })
-                        IssueClearCommands({ unit })
+                        IssueToUnitClearCommands(unit)
                     end
                 end
             end

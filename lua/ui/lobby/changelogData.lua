@@ -1,4 +1,4 @@
-last_version = 3767
+last_version = 3769
 
 ---@alias PatchNotesType "Hotfix"|"Developers patch"|"Balance patch"
 
@@ -12,6 +12,38 @@ last_version = 3767
 
 ---@type PatchNotes[]
 gamePatches = {
+    {
+        version = 3769,
+        name = "Hotfix",
+        description = {
+            "# Game version 3769 (24th of September, 2023)",
+            "",
+            "Please refer to the notes of versions 3765, 3766, 3767 and 3768 for the full patch notes.",
+            "",
+            "With gratitude to all those who took the time to report issues,",
+            "",
+            "Jip",
+            "",
+            "## Bug fixes",
+            "",
+            "- (#5454) Fix a bug that can enable the Seraphim MML to launch an endless barrage of missiles.",
+            "- (#5454) Fix a bug where the command queue is stuck on a launch order.",
+            "",
+            "This specifically occurred with the tech 3 strategic submarines and the tech 3 Seraphim battleship. As a result, the unit would be 'stuck' on the ",
+            "launch order, and any other order issued after the launch order would never be executed.",
+            "",
+            "- (#5454) Fix a bug where distributed launch orders would not actually launch a missile.",
+            "",
+            "This occurs when you issue launch orders and then distribute them. The new, distributed orders are processed and removed from the queue even though ",
+            "no missiles have been launched.",
+            "",
+            "## Contributors",
+            "",
+            "With thanks to the following individuals who contributed through coding:",
+            "",
+            "- Jip",
+        }
+    },
     {
         version = 3767,
         name = "Hotfix",
