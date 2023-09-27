@@ -211,6 +211,7 @@ UnitBlueprint{
         TeleportEnergyMod = 5.42,
         TeleportMassMod = 0,
         TeleportTimeMod = 0.0001,
+        UseProportionalTeleportCosts = true,
     },
     EnhancementPresets = {
         AdvancedCombat = {
@@ -527,7 +528,7 @@ UnitBlueprint{
             },
         },
         SelectionPriority = 3,
-        TeleportDelay = 10,
+        TeleportDelay = 3,
     },
     Intel = {
         FreeIntel = true,

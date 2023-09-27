@@ -39,30 +39,30 @@ TeleportCostFunction = function(unit, location)
     local bpEco = bp.Economy
     local energyCost, time
     
-    --[[
-    Old function here, for reference:
-    if bpEco then
-        local mass = (bpEco.TeleportMassCost or bpEco.BuildCostMass or 1) * (bpEco.TeleportMassMod or 0.01)
-        local energy = (bpEco.TeleportEnergyCost or bpEco.BuildCostEnergy or 1) * (bpEco.TeleportEnergyMod or 0.01)
-        energyCost = mass + energy
-        time = energyCost * (bpEco.TeleportTimeMod or 0.01)
-    end
+    if bpEco.UseProportionalTeleportCosts then
+        -- New function
+        -- energy cost is dist^2
+        -- time cost is natural log of dist
+        energyCost = math.pow(dist, 2)
+        time = math.log(dist)
+        
+        if time < teleDelay then
+            time = teleDelay
+        end
+    else
+        -- original cost function
+        if bpEco then
+            local mass = (bpEco.TeleportMassCost or bpEco.BuildCostMass or 1) * (bpEco.TeleportMassMod or 0.01)
+            local energy = (bpEco.TeleportEnergyCost or bpEco.BuildCostEnergy or 1) * (bpEco.TeleportEnergyMod or 0.01)
+            energyCost = mass + energy
+            time = energyCost * (bpEco.TeleportTimeMod or 0.01)
+        end
 
-    if teleDelay then
-        energyCostMod = (time + teleDelay) / time
-        time = time + teleDelay
-        energyCost = energyCost * energyCostMod
-    end
-    ]]
-
-    -- New function
-    -- energy cost is dist^2
-    -- time cost is natural log of dist
-    energyCost = math.pow(dist, 2)
-    time = math.log(dist)
-    
-    if time < teleDelay then
-        time = teleDelay
+        if teleDelay then
+            energyCostMod = (time + teleDelay) / time
+            time = time + teleDelay
+            energyCost = energyCost * energyCostMod
+        end
     end
 
     return energyCost, time, teleDelay

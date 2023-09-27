@@ -224,6 +224,7 @@ UnitBlueprint{
         TeleportEnergyMod = 0.03,
         TeleportMassMod = 0,
         TeleportTimeMod = 0.0001,
+        UseProportionalTeleportCosts = true,
     },
     Enhancements = {
         AdvancedEngineering = {
@@ -666,7 +667,7 @@ UnitBlueprint{
         },
         QuickSelectPriority = 1,
         SelectionPriority = 3,
-        TeleportDelay = 10,
+        TeleportDelay = 3,
     },
     Intel = {
         FreeIntel = true,
