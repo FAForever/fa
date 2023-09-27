@@ -35,8 +35,8 @@ GridDeposits = Class(Grid) {
             end
         end
 
-        --self:Update()
-        self:DebugUpdate()
+        -- self:Update()
+        -- self:DebugUpdate()
     end,
 
     --- Converts a world position to a cell

@@ -110,6 +110,11 @@ end
 function GetMarkersByType(type)
     type = MapMarkerType(type)
 
+    -- defensive programming
+    if not type then
+        return {} , 0
+    end
+
     -- check if it is cached and return that
     local cache = MarkerCache[type]
     if cache then
@@ -138,7 +143,7 @@ function GetMarkersByType(type)
     end
 
     -- tell us about it, for now
-    SPEW("Caching " .. n - 1 .. " markers of type " .. type .. "!")
+    SPEW("Caching " .. n - 1 .. " markers of type " .. tostring(type) .. "!")
 
     -- construct the cache
     cache = {
@@ -155,6 +160,11 @@ end
 ---@param markers any
 function OverwriteMarkerByType(type, markers)
     type = MapMarkerType(type)
+
+    -- defensive programming
+    if not type then
+        return {} , 0
+    end
 
     local ms = {}
     local n = 1
@@ -178,7 +188,7 @@ function OverwriteMarkerByType(type, markers)
         Markers = ms
     }
 
-    SPEW("Overwriting " .. n - 1 .. " markers of type " .. type .. " in cache!")
+    SPEW("Overwriting " .. n - 1 .. " markers of type " .. tostring(type) .. " in cache!")
 end
 
 --- Flushes the cache of a certain type. Does not remove
@@ -186,6 +196,11 @@ end
 ---@param type MarkerType The type to flush.
 function FlushMarkerCacheByType(type)
     type = MapMarkerType(type)
+
+    -- defensive programming
+    if not type then
+        return
+    end
 
     -- give developer a warning, you can't do this
     if type == "Mass" or type == "Hydrocarbon" or type == "Spawn" then
@@ -342,7 +357,13 @@ function ToggleDebugMarkersByType(type)
 
                         if marker.Extractors then
                             for _, neighbour in marker.Extractors do
-                                DrawLine(marker.Position, neighbour.Position, neighbour.Color or 'ffffffff')
+                                DrawLine(marker.Position, neighbour.Position, '3BFF55')
+                            end
+                        end
+
+                        if marker.HydrocarbonPlants then
+                            for _, neighbour in marker.HydrocarbonPlants do
+                                DrawLine(marker.Position, neighbour.Position, 'F2FF3B')
                             end
                         end
                     end
@@ -460,10 +481,12 @@ function Setup()
     -- prepare spawn markers
     local armies = table.hash(ListArmies())
     for k, marker in AllMarkers do
-        if armies[k] then
+        if string.sub(k, 1, 5) == 'ARMY_' then
             marker.Name = k
             marker.Position = marker.position
-            marker.size = 50
+            marker.size = 25
+            marker.Size = 25
+            marker.IsOccupied = (armies[k] and true) or false
             MarkerCache["Spawn"].Count = MarkerCache["Spawn"].Count + 1
             MarkerCache["Spawn"].Markers[MarkerCache["Spawn"].Count] = marker
         end

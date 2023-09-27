@@ -105,8 +105,8 @@ function Generate()
     local largeExpansions, largeExpansionCount = import("/lua/sim/markerutilities.lua").GetMarkersByType('Large Expansion Area') --[[@as (MarkerExpansion[])]]
     local smallExpansions, smallExpansionCount = import("/lua/sim/markerutilities.lua").GetMarkersByType('Expansion Area') --[[@as (MarkerExpansion[])]]
 
-    if largeExpansionCount == 0 and smallExpansionCount == 0 then
-        WARN("Unable to generate rally point markers without expansion markers")
+    if (largeExpansionCount == 0) and (smallExpansionCount == 0) and (spawnCount == 0) then
+        WARN("Unable to generate naval area markers without expansion markers")
         import("/lua/sim/markerutilities.lua").OverwriteMarkerByType('Naval Area', Markers)
         return
     end

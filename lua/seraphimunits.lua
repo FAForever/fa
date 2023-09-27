@@ -572,7 +572,7 @@ SEnergyBallUnit = ClassUnit(SHoverLandUnit) {
             -- Queue up random moves
             local x, y,z = unpack(self:GetPosition())
             for i = 1, 100 do
-                IssueMove({self}, {x + Random(-bp.MaxMoveRange, bp.MaxMoveRange), y, z + Random(-bp.MaxMoveRange, bp.MaxMoveRange)})
+                IssueToUnitMove(self, {x + Random(-bp.MaxMoveRange, bp.MaxMoveRange), y, z + Random(-bp.MaxMoveRange, bp.MaxMoveRange)})
             end
 
             -- Weapon information

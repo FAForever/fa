@@ -499,7 +499,7 @@ function AINewExpansionBase(aiBrain, baseName, position, builder, constructionDa
             aiBrain.BuilderManagers[baseName].EngineerManager:AddUnit(builder, true)
             return
         end
-
+        
         aiBrain:AddBuilderManagers(position, radius, baseName, true)
 
         -- Move the engineer to the new base managers
@@ -836,7 +836,7 @@ function AIMaintainBuildList(aiBrain, builder, buildingTemplate, brainBaseTempla
                             if m > 1 then
                                 if aiBrain:CanBuildStructureAt(v.StructureCategory, BuildToNormalLocation(location)) then
                                     IssueStop({builder})
-                                    IssueClearCommands({builder})
+                                    IssueToUnitClearCommands(builder)
                                     aiBrain:BuildStructure(builder, v.StructureCategory, location, false)
                                     return true
                                 end
@@ -846,7 +846,7 @@ function AIMaintainBuildList(aiBrain, builder, buildingTemplate, brainBaseTempla
                 end
             elseif aiBrain:FindPlaceToBuild(v.StructureType, v.StructureCategory,  brainBaseTemplate.Template, false, v.CloseToBuilder) then
                 IssueStop({builder})
-                IssueClearCommands({builder})
+                IssueToUnitClearCommands(builder)
                 if AIExecuteBuildStructure(aiBrain, builder, v.StructureType , v.CloseToBuilder, false, buildingTemplate, brainBaseTemplate.Template) then
                     return true
                 end

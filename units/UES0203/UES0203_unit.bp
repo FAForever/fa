@@ -2,10 +2,6 @@ UnitBlueprint{
     Description = "<LOC ues0203_desc>Attack Submarine",
     AI = {
         GuardReturnRadius = 30,
-        TargetBones = {
-            "Spinner",
-            "UES0203",
-        },
     },
     Audio = {
         AmbientMove    = Sound { Bank = 'UES',        Cue = 'UES0203_Move_Loop',  LodCutoff = 'UnitMove_LodCutoff' },
@@ -85,11 +81,11 @@ UnitBlueprint{
             LODs = {
                 {
                     LODCutoff = 100,
-                    ShaderName = "Unit",
+                    ShaderName = "UEFNavy",
                 },
                 {
                     LODCutoff = 215,
-                    ShaderName = "Unit",
+                    ShaderName = "UEFNavy",
                     AlbedoName = "ues0203_lod1_albedo.dds",
                     SpecularName = "ues0203_lod1_specteam.dds",
                 },
