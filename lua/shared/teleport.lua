@@ -39,7 +39,7 @@ TeleportCostFunction = function(unit, location)
     local bpEco = bp.Economy
     local energyCost, time
     
-    if bpEco.UseProportionalTeleportCosts then
+    if bpEco.UseVariableTeleportCosts then
         -- New function
         -- energy cost is dist^2
         -- time cost is natural log of dist

@@ -207,7 +207,7 @@ UnitBlueprint{
         TeleportEnergyMod = 5.16,
         TeleportMassMod = 0,
         TeleportTimeMod = 0.0001,
-        UseProportionalTeleportCosts = true,
+        UseVariableTeleportCosts = true,
     },
     EnhancementPresets = {
         Engineer = {
