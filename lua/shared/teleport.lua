@@ -26,11 +26,16 @@
 
 --- Formula to compute the energy and time cost of a teleport.
 
+-- Local performance upvalues
+local VDist3 = VDist3
+local MathPow = math.pow
+local MathLog = math.log
+
 ---@param unit Unit | UserUnit
 ---@param location Vector
 ---@return number energyCost
 ---@return number time
----@return number teleDelay
+---@return number? teleDelay
 TeleportCostFunction = function(unit, location)
     local bp = unit.Blueprint or unit:GetBlueprint()
     local pos = unit:GetPosition()
@@ -43,11 +48,11 @@ TeleportCostFunction = function(unit, location)
         -- New function
         -- energy cost is dist^2
         -- time cost is natural log of dist
-        energyCost = math.pow(dist, 2)
-        time = math.log(dist)
+        energyCost = MathPow(dist, 2)
+        time = MathLog(dist)
         
         -- clamp time to teleDelay
-        if time < teleDelay then
+        if teleDelay and time < teleDelay then
             time = teleDelay
         end
     else

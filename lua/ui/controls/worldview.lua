@@ -17,8 +17,7 @@ local Prefs = import("/lua/user/prefs.lua")
 local OverchargeCanKill = import("/lua/ui/game/unitview.lua").OverchargeCanKill
 local CommandMode = import("/lua/ui/game/commandmode.lua")
 
-local TeleportReticle = import("/lua/ui/controls/reticle.lua").TeleportReticle
-local TestReticle = import("/lua/ui/controls/reticle.lua").TestReticle
+local TeleportReticle = import("/lua/ui/controls/reticles/teleport.lua").TeleportReticle
 
 WorldViewParams = {
     ui_SelectTolerance = 7.0,

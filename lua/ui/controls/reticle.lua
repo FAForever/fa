@@ -24,25 +24,25 @@ local UIUtil = import("/lua/ui/uiutil.lua")
 local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
 local Group = import("/lua/maui/group.lua").Group
 
-local TeleportCostFunction = import("/lua/shared/teleport.lua").TeleportCostFunction
-
 -- Local upvalues for performance
 local GetMouseScreenPos = GetMouseScreenPos
 local GetMouseWorldPos = GetMouseWorldPos
-local GetSelectedUnits = GetSelectedUnits
 
 --- Reticle base class for displaying images and texts on the cursor
 ---@class Reticle : Group
 ---@field parent WorldView
 ---@field Trash TrashBag
 ---@field onMap boolean
+---@field mapX number
+---@field mapZ number
 Reticle = ClassUI(Group) {
+
     __init = function(self, parent, data)
         -- update our basic information
         Group.__init(self, parent)
-        self.parent = parent
-        self.parent.Trash:Add(self)
-        self.parent.CursorTrash:Add(self)
+        self.WorldView = parent
+        self.WorldView.Trash:Add(self)
+        self.WorldView.CursorTrash:Add(self)
         --self.Trash = TrashBag()
         self.onMap = false
         self.changedOnMap = true
@@ -50,7 +50,7 @@ Reticle = ClassUI(Group) {
         -- get map dimensions for on and off map update check
         local scenarioInfo = SessionGetScenarioInfo()
         self.mapX, self.mapZ = scenarioInfo.PlayableAreaWidth, scenarioInfo.PlayableAreaHeight
-        
+
         -- set dimensions, default 64x64
         local xDim, yDim = data.xDim or 64, data.yDim or 64
         LayoutHelpers.SetDimensions(self, xDim, yDim)
@@ -65,6 +65,7 @@ Reticle = ClassUI(Group) {
 
         -- update us on frame
         self:SetNeedsFrameUpdate(true)
+        self:DisableHitTest(true)
     end,
 
     --- create and set the initial position of our child components
@@ -73,14 +74,13 @@ Reticle = ClassUI(Group) {
     end,
 
     --- update all our child components
-    UpdateLayout = function(self, mouseWorldPos, changed)
+    UpdateDisplay = function(self, mouseWorldPos, changed)
         -- override me!
     end,
 
     --- function to update our on/off map state and see if it changed
     ---@param self Reticle
     ---@param mouseWorldPos Vector
-    ---@return boolean
     UpdateOnMapStatus = function(self, mouseWorldPos)
         if ((mouseWorldPos[1] < 1 or mouseWorldPos[1] > self.mapX - 1) or
         (mouseWorldPos[3] < 1 or mouseWorldPos[3] > self.mapZ - 1)) == self.onMap then
@@ -89,12 +89,20 @@ Reticle = ClassUI(Group) {
         end
     end,
 
+    --- updates the position of our reticle to align with our mouse
+    ---@param self any
+    UpdatePosition = function(self)
+        local pos = GetMouseScreenPos()
+        self.Left:Set(pos[1] - self.Width()/2)
+        self.Top:Set(pos[2] - self.Height()/2)
+    end,
+
     --- frame update function
     ---@param self any
     ---@param elapsedTime any
     OnFrame = function(self, elapsedTime)
         -- update if we're over the world, hide it otherwise
-        if self.parent.CursorOverWorld then
+        if self.WorldView.CursorOverWorld then
 
             -- update our on/offMap state and track if it changed
             local mouseWorldPos = GetMouseWorldPos()
@@ -107,12 +115,10 @@ Reticle = ClassUI(Group) {
             end
 
             -- update our layout
-            self:UpdateLayout(mouseWorldPos)
+            self:UpdateDisplay(mouseWorldPos)
 
             -- move our reticle to a position centered on the mouse
-            local pos = GetMouseScreenPos()
-            self.Left:Set(pos[1] - self.Width()/2)
-            self.Top:Set(pos[2] - self.Height()/2)
+            self:UpdatePosition()
         else
             if not self:IsHidden() then
                 self:Hide()
@@ -146,7 +152,7 @@ TestReticle = ClassUI(Reticle) {
         LayoutHelpers.RightOf(self.mouseZText, self.mouseZPrefix, 0)
     end,
 
-    UpdateLayout = function(self, mouseWorldPos)
+    UpdateDisplay = function(self, mouseWorldPos)
         if self.onMap then
             if self.changedOnMap then
                 self.onMapText:SetText("On Map")
@@ -165,52 +171,4 @@ TestReticle = ClassUI(Reticle) {
             end
         end
     end,
-}
-
---- Reticle for teleport cost info
----@class TeleportReticle : Reticle
----@field ePrefix Text
----@field tPrefix Text
----@field eText Text
----@field tText Text
-TeleportReticle = ClassUI(Reticle) {
-
-    SetLayout = function(self)
-        self.ePrefix = UIUtil.CreateText(self, "Eng Cost: ", 16, UIUtil.bodyFont, true)
-        self.tPrefix = UIUtil.CreateText(self, "Max Time: ", 16, UIUtil.bodyFont, true)
-        self.eText = UIUtil.CreateText(self, "eCost", 16, UIUtil.bodyFont, true)
-        self.tText = UIUtil.CreateText(self, "tCost", 16, UIUtil.bodyFont, true)
-        LayoutHelpers.RightOf(self.ePrefix, self, 4)
-        LayoutHelpers.RightOf(self.eText, self.ePrefix, 0)
-        LayoutHelpers.Below(self.tPrefix, self.ePrefix, 4)
-        LayoutHelpers.RightOf(self.tText, self.tPrefix, 0)
-
-        self.ePrefix:SetColor('654bc2')
-        self.tPrefix:SetColor('654bc2')
-        self.eText:SetColor('ffff00')
-    end,
-
-    UpdateLayout = function(self, mouseWorldPos)
-        if self.onMap then
-            local eCost, tCost = 0,0
-            -- add up our teleport energy costs and find the max time
-            for _, unit in GetSelectedUnits() do
-                local eCache, tCache = TeleportCostFunction(unit, mouseWorldPos)
-                eCost = eCost + eCache
-                if tCache > tCost then
-                    tCost = tCache
-                end
-            end
-            -- update our text
-            self.eText:SetText(string.format('%.0f', eCost))
-            self.tText:SetText(string.format('%.2f', tCost))
-        else
-            if self.changedOnMap then
-                self.eText:SetText('--')
-                self.tText:SetText('--')
-                self.changedOnMap = false
-            end
-        end
-    end,
-
 }
