@@ -527,6 +527,8 @@ Projectile = ClassProjectile(ProjectileMethods) {
 
     ---@param self Projectile
     RetargetThread = function (self)
+        local createdByWeapon = self.CreatedByWeapon
+
         for k = 1, 5 do
             WaitTicks(0.2)
 
@@ -534,11 +536,11 @@ Projectile = ClassProjectile(ProjectileMethods) {
                 return
             end
 
-            if IsDestroyed(self.CreatedByWeapon) then
+            if IsDestroyed(createdByWeapon) then
                 return
             end
 
-            local target = self.CreatedByWeapon:GetCurrentTarget()
+            local target = createdByWeapon:GetCurrentTarget()
             if target then
                 self:SetNewTarget(target)
                 self:TrackTarget(true)
