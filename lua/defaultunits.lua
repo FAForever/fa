@@ -31,7 +31,7 @@ MassStorageUnit = import("/lua/defaultunits/massstorage.lua").MassStorageUnit
 EnergyCreationUnit = import("/lua/defaultunits/energycreation.lua").EnergyCreationUnit
 EnergyStorageUnit = import("/lua/defaultunits/energystorage.lua").EnergyStorageUnit
 
--- MobileUnit = import("/lua/defaultunits/mobile.lua").MobileUnit
+MobileUnit = import("/lua/defaultunits/mobile.lua").MobileUnit
 WalkingLandUnit = import("/lua/defaultunits/walkingland.lua").WalkingLandUnit
 SubUnit = import("/lua/defaultunits/sub.lua").SubUnit
 AirUnit = import("/lua/defaultunits/air.lua").AirUnit
