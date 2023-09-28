@@ -3,7 +3,8 @@ local weaponTargetCheckUpperLimit = 6000
 
 ---@param unit UnitBlueprint
 ---@param weapon WeaponBlueprint
-local function ProcessWeapon(unit, weapon)
+---@param projectile? ProjectileBlueprint
+local function ProcessWeapon(unit, weapon, projectile)
     -- pre-compute flags   
     local isAir = false
     local isStructure = false
@@ -71,6 +72,13 @@ local function ProcessWeapon(unit, weapon)
         if weapon.TargetCheckInterval > 3 then
             weapon.TargetCheckInterval = 3
         end
+
+        -- allow weapons that retarget to have a relative fast target check interval
+        if projectile then
+            if projectile.Physics.TrackTarget and weapon.TargetCheckInterval > 0.8 then
+                weapon.TargetCheckInterval = 0.8
+            end
+        end
     end
 
     -- process target tracking radius 
@@ -133,8 +141,9 @@ local function ProcessWeapon(unit, weapon)
     weapon.TrackingRadius = 0.1 * math.floor(10 * weapon.TrackingRadius)
 end
 
+---@param allBlueprints BlueprintsTable
 ---@param units UnitBlueprint[]
-function ProcessWeapons(units)
+function ProcessWeapons(allBlueprints, units)
     local StringLower = string.lower
 
     local unitsToSkip = {
@@ -146,7 +155,17 @@ function ProcessWeapons(units)
             if unit.Weapon then
                 for _, weapon in unit.Weapon do
                     if not weapon.DummyWeapon then
-                        ProcessWeapon(unit, weapon)
+
+                        local projectile
+                        local projectileId = string.lower(tostring(weapon.ProjectileId))
+                        for k, projectile in allBlueprints.Projectile do
+                            if string.lower(tostring(projectile.Source)) == projectileId then
+                                projectile = projectile
+                                break
+                            end
+                        end
+
+                        ProcessWeapon(unit, weapon, projectile)
                     end
                 end
             end
