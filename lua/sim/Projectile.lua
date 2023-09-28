@@ -72,12 +72,13 @@ local ForkThread = ForkThread
 local CategoriesDoNotCollide = categories.TORPEDO + categories.MISSILE + categories.DIRECTFIRE
 local OnImpactDestroyCategories = categories.ANTIMISSILE * categories.ALLPROJECTILES
 
----@class Projectile : moho.projectile_methods
+---@class Projectile : moho.projectile_methods, InternalObject
 ---@field Blueprint ProjectileBlueprint
 ---@field Army number
 ---@field Trash TrashBag
 ---@field Launcher Unit
 ---@field DamageData table
+---@field CreatedByWeapon Weapon
 Projectile = ClassProjectile(ProjectileMethods) {
     IsProjectile = true,
     DestroyOnImpact = true,
@@ -512,14 +513,47 @@ Projectile = ClassProjectile(ProjectileMethods) {
     OnLostTarget = function(self)
         local bp = self.Blueprint.Physics
         local trackTarget = bp.TrackTarget
-        local onLostTargetLifetime = bp.OnLostTargetLifetime or 0.5
         if trackTarget then
-            self:SetLifetime(onLostTargetLifetime)
+            self.Trash:Add(ForkThread(self.RetargetThread, self))
         end
 
         local originalTarget = self.OriginalTarget
         if originalTarget and not (originalTarget.Dead or IsDestroyed(originalTarget)) then
             self:SetNewTarget(originalTarget)
+        end
+    end,
+
+    -- Lua functionality
+
+    ---@param self Projectile
+    RetargetThread = function (self)
+        local createdByWeapon = self.CreatedByWeapon
+
+        for k = 1, 5 do
+            WaitTicks(0.2)
+
+            if IsDestroyed(self) then
+                return
+            end
+
+            if IsDestroyed(createdByWeapon) then
+                return
+            end
+
+            local target = createdByWeapon:GetCurrentTarget()
+            if target then
+                self:SetNewTarget(target)
+                self:TrackTarget(true)
+                return
+            end
+        end
+
+        -- we couldn't find a new target, take us out
+        local bp = self.Blueprint.Physics
+        if bp.OnLostTargetLifetime then
+            self:SetLifetime(bp.OnLostTargetLifetime)
+        else
+            self:SetLifetime(0.5)
         end
     end,
 

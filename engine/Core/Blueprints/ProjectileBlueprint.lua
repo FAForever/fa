@@ -129,3 +129,4 @@
 ---@field RealisticOrdinance boolean
 --- bombs that always drop stright down
 ---@field StraightDownOrdinance boolean
+---@field OnLostTargetLifetime? number
