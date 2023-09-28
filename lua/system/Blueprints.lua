@@ -979,7 +979,7 @@ function PostModBlueprints(all_bps)
     SetUnitThreatValues(all_bps.Unit)
     BlueprintLoaderUpdateProgress()
 
-    ProcessWeapons(all_bps.Unit)
+    ProcessWeapons(all_bps, all_bps.Unit)
     BlueprintLoaderUpdateProgress()
 
     -- re-computes all the LODs of various entities to match the LOD with the size of the entity
