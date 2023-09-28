@@ -248,6 +248,7 @@ URL0402 = ClassUnit(CWalkingLandUnit) {
 
         self:CreateWreckage(0.1)
         self:Destroy()
+        
     end,
 
     ---@deprecated
@@ -327,8 +328,8 @@ URL0402 = ClassUnit(CWalkingLandUnit) {
                 self.Animator:SetDirectionalAnim(true)
                 self.Animator:SetRate(bpDisplay.AnimationWalkRate)
             end
-         end
-    end,	
+        end
+    end,
 }
 
 TypeClass = URL0402
