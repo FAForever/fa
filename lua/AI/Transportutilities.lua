@@ -534,7 +534,7 @@ function GetTransports( platoon, aiBrain)
     local transports = {}			-- this will hold the data for all of the eligible transports    
 	local out_of_range = false
     local FuelRequired = .5
-    local HealthRequired = .7
+    local HealthRequired = .2
 
     local id, range, unitPos
 
@@ -2121,24 +2121,97 @@ function WatchUnitUnload( transport, unitlist, destination, aiBrain, UnitPlatoon
     transport.Unloading = nil
 end
 
--- Processes air units at the end of work. Note we dont have an AirUnitRefitThread that handles transport yet so it is disabled.
+-- Processes air units at the end of work.
 function ProcessAirUnits( unit, aiBrain )
 	if (not unit.Dead) and (not IsBeingBuilt(unit)) then
         local fuel = GetFuelRatio(unit)
-		if ( fuel > -1 and fuel < .75 ) or unit:GetHealthPercent() < .80 then
+		local health = unit:GetHealthPercent()
+		if ( fuel > -1 and fuel < .75 ) or health < .2 then
             if not unit.InRefit then
                 if ScenarioInfo.TransportDialog then
-                    LOG("*AI DEBUG "..aiBrain.Nickname.." Air Unit "..unit.Sync.id.." assigned to AirUnitRefitThread ")
+                    LOG("*AI DEBUG "..aiBrain.Nickname.." Air Unit "..unit.Sync.id.." assigned to TransportReturnToBase ")
                 end
                 -- and send it off to the refit thread --
-                --unit:ForkThread( AirUnitRefitThread, aiBrain )
+                unit:ForkThread( TransportReturnToBase, aiBrain )
                 return true
             else
-                LOG("*AI DEBUG "..aiBrain.Nickname.." Air Unit "..unit.Sync.id.." "..unit:GetBlueprint().Description.." already in refit Thread")
+                LOG("*AI DEBUG "..aiBrain.Nickname.." Air Unit "..unit.Sync.id.." "..unit:GetBlueprint().Description.." already in return to base thread")
             end
 		end
 	end
 	return false    -- unit did not need processing
+end
+
+function TransportReturnToBase(unit, aiBrain)
+	if unit.Dead or unit.InRefit then
+        return
+    end
+	local NavUtils = import("/lua/sim/navutils.lua")
+
+	local ident = Random(100000,999999)
+	local rtbissued = false
+	local fuellimit = .75
+	local healthlimit = .2
+
+	local returnpool = aiBrain:MakePlatoon('AirRefit'..tostring(ident), 'none')
+	if not unit.Dead then
+		AssignUnitsToPlatoon( aiBrain, returnpool, {unit}, 'Unassigned', '')
+		unit.PlatoonHandle = returnpool
+	end
+	while (not unit.Dead) do
+		fuel = GetFuelRatio(unit)
+		health = unit:GetHealthPercent()
+		if ( fuel > -1 and fuel < fuellimit ) or health < healthlimit then
+			if health < healthlimit then
+				unit:Kill()
+			end
+			if not rtbissued then
+				-- find closest base
+				local bestBaseName
+				local bestDistSq
+				local platPos = returnpool:GetPlatoonPosition()
+				local returnPos
+				for baseName, base in aiBrain.BuilderManagers do
+					if base.Layer ~= 'Water' and base.EngineerManager and base.EngineerManager:GetNumCategoryUnits('Engineers', categories.ALLUNITS) > 0 then
+						local distSq = VDist2Sq(platPos[1], platPos[3], base.Position[1], base.Position[3])
+						if not bestDistSq or distSq < bestDistSq then
+							bestBaseName = baseName
+							bestDistSq = distSq
+						end
+					end
+				end
+				if bestBaseName then
+					unit.InRefit = true
+					rtbissued = true
+					if ScenarioInfo.TransportDialog then
+						LOG("*AI DEBUG "..aiBrain.Nickname.." Air Unit "..unit.Sync.id.." returning to base ")
+					end
+					returnPos = aiBrain.BuilderManagers[bestBaseName].Position
+					IssueStop ( {unit} )
+					IssueClearCommands( {unit} )
+					local safePath, reason = NavUtils.PathToWithThreatThreshold('Air', platPos, returnPos, aiBrain, NavUtils.ThreatFunctions.AntiAir, 50, aiBrain.IMAPConfig.Rings)
+					if safePath then
+						-- use path
+						for _,p in safePath do
+							IssueMove( {unit}, p )
+						end
+					else
+						-- go direct -- possibly bad
+						IssueMove( {unit}, returnPos )
+					end
+				end
+			end
+		-- otherwise we may have refueled/repaired ourselves or don't need it
+		else
+			unit.InRefit = nil
+			break
+		end
+		if rtbissued then
+			WaitTicks(21)
+		else
+			break
+		end
+	end
 end
 
 -- Supporting function. Should be replaced by navutils equivalent.
