@@ -3932,7 +3932,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
 
     --- Plays an ambient sound using the unit as a source. Returns true if successful, false otherwise
     ---@param self Unit
-    ---@param sound SoundBlueprint
+    ---@param sound string
     ---@return boolean
     PlayUnitAmbientSound = function(self, sound)
         local audio = self.Blueprint.Audio[sound]
