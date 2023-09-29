@@ -126,16 +126,6 @@ UAS0401 = ClassUnit(ASeaUnit, ExternalFactoryComponent) {
         ASeaUnit.OnLayerChange(self, new, old)
     end,
 
-    OnPaused = function(self)
-        ASeaUnit.OnPaused(self)
-        ExternalFactoryComponent.OnPaused(self)
-    end,
-
-    OnUnpaused = function(self)
-        ASeaUnit.OnUnpaused(self)
-        ExternalFactoryComponent.OnUnpaused(self)
-    end,
-
     RolloffBody = function(self)
     end,
 

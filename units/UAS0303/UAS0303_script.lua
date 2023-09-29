@@ -35,16 +35,6 @@ UAS0303 = ClassUnit(AircraftCarrier, ExternalFactoryComponent) {
         ChangeState(self, self.IdleState)
     end,
 
-    OnPaused = function(self)
-        AircraftCarrier.OnPaused(self)
-        ExternalFactoryComponent.OnPaused(self)
-    end,
-
-    OnUnpaused = function(self)
-        AircraftCarrier.OnUnpaused(self)
-        ExternalFactoryComponent.OnUnpaused(self)
-    end,
-
     OnLayerChange = function(self, new, old)
         AircraftCarrier.OnLayerChange(self, new, old)
     end,

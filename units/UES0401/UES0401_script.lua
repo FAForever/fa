@@ -50,16 +50,6 @@ UES0401 = ClassUnit(AircraftCarrier, ExternalFactoryComponent) {
         end
     end,
 
-    OnPaused = function(self)
-        AircraftCarrier.OnPaused(self)
-        ExternalFactoryComponent.OnPaused(self)
-    end,
-
-    OnUnpaused = function(self)
-        AircraftCarrier.OnUnpaused(self)
-        ExternalFactoryComponent.OnUnpaused(self)
-    end,
-
     StartBeingBuiltEffects = function(self, builder, layer)
         self:SetMesh(self:GetBlueprint().Display.BuildMeshBlueprint, true)
         if self:GetBlueprint().General.UpgradesFrom ~= builder.UnitId then
