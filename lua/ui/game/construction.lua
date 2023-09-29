@@ -1445,7 +1445,20 @@ function OnClickHandler(button, modifiers)
                 else
                     -- If the item to build can move, it must be built by a factory
                     -- TODO - what about mobile factories?
-                    IssueBlueprintCommand("UNITCOMMAND_BuildFactory", item.id, count)
+                    -- ... call it Tah-DONE..!
+                    local selection = GetSelectedUnits()
+                    local exFacs = EntityCategoryFilterDown(categories.EXTERNALFACTORY, selection)
+                    if not table.empty(exFacs) then
+                        local exFacUnits = EntityCategoryFilterOut(categories.EXTERNALFACTORY, selection)
+                        for _, exFac in exFacs do
+                            table.insert(exFacUnits, exFac:GetCreator())
+                        end
+                        -- in case we've somehow selected both the platform and the factory, only put the fac in once
+                        exFacUnits = table.unique(exFacUnits)
+                        IssueBlueprintCommandToUnits(exFacUnits, "UNITCOMMAND_BuildFactory", item.id, count)
+                    else
+                        IssueBlueprintCommand("UNITCOMMAND_BuildFactory", item.id, count)
+                    end
                 end
             end
         else
