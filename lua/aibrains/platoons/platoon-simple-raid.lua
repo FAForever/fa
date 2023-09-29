@@ -98,14 +98,6 @@ AIPlatoonSimpleRaidBehavior = Class(AIPlatoon) {
                 local selectionNumber = Random(1, candidateCount)
                 local expansion = candidates[selectionNumber]
                 self.LocationToRaid = expansion.position
-                if self.LocationToRaid then
-                    LOG('Location to raid is '..repr(self.LocationToRaid))
-                else
-                    LOG('Location to raid is nil')
-                    LOG(repr(expansion))
-                    LOG('Selection was '..selectionNumber)
-                    LOG('candidates '..repr(candidates))
-                end
                 self:ChangeState(self.Navigating)
                 return
             else
@@ -203,8 +195,6 @@ AIPlatoonSimpleRaidBehavior = Class(AIPlatoon) {
                                 self:ChangeState(self.Retreating)
                                 return
                             end
-                        else
-                            LOG('Threat and we need to attack then since it is allied, status '..positionStatus)
                         end
                     end
 
@@ -473,7 +463,6 @@ AIPlatoonSimpleRaidBehavior = Class(AIPlatoon) {
 ---@param units Unit[]
 DebugAssignToUnits = function(data, units)
     if units and not TableEmpty(units) then
-        LOG('Assigning Units to new platoon')
 
         -- meet platoon requirements
         import("/lua/sim/navutils.lua").Generate()

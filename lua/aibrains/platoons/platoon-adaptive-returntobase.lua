@@ -28,7 +28,6 @@ AIPlatoonAdaptiveReturnToBaseBehavior = Class(AIPlatoon) {
         --- Initial state of any state machine
         ---@param self AIPlatoonAdaptiveReturnToBaseBehavior
         Main = function(self)
-            LOG('Starting Guard State Machine')
             -- requires expansion markers
             if not import("/lua/sim/markerutilities/expansions.lua").IsGenerated() then
                 self:LogWarning('requires generated expansion markers')
