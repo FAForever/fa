@@ -5,24 +5,24 @@
 --SACU Presets
 
 --Aeon
-ual0301_Engineer_desc="SACU (Engineer Preset)"
-ual0301_Engineer_help="Enhanced during construction with Rapid Fabricator."
-ual0301_Engineer_name=""
-ual0301_NanoCombat_desc="SACU (Nano Combatant Preset)"
-ual0301_NanoCombat_help="Enhanced during construction with the Reacton Refractor and Nano-Repair System."
-ual0301_NanoCombat_name=""
-ual0301_Rambo_desc="SACU (Rambo Preset)"
-ual0301_Rambo_help="Enhanced during construction with the Heavy Personal Shield and Reacton Refractor."
-ual0301_Rambo_name=""
-ual0301_ShieldCombat_desc="SACU (Shield Combatant Preset)"
-ual0301_ShieldCombat_help="Enhanced during construction with the Personal Shield and Reacton Refractor."
-ual0301_ShieldCombat_name=""
-ual0301_SimpleCombat_desc="SACU (Combatant Preset)"
-ual0301_SimpleCombat_help="Enhanced during construction with the Reacton Refractor."
-ual0301_SimpleCombat_name=""
 ual0301_RAS_desc="SACU (RAS Preset)"
 ual0301_RAS_help="Enhanced during construction with a Resource Allocation System."
 ual0301_RAS_name=""
+ual0301_Engineer_desc="SACU (Engineer Preset)"
+ual0301_Engineer_help="Enhanced during construction with Rapid Fabricator."
+ual0301_Engineer_name=""
+ual0301_AdvEngineer_desc="SACU (Advanaced Engineer Preset)"
+ual0301_AdvEngineer_help="Enhanced during construction with the Rapid Replicator & Resource Allocation Enhancement."
+ual0301_AdvEngineer_name=""
+ual0301_SimpleCombat_desc="SACU (Combat Preset)"
+ual0301_SimpleCombat_help="Enhanced during construction with the Reacton Refractor (Gun AoE) & Nano-Repair System enhancement."
+ual0301_SimpleCombat_name=""
+ual0301_AdvanacedCombat_desc="SACU (Advanaced Combat Preset)"
+ual0301_AdvanacedCombat_help="Enhanced during construction with the reacton refractor ,nano-repair system and Light Shield enhancements."
+ual0301_AdvanacedCombat_name=""
+ual0301_ExperimentalCombat_desc="SACU (Experimental Combat Preset)"
+ual0301_ExperimentalCombat_help="Enhanced during construction with the Heavy Personal Shield and Reacton Refractor."
+ual0301_ExperimentalCombat_name=""
 
 --UEF
 uel0301_BubbleShield_desc="SACU (Shield Preset)"
@@ -1446,8 +1446,8 @@ Unit_Description_0018="Creates a protective Personal Shield around the SACU. Req
 Unit_Description_0019="Replaces the SACU's Personal Shield with a Bubble Shield which protects friendly units inside it. Requires additional energy to run. Shields transfer residual damage to intersecting bubbles."
 Unit_Description_0020="Adds a Radar Jammer which creates false radar images. Countered by omni sensors."
 Unit_Description_0021="Increases SACU's resource generation by 10 mass per second and 1000 energy per second."
-Unit_Description_0022="Greatly expands the range of the standard on-board SACU sensor systems."
-Unit_Description_0023="Primary weapon now fires 1.82 times as fast."
+Unit_Description_0022="Greatly expands the range of the standard on-board SACU sensor systems and Adds a Radar Jammer which creates false radar images. Countered by omni sensors."
+Unit_Description_0023="Primary weapon now fires 1.85 times as fast."
 Unit_Description_0024="Equips the standard SACU Cannon with Area-Of-Effect damage and much higher range."
 
 -- UEF -- Land Units
@@ -1763,7 +1763,7 @@ Unit_Description_0466_faf="Massively increases the range of the ACU's main canno
 
 -- AEON -- Support Commander Units/Upgrades
 Unit_Description_0167="A highly versatile combat and engineering unit useful on late-stage battlefields."
-Unit_Description_0168="Massively increases SACU build-power."
+Unit_Description_0168="Massively increases SACU build-power and Sacrifice System integration.."
 Unit_Description_0169="Increases SACU's resource generation by 10 mass per second and 1000 energy per second."
 Unit_Description_0170="Grants the Sacrifice ability, allowing the SACU to suicide itself to add its mass to another construction project instantly."
 Unit_Description_0171="Creates a protective Personal Shield around the SACU. Requires energy to run."
