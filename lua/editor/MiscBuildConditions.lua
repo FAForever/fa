@@ -373,15 +373,6 @@ end
 ---@return true | nil
 function ReclaimAvailableInGrid(aiBrain, locationType, mapSearch)
     -- this condition won't work without a reference to the reclaim grid
-    if aiBrain.ReclaimFailCounter > 10 then
-        local currentTime = GetGameTimeSeconds()
-        if aiBrain.ReclaimFailTimeStamp + 180 < currentTime then
-            aiBrain.ReclaimFailCounter = 0
-            aiBrain.ReclaimFailTimeStamp = 0
-        else
-            return false
-        end
-    end
     local gridReclaim = aiBrain.GridReclaim
     if not gridReclaim then
         WARN(string.format("Build condition ('ReclaimAvailableInGrid') requires a reference to the reclaim grid in the brain (of %s)", aiBrain.Nickname))
@@ -402,6 +393,20 @@ function ReclaimAvailableInGrid(aiBrain, locationType, mapSearch)
         return false
     end
 
+    return true
+end
+
+function ReclaimEnabledOnBrain(aiBrain)
+    -- this condition won't work without a reference to the reclaim grid
+    if aiBrain.ReclaimFailCounter > 10 then
+        local currentTime = GetGameTimeSeconds()
+        if aiBrain.ReclaimFailTimeStamp + 180 < currentTime then
+            aiBrain.ReclaimFailCounter = 0
+            aiBrain.ReclaimFailTimeStamp = 0
+        else
+            return false
+        end
+    end
     return true
 end
 
