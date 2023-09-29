@@ -2126,7 +2126,7 @@ function ProcessAirUnits( unit, aiBrain )
 	if (not unit.Dead) and (not IsBeingBuilt(unit)) then
         local fuel = GetFuelRatio(unit)
 		local health = unit:GetHealthPercent()
-		if ( fuel > -1 and fuel < .75 ) or health < .2 then
+		if ( fuel > -1 and fuel < .75 ) or health < .90 then
             if not unit.InRefit then
                 if ScenarioInfo.TransportDialog then
                     LOG("*AI DEBUG "..aiBrain.Nickname.." Air Unit "..unit.Sync.id.." assigned to TransportReturnToBase ")
@@ -2151,7 +2151,9 @@ function TransportReturnToBase(unit, aiBrain)
 	local ident = Random(100000,999999)
 	local rtbissued = false
 	local fuellimit = .75
-	local healthlimit = .2
+	local healthlimit = .90
+	local returnPos
+	local killUnitOnReturn = false
 
 	local returnpool = aiBrain:MakePlatoon('AirRefit'..tostring(ident), 'none')
 	if not unit.Dead then
@@ -2163,14 +2165,14 @@ function TransportReturnToBase(unit, aiBrain)
 		health = unit:GetHealthPercent()
 		if ( fuel > -1 and fuel < fuellimit ) or health < healthlimit then
 			if health < healthlimit then
-				unit:Kill()
+				killUnitOnReturn = true
 			end
 			if not rtbissued then
 				-- find closest base
 				local bestBaseName
 				local bestDistSq
 				local platPos = returnpool:GetPlatoonPosition()
-				local returnPos
+				
 				for baseName, base in aiBrain.BuilderManagers do
 					if base.Layer ~= 'Water' and base.EngineerManager and base.EngineerManager:GetNumCategoryUnits('Engineers', categories.ALLUNITS) > 0 then
 						local distSq = VDist2Sq(platPos[1], platPos[3], base.Position[1], base.Position[3])
@@ -2195,6 +2197,7 @@ function TransportReturnToBase(unit, aiBrain)
 						for _,p in safePath do
 							IssueMove( {unit}, p )
 						end
+						IssueMove( {unit}, returnPos)
 					else
 						-- go direct -- possibly bad
 						IssueMove( {unit}, returnPos )
@@ -2208,6 +2211,14 @@ function TransportReturnToBase(unit, aiBrain)
 		end
 		if rtbissued then
 			WaitTicks(21)
+			if killUnitOnReturn and returnPos then
+				local origin = returnpool:GetPlatoonPosition()
+				local dx = origin[1] - returnPos[1]
+                local dz = origin[3] -returnPos[3]
+                if dx * dx + dz * dz < 1225 then
+					unit:Kill()
+				end
+			end
 		else
 			break
 		end
