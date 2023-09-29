@@ -534,7 +534,7 @@ function GetTransports( platoon, aiBrain)
     local transports = {}			-- this will hold the data for all of the eligible transports    
 	local out_of_range = false
     local FuelRequired = .5
-    local HealthRequired = .2
+    local HealthRequired = .25
 
     local id, range, unitPos
 
@@ -2126,7 +2126,7 @@ function ProcessAirUnits( unit, aiBrain )
 	if (not unit.Dead) and (not IsBeingBuilt(unit)) then
         local fuel = GetFuelRatio(unit)
 		local health = unit:GetHealthPercent()
-		if ( fuel > -1 and fuel < .75 ) or health < .90 then
+		if ( fuel > -1 and fuel < .75 ) or health < .25 then
             if not unit.InRefit then
                 if ScenarioInfo.TransportDialog then
                     LOG("*AI DEBUG "..aiBrain.Nickname.." Air Unit "..unit.Sync.id.." assigned to TransportReturnToBase ")
@@ -2151,7 +2151,7 @@ function TransportReturnToBase(unit, aiBrain)
 	local ident = Random(100000,999999)
 	local rtbissued = false
 	local fuellimit = .75
-	local healthlimit = .90
+	local healthlimit = .25
 	local returnPos
 	local killUnitOnReturn = false
 
