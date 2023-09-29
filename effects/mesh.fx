@@ -878,6 +878,7 @@ float4 PBR_Cybran(NORMALMAPPED_VERTEX vertex, float teamColorFactor, uniform boo
     float metallic = saturate(specular.r + saturate(specular.g - 0.1) * 0.87 - specular.a * 2.2);
     float roughness = lerp(0.8 * (1 - specular.g), lerp(0.5, 0.25, specular.g), metallic);
 
+    albedo += specular.r * 0.1;
     albedo = min(lerp(albedo, albedo * 2.3, pow(metallic, 2.5)), float3(1, 1, 1));
     albedo = lerp(albedo, vertex.color.rgb, teamColorFactor * specular.a);
 
