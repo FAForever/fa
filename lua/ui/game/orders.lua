@@ -657,8 +657,6 @@ end
 
 local function ExternalFactoryBehavior(self, modifiers)
     if modifiers.Left then
-        LOG("ExternalFactoryBehavior")
-        LOG("Length of self._unit: ", table.getn(self._unit))
         SelectUnits(self._unit)
     end
 end
@@ -1328,9 +1326,20 @@ local function CreateAltOrders(availableOrders, availableToggles, units)
 
     --- External factories
     local exFacs = EntityCategoryFilterDown(categories.EXTERNALFACTORY + categories.EXTERNALFACTORYUNIT, units)
-    if table.getn(exFacs) == 1 then
-        table.insert(availableOrders, 'ExFac')
-        assistingUnitList['ExFac'] = {exFacs[1]:GetCreator()}
+    if not table.empty(exFacs) and table.getn(exFacs) == table.getn(units) then
+        -- make sure we've selected all external factories, or all external factory units
+        if table.getn(EntityCategoryFilterDown(categories.EXTERNALFACTORY, exFacs)) == table.getn(units) or
+           table.getn(EntityCategoryFilterDown(categories.EXTERNALFACTORYUNIT, exFacs)) == table.getn(units) then
+            assistingUnitList['ExFac'] = {}
+            -- finally, make sure our units are all of the same type
+            local bp = exFacs[1]:GetUnitId()
+            if table.getn(EntityCategoryFilterDown(categories[bp], exFacs)) == table.getn(exFacs) then
+                for _, exFac in exFacs do
+                    table.insert(assistingUnitList['ExFac'], exFac:GetCreator())
+                end
+                table.insert(availableOrders, 'ExFac')
+            end
+        end
     end
 
     -- Determine what slots to put alt orders
