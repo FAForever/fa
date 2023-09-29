@@ -854,18 +854,19 @@ ExternalFactoryComponent = ClassSimple {
         self.Trash:Add(self.ExternalFactory)
     end,
 
+    --- Comment these out for now until a more permanent solution is decided on
     ---@param self Unit | ExternalFactoryComponent
     OnPaused = function(self)
-        if self.ExternalFactory then
-            self.ExternalFactory:SetPaused(true)
-        end
+    --    if self.ExternalFactory then
+    --        self.ExternalFactory:SetPaused(true)
+    --    end
     end,
 
     ---@param self Unit | ExternalFactoryComponent
     OnUnpaused = function(self)
-        if self.ExternalFactory then
-            self.ExternalFactory:SetPaused(false)
-        end
+    --    if self.ExternalFactory then
+    --        self.ExternalFactory:SetPaused(false)
+    --    end
     end,
 
     ---@param self Unit | ExternalFactoryComponent

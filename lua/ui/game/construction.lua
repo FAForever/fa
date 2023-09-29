@@ -1908,6 +1908,15 @@ function CreateExtraControls(controlType)
         Tooltip.AddCheckboxTooltip(controls.extraBtn2, 'construction_pause')
         controls.extraBtn2.OnCheck = function(self, checked)
             SetPaused(sortedOptions.selection, checked)
+            local exFacs = EntityCategoryFilterDown(categories.EXTERNALFACTORY + categories.EXTERNALFACTORYUNIT, sortedOptions.selection)
+            if not table.empty(exFacs) then
+                LOG('We have external factories #: '..table.getn(exFacs))
+                local toBePaused = {}
+                for _, exFac in exFacs do
+                    table.insert(toBePaused, exFac:GetCreator())
+                end
+                SetPaused(toBePaused, checked)
+            end
         end
         if pauseEnabled then
             controls.extraBtn2:Enable()
@@ -1926,8 +1935,16 @@ function CreateExtraControls(controlType)
             for _, v in sortedOptions.selection do
                 if checked then
                     v:ProcessInfo('SetRepeatQueue', 'true')
+                    if EntityCategoryContains(categories.EXTERNALFACTORY + categories.EXTERNALFACTORYUNIT, v) then
+                        LOG('Setting creator to repeat queue')
+                        v:GetCreator():ProcessInfo('SetRepeatQueue', 'true')
+                    end
                 else
                     v:ProcessInfo('SetRepeatQueue', 'false')
+                    if EntityCategoryContains(categories.EXTERNALFACTORY + categories.EXTERNALFACTORYUNIT, v) then
+                        LOG('Setting creator to repeat queue')
+                        v:GetCreator():ProcessInfo('SetRepeatQueue', 'false')
+                    end
                 end
             end
         end
@@ -2499,7 +2516,11 @@ function OnSelection(buildableCategories, selection, isOldSelection)
     end
 
     if table.getn(selection) == 1 then
-        currentCommandQueue = SetCurrentFactoryForQueueDisplay(selection[1])
+        if EntityCategoryContains(categories.EXTERNALFACTORY, selection[1]) then
+            currentCommandQueue = SetCurrentFactoryForQueueDisplay(selection[1]:GetCreator())
+        else
+            currentCommandQueue = SetCurrentFactoryForQueueDisplay(selection[1])
+        end
     else
         currentCommandQueue = {}
         ClearCurrentFactoryForQueueDisplay()
