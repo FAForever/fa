@@ -849,22 +849,9 @@ ExternalFactoryComponent = ClassSimple {
         self.ExternalFactory = CreateUnitHPR(blueprintIdExternalFactory, self.Army, position[1], position[2], position[3], 0, 0, 0) --[[@as ExternalFactoryUnit]]
         self.ExternalFactory:AttachTo(entity, -1)
         self.ExternalFactory:SetCreator(self)
+        self:SetCreator(self.ExternalFactory)
         self.ExternalFactory:SetParent(self)
         self.Trash:Add(self.ExternalFactory)
-    end,
-
-    ---@param self Unit | ExternalFactoryComponent
-    OnPaused = function(self)
-        if self.ExternalFactory then
-            self.ExternalFactory:SetPaused(true)
-        end
-    end,
-
-    ---@param self Unit | ExternalFactoryComponent
-    OnUnpaused = function(self)
-        if self.ExternalFactory then
-            self.ExternalFactory:SetPaused(false)
-        end
     end,
 
     ---@param self Unit | ExternalFactoryComponent
