@@ -1444,8 +1444,11 @@ function OnClickHandler(button, modifiers)
                     import("/lua/ui/game/commandmode.lua").StartCommandMode(buildCmd, {name = item.id})
                 else
                     -- If the item to build can move, it must be built by a factory
-                    -- TODO - what about mobile factories?
-                    -- ... call it Tah-DONE..!
+                    -- Mobile factories: we check for platforms (the attached units can be given orders as normal)
+                    -- If we've got platforms, we take our selected units (minus the platforms), then add the
+                    -- external factories to that list, then give orders with 
+                    -- IssueBlueprintCommandToUnits (which can give orders to an arbitrary list of units)
+                    -- instead of IssueBlueprintCommand (which gives orders to the current selection)
                     local selection = GetSelectedUnits()
                     local exFacs = EntityCategoryFilterDown(categories.EXTERNALFACTORY, selection)
                     if not table.empty(exFacs) then
@@ -1908,9 +1911,10 @@ function CreateExtraControls(controlType)
         Tooltip.AddCheckboxTooltip(controls.extraBtn2, 'construction_pause')
         controls.extraBtn2.OnCheck = function(self, checked)
             SetPaused(sortedOptions.selection, checked)
+            -- If we have exFacs platforms or exFac units selected, we add their counterpart unit(s) to a table
+            -- and set them to paused as well
             local exFacs = EntityCategoryFilterDown(categories.EXTERNALFACTORY + categories.EXTERNALFACTORYUNIT, sortedOptions.selection)
             if not table.empty(exFacs) then
-                LOG('We have external factories #: '..table.getn(exFacs))
                 local toBePaused = {}
                 for _, exFac in exFacs do
                     table.insert(toBePaused, exFac:GetCreator())
@@ -1933,16 +1937,16 @@ function CreateExtraControls(controlType)
         end
         controls.extraBtn1.OnCheck = function(self, checked)
             for _, v in sortedOptions.selection do
+                -- A little repetition here, but likewise we check for the presence of exFacs and
+                -- apply the repeat queue modification to their counterparts
                 if checked then
                     v:ProcessInfo('SetRepeatQueue', 'true')
                     if EntityCategoryContains(categories.EXTERNALFACTORY + categories.EXTERNALFACTORYUNIT, v) then
-                        LOG('Setting creator to repeat queue')
                         v:GetCreator():ProcessInfo('SetRepeatQueue', 'true')
                     end
                 else
                     v:ProcessInfo('SetRepeatQueue', 'false')
                     if EntityCategoryContains(categories.EXTERNALFACTORY + categories.EXTERNALFACTORYUNIT, v) then
-                        LOG('Setting creator to repeat queue')
                         v:GetCreator():ProcessInfo('SetRepeatQueue', 'false')
                     end
                 end
@@ -2516,6 +2520,9 @@ function OnSelection(buildableCategories, selection, isOldSelection)
     end
 
     if table.getn(selection) == 1 then
+        -- Queue display is easy: if we've got one unit selected, and it's an exFac platform,
+        -- show the queue of its attached external factory
+        -- this automatically supports removing/modifying the queue, neat!
         if EntityCategoryContains(categories.EXTERNALFACTORY, selection[1]) then
             currentCommandQueue = SetCurrentFactoryForQueueDisplay(selection[1]:GetCreator())
         else
