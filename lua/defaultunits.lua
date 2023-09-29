@@ -3388,8 +3388,6 @@ ExternalFactoryUnit = ClassUnit(Unit) {
     ---@param self FactoryUnit
     OnPaused = function(self)
         Unit.OnPaused(self)
-
-        -- When factory is paused take some action
         if self:IsUnitState('Building') then
             self:StopUnitAmbientSound('ConstructLoop')
             self:StopBuildingEffects(self.UnitBeingBuilt)

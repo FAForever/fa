@@ -1911,15 +1911,9 @@ function CreateExtraControls(controlType)
         Tooltip.AddCheckboxTooltip(controls.extraBtn2, 'construction_pause')
         controls.extraBtn2.OnCheck = function(self, checked)
             SetPaused(sortedOptions.selection, checked)
-            -- If we have exFacs platforms or exFac units selected, we add their counterpart unit(s) to a table
-            -- and set them to paused as well
-            local exFacs = EntityCategoryFilterDown(categories.EXTERNALFACTORY + categories.EXTERNALFACTORYUNIT, sortedOptions.selection)
-            if not table.empty(exFacs) then
-                local toBePaused = {}
-                for _, exFac in exFacs do
-                    table.insert(toBePaused, exFac:GetCreator())
-                end
-                SetPaused(toBePaused, checked)
+            -- If we have exFacs platforms or exFac units selected, we'll pause their counterparts as well
+            for _, exFac in EntityCategoryFilterDown(categories.EXTERNALFACTORY + categories.EXTERNALFACTORYUNIT, sortedOptions.selection) do
+                exFac:GetCreator():ProcessInfo('SetPaused', tostring(checked))
             end
         end
         if pauseEnabled then
@@ -1937,18 +1931,9 @@ function CreateExtraControls(controlType)
         end
         controls.extraBtn1.OnCheck = function(self, checked)
             for _, v in sortedOptions.selection do
-                -- A little repetition here, but likewise we check for the presence of exFacs and
-                -- apply the repeat queue modification to their counterparts
-                if checked then
-                    v:ProcessInfo('SetRepeatQueue', 'true')
-                    if EntityCategoryContains(categories.EXTERNALFACTORY + categories.EXTERNALFACTORYUNIT, v) then
-                        v:GetCreator():ProcessInfo('SetRepeatQueue', 'true')
-                    end
-                else
-                    v:ProcessInfo('SetRepeatQueue', 'false')
-                    if EntityCategoryContains(categories.EXTERNALFACTORY + categories.EXTERNALFACTORYUNIT, v) then
-                        v:GetCreator():ProcessInfo('SetRepeatQueue', 'false')
-                    end
+                v:ProcessInfo('SetRepeatQueue', tostring(checked))
+                if EntityCategoryContains(categories.EXTERNALFACTORY + categories.EXTERNALFACTORYUNIT, v) then
+                    v:GetCreator():ProcessInfo('SetRepeatQueue', tostring(checked))
                 end
             end
         end
