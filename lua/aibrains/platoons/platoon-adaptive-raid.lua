@@ -91,7 +91,7 @@ AIPlatoonAdaptiveRaidBehavior = Class(AIPlatoon) {
 
             -- determine navigational label of that unit
             local position = unit:GetPosition()
-            local label, error = NavUtils.GetLabel('Land', position)
+            local label, error = NavUtils.GetLabel(self.MovementLayer, position)
 
             if label then
                 
@@ -105,23 +105,45 @@ AIPlatoonAdaptiveRaidBehavior = Class(AIPlatoon) {
                 local unpathableCandidateCount = 0
                 for k = 1, count do
                     local expansion = expansions[k]
-                    if expansion.NavLabel == label then
-                        if aiBrain.GridPresence:GetInferredStatus(position) ~= 'Allied' then
+                    if NavUtils.GetLabel(self.MovementLayer, expansion.position) == label then
+                        if aiBrain.GridPresence:GetInferredStatus(expansion.position) ~= 'Allied' then
                             candidates[candidateCount + 1] = expansion
                             candidateCount = candidateCount + 1
                         end
                     elseif not NavUtils.CanPathTo(self.MovementLayer, position, expansion.position) then
-                        if aiBrain.GridPresence:GetInferredStatus(position) ~= 'Allied' then
+                        if aiBrain.GridPresence:GetInferredStatus(expansion.position) ~= 'Allied' then
                             unpathableCandidates[unpathableCandidateCount + 1] = expansion
                             unpathableCandidateCount = unpathableCandidateCount + 1
                         end
                     end
+                    
                 end
                 -- END OF TODO
 
                 -- something odd happened: there are no expansions with a matching label
                 if candidateCount == 0 and unpathableCandidateCount == 0 then
-                    self:LogWarning(string.format('no expansions found on label %d', label))
+                    self:LogDebug(string.format('no expansion candidates found on label %d switch to mass points', label))
+                    -- There are no expansion positions to raid, switch to mass markers
+                    local massmarkers, count = MarkerUtils.GetMarkersByType('Mass')
+                    for k = 1, count do
+                        local masspoint = massmarkers[k]
+                        if NavUtils.GetLabel(self.MovementLayer, masspoint.position) == label then
+                            if aiBrain.GridPresence:GetInferredStatus(masspoint.position) ~= 'Allied' then
+                                candidates[candidateCount + 1] = masspoint
+                                candidateCount = candidateCount + 1
+                            end
+                        elseif not NavUtils.CanPathTo(self.MovementLayer, position, masspoint.position) then
+                            if aiBrain.GridPresence:GetInferredStatus(masspoint.position) ~= 'Allied' then
+                                unpathableCandidates[unpathableCandidateCount + 1] = masspoint
+                                unpathableCandidateCount = unpathableCandidateCount + 1
+                            end
+                        end
+                    end
+                end
+
+                if candidateCount == 0 and unpathableCandidateCount == 0 then
+                    -- There are still no candidates
+                    self:LogWarning(string.format('no raid candidates found on label %d', label))
                     self:ChangeState(self.Error)
                     return
                 end
@@ -292,7 +314,7 @@ AIPlatoonAdaptiveRaidBehavior = Class(AIPlatoon) {
         ---@param self AIPlatoonAdaptiveRaidBehavior
         Main = function(self)
             local brain = self:GetBrain()
-            local usedTransports = TransportUtils.SendPlatoonWithTransports(brain, self, self.LocationToRaid, 1, false)
+            local usedTransports = TransportUtils.SendPlatoonWithTransports(brain, self, self.LocationToRaid, 3, false)
             if usedTransports then
                 self:LogDebug(string.format('Raid Platoon used transports'))
                 self:ChangeState(self.Navigating)
@@ -428,7 +450,7 @@ AIPlatoonAdaptiveRaidBehavior = Class(AIPlatoon) {
                 -- check if our command is still going
                 if not self:IsCommandsActive(attackCommand) then
                     -- setup attack units
-                    local attackOffset, error = NavUtils.RandomDirectionFrom('Land', location, 10, 8)       -- TODO: remove magic numbers
+                    local attackOffset, error = NavUtils.RandomDirectionFrom('Land', location, 20, 8)       -- TODO: remove magic numbers
                     if not attackOffset then
                         self:LogWarning(string.format('no alternative directions found to evade'))
                         self:ChangeState(self.Error)

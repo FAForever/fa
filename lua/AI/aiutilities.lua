@@ -3309,9 +3309,6 @@ function CanBuildOnGridMassPoints(aiBrain, engPos, distance, layer)
             end
         end
     end
-    if table.getn(validMassMarkers) > 0 then
-        LOG('Close mass markers '..repr(validMassMarkers))
-    end
     table.sort(validMassMarkers, function(a,b) return a.Distance < b.Distance end)
     if table.getn(validMassMarkers) > 0 then
         return true, validMassMarkers
