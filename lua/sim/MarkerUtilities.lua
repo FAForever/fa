@@ -129,13 +129,14 @@ function GetMarkersByType(type)
     for k, marker in AllMarkers do
         if marker.type == type then
             -- mod support syntax
-            marker.Name = k
-            marker.Size = marker.size
-            marker.Resource = marker.resource
+            marker.Name = marker.Name or k
+            marker.name = marker.Name
+            marker.Size = marker.size or 1
+            marker.Resource = marker.resource or false
             marker.Type = marker.type
             marker.Orientation = marker.orientation
             marker.Position = marker.position
-            marker.Color = marker.color
+            marker.Color = marker.color or 'ffffff'
 
             ms[n] = marker
             n = n + 1
