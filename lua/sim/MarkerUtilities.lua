@@ -130,7 +130,6 @@ function GetMarkersByType(type)
         if marker.type == type then
             -- mod support syntax
             marker.Name = marker.Name or k
-            marker.name = marker.Name
             marker.Size = marker.size or 1
             marker.Resource = marker.resource or false
             marker.Type = marker.type
