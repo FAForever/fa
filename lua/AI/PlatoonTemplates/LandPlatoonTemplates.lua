@@ -172,7 +172,7 @@ PlatoonTemplate {
     Plan = 'None',
     GlobalSquads = {
         --DUNCAN - was 1 to 3
-        { categories.DIRECTFIRE * categories.TECH1 * categories.LAND * categories.MOBILE - categories.SCOUT - categories.ENGINEER, 3, 5, 'guard', 'None' }
+        { categories.DIRECTFIRE * categories.TECH1 * categories.LAND * categories.MOBILE - categories.SCOUT - categories.ENGINEER, 2, 3, 'guard', 'None' }
     },
 }
 
@@ -191,7 +191,15 @@ PlatoonTemplate {
         { categories.DIRECTFIRE * categories.LAND * categories.MOBILE - categories.SCOUT - categories.ENGINEER, 2, 15, 'Attack', 'None' },
         { categories.LAND * categories.MOBILE * categories.SCOUT, 1, 2, 'Scout', 'None' }
     },
+}
 
+PlatoonTemplate {
+    Name = 'StateMachineSmallAttackPlatoon',
+    Plan = 'StateMachineAI',
+    GlobalSquads = {
+        { categories.DIRECTFIRE * categories.LAND * categories.MOBILE - categories.SCOUT - categories.ENGINEER, 2, 5, 'Attack', 'None' },
+        { categories.LAND * categories.MOBILE * categories.SCOUT, 0, 2, 'Scout', 'None' }
+    },
 }
 -- ==== Factional Templates ==== --
 

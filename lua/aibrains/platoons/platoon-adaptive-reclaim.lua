@@ -27,7 +27,6 @@ AIPlatoonAdaptiveReclaimBehavior = Class(AIPlatoon) {
         ---@param self AIPlatoonAdaptiveReclaimBehavior
         Main = function(self)
             local brain = self:GetBrain()
-            LOG('Starting Reclaim state machine')
 
             if not self.SearchRadius then
                 local maxMapDimension = math.max(ScenarioInfo.size[1], ScenarioInfo.size[2])
@@ -142,6 +141,10 @@ AIPlatoonAdaptiveReclaimBehavior = Class(AIPlatoon) {
                     return
                 end
                 self:LogWarning(string.format('no reclaim target found'))
+                brain.ReclaimFailCounter = brain.ReclaimFailCounter + 1
+                if brain.ReclaimFailTimeStamp == 0 then
+                    brain.ReclaimFailTimeStamp = GetGameTimeSeconds()
+                end
                 local closestManagerDist
                 local returnPos
                 if eng.BuilderManagerData.EngineerManager.Location then
@@ -158,8 +161,9 @@ AIPlatoonAdaptiveReclaimBehavior = Class(AIPlatoon) {
                     end
                 end
                 if returnPos and VDist3Sq(engPos, returnPos) < 6400 then
-                    LOG('Exiting Reclaim state machine')
+                    self:LogDebug(string.format('Exiting Reclaim state machine'))
                     self:ExitStateMachine()
+                    return
                 elseif returnPos then
                     self.LocationToReclaim = returnPos
                     self:ChangeState(self.Navigating)

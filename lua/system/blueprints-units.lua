@@ -559,11 +559,8 @@ function PostProcessUnitWithExternalFactory(allBlueprints, unit)
         efBlueprint.SelectionCenterOffsetZ = 0.35 * unit.SelectionSizeZ
 
         -- remove properties of the seed unit
-        unit.CategoriesHash['FACTORY'] = nil
-        unit.CategoriesHash['CONSTRUCTION'] = nil
         unit.Categories = table.unhash(unit.CategoriesHash)
         unit.Economy.BuildRate = 0
-        unit.Economy.BuildableCategory = nil
     end
 end
 

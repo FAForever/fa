@@ -1444,8 +1444,24 @@ function OnClickHandler(button, modifiers)
                     import("/lua/ui/game/commandmode.lua").StartCommandMode(buildCmd, {name = item.id})
                 else
                     -- If the item to build can move, it must be built by a factory
-                    -- TODO - what about mobile factories?
-                    IssueBlueprintCommand("UNITCOMMAND_BuildFactory", item.id, count)
+                    -- Mobile factories: we check for platforms (the attached units can be given orders as normal)
+                    -- If we've got platforms, we take our selected units (minus the platforms), then add the
+                    -- external factories to that list, then give orders with 
+                    -- IssueBlueprintCommandToUnits (which can give orders to an arbitrary list of units)
+                    -- instead of IssueBlueprintCommand (which gives orders to the current selection)
+                    local selection = GetSelectedUnits()
+                    local exFacs = EntityCategoryFilterDown(categories.EXTERNALFACTORY, selection)
+                    if not table.empty(exFacs) then
+                        local exFacUnits = EntityCategoryFilterOut(categories.EXTERNALFACTORY, selection)
+                        for _, exFac in exFacs do
+                            table.insert(exFacUnits, exFac:GetCreator())
+                        end
+                        -- in case we've somehow selected both the platform and the factory, only put the fac in once
+                        exFacUnits = table.unique(exFacUnits)
+                        IssueBlueprintCommandToUnits(exFacUnits, "UNITCOMMAND_BuildFactory", item.id, count)
+                    else
+                        IssueBlueprintCommand("UNITCOMMAND_BuildFactory", item.id, count)
+                    end
                 end
             end
         else
@@ -1895,6 +1911,10 @@ function CreateExtraControls(controlType)
         Tooltip.AddCheckboxTooltip(controls.extraBtn2, 'construction_pause')
         controls.extraBtn2.OnCheck = function(self, checked)
             SetPaused(sortedOptions.selection, checked)
+            -- If we have exFacs platforms or exFac units selected, we'll pause their counterparts as well
+            for _, exFac in EntityCategoryFilterDown(categories.EXTERNALFACTORY + categories.EXTERNALFACTORYUNIT, sortedOptions.selection) do
+                exFac:GetCreator():ProcessInfo('SetPaused', tostring(checked))
+            end
         end
         if pauseEnabled then
             controls.extraBtn2:Enable()
@@ -1911,10 +1931,9 @@ function CreateExtraControls(controlType)
         end
         controls.extraBtn1.OnCheck = function(self, checked)
             for _, v in sortedOptions.selection do
-                if checked then
-                    v:ProcessInfo('SetRepeatQueue', 'true')
-                else
-                    v:ProcessInfo('SetRepeatQueue', 'false')
+                v:ProcessInfo('SetRepeatQueue', tostring(checked))
+                if EntityCategoryContains(categories.EXTERNALFACTORY + categories.EXTERNALFACTORYUNIT, v) then
+                    v:GetCreator():ProcessInfo('SetRepeatQueue', tostring(checked))
                 end
             end
         end
@@ -2486,7 +2505,14 @@ function OnSelection(buildableCategories, selection, isOldSelection)
     end
 
     if table.getn(selection) == 1 then
-        currentCommandQueue = SetCurrentFactoryForQueueDisplay(selection[1])
+        -- Queue display is easy: if we've got one unit selected, and it's an exFac platform,
+        -- show the queue of its attached external factory
+        -- this automatically supports removing/modifying the queue, neat!
+        if EntityCategoryContains(categories.EXTERNALFACTORY, selection[1]) then
+            currentCommandQueue = SetCurrentFactoryForQueueDisplay(selection[1]:GetCreator())
+        else
+            currentCommandQueue = SetCurrentFactoryForQueueDisplay(selection[1])
+        end
     else
         currentCommandQueue = {}
         ClearCurrentFactoryForQueueDisplay()

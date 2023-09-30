@@ -655,6 +655,12 @@ local function DroneInit(self, selection)
 
 end
 
+local function ExternalFactoryBehavior(self, modifiers)
+    if modifiers.Left then
+        SelectUnits(self._unit)
+    end
+end
+
 -- Retaliate button specific behvior
 local retaliateStateInfo = {
     [-1] = {bitmap = 'stand-ground',    helpText = "mode_mixed"},
@@ -1049,6 +1055,8 @@ local defaultOrdersTable = {
     DroneL = {                      helpText = "drone",             bitmapId = 'unload02',              preferredSlot = 10, behavior = DroneBehavior,               initialStateFunc = DroneInit},
     DroneR = {                      helpText = "drone",             bitmapId = 'unload02',              preferredSlot = 11, behavior = DroneBehavior,               initialStateFunc = DroneInit},
 
+    ExFac = {                       helpText = "external_factory",  bitmapId = 'exfac',                 preferredSlot = 10,  behavior = ExternalFactoryBehavior},
+
     -- Unit toggle rules
     RULEUTC_ShieldToggle = {        helpText = "toggle_shield",     bitmapId = 'shield',                preferredSlot = 8,  behavior = ScriptButtonOrderBehavior,   initialStateFunc = ScriptButtonInitFunction, extraInfo = 0},
     RULEUTC_WeaponToggle = {        helpText = "toggle_weapon",     bitmapId = 'toggle-weapon',         preferredSlot = 8,  behavior = ScriptButtonOrderBehavior,   initialStateFunc = ScriptButtonInitFunction, extraInfo = 1},
@@ -1281,6 +1289,8 @@ local function CreateAltOrders(availableOrders, availableToggles, units)
     AddAbilityButtons(standardOrdersTable, availableOrders, units)
 
     local assistingUnitList = {}
+
+    --- Pods
     local podUnits = {}
     local podStagingPlatforms = EntityCategoryFilterDown(categories.PODSTAGINGPLATFORM, units)
     local pods = EntityCategoryFilterDown(categories.POD, units)
@@ -1310,6 +1320,24 @@ local function CreateAltOrders(availableOrders, availableToggles, units)
             else
                 table.insert(availableOrders, 'DroneL')
                 assistingUnitList['DroneL'] = assistingUnits
+            end
+        end
+    end
+
+    --- External factories
+    local exFacs = EntityCategoryFilterDown(categories.EXTERNALFACTORY + categories.EXTERNALFACTORYUNIT, units)
+    if not table.empty(exFacs) and table.getn(exFacs) == table.getn(units) then
+        -- make sure we've selected all external factories, or all external factory units
+        if table.getn(EntityCategoryFilterDown(categories.EXTERNALFACTORY, exFacs)) == table.getn(units) or
+           table.getn(EntityCategoryFilterDown(categories.EXTERNALFACTORYUNIT, exFacs)) == table.getn(units) then
+            assistingUnitList['ExFac'] = {}
+            -- finally, make sure our units are all of the same type
+            local bp = exFacs[1]:GetUnitId()
+            if table.getn(EntityCategoryFilterDown(categories[bp], exFacs)) == table.getn(exFacs) then
+                for _, exFac in exFacs do
+                    table.insert(assistingUnitList['ExFac'], exFac:GetCreator())
+                end
+                table.insert(availableOrders, 'ExFac')
             end
         end
     end
