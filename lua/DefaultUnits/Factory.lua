@@ -1,15 +1,12 @@
 
 local StructureUnit = import("/lua/defaultunits/structure.lua").StructureUnit
-
 local FireState = import("/lua/game.lua").FireState
-
-local RolloffUnitTable = { nil }
-local RolloffPositionTable = { 0, 0, 0 }
 
 ---@class FactoryUnit : StructureUnit
 ---@field BuildingUnit boolean
 ---@field BuildBoneRotator moho.RotateManipulator
 ---@field BuildEffectBones string[]
+---@field RollOffPoint Vector
 FactoryUnit = ClassUnit(StructureUnit) {
 
     RollOffAnimationRate = 10,
@@ -31,6 +28,9 @@ FactoryUnit = ClassUnit(StructureUnit) {
         self.BuildEffectBones = self.Blueprint.General.BuildBones.BuildEffectBones
         self.BuildingUnit = false
         self:SetFireState(FireState.GROUND_FIRE)
+
+        -- save for quick access later
+        self.RollOffPoint = { 0, 0, 0 }
     end,
 
     ---@param self FactoryUnit
@@ -281,12 +281,7 @@ FactoryUnit = ClassUnit(StructureUnit) {
 
     ---@param self FactoryUnit
     RollOffUnit = function(self)
-        local spin, x, y, z = self:CalculateRollOffPoint()
-        self.UnitBeingBuilt:SetRotation(spin)
-
-        RolloffUnitTable[1] = self.UnitBeingBuilt
-        RolloffPositionTable[1], RolloffPositionTable[2], RolloffPositionTable[3] = x, y, z
-        IssueMove(RolloffUnitTable, RolloffPositionTable)
+        IssueToUnitMoveOffFactory(self.UnitBeingBuilt, self.RollOffPoint)
     end,
 
     ---@param self FactoryUnit
@@ -424,7 +419,13 @@ FactoryUnit = ClassUnit(StructureUnit) {
                 self.UnitBeingBuilt:HideBone(0, true)
             end
 
-            local spin = self:CalculateRollOffPoint()
+            -- determine and preserve the roll off point
+            local spin, x, y, z = self:CalculateRollOffPoint()
+            local rollOffPoint = self.RollOffPoint
+            rollOffPoint[1] = x
+            rollOffPoint[2] = y
+            rollOffPoint[3] = z
+
             self.BuildBoneRotator:SetGoal(spin)
             self.UnitBeingBuilt:AttachBoneTo(-2, self, self.Blueprint.Display.BuildAttachBone or 0)
             self:StartBuildFx(self.UnitBeingBuilt)
