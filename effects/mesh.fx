@@ -6243,7 +6243,6 @@ technique UEFNavy_LowFidelity
     }
 }
 
-
 technique CybranNavy_HighFidelity
 <
     string abstractTechnique = "CybranNavy";
