@@ -568,9 +568,9 @@ function UpdateWindow(info)
             else
                 controls.actionIcon:SetTexture('/textures/ui/common/game/unit_view_icons/unidentified.dds')
             end
-            if info.focus.health and info.focus.maxHealth then
+            if info.focus.health and info.focus.maxHealth and info.focus.userUnit then
                 controls.actionText:SetFont(UIUtil.bodyFont, 14)
-                controls.actionText:SetText(string.format('%d%%', (info.focus.health / info.focus.maxHealth) * 100))
+                controls.actionText:SetText(string.format('%d%%', info.focus.userUnit:GetFractionComplete() * 100))
             elseif queueTextures[unitQueue[1].type] then
                 controls.actionText:SetFont(UIUtil.bodyFont, 10)
                 controls.actionText:SetText(LOC(queueTextures[unitQueue[1].type].text))
