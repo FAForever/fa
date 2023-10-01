@@ -3776,7 +3776,7 @@ float4 NormalMappedInsectPS( NORMALMAPPED_VERTEX vertex, uniform bool hiDefShado
 
     albedo.rgb = lerp( vertex.color.rgb, albedo.rgb, 1 - specular.a );
 
-    float4 phongAdditive = anisoAmount * specular.g + float4( 0.5 * specular.r * environment, 0);
+    float4 phongAdditive = anisoAmount * specular.g + float4( 0.05 * specular.r * environment, 0);
   phongAdditive *= ( 1 - specular.a);
 
     float shadow = ComputeShadow( vertex.shadow, hiDefShadows);
