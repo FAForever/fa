@@ -19,8 +19,12 @@ ExternalFactoryUnit = ClassUnit(Unit) {
         -- do not allow the unit to be killed or to take damage
         self.CanBeKilled = false
         self.CanTakeDamage = false
-        self:SetReclaimable (false)
+
+        -- is inherited by units, mimic what factories have as their default
         self:SetFireState(2)
+
+        -- do not allow the unit to be reclaimed or targeted by weapons
+        self:SetReclaimable (false)
         self:SetDoNotTarget(true)
     end,
 
