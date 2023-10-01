@@ -3,7 +3,6 @@ local EffectUtil = import("/lua/effectutilities.lua")
 
 local Unit = import("/lua/sim/unit.lua").Unit
 local TreadComponent = import("/lua/defaultcomponents.lua").TreadComponent
-local FireState = import("/lua/game.lua").FireState
 
 ---@class MobileUnit : Unit, TreadComponent
 ---@field MovementEffectsBag TrashBag
@@ -16,8 +15,6 @@ MobileUnit = ClassUnit(Unit, TreadComponent) {
     OnCreate = function(self)
         Unit.OnCreate(self)
         TreadComponent.OnCreate(self)
-
-        self:SetFireState(FireState.GROUND_FIRE)
 
         self.MovementEffectsBag = TrashBag()
         self.TopSpeedEffectsBag = TrashBag()
