@@ -12,7 +12,13 @@ ExternalFactoryUnit = ClassUnit(Unit) {
     ---@param self ExternalFactoryUnit
     OnCreate = function(self)
         Unit.OnCreate(self)
+
+        -- do not show the mesh
         self:HideBone(0, true)
+
+        -- do not allow the unit to be killed or to take damage
+        self.CanBeKilled = false
+        self.CanTakeDamage = false
     end,
 
     ---@param self ExternalFactoryUnit
