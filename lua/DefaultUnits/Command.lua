@@ -1,4 +1,6 @@
 
+local EffectTemplate = import("/lua/effecttemplates.lua")
+
 local WalkingLandUnit = import("/lua/defaultunits/walkingland.lua").WalkingLandUnit
 
 ---@class CommandUnit : WalkingLandUnit
