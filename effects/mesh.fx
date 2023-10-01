@@ -622,7 +622,9 @@ float3 ApplyWaterColor(float depth, float3 viewDirection, float3 color, float3 e
             color = lerp(color, waterColor.rgb, waterColor.w);
             color += emission;
         }
-    } 
+    } else {
+        color += emission;
+    }
     return color;
 }
 
@@ -792,28 +794,28 @@ float4 PBR_UEF(NORMALMAPPED_VERTEX vertex, float teamColorFactor, uniform bool h
 {
     float3x3 rotationMatrix = float3x3(vertex.binormal, vertex.tangent, vertex.normal);
     float3 normal = ComputeNormal(normalsSampler, vertex.texcoord0.zw, rotationMatrix);
-    float4 albedo = tex2D(albedoSampler, vertex.texcoord0.xy);
+    float3 albedo = tex2D(albedoSampler, vertex.texcoord0.xy).rgb;
     float4 specular = tex2D(specularSampler, vertex.texcoord0.xy);
 
     // try to extract some ambient occlusion information from the albedo
     // unfortunately the albedos have lots of baked in lighting so
     // we have to keep the effect slight
-    float ao = .5 + logisticFn(length(albedo.rgb) / sqrt(3), .1, 40, .5, 2);
+    float ao = .5 + logisticFn(length(albedo) / sqrt(3), .1, 40, .5, 2);
 
     float teamcolor = min(pow(specular.a * 1.1, 0.6), 1);
     float metallic = max(1 - teamcolor * 2.2, 0);
 
-    albedo.rgb = lerp(albedo.rgb, albedo.rgb * 1.9, metallic);
-    albedo.rgb = lerp(albedo.rgb, vertex.color.rgb * 0.6, teamColorFactor * teamcolor);
+    albedo = lerp(albedo, albedo * 1.9, metallic);
+    albedo = lerp(albedo, vertex.color.rgb * 0.6, teamColorFactor * teamcolor);
 
     float planeCockpitMask = saturate((specular.r - 0.65) * 3);
-    albedo.rgb += planeCockpitMask;
+    albedo += planeCockpitMask;
 
     float roughness = specular.g * 0.6 + 0.35 + saturate(pow(specular.a * 3.7, 0.6)) * 0.3;
     roughness += planeCockpitMask - specular.b * 3;
     roughness = saturate(1 - roughness);
 
-    float3 color = PBR(vertex, albedo.rgb, metallic, roughness, normal, hiDefShadows, .04, ao);
+    float3 color = PBR(vertex, albedo, metallic, roughness, normal, hiDefShadows, .04, ao);
     float emission = specular.b * 0.8;
     color = ApplyWaterColor(vertex.depth.x, vertex.viewDirection, color, emission * albedo);
 
@@ -872,16 +874,17 @@ float4 PBR_Cybran(NORMALMAPPED_VERTEX vertex, float teamColorFactor, uniform boo
 
     float3x3 rotationMatrix = float3x3(vertex.binormal, vertex.tangent, vertex.normal);
     float3 normal = ComputeNormal(normalsSampler, vertex.texcoord0.zw, rotationMatrix);
-    float4 albedo = tex2D( albedoSampler, vertex.texcoord0.xy);
+    float3 albedo = tex2D( albedoSampler, vertex.texcoord0.xy).rgb;
     float4 specular = tex2D( specularSampler, vertex.texcoord0.xy);
 
     float metallic = saturate(specular.r + saturate(specular.g - 0.1) * 0.87 - specular.a * 2.2);
     float roughness = lerp(0.8 * (1 - specular.g), lerp(0.5, 0.25, specular.g), metallic);
 
-    albedo.rgb = min(lerp(albedo.rgb, albedo.rgb * 2.3, pow(metallic, 2.5)), float3(1, 1, 1));
-    albedo.rgb = lerp(albedo.rgb, vertex.color.rgb, teamColorFactor * specular.a);
+    albedo += specular.r * 0.1;
+    albedo = min(lerp(albedo, albedo * 2.3, pow(metallic, 2.5)), float3(0.9, 0.9, 0.9));
+    albedo = lerp(albedo, vertex.color.rgb, teamColorFactor * specular.a);
 
-    float3 color = PBR(vertex, albedo.rgb, metallic, roughness, normal, hiDefShadows);
+    float3 color = PBR(vertex, albedo, metallic, roughness, normal, hiDefShadows);
     float emission = pow(max(specular.b - 0.04, 0.0), 0.5);
     color = ApplyWaterColor(vertex.depth.x, vertex.viewDirection, color, emission * albedo);
 
@@ -3773,7 +3776,7 @@ float4 NormalMappedInsectPS( NORMALMAPPED_VERTEX vertex, uniform bool hiDefShado
 
     albedo.rgb = lerp( vertex.color.rgb, albedo.rgb, 1 - specular.a );
 
-    float4 phongAdditive = anisoAmount * specular.g + float4( 0.5 * specular.r * environment, 0);
+    float4 phongAdditive = anisoAmount * specular.g + float4( 0.05 * specular.r * environment, 0);
   phongAdditive *= ( 1 - specular.a);
 
     float shadow = ComputeShadow( vertex.shadow, hiDefShadows);
