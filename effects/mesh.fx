@@ -622,7 +622,9 @@ float3 ApplyWaterColor(float depth, float3 viewDirection, float3 color, float3 e
             color = lerp(color, waterColor.rgb, waterColor.w);
             color += emission;
         }
-    } 
+    } else {
+        color += emission;
+    }
     return color;
 }
 
