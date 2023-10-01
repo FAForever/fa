@@ -19,6 +19,9 @@ ExternalFactoryUnit = ClassUnit(Unit) {
         -- do not allow the unit to be killed or to take damage
         self.CanBeKilled = false
         self.CanTakeDamage = false
+        self:SetReclaimable (false)
+        self:SetFireState(2)
+        self:SetDoNotTarget(true)
     end,
 
     ---@param self ExternalFactoryUnit
