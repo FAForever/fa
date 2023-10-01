@@ -88,7 +88,7 @@ function UserUnit:GetBuildRate()
 end
 
 --- Returns a table of commands
----@return OrderInfo[]
+---@return table[]
 function UserUnit:GetCommandQueue()
 end
 
