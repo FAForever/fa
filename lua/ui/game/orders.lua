@@ -1479,17 +1479,7 @@ local function CreateAltOrders(availableOrders, availableToggles, units)
     end
 end
 
--- Called by gamemain when new orders are available,
-function SetAvailableOrders(availableOrders, availableToggles, newSelection)
-    -- Save new selection
-    currentSelection = newSelection
-    -- Clear existing orders
-    orderCheckboxMap = {}
-    controls.orderButtonGrid:DestroyAllItems(true)
-
-    -- Create our copy of orders table
-    standardOrdersTable = table.deepcopy(defaultOrdersTable)
-
+function ApplyOverrides(standardOrdersTable, newSelection)
     -- Look in blueprints for any icon or tooltip overrides
     -- Note that if multiple overrides are found for the same order, then the default is used
     -- The syntax of the override in the blueprint is as follows (the overrides use same naming as in the default table above):
@@ -1531,6 +1521,21 @@ function SetAvailableOrders(availableOrders, availableToggles, newSelection)
             end
         end
     end
+end
+
+-- Called by gamemain when new orders are available,
+function SetAvailableOrders(availableOrders, availableToggles, newSelection)
+    -- Save new selection
+    currentSelection = newSelection
+    -- Clear existing orders
+    orderCheckboxMap = {}
+    controls.orderButtonGrid:DestroyAllItems(true)
+
+    -- Create our copy of orders table
+    standardOrdersTable = table.deepcopy(defaultOrdersTable)
+
+    -- Apply any overrides
+    ApplyOverrides(standardOrdersTable, newSelection)
 
     CreateCommonOrders(availableOrders)
 
