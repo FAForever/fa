@@ -237,6 +237,7 @@ UnitBlueprint{
             FiringTolerance = 2,
             Label = "CruiseMissiles",
             MaxRadius = 150,
+            MinRadius = 15,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
             MuzzleVelocity = 5,
