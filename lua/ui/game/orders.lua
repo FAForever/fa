@@ -1493,7 +1493,6 @@ function ApplyOverrides(standardOrdersTable, newSelection)
     --         initialStateFunc = 'TestInit'
     --     },
     --  },
-    LOG('ApplyingOverrides')
     local orderDiffs
     for index, unit in newSelection do
         local overrideTable = unit:GetBlueprint().General.OrderOverrides
