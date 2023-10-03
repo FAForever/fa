@@ -1504,9 +1504,9 @@ Unit_Description_0062="Anti-Air flak turret. Designed to engage mid-level aircra
 Unit_Description_0064="Armoured torpedo turret."
 Unit_Description_0066="Anti-Air turret armed with Area-Of-Effect SAMs, effective against fast aircraft."
 Unit_Description_0069="Stationary Artillery designed to engage slow-moving units and fixed structures. Rate-Of-Fire increased when adjacent to energy production buildings."
-Unit_Description_0070="Tactical Missile Launcher. Toggleable missile construction for 6 mass per second and 120 energy per second. Defaults to automatic."
+Unit_Description_0070="Tactical Missile Launcher. Toggleable missile construction for 8.3 mass per second and 120 energy per second. Defaults to automatic."
 Unit_Description_0072="Stationary Heavy Artillery with excellent range and damage, but poor accuracy. Rate-Of-Fire increased when adjacent to energy production buildings."
-Unit_Description_0073="Strategic Missile Launcher. Must be ordered to construct and launch missiles manually. These missiles are expensive."
+Unit_Description_0073="Strategic Missile Launcher. Toggleable missile construction. Defaults to automatic. These missiles are expensive."
 Unit_Description_0075="Strategic Assassination Artillery. Can hit any target on the map regardless of motion, range, or protection. Rate-Of-Fire increased when adjacent to energy production buildings."
 Unit_Description_0313="Heavy surface defense turret."
 Unit_Description_0314="Orbital Laser Bombardment Satellite. The Satellite is untargetable by any weapon, but can be impacted. If the Base Station dies, so does the Satellite."
@@ -1670,9 +1670,9 @@ Unit_Description_0181="Anti-Air flak turret. Designed to engage mid-level aircra
 Unit_Description_0183="Armoured torpedo turret."
 Unit_Description_0185="Anti-Air turret armed with Area-Of-Effect SAMs, effective against fast aircraft."
 Unit_Description_0187="Stationary Artillery designed to engage slow-moving units and fixed structures. Rate-Of-Fire increased when adjacent to energy production buildings."
-Unit_Description_0188="Tactical Missile Launcher. Must be ordered to construct missiles. Missiles break into smaller missiles when hit by countermeasures."
+Unit_Description_0188="Tactical Missile Launcher. Toggleable missile construction for 8.3 mass per second and 120 energy per second. Defaults to automatic. Missiles break into smaller missiles when hit by countermeasures."
 Unit_Description_0190="Stationary Heavy Artillery with excellent range and damage, but poor accuracy. Rate-Of-Fire increased when adjacent to energy production buildings."
-Unit_Description_0191="Strategic Missile Launcher. Must be ordered to construct and launch missiles manually. These missiles are expensive."
+Unit_Description_0191="Strategic Missile Launcher. Toggleable missile construction. Defaults to automatic. These missiles are expensive."
 Unit_Description_0325="Submerged torpedo launcher. Capable of destroying the largest of enemy vessels."
 
 -- CYBRAN -- Defensive Structures
@@ -1828,9 +1828,9 @@ Unit_Description_0260="Anti-Air flak turret. Designed to engage mid-level aircra
 Unit_Description_0262="Armoured torpedo turret."
 Unit_Description_0264="Anti-Air turret armed with Area-Of-Effect SAMs, effective against fast aircraft."
 Unit_Description_0267="Stationary Artillery designed to engage slow-moving units and fixed structures. Rate-Of-Fire increased when adjacent to energy production buildings."
-Unit_Description_0268="Tactical Missile Launcher. Toggleable missile construction for 6 mass per second and 120 energy per second. Defaults to automatic."
+Unit_Description_0268="Tactical Missile Launcher. Toggleable missile construction for 8.3 mass per second and 120 energy per second. Defaults to automatic."
 Unit_Description_0270="Stationary Heavy Artillery with excellent range, damage and accuracy, but poor Rate-Of-Fire. Rate-Of-Fire increased when adjacent to energy production buildings."
-Unit_Description_0271="Strategic Missile Launcher. Must be ordered to construct and launch missiles manually. These missiles are expensive."
+Unit_Description_0271="Strategic Missile Launcher. Toggleable missile construction. Defaults to automatic. These missiles are expensive."
 Unit_Description_0334="Rapid-Fire Obliteration Artillery. Fires a splitting cluster shell designed to overwhelm shields and inflict massive damage to the enemy base."
 
 -- AEON -- Defensive Structures
@@ -1974,10 +1974,10 @@ Unit_Description_0374="Anti-Air flak turret. Designed to engage mid-level aircra
 Unit_Description_0377="Armoured Torpedo turret equipped with Torpedo defenses."
 Unit_Description_0378="Anti-Air turret armed with Area-Of-Effect blaster, effective against fast aircraft."
 Unit_Description_0381="Stationary Artillery designed to engage slow-moving units and fixed structures. Rate-Of-Fire increased when adjacent to energy production buildings."
-Unit_Description_0382="Tactical Missile Launcher. Toggleable missile construction for 6 mass per second and 120 energy per second. Defaults to automatic."
+Unit_Description_0382="Tactical Missile Launcher. Toggleable missile construction for 8.3 mass per second and 120 energy per second. Defaults to automatic."
 Unit_Description_0384="Stationary Heavy Artillery with excellent range and damage, but poor accuracy. Rate-Of-Fire increased when adjacent to energy production buildings."
-Unit_Description_0385="Strategic Missile Launcher. Must be ordered to construct and launch missiles manually. These missiles are expensive."
-Unit_Description_0386="Experimental Strategic Missile Launcher. Must be ordered to construct and launch Missiles manually. Each missile can only be blocked by two countermeasures."
+Unit_Description_0385="Strategic Missile Launcher. Toggleable missile construction. Defaults to automatic. These missiles are expensive."
+Unit_Description_0386="Experimental Strategic Missile Launcher. Toggleable missile construction. Defaults to automatic. Each missile can only be blocked by two countermeasures."
 
 -- SERAPHIM -- Defensive Structures
 Unit_Description_0372="Restricts the movement of enemy units and offers substantial protection from low direct fire attacks."
