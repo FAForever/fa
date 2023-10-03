@@ -169,12 +169,12 @@ UES0401 = ClassUnit(AircraftCarrier, ExternalFactoryComponent) {
             local unitBuilding = self.UnitBeingBuilt
             unitBuilding:DetachFrom(true)
             self:DetachAll(self.BuildAttachBone)
-            if self:TransportHasAvailableStorage() then
-                self:AddUnitToStorage(unitBuilding)
-            else
-                local worldPos = self:CalculateWorldPositionFromRelative({0, 0, -20})
+            if not self:TransportHasAvailableStorage() or self:GetScriptBit('RULEUTC_WeaponToggle') then
+                local worldPos = self:CalculateWorldPositionFromRelative({ 0, 0, -20 })
                 IssueToUnitMoveOffFactory(unitBuilding, worldPos)
-                unitBuilding:ShowBone(0,true)
+                unitBuilding:ShowBone(0, true)
+            else
+                self:AddUnitToStorage(unitBuilding)
             end
 
             self:RequestRefreshUI()
