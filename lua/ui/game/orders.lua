@@ -1488,8 +1488,12 @@ function ApplyOverrides(standardOrdersTable, newSelection)
     --     RULEUTC_IntelToggle = {
     --         bitmapId = 'custom',
     --         helpText = 'toggle_custom',
+    --         preferredSlot = 7,
+    --         behavior = 'TestBehavior'
+    --         initialStateFunc = 'TestInit'
     --     },
     --  },
+    LOG('ApplyingOverrides')
     local orderDiffs
     for index, unit in newSelection do
         local overrideTable = unit:GetBlueprint().General.OrderOverrides
@@ -1498,11 +1502,17 @@ function ApplyOverrides(standardOrdersTable, newSelection)
                 if orderDiffs == nil then
                     orderDiffs = {}
                 end
-                if orderDiffs[orderKey] ~= nil and (orderDiffs[orderKey].bitmapId ~= override.bitmapId or orderDiffs[orderKey].helpText ~= override.helpText) then
-                    -- Found order diff already, so mark it false so it gets ignored when applying to table
-                    orderDiffs[orderKey] = false
-                else
-                    orderDiffs[orderKey] = override
+                for key, value in override do
+                    if orderDiffs[orderKey][key] ~= nil and (orderDiffs[orderKey][key] ~= value) then
+                        -- Found order diff already, so mark it false so it gets ignored when applying to table
+                        orderDiffs[orderKey] = false
+                        break
+                    else
+                        if orderDiffs[orderKey] == nil then
+                            orderDiffs[orderKey] = {}
+                        end
+                        orderDiffs[orderKey][key] = value
+                    end
                 end
             end
         end
@@ -1512,11 +1522,20 @@ function ApplyOverrides(standardOrdersTable, newSelection)
     if orderDiffs ~= nil then
         for orderKey, override in orderDiffs do
             if override and override ~= false then
-                if override.bitmapId then
-                    standardOrdersTable[orderKey].bitmapId = override.bitmapId
-                end
-                if override.helpText then
-                    standardOrdersTable[orderKey].helpText = override.helpText
+                for key, value in override do
+                    -- if we have a function override, we'll need to get it from the table
+                    -- behaviorOverrideTable takes a string and gives a function of the same name
+                    -- the value of the behavior field in the override in the blueprint should be 
+                    -- equal to the key in the behaviorOverrideTable
+                    if key == 'behavior' or key == 'initialStateFunc' then
+                        if not behaviorOverrideTable[value] then
+                            WARN('Attempted to override an order behavior with a function that does not exist in behaviorOverrideTable!')
+                        else
+                            standardOrdersTable[orderKey][key] = behaviorOverrideTable[value]
+                        end
+                    else
+                        standardOrdersTable[orderKey][key] = value
+                    end
                 end
             end
         end
