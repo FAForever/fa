@@ -214,9 +214,9 @@ AirUnit = ClassUnit(MobileUnit) {
 
     --- Called when a unit collides with a projectile to check if the collision is valid, allows
     -- ASF to be destroyed when they impact with strategic missiles
-    ---@param self AirUnit The unit we're checking the collision for
-    ---@param other Projectile other The projectile we're checking the collision with
-    ---@param firingWeapon Weapon The weapon that the projectile originates from
+    ---@param self AirUnit # The unit we're checking the collision for
+    ---@param other Projectile # other The projectile we're checking the collision with
+    ---@param firingWeapon Weapon # The weapon that the projectile originates from
     ---@return boolean
     OnCollisionCheck = function(self, other, firingWeapon)
         if self.DisallowCollisions then

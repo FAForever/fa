@@ -31,7 +31,7 @@ TacticalMissileComponent = ClassSimple(SemiBallisticComponent) {
             -- then up the turn rate so we can actually get close to hitting something
             WaitTicks((glideTime-1) * 10)
             -- set remaining glideTime to 1 for the miss check later, tweak this value if we end up disabling tracking too early
-            glideTime = 1
+            glideTime = 0
             self:SetTurnRate(100)
         else
             self:SetTurnRate(glideTurnRate)
