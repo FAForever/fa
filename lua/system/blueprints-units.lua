@@ -558,6 +558,23 @@ function PostProcessUnitWithExternalFactory(allBlueprints, unit)
         efBlueprint.SelectionSizeZ = 0.25 * unit.SelectionSizeZ
         efBlueprint.SelectionCenterOffsetZ = 0.35 * unit.SelectionSizeZ
 
+        -- add order overrides to carriers
+        if unit.CategoriesHash['CARRIER'] then
+            -- override our toggle function to display properly
+            if not unit.General.OrderOverrides then
+                unit.General.OrderOverrides = {}
+            end
+            unit.General.OrderOverrides.RULEUTC_WeaponToggle = {
+                bitmapId = 'auto-toggle',
+                helpText = 'auto_deploy',
+            }
+            -- add the toggle so it can be flipped to begin with
+            if not unit.General.ToggleCaps then
+                unit.General.ToggleCaps = {}
+            end
+            unit.General.ToggleCaps.RULEUTC_WeaponToggle = true
+        end
+
         -- remove properties of the seed unit
         unit.Categories = table.unhash(unit.CategoriesHash)
         unit.Economy.BuildRate = 0
