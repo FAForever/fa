@@ -1,3 +1,5 @@
+local GetRandomInt = import('/lua/utilities.lua').GetRandomInt
+local MathMax = math.max
 
 local SemiBallisticComponent = import("/lua/sim/components-projectile/semiballisticcomponent.lua").SemiBallisticComponent
 
@@ -16,7 +18,8 @@ TacticalMissileComponent = ClassSimple(SemiBallisticComponent) {
 
         -- launch
         self:SetTurnRate(self.LaunchTurnRate)
-        WaitTicks(self.LaunchTicks)
+        local launchTicks = GetRandomInt(self.LaunchTicks - self.LaunchTicksVariation, self.LaunchTicks + self.LaunchTicksVariation)
+        WaitTicks(MathMax(launchTicks, 1))
 
         -- boost
         local boostTurnRate, boostTime = self:TurnRateFromAngleAndHeight()

@@ -1,3 +1,4 @@
+local GetRandomFloat = import('/lua/utilities.lua').GetRandomFloat
 
 -- upvalue globals for performance
 local VDist2 = VDist2
@@ -19,6 +20,8 @@ local MathPi = math.pi
 ---@field MinHeight number              # Minimum height of the highest point of the trajectory measured from the position of the missile at the end of the launch phase minRadius/2 or so is a decent value
 ---@field FinalBoostAngle number        # Angle in degrees that we'll aim to be at the end of the boost phase 90 is vertical, 0 is horizontal
 ---@field MaxZigZagThreshold number     # Threshold for when we consider the missile to be zigzagging
+---@field LaunchTicksVariation integer  # Maximum number of ticks we'll vary the launch time by
+---@field MaxHeightVariation number     # Percentage by which we'll vary the max height of the trajectory
 SemiBallisticComponent = ClassSimple {
 
     -- set some sane defaults
@@ -27,7 +30,9 @@ SemiBallisticComponent = ClassSimple {
     HeightDistanceFactor = 5,
     MinHeight = 2,
     FinalBoostAngle = 0,
-    MaxZigZagThreshold = 1,
+    MaxZigZagThreshold = 1.5,
+    LaunchTicksVariation = 1,
+    MaxHeightVariation = 0.07,
 
     --- For a projectile that starts under acceleration, 
     --- but needs to calculate a ballistic trajectory mid-flight
@@ -61,6 +66,7 @@ SemiBallisticComponent = ClassSimple {
         if deltaY < self.MinHeight then
             deltaY = self.MinHeight
         end
+        deltaY = GetRandomFloat(deltaY * (1-self.MaxHeightVariation), deltaY * (1+self.MaxHeightVariation))
         local turnTime = deltaY/self:AverageVerticalVelocityThroughTurn(targetAngle, currentAngle)
 
         local degreesPerSecond = MathAbs(targetAngle - currentAngle)/turnTime * 180/MathPi
