@@ -13,20 +13,35 @@ local MathPi = math.pi
 
 --- Semi-Ballistic Component
 ---@class SemiBallisticComponent
----@field LaunchTicks number            # How long we spend in the launch phase
----@field LaunchTurnRate number         # Inital launch phase turn rate, gives a little turnover coming out of the tube
----@field HeightDistanceFactor number   # Each missile calculates an optimal highest point of its trajectory, based on its distance to the target. This is the factor that determines how high above the target that point is, in relation to the horizontal distance.  A higher number will result in a lower trajectory 5-8 is a decent value
----@field MinHeight number              # Minimum height of the highest point of the trajectory measured from the position of the missile at the end of the launch phase minRadius/2 or so is a decent value
----@field FinalBoostAngle number        # Angle in degrees that we'll aim to be at the end of the boost phase 90 is vertical, 0 is horizontal
----@field MaxZigZagThreshold number     # Threshold for when we consider the missile to be zigzagging
+---@field LaunchTicks number                # How long we spend in the launch phase, in ticks
+---@field LaunchTicksRange number           # Randomness factor for `LaunchTicks` in ticks
+---@field LaunchTurnRate number             # Inital launch phase turn rate, gives a little turnover coming out of the tube
+---@field LaunchTurnRateRange number        # Randomness factor for `LaunchTurnRate`
+---@field HeightDistanceFactor number       # Each missile calculates an optimal highest point of its trajectory, based on its distance to the target. This is the factor that determines how high above the target that point is, in relation to the horizontal distance.  A higher number will result in a lower trajectory 5-8 is a decent value
+---@field HeightDistanceFactorRange number  # Randomness factor for `HeightDistanceFactor`
+---@field MinHeight number                  # Minimum height of the highest point of the trajectory measured from the position of the missile at the end of the launch phase minRadius/2 or so is a decent value
+---@field MinHeightRange number             # Randomness factor for `MinHeight`
+---@field FinalBoostAngle number            # Angle in degrees that we'll aim to be at the end of the boost phase 90 is vertical, 0 is horizontal
+---@field FinalBoostAngleRange number       # Randomness factor for `FinalBoostAngleRange`
+---@field MaxZigZagThreshold number         # Threshold for when we consider the missile to be zigzagging
 SemiBallisticComponent = ClassSimple {
 
     -- set some sane defaults
     LaunchTicks = 2,
+    LaunchTicksRange = 0,
+
     LaunchTurnRate = 6,
+    LaunchTurnRateRange = 0,
+
     HeightDistanceFactor = 5,
+    HeightDistanceFactorRange = 0,
+
     MinHeight = 2,
+    MinHeightRange = 0,
+
     FinalBoostAngle = 0,
+    FinalBoostAngleRange = 0,
+
     MaxZigZagThreshold = 1,
 
     --- For a projectile that starts under acceleration, 
@@ -55,14 +70,17 @@ SemiBallisticComponent = ClassSimple {
     ---@return number
     ---@return number
     TurnRateFromAngleAndHeight = function(self)
-        local targetAngle = self.FinalBoostAngle * MathPi/180
+        local finalBoostAngle = self.FinalBoostAngle + self.FinalBoostAngleRange * (2 * Random() - 1)
+        local targetAngle = finalBoostAngle * MathPi/180
         local currentAngle = self:ElevationAngle()
         local deltaY = self:OptimalMaxHeight() - self:GetPosition()[2]
-        if deltaY < self.MinHeight then
-            deltaY = self.MinHeight
-        end
-        local turnTime = deltaY/self:AverageVerticalVelocityThroughTurn(targetAngle, currentAngle)
 
+        local minHeight = self.MinHeight + self.MinHeightRange * (2 * Random() - 1)
+        if deltaY < minHeight then
+            deltaY = minHeight
+        end
+
+        local turnTime = deltaY/self:AverageVerticalVelocityThroughTurn(targetAngle, currentAngle)
         local degreesPerSecond = MathAbs(targetAngle - currentAngle)/turnTime * 180/MathPi
         return degreesPerSecond, turnTime
     end,
@@ -72,6 +90,7 @@ SemiBallisticComponent = ClassSimple {
     ---@return number
     ---@return number
     TurnRateFromDistance = function(self)
+        local blueprintPhysics = self.Blueprint.Physics
 
         local dist = self:DistanceToTarget()
         local targetVector = VDiff(self:GetCurrentTargetPosition(), self:GetPosition())
@@ -84,11 +103,11 @@ SemiBallisticComponent = ClassSimple {
         local arcLength = 2 * theta * dist/(2 * MathSin(theta))
 
         local averageSpeed
-        if speed*10 < self:GetBlueprint().Physics.MaxSpeed * 0.95 then
+        if speed*10 < blueprintPhysics.MaxSpeed * 0.95 then
             -- assuming acceleration is still equal to the blueprint value, this could bite us!
-            averageSpeed = self:AverageSpeedOverDistance(arcLength, self:GetBlueprint().Physics.Acceleration)
+            averageSpeed = self:AverageSpeedOverDistance(arcLength, blueprintPhysics.Acceleration)
         else
-            averageSpeed = self:GetBlueprint().Physics.MaxSpeed
+            averageSpeed = blueprintPhysics.MaxSpeed
         end
 
         local arcTime = arcLength / averageSpeed
@@ -102,8 +121,10 @@ SemiBallisticComponent = ClassSimple {
     ---@param acceleration number
     ---@return number
     AverageSpeedOverDistance = function(self, dist, acceleration)
+        local blueprintPhysics = self.Blueprint.Physics
+
         local speed = self:GetCurrentSpeed()*10
-        local maxSpeed = self:GetBlueprint().Physics.MaxSpeed
+        local maxSpeed = blueprintPhysics.MaxSpeed
         local accelerationDistance = (MathPow(maxSpeed,2) - MathPow(speed,2)) / (2 * acceleration)
         local averageSpeed
         if dist < accelerationDistance then
@@ -173,7 +194,7 @@ SemiBallisticComponent = ClassSimple {
     OptimalMaxHeight = function(self)
         local horizDist = self:HorizontalDistanceToTarget()
         local targetHeight = self:GetCurrentTargetPosition()[2]
-        local maxHeight = targetHeight + horizDist/self.HeightDistanceFactor
+        local maxHeight = targetHeight + horizDist/(self.HeightDistanceFactor + self.HeightDistanceFactorRange * (2 * Random() - 1))
         return maxHeight
     end,
 
