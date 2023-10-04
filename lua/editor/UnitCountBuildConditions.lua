@@ -1522,3 +1522,25 @@ function CheckBuildPlattonDelay(aiBrain, PlatoonName)
     end
     return true
 end
+
+function HaveUnitsInCategoryBeingUpgraded(aiBrain, numunits, category, compareType)
+    -- get all units matching 'category'
+    local unitsBuilding = aiBrain:GetListOfUnits(category, false)
+    local numBuilding = 0
+    -- own armyIndex
+    local armyIndex = aiBrain:GetArmyIndex()
+    -- loop over all units and search for upgrading units
+    for _, unit in unitsBuilding do
+        if not unit.Dead and not unit:BeenDestroyed() and unit:IsUnitState('Upgrading') and unit:GetAIBrain():GetArmyIndex() == armyIndex then
+            numBuilding = numBuilding + 1
+        end
+    end
+    --RNGLOG(aiBrain:GetArmyIndex()..' HaveUnitsInCategoryBeingUpgrade ( '..numBuilding..' '..compareType..' '..numunits..' ) --  return '..repr(CompareBody(numBuilding, numunits, compareType))..' ')
+    return CompareBody(numBuilding, numunits, compareType)
+end
+function HaveLessThanUnitsInCategoryBeingUpgraded(aiBrain, numunits, category)
+    return HaveUnitsInCategoryBeingUpgraded(aiBrain, numunits, category, '<')
+end
+function HaveGreaterThanUnitsInCategoryBeingUpgraded(aiBrain, numunits, category)
+    return HaveUnitsInCategoryBeingUpgraded(aiBrain, numunits, category, '>')
+end
