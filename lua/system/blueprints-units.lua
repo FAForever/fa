@@ -560,30 +560,28 @@ function PostProcessUnitWithExternalFactory(allBlueprints, unit)
 
         -- add order overrides to carriers
         if unit.CategoriesHash['CARRIER'] then
-            -- remove the basic transport order
-            unit.General.CommandCaps.RULEUCC_Transport = false
 
-            -- override our toggle function to display properly
-            -- and remove the normal transport order override
+            -- override our transport function to display what we want
+            -- and exhibit new behavior
             if not unit.General.OrderOverrides then
                 unit.General.OrderOverrides = {}
-            else
-                unit.General.OrderOverrides.RULEUCC_Transport = nil
             end
-
-            unit.General.OrderOverrides.RULEUTC_WeaponToggle = {
+            
+            unit.General.OrderOverrides.RULEUCC_Transport = {
                 bitmapId = 'deploy',
                 helpText = 'auto_deploy',
                 behavior = 'AutoDeployBehavior',
                 initialStateFunc = 'AutoDeployInit',
-                preferredSlot = 9,
+                extraInfo = 1,
             }
             
             -- add the toggle so it can be flipped to begin with
+            -- but add an order override to remove it from our orders table
             if not unit.General.ToggleCaps then
                 unit.General.ToggleCaps = {}
             end
             unit.General.ToggleCaps.RULEUTC_WeaponToggle = true
+            unit.General.OrderOverrides.RULEUTC_WeaponToggle = false
         end
 
         -- remove properties of the seed unit
