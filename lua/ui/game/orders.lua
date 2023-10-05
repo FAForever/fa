@@ -1121,7 +1121,7 @@ local defaultOrdersTable = {
     -- Common rules
     AttackMove = {                  helpText = "attack_move",       bitmapId = 'attack_move',           preferredSlot = 1,  behavior = AttackMoveBehavior},
     RULEUCC_Move = {                helpText = "move",              bitmapId = 'move',                  preferredSlot = 2,  behavior = StandardOrderBehavior},
-    RULEUCC_Attack = {              helpText = "attack",            bitmapId = 'attack',                preferredSlot = 3,  behavior = AttackOrderBehavior, initialStateFunc = AttackOrderInit},
+    RULEUCC_Attack = {              helpText = "attack",            bitmapId = 'attack',                preferredSlot = 3,  behavior = AttackOrderBehavior,         initialStateFunc = AttackOrderInit},
     RULEUCC_Patrol = {              helpText = "patrol",            bitmapId = 'patrol',                preferredSlot = 4,  behavior = StandardOrderBehavior},
     RULEUCC_Stop = {                helpText = "stop",              bitmapId = 'stop',                  preferredSlot = 5,  behavior = StopOrderBehavior},
     RULEUCC_Guard = {               helpText = "assist",            bitmapId = 'guard',                 preferredSlot = 6,  behavior = StandardOrderBehavior},
@@ -1132,8 +1132,8 @@ local defaultOrdersTable = {
     RULEUCC_SiloBuildNuke = {       helpText = "build_nuke",        bitmapId = 'silo-build-nuke',       preferredSlot = 9,  behavior = BuildOrderBehavior,          initialStateFunc = BuildInitFunction},
     RULEUCC_Script = {              helpText = "special_action",    bitmapId = 'overcharge',            preferredSlot = 8,  behavior = StandardOrderBehavior},
     RULEUCC_Transport = {           helpText = "transport",         bitmapId = 'unload',                preferredSlot = 9,  behavior = StandardOrderBehavior},
-    RULEUCC_Nuke = {                helpText = "fire_nuke",         bitmapId = 'launch-nuke',           preferredSlot = 10, behavior = StandardOrderBehavior, ButtonTextFunc = NukeBtnText},
-    RULEUCC_Tactical = {            helpText = "fire_tactical",     bitmapId = 'launch-tactical',       preferredSlot = 10, behavior = StandardOrderBehavior, ButtonTextFunc = TacticalBtnText},
+    RULEUCC_Nuke = {                helpText = "fire_nuke",         bitmapId = 'launch-nuke',           preferredSlot = 10, behavior = StandardOrderBehavior,       ButtonTextFunc = NukeBtnText},
+    RULEUCC_Tactical = {            helpText = "fire_tactical",     bitmapId = 'launch-tactical',       preferredSlot = 10, behavior = StandardOrderBehavior,       ButtonTextFunc = TacticalBtnText},
     RULEUCC_Teleport = {            helpText = "teleport",          bitmapId = 'teleport',              preferredSlot = 10, behavior = StandardOrderBehavior},
     RULEUCC_Ferry = {               helpText = "ferry",             bitmapId = 'ferry',                 preferredSlot = 10, behavior = StandardOrderBehavior},
     RULEUCC_Sacrifice = {           helpText = "sacrifice",         bitmapId = 'sacrifice',             preferredSlot = 10, behavior = StandardOrderBehavior},
@@ -1146,7 +1146,7 @@ local defaultOrdersTable = {
     DroneL = {                      helpText = "drone",             bitmapId = 'unload02',              preferredSlot = 10, behavior = DroneBehavior,               initialStateFunc = DroneInit},
     DroneR = {                      helpText = "drone",             bitmapId = 'unload02',              preferredSlot = 11, behavior = DroneBehavior,               initialStateFunc = DroneInit},
 
-    ExFac = {                       helpText = "external_factory",  bitmapId = 'exfac',                 preferredSlot = 10,  behavior = ExternalFactoryBehavior},
+    ExFac = {                       helpText = "external_factory",  bitmapId = 'exfac',                 preferredSlot = 10, behavior = ExternalFactoryBehavior},
 
     -- Unit toggle rules
     RULEUTC_ShieldToggle = {        helpText = "toggle_shield",     bitmapId = 'shield',                preferredSlot = 8,  behavior = ScriptButtonOrderBehavior,   initialStateFunc = ScriptButtonInitFunction, extraInfo = 0},
@@ -1379,6 +1379,66 @@ function AddAbilityButtons(standardOrdersTable, availableOrders, units)
     end
 end
 
+function DronePreCheck(availableOrders, units, assistingUnitList)
+    local podStagingPlatforms = EntityCategoryFilterDown(categories.PODSTAGINGPLATFORM, units)
+    local pods = EntityCategoryFilterDown(categories.POD, units)
+    if not table.empty(units) and (not table.empty(podStagingPlatforms) or not table.empty(pods)) then
+        assistingUnitList.podUnits = {}
+        local assistingUnits = {}
+        if not table.empty(pods) then
+            for _, pod in pods do
+                table.insert(assistingUnits, pod:GetCreator())
+            end
+            assistingUnitList.podUnits['DroneL'] = pods
+        elseif not table.empty(podStagingPlatforms) then
+            assistingUnits = GetAssistingUnitsList(podStagingPlatforms)
+            assistingUnitList.podUnits['DroneL'] = assistingUnits
+        end
+
+        
+        if not table.empty(assistingUnits) then
+            if table.getn(podStagingPlatforms) == 1 and table.empty(pods) then
+                table.insert(availableOrders, 'DroneL')
+                assistingUnitList['DroneL'] = {assistingUnits[1]}
+                if table.getn(assistingUnits) > 1 then
+                    table.insert(availableOrders, 'DroneR')
+                    assistingUnitList['DroneR'] = {assistingUnits[2]}
+                    assistingUnitList.podUnits['DroneL'] = {assistingUnits[1]}
+                    assistingUnitList.podUnits['DroneR'] = {assistingUnits[2]}
+                end
+            else
+                table.insert(availableOrders, 'DroneL')
+                assistingUnitList['DroneL'] = assistingUnits
+            end
+        end
+    end
+end
+
+function ExternalFactoryPreCheck(availableOrders, units, assistingUnitList)
+    local exFacs = EntityCategoryFilterDown(categories.EXTERNALFACTORY + categories.EXTERNALFACTORYUNIT, units)
+    if not table.empty(exFacs) and table.getn(exFacs) == table.getn(units) then
+        -- make sure we've selected all external factories, or all external factory units
+        if table.getn(EntityCategoryFilterDown(categories.EXTERNALFACTORY, exFacs)) == table.getn(units) or
+           table.getn(EntityCategoryFilterDown(categories.EXTERNALFACTORYUNIT, exFacs)) == table.getn(units) then
+            assistingUnitList['ExFac'] = {}
+            -- finally, make sure our units are all of the same type
+            local bp = exFacs[1]:GetUnitId()
+            if table.getn(EntityCategoryFilterDown(categories[bp], exFacs)) == table.getn(exFacs) then
+                for _, exFac in exFacs do
+                    table.insert(assistingUnitList['ExFac'], exFac:GetCreator())
+                end
+                table.insert(availableOrders, 'ExFac')
+            end
+        end
+    end
+end
+
+local altPreCheckFunctions = {
+    Drone = DronePreCheck,
+    ExternalFactory = ExternalFactoryPreCheck,
+    --BuildUnitToggle = BuildUnitTogglePreCheck,
+}
+
 -- Creates the buttons for the alt orders, placing them as possible
 local function CreateAltOrders(availableOrders, availableToggles, units)
     -- TODO? it would indeed be easier if the alt orders slot was in the blueprint, but for now try
@@ -1386,8 +1446,11 @@ local function CreateAltOrders(availableOrders, availableToggles, units)
     AddAbilityButtons(standardOrdersTable, availableOrders, units)
 
     local assistingUnitList = {}
+    for _, fn in altPreCheckFunctions do
+        fn(availableOrders, units, assistingUnitList)
+    end
 
-    --- Pods
+    --[[- Pods
     local podUnits = {}
     local podStagingPlatforms = EntityCategoryFilterDown(categories.PODSTAGINGPLATFORM, units)
     local pods = EntityCategoryFilterDown(categories.POD, units)
@@ -1437,7 +1500,7 @@ local function CreateAltOrders(availableOrders, availableToggles, units)
                 table.insert(availableOrders, 'ExFac')
             end
         end
-    end
+    end]]
 
     -- Determine what slots to put alt orders
     -- We first want a table of slots we want to fill, and what orders want to fill them
@@ -1539,8 +1602,8 @@ local function CreateAltOrders(availableOrders, availableToggles, units)
                 orderCheckbox._unit = assistingUnitList[availOrder]
             end
 
-            if podUnits[availOrder] then
-                orderCheckbox._pod = podUnits[availOrder]
+            if assistingUnitList.podUnits[availOrder] then
+                orderCheckbox._pod = assistingUnitList.podUnits[availOrder]
             end
 
             if orderInfo.initialStateFunc then
