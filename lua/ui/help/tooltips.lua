@@ -267,8 +267,8 @@ Tooltips = {
         description = "",
     },
     auto_deploy = {
-        title = "Auto Deploy",
-        description = "Automatically deploy constructed units",
+        title = "Deploy",
+        description = "Right click to automatically deploy constructed units",
     },
     drone = {
         title = "<LOC tooltipui0411>Select Drone",
