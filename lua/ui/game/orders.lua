@@ -561,8 +561,13 @@ local function AbilityButtonBehavior(self, modifiers)
 end
 
 -- Generic script button specific behvior
-local function ScriptButtonOrderBehavior(self, modifiers)
-    local state = self:IsChecked()
+local function ScriptButtonOrderBehavior(self, modifiers, toggle)
+    local state
+    if toggle ~= nil then
+        state = toggle
+    else
+        state = self:IsChecked()
+    end
     local mixed = false
     if self._mixedIcon then
         mixed = true
@@ -580,11 +585,12 @@ local function ScriptButtonOrderBehavior(self, modifiers)
     if controls.mouseoverDisplay.text then
         controls.mouseoverDisplay.text:SetText(self._curHelpText)
     end
-
-    Checkbox.OnClick(self)
+    if toggle == nil then
+        Checkbox.OnClick(self)
+    end
 end
 
-local function ScriptButtonInitFunction(control, unitList)
+local function ScriptButtonInitFunction(control, unitList, toggleCheck)
     local result = nil
     local mixed = false
     for i, v in unitList do
@@ -603,7 +609,11 @@ local function ScriptButtonInitFunction(control, unitList)
         control._mixedIcon = Bitmap(control, UIUtil.UIFile('/game/orders-panel/question-mark_bmp.dds'))
         LayoutHelpers.AtRightTopIn(control._mixedIcon, control, -2, 2)
     end
-    control:SetCheck(result) -- Selected state
+    if not toggleCheck then
+        control:SetCheck(result) -- Selected state
+    else
+        return result, mixed
+    end
 end
 
 local function DroneBehavior(self, modifiers)
@@ -1001,6 +1011,30 @@ local function OverchargeFrame(self, deltaTime)
     end
 end
 
+AutoDeployBehavior = function(self, modifiers)
+    if modifiers.Left then
+        StandardOrderBehavior(self, modifiers)
+    elseif modifiers.Right then
+        ScriptButtonOrderBehavior(self, modifiers, self.toggle)
+        self.toggle = not self.toggle
+        if self.toggle then
+            self.toggleIcon:SetAlpha(1)
+        else
+            self.toggleIcon:SetAlpha(0)
+        end
+    end
+end
+
+AutoDeployInit = function(self, selection)
+    self._order = 'RULEUCC_Transport'
+    self.toggleIcon = Bitmap(self, UIUtil.UIFile('/game/orders/ring-yellow_mod.dds'))
+    LayoutHelpers.AtCenterIn(self.toggleIcon, self)
+    local mixed
+    self.toggle, mixed = ScriptButtonInitFunction(self, selection, true)
+    if mixed or not self.toggle then
+        self.toggleIcon:SetAlpha(0)
+    end
+end
 
 ---@alias CommandCap EngineCommandCap
 ---| "AttackMove"
@@ -1085,6 +1119,12 @@ local commonOrders = {
     RULEUCC_Guard = true,
     RULEUCC_RetaliateToggle = true,
     AttackMove = true,
+}
+
+-- Put function overrides here so they can be accessed from values passed from unit blueprints
+local overrideFunctionTable = {
+    AutoDeployInit = AutoDeployInit,
+    AutoDeployBehavior = AutoDeployBehavior,
 }
 
 --[[
@@ -1523,14 +1563,14 @@ function ApplyOverrides(standardOrdersTable, newSelection)
             if override and override ~= false then
                 for key, value in override do
                     -- if we have a function override, we'll need to get it from the table
-                    -- behaviorOverrideTable takes a string and gives a function of the same name
+                    -- overrideFunctionTable takes a string and gives a function of the same name
                     -- the value of the behavior field in the override in the blueprint should be 
-                    -- equal to the key in the behaviorOverrideTable
+                    -- equal to the key in the overrideFunctionTable
                     if key == 'behavior' or key == 'initialStateFunc' then
-                        if not behaviorOverrideTable[value] then
-                            WARN('Attempted to override an order behavior with a function that does not exist in behaviorOverrideTable!')
+                        if not overrideFunctionTable[value] then
+                            WARN('Attempted to override an order behavior with a function that does not exist in overrideFunctionTable!')
                         else
-                            standardOrdersTable[orderKey][key] = behaviorOverrideTable[value]
+                            standardOrdersTable[orderKey][key] = overrideFunctionTable[value]
                         end
                     else
                         standardOrdersTable[orderKey][key] = value
