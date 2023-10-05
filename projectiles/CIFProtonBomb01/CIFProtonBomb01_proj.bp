@@ -20,7 +20,6 @@ ProjectileBlueprint {
         'CYBRAN',
         'PROJECTILE',
         'INDIRECTFIRE',
-        'STRATEGIC',
     },
     Display = {
         CameraFollowTimeout = 2,
@@ -45,12 +44,6 @@ ProjectileBlueprint {
     },
     General = {
         Category = 'Bomb',
-        EntityCategory = {
-            'CYBRAN',
-            'PROJECTILE',
-            'INDIRECTFIRE',
-            'STRATEGIC',
-        },
         Faction = 'Cybran',
         Weapon = 'Proton Bomb',
     },
