@@ -1433,10 +1433,15 @@ function ExternalFactoryPreCheck(availableOrders, units, assistingUnitList)
     end
 end
 
+
+function BuildUnitTogglePreCheck(availableOrders, units, assistingUnitList)
+    local factories = EntityCategoryFilterDown(categories.FACTORY - categories.EXTERNALFACTORY, units)
+end
+
 local altPreCheckFunctions = {
     Drone = DronePreCheck,
     ExternalFactory = ExternalFactoryPreCheck,
-    --BuildUnitToggle = BuildUnitTogglePreCheck,
+    BuildUnitToggle = BuildUnitTogglePreCheck,
 }
 
 -- Creates the buttons for the alt orders, placing them as possible
@@ -1449,58 +1454,6 @@ local function CreateAltOrders(availableOrders, availableToggles, units)
     for _, fn in altPreCheckFunctions do
         fn(availableOrders, units, assistingUnitList)
     end
-
-    --[[- Pods
-    local podUnits = {}
-    local podStagingPlatforms = EntityCategoryFilterDown(categories.PODSTAGINGPLATFORM, units)
-    local pods = EntityCategoryFilterDown(categories.POD, units)
-    if not table.empty(units) and (not table.empty(podStagingPlatforms) or not table.empty(pods)) then
-        local assistingUnits = {}
-        if not table.empty(pods) then
-            for _, pod in pods do
-                table.insert(assistingUnits, pod:GetCreator())
-            end
-            podUnits['DroneL'] = pods
-        elseif not table.empty(podStagingPlatforms) then
-            assistingUnits = GetAssistingUnitsList(podStagingPlatforms)
-            podUnits['DroneL'] = assistingUnits
-        end
-
-        
-        if not table.empty(assistingUnits) then
-            if table.getn(podStagingPlatforms) == 1 and table.empty(pods) then
-                table.insert(availableOrders, 'DroneL')
-                assistingUnitList['DroneL'] = {assistingUnits[1]}
-                if table.getn(assistingUnits) > 1 then
-                    table.insert(availableOrders, 'DroneR')
-                    assistingUnitList['DroneR'] = {assistingUnits[2]}
-                    podUnits['DroneL'] = {assistingUnits[1]}
-                    podUnits['DroneR'] = {assistingUnits[2]}
-                end
-            else
-                table.insert(availableOrders, 'DroneL')
-                assistingUnitList['DroneL'] = assistingUnits
-            end
-        end
-    end
-
-    --- External factories
-    local exFacs = EntityCategoryFilterDown(categories.EXTERNALFACTORY + categories.EXTERNALFACTORYUNIT, units)
-    if not table.empty(exFacs) and table.getn(exFacs) == table.getn(units) then
-        -- make sure we've selected all external factories, or all external factory units
-        if table.getn(EntityCategoryFilterDown(categories.EXTERNALFACTORY, exFacs)) == table.getn(units) or
-           table.getn(EntityCategoryFilterDown(categories.EXTERNALFACTORYUNIT, exFacs)) == table.getn(units) then
-            assistingUnitList['ExFac'] = {}
-            -- finally, make sure our units are all of the same type
-            local bp = exFacs[1]:GetUnitId()
-            if table.getn(EntityCategoryFilterDown(categories[bp], exFacs)) == table.getn(exFacs) then
-                for _, exFac in exFacs do
-                    table.insert(assistingUnitList['ExFac'], exFac:GetCreator())
-                end
-                table.insert(availableOrders, 'ExFac')
-            end
-        end
-    end]]
 
     -- Determine what slots to put alt orders
     -- We first want a table of slots we want to fill, and what orders want to fill them
