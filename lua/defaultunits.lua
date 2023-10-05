@@ -5,52 +5,52 @@
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
-BaseTransport = import("/lua/defaultunitcomponents/transport.lua").BaseTransport
+BaseTransport = import("/lua/sim/defaultunitcomponents/transportunitcomponent.lua").BaseTransport
 
-StructureUnit = import("/lua/defaultunits/structure.lua").StructureUnit
-AirStagingPlatformUnit = import("/lua/defaultunits/airstagingplatform.lua").AirStagingPlatformUnit
-ConcreteStructureUnit = import("/lua/defaultunits/concretestructure.lua").ConcreteStructureUnit
-RadarUnit = import("/lua/defaultunits/radar.lua").RadarUnit
-RadarJammerUnit = import("/lua/defaultunits/radarjammer.lua").RadarJammerUnit
-SonarUnit = import("/lua/defaultunits/sonar.lua").SonarUnit
+StructureUnit = import("/lua/sim/defaultunits/structureunit.lua").StructureUnit
+AirStagingPlatformUnit = import("/lua/sim/defaultunits/airstagingplatformunit.lua").AirStagingPlatformUnit
+ConcreteStructureUnit = import("/lua/sim/defaultunits/concretestructureunit.lua").ConcreteStructureUnit
+RadarUnit = import("/lua/sim/defaultunits/radarunit.lua").RadarUnit
+RadarJammerUnit = import("/lua/sim/defaultunits/radarjammerunit.lua").RadarJammerUnit
+SonarUnit = import("/lua/sim/defaultunits/sonarunit.lua").SonarUnit
 
-ShieldStructureUnit = import("/lua/defaultunits/shieldstructure.lua").ShieldStructureUnit
-TransportBeaconUnit = import("/lua/defaultunits/transportbeacon.lua").TransportBeaconUnit
-WallStructureUnit = import("/lua/defaultunits/wallstructure.lua").WallStructureUnit
+ShieldStructureUnit = import("/lua/sim/defaultunits/shieldstructureunit.lua").ShieldStructureUnit
+TransportBeaconUnit = import("/lua/sim/defaultunits/transportbeaconunit.lua").TransportBeaconUnit
+WallStructureUnit = import("/lua/sim/defaultunits/wallstructureunit.lua").WallStructureUnit
 
-FactoryUnit = import("/lua/defaultunits/factory.lua").FactoryUnit
-AirFactoryUnit = import("/lua/defaultunits/airfactory.lua").AirFactoryUnit
-LandFactoryUnit = import("/lua/defaultunits/landfactory.lua").LandFactoryUnit
-SeaFactoryUnit = import("/lua/defaultunits/seafactory.lua").SeaFactoryUnit
-QuantumGateUnit = import("/lua/defaultunits/quantumgate.lua").QuantumGateUnit
+FactoryUnit = import("/lua/sim/defaultunits/factoryunit.lua").FactoryUnit
+AirFactoryUnit = import("/lua/sim/defaultunits/airfactoryunit.lua").AirFactoryUnit
+LandFactoryUnit = import("/lua/sim/defaultunits/landfactoryunit.lua").LandFactoryUnit
+SeaFactoryUnit = import("/lua/sim/defaultunits/seafactoryunit.lua").SeaFactoryUnit
+QuantumGateUnit = import("/lua/sim/defaultunits/quantumgateunit.lua").QuantumGateUnit
 
-MassCollectionUnit = import("/lua/defaultunits/masscollection.lua").MassCollectionUnit
-MassFabricationUnit = import("/lua/defaultunits/massfabrication.lua").MassFabricationUnit
-MassStorageUnit = import("/lua/defaultunits/massstorage.lua").MassStorageUnit
+MassCollectionUnit = import("/lua/sim/defaultunits/masscollectionunit.lua").MassCollectionUnit
+MassFabricationUnit = import("/lua/sim/defaultunits/massfabricationunit.lua").MassFabricationUnit
+MassStorageUnit = import("/lua/sim/defaultunits/massstorageunit.lua").MassStorageUnit
 
-EnergyCreationUnit = import("/lua/defaultunits/energycreation.lua").EnergyCreationUnit
-EnergyStorageUnit = import("/lua/defaultunits/energystorage.lua").EnergyStorageUnit
+EnergyCreationUnit = import("/lua/sim/defaultunits/energycreationunit.lua").EnergyCreationUnit
+EnergyStorageUnit = import("/lua/sim/defaultunits/energystorageunit.lua").EnergyStorageUnit
 
-MobileUnit = import("/lua/defaultunits/mobile.lua").MobileUnit
-WalkingLandUnit = import("/lua/defaultunits/walkingland.lua").WalkingLandUnit
-SubUnit = import("/lua/defaultunits/sub.lua").SubUnit
-AirUnit = import("/lua/defaultunits/air.lua").AirUnit
-LandUnit = import("/lua/defaultunits/land.lua").LandUnit
-SeaUnit = import("/lua/defaultunits/sea.lua").SeaUnit
-HoverLandUnit = import("/lua/defaultunits/hoverland.lua").HoverLandUnit
-SlowHoverLandUnit = import("/lua/defaultunits/slowhoverland.lua").SlowHoverLandUnit
-ConstructionUnit = import("/lua/defaultunits/construction.lua").ConstructionUnit
-AmphibiousLandUnit = import("/lua/defaultunits/amphibiousland.lua").AmphibiousLandUnit
-SlowAmphibiousLandUnit = import("/lua/defaultunits/slowamphibiousland.lua").SlowAmphibiousLandUnit
-CommandUnit = import("/lua/defaultunits/command.lua").CommandUnit
-ACUUnit = import("/lua/defaultunits/acu.lua").ACUUnit
-AirTransport = import("/lua/defaultunits/airtransport.lua").AirTransport
-AircraftCarrier = import("/lua/defaultunits/aircraftcarrier.lua").AircraftCarrier
-ShieldHoverLandUnit = import("/lua/defaultunits/shieldhoverland.lua").ShieldHoverLandUnit
-ShieldLandUnit = import("/lua/defaultunits/shieldland.lua").ShieldLandUnit
-ShieldSeaUnit = import("/lua/defaultunits/shieldsea.lua").ShieldSeaUnit
+MobileUnit = import("/lua/sim/defaultunits/mobileunit.lua").MobileUnit
+WalkingLandUnit = import("/lua/sim/defaultunits/walkinglandunit.lua").WalkingLandUnit
+SubUnit = import("/lua/sim/defaultunits/subunit.lua").SubUnit
+AirUnit = import("/lua/sim/defaultunits/airunit.lua").AirUnit
+LandUnit = import("/lua/sim/defaultunits/landunit.lua").LandUnit
+SeaUnit = import("/lua/sim/defaultunits/seaunit.lua").SeaUnit
+HoverLandUnit = import("/lua/sim/defaultunits/hoverlandunit.lua").HoverLandUnit
+SlowHoverLandUnit = import("/lua/sim/defaultunits/slowhoverlandunit.lua").SlowHoverLandUnit
+ConstructionUnit = import("/lua/sim/defaultunits/constructionunit.lua").ConstructionUnit
+AmphibiousLandUnit = import("/lua/sim/defaultunits/amphibiouslandunit.lua").AmphibiousLandUnit
+SlowAmphibiousLandUnit = import("/lua/sim/defaultunits/slowamphibiouslandunit.lua").SlowAmphibiousLandUnit
+CommandUnit = import("/lua/sim/defaultunits/commandunit.lua").CommandUnit
+ACUUnit = import("/lua/sim/defaultunits/acuunit.lua").ACUUnit
+AirTransport = import("/lua/sim/defaultunits/airtransportunit.lua").AirTransport
+AircraftCarrier = import("/lua/sim/defaultunits/aircraftcarrierunit.lua").AircraftCarrier
+ShieldHoverLandUnit = import("/lua/sim/defaultunits/shieldhoverlandunit.lua").ShieldHoverLandUnit
+ShieldLandUnit = import("/lua/sim/defaultunits/shieldlandunit.lua").ShieldLandUnit
+ShieldSeaUnit = import("/lua/sim/defaultunits/shieldseaunit.lua").ShieldSeaUnit
 
-ExternalFactoryUnit = import("/lua/defaultunits/externalfactory.lua").ExternalFactoryUnit
+ExternalFactoryUnit = import("/lua/sim/defaultunits/externalfactoryunit.lua").ExternalFactoryUnit
 
 -------------------------------------------------------------------------------
 --#region Backwards compatibility

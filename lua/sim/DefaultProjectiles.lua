@@ -20,29 +20,29 @@
 --** SOFTWARE.
 --******************************************************************************************************
 
-SemiBallisticComponent = import("/lua/sim/components-projectile/semiballisticcomponent.lua").SemiBallisticComponent
-TacticalMissileComponent = import("/lua/sim/components-projectile/tacticalmissilecomponent.lua").TacticalMissileComponent
+SemiBallisticComponent = import("/lua/sim/defaultprojectilecomponents/semiballisticcomponent.lua").SemiBallisticComponent
+TacticalMissileComponent = import("/lua/sim/defaultprojectilecomponents/tacticalmissilecomponent.lua").TacticalMissileComponent
 
-NullShell = import("/lua/defaultprojectiles/null.lua").NullShell
+NullShell = import("/lua/sim/defaultprojectiles/nullprojectile.lua").NullShell
 
-EmitterProjectile = import("/lua/defaultprojectiles/emitter.lua").EmitterProjectile
+EmitterProjectile = import("/lua/sim/defaultprojectiles/emitterprojectile.lua").EmitterProjectile
 
-SingleBeamProjectile = import("/lua/defaultprojectiles/singlebeam.lua").SingleBeamProjectile
-MultiBeamProjectile = import("/lua/defaultprojectiles/multibeam.lua").MultiBeamProjectile
+SingleBeamProjectile = import("/lua/sim/defaultprojectiles/singlebeamprojectile.lua").SingleBeamProjectile
+MultiBeamProjectile = import("/lua/sim/defaultprojectiles/multibeamprojectile.lua").MultiBeamProjectile
 
-NukeProjectile = import("/lua/defaultprojectiles/nuke.lua").NukeProjectile
+NukeProjectile = import("/lua/sim/defaultprojectiles/nukeprojectile.lua").NukeProjectile
 
-SinglePolyTrailProjectile = import("/lua/defaultprojectiles/singlepolytrail.lua").SinglePolyTrailProjectile
-MultiPolyTrailProjectile = import("/lua/defaultprojectiles/multipolytrail.lua").MultiPolyTrailProjectile
+SinglePolyTrailProjectile = import("/lua/sim/defaultprojectiles/singlepolytrailprojectile.lua").SinglePolyTrailProjectile
+MultiPolyTrailProjectile = import("/lua/sim/defaultprojectiles/multipolytrailprojectile.lua").MultiPolyTrailProjectile
 
-SingleCompositeEmitterProjectile = import("/lua/defaultprojectiles/singlecompositeemitter.lua").SingleCompositeEmitterProjectile
-MultiCompositeEmitterProjectile = import("/lua/defaultprojectiles/multicompositeemitter.lua").MultiCompositeEmitterProjectile
+SingleCompositeEmitterProjectile = import("/lua/sim/defaultprojectiles/singlecompositeemitterprojectile.lua").SingleCompositeEmitterProjectile
+MultiCompositeEmitterProjectile = import("/lua/sim/defaultprojectiles/multicompositeemitterprojectile.lua").MultiCompositeEmitterProjectile
 
-OnWaterEntryEmitterProjectile = import("/lua/defaultprojectiles/onwaterentryemitter.lua").OnWaterEntryEmitterProjectile
+OnWaterEntryEmitterProjectile = import("/lua/sim/defaultprojectiles/onwaterentryemitterprojectile.lua").OnWaterEntryEmitterProjectile
 
-BaseGenericDebris = import("/lua/defaultprojectiles/debris.lua").BaseGenericDebris
+BaseGenericDebris = import("/lua/sim/defaultprojectiles/debrisprojectile.lua").BaseGenericDebris
 
-OverchargeProjectile = import("/lua/defaultprojectiles/overcharge.lua").OverchargeProjectile
+OverchargeProjectile = import("/lua/sim/defaultprojectiles/overchargeprojectile.lua").OverchargeProjectile
 
 -------------------------------------------------------------------------------
 --#region Backwards compatibility
