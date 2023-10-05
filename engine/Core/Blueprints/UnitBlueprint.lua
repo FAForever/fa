@@ -52,8 +52,6 @@
 --- the localised language). If the localisation part is not set, the description in tags will be
 --- used for any language, which would be "Medium Tank" for this example
 ---@field Description UnlocalizedString
---- list of categories that this unit will not collide with
----@field DoNotCollideList? CategoryName[]
 --- used by the Othuy ("lighting storm") script
 ---@field Lifetime? number
 --- used by the Othuy ("lighting storm") script
@@ -106,10 +104,6 @@
 ---@field BlueprintId UnitId
 --- auto-generated categories table based on `Categories` with each key a value in that array
 ---@field CategoriesHash table<CategoryName, true>
---- auto-generated number from `DoNotCollideList`
----@field DoNotCollideListCount number
---- auto-generated table from `DoNotCollideList`
----@field DoNotCollideListHash table<UnparsedCategory, true>
 --- auto-generated for unit blueprints generated from a unit with a preset in `EnhancementPresets`
 ---@field EnhancementPresetAssigned? UnitBlueprintAssignedEnhancementPreset
 --- auto-generated faction category from `Categories`
