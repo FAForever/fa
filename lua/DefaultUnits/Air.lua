@@ -224,7 +224,7 @@ AirUnit = ClassUnit(MobileUnit) {
         end
 
         -- allow regular air units to be destroyed by the projectiles of SMDs and SMLs
-        if other.Blueprint.CategoriesHash["DESTROYAIRONCOLLISION"] and not self.Blueprint.CategoriesHash.EXPERIMENTAL then
+        if other.Blueprint.CategoriesHash["KILLAIRONCOLLISION"] and not self.Blueprint.CategoriesHash.EXPERIMENTAL then
             self:Kill()
             return false
         end

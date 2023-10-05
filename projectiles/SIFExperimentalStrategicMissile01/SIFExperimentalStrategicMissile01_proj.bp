@@ -28,7 +28,7 @@ ProjectileBlueprint {
         'STRATEGIC',
         'MISSILE',
         'NOSPLASHDAMAGE',
-        'DESTROYAIRONCOLLISION',
+        'KILLAIRONCOLLISION',
     },
     Defense = {
         Health = 60000,
