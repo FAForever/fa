@@ -130,16 +130,6 @@ local function PostProcessUnit(unit)
 
     unit.CategoriesHash[unit.BlueprintId] = true
 
-    -- create hash tables for quick lookup
-    unit.DoNotCollideListCount = 0
-    unit.DoNotCollideListHash = {}
-    if unit.DoNotCollideList then
-        unit.DoNotCollideListCount = table.getn(unit.DoNotCollideList)
-        for _, category in unit.DoNotCollideList do
-            unit.DoNotCollideListHash[category] = true
-        end
-    end
-
     -- sanitize guard scan radius
 
     -- The guard scan radius is used when:
