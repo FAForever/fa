@@ -20,6 +20,7 @@ ProjectileBlueprint {
         'UEF',
         'PROJECTILE',
         'INDIRECTFIRE',
+        'IGNOREASFONCOLLISION',
     },
     Display = {
         CameraFollowTimeout = 2,
@@ -37,9 +38,6 @@ ProjectileBlueprint {
         },
         StrategicIconSize = 2,
         UniformScale = 0.125,
-    },
-    DoNotCollideList = {
-        'ASF',
     },
     General = {
         Category = 'Bomb',

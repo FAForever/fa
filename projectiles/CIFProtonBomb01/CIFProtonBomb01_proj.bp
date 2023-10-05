@@ -20,6 +20,7 @@ ProjectileBlueprint {
         'CYBRAN',
         'PROJECTILE',
         'INDIRECTFIRE',
+        'IGNOREASFONCOLLISION',
     },
     Display = {
         CameraFollowTimeout = 2,
@@ -38,9 +39,6 @@ ProjectileBlueprint {
         },
         StrategicIconSize = 2,
         UniformScale = 0.25,
-    },
-    DoNotCollideList = {
-        'ASF',
     },
     General = {
         Category = 'Bomb',
