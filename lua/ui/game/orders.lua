@@ -1541,26 +1541,31 @@ function ApplyOverrides(standardOrdersTable, newSelection)
                 if orderDiffs == nil then
                     orderDiffs = {}
                 end
-                for key, value in override do
-                    if orderDiffs[orderKey][key] ~= nil and (orderDiffs[orderKey][key] ~= value) then
-                        -- Found order diff already, so mark it false so it gets ignored when applying to table
-                        orderDiffs[orderKey] = false
-                        break
-                    else
-                        if orderDiffs[orderKey] == nil then
-                            orderDiffs[orderKey] = {}
+                if override then
+                    for key, value in override do
+                        if orderDiffs[orderKey][key] ~= nil and (orderDiffs[orderKey][key] ~= value) then
+                            -- Found order diff already, so mark it false so it gets ignored when applying to table
+                            orderDiffs[orderKey] = false
+                            break
+                        else
+                            if orderDiffs[orderKey] == nil then
+                                orderDiffs[orderKey] = {}
+                            end
+                            orderDiffs[orderKey][key] = value
                         end
-                        orderDiffs[orderKey][key] = value
                     end
+                elseif override == false then
+                    orderDiffs[orderKey] = false
                 end
             end
         end
     end
 
     -- Apply overrides
+    -- override sets to false will prevent that order from showing up
     if orderDiffs ~= nil then
         for orderKey, override in orderDiffs do
-            if override and override ~= false then
+            if override then
                 for key, value in override do
                     -- if we have a function override, we'll need to get it from the table
                     -- overrideFunctionTable takes a string and gives a function of the same name
@@ -1576,6 +1581,8 @@ function ApplyOverrides(standardOrdersTable, newSelection)
                         standardOrdersTable[orderKey][key] = value
                     end
                 end
+            elseif override == false then
+                standardOrdersTable[orderKey] = nil
             end
         end
     end
