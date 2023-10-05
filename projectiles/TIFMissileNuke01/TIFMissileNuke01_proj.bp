@@ -28,6 +28,7 @@ ProjectileBlueprint {
         'STRATEGIC',
         'MISSILE',
         'NOSPLASHDAMAGE',
+        'DESTROYAIRONCOLLISION',
     },
     Defense = {
         Health = 25000,
@@ -55,14 +56,6 @@ ProjectileBlueprint {
     },
     General = {
         Category = 'Missile',
-        EntityCategory = {
-            'UEF',
-            'PROJECTILE',
-            'INDIRECTFIRE',
-            'STRATEGIC',
-            'MISSILE',
-            'NOSPLASHDAMAGE',
-        },
         Faction = 'UEF',
     },
     Interface = {

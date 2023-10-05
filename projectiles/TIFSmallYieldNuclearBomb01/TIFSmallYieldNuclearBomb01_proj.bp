@@ -20,7 +20,6 @@ ProjectileBlueprint {
         'UEF',
         'PROJECTILE',
         'INDIRECTFIRE',
-        'STRATEGIC',
     },
     Display = {
         CameraFollowTimeout = 2,
@@ -44,12 +43,6 @@ ProjectileBlueprint {
     },
     General = {
         Category = 'Bomb',
-        EntityCategory = {
-            'UEF',
-            'PROJECTILE',
-            'INDIRECTFIRE',
-            'STRATEGIC',
-        },
         Faction = 'UEF',
         Weapon = 'Small Yield Nuclear Bomb',
     },
