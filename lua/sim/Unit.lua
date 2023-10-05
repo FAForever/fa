@@ -3233,6 +3233,11 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         -- Store latest layer for performance, preventing .Layer engine calls.
         self.Layer = new 
 
+        if old != 'None' then
+            self:DestroyMovementEffects()
+            self:CreateMovementEffects(self.MovementEffectsBag, nil)
+        end
+
         -- Bail out early if dead. The engine calls this function AFTER entity:Destroy() has killed
         -- the C object. Any functions down this line which expect a live C object (self:CreateAnimator())
         -- for example, will throw an error.
@@ -3356,7 +3361,6 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         local layer = self.Layer
         if (new == 'Up' and old == 'Bottom') or (new == 'Down' and old == 'Top') then
             self:DestroyIdleEffects()
-
             if new == 'Up' and layer == 'Sub' then
                 self:PlayUnitSound('SurfaceStart')
             end
