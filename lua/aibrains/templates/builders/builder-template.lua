@@ -82,6 +82,18 @@ AIBuilderTemplate = function(spec)
         spec.BuilderConditions = {}
     end
 
+    for k, builderCondition in spec.BuilderConditions do
+        if type(builderCondition[1]) != "function" then
+            WARN('Builder excluded for a condition without a function: ', reprs(spec))
+            return nil
+        end
+
+        if not ((type(builderCondition[2]) == "table") or (type(builderCondition[2]) == "nil")) then
+            WARN('Builder excluded for a condition with invalid input: ', reprs(spec))
+            return nil
+        end
+    end
+
     -- default value
     if not spec.BuilderData then
         spec.BuilderData = {}

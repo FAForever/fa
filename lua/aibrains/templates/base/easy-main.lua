@@ -13,7 +13,7 @@ BaseTemplateMain = AIBaseTemplate {
     },
     FactoryManager = {
         BuilderGroupTemplates = {
-            rawget(import("/lua/aibrains/templates/builder-groups/EasyLandFactoryBuilderGroups.lua"), 'StandardLandFactory'),
+            rawget(import("/lua/aibrains/templates/builder-groups/Factories/Land/EasyLandFactoryBuilderGroups.lua"), 'StandardLandFactory'),
         },
         BuilderGroupTemplatesNonCheating = {},
     }

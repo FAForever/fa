@@ -101,16 +101,23 @@ AIPlatoonSimpleFactory = Class(AIPlatoon) {
             -------------------------------------------------------------------
             -- determine what to build through the factory manager
 
+            local factory = units[1]
+
             local builder = self.Base.FactoryManager:GetHighestBuilder(self, units[1], self.BuilderType)
 
             if builder then
                 local candidates = EntityCategoryGetUnitList(builder.BuilderData.Categories * self.BuildableCategories)
                 if candidates and table.getn(candidates) > 0 then
                     local candidate = table.random(candidates)
-                    IssueBuildFactory(units, candidate, 1)
-
-                    self:ChangeState(self.Building)
-                    return
+                    if factory:CanBuild(candidate) then
+                        IssueBuildFactory(units, candidate, 1)
+                        self:ChangeState(self.Building)
+                        return
+                    else
+                        self:LogWarning(string.format("Unable to build: %s", candidate))
+                        self:ChangeState(self.Waiting)
+                        return
+                    end
                 end
             end
         end,
