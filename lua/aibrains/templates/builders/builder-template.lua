@@ -20,6 +20,8 @@
 ---@field UseUpgradeToBlueprintField boolean
 --- used by the structure manager. Indicates a specific blueprint to upgrade to, the second character is replaced with the faction of the structure: `uab0302` would become `ueb0302` for the UEF tech 3 land factory
 ---@field UpgradeToFactionReplace string
+--- categories used for various tasks
+---@field Categories EntityCategory
 
 ---@class AIBuilderTemplate
 ---@field BuilderConditions AIBuilderTemplateCondition[]

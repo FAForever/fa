@@ -228,19 +228,18 @@ AIStructureManager = Class(BuilderManager) {
             local tech = blueprint.TechCategory
             local id = unit.EntityId
 
-            LOG("Switched!")
             self.StructuresBeingBuilt[tech][id] = nil
             self.Structures[tech][id] = unit
 
             -- create the platoon and start the behavior
-            local brain = self.Brain
-            local platoon = brain:MakePlatoon('', '') --[[@as AIPlatoonSimpleStructure]]
-            platoon.Brain = self.Brain
-            platoon.Base = self.Base
+            -- local brain = self.Brain
+            -- local platoon = brain:MakePlatoon('', '') --[[@as AIPlatoonSimpleStructure]]
+            -- platoon.Brain = self.Brain
+            -- platoon.Base = self.Base
 
-            setmetatable(platoon, import("/lua/aibrains/platoons/platoon-simple-structure.lua").AIPlatoonSimpleStructure)
-            brain:AssignUnitsToPlatoon(platoon, { unit }, 'Unassigned', 'None')
-            ChangeState(platoon, platoon.Start)
+            -- setmetatable(platoon, import("/lua/aibrains/platoons/platoon-simple-structure.lua").AIPlatoonSimpleStructure)
+            -- brain:AssignUnitsToPlatoon(platoon, { unit }, 'Unassigned', 'None')
+            -- ChangeState(platoon, platoon.Start)
         end
     end,
 
