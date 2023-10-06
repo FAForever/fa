@@ -271,7 +271,7 @@ function factoryHotkey(units, count)
     -- Another 'hack' that is, uuhh - a hack. Override the event handle of the world view. If it doesn't 
     -- return false then the event is captured and the engine ignores it (no orders are issued when clicking, etc)
     worldview.HandleEvent = function(self, event)
-        if event.Type != 'ButtonRelease' then
+        if event.Type == 'ButtonPress' or event.Type == 'ButtonDClick' then
             if event.Modifiers.Left then
                 factoryHotkeyLastClickWasLeft = true
                 if type(units) == "string" then
@@ -291,10 +291,12 @@ function factoryHotkey(units, count)
                 end
             end
         else
-            if factoryHotkeyLastClickWasLeft then
-                factoryHotkeyLastClickWasLeft = false
-            else
-                StopCycleMap(self, event)
+            if event.Type == 'ButtonRelease'then
+                if factoryHotkeyLastClickWasLeft then
+                    factoryHotkeyLastClickWasLeft = false
+                else
+                    StopCycleMap(self, event)
+                end
             end
         end
     end
