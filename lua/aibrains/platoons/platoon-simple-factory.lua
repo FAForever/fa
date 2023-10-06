@@ -111,6 +111,11 @@ AIPlatoonSimpleFactory = Class(AIPlatoon) {
                         self:ChangeState(self.Waiting)
                         return
                     end
+                else
+                    -- try again in a bit
+                    self:LogWarning(string.format("Unable to process: %s", builder.Template.BuilderName))
+                    self:ChangeState(self.Waiting)
+                    return
                 end
             else
                 -- try again in a bit

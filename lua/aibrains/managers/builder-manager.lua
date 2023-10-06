@@ -102,6 +102,10 @@ AIBuilderManager = ClassSimple {
     AddBuilder = function(self, builderTemplate)
         -- create the type as necessary
         local builderType = builderTemplate.BuilderType
+        if not builderType then
+            builderType = 'All'
+        end
+
         if not self.BuilderData[builderTemplate.BuilderType] then
             self.BuilderData[builderType] = { Builders = {}, NeedSort = false }
         end

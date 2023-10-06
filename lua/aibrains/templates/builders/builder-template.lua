@@ -71,12 +71,6 @@ AIBuilderTemplate = function(spec)
         return nil
     end
 
-    -- required field
-    if not spec.BuilderType then
-        WARN('Builder excluded for missing field "BuilderType": ', reprs(spec))
-        return nil
-    end
-
     -- default value
     if not spec.BuilderConditions then
         spec.BuilderConditions = {}
