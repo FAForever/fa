@@ -1,16 +1,11 @@
 local AIPlatoon = import("/lua/aibrains/platoons/platoon-base.lua").AIPlatoon
-local NavUtils = import("/lua/sim/navutils.lua")
-local MarkerUtils = import("/lua/sim/markerutilities.lua")
 
 -- upvalue scope for performance
-local Random = Random
-local IsDestroyed = IsDestroyed
-
 local TableGetn = table.getn
-local TableEmpty = table.empty
+local TableRandom = table.random
 
--- how to get list of units to build
---         reprsl(EntityCategoryGetUnitList(ParseEntityCategory(self.Blueprint.Economy.BuildableCategory[3])))
+local ParseEntityCategory = ParseEntityCategory
+local EntityCategoryGetUnitList = EntityCategoryGetUnitList
 
 ---@class AIPlatoonSimpleFactory : AIPlatoon
 ---@field Base AIBase
@@ -22,7 +17,7 @@ AIPlatoonSimpleFactory = Class(AIPlatoon) {
 
     PlatoonName = 'SimpleFactoryBehavior',
 
-    --- Precomputes the buildable categories to make it easier to use throughout the script
+    --- Precomputes the buildable categories to make it easier to use throughout the state machine
     ---@param self AIPlatoonSimpleFactory
     PrecomputeBuildableCategories = function(self)
 
@@ -74,6 +69,7 @@ AIPlatoonSimpleFactory = Class(AIPlatoon) {
 
             -- cache builder type
             self.BuilderType = unit.Blueprint.LayerCategory
+            self:PrecomputeBuildableCategories()
 
             self:ChangeState(self.SearchingForTask)
             return
@@ -95,9 +91,6 @@ AIPlatoonSimpleFactory = Class(AIPlatoon) {
                 return
             end
 
-            -- TODO: refactor this when the architecture is more clear
-            self:PrecomputeBuildableCategories()
-
             -------------------------------------------------------------------
             -- determine what to build through the factory manager
 
@@ -107,8 +100,8 @@ AIPlatoonSimpleFactory = Class(AIPlatoon) {
 
             if builder then
                 local candidates = EntityCategoryGetUnitList(builder.BuilderData.Categories * self.BuildableCategories)
-                if candidates and table.getn(candidates) > 0 then
-                    local candidate = table.random(candidates)
+                if candidates and TableGetn(candidates) > 0 then
+                    local candidate = TableRandom(candidates)
                     if factory:CanBuild(candidate) then
                         IssueBuildFactory(units, candidate, 1)
                         self:ChangeState(self.Building)
@@ -183,19 +176,4 @@ AIPlatoonSimpleFactory = Class(AIPlatoon) {
 
         end,
     }
-
-    -----------------------------------------------------------------
-    -- brain events
 }
-
----@param data { }
----@param units Unit[]
-DebugAssignToUnits = function(data, units)
-    if units and not TableEmpty(units) then
-        -- trigger the on stop being built event of the brain
-        for k = 1, table.getn(units) do
-            local unit = units[k]
-            unit.Brain:OnUnitStopBeingBuilt(unit, nil, unit.Layer)
-        end
-    end
-end
