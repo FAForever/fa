@@ -789,9 +789,7 @@ local function CreateBuiltUnitTogglePopup(parent, selected)
     bg:DisableHitTest(true)
 
     local function CreateButton(toggle)
-        LOG(toggle)
         local orderInfo = defaultOrdersTable[toggle]
-        LOG(repr(orderInfo))
         local checkbox = Checkbox(bg, GetOrderBitmapNames(orderInfo.bitmapId))
 
         -- Set the info in to the data member for retrieval
@@ -800,13 +798,32 @@ local function CreateBuiltUnitTogglePopup(parent, selected)
         -- Set up initial help text
         checkbox._curHelpText = orderInfo.helpText
 
-        -- Set up click handler
-        checkbox.OnClick = orderInfo.behavior
+        -- see if we're mixed
+        local result = nil
+        local mixed = false
+        for i, v in selected do
+            LOG(toggle..' is '..repr(v:GetStat(toggle).Value))
+            local thisUnitStatus = v:GetStat(toggle, 0).Value
+            if result == nil then
+                result = thisUnitStatus
+            else
+                if thisUnitStatus ~= result then
+                    mixed = true
+                    result = true
+                    break
+                end
+            end
+        end
+        if mixed then
+            checkbox._mixedIcon = Bitmap(checkbox, UIUtil.UIFile('/game/orders-panel/question-mark_bmp.dds'))
+            LayoutHelpers.AtRightTopIn(checkbox._mixedIcon, checkbox, -2, 2)
+        end
+        checkbox:SetCheck(result > 0 and true or false) -- Selected state
 
         --orderInfo.initialStateFunction(checkbox, selected)
         checkbox.HandleEvent = function(control, event)
             if event.Type == 'MouseEnter' then
-                CreateMouseoverDisplay(control, control.info.helpText, 1)
+                CreateMouseoverDisplay(control, control._curHelpText, 1)
             elseif event.Type == "MouseExit" then
                 if controls.mouseoverDisplay then
                     controls.mouseoverDisplay:Destroy()
@@ -817,7 +834,7 @@ local function CreateBuiltUnitTogglePopup(parent, selected)
         end
 
         checkbox.OnCheck = function(self, checked)
-            parent:_OnButtonToggle(toggle)
+            parent:_OnButtonToggle(toggle, checked)
         end
         return checkbox
     end
@@ -826,7 +843,6 @@ local function CreateBuiltUnitTogglePopup(parent, selected)
     bg.buttons = {}
     for _, toggle in parent._data.availableBuildToggles do
         bg.buttons[i] = CreateButton(toggle)
-        LOG('Button created')
         if i == 1 then
             LayoutHelpers.AtBottomIn(bg.buttons[i], bg)
             LayoutHelpers.AtLeftIn(bg.buttons[i], bg)
@@ -850,15 +866,17 @@ end
 
 local function BuiltUnitToggleBehavior(self, modifiers)
     if not self._OnButtonToggle then
-        self._OnButtonToggle = function(self, toggle)
-            LOG('Toggling '..toggle)
+        self._OnButtonToggle = function(self, toggle, state)
+            state = (state and 1) or 0 -- numerize our bool
+            SimCallback( { Func="SetStatByCallback", Args= {[toggle] = state}}, true )
         end
     end
+    
     if self._popup then
         self._popup:Destroy()
         self._popup = nil
     else
-        self._popup = CreateBuiltUnitTogglePopup(self)
+        self._popup = CreateBuiltUnitTogglePopup(self, currentSelection)
         local function CollapsePopup(event)
             if (event.y < self._popup.Top() or event.y > self._popup.Bottom()) or (event.x < self._popup.Left() or event.x > self._popup.Right()) then
                 self._popup:Destroy()
@@ -1575,7 +1593,6 @@ function BuiltUnitTogglePreCheck(availableOrders, units, assistingUnitList)
                     table.insert(standardOrdersTable['BuiltUnitToggles'].availableBuildToggles, toggle)
                 end
             end
-            LOG(repr(standardOrdersTable['BuiltUnitToggles'].availableBuildToggles))
         end
     end
 end
