@@ -88,6 +88,21 @@ end
 Callbacks.EmptyCallback = function(data, units)
 end
 
+Callbacks.SetStatByCallback = function(data, units)
+    for _, u in units or {} do
+        if IsEntity(u) and OkayToMessWithArmy(u.Army) then
+            for stat, value in data do
+                if not tonumber(value) then
+                    WARN('Need a numeric value for SetStatByCallback!')
+                else
+                    LOG('SetStatByCallback: ' .. repr(stat) .. ' = ' .. repr(value))
+                    u:UpdateStat(stat, value)
+                end
+            end
+        end
+    end
+end
+
 Callbacks.AutoOvercharge = function(data, units)
     for _, u in units or {} do
         if IsEntity(u) and OkayToMessWithArmy(u.Army) and u.SetAutoOvercharge then
