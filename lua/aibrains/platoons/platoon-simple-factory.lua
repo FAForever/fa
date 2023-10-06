@@ -119,6 +119,10 @@ AIPlatoonSimpleFactory = Class(AIPlatoon) {
                         return
                     end
                 end
+            else
+                -- try again in a bit
+                self:ChangeState(self.Waiting)
+                return
             end
         end,
     },
@@ -131,6 +135,7 @@ AIPlatoonSimpleFactory = Class(AIPlatoon) {
         Main = function(self)
             WaitTicks(40)
             self:ChangeState(self.SearchingForTask)
+            return
         end,
     },
 
