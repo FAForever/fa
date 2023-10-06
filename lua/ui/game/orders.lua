@@ -22,6 +22,7 @@ local EnhancementQueue = import("/lua/ui/notify/enhancementqueue.lua")
 local SetWeaponPriorities = import("/lua/keymap/misckeyactions.lua").SetWeaponPriorities
 local CommandMode = import("/lua/ui/game/commandmode.lua")
 local Construction = import("/lua/ui/game/construction.lua")
+local GetBits = import("/lua/shared/mathutilities.lua").GetBits
 
 controls = import("/lua/ui/controls.lua").Get()
 
@@ -779,6 +780,105 @@ local function CreateBorder(parent)
     return border
 end
 
+local defaultOrdersTable
+
+local function CreateBuiltUnitTogglePopup(parent, selected)
+    local bg = Bitmap(parent, UIUtil.UIFile('/game/ability_brd/chat_brd_m.dds'))
+
+    bg.border = CreateBorder(bg)
+    bg:DisableHitTest(true)
+
+    local function CreateButton(toggle)
+        LOG(toggle)
+        local orderInfo = defaultOrdersTable[toggle]
+        LOG(repr(orderInfo))
+        local checkbox = Checkbox(bg, GetOrderBitmapNames(orderInfo.bitmapId))
+
+        -- Set the info in to the data member for retrieval
+        checkbox._data = orderInfo
+
+        -- Set up initial help text
+        checkbox._curHelpText = orderInfo.helpText
+
+        -- Set up click handler
+        checkbox.OnClick = orderInfo.behavior
+
+        --orderInfo.initialStateFunction(checkbox, selected)
+        checkbox.HandleEvent = function(control, event)
+            if event.Type == 'MouseEnter' then
+                CreateMouseoverDisplay(control, control.info.helpText, 1)
+            elseif event.Type == "MouseExit" then
+                if controls.mouseoverDisplay then
+                    controls.mouseoverDisplay:Destroy()
+                    controls.mouseoverDisplay = false
+                end
+            end
+            return Checkbox.HandleEvent(control, event)
+        end
+
+        checkbox.OnCheck = function(self, checked)
+            parent:_OnButtonToggle(toggle)
+        end
+        return checkbox
+    end
+
+    local i = 1
+    bg.buttons = {}
+    for _, toggle in parent._data.availableBuildToggles do
+        bg.buttons[i] = CreateButton(toggle)
+        LOG('Button created')
+        if i == 1 then
+            LayoutHelpers.AtBottomIn(bg.buttons[i], bg)
+            LayoutHelpers.AtLeftIn(bg.buttons[i], bg)
+        else
+            LayoutHelpers.Above(bg.buttons[i], bg.buttons[i-1])
+        end
+        i = i + 1
+    end
+
+    bg.Height:Set(function() return table.getsize(bg.buttons) * bg.buttons[1].Height() end)
+    bg.Width:Set(bg.buttons[1].Width)
+
+    if UIUtil.currentLayout == 'left' then
+        LayoutHelpers.RightOf(bg, parent, 40)
+    else
+        LayoutHelpers.Above(bg, controls.orderButtonGrid:GetItem(parent.col, 1), 20)
+    end
+
+    return bg
+end
+
+local function BuiltUnitToggleBehavior(self, modifiers)
+    if not self._OnButtonToggle then
+        self._OnButtonToggle = function(self, toggle)
+            LOG('Toggling '..toggle)
+        end
+    end
+    if self._popup then
+        self._popup:Destroy()
+        self._popup = nil
+    else
+        self._popup = CreateBuiltUnitTogglePopup(self)
+        local function CollapsePopup(event)
+            if (event.y < self._popup.Top() or event.y > self._popup.Bottom()) or (event.x < self._popup.Left() or event.x > self._popup.Right()) then
+                self._popup:Destroy()
+                self._popup = nil
+            end
+        end
+
+        UIMain.AddOnMouseClickedFunc(CollapsePopup)
+
+        self._popup.OnDestroy = function(popup)
+            UIMain.RemoveOnMouseClickedFunc(CollapsePopup)
+            Checkbox.OnDestroy(popup)
+        end
+    end
+end
+
+local function BuiltUnitToggleInitFunction(control, unitList)
+    LOG('BuiltUnitToggleInitFunction')
+end
+
 local function CreateFirestatePopup(parent, selected)
     local bg = Bitmap(parent, UIUtil.UIFile('/game/ability_brd/chat_brd_m.dds'))
 
@@ -1117,7 +1217,7 @@ end
 ---      the function should have this declaration: function(checkbox, unitList)
 --- extraInfo is used for storing any extra information required in setting up the button
 
-local defaultOrdersTable = {
+defaultOrdersTable = {
     -- Common rules
     AttackMove = {                  helpText = "attack_move",       bitmapId = 'attack_move',           preferredSlot = 1,  behavior = AttackMoveBehavior},
     RULEUCC_Move = {                helpText = "move",              bitmapId = 'move',                  preferredSlot = 2,  behavior = StandardOrderBehavior},
@@ -1147,6 +1247,7 @@ local defaultOrdersTable = {
     DroneR = {                      helpText = "drone",             bitmapId = 'unload02',              preferredSlot = 11, behavior = DroneBehavior,               initialStateFunc = DroneInit},
 
     ExFac = {                       helpText = "external_factory",  bitmapId = 'exfac',                 preferredSlot = 10, behavior = ExternalFactoryBehavior},
+    BuiltUnitToggles = {            helpText = "move",              bitmapId = 'move',                  preferredSlot = 14, behavior = BuiltUnitToggleBehavior,     initalStateFunc = BuiltUnitToggleInitFunction},
 
     -- Unit toggle rules
     RULEUTC_ShieldToggle = {        helpText = "toggle_shield",     bitmapId = 'shield',                preferredSlot = 8,  behavior = ScriptButtonOrderBehavior,   initialStateFunc = ScriptButtonInitFunction, extraInfo = 0},
@@ -1176,6 +1277,18 @@ local commonOrders = {
     RULEUCC_Guard = true,
     RULEUCC_RetaliateToggle = true,
     AttackMove = true,
+}
+
+local scriptBitToggles = {
+    "RULEUTC_ShieldToggle",
+    "RULEUTC_WeaponToggle",
+    "RULEUTC_JammingToggle",
+    "RULEUTC_IntelToggle",
+    "RULEUTC_ProductionToggle",
+    "RULEUTC_StealthToggle",
+    "RULEUTC_GenericToggle",
+    "RULEUTC_SpecialToggle",
+    "RULEUTC_CloakToggle",
 }
 
 -- Put function overrides here so they can be accessed from values passed from unit blueprints
@@ -1302,10 +1415,10 @@ local function AddOrder(orderInfo, slot, batchMode)
 
     -- Calculate row and column, remove old item, add new checkbox
     local cols, rows = controls.orderButtonGrid:GetDimensions()
-    local row = math.ceil(slot / cols)
-    local col = math.mod(slot - 1, cols) + 1
-    controls.orderButtonGrid:DestroyItem(col, row, batchMode)
-    controls.orderButtonGrid:SetItem(checkbox, col, row, batchMode)
+    checkbox.row = math.ceil(slot / cols)
+    checkbox.col = math.mod(slot - 1, cols) + 1
+    controls.orderButtonGrid:DestroyItem(checkbox.col, checkbox.row, batchMode)
+    controls.orderButtonGrid:SetItem(checkbox, checkbox.col, checkbox.row, batchMode)
 
     -- Handle Hotbuild labels
     if orderKeys[orderInfo.helpText] then
@@ -1434,14 +1547,43 @@ function ExternalFactoryPreCheck(availableOrders, units, assistingUnitList)
 end
 
 
-function BuildUnitTogglePreCheck(availableOrders, units, assistingUnitList)
-    local factories = EntityCategoryFilterDown(categories.FACTORY - categories.EXTERNALFACTORY, units)
+function BuiltUnitTogglePreCheck(availableOrders, units, assistingUnitList)
+    local factories = EntityCategoryFilterDown(categories.FACTORY, units)
+    if not table.empty(factories) and table.getn(factories) == table.getn(units) then
+        local _, _, buildableCategories = GetUnitCommandData(units)
+        local bpIds = EntityCategoryGetUnitList(buildableCategories)
+        local availableBuildToggles = {}
+        for _, bpId in bpIds do
+            local bp = __blueprints[bpId]
+            if bp.General.ToggleCaps and bp.General.ToggleCaps ~= '0' then
+                if tonumber(bp.General.ToggleCaps) then
+                    for k,v in GetBits(tonumber(bp.General.ToggleCaps)) do
+                        if v then
+                            availableBuildToggles[scriptBitToggles[k+1]] = true
+                        end
+                    end
+                else
+                    availableBuildToggles[bp.General.ToggleCaps] = true
+                end
+            end
+        end
+        if not table.empty(availableBuildToggles) then
+            table.insert(availableOrders, 'BuiltUnitToggles')
+            standardOrdersTable['BuiltUnitToggles'].availableBuildToggles = {}
+            for i, toggle in ipairs(scriptBitToggles) do
+                if availableBuildToggles[toggle] then
+                    table.insert(standardOrdersTable['BuiltUnitToggles'].availableBuildToggles, toggle)
+                end
+            end
+            LOG(repr(standardOrdersTable['BuiltUnitToggles'].availableBuildToggles))
+        end
+    end
 end
 
 local altPreCheckFunctions = {
     Drone = DronePreCheck,
     ExternalFactory = ExternalFactoryPreCheck,
-    BuildUnitToggle = BuildUnitTogglePreCheck,
+    BuiltUnitToggle = BuiltUnitTogglePreCheck,
 }
 
 -- Creates the buttons for the alt orders, placing them as possible
