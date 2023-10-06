@@ -885,7 +885,7 @@ WorldView = ClassUI(moho.UIWorldView, Control) {
         end
     end,
 
-    --- Called whenever the mouse moves and clicks in the world view
+    --- Called whenever the mouse moves and clicks in the world view. If it returns false then the engine further processes the event for orders
     ---@param self WorldView
     ---@param event any
     ---@return boolean
