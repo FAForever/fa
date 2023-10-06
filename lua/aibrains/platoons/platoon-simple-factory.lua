@@ -88,7 +88,6 @@ AIPlatoonSimpleFactory = Class(AIPlatoon) {
         ---@param self AIPlatoonSimpleFactory
         Main = function(self)
 
-            LOG("Searching for Task")
             local units, count = self:GetPlatoonUnits()
             if count > 1 then
                 self:LogWarning("multiple units is not supported")
