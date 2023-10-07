@@ -548,6 +548,8 @@ function Setup()
             marker.size = 25
             marker.Size = 25
             marker.IsOccupied = (armies[k] and true) or false
+
+            BackwardsCompatibility(marker)
             MarkerCache["Spawn"].Count = MarkerCache["Spawn"].Count + 1
             MarkerCache["Spawn"].Markers[MarkerCache["Spawn"].Count] = marker
         end
