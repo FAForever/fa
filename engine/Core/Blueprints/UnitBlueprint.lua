@@ -88,6 +88,7 @@
 ---@field Defense UnitBlueprintDefense
 ---@field Display UnitBlueprintDisplay
 ---@field Economy UnitBlueprintEconomy
+---@field ExternalFactory UnitBlueprintExternalFactory
 ---@field Enhancements?  table<Enhancement, UnitBlueprintEnhancement>
 ---@field EnhancementPresets? table<string, UnitBlueprintEnhancementPreset>
 ---@field General UnitBlueprintGeneral
@@ -753,6 +754,11 @@
 --- Treated as `0.01` when absent.
 ---@field TeleportTimeMod? number
 
+---@class UnitBlueprintExternalFactory
+---@field SelectionSizeX number
+---@field SelectionSizeZ number
+---@field SelectionCenterOffsetX number
+---@field SelectionCenterOffsetZ number
 
 ---@class UnitBlueprintEnhancements : table<Enhancement, UnitBlueprintEnhancement>
 ---@field Slots table<EnhancementSlot, {name: UnlocalizedString, x: number, y: number}>
