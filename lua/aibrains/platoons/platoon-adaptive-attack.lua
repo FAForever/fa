@@ -375,7 +375,7 @@ AIPlatoonAdaptiveAttackBehavior = Class(AIPlatoon) {
                 -- check if our command is still going
                 if not self:IsCommandsActive(attackCommand) then
                     -- setup attack units
-                    local attackOffset, error = NavUtils.RandomDirectionFrom('Land', location, 10, 8)       -- TODO: remove magic numbers
+                    local attackOffset, error = NavUtils.RandomDirectionFrom('Land', location, 20, 8)       -- TODO: remove magic numbers
                     if not attackOffset then
                         self:LogWarning(string.format('no alternative directions found to evade'))
                         self:ChangeState(self.Error)

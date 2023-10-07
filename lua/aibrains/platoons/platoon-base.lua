@@ -457,7 +457,6 @@ AIPlatoon = Class(moho.platoon_methods) {
             end
         end
         brain:DisbandPlatoon(self)
-
     end,
 
     ---------------------------------------------------------------------------

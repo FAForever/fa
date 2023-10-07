@@ -130,16 +130,6 @@ local function PostProcessUnit(unit)
 
     unit.CategoriesHash[unit.BlueprintId] = true
 
-    -- create hash tables for quick lookup
-    unit.DoNotCollideListCount = 0
-    unit.DoNotCollideListHash = {}
-    if unit.DoNotCollideList then
-        unit.DoNotCollideListCount = table.getn(unit.DoNotCollideList)
-        for _, category in unit.DoNotCollideList do
-            unit.DoNotCollideListHash[category] = true
-        end
-    end
-
     -- sanitize guard scan radius
 
     -- The guard scan radius is used when:
@@ -558,12 +548,35 @@ function PostProcessUnitWithExternalFactory(allBlueprints, unit)
         efBlueprint.SelectionSizeZ = 0.25 * unit.SelectionSizeZ
         efBlueprint.SelectionCenterOffsetZ = 0.35 * unit.SelectionSizeZ
 
+        -- add order overrides to carriers
+        if unit.CategoriesHash['CARRIER'] then
+
+            -- override our transport function to display what we want
+            -- and exhibit new behavior
+            if not unit.General.OrderOverrides then
+                unit.General.OrderOverrides = {}
+            end
+            
+            unit.General.OrderOverrides.RULEUCC_Transport = {
+                bitmapId = 'deploy',
+                helpText = 'auto_deploy',
+                behavior = 'AutoDeployBehavior',
+                initialStateFunc = 'AutoDeployInit',
+                extraInfo = 1,
+            }
+            
+            -- add the toggle so it can be flipped to begin with
+            -- but add an order override to remove it from our orders table
+            if not unit.General.ToggleCaps then
+                unit.General.ToggleCaps = {}
+            end
+            unit.General.ToggleCaps.RULEUTC_WeaponToggle = true
+            unit.General.OrderOverrides.RULEUTC_WeaponToggle = false
+        end
+
         -- remove properties of the seed unit
-        unit.CategoriesHash['FACTORY'] = nil
-        unit.CategoriesHash['CONSTRUCTION'] = nil
         unit.Categories = table.unhash(unit.CategoriesHash)
         unit.Economy.BuildRate = 0
-        unit.Economy.BuildableCategory = nil
     end
 end
 

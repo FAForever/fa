@@ -1,28 +1,34 @@
 
-local SemiBallisticComponent = import("/lua/sim/components-projectile/semiballisticcomponent.lua").SemiBallisticComponent
+local SemiBallisticComponent = import("/lua/sim/defaultprojectilecomponents/semiballisticcomponent.lua").SemiBallisticComponent
 
 ---@class TacticalMissileComponent : SemiBallisticComponent
 TacticalMissileComponent = ClassSimple(SemiBallisticComponent) {
 
     ---@param self TacticalMissileComponent | Projectile
     MovementThread = function(self)
+        local blueprintPhysics = self.Blueprint.Physics
 
         -- are we a wiggler?
         local zigZagger = false
-        if self:GetBlueprint().Physics.MaxZigZag and
-           self:GetBlueprint().Physics.MaxZigZag > self.MaxZigZagThreshold then
+        if blueprintPhysics.MaxZigZag and
+           blueprintPhysics.MaxZigZag > self.MaxZigZagThreshold then
             zigZagger = true
         end
 
         -- launch
-        self:SetTurnRate(self.LaunchTurnRate)
-        WaitTicks(self.LaunchTicks)
+        local launchTurnRateRange = self.LaunchTurnRateRange
+        local launchTurnRate = self.LaunchTurnRate + launchTurnRateRange * (2 * Random() - 1)
+        self:SetTurnRate(launchTurnRate)
+
+        local launchTicksRange = self.LaunchTicksRange
+        local launchTicks = self.LaunchTicks + Random(-launchTicksRange, launchTicksRange)
+        WaitTicks(launchTicks)
 
         -- boost
         local boostTurnRate, boostTime = self:TurnRateFromAngleAndHeight()
         self:SetTurnRate(boostTurnRate)
         WaitTicks(boostTime * 10)
-        
+
         -- glide
         local glideTurnRate, glideTime = self:TurnRateFromDistance()
         if zigZagger then

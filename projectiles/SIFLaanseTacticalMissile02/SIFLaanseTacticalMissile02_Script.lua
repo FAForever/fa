@@ -8,11 +8,13 @@ local TacticalMissileComponent = import('/lua/sim/DefaultProjectiles.lua').Tacti
 
 SIFLaanseTacticalMissile02 = ClassProjectile(SLaanseTacticalMissile, TacticalMissileComponent) {
 
-    LaunchTicks = 6,
+    LaunchTicks = 3,
+    LaunchTicksRange = 1,
     LaunchTurnRate = 6,
+    LaunchTurnRateRange = 1,
     HeightDistanceFactor = 5,
-    MinHeight = 5,
-    FinalBoostAngle = 0,
+    MinHeight = 10,
+    FinalBoostAngle = 50,
 
     OnCreate = function(self)
         SLaanseTacticalMissile.OnCreate(self)

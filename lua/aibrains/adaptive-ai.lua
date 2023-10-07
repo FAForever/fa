@@ -108,6 +108,8 @@ AIBrain = Class(StandardBrain, EconomyComponent) {
         self.UnitBuiltTriggerList = {}
         self.FactoryAssistList = {}
         self.DelayEqualBuildPlattons = {}
+        self.ReclaimFailCounter = 0
+        self.ReclaimFailTimeStamp = 0
 
         self:ForkThread(self.GetPlatoonDebugInfoThread)
     end,

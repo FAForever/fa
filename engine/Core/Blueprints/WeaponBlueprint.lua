@@ -94,9 +94,6 @@
 --- Name of the weapon. Used for lobby restrictions and for debugging:
 --- `dbg weapons` in the console shows the weapon names.
 ---@field DisplayName string
---- Use the `DoNotCollideList` in the projectile blueprint instead--this table is only used
---- by anti-artillery shields
----@field DoNotCollideList? UnparsedCategory[]
 --- number of times the Damage over Time damage will be dealt
 ---@field DoTPulses number
 --- duration that the Damage over Time will last in seconds
