@@ -135,6 +135,12 @@ UnitBlueprint{
             "BUILTBYTIER3FACTORY CYBRAN MOBILE AIR ANTIGROUND",
         },
     },
+    ExternalFactory = {
+        SelectionSizeX = 2,
+        SelectionSizeZ = 4,
+        SelectionCenterOffsetX = 0,
+        SelectionCenterOffsetZ = 12,
+    },
     Footprint = {
         SizeX = 5,
         SizeZ = 17,

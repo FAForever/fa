@@ -130,6 +130,12 @@ UnitBlueprint{
             "BUILTBYTIER3FACTORY AEON MOBILE AIR ANTIGROUND",
         },
     },
+    ExternalFactory = {
+        SelectionSizeX = 4,
+        SelectionSizeZ = 2,
+        SelectionCenterOffsetX = 0,
+        SelectionCenterOffsetZ = 8.5,
+    },
     Footprint = {
         SizeX = 5,
         SizeZ = 17,

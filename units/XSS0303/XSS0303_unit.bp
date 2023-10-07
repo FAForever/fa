@@ -132,6 +132,12 @@ UnitBlueprint{
             "BUILTBYTIER3FACTORY SERAPHIM MOBILE AIR ANTIGROUND",
         },
     },
+    ExternalFactory = {
+        SelectionSizeX = 2.8,
+        SelectionSizeZ = 3.2,
+        SelectionCenterOffsetX = 0,
+        SelectionCenterOffsetZ = 9.1,
+    },
     Footprint = {
         SizeX = 5,
         SizeZ = 17,

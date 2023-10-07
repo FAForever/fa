@@ -544,9 +544,10 @@ function PostProcessUnitWithExternalFactory(allBlueprints, unit)
         efBlueprint.CategoriesHash[unit.FactionCategory] = true
         efBlueprint.CategoriesHash[unit.LayerCategory] = true
         efBlueprint.Categories = table.unhash(efBlueprint.CategoriesHash)
-        efBlueprint.SelectionSizeX = 0.95 * unit.SelectionSizeX
-        efBlueprint.SelectionSizeZ = 0.25 * unit.SelectionSizeZ
-        efBlueprint.SelectionCenterOffsetZ = 0.35 * unit.SelectionSizeZ
+        efBlueprint.SelectionSizeX = unit.ExternalFactory.SelectionSizeX or (0.95 * unit.SelectionSizeX)
+        efBlueprint.SelectionSizeZ = unit.ExternalFactory.SelectionSizeZ or (0.25 * unit.SelectionSizeZ)
+        efBlueprint.SelectionCenterOffsetX = unit.ExternalFactory.SelectionCenterOffsetX or (0)
+        efBlueprint.SelectionCenterOffsetZ = unit.ExternalFactory.SelectionCenterOffsetZ or (0.35 * unit.SelectionSizeZ)
 
         -- add order overrides to carriers
         if unit.CategoriesHash['CARRIER'] then
@@ -556,7 +557,7 @@ function PostProcessUnitWithExternalFactory(allBlueprints, unit)
             if not unit.General.OrderOverrides then
                 unit.General.OrderOverrides = {}
             end
-            
+
             unit.General.OrderOverrides.RULEUCC_Transport = {
                 bitmapId = 'deploy',
                 helpText = 'auto_deploy',
@@ -564,7 +565,7 @@ function PostProcessUnitWithExternalFactory(allBlueprints, unit)
                 initialStateFunc = 'AutoDeployInit',
                 extraInfo = 1,
             }
-            
+
             -- add the toggle so it can be flipped to begin with
             -- but add an order override to remove it from our orders table
             if not unit.General.ToggleCaps then

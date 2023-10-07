@@ -143,8 +143,8 @@ UnitBlueprint{
     ExternalFactory = {
         SelectionSizeX = 4,
         SelectionSizeZ = 4,
-        SelectionCenterOffsetX = 4,
-        SelectionCenterOffsetZ = 0,
+        SelectionCenterOffsetX = 0,
+        SelectionCenterOffsetZ = 4,
     },
     Footprint = {
         MaxSlope = 0.25,
