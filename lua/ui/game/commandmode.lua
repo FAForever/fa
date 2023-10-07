@@ -271,6 +271,7 @@ local function CheatSpawn(command, data)
             veterancy = data.vet,
             CreateTarmac = data.CreateTarmac,
             MeshOnly = data.MeshOnly,
+            ShowRaisedPlatforms = data.ShowRaisedPlatforms,
             UnitIconCameraMode = data.UnitIconCameraMode,
         }
     }, true)

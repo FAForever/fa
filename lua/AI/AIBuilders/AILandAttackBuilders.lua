@@ -1000,7 +1000,7 @@ BuilderGroup {
     -- Seek and destroy
     Builder {
         BuilderName = 'T1 LAB Hunters',
-        PlatoonTemplate = 'StateMachinePlatoon',
+        PlatoonTemplate = 'StateMachineSmallAttackPlatoon',
         Priority = 1000,
         InstanceCount = 4,
         BuilderType = 'Any',
@@ -1023,11 +1023,11 @@ BuilderGroup {
     --DUNCAN - uncommented
     Builder {
         BuilderName = 'T1 Tanks - Engineer Guard',
-        PlatoonTemplate = 'T1EngineerGuard',
-        PlatoonAIPlan = 'GuardEngineer',
+        PlatoonTemplate = 'StateMachineSmallAttackPlatoon',
         Priority = 750,
-        InstanceCount = 3,
+        InstanceCount = 2,
         BuilderData = {
+            StateMachine = 'AIPlatoonAdaptiveGuardBehavior',
             NeverGuardBases = true,
         },
         BuilderConditions = {

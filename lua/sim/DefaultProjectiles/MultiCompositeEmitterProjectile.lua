@@ -20,34 +20,30 @@
 --** SOFTWARE.
 --******************************************************************************************************
 
-local EmitterProjectile = import("/lua/defaultprojectiles/emitter.lua").EmitterProjectile
 
--- upvalue scope for performance
-local CreateTrail = CreateTrail
-local IEffectOffsetEmitter = _G.moho.IEffect.OffsetEmitter
+local MultiPolyTrailProjectile = import("/lua/sim/defaultprojectiles/multipolytrailprojectile.lua").MultiPolyTrailProjectile
 
----@class SinglePolyTrailProjectile : EmitterProjectile
-SinglePolyTrailProjectile = ClassProjectile(EmitterProjectile) {
+-- upvalue for performance
+local CreateBeamEmitterOnEntity = CreateBeamEmitterOnEntity
 
-    PolyTrail = '/effects/emitters/test_missile_trail_emit.bp',
-    PolyTrailOffset = 0,
+---@class MultiCompositeEmitterProjectile : MultiPolyTrailProjectile
+MultiCompositeEmitterProjectile = ClassProjectile(MultiPolyTrailProjectile) {
+
+    Beams = {'/effects/emitters/default_beam_01_emit.bp',},
+    PolyTrails = {'/effects/emitters/test_missile_trail_emit.bp'},
+    PolyTrailOffset = { 0 },
+    RandomPolyTrails = 0,
     FxTrails = { },
 
-    ---@param self SinglePolyTrailProjectile
+    ---@param self MultiCompositeEmitterProjectile
     OnCreate = function(self)
-        EmitterProjectile.OnCreate(self)
+        MultiPolyTrailProjectile.OnCreate(self)
 
         local army = self.Army
-        local polyTrail = self.PolyTrail
-        local polyTrailOffset = self.PolyTrailOffset
+        local beams = self.Beams
 
-        if polyTrail ~= '' then
-            local effect = CreateTrail(self, -1, army, polyTrail)
-
-            -- only do these engine calls when they matter
-            if polyTrailOffset ~= 0 then
-                IEffectOffsetEmitter(effect, 0, 0, polyTrailOffset)
-            end
+        for _, beamName in beams do
+            CreateBeamEmitterOnEntity(self, -1, army, beamName)
         end
     end,
 }

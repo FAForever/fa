@@ -20,7 +20,7 @@ ProjectileBlueprint {
         'UEF',
         'PROJECTILE',
         'INDIRECTFIRE',
-        'STRATEGIC',
+        'IGNOREASFONCOLLISION',
     },
     Display = {
         CameraFollowTimeout = 2,
@@ -39,17 +39,8 @@ ProjectileBlueprint {
         StrategicIconSize = 2,
         UniformScale = 0.125,
     },
-    DoNotCollideList = {
-        'ASF',
-    },
     General = {
         Category = 'Bomb',
-        EntityCategory = {
-            'UEF',
-            'PROJECTILE',
-            'INDIRECTFIRE',
-            'STRATEGIC',
-        },
         Faction = 'UEF',
         Weapon = 'Small Yield Nuclear Bomb',
     },

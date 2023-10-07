@@ -1288,17 +1288,11 @@ AntiArtilleryShield = ClassShield(Shield) {
                 return false
             end
         end
-        -- Check DNC list
-        if bp.DoNotCollideList then
-            for k, v in pairs(bp.DoNotCollideList) do
-                if EntityCategoryContains(ParseEntityCategory(v), self) then
-                    return false
-                end
-            end
-        end
+
         if bp.ArtilleryShieldBlocks then
             return true
         end
+
         return false
     end,
 

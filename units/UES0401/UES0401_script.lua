@@ -50,16 +50,6 @@ UES0401 = ClassUnit(AircraftCarrier, ExternalFactoryComponent) {
         end
     end,
 
-    OnPaused = function(self)
-        AircraftCarrier.OnPaused(self)
-        ExternalFactoryComponent.OnPaused(self)
-    end,
-
-    OnUnpaused = function(self)
-        AircraftCarrier.OnUnpaused(self)
-        ExternalFactoryComponent.OnUnpaused(self)
-    end,
-
     StartBeingBuiltEffects = function(self, builder, layer)
         self:SetMesh(self:GetBlueprint().Display.BuildMeshBlueprint, true)
         if self:GetBlueprint().General.UpgradesFrom ~= builder.UnitId then
@@ -179,12 +169,12 @@ UES0401 = ClassUnit(AircraftCarrier, ExternalFactoryComponent) {
             local unitBuilding = self.UnitBeingBuilt
             unitBuilding:DetachFrom(true)
             self:DetachAll(self.BuildAttachBone)
-            if self:TransportHasAvailableStorage() then
-                self:AddUnitToStorage(unitBuilding)
-            else
-                local worldPos = self:CalculateWorldPositionFromRelative({0, 0, -20})
+            if not self:TransportHasAvailableStorage() or self:GetScriptBit('RULEUTC_WeaponToggle') then
+                local worldPos = self:CalculateWorldPositionFromRelative({ 0, 0, -20 })
                 IssueToUnitMoveOffFactory(unitBuilding, worldPos)
-                unitBuilding:ShowBone(0,true)
+                unitBuilding:ShowBone(0, true)
+            else
+                self:AddUnitToStorage(unitBuilding)
             end
 
             self:RequestRefreshUI()

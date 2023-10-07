@@ -3,6 +3,7 @@
 local TMissileCruiseProjectile = import("/lua/terranprojectiles.lua").TMissileCruiseProjectile
 local TacticalMissileComponent = import('/lua/sim/DefaultProjectiles.lua').TacticalMissileComponent
 
+---@class TIFMissileCruise04 : TMissileCruiseProjectile, TacticalMissileComponent
 TIFMissileCruise04 = ClassProjectile(TMissileCruiseProjectile, TacticalMissileComponent) {
 
     FxAirUnitHitScale = 1.5,
@@ -18,10 +19,15 @@ TIFMissileCruise04 = ClassProjectile(TMissileCruiseProjectile, TacticalMissileCo
     FxOnKilledScale = 1.5,
 
     LaunchTicks = 6,
+    LaunchTicksRange = 2,
     LaunchTurnRate = 6,
-    HeightDistanceFactor = 5,
-    MinHeight = 5,
-    FinalBoostAngle = 0,
+    LaunchTurnRateRange = 2,
+    HeightDistanceFactor = 5.5,
+    HeightDistanceFactorRange = 0.5,
+    MinHeight = 10,
+    MinHeightRange = 1,
+    FinalBoostAngle = 50,
+    FinalBoostAngleRange = 5,
 
     OnCreate = function(self)
         TMissileCruiseProjectile.OnCreate(self)

@@ -396,5 +396,19 @@ function ReclaimAvailableInGrid(aiBrain, locationType, mapSearch)
     return true
 end
 
+function ReclaimEnabledOnBrain(aiBrain)
+    -- this condition won't work without a reference to the reclaim grid
+    if aiBrain.ReclaimFailCounter > 10 then
+        local currentTime = GetGameTimeSeconds()
+        if aiBrain.ReclaimFailTimeStamp + 180 < currentTime then
+            aiBrain.ReclaimFailCounter = 0
+            aiBrain.ReclaimFailTimeStamp = 0
+        else
+            return false
+        end
+    end
+    return true
+end
+
 -- unused imports kept for mod support
 local Utils = import("/lua/utilities.lua")
