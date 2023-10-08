@@ -5,6 +5,7 @@ local AIUtils = import("/lua/ai/aiutilities.lua")
 
 local Utilities = import("/lua/utilities.lua")
 local ScenarioUtils = import("/lua/sim/scenarioutilities.lua")
+local MarkerUtilities = import("/lua/sim/markerutilities.lua")
 
 local FactoryManager = import("/lua/sim/factorybuildermanager.lua")
 local PlatoonFormManager = import("/lua/sim/platoonformmanager.lua")
@@ -524,9 +525,10 @@ AIBrain = Class(StandardBrain, EconomyComponent) {
             EngineerManager = EngineerManager.CreateEngineerManager(self, baseName, position, radius),
             BuilderHandles = {},
             Position = position,
-            BaseType = Scenario.MasterChain._MASTERCHAIN_.Markers[baseName].type or 'MAIN',
+            BaseType = MarkerUtilities.GetMarker(baseName).Name or 'Main',
             Layer = baseLayer,
         }
+
         self.NumBases = self.NumBases + 1
     end,
 
