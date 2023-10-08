@@ -1,12 +1,16 @@
 
 local StructureUnit = import("/lua/sim/defaultunits/structureunit.lua").StructureUnit
 
+-- upvalue scope for performance
+local EntityCategoryContains = EntityCategoryContains
+
 local StructureUnitOnDamage = StructureUnit.OnDamage
+
+local CategoriesWall = categories.WALL
 
 ---@class WallStructureUnit : StructureUnit
 WallStructureUnit = ClassUnit(StructureUnit) {
 
-    IsWall = true,
     WallOverspillFactor = 0.2,
 
     ---@param self WallStructureUnit
@@ -22,7 +26,7 @@ WallStructureUnit = ClassUnit(StructureUnit) {
             if adjacentUnits then
                 local wallOverspillFactor = self.WallOverspillFactor
                 for id, adjacentUnit in adjacentUnits do
-                    if adjacentUnit.IsWall then
+                    if EntityCategoryContains(CategoriesWall, adjacentUnit) then
                         adjacentUnit:OnDamage(instigator, wallOverspillFactor * amount, vector, 'WallOverspill')
                     end
                 end
