@@ -184,6 +184,13 @@ UnitBlueprint{
             "BUILTBYTIER2FACTORY AEON MOBILE NAVAL",
         },
     },
+    ExternalFactory = {
+        SelectionSizeX = 3,
+        SelectionSizeZ = 3,
+        SelectionCenterOffsetX = 0,
+        SelectionCenterOffsetY = 2.0,
+        SelectionCenterOffsetZ = 3,
+    },
     General = {
         CommandCaps = {
             RULEUCC_Attack = true,

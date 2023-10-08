@@ -144,7 +144,8 @@ UnitBlueprint{
         SelectionSizeX = 4,
         SelectionSizeZ = 4,
         SelectionCenterOffsetX = 0,
-        SelectionCenterOffsetZ = 4,
+        SelectionCenterOffsetY = 2.7,
+        SelectionCenterOffsetZ = -2,
     },
     Footprint = {
         MaxSlope = 0.25,

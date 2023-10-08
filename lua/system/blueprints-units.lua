@@ -546,8 +546,13 @@ function PostProcessUnitWithExternalFactory(allBlueprints, unit)
         efBlueprint.Categories = table.unhash(efBlueprint.CategoriesHash)
         efBlueprint.SelectionSizeX = unit.ExternalFactory.SelectionSizeX or (0.95 * unit.SelectionSizeX)
         efBlueprint.SelectionSizeZ = unit.ExternalFactory.SelectionSizeZ or (0.25 * unit.SelectionSizeZ)
-        efBlueprint.SelectionCenterOffsetX = unit.ExternalFactory.SelectionCenterOffsetX or (0)
+        efBlueprint.SelectionCenterOffsetX = unit.ExternalFactory.SelectionCenterOffsetX or 0
+        efBlueprint.SelectionCenterOffsetY = unit.ExternalFactory.SelectionCenterOffsetY or 0
         efBlueprint.SelectionCenterOffsetZ = unit.ExternalFactory.SelectionCenterOffsetZ or (0.35 * unit.SelectionSizeZ)
+        efBlueprint.SelectionMeshScaleX = unit.ExternalFactory.SelectionMeshScaleX or 1
+        efBlueprint.SelectionMeshScaleY = unit.ExternalFactory.SelectionMeshScaleY or 3
+        efBlueprint.SelectionMeshScaleZ = unit.ExternalFactory.SelectionMeshScaleZ or 1
+        efBlueprint.Display.UniformScale = unit.ExternalFactory.UniformScale or 1.6
 
         -- add order overrides to carriers
         if unit.CategoriesHash['CARRIER'] then

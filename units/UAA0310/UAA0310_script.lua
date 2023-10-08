@@ -21,7 +21,7 @@ local ExternalFactoryComponent = import("/lua/defaultcomponents.lua").ExternalFa
 UAA0310 = ClassUnit(AirTransport, ExternalFactoryComponent) {
     DestroyNoFallRandomChance = 1.1,
     BuildAttachBone = 'Attachpoint01',
-    FactoryAttachBone = 'Attachpoint01',
+    FactoryAttachBone = 'Attachpoint02',
 
     Weapons = {
         QuantumBeamGeneratorWeapon = ClassWeapon(AQuantumBeamGenerator) {},
@@ -112,6 +112,7 @@ UAA0310 = ClassUnit(AirTransport, ExternalFactoryComponent) {
             self:DetachAll(self.BuildAttachBone)
             self:SetBusy(false)
             self:OnIdle()
+            LOG("OnIdle")
         end,
 
         OnStartBuild = function(self, unitBuilding, order)
