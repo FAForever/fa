@@ -1,16 +1,16 @@
 EmitterBlueprint {
-    BlueprintId = 'watertower',
+    BlueprintId = 'watersplash',
     Lifetime = 2.00,
     Repeattime = 50.00,
     TextureFramecount = 1.00,
     Blendmode = 0.00,
     LocalVelocity = false,
     LocalAcceleration = false,
-    Gravity = true,
-    AlignRotation = false,
+    Gravity = false,
+    AlignRotation = true,
     AlignToBone = false,
     Flat = false,
-    LODCutoff = 150.00,
+    LODCutoff = 200.00,
     EmitIfVisible = true,
     CatchupEmit = true,
     CreateIfVisible = false,
@@ -28,25 +28,25 @@ EmitterBlueprint {
     XDirectionCurve = {
         XRange = 50.00,
         Keys = {
-            { x=0.200,y=0.000,z=0.050 },
+            { x=0.200,y=0.000,z=0.200 },
         },
     },
     YDirectionCurve = {
-        XRange = 10.00,
+        XRange = 50.00,
         Keys = {
-            { x=0.333,y=0.220,z=0.050 },
+            { x=0.333,y=0.075,z=0.050 },
         },
     },
     ZDirectionCurve = {
         XRange = 50.00,
         Keys = {
-            { x=0.000,y=0.000,z=0.050 },
+            { x=0.133,y=0.000,z=0.200 },
         },
     },
     EmitRateCurve = {
         XRange = 50.00,
         Keys = {
-            { x=3.333,y=2.000,z=0.000 },
+            { x=3.333,y=3,z=6.000 },
         },
     },
     LifetimeCurve = {
@@ -58,7 +58,7 @@ EmitterBlueprint {
     VelocityCurve = {
         XRange = 50.00,
         Keys = {
-            { x=0.000,y=1.200,z=0.000 },
+            { x=0.000,y=1.000,z=0.000 },
         },
     },
     XAccelCurve = {
@@ -70,7 +70,7 @@ EmitterBlueprint {
     YAccelCurve = {
         XRange = 50.00,
         Keys = {
-            { x=25.333,y=0.000,z=0.000 },
+            { x=0.000,y=-0.001,z=0.000 },
         },
     },
     ZAccelCurve = {
@@ -82,13 +82,13 @@ EmitterBlueprint {
     ResistanceCurve = {
         XRange = 50.00,
         Keys = {
-            { x=11.200,y=0.135,z=0.000 },
+            { x=0.000,y=0.000,z=0.000 },
         },
     },
     SizeCurve = {
         XRange = 50.00,
         Keys = {
-            { x=0.000,y=0.127,z=0.000 },
+            { x=0.000,y=0.100,z=0.010 },
         },
     },
     XPosCurve = {
@@ -118,7 +118,7 @@ EmitterBlueprint {
     EndSizeCurve = {
         XRange = 50.00,
         Keys = {
-            { x=5.933,y=3.000,z=0.100 },
+            { x=5.800,y=2.000,z=0.100 },
         },
     },
     InitialRotationCurve = {
