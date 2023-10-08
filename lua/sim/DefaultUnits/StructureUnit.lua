@@ -729,18 +729,18 @@ StructureUnit = ClassUnit(Unit) {
             return
         end
 
-        -- make sure we have adjacency buffs to apply
-        local adjBuffs = self.Blueprint.Adjacency
-        if not adjBuffs then
-            return
-        end
-
         -- keep track of who is adjacent to who
         self.AdjacentUnits = self.AdjacentUnits or { }
         adjacentUnit.AdjacentUnits = adjacentUnit.AdjacentUnits or { }
 
         self.AdjacentUnits[adjacentUnit.EntityId] = adjacentUnit
         adjacentUnit.AdjacentUnits[self.EntityId] = self
+
+        -- make sure we have adjacency buffs to apply
+        local adjBuffs = self.Blueprint.Adjacency
+        if not adjBuffs then
+            return
+        end
 
         -- apply the buffs
         local buffApplied = false
@@ -785,6 +785,10 @@ StructureUnit = ClassUnit(Unit) {
             return
         end
 
+        -- keep track of who is adjacent to who
+        self.AdjacentUnits[adjacentUnit.EntityId] = nil
+        adjacentUnit.AdjacentUnits[self.EntityId] = nil
+
         -- make sure we have buffs to remove
         local adjBuffs = self.Blueprint.Adjacency
         if not adjBuffs then
@@ -822,10 +826,6 @@ StructureUnit = ClassUnit(Unit) {
 
         -- clean up effects
         self:DestroyAdjacentEffects(adjacentUnit)
-
-        -- keep track of who is adjacent to who
-        self.AdjacentUnits[adjacentUnit.EntityId] = nil
-        adjacentUnit.AdjacentUnits[self.EntityId] = nil
 
         -- refresh the UI
         adjacentUnit:RequestRefreshUI()
