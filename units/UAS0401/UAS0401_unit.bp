@@ -189,7 +189,7 @@ UnitBlueprint{
         SelectionSizeZ = 3,
         SelectionCenterOffsetX = 0,
         SelectionCenterOffsetY = 2.0,
-        SelectionCenterOffsetZ = 3,
+        SelectionCenterOffsetZ = 4,
     },
     General = {
         CommandCaps = {
