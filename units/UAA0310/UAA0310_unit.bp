@@ -140,6 +140,13 @@ UnitBlueprint{
         BuildableCategory = { "BUILTBYTIER3FACTORY AEON MOBILE AIR" },
         MaintenanceConsumptionPerSecondEnergy = 500,
     },
+    ExternalFactory = {
+        SelectionSizeX = 4,
+        SelectionSizeZ = 4,
+        SelectionCenterOffsetX = 0,
+        SelectionCenterOffsetY = 2.7,
+        SelectionCenterOffsetZ = -2,
+    },
     Footprint = {
         MaxSlope = 0.25,
         SizeX = 20,

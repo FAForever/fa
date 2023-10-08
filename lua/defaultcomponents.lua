@@ -828,6 +828,10 @@ ExternalFactoryComponent = ClassSimple {
             error(string.format("%s is not setup for an external factory: the unit does not have a field 'FactoryAttachBone'", blueprint.BlueprintId))
         end
 
+        if self.BuildAttachBone and self.BuildAttachBone == self.FactoryAttachBone then
+            error(string.format("%s is not setup for an external factory: the 'FactoryAttachBone' can not be the same as the 'BuildAttachBone'", blueprint.BlueprintId))
+        end
+
         if not blueprint.CategoriesHash['EXTERNALFACTORY'] then
             error(string.format("%s is not setup for an external factory: the unit does not have a 'EXTERNALFACTORY' category", blueprint.BlueprintId))
         end
