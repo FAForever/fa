@@ -43,7 +43,7 @@ texture        UtilityTextureB;
 // red: wave normal strength
 // green: water depth
 // blue: ???
-// ???
+// alpha: foam reduction
 texture        UtilityTextureC;
 
 // appear to be unused
