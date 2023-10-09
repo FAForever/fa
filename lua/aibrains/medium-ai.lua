@@ -16,7 +16,7 @@ local SUtils = import("/lua/ai/sorianutilities.lua")
 
 local TableGetn = table.getn
 
----@class EasyAIBrainManagers
+---@class MediumAIBrainManagers
 ---@field FactoryManager AIFactoryManager
 ---@field EngineerManager AIEngineerManager
 ---@field StructureManager AIStructureManager
@@ -30,7 +30,7 @@ local TableGetn = table.getn
 ---@field OnceOnly boolean
 ---@field TargetAIBrain AIBrain
 
----@class EasyAIBrain: AIBrain, AIBrainEconomyComponent
+---@class MediumAIBrain: AIBrain, AIBrainEconomyComponent
 ---@field GridReclaim AIGridReclaim
 ---@field GridBrain AIGridBrain
 ---@field GridRecon AIGridRecon
@@ -1601,7 +1601,7 @@ AIBrain = Class(StandardBrain, EconomyComponent) {
     ---------------------------------------------------------------------------
     --#region Debug functionality
 
-    ---@param self EasyAIBrain
+    ---@param self MediumAIBrain
     ---@return AIBaseDebugInfo
     GetPlatoonDebugInfoThread = function(self)
         while true do
