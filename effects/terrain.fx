@@ -494,7 +494,7 @@ float3 PBR(VS_OUTPUT inV, float4 position, float3 albedo, float3 n, float roughn
 
     float shadow = 1;
     if (ShadowsEnabled == 1) {
-        float mapShadow = 1 - tex2D(UpperAlbedoSampler, position.xy).z; // 1 where sun is, 0 where shadow is
+        float mapShadow = 1 - tex2D(UpperAlbedoSampler, position.xy).w; // 1 where sun is, 0 where shadow is
         shadow = tex2D(ShadowSampler, inV.mShadow.xy).g; // 1 where sun is, 0 where shadow is
         shadow *= mapShadow;
     }
@@ -1897,10 +1897,10 @@ float blendHeight(float4 position, float2 blendWeights, uniform float2 nearscale
 //  ----            ---             ---            ---               ---             ---             ---             ---            ---
 // | S4 | R             G               B              unused          | X               Y               Z               unused       |
 // | S5 | R             G               B              unused          | X               Y               Z               unused       |
-// | S6 | R             G               B              unused          | X               Y               Z               unused       |
-// | S7 | height L-S2   roughness L-S2  height S3-S6   roughness S3-S6 | envMap R        envMap G        envMap B        unused       |
+// | S6 | R             G               B          sampling direction  | X               Y               Z               unused       |
+// | S7 | height L-S2   roughness L-S2  height S3-S6   roughness S3-S6 | macrotexture R  macrotexture G  macrotexture B  transparency |
 //  ----            ---             ---             ---              ---             ---             ---             ---            ---
-// | U  | normal.x      normal.z        shadow     sampling direction  | 
+// | U  | normal.x      normal.z        waterDepth     shadow          | 
 
 /* similar to Terrain101 but aditionally uses rotated sampling of all textures to break up repetition patterns */
 /* and uses vertical texture sampling for cliff textures in stratum3 */
@@ -1913,7 +1913,7 @@ float4 TerrainPBRNormalsPS ( VS_OUTPUT inV ) : COLOR
 
     float4 mask0 = tex2D(UtilitySamplerA, position.xy);
     float4 mask1 = tex2D(UtilitySamplerB, position.xy);
-    float rotationMask = tex2D(UpperAlbedoSampler, position.xy * 7).w;
+    float rotationMask = tex2D(Stratum6AlbedoSampler, position.xy / (SpecularColor.r + 0.01)).w;
 
     float3 lowerNormal    = sampleNormal(LowerNormalSampler,    position.xy, LowerAlbedoTile.xy,    rotationMask);
     float3 stratum0Normal = sampleNormal(Stratum0NormalSampler, position.xy, Stratum0AlbedoTile.xy, rotationMask);
@@ -1961,7 +1961,7 @@ float4 TerrainPBRAlbedoPS ( VS_OUTPUT inV) : COLOR
 
     float4 mask0 = tex2D(UtilitySamplerA, position.xy);
     float4 mask1 = tex2D(UtilitySamplerB, position.xy);
-    float rotationMask = tex2D(UpperAlbedoSampler, position.xy * 7).w;
+    float rotationMask = tex2D(Stratum6AlbedoSampler, position.xy / (SpecularColor.r + 0.01)).w;
 
     // This shader wouldn't compile because it would have to store too many variables if we didn't use this trick in the vertex shader
     float4 lowerAlbedo =    sampleAlbedo(LowerAlbedoSampler,    position.xy, LowerAlbedoTile.xy,    float2(0.0, 0.0), true,  rotationMask);
@@ -1994,17 +1994,20 @@ float4 TerrainPBRAlbedoPS ( VS_OUTPUT inV) : COLOR
     albedo = splatLerp(albedo, stratum4Albedo, stratum4Height, mask1.x);
     albedo = splatLerp(albedo, stratum5Albedo, stratum5Height, mask1.y);
     albedo = splatLerp(albedo, stratum6Albedo, stratum6Height, mask1.z);
+    float4 mapwide = tex2D(Stratum7NormalSampler, position.xy);
+    albedo.rgb = lerp(albedo.rgb, mapwide.rgb, mapwide.a);
 
     // We need to add 0.01 as the reflection disappears at 0
     float roughness = saturate(albedo.a * mask1.w * 2 + 0.01);
     roughness = inV.mTexWT.z < WaterElevation ? 0.9 : roughness;
     float3 color = PBR(inV, position, albedo, normal, roughness);
 
-    float waterDepth = tex2Dproj(UtilitySamplerC, position).g;
+    float waterDepth = tex2D(UpperAlbedoSampler, position.xy).b;
     color = ApplyWaterColorExponentially(-1 * inV.mViewDirection, inV.mTexWT.z, waterDepth, color);
 
     return float4(color, 0.01f);
-    // SpecularColor, LowerNormalTile, Stratum7AlbedoTile and Stratum7NormalTile are unused now
+    // SpecularColor.gba, LowerNormalTile, Stratum7AlbedoTile and Stratum7NormalTile are unused now
+    // Candidates for configurable values are the rotation matrix and the blending blurriness
 }
 
 technique TerrainPBRNormals
