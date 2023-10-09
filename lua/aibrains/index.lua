@@ -12,7 +12,7 @@ keyToBrain = {
     turtle = import("/lua/aibrains/turtle-ai.lua").AIBrain,
     rush = import("/lua/aibrains/rush-ai.lua").AIBrain,
     easy = import("/lua/aibrains/easy-ai.lua").AIBrain,
-    medium = import("/lua/aibrains/mediua-ai.lua").AIBrain,
+    medium = import("/lua/aibrains/medium-ai.lua").AIBrain,
     adaptive = import("/lua/aibrains/adaptive-ai.lua").AIBrain,
     random = import("/lua/aibrains/adaptive-ai.lua").AIBrain,
 
