@@ -424,7 +424,7 @@ float4 CalculateLighting( float3 inNormal, float3 inViewPosition, float3 inAlbed
     float shadow = ( inShadows && ( 1 == ShadowsEnabled ) ) ? ComputeShadow( inShadow ) : 1;
     if (IsExperimentalShader()) {
         float3 position = TerrainScale * inViewPosition;
-        float mapShadow = saturate(1 - tex2D(Stratum7AlbedoSampler, position.xy).b);
+        float mapShadow = tex2D(Stratum7AlbedoSampler, position.xy).w;
         shadow = shadow * mapShadow;
     }
 
@@ -494,7 +494,7 @@ float3 PBR(VS_OUTPUT inV, float4 position, float3 albedo, float3 n, float roughn
 
     float shadow = 1;
     if (ShadowsEnabled == 1) {
-        float mapShadow = 1 - tex2D(UpperAlbedoSampler, position.xy).w; // 1 where sun is, 0 where shadow is
+        float mapShadow = tex2D(UpperAlbedoSampler, position.xy).w; // 1 where sun is, 0 where shadow is
         shadow = tex2D(ShadowSampler, inV.mShadow.xy).g; // 1 where sun is, 0 where shadow is
         shadow *= mapShadow;
     }
