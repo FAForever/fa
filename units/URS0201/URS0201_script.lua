@@ -158,14 +158,6 @@ URS0201 = ClassUnit(CSeaUnit) {
         end
     end,
 
-    OnStopBeingBuilt = function(self, builder, layer)
-        CSeaUnit.OnStopBeingBuilt(self, builder, layer)
-
-        if self:GetAIBrain().BrainType == 'Human' and self.Layer ~= 'Land' then
-            self:SetScriptBit('RULEUTC_WeaponToggle', true)
-        end
-    end,
-
     OnScriptBitSet = function(self, bit)
         CSeaUnit.OnScriptBitSet(self, bit)
         if bit == 1 then
