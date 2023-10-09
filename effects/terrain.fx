@@ -391,7 +391,7 @@ float ComputeShadow( float4 vShadowCoord )
 // apply the water color
 float3 ApplyWaterColor(float terrainHeight, float depth, float3 inColor)
 {
-    if (terrainHeight <= WaterElevation) {
+    if (depth > 0.1 || terrainHeight <= WaterElevation) {
         float4 wcolor = tex1D(WaterRampSampler, depth);
         inColor = lerp( inColor.xyz, wcolor.xyz, wcolor.w );
     }
@@ -399,8 +399,9 @@ float3 ApplyWaterColor(float terrainHeight, float depth, float3 inColor)
 }
 
 float3 ApplyWaterColorExponentially(float3 viewDirection, float terrainHeight, float waterDepth, float3 color) {
-    // With this extra check we get rid of unwanted coloration on steep cliffs
-    if (terrainHeight <= WaterElevation) {
+    // With this extra check we get rid of unwanted coloration on reasonably steep cliffs,
+    // but we prevent that terrain tesselation swallows too much of the water when zoomed out
+    if (waterDepth > 0.1 || terrainHeight <= WaterElevation) {
         float4 waterColor = tex1D(WaterRampSampler, waterDepth);
         float3 up = float3(0,1,0);
         // To simplify, we assume that the light enters vertically into the water,
@@ -489,7 +490,7 @@ float GeometrySmith(float3 n, float nDotV, float3 l, float roughness)
     return gs1 * gs2;
 }
 
-float3 PBR(VS_OUTPUT inV, float4 position, float3 albedo, float3 n, float roughness) {
+float3 PBR(VS_OUTPUT inV, float4 position, float3 albedo, float3 n, float roughness, float waterDepth) {
     // See https://blog.selfshadow.com/publications/s2013-shading-course/
 
     float shadow = 1;
@@ -499,8 +500,17 @@ float3 PBR(VS_OUTPUT inV, float4 position, float3 albedo, float3 n, float roughn
         shadow *= mapShadow;
     }
 
+    float facingSpecular = 0.04;
+    // using only the texture looks bad when zoomed in, using only the mesh 
+    // looks bad when zoomed out, so we check for both
+    bool underwater = waterDepth > 0 && inV.mTexWT.z < WaterElevation;
+    if (underwater) {
+        // specular reflections of dielectrics mostly disappear underwater
+        facingSpecular *= 0.1;
+    }
+
     float3 v = normalize(-inV.mViewDirection);
-    float3 F0 = float3(0.04, 0.04, 0.04);
+    float3 F0 = float3(facingSpecular, facingSpecular, facingSpecular);
     float3 l = SunDirection;
     float3 h = normalize(v + l);
     float nDotL = max(dot(n, l), 0.0);
@@ -1999,10 +2009,9 @@ float4 TerrainPBRAlbedoPS ( VS_OUTPUT inV) : COLOR
 
     // We need to add 0.01 as the reflection disappears at 0
     float roughness = saturate(albedo.a * mask1.w * 2 + 0.01);
-    roughness = inV.mTexWT.z < WaterElevation ? 0.9 : roughness;
-    float3 color = PBR(inV, position, albedo, normal, roughness);
 
     float waterDepth = tex2D(UpperAlbedoSampler, position.xy).b;
+    float3 color = PBR(inV, position, albedo, normal, roughness, waterDepth);
     color = ApplyWaterColorExponentially(-1 * inV.mViewDirection, inV.mTexWT.z, waterDepth, color);
 
     return float4(color, 0.01f);
@@ -2498,10 +2507,9 @@ float4 Terrain101AlbedoPS ( VS_OUTPUT inV) : COLOR
 
     // We need to add 0.01 as the reflection disappears at 0
     float roughness = saturate(albedo.a * mask1.w * 2 + 0.01);
-    roughness = inV.mTexWT.z < WaterElevation ? 0.9 : roughness;
-    float3 color = PBR(inV, position, albedo, normal, roughness);
 
     float waterDepth = tex2D(UpperAlbedoSampler, position.xy).b;
+    float3 color = PBR(inV, position, albedo, normal, roughness, waterDepth);
     color = ApplyWaterColorExponentially(-1 * inV.mViewDirection, inV.mTexWT.z, waterDepth, color);
 
     return float4(color, 0.01f);
@@ -2613,10 +2621,9 @@ float4 Terrain301AlbedoPS ( VS_OUTPUT inV) : COLOR
 
     // We need to add 0.01 as the reflection disappears at 0
     float roughness = saturate(albedo.a * mask1.w * 2 + 0.01);
-    roughness = inV.mTexWT.z < WaterElevation ? 0.9 : roughness;
-    float3 color = PBR(inV, position, albedo, normal, roughness);
-
-    float waterDepth = tex2Dproj(UtilitySamplerC, position).g;
+    
+    float waterDepth = tex2D(UpperAlbedoSampler, position.xy).b;
+    float3 color = PBR(inV, position, albedo, normal, roughness, waterDepth);
     color = ApplyWaterColorExponentially(-1 * inV.mViewDirection, inV.mTexWT.z, waterDepth, color);
 
     return float4(color, 0.01f);
