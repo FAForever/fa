@@ -818,7 +818,6 @@ local function CreateOnBuildTogglePopup(parent, selected)
         end
         checkbox:SetCheck(result > 0 and true or false) -- Selected state
 
-        --orderInfo.initialStateFunction(checkbox, selected)
         checkbox.HandleEvent = function(control, event)
             if event.Type == 'MouseEnter' then
                 CreateMouseoverDisplay(control, control._curHelpText, 1)
