@@ -1894,7 +1894,9 @@ float blendHeight(float4 position, float2 blendWeights, uniform float2 nearscale
 }
 
 /* # TerrainPBR # */
- 
+/* a worksite to test new things and an agglomeration of all kinds of stuff you can do to improve the visuals */
+/* similar to Terrain301 but additionally uses rotated sampling of all textures to break up repetition patterns */
+/* and uses vertical texture sampling for cliff textures in stratum3 */
 // Layer| Albedo stratum                                               | Normal stratum
 //      | R           | G             | B            | A               | R             | G             | B             | A            |
 //  ----            ---             ---             ---              ---             ---             ---             ---            ---
@@ -1911,9 +1913,12 @@ float blendHeight(float4 position, float2 blendWeights, uniform float2 nearscale
 // | S7 | height L-S2   roughness L-S2  height S3-S6   roughness S3-S6 | macrotexture R  macrotexture G  macrotexture B  transparency |
 //  ----            ---             ---             ---              ---             ---             ---             ---            ---
 // | U  | normal.x      normal.z        waterDepth     shadow          | 
+//  ----
+// The normal map scales are controlled by the albedo scales to ensure that they use the same values.
+// The layer mask of S7 acts as a roughness multiplier with 0.5 as the neutral value.
+// Height processing happens at two scales, the albedo scales control the near scale and the normal scales control the far scale.
+// SpecularColor.r is used for the scaling of the sampling direction texture
 
-/* similar to Terrain101 but aditionally uses rotated sampling of all textures to break up repetition patterns */
-/* and uses vertical texture sampling for cliff textures in stratum3 */
 float4 TerrainPBRNormalsPS ( VS_OUTPUT inV ) : COLOR
 {
     // z coordinate of Terrainscale is 0
@@ -2052,10 +2057,12 @@ technique TerrainPBR <
 // Terrain2XX for shaders using advanced splatting
 // Terrain3XX for shaders using roughness and advanced splatting
 
-// TerrainX1X for shaders using the full mask range?
-// TerrainX2X for shaders using exponential water absorption?
-// TerrainX3X for shaders using rotated sampling?
-// TerrainX4X for shaders using biplanar mapping?
+// TerrainX0X to TerrainX4X for shaders with half mask range
+// TerrainX5X to TerrainX9X for shaders using the full mask range
+// -> implement a boolean toggle to avoid code duplication
+// TerrainX1X and TerrainX6X for shaders using biplanar mapping?
+// TerrainX2X and TerrainX7X for shaders using additional rotated sampling?
+// TerrainX3X and TerrainX8X for shaders using biplanar mapping and additional rotated sampling?
 
 // ----------------------------------------------------------------------------
 //#region Terrain001 and Terrain002
@@ -2430,6 +2437,10 @@ technique Terrain003 <
 //#endregion
 // ----------------------------------------------------------------------------
 
+// ----------------------------------------------------------------------------
+//#region Terrain100
+// These use roughness maps for PBR rendering
+
 // Layer| Albedo stratum                                               | Normal stratum
 //      | R           | G             | B            | A               | R             | G             | B             | A            |
 //  ----            ---             ---             ---              ---             ---             ---             ---            ---
@@ -2446,6 +2457,10 @@ technique Terrain003 <
 // | S7 | unused   roughness L-S2       unused      roughness S3-S6    | macrotexture R  macrotexture G  macrotexture B  transparency |
 //  ----            ---             ---             ---              ---             ---             ---             ---            ---
 // | U  | normal.x      normal.z        waterDepth     shadow          | 
+//  ----
+// The normal map scales are controlled by the albedo scales to ensure that they use the same values.
+// The layer mask of S7 acts as a roughness multiplier with 0.5 as the neutral value.
+
 float4 Terrain101NormalsPS ( VS_OUTPUT inV ) : COLOR
 {
     float4 position = TerrainScale * inV.mTexWT;
@@ -2542,9 +2557,34 @@ technique Terrain101 <
     }
 }
 
+//#endregion
+// ----------------------------------------------------------------------------
 
+// ----------------------------------------------------------------------------
+//#region Terrain300
+// These use roughness maps for PBR rendering and height maps for texture splatting
 
-/* Uses roughness maps for PBR rendering and height maps for texture splatting  */
+// Layer| Albedo stratum                                               | Normal stratum
+//      | R           | G             | B            | A               | R             | G             | B             | A            |
+//  ----            ---             ---             ---              ---             ---             ---             ---            ---
+// | L  | R             G               B              unused          | X               Y               Z               unused       |
+//  ----            ---             ---             ---              ---             ---             ---             ---            ---
+// | S0 | R             G               B              unused          | X               Y               Z               unused       |
+// | S1 | R             G               B              unused          | X               Y               Z               unused       |
+// | S2 | R             G               B              unused          | X               Y               Z               unused       |
+// | S3 | R             G               B              unused          | X               Y               Z               unused       |
+//  ----            ---             ---            ---               ---             ---             ---             ---            ---
+// | S4 | R             G               B              unused          | X               Y               Z               unused       |
+// | S5 | R             G               B              unused          | X               Y               Z               unused       |
+// | S6 | R             G               B              unused          | X               Y               Z               unused       |
+// | S7 | height L-S2   roughness L-S2  height S3-S6   roughness S3-S6 | macrotexture R  macrotexture G  macrotexture B  transparency |
+//  ----            ---             ---             ---              ---             ---             ---             ---            ---
+// | U  | normal.x      normal.z        waterDepth     shadow          | 
+//  ----
+// The normal map scales are controlled by the albedo scales to ensure that they use the same values.
+// The layer mask of S7 acts as a roughness multiplier with 0.5 as the neutral value.
+// Height processing happens at two scales, the albedo scales control the near scale and the normal scales control the far scale.
+
 float4 Terrain301NormalsPS ( VS_OUTPUT inV ) : COLOR
 {
     float4 position = TerrainScale * inV.mTexWT;
@@ -2657,3 +2697,6 @@ technique Terrain301 <
         PixelShader = compile ps_2_a Terrain301AlbedoPS();
     }
 }
+
+//#endregion
+// ----------------------------------------------------------------------------
