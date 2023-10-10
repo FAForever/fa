@@ -16,7 +16,7 @@ local SUtils = import("/lua/ai/sorianutilities.lua")
 
 local TableGetn = table.getn
 
----@class EasyAIBrainManagers
+---@class AdaptiveAIBrainManagers
 ---@field FactoryManager AIFactoryManager
 ---@field EngineerManager AIEngineerManager
 ---@field StructureManager AIStructureManager
@@ -30,7 +30,7 @@ local TableGetn = table.getn
 ---@field OnceOnly boolean
 ---@field TargetAIBrain AIBrain
 
----@class EasyAIBrain: AIBrain, AIBrainEconomyComponent
+---@class AdaptiveAIBrain: AIBrain, AIBrainEconomyComponent
 ---@field GridReclaim AIGridReclaim
 ---@field GridBrain AIGridBrain
 ---@field GridRecon AIGridRecon
@@ -1110,8 +1110,8 @@ AIBrain = Class(StandardBrain, EconomyComponent) {
                     self:AddBuilderManagers(self:GetStartVector3f(), 100, 'MAIN', false)
                     SUtils.AddCustomUnitSupport(self)
 
-                    ArmyBrains[self:GetArmyIndex()].Nickname = 'CMDR Sorian..(was '..oldName..')'
-                    ScenarioInfo.ArmySetup[self.Name].AIPersonality = 'sorianadaptive'
+                    ArmyBrains[self:GetArmyIndex()].Nickname = 'CMDR Adaptive..(was '..oldName..')'
+                    ScenarioInfo.ArmySetup[self.Name].AIPersonality = 'adaptive'
 
                     local cmdUnits = self:GetListOfUnits(categories.COMMAND, true)
                     if cmdUnits then
@@ -1601,7 +1601,7 @@ AIBrain = Class(StandardBrain, EconomyComponent) {
     ---------------------------------------------------------------------------
     --#region Debug functionality
 
-    ---@param self EasyAIBrain
+    ---@param self AdaptiveAIBrain
     ---@return AIBaseDebugInfo
     GetPlatoonDebugInfoThread = function(self)
         while true do

@@ -207,27 +207,27 @@ function CAiBrain:GetCurrentUnits(category)
 end
 
 --- Returns current resource income.
--- @param resource 'ENERGY' or 'MASS'.
+---@param resource 'ENERGY'|'MASS'.
 -- @return Number.
 function CAiBrain:GetEconomyIncome(resource)
 end
 
 --- Return how much of the resource the brains wants to use.
 -- This is used for calculating Paragon's production.
--- @param resource 'ENERGY' or 'MASS'.
+---@param resource 'ENERGY'|'MASS'.
 -- @return Number.
 function CAiBrain:GetEconomyRequested(resource)
 end
 
 --- Return current resource amout in storage.
--- @param resource 'ENERGY' or 'MASS'.
+---@param resource 'ENERGY'|'MASS'.
 -- @return Number.
 function CAiBrain:GetEconomyStored(resource)
 end
 
 --- Returns the ratio between resource in storage to maximum storage amout.
--- @param resource 'ENERGY' or 'MASS'.
--- @return Float Number 0.0 - 1
+---@param resource  'ENERGY' | 'MASS'.
+---@return number
 function CAiBrain:GetEconomyStoredRatio(resource)
 end
 
