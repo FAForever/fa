@@ -1,5 +1,5 @@
 
-local SemiBallisticComponent = import("/lua/sim/defaultprojectilecomponents/semiballisticcomponent.lua").SemiBallisticComponent
+local SemiBallisticComponent = import("/lua/sim/projectiles/components/semiballisticcomponent.lua").SemiBallisticComponent
 
 ---@class TacticalMissileComponent : SemiBallisticComponent
 TacticalMissileComponent = ClassSimple(SemiBallisticComponent) {
