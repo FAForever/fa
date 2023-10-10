@@ -114,7 +114,7 @@ UnitBlueprint{
     SelectionSizeZ = 0.6,
     SelectionThickness = 0.66,
     SizeX = 1,
-    SizeY = 0.4,
+    SizeY = 0.5,
     SizeZ = 1,
     StrategicIconName = "icon_structure_wall",
     StrategicIconSortPriority = 210,
