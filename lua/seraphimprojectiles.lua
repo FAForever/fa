@@ -218,6 +218,10 @@ SLaanseTacticalMissile = ClassProjectile(SinglePolyTrailProjectile) {
     FxImpactProp = EffectTemplate.SLaanseMissleHitUnit,
     FxImpactUnit = EffectTemplate.SLaanseMissleHitUnit,
     FxImpactAirUnit = EffectTemplate.SLaanseMissleHitUnit,
+
+    FxImpactNone = EffectTemplate.SLaanseMissleHitNone,
+    FxNoneHitScale = 0.6,
+
     FxTrails = EffectTemplate.SLaanseMissleExhaust02,
     PolyTrail = EffectTemplate.SLaanseMissleExhaust01,
 

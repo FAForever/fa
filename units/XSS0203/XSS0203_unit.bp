@@ -286,6 +286,7 @@ UnitBlueprint{
             CollideFriendly = false,
             Damage = 2,
             DamageType = "Normal",
+            DisableWhileReloading = true,
             DisplayName = "Ajellu Anti-Torpedo Defense",
             EffectiveRadius = 26,
             FireTargetLayerCapsTable = {

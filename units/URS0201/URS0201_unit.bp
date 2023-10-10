@@ -481,6 +481,7 @@ UnitBlueprint{
                 ProjectilesToDeflect = 3,
                 Radius = 8,
             },
+            DisableWhileReloading = true,
             DisplayName = "Anti Torpedo Solution",
             FireTargetLayerCapsTable = { Water = "Seabed|Sub|Water" },
             FiringTolerance = 2,
