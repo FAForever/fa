@@ -91,6 +91,8 @@
 --- of the target it was launched at.
 --- See `moho.projectile_methods:ChangeDetonateAboveHeight(height)`
 ---@field DetonatesAtTargetHeight? boolean
+--- Disables the weapon while it is reloading
+---@field DisableWhileReloading boolean
 --- Name of the weapon. Used for lobby restrictions and for debugging:
 --- `dbg weapons` in the console shows the weapon names.
 ---@field DisplayName string

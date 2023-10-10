@@ -286,6 +286,7 @@ UnitBlueprint{
             CollideFriendly = false,
             Damage = 2,
             DamageType = "Normal",
+            DisableWhileReloading = true,
             DisplayName = "Ajellu Anti-Torpedo Defense",
             EffectiveRadius = 26,
             FireTargetLayerCapsTable = {
@@ -317,7 +318,6 @@ UnitBlueprint{
             RangeCategory = "UWRC_Countermeasure",
             RateOfFire = 0.2,
             TargetCheckInterval = 1.0,
-            TargetResetAfterFiring = true,
             TargetRestrictDisallow = "UNTARGETABLE",
             TargetRestrictOnlyAllow = "TORPEDO",
             TargetType = "RULEWTT_Projectile",

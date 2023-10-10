@@ -301,6 +301,7 @@ UnitBlueprint{
                 ProjectilesToDeflect = 3,
                 Radius = 5,
             },
+            DisableWhileReloading = true,
             DisplayName = "Anti-Torpedo Flare",
             FireTargetLayerCapsTable = {
                 Sub = "Seabed|Sub|Water",
@@ -332,8 +333,6 @@ UnitBlueprint{
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_Countermeasure",
             RateOfFire = 0.05,
-            TargetCheckInterval = 1.0,
-            TargetResetAfterFiring = true,
             TargetRestrictDisallow = "UNTARGETABLE",
             TargetRestrictOnlyAllow = "TORPEDO",
             TargetType = "RULEWTT_Projectile",

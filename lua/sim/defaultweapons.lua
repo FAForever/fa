@@ -879,7 +879,8 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
                 if bp.TargetResetAfterFiring then
 
                     -- attempts to fix weapons that intercept projectiles to being stuck on a projectile while reloading, preventing
-                    -- other weapons from targeting that projectile. Is a side effect of the blueprint field `DesiredShooterCap`
+                    -- other weapons from targeting that projectile. Is a side effect of the blueprint field `DesiredShooterCap`. For a more
+                    -- aggressive version see the blueprint field `DisableWhileReloading` which completely disables the weapon
 
                     WaitTicks(5)
                     self:ResetTarget()
@@ -1064,6 +1065,21 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
 
             -- We can fire again after reaching here
             self.HaltFireOrdered = false
+
+            -- attempts to fix weapons that intercept projectiles to being stuck on a projectile while reloading, preventing
+            -- other weapons from targeting that projectile. Is a side effect of the blueprint field `DesiredShooterCap`. This
+            -- is the more aggressive variant of `TargetResetAfterFiring` as it completely disables the weapon. Should only be used
+            -- for weapons that do not visually track, such as torpedo defenses
+
+            if bp.DisableWhileReloading then
+                local reloadTime = math.floor(10 / self.Blueprint.RateOfFire) - 1
+                if reloadTime > 4 then
+                    DrawCircle(self.unit:GetPosition(), 2, 'ffffff')
+                    self:SetEnabled(false)
+                    WaitTicks(reloadTime)
+                    self:SetEnabled(true)
+                end
+            end
 
             -- Deal with the rack firing sequence
             if self.CurrentRackSalvoNumber > rackBoneCount then
