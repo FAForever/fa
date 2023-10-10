@@ -245,6 +245,10 @@ Tooltips = {
         title = "<LOC tooltipui0501>Personal Stealth Toggle",
         description = "<LOC tooltipui0502>Turn the selected units personal stealth field on/off",
     },
+    toggle_stealth = {
+        title = "<LOC tooltipui0499>Stealth Toggle",
+        description = "<LOC tooltipui0500>Turn the selected units stealth on/off",
+    },
     toggle_cloak = {
         title = "<LOC tooltipui0339>Personal Cloak",
         description = "<LOC tooltipui0342>Turn the selected units cloaking on/off",
@@ -265,6 +269,10 @@ Tooltips = {
     external_factory = {
         title = "Select Mobile Factory",
         description = "",
+    },
+    prod_options = {
+        title = "Construction Options",
+        description = "Options for constructed units."
     },
     auto_deploy = {
         title = "Deploy",
