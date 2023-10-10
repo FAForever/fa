@@ -543,7 +543,6 @@ UnitBlueprint{
             MinRadius = 2,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
-            NeedPrep = true,
             RackBones = {
                 {
                     MuzzleBones = { "Left_Muzzle01" },
@@ -596,7 +595,6 @@ UnitBlueprint{
             MinRadius = 2,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
-            NeedPrep = true,
             RackBones = {
                 {
                     MuzzleBones = { "Right_Muzzle01" },

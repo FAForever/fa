@@ -883,6 +883,9 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
                     -- aggressive version see the blueprint field `DisableWhileReloading` which completely disables the weapon
 
                     WaitTicks(5)
+
+                    DrawCircle(self.unit:GetPosition(), 2, 'ffffff')
+
                     self:ResetTarget()
                 else
 
