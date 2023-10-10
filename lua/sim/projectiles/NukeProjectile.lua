@@ -20,7 +20,7 @@
 --** SOFTWARE.
 --******************************************************************************************************
 
-local NullShell = import("/lua/sim/defaultprojectiles/nullprojectile.lua").NullShell
+local NullShell = import("/lua/sim/projectiles/nullprojectile.lua").NullShell
 
 ---@class NukeProjectile : NullShell
 NukeProjectile = ClassProjectile(NullShell) {

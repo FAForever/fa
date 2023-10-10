@@ -20,7 +20,7 @@
 --** SOFTWARE.
 --******************************************************************************************************
 
-local EmitterProjectile = import("/lua/sim/defaultprojectiles/emitterprojectile.lua").EmitterProjectile
+local EmitterProjectile = import("/lua/sim/projectiles/emitterprojectile.lua").EmitterProjectile
 
 -- upvalue scope for performance
 local CreateBeamEmitterOnEntity = CreateBeamEmitterOnEntity

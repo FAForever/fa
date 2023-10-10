@@ -20,57 +20,33 @@
 --** SOFTWARE.
 --******************************************************************************************************
 
-local EmitterProjectile = import("/lua/sim/defaultprojectiles/emitterprojectile.lua").EmitterProjectile
+local EmitterProjectile = import("/lua/sim/projectiles/emitterprojectile.lua").EmitterProjectile
 
 -- upvalue scope for performance
-local Random = Random
 local CreateTrail = CreateTrail
 local IEffectOffsetEmitter = _G.moho.IEffect.OffsetEmitter
 
-local TableGetn = table.getn
+---@class SinglePolyTrailProjectile : EmitterProjectile
+SinglePolyTrailProjectile = ClassProjectile(EmitterProjectile) {
 
----@class MultiPolyTrailProjectile : EmitterProjectile
-MultiPolyTrailProjectile = ClassProjectile(EmitterProjectile) {
-
-    PolyTrails = {'/effects/emitters/test_missile_trail_emit.bp'},
-    PolyTrailOffset = { 0 },
+    PolyTrail = '/effects/emitters/test_missile_trail_emit.bp',
+    PolyTrailOffset = 0,
     FxTrails = { },
 
-    --- Count of how many are selected randomly for PolyTrail table
-    RandomPolyTrails = 0,
-
-    ---@param self MultiPolyTrailProjectile
+    ---@param self SinglePolyTrailProjectile
     OnCreate = function(self)
         EmitterProjectile.OnCreate(self)
 
         local army = self.Army
-        local polyTrails = self.PolyTrails
-        local polyTrailOffsets = self.PolyTrailOffset
-        local numberOfPolyTrails = self.RandomPolyTrails
+        local polyTrail = self.PolyTrail
+        local polyTrailOffset = self.PolyTrailOffset
 
-        if polyTrails then
-            local polyTrailCount = TableGetn(polyTrails)
+        if polyTrail ~= '' then
+            local effect = CreateTrail(self, -1, army, polyTrail)
 
-            if numberOfPolyTrails ~= 0 then
-                local index
-                for i = 1, numberOfPolyTrails do
-                    index = Random(1, polyTrailCount)
-                    local effect = CreateTrail(self, -1, army, polyTrails[index])
-
-                    -- only do these engine calls when they matter
-                    if polyTrailOffsets[index] ~= 0 then 
-                        IEffectOffsetEmitter(effect, 0, 0, polyTrailOffsets[index])
-                    end
-                end
-            else
-                for i = 1, polyTrailCount do
-                    local effect = CreateTrail(self, -1, army, polyTrails[i])
-
-                    -- only do these engine calls when they matter
-                    if polyTrailOffsets[i] ~= 0 then 
-                        IEffectOffsetEmitter(effect, 0, 0, polyTrailOffsets[i])
-                    end
-                end
+            -- only do these engine calls when they matter
+            if polyTrailOffset ~= 0 then
+                IEffectOffsetEmitter(effect, 0, 0, polyTrailOffset)
             end
         end
     end,
