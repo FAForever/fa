@@ -26,6 +26,7 @@ local GetReclaimablesInRect = GetReclaimablesInRect
 local EntityCategoryContains = EntityCategoryContains
 local CreateLightParticleIntel = CreateLightParticleIntel
 
+local MathClamp = math.clamp
 local MathMax = math.max
 local MathFloor = math.floor
 local MathCeil = math.ceil
@@ -274,14 +275,17 @@ StructureUnit = ClassUnit(Unit) {
     ---@param self StructureUnit
     FlattenSkirtHorizontally = function(self)
         local x0, z0, x1, z1 = self:GetSkirtRect()
+        local size = ScenarioInfo.size
+        local sx = size[1] - 1
+        local sz = size[2] - 1
 
-        -- floor them
-        x0 = MathFloor(x0)
-        z0 = MathFloor(z0)
+        -- floor and clamp them
+        x0 = MathClamp(MathFloor(x0), 0, sx)
+        z0 = MathClamp(MathFloor(z0), 0, sz)
 
-        -- ceil them
-        x1 = MathCeil(x1)
-        z1 = MathCeil(z1)
+        -- ceil and clamp them
+        x1 = MathClamp(MathCeil(x1), 0, sx)
+        z1 = MathClamp(MathCeil(z1), 0, sz)
 
         -- compute average elevation and flatten
         local elevation = 0.25 * (
@@ -297,14 +301,17 @@ StructureUnit = ClassUnit(Unit) {
     ---@param self StructureUnit
     FlattenSkirt = function(self)
         local x0, z0, x1, z1 = self:GetSkirtRect()
+        local size = ScenarioInfo.size
+        local sx = size[1] - 1
+        local sz = size[2] - 1
 
-        -- floor them
-        x0 = MathFloor(x0)
-        z0 = MathFloor(z0)
+        -- floor and clamp them
+        x0 = MathClamp(MathFloor(x0), 0, sx)
+        z0 = MathClamp(MathFloor(z0), 0, sz)
 
-        -- ceil them
-        x1 = MathCeil(x1)
-        z1 = MathCeil(z1)
+        -- ceil and clamp them
+        x1 = MathClamp(MathCeil(x1), 0, sx)
+        z1 = MathClamp(MathCeil(z1), 0, sz)
 
         import('/lua/sim/TerrainUtils.lua').FlattenGradientMapRect(x0, z0, x1 - x0, z1 - z0)
     end,
@@ -722,18 +729,18 @@ StructureUnit = ClassUnit(Unit) {
             return
         end
 
-        -- make sure we have adjacency buffs to apply
-        local adjBuffs = self.Blueprint.Adjacency
-        if not adjBuffs then
-            return
-        end
-
         -- keep track of who is adjacent to who
         self.AdjacentUnits = self.AdjacentUnits or { }
         adjacentUnit.AdjacentUnits = adjacentUnit.AdjacentUnits or { }
 
         self.AdjacentUnits[adjacentUnit.EntityId] = adjacentUnit
         adjacentUnit.AdjacentUnits[self.EntityId] = self
+
+        -- make sure we have adjacency buffs to apply
+        local adjBuffs = self.Blueprint.Adjacency
+        if not adjBuffs then
+            return
+        end
 
         -- apply the buffs
         local buffApplied = false
@@ -778,6 +785,10 @@ StructureUnit = ClassUnit(Unit) {
             return
         end
 
+        -- keep track of who is adjacent to who
+        self.AdjacentUnits[adjacentUnit.EntityId] = nil
+        adjacentUnit.AdjacentUnits[self.EntityId] = nil
+
         -- make sure we have buffs to remove
         local adjBuffs = self.Blueprint.Adjacency
         if not adjBuffs then
@@ -815,10 +826,6 @@ StructureUnit = ClassUnit(Unit) {
 
         -- clean up effects
         self:DestroyAdjacentEffects(adjacentUnit)
-
-        -- keep track of who is adjacent to who
-        self.AdjacentUnits[adjacentUnit.EntityId] = nil
-        adjacentUnit.AdjacentUnits[self.EntityId] = nil
 
         -- refresh the UI
         adjacentUnit:RequestRefreshUI()

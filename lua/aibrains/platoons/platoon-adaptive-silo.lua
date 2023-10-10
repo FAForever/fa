@@ -18,7 +18,7 @@ local UnitTypeOrder = {
 
 ---@class AIPlatoonAdaptiveSilo : AIPlatoon
 ---@field Base AIBase
----@field Brain EasyAIBrain
+---@field Brain AdaptiveAIBrain
 ---@field BuilderType 'TACTICALMISSILEPLATFORM' | 'NUKE'
 ---@field Builder AIBuilder | nil
 AIPlatoonAdaptiveSilo = Class(AIPlatoon) {

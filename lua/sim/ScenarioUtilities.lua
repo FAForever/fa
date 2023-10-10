@@ -55,10 +55,12 @@ function EnableLoadBalance(enabled, unitThreshold)
     end
 end
 
+---@deprecated # use marker utilities instead
 function GetMarkers()
     return Scenario.MasterChain._MASTERCHAIN_.Markers
 end
 
+---@deprecated # use marker utilities instead
 ---@param name MarkerChain
 ---@return MarkerChain[]
 function GetMarker(name)

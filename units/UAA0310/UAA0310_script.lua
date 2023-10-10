@@ -15,10 +15,13 @@ local CzarShield = import("/lua/shield.lua").CzarShield
 
 local CreateAeonCZARBuildingEffects = import("/lua/effectutilities.lua").CreateAeonCZARBuildingEffects
 
----@class UAA0310 : AirTransport
-UAA0310 = ClassUnit(AirTransport) {
+local ExternalFactoryComponent = import("/lua/defaultcomponents.lua").ExternalFactoryComponent
+
+---@class UAA0310 : AirTransport, ExternalFactoryComponent
+UAA0310 = ClassUnit(AirTransport, ExternalFactoryComponent) {
     DestroyNoFallRandomChance = 1.1,
-    BuildAttachBone = 'UAA0310',
+    BuildAttachBone = 'Attachpoint01',
+    FactoryAttachBone = 'Attachpoint02',
 
     Weapons = {
         QuantumBeamGeneratorWeapon = ClassWeapon(AQuantumBeamGenerator) {},
@@ -38,6 +41,8 @@ UAA0310 = ClassUnit(AirTransport) {
     end,
 
     OnKilled = function(self, instigator, type, overkillRatio)
+        ExternalFactoryComponent.OnKilled(self, instigator, type, overkillRatio)
+
         local wep = self:GetWeaponByLabel('QuantumBeamGeneratorWeapon')
         for _, v in wep.Beams do
             v.Beam:Disable()
@@ -63,6 +68,13 @@ UAA0310 = ClassUnit(AirTransport) {
         AirTransport.OnKilled(self, instigator, type, overkillRatio)
     end,
 
+    ---@param self UAS0401
+    ---@param new Layer
+    ---@param old Layer
+    OnLayerChange = function(self, new, old)
+        AirTransport.OnLayerChange(self, new, old)
+    end,
+
     OnAnimTerrainCollision = function(self, bone, x, y, z)
         local blueprint = self.Blueprint
         local position = { x, y, z }
@@ -75,6 +87,7 @@ UAA0310 = ClassUnit(AirTransport) {
 
     OnStopBeingBuilt = function(self, builder, layer)
         AirTransport.OnStopBeingBuilt(self, builder, layer)
+        ExternalFactoryComponent.OnStopBeingBuilt(self, builder, layer)
         ChangeState(self, self.IdleState)
     end,
 
@@ -98,6 +111,8 @@ UAA0310 = ClassUnit(AirTransport) {
         Main = function(self)
             self:DetachAll(self.BuildAttachBone)
             self:SetBusy(false)
+            self:OnIdle()
+            LOG("OnIdle")
         end,
 
         OnStartBuild = function(self, unitBuilding, order)
@@ -111,33 +126,29 @@ UAA0310 = ClassUnit(AirTransport) {
         Main = function(self)
             local unitBuilding = self.UnitBeingBuilt
             local bone = self.BuildAttachBone
-            self:DetachAll(bone)
+            unitBuilding:AttachBoneTo(-2, self, bone)
             unitBuilding:HideBone(0, true)
             self.UnitDoneBeingBuilt = false
         end,
 
         OnStopBuild = function(self, unitBeingBuilt)
             AirTransport.OnStopBuild(self, unitBeingBuilt)
-            ChangeState(self, self.FinishedBuildingState)
-        end,
-    },
 
-    FinishedBuildingState = State {
-        Main = function(self)
+
             local unitBuilding = self.UnitBeingBuilt
             unitBuilding:DetachFrom(true)
             self:DetachAll(self.BuildAttachBone)
-            if self:TransportHasAvailableStorage() then
-                self:AddUnitToStorage(unitBuilding)
-            else
-                local worldPos = self:CalculateWorldPositionFromRelative({ 0, 0, -20 })
-                IssueToUnitMoveOffFactory(unitBuilding, worldPos)
+
+            if not self:TransportHasAvailableStorage() or self:GetScriptBit('RULEUTC_WeaponToggle') then
                 unitBuilding:ShowBone(0, true)
+            else
+                self:AddUnitToStorage(unitBuilding)
             end
+
             self:RequestRefreshUI()
             ChangeState(self, self.IdleState)
         end,
-    }
+    },
 }
 
 TypeClass = UAA0310
