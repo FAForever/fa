@@ -875,13 +875,24 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
                 ChangeState(self, self.RackSalvoFiringState)
             end
 
-            -- attempts to fix units being stuck on targets that are outside their current attack radius, but inside
-            -- the tracking radius. This happens when the unit is trying to fire, but it is never actually firing and
-            -- therefore the thread of this state is not destroyed
             if not (IsDestroyed(unit) or IsDestroyed(self)) then
-                -- wait reload time + 2 seconds, then force the weapon to recheck its target 
-                WaitSeconds((1 / self.Blueprint.RateOfFire) + 3)
-                self:ResetTarget()
+                if bp.TargetResetAfterFiring then
+
+                    -- attempts to fix weapons that intercept projectiles to being stuck on a projectile while reloading, preventing
+                    -- other weapons from targeting that projectile. Is a side effect of the blueprint field `DesiredShooterCap`
+
+                    WaitTicks(5)
+                    self:ResetTarget()
+                else
+
+                    -- attempts to fix units being stuck on targets that are outside their current attack radius, but inside
+                    -- the tracking radius. This happens when the unit is trying to fire, but it is never actually firing and
+                    -- therefore the thread of this state is not destroyed
+
+                    -- wait reload time + 2 seconds, then force the weapon to recheck its target
+                    WaitSeconds((1 / self.Blueprint.RateOfFire) + 3)
+                    self:ResetTarget()
+                end
             end
         end,
 
