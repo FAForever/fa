@@ -262,7 +262,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
             BuffTable = {},
             Affects = {},
         }
-
+        
         self:ShowPresetEnhancementBones()
 
         local bpDeathAnim = bp.Display.AnimationDeath
