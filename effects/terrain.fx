@@ -425,7 +425,7 @@ float4 CalculateLighting( float3 inNormal, float3 inViewPosition, float3 inAlbed
     float shadow = ( inShadows && ( 1 == ShadowsEnabled ) ) ? ComputeShadow( inShadow ) : 1;
     if (IsExperimentalShader()) {
         float3 position = TerrainScale * inViewPosition;
-        float mapShadow = tex2D(Stratum7AlbedoSampler, position.xy).w;
+        float mapShadow = tex2D(UpperAlbedoSampler, position.xy).w;
         shadow = shadow * mapShadow;
     }
 
