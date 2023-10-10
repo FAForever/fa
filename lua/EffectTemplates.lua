@@ -3928,6 +3928,13 @@ SLaanseMissleHit = {
     EmtBpPath .. 'seraphim_lancer_missile_hit_06_emit.bp',
 }
 
+SLaanseMissleHitNone = {
+    EmtBpPath .. 'seraphim_lancer_missile_hit_01_emit.bp', -- little flash effect
+    EmtBpPath .. 'seraphim_lancer_missile_hit_02_none_emit.bp', -- inner white ring
+    EmtBpPath .. 'seraphim_lancer_missile_hit_03_none_emit.bp', -- inner white ring
+    EmtBpPath .. 'seraphim_lancer_missile_hit_05_emit.bp', -- smoke
+}
+
 SLaanseMissleHitWater = {
     EmtBpPath .. 'seraphim_lancer_missile_hit_01_emit.bp',
     EmtBpPath .. 'seraphim_lancer_missile_hit_02_emit.bp',
