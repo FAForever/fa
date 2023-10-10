@@ -876,7 +876,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
             end
 
             if not (IsDestroyed(unit) or IsDestroyed(self)) then
-                if bp.TargetResetAfterFiring then
+                if bp.TargetResetWhenReady then
 
                     -- attempts to fix weapons that intercept projectiles to being stuck on a projectile while reloading, preventing
                     -- other weapons from targeting that projectile. Is a side effect of the blueprint field `DesiredShooterCap`. For a more
@@ -1068,7 +1068,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
 
             -- attempts to fix weapons that intercept projectiles to being stuck on a projectile while reloading, preventing
             -- other weapons from targeting that projectile. Is a side effect of the blueprint field `DesiredShooterCap`. This
-            -- is the more aggressive variant of `TargetResetAfterFiring` as it completely disables the weapon. Should only be used
+            -- is the more aggressive variant of `TargetResetWhenReady` as it completely disables the weapon. Should only be used
             -- for weapons that do not visually track, such as torpedo defenses
 
             if bp.DisableWhileReloading then

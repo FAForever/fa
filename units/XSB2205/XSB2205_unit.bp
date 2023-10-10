@@ -272,7 +272,7 @@ UnitBlueprint{
             RangeCategory = "UWRC_Countermeasure",
             RateOfFire = 0.5,
             TargetCheckInterval = 1.0,
-            TargetResetAfterFiring = true,
+            TargetResetWhenReady = true,
             TargetRestrictDisallow = "UNTARGETABLE",
             TargetRestrictOnlyAllow = "TORPEDO",
             TargetType = "RULEWTT_Projectile",

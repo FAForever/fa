@@ -294,7 +294,7 @@
 --- interval of time between looking for a target
 ---@field TargetCheckInterval number
 --- issues a `ResetTarget` half way the firing sequence
----@field TargetResetAfterFiring boolean
+---@field TargetResetWhenReady boolean
 --- table of category strings that define the targetting order of this weapon
 ---@field TargetPriorities UnparsedCategory[]
 --- comma separated list of category names that are always invalid targets
