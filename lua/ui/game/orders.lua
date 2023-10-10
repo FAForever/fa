@@ -22,7 +22,6 @@ local EnhancementQueue = import("/lua/ui/notify/enhancementqueue.lua")
 local SetWeaponPriorities = import("/lua/keymap/misckeyactions.lua").SetWeaponPriorities
 local CommandMode = import("/lua/ui/game/commandmode.lua")
 local Construction = import("/lua/ui/game/construction.lua")
-local GetBits = import("/lua/shared/mathutilities.lua").GetBits
 
 controls = import("/lua/ui/controls.lua").Get()
 
@@ -39,6 +38,10 @@ local horzRows = 4
 local vertCols = numSlots/vertRows
 local horzCols = numSlots/horzRows
 local lastOCTime = {}
+
+-- Forward declare our main info tables so functions can access them
+local defaultOrdersTable
+local commonOrders
 
 local function CreateOrderGlow(parent)
     controls.orderGlow = Bitmap(parent, UIUtil.UIFile('/game/orders/glow-02_bmp.dds'))
@@ -780,30 +783,25 @@ local function CreateBorder(parent)
     return border
 end
 
-local defaultOrdersTable
-
-local function CreateBuiltUnitTogglePopup(parent, selected)
+local function CreateOnBuildTogglePopup(parent, selected)
     local bg = Bitmap(parent, UIUtil.UIFile('/game/ability_brd/chat_brd_m.dds'))
 
     bg.border = CreateBorder(bg)
     bg:DisableHitTest(true)
 
-    local function CreateButton(toggle)
-        local orderInfo = defaultOrdersTable[toggle]
-        local checkbox = Checkbox(bg, GetOrderBitmapNames(orderInfo.bitmapId))
+    local function CreateButton(statToggle)
+        local bitmapId = statToggle.override.bitmapId or defaultOrdersTable[statToggle.defaultOrder].bitmapId
+        local checkbox = Checkbox(bg, GetOrderBitmapNames(bitmapId))
 
-        -- Set the info in to the data member for retrieval
-        checkbox._data = orderInfo
-
-        -- Set up initial help text
-        checkbox._curHelpText = orderInfo.helpText
+        -- apply help text override or use default
+        -- probably need to change all of these to use a special production tooltip
+        checkbox._curHelpText = statToggle.override.helpText or defaultOrdersTable[statToggle.defaultOrder].helpText
 
         -- see if we're mixed
         local result = nil
         local mixed = false
         for i, v in selected do
-            LOG(toggle..' is '..repr(v:GetStat(toggle).Value))
-            local thisUnitStatus = v:GetStat(toggle, 0).Value
+            local thisUnitStatus = v:GetStat(statToggle.stat, 0).Value
             if result == nil then
                 result = thisUnitStatus
             else
@@ -834,41 +832,43 @@ local function CreateBuiltUnitTogglePopup(parent, selected)
         end
 
         checkbox.OnCheck = function(self, checked)
-            parent:_OnButtonToggle(toggle, checked)
+            parent:_OnButtonToggle(statToggle.stat, checked)
         end
+
         return checkbox
     end
 
+    local buttonPadding = 3
     local i = 1
     bg.buttons = {}
-    for _, toggle in parent._data.availableBuildToggles do
-        bg.buttons[i] = CreateButton(toggle)
+    for _, statToggle in parent._data.buildToggles do
+        bg.buttons[i] = CreateButton(statToggle)
         if i == 1 then
-            LayoutHelpers.AtBottomIn(bg.buttons[i], bg)
-            LayoutHelpers.AtLeftIn(bg.buttons[i], bg)
+            LayoutHelpers.AtBottomCenterIn(bg.buttons[i], bg, -8)
+            --LayoutHelpers.AtLeftIn(bg.buttons[i], bg)
         else
-            LayoutHelpers.Above(bg.buttons[i], bg.buttons[i-1])
+            LayoutHelpers.Above(bg.buttons[i], bg.buttons[i-1], buttonPadding)
         end
         i = i + 1
     end
 
-    bg.Height:Set(function() return table.getsize(bg.buttons) * bg.buttons[1].Height() end)
-    bg.Width:Set(bg.buttons[1].Width)
+    bg.Height:Set(function() return table.getsize(bg.buttons) * (bg.buttons[1].Height()+buttonPadding) - 20 end)
+    bg.Width:Set(bg.buttons[1].Width() - 20)
 
     if UIUtil.currentLayout == 'left' then
         LayoutHelpers.RightOf(bg, parent, 40)
     else
-        LayoutHelpers.Above(bg, controls.orderButtonGrid:GetItem(parent.col, 1), 20)
+        LayoutHelpers.CenteredAbove(bg, controls.orderButtonGrid:GetItem(parent.col, 1), 20)
     end
 
     return bg
 end
 
-local function BuiltUnitToggleBehavior(self, modifiers)
+local function OnBuildToggleBehavior(self, modifiers)
     if not self._OnButtonToggle then
-        self._OnButtonToggle = function(self, toggle, state)
+        self._OnButtonToggle = function(self, stat, state)
             state = (state and 1) or 0 -- numerize our bool
-            SimCallback( { Func="SetStatByCallback", Args= {[toggle] = state}}, true )
+            SimCallback( { Func="SetStatByCallback", Args= {[stat] = state}}, true )
         end
     end
     
@@ -876,7 +876,7 @@ local function BuiltUnitToggleBehavior(self, modifiers)
         self._popup:Destroy()
         self._popup = nil
     else
-        self._popup = CreateBuiltUnitTogglePopup(self, currentSelection)
+        self._popup = CreateOnBuildTogglePopup(self, currentSelection)
         local function CollapsePopup(event)
             if (event.y < self._popup.Top() or event.y > self._popup.Bottom()) or (event.x < self._popup.Left() or event.x > self._popup.Right()) then
                 self._popup:Destroy()
@@ -891,10 +891,6 @@ local function BuiltUnitToggleBehavior(self, modifiers)
             Checkbox.OnDestroy(popup)
         end
     end
-end
-
-local function BuiltUnitToggleInitFunction(control, unitList)
-    LOG('BuiltUnitToggleInitFunction')
 end
 
 local function CreateFirestatePopup(parent, selected)
@@ -925,27 +921,27 @@ local function CreateFirestatePopup(parent, selected)
     end
 
     local i = 1
+    local buttonPadding = 3
     bg.buttons = {}
     for index, state in retaliateStateInfo do
         if index ~= -1 then
             bg.buttons[i] = CreateButton(index, state)
             if i == 1 then
-                LayoutHelpers.AtBottomIn(bg.buttons[i], bg)
-                LayoutHelpers.AtLeftIn(bg.buttons[i], bg)
+                LayoutHelpers.AtBottomCenterIn(bg.buttons[i], bg, -8)
             else
-                LayoutHelpers.Above(bg.buttons[i], bg.buttons[i-1])
+                LayoutHelpers.Above(bg.buttons[i], bg.buttons[i-1], buttonPadding)
             end
             i = i + 1
         end
     end
 
-    bg.Height:Set(function() return table.getsize(bg.buttons) * bg.buttons[1].Height() end)
-    bg.Width:Set(bg.buttons[1].Width)
+    bg.Height:Set(function() return table.getsize(bg.buttons) * (bg.buttons[1].Height() + buttonPadding) - 20 end)
+    bg.Width:Set(bg.buttons[1].Width() - 20)
 
     if UIUtil.currentLayout == 'left' then
         LayoutHelpers.RightOf(bg, parent, 40)
     else
-        LayoutHelpers.Above(bg, parent, 20)
+        LayoutHelpers.CenteredAbove(bg, parent, 20)
     end
 
     return bg
@@ -1265,7 +1261,7 @@ defaultOrdersTable = {
     DroneR = {                      helpText = "drone",             bitmapId = 'unload02',              preferredSlot = 11, behavior = DroneBehavior,               initialStateFunc = DroneInit},
 
     ExFac = {                       helpText = "external_factory",  bitmapId = 'exfac',                 preferredSlot = 10, behavior = ExternalFactoryBehavior},
-    BuiltUnitToggles = {            helpText = "move",              bitmapId = 'move',                  preferredSlot = 14, behavior = BuiltUnitToggleBehavior,     initalStateFunc = BuiltUnitToggleInitFunction},
+    OnBuildToggle = {               helpText = "prod_options",      bitmapId = "prod-options",          preferredSlot = 14, behavior = OnBuildToggleBehavior},
 
     -- Unit toggle rules
     RULEUTC_ShieldToggle = {        helpText = "toggle_shield",     bitmapId = 'shield',                preferredSlot = 8,  behavior = ScriptButtonOrderBehavior,   initialStateFunc = ScriptButtonInitFunction, extraInfo = 0},
@@ -1287,7 +1283,7 @@ local specialOrdersTable = {
 }
 
 -- This is a used as a set
-local commonOrders = {
+commonOrders = {
     RULEUCC_Move = true,
     RULEUCC_Attack = true,
     RULEUCC_Patrol = true,
@@ -1295,24 +1291,6 @@ local commonOrders = {
     RULEUCC_Guard = true,
     RULEUCC_RetaliateToggle = true,
     AttackMove = true,
-}
-
-local scriptBitToggles = {
-    "RULEUTC_ShieldToggle",
-    "RULEUTC_WeaponToggle",
-    "RULEUTC_JammingToggle",
-    "RULEUTC_IntelToggle",
-    "RULEUTC_ProductionToggle",
-    "RULEUTC_StealthToggle",
-    "RULEUTC_GenericToggle",
-    "RULEUTC_SpecialToggle",
-    "RULEUTC_CloakToggle",
-}
-
--- Put function overrides here so they can be accessed from values passed from unit blueprints
-local overrideFunctionTable = {
-    AutoDeployInit = AutoDeployInit,
-    AutoDeployBehavior = AutoDeployBehavior,
 }
 
 --[[
@@ -1564,35 +1542,47 @@ function ExternalFactoryPreCheck(availableOrders, units, assistingUnitList)
     end
 end
 
-
-function BuiltUnitTogglePreCheck(availableOrders, units, assistingUnitList)
+function OnBuildTogglePreCheck(availableOrders, units, assistingUnitList)
     local factories = EntityCategoryFilterDown(categories.FACTORY, units)
     if not table.empty(factories) and table.getn(factories) == table.getn(units) then
-        local _, _, buildableCategories = GetUnitCommandData(units)
-        local bpIds = EntityCategoryGetUnitList(buildableCategories)
-        local availableBuildToggles = {}
-        for _, bpId in bpIds do
-            local bp = __blueprints[bpId]
-            if bp.General.ToggleCaps and bp.General.ToggleCaps ~= '0' then
-                if tonumber(bp.General.ToggleCaps) then
-                    for k,v in GetBits(tonumber(bp.General.ToggleCaps)) do
-                        if v then
-                            availableBuildToggles[scriptBitToggles[k+1]] = true
-                        end
-                    end
+        
+        -- get a list of factory blueprints and populate our first set of build toggles
+        local bps = {}
+        local availableBuildToggles
+        for _, factory in factories do
+            local bp = factory:GetBlueprint()
+            if bp.General.OnStopBuildableToggles then
+                if not availableBuildToggles then
+                    availableBuildToggles = bp.General.OnStopBuildableToggles
                 else
-                    availableBuildToggles[bp.General.ToggleCaps] = true
+                    bps[bp] = true
                 end
             end
         end
-        if not table.empty(availableBuildToggles) then
-            table.insert(availableOrders, 'BuiltUnitToggles')
-            standardOrdersTable['BuiltUnitToggles'].availableBuildToggles = {}
-            for i, toggle in ipairs(scriptBitToggles) do
-                if availableBuildToggles[toggle] then
-                    table.insert(standardOrdersTable['BuiltUnitToggles'].availableBuildToggles, toggle)
+
+        if not availableBuildToggles then
+            return
+        end
+
+        -- find the build toggles they have in common
+        
+        for stat, _ in availableBuildToggles do
+            for bp, _ in bps do
+                if not bp.General.OnStopBuildableToggles[stat] then
+                    availableBuildToggles[stat] = nil
                 end
             end
+        end
+
+        if not table.empty(availableBuildToggles) then
+            standardOrdersTable['OnBuildToggle'].buildToggles = {}
+            for _, statData in availableBuildToggles do
+                table.insert(standardOrdersTable['OnBuildToggle'].buildToggles, statData)
+            end
+            table.sort(standardOrdersTable['OnBuildToggle'].buildToggles, function(a, b)
+                return a.index < b.index
+            end)
+            table.insert(availableOrders, 'OnBuildToggle')
         end
     end
 end
@@ -1600,7 +1590,7 @@ end
 local altPreCheckFunctions = {
     Drone = DronePreCheck,
     ExternalFactory = ExternalFactoryPreCheck,
-    BuiltUnitToggle = BuiltUnitTogglePreCheck,
+    OnBuildToggle = OnBuildTogglePreCheck,
 }
 
 -- Creates the buttons for the alt orders, placing them as possible
