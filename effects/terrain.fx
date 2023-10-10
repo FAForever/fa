@@ -2618,6 +2618,8 @@ float4 Terrain301AlbedoPS ( VS_OUTPUT inV) : COLOR
     albedo = splatLerp(albedo, stratum4Albedo, stratum4Height, mask1.x);
     albedo = splatLerp(albedo, stratum5Albedo, stratum5Height, mask1.y);
     albedo = splatLerp(albedo, stratum6Albedo, stratum6Height, mask1.z);
+    float4 mapwide = tex2D(Stratum7NormalSampler, position.xy);
+    albedo.rgb = lerp(albedo.rgb, mapwide.rgb, mapwide.a);
 
     // We need to add 0.01 as the reflection disappears at 0
     float roughness = saturate(albedo.a * mask1.w * 2 + 0.01);
