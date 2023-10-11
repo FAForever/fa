@@ -88,16 +88,21 @@ end
 Callbacks.EmptyCallback = function(data, units)
 end
 
+---@param data table<string, boolean>
 Callbacks.SetStatByCallback = function(data, units)
-    for _, u in units or {} do
-        if IsEntity(u) and OkayToMessWithArmy(u.Army) then
-            for stat, value in data do
-                if not tonumber(value) then
-                    WARN('Need a numeric value for SetStatByCallback!')
-                else
-                    LOG('SetStatByCallback: ' .. repr(stat) .. ' = ' .. repr(value))
-                    u:UpdateStat(stat, value)
+    for stat, value in data do
+        for _, u in units or {} do
+            if IsEntity(u) and OkayToMessWithArmy(u.Army) then
+                if not u.Blueprint.General.StatToggles or not u.Blueprint.General.StatToggles[stat] then
+                    WARN('SetStatByCallback: ' .. repr(stat) .. ' is not a valid stat for this unit!')
+                    continue
                 end
+                if not type(value) == 'boolean' then
+                    WARN('SetStatByCallback: received non boolean value ' .. repr(value) .. ' for stat '..repr(stat)..'!')
+                end
+                value = (value and 1) or 0 -- numerize our bool
+                LOG('SetStatByCallback: ' .. repr(stat) .. ' = ' .. repr(value))
+                u:SetStat(stat, value)
             end
         end
     end
