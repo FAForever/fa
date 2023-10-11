@@ -111,18 +111,7 @@ local function DetermineWeaponCategory(weapon)
     return nil
 end
 
-local function Split(inputstr, sep)
-    if sep == nil then
-            sep = "%s"
-    end
-    local t={}
-    for str in string.gmatch(inputstr, "([^"..sep.."]+)") do
-            table.insert(t, str)
-    end
-    return t
-end
-
--- This isn't needed in the main game, so we'll define it here
+-- We need this because the EntityCategory functions are not available
 --- Returns if the builder can build the unit
 ---@param builder UnitBlueprint
 ---@param unit UnitBlueprint
@@ -133,12 +122,19 @@ local function CanBuild(builder, unit)
     end
     for _, buildableCategory in builder.Economy.BuildableCategory do
         local flag = true
-        local subCats = Split(buildableCategory, ' ')
-        for _, subCat in subCats do
-            if not unit.CategoriesHash[subCat] then
-                flag = false
-                break
+        local subCats = {}
+        for str in string.gmatch(buildableCategory, "([^ ]+)") do
+            table.insert(subCats, str)
+        end
+        if not table.empty(subCats) then
+            for _, subCat in subCats do
+                if not unit.CategoriesHash[subCat] then
+                    flag = false
+                    break
+                end
             end
+        elseif not unit.CategoriesHash[buildableCategory] then
+            flag = false
         end
         if flag then
             return true
