@@ -838,6 +838,8 @@
 ---@field ToggleCaps table<ToggleCap, boolean>
 --- table of boolean toggles set/got with SetStatByCallback/GetStat
 ---@field StatToggles table<string, table>
+--- table of boolean toggles to be applied to units built by this unit
+---@field OnStopBeingBuiltStatToggles table<string, table>
 --- name of the unit
 ---@field UnitName UnlocalizedString
 ---@field UnitWeight number unused
