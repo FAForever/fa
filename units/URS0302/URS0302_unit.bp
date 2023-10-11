@@ -543,7 +543,6 @@ UnitBlueprint{
             MinRadius = 2,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
-            NeedPrep = true,
             RackBones = {
                 {
                     MuzzleBones = { "Left_Muzzle01" },
@@ -559,6 +558,7 @@ UnitBlueprint{
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_Countermeasure",
             RateOfFire = 0.5,
+            TargetResetWhenReady = true,
             TargetRestrictDisallow = "UNTARGETABLE,STRATEGIC",
             TargetRestrictOnlyAllow = "TACTICAL,MISSILE",
             TargetType = "RULEWTT_Projectile",
@@ -595,7 +595,6 @@ UnitBlueprint{
             MinRadius = 2,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
-            NeedPrep = true,
             RackBones = {
                 {
                     MuzzleBones = { "Right_Muzzle01" },
@@ -611,6 +610,7 @@ UnitBlueprint{
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_Countermeasure",
             RateOfFire = 0.5,
+            TargetResetWhenReady = true,
             TargetRestrictDisallow = "UNTARGETABLE,STRATEGIC",
             TargetRestrictOnlyAllow = "TACTICAL,MISSILE",
             TargetType = "RULEWTT_Projectile",

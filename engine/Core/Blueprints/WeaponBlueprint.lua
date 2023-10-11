@@ -91,6 +91,8 @@
 --- of the target it was launched at.
 --- See `moho.projectile_methods:ChangeDetonateAboveHeight(height)`
 ---@field DetonatesAtTargetHeight? boolean
+--- Disables the weapon while it is reloading
+---@field DisableWhileReloading boolean
 --- Name of the weapon. Used for lobby restrictions and for debugging:
 --- `dbg weapons` in the console shows the weapon names.
 ---@field DisplayName string
@@ -291,6 +293,8 @@
 ---@field StopOnPrimaryWeaponBusy? boolean
 --- interval of time between looking for a target
 ---@field TargetCheckInterval number
+--- issues a `ResetTarget` half way the firing sequence
+---@field TargetResetWhenReady boolean
 --- table of category strings that define the targetting order of this weapon
 ---@field TargetPriorities UnparsedCategory[]
 --- comma separated list of category names that are always invalid targets

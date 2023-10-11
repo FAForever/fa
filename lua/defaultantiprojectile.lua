@@ -52,9 +52,23 @@ Flare = Class(Entity){
     ---@param other Projectile
     ---@return boolean
     OnCollisionCheck = function(self,other)
-        if EntityCategoryContains(ParseEntityCategory(self.RedirectCat), other) and self.Army ~= other.Army and IsAlly(self.Army, other.Army) == false then
+        if  EntityCategoryContains(ParseEntityCategory(self.RedirectCat), other) and
+            IsEnemy(self.Army, other.Army)
+        then
+            -- take out any scripted movement
+            if other.MoveThread then
+                KillThread(other.MoveThread)
+            end
+
             other:SetNewTarget(self.Owner)
+            other:SetTurnRate(90)
+
+            if not other.IsRedirected then
+                other.IsRedirected = true
+                other:SetLifetime(3 + 2 * Random())
+            end
         end
+
         return false
     end,
 }

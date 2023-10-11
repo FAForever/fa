@@ -492,6 +492,7 @@ UnitBlueprint{
                 ProjectilesToDeflect = 3,
                 Radius = 9,
             },
+            DisableWhileReloading = true,
             DisplayName = "Smart Charge AntiTorpedo",
             FireTargetLayerCapsTable = { Water = "Sub|Water|Seabed" },
             FiringTolerance = 15,

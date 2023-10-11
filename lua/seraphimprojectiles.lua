@@ -214,15 +214,29 @@ SHeavyQuarnonCannon = ClassProjectile(MultiPolyTrailProjectile) {
 ---@class SLaanseTacticalMissile : SinglePolyTrailProjectile
 SLaanseTacticalMissile = ClassProjectile(SinglePolyTrailProjectile) { 
     FxImpactLand = EffectTemplate.SLaanseMissleHit,
+    FxImpactWater = EffectTemplate.SLaanseMissleHitWater,
     FxImpactProp = EffectTemplate.SLaanseMissleHitUnit,
     FxImpactUnit = EffectTemplate.SLaanseMissleHitUnit,
+    FxImpactAirUnit = EffectTemplate.SLaanseMissleHitUnit,
+
+    FxImpactNone = EffectTemplate.SLaanseMissleHitNone,
+    FxNoneHitScale = 0.6,
+
     FxTrails = EffectTemplate.SLaanseMissleExhaust02,
     PolyTrail = EffectTemplate.SLaanseMissleExhaust01,
 
     ---@param self SLaanseMissileWeapon
     OnCreate = function(self)
         SinglePolyTrailProjectile.OnCreate(self)
-        self:SetCollisionShape('Sphere', 0, 0, 0, 1.0)
+        self:SetCollisionShape('Sphere', 0, 0, 0, 2.0)
+    end,
+
+    ---@param self SLaanseTacticalMissile
+    ---@param targetType string
+    ---@param targetEntity Prop|Unit
+    OnImpact = function(self, targetType, targetEntity)
+        SinglePolyTrailProjectile.OnImpact(self, targetType, targetEntity)
+        CreateLightParticleIntel(self, -1, self.Army, 4, 4, 'glow_02', 'ramp_blue_22')
     end,
 }
 

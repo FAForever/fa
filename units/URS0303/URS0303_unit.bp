@@ -505,7 +505,6 @@ UnitBlueprint{
             MinRadius = 2,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
-            NeedPrep = true,
             RackBones = {
                 {
                     MuzzleBones = { "Zapper_Muzzle" },
@@ -521,6 +520,7 @@ UnitBlueprint{
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_Countermeasure",
             RateOfFire = 0.25,
+            TargetResetWhenReady = true,
             TargetRestrictDisallow = "UNTARGETABLE,STRATEGIC",
             TargetRestrictOnlyAllow = "TACTICAL,MISSILE",
             TargetType = "RULEWTT_Projectile",

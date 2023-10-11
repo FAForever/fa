@@ -1,4 +1,26 @@
 
+--******************************************************************************************************
+--** Copyright (c) 2022  Willem 'Jip' Wijnia
+--**
+--** Permission is hereby granted, free of charge, to any person obtaining a copy
+--** of this software and associated documentation files (the "Software"), to deal
+--** in the Software without restriction, including without limitation the rights
+--** to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+--** copies of the Software, and to permit persons to whom the Software is
+--** furnished to do so, subject to the following conditions:
+--**
+--** The above copyright notice and this permission notice shall be included in all
+--** copies or substantial portions of the Software.
+--**
+--** THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+--** IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+--** FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+--** AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+--** LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+--** OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+--** SOFTWARE.
+--******************************************************************************************************
+
 local Builder = import("/lua/aibrains/templates/builders/builder.lua")
 
 -- upvalue scope for performance
@@ -80,6 +102,10 @@ AIBuilderManager = ClassSimple {
     AddBuilder = function(self, builderTemplate)
         -- create the type as necessary
         local builderType = builderTemplate.BuilderType
+        if not builderType then
+            builderType = 'All'
+        end
+
         if not self.BuilderData[builderTemplate.BuilderType] then
             self.BuilderData[builderType] = { Builders = {}, NeedSort = false }
         end
@@ -121,6 +147,7 @@ AIBuilderManager = ClassSimple {
     GetHighestBuilder = function(self, platoon, unit, unitType)
         local builderData = self.BuilderData[unitType]
         if not builderData then
+            -- LOG(string.format("Wrong unitType: %s", tostring(unitType)))
             return nil
         end
 
@@ -145,18 +172,21 @@ AIBuilderManager = ClassSimple {
             -- check tech requirement
             local builderTech = builderTemplate.BuilderTech
             if builderTech and builderTech != unitTech then
+                -- LOG(string.format("Wrong unitTech: %s", tostring(unitTech)))
                 continue
             end
 
             -- check layer requirement
             local builderLayer = builderTemplate.BuilderLayer
             if builderLayer and builderLayer != unitLayer then
+                -- LOG(string.format("Wrong unitLayer: %s", tostring(unitLayer)))
                 continue
             end
 
             -- check faction requirement
             local builderFaction = builderTemplate.BuilderFaction
             if builderFaction and builderFaction != unitFaction then
+                -- LOG(string.format("Wrong unitFaction: %s", tostring(unitFaction)))
                 continue
             end
 
@@ -171,7 +201,7 @@ AIBuilderManager = ClassSimple {
                 -- check builder conditions
                 if self:BuilderParamCheck(builder, platoon, unit) then
                     -- check task conditions
-                    if builder:EvaluateBuilderConditions(brain, base, tick) then
+                    if builder:EvaluateBuilderConditions(brain, base, platoon, tick) then
                         candidates[candidateNext] = builder
                         candidateNext = candidateNext + 1
                         candidatePriority = priority

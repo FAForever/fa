@@ -3928,13 +3928,32 @@ SLaanseMissleHit = {
     EmtBpPath .. 'seraphim_lancer_missile_hit_06_emit.bp',
 }
 
-SLaanseMissleHitUnit = {
-    EmtBpPath .. 'seraphim_lancer_missile_hit_01_unit.bp',
-    EmtBpPath .. 'seraphim_lancer_missile_hit_02_unit.bp',
-    EmtBpPath .. 'seraphim_lancer_missile_hit_02_flat_unit.bp',
-    EmtBpPath .. 'seraphim_lancer_missile_hit_04_unit.bp',
-    EmtBpPath .. 'seraphim_lancer_missile_hit_05_unit.bp',
+SLaanseMissleHitNone = {
+    EmtBpPath .. 'seraphim_lancer_missile_hit_01_emit.bp', -- little flash effect
+    EmtBpPath .. 'seraphim_lancer_missile_hit_02_none_emit.bp', -- inner white ring
+    EmtBpPath .. 'seraphim_lancer_missile_hit_03_none_emit.bp', -- inner white ring
+    EmtBpPath .. 'seraphim_lancer_missile_hit_05_emit.bp', -- smoke
+}
+
+SLaanseMissleHitWater = {
+    EmtBpPath .. 'seraphim_lancer_missile_hit_01_emit.bp',
+    EmtBpPath .. 'seraphim_lancer_missile_hit_02_emit.bp',
+    EmtBpPath .. 'seraphim_lancer_missile_hit_03_emit.bp',
+    EmtBpPath .. 'seraphim_lancer_missile_hit_04_emit.bp',
+    EmtBpPath .. 'seraphim_lancer_missile_hit_05_emit.bp',
     EmtBpPath .. 'seraphim_lancer_missile_hit_06_emit.bp',
+    EmtBpPath .. 'Watertower_tactical.bp',
+    EmtBpPath .. 'water_pie_tactical.bp',
+    EmtBpPath .. 'Watersplash_tactical.bp',
+}
+
+SLaanseMissleHitUnit = {
+    EmtBpPath .. 'seraphim_lancer_missile_hit_01_unit.bp', -- little flash effect
+    EmtBpPath .. 'seraphim_lancer_missile_hit_02_unit.bp', -- inner white ring
+    EmtBpPath .. 'seraphim_lancer_missile_hit_02_flat_unit.bp', -- inner white ring
+    EmtBpPath .. 'seraphim_lancer_missile_hit_04_unit.bp', -- black lines
+    EmtBpPath .. 'seraphim_lancer_missile_hit_05_unit.bp', -- smoke
+    EmtBpPath .. 'seraphim_lancer_missile_hit_06_emit.bp', -- outer black ring
 }
 
 
