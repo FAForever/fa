@@ -18,7 +18,7 @@ TIFMissileCruise04 = ClassProjectile(TMissileCruiseProjectile, TacticalMissileCo
     FxWaterHitScale = 1.5,
     FxOnKilledScale = 1.5,
 
-    LaunchTicks = 6,
+    LaunchTicks = 12,
     LaunchTicksRange = 2,
     LaunchTurnRate = 6,
     LaunchTurnRateRange = 2,
@@ -31,7 +31,6 @@ TIFMissileCruise04 = ClassProjectile(TMissileCruiseProjectile, TacticalMissileCo
 
     OnCreate = function(self)
         TMissileCruiseProjectile.OnCreate(self)
-        self:SetCollisionShape('Sphere', 0, 0, 0, 2.0)
         self.Trash:Add(ForkThread( self.MovementThread,self ))
     end,
 }

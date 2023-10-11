@@ -303,6 +303,25 @@ TMissileCruiseProjectile = ClassProjectile(SingleBeamProjectile) {
     FxImpactUnit = EffectTemplate.TMissileHit01,
     FxImpactLand = EffectTemplate.TMissileHit01,
     FxImpactProp = EffectTemplate.TMissileHit01,
+
+    FxOnKilled = EffectTemplate.TMissileKilled01,
+
+    ---@param self SLaanseMissileWeapon
+    OnCreate = function(self)
+        SingleBeamProjectile.OnCreate(self)
+        self:SetCollisionShape('Sphere', 0, 0, 0, 2.0)
+    end,
+
+    ---@param self TMissileCruiseProjectile
+    ---@param instigator Unit
+    ---@param type string
+    ---@param overkillRatio number
+    OnKilled = function(self, instigator, type, overkillRatio)
+        SingleBeamProjectile.OnKilled(self, instigator, type, overkillRatio)
+        local child = self:CreateChildProjectile('/effects/entities/DebrisMisc04/DebrisMisc04_proj.bp')
+
+        CreateLightParticleIntel(self, -1, self.Army, 3, 6, 'flare_lens_add_02', 'ramp_fire_13')
+    end,
 }
 
 ---@class TMissileCruiseProjectile02 : SingleBeamProjectile
