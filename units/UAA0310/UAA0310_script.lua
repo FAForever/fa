@@ -91,6 +91,11 @@ UAA0310 = ClassUnit(AirTransport, ExternalFactoryComponent) {
         ChangeState(self, self.IdleState)
     end,
 
+    UpdateStat = function(self, stat, value)
+        AirTransport.UpdateStat(self, stat, value)
+        ExternalFactoryComponent.UpdateStat(self, stat, value)
+    end,
+
     OnFailedToBuild = function(self)
         AirTransport.OnFailedToBuild(self)
         ChangeState(self, self.IdleState)

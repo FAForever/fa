@@ -628,7 +628,11 @@ local function Lookup(t, keys)
     return t
 end
 
-function PostProcessOnStopBuildToggles(allBlueprints, units)
+function PostProcessStatToggles(allBlueprints, units)
+
+    -- unit.General.StatToggles are toggles we expect to be modified by the player through the UI
+    -- All other toggles (such as unit.General.OnStopBeingBuiltStatToggles) are toggles that live
+    -- only in the blueprint so they can be checked under certain conditions (like the unit being built)
 
     local prefix = 'OnBuild'
     local scriptBitToggles = {
@@ -670,10 +674,10 @@ function PostProcessOnStopBuildToggles(allBlueprints, units)
     --OnBuildRULEUTC_StealthToggle
     --OnBuildRULEUTC_CloakToggle
 
-    -- these are toggles that we don't want to show up (like the firebeetle detonate)
+    -- these are toggles that we don't want to show up
     local removeToggles = {
-        OnBuildRULEUTC_SpecialToggle_charge = true,
-        OnBuildRULEUTC_ProductionToggle_overcharge = true,
+        OnBuildRULEUTC_SpecialToggle_charge = true, -- Loyalist EMP self-destruct
+        OnBuildRULEUTC_ProductionToggle_overcharge = true, -- Fire Beetle detonate
     }
 
     -- Default values that will be applied to a builder whenever it is constructed
@@ -702,7 +706,7 @@ function PostProcessOnStopBuildToggles(allBlueprints, units)
     local toggleUnits = {}
     for _, unit in units do
         if unit.General.ToggleCaps then
-            unit.General.OnStopBuildToggles = {}
+            unit.General.OnStopBeingBuiltStatToggles = {}
             for toggleCap, _ in unit.General.ToggleCaps do
                 local override = Lookup(unit.General, {'OrderOverrides', toggleCap})
                 local stat = prefix..toggleCap
@@ -719,16 +723,17 @@ function PostProcessOnStopBuildToggles(allBlueprints, units)
                     override = override,
                     default = defaultValues[stat],
                 }
-                unit.General.OnStopBuildToggles[stat] = {scriptBit = toggleCap}
+                unit.General.OnStopBeingBuiltStatToggles[stat] = {scriptBit = toggleCap}
                 toggleUnits[unit] = true
             end
         end
         -- add support for alternative toggles and overrides here
     end
 
+    local statToggles = {}
+
     -- sort the sub arrays and convert them to a single hash table
     -- keep our index for sorting, and bitmap Id for later display
-    local availableToggles = {}
     i = 0
     for _, toggleCap in scriptBitToggles do
         local stats = {}--table.unhash(scriptBitTogglesHash[toggleCap].stats)
@@ -741,7 +746,7 @@ function PostProcessOnStopBuildToggles(allBlueprints, units)
         for _, statData in ipairs(stats) do
             i = i + 1
             statData.index = i
-            availableToggles[statData.stat] = statData
+            statToggles[statData.stat] = statData
         end
     end
 
@@ -752,11 +757,11 @@ function PostProcessOnStopBuildToggles(allBlueprints, units)
             end
             for toggleUnit, _ in toggleUnits do
                 if CanBuild(unit, toggleUnit) then
-                    if not unit.General.OnStopBuildableToggles then
-                        unit.General.OnStopBuildableToggles = {}
+                    if not unit.General.StatToggles then
+                        unit.General.StatToggles = {}
                     end
-                    for stat, _ in toggleUnit.General.OnStopBuildToggles do
-                        unit.General.OnStopBuildableToggles[stat] = availableToggles[stat]
+                    for stat, _ in toggleUnit.General.OnStopBeingBuiltStatToggles do
+                        unit.General.StatToggles[stat] = statToggles[stat]
                     end
                 end
             end
@@ -778,6 +783,6 @@ function PostProcessUnits(allBlueprints, units)
         end
     end
 
-    PostProcessOnStopBuildToggles(allBlueprints, units)
+    PostProcessStatToggles(allBlueprints, units)
 
 end

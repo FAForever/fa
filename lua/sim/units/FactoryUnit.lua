@@ -1,5 +1,6 @@
 
 local StructureUnit = import("/lua/sim/units/structureunit.lua").StructureUnit
+local OnStopBuildStatToggleComponent = import("/lua/sim/units/components/OnStopBuildStatToggleComponent.lua").OnStopBuildStatToggleComponent
 local FireState = import("/lua/game.lua").FireState
 
 ---@class FactoryUnit : StructureUnit
@@ -7,13 +8,14 @@ local FireState = import("/lua/game.lua").FireState
 ---@field BuildBoneRotator moho.RotateManipulator
 ---@field BuildEffectBones string[]
 ---@field RollOffPoint Vector
-FactoryUnit = ClassUnit(StructureUnit) {
+FactoryUnit = ClassUnit(StructureUnit, OnStopBuildStatToggleComponent) {
 
     RollOffAnimationRate = 10,
 
     ---@param self FactoryUnit
     OnCreate = function(self)
         StructureUnit.OnCreate(self)
+        OnStopBuildStatToggleComponent.OnCreate(self)
 
         -- if we're a support factory, make sure our build restrictions are correct
         if self.Blueprint.CategoriesHash["SUPPORTFACTORY"] then
@@ -166,6 +168,7 @@ FactoryUnit = ClassUnit(StructureUnit) {
     ---@param unitBeingBuilt Unit
     ---@param order boolean
     OnStopBuild = function(self, unitBeingBuilt, order)
+        OnStopBuildStatToggleComponent.OnStopBuild(self, unitBeingBuilt)
         if self.DisabledAssist then
             self:AddCommandCap('RULEUCC_Guard')
             self.DisabledAssist = nil

@@ -866,7 +866,6 @@ end
 local function OnBuildToggleBehavior(self, modifiers)
     if not self._OnButtonToggle then
         self._OnButtonToggle = function(self, stat, state)
-            state = (state and 1) or 0 -- numerize our bool
             SimCallback( { Func="SetStatByCallback", Args= {[stat] = state}}, true )
         end
     end
@@ -1550,9 +1549,9 @@ function OnBuildTogglePreCheck(availableOrders, units, assistingUnitList)
         local availableBuildToggles
         for _, factory in factories do
             local bp = factory:GetBlueprint()
-            if bp.General.OnStopBuildableToggles then
+            if bp.General.StatToggles then
                 if not availableBuildToggles then
-                    availableBuildToggles = bp.General.OnStopBuildableToggles
+                    availableBuildToggles = bp.General.StatToggles
                 else
                     bps[bp] = true
                 end
@@ -1567,7 +1566,7 @@ function OnBuildTogglePreCheck(availableOrders, units, assistingUnitList)
         
         for stat, _ in availableBuildToggles do
             for bp, _ in bps do
-                if not bp.General.OnStopBuildableToggles[stat] then
+                if not bp.General.StatToggles[stat] then
                     availableBuildToggles[stat] = nil
                 end
             end

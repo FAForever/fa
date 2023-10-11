@@ -40,6 +40,11 @@ URS0303 = ClassUnit(AircraftCarrier, ExternalFactoryComponent) {
         ChangeState(self, self.IdleState)
     end,
 
+    UpdateStat = function(self, stat, value)
+        AircraftCarrier.UpdateStat(self, stat, value)
+        ExternalFactoryComponent.UpdateStat(self, stat, value)
+    end,
+
     OnLayerChange = function(self, new, old)
         AircraftCarrier.OnLayerChange(self, new, old)
     end,

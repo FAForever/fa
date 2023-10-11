@@ -1,11 +1,12 @@
 
 local Unit = import("/lua/sim/unit.lua").Unit
 local FactoryUnit = import("/lua/sim/units/factoryunit.lua").FactoryUnit
+local OnStopBuildStatToggleComponent = import("/lua/sim/units/components/OnStopBuildStatToggleComponent.lua").OnStopBuildStatToggleComponent
 
 ---@class ExternalFactoryUnit : Unit
 ---@field Parent Unit
 ---@field UpdateParentProgressThread? thread
-ExternalFactoryUnit = ClassUnit(Unit) {
+ExternalFactoryUnit = ClassUnit(Unit, OnStopBuildStatToggleComponent) {
 
     UpdateProgressOfParent = true,
 
@@ -32,6 +33,20 @@ ExternalFactoryUnit = ClassUnit(Unit) {
     ---@param parent Unit
     SetParent = function(self, parent)
         self.Parent = parent
+    end,
+
+    InitBuildToggles = function(self)
+        OnStopBuildStatToggleComponent.OnCreate(self)
+    end,
+
+    UpdateStat = function(self, stat, value, stop)
+        Unit.UpdateStat(self, stat, value)
+        if stop then return end
+        -- make sure it's a stat toggle before applying it to our parent
+        if self.Blueprint.General.StatToggles
+        and self.Blueprint.General.StatToggles[stat] then
+            self.Parent:UpdateStat(stat, value, true)
+        end
     end,
 
     ---@param self ExternalFactoryUnit
@@ -71,6 +86,7 @@ ExternalFactoryUnit = ClassUnit(Unit) {
     OnStopBuild = function(self, unitBeingBuilt)
         Unit.OnStopBuild(self, unitBeingBuilt)
         self.Parent:OnStopBuild(unitBeingBuilt)
+        OnStopBuildStatToggleComponent.OnStopBuild(self, unitBeingBuilt)
         self.UnitBeingBuilt = nil
 
         if self.UpdateParentProgressThread then

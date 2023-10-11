@@ -2257,20 +2257,6 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
 
     ---@param self Unit
     ---@param builder Unit
-    ---@param stat string
-    ---@param toggleData table
-    InheritStatToggle = function(self, builder, stat, toggleData)
-        local statValue = builder:GetStat(stat, -1).Value
-        if statValue < 0 then return end
-        local bool = statValue == 1 and true or false
-        if toggleData.scriptBit then
-            self:SetScriptBit(toggleData.scriptBit, bool)
-        end
-        -- additional checks for different stats can be added here
-    end,
-
-    ---@param self Unit
-    ---@param builder Unit
     ---@param layer Layer
     ---@return boolean
     OnStopBeingBuilt = function(self, builder, layer)
@@ -2386,28 +2372,6 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
             self:SendNotifyMessage('completed')
         end
 
-        -- Set our build toggles (to be applied) to their default values
-        -- These will be the default values applied to units
-        if bp.General.OnStopBuildableToggles then
-            for stat, toggleData in bp.General.OnStopBuildableToggles do
-                if toggleData.default then
-                    self:UpdateStat(stat, toggleData.default)
-                end
-            end
-        end
-
-        -- Do our build toggle inheritance
-        if bp.General.OnStopBuildToggles and builder then
-            if not EntityCategoryContains(categories.STRUCTURE, self) then
-                if builder:GetBlueprint().General.OnStopBuildableToggles then
-                    for stat, toggleData in bp.General.OnStopBuildToggles do
-                        LOG(stat)
-                        LOG(repr(toggleData))
-                        self:InheritStatToggle(builder, stat, toggleData)
-                    end
-                end
-            end
-        end
 
         return true
     end,

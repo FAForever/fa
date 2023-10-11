@@ -110,6 +110,11 @@ UEL0401 = ClassUnit(TMobileFactoryUnit, ExternalFactoryComponent) {
         ChangeState(self, self.IdleState)
     end,
 
+    UpdateStat = function(self, stat, value)
+        TMobileFactoryUnit.UpdateStat(self, stat, value)
+        ExternalFactoryComponent.UpdateStat(self, stat, value)
+    end,
+
     ---@param self UEL0401
     ---@param new Layer
     ---@param old Layer
