@@ -1291,6 +1291,12 @@ commonOrders = {
     AttackMove = true,
 }
 
+-- Put function overrides here so they can be accessed from values passed from unit blueprints
+local overrideFunctionTable = {
+    AutoDeployInit = AutoDeployInit,
+    AutoDeployBehavior = AutoDeployBehavior,
+}
+
 --[[
 Add an order to a particular slot, destroys what's currently in the slot if anything
 Returns checkbox if you need to add any data to the structure
