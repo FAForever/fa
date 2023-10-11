@@ -778,14 +778,64 @@ function create_graph(parent,path,x1,y1,x2,y2)
         inc_periode=((data_nbr)/(x2-x1)) -- give the increment on the screen between each periode (i.e. between each saved)
         if inc_periode<1 then inc_periode=1 end -- can not be <1 => use the whole screen
         local nbr=0 -- couting the number of iterancy done
+
+        -- for the windows under the mouse on the background
+        local hoverInfo = Group(grp)
+        hoverInfo.Left:Set(0)
+        hoverInfo.Top:Set(0)
+        hoverInfo.Right:Set(50)
+        hoverInfo.Bottom:Set(30)
+        hoverInfo:DisableHitTest(true)
+        local infoPopupbg = Bitmap(hoverInfo) -- the borders of the windows
+        infoPopupbg:SetSolidColor('white')
+        infoPopupbg:SetAlpha(.6)
+        infoPopupbg.Depth:Set(function() return hoverInfo.Depth()+1 end)
+        infoPopupbg.Width:Set(function() return hoverInfo.Width()+2 end)
+        infoPopupbg.Height:Set(function() return hoverInfo.Height()+2 end)
+        infoPopupbg.Left:Set(function() return hoverInfo.Left()-1 end)
+        infoPopupbg.Bottom:Set(function() return hoverInfo.Bottom() + 2 end)
+        local infoPopup = Bitmap(infoPopupbg)
+        infoPopup:SetSolidColor('black')
+        infoPopup:SetAlpha(.6)
+        infoPopup.Depth:Set(function() return hoverInfo.Depth()+2 end)
+        infoPopup.Width:Set(function() return infoPopupbg.Width() - 4 end)
+        infoPopup.Height:Set(function() return infoPopupbg.Height() - 4 end)
+        infoPopup.Left:Set(function() return infoPopupbg.Left() + 2 end)
+        infoPopup.Bottom:Set(function() return infoPopupbg.Bottom() - 2 end)
+        local infoText = UIUtil.CreateText(hoverInfo, '', 14, UIUtil.titleFont)
+        infoText:SetColor("white")
+        infoText:DisableHitTest()
+        infoText.Left:Set(function() return hoverInfo.Left() + 4 end)
+        infoText.Bottom:Set(function() return hoverInfo.Bottom() - 4 end)
+        infoText.Depth:Set(function() return hoverInfo.Depth()+3 end)
+                --displays the value when the mouse is over a graph
+        bg.HandleEvent = function(self, event)
+            -- return
+            local posX = function() return event.MouseX end -- - bg.Left() end
+            local posY = function() return event.MouseY  end-- - bg.Top() end
+            if posX()>x1 and posX()<x2 and posY()>y1 and posY()<y2 then
+                local  value = tps_format((posX()-x1)/(x2-x1)*scoreInterval*data_nbr) .. " / " .. FormatNumber(math.floor(ReverseScaling((y2-posY())/factor))) --This is the value that gets shown when we hover the mouse over any point in the graph, so want to reverse the scaled value so we see the actual value
+
+                hoverInfo:Show()
+                infoText:SetText(value)
+                hoverInfo.Left:Set(function() return posX()-7 end)
+                hoverInfo.Bottom:Set(function() return posY() + 70 end)
+                hoverInfo.Width:Set(function() return infoText.Width() + 10 end)
+                hoverInfo.Height:Set(function() return infoText.Height() + 10 end)
+            else
+                hoverInfo:Hide()
+            end
+        end
+        
         -- ============ starting
         t=CurrentTime()
         WaitFrames(10)
         t1=CurrentTime()
-        --LOG("------- calculating the timing of the frame")
-        --LOG("Time to display 1 frame (calculate with 10 frames):",(t1-t)/10,'  t:',t,'   t1:',t1)
+        LOG("------- calculating the timing of the frame")
+        LOG("Time to display 1 frame (calculate with 10 frames):",(t1-t)/10,'  t:',t,'   t1:',t1)
         delta_refresh=(x2-x1)*(t1-t)/10*((player_nbr+1)/4)
-        --LOG("So refresh all the ",delta_refresh," pixels displayed (delta_refresh:)")
+        local bitmaps = 0
+        LOG("So refresh all the ",delta_refresh," pixels displayed (delta_refresh:)")
         while periode<data_nbr do
             nbr=nbr+1
             periode=math.floor(nbr*inc_periode) -- calculate the next periode to use (i.e. skip some of them it more value than the screen can display)
@@ -801,23 +851,25 @@ function create_graph(parent,path,x1,y1,x2,y2)
                     color=dat.color,index=dat.index,
                     y_factor=(yb-ya)/dist*size} -- important: the factor of deplacement for the bitmap
             end
-            local sav_x=x
             while (x<(parent.Left()+ x1 + nbr*dist) and x<(x2+parent.Left()))  do
                 for name,data in line do
-                    graph[data.index][x-x1]=Bitmap(grp)
-                    graph[data.index][x-x1].Left:Set(parent.Left() +x)
+                    local bitmap = Bitmap(grp)
+                    graph[data.index][x-x1] = bitmap
+                    bitmaps = bitmaps + 1
+                    bitmap.Left:Set(parent.Left() +x)
                     if data.y_factor != 0 then
                     local yn=parent.Top() +data.y+data.y_factor/math.abs(data.y_factor)*size*((math.abs(data.y_factor)+1))
                         if data.y_factor<0 and (yn+size)<data.yb then yn=data.yb-size end
                         if data.y_factor>0 and (yn-size)>data.yb then yn=data.yb-size end
-                        graph[data.index][x-x1].Top:Set(yn)
+                        bitmap.Top:Set(yn)
                     else
-                        graph[data.index][x-x1].Top:Set(parent.Top() +data.y-size)
+                        bitmap.Top:Set(parent.Top() +data.y-size)
                     end
-                    graph[data.index][x-x1].Right:Set(graph[data.index][x-x1].Left() +size)
-                    graph[data.index][x-x1].Bottom:Set(parent.Top() +data.y)
-                    graph[data.index][x-x1]:SetSolidColor(data.color)
-                    graph[data.index][x-x1]:Depth(bg.Depth()+5)
+                    bitmap.Right:Set(bitmap.Left() +size)
+                    bitmap.Bottom:Set(parent.Top() +data.y)
+                    bitmap:SetSolidColor(data.color)
+                    bitmap:Depth(bg.Depth()+5)
+                    bitmap:DisableHitTest()
                     data.y=data.y+data.y_factor
                 end
                 x=x+size
@@ -828,9 +880,12 @@ function create_graph(parent,path,x1,y1,x2,y2)
                 end
             end
         end
+        LOG("------- Done the periode<data_nbr stage")
+        LOG("Created bitmaps: ", bitmaps)
         for index, data in player do
-            graph[data.index][x2]=Bitmap(grp)
-            graph[data.index][x2].Left:Set(x2)
+            local bitmap = Bitmap(grp)
+            graph[data.index][x2]=bitmap
+            bitmap.Left:Set(x2)
             if data.y_factor != 0 then
                 val=return_value(math.floor((nbr-1)*inc_periode),data.index,path)
                 --LOG("1st:",val)
@@ -844,19 +899,20 @@ function create_graph(parent,path,x1,y1,x2,y2)
                 --local yn=parent.Top() +data.y+data.y_factor/math.abs(data.y_factor)*size*((math.abs(data.y_factor)+1))
                 --if data.y_factor<0 and (yn+size)<data.yb then yn=data.yb-size end
                 --if data.y_factor>0 and (yn-size)>data.yb then yn=data.yb-size end
-                --  graph[data.index][x2].Top:Set(yn)
+                --  bitmap.Top:Set(yn)
                 --else
-                    graph[data.index][x2].Top:Set(parent.Top() +yb)
+                    bitmap.Top:Set(parent.Top() +yb)
                 --end
                 --LOG("x: ",x2,"  ya:",ya,"  yb:",yb)
-                graph[data.index][x2].Right:Set(graph[data.index][x2].Left() +size)
-                graph[data.index][x2].Bottom:Set(parent.Top() +ya)
-                graph[data.index][x2]:SetSolidColor(data.color)
+                bitmap.Right:Set(bitmap.Left() +size)
+                bitmap.Bottom:Set(parent.Top() +ya)
+                bitmap:SetSolidColor(data.color)
+                bitmap:DisableHitTest()
             end
         end
         -- ========= end of the drawing of the graph
         t=CurrentTime()
-        --LOG("total time:",t-t1)
+        LOG("total time:",t-t1)
         -- display the max value
         local value_graph_label={}
         for index, dat in player do
@@ -872,41 +928,6 @@ function create_graph(parent,path,x1,y1,x2,y2)
         if current_player_index != 0 and current_player_index != nil and graph[current_player_index][1] != nil then
             for i,bmp in graph[current_player_index] do
                 EffectHelpers.Pulse(bmp,1,.65,1)
-            end
-        end
-        -- for the windows under the mouse on the background
-        local infoText = false
-        --displays the value when the mouse is over a graph
-        bg.HandleEvent = function(self, event)
-            local posX = function() return event.MouseX end -- - bg.Left() end
-            local posY = function() return event.MouseY  end-- - bg.Top() end
-            if infoText != false then
-                infoText:Destroy()
-                infoText = false
-            end
-            if posX()>x1 and posX()<x2 and posY()>y1 and posY()<y2 then
-                local  value = tps_format((posX()-x1)/(x2-x1)*scoreInterval*data_nbr) .. " / " .. FormatNumber(math.floor(ReverseScaling((y2-posY())/factor))) --This is the value that gets shown when we hover the mouse over any point in the graph, so want to reverse the scaled value so we see the actual value
-                infoText = UIUtil.CreateText(grp,value, 14, UIUtil.titleFont)
-                infoText.Left:Set(function() return posX()-(infoText.Width()/2) end)
-                infoText.Bottom:Set(function() return posY()-7 end)
-                infoText:SetColor("white")
-                infoText:DisableHitTest()
-                local infoPopupbg = Bitmap(infoText) -- the borders of the windows
-                infoPopupbg:SetSolidColor('white')
-                infoPopupbg:SetAlpha(.6)
-                infoPopupbg.Depth:Set(function() return infoText.Depth()-2 end)
-                local infoPopup = Bitmap(infoText)
-                infoPopup:SetSolidColor('black')
-                infoPopup:SetAlpha(.6)
-                infoPopupbg.Depth:Set(function() return infoText.Depth()-1 end)
-                infoPopup.Width:Set(function() return infoText.Width() +8 end)
-                infoPopup.Height:Set(function() return infoText.Height()+8 end)
-                infoPopup.Left:Set(function() return infoText.Left()-4 end)
-                infoPopup.Bottom:Set(function() return infoText.Bottom()+4 end)
-                infoPopupbg.Width:Set(function() return infoPopup.Width()+2 end)
-                infoPopupbg.Height:Set(function() return infoPopup.Height()+2 end)
-                infoPopupbg.Left:Set(function() return infoPopup.Left()-1 end)
-                infoPopupbg.Bottom:Set(function() return infoPopup.Bottom() +1 end)
             end
         end
     end)
@@ -974,16 +995,18 @@ end
                     --LOG(ya_draw, '     ',yb_draw)
                     --data.ya*(1-data.yb*(x/sav_x)/data.ya)*factor
                     --data.ya*factor*(x/sva_x)
-                    graph2[data.index][x-x1]=Bitmap(grp)
-                    graph2[data.index][x-x1].Left:Set(parent.Left() +x)
+                    local bitmap = Bitmap(grp)
+                    graph2[data.index][x-x1]=bitmap
+                    bitmap.Left:Set(parent.Left() +x)
                     --local yn=parent.Top() +data.y+data.y_factor/math.abs(data.y_factor)*size*((math.abs(data.y_factor)+1))
-                    graph2[data.index][x-x1].Top:Set(parent.Top()+ya_draw)
-                    graph2[data.index][x-x1].Right:Set(graph2[data.index][x-x1].Left() +size)
-                    graph2[data.index][x-x1].Bottom:Set(parent.Top() +yb_draw) --+data.y)
-                    graph2[data.index][x-x1]:SetSolidColor(data.color)
-                    graph2[data.index][x-x1]:Depth(bg.Depth()+1)
-                    -- graph2[data.index][x-x1]:SetAlpha(.15)
-                    graph2[data.index][x-x1]:SetAlpha(.15)
+                    bitmap.Top:Set(parent.Top()+ya_draw)
+                    bitmap.Right:Set(bitmap.Left() +size)
+                    bitmap.Bottom:Set(parent.Top() +yb_draw) --+data.y)
+                    bitmap:SetSolidColor(data.color)
+                    bitmap:Depth(bg.Depth()+1)
+                    -- bitmap:SetAlpha(.15)
+                    bitmap:SetAlpha(.15)
+                    bitmap:DisableHitTest()
                 end
                 x=x+size
                 delta=delta+1
