@@ -41,14 +41,6 @@ ProjectileBlueprint {
     },
     General = {
         Category = 'Missile',
-        EntityCategory = {
-            'CYBRAN',
-            'PROJECTILE',
-            'INDIRECTFIRE',
-            'TACTICAL',
-            'MISSILE',
-            'NOSPLASHDAMAGE',
-        },
         Faction = 'Cybran',
     },
     Interface = {

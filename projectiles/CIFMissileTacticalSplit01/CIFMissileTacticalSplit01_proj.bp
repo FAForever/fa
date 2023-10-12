@@ -27,18 +27,10 @@ ProjectileBlueprint {
             },
         },
         StrategicIconSize = 2,
-        UniformScale = 0.1,
+        UniformScale = 0.05,
     },
     General = {
         Category = 'Missile',
-        EntityCategory = {
-            'CYBRAN',
-            'PROJECTILE',
-            'INDIRECTFIRE',
-            'TACTICAL',
-            'MISSILE',
-            'NOSPLASHDAMAGE',
-        },
         Faction = 'Cybran',
     },
     Interface = {
@@ -46,7 +38,7 @@ ProjectileBlueprint {
     },
     Physics = {
         Acceleration = 6,
-        DestroyOnWater = false,
+        DestroyOnWater = true,
         InitialSpeed = 2,
         MaxSpeed = 15,
         RotationalVelocity = 0,

@@ -4,33 +4,21 @@
 --
 local CLOATacticalChildMissileProjectile = import("/lua/cybranprojectiles.lua").CLOATacticalChildMissileProjectile
 
+---@class CIFMissileTacticalSplit01 : CLOATacticalChildMissileProjectile
 CIFMissileTacticalSplit01 = ClassProjectile(CLOATacticalChildMissileProjectile) {
 
+    ---@param self CIFMissileTacticalSplit01
     OnCreate = function(self)
         CLOATacticalChildMissileProjectile.OnCreate(self)
-        self:SetCollisionShape('Sphere', 0, 0, 0, 2.5)
-        self:SetDamage(25)
-        self.invincible = true
-        self.Trash:Add(ForkThread(self.DelayForDestruction,self))
+        self.MoveThread = self.Trash:Add(ForkThread(self.MovementThread,self))
     end,
 
     -- Give the projectile enough time to get out of the explosion
-    DelayForDestruction = function(self)
-        self.CanTakeDamage = false
-        WaitTicks(4)
-        self.invincible = false
-        self.CanTakeDamage = true
-        self:SetDestroyOnWater(true)
-        self:TrackTarget(true)
-        self:SetTurnRate(80)
-        self:SetMaxSpeed(15)
-        self:SetAcceleration(6)
-    end,
+    ---@param self CIFMissileTacticalSplit01
+    MovementThread = function(self)
+        WaitTicks(3)
 
-    OnDamage = function(self, instigator, amount, vector, damageType)
-        if not self.invincible then
-            CLOATacticalChildMissileProjectile.OnDamage(self, instigator, amount, vector, damageType)
-        end
+        self:TrackTarget(true)
     end,
 }
 TypeClass = CIFMissileTacticalSplit01
