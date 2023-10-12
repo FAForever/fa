@@ -27,7 +27,7 @@ TacticalMissileComponent = ClassSimple(SemiBallisticComponent) {
         -- boost
         local boostTurnRate, boostTime = self:TurnRateFromAngleAndHeight()
         self:SetTurnRate(boostTurnRate)
-        WaitTicks(boostTime * 10)
+        WaitTicks(boostTime * 10 + 1)
 
         -- glide
         local glideTurnRate, glideTime = self:TurnRateFromDistance()

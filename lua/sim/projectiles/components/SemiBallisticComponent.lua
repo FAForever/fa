@@ -81,7 +81,7 @@ SemiBallisticComponent = ClassSimple {
         end
 
         local turnTime = deltaY/self:AverageVerticalVelocityThroughTurn(targetAngle, currentAngle)
-        local degreesPerSecond = MathAbs(targetAngle - currentAngle)/turnTime * 180/MathPi
+        local degreesPerSecond = MathAbs(targetAngle - currentAngle)/turnTime * 180/MathPi        
         return degreesPerSecond, turnTime
     end,
 
