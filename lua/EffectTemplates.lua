@@ -2561,6 +2561,13 @@ TMissileHit01 = {
     EmtBpPath .. 'terran_missile_hit_04_emit.bp',
 }
 
+TMissileKilled01 = {
+    EmtBpPath .. 'terran_missile_hit_01_emit.bp',
+    EmtBpPath .. 'terran_missile_hit_02_emit.bp',
+    -- EmtBpPath .. 'terran_missile_hit_03_emit.bp',
+    -- EmtBpPath .. 'terran_missile_hit_04_emit.bp',
+}
+
 TMissileHit02 = {
     EmtBpPath .. 'terran_missile_hit_01_emit.bp',
     EmtBpPath .. 'terran_missile_hit_02_emit.bp',

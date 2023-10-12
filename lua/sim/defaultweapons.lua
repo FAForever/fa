@@ -1147,7 +1147,8 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
                 unit:SetBusy(true)
             end
             local hasTarget = self:WeaponHasTarget()
-            local canFire = self:CanFire()
+            local canFire = self.WeaponCanFire
+
             if hasTarget and bp.RackSalvoChargeTime > 0 and canFire then
                 ChangeState(self, self.RackSalvoChargeState)
             elseif hasTarget and canFire then

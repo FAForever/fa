@@ -210,14 +210,17 @@ SHeavyQuarnonCannon = ClassProjectile(MultiPolyTrailProjectile) {
 }
 
 ---  SERAPHIM LAANSE TACTICAL MISSILE
---- ACU / SACU / TML /MML
+--- ACU / SACU / TML / MML
 ---@class SLaanseTacticalMissile : SinglePolyTrailProjectile
-SLaanseTacticalMissile = ClassProjectile(SinglePolyTrailProjectile) { 
+SLaanseTacticalMissile = ClassProjectile(SinglePolyTrailProjectile) {
     FxImpactLand = EffectTemplate.SLaanseMissleHit,
     FxImpactWater = EffectTemplate.SLaanseMissleHitWater,
     FxImpactProp = EffectTemplate.SLaanseMissleHitUnit,
     FxImpactUnit = EffectTemplate.SLaanseMissleHitUnit,
     FxImpactAirUnit = EffectTemplate.SLaanseMissleHitUnit,
+
+    FxOnKilled = EffectTemplate.SLaanseMissleHitNone,
+    FxOnKilledScale = 0.6,
 
     FxImpactNone = EffectTemplate.SLaanseMissleHitNone,
     FxNoneHitScale = 0.6,
@@ -232,11 +235,20 @@ SLaanseTacticalMissile = ClassProjectile(SinglePolyTrailProjectile) {
     end,
 
     ---@param self SLaanseTacticalMissile
+    ---@param instigator Unit
+    ---@param type string
+    ---@param overkillRatio number
+    OnKilled = function(self, instigator, type, overkillRatio)
+        SinglePolyTrailProjectile.OnKilled(self, instigator, type, overkillRatio)
+        CreateLightParticleIntel(self, -1, self.Army, 3, 6, 'flare_lens_add_02', 'ramp_blue_13')
+    end,
+
+    ---@param self SLaanseTacticalMissile
     ---@param targetType string
     ---@param targetEntity Prop|Unit
     OnImpact = function(self, targetType, targetEntity)
         SinglePolyTrailProjectile.OnImpact(self, targetType, targetEntity)
-        CreateLightParticleIntel(self, -1, self.Army, 4, 4, 'glow_02', 'ramp_blue_22')
+        CreateLightParticleIntel(self, -1, self.Army, 4, 4, 'flare_lens_add_02', 'ramp_blue_13')
     end,
 }
 
