@@ -141,6 +141,7 @@ UnitBlueprint{
             CollideFriendly = false,
             Damage = 1,
             DamageType = "Normal",
+            DisableWhileReloading = true,
             DisplayName = "Zapper Anti Missile",
             FireTargetLayerCapsTable = {
                 Land = "Air",
@@ -168,7 +169,6 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RangeCategory = "UWRC_Countermeasure",
             RateOfFire = 0.56,
-            TargetResetWhenReady = true,
             TargetRestrictDisallow = "UNTARGETABLE",
             TargetRestrictOnlyAllow = "TACTICAL MISSILE",
             TargetType = "RULEWTT_Projectile",

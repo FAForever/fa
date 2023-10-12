@@ -154,7 +154,7 @@ UnitBlueprint{
             MinRadius = 2,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
-            MuzzleVelocity = 100,
+            MuzzleVelocity = 120,
             ProjectileId = "/projectiles/TDPhalanx01/TDPhalanx01_proj.bp",
             ProjectileLifetimeUsesMultiplier = 2,
             ProjectilesPerOnFire = 1,
