@@ -150,6 +150,7 @@ UnitBlueprint{
             CollideFriendly = false,
             Damage = 30,
             DamageType = "Normal",
+            DisableWhileReloading = true,
             DisplayName = "Will O Wisp Anti Missile",
             EffectiveRadius = 15,
             FireTargetLayerCapsTable = {
@@ -184,7 +185,6 @@ UnitBlueprint{
             RackSalvoReloadTime = 0,
             RackSalvoSize = 1,
             RateOfFire = 0.25,
-            TargetResetWhenReady = true,
             TargetRestrictDisallow = "UNTARGETABLE",
             TargetRestrictOnlyAllow = "TACTICAL MISSILE",
             TargetType = "RULEWTT_Projectile",
