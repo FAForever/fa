@@ -131,8 +131,17 @@ AIPlatoonAdaptiveReclaimBehavior = Class(AIPlatoon) {
                 self.CellAssigned = { reclaimTargetX, reclaimTargetZ }
                 brainGridInstance:AddReclaimingEngineer(brainCell, eng)
                 self.LocationToReclaim = reclaimGridInstance:ToWorldSpace(reclaimTargetX, reclaimTargetZ)
-                self:ChangeState(self.Navigating)
-                return
+                local dx = self.LocationToReclaim[1] - engPos[1]
+                local dz = self.LocationToReclaim[3] - engPos[3]
+                if dx * dx + dz * dz < 1225 then
+                    LOG('Reclaim Engineer already close, performing reclaim ')
+                    self:ChangeState(self.ReclaimCell)
+                    return
+                else
+                    LOG('Reclaim Engineer navigating to reclaim location '..repr(self.LocationToReclaim))
+                    self:ChangeState(self.Navigating)
+                    return
+                end
             else
                 if self.SearchRadius < 8 then
                     self.SearchRadius = 8
@@ -165,6 +174,7 @@ AIPlatoonAdaptiveReclaimBehavior = Class(AIPlatoon) {
                     self:ExitStateMachine()
                     return
                 elseif returnPos then
+                    LOG('Reclaim Engineer Returning to base, fail count is '..brain.ReclaimFailCounter)
                     self.LocationToReclaim = returnPos
                     self:ChangeState(self.Navigating)
                 else

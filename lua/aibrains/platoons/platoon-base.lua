@@ -130,8 +130,10 @@ AIPlatoon = Class(moho.platoon_methods) {
     ---@param state AIPlatoonState
     ChangeState = function(self, state)
         self:LogDebug(string.format('Changing state to: %s', state.StateName))
+        LOG(string.format('Changing state to: %s', state.StateName))
+        LOG('Platoon is '..self.PlatoonName)
 
-        WaitTicks(1)
+        --WaitTicks(1)
 
         if not IsDestroyed(self) then
             ChangeState(self, state)

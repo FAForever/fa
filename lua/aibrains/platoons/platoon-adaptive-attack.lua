@@ -1,6 +1,7 @@
 
 local AIPlatoon = import("/lua/aibrains/platoons/platoon-base.lua").AIPlatoon
 local NavUtils = import("/lua/sim/navutils.lua")
+local AIUtils = import("/lua/ai/aiutilities.lua")
 local MarkerUtils = import("/lua/sim/markerutilities.lua")
 local TransportUtils = import("/lua/ai/transportutilities.lua")
 local AIAttackUtils = import("/lua/ai/aiattackutilities.lua")
@@ -77,12 +78,24 @@ AIPlatoonAdaptiveAttackBehavior = Class(AIPlatoon) {
             local label, error = NavUtils.GetLabel('Land', position)
 
             if label then
-                local target = self:FindClosestUnit('Attack', 'Enemy', true, categories.ALLUNITS - categories.WALL - categories.AIR)
-                if target then
+                local target = self:FindClosestUnit('Attack', 'Enemy', true, categories.ALLUNITS - categories.WALL - categories.AIR - categories.INSIGNIFICANTUNIT)
+                if target and not IsDestroyed(target) then
                     self.TargetToAttack = target
-                    self.LocationToAttack = table.copy(target:GetPosition())
-                    IssueClearCommands(units)
-                    self:ChangeState(self.Navigating)
+                    local targetPos = table.copy(target:GetPosition())
+                    if targetPos then
+                        self.LocationToAttack = targetPos
+                        local dx = position[1] - targetPos[1]
+                        local dz = position[3] - targetPos[3]
+                        IssueClearCommands(units)
+                        if dx * dx + dz * dz < 3600 then
+                            self:ChangeState(self.AttackingTarget)
+                        else
+                            self:ChangeState(self.Navigating)
+                        end
+                    else
+                        WaitTicks(20)
+                        self:ChangeState(self.Searching)
+                    end
                 else
                     WaitTicks(50)
                     self:ChangeState(self.Searching)
@@ -141,11 +154,13 @@ AIPlatoonAdaptiveAttackBehavior = Class(AIPlatoon) {
                 end
 
                 -- generate a direction
-                local waypoint, length = NavUtils.DirectionTo('Land', origin, destination, 60)
+                local waypoint, length = NavUtils.DirectionTo('Land', origin, destination, 30)
 
                 -- something odd happened: no direction found
                 if not waypoint then
                     self:LogWarning(string.format('no path found'))
+                    LOG('No waypoint, switch to searching')
+                    WaitTicks(10)
                     self:ChangeState(self.Searching)
                     return
                 end
@@ -284,7 +299,6 @@ AIPlatoonAdaptiveAttackBehavior = Class(AIPlatoon) {
                         if threatTable and not TableEmpty(threatTable) then
                             local info = threatTable[Random(1, TableGetn(threatTable))]
                             self.ThreatToEvade = { info[1], GetSurfaceHeight(info[1], info[2]), info[2] }
-                            DrawCircle(self.ThreatToEvade, 5, 'ff0000')
                             self:ChangeState(self.Retreating)
                             return
                         end
@@ -436,6 +450,10 @@ AIPlatoonAdaptiveAttackBehavior = Class(AIPlatoon) {
                         if self.RetreatCount < 3 then
                             self:ChangeState(self.Navigating)
                         else
+                            WaitTicks(10)
+                            LOG('Merge Attempt')
+                            AIUtils.MergeWithNearbyStateMachines(self, 'AdaptiveAttackBehavior', 80, 25, false)
+                            WaitTicks(10)
                             self:ChangeState(self.Searching)
                         end
                         return
