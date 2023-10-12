@@ -6,9 +6,12 @@
 -- 
 local CLOATacticalMissileProjectile = import("/lua/cybranprojectiles.lua").CLOATacticalMissileProjectile
 
+--- used by urb2108
+---@class CIFMissileTactical03 : CLOATacticalMissileProjectile
 CIFMissileTactical03 = ClassProjectile(CLOATacticalMissileProjectile) {
     NumChildMissiles = 3,
 
+    ---@param self CLOATacticalMissileProjectile
     OnCreate = function(self)
         CLOATacticalMissileProjectile.OnCreate(self)
         self.MoveThread = self.Trash:Add(ForkThread( self.MovementThread,self ))
