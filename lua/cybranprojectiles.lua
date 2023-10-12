@@ -571,6 +571,9 @@ CLOATacticalMissileProjectile = ClassProjectile(SingleBeamProjectile, TacticalMi
     MinHeight = 2,
     FinalBoostAngle = 0,
 
+    ChildCount = 3,
+    ChildProjectileBlueprint = '/projectiles/CIFMissileTacticalSplit01/CIFMissileTacticalSplit01_proj.bp',
+
     ---@param self CLOATacticalMissileProjectile
     ---@param inWater boolean
     OnCreate = function(self, inWater)

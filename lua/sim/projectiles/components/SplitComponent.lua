@@ -34,12 +34,12 @@ SplitComponent = ClassSimple {
             local zVec = vz + MathCos(i * childConeSection) * spreadMultiplier +
                 (2 * spreadMultiplierRange * (Random() - 0.5))
             local proj = self:CreateChildProjectile(childBlueprint)
-            proj:SetVelocity(xVec, yVec, zVec)
-            proj:SetVelocity(childVelocity)
+            -- proj:SetVelocity(xVec, yVec, zVec)
+            -- proj:SetVelocity(childVelocity)
             proj.DamageData = self.DamageData
 
             if inheritTargetGround then
-                proj:SetTurnRate(5)
+                proj:SetTurnRate(40)
                 proj:SetNewTargetGround(self:GetCurrentTargetPosition())
                 proj:TrackTarget(false)
             end
