@@ -1075,7 +1075,6 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
             if bp.DisableWhileReloading then
                 local reloadTime = math.floor(10 / self.Blueprint.RateOfFire) - 1
                 if reloadTime > 4 then
-                    DrawCircle(self.unit:GetPosition(), 2, 'ffffff')
                     self:SetEnabled(false)
                     WaitTicks(reloadTime)
                     self:SetEnabled(true)
