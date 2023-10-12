@@ -884,8 +884,6 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
 
                     WaitTicks(5)
 
-                    DrawCircle(self.unit:GetPosition(), 2, 'ffffff')
-
                     self:ResetTarget()
                 else
 
