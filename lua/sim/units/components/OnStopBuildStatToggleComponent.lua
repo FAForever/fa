@@ -17,12 +17,14 @@ OnStopBuildStatToggleComponent = ClassSimple {
     ---@param unit Unit
     OnStopBuild = function(self, unit)
         if self.Blueprint.General.StatToggles then
-            for stat, toggleData in unit.Blueprint.General.OnStopBeingBuiltStatToggles do
-                LOG(stat)
-                LOG(repr(toggleData))
-                if toggleData.scriptBit then
-                    -- apply the script bit with our stat value
-                    unit:SetScriptBit(toggleData.scriptBit, (self:GetStat(stat, 0).Value == 1 and true) or false)
+            if unit.Blueprint.General.OnStopBeingBuiltStatToggles then
+                for stat, toggleData in unit.Blueprint.General.OnStopBeingBuiltStatToggles do
+                    LOG(stat)
+                    LOG(repr(toggleData))
+                    if toggleData.scriptBit then
+                        -- apply the script bit with our stat value
+                        unit:SetScriptBit(toggleData.scriptBit, (self:GetStat(stat, 0).Value == 1 and true) or false)
+                    end
                 end
             end
         end
