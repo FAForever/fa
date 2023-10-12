@@ -1021,16 +1021,16 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
                     if proj and not proj:BeenDestroyed() and countedProjectile then
                         if bp.NukeWeapon then
                             unit:NukeCreatedAtUnit()
+                            unit:RemoveNukeSiloAmmo(1)
                             -- Generate UI notification for automatic nuke ping
                             local launchData = {
                                 army = self.Army - 1,
-                                location = self:GetCurrentTargetPos()
+                                location = IsAlly(self.Army, GetFocusArmy()) and self:GetCurrentTargetPos() or nil
                             }
                             if not Sync.NukeLaunchData then
                                 Sync.NukeLaunchData = {}
                             end
                             table.insert(Sync.NukeLaunchData, launchData)
-                            unit:RemoveNukeSiloAmmo(1)
                         else
                             unit:RemoveTacticalSiloAmmo(1)
                         end
