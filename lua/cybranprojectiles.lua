@@ -563,7 +563,10 @@ CLOATacticalMissileProjectile = ClassProjectile(SingleBeamProjectile, TacticalMi
     FxImpactProp = EffectTemplate.CMissileLOAHit01,
 
     FxImpactNone = EffectTemplate.CMissileLOAHit01,
+    FxNoneHitScale = 0.6,
+
     FxKilled = EffectTemplate.CMissileLOAHit01,
+    FxOnKilledScale = 0.6,
 
     LaunchTicks = 2,
     LaunchTurnRate = 6,
