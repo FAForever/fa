@@ -2059,13 +2059,13 @@ technique TerrainPBR <
 
 // TerrainX0X to TerrainX4X for shaders with half mask range
 // TerrainX5X to TerrainX9X for shaders using the full mask range
-// -> implement a boolean toggle to avoid code duplication
+
 // TerrainX1X and TerrainX6X for shaders using biplanar mapping?
 // TerrainX2X and TerrainX7X for shaders using additional rotated sampling?
 // TerrainX3X and TerrainX8X for shaders using biplanar mapping and additional rotated sampling?
 
 // ----------------------------------------------------------------------------
-//#region Terrain001 and Terrain002
+//#region Terrain001, Terrain002 and Terrain052
 
 // Layer| Albedo stratum                                               | Normal stratum
 //      | R           | G             | B            | A               | R             | G             | B             | A            |
@@ -2093,7 +2093,9 @@ technique TerrainPBR <
 // 255 (100%). We choose to keep it instead of fixing the range as all editors
 // assume the values to range from 128 to 255
 
-float4 Terrain002NormalsPS( VS_OUTPUT pixel ) : COLOR
+// Terrain052 uses the full mask range
+
+float4 Terrain002NormalsPS( VS_OUTPUT pixel, uniform bool halfRange ) : COLOR
 {
     float2 coordinates = pixel.mTexWT * TerrainScale;
 
@@ -2101,13 +2103,18 @@ float4 Terrain002NormalsPS( VS_OUTPUT pixel ) : COLOR
     // - y = stratum layer 1
     // - z = stratum layer 2
     // - w = stratum layer 3
-    float4 mask0 = saturate(tex2D(UtilitySamplerA, coordinates) * 2 - 1);
+    float4 mask0 = tex2D(UtilitySamplerA, coordinates);
 
     // - x = stratum layer 4
     // - y = stratum layer 5
     // - z = stratum layer 6
     // - w = stratum layer 7
-    float4 mask1 = saturate(tex2D(UtilitySamplerB, coordinates) * 2 - 1);
+    float4 mask1 = tex2D(UtilitySamplerB, coordinates);
+
+    if (halfRange) {
+        mask0 = saturate(mask0 * 2 - 1);
+        mask1 = saturate(mask1 * 2 - 1);
+    }
 
     // these normals are pre-baked on top of the terrain
     float4 lowerNormal    = normalize(tex2D(LowerNormalSampler,    coordinates * LowerNormalTile.xx)    * 2 - 1);
@@ -2134,7 +2141,7 @@ float4 Terrain002NormalsPS( VS_OUTPUT pixel ) : COLOR
     return float4( (normal.xyz * 0.5 + 0.5) , normal.w);
 }
 
-float4 Terrain001AlbedoPS ( VS_OUTPUT inV) : COLOR
+float4 Terrain001AlbedoPS ( VS_OUTPUT inV, uniform bool halfRange ) : COLOR
 {
     float4 coordinates = TerrainScale * inV.mTexWT;
 
@@ -2142,13 +2149,18 @@ float4 Terrain001AlbedoPS ( VS_OUTPUT inV) : COLOR
     // - y = stratum layer 1
     // - z = stratum layer 2
     // - w = stratum layer 3
-    float4 mask0 = saturate(tex2Dproj(UtilitySamplerA,coordinates)*2-1);
+    float4 mask0 = tex2D(UtilitySamplerA, coordinates.xy);
 
     // - x = stratum layer 4
     // - y = stratum layer 5
     // - z = stratum layer 6
     // - w = stratum layer 7
-    float4 mask1 = saturate(tex2Dproj(UtilitySamplerB,coordinates)*2-1);
+    float4 mask1 = tex2D(UtilitySamplerB, coordinates.xy);
+
+    if (halfRange) {
+        mask0 = saturate(mask0 * 2 - 1);
+        mask1 = saturate(mask1 * 2 - 1);
+    }
 
     // x = normals-x
     // y = normals-z
@@ -2224,7 +2236,7 @@ technique Terrain001 <
         DepthState( Depth_Enable )
 
         VertexShader = compile vs_1_1 TerrainVS(true);
-        PixelShader = compile ps_2_a Terrain001AlbedoPS();
+        PixelShader = compile ps_2_a Terrain001AlbedoPS(true);
     }
 }
 
@@ -2236,7 +2248,7 @@ technique Terrain002Normals
         DepthState( Depth_Enable )
 
         VertexShader = compile vs_1_1 TerrainVS(false);
-        PixelShader = compile ps_2_a Terrain002NormalsPS();
+        PixelShader = compile ps_2_a Terrain002NormalsPS(true);
     }
 }
 
@@ -2253,14 +2265,41 @@ technique Terrain002 <
         DepthState( Depth_Enable )
 
         VertexShader = compile vs_1_1 TerrainVS(true);
-        PixelShader = compile ps_2_a Terrain001AlbedoPS();
+        PixelShader = compile ps_2_a Terrain001AlbedoPS(true);
+    }
+}
+
+technique Terrain052Normals
+{
+    pass P0
+    {
+        AlphaState( AlphaBlend_Disable_Write_RG )
+        DepthState( Depth_Enable )
+
+        VertexShader = compile vs_1_1 TerrainVS(false);
+        PixelShader = compile ps_2_a Terrain002NormalsPS(false);
+    }
+}
+
+technique Terrain052 <
+    string usage = "composite";
+    string normals = "Terrain052Normals";
+>
+{
+    pass P0
+    {
+        AlphaState( AlphaBlend_Disable_Write_RGBA )
+        DepthState( Depth_Enable )
+
+        VertexShader = compile vs_1_1 TerrainVS(true);
+        PixelShader = compile ps_2_a Terrain001AlbedoPS(false);
     }
 }
 
 //#endregion
 
 // ----------------------------------------------------------------------------
-//#region Terrain003
+//#region Terrain003 and Terrain053
 
 // Layer| Albedo stratum                                               | Normal stratum
 //      | R           | G             | B            | A               | R             | G             | B             | A            |
@@ -2284,7 +2323,7 @@ float4 UDNBlending(float4 n1, float4 n2, float factor) {
     return normalize(float4(n1.xy + n2.xy, n1.z, 0));
 }
 
-float4 Terrain003NormalsPS( VS_OUTPUT pixel ) : COLOR
+float4 Terrain003NormalsPS( VS_OUTPUT pixel, uniform bool halfRange ) : COLOR
 {
     float2 coordinates = pixel.mTexWT * TerrainScale;
 
@@ -2292,13 +2331,18 @@ float4 Terrain003NormalsPS( VS_OUTPUT pixel ) : COLOR
     // - y = stratum layer 1
     // - z = stratum layer 2
     // - w = stratum layer 3
-    float4 mask0 = saturate(tex2D(UtilitySamplerA, coordinates) * 2 - 1);
+    float4 mask0 = tex2D(UtilitySamplerA, coordinates);
 
     // - x = stratum layer 4
     // - y = stratum layer 5
     // - z = stratum layer 6
     // - w = unused
-    float4 mask1 = saturate(tex2D(UtilitySamplerB, coordinates) * 2 - 1);
+    float4 mask1 = tex2D(UtilitySamplerB, coordinates);
+
+    if (halfRange) {
+        mask0 = saturate(mask0 * 2 - 1);
+        mask1 = saturate(mask1 * 2 - 1);
+    }
 
     // these normals are pre-baked on top of the terrain
     float4 base =           normalize(tex2D(LowerNormalSampler,    coordinates * LowerNormalTile.xx   ) * 2 - 1);
@@ -2323,7 +2367,7 @@ float4 Terrain003NormalsPS( VS_OUTPUT pixel ) : COLOR
     return float4( (normal.xyz * 0.5 + 0.5) , normal.w);
 }
 
-float4 Terrain003AlbedoPS ( VS_OUTPUT inV) : COLOR
+float4 Terrain003AlbedoPS ( VS_OUTPUT inV, uniform bool halfRange ) : COLOR
 {
     float2 coordinates = TerrainScale * inV.mTexWT;
 
@@ -2331,13 +2375,18 @@ float4 Terrain003AlbedoPS ( VS_OUTPUT inV) : COLOR
     // y = stratum layer 1
     // z = stratum layer 2
     // w = stratum layer 3
-    float4 mask0 = saturate(tex2D(UtilitySamplerA, coordinates) * 2 - 1);
+    float4 mask0 = tex2D(UtilitySamplerA, coordinates);
 
     // x = stratum layer 4
     // y = stratum layer 5
     // z = stratum layer 6
     // w = ??
-    float4 mask1 = saturate(tex2D(UtilitySamplerB, coordinates) * 2 - 1);
+    float4 mask1 = tex2D(UtilitySamplerB, coordinates);
+
+    if (halfRange) {
+        mask0 = saturate(mask0 * 2 - 1);
+        mask1 = saturate(mask1 * 2 - 1);
+    }
 
     // x = normals-x
     // y = normals-z
@@ -2415,7 +2464,7 @@ technique Terrain003Normals
         DepthState( Depth_Enable )
 
         VertexShader = compile vs_1_1 TerrainVS(false);
-        PixelShader = compile ps_2_a Terrain003NormalsPS();
+        PixelShader = compile ps_2_a Terrain003NormalsPS(true);
     }
 }
 
@@ -2430,7 +2479,34 @@ technique Terrain003 <
         DepthState( Depth_Enable )
 
         VertexShader = compile vs_1_1 TerrainVS(true);
-        PixelShader = compile ps_2_a Terrain003AlbedoPS();
+        PixelShader = compile ps_2_a Terrain003AlbedoPS(true);
+    }
+}
+
+technique Terrain053Normals
+{
+    pass P0
+    {
+        AlphaState( AlphaBlend_Disable_Write_RG )
+        DepthState( Depth_Enable )
+
+        VertexShader = compile vs_1_1 TerrainVS(false);
+        PixelShader = compile ps_2_a Terrain003NormalsPS(false);
+    }
+}
+
+technique Terrain053 <
+    string usage = "composite";
+    string normals = "Terrain053Normals"; 
+>
+{
+    pass P0
+    {
+        AlphaState( AlphaBlend_Disable_Write_RGBA )
+        DepthState( Depth_Enable )
+
+        VertexShader = compile vs_1_1 TerrainVS(true);
+        PixelShader = compile ps_2_a Terrain003AlbedoPS(false);
     }
 }
 
@@ -2461,12 +2537,17 @@ technique Terrain003 <
 // The normal map scales are controlled by the albedo scales to ensure that they use the same values.
 // The layer mask of S7 acts as a roughness multiplier with 0.5 as the neutral value.
 
-float4 Terrain101NormalsPS ( VS_OUTPUT inV ) : COLOR
+float4 Terrain101NormalsPS ( VS_OUTPUT inV, uniform bool halfRange ) : COLOR
 {
     float4 position = TerrainScale * inV.mTexWT;
 
-    float4 mask0 = saturate(tex2D(UtilitySamplerA, position.xy) * 2 - 1);
-    float4 mask1 = saturate(tex2D(UtilitySamplerB, position.xy) * 2 - 1);
+    float4 mask0 = tex2D(UtilitySamplerA, position.xy);
+    float4 mask1 = tex2D(UtilitySamplerB, position.xy);
+
+    if (halfRange) {
+        mask0 = saturate(mask0 * 2 - 1);
+        mask1 = saturate(mask1 * 2 - 1);
+    }
 
     float3 lowerNormal    = normalize(tex2D(LowerNormalSampler,    position.xy * LowerAlbedoTile.xy   ).rgb * 2 - 1);
     float3 stratum0Normal = normalize(tex2D(Stratum0NormalSampler, position.xy * Stratum0AlbedoTile.xy).rgb * 2 - 1);
@@ -2489,7 +2570,7 @@ float4 Terrain101NormalsPS ( VS_OUTPUT inV ) : COLOR
     return float4( 0.5 + 0.5 * normal.rgb, 1);
 }
 
-float4 Terrain101AlbedoPS ( VS_OUTPUT inV) : COLOR
+float4 Terrain101AlbedoPS ( VS_OUTPUT inV, uniform bool halfRange ) : COLOR
 {
     // height is now in the z coordinate
     float4 position = TerrainScale * inV.mTexWT;
@@ -2497,8 +2578,13 @@ float4 Terrain101AlbedoPS ( VS_OUTPUT inV) : COLOR
     // do arithmetics to get range from (0, 1) to (-1, 1) as normal maps store their values as (0, 1)
     float3 normal = normalize(2 * SampleScreen(NormalSampler,inV.mTexSS).xyz - 1);
 
-    float4 mask0 = saturate(tex2D(UtilitySamplerA, position.xy) * 2 - 1);
-    float4 mask1 = saturate(tex2D(UtilitySamplerB, position.xy) * 2 - 1);
+    float4 mask0 = tex2D(UtilitySamplerA, position.xy);
+    float4 mask1 = tex2D(UtilitySamplerB, position.xy);
+
+    if (halfRange) {
+        mask0 = saturate(mask0 * 2 - 1);
+        mask1 = saturate(mask1 * 2 - 1);
+    }
 
     float4 lowerAlbedo =    sampleAlbedo(LowerAlbedoSampler,    position.xy, LowerAlbedoTile.xy,    float2(0.0, 0.0), true);
     float4 stratum0Albedo = sampleAlbedo(Stratum0AlbedoSampler, position.xy, Stratum0AlbedoTile.xy, float2(0.5, 0.0), true);
@@ -2538,7 +2624,7 @@ technique Terrain101Normals
         DepthState( Depth_Enable )
 
         VertexShader = compile vs_1_1 TerrainVS(false);
-        PixelShader = compile ps_2_a Terrain101NormalsPS();
+        PixelShader = compile ps_2_a Terrain101NormalsPS(true);
     }
 }
 
@@ -2553,7 +2639,34 @@ technique Terrain101 <
         DepthState( Depth_Enable )
 
         VertexShader = compile vs_1_1 TerrainVS(true);
-        PixelShader = compile ps_2_a Terrain101AlbedoPS();
+        PixelShader = compile ps_2_a Terrain101AlbedoPS(true);
+    }
+}
+
+technique Terrain151Normals
+{
+    pass P0
+    {
+        AlphaState( AlphaBlend_Disable_Write_RG )
+        DepthState( Depth_Enable )
+
+        VertexShader = compile vs_1_1 TerrainVS(false);
+        PixelShader = compile ps_2_a Terrain101NormalsPS(false);
+    }
+}
+
+technique Terrain151 <
+    string usage = "composite";
+    string normals = "Terrain151Normals";
+>
+{
+    pass P0
+    {
+        AlphaState( AlphaBlend_Disable_Write_RGBA )
+        DepthState( Depth_Enable )
+
+        VertexShader = compile vs_1_1 TerrainVS(true);
+        PixelShader = compile ps_2_a Terrain101AlbedoPS(false);
     }
 }
 
@@ -2585,12 +2698,17 @@ technique Terrain101 <
 // The layer mask of S7 acts as a roughness multiplier with 0.5 as the neutral value.
 // Height processing happens at two scales, the albedo scales control the near scale and the normal scales control the far scale.
 
-float4 Terrain301NormalsPS ( VS_OUTPUT inV ) : COLOR
+float4 Terrain301NormalsPS ( VS_OUTPUT inV, uniform bool halfRange ) : COLOR
 {
     float4 position = TerrainScale * inV.mTexWT;
 
     float4 mask0 = tex2D(UtilitySamplerA, position.xy);
     float4 mask1 = tex2D(UtilitySamplerB, position.xy);
+
+    if (halfRange) {
+        mask0 = saturate(mask0 * 2 - 1);
+        mask1 = saturate(mask1 * 2 - 1);
+    }
 
     float3 lowerNormal    = normalize(tex2D(LowerNormalSampler,    position.xy * LowerAlbedoTile.xy   ).rgb * 2 - 1);
     float3 stratum0Normal = normalize(tex2D(Stratum0NormalSampler, position.xy * Stratum0AlbedoTile.xy).rgb * 2 - 1);
@@ -2621,7 +2739,7 @@ float4 Terrain301NormalsPS ( VS_OUTPUT inV ) : COLOR
     return float4( 0.5 + 0.5 * normal.rgb, 1);
 }
 
-float4 Terrain301AlbedoPS ( VS_OUTPUT inV) : COLOR
+float4 Terrain301AlbedoPS ( VS_OUTPUT inV, uniform bool halfRange ) : COLOR
 {
     // height is now in the z coordinate
     float4 position = TerrainScale * inV.mTexWT;
@@ -2631,6 +2749,11 @@ float4 Terrain301AlbedoPS ( VS_OUTPUT inV) : COLOR
 
     float4 mask0 = tex2D(UtilitySamplerA, position.xy);
     float4 mask1 = tex2D(UtilitySamplerB, position.xy);
+
+    if (halfRange) {
+        mask0 = saturate(mask0 * 2 - 1);
+        mask1 = saturate(mask1 * 2 - 1);
+    }
 
     // This shader wouldn't compile because it would have to store too many variables if we didn't use this trick in the vertex shader
     float4 lowerAlbedo =    sampleAlbedo(LowerAlbedoSampler,    position.xy, LowerAlbedoTile.xy,    float2(0.0, 0.0), true);
@@ -2679,7 +2802,7 @@ technique Terrain301Normals
         DepthState( Depth_Enable )
 
         VertexShader = compile vs_1_1 TerrainVS(false);
-        PixelShader = compile ps_2_a Terrain301NormalsPS();
+        PixelShader = compile ps_2_a Terrain301NormalsPS(true);
     }
 }
 
@@ -2694,7 +2817,34 @@ technique Terrain301 <
         DepthState( Depth_Enable )
 
         VertexShader = compile vs_1_1 TerrainVS(true);
-        PixelShader = compile ps_2_a Terrain301AlbedoPS();
+        PixelShader = compile ps_2_a Terrain301AlbedoPS(true);
+    }
+}
+
+technique Terrain351Normals
+{
+    pass P0
+    {
+        AlphaState( AlphaBlend_Disable_Write_RG )
+        DepthState( Depth_Enable )
+
+        VertexShader = compile vs_1_1 TerrainVS(false);
+        PixelShader = compile ps_2_a Terrain301NormalsPS(false);
+    }
+}
+
+technique Terrain351 <
+    string usage = "composite";
+    string normals = "Terrain351Normals";
+>
+{
+    pass P0
+    {
+        AlphaState( AlphaBlend_Disable_Write_RGBA )
+        DepthState( Depth_Enable )
+
+        VertexShader = compile vs_1_1 TerrainVS(true);
+        PixelShader = compile ps_2_a Terrain301AlbedoPS(false);
     }
 }
 
