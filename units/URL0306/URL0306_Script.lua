@@ -29,7 +29,6 @@ URL0306 = ClassUnit(CLandUnit) {
 
     OnStopBeingBuilt = function(self, builder, layer)
         CLandUnit.OnStopBeingBuilt(self, builder, layer)
-        self:SetMaintenanceConsumptionActive()
 
         self.TargetPointer = self:GetWeapon(1)
         self.TargetLayerCaps = self.Blueprint.Weapon[1].FireTargetLayerCapsTable

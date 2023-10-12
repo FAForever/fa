@@ -26,7 +26,6 @@ UEA0305 = ClassUnit(TAirUnit) {
 
     OnStopBeingBuilt = function(self,builder,layer)
         TAirUnit.OnStopBeingBuilt(self,builder,layer)
-        self:SetMaintenanceConsumptionActive()
 
         -- create the engine thrust manipulators
         for _, bone in self.EngineRotateBones do

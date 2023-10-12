@@ -20,11 +20,6 @@ URS0304 = ClassUnit(CSubUnit) {
         Torpedo01 = ClassWeapon(CANTorpedoLauncherWeapon){},
         Torpedo02 = ClassWeapon(CANTorpedoLauncherWeapon){},
     },
-
-    OnStopBeingBuilt = function(self, builder, layer)
-        CSubUnit.OnStopBeingBuilt(self, builder, layer)
-        self:SetMaintenanceConsumptionActive()
-    end,
 }
 
 TypeClass = URS0304

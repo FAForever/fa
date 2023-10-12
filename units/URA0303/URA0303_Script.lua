@@ -19,12 +19,6 @@ URA0303 = ClassUnit(CAirUnit) {
         Missiles1 = ClassWeapon(CAAMissileNaniteWeapon) {},
         Missiles2 = ClassWeapon(CAAMissileNaniteWeapon) {},
     },
-    OnStopBeingBuilt = function(self,builder,layer)
-        CAirUnit.OnStopBeingBuilt(self,builder,layer)
-        self:SetMaintenanceConsumptionInactive()
-        self:SetScriptBit('RULEUTC_StealthToggle', true)
-        self:RequestRefreshUI()
-    end,
     
 }
 

@@ -96,14 +96,6 @@ XSL0101 = ClassUnit(SWalkingLandUnit) {
         self.CloakThread = nil
     end,
 
-    OnStopBeingBuilt = function(self, builder, layer)
-        SWalkingLandUnit.OnStopBeingBuilt(self, builder, layer)
-        self:SetMaintenanceConsumptionInactive()
-        self:SetScriptBit('RULEUTC_CloakToggle', true)
-        self.WaitingForCloak = false
-        self.Trash:Add(ForkThread(self.HideUnit, self))
-    end,
-
     OnMotionHorzEventChange = function(self, new, old)
         if new == 'Stopped' then
             KillThread(self.CloakThread)
