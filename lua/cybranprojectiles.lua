@@ -624,7 +624,7 @@ CLOATacticalMissileProjectile = ClassProjectile(SingleBeamProjectile, TacticalMi
         SingleBeamProjectile.OnImpact(self, targetType, targetEntity)
 
         CreateLightParticle(self, -1, self.Army, 3, 6, 'flare_lens_add_02', 'ramp_fire_11')
-        if targetType == 'None' then
+        if targetType == 'None' or targetType == 'Air' then
             self:CreateDebris()
         end
     end,

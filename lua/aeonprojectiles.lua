@@ -353,7 +353,7 @@ AMissileSerpentineProjectile = ClassProjectile(SingleCompositeEmitterProjectile,
     OnImpact = function(self, targetType, targetEntity)
         SingleCompositeEmitterProjectile.OnImpact(self, targetType, targetEntity)
 
-        if targetType == 'None' then
+        if targetType == 'None' or targetType == 'Air' then
             self:CreateDebris()
         end
 
