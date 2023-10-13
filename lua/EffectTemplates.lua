@@ -255,19 +255,19 @@ GenericDebrisTrails01 = {
 TacticalDebrisTrails01 = {
     EmtBpPath .. 'tactical_debris_smoke_01_emit.bp',
     EmtBpPath .. 'tactical_debris_smoke_02_emit.bp',
-    EmtBpPath .. 'tactical_debris_trail_01.bp',
+    EmtBpPath .. 'tactical_debris_trail_01_emit.bp',
 }
 
 TacticalDebrisTrails02 = {
     EmtBpPath .. 'tactical_debris_fire_01_emit.bp',
     EmtBpPath .. 'tactical_debris_distortion_01_emit.bp',
-    EmtBpPath .. 'tactical_debris_trail_01.bp',
+    EmtBpPath .. 'tactical_debris_trail_01_emit.bp',
 }
 
 TacticalDebrisTrails03 = {
     EmtBpPath .. 'tactical_debris_smoke_03_emit.bp',
     EmtBpPath .. 'tactical_debris_smoke_04_emit.bp',
-    EmtBpPath .. 'tactical_debris_trail_01.bp',
+    EmtBpPath .. 'tactical_debris_trail_01_emit.bp',
 }
 
 
