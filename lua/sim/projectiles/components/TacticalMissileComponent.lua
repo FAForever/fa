@@ -1,4 +1,3 @@
-
 local SemiBallisticComponent = import("/lua/sim/projectiles/components/semiballisticcomponent.lua").SemiBallisticComponent
 
 ---@class TacticalMissileComponent : SemiBallisticComponent
@@ -11,7 +10,7 @@ TacticalMissileComponent = ClassSimple(SemiBallisticComponent) {
         -- are we a wiggler?
         local zigZagger = false
         if blueprintPhysics.MaxZigZag and
-           blueprintPhysics.MaxZigZag > self.MaxZigZagThreshold then
+            blueprintPhysics.MaxZigZag > self.MaxZigZagThreshold then
             zigZagger = true
         end
 
@@ -26,29 +25,46 @@ TacticalMissileComponent = ClassSimple(SemiBallisticComponent) {
 
         -- boost
         local boostTurnRate, boostTime = self:TurnRateFromAngleAndHeight()
-        self:SetTurnRate(boostTurnRate)
+        self:SetTurnRate(boostTurnRate)       
         WaitTicks(boostTime * 10 + 1)
 
         -- glide
         local glideTurnRate, glideTime = self:TurnRateFromDistance()
+
         if zigZagger then
-            self:SetTurnRate(75)
-            -- wait until we're just short of our target (just short of the normal glide time is a good number)
-            -- then up the turn rate so we can actually get close to hitting something
-            WaitTicks((glideTime-1) * 10)
-            -- set remaining glideTime to 1 for the miss check later, tweak this value if we end up disabling tracking too early
-            glideTime = 1
-            self:SetTurnRate(100)
+            -- try to create a smooth transition
+            if glideTime > 4.0 then
+                for k = 1, 10 do
+                    WaitTicks(4)
+                    self:SetTurnRate(5 * k)
+                end
+                glideTime = glideTime - 4.0
+            elseif glideTime > 2.0 then
+                for k = 1, 5 do
+                    WaitTicks(4)
+                    self:SetTurnRate(10 * k)
+                end
+                glideTime = glideTime - 2.0
+            elseif glideTime > 1.0 then
+                for k = 1, 5 do
+                    WaitTicks(2)
+                    self:SetTurnRate(10 * k)
+                end
+                glideTime = glideTime - 1.0
+            else
+                self:SetTurnRate(50)
+            end
         else
             self:SetTurnRate(glideTurnRate)
         end
 
-        -- wait until we've allegedly hit our target, then turn tracking off
-        -- (in case we miss, so we don't fly in circles forever)
+        -- wait until we've allegedly hit our target
+        self:SetLifetime((glideTime + 3))
+        WaitTicks((glideTime + 1) * 10)
 
-        self:SetLifetime((glideTime+3))
+        -- then, if we still exist, we just want to stop existing. Therefore we find
+        -- our way to the ground
 
-        WaitTicks((glideTime+1) * 10)
         if not self:BeenDestroyed() then
 
             -- target the ground below us slowly turn towards the ground so that we do not fly off indefinitely
