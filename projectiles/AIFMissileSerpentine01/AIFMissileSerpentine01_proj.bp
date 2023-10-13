@@ -55,11 +55,13 @@ ProjectileBlueprint {
         DestroyOnWater = true,
         InitialSpeed = 2,
         MaxSpeed = 14,
-        MaxZigZag = 5,
+
         TrackTarget = true,
         TrackTargetGround = true,
         TurnRate = 0,
         VelocityAlign = true,
+
+        MaxZigZag = 5,
         ZigZagFrequency = 0.5,
     },
 }

@@ -20,7 +20,7 @@ local NukeProjectile = DefaultProjectileFile.NukeProjectile
 
 local TacticalMissileComponent = import('/lua/sim/DefaultProjectiles.lua').TacticalMissileComponent
 local SplitComponent = import('/lua/sim/projectiles/components/SplitComponent.lua').SplitComponent
-
+local DebrisComponent = import('/lua/sim/projectiles/components/DebrisComponent.lua').DebrisComponent
 
 ---  CYBRAN BRACKMAN "HACK PEG-POD" PROJECTILE
 ---@class CDFBrackmanHackPegProjectile01 : MultiPolyTrailProjectile
@@ -551,8 +551,8 @@ CRocketProjectile = ClassProjectile(SingleBeamProjectile) {
 }
 
 ---  CYBRAN ROCKET PROJECILES
----@class CLOATacticalMissileProjectile : SingleBeamProjectile, TacticalMissileComponent, SplitComponent
-CLOATacticalMissileProjectile = ClassProjectile(SingleBeamProjectile, TacticalMissileComponent, SplitComponent) {
+---@class CLOATacticalMissileProjectile : SingleBeamProjectile, TacticalMissileComponent, SplitComponent, DebrisComponent
+CLOATacticalMissileProjectile = ClassProjectile(SingleBeamProjectile, TacticalMissileComponent, SplitComponent, DebrisComponent) {
     BeamName = '/effects/emitters/missile_loa_munition_exhaust_beam_01_emit.bp',
     FxTrails = {'/effects/emitters/missile_cruise_munition_trail_01_emit.bp',},
     FxTrailOffset = -0.5,
@@ -565,7 +565,7 @@ CLOATacticalMissileProjectile = ClassProjectile(SingleBeamProjectile, TacticalMi
     FxImpactNone = EffectTemplate.CMissileLOAHit01,
     FxNoneHitScale = 0.6,
 
-    FxKilled = EffectTemplate.CMissileLOAHit01,
+    FxOnKilled = EffectTemplate.CMissileLOAHit01,
     FxOnKilledScale = 0.6,
 
     LaunchTicks = 2,
@@ -576,6 +576,10 @@ CLOATacticalMissileProjectile = ClassProjectile(SingleBeamProjectile, TacticalMi
 
     ChildCount = 3,
     ChildProjectileBlueprint = '/projectiles/CIFMissileTacticalSplit01/CIFMissileTacticalSplit01_proj.bp',
+
+    DebrisBlueprints = {
+        '/effects/entities/DebrisMisc04/DebrisMisc04_proj.bp'
+    },
 
     ---@param self CLOATacticalMissileProjectile
     ---@param inWater boolean
@@ -621,11 +625,6 @@ CLOATacticalMissileProjectile = ClassProjectile(SingleBeamProjectile, TacticalMi
         if targetType == 'None' then
             self:CreateDebris()
         end
-    end,
-
-    ---@param self TMissileProjectile
-    CreateDebris = function(self)
-        self:CreateChildProjectile('/effects/entities/DebrisMisc04/DebrisMisc04_proj.bp')
     end,
 }
 

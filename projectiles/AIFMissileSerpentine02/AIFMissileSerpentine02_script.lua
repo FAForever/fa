@@ -2,27 +2,15 @@
 -- Aeon Serpentine Missile
 --
 local AMissileSerpentineProjectile = import("/lua/aeonprojectiles.lua").AMissileSerpentineProjectile
-local TacticalMissileComponent = import('/lua/sim/DefaultProjectiles.lua').TacticalMissileComponent
 
-AIFMissileSerpentine02 = ClassProjectile(AMissileSerpentineProjectile, TacticalMissileComponent) {
-
-    LaunchTicks = 6,
-    LaunchTurnRate = 6,
-    HeightDistanceFactor = 5,
-    MinHeight = 5,
-    FinalBoostAngle = 0,
-
+---@class AIFMissileSerpentine02 : AMissileSerpentineProjectile
+AIFMissileSerpentine02 = ClassProjectile(AMissileSerpentineProjectile) {
     FxWaterHitScale = 1.65,
 
+    ---@param self AIFMissileSerpentine02
     OnCreate = function(self)
         AMissileSerpentineProjectile.OnCreate(self)
-        self:SetCollisionShape('Sphere', 0, 0, 0, 2.0)
-        self:ForkThread( self.MovementThread )
-    end,
-    
-    OnExitWater = function(self)
-        AMissileSerpentineProjectile.OnExitWater(self)
-        self:SetDestroyOnWater(true)
+        self.MoveThread = self.Trash:Add(ForkThread(self.MovementThread, self))
     end,
 }
 
