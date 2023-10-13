@@ -562,10 +562,10 @@ CLOATacticalMissileProjectile = ClassProjectile(SingleBeamProjectile, TacticalMi
     FxImpactLand = EffectTemplate.CMissileLOAHit01,
     FxImpactProp = EffectTemplate.CMissileLOAHit01,
 
-    FxImpactNone = EffectTemplate.CMissileLOAHit01,
+    FxImpactNone = EffectTemplate.TMissileKilled01,
     FxNoneHitScale = 0.6,
 
-    FxOnKilled = EffectTemplate.CMissileLOAHit01,
+    FxOnKilled = EffectTemplate.TMissileKilled01,
     FxOnKilledScale = 0.6,
 
     LaunchTicks = 2,
@@ -578,7 +578,9 @@ CLOATacticalMissileProjectile = ClassProjectile(SingleBeamProjectile, TacticalMi
     ChildProjectileBlueprint = '/projectiles/CIFMissileTacticalSplit01/CIFMissileTacticalSplit01_proj.bp',
 
     DebrisBlueprints = {
-        '/effects/entities/DebrisMisc04/DebrisMisc04_proj.bp'
+        '/effects/Entities/TacticalDebris01/TacticalDebris01_proj.bp',
+        '/effects/Entities/TacticalDebris01/TacticalDebris01_proj.bp',
+        '/effects/Entities/TacticalDebris02/TacticalDebris02_proj.bp',
     },
 
     ---@param self CLOATacticalMissileProjectile
@@ -629,8 +631,8 @@ CLOATacticalMissileProjectile = ClassProjectile(SingleBeamProjectile, TacticalMi
 }
 
 ---  CYBRAN ROCKET PROJECILES
----@class CLOATacticalChildMissileProjectile : SingleBeamProjectile, TacticalMissileComponent
-CLOATacticalChildMissileProjectile = ClassProjectile(SingleBeamProjectile, TacticalMissileComponent) {
+---@class CLOATacticalChildMissileProjectile : SingleBeamProjectile, TacticalMissileComponent, DebrisComponent
+CLOATacticalChildMissileProjectile = ClassProjectile(SingleBeamProjectile, TacticalMissileComponent, DebrisComponent) {
     BeamName = '/effects/emitters/missile_loa_munition_exhaust_beam_02_emit.bp',
     FxTrails = {'/effects/emitters/missile_cruise_munition_trail_03_emit.bp',},
     FxTrailOffset = -0.5,
@@ -638,15 +640,18 @@ CLOATacticalChildMissileProjectile = ClassProjectile(SingleBeamProjectile, Tacti
     FxImpactUnit = EffectTemplate.CMissileLOAHit01,
     FxImpactLand = EffectTemplate.CMissileLOAHit01,
     FxImpactProp = EffectTemplate.CMissileLOAHit01,
-    FxImpactNone = EffectTemplate.CMissileLOAHit01,
     FxAirUnitHitScale = 0.375,
     FxLandHitScale = 0.375,
-    FxNoneHitScale = 0.375,
     FxPropHitScale = 0.375,
     FxProjectileHitScale = 0.375,
     FxShieldHitScale = 0.375,
     FxUnitHitScale = 0.375,
     FxWaterHitScale = 0.375,
+
+    FxImpactNone = EffectTemplate.TMissileKilled01,
+    FxNoneHitScale = 0.375,
+
+    FxOnKilled = EffectTemplate.TMissileKilled01,
     FxOnKilledScale = 0.375,
 
     LaunchTicks = 2,
@@ -654,6 +659,10 @@ CLOATacticalChildMissileProjectile = ClassProjectile(SingleBeamProjectile, Tacti
     HeightDistanceFactor = 5,
     MinHeight = 2,
     FinalBoostAngle = 0,
+
+    DebrisBlueprints = {
+        '/effects/Entities/TacticalDebris03/TacticalDebris03_proj.bp',
+    },
 
     ---@param self CLOATacticalChildMissileProjectile
     OnCreate = function(self)
@@ -682,11 +691,6 @@ CLOATacticalChildMissileProjectile = ClassProjectile(SingleBeamProjectile, Tacti
         if targetType == 'None' then
             self:CreateDebris()
         end
-    end,
-
-    ---@param self TMissileProjectile
-    CreateDebris = function(self)
-        self:CreateChildProjectile('/effects/entities/DebrisMisc04/DebrisMisc04_proj.bp')
     end,
 }
 

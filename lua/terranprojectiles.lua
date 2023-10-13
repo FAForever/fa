@@ -329,7 +329,9 @@ TMissileProjectile = ClassProjectile(SingleBeamProjectile, TacticalMissileCompon
     FinalBoostAngleRange = 5,
 
     DebrisBlueprints = {
-        '/effects/entities/DebrisMisc04/DebrisMisc04_proj.bp'
+        '/effects/Entities/TacticalDebris01/TacticalDebris01_proj.bp',
+        '/effects/Entities/TacticalDebris01/TacticalDebris01_proj.bp',
+        '/effects/Entities/TacticalDebris02/TacticalDebris02_proj.bp',
     },
 
     OnCreate = function(self)
