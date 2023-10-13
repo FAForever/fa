@@ -153,6 +153,14 @@ AIMFlareProjectile = ClassProjectile(EmitterProjectile) {
     FxAirUnitHitScale = 0.4,
     FxNoneHitScale = 0.4,
     DestroyOnImpact = false,
+
+    ---@param self AIMAntiMissile01
+    ---@param other Projectile
+    ---@return boolean
+    OnCollisionCheck = function(self, other)
+        other.DamageData.Damage = 0
+        return true
+    end,
 }
 
 --- AEON LASER PROJECTILES
