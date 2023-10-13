@@ -3,7 +3,6 @@ local AIPlatoon = import("/lua/aibrains/platoons/platoon-base.lua").AIPlatoon
 local NavUtils = import("/lua/sim/navutils.lua")
 local MarkerUtils = import("/lua/sim/markerutilities.lua")
 local TransportUtils = import("/lua/ai/transportutilities.lua")
-local AIAttackUtils = import("/lua/ai/aiattackutilities.lua")
 
 -- upvalue scope for performance
 local Random = Random
@@ -111,6 +110,7 @@ AIPlatoonAdaptiveReturnToBaseBehavior = Class(AIPlatoon) {
             local destination = self.LocationToReturn
             if not destination then
                 self:LogWarning(string.format('no destination to navigate to'))
+                WaitTicks(20)
                 self:ChangeState(self.Searching)
                 return
             end
@@ -122,6 +122,7 @@ AIPlatoonAdaptiveReturnToBaseBehavior = Class(AIPlatoon) {
 
             if not NavUtils.CanPathToCell(self.MovementLayer, self:GetPlatoonPosition(), destination) then
                 self:LogDebug(string.format('ReturnToBase platoon is going to use transport'))
+                WaitTicks(10)
                 self:ChangeState(self.Transporting)
                 return
             end
@@ -142,6 +143,7 @@ AIPlatoonAdaptiveReturnToBaseBehavior = Class(AIPlatoon) {
                 -- something odd happened: no direction found
                 if not waypoint then
                     self:LogWarning(string.format('no path found'))
+                    WaitTicks(20)
                     self:ChangeState(self.Searching)
                     return
                 end
@@ -183,7 +185,7 @@ AIPlatoonAdaptiveReturnToBaseBehavior = Class(AIPlatoon) {
         ---@param self AIPlatoonAdaptiveReturnToBaseBehavior
         Main = function(self)
             local brain = self:GetBrain()
-            local usedTransports = TransportUtils.SendPlatoonWithTransports(brain, self, self.LocationToReturn, 1, false)
+            local usedTransports = TransportUtils.SendPlatoonWithTransports(brain, self, self.LocationToReturn, 3, false)
             if usedTransports then
                 self:LogDebug(string.format('Attack Platoon used transports'))
                 self:ChangeState(self.Navigating)
@@ -220,6 +222,7 @@ AIPlatoonAdaptiveReturnToBaseBehavior = Class(AIPlatoon) {
 
                 -- check if there is something to attack
                 if not attackTarget or IsDestroyed(attackTarget) then
+                    WaitTicks(10)
                     self:ChangeState(self.Searching)
                     return
                 end

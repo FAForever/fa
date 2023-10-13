@@ -1,9 +1,9 @@
 
 local AIPlatoon = import("/lua/aibrains/platoons/platoon-base.lua").AIPlatoon
 local NavUtils = import("/lua/sim/navutils.lua")
+local AIUtils = import("/lua/ai/aiutilities.lua")
 local MarkerUtils = import("/lua/sim/markerutilities.lua")
 local TransportUtils = import("/lua/ai/transportutilities.lua")
-local AIAttackUtils = import("/lua/ai/aiattackutilities.lua")
 
 -- upvalue scope for performance
 local Random = Random
@@ -173,6 +173,7 @@ AIPlatoonAdaptiveRaidBehavior = Class(AIPlatoon) {
             else
                 -- something odd happened: try again with another unit
                 self:LogWarning(string.format('no label found', label))
+                WaitTicks(20)
                 self:ChangeState(self.Searching)
                 return
             end
@@ -194,6 +195,7 @@ AIPlatoonAdaptiveRaidBehavior = Class(AIPlatoon) {
             local destination = self.LocationToRaid
             if not destination then
                 self:LogWarning(string.format('no destination to navigate to'))
+                WaitTicks(20)
                 self:ChangeState(self.Searching)
                 return
             end
@@ -208,6 +210,7 @@ AIPlatoonAdaptiveRaidBehavior = Class(AIPlatoon) {
 
             if not NavUtils.CanPathToCell(self.MovementLayer, self:GetPlatoonPosition(), destination) then
                 self:LogDebug(string.format('Raid platoon is going to use transport'))
+                WaitTicks(10)
                 self:ChangeState(self.Transporting)
                 return
             end
@@ -228,6 +231,7 @@ AIPlatoonAdaptiveRaidBehavior = Class(AIPlatoon) {
                 -- something odd happened: no direction found
                 if not waypoint then
                     self:LogWarning(string.format('no path found'))
+                    WaitTicks(10)
                     self:ChangeState(self.Searching)
                     return
                 end
@@ -267,7 +271,6 @@ AIPlatoonAdaptiveRaidBehavior = Class(AIPlatoon) {
                             if threatTable and not TableEmpty(threatTable) then
                                 local info = threatTable[Random(1, TableGetn(threatTable))]
                                 self.ThreatToEvade = { info[1], GetSurfaceHeight(info[1], info[2]), info[2] }
-                                DrawCircle(self.ThreatToEvade, 5, 'ff0000')
                                 self:LogDebug(string.format('We are going to retreat, enemy threat '..threat..' our threat '..platoonThreat..' position status '..positionStatus))
                                 self:ChangeState(self.Retreating)
                                 return
@@ -438,7 +441,6 @@ AIPlatoonAdaptiveRaidBehavior = Class(AIPlatoon) {
                         if threatTable and not TableEmpty(threatTable) then
                             local info = threatTable[Random(1, TableGetn(threatTable))]
                             self.ThreatToEvade = { info[1], GetSurfaceHeight(info[1], info[2]), info[2] }
-                            DrawCircle(self.ThreatToEvade, 5, 'ff0000')
                             self:ChangeState(self.Retreating)
                             return
                         end
@@ -511,6 +513,9 @@ AIPlatoonAdaptiveRaidBehavior = Class(AIPlatoon) {
                         if self.RetreatCount < 3 then
                             self:ChangeState(self.Navigating)
                         else
+                            WaitTicks(10)
+                            AIUtils.MergeWithNearbyStateMachines(self, 'AdaptiveRaidBehavior', 80, 25, false)
+                            WaitTicks(10)
                             self:ChangeState(self.Searching)
                         end
                         return

@@ -4784,7 +4784,6 @@ Platoon = Class(moho.platoon_methods) {
                     else
                         WARN('No buildLocation or whatToBuild during ACU initialization')
                     end
-                    aiBrain:BuildStructure(eng, whatToBuild, buildLocation, false)
                 end
             end
         end
@@ -4799,7 +4798,6 @@ Platoon = Class(moho.platoon_methods) {
             else
                 WARN('No buildLocation or whatToBuild during ACU initialization')
             end
-            aiBrain:BuildStructure(eng, whatToBuild, buildLocation, false)
         end
         -- wait for the build to complete
         if not hydroPresent then
@@ -4882,7 +4880,6 @@ Platoon = Class(moho.platoon_methods) {
                         else
                             WARN('No buildLocation or whatToBuild during ACU initialization')
                         end
-                        aiBrain:BuildStructure(eng, whatToBuild, buildLocation, false)
                     else
                         buildLocation, whatToBuild, borderWarning = AIUtils.GetBuildLocation(aiBrain, buildingTmpl, baseTmplDefault['BaseTemplates'][factionIndex], 'T1LandFactory', eng, true, categories.HYDROCARBON, 15, true)
                         if borderWarning and buildLocation and whatToBuild then
@@ -4893,7 +4890,6 @@ Platoon = Class(moho.platoon_methods) {
                         else
                             WARN('No buildLocation or whatToBuild during ACU initialization')
                         end
-                        aiBrain:BuildStructure(eng, whatToBuild, buildLocation, false)
                         if playableArea[3] > 256 or playableArea[4] > 256 and aiBrain:GetEngineerManagerUnitsBeingBuilt(categories.FACTORY * categories.AIR) < 1 and aiBrain:GetCurrentUnits(categories.FACTORY * categories.AIR) < 1 then
                             buildLocation, whatToBuild, borderWarning = AIUtils.GetBuildLocation(aiBrain, buildingTmpl, baseTmplDefault['BaseTemplates'][factionIndex], 'T1AirFactory', eng, true, categories.HYDROCARBON, 25, true)
                             if borderWarning and buildLocation and whatToBuild then
@@ -4904,7 +4900,6 @@ Platoon = Class(moho.platoon_methods) {
                             else
                                 WARN('No buildLocation or whatToBuild during ACU initialization')
                             end
-                            aiBrain:BuildStructure(eng, whatToBuild, buildLocation, false)
                         end
                     end
                     while eng:IsUnitState('Building') or 0<table.getn(eng:GetCommandQueue()) do

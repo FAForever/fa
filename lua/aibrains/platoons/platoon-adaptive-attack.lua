@@ -4,7 +4,6 @@ local NavUtils = import("/lua/sim/navutils.lua")
 local AIUtils = import("/lua/ai/aiutilities.lua")
 local MarkerUtils = import("/lua/sim/markerutilities.lua")
 local TransportUtils = import("/lua/ai/transportutilities.lua")
-local AIAttackUtils = import("/lua/ai/aiattackutilities.lua")
 
 -- upvalue scope for performance
 local Random = Random
@@ -63,6 +62,7 @@ AIPlatoonAdaptiveAttackBehavior = Class(AIPlatoon) {
         Main = function(self)
             -- reset state
             self.LocationToAttack = nil
+            self.TargetToAttack = nil
             self.OpportunityToRaid = nil
             self.ThreatToEvade = nil
             self.RetreatCount = 0
@@ -104,6 +104,7 @@ AIPlatoonAdaptiveAttackBehavior = Class(AIPlatoon) {
             else
                 -- something odd happened: try again with another unit
                 self:LogWarning(string.format('no label found', label))
+                WaitTicks(20)
                 self:ChangeState(self.Searching)
                 return
             end
@@ -139,6 +140,7 @@ AIPlatoonAdaptiveAttackBehavior = Class(AIPlatoon) {
 
             if not NavUtils.CanPathToCell(self.MovementLayer, self:GetPlatoonPosition(), destination) then
                 self:LogDebug(string.format('Attack platoon is going to use transport'))
+                WaitTicks(10)
                 self:ChangeState(self.Transporting)
                 return
             end
@@ -159,8 +161,7 @@ AIPlatoonAdaptiveAttackBehavior = Class(AIPlatoon) {
                 -- something odd happened: no direction found
                 if not waypoint then
                     self:LogWarning(string.format('no path found'))
-                    LOG('No waypoint, switch to searching')
-                    WaitTicks(10)
+                    WaitTicks(20)
                     self:ChangeState(self.Searching)
                     return
                 end
@@ -201,7 +202,6 @@ AIPlatoonAdaptiveAttackBehavior = Class(AIPlatoon) {
                             if threatTable and not TableEmpty(threatTable) then
                                 local info = threatTable[Random(1, TableGetn(threatTable))]
                                 self.ThreatToEvade = { info[1], GetSurfaceHeight(info[1], info[2]), info[2] }
-                                DrawCircle(self.ThreatToEvade, 5, 'ff0000')
                                 self:LogDebug(string.format('We are going to retreat, enemy threat '..threat..' our threat '..platoonThreat..' position status '..positionStatus))
                                 self:ChangeState(self.Retreating)
                                 return
@@ -248,7 +248,7 @@ AIPlatoonAdaptiveAttackBehavior = Class(AIPlatoon) {
         ---@param self AIPlatoonAdaptiveAttackBehavior
         Main = function(self)
             local brain = self:GetBrain()
-            local usedTransports = TransportUtils.SendPlatoonWithTransports(brain, self, self.LocationToAttack, 1, false)
+            local usedTransports = TransportUtils.SendPlatoonWithTransports(brain, self, self.LocationToAttack, 3, false)
             if usedTransports then
                 self:LogDebug(string.format('Attack Platoon used transports'))
                 self:ChangeState(self.Navigating)
@@ -377,7 +377,6 @@ AIPlatoonAdaptiveAttackBehavior = Class(AIPlatoon) {
                         if threatTable and not TableEmpty(threatTable) then
                             local info = threatTable[Random(1, TableGetn(threatTable))]
                             self.ThreatToEvade = { info[1], GetSurfaceHeight(info[1], info[2]), info[2] }
-                            DrawCircle(self.ThreatToEvade, 5, 'ff0000')
                             self:ChangeState(self.Retreating)
                             return
                         end
@@ -451,7 +450,6 @@ AIPlatoonAdaptiveAttackBehavior = Class(AIPlatoon) {
                             self:ChangeState(self.Navigating)
                         else
                             WaitTicks(10)
-                            LOG('Merge Attempt')
                             AIUtils.MergeWithNearbyStateMachines(self, 'AdaptiveAttackBehavior', 80, 25, false)
                             WaitTicks(10)
                             self:ChangeState(self.Searching)

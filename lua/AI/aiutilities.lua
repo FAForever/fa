@@ -3675,7 +3675,8 @@ MergeWithNearbyStateMachines = function(platoon, stateMachine, radius, maxMergeN
         end
     end
     if bMergedPlatoons then
-        IssueClearCommands(platoon:GetPlatoonUnits())
+        local mergedPlatoonUnits = platoon:GetPlatoonUnits()
+        IssueClearCommands(mergedPlatoonUnits)
     end
     return bMergedPlatoons
 end
