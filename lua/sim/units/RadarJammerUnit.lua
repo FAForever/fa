@@ -1,5 +1,6 @@
 
 local StructureUnit = import("/lua/sim/units/structureunit.lua").StructureUnit
+local EffectUtil = import("/lua/effectutilities.lua")
 
 ---@class RadarJammerUnit : StructureUnit
 RadarJammerUnit = ClassUnit(StructureUnit) {
