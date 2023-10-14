@@ -1202,7 +1202,10 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
         ---@param self DefaultProjectileWeapon
         Main = function(self)
             local unit = self.unit
-            unit:SetBusy(true)
+
+            if not IsDestroyed(unit) then
+                unit:SetBusy(true)
+            end
 
             local bp = self.Blueprint
             WaitSeconds(bp.WeaponRepackTimeout)
