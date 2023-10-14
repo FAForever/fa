@@ -74,7 +74,7 @@ XSL0305 = ClassUnit(SLandUnit) {
             self.Trash:Add(ForkThread(function()
                 self.isChangingMoveMode = true
                 WaitSeconds(delaySeconds)
-                switchToMode(mode)
+                switchToMode(self.isSniperFiringMode)
                 self.isChangingMoveMode = nil
                 end))
         end
@@ -84,6 +84,7 @@ XSL0305 = ClassUnit(SLandUnit) {
     ---@param mode boolean
     SetSniperMode = function(self, mode)
         local label
+        self.isSniperFiringMode = mode
         if mode then
             label = "SniperGun"
         else
