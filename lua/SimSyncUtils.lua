@@ -1,3 +1,4 @@
+
 ---@param data SimCameraEvent
 function SyncCameraRequest(data)
     local Sync = Sync
@@ -5,8 +6,6 @@ function SyncCameraRequest(data)
     table.insert(Sync.CameraRequests, data)
 end
 
----comment
----@param data any
 function SyncVoice(data)
     local Sync = Sync
     Sync.Voice = Sync.Voice or { }
@@ -35,4 +34,53 @@ function SyncQueryResult(data)
     local Sync = Sync
     Sync.QueryResults = Sync.QueryResults or { }
     table.insert(Sync.QueryResults, data)
+end
+
+--- Sends 
+---@param message UIMessage
+function SyncUIChatMessage(message)
+    local recipient = message.To
+    if recipient =='All' then
+        Sync.ReceiveChatMessage = Sync.ReceiveChatMessage or { }
+        table.insert(Sync.ReceiveChatMessage, message)
+        return
+    end
+
+    if recipient == 'Allies' and IsAlly(message.From, GetFocusArmy()) then
+        Sync.ReceiveChatMessage = Sync.ReceiveChatMessage or { }
+        table.insert(Sync.ReceiveChatMessage, message)
+        return
+    end
+
+    if recipient == GetFocusArmy() then
+        Sync.ReceiveChatMessage = Sync.ReceiveChatMessage or { }
+        table.insert(Sync.ReceiveChatMessage, message)
+        return
+    end
+
+    WARN(string.format("Malformed chat message: %s", reprs(message)))
+end
+
+---@param message UIMessage
+function SyncUIEventMessage(message)
+    local recipient = message.To
+    if recipient =='All' then
+        Sync.ReceiveEventMessage = Sync.ReceiveEventMessage or { }
+        table.insert(Sync.ReceiveEventMessage, message)
+        return
+    end
+
+    if recipient == 'Allies' and IsAlly(message.From, GetFocusArmy()) then
+        Sync.ReceiveEventMessage = Sync.ReceiveEventMessage or { }
+        table.insert(Sync.ReceiveEventMessage, message)
+        return
+    end
+
+    if recipient == GetFocusArmy() then
+        Sync.ReceiveEventMessage = Sync.ReceiveEventMessage or { }
+        table.insert(Sync.ReceiveEventMessage, message)
+        return
+    end
+
+    WARN(string.format("Malformed event message: %s", reprs(message)))
 end

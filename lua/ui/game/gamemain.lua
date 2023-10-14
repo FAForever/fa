@@ -32,7 +32,7 @@ local NISActive = false
 local isReplay = false
 local waitingDialog = false
 
-local sendChat = import("/lua/ui/game/chat.lua").ReceiveChatFromSim
+-- local sendChat = import("/lua/ui/game/chat.lua").ReceiveChatFromSim
 local oldData = {}
 local lastObserving
 
@@ -87,7 +87,7 @@ function SetLayout(layout)
     import("/lua/ui/game/score.lua").SetLayout()
     import("/lua/ui/game/tabs.lua").SetLayout()
     import("/lua/ui/game/controlgroups.lua").SetLayout()
-    import("/lua/ui/game/chat.lua").SetLayout()
+    -- import("/lua/ui/game/chat.lua").SetLayout()
     import("/lua/ui/game/minimap.lua").SetLayout()
     import("/lua/ui/game/massfabs.lua").SetLayout()
     import("/lua/ui/game/recall.lua").SetLayout()
@@ -306,7 +306,7 @@ function CreateUI(isReplay)
     import("/lua/ui/game/build_templates.lua").Init()
     import("/lua/ui/game/taunt.lua").Init()
 
-    import("/lua/ui/game/chat.lua").SetupChatLayout(windowGroup)
+    -- import("/lua/ui/game/chat.lua").SetupChatLayout(windowGroup)
     import("/lua/ui/game/minimap.lua").CreateMinimap(windowGroup)
 
     if import("/lua/ui/campaign/campaignmanager.lua").campaignMode then
@@ -897,7 +897,7 @@ function NISMode(state)
         import("/lua/ui/game/consoleecho.lua").ToggleOutput(false)
         import("/lua/ui/game/multifunction.lua").PreNIS()
         import("/lua/ui/game/tooltip.lua").DestroyMouseoverDisplay()
-        import("/lua/ui/game/chat.lua").OnNISBegin()
+        -- import("/lua/ui/game/chat.lua").OnNISBegin()
         import("/lua/ui/game/unitviewdetail.lua").OnNIS()
         HideGameUI(state)
         ShowNISBars()

@@ -566,6 +566,55 @@ end
 --#endregion
 
 -------------------------------------------------------------------------------
+--#region Chat and event message functionality
+
+---@param data UIMessage
+Callbacks.DistributeChatMessage = function(data)
+    -- basic validation
+    if  (not data.From) or
+        (GetCurrentCommandSource() != data.From) or
+        (not OkayToMessWithArmy(data.From))
+    then
+        WARN(string.format("Malformed chat message: (command source: %d) %s", GetCurrentCommandSource(), reprs(data)))
+        CheatsEnabled()
+        return
+    end
+
+    -- basic validation
+    if (not data.To) then
+        WARN(string.format("Malformed chat data: (command source: %d) %s", GetCurrentCommandSource(), reprs(data)))
+        CheatsEnabled()
+        return
+    end
+
+    import('/lua/SimSyncUtils.lua').SyncUIChatMessage(data)
+end
+
+---@param data UIMessage
+Callbacks.DistributeEventMessage = function(data)
+    -- basic validation
+    if  (not data.From) or
+        (GetCurrentCommandSource() != data.From) or
+        (not OkayToMessWithArmy(data.From))
+    then
+        WARN(string.format("Malformed event message: (command source: %d) %s", GetCurrentCommandSource(), reprs(data)))
+        CheatsEnabled()
+        return
+    end
+
+    -- basic validation
+    if (not data.To) then
+        WARN(string.format("Malformed event message: (command source: %d) %s", GetCurrentCommandSource(), reprs(data)))
+        CheatsEnabled()
+        return
+    end
+
+    import('/lua/SimSyncUtils.lua').SyncUIEventMessage(data)
+end
+
+--@endregion
+
+-------------------------------------------------------------------------------
 --#region Development / debug related functionality
 
 --- An anti cheat check that passes when there is only 1 player or cheats are enabled

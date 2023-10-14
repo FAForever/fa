@@ -71,10 +71,12 @@ local ToStrings = {
 }
 
 function SetLayout()
+    LOG("Chat.lua - SetLayout")
     import(UIUtil.GetLayoutFilename('chat')).SetLayout()
 end
 
 function CreateChatBackground()
+    LOG("Chat.lua - CreateChatBackground")
     local location = {Top = function() return GetFrame(0).Bottom() - LayoutHelpers.ScaleNumber(393) end,
         Left = function() return GetFrame(0).Left() + LayoutHelpers.ScaleNumber(8) end,
         Right = function() return GetFrame(0).Left() + LayoutHelpers.ScaleNumber(430) end,
@@ -105,6 +107,7 @@ function CreateChatBackground()
             if event.Type == 'MouseEnter' then
                 if controlMap[controlID] then
                     for _, control in controlMap[controlID] do
+                        reprsl(control)
                         control:SetTexture(control.textures.over)
                     end
                 end
@@ -175,6 +178,7 @@ function CreateChatBackground()
 end
 
 function CreateChatLines()
+    LOG("Chat.lua - CreateChatLines")
     local function CreateChatLine()
         local line = Group(GUI.chatContainer)
 
@@ -290,10 +294,12 @@ function CreateChatLines()
 end
 
 function OnNISBegin()
+    LOG("Chat.lua - OnNISBegin")
     CloseChat()
 end
 
 function SetupChatScroll()
+    LOG("Chat.lua - SetupChatScroll")
     GUI.chatContainer.top = 1
     GUI.chatContainer.scroll = UIUtil.CreateVertScrollbarFor(GUI.chatContainer)
 
@@ -507,6 +513,7 @@ function SetupChatScroll()
 end
 
 function FindClients(id)
+    LOG("Chat.lua - FindClients")
     local t = GetArmiesTable()
     local focus = t.focusArmy
     local result = {}
@@ -562,6 +569,7 @@ end
 
 local RunChatCommand = import("/lua/ui/notify/commands.lua").RunChatCommand
 function CreateChatEdit()
+    LOG("Chat.lua - CreateChatEdit")
     local parent = GUI.bg:GetClientGroup()
     local group = Group(parent)
 
@@ -925,14 +933,17 @@ function ToggleChat()
 end
 
 function ActivateChat(modifiers)
-    if type(ChatTo()) ~= 'number' then
-        if (not modifiers.Shift) == (ChatOptions['send_type'] or false) then
-            ChatTo:Set('allies')
-        else
-            ChatTo:Set('all')
-        end
-    end
-    ToggleChat()
+
+    import("/lua/ui/game/chat/chat.lua").ToggleWindow()
+
+    -- if type(ChatTo()) ~= 'number' then
+    --     if (not modifiers.Shift) == (ChatOptions['send_type'] or false) then
+    --         ChatTo:Set('allies')
+    --     else
+    --         ChatTo:Set('all')
+    --     end
+    -- end
+    -- ToggleChat()
 end
 
 ---------------------
