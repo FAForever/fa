@@ -164,8 +164,18 @@ Cycle = function()
         -- a bit of a hack to retrieve the faction prefix
         local prefix = selectedUnits[1]:GetBlueprint().BlueprintId:sub(1, 2)
 
-        local massDeposits = TableGetn(GetDepositsAroundPoint(position[1], position[3], 1.5, 1))
-        local hydroDeposits = TableGetn(GetDepositsAroundPoint(position[1], position[3], 3.0, 2))
+        -- deposit scan radius depending on zoom level to make it easier to place extractors while zoomed out
+        local radius = 2
+        local camera = GetCamera('WorldCamera')
+        if camera then
+            local zoom = camera:GetZoom()
+            if zoom > 200 then
+                radius = radius * zoom * 0.005
+            end
+        end
+
+        local massDeposits = TableGetn(GetDepositsAroundPoint(position[1], position[3], radius, 1))
+        local hydroDeposits = TableGetn(GetDepositsAroundPoint(position[1], position[3], 2 * radius, 2))
         local noDeposits = (massDeposits == 0) and (hydroDeposits == 0)
         local onLand = elevation + 0.1 >= position[2]
 
