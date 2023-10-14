@@ -52,7 +52,6 @@ XSL0305 = ClassUnit(SLandUnit) {
     ---@param mode boolean
     ScheduleMovementChange = function(self, delaySeconds, mode)
         if self.isSniperMoveMode == mode then return end
-        LOG("sniper move mode " .. tostring(self.isSniperMoveMode) .. "   changing mode " .. tostring(self.isChangingMoveMode))
         local switchToMode = function(mode)
             local speedMult = self.Blueprint.Physics.LandSpeedMultiplier or 1 -- left for compatability
             self.isSniperMoveMode = mode
