@@ -175,7 +175,7 @@ Cycle = function()
         end
 
         local massDeposits = TableGetn(GetDepositsAroundPoint(position[1], position[3], radius, 1))
-        local hydroDeposits = TableGetn(GetDepositsAroundPoint(position[1], position[3], 2 * radius, 2))
+        local hydroDeposits = TableGetn(GetDepositsAroundPoint(position[1], position[3], 2 + radius, 2))
         local noDeposits = (massDeposits == 0) and (hydroDeposits == 0)
         local onLand = elevation + 0.1 >= position[2]
 
