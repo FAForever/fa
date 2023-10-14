@@ -355,8 +355,6 @@ TMissileProjectile = ClassProjectile(SingleBeamProjectile, TacticalMissileCompon
     ---@param targetEntity Prop|Unit
     OnImpact = function(self, targetType, targetEntity)
         SingleBeamProjectile.OnImpact(self, targetType, targetEntity)
-
-        LOG(targetType)
         if targetType == 'None' or targetType == 'Air' then
             self:CreateDebris()
         end
