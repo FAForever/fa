@@ -422,9 +422,9 @@ function CreateSkirmishScreen(victory, showCampaign, operationVictoryTable)
 
     -- No way to set ambient sound volumes, so let's at least turn it off if music is off.
     if (GetVolume("Music") > 0) then
-    local ambientSounds = PlaySound(Sound({Cue = "AMB_SER_OP_Briefing", Bank = "AmbientTest",}))
-    dialog.OnDestroy = function(self)
-        StopSound(ambientSounds)
+        local ambientSounds = PlaySound(Sound({Cue = "AMB_SER_OP_Briefing", Bank = "AmbientTest",}))
+        dialog.OnDestroy = function(self)
+            StopSound(ambientSounds)
         end
     end
 
