@@ -378,7 +378,7 @@ local function OnGuardCopy(guardees, unit)
         EntityCategoryContains(categories.ENGINEER, unit)
     then
         if IsKeyDown('Control') then
-            SimCallback({ Func = 'CopyOrders', Args = { Target = unit:GetEntityId(), ClearCommands = false } }, true)
+            SimCallback({ Func = 'CopyOrders', Args = { Target = unit:GetEntityId(), ClearCommands = true } }, true)
         end
     end
 end
