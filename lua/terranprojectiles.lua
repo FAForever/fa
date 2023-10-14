@@ -329,7 +329,9 @@ TMissileProjectile = ClassProjectile(SingleBeamProjectile, TacticalMissileCompon
     FinalBoostAngleRange = 5,
 
     DebrisBlueprints = {
-        '/effects/entities/DebrisMisc04/DebrisMisc04_proj.bp'
+        '/effects/Entities/TacticalDebris01/TacticalDebris01_proj.bp',
+        '/effects/Entities/TacticalDebris01/TacticalDebris01_proj.bp',
+        '/effects/Entities/TacticalDebris02/TacticalDebris02_proj.bp',
     },
 
     OnCreate = function(self)
@@ -354,7 +356,8 @@ TMissileProjectile = ClassProjectile(SingleBeamProjectile, TacticalMissileCompon
     OnImpact = function(self, targetType, targetEntity)
         SingleBeamProjectile.OnImpact(self, targetType, targetEntity)
 
-        if targetType == 'None' then
+        LOG(targetType)
+        if targetType == 'None' or targetType == 'Air' then
             self:CreateDebris()
         end
 
