@@ -135,7 +135,6 @@ local function ValidateTemplate(template, buildableUnits, prefix)
         local isSupportFactory = templateUnit[1]:sub(1, 1) == 'z'
         if isSupportFactory then
             templateUnitBlueprintId = 'z' .. prefix:sub(2, 2) .. templateUnit[1]:sub(3)
-            WARN(templateUnitBlueprintId)
         end
 
         -- same here but then for units that are part of the Forged Alliance expansion; they
@@ -143,7 +142,6 @@ local function ValidateTemplate(template, buildableUnits, prefix)
         local isExpansion = templateUnit[1]:sub(1, 1) == 'x' and templateUnit[1]:sub(1, 2) ~= 'xs'
         if isExpansion then
             templateUnitBlueprintId = 'x' .. prefix:sub(2, 2) .. templateUnit[1]:sub(3)
-            SPEW(templateUnitBlueprintId)
         end
 
         -- proceed as usual
