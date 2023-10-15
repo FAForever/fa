@@ -652,6 +652,12 @@ Tooltips = {
         title = "<LOC ASSIST_TO_UNPAUSE_TITLE>Assist to Unpause",
         description = "<LOC ASSIST_TO_UNPAUSE_DESCRIPTION>When enabled structures automatically unpause as engineers start assisting it.",
     },
+
+    options_assist_to_copy_command_queue = {
+        title = "<LOC ASSIST_TO_UNPAUSE_TITLE>Assist to copy command queue",
+        description = "<LOC ASSIST_TO_UNPAUSE_DESCRIPTION>When enabled, engineers in the selection will try to copy the command queue of the engineer you issue an assist order for. \r\n\r\nRequires you to hold 'Control'",
+    },
+
     options_mp_taunt_head = {
         title = "<LOC OPTIONS_0119>MP Taunt Head",
         description = "<LOC OPTIONS_0120>Select which 3D head is displayed when taunts are used in multiplayer",

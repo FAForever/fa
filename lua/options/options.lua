@@ -510,6 +510,20 @@ options = {
             },
 
             {
+                title = "<LOC ASSIST_TO_COPY_COMMAND_QUEUE>Assist to copy command queue",
+                key = 'assist_to_copy_command_queue',
+                type = 'toggle',
+                default = 'Off',
+                custom = {
+                    states = {
+                        { text = "<LOC _Off>Off", key = 'Off' },
+                        { text = "<LOC _ASSIST_TO_COPY_ENGINEERS>Only engineers",
+                            key = 'OnlyEngineers' },
+                    },
+                },
+            },
+
+            {
                 title = "<LOC OPTIONS_0287>Factories Default to Repeat Build",
                 key = 'repeatbuild',
                 type = 'toggle',
