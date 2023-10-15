@@ -252,6 +252,25 @@ GenericDebrisTrails01 = {
     EmtBpPath .. 'destruction_explosion_debris_trail_01_emit.bp',
 }
 
+TacticalDebrisTrails01 = {
+    EmtBpPath .. 'tactical_debris_smoke_01_emit.bp',
+    EmtBpPath .. 'tactical_debris_smoke_02_emit.bp',
+    EmtBpPath .. 'tactical_debris_trail_01_emit.bp',
+}
+
+TacticalDebrisTrails02 = {
+    EmtBpPath .. 'tactical_debris_fire_01_emit.bp',
+    EmtBpPath .. 'tactical_debris_distortion_01_emit.bp',
+    EmtBpPath .. 'tactical_debris_trail_01_emit.bp',
+}
+
+TacticalDebrisTrails03 = {
+    EmtBpPath .. 'tactical_debris_smoke_03_emit.bp',
+    EmtBpPath .. 'tactical_debris_smoke_04_emit.bp',
+    EmtBpPath .. 'tactical_debris_trail_01_emit.bp',
+}
+
+
 UnitHitShrapnel01 = { EmtBpPath .. 'destruction_unit_hit_shrapnel_01_emit.bp',}
 
 WaterSplash01 = {
@@ -2559,6 +2578,14 @@ TMissileHit01 = {
     EmtBpPath .. 'terran_missile_hit_02_emit.bp',
     EmtBpPath .. 'terran_missile_hit_03_emit.bp',
     EmtBpPath .. 'terran_missile_hit_04_emit.bp',
+}
+
+TMissileKilled01 = {
+    EmtBpPath .. 'terran_missile_hit_01_emit.bp',
+    EmtBpPath .. 'terran_missile_hit_02_emit.bp',
+    EmtBpPath .. 'tactical_debris_smoke_01_emit.bp',
+    -- EmtBpPath .. 'terran_missile_hit_03_emit.bp',
+    -- EmtBpPath .. 'terran_missile_hit_04_emit.bp',
 }
 
 TMissileHit02 = {

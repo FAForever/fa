@@ -86,6 +86,10 @@ end
 --but before any armies are created.
 function SetupSession()
 
+    ScenarioInfo.pathcap_land = 20000
+    ScenarioInfo.pathcap_sea = 20000
+    ScenarioInfo.pathcap_both = 20000
+
     import("/lua/ai/gridreclaim.lua").Setup()
 
     ScenarioInfo.TriggerManager = import("/lua/triggermanager.lua").Manager
@@ -109,6 +113,8 @@ function SetupSession()
     -- LOG('SetupSession: ', repr(ScenarioInfo))
     ---@type AIBrain[]
     ArmyBrains = {}
+
+
 
     -- ScenarioInfo is a table filled in by the engine with fields from the _scenario.lua
     -- file we're using for this game. We use it to store additional global information

@@ -502,7 +502,7 @@ TreadComponent = ClassSimple {
         end
 
         while true do
-            while not self.TreadSuspend do
+            while not (self.TreadSuspend or IsDestroyed(self)) do
                 CreateSplatOnBone(self, treadOffset, treadBone, treadTexture, sizeX, sizeZ, lod, duration, army)
                 WaitTicks(interval)
             end

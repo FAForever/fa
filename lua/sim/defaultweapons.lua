@@ -884,8 +884,6 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
 
                     WaitTicks(5)
 
-                    DrawCircle(self.unit:GetPosition(), 2, 'ffffff')
-
                     self:ResetTarget()
                 else
 
@@ -1077,7 +1075,6 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
             if bp.DisableWhileReloading then
                 local reloadTime = math.floor(10 / self.Blueprint.RateOfFire) - 1
                 if reloadTime > 4 then
-                    DrawCircle(self.unit:GetPosition(), 2, 'ffffff')
                     self:SetEnabled(false)
                     WaitTicks(reloadTime)
                     self:SetEnabled(true)
@@ -1147,7 +1144,8 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
                 unit:SetBusy(true)
             end
             local hasTarget = self:WeaponHasTarget()
-            local canFire = self:CanFire()
+            local canFire = self.WeaponCanFire
+
             if hasTarget and bp.RackSalvoChargeTime > 0 and canFire then
                 ChangeState(self, self.RackSalvoChargeState)
             elseif hasTarget and canFire then
@@ -1204,7 +1202,10 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
         ---@param self DefaultProjectileWeapon
         Main = function(self)
             local unit = self.unit
-            unit:SetBusy(true)
+
+            if not IsDestroyed(unit) then
+                unit:SetBusy(true)
+            end
 
             local bp = self.Blueprint
             WaitSeconds(bp.WeaponRepackTimeout)
