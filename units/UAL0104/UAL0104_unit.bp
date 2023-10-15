@@ -146,7 +146,7 @@ UnitBlueprint{
     SelectionSizeZ = 0.55,
     SelectionThickness = 0.67,
     SizeX = 0.7,
-    SizeY = 0.7,
+    SizeY = 0.5,
     SizeZ = 1,
     StrategicIconName = "icon_land1_antiair",
     StrategicIconSortPriority = 135,

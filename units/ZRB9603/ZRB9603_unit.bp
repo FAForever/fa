@@ -1,9 +1,10 @@
 UnitBlueprint {
     AI = {
         TargetBones = {
-            'ZRB9603',
-            'B01',
-            'B06',
+            "B03",
+            "B08",
+            "B28",
+            "B14",
         },
     },
     Audio = {
@@ -61,9 +62,7 @@ UnitBlueprint {
         'SORTCONSTRUCTION',
         'SUPPORTFACTORY',
     },
-    CollisionOffsetX = 0,
     CollisionOffsetY = -1,
-    CollisionOffsetZ = 0,
     Defense = {
         AirThreatLevel = 0,
         ArmorType = 'Structure',
@@ -216,9 +215,11 @@ UnitBlueprint {
     SelectionSizeX = 2.6,
     SelectionSizeZ = 8.1,
     SelectionThickness = 0.21,
-    SizeX = 4,
-    SizeY = 3, --from 2, for beam weapons
-    SizeZ = 10,
+    CollisionOffsetX = -0.25,
+    CollisionOffsetZ = -1,
+    SizeX = 3.0,
+    SizeY = 3,
+    SizeZ = 13,
     StrategicIconName = 'icon_factory3_naval',
     StrategicIconSortPriority = 210,
     Wreckage = {

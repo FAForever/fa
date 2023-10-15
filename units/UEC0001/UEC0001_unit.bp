@@ -1,5 +1,5 @@
 UnitBlueprint {
-    Audio = {
+    Audio = { 
         AmbientMove = Sound {
             Bank = 'UEL',
             Cue = 'UEC0001_Move_Loop',

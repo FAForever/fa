@@ -1,8 +1,5 @@
 UnitBlueprint{
     Description = "<LOC xrl0302_desc>Mobile Bomb",
-    AI = {
-        TargetBones = { "torso" },
-    },
     Audio = {
         AmbientMove        = Sound { Bank = 'XRL',        Cue = 'XRL0302_Move_Loop',        LodCutoff = 'UnitMove_LodCutoff' },
         Destroyed          = Sound { Bank = 'XRL_Weapon', Cue = 'XRL0302_SelfDestructBomb', LodCutoff = 'UnitMove_LodCutoff' },
@@ -96,7 +93,7 @@ UnitBlueprint{
     Economy = {
         BuildCostEnergy = 1300,
         BuildCostMass = 190,
-        BuildTime = 700,
+        BuildTime = 550,
         TeleportEnergyMod = 0.15,
         TeleportMassMod = 1,
         TeleportTimeMod = 0.01,
@@ -165,7 +162,7 @@ UnitBlueprint{
     SelectionThickness = 0.83,
     CollisionOffsetZ = 0.05,
     SizeX = 0.5,
-    SizeY = 0.4,
+    SizeY = 0.5,
     SizeZ = 1,
     StrategicIconName = "icon_land2_bomb",
     StrategicIconSortPriority = 135,
@@ -186,6 +183,7 @@ UnitBlueprint{
                 Land = "Land|Water|Seabed",
                 Water = "Land|Water|Seabed",
             },
+            TargetCheckInterval = 1000000,
             FiringTolerance = 180,
             Label = "Suicide",
             MaxRadius = 3,
@@ -217,6 +215,7 @@ UnitBlueprint{
             IgnoreIfDisabled = true,
             Label = "DeathWeapon",
             MaxRadius = 3,
+            ManualFire = false,
             MuzzleVelocity = 0,
             ProjectileId = "/projectiles/CIFEMP01/CIFEMP01_proj.bp",
             ProjectileLifetimeUsesMultiplier = 1.15,
