@@ -93,7 +93,7 @@ UnitBlueprint{
     Economy = {
         BuildCostEnergy = 8000,
         BuildCostMass = 800,
-        BuildTime = 1195,
+        BuildTime = 1400,
         RebuildBonusIds = { "xsb2304" },
     },
     Footprint = { MinWaterDepth = 1 },

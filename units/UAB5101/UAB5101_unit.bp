@@ -1,11 +1,5 @@
 UnitBlueprint{
     Description = "<LOC uab5101_desc>Wall Section",
-    AI = {
-        TargetBones = {
-            "Wall01",
-            "Lid",
-        },
-    },
     Audio = {
         Destroyed   = Sound { Bank = 'UALDestroy', Cue = 'UAB_Destroy_Huge',      LodCutoff = 'UnitMove_LodCutoff' },
         UISelection = Sound { Bank = 'Interface',  Cue = 'Aeon_Select_Structure', LodCutoff = 'UnitMove_LodCutoff' },
@@ -33,8 +27,8 @@ UnitBlueprint{
         AirThreatLevel = 0,
         ArmorType = "Structure",
         EconomyThreatLevel = 0,
-        Health = 2000,
-        MaxHealth = 2000,
+        Health = 500,
+        MaxHealth = 500,
         RegenRate = 0,
         SubThreatLevel = 0,
         SurfaceThreatLevel = 0,
@@ -63,9 +57,9 @@ UnitBlueprint{
         UniformScale = 0.122,
     },
     Economy = {
-        BuildCostEnergy = 10,
-        BuildCostMass = 2,
-        BuildTime = 20,
+        BuildCostEnergy = 20,
+        BuildCostMass = 3,
+        BuildTime = 15,
         RebuildBonusIds = { "uab5101" },
     },
     General = {

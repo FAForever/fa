@@ -1,8 +1,5 @@
 UnitBlueprint{
     Description = "<LOC xsl0202_desc>Assault Bot",
-    AI = {
-        TargetBones = { "Torso" },
-    },
     Audio = {
         AmbientMove = Sound { Bank = 'XSL',            Cue = 'XSL0202_Move_Loop',    LodCutoff = 'UnitMove_LodCutoff' },
         Destroyed   = Sound { Bank = 'XSL_Destroy',    Cue = 'XSL_Destroy_Land_Med', LodCutoff = 'UnitMove_LodCutoff' },
@@ -208,9 +205,9 @@ UnitBlueprint{
     SelectionSizeZ = 0.5,
     SelectionThickness = 0.7,
     CollisionOffsetZ = -0.05,
-    SizeX = 1.2,
-    SizeY = 1.1,
-    SizeZ = 1.2,
+    SizeX = 1.1,
+    SizeY = 1.2,
+    SizeZ = 1.1,
     StrategicIconName = "icon_bot2_directfire",
     StrategicIconSortPriority = 125,
     Transport = { TransportClass = 2 },

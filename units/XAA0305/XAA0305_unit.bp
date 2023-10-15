@@ -220,7 +220,7 @@ UnitBlueprint{
             MaxRadius = 25,
             MuzzleSalvoDelay = 0.2,
             MuzzleSalvoSize = 4,
-            MuzzleVelocity = 40,
+            MuzzleVelocity = 35,
             ProjectileId = "/projectiles/ADFQuadLaserLight01/ADFQuadLaserLight01_proj.bp",
             ProjectileLifetimeUsesMultiplier = 1.15,
             ProjectilesPerOnFire = 4,

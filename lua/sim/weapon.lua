@@ -47,7 +47,7 @@ end
 
 local WeaponMethods = moho.weapon_methods
 
----@class Weapon : moho.weapon_methods
+---@class Weapon : moho.weapon_methods, InternalObject
 ---@field AimControl? moho.AimManipulator
 ---@field AimLeft? moho.AimManipulator
 ---@field AimRight? moho.AimManipulator
@@ -455,7 +455,10 @@ Weapon = ClassWeapon(WeaponMethods) {
     CreateProjectileForWeapon = function(self, bone)
         local proj = self:CreateProjectile(bone)
 
-        -- store the original target, can be nil if ground firing
+        -- used for the retargeting feature
+        proj.CreatedByWeapon = self
+
+        -- used for tactical / strategic defenses to ignore all other collisions
         proj.OriginalTarget = self:GetCurrentTarget()
         if proj.OriginalTarget.GetSource then
             proj.OriginalTarget = proj.OriginalTarget:GetSource()

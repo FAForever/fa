@@ -2,11 +2,6 @@ UnitBlueprint{
     Description = "<LOC ura0204_desc>Torpedo Bomber",
     AI = {
         GuardReturnRadius = 125,
-        TargetBones = {
-            "UEA0204",
-            "Wing_R02",
-            "Wing_L02",
-        },
     },
     Air = {
         AutoLandTime = 1,

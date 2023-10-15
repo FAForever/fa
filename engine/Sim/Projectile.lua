@@ -113,7 +113,7 @@ function Projectile:SetMaxSpeed(speed)
 end
 
 ---
----@param object Entity | Unit | Projectile
+---@param object Blip | Entity | Unit | Projectile
 function Projectile:SetNewTarget(object)
 end
 

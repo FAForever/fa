@@ -2,9 +2,10 @@ UnitBlueprint{
     Description = "<LOC urb0203_desc>Naval Factory HQ",
     AI = {
         TargetBones = {
-            "URB0203",
+            "B03", 
             "B08",
-            "Right_Exhaust01",
+            "B28",
+            "B14",
         },
     },
     Audio = {
@@ -165,10 +166,10 @@ UnitBlueprint{
     SelectionThickness = 0.21,
     CollisionOffsetX = 0,
     CollisionOffsetY = -1,
-    CollisionOffsetZ = 0,
+    CollisionOffsetZ = -1,
     SizeX = 4,
     SizeY = 3,
-    SizeZ = 10,
+    SizeZ = 13,
     StrategicIconName = "icon_factoryhq2_naval",
     StrategicIconSortPriority = 215,
     Wreckage = {
