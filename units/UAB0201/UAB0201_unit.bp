@@ -4,6 +4,7 @@ UnitBlueprint{
         TargetBones = {
             "B01",
             "B02",
+            "Attachpoint"
         },
     },
     Audio = {

@@ -1,11 +1,5 @@
 UnitBlueprint{
     Description = "<LOC drl0204_desc>Rocket Bot",
-    AI = {
-        TargetBones = {
-            "Torso",
-            "Turret_Barrel",
-        },
-    },
     Audio = {
         AmbientMove = Sound { Bank = 'URL',        Cue = 'URL0107_Move_Loop',  LodCutoff = 'UnitMove_LodCutoff' },
         Destroyed   = Sound { Bank = 'URLDestroy', Cue = 'URL_Destroy_Land',   LodCutoff = 'UnitMove_LodCutoff' },
@@ -183,8 +177,8 @@ UnitBlueprint{
     SelectionSizeX = 0.75,
     SelectionSizeZ = 0.85,
     SelectionThickness = 0.5,
-    SizeX = 0.45,
-    SizeY = 0.8,
+    SizeX = 0.6,
+    SizeY = 1.0,
     SizeZ = 0.9,
     StrategicIconName = "icon_bot2_directfire",
     StrategicIconSortPriority = 135,

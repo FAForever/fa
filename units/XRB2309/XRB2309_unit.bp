@@ -1,8 +1,5 @@
 UnitBlueprint{
     Description = "<LOC xrb2308_desc>Torpedo Ambushing System",
-    AI = {
-        TargetBones = { "Turret_Barrel" },
-    },
     Audio = {
         DeathExplosion = Sound { Bank = 'URLDestroy', Cue = 'URB_Destroy_Lrg_PreDestroy', LodCutoff = 'UnitMove_LodCutoff' },
         Deploy         = Sound { Bank = 'XRB',        Cue = 'XRB2308_Activate',           LodCutoff = 'UnitMove_LodCutoff' },
