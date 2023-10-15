@@ -20,7 +20,7 @@ UnitBlueprint{
         KTurn = 1,
         KTurnDamping = 1.5,
         LiftFactor = 10,
-        MaxAirspeed = 15,
+        MaxAirspeed = 14.25,
         MinAirspeed = 10,
         PredictAheadForBombDrop = 4,
         StartTurnDistance = 5,
