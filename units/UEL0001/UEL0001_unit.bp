@@ -460,7 +460,7 @@ UnitBlueprint{
             Name = "<LOC enhancements_0050>Shield Generator Field",
             ShieldEnergyDrainRechargeTime = 5,
             ShieldEnhancementNumber = 5,
-            ShieldMaxHealth = 9000,
+            ShieldMaxHealth = 11000,
             ShieldRechargeTime = 90,
             ShieldRegenRate = 60,
             ShieldRegenStartTime = 1,
