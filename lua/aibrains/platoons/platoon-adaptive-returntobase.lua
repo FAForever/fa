@@ -138,7 +138,7 @@ AIPlatoonAdaptiveReturnToBaseBehavior = Class(AIPlatoon) {
                 end
 
                 -- generate a direction
-                local waypoint, length = NavUtils.DirectionTo('Land', origin, destination, 30)
+                local waypoint, length = NavUtils.DirectionTo('Land', origin, destination, 60)
 
                 -- something odd happened: no direction found
                 if not waypoint then

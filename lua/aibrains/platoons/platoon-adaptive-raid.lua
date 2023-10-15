@@ -13,7 +13,7 @@ local TableGetn = table.getn
 local TableEmpty = table.empty
 
 -- constants
-local NavigateDistanceThresholdSquared = 20 * 20
+local NavigateDistanceThresholdSquared = 25 * 25
 
 ---@class AIPlatoonAdaptiveRaidBehavior : AIPlatoon
 ---@field RetreatCount number 
@@ -252,12 +252,17 @@ AIPlatoonAdaptiveRaidBehavior = Class(AIPlatoon) {
                 local wx = waypoint[1]
                 local wz = waypoint[3]
                 while not IsDestroyed(self) do
-                    local position = self:GetPlatoonPosition()
+                    local platUnits = self:GetPlatoonUnits()
+                    local position
+                    for _, v in platUnits do
+                        position = v:GetPosition()
+                        break
+                    end
 
                     -- check if we're near our current waypoint
-                    local dx = position[1] - wx
-                    local dz = position[3] - wz
-                    if dx * dx + dz * dz < NavigateDistanceThresholdSquared then
+                    local nx = position[1] - wx
+                    local nz = position[3] - wz
+                    if nx * nx + nz * nz < NavigateDistanceThresholdSquared then
                         break
                     end
 

@@ -224,7 +224,7 @@ AIPlatoonAdaptiveReclaimBehavior = Class(AIPlatoon) {
                 local origin = eng:GetPosition()
 
                 -- generate a direction
-                local waypoint, length = NavUtils.DirectionTo(self.MovementLayer, origin, destination, 50)
+                local waypoint, length = NavUtils.DirectionTo(self.MovementLayer, origin, destination, 60)
 
                 -- something odd happened: no direction found
                 if not waypoint then

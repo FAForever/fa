@@ -13,7 +13,7 @@ local TableGetn = table.getn
 local TableEmpty = table.empty
 
 -- constants
-local NavigateDistanceThresholdSquared = 20 * 20
+local NavigateDistanceThresholdSquared = 35 * 35
 
 ---@class AIPlatoonAdaptiveAttackBehavior : AIPlatoon
 ---@field RetreatCount number 
@@ -144,19 +144,25 @@ AIPlatoonAdaptiveAttackBehavior = Class(AIPlatoon) {
                 self:ChangeState(self.Transporting)
                 return
             end
-
+            local count = 0
             while not IsDestroyed(self) do
                 -- pick random unit for a position on the grid
                 local units = self:GetPlatoonUnits()
                 local origin
                 for _, v in units do
-                    if v and not v.Dead then
-                        origin = v:GetPosition()
-                    end
+                    origin = v:GetPosition()
+                    break
                 end
 
                 -- generate a direction
-                local waypoint, length = NavUtils.DirectionTo('Land', origin, destination, 30)
+                local waypoint, length = NavUtils.DirectionTo('Land', origin, destination, 60)
+                LOG('Attack Destination distnace '..VDist3(origin,destination))
+                if waypoint then
+                    LOG('Waypoint Distance '..VDist3(origin,waypoint))
+                end
+                LOG("DirectionTo")
+                count = count + 1
+                DrawCircle(origin, math.sqrt(count), 'ffffff')
 
                 -- something odd happened: no direction found
                 if not waypoint then
@@ -167,7 +173,10 @@ AIPlatoonAdaptiveAttackBehavior = Class(AIPlatoon) {
                 end
 
                 -- we're near the destination, better start attacking it!
-                if waypoint == destination then
+                local dx = origin[1] - destination[1]
+                local dz = origin[3] - destination[3]
+                if waypoint == destination or (dx * dx + dz * dz < NavigateDistanceThresholdSquared) then
+                    self:LogDebug(string.format('waypoint == destination'))
                     self:ChangeState(self.AttackingTarget)
                     return
                 end
@@ -183,12 +192,19 @@ AIPlatoonAdaptiveAttackBehavior = Class(AIPlatoon) {
                 local wx = waypoint[1]
                 local wz = waypoint[3]
                 while not IsDestroyed(self) do
-                    local position = self:GetPlatoonPosition()
+                    local platUnits = self:GetPlatoonUnits()
+                    local position
+                    for _, v in platUnits do
+                        position = v:GetPosition()
+                        break
+                    end
 
                     -- check if we're near our current waypoint
-                    local dx = position[1] - wx
-                    local dz = position[3] - wz
-                    if dx * dx + dz * dz < NavigateDistanceThresholdSquared then
+                    local nx = position[1] - wx
+                    local nz = position[3] - wz
+                    if nx * nx + nz * nz < NavigateDistanceThresholdSquared then
+                        LOG('Navigation ThreashHold met distance '..(nx * nx + nz * nz)..' threshhold '..NavigateDistanceThresholdSquared)
+                        self:LogDebug(string.format('NavigateDistanceThresholdSquared reached'))
                         break
                     end
 
@@ -224,6 +240,7 @@ AIPlatoonAdaptiveAttackBehavior = Class(AIPlatoon) {
                                 local threat = brain:GetThreatAtPosition(cache, 0, true, 'AntiSurface')
                                 if threat == 0 then
                                     self.OpportunityToRaid = { info[1], GetSurfaceHeight(info[1], info[2]), info[2] }
+                                    self:LogDebug(string.format('RaidingOpportunity'))
                                     self:ChangeState(self.RaidingOpportunity)
                                     return
                                 end

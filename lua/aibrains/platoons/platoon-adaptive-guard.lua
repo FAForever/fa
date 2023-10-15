@@ -13,7 +13,7 @@ local TableGetn = table.getn
 local TableEmpty = table.empty
 
 -- constants
-local NavigateDistanceThresholdSquared = 20 * 20
+local NavigateDistanceThresholdSquared = 25 * 25
 
 ---@class AIPlatoonAdaptiveGuardBehavior : AIPlatoon
 ---@field RetreatCount number 
@@ -224,7 +224,7 @@ AIPlatoonAdaptiveGuardBehavior = Class(AIPlatoon) {
                 end
 
                 -- generate a direction
-                local waypoint, length = NavUtils.DirectionTo('Land', origin, destination, 30)
+                local waypoint, length = NavUtils.DirectionTo('Land', origin, destination, 60)
 
                 -- something odd happened: no direction found
                 if not waypoint then
