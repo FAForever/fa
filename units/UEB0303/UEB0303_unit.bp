@@ -2,10 +2,11 @@ UnitBlueprint{
     Description = "<LOC ueb0303_desc>Naval Factory HQ",
     AI = {
         TargetBones = {
-            "UEB0303",
-            "Dock_Cover",
-            "Dock",
-            "Center_Deck_Support",
+            "B09",
+            "B10",
+            "B11",
+            "B12",
+            "B13",
         },
     },
     Audio = {

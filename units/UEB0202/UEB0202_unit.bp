@@ -5,7 +5,6 @@ UnitBlueprint{
             "Target01",
             "Target02",
             "Target03",
-            "UEB0202",
         },
     },
     Audio = {
@@ -85,7 +84,7 @@ UnitBlueprint{
         BuildCostEnergy = 18000,
         BuildCostMass = 920,
         BuildRate = 40,
-        BuildTime = 2000,
+        BuildTime = 2300,
         BuildableCategory = {
             "BUILTBYTIER2FACTORY UEF MOBILE CONSTRUCTION",
             "BUILTBYTIER2FACTORY UEF STRUCTURE AIR",

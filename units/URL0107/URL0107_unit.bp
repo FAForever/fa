@@ -1,8 +1,5 @@
-UnitBlueprint{
+ UnitBlueprint{
     Description = "<LOC url0107_desc>Assault Bot",
-    AI = {
-        TargetBones = { "Torso" },
-    },
     Audio = {
         AmbientMove   = Sound { Bank = 'URL',        Cue = 'URL0107_Move_Loop',       LodCutoff = 'UnitMove_LodCutoff' },
         Construct     = Sound { Bank = 'URL',        Cue = 'URL0208_Construct_Start', LodCutoff = 'UnitMove_LodCutoff' },
@@ -159,7 +156,6 @@ UnitBlueprint{
     SelectionSizeX = 0.55,
     SelectionSizeZ = 0.6,
     SelectionThickness = 0.7,
-    CollisionOffsetY = 0.15,
     SizeX = 0.7,
     SizeY = 0.7,
     SizeZ = 0.9,

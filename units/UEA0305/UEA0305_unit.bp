@@ -310,7 +310,7 @@ UnitBlueprint {
             MaxRadius = 25,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
-            MuzzleVelocity = 40,
+            MuzzleVelocity = 35,
             ProjectileId = "/projectiles/TDFPlasmaHeavy02/TDFPlasmaHeavy02_proj.bp",
             ProjectileLifetimeUsesMultiplier = 1.15,
             RackBones = {

@@ -1,8 +1,5 @@
 UnitBlueprint{
     Description = "<LOC xsl0103_desc>Mobile Light Artillery",
-    AI = {
-        TargetBones = { "AttachPoint" },
-    },
     Audio = {
         AmbientMove = Sound { Bank = 'XSL',            Cue = 'XSL0103_Move_Loop',       LodCutoff = 'UnitMove_LodCutoff' },
         Destroyed   = Sound { Bank = 'XSL_Destroy',    Cue = 'XSL_Destroy_Land_Sml',    LodCutoff = 'UnitMove_LodCutoff' },
@@ -185,8 +182,8 @@ UnitBlueprint{
     SelectionSizeX = 0.35,
     SelectionSizeZ = 0.5,
     SelectionThickness = 0.75,
-    SizeX = 0.65,
-    SizeY = 0.4,
+    SizeX = 0.7,
+    SizeY = 0.5,
     SizeZ = 0.9,
     StrategicIconName = "icon_land1_artillery",
     StrategicIconSortPriority = 135,
