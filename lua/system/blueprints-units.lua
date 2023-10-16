@@ -629,7 +629,7 @@ end
 
 function PostProcessStatToggles(allBlueprints, units)
 
-    -- unit.General.StatToggles are toggles we expect to be modified by the player through the UI
+    -- unit.General.StatToggles are toggles we expect to be modified by the player through the UI via SetStatByCallback
     -- All other toggles (such as unit.General.OnStopBeingBuiltStatToggles) are toggles that live
     -- only in the blueprint so they can be checked under certain conditions (like the unit being built)
 
@@ -720,9 +720,10 @@ function PostProcessStatToggles(allBlueprints, units)
                     stat = stat,
                     defaultOrder = toggleCap,
                     override = override,
-                    default = defaultValues[stat],
+                    defaultValue = defaultValues[stat],
+                    scriptBitName = toggleCap,
                 }
-                unit.General.OnStopBeingBuiltStatToggles[stat] = {scriptBit = toggleCap}
+                unit.General.OnStopBeingBuiltStatToggles[stat] = true
                 toggleUnits[unit] = true
             end
         end
@@ -734,8 +735,8 @@ function PostProcessStatToggles(allBlueprints, units)
     -- sort the sub arrays and convert them to a single hash table
     -- keep our index for sorting, and bitmap Id for later display
     i = 0
-    for _, toggleCap in scriptBitToggles do
-        local stats = {}--table.unhash(scriptBitTogglesHash[toggleCap].stats)
+    for scriptBitNumber, toggleCap in scriptBitToggles do
+        local stats = {}
         for stat, statData in scriptBitTogglesHash[toggleCap].stats do
             if not removeToggles[stat] then
                 table.insert(stats, statData)
@@ -745,6 +746,7 @@ function PostProcessStatToggles(allBlueprints, units)
         for _, statData in ipairs(stats) do
             i = i + 1
             statData.index = i
+            statData.scriptBitNumber = scriptBitNumber - 1
             statToggles[statData.stat] = statData
         end
     end
