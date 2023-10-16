@@ -1184,24 +1184,23 @@ AutoDeployBehavior = function(self, modifiers)
     if modifiers.Left then
         StandardOrderBehavior(self, modifiers)
     elseif modifiers.Right then
-        ScriptButtonOrderBehavior(self, modifiers, self.toggle)
-        self.toggle = not self.toggle
-        if self.toggle then
-            self.toggleIcon:SetAlpha(1)
+        self._toggleState = StatToggleOrderBehavior(self, modifiers, self._toggleState)
+        if self._toggleState then
+            self._toggleIcon:SetAlpha(1)
         else
-            self.toggleIcon:SetAlpha(0)
+            self._toggleIcon:SetAlpha(0)
         end
     end
 end
 
 AutoDeployInit = function(self, selection)
     self._order = 'RULEUCC_Transport'
-    self.toggleIcon = Bitmap(self, UIUtil.UIFile('/game/orders/ring-yellow_mod.dds'))
-    LayoutHelpers.AtCenterIn(self.toggleIcon, self)
+    self._toggleIcon = Bitmap(self, UIUtil.UIFile('/game/orders/ring-yellow_mod.dds'))
+    LayoutHelpers.AtCenterIn(self._toggleIcon, self)
     local mixed
-    self.toggle, mixed = ScriptButtonInitFunction(self, selection, true)
-    if mixed or not self.toggle then
-        self.toggleIcon:SetAlpha(0)
+    self._toggleState, mixed = StatToggleInitFunction(self, selection, true)
+    if mixed or not self._toggleState then
+        self._toggleIcon:SetAlpha(0)
     end
 end
 

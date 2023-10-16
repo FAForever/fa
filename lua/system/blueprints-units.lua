@@ -600,16 +600,15 @@ function PostProcessUnitWithExternalFactory(allBlueprints, unit)
                 helpText = 'auto_deploy',
                 behavior = 'AutoDeployBehavior',
                 initialStateFunc = 'AutoDeployInit',
-                extraInfo = 1,
+                statToggle = 'AutoDeploy',
             }
 
             -- add the toggle so it can be flipped to begin with
             -- but add an order override to remove it from our orders table
-            if not unit.General.ToggleCaps then
-                unit.General.ToggleCaps = {}
+            if not unit.General.StatToggles then
+                unit.General.StatToggles = {}
             end
-            unit.General.ToggleCaps.RULEUTC_WeaponToggle = true
-            unit.General.OrderOverrides.RULEUTC_WeaponToggle = false
+            unit.General.StatToggles.AutoDeploy = true
         end
 
         -- don't remove any properties of the seed unit, we want the build rate to display properly
