@@ -760,7 +760,10 @@ function PostProcessStatToggles(allBlueprints, units)
                         unit.General.StatToggles = {}
                     end
                     for stat, _ in toggleUnit.General.OnStopBeingBuiltStatToggles do
-                        unit.General.StatToggles[stat] = statToggles[stat]
+                        if statToggles[stat] then
+                            unit.General.StatToggles[stat] = statToggles[stat]
+                            unit.General.StatToggles[stat].onStopBuild = true
+                        end
                     end
                 end
             end

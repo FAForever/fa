@@ -1569,7 +1569,10 @@ function OnBuildTogglePreCheck(availableOrders, units, assistingUnitList)
 
         -- find the build toggles they have in common
         
-        for stat, _ in availableBuildToggles do
+        for stat, toggleData in availableBuildToggles do
+            if not toggleData.onStopBuild then
+                availableBuildToggles[stat] = nil
+            end
             for bp, _ in bps do
                 if not bp.General.StatToggles[stat] then
                     availableBuildToggles[stat] = nil
