@@ -77,7 +77,7 @@ UAS0303 = ClassUnit(AircraftCarrier, ExternalFactoryComponent) {
             unitBuilding:DetachFrom(true)
             self:DetachAll(self.BuildAttachBone)
 
-            if not self:TransportHasAvailableStorage() or self:GetScriptBit('RULEUTC_WeaponToggle') then
+            if not self:TransportHasAvailableStorage() or self:GetStat('AutoDeploy', 0).Value == 1 then
                 unitBuilding:ShowBone(0, true)
                 local worldPos = self:CalculateWorldPositionFromRelative({20, 0, 0})
                 IssueToUnitMove(unitBeingBuilt, worldPos)
