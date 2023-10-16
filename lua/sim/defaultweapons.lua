@@ -772,15 +772,16 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
         end,
 
         OnFire = function(self)
+
             local bp = self.Blueprint
-            if bp.WeaponUnpacks then
+            if bp.WeaponUnpacks and self.WeaponPackState ~= 'Unpacked' then
                 ChangeState(self, self.WeaponUnpackingState)
             else
                 if bp.RackSalvoChargeTime and bp.RackSalvoChargeTime > 0 then
                     ChangeState(self, self.RackSalvoChargeState)
 
                     -- SkipReadyState used for Janus and Corsair
-                elseif bp.SkipReadyState and bp.SkipReadyState then
+                elseif bp.SkipReadyState then
                     ChangeState(self, self.RackSalvoFiringState)
                 else
                     ChangeState(self, self.RackSalvoFireReadyState)
@@ -1140,11 +1141,8 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
 
             self:WaitForAndDestroyManips()
 
-            if notExclusive then
-                unit:SetBusy(true)
-            end
             local hasTarget = self:WeaponHasTarget()
-            local canFire = self.WeaponCanFire
+            local canFire = self:CanFire()
 
             if hasTarget and bp.RackSalvoChargeTime > 0 and canFire then
                 ChangeState(self, self.RackSalvoChargeState)
