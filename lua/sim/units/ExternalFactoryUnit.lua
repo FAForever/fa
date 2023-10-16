@@ -85,8 +85,8 @@ ExternalFactoryUnit = ClassUnit(Unit, OnStopBuildStatToggleComponent) {
     ---@param unitBeingBuilt Unit
     OnStopBuild = function(self, unitBeingBuilt)
         Unit.OnStopBuild(self, unitBeingBuilt)
-        self.Parent:OnStopBuild(unitBeingBuilt)
         OnStopBuildStatToggleComponent.OnStopBuild(self, unitBeingBuilt)
+        self.Parent:OnStopBuild(unitBeingBuilt)
         self.UnitBeingBuilt = nil
 
         if self.UpdateParentProgressThread then

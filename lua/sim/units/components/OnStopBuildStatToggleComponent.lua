@@ -30,7 +30,7 @@ OnStopBuildStatToggleComponent = ClassSimple {
         -- These will be the default values applied to units we build
         if self.Blueprint.General.StatToggles then
             for stat, toggleData in self.Blueprint.General.StatToggles do
-                self:UpdateStat(stat, toggleData.default or 0)
+                self:UpdateStat(stat, toggleData.defaultValue or 0)
             end
         end
     end,
@@ -40,12 +40,22 @@ OnStopBuildStatToggleComponent = ClassSimple {
     OnStopBuild = function(self, unit)
         if self.Blueprint.General.StatToggles then
             if unit.Blueprint.General.OnStopBeingBuiltStatToggles then
-                for stat, toggleData in unit.Blueprint.General.OnStopBeingBuiltStatToggles do
-                    LOG(stat)
-                    LOG(repr(toggleData))
-                    if toggleData.scriptBit then
+                for stat, _ in unit.Blueprint.General.OnStopBeingBuiltStatToggles do
+                    toggleData = self.Blueprint.General.StatToggles[stat]
+                    -- Bail if we have no toggle data for this stat
+                    -- shouldn't happen, but good to check
+                    if not toggleData then
+                        continue
+                    end
+                    if toggleData.scriptBitName then
                         -- apply the script bit with our stat value
-                        unit:SetScriptBit(toggleData.scriptBit, (self:GetStat(stat, 0).Value == 1 and true) or false)
+                        local bitValue = (self:GetStat(stat, 0).Value == 1 and true) or false
+                        unit:SetScriptBit(toggleData.scriptBitName, bitValue)
+                        if not bitValue then
+                            -- because script bits default to clear (0), setting them to that state on build will
+                            -- not trigger the callback, so we need to do it manually
+                            unit:OnScriptBitClear(toggleData.scriptBitNumber)
+                        end
                     end
                 end
             end
