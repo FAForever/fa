@@ -92,6 +92,111 @@ local function MapMarkerType(type)
     return type
 end
 
+--- Adds fields used for backwards compatibility
+---@param marker MarkerData
+local function BackwardsCompatibility(marker)
+    if marker.Name then
+        marker.name = marker.Name
+    elseif marker.name then
+        marker.Name = marker.name
+    else
+        marker.name = 'Unknown'
+        marker.Name = 'Unknown'
+    end
+
+    if marker.Type then
+        marker.type = marker.Type
+    elseif marker.type then
+        marker.Type = marker.type
+    else
+        marker.Type = 'Unknown'
+        marker.type = 'Unknown'
+    end
+
+    if marker.position then
+        marker.Position = marker.position
+    elseif marker.Position then
+        marker.position = marker.Position
+    else
+        marker.position = { 0, 0, 0 }
+        marker.Position = { 0, 0, 0 }
+    end
+
+    if marker.resource then
+        marker.Resource = marker.resource
+    elseif marker.Resource then
+        marker.resource = marker.Resource
+    else
+        marker.resource = false
+        marker.Resource = false
+    end
+
+    -- properties used for debugging
+
+    if marker.Size then
+        marker.size = marker.Size
+    elseif marker.size then
+        marker.Size = marker.size
+    else
+        marker.Size = 1
+        marker.size = 1
+    end
+
+    if marker.Color then
+        marker.color = marker.Color
+    elseif marker.color then
+        marker.Color = marker.color
+    else
+        marker.color = 'ffffff'
+        marker.Color = 'ffffff'
+    end
+end
+
+---@param type MarkerType
+---@param markers MarkerData
+---@param count number  
+local function AddToMarkerCache(type, markers, count)
+
+    -- post process markers
+    for k = 1, count do
+        local marker = markers[k]
+
+        -- add fields for backwards compatibility
+        BackwardsCompatibility(marker)
+
+        -- register marker for quick lookup
+        AllMarkers[marker.Name] =  marker
+    end
+
+    -- add it to the marker cache
+    MarkerCache[type] = {
+        Count = count,
+        Markers = markers
+    }
+
+    -- easier debugging
+    SPEW("Caching " .. count .. " markers of type " .. tostring(type) .. "!")
+end
+
+---@param type MarkerType
+---@param marker MarkerData
+local function AppendTomarkerCache(type, marker)
+    if not MarkerCache[type] then
+        AddToMarkerCache(type, {marker}, 1)
+    end
+
+    -- add fields for backwards compatibility
+    BackwardsCompatibility(marker)
+
+    -- register marker for quick lookup
+    AllMarkers[marker.Name] =  marker
+
+    -- append it to the cache
+    local cache = MarkerCache[type]
+    cache.Count = cache.Count + 1
+    cache.Markers[cache.Count] = marker
+end
+
 ---@return MarkerData[]
 function GetAllMarkers()
     return AllMarkers
@@ -110,6 +215,11 @@ end
 function GetMarkersByType(type)
     type = MapMarkerType(type)
 
+    -- defensive programming
+    if not type then
+        return {} , 0
+    end
+
     -- check if it is cached and return that
     local cache = MarkerCache[type]
     if cache then
@@ -124,37 +234,34 @@ function GetMarkersByType(type)
     for k, marker in AllMarkers do
         if marker.type == type then
             -- mod support syntax
-            marker.Name = k
-            marker.Size = marker.size
-            marker.Resource = marker.resource
+            marker.Name = marker.Name or k
+            marker.Size = marker.size or 1
+            marker.Resource = marker.resource or false
             marker.Type = marker.type
             marker.Orientation = marker.orientation
             marker.Position = marker.position
-            marker.Color = marker.color
+            marker.Color = marker.color or 'ffffff'
 
             ms[n] = marker
             n = n + 1
         end
     end
 
-    -- tell us about it, for now
-    SPEW("Caching " .. n - 1 .. " markers of type " .. type .. "!")
+    -- register the markers
+    AddToMarkerCache(type, ms, n - 1)
 
-    -- construct the cache
-    cache = {
-        Count = n - 1,
-        Markers = ms
-    }
-
-    -- cache it and return it
-    MarkerCache[type] = cache
-    return cache.Markers, cache.Count
+    return ms, n - 1
 end
 
 ---@param type MarkerType
 ---@param markers any
 function OverwriteMarkerByType(type, markers)
     type = MapMarkerType(type)
+
+    -- defensive programming
+    if not type then
+        return {} , 0
+    end
 
     local ms = {}
     local n = 1
@@ -173,39 +280,8 @@ function OverwriteMarkerByType(type, markers)
         n = n + 1
     end
 
-    MarkerCache[type] = {
-        Count = n - 1,
-        Markers = ms
-    }
-
-    SPEW("Overwriting " .. n - 1 .. " markers of type " .. type .. " in cache!")
-end
-
---- Flushes the cache of a certain type. Does not remove
--- existing references.
----@param type MarkerType The type to flush.
-function FlushMarkerCacheByType(type)
-    type = MapMarkerType(type)
-
-    -- give developer a warning, you can't do this
-    if type == "Mass" or type == "Hydrocarbon" or type == "Spawn" then
-        WARN("Unable to flush resource markers from the cache - it can cause issues for adaptive maps.")
-        return
-    end
-
-    MarkerCache[type] = nil
-end
-
---- Flushes the entire marker cache. Does not remove existing references.
-function FlushMarkerCache()
-
-    -- copy over for consistency
-    local cache = {}
-    cache.Mass = MarkerCache.Mass
-    cache.Hydrocarbon = MarkerCache.Hydrocarbon
-    cache.Spawn = MarkerCache.Spawn
-
-    MarkerCache = cache
+    -- register the markers
+    AddToMarkerCache(type, ms, n - 1)
 end
 
 --- Retrieves a chain of markers. Throws an error if the chain
@@ -342,7 +418,13 @@ function ToggleDebugMarkersByType(type)
 
                         if marker.Extractors then
                             for _, neighbour in marker.Extractors do
-                                DrawLine(marker.Position, neighbour.Position, neighbour.Color or 'ffffffff')
+                                DrawLine(marker.Position, neighbour.Position, '3BFF55')
+                            end
+                        end
+
+                        if marker.HydrocarbonPlants then
+                            for _, neighbour in marker.HydrocarbonPlants do
+                                DrawLine(marker.Position, neighbour.Position, 'F2FF3B')
                             end
                         end
                     end
@@ -460,10 +542,14 @@ function Setup()
     -- prepare spawn markers
     local armies = table.hash(ListArmies())
     for k, marker in AllMarkers do
-        if armies[k] then
+        if string.sub(k, 1, 5) == 'ARMY_' then
             marker.Name = k
             marker.Position = marker.position
-            marker.size = 50
+            marker.size = 25
+            marker.Size = 25
+            marker.IsOccupied = (armies[k] and true) or false
+
+            BackwardsCompatibility(marker)
             MarkerCache["Spawn"].Count = MarkerCache["Spawn"].Count + 1
             MarkerCache["Spawn"].Markers[MarkerCache["Spawn"].Count] = marker
         end
@@ -538,15 +624,7 @@ function Setup()
             }
         end
 
-        -- make sure cache exists
-        local markers, count = GetMarkersByType(type)
-
-        -- add name
-        marker.Name = string.format("%s %d", type, count + 1)
-
-        -- add to cache
-        MarkerCache[type].Count = count + 1
-        MarkerCache[type].Markers[count + 1] = marker
+        AppendTomarkerCache(type, marker)
     end
 end
 
@@ -556,7 +634,7 @@ GenerateRallyPointMarkers = import("/lua/sim/markerutilities/rallypoints.lua").G
 
 function __moduleinfo.OnReload(newModule)
     -- add existing markers to new module
-    for key, info in MarkerCache do 
+    for key, info in MarkerCache do
         newModule.OverwriteMarkerByType(key, info.Markers)
     end
 end

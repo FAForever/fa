@@ -144,6 +144,14 @@ function Generate()
     end
 end
 
+--- Converts a world distance into grid distance
+---@param distance number
+---@return number
+function ToGridDistance(distance)
+    local sizeOfCell = NavGenerator.SizeOfCell()
+    return math.floor(distance / sizeOfCell) + 1
+end
+
 ---@param layer NavLayers
 ---@return NavGrid?
 ---@return 'InvalidLayer'?
@@ -158,8 +166,8 @@ end
 
 ---@param grid NavGrid
 ---@param position Vector
----@return CompressedLabelTreeLeaf?
----@return 'OutsideMap'?
+---@return CompressedLabelTreeLeaf | nil
+---@return 'OutsideMap' | nil
 local function FindLeaf(grid, position)
     -- check position argument
     local leaf = grid:FindLeafXZ(position[1], position[3])
@@ -194,6 +202,13 @@ local function FindLeaf(grid, position)
     end
 
     return leaf
+end
+
+---@param grid NavGrid
+---@param position Vector A position in world space
+---@return CompressedLabelTreeRoot?
+local FindRoot = function(grid, position)
+    return grid:FindRootXZ(position[1], position[3])
 end
 
 ---@param destination CompressedLabelTreeLeaf 
@@ -231,7 +246,7 @@ local function TracePath(destination)
     end
 
     -- reverse the path
-    for k = 1, math.floor(0.5 * head) do
+    for k = 1, (0.5 * head) ^ 0 do
         local temp = path[k]
         path[k] = path[head - k]
         path[head - k] = temp
@@ -292,6 +307,51 @@ function CanPathTo(layer, origin, destination)
     end
 
     if originLeaf.Label == destinationLeaf.Label then
+        return true
+    else
+        return false, 'Unpathable'
+    end
+end
+
+--- A more generous version of `CanPathTo`. Returns true when the root cell of the destination has a label that matches the label of the origin. Is in general less accurate
+---@param layer NavLayers
+---@param origin Vector
+---@param destination Vector
+---@return boolean?
+---@return ('SystemError' | 'NotGenerated' | 'InvalidLayer' | 'OutsideMap' | 'OriginOutsideMap' | 'OriginUnpathable' | 'DestinationOutsideMap' | 'Unpathable')?
+function CanPathToCell (layer, origin, destination)
+    -- check if generated
+    if not NavGenerator.IsGenerated() then
+        return nil, 'NotGenerated'
+    end
+
+    -- check layer argument
+    local grid = FindGrid(layer)
+    if not grid then
+        return nil, 'InvalidLayer'
+    end
+
+    -- check origin argument
+    local originLeaf = FindLeaf(grid, origin)
+    if not originLeaf then
+        return nil, 'OriginOutsideMap'
+    end
+
+    if originLeaf.Label == -1 then
+        return nil, 'OriginUnpathable'
+    end
+
+    if originLeaf.Label == 0 then
+        return nil, 'SystemError'
+    end
+
+    -- check destination argument
+    local destinationRoot = FindRoot(grid, destination)
+    if not destinationRoot then
+        return nil, 'DestinationOutsideMap'
+    end
+
+    if destinationRoot.Labels[originLeaf.Label] then
         return true
     else
         return false, 'Unpathable'
@@ -602,7 +662,7 @@ local GenericQueueCache = { }
 ---@param position Vector
 ---@param thresholdDistance number
 ---@param thresholdSize? number
----@return { [1]: number, [2]: number, [3]: number, [4]: number }?
+---@return { [1]: number, [2]: number, [3]: number }?
 ---@return number | ('NotGenerated' | 'InvalidLayer' | 'OutsideMap' | 'SystemError' | 'Unpathable' | 'NoData')?
 function GetPositionsInRadius(layer, position, thresholdDistance, thresholdSize, cache)
     -- check if generated
@@ -631,8 +691,7 @@ function GetPositionsInRadius(layer, position, thresholdDistance, thresholdSize,
         return nil, 'OutsideMap'
     end
 
-    local sizeOfcell = NavGenerator.SizeOfCell()
-    local distanceInCells = math.ceil(0.5 * thresholdDistance / sizeOfcell) + 1
+    local distanceInCells = ToGridDistance(thresholdDistance)
     for lz = -distanceInCells, distanceInCells do
         for lx = -distanceInCells, distanceInCells do
             local neighbor = FindRootGridspaceXZ(grid, gx + lz, gz + lx)
@@ -677,7 +736,10 @@ function GetPositionsInRadius(layer, position, thresholdDistance, thresholdSize,
             position[1] = px 
             position[2] = GetSurfaceHeight(px, pz)
             position[3] = pz
-            position[4] = size
+
+            -- this is useful information, but it causes issues with functions such as `IssueMove`
+            -- position[4] = size
+
             cache[cacheHead] = position
             cacheHead = cacheHead + 1
         end
@@ -1295,3 +1357,4 @@ end
 function IsInBuildableArea(origin)
     return IsInPlayableArea(origin, 8)
 end
+

@@ -90,11 +90,11 @@ UnitBlueprint{
             LODs = {
                 {
                     LODCutoff = 200,
-                    ShaderName = "Insect",
+                    ShaderName = "CybranNavy",
                 },
                 {
                     LODCutoff = 600,
-                    ShaderName = "Insect",
+                    ShaderName = "CybranNavy",
                     AlbedoName = "urs0303_lod1_albedo.dds",
                     SpecularName = "urs0303_lod1_specteam.dds",
                 },
@@ -134,6 +134,12 @@ UnitBlueprint{
             "BUILTBYTIER3FACTORY CYBRAN MOBILE AIR ANTIAIR",
             "BUILTBYTIER3FACTORY CYBRAN MOBILE AIR ANTIGROUND",
         },
+    },
+    ExternalFactory = {
+        SelectionSizeX = 2,
+        SelectionSizeZ = 4,
+        SelectionCenterOffsetX = 0,
+        SelectionCenterOffsetZ = 12,
     },
     Footprint = {
         SizeX = 5,
@@ -492,6 +498,7 @@ UnitBlueprint{
             Damage = 1,
             DamageType = "Normal",
             DisplayName = "Zapper Anti Missile",
+            DisableWhileReloading = true,
             FireTargetLayerCapsTable = { Water = "Air" },
             FiringTolerance = 5,
             Label = "Zapper",
@@ -499,7 +506,6 @@ UnitBlueprint{
             MinRadius = 2,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
-            NeedPrep = true,
             RackBones = {
                 {
                     MuzzleBones = { "Zapper_Muzzle" },
@@ -514,7 +520,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_Countermeasure",
-            RateOfFire = 0.25,
+            RateOfFire = 1.0,
             TargetRestrictDisallow = "UNTARGETABLE,STRATEGIC",
             TargetRestrictOnlyAllow = "TACTICAL,MISSILE",
             TargetType = "RULEWTT_Projectile",
@@ -523,7 +529,7 @@ UnitBlueprint{
             TurretBoneYaw = "Zapper_Turret",
             TurretDualManipulators = false,
             TurretPitch = 0,
-            TurretPitchRange = 90,
+            TurretPitchRange = 80,
             TurretPitchSpeed = 180,
             TurretYaw = 0,
             TurretYawRange = 180,

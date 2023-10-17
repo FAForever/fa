@@ -420,9 +420,12 @@ function CreateSkirmishScreen(victory, showCampaign, operationVictoryTable)
         self:SetNeedsFrameUpdate(false)
     end
 
-    local ambientSounds = PlaySound(Sound({Cue = "AMB_SER_OP_Briefing", Bank = "AmbientTest",}))
-    dialog.OnDestroy = function(self)
-        StopSound(ambientSounds)
+    -- No way to set ambient sound volumes, so let's at least turn it off if music is off.
+    if (GetVolume("Music") > 0) then
+        local ambientSounds = PlaySound(Sound({Cue = "AMB_SER_OP_Briefing", Bank = "AmbientTest",}))
+        dialog.OnDestroy = function(self)
+            StopSound(ambientSounds)
+        end
     end
 
     movieBG = Movie(dialog, '/movies/menu_background.sfd')

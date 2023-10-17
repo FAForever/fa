@@ -3,6 +3,7 @@ UnitBlueprint{
     AI = {
         AttackAngle = 60,
         GuardScanRadius = 40,
+        TargetBones = { 'Turret_Front', 'Turret_Back', 'Projectile01', 'Projectile02', 'Exhaust01', 'Exhaust02' }
     },
     Audio = {
         AmbientMove = Sound { Bank = 'UAS',        Cue = 'UAS0103_Move_Loop',  LodCutoff = 'UnitMove_LodCutoff' },
@@ -86,11 +87,11 @@ UnitBlueprint{
             LODs = {
                 {
                     LODCutoff = 140,
-                    ShaderName = "Aeon",
+                    ShaderName = "AeonNavy",
                 },
                 {
                     LODCutoff = 250,
-                    ShaderName = "Aeon",
+                    ShaderName = "AeonNavy",
                     AlbedoName = "uas0103_lod1_albedo.dds",
                     SpecularName = "uas0103_lod1_specteam.dds",
                 },
@@ -237,7 +238,7 @@ UnitBlueprint{
             },
             TargetRestrictDisallow = "UNTARGETABLE",
             TurretBoneMuzzle = "Turret_Front_Muzzle",
-            TurretBonePitch = "Turret_Front_Barrel",
+            TurretBonePitch = "Turret_Front_Pitch",
             TurretBoneYaw = "Turret_Front",
             TurretDualManipulators = false,
             TurretPitch = 10,
@@ -276,7 +277,7 @@ UnitBlueprint{
             RackBones = {
                 {
                     MuzzleBones = { "Turret_Back_Muzzle" },
-                    RackBone = "Turret_Back",
+                    RackBone = "Turret_Back_Barrel",
                 },
             },
             RackFireTogether = false,
@@ -296,7 +297,7 @@ UnitBlueprint{
             },
             TargetRestrictDisallow = "UNTARGETABLE",
             TurretBoneMuzzle = "Turret_Back_Muzzle",
-            TurretBonePitch = "Turret_Back_Barrel",
+            TurretBonePitch = "Turret_Back_Pitch",
             TurretBoneYaw = "Turret_Back",
             TurretDualManipulators = false,
             TurretPitch = 10,
@@ -314,6 +315,7 @@ UnitBlueprint{
             CollideFriendly = false,
             Damage = 2,
             DamageType = "Normal",
+            DisableWhileReloading = true,
             DisplayName = "Quasar Anti Torpedo",
             FireTargetLayerCapsTable = { Water = "Seabed|Sub|Water" },
             FiringTolerance = 10,

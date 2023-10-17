@@ -89,13 +89,13 @@ XEB2402 = ClassUnit(TAirFactoryUnit) {
 
                 -- Release unit
                 self.Satellite:DetachFrom()
-                IssueMove({self.Satellite}, self:GetRallyPoint())
+                IssueToUnitMove(self.Satellite, self:GetRallyPoint())
                 self.Satellite:Open()
 
                 self.waitingForLaunch = false
                 self:Retract()
 
-                IssueClearCommands({self})
+                IssueToUnitClearCommands(self)
             end
 
             ChangeState(self, self.IdleState)
@@ -106,7 +106,7 @@ XEB2402 = ClassUnit(TAirFactoryUnit) {
     OnStartBuild = function(self, unitBeingBuilt, order)
         if self.Satellite or self.waitingForLaunch then
             IssueStop({self})
-            IssueClearCommands({self}) -- This clears the State launch procedure for some reason, leading to the following hack
+            IssueToUnitClearCommands(self) -- This clears the State launch procedure for some reason, leading to the following hack
 
             -- This is ugly but necessary. It will keep resetting the launch procedure if the player spams to build a Satellite before initial launch
             -- It looks bad, but it's better than that player not getting a Satellite at all

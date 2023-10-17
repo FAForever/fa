@@ -205,7 +205,7 @@ ADFTractorClaw = ClassWeapon(Weapon) {
             self:MakeImmune(target)
 
             -- make it stop what it was doing
-            IssueClearCommands({target})
+            IssueToUnitClearCommands(target)
 
             local velocity = self.SliderVelocity[target.Blueprint.TechCategory] or 13
 

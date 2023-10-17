@@ -252,6 +252,25 @@ GenericDebrisTrails01 = {
     EmtBpPath .. 'destruction_explosion_debris_trail_01_emit.bp',
 }
 
+TacticalDebrisTrails01 = {
+    EmtBpPath .. 'tactical_debris_smoke_01_emit.bp',
+    EmtBpPath .. 'tactical_debris_smoke_02_emit.bp',
+    EmtBpPath .. 'tactical_debris_trail_01_emit.bp',
+}
+
+TacticalDebrisTrails02 = {
+    EmtBpPath .. 'tactical_debris_fire_01_emit.bp',
+    EmtBpPath .. 'tactical_debris_distortion_01_emit.bp',
+    EmtBpPath .. 'tactical_debris_trail_01_emit.bp',
+}
+
+TacticalDebrisTrails03 = {
+    EmtBpPath .. 'tactical_debris_smoke_03_emit.bp',
+    EmtBpPath .. 'tactical_debris_smoke_04_emit.bp',
+    EmtBpPath .. 'tactical_debris_trail_01_emit.bp',
+}
+
+
 UnitHitShrapnel01 = { EmtBpPath .. 'destruction_unit_hit_shrapnel_01_emit.bp',}
 
 WaterSplash01 = {
@@ -1078,6 +1097,12 @@ AQuantumDisruptorHit01 = {
     EmtBpPath .. 'aeon_commander_disruptor_hit_02_emit.bp',
     EmtBpPath .. 'aeon_commander_disruptor_hit_03_emit.bp',
 }
+
+AQuantumDisruptorHitWater01 = {
+    EmtBpPath .. 'aeon_commander_disruptor_hit_01_emit.bp',
+    EmtBpPath .. 'aeon_commander_disruptor_hit_02_emit.bp',
+}
+
 AQuantumDisplacementHit01 = {
     EmtBpPath .. 'quantum_displacement_cannon_hit_01_emit.bp',
     EmtBpPath .. 'quantum_displacement_cannon_hit_02_emit.bp',
@@ -1724,6 +1749,10 @@ CProtonCannonHit01 = {
      EmtBpPath .. 'proton_cannon_hit_01_emit.bp',
 }
 
+CProtonCannonHitWater01 = {
+    EmtBpPath .. 'proton_cannon_hit_01_emit.bp',
+}
+
 CProtonCannonPolyTrail =  EmtBpPath .. 'proton_cannon_polytrail_01_emit.bp'
 CProtonCannonPolyTrail02 =  EmtBpPath .. 'proton_cannon_polytrail_02_emit.bp'
 CProtonCannonFXTrail01 =  { EmtBpPath .. 'proton_cannon_fxtrail_01_emit.bp' }
@@ -1911,6 +1940,12 @@ TGaussCannonHit01 = {
     EmtBpPath .. 'gauss_cannon_hit_04_emit.bp',
     EmtBpPath .. 'gauss_cannon_hit_05_emit.bp',
 }
+
+TGaussWaterSplash01 = {
+    EmtBpPath .. 'gauss_cannon_hit_02_emit.bp',
+    EmtBpPath .. 'gauss_cannon_hit_05_emit.bp',
+}
+
 TGaussCannonHit02 = {
     EmtBpPath .. 'gauss_cannon_hit_01_emit.bp',
     EmtBpPath .. 'gauss_cannon_hit_02_emit.bp',
@@ -2543,6 +2578,14 @@ TMissileHit01 = {
     EmtBpPath .. 'terran_missile_hit_02_emit.bp',
     EmtBpPath .. 'terran_missile_hit_03_emit.bp',
     EmtBpPath .. 'terran_missile_hit_04_emit.bp',
+}
+
+TMissileKilled01 = {
+    EmtBpPath .. 'terran_missile_hit_01_emit.bp',
+    EmtBpPath .. 'terran_missile_hit_02_emit.bp',
+    EmtBpPath .. 'tactical_debris_smoke_01_emit.bp',
+    -- EmtBpPath .. 'terran_missile_hit_03_emit.bp',
+    -- EmtBpPath .. 'terran_missile_hit_04_emit.bp',
 }
 
 TMissileHit02 = {
@@ -3912,13 +3955,32 @@ SLaanseMissleHit = {
     EmtBpPath .. 'seraphim_lancer_missile_hit_06_emit.bp',
 }
 
-SLaanseMissleHitUnit = {
-    EmtBpPath .. 'seraphim_lancer_missile_hit_01_unit.bp',
-    EmtBpPath .. 'seraphim_lancer_missile_hit_02_unit.bp',
-    EmtBpPath .. 'seraphim_lancer_missile_hit_02_flat_unit.bp',
-    EmtBpPath .. 'seraphim_lancer_missile_hit_04_unit.bp',
-    EmtBpPath .. 'seraphim_lancer_missile_hit_05_unit.bp',
+SLaanseMissleHitNone = {
+    EmtBpPath .. 'seraphim_lancer_missile_hit_01_emit.bp', -- little flash effect
+    EmtBpPath .. 'seraphim_lancer_missile_hit_02_none_emit.bp', -- inner white ring
+    EmtBpPath .. 'seraphim_lancer_missile_hit_03_none_emit.bp', -- inner white ring
+    EmtBpPath .. 'seraphim_lancer_missile_hit_05_emit.bp', -- smoke
+}
+
+SLaanseMissleHitWater = {
+    EmtBpPath .. 'seraphim_lancer_missile_hit_01_emit.bp',
+    EmtBpPath .. 'seraphim_lancer_missile_hit_02_emit.bp',
+    EmtBpPath .. 'seraphim_lancer_missile_hit_03_emit.bp',
+    EmtBpPath .. 'seraphim_lancer_missile_hit_04_emit.bp',
+    EmtBpPath .. 'seraphim_lancer_missile_hit_05_emit.bp',
     EmtBpPath .. 'seraphim_lancer_missile_hit_06_emit.bp',
+    EmtBpPath .. 'Watertower_tactical.bp',
+    EmtBpPath .. 'water_pie_tactical.bp',
+    EmtBpPath .. 'Watersplash_tactical.bp',
+}
+
+SLaanseMissleHitUnit = {
+    EmtBpPath .. 'seraphim_lancer_missile_hit_01_unit.bp', -- little flash effect
+    EmtBpPath .. 'seraphim_lancer_missile_hit_02_unit.bp', -- inner white ring
+    EmtBpPath .. 'seraphim_lancer_missile_hit_02_flat_unit.bp', -- inner white ring
+    EmtBpPath .. 'seraphim_lancer_missile_hit_04_unit.bp', -- black lines
+    EmtBpPath .. 'seraphim_lancer_missile_hit_05_unit.bp', -- smoke
+    EmtBpPath .. 'seraphim_lancer_missile_hit_06_emit.bp', -- outer black ring
 }
 
 

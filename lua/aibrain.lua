@@ -1129,7 +1129,7 @@ AIBrain = Class(AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerCom
                             unit.PlatoonHandle:PlatoonDisbandNoAssign()
                         end
                         IssueStop({ unit })
-                        IssueClearCommands({ unit })
+                        IssueToUnitClearCommands(unit)
                     end
                 end
             end
@@ -1141,16 +1141,33 @@ AIBrain = Class(AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerCom
             end
             -- removing AI BuilderManagers
             if self.BuilderManagers then
-                for k, v in self.BuilderManagers do
-                    v.EngineerManager:SetEnabled(false)
-                    v.FactoryManager:SetEnabled(false)
-                    v.PlatoonFormManager:SetEnabled(false)
-                    v.EngineerManager:Destroy()
-                    v.FactoryManager:Destroy()
-                    v.PlatoonFormManager:Destroy()
-                    if v.StrategyManager then
-                        v.StrategyManager:SetEnabled(false)
-                        v.StrategyManager:Destroy()
+                for k, manager in self.BuilderManagers do
+                    if manager.EngineerManager then
+                        manager.EngineerManager:SetEnabled(false)
+                    end
+
+                    if manager.FactoryManager then
+                        manager.FactoryManager:SetEnabled(false)
+                    end
+
+                    if manager.PlatoonFormManager then
+                        manager.PlatoonFormManager:SetEnabled(false)
+                    end
+
+                    if manager.EngineerManager then
+                        manager.EngineerManager:Destroy()
+                    end
+
+                    if manager.FactoryManager then
+                        manager.FactoryManager:Destroy()
+                    end
+
+                    if manager.PlatoonFormManager then
+                        manager.PlatoonFormManager:Destroy()
+                    end
+                    if manager.StrategyManager then
+                        manager.StrategyManager:SetEnabled(false)
+                        manager.StrategyManager:Destroy()
                     end
                     self.BuilderManagers[k].EngineerManager = nil
                     self.BuilderManagers[k].FactoryManager = nil

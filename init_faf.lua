@@ -48,8 +48,8 @@ if SetProcessPriority and GetProcessAffinityMask and SetProcessAffinityMask then
     local success, processAffinityMask, systemAffinityMask = GetProcessAffinityMask();
     if success then
         -- system has 6 (logical) computing units or more, skip first two computing units
-        if systemAffinityMask >= 63 then
-            processAffinityMask = systemAffinityMask & (systemAffinityMask << 2)
+        if (systemAffinityMask >= 63) and (processAffinityMask == systemAffinityMask) then
+            processAffinityMask = systemAffinityMask - 3
         end
 
         -- update the afinity mask

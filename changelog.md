@@ -1,6 +1,103 @@
 
 Some sections of the changelog are available in other languages such as [French](changelog-fr.md) or [Russian](changelog-ru.md)
 
+# Game version 3769 (24th of September, 2023)
+
+Please refer to the notes of versions 3765, 3766, 3767 and 3768 for the full patch notes.
+
+With gratitude to all those who took the time to report issues,
+
+Jip
+
+## Bug fixes
+
+- (#5454) Fix a bug that can enable the Seraphim MML to launch an endless barrage of missiles.
+- (#5454) Fix a bug where the command queue is stuck on a launch order.
+
+This specifically occurred with the tech 3 strategic submarines and the tech 3 Seraphim battleship. As a result, the unit would be 'stuck' on the launch order, and any other order issued after the launch order would never be executed.
+
+- (#5454) Fix a bug where distributed launch orders would not actually launch a missile.
+
+This occurs when you issue launch orders and then distribute them. The new, distributed orders are processed and removed from the queue even though no missiles have been launched.
+
+## Contributors
+
+With thanks to the following individuals who contributed through coding:
+
+- Jip
+
+# Game version 3768 (17th of September, 2023)
+
+Please refer to the notes of versions 3765, 3766 and 3767 for the full patch notes.
+
+With gratitude to all those who took the time to report issues,
+
+Jip
+
+## Bug fixes
+
+- (#5451) Fix a breaking bug for campaign content
+
+## Contributors
+
+With thanks to the following individuals who contributed through coding:
+
+- Jip
+
+# Game version 3767 (17th of September, 2023)
+
+Please refer to the notes of versions 3765 and 3766 for the full patch notes.
+
+With gratitude to all those who took the time to report issues,
+
+Jip
+
+## Features
+
+- (#5427) Introduce a basic visualizer of the performance metrics that we gather as players play the game.
+- (#5448) Generate additional metadata when generating markers for AIs.
+- (#5422) Introduce a resource deposit grid for the AI.
+
+This grid allows for computationally efficient lookups for the AI to scan the environment for resource deposits.
+
+## Bug fixes
+
+### Beams that miss
+
+We examined all tech 1 and tech 2 naval units and found that some had the ability to reliably evade beam weapons, with one particular submarine even doing so without moving.
+
+The Seraphim destroyer should now be able to reliably hit all tech 1 and tech 2 naval units with its beam weaponry.
+
+Additionally, the Galactic Colossus can no longer evade the beams and should now be hit reliably, especially by the Spiderbot.
+
+### Other bug fixes
+
+- (#5437) Fixed units being able to miss the Galactic Colossus while it is being constructed.
+- (0883d0c) Fixed errors when an AI would be defeated.
+- (0fecc7d) Fixed tree groups breaking when building structures.
+- (#5412) Quickly fixed an issue where coop had trouble understanding the mobile factories.
+- (#5441) Fixed the AI misinterpreting blank markers.
+
+## Contributors
+
+With thanks to the following individuals who contributed through coding:
+
+- Relent0r
+- Jip
+- Eddie
+- Clyfordv (Slicknixon)
+- Dhomie (Grandpa Sawyer)
+
+With thanks to the following individuals who contributed through model, texture, and effect changes:
+
+- MadMax
+- Jip
+
+And last but certainly not least, with thanks to those who took part in constructive discussions:
+
+- A-Army
+- Yolo-
+
 # Game version 3766 (9th of September, 2023)
 
 See the patch notes of 3766 for the full patch notes.

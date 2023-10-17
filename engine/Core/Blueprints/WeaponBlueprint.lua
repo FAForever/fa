@@ -91,12 +91,11 @@
 --- of the target it was launched at.
 --- See `moho.projectile_methods:ChangeDetonateAboveHeight(height)`
 ---@field DetonatesAtTargetHeight? boolean
+--- Disables the weapon while it is reloading
+---@field DisableWhileReloading boolean
 --- Name of the weapon. Used for lobby restrictions and for debugging:
 --- `dbg weapons` in the console shows the weapon names.
 ---@field DisplayName string
---- Use the `DoNotCollideList` in the projectile blueprint instead--this table is only used
---- by anti-artillery shields
----@field DoNotCollideList? UnparsedCategory[]
 --- number of times the Damage over Time damage will be dealt
 ---@field DoTPulses number
 --- duration that the Damage over Time will last in seconds
@@ -139,7 +138,7 @@
 ---@field FixedSpreadRadius? number
 --- flares that this weapons launches
 ---@field Flare WeaponBlueprintFlare
---- if the weapon doesn't unpack (used for all counted projectiles)
+--- used to force packing up a weapon before being able to fire again
 ---@field ForceSingleFire? boolean
 --- controls what the weapon is allowed to target in reference to the heading of the unit
 ---@field HeadingArcCenter number
@@ -162,7 +161,10 @@
 ---@field Label string
 --- for tracking weapons, if the weapon should lead its target when aiming
 ---@field LeadTarget? boolean
---- if this weapon never fires automatically
+--- if set, requires a player to directly issue an attack / launch order for the unit to fire. Is set for all SMLs and 
+--- stationary TMLs. Requires _some_ kind of delay between the firing (such as a charge delay) or queued orders are not 
+--- registered properly by the engine and the unit will remain stuck on the first order, never firing again until the
+--- player clears the command queue and re-issues the order
 ---@field ManualFire? boolean
 --- changes the weapon range from spherical to cylindrical, where the cylinder has a height of
 --- this twice this value
@@ -291,6 +293,8 @@
 ---@field StopOnPrimaryWeaponBusy? boolean
 --- interval of time between looking for a target
 ---@field TargetCheckInterval number
+--- issues a `ResetTarget` half way the firing sequence
+---@field TargetResetWhenReady boolean
 --- table of category strings that define the targetting order of this weapon
 ---@field TargetPriorities UnparsedCategory[]
 --- comma separated list of category names that are always invalid targets

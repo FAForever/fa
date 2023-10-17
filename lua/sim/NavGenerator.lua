@@ -101,7 +101,7 @@ end
 function SizeOfCell()
     ---@type number
     local MapSize = math.max(ScenarioInfo.size[1], ScenarioInfo.size[2])
-
+    
     ---@type number
     return MapSize / LabelCompressionTreesPerAxis
 end
@@ -1130,12 +1130,11 @@ end
 function ComputeLandPathingMatrix(size, daCache, pCache, bCache, rCache)
     for z = 1, size do
         for x = 1, size do
-            if daCache[z][x] <= 0 and -- should be on land
-                bCache[z][x] and -- should have accessible terrain type
-                pCache[z][x] -- should be flat enough
-            then
+            local nonBlockingTerrainType = bCache[z][x]
+            local isLand = daCache[z][x] <= 0
+            local nonBlockingTerrainAngle = pCache[z][x]
+            if isLand and nonBlockingTerrainType and nonBlockingTerrainAngle then
                 rCache[z][x] = 0
-                --DrawSquare(labelTree.bx + x + 0.3, labelTree.bz + z + 0.3, 0.4, '00ff00')
             else
                 rCache[z][x] = -1
             end
@@ -1151,12 +1150,12 @@ end
 function ComputeHoverPathingMatrix(size, daCache, pCache, bCache, rCache)
     for z = 1, size do
         for x = 1, size do
-            if bCache[z][x] and (-- should have accessible terrain type
-                daCache[z][x] >= 1 or -- can either be on water
-                    pCache[z][x]-- or on flat enough terrain
-                ) then
+            local nonBlockingTerrainType = bCache[z][x]
+            local sufficientDepth = daCache[z][x] >= 1
+            local nonBlockingTerrainAngle = pCache[z][x]
+
+            if nonBlockingTerrainType and (sufficientDepth or nonBlockingTerrainAngle) then
                 rCache[z][x] = 0
-                --DrawSquare(labelTree.bx + x + 0.4, labelTree.bz + z + 0.4, 0.2, '00b3b3')
             else
                 rCache[z][x] = -1
             end
@@ -1172,12 +1171,12 @@ end
 function ComputeNavalPathingMatrix(size, daCache, pCache, bCache, rCache)
     for z = 1, size do
         for x = 1, size do
-            if daCache[z][x] >= MinWaterDepthNaval and -- should be deep enough
-                bCache[z][x] -- should have accessible terrain type
-            then
+            local nonBlockingTerrainType = bCache[z][x]
+            local sufficientDepth = daCache[z][x] >= MinWaterDepthNaval
+
+            if sufficientDepth and nonBlockingTerrainType then
                 rCache[z][x] = 0
-                --DrawSquare(labelTree.bx + x + 0.45, labelTree.bz + z + 0.45, 0.1, '0000ff')
-            else -- this is inaccessible
+            else
                 rCache[z][x] = -1
             end
         end
@@ -1192,13 +1191,13 @@ end
 function ComputeAmphPathingMatrix(size, daCache, pCache, bCache, rCache)
     for z = 1, size do
         for x = 1, size do
-            if daCache[z][x] <= MaxWaterDepthAmphibious and -- should be on land
-                bCache[z][x] and -- should have accessible terrain type
-                pCache[z][x] -- should be flat enough
-            then
+            local nonBlockingTerrainType = bCache[z][x]
+            local notTooDeep = daCache[z][x] <= MaxWaterDepthAmphibious
+            local nonBlockingTerrainAngle = pCache[z][x]
+
+            if notTooDeep and nonBlockingTerrainType and nonBlockingTerrainAngle then
                 rCache[z][x] = 0
-                --DrawSquare(labelTree.bx + x + 0.35, labelTree.bz + z + 0.35, 0.3, 'ffa500')
-            else -- this is inaccessible
+            else
                 rCache[z][x] = -1
             end
         end

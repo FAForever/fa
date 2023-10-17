@@ -27,7 +27,7 @@ XSS0303 = ClassUnit(AircraftCarrier, ExternalFactoryComponent) {
     },
 
     FactoryAttachBone = 'ExternalFactoryPoint',
-    BuildAttachBone = 'XSS0303',
+    BuildAttachBone = 'Attachpoint02',
 
     OnStopBeingBuilt = function(self,builder,layer)
         AircraftCarrier.OnStopBeingBuilt(self,builder,layer)
@@ -38,16 +38,6 @@ XSS0303 = ClassUnit(AircraftCarrier, ExternalFactoryComponent) {
     OnFailedToBuild = function(self)
         AircraftCarrier.OnFailedToBuild(self)
         ChangeState(self, self.IdleState)
-    end,
-
-    OnPaused = function(self)
-        AircraftCarrier.OnPaused(self)
-        ExternalFactoryComponent.OnPaused(self)
-    end,
-
-    OnUnpaused = function(self)
-        AircraftCarrier.OnUnpaused(self)
-        ExternalFactoryComponent.OnUnpaused(self)
     end,
 
     OnLayerChange = function(self, new, old)
@@ -84,26 +74,23 @@ XSS0303 = ClassUnit(AircraftCarrier, ExternalFactoryComponent) {
             self.UnitDoneBeingBuilt = false
         end,
 
+        ---@param self XSS0303
+        ---@param unitBeingBuilt Unit
         OnStopBuild = function(self, unitBeingBuilt)
             AircraftCarrier.OnStopBuild(self, unitBeingBuilt)
-            ChangeState(self, self.FinishedBuildingState)
-        end,
-    },
 
-    FinishedBuildingState = State {
-        Main = function(self)
-            self:SetBusy(true)
             local unitBuilding = self.UnitBeingBuilt
             unitBuilding:DetachFrom(true)
             self:DetachAll(self.BuildAttachBone)
-            if self:TransportHasAvailableStorage() then
-                self:AddUnitToStorage(unitBuilding)
+
+            if not self:TransportHasAvailableStorage() or self:GetScriptBit('RULEUTC_WeaponToggle') then
+                unitBuilding:ShowBone(0, true)
+                local worldPos = self:CalculateWorldPositionFromRelative({20, 0, 0})
+                IssueToUnitMove(unitBeingBuilt, worldPos)
             else
-                local worldPos = self:CalculateWorldPositionFromRelative({0, 0, -20})
-                IssueMoveOffFactory({unitBuilding}, worldPos)
-                unitBuilding:ShowBone(0,true)
+                self:AddUnitToStorage(unitBuilding)
             end
-            self:SetBusy(false)
+
             self:RequestRefreshUI()
             ChangeState(self, self.IdleState)
         end,

@@ -262,11 +262,18 @@ function availableTemplate(allTemplates,buildable)
     return effectiveTemplates, effectiveIcons
 end
 
+--- A 'hack' to allow us to detect whether the `ButtonRelease` event was from a left-click
+factoryHotkeyLastClickWasLeft = false
+
 function factoryHotkey(units, count)
     CommandMode.StartCommandMode("build", {name = ''})
+
+    -- Another 'hack' that is, uuhh - a hack. Override the event handle of the world view. If it doesn't 
+    -- return false then the event is captured and the engine ignores it (no orders are issued when clicking, etc)
     worldview.HandleEvent = function(self, event)
-        if event.Type == 'ButtonPress' then
+        if event.Type == 'ButtonPress' or event.Type == 'ButtonDClick' then
             if event.Modifiers.Left then
+                factoryHotkeyLastClickWasLeft = true
                 if type(units) == "string" then
                     if IsKeyDown("Shift") then
                         count = 5
@@ -282,15 +289,21 @@ function factoryHotkey(units, count)
                     end
                     StopCycleMap(self, event)
                 end
-            else
-                StopCycleMap(self, event)
+            end
+        else
+            if event.Type == 'ButtonRelease'then
+                if factoryHotkeyLastClickWasLeft then
+                    factoryHotkeyLastClickWasLeft = false
+                else
+                    StopCycleMap(self, event)
+                end
             end
         end
     end
 end
 
 function StopCycleMap(self, event)
-    worldview.HandleEvent = oldHandleEvent(self, event)
+    worldview.HandleEvent = oldHandleEvent
     cycleThread = ForkThread(function()
         local options = Prefs.GetFromCurrentProfile('options')
         local fadeTime = options.hotbuild_cycle_reset_time / 2000.0
@@ -494,6 +507,8 @@ function buildActionTemplate(modifier)
 end
 
 function buildActionUnit(name, modifier)
+    LOG("buildActionUnit")
+    LOG(" - " .. name)
     local values = unitkeygroups[name]
     local factoryFlag = true
 

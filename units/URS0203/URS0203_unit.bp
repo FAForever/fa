@@ -2,10 +2,6 @@ UnitBlueprint{
     Description = "<LOC urs0203_desc>Attack Submarine",
     AI = {
         GuardReturnRadius = 40,
-        TargetBones = {
-            "Turret",
-            "URS0203",
-        },
     },
     Audio = {
         AmbientMove    = Sound { Bank = 'URS',        Cue = 'URS0203_Move_Loop',  LodCutoff = 'UnitMove_LodCutoff' },
@@ -91,11 +87,11 @@ UnitBlueprint{
             LODs = {
                 {
                     LODCutoff = 100,
-                    ShaderName = "Insect",
+                    ShaderName = "CybranNavy",
                 },
                 {
                     LODCutoff = 215,
-                    ShaderName = "Insect",
+                    ShaderName = "CybranNavy",
                     AlbedoName = "urs0203_lod1_albedo.dds",
                     SpecularName = "urs0203_lod1_specteam.dds",
                 },

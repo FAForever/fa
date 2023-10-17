@@ -262,6 +262,14 @@ Tooltips = {
         title = "<LOC tooltipui0307>Help Tips",
         description = "<LOC tooltipui0344>Click on the question mark icon to view detailed suggestions on how to play Supreme Commander: Forged Alliance",
     },
+    external_factory = {
+        title = "Select Mobile Factory",
+        description = "",
+    },
+    auto_deploy = {
+        title = "Deploy",
+        description = "Right click to automatically deploy constructed units",
+    },
     drone = {
         title = "<LOC tooltipui0411>Select Drone",
         description = "<LOC tooltipui0412>Right click to toggle auto-assist",
@@ -644,6 +652,12 @@ Tooltips = {
         title = "<LOC ASSIST_TO_UNPAUSE_TITLE>Assist to Unpause",
         description = "<LOC ASSIST_TO_UNPAUSE_DESCRIPTION>When enabled structures automatically unpause as engineers start assisting it.",
     },
+
+    options_assist_to_copy_command_queue = {
+        title = "<LOC ASSIST_TO_UNPAUSE_TITLE>Assist to copy command queue",
+        description = "<LOC ASSIST_TO_UNPAUSE_DESCRIPTION>When enabled, engineers in the selection will try to copy the command queue of the engineer you issue an assist order for. \r\n\r\nRequires you to hold 'Control'",
+    },
+
     options_mp_taunt_head = {
         title = "<LOC OPTIONS_0119>MP Taunt Head",
         description = "<LOC OPTIONS_0120>Select which 3D head is displayed when taunts are used in multiplayer",

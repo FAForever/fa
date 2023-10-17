@@ -502,7 +502,7 @@ TreadComponent = ClassSimple {
         end
 
         while true do
-            while not self.TreadSuspend do
+            while not (self.TreadSuspend or IsDestroyed(self)) do
                 CreateSplatOnBone(self, treadOffset, treadBone, treadTexture, sizeX, sizeZ, lod, duration, army)
                 WaitTicks(interval)
             end
@@ -828,6 +828,10 @@ ExternalFactoryComponent = ClassSimple {
             error(string.format("%s is not setup for an external factory: the unit does not have a field 'FactoryAttachBone'", blueprint.BlueprintId))
         end
 
+        if self.BuildAttachBone and self.BuildAttachBone == self.FactoryAttachBone then
+            error(string.format("%s is not setup for an external factory: the 'FactoryAttachBone' can not be the same as the 'BuildAttachBone'", blueprint.BlueprintId))
+        end
+
         if not blueprint.CategoriesHash['EXTERNALFACTORY'] then
             error(string.format("%s is not setup for an external factory: the unit does not have a 'EXTERNALFACTORY' category", blueprint.BlueprintId))
         end
@@ -849,22 +853,9 @@ ExternalFactoryComponent = ClassSimple {
         self.ExternalFactory = CreateUnitHPR(blueprintIdExternalFactory, self.Army, position[1], position[2], position[3], 0, 0, 0) --[[@as ExternalFactoryUnit]]
         self.ExternalFactory:AttachTo(entity, -1)
         self.ExternalFactory:SetCreator(self)
+        self:SetCreator(self.ExternalFactory)
         self.ExternalFactory:SetParent(self)
         self.Trash:Add(self.ExternalFactory)
-    end,
-
-    ---@param self Unit | ExternalFactoryComponent
-    OnPaused = function(self)
-        if self.ExternalFactory then
-            self.ExternalFactory:SetPaused(true)
-        end
-    end,
-
-    ---@param self Unit | ExternalFactoryComponent
-    OnUnpaused = function(self)
-        if self.ExternalFactory then
-            self.ExternalFactory:SetPaused(false)
-        end
     end,
 
     ---@param self Unit | ExternalFactoryComponent
@@ -887,7 +878,7 @@ ExternalFactoryComponent = ClassSimple {
                 self.ExternalFactory:AddBuildRestriction(categories.ALLUNITS)
                 self.ExternalFactory:RequestRefreshUI()
 
-                IssueClearCommands({self.ExternalFactory})
+                IssueToUnitClearCommands(self.ExternalFactory)
             end
         end
     end,
@@ -896,7 +887,7 @@ ExternalFactoryComponent = ClassSimple {
         if not IsDestroyed(self.ExternalFactory) then
             self.ExternalFactory:SetBusy(true)
             self.ExternalFactory:SetBlockCommandQueue(true)
-            self.ExternalFactory:Kill()
+            self.ExternalFactory:Destroy()
         end
     end,
 

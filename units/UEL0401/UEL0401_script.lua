@@ -111,18 +111,6 @@ UEL0401 = ClassUnit(TMobileFactoryUnit, ExternalFactoryComponent) {
     end,
 
     ---@param self UEL0401
-    OnPaused = function(self)
-        TMobileFactoryUnit.OnPaused(self)
-        ExternalFactoryComponent.OnPaused(self)
-    end,
-
-    ---@param self UEL0401
-    OnUnpaused = function(self)
-        TMobileFactoryUnit.OnUnpaused(self)
-        ExternalFactoryComponent.OnUnpaused(self)
-    end,
-
-    ---@param self UEL0401
     ---@param new Layer
     ---@param old Layer
     OnLayerChange = function(self, new, old)

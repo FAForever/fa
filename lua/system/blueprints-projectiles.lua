@@ -10,9 +10,6 @@
 --      Description = STRING,           -- default
 --      Display = { },                  -- default
 --      Economy = { },                  -- default
---      DoNotCollideList = { },         -- default
---      DoNotCollideListCount = NUMBER, -- generated
---      DoNotCollideListHash = { },     -- generated
 --      General = { },                  -- default
 --      Interface = { },                -- default
 --      Physics = { },                  -- default
@@ -32,16 +29,6 @@ local function PostProcessProjectile(projectile)
     end
 
     projectile.CategoriesHash[projectile.BlueprintId] = true
-
-    -- create hash tables for quick lookup
-    projectile.DoNotCollideListCount = 0
-    projectile.DoNotCollideListHash = {}
-    if projectile.DoNotCollideList then
-        projectile.DoNotCollideListCount = table.getn(projectile.DoNotCollideList)
-        for _, category in projectile.DoNotCollideList do
-            projectile.DoNotCollideListHash[category] = true
-        end
-    end
 
     -- fix desired shooter cap for missiles
     if (projectile.CategoriesHash['MISSILE'] and (not projectile.CategoriesHash['STRATEGIC'])) or projectile.CategoriesHash["TORPEDO"] then
