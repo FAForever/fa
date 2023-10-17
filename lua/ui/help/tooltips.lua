@@ -271,8 +271,8 @@ Tooltips = {
         description = "",
     },
     prod_options = {
-        title = "Construction Options",
-        description = "Options for constructed units."
+        title = "<LOC tooltipui0748>Construction Options",
+        description = "<LOC tooltipui0749>Options for units constructed by this factory"
     },
     auto_deploy = {
         title = "Deploy",
@@ -2258,42 +2258,42 @@ Tooltips = {
     -- **********************
     build_toggle_amphibious = {
         title = "<LOC tooltipui0697>Amphibious Mode Toggle",
-        description = "Toggle amphibious mode for constructed units",
+        description = "<LOC tooltipui0738>Toggle amphibious mode for constructed units",
     },
     build_toggle_shield = {
         title = "<LOC tooltipui0040>Shield Toggle",
-        description = "Turn constructed units shields on/off",
+        description = "<LOC tooltipui0739>Turn constructed units shields on/off",
     },
     build_toggle_sniper = {
         title = "<LOC tooltipui0647>Sniper Toggle",
-        description = "Toggle sniper mode for constructed units"
+        description = "<LOC tooltipui0740>Toggle sniper mode for constructed units"
     },
     build_toggle_weapon = {
         title = "<LOC tooltipui0361>Weapon Toggle",
-        description = "Toggle constructed units between air and ground weaponry",
+        description = "<LOC tooltipui0741>Toggle constructed units between air and ground weaponry",
     },
     build_toggle_jamming = {
         title = "<LOC tooltipui0044>Radar Jamming Toggle",
-        description = "Turn constructed units radar jamming on/off",
+        description = "<LOC tooltipui0742>Turn constructed units radar jamming on/off",
     },
     build_toggle_radar = {
         title = "<LOC tooltipui0488>Radar Toggle",
-        description = "Turn constructed units radar on/off",
+        description = "<LOC tooltipui0743>Turn constructed units radar on/off",
     },
     build_toggle_sonar = {
         title = "<LOC tooltipui0490>Sonar Toggle",
-        description = "Turn constructed units sonar on/off",
+        description = "<LOC tooltipui0744>Turn constructed units sonar on/off",
     },
     build_toggle_stealth_field = {
         title = "<LOC tooltipui0499>Stealth Field Toggle",
-        description = "Turn constructed units stealth field on/off",
+        description = "<LOC tooltipui0745>Turn constructed units stealth field on/off",
     },
     build_toggle_stealth_personal = {
         title = "<LOC tooltipui0501>Personal Stealth Toggle",
-        description = "Turn constructed units personal stealth field on/off",
+        description = "<LOC tooltipui0746>Turn constructed units personal stealth field on/off",
     },
     build_toggle_cloak = {
         title = "<LOC tooltipui0339>Personal Cloak",
-        description = "<LOC tooltipui0342>Turn constructed units cloaking on/off",
+        description = "<LOC tooltipui0747>Turn constructed units cloaking on/off",
     },
 }
