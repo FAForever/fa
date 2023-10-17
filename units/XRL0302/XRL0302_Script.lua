@@ -14,6 +14,15 @@ local DeathWeaponKamikaze = ClassWeapon(Weapon) {
             self.unit:Kill()
         end
     end,
+
+    OnMotionHorzEventChange = function(self, new, old)
+        LOG('OnMotionHorzEventChange')
+        LOG('new: '..new)
+        LOG('old: '..old)
+        if (new == 'Stopping') then
+            self:SetBusy(false)
+        end
+    end,
 }
 
 local DeathWeaponEMP = ClassWeapon(Weapon) {
