@@ -1,4 +1,3 @@
-
 --******************************************************************************************************
 --** Copyright (c) 2023  Willem 'Jip' Wijnia
 --**
@@ -65,11 +64,12 @@ end
 local RawTemplates = import("/lua/ui/game/hotkeys/context-based-templates-data.lua")
 
 ---@type ContextBasedTemplate[]
-local Templates = { }
+local Templates = {}
 
 for k, template in RawTemplates do
     if type(template) == "table" then
-        if template.TriggersOnUnit or template.TriggersOnLand or template.TriggersOnMassDeposit or template.TriggersOnHydroDeposit or template.TriggersOnWater then
+        if template.TriggersOnUnit or template.TriggersOnLand or template.TriggersOnMassDeposit or
+            template.TriggersOnHydroDeposit or template.TriggersOnWater or template.TriggersOnBuilding then
             if template.TemplateSortingOrder then
                 TableInsert(Templates, template)
                 SPEW(StringFormat("Found template: %s with name %s", tostring(k), tostring(template.Name)))
@@ -82,8 +82,11 @@ SPEW(StringFormat("Found %d templates", table.getn(Templates)))
 
 --#endregion
 
+---@type 'Unknown' | 'ByCommandMode' | 'ByMouseContext'
+local ContextBasedMode = 'Unknown'
+
 ---@type ContextBasedTemplate[]
-local ContextBasedTemplates = { }
+local ContextBasedTemplates = {}
 
 ---@type number
 local ContextBasedTemplateStep = 0
@@ -94,10 +97,21 @@ local ContextBasedTemplateCount = 1
 -- reset the state when command mode ends and we were trying to do something
 local CommandMode = import("/lua/ui/game/commandmode.lua")
 CommandMode.AddEndBehavior(
-    function()
+    function(mode, data)
         if not table.empty(ContextBasedTemplates) then
-            ContextBasedTemplates = { }
+            ContextBasedTemplates = {}
             ContextBasedTemplateStep = 0
+        end
+
+        ContextBasedMode = 'Unknown'
+    end,
+    'ContextBasedTemplates'
+)
+
+CommandMode.AddStartBehavior(
+    function(mode, data)
+        if mode == 'build' and ContextBasedMode == 'Unknown' then
+            ContextBasedMode = 'ByCommandMode'
         end
     end,
     'ContextBasedTemplates'
@@ -106,14 +120,31 @@ CommandMode.AddEndBehavior(
 --- Validates the template in-place, returns whether the process succeeded
 ---@param template ContextBasedTemplate
 ---@param buildableUnits table<BlueprintId, boolean>
----@param prefix 'ua' | 'ue' | 'ur' | 'xs'
+---@param prefix 'ua' | 'ue' | 'ur' | 'xs' | 'xn'
 ---@return boolean
 local function ValidateTemplate(template, buildableUnits, prefix)
     local allUnitsExist = true
     local allUnitsBuildable = true
+
     for l = 3, TableGetn(template.TemplateData) do
         local templateUnit = template.TemplateData[l]
         local templateUnitBlueprintId = prefix .. templateUnit[1]:sub(3)
+
+        -- because the support factories originate from mods they do not adhere to the
+        -- standard blueprint convention for factions; very annoying ^^
+        local isSupportFactory = templateUnit[1]:sub(1, 1) == 'z'
+        if isSupportFactory then
+            templateUnitBlueprintId = 'z' .. prefix:sub(2, 2) .. templateUnit[1]:sub(3)
+        end
+
+        -- same here but then for units that are part of the Forged Alliance expansion; they
+        -- do not adhere to blueprint standards
+        local isExpansion = templateUnit[1]:sub(1, 1) == 'x' and templateUnit[1]:sub(1, 2) ~= 'xs'
+        if isExpansion then
+            templateUnitBlueprintId = 'x' .. prefix:sub(2, 2) .. templateUnit[1]:sub(3)
+        end
+
+        -- proceed as usual
         local templateUnitBlueprint = __blueprints[templateUnitBlueprintId]
         if templateUnitBlueprint then
             if buildableUnits[templateUnitBlueprintId] then
@@ -129,6 +160,95 @@ local function ValidateTemplate(template, buildableUnits, prefix)
     return allUnitsExist and allUnitsBuildable
 end
 
+---@param buildableUnits table<BlueprintId, boolean>
+---@param prefix string
+local function FilterTemplatesByContext(buildableUnits, prefix)
+    -- deposit scan radius depending on zoom level to make it easier to place extractors while zoomed out
+    local radius = 2
+    local camera = GetCamera('WorldCamera')
+    if camera then
+        local zoom = camera:GetZoom()
+        if zoom > 200 then
+            radius = radius * zoom * 0.005
+        end
+    end
+
+    -- gather information to determine the context
+    local info = GetRolloverInfo()
+    local userUnit = info.userUnit
+    local position = GetMouseWorldPos()
+    local elevation = GetMouseTerrainElevation()
+    local massDeposits = TableGetn(GetDepositsAroundPoint(position[1], position[3], radius, 1))
+    local hydroDeposits = TableGetn(GetDepositsAroundPoint(position[1], position[3], 2 + radius, 2))
+    local noDeposits = (massDeposits == 0) and (hydroDeposits == 0)
+    local onLand = elevation + 0.1 >= position[2]
+
+    for k = 1, TableGetn(Templates) do
+        local template = Templates[k]
+        local valid = ValidateTemplate(template, buildableUnits, prefix)
+        if valid then
+            if -- check conditions based on the context of the mouse
+            ((not template.TriggersOnUnit) or (userUnit and EntityCategoryContains(template.TriggersOnUnit, userUnit)))
+                and
+                ((not template.TriggersOnMassDeposit) or ((not userUnit) and (massDeposits > 0))) and
+                ((not template.TriggersOnHydroDeposit) or ((not userUnit) and (hydroDeposits > 0))) and
+                ((not template.TriggersOnLand) or ((not userUnit) and noDeposits and onLand)) and
+                ((not template.TriggersOnWater) or ((not userUnit) and noDeposits and (not onLand))) and
+                (not template.TriggersOnBuilding)
+            then
+                TableInsert(ContextBasedTemplates, template)
+                ContextBasedTemplateCount = ContextBasedTemplateCount + 1
+            end
+        end
+    end
+
+    -- no templates to use, default to those that trigger on land or water
+    if ContextBasedTemplateCount == 0 then
+        for k = 1, TableGetn(Templates) do
+            local template = Templates[k]
+            local valid = ValidateTemplate(template, buildableUnits, prefix)
+            if valid then
+                if -- check conditions based on the context of the mouse
+                (template.TriggersOnLand and onLand) or
+                    (template.TriggersOnWater and (not onLand))
+                then
+                    TableInsert(ContextBasedTemplates, template)
+                    ContextBasedTemplateCount = ContextBasedTemplateCount + 1
+                end
+            end
+        end
+    end
+end
+
+---@param buildableUnits table<BlueprintId, boolean>
+---@param prefix string
+local function FilterTemplatesByCommandMode(buildableUnits, prefix)
+    local commandMode = import("/lua/ui/game/commandmode.lua").GetCommandMode()
+    local blueprintId = commandMode[2].name
+
+    if not blueprintId then
+        return
+    end
+
+    for k = 1, TableGetn(Templates) do
+        local template = Templates[k]
+
+        if -- check conditions based on the unit that we're trying to build
+        (template.TriggersOnBuilding) and
+            EntityCategoryContains(template.TriggersOnBuilding, blueprintId)
+        then
+            -- replace the dummy blueprint id with the actual blueprint id
+            template.TemplateData[3][1] = blueprintId
+            local valid = ValidateTemplate(template, buildableUnits, prefix)
+
+            if valid then
+                TableInsert(ContextBasedTemplates, template)
+                ContextBasedTemplateCount = ContextBasedTemplateCount + 1
+            end
+        end
+    end
+end
+
 --- Provides a sense of order to the chosen templates
 ---@param a ContextBasedTemplate
 ---@param b ContextBasedTemplate
@@ -141,10 +261,10 @@ Cycle = function()
 
     local start = GetSystemTimeSeconds()
 
-    local info = GetRolloverInfo()
-    local userUnit = info.userUnit
-    local position = GetMouseWorldPos()
-    local elevation = GetMouseTerrainElevation()
+    -- default to the mouse context
+    if ContextBasedMode == 'Unknown' then
+        ContextBasedMode = 'ByMouseContext'
+    end
 
     local selectedUnits = GetSelectedUnits()
     if selectedUnits and not TableEmpty(selectedUnits) then
@@ -163,56 +283,26 @@ Cycle = function()
 
         -- a bit of a hack to retrieve the faction prefix
         local prefix = selectedUnits[1]:GetBlueprint().BlueprintId:sub(1, 2)
-
-        -- deposit scan radius depending on zoom level to make it easier to place extractors while zoomed out
-        local radius = 2
-        local camera = GetCamera('WorldCamera')
-        if camera then
-            local zoom = camera:GetZoom()
-            if zoom > 200 then
-                radius = radius * zoom * 0.005
-            end
+        local factionOfSelection = selectedUnits[1]:GetBlueprint().FactionCategory
+        if factionOfSelection and factionOfSelection == "UEF" then
+            prefix = 'ue'
+        elseif factionOfSelection and factionOfSelection == "AEON" then
+            prefix = 'ua'
+        elseif factionOfSelection and factionOfSelection == "CYBRAN" then
+            prefix = 'ur'
+        elseif factionOfSelection and factionOfSelection == "SERAPHIM" then
+            prefix = 'xs'
+        elseif factionOfSelection and factionOfSelection == "NOMADS" then
+            prefix = 'xn'
         end
 
-        local massDeposits = TableGetn(GetDepositsAroundPoint(position[1], position[3], radius, 1))
-        local hydroDeposits = TableGetn(GetDepositsAroundPoint(position[1], position[3], 2 + radius, 2))
-        local noDeposits = (massDeposits == 0) and (hydroDeposits == 0)
-        local onLand = elevation + 0.1 >= position[2]
-
-        ContextBasedTemplates = { }
+        ContextBasedTemplates = {}
         ContextBasedTemplateCount = 0
-        for k = 1, TableGetn(Templates) do
-            local template = Templates[k]
-            local valid = ValidateTemplate(template, buildableUnits, prefix)
-            if valid then
-                if  -- check conditions based on the context of the mouse
-                    ((not template.TriggersOnUnit) or (userUnit and EntityCategoryContains(template.TriggersOnUnit, userUnit))) and
-                    ((not template.TriggersOnMassDeposit) or ((not userUnit) and (massDeposits > 0))) and
-                    ((not template.TriggersOnHydroDeposit) or ((not userUnit) and (hydroDeposits > 0))) and
-                    ((not template.TriggersOnLand) or ((not userUnit) and noDeposits and onLand)) and
-                    ((not template.TriggersOnWater) or ((not userUnit) and noDeposits and (not onLand)))
-                then
-                    TableInsert(ContextBasedTemplates, template)
-                    ContextBasedTemplateCount = ContextBasedTemplateCount + 1
-                end
-            end
-        end
 
-        -- no templates to use, default to those that trigger on land or water
-        if ContextBasedTemplateCount == 0 then
-            for k = 1, TableGetn(Templates) do
-                local template = Templates[k]
-                local valid = ValidateTemplate(template, buildableUnits, prefix)
-                if valid then
-                    if  -- check conditions based on the context of the mouse
-                        (template.TriggersOnLand and onLand) or
-                        (template.TriggersOnWater and (not onLand))
-                    then
-                        TableInsert(ContextBasedTemplates, template)
-                        ContextBasedTemplateCount = ContextBasedTemplateCount + 1
-                    end
-                end
-            end
+        if ContextBasedMode == 'ByCommandMode' then
+            FilterTemplatesByCommandMode(buildableUnits, prefix)
+        else
+            FilterTemplatesByContext(buildableUnits, prefix)
         end
 
         -- absolutely nothing available
@@ -232,7 +322,7 @@ Cycle = function()
         local template = ContextBasedTemplates[index]
         if template then
             import("/lua/ui/game/commandmode.lua").SetIgnoreSelection(true)
-            import("/lua/ui/game/commandmode.lua").StartCommandMode('build', {name = template.TemplateData[3][1]})
+            import("/lua/ui/game/commandmode.lua").StartCommandMode('build', { name = template.TemplateData[3][1] })
             import("/lua/ui/game/commandmode.lua").SetIgnoreSelection(false)
 
             -- only turn it into a build template when we have more than 1 unit in it
