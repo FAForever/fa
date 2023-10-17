@@ -2252,4 +2252,48 @@ Tooltips = {
     minimap_mesh = {
         description = "<LOC tooltipui0720>Disables the rendering of meshes of units and props on the minimap to reduce the burden on the rendering thread. Can potentially improve your framerate.",
     },
+
+    -- **********************
+    -- ** Build Options Toggles
+    -- **********************
+    build_toggle_amphibious = {
+        title = "<LOC tooltipui0697>Amphibious Mode Toggle",
+        description = "Toggle amphibious mode for constructed units",
+    },
+    build_toggle_shield = {
+        title = "<LOC tooltipui0040>Shield Toggle",
+        description = "Turn constructed units shields on/off",
+    },
+    build_toggle_sniper = {
+        title = "<LOC tooltipui0647>Sniper Toggle",
+        description = "Toggle sniper mode for constructed units"
+    },
+    build_toggle_weapon = {
+        title = "<LOC tooltipui0361>Weapon Toggle",
+        description = "Toggle constructed units between air and ground weaponry",
+    },
+    build_toggle_jamming = {
+        title = "<LOC tooltipui0044>Radar Jamming Toggle",
+        description = "Turn constructed units radar jamming on/off",
+    },
+    build_toggle_radar = {
+        title = "<LOC tooltipui0488>Radar Toggle",
+        description = "Turn constructed units radar on/off",
+    },
+    build_toggle_sonar = {
+        title = "<LOC tooltipui0490>Sonar Toggle",
+        description = "Turn constructed units sonar on/off",
+    },
+    build_toggle_stealth_field = {
+        title = "<LOC tooltipui0499>Stealth Field Toggle",
+        description = "Turn constructed units stealth field on/off",
+    },
+    build_toggle_stealth_personal = {
+        title = "<LOC tooltipui0501>Personal Stealth Toggle",
+        description = "Turn constructed units personal stealth field on/off",
+    },
+    build_toggle_cloak = {
+        title = "<LOC tooltipui0339>Personal Cloak",
+        description = "<LOC tooltipui0342>Turn constructed units cloaking on/off",
+    },
 }

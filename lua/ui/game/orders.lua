@@ -796,6 +796,9 @@ local function CreateOnBuildTogglePopup(parent, selected)
         -- apply help text override or use default
         -- probably need to change all of these to use a special production tooltip
         checkbox._curHelpText = statToggle.override.helpText or defaultOrdersTable[statToggle.defaultOrder].helpText
+        if TooltipInfo.Tooltips['build_'..checkbox._curHelpText] then
+            checkbox._curHelpText = 'build_'..checkbox._curHelpText
+        end
 
         -- see if we're mixed
         local result = nil
