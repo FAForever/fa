@@ -43,7 +43,7 @@ Reticle = ClassUI(Group) {
         self.WorldView = parent
         self.WorldView.Trash:Add(self)
         self.WorldView.CursorTrash:Add(self)
-        --self.Trash = TrashBag()
+        self.Trash = TrashBag()
         self.onMap = false
         self.changedOnMap = true
 
@@ -124,6 +124,10 @@ Reticle = ClassUI(Group) {
                 self:Hide()
             end
         end
+    end,
+
+    OnDestroy = function(self)
+        self.Trash:Destroy()
     end,
 }
 

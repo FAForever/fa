@@ -1,5 +1,5 @@
 --******************************************************************************************************
---** Copyright (c) 2022  clyf
+--** Copyright (c) 2023  clyf
 --**
 --** Permission is hereby granted, free of charge, to any person obtaining a copy
 --** of this software and associated documentation files (the "Software"), to deal
@@ -23,6 +23,10 @@
 local AddBeatFunction = import("/lua/ui/game/gamemain.lua").AddBeatFunction
 local RemoveBeatFunction = import("/lua/ui/game/gamemain.lua").RemoveBeatFunction
 local FireState = import("/lua/game.lua").FireState
+
+local UIUtil = import("/lua/ui/uiutil.lua")
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local Reticle = import('/lua/ui/controls/reticle.lua').Reticle
 
 -- Upvalue scope for performance
 local GameTick = GameTick
@@ -233,3 +237,38 @@ SynchronizedStrikeInprocess = function(command)
     -- for testing
     ReleaseSyncStrike()
 end
+
+local function AnimateSyncText(text)
+    while not text:IsHidden() do
+        text:SetColor('Red')
+        WaitSeconds(.1)
+        text:SetColor('White')
+        WaitSeconds(.1)
+    end
+end
+
+TacticalReticle = ClassUI(Reticle) {
+
+    SetLayout = function(self)
+        self.syncText = UIUtil.CreateText(self, "SYNC", 16, UIUtil.bodyFont, true)
+        LayoutHelpers.RightOf(self.syncText, self, 4)
+        self.syncText:SetColor('Red')
+    end,
+
+    UpdateDisplay = function(self, mouseWorldPos)
+        if self.onMap and IsKeyDown("CONTROL") then
+            if self.syncText:IsHidden() then
+                self.syncText:Show()
+                self.animThread = ForkThread(AnimateSyncText, self.syncText)
+                self.Trash:Add(self.animThread)
+            end
+        else
+            if not self.syncText:IsHidden() then
+                self.syncText:Hide()
+                if self.animThread then
+                    self.animThread:Destroy()
+                end
+            end
+        end
+    end,
+}
