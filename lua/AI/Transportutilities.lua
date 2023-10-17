@@ -2154,6 +2154,8 @@ function TransportReturnToBase(unit, aiBrain)
 	local healthlimit = .30
 	local returnPos
 	local killUnitOnReturn = false
+	local fuel
+	local health
 
 	local returnpool = aiBrain:MakePlatoon('AirRefit'..tostring(ident), 'none')
 	if not unit.Dead then
