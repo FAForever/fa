@@ -704,7 +704,7 @@ function PostProcessStatToggles(allBlueprints, units)
     -- also, we'll add any toggles and overrides we find to the sublists in scriptBitTogglesHash
     local toggleUnits = {}
     for _, unit in units do
-        if unit.General.ToggleCaps then
+        if unit.General.ToggleCaps and type(unit.General.ToggleCaps) == 'table' then
             unit.General.OnStopBeingBuiltStatToggles = {}
             for toggleCap, _ in unit.General.ToggleCaps do
                 local override = Lookup(unit.General, {'OrderOverrides', toggleCap})
