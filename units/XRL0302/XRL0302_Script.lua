@@ -16,11 +16,10 @@ local DeathWeaponKamikaze = ClassWeapon(Weapon) {
     end,
 
     OnMotionHorzEventChange = function(self, new, old)
-        LOG('OnMotionHorzEventChange')
-        LOG('new: '..new)
-        LOG('old: '..old)
-        if (new == 'Stopping') then
-            self:SetBusy(false)
+        if new == 'Cruise' then
+            self.unit:SetBusy(true)
+        elseif new == 'Stopping' then
+            self.unit:SetBusy(false)
         end
     end,
 }
