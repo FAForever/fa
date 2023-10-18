@@ -45,6 +45,8 @@ local Dragger = import("/lua/maui/dragger.lua").Dragger
 local Tooltip = import("/lua/ui/game/tooltip.lua")
 local UIMain = import("/lua/ui/uimain.lua")
 
+local ChatMessage = import("/lua/ui/game/chat/message.lua").ChatMessage
+
 ---@param message any
 local LOG = function(message)
     _G.LOG("Chat.lua - " .. tostring(message))
@@ -185,10 +187,10 @@ ChatWindow = ClassUI(Window) {
             })
         end
 
-        self.Rows = { }
-        for k = 1, 50 do
-            self.Rows[k] = 
-        end
+        -- self.Rows = { }
+        -- for k = 1, 50 do
+        --     self.Rows[k] = ChatMessage()
+        -- end
 
         AddOnSyncHashedCallback(
         ---@param messages UIMessage[]
@@ -232,6 +234,22 @@ ChatWindow = ClassUI(Window) {
     ---@param self UIChatWindow
     ---@param parent Control
     __post_init = function(self, parent)
+
+        -- state that users can change
+
+        self.WindowAlpha = import("/lua/lazyvar.lua").Create()
+        self.WindowAlpha.OnDirty = function(lazyvar)
+            local value = lazyvar()
+            if value > 1.0 then
+                return
+            end
+
+            if value < 0.0 then
+                return
+            end
+
+            self:SetAlpha(value)
+        end
 
         -- custom draggers setup: top-left / top-right / bottom-left / bottom-right
 
