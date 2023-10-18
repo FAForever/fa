@@ -15,7 +15,7 @@ local SDFSihEnergyRifleSniperMode = SeraphimWeapons.SDFSniperShotSniperMode
 ---@class XSL0305 : SLandUnit
 ---@field TrashSniperFx TrashBag
 ---@field isSniperFiringMode boolean -- Whether the sniper mode is active for next shot
----@field isSniperMoveMode boolean -- Whether the sniper mode speed slowdown is active. Is active during sniper mode shot cooldown.
+---@field isSniperMoveMode boolean -- Whether the sniper mode speed slowdown is active. Is active during sniper mode.
 XSL0305 = ClassUnit(SLandUnit) {
     Weapons = {
         -- used for both modes of operation
