@@ -14,6 +14,8 @@ local SDFSihEnergyRifleSniperMode = SeraphimWeapons.SDFSniperShotSniperMode
 
 ---@class XSL0305 : SLandUnit
 ---@field TrashSniperFx TrashBag
+---@field isSniperFiringMode boolean -- Whether the sniper mode is active for next shot
+---@field isSniperMoveMode boolean -- Whether the sniper mode speed slowdown is active. Is active during sniper mode.
 XSL0305 = ClassUnit(SLandUnit) {
     Weapons = {
         -- used for both modes of operation
@@ -52,7 +54,7 @@ XSL0305 = ClassUnit(SLandUnit) {
     ---@param mode boolean
     ScheduleMovementChange = function(self, delaySeconds, mode)
         if self.isSniperMoveMode == mode then return end
-        local switchToMode = function(mode)
+        local switchToMoveMode = function(mode)
             local speedMult = self.Blueprint.Physics.LandSpeedMultiplier or 1 -- left for compatability
             self.isSniperMoveMode = mode
             if mode then
@@ -69,12 +71,12 @@ XSL0305 = ClassUnit(SLandUnit) {
         end
 
         if delaySeconds == 0 then
-            switchToMode(mode)
+            switchToMoveMode(mode)
         elseif self.isChangingMoveMode == nil then 
             self.Trash:Add(ForkThread(function()
                 self.isChangingMoveMode = true
                 WaitSeconds(delaySeconds)
-                switchToMode(self.isSniperFiringMode)
+                switchToMoveMode(self.isSniperFiringMode)
                 self.isChangingMoveMode = nil
                 end))
         end
