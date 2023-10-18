@@ -324,6 +324,12 @@ AMissileSerpentineProjectile = ClassProjectile(SingleCompositeEmitterProjectile,
     MinHeight = 2,
     FinalBoostAngle = 20,
 
+    DebrisBlueprints = {
+        '/effects/Entities/TacticalDebris01/TacticalDebris01_proj.bp',
+        '/effects/Entities/TacticalDebris01/TacticalDebris01_proj.bp',
+        '/effects/Entities/TacticalDebris02/TacticalDebris02_proj.bp',
+    },
+
     ---@param self AMissileSerpentineProjectile
     OnCreate = function(self)
         SingleCompositeEmitterProjectile.OnCreate(self)
@@ -347,7 +353,7 @@ AMissileSerpentineProjectile = ClassProjectile(SingleCompositeEmitterProjectile,
     OnImpact = function(self, targetType, targetEntity)
         SingleCompositeEmitterProjectile.OnImpact(self, targetType, targetEntity)
 
-        if targetType == 'None' then
+        if targetType == 'None' or targetType == 'Air' then
             self:CreateDebris()
         end
 

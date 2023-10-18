@@ -93,6 +93,7 @@ defaultKeyMap = {
     ['Shift-T']             = 'create_build_template',
 
     ['Tab']                 = 'cycle_context_based_templates',
+    ['Shift-Tab']           = 'cycle_context_based_templates',
     ['Q']                   = 'zoom_in',
     ['W']                   = 'zoom_out',
     ['Shift-Q']             = 'zoom_in_fast',

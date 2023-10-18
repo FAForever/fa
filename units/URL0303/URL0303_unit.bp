@@ -34,6 +34,7 @@ UnitBlueprint{
         "MOBILE",
         "OVERLAYDEFENSE",
         "OVERLAYDIRECTFIRE",
+        "OVERLAYINDIRECTFIRE",
         "PRODUCTSC1",
         "RECLAIMABLE",
         "SELECTABLE",
@@ -338,7 +339,7 @@ UnitBlueprint{
             RackSalvoReloadTime = 0,
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
-            RangeCategory = "UWRC_DirectFire",
+            RangeCategory = "UWRC_IndirectFire",
             RateOfFire = 2.5,
             TargetPriorities = {
                 "TECH1 MOBILE",
