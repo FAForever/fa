@@ -196,13 +196,6 @@ allowedAssetsScd["ambience.scd"] = false    -- Empty
 allowedAssetsScd["sc_music.scd"] = true
 allowedAssetsScd = LowerHashTable(allowedAssetsScd)
 
--- typical backwards compatible packages
-local allowedAssetsNxt = { }
-allowedAssetsNxt["kyros.nxt"] = true
-allowedAssetsNxt["advanced strategic icons.nxt"] = true
-allowedAssetsNxt["advanced_strategic_icons.nxt"] = true
-allowedAssetsNxt = LowerHashTable(allowedAssetsNxt)
-
 -- default wave banks to prevent collisions
 local soundsBlocked = { }
 local sounds = FindFilesWithExtension(fa_path .. '/sounds', "xwb", "/sounds")
@@ -627,7 +620,6 @@ else
 end
 
 -- load in .nxt / .nxy / .scd files that we allow
-MountAllowedContent(InitFileDir .. '/../gamedata/', '*.nxt', allowedAssetsNxt)
 MountAllowedContent(InitFileDir .. '/../gamedata/', '*.nx4', allowedAssetsNxy)
 MountAllowedContent(fa_path .. '/gamedata/', '*.scd', allowedAssetsScd)
 
