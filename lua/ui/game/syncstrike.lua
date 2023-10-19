@@ -28,6 +28,8 @@ local UIUtil = import("/lua/ui/uiutil.lua")
 local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
 local Reticle = import('/lua/ui/controls/reticle.lua').Reticle
 
+local SyncStrikeWorldLabel = import('/lua/ui/game/worldlabels/syncstrikelabel.lua').SyncStrikeWorldLabel
+
 -- Upvalue scope for performance
 local GameTick = GameTick
 local VDist2 = VDist2
@@ -74,14 +76,22 @@ CYCLE = {
 ---@type table<number, { fire: UserUnit[], hold: UserUnit }>
 local watchArray = {}
 
-local syncCache = {}
-local syncIndex = 1
+local launcherSyncTable = {}
 
 ---@param launcher UserUnit
----@return number | false
 local CalculateTicksToTarget = function(launcher)
 
+    if launcher:IsDead() then
+        LOG('Dead launcher')
+        launcher.ticksToTarget = nil
+        return
+    end
     local targetPos = launcher:GetCommandQueue()[1].position
+    if not targetPos then
+        LOG('No target position!')
+        launcher.ticksToTarget = nil
+        return
+    end
     local pos = launcher:GetPosition()
     local range = VDist2(pos[1], pos[3], targetPos[1], targetPos[3])
     local unitId = launcher:GetUnitId()
@@ -89,9 +99,9 @@ local CalculateTicksToTarget = function(launcher)
     --make sure we're in range
     if FLIGHT[unitId][math.floor(range)] then
         --we can add support for multiple queued syncronized strikes here
-        return CYCLE[unitId] * (TableGetn(launcher:GetCommandQueue())-1) + READY[unitId] + LAUNCH[unitId] + FLIGHT[unitId][math.floor(range)]
+        launcher.ticksToTarget = CYCLE[unitId] * (TableGetn(launcher:GetCommandQueue())-1) + READY[unitId] + LAUNCH[unitId] + FLIGHT[unitId][math.floor(range)]
     else
-        return false
+        launcher.ticksToTarget = nil
     end
 end
 
@@ -109,15 +119,6 @@ WatcherBeat = function()
         for _, launcher in watchArray[tick].fire do
             LOG('setting launcher to fire:' .. launcher:GetEntityId())
             SetFireState({launcher}, FireState.GROUND_FIRE)
-            launcher.syncCount = launcher.syncCount - 1
-            if launcher.syncCount > 0 then
-                if not watchArray[tick+20] then
-                    watchArray[tick+20] = {fire={},hold={}}
-                end
-                TableInsert(watchArray[tick+20].hold,launcher)
-            else
-                launcher.syncCount = nil
-            end
         end
 
         for _, launcher in watchArray[tick].hold do
@@ -125,11 +126,11 @@ WatcherBeat = function()
         end
 
         watchArray[tick] = nil
-
     end
 
     --if there are no more ticks to watch for in the cache, remove the beat function
     if TableEmpty(watchArray) then
+        LOG('WatchArray is empty, removing beat function')
         RemoveBeatFunction(WatcherBeat)
     end
 
@@ -154,9 +155,11 @@ local PreProcessLaunchers = function(subSyncCache)
         --add launcher to the launcherCache and set to hold fire
         if launcher.ticksToTarget then
             if launcher.syncCount then
+                LOG('Launcher has a syncCount')
                 --for a launcher that is already in the system, we won't mess with the fire state
                 launcher.syncCount = launcher.syncCount + 1
             else
+                LOG('Setting launcher to hold fire')
                 --otherwise, initialize the firestate and set to hold fire
                 SetFireState({launcher}, FireState.HOLD_FIRE)
                 launcher.syncCount = 1
@@ -173,7 +176,7 @@ local PreProcessLaunchers = function(subSyncCache)
     return launcherCache, maxTicksToTarget
 end
 
-local SynchronizedStrike = function(subSyncCache)
+local LaunchStrike = function(subSyncCache)
 
     --calc tickOnTarget for relevant launchers and add them to the launcherCache
     --obtain impactTick from the return maxTicksToTargetValue
@@ -194,6 +197,7 @@ local SynchronizedStrike = function(subSyncCache)
     --format is watchArray[GameTick] = {fire={...},hold={...}}
     --where the beat function will check the keys for the game tick, and apply the firestate changes to the launchers if so
     for _, launcher in launcherCache do
+        CalculateTicksToTarget(launcher)
         local fireStateChangeTick = impactTick - launcher.ticksToTarget + READY[launcher:GetUnitId()]
         if not watchArray[fireStateChangeTick] then
             watchArray[fireStateChangeTick] = {fire={},hold={}}
@@ -206,37 +210,75 @@ local SynchronizedStrike = function(subSyncCache)
 end
 
 ReleaseSyncStrike = function()
+    LOG('ReleaseSyncStrike')
     -- releases the sync strike on top of the stack
-    SynchronizedStrike(syncCache[syncIndex])
-    table.remove(syncCache, 1)
-    syncIndex = syncIndex - 1
+    if not table.empty(syncCache) then
+        LaunchStrike(syncCache[syncIndex])
+        table.remove(syncCache, 1)
+        syncIndex = syncIndex - 1
+    end
 end
 
--- administrative overhead here to stage launchers that are passed from OnTacticalCommandIssued
-SynchronizedStrikeInprocess = function(command)
-    local inprocessingCache = {}
-    if TableEmpty(syncCache) then
-        TableInsert(syncCache, {type='',launchers={}})
-        syncIndex = 1
-    end
+SyncStrike = ClassSimple {
 
-    for _, launcher in command.Units do
-        TableInsert(inprocessingCache, launcher)
-        if syncCache[syncIndex].launchers[launcher] or command.CommandType ~= syncCache[syncIndex].type then
-            TableInsert(syncCache, {type='',launchers={}})
-            syncIndex = syncIndex + 1
+    __init = function(self, command)
+        self.launchers = {}
+        self.commandType = command.CommandType:lower()
+        LOG(self.commandType)
+        self.button = SyncStrikeWorldLabel(command.Target.Position, self)
+        self:InprocessLaunchers(command.Units)
+    end,
+
+    InprocessLaunchers = function(self, launchers)
+        LOG('Sync strike inprocess')
+        if not self.maxTicksToTarget then
+            self.maxTicksToTarget = 0
         end
-    end
+        for _, launcher in launchers do
+            if table.getn(launcher:GetCommandQueue()) == 1 then
+                CalculateTicksToTarget(launcher)
+                if launcher.ticksToTarget and launcher.ticksToTarget > self.maxTicksToTarget then
+                    self.maxTicksToTarget = launcher.ticksToTarget
+                end
+                SetFireState({launcher}, FireState.HOLD_FIRE)
+                table.insert(self.launchers, launcher)
+            end
+        end
+    end,
 
-    syncCache[syncIndex].type = command.CommandType:lower()
-    for _, launcher in inprocessingCache do
-        syncCache[syncIndex].launchers[launcher] = true
-    end
+    Launch = function(self)
+        local impactTick = GameTick() + self.maxTicksToTarget
 
-    -- this will release whatever order comes in automatically
-    -- for testing
-    ReleaseSyncStrike()
-end
+        if table.empty(self.launchers) then
+            return
+        end
+
+        if TableEmpty(watchArray) then
+            LOG('Adding beat function')
+            AddBeatFunction(WatcherBeat)
+        end
+
+        for _, launcher in self.launchers do
+            CalculateTicksToTarget(launcher)
+            if not launcher.ticksToTarget  then
+                continue
+            end
+            if launcher:GetMissileInfo()[self.commandType.. 'SiloStorageCount'] > 0 then
+                LOG('launcher is loaded')
+                local fireStateChangeTick = impactTick - launcher.ticksToTarget + READY[launcher:GetUnitId()]
+                if not watchArray[fireStateChangeTick] then
+                    watchArray[fireStateChangeTick] = {fire={},hold={}}
+                end
+                TableInsert(watchArray[fireStateChangeTick].fire, launcher)
+            end
+            launcher.ticksToTarget = nil
+        end
+    
+        --call our beat function, because it might get missed this tick
+        WatcherBeat()
+    end,
+
+}
 
 local function AnimateSyncText(text)
     while not text:IsHidden() do

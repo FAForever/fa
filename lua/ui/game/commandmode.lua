@@ -16,7 +16,7 @@ local EnhancementQueueFile = import("/lua/ui/notify/enhancementqueue.lua")
 local WorldView = import("/lua/ui/controls/worldview.lua")
 local GameMain = import("/lua/ui/game/gamemain.lua")
 
-local SynchronizedStrikeInprocess = import("/lua/ui/game/syncstrike.lua").SynchronizedStrikeInprocess
+local SyncStrike = import("/lua/ui/game/syncstrike.lua").SyncStrike
 
 -- upvalue globals for performance
 local IsKeyDown = IsKeyDown
@@ -401,7 +401,7 @@ end
 local function OnLaunchCommandIssued(command)
     --Deal with the case where control is held down and a tactical missile is being launched (for now)
     if IsKeyDown("CONTROL") and command.CommandType == "Tactical" then
-        SynchronizedStrikeInprocess(command)
+        SyncStrike(command)
     end
 end
 
