@@ -386,6 +386,7 @@ UnitBlueprint{
             CollideFriendly = false,
             Damage = 30,
             DamageType = "Normal",
+            DisableWhileReloading = true,
             DisplayName = "Will O Wisp Anti Missile",
             FireTargetLayerCapsTable = { Water = "Air" },
             FiringTolerance = 360,

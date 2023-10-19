@@ -130,16 +130,6 @@ local function PostProcessUnit(unit)
 
     unit.CategoriesHash[unit.BlueprintId] = true
 
-    -- create hash tables for quick lookup
-    unit.DoNotCollideListCount = 0
-    unit.DoNotCollideListHash = {}
-    if unit.DoNotCollideList then
-        unit.DoNotCollideListCount = table.getn(unit.DoNotCollideList)
-        for _, category in unit.DoNotCollideList do
-            unit.DoNotCollideListHash[category] = true
-        end
-    end
-
     -- sanitize guard scan radius
 
     -- The guard scan radius is used when:
@@ -554,9 +544,41 @@ function PostProcessUnitWithExternalFactory(allBlueprints, unit)
         efBlueprint.CategoriesHash[unit.FactionCategory] = true
         efBlueprint.CategoriesHash[unit.LayerCategory] = true
         efBlueprint.Categories = table.unhash(efBlueprint.CategoriesHash)
-        efBlueprint.SelectionSizeX = 0.95 * unit.SelectionSizeX
-        efBlueprint.SelectionSizeZ = 0.25 * unit.SelectionSizeZ
-        efBlueprint.SelectionCenterOffsetZ = 0.35 * unit.SelectionSizeZ
+        efBlueprint.SelectionSizeX = unit.ExternalFactory.SelectionSizeX or (0.95 * unit.SelectionSizeX)
+        efBlueprint.SelectionSizeZ = unit.ExternalFactory.SelectionSizeZ or (0.25 * unit.SelectionSizeZ)
+        efBlueprint.SelectionCenterOffsetX = unit.ExternalFactory.SelectionCenterOffsetX or 0
+        efBlueprint.SelectionCenterOffsetY = unit.ExternalFactory.SelectionCenterOffsetY or 0
+        efBlueprint.SelectionCenterOffsetZ = unit.ExternalFactory.SelectionCenterOffsetZ or (0.35 * unit.SelectionSizeZ)
+        efBlueprint.SelectionMeshScaleX = unit.ExternalFactory.SelectionMeshScaleX or 1
+        efBlueprint.SelectionMeshScaleY = unit.ExternalFactory.SelectionMeshScaleY or 3
+        efBlueprint.SelectionMeshScaleZ = unit.ExternalFactory.SelectionMeshScaleZ or 1
+        efBlueprint.Display.UniformScale = unit.ExternalFactory.UniformScale or 1.6
+
+        -- add order overrides to carriers
+        if unit.CategoriesHash['CARRIER'] then
+
+            -- override our transport function to display what we want
+            -- and exhibit new behavior
+            if not unit.General.OrderOverrides then
+                unit.General.OrderOverrides = {}
+            end
+
+            unit.General.OrderOverrides.RULEUCC_Transport = {
+                bitmapId = 'deploy',
+                helpText = 'auto_deploy',
+                behavior = 'AutoDeployBehavior',
+                initialStateFunc = 'AutoDeployInit',
+                extraInfo = 1,
+            }
+
+            -- add the toggle so it can be flipped to begin with
+            -- but add an order override to remove it from our orders table
+            if not unit.General.ToggleCaps then
+                unit.General.ToggleCaps = {}
+            end
+            unit.General.ToggleCaps.RULEUTC_WeaponToggle = true
+            unit.General.OrderOverrides.RULEUTC_WeaponToggle = false
+        end
 
         -- remove properties of the seed unit
         unit.Categories = table.unhash(unit.CategoriesHash)

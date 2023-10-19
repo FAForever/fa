@@ -184,6 +184,13 @@ UnitBlueprint{
             "BUILTBYTIER2FACTORY AEON MOBILE NAVAL",
         },
     },
+    ExternalFactory = {
+        SelectionSizeX = 3,
+        SelectionSizeZ = 3,
+        SelectionCenterOffsetX = 0,
+        SelectionCenterOffsetY = 2.0,
+        SelectionCenterOffsetZ = 4,
+    },
     General = {
         CommandCaps = {
             RULEUCC_Attack = true,
@@ -403,6 +410,7 @@ UnitBlueprint{
             CollideFriendly = false,
             Damage = 3,
             DamageType = "Normal",
+            DisableWhileReloading = true,
             DisplayName = "Quasar Anti Torpedo",
             FireTargetLayerCapsTable = {
                 Sub = "Sub|Water",

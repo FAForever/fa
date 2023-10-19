@@ -262,7 +262,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
             BuffTable = {},
             Affects = {},
         }
-
+        
         self:ShowPresetEnhancementBones()
 
         local bpDeathAnim = bp.Display.AnimationDeath
@@ -1518,8 +1518,6 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         end
     end,
 
-    
-
     --- Called when a unit collides with a projectile to check if the collision is valid
     ---@param self Unit The unit we're checking the collision for
     ---@param other Projectile The projectile we're checking the collision with
@@ -1531,23 +1529,12 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
             return false
         end
 
+        local selfArmy = self.Army
+        local otherArmy = other.Army
+
         -- if we're allied, check if we allow allied collisions
-        if self.Army == other.Army or IsAlly(self.Army, other.Army) then
+        if selfArmy == otherArmy or IsAlly(selfArmy, otherArmy) then
             return other.CollideFriendly
-        end
-
-        -- check for exclusions from projectile perspective
-        for k = 1, other.Blueprint.DoNotCollideListCount do
-            if self.Blueprint.CategoriesHash[other.Blueprint.DoNotCollideList[k]] then
-                return false 
-            end
-        end
-
-        -- check for exclusions from unit perspective
-        for k = 1, self.Blueprint.DoNotCollideListCount do
-            if other.Blueprint.CategoriesHash[self.Blueprint.DoNotCollideList[k]] then
-                return false
-            end
         end
 
         return true
@@ -1564,8 +1551,11 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
             return false
         end
 
+        local selfArmy = self.Army
+        local otherArmy = firingWeapon.Army
+
         -- if we're allied, check if we allow allied collisions
-        if self.Army == firingWeapon.Army or IsAlly(self.Army, firingWeapon.Army) then
+        if selfArmy == otherArmy or IsAlly(selfArmy, otherArmy) then
             return firingWeapon.Blueprint.CollideFriendly
         end
 
@@ -3233,6 +3223,11 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         -- Store latest layer for performance, preventing .Layer engine calls.
         self.Layer = new 
 
+        if old != 'None' then
+            self:DestroyMovementEffects()
+            self:CreateMovementEffects(self.MovementEffectsBag, nil)
+        end
+
         -- Bail out early if dead. The engine calls this function AFTER entity:Destroy() has killed
         -- the C object. Any functions down this line which expect a live C object (self:CreateAnimator())
         -- for example, will throw an error.
@@ -3356,7 +3351,6 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         local layer = self.Layer
         if (new == 'Up' and old == 'Bottom') or (new == 'Down' and old == 'Top') then
             self:DestroyIdleEffects()
-
             if new == 'Up' and layer == 'Sub' then
                 self:PlayUnitSound('SurfaceStart')
             end

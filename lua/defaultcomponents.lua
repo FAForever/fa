@@ -502,7 +502,7 @@ TreadComponent = ClassSimple {
         end
 
         while true do
-            while not self.TreadSuspend do
+            while not (self.TreadSuspend or IsDestroyed(self)) do
                 CreateSplatOnBone(self, treadOffset, treadBone, treadTexture, sizeX, sizeZ, lod, duration, army)
                 WaitTicks(interval)
             end
@@ -826,6 +826,10 @@ ExternalFactoryComponent = ClassSimple {
         local blueprint = self.Blueprint
         if not self.FactoryAttachBone then
             error(string.format("%s is not setup for an external factory: the unit does not have a field 'FactoryAttachBone'", blueprint.BlueprintId))
+        end
+
+        if self.BuildAttachBone and self.BuildAttachBone == self.FactoryAttachBone then
+            error(string.format("%s is not setup for an external factory: the 'FactoryAttachBone' can not be the same as the 'BuildAttachBone'", blueprint.BlueprintId))
         end
 
         if not blueprint.CategoriesHash['EXTERNALFACTORY'] then

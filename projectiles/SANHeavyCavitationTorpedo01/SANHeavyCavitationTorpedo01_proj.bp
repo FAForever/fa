@@ -32,10 +32,6 @@ ProjectileBlueprint {
         },
         StrategicIconSize = 1,
     },
-    DoNotCollideList = {
-        'PROJECTILE',
-        'TORPEDO',
-    },
     General = {
         Category = 'Anti Navy',
         Faction = 'Seraphim',

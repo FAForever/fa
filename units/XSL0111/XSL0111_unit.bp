@@ -180,7 +180,7 @@ UnitBlueprint{
             HeadingArcRange = 60,
             Label = "MissileRack",
             MaxRadius = 60,
-            MinRadius = 4,
+            MinRadius = 10,
             MuzzleChargeDelay = 0.1,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,

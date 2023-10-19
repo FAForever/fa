@@ -20,6 +20,7 @@ UnitBlueprint{
         "LAND",
         "MOBILE",
         "OVERLAYDIRECTFIRE",
+        "OVERLAYINDIRECTFIRE",
         "PRODUCTFA",
         "RECLAIMABLE",
         "SELECTABLE",

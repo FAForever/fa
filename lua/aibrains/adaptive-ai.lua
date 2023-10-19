@@ -5,6 +5,7 @@ local AIUtils = import("/lua/ai/aiutilities.lua")
 
 local Utilities = import("/lua/utilities.lua")
 local ScenarioUtils = import("/lua/sim/scenarioutilities.lua")
+local MarkerUtilities = import("/lua/sim/markerutilities.lua")
 
 local FactoryManager = import("/lua/sim/factorybuildermanager.lua")
 local PlatoonFormManager = import("/lua/sim/platoonformmanager.lua")
@@ -15,7 +16,7 @@ local SUtils = import("/lua/ai/sorianutilities.lua")
 
 local TableGetn = table.getn
 
----@class EasyAIBrainManagers
+---@class AdaptiveAIBrainManagers
 ---@field FactoryManager AIFactoryManager
 ---@field EngineerManager AIEngineerManager
 ---@field StructureManager AIStructureManager
@@ -29,7 +30,7 @@ local TableGetn = table.getn
 ---@field OnceOnly boolean
 ---@field TargetAIBrain AIBrain
 
----@class EasyAIBrain: AIBrain, AIBrainEconomyComponent
+---@class AdaptiveAIBrain: AIBrain, AIBrainEconomyComponent
 ---@field GridReclaim AIGridReclaim
 ---@field GridBrain AIGridBrain
 ---@field GridRecon AIGridRecon
@@ -524,9 +525,10 @@ AIBrain = Class(StandardBrain, EconomyComponent) {
             EngineerManager = EngineerManager.CreateEngineerManager(self, baseName, position, radius),
             BuilderHandles = {},
             Position = position,
-            BaseType = Scenario.MasterChain._MASTERCHAIN_.Markers[baseName].type or 'MAIN',
+            BaseType = MarkerUtilities.GetMarker(baseName).Name or 'Main',
             Layer = baseLayer,
         }
+
         self.NumBases = self.NumBases + 1
     end,
 
@@ -1108,8 +1110,8 @@ AIBrain = Class(StandardBrain, EconomyComponent) {
                     self:AddBuilderManagers(self:GetStartVector3f(), 100, 'MAIN', false)
                     SUtils.AddCustomUnitSupport(self)
 
-                    ArmyBrains[self:GetArmyIndex()].Nickname = 'CMDR Sorian..(was '..oldName..')'
-                    ScenarioInfo.ArmySetup[self.Name].AIPersonality = 'sorianadaptive'
+                    ArmyBrains[self:GetArmyIndex()].Nickname = 'CMDR Adaptive..(was '..oldName..')'
+                    ScenarioInfo.ArmySetup[self.Name].AIPersonality = 'adaptive'
 
                     local cmdUnits = self:GetListOfUnits(categories.COMMAND, true)
                     if cmdUnits then
@@ -1599,7 +1601,7 @@ AIBrain = Class(StandardBrain, EconomyComponent) {
     ---------------------------------------------------------------------------
     --#region Debug functionality
 
-    ---@param self EasyAIBrain
+    ---@param self AdaptiveAIBrain
     ---@return AIBaseDebugInfo
     GetPlatoonDebugInfoThread = function(self)
         while true do

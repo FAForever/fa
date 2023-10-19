@@ -315,6 +315,7 @@ UnitBlueprint{
             CollideFriendly = false,
             Damage = 2,
             DamageType = "Normal",
+            DisableWhileReloading = true,
             DisplayName = "Quasar Anti Torpedo",
             FireTargetLayerCapsTable = { Water = "Seabed|Sub|Water" },
             FiringTolerance = 10,
