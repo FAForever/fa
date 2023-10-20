@@ -246,6 +246,7 @@ UnitBlueprint{
             Damage = 2,
             DamageType = "Normal",
             DisplayName = "Ajellu Anti-Torpedo Defense",
+            DisableWhileReloading = true,
             FireTargetLayerCapsTable = { Water = "Seabed|Sub|Water" },
             FiringTolerance = 10,
             Label = "AjelluTorpedoDefense",

@@ -338,6 +338,7 @@ UnitBlueprint{
             CollideFriendly = false,
             Damage = 2,
             DamageType = "Normal",
+            DisableWhileReloading = true,
             DisplayName = "Anti Torpedo",
             EffectiveRadius = 42,
             FireTargetLayerCapsTable = { Water = "Sub|Water|Seabed" },
