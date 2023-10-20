@@ -14,6 +14,7 @@ local EffectTemplate = import("/lua/effecttemplates.lua")
 local DepthCharge = import("/lua/defaultantiprojectile.lua").DepthCharge
 local NukeProjectile = DefaultProjectileFile.NukeProjectile
 
+local DebrisComponent = import('/lua/sim/projectiles/components/DebrisComponent.lua').DebrisComponent
 local TacticalMissileComponent = import('/lua/sim/DefaultProjectiles.lua').TacticalMissileComponent
 
 ---@class TFragmentationGrenade : EmitterProjectile
@@ -296,8 +297,8 @@ TAntiNukeInterceptorProjectile = ClassProjectile(SingleBeamProjectile) {
 }
 
 ---  TERRAN MISSILE PROJECTILES - General Purpose
----@class TMissileProjectile : SingleBeamProjectile
-TMissileProjectile = ClassProjectile(SingleBeamProjectile, TacticalMissileComponent) {
+---@class TMissileProjectile : SingleBeamProjectile, TacticalMissileComponent, DebrisComponent
+TMissileProjectile = ClassProjectile(SingleBeamProjectile, TacticalMissileComponent, DebrisComponent) {
     DestroyOnImpact = false,
     FxTrails = EffectTemplate.TMissileExhaust02,
     FxTrailOffset = -1,
@@ -327,6 +328,12 @@ TMissileProjectile = ClassProjectile(SingleBeamProjectile, TacticalMissileCompon
     FinalBoostAngle = 50,
     FinalBoostAngleRange = 5,
 
+    DebrisBlueprints = {
+        '/effects/Entities/TacticalDebris01/TacticalDebris01_proj.bp',
+        '/effects/Entities/TacticalDebris01/TacticalDebris01_proj.bp',
+        '/effects/Entities/TacticalDebris02/TacticalDebris02_proj.bp',
+    },
+
     OnCreate = function(self)
         SingleBeamProjectile.OnCreate(self)
         self:SetCollisionShape('Sphere', 0, 0, 0, 2.0)
@@ -340,7 +347,7 @@ TMissileProjectile = ClassProjectile(SingleBeamProjectile, TacticalMissileCompon
         SingleBeamProjectile.OnKilled(self, instigator, type, overkillRatio)
 
         self:CreateDebris()
-        CreateLightParticleIntel(self, -1, self.Army, 3, 6, 'flare_lens_add_02', 'ramp_fire_13')
+        CreateLightParticle(self, -1, self.Army, 3, 6, 'flare_lens_add_02', 'ramp_fire_13')
     end,
 
     ---@param self TMissileProjectile
@@ -348,17 +355,11 @@ TMissileProjectile = ClassProjectile(SingleBeamProjectile, TacticalMissileCompon
     ---@param targetEntity Prop|Unit
     OnImpact = function(self, targetType, targetEntity)
         SingleBeamProjectile.OnImpact(self, targetType, targetEntity)
-
-        if targetType == 'None' then
+        if targetType == 'None' or targetType == 'Air' then
             self:CreateDebris()
         end
 
-        CreateLightParticleIntel(self, -1, self.Army, 4, 4, 'flare_lens_add_02', 'ramp_fire_13')
-    end,
-
-    ---@param self TMissileProjectile
-    CreateDebris = function(self)
-        self:CreateChildProjectile('/effects/entities/DebrisMisc04/DebrisMisc04_proj.bp')
+        CreateLightParticle(self, -1, self.Army, 4, 4, 'flare_lens_add_02', 'ramp_fire_13')
     end,
 }
 

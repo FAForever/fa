@@ -240,7 +240,7 @@ SLaanseTacticalMissile = ClassProjectile(SinglePolyTrailProjectile) {
     ---@param overkillRatio number
     OnKilled = function(self, instigator, type, overkillRatio)
         SinglePolyTrailProjectile.OnKilled(self, instigator, type, overkillRatio)
-        CreateLightParticleIntel(self, -1, self.Army, 3, 6, 'flare_lens_add_02', 'ramp_blue_13')
+        CreateLightParticle(self, -1, self.Army, 3, 6, 'flare_lens_add_02', 'ramp_blue_13')
     end,
 
     ---@param self SLaanseTacticalMissile
@@ -248,7 +248,7 @@ SLaanseTacticalMissile = ClassProjectile(SinglePolyTrailProjectile) {
     ---@param targetEntity Prop|Unit
     OnImpact = function(self, targetType, targetEntity)
         SinglePolyTrailProjectile.OnImpact(self, targetType, targetEntity)
-        CreateLightParticleIntel(self, -1, self.Army, 4, 4, 'flare_lens_add_02', 'ramp_blue_13')
+        CreateLightParticle(self, -1, self.Army, 4, 4, 'flare_lens_add_02', 'ramp_blue_13')
     end,
 }
 

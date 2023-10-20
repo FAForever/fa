@@ -22,7 +22,7 @@ CIFMissileTacticalSplit01 = ClassProjectile(CLOATacticalChildMissileProjectile) 
 
         self:TrackTarget(true)
 
-        for k = 9, 1, -1 do
+        for k = 9, 5, -1 do
             WaitTicks(6)
             if not IsDestroyed(self) then
                 self:ChangeMaxZigZag(k)
