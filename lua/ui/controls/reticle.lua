@@ -28,6 +28,24 @@ local Group = import("/lua/maui/group.lua").Group
 local GetMouseScreenPos = GetMouseScreenPos
 local GetMouseWorldPos = GetMouseWorldPos
 
+-- pa : playable area
+local pa = import('/lua/ui/game/gamemain.lua').GetPlayableArea()
+
+import('/lua/UserSync.lua').AddOnSyncHashedCallback(
+    function(data) pa = data LOG('pa: '..repr(pa)) end,
+    'NewPlayableArea',
+    'ReticlePlayableArea'
+)
+
+LOG('pa: '..repr(pa))
+
+local InPlayableArea = function(pos)
+    return (
+        (pos[1] >= pa[1] and pos[1] <= pa[3]) and
+        (pos[3] >= pa[2] and pos[3] <= pa[4])
+    )
+end
+
 --- Reticle base class for displaying images and texts on the cursor
 ---@class Reticle : Group
 ---@field parent WorldView
@@ -46,10 +64,6 @@ Reticle = ClassUI(Group) {
         self.Trash = TrashBag()
         self.onMap = false
         self.changedOnMap = true
-
-        -- get map dimensions for on and off map update check
-        local scenarioInfo = SessionGetScenarioInfo()
-        self.mapX, self.mapZ = scenarioInfo.PlayableAreaWidth, scenarioInfo.PlayableAreaHeight
 
         -- set dimensions, default 64x64
         local xDim, yDim = data.xDim or 64, data.yDim or 64
@@ -82,8 +96,9 @@ Reticle = ClassUI(Group) {
     ---@param self Reticle
     ---@param mouseWorldPos Vector
     UpdateOnMapStatus = function(self, mouseWorldPos)
-        if ((mouseWorldPos[1] < 1 or mouseWorldPos[1] > self.mapX - 1) or
-        (mouseWorldPos[3] < 1 or mouseWorldPos[3] > self.mapZ - 1)) == self.onMap then
+        if InPlayableArea(mouseWorldPos) ~= self.onMap then
+            LOG('onMap changed to: '..repr(not self.onMap))
+            LOG('mouseWorldPos: '..repr(mouseWorldPos))
             self.changedOnMap = true
             self.onMap = not self.onMap
         end

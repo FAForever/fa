@@ -26,6 +26,8 @@ local mapGroup = controls.map
 local mfdControl = controls.mfd
 local ordersControl = false
 
+local playableArea
+
 local OnDestroyFuncs = {}
 
 local NISActive = false
@@ -715,6 +717,23 @@ function OnQueueChanged(newQueue)
     if not gameUIHidden then
         import("/lua/ui/game/construction.lua").OnQueueChanged(newQueue)
     end
+end
+
+function OnPlayableAreaChanged(newPlayableArea)
+    playableArea = newPlayableArea
+end
+
+function GetPlayableArea()
+    if not playableArea then
+        local sessionInfo = SessionGetScenarioInfo()
+        playableArea = {
+            0,
+            sessionInfo.PlayableAreaWidth,
+            0,
+            sessionInfo.PlayableAreaHeight,
+        }
+    end
+    return playableArea
 end
 
 -- Called after the Sim has confirmed the game is indeed paused. This will happen
