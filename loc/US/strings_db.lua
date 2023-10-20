@@ -1587,15 +1587,15 @@ Unit_Description_s087="Constructs Tech 3 Naval units. Buildable for a much cheap
 -- CYBRAN -- Armored Commander Unit/Upgrades
 Unit_Description_0304="Armored Commander is a combination of barracks and command center. Contains all the blueprints necessary to build a basic army from scratch. Upgradeable with combat enhancements, advanced engineering suits, resource allocation system, and teleporting. Lightly armoured, but with high Regeneration rate."
 Unit_Description_0106="Increases ACU's resource generation to 13 mass per second and 2720 energy per second."
-Unit_Description_0107="Personal Cloaking further hiding the ACU from optical sensors and massively boosts HP. Countered by omni sensors. Costs energy to run."
-Unit_Description_0108="Personal Stealth hiding the ACU from radar. Countered by omni sensors. Costs energy to run."
+Unit_Description_0107="Personal Cloaking further hiding the ACU from optical sensors and massively boosts HP. Countered by omni sensors. Costs energy to run.\n\n+12000 Health"
+Unit_Description_0108="Personal Stealth hiding the ACU from radar. Countered by omni sensors. Costs energy to run.\n\n+2000 Health"
 Unit_Description_0109="Adds Teleportation capability. Requires considerable energy to activate."
-Unit_Description_0110="Grants Tech 2 schematic access and increases the ACU's build speed and maximum health"
-Unit_Description_0111="Replaces the Tech 2 engineering Suite. Grants Tech 3 and Experimental schematic access and further increases the ACU's build speed and maximum health"
-Unit_Description_0112="Doubles the main cannon's Rate-Of-Fire, and increases the range of all the ACU's weaponry."
+Unit_Description_0110="Grants Tech 2 schematic access and increases the ACU's build speed and maximum health.\n\n+32 Buildpower\n+2000 Health\n+10 Regen"
+Unit_Description_0111="Replaces the Tech 2 engineering Suite. Grants Tech 3 and Experimental schematic access and further increases the ACU's build speed and maximum health.\n\n+58 Buildpower\n+3000 Health\n+20 Regen"
+Unit_Description_0112="Doubles the main cannon's Rate-Of-Fire, and increases the range of all the ACU's weaponry.\n\n+1 Rate of fire\n+8 Main Weapon range"
 Unit_Description_0113="Enhances the ACU with Microwave Laser weapon with unbelievable firepower."
 Unit_Description_0114="Enhances the ACU with a torpedo weapon and sonar sensor."
-Unit_Description_0465_faf="Massively increases the rate at which the ACU repairs its armour."
+Unit_Description_0465_faf="Massively increases the rate at which the ACU repairs its armour.\n\n+1500 Health\n+60 Regen"
 
 -- CYBRAN -- Support Commander Units/Upgrades
 Unit_Description_0115="A highly versatile combat and engineering unit useful on late-stage battlefields."
