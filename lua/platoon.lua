@@ -2445,7 +2445,11 @@ Platoon = Class(moho.platoon_methods) {
             local guards = eng:GetGuards()
             for k,v in guards do
                 if not v.Dead and v.PlatoonHandle and aiBrain:PlatoonExists(v.PlatoonHandle) then
-                    v.PlatoonHandle:PlatoonDisband()
+                    if v.PlatoonHandle.PlatoonDisband then
+                        v.PlatoonHandle:PlatoonDisband()
+                    elseif not v.PlatoonHandle.ExitGuard then
+                        v.PlatoonHandle.ExitGuard = true
+                    end
                 end
             end
         end

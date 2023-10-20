@@ -1255,6 +1255,7 @@ function SendPlatoonWithTransports(aiBrain, platoon, destination, attempts, bSki
     if platoon.LogDebug then
 		platoon:LogDebug(string.format('Raid Platoon existing transport function'))
 	end
+	LOG('SendPlatoonWithTransports is returning the platoon exist still')
 	return PlatoonExists( aiBrain, platoon )
     
 end

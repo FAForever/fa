@@ -130,11 +130,26 @@ AIPlatoon = Class(moho.platoon_methods) {
     ---@param state AIPlatoonState
     ChangeState = function(self, state)
         self:LogDebug(string.format('Changing state to: %s', state.StateName))
+        LOG('Changing state to: %s', state.StateName)
 
-        WaitTicks(1)
+        --WaitTicks(1)
 
         if not IsDestroyed(self) then
             ChangeState(self, state)
+        end
+    end,
+
+    ---@param self AIPlatoon
+    ---@param fn function
+    ---@param ... any
+    ---@return thread
+    ForkThread = function(self, fn, ...)
+        if fn then
+            local thread = ForkThread(fn, self, unpack(arg))
+            self.Trash:Add(thread)
+            return thread
+        else
+            return nil
         end
     end,
 

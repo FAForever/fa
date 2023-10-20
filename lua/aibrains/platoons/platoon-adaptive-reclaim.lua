@@ -42,6 +42,11 @@ AIPlatoonAdaptiveReclaimBehavior = Class(AIPlatoon) {
                 self:ChangeState(self.Error)
                 return
             end
+            if self.PlatoonData.LocationType then
+                self.LocationType = self.PlatoonData.LocationType
+            else
+                self.LocationType = 'MAIN'
+            end
 
             self.CellSize = brain.GridReclaim.CellSize * brain.GridReclaim.CellSize
 

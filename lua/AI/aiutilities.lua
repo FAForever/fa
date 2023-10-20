@@ -3545,3 +3545,108 @@ function GetResourceMarkerWithinRadius(aiBrain, pos, markerType, radius, canBuil
     end
     return false
 end
+
+MergeWithNearbyStatePlatoons = function(platoon, stateMachine, radius, maxMergeNumber, ignoreBase)
+    -- check to see we're not near an ally base
+    -- ignoreBase is not worded well, if false then ignore if too close to base
+    if IsDestroyed(platoon) then
+        return
+    end
+    local aiBrain = platoon:GetBrain()
+    if not aiBrain then
+        return
+    end
+
+    if platoon.UsingTransport then
+        return
+    end
+    local platUnits = platoon:GetPlatoonUnits()
+    local platCount = 0
+
+    for _, u in platUnits do
+        if not u.Dead then
+            platCount = platCount + 1
+        end
+    end
+
+    if (maxMergeNumber and platCount > maxMergeNumber) or platCount < 1 then
+        return
+    end 
+
+    local platPos = platoon:GetPlatoonPosition()
+    if not platPos then
+        return
+    end
+
+    local radiusSq = radius*radius
+    -- if we're too close to a base, forget it
+    if not ignoreBase then
+        if aiBrain.BuilderManagers then
+            for baseName, base in aiBrain.BuilderManagers do
+                if VDist2Sq(platPos[1], platPos[3], base.Position[1], base.Position[3]) <= (2*radiusSq) then
+                    --RNGLOG('Platoon too close to base, not merge happening')
+                    return
+                end
+            end
+        end
+    end
+
+    local AlliedPlatoons = aiBrain:GetPlatoonsList()
+    local bMergedPlatoons = false
+    for _,aPlat in AlliedPlatoons do
+        if aPlat.PlatoonName ~= stateMachine then
+            continue
+        end
+        if aPlat == platoon then
+            continue
+        end
+
+        if aPlat.UsingTransport then
+            continue
+        end
+
+        if aPlat.PlatoonFull then
+            --RNGLOG('Remote platoon is full, skip')
+            continue
+        end
+
+        local allyPlatPos = aPlat:GetPlatoonPosition()
+        if not allyPlatPos or not aiBrain:PlatoonExists(aPlat) then
+            continue
+        end
+
+        if not platoon.MovementLayer then
+            platoon:GetNavigationalLayer()
+        end
+        if not aPlat.MovementLayer then
+            aPlat:GetNavigationalLayer()
+        end
+
+        -- make sure we're the same movement layer type to avoid hamstringing air of amphibious
+        if platoon.MovementLayer ~= aPlat.MovementLayer then
+            continue
+        end
+
+        if  VDist2Sq(platPos[1], platPos[3], allyPlatPos[1], allyPlatPos[3]) <= radiusSq then
+            local units = aPlat:GetPlatoonUnits()
+            local validUnits = {}
+            local bValidUnits = false
+            for _,u in units do
+                if not u.Dead and not u:IsUnitState('Attached') then
+                    table.insert(validUnits, u)
+                    bValidUnits = true
+                end
+            end
+            if bValidUnits then
+                --LOG("*AI DEBUG: Merging platoons " .. platoon.BuilderName .. ": (" .. platPos[1] .. ", " .. platPos[3] .. ") and " .. aPlat.BuilderName .. ": (" .. allyPlatPos[1] .. ", " .. allyPlatPos[3] .. ")")
+                aiBrain:AssignUnitsToPlatoon(platoon, validUnits, 'Attack', 'GrowthFormation')
+                bMergedPlatoons = true
+            end
+        end
+    end
+    if bMergedPlatoons then
+        local platUnits = platoon:GetPlatoonUnits()
+        IssueClearCommands(platUnits)
+    end
+    return bMergedPlatoons
+end
