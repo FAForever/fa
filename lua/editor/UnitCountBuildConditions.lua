@@ -965,10 +965,8 @@ function FactoryCapCheck(aiBrain, locationType, factoryType)
     numUnits = numUnits + aiBrain:GetEngineerManagerUnitsBeingBuilt(catCheck)
 
     if numUnits < aiBrain.BuilderManagers[locationType].BaseSettings.FactoryCount[factoryType] then
-        LOG('Factory Cap Check is true')
         return true
     end
-    LOG('Factory Cap Check is false')
     return false
 end
 

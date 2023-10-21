@@ -2445,7 +2445,11 @@ Platoon = Class(moho.platoon_methods) {
             local guards = eng:GetGuards()
             for k,v in guards do
                 if not v.Dead and v.PlatoonHandle and aiBrain:PlatoonExists(v.PlatoonHandle) then
-                    v.PlatoonHandle:PlatoonDisband()
+                    if v.PlatoonHandle.PlatoonDisband then
+                        v.PlatoonHandle:PlatoonDisband()
+                    elseif not v.PlatoonHandle.ExitGuard then
+                        v.PlatoonHandle.ExitGuard = true
+                    end
                 end
             end
         end
@@ -3414,7 +3418,7 @@ Platoon = Class(moho.platoon_methods) {
         AlliedPlatoons = aiBrain:GetPlatoonsList()
         local bMergedPlatoons = false
         for _,aPlat in AlliedPlatoons do
-            if aPlat:GetPlan() != planName then
+            if aPlat.GetPlan and aPlat:GetPlan() != planName then
                 continue
             end
             if aPlat == self then
@@ -3733,7 +3737,7 @@ Platoon = Class(moho.platoon_methods) {
 
         -- final check for if we should disband
         if not eng or eng.Dead or table.empty(eng.EngineerBuildQueue) then
-            if eng.PlatoonHandle and aiBrain:PlatoonExists(eng.PlatoonHandle) and not eng.PlatoonHandle.UsingTransport then
+            if eng.PlatoonHandle and aiBrain:PlatoonExists(eng.PlatoonHandle) and not eng.PlatoonHandle.UsingTransport and eng.PlatoonHandle.PlatoonDisband then
                 eng.PlatoonHandle:PlatoonDisband()
             end
         end

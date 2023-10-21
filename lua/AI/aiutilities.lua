@@ -3575,7 +3575,7 @@ function GetResourceMarkerWithinRadius(aiBrain, pos, markerType, radius, canBuil
     return false
 end
 
-MergeWithNearbyStateMachines = function(platoon, stateMachine, radius, maxMergeNumber, ignoreBase)
+MergeWithNearbyStatePlatoons = function(platoon, stateMachine, radius, maxMergeNumber, ignoreBase)
     -- check to see we're not near an ally base
     -- ignoreBase is not worded well, if false then ignore if too close to base
     if IsDestroyed(platoon) then
@@ -3645,10 +3645,10 @@ MergeWithNearbyStateMachines = function(platoon, stateMachine, radius, maxMergeN
         end
 
         if not platoon.MovementLayer then
-            platoon.MovementLayer = platoon:GetNavigationalLayer()
+            platoon:GetNavigationalLayer()
         end
         if not aPlat.MovementLayer then
-            AIAttackUtils.GetMostRestrictiveLayer(aPlat)
+            aPlat:GetNavigationalLayer()
         end
 
         -- make sure we're the same movement layer type to avoid hamstringing air of amphibious
@@ -3667,16 +3667,15 @@ MergeWithNearbyStateMachines = function(platoon, stateMachine, radius, maxMergeN
                 end
             end
             if bValidUnits then
-                --RNG("*AI DEBUG: Merging platoons " .. platoon.BuilderName .. ": (" .. platPos[1] .. ", " .. platPos[3] .. ") and " .. aPlat.BuilderName .. ": (" .. allyPlatPos[1] .. ", " .. allyPlatPos[3] .. ")")
+                --LOG("*AI DEBUG: Merging platoons " .. platoon.BuilderName .. ": (" .. platPos[1] .. ", " .. platPos[3] .. ") and " .. aPlat.BuilderName .. ": (" .. allyPlatPos[1] .. ", " .. allyPlatPos[3] .. ")")
                 aiBrain:AssignUnitsToPlatoon(platoon, validUnits, 'Attack', 'GrowthFormation')
                 bMergedPlatoons = true
             end
-            
         end
     end
     if bMergedPlatoons then
-        local mergedPlatoonUnits = platoon:GetPlatoonUnits()
-        IssueClearCommands(mergedPlatoonUnits)
+        local platUnits = platoon:GetPlatoonUnits()
+        IssueClearCommands(platUnits)
     end
     return bMergedPlatoons
 end
