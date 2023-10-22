@@ -136,7 +136,7 @@ end
 
 local FactoryNavGrid = {
     __call = function(self, layer, treeSize)
-        local instance = {&3 &0}
+        local instance = {}
         setmetatable(instance, self)
         instance:OnCreate(layer, treeSize)
         return instance
@@ -162,9 +162,9 @@ NavGrid = ClassNavGrid {
     OnCreate = function(self, layer, treeSize)
         self.Layer = layer
         self.TreeSize = treeSize
-        self.Trees = {&0 &16}
+        self.Trees = {}
         for z = 0, LabelCompressionTreesPerAxis - 1 do
-            self.Trees[z] = {&0 &16}
+            self.Trees[z] = {}
         end
     end,
 
@@ -339,7 +339,7 @@ NavGrid = ClassNavGrid {
 
 local FactoryCompressedLabelTree = {
     __call = function(self, layer, treeSize)
-        local instance = {&3 &4}
+        local instance = {}
         setmetatable(instance, self)
         instance:OnCreate(layer, treeSize)
         return instance
@@ -394,9 +394,6 @@ CompressedLabelTree = ClassCompressedLabelTree {
 
     ---@param self CompressedLabelTreeNode | CompressedLabelTreeLeaf
     OnCreate = function(self)
-        local identifier = GenerateCellIdentifier()
-        NavCells[identifier] = self
-        self.Identifier = identifier
     end,
 
     --- Compresses the cache using a quad tree, significantly reducing the amount of data stored. At this point
@@ -424,6 +421,11 @@ CompressedLabelTree = ClassCompressedLabelTree {
                     end
                 end
             end
+
+            -- generate a unique identifier
+            local identifier = GenerateCellIdentifier()
+            NavCells[identifier] = self
+            self.Identifier = identifier
 
             self.Size = size
             self.Root = root
@@ -456,6 +458,11 @@ CompressedLabelTree = ClassCompressedLabelTree {
         end
 
         if uniform then
+            -- generate a unique identifier
+            local identifier = GenerateCellIdentifier()
+            NavCells[identifier] = self
+            self.Identifier = identifier
+
             -- we're uniform, so we're good
             self.Label = value
             self.Size = size
@@ -494,6 +501,11 @@ CompressedLabelTree = ClassCompressedLabelTree {
     ---@param label -1 | 0
     ---@param layer NavLayers
     Flatten = function(self, bx, bz, ox, oz, size, root, label, layer)
+        -- generate a unique identifier
+        local identifier = GenerateCellIdentifier()
+        NavCells[identifier] = self
+        self.Identifier = identifier
+
         self.Label = label
         self.Size = size
         self.Root = root
@@ -1603,6 +1615,9 @@ function Generate()
     SPEW(string.format("Number of labels: %f", LabelIdentifier))
     SPEW(string.format("Number of cells: %f", CellIdentifier))
     SPEW(reprs(NavLayerData))
+
+    -- LOG(repru(NavGrids.Land.Trees[8][0]))
+    -- LOG(import('/lua/system/utils.lua').ToBytes(NavGrids.Land.Trees[8][0]) / (1024 * 1024))
 
     Sync.NavLayerData = NavLayerData
     Generated = true
