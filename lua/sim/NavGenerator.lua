@@ -338,11 +338,8 @@ NavGrid = ClassNavGrid {
 }
 
 local FactoryCompressedLabelTree = {
-    __call = function(self, layer, treeSize)
-        local instance = {}
-        setmetatable(instance, self)
-        instance:OnCreate(layer, treeSize)
-        return instance
+    __call = function(self)
+        return setmetatable({}, self)
     end
 }
 
@@ -392,10 +389,6 @@ local CompressedLabelTree
 ---@field [4] CompressedLabelTreeNode?
 CompressedLabelTree = ClassCompressedLabelTree {
 
-    ---@param self CompressedLabelTreeNode | CompressedLabelTreeLeaf
-    OnCreate = function(self)
-    end,
-
     --- Compresses the cache using a quad tree, significantly reducing the amount of data stored. At this point
     --- the label cache only exists of 0s and -1s
     ---@param self CompressedLabelTreeNode
@@ -432,7 +425,7 @@ CompressedLabelTree = ClassCompressedLabelTree {
 
             if uniform then
                 self.Label = value
-                if self.Label >= 0 then
+                if value >= 0 then
                     NavLayerData[layer].PathableLeafs = NavLayerData[layer].PathableLeafs + 1
                 else
                     NavLayerData[layer].UnpathableLeafs = NavLayerData[layer].UnpathableLeafs + 1
@@ -468,7 +461,7 @@ CompressedLabelTree = ClassCompressedLabelTree {
             self.Size = size
             self.Root = root
 
-            if self.Label >= 0 then
+            if value >= 0 then
                 NavLayerData[layer].PathableLeafs = NavLayerData[layer].PathableLeafs + 1
             else
                 NavLayerData[layer].UnpathableLeafs = NavLayerData[layer].UnpathableLeafs + 1
@@ -476,10 +469,10 @@ CompressedLabelTree = ClassCompressedLabelTree {
         else
             -- we're not uniform, split up to children
             local hc = 0.5 * size
-            self[1] = CompressedLabelTree(hc)
-            self[2] = CompressedLabelTree(hc)
-            self[3] = CompressedLabelTree(hc)
-            self[4] = CompressedLabelTree(hc)
+            self[1] = CompressedLabelTree()
+            self[2] = CompressedLabelTree()
+            self[3] = CompressedLabelTree()
+            self[4] = CompressedLabelTree()
 
             self[1]:Compress(bx, bz, ox, oz, hc, root, rCache, compressionThreshold, layer)
             self[2]:Compress(bx, bz, ox + hc, oz, hc, root, rCache, compressionThreshold, layer)
@@ -510,7 +503,7 @@ CompressedLabelTree = ClassCompressedLabelTree {
         self.Size = size
         self.Root = root
 
-        if self.Label >= 0 then
+        if label >= 0 then
             NavLayerData[layer].PathableLeafs = NavLayerData[layer].PathableLeafs + 1
         else
             NavLayerData[layer].UnpathableLeafs = NavLayerData[layer].UnpathableLeafs + 1
@@ -1615,9 +1608,6 @@ function Generate()
     SPEW(string.format("Number of labels: %f", LabelIdentifier))
     SPEW(string.format("Number of cells: %f", CellIdentifier))
     SPEW(reprs(NavLayerData))
-
-    -- LOG(repru(NavGrids.Land.Trees[8][0]))
-    -- LOG(import('/lua/system/utils.lua').ToBytes(NavGrids.Land.Trees[8][0]) / (1024 * 1024))
 
     Sync.NavLayerData = NavLayerData
     Generated = true
