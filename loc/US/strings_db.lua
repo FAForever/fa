@@ -1748,18 +1748,18 @@ Unit_Description_s204="Constructs Tech 3 Naval units. Buildable for a much cheap
 
 -- AEON -- Armored Commander Unit/Upgrades
 Unit_Description_0305="Armored Commander is a combination of barracks and command center. Contains all the blueprints necessary to build a basic army from scratch. Upgradeable with combat enhancements, advanced engineering suits, resource allocation system, and teleporting."
-Unit_Description_0156="Grants Tech 2 schematic access and increases the ACU's build speed and maximum health"
+Unit_Description_0156="Grants Tech 2 schematic access and increases the ACU's build speed and maximum health.\n\n+32 Buildpower\n+2000 Health\n+10 Regen"
 Unit_Description_0157="Creates a Quantum Stasis Field around the ACU. Immobilizes enemy units within its radius."
-Unit_Description_0158="Increases the range of the ACU's main cannon and that of Overcharge."
-Unit_Description_0159="Grants the ACU a long range omni Sensor and increased optical range."
-Unit_Description_0160="Replaces the Tech 2 engineering Suite. Grants Tech 3 and Experimental schematic access and further increases the ACU's build speed and maximum health"
-Unit_Description_0161="Doubles main cannon Rate-Of-Fire."
+Unit_Description_0158="Increases the range of the ACU's main cannon and that of Overcharge.\n\n+8 Main Weapon range"
+Unit_Description_0159="Grants the ACU a long range omni Sensor and increased optical range.\n\n+54 Vision Radius\n+54 Omni Radius"
+Unit_Description_0160="Replaces the Tech 2 engineering Suite. Grants Tech 3 and Experimental schematic access and further increases the ACU's build speed and maximum health.\n\n+58 Buildpower\n+3000 Health\n+20 Regen"
+Unit_Description_0161="Doubles main cannon Rate-Of-Fire.\n\n+100% Rate of fire"
 Unit_Description_0162="Increases ACU's resource generation to 19 mass per second and 1720 energy per second."
 Unit_Description_0163="Increases ACU's resource generation to 37 mass per second and 3420 energy per second."
 Unit_Description_0164="Creates a protective Personal Shield around the ACU. Requires energy to run."
 Unit_Description_0165="Greatly increases Personal Shield HP. Requires energy to run."
 Unit_Description_0166="Adds Teleportation capability. Requires considerable energy to activate."
-Unit_Description_0466_faf="Massively increases the range of the ACU's main cannon and that of Overcharge."
+Unit_Description_0466_faf="Massively increases the range of the ACU's main cannon and that of Overcharge.\n\n+5 Main Weapon range"
 
 -- AEON -- Support Commander Units/Upgrades
 Unit_Description_0167="A highly versatile combat and engineering unit useful on late-stage battlefields."
