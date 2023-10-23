@@ -64,7 +64,7 @@ XRL0302 = ClassUnit(CWalkingLandUnit) {
     },
 
     Weapons = {
-        DeathWeapon = ClassWeapon(DeathWeaponEMP) {},
+        KamikazeEMP = ClassWeapon(DeathWeaponEMP) {},
     },
 
     OnCreate = function(self)
@@ -102,7 +102,7 @@ XRL0302 = ClassUnit(CWalkingLandUnit) {
 
     -- Use the special toggle instead of production pausing as our detonator
     EnableSpecialToggle = function(self)
-        self:GetWeaponByLabel('DeathWeapon'):FireWeapon()
+        self:GetWeaponByLabel('KamikazeEMP'):FireWeapon()
     end,
 
     -- This prevents us from firing the death weapon when we're moving
@@ -113,6 +113,10 @@ XRL0302 = ClassUnit(CWalkingLandUnit) {
         elseif new == 'Stopping' then
             self:SetBusy(false)
         end
+    end,
+
+    DoDeathWeapon = function(self)
+        self:GetWeaponByLabel('KamikazeEMP'):FireWeapon()
     end,
 }
 

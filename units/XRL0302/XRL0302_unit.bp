@@ -173,6 +173,7 @@ UnitBlueprint{
     Weapon = {
         {
             AboveWaterTargetsOnly = true,
+            AutoInitiateAttackCommand = true,
             CollideFriendly = false,
             Damage = 1100,
             DamageFriendly = false,
@@ -184,11 +185,12 @@ UnitBlueprint{
                 Water = "Land|Water|Seabed",
             },
             FiringTolerance = 180,
-            Label = "DeathWeapon",
-            MaxRadius = 3,
+            Label = "KamikazeEMP",
+            MaxRadius = 2,
             RangeCategory = "UWRC_DirectFire",
             TargetPriorities = { "ALLUNITS", },
             TargetRestrictDisallow = "UNTARGETABLE",
+            TrackingRadius = 3.25,
             Turreted = false,
             WeaponCategory = "Kamikaze",
         },
