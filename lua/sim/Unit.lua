@@ -292,6 +292,11 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
             self.ResetJammer = -1
         end
 
+        -- default to ground fire for structures, experimentals and (S)ACUs
+        if EntityCategoryContains(categories.STRUCTURE + categories.EXPERIMENTAL + categories.COMMAND, self) then
+            self:SetFireState(2)
+        end
+
         -- Flags for scripts
         self.IsCivilian = armies[self.Army] == "NEUTRAL_CIVILIAN" or nil
 
