@@ -8,20 +8,6 @@ UnitBlueprint{
         StopMove           = Sound { Bank = 'XRL',        Cue = 'XRL0302_Move_Stop',        LodCutoff = 'UnitMove_LodCutoff' },
         UISelection        = Sound { Bank = 'Interface',  Cue = 'Cybran_Select_Vehicle',    LodCutoff = 'UnitMove_LodCutoff' },
     },
-    Buffs = {
-        Stun = {
-            Add = {
-                OnDeath = true,
-                OnImpact = true,
-            },
-            AppliedToTarget = false,
-            BuffType = "STUN",
-            Duration = 2,
-            Radius = 7,
-            TargetAllow = "MOBILE",
-            TargetDisallow = "EXPERIMENTAL, WALL, COMMAND",
-        },
-    },
     BuildIconSortPriority = 80,
     Categories = {
         "BOMB",
@@ -174,6 +160,16 @@ UnitBlueprint{
         {
             AboveWaterTargetsOnly = true,
             AutoInitiateAttackCommand = true,
+            Buffs = {
+                {
+                    Add = { OnFire = true },
+                    BuffType = "STUN",
+                    Duration = 2,
+                    Radius = 7,
+                    TargetAllow = "MOBILE",
+                    TargetDisallow = "EXPERIMENTAL, WALL, COMMAND",
+                },
+            },
             CollideFriendly = false,
             Damage = 1100,
             DamageFriendly = false,

@@ -9,8 +9,11 @@ local EffectTemplate = import("/lua/effecttemplates.lua")
 local Weapon = import("/lua/sim/weapon.lua").Weapon
 
 local DeathWeaponEMP = ClassWeapon(Weapon) {
+
     FxDeath = EffectTemplate.CMobileKamikazeBombExplosion,
+
     OnFire = function(self)
+        Weapon.OnFire(self)
 
         -- Disable our death weapon so we don't fire it again
         self.unit:SetDeathWeaponEnabled(false)
@@ -78,21 +81,6 @@ XRL0302 = ClassUnit(CWalkingLandUnit) {
 
         -- Enable our death weapon
         self:SetDeathWeaponEnabled(true)
-
-        -- Add our OnKilled stun buff as a callback
-        self:AddUnitCallback(function()
-                -- Apply stun buff
-                local bp
-                for k, v in self.Blueprint.Buffs do
-                    if v.Add.OnDeath then
-                        bp = v
-                    end
-                end
-                if bp ~= nil then
-                    self:AddBuff(bp)
-                end
-            end, 'OnKilled'
-        )
     end,
 
     HideUnit = function(self)
