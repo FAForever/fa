@@ -46,6 +46,32 @@ local DeathWeaponEMP = ClassWeapon(Weapon) {
         -- Don't leave wreckage
         self.unit:Destroy()
     end,
+
+    -- This prevents us from firing the death weapon when we're moving
+    -- also gives much better tailchase performance by adjusting the detonation range
+    OnMotionHorzEventChange = function(self, new, old)
+        if new == 'Cruise' then
+            self:SetEnabled(false)
+        elseif new == 'Stopping' then
+            if not self.unit:IsUnitState('Moving') then
+                self:SetEnabled(true)
+                if self.unit:IsUnitState('Attacking') then
+                    local target = self.unit:GetCommandQueue()[1].target
+                    if target then
+                        local dist = VDist3(self.unit:GetPosition(), target:GetPosition())
+                        if not self.chasing and dist < self.Blueprint.MaxRadius or
+                        self.chasing and dist < self.Blueprint.DamageRadius then
+                            self:FireWeapon()
+                        end
+                    end
+                    self.chasing = true
+                end
+            end
+        elseif new == 'Stopped' then
+            self:SetEnabled(true)
+            self.chasing = nil
+        end
+    end,
 }
 
 ---@class XRL0302 : CWalkingLandUnit
@@ -91,16 +117,6 @@ XRL0302 = ClassUnit(CWalkingLandUnit) {
     -- Use the special toggle instead of production pausing as our detonator
     EnableSpecialToggle = function(self)
         self:GetWeaponByLabel('KamikazeEMP'):FireWeapon()
-    end,
-
-    -- This prevents us from firing the death weapon when we're moving
-    OnMotionHorzEventChange = function(self, new, old)
-        CWalkingLandUnit.OnMotionHorzEventChange(self, new, old)
-        if new == 'Cruise' then
-            self:SetBusy(true)
-        elseif new == 'Stopping' then
-            self:SetBusy(false)
-        end
     end,
 
     DoDeathWeapon = function(self)

@@ -159,6 +159,7 @@ UnitBlueprint{
     Weapon = {
         {
             AboveWaterTargetsOnly = true,
+            AlwaysRecheckTarget = false,
             AutoInitiateAttackCommand = true,
             Buffs = {
                 {
