@@ -256,7 +256,7 @@ UnitBlueprint{
             WeaponCategory = "Artillery",
             WeaponRepackTimeout = 0,
             WeaponUnpackAnimation = "/units/XSL0304/XSL0304_attack01.sca",
-            WeaponUnpackAnimationRate = 0.22,
+            WeaponUnpackAnimationRate = 0.44,
             WeaponUnpackLocksMotion = true,
             WeaponUnpacks = true,
         },
