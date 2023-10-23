@@ -8,30 +8,13 @@ local CWalkingLandUnit = import("/lua/cybranunits.lua").CWalkingLandUnit
 local EffectTemplate = import("/lua/effecttemplates.lua")
 local Weapon = import("/lua/sim/weapon.lua").Weapon
 
-local DeathWeaponKamikaze = ClassWeapon(Weapon) {
-    OnFire = function(self)
-        if not self.unit.Dead then
-            self.unit:Kill()
-        end
-    end,
-
-    OnMotionHorzEventChange = function(self, new, old)
-        if new == 'Cruise' then
-            self.unit:SetBusy(true)
-        elseif new == 'Stopping' then
-            self.unit:SetBusy(false)
-        end
-    end,
-}
-
 local DeathWeaponEMP = ClassWeapon(Weapon) {
     FxDeath = EffectTemplate.CMobileKamikazeBombExplosion,
-    OnCreate = function(self)
-        Weapon.OnCreate(self)
-        self:SetWeaponEnabled(false)
-    end,
+    OnFire = function(self)
 
-    Fire = function(self)
+        -- Disable our death weapon so we don't fire it again
+        self.unit:SetDeathWeaponEnabled(false)
+
         local blueprint = self.Blueprint
         local position = self.unit:GetPosition()
 
@@ -40,16 +23,24 @@ local DeathWeaponEMP = ClassWeapon(Weapon) {
             CreateEmitterAtBone(self.unit, -2, army, v)
         end
 
+        -- Do tree knockdown if we're not in a transport
         if not self.unit.transportDrop then
             local rotation = math.random(0, 6.28)
-            DamageArea(self.unit, position, 6, 1, 'TreeForce', true)
-            DamageArea(self.unit, position, 6, 1, 'TreeForce', true)
+            DamageArea(self.unit, position, blueprint.DamageRadius, 1, 'TreeForce', true)
             CreateDecal(position, rotation, 'scorch_010_albedo', '', 'Albedo', 11, 11, 250, 120, army)
         end
 
+        -- Do damage
         DamageArea(self.unit, position, blueprint.DamageRadius, blueprint.Damage, blueprint.DamageType or 'Normal',
             blueprint.DamageFriendly or false)
         self.unit:PlayUnitSound('Destroyed')
+
+        -- Kill unit if it's not already dead
+        if not self.unit.Dead then
+            self.unit:Kill()
+        end
+
+        -- Don't leave wreckage
         self.unit:Destroy()
     end,
 }
@@ -73,30 +64,35 @@ XRL0302 = ClassUnit(CWalkingLandUnit) {
     },
 
     Weapons = {
-        Suicide = ClassWeapon(DeathWeaponKamikaze) {},
         DeathWeapon = ClassWeapon(DeathWeaponEMP) {},
-    },
-
-    AmbientExhaustBones = {
-        'XRL0302',
-    },
-
-    AmbientLandExhaustEffects = {
-        '/effects/emitters/cannon_muzzle_smoke_12_emit.bp',
     },
 
     OnCreate = function(self)
         CWalkingLandUnit.OnCreate(self)
-        self.EffectsBagXRL = TrashBag()
-        self.AmbientExhaustEffectsBagXRL = TrashBag()
-        self:CreateTerrainTypeEffects(self.IntelEffects.Cloak, 'FXIdle', self.Layer, nil, self.EffectsBag)
-        self.PeriodicFXThread = ForkThread(self.EmitPeriodicEffects, self)
-        self.Trash:Add(self.PeriodicFXThread)
+        self:CreateTerrainTypeEffects(self.IntelEffects.Cloak, 'FXIdle', self.Layer, nil, self.Trash)
     end,
 
     OnStopBeingBuilt = function(self, builder, layer)
         CWalkingLandUnit.OnStopBeingBuilt(self, builder, layer)
         self.Trash:Add(ForkThread(self.HideUnit, self))
+
+        -- Enable our death weapon
+        self:SetDeathWeaponEnabled(true)
+
+        -- Add our OnKilled stun buff as a callback
+        self:AddUnitCallback(function()
+                -- Apply stun buff
+                local bp
+                for k, v in self.Blueprint.Buffs do
+                    if v.Add.OnDeath then
+                        bp = v
+                    end
+                end
+                if bp ~= nil then
+                    self:AddBuff(bp)
+                end
+            end, 'OnKilled'
+        )
     end,
 
     HideUnit = function(self)
@@ -104,41 +100,18 @@ XRL0302 = ClassUnit(CWalkingLandUnit) {
         self:SetMesh(self.Blueprint.Display.CloakMeshBlueprint, true)
     end,
 
-    OnProductionPaused = function(self)
-        self:GetWeaponByLabel('Suicide'):FireWeapon()
+    -- Use the special toggle instead of production pausing as our detonator
+    EnableSpecialToggle = function(self)
+        self:GetWeaponByLabel('DeathWeapon'):FireWeapon()
     end,
 
-    EmitPeriodicEffects = function(self)
-        local army = self.Army
-        local ambientLandExhaustEffects = self.AmbientLandExhaustEffects
-        local ambientExhaustBones = self.AmbientExhaustBones
-
-        while not self.Dead do
-            for kE, vE in ambientLandExhaustEffects do
-                for kB, vB in ambientExhaustBones do
-                    CreateAttachedEmitter(self, vB, army, vE)
-                end
-            end
-            WaitTicks(31)
-        end
-    end,
-
-    DoDeathWeapon = function(self)
-        if self:IsBeingBuilt() then return end
-        CWalkingLandUnit.DoDeathWeapon(self)
-        self.EffectsBagXRL:Destroy()
-        self.AmbientExhaustEffectsBagXRL:Destroy()
-        self.PeriodicFXThread:Destroy()
-        self.PeriodicFXThread = nil
-        local bp
-        for k, v in self.Blueprint.Buffs do
-            if v.Add.OnDeath then
-                bp = v
-            end
-        end
-
-        if bp ~= nil then
-            self:AddBuff(bp)
+    -- This prevents us from firing the death weapon when we're moving
+    OnMotionHorzEventChange = function(self, new, old)
+        CWalkingLandUnit.OnMotionHorzEventChange(self, new, old)
+        if new == 'Cruise' then
+            self:SetBusy(true)
+        elseif new == 'Stopping' then
+            self:SetBusy(false)
         end
     end,
 }
