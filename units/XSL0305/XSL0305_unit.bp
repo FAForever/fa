@@ -127,8 +127,8 @@ UnitBlueprint{
         UniformScale = 0.095,
     },
     Economy = {
-        BuildCostEnergy = 15360,
-        BuildCostMass = 960,
+        BuildCostEnergy = 27000,
+        BuildCostMass = 780,
         BuildTime = 5400,
         TeleportEnergyMod = 0.15,
         TeleportMassMod = 1,
@@ -219,7 +219,7 @@ UnitBlueprint{
                 Water = "Land|Water|Seabed",
             },
             Label = "DummyWeapon",
-            MaxRadius = 65,
+            MaxRadius = 55,
             RackBones = {
                 {
                     MuzzleBones = { "Muzzle" },
@@ -262,7 +262,7 @@ UnitBlueprint{
             FiringTolerance = 3,
             IgnoreIfDisabled = true,
             Label = "MainGun",
-            MaxRadius = 65,
+            MaxRadius = 55,
             MuzzleChargeDelay = 0,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
@@ -335,7 +335,7 @@ UnitBlueprint{
             FiringTolerance = 0.5,
             IgnoreIfDisabled = true,
             Label = "SniperGun",
-            MaxRadius = 75,
+            MaxRadius = 65,
             MuzzleChargeDelay = 0.5,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
