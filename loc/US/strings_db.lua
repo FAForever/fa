@@ -1759,7 +1759,7 @@ Unit_Description_0163="Increases ACU's resource generation to 37 mass per second
 Unit_Description_0164="Creates a protective Personal Shield around the ACU. Requires energy to run."
 Unit_Description_0165="Greatly increases Personal Shield HP. Requires energy to run."
 Unit_Description_0166="Adds Teleportation capability. Requires considerable energy to activate."
-Unit_Description_0466_faf="Massively increases the range of the ACU's main cannon and that of Overcharge.\n\n+5 Main Weapon range"
+Unit_Description_0466_faf="Further increases the range of the ACU's main cannon and that of Overcharge.\n\n+5 Main Weapon range"
 
 -- AEON -- Support Commander Units/Upgrades
 Unit_Description_0167="A highly versatile combat and engineering unit useful on late-stage battlefields."
