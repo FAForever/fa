@@ -1593,7 +1593,7 @@ Unit_Description_0109="Adds Teleportation capability. Requires considerable ener
 Unit_Description_0110="Grants Tech 2 schematic access and increases the ACU's build speed and maximum health.\n\n+32 Buildpower\n+2000 Health\n+10 Regen"
 Unit_Description_0111="Grants Tech 3 and Experimental schematic access and further increases the ACU's build speed and maximum health.\n\n+58 Buildpower\n+1500 Health\n+10 Regen"
 Unit_Description_0112="Doubles the main cannon's Rate-Of-Fire, and increases the range of all the ACU's weaponry.\n\n+100% Rate of fire\n+8 Main Weapon range"
-Unit_Description_0113="Enhances the ACU with Microwave Laser weapon with unbelievable firepower."
+Unit_Description_0113="Enhances the ACU with Microwave Laser weapon with unbelievable firepower.\n\nMicrowave Laser DPS = 3000"
 Unit_Description_0114="Enhances the ACU with a torpedo weapon and sonar sensor."
 Unit_Description_0465_faf="Massively increases the rate at which the ACU repairs its armour.\n\n+1500 Health\n+60 Regen"
 
