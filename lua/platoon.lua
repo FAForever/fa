@@ -2445,7 +2445,11 @@ Platoon = Class(moho.platoon_methods) {
             local guards = eng:GetGuards()
             for k,v in guards do
                 if not v.Dead and v.PlatoonHandle and aiBrain:PlatoonExists(v.PlatoonHandle) then
-                    v.PlatoonHandle:PlatoonDisband()
+                    if v.PlatoonHandle.PlatoonDisband then
+                        v.PlatoonHandle:PlatoonDisband()
+                    elseif not v.PlatoonHandle.ExitGuard then
+                        v.PlatoonHandle.ExitGuard = true
+                    end
                 end
             end
         end
@@ -3414,7 +3418,7 @@ Platoon = Class(moho.platoon_methods) {
         AlliedPlatoons = aiBrain:GetPlatoonsList()
         local bMergedPlatoons = false
         for _,aPlat in AlliedPlatoons do
-            if aPlat:GetPlan() != planName then
+            if aPlat.GetPlan and aPlat:GetPlan() != planName then
                 continue
             end
             if aPlat == self then
@@ -3733,7 +3737,7 @@ Platoon = Class(moho.platoon_methods) {
 
         -- final check for if we should disband
         if not eng or eng.Dead or table.empty(eng.EngineerBuildQueue) then
-            if eng.PlatoonHandle and aiBrain:PlatoonExists(eng.PlatoonHandle) and not eng.PlatoonHandle.UsingTransport then
+            if eng.PlatoonHandle and aiBrain:PlatoonExists(eng.PlatoonHandle) and not eng.PlatoonHandle.UsingTransport and eng.PlatoonHandle.PlatoonDisband then
                 eng.PlatoonHandle:PlatoonDisband()
             end
         end
@@ -4784,7 +4788,6 @@ Platoon = Class(moho.platoon_methods) {
                     else
                         WARN('No buildLocation or whatToBuild during ACU initialization')
                     end
-                    aiBrain:BuildStructure(eng, whatToBuild, buildLocation, false)
                 end
             end
         end
@@ -4799,7 +4802,6 @@ Platoon = Class(moho.platoon_methods) {
             else
                 WARN('No buildLocation or whatToBuild during ACU initialization')
             end
-            aiBrain:BuildStructure(eng, whatToBuild, buildLocation, false)
         end
         -- wait for the build to complete
         if not hydroPresent then
@@ -4882,7 +4884,6 @@ Platoon = Class(moho.platoon_methods) {
                         else
                             WARN('No buildLocation or whatToBuild during ACU initialization')
                         end
-                        aiBrain:BuildStructure(eng, whatToBuild, buildLocation, false)
                     else
                         buildLocation, whatToBuild, borderWarning = AIUtils.GetBuildLocation(aiBrain, buildingTmpl, baseTmplDefault['BaseTemplates'][factionIndex], 'T1LandFactory', eng, true, categories.HYDROCARBON, 15, true)
                         if borderWarning and buildLocation and whatToBuild then
@@ -4893,7 +4894,6 @@ Platoon = Class(moho.platoon_methods) {
                         else
                             WARN('No buildLocation or whatToBuild during ACU initialization')
                         end
-                        aiBrain:BuildStructure(eng, whatToBuild, buildLocation, false)
                         if playableArea[3] > 256 or playableArea[4] > 256 and aiBrain:GetEngineerManagerUnitsBeingBuilt(categories.FACTORY * categories.AIR) < 1 and aiBrain:GetCurrentUnits(categories.FACTORY * categories.AIR) < 1 then
                             buildLocation, whatToBuild, borderWarning = AIUtils.GetBuildLocation(aiBrain, buildingTmpl, baseTmplDefault['BaseTemplates'][factionIndex], 'T1AirFactory', eng, true, categories.HYDROCARBON, 25, true)
                             if borderWarning and buildLocation and whatToBuild then
@@ -4904,7 +4904,6 @@ Platoon = Class(moho.platoon_methods) {
                             else
                                 WARN('No buildLocation or whatToBuild during ACU initialization')
                             end
-                            aiBrain:BuildStructure(eng, whatToBuild, buildLocation, false)
                         end
                     end
                     while eng:IsUnitState('Building') or 0<table.getn(eng:GetCommandQueue()) do
