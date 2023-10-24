@@ -66,7 +66,7 @@ local HashCache = {}
 NavGrids = {}
 
 ---@class NavLabelMetadata
----@field Node CompressedLabelTreeLeaf
+---@field Node NavLeaf
 ---@field Area number
 ---@field Layer NavLayers
 ---@field NumberOfExtractors number
@@ -77,7 +77,7 @@ NavGrids = {}
 ---@type table<number, NavLabelMetadata>
 NavLabels = {}
 
----@type table<number, CompressedLabelTreeNode | CompressedLabelTreeLeaf>
+---@type table<number, NavTree | NavLeaf>
 NavCells = {}
 
 local Generated = false
@@ -158,7 +158,7 @@ end
 ---@class NavGrid
 ---@field Layer NavLayers
 ---@field TreeSize number
----@field Trees CompressedLabelTreeNode[][]
+---@field Trees NavTree[][]
 NavGrid = ClassNavGrid {
 
     ---@param self NavGrid
@@ -184,7 +184,7 @@ NavGrid = ClassNavGrid {
     ---@param self NavGrid
     ---@param z number index
     ---@param x number index
-    ---@param labelTree CompressedLabelTreeNode
+    ---@param labelTree NavTree
     AddTree = function(self, z, x, labelTree)
         self.Trees[z][x] = labelTree
     end,
@@ -221,7 +221,7 @@ NavGrid = ClassNavGrid {
 
     ---@param self NavGrid
     ---@param position Vector A position in world space
-    ---@return CompressedLabelTreeRoot?
+    ---@return NavTree?
     FindRoot = function(self, position)
         return self:FindRootXZ(position[1], position[3])
     end,
@@ -229,7 +229,7 @@ NavGrid = ClassNavGrid {
     ---@param self NavGrid
     ---@param x number x-coordinate, in world space
     ---@param z number z-coordinate, in world space
-    ---@return CompressedLabelTreeRoot?
+    ---@return NavTree?
     FindRootXZ = function(self, x, z)
         if x > 0 and z > 0 then
             local size = self.TreeSize
@@ -237,7 +237,7 @@ NavGrid = ClassNavGrid {
 
             local bx = math.floor(x / size)
             local bz = math.floor(z / size)
-            local root = trees[bz][bx] --[[@as CompressedLabelTreeRoot]]
+            local root = trees[bz][bx] --[[@as NavTree]]
             return root
         end
 
@@ -247,15 +247,15 @@ NavGrid = ClassNavGrid {
     ---@param self NavGrid
     ---@param gx number x-coordinate, in grid space
     ---@param gz number z-coordinate, in grid space
-    ---@return CompressedLabelTreeRoot?
+    ---@return NavTree?
     FindRootGridspaceXZ = function(self, gx, gz)
-        return self.Trees[gz][gx] --[[@as CompressedLabelTreeRoot]]
+        return self.Trees[gz][gx] --[[@as NavTree]]
     end,
 
     --- Returns the leaf that encompasses the position, or nil if no leaf does
     ---@param self NavGrid
     ---@param position Vector A position in world space
-    ---@return CompressedLabelTreeLeaf?
+    ---@return NavLeaf?
     FindLeaf = function(self, position)
         return self:FindLeafXZ(position[1], position[3])
     end,
@@ -264,7 +264,7 @@ NavGrid = ClassNavGrid {
     ---@param self NavGrid
     ---@param x number x-coordinate, in world space
     ---@param z number z-coordinate, in world space
-    ---@return CompressedLabelTreeLeaf?
+    ---@return NavLeaf?
     FindLeafXZ = function(self, x, z)
         if x > 0 and z > 0 then
 
@@ -345,45 +345,25 @@ local ClassCompressedLabelTree = function(specs)
     return setmetatable(specs, FactoryCompressedLabelTree)
 end
 
--- defined here, as it is a recursive class
-local CompressedLabelTree
+---@class NavLeaf 
+---@field Identifier number
+---@field Size number               # Element count starting at { bx + ox, bz + oz }, used as a parameter during path finding to determine if a unit can pass
+---@field Label number              # Label for efficient `CanPathTo` check
+---@field px number                 # x-coordinate of center in world space
+---@field pz number                 # z-coordinate of center in world space
+---@field From? NavLeaf             # Populated during path finding
+---@field AcquiredCosts? number     # Populated during path finding
+---@field TotalCosts? number        # Populated during path finding
+---@field Seen? number              # Populated during path finding
 
---- The leaf of the compression tree, with additional properties used during path finding
----@class CompressedLabelTreeLeaf : CompressedLabelTreeNode
----@field [1] CompressedLabelTreeLeaf?
----@field [2] CompressedLabelTreeLeaf?
----@field [3] CompressedLabelTreeLeaf?
----@field [4] CompressedLabelTreeLeaf?
----@field [5] CompressedLabelTreeLeaf?
----@field [6] CompressedLabelTreeLeaf?
----@field [7] CompressedLabelTreeLeaf?
----@field [8] CompressedLabelTreeLeaf?
----@field [9] CompressedLabelTreeLeaf?
----@field Root CompressedLabelTreeNode | CompressedLabelTreeLeaf
----@field Size number                       # Element count starting at { bx + ox, bz + oz }, used as a parameter during path finding to determine if a unit can pass
----@field Label number                      # Label for efficient `CanPathTo` check
----@field px number                         # x-coordinate of center in world space
----@field pz number                         # z-coordinate of center in world space
----@field From CompressedLabelTreeLeaf      # Populated during path finding
----@field AcquiredCosts number              # Populated during path finding
----@field TotalCosts number                 # Populated during path finding
----@field Seen number                       # Populated during path
-
----@class CompressedLabelTreeRoot : CompressedLabelTreeNode
+--- A simplified quad tree that acts as a compression of the pathing capabilities of a section of the heightmap
+---@class NavTree: table<number, NavLeaf | number>
 ---@field Labels table<number, number>      # Table that tells us which labels are part of this compression tree. The key represents as the label, the value represents as the fractional area that the label consumes. A value of 1 means the label tree entirely consists of one value.
 ---@field Seen number | nil                 # Used during navigating
 ---@field Threat number | nil               # Used during navigating
-
---- A simplified quad tree that acts as a compression of the pathing capabilities of a section of the heightmap
----@class CompressedLabelTreeNode
----@field Identifier number
----@field [1] CompressedLabelTreeNode?
----@field [2] CompressedLabelTreeNode?
----@field [3] CompressedLabelTreeNode?
----@field [4] CompressedLabelTreeNode?
 CompressedLabelTree = ClassCompressedLabelTree {
 
-    ---@param self CompressedLabelTreeNode
+    ---@param self NavTree
     ---@param x number
     ---@param z number
     ---@param s number
@@ -434,13 +414,13 @@ CompressedLabelTree = ClassCompressedLabelTree {
 
     --- Compresses the cache using a quad tree, significantly reducing the amount of data stored. At this point
     --- the label cache only exists of 0s and -1s
-    ---@param self CompressedLabelTreeNode
+    ---@param self NavTree
     ---@param bx number             # Location of top-left corner, in world space
     ---@param bz number             # Location of top-left corner, in world space
     ---@param ox number             # Offset from top-left corner, in local space
     ---@param oz number             # Offset from top-left corner, in local space
     ---@param size number           # Element count starting at { bx + ox, bz + oz }
-    ---@param root CompressedLabelTreeNode | CompressedLabelTreeLeaf
+    ---@param root NavTree
     ---@param rCache NavLabelCache
     ---@param compressionThreshold number
     ---@param layer NavLayers
@@ -579,7 +559,7 @@ CompressedLabelTree = ClassCompressedLabelTree {
 
     --- Flattens the label tree into a leaf
     ---@see Compress
-    ---@param self CompressedLabelTreeNode
+    ---@param self NavTree
     ---@param bx number             # Location of top-left corner, in world space
     ---@param bz number             # Location of top-left corner, in world space
     ---@param ox number             # Offset from top-left corner, in local space
@@ -592,7 +572,7 @@ CompressedLabelTree = ClassCompressedLabelTree {
     end,
 
     --- Generates the following neighbors, when they are valid:
-    ---@param self CompressedLabelTreeLeaf
+    ---@param self NavLeaf
     ---@param grid NavGrid
     ---@param layer NavLayers
     GenerateDirectNeighbors = function(self, grid, layer)
@@ -764,7 +744,7 @@ CompressedLabelTree = ClassCompressedLabelTree {
         end
     end,
 
-    ---@param self CompressedLabelTreeNode
+    ---@param self NavTree
     ---@param stack table
     ---@param layer NavLayers
     GenerateLabels = function(self, stack, layer)
@@ -787,7 +767,7 @@ CompressedLabelTree = ClassCompressedLabelTree {
 
                 NavLabels[label] = {
                     Area = 0,
-                    Node = instance --[[@as CompressedLabelTreeLeaf]] ,
+                    Node = instance --[[@as NavLeaf]] ,
                     Layer = layer,
                     NumberOfExtractors = 0,
                     NumberOfHydrocarbons = 0,
@@ -840,8 +820,8 @@ CompressedLabelTree = ClassCompressedLabelTree {
         end
     end,
 
-    ---@param self CompressedLabelTreeLeaf
-    ---@param other CompressedLabelTreeLeaf
+    ---@param self NavLeaf
+    ---@param other NavLeaf
     ---@return number
     DistanceTo = function(self, other)
         local dx = self.px - other.px
@@ -849,8 +829,8 @@ CompressedLabelTree = ClassCompressedLabelTree {
         return math.sqrt(dx * dx + dz * dz)
     end,
 
-    ---@param self CompressedLabelTreeLeaf
-    ---@param other CompressedLabelTreeLeaf
+    ---@param self NavLeaf
+    ---@param other NavLeaf
     ---@return number
     ---@return number
     DirectionTo = function(self, other)
@@ -858,15 +838,24 @@ CompressedLabelTree = ClassCompressedLabelTree {
     end,
 
     --- Returns all leaves in a table
-    ---@param self CompressedLabelTreeNode
-    ---@return CompressedLabelTreeLeaf[]
+    ---@param self NavTree
+    ---@return NavLeaf[]
     ---@return number
     FindLeaves = function(self, cache)
         local head = 1
         cache = cache or {}
-        cache, head = self:_FindLeaves(cache, head)
 
-        -- clean up remainders
+        -- gather all the leaves
+        for k = 1, TableGetn(self) do
+            local instance = self[k]
+            local isLeaf = type(instance) == "table"
+            if isLeaf then
+                cache[head] = instance
+                head = head + 1
+            end
+        end
+
+        -- clean up remaining entries in the cache
         for k = head, TableGetn(cache) do
             cache[k] = nil
         end
@@ -874,93 +863,53 @@ CompressedLabelTree = ClassCompressedLabelTree {
         return cache, head - 1
     end,
 
-    --- Returns all leaves in a table
-    ---@param self CompressedLabelTreeNode
-    ---@return CompressedLabelTreeLeaf[]
-    ---@return number
-    _FindLeaves = function(self, cache, head)
-        if not self.Label then
-            cache, head = self[1]:_FindLeaves(cache, head)
-            cache, head = self[2]:_FindLeaves(cache, head)
-            cache, head = self[3]:_FindLeaves(cache, head)
-            cache, head = self[4]:_FindLeaves(cache, head)
-        else
-            cache[head] = self
-            head = head + 1
-        end
-
-        return cache, head
-    end,
-
-
     --- Returns all traversable leaves in a table
-    ---@param self CompressedLabelTreeNode | CompressedLabelTreeLeaf | CompressedLabelTreeRoot
-    ---@return CompressedLabelTreeLeaf[]
+    ---@param self NavTree | NavLeaf | NavTree
+    ---@return NavLeaf[]
     ---@return number
     FindTraversableLeaves = function(self, thresholdSize, cache, cacheQueue)
-
-        -- localize for performance
-        local TableGetn = TableGetn
-
-        -- prepare (optionally) cached values
-        local cacheHead = 1
+        local head = 1
         cache = cache or {}
 
-        local queueHead = 1
-        local queueTail = 1
-        local queue = cacheQueue or {}
-
-        -- use a breath-first search based search to find leaves
-        queue[1] = self
-        queueHead = queueHead + 1
-
-        while queueTail < queueHead do
-            local element = queue[queueTail]
-            queueTail = queueTail + 1
-
-            local label = element.Label
-            if label then
-                -- found a leaf
-                if label > 0 and element.Size >= thresholdSize then
-                    cache[cacheHead] = element
-                    cacheHead = cacheHead + 1
-                end
-            else
-                -- found a node
-                for k = 1, TableGetn(element) do
-                    queue[queueHead] = element[k]
-                    queueHead = queueHead + 1
+        -- gather all the leaves
+        for k = 1, TableGetn(self) do
+            local instance = self[k]
+            local isLeaf = type(instance) == "table"
+            if isLeaf then
+                if instance.Label > 0 then
+                    cache[head] = instance
+                    head = head + 1
                 end
             end
         end
 
-        -- clean up remainders
-        for k = cacheHead, TableGetn(cache) do
+        -- clean up remaining entries in the cache
+        for k = head, TableGetn(cache) do
             cache[k] = nil
         end
 
-        return cache, cacheHead - 1
+        return cache, head - 1
     end,
 
     --- Returns the leaf that encompasses the position, or nil if no leaf does
-    ---@param self CompressedLabelTreeNode
+    ---@param self NavTree
     ---@param bx number             # Location of top-left corner, in world space
     ---@param bz number             # Location of top-left corner, in world space
     ---@param size number           # Element count starting at { bx + ox, bz + oz }
     ---@param position Vector       # A position in world space
-    ---@return CompressedLabelTreeLeaf?
+    ---@return NavLeaf?
     FindLeaf = function(self, bx, bz, size, position)
         return self:FindLeafXZ(bx, bz, size, position[1], position[3])
     end,
 
     --- Returns the leaf that encompasses the position, or nil if no leaf does
-    ---@param self CompressedLabelTreeNode
+    ---@param self NavTree
     ---@param bx number             # Location of top-left corner, in world space
     ---@param bz number             # Location of top-left corner, in world space
     ---@param size number           # Element count starting at { bx + ox, bz + oz }
     ---@param x number              # x-coordinate, in world space
     ---@param z number              # z-coordinate, in world space
-    ---@return CompressedLabelTreeLeaf?
+    ---@return NavLeaf?
     FindLeafXZ = function(self, bx, bz, size, x, z)
         -- check if we're inside in the area
         if x < bx or bx + size < x or z < bz or bz + size < z then
@@ -1003,15 +952,14 @@ CompressedLabelTree = ClassCompressedLabelTree {
             end
         end
 
-        return instance --[[@as CompressedLabelTreeLeaf]]
+        return instance --[[@as NavLeaf]]
     end;
 
-    ---@param self CompressedLabelTreeNode
+    ---@param self NavTree
     ---@param color Color
     Draw = function(self, color, inset)
 
         -- local scope for performance
-        local GetSurfaceHeight = GetSurfaceHeight
         local TableGetn = TableGetn
         local type = type
 
@@ -1034,7 +982,7 @@ CompressedLabelTree = ClassCompressedLabelTree {
         end
     end,
 
-    ---@param self CompressedLabelTreeNode
+    ---@param self NavTree
     DrawLabels = function(self, inset)
 
         -- local scope for performance
@@ -1101,7 +1049,7 @@ end
 
 --- Populates the caches for the given label tree,
 --- Heavily inspired by the code written by Softles
----@param labelTree CompressedLabelTreeNode
+---@param labelTree NavTree
 ---@param tCache NavTerrainCache
 ---@param dCache NavDepthCache
 ---@param daCache NavAverageDepthCache
@@ -1472,7 +1420,7 @@ local function GenerateCullLabels()
 
     local culledLabels = 0
 
-    ---@type CompressedLabelTreeLeaf[]
+    ---@type NavLeaf[]
     local stack = {}
     local count = 1
     for k, _ in navLabels do
@@ -1490,7 +1438,7 @@ local function GenerateCullLabels()
             while count > 0 do
                 node = stack[count]
                 count = count - 1
-                for k = 1, table.getn(node) do
+                for k = 1, TableGetn(node) do
                     local neighbor = node[k]
                     if neighbor.Label > 0 then
                         neighbor.Label = -1
@@ -1581,7 +1529,7 @@ local function GenerateRootInformation(processAmphibious, processHover)
     for _, grid in grids do
         for z = 0, LabelCompressionTreesPerAxis - 1 do
             for x = 0, LabelCompressionTreesPerAxis - 1 do
-                ---@type CompressedLabelTreeRoot
+                ---@type NavTree
                 local tree = grid.Trees[z][x]
 
                 if not tree.Labels then
@@ -1686,13 +1634,13 @@ function Generate()
     GenerateGraphs(processAmphibious, processHover)
     print(string.format("generated neighbors and labels: %f", GetSystemTimeSecondsOnlyForProfileUse() - start))
 
-    -- GenerateMarkerMetadata(processAmphibious, processHover)
-    -- print(string.format("generated marker metadata: %f", GetSystemTimeSecondsOnlyForProfileUse() - start))
+    GenerateMarkerMetadata(processAmphibious, processHover)
+    print(string.format("generated marker metadata: %f", GetSystemTimeSecondsOnlyForProfileUse() - start))
 
-    -- GenerateCullLabels()
-    -- print(string.format("cleaning up generated data: %f", GetSystemTimeSecondsOnlyForProfileUse() - start))
+    GenerateCullLabels()
+    print(string.format("cleaning up generated data: %f", GetSystemTimeSecondsOnlyForProfileUse() - start))
 
-    -- GenerateRootInformation(processAmphibious, processHover)
+    GenerateRootInformation(processAmphibious, processHover)
 
     SPEW(string.format("Generated navigational mesh in %f seconds", GetSystemTimeSecondsOnlyForProfileUse() - start))
 
