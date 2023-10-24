@@ -308,24 +308,13 @@ NavGrid = ClassNavGrid {
         NavLayerData[self.Layer].Labels = labelEnd - labelStart
     end,
 
-    ---@param self NavGrid
-    Precompute = function(self)
-        local size = self.TreeSize
-        local trees = self.Trees
-        for z = 0, LabelCompressionTreesPerAxis - 1 do
-            for x = 0, LabelCompressionTreesPerAxis - 1 do
-                trees[z][x]:ComputeCenter(x * size, z * size, 0, 0, size)
-            end
-        end
-    end,
-
     --- Draws all trees with the correct layer color
     ---@param self NavGrid
     Draw = function(self)
         local size = self.TreeSize
         for z = 0, LabelCompressionTreesPerAxis - 1 do
             for x = 0, LabelCompressionTreesPerAxis - 1 do
-                self.Trees[z][x]:Draw(Shared.LayerColors[self.Layer], 0, x * size, z * size, 0, 0, size)
+                self.Trees[z][x]:Draw(Shared.LayerColors[self.Layer])
             end
         end
     end,
@@ -336,7 +325,7 @@ NavGrid = ClassNavGrid {
         local size = self.TreeSize
         for z = 0, LabelCompressionTreesPerAxis - 1 do
             for x = 0, LabelCompressionTreesPerAxis - 1 do
-                self.Trees[z][x]:DrawLabels(inset, x * size, z * size, 0, 0, size)
+                self.Trees[z][x]:DrawLabels(inset)
             end
         end
     end,
@@ -779,11 +768,17 @@ CompressedLabelTree = ClassCompressedLabelTree {
     ---@param stack table
     ---@param layer NavLayers
     GenerateLabels = function(self, stack, layer)
-        -- leaf case
-        if self.Label then
+
+        -- local scope for performance
+        local type = type
+
+        for k = 1, TableGetn(self) do
+            local instance = self[k]
+            local isLeaf = type(instance) == "table"
+            if isLeaf then
 
             -- check if we are unassigned (labels start at 1)
-            if self.Label == 0 then
+            if instance.Label == 0 then
 
                 -- we can hit a stack overflow if we do this recursively, therefore we do a
                 -- depth first search using a stack that we re-use for better performance
@@ -792,7 +787,7 @@ CompressedLabelTree = ClassCompressedLabelTree {
 
                 NavLabels[label] = {
                     Area = 0,
-                    Node = self --[[@as CompressedLabelTreeLeaf]] ,
+                    Node = instance --[[@as CompressedLabelTreeLeaf]] ,
                     Layer = layer,
                     NumberOfExtractors = 0,
                     NumberOfHydrocarbons = 0,
@@ -804,11 +799,11 @@ CompressedLabelTree = ClassCompressedLabelTree {
 
                 -- assign the label, and then search through our neighbors to assign the same label to them
                 self.Label = label
-                metadata.Area = metadata.Area + ((0.01 * self.Size) * (0.01 * self.Size))
+                metadata.Area = metadata.Area + ((0.01 * instance.Size) * (0.01 * instance.Size))
 
                 -- add our pathable neighbors to the stack
-                for k = 1, TableGetn(self) do
-                    local neighbor = NavCells[ self[k] ]
+                for k = 1, TableGetn(instance) do
+                    local neighbor = NavCells[ instance[k] ]
                     if neighbor.Label == 0 then
                         stack[free] = neighbor
                         free = free + 1
@@ -841,32 +836,7 @@ CompressedLabelTree = ClassCompressedLabelTree {
                 end
             end
 
-            return
-        end
-
-        -- node case
-        self[1]:GenerateLabels(stack, layer)
-        self[2]:GenerateLabels(stack, layer)
-        self[3]:GenerateLabels(stack, layer)
-        self[4]:GenerateLabels(stack, layer)
-    end,
-
-    ---@param self CompressedLabelTreeLeaf
-    ---@param bx number             # Location of top-left corner, in world space
-    ---@param bz number             # Location of top-left corner, in world space
-    ---@param ox number             # Offset from top-left corner, in local space
-    ---@param oz number             # Offset from top-left corner, in local space
-    ---@param size number           # Element count starting at { bx + ox, bz + oz }
-    ComputeCenter = function(self, bx, bz, ox, oz, size)
-        if not self.Label then
-            local hc = 0.5 * size
-            self[1]:ComputeCenter(bx, bz, ox, oz, hc)
-            self[2]:ComputeCenter(bx, bz, ox + hc, oz, hc)
-            self[3]:ComputeCenter(bx, bz, ox, oz + hc, hc)
-            self[4]:ComputeCenter(bx, bz, ox + hc, oz + hc, hc)
-        else
-            self.px = bx + ox + 0.5 * size
-            self.pz = bz + oz + 0.5 * size
+            end
         end
     end,
 
@@ -1472,26 +1442,26 @@ local function GenerateGraphs(processAmphibious, processHover)
     local navAir = NavGrids['Air'] --[[@as NavGrid]]
 
     navAir:GenerateNeighbors()
-    -- navAir:GenerateLabels()
+    navAir:GenerateLabels()
     -- navAir:Precompute()
 
     navLand:GenerateNeighbors()
-    -- navLand:GenerateLabels()
+    navLand:GenerateLabels()
     -- navLand:Precompute()
 
     navWater:GenerateNeighbors()
-    -- navWater:GenerateLabels()
+    navWater:GenerateLabels()
     -- navWater:Precompute()
 
     if processHover then
         navHover:GenerateNeighbors()
-        -- navHover:GenerateLabels()
+        navHover:GenerateLabels()
         -- navHover:Precompute()
     end
 
     if processAmphibious then
         navAmphibious:GenerateNeighbors()
-        -- navAmphibious:GenerateLabels()
+        navAmphibious:GenerateLabels()
         -- navAmphibious:Precompute()
     end
 end
