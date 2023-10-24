@@ -6754,6 +6754,7 @@ uvd_0011="Speed: %0.1f, Turning: %0.1f"
 uvd_0012="Speed: %0.1f, Reverse: %0.1f, Acceleration: %0.1f, Turning: %d"
 uvd_0013="Vision: %d, Underwater Vision: %d, Regen: %0.1f, Cap Cost: %0.1f"
 uvd_0014="Damage: %d - %d, Splash: %d - %d"
+uvd_0015="Damage: %d x%d, Splash: %d"
 
 uvd_DPS="(DPS: %d)"
 uvd_ManualFire="(Manual Fire)"
