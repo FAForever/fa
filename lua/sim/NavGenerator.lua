@@ -389,6 +389,46 @@ local CompressedLabelTree
 ---@field [4] CompressedLabelTreeNode?
 CompressedLabelTree = ClassCompressedLabelTree {
 
+  ---@param self CompressedLabelTreeNode
+    ---@param x number
+    ---@param z number
+    ---@param s number
+    ---@param rCache NavLabelCache
+    CompressArea = function(self, x, z, s, rCache)
+        local value = rCache[z + 1][x + 1]
+        for lz = z + 1, z + s do
+            for lx = x + 1, x + s do
+                if value ~= rCache[lz][lx] then
+                    return false, -2
+                end
+            end
+        end
+
+        return true, value
+    end,
+
+    ---@param self any
+    ---@param bx number
+    ---@param bz number
+    ---@param ox number
+    ---@param oz number
+    ---@param size number
+    ---@param label number
+    ---@return table
+    CreateArea = function(self, bx, bz, ox, oz, size, label, statistics)
+        -- statistics
+        if label >= 0 then
+            statistics.PathableLeafs = statistics.PathableLeafs + 1
+        else
+            statistics.UnpathableLeafs = statistics.UnpathableLeafs + 1
+        end
+
+        return {
+            Size = size,
+            Label = label,
+        }
+    end,
+
     --- Compresses the cache using a quad tree, significantly reducing the amount of data stored. At this point
     --- the label cache only exists of 0s and -1s
     ---@param self CompressedLabelTreeNode
@@ -402,86 +442,123 @@ CompressedLabelTree = ClassCompressedLabelTree {
     ---@param compressionThreshold number
     ---@param layer NavLayers
     Compress = function(self, bx, bz, ox, oz, size, root, rCache, compressionThreshold, layer)
-        -- base case when we meet compression threshold, we skip the children and become very pessimistic
-        if size <= compressionThreshold then
-            local value = rCache[oz + 1][ox + 1]
-            local uniform = true
-            for z = oz + 1, oz + size do
-                for x = ox + 1, ox + size do
-                    uniform = uniform and (value == rCache[z][x])
-                    if not uniform then
-                        break
-                    end
-                end
-            end
 
-            -- generate a unique identifier
-            local identifier = GenerateCellIdentifier()
-            NavCells[identifier] = self
-            self.Identifier = identifier
+        local CompressArea = self.CompressArea
+        local CreateArea = self.CreateArea
 
-            self.Size = size
-            self.Root = root
+        local statistics = NavLayerData[layer]
 
-            if uniform then
-                self.Label = value
-                if value >= 0 then
-                    NavLayerData[layer].PathableLeafs = NavLayerData[layer].PathableLeafs + 1
+        local cox = { ox }
+        local coz =  { oz }
+        local csize = { size }
+        local cindex = { 1 }
+        local curr = 1
+
+        local next = 2
+
+        do
+            repeat
+                local lx = cox[curr]
+                local lz = coz[curr]
+                local ls = csize[curr]
+                local lh = 0.5 * ls
+                local ci = cindex[curr]
+                curr = curr - 1
+
+                -- determine whether they are uniform or not
+                local uniformTopleft, labelTopLeft =            CompressArea(self, lx,      lz,         lh, rCache)
+                local uniformTopRight, labelTopRight =          CompressArea(self, lx + lh, lz,         lh, rCache)
+                local uniformBottomleft, labelBottomLeft =      CompressArea(self, lx,      lz + lh,    lh, rCache)
+                local uniformBottomRight, labelBottomRight =    CompressArea(self, lx + lh, lz + lh,    lh, rCache)
+
+                if (uniformTopleft and uniformTopRight and uniformBottomleft and uniformBottomRight) and 
+                    (labelTopLeft == labelTopRight and labelTopLeft == labelBottomLeft and labelTopLeft == labelBottomRight)
+                then
+
+                    ---------------------------------------------------------------
+                    -- case 1: we're completely uniform with the same label
+
+                    self[ci] = CreateArea(self, bx, bz, lx, lz, ls, labelTopLeft, statistics)
                 else
-                    NavLayerData[layer].UnpathableLeafs = NavLayerData[layer].UnpathableLeafs + 1
+
+                    ----------------------------------------------------------------
+                    -- case 2: we don't have the same label everywhere
+
+                    self[ci] = next
+
+                    local index
+
+                    index = next
+                    if uniformTopleft then
+                        self[index] = CreateArea(self, bx, bz, lx, lz, lh, labelTopLeft, statistics)
+                    else
+                        if lh <= compressionThreshold then
+                            self[index] = CreateArea(self, bx, bz, lx, lz, lh, -1, statistics)
+                        else
+                            curr = curr + 1
+                            cox [curr] = lx
+                            coz [curr] = lz
+                            csize[curr] = lh
+                            cindex[curr] = index
+                        end
+                    end
+
+                    local index = next + 1
+                    if uniformTopRight then
+                        self[index] = CreateArea(self, bx, bz, lx + lh, lz, lh, labelTopRight, statistics)
+                    else
+
+                        if lh <= compressionThreshold then
+                            self[index] = CreateArea(self, bx, bz, lx + lh, lz, lh, -1, statistics)
+                        else
+                            curr = curr + 1
+                            cox [curr] = lx + lh
+                            coz [curr] = lz
+                            csize[curr] = lh
+                            cindex[curr] = index
+                        end
+                    end
+
+                    index = next + 2
+                    if uniformBottomleft then
+                        self[index] = CreateArea(self, bx, bz, lx, lz + lh, lh, labelBottomLeft, statistics)
+                    else
+                        if lh <= compressionThreshold then
+                            self[index] = CreateArea(self, bx, bz, lx, lz + lh, lh, -1, statistics)
+                        else
+                            curr = curr + 1
+                            cox [curr] = lx
+                            coz [curr] = lz + lh
+                            csize[curr] = lh
+                            cindex[curr] = index
+                        end
+                    end
+
+                    index = next + 3
+                    if uniformBottomRight then
+                        self[index] = CreateArea(self, bx, bz, lx + lh, lz + lh, lh, labelBottomRight, statistics)
+                    else
+                        if lh <= compressionThreshold then
+                            self[index] = CreateArea(self, bx, bz, lx + lh, lz + lh, lh, -1, statistics)
+                        else
+                            curr = curr + 1
+                            cox [curr] = lx + lh
+                            coz [curr] = lz + lh
+                            csize[curr] = lh
+                            cindex[curr] = index
+                        end
+                    end
+
+                    next = next + 4
+
+                    -- statistics
+                    statistics.Subdivisions = statistics.Subdivisions + 1
                 end
-            else
-                self.Label = -1
-                NavLayerData[layer].UnpathableLeafs = NavLayerData[layer].UnpathableLeafs + 1
-            end
 
-            return
-        end
-
-        -- recursive case where we do make children
-        local value = rCache[oz + 1][ox + 1]
-        local uniform = true
-        for z = oz + 1, oz + size do
-            for x = ox + 1, ox + size do
-                uniform = uniform and (value == rCache[z][x])
-                if not uniform then
-                    break
-                end
-            end
-        end
-
-        if uniform then
-            -- generate a unique identifier
-            local identifier = GenerateCellIdentifier()
-            NavCells[identifier] = self
-            self.Identifier = identifier
-
-            -- we're uniform, so we're good
-            self.Label = value
-            self.Size = size
-            self.Root = root
-
-            if value >= 0 then
-                NavLayerData[layer].PathableLeafs = NavLayerData[layer].PathableLeafs + 1
-            else
-                NavLayerData[layer].UnpathableLeafs = NavLayerData[layer].UnpathableLeafs + 1
-            end
-        else
-            -- we're not uniform, split up to children
-            local hc = 0.5 * size
-            self[1] = CompressedLabelTree()
-            self[2] = CompressedLabelTree()
-            self[3] = CompressedLabelTree()
-            self[4] = CompressedLabelTree()
-
-            self[1]:Compress(bx, bz, ox, oz, hc, root, rCache, compressionThreshold, layer)
-            self[2]:Compress(bx, bz, ox + hc, oz, hc, root, rCache, compressionThreshold, layer)
-            self[3]:Compress(bx, bz, ox, oz + hc, hc, root, rCache, compressionThreshold, layer)
-            self[4]:Compress(bx, bz, ox + hc, oz + hc, hc, root, rCache, compressionThreshold, layer)
-
-            NavLayerData[layer].Subdivisions = NavLayerData[layer].Subdivisions + 1
+            until curr == 0
         end
     end,
+
 
     --- Flattens the label tree into a leaf
     ---@see Compress
@@ -1587,16 +1664,16 @@ function Generate()
         NavLayerData['Hover'].UnpathableLeafs = 0
     end
 
-    GenerateGraphs(processAmphibious, processHover)
-    print(string.format("generated neighbors and labels: %f", GetSystemTimeSecondsOnlyForProfileUse() - start))
+    -- GenerateGraphs(processAmphibious, processHover)
+    -- print(string.format("generated neighbors and labels: %f", GetSystemTimeSecondsOnlyForProfileUse() - start))
 
-    GenerateMarkerMetadata(processAmphibious, processHover)
-    print(string.format("generated marker metadata: %f", GetSystemTimeSecondsOnlyForProfileUse() - start))
+    -- GenerateMarkerMetadata(processAmphibious, processHover)
+    -- print(string.format("generated marker metadata: %f", GetSystemTimeSecondsOnlyForProfileUse() - start))
 
-    GenerateCullLabels()
-    print(string.format("cleaning up generated data: %f", GetSystemTimeSecondsOnlyForProfileUse() - start))
+    -- GenerateCullLabels()
+    -- print(string.format("cleaning up generated data: %f", GetSystemTimeSecondsOnlyForProfileUse() - start))
 
-    GenerateRootInformation(processAmphibious, processHover)
+    -- GenerateRootInformation(processAmphibious, processHover)
 
     SPEW(string.format("Generated navigational mesh in %f seconds", GetSystemTimeSecondsOnlyForProfileUse() - start))
 
