@@ -388,7 +388,7 @@ CompressedLabelTree = ClassCompressedLabelTree {
     ---@param size number
     ---@param label number
     ---@return table
-    CreateLeaf = function(self, bx, bz, ox, oz, size, label, statistics)
+    CreateLeaf = function(self, bx, bz, ox, oz, size,label, statistics)
         -- statistics
         if label >= 0 then
             statistics.PathableLeafs = statistics.PathableLeafs + 1
@@ -398,6 +398,7 @@ CompressedLabelTree = ClassCompressedLabelTree {
 
         local identifier = GenerateCellIdentifier()
         local instance = {
+            Root = self,
             Identifier = identifier,
             Size = size,
             Label = label,

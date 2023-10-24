@@ -132,7 +132,7 @@ AIPlatoonAdaptiveAttackBehavior = Class(AIPlatoon) {
 
             while not IsDestroyed(self) do
                 -- pick random unit for a position on the grid
-                local units = self:GetPlatoonUnits()
+                local units, unitCount = self:GetPlatoonUnits()
                 local origin
                 for _, v in units do
                     if v and not v.Dead then

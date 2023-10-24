@@ -212,7 +212,7 @@ AIPlatoonAdaptiveGuardBehavior = Class(AIPlatoon) {
 
             while not IsDestroyed(self) do
                 -- pick random unit for a position on the grid
-                local units = self:GetPlatoonUnits()
+                local units, unitCount = self:GetPlatoonUnits()
                 local origin
                 for _, v in units do
                     if v and not v.Dead then
@@ -319,8 +319,9 @@ AIPlatoonAdaptiveGuardBehavior = Class(AIPlatoon) {
                 local dx = guardUnitPos[1] - enemyUnitPos[1]
                 local dz = guardUnitPos[3] - enemyUnitPos[3]
                 if dx * dx + dz * dz > 3025 then
-                    IssueClearCommands(self:GetPlatoonUnits())
-                    IssueMove(guardUnitPos)
+                    local units, unitCount = self:GetPlatoonUnits()
+                    IssueClearCommands(units)
+                    IssueMove(units, guardUnitPos)
                     coroutine.yield(30)
                     if not IsDestroyed(unitToGuard) then
                         self:ChangeState(self.GuardUnit)
@@ -358,7 +359,8 @@ AIPlatoonAdaptiveGuardBehavior = Class(AIPlatoon) {
 
                 -- sanity check
                 local location = self.OpportunityToRaid
-                IssueGuard(self:GetPlatoonUnits(), unitToGuard)
+                local units, unitCount = self:GetPlatoonUnits()
+                IssueGuard(units, unitToGuard)
                 local guardTime = 0
                 while brain:PlatoonExists(self) and not unitToGuard.Dead do
                     local guardUnitPos = unitToGuard:GetPosition()
@@ -392,14 +394,16 @@ AIPlatoonAdaptiveGuardBehavior = Class(AIPlatoon) {
 
                     if self.PlatoonData.EngineerGuardTimeLimit and guardTime >= self.PlatoonData.EngineerGuardTimeLimit
                     or (not unitToGuard.Dead and unitToGuard.Layer == 'Seabed' and self.MovementLayer == 'Land') then
-                        IssueClearCommands({self:GetPlatoonUnits()})
+                        local units, unitCount = self:GetPlatoonUnits()
+                        IssueClearCommands(units)
                         coroutine.yield(10)
                         self:ChangeState(self.Searching)
                         return
                     end
                 end
             else
-                IssueClearCommands({self:GetPlatoonUnits()})
+                local units, unitCount = self:GetPlatoonUnits()
+                IssueClearCommands(units)
                 coroutine.yield(10)
                 self:ChangeState(self.Searching)
                 return
@@ -418,7 +422,8 @@ AIPlatoonAdaptiveGuardBehavior = Class(AIPlatoon) {
             local baseToGuardPos = self.LocationToGuard
             if baseToGuardPos then
                 -- sanity check
-                IssueGuard(self:GetPlatoonUnits(), baseToGuardPos)
+                local units, unitCount = self:GetPlatoonUnits()
+                IssueGuard(units, baseToGuardPos)
                 local guardTime = 0
                 local rnd = Random(13,17)
                 WaitSeconds(rnd)
@@ -458,7 +463,8 @@ AIPlatoonAdaptiveGuardBehavior = Class(AIPlatoon) {
                     WaitTicks(50)
                 end
             else
-                IssueClearCommands({self:GetPlatoonUnits()})
+                local units, count = self:GetPlatoonUnits()
+                IssueClearCommands(units)
                 coroutine.yield(10)
                 self:ChangeState(self.Searching)
                 return

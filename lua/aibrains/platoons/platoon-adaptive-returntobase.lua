@@ -128,7 +128,7 @@ AIPlatoonAdaptiveReturnToBaseBehavior = Class(AIPlatoon) {
 
             while not IsDestroyed(self) do
                 -- pick random unit for a position on the grid
-                local units = self:GetPlatoonUnits()
+                local units, unitCount = self:GetPlatoonUnits()
                 local origin
                 for _, v in units do
                     if v and not v.Dead then
@@ -226,7 +226,8 @@ AIPlatoonAdaptiveReturnToBaseBehavior = Class(AIPlatoon) {
 
                 -- check if our command is still going
                 if not self:IsCommandsActive(command) then
-                    IssueClearCommands(self:GetPlatoonUnits())
+                    local units, unitCount = self:GetPlatoonUnits()
+                    IssueClearCommands(units)
                     self:ChangeState(self.Navigating)
                     return
                 end
