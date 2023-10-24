@@ -960,6 +960,7 @@ CompressedLabelTree = ClassCompressedLabelTree {
     Draw = function(self, color, inset)
 
         -- local scope for performance
+        local GetSurfaceHeight = GetSurfaceHeight
         local TableGetn = TableGetn
         local type = type
 
@@ -997,8 +998,14 @@ CompressedLabelTree = ClassCompressedLabelTree {
                 local px = instance.px
                 local pz = instance.pz
                 local size = instance.Size
-                DrawCircle({ px, GetSurfaceHeight(px, pz), pz }, 0.5, 'ffffff')
-                DrawSquare(px - 0.5 * size, pz - 0.5 * size, size, Shared.LabelToColor(instance.Label), inset)
+
+                -- DrawCircle({ px, GetSurfaceHeight(px, pz), pz }, 0.5, 'ffffff')
+
+                if instance.Label >= 0 then
+                    DrawSquare(px - 0.5 * size, pz - 0.5 * size, size, Shared.LabelToColor(instance.Label), inset)
+                else
+                    DrawSquare(px - 0.5 * size, pz - 0.5 * size, size, 'ff0000', inset)
+                end
             end
         end
     end,
@@ -1390,26 +1397,21 @@ local function GenerateGraphs(processAmphibious, processHover)
 
     navAir:GenerateNeighbors()
     navAir:GenerateLabels()
-    -- navAir:Precompute()
 
     navLand:GenerateNeighbors()
     navLand:GenerateLabels()
-    -- navLand:Precompute()
 
     navWater:GenerateNeighbors()
     navWater:GenerateLabels()
-    -- navWater:Precompute()
 
     if processHover then
         navHover:GenerateNeighbors()
         navHover:GenerateLabels()
-        -- navHover:Precompute()
     end
 
     if processAmphibious then
         navAmphibious:GenerateNeighbors()
         navAmphibious:GenerateLabels()
-        -- navAmphibious:Precompute()
     end
 end
 

@@ -60,30 +60,30 @@ Stack = ClassSimple {
     end,
 }
 
----@class NavPathToHeap
----@field Heap CompressedLabelTreeLeaf[]
+---@class NavHeap
+---@field Heap NavLeaf[]
 ---@field HeapSize number
-NavPathToHeap = ClassSimple {
+NavHeap = ClassSimple {
 
-    ---@param self NavPathToHeap
+    ---@param self NavHeap
     __init = function(self)
         self.Heap = {}
         self.HeapSize = 0
     end,
 
-    ---@param self NavPathToHeap
+    ---@param self NavHeap
     ---@return boolean
     IsEmpty = function(self)
         return self.HeapSize == 0
     end,
 
-    ---@param self NavPathToHeap
+    ---@param self NavHeap
     Clear = function(self)
         self.HeapSize = 0
     end,
 
-    ---@param self NavPathToHeap
-    ---@return CompressedLabelTreeLeaf?
+    ---@param self NavHeap
+    ---@return NavLeaf?
     ExtractMin = function(self)
         local heap = self.Heap
         local heapSize = self.HeapSize
@@ -108,7 +108,7 @@ NavPathToHeap = ClassSimple {
     end,
 
     --- 'Bubble down' operation, applied when we extract an element from the heap
-    ---@param self NavPathToHeap
+    ---@param self NavHeap
     Heapify = function(self)
         local heap = self.Heap
         local heapSize = self.HeapSize
@@ -147,7 +147,7 @@ NavPathToHeap = ClassSimple {
     end,
 
     --- 'Bubble up' operation, applied when we insert a new element into the heap
-    ---@param self NavPathToHeap
+    ---@param self NavHeap
     Rootify = function(self)
         local heap = self.Heap
         local index = self.HeapSize
@@ -172,8 +172,8 @@ NavPathToHeap = ClassSimple {
         end
     end,
 
-    ---@param self NavPathToHeap
-    ---@param element CompressedLabelTreeLeaf
+    ---@param self NavHeap
+    ---@param element NavLeaf
     Insert = function(self, element)
         self.HeapSize = self.HeapSize + 1
         self.Heap[self.HeapSize] = element

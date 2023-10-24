@@ -378,8 +378,8 @@ function CanPathToCell (layer, origin, destination)
     end
 end
 
----@type NavPathToHeap
-local PathToHeap = NavDatastructures.NavPathToHeap()
+---@type NavHeap
+local PathToHeap = NavDatastructures.NavHeap()
 
 ---@type number
 local PathToIdentifier = 1
