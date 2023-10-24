@@ -81,7 +81,9 @@ AIPlatoonAdaptiveReclaimBehavior = Class(AIPlatoon) {
             local reclaimGridInstance = brain.GridReclaim
             local brainGridInstance = brain.GridBrain
             local searchRadius = self.SearchRadius
-            local eng = self:GetPlatoonUnits()[1]
+
+            local units, unitCount = self:GetPlatoonUnits()
+            local eng = units[1]
             local searchLoop = 0
             local reclaimTargetX, reclaimTargetZ
             local engPos = eng:GetPosition()
@@ -211,7 +213,9 @@ AIPlatoonAdaptiveReclaimBehavior = Class(AIPlatoon) {
             end
             local brain = self:GetBrain()
             self:Stop()
-            local eng = self:GetPlatoonUnits()[1]
+
+            local units, unitCount = self:GetPlatoonUnits()
+            local eng = units[1]
             local cache = { 0, 0, 0 }
 
             if not brain.GridPresence then
@@ -319,7 +323,9 @@ AIPlatoonAdaptiveReclaimBehavior = Class(AIPlatoon) {
             end
 
             self:LogDebug('Attempting to build a mass point or two')
-            local eng = self:GetPlatoonUnits()[1]
+
+            local units, unitCount = self:GetPlatoonUnits()
+            local eng = units[1]
             local brain = self:GetBrain()
             IssueClearCommands({ eng })
             local factionIndex = brain:GetFactionIndex()
@@ -352,7 +358,8 @@ AIPlatoonAdaptiveReclaimBehavior = Class(AIPlatoon) {
         --- The platoon avoids danger or attempts to reclaim if they are too close to avoid
         ---@param self AIPlatoonAdaptiveReclaimBehavior
         Main = function(self)
-            local eng = self:GetPlatoonUnits()[1]
+            local units, unitCount = self:GetPlatoonUnits()
+            local eng = units[1]
             local brain = self:GetBrain()
 
             local engPos = eng:GetPosition()
@@ -402,7 +409,8 @@ AIPlatoonAdaptiveReclaimBehavior = Class(AIPlatoon) {
         --- The platoon avoids danger or attempts to reclaim if they are too close to avoid
         ---@param self AIPlatoonAdaptiveReclaimBehavior
         Main = function(self)
-            local eng = self:GetPlatoonUnits()[1]
+            local units, unitCount = self:GetPlatoonUnits()
+            local eng = units[1]
             local brain = self:GetBrain()
             local reclaimGridInstance = brain.GridReclaim
             local reclaimTargetX = self.CellAssigned[1]

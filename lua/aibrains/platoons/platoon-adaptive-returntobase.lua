@@ -259,7 +259,7 @@ AIPlatoonAdaptiveReturnToBaseBehavior = Class(AIPlatoon) {
 
                 -- check if our command is still going
                 if not self:IsCommandsActive(command) then
-                    local units = self:GetPlatoonUnits()
+                    local units, unitCount = self:GetPlatoonUnits()
                     IssueClearCommands(units)
                     self:ChangeState(self.Navigating)
                     return
