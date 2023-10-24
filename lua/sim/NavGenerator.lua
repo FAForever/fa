@@ -52,6 +52,8 @@ local TableInsert = table.insert
 local TableGetn = table.getn
 
 local MathFloor = math.floor
+local MathMax = math.max
+local MathAbs = math.abs
 
 local HashCache = {}
 
@@ -104,7 +106,7 @@ end
 ---@return number
 function SizeOfCell()
     ---@type number
-    local MapSize = math.max(ScenarioInfo.size[1], ScenarioInfo.size[2])
+    local MapSize = MathMax(ScenarioInfo.size[1], ScenarioInfo.size[2])
 
     ---@type number
     return MapSize / LabelCompressionTreesPerAxis
@@ -172,14 +174,6 @@ NavGrid = ClassNavGrid {
         end
     end,
 
-    Simplify = function(self)
-        for z = 0, LabelCompressionTreesPerAxis - 1 do
-            for x = 0, LabelCompressionTreesPerAxis - 1 do
-                self.Trees[z][x]:Simplify()
-            end
-        end
-    end,
-
     --- Adds a compressed label tree to the navigational grid
     ---@param self NavGrid
     ---@param z number index
@@ -207,8 +201,8 @@ NavGrid = ClassNavGrid {
             local size = self.TreeSize
             local trees = self.Trees
 
-            local bx = math.floor(x / size)
-            local bz = math.floor(z / size)
+            local bx = MathFloor(x / size)
+            local bz = MathFloor(z / size)
             if trees[bz][bx] then
                 return bx, bz
             else
@@ -235,8 +229,8 @@ NavGrid = ClassNavGrid {
             local size = self.TreeSize
             local trees = self.Trees
 
-            local bx = math.floor(x / size)
-            local bz = math.floor(z / size)
+            local bx = MathFloor(x / size)
+            local bz = MathFloor(z / size)
             local root = trees[bz][bx] --[[@as NavTree]]
             return root
         end
@@ -363,6 +357,10 @@ end
 ---@field Threat number | nil               # Used during navigating
 CompressedLabelTree = ClassCompressedLabelTree {
 
+    ---------------------------------------------------------------------------
+    --#region Generation
+
+    --- Scans the area to check whether the labels are uniform.
     ---@param self NavTree
     ---@param x number
     ---@param z number
@@ -381,6 +379,7 @@ CompressedLabelTree = ClassCompressedLabelTree {
         return true, value
     end,
 
+    --- Creates all the information that is required for a leaf.
     ---@param self any
     ---@param bx number
     ---@param bz number
@@ -558,8 +557,7 @@ CompressedLabelTree = ClassCompressedLabelTree {
 
     end,
 
-
-    --- Flattens the label tree into a leaf
+    --- Flattens the tree into a leaf.
     ---@see Compress
     ---@param self NavTree
     ---@param bx number             # Location of top-left corner, in world space
@@ -573,7 +571,7 @@ CompressedLabelTree = ClassCompressedLabelTree {
         self[1] = self:CreateLeaf(bx, bz, ox, oz, size, label, NavLayerData[layer])
     end,
 
-    --- Generates the following neighbors, when they are valid:
+    --- Generates the neighbors of all leaves.
     ---@param self NavLeaf
     ---@param grid NavGrid
     ---@param layer NavLayers
@@ -822,22 +820,10 @@ CompressedLabelTree = ClassCompressedLabelTree {
         end
     end,
 
-    ---@param self NavLeaf
-    ---@param other NavLeaf
-    ---@return number
-    DistanceTo = function(self, other)
-        local dx = self.px - other.px
-        local dz = self.pz - other.pz
-        return math.sqrt(dx * dx + dz * dz)
-    end,
+    --#endregion
 
-    ---@param self NavLeaf
-    ---@param other NavLeaf
-    ---@return number
-    ---@return number
-    DirectionTo = function(self, other)
-        return self.px - other.px, self.pz - other.pz
-    end,
+    ---------------------------------------------------------------------------
+    --#region Functionality
 
     --- Returns all leaves in a table
     ---@param self NavTree
@@ -957,12 +943,19 @@ CompressedLabelTree = ClassCompressedLabelTree {
         return instance --[[@as NavLeaf]]
     end;
 
+    --#endregion
+
+    ---------------------------------------------------------------------------
+    --#region Debug functionality
+
+    --- Draws the labels as colors. It can help visualize the state of the navigational mesh.
+    ---
+    --- Used for debugging
     ---@param self NavTree
     ---@param color Color
     Draw = function(self, color, inset)
 
         -- local scope for performance
-        local GetSurfaceHeight = GetSurfaceHeight
         local TableGetn = TableGetn
         local type = type
 
@@ -985,11 +978,13 @@ CompressedLabelTree = ClassCompressedLabelTree {
         end
     end,
 
+    --- Draws the labels as colors. It can help visualize the state of the navigational mesh.
+    ---
+    --- Used for debugging
     ---@param self NavTree
     DrawLabels = function(self, inset)
 
         -- local scope for performance
-        local GetSurfaceHeight = GetSurfaceHeight
         local TableGetn = TableGetn
         local type = type
 
@@ -1011,6 +1006,8 @@ CompressedLabelTree = ClassCompressedLabelTree {
             end
         end
     end,
+
+    --#endregion
 }
 
 ---@param cells number
@@ -1068,8 +1065,7 @@ end
 ---@return number   # minimum depth
 ---@return number   # maximum depth
 function PopulateCaches(tCache, dCache, daCache, pxCache, pzCache, pCache, bCache, bx, bz, c)
-    local MathAbs = math.abs
-    local Mathmax = math.max
+    local MathAbs = MathAbs
     local GetTerrainHeight = GetTerrainHeight
     local GetSurfaceHeight = GetSurfaceHeight
     local GetTerrainType = GetTerrainType
@@ -1077,8 +1073,11 @@ function PopulateCaches(tCache, dCache, daCache, pxCache, pzCache, pCache, bCach
     -- scan / cache terrain and depth
     for z = 1, c + 1 do
         local absZ = bz + z - 1
+
+        -- local scope to pre-compute `GETTABLE`
         local tc = tCache[z]
         local dc = dCache[z]
+
         for x = 1, c + 1 do
             local absX = bx + x - 1
             local terrain = GetTerrainHeight(absX, absZ)
@@ -1093,14 +1092,18 @@ function PopulateCaches(tCache, dCache, daCache, pxCache, pzCache, pCache, bCach
 
     -- scan / cache cliff walkability
     for z = 1, c + 1 do
+        -- local scope to pre-compute `GETTABLE`
         local pc = pxCache[z]
+
         for x = 1, c do
             pc[x] = MathAbs(tCache[z][x] - tCache[z][x + 1]) < MaxHeightDifference
         end
     end
 
     for z = 1, c do
+        -- local scope to pre-compute `GETTABLE`
         local pc = pzCache[z]
+        
         for x = 1, c + 1 do
             pc[x] = MathAbs(tCache[z][x] - tCache[z + 1][x]) < MaxHeightDifference
         end
@@ -1109,6 +1112,8 @@ function PopulateCaches(tCache, dCache, daCache, pxCache, pzCache, pCache, bCach
     -- compute cliff walkability
     -- compute average depth
     for z = 1, c do
+
+        -- local scope to pre-compute `GETTABLE`
         local pxc = pxCache[z]
         local pzc = pzCache[z]
         local pxc1 = pxCache[z + 1]
@@ -1166,15 +1171,21 @@ function ComputeLandPathingMatrix(size, daCache, pCache, bCache, rCache)
     local allPathable = true
 
     for z = 1, size do
+        -- local scope to pre-compute `GETTABLE`
+        local bc = bCache[z]
+        local dac = daCache[z]
+        local pc = pCache[z]
+        local rc = rCache[z]
+
         for x = 1, size do
-            local nonBlockingTerrainType = bCache[z][x]
-            local isLand = daCache[z][x] <= 0
-            local nonBlockingTerrainAngle = pCache[z][x]
+            local nonBlockingTerrainType = bc[x]
+            local isLand = dac[x] <= 0
+            local nonBlockingTerrainAngle = pc[x]
             if isLand and nonBlockingTerrainType and nonBlockingTerrainAngle then
-                rCache[z][x] = 0
+                rc[x] = 0
                 allBlocking = false
             else
-                rCache[z][x] = -1
+                rc[x] = -1
                 allPathable = false
             end
         end
@@ -1193,16 +1204,22 @@ function ComputeHoverPathingMatrix(size, daCache, pCache, bCache, rCache)
     local allPathable = true
 
     for z = 1, size do
+        -- local scope to pre-compute `GETTABLE`
+        local bc = bCache[z]
+        local dac = daCache[z]
+        local pc = pCache[z]
+        local rc = rCache[z]
+
         for x = 1, size do
-            local nonBlockingTerrainType = bCache[z][x]
-            local sufficientDepth = daCache[z][x] >= 1
-            local nonBlockingTerrainAngle = pCache[z][x]
+            local nonBlockingTerrainType = bc[x]
+            local sufficientDepth = dac[x] >= 1
+            local nonBlockingTerrainAngle = pc[x]
 
             if nonBlockingTerrainType and (sufficientDepth or nonBlockingTerrainAngle) then
-                rCache[z][x] = 0
+                rc[x] = 0
                 allBlocking = false
             else
-                rCache[z][x] = -1
+                rc[x] = -1
                 allPathable = false
             end
         end
@@ -1221,15 +1238,20 @@ function ComputeNavalPathingMatrix(size, daCache, pCache, bCache, rCache)
     local allPathable = true
 
     for z = 1, size do
+        -- local scope to pre-compute `GETTABLE`
+        local bc = bCache[z]
+        local dac = daCache[z]
+        local rc = rCache[z]
+
         for x = 1, size do
-            local nonBlockingTerrainType = bCache[z][x]
-            local sufficientDepth = daCache[z][x] >= MinWaterDepthNaval
+            local nonBlockingTerrainType = bc[x]
+            local sufficientDepth = dac[x] >= MinWaterDepthNaval
 
             if sufficientDepth and nonBlockingTerrainType then
-                rCache[z][x] = 0
+                rc[x] = 0
                 allBlocking = false
             else
-                rCache[z][x] = -1
+                rc[x] = -1
                 allPathable = false
             end
         end
@@ -1248,16 +1270,22 @@ function ComputeAmphPathingMatrix(size, daCache, pCache, bCache, rCache)
     local allPathable = true
 
     for z = 1, size do
+        -- local scope to pre-compute `GETTABLE`
+        local bc = bCache[z]
+        local dac = daCache[z]
+        local pc = pCache[z]
+        local rc = rCache[z]
+
         for x = 1, size do
-            local nonBlockingTerrainType = bCache[z][x]
-            local notTooDeep = daCache[z][x] <= MaxWaterDepthAmphibious
-            local nonBlockingTerrainAngle = pCache[z][x]
+            local nonBlockingTerrainType = bc[x]
+            local notTooDeep = dac[x] <= MaxWaterDepthAmphibious
+            local nonBlockingTerrainAngle = pc[x]
 
             if notTooDeep and nonBlockingTerrainType and nonBlockingTerrainAngle then
-                rCache[z][x] = 0
+                rc[x] = 0
                 allBlocking = false
             else
-                rCache[z][x] = -1
+                rc[x] = -1
                 allPathable = false
             end
         end
@@ -1518,7 +1546,7 @@ function Generate()
     NavLayerData = Shared.CreateEmptyNavLayerData()
 
     ---@type number
-    local MapSize = math.max(ScenarioInfo.size[1], ScenarioInfo.size[2])
+    local MapSize = MathMax(ScenarioInfo.size[1], ScenarioInfo.size[2])
 
     ---@type number
     local CompressionTreeSize = MapSize / LabelCompressionTreesPerAxis
@@ -1579,8 +1607,8 @@ function Generate()
     local allocatedSizeLabels = import('/lua/system/utils.lua').ToBytes(NavLabels, { Node = true }) / (1024 * 1024)
 
     local infoMessage = string.format("Allocating %.1fmb memory", allocatedSizeGrids)
-    SPEW(infoMessage)
     print(infoMessage)
+    SPEW(infoMessage)
 
     SPEW(string.format("Allocated megabytes for labels: %f", allocatedSizeLabels))
     SPEW(string.format("Number of labels: %f", LabelIdentifier))
