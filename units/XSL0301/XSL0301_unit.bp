@@ -663,6 +663,7 @@ UnitBlueprint{
             DamageRadius = 2.5,
             DamageType = "Overcharge",
             DisplayName = "Light Overcharge Cannon",
+            EnabledByEnhancement = "Overcharge",
             EnergyChargeForFirstShot = false,
             EnergyDrainPerSecond = 5000,
             EnergyRequired = 5000,
@@ -743,6 +744,7 @@ UnitBlueprint{
             DamageRadius = 2.5,
             DamageType = "Overcharge",
             DisplayName = "Light AutoOvercharge Cannon",
+            EnabledByEnhancement = "Overcharge",
             EnergyChargeForFirstShot = false,
             EnergyDrainPerSecond = 5000,
             EnergyRequired = 5000,
@@ -850,6 +852,7 @@ UnitBlueprint{
             DamageType = "Normal",
             DisplayName = "Laanse Tactical Missile Launcher",
             EffectiveRadius = 0,
+            EnabledByEnhancement = "Missile",
             FireTargetLayerCapsTable = {
                 Land = "Land|Water|Seabed",
                 Seabed = "Land|Water|Seabed",
