@@ -123,7 +123,7 @@ end
 ---@param mouse Vector
 ---@param layer NavLayers
 function ScanOver(mouse, layer)
-    if mouse and false then
+    if mouse then
         ---@type NavGrid
         local navGrid = NavGenerator.NavGrids[layer]
         local over = navGrid:FindLeaf(mouse)

@@ -286,9 +286,10 @@ NavGrid = ClassNavGrid {
     GenerateNeighbors = function(self)
         local size = self.TreeSize
         local trees = self.Trees
+        local layer = self.Layer
         for z = 0, LabelCompressionTreesPerAxis - 1 do
             for x = 0, LabelCompressionTreesPerAxis - 1 do
-                trees[z][x]:GenerateDirectNeighbors(x * size, z * size, 0, 0, size, self, self.Layer)
+                trees[z][x]:GenerateDirectNeighbors(self, layer)
             end
         end
     end,
@@ -603,14 +604,17 @@ CompressedLabelTree = ClassCompressedLabelTree {
 
     --- Generates the following neighbors, when they are valid:
     ---@param self CompressedLabelTreeLeaf
-    ---@param bx number             # Location of top-left corner, in world space
-    ---@param bz number             # Location of top-left corner, in world space
-    ---@param ox number             # Offset from top-left corner, in local space
-    ---@param oz number             # Offset from top-left corner, in local space
-    ---@param size number           # Element count starting at { bx + ox, bz + oz }
-    ---@param root NavGrid
+    ---@param grid NavGrid
     ---@param layer NavLayers
-    GenerateDirectNeighbors = function(self, bx, bz, ox, oz, size, root, layer)
+    GenerateDirectNeighbors = function(self, grid, layer)
+
+        -- local scope for performance
+        local type = type
+        local seen = HashCache
+
+        local FindLeafXZ = grid.FindLeafXZ
+        local TableInsert = TableInsert
+
         for k = 1, TableGetn(self) do
             local instance = self[k]
             local isLeaf = type(instance) == "table"
@@ -629,7 +633,6 @@ CompressedLabelTree = ClassCompressedLabelTree {
                 local x1Outside, z1Outside = x1 - 0.5, z1 - 0.5
                 local x2Outside, z2Outside = x2 + 0.5, z2 + 0.5
 
-                local seen = HashCache
                 for k, v in seen do
                     seen[k] = nil
                 end
@@ -642,7 +645,7 @@ CompressedLabelTree = ClassCompressedLabelTree {
                 for k = x1, x2 - 1 do
                     local x = k + 0.5
                     -- DrawCircle({x, GetSurfaceHeight(x, z1Outside), z1Outside}, 0.5, 'ff0000')
-                    local neighbor = root:FindLeafXZ(x, z1Outside)
+                    local neighbor = FindLeafXZ(grid, x, z1Outside)
                     if neighbor then
                         local identifier = neighbor.Identifier
                         k = k + neighbor.Size - 1
@@ -659,7 +662,7 @@ CompressedLabelTree = ClassCompressedLabelTree {
                 for k = x1, x2 - 1 do
                     local x = k + 0.5
                     -- DrawCircle({x, GetSurfaceHeight(x, z2Outside), z2Outside}, 0.5, 'ff0000')
-                    local neighbor = root:FindLeafXZ(x, z2Outside)
+                    local neighbor = FindLeafXZ(grid, x, z2Outside)
                     if neighbor then
                         local identifier = neighbor.Identifier
                         k = k + neighbor.Size - 1
@@ -676,7 +679,7 @@ CompressedLabelTree = ClassCompressedLabelTree {
                 for k = z1, z2 - 1 do
                     local z = k + 0.5
                     -- DrawCircle({x1Outside, GetSurfaceHeight(x1Outside, z), z}, 0.5, 'ff0000')
-                    local neighbor = root:FindLeafXZ(x1Outside, z)
+                    local neighbor = FindLeafXZ(grid, x1Outside, z)
                     if neighbor then
                         local identifier = neighbor.Identifier
                         k = k + neighbor.Size - 1
@@ -693,7 +696,7 @@ CompressedLabelTree = ClassCompressedLabelTree {
                 for k = z1, z2 - 1 do
                     local z = k + 0.5
                     -- DrawCircle({x2Outside, GetSurfaceHeight(x2Outside, z), z}, 0.5, 'ff0000')
-                    local neighbor = root:FindLeafXZ(x2Outside, z)
+                    local neighbor = FindLeafXZ(grid, x2Outside, z)
                     if neighbor then
                         local identifier = neighbor.Identifier
                         k = k + neighbor.Size - 1
@@ -712,13 +715,13 @@ CompressedLabelTree = ClassCompressedLabelTree {
 
                 -- scan top-left
                 local a, b
-                local neighbor = root:FindLeafXZ(x1Outside, z1Outside)
+                local neighbor = FindLeafXZ(grid, x1Outside, z1Outside)
                 -- DrawCircle({x1Outside, GetSurfaceHeight(x1Outside, z1Outside), z1Outside}, 0.5, 'ff0000')
                 if neighbor and not seen[neighbor] then
                     local identifier = neighbor.Identifier
                     seen[identifier] = true
-                    a = root:FindLeafXZ(x1Outside + 1, z1Outside)
-                    b = root:FindLeafXZ(x1Outside, z1Outside + 1)
+                    a = FindLeafXZ(grid, x1Outside + 1, z1Outside)
+                    b = FindLeafXZ(grid, x1Outside, z1Outside + 1)
 
                     if a and b and (a.Label == 0 or b.Label == 0) then
                         TableInsert(instance, identifier)
@@ -726,13 +729,13 @@ CompressedLabelTree = ClassCompressedLabelTree {
                 end
 
                 -- scan top-right
-                neighbor = root:FindLeafXZ(x2Outside, z1Outside)
+                neighbor = FindLeafXZ(grid, x2Outside, z1Outside)
                 -- DrawCircle({x2Outside, GetSurfaceHeight(x2Outside, z1Outside), z1Outside}, 0.5, 'ff0000')
                 if neighbor and not seen[neighbor] then
                     local identifier = neighbor.Identifier
                     seen[identifier] = true
-                    a = root:FindLeafXZ(x2Outside - 1, z1Outside)
-                    b = root:FindLeafXZ(x2Outside, z1Outside + 1)
+                    a = FindLeafXZ(grid, x2Outside - 1, z1Outside)
+                    b = FindLeafXZ(grid, x2Outside, z1Outside + 1)
 
                     if a and b and (a.Label == 0 or b.Label == 0) then
                         TableInsert(instance, identifier)
@@ -741,12 +744,12 @@ CompressedLabelTree = ClassCompressedLabelTree {
 
                 -- scan bottom-left
                 -- DrawCircle({x1Outside, GetSurfaceHeight(x1Outside, z2Outside), z2Outside}, 0.5, 'ff0000')
-                neighbor = root:FindLeafXZ(x1Outside, z2Outside)
+                neighbor = FindLeafXZ(grid, x1Outside, z2Outside)
                 if neighbor and not seen[neighbor] then
                     local identifier = neighbor.Identifier
                     seen[identifier] = true
-                    a = root:FindLeafXZ(x1Outside + 1, z2Outside)
-                    b = root:FindLeafXZ(x1Outside, z2Outside - 1)
+                    a = FindLeafXZ(grid, x1Outside + 1, z2Outside)
+                    b = FindLeafXZ(grid, x1Outside, z2Outside - 1)
 
                     if a and b and (a.Label == 0 or b.Label == 0) then
                         TableInsert(instance, identifier)
@@ -755,12 +758,12 @@ CompressedLabelTree = ClassCompressedLabelTree {
 
                 -- scan bottom-right
                 -- DrawCircle({x2Outside, GetSurfaceHeight(x2Outside, z2Outside), z2Outside}, 0.5, 'ff0000')
-                neighbor = root:FindLeafXZ(x2Outside, z2Outside)
+                neighbor = FindLeafXZ(grid, x2Outside, z2Outside)
                 if neighbor and not seen[neighbor] then
                     local identifier = neighbor.Identifier
                     seen[identifier] = true
-                    a = root:FindLeafXZ(x2Outside - 1, z2Outside)
-                    b = root:FindLeafXZ(x2Outside, z2Outside - 1)
+                    a = FindLeafXZ(grid, x2Outside - 1, z2Outside)
+                    b = FindLeafXZ(grid, x2Outside, z2Outside - 1)
 
                     if a and b and (a.Label == 0 or b.Label == 0) then
                         TableInsert(instance, identifier)
