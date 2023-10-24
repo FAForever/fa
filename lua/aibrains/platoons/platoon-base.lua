@@ -138,6 +138,20 @@ AIPlatoon = Class(moho.platoon_methods) {
         end
     end,
 
+    ---@param self AIPlatoon
+    ---@param fn function
+    ---@param ... any
+    ---@return thread
+    ForkThread = function(self, fn, ...)
+        if fn then
+            local thread = ForkThread(fn, self, unpack(arg))
+            self.Trash:Add(thread)
+            return thread
+        else
+            return nil
+        end
+    end,
+
     Start = State {
 
         StateName = 'Start',

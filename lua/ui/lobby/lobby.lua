@@ -2343,6 +2343,7 @@ local function UpdateGame()
                 function()
                     -- store in preferences so that we can retrieve it during blueprint loading
                     SetPreference('PreGameData', preGameData)
+                    SavePreferences()
                 end
             )
 
@@ -2357,8 +2358,8 @@ local function UpdateGame()
             -- hence we can not rely on mod and / or lobby option
             -- changes to be present.
 
-            local mods = Mods.GetGameMods(gameInfo.GameMods)
-            PrefetchSession(scenarioInfo.map, mods, true)
+            -- local mods = Mods.GetGameMods(gameInfo.GameMods)
+            -- PrefetchSession(scenarioInfo.map, mods, true)
 
         else
             AlertHostMapMissing()

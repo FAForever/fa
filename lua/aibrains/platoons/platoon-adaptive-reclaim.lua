@@ -42,6 +42,11 @@ AIPlatoonAdaptiveReclaimBehavior = Class(AIPlatoon) {
                 self:ChangeState(self.Error)
                 return
             end
+            if self.PlatoonData.LocationType then
+                self.LocationType = self.PlatoonData.LocationType
+            else
+                self.LocationType = 'MAIN'
+            end
 
             self.CellSize = brain.GridReclaim.CellSize * brain.GridReclaim.CellSize
 
@@ -107,6 +112,7 @@ AIPlatoonAdaptiveReclaimBehavior = Class(AIPlatoon) {
                     elseif brain:GetThreatAtPosition(centerOfCell, imapRadius, true, 'AntiSurface') < 10 then
                         TableInsert(pathFailTable, { center = centerOfCell, x = cell.X, z = cell.Z })
                     end
+                    WaitTicks(1)
                 end
 
                 searchLoop = searchLoop + 1
@@ -131,12 +137,20 @@ AIPlatoonAdaptiveReclaimBehavior = Class(AIPlatoon) {
                 self.CellAssigned = { reclaimTargetX, reclaimTargetZ }
                 brainGridInstance:AddReclaimingEngineer(brainCell, eng)
                 self.LocationToReclaim = reclaimGridInstance:ToWorldSpace(reclaimTargetX, reclaimTargetZ)
-                self:ChangeState(self.Navigating)
-                return
+                local dx = self.LocationToReclaim[1] - engPos[1]
+                local dz = self.LocationToReclaim[3] - engPos[3]
+                if dx * dx + dz * dz < 1225 then
+                    self:ChangeState(self.ReclaimCell)
+                    return
+                else
+                    self:ChangeState(self.Navigating)
+                    return
+                end
             else
                 if self.SearchRadius < 8 then
                     self.SearchRadius = 8
                     self:LogDebug(string.format('No reclaim found, extending search range to 8'))
+                    WaitTicks(10)
                     self:ChangeState(self.Searching)
                     return
                 end
@@ -162,6 +176,7 @@ AIPlatoonAdaptiveReclaimBehavior = Class(AIPlatoon) {
                 end
                 if returnPos and VDist3Sq(engPos, returnPos) < 6400 then
                     self:LogDebug(string.format('Exiting Reclaim state machine'))
+                    WaitTicks(20)
                     self:ExitStateMachine()
                     return
                 elseif returnPos then
@@ -190,6 +205,7 @@ AIPlatoonAdaptiveReclaimBehavior = Class(AIPlatoon) {
             local destination = self.LocationToReclaim
             if not destination then
                 self:LogWarning(string.format('no destination to navigate to'))
+                WaitTicks(20)
                 self:ChangeState(self.Searching)
                 return
             end
@@ -203,6 +219,7 @@ AIPlatoonAdaptiveReclaimBehavior = Class(AIPlatoon) {
             end
             if not NavUtils.CanPathToCell(self.MovementLayer, eng:GetPosition(), destination) then
                 self:LogDebug(string.format('Reclaim engineer is going to use transport'))
+                WaitTicks(20)
                 self:ChangeState(self.Transporting)
                 return
             end
@@ -212,11 +229,12 @@ AIPlatoonAdaptiveReclaimBehavior = Class(AIPlatoon) {
                 local origin = eng:GetPosition()
 
                 -- generate a direction
-                local waypoint, length = NavUtils.DirectionTo(self.MovementLayer, origin, destination, 50)
+                local waypoint, length = NavUtils.DirectionTo(self.MovementLayer, origin, destination, 60)
 
                 -- something odd happened: no direction found
                 if not waypoint then
                     self:LogWarning(string.format('No Direction waypoint returned'))
+                    WaitTicks(20)
                     self:ChangeState(self.Searching)
                     return
                 end

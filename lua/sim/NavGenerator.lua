@@ -136,7 +136,7 @@ end
 
 local FactoryNavGrid = {
     __call = function(self, layer, treeSize)
-        local instance = {&3 &0}
+        local instance = {}
         setmetatable(instance, self)
         instance:OnCreate(layer, treeSize)
         return instance
@@ -162,9 +162,9 @@ NavGrid = ClassNavGrid {
     OnCreate = function(self, layer, treeSize)
         self.Layer = layer
         self.TreeSize = treeSize
-        self.Trees = {&0 &16}
+        self.Trees = {}
         for z = 0, LabelCompressionTreesPerAxis - 1 do
-            self.Trees[z] = {&0 &16}
+            self.Trees[z] = {}
         end
     end,
 
@@ -338,11 +338,8 @@ NavGrid = ClassNavGrid {
 }
 
 local FactoryCompressedLabelTree = {
-    __call = function(self, layer, treeSize)
-        local instance = {&3 &4}
-        setmetatable(instance, self)
-        instance:OnCreate(layer, treeSize)
-        return instance
+    __call = function(self)
+        return setmetatable({}, self)
     end
 }
 
@@ -392,13 +389,6 @@ local CompressedLabelTree
 ---@field [4] CompressedLabelTreeNode?
 CompressedLabelTree = ClassCompressedLabelTree {
 
-    ---@param self CompressedLabelTreeNode | CompressedLabelTreeLeaf
-    OnCreate = function(self)
-        local identifier = GenerateCellIdentifier()
-        NavCells[identifier] = self
-        self.Identifier = identifier
-    end,
-
     --- Compresses the cache using a quad tree, significantly reducing the amount of data stored. At this point
     --- the label cache only exists of 0s and -1s
     ---@param self CompressedLabelTreeNode
@@ -425,12 +415,17 @@ CompressedLabelTree = ClassCompressedLabelTree {
                 end
             end
 
+            -- generate a unique identifier
+            local identifier = GenerateCellIdentifier()
+            NavCells[identifier] = self
+            self.Identifier = identifier
+
             self.Size = size
             self.Root = root
 
             if uniform then
                 self.Label = value
-                if self.Label >= 0 then
+                if value >= 0 then
                     NavLayerData[layer].PathableLeafs = NavLayerData[layer].PathableLeafs + 1
                 else
                     NavLayerData[layer].UnpathableLeafs = NavLayerData[layer].UnpathableLeafs + 1
@@ -456,12 +451,17 @@ CompressedLabelTree = ClassCompressedLabelTree {
         end
 
         if uniform then
+            -- generate a unique identifier
+            local identifier = GenerateCellIdentifier()
+            NavCells[identifier] = self
+            self.Identifier = identifier
+
             -- we're uniform, so we're good
             self.Label = value
             self.Size = size
             self.Root = root
 
-            if self.Label >= 0 then
+            if value >= 0 then
                 NavLayerData[layer].PathableLeafs = NavLayerData[layer].PathableLeafs + 1
             else
                 NavLayerData[layer].UnpathableLeafs = NavLayerData[layer].UnpathableLeafs + 1
@@ -469,10 +469,10 @@ CompressedLabelTree = ClassCompressedLabelTree {
         else
             -- we're not uniform, split up to children
             local hc = 0.5 * size
-            self[1] = CompressedLabelTree(hc)
-            self[2] = CompressedLabelTree(hc)
-            self[3] = CompressedLabelTree(hc)
-            self[4] = CompressedLabelTree(hc)
+            self[1] = CompressedLabelTree()
+            self[2] = CompressedLabelTree()
+            self[3] = CompressedLabelTree()
+            self[4] = CompressedLabelTree()
 
             self[1]:Compress(bx, bz, ox, oz, hc, root, rCache, compressionThreshold, layer)
             self[2]:Compress(bx, bz, ox + hc, oz, hc, root, rCache, compressionThreshold, layer)
@@ -494,11 +494,16 @@ CompressedLabelTree = ClassCompressedLabelTree {
     ---@param label -1 | 0
     ---@param layer NavLayers
     Flatten = function(self, bx, bz, ox, oz, size, root, label, layer)
+        -- generate a unique identifier
+        local identifier = GenerateCellIdentifier()
+        NavCells[identifier] = self
+        self.Identifier = identifier
+
         self.Label = label
         self.Size = size
         self.Root = root
 
-        if self.Label >= 0 then
+        if label >= 0 then
             NavLayerData[layer].PathableLeafs = NavLayerData[layer].PathableLeafs + 1
         else
             NavLayerData[layer].UnpathableLeafs = NavLayerData[layer].UnpathableLeafs + 1
