@@ -263,12 +263,16 @@ Tooltips = {
         description = "<LOC tooltipui0344>Click on the question mark icon to view detailed suggestions on how to play Supreme Commander: Forged Alliance",
     },
     external_factory = {
-        title = "Select Mobile Factory",
-        description = "",
+        title = "<LOC tooltipui0750>Mobile Factory",
+        description = "<LOC tooltipui0751>Select attached factory",
+    },
+    external_factory_unit = {
+        title = "<LOC tooltipui0750>Mobile Factory",
+        description = "<LOC tooltipui0752>Select base unit",
     },
     auto_deploy = {
-        title = "Deploy",
-        description = "Right click to automatically deploy constructed units",
+        title = "<LOC tooltipui0478>Deploy",
+        description = "<LOC tooltipui0753>Right click to automatically deploy constructed units",
     },
     drone = {
         title = "<LOC tooltipui0411>Select Drone",

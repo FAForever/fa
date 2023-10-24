@@ -13,7 +13,7 @@ local TableGetn = table.getn
 local TableEmpty = table.empty
 
 -- constants
-local NavigateDistanceThresholdSquared = 20 * 20
+local NavigateDistanceThresholdSquared = 25 * 25
 
 ---@class AIPlatoonAdaptiveGuardBehavior : AIPlatoon
 ---@field RetreatCount number 
@@ -43,6 +43,12 @@ AIPlatoonAdaptiveGuardBehavior = Class(AIPlatoon) {
                 self:LogWarning('requires generated navigational mesh')
                 self:ChangeState(self.Error)
                 return
+            end
+
+            if self.PlatoonData.LocationType then
+                self.LocationType = self.PlatoonData.LocationType
+            else
+                self.LocationType = 'MAIN'
             end
 
             -- Set the movement layer for pathing, included for mods where water or air based engineers may exist
@@ -224,7 +230,7 @@ AIPlatoonAdaptiveGuardBehavior = Class(AIPlatoon) {
                 end
 
                 -- generate a direction
-                local waypoint, length = NavUtils.DirectionTo('Land', origin, destination, 30)
+                local waypoint, length = NavUtils.DirectionTo('Land', origin, destination, 60)
 
                 -- something odd happened: no direction found
                 if not waypoint then
@@ -334,9 +340,11 @@ AIPlatoonAdaptiveGuardBehavior = Class(AIPlatoon) {
                 -- check if our command is still going
                 if not self:IsCommandsActive(command) then
                     if not IsDestroyed(unitToGuard) then
+                        coroutine.yield(10)
                         self:ChangeState(self.GuardUnit)
                         return
                     else
+                        coroutine.yield(10)
                         self:ChangeState(self.Searching)
                         return
                     end
@@ -358,8 +366,7 @@ AIPlatoonAdaptiveGuardBehavior = Class(AIPlatoon) {
             if unitToGuard and not unitToGuard.Dead then
 
                 -- sanity check
-                local location = self.OpportunityToRaid
-                local units, unitCount = self:GetPlatoonUnits()
+                local units = self:GetPlatoonUnits()
                 IssueGuard(units, unitToGuard)
                 local guardTime = 0
                 while brain:PlatoonExists(self) and not unitToGuard.Dead do
@@ -389,15 +396,21 @@ AIPlatoonAdaptiveGuardBehavior = Class(AIPlatoon) {
                         
                     end
                     guardTime = guardTime + 5
-                    WaitSeconds(5)
+                    WaitTicks(50)
                     
-
                     if self.PlatoonData.EngineerGuardTimeLimit and guardTime >= self.PlatoonData.EngineerGuardTimeLimit
                     or (not unitToGuard.Dead and unitToGuard.Layer == 'Seabed' and self.MovementLayer == 'Land') then
                         local units, unitCount = self:GetPlatoonUnits()
                         IssueClearCommands(units)
                         coroutine.yield(10)
                         self:ChangeState(self.Searching)
+                        return
+                    end
+                    if self.ExitGuard then
+                        local plat = brain:MakePlatoon('', '')
+                        local units = self:GetPlatoonUnits()
+                        brain:AssignUnitsToPlatoon(plat, units, 'attack', 'None')
+                        import("/lua/aibrains/platoons/platoon-adaptive-returntobase.lua").AssignToUnitsMachine({ LocationType = self.LocationType}, plat, units)
                         return
                     end
                 end

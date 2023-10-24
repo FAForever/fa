@@ -3,7 +3,6 @@ local AIPlatoon = import("/lua/aibrains/platoons/platoon-base.lua").AIPlatoon
 local NavUtils = import("/lua/sim/navutils.lua")
 local MarkerUtils = import("/lua/sim/markerutilities.lua")
 local TransportUtils = import("/lua/ai/transportutilities.lua")
-local AIAttackUtils = import("/lua/ai/aiattackutilities.lua")
 
 -- upvalue scope for performance
 local Random = Random
@@ -111,67 +110,100 @@ AIPlatoonAdaptiveReturnToBaseBehavior = Class(AIPlatoon) {
             local destination = self.LocationToReturn
             if not destination then
                 self:LogWarning(string.format('no destination to navigate to'))
+                WaitTicks(20)
                 self:ChangeState(self.Searching)
                 return
             end
 
             self:Stop()
 
-            local cache = { 0, 0, 0 }
+            if not self.CurrentPlatoonThreat then
+                self.CurrentPlatoonThreat = self:CalculatePlatoonThreat('Surface', categories.ALLUNITS)
+            end
+            local units = self:GetPlatoonUnits()
+            local origin
+            for _, v in units do
+                if v and not v.Dead then
+                    origin = v:GetPosition()
+                    break
+                end
+            end
             local brain = self:GetBrain()
-
-            if not NavUtils.CanPathToCell(self.MovementLayer, self:GetPlatoonPosition(), destination) then
-                self:LogDebug(string.format('ReturnToBase platoon is going to use transport'))
+            local path, reason =  NavUtils.PathToWithThreatThreshold(self.MovementLayer, origin, destination, brain, NavUtils.ThreatFunctions.AntiSurface, 200, brain.IMAPConfig.Rings)
+            if not path then
+                self:LogDebug(string.format('platoon is going to use transport'))
+                WaitTicks(10)
                 self:ChangeState(self.Transporting)
                 return
             end
-
-            while not IsDestroyed(self) do
-                -- pick random unit for a position on the grid
-                local units, unitCount = self:GetPlatoonUnits()
-                local origin
-                for _, v in units do
-                    if v and not v.Dead then
-                        origin = v:GetPosition()
-                    end
-                end
-
-                -- generate a direction
-                local waypoint, length = NavUtils.DirectionTo('Land', origin, destination, 30)
-
-                -- something odd happened: no direction found
-                if not waypoint then
-                    self:LogWarning(string.format('no path found'))
-                    self:ChangeState(self.Searching)
+            local pathNodesCount = TableGetn(path)
+            local attackFormation = false
+            for i=1, pathNodesCount do
+                if self.Dead then
                     return
                 end
-
-                -- we're near the destination
-                if waypoint == destination then
-                    self:ChangeState(self.Searching)
-                    return
-                end
-
-                self:MoveToLocation(waypoint, false)
-
-                -- check for opportunities
-                local wx = waypoint[1]
-                local wz = waypoint[3]
+                local distEnd
+                self:MoveToLocation(path[i], false)
+                local Lastdist
+                local dist
+                local Stuck = 0
                 while not IsDestroyed(self) do
-                    local position = self:GetPlatoonPosition()
-
-                    -- check if we're near our current waypoint
-                    local dx = position[1] - wx
-                    local dz = position[3] - wz
-                    if dx * dx + dz * dz < NavigateDistanceThresholdSquared then
-                        self:ChangeState(self.Searching)
+                    coroutine.yield(1)
+                    if self.Dead then
                         return
                     end
-                    WaitTicks(10)
+                    local position
+                    units = self:GetPlatoonUnits()
+                    for _, v in units do
+                        if v and not v.Dead then
+                            position = v:GetPosition()
+                            break
+                        end
+                    end
+                    -- check for opportunities
+                    distEnd = VDist2Sq(path[pathNodesCount][1], path[pathNodesCount][3], position[1], position[3] )
+                    if not attackFormation and distEnd < 6400 then
+                        attackFormation = true
+                        self:SetPlatoonFormationOverride('AttackFormation')
+                    end
+                    dist = VDist2Sq(path[i][1], path[i][3], position[1], position[3])
+                    if dist < 400 then
+                        IssueClearCommands(units)
+                        break
+                    end
+                    
+                    if Lastdist ~= dist then
+                        Stuck = 0
+                        Lastdist = dist
+                    -- No, we are not moving, wait 15 ticks then break and use the next weaypoint
+                    else
+                        Stuck = Stuck + 1
+                        if Stuck > 15 then
+                            WaitTicks(15)
+                            self:Stop()
+                            break
+                        end
+                    end
+                    --LOG('Lastdist '..Lastdist..' dist '..dist)
+                    coroutine.yield(15)
                 end
-                -- always wait
-                WaitTicks(1)
             end
+            local position
+            units = self:GetPlatoonUnits()
+            for _, v in units do
+                if v and not v.Dead then
+                    position = v:GetPosition()
+                    break
+                end
+            end
+            local hx = position[1] - destination[1]
+            local hz = position[3] - destination[3]
+            if hx * hx + hz * hz < 3600 then
+                self:ExitStateMachine()
+                return
+            end
+            self:ChangeState(self.Searching)
+            return
         end,
     },
 
@@ -183,7 +215,7 @@ AIPlatoonAdaptiveReturnToBaseBehavior = Class(AIPlatoon) {
         ---@param self AIPlatoonAdaptiveReturnToBaseBehavior
         Main = function(self)
             local brain = self:GetBrain()
-            local usedTransports = TransportUtils.SendPlatoonWithTransports(brain, self, self.LocationToReturn, 1, false)
+            local usedTransports = TransportUtils.SendPlatoonWithTransports(brain, self, self.LocationToReturn, 3, false)
             if usedTransports then
                 self:LogDebug(string.format('Attack Platoon used transports'))
                 self:ChangeState(self.Navigating)
@@ -220,6 +252,7 @@ AIPlatoonAdaptiveReturnToBaseBehavior = Class(AIPlatoon) {
 
                 -- check if there is something to attack
                 if not attackTarget or IsDestroyed(attackTarget) then
+                    WaitTicks(10)
                     self:ChangeState(self.Searching)
                     return
                 end

@@ -2128,14 +2128,16 @@ function ProcessAirUnits( unit, aiBrain )
 		local health = unit:GetHealthPercent()
 		if ( fuel > -1 and fuel < .75 ) or health < .30 then
             if not unit.InRefit then
-                if ScenarioInfo.TransportDialog then
+                if TransportDialog then
                     LOG("*AI DEBUG "..aiBrain.Nickname.." Air Unit "..unit.Sync.id.." assigned to TransportReturnToBase ")
                 end
                 -- and send it off to the refit thread --
                 unit:ForkThread( TransportReturnToBase, aiBrain )
                 return true
             else
-                LOG("*AI DEBUG "..aiBrain.Nickname.." Air Unit "..unit.Sync.id.." "..unit:GetBlueprint().Description.." already in return to base thread")
+				if TransportDialog then
+                    LOG("*AI DEBUG "..aiBrain.Nickname.." Air Unit "..unit.Sync.id.." "..unit:GetBlueprint().Description.." already in return to base thread")
+				end
             end
 		end
 	end
@@ -2213,7 +2215,7 @@ function TransportReturnToBase(unit, aiBrain)
 		end
 		if rtbissued then
 			WaitTicks(21)
-			if killUnitOnReturn and returnPos then
+			if not IsDestroyed(returnpool) and killUnitOnReturn and returnPos then
 				local origin = returnpool:GetPlatoonPosition()
 				local dx = origin[1] - returnPos[1]
                 local dz = origin[3] -returnPos[3]
