@@ -368,7 +368,7 @@ CompressedLabelTree = ClassCompressedLabelTree {
     ---@param z number
     ---@param s number
     ---@param rCache NavLabelCache
-    CompressArea = function(self, x, z, s, rCache)
+    CheckArea = function(self, x, z, s, rCache)
         local value = rCache[z + 1][x + 1]
         for lz = z + 1, z + s do
             for lx = x + 1, x + s do
@@ -389,7 +389,7 @@ CompressedLabelTree = ClassCompressedLabelTree {
     ---@param size number
     ---@param label number
     ---@return table
-    CreateArea = function(self, bx, bz, ox, oz, size, label, statistics)
+    CreateLeaf = function(self, bx, bz, ox, oz, size, label, statistics)
         -- statistics
         if label >= 0 then
             statistics.PathableLeafs = statistics.PathableLeafs + 1
@@ -427,8 +427,8 @@ CompressedLabelTree = ClassCompressedLabelTree {
     Compress = function(self, bx, bz, ox, oz, size, root, rCache, compressionThreshold, layer)
 
         -- localize for performance
-        local CompressArea = self.CompressArea
-        local CreateArea = self.CreateArea
+        local CheckArea = self.CheckArea
+        local CreateLeaf = self.CreateLeaf
 
         local statistics = NavLayerData[layer]
 
@@ -453,10 +453,10 @@ CompressedLabelTree = ClassCompressedLabelTree {
             curr = curr - 1
 
             -- determine whether they are uniform or not
-            local uniformTopleft, labelTopLeft = CompressArea(self, lx, lz, lh, rCache)
-            local uniformTopRight, labelTopRight = CompressArea(self, lx + lh, lz, lh, rCache)
-            local uniformBottomleft, labelBottomLeft = CompressArea(self, lx, lz + lh, lh, rCache)
-            local uniformBottomRight, labelBottomRight = CompressArea(self, lx + lh, lz + lh, lh, rCache)
+            local uniformTopleft, labelTopLeft = CheckArea(self, lx, lz, lh, rCache)
+            local uniformTopRight, labelTopRight = CheckArea(self, lx + lh, lz, lh, rCache)
+            local uniformBottomleft, labelBottomLeft = CheckArea(self, lx, lz + lh, lh, rCache)
+            local uniformBottomRight, labelBottomRight = CheckArea(self, lx + lh, lz + lh, lh, rCache)
 
             if (
                 uniformTopleft and
@@ -475,7 +475,7 @@ CompressedLabelTree = ClassCompressedLabelTree {
                 ---------------------------------------------------------------
                 -- case 1: we're completely uniform with the same label
 
-                self[ci] = CreateArea(self, bx, bz, lx, lz, ls, labelTopLeft, statistics)
+                self[ci] = CreateLeaf(self, bx, bz, lx, lz, ls, labelTopLeft, statistics)
             else
 
                 ----------------------------------------------------------------
@@ -487,10 +487,10 @@ CompressedLabelTree = ClassCompressedLabelTree {
 
                 index = next
                 if uniformTopleft then
-                    self[index] = CreateArea(self, bx, bz, lx, lz, lh, labelTopLeft, statistics)
+                    self[index] = CreateLeaf(self, bx, bz, lx, lz, lh, labelTopLeft, statistics)
                 else
                     if lh <= compressionThreshold then
-                        self[index] = CreateArea(self, bx, bz, lx, lz, lh, -1, statistics)
+                        self[index] = CreateLeaf(self, bx, bz, lx, lz, lh, -1, statistics)
                     else
                         curr = curr + 1
                         cox[curr] = lx
@@ -502,11 +502,11 @@ CompressedLabelTree = ClassCompressedLabelTree {
 
                 local index = next + 1
                 if uniformTopRight then
-                    self[index] = CreateArea(self, bx, bz, lx + lh, lz, lh, labelTopRight, statistics)
+                    self[index] = CreateLeaf(self, bx, bz, lx + lh, lz, lh, labelTopRight, statistics)
                 else
 
                     if lh <= compressionThreshold then
-                        self[index] = CreateArea(self, bx, bz, lx + lh, lz, lh, -1, statistics)
+                        self[index] = CreateLeaf(self, bx, bz, lx + lh, lz, lh, -1, statistics)
                     else
                         curr = curr + 1
                         cox[curr] = lx + lh
@@ -518,10 +518,10 @@ CompressedLabelTree = ClassCompressedLabelTree {
 
                 index = next + 2
                 if uniformBottomleft then
-                    self[index] = CreateArea(self, bx, bz, lx, lz + lh, lh, labelBottomLeft, statistics)
+                    self[index] = CreateLeaf(self, bx, bz, lx, lz + lh, lh, labelBottomLeft, statistics)
                 else
                     if lh <= compressionThreshold then
-                        self[index] = CreateArea(self, bx, bz, lx, lz + lh, lh, -1, statistics)
+                        self[index] = CreateLeaf(self, bx, bz, lx, lz + lh, lh, -1, statistics)
                     else
                         curr = curr + 1
                         cox[curr] = lx
@@ -533,10 +533,10 @@ CompressedLabelTree = ClassCompressedLabelTree {
 
                 index = next + 3
                 if uniformBottomRight then
-                    self[index] = CreateArea(self, bx, bz, lx + lh, lz + lh, lh, labelBottomRight, statistics)
+                    self[index] = CreateLeaf(self, bx, bz, lx + lh, lz + lh, lh, labelBottomRight, statistics)
                 else
                     if lh <= compressionThreshold then
-                        self[index] = CreateArea(self, bx, bz, lx + lh, lz + lh, lh, -1, statistics)
+                        self[index] = CreateLeaf(self, bx, bz, lx + lh, lz + lh, lh, -1, statistics)
                     else
                         curr = curr + 1
                         cox[curr] = lx + lh
@@ -568,7 +568,7 @@ CompressedLabelTree = ClassCompressedLabelTree {
     ---@param label -1 | 0
     ---@param layer NavLayers
     Flatten = function(self, bx, bz, ox, oz, size, root, label, layer)
-        self[1] = self:CreateArea(bx, bz, ox, oz, size, label, NavLayerData[layer])
+        self[1] = self:CreateLeaf(bx, bz, ox, oz, size, label, NavLayerData[layer])
     end,
 
     --- Generates the following neighbors, when they are valid:
@@ -1049,7 +1049,6 @@ end
 
 --- Populates the caches for the given label tree,
 --- Heavily inspired by the code written by Softles
----@param labelTree NavTree
 ---@param tCache NavTerrainCache
 ---@param dCache NavDepthCache
 ---@param daCache NavAverageDepthCache
