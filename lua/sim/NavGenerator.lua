@@ -1269,13 +1269,13 @@ end
 --- Generates the compression grids based on the heightmap
 ---@param size number (square) size of each cell of the compression grid
 ---@param threshold number (square) size of the smallest acceptable leafs, used for culling
-local function GenerateCompressionGrids(size, threshold)
+local function GenerateCompressionGrids(size, threshold, mapHasWater)
 
+    local navAir = NavGrids['Air'] --[[@as NavGrid]]
     local navLand = NavGrids['Land'] --[[@as NavGrid]]
     local navWater = NavGrids['Water'] --[[@as NavGrid]]
     local navHover = NavGrids['Hover'] --[[@as NavGrid]]
     local navAmphibious = NavGrids['Amphibious'] --[[@as NavGrid]]
-    local navAir = NavGrids['Air'] --[[@as NavGrid]]
 
     local tCache, dCache, daCache, pxCache, pzCache, pCache, bCache, rCache = InitCaches(size)
 
@@ -1283,24 +1283,17 @@ local function GenerateCompressionGrids(size, threshold)
         local bz = z * size
         for x = 0, LabelCompressionTreesPerAxis - 1 do
             local bx = x * size
-            local labelTreeLand = CompressedLabelTree()
-            local labelTreeNaval = CompressedLabelTree()
-            local labelTreeHover = CompressedLabelTree()
-            local labelTreeAmph = CompressedLabelTree()
+
             local labelTreeAir = CompressedLabelTree()
-
-            navLand:AddTree(z, x, labelTreeLand)
-            navWater:AddTree(z, x, labelTreeNaval)
-            navHover:AddTree(z, x, labelTreeHover)
-            navAmphibious:AddTree(z, x, labelTreeAmph)
-
             labelTreeAir:Flatten(bx, bz, 0, 0, size, labelTreeAir, 0, 'Air')
             navAir:AddTree(z, x, labelTreeAir)
 
             -- pre-computing the caches is irrelevant layer-wise, so we just pick the Land layer
             PopulateCaches(tCache, dCache, daCache, pxCache, pzCache, pCache, bCache, bx, bz, size)
 
-            local allPathable, allBlocked = ComputeLandPathingMatrix(size, daCache, pCache, bCache, rCache)
+            local labelTreeLand = CompressedLabelTree()
+            navLand:AddTree(z, x, labelTreeLand)
+            local allBlocked, allPathable = ComputeLandPathingMatrix(size, daCache, pCache, bCache, rCache)
             if allPathable then
                 labelTreeLand:Flatten(bx, bz, 0, 0, size, labelTreeLand, 0, 'Land')
             elseif allBlocked then
@@ -1309,7 +1302,9 @@ local function GenerateCompressionGrids(size, threshold)
                 labelTreeLand:Compress(bx, bz, 0, 0, size, labelTreeLand, rCache, threshold, 'Land')
             end
 
-            local allPathable, allBlocked = ComputeNavalPathingMatrix(size, daCache, pCache, bCache, rCache)
+            local labelTreeNaval = CompressedLabelTree()
+            navWater:AddTree(z, x, labelTreeNaval)
+            local allBlocked, allPathable = ComputeNavalPathingMatrix(size, daCache, pCache, bCache, rCache)
             if allPathable then
                 labelTreeNaval:Flatten(bx, bz, 0, 0, size, labelTreeNaval, 0, 'Water')
             elseif allBlocked then
@@ -1318,32 +1313,35 @@ local function GenerateCompressionGrids(size, threshold)
                 labelTreeNaval:Compress(bx, bz, 0, 0, size, labelTreeNaval, rCache, 2 * threshold, 'Water')
             end
 
-            local allPathable, allBlocked = ComputeHoverPathingMatrix(size, daCache, pCache, bCache, rCache)
-            if allPathable then
-                labelTreeHover:Flatten(bx, bz, 0, 0, size, labelTreeHover, 0, 'Hover')
-            elseif allBlocked then
-                labelTreeHover:Flatten(bx, bz, 0, 0, size, labelTreeHover, -1, 'Hover')
-            else
-                labelTreeHover:Compress(bx, bz, 0, 0, size, labelTreeHover, rCache, threshold, 'Hover')
-            end
+            if mapHasWater then
+                local labelTreeHover = CompressedLabelTree()
+                navHover:AddTree(z, x, labelTreeHover)
+                local allBlocked, allPathable = ComputeHoverPathingMatrix(size, daCache, pCache, bCache, rCache)
+                if allPathable then
+                    labelTreeHover:Flatten(bx, bz, 0, 0, size, labelTreeHover, 0, 'Hover')
+                elseif allBlocked then
+                    labelTreeHover:Flatten(bx, bz, 0, 0, size, labelTreeHover, -1, 'Hover')
+                else
+                    labelTreeHover:Compress(bx, bz, 0, 0, size, labelTreeHover, rCache, threshold, 'Hover')
+                end
 
-
-            local allPathable, allBlocked = ComputeAmphPathingMatrix(size, daCache, pCache, bCache, rCache)
-            if allPathable then
-                labelTreeAmph:Flatten(bx, bz, 0, 0, size, labelTreeAmph, 0, 'Amphibious')
-            elseif allBlocked then
-                labelTreeAmph:Flatten(bx, bz, 0, 0, size, labelTreeAmph, -1, 'Amphibious')
-            else
-                labelTreeAmph:Compress(bx, bz, 0, 0, size, labelTreeAmph, rCache, threshold, 'Amphibious')
+                local labelTreeAmph = CompressedLabelTree()
+                navAmphibious:AddTree(z, x, labelTreeAmph)
+                local allBlocked, allPathable = ComputeAmphPathingMatrix(size, daCache, pCache, bCache, rCache)
+                if allPathable then
+                    labelTreeAmph:Flatten(bx, bz, 0, 0, size, labelTreeAmph, 0, 'Amphibious')
+                elseif allBlocked then
+                    labelTreeAmph:Flatten(bx, bz, 0, 0, size, labelTreeAmph, -1, 'Amphibious')
+                else
+                    labelTreeAmph:Compress(bx, bz, 0, 0, size, labelTreeAmph, rCache, threshold, 'Amphibious')
+                end
             end
         end
     end
 end
 
 --- Generates graphs that we can traverse, based on the compression grids
----@param processAmphibious boolean
----@param processHover boolean
-local function GenerateGraphs(processAmphibious, processHover)
+local function GenerateGraphs(mapHasWater)
     local navLand = NavGrids['Land'] --[[@as NavGrid]]
     local navWater = NavGrids['Water'] --[[@as NavGrid]]
     local navHover = NavGrids['Hover'] --[[@as NavGrid]]
@@ -1359,12 +1357,10 @@ local function GenerateGraphs(processAmphibious, processHover)
     navWater:GenerateNeighbors()
     navWater:GenerateLabels()
 
-    if processHover then
+    if mapHasWater then
         navHover:GenerateNeighbors()
         navHover:GenerateLabels()
-    end
 
-    if processAmphibious then
         navAmphibious:GenerateNeighbors()
         navAmphibious:GenerateLabels()
     end
@@ -1410,18 +1406,15 @@ local function GenerateCullLabels()
 end
 
 --- Generates metadata for markers for quick access
-local function GenerateMarkerMetadata(processAmphibious, processHover)
+local function GenerateMarkerMetadata(mapHasWater)
     local navLabels = NavLabels
 
     local grids = {
         NavGrids['Land'],
     }
 
-    if processAmphibious then
+    if mapHasWater then
         TableInsert(grids, NavGrids['Amphibious'])
-    end
-
-    if processHover then
         TableInsert(grids, NavGrids['Hover'])
     end
 
@@ -1462,7 +1455,7 @@ local function GenerateMarkerMetadata(processAmphibious, processHover)
 end
 
 --- Computes various fields for the root nodes
-local function GenerateRootInformation(processAmphibious, processHover)
+local function GenerateRootInformation(mapHasWater)
 
     local cache = {}
     local size = ScenarioInfo.size[1] / LabelCompressionTreesPerAxis
@@ -1474,11 +1467,8 @@ local function GenerateRootInformation(processAmphibious, processHover)
         NavGrids['Air'],
     }
 
-    if processAmphibious then
+    if mapHasWater then
         TableInsert(grids, NavGrids['Amphibious'])
-    end
-
-    if processHover then
         TableInsert(grids, NavGrids['Hover'])
     end
 
@@ -1546,57 +1536,34 @@ function Generate()
         compressionThreshold = 2 * compressionThreshold
     end
 
+    -- check the water ratio
+    local brain = GetArmyBrain(1)
+    local mapHasWater = brain:GetMapWaterRatio() > 0
+
+    NavGrids['Air'] = NavGrid('Air', CompressionTreeSize)
     NavGrids['Land'] = NavGrid('Land', CompressionTreeSize)
     NavGrids['Water'] = NavGrid('Water', CompressionTreeSize)
     NavGrids['Hover'] = NavGrid('Hover', CompressionTreeSize)
     NavGrids['Amphibious'] = NavGrid('Amphibious', CompressionTreeSize)
-    NavGrids['Air'] = NavGrid('Air', CompressionTreeSize)
 
-    GenerateCompressionGrids(CompressionTreeSize, compressionThreshold)
+    GenerateCompressionGrids(CompressionTreeSize, compressionThreshold, mapHasWater)
     print(string.format("generated compression trees: %f", GetSystemTimeSecondsOnlyForProfileUse() - start))
 
-    local processAmphibious = true
-    if NavLayerData['Land'].PathableLeafs == NavLayerData['Amphibious'].PathableLeafs and
-        NavLayerData['Land'].Subdivisions == NavLayerData['Amphibious'].Subdivisions and
-        NavLayerData['Land'].UnpathableLeafs == NavLayerData['Amphibious'].UnpathableLeafs
-    then
-        SPEW(string.format("NavGenerator - replacing amphibious grid with land grid to conserve memory"))
-        processAmphibious = false
-
-        NavGrids['Amphibious'] = NavGrids['Land']
-        NavLayerData['Amphibious'].Labels = 0
-        NavLayerData['Amphibious'].Neighbors = 0
-        NavLayerData['Amphibious'].PathableLeafs = 0
-        NavLayerData['Amphibious'].Subdivisions = 0
-        NavLayerData['Amphibious'].UnpathableLeafs = 0
-    end
-
-    local processHover = true
-    if NavLayerData['Land'].PathableLeafs == NavLayerData['Hover'].PathableLeafs and
-        NavLayerData['Land'].Subdivisions == NavLayerData['Hover'].Subdivisions and
-        NavLayerData['Land'].UnpathableLeafs == NavLayerData['Hover'].UnpathableLeafs
-    then
-        SPEW(string.format("NavGenerator - replacing hover grid with land grid to conserve memory"))
-        processHover = false
-
-        NavGrids['Hover'] = NavGrids['Land']
-        NavLayerData['Hover'].Labels = 0
-        NavLayerData['Hover'].Neighbors = 0
-        NavLayerData['Hover'].PathableLeafs = 0
-        NavLayerData['Hover'].Subdivisions = 0
-        NavLayerData['Hover'].UnpathableLeafs = 0
-    end
-
-    GenerateGraphs(processAmphibious, processHover)
+    GenerateGraphs(mapHasWater)
     print(string.format("generated neighbors and labels: %f", GetSystemTimeSecondsOnlyForProfileUse() - start))
 
-    GenerateMarkerMetadata(processAmphibious, processHover)
+    GenerateMarkerMetadata(mapHasWater)
     print(string.format("generated marker metadata: %f", GetSystemTimeSecondsOnlyForProfileUse() - start))
 
     GenerateCullLabels()
     print(string.format("cleaning up generated data: %f", GetSystemTimeSecondsOnlyForProfileUse() - start))
 
-    GenerateRootInformation(processAmphibious, processHover)
+    GenerateRootInformation(mapHasWater)
+
+    if not mapHasWater then
+        NavGrids['Hover'] = NavGrids['Land']
+        NavGrids['Amphibious'] = NavGrids['Land']
+    end
 
     SPEW(string.format("Generated navigational mesh in %f seconds", GetSystemTimeSecondsOnlyForProfileUse() - start))
 
