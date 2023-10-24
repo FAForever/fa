@@ -580,7 +580,7 @@ function WrapAndPlaceText(bp, builder, descID, control)
                             if info.BeamLifetime > 0 then
                                 Damage = Damage * (info.BeamLifetime * 10 + 1)
                             end
-                            Damage = Damage * (info.DoTPulses or 1)
+                            Damage = Damage * (info.DoTPulses or 1) + (info.InitialDamage or 0)
                             local ProjectilePhysics = __blueprints[info.ProjectileId].Physics
                             while ProjectilePhysics do
                                 Damage = Damage * (ProjectilePhysics.Fragments or 1)
@@ -592,7 +592,7 @@ function WrapAndPlaceText(bp, builder, descID, control)
 
                             if not info.ManualFire and info.WeaponCategory ~= 'Kamikaze' then
                                 local DPS = Damage * MuzzleBones
-                                DPS = DPS / ReloadTime + (info.InitialDamage or 0)
+                                DPS = DPS / ReloadTime
                                 weaponDetails1 = weaponDetails1..LOCF('<LOC uvd_DPS>', DPS)
                             end
 
