@@ -384,7 +384,7 @@ GetAbilityDesc = {
         return LOCF('<LOC uvd_RegenRate>', bp.Defense.Shield.ShieldRegenRate)
     end,
     ability_shielddome = function(bp)
-        return LOCF('<LOC uvd_Radius>', bp.Defense.Shield.ShieldSize)..', '
+        return LOCF('<LOC uvd_Radius>', bp.Defense.Shield.ShieldSize/2)..', '
              ..LOCF('<LOC uvd_RegenRate>', bp.Defense.Shield.ShieldRegenRate)
     end,
     ability_stealthfield = function(bp)
