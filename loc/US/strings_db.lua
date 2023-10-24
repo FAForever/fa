@@ -1433,9 +1433,9 @@ Unit_Description_0007="Grants Tech 3 and Experimental schematic access and furth
 Unit_Description_0008="Doubles the ACU's main weapon damage, and increases its range and that of Overcharge.\n\n+100 Main Weapon damage\n+8 Main Weapon range"
 Unit_Description_0009="Tactical Cruise Missiles replaced by much more expensive, powerful Tactical Nuclear Missiles."
 Unit_Description_0010="Adds Teleportation capability. Requires considerable energy to activate."
-Unit_Description_0011="Creates a Bubble Shield around the ACU, which protects friendly units inside its radius. If present, the shield will transfer a portion of the damage received to intersecting shield bubbles. Requires energy to run."
+Unit_Description_0011="Creates a Bubble Shield around the ACU, which protects friendly units inside its radius. If present, the shield will transfer a portion of the damage received to intersecting shield bubbles. Requires energy to run.\n\nShield regen rate = 60 HP/s\nShield recharge time = 90 seconds"
 Unit_Description_0012="Increases ACU's resource generation to 15 mass per second and 2520 energy per second."
-Unit_Description_0013="Creates a protective Personal Shield around the ACU. Requires energy to run."
+Unit_Description_0013="Creates a protective Personal Shield around the ACU. Requires energy to run.\n\nShield regen rate = 30 HP/s\nShield recharge time = 140 seconds"
 Unit_Description_0014="Creates an Engineering Drone which act as a flying T1 Engineer. Assists the ACU by default, but can be given its own orders."
 Unit_Description_0015="Adds a second Engineering Drone."
 
@@ -1756,8 +1756,8 @@ Unit_Description_0160="Grants Tech 3 and Experimental schematic access and furth
 Unit_Description_0161="Doubles main cannon Rate-Of-Fire.\n\n+100% Rate of fire"
 Unit_Description_0162="Increases ACU's resource generation to 19 mass per second and 1720 energy per second."
 Unit_Description_0163="Increases ACU's resource generation to 37 mass per second and 3420 energy per second."
-Unit_Description_0164="Creates a protective Personal Shield around the ACU. Requires energy to run."
-Unit_Description_0165="Greatly increases Personal Shield HP. Requires energy to run."
+Unit_Description_0164="Creates a protective Personal Shield around the ACU. Requires energy to run.\n\nShield regen rate = 30 HP/s\nShield recharge time = 75 seconds"
+Unit_Description_0165="Greatly increases Personal Shield's HP. Requires energy to run.\n\nShield regen rate = 32 HP/s\nShield recharge time = 160 seconds"
 Unit_Description_0166="Adds Teleportation capability. Requires considerable energy to activate."
 Unit_Description_0466_faf="Further increases the range of the ACU's main cannon and that of Overcharge.\n\n+5 Main Weapon range"
 
