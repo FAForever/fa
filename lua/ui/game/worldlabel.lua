@@ -1,5 +1,34 @@
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 local Group = import('/lua/maui/group.lua').Group
+local CommandMode = import('/lua/ui/game/commandmode.lua')
+
+local fadeStart = 150
+local fadeRange = 650
+local fadeLimit = 0.5
+
+local worldLabelManagers
+
+local function TrackCommandMode()
+    CommandMode.AddStartBehavior(
+        function(commandMode,modeData)
+            LOG('Start behavior')
+            for labelManager, _ in worldLabelManagers do
+                labelManager:OnCommandMode(true, commandMode, modeData)
+            end
+        end,
+        'WorldLabelCommandModeUpdate'
+    )
+
+    CommandMode.AddEndBehavior(
+        function(commandMode,modeData)
+            LOG('End behavior')
+            for labelManager, _ in worldLabelManagers do
+                labelManager:OnCommandMode(false, commandMode, modeData)
+            end
+        end,
+        'WorldLabelCommandModeUpdate'
+    )
+end
 
 ---@class WorldLabelManager : Group
 ---@field camera Camera
@@ -8,14 +37,22 @@ local Group = import('/lua/maui/group.lua').Group
 ---@field changed boolean
 local WorldLabelManager = ClassUI(Group) {
 
-    __init = function(self, labelView)
+    __init = function(self, view)
         LOG('Initializing world label manager')
-        Group.__init(self, labelView)
-        labelView.WorldLabelManager = self
-
-        self.view = labelView
+        self.view = view
         self.camera = GetCamera("WorldCamera")
-        LayoutHelpers.FillParent(self, labelView)
+        self.mapGroup = view:GetParent()
+        self.mapGroup.WorldLabelManager = self
+
+        Group.__init(self, self.mapGroup)
+        LayoutHelpers.FillParent(self, self.mapGroup)
+
+        if not worldLabelManagers then
+            worldLabelManagers = {}
+            TrackCommandMode()
+        end
+        worldLabelManagers[self] = true
+
         self:DisableHitTest()
         self:Show()
 
@@ -24,34 +61,27 @@ local WorldLabelManager = ClassUI(Group) {
         self._prevZoom = self.camera:GetZoom()
         self._prevPos = self.camera:GetFocusPosition()
 
-        self.labelTable = {}
+        self._labelGroups = {}
 
         self.changed = true
 
     end,
 
-    -- Register a label with the manager, and start showing labels if we weren't already
-    RegisterLabel = function(self, label)
-        LOG('Registering label')
-        if not self.labelTable[label.type] then
-            LOG('First label of type '..label.type)
-            self.labelTable[label.type] = {}
-            self:ShowLabels(true)
-        end
-        self.labelTable[label.type][label] = true
+    GetLabelGroup = function(self, type)
+        return self._labelGroups[type]
     end,
 
-    -- Dregister a label with the manager, stop showing labels if we have none
-    DeregisterLabel = function(self, label)
-        LOG('Deregistering label')
-        self.labelTable[label.type][label] = nil
-        if table.empty(self.labelTable[label.type]) then
-            LOG('No more labels of type '..label.type)
-            self.labelTable[label.type] = nil
-            if table.empty(self.labelTable) then
-                LOG('No more labels of any kind')
-                self:ShowLabels(false)
-            end
+    RegisterLabelGroup = function(self, type, group)
+        self._labelGroups[type] = group
+        if not self:ShowLabels() then
+            self:ShowLabels(true)
+        end
+    end,
+
+    DeregisterLabelGroup = function(self, type)
+        self._labelGroups[type] = nil
+        if table.empty(self._labelGroups) then
+            self:ShowLabels(false)
         end
     end,
 
@@ -76,9 +106,18 @@ local WorldLabelManager = ClassUI(Group) {
             pos[2] ~= self._prevPos[2] or
             pos[3] ~= self._prevPos[3]
 
-        self._prevZoom = zoom
-        self._prevPos = pos
+        if self.changed then
+            self._prevZoom = zoom
+            self._prevPos = pos
+        end
 
+    end,
+
+    OnCommandMode = function(self, inMode, commandMode, modeData)
+        LOG(repr(self._labelGroups))
+        for type, group in self._labelGroups do
+            group:OnCommandMode(inMode, commandMode, modeData)
+        end
     end,
 }
 
@@ -91,20 +130,41 @@ function GetWorldLabelManager(view)
     return view.worldLabelManager
 end
 
+---@class WorldLabelGroup : Group
+---@field type string
+WorldLabelGroup = ClassUI(Group) {
+
+    ---@param self WorldLabelGroup
+    ---@param type string
+    ---@param view WorldView
+    __init = function(self, type, view)
+        self.manager = GetWorldLabelManager(view)
+        Group.__init(self, self.manager)
+        LayoutHelpers.FillParent(self, self.manager)
+        self:DisableHitTest()
+        self.type = type
+        self.manager:RegisterLabelGroup(type, self)
+    end,
+
+    OnCommandMode = function(self, inMode, commandMode, modeData)
+        -- override me!
+    end,
+
+}
+
 ---@class WorldLabel : Group
 ---@field position Vector
----@field type string
 ---@field manager WorldLabelManager
 ---@field view WorldView
 WorldLabel = ClassUI(Group) {
 
     ---@param self WorldLabel
-    __init = function(self, position, type)
-        self.type = type or 'none_type'
-        self.manager = GetWorldLabelManager()
-        Group.__init(self, self.manager)
-        self.manager:RegisterLabel(self)
-        
+    __init = function(self, position, type, view)
+
+        local type = type or 'none_type'
+        self.manager = GetWorldLabelManager(view)
+        Group.__init(self, self.manager:GetLabelGroup(type) or self:CreateLabelGroup(type, view))
+
         self.position = position
         self:SetLayout(position)
         self:ProjectToScreen()
@@ -114,6 +174,11 @@ WorldLabel = ClassUI(Group) {
     ---@param self WorldLabel
     SetLayout = function(self, position)
         -- override me!
+    end,
+
+    ---@param self WorldLabel
+    CreateLabelGroup = function(self, type, view)
+        return WorldLabelGroup(type, view)
     end,
 
     ---@param self WorldLabel
@@ -137,9 +202,5 @@ WorldLabel = ClassUI(Group) {
     ---@param hidden boolean
     OnHide = function(self, hidden)
         self:SetNeedsFrameUpdate(not hidden)
-    end,
-
-    OnDestroy = function(self)
-        self.manager:DeregisterLabel(self)
     end,
 }

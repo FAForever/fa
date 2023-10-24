@@ -728,9 +728,9 @@ function GetPlayableArea()
         local sessionInfo = SessionGetScenarioInfo()
         playableArea = {
             0,
-            sessionInfo.PlayableAreaWidth,
             0,
-            sessionInfo.PlayableAreaHeight,
+            sessionInfo.size[1],
+            sessionInfo.size[2],
         }
     end
     return playableArea

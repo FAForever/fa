@@ -289,6 +289,11 @@ local function AnimateSyncText(text)
     end
 end
 
+local syncStrikeLabelGroup
+function RegisterSyncStrikeLabelGroup(group)
+    syncStrikeLabelGroup = group
+end
+
 TacticalReticle = ClassUI(Reticle) {
 
     SetLayout = function(self)
@@ -303,6 +308,7 @@ TacticalReticle = ClassUI(Reticle) {
                 self.syncText:Show()
                 self.animThread = ForkThread(AnimateSyncText, self.syncText)
                 self.Trash:Add(self.animThread)
+                if syncStrikeLabelGroup then syncStrikeLabelGroup:OnSyncButton(true) end
             end
         else
             if not self.syncText:IsHidden() then
@@ -310,6 +316,7 @@ TacticalReticle = ClassUI(Reticle) {
                 if self.animThread then
                     self.animThread:Destroy()
                 end
+                if syncStrikeLabelGroup then syncStrikeLabelGroup:OnSyncButton(false) end
             end
         end
     end,
