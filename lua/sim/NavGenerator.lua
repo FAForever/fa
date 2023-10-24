@@ -1547,30 +1547,41 @@ function Generate()
     NavGrids['Amphibious'] = NavGrid('Amphibious', CompressionTreeSize)
 
     GenerateCompressionGrids(CompressionTreeSize, compressionThreshold, mapHasWater)
-    print(string.format("generated compression trees: %f", GetSystemTimeSecondsOnlyForProfileUse() - start))
+    local infoMessage = string.format("generated compression trees: %f", GetSystemTimeSecondsOnlyForProfileUse() - start)
+    SPEW(infoMessage)
 
     GenerateGraphs(mapHasWater)
-    print(string.format("generated neighbors and labels: %f", GetSystemTimeSecondsOnlyForProfileUse() - start))
+    local infoMessage = string.format("generated neighbors and labels: %f", GetSystemTimeSecondsOnlyForProfileUse() - start)
+    SPEW(infoMessage)
 
     GenerateMarkerMetadata(mapHasWater)
-    print(string.format("generated marker metadata: %f", GetSystemTimeSecondsOnlyForProfileUse() - start))
+    local infoMessage = string.format("generated marker metadata: %f", GetSystemTimeSecondsOnlyForProfileUse() - start)
+    SPEW(infoMessage)
 
     GenerateCullLabels()
-    print(string.format("cleaning up generated data: %f", GetSystemTimeSecondsOnlyForProfileUse() - start))
+    local infoMessage = string.format("cleaning up generated data: %f", GetSystemTimeSecondsOnlyForProfileUse() - start)
+    SPEW(infoMessage)
 
     GenerateRootInformation(mapHasWater)
+    local infoMessage = string.format("generated tree information: %f", GetSystemTimeSecondsOnlyForProfileUse() - start)
+    SPEW(infoMessage)
 
     if not mapHasWater then
         NavGrids['Hover'] = NavGrids['Land']
         NavGrids['Amphibious'] = NavGrids['Land']
     end
 
-    SPEW(string.format("Generated navigational mesh in %f seconds", GetSystemTimeSecondsOnlyForProfileUse() - start))
+    local infoMessage = string.format("Generated in %.2f seconds", GetSystemTimeSecondsOnlyForProfileUse() - start)
+    print(infoMessage)
+    SPEW(infoMessage)
 
     local allocatedSizeGrids = import('/lua/system/utils.lua').ToBytes(NavGrids) / (1024 * 1024)
     local allocatedSizeLabels = import('/lua/system/utils.lua').ToBytes(NavLabels, { Node = true }) / (1024 * 1024)
 
-    SPEW(string.format("Allocated megabytes for navigational mesh: %f", allocatedSizeGrids))
+    local infoMessage = string.format("Allocating %.1fmb memory", allocatedSizeGrids)
+    SPEW(infoMessage)
+    print(infoMessage)
+
     SPEW(string.format("Allocated megabytes for labels: %f", allocatedSizeLabels))
     SPEW(string.format("Number of labels: %f", LabelIdentifier))
     SPEW(string.format("Number of cells: %f", CellIdentifier))
