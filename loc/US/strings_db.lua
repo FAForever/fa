@@ -1441,14 +1441,14 @@ Unit_Description_0015="Adds a second Engineering Drone.\n\n+5 Buildpower Drone"
 
 -- UEF -- Support Commander Units/Upgrades
 Unit_Description_0016="A highly versatile combat and engineering unit useful on late-stage battlefields."
-Unit_Description_0017="Creates an Engineering Drone which act as a flying Engineer. Assists the SACU by default, but can be given its own orders."
-Unit_Description_0018="Creates a protective Personal Shield around the SACU. Requires energy to run."
-Unit_Description_0019="Replaces the SACU's Personal Shield with a Bubble Shield which protects friendly units inside it. Requires additional energy to run. Shields transfer residual damage to intersecting bubbles."
+Unit_Description_0017="Creates an Engineering Drone which act as a flying Engineer. Assists the SACU by default, but can be given its own orders.\n\n+35 Buildpower Drone"
+Unit_Description_0018="Creates a protective Personal Shield around the SACU. Requires energy to run.\n\nShield Regen Rate = 50 HP/s\nShield Recharge Time = 170 seconds"
+Unit_Description_0019="Replaces the SACU's Personal Shield with a Bubble Shield which protects friendly units inside it. Requires additional energy to run. Shields transfer residual damage to intersecting bubbles.\n\nShield Regen Rate = 150 HP/s\nShield Recharge Time = 215 seconds"
 Unit_Description_0020="Adds a Radar Jammer which creates false radar images. Countered by omni sensors."
 Unit_Description_0021="Increases SACU's resource generation by 10 mass per second and 1000 energy per second."
-Unit_Description_0022="Greatly expands the range of the standard on-board SACU sensor systems."
-Unit_Description_0023="Primary weapon now fires 1.82 times as fast."
-Unit_Description_0024="Equips the standard SACU Cannon with Area-Of-Effect damage and much higher range."
+Unit_Description_0022="Greatly expands the range of the standard on-board SACU sensor systems.\n\n+64 Omni Radius\n+15 Vision Radius"
+Unit_Description_0023="Primary weapon now fires 1.82 times as fast.\n\n+82% Rate of Fire"
+Unit_Description_0024="Equips the standard SACU Cannon with Area-Of-Effect damage and much higher range.\n\n+10 Main cannon range\n+2 Main cannon damage radius"
 
 -- UEF -- Land Units
 Unit_Description_0025="Fast, lightly armoured reconnaissance vehicle. Armed with a machine gun and a basic sensor suite."
@@ -1599,13 +1599,13 @@ Unit_Description_0465_faf="Massively increases the rate at which the ACU repairs
 
 -- CYBRAN -- Support Commander Units/Upgrades
 Unit_Description_0115="A highly versatile combat and engineering unit useful on late-stage battlefields."
-Unit_Description_0116="Personal Cloaking further hiding the ACU from optical sensors. Countered by omni sensors. Costs energy to run."
-Unit_Description_0117="Grants the main cannon EMP capability, utterly disabling enemy units."
-Unit_Description_0118="Increases main cannon range."
-Unit_Description_0119="Adds an anti-air SAM weapon system."
+Unit_Description_0116="Personal Cloaking further hiding the SACU from optical sensors and massively boosting HP. Countered by omni sensors. Costs a large amount of energy to run.\n\n+15000 Health"
+Unit_Description_0117="Grants the main cannon EMP capability, utterly disabling enemy units.\n\n+3 Main cannon EMP Radius - Stun Duration = 3 seconds (T3) 0.3 seconds (SACU)"
+Unit_Description_0118="Increases main cannon damage and range.\n\n+200 Main cannon damage\n+15 Main cannon range"
+Unit_Description_0119="Adds an anti-air SAM weapon system.\n\nNanite Missile System - DPS: 360, Range: 60"
 Unit_Description_0120="Increases SACU's resource generation by 10 mass per second and 1000 energy per second."
-Unit_Description_0121="Massively increases SACU build speed."
-Unit_Description_0122="Massively increases the rate at which the SACU repairs its armour."
+Unit_Description_0121="Massively increases SACU build speed.\n\n+42 Buildpower"
+Unit_Description_0122="Massively increases the rate at which the SACU repairs its armour.\n\n+375 Regen"
 Unit_Description_0123="Personal Stealth hiding the SACU from radar. Countered by omni sensors. Costs energy to run."
 
 -- CYBRAN -- Land Units
@@ -1763,13 +1763,13 @@ Unit_Description_0466_faf="Further increases the range of the ACU's main cannon 
 
 -- AEON -- Support Commander Units/Upgrades
 Unit_Description_0167="A highly versatile combat and engineering unit useful on late-stage battlefields."
-Unit_Description_0168="Massively increases SACU build-power."
+Unit_Description_0168="Massively increases SACU build speed.\n\n+42 Buildpower"
 Unit_Description_0169="Increases SACU's resource generation by 10 mass per second and 1000 energy per second."
-Unit_Description_0170="Grants the Sacrifice ability, allowing the SACU to suicide itself to add its mass to another construction project instantly."
-Unit_Description_0171="Creates a protective Personal Shield around the SACU. Requires energy to run."
-Unit_Description_0172="Greatly increases Personal Shield HP. Requires energy to run."
-Unit_Description_0173="Equips the standard SACU cannon with Area-Of-Effect damage."
-Unit_Description_0174="Massively increases the rate at which the SACU repairs its armour."
+Unit_Description_0170="Grants the Sacrifice ability, allowing the SACU to sacrifice itself to add its mass and energy to another construction project instantly at 90% efficiency."
+Unit_Description_0171="Creates a protective Personal Shield around the SACU. Requires energy to run.\n\nShield Regen Rate = 40 HP/s\nShield Recharge Time = 190 seconds"
+Unit_Description_0172="Greatly improves Personal Shield HP and regeneration. Requires energy to run.\n\n+20000 Personal Shield Health\n+80 Personal Shield Regen\n-10 Personal Shield Recharge Time"
+Unit_Description_0173="Increases main cannon range and grants Area-Of-Effect damage radius.\n\n+10 Main cannon range\n+3.5 Main cannon damage radius"
+Unit_Description_0174="Massively increases the rate at which the SACU repairs its armour.\n\n+283 Regen"
 Unit_Description_0175="Adds Teleportation capability. Requires considerable energy to activate."
 
 -- AEON -- Land Units
@@ -1920,12 +1920,12 @@ Unit_Description_0454="Further increases the rate at which the ACU repairs its a
 -- SERAPHIM -- Support Commander Units/Upgrades
 Unit_Description_0433="A highly versatile combat and engineering unit useful on late-stage battlefields."
 Unit_Description_0434="Mounts a Tactical Cruise Missile Launcher onto the back of the SACU."
-Unit_Description_0435="Massively increases the rate at which the SACU repairs its armour as well as providing a large HP boost."
-Unit_Description_0436="Greatly increases the range of the SACU's weapons and sensors."
-Unit_Description_0437="Massively increases SACU build speed."
-Unit_Description_0438="Creates a protective Personal Shield around the SACU. Requires energy to run."
+Unit_Description_0435="Massively increases the rate at which the SACU repairs its armour as well as providing a large HP boost.\n\n+14000 Health\n+250 Regen"
+Unit_Description_0436="Greatly increases the range of the SACU's main cannon, overcharge if present, and sensors.\n\n+10 Main cannon range\n+44 Omni Radius\n+6 Vision Radius"
+Unit_Description_0437="Massively increases SACU build speed.\n\n+42 Buildpower"
+Unit_Description_0438="Creates a protective Personal Shield around the SACU. Requires energy to run.\n\nShield Regen Rate = 22 HP/s\nShield Recharge Time = 160 seconds"
 Unit_Description_0439="Adds Teleportation capability. Requires considerable energy to activate."
-Unit_Description_0440="Expands the SACU's weaponry with an Overcharge function identical to that of the standard ACU."
+Unit_Description_0440="Expands the SACU's weaponry with an Overcharge function identical to that of the standard ACU. Requires 100000 energy storage for maximum damage."
 
 -- SERAPHIM -- Land Units
 Unit_Description_0337="Light, fast mobile reconnaissance unit. When stationary, deploys cloaking and stealth fields."
