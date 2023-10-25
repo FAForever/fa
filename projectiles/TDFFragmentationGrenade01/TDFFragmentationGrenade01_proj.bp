@@ -27,7 +27,7 @@ ProjectileBlueprint {
             Type = 'Medium02',
         },
         MeshBlueprint = '/projectiles/TIFMortar01/TIFMortar01_mesh.bp',
-        StrategicIconSize = 1,
+        StrategicIconSize = 2,
         UniformScale = 0.05,
     },
     General = {

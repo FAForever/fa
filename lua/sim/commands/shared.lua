@@ -105,7 +105,13 @@ UnitQueueDataToCommand = {
     },
     [19] = {
         Type = "Reclaim",
-        Callback = function(units, positionOrEntity) pcall(IssueReclaim, units, positionOrEntity) end,
+        Callback = function(units, positionOrEntity)
+            if IsDestroyed(positionOrEntity) then
+                return
+            end
+
+            pcall(IssueReclaim, units, positionOrEntity)
+        end,
         BatchOrders = true,
         FullRedundancy = true,
     },
