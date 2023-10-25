@@ -1430,7 +1430,7 @@ Unit_Description_0004="Mounts a Tactical Cruise Missile Launcher onto the back o
 Unit_Description_0005="Grants Tech 2 schematic access and increases the ACU's build speed and maximum health.\n\n+32 Buildpower\n+2000 Health\n+10 Regen"
 Unit_Description_0006="Increases the speed at which the ACU repairs itself.\n\n+1500 Health\n+40 Regen"
 Unit_Description_0007="Grants Tech 3 and Experimental schematic access and further increases the ACU's build speed and maximum health.\n\n+58 Buildpower\n+1000 Health\n+10 Regen"
-Unit_Description_0008="Doubles the ACU's main weapon damage, and increases its range and that of Overcharge.\n\n+100 Main Weapon damage\n+8 Main Weapon range"
+Unit_Description_0008="Doubles the ACU's main cannon's damage, and increases its range and that of Overcharge.\n\n+100 Main cannon damage\n+8 Main cannon range"
 Unit_Description_0009="Tactical Cruise Missiles replaced by much more expensive, powerful Tactical Nuclear Missiles."
 Unit_Description_0010="Adds Teleportation capability. Requires considerable energy to activate."
 Unit_Description_0011="Creates a Bubble Shield around the ACU, which protects friendly units inside its radius. If present, the shield will transfer a portion of the damage received to intersecting shield bubbles. Requires energy to run.\n\nShield Regen Rate = 60 HP/s\nShield Recharge Time = 90 seconds"
@@ -1592,7 +1592,7 @@ Unit_Description_0108="Personal Stealth hiding the ACU from radar. Countered by 
 Unit_Description_0109="Adds Teleportation capability. Requires considerable energy to activate."
 Unit_Description_0110="Grants Tech 2 schematic access and increases the ACU's build speed and maximum health.\n\n+32 Buildpower\n+2000 Health\n+10 Regen"
 Unit_Description_0111="Grants Tech 3 and Experimental schematic access and further increases the ACU's build speed and maximum health.\n\n+58 Buildpower\n+1500 Health\n+10 Regen"
-Unit_Description_0112="Doubles the main cannon's rate of fire, and increases the range of all the ACU's weaponry.\n\n+100% Main Weapon rate of fire\n+8 Main Weapon range\n+8 Microwave Laser range"
+Unit_Description_0112="Doubles the main cannon's rate of fire, and increases the range of the Microwave Laser if present.\n\n+100% Main cannon rate of fire\n+8 Main cannon range\n+8 Microwave Laser range"
 Unit_Description_0113="Enhances the ACU with a Microwave Laser weapon with unbelievable firepower.\n\nMicrowave Laser DPS = 3000"
 Unit_Description_0114="Enhances the ACU with a torpedo weapon and sonar sensor.\n\nNanite Torpedo DPS = 250\nNanite Torpedo range = 60\n+34 Sonar Radius"
 Unit_Description_0465_faf="Massively increases the rate at which the ACU repairs its armour.\n\n+1500 Health\n+60 Regen"
@@ -1750,7 +1750,7 @@ Unit_Description_s204="Constructs Tech 3 Naval units. Buildable for a much cheap
 Unit_Description_0305="The Armored Command Unit (ACU) is a combination of barracks and command center. Contains all the blueprints necessary to build a basic army from scratch. Upgradeable with combat enhancements, advanced engineering suites, resource allocation system, and teleportation."
 Unit_Description_0156="Grants Tech 2 schematic access and increases the ACU's build speed and maximum health.\n\n+32 Buildpower\n+2000 Health\n+10 Regen"
 Unit_Description_0157="Creates a Quantum Stasis Field around the ACU. Immobilizes enemy units within the ACU's main cannon range.\n\n+3000 Health"
-Unit_Description_0158="Increases the range of the ACU's main cannon and that of Overcharge.\n\n+8 Main Weapon range"
+Unit_Description_0158="Increases the range of the ACU's main cannon and that of Overcharge.\n\n+8 Main cannon range"
 Unit_Description_0159="Grants the ACU a long range omni Sensor and increased optical range.\n\n+50 Vision Radius\n+54 Omni Radius"
 Unit_Description_0160="Grants Tech 3 and Experimental schematic access and further increases the ACU's build speed and maximum health.\n\n+58 Buildpower\n+1000 Health\n+10 Regen"
 Unit_Description_0161="Doubles main cannon rate of fire.\n\n+100% Rate of fire"
@@ -1759,7 +1759,7 @@ Unit_Description_0163="Increases ACU's resource generation to 37 mass per second
 Unit_Description_0164="Creates a protective Personal Shield around the ACU. Requires energy to run.\n\nShield Regen Rate = 30 HP/s\nShield Recharge Time = 75 seconds"
 Unit_Description_0165="Greatly increases Personal Shield's HP. Requires energy to run.\n\nShield Regen Rate = 32 HP/s\nShield Recharge Time = 160 seconds"
 Unit_Description_0166="Adds Teleportation capability. Requires considerable energy to activate."
-Unit_Description_0466_faf="Further increases the range of the ACU's main cannon and that of Overcharge.\n\n+5 Main Weapon range"
+Unit_Description_0466_faf="Further increases the range of the ACU's main cannon and that of Overcharge.\n\n+5 Main cannon range"
 
 -- AEON -- Support Commander Units/Upgrades
 Unit_Description_0167="A highly versatile combat and engineering unit useful on late-stage battlefields."
@@ -1910,10 +1910,14 @@ Unit_Description_0424="Increases ACU's resource generation to 17 mass per second
 Unit_Description_0425="Increases ACU's resource generation to 33 mass per second and 4020 energy per second."
 Unit_Description_0426="Grants Tech 2 schematic access and increases the ACU's build speed and maximum health.\n\n+32 Buildpower\n+2000 Health\n+10 Regen"
 Unit_Description_0427="Grants Tech 3 and Experimental schematic access and further increases the ACU's build speed and maximum health.\n\n+58 Buildpower\n+1500 Health\n+10 Regen"
+<<<<<<< HEAD
+Unit_Description_0428="Increases main cannon damage to 720% and grants Area-Of-Effect damage radius.\n\n+620 Main cannon damage\n+2.7 Main cannon damage radius"
+=======
 Unit_Description_0428="Increases main cannon damage to 720 and grants Area-Of-Effect damage radius.\n\n+620 Main Weapon damage\n+2.7 Main Weapon damage radius"
+>>>>>>> 4c6c2e568219c777e58acd762be0c01edce89b8f
 Unit_Description_0429="Emits a field which repairs nearby allied units, as well as providing a boost to the maximum HP of those units.\n\n+500 Health (ACU only)\n+10 Regen (ACU only)\nAura Radius = 30\nAura HP-buff = 10%"
 Unit_Description_0430="Enhances the Repair Field to grant faster restoration in a larger area, as well as providing a larger boost to the maximum HP of those units.\n\n+1000 Health (ACU only)\n+10 Regen (ACU only)\nAura Radius = 35\nAura HP-buff = 20%"
-Unit_Description_0431="Doubles the ACU's main weapon rate of fire, and increases its range and that of Overcharge.\n\n+100% Rate of fire\n+8 Main Weapon range"
+Unit_Description_0431="Doubles the ACU's main cannon's rate of fire, and increases its range and that of Overcharge.\n\n+100% Rate of fire\n+8 Main cannon range"
 Unit_Description_0432="Mounts a Tactical Cruise Missile Launcher onto the back of the ACU."
 Unit_Description_0454="Further increases the rate at which the ACU repairs its armour as well as providing a large HP boost.\n\n+20000 Health\n+150 Regen"
 
