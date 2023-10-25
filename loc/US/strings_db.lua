@@ -1424,7 +1424,7 @@ UI_Disco0006="Ejected by"
 -- Unit Descriptions
 
 -- UEF -- Armored Commander Unit/Upgrades
-Unit_Description_0303="The Armored Command Unit (ACU) is a combination of barracks and command center. Contains all the blueprints necessary to build a basic army from scratch. Upgradeable with combat enhancements, advanced engineering suits, resource allocation system, and teleporting."
+Unit_Description_0303="The Armored Command Unit (ACU) is a combination of barracks and command center. Contains all the blueprints necessary to build a basic army from scratch. Upgradeable with combat enhancements, advanced engineering suites, resource allocation system, and teleportation."
 Unit_Description_0056="The UEF Supreme Commander Description."
 Unit_Description_0004="Mounts a Tactical Cruise Missile Launcher onto the back of the ACU."
 Unit_Description_0005="Grants Tech 2 schematic access and increases the ACU's build speed and maximum health.\n\n+32 Buildpower\n+2000 Health\n+10 Regen"
