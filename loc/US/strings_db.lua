@@ -1436,8 +1436,8 @@ Unit_Description_0010="Adds Teleportation capability. Requires considerable ener
 Unit_Description_0011="Creates a Bubble Shield around the ACU, which protects friendly units inside its radius. If present, the shield will transfer a portion of the damage received to intersecting shield bubbles. Requires energy to run.\n\nShield Regen Rate = 60 HP/s\nShield Recharge Time = 90 seconds"
 Unit_Description_0012="Increases ACU's resource generation to 15 mass per second and 2520 energy per second."
 Unit_Description_0013="Creates a protective Personal Shield around the ACU. Requires energy to run.\n\nShield Regen Rate = 30 HP/s\nShield Recharge Time = 140 seconds"
-Unit_Description_0014="Creates an Engineering Drone which act as a flying T1 Engineer. Assists the ACU by default, but can be given its own orders."
-Unit_Description_0015="Adds a second Engineering Drone."
+Unit_Description_0014="Creates an Engineering Drone which act as a flying T1 Engineer. Assists the ACU by default, but can be given its own orders.\n\n+5 Buildpower Drone"
+Unit_Description_0015="Adds a second Engineering Drone.\n\n+5 Buildpower Drone"
 
 -- UEF -- Support Commander Units/Upgrades
 Unit_Description_0016="A highly versatile combat and engineering unit useful on late-stage battlefields."
