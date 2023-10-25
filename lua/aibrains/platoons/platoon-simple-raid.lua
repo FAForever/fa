@@ -138,7 +138,7 @@ AIPlatoonSimpleRaidBehavior = Class(AIPlatoon) {
 
             while not IsDestroyed(self) do
                 -- pick random unit for a position on the grid
-                local units = self:GetPlatoonUnits()
+                local units, unitCount = self:GetPlatoonUnits()
                 local origin
                 for _, v in units do
                     if v and not v.Dead then
@@ -191,7 +191,6 @@ AIPlatoonSimpleRaidBehavior = Class(AIPlatoon) {
                             if threatTable and not TableEmpty(threatTable) then
                                 local info = threatTable[Random(1, TableGetn(threatTable))]
                                 self.ThreatToEvade = { info[1], GetSurfaceHeight(info[1], info[2]), info[2] }
-                                DrawCircle(self.ThreatToEvade, 5, 'ff0000')
                                 self:ChangeState(self.Retreating)
                                 return
                             end
