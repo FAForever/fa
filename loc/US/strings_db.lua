@@ -1756,8 +1756,8 @@ Unit_Description_0160="Grants Tech 3 and Experimental schematic access and furth
 Unit_Description_0161="Doubles the main cannon's rate of fire.\n\n+100% Rate of fire"
 Unit_Description_0162="Increases ACU's resource generation to 19 mass per second and 1720 energy per second."
 Unit_Description_0163="Increases ACU's resource generation to 37 mass per second and 3420 energy per second."
-Unit_Description_0164="Creates a protective Personal Shield around the ACU. Requires energy to run.\n\nShield Regen Rate = 30 HP/s\nShield Recharge Time = 75 seconds"
-Unit_Description_0165="Greatly increases Personal Shield's HP. Requires energy to run.\n\nShield Regen Rate = 32 HP/s\nShield Recharge Time = 160 seconds"
+Unit_Description_0164="Creates a rapidly-recharging, protective Personal Shield around the ACU. Requires energy to run.\n\nShield Regen Rate = 30 HP/s\nShield Recharge Time = 75 seconds"
+Unit_Description_0165="Greatly increases the Personal Shield's HP. Requires energy to run.\n\nShield Regen Rate = 32 HP/s\nShield Recharge Time = 160 seconds"
 Unit_Description_0166="Adds Teleportation capability. Requires considerable energy to activate."
 Unit_Description_0466_faf="Further increases the range of the ACU's main cannon and that of Overcharge.\n\n+5 Main cannon range"
 
