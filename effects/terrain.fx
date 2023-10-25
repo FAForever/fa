@@ -391,28 +391,31 @@ float ComputeShadow( float4 vShadowCoord )
 // apply the water color
 float3 ApplyWaterColor(float terrainHeight, float depth, float3 inColor)
 {
-    if (depth > 0.1 || terrainHeight <= WaterElevation) {
+    if (depth > 0) {
+        // With this extra check we get rid of unwanted coloration on steep cliffs when zoomed in,
+        // but we prevent that terrain tesselation swallows too much of the water when zoomed out
+        float opacity = saturate(smoothstep(10, 200, CameraPosition.y - WaterElevation) + step(terrainHeight, WaterElevation));
         float4 wcolor = tex1D(WaterRampSampler, depth);
-        inColor = lerp( inColor.xyz, wcolor.xyz, wcolor.w );
+        inColor = lerp(inColor.xyz, wcolor.xyz, wcolor.w * opacity);
     }
     return inColor;
 }
 
-float3 ApplyWaterColorExponentially(float3 viewDirection, float terrainHeight, float waterDepth, float3 color) {
-    // With this extra check we get rid of unwanted coloration on reasonably steep cliffs,
-    // but we prevent that terrain tesselation swallows too much of the water when zoomed out
-    if (waterDepth > 0.1 || terrainHeight <= WaterElevation) {
+float3 ApplyWaterColorExponentially(float3 viewDirection, float terrainHeight, float waterDepth, float3 color)
+{
+    if (waterDepth > 0) {
+        float opacity = saturate(smoothstep(10, 200, CameraPosition.y - WaterElevation) + step(terrainHeight, WaterElevation));
         float4 waterColor = tex1D(WaterRampSampler, waterDepth);
         float3 up = float3(0,1,0);
         // To simplify, we assume that the light enters vertically into the water,
         // this is the length that the light travels underwater back to the camera
         float oneOverCosV = 1 / max(abs(dot(up, normalize(viewDirection))), 0.0001);
         // light gets absorbed exponentially
-        float waterAbsorption = saturate(exp(-waterColor.w * (1 + oneOverCosV)));
+        float waterAbsorption = 1 - saturate(exp(-waterColor.w * (1 + oneOverCosV)));
         // darken the color first to simulate the light absorption on the way in and out
-        color *= waterAbsorption;
+        color *= 1 - waterAbsorption * opacity;
         // lerp in the watercolor to simulate the scattered light from the dirty water
-        color = lerp(waterColor.rgb, color, waterAbsorption);
+        color = lerp(color, waterColor.rgb, waterAbsorption * opacity);
     }
     return color;
 }
@@ -502,12 +505,9 @@ float3 PBR(VS_OUTPUT inV, float4 position, float3 albedo, float3 n, float roughn
 
     float facingSpecular = 0.04;
     // using only the texture looks bad when zoomed in, using only the mesh 
-    // looks bad when zoomed out, so we check for both
-    bool underwater = waterDepth > 0 && inV.mTexWT.z < WaterElevation;
-    if (underwater) {
-        // specular reflections of dielectrics mostly disappear underwater
-        facingSpecular *= 0.1;
-    }
+    // looks bad when zoomed out, so we interpolate between both
+    float underwater = lerp(step(inV.mTexWT.z, WaterElevation), saturate(waterDepth * 20), smoothstep(10, 200, CameraPosition.y - WaterElevation));
+    facingSpecular *= 1 - 0.9 * underwater;
 
     float3 v = normalize(-inV.mViewDirection);
     float3 F0 = float3(facingSpecular, facingSpecular, facingSpecular);
