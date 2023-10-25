@@ -844,14 +844,8 @@ ExternalFactoryComponent = ClassSimple {
         -- create the factory somewhere completely unrelated
         local position = self:GetPosition(self.FactoryAttachBone)
 
-        -- we need to put an entity in between so that we can always click-select the 
-        -- factory. The 'CARRIER' category can prevent us from clicking on attached units
-        local entity = Entity({Owner = self})
-        self.Trash:Add(entity)
-        entity:AttachTo(self, self.FactoryAttachBone)
-
         self.ExternalFactory = CreateUnitHPR(blueprintIdExternalFactory, self.Army, position[1], position[2], position[3], 0, 0, 0) --[[@as ExternalFactoryUnit]]
-        self.ExternalFactory:AttachTo(entity, -1)
+        self.ExternalFactory:AttachTo(self, self.FactoryAttachBone)
         self.ExternalFactory:SetCreator(self)
         self:SetCreator(self.ExternalFactory)
         self.ExternalFactory:SetParent(self)
@@ -889,6 +883,31 @@ ExternalFactoryComponent = ClassSimple {
             self.ExternalFactory:SetBlockCommandQueue(true)
             self.ExternalFactory:Destroy()
         end
+    end,
+
+    -- We need to wait one tick for our unit to "exist" before we can clear its orders
+    -- This prevents order graphs from being drawn from units inside the carrier
+    ClearOrdersThread = function(unitBeingBuilt)
+        WaitTicks(1)
+        IssueToUnitClearCommands(unitBeingBuilt)
+    end,
+
+    StorageOnStopBuild = function(self, unitBeingBuilt, baseClass)
+        baseClass.OnStopBuild(self, unitBeingBuilt)
+
+        --local unitBeingBuilt = self.UnitBeingBuilt
+        unitBeingBuilt:DetachFrom(true)
+        self:DetachAll(self.BuildAttachBone)
+
+        if not self:TransportHasAvailableStorage() or self:GetStat('AutoDeploy', 0).Value == 1 then
+            unitBeingBuilt:ShowBone(0, true)
+        else
+            self:AddUnitToStorage(unitBeingBuilt)
+            ForkThread(self.ClearOrdersThread, unitBeingBuilt)
+        end
+
+        self:RequestRefreshUI()
+        ChangeState(self, self.IdleState)
     end,
 
 }
