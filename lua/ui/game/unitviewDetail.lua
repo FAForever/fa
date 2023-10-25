@@ -611,6 +611,18 @@ function WrapAndPlaceText(bp, builder, descID, control)
                         end
                         table.insert(blocks, {color = UIUtil.fontColor, lines = {weaponDetails1}})
                         table.insert(blocks, {color = 'FFFFB0B0', lines = {weaponDetails2}})
+
+                        if info.EnergyRequired > 0 and info.EnergyDrainPerSecond > 0 then
+                            local weaponDetails3 = string.format('Charge Cost: -%d E (-%d E/s)', info.EnergyRequired, info.EnergyDrainPerSecond)
+                            table.insert(blocks, {color = 'FFFF9595', lines = {weaponDetails3}})
+
+                        end
+
+                        local ProjectileEco = __blueprints[info.ProjectileId].Economy
+                        if ProjectileEco and (ProjectileEco.BuildCostMass > 0 or ProjectileEco.BuildCostEnergy > 0) and ProjectileEco.BuildTime > 0 then
+                            local weaponDetails4 = string.format('Missile Cost: %d M, %d E, %d BT', ProjectileEco.BuildCostMass, ProjectileEco.BuildCostEnergy, ProjectileEco.BuildTime)
+                            table.insert(blocks, {color = 'FFFF9595', lines = {weaponDetails4}})
+                        end
                     end
                     lines = {}
                     for name, weapon in v.death do
