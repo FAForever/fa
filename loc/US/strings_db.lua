@@ -1911,7 +1911,7 @@ Unit_Description_0425="Increases ACU's resource generation to 33 mass per second
 Unit_Description_0426="Grants Tech 2 schematic access and increases the ACU's build speed and maximum health.\n\n+32 Buildpower\n+2000 Health\n+10 Regen"
 Unit_Description_0427="Grants Tech 3 and Experimental schematic access and further increases the ACU's build speed and maximum health.\n\n+58 Buildpower\n+1500 Health\n+10 Regen"
 Unit_Description_0428="Increases main cannon's damage to 720 and grants it an Area-Of-Effect damage radius.\n\n+620 Main Weapon damage\n+2.7 Main Weapon damage radius"
-Unit_Description_0429="Emits a field which repairs nearby allied units, as well as providing a boost to the maximum HP of those units.\n\n+500 Health (ACU only)\n+10 Regen (ACU only)\nAura Radius = 30\nAura HP Buff = 10%\nAura Regen Buff = 2% of HP"
+Unit_Description_0429="Emits a field which repairs nearby allied units, as well as providing a boost to the maximum HP of those units.\n\n+500 Health (ACU only)\n+10 Regen (ACU only)\nAura Radius = 30\nAura HP Buff = 10%\nAura Regen Buff = 2% of HP\nMax Regen = 10 (T1), 15 (T2), 25 (T3), 30 (SACU), 40 (T4)"
 Unit_Description_0430="Enhances the Repair Field to grant faster restoration in a larger area, as well as providing a larger boost to the maximum HP of those units.\n\n+1000 Health (ACU only)\n+10 Regen (ACU only)\nAura Radius = 35\nAura HP Buff = 20%\nAura Regen Buff = 3.5% of HP\nMax Regen = 20 (T1), 50 (T2), 120 (T3), 140 (SACU), 240 (T4)"
 Unit_Description_0431="Doubles the main cannon's rate of fire, and increases its range and that of Overcharge.\n\n+100% Rate of fire\n+8 Main cannon range"
 Unit_Description_0432="Mounts a Tactical Cruise Missile Launcher onto the back of the ACU."
