@@ -103,7 +103,6 @@ Callbacks.SetStatByCallback = function(data, units)
                     WARN('SetStatByCallback: ' .. repr(stat) .. ' is not a valid stat for this unit!')
                     continue
                 end
-                LOG('SetStatByCallback: ' .. repr(stat) .. ' = ' .. repr(value))
                 u:UpdateStat(stat, value)
             end
         end
