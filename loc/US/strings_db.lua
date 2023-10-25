@@ -1587,7 +1587,7 @@ Unit_Description_s087="Constructs Tech 3 Naval units. Buildable for a much cheap
 -- CYBRAN -- Armored Commander Unit/Upgrades
 Unit_Description_0304="The Armored Command Unit (ACU) is a combination of barracks and command center. Contains all the blueprints necessary to build a basic army from scratch. Upgradeable with combat enhancements, advanced engineering suites, resource allocation system, and teleportation. Lightly armoured, but with high Regeneration rate."
 Unit_Description_0106="Increases ACU's resource generation to 13 mass per second and 2720 energy per second."
-Unit_Description_0107="Personal Cloaking further hiding the ACU from optical sensors and massively boosts HP. Countered by omni sensors. Costs energy to run.\n\n+12000 Health"
+Unit_Description_0107="Personal Cloaking further hiding the ACU from optical sensors and massively boosts HP. Countered by omni sensors. Costs a large amount of energy to run.\n\n+12000 Health"
 Unit_Description_0108="Personal Stealth hiding the ACU from radar. Countered by omni sensors. Costs energy to run.\n\n+2000 Health"
 Unit_Description_0109="Adds Teleportation capability. Requires considerable energy to activate."
 Unit_Description_0110="Grants Tech 2 schematic access and increases the ACU's build speed and maximum health.\n\n+32 Buildpower\n+2000 Health\n+10 Regen"
