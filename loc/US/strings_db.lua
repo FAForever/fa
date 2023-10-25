@@ -1910,7 +1910,7 @@ Unit_Description_0424="Increases ACU's resource generation to 17 mass per second
 Unit_Description_0425="Increases ACU's resource generation to 33 mass per second and 4020 energy per second."
 Unit_Description_0426="Grants Tech 2 schematic access and increases the ACU's build speed and maximum health.\n\n+32 Buildpower\n+2000 Health\n+10 Regen"
 Unit_Description_0427="Grants Tech 3 and Experimental schematic access and further increases the ACU's build speed and maximum health.\n\n+58 Buildpower\n+1500 Health\n+10 Regen"
-Unit_Description_0428="Increases main cannon damage to 720% and grants Area-Of-Effect damage radius.\n\n+620 Main Weapon damage\n+2.7 Main Weapon damage radius"
+Unit_Description_0428="Increases main cannon damage to 720 and grants Area-Of-Effect damage radius.\n\n+620 Main Weapon damage\n+2.7 Main Weapon damage radius"
 Unit_Description_0429="Emits a field which repairs nearby allied units, as well as providing a boost to the maximum HP of those units.\n\n+500 Health (ACU only)\n+10 Regen (ACU only)\nAura Radius = 30\nAura HP-buff = 10%"
 Unit_Description_0430="Enhances the Repair Field to grant faster restoration in a larger area, as well as providing a larger boost to the maximum HP of those units.\n\n+1000 Health (ACU only)\n+10 Regen (ACU only)\nAura Radius = 35\nAura HP-buff = 20%"
 Unit_Description_0431="Doubles the ACU's main weapon rate of fire, and increases its range and that of Overcharge.\n\n+100% Rate of fire\n+8 Main Weapon range"
