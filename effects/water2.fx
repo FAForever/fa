@@ -23,6 +23,11 @@ float3 waveCrestColor = float3( 1, 1, 1);
 
 float4x4		WorldToView;
 float4x4		Projection;
+
+// red: wave normal strength
+// green: water depth
+// blue: ???
+// alpha: foam reduction
 texture		UtilityTextureC;
 
 samplerCUBE SkySampler = sampler_state
