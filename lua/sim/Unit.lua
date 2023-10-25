@@ -2377,6 +2377,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
             self:SendNotifyMessage('completed')
         end
 
+
         return true
     end,
 

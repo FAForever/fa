@@ -22,10 +22,7 @@ XRS0204 = ClassUnit(CSubUnit) {
         AntiTorpedo01 = ClassWeapon(CIFSmartCharge) {},
         AntiTorpedo02 = ClassWeapon(CIFSmartCharge) {},
     },
-    OnCreate = function(self)
-        CSubUnit.OnCreate(self)
-        self:SetMaintenanceConsumptionActive()
-    end,
+    
 }
 
 TypeClass = XRS0204

@@ -11,9 +11,6 @@ URL0101 = ClassUnit(CWalkingLandUnit) {
         CWalkingLandUnit.OnStopBeingBuilt(self, builder, layer)
 
         self.Trash:Add(CreateRotator(self, 'Spinner', 'y', nil, 90, 5, 90))
-        self:SetMaintenanceConsumptionInactive()
-        self:SetScriptBit('RULEUTC_CloakToggle', true)
-        self:RequestRefreshUI()
     end,
 }
 

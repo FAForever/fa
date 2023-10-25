@@ -212,6 +212,11 @@ UAS0401 = ClassUnit(ASeaUnit, ExternalFactoryComponent) {
         end,
     },
 
+    UpdateStat = function(self, stat, value)
+        ASeaUnit.UpdateStat(self, stat, value)
+        ExternalFactoryComponent.UpdateStat(self, stat, value)
+    end,
+
     OnKilled = function(self, instigator, type, overkillRatio)
         ExternalFactoryComponent.OnKilled(self, instigator, type, overkillRatio)
         local watchBone = self:GetBlueprint().WatchBone or 0

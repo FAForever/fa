@@ -855,6 +855,7 @@ ExternalFactoryComponent = ClassSimple {
         self.ExternalFactory:SetCreator(self)
         self:SetCreator(self.ExternalFactory)
         self.ExternalFactory:SetParent(self)
+        self.ExternalFactory:InitBuildToggles()
         self.Trash:Add(self.ExternalFactory)
     end,
 
@@ -880,6 +881,16 @@ ExternalFactoryComponent = ClassSimple {
 
                 IssueToUnitClearCommands(self.ExternalFactory)
             end
+        end
+    end,
+
+    UpdateStat = function(self, stat, value, stop)
+        if stop then return end
+        -- Check if it's a stat toggle before sending it along
+        if self.ExternalFactory
+        and self.Blueprint.General.StatToggles
+        and self.Blueprint.General.StatToggles[stat] then
+            self.ExternalFactory:UpdateStat(stat, value, true)
         end
     end,
 

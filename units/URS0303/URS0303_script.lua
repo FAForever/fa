@@ -40,6 +40,11 @@ URS0303 = ClassUnit(AircraftCarrier, ExternalFactoryComponent) {
         ChangeState(self, self.IdleState)
     end,
 
+    UpdateStat = function(self, stat, value)
+        AircraftCarrier.UpdateStat(self, stat, value)
+        ExternalFactoryComponent.UpdateStat(self, stat, value)
+    end,
+
     OnLayerChange = function(self, new, old)
         AircraftCarrier.OnLayerChange(self, new, old)
     end,
@@ -81,7 +86,7 @@ URS0303 = ClassUnit(AircraftCarrier, ExternalFactoryComponent) {
             unitBuilding:DetachFrom(true)
             self:DetachAll(self.BuildAttachBone)
 
-            if not self:TransportHasAvailableStorage() or self:GetScriptBit('RULEUTC_WeaponToggle') then
+            if not self:TransportHasAvailableStorage() or self:GetStat('AutoDeploy', 0).Value == 1 then
                 local worldPos = self:CalculateWorldPositionFromRelative({0, 0, 20})
                 IssueToUnitMove(unitBeingBuilt, worldPos)
                 unitBuilding:ShowBone(0, true)

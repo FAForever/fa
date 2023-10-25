@@ -50,6 +50,11 @@ UES0401 = ClassUnit(AircraftCarrier, ExternalFactoryComponent) {
         end
     end,
 
+    UpdateStat = function (self, stat, value)
+        AircraftCarrier.UpdateStat(self, stat, value)
+        ExternalFactoryComponent.UpdateStat(self, stat, value)
+    end,
+
     StartBeingBuiltEffects = function(self, builder, layer)
         self:SetMesh(self:GetBlueprint().Display.BuildMeshBlueprint, true)
         if self:GetBlueprint().General.UpgradesFrom ~= builder.UnitId then
@@ -165,7 +170,7 @@ UES0401 = ClassUnit(AircraftCarrier, ExternalFactoryComponent) {
             unitBuilding:DetachFrom(true)
             self:DetachAll(self.BuildAttachBone)
 
-            if not self:TransportHasAvailableStorage() or self:GetScriptBit('RULEUTC_WeaponToggle') then
+            if not self:TransportHasAvailableStorage() or self:GetStat('AutoDeploy', 0).Value == 1 then
                 unitBuilding:ShowBone(0, true)
             else
                 self:AddUnitToStorage(unitBuilding)
