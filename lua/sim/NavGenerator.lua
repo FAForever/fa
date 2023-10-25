@@ -1063,8 +1063,6 @@ end
 ---@param pzCache NavVerticalPathCache
 ---@param pCache NavPathCache
 ---@param bCache NavTerrainBlockCache
----@return number   # minimum depth
----@return number   # maximum depth
 function PopulateCaches(tCache, dCache, daCache, pxCache, pzCache, pCache, bCache, bx, bz, c)
     local MathAbs = MathAbs
     local GetTerrainHeight = GetTerrainHeight
@@ -1167,6 +1165,8 @@ end
 ---@param bCache NavTerrainBlockCache
 ---@param pCache NavPathCache
 ---@param rCache NavLabelCache
+---@return boolean # all blocking
+---@return boolean # all pathable
 function ComputeLandPathingMatrix(size, daCache, pCache, bCache, rCache)
     local allBlocking = true
     local allPathable = true
@@ -1200,6 +1200,8 @@ end
 ---@param bCache NavTerrainBlockCache
 ---@param pCache NavPathCache
 ---@param rCache NavLabelCache
+---@return boolean # all blocking
+---@return boolean # all pathable
 function ComputeHoverPathingMatrix(size, daCache, pCache, bCache, rCache)
     local allBlocking = true
     local allPathable = true
@@ -1234,6 +1236,8 @@ end
 ---@param bCache NavTerrainBlockCache
 ---@param pCache NavPathCache
 ---@param rCache NavLabelCache
+---@return boolean # all blocking
+---@return boolean # all pathable
 function ComputeNavalPathingMatrix(size, daCache, pCache, bCache, rCache)
     local allBlocking = true
     local allPathable = true
@@ -1266,6 +1270,8 @@ end
 ---@param bCache NavTerrainBlockCache
 ---@param pCache NavPathCache
 ---@param rCache NavLabelCache
+---@return boolean # all blocking
+---@return boolean # all pathable
 function ComputeAmphPathingMatrix(size, daCache, pCache, bCache, rCache)
     local allBlocking = true
     local allPathable = true
@@ -1298,6 +1304,7 @@ end
 --- Generates the compression grids based on the heightmap
 ---@param size number (square) size of each cell of the compression grid
 ---@param threshold number (square) size of the smallest acceptable leafs, used for culling
+---@param mapHasWater boolean
 local function GenerateCompressionGrids(size, threshold, mapHasWater)
 
     local navAir = NavGrids['Air'] --[[@as NavGrid]]
@@ -1370,6 +1377,7 @@ local function GenerateCompressionGrids(size, threshold, mapHasWater)
 end
 
 --- Generates graphs that we can traverse, based on the compression grids
+---@param mapHasWater boolean
 local function GenerateGraphs(mapHasWater)
     local navLand = NavGrids['Land'] --[[@as NavGrid]]
     local navWater = NavGrids['Water'] --[[@as NavGrid]]
@@ -1435,6 +1443,7 @@ local function GenerateCullLabels()
 end
 
 --- Generates metadata for markers for quick access
+---@param mapHasWater boolean
 local function GenerateMarkerMetadata(mapHasWater)
     local navLabels = NavLabels
 
@@ -1484,7 +1493,8 @@ local function GenerateMarkerMetadata(mapHasWater)
 end
 
 --- Computes various fields for the root nodes
-local function GenerateRootInformation(mapHasWater)
+---@param mapHasWater boolean
+local function ComputeTreeInformation(mapHasWater)
 
     local cache = {}
     local size = ScenarioInfo.size[1] / LabelCompressionTreesPerAxis
@@ -1591,7 +1601,7 @@ function Generate()
     local infoMessage = string.format("cleaning up generated data: %f", GetSystemTimeSecondsOnlyForProfileUse() - start)
     SPEW(infoMessage)
 
-    GenerateRootInformation(mapHasWater)
+    ComputeTreeInformation(mapHasWater)
     local infoMessage = string.format("generated tree information: %f", GetSystemTimeSecondsOnlyForProfileUse() - start)
     SPEW(infoMessage)
 
