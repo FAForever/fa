@@ -891,4 +891,29 @@ ExternalFactoryComponent = ClassSimple {
         end
     end,
 
+    -- We need to wait one tick for our unit to "exist" before we can clear its orders
+    -- This prevents order graphs from being drawn from units inside the carrier
+    ClearOrdersThread = function(unitBeingBuilt)
+        WaitTicks(1)
+        IssueToUnitClearCommands(unitBeingBuilt)
+    end,
+
+    StorageOnStopBuild = function(self, unitBeingBuilt, baseClass)
+        baseClass.OnStopBuild(self, unitBeingBuilt)
+
+        --local unitBeingBuilt = self.UnitBeingBuilt
+        unitBeingBuilt:DetachFrom(true)
+        self:DetachAll(self.BuildAttachBone)
+
+        if not self:TransportHasAvailableStorage() or self:GetStat('AutoDeploy', 0).Value == 1 then
+            unitBeingBuilt:ShowBone(0, true)
+        else
+            self:AddUnitToStorage(unitBeingBuilt)
+            ForkThread(self.ClearOrdersThread, unitBeingBuilt)
+        end
+
+        self:RequestRefreshUI()
+        ChangeState(self, self.IdleState)
+    end,
+
 }

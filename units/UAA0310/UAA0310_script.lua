@@ -131,21 +131,7 @@ UAA0310 = ClassUnit(AirTransport, ExternalFactoryComponent) {
         end,
 
         OnStopBuild = function(self, unitBeingBuilt)
-            AirTransport.OnStopBuild(self, unitBeingBuilt)
-
-
-            local unitBuilding = self.UnitBeingBuilt
-            unitBuilding:DetachFrom(true)
-            self:DetachAll(self.BuildAttachBone)
-
-            if not self:TransportHasAvailableStorage() or self:GetStat('AutoDeploy', 0).Value == 1 then
-                unitBuilding:ShowBone(0, true)
-            else
-                self:AddUnitToStorage(unitBuilding)
-            end
-
-            self:RequestRefreshUI()
-            ChangeState(self, self.IdleState)
+            ExternalFactoryComponent.StorageOnStopBuild(self, unitBeingBuilt, AirTransport)
         end,
     },
 }

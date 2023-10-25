@@ -159,20 +159,7 @@ UES0401 = ClassUnit(AircraftCarrier, ExternalFactoryComponent) {
         end,
 
         OnStopBuild = function(self, unitBeingBuilt)
-            AircraftCarrier.OnStopBuild(self, unitBeingBuilt)
-
-            local unitBuilding = self.UnitBeingBuilt
-            unitBuilding:DetachFrom(true)
-            self:DetachAll(self.BuildAttachBone)
-
-            if not self:TransportHasAvailableStorage() or self:GetStat('AutoDeploy', 0).Value == 1 then
-                unitBuilding:ShowBone(0, true)
-            else
-                self:AddUnitToStorage(unitBuilding)
-            end
-
-            self:RequestRefreshUI()
-            ChangeState(self, self.IdleState)
+            ExternalFactoryComponent.StorageOnStopBuild(self, unitBeingBuilt, AircraftCarrier)
         end,
     },
 }
