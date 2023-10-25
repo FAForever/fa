@@ -26,6 +26,7 @@ ProjectileBlueprint {
             Type = 'Small01',
         },
         StrategicIconSize = 1,
+        ScorchSplat = '/env/Tundra/splats/Splat_Tund_008  _albedo.dds',
     },
     General = {
         Category = 'Artillery',

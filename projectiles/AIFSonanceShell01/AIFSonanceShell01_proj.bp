@@ -25,6 +25,7 @@ ProjectileBlueprint {
         CameraFollowTimeout = 5,
         CameraFollowsProjectile = true,
         StrategicIconSize = 3,
+        ScorchSplat = '/env/Evergreen/splats/Splat_evergreen_008_albedo.dds',
     },
     General = {
         Category = 'Artillery',

@@ -37,6 +37,7 @@ ProjectileBlueprint {
         },
         StrategicIconSize = 3,
         UniformScale = 0.45,
+        ScorchSplat = '/env/RedRocks/splats/Splat_redrocks_008_albedo.dds',
     },
     General = {
         Category = 'Artillery',

@@ -31,6 +31,7 @@ ProjectileBlueprint {
         StrategicIconName = '/textures/ui/common/game/strategicicons/icon_strategic_artillery.dds',
         StrategicIconSize = 3,
         UniformScale = 0.4,
+        ScorchSplat = '/env/Desert/splats/Splat_desert_010_albedo.dds',
     },
     General = {
         Category = 'Artillery',
