@@ -77,7 +77,8 @@ XSS0303 = ClassUnit(AircraftCarrier, ExternalFactoryComponent) {
         ---@param self XSS0303
         ---@param unitBeingBuilt Unit
         OnStopBuild = function(self, unitBeingBuilt)
-            ExternalFactoryComponent.StorageOnStopBuild(self, unitBeingBuilt, AircraftCarrier)
+            AircraftCarrier.OnStopBuild(self, unitBeingBuilt)
+            ExternalFactoryComponent.OnStopBuildWithStorage(self, unitBeingBuilt)
         end,
     },
 }

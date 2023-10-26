@@ -131,7 +131,8 @@ UAA0310 = ClassUnit(AirTransport, ExternalFactoryComponent) {
         end,
 
         OnStopBuild = function(self, unitBeingBuilt)
-            ExternalFactoryComponent.StorageOnStopBuild(self, unitBeingBuilt, AirTransport)
+            AirTransport.OnStopBuild(self, unitBeingBuilt)
+            ExternalFactoryComponent.OnStopBuildWithStorage(self, unitBeingBuilt)
         end,
     },
 }
