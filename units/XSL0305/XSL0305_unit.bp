@@ -326,7 +326,7 @@ UnitBlueprint{
             DamageFriendly = false,
             DamageRadius = 0,
             DamageType = "Normal",
-            DisplayName = "Sih Energy Rifle",
+            DisplayName = "Sih Energy Rifle Sniper Mode",
             FireTargetLayerCapsTable = {
                 Land = "Land|Water|Seabed",
                 Water = "Land|Water|Seabed",

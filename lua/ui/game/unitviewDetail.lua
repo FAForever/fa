@@ -384,7 +384,7 @@ GetAbilityDesc = {
         return LOCF('<LOC uvd_RegenRate>', bp.Defense.Shield.ShieldRegenRate)
     end,
     ability_shielddome = function(bp)
-        return LOCF('<LOC uvd_Radius>', bp.Defense.Shield.ShieldSize)..', '
+        return LOCF('<LOC uvd_Radius>', bp.Defense.Shield.ShieldSize/2)..', '
              ..LOCF('<LOC uvd_RegenRate>', bp.Defense.Shield.ShieldRegenRate)
     end,
     ability_stealthfield = function(bp)
@@ -577,7 +577,10 @@ function WrapAndPlaceText(bp, builder, descID, control)
                             if info.DamageToShields then
                                 Damage = math.max(Damage, info.DamageToShields)
                             end
-                            Damage = Damage * (info.DoTPulses or 1)
+                            if info.BeamLifetime > 0 then
+                                Damage = Damage * (info.BeamLifetime * 10 + 1)
+                            end
+                            Damage = Damage * (info.DoTPulses or 1) + (info.InitialDamage or 0)
                             local ProjectilePhysics = __blueprints[info.ProjectileId].Physics
                             while ProjectilePhysics do
                                 Damage = Damage * (ProjectilePhysics.Fragments or 1)
@@ -589,21 +592,37 @@ function WrapAndPlaceText(bp, builder, descID, control)
 
                             if not info.ManualFire and info.WeaponCategory ~= 'Kamikaze' then
                                 local DPS = Damage * MuzzleBones
-                                if info.BeamLifetime > 0 then
-                                    DPS = DPS * info.BeamLifetime * 10
-                                end
-                                DPS = DPS / ReloadTime + (info.InitialDamage or 0)
+                                DPS = DPS / ReloadTime
                                 weaponDetails1 = weaponDetails1..LOCF('<LOC uvd_DPS>', DPS)
                             end
 
-                            weaponDetails2 = string.format(LOC('<LOC uvd_0010>Damage: %d, Splash: %d')..', '..LOC('<LOC uvd_Range>')..', '..LOC('<LOC uvd_Reload>'),
-                                Damage, info.DamageRadius, info.MinRadius, info.MaxRadius, ReloadTime)
+                            if MuzzleBones > 1 then
+                                 weaponDetails2 = string.format(LOC('<LOC uvd_0015>Damage: %d x%d, Splash: %d')..', '..LOC('<LOC uvd_Range>')..', '..LOC('<LOC uvd_Reload>'),
+                                    Damage, MuzzleBones, info.DamageRadius, info.MinRadius, info.MaxRadius, ReloadTime)
+                            else
+                                weaponDetails2 = string.format(LOC('<LOC uvd_0010>Damage: %d, Splash: %d')..', '..LOC('<LOC uvd_Range>')..', '..LOC('<LOC uvd_Reload>'),
+                                    Damage, info.DamageRadius, info.MinRadius, info.MaxRadius, ReloadTime)
+                            end
+
+
                         end
                         if weapon.count > 1 then
                             weaponDetails1 = weaponDetails1..' x'..weapon.count
                         end
                         table.insert(blocks, {color = UIUtil.fontColor, lines = {weaponDetails1}})
                         table.insert(blocks, {color = 'FFFFB0B0', lines = {weaponDetails2}})
+
+                        if info.EnergyRequired > 0 and info.EnergyDrainPerSecond > 0 then
+                            local weaponDetails3 = string.format('Charge Cost: -%d E (-%d E/s)', info.EnergyRequired, info.EnergyDrainPerSecond)
+                            table.insert(blocks, {color = 'FFFF9595', lines = {weaponDetails3}})
+
+                        end
+
+                        local ProjectileEco = __blueprints[info.ProjectileId].Economy
+                        if ProjectileEco and (ProjectileEco.BuildCostMass > 0 or ProjectileEco.BuildCostEnergy > 0) and ProjectileEco.BuildTime > 0 then
+                            local weaponDetails4 = string.format('Missile Cost: %d M, %d E, %d BT', ProjectileEco.BuildCostMass, ProjectileEco.BuildCostEnergy, ProjectileEco.BuildTime)
+                            table.insert(blocks, {color = 'FFFF9595', lines = {weaponDetails4}})
+                        end
                     end
                     lines = {}
                     for name, weapon in v.death do
