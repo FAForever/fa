@@ -411,7 +411,7 @@ UnitBlueprint{
             CollideFriendly = false,
             Damage = 40,
             DamageType = "Normal",
-            DisplayName = "Nanodart Launcher",
+            DisplayName = "Nanodart Surface Launcher",
             FireTargetLayerCapsTable = { Water = "Land|Water|Seabed" },
             FiringRandomness = 0.9,
             FiringTolerance = 0.1,
