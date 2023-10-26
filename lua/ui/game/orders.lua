@@ -561,10 +561,10 @@ local function AbilityButtonBehavior(self, modifiers)
 end
 
 -- Generic script button specific behvior
-local function ScriptButtonOrderBehavior(self, modifiers, toggle)
+local function ScriptButtonOrderBehavior(self, modifiers, subState)
     local state
-    if toggle ~= nil then
-        state = toggle
+    if subState ~= nil then
+        state = subState
     else
         state = self:IsChecked()
     end
@@ -585,12 +585,12 @@ local function ScriptButtonOrderBehavior(self, modifiers, toggle)
     if controls.mouseoverDisplay.text then
         controls.mouseoverDisplay.text:SetText(self._curHelpText)
     end
-    if toggle == nil then
+    if subState == nil then
         Checkbox.OnClick(self)
     end
 end
 
-local function ScriptButtonInitFunction(control, unitList, toggleCheck)
+local function ScriptButtonInitFunction(control, unitList, subCheck)
     local result = nil
     local mixed = false
     for i, v in unitList do
@@ -609,10 +609,67 @@ local function ScriptButtonInitFunction(control, unitList, toggleCheck)
         control._mixedIcon = Bitmap(control, UIUtil.UIFile('/game/orders-panel/question-mark_bmp.dds'))
         LayoutHelpers.AtRightTopIn(control._mixedIcon, control, -2, 2)
     end
-    if not toggleCheck then
+    if not subCheck then
         control:SetCheck(result) -- Selected state
     else
-        return result, mixed
+        return result, mixed -- Return our values so our meta button can do what it likes with them
+    end
+end
+
+local function StatToggleOrderBehavior(self, modifiers, subState)
+    local state
+    if subState ~= nil then
+        state = subState
+    else
+        state = self:IsChecked()
+    end
+    local mixed = false
+    if self._mixedIcon then
+        mixed = true
+        self._mixedIcon:Destroy()
+        self._mixedIcon = nil
+    end
+
+    -- Mixed shields get special behaviour: turn everything on, not off.
+    if mixed then
+        SimCallback( { Func="SetStatByCallback", Args= {[self._data.statToggle] = true}}, true )
+    else
+        SimCallback( { Func="SetStatByCallback", Args= {[self._data.statToggle] = not state}}, true)
+    end
+
+    if controls.mouseoverDisplay.text then
+        controls.mouseoverDisplay.text:SetText(self._curHelpText)
+    end
+    if subState == nil then
+        Checkbox.OnClick(self)
+    else
+        return (mixed and true) or (not state)
+    end
+end
+
+local function StatToggleInitFunction(control, unitList, subCheck)
+    local result = nil
+    local mixed = false
+    for i, v in unitList do
+        local thisUnitStatus = (v:GetStat(control._data.statToggle, 0).Value == 1 and true) or false
+        if result == nil then
+            result = thisUnitStatus
+        else
+            if thisUnitStatus ~= result then
+                mixed = true
+                result = true
+                break
+            end
+        end
+    end
+    if mixed then
+        control._mixedIcon = Bitmap(control, UIUtil.UIFile('/game/orders-panel/question-mark_bmp.dds'))
+        LayoutHelpers.AtRightTopIn(control._mixedIcon, control, -2, 2)
+    end
+    if not subCheck then
+        control:SetCheck(result) -- Selected state
+    else
+        return result, mixed -- Return our values so our meta button can do what it likes with them
     end
 end
 
@@ -1015,24 +1072,23 @@ AutoDeployBehavior = function(self, modifiers)
     if modifiers.Left then
         StandardOrderBehavior(self, modifiers)
     elseif modifiers.Right then
-        ScriptButtonOrderBehavior(self, modifiers, self.toggle)
-        self.toggle = not self.toggle
-        if self.toggle then
-            self.toggleIcon:SetAlpha(1)
+        self._toggleState = StatToggleOrderBehavior(self, modifiers, self._toggleState)
+        if self._toggleState then
+            self._toggleIcon:SetAlpha(1)
         else
-            self.toggleIcon:SetAlpha(0)
+            self._toggleIcon:SetAlpha(0)
         end
     end
 end
 
 AutoDeployInit = function(self, selection)
     self._order = 'RULEUCC_Transport'
-    self.toggleIcon = Bitmap(self, UIUtil.UIFile('/game/orders/ring-yellow_mod.dds'))
-    LayoutHelpers.AtCenterIn(self.toggleIcon, self)
+    self._toggleIcon = Bitmap(self, UIUtil.UIFile('/game/orders/ring-yellow_mod.dds'))
+    LayoutHelpers.AtCenterIn(self._toggleIcon, self)
     local mixed
-    self.toggle, mixed = ScriptButtonInitFunction(self, selection, true)
-    if mixed or not self.toggle then
-        self.toggleIcon:SetAlpha(0)
+    self._toggleState, mixed = StatToggleInitFunction(self, selection, true)
+    if mixed or not self._toggleState then
+        self._toggleIcon:SetAlpha(0)
     end
 end
 
