@@ -393,9 +393,14 @@ end
 ---@field Area number
 ---@field Center Vector
 ---@field Identifier NavSectionIdentifier
+---@field Label NavLabelIdentifier
 ---@field Leaves NavLeaf[]
 ---@field Neighbors NavSectionIdentifier[]
 ---@field Tree NavTreeIdentifier
+---@field HeapFrom NavSectionIdentifier
+---@field HeapIdentifier number
+---@field HeapAcquiredCosts number
+---@field HeapTotalCosts number
 
 ---@class NavLeaf 
 ---@field Root NavTree
@@ -406,8 +411,8 @@ end
 ---@field px number                 # x-coordinate of center in world space
 ---@field pz number                 # z-coordinate of center in world space
 ---@field From? NavLeaf             # Populated during path finding
----@field AcquiredCosts? number     # Populated during path finding
----@field TotalCosts? number        # Populated during path finding
+---@field HeapAcquiredCosts? number     # Populated during path finding
+---@field HeapTotalCosts? number        # Populated during path finding
 ---@field Seen? number              # Populated during path finding
 
 --- A simplified quad tree that acts as a compression of the pathing capabilities of a section of the heightmap
@@ -1661,6 +1666,7 @@ local function ComputeTreeInformation(mapHasWater)
                     ---@type NavSection
                     local section = {
                         Identifier = identifier,
+                        Label = leaf.Label,
                         Neighbors = { },
                         Leaves = { },
                         Tree = tree.Identifier,

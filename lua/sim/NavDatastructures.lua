@@ -61,7 +61,7 @@ Stack = ClassSimple {
 }
 
 ---@class NavHeap
----@field Heap NavLeaf[]
+---@field Heap NavSection[]
 ---@field HeapSize number
 NavHeap = ClassSimple {
 
@@ -83,7 +83,7 @@ NavHeap = ClassSimple {
     end,
 
     ---@param self NavHeap
-    ---@return NavLeaf?
+    ---@return NavSection?
     ExtractMin = function(self)
         local heap = self.Heap
         local heapSize = self.HeapSize
@@ -124,13 +124,13 @@ NavHeap = ClassSimple {
 
             -- if there is a right child, compare its value with the left one
             -- if right is smaller, then assign min = right. Else, keep min on left.
-            if right <= heapSize and (heap[right].TotalCosts < heap[left].TotalCosts) then
+            if right <= heapSize and (heap[right].HeapTotalCosts < heap[left].HeapTotalCosts) then
                 min = right
             end
 
             -- if min has higher value than the index it means we restored heap properties
             -- and can break the loop
-            if heap[min].TotalCosts > heap[index].TotalCosts then
+            if heap[min].HeapTotalCosts > heap[index].HeapTotalCosts then
                 return
             end
 
@@ -156,7 +156,7 @@ NavHeap = ClassSimple {
         while parent >= 1 do
 
             -- if parent value is smaller than index value it means we restored correct order of the elements
-            if heap[parent].TotalCosts < heap[index].TotalCosts then
+            if heap[parent].HeapTotalCosts < heap[index].HeapTotalCosts then
                 return
             end
 
@@ -173,7 +173,7 @@ NavHeap = ClassSimple {
     end,
 
     ---@param self NavHeap
-    ---@param element NavLeaf
+    ---@param element NavSection
     Insert = function(self, element)
         self.HeapSize = self.HeapSize + 1
         self.Heap[self.HeapSize] = element

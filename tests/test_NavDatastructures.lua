@@ -8,7 +8,7 @@ require "../lua/sim/NavDatastructures.lua"
 ---@param cost number
 local function AsLeaf(cost)
     -- Heap computes value of current node using this value
-    return { TotalCosts = cost }
+    return { HeapTotalCosts = cost }
 end
 
 luft.describe("NavDatastructures", function()
