@@ -1329,8 +1329,6 @@ function RetreatDirectionFrom(layer, origin, threat, distance)
     return waypoint
 end
 
-local DirectionToPath = { }
-
 --- Computes a waypoint that represents the direction towards a destination
 ---@param layer NavLayers
 ---@param origin Vector
@@ -1338,139 +1336,44 @@ local DirectionToPath = { }
 ---@return Vector?              
 ---@return ('SystemError' | 'NotGenerated' | 'InvalidLayer' | 'OutsideMap' | 'OriginOutsideMap' | 'OriginUnpathable' | 'DestinationOutsideMap' | 'DestinationUnpathable' | 'Unpathable') | number      
 function DirectionTo(layer, origin, destination, distance)
-    -- check if generated
-    if not NavGenerator.IsGenerated() then
-        return nil, 'NotGenerated'
+    local path, count, length = PathTo(layer, origin, destination)
+
+    if not (path and count and length) then
+        return nil, count
     end
 
-    -- check if we can path
-    local ok, msg = CanPathTo(layer, origin, destination)
-    if not ok then
-        return nil, msg
-    end
-
-    -- setup pathing
-    local seenIdentifier = PathToGetUniqueIdentifier()
-    local grid = FindGrid(layer)                        --[[@as NavGrid]]
-    local originLeaf = FindLeaf(grid, origin)           --[[@as NavLeaf]]
-    local destinationLeaf = FindLeaf(grid, destination) --[[@as NavLeaf]]
-
-    -- 0th iteration of search
-    originLeaf.HeapFrom = nil
-    originLeaf.HeapAcquiredCosts = 0
-    originLeaf.HeapTotalCosts = DistanceTo(originLeaf, destinationLeaf)
-    originLeaf.HeapIdentifier = seenIdentifier
-
-    -- start using the navigational heap
-    PathToHeap:Clear()
-    PathToHeap:Insert(originLeaf)
-
-    destinationLeaf.HeapFrom = nil
-    destinationLeaf.HeapAcquiredCosts = 0
-    destinationLeaf.HeapTotalCosts = 0
-    destinationLeaf.HeapIdentifier = 0
-
-    -- search iterations
-    while not PathToHeap:IsEmpty() do
-
-        local leaf = PathToHeap:ExtractMin() --[[@as NavLeaf]]
-
-        -- final state
-        if leaf == destinationLeaf then
-            break
-        end
-
-        -- continue state
-        for k = 1, TableGetn(leaf) do
-            local neighbor = NavGenerator.NavLeaves[leaf[k]]
-            if neighbor.Label > 0 and neighbor.HeapIdentifier != seenIdentifier then
-                local preferLargeNeighbor = 0
-                if leaf.Size > neighbor.Size then
-                    preferLargeNeighbor = 100
-                end
-                neighbor.HeapFrom = leaf
-                neighbor.HeapIdentifier = seenIdentifier
-                neighbor.HeapAcquiredCosts = leaf.HeapAcquiredCosts + DistanceTo(leaf, neighbor) + 2 + preferLargeNeighbor
-                neighbor.HeapTotalCosts = neighbor.HeapAcquiredCosts + 0.25 * DistanceTo(destinationLeaf, neighbor)
-
-                PathToHeap:Insert(neighbor)
-            end
-        end
-    end
-
-    -- check if we found a path
-    if not destinationLeaf.HeapIdentifier == seenIdentifier then
-        return nil, 'SystemError'
-    end
-
-    -- construct current path
-    local head = 1
-    local path = DirectionToPath
-    local length = 0
-    local leaf = destinationLeaf
-    while leaf.HeapFrom and leaf.HeapFrom != leaf do
-
-        -- add to path
-        local waypoint = path[head] or { }
-        path[head] = waypoint
-        head = head + 1
-
-        waypoint[1] = leaf.px
-        waypoint[2] = 0
-        waypoint[3] = leaf.pz
-
-        -- keep track of distance
-        length = length + DistanceTo(leaf, leaf.HeapFrom)
-
-        -- continue down the tree
-        leaf = leaf.HeapFrom
-    end
-
-    -- add origin to the list
-    local waypoint = path[head] or { }
-    path[head] = waypoint
-    waypoint[1] = originLeaf.px
-    waypoint[2] = 0
-    waypoint[3] = originLeaf.pz
-
-    -- total path length is too short
-    if length <= distance then
+    -- too close to the destination
+    if length < distance then
         return destination, length
     end
 
-    -- not enough steps, likely a line
-    if head <= 2 then
-        return destination, length
-    end
-
-    -- determine waypoint to pass back
-    local lastWaypoint = origin
-    local taken = 0
-    local output = { destination[1], destination[2], destination[3] }
-
-    -- traverse the path
-    for k = head, 2, -1 do
-
-        local waypoint = path[k]
-        local dx = waypoint[1] - lastWaypoint[1]
-        local dz = waypoint[3] - lastWaypoint[3]
+    -- try to match the distance that we intend to move
+    local toTravel = distance
+    local curr = origin
+    for k = 1, count do
+        local next = path[k]
+        local dx = curr[1] - next[1]
+        local dz = curr[3] - next[3]
         local d = MathSqrt(dx * dx + dz * dz)
 
-        if d + taken < distance then
-            taken = taken + d
-            lastWaypoint = waypoint
+        if toTravel > d then
+            toTravel = toTravel - d
         else
-            output[1] = waypoint[1]
-            output[3] = waypoint[3]
-            output[2] = GetSurfaceHeight(output[1], output[3])
-
-            break
+            local factor = toTravel / d
+            local px = (1 - factor) * curr[1] + (factor) * next[1]
+            local pz = (1 - factor) * curr[3] + (factor) * next[3]
+            return {
+                px,
+                GetSurfaceHeight(px, pz),
+                pz
+            }, distance
         end
 
-        lastWaypoint = waypoint
+        curr = next
     end
 
-    return output, distance
+    -- fallback that should never happen
+    return destination, distance
 end
 
 --- Returns true when the origin is in the playable area
