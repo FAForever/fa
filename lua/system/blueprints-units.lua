@@ -554,6 +554,15 @@ function PostProcessUnitWithExternalFactory(allBlueprints, unit)
         efBlueprint.SelectionMeshScaleZ = unit.ExternalFactory.SelectionMeshScaleZ or 1
         efBlueprint.Display.UniformScale = unit.ExternalFactory.UniformScale or 1.6
 
+        -- add our select button override
+        if not efBlueprint.General.OrderOverrides then
+            efBlueprint.General.OrderOverrides = {}
+        end
+        efBlueprint.General.OrderOverrides.ExFac = {
+            bitmapId = 'exfacunit',
+            helpText = 'external_factory_unit',
+        }
+
         -- add order overrides to carriers
         if unit.CategoriesHash['CARRIER'] then
 
