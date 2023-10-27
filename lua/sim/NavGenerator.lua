@@ -335,9 +335,6 @@ NavGrid = ClassNavGrid {
     --- Draws all trees with the correct layer color
     ---@param self NavGrid
     Draw = function(self)
-
-        local count = 10
-
         for z = 0, LabelCompressionTreesPerAxis - 1 do
             for x = 0, LabelCompressionTreesPerAxis - 1 do
                 local tree = self.Trees[z][x]
@@ -1775,17 +1772,15 @@ local function ComputeTreeInformation(mapHasWater)
 
                 -- find neighbors for each section
                 local section = sections[s] --[[@as (NavSection)]]
-                if section.Area > thresholdArea then
-                    for l = 1, TableGetn(section.Leaves) do
-                        local leaf = section.Leaves[l]
+                for l = 1, TableGetn(section.Leaves) do
+                    local leaf = section.Leaves[l]
 
-                        for n = 1, TableGetn(leaf) do
-                            local neighbor = NavLeaves[leaf[n]]
-                            local neighborTree = neighbor.Root --[[@as NavTree]]
-                            local neighborSection = NavSections[neighbor.Section] --[[@as NavSection]]
-                            if (neighbor.Label > 0) and (neighborTree ~= tree) and (neighborSection.Area > thresholdArea) then
-                                section.Neighbors[neighborSection.Identifier] = true
-                            end
+                    for n = 1, TableGetn(leaf) do
+                        local neighbor = NavLeaves[leaf[n]]
+                        local neighborTree = neighbor.Root --[[@as NavTree]]
+                        local neighborSection = NavSections[neighbor.Section] --[[@as NavSection]]
+                        if (neighbor.Label > 0) and (neighborTree ~= tree) and (neighborSection.Area > thresholdArea) then
+                            section.Neighbors[neighborSection.Identifier] = true
                         end
                     end
                 end
