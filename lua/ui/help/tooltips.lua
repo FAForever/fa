@@ -997,6 +997,10 @@ Tooltips = {
         title = '<LOC OPTIONS_0240>Template Name Cutoff',
         description = '<LOC OPTIONS_0266>The first 7 characters are displayed (default). Number of characters omitted can be customized. (Needs restart for effects to be visible.)',
     },
+    options_gui_template_merge_context_ingame = {
+        title = '<LOC gui_template_merge_context_ingame_title>Merge context based and normal templates',
+        description = '<LOC gui_template_merge_context_ingame_desc>Show ingame templates instead of default ones when hovering over empty land/water.',
+    },
     options_gui_detailed_unitview = {
         title = '<LOC OPTIONS_0241>Display More Unit Stats',
         description = '<LOC OPTIONS_0267>Displays Shield Hp, Regen rate, Hp Regen rate and Build rate. Adapted from Total Veterancy by Eni.',

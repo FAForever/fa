@@ -398,6 +398,23 @@ options = {
             },
 
             {
+                title = "<LOC gui_template_merge_context_ingame_title>Merge context based and normal templates",
+                key = 'gui_template_merge_context_ingame',
+                type = 'toggle',
+                default = "off",
+                set = function(key, value, startup)
+                    if GetCurrentUIState() == 'game' then
+                        import("/lua/ui/game/hotkeys/context-based-templates.lua").UseIngametemplates = value == 'on'
+                    end
+                end,
+                custom = {
+                    states = {
+                        { text = "<LOC _Off>Off", key = "off" },
+                        { text = "<LOC _On>On", key = "on" },
+                    },
+                },
+            },
+            {
                 title = '<LOC OPTIONS_0324>Control groups',
                 type = 'header',
 
