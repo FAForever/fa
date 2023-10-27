@@ -15,11 +15,21 @@ local SDFSihEnergyRifleSniperMode = SeraphimWeapons.SDFSniperShotSniperMode
 ---@class XSL0305 : SLandUnit
 ---@field TrashSniperFx TrashBag
 ---@field isSniperFiringMode boolean -- Whether the sniper mode is active for next shot
----@field isSniperMoveMode boolean -- Whether the sniper mode speed slowdown is active. Is active during sniper mode.
+---@field isSniperMoveMode boolean -- Whether the sniper mode speed slowdown is active. Is active during sniper mode shot cooldown.
 XSL0305 = ClassUnit(SLandUnit) {
     Weapons = {
         -- used for both modes of operation
-        MainGun = ClassWeapon(SDFSihEnergyRifleNormalMode) {},
+        MainGun = ClassWeapon(SDFSihEnergyRifleNormalMode) {
+            RackSalvoFiringState = State(SDFSihEnergyRifleNormalMode.RackSalvoFiringState) {
+                Main = function(self)
+                    if self.unit.isSniperFiringMode ~= nil then
+                        self.unit:ScheduleMovementChange(0, true)
+                        self.unit:ScheduleMovementChange(1 / self:GetWeaponRoF(), false)
+                    end
+                    SDFSihEnergyRifleNormalMode.RackSalvoFiringState.Main(self)
+                end,
+            }
+        },
         -- kind of a dummy weapon that carries the data of the sniper mode for the main gun
         SniperGun = ClassWeapon(SDFSihEnergyRifleSniperMode) {},
     },
@@ -76,7 +86,7 @@ XSL0305 = ClassUnit(SLandUnit) {
             self.Trash:Add(ForkThread(function()
                 self.isChangingMoveMode = true
                 WaitSeconds(delaySeconds)
-                switchToMoveMode(self.isSniperFiringMode)
+                switchToMoveMode(mode)
                 self.isChangingMoveMode = nil
                 end))
         end
@@ -89,16 +99,13 @@ XSL0305 = ClassUnit(SLandUnit) {
         self.isSniperFiringMode = mode
         if mode then
             label = "SniperGun"
+            self.isSniperFiringMode = true
         else
             label = "MainGun"
+            self.isSniperFiringMode = nil
         end
         
         local weapon = self:GetWeaponByLabel("MainGun")
-
-        -- We will reload 0.1 seconds this current tick.
-        local reloadTimeLeft = math.max(0, (1 - weapon:GetFireClockPct()) / (weapon:GetWeaponRoF()) - 0.1)
-        self.ScheduleMovementChange(self, reloadTimeLeft, mode)
-        
         local bp = self:GetWeaponByLabel(label):GetBlueprint()
         -- a lot of the firing sequence relies on the stored blueprint - we'll store the current
         -- weapon blueprint so that it works
