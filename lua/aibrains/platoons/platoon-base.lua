@@ -439,6 +439,48 @@ AIPlatoon = Class(moho.platoon_methods) {
         return units, head - 1
     end,
 
+    ---@param self AIPlatoon
+    ---@return Vector?
+    GetPlatoonPosition = function(self)
+        if IsDestroyed(self) then
+            return nil
+        end
+
+        -- retrieve average position
+        local position = AIPlatoonMoho.GetPlatoonPosition(self)
+        if not position then
+            return nil
+        end
+
+        -- retrieve units
+        local units, unitCount = self:GetPlatoonUnits()
+        if unitCount == 0 then
+            return nil
+        end
+
+        local px = position[1]
+        local pz = position[3]
+
+        -- try to find the unit closest to the center
+        local nx, ny, nz, distance
+        for k = 1, unitCount do
+            local unit = units[k]
+            local ux, uy, uz = unit:GetPositionXYZ()
+            local dx = ux - px
+            local dz = uz - pz
+            local d = dx * dx + dz * dz
+
+            if (not distance) or d < distance then
+                nx = ux
+                ny = uy
+                nz = uz
+                distance = d
+            end
+        end
+
+        return { nx, ny, nz }
+    end,
+
 
     --- This disbands the state machine platoon and sets engineers back to a manager.
     ---@param self AIPlatoon

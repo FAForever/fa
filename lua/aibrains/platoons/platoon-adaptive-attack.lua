@@ -78,17 +78,12 @@ AIPlatoonAdaptiveAttackBehavior = Class(AIPlatoon) {
 
             self:Stop()
 
-            -- pick random unit
-            local units, unitCount = self:GetPlatoonUnits()
-            local unit = units[Random(1, unitCount)]
-
-            if not unit then
-                LOG("No unit!")
-                reprsl(units)
+            local position = self:GetPlatoonPosition()
+            if not position then
+                return
             end
 
-            -- determine navigational label of that unit
-            local position = unit:GetPosition()
+            local units, unitCount = self:GetPlatoonUnits()
             local label, error = NavUtils.GetLabel('Land', position)
 
             if label then
@@ -148,14 +143,11 @@ AIPlatoonAdaptiveAttackBehavior = Class(AIPlatoon) {
             if not self.CurrentPlatoonThreat then
                 self.CurrentPlatoonThreat = self:CalculatePlatoonThreat('Surface', categories.ALLUNITS)
             end
-            local units = self:GetPlatoonUnits()
-            local origin
-            for _, v in units do
-                if v and not v.Dead then
-                    origin = v:GetPosition()
-                    break
-                end
+            local origin = self:GetPlatoonPosition()
+            if not origin then
+                return
             end
+
             local brain = self:GetBrain()
             local path, reason =  NavUtils.PathToWithThreatThreshold(self.MovementLayer, origin, destination, brain, NavUtils.ThreatFunctions.AntiSurface, 200, brain.IMAPConfig.Rings)
             if not path then
@@ -207,18 +199,12 @@ AIPlatoonAdaptiveAttackBehavior = Class(AIPlatoon) {
                         return
                     end
 
-                    local position
-                    units = self:GetPlatoonUnits()
-                    for _, v in units do
-                        if v and not v.Dead then
-                            position = v:GetPosition()
-                            break
-                        end
-                    end
-
+                    local position = self:GetPlatoonPosition()
                     if not position then
                         return
                     end
+
+                    units = self:GetPlatoonUnits()
 
                     local threat = brain:GetThreatAtPosition(position, 1, true, 'AntiSurface')
                     if threat > 0 then
@@ -343,6 +329,10 @@ AIPlatoonAdaptiveAttackBehavior = Class(AIPlatoon) {
 
                 -- check for threats
                 local position = self:GetPlatoonPosition()
+                if not position then
+                    return
+                end
+
                 local threat = brain:GetThreatAtPosition(position, 1, true, 'AntiSurface')
                 if threat > 0 then
                     local threatTable = brain:GetThreatsAroundPosition(position, 1, true, 'AntiSurface')
@@ -425,7 +415,6 @@ AIPlatoonAdaptiveAttackBehavior = Class(AIPlatoon) {
                     return
                 end
 
-
                 local threat = brain:GetThreatAtPosition(position, 1, true, 'AntiSurface')
                 if threat > 0 then
                     local threatTable = brain:GetThreatsAroundPosition(position, 1, true, 'AntiSurface')
@@ -484,12 +473,16 @@ AIPlatoonAdaptiveAttackBehavior = Class(AIPlatoon) {
             local platoonUnits, platoonCount = self:GetPlatoonUnits()
 
             while not IsDestroyed(self) do
-
                 local position = self:GetPlatoonPosition()
+                if not position then
+                    return
+                end
+
                 local waypoint, error = NavUtils.RetreatDirectionFrom('Land', position, location, 40)
 
                 if not waypoint then
-                    -- do something
+                    LOG("Stuck, nowhere to retreat to!")
+                    self:ChangeState(self.Error)
                     return
                 end
 
