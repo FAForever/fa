@@ -418,6 +418,13 @@ function WrapAndPlaceText(bp, builder, descID, control)
     --Unit description
     local text = LOC(UnitDescriptions[descID])
     if text and text ~='' then
+        local UpgradeDescription
+        if bp.Enhancements then
+            UpgradeDescription = LOCF(('<LOC Unit_Description_0006>Increases the speed at which the ACU repairs itself.\n\n+%d Health\n+%d Regen'),
+            bp.Enhancements.DamageStabilization.NewHealth,
+            bp.Enhancements.DamageStabilization.NewRegenRate)
+            table.insert(blocks, {color = UIUtil.fontColor, lines = {''}})
+        end
         table.insert(blocks, {color = UIUtil.fontColor,
             lines = WrapText(text, control.Value[1].Width(), function(text)
                 return control.Value[1]:GetStringAdvance(text)
