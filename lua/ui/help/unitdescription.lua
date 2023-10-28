@@ -15,7 +15,7 @@ Description = {
     ['uel0001-aes'] = "<LOC Unit_Description_0005> Grants Tech 2 schematic access and increases the ACU's build speed and maximum health.\n\n+%d Buildpower\n+%d Health\n+%d Regen",
     ['uel0001-dsu'] = "<LOC Unit_Description_0006> Increases the speed at which the ACU repairs itself.\n\n+%d Health\n+%d Regen",
     ['uel0001-ees'] = "<LOC Unit_Description_0007> Grants Tech 3 and Experimental schematic access and further increases the ACU's build speed and maximum health.\n\n+%d Buildpower\n+%d Health\n+%d Regen",
-    ['uel0001-hamc'] = "<LOC Unit_Description_0008> "Doubles the main cannon's damage, and increases its range and that of Overcharge.\n\n+%d Main cannon damage\n%d Main cannon range",
+    ['uel0001-hamc'] = "<LOC Unit_Description_0008> Doubles the main cannon's damage, and increases its range and that of Overcharge.\n\n+%d Main cannon damage\n%d Main cannon range",
     ['uel0001-srtn'] = "<LOC Unit_Description_0009> Tactical Cruise Missiles replaced by much more expensive, powerful Tactical Nuclear Missiles.",
     ['uel0001-pqt'] = "<LOC Unit_Description_0010> Adds Teleportation capability. Requires considerable energy to activate.",
     ['uel0001-sgf'] = "<LOC Unit_Description_0011> Creates a Bubble Shield around the ACU, which protects friendly units inside it. If present, the shield will transfer a portion of the damage received to intersecting shield bubbles. Requires energy to run.\n\nShield Regen Rate = %d HP/s\nShield Recharge Time = %d seconds",
