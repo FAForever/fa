@@ -104,6 +104,8 @@ NavHeap = ClassSimple {
         -- fix its position.
         self:Heapify()
 
+        -- DrawCircle(value.Center, 5, '9999ff')
+
         return value
     end,
 
@@ -178,5 +180,8 @@ NavHeap = ClassSimple {
         self.HeapSize = self.HeapSize + 1
         self.Heap[self.HeapSize] = element
         self:Rootify()
+
+        -- DrawCircle(element.Center, 5, '999999')
+
     end,
 }

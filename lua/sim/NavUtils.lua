@@ -611,7 +611,7 @@ ThreatFunctions = Shared.ThreatFunctions
 ---@param threatThreshold number
 ---@param threatRadius number
 ---@return Vector[]?            # List of positions
----@return (('SystemError' | 'NotGenerated' | 'InvalidLayer' | 'OutsideMap' | 'OriginOutsideMap' | 'OriginUnpathable' | 'DestinationOutsideMap' | 'DestinationUnpathable' | 'Unpathable') | number)?   # Error message, or the number of positions
+---@return (('SystemError' | 'NotGenerated' | 'InvalidLayer' | 'OutsideMap' | 'OriginOutsideMap' | 'OriginUnpathable' | 'DestinationOutsideMap' | 'DestinationUnpathable' | 'Unpathable' | 'NoResults') | number)?   # Error message, or the number of positions
 ---@return number?              # Length of path
 function PathToWithThreatThreshold(layer, origin, destination, aibrain, threatFunc, threatThreshold, threatRadius)
     -- check if generated
@@ -625,60 +625,54 @@ function PathToWithThreatThreshold(layer, origin, destination, aibrain, threatFu
         return nil, msg
     end
 
+    -- local scope for performance
+    local NavSections = NavGenerator.NavSections
+
     -- setup pathing
     local seenIdentifier = PathToGetUniqueIdentifier()
-    local grid = FindGrid(layer)                        --[[@as NavGrid]]
-    local originLeaf = FindLeaf(grid, origin)           --[[@as NavLeaf]]
-    local destinationLeaf = FindLeaf(grid, destination) --[[@as NavLeaf]]
+    local grid = FindGrid(layer)                                --[[@as NavGrid]]
+    local originSection = FindSection(grid, origin)             --[[@as NavSection]]
+    local destinationSection = FindSection(grid, destination)   --[[@as NavSection]]
 
     -- 0th iteration of search
-    originLeaf.HeapFrom = nil
-    originLeaf.HeapAcquiredCosts = 0
-    originLeaf.HeapTotalCosts = DistanceTo(originLeaf, destinationLeaf)
-    originLeaf.HeapIdentifier = seenIdentifier
+    originSection.HeapFrom = nil
+    originSection.HeapAcquiredCosts = 0
+    originSection.HeapTotalCosts = DistanceTo(originSection, destinationSection)
+    originSection.HeapIdentifier = seenIdentifier
 
     -- start using the navigational heap
     PathToHeap:Clear()
-    PathToHeap:Insert(originLeaf)
+    PathToHeap:Insert(originSection)
 
-    destinationLeaf.HeapFrom = nil
-    destinationLeaf.HeapAcquiredCosts = 0
-    destinationLeaf.HeapTotalCosts = 0
-    destinationLeaf.HeapIdentifier = 0
+    destinationSection.HeapFrom = nil
+    destinationSection.HeapAcquiredCosts = 0
+    destinationSection.HeapTotalCosts = 0
+    destinationSection.HeapIdentifier = 0
 
     -- search iterations
     while not PathToHeap:IsEmpty() do
 
-        local leaf = PathToHeap:ExtractMin() --[[@as NavLeaf]]
+        local section = PathToHeap:ExtractMin() --[[@as NavSection]]
 
-        -- did we reach the destination?
-        if leaf == destinationLeaf then
+        -- final state
+        if section == destinationSection then
             break
         end
 
-        -- search through neighbors
-        for k = 1, TableGetn(leaf) do
-            local neighbor = NavGenerator.NavLeaves[leaf[k]]
+        local neighbors = section.Neighbors
+
+        -- continue state
+        for k = 1, TableGetn(neighbors) do
+            local neighbor = NavSections[neighbors[k]]
+            local threat = threatFunc(aibrain, neighbor.Center, threatRadius)
             if neighbor.Label > 0 and neighbor.HeapIdentifier != seenIdentifier then
-                local preferLargeNeighbor = 0
-                if leaf.Size > neighbor.Size then
-                    preferLargeNeighbor = 100
-                end
-
-                -- update threat state
-                local root = neighbor.Root
-                if neighbor.HeapIdentifier != seenIdentifier then
-                    root.Threat = threatFunc(aibrain, {neighbor.px, 0, neighbor.pz}, threatRadius)
-                end
-
-                -- update pathing state
-                neighbor.HeapFrom = leaf
-                neighbor.HeapIdentifier = seenIdentifier
-                neighbor.HeapAcquiredCosts = leaf.HeapAcquiredCosts + DistanceTo(leaf, neighbor) + 2 + preferLargeNeighbor
-                neighbor.HeapTotalCosts = neighbor.HeapAcquiredCosts + 0.25 * DistanceTo(destinationLeaf, neighbor)
-
-                -- include in search when threat is low enough
-                if root.Threat <= threatThreshold then
+                if threat > threatThreshold then
+                    neighbor.HeapIdentifier = seenIdentifier
+                else
+                    neighbor.HeapIdentifier = seenIdentifier
+                    neighbor.HeapFrom = section.Identifier
+                    neighbor.HeapAcquiredCosts = section.HeapAcquiredCosts + DistanceTo(section, neighbor)
+                    neighbor.HeapTotalCosts = neighbor.HeapAcquiredCosts + DistanceTo(destinationSection, neighbor)
                     PathToHeap:Insert(neighbor)
                 end
             end
@@ -686,16 +680,18 @@ function PathToWithThreatThreshold(layer, origin, destination, aibrain, threatFu
     end
 
     -- check if we found a path
-    if not destinationLeaf.HeapIdentifier == seenIdentifier then
-        return nil, 'SystemError'
+    if destinationSection.HeapIdentifier ~= seenIdentifier then
+        return nil, 'NoResults'
     end
 
-    local path, head, distance = TracePath(destinationLeaf)
+    local sections, sectionCount = TracePath(destinationSection)
+    local positions, positionCount, distance = PathToPositions(grid, originSection.Label, originSection, destination, sections, sectionCount)
 
-    DebugRegisterPath('PathToWithThreatThreshold', path, origin, destination)
+    -- debugging!
+    DebugRegisterPath('PathTo', positions, origin, destination)
 
     -- return all the goodies!!
-    return path, head, distance
+    return positions, positionCount, distance
 end
 
 --- Returns a label that indicates to what sub-graph it belongs to. Unlike `GetTerrainLabel` this function will try to find the nearest valid neighbor
