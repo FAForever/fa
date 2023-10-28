@@ -421,7 +421,7 @@ AIPlatoon = Class(moho.platoon_methods) {
 
         -- populate the cache
         local head = 1
-        for k, unit in units do
+        for _, unit in units do
             if not IsDestroyed(unit) then
                 units[head] = unit
                 head = head + 1
@@ -439,10 +439,57 @@ AIPlatoon = Class(moho.platoon_methods) {
         return units, head - 1
     end,
 
+    --- Returns the position of the unit that is nearest to the center of the platoon.
+    ---@param self AIPlatoon
+    ---@return Vector?
+    GetPlatoonPosition = function(self)
+        if IsDestroyed(self) then
+            return nil
+        end
+
+        -- retrieve average position
+        local position = AIPlatoonMoho.GetPlatoonPosition(self)
+        if not position then
+            return nil
+        end
+
+        -- retrieve units
+        local units, unitCount = self:GetPlatoonUnits()
+        if unitCount == 0 then
+            return nil
+        end
+
+        local px = position[1]
+        local pz = position[3]
+
+        -- try to find the unit closest to the center
+        local nx, ny, nz, distance
+        for k = 1, unitCount do
+            local unit = units[k]
+            local ux, uy, uz = unit:GetPositionXYZ()
+            local dx = ux - px
+            local dz = uz - pz
+            local d = dx * dx + dz * dz
+
+            if (not distance) or d < distance then
+                nx = ux
+                ny = uy
+                nz = uz
+                distance = d
+            end
+        end
+
+        return { nx, ny, nz }
+    end,
+
 
     --- This disbands the state machine platoon and sets engineers back to a manager.
     ---@param self AIPlatoon
     ExitStateMachine = function(self)
+        if IsDestroyed(self) then
+            return
+        end
+
         local brain = self:GetBrain()
         local platUnits = self:GetPlatoonUnits()
         if platUnits then
@@ -501,6 +548,11 @@ AIPlatoon = Class(moho.platoon_methods) {
         info.PlatoonName = self.PlatoonName
         info.StateName = self.StateName
         info.DebugMessages = self.DebugMessages
+        table.sort(self.DebugMessages,
+            function (a, b)
+                return a > b
+            end
+        )
 
         return info
     end,

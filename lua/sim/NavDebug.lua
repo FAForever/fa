@@ -129,7 +129,7 @@ function ScanOver(mouse, layer)
         local over = navGrid:FindLeaf(mouse)
         if over then
             if over.Label then
-                local color = Shared.LabelToColor(over.Label)
+                local color = Shared.LayerColors[navGrid.Layer]
                 local size = over.Size
                 local h = 0.5 * size
                 NavGenerator.DrawSquare(over.px - h, over.pz - h, size, color, 0.1)
@@ -137,10 +137,9 @@ function ScanOver(mouse, layer)
                 NavGenerator.DrawSquare(over.px - h, over.pz - h, size, color, 0.2)
 
                 for k = 1, table.getn(over) do
-                    local neighbor = NavGenerator.NavCells[over[k]]
+                    local neighbor = NavGenerator.NavLeaves[over[k]]
                     local size = neighbor.Size
                     local h = 0.5 * size
-                    local color = Shared.LabelToColor(neighbor.Label)
                     NavGenerator.DrawSquare(neighbor.px - h, neighbor.pz - h, size, color, 0.1)
                 end
             else
