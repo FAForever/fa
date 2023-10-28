@@ -98,12 +98,6 @@ AIPlatoonAdaptiveRaidBehavior = Class(AIPlatoon) {
             local units, unitCount = self:GetPlatoonUnits()
             local unit = units[Random(1, unitCount)]
 
-            if not unit then
-                LOG("No unit!")
-                reprsl(units)
-                return
-            end
-
             -- determine navigational label of that unit
             local position = unit:GetPosition()
             local label, error = NavUtils.GetLabel(self.MovementLayer, position)
