@@ -63,12 +63,11 @@ AIPlatoonAdaptiveReturnToBaseBehavior = Class(AIPlatoon) {
 
             self:Stop()
 
-            -- pick random unit
-            local units, unitCount = self:GetPlatoonUnits()
-            local unit = units[Random(1, unitCount)]
-
             -- determine navigational label of that unit
-            local position = unit:GetPosition()
+            local position = self:GetPlatoonPosition()
+            if not position then
+                return
+            end
 
             --Guard the closest least-defended base
             local bestBase = false

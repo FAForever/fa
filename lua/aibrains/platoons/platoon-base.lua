@@ -439,6 +439,7 @@ AIPlatoon = Class(moho.platoon_methods) {
         return units, head - 1
     end,
 
+    --- Returns the position of the unit that is nearest to the center of the platoon.
     ---@param self AIPlatoon
     ---@return Vector?
     GetPlatoonPosition = function(self)
@@ -485,6 +486,10 @@ AIPlatoon = Class(moho.platoon_methods) {
     --- This disbands the state machine platoon and sets engineers back to a manager.
     ---@param self AIPlatoon
     ExitStateMachine = function(self)
+        if IsDestroyed(self) then
+            return
+        end
+
         local brain = self:GetBrain()
         local platUnits = self:GetPlatoonUnits()
         if platUnits then

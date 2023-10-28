@@ -215,16 +215,16 @@ AIPlatoonAdaptiveAttackBehavior = Class(AIPlatoon) {
                             local threatTable = brain:GetThreatsAroundPosition(position, 1, true, 'AntiSurface')
                             local platoonThreat = self:CalculatePlatoonThreatAroundPosition('Surface', categories.MOBILE * categories.DIRECTFIRE - categories.SCOUT, position, 30)
                             local positionStatus = brain.GridPresence:GetInferredStatus(position)
-                            if positionStatus != 'Allied' or platoonThreat < threat then
+                            if positionStatus != 'Allied' and platoonThreat < threat then
                                 if threatTable and not TableEmpty(threatTable) then
                                     local info = threatTable[Random(1, TableGetn(threatTable))]
                                     self.ThreatToEvade = { info[1], GetSurfaceHeight(info[1], info[2]), info[2] }
-                                    self:LogDebug(string.format('We are going to retreat, enemy threat '..threat..' our threat '..platoonThreat..' position status '..positionStatus))
+                                    self:LogDebug(string.format('We are going to retreat, enemy threat '..threat..' our threat '..platoonThreat..' position status '.. tostring(positionStatus)))
                                     self:ChangeState(self.Retreating)
                                     return
                                 end
                             elseif positionStatus then
-                                self:LogDebug(string.format('We are going to attack, enemy threat '..threat..' our threat '..platoonThreat..' position status '..positionStatus))
+                                self:LogDebug(string.format('We are going to attack, enemy threat '..threat..' our threat '..platoonThreat..' position status '.. tostring(positionStatus)))
                             end
                         end
                     end
@@ -420,7 +420,7 @@ AIPlatoonAdaptiveAttackBehavior = Class(AIPlatoon) {
                     local threatTable = brain:GetThreatsAroundPosition(position, 1, true, 'AntiSurface')
                     local platoonThreat = self:CalculatePlatoonThreatAroundPosition('Surface', categories.MOBILE * categories.DIRECTFIRE - categories.SCOUT, position, 30)
                     local positionStatus = brain.GridPresence:GetInferredStatus(position)
-                    if positionStatus != 'Allied' or platoonThreat * 2 < threat then
+                    if positionStatus != 'Allied' and platoonThreat * 2 < threat then
                         if threatTable and not TableEmpty(threatTable) then
                             local info = threatTable[Random(1, TableGetn(threatTable))]
                             self.ThreatToEvade = { info[1], GetSurfaceHeight(info[1], info[2]), info[2] }
@@ -428,7 +428,7 @@ AIPlatoonAdaptiveAttackBehavior = Class(AIPlatoon) {
                             return
                         end
                     else
-                        self:LogDebug(string.format('Threat and we need to attack then since it is allied, status '..positionStatus))
+                        self:LogDebug(string.format('Threat and we need to attack then since it is allied, status '.. tostring(positionStatus)))
                     end
                 end
 
