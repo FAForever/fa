@@ -21,7 +21,6 @@ UnitBlueprint{
         "ANTIAIR",
         "BUILTBYTIER3FACTORY",
         "CARRIER",
-        "FACTORY",
         "MOBILE",
         "NAVAL",
         "NAVALCARRIER",

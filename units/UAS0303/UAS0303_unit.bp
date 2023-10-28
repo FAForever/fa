@@ -28,7 +28,6 @@ UnitBlueprint{
         "ANTIMISSILE",
         "BUILTBYTIER3FACTORY",
         "CARRIER",
-        "FACTORY",
         "MOBILE",
         "NAVAL",
         "NAVALCARRIER",

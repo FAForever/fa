@@ -45,7 +45,6 @@ UnitBlueprint{
         "CONSTRUCTION",
         "DRAGBUILD",
         "EXPERIMENTAL",
-        "FACTORY",
         "INDIRECTFIRE",
         "LAND",
         "LOWSELECTPRIO",

@@ -40,7 +40,6 @@ UnitBlueprint{
         "CARRIER",
         "DRAGBUILD",
         "EXPERIMENTAL",
-        "FACTORY",
         "INTELLIGENCE",
         "LOWSELECTPRIO",
         "MOBILE",
