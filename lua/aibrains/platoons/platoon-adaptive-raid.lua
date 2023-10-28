@@ -98,6 +98,12 @@ AIPlatoonAdaptiveRaidBehavior = Class(AIPlatoon) {
             local units, unitCount = self:GetPlatoonUnits()
             local unit = units[Random(1, unitCount)]
 
+            if not unit then
+                LOG("No unit!")
+                reprsl(units)
+                return
+            end
+
             -- determine navigational label of that unit
             local position = unit:GetPosition()
             local label, error = NavUtils.GetLabel(self.MovementLayer, position)
@@ -202,7 +208,7 @@ AIPlatoonAdaptiveRaidBehavior = Class(AIPlatoon) {
         StateName = "Navigating",
 
         --- The platoon retreats from a threat
-        ---@param self AIPlatoonLandAssaultBehavior
+        ---@param self AIPlatoonAdaptiveRaidBehavior
         Main = function(self)
             self:LogDebug('Navigating')
             if IsDestroyed(self) then
@@ -244,14 +250,14 @@ AIPlatoonAdaptiveRaidBehavior = Class(AIPlatoon) {
             local pathNodesCount = TableGetn(path)
             local attackFormation = false
             for i=1, pathNodesCount do
-                if self.Dead then
+                if IsDestroyed(self) then
                     return
                 end
                 local distEnd
                 local currentLayerSeaBed = false
                 local units = self:GetPlatoonUnits()
                 for _, v in units do
-                    if v and not v.Dead then
+                    if v and not IsDestroyed(v) then
                         if v:GetCurrentLayer() ~= 'Seabed' then
                             currentLayerSeaBed = false
                             break
@@ -280,18 +286,13 @@ AIPlatoonAdaptiveRaidBehavior = Class(AIPlatoon) {
                 local Stuck = 0
                 while not IsDestroyed(self) do
                     coroutine.yield(1)
-                    if self.Dead then
+                    if IsDestroyed(self) then
                         return
                     end
                     
-                    local position
+                    local position = self:GetPlatoonPosition()
                     units = self:GetPlatoonUnits()
-                    for _, v in units do
-                        if v and not v.Dead then
-                            position = v:GetPosition()
-                            break
-                        end
-                    end
+
                     local threat = brain:GetThreatAtPosition(position, 1, true, 'AntiSurface')
                     if threat > 0 then
                         local homeBasePosition = brain.BuilderManagers[self.LocationType].Position or brain.BuilderManagers['MAIN'].Position
@@ -408,7 +409,6 @@ AIPlatoonAdaptiveRaidBehavior = Class(AIPlatoon) {
             local command = self:AggressiveMoveToLocation(location)
 
             while not IsDestroyed(self) do
-                WaitTicks(50)
                 -- check if there is something to raid
                 local opportunity = brain:GetThreatAtPosition(location, 0, true, 'Economy')
                 if opportunity == 0 then
@@ -418,6 +418,9 @@ AIPlatoonAdaptiveRaidBehavior = Class(AIPlatoon) {
 
                 -- check for threats
                 local position = self:GetPlatoonPosition()
+                if not position then
+                    return
+                end
                 local threat = brain:GetThreatAtPosition(position, 1, true, 'AntiSurface')
                 if threat > 0 then
                     local threatTable = brain:GetThreatsAroundPosition(position, 1, true, 'AntiSurface')
@@ -428,13 +431,14 @@ AIPlatoonAdaptiveRaidBehavior = Class(AIPlatoon) {
                         return
                     end
                 end
+
                 -- check if our command is still going
                 if not self:IsCommandsActive(command) then
                     self:ChangeState(self.Searching)
                     return
                 end
 
-                WaitTicks(10)
+                WaitTicks(60)
             end
         end,
     },

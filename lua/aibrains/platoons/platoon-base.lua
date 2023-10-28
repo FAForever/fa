@@ -421,7 +421,7 @@ AIPlatoon = Class(moho.platoon_methods) {
 
         -- populate the cache
         local head = 1
-        for k, unit in units do
+        for _, unit in units do
             if not IsDestroyed(unit) then
                 units[head] = unit
                 head = head + 1
@@ -501,6 +501,11 @@ AIPlatoon = Class(moho.platoon_methods) {
         info.PlatoonName = self.PlatoonName
         info.StateName = self.StateName
         info.DebugMessages = self.DebugMessages
+        table.sort(self.DebugMessages,
+            function (a, b)
+                return a > b
+            end
+        )
 
         return info
     end,

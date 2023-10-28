@@ -82,6 +82,11 @@ AIPlatoonAdaptiveAttackBehavior = Class(AIPlatoon) {
             local units, unitCount = self:GetPlatoonUnits()
             local unit = units[Random(1, unitCount)]
 
+            if not unit then
+                LOG("No unit!")
+                reprsl(units)
+            end
+
             -- determine navigational label of that unit
             local position = unit:GetPosition()
             local label, error = NavUtils.GetLabel('Land', position)
@@ -122,7 +127,7 @@ AIPlatoonAdaptiveAttackBehavior = Class(AIPlatoon) {
         StateName = 'Navigating',
 
         --- The platoon retreats from a threat
-        ---@param self AIPlatoonLandAssaultBehavior
+        ---@param self AIPlatoonAdaptiveAttackBehavior
         Main = function(self)
             self:LogDebug('Navigating')
             if IsDestroyed(self) then
@@ -163,7 +168,7 @@ AIPlatoonAdaptiveAttackBehavior = Class(AIPlatoon) {
             local pathNodesCount = TableGetn(path)
             local attackFormation = false
             for i=1, pathNodesCount do
-                if self.Dead then
+                if IsDestroyed(self) then
                     return
                 end
                 local distEnd
@@ -198,10 +203,10 @@ AIPlatoonAdaptiveAttackBehavior = Class(AIPlatoon) {
                 local Stuck = 0
                 while not IsDestroyed(self) do
                     coroutine.yield(1)
-                    if self.Dead then
+                    if IsDestroyed(self) then
                         return
                     end
-                    
+
                     local position
                     units = self:GetPlatoonUnits()
                     for _, v in units do
@@ -210,6 +215,11 @@ AIPlatoonAdaptiveAttackBehavior = Class(AIPlatoon) {
                             break
                         end
                     end
+
+                    if not position then
+                        return
+                    end
+
                     local threat = brain:GetThreatAtPosition(position, 1, true, 'AntiSurface')
                     if threat > 0 then
                         local homeBasePosition = brain.BuilderManagers[self.LocationType].Position or brain.BuilderManagers['MAIN'].Position
@@ -346,7 +356,7 @@ AIPlatoonAdaptiveAttackBehavior = Class(AIPlatoon) {
                             return
                         end
                     else
-                        self:LogDebug(string.format('Threat and we need to attack then since it is allied, status '..positionStatus))
+                        self:LogDebug(string.format('Threat and we need to attack then since it is allied, status '.. tostring(positionStatus)))
                     end
                 end
 
@@ -411,6 +421,11 @@ AIPlatoonAdaptiveAttackBehavior = Class(AIPlatoon) {
 
                 -- check for threats
                 local position = self:GetPlatoonPosition()
+                if not position then
+                    return
+                end
+
+
                 local threat = brain:GetThreatAtPosition(position, 1, true, 'AntiSurface')
                 if threat > 0 then
                     local threatTable = brain:GetThreatsAroundPosition(position, 1, true, 'AntiSurface')
@@ -485,6 +500,9 @@ AIPlatoonAdaptiveAttackBehavior = Class(AIPlatoon) {
 
                 while not IsDestroyed(self) do
                     local position = self:GetPlatoonPosition()
+                    if not position then
+                        return
+                    end
 
                     -- check if we're near our retreat point
                     local dx = position[1] - wx
