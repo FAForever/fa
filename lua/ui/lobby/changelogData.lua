@@ -60,7 +60,7 @@ gamePatches = {
             "",
             "### Anti-projectile weaponry",
             "",
-            "In a previous developer iteration, we addressed the issue of excessive "overkill" by anti-projectile weaponry. The concept was to "lock on" to a ",
+            "In a previous developer iteration, we addressed the issue of excessive 'overkill' by anti-projectile weaponry. The concept was to 'lock on' to a ",
             "projectile, which would prevent other anti-projectile weaponry from locking on, and this generally worked well. However, there were exceptions when a ",
             "weapon maintained the lock on a projectile while reloading.",
             "",
