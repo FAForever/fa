@@ -72,8 +72,8 @@ MassFabPanel = ClassUI(Group) {
         LayoutHelpers.AtTopIn(self._collapseArrow, self._parent, -3)
         LayoutHelpers.AtHorizontalCenterIn(self._collapseArrow, self)
         LayoutHelpers.DepthOverParent(self._collapseArrow, self, 10)
-        self._collapseArrow:Disable()
-        self._collapseArrow:Hide()
+        -- self._collapseArrow:Disable()
+        -- self._collapseArrow:Hide()
 
         self._leftPanel:SetTexture(UIUtil.SkinnableFile("/game/filter-ping-panel/filter-ping-panel01_l_bmp.dds"))
         self._rightPanel:SetTexture(UIUtil.SkinnableFile("/game/filter-ping-panel/filter-ping-panel01_r_bmp.dds"))
@@ -126,7 +126,7 @@ MassFabPanel = ClassUI(Group) {
         Tooltip.AddControlTooltip(self._activeCountText, "mf_active_amount")
         Tooltip.AddControlTooltip(self._inactiveCountText, "mf_inactive_amount")
         Tooltip.AddCheckboxTooltip(self._collapseArrow, "fabricator_collapse")
-    
+
         self._energyRequiredText:SetColor("fff8c000")
         self._energyConsumedText:SetColor("fff8c000")
         self._massProducedText:SetColor("ffb7e75f")
@@ -178,11 +178,6 @@ MassFabPanel = ClassUI(Group) {
                     self:Hide()
                     self._collapseArrow:SetCheck(true, true)
                 end
-            end
-        end
-        self._collapseArrow.OnHide = function(collapse, hide)
-            if hide ~= collapse:IsDisabled() then
-                return true
             end
         end
     end,
@@ -237,21 +232,6 @@ MassFabPanel = ClassUI(Group) {
         })
     end,
 
-    OnHide = function(self, hide)
-        local supress = import("/lua/ui/game/gamecommon.lua").SupressShowingWhenRestoringUI(self, hide)
-        local collapse = self._collapseArrow
-        if collapse then
-            if supress or collapse:IsDisabled() then
-                collapse:Hide()
-                if not hide then
-                    supress = true
-                end
-            else
-                collapse:Show()
-            end
-        end
-        return supress
-    end,
+    OnHide = import("/lua/ui/game/gamecommon.lua").SupressShowingWhenRestoringUI,
 
 }
-
