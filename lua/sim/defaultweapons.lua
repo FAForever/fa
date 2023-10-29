@@ -1025,7 +1025,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
                             -- Generate UI notification for automatic nuke ping
                             local launchData = {
                                 army = self.Army - 1,
-                                location = IsAlly(self.Army, GetFocusArmy()) and self:GetCurrentTargetPos() or nil
+                                location = (GetFocusArmy() == -1 or IsAlly(self.Army, GetFocusArmy())) and self:GetCurrentTargetPos() or nil
                             }
                             if not Sync.NukeLaunchData then
                                 Sync.NukeLaunchData = {}
