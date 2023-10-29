@@ -36,7 +36,15 @@
         "ScenarioInfo"
     ],
 
-    // used for grammar checks of changelog
-    "grammarly.files.include": ["**/changelog-dev.md", "**/changelog.md", "**/*.txt"]
+    "workbench.colorCustomizations": {
+        "activityBar.background": "#0E050F",
+        "activityBar.foreground": "#9388A2",
+        "statusBar.background": "#0E050F",
+        "statusBar.foreground": "#9388A2",
+        "titleBar.activeBackground": "#0E050F",
+        "titleBar.activeForeground": "#9388A2",
+        "titleBar.inactiveBackground": "#0E050F",
+        "titleBar.inactiveForeground": "#9388A2"
+    }
 }
 
