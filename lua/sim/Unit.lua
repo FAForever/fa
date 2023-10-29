@@ -6,7 +6,6 @@
 -----------------------------------------------------------------
 
 -- Imports. Localise commonly used subfunctions for speed
-local AIUtils = import("/lua/ai/aiutilities.lua")
 local EffectTemplate = import("/lua/effecttemplates.lua")
 local EffectUtilities = import("/lua/effectutilities.lua")
 local EnhancementCommon = import("/lua/enhancementcommon.lua")
@@ -271,7 +270,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         end
 
         if self.Brain.CheatEnabled then
-            AIUtils.ApplyCheatBuffs(self)
+            import("/lua/ai/aiutilities.lua").ApplyCheatBuffs(self)
         end
 
         -- for syncing data to UI
