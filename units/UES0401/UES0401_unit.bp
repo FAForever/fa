@@ -38,7 +38,6 @@ UnitBlueprint{
         "CARRIER",
         "DRAGBUILD",
         "EXPERIMENTAL",
-        "FACTORY",
         "INTELLIGENCE",
         "LOWSELECTPRIO",
         "MOBILE",
@@ -136,11 +135,11 @@ UnitBlueprint{
             LODs = {
                 {
                     LODCutoff = 800,
-                    ShaderName = "Unit",
+                    ShaderName = "UEFNavy",
                 },
                 {
                     LODCutoff = 300,
-                    ShaderName = "Unit",
+                    ShaderName = "UEFNavy",
                     AlbedoName = "ues0401_lod1_albedo.dds",
                     SpecularName = "ues0401_lod1_specteam.dds",
                 },
@@ -212,6 +211,13 @@ UnitBlueprint{
         BuildRate = 180,
         BuildTime = 20500,
         BuildableCategory = { "BUILTBYTIER3FACTORY UEF MOBILE AIR" },
+    },
+    ExternalFactory = {
+        SelectionSizeX = 1,
+        SelectionSizeZ = 4.5,
+        SelectionCenterOffsetX = 0,
+        SelectionCenterOffsetY = 1.0,
+        SelectionCenterOffsetZ = 8,
     },
     Footprint = {
         SizeX = 6,

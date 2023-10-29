@@ -88,6 +88,27 @@ end
 Callbacks.EmptyCallback = function(data, units)
 end
 
+--- Callback takes a boolean and toggles a stat on given units between 0 and 1
+---@param data table<string, boolean>
+Callbacks.SetStatByCallback = function(data, units)
+    for stat, value in data do
+        if not type(value) == 'boolean' then
+            WARN('SetStatByCallback: received non boolean value ' .. repr(value) .. ' for stat '..repr(stat)..'!')
+            continue
+        end
+        value = (value and 1) or 0 -- numerize our bool
+        for _, u in units or {} do
+            if IsEntity(u) and OkayToMessWithArmy(u.Army) then
+                if not u.Blueprint.General.StatToggles or not u.Blueprint.General.StatToggles[stat] then
+                    WARN('SetStatByCallback: ' .. repr(stat) .. ' is not a valid stat for this unit!')
+                    continue
+                end
+                u:UpdateStat(stat, value)
+            end
+        end
+    end
+end
+
 Callbacks.AutoOvercharge = function(data, units)
     for _, u in units or {} do
         if IsEntity(u) and OkayToMessWithArmy(u.Army) and u.SetAutoOvercharge then
@@ -224,7 +245,7 @@ Callbacks.ValidateAssist = function(data, units)
     if units and target then
         for k, u in units do
             if IsEntity(u) and u.Army == target.Army and IsInvalidAssist(u, target) then
-                IssueClearCommands({ target })
+                IssueToUnitClearCommands(target)
                 return
             end
         end
@@ -647,6 +668,29 @@ local function SetWorldCameraToUnitIconAngle(location, zoom)
     })
 end
 
+local function ShowRaisedPlatforms(self)
+    local plats = self:GetBlueprint().Physics.RaisedPlatforms
+    if not plats then return end
+    local pos = self:GetPosition()
+    local entities = {}
+    for i=1, (table.getn(plats)/12) do
+        entities[i]={}
+        for b=1,4 do
+            entities[i][b] = import('/lua/sim/Entity.lua').Entity{Owner = self}
+            self.Trash:Add(entities[i][b])
+            entities[i][b]:SetPosition(Vector(
+                pos[1]+plats[((i-1)*12)+(b*3)-2],
+                pos[2]+plats[((i-1)*12)+(b*3)],
+                pos[3]+plats[((i-1)*12)+(b*3)-1]
+            ), true)
+        end
+        self.Trash:Add(AttachBeamEntityToEntity(entities[i][1], -2, entities[i][2], -2, self:GetArmy(), '/effects/emitters/build_beam_01_emit.bp'))
+        self.Trash:Add(AttachBeamEntityToEntity(entities[i][1], -2, entities[i][3], -2, self:GetArmy(), '/effects/emitters/build_beam_01_emit.bp'))
+        self.Trash:Add(AttachBeamEntityToEntity(entities[i][4], -2, entities[i][2], -2, self:GetArmy(), '/effects/emitters/build_beam_01_emit.bp'))
+        self.Trash:Add(AttachBeamEntityToEntity(entities[i][4], -2, entities[i][3], -2, self:GetArmy(), '/effects/emitters/build_beam_01_emit.bp'))
+    end
+end
+
 Callbacks.ClearSpawnedMeshes = function()
     if not PassesAntiCheatCheck() then
         return
@@ -715,6 +759,9 @@ Callbacks.CheatSpawnUnit = function(data)
             end
             if data.veterancy and data.veterancy ~= 0 and unit.SetVeterancy then
                 unit:SetVeterancy(data.veterancy)
+            end
+            if data.ShowRaisedPlatforms then
+                ShowRaisedPlatforms(unit)
             end
         end
     end

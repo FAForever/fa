@@ -28,6 +28,7 @@
 ---| "TacticalMissile"
 ---| "TreeFire"
 ---| "TreeForce"
+---| "WallOverspill"
 
 ---@alias ArmorType
 ---| "ASF"

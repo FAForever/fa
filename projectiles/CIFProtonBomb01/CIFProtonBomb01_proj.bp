@@ -20,7 +20,7 @@ ProjectileBlueprint {
         'CYBRAN',
         'PROJECTILE',
         'INDIRECTFIRE',
-        'STRATEGIC',
+        'IGNOREASFONCOLLISION',
     },
     Display = {
         CameraFollowTimeout = 2,
@@ -40,17 +40,8 @@ ProjectileBlueprint {
         StrategicIconSize = 2,
         UniformScale = 0.25,
     },
-    DoNotCollideList = {
-        'ASF',
-    },
     General = {
         Category = 'Bomb',
-        EntityCategory = {
-            'CYBRAN',
-            'PROJECTILE',
-            'INDIRECTFIRE',
-            'STRATEGIC',
-        },
         Faction = 'Cybran',
         Weapon = 'Proton Bomb',
     },

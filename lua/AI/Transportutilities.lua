@@ -90,7 +90,7 @@ function AssignTransportToPool( unit, aiBrain )
         if TransportDialog then
             LOG("*AI DEBUG TRANSPORT "..repr(unit.PlatoonHandle.BuilderName).." Transport "..unit.EntityId.." starts assigning to Transport Pool" )
         end
-		IssueClearCommands( {unit} )
+		IssueToUnitClearCommands(unit)
 		-- if not in need of repair or fuel -- 
 		if not ProcessAirUnits( unit, aiBrain ) then
             if aiBrain.TransportPool then
@@ -153,7 +153,7 @@ function CheckTransportPool( aiBrain )
 				--	continue
 				--end
 			end
-			IssueClearCommands( {v} )
+			IssueToUnitClearCommands(v)
 			if v.WatchLoadingThread then
                 if TransportDialog then
                     LOG("*AI DEBUG "..aiBrain.Nickname.." Killing Watch Loading thread - transport "..v.EntityId.." in CheckTransportPool")
@@ -534,7 +534,7 @@ function GetTransports( platoon, aiBrain)
     local transports = {}			-- this will hold the data for all of the eligible transports    
 	local out_of_range = false
     local FuelRequired = .5
-    local HealthRequired = .7
+    local HealthRequired = .30
 
     local id, range, unitPos
 
@@ -667,8 +667,8 @@ function GetTransports( platoon, aiBrain)
                 end
                 
 				AssignUnitsToPlatoon( aiBrain, transportplatoon, {transport}, 'Support', 'BlockFormation')
-				IssueClearCommands({transport})
-				IssueMove( {transport}, location )
+				IssueToUnitClearCommands(transport)
+				IssueToUnitMove(transport, location )
 
                 while neededTable.Large >= 1 and AvailableSlots.Large >= 1 do
                     neededTable.Large = neededTable.Large - 1.0
@@ -846,7 +846,7 @@ function ReturnTransportsToPool( aiBrain, units, move )
                     return
                 end
                 baseposition = RandomLocation(x,z)
-                IssueClearCommands( {v} )
+                IssueToUnitClearCommands(v)
                 if VDist3( baseposition, unitposition ) > 100 then
                     -- this requests a path for the transport with a threat allowance of 20 - which is kinda steep sometimes
 					local safePath, reason = NavUtils.PathToWithThreatThreshold('Air', unitposition, baseposition, aiBrain, NavUtils.ThreatFunctions.AntiAir, 50, aiBrain.IMAPConfig.Rings)
@@ -856,17 +856,17 @@ function ReturnTransportsToPool( aiBrain, units, move )
                         end
                         -- use path
                         for _,p in safePath do
-                            IssueMove( {v}, p )
+                            IssueToUnitMove(v, p )
                         end
                     else
                         if TransportDialog then
                             LOG("*AI DEBUG "..aiBrain.Nickname.." "..returnpool.BuilderName.." Transport "..v.EntityId.." no safe path for RTB -- home -- after drop - going direct")
                         end
                         -- go direct -- possibly bad
-                        IssueMove( {v}, baseposition )
+                        IssueToUnitMove(v, baseposition )
                     end
                 else
-                    IssueMove( {v}, baseposition)
+                    IssueToUnitMove(v, baseposition)
                 end
 
 				-- move the unit to the correct pool - pure transports to Transport Pool
@@ -907,7 +907,7 @@ function ReturnUnloadedUnitToPool( aiBrain, unit )
 	local attached = true
 	
 	if not unit.Dead then
-		IssueClearCommands( {unit} )
+		IssueToUnitClearCommands(unit)
 		local ident = Random(1,999999)
 		local returnpool = aiBrain:MakePlatoon('ReturnToPool'..tostring(ident), 'none')
 		AssignUnitsToPlatoon( aiBrain, returnpool, {unit}, 'Unassigned', 'None' )
@@ -1196,6 +1196,9 @@ function SendPlatoonWithTransports(aiBrain, platoon, destination, attempts, bSki
 		-- we stay in this function until we load, move and arrive or die
 		-- we'll get a false return if then entire unit platoon cannot be transported
 		-- note how we pass the IsEngineer flag -- alters the behaviour of the transport
+		if platoon.LogDebug then
+			platoon:LogDebug(string.format('Raid Platoon using transports'))
+		end
 		bUsedTransports = UseTransports( aiBrain, transportplatoon, transportLocation, platoon, IsEngineer )
 
 		-- if platoon died or we couldn't use transports -- exit
@@ -1224,7 +1227,11 @@ function SendPlatoonWithTransports(aiBrain, platoon, destination, attempts, bSki
 				v:MarkWeaponsOnTransport(v, false)
 			end
 		end
-		
+
+		if platoon.LogDebug then
+			platoon:LogDebug(string.format('Raid Platoon getting commands post drop off'))
+		end
+
 		-- set path to destination if we landed anywhere else but the destination
 		-- All platoons except engineers (which move themselves) get this behavior
 		if (not IsEngineer) and GetPlatoonPosition(platoon) != destination then
@@ -1245,7 +1252,9 @@ function SendPlatoonWithTransports(aiBrain, platoon, destination, attempts, bSki
 			end
 		end
 	end
-    
+    if platoon.LogDebug then
+		platoon:LogDebug(string.format('Raid Platoon existing transport function'))
+	end
 	return PlatoonExists( aiBrain, platoon )
     
 end
@@ -1453,7 +1462,7 @@ function UseTransports( aiBrain, transports, location, UnitPlatoon, IsEngineer )
 		-- send any leftovers to RTB --
 		if currLeftovers[1] then
 			for _,v in currLeftovers do
-				IssueClearCommands({v})
+				IssueToUnitClearCommands(v)
 			end
 			local ident = Random(1,999999)
 			local returnpool = aiBrain:MakePlatoon('RTB - Excess in SortingOnTransport'..tostring(ident), 'none')
@@ -1584,7 +1593,7 @@ function UseTransports( aiBrain, transports, location, UnitPlatoon, IsEngineer )
 							returnpool.BuilderName = UnitPlatoon.BuilderName
 						end
 					end
-					IssueClearCommands( {v} )
+					IssueToUnitClearCommands(v)
 					AssignUnitsToPlatoon( aiBrain, returnpool, {v}, 'Attack', 'None' )
 				end
 			end
@@ -1775,7 +1784,7 @@ function WatchUnitLoading( transport, units, aiBrain, UnitPlatoon)
 	
     -- At this point we really should safepath to the position
     -- and we should probably use a movement thread 
-	IssueMove( {transport}, GetPosition(units[1]) )
+	IssueToUnitMove(transport, GetPosition(units[1]) )
 	WaitTicks(5)
 	
 	for _,u in newunits do
@@ -2003,8 +2012,8 @@ function WatchTransportTravel( transport, destination, aiBrain, UnitPlatoon )
 					transport.StuckCount = 0
 				end
 
-				IssueClearCommands( {transport} )
-				IssueMove( {transport}, destination )
+				IssueToUnitClearCommands(transport)
+				IssueToUnitMove(transport, destination )
 			end
 		
 			-- this needs some examination -- it should signal the entire transport platoon - not just itself --
@@ -2022,7 +2031,7 @@ function WatchTransportTravel( transport, destination, aiBrain, UnitPlatoon )
 	end
 
 	if not transport.Dead then
-		IssueClearCommands( {transport} )
+		IssueToUnitClearCommands(transport)
 		if not transport.Dead then
             if TransportDialog then
                 LOG("*AI DEBUG "..aiBrain.Nickname.." "..UnitPlatoon.BuilderName.." "..transport.PlatoonHandle.BuilderName.." Transport "..transport.EntityId.." ends travelwatch ")
@@ -2112,24 +2121,112 @@ function WatchUnitUnload( transport, unitlist, destination, aiBrain, UnitPlatoon
     transport.Unloading = nil
 end
 
--- Processes air units at the end of work. Note we dont have an AirUnitRefitThread that handles transport yet so it is disabled.
+-- Processes air units at the end of work.
 function ProcessAirUnits( unit, aiBrain )
 	if (not unit.Dead) and (not IsBeingBuilt(unit)) then
         local fuel = GetFuelRatio(unit)
-		if ( fuel > -1 and fuel < .75 ) or unit:GetHealthPercent() < .80 then
+		local health = unit:GetHealthPercent()
+		if ( fuel > -1 and fuel < .75 ) or health < .30 then
             if not unit.InRefit then
-                if ScenarioInfo.TransportDialog then
-                    LOG("*AI DEBUG "..aiBrain.Nickname.." Air Unit "..unit.Sync.id.." assigned to AirUnitRefitThread ")
+                if TransportDialog then
+                    LOG("*AI DEBUG "..aiBrain.Nickname.." Air Unit "..unit.Sync.id.." assigned to TransportReturnToBase ")
                 end
                 -- and send it off to the refit thread --
-                --unit:ForkThread( AirUnitRefitThread, aiBrain )
+                unit:ForkThread( TransportReturnToBase, aiBrain )
                 return true
             else
-                LOG("*AI DEBUG "..aiBrain.Nickname.." Air Unit "..unit.Sync.id.." "..unit:GetBlueprint().Description.." already in refit Thread")
+				if TransportDialog then
+                    LOG("*AI DEBUG "..aiBrain.Nickname.." Air Unit "..unit.Sync.id.." "..unit:GetBlueprint().Description.." already in return to base thread")
+				end
             end
 		end
 	end
 	return false    -- unit did not need processing
+end
+
+function TransportReturnToBase(unit, aiBrain)
+	if unit.Dead or unit.InRefit then
+        return
+    end
+	local NavUtils = import("/lua/sim/navutils.lua")
+
+	local ident = Random(100000,999999)
+	local rtbissued = false
+	local fuellimit = .75
+	local healthlimit = .30
+	local returnPos
+	local killUnitOnReturn = false
+	local fuel
+	local health
+
+	local returnpool = aiBrain:MakePlatoon('AirRefit'..tostring(ident), 'none')
+	if not unit.Dead then
+		AssignUnitsToPlatoon( aiBrain, returnpool, {unit}, 'Unassigned', '')
+		unit.PlatoonHandle = returnpool
+	end
+	while (not unit.Dead) do
+		fuel = GetFuelRatio(unit)
+		health = unit:GetHealthPercent()
+		if ( fuel > -1 and fuel < fuellimit ) or health < healthlimit then
+			if health < healthlimit then
+				killUnitOnReturn = true
+			end
+			if not rtbissued then
+				-- find closest base
+				local bestBaseName
+				local bestDistSq
+				local platPos = returnpool:GetPlatoonPosition()
+				
+				for baseName, base in aiBrain.BuilderManagers do
+					if base.Layer ~= 'Water' and base.EngineerManager and base.EngineerManager:GetNumCategoryUnits('Engineers', categories.ALLUNITS) > 0 then
+						local distSq = VDist2Sq(platPos[1], platPos[3], base.Position[1], base.Position[3])
+						if not bestDistSq or distSq < bestDistSq then
+							bestBaseName = baseName
+							bestDistSq = distSq
+						end
+					end
+				end
+				if bestBaseName then
+					unit.InRefit = true
+					rtbissued = true
+					if ScenarioInfo.TransportDialog then
+						LOG("*AI DEBUG "..aiBrain.Nickname.." Air Unit "..unit.Sync.id.." returning to base ")
+					end
+					returnPos = aiBrain.BuilderManagers[bestBaseName].Position
+					IssueStop ( {unit} )
+					IssueClearCommands( {unit} )
+					local safePath, reason = NavUtils.PathToWithThreatThreshold('Air', platPos, returnPos, aiBrain, NavUtils.ThreatFunctions.AntiAir, 50, aiBrain.IMAPConfig.Rings)
+					if safePath then
+						-- use path
+						for _,p in safePath do
+							IssueMove( {unit}, p )
+						end
+						IssueMove( {unit}, returnPos)
+					else
+						-- go direct -- possibly bad
+						IssueMove( {unit}, returnPos )
+					end
+				end
+			end
+		-- otherwise we may have refueled/repaired ourselves or don't need it
+		else
+			unit.InRefit = nil
+			break
+		end
+		if rtbissued then
+			WaitTicks(21)
+			if not IsDestroyed(returnpool) and killUnitOnReturn and returnPos then
+				local origin = returnpool:GetPlatoonPosition()
+				local dx = origin[1] - returnPos[1]
+                local dz = origin[3] -returnPos[3]
+                if dx * dx + dz * dz < 1225 then
+					unit:Kill()
+				end
+			end
+		else
+			break
+		end
+	end
 end
 
 -- Supporting function. Should be replaced by navutils equivalent.

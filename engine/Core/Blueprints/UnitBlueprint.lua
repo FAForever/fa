@@ -52,8 +52,6 @@
 --- the localised language). If the localisation part is not set, the description in tags will be
 --- used for any language, which would be "Medium Tank" for this example
 ---@field Description UnlocalizedString
---- list of categories that this unit will not collide with
----@field DoNotCollideList? CategoryName[]
 --- used by the Othuy ("lighting storm") script
 ---@field Lifetime? number
 --- used by the Othuy ("lighting storm") script
@@ -90,6 +88,7 @@
 ---@field Defense UnitBlueprintDefense
 ---@field Display UnitBlueprintDisplay
 ---@field Economy UnitBlueprintEconomy
+---@field ExternalFactory? UnitBlueprintExternalFactory
 ---@field Enhancements?  table<Enhancement, UnitBlueprintEnhancement>
 ---@field EnhancementPresets? table<string, UnitBlueprintEnhancementPreset>
 ---@field General UnitBlueprintGeneral
@@ -106,10 +105,6 @@
 ---@field BlueprintId UnitId
 --- auto-generated categories table based on `Categories` with each key a value in that array
 ---@field CategoriesHash table<CategoryName, true>
---- auto-generated number from `DoNotCollideList`
----@field DoNotCollideListCount number
---- auto-generated table from `DoNotCollideList`
----@field DoNotCollideListHash table<UnparsedCategory, true>
 --- auto-generated for unit blueprints generated from a unit with a preset in `EnhancementPresets`
 ---@field EnhancementPresetAssigned? UnitBlueprintAssignedEnhancementPreset
 --- auto-generated faction category from `Categories`
@@ -759,6 +754,16 @@
 --- Treated as `0.01` when absent.
 ---@field TeleportTimeMod? number
 
+---@class UnitBlueprintExternalFactory
+---@field SelectionSizeX? number
+---@field SelectionSizeZ? number
+---@field SelectionCenterOffsetX? number
+---@field SelectionCenterOffsetY? number
+---@field SelectionCenterOffsetZ? number
+---@field SelectionMeshScaleX? number
+---@field SelectionMeshScaleY? number
+---@field SelectionMeshScaleZ? number
+---@field UniformScale? number
 
 ---@class UnitBlueprintEnhancements : table<Enhancement, UnitBlueprintEnhancement>
 ---@field Slots table<EnhancementSlot, {name: UnlocalizedString, x: number, y: number}>
@@ -831,6 +836,8 @@
 ---@field TeleportDelay? number
 --- table of toggle capabilities available for this unit
 ---@field ToggleCaps table<ToggleCap, boolean>
+--- table of boolean toggles set/got with SetStatByCallback/GetStat
+---@field StatToggles table<string, table>
 --- name of the unit
 ---@field UnitName UnlocalizedString
 ---@field UnitWeight number unused

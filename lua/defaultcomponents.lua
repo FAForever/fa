@@ -502,7 +502,7 @@ TreadComponent = ClassSimple {
         end
 
         while true do
-            while not self.TreadSuspend do
+            while not (self.TreadSuspend or IsDestroyed(self)) do
                 CreateSplatOnBone(self, treadOffset, treadBone, treadTexture, sizeX, sizeZ, lod, duration, army)
                 WaitTicks(interval)
             end
@@ -820,12 +820,23 @@ VeterancyComponent = ClassSimple {
 ExternalFactoryComponent = ClassSimple {
 
     FactoryAttachBone = false,
+    BuildAttachBone = false,
 
     ---@param self Unit | ExternalFactoryComponent
+    ---@param builder Unit
+    ---@param layer Layer
     OnStopBeingBuilt = function(self, builder, layer)
         local blueprint = self.Blueprint
         if not self.FactoryAttachBone then
             error(string.format("%s is not setup for an external factory: the unit does not have a field 'FactoryAttachBone'", blueprint.BlueprintId))
+        end
+
+        if not self.BuildAttachBone then
+            error(string.format("%s is not setup for an external factory: the unit does not have a field 'BuildAttachBone'", blueprint.BlueprintId))
+        end
+
+        if self.BuildAttachBone == self.FactoryAttachBone then
+            error(string.format("%s is not setup for an external factory: the 'FactoryAttachBone' can not be the same as the 'BuildAttachBone'", blueprint.BlueprintId))
         end
 
         if not blueprint.CategoriesHash['EXTERNALFACTORY'] then
@@ -838,33 +849,14 @@ ExternalFactoryComponent = ClassSimple {
         end
 
         -- create the factory somewhere completely unrelated
-        local position = self:GetPosition(self.FactoryAttachBone)
+        local px, py, pz = self:GetPositionXYZ(self.FactoryAttachBone)
 
-        -- we need to put an entity in between so that we can always click-select the 
-        -- factory. The 'CARRIER' category can prevent us from clicking on attached units
-        local entity = Entity({Owner = self})
-        self.Trash:Add(entity)
-        entity:AttachTo(self, self.FactoryAttachBone)
-
-        self.ExternalFactory = CreateUnitHPR(blueprintIdExternalFactory, self.Army, position[1], position[2], position[3], 0, 0, 0) --[[@as ExternalFactoryUnit]]
-        self.ExternalFactory:AttachTo(entity, -1)
+        self.ExternalFactory = CreateUnitHPR(blueprintIdExternalFactory, self.Army, px, py, pz, 0, 0, 0) --[[@as ExternalFactoryUnit]]
+        self.ExternalFactory:AttachTo(self, self.FactoryAttachBone)
         self.ExternalFactory:SetCreator(self)
+        self:SetCreator(self.ExternalFactory)
         self.ExternalFactory:SetParent(self)
         self.Trash:Add(self.ExternalFactory)
-    end,
-
-    ---@param self Unit | ExternalFactoryComponent
-    OnPaused = function(self)
-        if self.ExternalFactory then
-            self.ExternalFactory:SetPaused(true)
-        end
-    end,
-
-    ---@param self Unit | ExternalFactoryComponent
-    OnUnpaused = function(self)
-        if self.ExternalFactory then
-            self.ExternalFactory:SetPaused(false)
-        end
     end,
 
     ---@param self Unit | ExternalFactoryComponent
@@ -887,17 +879,45 @@ ExternalFactoryComponent = ClassSimple {
                 self.ExternalFactory:AddBuildRestriction(categories.ALLUNITS)
                 self.ExternalFactory:RequestRefreshUI()
 
-                IssueClearCommands({self.ExternalFactory})
+                IssueToUnitClearCommands(self.ExternalFactory)
             end
         end
     end,
 
+    ---@param self Unit | ExternalFactoryComponent
     OnKilled = function(self, instigator, type, overkillRatio)
         if not IsDestroyed(self.ExternalFactory) then
             self.ExternalFactory:SetBusy(true)
             self.ExternalFactory:SetBlockCommandQueue(true)
-            self.ExternalFactory:Kill()
+            self.ExternalFactory:Destroy()
         end
+    end,
+
+    -- We need to wait one tick for our unit to "exist" before we can clear its orders
+    -- This prevents order graphs from being drawn from units inside the carrier
+    ---@param self Unit | ExternalFactoryComponent
+    ---@param unitBeingBuilt Unit
+    ClearOrdersThread = function(self, unitBeingBuilt)
+        WaitTicks(1)
+        IssueToUnitClearCommands(unitBeingBuilt)
+    end,
+
+    ---@param self Unit | ExternalFactoryComponent
+    ---@param unitBeingBuilt Unit
+    OnStopBuildWithStorage = function(self, unitBeingBuilt)
+        --local unitBeingBuilt = self.UnitBeingBuilt
+        unitBeingBuilt:DetachFrom(true)
+        self:DetachAll(self.BuildAttachBone)
+
+        if not self:TransportHasAvailableStorage() or self:GetStat('AutoDeploy', 0).Value == 1 then
+            unitBeingBuilt:ShowBone(0, true)
+        else
+            self:AddUnitToStorage(unitBeingBuilt)
+            ForkThread(self.ClearOrdersThread, self, unitBeingBuilt)
+        end
+
+        self:RequestRefreshUI()
+        ChangeState(self, self.IdleState)
     end,
 
 }

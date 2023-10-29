@@ -14,7 +14,7 @@ UnitBlueprint{
         KRoll = 2,
         KRollDamping = 2,
         KTurn = 2,
-        KTurnDamping = 1,
+        KTurnDamping = 2.2,
         LiftFactor = 10,
         MaxAirspeed = 13,
         MinAirspeed = 3,

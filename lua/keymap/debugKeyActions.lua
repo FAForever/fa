@@ -221,10 +221,6 @@ local keyActionsDebug = {
         action = 'UI_ToggleGamePanels',
         category = 'debug',
     },
-    ['debug_performance_metrics'] = {
-        action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").TogglePerformanceMetricsWindow()',
-        category = 'debug',
-    },
 }
 
 ---@type table<string, UIKeyAction>
@@ -255,6 +251,10 @@ local keyActionsDebugAI = {
     },
     ['toggle_ai_base_ui'] = {
         action = 'UI_Lua import("/lua/ui/game/aibaseinfo.lua").OpenWindow()',
+        category = 'ai'
+    },
+    ['toggle_ai_platoon_ui'] = {
+        action = 'UI_Lua import("/lua/ui/game/aiplatooninfo.lua").OpenWindow()',
         category = 'ai'
     },
     ['toggle_ai_reclaim_grid_ui'] = {

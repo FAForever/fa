@@ -29,10 +29,10 @@
 ---| "Water Mask"
 ---| "Water Normals"
 
----@alias Object Blip | CollisionBeam | Entity | Prop | Projectile | Unit
----@alias BoneObject Projectile | Prop | Unit | Entity
----@alias ReclaimObject Prop | Unit
----@alias TargetObject Prop | Unit
+---@alias Object Blip | CollisionBeam | moho.entity_methods | moho.prop_methods | moho.projectile_methods | moho.unit_methods
+---@alias BoneObject moho.entity_methods | moho.prop_methods | moho.projectile_methods | moho.unit_methods
+---@alias ReclaimObject moho.prop_methods | moho.unit_methods
+---@alias TargetObject moho.prop_methods | moho.unit_methods
 
 --- restricts the army from building the unit category
 ---@param army Army
@@ -773,7 +773,7 @@ end
 function IssueCapture(units, target)
 end
 
---- Clears out all commands issued on the group of units, this happens immediately
+--- Clears out all commands issued on the group of units, this happens immediately. See `IssueToUnitClearCommands` when you want to computationally efficiently apply it to a single unit 
 ---@param units Unit[]
 ---@return SimCommand
 function IssueClearCommands(units)
@@ -870,14 +870,14 @@ end
 function IssueKillSelf(units)
 end
 
---- Orders a group of units to move to a position
+--- Orders a group of units to move to a position.  See `IssueToUnitMove` when you want to computationally efficiently apply it to a single unit 
 ---@param units Unit[]
 ---@param position Vector
 ---@return SimCommand
 function IssueMove(units, position)
 end
 
---- Orders a group of units to move off a factory build site
+--- Orders a group of units to move off a factory build site. See `IssueToUnitMoveOffFactory` when you want to computationally efficiently apply it to a single unit
 ---@param units Unit[]
 ---@param position Vector
 ---@return SimCommand

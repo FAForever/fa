@@ -271,6 +271,7 @@ local function CheatSpawn(command, data)
             veterancy = data.vet,
             CreateTarmac = data.CreateTarmac,
             MeshOnly = data.MeshOnly,
+            ShowRaisedPlatforms = data.ShowRaisedPlatforms,
             UnitIconCameraMode = data.UnitIconCameraMode,
         }
     }, true)
@@ -350,7 +351,7 @@ local function OnGuardUnpause(guardees, target)
                             target.ThreadUnpauseCandidates = nil
                             target.ThreadUnpause = nil
                             break
-                            ;end
+                            ; end
 
                         WaitSeconds(1.0)
                         target = GetUnitById(id)
@@ -367,6 +368,21 @@ local function OnGuardUnpause(guardees, target)
     end
 end
 
+---@param guardees UserUnit[]
+---@param unit UserUnit
+local function OnGuardCopy(guardees, unit)
+    local prefs = Prefs.GetFromCurrentProfile('options.assist_to_copy_command_queue')
+    local engineers = EntityCategoryFilterDown(categories.ENGINEER, guardees)
+    if table.getn(engineers) > 0 and
+        (prefs == 'OnlyEngineers') and
+        EntityCategoryContains(categories.ENGINEER, unit)
+    then
+        if IsKeyDown('Control') then
+            SimCallback({ Func = 'CopyOrders', Args = { Target = unit:GetEntityId(), ClearCommands = true } }, true)
+        end
+    end
+end
+
 --- Is called when a unit receies a guard / assist order
 ---@param guardees UserUnit[]
 ---@param unit UserUnit
@@ -374,6 +390,7 @@ local function OnGuard(guardees, unit)
     if unit:GetArmy() == GetFocusArmy() then
         OnGuardUpgrade(guardees, unit)
         OnGuardUnpause(guardees, unit)
+        OnGuardCopy(guardees, unit)
     end
 end
 

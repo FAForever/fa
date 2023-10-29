@@ -143,9 +143,9 @@ UnitBlueprint{
     SelectionSizeX = 0.35,
     SelectionSizeZ = 0.5,
     SelectionThickness = 0.75,
-    SizeX = 0.5,
+    SizeX = 0.6,
     SizeY = 0.5,
-    SizeZ = 1,
+    SizeZ = 1.2,
     StrategicIconName = "icon_land1_artillery",
     StrategicIconSortPriority = 135,
     Veteran = {
