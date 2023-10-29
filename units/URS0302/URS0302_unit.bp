@@ -95,11 +95,11 @@ UnitBlueprint{
             LODs = {
                 {
                     LODCutoff = 200,
-                    ShaderName = "Insect",
+                    ShaderName = "CybranNavy",
                 },
                 {
                     LODCutoff = 600,
-                    ShaderName = "Insect",
+                    ShaderName = "CybranNavy",
                     AlbedoName = "urs0302_lod1_albedo.dds",
                     SpecularName = "urs0302_lod1_specteam.dds",
                 },
@@ -536,6 +536,7 @@ UnitBlueprint{
             Damage = 1,
             DamageType = "Normal",
             DisplayName = "Zapper Anti Missile",
+            DisableWhileReloading = true,
             FireTargetLayerCapsTable = { Water = "Air" },
             FiringTolerance = 5,
             HeadingArcCenter = -90,
@@ -545,7 +546,6 @@ UnitBlueprint{
             MinRadius = 2,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
-            NeedPrep = true,
             RackBones = {
                 {
                     MuzzleBones = { "Left_Muzzle01" },
@@ -560,7 +560,8 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_Countermeasure",
-            RateOfFire = 0.5,
+            RateOfFire = 1.0,
+            TargetResetWhenReady = true,
             TargetRestrictDisallow = "UNTARGETABLE,STRATEGIC",
             TargetRestrictOnlyAllow = "TACTICAL,MISSILE",
             TargetType = "RULEWTT_Projectile",
@@ -569,7 +570,7 @@ UnitBlueprint{
             TurretBoneYaw = "Left_Turret01",
             TurretDualManipulators = false,
             TurretPitch = 0,
-            TurretPitchRange = 90,
+            TurretPitchRange = 80,
             TurretPitchSpeed = 180,
             TurretYaw = 0,
             TurretYawRange = 95,
@@ -588,6 +589,7 @@ UnitBlueprint{
             Damage = 1,
             DamageType = "Normal",
             DisplayName = "Zapper Anti Missile",
+            DisableWhileReloading = true,
             FireTargetLayerCapsTable = { Water = "Air" },
             FiringTolerance = 5,
             HeadingArcCenter = 90,
@@ -597,7 +599,6 @@ UnitBlueprint{
             MinRadius = 2,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
-            NeedPrep = true,
             RackBones = {
                 {
                     MuzzleBones = { "Right_Muzzle01" },
@@ -612,7 +613,8 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_Countermeasure",
-            RateOfFire = 0.5,
+            RateOfFire = 1.0,
+            TargetResetWhenReady = true,
             TargetRestrictDisallow = "UNTARGETABLE,STRATEGIC",
             TargetRestrictOnlyAllow = "TACTICAL,MISSILE",
             TargetType = "RULEWTT_Projectile",
@@ -621,7 +623,7 @@ UnitBlueprint{
             TurretBoneYaw = "Right_Turret",
             TurretDualManipulators = false,
             TurretPitch = 0,
-            TurretPitchRange = 90,
+            TurretPitchRange = 80,
             TurretPitchSpeed = 180,
             TurretYaw = 0,
             TurretYawRange = 95,

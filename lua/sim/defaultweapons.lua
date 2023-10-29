@@ -772,15 +772,16 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
         end,
 
         OnFire = function(self)
+
             local bp = self.Blueprint
-            if bp.WeaponUnpacks then
+            if bp.WeaponUnpacks and self.WeaponPackState ~= 'Unpacked' then
                 ChangeState(self, self.WeaponUnpackingState)
             else
                 if bp.RackSalvoChargeTime and bp.RackSalvoChargeTime > 0 then
                     ChangeState(self, self.RackSalvoChargeState)
 
                     -- SkipReadyState used for Janus and Corsair
-                elseif bp.SkipReadyState and bp.SkipReadyState then
+                elseif bp.SkipReadyState then
                     ChangeState(self, self.RackSalvoFiringState)
                 else
                     ChangeState(self, self.RackSalvoFireReadyState)
@@ -875,13 +876,26 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
                 ChangeState(self, self.RackSalvoFiringState)
             end
 
-            -- attempts to fix units being stuck on targets that are outside their current attack radius, but inside
-            -- the tracking radius. This happens when the unit is trying to fire, but it is never actually firing and
-            -- therefore the thread of this state is not destroyed
             if not (IsDestroyed(unit) or IsDestroyed(self)) then
-                -- wait reload time + 2 seconds, then force the weapon to recheck its target 
-                WaitSeconds((1 / self.Blueprint.RateOfFire) + 3)
-                self:ResetTarget()
+                if bp.TargetResetWhenReady then
+
+                    -- attempts to fix weapons that intercept projectiles to being stuck on a projectile while reloading, preventing
+                    -- other weapons from targeting that projectile. Is a side effect of the blueprint field `DesiredShooterCap`. For a more
+                    -- aggressive version see the blueprint field `DisableWhileReloading` which completely disables the weapon
+
+                    WaitTicks(5)
+
+                    self:ResetTarget()
+                else
+
+                    -- attempts to fix units being stuck on targets that are outside their current attack radius, but inside
+                    -- the tracking radius. This happens when the unit is trying to fire, but it is never actually firing and
+                    -- therefore the thread of this state is not destroyed
+
+                    -- wait reload time + 2 seconds, then force the weapon to recheck its target
+                    WaitSeconds((1 / self.Blueprint.RateOfFire) + 3)
+                    self:ResetTarget()
+                end
             end
         end,
 
@@ -1007,16 +1021,16 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
                     if proj and not proj:BeenDestroyed() and countedProjectile then
                         if bp.NukeWeapon then
                             unit:NukeCreatedAtUnit()
+                            unit:RemoveNukeSiloAmmo(1)
                             -- Generate UI notification for automatic nuke ping
                             local launchData = {
                                 army = self.Army - 1,
-                                location = self:GetCurrentTargetPos()
+                                location = (GetFocusArmy() == -1 or IsAlly(self.Army, GetFocusArmy())) and self:GetCurrentTargetPos() or nil
                             }
                             if not Sync.NukeLaunchData then
                                 Sync.NukeLaunchData = {}
                             end
                             table.insert(Sync.NukeLaunchData, launchData)
-                            unit:RemoveNukeSiloAmmo(1)
                         else
                             unit:RemoveTacticalSiloAmmo(1)
                         end
@@ -1053,6 +1067,20 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
 
             -- We can fire again after reaching here
             self.HaltFireOrdered = false
+
+            -- attempts to fix weapons that intercept projectiles to being stuck on a projectile while reloading, preventing
+            -- other weapons from targeting that projectile. Is a side effect of the blueprint field `DesiredShooterCap`. This
+            -- is the more aggressive variant of `TargetResetWhenReady` as it completely disables the weapon. Should only be used
+            -- for weapons that do not visually track, such as torpedo defenses
+
+            if bp.DisableWhileReloading then
+                local reloadTime = math.floor(10 / self.Blueprint.RateOfFire) - 1
+                if reloadTime > 4 then
+                    self:SetEnabled(false)
+                    WaitTicks(reloadTime)
+                    self:SetEnabled(true)
+                end
+            end
 
             -- Deal with the rack firing sequence
             if self.CurrentRackSalvoNumber > rackBoneCount then
@@ -1113,11 +1141,9 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
 
             self:WaitForAndDestroyManips()
 
-            if notExclusive then
-                unit:SetBusy(true)
-            end
             local hasTarget = self:WeaponHasTarget()
             local canFire = self:CanFire()
+
             if hasTarget and bp.RackSalvoChargeTime > 0 and canFire then
                 ChangeState(self, self.RackSalvoChargeState)
             elseif hasTarget and canFire then
@@ -1174,7 +1200,10 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
         ---@param self DefaultProjectileWeapon
         Main = function(self)
             local unit = self.unit
-            unit:SetBusy(true)
+
+            if not IsDestroyed(unit) then
+                unit:SetBusy(true)
+            end
 
             local bp = self.Blueprint
             WaitSeconds(bp.WeaponRepackTimeout)

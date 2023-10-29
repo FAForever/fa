@@ -126,16 +126,6 @@ UAS0401 = ClassUnit(ASeaUnit, ExternalFactoryComponent) {
         ASeaUnit.OnLayerChange(self, new, old)
     end,
 
-    OnPaused = function(self)
-        ASeaUnit.OnPaused(self)
-        ExternalFactoryComponent.OnPaused(self)
-    end,
-
-    OnUnpaused = function(self)
-        ASeaUnit.OnUnpaused(self)
-        ExternalFactoryComponent.OnUnpaused(self)
-    end,
-
     RolloffBody = function(self)
     end,
 
@@ -205,7 +195,7 @@ UAS0401 = ClassUnit(ASeaUnit, ExternalFactoryComponent) {
             local blueprint = unitBeingBuilt.Blueprint
             local distance = math.max(blueprint.SizeX, blueprint.SizeZ, 6)
             local worldPos = self:CalculateWorldPositionFromRelative({0, 0, - 2 * distance})
-            IssueMoveOffFactory({unitBeingBuilt}, worldPos)
+            IssueToUnitMoveOffFactory(unitBeingBuilt, worldPos)
             ChangeState(self, self.RollingOffState)
         end,
     },

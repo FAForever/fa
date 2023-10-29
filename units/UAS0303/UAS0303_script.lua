@@ -22,7 +22,7 @@ UAS0303 = ClassUnit(AircraftCarrier, ExternalFactoryComponent) {
         AntiMissile = ClassWeapon(AAMWillOWisp) {},
     },
 
-    BuildAttachBone = 'UAS0303',
+    BuildAttachBone = 'Attachpoint02',
 
     OnStopBeingBuilt = function(self, builder, layer)
         AircraftCarrier.OnStopBeingBuilt(self, builder, layer)
@@ -33,16 +33,6 @@ UAS0303 = ClassUnit(AircraftCarrier, ExternalFactoryComponent) {
     OnFailedToBuild = function(self)
         AircraftCarrier.OnFailedToBuild(self)
         ChangeState(self, self.IdleState)
-    end,
-
-    OnPaused = function(self)
-        AircraftCarrier.OnPaused(self)
-        ExternalFactoryComponent.OnPaused(self)
-    end,
-
-    OnUnpaused = function(self)
-        AircraftCarrier.OnUnpaused(self)
-        ExternalFactoryComponent.OnUnpaused(self)
     end,
 
     OnLayerChange = function(self, new, old)
@@ -82,26 +72,7 @@ UAS0303 = ClassUnit(AircraftCarrier, ExternalFactoryComponent) {
 
         OnStopBuild = function(self, unitBeingBuilt)
             AircraftCarrier.OnStopBuild(self, unitBeingBuilt)
-            ChangeState(self, self.FinishedBuildingState)
-        end,
-    },
-
-    FinishedBuildingState = State {
-        Main = function(self)
-            self:SetBusy(true)
-            local unitBuilding = self.UnitBeingBuilt
-            unitBuilding:DetachFrom(true)
-            self:DetachAll(self.BuildAttachBone)
-            if self:TransportHasAvailableStorage() then
-                self:AddUnitToStorage(unitBuilding)
-            else
-                local worldPos = self:CalculateWorldPositionFromRelative({ 0, 0, -20 })
-                IssueMoveOffFactory({ unitBuilding }, worldPos)
-                unitBuilding:ShowBone(0, true)
-            end
-            self:SetBusy(false)
-            self:RequestRefreshUI()
-            ChangeState(self, self.IdleState)
+            ExternalFactoryComponent.OnStopBuildWithStorage(self, unitBeingBuilt)
         end,
     },
 }

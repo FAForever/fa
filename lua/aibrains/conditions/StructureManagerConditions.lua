@@ -1,17 +1,31 @@
-
--------------------------------------------------------------------------------
--- Summary: Contains all builder conditions that directly interface with
--- the structure manager
---
--- All builder conditions in this file are of complexity O(1)
--------------------------------------------------------------------------------
+--******************************************************************************************************
+--** Copyright (c) 2022  Willem 'Jip' Wijnia
+--**
+--** Permission is hereby granted, free of charge, to any person obtaining a copy
+--** of this software and associated documentation files (the "Software"), to deal
+--** in the Software without restriction, including without limitation the rights
+--** to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+--** copies of the Software, and to permit persons to whom the Software is
+--** furnished to do so, subject to the following conditions:
+--**
+--** The above copyright notice and this permission notice shall be included in all
+--** copies or substantial portions of the Software.
+--**
+--** THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+--** IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+--** FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+--** AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+--** LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+--** OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+--** SOFTWARE.
+--******************************************************************************************************
 
 ---@param aiBrain AIBrain
 ---@param base AIBase
 ---@param count number
 ---@param tech TechCategory
 ---@return boolean
-function LessStructuresByTech(aiBrain, base, count, tech)
+function LessStructuresByTech(aiBrain, base, platoon, count, tech)
     if base.StructureManager.Structures[tech] < count then
         return true
     end
@@ -24,7 +38,7 @@ end
 ---@param count number
 ---@param tech TechCategory
 ---@return boolean
-function MoreStructuresByTech(aiBrain, base, count, tech)
+function MoreStructuresByTech(aiBrain, base, platoon, count, tech)
     if base.StructureManager.Structures[tech] > count then
         return true
     end
@@ -37,7 +51,7 @@ end
 ---@param count number
 ---@param tech TechCategory
 ---@return boolean
-function LessStructuresBeingbuiltByTech(aiBrain, base, count, tech)
+function LessStructuresBeingbuiltByTech(aiBrain, base, platoon, count, tech)
     if base.StructureManager.StructureBeingBuiltCount[tech] < count then
         return true
     end
@@ -50,7 +64,7 @@ end
 ---@param count number
 ---@param tech TechCategory
 ---@return boolean
-function MoreStructuresBeingbuiltByTech(aiBrain, base, count, tech)
+function MoreStructuresBeingbuiltByTech(aiBrain, base, platoon, count, tech)
     if base.StructureManager.StructureBeingBuiltCount[tech] > count then
         return true
     end
@@ -63,7 +77,7 @@ end
 ---@param base AIBase
 ---@param amount number
 ---@return boolean
-function MoreSurfaceThreatThan (aiBrain, base, amount)
+function MoreSurfaceThreatThan (aiBrain, base, platoon, amount)
     return base.StructureManager.GeneratedThreat.Surface > amount
 end
 
@@ -72,7 +86,7 @@ end
 ---@param base AIBase
 ---@param amount number
 ---@return boolean
-function MoreSubThreatThan (aiBrain, base, amount)
+function MoreSubThreatThan (aiBrain, base, platoon, amount)
     return base.StructureManager.GeneratedThreat.Sub > amount
 end
 
@@ -81,7 +95,7 @@ end
 ---@param base AIBase
 ---@param amount number
 ---@return boolean
-function MoreAirThreatThan (aiBrain, base, amount)
+function MoreAirThreatThan (aiBrain, base, platoon, amount)
     return base.StructureManager.GeneratedThreat.Air > amount
 end
 
@@ -90,7 +104,7 @@ end
 ---@param base AIBase
 ---@param amount number
 ---@return boolean
-function MoreEconomyThreatThan (aiBrain, base, amount)
+function MoreEconomyThreatThan (aiBrain, base, platoon, amount)
     return base.StructureManager.GeneratedThreat.Economy > amount
 end
 
@@ -99,7 +113,7 @@ end
 ---@param base AIBase
 ---@param amount number
 ---@return boolean
-function LessSurfaceThreatThan (aiBrain, base, amount)
+function LessSurfaceThreatThan (aiBrain, base, platoon, amount)
     return base.StructureManager.GeneratedThreat.Surface < amount
 end
 
@@ -108,7 +122,7 @@ end
 ---@param base AIBase
 ---@param amount number
 ---@return boolean
-function LessSubThreatThan (aiBrain, base, amount)
+function LessSubThreatThan (aiBrain, base, platoon, amount)
     return base.StructureManager.GeneratedThreat.Sub < amount
 end
 
@@ -117,7 +131,7 @@ end
 ---@param base AIBase
 ---@param amount number
 ---@return boolean
-function LessAirThreatThan (aiBrain, base, amount)
+function LessAirThreatThan (aiBrain, base, platoon, amount)
     return base.StructureManager.GeneratedThreat.Air < amount
 end
 
@@ -126,6 +140,6 @@ end
 ---@param base AIBase
 ---@param amount number
 ---@return boolean
-function LessEconomyThreatThan (aiBrain, base, amount)
+function LessEconomyThreatThan (aiBrain, base, platoon, amount)
     return base.StructureManager.GeneratedThreat.Economy < amount
 end

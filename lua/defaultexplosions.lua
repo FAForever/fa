@@ -206,7 +206,7 @@ local ProjectileDebrisBpsN = TableGetn(ProjectileDebrisBps)
 -- @unit The Unit to create the explosion for.
 -- @overKillRatio Has an impact on how strong the explosion is.
 ---@param unit Unit
----@param debrisMultiplier? integer
+---@param debrisMultiplier? number
 ---@param circularDebris? boolean
 function CreateScalableUnitExplosion(unit, debrisMultiplier, circularDebris)
 

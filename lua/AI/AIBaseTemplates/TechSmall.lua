@@ -196,7 +196,7 @@ BaseBuilderTemplate {
         if mapSizeX < 500 and mapSizeZ < 500 then
             return 100, 'tech'
         elseif mapSizeX >= 512 and mapSizeZ >= 512 and mapSizeX < 1024 and mapSizeZ < 1024 then
-            return Random(75, 100), 'tech'
+            return Random(50, 100), 'tech'
         elseif mapSizeX <= 1024 and mapSizeZ <= 1024 then
             return 50, 'tech'
         else

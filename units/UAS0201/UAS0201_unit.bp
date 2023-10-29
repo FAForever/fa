@@ -79,11 +79,11 @@ UnitBlueprint{
             LODs = {
                 {
                     LODCutoff = 140,
-                    ShaderName = "Aeon",
+                    ShaderName = "AeonNavy",
                 },
                 {
                     LODCutoff = 300,
-                    ShaderName = "Aeon",
+                    ShaderName = "AeonNavy",
                     AlbedoName = "uas0201_lod1_albedo.dds",
                     SpecularName = "uas0201_lod1_specteam.dds",
                 },
@@ -338,6 +338,7 @@ UnitBlueprint{
             CollideFriendly = false,
             Damage = 2,
             DamageType = "Normal",
+            DisableWhileReloading = true,
             DisplayName = "Anti Torpedo",
             EffectiveRadius = 42,
             FireTargetLayerCapsTable = { Water = "Sub|Water|Seabed" },
@@ -369,6 +370,7 @@ UnitBlueprint{
             RangeCategory = "UWRC_Countermeasure",
             RateOfFire = 0.26,
             TargetCheckInterval = 1.0,
+            TargetResetWhenReady = true,
             TargetRestrictDisallow = "UNTARGETABLE",
             TargetRestrictOnlyAllow = "TORPEDO",
             TargetType = "RULEWTT_Projectile",

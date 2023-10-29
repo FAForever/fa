@@ -88,11 +88,11 @@ UnitBlueprint{
             LODs = {
                 {
                     LODCutoff = 140,
-                    ShaderName = "Unit",
+                    ShaderName = "UEFNavy",
                 },
                 {
                     LODCutoff = 300,
-                    ShaderName = "Unit",
+                    ShaderName = "UEFNavy",
                     AlbedoName = "ues0201_lod1_albedo.dds",
                     SpecularName = "ues0201_lod1_specteam.dds",
                 },
@@ -492,6 +492,7 @@ UnitBlueprint{
                 ProjectilesToDeflect = 3,
                 Radius = 9,
             },
+            DisableWhileReloading = true,
             DisplayName = "Smart Charge AntiTorpedo",
             FireTargetLayerCapsTable = { Water = "Sub|Water|Seabed" },
             FiringTolerance = 15,

@@ -85,12 +85,12 @@ UnitBlueprint{
                 {
                     LODCutoff = 100,
                     LookupName = "/textures/environment/Falloff_seraphim_lookup.dds",
-                    ShaderName = "Seraphim",
+                    ShaderName = "SeraphimNavy",
                 },
                 {
                     LODCutoff = 215,
                     LookupName = "/textures/environment/Falloff_seraphim_lookup.dds",
-                    ShaderName = "Seraphim",
+                    ShaderName = "SeraphimNavy",
                     AlbedoName = "xss0203_lod1_albedo.dds",
                     SpecularName = "xss0203_lod1_specteam.dds",
                 },
@@ -286,6 +286,7 @@ UnitBlueprint{
             CollideFriendly = false,
             Damage = 2,
             DamageType = "Normal",
+            DisableWhileReloading = true,
             DisplayName = "Ajellu Anti-Torpedo Defense",
             EffectiveRadius = 26,
             FireTargetLayerCapsTable = {

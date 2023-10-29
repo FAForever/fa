@@ -117,13 +117,13 @@ UnitBlueprint{
                 {
                     LODCutoff = 1500,
                     LookupName = "/textures/environment/Falloff_seraphim_lookup.dds",
+                    SecondaryName = "/units/uaa0310/uaa0310_secondary.dds",
                     ShaderName = "Seraphim",
-                    AlbedoName = "xsa0402_lod1_albedo.dds",
-                    SpecularName = "xsa0402_lod1_specteam.dds",
                 },
             },
         },
         MovementEffects = {
+
             Air = {
                 Contrails = {
                     Bones = { "Tail_Extent" },

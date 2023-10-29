@@ -110,8 +110,6 @@ URL0001 = ClassUnit(ACUUnit, CCommandUnit) {
     CreateEnhancement = function(self, enh)
         ACUUnit.CreateEnhancement(self, enh)
 
-        LOG(enh)
-
         local bp = self.Blueprint.Enhancements[enh]
         if enh == 'Teleporter' then
             self:AddCommandCap('RULEUCC_Teleport')

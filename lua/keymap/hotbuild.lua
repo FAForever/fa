@@ -9,6 +9,7 @@ local CommandMode = import("/lua/ui/game/commandmode.lua")
 local Construction = import("/lua/ui/game/construction.lua")
 local Templates = import("/lua/ui/game/build_templates.lua")
 local FactoryTemplates = import("/lua/ui/templates_factory.lua")
+local cycleTemplates = import("/lua/ui/game/hotkeys/context-based-templates.lua")
 
 local Group = import("/lua/maui/group.lua").Group
 local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
@@ -149,7 +150,7 @@ function getUnitKeyGroups()
                         LOG("!!!!! Invalid indirect building value " .. value .. " -> " .. realValue)
                     end
                 end
-            elseif value == '_upgrade' or value == '_templates' or value == '_factory_templates' then
+            elseif value == '_upgrade' or value == '_templates' or value == '_factory_templates' or value == '_cycleTemplates' then
                 table.insert(groups[name], value)
             else
                 LOG("!!!!! Invalid building value " .. value)
@@ -262,11 +263,18 @@ function availableTemplate(allTemplates,buildable)
     return effectiveTemplates, effectiveIcons
 end
 
+--- A 'hack' to allow us to detect whether the `ButtonRelease` event was from a left-click
+factoryHotkeyLastClickWasLeft = false
+
 function factoryHotkey(units, count)
     CommandMode.StartCommandMode("build", {name = ''})
+
+    -- Another 'hack' that is, uuhh - a hack. Override the event handle of the world view. If it doesn't 
+    -- return false then the event is captured and the engine ignores it (no orders are issued when clicking, etc)
     worldview.HandleEvent = function(self, event)
-        if event.Type == 'ButtonPress' then
+        if event.Type == 'ButtonPress' or event.Type == 'ButtonDClick' then
             if event.Modifiers.Left then
+                factoryHotkeyLastClickWasLeft = true
                 if type(units) == "string" then
                     if IsKeyDown("Shift") then
                         count = 5
@@ -282,15 +290,21 @@ function factoryHotkey(units, count)
                     end
                     StopCycleMap(self, event)
                 end
-            else
-                StopCycleMap(self, event)
+            end
+        else
+            if event.Type == 'ButtonRelease'then
+                if factoryHotkeyLastClickWasLeft then
+                    factoryHotkeyLastClickWasLeft = false
+                else
+                    StopCycleMap(self, event)
+                end
             end
         end
     end
 end
 
 function StopCycleMap(self, event)
-    worldview.HandleEvent = oldHandleEvent(self, event)
+    worldview.HandleEvent = oldHandleEvent
     cycleThread = ForkThread(function()
         local options = Prefs.GetFromCurrentProfile('options')
         local fadeTime = options.hotbuild_cycle_reset_time / 2000.0
@@ -337,6 +351,9 @@ function buildActionBuilding(name, modifier)
 
     if table.find(allValues, "_templates") then
         return buildActionTemplate(modifier)
+    end
+    if table.find(allValues, "_cycleTemplates") then
+        return cycleTemplates.Cycle()
     end
 
     -- Reset everything that could be fading or running
@@ -494,6 +511,8 @@ function buildActionTemplate(modifier)
 end
 
 function buildActionUnit(name, modifier)
+    LOG("buildActionUnit")
+    LOG(" - " .. name)
     local values = unitkeygroups[name]
     local factoryFlag = true
 

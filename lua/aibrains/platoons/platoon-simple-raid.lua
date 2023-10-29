@@ -62,12 +62,11 @@ AIPlatoonSimpleRaidBehavior = Class(AIPlatoon) {
 
             self:Stop()
 
-            -- pick random unit
-            local units, unitCount = self:GetPlatoonUnits()
-            local unit = units[Random(1, unitCount)]
+            local position = self:GetPlatoonPosition()
+            if not position then
+                return
+            end
 
-            -- determine navigational label of that unit
-            local position = unit:GetPosition()
             local label, error = NavUtils.GetLabel('Land', position)
 
             if label then
@@ -95,7 +94,8 @@ AIPlatoonSimpleRaidBehavior = Class(AIPlatoon) {
                 end
 
                 -- pick random expansion that we can Navigating to
-                local expansion = candidates[Random(1, count)]
+                local selectionNumber = Random(1, candidateCount)
+                local expansion = candidates[selectionNumber]
                 self.LocationToRaid = expansion.position
                 self:ChangeState(self.Navigating)
                 return
@@ -131,12 +131,18 @@ AIPlatoonSimpleRaidBehavior = Class(AIPlatoon) {
 
             local cache = { 0, 0, 0 }
             local brain = self:GetBrain()
+            if not brain.GridPresence then
+                WARN('GridPresence does not exist, unable to detect conflict line')
+            end
 
             while not IsDestroyed(self) do
                 -- pick random unit for a position on the grid
                 local units, unitCount = self:GetPlatoonUnits()
                 local origin = self:GetPlatoonPosition()
-
+                if not origin then
+                    return
+                end
+                
                 -- generate a direction
                 local waypoint, length = NavUtils.DirectionTo('Land', origin, destination, 60)
 
@@ -164,6 +170,9 @@ AIPlatoonSimpleRaidBehavior = Class(AIPlatoon) {
                 local wz = waypoint[3]
                 while not IsDestroyed(self) do
                     local position = self:GetPlatoonPosition()
+                    if not position then
+                        return
+                    end
 
                     -- check if we're near our current waypoint
                     local dx = position[1] - wx
@@ -176,12 +185,15 @@ AIPlatoonSimpleRaidBehavior = Class(AIPlatoon) {
                     local threat = brain:GetThreatAtPosition(position, 1, true, 'AntiSurface')
                     if threat > 0 then
                         local threatTable = brain:GetThreatsAroundPosition(position, 1, true, 'AntiSurface')
-                        if threatTable and not TableEmpty(threatTable) then
-                            local info = threatTable[Random(1, TableGetn(threatTable))]
-                            self.ThreatToEvade = { info[1], GetSurfaceHeight(info[1], info[2]), info[2] }
-                            DrawCircle(self.ThreatToEvade, 5, 'ff0000')
-                            self:ChangeState(self.Retreating)
-                            return
+                        local platoonThreat = self:CalculatePlatoonThreatAroundPosition('Surface', categories.MOBILE * categories.DIRECTFIRE - categories.SCOUT, position, 30)
+                        local positionStatus = brain.GridPresence:GetInferredStatus(position)
+                        if positionStatus != 'Allied' or platoonThreat * 2 < threat then
+                            if threatTable and not TableEmpty(threatTable) then
+                                local info = threatTable[Random(1, TableGetn(threatTable))]
+                                self.ThreatToEvade = { info[1], GetSurfaceHeight(info[1], info[2]), info[2] }
+                                self:ChangeState(self.Retreating)
+                                return
+                            end
                         end
                     end
 
@@ -245,6 +257,10 @@ AIPlatoonSimpleRaidBehavior = Class(AIPlatoon) {
 
                 -- check for threats
                 local position = self:GetPlatoonPosition()
+                if not position then
+                    return
+                end
+
                 local threat = brain:GetThreatAtPosition(position, 1, true, 'AntiSurface')
                 if threat > 0 then
                     local threatTable = brain:GetThreatsAroundPosition(position, 1, true, 'AntiSurface')
@@ -317,6 +333,10 @@ AIPlatoonSimpleRaidBehavior = Class(AIPlatoon) {
 
                 -- check for threats
                 local position = self:GetPlatoonPosition()
+                if not position then
+                    return
+                end
+
                 local threat = brain:GetThreatAtPosition(position, 1, true, 'AntiSurface')
                 if threat > 0 then
                     local threatTable = brain:GetThreatsAroundPosition(position, 1, true, 'AntiSurface')
@@ -370,6 +390,10 @@ AIPlatoonSimpleRaidBehavior = Class(AIPlatoon) {
             while not IsDestroyed(self) do
 
                 local position = self:GetPlatoonPosition()
+                if not position then
+                    return
+                end
+
                 local waypoint, error = NavUtils.RetreatDirectionFrom('Land', position, location, 40)
 
                 if not waypoint then
@@ -384,6 +408,9 @@ AIPlatoonSimpleRaidBehavior = Class(AIPlatoon) {
 
                 while not IsDestroyed(self) do
                     local position = self:GetPlatoonPosition()
+                    if not position then
+                        return
+                    end
 
                     -- check if we're near our retreat point
                     local dx = position[1] - wx
@@ -465,6 +492,29 @@ DebugAssignToUnits = function(data, units)
         local others = EntityCategoryFilterDown(categories.ALLUNITS - categories.SCOUT, units)
         brain:AssignUnitsToPlatoon(platoon, others, 'Attack', 'None')
         brain:AssignUnitsToPlatoon(platoon, scouts, 'Scout', 'None')
+
+        -- start the behavior
+        ChangeState(platoon, platoon.Start)
+    end
+end
+
+---@param data { Behavior: 'AIBehaviorTacticalSimple' }
+---@param units Unit[]
+AssignToUnitsMachine = function(data, platoon, units)
+    if units and not TableEmpty(units) then
+        -- meet platoon requirements
+        import("/lua/sim/navutils.lua").Generate()
+        import("/lua/sim/markerutilities.lua").GenerateExpansionMarkers()
+        -- create the platoon
+        setmetatable(platoon, AIPlatoonSimpleRaidBehavior)
+        local count = TableGetn(platoon:GetSquadUnits('Attack'))
+        local scouts = platoon:GetSquadUnits('Scout')
+        if scouts then
+            for k, scout in scouts do
+                IssueClearCommands(scout)
+                IssueGuard(scout, units[Random(1, count)])
+            end
+        end
 
         -- start the behavior
         ChangeState(platoon, platoon.Start)
