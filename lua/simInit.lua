@@ -236,24 +236,24 @@ function OnCreateArmyBrain(index, brain, name, nickname)
     -- switch out brains for non-human armies
     local info = ScenarioInfo.ArmySetup[name]
     if (not info.Human) then
-        local info
+        local reference
         local keys = import("/lua/aibrains/index.lua").keyToBrain
         if (not info.Civilian) and (info.AIPersonality != '') then
             -- likely a skirmish scenario
-            info = keys[info.AIPersonality]
+            reference = keys[info.AIPersonality]
         else
             -- likely a campaign scenario
             if ScenarioInfo.type != 'skirmish' then
-                info = keys['campaign']
+                reference = keys['campaign']
             end
         end
 
-        if info then
+        if reference then
             local instance
-            if not table.empty(getmetatable(info)) then
-                instance = info
+            if not table.empty(getmetatable(reference)) then
+                instance = reference
             else
-                instance = import(info[1])[info[2]]
+                instance = import(reference[1])[reference[2]]
             end
 
             if instance then
