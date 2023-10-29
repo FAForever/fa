@@ -126,9 +126,10 @@ With thanks to the following people who contributed through coding:
 - Balthazar
 - Relent0r
 - lL1l1 
-- Nyx
+- Nex37
 - Pokute 
 - Basilisk3
+- Rowey
 
 With thanks to the following people who contributed through binary patches:
 
@@ -143,7 +144,9 @@ With thanks to the following people who contributed through model, texture, desc
 - Pokute
 - lL1l1 
 - Basilisk3
-  
+- Fichom
+- Clyf
+
 And, last but certainly not least - with thanks to those that took part in constructive discussions:
 
 - BuildMoreRadar
@@ -151,6 +154,10 @@ And, last but certainly not least - with thanks to those that took part in const
 - Sheikah
 - Magge
 - MostLostNoob
+- Fichom
+- Clyf
+- BlackYps
+- Rowey
 
 # Game version 3769 (24th of September, 2023)
 
