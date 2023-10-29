@@ -664,6 +664,7 @@ UnitBlueprint{
             DamageType = "Overcharge",
             DisplayName = "Light Overcharge Cannon",
             EnabledByEnhancement = "Overcharge",
+            EnergyRequired = 7500,
             FireTargetLayerCapsTable = {
                 Land = "Land|Water|Seabed",
                 Seabed = "Land|Water|Seabed",
@@ -742,6 +743,7 @@ UnitBlueprint{
             DamageType = "Overcharge",
             DisplayName = "Light AutoOvercharge Cannon",
             EnabledByEnhancement = "Overcharge",
+            EnergyRequired = 7500,
             FireTargetLayerCapsTable = {
                 Land = "Land|Water|Seabed",
                 Seabed = "Land|Water|Seabed",
