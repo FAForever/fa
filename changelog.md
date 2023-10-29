@@ -15,7 +15,7 @@ Jip
 
 ## Features
 
-### Physics based rendering (PBR) shaders
+### Physically based rendering (PBR) shaders
 
 We've been discussing shader improvements, and the initial changes are now live! PBR shaders have been implemented for all units, including mods, when you have the high fidelity preset selected. The medium fidelity preset now corresponds to the previous high fidelity setting, while the low fidelity preset remains unaffected.
 
