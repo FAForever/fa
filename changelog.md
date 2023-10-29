@@ -150,6 +150,7 @@ And, last but certainly not least - with thanks to those that took part in const
 - CheeseBerry
 - Sheikah
 - Magge
+- MostLostNoob
 
 # Game version 3769 (24th of September, 2023)
 
