@@ -285,6 +285,7 @@ UnitBlueprint{
             CollideFriendly = false,
             Damage = 2,
             DamageType = "Normal",
+            DisableWhileReloading = true,
             DisplayName = "Ajellu Anti-Torpedo Defense",
             FireTargetLayerCapsTable = {
                 Sub = "Seabed|Sub|Water",
@@ -314,7 +315,6 @@ UnitBlueprint{
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_Countermeasure",
             RateOfFire = 0.15,
-            TargetCheckInterval = 1.0,
             TargetRestrictDisallow = "UNTARGETABLE",
             TargetRestrictOnlyAllow = "TORPEDO",
             TargetType = "RULEWTT_Projectile",
@@ -340,6 +340,7 @@ UnitBlueprint{
             CollideFriendly = false,
             Damage = 2,
             DamageType = "Normal",
+            DisableWhileReloading = true,
             DisplayName = "Ajellu Anti-Torpedo Defense",
             FireTargetLayerCapsTable = {
                 Sub = "Seabed|Sub|Water",
@@ -369,7 +370,6 @@ UnitBlueprint{
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_Countermeasure",
             RateOfFire = 0.15,
-            TargetCheckInterval = 1.0,
             TargetRestrictDisallow = "UNTARGETABLE",
             TargetRestrictOnlyAllow = "TORPEDO",
             TargetType = "RULEWTT_Projectile",

@@ -275,7 +275,7 @@ local function AssimilateExpansionMarkers(expansions, expansionCount)
         end
 
         -- assimilate it into the spawn location
-        if math.sqrt(nearestStartLocationDistance) < threshold then
+        if nearestStartLocationDistance and math.sqrt(nearestStartLocationDistance) < threshold then
             local extractors = nearestStartLocation.Extractors
             for k, resource in expansion.Extractors do
                 table.insert(extractors, resource)

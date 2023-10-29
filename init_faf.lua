@@ -601,12 +601,12 @@ for k, file in IoDir(shaderCache .. '/*') do
 end
 
 -- Clears out the shader cache as it takes a release to reset the shaders
--- local shaderCache = SHGetFolderPath('LOCAL_APPDATA') .. 'Gas Powered Games/Supreme Commander Forged Alliance/cache'
--- for k, file in IoDir(shaderCache .. '/*') do
---     if file != '.' and file != '..' then 
---         os.remove(shaderCache .. '/' .. file)
---     end
--- end
+local shaderCache = SHGetFolderPath('LOCAL_APPDATA') .. 'Gas Powered Games/Supreme Commander Forged Alliance/cache'
+for k, file in IoDir(shaderCache .. '/*') do
+    if file != '.' and file != '..' then 
+        os.remove(shaderCache .. '/' .. file)
+    end
+end
 
 -- typical FAF packages
 local allowedAssetsNxy = { }

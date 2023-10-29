@@ -1,6 +1,24 @@
---****************************************************************************
---**  Summary: Manage factories for a location
---****************************************************************************
+--******************************************************************************************************
+--** Copyright (c) 2022  Willem 'Jip' Wijnia
+--**
+--** Permission is hereby granted, free of charge, to any person obtaining a copy
+--** of this software and associated documentation files (the "Software"), to deal
+--** in the Software without restriction, including without limitation the rights
+--** to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+--** copies of the Software, and to permit persons to whom the Software is
+--** furnished to do so, subject to the following conditions:
+--**
+--** The above copyright notice and this permission notice shall be included in all
+--** copies or substantial portions of the Software.
+--**
+--** THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+--** IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+--** FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+--** AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+--** LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+--** OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+--** SOFTWARE.
+--******************************************************************************************************
 
 local BuilderManager = import("/lua/aibrains/managers/builder-manager.lua").AIBuilderManager
 
@@ -10,16 +28,6 @@ local TableGetSize = table.getsize
 local TableGetn = table.getn
 
 local WeakValues = { __mode = 'v' }
-local FactoryCache = {}
-local TemplateCache = {}
-
-local MapFactionCategory = {
-    UEF = 'UEF',
-    AEON = 'Aeon',
-    CYBRAN = 'Cybran',
-    SERAPHIM = 'Seraphim',
-    NOMADS = 'Nomads'
-}
 
 ---@class AIFactoryManagerDebugInfo
 
@@ -27,13 +35,36 @@ local MapFactionCategory = {
 ---@field [1] string    # Name of platoon template
 ---@field [2] string    # Always ''
 
+
+---@class AIFactoryManagerReferenceTechs
+---@field TECH1 AIFactoryManagerReferenceLayers
+---@field TECH2 AIFactoryManagerReferenceLayers
+---@field TECH3 AIFactoryManagerReferenceLayers
+---@field EXPERIMENTAL AIFactoryManagerReferenceLayers
+
+---@class AIFactoryManagerReferenceLayers
+---@field LAND table<EntityId, Unit>
+---@field AIR table<EntityId, Unit>
+---@field NAVAL table<EntityId, Unit>
+
 ---@class AIFactoryManagerReferences
----@field RESEARCH { TECH1: table<EntityId, Unit>, TECH2: table<EntityId, Unit>, TECH3: table<EntityId, Unit>, EXPERIMENTAL: table<EntityId, Unit> }
----@field SUPPORT { TECH1: table<EntityId, Unit>, TECH2: table<EntityId, Unit>, TECH3: table<EntityId, Unit>, EXPERIMENTAL: table<EntityId, Unit> }
+---@field RESEARCH AIFactoryManagerReferenceTechs
+---@field SUPPORT AIFactoryManagerReferenceTechs
+
+---@class AIFactoryManagerCountTechs
+---@field TECH1 AIFactoryManagerCountLayers
+---@field TECH2 AIFactoryManagerCountLayers
+---@field TECH3 AIFactoryManagerCountLayers
+---@field EXPERIMENTAL AIFactoryManagerCountLayers
+
+---@class AIFactoryManagerCountLayers
+---@field LAND number
+---@field AIR number
+---@field NAVAL number
 
 ---@class AIFactoryManagerCounts
----@field RESEARCH { TECH1: number, TECH2: number, TECH3: number, EXPERIMENTAL: number }
----@field SUPPORT { TECH1: number, TECH2: number, TECH3: number, EXPERIMENTAL: number }
+---@field RESEARCH AIFactoryManagerCountTechs
+---@field SUPPORT AIFactoryManagerCountTechs
 
 ---@class AIFactoryManager : AIBuilderManager
 ---@field Factories AIFactoryManagerReferences
@@ -54,61 +85,189 @@ AIFactoryManager = Class(BuilderManager) {
 
         self.Factories = {
             RESEARCH = {
-                TECH1 = setmetatable({}, WeakValues),
-                TECH2 = setmetatable({}, WeakValues),
-                TECH3 = setmetatable({}, WeakValues),
-                EXPERIMENTAL = setmetatable({}, WeakValues),
+                TECH1 = {
+                    LAND = setmetatable({}, WeakValues),
+                    AIR = setmetatable({}, WeakValues),
+                    NAVAL = setmetatable({}, WeakValues),
+                },
+                TECH2 = {
+                    LAND = setmetatable({}, WeakValues),
+                    AIR = setmetatable({}, WeakValues),
+                    NAVAL = setmetatable({}, WeakValues),
+                },
+                TECH3 = {
+                    LAND = setmetatable({}, WeakValues),
+                    AIR = setmetatable({}, WeakValues),
+                    NAVAL = setmetatable({}, WeakValues),
+                },
+                EXPERIMENTAL = {
+                    LAND = setmetatable({}, WeakValues),
+                    AIR = setmetatable({}, WeakValues),
+                    NAVAL = setmetatable({}, WeakValues),
+                },
             },
             SUPPORT = {
-                TECH1 = setmetatable({}, WeakValues),
-                TECH2 = setmetatable({}, WeakValues),
-                TECH3 = setmetatable({}, WeakValues),
-                EXPERIMENTAL = setmetatable({}, WeakValues),
+                TECH1 = {
+                    LAND = setmetatable({}, WeakValues),
+                    AIR = setmetatable({}, WeakValues),
+                    NAVAL = setmetatable({}, WeakValues),
+                },
+                TECH2 = {
+                    LAND = setmetatable({}, WeakValues),
+                    AIR = setmetatable({}, WeakValues),
+                    NAVAL = setmetatable({}, WeakValues),
+                },
+                TECH3 = {
+                    LAND = setmetatable({}, WeakValues),
+                    AIR = setmetatable({}, WeakValues),
+                    NAVAL = setmetatable({}, WeakValues),
+                },
+                EXPERIMENTAL = {
+                    LAND = setmetatable({}, WeakValues),
+                    AIR = setmetatable({}, WeakValues),
+                    NAVAL = setmetatable({}, WeakValues),
+                },
             }
         }
 
         self.FactoryCount = {
             RESEARCH = {
-                TECH1 = 0,
-                TECH2 = 0,
-                TECH3 = 0,
-                EXPERIMENTAL = 0,
+                TECH1 = {
+                    LAND = 0,
+                    AIR = 0,
+                    NAVAL = 0,
+                },
+                TECH2 = {
+                    LAND = 0,
+                    AIR = 0,
+                    NAVAL = 0,
+                },
+                TECH3 = {
+                    LAND = 0,
+                    AIR = 0,
+                    NAVAL = 0,
+                },
+                EXPERIMENTAL = {
+                    LAND = 0,
+                    AIR = 0,
+                    NAVAL = 0,
+                },
             },
             SUPPORT = {
-                TECH1 = 0,
-                TECH2 = 0,
-                TECH3 = 0,
-                EXPERIMENTAL = 0,
+                TECH1 = {
+                    LAND = 0,
+                    AIR = 0,
+                    NAVAL = 0,
+                },
+                TECH2 = {
+                    LAND = 0,
+                    AIR = 0,
+                    NAVAL = 0,
+                },
+                TECH3 = {
+                    LAND = 0,
+                    AIR = 0,
+                    NAVAL = 0,
+                },
+                EXPERIMENTAL = {
+                    LAND = 0,
+                    AIR = 0,
+                    NAVAL = 0,
+                },
             }
         }
 
         self.FactoriesBeingBuilt = {
             RESEARCH = {
-                TECH1 = setmetatable({}, WeakValues),
-                TECH2 = setmetatable({}, WeakValues),
-                TECH3 = setmetatable({}, WeakValues),
-                EXPERIMENTAL = setmetatable({}, WeakValues),
+                TECH1 = {
+                    LAND = setmetatable({}, WeakValues),
+                    AIR = setmetatable({}, WeakValues),
+                    NAVAL = setmetatable({}, WeakValues),
+                },
+                TECH2 = {
+                    LAND = setmetatable({}, WeakValues),
+                    AIR = setmetatable({}, WeakValues),
+                    NAVAL = setmetatable({}, WeakValues),
+                },
+                TECH3 = {
+                    LAND = setmetatable({}, WeakValues),
+                    AIR = setmetatable({}, WeakValues),
+                    NAVAL = setmetatable({}, WeakValues),
+                },
+                EXPERIMENTAL = {
+                    LAND = setmetatable({}, WeakValues),
+                    AIR = setmetatable({}, WeakValues),
+                    NAVAL = setmetatable({}, WeakValues),
+                },
             },
             SUPPORT = {
-                TECH1 = setmetatable({}, WeakValues),
-                TECH2 = setmetatable({}, WeakValues),
-                TECH3 = setmetatable({}, WeakValues),
-                EXPERIMENTAL = setmetatable({}, WeakValues),
+                TECH1 = {
+                    LAND = setmetatable({}, WeakValues),
+                    AIR = setmetatable({}, WeakValues),
+                    NAVAL = setmetatable({}, WeakValues),
+                },
+                TECH2 = {
+                    LAND = setmetatable({}, WeakValues),
+                    AIR = setmetatable({}, WeakValues),
+                    NAVAL = setmetatable({}, WeakValues),
+                },
+                TECH3 = {
+                    LAND = setmetatable({}, WeakValues),
+                    AIR = setmetatable({}, WeakValues),
+                    NAVAL = setmetatable({}, WeakValues),
+                },
+                EXPERIMENTAL = {
+                    LAND = setmetatable({}, WeakValues),
+                    AIR = setmetatable({}, WeakValues),
+                    NAVAL = setmetatable({}, WeakValues),
+                },
             }
         }
 
         self.FactoryBeingBuiltCount = {
             RESEARCH = {
-                TECH1 = 0,
-                TECH2 = 0,
-                TECH3 = 0,
-                EXPERIMENTAL = 0,
+                TECH1 = {
+                    LAND = 0,
+                    AIR = 0,
+                    NAVAL = 0,
+                },
+                TECH2 = {
+                    LAND = 0,
+                    AIR = 0,
+                    NAVAL = 0,
+                },
+                TECH3 = {
+                    LAND = 0,
+                    AIR = 0,
+                    NAVAL = 0,
+                },
+                EXPERIMENTAL = {
+                    LAND = 0,
+                    AIR = 0,
+                    NAVAL = 0,
+                },
             },
             SUPPORT = {
-                TECH1 = 0,
-                TECH2 = 0,
-                TECH3 = 0,
-                EXPERIMENTAL = 0,
+                TECH1 = {
+                    LAND = 0,
+                    AIR = 0,
+                    NAVAL = 0,
+                },
+                TECH2 = {
+                    LAND = 0,
+                    AIR = 0,
+                    NAVAL = 0,
+                },
+                TECH3 = {
+                    LAND = 0,
+                    AIR = 0,
+                    NAVAL = 0,
+                },
+                EXPERIMENTAL = {
+                    LAND = 0,
+                    AIR = 0,
+                    NAVAL = 0,
+                },
             }
         }
 
@@ -119,41 +278,24 @@ AIFactoryManager = Class(BuilderManager) {
     ---@param self AIFactoryManager
     UpdateFactoryThread = function(self)
         while true do
-            local total = 0
-            local engineers = self.Factories
-            local engineerCount = self.FactoryCount
-            for tech, _ in engineerCount do
-                local count = TableGetSize(engineers[tech])
-                engineerCount[tech] = count
-                total = total + count
+            for category, techs in self.Factories do
+                for tech, layers in techs do
+                    for layer, factories in layers do
+                        self.FactoryCount[category][tech][layer] = TableGetSize(factories)
+                    end
+                end
             end
 
-            local factoryBeingBuilt = self.FactoriesBeingBuilt
-            local factoryBeingBuiltCount = self.FactoryBeingBuiltCount
-            for tech, _ in factoryBeingBuiltCount do
-                local count = TableGetSize(factoryBeingBuilt[tech])
-                factoryBeingBuiltCount[tech] = count
-                total = total + count
+            for category, techs in self.FactoriesBeingBuilt do
+                for tech, layers in techs do
+                    for layer, factories in layers do
+                        self.FactoryBeingBuiltCount[category][tech][layer] = TableGetSize(factories)
+                    end
+                end
             end
+
             WaitTicks(10)
         end
-    end,
-
-    -- Check if given factory can build the builder
-    ---@param self AIFactoryManager
-    ---@param builder AIBuilder
-    ---@param factories Unit[]
-    ---@return boolean
-    BuilderParamCheck = function(self, builder, factories)
-        local template = self:GetFactoryTemplate(factories[1], builder:GetPlatoonTemplate())
-
-        -- This faction doesn't have unit of this type
-        if TableGetn(template) == 2 then
-            return false
-        end
-
-        -- This function takes a table of factories to determine if it can build
-        return self.Brain:CanBuildPlatoon(template, factories)
     end,
 
     --------------------------------------------------------------------------------------------
@@ -169,8 +311,9 @@ AIFactoryManager = Class(BuilderManager) {
         if blueprint.CategoriesHash['STRUCTURE'] and blueprint.CategoriesHash['FACTORY'] then
             local type = (blueprint.CategoriesHash['RESEARCH'] and 'RESEARCH') or 'SUPPORT'
             local tech = blueprint.TechCategory
+            local layer = blueprint.LayerCategory
             local id = unit.EntityId
-            self.FactoriesBeingBuilt[type][tech][id] = unit
+            self.FactoriesBeingBuilt[type][tech][layer][id] = unit
 
             -- used by platoon functions to find the manager
             local builderManagerData = unit.BuilderManagerData or {}
@@ -185,21 +328,7 @@ AIFactoryManager = Class(BuilderManager) {
     ---@param builder Unit
     ---@param layer Layer
     OnUnitStopBeingBuilt = function(self, unit, builder, layer)
-        local blueprint = unit.Blueprint
-        if blueprint.CategoriesHash['STRUCTURE'] and blueprint.CategoriesHash['FACTORY'] then
-            local type = (blueprint.CategoriesHash['RESEARCH'] and 'RESEARCH') or 'SUPPORT'
-            local tech = blueprint.TechCategory
-            local id = unit.EntityId
-            self.FactoriesBeingBuilt[type][tech][id] = nil
-            self.Factories[type][tech][id] = unit
-
-            -- used by platoon functions to find the manager
-            local builderManagerData = unit.BuilderManagerData or {}
-            unit.BuilderManagerData = builderManagerData
-            builderManagerData.FactoryManager = self
-
-            self:DelayOrder(unit, 'Any', 10)
-        end
+        self:AddFactory(unit)
     end,
 
     --- Called by a unit as it is destroyed
@@ -210,9 +339,10 @@ AIFactoryManager = Class(BuilderManager) {
         if blueprint.CategoriesHash['STRUCTURE'] and blueprint.CategoriesHash['FACTORY'] then
             local type = (blueprint.CategoriesHash['RESEARCH'] and 'RESEARCH') or 'SUPPORT'
             local tech = blueprint.TechCategory
+            local layer = blueprint.LayerCategory
             local id = unit.EntityId
-            self.FactoriesBeingBuilt[type][tech][id] = nil
-            self.Factories[type][tech][id] = nil
+            self.FactoriesBeingBuilt[type][tech][layer][id] = nil
+            self.Factories[type][tech][layer][id] = nil
         end
     end,
 
@@ -240,22 +370,37 @@ AIFactoryManager = Class(BuilderManager) {
     --------------------------------------------------------------------------------------------
     -- factory manager interface
 
-    --- Add a unit to, similar to calling `OnUnitStopBeingBuilt`
+    ---@param self AIFactoryManager
+    ---@return AIPlatoon
+    GetFactoryPlatoonMetaTable = function(self)
+        return import("/lua/aibrains/platoons/platoon-simple-factory.lua").AIPlatoonSimpleFactory
+    end,
+
+    --- Add a unit to the factory manager
     ---@param self AIFactoryManager
     ---@param unit Unit
     AddFactory = function(self, unit)
         local blueprint = unit.Blueprint
-        if blueprint.CategoriesHash['STRUCTURE'] then
+        if blueprint.CategoriesHash['STRUCTURE'] and blueprint.CategoriesHash['FACTORY'] then
             local type = (blueprint.CategoriesHash['RESEARCH'] and 'RESEARCH') or 'SUPPORT'
             local tech = blueprint.TechCategory
+            local layer = blueprint.LayerCategory
             local id = unit.EntityId
-            self.FactoriesBeingBuilt[type][tech][id] = nil
-            self.Factories[type][tech][id] = unit
+            self.FactoriesBeingBuilt[type][tech][layer][id] = nil
+            self.Factories[type][tech][layer][id] = unit
 
             -- used by platoon functions to find the manager
             local builderManagerData = unit.BuilderManagerData or {}
             unit.BuilderManagerData = builderManagerData
             builderManagerData.StructureManager = self
+
+            -- create a new platoon instance
+            local platoon = self.Brain:MakePlatoon("FactoryManager - " .. tostring(unit), '') --[[@as AIPlatoon]]
+            setmetatable(platoon, self:GetFactoryPlatoonMetaTable())
+            platoon.Base = self.Base
+            platoon.Brain = self.Brain
+            self.Brain:AssignUnitsToPlatoon(platoon, { unit }, 'Unassigned', 'None')
+            ChangeState(platoon, platoon.Start)
         end
     end,
 
@@ -273,73 +418,6 @@ AIFactoryManager = Class(BuilderManager) {
         end
     end,
 
-    ---@param self FactoryBuilderManager
-    ---@param factory Unit
-    ---@param templateName string
-    ---@return AIFactoryTemplate
-    GetFactoryTemplate = function(self, factory, templateName)
-        local platoonTemplate = PlatoonTemplates[templateName]
-
-        -- clear out the cached template
-        local template = TemplateCache
-        for k = 3, table.getn(template) do
-            template[k] = nil
-        end
-
-        -- populate the template
-        template[1] = platoonTemplate.Name
-        template[2] = ''
-
-        local head = 3
-        for _, squad in platoonTemplate.FactionSquads[MapFactionCategory[factory.Blueprint.FactionCategory]] do
-            template[head] = squad
-            head = head + 1
-        end
-
-        return template
-    end,
-
-    --- Assigns a build order to a factory
-    ---@param self AIFactoryManager
-    ---@param factory Unit
-    ---@param builderType AIBuilderType
-    AssignOrder = function(self, factory, builderType)
-        error("AssignOrder")
-        local factoryCache = FactoryCache
-        factoryCache[1] = factory
-
-        local builder = self:GetHighestBuilder(builderType, factoryCache)
-        if builder then
-            -- found something to build
-            local template = self:GetFactoryTemplate(factory, builder:GetPlatoonTemplate())
-            self.Brain:BuildPlatoon(template, factoryCache, 1)
-        else
-            -- did not find anything to build
-            self:DelayOrder(factory, builderType, 10)
-        end
-    end,
-
-    --- Assigns a builder order to a factory after waiting a few ticks
-    ---@param self AIFactoryManager
-    ---@param factory Unit
-    ---@param builderType AIBuilderType
-    ---@param delayInTicks number
-    DelayOrder = function(self, factory, builderType, delayInTicks)
-        self.Trash:Add(ForkThread(self.DelayOrderThread, self, factory, builderType, delayInTicks))
-    end,
-
-    ---@param self AIFactoryManager
-    ---@param factory Unit
-    ---@param builderType AIBuilderType
-    ---@param delayInTicks number
-    DelayOrderThread = function(self, factory, builderType, delayInTicks)
-        WaitTicks(delayInTicks)
-
-        if not IsDestroyed(factory) then
-            self:AssignOrder(factory, builderType)
-        end
-    end,
-
     --------------------------------------------------------------------------------------------
     -- factory conditions interface
 
@@ -351,7 +429,7 @@ AIFactoryManager = Class(BuilderManager) {
     GetDebugInfo = function(self)
         local info = self.DebugInfo
         if not info then
-            info = { }
+            info = {}
             self.DebugInfo = info
         end
 

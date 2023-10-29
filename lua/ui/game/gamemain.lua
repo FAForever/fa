@@ -230,21 +230,21 @@ function CreateUI(isReplay)
         DiskFindFiles("/textures/ui/common/icons", "*.dds")
     )
 
-    prefetchTable.d3d_textures = table.concatenate(
-        DiskFindFiles("/textures/particles", "*.dds"),
-        DiskFindFiles("/textures/effects", "*.dds"),
-        DiskFindFiles("/projectiles", "*.dds"),
-        DiskFindFiles("/meshes/", "*.dds")
-    )
+    -- prefetchTable.d3d_textures = table.concatenate(
+    --     DiskFindFiles("/textures/particles", "*.dds"),
+    --     DiskFindFiles("/textures/effects", "*.dds"),
+    --     DiskFindFiles("/projectiles", "*.dds"),
+    --     DiskFindFiles("/meshes/", "*.dds")
+    -- )
 
-    prefetchTable.models = table.concatenate(
-        DiskFindFiles("/projectiles", "*.scm"),
-        DiskFindFiles("/meshes/", "*.scm")
-    )
+    -- prefetchTable.models = table.concatenate(
+    --     DiskFindFiles("/projectiles", "*.scm"),
+    --     DiskFindFiles("/meshes/", "*.scm")
+    -- )
 
-    prefetchTable.anims = table.concatenate(
-        DiskFindFiles("/units/", "*.sca")
-    )
+    -- prefetchTable.anims = table.concatenate(
+    --     DiskFindFiles("/units/", "*.sca")
+    -- )
 
     SPEW(string.format("Preloading %d batch textures", table.getn(prefetchTable.batch_textures)))
     SPEW(string.format("Preloading %d d3d textures", table.getn(prefetchTable.d3d_textures)))

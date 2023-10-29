@@ -188,7 +188,7 @@ function OverrideDoDamage(self, instigator, amount, vector, damageType)
             if excess < 0 and maxHealth > 0 then
                 excessDamageRatio = -excess / maxHealth
             end
-            IssueClearCommands({self})
+            IssueToUnitClearCommands(self)
             ForkThread(UnlockAndKillUnitThread, self, instigator, damageType, excessDamageRatio)
         end
     end
@@ -915,7 +915,7 @@ end
 ---@param killUnit? boolean
 function FakeTeleportUnit(unit, killUnit)
     IssueStop({unit})
-    IssueClearCommands({unit})
+    IssueToUnitClearCommands(unit)
     unit.CanBeKilled = false
 
     unit:PlayTeleportChargeEffects(unit:GetPosition(), unit:GetOrientation())
@@ -1034,7 +1034,7 @@ end
 function UpgradeUnit(unit)
     local upgradeBP = unit:GetBlueprint().General.UpgradesTo
     IssueStop({unit})
-    IssueClearCommands({unit})
+    IssueToUnitClearCommands(unit)
     IssueUpgrade({unit}, upgradeBP)
 end
 
@@ -2309,8 +2309,8 @@ function MoveOnMap(unit)
         nearestPoint[3] = playableArea[4] - 5
     end
 
-    IssueClearCommands({unit})
-    IssueMove({unit}, nearestPoint)
+    IssueToUnitClearCommands(unit)
+    IssueToUnitMove(unit, nearestPoint)
 end
 
 --- Returns if the unit's army is human

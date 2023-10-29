@@ -80,11 +80,11 @@ UnitBlueprint{
             LODs = {
                 {
                     LODCutoff = 100,
-                    ShaderName = "Insect",
+                    ShaderName = "CybranNavy",
                 },
                 {
                     LODCutoff = 215,
-                    ShaderName = "Insect",
+                    ShaderName = "CybranNavy",
                     AlbedoName = "xrs0204_lod1_albedo.dds",
                     SpecularName = "xrs0204_lod1_specteam.dds",
                 },
@@ -301,6 +301,7 @@ UnitBlueprint{
                 ProjectilesToDeflect = 3,
                 Radius = 5,
             },
+            DisableWhileReloading = true,
             DisplayName = "Anti-Torpedo Flare",
             FireTargetLayerCapsTable = {
                 Sub = "Seabed|Sub|Water",
@@ -332,7 +333,6 @@ UnitBlueprint{
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_Countermeasure",
             RateOfFire = 0.05,
-            TargetCheckInterval = 1.0,
             TargetRestrictDisallow = "UNTARGETABLE",
             TargetRestrictOnlyAllow = "TORPEDO",
             TargetType = "RULEWTT_Projectile",

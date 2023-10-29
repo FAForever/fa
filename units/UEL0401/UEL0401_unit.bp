@@ -43,7 +43,6 @@ UnitBlueprint{
         "CONSTRUCTION",
         "DRAGBUILD",
         "EXPERIMENTAL",
-        "FACTORY",
         "INDIRECTFIRE",
         "LAND",
         "LOWSELECTPRIO",
@@ -230,6 +229,13 @@ UnitBlueprint{
         MaintenanceConsumptionPerSecondEnergy = 600,
         StorageEnergy = 1000,
         StorageMass = 200,
+    },
+    ExternalFactory = {
+        SelectionSizeX = 2,
+        SelectionSizeZ = 2,
+        SelectionCenterOffsetX = 0,
+        SelectionCenterOffsetY = 1.5,
+        SelectionCenterOffsetZ = 2.5,
     },
     General = {
         BuildBones = {

@@ -358,7 +358,7 @@ function AssistConditionalBuild(singleEngineerPlatoon)
     bManager.ConditionalBuildData.IncrementAssisting()
 
     -- Give orders to repair the unit
-    IssueClearCommands({engineer})
+    IssueToUnitClearCommands(engineer)
     IssueRepair({engineer}, bManager.ConditionalBuildData.Unit)
 
     -- Super loop
@@ -370,7 +370,7 @@ function AssistConditionalBuild(singleEngineerPlatoon)
         end
     end
 
-    IssueClearCommands({engineer})
+    IssueToUnitClearCommands(engineer)
     TriggerFile.RemoveUnitTrigger(engineer, ConditionalBuilderDead)
 end
 
@@ -411,7 +411,7 @@ function DoConditionalBuild(singleEngineerPlatoon)
     TriggerFile.CreateUnitDestroyedTrigger(ConditionalBuilderDead, engineer)
 
     -- Issue build orders
-    IssueClearCommands({engineer})
+    IssueToUnitClearCommands(engineer)
     local result = aiBrain:BuildStructure(engineer, unitToBuild.type, {unitToBuild.Position[1], unitToBuild.Position[3], 0})
 
     -- Enter build monitoring loop
@@ -450,7 +450,7 @@ function DoConditionalBuild(singleEngineerPlatoon)
         end
         WaitTicks(Random(7, 13))
     end
-    IssueClearCommands({engineer})
+    IssueToUnitClearCommands(engineer)
     TriggerFile.RemoveUnitTrigger(engineer, ConditionalBuilderDead)
 end
 
@@ -801,7 +801,7 @@ function BaseManagerEngineerThread(platoon)
             if not eng then
                 eng = v
             else
-                IssueClearCommands({v})
+                IssueToUnitClearCommands(v)
                 IssueGuard({v}, eng)
             end
         end
@@ -938,7 +938,7 @@ function BuildBaseManagerStructure(aiBrain, eng, baseManager, levelName, buildin
                     -- Removed transport call as the pathing check was creating problems with base manager rebuilding
                     -- TODO: develop system where base managers more easily rebuild in far away or hard to reach locations
                     -- and TransportUnitsToLocation(platoon, {closest[1], 0, closest[2]}) then
-                    IssueClearCommands({eng})
+                    IssueToUnitClearCommands(eng)
                     aiBrain:BuildStructure(eng, category, closest, false)
 
                     local unitName = false
@@ -988,7 +988,7 @@ function BuildUnfinishedStructures(platoon)
             if ScenarioInfo.UnitNames[armyIndex][unitName] and not ScenarioInfo.UnitNames[armyIndex][unitName].Dead then
                 if not beingBuiltList[unitName] then
                     unfinishedBuildings = true
-                    IssueClearCommands({eng})
+                    IssueToUnitClearCommands(eng)
                     IssueRepair({eng}, ScenarioInfo.UnitNames[armyIndex][unitName])
                     repeat
                         WaitSeconds(3)
@@ -1248,7 +1248,7 @@ function BaseManagerNukeAI(platoon)
 			if nukePos then
 				IssueNuke({unit}, nukePos)
 				WaitSeconds(15)
-				IssueClearCommands({unit})
+				IssueToUnitClearCommands(unit)
 			end
 		end
 		WaitSeconds(10)
@@ -1379,7 +1379,7 @@ function UnitUpgradeThread(unit)
                     Enhancement = upgradeName
                 }
                 IssueStop({unit})
-                IssueClearCommands({unit})
+                IssueToUnitClearCommands(unit)
                 IssueScript({unit}, order)
 
                 repeat

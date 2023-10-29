@@ -85,11 +85,11 @@ UnitBlueprint{
             LODs = {
                 {
                     LODCutoff = 250,
-                    ShaderName = "Aeon",
+                    ShaderName = "AeonNavy",
                 },
                 {
                     LODCutoff = 600,
-                    ShaderName = "Aeon",
+                    ShaderName = "AeonNavy",
                     AlbedoName = "uas0302_lod1_albedo.dds",
                     SpecularName = "uas0302_lod1_specteam.dds",
                 },
@@ -388,6 +388,7 @@ UnitBlueprint{
             CollideFriendly = false,
             Damage = 30,
             DamageType = "Normal",
+            DisableWhileReloading = true,
             DisplayName = "Will O Wisp Anti Missile",
             FireTargetLayerCapsTable = { Water = "Air" },
             FiringTolerance = 360,

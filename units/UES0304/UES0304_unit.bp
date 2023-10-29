@@ -85,11 +85,11 @@ UnitBlueprint{
             LODs = {
                 {
                     LODCutoff = 100,
-                    ShaderName = "Unit",
+                    ShaderName = "UEFNavy",
                 },
                 {
                     LODCutoff = 215,
-                    ShaderName = "Unit",
+                    ShaderName = "UEFNavy",
                     AlbedoName = "ues0304_lod1_albedo.dds",
                     SpecularName = "ues0304_lod1_specteam.dds",
                 },
@@ -254,7 +254,7 @@ UnitBlueprint{
             FiringTolerance = 2,
             Label = "CruiseMissiles",
             MaxRadius = 256,
-            MinRadius = 15,
+            MinRadius = 20,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
             MuzzleVelocity = 5,

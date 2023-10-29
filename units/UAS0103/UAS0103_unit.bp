@@ -87,11 +87,11 @@ UnitBlueprint{
             LODs = {
                 {
                     LODCutoff = 140,
-                    ShaderName = "Aeon",
+                    ShaderName = "AeonNavy",
                 },
                 {
                     LODCutoff = 250,
-                    ShaderName = "Aeon",
+                    ShaderName = "AeonNavy",
                     AlbedoName = "uas0103_lod1_albedo.dds",
                     SpecularName = "uas0103_lod1_specteam.dds",
                 },
@@ -315,6 +315,7 @@ UnitBlueprint{
             CollideFriendly = false,
             Damage = 2,
             DamageType = "Normal",
+            DisableWhileReloading = true,
             DisplayName = "Quasar Anti Torpedo",
             FireTargetLayerCapsTable = { Water = "Seabed|Sub|Water" },
             FiringTolerance = 10,

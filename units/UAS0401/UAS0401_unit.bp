@@ -39,7 +39,6 @@ UnitBlueprint{
         "DIRECTFIRE",
         "DRAGBUILD",
         "EXPERIMENTAL",
-        "FACTORY",
         "INTELLIGENCE",
         "LOWSELECTPRIO",
         "MOBILE",
@@ -113,11 +112,11 @@ UnitBlueprint{
             LODs = {
                 {
                     LODCutoff = 200,
-                    ShaderName = "Aeon",
+                    ShaderName = "AeonNavy",
                 },
                 {
                     LODCutoff = 900,
-                    ShaderName = "Aeon",
+                    ShaderName = "AeonNavy",
                     AlbedoName = "uas0401_lod1_albedo.dds",
                     SpecularName = "uas0401_lod1_specteam.dds",
                 },
@@ -188,6 +187,13 @@ UnitBlueprint{
             "BUILTBYTIER1FACTORY AEON MOBILE CONSTRUCTION",
             "BUILTBYTIER2FACTORY AEON MOBILE NAVAL",
         },
+    },
+    ExternalFactory = {
+        SelectionSizeX = 3,
+        SelectionSizeZ = 3,
+        SelectionCenterOffsetX = 0,
+        SelectionCenterOffsetY = 2.0,
+        SelectionCenterOffsetZ = 4,
     },
     General = {
         CommandCaps = {
@@ -408,6 +414,7 @@ UnitBlueprint{
             CollideFriendly = false,
             Damage = 3,
             DamageType = "Normal",
+            DisableWhileReloading = true,
             DisplayName = "Quasar Anti Torpedo",
             FireTargetLayerCapsTable = {
                 Sub = "Sub|Water",

@@ -20,6 +20,7 @@ ProjectileBlueprint {
         'SERAPHIM',
         'PROJECTILE',
         'INDIRECTFIRE',
+        'IGNOREASFONCOLLISION',
     },
     Display = {
         CameraFollowTimeout = 2,
@@ -28,9 +29,6 @@ ProjectileBlueprint {
             Type = 'Small01',
         },
         StrategicIconSize = 2,
-    },
-    DoNotCollideList = {
-        'ASF',
     },
     General = {
         Category = 'Bomb',

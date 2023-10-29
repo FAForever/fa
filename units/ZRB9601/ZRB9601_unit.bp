@@ -1,12 +1,5 @@
 UnitBlueprint {
-    AI = {
-        TargetBones = {
-            'Attachpoint',
-            'B05',
-            'B06',
-            'B11',
-        },
-    },
+    AI = {},
     Audio = {
         Construct = Sound {
             Bank = 'URB',

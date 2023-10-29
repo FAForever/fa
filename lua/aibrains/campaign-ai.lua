@@ -554,7 +554,7 @@ AIBrain = Class(StandardBrain) {
             if not v.Dead and not (v:IsUnitState('Building') or v:IsUnitState('Upgrading')) then
                 local guarded = v:GetGuardedUnit()
                 if not guarded or guarded.EntityId ~= primary.EntityId then
-                    IssueClearCommands({v})
+                    IssueToUnitClearCommands(v)
                     IssueFactoryAssist({v}, primary)
                 end
             end

@@ -209,7 +209,7 @@ function ResetOrderQueue(factory)
 end
 
 function ResetOrderQueues(units)
-    local factories = EntityCategoryFilterDown((categories.SHOWQUEUE * categories.STRUCTURE) + categories.FACTORY, units)
+    local factories = EntityCategoryFilterDown((categories.SHOWQUEUE * categories.STRUCTURE) + categories.FACTORY + categories.EXTERNALFACTORY, units)
     if factories[1] then
         Select.Hidden(function()
             for _, factory in factories do
@@ -1082,7 +1082,7 @@ end
 function OnRolloverHandler(button, state)
     local item = button.Data
 
-    if options.gui_draggable_queue ~= 0 and item.type == 'queuestack' and prevSelection and EntityCategoryContains(categories.FACTORY, prevSelection[1]) then
+    if options.gui_draggable_queue ~= 0 and item.type == 'queuestack' and prevSelection and EntityCategoryContains(categories.FACTORY + categories.EXTERNALFACTORY, prevSelection[1]) then
         if state == 'enter' then
             button.oldHandleEvent = button.HandleEvent
             -- If we have entered the button and are dragging something then we want to replace it with what we are dragging
@@ -1444,8 +1444,24 @@ function OnClickHandler(button, modifiers)
                     import("/lua/ui/game/commandmode.lua").StartCommandMode(buildCmd, {name = item.id})
                 else
                     -- If the item to build can move, it must be built by a factory
-                    -- TODO - what about mobile factories?
-                    IssueBlueprintCommand("UNITCOMMAND_BuildFactory", item.id, count)
+                    -- Mobile factories: we check for platforms (the attached units can be given orders as normal)
+                    -- If we've got platforms, we take our selected units (minus the platforms), then add the
+                    -- external factories to that list, then give orders with 
+                    -- IssueBlueprintCommandToUnits (which can give orders to an arbitrary list of units)
+                    -- instead of IssueBlueprintCommand (which gives orders to the current selection)
+                    local selection = GetSelectedUnits()
+                    local exFacs = EntityCategoryFilterDown(categories.EXTERNALFACTORY, selection)
+                    if not table.empty(exFacs) then
+                        local exFacUnits = EntityCategoryFilterOut(categories.EXTERNALFACTORY, selection)
+                        for _, exFac in exFacs do
+                            table.insert(exFacUnits, exFac:GetCreator())
+                        end
+                        -- in case we've somehow selected both the platform and the factory, only put the fac in once
+                        exFacUnits = table.unique(exFacUnits)
+                        IssueBlueprintCommandToUnits(exFacUnits, "UNITCOMMAND_BuildFactory", item.id, count)
+                    else
+                        IssueBlueprintCommand("UNITCOMMAND_BuildFactory", item.id, count)
+                    end
                 end
             end
         else
@@ -1895,6 +1911,10 @@ function CreateExtraControls(controlType)
         Tooltip.AddCheckboxTooltip(controls.extraBtn2, 'construction_pause')
         controls.extraBtn2.OnCheck = function(self, checked)
             SetPaused(sortedOptions.selection, checked)
+            -- If we have exFacs platforms or exFac units selected, we'll pause their counterparts as well
+            for _, exFac in EntityCategoryFilterDown(categories.EXTERNALFACTORY + categories.EXTERNALFACTORYUNIT, sortedOptions.selection) do
+                exFac:GetCreator():ProcessInfo('SetPaused', tostring(checked))
+            end
         end
         if pauseEnabled then
             controls.extraBtn2:Enable()
@@ -1911,10 +1931,9 @@ function CreateExtraControls(controlType)
         end
         controls.extraBtn1.OnCheck = function(self, checked)
             for _, v in sortedOptions.selection do
-                if checked then
-                    v:ProcessInfo('SetRepeatQueue', 'true')
-                else
-                    v:ProcessInfo('SetRepeatQueue', 'false')
+                v:ProcessInfo('SetRepeatQueue', tostring(checked))
+                if EntityCategoryContains(categories.EXTERNALFACTORY + categories.EXTERNALFACTORYUNIT, v) then
+                    v:GetCreator():ProcessInfo('SetRepeatQueue', tostring(checked))
                 end
             end
         end
@@ -1926,7 +1945,7 @@ function CreateExtraControls(controlType)
                 currentInfiniteQueueCheckStatus = false
             end
 
-            if not v:IsInCategory('FACTORY') then
+            if not (v:IsInCategory('FACTORY') or v:IsInCategory('EXTERNALFACTORY'))then
                 allFactories = false
             end
         end
@@ -2034,7 +2053,7 @@ function FormatData(unitData, type)
         -- or T1 -> T2 Support -> T3 Support is not supported yet by the code which actually
         -- looks up, stores, and executes the upgrade chain. This needs doing for 3654.
         local unitSelected = sortedOptions.selection[1]
-        local isStructure = EntityCategoryContains(categories.STRUCTURE - categories.FACTORY, unitSelected)
+        local isStructure = EntityCategoryContains(categories.STRUCTURE - (categories.FACTORY + categories.EXTERNALFACTORY), unitSelected)
 
         for i, units in sortedUnits do
             table.sort(units, SortFunc)
@@ -2477,7 +2496,7 @@ function OnSelection(buildableCategories, selection, isOldSelection)
         else
             allFactories = true
             for i, v in selection do
-                if not v:IsInCategory('FACTORY') then
+                if not (v:IsInCategory('FACTORY') or v:IsInCategory('EXTERNALFACTORY')) then
                     allFactories = false
                     break
                 end
@@ -2486,7 +2505,14 @@ function OnSelection(buildableCategories, selection, isOldSelection)
     end
 
     if table.getn(selection) == 1 then
-        currentCommandQueue = SetCurrentFactoryForQueueDisplay(selection[1])
+        -- Queue display is easy: if we've got one unit selected, and it's an exFac platform,
+        -- show the queue of its attached external factory
+        -- this automatically supports removing/modifying the queue, neat!
+        if EntityCategoryContains(categories.EXTERNALFACTORY, selection[1]) then
+            currentCommandQueue = SetCurrentFactoryForQueueDisplay(selection[1]:GetCreator())
+        else
+            currentCommandQueue = SetCurrentFactoryForQueueDisplay(selection[1])
+        end
     else
         currentCommandQueue = {}
         ClearCurrentFactoryForQueueDisplay()
@@ -2528,7 +2554,7 @@ function OnSelection(buildableCategories, selection, isOldSelection)
         -- Only honour CONSTRUCTIONSORTDOWN if we selected a factory
         local allFactory = true
         for i, v in selection do
-            if allFactory and not v:IsInCategory('FACTORY') then
+            if allFactory and not ( v:IsInCategory('FACTORY') or v:IsInCategory('EXTERNALFACTORY')) then
                 allFactory = false
             end
         end
@@ -2549,7 +2575,7 @@ function OnSelection(buildableCategories, selection, isOldSelection)
                     table.insert(sortedOptions.t1, unit)
                 end
             end
-        elseif EntityCategoryContains(categories.ENGINEER + categories.FACTORY, selection[1]) then
+        elseif EntityCategoryContains(categories.ENGINEER + categories.FACTORY + categories.EXTERNALFACTORY, selection[1]) then
             sortedOptions.t1 = EntityCategoryFilterDown(categories.TECH1, buildableUnits)
             sortedOptions.t2 = EntityCategoryFilterDown(categories.TECH2, buildableUnits)
             sortedOptions.t3 = EntityCategoryFilterDown(categories.TECH3, buildableUnits)

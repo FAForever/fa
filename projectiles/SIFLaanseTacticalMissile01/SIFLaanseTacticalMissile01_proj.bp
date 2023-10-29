@@ -22,6 +22,7 @@ ProjectileBlueprint {
         'INDIRECTFIRE',
         'TACTICAL',
         'MISSILE',
+        'NOSPLASHDAMAGE'
     },
     Defense = {
         Health = 1,
@@ -55,5 +56,8 @@ ProjectileBlueprint {
         TurnRate = 0,
         UseGravity = false,
         VelocityAlign = true,
+        
+        ZigZagFrequency = 1,
+        MaxZigZag = 1
     },
 }

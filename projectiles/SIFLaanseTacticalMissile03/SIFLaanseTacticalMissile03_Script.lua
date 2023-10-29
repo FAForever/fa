@@ -1,54 +1,47 @@
--- File     :  /data/projectiles/SIFLaanseTacticalMissile03/SIFLaanseTacticalMissile03_script.lua
--- Author(s):  Gordon Duclos, Aaron Lundquist
--- Summary  :  Laanse Tactical Missile Projectile script, XSS0303
--- Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
----------------------------------------------------------------------------------------------------
+
+--******************************************************************************************************
+--** Copyright (c) 2022  Willem 'Jip' Wijnia
+--**
+--** Permission is hereby granted, free of charge, to any person obtaining a copy
+--** of this software and associated documentation files (the "Software"), to deal
+--** in the Software without restriction, including without limitation the rights
+--** to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+--** copies of the Software, and to permit persons to whom the Software is
+--** furnished to do so, subject to the following conditions:
+--**
+--** The above copyright notice and this permission notice shall be included in all
+--** copies or substantial portions of the Software.
+--**
+--** THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+--** IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+--** FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+--** AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+--** LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+--** OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+--** SOFTWARE.
+--******************************************************************************************************
+
 local SLaanseTacticalMissile = import("/lua/seraphimprojectiles.lua").SLaanseTacticalMissile
-SIFLaanseTacticalMissile03 = ClassProjectile(SLaanseTacticalMissile) {
+local TacticalMissileComponent = import('/lua/sim/DefaultProjectiles.lua').TacticalMissileComponent
+
+--- Used by XSS0303
+---@class SIFLaanseTacticalMissile03 : SLaanseTacticalMissile, TacticalMissileComponent
+SIFLaanseTacticalMissile03 = ClassProjectile(SLaanseTacticalMissile, TacticalMissileComponent) {
+
+    LaunchTicks = 16,
+    LaunchTicksRange = 1,
+    LaunchTurnRate = 20,
+    LaunchTurnRateRange = 1,
+    HeightDistanceFactor = 8,
+    HeightDistanceFactorRange = 0,
+    MinHeight = 5,
+    MinHeightRange = 0,
+    FinalBoostAngle = 30,
+    FinalBoostAngleRange = 0,
+
     OnCreate = function(self)
         SLaanseTacticalMissile.OnCreate(self)
-        self:SetCollisionShape('Sphere', 0, 0, 0, 2.0)
-        self.Trash:Add(ForkThread( self.MovementThread,self ))
-    end,
-
-    MovementThread = function(self)
-        self:SetTurnRate(8)
-        WaitTicks(4)
-        while not self:BeenDestroyed() do
-            self:SetTurnRateByDist()
-            WaitTicks(2)
-        end
-    end,
-
-    SetTurnRateByDist = function(self)
-        local dist = self:GetDistanceToTarget()
-        --Get the nuke as close to 90 deg as possible
-        if dist > 50 then        
-            --Freeze the turn rate as to prevent steep angles at long distance targets
-            WaitTicks(21)
-            self:SetTurnRate(20)
-        elseif dist > 64 and dist <= 107 then
-						-- Increase check intervals
-						self:SetTurnRate(30)
-						WaitTicks(16)
-            self:SetTurnRate(30)
-        elseif dist > 21 and dist <= 53 then
-						-- Further increase check intervals
-                        WaitTicks(4)
-            self:SetTurnRate(50)
-				elseif dist > 0 and dist <= 21 then
-						-- Further increase check intervals            
-            self:SetTurnRate(100)
-            KillThread(self.MoveThread)
-        end
-    end,
-
-    GetDistanceToTarget = function(self)
-        local tpos = self:GetCurrentTargetPosition()
-        local mpos = self:GetPosition()
-        local dist = VDist2(mpos[1], mpos[3], tpos[1], tpos[3])
-        return dist
+        self.MoveThread = self.Trash:Add(ForkThread(self.MovementThread, self))
     end,
 }
 TypeClass = SIFLaanseTacticalMissile03
-

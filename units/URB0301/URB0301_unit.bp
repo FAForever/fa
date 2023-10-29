@@ -1,12 +1,6 @@
 UnitBlueprint{
     Description = "<LOC urb0301_desc>Land Factory HQ",
-    AI = {
-        TargetBones = {
-            "URB0301",
-            "B05",
-            "B06",
-        },
-    },
+    AI = { },
     Audio = {
         Construct      = Sound { Bank = 'URB',        Cue = 'URB0301_Construct_Start',    LodCutoff = 'UnitMove_LodCutoff' },
         ConstructLoop  = Sound { Bank = 'URB',        Cue = 'URB0301_Construct_Loop',     LodCutoff = 'UnitMove_LodCutoff' },

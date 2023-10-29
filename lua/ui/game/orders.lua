@@ -561,8 +561,13 @@ local function AbilityButtonBehavior(self, modifiers)
 end
 
 -- Generic script button specific behvior
-local function ScriptButtonOrderBehavior(self, modifiers)
-    local state = self:IsChecked()
+local function ScriptButtonOrderBehavior(self, modifiers, subState)
+    local state
+    if subState ~= nil then
+        state = subState
+    else
+        state = self:IsChecked()
+    end
     local mixed = false
     if self._mixedIcon then
         mixed = true
@@ -580,11 +585,12 @@ local function ScriptButtonOrderBehavior(self, modifiers)
     if controls.mouseoverDisplay.text then
         controls.mouseoverDisplay.text:SetText(self._curHelpText)
     end
-
-    Checkbox.OnClick(self)
+    if subState == nil then
+        Checkbox.OnClick(self)
+    end
 end
 
-local function ScriptButtonInitFunction(control, unitList)
+local function ScriptButtonInitFunction(control, unitList, subCheck)
     local result = nil
     local mixed = false
     for i, v in unitList do
@@ -603,27 +609,123 @@ local function ScriptButtonInitFunction(control, unitList)
         control._mixedIcon = Bitmap(control, UIUtil.UIFile('/game/orders-panel/question-mark_bmp.dds'))
         LayoutHelpers.AtRightTopIn(control._mixedIcon, control, -2, 2)
     end
-    control:SetCheck(result) -- Selected state
+    if not subCheck then
+        control:SetCheck(result) -- Selected state
+    else
+        return result, mixed -- Return our values so our meta button can do what it likes with them
+    end
+end
+
+local function StatToggleOrderBehavior(self, modifiers, subState)
+    local state
+    if subState ~= nil then
+        state = subState
+    else
+        state = self:IsChecked()
+    end
+    local mixed = false
+    if self._mixedIcon then
+        mixed = true
+        self._mixedIcon:Destroy()
+        self._mixedIcon = nil
+    end
+
+    -- Mixed shields get special behaviour: turn everything on, not off.
+    if mixed then
+        SimCallback( { Func="SetStatByCallback", Args= {[self._data.statToggle] = true}}, true )
+    else
+        SimCallback( { Func="SetStatByCallback", Args= {[self._data.statToggle] = not state}}, true)
+    end
+
+    if controls.mouseoverDisplay.text then
+        controls.mouseoverDisplay.text:SetText(self._curHelpText)
+    end
+    if subState == nil then
+        Checkbox.OnClick(self)
+    else
+        return (mixed and true) or (not state)
+    end
+end
+
+local function StatToggleInitFunction(control, unitList, subCheck)
+    local result = nil
+    local mixed = false
+    for i, v in unitList do
+        local thisUnitStatus = (v:GetStat(control._data.statToggle, 0).Value == 1 and true) or false
+        if result == nil then
+            result = thisUnitStatus
+        else
+            if thisUnitStatus ~= result then
+                mixed = true
+                result = true
+                break
+            end
+        end
+    end
+    if mixed then
+        control._mixedIcon = Bitmap(control, UIUtil.UIFile('/game/orders-panel/question-mark_bmp.dds'))
+        LayoutHelpers.AtRightTopIn(control._mixedIcon, control, -2, 2)
+    end
+    if not subCheck then
+        control:SetCheck(result) -- Selected state
+    else
+        return result, mixed -- Return our values so our meta button can do what it likes with them
+    end
 end
 
 local function DroneBehavior(self, modifiers)
     if modifiers.Left then
-        SelectUnits({self._unit})
+        SelectUnits(self._unit)
     end
 
     if modifiers.Right then
+        if self._mixedIcon then
+            self._mixedIcon:Destroy()
+            self._mixedIcon = nil
+        end
         if self:IsChecked() then
-            self._pod:ProcessInfo('SetAutoMode', 'false')
+            for _, pod in self._pod do
+                pod:ProcessInfo('SetAutoMode', 'false')
+            end
             self:SetCheck(false)
         else
-            self._pod:ProcessInfo('SetAutoMode', 'true')
+            for _, pod in self._pod do
+                pod:ProcessInfo('SetAutoMode', 'true')
+            end
             self:SetCheck(true)
         end
     end
 end
 
 local function DroneInit(self, selection)
-    self:SetCheck(self._pod:IsAutoMode())
+
+    local mixed = false
+    local lastMode = nil
+    if self._pod and next(self._pod) then
+        for _, pod in self._pod do
+            if lastMode == nil then
+                lastMode = pod:IsAutoMode()
+            elseif lastMode ~= pod:IsAutoMode() then
+                mixed = true
+                break
+            end
+        end
+    end
+
+    if mixed then
+        self:SetCheck(false)
+        self._mixedIcon = Bitmap(self, UIUtil.UIFile('/game/orders-panel/question-mark_bmp.dds'))
+        LayoutHelpers.AtRightTopIn(self._mixedIcon, self, -2, 2)
+    else
+        self:SetCheck(lastMode)
+    end
+
+end
+
+local function ExternalFactoryBehavior(self, modifiers)
+    if modifiers.Left then
+        SelectUnits(self._unit)
+    end
 end
 
 -- Retaliate button specific behvior
@@ -966,6 +1068,29 @@ local function OverchargeFrame(self, deltaTime)
     end
 end
 
+AutoDeployBehavior = function(self, modifiers)
+    if modifiers.Left then
+        StandardOrderBehavior(self, modifiers)
+    elseif modifiers.Right then
+        self._toggleState = StatToggleOrderBehavior(self, modifiers, self._toggleState)
+        if self._toggleState then
+            self._toggleIcon:SetAlpha(1)
+        else
+            self._toggleIcon:SetAlpha(0)
+        end
+    end
+end
+
+AutoDeployInit = function(self, selection)
+    self._order = 'RULEUCC_Transport'
+    self._toggleIcon = Bitmap(self, UIUtil.UIFile('/game/orders/ring-yellow_mod.dds'))
+    LayoutHelpers.AtCenterIn(self._toggleIcon, self)
+    local mixed
+    self._toggleState, mixed = StatToggleInitFunction(self, selection, true)
+    if mixed or not self._toggleState then
+        self._toggleIcon:SetAlpha(0)
+    end
+end
 
 ---@alias CommandCap EngineCommandCap
 ---| "AttackMove"
@@ -1017,8 +1142,10 @@ local defaultOrdersTable = {
     RULEUCC_Repair = {              helpText = "repair",            bitmapId = 'repair',                preferredSlot = 14, behavior = StandardOrderBehavior},
     RULEUCC_Dock = {                helpText = "dock",              bitmapId = 'dock',                  preferredSlot = 14, behavior = DockOrderBehavior},
 
-    DroneL = {                      helpText = "drone",             bitmapId = 'unload02',              preferredSlot = 13, behavior = DroneBehavior,               initialStateFunc = DroneInit},
-    DroneR = {                      helpText = "drone",             bitmapId = 'unload02',              preferredSlot = 13, behavior = DroneBehavior,               initialStateFunc = DroneInit},
+    DroneL = {                      helpText = "drone",             bitmapId = 'unload02',              preferredSlot = 10, behavior = DroneBehavior,               initialStateFunc = DroneInit},
+    DroneR = {                      helpText = "drone",             bitmapId = 'unload02',              preferredSlot = 11, behavior = DroneBehavior,               initialStateFunc = DroneInit},
+
+    ExFac = {                       helpText = "external_factory",  bitmapId = 'exfac',                 preferredSlot = 10,  behavior = ExternalFactoryBehavior},
 
     -- Unit toggle rules
     RULEUTC_ShieldToggle = {        helpText = "toggle_shield",     bitmapId = 'shield',                preferredSlot = 8,  behavior = ScriptButtonOrderBehavior,   initialStateFunc = ScriptButtonInitFunction, extraInfo = 0},
@@ -1048,6 +1175,12 @@ local commonOrders = {
     RULEUCC_Guard = true,
     RULEUCC_RetaliateToggle = true,
     AttackMove = true,
+}
+
+-- Put function overrides here so they can be accessed from values passed from unit blueprints
+local overrideFunctionTable = {
+    AutoDeployInit = AutoDeployInit,
+    AutoDeployBehavior = AutoDeployBehavior,
 }
 
 --[[
@@ -1251,28 +1384,57 @@ local function CreateAltOrders(availableOrders, availableToggles, units)
     -- to determine where they go by using preferred slots
     AddAbilityButtons(standardOrdersTable, availableOrders, units)
 
-    local assitingUnitList = {}
+    local assistingUnitList = {}
+
+    --- Pods
     local podUnits = {}
-    if not table.empty(units) and (EntityCategoryFilterDown(categories.PODSTAGINGPLATFORM, units) or EntityCategoryFilterDown(categories.POD, units)) then
-        local PodStagingPlatforms = EntityCategoryFilterDown(categories.PODSTAGINGPLATFORM, units)
-        local Pods = EntityCategoryFilterDown(categories.POD, units)
+    local podStagingPlatforms = EntityCategoryFilterDown(categories.PODSTAGINGPLATFORM, units)
+    local pods = EntityCategoryFilterDown(categories.POD, units)
+    if not table.empty(units) and (not table.empty(podStagingPlatforms) or not table.empty(pods)) then
         local assistingUnits = {}
-        if table.empty(PodStagingPlatforms) and table.getn(Pods) == 1 then
-            assistingUnits[1] = Pods[1]:GetCreator()
-            podUnits['DroneL'] = Pods[1]
-            podUnits['DroneR'] = Pods[2]
-        elseif table.getn(PodStagingPlatforms) == 1 then
-            assistingUnits = GetAssistingUnitsList(PodStagingPlatforms)
-            podUnits['DroneL'] = assistingUnits[1]
-            podUnits['DroneR'] = assistingUnits[2]
+        if not table.empty(pods) then
+            for _, pod in pods do
+                table.insert(assistingUnits, pod:GetCreator())
+            end
+            podUnits['DroneL'] = pods
+        elseif not table.empty(podStagingPlatforms) then
+            assistingUnits = GetAssistingUnitsList(podStagingPlatforms)
+            podUnits['DroneL'] = assistingUnits
         end
-        if assistingUnits[1] then
-            table.insert(availableOrders, 'DroneL')
-            assitingUnitList['DroneL'] = assistingUnits[1]
+
+        
+        if not table.empty(assistingUnits) then
+            if table.getn(podStagingPlatforms) == 1 and table.empty(pods) then
+                table.insert(availableOrders, 'DroneL')
+                assistingUnitList['DroneL'] = {assistingUnits[1]}
+                if table.getn(assistingUnits) > 1 then
+                    table.insert(availableOrders, 'DroneR')
+                    assistingUnitList['DroneR'] = {assistingUnits[2]}
+                    podUnits['DroneL'] = {assistingUnits[1]}
+                    podUnits['DroneR'] = {assistingUnits[2]}
+                end
+            else
+                table.insert(availableOrders, 'DroneL')
+                assistingUnitList['DroneL'] = assistingUnits
+            end
         end
-        if assistingUnits[2] then
-            table.insert(availableOrders, 'DroneR')
-            assitingUnitList['DroneR'] = assistingUnits[2]
+    end
+
+    --- External factories
+    local exFacs = EntityCategoryFilterDown(categories.EXTERNALFACTORY + categories.EXTERNALFACTORYUNIT, units)
+    if not table.empty(exFacs) and table.getn(exFacs) == table.getn(units) then
+        -- make sure we've selected all external factories, or all external factory units
+        if table.getn(EntityCategoryFilterDown(categories.EXTERNALFACTORY, exFacs)) == table.getn(units) or
+           table.getn(EntityCategoryFilterDown(categories.EXTERNALFACTORYUNIT, exFacs)) == table.getn(units) then
+            assistingUnitList['ExFac'] = {}
+            -- finally, make sure our units are all of the same type
+            local bp = exFacs[1]:GetUnitId()
+            if table.getn(EntityCategoryFilterDown(categories[bp], exFacs)) == table.getn(exFacs) then
+                for _, exFac in exFacs do
+                    table.insert(assistingUnitList['ExFac'], exFac:GetCreator())
+                end
+                table.insert(availableOrders, 'ExFac')
+            end
         end
     end
 
@@ -1372,8 +1534,8 @@ local function CreateAltOrders(availableOrders, availableToggles, units)
                 orderCheckbox._cursor = standardOrdersTable[availOrder].cursor
             end
 
-            if assitingUnitList[availOrder] then
-                orderCheckbox._unit = assitingUnitList[availOrder]
+            if assistingUnitList[availOrder] then
+                orderCheckbox._unit = assistingUnitList[availOrder]
             end
 
             if podUnits[availOrder] then
@@ -1400,8 +1562,8 @@ local function CreateAltOrders(availableOrders, availableToggles, units)
                 orderCheckbox._script = standardOrdersTable[availToggle].script
             end
 
-            if assitingUnitList[availToggle] then
-                orderCheckbox._unit = assitingUnitList[availToggle]
+            if assistingUnitList[availToggle] then
+                orderCheckbox._unit = assistingUnitList[availToggle]
             end
 
             if orderInfo.initialStateFunc then
@@ -1409,6 +1571,75 @@ local function CreateAltOrders(availableOrders, availableToggles, units)
             end
 
             orderCheckboxMap[availToggle] = orderCheckbox
+        end
+    end
+end
+
+function ApplyOverrides(standardOrdersTable, newSelection)
+    -- Look in blueprints for any icon or tooltip overrides
+    -- Note that if multiple overrides are found for the same order, then the default is used
+    -- The syntax of the override in the blueprint is as follows (the overrides use same naming as in the default table above):
+    -- In General table
+    -- OrderOverrides = {
+    --     RULEUTC_IntelToggle = {
+    --         bitmapId = 'custom',
+    --         helpText = 'toggle_custom',
+    --         preferredSlot = 7,
+    --         behavior = 'TestBehavior'
+    --         initialStateFunc = 'TestInit'
+    --     },
+    --  },
+    local orderDiffs
+    for index, unit in newSelection do
+        local overrideTable = unit:GetBlueprint().General.OrderOverrides
+        if overrideTable then
+            for orderKey, override in overrideTable do
+                if orderDiffs == nil then
+                    orderDiffs = {}
+                end
+                if override then
+                    for key, value in override do
+                        if orderDiffs[orderKey][key] ~= nil and (orderDiffs[orderKey][key] ~= value) then
+                            -- Found order diff already, so mark it false so it gets ignored when applying to table
+                            orderDiffs[orderKey] = false
+                            break
+                        else
+                            if orderDiffs[orderKey] == nil then
+                                orderDiffs[orderKey] = {}
+                            end
+                            orderDiffs[orderKey][key] = value
+                        end
+                    end
+                elseif override == false then
+                    orderDiffs[orderKey] = false
+                end
+            end
+        end
+    end
+
+    -- Apply overrides
+    -- override sets to false will prevent that order from showing up
+    if orderDiffs ~= nil then
+        for orderKey, override in orderDiffs do
+            if override then
+                for key, value in override do
+                    -- if we have a function override, we'll need to get it from the table
+                    -- overrideFunctionTable takes a string and gives a function of the same name
+                    -- the value of the behavior field in the override in the blueprint should be 
+                    -- equal to the key in the overrideFunctionTable
+                    if key == 'behavior' or key == 'initialStateFunc' then
+                        if not overrideFunctionTable[value] then
+                            WARN('Attempted to override an order behavior with a function that does not exist in overrideFunctionTable!')
+                        else
+                            standardOrdersTable[orderKey][key] = overrideFunctionTable[value]
+                        end
+                    else
+                        standardOrdersTable[orderKey][key] = value
+                    end
+                end
+            elseif override == false then
+                standardOrdersTable[orderKey] = nil
+            end
         end
     end
 end
@@ -1424,47 +1655,8 @@ function SetAvailableOrders(availableOrders, availableToggles, newSelection)
     -- Create our copy of orders table
     standardOrdersTable = table.deepcopy(defaultOrdersTable)
 
-    -- Look in blueprints for any icon or tooltip overrides
-    -- Note that if multiple overrides are found for the same order, then the default is used
-    -- The syntax of the override in the blueprint is as follows (the overrides use same naming as in the default table above):
-    -- In General table
-    -- OrderOverrides = {
-    --     RULEUTC_IntelToggle = {
-    --         bitmapId = 'custom',
-    --         helpText = 'toggle_custom',
-    --     },
-    --  },
-    local orderDiffs
-    for index, unit in newSelection do
-        local overrideTable = unit:GetBlueprint().General.OrderOverrides
-        if overrideTable then
-            for orderKey, override in overrideTable do
-                if orderDiffs == nil then
-                    orderDiffs = {}
-                end
-                if orderDiffs[orderKey] ~= nil and (orderDiffs[orderKey].bitmapId ~= override.bitmapId or orderDiffs[orderKey].helpText ~= override.helpText) then
-                    -- Found order diff already, so mark it false so it gets ignored when applying to table
-                    orderDiffs[orderKey] = false
-                else
-                    orderDiffs[orderKey] = override
-                end
-            end
-        end
-    end
-
-    -- Apply overrides
-    if orderDiffs ~= nil then
-        for orderKey, override in orderDiffs do
-            if override and override ~= false then
-                if override.bitmapId then
-                    standardOrdersTable[orderKey].bitmapId = override.bitmapId
-                end
-                if override.helpText then
-                    standardOrdersTable[orderKey].helpText = override.helpText
-                end
-            end
-        end
-    end
+    -- Apply any overrides
+    ApplyOverrides(standardOrdersTable, newSelection)
 
     CreateCommonOrders(availableOrders)
 

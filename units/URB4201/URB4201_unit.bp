@@ -141,6 +141,7 @@ UnitBlueprint{
             CollideFriendly = false,
             Damage = 1,
             DamageType = "Normal",
+            DisableWhileReloading = true,
             DisplayName = "Zapper Anti Missile",
             FireTargetLayerCapsTable = {
                 Land = "Air",
@@ -153,7 +154,6 @@ UnitBlueprint{
             MinRadius = 2,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
-            NeedPrep = true,
             ProjectilesPerOnFire = 1,
             RackBones = {
                 {
@@ -163,7 +163,7 @@ UnitBlueprint{
             },
             RackFireTogether = false,
             RackRecoilDistance = 0,
-            RackReloadTimeout = 10,
+            RackReloadTimeout = 0,
             RackSalvoChargeTime = 0,
             RackSalvoReloadTime = 0,
             RackSalvoSize = 1,
@@ -177,7 +177,7 @@ UnitBlueprint{
             TurretBoneYaw = "Turret",
             TurretDualManipulators = false,
             TurretPitch = 0,
-            TurretPitchRange = 90,
+            TurretPitchRange = 80,
             TurretPitchSpeed = 180,
             TurretYaw = 0,
             TurretYawRange = 180,

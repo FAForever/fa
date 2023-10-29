@@ -1,6 +1,24 @@
---****************************************************************************
---**  Summary: Manage structures for a location
---****************************************************************************
+--******************************************************************************************************
+--** Copyright (c) 2022  Willem 'Jip' Wijnia
+--**
+--** Permission is hereby granted, free of charge, to any person obtaining a copy
+--** of this software and associated documentation files (the "Software"), to deal
+--** in the Software without restriction, including without limitation the rights
+--** to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+--** copies of the Software, and to permit persons to whom the Software is
+--** furnished to do so, subject to the following conditions:
+--**
+--** The above copyright notice and this permission notice shall be included in all
+--** copies or substantial portions of the Software.
+--**
+--** THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+--** IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+--** FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+--** AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+--** LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+--** OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+--** SOFTWARE.
+--******************************************************************************************************
 
 local BuilderManager = import("/lua/aibrains/managers/builder-manager.lua").AIBuilderManager
 
@@ -228,19 +246,18 @@ AIStructureManager = Class(BuilderManager) {
             local tech = blueprint.TechCategory
             local id = unit.EntityId
 
-            LOG("Switched!")
             self.StructuresBeingBuilt[tech][id] = nil
             self.Structures[tech][id] = unit
 
             -- create the platoon and start the behavior
-            local brain = self.Brain
-            local platoon = brain:MakePlatoon('', '') --[[@as AIPlatoonSimpleStructure]]
-            platoon.Brain = self.Brain
-            platoon.Base = self.Base
+            -- local brain = self.Brain
+            -- local platoon = brain:MakePlatoon('', '') --[[@as AIPlatoonSimpleStructure]]
+            -- platoon.Brain = self.Brain
+            -- platoon.Base = self.Base
 
-            setmetatable(platoon, import("/lua/aibrains/platoons/platoon-simple-structure.lua").AIPlatoonSimpleStructure)
-            brain:AssignUnitsToPlatoon(platoon, { unit }, 'Unassigned', 'None')
-            ChangeState(platoon, platoon.Start)
+            -- setmetatable(platoon, import("/lua/aibrains/platoons/platoon-simple-structure.lua").AIPlatoonSimpleStructure)
+            -- brain:AssignUnitsToPlatoon(platoon, { unit }, 'Unassigned', 'None')
+            -- ChangeState(platoon, platoon.Start)
         end
     end,
 

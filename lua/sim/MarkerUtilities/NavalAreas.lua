@@ -74,11 +74,13 @@ local function GenerateForExpansion(expansion, distance, thresholdSize, threshol
                 position = point,
                 size = 4,
                 color = 'ffffff',
+                type = 'Naval Area',
 
                 -- modern properties
                 PartOf = expansion,
                 Name = string.format("Naval Area %00d", MarkerCount + 1),
-                Size = points[4]
+                Size = points[4],
+                Type = 'Naval Area',
             }
 
             -- keep track of the marker
