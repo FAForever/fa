@@ -1,12 +1,5 @@
 UnitBlueprint{
     Description = "<LOC xsb1103_desc>Mass Extractor",
-    AI = {
-        TargetBones = {
-            "Turret01_B02",
-            "Turret02_B02",
-            "Turret03_B02",
-        },
-    },
     Adjacency = "T1MassExtractorAdjacencyBuffs",
     Audio = {
         ActiveLoop     = Sound { Bank = 'XSB',            Cue = 'XSB1103_Active',             LodCutoff = 'UnitMove_LodCutoff' },

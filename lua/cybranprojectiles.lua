@@ -587,7 +587,10 @@ CLOATacticalMissileProjectile = ClassProjectile(SingleBeamProjectile, TacticalMi
     ---@param inWater boolean
     OnCreate = function(self, inWater)
         SingleBeamProjectile.OnCreate(self, inWater)
-        self:SetCollisionShape('Sphere', 0, 0, 0, 2)
+        
+        local blueprintPhysics = self.Blueprint.Physics
+        local radius = 0.105 * (blueprintPhysics.MaxSpeed + blueprintPhysics.MaxSpeedRange)
+        self:SetCollisionShape('Sphere', 0, 0, 0, radius)
     end,
 
     ---@param self CLOATacticalMissileProjectile
@@ -666,8 +669,11 @@ CLOATacticalChildMissileProjectile = ClassProjectile(SingleBeamProjectile, Tacti
 
     ---@param self CLOATacticalChildMissileProjectile
     OnCreate = function(self)
-        self:SetCollisionShape('Sphere', 0, 0, 0, 2.0)
         SingleBeamProjectile.OnCreate(self)
+
+        local blueprintPhysics = self.Blueprint.Physics
+        local radius = 0.105 * (blueprintPhysics.MaxSpeed + blueprintPhysics.MaxSpeedRange)
+        self:SetCollisionShape('Sphere', 0, 0, 0, radius)
     end,
 
     ---@param self CLOATacticalChildMissileProjectile

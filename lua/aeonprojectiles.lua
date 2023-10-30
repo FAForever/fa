@@ -293,8 +293,10 @@ AMissileCruiseSubProjectile = ClassProjectile(EmitterProjectile) {
 
     ---@param self AMissileCruiseSubProjectile
     OnCreate = function(self)
-        self:SetCollisionShape('Sphere', 0, 0, 0, 1.0)
         SinglePolyTrailProjectile.OnCreate(self)
+        local blueprintPhysics = self.Blueprint.Physics
+        local radius = 0.105 * (blueprintPhysics.MaxSpeed + blueprintPhysics.MaxSpeedRange)
+        self:SetCollisionShape('Sphere', 0, 0, 0, radius)
     end,
 }
 
@@ -333,7 +335,9 @@ AMissileSerpentineProjectile = ClassProjectile(SingleCompositeEmitterProjectile,
     ---@param self AMissileSerpentineProjectile
     OnCreate = function(self)
         SingleCompositeEmitterProjectile.OnCreate(self)
-        self:SetCollisionShape('Sphere', 0, 0, 0, 2)
+        local blueprintPhysics = self.Blueprint.Physics
+        local radius = 0.105 * (blueprintPhysics.MaxSpeed + blueprintPhysics.MaxSpeedRange)
+        self:SetCollisionShape('Sphere', 0, 0, 0, radius)
     end,
 
     ---@param self AMissileSerpentineProjectile

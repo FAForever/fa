@@ -58,7 +58,6 @@ UnitBlueprint{
         "DIRECTFIRE",
         "DRAGBUILD",
         "EXPERIMENTAL",
-        "FACTORY",
         "HIGHALTAIR",
         "LOWSELECTPRIO",
         "MOBILE",

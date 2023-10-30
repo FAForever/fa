@@ -5,7 +5,6 @@ UnitBlueprint{
             "Target01",
             "Target02",
             "Target03",
-            "UEB0202",
         },
     },
     Audio = {

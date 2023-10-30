@@ -1,10 +1,10 @@
 UnitBlueprint {
     AI = {
         TargetBones = {
-            'Target01',
-            'Target02',
-            'Target03',
-            'ZEB9601',
+            'Foot_Right',
+            'Foot_Left',
+            "Pad_Left",
+            "Pad_Right",
         },
     },
     Audio = {

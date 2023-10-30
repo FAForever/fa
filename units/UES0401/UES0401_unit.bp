@@ -8,8 +8,6 @@ UnitBlueprint{
         RepairConsumeMass = 0,
         StagingPlatformScanRadius = 300,
         TargetBones = {
-            "Front_Left_Projectile02",
-            "Front_Right_Projectile02",
             "Attachpoint01",
             "Attachpoint03",
             "Attachpoint06",
@@ -40,7 +38,6 @@ UnitBlueprint{
         "CARRIER",
         "DRAGBUILD",
         "EXPERIMENTAL",
-        "FACTORY",
         "INTELLIGENCE",
         "LOWSELECTPRIO",
         "MOBILE",

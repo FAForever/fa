@@ -277,6 +277,12 @@ local function PostProcessUnit(unit)
                         , tostring(unit.BlueprintId), tostring(0.1 * speed), tostring(speed)))
                     unit.SizeZ = 0.1 * speed
                 end
+
+                if unit.SizeY < 0.5 then
+                    WARN(string.format("Overriding the y axis of collision box of unit ( %s ), it should be atleast 0.5 to guarantee proper functioning gunships"
+                        , tostring(unit.BlueprintId), tostring(0.1 * speed), tostring(speed)))
+                    unit.SizeY = 0.5
+                end
             end
         end
     end
@@ -553,6 +559,15 @@ function PostProcessUnitWithExternalFactory(allBlueprints, unit)
         efBlueprint.SelectionMeshScaleY = unit.ExternalFactory.SelectionMeshScaleY or 3
         efBlueprint.SelectionMeshScaleZ = unit.ExternalFactory.SelectionMeshScaleZ or 1
         efBlueprint.Display.UniformScale = unit.ExternalFactory.UniformScale or 1.6
+
+        -- add our select button override
+        if not efBlueprint.General.OrderOverrides then
+            efBlueprint.General.OrderOverrides = {}
+        end
+        efBlueprint.General.OrderOverrides.ExFac = {
+            bitmapId = 'exfacunit',
+            helpText = 'external_factory_unit',
+        }
 
         -- add order overrides to carriers
         if unit.CategoriesHash['CARRIER'] then
