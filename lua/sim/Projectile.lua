@@ -223,7 +223,6 @@ Projectile = ClassProjectile(ProjectileMethods) {
     ---@param firingWeapon Weapon The weapon the beam originates from that we're checking the collision with
     ---@return boolean
     OnCollisionCheckWeapon = function(self, firingWeapon)
-
         -- we can't hit our own
         if self.Army == firingWeapon.Army then
             return false
