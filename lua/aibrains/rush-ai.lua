@@ -143,6 +143,7 @@ AIBrain = Class(StandardBrain, EconomyComponent) {
         -- requires these markers to exist
         import("/lua/sim/MarkerUtilities.lua").GenerateExpansionMarkers()
         import("/lua/sim/MarkerUtilities.lua").GenerateRallyPointMarkers()
+        import("/lua/sim/MarkerUtilities.lua").GenerateNavalAreaMarkers()
 
         -- requires these datastructures to understand the game
         self.GridReclaim = import("/lua/ai/gridreclaim.lua").Setup(self)

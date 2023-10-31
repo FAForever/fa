@@ -184,7 +184,6 @@ Projectile = ClassProjectile(ProjectileMethods) {
     ---@param other Projectile The projectile we're checking the collision with
     ---@return boolean
     OnCollisionCheck = function(self, other)
-
         -- we can't hit our own
         if self.Army == other.Army then
             return false
@@ -223,7 +222,6 @@ Projectile = ClassProjectile(ProjectileMethods) {
     ---@param firingWeapon Weapon The weapon the beam originates from that we're checking the collision with
     ---@return boolean
     OnCollisionCheckWeapon = function(self, firingWeapon)
-
         -- we can't hit our own
         if self.Army == firingWeapon.Army then
             return false
@@ -237,7 +235,7 @@ Projectile = ClassProjectile(ProjectileMethods) {
         -- check for projectile types that require a defensive weapon to intercept
         if selfHashedCategories['TACTICAL'] or selfHashedCategories['STRATEGIC'] or selfHashedCategories['TORPEDO'] then
             if firingWeapon.Blueprint.WeaponCategory == 'Defense' then
-                return alliedCheck
+                return firingWeapon:GetCurrentTarget() == self
             else
                 return false
             end
