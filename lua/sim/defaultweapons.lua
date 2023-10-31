@@ -1074,7 +1074,6 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
             -- for weapons that do not visually track, such as torpedo defenses
 
             if bp.DisableWhileReloading then
-                DrawCircle(unit:GetPosition(), 10, 'ffffff')
                 local reloadTime = math.floor(10 / self.Blueprint.RateOfFire) - 1
                 if reloadTime > 4 then
                     self:SetEnabled(false)
