@@ -889,7 +889,7 @@ ExternalFactoryComponent = ClassSimple {
         if not IsDestroyed(self.ExternalFactory) then
             self.ExternalFactory:SetBusy(true)
             self.ExternalFactory:SetBlockCommandQueue(true)
-            self.ExternalFactory:Destroy()
+            self.ExternalFactory:Kill()
         end
     end,
 

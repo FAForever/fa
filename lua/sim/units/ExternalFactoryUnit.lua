@@ -17,7 +17,6 @@ ExternalFactoryUnit = ClassUnit(Unit) {
         self:HideBone(0, true)
 
         -- do not allow the unit to be killed or to take damage
-        self.CanBeKilled = false
         self.CanTakeDamage = false
 
         -- is inherited by units, mimic what factories have as their default
@@ -165,6 +164,13 @@ ExternalFactoryUnit = ClassUnit(Unit) {
             self:PlayUnitAmbientSound('ConstructLoop')
             self:StartBuildingEffects(self.UnitBeingBuilt, self.UnitBuildOrder)
         end
+    end,
+
+    --- Prevent leaving a wreckage of any kind
+    ---@param self Unit
+    ---@param overkillRatio number
+    ---@return nil
+    CreateWreckage = function (self, overkillRatio)
     end,
 
     IdleState = FactoryUnit.IdleState,
