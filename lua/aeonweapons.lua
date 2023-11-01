@@ -244,10 +244,10 @@ ADFTractorClaw = ClassWeapon(Weapon) {
 
                 if not IsDestroyed(unit) then
 
-                    while not IsDestroyed(target) and not IsDestroyed(unit) and not unit.Dead and target:GetHealth() >= 730 do
-                        Damage(unit, bonePosition, target, 729, "Normal")
+                    while not IsDestroyed(target) and not IsDestroyed(unit) and not unit.Dead and target:GetHealth() >= (self.Blueprint.TractorDamage or 729)+1 do
+                        Damage(unit, bonePosition, target, (self.Blueprint.TractorDamage or 729), "Normal")
                         Explosion.CreateScalableUnitExplosion(target, 1, true)
-                        WaitTicks(11)
+                        WaitTicks((self.Blueprint.TractorDamageInterval or 10)+1)
                     end
 
                     CreateLightParticle(unit, muzzle, self.Army, 4, 2, 'glow_02', 'ramp_blue_16')
