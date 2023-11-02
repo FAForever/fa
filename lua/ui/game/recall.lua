@@ -235,7 +235,7 @@ RecallPanel = ClassUI(NinePatch.NinePatch) {
             end
         end
         self.collapseArrow.OnHide = function(collapse, hide)
-            if hide ~= collapse:IsDisabled() then
+            if collapse:IsDisabled() and not hide then
                 return true
             end
         end
