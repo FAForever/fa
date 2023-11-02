@@ -77,6 +77,7 @@ XRL0302 = ClassUnit(CWalkingLandUnit) {
         '/effects/emitters/cannon_muzzle_smoke_12_emit.bp',
     },
 
+    ---@param self XRL0302
     OnCreate = function(self)
         CWalkingLandUnit.OnCreate(self)
         self.EffectsBagXRL = TrashBag()
@@ -84,22 +85,53 @@ XRL0302 = ClassUnit(CWalkingLandUnit) {
         self:CreateTerrainTypeEffects(self.IntelEffects.Cloak, 'FXIdle', self.Layer, nil, self.EffectsBag)
         self.PeriodicFXThread = ForkThread(self.EmitPeriodicEffects, self)
         self.Trash:Add(self.PeriodicFXThread)
+
+        self.Trash:Add(
+            ForkThread(
+                self.TrackTargetThread, self
+            )
+        )
     end,
 
+    ---@param self XRL0302
+    TrackTargetThread = function(self)
+        local navigator = self:GetNavigator()
+        while not IsDestroyed(self) do
+            local command = self:GetCommandQueue()[1]
+            -- confirm that it is an attack command
+            if command and command.commandType == 10 then
+                -- override navigator behavior
+                local target = command.target
+                if target then
+                    navigator:SetDestUnit(target)
+                    navigator:SetSpeedThroughGoal(true)
+                end
+            end
+
+            WaitTicks(10)
+        end
+    end,
+
+    ---@param self XRL0302
+    ---@param builder Unit
+    ---@param layer Layer
     OnStopBeingBuilt = function(self, builder, layer)
         CWalkingLandUnit.OnStopBeingBuilt(self, builder, layer)
         self.Trash:Add(ForkThread(self.HideUnit, self))
     end,
 
+    ---@param self XRL0302
     HideUnit = function(self)
         WaitTicks(1)
         self:SetMesh(self.Blueprint.Display.CloakMeshBlueprint, true)
     end,
 
+    ---@param self XRL0302
     OnProductionPaused = function(self)
         self:GetWeaponByLabel('Suicide'):FireWeapon()
     end,
 
+    ---@param self XRL0302
     EmitPeriodicEffects = function(self)
         local army = self.Army
         local ambientLandExhaustEffects = self.AmbientLandExhaustEffects
@@ -115,6 +147,7 @@ XRL0302 = ClassUnit(CWalkingLandUnit) {
         end
     end,
 
+    ---@param self XRL0302
     DoDeathWeapon = function(self)
         if self:IsBeingBuilt() then return end
         CWalkingLandUnit.DoDeathWeapon(self)
@@ -131,7 +164,7 @@ XRL0302 = ClassUnit(CWalkingLandUnit) {
 
         if bp ~= nil then
             self:AddBuff(bp)
-        end
+        end 
     end,
 }
 
