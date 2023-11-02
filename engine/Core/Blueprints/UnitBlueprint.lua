@@ -768,21 +768,6 @@
 ---@class UnitBlueprintEnhancements : table<Enhancement, UnitBlueprintEnhancement>
 ---@field Slots table<EnhancementSlot, {name: UnlocalizedString, x: number, y: number}>
 
----@class UnitBlueprintEnhancement
----@field BuildCostEnergy number
----@field BuildCostMass number
----@field BuildTime number
----@field HideBones? Bone[]
----@field Icon string
----@field MaintenanceConsumptionPerSecondEnergy number
----@field Name UnlocalizedString
----@field Prerequisite? Enhancement
----@field RemoveEnhancements? Enhancement[]
----@field ShowBones? Bone[]
----@field Slot EnhancementSlot
----@field UpgradeEffectBones? Bone[]
----@field UpgradeUnitAmbientBones? Bone[]
-
 ---@class UnitBlueprintEnhancementPreset
 ---@field BuildIconSortPriority number
 ---@field Description UnlocalizedString
@@ -799,8 +784,131 @@
 ---@field Enhancements Enhancement[]
 ---@field BaseBlueprintId UnitId
 
---- TODO
 ---@class UnitBlueprintEnhancement
+--- Cost of the enhancement in energy
+---@field BuildCostEnergy number
+--- Cost of the enhancement in mass
+---@field BuildCostMass number
+--- Time it takes to build the enhancement
+---@field BuildTime number
+--- Adds buildable enhancements to the unit
+---@field BuildableCategoryAdds string
+--- Unit icon to use for the enhancement
+---@field Icon string
+--- Name of the enhancement
+---@field Name string|number
+--- Energy Production of the enhancement
+---@field ProductionPerSecondEnergy number
+--- Mass Production of the enhancement
+---@field ProductionPerSecondMass number
+---
+---
+--- New Build Rate of the unit
+---@field NewBuildRate number
+--- New Health of the unit
+---@field NewHealth number
+--- New Regen Rate of the unit
+---@field NewRegenRate number
+--- Gun Damage Enhancement
+---@field ZephyrDamageMod number
+--- New Max Radius of the unit
+---@field NewMaxRadius number
+--- New Rate of Fire of the unit. This is How fast the Gun shoots
+---@field NewRateOfFire number
+--- New Damage Radius of the unit
+---@field NewDamageRadius number
+---
+--- New Omni Radius of the unit
+---@field NewOmniRadius number
+--- New Vision Radius of the unit
+---@field NewVisionRadius number
+--- New Sonar Radius of the unit
+---@field NewSonarRadius number
+---
+--- Show bones of the unit
+---@field ShowBones? Bone[]
+--- Hide bones of the unit
+---@field HideBones? Bone[]
+---
+--- Slot of the enhancement
+---@field Slot EnhancementSlot
+---
+--- Upgrade effect bones of the unit
+---@field UpgradeEffectBones? Bone[]
+--- Upgrade unit ambient bones of the unit
+---@field UpgradeUnitAmbientBones? Bone[]
+---
+--- Prerequisite enhancement
+---@field Prerequisite? Enhancement
+--- Remove enhancements
+---@field RemoveEnhancements Enhancement[]
+---
+--- Impact effects of the enhancement
+---@field ImpactEffects string
+--- 
+--- Maintenance energy consumption of the enhancement
+---@field MaintenanceConsumptionPerSecondEnergy number
+---
+---
+--- Owner shield mesh blueprint
+---@field OwnerShieldMesh string
+--- Personal shiled toggle
+---@field PersonalShield boolean
+--- an efficacy multiplier applied to units assisting the shield to regenerate its health
+---@field RegenAssistMult number
+--- The amount of time the shield takes to come back online when its disabled due to insufficient energy. Defaults to 10 in the shield spec.
+---@field ShieldEnergyDrainRechargeTime number
+--- The maximum health of the shield. Defaults to 250 in the shield spec.
+---@field ShieldMaxHealth number
+--- The time it takes for the shield to come online once completely depleted by damage. Treated as 10 when absent and 5 when false for the shield spec.
+---@field ShieldRechargeTime number
+---The amount of health the shield regenerates per second when it's not taking damage. Defaults to 1 in the shield spec (and treated the same when false).
+---@field ShieldRegenRate number
+---The delay after getting hit by ordinance the shield starts recharging. Defaults to 5 in the shield spec.
+---@field ShieldRegenStartTime number
+---The radius of the shield (converted to Size for the final shield spec, where it defaults to 10 as a default if absent from this blueprint)
+---@field ShieldSize number
+---How much of the damage applied to the shield will also be applied to others overlapping this one. Treated as 0.15 when absent from the shield spec.
+---@field ShieldSpillOverDamageMod number
+--- How many units the shield is moved up (or down if negative) from center. Defaults to -1 in the shield spec.
+---@field ShieldVerticalOffset number
+--- Shield mesh effect
+---@field Mesh string
+--- Shield mesh Z blueprint
+---@field MeshZ string
+--- Shield Enhancement number (Unknown)
+---@field ShieldEnhancement number
+---
+--- Impact Mesh of the enhancement
+---@field ImpactMesh string
+---
+---
+--- Add Health to the unit
+---@field ACUAddHealth number
+--- Max Health of the unit
+---@field MaxHealthFactor number
+--- Radius Increase of RegenAura
+---@field Radius number
+---
+--- Max Regen of SCU
+---@field RegenCeilingSCU number
+--- Max Regen of T1 
+---@field RegenCeilingT1 number
+--- Max Regen of T2
+---@field RegenCeilingT2 number
+--- Max Regen of T3
+---@field RegenCeilingT3 number
+--- Max Regen of T4
+---@field RegenCeilingT4 number
+--- Base Regen
+---@field RegenFloor number
+--- Regen Per Second. How much health the unit regenerates per second
+--- This is a multiplier of the base regen
+---@field RegenPerSecond number
+
+
+
+
 
 ---@class UnitBlueprintGeneral
 ---@field BuildBones? BuildBones
