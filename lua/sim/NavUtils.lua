@@ -28,7 +28,6 @@ local NavDatastructures = import("/lua/sim/navdatastructures.lua")
 
 -- upvalue scope for performance
 local TableGetn = table.getn
-local TableInsert = table.insert
 
 local MathSqrt = math.sqrt
 
@@ -374,20 +373,20 @@ local function FindSections(grid, position, distance)
         end
     end
 
-    local count = 0
+    local head = 1
 
     ---@type Vector[]
     local positions = { }
     for _, center in candidates do
-        TableInsert(positions, center)
-        count = count + 1
+        positions[head] = center
+        head = head + 1
     end
 
-    if count == 0 then
+    if head == 1 then
         return nil, 'NoResults'
     end
 
-    return positions, count
+    return positions, head - 1
 end
 
 
@@ -1000,7 +999,6 @@ function DirectionsFrom(layer, origin, distance)
     end
 
     -- only keep those at the edge
-    local positions = { }
     local ox = origin[1]
     local oz = origin[3]
     local ds = distance * distance
@@ -1012,7 +1010,7 @@ function DirectionsFrom(layer, origin, distance)
         local dz = oz - point[3]
 
         if dx * dx + dz * dz > ds then
-            positions[head] = point
+            points[head] = point
             head = head + 1
         end
     end
@@ -1021,7 +1019,12 @@ function DirectionsFrom(layer, origin, distance)
         return nil, 'NoResults'
     end
 
-    return positions, head - 1
+    -- clear out remaining points
+    for k = count, head, -1 do
+        points[k] = nil
+    end
+
+    return points, head - 1
 end
 
 --- Computes a list of waypoints that represent random directions that we can navigate to
@@ -1064,13 +1067,12 @@ function DirectionsFromWithThreatThreshold(layer, origin, distance, aibrain, thr
     ---@type BrainPositionThreat[]
     local threats = { }
 
-    local positions = { }
     local head = 1
     for k = 1, count do
         local point = points[k]
         local threat = threatFunc(aibrain, point, threatRadius)
         if threat < threatThreshold then
-            positions[head] = point
+            points[head] = point
             head = head + 1
         else
             threats[tHead] = { point[1], point[3], threat }
@@ -1078,12 +1080,16 @@ function DirectionsFromWithThreatThreshold(layer, origin, distance, aibrain, thr
         end
     end
 
-    -- no locations remain
+    -- clear out remaining points
     if head == 1 then
         return nil, 'TooMuchThreat', threats, tHead - 1
     end
 
-    return positions, head - 1, threats, tHead - 1
+    for k = head, count do
+        points[k] = nil
+    end
+
+    return points, head - 1, threats, tHead - 1
 end
 
 --- Computes a waypoint that represents a random direction that we can navigate to
