@@ -1,4 +1,4 @@
-last_version = 3771
+last_version = 3772
 
 ---@alias PatchNotesType "Hotfix"|"Developers patch"|"Balance patch"
 
