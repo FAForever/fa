@@ -56,7 +56,7 @@ UnitBlueprint{
             "<LOC ability_stun>EMP Weapon",
         },
         AnimationWalk = "/units/XRL0302/XRL0302_Awalk.sca",
-        AnimationWalkRate = 11.5,
+        AnimationWalkRate = 20,
         Mesh = {
             IconFadeInZoom = 130,
             LODs = {

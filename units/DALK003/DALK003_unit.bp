@@ -52,7 +52,7 @@ UnitBlueprint{
             },
         },
         AnimationWalk = "/units/DALK003/DALK003_walk.sca",
-        AnimationWalkRate = 6,
+        AnimationWalkRate = 7,
         Mesh = {
             IconFadeInZoom = 130,
             LODs = {

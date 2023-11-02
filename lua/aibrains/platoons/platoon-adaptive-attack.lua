@@ -396,7 +396,8 @@ AIPlatoonAdaptiveAttackBehavior = Class(AIPlatoon) {
             else
                 local scoutOffsetCount = TableGetn(scoutOffsets)
                 for k = 1, 3 do
-                    self:Patrol(scoutOffsets[Random(1, scoutOffsetCount)], 'Scout')
+                    local index = Random(1, scoutOffsetCount)
+                    self:Patrol(scoutOffsets[index], 'Scout')
                 end
             end
 
