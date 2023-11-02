@@ -57,7 +57,24 @@ function DebugThread()
             local distance = State.Distance
             local threshold = State.Threshold
             if layer and origin and distance and threshold then
-                local directions, error = NavUtils.DirectionsFrom(layer, origin, distance, threshold)
+                local brain = ArmyBrains[1]
+                local directions, error, threats, tn = NavUtils.DirectionsFromWithThreatThreshold(layer, origin, distance, brain, NavUtils.ThreatFunctions.AntiSurface, 100, 0)
+
+                if threats then
+                    local position = { 0, 0, 0 }
+                    for k = 1, tn do
+                        local threat = threats[k]
+                        local tx = threat[1]
+                        local tz = threat[2]
+                        local t = threat[3]
+
+                        position[1] = tx
+                        position[3] = tz
+                        position[2] = GetSurfaceHeight(tx, tz)
+                        DrawCircle(position, math.sqrt(t), 'ff0000')
+                    end
+                end
+
                 if directions then
                     DrawCircle(origin, 10, 'ffffff')
                     for k, direction in directions do

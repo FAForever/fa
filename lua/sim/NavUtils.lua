@@ -688,9 +688,7 @@ ThreatFunctions = Shared.ThreatFunctions
 ---@return Vector[]?            # List of positions
 ---@return (number | ('SystemError' | 'NotGenerated' | 'InvalidLayer' | 'OutsideMap' | 'OriginOutsideMap' | 'OriginUnpathable' | 'DestinationOutsideMap' | 'DestinationUnpathable' | 'Unpathable' | 'NoResults' | 'TooMuchThreat')?   # Error message, or the number of positions
 ---@return number?  # Length of path
----@return number?  # smallest threat that is at least the threat threshold
----@return number?  # largest threat that is at least the threat threshold
----@return BrainPositionThreat? # all locations with their threat that is at least the threat threshold
+---@return BrainPositionThreat[]? # all locations with their threat that is at least the threat threshold
 ---@return number? # number of threat found
 function PathToWithThreatThreshold(layer, origin, destination, aibrain, threatFunc, threatThreshold, threatRadius)
     -- check if generated
@@ -729,10 +727,8 @@ function PathToWithThreatThreshold(layer, origin, destination, aibrain, threatFu
     destinationSection.HeapIdentifier = 0
 
     local tHead = 1
-
     ---@type BrainPositionThreat[]
     local threats = { }
-    local minThreat, maxThreat
 
     -- search iterations
     while not PathToHeap:IsEmpty() do
@@ -756,14 +752,6 @@ function PathToWithThreatThreshold(layer, origin, destination, aibrain, threatFu
 
                     threats[tHead] = { neighbor.Center[1], neighbor.Center[3], threat }
                     tHead = tHead + 1
-
-                    if (not minThreat) or minThreat < threat then
-                        minThreat = threat
-                    end
-
-                    if (not maxThreat) or maxThreat > threat then
-                        maxThreat = threat
-                    end
                 else
                     neighbor.HeapIdentifier = seenIdentifier
                     neighbor.HeapFrom = section.Identifier
@@ -777,7 +765,7 @@ function PathToWithThreatThreshold(layer, origin, destination, aibrain, threatFu
 
     -- check if we found a path
     if destinationSection.HeapIdentifier ~= seenIdentifier then
-        return nil, 'TooMuchThreat', nil, minThreat, maxThreat, threats, tHead - 1
+        return nil, 'TooMuchThreat', nil, threats, tHead - 1
     end
 
     local sections, sectionCount = TracePath(destinationSection)
@@ -787,7 +775,7 @@ function PathToWithThreatThreshold(layer, origin, destination, aibrain, threatFu
     DebugRegisterPath('PathTo', positions, origin, destination)
 
     -- return all the goodies!!
-    return positions, positionCount, distance, minThreat, maxThreat, threats, tHead - 1
+    return positions, positionCount, distance, threats, tHead - 1
 end
 
 --- Returns a label that indicates to what sub-graph it belongs to. Unlike `GetTerrainLabel` this function will try to find the nearest valid neighbor
@@ -1045,35 +1033,57 @@ end
 ---@param origin Vector
 ---@param distance number
 ---@param aibrain AIBrain
----@param threatFunc fun(aiBrain: AIBrain, origin: Vector, destination: Vector, radius: number) : number
+---@param threatFunc fun(aiBrain: AIBrain, position: Vector, radius: number) : number
 ---@param threatThreshold number
 ---@param threatRadius number
 ---@return Vector[] | nil
 ---@return number | ('NotGenerated' | 'OutsideMap' | 'NoResults' | 'InvalidLayer' | 'TooMuchThreat')
----@return number?  # smallest threat that is at least the threat threshold
----@return number?  # largest threat that is at least the threat threshold
----@return BrainPositionThreat? # all locations with their threat that is at least the threat threshold
+---@return BrainPositionThreat[]? # all locations with their threat that is at least the threat threshold
 ---@return number? # number of threat found
-function DirectionsFromWithThreat(layer, origin, distance, aibrain, threatFunc, threatThreshold, threatRadius)
-    -- TODO: use a cache as we're not interested in all the positions
-    local points, count = DirectionsFrom(layer, origin, distance)
+function DirectionsFromWithThreatThreshold(layer, origin, distance, aibrain, threatFunc, threatThreshold, threatRadius)
+    -- check if generated
+    if not NavGenerator.IsGenerated() then
+        return nil, 'NotGenerated', nil, nil
+    end
+
+    -- sanity check on the grid
+    local grid = FindGrid(layer)
+    if not grid then
+        return nil, 'InvalidLayer', nil, nil
+    end
+
+    -- compute directions
+    local points, count = FindSections(grid, origin, distance)
     if not points then
         local msg = count --[[@as string]]
-        return nil, msg, nil, nil, nil, nil
+        return nil, msg, nil, nil
     end
+
+    -- no locations found
+    if count == 0 then
+        return nil, 'NoResults', nil, nil
+    end
+
+    local tHead = 1
+    ---@type BrainPositionThreat[]
+    local threats = { }
 
     local head = 1
     for k = 1, count do
         local point = points[k]
-        local threat = threatFunc(aibrain, origin, point, threatRadius)
+        local threat = threatFunc(aibrain, point, threatRadius)
         if threat < threatThreshold then
             points[head] = point
             head = head + 1
+        else
+            threats[tHead] = { point[1], point[3], threat }
+            tHead = tHead + 1
         end
     end
 
+    -- no locations remain
     if head == 1 then
-        return nil, 'TooMuchThreat'
+        return nil, 'TooMuchThreat', threats, tHead - 1
     end
 
     -- remove remaining points
@@ -1081,7 +1091,7 @@ function DirectionsFromWithThreat(layer, origin, distance, aibrain, threatFunc, 
         points[k] = nil
     end
 
-    return points, count
+    return points, count, threats, tHead - 1
 end
 
 --- Computes a waypoint that represents a random direction that we can navigate to
