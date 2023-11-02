@@ -1000,6 +1000,7 @@ function DirectionsFrom(layer, origin, distance)
     end
 
     -- only keep those at the edge
+    local positions = { }
     local ox = origin[1]
     local oz = origin[3]
     local ds = distance * distance
@@ -1011,7 +1012,7 @@ function DirectionsFrom(layer, origin, distance)
         local dz = oz - point[3]
 
         if dx * dx + dz * dz > ds then
-            points[head] = point
+            positions[head] = point
             head = head + 1
         end
     end
@@ -1020,12 +1021,7 @@ function DirectionsFrom(layer, origin, distance)
         return nil, 'NoResults'
     end
 
-    -- remove remaining points
-    for k = head, count do
-        points[k] = nil
-    end
-
-    return points, head - 1
+    return positions, head - 1
 end
 
 --- Computes a list of waypoints that represent random directions that we can navigate to
@@ -1068,12 +1064,13 @@ function DirectionsFromWithThreatThreshold(layer, origin, distance, aibrain, thr
     ---@type BrainPositionThreat[]
     local threats = { }
 
+    local positions = { }
     local head = 1
     for k = 1, count do
         local point = points[k]
         local threat = threatFunc(aibrain, point, threatRadius)
         if threat < threatThreshold then
-            points[head] = point
+            positions[head] = point
             head = head + 1
         else
             threats[tHead] = { point[1], point[3], threat }
@@ -1086,12 +1083,7 @@ function DirectionsFromWithThreatThreshold(layer, origin, distance, aibrain, thr
         return nil, 'TooMuchThreat', threats, tHead - 1
     end
 
-    -- remove remaining points
-    for k = head, count do
-        points[k] = nil
-    end
-
-    return points, count, threats, tHead - 1
+    return positions, head - 1, threats, tHead - 1
 end
 
 --- Computes a waypoint that represents a random direction that we can navigate to
