@@ -64,8 +64,8 @@ function CreateSeraphimFactoryBuildingEffects(builder, unitBeingBuilt, effectBon
     local bp = unitBeingBuilt.Blueprint
     local Physics = bp.Physics
     local Footprint = bp.Footprint
-    local sx = Physics.MeshExtentsX or Footprint.SizeX
-    local sz = Physics.MeshExtentsZ or Footprint.SizeZ
+    local sx = Physics.MeshExtentsX or Footprint.SizeX or 1
+    local sz = Physics.MeshExtentsZ or Footprint.SizeZ or 1
     local sy = Physics.MeshExtentsY or Footprint.SizeYX or MathMin(sx, sz)
 
     -- do not apply offsets for subs and air units
