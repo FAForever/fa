@@ -5,12 +5,14 @@
 -- Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 -------------------------------------------------------------------------------------------------
 local ATorpedoCluster = import("/lua/aeonprojectiles.lua").ATorpedoCluster
-local VisionMarkerOpti = import("/lua/sim/vizmarker.lua").VisionMarkerOpti
 
+--- Aeon Torpedo Cluster Projectile script, XAA0306
+---@class AANTorpedoCluster01 : ATorpedoCluster
 AANTorpedoCluster01 = ClassProjectile(ATorpedoCluster) {
-
     FxTrail = import("/lua/effecttemplates.lua").ATorpedoPolyTrails01,
 
+    ---@param self AANTorpedoCluster01
+    ---@param inWater boolean
     OnCreate = function(self, inWater)
         ATorpedoCluster.OnCreate(self, inWater)
         CreateTrail(self, -1, self.Army, import("/lua/effecttemplates.lua").ATorpedoPolyTrails01)

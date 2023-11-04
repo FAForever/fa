@@ -141,8 +141,8 @@ end
 
 ---
 ---@param velX number
----@param velY number
----@param velZ number
+---@param velY? number
+---@param velZ? number
 function Projectile:SetVelocity(velX, velY, velZ)
 end
 

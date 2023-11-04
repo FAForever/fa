@@ -1,8 +1,13 @@
--- Depth Charge Script
 local ADepthChargeProjectile = import("/lua/aeonprojectiles.lua").ADepthChargeProjectile
 local VisionMarkerOpti = import("/lua/sim/vizmarker.lua").VisionMarkerOpti
 
+-- Depth Charge Script
+---@class AANDepthCharge02 : ADepthChargeProjectile
 AANDepthCharge02 = ClassProjectile(ADepthChargeProjectile) {
+
+    ---@param self AANDepthCharge02
+    ---@param TargetType string
+    ---@param TargetEntity Prop|Unit
     OnImpact = function(self, TargetType, TargetEntity)
         local px,_,pz = self:GetPositionXYZ()
         local marker = VisionMarkerOpti({Owner = self})
