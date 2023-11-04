@@ -55,6 +55,7 @@ UnitBlueprint{
         "BUILTBYTIER3ENGINEER",
         "CANNOTUSEAIRSTAGING",
         "CARRIER",
+        "CQUEMOV",
         "DIRECTFIRE",
         "DRAGBUILD",
         "EXPERIMENTAL",

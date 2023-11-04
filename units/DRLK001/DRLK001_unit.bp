@@ -48,7 +48,7 @@ UnitBlueprint{
             },
         },
         AnimationWalk = "/units/DRLK001/DRLK001_walk.sca",
-        AnimationWalkRate = 7,
+        AnimationWalkRate = 11,
         AttackReticleSize = 3,
         Mesh = {
             IconFadeInZoom = 130,

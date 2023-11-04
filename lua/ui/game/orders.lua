@@ -1604,9 +1604,7 @@ function ApplyOverrides(standardOrdersTable, newSelection)
                             orderDiffs[orderKey] = false
                             break
                         else
-                            if orderDiffs[orderKey] == nil then
-                                orderDiffs[orderKey] = {}
-                            end
+                            orderDiffs[orderKey] = orderDiffs[orderKey] or {}
                             orderDiffs[orderKey][key] = value
                         end
                     end

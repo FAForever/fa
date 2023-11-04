@@ -195,7 +195,7 @@ AirUnit = ClassUnit(MobileUnit) {
             end
 
             if not self.deathWep or self.deathWep == {} then
-                WARN('An Air unit with no death weapon, or with incorrect label has died!!')
+                WARN(string.format('(%s) has no death weapon or the death weapon has an incorrect label!', tostring(bp.BlueprintId)))
             else
                 self.DeathCrashDamage = self.deathWep.Damage
             end

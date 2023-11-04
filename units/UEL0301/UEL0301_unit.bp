@@ -445,7 +445,7 @@ UnitBlueprint{
             BuildCostEnergy = 360800,
             BuildCostMass = 3500,
             BuildTime = 10800,
-            HideBones = { "Jetpack" },
+            ShowBones = { "Jetpack" },
             Icon = "sgf",
             ImpactEffects = "UEFShieldHit01",
             ImpactMesh = "/effects/entities/ShieldSection01/ShieldSection01_mesh",

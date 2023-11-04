@@ -281,6 +281,14 @@ FactoryUnit = ClassUnit(StructureUnit) {
 
     ---@param self FactoryUnit
     RollOffUnit = function(self)
+        local rollOffPoint = self.RollOffPoint
+        local unitBeingBuilt = self.UnitBeingBuilt
+        if unitBeingBuilt and EntityCategoryContains(categories.ENGINEER, unitBeingBuilt) then
+            local spin, x, y, z = self:CalculateRollOffPoint()
+            unitBeingBuilt:SetRotation(spin)
+            rollOffPoint[1], rollOffPoint[2], rollOffPoint[3] = x, y, z
+        end
+
         IssueToUnitMoveOffFactory(self.UnitBeingBuilt, self.RollOffPoint)
     end,
 

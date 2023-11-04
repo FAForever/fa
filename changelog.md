@@ -1,6 +1,131 @@
 
 Some sections of the changelog are available in other languages such as [French](changelog-fr.md) or [Russian](changelog-ru.md)
 
+# Game version 3773 (2th of November, 2023)
+
+Please refer to the notes of versions 3771 and 3772 for the full patch notes.
+
+This patch ships with a new executable that tackles game crashes related to the memory address '0x0128CACC'.
+
+With gratitude to all those who took the time to report issues,
+
+Jip
+
+## Bug fixes
+
+- (#5636) Fix various bugs that could occur with AI
+- (#5635) Fix various bugs with the recent tactical missile changes
+
+The minimum range is increased for various weapons that fire tactical missiles. Reduced the chance that non-zigzagging tactical missiles end up missing their target.
+
+- (#5634) Revert an accidental parameter change related to path finding
+
+Units should now be as responsive as before.
+
+## Other changes
+
+- (#5626) Improve the code style of the navigational mesh
+
+## Contributors
+
+With thanks to the following people who contributed through coding:
+
+- Jip
+
+With thanks to the following people who contributed through binary patches:
+
+- Kionx
+- 4z0t
+
+And, last but certainly not least - with thanks to those that took part in constructive discussions:
+
+- Deribus
+- Sheikah
+- MostLostNoob
+- Maudlin27
+  
+# Game version 3772 (2th of November, 2023)
+
+Please refer to the notes of versions 3771 for the full patch notes.
+
+With gratitude to all those who took the time to report issues,
+
+Jip
+
+## Features
+
+- (#5545) Rebalance walls
+
+With the latest patch, walls now reliably block projectiles, even for units hiding behind them. This can create nearly impenetrable defenses without the need for artillery. In collaboration with the balance team, we have decided to implement the following balance changes for all wall sections:
+
+- - Health: X -> 500
+- - Health regeneration: X -> 0
+- - Build time: 20 -> 15
+- - Mass costs: 2 -> 3
+- - Energy costs: 10 -> 20
+
+- (#5617) Allow engineers to change orientation when done constructing
+
+In the recent patch, units no longer automatically rotate towards the optimal rollout point upon completing construction. The old behavior, especially noticeable with large units (e.g., naval units), could be quite awkward. We have decided to make an exception for engineers since an incorrectly oriented engineer at the beginning of the game can significantly slow down your build order, costing valuable seconds.
+
+### AI
+
+- (#5621) Enhance 'PathToWithThreatThreshold' to also provide information about the threat location.
+- (#5621) Introduce 'DirectionsFromWithThreatThreshold' for obtaining a secure landing location.
+- (#5607) Correct 'GetPositionsInRadius' to function with the updated coarse graph.
+- (#5608) The easy AI is now functioning properly once more.
+
+## Bug fixes
+
+- (#5618) Correct the missing energy requirements for Overcharge.
+- (#5606) Conceal the collapse button of the mass fabrication panel via the 'UI_ToggleGamePanels' console command.
+- (#5620) Experimental mobile factories can now be selected even during construction.
+- (#5619) Restore the trail to the projectiles of the AA guns on the Cybran carrier.
+- (#5615) Display the backpack on the UEF ACU when the bubble shield enhancement is installed.
+- (#5611) Display the backpack on the UEF ACU when the bubble shield enhancement is installed.
+- (#5610) Resolve factory modules (of mobile factories) causing issues with campaign objectives.
+
+Factory modules are still part of the objective. It is up to the author of the campaign map to exclude them in the script files if they do not want them to be part of the objective
+
+- (#5610) Correct Zappers (Cybran TMD) from intercepting the wrong missiles.
+- (#5622) Adjust the walking animation rate of various units.
+- (#52) Prevent the 'OnEnterWater' event of projectiles triggering when intersecting with the terrain.
+
+This bug was addressed through an assembly patch, which was noticeable due to water splashes appearing on land. This issue was particularly prominent with transports crashing, but it also affected the average projectile, creating small water splashes.
+
+- (#53) Rectify a bug where a projectile would intersect with the terrain while there's a unit in between.
+
+This bug was fixed through an assembly patch, primarily affecting the Stinger's ability to target specific, smaller units.
+
+## Other changes
+
+- (#5616) Reintroduce Seraphim-specific scorch splats.
+- (#5613) Include the damage of the Colossus' claw in the blueprint, facilitating modding.
+- (#5614) Store map-wide albedo for shaders in the same slot, simplifying terrain shader switching.
+
+## Contributors
+
+With thanks to the following people who contributed through coding:
+
+- Jip
+- BlackYps
+- Balthazar
+- HudoraX
+
+With thanks to the following people who contributed through binary patches:
+
+- hdt80bro
+
+And, last but certainly not least - with thanks to those that took part in constructive discussions:
+
+- Deribus
+- CheeseBerry
+- Sheikah
+- Magge
+- MostLostNoob
+- Fichom
+- Rowey
+  
 # Game version 3771 (29th of October, 2023)
 
 This patch introduces a number of significant changes that once again affect the game's balance. The balance team is fully aware of this and is actively making adjustments to adapt to these changes. If you want to experience the latest in balancing, be sure to select the FAF Beta game type when hosting a game; it contains the most up-to-date improvements. We encourage you to provide feedback on the forums and through Discord.

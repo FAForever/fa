@@ -386,38 +386,29 @@ Projectile = ClassProjectile(ProjectileMethods) {
                 false-- damage friendly flag
             )
 
-            -- try and spawn in a splat
-            if -- if we flat out hit the terrain
-            targetType == "Terrain" or
-
-                -- if we hit a unit that is on land
-                (targetEntity and targetEntity.Layer == "Land")
+            if (-- see if we need to spawn a splat
+                targetType == "Terrain" or
+                    targetEntity and targetEntity.Layer == "Land"
+                ) and (not blueprintDisplay.NoGenericScorchSplats)
             then
-                -- choose a splat to spawn
-                local splat = blueprintDisplay.ScorchSplat
-                if not splat then
-                    splat = ScorchSplatTextures[ ScorchSplatTexturesLookup[ScorchSplatTexturesLookupIndex] ]
-                    ScorchSplatTexturesLookupIndex = ScorchSplatTexturesLookupIndex + 1
-                    if ScorchSplatTexturesLookupIndex > ScorchSplatTexturesLookupCount then
-                        ScorchSplatTexturesLookupIndex = 1
-                    end
+                -- choose a splat
+                local splat = ScorchSplatTextures[ ScorchSplatTexturesLookup[ScorchSplatTexturesLookupIndex] ]
+                ScorchSplatTexturesLookupIndex = ScorchSplatTexturesLookupIndex + 1
+                if ScorchSplatTexturesLookupIndex > ScorchSplatTexturesLookupCount then
+                    ScorchSplatTexturesLookupIndex = 1
                 end
 
-                -- choose our radius to use
-                local altRadius = blueprintDisplay.ScorchSplatSize
-                if not altRadius then
-                    local damageMultiplier = (0.01 * damageData.DamageAmount)
-                    if damageMultiplier > 1 then
-                        damageMultiplier = 1
-                    end
-                    altRadius = damageMultiplier * radius
+                -- determine radius
+                local damageMultiplier = (0.01 * damageData.DamageAmount)
+                if damageMultiplier > 1 then
+                    damageMultiplier = 1
                 end
+                local altRadius = damageMultiplier * radius
 
                 -- radius, lod and lifetime share the same rng adjustment
                 local rngRadius = altRadius * Random()
 
                 CreateSplat(
-                -- position, orientation and the splat
                     vc, -- position
                     6.28 * Random(), -- heading
                     splat, -- splat

@@ -83,7 +83,7 @@ UnitBlueprint{
             "<LOC ability_deathaoe>Volatile",
         },
         AnimationWalk = "/units/url0001/url0001_awalk02.sca",
-        AnimationWalkRate = 1.7,
+        AnimationWalkRate = 1.45,
         IdleEffects = {
             Seabed = {
                 Effects = {
@@ -780,6 +780,7 @@ UnitBlueprint{
             DamageRadius = 2.5,
             DamageType = "Overcharge",
             DisplayName = "Overcharge Cannon",
+            EnergyRequired = 7500,
             FireTargetLayerCapsTable = {
                 Land = "Land|Water|Seabed",
                 Seabed = "Land|Water|Seabed",
@@ -857,6 +858,7 @@ UnitBlueprint{
             DamageRadius = 2.5,
             DamageType = "Overcharge",
             DisplayName = "AutoOvercharge Cannon",
+            EnergyRequired = 7500,
             FireTargetLayerCapsTable = {
                 Land = "Land|Water|Seabed",
                 Seabed = "Land|Water|Seabed",
