@@ -54,8 +54,8 @@ TacticalMissileComponent = ClassSimple(SemiBallisticComponent) {
         -- glide
         local glideTurnRate, glideTime = self:TurnRateFromDistance()
 
+        -- try to create a smooth transition for zig-zaggers
         if zigZagger then
-            -- try to create a smooth transition
             if glideTime > 4.0 then
                 for k = 1, 10 do
                     WaitTicks(4)
@@ -81,13 +81,20 @@ TacticalMissileComponent = ClassSimple(SemiBallisticComponent) {
             self:SetTurnRate(glideTurnRate)
         end
 
-        -- wait until we've allegedly hit our target
         self:SetLifetime((glideTime + 3))
+
+        -- for non-zigzaggers, reduce the maximum zig zag frequency halfway so that they're unlikely to miss targets
+        if not zigZagger then
+            glideTime = 0.5 * glideTime
+            WaitTicks((glideTime + 0.1) * 10)
+            self:ChangeMaxZigZag(0.2)
+        end
+
+        -- wait until we've allegedly hit our target
         WaitTicks((glideTime + 1) * 10)
 
         -- then, if we still exist, we just want to stop existing. Therefore we find
         -- our way to the ground
-
         if not self:BeenDestroyed() then
 
             -- target the ground below us slowly turn towards the ground so that we do not fly off indefinitely
