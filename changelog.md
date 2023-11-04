@@ -1,6 +1,49 @@
 
 Some sections of the changelog are available in other languages such as [French](changelog-fr.md) or [Russian](changelog-ru.md)
 
+# Game version 3773 (2th of November, 2023)
+
+Please refer to the notes of versions 3771 and 3772 for the full patch notes.
+
+This patch ships with a new executable that tackles game crashes related to the memory address '0x0128CACC'.
+
+With gratitude to all those who took the time to report issues,
+
+Jip
+
+## Bug fixes
+
+- (#5636) Fix various bugs that could occur with AI
+- (#5635) Fix various bugs with the recent tactical missile changes
+
+The minimum range is increased for various weapons that fire tactical missiles. Reduced the chance that non-zigzagging tactical missiles end up missing their target.
+
+- (#5634) Revert an accidental parameter change related to path finding
+
+Units should now be as responsive as before.
+
+## Other changes
+
+- (#5626) Improve the code style of the navigational mesh
+
+## Contributors
+
+With thanks to the following people who contributed through coding:
+
+- Jip
+
+With thanks to the following people who contributed through binary patches:
+
+- Kionx
+- 4z0t
+
+And, last but certainly not least - with thanks to those that took part in constructive discussions:
+
+- Deribus
+- Sheikah
+- MostLostNoob
+- Maudlin27
+  
 # Game version 3772 (2th of November, 2023)
 
 Please refer to the notes of versions 3771 for the full patch notes.
