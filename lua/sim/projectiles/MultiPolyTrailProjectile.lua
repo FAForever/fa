@@ -55,20 +55,12 @@ MultiPolyTrailProjectile = ClassProjectile(EmitterProjectile) {
                 for i = 1, numberOfPolyTrails do
                     index = Random(1, polyTrailCount)
                     local effect = CreateTrail(self, -1, army, polyTrails[index])
-
-                    -- only do these engine calls when they matter
-                    if polyTrailOffsets[index] ~= 0 then
-                        IEffectOffsetEmitter(effect, 0, 0, polyTrailOffsets[index])
-                    end
+                    IEffectOffsetEmitter(effect, 0, 0, polyTrailOffsets[index])
                 end
             else
                 for i = 1, polyTrailCount do
                     local effect = CreateTrail(self, -1, army, polyTrails[i])
-
-                    -- only do these engine calls when they matter
-                    if polyTrailOffsets[i] ~= 0 then
-                        IEffectOffsetEmitter(effect, 0, 0, polyTrailOffsets[i])
-                    end
+                    IEffectOffsetEmitter(effect, 0, 0, polyTrailOffsets[i])
                 end
             end
         end

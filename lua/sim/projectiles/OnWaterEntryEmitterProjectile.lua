@@ -69,24 +69,13 @@ OnWaterEntryEmitterProjectile = ClassProjectile(Projectile) {
 
             for i in fxTrails do
                 local effect = CreateEmitterOnEntity(self, army, fxTrails[i])
-
-                -- only do these engine calls when they matter
-                if fxTrailScale ~= 1 then
-                    IEffectScaleEmitter(effect, fxTrailScale)
-                end
-
-                if fxTrailOffset ~= 1 then
-                    IEffectOffsetEmitter(effect, 0, 0, fxTrailOffset)
-                end
+                IEffectScaleEmitter(effect, fxTrailScale)
+                IEffectOffsetEmitter(effect, 0, 0, fxTrailOffset)
             end
 
             if polyTrail ~= '' then
                 local effect = CreateTrail(self, -1, army, polyTrail)
-
-                -- only do these engine calls when they matter
-                if polyTrailOffset ~= 0 then
-                    IEffectOffsetEmitter(effect, 0, 0, polyTrailOffset)
-                end
+                IEffectOffsetEmitter(effect, 0, 0, polyTrailOffset)
             end
         end
     end,
@@ -108,24 +97,13 @@ OnWaterEntryEmitterProjectile = ClassProjectile(Projectile) {
 
         for i in fxTrails do
             local effect = CreateEmitterOnEntity(self, army, fxTrails[i])
-
-            -- only do these engine calls when they matter
-            if fxTrailScale ~= 1 then
-                IEffectScaleEmitter(effect, fxTrailScale)
-            end
-
-            if fxTrailOffset ~= 1 then
-                IEffectOffsetEmitter(effect, 0, 0, fxTrailOffset)
-            end
+            IEffectScaleEmitter(effect, fxTrailScale)
+            IEffectOffsetEmitter(effect, 0, 0, fxTrailOffset)
         end
 
         if polyTrail ~= '' then
             local effect = CreateTrail(self, -1, army, polyTrail)
-
-            -- only do these engine calls when they matter
-            if polyTrailOffset ~= 0 then
-                IEffectOffsetEmitter(effect, 0, 0, polyTrailOffset)
-            end
+            IEffectOffsetEmitter(effect, 0, 0, polyTrailOffset)
         end
     end,
 

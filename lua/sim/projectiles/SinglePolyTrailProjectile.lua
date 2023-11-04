@@ -32,7 +32,7 @@ SinglePolyTrailProjectile = ClassProjectile(EmitterProjectile) {
 
     PolyTrail = '/effects/emitters/test_missile_trail_emit.bp',
     PolyTrailOffset = 0,
-    FxTrails = { },
+    FxTrails = {},
 
     ---@param self SinglePolyTrailProjectile
     OnCreate = function(self)
@@ -44,11 +44,7 @@ SinglePolyTrailProjectile = ClassProjectile(EmitterProjectile) {
 
         if polyTrail ~= '' then
             local effect = CreateTrail(self, -1, army, polyTrail)
-
-            -- only do these engine calls when they matter
-            if polyTrailOffset ~= 0 then
-                IEffectOffsetEmitter(effect, 0, 0, polyTrailOffset)
-            end
+            IEffectOffsetEmitter(effect, 0, 0, polyTrailOffset)
         end
     end,
 }

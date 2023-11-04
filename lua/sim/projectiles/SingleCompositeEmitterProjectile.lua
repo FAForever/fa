@@ -30,7 +30,7 @@ local CreateBeamEmitterOnEntity = CreateBeamEmitterOnEntity
 SingleCompositeEmitterProjectile = ClassProjectile(SinglePolyTrailProjectile) {
 
     BeamName = '/effects/emitters/default_beam_01_emit.bp',
-    FxTrails = { },
+    FxTrails = {},
 
     ---@param self SingleCompositeEmitterProjectile
     OnCreate = function(self)

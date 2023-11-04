@@ -47,14 +47,8 @@ EmitterProjectile = ClassProjectile(Projectile) {
 
         for i in fxTrails do
             local effect = CreateEmitterOnEntity(self, army, fxTrails[i])
-
-            if fxTrailScale ~= 1 then
-                IEffectScaleEmitter(effect, fxTrailScale)
-            end
-
-            if fxTrailOffset ~= 0 then
-                IEffectOffsetEmitter(effect, 0, 0, fxTrailOffset)
-            end
+            IEffectScaleEmitter(effect, fxTrailScale)
+            IEffectOffsetEmitter(effect, 0, 0, fxTrailOffset)
         end
     end,
 }
