@@ -28,7 +28,7 @@ function Projectile:ChangeZigZagFrequency(freq)
 end
 
 --- Creates a child projectile that inherits the speed and orientation of its parent
----@param blueprint ProjectileBlueprint
+---@param blueprint BlueprintId
 ---@return Projectile
 function Projectile:CreateChildProjectile(blueprint)
 end

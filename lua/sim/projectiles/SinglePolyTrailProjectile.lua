@@ -21,6 +21,7 @@
 --******************************************************************************************************
 
 local EmitterProjectile = import("/lua/sim/projectiles/emitterprojectile.lua").EmitterProjectile
+local EmitterProjectileOnCreate = EmitterProjectile.OnCreate
 
 -- upvalue scope for performance
 local CreateTrail = CreateTrail
@@ -35,7 +36,7 @@ SinglePolyTrailProjectile = ClassProjectile(EmitterProjectile) {
 
     ---@param self SinglePolyTrailProjectile
     OnCreate = function(self)
-        EmitterProjectile.OnCreate(self)
+        EmitterProjectileOnCreate(self)
 
         local army = self.Army
         local polyTrail = self.PolyTrail
