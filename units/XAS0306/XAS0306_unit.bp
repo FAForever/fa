@@ -279,7 +279,7 @@ UnitBlueprint{
             HeadingArcRange = 165,
             Label = "MissileRackBack",
             MaxRadius = 200,
-            MinRadius = 90,
+            MinRadius = 80,
             MuzzleChargeDelay = 0,
             MuzzleSalvoDelay = 1,
             MuzzleSalvoSize = 5,
