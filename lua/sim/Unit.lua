@@ -2941,7 +2941,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
     end,
 
     ---@param self Unit
-    ---@param built boolean
+    ---@param built Unit
     StopBuildingEffects = function(self, built)
         if self.BuildEffectsBag then
             self.BuildEffectsBag:Destroy()
