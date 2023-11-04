@@ -28,8 +28,9 @@ BaseTransport = ClassSimple {
         self:RequestRefreshUI()
 
         local slots = self.slots
-        if slots then
-            slots[unit.attachmentBone] = nil
+        local attachmentBone = unit.attachmentBone
+        if slots and attachmentBone then
+            slots[attachmentBone] = nil
             unit.attachmentBone = nil
         end
     end,
