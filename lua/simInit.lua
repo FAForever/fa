@@ -86,10 +86,6 @@ end
 --but before any armies are created.
 function SetupSession()
 
-    ScenarioInfo.pathcap_land = 20000
-    ScenarioInfo.pathcap_sea = 20000
-    ScenarioInfo.pathcap_both = 20000
-
     import("/lua/ai/gridreclaim.lua").Setup()
 
     ScenarioInfo.TriggerManager = import("/lua/triggermanager.lua").Manager
