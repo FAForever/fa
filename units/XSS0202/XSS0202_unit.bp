@@ -194,7 +194,7 @@ UnitBlueprint{
             Label = "Missile",
             MaxProjectileStorage = 1,
             MaxRadius = 150,
-            MinRadius = 12.5,
+            MinRadius = 17.5,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
             MuzzleVelocity = 5,

@@ -186,7 +186,7 @@ UnitBlueprint{
             ManualFire = true,
             MaxProjectileStorage = 6,
             MaxRadius = 256,
-            MinRadius = 15,
+            MinRadius = 25,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
             MuzzleVelocity = 5,
