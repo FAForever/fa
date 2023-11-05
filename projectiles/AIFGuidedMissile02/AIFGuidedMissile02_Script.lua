@@ -6,21 +6,27 @@
 -------------------------------------------------------------------------------
 local AGuidedMissileProjectile = import("/lua/aeonprojectiles.lua").AGuidedMissileProjectile
 local AMiasmaProjectile = import('/lua/aeonprojectiles.lua').AMiasmaProjectile
-local utilities = import('/lua/utilities.lua')
 local VisionMarker = import("/lua/sim/vizmarker.lua").VisionMarkerOpti
 
-
+--- Aeon Guided Split Missile, DAA0206
+---@class AIFGuidedMissile02 : AGuidedMissileProjectile
 AIFGuidedMissile02 = ClassProjectile(AGuidedMissileProjectile) {
+
+    ---@param self AIFGuidedMissile02
     OnCreate = function(self)
 		AGuidedMissileProjectile.OnCreate(self)
 		self.Trash:Add(ForkThread(self.MovementThread, self))
     end,
 
+    ---@param self AIFGuidedMissile02
 	MovementThread = function(self)
 		WaitTicks(7)
 		self:TrackTarget(true)
 	end,
 
+    ---@param self AIFGuidedMissile02
+    ---@param TargetType string
+    ---@param TargetEntity Prop|Unit
 	OnImpact = function(self, TargetType, TargetEntity)
         AMiasmaProjectile.OnImpact(self, TargetType, TargetEntity)
 
@@ -32,11 +38,11 @@ AIFGuidedMissile02 = ClassProjectile(AGuidedMissileProjectile) {
         elseif bp.Impact then
             self:PlaySound(bp.Impact)
         end
-        
+
         --Vision for when projectile impacts
         ---@type VisionMarkerOpti
         local entity = VisionMarker({Owner = self})
-    
+
         local px, py, pz = self:GetPositionXYZ()
         entity:UpdatePosition(px, pz)
         entity:UpdateIntel(self.Army, 12, 'Vision', true)
@@ -61,3 +67,6 @@ AIFGuidedMissile02 = ClassProjectile(AGuidedMissileProjectile) {
     end,
 }
 TypeClass = AIFGuidedMissile02
+
+-- Moved for mod compatibility
+local utilities = import('/lua/utilities.lua')

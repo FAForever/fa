@@ -1,5 +1,6 @@
--- Aeon Quantum Disruptor Projectile
 local AQuantumDisruptorProjectile = import("/lua/aeonprojectiles.lua").AQuantumDisruptorProjectile
-ADFQuantumDisruptor01 = ClassProjectile(AQuantumDisruptorProjectile) {
-}
+
+-- Aeon Quantum Disruptor Projectile
+---@class ADFQuantumDisruptor01 : AQuantumDisruptorProjectile
+ADFQuantumDisruptor01 = ClassProjectile(AQuantumDisruptorProjectile) { }
 TypeClass = ADFQuantumDisruptor01
