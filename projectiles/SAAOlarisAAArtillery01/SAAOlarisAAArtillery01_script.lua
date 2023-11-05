@@ -3,5 +3,8 @@
 -- Summary  :  Olaris AA Artillery Projectile script, XSL0001
 -- Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --------------------------------------------------------------------------------------------
+
+--- Olaris AA Artillery Projectile script, XSL0001
+---@class SAAOlarisAAArtillery01 : SOlarisAAArtillery
 SAAOlarisAAArtillery01 = ClassProjectile(import("/lua/seraphimprojectiles.lua").SOlarisAAArtillery) {}
 TypeClass = SAAOlarisAAArtillery01
