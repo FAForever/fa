@@ -1,8 +1,6 @@
---
--- Terran Torpedo Bomb
---
-
 local TTorpedoShipProjectile = import("/lua/terranprojectiles.lua").TTorpedoShipProjectile
+
+--- Terran Anti Air Missile
 ---@class TANAnglerTorpedo06: TTorpedoShipProjectile
 TANAnglerTorpedo06 = ClassProjectile(TTorpedoShipProjectile) {
 

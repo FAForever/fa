@@ -58,6 +58,7 @@ TIFMissileCruise02 = ClassProjectile(TMissileCruiseSubProjectile) {
         self.MoveThread = self.Trash:Add(ForkThread(self.MovementThread, self))
     end,
 
+    ---@param self TIFMissileCruise02
     OnExitWater = function(self)
         TMissileCruiseSubProjectile.OnExitWater(self)
         self:SetDestroyOnWater(true)
