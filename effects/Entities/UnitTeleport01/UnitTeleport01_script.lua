@@ -7,13 +7,17 @@ local NullShell = import("/lua/sim/defaultprojectiles.lua").NullShell
 local RandomFloat = import("/lua/utilities.lua").GetRandomFloat
 local EffectTemplate = import("/lua/effecttemplates.lua")
 
+--- UnitTeleportEffect01
+---@class UnitTeleportEffect01 : NullShell
 UnitTeleportEffect01 = Class(NullShell) {
 
+    ---@param self UnitTeleportEffect01
     OnCreate = function(self)
         NullShell.OnCreate(self)
         self:ForkThread(self.TeleportEffectThread)
     end,
 
+    ---@param self UnitTeleportEffect01
     TeleportEffectThread = function(self)
         local army = self.Army
         local pos = self:GetPosition()
@@ -89,6 +93,7 @@ UnitTeleportEffect01 = Class(NullShell) {
         DamageRing(self, pos, 12, 22, 1, 'TreeFire', false, false)
     end,
 
+    ---@param self UnitTeleportEffect01
     CreateEnergySpinner = function(self)
         self:CreateProjectile('/effects/entities/TeleportSpinner01/TeleportSpinner01_proj.bp', 0, 0, 0, nil, nil, nil):
             SetCollision(false)
@@ -98,13 +103,16 @@ UnitTeleportEffect01 = Class(NullShell) {
             SetCollision(false)
     end,
 
+    ---@param self UnitTeleportEffect01
+    ---@param army number
     CreateQuantumEnergy = function(self, army)
         for k, v in EffectTemplate.CommanderQuantumGateInEnergy do
             CreateEmitterOnEntity(self, army, v)
         end
     end,
 
-
+    ---@param self UnitTeleportEffect01
+    ---@param army number
     CreateFlares = function(self, army)
         local numFlares = 45
         local angle = (2 * math.pi) / numFlares
@@ -133,6 +141,7 @@ UnitTeleportEffect01 = Class(NullShell) {
         end
     end,
 
+    ---@param self UnitTeleportEffect01
     CreateSmokeRing = function(self)
         local blanketSides = 36
         local blanketAngle = (2 * math.pi) / blanketSides
@@ -154,5 +163,4 @@ UnitTeleportEffect01 = Class(NullShell) {
         end
     end,
 }
-
 TypeClass = UnitTeleportEffect01
