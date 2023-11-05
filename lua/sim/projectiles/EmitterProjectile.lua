@@ -23,6 +23,8 @@
 
 local Projectile = import("/lua/sim/projectile.lua").Projectile
 
+local ProjectileOnCreate = Projectile.OnCreate
+
 -- upvalue scope for performance
 local CreateEmitterOnEntity = CreateEmitterOnEntity
 local IEffectScaleEmitter = _G.moho.IEffect.ScaleEmitter
@@ -30,29 +32,23 @@ local IEffectOffsetEmitter = _G.moho.IEffect.OffsetEmitter
 
 ---@class EmitterProjectile : Projectile
 EmitterProjectile = ClassProjectile(Projectile) {
-    FxTrails = {'/effects/emitters/missile_munition_trail_01_emit.bp',},
+    FxTrails = { '/effects/emitters/missile_munition_trail_01_emit.bp', },
     FxTrailScale = 1,
     FxTrailOffset = 0,
 
     ---@param self EmitterProjectile
     OnCreate = function(self)
-        Projectile.OnCreate(self)
+        ProjectileOnCreate(self)
 
+        local army = self.Army
+        local fxTrails = self.FxTrails
         local fxTrailScale = self.FxTrailScale
         local fxTrailOffset = self.FxTrailOffset
-        local army = self.Army
 
-        local effect
-        for i in self.FxTrails do
-            effect = CreateEmitterOnEntity(self, army, self.FxTrails[i])
-
-            if fxTrailScale ~= 1 then
-                IEffectScaleEmitter(effect, fxTrailScale)
-            end
-
-            if fxTrailOffset ~= 1 then
-                IEffectOffsetEmitter(effect, 0, 0, fxTrailOffset)
-            end
+        for i in fxTrails do
+            local effect = CreateEmitterOnEntity(self, army, fxTrails[i])
+            IEffectScaleEmitter(effect, fxTrailScale)
+            IEffectOffsetEmitter(effect, 0, 0, fxTrailOffset)
         end
     end,
 }

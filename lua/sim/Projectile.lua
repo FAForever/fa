@@ -942,7 +942,7 @@ Projectile = ClassProjectile(ProjectileMethods) {
     --#region C hooks
 
     --- Creates a child projectile that inherits the speed, orientation and launcher of its parent
-    ---@param blueprint ProjectileBlueprint
+    ---@param blueprint BlueprintId
     ---@return Projectile
     CreateChildProjectile = function(self, blueprint)
         local projectile = ProjectileMethods.CreateChildProjectile(self, blueprint)
