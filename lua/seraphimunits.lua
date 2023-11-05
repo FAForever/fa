@@ -137,7 +137,7 @@ SAirFactoryUnit = ClassUnit(AirFactoryUnit) {
                 CreateEmitterAtBone(unitBuilding, -1, unitBuilding.Army, '/effects/emitters/seraphim_rifter_mobileartillery_hit_08_emit.bp'):OffsetEmitter(0, -1, 0)
             end
 
-            WaitTicks(8)
+            WaitTicks(4)
 
             self:SetBusy(false)
             ChangeState(self, self.IdleState)
