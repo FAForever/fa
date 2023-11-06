@@ -277,6 +277,15 @@ AIPlatoonAdaptiveAttackBehavior = Class(AIPlatoon) {
             self:ChangeState(self.Searching)
             return
         end,
+
+        ---@param self AIPlatoonAdaptiveAttackBehavior
+        Visualize = function(self)
+            local position = self:GetPlatoonPosition()
+            local locationToRaid = self.LocationToAttack
+            if position and locationToRaid then
+                DrawLinePop(position, locationToRaid, 'ffffff')
+            end
+        end
     },
 
     Transporting = State {

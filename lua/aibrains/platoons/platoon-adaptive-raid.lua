@@ -357,6 +357,15 @@ AIPlatoonAdaptiveRaidBehavior = Class(AIPlatoon) {
             self:ChangeState(self.Searching)
             return
         end,
+
+        ---@param self AIPlatoonAdaptiveRaidBehavior
+        Visualize = function(self)
+            local position = self:GetPlatoonPosition()
+            local locationToRaid = self.LocationToRaid
+            if position and locationToRaid then
+                DrawLinePop(position, locationToRaid, 'ffffff')
+            end
+        end
     },
 
     Transporting = State {

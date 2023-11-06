@@ -127,14 +127,16 @@ AIPlatoon = Class(moho.platoon_methods) {
     -- platoon states
 
     ---@param self AIPlatoon
-    ---@param state AIPlatoonState
-    ChangeState = function(self, state)
-        self:LogDebug(string.format('Changing state to: %s', state.StateName))
+    ---@param name AIPlatoonState
+    ---@param state table
+    ChangeState = function(self, name, state)
+        self:LogDebug(string.format('Changing state to: %s', name.StateName))
 
         WaitTicks(1)
 
         if not IsDestroyed(self) then
-            ChangeState(self, state)
+            self.State = state
+            ChangeState(self, name)
         end
     end,
 
@@ -555,6 +557,10 @@ AIPlatoon = Class(moho.platoon_methods) {
         )
 
         return info
+    end,
+
+    ---@param self AIPlatoon
+    Visualize = function(self)
     end,
 
     --#endregion
