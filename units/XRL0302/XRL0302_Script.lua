@@ -64,11 +64,13 @@ local DeathWeaponEMP = ClassWeapon(Weapon) {
                             self:FireWeapon()
                         end
                     end
+                    self.unit:GetNavigator():SetSpeedThroughGoal(true)
                     self.chasing = true
                 end
             end
         elseif new == 'Stopped' then
             self:SetEnabled(true)
+            self.unit:GetNavigator():SetSpeedThroughGoal(false)
             self.chasing = nil
         end
     end,
