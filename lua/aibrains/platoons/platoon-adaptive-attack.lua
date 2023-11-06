@@ -29,6 +29,7 @@ AIPlatoonAdaptiveAttackBehavior = Class(AIPlatoon) {
     Start = State {
 
         StateName = 'Start',
+        StateColor = '919B00',
 
         --- Initial state of any state machine
         ---@param self AIPlatoonAdaptiveAttackBehavior
@@ -60,11 +61,20 @@ AIPlatoonAdaptiveAttackBehavior = Class(AIPlatoon) {
             self:ChangeState(self.Searching)
             return
         end,
+
+        ---@param self AIPlatoonAdaptiveAttackBehavior
+        Visualize = function(self)
+            local position = self:GetPlatoonPosition()
+            if position then
+                DrawCircle(position, 10, self.StateColor)
+            end
+        end
     },
 
     Searching = State {
 
         StateName = 'Searching',
+        StateColor = '999999',
 
         --- The platoon searches for a target
         ---@param self AIPlatoonAdaptiveAttackBehavior
@@ -116,11 +126,11 @@ AIPlatoonAdaptiveAttackBehavior = Class(AIPlatoon) {
             end
         end,
 
-        ---@param self AIPlatoonAdaptiveRaidBehavior
+        ---@param self AIPlatoonAdaptiveAttackBehavior
         Visualize = function(self)
             local position = self:GetPlatoonPosition()
             if position then
-                DrawCircle(position, 10, 'ffffff')
+                DrawCircle(position, 10, self.StateColor)
             end
         end
     },
@@ -128,6 +138,7 @@ AIPlatoonAdaptiveAttackBehavior = Class(AIPlatoon) {
     Navigating = State {
 
         StateName = 'Navigating',
+        StateColor = 'ffffff',
 
         --- The platoon retreats from a threat
         ---@param self AIPlatoonAdaptiveAttackBehavior
@@ -291,7 +302,7 @@ AIPlatoonAdaptiveAttackBehavior = Class(AIPlatoon) {
             local position = self:GetPlatoonPosition()
             local target = self.LocationToAttack
             if position and target then
-                DrawLinePop(position, target, 'ffffff')
+                DrawLinePop(position, target, self.StateColor)
             end
         end
     },
@@ -299,6 +310,7 @@ AIPlatoonAdaptiveAttackBehavior = Class(AIPlatoon) {
     Transporting = State {
 
         StateName = 'Transporting',
+        StateColor = 'FF00D4',
 
         --- The platoon avoids danger or attempts to reclaim if they are too close to avoid
         ---@param self AIPlatoonAdaptiveAttackBehavior
@@ -315,11 +327,11 @@ AIPlatoonAdaptiveAttackBehavior = Class(AIPlatoon) {
             return
         end,
 
-        ---@param self AIPlatoonAdaptiveRaidBehavior
+        ---@param self AIPlatoonAdaptiveAttackBehavior
         Visualize = function(self)
             local position = self:GetPlatoonPosition()
             if position then
-                DrawCircle(position, 10, 'FF00D4')
+                DrawCircle(position, 10, self.StateColor)
             end
         end
     },
@@ -327,6 +339,7 @@ AIPlatoonAdaptiveAttackBehavior = Class(AIPlatoon) {
     AttackingTarget = State {
 
         StateName = 'AttackingTarget',
+        StateColor = 'ff0000',
 
         --- The platoon attacks the target
         ---@param self AIPlatoonAdaptiveAttackBehavior
@@ -385,12 +398,12 @@ AIPlatoonAdaptiveAttackBehavior = Class(AIPlatoon) {
             end
         end,
 
-        ---@param self AIPlatoonAdaptiveRaidBehavior
+        ---@param self AIPlatoonAdaptiveAttackBehavior
         Visualize = function(self)
             local position = self:GetPlatoonPosition()
             local target = self.LocationToAttack
             if position and target then
-                DrawLinePop(position, target, 'ff0000')
+                DrawLinePop(position, target, self.StateColor)
             end
         end
     },
@@ -398,6 +411,7 @@ AIPlatoonAdaptiveAttackBehavior = Class(AIPlatoon) {
     RaidingOpportunity = State {
 
         StateName = 'RaidingOpportunity',
+        StateColor = 'ff0000',
 
         --- The platoon raids the opportunity it walked into
         ---@param self AIPlatoonAdaptiveAttackBehavior
@@ -484,12 +498,12 @@ AIPlatoonAdaptiveAttackBehavior = Class(AIPlatoon) {
             end
         end,
 
-        ---@param self AIPlatoonAdaptiveRaidBehavior
+        ---@param self AIPlatoonAdaptiveAttackBehavior
         Visualize = function(self)
             local position = self:GetPlatoonPosition()
             local target = self.OpportunityToRaid
             if position and target then
-                DrawLinePop(position, target, 'ff0000')
+                DrawLinePop(position, target, self.StateColor)
             end
         end
     },
@@ -497,6 +511,7 @@ AIPlatoonAdaptiveAttackBehavior = Class(AIPlatoon) {
     Retreating = State {
 
         StateName = "Retreating",
+        StateColor = 'FFC400',
 
         --- The platoon retreats from a threat
         ---@param self AIPlatoonAdaptiveAttackBehavior
@@ -566,12 +581,12 @@ AIPlatoonAdaptiveAttackBehavior = Class(AIPlatoon) {
             end
         end,
 
-        ---@param self AIPlatoonAdaptiveRaidBehavior
+        ---@param self AIPlatoonAdaptiveAttackBehavior
         Visualize = function(self)
             local position = self:GetPlatoonPosition()
             local target = self.ThreatToEvade
             if position and target then
-                DrawLinePop(position, target, 'FFC400')
+                DrawLinePop(position, target, self.StateColor)
             end
         end
     },
