@@ -115,6 +115,14 @@ AIPlatoonAdaptiveAttackBehavior = Class(AIPlatoon) {
                 return
             end
         end,
+
+        ---@param self AIPlatoonAdaptiveRaidBehavior
+        Visualize = function(self)
+            local position = self:GetPlatoonPosition()
+            if position then
+                DrawCircle(position, 10, 'ffffff')
+            end
+        end
     },
 
     Navigating = State {
@@ -281,9 +289,9 @@ AIPlatoonAdaptiveAttackBehavior = Class(AIPlatoon) {
         ---@param self AIPlatoonAdaptiveAttackBehavior
         Visualize = function(self)
             local position = self:GetPlatoonPosition()
-            local locationToRaid = self.LocationToAttack
-            if position and locationToRaid then
-                DrawLinePop(position, locationToRaid, 'ffffff')
+            local target = self.LocationToAttack
+            if position and target then
+                DrawLinePop(position, target, 'ffffff')
             end
         end
     },
@@ -306,6 +314,14 @@ AIPlatoonAdaptiveAttackBehavior = Class(AIPlatoon) {
             end
             return
         end,
+
+        ---@param self AIPlatoonAdaptiveRaidBehavior
+        Visualize = function(self)
+            local position = self:GetPlatoonPosition()
+            if position then
+                DrawCircle(position, 10, 'FF00D4')
+            end
+        end
     },
 
     AttackingTarget = State {
@@ -368,6 +384,15 @@ AIPlatoonAdaptiveAttackBehavior = Class(AIPlatoon) {
                 WaitTicks(10)
             end
         end,
+
+        ---@param self AIPlatoonAdaptiveRaidBehavior
+        Visualize = function(self)
+            local position = self:GetPlatoonPosition()
+            local target = self.LocationToAttack
+            if position and target then
+                DrawLinePop(position, target, 'ff0000')
+            end
+        end
     },
 
     RaidingOpportunity = State {
@@ -458,6 +483,15 @@ AIPlatoonAdaptiveAttackBehavior = Class(AIPlatoon) {
                 WaitTicks(10)
             end
         end,
+
+        ---@param self AIPlatoonAdaptiveRaidBehavior
+        Visualize = function(self)
+            local position = self:GetPlatoonPosition()
+            local target = self.OpportunityToRaid
+            if position and target then
+                DrawLinePop(position, target, 'ff0000')
+            end
+        end
     },
 
     Retreating = State {
@@ -531,6 +565,15 @@ AIPlatoonAdaptiveAttackBehavior = Class(AIPlatoon) {
                 WaitTicks(1)
             end
         end,
+
+        ---@param self AIPlatoonAdaptiveRaidBehavior
+        Visualize = function(self)
+            local position = self:GetPlatoonPosition()
+            local target = self.ThreatToEvade
+            if position and target then
+                DrawLinePop(position, target, 'FFC400')
+            end
+        end
     },
 
     -----------------------------------------------------------------
