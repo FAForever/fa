@@ -381,6 +381,15 @@ function BeginSessionAI()
         for k,file in DiskFindFiles('/lua/AI/AIBaseTemplates', '*.lua') do
             import(file)
         end
+
+        -- allow for debugging code
+        ForkThread(
+            import("/lua/aibrains/utils/debug.lua").AIStateMachineVisualize
+        )
+
+        ForkThread(
+            import("/lua/aibrains/utils/debug.lua").AIStateMachineSyncMessages
+        )
     end
 end
 
