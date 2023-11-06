@@ -107,6 +107,15 @@ SAirFactoryUnit = ClassUnit(AirFactoryUnit) {
     end,
 
     RolloffBody = function(self)
+
+        local rollOffPoint = self.RollOffPoint
+        local unitBeingBuilt = self.UnitBeingBuilt
+        if unitBeingBuilt and EntityCategoryContains(categories.ENGINEER, unitBeingBuilt) then
+            local spin, x, y, z = self:CalculateRollOffPoint()
+            unitBeingBuilt:SetRotation(spin)
+            rollOffPoint[1], rollOffPoint[2], rollOffPoint[3] = x, y, z
+        end
+
         self:SetBusy(true)
         local unitBuilding = self.UnitBeingBuilt
 
