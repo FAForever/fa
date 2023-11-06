@@ -21,6 +21,7 @@
 --******************************************************************************************************
 
 local EmitterProjectile = import("/lua/sim/projectiles/emitterprojectile.lua").EmitterProjectile
+local EmitterProjectileOnCreate = EmitterProjectile.OnCreate
 
 -- upvalue scope for performance
 local CreateTrail = CreateTrail
@@ -31,11 +32,11 @@ SinglePolyTrailProjectile = ClassProjectile(EmitterProjectile) {
 
     PolyTrail = '/effects/emitters/test_missile_trail_emit.bp',
     PolyTrailOffset = 0,
-    FxTrails = { },
+    FxTrails = {},
 
     ---@param self SinglePolyTrailProjectile
     OnCreate = function(self)
-        EmitterProjectile.OnCreate(self)
+        EmitterProjectileOnCreate(self)
 
         local army = self.Army
         local polyTrail = self.PolyTrail
@@ -43,11 +44,7 @@ SinglePolyTrailProjectile = ClassProjectile(EmitterProjectile) {
 
         if polyTrail ~= '' then
             local effect = CreateTrail(self, -1, army, polyTrail)
-
-            -- only do these engine calls when they matter
-            if polyTrailOffset ~= 0 then
-                IEffectOffsetEmitter(effect, 0, 0, polyTrailOffset)
-            end
+            IEffectOffsetEmitter(effect, 0, 0, polyTrailOffset)
         end
     end,
 }

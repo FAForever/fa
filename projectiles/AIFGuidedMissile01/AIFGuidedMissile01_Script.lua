@@ -8,7 +8,11 @@ local AGuidedMissileProjectile = import("/lua/aeonprojectiles.lua").AGuidedMissi
 local RandF = import("/lua/utilities.lua").GetRandomFloat
 local EffectTemplate = import("/lua/effecttemplates.lua")
 
+--- Aeon Guided Missile, DAA0206
+---@class AIFGuidedMissile : AGuidedMissileProjectile
 AIFGuidedMissile = ClassProjectile(AGuidedMissileProjectile) {
+
+    ---@param self AIFGuidedMissile
     OnCreate = function(self)
 		AGuidedMissileProjectile.OnCreate(self)
         local launcher = self.Launcher
@@ -18,6 +22,7 @@ AIFGuidedMissile = ClassProjectile(AGuidedMissileProjectile) {
 		self.Trash:Add(ForkThread( self.SplitThread,self ))
     end,
 
+    ---@param self AIFGuidedMissile
     SplitThread = function(self)
         ------Create/play the split effects.
 		for k,v in EffectTemplate.AMercyGuidedMissileSplit do
@@ -35,7 +40,7 @@ AIFGuidedMissile = ClassProjectile(AGuidedMissileProjectile) {
         local xVec = 0 
         local yVec = vy*0.8
         local zVec = 0
-        
+
         -- Adjust damage by number of split projectiles
         self.DamageData.DamageAmount = self.DamageData.DamageAmount / numProjectiles
 
