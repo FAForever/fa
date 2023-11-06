@@ -488,7 +488,7 @@ AIPlatoonAdaptiveRaidBehavior = Class(AIPlatoon) {
 
         StateName = 'RaidingOpportunity',
         StateColor = 'ff0000',
-        
+
         --- The platoon raids the opportunity it walked into
         ---@param self AIPlatoonAdaptiveRaidBehavior
         Main = function(self)
@@ -586,7 +586,8 @@ AIPlatoonAdaptiveRaidBehavior = Class(AIPlatoon) {
     Retreating = State {
 
         StateName = "Retreating",
-
+        StateColor = 'FFC400',
+        
         --- The platoon retreats from a threat
         ---@param self AIPlatoonAdaptiveRaidBehavior
         Main = function(self)
