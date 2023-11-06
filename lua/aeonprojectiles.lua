@@ -16,12 +16,10 @@ local MultiPolyTrailProjectile = DefaultProjectileFile.MultiPolyTrailProjectile
 local SingleCompositeEmitterProjectile = DefaultProjectileFile.SingleCompositeEmitterProjectile
 local MultiCompositeEmitterProjectile = DefaultProjectileFile.MultiCompositeEmitterProjectile
 local NullShell = DefaultProjectileFile.NullShell
-local DepthCharge = import("/lua/defaultantiprojectile.lua").DepthCharge
 local EffectTemplate = import("/lua/effecttemplates.lua")
 local NukeProjectile = DefaultProjectileFile.NukeProjectile
-
 local DebrisComponent = import('/lua/sim/projectiles/components/DebrisComponent.lua').DebrisComponent
-local TacticalMissileComponent = import('/lua/sim/DefaultProjectiles.lua').TacticalMissileComponent
+local TacticalMissileComponent = import('/lua/sim/defaultprojectiles.lua').TacticalMissileComponent
 
 --- AEON ANTI-NUKE PROJECTILES
 ---@class ASaintAntiNuke : SinglePolyTrailProjectile
@@ -109,6 +107,7 @@ ADepthChargeProjectile = ClassProjectile(OnWaterEntryEmitterProjectile) {
     FxImpactProp = EffectTemplate.ADepthChargeHitUnit01,
     FxImpactUnderWater = EffectTemplate.ADepthChargeHitUnderWaterUnit01,
 
+    ---@param self ADepthChargeProjectile
     OnEnterWater = function(self)
         OnWaterEntryEmitterProjectile.OnEnterWater(self)
         self:SetMaxSpeed(20)
@@ -364,6 +363,7 @@ AMissileSerpentineProjectile = ClassProjectile(SingleCompositeEmitterProjectile,
         CreateLightParticle(self, -1, self.Army, 4, 4, 'flare_lens_add_02', 'ramp_aeon_02')
     end,
 
+    ---@param self AMissileSerpentineProjectile
     OnExitWater = function(self)
         SingleCompositeEmitterProjectile.OnExitWater(self)
         self:SetDestroyOnWater(true)
@@ -776,3 +776,4 @@ AArtilleryFragmentationSensorShellProjectile03 = ClassProjectile(AArtilleryFragm
 
 -- kept for mod backwards compatibility
 local DefaultExplosion = import("/lua/defaultexplosions.lua")
+local DepthCharge = import("/lua/defaultantiprojectile.lua").DepthCharge

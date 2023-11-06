@@ -1,12 +1,9 @@
---****************************************************************************
---**
---**  File     :  /lua/aeonunits.lua
---**  Author(s): John Comes, Gordon Duclos
---**
---**  Summary  :
---**
---**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
---****************************************************************************
+------------------------------------------------------------------------------
+-- File     :  /lua/aeonunits.lua
+-- Author(s): John Comes, Gordon Duclos
+-- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+------------------------------------------------------------------------------
+
 ----------------------------------------------------------------------------
 -- AEON DEFAULT UNITS
 ----------------------------------------------------------------------------
@@ -18,7 +15,6 @@ local LandFactoryUnit = DefaultUnitsFile.LandFactoryUnit
 local SeaFactoryUnit = DefaultUnitsFile.SeaFactoryUnit
 local ShieldStructureUnit = DefaultUnitsFile.ShieldStructureUnit
 local RadarJammerUnit = DefaultUnitsFile.RadarJammerUnit
-
 local EffectTemplate = import("/lua/effecttemplates.lua")
 local EffectUtil = import("/lua/effectutilities.lua")
 local CreateAeonFactoryBuildingEffects = EffectUtil.CreateAeonFactoryBuildingEffects
@@ -313,6 +309,7 @@ ARadarJammerUnit = ClassUnit(RadarJammerUnit) {
     end,
 
     ---@param self ARadarJammerUnit
+    ---@param intel string
     OnIntelEnabled = function(self, intel)
         RadarJammerUnit.OnIntelEnabled(self, intel)
         if self.OpenAnim then
@@ -327,6 +324,7 @@ ARadarJammerUnit = ClassUnit(RadarJammerUnit) {
     end,
 
     ---@param self ARadarJammerUnit
+    ---@param intel string
     OnIntelDisabled = function(self, intel)
         RadarJammerUnit.OnIntelDisabled(self, intel)
         if self.OpenAnim then
