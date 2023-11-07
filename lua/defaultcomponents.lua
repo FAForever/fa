@@ -1,5 +1,4 @@
 local Buff = import("/lua/sim/buff.lua")
-local Entity = import("/lua/sim/Entity.lua").Entity
 
 ---@class ShieldEffectsComponent : Unit
 ---@field Trash TrashBag
@@ -41,9 +40,13 @@ ShieldEffectsComponent = ClassSimple {
 ---@class IntelComponent
 ---@field IntelStatus? UnitIntelStatus
 ---@field DetectedByHooks? fun(unit: Unit, army: number)[]
+---@field Blueprint Blueprint
+---@field Brain AIBrain
 IntelComponent = ClassSimple {
 
     ---@param self IntelComponent | Unit
+    ---@param builder Unit unused
+    ---@param layer Layer unused
     OnStopBeingBuilt = function(self, builder, layer)
         local intelBlueprint = self.Blueprint.Intel
         if intelBlueprint and intelBlueprint.State then
@@ -612,8 +615,8 @@ VeterancyComponent = ClassSimple {
     ---@param self VeterancyComponent | Unit
     ---@param instigator Unit
     ---@param amount number
-    ---@param vector Vector
-    ---@param damageType DamageType
+    ---@param vector Vector unused
+    ---@param damageType DamageType unused
     DoTakeDamage = function(self, instigator, amount, vector, damageType)
         amount = MathMin(amount, self:GetMaxHealth())
         self.VetDamageTaken = self.VetDamageTaken + amount
@@ -869,7 +872,7 @@ ExternalFactoryComponent = ClassSimple {
 
     ---@param self Unit | ExternalFactoryComponent
     ---@param new Layer
-    ---@param old Layer
+    ---@param old Layer unused
     OnLayerChange = function(self, new, old)
         if self.ExternalFactory then
             if new == 'Land' then
@@ -885,6 +888,9 @@ ExternalFactoryComponent = ClassSimple {
     end,
 
     ---@param self Unit | ExternalFactoryComponent
+    ---@param instigator Unit unused
+    ---@param type string unused
+    ---@param overkillRatio number unused
     OnKilled = function(self, instigator, type, overkillRatio)
         if not IsDestroyed(self.ExternalFactory) then
             self.ExternalFactory:SetBusy(true)
@@ -895,7 +901,7 @@ ExternalFactoryComponent = ClassSimple {
 
     -- We need to wait one tick for our unit to "exist" before we can clear its orders
     -- This prevents order graphs from being drawn from units inside the carrier
-    ---@param self Unit | ExternalFactoryComponent
+    ---@param self Unit | ExternalFactoryComponent unused
     ---@param unitBeingBuilt Unit
     ClearOrdersThread = function(self, unitBeingBuilt)
         WaitTicks(1)
@@ -921,3 +927,7 @@ ExternalFactoryComponent = ClassSimple {
     end,
 
 }
+
+
+--- Moved for Backwards Compatibility
+local Entity = import("/lua/sim/entity.lua").Entity

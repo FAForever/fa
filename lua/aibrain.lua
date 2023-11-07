@@ -307,7 +307,7 @@ local AIBrainEnergyComponent = ClassSimple {
 
     --- Adds an entity to the list of entities that receive callbacks when the energy storage is depleted or viable, expects the functions OnEnergyDepleted and OnEnergyViable on the unit
     ---@param self AIBrain
-    ---@param entity Unit | Shield
+    ---@param entity Unit
     AddEnergyDependingEntity = function(self, entity)
         self.EnergyDependingUnits[entity.EntityId] = entity
 
