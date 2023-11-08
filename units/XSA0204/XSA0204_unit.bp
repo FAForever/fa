@@ -225,7 +225,7 @@ UnitBlueprint{
             Label = "Bomb",
             MaxRadius = 42,
             MinRadius = 4,
-            MuzzleSalvoDelay = 0.3,
+            MuzzleSalvoDelay = 0.1,
             MuzzleSalvoSize = 5,
             MuzzleVelocity = 0,
             ProjectileId = "/projectiles/SANHeavyCavitationTorpedo01/SANHeavyCavitationTorpedo01_proj.bp",

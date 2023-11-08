@@ -234,7 +234,7 @@ UnitBlueprint{
             Label = "Torpedo",
             MaxRadius = 42,
             MinRadius = 4,
-            MuzzleSalvoDelay = 0.6,
+            MuzzleSalvoDelay = 0.2,
             MuzzleSalvoSize = 5,
             MuzzleVelocity = 0,
             ProjectileId = "/projectiles/TANAnglerTorpedo06/TANAnglerTorpedo06_proj.bp",
