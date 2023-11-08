@@ -38,6 +38,7 @@ SIFLaanseTacticalMissile04 = ClassProjectile(SLaanseTacticalMissile, TacticalMis
     FinalBoostAngle = 30,
     FinalBoostAngleRange = 0,
 
+    ---@param self SIFLaanseTacticalMissile04
     OnCreate = function(self)
         SLaanseTacticalMissile.OnCreate(self)
         self.MoveThread = self.Trash:Add(ForkThread(self.MovementThread, self))

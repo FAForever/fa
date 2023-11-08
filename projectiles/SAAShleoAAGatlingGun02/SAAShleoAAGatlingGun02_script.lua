@@ -3,5 +3,8 @@
 -- Summary  :  Shleo Gatling Gun Projectile script, XSA102
 -- Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 ------------------------------------------------------------------------------------------
+
+--- Shleo Gatling Gun Projectile script, XSA102
+---@class SAAShleoAAGatlingGun02 : SShleoAACannon
 SAAShleoAAGatlingGun02 = ClassProjectile(import("/lua/seraphimprojectiles.lua").SShleoAACannon) {}
 TypeClass = SAAShleoAAGatlingGun02

@@ -1,4 +1,3 @@
-
 --******************************************************************************************************
 --** Copyright (c) 2022  Willem 'Jip' Wijnia
 --**
@@ -39,6 +38,7 @@ SIFLaanseTacticalMissile01 = ClassProjectile(SLaanseTacticalMissile, TacticalMis
     FinalBoostAngle = 12,
     FinalBoostAngleRange = 2,
 
+    ---@param self SIFLaanseTacticalMissile01
     OnCreate = function(self)
         SLaanseTacticalMissile.OnCreate(self)
         self.MoveThread = self.Trash:Add(ForkThread(self.MovementThread, self))

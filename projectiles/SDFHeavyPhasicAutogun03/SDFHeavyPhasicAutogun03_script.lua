@@ -3,5 +3,8 @@
 -- Summary  :  Heavy Phasic Autogun Projectile script, XSL0203
 -- Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 ----------------------------------------------------------------------------------------------
+
+--- Heavy Phasic Autogun Projectile script, XSL0203
+---@class SDFHeavyPhasicAutogun01 : SHeavyPhasicAutogun
 SDFHeavyPhasicAutogun03 = ClassProjectile(import("/lua/seraphimprojectiles.lua").SHeavyPhasicAutogun) {}
 TypeClass = SDFHeavyPhasicAutogun03

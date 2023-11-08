@@ -2,11 +2,12 @@
 -- Author(s):  Gordon Duclos
 -- Summary  :  Heavy Cavitation Torpedo Projectile script, XSB2205
 -- Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
---****************************************************************************
+-----------------------------------------------------------------------------------------------------
 local SHeavyCavitationTorpedo = import("/lua/seraphimprojectiles.lua").SHeavyCavitationTorpedo
 local RandomFloat = import("/lua/utilities.lua").GetRandomFloat
 local EffectTemplate = import("/lua/effecttemplates.lua")
 
+---@class SANHeavyCavitationTorpedo02 : SHeavyCavitationTorpedo
 SANHeavyCavitationTorpedo02 = ClassProjectile(SHeavyCavitationTorpedo) {
     FxSplashScale = .4,
     FxEnterWaterEmitter = {
@@ -22,6 +23,7 @@ SANHeavyCavitationTorpedo02 = ClassProjectile(SHeavyCavitationTorpedo) {
         '/effects/emitters/seraphim_heayvcavitation_torpedo_projectile_hit_05_emit.bp',
     },
 
+    ---@param self SANHeavyCavitationTorpedo02
     OnEnterWater = function(self)
         SHeavyCavitationTorpedo.OnEnterWater(self)
         self:SetCollisionShape('Sphere', 0, 0, 0, 0.5)
@@ -31,12 +33,15 @@ SANHeavyCavitationTorpedo02 = ClassProjectile(SHeavyCavitationTorpedo) {
         self:SetCollideSurface(false)
     end,
 
+    ---@param self SANHeavyCavitationTorpedo02
+    ---@param inWater boolean
     OnCreate = function(self, inWater)
         SHeavyCavitationTorpedo.OnCreate(self, inWater)
         self.Trash:Add(ForkThread(self.ProjectileSplit,self))
         self.AirTrails = CreateEmitterOnEntity(self,self.Army,EffectTemplate.SHeavyCavitationTorpedoFxTrails02)
     end,
 
+    ---@param self SANHeavyCavitationTorpedo02
     ProjectileSplit = function(self)
         WaitTicks(2)
         local ChildProjectileBP = '/projectiles/SANHeavyCavitationTorpedo03/SANHeavyCavitationTorpedo03_proj.bp'
