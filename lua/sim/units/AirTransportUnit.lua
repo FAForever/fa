@@ -2,6 +2,18 @@
 local AirUnit = import("/lua/sim/units/airunit.lua").AirUnit
 local BaseTransport = import("/lua/sim/units/components/transportunitcomponent.lua").BaseTransport
 
+local unloadCommands = {
+    [24] = true,
+    [25] = true,
+    [37] = true,
+}
+
+-- Horizontal distance in ogrids within which we can still unload cargo
+local horzUnloadMargin = 2
+
+-- Factor by which to multiply TransportHoverHeight when determining if we can unload cargo
+local vertUnloadFactor = 1.5
+
 ---@class AirTransport: AirUnit, BaseTransport
 ---@field slots table<Bone, Unit>
 AirTransport = ClassUnit(AirUnit, BaseTransport) {
@@ -10,6 +22,60 @@ AirTransport = ClassUnit(AirUnit, BaseTransport) {
         AirUnit.OnCreate(self)
         self.slots = {}
         self.transData = {}
+    end,
+
+    startStoppingTick = false,
+    stoppingToUnload = false,
+
+    OnMotionHorzEventChange = function(self, new, old)
+        AirUnit.OnMotionHorzEventChange(self, new, old)
+        LOG('motion horz: '..old..' -> '..new)
+        if new == 'Cruise' then
+            self.startStoppingTick = false
+            self.stoppingToUnload = false
+        end
+        if new == 'Stopped' and unloadCommands[self:GetCommandQueue()[1].commandType] then
+            local navigator = self:GetNavigator()
+            local targetPos = navigator:GetCurrentTargetPos()
+            local pos = self:GetPosition()
+
+            -- Don't drop if we're too far away from the target
+            if VDist2(pos[1], pos[3], targetPos[1], targetPos[3]) > horzUnloadMargin or
+            pos[2] - targetPos[2] > vertUnloadFactor * self.Blueprint.Air.TransportHoverHeight then
+                LOG('Too far away to unload')
+                LOG('horz: '..VDist2(pos[1], pos[3], targetPos[1], targetPos[3]))
+                LOG('vert: '..pos[2] - targetPos[2])
+                return
+            end
+
+            -- Tell our navigator to abort movement
+            -- this has the effect of causing the next unload command to be executed immediately
+            self:GetNavigator():AbortMove()
+        end
+        if self.stoppingToUnload then
+            LOG('motion horz: '..old..' -> '..new)
+        end
+        if new == "Stopping" and unloadCommands[self:GetCommandQueue()[1].commandType] then
+            if not self.stoppingToUnload then
+                self.stoppingToUnload = true
+                self.startStoppingTick = GetGameTick()
+            else
+                return
+            end
+
+            local navigator = self:GetNavigator()
+
+            LOG('Stopping to unload')
+            local pos = self:GetPosition()
+            
+            local navTarget = navigator:GetCurrentTargetPos()
+            local printTable = {}
+            printTable.height = pos[2] - navTarget[2]
+            printTable.dist = VDist2(pos[1], pos[3], navTarget[1], navTarget[3])
+            local vx, vy, vz = self:GetVelocity()
+            printTable.vel = repr(vx..' '..vy..' '..vz)
+            LOG(repr(printTable))
+        end
     end,
 
     ---@param self AirTransport
@@ -26,6 +92,27 @@ AirTransport = ClassUnit(AirUnit, BaseTransport) {
     OnTransportDetach = function(self, attachBone, unit)
         AirUnit.OnTransportDetach(self, attachBone, unit)
         BaseTransport.OnTransportDetach(self, attachBone, unit)
+        if self.stoppingToUnload then
+            local navigator = self:GetNavigator()
+            self:SetAccMult(1)
+
+            LOG('OnTransportDetach')
+            local pos = self:GetPosition()
+            local navTarget = navigator:GetCurrentTargetPos()
+            local printTable = {}
+            printTable.height = pos[2] - navTarget[2]
+            printTable.dist = VDist2(pos[1], pos[3], navTarget[1], navTarget[3])
+            printTable.unloadTicks = GetGameTick() - self.startStoppingTick
+            self.startStoppingTick = false
+            self.stoppingToUnload = false
+            local vx, vy, vz = self:GetVelocity()
+            printTable.transVel = repr(vx..' '..vy..' '..vz)
+            vx, vy, vz = unit:GetVelocity()
+            printTable.unitVel = repr(vx..' '..vy..' '..vz)
+            --printTable.vx = vx
+            --printTable.vz = vz
+            LOG(repr(printTable))
+        end
     end,
 
     OnAttachedKilled = function(self, attached)
