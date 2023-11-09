@@ -99,11 +99,7 @@ SAirFactoryUnit = ClassUnit(AirFactoryUnit) {
     end,
 
     RollOffUnit = function(self)
-        if EntityCategoryContains(categories.AIR, self.UnitBeingBuilt) then
-            local spin, x, y, z = self:CalculateRollOffPoint()
-            local units = {self.UnitBeingBuilt}
-            self.MoveCommand = IssueMove(units, Vector(x, y, z))
-        end
+        -- intentionally do not define a roll off point; seraphim air factories can roll off into any direction
     end,
 
     RolloffBody = function(self)
