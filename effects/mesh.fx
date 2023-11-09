@@ -601,25 +601,27 @@ float3 ComputeNormal( sampler2D source, float2 uv, float3x3 rotationMatrix)
 float3 ApplyWaterColor(float depth, float3 viewDirection, float3 color, float3 emission = float3(0, 0, 0)) {
     // disable the whole thing on land-only maps
     if (surfaceElevation > 0) {
-        float4 waterColor = tex1D(WaterRampSampler, -depth / (surfaceElevation - abyssElevation));
         // we need this switch to make it consistent with the terrain shader coloration
         if (IsExperimentalShader()) {
+            // We need to multiply by 2 to reach 98% absorption.
+            float adjustedDepth = tex1D(WaterRampSampler, -depth / (surfaceElevation - abyssElevation)).w * 2;
             float3 up = float3(0,1,0);
             // this is the length that the light travels underwater back to the camera
             float oneOverCosV = 1 / max(dot(up, normalize(viewDirection)), 0.0001);
             // Light gets absorbed exponentially.
             // To simplify, we assume that the light enters vertically into the water.
-            // We need to multiply by 2 to reach 98% absorption.
-            float waterAbsorption = 1 - saturate(exp(-waterColor.w * 2 * (1 + oneOverCosV)));
+            float waterAbsorption = 1 - saturate(exp(-adjustedDepth * (1 + oneOverCosV)));
             // when the mesh emits light, then the path from the surface to the mesh doesn't apply
-            float emissionTransmitted = saturate(exp(-waterColor.w * 2 * oneOverCosV));
+            float emissionTransmitted = saturate(exp(-adjustedDepth * oneOverCosV));
             // darken the color first to simulate the light absorption on the way in and out
             color *= 1 - waterAbsorption;
             // lerp in the watercolor to simulate the scattered light from the dirty water
+            float4 waterColor = tex1D(WaterRampSampler, waterAbsorption);
             color = lerp(color, waterColor.rgb, waterAbsorption);
             // similarly tune down the emission light
             color += emission * emissionTransmitted;
         } else {
+            float4 waterColor = tex1D(WaterRampSampler, -depth / (surfaceElevation - abyssElevation));
             color = lerp(color, waterColor.rgb, waterColor.w);
             color += emission;
         }
