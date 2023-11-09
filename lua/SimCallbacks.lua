@@ -584,6 +584,24 @@ do
     end
 end
 
+do
+    ---@param data { }
+    ---@param selection Unit[]
+    Callbacks.AbortNavigation = function(data, selection)
+        -- verify selection
+        selection = SecureUnits(selection)
+        if (not selection) or TableEmpty(selection) then
+            return
+        end
+
+        -- only apply this to engineers
+        local engineers = EntityCategoryFilterDown(categories.ENGINEER + categories.COMMAND, selection)
+
+        import("/lua/sim/commands/abort-navigation.lua").AbortNavigation(engineers)
+    end
+end
+
+
 --#endregion
 
 -------------------------------------------------------------------------------
