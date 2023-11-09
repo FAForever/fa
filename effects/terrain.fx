@@ -405,14 +405,12 @@ float3 ApplyWaterColorExponentially(float3 viewDirection, float terrainHeight, f
 {
     if (waterDepth > 0) {
         float opacity = saturate(smoothstep(10, 200, CameraPosition.y - WaterElevation) + step(terrainHeight, WaterElevation));
-        // We need to multiply by 2 to reach 98% absorption.
-        float adjustedDepth = tex1D(WaterRampSampler, waterDepth).w * 2;
         float3 up = float3(0,1,0);
         // this is the length that the light travels underwater back to the camera
         float oneOverCosV = 1 / max(dot(up, normalize(viewDirection)), 0.0001);
         // Light gets absorbed exponentially,
         // to simplify, we assume that the light enters vertically into the water.
-        float waterAbsorption = 1 - saturate(exp(-adjustedDepth * (1 + oneOverCosV)));
+        float waterAbsorption = 1 - saturate(exp(-waterDepth * (1 + oneOverCosV)));
         // darken the color first to simulate the light absorption on the way in and out
         color *= 1 - waterAbsorption * opacity;
         // lerp in the watercolor to simulate the scattered light from the dirty water

@@ -603,16 +603,15 @@ float3 ApplyWaterColor(float depth, float3 viewDirection, float3 color, float3 e
     if (surfaceElevation > 0) {
         // we need this switch to make it consistent with the terrain shader coloration
         if (IsExperimentalShader()) {
-            // We need to multiply by 2 to reach 98% absorption.
-            float adjustedDepth = tex1D(WaterRampSampler, -depth / (surfaceElevation - abyssElevation)).w * 2;
+            float scaledDepth = (-depth / (surfaceElevation - abyssElevation));
             float3 up = float3(0,1,0);
             // this is the length that the light travels underwater back to the camera
             float oneOverCosV = 1 / max(dot(up, normalize(viewDirection)), 0.0001);
             // Light gets absorbed exponentially.
             // To simplify, we assume that the light enters vertically into the water.
-            float waterAbsorption = 1 - saturate(exp(-adjustedDepth * (1 + oneOverCosV)));
+            float waterAbsorption = 1 - saturate(exp(-scaledDepth * (1 + oneOverCosV)));
             // when the mesh emits light, then the path from the surface to the mesh doesn't apply
-            float emissionTransmitted = saturate(exp(-adjustedDepth * oneOverCosV));
+            float emissionTransmitted = saturate(exp(-scaledDepth * oneOverCosV));
             // darken the color first to simulate the light absorption on the way in and out
             color *= 1 - waterAbsorption;
             // lerp in the watercolor to simulate the scattered light from the dirty water
