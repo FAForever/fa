@@ -9,7 +9,7 @@ local unloadCommands = {
 }
 
 -- Horizontal distance in ogrids within which we can still unload cargo
-local horzUnloadMargin = 2
+local horzUnloadMargin = 2.5
 
 -- Factor by which to multiply TransportHoverHeight when determining if we can unload cargo
 local vertUnloadFactor = 1.5
