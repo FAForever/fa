@@ -53,7 +53,6 @@ UnitBlueprint{
             LODs = {
                 {
                     LODCutoff = 200,
-                    NormalsName = "UEB0301_NormalsTS.dds",
                     ShaderName = "Unit",
                 },
                 {
