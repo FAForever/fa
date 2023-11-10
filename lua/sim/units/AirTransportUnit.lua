@@ -121,7 +121,7 @@ AirTransport = ClassUnit(AirUnit, BaseTransport) {
         -- needs to be defined
         damageType = damageType or "Normal"
         excessDamageRatio = excessDamageRatio or 0
-        
+
         self:FlagCargo(not instigator or not IsUnit(instigator))
         AirUnitKill(self, instigator, damageType, excessDamageRatio)
     end,
