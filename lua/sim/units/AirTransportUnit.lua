@@ -1,54 +1,76 @@
-
 local AirUnit = import("/lua/sim/units/airunit.lua").AirUnit
-local BaseTransport = import("/lua/sim/units/components/transportunitcomponent.lua").BaseTransport
+local AirUnitOnCreate = AirUnit.OnCreate
+local AirUnitOnMotionHorzEventChange = AirUnit.OnMotionHorzEventChange
+local AirUnitOnTransportAttach = AirUnit.OnTransportAttach
+local AirUnitOnTransportDetach = AirUnit.OnTransportDetach
+local AirUnitOnAttachedKilled = AirUnit.OnAttachedKilled
+local AirUnitOnStartTransportLoading = AirUnit.OnStartTransportLoading
+local AirUnitOnStopTransportLoading = AirUnit.OnStopTransportLoading
+local AirUnitKill = AirUnit.Kill
+local AirUnitOnImpact = AirUnit.OnImpact
+local AirUnitOnStorageChange = AirUnit.OnStorageChange
 
-local unloadCommands = {
-    [24] = true,
-    [25] = true,
-    [37] = true,
+local BaseTransport = import("/lua/sim/units/components/transportunitcomponent.lua").BaseTransport
+local BaseTransportOnTransportAttach = BaseTransport.OnTransportAttach
+local BaseTransportOnTransportDetach = BaseTransport.OnTransportDetach
+local BaseTransportOnAttachedKilled = BaseTransport.OnAttachedKilled
+local BaseTransportOnStartTransportLoading = BaseTransport.OnStartTransportLoading
+local BaseTransportOnStopTransportLoading = BaseTransport.OnStopTransportLoading
+local BaseTransportDestroyedOnTransport = BaseTransport.DestroyedOnTransport
+
+local UnloadCommands = {
+    [24] = true, -- TransportUnloadUnits
+    [25] = true, -- TransportUnloadSpecificUnits
+    [37] = true, -- AssistMove
 }
 
 -- Horizontal distance in ogrids within which we can still unload cargo
-local horzUnloadMargin = 2.5
+local HorzUnloadMargin = 2.5
 
 -- Factor by which to multiply TransportHoverHeight when determining if we can unload cargo
-local vertUnloadFactor = 1.5
+local VertUnloadFactor = 1.5
 
 ---@class AirTransport: AirUnit, BaseTransport
 ---@field slots table<Bone, Unit>
 AirTransport = ClassUnit(AirUnit, BaseTransport) {
     ---@param self AirTransport
     OnCreate = function(self)
-        AirUnit.OnCreate(self)
+        AirUnitOnCreate(self)
         self.slots = {}
         self.transData = {}
     end,
 
-    --- See if we're coming in for a landing, if so
-    --- drop our cargo as soon as we're not moving + in the window,
-    --- instead of fumbling around waiting to get shot down
     ---@param self AirTransport
     ---@param new string
     ---@param old string
     OnMotionHorzEventChange = function(self, new, old)
-        AirUnit.OnMotionHorzEventChange(self, new, old)
-        local command = self:GetCommandQueue()[1]
-        if new == 'Stopped' and unloadCommands[command.commandType] then
-            local navigator = self:GetNavigator()
-            local targetPos = navigator:GetCurrentTargetPos()
-            local pos = self:GetPosition()
+        AirUnitOnMotionHorzEventChange(self, new, old)
 
-            -- Don't drop if we're too far away from the target
-            if not targetPos
-            or VDist2(pos[1], pos[3], command.x, command.z) > 20
-            or VDist2(pos[1], pos[3], targetPos[1], targetPos[3]) > horzUnloadMargin
-            or pos[2] - targetPos[2] > self.Blueprint.Air.TransportHoverHeight * vertUnloadFactor then
-                return
+        -- Unloading the units of a transport has always been a bit sketchy. The Transport would take forever to get
+        -- the signal to actually drop the units. We discovered that aborting the navigation while we're trying to
+        -- unload is the signal that the engine uses to drop the units. We help the engine here a little bit by
+        -- increasing the threshold at which the transport can start dropping the units
+
+        if new == 'Stopped' then
+            local command = self:GetCommandQueue()[1]
+            if UnloadCommands[command.commandType] then
+                local navigator = self:GetNavigator()
+                local targetPos = navigator:GetCurrentTargetPos()
+                local pos = self:GetPosition()
+
+                -- Don't drop if we're too far away from the target
+                if not targetPos
+                    or VDist2(pos[1], pos[3], command.x, command.z) > 20
+                    or VDist2(pos[1], pos[3], targetPos[1], targetPos[3]) > HorzUnloadMargin
+                    or pos[2] - targetPos[2] > (self.Blueprint.Air.TransportHoverHeight or 6) * VertUnloadFactor
+                then
+                    return
+                end
+
+                -- Tell our navigator to abort the move
+                -- this has the effect of causing the next unload command to be executed immediately
+                navigator:AbortMove()
             end
-
-            -- Tell our navigator to abort the move
-            -- this has the effect of causing the next unload command to be executed immediately
-            navigator:AbortMove()
         end
     end,
 
@@ -56,48 +78,52 @@ AirTransport = ClassUnit(AirUnit, BaseTransport) {
     ---@param attachBone Bone
     ---@param unit Unit
     OnTransportAttach = function(self, attachBone, unit)
-        AirUnit.OnTransportAttach(self, attachBone, unit)
-        BaseTransport.OnTransportAttach(self, attachBone, unit)
+        AirUnitOnTransportAttach(self, attachBone, unit)
+        BaseTransportOnTransportAttach(self, attachBone, unit)
     end,
 
     ---@param self AirTransport
     ---@param attachBone Bone
     ---@param unit Unit
     OnTransportDetach = function(self, attachBone, unit)
-        AirUnit.OnTransportDetach(self, attachBone, unit)
-        BaseTransport.OnTransportDetach(self, attachBone, unit)
+        AirUnitOnTransportDetach(self, attachBone, unit)
+        BaseTransportOnTransportDetach(self, attachBone, unit)
     end,
 
     OnAttachedKilled = function(self, attached)
-        AirUnit.OnAttachedKilled(self, attached)
-        BaseTransport.OnAttachedKilled(self, attached)
+        AirUnitOnAttachedKilled(self, attached)
+        BaseTransportOnAttachedKilled(self, attached)
     end,
 
     ---@param self AirTransport
     OnStartTransportLoading = function(self)
-        AirUnit.OnStartTransportLoading(self)
-        BaseTransport.OnStartTransportLoading(self)
+        AirUnitOnStartTransportLoading(self)
+        BaseTransportOnStartTransportLoading(self)
     end,
 
     ---@param self AirTransport
     OnStopTransportLoading = function(self)
-        AirUnit.OnStopTransportLoading(self)
-        BaseTransport.OnStopTransportLoading(self)
+        AirUnitOnStopTransportLoading(self)
+        BaseTransportOnStopTransportLoading(self)
     end,
 
     ---@param self AirTransport
     DestroyedOnTransport = function(self)
         -- AirUnit.DestroyedOnTransport(self)
-        BaseTransport.DestroyedOnTransport(self)
+        BaseTransportDestroyedOnTransport(self)
     end,
 
     ---@param self AirTransport
-    ---@param ... any
-    Kill = function(self, ...) -- Hook the engine 'Kill' command to flag cargo properly
-         -- The arguments are (self, instigator, type, overkillRatio) but we can't just use normal arguments or AirUnit.Kill will complain if type is nil (which does happen)
-        local instigator = arg[1]
+    ---@param instigator? Unit
+    ---@param damageType? DamageType
+    ---@param excessDamageRatio? number
+    Kill = function(self, instigator, damageType, excessDamageRatio)
+        -- needs to be defined
+        damageType = damageType or "Normal"
+        excessDamageRatio = excessDamageRatio or 0
+        
         self:FlagCargo(not instigator or not IsUnit(instigator))
-        AirUnit.Kill(self, unpack(arg))
+        AirUnitKill(self, instigator, damageType, excessDamageRatio)
     end,
 
     -- Override OnImpact to kill all cargo
@@ -107,13 +133,13 @@ AirTransport = ClassUnit(AirUnit, BaseTransport) {
         if self.GroundImpacted then return end
 
         self:KillCrashedCargo()
-        AirUnit.OnImpact(self, with)
+        AirUnitOnImpact(self, with)
     end,
 
     ---@param self AirTransport
     ---@param loading boolean
     OnStorageChange = function(self, loading)
-        AirUnit.OnStorageChange(self, loading)
+        AirUnitOnStorageChange(self, loading)
         for k, v in self:GetCargo() do
             v:OnStorageChange(loading)
         end
