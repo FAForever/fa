@@ -266,7 +266,7 @@ end
 --- A 'hack' to allow us to detect whether the `ButtonRelease` event was from a left-click
 factoryHotkeyLastClickWasLeft = false
 
-function factoryHotkey(units, count)
+function factoryHotkey(units, count, selection, exFacUnits)
     CommandMode.StartCommandMode("build", {name = ''})
 
     -- Another 'hack' that is, uuhh - a hack. Override the event handle of the world view. If it doesn't 
@@ -275,36 +275,22 @@ function factoryHotkey(units, count)
         if event.Type == 'ButtonPress' or event.Type == 'ButtonDClick' then
             if event.Modifiers.Left then
                 factoryHotkeyLastClickWasLeft = true
-                local selection = GetSelectedUnits()
-                local exFacs = EntityCategoryFilterDown(categories.EXTERNALFACTORY, selection)
                 if type(units) == "string" then
                     if IsKeyDown("Shift") then
                         count = 5
                     end
-                    if not table.empty(exFacs) then
-                        local exFacUnits = EntityCategoryFilterOut(categories.EXTERNALFACTORY, selection)
-                        for _, exFac in exFacs do
-                            table.insert(exFacUnits, exFac:GetCreator())
-                        end
-                        -- in case we've somehow selected both the platform and the factory, only put the fac in once
-                        exFacUnits = table.unique(exFacUnits)
+                    if exFacUnits then
                         IssueBlueprintCommandToUnits(exFacUnits, "UNITCOMMAND_BuildFactory", units, count)
                     else
                         IssueBlueprintCommand("UNITCOMMAND_BuildFactory", units, count)
                     end
                     count = 1
-                    factoryHotkey(units, count)
+                    factoryHotkey(units, count, selection, exFacUnits)
                 else
                     for _, unit in units do
                         local v = unit.id
                         local count = unit.count
-                        if not table.empty(exFacs) then
-                            local exFacUnits = EntityCategoryFilterOut(categories.EXTERNALFACTORY, selection)
-                            for _, exFac in exFacs do
-                                table.insert(exFacUnits, exFac:GetCreator())
-                            end
-                            -- in case we've somehow selected both the platform and the factory, only put the fac in once
-                            exFacUnits = table.unique(exFacUnits)
+                        if exFacUnits then
                             IssueBlueprintCommandToUnits(exFacUnits, "UNITCOMMAND_BuildFactory", v, count)
                         else
                             IssueBlueprintCommand("UNITCOMMAND_BuildFactory", v, count)
@@ -438,15 +424,28 @@ function buildActionFactoryTemplate(modifier)
 
     local template = effectiveTemplates[cyclePos]
     local selectedTemplate = template.templateData
-
+    local exFacs = EntityCategoryFilterDown(categories.EXTERNALFACTORY, selection)
+    local exFacUnits = nil
+    if not table.empty(exFacs) then
+        local exFacUnits = EntityCategoryFilterOut(categories.EXTERNALFACTORY, selection)
+        for _, exFac in exFacs do
+            table.insert(exFacUnits, exFac:GetCreator())
+        end
+        -- in case we've somehow selected both the platform and the factory, only put the fac in once
+        exFacUnits = table.unique(exFacUnits)
+    end
     if maxPos == 1 then
         for _, units in selectedTemplate do
             local v = units.id
             local count = units.count
-            IssueBlueprintCommand("UNITCOMMAND_BuildFactory", v, count)
+            if exFacUnits then
+                IssueBlueprintCommandToUnits(exFacUnits, "UNITCOMMAND_BuildFactory", v, count)
+            else
+                IssueBlueprintCommand("UNITCOMMAND_BuildFactory", v, count)
+            end
         end
     else
-        factoryHotkey(selectedTemplate)
+        factoryHotkey(selectedTemplate, nil, selection, exFacUnits)
     end
 end
 
@@ -580,22 +579,25 @@ function buildActionUnit(name, modifier)
 
     local unit = effectiveValues[cyclePos]
 
+    local exFacs = EntityCategoryFilterDown(categories.EXTERNALFACTORY, selection)
+    local exFacUnits = nil
+    if not table.empty(exFacs) then
+        exFacUnits = EntityCategoryFilterOut(categories.EXTERNALFACTORY, selection)
+        for _, exFac in exFacs do
+            table.insert(exFacUnits, exFac:GetCreator())
+        end
+        -- in case we've somehow selected both the platform and the factory, only put the fac in once
+        exFacUnits = table.unique(exFacUnits)
+    end
     if maxPos == 1 then
-        local exFacs = EntityCategoryFilterDown(categories.EXTERNALFACTORY, selection)
-        if not table.empty(exFacs) then
-            local exFacUnits = EntityCategoryFilterOut(categories.EXTERNALFACTORY, selection)
-            for _, exFac in exFacs do
-                table.insert(exFacUnits, exFac:GetCreator())
-            end
-            -- in case we've somehow selected both the platform and the factory, only put the fac in once
-            exFacUnits = table.unique(exFacUnits)
+        if exFacUnits then
             IssueBlueprintCommandToUnits(exFacUnits, "UNITCOMMAND_BuildFactory", unit, count)
         else
             IssueBlueprintCommand("UNITCOMMAND_BuildFactory", unit, count)
         end
         Construction.RefreshUI()
     else
-        factoryHotkey(unit, count)
+        factoryHotkey(unit, count, selection, exFacUnits)
     end
 end
 
