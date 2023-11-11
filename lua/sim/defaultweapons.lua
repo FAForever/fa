@@ -779,7 +779,8 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
             LOG("IdleState OnFire " .. math.mod(GetGameTick(), 200))
 
             local bp = self.Blueprint
-            if bp.WeaponUnpacks and self.WeaponPackState ~= 'Unpacked' then
+            if bp.WeaponUnpacks and self.WeaponPackState ~= 'Unpacked'
+                and (bp.WeaponUnpackLocksMotion or bp.WeaponUnpackAnimation) then
                 ChangeState(self, self.WeaponUnpackingState)
             else
                 if bp.RackSalvoChargeTime and bp.RackSalvoChargeTime > 0 then
@@ -820,7 +821,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
                 unit:SetBusy(true)
             end
 
-            if bp.RackSalvoFiresAfterCharge then
+            if bp.RackSalvoFiresAfterCharge or bp.SkipReadyState then
                 ChangeState(self, self.RackSalvoFiringState)
             else
                 ChangeState(self, self.RackSalvoFireReadyState)
