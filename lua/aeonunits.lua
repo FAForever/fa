@@ -23,6 +23,7 @@ local CreateAeonFactoryBuildingEffects = EffectUtil.CreateAeonFactoryBuildingEff
 --  FACTORIES
 ---------------------------------------------------------------
 ---@class AFactoryUnit : FactoryUnit
+---@field BuildEffectsBag TrashBag
 AFactoryUnit = ClassUnit(FactoryUnit) {
 
     ---@param self AFactoryUnit
@@ -89,6 +90,7 @@ AConcreteStructureUnit = ClassUnit(DefaultUnitsFile.ConcreteStructureUnit) {}
 --  Construction Units
 ---------------------------------------------------------------
 ---@class AConstructionUnit : ConstructionUnit
+---@field BuildEffectsBag TrashBag
 AConstructionUnit = ClassUnit(ConstructionUnit) {
 
     ---@param self AConstructionUnit
@@ -103,6 +105,7 @@ AConstructionUnit = ClassUnit(ConstructionUnit) {
 --  ENERGY CREATION UNITS
 ---------------------------------------------------------------
 ---@class AEnergyCreationUnit : EnergyCreationUnit
+---@field AmbientEffects string[]
 AEnergyCreationUnit = ClassUnit(EnergyCreationUnit) {
     ---@param self AEnergyCreationUnit
     ---@param builder Unit
@@ -179,6 +182,7 @@ ASonarUnit = ClassUnit(DefaultUnitsFile.SonarUnit) {}
 --  SEA FACTORY STRUCTURES
 ---------------------------------------------------------------
 ---@class ASeaFactoryUnit : SeaFactoryUnit
+---@field BuildEffectsBag TrashBag
 ASeaFactoryUnit = ClassUnit(SeaFactoryUnit) {
 
     ---@param self ASeaFactoryUnit

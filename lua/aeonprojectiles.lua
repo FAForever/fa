@@ -433,6 +433,7 @@ AQuantumDisruptorProjectile = ClassProjectile(SinglePolyTrailProjectile) {
 
 --- AEON AA PROJECTILES
 ---@class AAAQuantumDisplacementCannonProjectile : NullShell
+---@field TrailEmitters table
 AAAQuantumDisplacementCannonProjectile = ClassProjectile(NullShell) {
     PolyTrail = '/effects/emitters/quantum_displacement_cannon_polytrail_01_emit.bp',
     FxImpactUnit = EffectTemplate.AQuantumDisplacementHit01,
