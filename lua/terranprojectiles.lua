@@ -4,390 +4,48 @@
 --  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 ------------------------------------------------------------
 local DefaultProjectileFile = import("/lua/sim/defaultprojectiles.lua")
-local EmitterProjectile = DefaultProjectileFile.EmitterProjectile
-local OnWaterEntryEmitterProjectile = DefaultProjectileFile.OnWaterEntryEmitterProjectile
-local SingleBeamProjectile = DefaultProjectileFile.SingleBeamProjectile
-local SinglePolyTrailProjectile = DefaultProjectileFile.SinglePolyTrailProjectile
-local MultiPolyTrailProjectile = DefaultProjectileFile.MultiPolyTrailProjectile
-local SingleCompositeEmitterProjectile = DefaultProjectileFile.SingleCompositeEmitterProjectile
+local EmitterProjectile = import("/lua/sim/defaultprojectiles.lua").EmitterProjectile
+local OnWaterEntryEmitterProjectile = import("/lua/sim/defaultprojectiles.lua").OnWaterEntryEmitterProjectile
+local SingleBeamProjectile = import("/lua/sim/defaultprojectiles.lua").SingleBeamProjectile
+local SinglePolyTrailProjectile = import("/lua/sim/defaultprojectiles.lua").SinglePolyTrailProjectile
+local MultiPolyTrailProjectile = import("/lua/sim/defaultprojectiles.lua").MultiPolyTrailProjectile
+local SingleCompositeEmitterProjectile = import("/lua/sim/defaultprojectiles.lua").SingleCompositeEmitterProjectile
 local EffectTemplate = import("/lua/effecttemplates.lua")
 local DepthCharge = import("/lua/defaultantiprojectile.lua").DepthCharge
-local NukeProjectile = DefaultProjectileFile.NukeProjectile
+local NukeProjectile = import("/lua/sim/defaultprojectiles.lua").NukeProjectile
 
 local DebrisComponent = import('/lua/sim/projectiles/components/DebrisComponent.lua').DebrisComponent
-local TacticalMissileComponent = import('/lua/sim/DefaultProjectiles.lua').TacticalMissileComponent
+local TacticalMissileComponent = import('/lua/sim/defaultprojectiles.lua').TacticalMissileComponent
 
----@class TFragmentationGrenade : EmitterProjectile
-TFragmentationGrenade = ClassProjectile(EmitterProjectile) {
-    FxImpactUnit = EffectTemplate.THeavyFragmentationGrenadeUnitHit,
-    FxImpactLand = EffectTemplate.THeavyFragmentationGrenadeHit,
-    FxImpactWater = EffectTemplate.THeavyFragmentationGrenadeHit,
-    FxImpactNone = EffectTemplate.THeavyFragmentationGrenadeHit,
-    FxImpactProp = EffectTemplate.THeavyFragmentationGrenadeUnitHit,
-    FxTrails = EffectTemplate.THeavyFragmentationGrenadeFxTrails,
-}
-
----@class TIFMissileNuke : NukeProjectile, SingleBeamProjectile
-TIFMissileNuke = ClassProjectile(NukeProjectile, SingleBeamProjectile) {
-    BeamName = '/effects/emitters/missile_exhaust_fire_beam_01_emit.bp',
-}
-
----@class TIFTacticalNuke : EmitterProjectile
-TIFTacticalNuke = ClassProjectile(EmitterProjectile) {}
-
---- UEF GINSU RAPID PULSE BEAM PROJECTILE
----@class TAAGinsuRapidPulseBeamProjectile : SingleBeamProjectile
-TAAGinsuRapidPulseBeamProjectile = ClassProjectile(SingleBeamProjectile) {
-    BeamName = '/effects/emitters/laserturret_munition_beam_03_emit.bp',
-    FxImpactUnit = EffectTemplate.TAAGinsuHitUnit,
-    FxImpactProp = EffectTemplate.TAAGinsuHitUnit,
-    FxImpactAirUnit = EffectTemplate.TAAGinsuHitUnit,
-    FxImpactLand = EffectTemplate.TAAGinsuHitLand,
-}
-
----  TERRAN AA PROJECTILES
----@class TAALightFragmentationProjectile : SingleCompositeEmitterProjectile
-TAALightFragmentationProjectile = ClassProjectile(SingleCompositeEmitterProjectile) {
-    BeamName = '/effects/emitters/antiair_munition_beam_01_emit.bp',
-    PolyTrail = '/effects/emitters/default_polytrail_01_emit.bp',
-    PolyTrailOffset = 0,
-    FxTrails = { '/effects/emitters/terran_flack_fxtrail_01_emit.bp' },
-    FxImpactAirUnit = EffectTemplate.TFragmentationShell01,
-    FxImpactNone = EffectTemplate.TFragmentationShell01,
-}
-
----  TERRAN ANTIMATTER ARTILLERY PROJECTILES
----@class TArtilleryAntiMatterProjectile : SinglePolyTrailProjectile
-TArtilleryAntiMatterProjectile = ClassProjectile(SinglePolyTrailProjectile) {
-    FxImpactTrajectoryAligned = false,
-    PolyTrail = '/effects/emitters/antimatter_polytrail_01_emit.bp',
-    PolyTrailOffset = 0,
-    FxImpactUnit = EffectTemplate.TAntiMatterShellHit01,
-    FxImpactProp = EffectTemplate.TAntiMatterShellHit01,
-    FxImpactLand = EffectTemplate.TAntiMatterShellHit01,
-    FxLandHitScale = 1,
-}
-
----  TERRAN ANTIMATTER ARTILLERY PROJECTILES
----@class TArtilleryAntiMatterProjectile02 : TArtilleryAntiMatterProjectile
-TArtilleryAntiMatterProjectile02 = ClassProjectile(TArtilleryAntiMatterProjectile) {
-    PolyTrail = '/effects/emitters/default_polytrail_07_emit.bp',
-    FxImpactUnit = EffectTemplate.TAntiMatterShellHit02,
-    FxImpactProp = EffectTemplate.TAntiMatterShellHit02,
-    FxImpactLand = EffectTemplate.TAntiMatterShellHit02,
-}
-
----  TERRAN ANTIMATTER ARTILLERY PROJECTILES
----@class TArtilleryAntiMatterSmallProjectile : TArtilleryAntiMatterProjectile02
-TArtilleryAntiMatterSmallProjectile = ClassProjectile(TArtilleryAntiMatterProjectile02) {
-    FxLandHitScale = 0.5,
-    FxUnitHitScale = 0.5,
-    FxSplatScale = 6,
-}
-
----  TERRAN ARTILLERY PROJECTILES
----@class TArtilleryProjectile : EmitterProjectile
-TArtilleryProjectile = ClassProjectile(EmitterProjectile) {
-    FxImpactTrajectoryAligned = false,
-    FxTrails = { '/effects/emitters/mortar_munition_01_emit.bp', },
-    FxImpactUnit = EffectTemplate.TPlasmaCannonHeavyHitUnit01,
-    FxImpactProp = EffectTemplate.TPlasmaCannonHeavyHitUnit01,
-    FxImpactLand = EffectTemplate.TPlasmaCannonHeavyHit01,
-}
-
----  TERRAN ARTILLERY PROJECTILES
----@class TArtilleryProjectilePolytrail : SinglePolyTrailProjectile
-TArtilleryProjectilePolytrail = ClassProjectile(SinglePolyTrailProjectile) {
-    FxImpactUnit = EffectTemplate.TPlasmaCannonHeavyHitUnit01,
-    FxImpactProp = EffectTemplate.TPlasmaCannonHeavyHitUnit01,
-    FxImpactLand = EffectTemplate.TPlasmaCannonHeavyHit01,
-}
-
----  TERRAN SHIP CANNON PROJECTILES
----@class TCannonSeaProjectile : SingleBeamProjectile
-TCannonSeaProjectile = ClassProjectile(SingleBeamProjectile) {
-    BeamName = '/effects/emitters/cannon_munition_ship_beam_01_emit.bp',
-}
-
----  TERRAN TANK CANNON PROJECTILES
----@class TCannonTankProjectile : SingleBeamProjectile
-TCannonTankProjectile = ClassProjectile(SingleBeamProjectile) {
-    BeamName = '/effects/emitters/cannon_munition_tank_beam_01_emit.bp',
-}
-
----  TERRAN DEPTH CHARGE PROJECTILES
----@class TDepthChargeProjectile : OnWaterEntryEmitterProjectile
-TDepthChargeProjectile = ClassProjectile(OnWaterEntryEmitterProjectile) {
-    FxTrails = { '/effects/emitters/torpedo_underwater_wake_01_emit.bp', },
-    TrailDelay = 0,
-    FxUnitHitScale = 1.25,
-    FxImpactUnit = EffectTemplate.TTorpedoHitUnit01,
-    FxImpactProp = EffectTemplate.TTorpedoHitUnit01,
-    FxImpactUnderWater = EffectTemplate.TTorpedoHitUnit01,
-    FxImpactProjectile = EffectTemplate.TTorpedoHitUnit01,
-    FxEnterWater = EffectTemplate.WaterSplash01,
-
-    ---@param self TDepthChargeProjectile
-    ---@param inWater? boolean
-    OnCreate = function(self, inWater)
-        OnWaterEntryEmitterProjectile.OnCreate(self)
-        self:TrackTarget(false)
-    end,
-
-    ---@param self TDepthChargeProjectile
-    OnEnterWater = function(self)
-        OnWaterEntryEmitterProjectile.OnEnterWater(self)
-        self:TrackTarget(false)
-        self:StayUnderwater(true)
-    end,
-}
-
----  TERRAN GAUSS CANNON PROJECTILES
----@class TDFGeneralGaussCannonProjectile : MultiPolyTrailProjectile
-TDFGeneralGaussCannonProjectile = ClassProjectile(MultiPolyTrailProjectile) {
-    PolyTrails = EffectTemplate.TGaussCannonPolyTrail,
-    PolyTrailOffset = { 0, 0 },
-    FxTrailOffset = 0,
-}
-
---- (UEB2301) UEF Triad and (UES0103) UEF Frigate and (UES0202) UEF Cruiser and (UEl0201) UEF Striker and (UEL0202) UEF Pillar
----@class TDFGaussCannonProjectile : TDFGeneralGaussCannonProjectile
-TDFGaussCannonProjectile = ClassProjectile(TDFGeneralGaussCannonProjectile) {
-    FxImpactUnit = EffectTemplate.TGaussCannonHitUnit01,
-    FxImpactProp = EffectTemplate.TGaussCannonHitUnit01,
-    FxImpactLand = EffectTemplate.TGaussCannonHitLand01,
-    FxImpactWater = EffectTemplate.TGaussWaterSplash01,
-    FxWaterHitScale = 0.75,
-}
-
---- (UES0201) UEF Destroyer
----@class TDFMediumShipGaussCannonProjectile : TDFGeneralGaussCannonProjectile
-TDFMediumShipGaussCannonProjectile = ClassProjectile(TDFGeneralGaussCannonProjectile) {
-    FxImpactTrajectoryAligned = false,
-    FxImpactUnit = EffectTemplate.TMediumShipGaussCannonHitUnit01,
-    FxImpactProp = EffectTemplate.TMediumShipGaussCannonHit01,
-    FxImpactLand = EffectTemplate.TMediumShipGaussCannonHit01,
-}
-
---- UES0302 (UEF Battleship)
----@class TDFBigShipGaussCannonProjectile : TDFGeneralGaussCannonProjectile
-TDFBigShipGaussCannonProjectile = ClassProjectile(TDFGeneralGaussCannonProjectile) {
-    FxImpactTrajectoryAligned = false,
-    FxImpactUnit = EffectTemplate.TShipGaussCannonHitUnit01,
-    FxImpactProp = EffectTemplate.TShipGaussCannonHit01,
-    FxImpactLand = EffectTemplate.TShipGaussCannonHit01,
-
-    ---@param self TDFBigShipGaussCannonProjectile
-    ---@param targetType string
-    ---@param targetEntity Unit | Prop
-    OnImpact = function(self, targetType, targetEntity)
-        MultiPolyTrailProjectile.OnImpact(self, targetType, targetEntity)
-        self:ShakeCamera(20, 1, 0, 1)
-    end,
-}
-
---- Triad (T2 PD)
----@class TDFMediumLandGaussCannonProjectile : TDFGeneralGaussCannonProjectile
-TDFMediumLandGaussCannonProjectile = ClassProjectile(TDFGeneralGaussCannonProjectile) {
-    FxImpactTrajectoryAligned = false,
-    FxImpactUnit = EffectTemplate.TMediumLandGaussCannonHitUnit01,
-    FxImpactProp = EffectTemplate.TMediumLandGaussCannonHit01,
-    FxImpactLand = EffectTemplate.TMediumLandGaussCannonHit01,
-}
-
---- Fatboy
----@class TDFBigLandGaussCannonProjectile : TDFGeneralGaussCannonProjectile
-TDFBigLandGaussCannonProjectile = ClassProjectile(TDFGeneralGaussCannonProjectile) {
-    FxImpactTrajectoryAligned = false,
-    FxImpactUnit = EffectTemplate.TBigLandGaussCannonHitUnit01,
-    FxImpactProp = EffectTemplate.TBigLandGaussCannonHit01,
-    FxImpactLand = EffectTemplate.TBigLandGaussCannonHit01,
-}
-
----  TERRAN HEAVY PLASMA CANNON PROJECTILES
---- SACU, titan, T3 gunship and T3 transport
----@class THeavyPlasmaCannonProjectile : MultiPolyTrailProjectile
-THeavyPlasmaCannonProjectile = ClassProjectile(MultiPolyTrailProjectile) {
-    FxTrails = EffectTemplate.TPlasmaCannonHeavyMunition,
-    RandomPolyTrails = 1,
-    PolyTrailOffset = { 0, 0, 0 },
-    PolyTrails = EffectTemplate.TPlasmaCannonHeavyPolyTrails,
-    FxImpactUnit = EffectTemplate.TPlasmaCannonHeavyHitUnit01,
-    FxImpactProp = EffectTemplate.TPlasmaCannonHeavyHitUnit01,
-    FxImpactLand = EffectTemplate.TPlasmaCannonHeavyHit01,
-}
-
----  UEF SMALL YIELD NUCLEAR BOMB
---- strategic bomber
----@class TIFSmallYieldNuclearBombProjectile : EmitterProjectile
-TIFSmallYieldNuclearBombProjectile = ClassProjectile(EmitterProjectile) {
-    FxImpactTrajectoryAligned = false,
-    PolyTrail = '/effects/emitters/antimatter_polytrail_01_emit.bp',
-    PolyTrailOffset = 0,
-    FxImpactUnit = EffectTemplate.TAntiMatterShellHit01,
-    FxImpactProp = EffectTemplate.TAntiMatterShellHit01,
-    FxImpactLand = EffectTemplate.TAntiMatterShellHit01,
-    FxLandHitScale = 1,
-}
-
----  TERRAN BOT LASER PROJECTILES
---- ACU
----@class TLaserBotProjectile : MultiPolyTrailProjectile
-TLaserBotProjectile = ClassProjectile(MultiPolyTrailProjectile) {
-    PolyTrails = EffectTemplate.TLaserPolytrail01,
-    PolyTrailOffset = { 0, 0, 0 },
-    FxTrails = EffectTemplate.TLaserFxtrail01,
-    FxImpactUnit = EffectTemplate.TLaserHitUnit02,
-    FxImpactProp = EffectTemplate.TLaserHitUnit02,
-    FxImpactLand = EffectTemplate.TLaserHitLand02,
-}
-
----  TERRAN LASER PROJECTILES
----@class TLaserProjectile : SingleBeamProjectile
-TLaserProjectile = ClassProjectile(SingleBeamProjectile) {
-    BeamName = '/effects/emitters/laserturret_munition_beam_02_emit.bp',
-    FxImpactUnit = EffectTemplate.TLaserHitUnit01,
-    FxImpactProp = EffectTemplate.TLaserHitUnit01,
-    FxImpactLand = EffectTemplate.TLaserHitLand01,
-}
-
----  TERRAN MACHINE GUN SHELLS
----@class TMachineGunProjectile : SinglePolyTrailProjectile
-TMachineGunProjectile = ClassProjectile(SinglePolyTrailProjectile) {
-    PolyTrail = EffectTemplate.TMachineGunPolyTrail,
-    FxImpactUnit = {
-        '/effects/emitters/gauss_cannon_muzzle_flash_01_emit.bp',
-        '/effects/emitters/flash_05_emit.bp',
-    },
-    FxImpactProp = {
-        '/effects/emitters/gauss_cannon_muzzle_flash_01_emit.bp',
-        '/effects/emitters/flash_05_emit.bp',
-    },
-    FxImpactLand = {
-        '/effects/emitters/gauss_cannon_muzzle_flash_01_emit.bp',
-        '/effects/emitters/flash_05_flat_emit.bp',
-    },
-}
-
----  TERRAN AA MISSILE PROJECTILES - Air Targets
----@class TMissileAAProjectile : EmitterProjectile
-TMissileAAProjectile = ClassProjectile(EmitterProjectile) {
-    TrailDelay = 1,
-    FxTrails = { '/effects/emitters/missile_sam_munition_trail_01_emit.bp', },
-    FxTrailOffset = -0.5,
-    FxAirUnitHitScale = 0.4,
-    FxLandHitScale = 0.4,
-    FxUnitHitScale = 0.4,
-    FxPropHitScale = 0.4,
-    FxImpactUnit = EffectTemplate.TMissileHit02,
-    FxImpactAirUnit = EffectTemplate.TMissileHit02,
-    FxImpactProp = EffectTemplate.TMissileHit02,
-    FxImpactLand = EffectTemplate.TMissileHit02,
-}
-
----@class TAntiNukeInterceptorProjectile : SingleBeamProjectile
-TAntiNukeInterceptorProjectile = ClassProjectile(SingleBeamProjectile) {
-    BeamName = '/effects/emitters/missile_exhaust_fire_beam_02_emit.bp',
-    FxTrails = EffectTemplate.TMissileExhaust03,
-    FxImpactUnit = EffectTemplate.TMissileHit01,
-    FxImpactProp = EffectTemplate.TMissileHit01,
-    FxImpactLand = EffectTemplate.TMissileHit01,
-    FxImpactProjectile = EffectTemplate.TMissileHit01,
-    FxProjectileHitScale = 5,
-}
-
----  TERRAN MISSILE PROJECTILES - General Purpose
----@class TMissileProjectile : SingleBeamProjectile, TacticalMissileComponent, DebrisComponent
-TMissileProjectile = ClassProjectile(SingleBeamProjectile, TacticalMissileComponent, DebrisComponent) {
-    DestroyOnImpact = false,
-    FxTrails = EffectTemplate.TMissileExhaust02,
-    FxTrailOffset = -1,
-    BeamName = '/effects/emitters/missile_munition_exhaust_beam_01_emit.bp',
-    FxImpactUnit = EffectTemplate.TMissileHit01,
-    FxImpactLand = EffectTemplate.TMissileHit01,
-    FxImpactProp = EffectTemplate.TMissileHit01,
-
-    FxOnKilled = EffectTemplate.TMissileKilled01,
-    FxOnKilledScale = 0.7,
-
-    FxImpactNone = EffectTemplate.TMissileKilled01,
-    FxNoneHitScale = 0.7,
-
-    LaunchTicks = 12,
-    LaunchTicksRange = 2,
-
-    LaunchTurnRate = 6,
-    LaunchTurnRateRange = 2,
-
-    HeightDistanceFactor = 5.5,
-    HeightDistanceFactorRange = 0.5,
-
-    MinHeight = 10,
-    MinHeightRange = 1,
-
-    FinalBoostAngle = 50,
-    FinalBoostAngleRange = 5,
-
-    DebrisBlueprints = {
-        '/effects/Entities/TacticalDebris01/TacticalDebris01_proj.bp',
-        '/effects/Entities/TacticalDebris01/TacticalDebris01_proj.bp',
-        '/effects/Entities/TacticalDebris02/TacticalDebris02_proj.bp',
-    },
-
-    OnCreate = function(self)
-        SingleBeamProjectile.OnCreate(self)
-        local blueprintPhysics = self.Blueprint.Physics
-        local radius = 0.105 * (blueprintPhysics.MaxSpeed + blueprintPhysics.MaxSpeedRange)
-        self:SetCollisionShape('Sphere', 0, 0, 0, radius)
-    end,
-
-    ---@param self TMissileProjectile
-    ---@param instigator Unit
-    ---@param type string
-    ---@param overkillRatio number
-    OnKilled = function(self, instigator, type, overkillRatio)
-        SingleBeamProjectile.OnKilled(self, instigator, type, overkillRatio)
-
-        self:CreateDebris()
-        CreateLightParticle(self, -1, self.Army, 3, 6, 'flare_lens_add_02', 'ramp_fire_13')
-    end,
-
-    ---@param self TMissileProjectile
-    ---@param targetType string
-    ---@param targetEntity Prop|Unit
-    OnImpact = function(self, targetType, targetEntity)
-        SingleBeamProjectile.OnImpact(self, targetType, targetEntity)
-        if targetType == 'None' or targetType == 'Air' then
-            self:CreateDebris()
-        end
-
-        CreateLightParticle(self, -1, self.Army, 4, 4, 'flare_lens_add_02', 'ramp_fire_13')
-    end,
-}
-
----  TERRAN CRUISE MISSILE PROJECTILES - Surface Targets
----@class TMissileCruiseProjectile : TMissileProjectile
-TMissileCruiseProjectile = ClassProjectile(TMissileProjectile) {
-    DestroyOnImpact = false,
-    FxTrails = EffectTemplate.TMissileExhaust02,
-    FxTrailOffset = -1,
-    BeamName = '/effects/emitters/missile_munition_exhaust_beam_01_emit.bp',
-    FxImpactUnit = EffectTemplate.TMissileHit01,
-    FxImpactLand = EffectTemplate.TMissileHit01,
-    FxImpactProp = EffectTemplate.TMissileHit01,
-}
-
----@class TMissileCruiseProjectile02 : TMissileProjectile
-TMissileCruiseProjectile02 = ClassProjectile(TMissileProjectile) {
-    FxImpactTrajectoryAligned = false,
-    DestroyOnImpact = false,
-    FxTrails = EffectTemplate.TMissileExhaust02,
-    FxTrailOffset = -1,
-    BeamName = '/effects/emitters/missile_munition_exhaust_beam_01_emit.bp',
-    FxImpactUnit = EffectTemplate.TShipGaussCannonHitUnit02,
-    FxImpactProp = EffectTemplate.TShipGaussCannonHit02,
-    FxImpactLand = EffectTemplate.TShipGaussCannonHit02,
-}
+TFragmentationGrenade = import("/lua/sim/projectiles/uef/TFragmentationGrenadeProjectile.lua").TFragmentationGrenade
+TIFMissileNuke = import("/lua/sim/projectiles/uef/TIFMissileNukeProjectile.lua").TIFMissileNuke
+TIFTacticalNuke = import("/lua/sim/projectiles/uef/TIFTacticalNukeProjectile.lua").TIFTacticalNuke
+TAAGinsuRapidPulseBeamProjectile = import("/lua/sim/projectiles/uef/TAAGinsuRapidPulseBeamProjectile.lua").TAAGinsuRapidPulseBeamProjectile
+TAALightFragmentationProjectile = import("/lua/sim/projectiles/uef/TAALightFragmentationProjectile.lua").TAALightFragmentationProjectile
+TArtilleryAntiMatterProjectile = import("/lua/sim/projectiles/uef/TArtilleryAntiMatterProjectile.lua").TArtilleryAntiMatterProjectile
+TArtilleryAntiMatterProjectile02 = import("/lua/sim/projectiles/uef/TArtilleryAntiMatterProjectile02.lua").TArtilleryAntiMatterProjectile02
+TArtilleryAntiMatterSmallProjectile = import("/lua/sim/projectiles/uef/TArtilleryAntiMatterSmallProjectile.lua").TArtilleryAntiMatterSmallProjectile
+TArtilleryProjectile = import("/lua/sim/projectiles/uef/TArtilleryProjectile.lua").TArtilleryProjectile
+TArtilleryProjectilePolytrail = import("/lua/sim/projectiles/uef/TArtilleryProjectilePolytrail.lua").TArtilleryProjectilePolytrail
+TCannonSeaProjectile = import("/lua/sim/projectiles/uef/TCannonSeaProjectile.lua").TCannonSeaProjectile
+TCannonTankProjectile = import("/lua/sim/projectiles/uef/TCannonTankProjectile.lua").TCannonTankProjectile
+TDepthChargeProjectile = import("/lua/sim/projectiles/uef/TDepthChargeProjectile.lua").TDepthChargeProjectile
+TDFGeneralGaussCannonProjectile = import("/lua/sim/projectiles/uef/TDFGeneralGaussCannonProjectile.lua").TDFGeneralGaussCannonProjectile
+TDFGaussCannonProjectile = import("/lua/sim/projectiles/uef/TDFGaussCannonProjectile.lua").TDFGaussCannonProjectile
+TDFMediumShipGaussCannonProjectile = import("/lua/sim/projectiles/uef/TDFMediumShipGaussCannonProjectile.lua").TDFMediumShipGaussCannonProjectile
+TDFBigShipGaussCannonProjectile = import("/lua/sim/projectiles/uef/TDFBigShipGaussCannonProjectile.lua").TDFBigShipGaussCannonProjectile
+TDFMediumLandGaussCannonProjectile = import("/lua/sim/projectiles/uef/TDFMediumLandGaussCannonProjectile.lua").TDFMediumLandGaussCannonProjectile
+TDFBigLandGaussCannonProjectile = import("/lua/sim/projectiles/uef/TDFBigLandGaussCannonProjectile.lua").TDFBigLandGaussCannonProjectile
+THeavyPlasmaCannonProjectile = import("/lua/sim/projectiles/uef/THeavyPlasmaCannonProjectile.lua").THeavyPlasmaCannonProjectile
+TIFSmallYieldNuclearBombProjectile = import("/lua/sim/projectiles/uef/TIFSmallYieldNuclearBombProjectile.lua").TIFSmallYieldNuclearBombProjectile
+TLaserBotProjectile = import("/lua/sim/projectiles/uef/TLaserBotProjectile.lua").TLaserBotProjectile
+TLaserProjectile = import("/lua/sim/projectiles/uef/TLaserProjectile.lua").TLaserProjectile
+TMachineGunProjectile = import("/lua/sim/projectiles/uef/TMachineGunProjectile.lua").TMachineGunProjectile
+TMissileAAProjectile = import("/lua/sim/projectiles/uef/TMissileAAProjectile.lua").TMissileAAProjectile
+TAntiNukeInterceptorProjectile = import("/lua/sim/projectiles/uef/TAntiNukeInterceptorProjectile.lua").TAntiNukeInterceptorProjectile
+TMissileProjectile = import("/lua/sim/projectiles/uef/TMissileProjectile.lua").TMissileProjectile
+TMissileCruiseProjectile = import("/lua/sim/projectiles/uef/TMissileCruiseProjectile.lua").TMissileCruiseProjectile
+TMissileCruiseProjectile02 = import("/lua/sim/projectiles/uef/TMissileCruiseProjectile02.lua").TMissileCruiseProjectile02
 
 ---  TERRAN SUB-LAUNCHED CRUISE MISSILE PROJECTILES
 ---@class TMissileCruiseSubProjectile : TMissileProjectile
