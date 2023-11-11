@@ -20,11 +20,30 @@
 --** SOFTWARE.
 --******************************************************************************************************
 
+-- upvalue scope for performance
+local TableGetn = table.getn
+local StringFormat = string.format
+
 ---@param units Unit[]
-function AbortNavigation(units)
-    for k = 1, table.getn(units) do
+---@param doPrint boolean           # if true, prints the total distributed orders
+function AbortNavigation(units, doPrint)
+    local unitCount = TableGetn(units)
+
+    if unitCount == 0 then
+        return
+    end
+
+    local brain = units[1]:GetAIBrain()
+
+    for k = 1, unitCount do
         local unit = units[k]
-        local navigator = unit:GetNavigator()
-        navigator:AbortMove()
+        if not IsDestroyed(unit) then
+            local navigator = unit:GetNavigator()
+            navigator:AbortMove()
+        end
+    end
+
+    if doPrint and (GetFocusArmy() == brain:GetArmyIndex()) then
+        print(StringFormat("Interrupted pathfinding for %s unit(s)", unitCount))
     end
 end

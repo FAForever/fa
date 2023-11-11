@@ -585,6 +585,8 @@ do
 end
 
 do
+    local CommandSourceGuards = { }
+
     ---@param data { }
     ---@param selection Unit[]
     Callbacks.AbortNavigation = function(data, selection)
@@ -596,7 +598,22 @@ do
 
         -- only apply this to engineers
         local engineers = EntityCategoryFilterDown(categories.ENGINEER + categories.COMMAND, selection)
+        if table.empty(engineers) then
+            return
+        end
 
+        -- prevent automation
+        local gameTick = GetGameTick()
+        local commandSource = GetCurrentCommandSource()
+        local commandSourceGuard = CommandSourceGuards[commandSource]
+
+        if commandSourceGuard and commandSourceGuard + 5 >= gameTick then
+            return
+        end
+
+        CommandSourceGuards[commandSource] = gameTick
+
+        -- perform the command
         import("/lua/sim/commands/abort-navigation.lua").AbortNavigation(engineers)
     end
 end

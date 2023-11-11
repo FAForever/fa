@@ -530,7 +530,7 @@ LoadIntoTransports = function(clearCommands)
 end
 
 AbortNavigation = function()
-    print("Abort navigation")
+    print("Abort pathfinding")
     SimCallback({ Func = 'AbortNavigation', Args = { } }, true)
 end
 
