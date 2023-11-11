@@ -9,13 +9,13 @@ local Entity = import("/lua/sim/entity.lua").Entity
 local Weapon = import("/lua/sim/weapon.lua").Weapon
 local WeaponFile = import("/lua/sim/defaultweapons.lua")
 local CollisionBeamFile = import("/lua/defaultcollisionbeams.lua")
-local QuantumBeamGeneratorCollisionBeam = CollisionBeamFile.QuantumBeamGeneratorCollisionBeam
-local TractorClawCollisionBeam = CollisionBeamFile.TractorClawCollisionBeam
+local QuantumBeamGeneratorCollisionBeam = import("/lua/defaultcollisionbeams.lua").QuantumBeamGeneratorCollisionBeam
+local TractorClawCollisionBeam = import("/lua/defaultcollisionbeams.lua").TractorClawCollisionBeam
 local utilities = import('/lua/utilities.lua')
 local Explosion = import("/lua/defaultexplosions.lua")
-local KamikazeWeapon = WeaponFile.KamikazeWeapon
-local DefaultProjectileWeapon = WeaponFile.DefaultProjectileWeapon
-local DefaultBeamWeapon = WeaponFile.DefaultBeamWeapon
+local KamikazeWeapon = import("/lua/sim/defaultweapons.lua").KamikazeWeapon
+local DefaultProjectileWeapon = import("/lua/sim/defaultweapons.lua").DefaultProjectileWeapon
+local DefaultBeamWeapon = import("/lua/sim/defaultweapons.lua").DefaultBeamWeapon
 local EffectTemplate = import("/lua/effecttemplates.lua")
 
 ---@class AIFBallisticMortarWeapon : DefaultProjectileWeapon
