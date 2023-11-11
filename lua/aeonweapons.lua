@@ -18,10 +18,8 @@ local DefaultProjectileWeapon = import("/lua/sim/defaultweapons.lua").DefaultPro
 local DefaultBeamWeapon = import("/lua/sim/defaultweapons.lua").DefaultBeamWeapon
 local EffectTemplate = import("/lua/effecttemplates.lua")
 
----@class AIFBallisticMortarWeapon : DefaultProjectileWeapon
-AIFBallisticMortarWeapon = ClassWeapon(DefaultProjectileWeapon) {
-    FxMuzzleFlash = EffectTemplate.AIFBallisticMortarFlash02,
-}
+
+AIFBallisticMortarWeapon = import('/lua/sim/weapons/aeon/AIFBallisticMortarWeapon.lua').AIFBallisticMortarWeapon
 
 ---@class ADFReactonCannon : DefaultProjectileWeapon
 ADFReactonCannon = ClassWeapon(DefaultProjectileWeapon) {
