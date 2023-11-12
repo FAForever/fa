@@ -13,81 +13,50 @@ local OverchargeWeapon = WeaponFile.OverchargeWeapon
 local CollisionBeamFile = import("/lua/defaultcollisionbeams.lua")
 local EffectTemplate = import("/lua/effecttemplates.lua")
 
----@class CDFBrackmanCrabHackPegLauncherWeapon : DefaultProjectileWeapon
-CDFBrackmanCrabHackPegLauncherWeapon = ClassWeapon(DefaultProjectileWeapon) {
-    FxMuzzleFlash = { '/effects/emitters/proton_cannon_muzzle_01_emit.bp',
-        '/effects/emitters/proton_cannon_muzzle_02_emit.bp', },
-}
+--- Weapon Files ---
+CDFBrackmanCrabHackPegLauncherWeapon = import('/lua/sim/weapons/cybran/CDFBrackmanCrabHackPegLauncherWeapon.lua').CDFBrackmanCrabHackPegLauncherWeapon
+CDFParticleCannonWeapon = import('/lua/sim/weapons/cybran/CDFParticleCannonWeapon.lua').CDFParticleCannonWeapon
+CDFProtonCannonWeapon = import('/lua/sim/weapons/cybran/CDFProtonCannonWeapon.lua').CDFProtonCannonWeapon
+CDFHvyProtonCannonWeapon = import('/lua/sim/weapons/cybran/CDFHvyProtonCannonWeapon.lua').CDFHvyProtonCannonWeapon
+CDFHeavyMicrowaveLaserGeneratorCom = import('/lua/sim/weapons/cybran/CDFHeavyMicrowaveLaserGeneratorCom.lua').CDFHeavyMicrowaveLaserGeneratorCom
+CDFHeavyMicrowaveLaserGenerator = import('/lua/sim/weapons/cybran/CDFHeavyMicrowaveLaserGenerator.lua').CDFHeavyMicrowaveLaserGenerator
+CDFEMP = import('/lua/sim/weapons/cybran/CDFEMP.lua').CDFEMP
+CDFElectronBolterWeapon = import('/lua/sim/weapons/cybran/CDFElectronBolterWeapon.lua').CDFElectronBolterWeapon
+CDFHeavyElectronBolterWeapon = import('/lua/sim/weapons/cybran/CDFHeavyElectronBolterWeapon.lua').CDFHeavyElectronBolterWeapon
+CIFSmartCharge = import('/lua/sim/weapons/cybran/CIFSmartCharge.lua').CIFSmartCharge
+CANTorpedoLauncherWeapon = import('/lua/sim/weapons/cybran/CANTorpedoLauncherWeapon.lua').CANTorpedoLauncherWeapon
+CANNaniteTorpedoWeapon = import('/lua/sim/weapons/cybran/CANNaniteTorpedoWeapon.lua').CANNaniteTorpedoWeapon
+CDFMissileMesonWeapon = import('/lua/sim/weapons/cybran/CDFMissileMesonWeapon.lua').CDFMissileMesonWeapon
+CDFRocketIridiumWeapon = import('/lua/sim/weapons/cybran/CDFRocketIridiumWeapon.lua').CDFRocketIridiumWeapon
+CDFRocketIridiumWeapon02 = import('/lua/sim/weapons/cybran/CDFRocketIridiumWeapon02.lua').CDFRocketIridiumWeapon02
+CIFMissileCorsairWeapon = import('/lua/sim/weapons/cybran/CIFMissileCorsairWeapon.lua').CIFMissileCorsairWeapon
+CDFLaserPulseLightWeapon = import('/lua/sim/weapons/cybran/CDFLaserPulseLightWeapon.lua').CDFLaserPulseLightWeapon
+CDFLaserHeavyWeapon = import('/lua/sim/weapons/cybran/CDFLaserHeavyWeapon.lua').CDFLaserHeavyWeapon
+CDFLaserHeavyWeapon02 = import('/lua/sim/weapons/cybran/CDFLaserHeavyWeapon02.lua').CDFLaserHeavyWeapon02
+CDFLaserDisintegratorWeapon01 = import('/lua/sim/weapons/cybran/CDFLaserDisintegratorWeapon01.lua').CDFLaserDisintegratorWeapon01
+CDFLaserDisintegratorWeapon02 = import('/lua/sim/weapons/cybran/CDFLaserDisintegratorWeapon02.lua').CDFLaserDisintegratorWeapon02
+CDFHeavyDisintegratorWeapon = import('/lua/sim/weapons/cybran/CDFHeavyDisintegratorWeapon.lua').CDFHeavyDisintegratorWeapon
+CAAAutocannon = import('/lua/sim/weapons/cybran/CAAAutocannon.lua').CAAAutocannon
+CAANanoDartWeapon = import('/lua/sim/weapons/cybran/CAANanoDartWeapon.lua').CAANanoDartWeapon
+CAABurstCloudFlakArtilleryWeapon = import('/lua/sim/weapons/cybran/CAABurstCloudFlakArtilleryWeapon.lua').CAABurstCloudFlakArtilleryWeapon
+CAAMissileNaniteWeapon = import('/lua/sim/weapons/cybran/CAAMissileNaniteWeapon.lua').CAAMissileNaniteWeapon
+CIFGrenadeWeapon = import('/lua/sim/weapons/cybran/CIFGrenadeWeapon.lua').CIFGrenadeWeapon
+CIFArtilleryWeapon = import('/lua/sim/weapons/cybran/CIFArtilleryWeapon.lua').CIFArtilleryWeapon
+CIFMissileStrategicWeapon = import('/lua/sim/weapons/cybran/CIFMissileStrategicWeapon.lua').CIFMissileStrategicWeapon
+CIFMissileLoaTacticalWeapon = import('/lua/sim/weapons/cybran/CIFMissileLoaTacticalWeapon.lua').CIFMissileLoaTacticalWeapon
+CIFBombNeutronWeapon = import('/lua/sim/weapons/cybran/CIFBombNeutronWeapon.lua').CIFBombNeutronWeapon
+CIFNaniteTorpedoWeapon = import('/lua/sim/weapons/cybran/CIFNaniteTorpedoWeapon.lua').CIFNaniteTorpedoWeapon
+CIFMissileLoaWeapon = import('/lua/sim/weapons/cybran/CIFMissileLoaWeapon.lua').CIFMissileLoaWeapon
+CAMEMPMissileWeapon = import('/lua/sim/weapons/cybran/CAMEMPMissileWeapon.lua').CAMEMPMissileWeapon
+CAMZapperWeapon = import('/lua/sim/weapons/cybran/CAMZapperWeapon.lua').CAMZapperWeapon
+CAMZapperWeapon02 = import('/lua/sim/weapons/cybran/CAMZapperWeapon02.lua').CAMZapperWeapon02
+CAMZapperWeapon03 = import('/lua/sim/weapons/cybran/CAMZapperWeapon03.lua').CAMZapperWeapon03
+CCannonMolecularWeapon = import('/lua/sim/weapons/cybran/CCannonMolecularWeapon.lua').CCannonMolecularWeapon
+CEMPAutoCannon = import('/lua/sim/weapons/cybran/CEMPAutoCannon.lua').CEMPAutoCannon
+CKrilTorpedoLauncherWeapon = import('/lua/sim/weapons/cybran/CKrilTorpedoLauncherWeapon.lua').CKrilTorpedoLauncherWeapon
+CMobileKamikazeBombWeapon = import('/lua/sim/weapons/cybran/CMobileKamikazeBombWeapon.lua').CMobileKamikazeBombWeapon
+CDFOverchargeWeapon = import('/lua/sim/weapons/cybran/CDFOverchargeWeapon.lua').CDFOverchargeWeapon
 
----@class CDFParticleCannonWeapon : DefaultBeamWeapon
-CDFParticleCannonWeapon = ClassWeapon(DefaultBeamWeapon) {
-    BeamType = CollisionBeamFile.ParticleCannonCollisionBeam,
-    FxMuzzleFlash = { '/effects/emitters/particle_cannon_muzzle_01_emit.bp' },
-}
-
----@class CDFProtonCannonWeapon : DefaultProjectileWeapon
-CDFProtonCannonWeapon = ClassWeapon(DefaultProjectileWeapon) {
-    FxMuzzleFlash = { '/effects/emitters/proton_cannon_muzzle_01_emit.bp',
-        '/effects/emitters/proton_cannon_muzzle_02_emit.bp', },
-}
-
----@class CDFHvyProtonCannonWeapon : DefaultProjectileWeapon
-CDFHvyProtonCannonWeapon = ClassWeapon(DefaultProjectileWeapon) {
-    FxMuzzleFlash = EffectTemplate.CHvyProtonCannonMuzzleflash,
-}
-
----@class CDFOverchargeWeapon : OverchargeWeapon
-CDFOverchargeWeapon = ClassWeapon(OverchargeWeapon) {
-    FxMuzzleFlash = EffectTemplate.CMolecularRipperOverChargeFlash01,
-    DesiredWeaponLabel = 'RightRipper'
-}
-
---- COMMANDER ENHANCEMENT WEAPON!
----@class CDFHeavyMicrowaveLaserGeneratorCom : DefaultBeamWeapon
-CDFHeavyMicrowaveLaserGeneratorCom = ClassWeapon(DefaultBeamWeapon) {
-    BeamType = CollisionBeamFile.MicrowaveLaserCollisionBeam02,
-}
-
---- SPIDER BOT WEAPON!
----@class CDFHeavyMicrowaveLaserGenerator : DefaultBeamWeapon
----@field RotatorManip moho.RotateManipulator
-CDFHeavyMicrowaveLaserGenerator = ClassWeapon(DefaultBeamWeapon) {
-    BeamType = CollisionBeamFile.MicrowaveLaserCollisionBeam01,
-    FxUpackingChargeEffects = EffectTemplate.CMicrowaveLaserCharge01,
-    FxUpackingChargeEffectScale = 1,
-
-    ---@param self CDFHeavyMicrowaveLaserGenerator
-    ---@param muzzle string
-    PlayFxBeamStart = function(self, muzzle)
-        DefaultBeamWeapon.PlayFxBeamStart(self, muzzle)
-
-        -- create rotator if it doesn't exist
-        local rotator = self.RotatorManip
-        if not rotator then
-            local unit = self.unit
-            rotator = CreateRotator(unit, 'Center_Turret_Barrel', 'z')
-            unit.Trash:Add(rotator)
-            self.RotatorManip = rotator
-        end
-
-        -- set their respective properties when firing
-        rotator:SetTargetSpeed(500)
-        rotator:SetAccel(200)
-    end,
-
-    ---@param self CDFHeavyMicrowaveLaserGenerator
-    ---@param beam string
-    PlayFxBeamEnd = function(self, beam)
-        DefaultBeamWeapon.PlayFxBeamEnd(self, beam)
-
-        -- if it exists, then stop rotating
-        local rotator = self.RotatorManip
-        if rotator then
-            rotator:SetTargetSpeed(0)
-            rotator:SetAccel(90)
-        end
-    end,
-}
 
 ---@class CDFEMP : DefaultProjectileWeapon
 CDFEMP = ClassWeapon(DefaultProjectileWeapon) {
