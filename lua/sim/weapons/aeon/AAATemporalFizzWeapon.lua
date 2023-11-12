@@ -21,6 +21,10 @@
 --**********************************************************************************
 
 local DefaultProjectileWeapon = import("/lua/sim/defaultweapons.lua").DefaultProjectileWeapon
+local DefaultProjectileWeaponPlayFxRackSalvoChargeSequence = DefaultProjectileWeapon.PlayFxRackSalvoChargeSequence
+
+-- upvalue scope for performance
+local CreateAttachedEmitter = CreateAttachedEmitter
 
 ---@class AAATemporalFizzWeapon : DefaultProjectileWeapon
 AAATemporalFizzWeapon = ClassWeapon(DefaultProjectileWeapon) {
@@ -29,11 +33,20 @@ AAATemporalFizzWeapon = ClassWeapon(DefaultProjectileWeapon) {
 
     ---@param self AAATemporalFizzWeapon
     PlayFxRackSalvoChargeSequence = function(self)
+        DefaultProjectileWeaponPlayFxRackSalvoChargeSequence(self)
+
+        local unit = self.unit
+        local army = unit.Army
+        local chargeEffectMuzzles = self.ChargeEffectMuzzles
+        local fxChargeEffects = self.FxChargeEffects
+
         DefaultProjectileWeapon.PlayFxRackSalvoChargeSequence(self)
-        for _, v in self.ChargeEffectMuzzles do
-            for i, j in self.FxChargeEffects do
-                CreateAttachedEmitter(self.unit, v, self.unit.Army, j)
+        for _, v in chargeEffectMuzzles do
+            for i, j in fxChargeEffects do
+                CreateAttachedEmitter(unit, v, army, j)
             end
         end
     end,
 }
+
+LOG(repr(debug.listcode(AAATemporalFizzWeapon.PlayFxRackSalvoChargeSequence)))

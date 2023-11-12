@@ -24,6 +24,11 @@ local DefaultBeamWeapon = import("/lua/sim/defaultweapons.lua").DefaultBeamWeapo
 local CollisionBeamFile = import("/lua/defaultcollisionbeams.lua")
 local EffectTemplate = import("/lua/effecttemplates.lua")
 
+local DefaultBeamWeaponPlayFxWeaponUnpackSequence = DefaultBeamWeapon.PlayFxWeaponUnpackSequence
+
+-- upvalue scope for performance
+local CreateAttachedEmitter = CreateAttachedEmitter
+
 ---@class ADFPhasonLaser : DefaultBeamWeapon
 ADFPhasonLaser = ClassWeapon(DefaultBeamWeapon) {
     BeamType = CollisionBeamFile.PhasonLaserCollisionBeam,
@@ -34,14 +39,24 @@ ADFPhasonLaser = ClassWeapon(DefaultBeamWeapon) {
 
     ---@param self ADFPhasonLaser
     PlayFxWeaponUnpackSequence = function(self)
-        if not self.ContBeamOn then
+
+        local contBeamOn = self.ContBeamOn
+
+        if not contBeamOn then
+            local unit = self.unit
+            local army = self.Army
             local bp = self.Blueprint
-            for _, v in self.FxUpackingChargeEffects do
-                for i, j in bp.RackBones[self.CurrentRackSalvoNumber].MuzzleBones do
-                    CreateAttachedEmitter(self.unit, j, self.unit.Army, v):ScaleEmitter(self.FxUpackingChargeEffectScale)
+            local rackbones = bp.RackBones
+            local fxUpackingChargeEffects = self.FxUpackingChargeEffects
+            local currentRackSalvoNumber = self.CurrentRackSalvoNumber
+            local fxUpackingChargeEffectScale = self.FxUpackingChargeEffectScale
+
+            for _, v in fxUpackingChargeEffects do
+                for i, j in rackbones[currentRackSalvoNumber].MuzzleBones do
+                    CreateAttachedEmitter(unit, j, army, v):ScaleEmitter(fxUpackingChargeEffectScale)
                 end
             end
-            DefaultBeamWeapon.PlayFxWeaponUnpackSequence(self)
+            DefaultBeamWeaponPlayFxWeaponUnpackSequence(self)
         end
     end,
 }

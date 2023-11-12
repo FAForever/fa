@@ -34,7 +34,7 @@ ADFChronoDampener = Class(DefaultProjectileWeapon) {
 
     RackSalvoFiringState = State(DefaultProjectileWeapon.RackSalvoFiringState) {
         Main = function(self)
-            local bp = self:GetBlueprint()
+            local bp = self.Blueprint
             ---@type Unit
             local unit = self.unit
             local primaryWeapon = unit:GetWeaponByLabel('RightDisruptor')
