@@ -89,7 +89,7 @@ UnitBlueprint {
         BuildCostEnergy = 11600,
         BuildCostMass = 1440,
         BuildRate = 90,
-        BuildTime = 2400,
+        BuildTime = 3200,
         BuildableCategory = {
             'BUILTBYTIER3FACTORY AEON MOBILE CONSTRUCTION',
             'BUILTBYTIER3FACTORY AEON STRUCTURE LAND',
