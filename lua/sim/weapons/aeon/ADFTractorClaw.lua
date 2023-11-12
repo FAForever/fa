@@ -20,7 +20,7 @@
 --** SOFTWARE.
 --**********************************************************************************
 
-local Weapon = import('/lua/sim/weapons.lua').Weapon
+local Weapon = import('/lua/sim/weapon.lua').Weapon
 local EffectTemplate = import('/lua/effecttemplates.lua')
 
 ---@class ADFTractorClaw : Weapon

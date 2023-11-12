@@ -21,9 +21,9 @@
 --**********************************************************************************
 
 local DefaultProjectileWeapon = import('/lua/sim/defaultweapons.lua').DefaultProjectileWeapon
+local EffectTemplate = import('/lua/effecttemplates.lua')
 
----@class ADFSonicPulsarWeapon : DefaultProjectileWeapon
-ADFSonicPulsarWeapon = ClassWeapon(DefaultProjectileWeapon) {
-    FxMuzzleFlash = {'/effects/emitters/flash_02_emit.bp'},
-    FxMuzzleFlashScale = 0.5,
+---@class ADFGravitonProjectorWeapon : DefaultProjectileWeapon
+ADFGravitonProjectorWeapon = ClassWeapon(DefaultProjectileWeapon) {
+    FxMuzzleFlash = EffectTemplate.AGravitonBolterMuzzleFlash01,
 }
