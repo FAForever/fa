@@ -107,7 +107,9 @@ local cUnit = moho.unit_methods
 ---@class Unit : moho.unit_methods, InternalObject, IntelComponent, VeterancyComponent, AIUnitProperties
 ---@field AIManagerIdentifier? string
 ---@field Brain AIBrain
+---@field buildBots? Unit[]
 ---@field Blueprint UnitBlueprint
+---@field BuildEffectsBag? TrashBag
 ---@field Trash TrashBag
 ---@field Layer Layer
 ---@field Army Army
@@ -2931,7 +2933,12 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
     ---@param built boolean
     ---@param order string
     StartBuildingEffects = function(self, built, order)
-        self.BuildEffectsBag:Add(self:ForkThread(self.CreateBuildEffects, built, order))
+        local buildEffectsBag = self.BuildEffectsBag
+        if buildEffectsBag then
+            local thread = ForkThread(self.CreateBuildEffects, self, built, order)
+            self.Trash:Add(thread)
+            buildEffectsBag:Add(thread)
+        end
     end,
 
     ---@param self Unit
@@ -2943,8 +2950,9 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
     ---@param self Unit
     ---@param built Unit
     StopBuildingEffects = function(self, built)
-        if self.BuildEffectsBag then
-            self.BuildEffectsBag:Destroy()
+        local buildEffectsBag = self.BuildEffectsBag
+        if buildEffectsBag then
+            buildEffectsBag:Destroy()
         end
 
         -- kept after --3355 for backwards compatibility with mods
@@ -3916,7 +3924,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
 
     --- Plays a sound using the unit as a source. Returns true if successful, false otherwise
     ---@param self Unit A unit
-    ---@param sound SoundBlueprint A string identifier that represents the sound to be played.
+    ---@param sound string A string identifier that represents the sound to be played.
     ---@return boolean
     PlayUnitSound = function(self, sound)
         local audio = self.Blueprint.Audio[sound]

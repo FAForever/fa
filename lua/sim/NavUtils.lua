@@ -459,6 +459,8 @@ local function PathToPositions(grid, label, origin, destination, sections, count
         if k > 1 then
             positions[k - 1] = { unpack(sectionNext.Center) }
         end
+
+        sectionLast = sectionNext
     end
 
     -- add in the destination

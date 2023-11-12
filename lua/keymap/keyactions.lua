@@ -1624,6 +1624,16 @@ local keyActionsOrdersAdvanced = {
         category = 'ordersAdvanced',
         wikiURL = 'Play/Game/Hotkeys/OrdersAdvanced#filter-engineers'
     },
+    ['abort_navigation'] = {
+        action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").AbortNavigation()',
+        category = 'ordersAdvanced',
+        wikiURL = 'Play/Game/Hotkeys/OrdersAdvanced#abort-navigation-of-engineers'
+    },
+    ['shift_abort_navigation'] = {
+        action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").AbortNavigation()',
+        category = 'ordersAdvanced',
+        wikiURL = 'Play/Game/Hotkeys/OrdersAdvanced#interrupt-navigation-of-engineers'
+    },
 }
 
 local keyActionsOrdersQueueBased = {

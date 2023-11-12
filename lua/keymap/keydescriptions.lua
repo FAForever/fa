@@ -540,6 +540,8 @@ keyDescriptions = {
 
     ['filter_highest_engineer_and_assist'] = '<LOC key_desc_filter_highest_engineer_and_assist>Filter engineers',
     ['shift_filter_highest_engineer_and_assist'] = '<LOC key_desc_shift_filter_highest_engineer_and_assist>Filter engineers',
+    ['abort_navigation'] = '<LOC key_abort_navigation>Interrupt pathfinding of engineers',
+    ['shift_abort_navigation'] = '<LOC key_abort_navigation>Interrupt pathfinding of engineers',
     ['spreadattack'] = '<LOC key_desc_distribute_orders>Distribute orders',
     ['shift_spreadattack'] = '<LOC key_desc_shift_distribute_orders>Distribute orders',
     ['spreadattack_context'] = '<LOC key_desc_distribute_orders>Distribute orders from the unit beneath the mouse cursor',

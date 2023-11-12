@@ -27,7 +27,7 @@ local MassCollectionUnit = DefaultUnitsFile.MassCollectionUnit
 
 local EffectTemplate = import("/lua/effecttemplates.lua")
 local EffectUtil = import("/lua/effectutilities.lua")
-local CreateCybranBuildBeams = false
+
 
 -- upvalued effect utility functions for performance
 local SpawnBuildBotsOpti = EffectUtil.SpawnBuildBotsOpti
@@ -63,6 +63,7 @@ MathMax = math.max
 local TrashBag = _G.TrashBag
 local TrashBagAdd = TrashBag.Add
 
+
 --- A class to managing the build bots. Make sure to call all the relevant functions.
 ---@class CConstructionTemplate
 ---@field BotBlueprintId? string
@@ -82,12 +83,12 @@ CConstructionTemplate = ClassSimple {
     ---@param self CConstructionTemplate
     DestroyAllBuildEffects = function(self)
         -- make sure we're not dead (then bots are destroyed by trashbag)
-        if self.Dead then 
-            return 
+        if self.Dead then
+            return
         end
 
         -- check if we ever had bots
-        local bots = self.BuildBots 
+        local bots = self.BuildBots
         if bots then
             -- check if we still have active bots
             local buildBotCount = self.BuildBotsNext - 1
@@ -158,7 +159,7 @@ CConstructionTemplate = ClassSimple {
     --- When making build effects, try and make the bots.
     ---@param self CConstructionTemplate
     ---@param unitBeingBuilt Unit
-    ---@param order number
+    ---@param order number 
     ---@param stationary boolean
     CreateBuildEffects = function(self, unitBeingBuilt, order, stationary)
         -- check if the unit still exists, this can happen when: 
@@ -321,20 +322,20 @@ CBuildBotUnit = ClassDummyUnit(DummyUnit) {
 
     --- prevent this type of operations
     ---@param self CBuildBotUnit
-    ---@param target Unit
+    ---@param target Unit unused
     OnStartCapture = function(self, target)
         IssueStop({self}) -- You can't capture!
     end,
     
     ---@param self CBuildBotUnit
-    ---@param target Unit
+    ---@param target Unit unused
     OnStartReclaim = function(self, target)
         IssueStop({self}) -- You can't reclaim!
     end,
 
     --- short cut - just get destroyed
     ---@param self CBuildBotUnit
-    ---@param with any
+    ---@param with any unused
     OnImpact = function(self, with)
 
         -- make it go boom
@@ -352,11 +353,13 @@ CBuildBotUnit = ClassDummyUnit(DummyUnit) {
 
 -- AIR FACTORY STRUCTURES
 ---@class CAirFactoryUnit : AirFactoryUnit
+---@field BuildEffectsBag TrashBag
+---@field BuildAnimManip moho.AnimationManipulator
 CAirFactoryUnit = ClassUnit(AirFactoryUnit) {
 
     ---@param self CAirFactoryUnit
     ---@param unitBeingBuilt Unit
-    ---@param order string
+    ---@param order string unused
     CreateBuildEffects = function(self, unitBeingBuilt, order)
         if not unitBeingBuilt then return end
         WaitTicks(2)
@@ -523,6 +526,8 @@ CEnergyStorageUnit = ClassUnit(EnergyStorageUnit) {}
 
 -- LAND FACTORY STRUCTURES
 ---@class CLandFactoryUnit : LandFactoryUnit
+---@field BuildEffectsBag TrashBag
+---@field BuildAnimManip moho.AnimationManipulator
 CLandFactoryUnit = ClassUnit(LandFactoryUnit) {
 
     ---@param self CLandFactoryUnit
@@ -837,8 +842,6 @@ CRadarUnit = ClassUnit(RadarUnit) {
             end
         end
     end,
-
-
 }
 
 -- SONAR STRUCTURES
@@ -847,6 +850,7 @@ CSonarUnit = ClassUnit(DefaultUnitsFile.SonarUnit) {}
 
 -- SEA FACTORY STRUCTURES
 ---@class CSeaFactoryUnit : SeaFactoryUnit
+---@field BuildEffectsBag TrashBag
 CSeaFactoryUnit = ClassUnit(SeaFactoryUnit) {
 
     ---@param self CSeaFactoryUnit
@@ -878,7 +882,7 @@ CSeaFactoryUnit = ClassUnit(SeaFactoryUnit) {
 
     ---@param self CSeaFactoryUnit
     ---@param unitBeingBuilt Unit
-    ---@param order number
+    ---@param order boolean|string
     OnStartBuild = function(self, unitBeingBuilt, order)
         SeaFactoryUnit.OnStartBuild(self, unitBeingBuilt, order)
         if order ~= 'Upgrade' then
@@ -887,7 +891,7 @@ CSeaFactoryUnit = ClassUnit(SeaFactoryUnit) {
     end,
 
     ---@param self CSeaFactoryUnit
-    ---@param unitBuilding boolean
+    ---@param unitBuilding Unit
     OnStopBuild = function(self, unitBuilding)
         SeaFactoryUnit.OnStopBuild(self, unitBuilding)
         if not self.Dead and self:GetFractionComplete() == 1 then
@@ -1022,6 +1026,11 @@ CConstructionEggUnit = ClassUnit(CStructureUnit) {
 -- TODO: This should be made more general and put in defaultunits.lua in case other factions get similar buildings
 -- CConstructionStructureUnit
 ---@class CConstructionStructureUnit : CStructureUnit, CConstructionTemplate
+---@field AnimationManipulator moho.AnimationManipulator
+---@field UnitBuildOrder number
+---@field BuildingOpenAnim string
+---@field BuildArmManipulator moho.manipulator_methods
+---@field BuildingOpenAnimManip moho.AnimationManipulator
 CConstructionStructureUnit = ClassUnit(CStructureUnit, CConstructionTemplate) {
 
     ---@param self CConstructionStructureUnit
@@ -1059,7 +1068,7 @@ CConstructionStructureUnit = ClassUnit(CStructureUnit, CConstructionTemplate) {
     end,
 
     ---@param self CConstructionStructureUnit
-    ---@param built boolean
+    ---@param built Unit
     StopBuildingEffects = function(self, built)
         CStructureUnit.StopBuildingEffects(self, built)
         CConstructionTemplate.StopBuildingEffects(self, built)
@@ -1182,7 +1191,7 @@ CConstructionStructureUnit = ClassUnit(CStructureUnit, CConstructionTemplate) {
 
 ---# CCommandUnit
 ---Cybran Command Units (ACU and SCU) have stealth and cloak enhancements, toggles can be handled in one class
----@class CCommandUnit : CommandUnit
+---@class CCommandUnit : CommandUnit, CConstructionTemplate
 CCommandUnit = ClassUnit(CommandUnit, CConstructionTemplate) {
 
     ---@param self CCommandUnit
@@ -1198,7 +1207,7 @@ CCommandUnit = ClassUnit(CommandUnit, CConstructionTemplate) {
     end,
 
     ---@param self CCommandUnit
-    ---@param built boolean
+    ---@param built Unit
     StopBuildingEffects = function(self, built)
         CommandUnit.StopBuildingEffects(self, built)
         CConstructionTemplate.StopBuildingEffects(self, built)
@@ -1212,9 +1221,10 @@ CCommandUnit = ClassUnit(CommandUnit, CConstructionTemplate) {
 
     ---@param self CCommandUnit
     ---@param unitBeingBuilt Unit
-    ---@param order string
-    CreateBuildEffects = function(self, unitBeingBuilt, order)
-        CConstructionTemplate.CreateBuildEffects(self, unitBeingBuilt, order)
+    ---@param order number
+    ---@param stationary boolean
+    CreateBuildEffects = function(self, unitBeingBuilt, order, stationary)
+        CConstructionTemplate.CreateBuildEffects(self, unitBeingBuilt, order, stationary)
     end,
 
     ---@param self CCommandUnit
@@ -1254,3 +1264,4 @@ CCommandUnit = ClassUnit(CommandUnit, CConstructionTemplate) {
 
 -- kept for mod backwards compatibility
 local Util = import("/lua/utilities.lua")
+local CreateCybranBuildBeams = false

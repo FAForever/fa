@@ -1,11 +1,13 @@
---
--- UEF Subcommander Heavy Plasma bolt
---
-
 local THeavyPlasmaCannonProjectile = import("/lua/terranprojectiles.lua").THeavyPlasmaCannonProjectile
 
+--- UEF Subcommander Heavy Plasma bolt
+---@class TDFPlasmaHeavy03: THeavyPlasmaCannonProjectile
 TDFPlasmaHeavy03 = ClassProjectile(THeavyPlasmaCannonProjectile) {
 
+	---@param self TDFPlasmaHeavy03
+	---@param army number
+	---@param EffectTable table
+	---@param EffectScale number
     CreateImpactEffects = function( self, army, EffectTable, EffectScale )
 		local launcher = self.Launcher
 		if launcher and launcher:HasEnhancement( 'HighExplosiveOrdnance' ) then
@@ -16,4 +18,3 @@ TDFPlasmaHeavy03 = ClassProjectile(THeavyPlasmaCannonProjectile) {
 	end,
 }
 TypeClass = TDFPlasmaHeavy03
-
