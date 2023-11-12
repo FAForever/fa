@@ -2935,7 +2935,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
     StartBuildingEffects = function(self, built, order)
         local buildEffectsBag = self.BuildEffectsBag
         if buildEffectsBag then
-            local thread = ForkThread(self.CreateBuildEffects, built, order)
+            local thread = ForkThread(self.CreateBuildEffects, self, built, order)
             self.Trash:Add(thread)
             buildEffectsBag:Add(thread)
         end
