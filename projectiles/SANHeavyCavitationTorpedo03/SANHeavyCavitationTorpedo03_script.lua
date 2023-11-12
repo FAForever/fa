@@ -6,7 +6,11 @@
 local SHeavyCavitationTorpedo = import("/lua/seraphimprojectiles.lua").SHeavyCavitationTorpedo
 local EffectTemplate = import("/lua/effecttemplates.lua")
 
+--- Heavy Cavitation Torpedo Projectile script, XSB2205
+---@class SANHeavyCavitationTorpedo03 : SHeavyCavitationTorpedo
 SANHeavyCavitationTorpedo03 = ClassProjectile(SHeavyCavitationTorpedo) {
+
+    ---@param self SANHeavyCavitationTorpedo03
     OnCreate = function(self)
         self:SetCollisionShape('Sphere', 0, 0, 0, 0.5)
         SHeavyCavitationTorpedo.OnCreate(self)
@@ -14,6 +18,7 @@ SANHeavyCavitationTorpedo03 = ClassProjectile(SHeavyCavitationTorpedo) {
         CreateEmitterOnEntity(self,self.Army,EffectTemplate.SHeavyCavitationTorpedoFxTrails)
     end,
 
+    ---@param self SANHeavyCavitationTorpedo03
     PauseUntilTrack = function(self)
         WaitTicks(2)
         self:TrackTarget(true)

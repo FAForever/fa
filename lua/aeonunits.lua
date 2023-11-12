@@ -18,6 +18,7 @@ local RadarJammerUnit = DefaultUnitsFile.RadarJammerUnit
 local EffectTemplate = import("/lua/effecttemplates.lua")
 local EffectUtil = import("/lua/effectutilities.lua")
 local CreateAeonFactoryBuildingEffects = EffectUtil.CreateAeonFactoryBuildingEffects
+local CreateAeonConstructionUnitBuildingEffects = EffectUtil.CreateAeonConstructionUnitBuildingEffects
 
 ---------------------------------------------------------------
 --  FACTORIES
@@ -97,7 +98,10 @@ AConstructionUnit = ClassUnit(ConstructionUnit) {
     ---@param unitBeingBuilt Unit
     ---@param order string
     CreateBuildEffects = function(self, unitBeingBuilt, order)
-        EffectUtil.CreateAeonConstructionUnitBuildingEffects(self, unitBeingBuilt, self.BuildEffectsBag)
+        local buildEffectsBag = self.BuildEffectsBag
+        if buildEffectsBag then
+            CreateAeonConstructionUnitBuildingEffects(self, unitBeingBuilt, buildEffectsBag)
+        end
     end,
 }
 

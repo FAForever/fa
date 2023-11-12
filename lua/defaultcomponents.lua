@@ -463,20 +463,23 @@ TreadComponent = ClassSimple {
     ---@param self Unit | TreadComponent
     ---@param treadMarks UnitBlueprintTreadMarks
     CreateTreads = function(self, treadMarks)
+        local trash = self.Trash
         local treadThreads = self.TreadThreads
-        if not treadThreads then
-            treadThreads = {}
-            self.TreadThreads = treadThreads
+        if not IsDestroyed(self) then
+            if not treadThreads then
+                treadThreads = {}
+                self.TreadThreads = treadThreads
 
-            for k, treadBlueprint in treadMarks do
-                local thread = ForkThread(self.CreateTreadsThread, self, treadBlueprint)
-                treadThreads[k] = thread
-                self.Trash:Add(thread)
-            end
-        else
-            self.TreadSuspend = nil
-            for _, thread in treadThreads do
-                ResumeThread(thread)
+                for k, treadBlueprint in treadMarks do
+                    local thread = ForkThread(self.CreateTreadsThread, self, treadBlueprint)
+                    treadThreads[k] = thread
+                    trash:Add(thread)
+                end
+            else
+                self.TreadSuspend = nil
+                for _, thread in treadThreads do
+                    ResumeThread(thread)
+                end
             end
         end
     end,
@@ -485,6 +488,7 @@ TreadComponent = ClassSimple {
     ---@param treads UnitBlueprintTreadMarks
     CreateTreadsThread = function(self, treads)
         -- trade memory for performance
+        local IsDestroyed = IsDestroyed
         local WaitTicks = WaitTicks
         local CreateSplatOnBone = CreateSplatOnBone
         local SuspendCurrentThread = SuspendCurrentThread
@@ -686,7 +690,7 @@ VeterancyComponent = ClassSimple {
                 upperThreshold = vetThresholds[currLevel + 1]
             end
 
-        -- case where we do have a limit (usual gameplay approach)
+            -- case where we do have a limit (usual gameplay approach)
         else
             if experience > diffThreshold then
                 experience = diffThreshold
@@ -773,7 +777,7 @@ VeterancyComponent = ClassSimple {
     ---@param self Unit | VeterancyComponent
     ---@param unitThatIsDying Unit
     ---@param experience? number
-    OnKilledUnit = function (self, unitThatIsDying, experience)
+    OnKilledUnit = function(self, unitThatIsDying, experience)
         if not experience then
             return
         end
@@ -831,24 +835,29 @@ ExternalFactoryComponent = ClassSimple {
     OnStopBeingBuilt = function(self, builder, layer)
         local blueprint = self.Blueprint
         if not self.FactoryAttachBone then
-            error(string.format("%s is not setup for an external factory: the unit does not have a field 'FactoryAttachBone'", blueprint.BlueprintId))
+            error(string.format("%s is not setup for an external factory: the unit does not have a field 'FactoryAttachBone'"
+                , blueprint.BlueprintId))
         end
 
         if not self.BuildAttachBone then
-            error(string.format("%s is not setup for an external factory: the unit does not have a field 'BuildAttachBone'", blueprint.BlueprintId))
+            error(string.format("%s is not setup for an external factory: the unit does not have a field 'BuildAttachBone'"
+                , blueprint.BlueprintId))
         end
 
         if self.BuildAttachBone == self.FactoryAttachBone then
-            error(string.format("%s is not setup for an external factory: the 'FactoryAttachBone' can not be the same as the 'BuildAttachBone'", blueprint.BlueprintId))
+            error(string.format("%s is not setup for an external factory: the 'FactoryAttachBone' can not be the same as the 'BuildAttachBone'"
+                , blueprint.BlueprintId))
         end
 
         if not blueprint.CategoriesHash['EXTERNALFACTORY'] then
-            error(string.format("%s is not setup for an external factory: the unit does not have a 'EXTERNALFACTORY' category", blueprint.BlueprintId))
+            error(string.format("%s is not setup for an external factory: the unit does not have a 'EXTERNALFACTORY' category"
+                , blueprint.BlueprintId))
         end
 
         local blueprintIdExternalFactory = blueprint.BlueprintId .. 'ef'
         if not __blueprints[blueprintIdExternalFactory] then
-            error(string.format("%s is not setup for an external factory: the external factory blueprint is not setup", blueprint.BlueprintId))
+            error(string.format("%s is not setup for an external factory: the external factory blueprint is not setup",
+                blueprint.BlueprintId))
         end
 
         -- create the factory somewhere completely unrelated
@@ -927,7 +936,6 @@ ExternalFactoryComponent = ClassSimple {
     end,
 
 }
-
 
 --- Moved for Backwards Compatibility
 local Entity = import("/lua/sim/entity.lua").Entity

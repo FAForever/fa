@@ -5,9 +5,15 @@
 -------------------------------------------------------------------------------
 local SZhanaseeBombProjectile = import("/lua/seraphimprojectiles.lua").SZhanaseeBombProjectile
 
+--- Zhanasee Bomb script, used on XSA0304
+---@class SBOZhanaseeBombProjectile01 : SZhanaseeBombProjectile
 SBOZhanaseeBombProjectile01 = ClassProjectile(SZhanaseeBombProjectile){
-    OnImpact = function(self, targetType, targetEntity)        
-		SZhanaseeBombProjectile.OnImpact(self, targetType, targetEntity) 
+
+    ---@param self SBOZhanaseeBombProjectile01
+    ---@param targetType string
+    ---@param targetEntity Prop|Unit
+    OnImpact = function(self, targetType, targetEntity)
+		SZhanaseeBombProjectile.OnImpact(self, targetType, targetEntity)
         local army = self.Army
         CreateLightParticle(self, -1, army, 26, 5, 'sparkle_white_add_08', 'ramp_white_24' )
 

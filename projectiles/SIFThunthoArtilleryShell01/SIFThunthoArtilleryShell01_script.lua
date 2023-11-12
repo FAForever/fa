@@ -8,23 +8,24 @@ local SThunthoArtilleryShell = import("/lua/seraphimprojectiles.lua").SThunthoAr
 local SThunderStormCannonProjectileSplitFx = import("/lua/effecttemplates.lua").SThunderStormCannonProjectileSplitFx 
 
 -- upvalue for performance
-local CreateTrail = CreateTrail
 local CreateEmitterAtEntity = CreateEmitterAtEntity
-local CreateEmitterOnEntity = CreateEmitterOnEntity
-
 local Random = Random
-
-local MathSin = math.sin 
+local MathSin = math.sin
 local MathCos = math.cos
-
 local EntityDestroy = _G.moho.entity_methods.Destroy
-
 local ProjectileCreateChildProjectile = _G.moho.projectile_methods.CreateChildProjectile
 local ProjectileSetVelocity = _G.moho.projectile_methods.SetVelocity
 local ProjectileGetVelocity = _G.moho.projectile_methods.GetVelocity
 
+
+--- Thuntho Artillery Shell Projectile script, XSL0103
+---@class SIFThunthoArtilleryShell01 : SThunthoArtilleryShell
 SIFThunthoArtilleryShell01 = ClassProjectile(SThunthoArtilleryShell) {
-    OnImpact = function(self, TargetType, TargetEntity) 
+
+    ---@param self SIFThunthoArtilleryShell01
+    ---@param TargetType string
+    ---@param TargetEntity Prop|Unit    
+    OnImpact = function(self, TargetType, TargetEntity)
 
         -- the split fx
         CreateEmitterAtEntity( self, self.Army, SThunderStormCannonProjectileSplitFx[1])
@@ -66,3 +67,7 @@ SIFThunthoArtilleryShell01 = ClassProjectile(SThunthoArtilleryShell) {
     end
 }
 TypeClass = SIFThunthoArtilleryShell01
+
+--- Moved for Mod Support
+local CreateTrail = CreateTrail
+local CreateEmitterOnEntity = CreateEmitterOnEntity
