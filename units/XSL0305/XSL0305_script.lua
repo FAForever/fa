@@ -60,7 +60,7 @@ XSL0305 = ClassUnit(SLandUnit) {
 
     ---@param self XSL0305
     ---@param delaySeconds number
-    ---@param mode boolean
+    ---@param mode boolean -- true activates the slowdown, false deactivates it.
     ScheduleMovementChange = function(self, delaySeconds, mode)
         local switchToMoveMode = function(mode)
             local speedMult = self.Blueprint.Physics.LandSpeedMultiplier or 1 -- left for compatability
