@@ -20,6 +20,11 @@ local AmphibiousLandUnit = DefaultUnitsFile.AmphibiousLandUnit
 
 local EffectUtil = import("/lua/effectutilities.lua")
 local CreateBuildCubeThread = EffectUtil.CreateBuildCubeThread
+local CreateDefaultBuildBeams = EffectUtil.CreateDefaultBuildBeams
+
+local WaitTicks = WaitTicks
+local ForkThread = ForkThread
+local CreateAttachedEmitter = CreateAttachedEmitter
 
 --------------------------------------------------------------
 --  AIR FACTORY STRUCTURES
@@ -31,10 +36,20 @@ TAirFactoryUnit = ClassUnit(AirFactoryUnit) {
     ---@param unitBeingBuilt Unit
     ---@param order string
     CreateBuildEffects = function(self, unitBeingBuilt, order)
-        WaitSeconds(0.1)
-        for _, v in self.BuildEffectBones do
-            self.BuildEffectsBag:Add(CreateAttachedEmitter(self, v, self.Army, '/effects/emitters/flashing_blue_glow_01_emit.bp'))
-            self.BuildEffectsBag:Add(self:ForkThread(EffectUtil.CreateDefaultBuildBeams, unitBeingBuilt, {v}, self.BuildEffectsBag))
+        WaitTicks(1)
+        local army = self.Army
+        local trash = self.Trash
+        local buildEffectsBag = self.BuildEffectsBag
+        local buildEffectBones = self.BuildEffectBones
+
+        if buildEffectsBag then
+            for _, v in buildEffectBones do
+                buildEffectsBag:Add(CreateAttachedEmitter(self, v, army, '/effects/emitters/flashing_blue_glow_01_emit.bp'))
+
+                local thread = ForkThread(CreateDefaultBuildBeams, self, unitBeingBuilt, {v}, buildEffectsBag)
+                buildEffectsBag:Add(thread)
+                trash:Add(thread)
+            end
         end
     end,
 
