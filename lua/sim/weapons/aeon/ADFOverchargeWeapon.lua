@@ -20,11 +20,11 @@
 --** SOFTWARE.
 --**********************************************************************************
 
-local DefaultProjectileWeapon = import('/lua/sim/defaultweapons.lua').DefaultProjectileWeapon
+local DefaultOverchargeWeapon = import('/lua/sim/defaultweapons.lua').OverchargeWeapon
 local EffectTemplate = import('/lua/effecttemplates.lua')
 
----Aeon Mortar Weapon
----@class AIFBallisticMortarWeapon: DefaultProjectileWeapon
-AIFBallisticMortarWeapon = ClassWeapon(DefaultProjectileWeapon) {
-    FxMuzzleFlash = EffectTemplate.AIFBallisticMortarFlash02,
+---@class ADFOverchargeWeapon : OverchargeWeapon
+ADFOverchargeWeapon = ClassWeapon(DefaultOverchargeWeapon) {
+    FxMuzzleFlash = EffectTemplate.ACommanderOverchargeFlash01,
+    DesiredWeaponLabel = 'RightDisruptor'
 }

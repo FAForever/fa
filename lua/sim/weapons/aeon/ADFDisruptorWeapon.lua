@@ -23,8 +23,8 @@
 local DefaultProjectileWeapon = import('/lua/sim/defaultweapons.lua').DefaultProjectileWeapon
 local EffectTemplate = import('/lua/effecttemplates.lua')
 
----Aeon Mortar Weapon
----@class AIFBallisticMortarWeapon: DefaultProjectileWeapon
-AIFBallisticMortarWeapon = ClassWeapon(DefaultProjectileWeapon) {
-    FxMuzzleFlash = EffectTemplate.AIFBallisticMortarFlash02,
+---@class ADFDisruptorWeapon : DefaultProjectileWeapon
+ADFDisruptorWeapon = ClassWeapon(DefaultProjectileWeapon) {
+    FxMuzzleFlash = EffectTemplate.ASDisruptorCannonMuzzle01,
+    FxChargeMuzzleFlash = EffectTemplate.ASDisruptorCannonChargeMuzzle01,
 }

@@ -20,11 +20,24 @@
 --** SOFTWARE.
 --**********************************************************************************
 
-local DefaultProjectileWeapon = import('/lua/sim/defaultweapons.lua').DefaultProjectileWeapon
-local EffectTemplate = import('/lua/effecttemplates.lua')
+local DefaultBeamWeapon = import("/lua/sim/defaultweapons.lua").DefaultBeamWeapon
+local QuantumBeamGeneratorCollisionBeam = import("/lua/defaultcollisionbeams.lua").QuantumBeamGeneratorCollisionBeam
 
----Aeon Mortar Weapon
----@class AIFBallisticMortarWeapon: DefaultProjectileWeapon
-AIFBallisticMortarWeapon = ClassWeapon(DefaultProjectileWeapon) {
-    FxMuzzleFlash = EffectTemplate.AIFBallisticMortarFlash02,
+---@class AQuantumBeamGenerator : DefaultBeamWeapon
+AQuantumBeamGenerator = ClassWeapon(DefaultBeamWeapon) {
+    BeamType = QuantumBeamGeneratorCollisionBeam,
+
+    FxUpackingChargeEffects = { },
+    FxUpackingChargeEffectScale = 1,
+
+    ---@param self AQuantumBeamGenerator
+    PlayFxWeaponUnpackSequence = function(self)
+        local bp = self:GetBlueprint()
+        for _, v in self.FxUpackingChargeEffects do
+            for i, j in bp.RackBones[self.CurrentRackSalvoNumber].MuzzleBones do
+                CreateAttachedEmitter(self.unit, j, self.unit.Army, v):ScaleEmitter(self.FxUpackingChargeEffectScale)
+            end
+        end
+        DefaultBeamWeapon.PlayFxWeaponUnpackSequence(self)
+    end,
 }

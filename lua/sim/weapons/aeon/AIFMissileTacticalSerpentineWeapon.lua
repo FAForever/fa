@@ -20,11 +20,9 @@
 --** SOFTWARE.
 --**********************************************************************************
 
-local DefaultProjectileWeapon = import('/lua/sim/defaultweapons.lua').DefaultProjectileWeapon
-local EffectTemplate = import('/lua/effecttemplates.lua')
+local DefaultProjectileWeapon = import("/lua/sim/defaultweapons.lua").DefaultProjectileWeapon
 
----Aeon Mortar Weapon
----@class AIFBallisticMortarWeapon: DefaultProjectileWeapon
-AIFBallisticMortarWeapon = ClassWeapon(DefaultProjectileWeapon) {
-    FxMuzzleFlash = EffectTemplate.AIFBallisticMortarFlash02,
+---@class AIFMissileTacticalSerpentineWeapon : DefaultProjectileWeapon
+AIFMissileTacticalSerpentineWeapon = ClassWeapon(DefaultProjectileWeapon) {
+    FxMuzzleFlash = {'/effects/emitters/aeon_missile_launch_02_emit.bp', },
 }

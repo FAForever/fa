@@ -20,11 +20,7 @@
 --** SOFTWARE.
 --**********************************************************************************
 
-local DefaultProjectileWeapon = import('/lua/sim/defaultweapons.lua').DefaultProjectileWeapon
-local EffectTemplate = import('/lua/effecttemplates.lua')
+local KamikazeWeapon = import("/lua/sim/defaultweapons.lua").KamikazeWeapon
 
----Aeon Mortar Weapon
----@class AIFBallisticMortarWeapon: DefaultProjectileWeapon
-AIFBallisticMortarWeapon = ClassWeapon(DefaultProjectileWeapon) {
-    FxMuzzleFlash = EffectTemplate.AIFBallisticMortarFlash02,
-}
+---@class AKamikazeWeapon : KamikazeWeapon
+AKamikazeWeapon = ClassWeapon(KamikazeWeapon) {}

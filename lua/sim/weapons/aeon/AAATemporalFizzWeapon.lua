@@ -20,11 +20,20 @@
 --** SOFTWARE.
 --**********************************************************************************
 
-local DefaultProjectileWeapon = import('/lua/sim/defaultweapons.lua').DefaultProjectileWeapon
-local EffectTemplate = import('/lua/effecttemplates.lua')
+local DefaultProjectileWeapon = import("/lua/sim/defaultweapons.lua").DefaultProjectileWeapon
 
----Aeon Mortar Weapon
----@class AIFBallisticMortarWeapon: DefaultProjectileWeapon
-AIFBallisticMortarWeapon = ClassWeapon(DefaultProjectileWeapon) {
-    FxMuzzleFlash = EffectTemplate.AIFBallisticMortarFlash02,
+---@class AAATemporalFizzWeapon : DefaultProjectileWeapon
+AAATemporalFizzWeapon = ClassWeapon(DefaultProjectileWeapon) {
+    FxChargeEffects = {'/effects/emitters/temporal_fizz_muzzle_charge_01_emit.bp', },
+    FxMuzzleFlash = {'/effects/emitters/temporal_fizz_muzzle_flash_01_emit.bp', },
+
+    ---@param self AAATemporalFizzWeapon
+    PlayFxRackSalvoChargeSequence = function(self)
+        DefaultProjectileWeapon.PlayFxRackSalvoChargeSequence(self)
+        for _, v in self.ChargeEffectMuzzles do
+            for i, j in self.FxChargeEffects do
+                CreateAttachedEmitter(self.unit, v, self.unit.Army, j)
+            end
+        end
+    end,
 }

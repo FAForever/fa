@@ -20,11 +20,10 @@
 --** SOFTWARE.
 --**********************************************************************************
 
-local DefaultProjectileWeapon = import('/lua/sim/defaultweapons.lua').DefaultProjectileWeapon
-local EffectTemplate = import('/lua/effecttemplates.lua')
+local DefaultBeamWeapon = import("/lua/sim/defaultweapons.lua").DefaultBeamWeapon
+local TractorClawCollisionBeam = import("/lua/defaultcollisionbeams.lua").TractorClawCollisionBeam
 
----Aeon Mortar Weapon
----@class AIFBallisticMortarWeapon: DefaultProjectileWeapon
-AIFBallisticMortarWeapon = ClassWeapon(DefaultProjectileWeapon) {
-    FxMuzzleFlash = EffectTemplate.AIFBallisticMortarFlash02,
+---@class ADFTractorClawStructure : DefaultBeamWeapon
+ADFTractorClawStructure = ClassWeapon(DefaultBeamWeapon) {
+    BeamType = TractorClawCollisionBeam,
 }

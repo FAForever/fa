@@ -20,11 +20,28 @@
 --** SOFTWARE.
 --**********************************************************************************
 
-local DefaultProjectileWeapon = import('/lua/sim/defaultweapons.lua').DefaultProjectileWeapon
-local EffectTemplate = import('/lua/effecttemplates.lua')
+local DefaultBeamWeapon = import("/lua/sim/defaultweapons.lua").DefaultBeamWeapon
+local CollisionBeamFile = import("/lua/defaultcollisionbeams.lua")
+local EffectTemplate = import("/lua/effecttemplates.lua")
 
----Aeon Mortar Weapon
----@class AIFBallisticMortarWeapon: DefaultProjectileWeapon
-AIFBallisticMortarWeapon = ClassWeapon(DefaultProjectileWeapon) {
-    FxMuzzleFlash = EffectTemplate.AIFBallisticMortarFlash02,
+---@class ADFPhasonLaser : DefaultBeamWeapon
+ADFPhasonLaser = ClassWeapon(DefaultBeamWeapon) {
+    BeamType = CollisionBeamFile.PhasonLaserCollisionBeam,
+    FxMuzzleFlash = { },
+    FxChargeMuzzleFlash = { },
+    FxUpackingChargeEffects = EffectTemplate.CMicrowaveLaserCharge01,
+    FxUpackingChargeEffectScale = 1,
+
+    ---@param self ADFPhasonLaser
+    PlayFxWeaponUnpackSequence = function(self)
+        if not self.ContBeamOn then
+            local bp = self.Blueprint
+            for _, v in self.FxUpackingChargeEffects do
+                for i, j in bp.RackBones[self.CurrentRackSalvoNumber].MuzzleBones do
+                    CreateAttachedEmitter(self.unit, j, self.unit.Army, v):ScaleEmitter(self.FxUpackingChargeEffectScale)
+                end
+            end
+            DefaultBeamWeapon.PlayFxWeaponUnpackSequence(self)
+        end
+    end,
 }
