@@ -32,11 +32,6 @@ ProjectileBlueprint {
     },
     General = {
         Category = 'Direct Fire',
-        EntityCategory = {
-            'UEF',
-            'PROJECTILE',
-            'DIRECTFIRE',
-        },
         Faction = 'UEF',
         Weapon = 'Gauss Cannon',
     },
