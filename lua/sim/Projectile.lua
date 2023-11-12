@@ -289,7 +289,7 @@ Projectile = ClassProjectile(ProjectileMethods) {
             launcher:OnMissileIntercepted(self:GetCurrentTargetPosition(), instigator, self:GetPosition())
 
             -- keep track of the number of intercepted missiles
-            if not IsDestroyed(instigator) then
+            if not IsDestroyed(instigator) and instigator.GetStat then
                 instigator:UpdateStat('KILLS', instigator:GetStat('KILLS', 0).Value + 1)
             end
         end
