@@ -54,6 +54,7 @@ TIFMissileNukeCDR = ClassProjectile(TIFMissileNuke, TacticalMissileComponent) {
         self:CreateEffects(self.ThrustEffects, self.Army, 1)
     end,
 
+    ---@param self TIFMissileNukeCDR
     OnEnterWater = function(self)
         TIFMissileNuke.OnEnterWater(self)
         self:SetDestroyOnWater(true)
