@@ -98,6 +98,8 @@ local EffectTemplate = import("/lua/effecttemplates.lua")
 local NukeProjectile = import("/lua/sim/defaultprojectiles.lua").NukeProjectile
 
 local DebrisComponent = import('/lua/sim/projectiles/components/DebrisComponent.lua').DebrisComponent
-local TacticalMissileComponent = import('/lua/sim/DefaultProjectiles.lua').TacticalMissileComponent
+local TacticalMissileComponent = import('/lua/sim/defaultprojectiles.lua').TacticalMissileComponent
 
+--#endregion
 -------------------------------------------------------------------------------
+

@@ -1,12 +1,9 @@
---****************************************************************************
---**
---**  File     :  /lua/cybranweapons.lua
---**  Author(s):  David Tomandl, John Comes, Gordon Duclos
---**
---**  Summary  :  Cybran weapon definitions
---**
---**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
---****************************************************************************
+------------------------------------------------------------------------------
+-- File     :  /lua/cybranweapons.lua
+-- Author(s):  David Tomandl, John Comes, Gordon Duclos
+-- Summary  :  Cybran weapon definitions
+-- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+------------------------------------------------------------------------------
 
 local WeaponFile = import("/lua/sim/defaultweapons.lua")
 local KamikazeWeapon = WeaponFile.KamikazeWeapon
@@ -53,6 +50,7 @@ CDFHeavyMicrowaveLaserGeneratorCom = ClassWeapon(DefaultBeamWeapon) {
 
 --- SPIDER BOT WEAPON!
 ---@class CDFHeavyMicrowaveLaserGenerator : DefaultBeamWeapon
+---@field RotatorManip moho.RotateManipulator
 CDFHeavyMicrowaveLaserGenerator = ClassWeapon(DefaultBeamWeapon) {
     BeamType = CollisionBeamFile.MicrowaveLaserCollisionBeam01,
     FxUpackingChargeEffects = EffectTemplate.CMicrowaveLaserCharge01,
@@ -277,6 +275,7 @@ CAMEMPMissileWeapon = ClassWeapon(DefaultProjectileWeapon) {
 }
 
 ---@class CAMZapperWeapon : DefaultBeamWeapon
+---@field SphereEffectEntity Entity
 CAMZapperWeapon = ClassWeapon(DefaultBeamWeapon) {
 
     BeamType = CollisionBeamFile.ZapperCollisionBeam,
@@ -331,6 +330,7 @@ CAMZapperWeapon02 = ClassWeapon(DefaultBeamWeapon) {
 }
 
 ---@class CAMZapperWeapon03 : DefaultBeamWeapon
+---@field SphereEffectEntity Entity
 CAMZapperWeapon03 = ClassWeapon(DefaultBeamWeapon) {
 
     BeamType = CollisionBeamFile.ZapperCollisionBeam,
@@ -392,6 +392,7 @@ CKrilTorpedoLauncherWeapon = ClassWeapon(DefaultProjectileWeapon) {
 }
 
 ---@class CMobileKamikazeBombWeapon : KamikazeWeapon
+---@field transportDrop boolean
 CMobileKamikazeBombWeapon = ClassWeapon(KamikazeWeapon) {
     FxDeath = EffectTemplate.CMobileKamikazeBombExplosion,
 
