@@ -9,313 +9,58 @@
 --**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local WeaponFile = import("/lua/sim/defaultweapons.lua")
-local CollisionBeamFile = import("/lua/defaultcollisionbeams.lua")
-local DefaultProjectileWeapon = WeaponFile.DefaultProjectileWeapon
-local DefaultBeamWeapon = WeaponFile.DefaultBeamWeapon
-local OverchargeWeapon = WeaponFile.OverchargeWeapon
-local EffectTemplate = import("/lua/effecttemplates.lua")
+SANAnaitTorpedo = import('/lua/sim/weapons/seraphim/SANAnaitTorpedo.lua').SANAnaitTorpedo
+SDFExperimentalPhasonProj = import('/lua/sim/weapons/seraphim/SDFExperimentalPhasonProj.lua').SDFExperimentalPhasonProj
+SDFAireauWeapon = import('/lua/sim/weapons/seraphim/SDFAireauWeapon.lua').SDFAireauWeapon
+SDFSinnuntheWeapon = import('/lua/sim/weapons/seraphim/SDFSinnuntheWeapon.lua').SDFSinnuntheWeapon
+SIFInainoWeapon = import('/lua/sim/weapons/seraphim/SIFInainoWeapon.lua').SIFInainoWeapon
+SIFHuAntiNukeWeapon = import('/lua/sim/weapons/seraphim/SIFHuAntiNukeWeapon.lua').SIFHuAntiNukeWeapon
+SIFExperimentalStrategicMissile = import('/lua/sim/weapons/seraphim/SIFExperimentalStrategicMissile.lua').SIFExperimentalStrategicMissile
+SDFPhasicAutoGunWeapon = import('/lua/sim/weapons/seraphim/SDFPhasicAutoGunWeapon.lua').SDFPhasicAutoGunWeapon
+SDFHeavyPhasicAutoGunTankWeapon = import('/lua/sim/weapons/seraphim/SDFHeavyPhasicAutoGunTankWeapon.lua').SDFHeavyPhasicAutoGunTankWeapon
+SDFHeavyPhasicAutoGunWeapon = import('/lua/sim/weapons/seraphim/SDFHeavyPhasicAutoGunWeapon.lua').SDFHeavyPhasicAutoGunWeapon
+SDFOhCannon = import('/lua/sim/weapons/seraphim/SDFOhCannon.lua').SDFOhCannon
+SDFOhCannon02 = import('/lua/sim/weapons/seraphim/SDFOhCannon02.lua').SDFOhCannon02
+SDFShriekerCannon = import('/lua/sim/weapons/seraphim/SDFShriekerCannon.lua').SDFShriekerCannon
+SIFLaanseTacticalMissileLauncher = import('/lua/sim/weapons/seraphim/SIFLaanseTacticalMissileLauncher.lua').SIFLaanseTacticalMissileLauncher
+SIFZthuthaamArtilleryCannon = import('/lua/sim/weapons/seraphim/SIFZthuthaamArtilleryCannon.lua').SIFZthuthaamArtilleryCannon
+SDFThauCannon = import('/lua/sim/weapons/seraphim/SDFThauCannon.lua').SDFThauCannon
+SDFAireauBolterWeapon = import('/lua/sim/weapons/seraphim/SDFAireauBolterWeapon.lua').SDFAireauBolterWeapon
+SDFAireauBolterWeapon02 = import('/lua/sim/weapons/seraphim/SDFAireauBolterWeapon02.lua').SDFAireauBolterWeapon02
+SANUallCavitationTorpedo = import('/lua/sim/weapons/seraphim/SANUallCavitationTorpedo.lua').SANUallCavitationTorpedo
+SANHeavyCavitationTorpedo = import('/lua/sim/weapons/seraphim/SANHeavyCavitationTorpedo.lua').SANHeavyCavitationTorpedo
+SANHeavyCavitationTorpedo02 = import('/lua/sim/weapons/seraphim/SANHeavyCavitationTorpedo02.lua').SANHeavyCavitationTorpedo02
+SDFChronotronCannonWeapon = import('/lua/sim/weapons/seraphim/SDFChronotronCannonWeapon.lua').SDFChronotronCannonWeapon
+SDFChronotronCannonOverChargeWeapon = import('/lua/sim/weapons/seraphim/SDFChronotronCannonOverChargeWeapon.lua').SDFChronotronCannonOverChargeWeapon
+SDFLightChronotronCannonWeapon = import('/lua/sim/weapons/seraphim/SDFLightChronotronCannonWeapon.lua').SDFLightChronotronCannonWeapon
+SDFLightChronotronCannonOverchargeWeapon = import('/lua/sim/weapons/seraphim/SDFLightChronotronCannonOverchargeWeapon.lua').SDFLightChronotronCannonOverchargeWeapon
+SAAShleoCannonWeapon = import('/lua/sim/weapons/seraphim/SAAShleoCannonWeapon.lua').SAAShleoCannonWeapon
+SAAOlarisCannonWeapon = import('/lua/sim/weapons/seraphim/SAAOlarisCannonWeapon.lua').SAAOlarisCannonWeapon
+SAALosaareAutoCannonWeapon = import('/lua/sim/weapons/seraphim/SAALosaareAutoCannonWeapon.lua').SAALosaareAutoCannonWeapon
+SAALosaareAutoCannonWeaponAirUnit = import('/lua/sim/weapons/seraphim/SAALosaareAutoCannonWeaponAirUnit.lua').SAALosaareAutoCannonWeaponAirUnit
+SAALosaareAutoCannonWeaponSeaUnit = import('/lua/sim/weapons/seraphim/SAALosaareAutoCannonWeaponSeaUnit.lua').SAALosaareAutoCannonWeaponSeaUnit
+SDFAjelluAntiTorpedoDefense = import('/lua/sim/weapons/seraphim/SDFAjelluAntiTorpedoDefense.lua').SDFAjelluAntiTorpedoDefense
+SIFThunthoCannonWeapon = import('/lua/sim/weapons/seraphim/SIFThunthoCannonWeapon.lua').SIFThunthoCannonWeapon
+SIFSuthanusArtilleryCannon = import('/lua/sim/weapons/seraphim/SIFSuthanusArtilleryCannon.lua').SIFSuthanusArtilleryCannon
+SIFSuthanusMobileArtilleryCannon = import('/lua/sim/weapons/seraphim/SIFSuthanusMobileArtilleryCannon.lua').SIFSuthanusMobileArtilleryCannon
+SDFExperimentalPhasonLaser = import('/lua/sim/weapons/seraphim/SDFExperimentalPhasonLaser.lua').SDFExperimentalPhasonLaser
+SDFUnstablePhasonBeam = import('/lua/sim/weapons/seraphim/SDFUnstablePhasonBeam.lua').SDFUnstablePhasonBeam
+SDFUltraChromaticBeamGenerator = import('/lua/sim/weapons/seraphim/SDFUltraChromaticBeamGenerator.lua').SDFUltraChromaticBeamGenerator
+SDFUltraChromaticBeamGenerator02 = import('/lua/sim/weapons/seraphim/SDFUltraChromaticBeamGenerator02.lua').SDFUltraChromaticBeamGenerator02
+SLaanseMissileWeapon = import('/lua/sim/weapons/seraphim/SLaanseMissileWeapon.lua').SLaanseMissileWeapon
+SExperimentalStrategicMissileWeapon = import('/lua/sim/weapons/seraphim/SExperimentalStrategicMissileWeapon.lua').SExperimentalStrategicMissileWeapon
+SAMElectrumMissileDefense = import('/lua/sim/weapons/seraphim/SAMElectrumMissileDefense.lua').SAMElectrumMissileDefense
+SDFBombOtheWeapon = import('/lua/sim/weapons/seraphim/SDFBombOtheWeapon.lua').SDFBombOtheWeapon
+SIFBombZhanaseeWeapon = import('/lua/sim/weapons/seraphim/SIFBombZhanaseeWeapon.lua').SIFBombZhanaseeWeapon
+SDFHeavyQuarnonCannon = import('/lua/sim/weapons/seraphim/SDFHeavyQuarnonCannon.lua').SDFHeavyQuarnonCannon
+SDFSniperShotNormalMode = import('/lua/sim/weapons/seraphim/SDFSniperShotNormalMode.lua').SDFSniperShotNormalMode
+SDFSniperShotSniperMode = import('/lua/sim/weapons/seraphim/SDFSniperShotSniperMode.lua').SDFSniperShotSniperMode
+SB0OhwalliExperimentalStrategicBombWeapon = import('/lua/sim/weapons/seraphim/SB0OhwalliExperimentalStrategicBombWeapon.lua').SB0OhwalliExperimentalStrategicBombWeapon
 
----@class SANAnaitTorpedo : DefaultProjectileWeapon
-SANAnaitTorpedo = ClassWeapon(DefaultProjectileWeapon) {
-    FxMuzzleFlash = EffectTemplate.SAnaitTorpedoMuzzleFlash,
-}
-
----@class SDFExperimentalPhasonProj : DefaultProjectileWeapon
-SDFExperimentalPhasonProj = ClassWeapon(DefaultProjectileWeapon) {
-    FxMuzzleFlash = EffectTemplate.SDFExperimentalPhasonProjMuzzleFlash,
-    FxChargeMuzzleFlash = EffectTemplate.SDFExperimentalPhasonProjChargeMuzzleFlash,
-}
-
----@class SDFAireauWeapon : DefaultProjectileWeapon
-SDFAireauWeapon = ClassWeapon(DefaultProjectileWeapon) {
-    FxMuzzleFlash = EffectTemplate.SDFAireauWeaponMuzzleFlash,
-}
-
----@class SDFSinnuntheWeapon : DefaultProjectileWeapon
-SDFSinnuntheWeapon = ClassWeapon(DefaultProjectileWeapon) {
-    FxMuzzleFlash = EffectTemplate.SDFSinnutheWeaponMuzzleFlash,
-    FxChargeMuzzleFlash = EffectTemplate.SDFSinnutheWeaponChargeMuzzleFlash
-}
-
----@class SIFInainoWeapon : DefaultProjectileWeapon
-SIFInainoWeapon = ClassWeapon(DefaultProjectileWeapon) {
-    FxMuzzleFlash = EffectTemplate.SIFInainoLaunch01,
-}
-
----@class SIFHuAntiNukeWeapon : DefaultProjectileWeapon
-SIFHuAntiNukeWeapon = ClassWeapon(DefaultProjectileWeapon) {
-    FxMuzzleFlash = EffectTemplate.SKhuAntiNukeMuzzleFlash,
-}
-
----@class SIFExperimentalStrategicMissile : DefaultProjectileWeapon
-SIFExperimentalStrategicMissile = ClassWeapon(DefaultProjectileWeapon) {
-    FxMuzzleFlash = EffectTemplate.SIFExperimentalStrategicMissileLaunch01,
-    FxChargeMuzzleFlash = EffectTemplate.SIFExperimentalStrategicMissileChargeLaunch01,
-}
-
----@class SDFPhasicAutoGunWeapon : DefaultProjectileWeapon
-SDFPhasicAutoGunWeapon = ClassWeapon(DefaultProjectileWeapon) {
-    FxMuzzleFlash = EffectTemplate.PhasicAutoGunMuzzleFlash,
-}
-
----@class SDFHeavyPhasicAutoGunTankWeapon : DefaultProjectileWeapon
-SDFHeavyPhasicAutoGunTankWeapon = ClassWeapon(DefaultProjectileWeapon) {
-    FxMuzzleFlash = EffectTemplate.HeavyPhasicAutoGunTankMuzzleFlash,
-}
-
----@class SDFHeavyPhasicAutoGunWeapon : DefaultProjectileWeapon
-SDFHeavyPhasicAutoGunWeapon = ClassWeapon(DefaultProjectileWeapon) {
-    FxMuzzleFlash = EffectTemplate.HeavyPhasicAutoGunMuzzleFlash,
-}
-
----@class SDFOhCannon : DefaultProjectileWeapon
-SDFOhCannon = ClassWeapon(DefaultProjectileWeapon) {
-    FxMuzzleFlash = EffectTemplate.OhCannonMuzzleFlash,
-}
-
----@class SDFOhCannon02 : DefaultProjectileWeapon
-SDFOhCannon02 = ClassWeapon(DefaultProjectileWeapon) {
-    FxMuzzleFlash = EffectTemplate.OhCannonMuzzleFlash02,
-}
-
----@class SDFShriekerCannon : DefaultProjectileWeapon
-SDFShriekerCannon = ClassWeapon(DefaultProjectileWeapon) {
-    FxMuzzleFlash = EffectTemplate.ShriekerCannonMuzzleFlash,
-}
-
--- Units: XSL0111
----@class SIFLaanseTacticalMissileLauncher : DefaultProjectileWeapon
-SIFLaanseTacticalMissileLauncher = ClassWeapon(DefaultProjectileWeapon) {
-    FxMuzzleFlash = EffectTemplate.SLaanseMissleMuzzleFlash,
-}
-
--- Units: XSB2303
----@class SIFZthuthaamArtilleryCannon : DefaultProjectileWeapon
-SIFZthuthaamArtilleryCannon = ClassWeapon(DefaultProjectileWeapon) {
-    FxMuzzleFlash= EffectTemplate.SZthuthaamArtilleryMuzzleFlash,
-    FxChargeMuzzleFlash= EffectTemplate.SZthuthaamArtilleryChargeMuzzleFlash,
-}
-
--- Units: XSL0303
----@class SDFThauCannon : DefaultProjectileWeapon
-SDFThauCannon = ClassWeapon(DefaultProjectileWeapon) {
-    FxMuzzleFlash = EffectTemplate.STauCannonMuzzleFlash,
-    FxMuzzleTerrainTypeName = 'ThauTerrainMuzzle',
-
-    PlayFxMuzzleSequence = function(self, muzzle)
-        DefaultProjectileWeapon.PlayFxMuzzleSequence(self, muzzle)
-        local pos = self.unit:GetPosition()
-        local TerrainType = GetTerrainType(pos.x,pos.z)
-        local effectTable = TerrainType.FXOther[self.unit.Layer][self.FxMuzzleTerrainTypeName]
-        if effectTable ~= nil then
-            local army = self.unit.Army
-            for k, v in effectTable do
-                CreateAttachedEmitter(self.unit, muzzle, army, v)
-            end
-        end
-    end,
-}
-
--- Units: XSL0303
----@class SDFAireauBolterWeapon : DefaultProjectileWeapon
-SDFAireauBolterWeapon = ClassWeapon(DefaultProjectileWeapon) {
-    FxMuzzleFlash = EffectTemplate.SAireauBolterMuzzleFlash,
-}
-
--- Units: XSL0202
----@class SDFAireauBolterWeapon02 : DefaultProjectileWeapon
-SDFAireauBolterWeapon02 = ClassWeapon(DefaultProjectileWeapon) {
-    FxMuzzleFlash = EffectTemplate.SAireauBolterMuzzleFlash02,
-}
-
--- Units: XSL0303
----@class SANUallCavitationTorpedo : DefaultProjectileWeapon
-SANUallCavitationTorpedo = ClassWeapon(DefaultProjectileWeapon) {
-    FxMuzzleFlash = EffectTemplate.SUallTorpedoMuzzleFlash
-}
-
----@class SANAnaitTorpedo : DefaultProjectileWeapon
-SANAnaitTorpedo = ClassWeapon(DefaultProjectileWeapon) {
-    FxMuzzleFlash = EffectTemplate.SAnaitTorpedoMuzzleFlash
-}
-
----@class SANHeavyCavitationTorpedo : DefaultProjectileWeapon
-SANHeavyCavitationTorpedo = ClassWeapon(DefaultProjectileWeapon) {
-    FxMuzzleFlash = EffectTemplate.SHeavyCavitationTorpedoMuzzleFlash
-}
-
----@class SANHeavyCavitationTorpedo02 : DefaultProjectileWeapon
-SANHeavyCavitationTorpedo02 = ClassWeapon(DefaultProjectileWeapon) {
-    FxMuzzleFlash = EffectTemplate.SHeavyCavitationTorpedoMuzzleFlash02
-}
-
----@class SDFChronotronCannonWeapon : DefaultProjectileWeapon
-SDFChronotronCannonWeapon = ClassWeapon(DefaultProjectileWeapon) {
-    FxMuzzleFlash = EffectTemplate.SChronotronCannonMuzzle,
-    FxChargeMuzzleFlash = EffectTemplate.SChronotronCannonMuzzleCharge,
-}
-
----@class SDFChronotronCannonOverChargeWeapon : OverchargeWeapon
-SDFChronotronCannonOverChargeWeapon = ClassWeapon(OverchargeWeapon) {
-    FxMuzzleFlash = EffectTemplate.SChronotronCannonOverChargeMuzzle,
-    DesiredWeaponLabel = 'ChronotronCannon'
-}
-
--- Units: XSL0301
----@class SDFLightChronotronCannonWeapon : DefaultProjectileWeapon
-SDFLightChronotronCannonWeapon = ClassWeapon(DefaultProjectileWeapon) {
-    FxMuzzleFlash = EffectTemplate.SLightChronotronCannonMuzzleFlash,
-}
-
----@class SDFLightChronotronCannonOverchargeWeapon : OverchargeWeapon
-SDFLightChronotronCannonOverchargeWeapon = ClassWeapon(OverchargeWeapon) {
-    FxMuzzleFlash = EffectTemplate.SLightChronotronCannonOverChargeMuzzleFlash,
-    DesiredWeaponLabel = 'LightChronatronCannon'
-}
-
----@class SAAShleoCannonWeapon : DefaultProjectileWeapon
-SAAShleoCannonWeapon = ClassWeapon(DefaultProjectileWeapon) {
-    FxMuzzleFlash = EffectTemplate.SShleoCannonMuzzleFlash,
-}
-
----@class SAAOlarisCannonWeapon : DefaultProjectileWeapon
-SAAOlarisCannonWeapon = ClassWeapon(DefaultProjectileWeapon) {
-    FxChargeEffects = EffectTemplate.SOlarisCannonMuzzleCharge,
-    FxMuzzleFlash = EffectTemplate.SOlarisCannonMuzzleFlash01,
-}
-
----@class SAALosaareAutoCannonWeapon : DefaultProjectileWeapon
-SAALosaareAutoCannonWeapon = ClassWeapon(DefaultProjectileWeapon) {
-    FxMuzzleFlash = EffectTemplate.SLosaareAutoCannonMuzzleFlash,
-}
----@class SAALosaareAutoCannonWeaponAirUnit : DefaultProjectileWeapon
-SAALosaareAutoCannonWeaponAirUnit = ClassWeapon(DefaultProjectileWeapon) {
-    FxMuzzleFlash = EffectTemplate.SLosaareAutoCannonMuzzleFlashAirUnit,
-}
----@class SAALosaareAutoCannonWeaponSeaUnit : DefaultProjectileWeapon
-SAALosaareAutoCannonWeaponSeaUnit = ClassWeapon(DefaultProjectileWeapon) {
-    FxMuzzleFlash = EffectTemplate.SLosaareAutoCannonMuzzleFlashSeaUnit,
-}
-
----@class SDFAjelluAntiTorpedoDefense : DefaultProjectileWeapon
-SDFAjelluAntiTorpedoDefense = ClassWeapon(DefaultProjectileWeapon) {
-    FxMuzzleFlash = EffectTemplate.SDFAjelluAntiTorpedoLaunch01,
-}
-
----@class SIFThunthoCannonWeapon : DefaultProjectileWeapon
-SIFThunthoCannonWeapon = ClassWeapon(DefaultProjectileWeapon) {
-    FxMuzzleFlash = EffectTemplate.SThunderStormCannonMuzzleFlash,
-}
-
----@class SIFSuthanusArtilleryCannon : DefaultProjectileWeapon
-SIFSuthanusArtilleryCannon = ClassWeapon(DefaultProjectileWeapon) {
-    FxChargeMuzzleFlash = EffectTemplate.SRifterArtilleryChargeMuzzleFlash,
-    FxMuzzleFlash = EffectTemplate.SRifterArtilleryMuzzleFlash,
-}
-
----@class SIFSuthanusMobileArtilleryCannon : DefaultProjectileWeapon
-SIFSuthanusMobileArtilleryCannon = ClassWeapon(DefaultProjectileWeapon) {
-    FxChargeMuzzleFlash = EffectTemplate.SRifterMobileArtilleryChargeMuzzleFlash,
-    FxMuzzleFlash = EffectTemplate.SRifterMobileArtilleryMuzzleFlash,
-}
-
----@class SDFExperimentalPhasonLaser : DefaultBeamWeapon
-SDFExperimentalPhasonLaser = ClassWeapon(DefaultBeamWeapon) {
-    BeamType = CollisionBeamFile.ExperimentalPhasonLaserCollisionBeam,
-    FxUpackingChargeEffects = EffectTemplate.SChargeExperimentalPhasonLaser,
-    FxUpackingChargeEffectScale = 1,
-
-    PlayFxWeaponUnpackSequence = function(self)
-        if not self.ContBeamOn then
-            local army = self.unit.Army
-            local bp = self.Blueprint
-            for k, v in self.FxUpackingChargeEffects do
-                for ek, ev in bp.RackBones[self.CurrentRackSalvoNumber].MuzzleBones do
-                    CreateAttachedEmitter(self.unit, ev, army, v):ScaleEmitter(self.FxUpackingChargeEffectScale)
-                end
-            end
-            DefaultBeamWeapon.PlayFxWeaponUnpackSequence(self)
-        end
-    end,
-}
-
----@class SDFUnstablePhasonBeam : DefaultBeamWeapon
-SDFUnstablePhasonBeam = ClassWeapon(DefaultBeamWeapon) {
-    BeamType = CollisionBeamFile.UnstablePhasonLaserCollisionBeam,
-    FxUpackingChargeEffects = EffectTemplate.CMicrowaveLaserCharge01,
-    FxUpackingChargeEffectScale = 1,
-}
-
----@class SDFUltraChromaticBeamGenerator : DefaultBeamWeapon
-SDFUltraChromaticBeamGenerator = ClassWeapon(DefaultBeamWeapon) {
-    BeamType = CollisionBeamFile.UltraChromaticBeamGeneratorCollisionBeam,
-    FxUpackingChargeEffects = EffectTemplate.SChargeUltraChromaticBeamGenerator,
-    FxUpackingChargeEffectScale = 1,
-
-    PlayFxWeaponUnpackSequence = function(self)
-        if not self.ContBeamOn then
-            local army = self.unit.Army
-            local bp = self.Blueprint
-            for k, v in self.FxUpackingChargeEffects do
-                for ek, ev in bp.RackBones[self.CurrentRackSalvoNumber].MuzzleBones do
-                    CreateAttachedEmitter(self.unit, ev, army, v):ScaleEmitter(self.FxUpackingChargeEffectScale)
-                end
-            end
-            DefaultBeamWeapon.PlayFxWeaponUnpackSequence(self)
-        end
-    end,
-}
-
----@class SDFUltraChromaticBeamGenerator02 : SDFUltraChromaticBeamGenerator
-SDFUltraChromaticBeamGenerator02 = ClassWeapon(SDFUltraChromaticBeamGenerator) {
-    BeamType = CollisionBeamFile.UltraChromaticBeamGeneratorCollisionBeam02,
-}
-
----@class SLaanseMissileWeapon : DefaultProjectileWeapon
-SLaanseMissileWeapon = ClassWeapon(DefaultProjectileWeapon) {
-    FxMuzzleFlash = EffectTemplate.SLaanseMissleMuzzleFlash,
-}
-
----@class SExperimentalStrategicMissileWeapon : DefaultProjectileWeapon
-SExperimentalStrategicMissileWeapon = ClassWeapon(DefaultProjectileWeapon) {
-    FxMuzzleFlash = EffectTemplate.SExperimentalStrategicMissileMuzzleFlash,
-}
-
----@class SAMElectrumMissileDefense : DefaultProjectileWeapon
-SAMElectrumMissileDefense = ClassWeapon(DefaultProjectileWeapon) {
-    FxMuzzleFlash = EffectTemplate.SElectrumMissleDefenseMuzzleFlash,
-}
-
----@class SDFBombOtheWeapon : DefaultProjectileWeapon
-SDFBombOtheWeapon = ClassWeapon(DefaultProjectileWeapon) {
-    FxMuzzleFlash = EffectTemplate.SOtheBombMuzzleFlash,
-}
-
----@class SIFBombZhanaseeWeapon : DefaultProjectileWeapon
-SIFBombZhanaseeWeapon = ClassWeapon(DefaultProjectileWeapon) {
-    FxMuzzleFlash = EffectTemplate.SZhanaseeMuzzleFlash01,
-}
-
----@class SDFHeavyQuarnonCannon : DefaultProjectileWeapon
-SDFHeavyQuarnonCannon = ClassWeapon(DefaultProjectileWeapon) {
-    FxMuzzleFlash = EffectTemplate.SHeavyQuarnonCannonMuzzleFlash,
-}
-
----@class SDFSniperShotNormalMode : DefaultProjectileWeapon
-SDFSniperShotNormalMode = ClassWeapon(DefaultProjectileWeapon) {
-    FxMuzzleFlash = EffectTemplate.SDFSniperShotNormalMuzzleFlash,
-}
-
----@class SDFSniperShotSniperMode : DefaultProjectileWeapon
-SDFSniperShotSniperMode = ClassWeapon(DefaultProjectileWeapon) {
-    FxMuzzleFlash = EffectTemplate.SDFSniperShotMuzzleFlash,
-}
-
----@class SB0OhwalliExperimentalStrategicBombWeapon : DefaultProjectileWeapon
-SB0OhwalliExperimentalStrategicBombWeapon = ClassWeapon(DefaultProjectileWeapon) {}
 
 --- Kept Mod Support
+local WeaponFile = import("/lua/sim/defaultweapons.lua")
+local CollisionBeamFile = import("/lua/defaultcollisionbeams.lua")
 local KamikazeWeapon = WeaponFile.KamikazeWeapon
 local BareBonesWeapon = WeaponFile.BareBonesWeapon
 local Explosion = import("/lua/defaultexplosions.lua")
@@ -323,3 +68,8 @@ local DisruptorBeamCollisionBeam = CollisionBeamFile.DisruptorBeamCollisionBeam
 local QuantumBeamGeneratorCollisionBeam = CollisionBeamFile.QuantumBeamGeneratorCollisionBeam
 local PhasonLaserCollisionBeam = CollisionBeamFile.PhasonLaserCollisionBeam
 local TractorClawCollisionBeam = CollisionBeamFile.TractorClawCollisionBeam
+local CollisionBeamFile = import("/lua/defaultcollisionbeams.lua")
+local DefaultProjectileWeapon = WeaponFile.DefaultProjectileWeapon
+local DefaultBeamWeapon = WeaponFile.DefaultBeamWeapon
+local OverchargeWeapon = WeaponFile.OverchargeWeapon
+local EffectTemplate = import("/lua/effecttemplates.lua")
