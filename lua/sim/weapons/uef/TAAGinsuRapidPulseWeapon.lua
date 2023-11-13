@@ -24,5 +24,5 @@ local DefaultProjectileWeapon = import('/lua/sim/defaultweapons.lua').DefaultPro
 
 ---@class TAAGinsuRapidPulseWeapon : DefaultProjectileWeapon
 TAAGinsuRapidPulseWeapon = ClassWeapon(DefaultProjectileWeapon) {
-    FxMuzzleFlash = { },
+    FxMuzzleFlash = {},
 }

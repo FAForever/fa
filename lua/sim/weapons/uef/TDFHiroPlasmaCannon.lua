@@ -26,5 +26,5 @@ local CollisionBeams = import("/lua/defaultcollisionbeams.lua")
 ---@class TDFHiroPlasmaCannon : DefaultBeamWeapon
 TDFHiroPlasmaCannon = ClassWeapon(DefaultBeamWeapon) {
     BeamType = CollisionBeams.TDFHiroCollisionBeam,
-    FxMuzzleFlash = { },
+    FxMuzzleFlash = {},
 }

@@ -21,7 +21,12 @@
 --**********************************************************************************
 
 local DefaultProjectileWeapon = import('/lua/sim/defaultweapons.lua').DefaultProjectileWeapon
+local DefaultProjectileWeaponPlayFxMuzzleSequence = DefaultProjectileWeapon.PlayFxMuzzleSequence
+
 local EffectTemplate = import('/lua/EffectTemplates.lua')
+
+-- upvalue scope for performance
+local CreateAttachedEmitter = CreateAttachedEmitter
 
 ---@class TAMPhalanxWeapon : DefaultProjectileWeapon
 TAMPhalanxWeapon = ClassWeapon(DefaultProjectileWeapon) {
@@ -31,12 +36,16 @@ TAMPhalanxWeapon = ClassWeapon(DefaultProjectileWeapon) {
     ---@param self TAMPhalanxWeapon
     ---@param muzzle Bone
     PlayFxMuzzleSequence = function(self, muzzle)
-        DefaultProjectileWeapon.PlayFxMuzzleSequence(self, muzzle)
+        DefaultProjectileWeaponPlayFxMuzzleSequence(self, muzzle)
+
         local unit = self.unit
-        local turrentBonePitch = self.Blueprint.TurretBonePitch
         local army = self.Army
-        for k, v in self.FxShellEject do
-            CreateAttachedEmitter(unit, turrentBonePitch, army, v)
+        local turretBonePitch = self.Blueprint.TurretBonePitch
+        local fxShellEject = self.FxShellEject
+        if turretBonePitch then
+            for k, v in fxShellEject do
+                CreateAttachedEmitter(unit, turretBonePitch, army, v)
+            end
         end
     end,
 }

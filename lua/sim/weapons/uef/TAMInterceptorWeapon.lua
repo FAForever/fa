@@ -24,5 +24,5 @@ local DefaultProjectileWeapon = import('/lua/sim/defaultweapons.lua').DefaultPro
 
 ---@class TAMInterceptorWeapon : DefaultProjectileWeapon
 TAMInterceptorWeapon = ClassWeapon(DefaultProjectileWeapon) {
-    FxMuzzleFlash = {'/effects/emitters/terran_antinuke_launch_01_emit.bp',},
+    FxMuzzleFlash = { '/effects/emitters/terran_antinuke_launch_01_emit.bp', },
 }

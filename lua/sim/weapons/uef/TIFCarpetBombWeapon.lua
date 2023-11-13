@@ -21,10 +21,11 @@
 --**********************************************************************************
 
 local DefaultProjectileWeapon = import('/lua/sim/defaultweapons.lua').DefaultProjectileWeapon
+local DefaultProjectileWeaponCreateProjectileAtMuzzle = DefaultProjectileWeapon.CreateProjectileAtMuzzle
 
 ---@class TIFCarpetBombWeapon : DefaultProjectileWeapon
 TIFCarpetBombWeapon = ClassWeapon(DefaultProjectileWeapon) {
-    FxMuzzleFlash = {'/effects/emitters/antiair_muzzle_fire_02_emit.bp',},
+    FxMuzzleFlash = { '/effects/emitters/antiair_muzzle_fire_02_emit.bp', },
 
     --- This function creates the projectile, and happens when the unit is trying to fire
     --- Called from inside RackSalvoFiringState
@@ -32,15 +33,15 @@ TIFCarpetBombWeapon = ClassWeapon(DefaultProjectileWeapon) {
     ---@param muzzle string
     ---@return Projectile
     CreateProjectileAtMuzzle = function(self, muzzle)
-        -- Adapt this function to keep the correct target lock during carpet bombing
+        -- adapt this function to keep the correct target lock during carpet bombing
         local data = self.CurrentSalvoData
         if data and data.usestore then
             local pos = data.targetpos
-            if pos then -- We are repeating, and have lost our original target
+            if pos then
                 self:SetTargetGround(pos)
             end
         end
 
-        return DefaultProjectileWeapon.CreateProjectileAtMuzzle(self, muzzle)
+        return DefaultProjectileWeaponCreateProjectileAtMuzzle(self, muzzle)
     end,
 }

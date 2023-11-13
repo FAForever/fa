@@ -21,6 +21,7 @@
 --**********************************************************************************
 
 local DefaultProjectileWeapon = import('/lua/sim/defaultweapons.lua').DefaultProjectileWeapon
+local DefaultProjectileWeaponCreateProjectileAtMuzzle = DefaultProjectileWeapon.CreateProjectileAtMuzzle
 
 ---@class TIFSmartCharge : DefaultProjectileWeapon
 TIFSmartCharge = ClassWeapon(DefaultProjectileWeapon) {
@@ -29,7 +30,8 @@ TIFSmartCharge = ClassWeapon(DefaultProjectileWeapon) {
     ---@param muzzle Bone
     ---@return Projectile
     CreateProjectileAtMuzzle = function(self, muzzle)
-        local proj = DefaultProjectileWeapon.CreateProjectileAtMuzzle(self, muzzle)
+        local proj = DefaultProjectileWeaponCreateProjectileAtMuzzle(self, muzzle)
+
         local blueprint = self.Blueprint.DepthCharge
         if blueprint then
             proj:AddDepthCharge(blueprint)
