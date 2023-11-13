@@ -436,7 +436,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
 
     -- Played when a muzzle is fired. Mostly used for muzzle flashes
     ---@param self DefaultProjectileWeapon
-    ---@param muzzle string
+    ---@param muzzle Bone
     PlayFxMuzzleSequence = function(self, muzzle)
         local unit = self.unit
         local army = self.Army
