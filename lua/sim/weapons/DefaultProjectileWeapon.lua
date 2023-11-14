@@ -20,9 +20,26 @@
 --** SOFTWARE.
 --**********************************************************************************
 local Weapon = import('/lua/sim/Weapon.lua').Weapon
+local WeaponOnCreate = Weapon.OnCreate
+local WeaponOnGotTarget = Weapon.OnGotTarget
+local WeaponOnLostTarget = Weapon.OnLostTarget
+local WeaponOnDestroy = Weapon.OnDestroy
+local WeaponOnMotionHorzEventChange = Weapon.OnMotionHorzEventChange
 
-local GetSurfaceHeight = GetSurfaceHeight
+-- upvalue scope for performance
+local WaitFor = WaitFor
+local WaitTicks = WaitTicks
+local WaitSeconds = WaitSeconds
+
 local VDist2 = VDist2
+local ForkThread = ForkThread
+local ChangeState = ChangeState
+local GetSurfaceHeight = GetSurfaceHeight
+
+local CreateSlider = CreateSlider
+local CreateAnimator = CreateAnimator
+
+local CreateAttachedEmitter = CreateAttachedEmitter
 
 local EntityMethods = moho.entity_methods
 local EntityGetPosition = EntityMethods.GetPosition
@@ -68,7 +85,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
     ---@param self DefaultProjectileWeapon
     ---@return boolean
     OnCreate = function(self)
-        Weapon.OnCreate(self)
+        WeaponOnCreate(self)
 
         local bp = self.Blueprint
         local rackBones = bp.RackBones
@@ -369,7 +386,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
     ---@param new string
     ---@param old string
     OnMotionHorzEventChange = function(self, new, old)
-        Weapon.OnMotionHorzEventChange(self, new, old)
+        WeaponOnMotionHorzEventChange(self, new, old)
 
         local blueprint = self.Blueprint
 
@@ -613,7 +630,9 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
                 recoilManipulatorBag:Add(tmpSldr)
             end
         end
-        self:ForkThread(self.PlayRackRecoilReturn, rackList)
+
+        local thread = ForkThread(self.PlayRackRecoilReturn, self, rackList)
+        self.Trash:Add(thread)
     end,
 
     -- The opposite function to PlayRackRecoil, returns the rack to default position
@@ -667,7 +686,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
             unit:OnLostTarget(self)
         end
 
-        Weapon.OnLostTarget(self)
+        WeaponOnLostTarget(self)
 
         if self.Blueprint.WeaponUnpacks then
             ChangeState(self, self.WeaponPackingState)
@@ -679,7 +698,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
     -- Sends the weapon to DeadState, probably called by the Owner
     ---@param self DefaultProjectileWeapon
     OnDestroy = function(self)
-        Weapon.OnDestroy(self)
+        WeaponOnDestroy(self)
         ChangeState(self, self.DeadState)
     end,
 
@@ -759,7 +778,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
         end,
 
         OnGotTarget = function(self)
-            Weapon.OnGotTarget(self)
+            WeaponOnGotTarget(self)
 
             local unit = self.unit
 
