@@ -21,6 +21,11 @@
 --**********************************************************************************
 
 local RadarJammerUnit = import('/lua/defaultunits.lua').RadarJammerUnit
+local RadarJammerUnitOnIntelEnabled = RadarJammerUnit.OnIntelEnabled
+local RadarJammerUnitOnIntelDisabled = RadarJammerUnit.OnIntelDisabled
+
+-- upvalue scope for performance
+local CreateRotator = CreateRotator
 
 ---@class TRadarJammerUnit : RadarJammerUnit
 ---@field MySpinner? moho.RotateManipulator
@@ -28,17 +33,20 @@ TRadarJammerUnit = ClassUnit(RadarJammerUnit) {
 
     ---@param self TRadarJammerUnit
     OnIntelEnabled = function(self, intel)
-        if not self.MySpinner then
-            self.MySpinner = CreateRotator(self, 'Spinner', 'y', nil, 0, 45, 180)
-            self.Trash:Add(self.MySpinner)
+        RadarJammerUnitOnIntelEnabled(self, intel)
+
+        local spinner = self.MySpinner
+        if not spinner then
+            spinner = CreateRotator(self, 'Spinner', 'y', nil, 0, 45, 180)
+            self.MySpinner = self.Trash:Add(spinner)
         end
-        RadarJammerUnit.OnIntelEnabled(self, intel)
-        self.MySpinner:SetTargetSpeed(180)
+
+        spinner:SetTargetSpeed(180)
     end,
 
     ---@param self TRadarJammerUnit
     OnIntelDisabled = function(self, intel)
-        RadarJammerUnit.OnIntelDisabled(self, intel)
+        RadarJammerUnitOnIntelDisabled(self, intel)
         self.MySpinner:SetTargetSpeed(0)
     end,
 }

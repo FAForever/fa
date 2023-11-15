@@ -30,7 +30,7 @@ TMobileFactoryUnit = ClassUnit(AmphibiousLandUnit) {
     ---@param layer Layer
     StartBeingBuiltEffects = function(self, builder, layer)
         self:SetMesh(self:GetBlueprint().Display.BuildMeshBlueprint, true)
-        if self:GetBlueprint().General.UpgradesFrom  ~= builder.UnitId then
+        if self:GetBlueprint().General.UpgradesFrom ~= builder.UnitId then
             self:HideBone(0, true)
             self.OnBeingBuiltEffectsBag:Add(self:ForkThread(CreateBuildCubeThread, builder, self.OnBeingBuiltEffectsBag))
         end

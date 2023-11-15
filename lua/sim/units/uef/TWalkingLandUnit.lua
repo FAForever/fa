@@ -23,4 +23,4 @@
 local WalkingLandUnit = import('/lua/defaultunits.lua').WalkingLandUnit
 
 ---@class TWalkingLandUnit : WalkingLandUnit
-TWalkingLandUnit = ClassUnit(WalkingLandUnit) { }
+TWalkingLandUnit = ClassUnit(WalkingLandUnit) {}

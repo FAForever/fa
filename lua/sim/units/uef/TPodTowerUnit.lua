@@ -59,7 +59,7 @@ TPodTowerUnit = ClassUnit(TStructureUnit) {
         -- Iterate through pod data and set up callbacks for transfer of pods.
         -- We never get the handle to the new tower, so we set up a new unit capture trigger to do the same thing
         -- not the most efficient thing ever but it makes for never having to update the capture codepath here
-        for k,v in self.PodData do
+        for k, v in self.PodData do
             if v.Active then
                 v.Active = false
 
@@ -99,7 +99,7 @@ TPodTowerUnit = ClassUnit(TStructureUnit) {
     ---@param unitBeingBuilt Unit
     ---@param order string
     OnStartBuild = function(self, unitBeingBuilt, order)
-        TStructureUnit.OnStartBuild(self,unitBeingBuilt,order)
+        TStructureUnit.OnStartBuild(self, unitBeingBuilt, order)
         local unitid = self:GetBlueprint().General.UpgradesTo
         if unitBeingBuilt.UnitId == unitid and order == 'Upgrade' then
             self.NowUpgrading = true
@@ -109,7 +109,7 @@ TPodTowerUnit = ClassUnit(TStructureUnit) {
 
     ---@param self TPodTowerUnit
     ---@param podName string
-    NotifyOfPodDeath = function(self,podName)
+    NotifyOfPodDeath = function(self, podName)
         self.PodData[podName].Active = false
     end,
 
@@ -134,7 +134,8 @@ TPodTowerUnit = ClassUnit(TStructureUnit) {
     ---@return Unit
     CreatePod = function(self, podName)
         local location = self:GetPosition(self.PodData[podName].PodAttachpoint)
-        self.PodData[podName].PodHandle = CreateUnitHPR(self.PodData[podName].PodUnitID, self.Army, location[1], location[2], location[3], 0, 0, 0)
+        self.PodData[podName].PodHandle = CreateUnitHPR(self.PodData[podName].PodUnitID, self.Army, location[1],
+            location[2], location[3], 0, 0, 0)
         self.PodData[podName].PodHandle:SetParent(self, podName)
         self.PodData[podName].Active = true
         return self.PodData[podName].PodHandle
@@ -145,7 +146,7 @@ TPodTowerUnit = ClassUnit(TStructureUnit) {
     ---@param attachee Unit
     OnTransportAttach = function(self, bone, attachee)
         attachee:SetDoNotTarget(true)
-        
+
         self:PlayUnitSound('Close')
         self:RequestRefreshUI()
         local PodPresent = 0
@@ -183,7 +184,7 @@ TPodTowerUnit = ClassUnit(TStructureUnit) {
             end
             self.OpenAnim:PlayAnim(bp.Display.AnimationOpen, false):SetRate(2.0)
             -- wait 5 ticks and stop the animation so that the doors stay open
-            ForkThread(function ()
+            ForkThread(function()
                 coroutine.yield(5)
                 self.OpenAnim:SetRate(0)
             end)
@@ -226,7 +227,7 @@ TPodTowerUnit = ClassUnit(TStructureUnit) {
         Main = function(self)
             self.MaintainState = true
             if self.Rebuilding then
-                self:SetPodConsumptionRebuildRate(self.PodData[ self.Rebuilding ])
+                self:SetPodConsumptionRebuildRate(self.PodData[self.Rebuilding])
                 ChangeState(self, self.RebuildingPodState)
             end
             local bp = self:GetBlueprint()
@@ -265,7 +266,7 @@ TPodTowerUnit = ClassUnit(TStructureUnit) {
     RebuildingPodState = State {
         Main = function(self)
             local rebuildFinished = false
-            local podData = self.PodData[ self.Rebuilding ]
+            local podData = self.PodData[self.Rebuilding]
             repeat
                 WaitTicks(1)
                 -- While the pod being built isn't finished
@@ -274,12 +275,15 @@ TPodTowerUnit = ClassUnit(TStructureUnit) {
                 local energy = self:GetConsumptionPerSecondEnergy() * fraction * 0.1
                 local mass = self:GetConsumptionPerSecondMass() * fraction * 0.1
 
-                self.PodData[ self.Rebuilding ].EnergyRemain = self.PodData[ self.Rebuilding ].EnergyRemain - energy
-                self.PodData[ self.Rebuilding ].MassRemain = self.PodData[ self.Rebuilding ].MassRemain - mass
+                self.PodData[self.Rebuilding].EnergyRemain = self.PodData[self.Rebuilding].EnergyRemain - energy
+                self.PodData[self.Rebuilding].MassRemain = self.PodData[self.Rebuilding].MassRemain - mass
 
-                self:SetWorkProgress((self.PodData[ self.Rebuilding ].BuildCostMass - self.PodData[ self.Rebuilding ].MassRemain) / self.PodData[ self.Rebuilding ].BuildCostMass)
+                self:SetWorkProgress((
+                    self.PodData[self.Rebuilding].BuildCostMass - self.PodData[self.Rebuilding].MassRemain) /
+                    self.PodData[self.Rebuilding].BuildCostMass)
 
-                if (self.PodData[ self.Rebuilding ].EnergyRemain <= 0) and (self.PodData[ self.Rebuilding ].MassRemain <= 0) then
+                if (self.PodData[self.Rebuilding].EnergyRemain <= 0) and
+                    (self.PodData[self.Rebuilding].MassRemain <= 0) then
                     rebuildFinished = true
                 end
             until rebuildFinished
@@ -317,7 +321,7 @@ TPodTowerUnit = ClassUnit(TStructureUnit) {
         Main = function(self)
 
             -- catch case when tower is immediately upgraded during build
-            if not self.InitializedTower then 
+            if not self.InitializedTower then
                 self:InitializeTower()
             end
 
@@ -360,7 +364,7 @@ TPodTowerUnit = ClassUnit(TStructureUnit) {
                 self:StopUpgradeEffects(unitBuilding)
                 self:PlayUnitSound('UpgradeEnd')
                 -- Iterate through pod data and transfer pods to the new unit
-                for k,v in self.PodData or {} do
+                for k, v in self.PodData or {} do
                     if v.Active then
                         unitBuilding:PodTransfer(v.PodHandle, v)
                         v.Active = false

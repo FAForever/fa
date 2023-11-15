@@ -21,31 +21,55 @@
 --**********************************************************************************
 
 local SeaFactoryUnit = import('/lua/defaultunits.lua').SeaFactoryUnit
-local EffectUtil = import('/lua/effectutilities.lua')
+local SeaFactoryUnitOnPaused = SeaFactoryUnit.OnPaused
+local SeaFactoryUnitOnUnpaused = SeaFactoryUnit.OnUnpaused
+local SeaFactoryUnitOnStartBuild = SeaFactoryUnit.OnStartBuild
+local SeaFactoryUnitOnStopBuild = SeaFactoryUnit.OnStopBuild
+local SeaFactoryUnitOnFailedToBuild = SeaFactoryUnit.OnFailedToBuild
+
+-- pre-import for performance
+local CreateDefaultBuildBeams = import('/lua/effectutilities.lua').CreateDefaultBuildBeams
+
+-- upvalue scope for performance
+local WaitTicks = WaitTicks
+local ForkThread = ForkThread
+local CreateAttachedEmitter = CreateAttachedEmitter
+
+-- precomputed categories for performance
+local CategoriesALLUNITS = categories.ALLUNITS
 
 ---@class TSeaFactoryUnit : SeaFactoryUnit
 TSeaFactoryUnit = ClassUnit(SeaFactoryUnit) {
+
     ---@param self TSeaFactoryUnit
     ---@param unitBeingBuilt Unit
     ---@param order string
     CreateBuildEffects = function(self, unitBeingBuilt, order)
-        WaitSeconds(0.1)
-        for _, v in self.BuildEffectBones do
-            self.BuildEffectsBag:Add(CreateAttachedEmitter(self, v, self.Army, '/effects/emitters/flashing_blue_glow_01_emit.bp'))
-            self.BuildEffectsBag:Add(self:ForkThread(EffectUtil.CreateDefaultBuildBeams, unitBeingBuilt, {v}, self.BuildEffectsBag))
+        WaitTicks(1)
+
+        local army = self.Army
+        local buildEffectsBag = self.BuildEffectsBag
+        local buildEffectBones = self.BuildEffectBones
+
+        -- create the beams and move the beams around
+        buildEffectsBag:Add(ForkThread(CreateDefaultBuildBeams, self, unitBeingBuilt, buildEffectBones, buildEffectsBag))
+
+        -- create a sparkle-like effect at the muzzles
+        for _, v in buildEffectBones do
+            buildEffectsBag:Add(CreateAttachedEmitter(self, v, army, '/effects/emitters/flashing_blue_glow_01_emit.bp'))
         end
     end,
 
     ---@param self TSeaFactoryUnit
     OnPaused = function(self)
-        SeaFactoryUnit.OnPaused(self)
+        SeaFactoryUnitOnPaused(self)
         self:StopArmsMoving()
     end,
 
     ---@param self TSeaFactoryUnit
     OnUnpaused = function(self)
-        SeaFactoryUnit.OnUnpaused(self)
-        if self:GetNumBuildOrders(categories.ALLUNITS) > 0 and not self:IsUnitState('Upgrading') then
+        SeaFactoryUnitOnUnpaused(self)
+        if self:GetNumBuildOrders(CategoriesALLUNITS) > 0 and not self:IsUnitState('Upgrading') then
             self:StartArmsMoving()
         end
     end,
@@ -54,29 +78,29 @@ TSeaFactoryUnit = ClassUnit(SeaFactoryUnit) {
     ---@param unitBeingBuilt Unit
     ---@param order string
     OnStartBuild = function(self, unitBeingBuilt, order)
-        SeaFactoryUnit.OnStartBuild(self, unitBeingBuilt, order)
-        if order  ~= 'Upgrade' then
+        SeaFactoryUnitOnStartBuild(self, unitBeingBuilt, order)
+        if order ~= 'Upgrade' then
             self:StartArmsMoving()
         end
     end,
 
     ---@param self TSeaFactoryUnit
-    ---@param unitBuilding boolean
+    ---@param unitBuilding Unit
     OnStopBuild = function(self, unitBuilding)
-        SeaFactoryUnit.OnStopBuild(self, unitBuilding)
+        SeaFactoryUnitOnStopBuild(self, unitBuilding)
         self:StopArmsMoving()
     end,
 
     ---@param self TSeaFactoryUnit
     OnFailedToBuild = function(self)
-        SeaFactoryUnit.OnFailedToBuild(self)
+        SeaFactoryUnitOnFailedToBuild(self)
         self:StopArmsMoving()
     end,
 
     ---@param self TSeaFactoryUnit
     StartArmsMoving = function(self)
         if not self.ArmsThread then
-            self.ArmsThread = self:ForkThread(self.MovingArmsThread)
+            self.ArmsThread = self.Trash:Add(ForkThread(self.MovingArmsThread, self))
         end
     end,
 
@@ -86,8 +110,9 @@ TSeaFactoryUnit = ClassUnit(SeaFactoryUnit) {
 
     ---@param self TSeaFactoryUnit
     StopArmsMoving = function(self)
-        if self.ArmsThread then
-            KillThread(self.ArmsThread)
+        local armsThread = self.ArmsThread
+        if armsThread then
+            KillThread(armsThread)
             self.ArmsThread = nil
         end
     end,

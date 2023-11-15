@@ -21,18 +21,34 @@
 --**********************************************************************************
 
 local LandFactoryUnit = import('/lua/defaultunits.lua').LandFactoryUnit
-local EffectUtil = import('/lua/effectutilities.lua')
+
+-- pre-import for performance
+local CreateDefaultBuildBeams = import('/lua/effectutilities.lua').CreateDefaultBuildBeams
+
+-- upvalue scope for performance
+local WaitTicks = WaitTicks
+local ForkThread = ForkThread
+local CreateAttachedEmitter = CreateAttachedEmitter
 
 ---@class TLandFactoryUnit : LandFactoryUnit
 TLandFactoryUnit = ClassUnit(LandFactoryUnit) {
-    ---@param self TConstructionUnit
+
+    ---@param self TLandFactoryUnit
     ---@param unitBeingBuilt Unit
     ---@param order string
     CreateBuildEffects = function(self, unitBeingBuilt, order)
-        WaitSeconds(0.1)
-        for _, v in self.BuildEffectBones do
-            self.BuildEffectsBag:Add(CreateAttachedEmitter(self, v, self.Army, '/effects/emitters/flashing_blue_glow_01_emit.bp'))
-            self.BuildEffectsBag:Add(self:ForkThread(EffectUtil.CreateDefaultBuildBeams, unitBeingBuilt, {v}, self.BuildEffectsBag))
+        WaitTicks(1)
+
+        local army = self.Army
+        local buildEffectsBag = self.BuildEffectsBag
+        local buildEffectBones = self.BuildEffectBones
+
+        -- create the beams and move the beams around
+        buildEffectsBag:Add(ForkThread(CreateDefaultBuildBeams, self, unitBeingBuilt, buildEffectBones, buildEffectsBag))
+
+        -- create a sparkle-like effect at the muzzles
+        for _, v in buildEffectBones do
+            buildEffectsBag:Add(CreateAttachedEmitter(self, v, army, '/effects/emitters/flashing_blue_glow_01_emit.bp'))
         end
     end,
 }

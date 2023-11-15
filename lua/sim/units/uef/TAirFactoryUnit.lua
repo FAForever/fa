@@ -34,7 +34,7 @@ local WaitTicks = WaitTicks
 local ForkThread = ForkThread
 local CreateAttachedEmitter = CreateAttachedEmitter
 
--- precomputed for performance
+-- precomputed categories for performance
 local CategoriesALLUNITS = categories.ALLUNITS
 
 ---@class TAirFactoryUnit : AirFactoryUnit
@@ -45,20 +45,17 @@ TAirFactoryUnit = ClassUnit(AirFactoryUnit) {
     ---@param order string
     CreateBuildEffects = function(self, unitBeingBuilt, order)
         WaitTicks(1)
+
         local army = self.Army
-        local trash = self.Trash
         local buildEffectsBag = self.BuildEffectsBag
         local buildEffectBones = self.BuildEffectBones
 
-        if buildEffectsBag then
-            for _, v in buildEffectBones do
-                buildEffectsBag:Add(CreateAttachedEmitter(self, v, army,
-                    '/effects/emitters/flashing_blue_glow_01_emit.bp'))
+        -- create the beams and move the beams around
+        buildEffectsBag:Add(ForkThread(CreateDefaultBuildBeams, self, unitBeingBuilt, buildEffectBones, buildEffectsBag))
 
-                local thread = ForkThread(CreateDefaultBuildBeams, self, unitBeingBuilt, { v }, buildEffectsBag)
-                buildEffectsBag:Add(thread)
-                trash:Add(thread)
-            end
+        -- create a sparkle-like effect at the muzzles
+        for _, v in buildEffectBones do
+            buildEffectsBag:Add(CreateAttachedEmitter(self, v, army, '/effects/emitters/flashing_blue_glow_01_emit.bp'))
         end
     end,
 
@@ -102,8 +99,7 @@ TAirFactoryUnit = ClassUnit(AirFactoryUnit) {
     ---@param self TAirFactoryUnit
     StartArmsMoving = function(self)
         if not self.ArmsThread then
-            local thread = ForkThread(self.MovingArmsThread, self)
-            self.ArmsThread = self.Trash:Add(thread)
+            self.ArmsThread = self.Trash:Add(ForkThread(self.MovingArmsThread, self))
         end
     end,
 
