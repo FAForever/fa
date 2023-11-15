@@ -383,7 +383,7 @@
 --- If this shield only blocks weapons marked with `ArtilleryShieldBlocks`.
 --- Should not be defined with `PersonalBubble`, `PersonalShield`, or `TransportShield`.
 ---@field AntiArtilleryShield? boolean
---- impact effect name in `/lua/EffectTemplates.lua`
+--- impact effect name in `/lua/effecttemplates.lua`
 ---@field ImpactEffects? string
 --- effect mesh to be created for impacts on the shield
 ---@field ImpactMesh? FileName
