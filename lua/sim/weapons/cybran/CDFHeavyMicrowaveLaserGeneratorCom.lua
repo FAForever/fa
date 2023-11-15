@@ -21,10 +21,10 @@
 --**********************************************************************************
 
 local DefaultBeamWeapon = import('/lua/sim/defaultweapons.lua').DefaultBeamWeapon
-local CollisionBeamFile = import('/lua/defaultcollisionbeams.lua')
+local MicrowaveLaserCollisionBeam02 = import('/lua/defaultcollisionbeams.lua').MicrowaveLaserCollisionBeam02
 
 --- COMMANDER ENHANCEMENT WEAPON!
 ---@class CDFHeavyMicrowaveLaserGeneratorCom : DefaultBeamWeapon
 CDFHeavyMicrowaveLaserGeneratorCom = ClassWeapon(DefaultBeamWeapon) {
-    BeamType = CollisionBeamFile.MicrowaveLaserCollisionBeam02,
+    BeamType = MicrowaveLaserCollisionBeam02,
 }

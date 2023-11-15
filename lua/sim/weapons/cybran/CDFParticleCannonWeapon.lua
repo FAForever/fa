@@ -21,10 +21,10 @@
 --**********************************************************************************
 
 local DefaultBeamWeapon = import('/lua/sim/defaultweapons.lua').DefaultBeamWeapon
-local CollisionBeamFile = import('/lua/defaultcollisionbeams.lua')
+local ParticleCannonCollisionBeam = import('/lua/defaultcollisionbeams.lua').ParticleCannonCollisionBeam
 
 ---@class CDFParticleCannonWeapon : DefaultBeamWeapon
 CDFParticleCannonWeapon = ClassWeapon(DefaultBeamWeapon) {
-    BeamType = CollisionBeamFile.ParticleCannonCollisionBeam,
+    BeamType = ParticleCannonCollisionBeam,
     FxMuzzleFlash = { '/effects/emitters/particle_cannon_muzzle_01_emit.bp' },
 }

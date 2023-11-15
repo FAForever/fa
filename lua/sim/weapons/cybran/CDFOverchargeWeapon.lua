@@ -21,10 +21,10 @@
 --**********************************************************************************
 
 local DefaultOverchargeWeapon = import('/lua/sim/defaultweapons.lua').OverchargeWeapon
-local EffectTemplate = import('/lua/effecttemplates.lua')
+local CMolecularRipperOverChargeFlash01 = import('/lua/effecttemplates.lua').CMolecularRipperOverChargeFlash01
 
 ---@class CDFOverchargeWeapon : OverchargeWeapon
 CDFOverchargeWeapon = ClassWeapon(DefaultOverchargeWeapon) {
-    FxMuzzleFlash = EffectTemplate.CMolecularRipperOverChargeFlash01,
+    FxMuzzleFlash = CMolecularRipperOverChargeFlash01,
     DesiredWeaponLabel = 'RightRipper'
 }

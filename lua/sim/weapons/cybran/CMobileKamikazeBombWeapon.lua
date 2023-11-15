@@ -21,12 +21,12 @@
 --**********************************************************************************
 
 local KamikazeWeapon = import('/lua/sim/defaultweapons.lua').KamikazeWeapon
-local EffectTemplate = import('/lua/effecttemplates.lua')
+local CMobileKamikazeBombExplosion = import('/lua/effecttemplates.lua').CMobileKamikazeBombExplosion
 
 ---@class CMobileKamikazeBombWeapon : KamikazeWeapon
 ---@field transportDrop boolean
 CMobileKamikazeBombWeapon = ClassWeapon(KamikazeWeapon) {
-    FxDeath = EffectTemplate.CMobileKamikazeBombExplosion,
+    FxDeath = CMobileKamikazeBombExplosion,
 
     ---@param self CMobileKamikazeBombWeapon
     OnFire = function(self)

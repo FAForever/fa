@@ -20,10 +20,10 @@
 --** SOFTWARE.
 --**********************************************************************************
 
-local DefaultProjectileWeapon = import('/lua/sim/DefaultWeapons.lua').DefaultProjectileWeapon
-local EffectTemplate = import('/lua/effecttemplates.lua')
+local DefaultProjectileWeapon = import('/lua/sim/defaultweapons.lua').DefaultProjectileWeapon
+local CElectronBolterMuzzleFlash01 = import('/lua/effecttemplates.lua').CElectronBolterMuzzleFlash01
 
 ---@class CDFElectronBolterWeapon : DefaultProjectileWeapon
 CDFElectronBolterWeapon = ClassWeapon(DefaultProjectileWeapon) {
-    FxMuzzleFlash = EffectTemplate.CElectronBolterMuzzleFlash01,
+    FxMuzzleFlash = CElectronBolterMuzzleFlash01,
 }

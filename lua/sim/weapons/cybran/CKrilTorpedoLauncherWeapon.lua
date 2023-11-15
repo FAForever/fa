@@ -21,9 +21,9 @@
 --**********************************************************************************
 
 local DefaultProjectileWeapon = import('/lua/sim/defaultweapons.lua').DefaultProjectileWeapon
-local EffectTemplate = import('/lua/effecttemplates.lua')
+local CKrilTorpedoLauncherMuzzleFlash01 = import('/lua/effecttemplates.lua').CKrilTorpedoLauncherMuzzleFlash01
 
 ---@class CKrilTorpedoLauncherWeapon : DefaultProjectileWeapon
 CKrilTorpedoLauncherWeapon = ClassWeapon(DefaultProjectileWeapon) {
-    FxMuzzleFlash = EffectTemplate.CKrilTorpedoLauncherMuzzleFlash01,
+    FxMuzzleFlash = CKrilTorpedoLauncherMuzzleFlash01,
 }

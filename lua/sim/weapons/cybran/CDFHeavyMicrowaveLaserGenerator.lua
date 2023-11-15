@@ -21,15 +21,15 @@
 --**********************************************************************************
 
 local DefaultBeamWeapon = import('/lua/sim/defaultweapons.lua').DefaultBeamWeapon
-local CollisionBeamFile = import('/lua/sim/CollisionBeam.lua').CollisionBeamFile
-local EffectTemplate = import('/lua/effecttemplates.lua')
+local MicrowaveLaserCollisionBeam01 = import("/lua/defaultcollisionbeams.lua").MicrowaveLaserCollisionBeam01
+local CMicrowaveLaserCharge01 = import('/lua/effecttemplates.lua').CMicrowaveLaserCharge01
 
 --- SPIDER BOT WEAPON!
 ---@class CDFHeavyMicrowaveLaserGenerator : DefaultBeamWeapon
 ---@field RotatorManip moho.RotateManipulator
 CDFHeavyMicrowaveLaserGenerator = ClassWeapon(DefaultBeamWeapon) {
-    BeamType = CollisionBeamFile.MicrowaveLaserCollisionBeam01,
-    FxUpackingChargeEffects = EffectTemplate.CMicrowaveLaserCharge01,
+    BeamType = MicrowaveLaserCollisionBeam01,
+    FxUpackingChargeEffects = CMicrowaveLaserCharge01,
     FxUpackingChargeEffectScale = 1,
 
     ---@param self CDFHeavyMicrowaveLaserGenerator

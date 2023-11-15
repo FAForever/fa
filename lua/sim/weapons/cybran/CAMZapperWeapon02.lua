@@ -21,10 +21,10 @@
 --**********************************************************************************
 
 local DefaultBeamWeapon = import('/lua/sim/defaultweapons.lua').DefaultBeamWeapon
-local CollisionBeamFile = import('/lua/defaultcollisionbeams.lua')
+local ZapperCollisionBeam = import('/lua/defaultcollisionbeams.lua').ZapperCollisionBeam
 
 ---@class CAMZapperWeapon02 : DefaultBeamWeapon
 CAMZapperWeapon02 = ClassWeapon(DefaultBeamWeapon) {
-    BeamType = CollisionBeamFile.ZapperCollisionBeam,
+    BeamType = ZapperCollisionBeam,
     FxMuzzleFlash = { '/effects/emitters/cannon_muzzle_flash_01_emit.bp', },
 }

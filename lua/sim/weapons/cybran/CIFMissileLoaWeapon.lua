@@ -21,9 +21,9 @@
 --**********************************************************************************
 
 local DefaultProjectileWeapon = import('/lua/sim/defaultweapons.lua').DefaultProjectileWeapon
-local EffectTemplate = import('/lua/effecttemplates.lua')
+local CIFCruiseMissileLaunchSmoke = import('/lua/effecttemplates.lua').CIFCruiseMissileLaunchSmoke
 
 ---@class CIFMissileLoaWeapon : DefaultProjectileWeapon
 CIFMissileLoaWeapon = ClassWeapon(DefaultProjectileWeapon) {
-    FxMuzzleFlash = EffectTemplate.CIFCruiseMissileLaunchSmoke,
+    FxMuzzleFlash = CIFCruiseMissileLaunchSmoke,
 }

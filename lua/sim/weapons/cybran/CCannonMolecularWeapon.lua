@@ -21,9 +21,9 @@
 --**********************************************************************************
 
 local DefaultProjectileWeapon = import('/lua/sim/defaultweapons.lua').DefaultProjectileWeapon
-local EffectTemplate = import('/lua/effecttemplates.lua')
+local CMolecularRipperFlash01 = import('/lua/effecttemplates.lua').CMolecularRipperFlash01
 
 ---@class CCannonMolecularWeapon : DefaultProjectileWeapon
 CCannonMolecularWeapon = ClassWeapon(DefaultProjectileWeapon) {
-    FxMuzzleFlash = EffectTemplate.CMolecularRipperFlash01,
+    FxMuzzleFlash = CMolecularRipperFlash01,
 }

@@ -21,9 +21,9 @@
 --**********************************************************************************
 
 local DefaultProjectileWeapon = import('/lua/sim/defaultweapons.lua').DefaultProjectileWeapon
-local EffectTemplate = import('/lua/effecttemplates.lua')
+local CArtilleryFlash01 = import('/lua/effecttemplates.lua').CArtilleryFlash01
 
 ---@class CIFArtilleryWeapon : DefaultProjectileWeapon
 CIFArtilleryWeapon = ClassWeapon(DefaultProjectileWeapon) {
-    FxMuzzleFlash = EffectTemplate.CArtilleryFlash01
+    FxMuzzleFlash = CArtilleryFlash01
 }

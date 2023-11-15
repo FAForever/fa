@@ -20,7 +20,7 @@
 --** SOFTWARE.
 --**********************************************************************************
 
-local DefaultProjectileWeapon = import('/lua/sim/DefaultWeapons.lua').DefaultProjectileWeapon
+local DefaultProjectileWeapon = import('/lua/sim/defaultweapons.lua').DefaultProjectileWeapon
 
 ---@class CDFEMP : DefaultProjectileWeapon
 CDFEMP = ClassWeapon(DefaultProjectileWeapon) {

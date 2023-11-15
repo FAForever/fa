@@ -21,13 +21,13 @@
 --**********************************************************************************
 
 local DefaultBeamWeapon = import('/lua/sim/defaultweapons.lua').DefaultBeamWeapon
-local CollisionBeamFile = import('/lua/defaultcollisionbeams.lua')
+local ZapperCollisionBeam = import('/lua/defaultcollisionbeams.lua').ZapperCollisionBeam
 
 ---@class CAMZapperWeapon03 : DefaultBeamWeapon
 ---@field SphereEffectEntity Entity
 CAMZapperWeapon03 = ClassWeapon(DefaultBeamWeapon) {
 
-    BeamType = CollisionBeamFile.ZapperCollisionBeam,
+    BeamType = ZapperCollisionBeam,
     FxMuzzleFlash = { '/effects/emitters/cannon_muzzle_flash_01_emit.bp', },
 
     SphereEffectIdleMesh = '/effects/entities/cybranphalanxsphere01/cybranphalanxsphere01_mesh',

@@ -21,9 +21,9 @@
 --**********************************************************************************
 
 local DefaultProjectileWeapon = import('/lua/sim/defaultweapons.lua').DefaultProjectileWeapon
-local EffectTemplate = import('/lua/effecttemplates.lua')
+local CHvyProtonCannonMuzzleflash = import('/lua/effecttemplates.lua').CHvyProtonCannonMuzzleflash
 
 ---@class CDFHvyProtonCannonWeapon : DefaultProjectileWeapon
 CDFHvyProtonCannonWeapon = ClassWeapon(DefaultProjectileWeapon) {
-    FxMuzzleFlash = EffectTemplate.CHvyProtonCannonMuzzleflash,
+    FxMuzzleFlash = CHvyProtonCannonMuzzleflash,
 }
