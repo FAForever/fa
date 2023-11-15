@@ -41,7 +41,6 @@ TShieldSeaUnit = import('/lua/sim/units/uef/TShieldSeaUnit.lua').TShieldSeaUnit
 TPodTowerUnit = import('/lua/sim/units/uef/TPodTowerUnit.lua').TPodTowerUnit
 
 -- kept for mod compatiablilty
-local CreateUEFBuildSliceBeams = EffectUtil.CreateUEFBuildSliceBeams
 local DefaultUnitsFile = import("/lua/defaultunits.lua")
 local AirFactoryUnit = DefaultUnitsFile.AirFactoryUnit
 local ConstructionUnit = DefaultUnitsFile.ConstructionUnit
@@ -50,6 +49,7 @@ local RadarJammerUnit = DefaultUnitsFile.RadarJammerUnit
 local SeaFactoryUnit = DefaultUnitsFile.SeaFactoryUnit
 local AmphibiousLandUnit = DefaultUnitsFile.AmphibiousLandUnit
 local EffectUtil = import("/lua/effectutilities.lua")
+local CreateUEFBuildSliceBeams = EffectUtil.CreateUEFBuildSliceBeams
 local CreateBuildCubeThread = EffectUtil.CreateBuildCubeThread
 local CreateDefaultBuildBeams = EffectUtil.CreateDefaultBuildBeams
 local WaitTicks = WaitTicks
