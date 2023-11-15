@@ -21,7 +21,7 @@
 --**********************************************************************************
 
 local DefaultProjectileWeapon = import('/lua/sim/defaultweapons.lua').DefaultProjectileWeapon
-local EffectTemplate = import('/lua/EffectTemplates.lua')
+local EffectTemplate = import('/lua/effecttemplates.lua')
 
 ---@class SIFBombZhanaseeWeapon : DefaultProjectileWeapon
 SIFBombZhanaseeWeapon = ClassWeapon(DefaultProjectileWeapon) {

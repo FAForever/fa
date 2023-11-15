@@ -22,11 +22,11 @@
 
 local DefaultBeamWeapon = import('/lua/sim/defaultweapons.lua').DefaultBeamWeapon
 local EffectTemplate = import('/lua/effecttemplates.lua')
-local UltraChromaticBeamGeneratorCollisionBeam = import('/lua/sim/CollisionBeam.lua').UltraChromaticBeamGeneratorCollisionBeam
+local CollisionBeamFile = import('/lua/defaultcollisionbeams.lua')
 
 ---@class SDFUltraChromaticBeamGenerator : DefaultBeamWeapon
 SDFUltraChromaticBeamGenerator = ClassWeapon(DefaultBeamWeapon) {
-    BeamType = UltraChromaticBeamGeneratorCollisionBeam,
+    BeamType = CollisionBeamFile.UltraChromaticBeamGeneratorCollisionBeam,
     FxUpackingChargeEffects = EffectTemplate.SChargeUltraChromaticBeamGenerator,
     FxUpackingChargeEffectScale = 1,
 
