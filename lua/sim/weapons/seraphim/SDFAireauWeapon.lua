@@ -21,9 +21,9 @@
 --**********************************************************************************
 
 local DefaultProjectileWeapon = import('/lua/sim/defaultweapons.lua').DefaultProjectileWeapon
-local EffectTemplate = import('/lua/effecttemplates.lua')
+local EffectTemplate = import('/lua/effecttemplates.lua').SDFAireauWeaponMuzzleFlash
 
 ---@class SDFAireauWeapon : DefaultProjectileWeapon
 SDFAireauWeapon = ClassWeapon(DefaultProjectileWeapon) {
-    FxMuzzleFlash = EffectTemplate.SDFAireauWeaponMuzzleFlash,
+    FxMuzzleFlash = EffectTemplate,
 }

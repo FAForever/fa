@@ -21,9 +21,9 @@
 --**********************************************************************************
 
 local DefaultProjectileWeapon = import('/lua/sim/defaultweapons.lua').DefaultProjectileWeapon
-local EffectTemplate = import('/lua/effecttemplates.lua')
+local EffectTemplate = import('/lua/effecttemplates.lua').SHeavyCavitationTorpedoMuzzleFlash02
 
 ---@class SANHeavyCavitationTorpedo02 : DefaultProjectileWeapon
 SANHeavyCavitationTorpedo02 = ClassWeapon(DefaultProjectileWeapon) {
-    FxMuzzleFlash = EffectTemplate.SHeavyCavitationTorpedoMuzzleFlash02
+    FxMuzzleFlash = EffectTemplate
 }

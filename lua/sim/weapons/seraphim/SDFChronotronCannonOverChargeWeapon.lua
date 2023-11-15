@@ -20,7 +20,7 @@
 --** SOFTWARE.
 --**********************************************************************************
 
-local OverchargeWeapon = import('/lua/sim/DefaultWeapons.lua').OverchargeWeapon
+local OverchargeWeapon = import('/lua/sim/defaultweapons.lua').OverchargeWeapon
 local EffectTemplate = import('/lua/effecttemplates.lua')
 
 ---@class SDFChronotronCannonOverChargeWeapon : OverchargeWeapon
