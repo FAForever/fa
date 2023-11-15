@@ -20,8 +20,22 @@
 --** SOFTWARE.
 --**********************************************************************************
 
-local AirFactoryUnit = import('/lua/defaultunits.lua').AirFactoryUnit
 local CreateDefaultBuildBeams = import('/lua/EffectUtilities.lua').CreateDefaultBuildBeams
+
+local AirFactoryUnit = import('/lua/defaultunits.lua').AirFactoryUnit
+local AirFactoryUnitOnPaused = AirFactoryUnit.OnPaused
+local AirFactoryUnitOnUnpaused = AirFactoryUnit.OnUnpaused
+local AirFactoryUnitOnStartBuild = AirFactoryUnit.OnStartBuild
+local AirFactoryUnitOnStopBuild = AirFactoryUnit.OnStopBuild
+local AirFactoryUnitOnFailedToBuild = AirFactoryUnit.OnFailedToBuild
+
+-- upvalue scope for performance
+local WaitTicks = WaitTicks
+local ForkThread = ForkThread
+local CreateAttachedEmitter = CreateAttachedEmitter
+
+-- precomputed for performance
+local CategoriesALLUNITS = categories.ALLUNITS
 
 ---@class TAirFactoryUnit : AirFactoryUnit
 TAirFactoryUnit = ClassUnit(AirFactoryUnit) {
@@ -38,9 +52,10 @@ TAirFactoryUnit = ClassUnit(AirFactoryUnit) {
 
         if buildEffectsBag then
             for _, v in buildEffectBones do
-                buildEffectsBag:Add(CreateAttachedEmitter(self, v, army, '/effects/emitters/flashing_blue_glow_01_emit.bp'))
+                buildEffectsBag:Add(CreateAttachedEmitter(self, v, army,
+                    '/effects/emitters/flashing_blue_glow_01_emit.bp'))
 
-                local thread = ForkThread(CreateDefaultBuildBeams, self, unitBeingBuilt, {v}, buildEffectsBag)
+                local thread = ForkThread(CreateDefaultBuildBeams, self, unitBeingBuilt, { v }, buildEffectsBag)
                 buildEffectsBag:Add(thread)
                 trash:Add(thread)
             end
@@ -49,45 +64,46 @@ TAirFactoryUnit = ClassUnit(AirFactoryUnit) {
 
     ---@param self TAirFactoryUnit
     OnPaused = function(self)
-        AirFactoryUnit.OnPaused(self)
+        AirFactoryUnitOnPaused(self)
         self:StopArmsMoving()
     end,
 
     ---@param self TAirFactoryUnit
     OnUnpaused = function(self)
-        AirFactoryUnit.OnUnpaused(self)
-        if self:GetNumBuildOrders(categories.ALLUNITS) > 0 and not self:IsUnitState('Upgrading') then
+        AirFactoryUnitOnUnpaused(self)
+        if self:GetNumBuildOrders(CategoriesALLUNITS) > 0 and not self:IsUnitState('Upgrading') then
             self:StartArmsMoving()
         end
     end,
 
     ---@param self TAirFactoryUnit
-    ---@param unitBeingBuilt boolean
+    ---@param unitBeingBuilt Unit
     ---@param order string
     OnStartBuild = function(self, unitBeingBuilt, order)
-        AirFactoryUnit.OnStartBuild(self, unitBeingBuilt, order)
-        if order  ~= 'Upgrade' then
+        AirFactoryUnitOnStartBuild(self, unitBeingBuilt, order)
+        if order ~= 'Upgrade' then
             self:StartArmsMoving()
         end
     end,
 
     ---@param self TAirFactoryUnit
-    ---@param unitBuilding boolean
+    ---@param unitBuilding Unit
     OnStopBuild = function(self, unitBuilding)
-        AirFactoryUnit.OnStopBuild(self, unitBuilding)
+        AirFactoryUnitOnStopBuild(self, unitBuilding)
         self:StopArmsMoving()
     end,
 
     ---@param self TAirFactoryUnit
     OnFailedToBuild = function(self)
-        AirFactoryUnit.OnFailedToBuild(self)
+        AirFactoryUnitOnFailedToBuild(self)
         self:StopArmsMoving()
     end,
 
     ---@param self TAirFactoryUnit
     StartArmsMoving = function(self)
         if not self.ArmsThread then
-            self.ArmsThread = self:ForkThread(self.MovingArmsThread)
+            local thread = ForkThread(self.MovingArmsThread, self)
+            self.ArmsThread = self.Trash:Add(thread)
         end
     end,
 
@@ -97,8 +113,9 @@ TAirFactoryUnit = ClassUnit(AirFactoryUnit) {
 
     ---@param self TAirFactoryUnit
     StopArmsMoving = function(self)
-        if self.ArmsThread then
-            KillThread(self.ArmsThread)
+        local armsThread = self.ArmsThread
+        if armsThread then
+            KillThread(armsThread)
             self.ArmsThread = nil
         end
     end,
