@@ -37,6 +37,8 @@ function DischargeShields(units, doPrint)
         return
     end
 
+    local dischargedUnits = 0
+
     for k = 1, unitCount do
         local unit = units[k]
         if not IsDestroyed(unit) then
@@ -58,12 +60,14 @@ function DischargeShields(units, doPrint)
 
                 -- light particle for bloom effect
                 CreateLightParticleIntel(unit, bone, army, 1.5 * size, 8, 'glow_02', 'ramp_flare_02')
+
+                dischargedUnits = dischargedUnits + 1
             end
         end
     end
 
     local brain = units[1]:GetAIBrain()
     if doPrint and (GetFocusArmy() == brain:GetArmyIndex()) then
-        print(StringFormat("Discharged %s shield(s)", unitCount))
+        print(StringFormat("Discharged %s shield(s)", dischargedUnits))
     end
 end
