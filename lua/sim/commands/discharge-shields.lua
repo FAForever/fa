@@ -22,16 +22,15 @@
 
 -- upvalue scope for performance
 local TableGetn = table.getn
+local MathMin = math.min
 local StringFormat = string.format
 
---- Interrupts the pathfinding of the given units. This has various interesting side effects as the 'done with pathfinding' signal is used in various commands. As a few examples:
---- - For engineers that are building they can start building from further away (but still within the build range)
---- - For engineers that are on a patrol or an attack move the engineer can start reclaiming from further away 
---- - For engineers that are assisting they can start assisting immediately if the target is in range (instead of moving into formation)
---- - For transports that are unloading units are deattached immediately when aborting the move command
+local CElectronBurstCloud01 = import("/lua/EffectTemplates.lua").CElectronBurstCloud01
+
+--- Discharges the shields of the provided units
 ---@param units Unit[]
 ---@param doPrint boolean           # if true, prints information about the order
-function AbortNavigation(units, doPrint)
+function DischargeShields(units, doPrint)
     local unitCount = TableGetn(units)
 
     if unitCount == 0 then
@@ -41,13 +40,30 @@ function AbortNavigation(units, doPrint)
     for k = 1, unitCount do
         local unit = units[k]
         if not IsDestroyed(unit) then
-            local navigator = unit:GetNavigator()
-            navigator:AbortMove()
+            local shield = unit.MyShield
+            if shield and shield:IsOn() then
+                local shieldHealth = shield:GetHealth()
+                shield:ApplyDamage(nil, shieldHealth, unit:GetPosition(), 'Discharge', false)
+
+                local army = unit.Army
+                local bone = unit.ShieldEffectsBone or -1
+                local blueprint = unit.Blueprint
+                local size = MathMin(blueprint.SizeX, blueprint.SizeZ)
+
+                -- particle effect with sparkles
+                for _, effect in CElectronBurstCloud01 do
+                    local effect = CreateEmitterAtBone(unit, bone, army, effect)
+                    effect:ScaleEmitter(0.75 * size)
+                end
+
+                -- light particle for bloom effect
+                CreateLightParticleIntel(unit, bone, army, 1.5 * size, 8, 'glow_02', 'ramp_flare_02')
+            end
         end
     end
 
     local brain = units[1]:GetAIBrain()
     if doPrint and (GetFocusArmy() == brain:GetArmyIndex()) then
-        print(StringFormat("Interrupted pathfinding for %s unit(s)", unitCount))
+        print(StringFormat("Discharged %s shield(s)", unitCount))
     end
 end
