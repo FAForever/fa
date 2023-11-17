@@ -59,10 +59,7 @@ AIFGuidedMissile = ClassProjectile(AGuidedMissileProjectile) {
         local xVec, yVec, zVec = 0, vy, 0
         local target = self:GetCurrentTargetPosition()
         local tx, ty, tz = target[1], target[2], target[3]
-        local radius = 50
-
-        -- Adjust damage by number of split projectiles
-        self.DamageData.DamageAmount = self.DamageData.DamageAmount / numProjectiles
+        local radius = 5
 
         -- Launch projectiles at semi-random angles away from split location
         for i = 0, (numProjectiles - 1) do
@@ -84,7 +81,6 @@ AIFGuidedMissile = ClassProjectile(AGuidedMissileProjectile) {
 
             -- set the new target
             proj:SetNewTargetGround(newTarget)
-            proj.DamageData = self.DamageData
             proj.tx = tx
             proj.tz = tz
         end
@@ -94,6 +90,8 @@ AIFGuidedMissile = ClassProjectile(AGuidedMissileProjectile) {
     ---@param TargetType any
     ---@param TargetEntity any
     OnImpact = function(self, TargetType, TargetEntity)
+        AGuidedMissileProjectile.OnImpact(self, TargetType, TargetEntity)
+
         -- local scope for performance
         local army = self.Army
 

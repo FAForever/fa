@@ -12,8 +12,6 @@ local VisionMarker = import("/lua/sim/vizmarker.lua").VisionMarkerOpti
 
 AIFGuidedMissile02 = ClassProjectile(AGuidedMissileProjectile) {
     OnImpact = function(self, TargetType, TargetEntity)
-        AMiasmaProjectile.OnImpact(self, TargetType, TargetEntity)
-
         local bp = self:GetBlueprint().Audio
         local snd = bp['Impact' .. TargetType]
         if snd then
@@ -36,6 +34,8 @@ AIFGuidedMissile02 = ClassProjectile(AGuidedMissileProjectile) {
         --emitter = CreateEmitterAtEntity(self, self.Army, '/effects/emitters/_Mercy_Circle_2.bp')
         --local emitter = CreateEmitterAtEntity(self, self.Army, '/effects/emitters/_Mercy_Circle.bp')
 
+        -- let bloom thrive a bit
+        CreateLightParticleIntel(self, -1, self.Army, 5, 8, 'glow_02', 'ramp_flare_02')
 
         self:Destroy()
     end,
