@@ -4,62 +4,85 @@
 -- Summary  :  Aeon Guided Missile, DAA0206
 -- Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 -------------------------------------------------------------------------------------
-local AGuidedMissileProjectile = import("/lua/aeonprojectiles.lua").AGuidedMissileProjectile
-local RandF = import("/lua/utilities.lua").GetRandomFloat
-local EffectTemplate = import("/lua/effecttemplates.lua")
 
+local AGuidedMissileProjectile = import("/lua/aeonprojectiles.lua").AGuidedMissileProjectile
+local AGuidedMissileProjectileOnCreate = AGuidedMissileProjectile.OnCreate
+
+-- pre-import for performance
+local AMercyGuidedMissileSplit = import("/lua/effecttemplates.lua").AMercyGuidedMissileSplit
+
+-- upvalue scope for performance
+local MathSin = math.sin
+local MathCos = math.cos
+local ForkThread = ForkThread
+local IsDestroyed = IsDestroyed
+local CreateEmitterOnEntity = CreateEmitterOnEntity
+local CreateEmitterAtEntity = CreateEmitterAtEntity
+local CreateLightParticleIntel = CreateLightParticleIntel
+
+---@class AIFGuidedMissile : AGuidedMissileProjectile
 AIFGuidedMissile = ClassProjectile(AGuidedMissileProjectile) {
+
+    ---@param self AIFGuidedMissile
     OnCreate = function(self)
-        AGuidedMissileProjectile.OnCreate(self)
+        AGuidedMissileProjectileOnCreate(self)
+
+        -- tell the mercy to self destruct
         local launcher = self.Launcher
-        if launcher and not launcher:IsDead() then
+        if launcher and not IsDestroyed(launcher) then
             launcher:ProjectileFired()
         end
+
         self.Trash:Add(ForkThread(self.SplitThread, self))
     end,
 
+    ---@param self AIFGuidedMissile
     SplitThread = function(self)
-        ------Create/play the split effects.
-        for k, v in EffectTemplate.AMercyGuidedMissileSplit do
-            CreateEmitterOnEntity(self, self.Army, v)
+        -- local scope for performance
+        local army = self.Army
+
+        -- create a split effect
+        for k, v in AMercyGuidedMissileSplit do
+            CreateEmitterOnEntity(self, army, v)
         end
+
+        -- we wait here so that the projectile has all the statistics set
         WaitTicks(1)
 
+        -- create the dummy projectiles
         -- Create several other projectiles in a dispersal pattern
         local vx, vy, vz = self:GetVelocity()
-        local velocity = 16
         local numProjectiles = 8
         local angle = (2 * math.pi) / numProjectiles
         local ChildProjectileBP = '/projectiles/AIFGuidedMissile02/AIFGuidedMissile02_proj.bp'
         local spreadMul = 0.4 -- Adjusts the width of the dispersal
-        local xVec = 0
-        local yVec = vy
-        local zVec = 0
-        local target = self.OriginalTarget
-        local tx, ty, tz = target:GetPositionXYZ()
-        local radius = 7.5
-
+        local xVec, yVec, zVec = 0, vy, 0
+        local target = self:GetCurrentTargetPosition()
+        local tx, ty, tz = target[1], target[2], target[3]
+        local radius = 5
 
         -- Adjust damage by number of split projectiles
         self.DamageData.DamageAmount = self.DamageData.DamageAmount / numProjectiles
 
-        -- -- Launch projectiles at semi-random angles away from split location
-
+        -- Launch projectiles at semi-random angles away from split location
         for i = 0, (numProjectiles - 1) do
-            addx = math.sin(i * angle) * spreadMul
-            addz = math.cos(i * angle) * spreadMul
-            --equalizer = 1.4
-            --WARN("addx = " .. tostring(addx) .. "    vx = " .. tostring(vx) .. "   sum = " .. tostring(addx + vx))
-            xVec = vx + addx
-            zVec = vz + addz
+            -- create the projectile
             local proj = self:CreateChildProjectile(ChildProjectileBP)
+
+            -- match velocity
+            xVec = vx + MathSin(i * angle) * spreadMul
+            zVec = vz + MathCos(i * angle) * spreadMul
             proj:SetVelocity(xVec, yVec, zVec)
-            --proj:SetVelocity( velocity )
+            proj:SetVelocity( 20 )
+
+            -- determine new target on the unit circle
             local newTarget = {
-                tx + radius * math.sin(i * angle),
+                tx + radius * MathSin(i * angle),
                 ty,
-                tz + radius * math.cos(i * angle),
+                tz + radius * MathCos(i * angle),
             }
+
+            -- set the new target
             proj:SetNewTargetGround(newTarget)
             proj.DamageData = self.DamageData
             proj.tx = tx
@@ -67,12 +90,21 @@ AIFGuidedMissile = ClassProjectile(AGuidedMissileProjectile) {
         end
     end,
 
+    ---@param self AIFGuidedMissile
+    ---@param TargetType any
+    ---@param TargetEntity any
     OnImpact = function(self, TargetType, TargetEntity)
-        CreateEmitterAtEntity(self, self.Army, '/effects/emitters/_Mercy_Circle_1.bp')
-        CreateEmitterAtEntity(self, self.Army, '/effects/emitters/_Mercy_Circle_2.bp')
-        CreateEmitterAtEntity(self, self.Army, '/effects/emitters/_Mercy_Fog.bp'):SetEmitterParam('LIFETIME', 100)
-        CreateEmitterAtEntity(self, self.Army, '/effects/emitters/_Mercy_sparkle_2.bp'):SetEmitterParam('LIFETIME', 100)
-        WARN("Sup bitch")
+        -- local scope for performance
+        local army = self.Army
+
+        -- let bloom thrive a bit
+        CreateLightParticleIntel(self, -1, army, 9, 8, 'glow_02', 'ramp_flare_02')
+
+        -- create the impact effects
+        CreateEmitterAtEntity(self, army, '/effects/emitters/_Mercy_Circle_1.bp')
+        CreateEmitterAtEntity(self, army, '/effects/emitters/_Mercy_Circle_2.bp')
+        CreateEmitterAtEntity(self, army, '/effects/emitters/_Mercy_Fog.bp'):SetEmitterParam('LIFETIME', 100)
+        CreateEmitterAtEntity(self, army, '/effects/emitters/_Mercy_sparkle_2.bp'):SetEmitterParam('LIFETIME', 100)
         self:Destroy()
     end
 }

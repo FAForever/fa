@@ -11,16 +11,6 @@ local VisionMarker = import("/lua/sim/vizmarker.lua").VisionMarkerOpti
 
 
 AIFGuidedMissile02 = ClassProjectile(AGuidedMissileProjectile) {
-    OnCreate = function(self)
-        AGuidedMissileProjectile.OnCreate(self)
-        self.Trash:Add(ForkThread(self.MovementThread, self))
-    end,
-
-    MovementThread = function(self)
-        WaitTicks(7)
-        self:TrackTarget(true)
-    end,
-
     OnImpact = function(self, TargetType, TargetEntity)
         AMiasmaProjectile.OnImpact(self, TargetType, TargetEntity)
 
@@ -41,18 +31,6 @@ AIFGuidedMissile02 = ClassProjectile(AGuidedMissileProjectile) {
         entity:UpdatePosition(px, pz)
         entity:UpdateIntel(self.Army, 12, 'Vision', true)
         entity:UpdateDuration(10)
-
-        -- Transplanted AIFMiasmaShell02 code
-
-        local pos = self:GetPosition()
-        local radius = self.DamageData.DamageRadius
-        local FriendlyFire = self.DamageData.DamageFriendly and radius ~= 0
-
-        DamageArea(self, pos, 0.5 * radius, 1, 'TreeFire', FriendlyFire)
-        DamageArea(self, pos, 0.5 * radius, 1, 'TreeFire', FriendlyFire)
-
-        tx = self.tx
-        tz = self.tz
 
         --emitter = CreateEmitterAtEntity(self, self.Army, '/effects/emitters/_Mercy_Circle_1.bp')
         --emitter = CreateEmitterAtEntity(self, self.Army, '/effects/emitters/_Mercy_Circle_2.bp')
