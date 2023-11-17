@@ -1,6 +1,6 @@
 EmitterBlueprint {
 	BlueprintId = '_Mercy',
-	Lifetime = 100.00,
+	Lifetime = 90.00,
 	Repeattime = 100.00,
 	TextureFramecount = 1.00,
 	Blendmode = 5.00,
@@ -24,7 +24,7 @@ EmitterBlueprint {
 	MedFidelity = true,
 	HighFidelity = true,
 	Texture = [[/textures/particles/distorted_ring.dds]],
-	RampTexture = [[/textures/particles/testramp.dds]],
+	RampTexture = [[/textures/particles/ramp_blue_08.dds]],
 	XDirectionCurve = {
 		XRange = 100.00,
 		Keys = {

@@ -114,15 +114,12 @@ EmitterBlueprint {
 		XRange = 5.00,
 		Keys = {
 			{ x=0.000,y=7.500,z=0.000 },
-			{ x=4.889,y=7.500,z=0.000 },
 		},
 	},
 	EndSizeCurve = {
 		XRange = 5.00,
 		Keys = {
 			{ x=0.000,y=6.000,z=0.000 },
-			{ x=2.378,y=6.000,z=0.000 },
-			{ x=3.514,y=6.000,z=0.000 },
 		},
 	},
 	InitialRotationCurve = {

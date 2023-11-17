@@ -100,6 +100,7 @@ AIFGuidedMissile = ClassProjectile(AGuidedMissileProjectile) {
 
         -- create the impact effects
         CreateEmitterAtEntity(self, army, '/effects/emitters/_Mercy_Circle_1.bp')
+        CreateEmitterAtEntity(self, army, '/effects/emitters/_Mercy_distort.bp')
         CreateEmitterAtEntity(self, army, '/effects/emitters/_Mercy_Circle_2.bp')
         CreateEmitterAtEntity(self, army, '/effects/emitters/_Mercy_Fog.bp'):SetEmitterParam('LIFETIME', 100)
         CreateEmitterAtEntity(self, army, '/effects/emitters/_Mercy_sparkle_2.bp'):SetEmitterParam('LIFETIME', 100)
