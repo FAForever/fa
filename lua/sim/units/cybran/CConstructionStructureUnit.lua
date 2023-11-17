@@ -21,7 +21,7 @@
 --**********************************************************************************
 
 local CStructureUnit = import('/lua/cybranunits.lua').CStructureUnit
-local CConstructionTemplate = import('/lua/BuildingTemplates.lua').CConstructionTemplate
+local CConstructionTemplate = import('/lua/cybranunits.lua').CConstructionTemplate
 
 -- TODO: This should be made more general and put in defaultunits.lua in case other factions get similar buildings
 -- CConstructionStructureUnit

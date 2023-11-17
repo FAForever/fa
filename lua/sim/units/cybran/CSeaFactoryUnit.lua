@@ -21,7 +21,7 @@
 --**********************************************************************************
 
 local SeaFactoryUnit = import('/lua/defaultunits.lua').SeaFactoryUnit
-local EffectUtil = import('/lua/EffectUtilities.lua')
+local EffectUtil = import('/lua/effectutilities.lua')
 local StructureUnit = import('/lua/defaultunits.lua').StructureUnit
 
 -- SEA FACTORY STRUCTURES

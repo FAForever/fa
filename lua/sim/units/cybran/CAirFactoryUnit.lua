@@ -21,7 +21,7 @@
 --**********************************************************************************
 
 local AirFactoryUnit = import('/lua/defaultunits.lua').AirFactoryUnit
-local EffectUtil = import('/lua/EffectUtilities.lua')
+local EffectUtil = import('/lua/effectutilities.lua')
 
 -- AIR FACTORY STRUCTURES
 ---@class CAirFactoryUnit : AirFactoryUnit

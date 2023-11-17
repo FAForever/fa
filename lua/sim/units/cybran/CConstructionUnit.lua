@@ -22,7 +22,7 @@
 
 local ConstructionUnit = import('/lua/defaultunits.lua').ConstructionUnit
 local ClassUnit = import('/lua/sim/Unit.lua').Unit
-local CConstructionTemplate = import('/lua/sim/units/CConstructionTemplate.lua').CConstructionTemplate
+local CConstructionTemplate = import('/lua/cybranunits.lua').CConstructionTemplate
 
 -- CONSTRUCTION UNITS
 ---@class CConstructionUnit : ConstructionUnit, CConstructionTemplate

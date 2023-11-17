@@ -21,7 +21,7 @@
 --**********************************************************************************
 
 local CommandUnit = import('/lua/defaultunits.lua').CommandUnit
-local CConstructionTemplate = import('/lua/cybran/CConstructionTemplate.lua').CConstructionTemplate
+local CConstructionTemplate = import('/lua/cybranunits.lua').CConstructionTemplate
 
 ---# CCommandUnit
 ---Cybran Command Units (ACU and SCU) have stealth and cloak enhancements, toggles can be handled in one class
