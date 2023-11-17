@@ -7,17 +7,43 @@ local SOhwalliStrategicBombProjectile = import("/lua/seraphimprojectiles.lua").S
 
 --- Ohwalli-Strategic Bomb script, used on XSA402
 ---@class SBOOhwalliStategicBomb01 : SOhwalliStrategicBombProjectile
-SBOOhwalliStategicBomb01 = ClassProjectile(SOhwalliStrategicBombProjectile){
+SBOOhwalliStategicBomb01 = ClassProjectile(SOhwalliStrategicBombProjectile) {
 
     ---@param self SBOOhwalliStategicBomb01
     ---@param targetType string
     ---@param targetEntity Prop|Unit
     OnImpact = function(self, targetType, targetEntity)
-        SOhwalliStrategicBombProjectile.OnImpact(self, targetType, targetEntity)
+        local effectController = '/effects/entities/SBOOhwalliBombEffectController01/SBOOhwalliBombEffectController01_proj.bp'
+        self:CreateProjectile(effectController, 0, 0, 0, 0, 0, 0)
 
-        if targetType == "Terrain" or (targetEntity and targetEntity.Layer == "Land") then
-            self:CreateProjectile('/effects/entities/SBOOhwalliBombEffectController01/SBOOhwalliBombEffectController01_proj.bp', 0, 0, 0, 0, 0, 0):SetCollision(false)
-        end
+        -- separate damage thread
+        local data = self.DamageData
+        local damage = data.DamageAmount
+        local radius = data.DamageRadius or 0
+        local instigator = self.Launcher or self
+        ForkThread(self.DamageThread, self, self:GetPosition(), instigator, damage, radius)
+        self:Destroy()
+    end,
+
+    ---@param self SBOOhwalliStategicBomb01
+    ---@param position Vector
+    ---@param instigator? Unit | Projectile
+    ---@param damage number
+    ---@param radius number
+    DamageThread = function(self, position, instigator, damage, radius)
+        -- knock over trees
+        DamageArea(instigator, position, 0.75 * radius, 1, 'TreeForce', false)
+
+        -- initial damage
+        DamageArea(instigator, position, radius, 0.1 * damage, 'Normal', false)
+
+        -- wait for the full explosion and then deal the remaining damage
+        WaitTicks(26)
+        DamageArea(instigator, position, radius, 0.3 * damage, 'Normal', false)
+        WaitTicks(1)
+        DamageArea(instigator, position, radius, 0.3 * damage, 'Normal', false)
+        WaitTicks(1)
+        DamageArea(instigator, position, radius, 0.3 * damage, 'Normal', false)
     end,
 }
 TypeClass = SBOOhwalliStategicBomb01
