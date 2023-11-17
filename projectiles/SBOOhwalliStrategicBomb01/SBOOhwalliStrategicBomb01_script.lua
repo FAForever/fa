@@ -33,7 +33,8 @@ SBOOhwalliStategicBomb01 = ClassProjectile(SOhwalliStrategicBombProjectile) {
     DamageThread = function(self, position, instigator, damage, radius)
         -- knock over trees
         DamageArea(instigator, position, 0.75 * radius, 1, 'TreeForce', false)
-
+        DamageArea(instigator, position, 0.75 * radius, 1, 'TreeForce', false)
+        
         -- initial damage
         DamageArea(instigator, position, radius, 0.1 * damage, 'Normal', false)
 
