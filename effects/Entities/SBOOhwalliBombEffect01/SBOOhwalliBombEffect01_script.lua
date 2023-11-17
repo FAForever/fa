@@ -36,9 +36,9 @@ SBOOhwalliBombEffect01 = Class(EmitterProjectile) {
 		CreateLightParticleIntel(self, -1, army, 3, 5, 'glow_03', 'ramp_antimatter_02')
 
 		-- create a bit of fire and additional damage
-		DamageArea(self, position, 3, 1, "TreeForce", false)
+		DamageArea(self, position, 2, 1, "TreeForce", false)
 		DamageArea(self, position, 3, 1, "TreeFire", false)
-		DamageArea(self, position, 3, 1, "TreeForce", false)
+		DamageArea(self, position, 2, 1, "TreeForce", false)
 		DamageArea(self, position, 1, 1, 'Disintegrate', false)
 		DamageArea(self, position, 3, 300, "Normal", false)
 	end,
