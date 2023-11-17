@@ -57,6 +57,7 @@ UnitBlueprint{
         "PRODUCTSC1",
         "RECLAIMABLE",
         "SELECTABLE",
+        "SHIELD",
         "SHOWQUEUE",
         "SNIPEMODE",
         "UEF",
