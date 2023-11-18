@@ -52,6 +52,7 @@ local StructureUnitOnStartBeingBuiltRotateBuildings = categories.STRUCTURE * (ca
 ---@field DeathAnimManip moho.AnimationManipulator
 ---@field OnBeingBuiltEffectsBag TrashBag
 ---@field AdjacencyBeamsBag TrashBag
+---@field BuildEffectsBag TrashBag
 StructureUnit = ClassUnit(Unit) {
     LandBuiltHiddenBones = {'Floatation'},
     MinConsumptionPerSecondEnergy = 1,

@@ -534,6 +534,11 @@ AbortNavigation = function()
     SimCallback({ Func = 'AbortNavigation', Args = { } }, true)
 end
 
+DischargeShields = function()
+    print("Discharge shields")
+    SimCallback({ Func = 'DischargeShields', Args = { } }, true)
+end
+
 AssignPlatoonBehaviorSilo = function()
     SimCallback({ Func = 'AIPlatoonSiloTacticalBehavior', Args = { Behavior = 'AIBehaviorTacticalSimple' } }, true)
 end

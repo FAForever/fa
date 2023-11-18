@@ -1,35 +1,12 @@
 UnitBlueprint {
+    Description = '<LOC zab9603_desc>Naval Factory',
     Audio = {
-        Construct = Sound {
-            Bank = 'UAB',
-            Cue = 'UAB0303_Construct_Start',
-            LodCutoff = 'UnitMove_LodCutoff',
-        },
-        ConstructLoop = Sound {
-            Bank = 'UAB',
-            Cue = 'UAB0303_Construct_Loop',
-            LodCutoff = 'UnitMove_LodCutoff',
-        },
-        DeathExplosion = Sound {
-            Bank = 'UALDestroy',
-            Cue = 'UAB_Destroy_Lrg_PreDestroy',
-            LodCutoff = 'UnitMove_LodCutoff',
-        },
-        Destroyed = Sound {
-            Bank = 'UALDestroy',
-            Cue = 'UAB_Destroy_Huge',
-            LodCutoff = 'UnitMove_LodCutoff',
-        },
-        DoneBeingBuilt = Sound {
-            Bank = 'UAB',
-            Cue = 'UAB0303_Activate',
-            LodCutoff = 'UnitMove_LodCutoff',
-        },
-        UISelection = Sound {
-            Bank = 'Interface',
-            Cue = 'Aeon_Select_Factory',
-            LodCutoff = 'UnitMove_LodCutoff',
-        },
+        Construct      = Sound { Bank = 'UAB',        Cue = 'UAB0303_Construct_Start',    LodCutoff = 'UnitMove_LodCutoff' },
+        ConstructLoop  = Sound { Bank = 'UAB',        Cue = 'UAB0303_Construct_Loop',     LodCutoff = 'UnitMove_LodCutoff' },
+        DeathExplosion = Sound { Bank = 'UALDestroy', Cue = 'UAB_Destroy_Lrg_PreDestroy', LodCutoff = 'UnitMove_LodCutoff' },
+        Destroyed      = Sound { Bank = 'UALDestroy', Cue = 'UAB_Destroy_Huge',           LodCutoff = 'UnitMove_LodCutoff' },
+        DoneBeingBuilt = Sound { Bank = 'UAB',        Cue = 'UAB0303_Activate',           LodCutoff = 'UnitMove_LodCutoff' },
+        UISelection    = Sound { Bank = 'Interface',  Cue = 'Aeon_Select_Factory',        LodCutoff = 'UnitMove_LodCutoff' },
     },
     BuildIconSortPriority = 61,
     Categories = {
@@ -64,7 +41,6 @@ UnitBlueprint {
         SubThreatLevel = 0,
         SurfaceThreatLevel = 0,
     },
-    Description = '<LOC zab9603_desc>Naval Factory',
     Display = {
         BuildAttachBone = 'Attachpoint01',
         IdleEffects = {
@@ -106,24 +82,20 @@ UnitBlueprint {
         BuildCostEnergy = 11000,
         BuildCostMass = 2200,
         BuildRate = 150,
-        BuildTime = 3500,
-        DifferentialUpgradeCostCalculation = true,
-        RebuildBonusIds = {
-            'zab9603',
-        },
+        BuildTime = 10800,
         BuildableCategory = {
             'BUILTBYTIER3FACTORY AEON MOBILE CONSTRUCTION',
             'BUILTBYTIER3FACTORY AEON STRUCTURE NAVAL',
             'BUILTBYTIER3FACTORY AEON MOBILE NAVAL',
         },
+        DifferentialUpgradeCostCalculation = true,
         InitialRallyX = 0,
         InitialRallyZ = 10,
+        RebuildBonusIds = { 'zab9603' },
         StorageEnergy = 0,
         StorageMass = 320,
     },
-    Footprint = {
-        MinWaterDepth = 1.5,
-    },
+    Footprint = { MinWaterDepth = 1.5 },
     General = {
         BuildBones = {
             BuildEffectBones = {
@@ -158,12 +130,7 @@ UnitBlueprint {
         UpgradesFrom = 'zab9503',
         UpgradesFromBase = 'uab0103',
     },
-    Intel = {
-        VisionRadius = 20,
-    },
-    Interface = {
-        HelpText = '<LOC zab9603_help>Naval Factory',
-    },
+    Intel = { VisionRadius = 20 },
     LifeBarHeight = 0.075,
     LifeBarOffset = 6.7,
     LifeBarSize = 4.75,
@@ -186,18 +153,8 @@ UnitBlueprint {
         MotionType = 'RULEUMT_None',
         ComputeRollOffPoint = true,
         RollOffPoints = {
-            {
-                UnitSpin = 180,
-                X = -6,
-                Y = 0,
-                Z = -8,
-            },
-            {
-                UnitSpin = 0,
-                X = -6,
-                Y = 0,
-                Z = 8,
-            },
+            { UnitSpin = 180, X = -6, Y = 0, Z = -8 },
+            { UnitSpin = 0,   X = -6, Y = 0, Z = 8  },
         },
         SkirtOffsetX = -6,
         SkirtOffsetZ = -2,
