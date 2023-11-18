@@ -4,6 +4,7 @@ local FireState = import("/lua/game.lua").FireState
 
 ---@class FactoryUnit : StructureUnit
 ---@field BuildingUnit boolean
+---@field BuildEffectsBag TrashBag
 ---@field BuildBoneRotator moho.RotateManipulator
 ---@field BuildEffectBones string[]
 ---@field RollOffPoint Vector
@@ -137,9 +138,12 @@ FactoryUnit = ClassUnit(StructureUnit) {
     ---@param self FactoryUnit
     OnUnpaused = function(self)
         StructureUnit.OnUnpaused(self)
-        if self:IsUnitState('Building') then
+        local unitBeingBuilt = self.UnitBeingBuilt --[[@as Unit]]
+        local unitBuildOrder = self.UnitBuildOrder
+        if self:IsUnitState('Building') and (not IsDestroyed(unitBeingBuilt)) then
+            LOG("OnUnpaused - FactoryUnit")
             self:PlayUnitAmbientSound('ConstructLoop')
-            StructureUnit.StartBuildingEffects(self, self.UnitBeingBuilt, self.UnitBuildOrder)
+            self:StartBuildingEffects(unitBeingBuilt, unitBuildOrder)
         end
     end,
 

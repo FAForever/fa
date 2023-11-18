@@ -22,6 +22,5 @@
 
 local AirStagingPlatformUnit = import('/lua/defaultunits.lua').AirStagingPlatformUnit
 
---  AIR STAGING STRUCTURES
 ---@class SAirStagingPlatformUnit : AirStagingPlatformUnit
 SAirStagingPlatformUnit = ClassUnit(AirStagingPlatformUnit) {}

@@ -21,16 +21,18 @@
 --**********************************************************************************
 
 local AirFactoryUnit = import('/lua/defaultunits.lua').AirFactoryUnit
+local AirFactoryUnitOnStartBuild = AirFactoryUnit.OnStartBuild
+local AirFactoryUnitUpgradingStateOnStopBuild = AirFactoryUnit.UpgradingState.OnStopBuild
+local AirFactoryUnitUpgradingStateOnFailedToBuild = AirFactoryUnit.UpgradingState.OnFailedToBuild
+
 local SFactoryUnit = import('/lua/seraphimunits.lua').SFactoryUnit
 
-
--- AIR STRUCTURES
 ---@class SAirFactoryUnit : AirFactoryUnit
 SAirFactoryUnit = ClassUnit(AirFactoryUnit) {
-    StartBuildFx = SFactoryUnit.StartBuildFx,
-    StartBuildFxUnpause = SFactoryUnit.StartBuildFxUnpause,
-    OnPaused = SFactoryUnit.OnPaused,
-    OnUnpaused = SFactoryUnit.OnUnpaused,
+    SyncRotators = SFactoryUnit.SyncRotators,
+    StartRotators = SFactoryUnit.StartRotators,
+    RestartRotators = SFactoryUnit.RestartRotators,
+    CreateBuildEffects = SFactoryUnit.CreateBuildEffects,
 
     FinishBuildThread = function(self, unitBeingBuilt, order)
         self:SetBusy(true)
@@ -58,7 +60,7 @@ SAirFactoryUnit = ClassUnit(AirFactoryUnit) {
     RollOffUnit = function(self)
         if EntityCategoryContains(categories.AIR, self.UnitBeingBuilt) then
             local spin, x, y, z = self:CalculateRollOffPoint()
-            local units = {self.UnitBeingBuilt}
+            local units = { self.UnitBeingBuilt }
             self.MoveCommand = IssueMove(units, Vector(x, y, z))
         end
     end,
@@ -76,8 +78,10 @@ SAirFactoryUnit = ClassUnit(AirFactoryUnit) {
                 unitBuilding:DetachFrom(true)
                 self:DetachAll(self.Blueprint.Display.BuildAttachBone or 0)
 
-                CreateEmitterAtBone(unitBuilding, -1, unitBuilding.Army, '/effects/emitters/seraphim_rifter_mobileartillery_hit_07_emit.bp'):OffsetEmitter(0, -1, 0)
-                CreateEmitterAtBone(unitBuilding, -1, unitBuilding.Army, '/effects/emitters/seraphim_rifter_mobileartillery_hit_07_emit.bp'):OffsetEmitter(0, -1, 0)
+                CreateEmitterAtBone(unitBuilding, -1, unitBuilding.Army,
+                    '/effects/emitters/seraphim_rifter_mobileartillery_hit_07_emit.bp'):OffsetEmitter(0, -1, 0)
+                CreateEmitterAtBone(unitBuilding, -1, unitBuilding.Army,
+                    '/effects/emitters/seraphim_rifter_mobileartillery_hit_07_emit.bp'):OffsetEmitter(0, -1, 0)
                 unitBuilding:HideBone(0, true)
             end
 
@@ -87,11 +91,16 @@ SAirFactoryUnit = ClassUnit(AirFactoryUnit) {
                 CreateLightParticle(unitBuilding, -1, unitBuilding.Army, 4, 12, 'glow_02', 'ramp_blue_22')
                 unitBuilding:ShowBone(0, true)
 
-                CreateEmitterAtBone(unitBuilding, -1, unitBuilding.Army, '/effects/emitters/seraphim_rifter_mobileartillery_hit_04_emit.bp'):OffsetEmitter(0, -1, 0)
-                CreateEmitterAtBone(unitBuilding, -1, unitBuilding.Army, '/effects/emitters/seraphim_rifter_mobileartillery_hit_05_emit.bp'):OffsetEmitter(0, -1, 0)
-                CreateEmitterAtBone(unitBuilding, -1, unitBuilding.Army, '/effects/emitters/seraphim_rifter_mobileartillery_hit_06_emit.bp'):OffsetEmitter(0, -1, 0)
-                CreateEmitterAtBone(unitBuilding, -1, unitBuilding.Army, '/effects/emitters/seraphim_rifter_mobileartillery_hit_07_emit.bp'):OffsetEmitter(0, -1, 0)
-                CreateEmitterAtBone(unitBuilding, -1, unitBuilding.Army, '/effects/emitters/seraphim_rifter_mobileartillery_hit_08_emit.bp'):OffsetEmitter(0, -1, 0)
+                CreateEmitterAtBone(unitBuilding, -1, unitBuilding.Army,
+                    '/effects/emitters/seraphim_rifter_mobileartillery_hit_04_emit.bp'):OffsetEmitter(0, -1, 0)
+                CreateEmitterAtBone(unitBuilding, -1, unitBuilding.Army,
+                    '/effects/emitters/seraphim_rifter_mobileartillery_hit_05_emit.bp'):OffsetEmitter(0, -1, 0)
+                CreateEmitterAtBone(unitBuilding, -1, unitBuilding.Army,
+                    '/effects/emitters/seraphim_rifter_mobileartillery_hit_06_emit.bp'):OffsetEmitter(0, -1, 0)
+                CreateEmitterAtBone(unitBuilding, -1, unitBuilding.Army,
+                    '/effects/emitters/seraphim_rifter_mobileartillery_hit_07_emit.bp'):OffsetEmitter(0, -1, 0)
+                CreateEmitterAtBone(unitBuilding, -1, unitBuilding.Army,
+                    '/effects/emitters/seraphim_rifter_mobileartillery_hit_08_emit.bp'):OffsetEmitter(0, -1, 0)
             end
 
             WaitTicks(8)
@@ -101,63 +110,32 @@ SAirFactoryUnit = ClassUnit(AirFactoryUnit) {
         end
     end,
 
+    ---@param self SAirFactoryUnit
+    ---@param unitBeingBuilt Unit
+    ---@param order string
     OnStartBuild = function(self, unitBeingBuilt, order)
-        -- Set goal for rotator
-        local unitid = self:GetBlueprint().General.UpgradesTo
-        if unitBeingBuilt.UnitId == unitid and order == 'Upgrade' then
-            -- Stop pods that exist in the upgraded unit
-            local savedAngle
-            if self.Rotator1 then
-                savedAngle = self.Rotator1:GetCurrentAngle()
-                self.Rotator1:SetGoal(savedAngle)
-                unitBeingBuilt.Rotator1:SetCurrentAngle(savedAngle)
-                unitBeingBuilt.Rotator1:SetGoal(savedAngle)
-                -- Freeze the next rotator to 0, since that's where it will be
-                unitBeingBuilt.Rotator2:SetCurrentAngle(0)
-                unitBeingBuilt.Rotator2:SetGoal(0)
-            end
+        AirFactoryUnitOnStartBuild(self, unitBeingBuilt, order)
 
-            if self.Rotator2 then
-                savedAngle = self.Rotator2:GetCurrentAngle()
-                self.Rotator2:SetGoal(savedAngle)
-                unitBeingBuilt.Rotator2:SetCurrentAngle(savedAngle)
-                unitBeingBuilt.Rotator2:SetGoal(savedAngle)
-                unitBeingBuilt.Rotator3:SetCurrentAngle(0)
-                unitBeingBuilt.Rotator3:SetGoal(0)
-            end
+        if order == 'Upgrade' then
+            self:SyncRotators(unitBeingBuilt)
         end
-        AirFactoryUnit.OnStartBuild(self, unitBeingBuilt, order)
     end,
 
     UpgradingState = State(AirFactoryUnit.UpgradingState) {
+        ---@param self SAirFactoryUnit
+        ---@param unitBuilding SFactoryUnit
         OnStopBuild = function(self, unitBuilding)
+            AirFactoryUnitUpgradingStateOnStopBuild(self, unitBuilding)
+
             if unitBuilding:GetFractionComplete() == 1 then
-                -- Start halted rotators on upgraded unit
-                if unitBuilding.Rotator1 then
-                    unitBuilding.Rotator1:ClearGoal()
-                end
-                if unitBuilding.Rotator2 then
-                    unitBuilding.Rotator2:ClearGoal()
-                end
-                if unitBuilding.Rotator3 then
-                    unitBuilding.Rotator3:ClearGoal()
-                end
+                self:StartRotators(unitBuilding)
             end
-            AirFactoryUnit.UpgradingState.OnStopBuild(self, unitBuilding)
         end,
 
+        ---@param self SAirFactoryUnit
         OnFailedToBuild = function(self)
-           AirFactoryUnit.UpgradingState.OnFailedToBuild(self)
-           -- Failed to build, so resume rotators
-           if self.Rotator1 then
-               self.Rotator1:ClearGoal()
-               self.Rotator1:SetSpeed(5)
-           end
-
-            if self.Rotator2 then
-               self.Rotator2:ClearGoal()
-               self.Rotator2:SetSpeed(5)
-           end
+            AirFactoryUnitUpgradingStateOnFailedToBuild(self)
+            self:RestartRotators()
         end,
     },
 }

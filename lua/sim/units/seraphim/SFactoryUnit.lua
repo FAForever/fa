@@ -21,38 +21,105 @@
 --**********************************************************************************
 
 local FactoryUnit = import('/lua/defaultunits.lua').FactoryUnit
-local StructureUnit = import('/lua/defaultunits.lua').StructureUnit
 
+-- pre-import for performance
+local TrashAdd = TrashBag.Add
 local CreateSeraphimFactoryBuildingEffects = import('/lua/EffectUtilities.lua').CreateSeraphimFactoryBuildingEffects
 
--- FACTORIES
+-- upvalue scope for performance
+local ForkThread = ForkThread
+
 ---@class SFactoryUnit : FactoryUnit
+---@field Rotator1? moho.RotateManipulator
+---@field Rotator2? moho.RotateManipulator
+---@field Rotator3? moho.RotateManipulator
 SFactoryUnit = ClassUnit(FactoryUnit) {
-    StartBuildFx = function(self, unitBeingBuilt)
-        local BuildBones = self.BuildEffectBones
-        local thread = self:ForkThread(CreateSeraphimFactoryBuildingEffects, unitBeingBuilt, BuildBones, 'Attachpoint', self.BuildEffectsBag)
-        self.BuildEffectsBag:Add(thread)
+    ---@param self SFactoryUnit
+    ---@param unitBeingBuilt Unit
+    ---@param order string
+    CreateBuildEffects = function(self, unitBeingBuilt, order)
+        local trashBag = self.Trash
+        local buildEffectsBag = self.BuildEffectsBag
+        local buildEffectBones = self.BuildEffectBones
+
+        local thread = ForkThread(CreateSeraphimFactoryBuildingEffects, self, unitBeingBuilt, buildEffectBones,
+            'Attachpoint', buildEffectsBag)
+        TrashAdd(trashBag, thread)
+        TrashAdd(buildEffectsBag, thread)
     end,
 
-    StartBuildFxUnpause = function(self, unitBeingBuilt)
-        local BuildBones = self.BuildEffectBones
-        local thread = self:ForkThread(CreateSeraphimFactoryBuildingEffects, unitBeingBuilt, BuildBones, 'Attachpoint', self.BuildEffectsBag)
-        self.BuildEffectsBag:Add(thread)
-    end,
+    ---@param self SFactoryUnit
+    ---@param unitBeingBuilt SFactoryUnit
+    SyncRotators = function(self, unitBeingBuilt)
+        -- retrieve all rotators
+        local rotator1 = self.Rotator1
+        local rotator2 = self.Rotator2
+        local otherRotator1 = unitBeingBuilt.Rotator1
+        local otherRotator2 = unitBeingBuilt.Rotator2
+        local otherRotator3 = unitBeingBuilt.Rotator3
 
-    OnPaused = function(self)
-        StructureUnit.OnPaused(self)
-        -- When factory is paused take some action
-        if self:IsUnitState('Building') and self.UnitBeingBuilt then
-            self:StopUnitAmbientSound('ConstructLoop')
-            self:StopBuildingEffects(self, self.UnitBeingBuilt)
+        -- inherit rotation
+        if rotator1 and otherRotator1 then
+            local savedAngle = rotator1:GetCurrentAngle()
+            rotator1:SetGoal(savedAngle)
+
+            otherRotator1:SetCurrentAngle(savedAngle)
+            otherRotator1:SetGoal(savedAngle)
+        end
+
+        if otherRotator2 then
+            otherRotator2:SetCurrentAngle(0)
+            otherRotator2:SetGoal(0)
+        end
+
+        -- inherit rotation
+        if rotator2 and otherRotator2 then
+            local savedAngle = rotator2:GetCurrentAngle()
+            rotator2:SetGoal(savedAngle)
+            otherRotator2:SetCurrentAngle(savedAngle)
+            otherRotator2:SetGoal(savedAngle)
+        end
+
+        if otherRotator3 then
+            otherRotator3:SetCurrentAngle(0)
+            otherRotator3:SetGoal(0)
         end
     end,
 
-    OnUnpaused = function(self)
-        FactoryUnit.OnUnpaused(self)
-        if self:IsUnitState('Building') and self.UnitBeingBuilt then
-            self:StartBuildFxUnpause(self:GetFocusUnit())
+    ---@param self SFactoryUnit
+    ---@param unitBeingBuilt SFactoryUnit
+    StartRotators = function(self, unitBeingBuilt)
+        local otherRotator1 = unitBeingBuilt.Rotator1
+        local otherRotator2 = unitBeingBuilt.Rotator2
+        local otherRotator3 = unitBeingBuilt.Rotator3
+
+        if otherRotator1 then
+            otherRotator1:ClearGoal()
+        end
+
+        if otherRotator2 then
+            otherRotator2:ClearGoal()
+        end
+
+        if otherRotator3 then
+            otherRotator3:ClearGoal()
+        end
+    end,
+
+    ---@param self SFactoryUnit
+    RestartRotators = function(self)
+        local rotator1 = self.Rotator1
+        local rotator2 = self.Rotator2
+
+        -- Failed to build, so resume rotators
+        if rotator1 then
+            rotator1:ClearGoal()
+            rotator1:SetSpeed(5)
+        end
+
+        if rotator2 then
+            rotator2:ClearGoal()
+            rotator2:SetSpeed(5)
         end
     end,
 }

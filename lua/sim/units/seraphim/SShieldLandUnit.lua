@@ -22,6 +22,5 @@
 
 local ShieldLandUnit = import('/lua/defaultunits.lua').ShieldLandUnit
 
--- SHIELD LAND UNITS
 ---@class SShieldLandUnit : ShieldLandUnit
 SShieldLandUnit = ClassUnit(ShieldLandUnit) {}

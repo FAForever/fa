@@ -22,7 +22,6 @@
 
 local ConcreteStructureUnit = import('/lua/defaultunits.lua').ConcreteStructureUnit
 
--- WALL  STRUCTURES
 ---@class SConcreteStructureUnit : ConcreteStructureUnit
 SConcreteStructureUnit = ClassUnit(ConcreteStructureUnit) {
     AdjacencyBeam = false,

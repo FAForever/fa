@@ -22,9 +22,5 @@
 
 local SubUnit = import('/lua/defaultunits.lua').SubUnit
 
--- SUBMARINE UNITS
 ---@class SSubUnit : SubUnit
-SSubUnit = ClassUnit(SubUnit) {
-    IdleSubBones = {},
-    IdleSubEffects = {}
-}
+SSubUnit = ClassUnit(SubUnit) {}

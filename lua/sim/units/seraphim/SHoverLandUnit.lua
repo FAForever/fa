@@ -22,10 +22,5 @@
 
 local HoverLandUnit = import('/lua/defaultunits.lua').HoverLandUnit
 
--- HOVERING LAND UNITS
 ---@class SHoverLandUnit : HoverLandUnit
-SHoverLandUnit = ClassUnit(HoverLandUnit) {
-    FxHoverScale = 1,
-    HoverEffects = nil,
-    HoverEffectBones = nil,
-}
+SHoverLandUnit = ClassUnit(HoverLandUnit) {}

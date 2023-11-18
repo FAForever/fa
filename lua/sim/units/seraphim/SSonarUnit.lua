@@ -22,6 +22,5 @@
 
 local SonarUnit = import('/lua/defaultunits.lua').SonarUnit
 
--- RADAR STRUCTURES
 ---@class SSonarUnit : SonarUnit
 SSonarUnit = ClassUnit(SonarUnit) {}

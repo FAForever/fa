@@ -22,8 +22,7 @@
 
 local AirUnit = import('/lua/defaultunits.lua').AirUnit
 
--- AIR UNITS
 ---@class SAirUnit : AirUnit
 SAirUnit = ClassUnit(AirUnit) {
-    ContrailEffects = {'/effects/emitters/contrail_ser_polytrail_01_emit.bp'}
+    ContrailEffects = { '/effects/emitters/contrail_ser_polytrail_01_emit.bp' }
 }

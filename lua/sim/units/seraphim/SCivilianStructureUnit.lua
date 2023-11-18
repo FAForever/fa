@@ -22,6 +22,5 @@
 
 local SStructureUnit = import('/lua/seraphimunits.lua').SStructureUnit
 
--- CIVILIAN STRUCTURES
 ---@class SCivilianStructureUnit : SStructureUnit
 SCivilianStructureUnit = ClassUnit(SStructureUnit) {}

@@ -122,6 +122,7 @@ local cUnit = moho.unit_methods
 ---@field TerrainType TerrainType
 ---@field EngineCommandCap? table<string, boolean>
 ---@field UnitBeingBuilt Unit?
+---@field UnitBuildOrder string
 ---@field EntityBeingReclaimed Unit | Prop | nil
 ---@field SoundEntity? Unit | Entity
 ---@field AutoModeEnabled? boolean
@@ -2930,11 +2931,12 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
     end,
 
     ---@param self Unit
-    ---@param built boolean
+    ---@param built Unit
     ---@param order string
     StartBuildingEffects = function(self, built, order)
         local buildEffectsBag = self.BuildEffectsBag
         if buildEffectsBag then
+            LOG("StartBuildingEffects - Unit")
             local thread = ForkThread(self.CreateBuildEffects, self, built, order)
             self.Trash:Add(thread)
             buildEffectsBag:Add(thread)
@@ -2942,9 +2944,10 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
     end,
 
     ---@param self Unit
-    ---@param built boolean
+    ---@param built Unit
     ---@param order string
     CreateBuildEffects = function(self, built, order)
+        LOG("CreateBuildEffects - Unit")
     end,
 
     ---@param self Unit

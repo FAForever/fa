@@ -22,6 +22,5 @@
 
 local RadarUnit = import('/lua/defaultunits.lua').RadarUnit
 
--- RADAR STRUCTURES
 ---@class SRadarUnit : RadarUnit
 SRadarUnit = ClassUnit(RadarUnit) {}

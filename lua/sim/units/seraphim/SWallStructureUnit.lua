@@ -22,6 +22,5 @@
 
 local WallStructureUnit = import('/lua/defaultunits.lua').WallStructureUnit
 
--- WALL  STRUCTURES
 ---@class SWallStructureUnit : WallStructureUnit
 SWallStructureUnit = Class(WallStructureUnit) {}

@@ -22,6 +22,5 @@
 
 local SeaUnit = import('/lua/defaultunits.lua').SeaUnit
 
--- SEA UNITS
 ---@class SSeaUnit : SeaUnit
 SSeaUnit = ClassUnit(SeaUnit) {}

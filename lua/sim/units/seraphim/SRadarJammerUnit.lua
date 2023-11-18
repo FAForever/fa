@@ -22,6 +22,5 @@
 
 local RadarJammerUnit = import('/lua/defaultunits.lua').RadarJammerUnit
 
--- RADAR JAMMER UNITS
 ---@class SRadarJammerUnit : RadarJammerUnit
 SRadarJammerUnit = ClassUnit(RadarJammerUnit) {}

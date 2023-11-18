@@ -21,73 +21,46 @@
 --**********************************************************************************
 
 local LandFactoryUnit = import('/lua/defaultunits.lua').LandFactoryUnit
+local LandFactoryUnitOnStartBuild = LandFactoryUnit.OnStartBuild
+local LandFactoryUnitUpgradingStateOnStopBuild = LandFactoryUnit.UpgradingState.OnStopBuild
+local LandFactoryUnitUpgradingStateOnFailedToBuild = LandFactoryUnit.UpgradingState.OnFailedToBuild
+
 local SFactoryUnit = import('/lua/seraphimunits.lua').SFactoryUnit
 
 -- LAND FACTORY STRUCTURES
 ---@class SLandFactoryUnit : LandFactoryUnit
 SLandFactoryUnit = ClassUnit(LandFactoryUnit) {
-    StartBuildFx = SFactoryUnit.StartBuildFx,
-    StartBuildFxUnpause = SFactoryUnit.StartBuildFxUnpause,
-    OnPaused = SFactoryUnit.OnPaused,
-    OnUnpaused = SFactoryUnit.OnUnpaused,
+    SyncRotators = SFactoryUnit.SyncRotators,
+    StartRotators = SFactoryUnit.StartRotators,
+    RestartRotators = SFactoryUnit.RestartRotators,
+    CreateBuildEffects = SFactoryUnit.CreateBuildEffects,
 
+    ---@param self SLandFactoryUnit
+    ---@param unitBeingBuilt Unit
+    ---@param order string
     OnStartBuild = function(self, unitBeingBuilt, order)
-        -- Set goal for rotator
-        local unitid = self:GetBlueprint().General.UpgradesTo
-        if unitBeingBuilt.UnitId == unitid and order == 'Upgrade' then
-            -- Stop pods that exist in the upgraded unit
-            local savedAngle
-            if self.Rotator1 then
-                savedAngle = self.Rotator1:GetCurrentAngle()
-                self.Rotator1:SetGoal(savedAngle)
-                unitBeingBuilt.Rotator1:SetCurrentAngle(savedAngle)
-                unitBeingBuilt.Rotator1:SetGoal(savedAngle)
-                -- Freeze the next rotator to 0, since that's where it will be
-                unitBeingBuilt.Rotator2:SetCurrentAngle(0)
-                unitBeingBuilt.Rotator2:SetGoal(0)
-            end
+        LandFactoryUnitOnStartBuild(self, unitBeingBuilt, order)
 
-            if self.Rotator2 then
-                savedAngle = self.Rotator2:GetCurrentAngle()
-                self.Rotator2:SetGoal(savedAngle)
-                unitBeingBuilt.Rotator2:SetCurrentAngle(savedAngle)
-                unitBeingBuilt.Rotator2:SetGoal(savedAngle)
-                unitBeingBuilt.Rotator3:SetCurrentAngle(0)
-                unitBeingBuilt.Rotator3:SetGoal(0)
-            end
+        if order == 'Upgrade' then
+            self:SyncRotators(unitBeingBuilt)
         end
-        LandFactoryUnit.OnStartBuild(self, unitBeingBuilt, order)
     end,
 
     UpgradingState = State(LandFactoryUnit.UpgradingState) {
+        ---@param self SLandFactoryUnit
+        ---@param unitBuilding SFactoryUnit
         OnStopBuild = function(self, unitBuilding)
+            LandFactoryUnitUpgradingStateOnStopBuild(self, unitBuilding)
+
             if unitBuilding:GetFractionComplete() == 1 then
-                -- Start halted rotators on upgraded unit
-                if unitBuilding.Rotator1 then
-                    unitBuilding.Rotator1:ClearGoal()
-                end
-                if unitBuilding.Rotator2 then
-                    unitBuilding.Rotator2:ClearGoal()
-                end
-                if unitBuilding.Rotator3 then
-                    unitBuilding.Rotator3:ClearGoal()
-                end
+                self:StartRotators(unitBuilding)
             end
-            LandFactoryUnit.UpgradingState.OnStopBuild(self, unitBuilding)
         end,
 
+        ---@param self SLandFactoryUnit
         OnFailedToBuild = function(self)
-           LandFactoryUnit.UpgradingState.OnFailedToBuild(self)
-           -- Failed to build, so resume rotators
-           if self.Rotator1 then
-               self.Rotator1:ClearGoal()
-               self.Rotator1:SetSpeed(5)
-           end
-
-            if self.Rotator2 then
-               self.Rotator2:ClearGoal()
-               self.Rotator2:SetSpeed(5)
-           end
+            LandFactoryUnitUpgradingStateOnFailedToBuild(self)
+            self:RestartRotators()
         end,
     },
 }

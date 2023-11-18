@@ -22,6 +22,5 @@
 
 local QuantumGateUnit = import('/lua/defaultunits.lua').QuantumGateUnit
 
--- QUANTUM GATE UNITS
 ---@class SQuantumGateUnit : QuantumGateUnit
 SQuantumGateUnit = ClassUnit(QuantumGateUnit) {}

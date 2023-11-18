@@ -22,6 +22,5 @@
 
 local MassCollectionUnit = import('/lua/defaultunits.lua').MassCollectionUnit
 
--- MASS COLLECTION UNITS
 ---@class SMassCollectionUnit : MassCollectionUnit
 SMassCollectionUnit = ClassUnit(MassCollectionUnit) {}

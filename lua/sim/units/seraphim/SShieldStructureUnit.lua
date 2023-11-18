@@ -21,25 +21,36 @@
 --**********************************************************************************
 
 local ShieldStructureUnit = import('/lua/defaultunits.lua').ShieldStructureUnit
+local ShieldStructureUnitOnShieldEnabled = ShieldStructureUnit.OnShieldEnabled
+local ShieldStructureUnitOnShieldDisabled = ShieldStructureUnit.OnShieldDisabled
 
--- SHIELD STRUCTURES
+-- upvalue scope for performance
+local CreateAnimator = CreateAnimator
+
 ---@class SShieldStructureUnit : ShieldStructureUnit
+---@field AnimationManipulator? moho.AnimationManipulator
 SShieldStructureUnit = ClassUnit(ShieldStructureUnit) {
     OnShieldEnabled = function(self)
-        ShieldStructureUnit.OnShieldEnabled(self)
+        ShieldStructureUnitOnShieldEnabled(self)
 
-        if not self.AnimationManipulator then
-            self.AnimationManipulator = CreateAnimator(self)
-            self.Trash:Add(self.AnimationManipulator)
-            self.AnimationManipulator:PlayAnim(self:GetBlueprint().Display.AnimationActivate, false)
+        local animationManipulator = self.AnimationManipulator
+        if not animationManipulator then
+            animationManipulator = CreateAnimator(self)
+            animationManipulator:PlayAnim(self.Blueprint.Display.AnimationActivate, false)
+            self.AnimationManipulator = self.Trash:Add(animationManipulator)
         end
-        self.AnimationManipulator:SetRate(1)
+
+        animationManipulator:SetRate(1)
     end,
 
     OnShieldDisabled = function(self)
-        ShieldStructureUnit.OnShieldDisabled(self)
-        if not self.AnimationManipulator then return end
+        ShieldStructureUnitOnShieldDisabled(self)
 
-        self.AnimationManipulator:SetRate(-1)
+        local animationManipulator = self.AnimationManipulator
+        if not animationManipulator then
+            return
+        end
+
+        animationManipulator:SetRate(-1)
     end,
 }
