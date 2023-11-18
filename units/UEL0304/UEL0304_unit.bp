@@ -229,7 +229,7 @@ UnitBlueprint{
             WeaponCategory = "Artillery",
             WeaponRepackTimeout = 0,
             WeaponUnpackAnimation = "/units/UEL0304/uel0304_aactivate.sca",
-            WeaponUnpackAnimationRate = 0.5,
+            WeaponUnpackAnimationRate = 1.0,
             WeaponUnpackLocksMotion = true,
             WeaponUnpacks = true,
         },

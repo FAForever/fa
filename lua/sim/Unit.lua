@@ -109,7 +109,7 @@ local cUnit = moho.unit_methods
 ---@field Brain AIBrain
 ---@field buildBots? Unit[]
 ---@field Blueprint UnitBlueprint
----@field BuildEffectsBag? TrashBag
+---@field BuildEffectsBag TrashBag
 ---@field Trash TrashBag
 ---@field Layer Layer
 ---@field Army Army
@@ -123,6 +123,7 @@ local cUnit = moho.unit_methods
 ---@field EngineCommandCap? table<string, boolean>
 ---@field UnitBeingBuilt Unit?
 ---@field UnitBuildOrder string
+---@field MyShield Shield?
 ---@field EntityBeingReclaimed Unit | Prop | nil
 ---@field SoundEntity? Unit | Entity
 ---@field AutoModeEnabled? boolean

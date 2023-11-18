@@ -11,6 +11,17 @@ local NullShell = import("/lua/sim/defaultprojectiles.lua").NullShell
 local RandomFloat = import("/lua/utilities.lua").GetRandomFloat
 local RandomInt = import("/lua/utilities.lua").GetRandomInt
 local EffectTemplate = import("/lua/effecttemplates.lua")
+local SOhwalliBombHit01 = EffectTemplate.SOhwalliBombHit01
+local ExplosionMediumWater = EffectTemplate.ExplosionMediumWater
+
+-- upvalue scope for performance
+local MathSin = math.sin
+local MathCos = math.cos
+local WaitTicks = WaitTicks
+local GetTerrainHeight = GetTerrainHeight
+local GetSurfaceHeight = GetSurfaceHeight
+local CreateEmitterAtEntity = CreateEmitterAtEntity
+
 
 local BaseRingRiftEffects = {
 	'/effects/Entities/SBOOhwalliBombEffect03/SBOOhwalliBombEffect03_proj.bp',
@@ -27,7 +38,16 @@ SBOOhwalliBombEffectController01 = Class(NullShell) {
     ---@param self SBOOhwalliBombEffectController01
     OnCreate = function( self )
 		NullShell.OnCreate(self)
-		local army = self:GetArmy()
+		local army = self.Army
+
+        -- create a water splash effect if we're on water
+        local position = self:GetPosition()
+        if GetSurfaceHeight(position[1], position[3]) > GetTerrainHeight(position[1], position[3]) then
+            for _, effect in ExplosionMediumWater do
+                local emitter = CreateEmitterAtEntity(self, army, effect)
+                emitter:ScaleEmitter(1)
+            end
+        end
 
         self:ForkThread(self.CreateInitialBuildup, army)
 		self:ForkThread(self.CreateRifts, army )
@@ -37,8 +57,8 @@ SBOOhwalliBombEffectController01 = Class(NullShell) {
     ---@param self SBOOhwalliBombEffectController01
     ---@param army number
     CreateInitialBuildup = function( self, army )
-		WaitSeconds(1.0)
-        for k, v in EffectTemplate.SOhwalliBombHit01 do
+		WaitTicks(11)
+        for k, v in SOhwalliBombHit01 do
             emit = CreateEmitterAtEntity(self,army,v)
         end
     end,
@@ -63,8 +83,8 @@ SBOOhwalliBombEffectController01 = Class(NullShell) {
         end  
 
         for i = 0, (num_projectiles -1) do
-            xVec = math.sin(angleInitial + (i*horizontal_angle) + RandomFloat(-angleVariation, angleVariation) )
-            zVec = math.cos(angleInitial + (i*horizontal_angle) + RandomFloat(-angleVariation, angleVariation) )
+            xVec = MathSin(angleInitial + (i*horizontal_angle) + RandomFloat(-angleVariation, angleVariation) )
+            zVec = MathCos(angleInitial + (i*horizontal_angle) + RandomFloat(-angleVariation, angleVariation) )
 
             local proj = self:CreateProjectile(BaseRingRiftEffects[RandomInt(1,3)], xVec * 1.2, 2, zVec * 1.2, xVec, 0, zVec)
             proj:SetVelocity(velocity * RandomFloat(0.7,1.4))
@@ -75,7 +95,7 @@ SBOOhwalliBombEffectController01 = Class(NullShell) {
     ---@param self SBOOhwalliBombEffectController01
     ---@param army number
     MainBlast = function( self, army )
-		WaitSeconds(2.5)
+		WaitTicks(26)
 
         -- Create a light for this thing's flash.
         CreateLightParticle(self, -1, self:GetArmy(), 80, 14, 'flare_lens_add_03', 'ramp_white_07' )
@@ -93,7 +113,7 @@ SBOOhwalliBombEffectController01 = Class(NullShell) {
         -- self:ShakeCamera( radius, maxShakeEpicenter, minShakeAtRadius, interval )
         self:ShakeCamera( 55, 10, 0, 2.5 )
 
-		WaitSeconds(0.3)
+		WaitTicks(4)
 
         -- Create upward moving smoke plume
         local plume = self:CreateProjectile('/effects/entities/SBOOhwalliBombEffect02/SBOOhwalliBombEffect02_proj.bp', 0, 3, 0, 0, 0, 0)
@@ -102,7 +122,6 @@ SBOOhwalliBombEffectController01 = Class(NullShell) {
         plume:SetVelocityAlign(true)
 
         -- Create explosion dust ring
-        local vx, vy, vz = self:GetVelocity()
         local num_projectiles = 16        
         local horizontal_angle = (2*math.pi) / num_projectiles
         local angleInitial = RandomFloat( 0, horizontal_angle )
@@ -111,8 +130,8 @@ SBOOhwalliBombEffectController01 = Class(NullShell) {
         local px, pz
 
         for i = 0, (num_projectiles -1) do            
-            xVec = (math.sin(angleInitial + (i*horizontal_angle)))
-            zVec = (math.cos(angleInitial + (i*horizontal_angle)))
+            xVec = (MathSin(angleInitial + (i*horizontal_angle)))
+            zVec = (MathCos(angleInitial + (i*horizontal_angle)))
             px = (offsetMultiple*xVec)
             pz = (offsetMultiple*zVec)
 
@@ -134,9 +153,9 @@ SBOOhwalliBombEffectController01 = Class(NullShell) {
         local px, py, pz
 
         for i = 0, (num_projectiles -1) do            
-            xVec = math.sin(angleInitial + (i*horizontal_angle) + RandomFloat(-angleVariation, angleVariation) )
+            xVec = MathSin(angleInitial + (i*horizontal_angle) + RandomFloat(-angleVariation, angleVariation) )
             yVec = RandomFloat( 0.7, 2.8 ) + 2.0
-            zVec = math.cos(angleInitial + (i*horizontal_angle) + RandomFloat(-angleVariation, angleVariation) )
+            zVec = MathCos(angleInitial + (i*horizontal_angle) + RandomFloat(-angleVariation, angleVariation) )
             px = RandomFloat( 0.5, 1.0 ) * xVec
             py = RandomFloat( 0.5, 1.0 ) * yVec
             pz = RandomFloat( 0.5, 1.0 ) * zVec
