@@ -141,7 +141,6 @@ FactoryUnit = ClassUnit(StructureUnit) {
         local unitBeingBuilt = self.UnitBeingBuilt --[[@as Unit]]
         local unitBuildOrder = self.UnitBuildOrder
         if self:IsUnitState('Building') and (not IsDestroyed(unitBeingBuilt)) then
-            LOG("OnUnpaused - FactoryUnit")
             self:PlayUnitAmbientSound('ConstructLoop')
             self:StartBuildingEffects(unitBeingBuilt, unitBuildOrder)
         end

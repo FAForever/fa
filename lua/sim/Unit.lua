@@ -2936,7 +2936,6 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
     StartBuildingEffects = function(self, built, order)
         local buildEffectsBag = self.BuildEffectsBag
         if buildEffectsBag then
-            LOG("StartBuildingEffects - Unit")
             local thread = ForkThread(self.CreateBuildEffects, self, built, order)
             self.Trash:Add(thread)
             buildEffectsBag:Add(thread)
@@ -2947,7 +2946,6 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
     ---@param built Unit
     ---@param order string
     CreateBuildEffects = function(self, built, order)
-        LOG("CreateBuildEffects - Unit")
     end,
 
     ---@param self Unit
