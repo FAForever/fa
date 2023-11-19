@@ -2757,7 +2757,8 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
 
     ---@param self Unit
     ---@param built Unit
-    OnStopBuild = function(self, built)
+    ---@param order string
+    OnStopBuild = function(self, built, order)
         self:StopBuildingEffects(built)
         self:SetActiveConsumptionInactive()
         self:DoOnUnitBuiltCallbacks(built)

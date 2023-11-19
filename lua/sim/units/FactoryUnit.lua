@@ -20,15 +20,23 @@ local CreateRotator = CreateRotator
 local CreateAnimator = CreateAnimator
 local EntityCategoryContains = EntityCategoryContains
 
+-- pre-compute for performance
+local categoriesAIR = categories.AIR
+local categoriesENGINEER = categories.ENGINEER
+
 ---@class FactoryUnit : StructureUnit
 ---@field BuildingUnit boolean
 ---@field BuildEffectsBag TrashBag
 ---@field BuildBoneRotator moho.RotateManipulator
 ---@field BuildEffectBones string[]
+---@field FactoryBuildFailed boolean
 ---@field RollOffPoint Vector
 FactoryUnit = ClassUnit(StructureUnit) {
 
     RollOffAnimationRate = 10,
+
+    ---------------------------------------------------------------------------
+    --#region Engine events
 
     ---@param self FactoryUnit
     OnCreate = function(self)
@@ -49,26 +57,8 @@ FactoryUnit = ClassUnit(StructureUnit) {
         -- store build effect bones for quick access
         self.BuildEffectBones = blueprint.General.BuildBones.BuildEffectBones
 
-        -- default to ground fire mode for all units being produced
-        self:SetFireState(2)
-
         -- save for quick access later
         self.RollOffPoint = { 0, 0, 0 }
-    end,
-
-    ---@param self FactoryUnit
-    DestroyUnitBeingBuilt = function(self)
-        local unitBeingBuilt = self.UnitBeingBuilt --[[@as Unit]]
-        if (not IsDestroyed(unitBeingBuilt)) then
-            local fraction = unitBeingBuilt:GetFractionComplete()
-            if fraction < 1.0 then
-                if fraction > 0.5 then
-                    unitBeingBuilt:Kill()
-                else
-                    unitBeingBuilt:Destroy()
-                end
-            end
-        end
     end,
 
     ---@param self FactoryUnit
@@ -84,7 +74,7 @@ FactoryUnit = ClassUnit(StructureUnit) {
 
             -- update all units affected by this
             local affected = brain:GetListOfUnits(categories.SUPPORTFACTORY - categories.EXPERIMENTAL, false)
-            for id, unit in affected do
+            for _, unit in affected do
                 unit:UpdateBuildRestrictions()
             end
         end
@@ -96,9 +86,8 @@ FactoryUnit = ClassUnit(StructureUnit) {
     OnPaused = function(self)
         StructureUnitOnPaused(self)
 
-        -- When factory is paused take some action
+        -- remove the build effects
         if self:IsUnitState('Building') then
-            self:StopUnitAmbientSound('ConstructLoop')
             self:StopBuildingEffects(self.UnitBeingBuilt)
         end
     end,
@@ -107,10 +96,10 @@ FactoryUnit = ClassUnit(StructureUnit) {
     OnUnpaused = function(self)
         StructureUnitOnUnpaused(self)
 
+        -- re-introduce the build effects
         local unitBeingBuilt = self.UnitBeingBuilt --[[@as Unit]]
         local unitBuildOrder = self.UnitBuildOrder
         if self:IsUnitState('Building') and (not IsDestroyed(unitBeingBuilt)) then
-            self:PlayUnitAmbientSound('ConstructLoop')
             self:StartBuildingEffects(unitBeingBuilt, unitBuildOrder)
         end
     end,
@@ -127,7 +116,7 @@ FactoryUnit = ClassUnit(StructureUnit) {
             ChangeState(self, self.BuildingState)
             self.BuildingUnit = nil
         elseif unitBeingBuilt.Blueprint.CategoriesHash["RESEARCH"] then
-            -- Removes assist command to prevent accidental cancellation when right-clicking on other factory
+            -- temporarily remove the ability to assist to prevent cancelling the upgrade
             self:RemoveCommandCap('RULEUCC_Guard')
             self.DisabledAssist = true
         end
@@ -136,18 +125,26 @@ FactoryUnit = ClassUnit(StructureUnit) {
     --- Introduce a rolloff delay, where defined.
     ---@param self FactoryUnit
     ---@param unitBeingBuilt Unit
-    ---@param order boolean
+    ---@param order string
     OnStopBuild = function(self, unitBeingBuilt, order)
+        StructureUnitOnStopBuild(self, unitBeingBuilt, order)
+
+        self.BuildingUnit = false
+
+        -- re-introduce the ability to assist
         if self.DisabledAssist then
             self:AddCommandCap('RULEUCC_Guard')
             self.DisabledAssist = nil
         end
-        local bp = self.Blueprint
-        if bp.General.RolloffDelay and bp.General.RolloffDelay > 0 and not self.FactoryBuildFailed then
-            self:ForkThread(self.PauseThread, bp.General.RolloffDelay, unitBeingBuilt, order)
-        else
-            self:DoStopBuild(unitBeingBuilt, order)
+
+        if not (self.FactoryBuildFailed or IsDestroyed(self)) then
+            if not EntityCategoryContains(categoriesAIR, unitBeingBuilt) then
+                self:RollOffUnit()
+            end
+            self:StopBuildFx()
+            self:ForkThread(self.FinishBuildThread, unitBeingBuilt, order)
         end
+
     end,
 
     ---@param self FactoryUnit
@@ -172,37 +169,32 @@ FactoryUnit = ClassUnit(StructureUnit) {
         end
     end,
 
-    --- Adds a pause between unit productions
     ---@param self FactoryUnit
-    ---@param productionpause number
-    ---@param unitBeingBuilt Unit
-    ---@param order boolean
-    PauseThread = function(self, productionpause, unitBeingBuilt, order)
+    OnFailedToBuild = function(self)
+        StructureUnitOnFailedToBuild(self)
+        self.FactoryBuildFailed = true
         self:StopBuildFx()
-        self:SetBusy(true)
-        self:SetBlockCommandQueue(true)
-
-        WaitSeconds(productionpause)
-
-        self:SetBusy(false)
-        self:SetBlockCommandQueue(false)
-        self:DoStopBuild(unitBeingBuilt, order)
+        ChangeState(self, self.IdleState)
     end,
 
-    ---@param self FactoryUnit
-    ---@param unitBeingBuilt Unit
-    ---@param order string
-    DoStopBuild = function(self, unitBeingBuilt, order)
-        StructureUnitOnStopBuild(self, unitBeingBuilt, order)
+    --#endregion
 
-        if not self.FactoryBuildFailed and not self.Dead then
-            if not EntityCategoryContains(categories.AIR, unitBeingBuilt) then
-                self:RollOffUnit()
+    ---------------------------------------------------------------------------
+    --#region Lua functionality
+
+    ---@param self FactoryUnit
+    DestroyUnitBeingBuilt = function(self)
+        local unitBeingBuilt = self.UnitBeingBuilt --[[@as Unit]]
+        if (not IsDestroyed(unitBeingBuilt)) then
+            local fraction = unitBeingBuilt:GetFractionComplete()
+            if fraction < 1.0 then
+                if fraction > 0.5 then
+                    unitBeingBuilt:Kill()
+                else
+                    unitBeingBuilt:Destroy()
+                end
             end
-            self:StopBuildFx()
-            self:ForkThread(self.FinishBuildThread, unitBeingBuilt, order)
         end
-        self.BuildingUnit = false
     end,
 
     ---@param self FactoryUnit
@@ -247,18 +239,10 @@ FactoryUnit = ClassUnit(StructureUnit) {
     end,
 
     ---@param self FactoryUnit
-    OnFailedToBuild = function(self)
-        StructureUnitOnFailedToBuild(self)
-        self.FactoryBuildFailed = true
-        self:StopBuildFx()
-        ChangeState(self, self.IdleState)
-    end,
-
-    ---@param self FactoryUnit
     RollOffUnit = function(self)
         local rollOffPoint = self.RollOffPoint
         local unitBeingBuilt = self.UnitBeingBuilt --[[@as Unit]]
-        if unitBeingBuilt and EntityCategoryContains(categories.ENGINEER, unitBeingBuilt) then
+        if unitBeingBuilt and EntityCategoryContains(categoriesENGINEER, unitBeingBuilt) then
             local spin, x, y, z = self:CalculateRollOffPoint()
             unitBeingBuilt:SetRotation(spin)
             rollOffPoint[1], rollOffPoint[2], rollOffPoint[3] = x, y, z
@@ -359,7 +343,7 @@ FactoryUnit = ClassUnit(StructureUnit) {
             size = unitBeingBuilt.Blueprint.SizeZ
         end
 
-        size = 0.25 * size * size
+        size = (0.5 * size) * (0.5 * size)
         local unitPosition, dx, dz, d
         local buildPosition = self:GetPosition(self.Blueprint.Display.BuildAttachBone or 0)
         repeat
@@ -376,6 +360,11 @@ FactoryUnit = ClassUnit(StructureUnit) {
 
         ChangeState(self, self.IdleState)
     end,
+
+    --#endregion
+
+    ---------------------------------------------------------------------------
+    --#region States
 
     IdleState = State {
         ---@param self FactoryUnit
@@ -423,6 +412,8 @@ FactoryUnit = ClassUnit(StructureUnit) {
             self:RolloffBody()
         end,
     },
+
+    --#endregion
 
     ---------------------------------------------------------------------------
     --#region Utility functions
@@ -491,6 +482,41 @@ FactoryUnit = ClassUnit(StructureUnit) {
 
     ---------------------------------------------------------------------------
     --#region Deprecated functionality
+
+    ---@deprecated
+    ---@param self FactoryUnit
+    ---@param unitBeingBuilt Unit
+    ---@param order string
+    DoStopBuild = function(self, unitBeingBuilt, order)
+        -- StructureUnitOnStopBuild(self, unitBeingBuilt, order)
+
+        -- if not self.FactoryBuildFailed and not self.Dead then
+        --     if not EntityCategoryContains(categories.AIR, unitBeingBuilt) then
+        --         self:RollOffUnit()
+        --     end
+        --     self:StopBuildFx()
+        --     self:ForkThread(self.FinishBuildThread, unitBeingBuilt, order)
+        -- end
+        -- self.BuildingUnit = false
+    end,
+
+    --- Adds a pause between unit productions
+    ---@deprecated
+    ---@param self FactoryUnit
+    ---@param productionpause number
+    ---@param unitBeingBuilt Unit
+    ---@param order string
+    PauseThread = function(self, productionpause, unitBeingBuilt, order)
+        -- self:StopBuildFx()
+        -- self:SetBusy(true)
+        -- self:SetBlockCommandQueue(true)
+
+        -- WaitSeconds(productionpause)
+
+        -- self:SetBusy(false)
+        -- self:SetBlockCommandQueue(false)
+        -- self:DoStopBuild(unitBeingBuilt, order)
+    end,
 
     ---@deprecated
     ---@param self FactoryUnit
