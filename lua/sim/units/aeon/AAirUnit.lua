@@ -22,6 +22,5 @@
 
 local AirUnit = import('/lua/sim/units/AirUnit.lua').AirUnit
 
---- Air Unit
 ---@class AAirUnit : AirUnit
 AAirUnit = ClassUnit(AirUnit) {}

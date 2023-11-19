@@ -20,12 +20,10 @@
 --** SOFTWARE.
 --**********************************************************************************
 
-local AFactoryUnit = import('/lua/defaultunits.lua').AirFactoryUnit
+local AirFactoryUnit = import('/lua/defaultunits.lua').AirFactoryUnit
+local AFactoryUnit = import('/lua/sim/units/aeon/AFactoryUnit.lua').AFactoryUnit
 
---- AIR STRUCTURES
 ---@class AAirFactoryUnit : AirFactoryUnit
-AAirFactoryUnit = ClassUnit(AFactoryUnit) {
+AAirFactoryUnit = ClassUnit(AirFactoryUnit) {
     StartBuildFx = AFactoryUnit.StartBuildFx,
-    OnPaused = AFactoryUnit.OnPaused,
-    OnUnpaused = AFactoryUnit.OnUnpaused,
 }

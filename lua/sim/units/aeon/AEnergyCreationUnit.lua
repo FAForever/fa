@@ -21,7 +21,12 @@
 --**********************************************************************************
 
 local EnergyCreationUnit = import('/lua/defaultunits.lua').EnergyCreationUnit
+local EnergyCreationUnitOnStopBeingBuilt = EnergyCreationUnit.OnStopBeingBuilt
+
 local EffectTemplate = import('/lua/effecttemplates.lua')
+
+-- upvalue scope for performance
+local CreateAttachedEmitter = CreateAttachedEmitter
 
 ---@class AEnergyCreationUnit : EnergyCreationUnit
 ---@field AmbientEffects string[]
@@ -29,11 +34,14 @@ AEnergyCreationUnit = ClassUnit(EnergyCreationUnit) {
     ---@param self AEnergyCreationUnit
     ---@param builder Unit
     ---@param layer Layer
-    OnStopBeingBuilt = function(self,builder,layer)
-        EnergyCreationUnit.OnStopBeingBuilt(self, builder, layer)
-        if self.AmbientEffects then
-            for k, v in EffectTemplate[self.AmbientEffects] do
-                CreateAttachedEmitter(self, 0, self.Army, v)
+    OnStopBeingBuilt = function(self, builder, layer)
+        EnergyCreationUnitOnStopBeingBuilt(self, builder, layer)
+
+        local army = self.Army
+        local ambientEffects = self.AmbientEffects
+        if ambientEffects then
+            for k, v in EffectTemplate[ambientEffects] do
+                CreateAttachedEmitter(self, 0, army, v)
             end
         end
     end,

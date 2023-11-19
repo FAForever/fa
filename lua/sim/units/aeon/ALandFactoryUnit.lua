@@ -26,6 +26,4 @@ local AFactoryUnit = import('/lua/aeonunits.lua').AFactoryUnit
 ---@class ALandFactoryUnit : LandFactoryUnit
 ALandFactoryUnit = ClassUnit(LandFactoryUnit) {
     StartBuildFx = AFactoryUnit.StartBuildFx,
-    OnPaused = AFactoryUnit.OnPaused,
-    OnUnpaused = AFactoryUnit.OnUnpaused,
 }

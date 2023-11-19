@@ -23,7 +23,9 @@
 local FactoryUnit = import('/lua/defaultunits.lua').FactoryUnit
 local CreateAeonFactoryBuildingEffects = import('/lua/effectutilities.lua').CreateAeonFactoryBuildingEffects
 
---- FACTORIES
+-- upvalue scope for performance
+local ForkThread = ForkThread
+
 ---@class AFactoryUnit : FactoryUnit
 ---@field BuildEffectsBag TrashBag
 AFactoryUnit = ClassUnit(FactoryUnit) {
@@ -31,31 +33,12 @@ AFactoryUnit = ClassUnit(FactoryUnit) {
     ---@param self AFactoryUnit
     ---@param unitBeingBuilt Unit
     StartBuildFx = function(self, unitBeingBuilt)
-        local thread = self:ForkThread(CreateAeonFactoryBuildingEffects, unitBeingBuilt, self.BuildEffectBones, 'Attachpoint', self.BuildEffectsBag)
+        local buildEffectBones = self.BuildEffectBones
+        local buildEffectsBag = self.BuildEffectsBag
+        local thread = ForkThread(CreateAeonFactoryBuildingEffects, unitBeingBuilt, buildEffectBones, 'Attachpoint',
+            buildEffectsBag)
+
+        self.Trash:Add(thread)
         unitBeingBuilt.Trash:Add(thread)
-    end,
-
-    ---@param self AFactoryUnit
-    OnPaused = function(self)
-        FactoryUnit.OnPaused(self)
-
-        -- stop the building fx
-        local unitBeingBuilt = self.UnitBeingBuilt
-        if unitBeingBuilt and self:IsUnitState('Building') and (not IsDestroyed(unitBeingBuilt)) then
-            FactoryUnit.StopBuildingEffects(self, unitBeingBuilt)
-            self:StopUnitAmbientSound('ConstructLoop')
-        end
-    end,
-
-    ---@param self AFactoryUnit
-    OnUnpaused = function(self)
-        FactoryUnit.OnUnpaused(self)
-
-        -- start the building fx
-        local unitBeingBuilt = self.UnitBeingBuilt
-        if unitBeingBuilt and self:IsUnitState('Building') and (not IsDestroyed(unitBeingBuilt)) then
-            FactoryUnit.StopBuildingEffects(self, unitBeingBuilt)
-            self:StartBuildFx(self:GetFocusUnit())
-        end
     end,
 }

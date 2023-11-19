@@ -22,7 +22,9 @@
 
 local SeaFactoryUnit = import('/lua/defaultunits.lua').SeaFactoryUnit
 local CreateAeonFactoryBuildingEffects = import('/lua/effectutilities.lua').CreateAeonFactoryBuildingEffects
-local AFactoryUnit = import('/lua/aeonunits.lua').AFactoryUnit
+
+-- upvalue scope for performance
+local ForkThread = ForkThread
 
 ---@class ASeaFactoryUnit : SeaFactoryUnit
 ---@field BuildEffectsBag TrashBag
@@ -31,10 +33,12 @@ ASeaFactoryUnit = ClassUnit(SeaFactoryUnit) {
     ---@param self ASeaFactoryUnit
     ---@param unitBeingBuilt Unit
     StartBuildFx = function(self, unitBeingBuilt)
-        local thread = self:ForkThread(CreateAeonFactoryBuildingEffects, unitBeingBuilt, self.BuildEffectBones, 'Attachpoint01', self.BuildEffectsBag)
+        local buildEffectBones = self.BuildEffectBones
+        local buildEffectsBag = self.BuildEffectsBag
+        local thread = ForkThread(CreateAeonFactoryBuildingEffects, unitBeingBuilt, buildEffectBones, 'Attachpoint01',
+            buildEffectsBag)
+
+        self.Trash:Add(thread)
         unitBeingBuilt.Trash:Add(thread)
     end,
-
-    OnPaused = AFactoryUnit.OnPaused,
-    OnUnpaused = AFactoryUnit.OnUnpaused,
 }

@@ -31,9 +31,6 @@ AConstructionUnit = ClassUnit(ConstructionUnit) {
     ---@param unitBeingBuilt Unit
     ---@param order string
     CreateBuildEffects = function(self, unitBeingBuilt, order)
-        local buildEffectsBag = self.BuildEffectsBag
-        if buildEffectsBag then
-            CreateAeonConstructionUnitBuildingEffects(self, unitBeingBuilt, buildEffectsBag)
-        end
+        CreateAeonConstructionUnitBuildingEffects(self, unitBeingBuilt, self.BuildEffectsBag)
     end,
 }

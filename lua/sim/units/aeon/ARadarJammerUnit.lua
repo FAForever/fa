@@ -21,6 +21,13 @@
 --**********************************************************************************
 
 local RadarJammerUnit = import('/lua/defaultunits.lua').RadarJammerUnit
+local RadarJammerUnitOnStopBeingBuilt = RadarJammerUnit.OnStopBeingBuilt
+local RadarJammerUnitOnIntelEnabled = RadarJammerUnit.OnIntelEnabled
+local RadarJammerUnitOnIntelDisabled = RadarJammerUnit.OnIntelDisabled
+
+-- upvalue scope for performance
+local CreateAnimator = CreateAnimator
+local CreateRotator = CreateRotator
 
 ---@class ARadarJammerUnit : RadarJammerUnit
 ---@field Rotator? moho.RotateManipulator
@@ -32,45 +39,57 @@ ARadarJammerUnit = ClassUnit(RadarJammerUnit) {
     ---@param builder Unit
     ---@param layer Layer
     OnStopBeingBuilt = function(self, builder, layer)
-        RadarJammerUnit.OnStopBeingBuilt(self, builder, layer)
-        local bp = self:GetBlueprint()
-        local bpAnim = bp.Display.AnimationOpen
-        if not bpAnim then return end
-        if not self.OpenAnim then
-            self.OpenAnim = CreateAnimator(self)
-            self.OpenAnim:PlayAnim(bpAnim)
-            self.Trash:Add(self.OpenAnim)
+        RadarJammerUnitOnStopBeingBuilt(self, builder, layer)
+        local animation = self.Blueprint.Display.AnimationOpen
+        if not animation then
+            return
         end
-        if not self.Rotator then
-            self.Rotator = CreateRotator(self, 'B02', 'z', nil, 0, 50, 0)
-            self.Trash:Add(self.Rotator)
+
+        local trash = self.Trash
+        local openAnimation = self.OpenAnim
+        if not openAnimation then
+            openAnimation = CreateAnimator(self)
+            openAnimation:PlayAnim(animation)
+            self.OpenAnim = trash:Add(openAnimation)
+        end
+
+        local rotator = self.Rotator
+        if not rotator then
+            rotator = CreateRotator(self, 'B02', 'z', nil, 0, 50, 0)
+            self.Rotator = trash:Add(rotator)
         end
     end,
 
     ---@param self ARadarJammerUnit
     ---@param intel string
     OnIntelEnabled = function(self, intel)
-        RadarJammerUnit.OnIntelEnabled(self, intel)
-        if self.OpenAnim then
-            self.OpenAnim:SetRate(1)
+        RadarJammerUnitOnIntelEnabled(self, intel)
+
+        local openAnimation = self.OpenAnim
+        if openAnimation then
+            openAnimation:SetRate(1)
         end
-        if not self.Rotator then
-            self.Rotator = CreateRotator(self, 'B02', 'z', nil, 0, 50, 0)
-            self.Trash:Add(self.Rotator)
+
+        local rotator = self.Rotator
+        if rotator then
+            rotator:SetSpinDown(false)
+            rotator:SetTargetSpeed(self.RotateSpeed)
         end
-        self.Rotator:SetSpinDown(false)
-        self.Rotator:SetTargetSpeed(self.RotateSpeed)
     end,
 
     ---@param self ARadarJammerUnit
     ---@param intel string
     OnIntelDisabled = function(self, intel)
-        RadarJammerUnit.OnIntelDisabled(self, intel)
-        if self.OpenAnim then
-            self.OpenAnim:SetRate(-1)
+        RadarJammerUnitOnIntelDisabled(self, intel)
+
+        local openAnimation = self.OpenAnim
+        if openAnimation then
+            openAnimation:SetRate(-1)
         end
-        if self.Rotator then
-            self.Rotator:SetTargetSpeed(0)
+
+        local rotator = self.Rotator
+        if rotator then
+            rotator:SetTargetSpeed(0)
         end
     end,
 }
