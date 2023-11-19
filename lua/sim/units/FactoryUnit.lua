@@ -1,6 +1,24 @@
 
 local StructureUnit = import("/lua/sim/units/structureunit.lua").StructureUnit
-local FireState = import("/lua/game.lua").FireState
+local StructureUnitOnCreate = StructureUnit.OnCreate
+local StructureUnitOnDestroy = StructureUnit.OnDestroy
+local StructureUnitOnPaused = StructureUnit.OnPaused
+local StructureUnitOnUnpaused = StructureUnit.OnUnpaused
+local StructureUnitOnStartBuild = StructureUnit.OnStartBuild
+local StructureUnitOnStopBuild = StructureUnit.OnStopBuild
+local StructureUnitOnStopBeingBuilt = StructureUnit.OnStopBeingBuilt
+local StructureUnitCheckBuildRestriction = StructureUnit.CheckBuildRestriction
+local StructureUnitOnFailedToBuild = StructureUnit.OnFailedToBuild
+
+-- upvalue scope for performance
+local WaitFor = WaitFor
+local WaitTicks = WaitTicks
+local ForkThread = ForkThread
+local IsDestroyed = IsDestroyed
+local ChangeState = ChangeState
+local CreateRotator = CreateRotator
+local CreateAnimator = CreateAnimator
+local EntityCategoryContains = EntityCategoryContains
 
 ---@class FactoryUnit : StructureUnit
 ---@field BuildingUnit boolean
@@ -14,108 +32,58 @@ FactoryUnit = ClassUnit(StructureUnit) {
 
     ---@param self FactoryUnit
     OnCreate = function(self)
-        StructureUnit.OnCreate(self)
+        StructureUnitOnCreate(self)
+
+        local blueprint = self.Blueprint
 
         -- if we're a support factory, make sure our build restrictions are correct
-        if self.Blueprint.CategoriesHash["SUPPORTFACTORY"] then
+        if blueprint.CategoriesHash["SUPPORTFACTORY"] then
             self:UpdateBuildRestrictions()
         end
 
-        -- Save build effect bones for faster access when creating build effects
-        self.BuildBoneRotator = CreateRotator(self, self.Blueprint.Display.BuildAttachBone or 0, 'y', 0, 10000)
-        self.BuildBoneRotator:SetPrecedence(1000)
+        -- store build bone rotator to prevent trashing the memory
+        local buildBoneRotator = CreateRotator(self, blueprint.Display.BuildAttachBone or 0, 'y', 0, 10000)
+        buildBoneRotator:SetPrecedence(1000)
+        self.BuildBoneRotator = self.Trash:Add(buildBoneRotator)
 
-        self.Trash:Add(self.BuildBoneRotator)
-        self.BuildEffectBones = self.Blueprint.General.BuildBones.BuildEffectBones
-        self.BuildingUnit = false
-        self:SetFireState(FireState.GROUND_FIRE)
+        -- store build effect bones for quick access
+        self.BuildEffectBones = blueprint.General.BuildBones.BuildEffectBones
+
+        -- default to ground fire mode for all units being produced
+        self:SetFireState(2)
 
         -- save for quick access later
         self.RollOffPoint = { 0, 0, 0 }
     end,
 
     ---@param self FactoryUnit
-    ---@return string?
-    ToSupportFactoryIdentifier = function(self)
-        local hashedCategories = self.Blueprint.CategoriesHash
-        local identifier = self.Blueprint.BlueprintId
-        local faction = identifier:sub(2, 2)
-        local layer = identifier:sub(7, 7)
-
-        -- HQs can not upgrade to support factories
-        if hashedCategories["RESEARCH"] then
-            return nil
-        end
-
-        -- tech 1 factories can go tech 2 support factories if we have a tech 2 hq
-        if  hashedCategories["TECH1"] and
-            self.Brain:CountHQs(self.Blueprint.FactionCategory, self.Blueprint.LayerCategory, 'TECH2') > 0
-        then
-            return 'z' .. faction .. 'b950' .. layer
-        end
-
-        -- tech 2 support factories can go tech 3 support factories if we have a tech 3 hq
-        if  hashedCategories["TECH2"] and
-            hashedCategories["SUPPORTFACTORY"] and
-            self.Brain:CountHQs(self.Blueprint.FactionCategory, self.Blueprint.LayerCategory, 'TECH3') > 0
-        then
-            return 'z' .. faction .. 'b960' .. layer
-        end
-
-        -- anything else can not upgrade
-        return nil
-    end,
-
-    ---@param self FactoryUnit
-    ToHQFactoryIdentifier = function(self)
-        local hashedCategories = self.Blueprint.CategoriesHash
-        local identifier = self.Blueprint.BlueprintId
-        local faction = identifier:sub(1, 3)
-        local layer = identifier:sub(7, 7)
-
-        -- support factories can not upgrade to HQs
-        if hashedCategories["SUPPORTFACTORY"] then
-            return nil
-        end
-
-        -- tech 1 factories can always upgrade
-        if hashedCategories["TECH1"] then
-            return faction .. '020' .. layer
-        end
-
-        -- tech 2 factories can always upgrade
-        if hashedCategories["TECH2"] and hashedCategories["RESEARCH"] then
-            return faction .. '030'  .. layer
-        end
-
-        -- anything else can not upgrade
-        return nil
-    end,
-
-    ---@param self FactoryUnit
     DestroyUnitBeingBuilt = function(self)
-        local unitBeingBuilt = self.UnitBeingBuilt
-        if unitBeingBuilt and (not unitBeingBuilt.Dead) and (unitBeingBuilt:GetFractionComplete() < 1) then
-            if unitBeingBuilt:GetFractionComplete() > 0.5 then
-                unitBeingBuilt:Kill()
-            else
-                unitBeingBuilt:Destroy()
+        local unitBeingBuilt = self.UnitBeingBuilt --[[@as Unit]]
+        if (not IsDestroyed(unitBeingBuilt)) then
+            local fraction = unitBeingBuilt:GetFractionComplete()
+            if fraction < 1.0 then
+                if fraction > 0.5 then
+                    unitBeingBuilt:Kill()
+                else
+                    unitBeingBuilt:Destroy()
+                end
             end
         end
     end,
 
     ---@param self FactoryUnit
     OnDestroy = function(self)
-        StructureUnit.OnDestroy(self)
+        StructureUnitOnDestroy(self)
+        local brain = self.Brain
+        local blueprint = self.Blueprint
 
-        if self.Blueprint.CategoriesHash["RESEARCH"] and self:GetFractionComplete() == 1.0 then
-
+        if blueprint.CategoriesHash["RESEARCH"] and self:GetFractionComplete() == 1.0 then
             -- update internal state
-            self.Brain:RemoveHQ(self.Blueprint.FactionCategory, self.Blueprint.LayerCategory, self.Blueprint.TechCategory)
-            self.Brain:SetHQSupportFactoryRestrictions(self.Blueprint.FactionCategory, self.Blueprint.LayerCategory)
+            brain:RemoveHQ(blueprint.FactionCategory, blueprint.LayerCategory, blueprint.TechCategory)
+            brain:SetHQSupportFactoryRestrictions(blueprint.FactionCategory, blueprint.LayerCategory)
 
             -- update all units affected by this
-            local affected = self.Brain:GetListOfUnits(categories.SUPPORTFACTORY - categories.EXPERIMENTAL, false)
+            local affected = brain:GetListOfUnits(categories.SUPPORTFACTORY - categories.EXPERIMENTAL, false)
             for id, unit in affected do
                 unit:UpdateBuildRestrictions()
             end
@@ -126,18 +94,19 @@ FactoryUnit = ClassUnit(StructureUnit) {
 
     ---@param self FactoryUnit
     OnPaused = function(self)
-        StructureUnit.OnPaused(self)
+        StructureUnitOnPaused(self)
 
         -- When factory is paused take some action
         if self:IsUnitState('Building') then
             self:StopUnitAmbientSound('ConstructLoop')
-            StructureUnit.StopBuildingEffects(self, self.UnitBeingBuilt)
+            self:StopBuildingEffects(self.UnitBeingBuilt)
         end
     end,
 
     ---@param self FactoryUnit
     OnUnpaused = function(self)
-        StructureUnit.OnUnpaused(self)
+        StructureUnitOnUnpaused(self)
+
         local unitBeingBuilt = self.UnitBeingBuilt --[[@as Unit]]
         local unitBuildOrder = self.UnitBuildOrder
         if self:IsUnitState('Building') and (not IsDestroyed(unitBeingBuilt)) then
@@ -148,20 +117,20 @@ FactoryUnit = ClassUnit(StructureUnit) {
 
     ---@param self FactoryUnit
     ---@param unitBeingBuilt Unit
-    ---@param order boolean
+    ---@param order string
     OnStartBuild = function(self, unitBeingBuilt, order)
-        StructureUnit.OnStartBuild(self, unitBeingBuilt, order)
+        StructureUnitOnStartBuild(self, unitBeingBuilt, order)
 
+        self.FactoryBuildFailed = nil
         self.BuildingUnit = true
         if order ~= 'Upgrade' then
             ChangeState(self, self.BuildingState)
-            self.BuildingUnit = false
+            self.BuildingUnit = nil
         elseif unitBeingBuilt.Blueprint.CategoriesHash["RESEARCH"] then
             -- Removes assist command to prevent accidental cancellation when right-clicking on other factory
             self:RemoveCommandCap('RULEUCC_Guard')
             self.DisabledAssist = true
         end
-        self.FactoryBuildFailed = false
     end,
 
     --- Introduce a rolloff delay, where defined.
@@ -185,15 +154,18 @@ FactoryUnit = ClassUnit(StructureUnit) {
     ---@param builder Unit
     ---@param layer Layer
     OnStopBeingBuilt = function(self, builder, layer)
-        StructureUnit.OnStopBeingBuilt(self, builder, layer)
+        StructureUnitOnStopBeingBuilt(self, builder, layer)
 
-        if self.Blueprint.CategoriesHash["RESEARCH"] then
+        local brain = self.Brain
+        local blueprint = self.Blueprint
+
+        if blueprint.CategoriesHash["RESEARCH"] then
             -- update internal state
-            self.Brain:AddHQ(self.Blueprint.FactionCategory, self.Blueprint.LayerCategory, self.Blueprint.TechCategory)
-            self.Brain:SetHQSupportFactoryRestrictions(self.Blueprint.FactionCategory, self.Blueprint.LayerCategory)
+            brain:AddHQ(blueprint.FactionCategory, blueprint.LayerCategory, blueprint.TechCategory)
+            brain:SetHQSupportFactoryRestrictions(blueprint.FactionCategory, blueprint.LayerCategory)
 
             -- update all units affected by this
-            local affected = self.Brain:GetListOfUnits(categories.SUPPORTFACTORY - categories.EXPERIMENTAL, false)
+            local affected = brain:GetListOfUnits(categories.SUPPORTFACTORY - categories.EXPERIMENTAL, false)
             for _, unit in affected do
                 unit:UpdateBuildRestrictions()
             end
@@ -219,9 +191,9 @@ FactoryUnit = ClassUnit(StructureUnit) {
 
     ---@param self FactoryUnit
     ---@param unitBeingBuilt Unit
-    ---@param order boolean
+    ---@param order string
     DoStopBuild = function(self, unitBeingBuilt, order)
-        StructureUnit.OnStopBuild(self, unitBeingBuilt, order)
+        StructureUnitOnStopBuild(self, unitBeingBuilt, order)
 
         if not self.FactoryBuildFailed and not self.Dead then
             if not EntityCategoryContains(categories.AIR, unitBeingBuilt) then
@@ -265,7 +237,7 @@ FactoryUnit = ClassUnit(StructureUnit) {
     ---@return boolean
     CheckBuildRestriction = function(self, target_bp)
         -- Check basic build restrictions first (Unit.CheckBuildRestriction but we only go up one inheritance level)
-        if not StructureUnit.CheckBuildRestriction(self, target_bp) then
+        if not StructureUnitCheckBuildRestriction(self, target_bp) then
             return false
         end
         -- Factories never build factories (this does not break Upgrades since CheckBuildRestriction is never called for Upgrades)
@@ -276,7 +248,7 @@ FactoryUnit = ClassUnit(StructureUnit) {
 
     ---@param self FactoryUnit
     OnFailedToBuild = function(self)
-        StructureUnit.OnFailedToBuild(self)
+        StructureUnitOnFailedToBuild(self)
         self.FactoryBuildFailed = true
         self:StopBuildFx()
         ChangeState(self, self.IdleState)
@@ -285,14 +257,14 @@ FactoryUnit = ClassUnit(StructureUnit) {
     ---@param self FactoryUnit
     RollOffUnit = function(self)
         local rollOffPoint = self.RollOffPoint
-        local unitBeingBuilt = self.UnitBeingBuilt
+        local unitBeingBuilt = self.UnitBeingBuilt --[[@as Unit]]
         if unitBeingBuilt and EntityCategoryContains(categories.ENGINEER, unitBeingBuilt) then
             local spin, x, y, z = self:CalculateRollOffPoint()
             unitBeingBuilt:SetRotation(spin)
             rollOffPoint[1], rollOffPoint[2], rollOffPoint[3] = x, y, z
         end
 
-        IssueToUnitMoveOffFactory(self.UnitBeingBuilt, self.RollOffPoint)
+        IssueToUnitMoveOffFactory(unitBeingBuilt, rollOffPoint)
     end,
 
     ---@param self FactoryUnit
@@ -364,10 +336,11 @@ FactoryUnit = ClassUnit(StructureUnit) {
 
     ---@param self FactoryUnit
     PlayFxRollOffEnd = function(self)
-        if self.RollOffAnim then
-            self.RollOffAnim:SetRate(-1 * self.RollOffAnimationRate)
-            WaitFor(self.RollOffAnim)
-            self.RollOffAnim:Destroy()
+        local rollOffAnim = self.RollOffAnim
+        if rollOffAnim then
+            rollOffAnim:SetRate(-1 * self.RollOffAnimationRate)
+            WaitFor(rollOffAnim)
+            rollOffAnim:Destroy()
             self.RollOffAnim = nil
         end
     end,
@@ -378,39 +351,30 @@ FactoryUnit = ClassUnit(StructureUnit) {
         self:SetBlockCommandQueue(true)
         self:PlayFxRollOff()
 
-        -- find out when build pad is free again
+        local unitBeingBuilt = self.UnitBeingBuilt --[[@as Unit]]
 
-        local size = 0.5 * self.UnitBeingBuilt.Blueprint.SizeX
-        if size < self.UnitBeingBuilt.Blueprint.SizeZ then
-            size = 0.5 * self.UnitBeingBuilt.Blueprint.SizeZ
+        -- find out when build pad is free again
+        local size = unitBeingBuilt.Blueprint.SizeX
+        if size < unitBeingBuilt.Blueprint.SizeZ then
+            size = unitBeingBuilt.Blueprint.SizeZ
         end
 
-        size = size * size
+        size = 0.25 * size * size
         local unitPosition, dx, dz, d
         local buildPosition = self:GetPosition(self.Blueprint.Display.BuildAttachBone or 0)
         repeat
-            unitPosition = self.UnitBeingBuilt:GetPosition()
+            unitPosition = unitBeingBuilt:GetPosition()
             dx = buildPosition[1] - unitPosition[1]
             dz = buildPosition[3] - unitPosition[3]
             d = dx * dx + dz * dz
             WaitTicks(2)
-        until IsDestroyed(self.UnitBeingBuilt) or d > size
+        until IsDestroyed(unitBeingBuilt) or d > size
 
         self:PlayFxRollOffEnd()
         self:SetBusy(false)
         self:SetBlockCommandQueue(false)
 
         ChangeState(self, self.IdleState)
-    end,
-
-    ---@deprecated
-    ---@param self FactoryUnit
-    CreateBuildRotator = function(self)
-    end,
-
-    ---@deprecated
-    ---@param self FactoryUnit
-    DestroyBuildRotator = function(self)
     end,
 
     IdleState = State {
@@ -424,10 +388,13 @@ FactoryUnit = ClassUnit(StructureUnit) {
     BuildingState = State {
         ---@param self FactoryUnit
         Main = function(self)
+
+            local unitBeingBuilt = self.UnitBeingBuilt --[[@as Unit]]
+
             -- to help prevent a 1-tick rotation on most units
-            local hasEnhancements = self.UnitBeingBuilt.Blueprint.Enhancements
+            local hasEnhancements = unitBeingBuilt.Blueprint.Enhancements
             if not hasEnhancements then
-                self.UnitBeingBuilt:HideBone(0, true)
+                unitBeingBuilt:HideBone(0, true)
             end
 
             -- determine and preserve the roll off point
@@ -438,14 +405,14 @@ FactoryUnit = ClassUnit(StructureUnit) {
             rollOffPoint[3] = z
 
             self.BuildBoneRotator:SetGoal(spin)
-            self.UnitBeingBuilt:AttachBoneTo(-2, self, self.Blueprint.Display.BuildAttachBone or 0)
-            self:StartBuildFx(self.UnitBeingBuilt)
+            unitBeingBuilt:AttachBoneTo(-2, self, self.Blueprint.Display.BuildAttachBone or 0)
+            self:StartBuildFx(unitBeingBuilt)
 
             -- prevents a 1-tick rotating visual 'glitch' of unit
             -- as it is being attached and the rotator is applied
             WaitTicks(3)
             if not hasEnhancements then
-                self.UnitBeingBuilt:ShowBone(0, true)
+                unitBeingBuilt:ShowBone(0, true)
             end
         end,
     },
@@ -456,4 +423,84 @@ FactoryUnit = ClassUnit(StructureUnit) {
             self:RolloffBody()
         end,
     },
+
+    ---------------------------------------------------------------------------
+    --#region Utility functions
+
+    ---@param self FactoryUnit
+    ---@return string?
+    ToSupportFactoryIdentifier = function(self)
+        local blueprint = self.Blueprint
+        local hashedCategories = blueprint.CategoriesHash
+        local identifier = blueprint.BlueprintId
+        local faction = identifier:sub(2, 2)
+        local layer = identifier:sub(7, 7)
+
+        -- HQs can not upgrade to support factories
+        if hashedCategories["RESEARCH"] then
+            return nil
+        end
+
+        -- tech 1 factories can go tech 2 support factories if we have a tech 2 hq
+        if  hashedCategories["TECH1"] and
+            self.Brain:CountHQs(blueprint.FactionCategory, blueprint.LayerCategory, 'TECH2') > 0
+        then
+            return 'z' .. faction .. 'b950' .. layer
+        end
+
+        -- tech 2 support factories can go tech 3 support factories if we have a tech 3 hq
+        if  hashedCategories["TECH2"] and
+            hashedCategories["SUPPORTFACTORY"] and
+            self.Brain:CountHQs(blueprint.FactionCategory, blueprint.LayerCategory, 'TECH3') > 0
+        then
+            return 'z' .. faction .. 'b960' .. layer
+        end
+
+        -- anything else can not upgrade
+        return nil
+    end,
+
+    ---@param self FactoryUnit
+    ToHQFactoryIdentifier = function(self)
+        local blueprint = self.Blueprint
+        local hashedCategories = blueprint.CategoriesHash
+        local identifier = blueprint.BlueprintId
+        local faction = identifier:sub(1, 3)
+        local layer = identifier:sub(7, 7)
+
+        -- support factories can not upgrade to HQs
+        if hashedCategories["SUPPORTFACTORY"] then
+            return nil
+        end
+
+        -- tech 1 factories can always upgrade
+        if hashedCategories["TECH1"] then
+            return faction .. '020' .. layer
+        end
+
+        -- tech 2 factories can always upgrade
+        if hashedCategories["TECH2"] and hashedCategories["RESEARCH"] then
+            return faction .. '030'  .. layer
+        end
+
+        -- anything else can not upgrade
+        return nil
+    end,
+
+    --#endregion
+
+    ---------------------------------------------------------------------------
+    --#region Deprecated functionality
+
+    ---@deprecated
+    ---@param self FactoryUnit
+    CreateBuildRotator = function(self)
+    end,
+
+    ---@deprecated
+    ---@param self FactoryUnit
+    DestroyBuildRotator = function(self)
+    end,
+
+    --#endregion
 }
