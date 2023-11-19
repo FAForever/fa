@@ -36,4 +36,4 @@ TypeClass = DAA0206
 
 -- Kept for Mod Backwards Compatablity
 local EffectTemplate = import('/lua/EffectTemplates.lua')
-local EffectUtils = import('/lua/effectutilities.lua')
+local EffectUtils = import('/lua/EffectUtilities.lua')

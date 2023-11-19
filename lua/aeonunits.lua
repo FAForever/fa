@@ -16,7 +16,7 @@ local SeaFactoryUnit = DefaultUnitsFile.SeaFactoryUnit
 local ShieldStructureUnit = DefaultUnitsFile.ShieldStructureUnit
 local RadarJammerUnit = DefaultUnitsFile.RadarJammerUnit
 local EffectTemplate = import("/lua/EffectTemplates.lua")
-local EffectUtil = import("/lua/effectutilities.lua")
+local EffectUtil = import('/lua/EffectUtilities.lua')
 local CreateAeonFactoryBuildingEffects = EffectUtil.CreateAeonFactoryBuildingEffects
 local CreateAeonConstructionUnitBuildingEffects = EffectUtil.CreateAeonConstructionUnitBuildingEffects
 

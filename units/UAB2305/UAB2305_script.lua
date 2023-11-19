@@ -44,4 +44,4 @@ UAB2305 = ClassUnit(AStructureUnit) {
 TypeClass = UAB2305
 
 -- Kept for mod support
-local EffectUtil = import("/lua/effectutilities.lua")
+local EffectUtil = import('/lua/EffectUtilities.lua')

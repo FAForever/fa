@@ -1,6 +1,6 @@
 local Unit = import("/lua/sim/unit.lua").Unit
 local explosion = import("/lua/defaultexplosions.lua")
-local EffectUtil = import("/lua/effectutilities.lua")
+local EffectUtil = import('/lua/EffectUtilities.lua')
 local EffectTemplate = import("/lua/EffectTemplates.lua")
 local TerrainUtils = import("/lua/sim/terrainutils.lua")
 local Buff = import("/lua/sim/buff.lua")

@@ -27,7 +27,7 @@ local SWeapons = import("/lua/seraphimweapons.lua")
 local SDFChronotronCannonWeapon = SWeapons.SDFChronotronCannonWeapon
 local SDFChronotronOverChargeCannonWeapon = SWeapons.SDFChronotronCannonOverChargeWeapon
 local DeathNukeWeapon = import("/lua/sim/defaultweapons.lua").DeathNukeWeapon
-local EffectUtil = import("/lua/effectutilities.lua")
+local EffectUtil = import('/lua/EffectUtilities.lua')
 local SIFLaanseTacticalMissileLauncher = SWeapons.SIFLaanseTacticalMissileLauncher
 local AIUtils = import("/lua/ai/aiutilities.lua")
 

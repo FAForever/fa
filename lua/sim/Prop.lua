@@ -1,5 +1,5 @@
 
-local PlayReclaimEndEffects = import("/lua/effectutilities.lua").PlayReclaimEndEffects
+local PlayReclaimEndEffects = import('/lua/EffectUtilities.lua').PlayReclaimEndEffects
 local GridReclaimInstance = import("/lua/AI/GridReclaim.lua").GridReclaimInstance
 
 -- upvalue for performance

@@ -9,7 +9,7 @@ local CDFRocketIridiumWeapon = import("/lua/cybranweapons.lua").CDFRocketIridium
 local CAAMissileNaniteWeapon = import("/lua/cybranweapons.lua").CAAMissileNaniteWeapon
 local CDFHeavyElectronBolterWeapon = import("/lua/cybranweapons.lua").CDFHeavyElectronBolterWeapon
 local util = import("/lua/utilities.lua")
-local fxutil = import("/lua/effectutilities.lua")
+local fxutil = import('/lua/EffectUtilities.lua')
 
 ---@class URA0401 : CAirUnit
 URA0401 = ClassUnit(CAirUnit) {

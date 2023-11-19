@@ -1,5 +1,5 @@
 
-local EffectUtil = import("/lua/effectutilities.lua")
+local EffectUtil = import('/lua/EffectUtilities.lua')
 
 local Unit = import("/lua/sim/unit.lua").Unit
 local TreadComponent = import("/lua/defaultcomponents.lua").TreadComponent

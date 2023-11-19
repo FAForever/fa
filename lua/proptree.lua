@@ -8,7 +8,7 @@
 --****************************************************************************
 local Prop = import("/lua/sim/prop.lua").Prop
 local FireEffects = import("/lua/EffectTemplates.lua").TreeBurning01
-local ApplyWindDirection = import("/lua/effectutilities.lua").ApplyWindDirection
+local ApplyWindDirection = import('/lua/EffectUtilities.lua').ApplyWindDirection
 local CreateScorchMarkSplat = import("/lua/defaultexplosions.lua").CreateScorchMarkSplat
 local GetRandomFloat = import("/lua/utilities.lua").GetRandomFloat
 

@@ -8,7 +8,7 @@
 local AircraftCarrier = import("/lua/defaultunits.lua").AircraftCarrier
 local TANTorpedoAngler = import("/lua/terranweapons.lua").TANTorpedoAngler
 local TSAMLauncher = import("/lua/terranweapons.lua").TSAMLauncher
-local EffectUtil = import("/lua/effectutilities.lua")
+local EffectUtil = import('/lua/EffectUtilities.lua')
 local CreateBuildCubeThread = EffectUtil.CreateBuildCubeThread
 
 local ExternalFactoryComponent = import("/lua/defaultcomponents.lua").ExternalFactoryComponent

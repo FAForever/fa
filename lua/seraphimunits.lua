@@ -61,5 +61,5 @@ local RadarJammerUnit = DefaultUnitsFile.RadarJammerUnit
 local WeaponFile = import("/lua/sim/defaultweapons.lua")
 local DefaultBeamWeapon = WeaponFile.DefaultBeamWeapon
 local EffectTemplate = import("/lua/EffectTemplates.lua")
-local EffectUtil = import("/lua/effectutilities.lua")
+local EffectUtil = import('/lua/EffectUtilities.lua')
 local CreateSeraphimFactoryBuildingEffects = EffectUtil.CreateSeraphimFactoryBuildingEffects

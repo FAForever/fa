@@ -9,7 +9,7 @@ local TWeapons = import("/lua/terranweapons.lua")
 local TDFPlasmaCannonWeapon = TWeapons.TDFPlasmaCannonWeapon
 local TIFFragLauncherWeapon = TWeapons.TDFFragmentationGrenadeLauncherWeapon
 
-local EffectUtils = import("/lua/effectutilities.lua")
+local EffectUtils = import('/lua/EffectUtilities.lua')
 local Effects = import("/lua/EffectTemplates.lua")
 
 

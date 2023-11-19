@@ -1,7 +1,7 @@
 local MobileUnit = import("/lua/sim/units/mobileunit.lua").MobileUnit
 
 local explosion = import("/lua/defaultexplosions.lua")
-local EffectUtil = import("/lua/effectutilities.lua")
+local EffectUtil = import('/lua/EffectUtilities.lua')
 local EffectTemplate = import("/lua/EffectTemplates.lua")
 local ScenarioFramework = import("/lua/scenarioframework.lua")
 

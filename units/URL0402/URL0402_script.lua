@@ -15,7 +15,7 @@ local explosion = import("/lua/defaultexplosions.lua")
 local CreateDeathExplosion = explosion.CreateDefaultHitExplosionAtBone
 local EffectTemplate = import("/lua/EffectTemplates.lua")
 local utilities = import("/lua/utilities.lua")
-local EffectUtil = import("/lua/effectutilities.lua")
+local EffectUtil = import('/lua/EffectUtilities.lua')
 local CANTorpedoLauncherWeapon = CybranWeaponsFile.CANTorpedoLauncherWeapon
 local Entity = import("/lua/sim/entity.lua").Entity
 

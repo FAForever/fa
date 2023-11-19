@@ -22,7 +22,7 @@ local TDFZephyrCannonWeapon = TerranWeaponFile.TDFZephyrCannonWeapon
 local DeathNukeWeapon = import("/lua/sim/defaultweapons.lua").DeathNukeWeapon
 local TIFCruiseMissileLauncher = TerranWeaponFile.TIFCruiseMissileLauncher
 local TDFOverchargeWeapon = TerranWeaponFile.TDFOverchargeWeapon
-local EffectUtil = import("/lua/effectutilities.lua")
+local EffectUtil = import('/lua/EffectUtilities.lua')
 local Buff = import("/lua/sim/buff.lua")
 
 ---@class UEL0001 : ACUUnit

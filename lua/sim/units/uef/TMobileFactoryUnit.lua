@@ -21,7 +21,7 @@
 --**********************************************************************************
 
 local AmphibiousLandUnit = import('/lua/defaultunits.lua').AmphibiousLandUnit
-local CreateBuildCubeThread = import('/lua/effectutilities.lua').CreateBuildCubeThread
+local CreateBuildCubeThread = import('/lua/EffectUtilities.lua').CreateBuildCubeThread
 
 ---@class TMobileFactoryUnit : AmphibiousLandUnit
 TMobileFactoryUnit = ClassUnit(AmphibiousLandUnit) {

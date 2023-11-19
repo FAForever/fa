@@ -13,7 +13,7 @@ local WeaponsFile = import("/lua/seraphimweapons.lua")
 local SDFThauCannon = WeaponsFile.SDFThauCannon
 local SDFAireauBolter = WeaponsFile.SDFAireauBolterWeapon
 local SANUallCavitationTorpedo = WeaponsFile.SANUallCavitationTorpedo
-local EffectUtil = import("/lua/effectutilities.lua")
+local EffectUtil = import('/lua/EffectUtilities.lua')
 
 ---@class XSL0303 : SLandUnit
 XSL0303 = ClassUnit(SLandUnit) {

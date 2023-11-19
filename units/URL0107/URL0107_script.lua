@@ -6,7 +6,7 @@
 local CWalkingLandUnit = import("/lua/cybranunits.lua").CWalkingLandUnit
 local CybranWeaponsFile = import("/lua/cybranweapons.lua")
 local CDFLaserHeavyWeapon = CybranWeaponsFile.CDFLaserHeavyWeapon
-local EffectUtil = import("/lua/effectutilities.lua")
+local EffectUtil = import('/lua/EffectUtilities.lua')
 
 local EmptyTable = EmptyTable
 

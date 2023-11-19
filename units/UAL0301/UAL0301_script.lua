@@ -16,7 +16,7 @@ local CommandUnit = import("/lua/defaultunits.lua").CommandUnit
 local AWeapons = import("/lua/aeonweapons.lua")
 local ADFReactonCannon = AWeapons.ADFReactonCannon
 local SCUDeathWeapon = import("/lua/sim/defaultweapons.lua").SCUDeathWeapon
-local EffectUtil = import("/lua/effectutilities.lua")
+local EffectUtil = import('/lua/EffectUtilities.lua')
 local Buff = import("/lua/sim/buff.lua")
 
 ---@class UAL0301 : CommandUnit

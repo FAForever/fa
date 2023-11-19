@@ -760,4 +760,4 @@ ADFCannonOblivionNaval = Class(DefaultProjectileWeapon) {
 local PhasonLaserCollisionBeam = CollisionBeamFile.PhasonLaserCollisionBeam
 local DisruptorBeamCollisionBeam = CollisionBeamFile.DisruptorBeamCollisionBeam
 local BareBonesWeapon = WeaponFile.BareBonesWeapon
-local EffectUtil = import("/lua/effectutilities.lua")
+local EffectUtil = import('/lua/EffectUtilities.lua')

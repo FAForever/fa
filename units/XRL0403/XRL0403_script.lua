@@ -368,7 +368,7 @@ XRL0403 = ClassUnit(CWalkingLandUnit, CConstructionTemplate) {
 TypeClass = XRL0403
 
 --- Kept for mod support
-local EffectUtil = import("/lua/effectutilities.lua")
+local EffectUtil = import('/lua/EffectUtilities.lua')
 local Entity = import("/lua/sim/entity.lua").Entity
 local Weapon = import("/lua/sim/weapon.lua").Weapon
 local MobileUnit = import("/lua/defaultunits.lua").MobileUnit

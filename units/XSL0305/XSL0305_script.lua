@@ -121,4 +121,4 @@ XSL0305 = ClassUnit(SLandUnit) {
 TypeClass = XSL0305
 
 --- Kept for mod support
-local EffectUtil = import("/lua/effectutilities.lua")
+local EffectUtil = import('/lua/EffectUtilities.lua')

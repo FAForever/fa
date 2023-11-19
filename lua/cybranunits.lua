@@ -26,7 +26,7 @@ local RadarUnit = DefaultUnitsFile.RadarUnit
 local MassCollectionUnit = DefaultUnitsFile.MassCollectionUnit
 
 local EffectTemplate = import("/lua/EffectTemplates.lua")
-local EffectUtil = import("/lua/effectutilities.lua")
+local EffectUtil = import('/lua/EffectUtilities.lua')
 
 
 -- upvalued effect utility functions for performance

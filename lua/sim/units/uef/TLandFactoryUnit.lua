@@ -23,7 +23,7 @@
 local LandFactoryUnit = import('/lua/defaultunits.lua').LandFactoryUnit
 
 -- pre-import for performance
-local CreateDefaultBuildBeams = import('/lua/effectutilities.lua').CreateDefaultBuildBeams
+local CreateDefaultBuildBeams = import('/lua/EffectUtilities.lua').CreateDefaultBuildBeams
 
 -- upvalue scope for performance
 local WaitTicks = WaitTicks

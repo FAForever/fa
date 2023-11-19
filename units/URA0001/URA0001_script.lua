@@ -5,8 +5,8 @@
 -- Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 local CAirUnit = import("/lua/cybranunits.lua").CAirUnit
-local CreateCybranBuildBeamsOpti = import("/lua/effectutilities.lua").CreateCybranBuildBeamsOpti
-local EffectUtil = import("/lua/effectutilities.lua")
+local CreateCybranBuildBeamsOpti = import('/lua/EffectUtilities.lua').CreateCybranBuildBeamsOpti
+local EffectUtil = import('/lua/EffectUtilities.lua')
 local EffectTemplate = import("/lua/EffectTemplates.lua")
 
 local DeprecatedWarnings = { }

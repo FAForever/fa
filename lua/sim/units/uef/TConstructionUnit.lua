@@ -24,8 +24,8 @@ local ConstructionUnit = import('/lua/defaultunits.lua').ConstructionUnit
 local ConstructionUnitOnStopBeingBuilt = ConstructionUnit.OnStopBeingBuilt
 
 -- pre-import for performance
-local CreateUEFBuildSliceBeams = import('/lua/effectutilities.lua').CreateUEFBuildSliceBeams
-local CreateDefaultBuildBeams = import('/lua/effectutilities.lua').CreateDefaultBuildBeams
+local CreateUEFBuildSliceBeams = import('/lua/EffectUtilities.lua').CreateUEFBuildSliceBeams
+local CreateDefaultBuildBeams = import('/lua/EffectUtilities.lua').CreateDefaultBuildBeams
 
 -- upvalue scope for performance
 local WaitFor = WaitFor

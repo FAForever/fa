@@ -15,7 +15,7 @@ local AIFQuasarAntiTorpedoWeapon = WeaponsFile.AIFQuasarAntiTorpedoWeapon
 local AeonBuildBeams01 = import("/lua/EffectTemplates.lua").AeonBuildBeams01
 local AeonBuildBeams02 = import("/lua/EffectTemplates.lua").AeonBuildBeams02
 
-local CreateAeonTempestBuildingEffects = import("/lua/effectutilities.lua").CreateAeonTempestBuildingEffects
+local CreateAeonTempestBuildingEffects = import('/lua/EffectUtilities.lua').CreateAeonTempestBuildingEffects
 
 local ExternalFactoryComponent = import("/lua/defaultcomponents.lua").ExternalFactoryComponent
 

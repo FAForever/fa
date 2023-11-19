@@ -17,7 +17,7 @@ local GetRandomOffset = util.GetRandomOffset
 local GetRandomOffset2 = util.GetRandomOffset2
 
 -- upvalue for performance
-local EfctUtil = import("/lua/effectutilities.lua")
+local EfctUtil = import('/lua/EffectUtilities.lua')
 local ApplyWindDirection = EfctUtil.ApplyWindDirection
 local CreateEffectsOpti = EfctUtil.CreateEffectsOpti
 local CreateBoneEffectsOpti = EfctUtil.CreateBoneEffectsOpti

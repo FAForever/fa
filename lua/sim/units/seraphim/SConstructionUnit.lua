@@ -25,8 +25,8 @@ local ConstructionUnitOnCreate = ConstructionUnit.OnCreate
 local ConstructionUnitSetupBuildBones = ConstructionUnit.SetupBuildBones
 local ConstructionUnitBuildManipulatorSetEnabled = ConstructionUnit.BuildManipulatorSetEnabled
 
-local CreateSeraphimUnitEngineerBuildingEffects = import('/lua/effectutilities.lua').CreateSeraphimUnitEngineerBuildingEffects
-local CreateBuilderArmController                = import('/lua/effectutilities.lua').CreateBuilderArmController
+local CreateSeraphimUnitEngineerBuildingEffects = import('/lua/EffectUtilities.lua').CreateSeraphimUnitEngineerBuildingEffects
+local CreateBuilderArmController                = import('/lua/EffectUtilities.lua').CreateBuilderArmController
 
 ---@class SConstructionUnit : ConstructionUnit
 ---@field BuildArm2Manipulator moho.BuilderArmManipulator
