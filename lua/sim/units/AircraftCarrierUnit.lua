@@ -1,4 +1,3 @@
-
 local SeaUnit = import("/lua/sim/units/seaunit.lua").SeaUnit
 local BaseTransport = import("/lua/sim/units/components/transportunitcomponent.lua").BaseTransport
 
