@@ -114,7 +114,7 @@ ConstructionUnit = ClassUnit(MobileUnit) {
         if self.BuildArmManipulator then
             WaitFor(self.BuildingOpenAnimManip)
             if enable then
-                self.BuildArmManipulator:Enable()
+                self:BuildManipulatorSetEnabled(enable)
             end
         end
     end,
