@@ -8,7 +8,7 @@
 ----**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 ----****************************************************************************
 local SQuantumGateUnit = import("/lua/seraphimunits.lua").SQuantumGateUnit
-local EffectTemplates = import("/lua/effecttemplates.lua")
+local EffectTemplates = import("/lua/EffectTemplates.lua")
 
 ---@class XSB0304 : SQuantumGateUnit
 XSB0304 = ClassUnit(SQuantumGateUnit) {

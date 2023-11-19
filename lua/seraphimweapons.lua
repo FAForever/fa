@@ -14,7 +14,7 @@ local CollisionBeamFile = import("/lua/defaultcollisionbeams.lua")
 local DefaultProjectileWeapon = WeaponFile.DefaultProjectileWeapon
 local DefaultBeamWeapon = WeaponFile.DefaultBeamWeapon
 local OverchargeWeapon = WeaponFile.OverchargeWeapon
-local EffectTemplate = import("/lua/effecttemplates.lua")
+local EffectTemplate = import("/lua/EffectTemplates.lua")
 
 ---@class SANAnaitTorpedo : DefaultProjectileWeapon
 SANAnaitTorpedo = ClassWeapon(DefaultProjectileWeapon) {

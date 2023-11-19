@@ -94,7 +94,7 @@ local SingleCompositeEmitterProjectile = import("/lua/sim/defaultprojectiles.lua
 local MultiCompositeEmitterProjectile = import("/lua/sim/defaultprojectiles.lua").MultiCompositeEmitterProjectile
 local NullShell = import("/lua/sim/defaultprojectiles.lua").NullShell
 local DepthCharge = import("/lua/defaultantiprojectile.lua").DepthCharge
-local EffectTemplate = import("/lua/effecttemplates.lua")
+local EffectTemplate = import("/lua/EffectTemplates.lua")
 local NukeProjectile = import("/lua/sim/defaultprojectiles.lua").NukeProjectile
 
 local DebrisComponent = import('/lua/sim/projectiles/components/DebrisComponent.lua').DebrisComponent

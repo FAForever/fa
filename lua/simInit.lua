@@ -526,7 +526,7 @@ end
 function BeginSessionEffects()
     local markers = import("/lua/sim/scenarioutilities.lua").GetMarkers()
     local Entity = import("/lua/sim/entity.lua").Entity
-    local EffectTemplate = import("/lua/effecttemplates.lua")
+    local EffectTemplate = import("/lua/EffectTemplates.lua")
     if markers then
         for k, v in markers do
             if v.type == 'Effect' then

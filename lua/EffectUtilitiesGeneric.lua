@@ -2,9 +2,9 @@
 -- cache for performance
 local util = import("/lua/utilities.lua")
 local Entity = import("/lua/sim/entity.lua").Entity
-local ReclaimObjectAOE = import("/lua/effecttemplates.lua").ReclaimObjectAOE
-local ReclaimBeams = import("/lua/effecttemplates.lua").ReclaimBeams
-local ReclaimObjectEnd = import("/lua/effecttemplates.lua").ReclaimObjectEnd
+local ReclaimObjectAOE = import("/lua/EffectTemplates.lua").ReclaimObjectAOE
+local ReclaimBeams = import("/lua/EffectTemplates.lua").ReclaimBeams
+local ReclaimObjectEnd = import("/lua/EffectTemplates.lua").ReclaimObjectEnd
 
 -- upvalue for performance
 local AttachBeamEntityToEntity = AttachBeamEntityToEntity

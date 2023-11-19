@@ -12,8 +12,8 @@ local ADFCannonOblivionWeapon = WeaponsFile.ADFCannonOblivionWeapon02
 local AANChronoTorpedoWeapon = WeaponsFile.AANChronoTorpedoWeapon
 local AIFQuasarAntiTorpedoWeapon = WeaponsFile.AIFQuasarAntiTorpedoWeapon
 
-local AeonBuildBeams01 = import("/lua/effecttemplates.lua").AeonBuildBeams01
-local AeonBuildBeams02 = import("/lua/effecttemplates.lua").AeonBuildBeams02
+local AeonBuildBeams01 = import("/lua/EffectTemplates.lua").AeonBuildBeams01
+local AeonBuildBeams02 = import("/lua/EffectTemplates.lua").AeonBuildBeams02
 
 local CreateAeonTempestBuildingEffects = import("/lua/effectutilities.lua").CreateAeonTempestBuildingEffects
 

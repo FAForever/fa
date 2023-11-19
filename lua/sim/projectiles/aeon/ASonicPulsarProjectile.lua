@@ -20,7 +20,7 @@
 --** SOFTWARE.
 --**********************************************************************************
 
-local EffectTemplate = import("/lua/effecttemplates.lua")
+local EffectTemplate = import("/lua/EffectTemplates.lua")
 local EmitterProjectile = import("/lua/sim/defaultprojectiles.lua").EmitterProjectile
 
 --- AEON LASER PROJECTILES

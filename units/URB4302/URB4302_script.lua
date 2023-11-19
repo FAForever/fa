@@ -5,7 +5,7 @@
 ------------------------------------------------------------------
 local CStructureUnit = import("/lua/cybranunits.lua").CStructureUnit
 local CAMEMPMissileWeapon = import("/lua/cybranweapons.lua").CAMEMPMissileWeapon
-local EffectTemplate = import("/lua/effecttemplates.lua")
+local EffectTemplate = import("/lua/EffectTemplates.lua")
 local nukeFiredOnGotTarget = false
 
 ---@class URB4302 : CStructureUnit

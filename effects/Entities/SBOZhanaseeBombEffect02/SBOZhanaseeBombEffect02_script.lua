@@ -4,7 +4,7 @@
 -- Summary  :  Zhanasee Bomb effect script, non-damaging
 -- Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 ------------------------------------------------------------------------------
-local EffectTemplate = import("/lua/effecttemplates.lua")
+local EffectTemplate = import("/lua/EffectTemplates.lua")
 
 --- Zhanasee Bomb effect script, non-damaging
 ---@class SBOZhanaseeBombEffect02 : MultiPolyTrailProjectile

@@ -7,7 +7,7 @@ local CWalkingLandUnit = import("/lua/cybranunits.lua").CWalkingLandUnit
 local CybranWeaponsFile = import("/lua/cybranweapons.lua")
 local CAANanoDartWeapon = CybranWeaponsFile.CAANanoDartWeapon
 local TargetingLaser = import("/lua/kirvesweapons.lua").TargetingLaser
-local Effects = import("/lua/effecttemplates.lua")
+local Effects = import("/lua/EffectTemplates.lua")
 
 ---@class DRLK001 : CWalkingLandUnit
 DRLK001 = ClassUnit(CWalkingLandUnit) {

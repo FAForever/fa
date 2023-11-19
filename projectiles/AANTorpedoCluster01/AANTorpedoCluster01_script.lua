@@ -32,7 +32,7 @@ local CreateTrail = CreateTrail
 --- Aeon Torpedo Cluster Projectile script, XAA0306
 ---@class AANTorpedoCluster01 : ATorpedoCluster
 AANTorpedoCluster01 = ClassProjectile(ATorpedoCluster) {
-    FxTrail = import("/lua/effecttemplates.lua").ATorpedoPolyTrails01,
+    FxTrail = import("/lua/EffectTemplates.lua").ATorpedoPolyTrails01,
 
     ---@param self AANTorpedoCluster01
     OnCreate = function(self)

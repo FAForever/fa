@@ -9,7 +9,7 @@ local AGuidedMissileProjectile = import("/lua/aeonprojectiles.lua").AGuidedMissi
 local AGuidedMissileProjectileOnCreate = AGuidedMissileProjectile.OnCreate
 
 -- pre-import for performance
-local AMercyGuidedMissileSplit = import("/lua/effecttemplates.lua").AMercyGuidedMissileSplit
+local AMercyGuidedMissileSplit = import("/lua/EffectTemplates.lua").AMercyGuidedMissileSplit
 
 -- upvalue scope for performance
 local MathSin = math.sin

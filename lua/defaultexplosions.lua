@@ -23,7 +23,7 @@ local CreateEffectsOpti = EfctUtil.CreateEffectsOpti
 local CreateBoneEffectsOpti = EfctUtil.CreateBoneEffectsOpti
 local CreateBoneEffectsOffsetOpti = EfctUtil.CreateBoneEffectsOffsetOpti
 
-local EffectTemplate = import("/lua/effecttemplates.lua")
+local EffectTemplate = import("/lua/EffectTemplates.lua")
 local ExplosionSmall = EffectTemplate.ExplosionSmall
 local ExplosionLarge = EffectTemplate.ExplosionLarge
 local ExplosionMedium = EffectTemplate.ExplosionMedium

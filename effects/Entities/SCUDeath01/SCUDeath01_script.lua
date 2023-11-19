@@ -100,4 +100,4 @@ SCUDeath01 = Class(NullShell) {
 TypeClass = SCUDeath01
 
 --- Kept for backwards compatibility
-local EffectTemplate = import("/lua/effecttemplates.lua")
+local EffectTemplate = import("/lua/EffectTemplates.lua")

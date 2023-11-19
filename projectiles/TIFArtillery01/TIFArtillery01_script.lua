@@ -1,4 +1,4 @@
-local EffectTemplate = import("/lua/effecttemplates.lua")
+local EffectTemplate = import("/lua/EffectTemplates.lua")
 local TArtilleryProjectilePolytrail = import("/lua/terranprojectiles.lua").TArtilleryProjectilePolytrail
 
 --- UEF T2 Artillery projectile : ueb2303

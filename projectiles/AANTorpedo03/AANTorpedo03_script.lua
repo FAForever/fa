@@ -27,13 +27,13 @@ local ATorpedoClusterOnEnterWater = ATorpedoCluster.OnEnterWater
 --- Aeon Torpedo Cluster Projectile script, XAA0306
 ---@class AANTorpedoCluster01 : ATorpedoCluster
 AANTorpedoCluster01 = ClassProjectile(ATorpedoCluster) {
-    FxTrail = import("/lua/effecttemplates.lua").ATorpedoPolyTrails01,
+    FxTrail = import("/lua/EffectTemplates.lua").ATorpedoPolyTrails01,
 
     ---@param self AANTorpedoCluster01
     ---@param inWater boolean
     OnCreate = function(self, inWater)
         ATorpedoClusterOnCreate(self, inWater)
-        CreateTrail(self, -1, self.Army, import("/lua/effecttemplates.lua").ATorpedoPolyTrails01)
+        CreateTrail(self, -1, self.Army, import("/lua/EffectTemplates.lua").ATorpedoPolyTrails01)
     end,
 
     ---@param self TANAnglerTorpedo06

@@ -9,7 +9,7 @@
 ------------------------------------------------------------
 
 local CollisionBeam = import("/lua/sim/collisionbeam.lua").CollisionBeam
-local EffectTemplate = import("/lua/effecttemplates.lua")
+local EffectTemplate = import("/lua/EffectTemplates.lua")
 local VisionMarkerOpti = import("/lua/sim/VizMarker.lua").VisionMarkerOpti
 local Util = import("/lua/utilities.lua")
 

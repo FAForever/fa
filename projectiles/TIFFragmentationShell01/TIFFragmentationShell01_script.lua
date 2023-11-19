@@ -5,7 +5,7 @@
 -- Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 ------------------------------------------------------------------------------
 local TArtilleryProjectile = import("/lua/terranprojectiles.lua").TArtilleryProjectile
-local EffectTemplate = import("/lua/effecttemplates.lua")
+local EffectTemplate = import("/lua/EffectTemplates.lua")
 
 --- Terran Fragmentation Shells, DEL0204
 ---@class TIFFragmentationShell01: TArtilleryProjectile

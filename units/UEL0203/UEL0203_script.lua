@@ -8,7 +8,7 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local EffectTemplate = import("/lua/effecttemplates.lua")
+local EffectTemplate = import("/lua/EffectTemplates.lua")
 local THoverLandUnit = import("/lua/terranunits.lua").THoverLandUnit
 local TDFRiotWeapon = import("/lua/terranweapons.lua").TDFRiotWeapon
 local SlowHover = import("/lua/defaultunits.lua").SlowHoverLandUnit

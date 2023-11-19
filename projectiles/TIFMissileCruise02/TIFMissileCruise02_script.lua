@@ -22,7 +22,7 @@
 --******************************************************************************************************
 
 local TMissileCruiseSubProjectile = import("/lua/terranprojectiles.lua").TMissileCruiseSubProjectile
-local EffectTemplate = import("/lua/effecttemplates.lua")
+local EffectTemplate = import("/lua/EffectTemplates.lua")
 
 --- Used by ues0304
 ---@class TIFMissileCruise02 : TMissileCruiseSubProjectile

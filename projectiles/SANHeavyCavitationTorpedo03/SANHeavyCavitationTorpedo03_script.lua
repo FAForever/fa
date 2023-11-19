@@ -4,7 +4,7 @@
 -- Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------------------------------------------
 local SHeavyCavitationTorpedo = import("/lua/seraphimprojectiles.lua").SHeavyCavitationTorpedo
-local EffectTemplate = import("/lua/effecttemplates.lua")
+local EffectTemplate = import("/lua/EffectTemplates.lua")
 
 --- Heavy Cavitation Torpedo Projectile script, XSB2205
 ---@class SANHeavyCavitationTorpedo03 : SHeavyCavitationTorpedo

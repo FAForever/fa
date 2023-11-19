@@ -1,6 +1,6 @@
 -- imports for functionality
-local AeonBuildBeams01 = import("/lua/effecttemplates.lua").AeonBuildBeams01
-local AeonBuildBeams02 = import("/lua/effecttemplates.lua").AeonBuildBeams02
+local AeonBuildBeams01 = import("/lua/EffectTemplates.lua").AeonBuildBeams01
+local AeonBuildBeams02 = import("/lua/EffectTemplates.lua").AeonBuildBeams02
 
 local AttachBeamEntityToEntity = AttachBeamEntityToEntity
 local CreateAttachedEmitter = CreateAttachedEmitter

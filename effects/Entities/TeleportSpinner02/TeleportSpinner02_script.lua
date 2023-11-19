@@ -6,7 +6,7 @@
 ------------------------------------------------------------------------------
 
 local NullShell = import("/lua/sim/defaultprojectiles.lua").NullShell
-local EffectTemplate = import("/lua/effecttemplates.lua")
+local EffectTemplate = import("/lua/EffectTemplates.lua")
 
 ---@class TeleportSpinner02 : NullShell
 TeleportSpinner02 = Class(NullShell) {

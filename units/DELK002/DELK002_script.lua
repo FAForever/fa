@@ -8,7 +8,7 @@ local TWeapons = import("/lua/terranweapons.lua")
 local TDFPlasmaCannonWeapon = TWeapons.TDFPlasmaCannonWeapon
 local TAAPhalanxWeapon = import("/lua/kirvesweapons.lua").TAAPhalanxWeapon
 local EffectUtils = import("/lua/effectutilities.lua")
-local Effects = import("/lua/effecttemplates.lua")
+local Effects = import("/lua/EffectTemplates.lua")
 
 
 ---@class DELK002 : TLandUnit

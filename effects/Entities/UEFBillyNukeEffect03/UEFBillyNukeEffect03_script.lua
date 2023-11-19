@@ -1,5 +1,5 @@
 local NullShell = import("/lua/sim/defaultprojectiles.lua").NullShell
-local EffectTemplate = import("/lua/effecttemplates.lua")
+local EffectTemplate = import("/lua/EffectTemplates.lua")
 
 ---@class UEFNukeEffect03 : NullShell
 UEFNukeEffect03 = Class(NullShell) {

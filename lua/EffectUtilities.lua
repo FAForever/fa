@@ -7,7 +7,7 @@
 
 local util = import("/lua/utilities.lua")
 local Entity = import("/lua/sim/entity.lua").Entity
-local EffectTemplate = import("/lua/effecttemplates.lua")
+local EffectTemplate = import("/lua/EffectTemplates.lua")
 
 local AttachBeamEntityToEntity = AttachBeamEntityToEntity
 local CreateAttachedEmitter = CreateAttachedEmitter

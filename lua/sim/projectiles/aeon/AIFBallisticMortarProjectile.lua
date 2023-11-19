@@ -21,7 +21,7 @@
 --**********************************************************************************
 
 local EmitterProjectile = import("/lua/sim/defaultprojectiles.lua").EmitterProjectile
-local EffectTemplate = import("/lua/effecttemplates.lua")
+local EffectTemplate = import("/lua/EffectTemplates.lua")
 
 --- AEON Ballistic Mortar Launcher
 ---@class AIFBallisticMortarProjectile : EmitterProjectile

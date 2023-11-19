@@ -1,5 +1,5 @@
 local CArtilleryProjectile = import("/lua/cybranprojectiles.lua").CArtilleryProjectile
-local EffectTemplate = import("/lua/effecttemplates.lua")
+local EffectTemplate = import("/lua/EffectTemplates.lua")
 
 --- Cybran T1 Artillery EMP Grenade : url0103
 ---@class CIFGrenade01 : CArtilleryProjectile

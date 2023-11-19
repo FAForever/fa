@@ -5,7 +5,7 @@
 -----------------------------------------------------------------------------------------------------
 local SHeavyCavitationTorpedo = import("/lua/seraphimprojectiles.lua").SHeavyCavitationTorpedo
 local RandomFloat = import("/lua/utilities.lua").GetRandomFloat
-local EffectTemplate = import("/lua/effecttemplates.lua")
+local EffectTemplate = import("/lua/EffectTemplates.lua")
 
 --- Heavy Cavitation Torpedo Projectile script, XSA0204
 ---@class SANHeavyCavitationTorpedo01 : SHeavyCavitationTorpedo

@@ -9,7 +9,7 @@
 ----****************************************************************************
 local SEnergyBallUnit = import("/lua/seraphimunits.lua").SEnergyBallUnit
 local SDFUnstablePhasonBeam = import("/lua/seraphimweapons.lua").SDFUnstablePhasonBeam
-local EffectTemplate = import("/lua/effecttemplates.lua")
+local EffectTemplate = import("/lua/EffectTemplates.lua")
 
 ---@class XSL0402 : SEnergyBallUnit
 XSL0402 = ClassUnit(SEnergyBallUnit) {

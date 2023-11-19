@@ -1,5 +1,5 @@
 
-local EffectTemplate = import("/lua/effecttemplates.lua")
+local EffectTemplate = import("/lua/EffectTemplates.lua")
 
 local Entity = import("/lua/sim/entity.lua").Entity
 local MobileUnit = import("/lua/sim/units/mobileunit.lua").MobileUnit

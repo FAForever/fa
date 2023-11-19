@@ -20,7 +20,7 @@
 --** SOFTWARE.
 --**********************************************************************************
 
-local EffectTemplate = import("/lua/effecttemplates.lua")
+local EffectTemplate = import("/lua/EffectTemplates.lua")
 local ATorpedoShipProjectile = import("/lua/sim/projectiles/aeon/ATorpedoShipProjectile.lua").ATorpedoShipProjectile
 
 --- AEON TORPEDO CLUSTER

@@ -7,7 +7,7 @@
 local TStructureUnit = import("/lua/terranunits.lua").TStructureUnit
 local TDFHeavyPlasmaCannonWeapon = import("/lua/terranweapons.lua").TDFHeavyPlasmaGatlingCannonWeapon
 local EffectUtils = import("/lua/effectutilities.lua")
-local Effects = import("/lua/effecttemplates.lua")
+local Effects = import("/lua/EffectTemplates.lua")
 
 ---@class XEB2306 : TStructureUnit
 XEB2306 = ClassUnit(TStructureUnit) {

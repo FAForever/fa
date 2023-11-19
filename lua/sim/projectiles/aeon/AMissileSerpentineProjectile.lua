@@ -21,7 +21,7 @@
 --** SOFTWARE.
 --**********************************************************************************
 
-local EffectTemplate = import("/lua/effecttemplates.lua")
+local EffectTemplate = import("/lua/EffectTemplates.lua")
 local SingleCompositeEmitterProjectile = import("/lua/sim/defaultprojectiles.lua").SingleCompositeEmitterProjectile
 local SingleCompositeEmitterProjectileOnCreate = SingleCompositeEmitterProjectile.OnCreate
 local SingleCompositeEmitterProjectileOnKilled = SingleCompositeEmitterProjectile.OnKilled

@@ -5,7 +5,7 @@
 ---------------------------------------------------------------------------------------------------
 
 local SThunthoArtilleryShell = import("/lua/seraphimprojectiles.lua").SThunthoArtilleryShell
-local SThunderStormCannonProjectileSplitFx = import("/lua/effecttemplates.lua").SThunderStormCannonProjectileSplitFx 
+local SThunderStormCannonProjectileSplitFx = import("/lua/EffectTemplates.lua").SThunderStormCannonProjectileSplitFx 
 
 -- upvalue for performance
 local CreateEmitterAtEntity = CreateEmitterAtEntity

@@ -1,5 +1,5 @@
 -- imports for functionality
-local EffectTemplate = import("/lua/effecttemplates.lua")
+local EffectTemplate = import("/lua/EffectTemplates.lua")
 
 -- globals as upvalues for performance
 local AttachBeamEntityToEntity = AttachBeamEntityToEntity

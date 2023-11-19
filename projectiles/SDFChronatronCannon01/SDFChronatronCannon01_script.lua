@@ -4,7 +4,7 @@
 -- Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------------------------------
 local SChronatronCannon = import("/lua/seraphimprojectiles.lua").SChronatronCannon
-local ChronatronBlastAttackAOE = import("/lua/effecttemplates.lua").SChronatronCannonBlastAttackAOE
+local ChronatronBlastAttackAOE = import("/lua/EffectTemplates.lua").SChronatronCannonBlastAttackAOE
 
 --- Chronatron Cannon Projectile script, XSL0001
 ---@class SDFChronatronCannon01 : SChronatronCannon

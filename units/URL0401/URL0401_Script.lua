@@ -5,7 +5,7 @@
 -------------------------------------------------------------------
 local CLandUnit = import("/lua/cybranunits.lua").CLandUnit
 local CIFArtilleryWeapon = import("/lua/cybranweapons.lua").CIFArtilleryWeapon
-local EffectTemplate = import("/lua/effecttemplates.lua")
+local EffectTemplate = import("/lua/EffectTemplates.lua")
 local Util = import("/lua/utilities.lua")
 local barrelBones = { 'Turret_Barrel_F_B01', 'Turret_Barrel_E_B01', 'Turret_Barrel_D_B01', 'Turret_Barrel_C_B01',
     'Turret_Barrel_B_B01', 'Turret_Barrel_A_B01' }

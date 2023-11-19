@@ -20,7 +20,7 @@
 --** SOFTWARE.
 --**********************************************************************************
 
-local EffectTemplate = import("/lua/effecttemplates.lua")
+local EffectTemplate = import("/lua/EffectTemplates.lua")
 local NullShell = import("/lua/sim/defaultprojectiles.lua").NullShell
 local NullShellOnCreate = NullShell.OnCreate
 

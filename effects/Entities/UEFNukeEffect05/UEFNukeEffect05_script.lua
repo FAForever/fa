@@ -5,7 +5,7 @@
 -- Copyright © 2005,2006 Gas Powered Games, Inc.  All rights reserved.
 ------------------------------------------------------------------------------
 local NullShell = import("/lua/sim/defaultprojectiles.lua").NullShell
-local EffectTemplate = import("/lua/effecttemplates.lua")
+local EffectTemplate = import("/lua/EffectTemplates.lua")
 
 --- UEFNukeEffect05
 ---@class UEFNukeEffect05 : NullShell

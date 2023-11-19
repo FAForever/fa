@@ -10,7 +10,7 @@
 
 local CSeaUnit = import("/lua/cybranunits.lua").CSeaUnit
 local CIFSmartCharge = import("/lua/cybranweapons.lua").CIFSmartCharge
-local EffectTemplates = import("/lua/effecttemplates.lua")
+local EffectTemplates = import("/lua/EffectTemplates.lua")
 
 ---@class XRS0205 : CSeaUnit
 ---@field Rotator moho.RotateManipulator

@@ -1,5 +1,5 @@
 local TLaserBotProjectile = import("/lua/terranprojectiles.lua").TLaserBotProjectile
-local EffectTemplate = import("/lua/effecttemplates.lua")
+local EffectTemplate = import("/lua/EffectTemplates.lua")
 local OverchargeProjectile = import("/lua/sim/defaultprojectiles.lua").OverchargeProjectile
 
 --- UEF Blaster

@@ -16,7 +16,7 @@ local Explosion = import("/lua/defaultexplosions.lua")
 local KamikazeWeapon = WeaponFile.KamikazeWeapon
 local DefaultProjectileWeapon = WeaponFile.DefaultProjectileWeapon
 local DefaultBeamWeapon = WeaponFile.DefaultBeamWeapon
-local EffectTemplate = import("/lua/effecttemplates.lua")
+local EffectTemplate = import("/lua/EffectTemplates.lua")
 
 ---@class AIFBallisticMortarWeapon : DefaultProjectileWeapon
 AIFBallisticMortarWeapon = ClassWeapon(DefaultProjectileWeapon) {

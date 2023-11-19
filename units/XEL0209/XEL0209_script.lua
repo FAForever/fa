@@ -7,7 +7,7 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local EffectTemplate = import("/lua/effecttemplates.lua")
+local EffectTemplate = import("/lua/EffectTemplates.lua")
 local TConstructionUnit = import("/lua/terranunits.lua").TConstructionUnit
 local TDFRiotWeapon = import("/lua/terranweapons.lua").TDFRiotWeapon
 

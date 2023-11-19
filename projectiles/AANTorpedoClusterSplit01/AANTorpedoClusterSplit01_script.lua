@@ -24,7 +24,7 @@ local ATorpedoCluster = import("/lua/aeonprojectiles.lua").ATorpedoCluster
 local ATorpedoClusterOnCreate = ATorpedoCluster.OnCreate
 local ATorpedoClusterOnImpact = ATorpedoCluster.OnImpact
 
-local ATorpedoPolyTrails01 = import("/lua/effecttemplates.lua").ATorpedoPolyTrails01
+local ATorpedoPolyTrails01 = import("/lua/EffectTemplates.lua").ATorpedoPolyTrails01
 
 local VisionMarkerOpti = import("/lua/sim/vizmarker.lua").VisionMarkerOpti
 

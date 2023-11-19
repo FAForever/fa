@@ -1,6 +1,6 @@
 local TArtilleryProjectile = import("/lua/terranprojectiles.lua").TArtilleryProjectile
 local VisionMarkerOpti = import("/lua/sim/vizmarker.lua").VisionMarkerOpti
-local TFragmentationSensorShellFrag = import("/lua/effecttemplates.lua").TFragmentationSensorShellFrag
+local TFragmentationSensorShellFrag = import("/lua/EffectTemplates.lua").TFragmentationSensorShellFrag
 
 -- upvalue for performance
 local CreateEmitterAtEntity = CreateEmitterAtEntity

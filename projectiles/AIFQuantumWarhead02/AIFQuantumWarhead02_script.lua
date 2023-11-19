@@ -6,7 +6,7 @@
 ------------------------------------------------------------------------------
 local NullShell = import("/lua/sim/defaultprojectiles.lua").NullShell
 local RandomFloat = import("/lua/utilities.lua").GetRandomFloat
-local EffectTemplate = import("/lua/effecttemplates.lua")
+local EffectTemplate = import("/lua/EffectTemplates.lua")
 
 ---@class CIFEMPFluxWarhead02 : NullShell
 AIFQuantumWarhead02 = ClassProjectile(NullShell) {

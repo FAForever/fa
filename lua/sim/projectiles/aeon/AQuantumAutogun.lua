@@ -20,7 +20,7 @@
 --** SOFTWARE.
 --**********************************************************************************
 
-local EffectTemplate = import("/lua/effecttemplates.lua")
+local EffectTemplate = import("/lua/EffectTemplates.lua")
 local SinglePolyTrailProjectile = import("/lua/sim/defaultprojectiles.lua").SinglePolyTrailProjectile
 
 --- AEON QUANTUM AUTOGUN SHELL

@@ -4,7 +4,7 @@
 -- Summary  :  Quantic Cluster Projectile script
 -- Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 ---------------------------------------------------------------------------------------
-local EffectTemplate = import("/lua/effecttemplates.lua")
+local EffectTemplate = import("/lua/EffectTemplates.lua")
 
 ---@class AIFQuanticCluster03 : AQuantumCluster
 AIFQuanticCluster03 = ClassProjectile(import("/lua/aeonprojectiles.lua").AQuantumCluster) {

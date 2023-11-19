@@ -21,7 +21,7 @@
 --**********************************************************************************
 
 local EmitterProjectile = import("/lua/sim/defaultprojectiles.lua").EmitterProjectile
-local EffectTemplate = import("/lua/effecttemplates.lua")
+local EffectTemplate = import("/lua/EffectTemplates.lua")
 
 --- AEON FLARE PROJECTILES
 ---@class AIMFlareProjectile : EmitterProjectile

@@ -6,7 +6,7 @@ local CCivilianStructureUnit = import("/lua/cybranunits.lua").CCivilianStructure
 local Util = import("/lua/utilities.lua")
 local RandomFloat = Util.GetRandomFloat
 local explosion = import("/lua/defaultexplosions.lua")
-local EffectTemplate = import("/lua/effecttemplates.lua")
+local EffectTemplate = import("/lua/EffectTemplates.lua")
 
 ---@class XRC2201 : CCivilianStructureUnit
 XRC2201 = ClassUnit(CCivilianStructureUnit) {

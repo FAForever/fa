@@ -9,7 +9,7 @@
 --****************************************************************************
 local AStructureUnit = import("/lua/aeonunits.lua").AStructureUnit
 
-local AQuantumGateAmbient = import("/lua/effecttemplates.lua").AQuantumGateAmbient
+local AQuantumGateAmbient = import("/lua/EffectTemplates.lua").AQuantumGateAmbient
 
 -- Setup as RemoteViewing child of AStructureUnit
 local RemoteViewing = import("/lua/remoteviewing.lua").RemoteViewing

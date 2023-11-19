@@ -11,6 +11,6 @@ local EmitterProjectileOnCreate = EmitterProjectile.OnCreate
 --- Ohwalli Strategic Bomb effect script, non-damaging
 ---@class SBOOhwalliBombEffect03 : EmitterProjectile
 SBOOhwalliBombEffect03 = Class(EmitterProjectile) {
-	FxTrails = import("/lua/effecttemplates.lua").SOhwalliBombHitRingProjectileFxTrails03,
+	FxTrails = import("/lua/EffectTemplates.lua").SOhwalliBombHitRingProjectileFxTrails03,
 }
 TypeClass = SBOOhwalliBombEffect03

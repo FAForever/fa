@@ -7,7 +7,7 @@
 local CAirUnit = import("/lua/cybranunits.lua").CAirUnit
 local CreateCybranBuildBeamsOpti = import("/lua/effectutilities.lua").CreateCybranBuildBeamsOpti
 local EffectUtil = import("/lua/effectutilities.lua")
-local EffectTemplate = import("/lua/effecttemplates.lua")
+local EffectTemplate = import("/lua/EffectTemplates.lua")
 
 local DeprecatedWarnings = { }
 

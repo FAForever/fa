@@ -7,7 +7,7 @@
 local SStructureUnit = import("/lua/seraphimunits.lua").SStructureUnit
 local SIFExperimentalStrategicMissile = import("/lua/seraphimweapons.lua").SIFExperimentalStrategicMissile
 local CreateSeraphimExperimentalBuildBaseThread = import("/lua/effectutilitiesseraphim.lua").CreateSeraphimExperimentalBuildBaseThread
-local EffectTemplate = import("/lua/effecttemplates.lua")
+local EffectTemplate = import("/lua/EffectTemplates.lua")
 local DeathNukeWeapon = import("/lua/sim/defaultweapons.lua").DeathNukeWeapon
 
 ---@class XSB2401 : SStructureUnit

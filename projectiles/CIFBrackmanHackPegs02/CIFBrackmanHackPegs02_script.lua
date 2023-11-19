@@ -6,7 +6,7 @@
 ------------------------------------------------------------------------------
 local TargetPos
 local RandomInt = import("/lua/utilities.lua").GetRandomInt
-local EffectTemplate = import("/lua/effecttemplates.lua")
+local EffectTemplate = import("/lua/EffectTemplates.lua")
 
 --This one should just like be something kind of new compared to the older version
 ---@class CIFBrackmanHackPegs02 : CDFBrackmanHackPegProjectile02

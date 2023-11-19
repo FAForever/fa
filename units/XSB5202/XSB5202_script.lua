@@ -8,8 +8,8 @@
 ----**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 ----****************************************************************************
 local SAirStagingPlatformUnit = import("/lua/seraphimunits.lua").SAirStagingPlatformUnit
-local SeraphimAirStagePlat02 = import("/lua/effecttemplates.lua").SeraphimAirStagePlat02
-local SeraphimAirStagePlat01 = import("/lua/effecttemplates.lua").SeraphimAirStagePlat01
+local SeraphimAirStagePlat02 = import("/lua/EffectTemplates.lua").SeraphimAirStagePlat02
+local SeraphimAirStagePlat01 = import("/lua/EffectTemplates.lua").SeraphimAirStagePlat01
 
 ---@class XSB5202 : SAirStagingPlatformUnit
 XSB5202 = ClassUnit(SAirStagingPlatformUnit) {

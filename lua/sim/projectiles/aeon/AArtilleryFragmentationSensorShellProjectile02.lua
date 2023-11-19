@@ -20,7 +20,7 @@
 --** SOFTWARE.
 --**********************************************************************************
 
-local EffectTemplate = import("/lua/effecttemplates.lua")
+local EffectTemplate = import("/lua/EffectTemplates.lua")
 local AArtilleryFragmentationSensorShellProjectile = import("/lua/sim/projectiles/aeon/AArtilleryFragmentationSensorShellProjectile.lua")
     .AArtilleryFragmentationSensorShellProjectile
 

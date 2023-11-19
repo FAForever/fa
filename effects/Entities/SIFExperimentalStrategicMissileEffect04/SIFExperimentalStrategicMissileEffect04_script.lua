@@ -4,7 +4,7 @@
 -- Summary  :  Seraphim Experimental Nuke effect script, non-damaging
 -- Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 ------------------------------------------------------------------------------
-local EffectTemplate = import("/lua/effecttemplates.lua")
+local EffectTemplate = import("/lua/EffectTemplates.lua")
 
 --- Seraphim Experimental Nuke effect script, non-damaging
 ---@class SIFExperimentalStrategicMissileEffect04 : EmitterProjectile

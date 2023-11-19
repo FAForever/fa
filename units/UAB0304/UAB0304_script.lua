@@ -4,7 +4,7 @@
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -------------------------------------------------------------------
 local AQuantumGateUnit = import("/lua/aeonunits.lua").AQuantumGateUnit
-local AQuantumGateAmbient = import("/lua/effecttemplates.lua").AQuantumGateAmbient
+local AQuantumGateAmbient = import("/lua/EffectTemplates.lua").AQuantumGateAmbient
 
 ---@class UAB0304 : AQuantumGateUnit
 UAB0304 = ClassUnit(AQuantumGateUnit) {

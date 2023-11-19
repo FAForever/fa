@@ -21,7 +21,7 @@
 --**********************************************************************************
 
 local MultiPolyTrailProjectile = import("/lua/sim/defaultprojectiles.lua").MultiPolyTrailProjectile
-local EffectTemplate = import("/lua/effecttemplates.lua")
+local EffectTemplate = import("/lua/EffectTemplates.lua")
 
 --- AEON Ballistic Mortar Launcher
 ---@class AIFBallisticMortarProjectile02 : MultiPolyTrailProjectile

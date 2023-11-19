@@ -4,7 +4,7 @@
 --  Summary  :  Brackman Hack Peg-Pod
 --  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 ------------------------------------------------------------------------------
-local EffectTemplate = import("/lua/effecttemplates.lua")
+local EffectTemplate = import("/lua/EffectTemplates.lua")
 local CDFBrackmanHackPegProjectile01 = import("/lua/cybranprojectiles.lua").CDFBrackmanHackPegProjectile01
 local RandomFloat = import("/lua/utilities.lua").GetRandomFloat
 

@@ -28,7 +28,7 @@ local OverchargeProjectile = import("/lua/sim/defaultprojectiles.lua").Overcharg
 local OverchargeProjectileOnCreate = OverchargeProjectile.OnCreate
 local OverchargeProjectileOnImpact = OverchargeProjectile.OnImpact
 
-local EffectTemplate = import("/lua/effecttemplates.lua")
+local EffectTemplate = import("/lua/EffectTemplates.lua")
 
 -- Aeon Mortar
 ---@class TDFOverCharge01 : ALaserBotProjectile, OverchargeProjectile

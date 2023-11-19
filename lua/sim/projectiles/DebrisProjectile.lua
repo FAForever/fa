@@ -33,9 +33,9 @@ local IEffectScaleEmitter = _G.moho.IEffect.ScaleEmitter
 ---@class BaseGenericDebris : DummyProjectile
 BaseGenericDebris = ClassDummyProjectile(DummyProjectile) {
 
-    FxImpactLand = import("/lua/effecttemplates.lua").GenericDebrisLandImpact01,
-    FxImpactWater = import("/lua/effecttemplates.lua").WaterSplash01,
-    FxTrails = import("/lua/effecttemplates.lua").GenericDebrisTrails01,
+    FxImpactLand = import("/lua/EffectTemplates.lua").GenericDebrisLandImpact01,
+    FxImpactWater = import("/lua/EffectTemplates.lua").WaterSplash01,
+    FxTrails = import("/lua/EffectTemplates.lua").GenericDebrisTrails01,
 
     ---@param self BaseGenericDebris
     OnCreate = function(self)

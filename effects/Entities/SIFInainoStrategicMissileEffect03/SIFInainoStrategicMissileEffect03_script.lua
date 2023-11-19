@@ -4,7 +4,7 @@
 -- Summary  :  Seraphim nuke effect script, non-damaging
 -- Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 ------------------------------------------------------------------------------
-local EffectTemplate = import("/lua/effecttemplates.lua")
+local EffectTemplate = import("/lua/EffectTemplates.lua")
 
 ---@class SIFInainoStrategicMissileEffect03 : EmitterProjectile
 SIFInainoStrategicMissileEffect03 = Class(import("/lua/sim/defaultprojectiles.lua").EmitterProjectile) {

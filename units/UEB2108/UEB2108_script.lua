@@ -7,7 +7,7 @@
 
 local TStructureUnit = import("/lua/terranunits.lua").TStructureUnit
 local TIFCruiseMissileLauncher = import("/lua/terranweapons.lua").TIFCruiseMissileLauncher
-local EffectTemplate = import("/lua/effecttemplates.lua")
+local EffectTemplate = import("/lua/EffectTemplates.lua")
 
 ---@class UEB2108 : TStructureUnit
 UEB2108 = ClassUnit(TStructureUnit) {

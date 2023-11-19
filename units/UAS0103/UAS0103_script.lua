@@ -12,7 +12,7 @@ local ASeaUnit = import("/lua/aeonunits.lua").ASeaUnit
 local AeonWeapons = import("/lua/aeonweapons.lua")
 local ADFCannonQuantumWeapon = AeonWeapons.ADFCannonQuantumWeapon
 local AIFQuasarAntiTorpedoWeapon = AeonWeapons.AIFQuasarAntiTorpedoWeapon
-local EffectTemplate = import("/lua/effecttemplates.lua")
+local EffectTemplate = import("/lua/EffectTemplates.lua")
 
 
 ---@class UAS0103 : ASeaUnit

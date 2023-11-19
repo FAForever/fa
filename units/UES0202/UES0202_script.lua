@@ -7,7 +7,7 @@
 --**
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
-local EffectTemplate = import("/lua/effecttemplates.lua")
+local EffectTemplate = import("/lua/EffectTemplates.lua")
 local TSeaUnit = import("/lua/terranunits.lua").TSeaUnit
 local WeaponFile = import("/lua/terranweapons.lua")
 local TSAMLauncher = WeaponFile.TSAMLauncher

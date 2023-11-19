@@ -6,7 +6,7 @@
 -----------------------------------------------------------------
 
 local SStructureUnit = import("/lua/seraphimunits.lua").SStructureUnit
-local SSJammerCrystalAmbient = import("/lua/effecttemplates.lua").SJammerCrystalAmbient
+local SSJammerCrystalAmbient = import("/lua/EffectTemplates.lua").SJammerCrystalAmbient
 
 ---@class XSC9002 : SStructureUnit
 XSC9002 = ClassUnit(SStructureUnit) {

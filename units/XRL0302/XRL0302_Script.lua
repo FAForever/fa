@@ -5,7 +5,7 @@
 -- Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 local CWalkingLandUnit = import("/lua/cybranunits.lua").CWalkingLandUnit
-local EffectTemplate = import("/lua/effecttemplates.lua")
+local EffectTemplate = import("/lua/EffectTemplates.lua")
 local Weapon = import("/lua/sim/weapon.lua").Weapon
 
 local DeathWeaponKamikaze = ClassWeapon(Weapon) {

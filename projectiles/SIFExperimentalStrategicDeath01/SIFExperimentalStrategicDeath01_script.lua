@@ -1,6 +1,6 @@
 local NullShell = import("/lua/sim/defaultprojectiles.lua").NullShell
 local RandomFloat = import("/lua/utilities.lua").GetRandomFloat
-local EffectTemplate = import("/lua/effecttemplates.lua")
+local EffectTemplate = import("/lua/EffectTemplates.lua")
 
 --- SIF Experimental Strategic Death 01
 ---@class SIFExperimentalStrategicDeath01 : NullShell

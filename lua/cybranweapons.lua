@@ -11,7 +11,7 @@ local DefaultProjectileWeapon = WeaponFile.DefaultProjectileWeapon
 local DefaultBeamWeapon = WeaponFile.DefaultBeamWeapon
 local OverchargeWeapon = WeaponFile.OverchargeWeapon
 local CollisionBeamFile = import("/lua/defaultcollisionbeams.lua")
-local EffectTemplate = import("/lua/effecttemplates.lua")
+local EffectTemplate = import("/lua/EffectTemplates.lua")
 
 ---@class CDFBrackmanCrabHackPegLauncherWeapon : DefaultProjectileWeapon
 CDFBrackmanCrabHackPegLauncherWeapon = ClassWeapon(DefaultProjectileWeapon) {

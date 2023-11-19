@@ -8,7 +8,7 @@
 local EmitterProjectile = import("/lua/sim/defaultprojectiles.lua").EmitterProjectile
 local EmitterProjectileOnImpact = EmitterProjectile.OnImpact
 
-local EffectTemplate = import("/lua/effecttemplates.lua")
+local EffectTemplate = import("/lua/EffectTemplates.lua")
 
 local VisionMarkerOpti = import("/lua/sim/vizmarker.lua").VisionMarkerOpti
 

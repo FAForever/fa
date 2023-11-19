@@ -7,7 +7,7 @@
 
 local NullShell = import("/lua/sim/defaultprojectiles.lua").NullShell
 local RandomFloat = import("/lua/utilities.lua").GetRandomFloat
-local EffectTemplate = import("/lua/effecttemplates.lua")
+local EffectTemplate = import("/lua/EffectTemplates.lua")
 
 ---@class UnitTeleportEffect01 : NullShell
 UnitTeleportEffect02 = Class(NullShell) {

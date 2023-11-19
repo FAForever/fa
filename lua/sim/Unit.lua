@@ -6,7 +6,7 @@
 -----------------------------------------------------------------
 
 -- Imports. Localise commonly used subfunctions for speed
-local EffectTemplate = import("/lua/effecttemplates.lua")
+local EffectTemplate = import("/lua/EffectTemplates.lua")
 local EffectUtilities = import("/lua/effectutilities.lua")
 local EnhancementCommon = import("/lua/enhancementcommon.lua")
 local Explosion = import("/lua/defaultexplosions.lua")

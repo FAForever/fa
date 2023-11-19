@@ -10,7 +10,7 @@
 local NullShell = import("/lua/sim/defaultprojectiles.lua").NullShell
 local RandomFloat = import("/lua/utilities.lua").GetRandomFloat
 local RandomInt = import("/lua/utilities.lua").GetRandomInt
-local EffectTemplate = import("/lua/effecttemplates.lua")
+local EffectTemplate = import("/lua/EffectTemplates.lua")
 local SOhwalliBombHit01 = EffectTemplate.SOhwalliBombHit01
 local ExplosionMediumWater = EffectTemplate.ExplosionMediumWater
 

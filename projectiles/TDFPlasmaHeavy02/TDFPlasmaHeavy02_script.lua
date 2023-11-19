@@ -5,7 +5,7 @@
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 ------------------------------------------------------------------
 local THeavyPlasmaCannonProjectile = import("/lua/terranprojectiles.lua").THeavyPlasmaCannonProjectile
-local EffectTemplate = import("/lua/effecttemplates.lua")
+local EffectTemplate = import("/lua/EffectTemplates.lua")
 
 --- UEF Heavy Plasma Cannon projectile, UEA0305 : T3 uef gunship & XEA0306 : T3 transport
 ---@class TDFPlasmaHeavy02: THeavyPlasmaCannonProjectile

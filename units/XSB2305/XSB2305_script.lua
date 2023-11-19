@@ -7,7 +7,7 @@
 
 local SStructureUnit = import("/lua/seraphimunits.lua").SStructureUnit
 local SIFInainoWeapon = import("/lua/seraphimweapons.lua").SIFInainoWeapon
-local EffectTemplate = import("/lua/effecttemplates.lua")
+local EffectTemplate = import("/lua/EffectTemplates.lua")
 
 ---@class XSB2305 : SStructureUnit
 XSB2305 = ClassUnit(SStructureUnit) {

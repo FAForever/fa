@@ -21,7 +21,7 @@
 --**********************************************************************************
 
 local NullShell = import("/lua/sim/defaultprojectiles.lua").NullShell
-local EffectTemplate = import("/lua/effecttemplates.lua")
+local EffectTemplate = import("/lua/EffectTemplates.lua")
 
 --- AEON BEAM PROJECTILES
 ---@class ABeamProjectile : NullShell

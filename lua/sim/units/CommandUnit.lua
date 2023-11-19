@@ -1,4 +1,9 @@
+<<<<<<< Updated upstream
 local EffectTemplate = import("/lua/effecttemplates.lua")
+=======
+
+local EffectTemplate = import("/lua/EffectTemplates.lua")
+>>>>>>> Stashed changes
 
 local WalkingLandUnit = import("/lua/sim/units/walkinglandunit.lua").WalkingLandUnit
 

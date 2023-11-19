@@ -21,7 +21,7 @@
 --**********************************************************************************
 
 local SinglePolyTrailProjectile = import("/lua/sim/defaultprojectiles.lua").SinglePolyTrailProjectile
-local EffectTemplate = import("/lua/effecttemplates.lua")
+local EffectTemplate = import("/lua/EffectTemplates.lua")
 
 --- AEON ANTI-NUKE PROJECTILES
 ---@class ASaintAntiNuke : SinglePolyTrailProjectile
