@@ -1,6 +1,18 @@
 
 Some sections of the changelog are available in other languages such as [French](changelog-fr.md) or [Russian](changelog-ru.md)
 
+# Game version 3775 (19th of November, 2023)
+
+Another day, another patch!
+
+This time around, it's a balance patch involving changes across the board, with special attention to balancing air units. For the full details, we recommend visiting the patchnotes website. You can navigate there by clicking the 'Balance notes' button at the bottom of the changelog window.
+
+A special shoutout to Brutus5000, P4Block, Sheikah, Ravendel, and others who have extensively investigated and tried to fix problems with the ICE adapter.
+
+Thanks to all those who took the time to report issues and participate in feedback sessions.
+
+The balance team and Jip
+
 # Game version 3774 (15th of November, 2023)
 
 Please refer to the notes of versions 3771, 3772 and 3773 for the full patch notes.
