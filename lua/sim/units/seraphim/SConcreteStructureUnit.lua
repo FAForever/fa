@@ -23,6 +23,4 @@
 local ConcreteStructureUnit = import('/lua/defaultunits.lua').ConcreteStructureUnit
 
 ---@class SConcreteStructureUnit : ConcreteStructureUnit
-SConcreteStructureUnit = ClassUnit(ConcreteStructureUnit) {
-    AdjacencyBeam = false,
-}
+SConcreteStructureUnit = ClassUnit(ConcreteStructureUnit) {}

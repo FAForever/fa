@@ -21,11 +21,22 @@
 --**********************************************************************************
 
 local AirFactoryUnit = import('/lua/defaultunits.lua').AirFactoryUnit
+local AirFactoryUnitRolloffBody = AirFactoryUnit.RolloffBody
 local AirFactoryUnitOnStartBuild = AirFactoryUnit.OnStartBuild
 local AirFactoryUnitUpgradingStateOnStopBuild = AirFactoryUnit.UpgradingState.OnStopBuild
 local AirFactoryUnitUpgradingStateOnFailedToBuild = AirFactoryUnit.UpgradingState.OnFailedToBuild
 
 local SFactoryUnit = import('/lua/seraphimunits.lua').SFactoryUnit
+
+-- upvalue scope for performance
+local ChangeState = ChangeState
+local IsDestroyed = IsDestroyed
+local CreateEmitterAtBone = CreateEmitterAtBone
+local EntityCategoryContains = EntityCategoryContains
+local CreateLightParticleIntel = CreateLightParticleIntel
+
+-- pre-computed for performance
+local categoriesLAND = categories.LAND
 
 ---@class SAirFactoryUnit : AirFactoryUnit
 SAirFactoryUnit = ClassUnit(AirFactoryUnit) {
@@ -34,6 +45,9 @@ SAirFactoryUnit = ClassUnit(AirFactoryUnit) {
     RestartRotators = SFactoryUnit.RestartRotators,
     CreateBuildEffects = SFactoryUnit.CreateBuildEffects,
 
+    ---@param self SAirFactoryUnit
+    ---@param unitBeingBuilt Unit
+    ---@param order string
     FinishBuildThread = function(self, unitBeingBuilt, order)
         self:SetBusy(true)
         self:SetBlockCommandQueue(true)
@@ -42,7 +56,9 @@ SAirFactoryUnit = ClassUnit(AirFactoryUnit) {
             local bp = self:GetBlueprint()
             self:DetachAll(bp.Display.BuildAttachBone or 0)
         end
+
         self:DestroyBuildRotator()
+
         if order ~= 'Upgrade' then
             ChangeState(self, self.RollingOffState)
         else
@@ -51,63 +67,68 @@ SAirFactoryUnit = ClassUnit(AirFactoryUnit) {
         end
     end,
 
+    ---@param self SAirFactoryUnit
     CreateRollOffEffects = function(self)
     end,
 
+    ---@param self SAirFactoryUnit
     DestroyRollOffEffects = function(self)
     end,
 
+    ---@param self SAirFactoryUnit
     RollOffUnit = function(self)
-        if EntityCategoryContains(categories.AIR, self.UnitBeingBuilt) then
-            local spin, x, y, z = self:CalculateRollOffPoint()
-            local units = { self.UnitBeingBuilt }
-            self.MoveCommand = IssueMove(units, Vector(x, y, z))
-        end
     end,
 
+    ---@param self SAirFactoryUnit
     RolloffBody = function(self)
         self:SetBusy(true)
-        local unitBuilding = self.UnitBeingBuilt
+
+        local unitBeingBuilt = self.UnitBeingBuilt
+        if not unitBeingBuilt then
+            return
+        end
+
+        local army = unitBeingBuilt.Army
 
         -- If the unit being built isn't an engineer use normal rolloff
-        if not EntityCategoryContains(categories.LAND, unitBuilding) then
-            AirFactoryUnit.RolloffBody(self)
+        if not EntityCategoryContains(categoriesLAND, unitBeingBuilt) then
+            AirFactoryUnitRolloffBody(self)
         else
 
-            if not IsDestroyed(unitBuilding) then
-                unitBuilding:DetachFrom(true)
+            if not IsDestroyed(unitBeingBuilt) then
+                unitBeingBuilt:DetachFrom(true)
                 self:DetachAll(self.Blueprint.Display.BuildAttachBone or 0)
 
-                CreateEmitterAtBone(unitBuilding, -1, unitBuilding.Army,
+                CreateEmitterAtBone(unitBeingBuilt, -1, army,
                     '/effects/emitters/seraphim_rifter_mobileartillery_hit_07_emit.bp'):OffsetEmitter(0, -1, 0)
-                CreateEmitterAtBone(unitBuilding, -1, unitBuilding.Army,
+                CreateEmitterAtBone(unitBeingBuilt, -1, army,
                     '/effects/emitters/seraphim_rifter_mobileartillery_hit_07_emit.bp'):OffsetEmitter(0, -1, 0)
-                unitBuilding:HideBone(0, true)
+                unitBeingBuilt:HideBone(0, true)
             end
 
             WaitTicks(4)
 
-            if not IsDestroyed(unitBuilding) then
-                CreateLightParticle(unitBuilding, -1, unitBuilding.Army, 4, 12, 'glow_02', 'ramp_blue_22')
-                unitBuilding:ShowBone(0, true)
+            if not IsDestroyed(unitBeingBuilt) then
+                CreateLightParticleIntel(unitBeingBuilt, -1, army, 4, 12, 'glow_02', 'ramp_blue_22')
+                unitBeingBuilt:ShowBone(0, true)
 
-                CreateEmitterAtBone(unitBuilding, -1, unitBuilding.Army,
+                CreateEmitterAtBone(unitBeingBuilt, -1, army,
                     '/effects/emitters/seraphim_rifter_mobileartillery_hit_04_emit.bp'):OffsetEmitter(0, -1, 0)
-                CreateEmitterAtBone(unitBuilding, -1, unitBuilding.Army,
+                CreateEmitterAtBone(unitBeingBuilt, -1, army,
                     '/effects/emitters/seraphim_rifter_mobileartillery_hit_05_emit.bp'):OffsetEmitter(0, -1, 0)
-                CreateEmitterAtBone(unitBuilding, -1, unitBuilding.Army,
+                CreateEmitterAtBone(unitBeingBuilt, -1, army,
                     '/effects/emitters/seraphim_rifter_mobileartillery_hit_06_emit.bp'):OffsetEmitter(0, -1, 0)
-                CreateEmitterAtBone(unitBuilding, -1, unitBuilding.Army,
+                CreateEmitterAtBone(unitBeingBuilt, -1, army,
                     '/effects/emitters/seraphim_rifter_mobileartillery_hit_07_emit.bp'):OffsetEmitter(0, -1, 0)
-                CreateEmitterAtBone(unitBuilding, -1, unitBuilding.Army,
+                CreateEmitterAtBone(unitBeingBuilt, -1, army,
                     '/effects/emitters/seraphim_rifter_mobileartillery_hit_08_emit.bp'):OffsetEmitter(0, -1, 0)
             end
 
             WaitTicks(8)
-
-            self:SetBusy(false)
             ChangeState(self, self.IdleState)
         end
+
+        self:SetBusy(false)
     end,
 
     ---@param self SAirFactoryUnit

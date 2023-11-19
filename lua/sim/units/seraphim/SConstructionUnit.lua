@@ -21,68 +21,74 @@
 --**********************************************************************************
 
 local ConstructionUnit = import('/lua/defaultunits.lua').ConstructionUnit
-local EffectUtil = import('/lua/effectutilities.lua')
-local CreateBuilderArmController = import('/lua/effectutilities.lua').CreateBuilderArmController
+local ConstructionUnitOnCreate = ConstructionUnit.OnCreate
+local ConstructionUnitSetupBuildBones = ConstructionUnit.SetupBuildBones
+local ConstructionUnitBuildManipulatorSetEnabled = ConstructionUnit.BuildManipulatorSetEnabled
 
--- Construction Units
+local CreateSeraphimUnitEngineerBuildingEffects = import('/lua/effectutilities.lua').CreateSeraphimUnitEngineerBuildingEffects
+local CreateBuilderArmController                = import('/lua/effectutilities.lua').CreateBuilderArmController
+
 ---@class SConstructionUnit : ConstructionUnit
+---@field BuildArm2Manipulator moho.BuilderArmManipulator
 SConstructionUnit = ClassUnit(ConstructionUnit) {
+
+    ---@param self SConstructionUnit
     OnCreate = function(self)
-        ConstructionUnit.OnCreate(self)
+        ConstructionUnitOnCreate(self)
+
+        -- is overwritten to add support for the second build arm manipulator
         if self.BuildingOpenAnim then
-            if self.BuildArm2Manipulator then
-                self.BuildArm2Manipulator:Disable()
+            local buildArmManipulator = self.BuildArm2Manipulator
+            if buildArmManipulator then
+                buildArmManipulator:Disable()
             end
         end
     end,
 
+    ---@param self SConstructionUnit
+    ---@param unitBeingBuilt Unit
+    ---@param order string
     CreateBuildEffects = function(self, unitBeingBuilt, order)
-        EffectUtil.CreateSeraphimUnitEngineerBuildingEffects(self, unitBeingBuilt, self.BuildEffectBones, self.BuildEffectsBag)
+        CreateSeraphimUnitEngineerBuildingEffects(self, unitBeingBuilt, self.BuildEffectBones, self.BuildEffectsBag)
     end,
 
+    ---@param self SConstructionUnit
     SetupBuildBones = function(self)
-        ConstructionUnit.SetupBuildBones(self)
+        ConstructionUnitSetupBuildBones(self)
 
-        local bp = self:GetBlueprint()
-        local buildbones = bp.General.BuildBones
-        if self.BuildArmManipulator then
-            self.BuildArmManipulator:SetAimingArc(buildbones.YawMin or -180, buildbones.YawMax or 180, buildbones.YawSlew or 360, buildbones.PitchMin or -90, buildbones.PitchMax or 90, buildbones.PitchSlew or 360)
-        end
-        if bp.General.BuildBonesAlt1 then
-            self.BuildArm2Manipulator = CreateBuilderArmController(self, bp.General.BuildBonesAlt1.YawBone or 0 , bp.General.BuildBonesAlt1.PitchBone or 0, bp.General.BuildBonesAlt1.AimBone or 0)
-            self.BuildArm2Manipulator:SetAimingArc(bp.General.BuildBonesAlt1.YawMin or -180, bp.General.BuildBonesAlt1.YawMax or 180, bp.General.BuildBonesAlt1.YawSlew or 360, bp.General.BuildBonesAlt1.PitchMin or -90, bp.General.BuildBonesAlt1.PitchMax or 90, bp.General.BuildBonesAlt1.PitchSlew or 360)
-            self.BuildArm2Manipulator:SetPrecedence(5)
-            if self.BuildingOpenAnimManip and self.Build2ArmManipulator then
-                self.BuildArm2Manipulator:Disable()
-            end
-            self.Trash:Add(self.BuildArm2Manipulator)
+        -- is overwritten to add support for the second build arm manipulator
+        local buildbones = self.Blueprint.General.BuildBonesAlt1
+        if buildbones then
+            buildArmManipulator = CreateBuilderArmController(self,
+                buildbones.YawBone or 0,
+                buildbones.PitchBone or 0,
+                buildbones.AimBone or 0
+            )
+            buildArmManipulator:SetAimingArc(-180, 180, 360, -90, 90, 360)
+            buildArmManipulator:SetPrecedence(5)
+            self.BuildArm2Manipulator = self.Trash:Add(buildArmManipulator)
         end
     end,
 
+    ---@param self SConstructionUnit
+    ---@param enable boolean
     BuildManipulatorSetEnabled = function(self, enable)
-        ConstructionUnit.BuildManipulatorSetEnabled(self, enable)
-        if not self or self.Dead then return end
-        if not self.BuildArm2Manipulator then return end
+        ConstructionUnitBuildManipulatorSetEnabled(self, enable)
+
+        -- is overwritten to add support for the second build arm manipulator
+        if IsDestroyed(self) then
+            return
+        end
+
+        local buildArmManipulator = self.BuildArm2Manipulator
+        if buildArmManipulator then
+            return
+        end
+
         if enable then
-            self.BuildArm2Manipulator:Enable()
+            buildArmManipulator:Enable()
         else
-            self.BuildArm2Manipulator:Disable()
-        end
-    end,
-
-    WaitForBuildAnimation = function(self, enable)
-        if self.BuildArmManipulator then
-            WaitFor(self.BuildingOpenAnimManip)
-            if enable then
-                self:BuildManipulatorSetEnabled(enable)
-            end
-        end
-    end,
-
-    OnStopBuilderTracking = function(self)
-        ConstructionUnit.OnStopBuilderTracking(self)
-        if self.StoppedBuilding then
-            self:BuildManipulatorSetEnabled(disable)
+            buildArmManipulator:Disable()
         end
     end,
 }
