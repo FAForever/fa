@@ -128,6 +128,8 @@ local cUnit = moho.unit_methods
 ---@field EntityBeingReclaimed Unit | Prop | nil
 ---@field SoundEntity? Unit | Entity
 ---@field AutoModeEnabled? boolean
+---@field OnBeingBuiltEffectsBag TrashBag
+---@field IdleEffectsBag TrashBag
 Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
 
     IsUnit = true,
