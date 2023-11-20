@@ -5,7 +5,6 @@ UnitBlueprint{
             "Target01",
             "Target02",
             "Target03",
-            "UEB0301",
         },
     },
     Audio = {
@@ -82,7 +81,7 @@ UnitBlueprint{
         BuildCostEnergy = 47400,
         BuildCostMass = 5220,
         BuildRate = 90,
-        BuildTime = 12100,
+        BuildTime = 12000,
         BuildableCategory = {
             "BUILTBYTIER3FACTORY UEF MOBILE CONSTRUCTION",
             "BUILTBYTIER3FACTORY UEF STRUCTURE LAND",
@@ -199,12 +198,6 @@ UnitBlueprint{
         HealthMult = 0.9,
         MassMult = 0.9,
         ReclaimTimeMultiplier = 1,
-        WreckageLayers = {
-            Air = false,
-            Land = true,
-            Seabed = false,
-            Sub = false,
-            Water = false,
-        },
+        WreckageLayers = { Land = true },
     },
 }

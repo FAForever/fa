@@ -79,7 +79,7 @@ UnitBlueprint{
         BuildCostEnergy = 10000,
         BuildCostMass = 2000,
         BuildRate = 90,
-        BuildTime = 3600,
+        BuildTime = 3200,
         BuildableCategory = {
             "BUILTBYTIER2FACTORY AEON MOBILE CONSTRUCTION",
             "BUILTBYTIER2FACTORY AEON STRUCTURE NAVAL",
@@ -158,11 +158,12 @@ UnitBlueprint{
     SelectionSizeX = 2.5,
     SelectionSizeZ = 7.5,
     SelectionThickness = 0.23,
+    CollisionOffsetX = 0,
     CollisionOffsetY = -1,
-    CollisionOffsetZ = 0,
+    CollisionOffsetZ = 1,
     SizeX = 4,
     SizeY = 3,
-    SizeZ = 10,
+    SizeZ = 12,
     StrategicIconName = "icon_factoryhq2_naval",
     StrategicIconSortPriority = 215,
     Wreckage = {

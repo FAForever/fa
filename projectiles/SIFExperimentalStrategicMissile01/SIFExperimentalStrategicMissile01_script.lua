@@ -6,6 +6,8 @@
 ---------------------------------------------------------------------------------------------------------------
 local SExperimentalStrategicMissile = import("/lua/seraphimprojectiles.lua").SExperimentalStrategicMissile
 
+--- Experimental Strategic Missile Projectile script, XSB2401
+---@class SIFExperimentalStrategicMissile01 : SExperimentalStrategicMissile
 SIFExperimentalStrategicMissile01 = ClassProjectile(SExperimentalStrategicMissile) {
     FxSplashScale = 0.5,
 
@@ -28,6 +30,7 @@ SIFExperimentalStrategicMissile01 = ClassProjectile(SExperimentalStrategicMissil
         '/effects/emitters/seraphim_expnuke_fxtrails_02_emit.bp',
     },
 
+    ---@param self SIFExperimentalStrategicMissile01
     OnCreate = function(self)
         SExperimentalStrategicMissile.OnCreate(self)
         self.effectEntityPath = '/effects/entities/SeraphimNukeEffectController01/SeraphimNukeEffectController01_proj.bp'
@@ -35,6 +38,9 @@ SIFExperimentalStrategicMissile01 = ClassProjectile(SExperimentalStrategicMissil
     end,
 
     -- Need to preserve warp action
+    ---@param self SIFExperimentalStrategicMissile01
+    ---@param TargetType string
+    ---@param TargetEntity Prop|Unit
     OnImpact = function(self, TargetType, TargetEntity)
         SExperimentalStrategicMissile.OnImpact(self, TargetType, TargetEntity)
         if not TargetEntity or not EntityCategoryContains(categories.PROJECTILE, TargetEntity) then
@@ -44,5 +50,4 @@ SIFExperimentalStrategicMissile01 = ClassProjectile(SExperimentalStrategicMissil
         end
     end,
 }
-
 TypeClass = SIFExperimentalStrategicMissile01

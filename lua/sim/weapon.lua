@@ -47,7 +47,7 @@ end
 
 local WeaponMethods = moho.weapon_methods
 
----@class Weapon : moho.weapon_methods
+---@class Weapon : moho.weapon_methods, InternalObject
 ---@field AimControl? moho.AimManipulator
 ---@field AimLeft? moho.AimManipulator
 ---@field AimRight? moho.AimManipulator
@@ -455,7 +455,10 @@ Weapon = ClassWeapon(WeaponMethods) {
     CreateProjectileForWeapon = function(self, bone)
         local proj = self:CreateProjectile(bone)
 
-        -- store the original target, can be nil if ground firing
+        -- used for the retargeting feature
+        proj.CreatedByWeapon = self
+
+        -- used for tactical / strategic defenses to ignore all other collisions
         proj.OriginalTarget = self:GetCurrentTarget()
         if proj.OriginalTarget.GetSource then
             proj.OriginalTarget = proj.OriginalTarget:GetSource()
@@ -677,25 +680,27 @@ Weapon = ClassWeapon(WeaponMethods) {
     ---@param self Weapon
     ---@param enable boolean
     SetWeaponEnabled = function(self, enable)
-        if not enable then
-            self:SetEnabled(enable)
-            return
-        end
-        local enabledByEnh = self.Blueprint.EnabledByEnhancement
-        if enabledByEnh then
-            local enhancements = SimUnitEnhancements[self.unit.EntityId]
-            if enhancements then
-                for _, enh in enhancements do
-                    if enh == enabledByEnh then
-                        self:SetEnabled(enable)
-                        return
+        if not IsDestroyed(self) then
+            if not enable then
+                self:SetEnabled(enable)
+                return
+            end
+            local enabledByEnh = self.Blueprint.EnabledByEnhancement
+            if enabledByEnh then
+                local enhancements = SimUnitEnhancements[self.unit.EntityId]
+                if enhancements then
+                    for _, enh in enhancements do
+                        if enh == enabledByEnh then
+                            self:SetEnabled(enable)
+                            return
+                        end
                     end
                 end
+                -- enhancement needed, but doesn't have it; don't allow weapon to be enabled
+                return
             end
-            -- enhancement needed, but doesn't have it; don't allow weapon to be enabled
-            return
+            self:SetEnabled(enable)
         end
-        self:SetEnabled(enable)
     end,
 
     ---------------------------------------------------------------------------

@@ -97,6 +97,8 @@ local __lazyimport_metatable = {
     end,
 }
 
+local indent = 0
+
 ---The global import function used to keep track of modules
 ---@param name FileName path to the module to load
 ---@param isLazy boolean?
@@ -116,6 +118,10 @@ function import(name, isLazy)
     if existing then
         return existing
     end
+
+    SPEW(string.format("%sLoading module: %s", string.rep("-> ", indent) or "", name))
+    indent = indent + 1
+
     ---@type ModuleInfo
     local moduleinfo = {
         name = name,
@@ -154,7 +160,9 @@ function import(name, isLazy)
         -- load immediately if said so
         LoadModule(module)
     end
-    
+
+    indent = indent - 1
+
     return module
 end
 

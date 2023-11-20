@@ -24,14 +24,17 @@ local UnitGetFractionComplete = moho.unit_methods.GetFractionComplete
 local TrashBagAdd = TrashBag.Add
 
 
+---@alias Animator moho.AnimationManipulator
+
+
 --- Creates an Aeon mercury pool build effect
 ---@param unitBeingBuilt Unit Unit to attach mercury pool to
----@param army integer Army of the pool
+---@param army number Army of the pool
 ---@param sx number Size x of the pool
 ---@param sy number Size y of the pool
 ---@param sz number Size z of the pool
 ---@param scale number Scale of secondary build effect
----@return Entity pool
+---@return Projectile pool
 function CreateMercuryPool(unitBeingBuilt, army, sx, sy, sz, scale)
     local onDeathTrash = unitBeingBuilt.Trash
     local onFinishedTrash = unitBeingBuilt.OnBeingBuiltEffectsBag
@@ -68,13 +71,13 @@ end
 
 --- Creates an Aeon mercury pool build effect
 ---@param unitBeingBuilt Unit Unit to attach mercury pool to
----@param army integer
+---@param army number
 ---@param bone Bone Bone to place pool at
 ---@param sx number Size x of the pool
 ---@param sy number Size y of the pool
 ---@param sz number Size z of the pool
 ---@param scale number Scale of secondary build effect
----@return Entity pool
+---@return Projectile pool
 function CreateMercuryPoolOnBone(unitBeingBuilt, army, bone, sx, sy, sz, scale)
     local onDeathTrash = unitBeingBuilt.Trash
     local onFinishedTrash = unitBeingBuilt.OnBeingBuiltEffectsBag
@@ -103,7 +106,7 @@ end
 
 --- Creates some generic build effects for Aeon
 ---@param unitBeingBuilt Unit Unit to attach build effects to
----@param army integer
+---@param army number
 ---@param sx number Size x of the emitter curve parameter
 ---@param sz number Size z of the emitter curve parameter
 ---@param scale number Scale of the build effect
@@ -126,7 +129,7 @@ end
 
 --- Creates generic Aeon build sparkles
 ---@param unitBeingBuilt Unit Unit to attach sparkles to
----@param army integer
+---@param army number
 ---@param sx number Size x of the emitter curve parameter
 ---@param sz number Size z of the emitter curve parameter
 function CreateAeonGenericBuildSparkles(unitBeingBuilt, army, sx, sz)

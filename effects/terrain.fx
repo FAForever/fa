@@ -405,16 +405,16 @@ float3 ApplyWaterColorExponentially(float3 viewDirection, float terrainHeight, f
 {
     if (waterDepth > 0) {
         float opacity = saturate(smoothstep(10, 200, CameraPosition.y - WaterElevation) + step(terrainHeight, WaterElevation));
-        float4 waterColor = tex1D(WaterRampSampler, waterDepth);
         float3 up = float3(0,1,0);
-        // To simplify, we assume that the light enters vertically into the water,
         // this is the length that the light travels underwater back to the camera
-        float oneOverCosV = 1 / max(abs(dot(up, normalize(viewDirection))), 0.0001);
-        // light gets absorbed exponentially
-        float waterAbsorption = 1 - saturate(exp(-waterColor.w * (1 + oneOverCosV)));
+        float oneOverCosV = 1 / max(dot(up, normalize(viewDirection)), 0.0001);
+        // Light gets absorbed exponentially,
+        // to simplify, we assume that the light enters vertically into the water.
+        float waterAbsorption = 1 - saturate(exp(-waterDepth * (1 + oneOverCosV)));
         // darken the color first to simulate the light absorption on the way in and out
         color *= 1 - waterAbsorption * opacity;
         // lerp in the watercolor to simulate the scattered light from the dirty water
+        float4 waterColor = tex1D(WaterRampSampler, waterAbsorption);
         color = lerp(color, waterColor.rgb, waterAbsorption * opacity);
     }
     return color;
@@ -1826,11 +1826,11 @@ float4 sampleAlbedo(sampler2D s, float2 position, uniform float2 scale, uniform 
     float4 albedoRotated = tex2D(s, mul(position, rotationMatrix) * scale);
     // store roughness in albedo alpha so we get the roughness splatting for free
     if (firstBatch) {
-        albedo.a = atlas2D(Stratum7AlbedoSampler, position * scale, offset).y;
-        albedoRotated.a = atlas2D(Stratum7AlbedoSampler, mul(position, rotationMatrix) * scale, offset).y;
+        albedo.a = atlas2D(Stratum7NormalSampler, position * scale, offset).y;
+        albedoRotated.a = atlas2D(Stratum7NormalSampler, mul(position, rotationMatrix) * scale, offset).y;
     } else {
-        albedo.a = atlas2D(Stratum7AlbedoSampler, position * scale, offset).w;
-        albedoRotated.a = atlas2D(Stratum7AlbedoSampler, mul(position, rotationMatrix) * scale, offset).w;
+        albedo.a = atlas2D(Stratum7NormalSampler, position * scale, offset).w;
+        albedoRotated.a = atlas2D(Stratum7NormalSampler, mul(position, rotationMatrix) * scale, offset).w;
     }
     return splatLerp(albedo, albedoRotated, 0.5, mask, 0.03);
 }
@@ -1839,24 +1839,24 @@ float4 sampleAlbedo(sampler2D s, float2 position, uniform float2 scale, uniform 
     float4 albedo = tex2D(s, position * scale);
     // store roughness in albedo alpha so we get the roughness splatting for free
     if (firstBatch) {
-        albedo.a = atlas2D(Stratum7AlbedoSampler, position * scale, offset).y;
+        albedo.a = atlas2D(Stratum7NormalSampler, position * scale, offset).y;
     } else {
-        albedo.a = atlas2D(Stratum7AlbedoSampler, position * scale, offset).w;
+        albedo.a = atlas2D(Stratum7NormalSampler, position * scale, offset).w;
     }
     return albedo;
 }
 
 float sampleHeight(float2 position, uniform float2 nearScale, uniform float2 farScale, uniform float2 offset, uniform bool firstBatch, float mask) {
     float2x2 rotationMatrix = float2x2(float2(0.866, -0.5), float2(0.5, 0.866));
-    float2 heightNear = atlas2D(Stratum7AlbedoSampler, position * nearScale, offset).xz;
-    float2 heightNearRotated = atlas2D(Stratum7AlbedoSampler, mul(position, rotationMatrix) * nearScale, offset).xz;
+    float2 heightNear = atlas2D(Stratum7NormalSampler, position * nearScale, offset).xz;
+    float2 heightNearRotated = atlas2D(Stratum7NormalSampler, mul(position, rotationMatrix) * nearScale, offset).xz;
     float heightFar;
     if (firstBatch) {
         heightNear.x = splatLerp(heightNear.x, heightNearRotated.x, 0.5, mask, 0.03);
-        heightFar = atlas2D(Stratum7AlbedoSampler, position * farScale, offset).x;
+        heightFar = atlas2D(Stratum7NormalSampler, position * farScale, offset).x;
     } else {
         heightNear.x = splatLerp(heightNear.y, heightNearRotated.y, 0.5, mask, 0.03);
-        heightFar = atlas2D(Stratum7AlbedoSampler, position * farScale, offset).z;
+        heightFar = atlas2D(Stratum7NormalSampler, position * farScale, offset).z;
     }
     return (heightNear.x + heightFar) / 2;
 }
@@ -1865,11 +1865,11 @@ float sampleHeight(float2 position, uniform float2 nearScale, uniform float2 far
     float heightNear;
     float heightFar;
     if (firstBatch) {
-        heightNear = atlas2D(Stratum7AlbedoSampler, position * nearScale, offset).x;
-        heightFar = atlas2D(Stratum7AlbedoSampler, position * farScale, offset).x;
+        heightNear = atlas2D(Stratum7NormalSampler, position * nearScale, offset).x;
+        heightFar = atlas2D(Stratum7NormalSampler, position * farScale, offset).x;
     } else {
-        heightNear = atlas2D(Stratum7AlbedoSampler, position * nearScale, offset).z;
-        heightFar = atlas2D(Stratum7AlbedoSampler, position * farScale, offset).z;
+        heightNear = atlas2D(Stratum7NormalSampler, position * nearScale, offset).z;
+        heightFar = atlas2D(Stratum7NormalSampler, position * farScale, offset).z;
     }
     return (heightNear + heightFar) / 2;
 }
@@ -1880,15 +1880,15 @@ float blendHeight(float4 position, float2 blendWeights, uniform float2 nearscale
     float heightNearYZ;
     float heightFarYZ;
     if (firstBatch) {
-        heightNearXZ = atlas2D(Stratum7AlbedoSampler, position.xz * nearscale, offset).x;
-        heightFarXZ = atlas2D(Stratum7AlbedoSampler, position.xz * farscale, offset).x;
-        heightNearYZ = atlas2D(Stratum7AlbedoSampler, position.yz * nearscale, offset).x;
-        heightFarYZ = atlas2D(Stratum7AlbedoSampler, position.yz * farscale, offset).x;
+        heightNearXZ = atlas2D(Stratum7NormalSampler, position.xz * nearscale, offset).x;
+        heightFarXZ = atlas2D(Stratum7NormalSampler, position.xz * farscale, offset).x;
+        heightNearYZ = atlas2D(Stratum7NormalSampler, position.yz * nearscale, offset).x;
+        heightFarYZ = atlas2D(Stratum7NormalSampler, position.yz * farscale, offset).x;
     } else {
-        heightNearXZ = atlas2D(Stratum7AlbedoSampler, position.xz * nearscale, offset).z;
-        heightFarXZ = atlas2D(Stratum7AlbedoSampler, position.xz * farscale, offset).z;
-        heightNearYZ = atlas2D(Stratum7AlbedoSampler, position.yz * nearscale, offset).z;
-        heightFarYZ = atlas2D(Stratum7AlbedoSampler, position.yz * farscale, offset).z;
+        heightNearXZ = atlas2D(Stratum7NormalSampler, position.xz * nearscale, offset).z;
+        heightFarXZ = atlas2D(Stratum7NormalSampler, position.xz * farscale, offset).z;
+        heightNearYZ = atlas2D(Stratum7NormalSampler, position.yz * nearscale, offset).z;
+        heightFarYZ = atlas2D(Stratum7NormalSampler, position.yz * farscale, offset).z;
     }
     return (heightNearYZ + heightFarYZ) / 2 * blendWeights.x + (heightNearXZ + heightFarXZ) / 2 * blendWeights.y;
 }
@@ -1910,7 +1910,7 @@ float blendHeight(float4 position, float2 blendWeights, uniform float2 nearscale
 // | S4 | R             G               B              unused          | X               Y               Z               unused       |
 // | S5 | R             G               B              unused          | X               Y               Z               unused       |
 // | S6 | R             G               B          sampling direction  | X               Y               Z               unused       |
-// | S7 | height L-S2   roughness L-S2  height S3-S6   roughness S3-S6 | macrotexture R  macrotexture G  macrotexture B  transparency |
+// | S7 | albedo.r      albedo.g        albedo.b       transparency    | height L-S2   roughness L-S2  height S3-S6   roughness S3-S6 |
 //  ----            ---             ---             ---              ---             ---             ---             ---            ---
 // | U  | normal.x      normal.z        waterDepth     shadow          | 
 //  ----
@@ -2009,7 +2009,7 @@ float4 TerrainPBRAlbedoPS ( VS_OUTPUT inV) : COLOR
     albedo = splatLerp(albedo, stratum4Albedo, stratum4Height, mask1.x);
     albedo = splatLerp(albedo, stratum5Albedo, stratum5Height, mask1.y);
     albedo = splatLerp(albedo, stratum6Albedo, stratum6Height, mask1.z);
-    float4 mapwide = tex2D(Stratum7NormalSampler, position.xy);
+    float4 mapwide = tex2D(Stratum7AlbedoSampler, position.xy);
     albedo.rgb = lerp(albedo.rgb, mapwide.rgb, mapwide.a);
 
     // We need to add 0.01 as the reflection disappears at 0
@@ -2530,7 +2530,7 @@ technique Terrain053 <
 // | S4 | R             G               B              unused          | X               Y               Z               unused       |
 // | S5 | R             G               B              unused          | X               Y               Z               unused       |
 // | S6 | R             G               B              unused          | X               Y               Z               unused       |
-// | S7 | unused   roughness L-S2       unused      roughness S3-S6    | macrotexture R  macrotexture G  macrotexture B  transparency |
+// | S7 | albedo.r      albedo.g        albedo.b       transparency    | height L-S2   roughness L-S2  height S3-S6   roughness S3-S6 |
 //  ----            ---             ---             ---              ---             ---             ---             ---            ---
 // | U  | normal.x      normal.z        waterDepth     shadow          | 
 //  ----
@@ -2603,7 +2603,7 @@ float4 Terrain101AlbedoPS ( VS_OUTPUT inV, uniform bool halfRange ) : COLOR
     albedo = lerp(albedo,stratum4Albedo,mask1.x);
     albedo = lerp(albedo,stratum5Albedo,mask1.y);
     albedo = lerp(albedo,stratum6Albedo,mask1.z);
-    float4 mapwide = tex2D(Stratum7NormalSampler, position.xy);
+    float4 mapwide = tex2D(Stratum7AlbedoSampler, position.xy);
     albedo.rgb = lerp(albedo.rgb, mapwide.rgb, mapwide.a);
 
     // We need to add 0.01 as the reflection disappears at 0
@@ -2690,7 +2690,7 @@ technique Terrain151 <
 // | S4 | R             G               B              unused          | X               Y               Z               unused       |
 // | S5 | R             G               B              unused          | X               Y               Z               unused       |
 // | S6 | R             G               B              unused          | X               Y               Z               unused       |
-// | S7 | height L-S2   roughness L-S2  height S3-S6   roughness S3-S6 | macrotexture R  macrotexture G  macrotexture B  transparency |
+// | S7 | albedo.r      albedo.g        albedo.b       transparency    | height L-S2   roughness L-S2  height S3-S6   roughness S3-S6 |
 //  ----            ---             ---             ---              ---             ---             ---             ---            ---
 // | U  | normal.x      normal.z        waterDepth     shadow          | 
 //  ----
@@ -2781,7 +2781,7 @@ float4 Terrain301AlbedoPS ( VS_OUTPUT inV, uniform bool halfRange ) : COLOR
     albedo = splatLerp(albedo, stratum4Albedo, stratum4Height, mask1.x);
     albedo = splatLerp(albedo, stratum5Albedo, stratum5Height, mask1.y);
     albedo = splatLerp(albedo, stratum6Albedo, stratum6Height, mask1.z);
-    float4 mapwide = tex2D(Stratum7NormalSampler, position.xy);
+    float4 mapwide = tex2D(Stratum7AlbedoSampler, position.xy);
     albedo.rgb = lerp(albedo.rgb, mapwide.rgb, mapwide.a);
 
     // We need to add 0.01 as the reflection disappears at 0

@@ -110,8 +110,6 @@ AIBrain = Class(StandardBrain, EconomyComponent) {
         self.DelayEqualBuildPlattons = {}
         self.ReclaimFailCounter = 0
         self.ReclaimFailTimeStamp = 0
-
-        self:ForkThread(self.GetPlatoonDebugInfoThread)
     end,
 
     --- Called after `SetupSession` but before `BeginSession` - no initial units, props or resources exist at this point
@@ -143,6 +141,7 @@ AIBrain = Class(StandardBrain, EconomyComponent) {
         -- requires these markers to exist
         import("/lua/sim/MarkerUtilities.lua").GenerateExpansionMarkers()
         import("/lua/sim/MarkerUtilities.lua").GenerateRallyPointMarkers()
+        import("/lua/sim/MarkerUtilities.lua").GenerateNavalAreaMarkers()
 
         -- requires these datastructures to understand the game
         self.GridReclaim = import("/lua/ai/gridreclaim.lua").Setup(self)
@@ -1597,33 +1596,4 @@ AIBrain = Class(StandardBrain, EconomyComponent) {
         end
         return false
     end,
-
-    ---------------------------------------------------------------------------
-    --#region Debug functionality
-
-    ---@param self MediumAIBrain
-    ---@return AIBaseDebugInfo
-    GetPlatoonDebugInfoThread = function(self)
-        while true do
-            if GetFocusArmy() == self:GetArmyIndex() then
-                local units = DebugGetSelection()
-                if units and units[1] then
-                    local unit = units[1]
-                    if unit.AIPlatoonReference then
-                        Sync.AIPlatoonInfo = {
-                            PlatoonInfo = unit.AIPlatoonReference:GetDebugInfo(),
-                            EntityId = unit.EntityId,
-                            BlueprintId = unit.Blueprint.BlueprintId,
-                            Position = unit:GetPosition(),
-                        }
-                    end
-                end
-            end
-
-            WaitTicks(10)
-        end
-    end,
-
-    --#endregion
-
 }

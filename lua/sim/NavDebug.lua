@@ -306,7 +306,7 @@ function Scan()
                     PathToWithThreatThresholdState.Threshold and
                     PathToWithThreatThresholdState.Army
                 then
-                    local path, n, label = NavUtils.PathToWithThreatThreshold(
+                    local path, pn, distance, threats, tn = NavUtils.PathToWithThreatThreshold(
                         PathToWithThreatThresholdState.Layer,
                         PathToWithThreatThresholdState.Origin,
                         PathToWithThreatThresholdState.Destination,
@@ -316,13 +316,28 @@ function Scan()
                         PathToWithThreatThresholdState.Radius
                     )
 
+                    if threats then
+                        local position = { 0, 0, 0 }
+                        for k = 1, tn do
+                            local threat = threats[k]
+                            local tx = threat[1]
+                            local tz = threat[2]
+                            local t = threat[3]
+
+                            position[1] = tx
+                            position[3] = tz
+                            position[2] = GetSurfaceHeight(tx, tz)
+                            DrawCircle(position, math.sqrt(t), 'ff0000')
+                        end
+                    end
+
                     if not path then
                         DrawLinePop(PathToWithThreatThresholdState.Origin, PathToWithThreatThresholdState.Destination,
                             'ff0000')
                     else
-                        if n >= 2 then
+                        if pn >= 2 then
                             local last = path[1]
-                            for k = 2, n do
+                            for k = 2, pn do
                                 DrawLinePop(last, path[k], 'ff0000')
                                 last = path[k]
                             end

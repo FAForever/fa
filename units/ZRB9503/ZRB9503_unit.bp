@@ -1,9 +1,10 @@
 UnitBlueprint {
     AI = {
         TargetBones = {
-            'ZRB9503',
-            'B08',
-            'Right_Exhaust01',
+            "B03",
+            "B08",
+            "B28",
+            "B14",
         },
     },
     Audio = {
@@ -63,9 +64,7 @@ UnitBlueprint {
         'SORTCONSTRUCTION',
         'SUPPORTFACTORY',
     },
-    CollisionOffsetX = 0,
     CollisionOffsetY = -1,
-    CollisionOffsetZ = 0,
     Defense = {
         AirThreatLevel = 0,
         ArmorType = 'Structure',
@@ -122,7 +121,7 @@ UnitBlueprint {
         BuildCostEnergy = 5500,
         BuildCostMass = 1100,
         BuildRate = 90,
-        BuildTime = 3000,
+        BuildTime = 2000,
         DifferentialUpgradeCostCalculation = true,
         RebuildBonusIds = {
             'zrb9503',
@@ -222,9 +221,11 @@ UnitBlueprint {
     SelectionSizeX = 2.6,
     SelectionSizeZ = 8.1,
     SelectionThickness = 0.21,
-    SizeX = 4,
-    SizeY = 3, --from 2, for beam weapons
-    SizeZ = 10,
+    CollisionOffsetX = -0.25,
+    CollisionOffsetZ = -1,
+    SizeX = 3.0,
+    SizeY = 3,
+    SizeZ = 13,
     StrategicIconName = 'icon_factory2_naval',
     StrategicIconSortPriority = 215,
     Wreckage = {

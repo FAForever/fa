@@ -30,7 +30,7 @@ TIFMissileCruise03 = ClassProjectile(TMissileCruiseProjectile) {
 
     FxTrails = EffectTemplate.TMissileExhaust01,
     FxTrailOffset = -0.85,
-    
+
     FxAirUnitHitScale = 0.65,
     FxLandHitScale = 0.65,
     FxNoneHitScale = 0.65,

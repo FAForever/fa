@@ -2,10 +2,7 @@ UnitBlueprint {
     AI = {
         TargetBones = {
             'ZRB9602',
-            'B05',
-            'B07',
             'B08',
-            'B10',
         },
     },
     Audio = {
@@ -122,7 +119,7 @@ UnitBlueprint {
         BuildCostEnergy = 34000,
         BuildCostMass = 1510,
         BuildRate = 120,
-        BuildTime = 4000,
+        BuildTime = 3200,
         DifferentialUpgradeCostCalculation = true,
         RebuildBonusIds = {
             'zrb9602',

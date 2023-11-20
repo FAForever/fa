@@ -21,6 +21,7 @@
 --******************************************************************************************************
 
 local EmitterProjectile = import("/lua/sim/projectiles/emitterprojectile.lua").EmitterProjectile
+local EmitterProjectileOnCreate = EmitterProjectile.OnCreate
 
 -- upvalue scope for performance
 local CreateBeamEmitterOnEntity = CreateBeamEmitterOnEntity
@@ -29,14 +30,16 @@ local CreateBeamEmitterOnEntity = CreateBeamEmitterOnEntity
 SingleBeamProjectile = ClassProjectile(EmitterProjectile) {
 
     BeamName = '/effects/emitters/default_beam_01_emit.bp',
-    FxTrails = { },
+    FxTrails = {},
 
     ---@param self SingleBeamProjectile
     OnCreate = function(self)
-        EmitterProjectile.OnCreate(self)
+        EmitterProjectileOnCreate(self)
 
-        if self.BeamName then
-            CreateBeamEmitterOnEntity(self, -1, self.Army, self.BeamName)
+        local army = self.Army
+        local beamName = self.BeamName
+        if beamName ~= '' then
+            CreateBeamEmitterOnEntity(self, -1, army, beamName)
         end
     end,
 }

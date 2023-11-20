@@ -6,7 +6,6 @@
 -----------------------------------------------------------------
 
 -- Imports. Localise commonly used subfunctions for speed
-local AIUtils = import("/lua/ai/aiutilities.lua")
 local EffectTemplate = import("/lua/effecttemplates.lua")
 local EffectUtilities = import("/lua/effectutilities.lua")
 local EnhancementCommon = import("/lua/enhancementcommon.lua")
@@ -108,7 +107,10 @@ local cUnit = moho.unit_methods
 ---@class Unit : moho.unit_methods, InternalObject, IntelComponent, VeterancyComponent, AIUnitProperties
 ---@field AIManagerIdentifier? string
 ---@field Brain AIBrain
+---@field buildBots? Unit[]
 ---@field Blueprint UnitBlueprint
+---@field BuildEffectsBag TrashBag
+---@field BuildArmManipulator? moho.BuilderArmManipulator
 ---@field Trash TrashBag
 ---@field Layer Layer
 ---@field Army Army
@@ -121,6 +123,8 @@ local cUnit = moho.unit_methods
 ---@field TerrainType TerrainType
 ---@field EngineCommandCap? table<string, boolean>
 ---@field UnitBeingBuilt Unit?
+---@field UnitBuildOrder string
+---@field MyShield Shield?
 ---@field EntityBeingReclaimed Unit | Prop | nil
 ---@field SoundEntity? Unit | Entity
 ---@field AutoModeEnabled? boolean
@@ -271,7 +275,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         end
 
         if self.Brain.CheatEnabled then
-            AIUtils.ApplyCheatBuffs(self)
+            import("/lua/ai/aiutilities.lua").ApplyCheatBuffs(self)
         end
 
         -- for syncing data to UI
@@ -2561,11 +2565,19 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
     ---@param self Unit
     ---@param enable boolean
     BuildManipulatorSetEnabled = function(self, enable)
-        if self.Dead or not self.BuildArmManipulator then return end
+        if IsDestroyed(self) then
+            return
+        end
+
+        local buildArmManipulator = self.BuildArmManipulator
+        if not buildArmManipulator then
+            return
+        end
+
         if enable then
-            self.BuildArmManipulator:Enable()
+            buildArmManipulator:Enable()
         else
-            self.BuildArmManipulator:Disable()
+            buildArmManipulator:Disable()
         end
     end,
 
@@ -2745,7 +2757,8 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
 
     ---@param self Unit
     ---@param built Unit
-    OnStopBuild = function(self, built)
+    ---@param order string
+    OnStopBuild = function(self, built, order)
         self:StopBuildingEffects(built)
         self:SetActiveConsumptionInactive()
         self:DoOnUnitBuiltCallbacks(built)
@@ -2929,23 +2942,29 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
     end,
 
     ---@param self Unit
-    ---@param built boolean
+    ---@param built Unit
     ---@param order string
     StartBuildingEffects = function(self, built, order)
-        self.BuildEffectsBag:Add(self:ForkThread(self.CreateBuildEffects, built, order))
+        local buildEffectsBag = self.BuildEffectsBag
+        if buildEffectsBag then
+            local thread = ForkThread(self.CreateBuildEffects, self, built, order)
+            self.Trash:Add(thread)
+            buildEffectsBag:Add(thread)
+        end
     end,
 
     ---@param self Unit
-    ---@param built boolean
+    ---@param built Unit
     ---@param order string
     CreateBuildEffects = function(self, built, order)
     end,
 
     ---@param self Unit
-    ---@param built boolean
+    ---@param built Unit
     StopBuildingEffects = function(self, built)
-        if self.BuildEffectsBag then
-            self.BuildEffectsBag:Destroy()
+        local buildEffectsBag = self.BuildEffectsBag
+        if buildEffectsBag then
+            buildEffectsBag:Destroy()
         end
 
         -- kept after --3355 for backwards compatibility with mods
@@ -3917,7 +3936,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
 
     --- Plays a sound using the unit as a source. Returns true if successful, false otherwise
     ---@param self Unit A unit
-    ---@param sound SoundBlueprint A string identifier that represents the sound to be played.
+    ---@param sound string A string identifier that represents the sound to be played.
     ---@return boolean
     PlayUnitSound = function(self, sound)
         local audio = self.Blueprint.Audio[sound]

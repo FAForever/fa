@@ -28,7 +28,6 @@ local NavDatastructures = import("/lua/sim/navdatastructures.lua")
 
 -- upvalue scope for performance
 local TableGetn = table.getn
-local TableInsert = table.insert
 
 local MathSqrt = math.sqrt
 
@@ -145,6 +144,18 @@ function Generate()
     if not IsGenerated() then
         NavGenerator.Generate()
     end
+end
+
+---@type NavHeap
+local PathToHeap = NavDatastructures.NavHeap()
+
+---@type number
+local PathToIdentifier = 1
+
+---@return number
+local function PathToGetUniqueIdentifier()
+    PathToIdentifier = PathToIdentifier + 1
+    return PathToIdentifier
 end
 
 ---@param a NavSection
@@ -304,6 +315,81 @@ local function FindSection(grid, position)
     return NavGenerator.NavSections[leaf.Section]
 end
 
+---@param grid NavGrid
+---@param position Vector
+---@param distance number
+---@return Vector[] | nil
+---@return number | ('NotGenerated'| 'OutsideMap' | 'NoResults')?
+local function FindSections(grid, position, distance)
+    -- check if generated
+    if not NavGenerator.IsGenerated() then
+        return nil, 'NotGenerated'
+    end
+
+    -- setup pathing
+    local seenIdentifier = PathToGetUniqueIdentifier()
+    local sectionOrigin = FindSection(grid, position)
+
+    -- sanity check
+    if not sectionOrigin then
+        return nil, 'OutsideMap'
+    end
+
+    -- local scope for performance
+    -- local scope for performance
+    local NavSections = NavGenerator.NavSections
+    local ox = position[1]
+    local oz = position[3]
+
+    -- 0th iteration of search
+    sectionOrigin.HeapIdentifier = seenIdentifier
+
+    local current = 1
+    local stack = { sectionOrigin }
+    local candidates = { sectionOrigin.Center }
+
+    while current > 0 do
+        local section = stack[current]
+        current = current - 1
+
+        -- look for the neighbors
+        local neighbors = section.Neighbors
+        for k = 1, TableGetn(neighbors) do
+            local neighbor = NavSections[neighbors[k]]
+            if neighbor.HeapIdentifier != seenIdentifier then
+                neighbor.HeapIdentifier = seenIdentifier
+
+                candidates[neighbor.Identifier] = neighbor.Center
+
+                -- if neighbor exceeds the distance then we pick the neighbor
+                local dx = ox - neighbor.Center[1]
+                local dz = oz - neighbor.Center[3]
+                if MathSqrt(dx * dx + dz * dz) < distance then
+                    -- always include it
+                    current = current + 1
+                    stack[current] = neighbor
+                end
+            end
+        end
+    end
+
+    local head = 1
+
+    ---@type Vector[]
+    local positions = { }
+    for _, center in candidates do
+        positions[head] = center
+        head = head + 1
+    end
+
+    if head == 1 then
+        return nil, 'NoResults'
+    end
+
+    return positions, head - 1
+end
+
+
 ---@param destination NavSection 
 ---@param cache? NavSection[]
 ---@return Vector[]
@@ -373,6 +459,8 @@ local function PathToPositions(grid, label, origin, destination, sections, count
         if k > 1 then
             positions[k - 1] = { unpack(sectionNext.Center) }
         end
+
+        sectionLast = sectionNext
     end
 
     -- add in the destination
@@ -507,18 +595,6 @@ function CanPathToCell (layer, origin, destination)
     end
 end
 
----@type NavHeap
-local PathToHeap = NavDatastructures.NavHeap()
-
----@type number
-local PathToIdentifier = 1
-
----@return number
-local function PathToGetUniqueIdentifier()
-    PathToIdentifier = PathToIdentifier + 1
-    return PathToIdentifier
-end
-
 ---@param layer NavLayers
 ---@param origin Vector
 ---@param destination Vector
@@ -611,18 +687,20 @@ ThreatFunctions = Shared.ThreatFunctions
 ---@param threatThreshold number
 ---@param threatRadius number
 ---@return Vector[]?            # List of positions
----@return (('SystemError' | 'NotGenerated' | 'InvalidLayer' | 'OutsideMap' | 'OriginOutsideMap' | 'OriginUnpathable' | 'DestinationOutsideMap' | 'DestinationUnpathable' | 'Unpathable' | 'NoResults') | number)?   # Error message, or the number of positions
----@return number?              # Length of path
+---@return (number | ('SystemError' | 'NotGenerated' | 'InvalidLayer' | 'OutsideMap' | 'OriginOutsideMap' | 'OriginUnpathable' | 'DestinationOutsideMap' | 'DestinationUnpathable' | 'Unpathable' | 'NoResults' | 'TooMuchThreat')?   # Error message, or the number of positions
+---@return number?  # Length of path
+---@return BrainPositionThreat[]? # all locations with their threat that is at least the threat threshold
+---@return number? # number of threat found
 function PathToWithThreatThreshold(layer, origin, destination, aibrain, threatFunc, threatThreshold, threatRadius)
     -- check if generated
     if not NavGenerator.IsGenerated() then
-        return nil, 'NotGenerated'
+        return nil, 'NotGenerated', nil, nil, nil
     end
 
     -- check if we can path
     local ok, msg = CanPathTo(layer, origin, destination)
     if not ok then
-        return nil, msg
+        return nil, msg, nil, nil, nil
     end
 
     -- local scope for performance
@@ -649,6 +727,10 @@ function PathToWithThreatThreshold(layer, origin, destination, aibrain, threatFu
     destinationSection.HeapTotalCosts = 0
     destinationSection.HeapIdentifier = 0
 
+    local tHead = 1
+    ---@type BrainPositionThreat[]
+    local threats = { }
+
     -- search iterations
     while not PathToHeap:IsEmpty() do
 
@@ -668,6 +750,9 @@ function PathToWithThreatThreshold(layer, origin, destination, aibrain, threatFu
             if neighbor.Label > 0 and neighbor.HeapIdentifier != seenIdentifier then
                 if threat > threatThreshold then
                     neighbor.HeapIdentifier = seenIdentifier
+
+                    threats[tHead] = { neighbor.Center[1], neighbor.Center[3], threat }
+                    tHead = tHead + 1
                 else
                     neighbor.HeapIdentifier = seenIdentifier
                     neighbor.HeapFrom = section.Identifier
@@ -681,7 +766,7 @@ function PathToWithThreatThreshold(layer, origin, destination, aibrain, threatFu
 
     -- check if we found a path
     if destinationSection.HeapIdentifier ~= seenIdentifier then
-        return nil, 'NoResults'
+        return nil, 'TooMuchThreat', nil, threats, tHead - 1
     end
 
     local sections, sectionCount = TracePath(destinationSection)
@@ -691,7 +776,7 @@ function PathToWithThreatThreshold(layer, origin, destination, aibrain, threatFu
     DebugRegisterPath('PathTo', positions, origin, destination)
 
     -- return all the goodies!!
-    return positions, positionCount, distance
+    return positions, positionCount, distance, threats, tHead - 1
 end
 
 --- Returns a label that indicates to what sub-graph it belongs to. Unlike `GetTerrainLabel` this function will try to find the nearest valid neighbor
@@ -813,15 +898,11 @@ local GenericQueueCache = { }
 
 ---@param layer NavLayers
 ---@param position Vector
----@param thresholdDistance number
+---@param distance number
 ---@param thresholdSize? number
----@return { [1]: number, [2]: number, [3]: number }?
+---@return Vector[] | nil
 ---@return number | ('NotGenerated' | 'InvalidLayer' | 'OutsideMap' | 'SystemError' | 'Unpathable' | 'NoData')?
-function GetPositionsInRadius(layer, position, thresholdDistance, thresholdSize, cache)
-    -- check if generated
-    if not NavGenerator.IsGenerated() then
-        return nil, 'NotGenerated'
-    end
+function GetPositionsInRadius(layer, position, distance, thresholdSize, cache)
 
     -- check layer argument
     local grid = FindGrid(layer)
@@ -829,86 +910,42 @@ function GetPositionsInRadius(layer, position, thresholdDistance, thresholdSize,
         return nil, 'InvalidLayer'
     end
 
-    -- local scope for performance
-    local TableEmpty = table.empty
-    local TableGetn = table.getn
-    local FindRootGridspaceXZ = grid.FindRootGridspaceXZ
-
-    ---------------------------------------------------------------------------
-    -- find candidates that we can search for traversable leaves
-
-    local candidatesHead = 1
-    local candidates = GetPositionsInRadiusCandidates
-    local gx, gz = grid:ToGridSpace(position)
-    if not (gx and gz) then
-        return nil, 'OutsideMap'
+    local gridAir = FindGrid('Air')
+    if not gridAir then
+        return nil, 'SystemError'
     end
 
-    local distanceInCells = ToGridDistance(thresholdDistance)
-    for lz = -distanceInCells, distanceInCells do
-        for lx = -distanceInCells, distanceInCells do
-            local neighbor = FindRootGridspaceXZ(grid, gx + lz, gz + lx)
-            if neighbor and not TableEmpty(neighbor.Labels) then
-                candidates[candidatesHead] = neighbor
-                candidatesHead = candidatesHead + 1
-            end
-        end
+    -- find surrounding points of interest
+    local points, count = FindSections(gridAir, position, distance)
+    if not points then
+        local msg = count --[[@as string]]
+        return nil, msg
     end
 
-    -- no neighboring cells found
-    if candidatesHead == 1 then
-        return nil, 'NoData'
-    end
-
-    ---------------------------------------------------------------------------
-    -- convert candidates to positions
-
-    -- local scope for performance
-    local GetSurfaceHeight = GetSurfaceHeight
-    local FindTraversableLeaves = candidates[1].FindTraversableLeaves
-
-    -- convert to a series of positions
-    local cacheHead = 1
+    -- use the cache
+    local head = 1
     cache = cache or { }
-    for k = 1, candidatesHead - 1 do
-        local candidate = candidates[k]
 
-        -- check if we have at least one traversable leaf
-        local leaves, leafCount = FindTraversableLeaves(candidate, thresholdSize, GenericResultsCache, GenericQueueCache)
-        local largest = leaves[1]
-        if not largest then
+    for k, point in points do
+        local section = FindSection(grid, point)
+        if not section then
             continue
         end
 
-        for l = 1, leafCount do
-            local leaf = leaves[l]
-            local px = leaf.px
-            local pz = leaf.pz
-            local size = leaf.Size
-            local position = cache[cacheHead] or { }
-            position[1] = px 
-            position[2] = GetSurfaceHeight(px, pz)
-            position[3] = pz
-
-            -- this is useful information, but it causes issues with functions such as `IssueMove`
-            -- position[4] = size
-
-            cache[cacheHead] = position
-            cacheHead = cacheHead + 1
-        end
+        cache[head] = section.Center
+        head = head + 1
     end
 
-    -- no traversable leaves found
-    if cacheHead == 1 then
-        return nil, 'NoData'
-    end
-
-    -- clean up cache
-    for k = cacheHead, TableGetn(cache) do
+    -- clean up remainder of the cache
+    for k = head, TableGetn(cache) do
         cache[k] = nil
     end
 
-    return cache, cacheHead - 1
+    if head == 1 then
+        return nil, 'NoResults'
+    end
+
+    return cache, head - 1
 end
 
 --- Returns the metadata of a label.
@@ -943,75 +980,118 @@ end
 ---@param origin Vector
 ---@param distance number
 ---@return Vector[] | nil
----@return number | ('NotGenerated' | 'OutsideMap' | 'NoResults')
+---@return number | ('NotGenerated' | 'OutsideMap' | 'NoResults' | 'InvalidLayer')
 function DirectionsFrom(layer, origin, distance)
-
     -- check if generated
     if not NavGenerator.IsGenerated() then
         return nil, 'NotGenerated'
     end
 
-    -- setup pathing
-    local seenIdentifier = PathToGetUniqueIdentifier()
-    local grid = FindGrid(layer)                        --[[@as NavGrid]]
-    local sectionOrigin = FindSection(grid, origin)           --[[@as NavSection]]
-
-    -- sanity check
-    if not sectionOrigin then
-        return nil, 'OutsideMap'
+    -- sanity check on the grid
+    local grid = FindGrid(layer)
+    if not grid then
+        return nil, 'InvalidLayer'
     end
 
-    -- local scope for performance
-    -- local scope for performance
-    local NavSections = NavGenerator.NavSections
+    -- compute directions
+    local points, count = FindSections(grid, origin, distance)
+    if not points then
+        local msg = count --[[@as string]]
+        return nil, msg
+    end
+
+    -- only keep those at the edge
     local ox = origin[1]
     local oz = origin[3]
+    local ds = distance * distance
+    local head = 1
+    for k = 1, count do
 
-    -- 0th iteration of search
-    sectionOrigin.HeapIdentifier = seenIdentifier
+        local point = points[k]
+        local dx = ox - point[1]
+        local dz = oz - point[3]
 
-    local current = 1
-    local stack = { sectionOrigin }
-    local candidates = { }
-
-    while current > 0 do
-        local section = stack[current]
-        current = current - 1
-
-        -- look for the neighbors
-        local neighbors = section.Neighbors
-        for k = 1, TableGetn(neighbors) do
-            local neighbor = NavSections[neighbors[k]]
-            if neighbor.HeapIdentifier != seenIdentifier then
-                neighbor.HeapIdentifier = seenIdentifier
-
-                -- if neighbor exceeds the distance then we pick the neighbor
-                local dx = ox - neighbor.Center[1]
-                local dz = oz - neighbor.Center[3]
-                if MathSqrt(dx * dx + dz * dz) > distance then
-                    candidates[neighbor.Identifier] = neighbor.Center
-                else
-                    current = current + 1
-                    stack[current] = neighbor
-                end
-            end
+        if dx * dx + dz * dz > ds then
+            points[head] = point
+            head = head + 1
         end
     end
 
-    local count = 0
-
-    ---@type Vector[]
-    local positions = { }
-    for _, center in candidates do
-        TableInsert(positions, center)
-        count = count + 1
-    end
-
-    if count == 0 then
+    if head == 1 then
         return nil, 'NoResults'
     end
 
-    return positions, count
+    -- clear out remaining points
+    for k = count, head, -1 do
+        points[k] = nil
+    end
+
+    return points, head - 1
+end
+
+--- Computes a list of waypoints that represent random directions that we can navigate to
+---@param layer NavLayers
+---@param origin Vector
+---@param distance number
+---@param aibrain AIBrain
+---@param threatFunc fun(aiBrain: AIBrain, position: Vector, radius: number) : number
+---@param threatThreshold number
+---@param threatRadius number
+---@return Vector[] | nil
+---@return number | ('NotGenerated' | 'OutsideMap' | 'NoResults' | 'InvalidLayer' | 'TooMuchThreat')
+---@return BrainPositionThreat[]? # all locations with their threat that is at least the threat threshold
+---@return number? # number of threat found
+function DirectionsFromWithThreatThreshold(layer, origin, distance, aibrain, threatFunc, threatThreshold, threatRadius)
+    -- check if generated
+    if not NavGenerator.IsGenerated() then
+        return nil, 'NotGenerated', nil, nil
+    end
+
+    -- sanity check on the grid
+    local grid = FindGrid(layer)
+    if not grid then
+        return nil, 'InvalidLayer', nil, nil
+    end
+
+    -- compute directions
+    local points, count = FindSections(grid, origin, distance)
+    if not points then
+        local msg = count --[[@as string]]
+        return nil, msg, nil, nil
+    end
+
+    -- no locations found
+    if count == 0 then
+        return nil, 'NoResults', nil, nil
+    end
+
+    local tHead = 1
+    ---@type BrainPositionThreat[]
+    local threats = { }
+
+    local head = 1
+    for k = 1, count do
+        local point = points[k]
+        local threat = threatFunc(aibrain, point, threatRadius)
+        if threat < threatThreshold then
+            points[head] = point
+            head = head + 1
+        else
+            threats[tHead] = { point[1], point[3], threat }
+            tHead = tHead + 1
+        end
+    end
+
+    -- clear out remaining points
+    if head == 1 then
+        return nil, 'TooMuchThreat', threats, tHead - 1
+    end
+
+    for k = head, count do
+        points[k] = nil
+    end
+
+    return points, head - 1, threats, tHead - 1
 end
 
 --- Computes a waypoint that represents a random direction that we can navigate to

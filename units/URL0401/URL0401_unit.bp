@@ -3,10 +3,6 @@ UnitBlueprint{
     AI = {
         GuardScanRadius = 30,
         NeedUnpack = true,
-        TargetBones = {
-            "URL0401",
-            "Turret_Aim",
-        },
     },
     Audio = {
         Activate    = Sound { Bank = 'URL',       Cue = 'URL0401_Close',       LodCutoff = 'UnitMove_LodCutoff' },

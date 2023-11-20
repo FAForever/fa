@@ -1,4 +1,12 @@
 UnitBlueprint {
+    AI = {
+        TargetBones = {
+            'B04',
+            'B03',
+            'B06',
+            'B05'
+        }
+    },
     Audio = {
         Construct = Sound {
             Bank = 'XSB',
@@ -121,7 +129,7 @@ UnitBlueprint {
         BuildCostEnergy = 5500,
         BuildCostMass = 1100,
         BuildRate = 90,
-        BuildTime = 3000,
+        BuildTime = 2000,
         DifferentialUpgradeCostCalculation = true,
         RebuildBonusIds = {
             'zsb9503',

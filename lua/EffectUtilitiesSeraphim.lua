@@ -59,13 +59,15 @@ end
 ---@param locationBone string The main build bone where the unit spawns on top of (unused)
 ---@param effectsBag TrashBag The trashbag for effects
 function CreateSeraphimFactoryBuildingEffects(builder, unitBeingBuilt, effectBones, locationBone, effectsBag)
+    WaitTicks(1)
+
     -- -- initialize various info used throughout the function
     local army = builder.Army
     local bp = unitBeingBuilt.Blueprint
     local Physics = bp.Physics
     local Footprint = bp.Footprint
-    local sx = Physics.MeshExtentsX or Footprint.SizeX
-    local sz = Physics.MeshExtentsZ or Footprint.SizeZ
+    local sx = Physics.MeshExtentsX or Footprint.SizeX or 1
+    local sz = Physics.MeshExtentsZ or Footprint.SizeZ or 1
     local sy = Physics.MeshExtentsY or Footprint.SizeYX or MathMin(sx, sz)
 
     -- do not apply offsets for subs and air units

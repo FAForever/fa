@@ -2,10 +2,11 @@ UnitBlueprint{
     Description = "<LOC ueb0303_desc>Naval Factory HQ",
     AI = {
         TargetBones = {
-            "UEB0303",
-            "Dock_Cover",
-            "Dock",
-            "Center_Deck_Support",
+            "B09",
+            "B10",
+            "B11",
+            "B12",
+            "B13",
         },
     },
     Audio = {
@@ -81,7 +82,7 @@ UnitBlueprint{
         BuildCostEnergy = 45000,
         BuildCostMass = 9500,
         BuildRate = 150,
-        BuildTime = 11250,
+        BuildTime = 21600,
         BuildableCategory = {
             "BUILTBYTIER3FACTORY UEF MOBILE CONSTRUCTION",
             "BUILTBYTIER3FACTORY UEF STRUCTURE NAVAL",

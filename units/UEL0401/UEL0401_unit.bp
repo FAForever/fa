@@ -7,11 +7,9 @@ UnitBlueprint{
         RepairConsumeEnergy = 30,
         RepairConsumeMass = 0,
         StagingPlatformScanRadius = 300,
-        TargetBones = {
-            "Bay_Cover",
+        TargetBones = { 
             "Front_Core",
             "Rear_Core",
-            "Ramp",
             "Turret_Left01",
             "Turret_Left02",
             "Turret_Right01",
@@ -43,9 +41,9 @@ UnitBlueprint{
         "BUILTBYTIER3COMMANDER",
         "BUILTBYTIER3ENGINEER",
         "CONSTRUCTION",
+        "CQUEMOV",
         "DRAGBUILD",
         "EXPERIMENTAL",
-        "FACTORY",
         "INDIRECTFIRE",
         "LAND",
         "LOWSELECTPRIO",
@@ -59,6 +57,7 @@ UnitBlueprint{
         "PRODUCTSC1",
         "RECLAIMABLE",
         "SELECTABLE",
+        "SHIELD",
         "SHOWQUEUE",
         "SNIPEMODE",
         "UEF",
@@ -290,7 +289,7 @@ UnitBlueprint{
     LifeBarOffset = 4.35,
     LifeBarSize = 5.75,
     Physics = {
-        BackUpDistance = 15,
+        BackUpDistance = 30,
         BankingSlope = 3,
         BuildOnLayerCaps = {
             LAYER_Air = false,
