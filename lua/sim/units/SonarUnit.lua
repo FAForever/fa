@@ -1,20 +1,24 @@
 
 local StructureUnit = import("/lua/sim/units/structureunit.lua").StructureUnit
+local StructureUnitOnStopBeingBuilt = StructureUnit.OnStopBeingBuilt
+local StructureUnitCreateIdleEffects = StructureUnit.CreateIdleEffects
+local StructureUnitDestroyIdleEffects = StructureUnit.DestroyIdleEffects
 
 ---@class SonarUnit : StructureUnit
+---@field TimedSonarEffectsThread? thread
 SonarUnit = ClassUnit(StructureUnit) {
 
     ---@param self SonarUnit
     ---@param builder Unit
     ---@param layer string
     OnStopBeingBuilt = function(self, builder, layer)
-        StructureUnit.OnStopBeingBuilt(self, builder, layer)
+        StructureUnitOnStopBeingBuilt(self, builder, layer)
         self:SetMaintenanceConsumptionActive()
     end,
 
     ---@param self SonarUnit
     CreateIdleEffects = function(self)
-        StructureUnit.CreateIdleEffects(self)
+        StructureUnitCreateIdleEffects(self)
         self.TimedSonarEffectsThread = self:ForkThread(self.TimedIdleSonarEffects)
     end,
 
@@ -45,9 +49,10 @@ SonarUnit = ClassUnit(StructureUnit) {
 
     ---@param self SonarUnit
     DestroyIdleEffects = function(self)
-        StructureUnit.DestroyIdleEffects(self)
-        if self.TimedSonarEffectsThread then
-            self.TimedSonarEffectsThread:Destroy()
+        StructureUnitDestroyIdleEffects(self)
+        local timedSonarEffectsThread = self.TimedSonarEffectsThread
+        if timedSonarEffectsThread then
+            timedSonarEffectsThread:Destroy()
         end
     end,
 }

@@ -21,6 +21,7 @@
 --**********************************************************************************
 
 local HoverLandUnit = import("/lua/sim/units/hoverlandunit.lua").HoverLandUnit
+local HoverLandUnitOnLayerChange = HoverLandUnit.OnLayerChange
 
 ---@class SlowHoverLandUnit : HoverLandUnit
 SlowHoverLandUnit = ClassUnit(HoverLandUnit) {
@@ -31,7 +32,7 @@ SlowHoverLandUnit = ClassUnit(HoverLandUnit) {
     OnLayerChange = function(self, new, old)
 
         -- call base class to make sure self.layer is set
-        HoverLandUnit.OnLayerChange(self, new, old)
+        HoverLandUnitOnLayerChange(self, new, old)
 
         -- Slow these units down when they transition from land to water
         -- The mult is applied twice thanks to an engine bug, so careful when adjusting it

@@ -21,7 +21,7 @@
 --**********************************************************************************
 
 local MobileUnit = import("/lua/sim/units/mobileunit.lua").MobileUnit
-
+local MobileUnitOnStopBeingBuilt = MobileUnit.OnStopBeingBuilt
 ---@class SeaUnit : MobileUnit
 SeaUnit = ClassUnit(MobileUnit) {
     DeathThreadDestructionWaitTime = 0,
@@ -33,7 +33,7 @@ SeaUnit = ClassUnit(MobileUnit) {
     ---@param builder Unit
     ---@param layer Layer
     OnStopBeingBuilt = function(self, builder, layer)
-        MobileUnit.OnStopBeingBuilt(self, builder, layer)
+        MobileUnitOnStopBeingBuilt(self, builder, layer)
         self:SetMaintenanceConsumptionActive()
     end,
 }
