@@ -636,6 +636,60 @@ do
     end
 end
 
+do
+    local CommandSourceGuards = {}
+
+    ---@param data { }
+    ---@param selection Unit[]
+    Callbacks.DischargeShields = function(data, selection)
+        -- verify selection
+        selection = SecureUnits(selection)
+        if (not selection) or TableEmpty(selection) then
+            if (GetFocusArmy() == GetCurrentCommandSource()) then
+                print("Unable to discharge")
+            end
+
+            return
+        end
+
+        -- only apply this to units with shields
+        local shead = 1
+        local unitsWithShields = {}
+        for k = 1, table.getn(selection) do
+            local unit = selection[k]
+            if unit.MyShield then
+                unitsWithShields[shead] = unit
+                shead = shead + 1
+            end
+        end
+
+        if table.empty(unitsWithShields) then
+            if (GetFocusArmy() == GetCurrentCommandSource()) then
+                print("Unable to discharge")
+            end
+
+            return
+        end
+
+        -- prevent automation
+        local gameTick = GetGameTick()
+        local commandSource = GetCurrentCommandSource()
+        local commandSourceGuard = CommandSourceGuards[commandSource]
+
+        if commandSourceGuard and commandSourceGuard + 5 >= gameTick then
+            if (GetFocusArmy() == GetCurrentCommandSource()) then
+                print("Unable to discharge")
+            end
+
+            return
+        end
+
+        CommandSourceGuards[commandSource] = gameTick
+
+        -- perform the command
+        import("/lua/sim/commands/discharge-shields.lua").DischargeShields(unitsWithShields, true)
+    end
+end
 
 --#endregion
 

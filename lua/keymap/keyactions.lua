@@ -1634,6 +1634,14 @@ local keyActionsOrdersAdvanced = {
         category = 'ordersAdvanced',
         wikiURL = 'Play/Game/Hotkeys/OrdersAdvanced#interrupt-navigation-of-engineers'
     },
+    ['discharge'] = {
+        action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").DischargeShields()',
+        category = 'ordersAdvanced',
+    },
+    ['shift_discharge'] = {
+        action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").DischargeShields()',
+        category = 'ordersAdvanced',
+    }
 }
 
 local keyActionsOrdersQueueBased = {

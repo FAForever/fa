@@ -109,7 +109,8 @@ local cUnit = moho.unit_methods
 ---@field Brain AIBrain
 ---@field buildBots? Unit[]
 ---@field Blueprint UnitBlueprint
----@field BuildEffectsBag? TrashBag
+---@field BuildEffectsBag TrashBag
+---@field BuildArmManipulator? moho.BuilderArmManipulator
 ---@field Trash TrashBag
 ---@field Layer Layer
 ---@field Army Army
@@ -122,6 +123,8 @@ local cUnit = moho.unit_methods
 ---@field TerrainType TerrainType
 ---@field EngineCommandCap? table<string, boolean>
 ---@field UnitBeingBuilt Unit?
+---@field UnitBuildOrder string
+---@field MyShield Shield?
 ---@field EntityBeingReclaimed Unit | Prop | nil
 ---@field SoundEntity? Unit | Entity
 ---@field AutoModeEnabled? boolean
@@ -2562,11 +2565,19 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
     ---@param self Unit
     ---@param enable boolean
     BuildManipulatorSetEnabled = function(self, enable)
-        if self.Dead or not self.BuildArmManipulator then return end
+        if IsDestroyed(self) then
+            return
+        end
+
+        local buildArmManipulator = self.BuildArmManipulator
+        if not buildArmManipulator then
+            return
+        end
+
         if enable then
-            self.BuildArmManipulator:Enable()
+            buildArmManipulator:Enable()
         else
-            self.BuildArmManipulator:Disable()
+            buildArmManipulator:Disable()
         end
     end,
 
@@ -2746,7 +2757,8 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
 
     ---@param self Unit
     ---@param built Unit
-    OnStopBuild = function(self, built)
+    ---@param order string
+    OnStopBuild = function(self, built, order)
         self:StopBuildingEffects(built)
         self:SetActiveConsumptionInactive()
         self:DoOnUnitBuiltCallbacks(built)
@@ -2930,7 +2942,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
     end,
 
     ---@param self Unit
-    ---@param built boolean
+    ---@param built Unit
     ---@param order string
     StartBuildingEffects = function(self, built, order)
         local buildEffectsBag = self.BuildEffectsBag
@@ -2942,7 +2954,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
     end,
 
     ---@param self Unit
-    ---@param built boolean
+    ---@param built Unit
     ---@param order string
     CreateBuildEffects = function(self, built, order)
     end,

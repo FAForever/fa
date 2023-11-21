@@ -20,7 +20,7 @@ XES0205 = ClassUnit(TShieldSeaUnit, ShieldEffectsComponent) {
     ShieldEffectsBone = 'XES0205',
 
     ---@param self XES0205
-    OnCreate = function(self) -- Are these missng on purpose?
+    OnCreate = function(self)
         TShieldSeaUnit.OnCreate(self)
         ShieldEffectsComponent.OnCreate(self)
     end,
