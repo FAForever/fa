@@ -90,10 +90,9 @@ RadarJammerUnit = ClassUnit(StructureUnit) {
     ---@param self RadarJammerUnit
     OnIntelEnabled = function(self, intel)
         StructureUnitOnIntelEnabled(self, intel)
-        self.IntelFxOn = true
-
         local intelEffects = self.IntelEffects
         if intelEffects and not self.IntelFxOn then
+            self.IntelFxOn = true
             self:CreateTerrainTypeEffects(intelEffects, 'FXIdle', self.Layer, nil, self.IntelEffectsBag)
         end
     end,
