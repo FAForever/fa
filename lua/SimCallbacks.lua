@@ -568,26 +568,27 @@ end
 -------------------------------------------------------------------------------
 --#region Chat and event message functionality
 
----@param data UIMessage
-Callbacks.DistributeChatMessage = function(data)
+---@param message UIMessage
+Callbacks.DistributeChatMessage = function(message)
     -- basic validation
-    if  (not data.From) or
-        (GetCurrentCommandSource() != data.From) or
-        (not OkayToMessWithArmy(data.From))
+    if  (not message.From) or
+        (GetCurrentCommandSource() != message.From) or
+        (not OkayToMessWithArmy(message.From))
     then
-        WARN(string.format("Malformed chat message: (command source: %d) %s", GetCurrentCommandSource(), reprs(data)))
+        WARN(string.format("Malformed chat message: (command source: %d) %s", GetCurrentCommandSource(), reprs(message)))
         CheatsEnabled()
         return
     end
 
-    -- basic validation
-    if (not data.To) then
-        WARN(string.format("Malformed chat data: (command source: %d) %s", GetCurrentCommandSource(), reprs(data)))
+    -- validate the message
+    local ok, msg  = import("/lua/shared/chat.lua").ValidateMessage(message)
+    if not ok then
+        WARN(msg)
         CheatsEnabled()
         return
     end
 
-    import('/lua/SimSyncUtils.lua').SyncUIChatMessage(data)
+    import('/lua/SimSyncUtils.lua').SyncUIChatMessage(message)
 end
 
 ---@param data UIMessage
@@ -602,9 +603,10 @@ Callbacks.DistributeEventMessage = function(data)
         return
     end
 
-    -- basic validation
-    if (not data.To) then
-        WARN(string.format("Malformed event message: (command source: %d) %s", GetCurrentCommandSource(), reprs(data)))
+    -- validate the message
+    local ok, msg  = import("/lua/shared/chat.lua").ValidateMessage(message)
+    if not ok then
+        WARN(msg)
         CheatsEnabled()
         return
     end

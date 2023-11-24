@@ -47,6 +47,12 @@ local UIMain = import("/lua/ui/uimain.lua")
 
 local ChatMessage = import("/lua/ui/game/chat/message.lua").ChatMessage
 
+-- Features to support:
+-- - [x] Send a chat message (as a sim callback)
+-- - [x] Receive a chat message (through a sim callback)
+-- - [ ] Visualize a chat message on screen
+-- - [ ]
+
 ---@param message any
 local LOG = function(message)
     _G.LOG("Chat.lua - " .. tostring(message))
@@ -58,7 +64,8 @@ local WARN = function(message)
 end
 
 ---@class UIMessage
----@field Tick number                   # timestamp when it was send
+---@field ReceivedAtTime number                   # timestamp of when it was received
+---@field SendAtTick number                   # timestamp when it was send
 ---@field Camera? UserCameraSettings    # some messages contain camera coordinates
 ---@field To 'All' | 'Allies' | number  # recipient
 ---@field From number                   # sender
@@ -76,6 +83,7 @@ EventMessages = {}
 local Instance = nil
 
 ---@class UIChatWindow : Window
+---@field Messages UIMessage[]
 ---@field WindowState 'Open' | 'Closed'
 ---@field ProcessChatMessages boolean
 ---@field ProcessEventMessages boolean
@@ -168,6 +176,10 @@ ChatWindow = ClassUI(Window) {
 
         -- content of the chat window
 
+        self.ProcessChatMessages = true
+        self.ProcessEventMessages = true
+        self.Messages = { }
+
         local contentGroup = self:GetClientGroup()
 
         self.EditGroup = Group(contentGroup)
@@ -198,6 +210,8 @@ ChatWindow = ClassUI(Window) {
                 if messages then
                     for _, message in messages do
                         if self:ValidateMessage(message) then
+                            -- keep track of when we received it
+                            message.ReceivedAtTime = GetGameTimeSeconds()
                             table.insert(ChatMessages, message)
                             self:ProcessMessages()
                         else
@@ -217,6 +231,8 @@ ChatWindow = ClassUI(Window) {
                 if messages then
                     for _, message in messages do
                         if self:ValidateMessage(message) then
+                            -- keep track of when we received it
+                            message.ReceivedAtTime = GetGameTimeSeconds()
                             table.insert(EventMessages, message)
                             self:ProcessMessages()
                         else
@@ -379,12 +395,46 @@ ChatWindow = ClassUI(Window) {
     ---@param self UIChatWindow
     ---@param message UIMessage
     ValidateMessage = function(self, message)
-        return true
+        local ok, msg = import("/lua/shared/chat.lua").ValidateMessage(message)
+        if not ok then
+            WARN(msg)
+        end
+
+        return ok
+    end,
+
+    ---@param a UIMessage
+    ---@param b UIMessage
+    SortMessageCriteria = function(a, b)
+        return a.ReceivedAtTime < b.ReceivedAtTime
     end,
 
     ---@param self UIChatWindow
     ProcessMessages = function(self)
+        local messages = self.Messages
+        local count = table.getn(messages)
 
+        local head = 1
+        if self.ProcessChatMessages then
+            for k = 1, ChatMessages do
+                messages[head] = ChatMessage[k]
+                head = head + 1
+            end
+        end
+
+        if self.ProcessEventMessages then
+            for k = 1, EventMessages do
+                messages[head] = EventMessages[k]
+                head = head + 1
+            end
+        end
+
+        -- clear out remaining messages
+        for k = head, count do
+            messages[k] = nil
+        end
+
+        table.sort(messages, self.SortMessageCriteria)
     end,
 }
 

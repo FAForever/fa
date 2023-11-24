@@ -70,6 +70,28 @@ styles = {
 }
 
 ---@class Window : Group
+---@field _resizeGroup Group
+---@field _pref string
+---@field tl Bitmap
+---@field tr Bitmap
+---@field bl Bitmap
+---@field br Bitmap
+---@field tm Bitmap
+---@field ml Bitmap
+---@field mr Bitmap
+---@field _borderSize number
+---@field _cornerSize number
+---@field _sizeLock boolean
+---@field _lockPosition Vector | false
+---@field _lockSize boolean
+---@field _xMin number
+---@field _yMin number
+---@field _titleIcon? Bitmap
+---@field _title Text
+---@field _closeBtn Button
+---@field _pinBtn? Button
+---@field _configBtn? Button
+---@field ClientGroup Group
 Window = ClassUI(Group) {
     __init = function(self, parent, title, icon, pin, config, lockSize, lockPosition, prefID, defaultPosition, textureTable)
         Group.__init(self, parent, tostring(title) .. "-window")

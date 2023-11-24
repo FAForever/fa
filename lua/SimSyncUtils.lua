@@ -40,7 +40,7 @@ end
 ---@param message UIMessage
 function SyncUIChatMessage(message)
     local recipient = message.To
-    if recipient =='All' then
+    if recipient == 'All' then
         Sync.ReceiveChatMessage = Sync.ReceiveChatMessage or { }
         table.insert(Sync.ReceiveChatMessage, message)
         return
