@@ -416,14 +416,14 @@ ChatWindow = ClassUI(Window) {
 
         local head = 1
         if self.ProcessChatMessages then
-            for k = 1, ChatMessages do
+            for k = 1, table.getn(ChatMessages) do
                 messages[head] = ChatMessage[k]
                 head = head + 1
             end
         end
 
         if self.ProcessEventMessages then
-            for k = 1, EventMessages do
+            for k = 1, table.getn(EventMessages) do
                 messages[head] = EventMessages[k]
                 head = head + 1
             end
@@ -435,6 +435,7 @@ ChatWindow = ClassUI(Window) {
         end
 
         table.sort(messages, self.SortMessageCriteria)
+        reprsl(messages)
     end,
 }
 
