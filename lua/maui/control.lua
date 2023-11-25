@@ -21,11 +21,17 @@
 
 
 -- debug methods
-    -- string GetName()
-    -- SetName(string name)
-    -- Dump()
+-- string GetName()
+-- SetName(string name)
+-- Dump()
 
 ---@class Control : moho.control_methods
+---@field Left LazyVar
+---@field Top LazyVar
+---@field Right LazyVar
+---@field Bottom LazyVar
+---@field Width LazyVar
+---@field Height LazyVar
 ---@field _isDisabled boolean
 Control = ClassUI(moho.control_methods) {
     --- Resets the control's layout to the defaults, in this case
@@ -72,7 +78,7 @@ Control = ClassUI(moho.control_methods) {
     end,
 
     --- Sets this control to be enabled and calls `OnEnable()`
-    ---@param self any
+    ---@param self Control
     Enable = function(self)
         self._isDisabled = false
         self:EnableHitTest()
@@ -110,6 +116,7 @@ Control = ClassUI(moho.control_methods) {
     --- If this function returns true, its children will not get their `OnHide` functions called.
     ---@param self Control
     ---@param hidden boolean
+    ---@return boolean
     OnHide = function(self, hidden)
     end,
 

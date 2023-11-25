@@ -32,84 +32,32 @@ local armies = GetArmiesTable()
 
 reprsl(armies)
 
----@class UIChatMessage : Group
+---@class UIChatRecipientOption : Group
 ---@field Background Bitmap
----@field ChatWindow UIChatWindow
----@field Message? UIMessage
----@field IsWrapped boolean     # if true then this line is wrapped onto the next line
----@field IsExtension boolean   # if true then this line is an extension of the previous line
----@field To Text               # indicates for whom the messages are
----@field Name Text             # name of the player
----@field Icon Bitmap           # usually faction icon of the player
----@field Color Bitmap          # color of the player
----@field Content Text          # text message of the player
----@field ContentExtended Text  # extended text of a wrapped message of the player
+---@field Text Text
+---@field Icon Bitmap
+---@field Identifier UIMessageRecipients
 ChatMessage = ClassUI(Group) {
 
-    ---@param self UIChatMessage
+    ---@param self UIChatRecipientOption
     ---@param parent UIChatWindow
     __init = function(self, parent)
         Group.__init(self, parent)
 
-        self.ChatWindow = parent
-        self.Background = UIUtil.CreateBitmapColor(self, 'ffffff')
-        self.Background:SetAlpha(0, true)
-        self.Content = UIUtil.CreateText(self, "", 12, UIUtil.bodyFont)
-        self.ContentExtended = UIUtil.CreateText(self, "", 12, UIUtil.bodyFont)
-        self.To = UIUtil.CreateText(self, "", 12, UIUtil.bodyFont)
-        self.Name = UIUtil.CreateText(self, "", 12, UIUtil.bodyFont)
-        self.Icon = UIUtil.CreateBitmapColor(self, '00000000')
-        self.Color = UIUtil.CreateBitmapColor(self, '00ffffff')
+        self.Text = UIUtil.CreateText(self, '', 12, UIUtil.bodyFont)
+
     end,
 
-    ---@param self UIChatMessage
+    ---@param self UIChatRecipientOption
     ---@param parent Control
     __post_init = function(self, parent)
-        -- disable all hit tests
-        self:DisableHitTest(true)
 
-        self.Content:SetClipToWidth(true)
-        self.ContentExtended:SetClipToWidth(true)
-
-        LayoutHelpers.LayoutFor(self)
-            :Over(parent, 10)
-
-        LayoutHelpers.LayoutFor(self.Icon)
-            :Width(12)
-            :Height(12)
-            :AtLeftTopIn(self, 2)
-            :Under(self, 2)
-
-        LayoutHelpers.LayoutFor(self.Color)
-            :Fill(self.Icon)
-            :Under(self.Icon, 2)
-
-        LayoutHelpers.LayoutFor(self.Name)
-            :RightOf(self.Icon, 2)
-            :Under(self, 2)
-
-        LayoutHelpers.LayoutFor(self.To)
-            :RightOf(self.Name, 2)
-            :Under(self, 2)
-
-        LayoutHelpers.LayoutFor(self.Content)
-            :RightOf(self.To, 2)
-            :Right(self.Right)
-            :Under(self, 2)
-
-        LayoutHelpers.LayoutFor(self.ContentExtended)
-            :RightOf(self.Icon, 2)
-            :Right(self.Right)
-            :Under(self, 2)
-
-        LayoutHelpers.LayoutFor(self.Background)
-            :Fill(self)
     end,
 
     ---------------------------------------------------------------------------
     --@region Engine functionality
 
-    ---@param self UIChatMessage
+    ---@param self UIChatRecipientOption
     ---@param event KeyEvent
     HandleEvent = function(self, event)
         local typeOfevent = event.Type
@@ -123,7 +71,7 @@ ChatMessage = ClassUI(Group) {
         end
     end,
 
-    ---@param self UIChatMessage
+    ---@param self UIChatRecipientOption
     Show = function(self)
         Group.Show(self)
 
@@ -134,7 +82,7 @@ ChatMessage = ClassUI(Group) {
         end
     end,
 
-    ---@param self UIChatMessage
+    ---@param self UIChatRecipientOption
     Hide = function(self)
         Group.Hide(self)
         self:DisableHitTest()
@@ -145,17 +93,17 @@ ChatMessage = ClassUI(Group) {
     ---------------------------------------------------------------------------
     --@region Lua functionality
 
-    ---@param self UIChatMessage
+    ---@param self UIChatRecipientOption
     CreateHighlight = function(self)
         self.Background:SetAlpha(0.25, true)
     end,
 
-    ---@param self UIChatMessage
+    ---@param self UIChatRecipientOption
     DestroyHighlight = function(self)
         self.Background:SetAlpha(0, true)
     end,
 
-    ---@param self UIChatMessage
+    ---@param self UIChatRecipientOption
     ---@param message? UIMessage
     ProcessMessage = function(self, message, isWrapped, isExtended)
         -- set our internal state

@@ -167,7 +167,7 @@ end
 ---@field MouseX number
 ---@field MouseY number
 ---@field RawKeyCode number
----@field Type string
+---@field Type 'MouseMotion' | 'MouseEnter' | 'MouseExit' | 'ButtonPress' | 'ButtonDClick'
 ---@field WheelDelta number
 ---@field WheelRotation number
 

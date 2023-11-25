@@ -1,5 +1,5 @@
 --**********************************************************************************
---** Copyright (c) 2022  Willem 'Jip' Wijnia
+--** Copyright (c) 2023  Willem 'Jip' Wijnia
 --**
 --** Permission is hereby granted, free of charge, to any person obtaining a copy
 --** of this software and associated documentation files (the "Software"), to deal
@@ -20,10 +20,6 @@
 --** SOFTWARE.
 --**********************************************************************************
 
-local UIUtil = import("/lua/ui/uiutil.lua")
-local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
-
-local Window = import("/lua/maui/window.lua").Window
 local Combo = import("/lua/ui/controls/combo.lua").Combo
 local IntegerSlider = import("/lua/maui/slider.lua").IntegerSlider
 local UiUtilsS = import("/lua/uiutilssorian.lua")
@@ -46,12 +42,22 @@ local Tooltip = import("/lua/ui/game/tooltip.lua")
 local UIMain = import("/lua/ui/uimain.lua")
 
 local ChatMessage = import("/lua/ui/game/chat/message.lua").ChatMessage
+local ChatRecipientPicker = import("/lua/ui/game/chat/recipient.lua").ChatRecipientPicker
+
+local sessionClients = GetSessionClients()
+local armies = GetArmiesTable()
 
 -- Features to support:
 -- - [x] Send a chat message (as a sim callback)
 -- - [x] Receive a chat message (through a sim callback)
--- - [ ] Visualize a chat message on screen
--- - [ ]
+-- - [x] Visualize a chat message on screen
+-- - [x] Add the user name, faction and color back to the chat
+-- - [x] Add a highlight
+-- - [x] Autofocus the text input when opened
+-- - [ ] Add the origin / color queue of messages (to all, to allies and the whisper)
+-- - [ ] Add support for wrapping messages
+-- - [ ] Add support for scrolling through the messages
+-- - [ ] Add support for 'to all' / 'to allies' / 'whisper'
 
 ---@param message any
 local LOG = function(message)
@@ -64,15 +70,14 @@ local WARN = function(message)
 end
 
 ---@class UIMessage
----@field ReceivedAtTime number                   # timestamp of when it was received
----@field SendAtTick number                   # timestamp when it was send
----@field Camera? UserCameraSettings    # some messages contain camera coordinates
----@field To 'All' | 'Allies' | number  # recipient
+---@field ReceivedAtTime number         # timestamp of when it was received
+---@field To 'All' | 'Allies' | 'Enemies' | number  # recipient(s)
 ---@field From number                   # sender
----@field Faction? number               # faction of sender
----@field Color? string                 # color of sender
----@field Text? string                  # message content
+---@field Text string                   # message content
+---@field Camera? UserCameraSettings    # some messages contain camera coordinates
 ---@field EventType?  'Nuke' | 'Resources' | 'Ping-Help' | 'Ping-Attack' | 'Ping-Assist'
+
+local Instance = nil
 
 ---@type UIMessage[]
 ChatMessages = {}
@@ -80,10 +85,9 @@ ChatMessages = {}
 ---@type UIMessage []
 EventMessages = {}
 
-local Instance = nil
-
 ---@class UIChatWindow : Window
----@field Messages UIMessage[]
+---@field MessageRows UIChatMessage[]
+---@field MessageContent UIMessage[]
 ---@field WindowState 'Open' | 'Closed'
 ---@field ProcessChatMessages boolean
 ---@field ProcessEventMessages boolean
@@ -92,10 +96,15 @@ local Instance = nil
 ---@field DragTR Bitmap
 ---@field DragBL Bitmap
 ---@field DragBR Bitmap
+---@field EditRecipientsBubble Button
 ---@field Edit Edit
 ---@field EditLabel Text
 ---@field EditGroup Group
+---@field EditRecipientsPicker UIChatRecipientPicker
 ChatWindow = ClassUI(Window) {
+
+    MinimumSizeX = 400,
+    MinimumSizeY = 160,
 
     ---@param self UIChatWindow
     ---@param parent Control
@@ -178,13 +187,21 @@ ChatWindow = ClassUI(Window) {
 
         self.ProcessChatMessages = true
         self.ProcessEventMessages = true
-        self.Messages = { }
+        self.MessageContent = {}
 
         local contentGroup = self:GetClientGroup()
 
         self.EditGroup = Group(contentGroup)
         self.EditLabel = UIUtil.CreateText(self.EditGroup, '', 14, 'Arial')
         self.Edit = Edit(self.EditGroup)
+
+        self.EditRecipientsBubble = UIUtil.CreateButton(self,
+            UIUtil.UIFile('/game/chat-box_btn/radio_btn_up.dds'),
+            UIUtil.UIFile('/game/chat-box_btn/radio_btn_down.dds'),
+            UIUtil.UIFile('/game/chat-box_btn/radio_btn_over.dds'),
+            UIUtil.UIFile('/game/chat-box_btn/radio_btn_dis.dds'))
+
+        self.EditRecipientsPicker = ChatRecipientPicker(self)
 
         self.Edit.OnEnterPressed = function(control, text)
             if text == '' then
@@ -199,10 +216,10 @@ ChatWindow = ClassUI(Window) {
             })
         end
 
-        -- self.Rows = { }
-        -- for k = 1, 50 do
-        --     self.Rows[k] = ChatMessage()
-        -- end
+        self.MessageRows = {}
+        for k = 1, 50 do
+            self.MessageRows[k] = ChatMessage(self)
+        end
 
         AddOnSyncHashedCallback(
         ---@param messages UIMessage[]
@@ -213,7 +230,7 @@ ChatWindow = ClassUI(Window) {
                             -- keep track of when we received it
                             message.ReceivedAtTime = GetGameTimeSeconds()
                             table.insert(ChatMessages, message)
-                            self:ProcessMessages()
+                            self:UpdateMessages()
                         else
                             WARN(string.format("Malformed chat data: %s", GetCurrentCommandSource(), reprs(message)))
                         end
@@ -234,7 +251,7 @@ ChatWindow = ClassUI(Window) {
                             -- keep track of when we received it
                             message.ReceivedAtTime = GetGameTimeSeconds()
                             table.insert(EventMessages, message)
-                            self:ProcessMessages()
+                            self:UpdateMessages()
                         else
                             WARN(string.format("Malformed event data: %s", GetCurrentCommandSource(), reprs(message)))
                         end
@@ -251,8 +268,9 @@ ChatWindow = ClassUI(Window) {
     ---@param parent Control
     __post_init = function(self, parent)
 
-        -- state that users can change
+        self:SetMinimumResize(self.MinimumSizeX, self.MinimumSizeY)
 
+        -- state that users can change
         self.WindowAlpha = import("/lua/lazyvar.lua").Create()
         self.WindowAlpha.OnDirty = function(lazyvar)
             local value = lazyvar()
@@ -305,7 +323,7 @@ ChatWindow = ClassUI(Window) {
 
         LayoutHelpers.LayoutFor(self.Edit)
             :AnchorToRight(self.EditLabel, 5)
-            :AtRightIn(self.EditGroup, 38)
+            :AtRightIn(self.EditGroup, 50)
             :Over(self, 200)
             :AtBottomIn(self.EditGroup, 1)
             :Height(function() return self.Edit:GetFontHeight() end)
@@ -314,7 +332,34 @@ ChatWindow = ClassUI(Window) {
         self.Edit:SetDropShadow(true)
         self.Edit:ShowBackground(false)
 
-        self:ProcessMessages()
+        LayoutHelpers.LayoutFor(self.EditRecipientsBubble)
+            :CenteredLeftOf(self.Edit, 12)
+            :Over(self, 10)
+
+        self.EditRecipientsBubble.OnClick = function(editRecipientsBubble)
+            self.EditRecipientsPicker:Show()
+        end
+
+        LayoutHelpers.LayoutFor(self.EditRecipientsPicker)
+            :Above(self.EditRecipientsBubble, 15)
+            :AtLeftIn(self.EditRecipientsBubble, 15)
+
+        self.EditRecipientsPicker:AddOnRecipientPickedCallback(
+            function(recipient)
+                reprsl(recipient)
+            end, 'Chat.lua'
+        )
+
+        for k = 1, 50 do
+            ---@type UIChatMessage
+            local chatMessage = self.MessageRows[k]
+            LayoutHelpers.LayoutFor(chatMessage)
+                :AtRightIn(contentGroup, 2)
+                :AtLeftTopIn(contentGroup, 8, 2 + (k - 1) * 16)
+                :Height(16)
+        end
+
+        self:UpdateMessages()
     end,
 
     ---------------------------------------------------------------------------
@@ -367,11 +412,18 @@ ChatWindow = ClassUI(Window) {
         self.DragTR:SetTexture(self.DragTR.textures.up)
         self.DragBL:SetTexture(self.DragBL.textures.up)
         self.DragBR:SetTexture(self.DragBR.textures.up)
+        self.Edit:AcquireFocus()
+    end,
+
+    ---@param self UIChatWindow
+    OnMoveSet = function(self)
+        self.Edit:AcquireFocus()
     end,
 
     ---@param self UIChatWindow
     OnOpen = function(self)
         self.WindowState = 'Open'
+        self.Edit:AcquireFocus()
         self:Show()
     end,
 
@@ -410,14 +462,14 @@ ChatWindow = ClassUI(Window) {
     end,
 
     ---@param self UIChatWindow
-    ProcessMessages = function(self)
-        local messages = self.Messages
+    UpdateMessages = function(self)
+        local messages = self.MessageContent
         local count = table.getn(messages)
 
         local head = 1
         if self.ProcessChatMessages then
             for k = 1, table.getn(ChatMessages) do
-                messages[head] = ChatMessage[k]
+                messages[head] = ChatMessages[k]
                 head = head + 1
             end
         end
@@ -435,7 +487,17 @@ ChatWindow = ClassUI(Window) {
         end
 
         table.sort(messages, self.SortMessageCriteria)
-        reprsl(messages)
+        self:ShowMessages()
+    end,
+
+    ---@param self UIChatWindow
+    ShowMessages = function(self)
+        local messages = self.MessageContent
+        local messageCount = table.getn(messages)
+        for k = 1, messageCount do
+            local chatMessage = self.MessageRows[k]
+            chatMessage:ProcessMessage(messages[k])
+        end
     end,
 }
 
@@ -445,7 +507,7 @@ function OpenWindow()
         Instance = ChatWindow(GetFrame(0))
     end
 
-    Instance:Show()
+    Instance:OnOpen()
 end
 
 --- Closes the chat window
@@ -455,6 +517,7 @@ function CloseWindow()
     end
 end
 
+--- Toggle the chat window, showing or hiding it if it was hidden or shown respectively
 function ToggleWindow()
     if Instance then
         Instance:OnToggle()
