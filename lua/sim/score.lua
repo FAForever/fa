@@ -84,7 +84,6 @@ end
 
 local function ScoreHistoryThread()
     while not GameIsOver do 
-        WaitSeconds(scoreData.interval)
         local data = {}
         for index, brain in ArmyBrains do
             local Score = scoreData.current[index]
@@ -96,6 +95,7 @@ local function ScoreHistoryThread()
             data[index] = table.deepcopy(Score)
         end
         table.insert(scoreData.history, data)
+        WaitSeconds(scoreData.interval)
     end
 end
 
