@@ -57,7 +57,7 @@ local armies = GetArmiesTable()
 -- - [ ] Add the origin / color queue of messages (to all, to allies and the whisper)
 -- - [ ] Add support for wrapping messages
 -- - [ ] Add support for scrolling through the messages
--- - [ ] Add support for 'to all' / 'to allies' / 'whisper'
+-- - [x] Add support for 'to all' / 'to allies' / 'whisper'
 
 ---@param message any
 local LOG = function(message)
@@ -101,6 +101,7 @@ EventMessages = {}
 ---@field EditLabel Text
 ---@field EditGroup Group
 ---@field EditRecipientsPicker UIChatRecipientPicker
+---@field Recipients LazyVar<UIChatRecipient>
 ChatWindow = ClassUI(Window) {
 
     MinimumSizeX = 400,
@@ -192,7 +193,7 @@ ChatWindow = ClassUI(Window) {
         local contentGroup = self:GetClientGroup()
 
         self.EditGroup = Group(contentGroup)
-        self.EditLabel = UIUtil.CreateText(self.EditGroup, '', 14, 'Arial')
+        self.EditLabel = UIUtil.CreateText(self.EditGroup, 'To all:', 14, 'Arial')
         self.Edit = Edit(self.EditGroup)
 
         self.EditRecipientsBubble = UIUtil.CreateButton(self,
@@ -212,7 +213,12 @@ ChatWindow = ClassUI(Window) {
             -- sync it to other players
 
             SimCallback({
-                Func = 'DistributeChatMessage', Args = { From = GetFocusArmy(), Text = text, To = 'All' }
+                Func = 'DistributeChatMessage',
+                Args = {
+                    From = GetFocusArmy(),
+                    To = self.Recipients().Identifier,
+                    Text = text,
+                }
             })
         end
 
@@ -269,6 +275,15 @@ ChatWindow = ClassUI(Window) {
     __post_init = function(self, parent)
 
         self:SetMinimumResize(self.MinimumSizeX, self.MinimumSizeY)
+
+        ---@type UIChatRecipient
+        local defaultRecipient = { Identifier = 'All', Name = 'To all:' }
+        self.Recipients = import("/lua/lazyvar.lua").Create(defaultRecipient)
+
+        ---@param lazyvar LazyVar<UIChatRecipient>
+        self.Recipients.OnDirty = function(lazyvar)
+            self.EditLabel:SetText(lazyvar().Name)
+        end
 
         -- state that users can change
         self.WindowAlpha = import("/lua/lazyvar.lua").Create()
@@ -333,20 +348,25 @@ ChatWindow = ClassUI(Window) {
         self.Edit:ShowBackground(false)
 
         LayoutHelpers.LayoutFor(self.EditRecipientsBubble)
-            :CenteredLeftOf(self.Edit, 12)
+            :CenteredLeftOf(self.EditLabel, 8)
             :Over(self, 10)
 
         self.EditRecipientsBubble.OnClick = function(editRecipientsBubble)
-            self.EditRecipientsPicker:Show()
+            if self.EditRecipientsPicker:IsHidden() then
+                self.EditRecipientsPicker:Show()
+            else
+                self.EditRecipientsPicker:Hide()
+            end
         end
 
         LayoutHelpers.LayoutFor(self.EditRecipientsPicker)
             :Above(self.EditRecipientsBubble, 15)
             :AtLeftIn(self.EditRecipientsBubble, 15)
+            :Hide()
 
         self.EditRecipientsPicker:AddOnRecipientPickedCallback(
             function(recipient)
-                reprsl(recipient)
+                self.Recipients:Set(recipient)
             end, 'Chat.lua'
         )
 
@@ -424,7 +444,13 @@ ChatWindow = ClassUI(Window) {
     OnOpen = function(self)
         self.WindowState = 'Open'
         self.Edit:AcquireFocus()
+
+        local isEditRecipientsPickerHidden =  self.EditRecipientsPicker:IsHidden()
         self:Show()
+
+        if isEditRecipientsPickerHidden then
+            self.EditRecipientsPicker:Hide()
+        end
     end,
 
     ---@param self UIChatWindow

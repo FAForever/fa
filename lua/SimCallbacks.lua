@@ -570,6 +570,7 @@ end
 
 ---@param message UIMessage
 Callbacks.DistributeChatMessage = function(message)
+
     -- basic validation
     if  (not message.From) or
         (GetCurrentCommandSource() != message.From) or

@@ -191,6 +191,8 @@ ChatMessage = ClassUI(Group) {
             textRecipients = 'to allies:'   -- todo: LOC
         elseif message.To == 'Enemies' then
             textRecipients = 'to all:'      -- todo: LOC
+        else
+            textRecipients = 'whispers:'    -- todo: LOC
         end
 
         self.To:SetText(textRecipients)

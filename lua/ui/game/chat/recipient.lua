@@ -24,6 +24,8 @@ local UIUtil = import("/lua/ui/uiutil.lua")
 local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
 local Group = import("/lua/maui/group.lua").Group
 
+local ChatRecipientOption = import("/lua/ui/game/chat/recipient-option.lua").ChatRecipientOption
+
 local armies = GetArmiesTable()
 
 ---@param message any
@@ -60,7 +62,7 @@ end
 ---@field BackgroundTop Bitmap
 ---@field BackgroundBottom Bitmap
 ---@field Recipients UIChatRecipient[]
----@field RecipientControls (Group | { Text: Text, Bitmap: Bitmap })[]
+---@field RecipientControls UIChatRecipientOption[]
 ---@field OnRecipientPickedCallbacks table<string, fun(recipient: UIChatRecipient)>
 ChatRecipientPicker = ClassUI(Group) {
 
@@ -70,6 +72,9 @@ ChatRecipientPicker = ClassUI(Group) {
     ---@param parent Control
     __init = function(self, parent)
         Group.__init(self, parent, 'ChatRecipientPicker')
+
+        self.OnRecipientPickedCallbacks = { }
+
         self.BackgroundTL = UIUtil.CreateBitmap(self, '/game/chat_brd/drop-box_brd_ul.dds')
         self.BackgroundTR = UIUtil.CreateBitmap(self, '/game/chat_brd/drop-box_brd_ur.dds')
         self.BackgroundBR = UIUtil.CreateBitmap(self, '/game/chat_brd/drop-box_brd_lr.dds')
@@ -79,15 +84,9 @@ ChatRecipientPicker = ClassUI(Group) {
         self.BackgroundTop = UIUtil.CreateBitmap(self, '/game/chat_brd/drop-box_brd_horz_um.dds')
         self.BackgroundBottom = UIUtil.CreateBitmap(self, '/game/chat_brd/drop-box_brd_lm.dds')
 
-        self.Recipients = {}
-        self.OnRecipientPickedCallbacks = { }
-
         self.RecipientControls = {}
         for k = 1, self.RecipientCount do
-            local group = Group(self)
-            group.Text = UIUtil.CreateText(group, '', 12, UIUtil.bodyFont)
-            group.Bitmap = UIUtil.CreateBitmapColor(group, 'ff000000')
-            self.RecipientControls[k] = group
+            self.RecipientControls[k] = ChatRecipientOption(self)
         end
     end,
 
@@ -95,6 +94,8 @@ ChatRecipientPicker = ClassUI(Group) {
     ---@param parent Control
     __post_init = function(self, parent)
         LayoutHelpers.LayoutFor(self)
+            :Width(10)
+            :Height(10)
             :Over(parent, 10)
 
         LayoutHelpers.LayoutFor(self.BackgroundTL)
@@ -141,51 +142,24 @@ ChatRecipientPicker = ClassUI(Group) {
             :Top(self.Bottom)
             :DisableHitTest()
 
+
+        ---@param recipient UIChatRecipient
+        local function OnClickCallback (recipient)
+            self:OnRecipientPicked(recipient)
+        end
+
         local recipientControls = self.RecipientControls
         for k = 1, self.RecipientCount do
-            -- local scope for references
-            local index = k
-
-            local controls = recipientControls[index]
-            LayoutHelpers.LayoutFor(controls)
-                :Width(controls.Text.Width)
-                :Height(controls.Text.Height)
+            local index =  k
+            local chatRecipient = recipientControls[index]
+            LayoutHelpers.LayoutFor(chatRecipient)
                 :AtLeftTopIn(self, 4, (index - 1) * 12)
-                :DisableHitTest()
-
-            LayoutHelpers.LayoutFor(controls.Text)
-                :AtLeftTopIn(controls)
-                :Color('ffffffff')
-                :DisableHitTest()
-
-            LayoutHelpers.LayoutFor(controls.Bitmap)
-                :Color('ff000000')
-                :Under(controls.Text)
-                :AtLeftTopIn(controls.Text, 0, 0)
-                :AtRightBottomIn(controls.Text, 0, 0)
                 :FillHorizontally(self)
 
-            ---@param bitmap Bitmap
-            ---@param event KeyEvent
-            controls.Bitmap.HandleEvent = function(bitmap, event)
-                local typeOfevent = event.Type
-                if typeOfevent == 'MouseEnter' then
-                    bitmap:SetSolidColor('ff666666')
-                    PlaySound(Sound({Bank = 'Interface', Cue = 'UI_Tab_Rollover_02'}))
-                elseif typeOfevent == 'MouseExit' then
-                    bitmap:SetSolidColor('ff000000')
-                elseif typeOfevent == 'ButtonPress' then
-                    PlaySound(Sound({Bank = 'Interface', Cue = 'UI_Tab_Click_02'}))
-                    local recipient = self.Recipients[index]
-                    if recipient then
-                        self:OnRecipientPicked(recipient)
-                    end
-                end
-            end
+            chatRecipient:AddOnClickCallback(OnClickCallback, 'Recipient.lua')
         end
 
         self:UpdateEntries()
-        self:ShowEntries()
     end,
 
     ---------------------------------------------------------------------------
@@ -233,8 +207,10 @@ ChatRecipientPicker = ClassUI(Group) {
 
     ---@param self UIChatRecipientPicker
     UpdateEntries = function(self)
+
+        -- gather all applicable entries
         local head = 3
-        local recipients = self.Recipients
+        local recipients = { }
         recipients[1] = { Name = 'To all:', Identifier = 'All' }
         recipients[2] = { Name = 'To allies:', Identifier = 'Allies' }
 
@@ -242,41 +218,35 @@ ChatRecipientPicker = ClassUI(Group) {
             local army = armies.armiesTable[k]
             if not army.civilian then
                 recipients[head] = {
-                    Name = army.nickname,
+                    Name = "To " .. army.nickname .. ":",
                     Identifier = k
                 }
                 head = head + 1
             end
         end
-    end,
 
-    ---@param self UIChatRecipientPicker
-    ShowEntries = function(self)
+        -- apply the entries
         local maxWidth = 0
         local recipientsUsed = 0 
-        for k = 1, self.RecipientCount do
-            local controls = self.RecipientControls[k]
-            local recipient = self.Recipients[k]
-            if recipient then
-                controls.Bitmap:SetSolidColor('ff000000')
-                controls.Text:SetText(recipient.Name)
 
+        for k = 1, self.RecipientCount do
+            local recipient = recipients[k]
+            local option = self.RecipientControls[k]
+            option:UpdateRecipient(recipient)
+
+            if recipient then
                 recipientsUsed = recipientsUsed + 1
-                local width = controls.Text:GetStringAdvance(recipient.Name)
+                local width = option.Text:GetStringAdvance(recipient.Name)
                 if width > maxWidth then
                     maxWidth = width
                 end
-            else
-
-                controls:Hide()
-                controls.Bitmap:SetSolidColor('00000000')
             end
         end
 
         -- determine width and height dynamically
         LayoutHelpers.LayoutFor(self)
             :Width(maxWidth + 20)
-            :Height(recipientsUsed * 14 + 2)
+            :Height(recipientsUsed * 12)
     end,
 
     --#endregion

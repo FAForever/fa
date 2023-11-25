@@ -16,7 +16,7 @@ local WeakKeyMeta = { __mode = 'k' }
 ---@alias Lazy<T> T | LazyVar<T> | fun(): T
 
 ---@class LazyVar<T> : Destroyable, OnDirtyListener, function
----@field OnDirty? function
+---@field OnDirty? fun(lazyvar: LazyVar<T>)
 ---@field [1] any                           # Cached result of what we represent
 ---@field [2] boolean                       # Flag whether the lazy var is busy
 ---@field [3] string                        # Optional trace when `ExtendedErrorMessages` is set
@@ -37,7 +37,10 @@ local WeakKeyMeta = { __mode = 'k' }
 ---@field [18] LazyVar?      # Lazy var that is dirty
 ---@field [19] LazyVar?      # Lazy var that is dirty
 ---@field [20] LazyVar?      # Lazy var that is dirty
-LazyVarMetaTable = {
+LazyVarMetaTable = ClassSimple {
+    ---@generic T
+    ---@param self LazyVar<T>
+    ---@return T
     __call = function(self)
         local value = self[1]
         if value == nil then

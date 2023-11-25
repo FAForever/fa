@@ -33,24 +33,53 @@ local armies = GetArmiesTable()
 reprsl(armies)
 
 ---@class UIChatRecipientOption : Group
+---@field Recipient? UIChatRecipient
 ---@field Background Bitmap
+---@field Highlight Bitmap
 ---@field Text Text
 ---@field Icon Bitmap
 ---@field Identifier UIMessageRecipients
-ChatMessage = ClassUI(Group) {
+---@field OnClickCallbacks table<string, fun(recipient: UIChatRecipient)>
+ChatRecipientOption = ClassUI(Group) {
 
     ---@param self UIChatRecipientOption
     ---@param parent UIChatWindow
     __init = function(self, parent)
         Group.__init(self, parent)
 
-        self.Text = UIUtil.CreateText(self, '', 12, UIUtil.bodyFont)
+        self.OnClickCallbacks = { }
 
+        self.Text = UIUtil.CreateText(self, '', 12, UIUtil.bodyFont)
+        self.Highlight = UIUtil.CreateBitmapColor(self, 'ffffffff')
+        self.Background = UIUtil.CreateBitmapColor(self, '00000000')
     end,
 
     ---@param self UIChatRecipientOption
     ---@param parent Control
     __post_init = function(self, parent)
+        LayoutHelpers.LayoutFor(self)
+            :Width(self.Text.Width)
+            :Height(self.Text.Height)
+            :DisableHitTest()
+
+        LayoutHelpers.LayoutFor(self.Text)
+            :AtLeftTopIn(self)
+            :Color('ffffffff')
+            :DisableHitTest()
+
+        LayoutHelpers.LayoutFor(self.Background)
+            :Color('ff000000')
+            :Under(self.Text, 5)
+            :AtLeftTopIn(self.Text, 0, 0)
+            :AtRightBottomIn(self.Text, 0, 0)
+            :FillHorizontally(self)
+
+            LayoutHelpers.LayoutFor(self.Highlight)
+            :Color('ffffffff')
+            :Under(self.Text, 1)
+            :AtLeftTopIn(self.Text, 0, 0)
+            :AtRightBottomIn(self.Text, 0, 0)
+            :FillHorizontally(self)
 
     end,
 
@@ -62,11 +91,15 @@ ChatMessage = ClassUI(Group) {
     HandleEvent = function(self, event)
         local typeOfevent = event.Type
 
-        if self.Message then
+        if self.Recipient then
             if typeOfevent == 'MouseEnter' then
                 self:CreateHighlight()
+                PlaySound(Sound({Bank = 'Interface', Cue = 'UI_Tab_Rollover_02'}))
             elseif typeOfevent == 'MouseExit' then
                 self:DestroyHighlight()
+            elseif typeOfevent == 'ButtonPress' then
+                PlaySound(Sound({Bank = 'Interface', Cue = 'UI_Tab_Click_02'}))
+                self:OnClick(self.Recipient)
             end
         end
     end,
@@ -74,18 +107,46 @@ ChatMessage = ClassUI(Group) {
     ---@param self UIChatRecipientOption
     Show = function(self)
         Group.Show(self)
-
         self:EnableHitTest()
-
-        if self.IsExtension then
-
-        end
     end,
 
     ---@param self UIChatRecipientOption
     Hide = function(self)
         Group.Hide(self)
-        self:DisableHitTest()
+        self:DisableHitTest(true)
+    end,
+
+    --#endregion
+
+    ---------------------------------------------------------------------------
+    --#region Callback functionality
+
+    ---@param self UIChatRecipientOption
+    ---@param recipient UIChatRecipient
+    OnClick = function(self, recipient)
+        for name, callback in self.OnClickCallbacks do
+            local ok, msg = pcall(callback, recipient)
+            if not ok then
+                WARN(string.format("Callback '%s' for 'OnRecipientPicked' failed: \r\n %s", name, msg))
+            end
+        end
+    end,
+
+    ---@param self UIChatRecipientOption
+    ---@param callback fun(recipient: UIChatRecipient)
+    ---@param name string
+    AddOnClickCallback = function(self, callback, name)
+        if (not name) or type(name) != 'string' then
+            WARN("Ignoring callback, 'name' parameter is invalid for  'AddOnClickCallback'")
+            return
+        end
+
+        if (not callback) or type(callback) != 'function' then
+            WARN("Ignoring callback, 'callback' parameter is invalid for 'AddOnClickCallback'")
+            return
+        end
+
+        self.OnClickCallbacks[name] = callback
     end,
 
     --#endregion
@@ -95,56 +156,32 @@ ChatMessage = ClassUI(Group) {
 
     ---@param self UIChatRecipientOption
     CreateHighlight = function(self)
-        self.Background:SetAlpha(0.25, true)
+        self.Highlight:SetAlpha(0.25, true)
     end,
 
     ---@param self UIChatRecipientOption
     DestroyHighlight = function(self)
-        self.Background:SetAlpha(0, true)
+        self.Highlight:SetAlpha(0, true)
     end,
 
     ---@param self UIChatRecipientOption
-    ---@param message? UIMessage
-    ProcessMessage = function(self, message, isWrapped, isExtended)
+    ---@param recipient? UIChatRecipient
+    UpdateRecipient = function(self, recipient, isWrapped, isExtended)
         -- set our internal state
-        self.Message = message
-        self.IsWrapped = isWrapped
-        self.IsExtension = isExtended
+        self.Recipient = recipient
 
         -- apparently there is nothing to show
-        if not message then
+        if not recipient then
             self:Hide()
-            self.Content:SetText("No message")
+            self.Background:SetAlpha(0)
+            self.Highlight:SetAlpha(0)
             return
         end
 
         self:Show()
-
-        if self.IsExtension then
-
-        else
-
-        end
-
-        -- populate this line of content
-        local army = armies.armiesTable[message.From]
-        local factions = import("/lua/factions.lua").Factions
-        self.Icon:SetTexture(UIUtil.UIFile(factions[army.faction + 1].Icon or
-        '/widgets/faction-icons-alpha_bmp/observer_ico.dds'))
-
-        local textRecipients = ":"
-        if message.To == 'All' then
-            textRecipients = 'to all:'      -- todo: LOC
-        elseif message.To == 'Allies' then
-            textRecipients = 'to allies:'   -- todo: LOC
-        elseif message.To == 'Enemies' then
-            textRecipients = 'to all:'      -- todo: LOC
-        end
-
-        self.To:SetText(textRecipients)
-        self.Name:SetText(army.nickname)
-        self.Color:SetSolidColor(army.color)
-        self.Content:SetText(message.Text)
+        self.Text:SetText(recipient.Name)
+        self.Background:SetAlpha(1)
+        self.Highlight:SetAlpha(0)
     end,
 
     --#endregion
