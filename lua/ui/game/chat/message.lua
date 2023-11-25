@@ -30,8 +30,6 @@ local IntegerSlider = import("/lua/maui/slider.lua").IntegerSlider
 -- does not change as the game progresses
 local armies = GetArmiesTable()
 
-reprsl(armies)
-
 ---@class UIChatMessage : Group
 ---@field Background Bitmap
 ---@field ChatWindow UIChatWindow
