@@ -458,31 +458,24 @@ function Pulse(control, time, alphaBtm, alphaTop)
 -- fades a control in (alphaTop) and out (alphaBtm) over time (time, in seconds)
 -- default is 0 to 1 alpha over 1 second
 
-    local duration = (time or 1) / 2
+    local newTime = time or 1
     local minAlpha = alphaBtm or 0
     local maxAlpha = alphaTop or 1
 
     local alphaNorm = maxAlpha - minAlpha
-    local direction = 1
     local elapsedTime = 0
-    local newAlpha = minAlpha
 
-    control:SetAlpha(newAlpha)
+    control:SetAlpha(minAlpha)
 
     control.OnFrame = function(self, frameTime)
-        elapsedTime = elapsedTime + frameTime
-        if elapsedTime >= duration then
-            direction = direction * -1 -- reverse direction
-            elapsedTime = 0
+        elapsedTime = math.mod((elapsedTime + frameTime), newTime)
+        local timeFraction = (elapsedTime / newTime) * 2
+        if (timeFraction <= 1 ) then
+            timeFraction = timeFraction -- rising half
+        else
+            timeFraction = math.min(1, 2 - timeFraction) -- lowering half
         end
-        local timeSlice = frameTime / duration
-        newAlpha = newAlpha + (timeSlice * alphaNorm * direction)
-        if newAlpha > 1 then
-            newAlpha = 1
-        elseif newAlpha < 0 then
-            newAlpha = 0
-        end
-        control:SetAlpha(newAlpha)
+        control:SetAlpha(minAlpha + timeFraction * alphaNorm)
     end
     control:SetNeedsFrameUpdate(true)
 end
