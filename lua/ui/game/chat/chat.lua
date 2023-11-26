@@ -55,9 +55,10 @@ local armies = GetArmiesTable()
 -- - [x] Add a highlight
 -- - [x] Autofocus the text input when opened
 -- - [ ] Add the origin / color queue of messages (to all, to allies and the whisper)
--- - [ ] Add support for wrapping messages
+-- - [x] Add support for wrapping messages
 -- - [ ] Add support for scrolling through the messages
 -- - [x] Add support for 'to all' / 'to allies' / 'whisper'
+-- - [x] Prevent draggers from being visible
 
 ---@param message any
 local LOG = function(message)
@@ -139,7 +140,6 @@ ChatWindow = ClassUI(Window) {
         }
 
         Window.__init(self, parent, title, icon, pin, config, lockSize, lockPosition, preferenceName, location, textures)
-
         self.WindowState = 'Open'
 
         -- custom draggers setup: top-left / top-right / bottom-left / bottom-right
@@ -268,12 +268,14 @@ ChatWindow = ClassUI(Window) {
 
             end, 'ReceiveEventMessage', 'Chat.lua'
         )
+
+        -- prevent Window class overwriting our roll over handler
+        self.RolloverHandler = nil
     end,
 
     ---@param self UIChatWindow
     ---@param parent Control
     __post_init = function(self, parent)
-
         self:SetMinimumResize(self.MinimumSizeX, self.MinimumSizeY)
 
         ---@type UIChatRecipient
@@ -385,13 +387,21 @@ ChatWindow = ClassUI(Window) {
     ---------------------------------------------------------------------------
     --#region UI events
 
-    ---@param self UIChatWindow
-    ---@param event any
+    ---@param control Control
+    ---@param event KeyEvent
     ---@param xControl number
     ---@param yControl number
     ---@param cursor any
     ---@param controlID any
-    RolloverHandler = function(self, event, xControl, yControl, cursor, controlID)
+    RolloverHandler = function(control, event, xControl, yControl, cursor, controlID)
+
+        -- This is an interesting and odd function. The control that is being passed along is the
+        -- control that triggered the event and not necessarily the chat window itself. As a result
+        -- we need to use the 'Instance' reference at the top of this function or we simply have no
+        -- reference to the chat window at all
+
+        local self = Instance
+
         if self._lockSize then
             return
         end
@@ -402,7 +412,6 @@ ChatWindow = ClassUI(Window) {
             if event.Type == 'MouseEnter' then
                 if controlMap[controlID] then
                     for _, control in controlMap[controlID] do
-                        reprsl(control)
                         control:SetTexture(control.textures.over)
                     end
                 end
@@ -447,7 +456,7 @@ ChatWindow = ClassUI(Window) {
         self.WindowState = 'Open'
         self.Edit:AcquireFocus()
 
-        local isEditRecipientsPickerHidden =  self.EditRecipientsPicker:IsHidden()
+        local isEditRecipientsPickerHidden = self.EditRecipientsPicker:IsHidden()
         self:Show()
         self:ShowMessages()
 

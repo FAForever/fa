@@ -520,7 +520,7 @@ function GetCursor(id)
     local cursors = skins[currentSkin()].cursors or skins['default'].cursors
     local cursor = cursors[id]
     if not cursor then
-        LOG("Requested cursor not found: " .. id)
+        LOG("Requested cursor not found: " .. tostring(id))
     end
     return cursor[1], cursor[2], cursor[3], cursor[4], cursor[5]
 end
