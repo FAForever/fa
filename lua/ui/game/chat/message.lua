@@ -41,7 +41,6 @@ local armies = GetArmiesTable()
 ---@field Icon Bitmap           # usually faction icon of the player
 ---@field Color Bitmap          # color of the player
 ---@field Content Text          # text message of the player
----@field ContentExtended Text  # extended text of a wrapped message of the player
 ChatMessage = ClassUI(Group) {
 
     ---@param self UIChatMessage
@@ -53,7 +52,6 @@ ChatMessage = ClassUI(Group) {
         self.Background = UIUtil.CreateBitmapColor(self, 'ffffff')
         self.Background:SetAlpha(0, true)
         self.Content = UIUtil.CreateText(self, "", 12, UIUtil.bodyFont)
-        self.ContentExtended = UIUtil.CreateText(self, "", 12, UIUtil.bodyFont)
         self.To = UIUtil.CreateText(self, "", 12, UIUtil.bodyFont)
         self.Name = UIUtil.CreateText(self, "", 12, UIUtil.bodyFont)
         self.Icon = UIUtil.CreateBitmapColor(self, '00000000')
@@ -67,7 +65,6 @@ ChatMessage = ClassUI(Group) {
         self:DisableHitTest(true)
 
         self.Content:SetClipToWidth(true)
-        self.ContentExtended:SetClipToWidth(true)
 
         LayoutHelpers.LayoutFor(self)
             :Over(parent, 10)
@@ -95,11 +92,6 @@ ChatMessage = ClassUI(Group) {
             :Right(self.Right)
             :Under(self, 2)
 
-        LayoutHelpers.LayoutFor(self.ContentExtended)
-            :RightOf(self.Icon, 2)
-            :Right(self.Right)
-            :Under(self, 2)
-
         LayoutHelpers.LayoutFor(self.Background)
             :Fill(self)
     end,
@@ -123,13 +115,26 @@ ChatMessage = ClassUI(Group) {
 
     ---@param self UIChatMessage
     Show = function(self)
-        Group.Show(self)
+        if not self.Message then
+            self:Hide()
+            return false
+        end
 
         self:EnableHitTest()
 
         if self.IsExtension then
-
+            self.Name:Hide()
+            self.To:Hide()
+            self.Icon:Hide()
+            self.Color:Hide()
+        else
+            self.Name:Show()
+            self.To:Show()
+            self.Icon:Show()
+            self.Color:Show()
         end
+
+        return false
     end,
 
     ---@param self UIChatMessage
@@ -154,49 +159,61 @@ ChatMessage = ClassUI(Group) {
     end,
 
     ---@param self UIChatMessage
-    ---@param message? UIMessage
-    ProcessMessage = function(self, message, isWrapped, isExtended)
+    ---@param message UIMessage
+    ---@param isWrapped boolean
+    ---@param isExtended boolean
+    Prepare = function(self, message, isWrapped, isExtended)
         -- set our internal state
         self.Message = message
         self.IsWrapped = isWrapped
         self.IsExtension = isExtended
 
-        -- apparently there is nothing to show
-        if not message then
+        if message then
+            -- populate this line of content
+            local army = armies.armiesTable[message.From]
+            local factions = import("/lua/factions.lua").Factions
+            self.Icon:SetTexture(UIUtil.UIFile(factions[army.faction + 1].Icon or
+                '/widgets/faction-icons-alpha_bmp/observer_ico.dds'))
+
+            local textRecipients = ":"
+            if message.To == 'All' then
+                textRecipients = 'to all:' -- todo: LOC
+            elseif message.To == 'Allies' then
+                textRecipients = 'to allies:' -- todo: LOC
+            elseif message.To == 'Enemies' then
+                textRecipients = 'to all:' -- todo: LOC
+            else
+                textRecipients = 'whispers:' -- todo: LOC
+            end
+
+            self.To:SetText(textRecipients)
+            self.Name:SetText(army.nickname)
+            self.Color:SetSolidColor(army.color)
+        else
             self:Hide()
-            self.Content:SetText("No message")
-            return
         end
+    end,
 
-        self:Show()
-
-        if self.IsExtension then
-
+    ---@param self UIChatMessage
+    ---@param content string
+    ---@param isWrapped boolean
+    ---@param isExtended boolean
+    Update = function(self, content, isWrapped, isExtended)
+        if isExtended then
+            self.Content:SetText(content)
+            self.Content:Show()
+            self.Name:Hide()
+            self.To:Hide()
+            self.Icon:Hide()
+            self.Color:Hide()
         else
-
+            self.Content:SetText(content)
+            self.Content:Show()
+            self.Name:Show()
+            self.To:Show()
+            self.Icon:Show()
+            self.Color:Show()
         end
-
-        -- populate this line of content
-        local army = armies.armiesTable[message.From]
-        local factions = import("/lua/factions.lua").Factions
-        self.Icon:SetTexture(UIUtil.UIFile(factions[army.faction + 1].Icon or
-        '/widgets/faction-icons-alpha_bmp/observer_ico.dds'))
-
-        local textRecipients = ":"
-        if message.To == 'All' then
-            textRecipients = 'to all:'      -- todo: LOC
-        elseif message.To == 'Allies' then
-            textRecipients = 'to allies:'   -- todo: LOC
-        elseif message.To == 'Enemies' then
-            textRecipients = 'to all:'      -- todo: LOC
-        else
-            textRecipients = 'whispers:'    -- todo: LOC
-        end
-
-        self.To:SetText(textRecipients)
-        self.Name:SetText(army.nickname)
-        self.Color:SetSolidColor(army.color)
-        self.Content:SetText(message.Text)
     end,
 
     --#endregion

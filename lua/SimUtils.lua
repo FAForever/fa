@@ -704,6 +704,9 @@ end
 
 ---@param data {From: number, To: number, Mass: number, Energy: number}
 function GiveResourcesToPlayer(data)
+
+
+
     SendChatToReplay(data)
     -- Ignore observers and players trying to send resources to themselves or to enemies
     if data.From ~= -1 and data.From ~= data.To and IsAlly(data.From, data.To) then
@@ -721,6 +724,13 @@ function GiveResourcesToPlayer(data)
 
         toBrain:GiveResource('Mass', massTaken)
         toBrain:GiveResource('Energy', energyTaken)
+
+        import("/lua/SimSyncUtils.lua").SyncUIEventMessage({
+            From = data.From,
+            To = 'Allies',
+            EventType = 'Resources',
+            Text = 'Sending resources...'
+        })
     end
 end
 

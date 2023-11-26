@@ -433,6 +433,8 @@ ChatWindow = ClassUI(Window) {
         self.DragBL:SetTexture(self.DragBL.textures.up)
         self.DragBR:SetTexture(self.DragBR.textures.up)
         self.Edit:AcquireFocus()
+
+        self:ShowMessages()
     end,
 
     ---@param self UIChatWindow
@@ -447,6 +449,7 @@ ChatWindow = ClassUI(Window) {
 
         local isEditRecipientsPickerHidden =  self.EditRecipientsPicker:IsHidden()
         self:Show()
+        self:ShowMessages()
 
         if isEditRecipientsPickerHidden then
             self.EditRecipientsPicker:Hide()
@@ -520,9 +523,40 @@ ChatWindow = ClassUI(Window) {
     ShowMessages = function(self)
         local messages = self.MessageContent
         local messageCount = table.getn(messages)
-        for k = 1, messageCount do
-            local chatMessage = self.MessageRows[k]
-            chatMessage:ProcessMessage(messages[k])
+
+        local l = 1
+        local m = 1
+        while m <= messageCount do
+            local chatMessage = messages[m]
+            m = m + 1
+
+            local chatLine = self.MessageRows[l]
+            local text = chatMessage.Text
+
+            -- not quite happy about this function, but it is the way it is for now
+            local lines = import("/lua/maui/text.lua").WrapText(
+                text,
+                chatLine.Content.Width,
+                function(text)
+                    return chatLine.Content:GetStringAdvance(text)
+                end
+            )
+            local lineCount = table.getn(lines)
+
+            chatLine:Prepare(chatMessage, false, false)
+            chatLine:Update(lines[1], false, false)
+            for k = 2, lineCount do
+                local chatLine = self.MessageRows[l + k - 1]
+                chatLine:Prepare(chatMessage, false, true)
+                chatLine:Update(lines[k], false, true)
+
+            end
+
+            l = l + lineCount
+        end
+
+        for i = l, 50 do
+            self.MessageRows[i]:Prepare(nil, false, false)
         end
     end,
 }

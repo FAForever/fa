@@ -39,8 +39,9 @@ end
 --- Sends 
 ---@param message UIMessage
 function SyncUIChatMessage(message)
-    -- see all messages
     local recipient = message.To
+
+    -- see all messages
     if recipient == 'All' then
         Sync.ReceiveChatMessage = Sync.ReceiveChatMessage or { }
         table.insert(Sync.ReceiveChatMessage, message)
@@ -72,23 +73,32 @@ end
 ---@param message UIMessage
 function SyncUIEventMessage(message)
     local recipient = message.To
+
+    -- see messages for all
     if recipient =='All' then
         Sync.ReceiveEventMessage = Sync.ReceiveEventMessage or { }
         table.insert(Sync.ReceiveEventMessage, message)
         return
     end
 
+    -- see allied messages
     if recipient == 'Allies' and IsAlly(message.From, GetFocusArmy()) then
         Sync.ReceiveEventMessage = Sync.ReceiveEventMessage or { }
         table.insert(Sync.ReceiveEventMessage, message)
         return
     end
 
+    -- see whispers
     if recipient == GetFocusArmy() then
         Sync.ReceiveEventMessage = Sync.ReceiveEventMessage or { }
         table.insert(Sync.ReceiveEventMessage, message)
         return
     end
 
-    WARN(string.format("Malformed event message: %s", reprs(message)))
+    -- always see our own messages
+    if message.From == GetFocusArmy() then
+        Sync.ReceiveChatMessage = Sync.ReceiveChatMessage or { }
+        table.insert(Sync.ReceiveChatMessage, message)
+        return
+    end
 end
