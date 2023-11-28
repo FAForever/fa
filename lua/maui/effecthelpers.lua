@@ -466,8 +466,6 @@ end
 ---@param alphaBtm number
 ---@param alphaTop number
 function Pulse(control, time, alphaBtm, alphaTop)
-
-
     local newTime = time or 1
     local minAlpha = alphaBtm or 0
     local maxAlpha = alphaTop or 1
