@@ -11,6 +11,11 @@ local Group = import("/lua/maui/group.lua").Group
 local UIUtil = import("/lua/ui/uiutil.lua")
 local Prefs = import("/lua/user/prefs.lua")
 
+-- upvalue scope for performance
+
+local MathMod = math.mod
+local MathMin = math.min
+
 --* Percentage versus offset
 --* Percentages are specified as a float, with 0.00 to 1.00 the normal ranges
 --* Percentages can change spacing when dimension is expended.
@@ -241,9 +246,9 @@ function MoveTo(control, xVal, yVal, time, mode, frameFunction)
         self.Left:Set(math.floor(MATH_Lerp(timeAccum, 0, time, initialXpos, xVal)))
         self.Top:Set(math.floor(MATH_Lerp(timeAccum, 0, time, initialYpos, yVal)))
 
-        if timeAccum >= time then           -- once the accrued time goes over our intended time
+        if timeAccum >= time then -- once the accrued time goes over our intended time
             self:SetNeedsFrameUpdate(false) -- turn off frame updates
-            self.Left:Set(xVal)             -- snap to the exact intended location. this is done since we can easily go past our intended destination due to inaccuracy in the frame-by-frame interpolation.
+            self.Left:Set(xVal) -- snap to the exact intended location. this is done since we can easily go past our intended destination due to inaccuracy in the frame-by-frame interpolation.
             self.Top:Set(yVal)
         end
 
@@ -270,13 +275,13 @@ function ScaleTo(control, newScale, time, origin, frameFunction)
         self.Height:Set(math.floor(MATH_Lerp(timeAccum, 0, time, initialHeight, newHeight)))
 
         if origin == 1 then
-            self.Left:Set(math.floor(initialXpos + ((initialWidth - self.Width())/2)))
-            self.Top:Set(math.floor(initialYpos + ((initialHeight - self.Height())/2)))
+            self.Left:Set(math.floor(initialXpos + ((initialWidth - self.Width()) / 2)))
+            self.Top:Set(math.floor(initialYpos + ((initialHeight - self.Height()) / 2)))
         end
 
-        if timeAccum >= time then               -- once the accrued time goes over our intended time
-            self:SetNeedsFrameUpdate(false)     -- turn off frame updates
-            self.Width:Set(newWidth)            -- snap to the exact intended dimensions. this is done since we can easily go past our intended size due to inaccuracy in the frame-by-frame interpolation.
+        if timeAccum >= time then -- once the accrued time goes over our intended time
+            self:SetNeedsFrameUpdate(false) -- turn off frame updates
+            self.Width:Set(newWidth) -- snap to the exact intended dimensions. this is done since we can easily go past our intended size due to inaccuracy in the frame-by-frame interpolation.
             self.Height:Set(newHeight)
         end
 
@@ -301,13 +306,13 @@ function SizeTo(control, newWidth, newHeight, time, origin, frameFunction)
         self.Height:Set(math.floor(MATH_Lerp(timeAccum, 0, time, initialHeight, newHeight)))
 
         if origin == 1 then
-            self.Left:Set(math.floor(initialXpos + ((initialWidth - self.Width())/2)))
-            self.Top:Set(math.floor(initialYpos + ((initialHeight - self.Height())/2)))
+            self.Left:Set(math.floor(initialXpos + ((initialWidth - self.Width()) / 2)))
+            self.Top:Set(math.floor(initialYpos + ((initialHeight - self.Height()) / 2)))
         end
 
-        if timeAccum >= time then               -- once the accrued time goes over our intended time
-            self:SetNeedsFrameUpdate(false)     -- turn off frame updates
-            self.Width:Set(newWidth)            -- snap to the exact intended dimensions. this is done since we can easily go past our intended size due to inaccuracy in the frame-by-frame interpolation.
+        if timeAccum >= time then -- once the accrued time goes over our intended time
+            self:SetNeedsFrameUpdate(false) -- turn off frame updates
+            self.Width:Set(newWidth) -- snap to the exact intended dimensions. this is done since we can easily go past our intended size due to inaccuracy in the frame-by-frame interpolation.
             self.Height:Set(newHeight)
         end
 
@@ -343,13 +348,13 @@ function MoveAndScaleTo(control, newScale, xVal, yVal, time, mode, origin, frame
         self.Top:Set(math.floor(MATH_Lerp(timeAccum, 0, time, initialYpos, yVal)))
 
         if origin == 1 then
-            self.Left:Set(math.floor(self.Left() + ((initialWidth - self.Width())/2)))
-            self.Top:Set(math.floor(self.Top() + ((initialHeight - self.Height())/2)))
+            self.Left:Set(math.floor(self.Left() + ((initialWidth - self.Width()) / 2)))
+            self.Top:Set(math.floor(self.Top() + ((initialHeight - self.Height()) / 2)))
         end
 
-        if timeAccum >= time then               -- once accrued time goes over intended time
-            self:SetNeedsFrameUpdate(false)     -- stop frame update
-            self.Left:Set(xVal)                 -- snap to the exact intended location and size. this is done since we can easily go past our intended destination/size due to inaccuracy in the frame-by-frame interpolation.
+        if timeAccum >= time then -- once accrued time goes over intended time
+            self:SetNeedsFrameUpdate(false) -- stop frame update
+            self.Left:Set(xVal) -- snap to the exact intended location and size. this is done since we can easily go past our intended destination/size due to inaccuracy in the frame-by-frame interpolation.
             self.Top:Set(yVal)
             self.Width:Set(newWidth)
             self.Height:Set(newHeight)
@@ -385,13 +390,13 @@ function MoveAndSizeTo(control, newWidth, newHeight, xVal, yVal, time, mode, ori
         self.Top:Set(math.floor(MATH_Lerp(timeAccum, 0, time, initialYpos, yVal)))
 
         if origin == 1 then
-            self.Left:Set(math.floor(self.Left() + ((initialWidth - self.Width())/2)))
-            self.Top:Set(math.floor(self.Top() + ((initialHeight - self.Height())/2)))
+            self.Left:Set(math.floor(self.Left() + ((initialWidth - self.Width()) / 2)))
+            self.Top:Set(math.floor(self.Top() + ((initialHeight - self.Height()) / 2)))
         end
 
-        if timeAccum >= time then               -- once accrued time goes over intended time
-            self:SetNeedsFrameUpdate(false)     -- stop frame update
-            self.Left:Set(xVal)                 -- snap to the exact intended location and size. this is done since we can easily go past our intended destination/size due to inaccuracy in the frame-by-frame interpolation.
+        if timeAccum >= time then -- once accrued time goes over intended time
+            self:SetNeedsFrameUpdate(false) -- stop frame update
+            self.Left:Set(xVal) -- snap to the exact intended location and size. this is done since we can easily go past our intended destination/size due to inaccuracy in the frame-by-frame interpolation.
             self.Top:Set(yVal)
             self.Width:Set(newWidth)
             self.Height:Set(newHeight)
@@ -402,61 +407,66 @@ function MoveAndSizeTo(control, newWidth, newHeight, xVal, yVal, time, mode, ori
 end
 
 function FadeIn(control, time, initialValue, finalValue)
- -- fades a control in over time
- -- time is specified in seconds
- -- initialValue is the initial alpha (default = 0.0)
- -- finalValue is the final alpha (default = 1.0)
+    -- fades a control in over time
+    -- time is specified in seconds
+    -- initialValue is the initial alpha (default = 0.0)
+    -- finalValue is the final alpha (default = 1.0)
 
     control:SetNeedsFrameUpdate(true)
 
     local initAlpha = initialValue or 0.0
-    local finalAlpha =  finalValue or 1.0
+    local finalAlpha = finalValue or 1.0
     local timeAccum = 0
 
-    control:SetAlpha(initAlpha,true)
+    control:SetAlpha(initAlpha, true)
     control:Show()
 
     control.OnFrame = function(self, elapsedTime)
         timeAccum = timeAccum + elapsedTime
-        self:SetAlpha(math.min(MATH_Lerp(timeAccum, 0, time, initAlpha, finalAlpha), 1),true)
+        self:SetAlpha(math.min(MATH_Lerp(timeAccum, 0, time, initAlpha, finalAlpha), 1), true)
 
-        if timeAccum >= time then               -- once accrued time goes over intended time
-            self:SetNeedsFrameUpdate(false)     -- stop frame update
-            self:SetAlpha(finalAlpha,true)
+        if timeAccum >= time then -- once accrued time goes over intended time
+            self:SetNeedsFrameUpdate(false) -- stop frame update
+            self:SetAlpha(finalAlpha, true)
         end
     end
 end
 
 function FadeOut(control, time, initialValue, finalValue)
- -- fades a control in over time
- -- time is specified in seconds
- -- initialValue is the initial alpha (default = 1.0)
- -- finalValue is the final alpha (default = 0.0)
+    -- fades a control in over time
+    -- time is specified in seconds
+    -- initialValue is the initial alpha (default = 1.0)
+    -- finalValue is the final alpha (default = 0.0)
 
     control:SetNeedsFrameUpdate(true)
 
     local initAlpha = initialValue or 1.0
-    local finalAlpha =  finalValue or 0.0
+    local finalAlpha = finalValue or 0.0
     local timeAccum = 0
 
-    control:SetAlpha(initAlpha,true)
+    control:SetAlpha(initAlpha, true)
     control:Show()
 
     control.OnFrame = function(self, elapsedTime)
         timeAccum = timeAccum + elapsedTime
-        self:SetAlpha(math.max(MATH_Lerp(timeAccum, 0, time, initAlpha, finalAlpha), 0),true)
+        self:SetAlpha(math.max(MATH_Lerp(timeAccum, 0, time, initAlpha, finalAlpha), 0), true)
 
-        if timeAccum >= time then               -- once accrued time goes over intended time
-            self:SetNeedsFrameUpdate(false)     -- stop frame update
-            self:SetAlpha(finalAlpha,true)
+        if timeAccum >= time then -- once accrued time goes over intended time
+            self:SetNeedsFrameUpdate(false) -- stop frame update
+            self:SetAlpha(finalAlpha, true)
             control:Hide()
         end
-   end
+    end
 end
 
+--- fades a control in (alphaTop) and out (alphaBtm) over time (time, in seconds)
+--- default is 0 to 1 alpha over 1 second
+---@param control Control
+---@param time number
+---@param alphaBtm number
+---@param alphaTop number
 function Pulse(control, time, alphaBtm, alphaTop)
--- fades a control in (alphaTop) and out (alphaBtm) over time (time, in seconds)
--- default is 0 to 1 alpha over 1 second
+
 
     local newTime = time or 1
     local minAlpha = alphaBtm or 0
@@ -468,12 +478,12 @@ function Pulse(control, time, alphaBtm, alphaTop)
     control:SetAlpha(minAlpha)
 
     control.OnFrame = function(self, frameTime)
-        elapsedTime = math.mod((elapsedTime + frameTime), newTime)
+        elapsedTime = MathMod((elapsedTime + frameTime), newTime)
         local timeFraction = (elapsedTime / newTime) * 2
-        if (timeFraction <= 1 ) then
+        if (timeFraction <= 1) then
             timeFraction = timeFraction -- rising half
         else
-            timeFraction = math.min(1, 2 - timeFraction) -- lowering half
+            timeFraction = MathMin(1, 2 - timeFraction) -- lowering half
         end
         control:SetAlpha(minAlpha + timeFraction * alphaNorm)
     end
