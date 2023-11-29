@@ -57,23 +57,23 @@ SBOOhwalliStategicBomb01 = ClassProjectile(SOhwalliStrategicBombProjectile) {
     ---@param radius number
     DamageThread = function(self, position, instigator, damage, radius)
         -- knock over trees
-        DamageArea(instigator, position, 0.75 * radius, 1, 'TreeForce', false)
-        DamageArea(instigator, position, 0.75 * radius, 1, 'TreeForce', false)
+        DamageArea(instigator, position, 0.75 * radius, 1, 'TreeForce', true, true)
+        DamageArea(instigator, position, 0.75 * radius, 1, 'TreeForce', true, true)
 
         -- initial damage
-        DamageArea(instigator, position, radius, 0.1 * damage, 'Normal', false)
-        DamageArea(instigator, position, 0.9 * radius, 1, 'TreeFire', false)
+        DamageArea(instigator, position, radius, 0.1 * damage, 'Normal', true, true)
+        DamageArea(instigator, position, 0.9 * radius, 1, 'TreeFire', true, true)
 
         -- wait for the full explosion and then deal the remaining damage
         WaitTicks(26)
-        DamageArea(instigator, position, 0.2 * radius, 1, 'Disintegrate', false)
-        DamageArea(instigator, position, radius, 0.3 * damage, 'Normal', false)
+        DamageArea(instigator, position, 0.2 * radius, 1, 'Disintegrate', true, true)
+        DamageArea(instigator, position, radius, 0.3 * damage, 'Normal', true, true)
         WaitTicks(1)
-        DamageArea(instigator, position, 0.3 * radius, 1, 'Disintegrate', false)
-        DamageArea(instigator, position, radius, 0.3 * damage, 'Normal', false)
+        DamageArea(instigator, position, 0.3 * radius, 1, 'Disintegrate', true, true)
+        DamageArea(instigator, position, radius, 0.3 * damage, 'Normal', true, true)
         WaitTicks(1)
-        DamageArea(instigator, position, 0.4 * radius, 1, 'Disintegrate', false)
-        DamageArea(instigator, position, radius, 0.3 * damage, 'Normal', false)
+        DamageArea(instigator, position, 0.4 * radius, 1, 'Disintegrate', true, true)
+        DamageArea(instigator, position, radius, 0.3 * damage, 'Normal', true, true)
     end,
 }
 TypeClass = SBOOhwalliStategicBomb01
