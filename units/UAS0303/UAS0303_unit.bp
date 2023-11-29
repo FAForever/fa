@@ -356,7 +356,7 @@ UnitBlueprint{
             Flare = {
                 Category = "MISSILE TACTICAL",
                 OffsetMult = 1.33,
-                Radius = 15,
+                Radius = 16,
                 Stack = true,
             },
             Label = "AntiMissile",

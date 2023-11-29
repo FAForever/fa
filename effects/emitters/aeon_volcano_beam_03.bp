@@ -8,5 +8,5 @@ BeamBlueprint {
     Blendmode = 1.0,
     RepeatRate = 1,
     UShift = 0.0,
-    VShift = -0.1,
+    VShift = 0.1,
 }
