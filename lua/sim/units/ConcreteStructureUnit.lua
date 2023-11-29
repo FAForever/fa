@@ -21,12 +21,13 @@
 --**********************************************************************************
 
 local StructureUnit = import("/lua/sim/units/structureunit.lua").StructureUnit
+local StructureUnitOnCreate = StructureUnit.OnCreate
 
 ---@class ConcreteStructureUnit : StructureUnit
 ConcreteStructureUnit = ClassUnit(StructureUnit) {
     ---@param self ConcreteStructureUnit
     OnCreate = function(self)
-        StructureUnit.OnCreate(self)
+        StructureUnitOnCreate(self)
         self:Destroy()
     end
 }
