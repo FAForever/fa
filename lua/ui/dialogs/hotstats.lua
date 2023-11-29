@@ -447,15 +447,15 @@ function line(parent,x1,y1,x2,y2,color, size)
     return grp
 end
 
-function tps_format(val)
-    if val<60 then return math.floor(val).."s" end
-    m=math.floor(val/60)
+function tps_format(seconds)
+    if seconds<60 then return math.floor(seconds).."s" end
+    m=math.floor(seconds/60)
     if m<60 then
-        if math.floor(val-60*m) != 0 then return m.."m"..math.floor(val-60*m) else return m.."m" end
+        if math.floor(seconds-60*m) != 0 then return m.."m"..math.floor(seconds-60*m) else return m.."m" end
     end
-    h=math.floor(val/3600)
-    if math.floor((val-3600*h)/60)==0 then return h.."h" end
-    return h.."h"..math.floor((val-3600*h)/60)
+    h=math.floor(seconds/3600)
+    if math.floor((seconds-3600*h)/60)==0 then return h.."h" end
+    return h.."h"..math.floor((seconds-3600*h)/60)
 end
 
 -- allow to find the best value upper to one (ie if int=3785 -->5000)
@@ -644,12 +644,12 @@ function create_graph(parent,path,x1,y1,x2,y2)
     local graphRight = graphLeft + graphWidth
     local graphBottom = graphTop + graphHeight
 
-    local data_nbr=table.getsize(scoreData.history) -- data_nbr is the number of group of data saved
+    local data_nbr=table.getsize(scoreData.history) -- data_nbr is the number of group of data saved. First one is at 00:00 and additional one every 30 seconds.
     --LOG("Number of data found:",data_nbr)
     if data_nbr<=0 then nodata() return nil end
+    -- scoreInterval is the time between to data saved
     local scoreInterval = scoreData.interval
     local player={} -- would be the name/color of the player in the left-top corner
-    -- scoreInterval is the time between to data saved
     -- parent group
     local grp=Group(parent)
     grp.Left:Set(0) grp.Top:Set(0) grp.Right:Set(0) grp.Bottom:Set(0)
@@ -707,7 +707,7 @@ function create_graph(parent,path,x1,y1,x2,y2)
     -- searching the highest value
     local maxvalue=0
     local periode=1
-    while periode<=data_nbr do
+    while periode<=(data_nbr + 1) do
         for index, dat in player do
             local val=return_value(periode,dat.index,path)  -- return the value
             if maxvalue<val then    maxvalue=val end
@@ -719,49 +719,51 @@ function create_graph(parent,path,x1,y1,x2,y2)
     --LOG('Max value pre adjust='..maxvalue)
     --maxvalue=arrange(maxvalue*1.02)
     maxvalue = math.ceil(AdjustValueScale(ReverseScaling(maxvalue)*1.05))
+    local gameTimeSeconds = GetGameTimeSeconds()
     -- calculate the scale factor on y
     local yScale=graphHeight/maxvalue
     --LOG('max value post adjust='..maxvalue..'; yScale='..yScale..'; y2='..y2..'; y1='..y1)
     --LOG("Value the highest:",maxvalue,"   final time saved:",scoreInterval*data_nbr,"   yScale:",yScale)
     -- drawing the axies/quadrillage
 
-    local finalSegmentTimeFraction = (GetGameTimeSeconds() - data_nbr * scoreData.interval) / scoreData.interval -- The final data point does not take the usual 30 seconds.
-    local dataSegmentSceenWidth=graphWidth / ((data_nbr - 1) + finalSegmentTimeFraction) -- Width of single data entry segment
+    local finalSegmentTimeFraction = (gameTimeSeconds - (data_nbr - 1) * scoreInterval) / scoreInterval -- The final data point does not take the usual 30 seconds.
+    local gameTimeInIntervals = data_nbr - 1 + finalSegmentTimeFraction
+    local dataSegmentSceenWidth=graphWidth / gameTimeInIntervals -- Width of single data entry segment
 
     local j=1
     local quadrillage_horiz={}
-    local nbr_quadrillage_horiz=6 -- how many horizontal axies
-    local nbr_quadrillage_vertical=8 -- how many vertical axies
-    while j<nbr_quadrillage_horiz do --i.e. this is the y axis, showing score or other value
-        local tmp=j
+    local valueAxisLabelCount=5 -- how many horizontal axies
+    local timeAxisLabelCount=7 -- how many vertical axies
+    while j<=valueAxisLabelCount do --i.e. this is the y axis, showing score or other value
         quadrillage_horiz[j]=Bitmap(grp)
+        local positionRatio = ((j-1)/(valueAxisLabelCount-1))
         quadrillage_horiz[j].Left:Set(function() return parent.Left() + x1 +1 end)
-        quadrillage_horiz[j].Top:Set(function() return parent.Top() +y2 - graphHeight*((tmp-1)/(nbr_quadrillage_horiz-2)) -1 end)
+        quadrillage_horiz[j].Top:Set(function() return parent.Top() +y2 - graphHeight*positionRatio -1 end)
         quadrillage_horiz[j].Right:Set(function() return parent.Left()+x2 +2 end)
-        quadrillage_horiz[j].Bottom:Set(function() return quadrillage_horiz[tmp].Top() +1  end)
+        quadrillage_horiz[j].Bottom:Set(function() return parent.Top() +y2 - graphHeight*positionRatio +1 end)
         quadrillage_horiz[j]:SetSolidColor("white")
         quadrillage_horiz[j].Depth:Set(grp.Depth)
 
-        quadrillage_horiz[j].title_label=UIUtil.CreateText(grp,FormatNumber(math.floor(ReverseScaling((j-1)/(nbr_quadrillage_horiz-2)*maxvalue))), 14, UIUtil.titleFont) --Reverse the scaled value for the y axis, i.e. want to show what the actual score is on the axis
+        quadrillage_horiz[j].title_label=UIUtil.CreateText(grp,FormatNumber(math.floor(ReverseScaling(positionRatio*maxvalue))), 14, UIUtil.titleFont) --Reverse the scaled value for the y axis, i.e. want to show what the actual score is on the axis
         quadrillage_horiz[j].title_label.Right:Set(parent.Left() + x1 -8)
-        quadrillage_horiz[j].title_label.Bottom:Set(parent.Top() +y2 - graphHeight*((tmp-1)/(nbr_quadrillage_horiz-2))+1)
+        quadrillage_horiz[j].title_label.Bottom:Set(parent.Top() +y2 - graphHeight*positionRatio+1)
         quadrillage_horiz[j].title_label:SetColor("white")
         j=j+1
     end
     local j=1
     local quadrillage_vertical={}
-    while j<nbr_quadrillage_vertical do --i.e. this is the x axis, showing time
-        local tmp=j
+    while j<=timeAxisLabelCount do --i.e. this is the x axis, showing time
         quadrillage_vertical[j]=Bitmap(grp)
-        quadrillage_vertical[j].Left:Set(function() return parent.Left()+x1 + graphWidth*((tmp-1)/(nbr_quadrillage_vertical-2))+1  end)
-        quadrillage_vertical[j].Top:Set(function() return parent.Left()+y1 -1  end)
-        quadrillage_vertical[j].Right:Set(function() return quadrillage_vertical[tmp].Left() +1 end)
+        local positionRatio = ((j-1)/(timeAxisLabelCount-1))
+        quadrillage_vertical[j].Left:Set(function() return parent.Left()+x1 + graphWidth*positionRatio+1 end)
+        quadrillage_vertical[j].Top:Set(function() return parent.Top()+y1 -1  end)
+        quadrillage_vertical[j].Right:Set(function() return parent.Left()+x1 + graphWidth*positionRatio+2 end)
         quadrillage_vertical[j].Bottom:Set(function() return parent.Top()+y2  end)
         quadrillage_vertical[j]:SetSolidColor("white")
         quadrillage_vertical[j].Depth:Set(grp.Depth)
 
-        quadrillage_vertical[j].title_label=UIUtil.CreateText(grp,tps_format((j-1)/(nbr_quadrillage_vertical-2)*data_nbr*scoreInterval), 14, UIUtil.titleFont)
-        quadrillage_vertical[j].title_label.Left:Set(parent.Left()+x1 + graphWidth*((tmp-1)/((nbr_quadrillage_vertical + finalSegmentTimeFraction)-2))+1)
+        quadrillage_vertical[j].title_label=UIUtil.CreateText(grp,tps_format((j-1)/(timeAxisLabelCount-1)*gameTimeSeconds), 14, UIUtil.titleFont)
+        quadrillage_vertical[j].title_label.Left:Set(parent.Left()+x1 + graphWidth*((j-1)/(timeAxisLabelCount-1))+1)
         quadrillage_vertical[j].title_label.Top:Set(parent.Top()+y2 +10)
         quadrillage_vertical[j].title_label:SetColor("white")
         j=j+1
@@ -813,9 +815,9 @@ function create_graph(parent,path,x1,y1,x2,y2)
         --displays the value when the mouse is over a graph
         bg.HandleEvent = function(self, event)
             local posX = function() return event.MouseX end -- - bg.Left() end
-            local posY = function() return event.MouseY  end-- - bg.Top() end
+            local posY = function() return event.MouseY end-- - bg.Top() end
             if posX()>x1 and posX()<x2 and posY()>y1 and posY()<y2 then
-                local  value = tps_format((posX()-x1)/graphWidth*scoreInterval*(data_nbr + finalSegmentTimeFraction)) .. " / " .. FormatNumber(math.floor(ReverseScaling((y2-posY())/yScale))) --This is the value that gets shown when we hover the mouse over any point in the graph, so want to reverse the scaled value so we see the actual value
+                local  value = tps_format((posX()-x1)/graphWidth*gameTimeSeconds) .. " / " .. FormatNumber(math.floor(ReverseScaling((y2-posY())/yScale))) --This is the value that gets shown when we hover the mouse over any point in the graph, so want to reverse the scaled value so we see the actual value
 
                 hoverInfo:Show()
                 infoText:SetText(value)
@@ -859,9 +861,15 @@ function create_graph(parent,path,x1,y1,x2,y2)
 
             local delta=0 -- counter for refresh and small halt
             local dataSegmentXStart = x
+            local currentDataSegmentScreenWidth
+            if (periode < data_nbr) then
+                currentDataSegmentScreenWidth = dataSegmentSceenWidth
+            else
+                currentDataSegmentScreenWidth = dataSegmentSceenWidth * finalSegmentTimeFraction
+            end
             while (x<(graphLeft + nbr*dataSegmentSceenWidth - size) and x < (graphRight - size))  do
-                local pixelStartRatio = (x - dataSegmentXStart) / dataSegmentSceenWidth -- ratio 0 to 1 between start and end of the data segment
-                local pixelEndRatio = math.min(1, ((x + size) - dataSegmentXStart) / dataSegmentSceenWidth) -- ratio 0 to 1 between start and end of the data segment
+                local pixelStartRatio = (x - dataSegmentXStart) / currentDataSegmentScreenWidth -- ratio 0 to 1 between start and end of the data segment
+                local pixelEndRatio = math.min(1, ((x + size) - dataSegmentXStart) / currentDataSegmentScreenWidth) -- ratio 0 to 1 between start and end of the data segment
                 for index,data in dataSegments do
                     local bitmap = bm(grp)
                     graph[index][x-x1] = bitmap
@@ -948,8 +956,14 @@ function create_graph(parent,path,x1,y1,x2,y2)
                 pixelTotalValueEnd = pixelTotalValueEnd + data.valEnd
             end
             local dataSegmentXStart = x
+            local currentDataSegmentScreenWidth
+            if (periode < data_nbr) then
+                currentDataSegmentScreenWidth = dataSegmentSceenWidth
+            else
+                currentDataSegmentScreenWidth = dataSegmentSceenWidth * finalSegmentTimeFraction
+            end
             while (x<(graphLeft + nbr*dataSegmentSceenWidth - size) and x < (graphRight - size))  do
-                local pixelStartRatio = (x - dataSegmentXStart) / dataSegmentSceenWidth -- ratio 0 to 1 between start and end of the data segment
+                local pixelStartRatio = (x - dataSegmentXStart) / currentDataSegmentScreenWidth -- ratio 0 to 1 between start and end of the data segment
                 local pixelTotalValue = (pixelTotalValueStart + (pixelTotalValueEnd - pixelTotalValueStart) * pixelStartRatio)
                 local valueAccumulator = 0
                 for index,data in dataSegments do
@@ -983,11 +997,10 @@ function create_graph(parent,path,x1,y1,x2,y2)
     local quadrillage_horiz2={}
     local nbr_quadrillage_horiz2=4 -- how many horizontal axies
     while j<nbr_quadrillage_horiz2 do
-        local tmp=j
         quadrillage_horiz2[j]={}
         quadrillage_horiz2[j].title_label=UIUtil.CreateText(grp,(math.floor((j-1)/(nbr_quadrillage_horiz2-2)*100)).." %", 14, UIUtil.titleFont)
         quadrillage_horiz2[j].title_label.Left:Set(parent.Left() + x2 +10)
-        quadrillage_horiz2[j].title_label.Bottom:Set(parent.Top() +y2 - (graphHeight-15)*((tmp-1)/(nbr_quadrillage_horiz2-2))+1)
+        quadrillage_horiz2[j].title_label.Bottom:Set(parent.Top() +y2 - (graphHeight-15)*((j-1)/(nbr_quadrillage_horiz2-2))+1)
         quadrillage_horiz2[j].title_label:SetColor("gray")
         j=j+1
     end
