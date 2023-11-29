@@ -23,6 +23,13 @@
 local EmitterProjectile = import("/lua/sim/defaultprojectiles.lua").EmitterProjectile
 local EffectTemplate = import("/lua/effecttemplates.lua")
 
+-- upvalue scope for performance
+local IsEnemy = IsEnemy
+local EntityCategoryContains = EntityCategoryContains
+
+-- pre-computed for performance
+local FlareCategories = categories.TACTICAL + categories.MISSILE
+
 --- AEON FLARE PROJECTILES
 ---@class AIMFlareProjectile : EmitterProjectile
 AIMFlareProjectile = ClassProjectile(EmitterProjectile) {
@@ -43,7 +50,14 @@ AIMFlareProjectile = ClassProjectile(EmitterProjectile) {
     ---@param other Projectile
     ---@return boolean
     OnCollisionCheck = function(self, other)
-        other.DamageData.Damage = 0
+        -- nullify damage amount when it hits the flare. We do this to prevent projectiles 
+        -- damaging the unit that fired the flare, as if it 'encapsulates' the damage
+        if EntityCategoryContains(FlareCategories, other) and
+            IsEnemy(self.Army, other.Army)
+        then
+            other.DamageData.DamageAmount = 0
+        end
+
         return true
     end,
 }
