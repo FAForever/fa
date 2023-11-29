@@ -399,12 +399,12 @@ UnitBlueprint{
                 Stack = true,
             },
             Label = "AntiMissile1",
-            MaxRadius = 20,
+            MaxRadius = 25,
             MuzzleSalvoDelay = 2.3,
             MuzzleSalvoSize = 2,
-            MuzzleVelocity = 15,
+            MuzzleVelocity = 18,
             ProjectileId = "/projectiles/AIMAntiMissile01/AIMAntiMissile01_proj.bp",
-            ProjectileLifetime = 3,
+            ProjectileLifetime = 3.5,
             RackBones = {
                 {
                     MuzzleBones = { "Projectile02" },
