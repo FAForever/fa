@@ -19,53 +19,53 @@ DEA0202 = ClassUnit(TAirUnit) {
         LeftBeam = ClassWeapon(TAirToAirLinkedRailgun) {},
         Bomb = ClassWeapon(TIFCarpetBombWeapon) {
 
-    IdleState = State (TIFCarpetBombWeapon.IdleState) {
-        Main = function(self)
-        TIFCarpetBombWeapon.IdleState.Main(self)
-    end,
-                
-    OnGotTarget = function(self)
-        if self.unit:IsUnitState('Moving') then
-           self.unit:SetSpeedMult(1.0)
-        else
-           self.unit:SetBreakOffTriggerMult(2.0)
-           self.unit:SetBreakOffDistanceMult(8.0)
-           self.unit:SetSpeedMult(0.67)
-           TIFCarpetBombWeapon.IdleState.OnGotTarget(self)
-        end
-    end,
-    OnFire = function(self)
-        self.unit:RotateWings(self:GetCurrentTarget())
-        TIFCarpetBombWeapon.IdleState.OnFire(self)
-    end,                
-    },
-            
-    OnFire = function(self)
-        self.unit:RotateWings(self:GetCurrentTarget())
-        TIFCarpetBombWeapon.OnFire(self)
-    end,
-                    
-    OnGotTarget = function(self)
-        if self.unit:IsUnitState('Moving') then
-           self.unit:SetSpeedMult(1.0)
-        else
-           self.unit:SetBreakOffTriggerMult(2.0)
-           self.unit:SetBreakOffDistanceMult(8.0)
-           self.unit:SetSpeedMult(0.67)
-           TIFCarpetBombWeapon.OnGotTarget(self)
-        end
-    end,
-        
-    OnLostTarget = function(self)
-        self.unit:SetBreakOffTriggerMult(1.0)
-        self.unit:SetBreakOffDistanceMult(1.0)
-        self.unit:SetSpeedMult(1.0)
-        TIFCarpetBombWeapon.OnLostTarget(self)
-    end,        
+            IdleState = State(TIFCarpetBombWeapon.IdleState) {
+                Main = function(self)
+                    TIFCarpetBombWeapon.IdleState.Main(self)
+                end,
+
+                OnGotTarget = function(self)
+                    if self.unit:IsUnitState('Moving') then
+                        self.unit:SetSpeedMult(1.0)
+                    else
+                        self.unit:SetBreakOffTriggerMult(2.0)
+                        self.unit:SetBreakOffDistanceMult(8.0)
+                        self.unit:SetSpeedMult(0.67)
+                        TIFCarpetBombWeapon.IdleState.OnGotTarget(self)
+                    end
+                end,
+                OnFire = function(self)
+                    self.unit:RotateWings(self:GetCurrentTarget())
+                    TIFCarpetBombWeapon.IdleState.OnFire(self)
+                end,
+            },
+
+            OnFire = function(self)
+                self.unit:RotateWings(self:GetCurrentTarget())
+                TIFCarpetBombWeapon.OnFire(self)
+            end,
+
+            OnGotTarget = function(self)
+                if self.unit:IsUnitState('Moving') then
+                    self.unit:SetSpeedMult(1.0)
+                else
+                    self.unit:SetBreakOffTriggerMult(2.0)
+                    self.unit:SetBreakOffDistanceMult(8.0)
+                    self.unit:SetSpeedMult(0.67)
+                    TIFCarpetBombWeapon.OnGotTarget(self)
+                end
+            end,
+
+            OnLostTarget = function(self)
+                self.unit:SetBreakOffTriggerMult(1.0)
+                self.unit:SetBreakOffDistanceMult(1.0)
+                self.unit:SetSpeedMult(1.0)
+                TIFCarpetBombWeapon.OnLostTarget(self)
+            end,
         },
     },
-    
-    
+
+
     RotateWings = function(self, target)
         if not self.LWingRotator then
             self.LWingRotator = CreateRotator(self, 'Left_Wing', 'y')
@@ -95,36 +95,36 @@ DEA0202 = ClassUnit(TAirUnit) {
             if self.RWingRotator then
                 self.RWingRotator:SetSpeed(wingSpeed)
                 self.RWingRotator:SetGoal(bomberAngle)
-            end                
-        end  
+            end
+        end
     end,
-    
+
     OnCreate = function(self)
         TAirUnit.OnCreate(self)
         self:ForkThread(self.MonitorWings)
     end,
-    
+
     MonitorWings = function(self)
         local airTargetRight
         local airTargetLeft
         while self and not self.Dead do
             local airTargetWeapon = self:GetWeaponByLabel('RightBeam')
-            if airTargetWeapon then     
+            if airTargetWeapon then
                 airTargetRight = airTargetWeapon:GetCurrentTarget()
             end
             airTargetWeapon = self:GetWeaponByLabel('LeftBeam')
             if airTargetWeapon then
                 airTargetLeft = airTargetWeapon:GetCurrentTarget()
             end
-            
+
             if airTargetRight then
-                self:RotateWings(airTargetRight)              
+                self:RotateWings(airTargetRight)
             elseif airTargetLeft then
-                self:RotateWings(airTargetLeft)             
+                self:RotateWings(airTargetLeft)
             else
                 self:RotateWings(nil)
             end
-            
+
             WaitSeconds(1)
         end
     end,
