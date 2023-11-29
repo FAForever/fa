@@ -82,6 +82,7 @@ local OnImpactDestroyCategories = categories.ANTIMISSILE * categories.ALLPROJECT
 ---@field OriginalTarget? Unit
 ---@field DamageData table
 ---@field CreatedByWeapon Weapon
+---@field IsRedirected? boolean
 Projectile = ClassProjectile(ProjectileMethods) {
     IsProjectile = true,
     DestroyOnImpact = true,
@@ -544,13 +545,9 @@ Projectile = ClassProjectile(ProjectileMethods) {
     OnLostTarget = function(self)
         local bp = self.Blueprint.Physics
         local trackTarget = bp.TrackTarget
-        if trackTarget then
+        local trackTargetGround = bp.TrackTargetGround
+        if trackTarget and (not trackTargetGround) then
             self.Trash:Add(ForkThread(self.RetargetThread, self))
-        end
-
-        local originalTarget = self.OriginalTarget
-        if originalTarget and not (originalTarget.Dead or IsDestroyed(originalTarget)) then
-            self:SetNewTarget(originalTarget)
         end
     end,
 
@@ -558,6 +555,7 @@ Projectile = ClassProjectile(ProjectileMethods) {
 
     ---@param self Projectile
     RetargetThread = function (self)
+        LOG("RetargetThread")
         local createdByWeapon = self.CreatedByWeapon
         if createdByWeapon then
             WaitTicks(0.2)
