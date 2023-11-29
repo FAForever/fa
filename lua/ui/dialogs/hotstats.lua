@@ -1,6 +1,8 @@
 local UIUtil = import("/lua/ui/uiutil.lua")
 local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local Layouter = LayoutHelpers.ReusedLayoutFor
 local EffectHelpers = import("/lua/maui/effecthelpers.lua")
+local pixelScaleFactor = import("/lua/user/prefs.lua").GetFromCurrentProfile("options").ui_scale or 1
 local Group = import("/lua/maui/group.lua").Group
 local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
 local Checkbox = import("/lua/maui/checkbox.lua").Checkbox
@@ -14,6 +16,7 @@ local page_active_graph = nil
 local page_active_graph2 = nil
 local create_anime_graph = nil
 local create_anime_graph2 = nil
+local graph_margins={Left= 110, Top= 120, Right=100, Bottom=160}
 local graph_pos={Left=function() return 110 end, Top=function() return 120 end, Right=function() return GetFrame(0).Right()-100 end, Bottom=function() return GetFrame(0).Bottom()-160 end}
 local bar_pos={Left=function() return 90 end, Top=function() return 140 end, Right=function() return GetFrame(0).Right()-60 end, Bottom=function() return GetFrame(0).Bottom()-150 end}
 
@@ -532,15 +535,15 @@ function page_graph(parent)
     page_active.Top:Set(0)
     page_active.Right:Set(0)
     page_active.Bottom:Set(0)
-    page_active_graph=create_graph(parent,info_dialog[5].path,graph_pos.Left(),graph_pos.Top(),graph_pos.Right(),graph_pos.Bottom())
+    page_active_graph=create_graph(parent,info_dialog[5].path,graph_margins.Left,graph_margins.Top,graph_margins.Right,graph_margins.Bottom)
     -- build the list box
     local graph_list={}
     local Combo = import("/lua/ui/controls/combo.lua").Combo
-    local BitmapCombo = import("/lua/ui/controls/combo.lua").BitmapCombo
+    -- local BitmapCombo = import("/lua/ui/controls/combo.lua").BitmapCombo
     combo_graph=Combo(page_active, 17, 10, nil, nil, "UI_Tab_Click_01", "UI_Tab_Rollover_01")
     combo_graph.Right:Set(function() return graph_pos.Right() end) --function() return 300 end)
-    combo_graph.Top:Set(function() return graph_pos.Top()-25 end) --function() return 300 end)
-    combo_graph.Width:Set(250)
+    combo_graph.Top:Set(function() return graph_pos.Top() - 25 * pixelScaleFactor end) --function() return 300 end)
+    combo_graph.Width:Set(250 * pixelScaleFactor)
     combo_graph.keyMap={}
     combo_graph.Key=1
     local i=0
@@ -560,7 +563,7 @@ function page_graph(parent)
         self.text=text
         self.path=info_dialog[index].path
         if page_active_graph then page_active_graph:Destroy() page_active_graph=false end
-        page_active_graph=create_graph(parent,info_dialog[index].path,graph_pos.Left(),graph_pos.Top(),graph_pos.Right(),graph_pos.Bottom())
+        page_active_graph=create_graph(parent,info_dialog[index].path,graph_margins.Left,graph_margins.Top,graph_margins.Right,graph_margins.Bottom)
         Title_score:SetText(LOC(info_dialog[index].name))
     end
     combo_graph.Key=2 -- here the defalut used value in key and in text
@@ -570,8 +573,8 @@ function page_graph(parent)
         local btn = UIUtil.CreateButtonStd(page_active, '/menus/main03/large', LOC(data.name), 14, 0, 0, "UI_Menu_MouseDown", "UI_Opt_Affirm_Over")
         local index = data.index
         --btn.Left:Set((math.min((x2-2*x1)/table.getsize(histo),200))*i+x1)
-        btn.Left:Set((((graph_pos.Right()-100)-btn.Width()*.5*(table.getsize(main_graph)))/(table.getsize(main_graph)+1)+btn.Width()*.5)*i+100)
-        btn.Top:Set(graph_pos.Bottom()+25)
+        btn.Left:Set((((graph_pos.Right()-100  * pixelScaleFactor)-btn.Width()*.5 * pixelScaleFactor*(table.getsize(main_graph)))/(table.getsize(main_graph)+1)+btn.Width()*.5 * pixelScaleFactor)*i+100 * pixelScaleFactor)
+        btn.Top:Set(graph_pos.Bottom()-25 * pixelScaleFactor)
         EffectHelpers.ScaleTo(btn, .5, 0)
         btn:UseAlphaHitTest(false)
         local tmp=data.path
@@ -579,7 +582,7 @@ function page_graph(parent)
         btn.OnClick = function(self, modifiers)
             if page_active_graph then page_active_graph:Destroy() page_active_graph=false end
             --LOG(repr(name))
-            page_active_graph=create_graph(parent,tmp,graph_pos.Left(),graph_pos.Top(),graph_pos.Right(),graph_pos.Bottom())
+            page_active_graph=create_graph(parent,tmp,graph_margins.Left,graph_margins.Top,graph_margins.Right,graph_margins.Bottom)
             Title_score:SetText(LOC(tmp_index))
             --LOG("-----------------------",tmp_index)
             return
@@ -635,13 +638,22 @@ end
 
 -- path is where is data is stored in scoredata
 -- xi,yi is the windows based on parent of the background
-function create_graph(parent,path,x1,y1,x2,y2)
-    local graphLeft = parent.Left() + x1
-    local graphTop = parent.Top() + y1
-    local graphWidth = x2 - x1
-    local graphHeight = y2 - y1
-    local graphRight = graphLeft + graphWidth
-    local graphBottom = graphTop + graphHeight
+function create_graph(parent,path,marginLeft,marginTop,marginRight,marginBottom)
+    local graphLeft = parent.Left() + marginLeft * pixelScaleFactor
+    local graphTop = parent.Top() + marginTop * pixelScaleFactor
+    local graphRight = parent.Right() - marginRight * pixelScaleFactor
+    local graphBottom = parent.Bottom() - marginBottom * pixelScaleFactor
+    local graphWidth = graphRight - graphLeft
+    local graphHeight = graphBottom - graphTop
+    LOG('Parent . L: ', parent.Left(), ' R: ', parent.Right(), ' T: ', parent.Top(), ' B: ', parent.Bottom())
+    LOG('Graph margins. L: ', graphLeft, ' R: ', graphRight, ' T: ', graphTop, ' B: ', graphBottom)
+
+    -- parent group
+    local grp=Group(parent)
+    Layouter(grp)
+        :OffsetIn(parent, marginLeft, marginTop, marginRight, marginBottom)
+        :End()
+    page_active_graph=grp
 
     local data_nbr=table.getsize(scoreData.history) -- data_nbr is the number of group of data saved. First one is at 00:00 and additional one every 30 seconds.
     --LOG("Number of data found:",data_nbr)
@@ -649,20 +661,12 @@ function create_graph(parent,path,x1,y1,x2,y2)
     -- scoreInterval is the time between to data saved
     local scoreInterval = scoreData.interval
     local player={} -- would be the name/color of the player in the left-top corner
-    -- parent group
-    local grp=Group(parent)
-    grp.Left:Set(0) grp.Top:Set(0) grp.Right:Set(0) grp.Bottom:Set(0)
-    page_active_graph=grp
     -- gray background that receive all
     bg=Bitmap(grp)
-    bg.Left:Set(function() return parent.Left() + x1 end)
-    bg.Top:Set(function() return parent.Top() + y1 - 2 end)
-    bg.Right:Set(function() return parent.Left() + x2 + 2 end)
-    bg.Bottom:Set(function() return parent.Top() + y2 + 1  end)
-    bg:SetSolidColor("gray")
+    LayoutHelpers.FillParent(bg,grp)
+    bg:SetSolidColor("4f4f4f")
     bg:SetAlpha(0.95)
-    bg2=Bitmap(grp)
-    LayoutHelpers.FillParent(bg2,bg)
+
     -- build parent-name in the left-top of the screen
     local armiesInfo = GetArmiesTable()
     local i=1
@@ -675,15 +679,17 @@ function create_graph(parent,path,x1,y1,x2,y2)
             player[i].color=v.color
             player[i].index=m
             -- Player name shadow
-            player[i].title_label=UIUtil.CreateText(grp,player[i].name, 14, UIUtil.titleFont)
-            player[i].title_label.Left:Set(x1+5)
-            player[i].title_label.Top:Set(y1 +23*(i-1)+5)
-            player[i].title_label:SetColor("black")
+            player[i].title_label_shadow=UIUtil.CreateText(grp,player[i].name, 14, UIUtil.titleFont)
+            LayoutHelpers.AtLeftIn(player[i].title_label_shadow, grp, 5)
+            LayoutHelpers.AtTopIn(player[i].title_label_shadow, grp, 23 * (i-1) + 5)
+            player[i].title_label_shadow:SetColor("black")
+            player[i].title_label_shadow:Depth(bg.Depth() + 3)
             -- Player name
-            player[i].title_label2=UIUtil.CreateText(grp,player[i].name, 14, UIUtil.titleFont)
-            player[i].title_label2.Left:Set(x1+4)
-            player[i].title_label2.Top:Set(y1 +23*(i-1)+4)
-            player[i].title_label2:SetColor(v.color)
+            player[i].title_label=UIUtil.CreateText(grp,player[i].name, 14, UIUtil.titleFont)
+            LayoutHelpers.AtLeftIn(player[i].title_label, grp, 4)
+            LayoutHelpers.AtTopIn(player[i].title_label, grp, 23 * (i-1) + 4)
+            player[i].title_label:SetColor(v.color)
+            player[i].title_label:Depth(bg.Depth() + 3)
             local acuKills = return_value(data_nbr + 1,player[i].index,{"units","cdr","kills"})
             if acuKills > 0 then
                 player[i].killIcon = {}
@@ -691,7 +697,7 @@ function create_graph(parent,path,x1,y1,x2,y2)
                     local index = kill
                     player[i].killIcon[index] = Bitmap(grp, UIUtil.UIFile('/hotstats/score/commander-kills-icon.dds'))
                     if index == 1 then
-                        LayoutHelpers.RightOf(player[i].killIcon[index], player[i].title_label)
+                        LayoutHelpers.RightOf(player[i].killIcon[index], player[i].title_label_shadow)
                     else
                         LayoutHelpers.RightOf(player[i].killIcon[index], player[i].killIcon[index-1])
                     end
@@ -734,41 +740,48 @@ function create_graph(parent,path,x1,y1,x2,y2)
     local bm = Bitmap
 
     local j=1
-    local valueAxisLabels={}
-    local valueAxisLabelCount=5 -- how many horizontal axies
-    local timeAxisLabelCount=7 -- how many vertical axies
-    while j<=valueAxisLabelCount do --i.e. this is the y axis, showing score or other value
-        valueAxisLabels[j]=bm(grp)
-        local positionRatio = ((j-1)/(valueAxisLabelCount-1))
-        valueAxisLabels[j].Left:Set(function() return parent.Left() + x1 +1 end)
-        valueAxisLabels[j].Top:Set(function() return parent.Top() +y2 - graphHeight*positionRatio -1 end)
-        valueAxisLabels[j].Right:Set(function() return parent.Left()+x2 +2 end)
-        valueAxisLabels[j].Bottom:Set(function() return parent.Top() +y2 - graphHeight*positionRatio +1 end)
-        valueAxisLabels[j]:SetSolidColor("white")
-        valueAxisLabels[j].Depth:Set(grp.Depth)
+    local valueAxisMarkers={}
+    local valueAxisMarkerCount=5 -- how many horizontal axies
+    local timeAxisMarkerCount=7 -- how many vertical axies
+    while j<=valueAxisMarkerCount do --i.e. this is the y axis, showing score or other value
+        valueAxisMarkers[j]=bm(grp)
+        local positionRatio = ((j-1)/(valueAxisMarkerCount-1))
+        Layouter(valueAxisMarkers[j])
+            :Height(2)
+            :FillHorizontally(grp)
+            :FromBottomWith(grp, positionRatio)
+            :Color("white")
+            :Under(grp)
+            :End()
 
-        valueAxisLabels[j].title_label=UIUtil.CreateText(grp,FormatNumber(math.floor(ReverseScaling(positionRatio*scaledMaxvalue))), 14, UIUtil.titleFont) --Reverse the scaled value for the y axis, i.e. want to show what the actual score is on the axis
-        valueAxisLabels[j].title_label.Right:Set(parent.Left() + x1 -8)
-        valueAxisLabels[j].title_label.Bottom:Set(parent.Top() +y2 - graphHeight*positionRatio+1)
-        valueAxisLabels[j].title_label:SetColor("white")
+        valueAxisMarkers[j].title_label=UIUtil.CreateText(grp,FormatNumber(math.floor(ReverseScaling(positionRatio*scaledMaxvalue))), 14, UIUtil.titleFont) --Reverse the scaled value for the y axis, i.e. want to show what the actual score is on the axis
+        Layouter(valueAxisMarkers[j].title_label)
+            :AnchorToLeft(grp, 8)
+            :FromBottomWith(grp, positionRatio)
+            :Color("white")
+            :End()
         j=j+1
     end
-    local j=1
-    local timeAxisLabels={}
-    while j<=timeAxisLabelCount do --i.e. this is the x axis, showing time
-        timeAxisLabels[j]=bm(grp)
-        local positionRatio = ((j-1)/(timeAxisLabelCount-1))
-        timeAxisLabels[j].Left:Set(function() return parent.Left()+x1 + graphWidth*positionRatio+1 end)
-        timeAxisLabels[j].Top:Set(function() return parent.Top()+y1 -1  end)
-        timeAxisLabels[j].Right:Set(function() return parent.Left()+x1 + graphWidth*positionRatio+2 end)
-        timeAxisLabels[j].Bottom:Set(function() return parent.Top()+y2  end)
-        timeAxisLabels[j]:SetSolidColor("white")
-        timeAxisLabels[j].Depth:Set(grp.Depth)
 
-        timeAxisLabels[j].title_label=UIUtil.CreateText(grp,tps_format((j-1)/(timeAxisLabelCount-1)*gameTimeSeconds), 14, UIUtil.titleFont)
-        timeAxisLabels[j].title_label.Left:Set(parent.Left()+x1 + graphWidth*((j-1)/(timeAxisLabelCount-1))+1)
-        timeAxisLabels[j].title_label.Top:Set(parent.Top()+y2 +10)
-        timeAxisLabels[j].title_label:SetColor("white")
+    local j=1
+    local timeAxisMarkers={}
+    while j<=timeAxisMarkerCount do --i.e. this is the x axis, showing time
+        timeAxisMarkers[j]=bm(grp)
+        local positionRatio = ((j-1)/(timeAxisMarkerCount-1))
+        Layouter(timeAxisMarkers[j])
+            :Width(2)
+            :FillVertically(grp)
+            :FromLeftWith(grp, positionRatio)
+            :Color("white")
+            :Under(grp)
+            :End()
+
+        timeAxisMarkers[j].title_label=UIUtil.CreateText(grp,tps_format((j-1)/(timeAxisMarkerCount-1)*gameTimeSeconds), 14, UIUtil.titleFont)
+        Layouter(timeAxisMarkers[j].title_label)
+            :AnchorToBottom(grp, 10)
+            :FromLeftWith(grp, positionRatio)
+            :Color("white")
+            :End()
         j=j+1
     end
 
@@ -783,7 +796,6 @@ function create_graph(parent,path,x1,y1,x2,y2)
 
         --if graph != nil and graph then graph:Destroy() graph=false end
         WaitSeconds(0.001) -- give time to refresh and displayed the background
-
         -- Display the mouse hover showing time and value at current position
         local hoverInfo = Group(grp)
         hoverInfo.Left:Set(0)
@@ -795,39 +807,39 @@ function create_graph(parent,path,x1,y1,x2,y2)
         infoPopupbg:SetSolidColor('white')
         infoPopupbg:SetAlpha(.6)
         infoPopupbg.Depth:Set(function() return hoverInfo.Depth()+1 end)
-        infoPopupbg.Width:Set(function() return hoverInfo.Width()+2 end)
-        infoPopupbg.Height:Set(function() return hoverInfo.Height()+2 end)
-        infoPopupbg.Left:Set(function() return hoverInfo.Left()-1 end)
-        infoPopupbg.Bottom:Set(function() return hoverInfo.Bottom() + 2 end)
+        infoPopupbg.Width:Set(function() return hoverInfo.Width()+2 * pixelScaleFactor end)
+        infoPopupbg.Height:Set(function() return hoverInfo.Height()+2 * pixelScaleFactor end)
+        infoPopupbg.Left:Set(function() return hoverInfo.Left()-1 * pixelScaleFactor end)
+        infoPopupbg.Bottom:Set(function() return hoverInfo.Bottom() + 2 * pixelScaleFactor end)
         local infoPopup = Bitmap(infoPopupbg)
         infoPopup:SetSolidColor('black')
         infoPopup:SetAlpha(.6)
         infoPopup.Depth:Set(function() return hoverInfo.Depth()+2 end)
-        infoPopup.Width:Set(function() return infoPopupbg.Width() - 4 end)
-        infoPopup.Height:Set(function() return infoPopupbg.Height() - 4 end)
-        infoPopup.Left:Set(function() return infoPopupbg.Left() + 2 end)
-        infoPopup.Bottom:Set(function() return infoPopupbg.Bottom() - 2 end)
+        infoPopup.Width:Set(function() return infoPopupbg.Width() - 4 * pixelScaleFactor end)
+        infoPopup.Height:Set(function() return infoPopupbg.Height() - 4 * pixelScaleFactor end)
+        infoPopup.Left:Set(function() return infoPopupbg.Left() + 2 * pixelScaleFactor end)
+        infoPopup.Bottom:Set(function() return infoPopupbg.Bottom() - 2 * pixelScaleFactor end)
         local infoText = UIUtil.CreateText(hoverInfo, '', 14, UIUtil.titleFont)
         infoText:SetColor("white")
         infoText:DisableHitTest()
-        infoText.Left:Set(function() return hoverInfo.Left() + 4 end)
-        infoText.Bottom:Set(function() return hoverInfo.Bottom() - 4 end)
+        infoText.Left:Set(function() return hoverInfo.Left() + 2 * pixelScaleFactor end)
+        infoText.Bottom:Set(function() return hoverInfo.Bottom() - 2 * pixelScaleFactor end)
         infoText.Depth:Set(function() return hoverInfo.Depth()+3 end)
         --displays the value when the mouse is over a graph
         bg.HandleEvent = function(self, event)
             local posX = function() return event.MouseX end -- - bg.Left() end
             local posY = function() return event.MouseY end -- - bg.Top() end
-            if posX()>x1 and posX()<x2 and posY()>y1 and posY()<y2 then
-                local timeAtCursor = (posX()-x1)/graphWidth*gameTimeSeconds
-                local valueAtCursor = math.floor(ReverseScaling((y2-posY()) / graphHeight * scaledMaxvalue)) --This is the value that gets shown when we hover the mouse over any point in the graph, so want to reverse the scaled value so we see the actual value
+            if posX()>grp.Left() and posX()<grp.Right() and posY()>grp.Top() and posY()<grp.Bottom() then
+                local timeAtCursor = (posX()-grp.Left())/graphWidth*gameTimeSeconds
+                local valueAtCursor = math.floor(ReverseScaling((grp.Bottom()-posY()) / graphHeight * scaledMaxvalue)) --This is the value that gets shown when we hover the mouse over any point in the graph, so want to reverse the scaled value so we see the actual value
                 local text = tps_format(timeAtCursor) .. " / " .. FormatNumber(valueAtCursor)
 
                 hoverInfo:Show()
                 infoText:SetText(text)
-                hoverInfo.Left:Set(function() return posX()-7 end)
-                hoverInfo.Bottom:Set(function() return posY() + 70 end)
-                hoverInfo.Width:Set(function() return infoText.Width() + 10 end)
-                hoverInfo.Height:Set(function() return infoText.Height() + 10 end)
+                hoverInfo.Left:Set(function() return posX() - 5 * pixelScaleFactor end)
+                hoverInfo.Bottom:Set(function() return posY() + 40 * pixelScaleFactor end)
+                hoverInfo.Width:Set(function() return infoText.Width() + 5 * pixelScaleFactor end)
+                hoverInfo.Height:Set(function() return infoText.Height() + 4 * pixelScaleFactor end)
             else
                 hoverInfo:Hide()
             end
@@ -847,7 +859,7 @@ function create_graph(parent,path,x1,y1,x2,y2)
         -- if not gamemain.GetReplayState() then current_player_index=GetFocusArmy() end
         if current_player_index == 0 then current_player_index = scoreData.focusArmyIndex end
 
-        local x = graphLeft  -- the current position on x
+        local x = 0  -- the current position on x
 
         local graph={} -- will containt a table for each line and each line will be a table of bitmap
         for index, dat in player do     graph[dat.index]={}     end -- init the different line
@@ -874,7 +886,7 @@ function create_graph(parent,path,x1,y1,x2,y2)
             else
                 currentDataSegmentScreenWidth = dataSegmentSceenWidth * finalSegmentTimeFraction
             end
-            while (x<(graphLeft + nbr*dataSegmentSceenWidth - size) and x < (graphRight - size))  do
+            while (x<(nbr*dataSegmentSceenWidth - size) and x < (graphWidth - size))  do
                 local pixelStartRatio = (x - dataSegmentXStart) / currentDataSegmentScreenWidth -- ratio 0 to 1 between start and end of the data segment
                 local pixelEndRatio = math.min(1, ((x + size) - dataSegmentXStart) / currentDataSegmentScreenWidth) -- ratio 0 to 1 between start and end of the data segment
                 for index,data in dataSegments do
@@ -883,13 +895,13 @@ function create_graph(parent,path,x1,y1,x2,y2)
                         extraSize = size
                     end
                     local bitmap = bm(grp)
-                    graph[index][x-x1] = bitmap
-                    bitmap.Left:Set(parent.Left() + x - extraSize)
-                    bitmap.Right:Set(bitmap.Left() + size + extraSize)
+                    graph[index][x] = bitmap
+                    bitmap.Left:Set(grp.Left() + x - extraSize)
+                    bitmap.Width:Set(size + extraSize)
                     local pixelStartVal = data.valStart + (data.valEnd - data.valStart) * pixelStartRatio
                     local pixelEndVal = data.valStart + (data.valEnd - data.valStart) * pixelEndRatio
-                    bitmap.Bottom:Set(graphBottom - math.min(pixelStartVal, pixelEndVal) * yScale + extraSize)
-                    bitmap.Top:Set(graphBottom - math.max(pixelStartVal, pixelEndVal) * yScale - size - extraSize)
+                    bitmap.Bottom:Set(grp.Bottom() - math.min(pixelStartVal, pixelEndVal) * yScale + extraSize)
+                    bitmap.Top:Set(grp.Bottom() - math.max(pixelStartVal, pixelEndVal) * yScale - size - extraSize)
                     bitmap:SetSolidColor(data.color)
                     bitmap:Depth(bg.Depth()+5)
                     bitmap:DisableHitTest()
@@ -910,14 +922,15 @@ function create_graph(parent,path,x1,y1,x2,y2)
         -- display the max values for each player
         local playerFinalValueLabel={}
         for index, dat in player do
-            playerFinalValueLabel[dat.index]={}
             local rawValue = return_value(data_nbr + 1,dat.index,path)
             val=math.floor(rawValue) --This is the value label that gets shown on the graph for each player, e.g. for the winner this will be the end-game high score achieved (not sure if this is the highest value at any point in the game or just the score at the end of the game)
-            playerFinalValueLabel[dat.index].title_label=UIUtil.CreateText(grp,FormatNumber(val), 14, UIUtil.titleFont)
-            playerFinalValueLabel[dat.index].title_label.Right:Set(graphRight)
-            playerFinalValueLabel[dat.index].title_label.Bottom:Set(graphBottom - AdjustValueScale(rawValue) * yScale)
-            playerFinalValueLabel[dat.index].title_label:SetColor(dat.color)
-            playerFinalValueLabel[dat.index].title_label:SetDropShadow(true)
+            playerFinalValueLabel[dat.index]=UIUtil.CreateText(grp,FormatNumber(val), 14, UIUtil.titleFont)
+            Layouter(playerFinalValueLabel[dat.index])
+                :Color(dat.color)
+                :AtRightIn(grp, 1)
+                :Bottom(function() return grp.Bottom() - AdjustValueScale(rawValue) * yScale  end)
+                :DropShadow(true)
+                :End()
         end
         -- pulse the player graph if not in replay
         if current_player_index > 0 and current_player_index != nil and graph[current_player_index] != nil then
@@ -928,9 +941,10 @@ function create_graph(parent,path,x1,y1,x2,y2)
         end
         end)
     end
+
     if create_anime_graph2 then KillThread(create_anime_graph2) end
         create_anime_graph2 = ForkThread(function()
-        local x=parent.Left()+ x1  -- the current position on x
+        local x=0  -- the current position on x
         local delta_refresh=graphWidth/(6*size) -- the distance in time between the smallest halt possible to make a refresh
         local delta=0 -- counter for refresh and small halt
         --if graph != nil and graph then graph:Destroy() graph=false end
@@ -972,21 +986,21 @@ function create_graph(parent,path,x1,y1,x2,y2)
             else
                 currentDataSegmentScreenWidth = dataSegmentSceenWidth * finalSegmentTimeFraction
             end
-            while (x<(graphLeft + nbr*dataSegmentSceenWidth - size) and x < (graphRight - size))  do
+            while (x<(nbr*dataSegmentSceenWidth - size) and x < (graphWidth - size))  do
                 local pixelStartRatio = (x - dataSegmentXStart) / currentDataSegmentScreenWidth -- ratio 0 to 1 between start and end of the data segment
                 local pixelTotalValue = (pixelTotalValueStart + (pixelTotalValueEnd - pixelTotalValueStart) * pixelStartRatio)
                 local valueAccumulator = 0
                 for index,data in dataSegments do
                     local pixelStartVal = (data.valStart + (data.valEnd - data.valStart) * pixelStartRatio)
                     local bitmap = bm(grp)
-                    graph2[index][x-x1]=bitmap
-                    bitmap.Left:Set(parent.Left() + x)
-                    bitmap.Right:Set(bitmap.Left() + size)
-                    bitmap.Top:Set(graphTop + (valueAccumulator + pixelStartVal) / pixelTotalValue  * graphHeight)
-                    bitmap.Bottom:Set(graphTop + (valueAccumulator) / pixelTotalValue * graphHeight)
+                    graph2[index][x]=bitmap
+                    bitmap.Left:Set(grp.Left() + x)
+                    bitmap.Width:Set(size)
+                    bitmap.Top:Set(grp.Top() + (valueAccumulator + pixelStartVal) / pixelTotalValue  * graphHeight)
+                    bitmap.Bottom:Set(grp.Top() + (valueAccumulator) / pixelTotalValue * graphHeight)
                     bitmap:SetSolidColor(data.color)
                     bitmap:Depth(bg.Depth()+1)
-                    bitmap:SetAlpha(.15)
+                    bitmap:SetAlpha(.2)
                     bitmap:DisableHitTest()
                     valueAccumulator = valueAccumulator + pixelStartVal
                 end
@@ -1009,8 +1023,8 @@ function create_graph(parent,path,x1,y1,x2,y2)
     while j<=percentageAxisLabelCount do
         percentageAxisLabels[j]={}
         percentageAxisLabels[j].title_label=UIUtil.CreateText(grp,(math.floor((j-1)/(percentageAxisLabelCount-1)*100)).." %", 14, UIUtil.titleFont)
-        percentageAxisLabels[j].title_label.Left:Set(parent.Left() + x2 +10)
-        percentageAxisLabels[j].title_label.Bottom:Set(parent.Top() +y2 - (graphHeight-15)*((j-1)/(percentageAxisLabelCount-1))+1)
+        percentageAxisLabels[j].title_label.Left:Set(grp.Right() +10)
+        percentageAxisLabels[j].title_label.Bottom:Set(grp.Bottom() - (graphHeight-15)*((j-1)/(percentageAxisLabelCount-1))+1)
         percentageAxisLabels[j].title_label:SetColor("gray")
         j=j+1
     end
