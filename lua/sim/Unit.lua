@@ -2658,7 +2658,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         end
 
         local guarded = self:GetGuardedUnit()
-        if guarded and not guarded.Dead then
+        if guarded and not (guarded.Dead or IsDestroyed(guarded) or (guarded:GetFractionComplete() >= 1.0 and EntityCategoryContains(categories.FACTORY, guarded))) then
             local focus = guarded:GetFocusUnit()
             if not focus then return end
 
