@@ -2658,9 +2658,10 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
 
         --- Given engineer A that is assisting engineer B in doing some task. This function fixes the following situations:
         ---
-        --- - Engineer B is damaged. Engineer B starts the construction of a factory. Engineer A is repairing 
+        --- - (1) Engineer B is damaged. Engineer B starts the construction of a factory. Engineer A is repairing 
         --- engineer B instead of assisting with the factory
-        --- - Engineer B is building a structure. Engineer A is building the structure too. Engineer B switches to reclaiming 
+        ---
+        --- - (2) Engineer B is building a structure. Engineer A is building the structure too. Engineer B switches to reclaiming 
         --- the same structure (before it is finished), but engineer A keeps on building the structure. This is a loop and the 
         --- structure will never cease to exist, the engineers are effectively stuck until the player intervenes
 
