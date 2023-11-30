@@ -39,9 +39,9 @@ local MathClamp = math.clamp
 ---@field WeaponPackState 'Packed' | 'Unpacked' | 'Unpacking' | 'Packing'
 DefaultProjectileWeapon = ClassWeapon(Weapon) {
 
-    FxRackChargeMuzzleFlash = { },
+    FxRackChargeMuzzleFlash = {},
     FxRackChargeMuzzleFlashScale = 1,
-    FxChargeMuzzleFlash = { },
+    FxChargeMuzzleFlash = {},
     FxChargeMuzzleFlashScale = 1,
     FxMuzzleFlash = {
         '/effects/emitters/default_muzzle_flash_01_emit.bp',
@@ -729,7 +729,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
             unit:SetBusy(false)
 
             -- at this point salvo is always done so reset the data
-            self.CurrentSalvoData = nil 
+            self.CurrentSalvoData = nil
 
             self:WaitForAndDestroyManips()
             local bp = self.Blueprint
@@ -925,9 +925,12 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
         WeaponAimWantEnabled = true,
 
         -- Render the fire recharge bar
-        RenderClockThread = function(self, rof)
+        ---@param self DefaultProjectileWeapon
+        ---@param rateOfFire number
+        RenderClockThread = function(self, rateOfFire)
             local unit = self.unit
-            local clockTime = math.round(21 * rof)
+            local clockTime = math.round(21 * rateOfFire)
+
             local totalTime = clockTime
             while clockTime >= 0 and
                 not self:BeenDestroyed() and
@@ -935,6 +938,32 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
                 unit:SetWorkProgress(self:GetFireClockPct())
                 clockTime = clockTime - 1
                 WaitSeconds(0.1)
+            end
+        end,
+
+        ---@param self DefaultProjectileWeapon
+        ---@param rateOfFire number
+        DisabledWhileReloadingThread = function(self, rateOfFire)
+
+            -- attempts to fix weapons that intercept projectiles to being stuck on a projectile while reloading, preventing
+            -- other weapons from targeting that projectile. Is a side effect of the blueprint field `DesiredShooterCap`. This
+            -- is the more aggressive variant of `TargetResetWhenReady` as it completely disables the weapon. Should only be used
+            -- for weapons that do not visually track, such as torpedo defenses
+
+            local reloadTime = math.floor(10 * rateOfFire) - 1
+            if reloadTime > 4 then
+                if IsDestroyed(self) then
+                    return
+                end
+
+                self:SetEnabled(false)
+                WaitTicks(reloadTime)
+
+                if IsDestroyed(self) then
+                    return
+                end
+
+                self:SetEnabled(true)
             end
         end,
 
@@ -1036,7 +1065,8 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
                             -- Generate UI notification for automatic nuke ping
                             local launchData = {
                                 army = self.Army - 1,
-                                location = (GetFocusArmy() == -1 or IsAlly(self.Army, GetFocusArmy())) and self:GetCurrentTargetPos() or nil
+                                location = (GetFocusArmy() == -1 or IsAlly(self.Army, GetFocusArmy())) and
+                                    self:GetCurrentTargetPos() or nil
                             }
                             if not Sync.NukeLaunchData then
                                 Sync.NukeLaunchData = {}
@@ -1079,18 +1109,8 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
             -- We can fire again after reaching here
             self.HaltFireOrdered = false
 
-            -- attempts to fix weapons that intercept projectiles to being stuck on a projectile while reloading, preventing
-            -- other weapons from targeting that projectile. Is a side effect of the blueprint field `DesiredShooterCap`. This
-            -- is the more aggressive variant of `TargetResetWhenReady` as it completely disables the weapon. Should only be used
-            -- for weapons that do not visually track, such as torpedo defenses
-
             if bp.DisableWhileReloading then
-                local reloadTime = math.floor(10 / self.Blueprint.RateOfFire) - 1
-                if reloadTime > 4 then
-                    self:SetEnabled(false)
-                    WaitTicks(reloadTime)
-                    self:SetEnabled(true)
-                end
+                unit.Trash:Add(ForkThread(self.DisabledWhileReloadingThread, self, 1 / rof))
             end
 
             -- Deal with the rack firing sequence
@@ -1255,8 +1275,8 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
         OnFire = function(self)
             LOG("WeaponPackingState OnFire " .. math.mod(GetGameTick(), 200))
             local bp = self.Blueprint
-            if  -- triggers when we use the distribute orders feature to distribute TMLs / SMLs launch orders
-                self.WeaponPackState == 'Unpacking' or
+            if -- triggers when we use the distribute orders feature to distribute TMLs / SMLs launch orders
+            self.WeaponPackState == 'Unpacking' or
 
                 -- triggers when we fired a missile but we're still waiting for the pack animation to finish
                 (bp.CountedProjectile and (not bp.ForceSingleFire))
