@@ -37,25 +37,25 @@ GameColors = {
     },
 
     PlayerColors = {
-        "FFe80a0a", -- (07 -> 01) Cybran red
-        "ff901427", -- (09 -> 02) dark red
-        "FFFF873E", -- (08 -> 03) Nomads orange
-        "ffb76518", -- (10 -> 04) new brown
-        "ffa79602", -- (11 -> 05) Sera golden
-        "fffafa00", -- (12 -> 06) new yellow
-        "ff9fd802", -- (18 -> 07) Order Green
-        "ff40bf40", -- (17 -> 08) mid green
-        "ff2e8b57", -- (16 -> 09) new green
-        "FF2F4F4F", -- (15 -> 10) olive (dark green)
-        "ff436eee", -- (01 -> 11) new blue1
-        "FF2929e1", -- (02 -> 12) UEF blue
-        "FF5F01A7", -- (03 -> 13) dark purple
-        "ff9161ff", -- (04 -> 14) purple
-        "ff66ffcc", -- (19 -> 15) aqua
-        "ffffffff", -- (13 -> 16) white
-        "ff616d7e", -- (14 -> 17) grey
-        "ffff88ff", -- (05 -> 18) pink
-        "ffff32ff", -- (06 -> 19) new fuschia
+        "FFe80a0a", -- (01) Cybran red
+        "ff901427", -- (02) dark red
+        "FFFF873E", -- (03) Nomads orange
+        "ffb76518", -- (04) new brown
+        "ffa79602", -- (05) Sera golden
+        "fffafa00", -- (06) new yellow
+        "ff9fd802", -- (07) Order Green
+        "ff40bf40", -- (08) mid green
+        "ff2e8b57", -- (09) new green
+        "FF2F4F4F", -- (10) olive (dark green)
+        "ff436eee", -- (11) new blue1
+        "FF2929e1", -- (12) UEF blue
+        "FF5F01A7", -- (13) dark purple
+        "ff9161ff", -- (14) purple
+        "ff66ffcc", -- (15) aqua
+        "ffffffff", -- (16) white
+        "ff616d7e", -- (17) grey
+        "ffff88ff", -- (18) pink
+        "ffff32ff", -- (19) new fuschia
     },
 
     TeamColorMode = {
