@@ -6,7 +6,7 @@ GameColors = {
 
     -- Default color order used for lobbies/TMM if not otherwise specified. Tightly coupled 
     -- with the ArmyColors and the PlayerColors tables.
-    LobbyColorOrder = {7, 9, 8, 10, 11, 12, 18, 17, 16, 15, 1, 2, 3, 4, 19, 13, 14, 5, 6}, -- warm vs cold 
+    LobbyColorOrder = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19 }, -- rainbow-like color for Fearghal
     TMMColorOrder = {1, 7, 2, 9, 4, 8, 19, 12, 17, 6, 18, 11, 3, 13, 14, 10}, -- warm vs cold 
 
     -- If you end up working with this file, suggestion to install the Color Highlight extension:
