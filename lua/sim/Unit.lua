@@ -2658,8 +2658,8 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
 
         --- Given engineer A that is assisting engineer B in doing some task. This function fixes the following situations:
         ---
-        --- - (1) Engineer B is damaged. Engineer B starts the construction of a factory. Engineer A is repairing 
-        --- engineer B instead of assisting with the factory
+        --- - (1) Engineer B is damaged. Engineer B starts the construction of a structure. Engineer A is repairing 
+        --- engineer B instead of assisting with the structure
         ---
         --- - (2) Engineer B is building a structure. Engineer A is building the structure too. Engineer B switches to reclaiming 
         --- the same structure (before it is finished), but engineer A keeps on building the structure. This is a loop and the 
