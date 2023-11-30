@@ -2651,16 +2651,37 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         end
     end,
 
+    --- This function is called when engineer A is assisting engineer B that is doing a task. It forces 
+    --- the assisting unit to perform the same task as the unit it is assisting.
     ---@param self Unit
     CheckAssistFocus = function(self)
-        if not (self and EntityCategoryContains(categories.ENGINEER, self)) or self.Dead then
+
+        --- Given engineer A that is assisting engineer B in doing some task. This function fixes the following situations:
+        ---
+        --- - (1) Engineer B is damaged. Engineer B starts the construction of a structure. Engineer A is repairing 
+        --- engineer B instead of assisting with the structure
+        ---
+        --- - (2) Engineer B is building a structure. Engineer A is building the structure too. Engineer B switches to reclaiming 
+        --- the same structure (before it is finished), but engineer A keeps on building the structure. This is a loop and the 
+        --- structure will never cease to exist, the engineers are effectively stuck until the player intervenes
+
+        if self.Dead or not (self and EntityCategoryContains(categories.ENGINEER, self)) then
             return
         end
 
         local guarded = self:GetGuardedUnit()
-        if guarded and not guarded.Dead then
+        if guarded and not (
+            -- do not shift focus for dead or destroyed units
+            guarded.Dead or
+            IsDestroyed(guarded) or
+
+            -- do not shift focus to the unit a factory is building
+            (guarded:GetFractionComplete() >= 1.0 and EntityCategoryContains(categories.FACTORY, guarded)))
+        then
             local focus = guarded:GetFocusUnit()
-            if not focus then return end
+            if not focus then
+                return
+            end
 
             local cmd
             if guarded:IsUnitState('Reclaiming') then
