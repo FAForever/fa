@@ -2653,14 +2653,23 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
 
     ---@param self Unit
     CheckAssistFocus = function(self)
-        if not (self and EntityCategoryContains(categories.ENGINEER, self)) or self.Dead then
+        if self.Dead or not (self and EntityCategoryContains(categories.ENGINEER, self)) then
             return
         end
 
         local guarded = self:GetGuardedUnit()
-        if guarded and not (guarded.Dead or IsDestroyed(guarded) or (guarded:GetFractionComplete() >= 1.0 and EntityCategoryContains(categories.FACTORY, guarded))) then
+        if guarded and not (
+            -- do not shift focus for dead or destroyed units
+            guarded.Dead or
+            IsDestroyed(guarded) or
+
+            -- do not shift focus to the unit a factory is building
+            (guarded:GetFractionComplete() >= 1.0 and EntityCategoryContains(categories.FACTORY, guarded)))
+        then
             local focus = guarded:GetFocusUnit()
-            if not focus then return end
+            if not focus then 
+                return 
+            end
 
             local cmd
             if guarded:IsUnitState('Reclaiming') then
