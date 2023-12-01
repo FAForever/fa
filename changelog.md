@@ -1,6 +1,101 @@
 
 Some sections of the changelog are available in other languages such as [French](changelog-fr.md) or [Russian](changelog-ru.md)
 
+# Game version 3776 (30th of November, 2023)
+
+Please refer to the notes of versions 3775 for the full patch notes.
+
+With gratitude to all those who took the time to report issues,
+
+Jip
+
+## Reworks
+
+- (#5681) Rework the impact effect of the Mercy
+
+The Mercy now has its own distinct tune! The effect clearly indicates the area in which units can expect to receive damage over time. Special thanks to Deribus for his extended efforts in creating this effect.
+
+- (#5695) Rework the appearance of the Janus
+
+The Janus has undergone various visual upgrades, including a new mesh and a normal map that better resembles the shape of the plane. This rework, carried out by Ejsstiil, is one of the first units to receive proper attention after the introduction of PBR. For those interested, the pull request provides a comprehensive explanation of all the changes made.
+
+- (#5705) Rework the mechanics of the flare-based anti-tactical missile weapons
+
+The flare was lacking due to changes introduced to tactical missiles. Specifically, the velocity of certain tactical missiles posed problems. To address this, the muzzle velocity of the flare and the radius in which flares can pull in missiles are increased. The number of missiles a single flare can pull in is reduced to 3. Visual elements are introduced to help the player understand which missiles are being pulled in by a flare. Notably, the Volcano is now on par with other stationary tactical missile defenses.
+
+## Features
+
+- (#5703) Add a highlight to the graph of the focus army
+
+This change makes it easier to identify your part of the graph in the score screen.
+
+- (#5640) Introduce additional roll off points for various (air) factories
+
+The Seraphim air factories have no roll-off point anymore, as it is the only factory that hovers above the ground. The Aeon air factories have a third roll-off point towards the front of the factory.
+
+## Bug fixes
+
+- (#5694) Fix the Striker being able to evade beams
+
+- (#5693) Add the bonus range to the Seraphim Mobile Missile launcher
+
+As intended by the balance team.
+
+- (#5705) Fix the Volcano being unable to intercept tactical missiles in a reliable fashion
+
+The tactical missiles would use the retargeting mechanic introduced with the balance patch to find a new target and home in on the target. That is of course not what is supposed to happen.
+
+- (#5706) Fix being unable to issue attack orders with your gunships while they are landed on water.
+
+- (#5706) Fix being able to dragbuild radars and sonars.
+
+- (#5706) The bomb of the Ahwassa now deals damage to friendlies again.
+
+- (#5640) Adjusting the process affinity on start up now supports CPUs with 24 or more logical cores
+
+- (#5709) Fix anti-projectile weapons being disabled forever
+
+This bug would only affect units with multiple weapons. In particular, torpedo defenses were prone to falling into this trap, turning them inert.
+
+- (#5707) Fix engineers being confused when a factory is damaged
+
+The cycle of engineers trying to 'repair' the unit that is under construction has been severed! The engineers now simply assist the factory, regardless of what else is going on.
+
+## Other changes
+
+- (#5700) Frametime independent pulse animation for UI
+
+- (#5706) Normalize the velocity of the Riot guns of the UEF
+
+The velocity would be all over the place. They now all have a steady muzzle velocity of 60.
+
+## Contributors
+
+With thanks to the following people who contributed through coding:
+
+- Jip
+- Pokute
+- Basilisk
+- Rowey
+- Deribus
+
+With thanks to the following people who contributed through model, texture, description and effect changes:
+
+- Deribus
+- Ejsstiil
+
+And, last but certainly not least - with thanks to those that took part in constructive discussions:
+
+- Deribus
+- MostLostNoob
+- MrBeast
+- Sladow
+- Aranei
+- Fluffy
+- Sorrydough
+- Cheeseberry
+- Nex37
+
 # Game version 3775 (19th of November, 2023)
 
 Another day, another patch!
