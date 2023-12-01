@@ -63,9 +63,6 @@ The cycle of engineers trying to 'repair' the unit that is under construction ha
 
 ## Other changes
 
-PRs that involve moving files around:
-(#5674, #5689, #5692)
-
 - (#5700) Frametime independent pulse animation for UI
 
 - (#5706) Normalize the velocity of the Riot guns of the UEF
