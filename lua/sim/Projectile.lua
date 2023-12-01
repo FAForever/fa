@@ -555,7 +555,6 @@ Projectile = ClassProjectile(ProjectileMethods) {
 
     ---@param self Projectile
     RetargetThread = function (self)
-        LOG("RetargetThread")
         local createdByWeapon = self.CreatedByWeapon
         if createdByWeapon then
             WaitTicks(0.2)
