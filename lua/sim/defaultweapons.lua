@@ -157,7 +157,6 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
     ---@param muzzle Bone
     ---@return Projectile
     CreateProjectileAtMuzzle = function(self, muzzle)
-        LOG("Created proj " .. math.mod(GetGameTick(), 200))
         local proj = self:CreateProjectileForWeapon(muzzle)
         if not proj or proj:BeenDestroyed() then
             return proj
@@ -648,7 +647,6 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
     -- Includes the manual selection of a new target, and the issuing of a move order
     ---@param self DefaultProjectileWeapon
     OnLostTarget = function(self)
-        LOG("Generic OnLostTarget " .. math.mod(GetGameTick(), 200))
         -- Issue 43
         -- Tell the owner this weapon has lost the target
         local unit = self.unit
@@ -723,7 +721,6 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
         WeaponAimWantEnabled = true,
 
         Main = function(self)
-            LOG("Entered IdleState " .. math.mod(GetGameTick(), 200))
             local unit = self.unit
             if unit.Dead then return end
             unit:SetBusy(false)
@@ -749,7 +746,6 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
         end,
 
         OnGotTarget = function(self)
-            LOG("IdleState OnGotTarget " .. math.mod(GetGameTick(), 200))
             Weapon.OnGotTarget(self)
 
             local unit = self.unit
@@ -776,7 +772,6 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
         end,
 
         OnFire = function(self)
-            LOG("IdleState OnFire " .. math.mod(GetGameTick(), 200))
 
             local bp = self.Blueprint
             if bp.WeaponUnpacks and self.WeaponPackState ~= 'Unpacked'
@@ -805,7 +800,6 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
         WeaponAimWantEnabled = true,
 
         Main = function(self)
-            LOG("Entered RackSalvoChargeState " .. math.mod(GetGameTick(), 200))
             local unit = self.unit
             local bp = self.Blueprint
             local notExclusive = bp.NotExclusive
@@ -829,7 +823,6 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
         end,
 
         OnFire = function(self)
-            LOG("RackSalvoChargeState OnFire " .. math.mod(GetGameTick(), 200))
         end,
     },
 
@@ -842,7 +835,6 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
         WeaponAimWantEnabled = true,
 
         Main = function(self)
-            LOG("Entered FireReadyState" .. math.mod(GetGameTick(), 200))
 
             -- We change the state on counted projectiles because we won't get another OnFire call.
             -- The second part is a hack for units with reload animations.  They have the same problem
@@ -909,7 +901,6 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
         end,
 
         OnFire = function(self)
-            LOG("FireReady OnFire" .. math.mod(GetGameTick(), 200))
             if self.WeaponCanFire then
                 ChangeState(self, self.RackSalvoFiringState)
             end
@@ -929,13 +920,12 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
         ---@param rateOfFire number
         RenderClockThread = function(self, rateOfFire)
             local unit = self.unit
-            local clockTime = math.round(21 * rateOfFire)
-
+            local clockTime = math.round(10 * rateOfFire)
             local totalTime = clockTime
             while clockTime >= 0 and
                 not self:BeenDestroyed() and
                 not unit.Dead do
-                unit:SetWorkProgress(self:GetFireClockPct())
+                unit:SetWorkProgress(1 - clockTime / totalTime)
                 clockTime = clockTime - 1
                 WaitSeconds(0.1)
             end
@@ -968,7 +958,6 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
         end,
 
         Main = function(self)
-            LOG("entered RackSalvoFiringState" .. math.mod(GetGameTick(), 200))
             local unit = self.unit
             unit:SetBusy(true)
             self:DestroyRecoilManips()
@@ -1137,13 +1126,11 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
         end,
 
         OnLostTarget = function(self)
-            LOG("FiringState OnLostTarget" .. math.mod(GetGameTick(), 200))
             self.HaltFireOrdered = true
         end,
 
         -- Set a bool so we won't fire if the target reticle is moved
         OnHaltFire = function(self)
-            LOG("FiringState OnHaltFire" .. math.mod(GetGameTick(), 200))
             self.HaltFireOrdered = true
         end,
     },
@@ -1157,7 +1144,6 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
         WeaponAimWantEnabled = true,
 
         Main = function(self)
-            LOG("Entered RackSalvoReloadState " .. math.mod(GetGameTick(), 200))
             local unit = self.unit
             unit:SetBusy(true)
             self:PlayFxRackSalvoReloadSequence()
@@ -1175,9 +1161,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
             self:WaitForAndDestroyManips()
 
             local hasTarget = self:WeaponHasTarget()
-            LOG(hasTarget)
             local canFire = self:CanFire()
-            LOG(canFire)
 
             if hasTarget and bp.RackSalvoChargeTime > 0 and canFire then
                 ChangeState(self, self.RackSalvoChargeState)
@@ -1191,11 +1175,9 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
         end,
 
         OnFire = function(self)
-            LOG("RackSalvoReloadState OnFire" .. math.mod(GetGameTick(), 200))
         end,
 
         OnLostTarget = function(self)
-            LOG("RackSalvoReloadState OnLostTarget" .. math.mod(GetGameTick(), 200))
             if self.ReloadEndTime then
                 WaitTicks(self.ReloadEndTime - GetGameTick())
             end
@@ -1211,7 +1193,6 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
         WeaponAimWantEnabled = false,
 
         Main = function(self)
-            LOG("Entered WeaponUnpackingState " .. math.mod(GetGameTick(), 200))
             local unit = self.unit
             unit:SetBusy(true)
 
@@ -1230,7 +1211,6 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
         end,
 
         OnFire = function(self)
-            LOG("WeaponUnpackingState OnFire " .. math.mod(GetGameTick(), 200))
         end,
     },
 
@@ -1244,7 +1224,6 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
 
         ---@param self DefaultProjectileWeapon
         Main = function(self)
-            LOG("Entered WeaponPackingState " .. math.mod(GetGameTick(), 200))
             local unit = self.unit
 
             if not IsDestroyed(unit) then
@@ -1264,7 +1243,6 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
 
         ---@param self DefaultProjectileWeapon
         OnGotTarget = function(self)
-            LOG("WeaponPackingState OnGotTarget " .. math.mod(GetGameTick(), 200))
             Weapon.OnGotTarget(self)
 
             local unit = self.unit
@@ -1279,7 +1257,6 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
 
         ---@param self DefaultProjectileWeapon
         OnFire = function(self)
-            LOG("WeaponPackingState OnFire " .. math.mod(GetGameTick(), 200))
             local bp = self.Blueprint
             if -- triggers when we use the distribute orders feature to distribute TMLs / SMLs launch orders
             self.WeaponPackState == 'Unpacking' or
