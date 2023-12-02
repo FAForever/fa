@@ -1171,7 +1171,9 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
             if notExclusive then
                 unit:SetBusy(false)
             end
+            self.ReloadEndTime = GetGameTick() + MATH_IRound(bp.RackSalvoReloadTime*10)
             WaitSeconds(bp.RackSalvoReloadTime)
+            self.ReloadEndTime = nil
 
             self:WaitForAndDestroyManips()
 
@@ -1193,6 +1195,13 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
 
         OnFire = function(self)
             LOG("RackSalvoReloadState OnFire" .. math.mod(GetGameTick(), 200))
+        end,
+
+        OnLostTarget = function(self)
+            LOG("RackSalvoReloadState OnLostTarget" .. math.mod(GetGameTick(), 200))
+            if self.ReloadEndTime then
+                WaitTicks(self.ReloadEndTime - GetGameTick())
+            end
         end,
     },
 
