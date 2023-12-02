@@ -36,6 +36,7 @@ UnitBlueprint{
         "BUILTBYTIER3COMMANDER",
         "BUILTBYTIER3ENGINEER",
         "CARRIER",
+        "CQUEMOV",
         "DRAGBUILD",
         "EXPERIMENTAL",
         "INTELLIGENCE",
