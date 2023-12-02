@@ -774,8 +774,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
         OnFire = function(self)
 
             local bp = self.Blueprint
-            if bp.WeaponUnpacks and self.WeaponPackState ~= 'Unpacked'
-                and (bp.WeaponUnpackLocksMotion or bp.WeaponUnpackAnimation) then
+            if bp.WeaponUnpacks and self.WeaponPackState ~= 'Unpacked' then
                 ChangeState(self, self.WeaponUnpackingState)
             else
                 if bp.RackSalvoChargeTime and bp.RackSalvoChargeTime > 0 then
@@ -815,7 +814,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
                 unit:SetBusy(true)
             end
 
-            if bp.RackSalvoFiresAfterCharge or bp.SkipReadyState then
+            if bp.RackSalvoFiresAfterCharge then
                 ChangeState(self, self.RackSalvoFiringState)
             else
                 ChangeState(self, self.RackSalvoFireReadyState)
