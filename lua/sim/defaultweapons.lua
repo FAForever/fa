@@ -1138,10 +1138,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
 
         OnLostTarget = function(self)
             LOG("FiringState OnLostTarget" .. math.mod(GetGameTick(), 200))
-            self.__base.OnLostTarget(self)
-            if self.Blueprint.WeaponUnpacks then
-                ChangeState(self, self.WeaponPackingState)
-            end
+            self.HaltFireOrdered = true
         end,
 
         -- Set a bool so we won't fire if the target reticle is moved
