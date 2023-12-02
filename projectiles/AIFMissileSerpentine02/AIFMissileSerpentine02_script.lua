@@ -1,8 +1,6 @@
---
--- Aeon Serpentine Missile
---
 local AMissileSerpentineProjectile = import("/lua/aeonprojectiles.lua").AMissileSerpentineProjectile
 
+--- Aeon Serpentine Missile
 ---@class AIFMissileSerpentine02 : AMissileSerpentineProjectile
 AIFMissileSerpentine02 = ClassProjectile(AMissileSerpentineProjectile) {
     FxWaterHitScale = 1.65,
@@ -13,5 +11,4 @@ AIFMissileSerpentine02 = ClassProjectile(AMissileSerpentineProjectile) {
         self.MoveThread = self.Trash:Add(ForkThread(self.MovementThread, self))
     end,
 }
-
 TypeClass = AIFMissileSerpentine02

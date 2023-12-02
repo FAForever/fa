@@ -893,8 +893,8 @@ UnitBlueprint{
             DamageFriendly = false,
             DamageRadius = 2.5,
             DamageType = "Overcharge",
-            EnergyRequired = 7500,
             DisplayName = "AutoOvercharge Cannon",
+            EnergyRequired = 7500,
             FireTargetLayerCapsTable = {
                 Land = "Land|Water|Seabed",
                 Seabed = "Land|Water|Seabed",

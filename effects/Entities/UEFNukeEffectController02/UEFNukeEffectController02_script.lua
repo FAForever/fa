@@ -9,7 +9,10 @@ local EffectTemplate = import("/lua/effecttemplates.lua")
 local Util = import("/lua/utilities.lua")
 local RandomFloat = Util.GetRandomFloat
 
+---@class UEFNukeEffectController01 : NullShell
 UEFNukeEffectController01 = Class(NullShell) {
+
+    ---@param self UEFNukeEffectController01
     EffectThread = function(self)
         local position = self:GetPosition()
         local army = self.Army
@@ -56,6 +59,7 @@ UEFNukeEffectController01 = Class(NullShell) {
         self:CreateGroundPlumeConvectionEffects(army)
     end,
 
+    ---@param self UEFNukeEffectController01
     CreateInitialFireballSmokeRing = function(self)
         local sides = 12
         local angle = (2 * math.pi) / sides
@@ -71,6 +75,7 @@ UEFNukeEffectController01 = Class(NullShell) {
         end
     end,
 
+    ---@param self UEFNukeEffectController01
     CreateOuterRingWaveSmokeRing = function(self)
         local sides = 32
         local angle = (2 * math.pi) / sides
@@ -95,6 +100,7 @@ UEFNukeEffectController01 = Class(NullShell) {
         end
     end,
 
+    ---@param self UEFNukeEffectController01
     CreateFlavorPlumes = function(self)
         local numProjectiles = 8
         local angle = (2 * math.pi) / numProjectiles
@@ -131,6 +137,7 @@ UEFNukeEffectController01 = Class(NullShell) {
         end
     end,
 
+    ---@param self UEFNukeEffectController01
     CreateHeadConvectionSpinners = function(self)
         local sides = 10
         local angle = (2 * math.pi) / sides
@@ -160,6 +167,8 @@ UEFNukeEffectController01 = Class(NullShell) {
         end
     end,
 
+    ---@param self UEFNukeEffectController01
+    ---@param army number
     CreateGroundPlumeConvectionEffects = function(self, army)
         for k, v in EffectTemplate.TNukeGroundConvectionEffects01 do
             CreateEmitterAtEntity(self, army, v)
@@ -185,5 +194,4 @@ UEFNukeEffectController01 = Class(NullShell) {
         end
     end,
 }
-
 TypeClass = UEFNukeEffectController01

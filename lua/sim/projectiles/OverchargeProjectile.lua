@@ -57,8 +57,8 @@ OverchargeProjectile = ClassSimple {
 
         local wep = launcher:GetWeaponByLabel('OverCharge')
         if not wep then
-             return
-            end
+            return
+        end
 
         if IsDestroyed(wep) then
             return
@@ -106,7 +106,7 @@ OverchargeProjectile = ClassSimple {
             local idealDamage = targetEntity:GetHealth()
             local maxHP = self:UnitsDetection(targetType, targetEntity)
             idealDamage = maxHP or data.minDamage
-            
+
             local targetCats = targetEntity:GetBlueprint().CategoriesHash
 
             -----SHIELDS------
@@ -132,7 +132,7 @@ OverchargeProjectile = ClassSimple {
             -- prevents radars blinks if there is less than 5k e in storage when OC hits the target
             if energyAvailable < 7500 then
                 damage = energyLimitDamage
-            end   
+            end
         end
         -- Turn the final damage into energy
         local drain = self:DamageAsEnergy(damage)
@@ -148,7 +148,8 @@ OverchargeProjectile = ClassSimple {
                 OCProjectiles[self.Army] = OCProjectiles[self.Army] - 1
                 launcher.EconDrain = nil
                 -- if oc depletes a mobile shield it kills the generator, vet counted, no wreck left
-                if killShieldUnit and targetEntity and not IsDestroyed(targetEntity) and (IsDestroyed(targetEntity.MyShield) or (not targetEntity.MyShield:IsUp())) then
+                if killShieldUnit and targetEntity and not IsDestroyed(targetEntity) and
+                    (IsDestroyed(targetEntity.MyShield) or (not targetEntity.MyShield:IsUp())) then
                     targetEntity:Kill(launcher, 'Overcharge', 2)
                     launcher:OnKilledUnit(targetEntity, targetEntity:GetVeterancyValue())
                 end
@@ -175,21 +176,23 @@ OverchargeProjectile = ClassSimple {
     ---@param targetEntity Unit
     ---@return number?
     UnitsDetection = function(self, targetType, targetEntity)
-     -- looking for units around target which are in splash range
+        -- looking for units around target which are in splash range
         local launcher = self.Launcher
         local maxHP = 0
 
-        for _, unit in UnitsInSphere(launcher, self:GetPosition(), 2.7, categories.MOBILE -categories.COMMAND) or {} do
-                if unit.MyShield and unit:GetHealth() + unit.MyShield:GetHealth() > maxHP then
-                    maxHP = unit:GetHealth() + unit.MyShield:GetHealth()
-                elseif unit:GetHealth() > maxHP then
-                    maxHP = unit:GetHealth()
-                end
+        for _, unit in UnitsInSphere(launcher, self:GetPosition(), 2.7, categories.MOBILE - categories.COMMAND) or {} do
+            if unit.MyShield and unit:GetHealth() + unit.MyShield:GetHealth() > maxHP then
+                maxHP = unit:GetHealth() + unit.MyShield:GetHealth()
+            elseif unit:GetHealth() > maxHP then
+                maxHP = unit:GetHealth()
+            end
         end
 
-        for _, unit in UnitsInSphere(launcher, self:GetPosition(), 13.2, categories.EXPERIMENTAL*categories.LAND*categories.MOBILE) or {} do
+        for _, unit in UnitsInSphere(launcher, self:GetPosition(), 13.2,
+            categories.EXPERIMENTAL * categories.LAND * categories.MOBILE) or {} do
             -- Special for fatty's shield
-            if EntityCategoryContains(categories.UEF, unit) and unit.MyShield._IsUp and unit.MyShield:GetMaxHealth() > maxHP then
+            if EntityCategoryContains(categories.UEF, unit) and unit.MyShield._IsUp and
+                unit.MyShield:GetMaxHealth() > maxHP then
                 maxHP = unit.MyShield:GetMaxHealth()
             elseif unit:GetHealth() > maxHP then
                 local distance = math.min(unit:GetBlueprint().SizeX, unit:GetBlueprint().SizeZ)

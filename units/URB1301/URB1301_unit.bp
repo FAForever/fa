@@ -6,7 +6,6 @@ UnitBlueprint{
             "Target02",
             "Target03",
             "Target04",
-            "URB1301",
         },
     },
     Adjacency = "T3PowerGeneratorAdjacencyBuffs",

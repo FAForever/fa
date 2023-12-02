@@ -83,7 +83,7 @@ UnitBlueprint{
             "<LOC ability_deathaoe>Volatile",
         },
         AnimationWalk = "/units/url0001/url0001_awalk02.sca",
-        AnimationWalkRate = 1.7,
+        AnimationWalkRate = 1.45,
         IdleEffects = {
             Seabed = {
                 Effects = {
@@ -982,7 +982,7 @@ UnitBlueprint{
                 Seabed = "Land|Water|Seabed",
                 Water = "Land|Water|Seabed",
             },
-            FiringTolerance = 0.25,
+            FiringTolerance = 1,
             HeadingArcCenter = 0,
             HeadingArcRange = 180,
             Label = "MLG",
@@ -1026,7 +1026,7 @@ UnitBlueprint{
             TurretPitchRange = 80,
             TurretPitchSpeed = 90,
             TurretYaw = 0,
-            TurretYawRange = 10,
+            TurretYawRange = 30,
             TurretYawSpeed = 110,
             Turreted = true,
             UseFiringSolutionInsteadOfAimBone = true,

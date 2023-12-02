@@ -1,8 +1,6 @@
--- Serpentine Missile 03
-
 local AMissileSerpentine02Projectile = import("/lua/aeonprojectiles.lua").AMissileSerpentine02Projectile
 
---- used by xas0306
+--- Serpentine Missile 03 : XAS0306
 ---@class AIFMissileTactical03: AMissileSerpentine02Projectile
 AIFMissileTactical03 = ClassProjectile(AMissileSerpentine02Projectile) {
 
@@ -25,5 +23,4 @@ AIFMissileTactical03 = ClassProjectile(AMissileSerpentine02Projectile) {
 TypeClass = AIFMissileTactical03
 
 --- backwards compatibility
-
 AIFMissileTactical02 = AIFMissileTactical03

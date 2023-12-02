@@ -307,7 +307,7 @@ local AIBrainEnergyComponent = ClassSimple {
 
     --- Adds an entity to the list of entities that receive callbacks when the energy storage is depleted or viable, expects the functions OnEnergyDepleted and OnEnergyViable on the unit
     ---@param self AIBrain
-    ---@param entity Unit | Shield
+    ---@param entity Unit
     AddEnergyDependingEntity = function(self, entity)
         self.EnergyDependingUnits[entity.EntityId] = entity
 
@@ -1420,7 +1420,7 @@ AIBrain = Class(AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerCom
     ---@param cats EntityCategory Unit's category, example: categories.TECH2 .
     ---@param needToBeIdle boolean true/false Unit has to be idle (appears to be not functional).
     ---@param requireBuilt? boolean true/false defaults to false which excludes units that are NOT finished (appears to be not functional).
-    ---@return table
+    ---@return Unit[]
     GetListOfUnits = function(self, cats, needToBeIdle, requireBuilt)
         -- defaults to false, prevent sending nil
         requireBuilt = requireBuilt or false

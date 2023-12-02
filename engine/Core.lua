@@ -101,7 +101,7 @@ end
 
 --- returns true if a unit category contains this unit
 ---@param category EntityCategory
----@param unit Unit | UserUnit | UnitId
+---@param unit Unit | UserUnit | UnitId | Projectile
 function EntityCategoryContains(category, unit)
 end
 

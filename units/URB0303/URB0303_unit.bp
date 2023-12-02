@@ -2,9 +2,10 @@ UnitBlueprint{
     Description = "<LOC urb0303_desc>Naval Factory HQ",
     AI = {
         TargetBones = {
-            "URB0303",
-            "B01",
-            "B06",
+            "B03", 
+            "B08",
+            "B28",
+            "B14",
         },
     },
     Audio = {
@@ -84,7 +85,7 @@ UnitBlueprint{
         BuildCostEnergy = 45000,
         BuildCostMass = 9500,
         BuildRate = 150,
-        BuildTime = 11250,
+        BuildTime = 21600,
         BuildableCategory = {
             "BUILTBYTIER3FACTORY CYBRAN MOBILE CONSTRUCTION",
             "BUILTBYTIER3FACTORY CYBRAN STRUCTURE NAVAL",
@@ -164,10 +165,10 @@ UnitBlueprint{
     SelectionThickness = 0.21,
     CollisionOffsetX = 0,
     CollisionOffsetY = -1,
-    CollisionOffsetZ = 0,
+    CollisionOffsetZ = -1,
     SizeX = 4,
     SizeY = 3,
-    SizeZ = 10,
+    SizeZ = 13,
     StrategicIconName = "icon_factoryhq3_naval",
     StrategicIconSortPriority = 210,
     Wreckage = {

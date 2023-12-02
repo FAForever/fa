@@ -1,9 +1,8 @@
--- Aeon T3 Mobile Artillery Projectile : ual0304
-
-
 local AArtilleryProjectile = import("/lua/aeonprojectiles.lua").AArtilleryProjectile
 local EffectTemplate = import("/lua/effecttemplates.lua")
 
+--- Aeon T3 Mobile Artillery Projectile : ual0304
+---@class AIFSonanceShell01 : AArtilleryProjectile
 AIFSonanceShell01 = ClassProjectile(AArtilleryProjectile) {
 
     PolyTrail = '/effects/emitters/aeon_sonicgun_trail_emit.bp',
@@ -12,6 +11,9 @@ AIFSonanceShell01 = ClassProjectile(AArtilleryProjectile) {
     FxImpactProp =  EffectTemplate.ASonanceWeaponHit02,
     FxImpactLand =  EffectTemplate.ASonanceWeaponHit02,
 
+    ---@param self AIFSonanceShell01
+    ---@param targetType string
+    ---@param targetEntity Prop|Unit
     OnImpact = function(self, targetType, targetEntity)
         AArtilleryProjectile.OnImpact(self, targetType, targetEntity)
 

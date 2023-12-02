@@ -209,7 +209,7 @@ function ResetOrderQueue(factory)
 end
 
 function ResetOrderQueues(units)
-    local factories = EntityCategoryFilterDown((categories.SHOWQUEUE * categories.STRUCTURE) + categories.FACTORY, units)
+    local factories = EntityCategoryFilterDown((categories.SHOWQUEUE * categories.STRUCTURE) + categories.FACTORY + categories.EXTERNALFACTORY, units)
     if factories[1] then
         Select.Hidden(function()
             for _, factory in factories do
@@ -1082,7 +1082,7 @@ end
 function OnRolloverHandler(button, state)
     local item = button.Data
 
-    if options.gui_draggable_queue ~= 0 and item.type == 'queuestack' and prevSelection and EntityCategoryContains(categories.FACTORY, prevSelection[1]) then
+    if options.gui_draggable_queue ~= 0 and item.type == 'queuestack' and prevSelection and EntityCategoryContains(categories.FACTORY + categories.EXTERNALFACTORY, prevSelection[1]) then
         if state == 'enter' then
             button.oldHandleEvent = button.HandleEvent
             -- If we have entered the button and are dragging something then we want to replace it with what we are dragging
@@ -1945,7 +1945,7 @@ function CreateExtraControls(controlType)
                 currentInfiniteQueueCheckStatus = false
             end
 
-            if not v:IsInCategory('FACTORY') then
+            if not (v:IsInCategory('FACTORY') or v:IsInCategory('EXTERNALFACTORY'))then
                 allFactories = false
             end
         end
@@ -2053,7 +2053,7 @@ function FormatData(unitData, type)
         -- or T1 -> T2 Support -> T3 Support is not supported yet by the code which actually
         -- looks up, stores, and executes the upgrade chain. This needs doing for 3654.
         local unitSelected = sortedOptions.selection[1]
-        local isStructure = EntityCategoryContains(categories.STRUCTURE - categories.FACTORY, unitSelected)
+        local isStructure = EntityCategoryContains(categories.STRUCTURE - (categories.FACTORY + categories.EXTERNALFACTORY), unitSelected)
 
         for i, units in sortedUnits do
             table.sort(units, SortFunc)
@@ -2496,7 +2496,7 @@ function OnSelection(buildableCategories, selection, isOldSelection)
         else
             allFactories = true
             for i, v in selection do
-                if not v:IsInCategory('FACTORY') then
+                if not (v:IsInCategory('FACTORY') or v:IsInCategory('EXTERNALFACTORY')) then
                     allFactories = false
                     break
                 end
@@ -2554,7 +2554,7 @@ function OnSelection(buildableCategories, selection, isOldSelection)
         -- Only honour CONSTRUCTIONSORTDOWN if we selected a factory
         local allFactory = true
         for i, v in selection do
-            if allFactory and not v:IsInCategory('FACTORY') then
+            if allFactory and not ( v:IsInCategory('FACTORY') or v:IsInCategory('EXTERNALFACTORY')) then
                 allFactory = false
             end
         end
@@ -2575,7 +2575,7 @@ function OnSelection(buildableCategories, selection, isOldSelection)
                     table.insert(sortedOptions.t1, unit)
                 end
             end
-        elseif EntityCategoryContains(categories.ENGINEER + categories.FACTORY, selection[1]) then
+        elseif EntityCategoryContains(categories.ENGINEER + categories.FACTORY + categories.EXTERNALFACTORY, selection[1]) then
             sortedOptions.t1 = EntityCategoryFilterDown(categories.TECH1, buildableUnits)
             sortedOptions.t2 = EntityCategoryFilterDown(categories.TECH2, buildableUnits)
             sortedOptions.t3 = EntityCategoryFilterDown(categories.TECH3, buildableUnits)

@@ -29,6 +29,7 @@ AIPlatoonAdaptiveAttackBehavior = Class(AIPlatoon) {
     Start = State {
 
         StateName = 'Start',
+        StateColor = '919B00',
 
         --- Initial state of any state machine
         ---@param self AIPlatoonAdaptiveAttackBehavior
@@ -60,11 +61,20 @@ AIPlatoonAdaptiveAttackBehavior = Class(AIPlatoon) {
             self:ChangeState(self.Searching)
             return
         end,
+
+        ---@param self AIPlatoonAdaptiveAttackBehavior
+        Visualize = function(self)
+            local position = self:GetPlatoonPosition()
+            if position then
+                DrawCircle(position, 10, self.StateColor)
+            end
+        end
     },
 
     Searching = State {
 
         StateName = 'Searching',
+        StateColor = '999999',
 
         --- The platoon searches for a target
         ---@param self AIPlatoonAdaptiveAttackBehavior
@@ -78,12 +88,12 @@ AIPlatoonAdaptiveAttackBehavior = Class(AIPlatoon) {
 
             self:Stop()
 
-            -- pick random unit
-            local units, unitCount = self:GetPlatoonUnits()
-            local unit = units[Random(1, unitCount)]
+            local position = self:GetPlatoonPosition()
+            if not position then
+                return
+            end
 
-            -- determine navigational label of that unit
-            local position = unit:GetPosition()
+            local units, unitCount = self:GetPlatoonUnits()
             local label, error = NavUtils.GetLabel('Land', position)
 
             if label then
@@ -115,14 +125,23 @@ AIPlatoonAdaptiveAttackBehavior = Class(AIPlatoon) {
                 return
             end
         end,
+
+        ---@param self AIPlatoonAdaptiveAttackBehavior
+        Visualize = function(self)
+            local position = self:GetPlatoonPosition()
+            if position then
+                DrawCircle(position, 10, self.StateColor)
+            end
+        end
     },
 
     Navigating = State {
 
         StateName = 'Navigating',
+        StateColor = 'ffffff',
 
         --- The platoon retreats from a threat
-        ---@param self AIPlatoonLandAssaultBehavior
+        ---@param self AIPlatoonAdaptiveAttackBehavior
         Main = function(self)
             self:LogDebug('Navigating')
             if IsDestroyed(self) then
@@ -143,14 +162,11 @@ AIPlatoonAdaptiveAttackBehavior = Class(AIPlatoon) {
             if not self.CurrentPlatoonThreat then
                 self.CurrentPlatoonThreat = self:CalculatePlatoonThreat('Surface', categories.ALLUNITS)
             end
-            local units = self:GetPlatoonUnits()
-            local origin
-            for _, v in units do
-                if v and not v.Dead then
-                    origin = v:GetPosition()
-                    break
-                end
+            local origin = self:GetPlatoonPosition()
+            if not origin then
+                return
             end
+
             local brain = self:GetBrain()
             local path, reason =  NavUtils.PathToWithThreatThreshold(self.MovementLayer, origin, destination, brain, NavUtils.ThreatFunctions.AntiSurface, 200, brain.IMAPConfig.Rings)
             if not path then
@@ -163,7 +179,7 @@ AIPlatoonAdaptiveAttackBehavior = Class(AIPlatoon) {
             local pathNodesCount = TableGetn(path)
             local attackFormation = false
             for i=1, pathNodesCount do
-                if self.Dead then
+                if IsDestroyed(self) then
                     return
                 end
                 local distEnd
@@ -198,18 +214,17 @@ AIPlatoonAdaptiveAttackBehavior = Class(AIPlatoon) {
                 local Stuck = 0
                 while not IsDestroyed(self) do
                     coroutine.yield(1)
-                    if self.Dead then
+                    if IsDestroyed(self) then
                         return
                     end
-                    
-                    local position
-                    units = self:GetPlatoonUnits()
-                    for _, v in units do
-                        if v and not v.Dead then
-                            position = v:GetPosition()
-                            break
-                        end
+
+                    local position = self:GetPlatoonPosition()
+                    if not position then
+                        return
                     end
+
+                    units = self:GetPlatoonUnits()
+
                     local threat = brain:GetThreatAtPosition(position, 1, true, 'AntiSurface')
                     if threat > 0 then
                         local homeBasePosition = brain.BuilderManagers[self.LocationType].Position or brain.BuilderManagers['MAIN'].Position
@@ -219,16 +234,16 @@ AIPlatoonAdaptiveAttackBehavior = Class(AIPlatoon) {
                             local threatTable = brain:GetThreatsAroundPosition(position, 1, true, 'AntiSurface')
                             local platoonThreat = self:CalculatePlatoonThreatAroundPosition('Surface', categories.MOBILE * categories.DIRECTFIRE - categories.SCOUT, position, 30)
                             local positionStatus = brain.GridPresence:GetInferredStatus(position)
-                            if positionStatus != 'Allied' or platoonThreat < threat then
+                            if positionStatus != 'Allied' and platoonThreat < threat then
                                 if threatTable and not TableEmpty(threatTable) then
                                     local info = threatTable[Random(1, TableGetn(threatTable))]
                                     self.ThreatToEvade = { info[1], GetSurfaceHeight(info[1], info[2]), info[2] }
-                                    self:LogDebug(string.format('We are going to retreat, enemy threat '..threat..' our threat '..platoonThreat..' position status '..positionStatus))
+                                    self:LogDebug(string.format('We are going to retreat, enemy threat '..threat..' our threat '..platoonThreat..' position status '.. tostring(positionStatus)))
                                     self:ChangeState(self.Retreating)
                                     return
                                 end
                             elseif positionStatus then
-                                self:LogDebug(string.format('We are going to attack, enemy threat '..threat..' our threat '..platoonThreat..' position status '..positionStatus))
+                                self:LogDebug(string.format('We are going to attack, enemy threat '..threat..' our threat '..platoonThreat..' position status '.. tostring(positionStatus)))
                             end
                         end
                     end
@@ -281,11 +296,21 @@ AIPlatoonAdaptiveAttackBehavior = Class(AIPlatoon) {
             self:ChangeState(self.Searching)
             return
         end,
+
+        ---@param self AIPlatoonAdaptiveAttackBehavior
+        Visualize = function(self)
+            local position = self:GetPlatoonPosition()
+            local target = self.LocationToAttack
+            if position and target then
+                DrawLinePop(position, target, self.StateColor)
+            end
+        end
     },
 
     Transporting = State {
 
         StateName = 'Transporting',
+        StateColor = 'FF00D4',
 
         --- The platoon avoids danger or attempts to reclaim if they are too close to avoid
         ---@param self AIPlatoonAdaptiveAttackBehavior
@@ -301,11 +326,20 @@ AIPlatoonAdaptiveAttackBehavior = Class(AIPlatoon) {
             end
             return
         end,
+
+        ---@param self AIPlatoonAdaptiveAttackBehavior
+        Visualize = function(self)
+            local position = self:GetPlatoonPosition()
+            if position then
+                DrawCircle(position, 10, self.StateColor)
+            end
+        end
     },
 
     AttackingTarget = State {
 
         StateName = 'AttackingTarget',
+        StateColor = 'ff0000',
 
         --- The platoon attacks the target
         ---@param self AIPlatoonAdaptiveAttackBehavior
@@ -333,6 +367,10 @@ AIPlatoonAdaptiveAttackBehavior = Class(AIPlatoon) {
 
                 -- check for threats
                 local position = self:GetPlatoonPosition()
+                if not position then
+                    return
+                end
+
                 local threat = brain:GetThreatAtPosition(position, 1, true, 'AntiSurface')
                 if threat > 0 then
                     local threatTable = brain:GetThreatsAroundPosition(position, 1, true, 'AntiSurface')
@@ -346,7 +384,7 @@ AIPlatoonAdaptiveAttackBehavior = Class(AIPlatoon) {
                             return
                         end
                     else
-                        self:LogDebug(string.format('Threat and we need to attack then since it is allied, status '..positionStatus))
+                        self:LogDebug(string.format('Threat and we need to attack then since it is allied, status '.. tostring(positionStatus)))
                     end
                 end
 
@@ -359,11 +397,21 @@ AIPlatoonAdaptiveAttackBehavior = Class(AIPlatoon) {
                 WaitTicks(10)
             end
         end,
+
+        ---@param self AIPlatoonAdaptiveAttackBehavior
+        Visualize = function(self)
+            local position = self:GetPlatoonPosition()
+            local target = self.LocationToAttack
+            if position and target then
+                DrawLinePop(position, target, self.StateColor)
+            end
+        end
     },
 
     RaidingOpportunity = State {
 
         StateName = 'RaidingOpportunity',
+        StateColor = 'ff0000',
 
         --- The platoon raids the opportunity it walked into
         ---@param self AIPlatoonAdaptiveAttackBehavior
@@ -396,7 +444,8 @@ AIPlatoonAdaptiveAttackBehavior = Class(AIPlatoon) {
             else
                 local scoutOffsetCount = TableGetn(scoutOffsets)
                 for k = 1, 3 do
-                    self:Patrol(scoutOffsets[Random(1, scoutOffsetCount)], 'Scout')
+                    local index = Random(1, scoutOffsetCount)
+                    self:Patrol(scoutOffsets[index], 'Scout')
                 end
             end
 
@@ -411,12 +460,16 @@ AIPlatoonAdaptiveAttackBehavior = Class(AIPlatoon) {
 
                 -- check for threats
                 local position = self:GetPlatoonPosition()
+                if not position then
+                    return
+                end
+
                 local threat = brain:GetThreatAtPosition(position, 1, true, 'AntiSurface')
                 if threat > 0 then
                     local threatTable = brain:GetThreatsAroundPosition(position, 1, true, 'AntiSurface')
                     local platoonThreat = self:CalculatePlatoonThreatAroundPosition('Surface', categories.MOBILE * categories.DIRECTFIRE - categories.SCOUT, position, 30)
                     local positionStatus = brain.GridPresence:GetInferredStatus(position)
-                    if positionStatus != 'Allied' or platoonThreat * 2 < threat then
+                    if positionStatus != 'Allied' and platoonThreat * 2 < threat then
                         if threatTable and not TableEmpty(threatTable) then
                             local info = threatTable[Random(1, TableGetn(threatTable))]
                             self.ThreatToEvade = { info[1], GetSurfaceHeight(info[1], info[2]), info[2] }
@@ -424,7 +477,7 @@ AIPlatoonAdaptiveAttackBehavior = Class(AIPlatoon) {
                             return
                         end
                     else
-                        self:LogDebug(string.format('Threat and we need to attack then since it is allied, status '..positionStatus))
+                        self:LogDebug(string.format('Threat and we need to attack then since it is allied, status '.. tostring(positionStatus)))
                     end
                 end
 
@@ -444,11 +497,21 @@ AIPlatoonAdaptiveAttackBehavior = Class(AIPlatoon) {
                 WaitTicks(10)
             end
         end,
+
+        ---@param self AIPlatoonAdaptiveAttackBehavior
+        Visualize = function(self)
+            local position = self:GetPlatoonPosition()
+            local target = self.OpportunityToRaid
+            if position and target then
+                DrawLinePop(position, target, self.StateColor)
+            end
+        end
     },
 
     Retreating = State {
 
         StateName = "Retreating",
+        StateColor = 'FFC400',
 
         --- The platoon retreats from a threat
         ---@param self AIPlatoonAdaptiveAttackBehavior
@@ -469,12 +532,16 @@ AIPlatoonAdaptiveAttackBehavior = Class(AIPlatoon) {
             local platoonUnits, platoonCount = self:GetPlatoonUnits()
 
             while not IsDestroyed(self) do
-
                 local position = self:GetPlatoonPosition()
+                if not position then
+                    return
+                end
+
                 local waypoint, error = NavUtils.RetreatDirectionFrom('Land', position, location, 40)
 
                 if not waypoint then
-                    -- do something
+                    LOG("Stuck, nowhere to retreat to!")
+                    self:ChangeState(self.Error)
                     return
                 end
 
@@ -485,6 +552,9 @@ AIPlatoonAdaptiveAttackBehavior = Class(AIPlatoon) {
 
                 while not IsDestroyed(self) do
                     local position = self:GetPlatoonPosition()
+                    if not position then
+                        return
+                    end
 
                     -- check if we're near our retreat point
                     local dx = position[1] - wx
@@ -510,6 +580,15 @@ AIPlatoonAdaptiveAttackBehavior = Class(AIPlatoon) {
                 WaitTicks(1)
             end
         end,
+
+        ---@param self AIPlatoonAdaptiveAttackBehavior
+        Visualize = function(self)
+            local position = self:GetPlatoonPosition()
+            local target = self.ThreatToEvade
+            if position and target then
+                DrawLinePop(position, target, self.StateColor)
+            end
+        end
     },
 
     -----------------------------------------------------------------

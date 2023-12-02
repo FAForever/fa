@@ -8,6 +8,7 @@ UnitBlueprint{
             "Target_Right_01",
             "Target_Right_02",
             "Target_Right_03",
+            "Attachpoint",
         },
     },
     Audio = {

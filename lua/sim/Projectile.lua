@@ -81,6 +81,8 @@ local OnImpactDestroyCategories = categories.ANTIMISSILE * categories.ALLPROJECT
 ---@field Launcher Unit
 ---@field OriginalTarget? Unit
 ---@field DamageData table
+---@field CreatedByWeapon Weapon
+---@field IsRedirected? boolean
 Projectile = ClassProjectile(ProjectileMethods) {
     IsProjectile = true,
     DestroyOnImpact = true,
@@ -184,7 +186,6 @@ Projectile = ClassProjectile(ProjectileMethods) {
     ---@param other Projectile The projectile we're checking the collision with
     ---@return boolean
     OnCollisionCheck = function(self, other)
-
         -- we can't hit our own
         if self.Army == other.Army then
             return false
@@ -223,7 +224,6 @@ Projectile = ClassProjectile(ProjectileMethods) {
     ---@param firingWeapon Weapon The weapon the beam originates from that we're checking the collision with
     ---@return boolean
     OnCollisionCheckWeapon = function(self, firingWeapon)
-
         -- we can't hit our own
         if self.Army == firingWeapon.Army then
             return false
@@ -237,7 +237,7 @@ Projectile = ClassProjectile(ProjectileMethods) {
         -- check for projectile types that require a defensive weapon to intercept
         if selfHashedCategories['TACTICAL'] or selfHashedCategories['STRATEGIC'] or selfHashedCategories['TORPEDO'] then
             if firingWeapon.Blueprint.WeaponCategory == 'Defense' then
-                return alliedCheck
+                return firingWeapon:GetCurrentTarget() == self
             else
                 return false
             end
@@ -291,7 +291,7 @@ Projectile = ClassProjectile(ProjectileMethods) {
             launcher:OnMissileIntercepted(self:GetCurrentTargetPosition(), instigator, self:GetPosition())
 
             -- keep track of the number of intercepted missiles
-            if not IsDestroyed(instigator) then
+            if not IsDestroyed(instigator) and instigator.GetStat then
                 instigator:UpdateStat('KILLS', instigator:GetStat('KILLS', 0).Value + 1)
             end
         end
@@ -388,38 +388,29 @@ Projectile = ClassProjectile(ProjectileMethods) {
                 false-- damage friendly flag
             )
 
-            -- try and spawn in a splat
-            if -- if we flat out hit the terrain
-            targetType == "Terrain" or
-
-                -- if we hit a unit that is on land
-                (targetEntity and targetEntity.Layer == "Land")
+            if (-- see if we need to spawn a splat
+                targetType == "Terrain" or
+                    targetEntity and targetEntity.Layer == "Land"
+                ) and (not blueprintDisplay.NoGenericScorchSplats)
             then
-                -- choose a splat to spawn
-                local splat = blueprintDisplay.ScorchSplat
-                if not splat then
-                    splat = ScorchSplatTextures[ ScorchSplatTexturesLookup[ScorchSplatTexturesLookupIndex] ]
-                    ScorchSplatTexturesLookupIndex = ScorchSplatTexturesLookupIndex + 1
-                    if ScorchSplatTexturesLookupIndex > ScorchSplatTexturesLookupCount then
-                        ScorchSplatTexturesLookupIndex = 1
-                    end
+                -- choose a splat
+                local splat = ScorchSplatTextures[ ScorchSplatTexturesLookup[ScorchSplatTexturesLookupIndex] ]
+                ScorchSplatTexturesLookupIndex = ScorchSplatTexturesLookupIndex + 1
+                if ScorchSplatTexturesLookupIndex > ScorchSplatTexturesLookupCount then
+                    ScorchSplatTexturesLookupIndex = 1
                 end
 
-                -- choose our radius to use
-                local altRadius = blueprintDisplay.ScorchSplatSize
-                if not altRadius then
-                    local damageMultiplier = (0.01 * damageData.DamageAmount)
-                    if damageMultiplier > 1 then
-                        damageMultiplier = 1
-                    end
-                    altRadius = damageMultiplier * radius
+                -- determine radius
+                local damageMultiplier = (0.01 * damageData.DamageAmount)
+                if damageMultiplier > 1 then
+                    damageMultiplier = 1
                 end
+                local altRadius = damageMultiplier * radius
 
                 -- radius, lod and lifetime share the same rng adjustment
                 local rngRadius = altRadius * Random()
 
                 CreateSplat(
-                -- position, orientation and the splat
                     vc, -- position
                     6.28 * Random(), -- heading
                     splat, -- splat
@@ -554,14 +545,42 @@ Projectile = ClassProjectile(ProjectileMethods) {
     OnLostTarget = function(self)
         local bp = self.Blueprint.Physics
         local trackTarget = bp.TrackTarget
-        local onLostTargetLifetime = bp.OnLostTargetLifetime or 0.5
-        if trackTarget then
-            self:SetLifetime(onLostTargetLifetime)
+        local trackTargetGround = bp.TrackTargetGround
+        if trackTarget and (not trackTargetGround) then
+            self.Trash:Add(ForkThread(self.RetargetThread, self))
+        end
+    end,
+
+    -- Lua functionality
+
+    ---@param self Projectile
+    RetargetThread = function (self)
+        local createdByWeapon = self.CreatedByWeapon
+        if createdByWeapon then
+            WaitTicks(0.2)
+
+            if IsDestroyed(self) then
+                return
+            end
+
+            if IsDestroyed(createdByWeapon) then
+                return
+            end
+
+            local target = createdByWeapon:GetCurrentTarget()
+            if target then
+                self:SetNewTarget(target)
+                self:TrackTarget(true)
+                return
+            end
         end
 
-        local originalTarget = self.OriginalTarget
-        if originalTarget and not (originalTarget.Dead or IsDestroyed(originalTarget)) then
-            self:SetNewTarget(originalTarget)
+        -- we couldn't find a new target, take us out
+        local bp = self.Blueprint.Physics
+        if bp.OnLostTargetLifetime then
+            self:SetLifetime(bp.OnLostTargetLifetime)
+        else
+            self:SetLifetime(0.5)
         end
     end,
 
@@ -953,7 +972,7 @@ Projectile = ClassProjectile(ProjectileMethods) {
     --#region C hooks
 
     --- Creates a child projectile that inherits the speed, orientation and launcher of its parent
-    ---@param blueprint ProjectileBlueprint
+    ---@param blueprint BlueprintId
     ---@return Projectile
     CreateChildProjectile = function(self, blueprint)
         local projectile = ProjectileMethods.CreateChildProjectile(self, blueprint)

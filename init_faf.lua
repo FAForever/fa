@@ -47,9 +47,14 @@ if SetProcessPriority and GetProcessAffinityMask and SetProcessAffinityMask then
     -- shift it if we think there are sufficient computing units
     local success, processAffinityMask, systemAffinityMask = GetProcessAffinityMask();
     if success then
+        -- system has 24 (logical) computing units or more, skip the first two computing units and all cores beyond the first 24. We need 
+        -- to do this because of floating point imprecision - we simply can't deduct a few digits to prevent using the first two cores
+        if systemAffinityMask >= 16777215 then
+            processAffinityMask = 16777212 -- 2 ^ 24 - 3 - 1
+
         -- system has 6 (logical) computing units or more, skip first two computing units
-        if (systemAffinityMask >= 63) and (processAffinityMask == systemAffinityMask) then
-            processAffinityMask = systemAffinityMask - 3
+        elseif (systemAffinityMask >= 63) then
+            processAffinityMask = systemAffinityMask - 4 -- 2 ^ 6 - 3 - 1
         end
 
         -- update the afinity mask
@@ -60,6 +65,8 @@ if SetProcessPriority and GetProcessAffinityMask and SetProcessAffinityMask then
             else
                 LOG("Process - Failed to adjust the process affinity, this may impact your framerate")
             end
+        else
+            LOG("Process - Failed to update the process affinity, this may impact your framerate")
         end
     else
         LOG("Process - Failed to retrieve the process affinity, this may impact your framerate")
@@ -601,12 +608,12 @@ for k, file in IoDir(shaderCache .. '/*') do
 end
 
 -- Clears out the shader cache as it takes a release to reset the shaders
--- local shaderCache = SHGetFolderPath('LOCAL_APPDATA') .. 'Gas Powered Games/Supreme Commander Forged Alliance/cache'
--- for k, file in IoDir(shaderCache .. '/*') do
---     if file != '.' and file != '..' then 
---         os.remove(shaderCache .. '/' .. file)
---     end
--- end
+local shaderCache = SHGetFolderPath('LOCAL_APPDATA') .. 'Gas Powered Games/Supreme Commander Forged Alliance/cache'
+for k, file in IoDir(shaderCache .. '/*') do
+    if file != '.' and file != '..' then 
+        os.remove(shaderCache .. '/' .. file)
+    end
+end
 
 -- typical FAF packages
 local allowedAssetsNxy = { }

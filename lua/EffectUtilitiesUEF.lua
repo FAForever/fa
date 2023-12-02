@@ -36,6 +36,11 @@ local BuilderSlicePeriod = 6
 function CreateDefaultBuildBeams(builder, unitBeingBuilt, buildEffectBones, buildEffectsBag)
     WaitTicks(1)
 
+    -- always confirm after waiting!
+    if IsDestroyed(unitBeingBuilt) then
+        return
+    end
+
     local ProjectileSetVelocity = ProjectileSetVelocity
     local WaitTicks = WaitTicks
 
@@ -84,7 +89,12 @@ end
 ---@param buildEffectsBag TrashBag The effects bag of the builder
 function CreateUEFBuildSliceBeams(builder, unitBeingBuilt, buildEffectBones, buildEffectsBag)
     WaitTicks(1)
-    
+
+    -- always confirm after waiting!
+    if IsDestroyed(unitBeingBuilt) then
+        return
+    end
+
     -- store as locals for performance
     local UnitGetFractionComplete = UnitGetFractionComplete
     local ProjectileSetVelocity = ProjectileSetVelocity

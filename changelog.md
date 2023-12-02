@@ -1,6 +1,447 @@
 
 Some sections of the changelog are available in other languages such as [French](changelog-fr.md) or [Russian](changelog-ru.md)
 
+# Game version 3776 (30th of November, 2023)
+
+Please refer to the notes of versions 3775 for the full patch notes.
+
+With gratitude to all those who took the time to report issues,
+
+Jip
+
+## Reworks
+
+- (#5681) Rework the impact effect of the Mercy
+
+The Mercy now has its own distinct tune! The effect clearly indicates the area in which units can expect to receive damage over time. Special thanks to Deribus for his extended efforts in creating this effect.
+
+- (#5695) Rework the appearance of the Janus
+
+The Janus has undergone various visual upgrades, including a new mesh and a normal map that better resembles the shape of the plane. This rework, carried out by Ejsstiil, is one of the first units to receive proper attention after the introduction of PBR. For those interested, the pull request provides a comprehensive explanation of all the changes made.
+
+- (#5705) Rework the mechanics of the flare-based anti-tactical missile weapons
+
+The flare was lacking due to changes introduced to tactical missiles. Specifically, the velocity of certain tactical missiles posed problems. To address this, the muzzle velocity of the flare and the radius in which flares can pull in missiles are increased. The number of missiles a single flare can pull in is reduced to 3. Visual elements are introduced to help the player understand which missiles are being pulled in by a flare. Notably, the Volcano is now on par with other stationary tactical missile defenses.
+
+## Features
+
+- (#5703) Add a highlight to the graph of the focus army
+
+This change makes it easier to identify your part of the graph in the score screen.
+
+- (#5640) Introduce additional roll off points for various (air) factories
+
+The Seraphim air factories have no roll-off point anymore, as it is the only factory that hovers above the ground. The Aeon air factories have a third roll-off point towards the front of the factory.
+
+## Bug fixes
+
+- (#5694) Fix the Striker being able to evade beams
+
+- (#5693) Add the bonus range to the Seraphim Mobile Missile launcher
+
+As intended by the balance team.
+
+- (#5705) Fix the Volcano being unable to intercept tactical missiles in a reliable fashion
+
+The tactical missiles would use the retargeting mechanic introduced with the balance patch to find a new target and home in on the target. That is of course not what is supposed to happen.
+
+- (#5706) Fix being unable to issue attack orders with your gunships while they are landed on water.
+
+- (#5706) Fix being able to dragbuild radars and sonars.
+
+- (#5706) The bomb of the Ahwassa now deals damage to friendlies again.
+
+- (#5640) Adjusting the process affinity on start up now supports CPUs with 24 or more logical cores
+
+- (#5709) Fix anti-projectile weapons being disabled forever
+
+This bug would only affect units with multiple weapons. In particular, torpedo defenses were prone to falling into this trap, turning them inert.
+
+- (#5707) Fix engineers being confused when a factory is damaged
+
+The cycle of engineers trying to 'repair' the unit that is under construction has been severed! The engineers now simply assist the factory, regardless of what else is going on.
+
+## Other changes
+
+- (#5700) Frametime independent pulse animation for UI
+
+- (#5706) Normalize the velocity of the Riot guns of the UEF
+
+The velocity would be all over the place. They now all have a steady muzzle velocity of 60.
+
+## Contributors
+
+With thanks to the following people who contributed through coding:
+
+- Jip
+- Pokute
+- Basilisk
+- Rowey
+- Deribus
+
+With thanks to the following people who contributed through model, texture, description and effect changes:
+
+- Deribus
+- Ejsstiil
+
+And, last but certainly not least - with thanks to those that took part in constructive discussions:
+
+- Deribus
+- MostLostNoob
+- MrBeast
+- Sladow
+- Aranei
+- Fluffy
+- Sorrydough
+- Cheeseberry
+- Nex37
+
+# Game version 3775 (19th of November, 2023)
+
+Another day, another patch!
+
+This time around, it's a balance patch involving changes across the board, with special attention to balancing air units. For the full details, we recommend visiting the patchnotes website. You can navigate there by clicking the 'Balance notes' button at the bottom of the changelog window.
+
+A special shoutout to Brutus5000, P4Block, Sheikah, Ravendel, and others who have extensively investigated and tried to fix problems with the ICE adapter.
+
+Thanks to all those who took the time to report issues and participate in feedback sessions.
+
+The balance team and Jip
+
+# Game version 3774 (15th of November, 2023)
+
+Please refer to the notes of versions 3771, 3772 and 3773 for the full patch notes.
+
+With gratitude to all those who took the time to report issues,
+
+Jip
+
+## Features
+
+- (#5655) Add a hotkey to interrupt the navigation of engineers
+
+This hotkey adds micro for easier utilization of the engineer's full build range.
+
+- (#5653) Improve the behavior of transports that want to pickup or dropoff units
+
+With thanks to Clyf the behavior of transports is more reliable. Transports will in general be quicker at picking up and dropping off units.
+
+## Bug fixes
+
+- (#5660) Fix various subtle bugs, improving overall stability
+
+## AI
+
+- (#5660) Fix the distance computation of pathing functions of the navigational mesh
+- (#5647) Add more debug functionality for state machines
+
+Add more debug functionality for state machines, making it easier for developers to visualize the state machine's objectives by selecting its units.
+
+## Graphics
+
+- (#5654) Further improve the appearance of water
+
+Specifically by reducing the 'light emitting,' 'glow,' or 'translucent' effect, especially on wrecks.
+
+## Other changes
+
+- Various annotation work of code has been completed
+- Various refactoring of file structures has been completed
+
+This is done in such a way that it won't break mods but it will allow us to refactor some of the classes to improve performance.
+
+## Contributors
+
+With thanks to the following people who contributed through coding:
+
+- Jip
+- BlackYps
+- Clyf
+- Rowey
+
+# Game version 3773 (2th of November, 2023)
+
+Please refer to the notes of versions 3771 and 3772 for the full patch notes.
+
+This patch ships with a new executable that tackles game crashes related to the memory address '0x0128CACC'.
+
+With gratitude to all those who took the time to report issues,
+
+Jip
+
+## Bug fixes
+
+- (#5636) Fix various bugs that could occur with AI
+- (#5635) Fix various bugs with the recent tactical missile changes
+
+The minimum range is increased for various weapons that fire tactical missiles. Reduced the chance that non-zigzagging tactical missiles end up missing their target.
+
+- (#5634) Revert an accidental parameter change related to path finding
+
+Units should now be as responsive as before.
+
+## Other changes
+
+- (#5626) Improve the code style of the navigational mesh
+
+## Contributors
+
+With thanks to the following people who contributed through coding:
+
+- Jip
+
+With thanks to the following people who contributed through binary patches:
+
+- Kionx
+- 4z0t
+
+And, last but certainly not least - with thanks to those that took part in constructive discussions:
+
+- Deribus
+- Sheikah
+- MostLostNoob
+- Maudlin27
+  
+# Game version 3772 (2th of November, 2023)
+
+Please refer to the notes of versions 3771 for the full patch notes.
+
+With gratitude to all those who took the time to report issues,
+
+Jip
+
+## Features
+
+- (#5545) Rebalance walls
+
+With the latest patch, walls now reliably block projectiles, even for units hiding behind them. This can create nearly impenetrable defenses without the need for artillery. In collaboration with the balance team, we have decided to implement the following balance changes for all wall sections:
+
+- - Health: X -> 500
+- - Health regeneration: X -> 0
+- - Build time: 20 -> 15
+- - Mass costs: 2 -> 3
+- - Energy costs: 10 -> 20
+
+- (#5617) Allow engineers to change orientation when done constructing
+
+In the recent patch, units no longer automatically rotate towards the optimal rollout point upon completing construction. The old behavior, especially noticeable with large units (e.g., naval units), could be quite awkward. We have decided to make an exception for engineers since an incorrectly oriented engineer at the beginning of the game can significantly slow down your build order, costing valuable seconds.
+
+### AI
+
+- (#5621) Enhance 'PathToWithThreatThreshold' to also provide information about the threat location.
+- (#5621) Introduce 'DirectionsFromWithThreatThreshold' for obtaining a secure landing location.
+- (#5607) Correct 'GetPositionsInRadius' to function with the updated coarse graph.
+- (#5608) The easy AI is now functioning properly once more.
+
+## Bug fixes
+
+- (#5618) Correct the missing energy requirements for Overcharge.
+- (#5606) Conceal the collapse button of the mass fabrication panel via the 'UI_ToggleGamePanels' console command.
+- (#5620) Experimental mobile factories can now be selected even during construction.
+- (#5619) Restore the trail to the projectiles of the AA guns on the Cybran carrier.
+- (#5615) Display the backpack on the UEF ACU when the bubble shield enhancement is installed.
+- (#5611) Display the backpack on the UEF ACU when the bubble shield enhancement is installed.
+- (#5610) Resolve factory modules (of mobile factories) causing issues with campaign objectives.
+
+Factory modules are still part of the objective. It is up to the author of the campaign map to exclude them in the script files if they do not want them to be part of the objective
+
+- (#5610) Correct Zappers (Cybran TMD) from intercepting the wrong missiles.
+- (#5622) Adjust the walking animation rate of various units.
+- (#52) Prevent the 'OnEnterWater' event of projectiles triggering when intersecting with the terrain.
+
+This bug was addressed through an assembly patch, which was noticeable due to water splashes appearing on land. This issue was particularly prominent with transports crashing, but it also affected the average projectile, creating small water splashes.
+
+- (#53) Rectify a bug where a projectile would intersect with the terrain while there's a unit in between.
+
+This bug was fixed through an assembly patch, primarily affecting the Stinger's ability to target specific, smaller units.
+
+## Other changes
+
+- (#5616) Reintroduce Seraphim-specific scorch splats.
+- (#5613) Include the damage of the Colossus' claw in the blueprint, facilitating modding.
+- (#5614) Store map-wide albedo for shaders in the same slot, simplifying terrain shader switching.
+
+## Contributors
+
+With thanks to the following people who contributed through coding:
+
+- Jip
+- BlackYps
+- Balthazar
+- HudoraX
+
+With thanks to the following people who contributed through binary patches:
+
+- hdt80bro
+
+And, last but certainly not least - with thanks to those that took part in constructive discussions:
+
+- Deribus
+- CheeseBerry
+- Sheikah
+- Magge
+- MostLostNoob
+- Fichom
+- Rowey
+  
+# Game version 3771 (29th of October, 2023)
+
+This patch introduces a number of significant changes that once again affect the game's balance. The balance team is fully aware of this and is actively making adjustments to adapt to these changes. If you want to experience the latest in balancing, be sure to select the FAF Beta game type when hosting a game; it contains the most up-to-date improvements. We encourage you to provide feedback on the forums and through Discord.
+
+The previous patch (version 3770) was a silent update designed to address several commonly exploited attack vectors. Notably, we closed an attack vector that had been causing issues in lobbies. As a consequence of this, side-loading Lua scripts to modify the lobby (such as Kyro's Lobby) or to alter strategic icons (ASI) is no longer functional. Fortunately, there are alternative UI mods available in the vault.
+
+Many have asked us why we don't allow changes to ASI and the uploading of such modifications to the vault. The reason is straightforward: the author clearly specifies in the description that no alterations are permitted. While we must respect this rule, it can certainly be frustrating. Personally, I take this as a reminder to appreciate software and assets with open source and/or Creative Commons licenses that permit people to create derivatives of the work.
+
+With thanks to all those that took the time to report issues and participate in feedback sessions,
+
+Jip
+
+## Features
+
+### Physically based rendering (PBR) shaders
+
+We've been discussing shader improvements, and the initial changes are now live! PBR shaders have been implemented for all units, including mods, when you have the high fidelity preset selected. The medium fidelity preset now corresponds to the previous high fidelity setting, while the low fidelity preset remains unaffected.
+
+This marks a significant advancement, and we're eagerly anticipating further graphic refinements in the upcoming developer iterations. If you happen to be a texture or 3D model artist, your assistance would be greatly appreciated in this endeavor. If you're interested in contributing, please don't hesitate to reach out to us via Discord.
+
+### Tactical missiles
+
+They've been left neglected for a considerable amount of time, but that's about to change! Tactical missiles have undergone extensive adjustments to enhance their behavior and introduce added immersion. These changes encompass alterations to their trajectory, velocity, and impact or intercept effects. Additionally, tactical missiles now exhibit distinct behaviors based on their faction:
+
+- UEF: Tactical missiles are capable of reaching significantly higher altitudes.
+- Cybran: Tactical missiles split into multiple projectiles when intercepted.
+- Aeon: Tactical missiles follow a zigzag pattern.
+- Seraphim: Tactical missiles can achieve higher speeds.
+
+### Anti-projectile weaponry
+
+In a previous developer iteration, we addressed the issue of excessive "overkill" by anti-projectile weaponry. The concept was to "lock on" to a projectile, which would prevent other anti-projectile weaponry from locking on, and this generally worked well. However, there were exceptions when a weapon maintained the lock on a projectile while reloading.
+
+To rectify this, all anti-torpedo and anti-tactical missile weaponry have now been modified to disable their weapons during the reloading process. This action prevents them from locking onto projectiles, effectively ensuring that the weapon won't block other nearby weapons to intercept projectiles. Consequently, Tactical Missile Defenses (TMDs) and Torpedo Defenses (TDs) now function with greater reliability and increased efficiency.
+
+### Mobile Factories feature
+
+In the previous developer iteration, we introduced the mobile factories feature, and thanks to valuable player feedback, we've made some improvements:
+
+ - You can now manage the queue of the factory module while selecting the primary unit. This includes queuing units and pausing or setting the factory module to repeat-build.
+ - For Aircraft Carriers, you can now simply right-click the deploy button to automatically deploy aircraft when they are created.
+ - You can now easily toggle between selecting the primary unit and the factory module. This simplifies the process of directly managing the factory module, such as setting rally points.
+
+And last but certainly not least, the CZAR now has the ability to build air units, following the same behavior as other aircraft carriers. 
+
+These enhancements aim to provide a smoother and more efficient experience when working with mobile factories, making gameplay even more enjoyable.
+
+### Navigational Mesh
+
+The navigational mesh plays a crucial role in helping AI entities decipher and navigate the map. In this iteration, we've implemented several improvements:
+
+- The computation of the navigational mesh now takes 20% to 30% less time compared to the previous version. On an average computer and a typical 20x20 map, it should now take no longer than two seconds to generate the navigational mesh. 
+- We've introduced a separate graph, similar to a mesh surface, for the actual pathfinding process. This adjustment reduces the overhead involved in generating paths, effectively skipping details that are irrelevant.
+
+As always, we strongly discourage direct code interactions with the navigational mesh. We encourage users to utilize the 'NavUtils' wrapper. Code that employs the 'NavUtils' wrapper remains unaffected functionally and automatically benefits from these runtime improvements.
+
+### Other features
+
+- (#5370) The toggle to select drones now selects all drones from all drone carriers within your selection.
+- (#5125) When you right-click a control group, it appends your current selection to the control group.
+- (#5487) Visualizations of raised platforms are now displayed when spawning units through the cheat menu.
+- (#5507) Translations for Simplified Chinese have been added.
+- (#5500) Descriptions concerning TMLs (Tactical Missile Launchers) and SMLs (Strategic Missile Launchers) have been updated.
+- (#5566) Descriptions for (S)ACU enhancements have been extended for better clarity and information.
+- (#5514) Introducing a wall overspill mechanic:
+
+Walls now have an overspill mechanic similar to Shields. They overspill damage to directly adjacent walls. The overspill factor is 20%. For example, when a wall receives 10 damage, all adjacent walls receive an additional 2 damage.
+
+- (#5524) Enhancing the performance of end-game score graphs:
+  
+The score graphs now render significantly faster, thanks to the same optimizations applied to speed up the simulation.
+
+- (#5541) Resource deposit detection in context-based templates while zoomed out:
+
+The search radius for resource deposits now extends as you zoom out, making it easier to build and place extractors.
+
+- (#5543) Context-based templates can now trigger on your build preview:
+
+Context-based templates no longer rely solely on the context of the mouse. With this change, they can also use the build preview as context to cycle through templates. For instance, if you have a Tech 2 Radar in the build preview, you can cycle to a build template that surrounds the radar with power generators. Similarly, if a Tech 3 Power Generator is in the build preview, you can switch to a build template that surrounds the power generator with air factories. These new templates can be edited, extended, or replaced just like the old ones.
+
+- (#5540) Assistance in copying the command queue of an engineer: 
+
+This feature can be enabled in the game options. When holding CTRL and assisting, an engineer will now copy the command queue of the engineer being assisted and apply it to your current selection, making engineering tasks more efficient.
+
+## Bug fixes
+
+- (#48) Resolving the bug where projectiles hit the wrong unit:
+
+In the past, there was an issue where projectiles would occasionally strike the incorrect unit. This problem typically occurred when a projectile intersected with multiple units at the same time, resulting in it targeting the last unit it encountered. This bug was particularly noticeable when walls positioned behind a point defense structure absorbed most of the damage, causing walls to function unreliably. The bug was most prevalent with tightly packed units or high-velocity projectiles, such as those fired by the Rhino.
+
+Fortunately, this bug has now been fixed. Projectiles will strike the first unit they encounter, ensuring that damage is allocated correctly. Consequently, damage will be absorbed by the walls in front of a point defense, enhancing the reliability of the gameplay. Additionally, small non-hover units can now effectively use walls as cover, as the walls will consistently absorb incoming damage.
+
+- (#5550) Corrected the issue of beam weapons sometimes missing various (hover) units.
+- Addressed the problem of missing targeting bones in various (structure) units.
+- Resolved a crash that occurred when distributing reclaim orders.
+- Fixed the Aeon tech 1 bomber (occasionally) flipping over its axis.
+- (#5553) The Seraphim regeneration field now properly applies to Transports.
+- (#5554) The Seraphim regeneration field now properly applies to Sparkies.
+- (#5254) Fix the Monkeylord from being able to get stuck.
+- (#5489) Units no longer rotate drastically as they finish building.
+
+This would happen when a change to the rally point would change the roll off point. Instead the unit now rolls off the direction it is facing and the next unit will be properly orientated again at the start of building
+
+- (#5503) Visual glitches related to the Ahwassa have been resolved.
+- (#5511) A bug that caused the map to be flattened has been fixed.
+- (#5522) The closing rate of the in-game menu screen for large displays has been adjusted to improve usability.
+- (#5538) Secondary ranges for the Seraphim Sniper and the Loyalist are now displayed.
+- (#5549) The breakoff distance for the Solace has been increased to enable proper bombing runs.
+- Icon mods now apply immediately without requiring the next game to be loaded. 
+
+However, this change is made at the expense of disabling asset prefetching during the lobby, ensuring that icon mods behave as users expect.
+
+- (#5537) Various bugs related to the Seraphim Sniper have been addressed.
+
+## Contributors
+
+With thanks to the following people who contributed through coding:
+
+- Clyfordv (clyf)
+- RabidPope
+- Jip
+- BlackYps
+- Balthazar
+- Relent0r
+- lL1l1 
+- Nex37
+- Pokute 
+- Basilisk3
+- Rowey
+
+With thanks to the following people who contributed through binary patches:
+
+- 4z0t
+- hdt80bro
+- Kionx
+
+With thanks to the following people who contributed through model, texture, description and effect changes:
+
+- HaoJun0823
+- Jip
+- Pokute
+- lL1l1 
+- Basilisk3
+- Fichom
+- Clyf
+
+And, last but certainly not least - with thanks to those that took part in constructive discussions:
+
+- BuildMoreRadar
+- CheeseBerry
+- Sheikah
+- Magge
+- MostLostNoob
+- Fichom
+- Clyf
+- BlackYps
+- Rowey
+
 # Game version 3769 (24th of September, 2023)
 
 Please refer to the notes of versions 3765, 3766, 3767 and 3768 for the full patch notes.
@@ -19,6 +460,14 @@ This specifically occurred with the tech 3 strategic submarines and the tech 3 S
 - (#5454) Fix a bug where distributed launch orders would not actually launch a missile.
 
 This occurs when you issue launch orders and then distribute them. The new, distributed orders are processed and removed from the queue even though no missiles have been launched.
+
+- (#5470) Fix a bug that cause gunships to have a tough time to hit certain units.
+
+When a projectile experiences multiple collisions in a single tick, the engine does not always return the first collision. This issue frequently occurs with gunships, as they often fire from nearly vertical angles. Consequently, gunships can appear to 'hit' the terrain, even though they clearly hit the intended unit. To resolve this, we now ensure that every collision box of every unit has a minimum length of 0.5 ogrids.
+
+- (#5470) Fix a bug that allows certain units to evade beams in specific conditions
+
+Most notable the Brick no longer has the ability to evade beams.
 
 ## Contributors
 

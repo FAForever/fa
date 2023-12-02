@@ -1,5 +1,4 @@
 local Buff = import("/lua/sim/buff.lua")
-local Entity = import("/lua/sim/Entity.lua").Entity
 
 ---@class ShieldEffectsComponent : Unit
 ---@field Trash TrashBag
@@ -41,9 +40,13 @@ ShieldEffectsComponent = ClassSimple {
 ---@class IntelComponent
 ---@field IntelStatus? UnitIntelStatus
 ---@field DetectedByHooks? fun(unit: Unit, army: number)[]
+---@field Blueprint Blueprint
+---@field Brain AIBrain
 IntelComponent = ClassSimple {
 
     ---@param self IntelComponent | Unit
+    ---@param builder Unit unused
+    ---@param layer Layer unused
     OnStopBeingBuilt = function(self, builder, layer)
         local intelBlueprint = self.Blueprint.Intel
         if intelBlueprint and intelBlueprint.State then
@@ -460,20 +463,23 @@ TreadComponent = ClassSimple {
     ---@param self Unit | TreadComponent
     ---@param treadMarks UnitBlueprintTreadMarks
     CreateTreads = function(self, treadMarks)
+        local trash = self.Trash
         local treadThreads = self.TreadThreads
-        if not treadThreads then
-            treadThreads = {}
-            self.TreadThreads = treadThreads
+        if not IsDestroyed(self) then
+            if not treadThreads then
+                treadThreads = {}
+                self.TreadThreads = treadThreads
 
-            for k, treadBlueprint in treadMarks do
-                local thread = ForkThread(self.CreateTreadsThread, self, treadBlueprint)
-                treadThreads[k] = thread
-                self.Trash:Add(thread)
-            end
-        else
-            self.TreadSuspend = nil
-            for _, thread in treadThreads do
-                ResumeThread(thread)
+                for k, treadBlueprint in treadMarks do
+                    local thread = ForkThread(self.CreateTreadsThread, self, treadBlueprint)
+                    treadThreads[k] = thread
+                    trash:Add(thread)
+                end
+            else
+                self.TreadSuspend = nil
+                for _, thread in treadThreads do
+                    ResumeThread(thread)
+                end
             end
         end
     end,
@@ -482,6 +488,7 @@ TreadComponent = ClassSimple {
     ---@param treads UnitBlueprintTreadMarks
     CreateTreadsThread = function(self, treads)
         -- trade memory for performance
+        local IsDestroyed = IsDestroyed
         local WaitTicks = WaitTicks
         local CreateSplatOnBone = CreateSplatOnBone
         local SuspendCurrentThread = SuspendCurrentThread
@@ -612,8 +619,8 @@ VeterancyComponent = ClassSimple {
     ---@param self VeterancyComponent | Unit
     ---@param instigator Unit
     ---@param amount number
-    ---@param vector Vector
-    ---@param damageType DamageType
+    ---@param vector Vector unused
+    ---@param damageType DamageType unused
     DoTakeDamage = function(self, instigator, amount, vector, damageType)
         amount = MathMin(amount, self:GetMaxHealth())
         self.VetDamageTaken = self.VetDamageTaken + amount
@@ -683,7 +690,7 @@ VeterancyComponent = ClassSimple {
                 upperThreshold = vetThresholds[currLevel + 1]
             end
 
-        -- case where we do have a limit (usual gameplay approach)
+            -- case where we do have a limit (usual gameplay approach)
         else
             if experience > diffThreshold then
                 experience = diffThreshold
@@ -770,7 +777,7 @@ VeterancyComponent = ClassSimple {
     ---@param self Unit | VeterancyComponent
     ---@param unitThatIsDying Unit
     ---@param experience? number
-    OnKilledUnit = function (self, unitThatIsDying, experience)
+    OnKilledUnit = function(self, unitThatIsDying, experience)
         if not experience then
             return
         end
@@ -820,38 +827,44 @@ VeterancyComponent = ClassSimple {
 ExternalFactoryComponent = ClassSimple {
 
     FactoryAttachBone = false,
+    BuildAttachBone = false,
 
     ---@param self Unit | ExternalFactoryComponent
+    ---@param builder Unit
+    ---@param layer Layer
     OnStopBeingBuilt = function(self, builder, layer)
         local blueprint = self.Blueprint
         if not self.FactoryAttachBone then
-            error(string.format("%s is not setup for an external factory: the unit does not have a field 'FactoryAttachBone'", blueprint.BlueprintId))
+            error(string.format("%s is not setup for an external factory: the unit does not have a field 'FactoryAttachBone'"
+                , blueprint.BlueprintId))
         end
 
-        if self.BuildAttachBone and self.BuildAttachBone == self.FactoryAttachBone then
-            error(string.format("%s is not setup for an external factory: the 'FactoryAttachBone' can not be the same as the 'BuildAttachBone'", blueprint.BlueprintId))
+        if not self.BuildAttachBone then
+            error(string.format("%s is not setup for an external factory: the unit does not have a field 'BuildAttachBone'"
+                , blueprint.BlueprintId))
+        end
+
+        if self.BuildAttachBone == self.FactoryAttachBone then
+            error(string.format("%s is not setup for an external factory: the 'FactoryAttachBone' can not be the same as the 'BuildAttachBone'"
+                , blueprint.BlueprintId))
         end
 
         if not blueprint.CategoriesHash['EXTERNALFACTORY'] then
-            error(string.format("%s is not setup for an external factory: the unit does not have a 'EXTERNALFACTORY' category", blueprint.BlueprintId))
+            error(string.format("%s is not setup for an external factory: the unit does not have a 'EXTERNALFACTORY' category"
+                , blueprint.BlueprintId))
         end
 
         local blueprintIdExternalFactory = blueprint.BlueprintId .. 'ef'
         if not __blueprints[blueprintIdExternalFactory] then
-            error(string.format("%s is not setup for an external factory: the external factory blueprint is not setup", blueprint.BlueprintId))
+            error(string.format("%s is not setup for an external factory: the external factory blueprint is not setup",
+                blueprint.BlueprintId))
         end
 
         -- create the factory somewhere completely unrelated
-        local position = self:GetPosition(self.FactoryAttachBone)
+        local px, py, pz = self:GetPositionXYZ(self.FactoryAttachBone)
 
-        -- we need to put an entity in between so that we can always click-select the 
-        -- factory. The 'CARRIER' category can prevent us from clicking on attached units
-        local entity = Entity({Owner = self})
-        self.Trash:Add(entity)
-        entity:AttachTo(self, self.FactoryAttachBone)
-
-        self.ExternalFactory = CreateUnitHPR(blueprintIdExternalFactory, self.Army, position[1], position[2], position[3], 0, 0, 0) --[[@as ExternalFactoryUnit]]
-        self.ExternalFactory:AttachTo(entity, -1)
+        self.ExternalFactory = CreateUnitHPR(blueprintIdExternalFactory, self.Army, px, py, pz, 0, 0, 0) --[[@as ExternalFactoryUnit]]
+        self.ExternalFactory:AttachTo(self, self.FactoryAttachBone)
         self.ExternalFactory:SetCreator(self)
         self:SetCreator(self.ExternalFactory)
         self.ExternalFactory:SetParent(self)
@@ -868,7 +881,7 @@ ExternalFactoryComponent = ClassSimple {
 
     ---@param self Unit | ExternalFactoryComponent
     ---@param new Layer
-    ---@param old Layer
+    ---@param old Layer unused
     OnLayerChange = function(self, new, old)
         if self.ExternalFactory then
             if new == 'Land' then
@@ -883,12 +896,46 @@ ExternalFactoryComponent = ClassSimple {
         end
     end,
 
+    ---@param self Unit | ExternalFactoryComponent
+    ---@param instigator Unit unused
+    ---@param type string unused
+    ---@param overkillRatio number unused
     OnKilled = function(self, instigator, type, overkillRatio)
         if not IsDestroyed(self.ExternalFactory) then
             self.ExternalFactory:SetBusy(true)
             self.ExternalFactory:SetBlockCommandQueue(true)
-            self.ExternalFactory:Destroy()
+            self.ExternalFactory:Kill()
         end
     end,
 
+    -- We need to wait one tick for our unit to "exist" before we can clear its orders
+    -- This prevents order graphs from being drawn from units inside the carrier
+    ---@param self Unit | ExternalFactoryComponent unused
+    ---@param unitBeingBuilt Unit
+    ClearOrdersThread = function(self, unitBeingBuilt)
+        WaitTicks(1)
+        IssueToUnitClearCommands(unitBeingBuilt)
+    end,
+
+    ---@param self Unit | ExternalFactoryComponent
+    ---@param unitBeingBuilt Unit
+    OnStopBuildWithStorage = function(self, unitBeingBuilt)
+        --local unitBeingBuilt = self.UnitBeingBuilt
+        unitBeingBuilt:DetachFrom(true)
+        self:DetachAll(self.BuildAttachBone)
+
+        if not self:TransportHasAvailableStorage() or self:GetStat('AutoDeploy', 0).Value == 1 then
+            unitBeingBuilt:ShowBone(0, true)
+        else
+            self:AddUnitToStorage(unitBeingBuilt)
+            ForkThread(self.ClearOrdersThread, self, unitBeingBuilt)
+        end
+
+        self:RequestRefreshUI()
+        ChangeState(self, self.IdleState)
+    end,
+
 }
+
+--- Moved for Backwards Compatibility
+local Entity = import("/lua/sim/entity.lua").Entity

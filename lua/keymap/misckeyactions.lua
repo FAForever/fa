@@ -529,6 +529,16 @@ LoadIntoTransports = function(clearCommands)
     SimCallback({ Func = 'LoadIntoTransports', Args = { ClearCommands = clearCommands or false } }, true)
 end
 
+AbortNavigation = function()
+    print("Interrupt pathfinding")
+    SimCallback({ Func = 'AbortNavigation', Args = { } }, true)
+end
+
+DischargeShields = function()
+    print("Discharge shields")
+    SimCallback({ Func = 'DischargeShields', Args = { } }, true)
+end
+
 AssignPlatoonBehaviorSilo = function()
     SimCallback({ Func = 'AIPlatoonSiloTacticalBehavior', Args = { Behavior = 'AIBehaviorTacticalSimple' } }, true)
 end

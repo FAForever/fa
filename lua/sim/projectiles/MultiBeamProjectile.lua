@@ -22,25 +22,26 @@
 
 
 local EmitterProjectile = import("/lua/sim/projectiles/emitterprojectile.lua").EmitterProjectile
-
+local EmitterProjectileOnCreate = EmitterProjectile.OnCreate
 -- upvalue scope for performance
 local CreateBeamEmitterOnEntity = CreateBeamEmitterOnEntity
 
 ---@class MultiBeamProjectile : EmitterProjectile
 MultiBeamProjectile = ClassProjectile(EmitterProjectile) {
 
-    Beams = {'/effects/emitters/default_beam_01_emit.bp',},
-    FxTrails = { },
+    Beams = { '/effects/emitters/default_beam_01_emit.bp', },
+    FxTrails = {},
 
     ---@param self MultiBeamProjectile
     OnCreate = function(self)
-        EmitterProjectile.OnCreate(self)
+        EmitterProjectileOnCreate(self)
 
         -- local scope for performance
         local army = self.Army
+        local beams = self.Beams
 
-        for k, v in self.Beams do
-            CreateBeamEmitterOnEntity(self, -1, army, v)
+        for i in beams do
+            CreateBeamEmitterOnEntity(self, -1, army, beams[i])
         end
     end,
 }

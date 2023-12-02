@@ -1,11 +1,9 @@
---
--- Spy Plane Launched Sonar Buoy Creator
---   This will create a temporary sonar buoy unit when it hits the water, nothing more.
---   This projectile is not intended to do damage.
---
 local TTorpedoShipProjectile = import("/lua/terranprojectiles.lua").TTorpedoShipProjectile
 
--- unused
+--- UNUSED
+--- ## Spy Plane Launched Sonar Buoy Creator
+--- - This will create a temporary sonar buoy unit when it hits the water, nothing more.
+--- - This projectile is not intended to do damage.
 ---@class TIMSonarBuoyCreator01 : TTorpedoShipProjectile
 TIMSonarBuoyCreator01 = ClassProjectile(TTorpedoShipProjectile) {
     FxSplashScale = 0.2,
@@ -24,7 +22,8 @@ TIMSonarBuoyCreator01 = ClassProjectile(TTorpedoShipProjectile) {
 		-- to prevent them from being shot out of the sky
 		self:SetCollisionShape('Sphere', 0, 0, 0, 1.0)
 	end,
-	
+
+    ---@param self TIMSonarBuoyCreator01
     OnEnterWater = function(self)
         for i in self.FxExitWaterEmitter do --splash
             CreateEmitterAtEntity(self,self.Army,self.FxExitWaterEmitter[i]):ScaleEmitter(self.FxSplashScale)
@@ -36,5 +35,4 @@ TIMSonarBuoyCreator01 = ClassProjectile(TTorpedoShipProjectile) {
         self:Destroy()
     end,
 }
-
 TypeClass = TIMSonarBuoyCreator01

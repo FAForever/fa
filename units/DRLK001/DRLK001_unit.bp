@@ -1,11 +1,5 @@
 UnitBlueprint{
     Description = "<LOC DRLK001_desc>Mobile Missile Anti-Air",
-    AI = {
-        TargetBones = {
-            "Turret01",
-            "DRLK001",
-        },
-    },
     Audio = {
         AmbientMove   = Sound { Bank = 'URL',        Cue = 'URL0107_Move_Loop',       LodCutoff = 'UnitMove_LodCutoff' },
         Construct     = Sound { Bank = 'URL',        Cue = 'URL0208_Construct_Start', LodCutoff = 'UnitMove_LodCutoff' },
@@ -54,7 +48,7 @@ UnitBlueprint{
             },
         },
         AnimationWalk = "/units/DRLK001/DRLK001_walk.sca",
-        AnimationWalkRate = 7,
+        AnimationWalkRate = 11,
         AttackReticleSize = 3,
         Mesh = {
             IconFadeInZoom = 130,
@@ -94,9 +88,9 @@ UnitBlueprint{
         UniformScale = 0.2,
     },
     Economy = {
-        BuildCostEnergy = 10000,
-        BuildCostMass = 800,
-        BuildTime = 4000,
+        BuildCostEnergy = 7500,
+        BuildCostMass = 600,
+        BuildTime = 3000,
         TeleportEnergyMod = 0.15,
         TeleportMassMod = 1,
         TeleportTimeMod = 0.01,
@@ -155,7 +149,7 @@ UnitBlueprint{
     SelectionSizeZ = 0.9,
     SelectionThickness = 0.62,
     SizeX = 1.2,
-    SizeY = 0.6,
+    SizeY = 0.9,
     SizeZ = 1.1,
     StrategicIconName = "icon_bot3_antiair",
     StrategicIconSortPriority = 155,

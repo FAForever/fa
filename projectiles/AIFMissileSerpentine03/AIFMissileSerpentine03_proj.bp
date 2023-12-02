@@ -53,12 +53,13 @@ ProjectileBlueprint {
         RotationalVelocityRange = 0,
         TrackTarget = true,
         TrackTargetGround = true,
-        TrackTargetGroundFuzziness = 2.0,
+        TrackTargetGroundFuzziness = 1.0,
+        TrackTargetGroundOffset = 2.0,
         TurnRate = 15,
         UseGravity = false,
         VelocityAlign = true,
 
         MaxZigZag = 5,
-        ZigZagFrequency = 1,
+        ZigZagFrequency = 1.0,
     },
 }

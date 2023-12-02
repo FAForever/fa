@@ -3,7 +3,6 @@ UnitBlueprint{
     AI = {
         GuardScanRadius = 26,
         InitialAutoMode = true,
-        TargetBones = { "Torso" },
     },
     Audio = {
         CaptureLoop                   = Sound { Bank = 'XSL',            Cue = 'XSL0001_Capture_Loop',      LodCutoff = 'UnitMove_LodCutoff' },

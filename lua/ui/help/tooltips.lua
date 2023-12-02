@@ -658,8 +658,8 @@ Tooltips = {
     },
 
     options_assist_to_copy_command_queue = {
-        title = "<LOC ASSIST_TO_UNPAUSE_TITLE>Assist to copy command queue",
-        description = "<LOC ASSIST_TO_UNPAUSE_DESCRIPTION>When enabled, engineers in the selection will try to copy the command queue of the engineer you issue an assist order for. \r\n\r\nRequires you to hold 'Control'",
+        title = "<LOC ASSIST_TO_COPY_TITLE>Assist to copy command queue",
+        description = "<LOC ASSIST_TO_COPY_DESCRIPTION>When enabled, engineers in the selection will try to copy the command queue of the engineer you issue an assist order for. \r\n\r\nRequires you to hold 'Control'",
     },
 
     options_mp_taunt_head = {

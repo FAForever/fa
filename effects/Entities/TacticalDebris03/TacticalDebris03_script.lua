@@ -1,4 +1,3 @@
-
 local GenericDebris = import("/lua/genericdebris.lua").GenericDebris
 
 ---@class TacticalDebris03 : GenericDebris

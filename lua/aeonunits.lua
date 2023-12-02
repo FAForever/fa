@@ -1,12 +1,9 @@
---****************************************************************************
---**
---**  File     :  /lua/aeonunits.lua
---**  Author(s): John Comes, Gordon Duclos
---**
---**  Summary  :
---**
---**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
---****************************************************************************
+------------------------------------------------------------------------------
+-- File     :  /lua/aeonunits.lua
+-- Author(s): John Comes, Gordon Duclos
+-- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+------------------------------------------------------------------------------
+
 ----------------------------------------------------------------------------
 -- AEON DEFAULT UNITS
 ----------------------------------------------------------------------------
@@ -18,15 +15,16 @@ local LandFactoryUnit = DefaultUnitsFile.LandFactoryUnit
 local SeaFactoryUnit = DefaultUnitsFile.SeaFactoryUnit
 local ShieldStructureUnit = DefaultUnitsFile.ShieldStructureUnit
 local RadarJammerUnit = DefaultUnitsFile.RadarJammerUnit
-
 local EffectTemplate = import("/lua/effecttemplates.lua")
 local EffectUtil = import("/lua/effectutilities.lua")
 local CreateAeonFactoryBuildingEffects = EffectUtil.CreateAeonFactoryBuildingEffects
+local CreateAeonConstructionUnitBuildingEffects = EffectUtil.CreateAeonConstructionUnitBuildingEffects
 
 ---------------------------------------------------------------
 --  FACTORIES
 ---------------------------------------------------------------
 ---@class AFactoryUnit : FactoryUnit
+---@field BuildEffectsBag TrashBag
 AFactoryUnit = ClassUnit(FactoryUnit) {
 
     ---@param self AFactoryUnit
@@ -38,19 +36,24 @@ AFactoryUnit = ClassUnit(FactoryUnit) {
 
     ---@param self AFactoryUnit
     OnPaused = function(self)
-        -- When factory is paused take some action
-        if self:IsUnitState('Building') and self.UnitBeingBuilt then
-            self:StopUnitAmbientSound('ConstructLoop')
-            FactoryUnit.StopBuildingEffects(self, self.UnitBeingBuilt)
-        end
         FactoryUnit.OnPaused(self)
+
+        -- stop the building fx
+        local unitBeingBuilt = self.UnitBeingBuilt
+        if unitBeingBuilt and self:IsUnitState('Building') and (not IsDestroyed(unitBeingBuilt)) then
+            FactoryUnit.StopBuildingEffects(self, unitBeingBuilt)
+            self:StopUnitAmbientSound('ConstructLoop')
+        end
     end,
 
     ---@param self AFactoryUnit
     OnUnpaused = function(self)
         FactoryUnit.OnUnpaused(self)
-        if self:IsUnitState('Building') and self.UnitBeingBuilt then
-            FactoryUnit.StopBuildingEffects(self, self.UnitBeingBuilt)
+
+        -- start the building fx
+        local unitBeingBuilt = self.UnitBeingBuilt
+        if unitBeingBuilt and self:IsUnitState('Building') and (not IsDestroyed(unitBeingBuilt)) then
+            FactoryUnit.StopBuildingEffects(self, unitBeingBuilt)
             self:StartBuildFx(self:GetFocusUnit())
         end
     end,
@@ -88,13 +91,17 @@ AConcreteStructureUnit = ClassUnit(DefaultUnitsFile.ConcreteStructureUnit) {}
 --  Construction Units
 ---------------------------------------------------------------
 ---@class AConstructionUnit : ConstructionUnit
+---@field BuildEffectsBag TrashBag
 AConstructionUnit = ClassUnit(ConstructionUnit) {
 
     ---@param self AConstructionUnit
     ---@param unitBeingBuilt Unit
     ---@param order string
     CreateBuildEffects = function(self, unitBeingBuilt, order)
-        EffectUtil.CreateAeonConstructionUnitBuildingEffects(self, unitBeingBuilt, self.BuildEffectsBag)
+        local buildEffectsBag = self.BuildEffectsBag
+        if buildEffectsBag then
+            CreateAeonConstructionUnitBuildingEffects(self, unitBeingBuilt, buildEffectsBag)
+        end
     end,
 }
 
@@ -102,6 +109,7 @@ AConstructionUnit = ClassUnit(ConstructionUnit) {
 --  ENERGY CREATION UNITS
 ---------------------------------------------------------------
 ---@class AEnergyCreationUnit : EnergyCreationUnit
+---@field AmbientEffects string[]
 AEnergyCreationUnit = ClassUnit(EnergyCreationUnit) {
     ---@param self AEnergyCreationUnit
     ---@param builder Unit
@@ -178,6 +186,7 @@ ASonarUnit = ClassUnit(DefaultUnitsFile.SonarUnit) {}
 --  SEA FACTORY STRUCTURES
 ---------------------------------------------------------------
 ---@class ASeaFactoryUnit : SeaFactoryUnit
+---@field BuildEffectsBag TrashBag
 ASeaFactoryUnit = ClassUnit(SeaFactoryUnit) {
 
     ---@param self ASeaFactoryUnit
@@ -308,6 +317,7 @@ ARadarJammerUnit = ClassUnit(RadarJammerUnit) {
     end,
 
     ---@param self ARadarJammerUnit
+    ---@param intel string
     OnIntelEnabled = function(self, intel)
         RadarJammerUnit.OnIntelEnabled(self, intel)
         if self.OpenAnim then
@@ -322,6 +332,7 @@ ARadarJammerUnit = ClassUnit(RadarJammerUnit) {
     end,
 
     ---@param self ARadarJammerUnit
+    ---@param intel string
     OnIntelDisabled = function(self, intel)
         RadarJammerUnit.OnIntelDisabled(self, intel)
         if self.OpenAnim then

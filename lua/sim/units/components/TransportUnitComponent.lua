@@ -9,10 +9,13 @@ BaseTransport = ClassSimple {
         self:PlayUnitSound('Load')
         self:RequestRefreshUI()
 
-        for i = 1, self:GetBoneCount() do
-            if self:GetBoneName(i) == attachBone then
-                self.slots[i] = unit
-                unit.attachmentBone = i
+        local slots = self.slots
+        if slots then
+            for i = 1, self:GetBoneCount() do
+                if self:GetBoneName(i) == attachBone then
+                    slots[i] = unit
+                    unit.attachmentBone = i
+                end
             end
         end
     end,
@@ -23,8 +26,13 @@ BaseTransport = ClassSimple {
     OnTransportDetach = function(self, attachBone, unit)
         self:PlayUnitSound('Unload')
         self:RequestRefreshUI()
-        self.slots[unit.attachmentBone] = nil
-        unit.attachmentBone = nil
+
+        local slots = self.slots
+        local attachmentBone = unit.attachmentBone
+        if slots and attachmentBone then
+            slots[attachmentBone] = nil
+            unit.attachmentBone = nil
+        end
     end,
 
     -- When one of our attached units gets killed, detach it

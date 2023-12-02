@@ -181,7 +181,7 @@ MassFabPanel = ClassUI(Group) {
             end
         end
         self._collapseArrow.OnHide = function(collapse, hide)
-            if hide ~= collapse:IsDisabled() then
+            if collapse:IsDisabled() and not hide then
                 return true
             end
         end
