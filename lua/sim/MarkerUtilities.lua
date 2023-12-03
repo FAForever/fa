@@ -64,9 +64,6 @@ local TableDeepCopy = table.deepcopy
 -- ---@field Extractors MarkerResource[]
 -- ---@field Hydrocarbons MarkerResource[]
 
----@type table<string, MarkerData>
-local ScenarioMarkers = {}
-
 -- easier access to all markers and all chains
 ---@type table<string, MarkerData>
 local CachedMarkers = {}
@@ -206,7 +203,7 @@ end
 ---@param name string
 ---@return MarkerData
 function GetMarker(name)
-    return CachedMarkers[name] or ScenarioMarkers[name]
+    return CachedMarkers[name] or Scenario.MasterChain._MASTERCHAIN_.Markers[name]
 end
 
 ---@param type MarkerType
@@ -231,7 +228,7 @@ function GetMarkersByType(type)
     local n = 1
 
     -- find all the relevant markers by searching through the original scenario markers
-    for k, marker in ScenarioMarkers do
+    for k, marker in Scenario.MasterChain._MASTERCHAIN_.Markers do
         if marker.type == type then
             -- mod support syntax
             marker.Name = marker.Name or k
@@ -536,12 +533,9 @@ function ToggleDebugChainByName(name)
 end
 
 function Setup()
-    -- quick and easy lookup
-    local ScenarioMarkers = Scenario.MasterChain._MASTERCHAIN_.Markers
-
     -- prepare spawn markers
     local armies = table.hash(ListArmies())
-    for k, marker in ScenarioMarkers do
+    for k, marker in Scenario.MasterChain._MASTERCHAIN_.Markers do
         if string.sub(k, 1, 5) == 'ARMY_' then
             marker.Name = k
             marker.Position = marker.position
