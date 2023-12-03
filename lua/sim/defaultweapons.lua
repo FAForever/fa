@@ -551,8 +551,8 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
             unpackAnimator:SetRate(bp.WeaponUnpackAnimationRate)
             self.WeaponPackState = 'Unpacking'
             WaitFor(unpackAnimator)
-            self.WeaponPackState = 'Unpacked'
         end
+        self.WeaponPackState = 'Unpacked'
     end,
 
     -- Played when a weapon packs up
@@ -572,8 +572,8 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
 
             self.WeaponPackState = 'Packing'
             WaitFor(unpackAnimator)
-            self.WeaponPackState = 'Packed'
         end
+        self.WeaponPackState = 'Packed'
     end,
 
     -- Create the visual side of rack recoil
@@ -738,6 +738,9 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
                 end
             end
             self:StartEconomyDrain()
+            if bp.WeaponUnpacks and self.WeaponPackState == 'Unpacked' then
+                ChangeState(self, self.WeaponPackingState)
+            end
             if self.NumRackBones > 1 and self.CurrentRackSalvoNumber > 1 then
                 WaitSeconds(bp.RackReloadTimeout)
                 self:PlayFxRackSalvoReloadSequence()
