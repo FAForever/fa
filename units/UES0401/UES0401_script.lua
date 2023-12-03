@@ -160,19 +160,7 @@ UES0401 = ClassUnit(AircraftCarrier, ExternalFactoryComponent) {
 
         OnStopBuild = function(self, unitBeingBuilt)
             AircraftCarrier.OnStopBuild(self, unitBeingBuilt)
-
-            local unitBuilding = self.UnitBeingBuilt
-            unitBuilding:DetachFrom(true)
-            self:DetachAll(self.BuildAttachBone)
-
-            if not self:TransportHasAvailableStorage() or self:GetScriptBit('RULEUTC_WeaponToggle') then
-                unitBuilding:ShowBone(0, true)
-            else
-                self:AddUnitToStorage(unitBuilding)
-            end
-
-            self:RequestRefreshUI()
-            ChangeState(self, self.IdleState)
+            ExternalFactoryComponent.OnStopBuildWithStorage(self, unitBeingBuilt)
         end,
     },
 }

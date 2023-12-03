@@ -284,7 +284,7 @@ UnitBlueprint{
             RegenFloor = 15,
             RegenPerSecond = 0.035,
             Slot = "LCH",
-            UnitCategory = "BUILTBYTIER3FACTORY, BUILTBYQUANTUMGATE, NEEDMOBILEBUILD",
+            UnitCategory = "BUILTBYTIER3FACTORY, BUILTBYQUANTUMGATE, NEEDMOBILEBUILD, TRANSPORTATION, FIELDENGINEER",
             UpgradeEffectBones = {
                 "Left_Upgrade",
                 "Left_Turret_Muzzle",
@@ -470,7 +470,7 @@ UnitBlueprint{
             RegenPerSecond = 0.02,
             ShowBones = { "Left_Upgrade" },
             Slot = "LCH",
-            UnitCategory = "BUILTBYTIER3FACTORY, BUILTBYQUANTUMGATE, NEEDMOBILEBUILD",
+            UnitCategory = "BUILTBYTIER3FACTORY, BUILTBYQUANTUMGATE, NEEDMOBILEBUILD, TRANSPORTATION, FIELDENGINEER",
             UpgradeEffectBones = {
                 "Left_Upgrade",
                 "Left_Turret_Muzzle",
@@ -806,8 +806,6 @@ UnitBlueprint{
             DamageRadius = 2.5,
             DamageType = "Overcharge",
             DisplayName = "Overcharge Cannon",
-            EnergyChargeForFirstShot = false,
-            EnergyDrainPerSecond = 7500,
             EnergyRequired = 7500,
             FireTargetLayerCapsTable = {
                 Land = "Land|Water|Seabed",
@@ -888,8 +886,6 @@ UnitBlueprint{
             DamageRadius = 2.5,
             DamageType = "Overcharge",
             DisplayName = "AutoOvercharge Cannon",
-            EnergyChargeForFirstShot = false,
-            EnergyDrainPerSecond = 7500,
             EnergyRequired = 7500,
             FireTargetLayerCapsTable = {
                 Land = "Land|Water|Seabed",
@@ -1034,7 +1030,7 @@ UnitBlueprint{
             RackRecoilDistance = 0,
             RackReloadTimeout = 10,
             RackSalvoChargeTime = 0,
-            RackSalvoReloadTime = 0,
+            RackSalvoReloadTime = 5,
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_IndirectFire",

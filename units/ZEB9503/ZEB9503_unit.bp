@@ -1,9 +1,11 @@
 UnitBlueprint {
     AI = {
         TargetBones = {
-            'UEB0203',
-            'Center_Deck',
-            'Left_BottomDeck',
+            'B13',
+            'B08',
+            'B09',
+            'B12',
+            'Dock_Cover',
         },
     },
     Audio = {
@@ -118,7 +120,7 @@ UnitBlueprint {
         BuildCostEnergy = 5500,
         BuildCostMass = 1100,
         BuildRate = 90,
-        BuildTime = 3000,
+        BuildTime = 2000,
         DifferentialUpgradeCostCalculation = true,
         RebuildBonusIds = {
             'zeb9503',

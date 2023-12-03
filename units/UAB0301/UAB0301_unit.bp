@@ -2,8 +2,10 @@ UnitBlueprint{
     Description = "<LOC uab0301_desc>Land Factory HQ",
     AI = {
         TargetBones = {
-            "B01",
-            "B02",
+            "Foot_Right",
+            "Foot_Left",
+            "Pad_Left",
+            "Pad_Right",
         },
     },
     Audio = {
@@ -84,7 +86,7 @@ UnitBlueprint{
         BuildCostEnergy = 47400,
         BuildCostMass = 5220,
         BuildRate = 90,
-        BuildTime = 12100,
+        BuildTime = 12000,
         BuildableCategory = {
             "BUILTBYTIER3FACTORY AEON MOBILE CONSTRUCTION",
             "BUILTBYTIER3FACTORY AEON STRUCTURE LAND",

@@ -2,13 +2,13 @@ UnitBlueprint{
     Description = "<LOC xaa0306_desc>Torpedo Bomber",
     AI = {
         GuardReturnRadius = 125,
-        TargetBones = { "XAA0306" },
+        TargetBones = { "Exhaust" },
     },
     Air = {
         AutoLandTime = 1,
         BankFactor = 2.5,
         BankForward = false,
-        BreakOffDistance = 34,
+        BreakOffDistance = 42,
         BreakOffTrigger = 15,
         CanFly = true,
         CombatTurnSpeed = 0.8,

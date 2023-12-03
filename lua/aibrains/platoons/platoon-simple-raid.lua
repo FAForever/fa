@@ -62,12 +62,11 @@ AIPlatoonSimpleRaidBehavior = Class(AIPlatoon) {
 
             self:Stop()
 
-            -- pick random unit
-            local units, unitCount = self:GetPlatoonUnits()
-            local unit = units[Random(1, unitCount)]
+            local position = self:GetPlatoonPosition()
+            if not position then
+                return
+            end
 
-            -- determine navigational label of that unit
-            local position = unit:GetPosition()
             local label, error = NavUtils.GetLabel('Land', position)
 
             if label then
@@ -138,14 +137,12 @@ AIPlatoonSimpleRaidBehavior = Class(AIPlatoon) {
 
             while not IsDestroyed(self) do
                 -- pick random unit for a position on the grid
-                local units = self:GetPlatoonUnits()
-                local origin
-                for _, v in units do
-                    if v and not v.Dead then
-                        origin = v:GetPosition()
-                    end
+                local units, unitCount = self:GetPlatoonUnits()
+                local origin = self:GetPlatoonPosition()
+                if not origin then
+                    return
                 end
-
+                
                 -- generate a direction
                 local waypoint, length = NavUtils.DirectionTo('Land', origin, destination, 60)
 
@@ -173,6 +170,9 @@ AIPlatoonSimpleRaidBehavior = Class(AIPlatoon) {
                 local wz = waypoint[3]
                 while not IsDestroyed(self) do
                     local position = self:GetPlatoonPosition()
+                    if not position then
+                        return
+                    end
 
                     -- check if we're near our current waypoint
                     local dx = position[1] - wx
@@ -191,7 +191,6 @@ AIPlatoonSimpleRaidBehavior = Class(AIPlatoon) {
                             if threatTable and not TableEmpty(threatTable) then
                                 local info = threatTable[Random(1, TableGetn(threatTable))]
                                 self.ThreatToEvade = { info[1], GetSurfaceHeight(info[1], info[2]), info[2] }
-                                DrawCircle(self.ThreatToEvade, 5, 'ff0000')
                                 self:ChangeState(self.Retreating)
                                 return
                             end
@@ -258,6 +257,10 @@ AIPlatoonSimpleRaidBehavior = Class(AIPlatoon) {
 
                 -- check for threats
                 local position = self:GetPlatoonPosition()
+                if not position then
+                    return
+                end
+
                 local threat = brain:GetThreatAtPosition(position, 1, true, 'AntiSurface')
                 if threat > 0 then
                     local threatTable = brain:GetThreatsAroundPosition(position, 1, true, 'AntiSurface')
@@ -330,6 +333,10 @@ AIPlatoonSimpleRaidBehavior = Class(AIPlatoon) {
 
                 -- check for threats
                 local position = self:GetPlatoonPosition()
+                if not position then
+                    return
+                end
+
                 local threat = brain:GetThreatAtPosition(position, 1, true, 'AntiSurface')
                 if threat > 0 then
                     local threatTable = brain:GetThreatsAroundPosition(position, 1, true, 'AntiSurface')
@@ -383,6 +390,10 @@ AIPlatoonSimpleRaidBehavior = Class(AIPlatoon) {
             while not IsDestroyed(self) do
 
                 local position = self:GetPlatoonPosition()
+                if not position then
+                    return
+                end
+
                 local waypoint, error = NavUtils.RetreatDirectionFrom('Land', position, location, 40)
 
                 if not waypoint then
@@ -397,6 +408,9 @@ AIPlatoonSimpleRaidBehavior = Class(AIPlatoon) {
 
                 while not IsDestroyed(self) do
                     local position = self:GetPlatoonPosition()
+                    if not position then
+                        return
+                    end
 
                     -- check if we're near our retreat point
                     local dx = position[1] - wx

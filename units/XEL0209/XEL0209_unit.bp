@@ -260,7 +260,7 @@ UnitBlueprint{
             MaxRadius = 18,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
-            MuzzleVelocity = 16,
+            MuzzleVelocity = 60,
             ProjectileId = "/projectiles/TDFRiot03/TDFRiot03_proj.bp",
             ProjectileLifetimeUsesMultiplier = 1.15,
             ProjectilesPerOnFire = 1,

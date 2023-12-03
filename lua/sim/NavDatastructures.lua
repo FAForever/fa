@@ -60,30 +60,30 @@ Stack = ClassSimple {
     end,
 }
 
----@class NavPathToHeap
----@field Heap CompressedLabelTreeLeaf[]
+---@class NavHeap
+---@field Heap NavSection[]
 ---@field HeapSize number
-NavPathToHeap = ClassSimple {
+NavHeap = ClassSimple {
 
-    ---@param self NavPathToHeap
+    ---@param self NavHeap
     __init = function(self)
         self.Heap = {}
         self.HeapSize = 0
     end,
 
-    ---@param self NavPathToHeap
+    ---@param self NavHeap
     ---@return boolean
     IsEmpty = function(self)
         return self.HeapSize == 0
     end,
 
-    ---@param self NavPathToHeap
+    ---@param self NavHeap
     Clear = function(self)
         self.HeapSize = 0
     end,
 
-    ---@param self NavPathToHeap
-    ---@return CompressedLabelTreeLeaf?
+    ---@param self NavHeap
+    ---@return NavSection?
     ExtractMin = function(self)
         local heap = self.Heap
         local heapSize = self.HeapSize
@@ -104,11 +104,13 @@ NavPathToHeap = ClassSimple {
         -- fix its position.
         self:Heapify()
 
+        -- DrawCircle(value.Center, 5, '9999ff')
+
         return value
     end,
 
     --- 'Bubble down' operation, applied when we extract an element from the heap
-    ---@param self NavPathToHeap
+    ---@param self NavHeap
     Heapify = function(self)
         local heap = self.Heap
         local heapSize = self.HeapSize
@@ -124,13 +126,13 @@ NavPathToHeap = ClassSimple {
 
             -- if there is a right child, compare its value with the left one
             -- if right is smaller, then assign min = right. Else, keep min on left.
-            if right <= heapSize and (heap[right].TotalCosts < heap[left].TotalCosts) then
+            if right <= heapSize and (heap[right].HeapTotalCosts < heap[left].HeapTotalCosts) then
                 min = right
             end
 
             -- if min has higher value than the index it means we restored heap properties
             -- and can break the loop
-            if heap[min].TotalCosts > heap[index].TotalCosts then
+            if heap[min].HeapTotalCosts > heap[index].HeapTotalCosts then
                 return
             end
 
@@ -147,7 +149,7 @@ NavPathToHeap = ClassSimple {
     end,
 
     --- 'Bubble up' operation, applied when we insert a new element into the heap
-    ---@param self NavPathToHeap
+    ---@param self NavHeap
     Rootify = function(self)
         local heap = self.Heap
         local index = self.HeapSize
@@ -156,7 +158,7 @@ NavPathToHeap = ClassSimple {
         while parent >= 1 do
 
             -- if parent value is smaller than index value it means we restored correct order of the elements
-            if heap[parent].TotalCosts < heap[index].TotalCosts then
+            if heap[parent].HeapTotalCosts < heap[index].HeapTotalCosts then
                 return
             end
 
@@ -172,11 +174,14 @@ NavPathToHeap = ClassSimple {
         end
     end,
 
-    ---@param self NavPathToHeap
-    ---@param element CompressedLabelTreeLeaf
+    ---@param self NavHeap
+    ---@param element NavSection
     Insert = function(self, element)
         self.HeapSize = self.HeapSize + 1
         self.Heap[self.HeapSize] = element
         self:Rootify()
+
+        -- DrawCircle(element.Center, 5, '999999')
+
     end,
 }

@@ -1,19 +1,17 @@
 ------------------------------------------------------------------------------
-----  File     :  /effects/Entities/SCUDeath01/SCUDeath01_script.lua
-----  Author(s):  Gordon Duclos
-----
-----  Summary  :  SCU Death Explosion
-----
-----  Copyright © 2005,2006 Gas Powered Games, Inc.  All rights reserved.
+-- File     :  /effects/Entities/SCUDeath01/SCUDeath01_script.lua
+-- Author(s):  Gordon Duclos
+-- Summary  :  SCU Death Explosion
+-- Copyright © 2005,2006 Gas Powered Games, Inc.  All rights reserved.
 ------------------------------------------------------------------------------
-
 local NullShell = import("/lua/sim/defaultprojectiles.lua").NullShell
-local EffectTemplate = import("/lua/effecttemplates.lua")
 local Util = import("/lua/utilities.lua")
 local RandomFloat = Util.GetRandomFloat
 
+---@class SCUDeath01 : NullShell
 SCUDeath01 = Class(NullShell) {
 
+    ---@param self SCUDeath01
     OnCreate = function(self)
         NullShell.OnCreate(self)
         local myBlueprint = self:GetBlueprint()
@@ -27,6 +25,8 @@ SCUDeath01 = Class(NullShell) {
         self:ForkThread(self.EffectThread)
     end,
 
+    ---@param self SCUDeath01
+    ---@param damageData table
     PassDamageData = function(self, damageData)
         NullShell.PassMetaDamage(self, damageData)
         local instigator = self:GetLauncher()
@@ -38,10 +38,14 @@ SCUDeath01 = Class(NullShell) {
         self:DoDamage( instigator, self.DamageData, nil )  
     end,
 
+    ---@param self SCUDeath01
+    ---@param targetType string
+    ---@param targetEntity Entity
     OnImpact = function(self, targetType, targetEntity)
         self:Destroy()
     end,
 
+    ---@param self SCUDeath01
     EffectThread = function(self)
         local army = self:GetArmy()
         local position = self:GetPosition()
@@ -69,6 +73,7 @@ SCUDeath01 = Class(NullShell) {
         DamageRing(self, position, 0.1, 15, 1, 'Force', true)
     end,
 
+    ---@param self SCUDeath01
     CreateOuterRingWaveSmokeRing = function(self)
         local sides = 10
         local angle = (2*math.pi) / sides
@@ -93,3 +98,6 @@ SCUDeath01 = Class(NullShell) {
     end,
 }
 TypeClass = SCUDeath01
+
+--- Kept for backwards compatibility
+local EffectTemplate = import("/lua/effecttemplates.lua")

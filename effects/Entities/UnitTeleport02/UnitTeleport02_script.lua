@@ -1,24 +1,24 @@
---****************************************************************************
---**
---**  File     :  /effects/entities/UnitTeleport01/UnitTeleport01_script.lua
---**  Author(s):  Gordon Duclos
---**
---**  Summary  :  Unit Teleport effect entity
---**
---**  Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
---****************************************************************************
+------------------------------------------------------------------------------
+-- File     :  /effects/entities/UnitTeleport01/UnitTeleport01_script.lua
+-- Author(s):  Gordon Duclos
+-- Summary  :  Unit Teleport effect entity
+-- Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
+------------------------------------------------------------------------------
 
 local NullShell = import("/lua/sim/defaultprojectiles.lua").NullShell
 local RandomFloat = import("/lua/utilities.lua").GetRandomFloat
 local EffectTemplate = import("/lua/effecttemplates.lua")
 
+---@class UnitTeleportEffect01 : NullShell
 UnitTeleportEffect02 = Class(NullShell) {
 
+    ---@param self UnitTeleportEffect01
     OnCreate = function(self)
         NullShell.OnCreate(self)
         self:ForkThread(self.TeleportEffectThread)
     end,
 
+    ---@param self UnitTeleportEffect01
     TeleportEffectThread = function(self)
         local army = self.Army
         local pos = self:GetPosition()
@@ -51,6 +51,7 @@ UnitTeleportEffect02 = Class(NullShell) {
 
     end,
 
+    ---@param self UnitTeleportEffect01
     CreateEnergySpinner = function(self)
         self:CreateProjectile('/effects/entities/TeleportSpinner01/TeleportSpinner01_proj.bp', 0, 0, 0, nil, nil, nil):
             SetCollision(false)
@@ -60,13 +61,16 @@ UnitTeleportEffect02 = Class(NullShell) {
             SetCollision(false)
     end,
 
+    ---@param self UnitTeleportEffect01
+    ---@param army number
     CreateQuantumEnergy = function(self, army)
         for k, v in EffectTemplate.CommanderQuantumGateInEnergy do
             CreateEmitterOnEntity(self, army, v)
         end
     end,
 
-
+    ---@param self UnitTeleportEffect01
+    ---@param army number
     CreateFlares = function(self, army)
         local numFlares = 45
         local angle = (2 * math.pi) / numFlares
@@ -95,6 +99,7 @@ UnitTeleportEffect02 = Class(NullShell) {
         end
     end,
 
+    ---@param self UnitTeleportEffect01
     CreateSmokeRing = function(self)
         local blanketSides = 36
         local blanketAngle = (2 * math.pi) / blanketSides
@@ -116,5 +121,4 @@ UnitTeleportEffect02 = Class(NullShell) {
         end
     end,
 }
-
 TypeClass = UnitTeleportEffect02

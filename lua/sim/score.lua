@@ -5,7 +5,7 @@ alliesScore = true
 local GameIsOver = false
 local ArmyScore = {}
 local scoreOption = ScenarioInfo.Options.Score or "no"
-scoreData = {interval = historyInterval, current = ArmyScore, history = {}}
+scoreData = {interval = historyInterval, current = ArmyScore, history = {}, focusArmyIndex = 0}
 
 -- Some of these values pre-existed and are used in other places, that's why their naming is not consistent
 local categoriesToCollect = {
@@ -84,7 +84,6 @@ end
 
 local function ScoreHistoryThread()
     while not GameIsOver do 
-        WaitSeconds(scoreData.interval)
         local data = {}
         for index, brain in ArmyBrains do
             local Score = scoreData.current[index]
@@ -96,6 +95,7 @@ local function ScoreHistoryThread()
             data[index] = table.deepcopy(Score)
         end
         table.insert(scoreData.history, data)
+        WaitSeconds(scoreData.interval)
     end
 end
 
@@ -219,6 +219,7 @@ local function ScoreThread()
         end
 
         local myArmyIndex = GetFocusArmy()
+        scoreData.focusArmyIndex = myArmyIndex -- Can't get the active player during score screen so we save it here.
         local observer = myArmyIndex == -1
 
         Sync.Score = { }

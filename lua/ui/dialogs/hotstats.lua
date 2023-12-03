@@ -191,6 +191,23 @@ local function nodata()
     noData.Depth:Set(GetFrame(0):GetTopmostDepth())
 end
 
+-- if periode=0 or past the end of game, then return the current value
+function return_value(periode,player,path)
+    local dataPoint = scoreData.history[periode];
+    if ((dataPoint == nil) or (dataPoint[player] == nil)) then
+        dataPoint = scoreData.current
+    end
+
+    local val
+    if path[3]==nil or path[3]==false then
+        val=dataPoint[player][path[1]][path[2]]
+    else
+        val=dataPoint[player][path[1]][path[2]][path[3]]
+    end
+
+    return (val or 0) * (path.fac_mul or 1)
+end
+
 function create_graph_bar(parent,name,x1,y1,x2,y2,data_previous)
     local data_nbr=table.getsize(scoreData.history) -- data_nbr is the number of group of data saved
     --LOG("Number of data found:",data_nbr)
@@ -368,7 +385,7 @@ function create_graph_bar(parent,name,x1,y1,x2,y2,data_previous)
                         end
                         local iBaseValue = return_value(0,player,path)
                         local  value = math.floor(iBaseValue + 0.5)
-                        chartInfoText = UIUtil.CreateText(self,math.floor(ReverseScaling(iBaseValue)), 14, UIUtil.titleFont) --Couldnt figure out when this actually takes effect - mouseover graph is in a separate section
+                        chartInfoText = UIUtil.CreateText(self,math.floor(iBaseValue), 14, UIUtil.titleFont) --Couldnt figure out when this actually takes effect - mouseover graph is in a separate section
                         chartInfoText.Left:Set(function() return posX()-(chartInfoText.Width()/2) end)
                         chartInfoText.Bottom:Set(function() return posY()-7 end)
                         chartInfoText.Depth:Set(GetFrame(0):GetTopmostDepth() + 1)
@@ -447,15 +464,15 @@ function line(parent,x1,y1,x2,y2,color, size)
     return grp
 end
 
-function tps_format(val)
-    if val<60 then return math.floor(val).."s" end
-    m=math.floor(val/60)
+function tps_format(seconds)
+    if seconds<60 then return math.floor(seconds).."s" end
+    m=math.floor(seconds/60)
     if m<60 then
-        if math.floor(val-60*m) != 0 then return m.."m"..math.floor(val-60*m) else return m.."m" end
+        if math.floor(seconds-60*m) != 0 then return m.."m"..math.floor(seconds-60*m) else return m.."m" end
     end
-    h=math.floor(val/3600)
-    if math.floor((val-3600*h)/60)==0 then return h.."h" end
-    return h.."h"..math.floor((val-3600*h)/60)
+    h=math.floor(seconds/3600)
+    if math.floor((seconds-3600*h)/60)==0 then return h.."h" end
+    return h.."h"..math.floor((seconds-3600*h)/60)
 end
 
 -- allow to find the best value upper to one (ie if int=3785 -->5000)
@@ -504,25 +521,6 @@ function FormatNumber(number)
 
     return sNewString
 end
-
--- if periode=0 then return the current value
-function return_value(periode,player,path)
-    local val
-    if periode==0 then
-        if path[3]==nil or path[3]==false then val=scoreData.current[player][path[1]][path[2]]
-        else val=scoreData.current[player][path[1]][path[2]][path[3]] end
-    else
-        if (scoreData.history[periode] ~= nil) and (scoreData.history[periode][player] == nil) then
-            scoreData.history[periode][player] = scoreData.history[periode-1][player]
-        end
-        if path[3]==nil or path[3]==false then val=scoreData.history[periode][player][path[1]][path[2]]
-        else val=scoreData.history[periode][player][path[1]][path[2]][path[3]] end
-    end
-    if val==nil then val=0 end
-    if path.fac_mul != nil then val=val*path.fac_mul end
-    return AdjustValueScale(val)
-end
-
 
 function page_graph(parent)
     --LOG("PAGE_GRAPH called")
@@ -638,12 +636,19 @@ end
 -- path is where is data is stored in scoredata
 -- xi,yi is the windows based on parent of the background
 function create_graph(parent,path,x1,y1,x2,y2)
-    local data_nbr=table.getsize(scoreData.history) -- data_nbr is the number of group of data saved
+    local graphLeft = parent.Left() + x1
+    local graphTop = parent.Top() + y1
+    local graphWidth = x2 - x1
+    local graphHeight = y2 - y1
+    local graphRight = graphLeft + graphWidth
+    local graphBottom = graphTop + graphHeight
+
+    local data_nbr=table.getsize(scoreData.history) -- data_nbr is the number of group of data saved. First one is at 00:00 and additional one every 30 seconds.
     --LOG("Number of data found:",data_nbr)
     if data_nbr<=0 then nodata() return nil end
+    -- scoreInterval is the time between to data saved
     local scoreInterval = scoreData.interval
     local player={} -- would be the name/color of the player in the left-top corner
-    -- scoreInterval is the time between to data saved
     -- parent group
     local grp=Group(parent)
     grp.Left:Set(0) grp.Top:Set(0) grp.Right:Set(0) grp.Bottom:Set(0)
@@ -651,9 +656,9 @@ function create_graph(parent,path,x1,y1,x2,y2)
     -- gray background that receive all
     bg=Bitmap(grp)
     bg.Left:Set(function() return parent.Left() + x1 end)
-    bg.Top:Set(function() return parent.Top()+y1 -2 end)
-    bg.Right:Set(function() return parent.Left()+x2 +2 end)
-    bg.Bottom:Set(function() return parent.Top()+y2 +1  end)
+    bg.Top:Set(function() return parent.Top() + y1 - 2 end)
+    bg.Right:Set(function() return parent.Left() + x2 + 2 end)
+    bg.Bottom:Set(function() return parent.Top() + y2 + 1  end)
     bg:SetSolidColor("gray")
     bg:SetAlpha(0.95)
     bg2=Bitmap(grp)
@@ -669,15 +674,17 @@ function create_graph(parent,path,x1,y1,x2,y2)
             player[i].name=scoreData.history[1][i].name
             player[i].color=v.color
             player[i].index=m
+            -- Player name shadow
             player[i].title_label=UIUtil.CreateText(grp,player[i].name, 14, UIUtil.titleFont)
             player[i].title_label.Left:Set(x1+5)
             player[i].title_label.Top:Set(y1 +23*(i-1)+5)
             player[i].title_label:SetColor("black")
+            -- Player name
             player[i].title_label2=UIUtil.CreateText(grp,player[i].name, 14, UIUtil.titleFont)
             player[i].title_label2.Left:Set(x1+4)
             player[i].title_label2.Top:Set(y1 +23*(i-1)+4)
             player[i].title_label2:SetColor(v.color)
-            local acuKills = return_value(0,player[i].index,{"units","cdr","kills"})
+            local acuKills = return_value(data_nbr + 1,player[i].index,{"units","cdr","kills"})
             if acuKills > 0 then
                 player[i].killIcon = {}
                 for kill = 1, acuKills do
@@ -697,293 +704,195 @@ function create_graph(parent,path,x1,y1,x2,y2)
     end
     local player_nbr=i-1
     -- searching the highest value
-    local maxvalue=0
-    local periode=-1
-    while periode<data_nbr do
-        periode=periode+1
+    local unscaledMaxvalue=0
+    local periode=1
+    while periode<=(data_nbr + 1) do
         for index, dat in player do
             local val=return_value(periode,dat.index,path)  -- return the value
-            if maxvalue<val then    maxvalue=val end
+            if unscaledMaxvalue<val then unscaledMaxvalue=val end
         end
+        periode=periode+1
     end
-    --LOG(maxvalue)
+    --LOG(rawMaxvalue)
     --arranging the highest value to be nice to see
-    --LOG('Max value pre adjust='..maxvalue)
-    --maxvalue=arrange(maxvalue*1.02)
-    maxvalue = math.ceil(AdjustValueScale(ReverseScaling(maxvalue)*1.05))
+    --LOG('Max value pre adjust='..rawMaxvalue)
+    --maxvalue=arrange(rawMaxvalue*1.02)
+    local graphTopMarginPercent = 0.05
+    unscaledMaxvalue = math.ceil(unscaledMaxvalue*(1 + graphTopMarginPercent))
+    local scaledMaxvalue = math.ceil(AdjustValueScale(unscaledMaxvalue))
+    local gameTimeSeconds = GetGameTimeSeconds()
     -- calculate the scale factor on y
-    local factor=(y2-y1)/maxvalue
-    --LOG('max value post adjust='..maxvalue..'; factor='..factor..'; y2='..y2..'; y1='..y1)
-    --LOG("Value the highest:",maxvalue,"   final time saved:",scoreInterval*data_nbr,"   scale factor on y:",factor)
+    local yScale=graphHeight/scaledMaxvalue
+    --LOG('max value post adjust='..maxvalue..'; yScale='..yScale..'; y2='..y2..'; y1='..y1)
+    --LOG("Value the highest:",maxvalue,"   final time saved:",scoreInterval*data_nbr,"   yScale:",yScale)
     -- drawing the axies/quadrillage
-    local j=1
-    local quadrillage_horiz={}
-    local nbr_quadrillage_horiz=6 -- how many horizontal axies
-    local nbr_quadrillage_vertical=8 -- how many vertical axies
-    while j<nbr_quadrillage_horiz do --i.e. this is the y axis, showing score or other value
-        local tmp=j
-        quadrillage_horiz[j]=Bitmap(grp)
-        quadrillage_horiz[j].Left:Set(function() return parent.Left() + x1 +1 end)
-        quadrillage_horiz[j].Top:Set(function() return parent.Top() +y2 - (y2-y1)*((tmp-1)/(nbr_quadrillage_horiz-2)) -1 end)
-        quadrillage_horiz[j].Right:Set(function() return parent.Left()+x2 +2 end)
-        quadrillage_horiz[j].Bottom:Set(function() return quadrillage_horiz[tmp].Top() +1  end)
-        quadrillage_horiz[j]:SetSolidColor("white")
-        quadrillage_horiz[j].Depth:Set(grp.Depth)
 
-        quadrillage_horiz[j].title_label=UIUtil.CreateText(grp,FormatNumber(math.floor(ReverseScaling((j-1)/(nbr_quadrillage_horiz-2)*maxvalue))), 14, UIUtil.titleFont) --Reverse the scaled value for the y axis, i.e. want to show what the actual score is on the axis
-        quadrillage_horiz[j].title_label.Right:Set(parent.Left() + x1 -8)
-        quadrillage_horiz[j].title_label.Bottom:Set(parent.Top() +y2 - (y2-y1)*((tmp-1)/(nbr_quadrillage_horiz-2))+1)
-        quadrillage_horiz[j].title_label:SetColor("white")
+    local finalSegmentTimeFraction = (gameTimeSeconds - (data_nbr - 1) * scoreInterval) / scoreInterval -- The final data point does not take the usual 30 seconds.
+    local gameTimeInIntervals = data_nbr - 1 + finalSegmentTimeFraction
+    local dataSegmentSceenWidth=graphWidth / gameTimeInIntervals -- Width of single data entry segment
+
+    local bm = Bitmap
+
+    local j=1
+    local valueAxisLabels={}
+    local valueAxisLabelCount=5 -- how many horizontal axies
+    local timeAxisLabelCount=7 -- how many vertical axies
+    while j<=valueAxisLabelCount do --i.e. this is the y axis, showing score or other value
+        valueAxisLabels[j]=bm(grp)
+        local positionRatio = ((j-1)/(valueAxisLabelCount-1))
+        valueAxisLabels[j].Left:Set(function() return parent.Left() + x1 +1 end)
+        valueAxisLabels[j].Top:Set(function() return parent.Top() +y2 - graphHeight*positionRatio -1 end)
+        valueAxisLabels[j].Right:Set(function() return parent.Left()+x2 +2 end)
+        valueAxisLabels[j].Bottom:Set(function() return parent.Top() +y2 - graphHeight*positionRatio +1 end)
+        valueAxisLabels[j]:SetSolidColor("white")
+        valueAxisLabels[j].Depth:Set(grp.Depth)
+
+        valueAxisLabels[j].title_label=UIUtil.CreateText(grp,FormatNumber(math.floor(ReverseScaling(positionRatio*scaledMaxvalue))), 14, UIUtil.titleFont) --Reverse the scaled value for the y axis, i.e. want to show what the actual score is on the axis
+        valueAxisLabels[j].title_label.Right:Set(parent.Left() + x1 -8)
+        valueAxisLabels[j].title_label.Bottom:Set(parent.Top() +y2 - graphHeight*positionRatio+1)
+        valueAxisLabels[j].title_label:SetColor("white")
         j=j+1
     end
     local j=1
-    local quadrillage_vertical={}
-    while j<nbr_quadrillage_vertical do --i.e. this is the x axis, showing time
-        local tmp=j
-        quadrillage_vertical[j]=Bitmap(grp)
-        quadrillage_vertical[j].Left:Set(function() return parent.Left()+x1 + ((x2-x1))*((tmp-1)/(nbr_quadrillage_vertical-2))+1  end)
-        quadrillage_vertical[j].Top:Set(function() return parent.Left()+y1 -1  end)
-        quadrillage_vertical[j].Right:Set(function() return quadrillage_vertical[tmp].Left() +1 end)
-        quadrillage_vertical[j].Bottom:Set(function() return parent.Top()+y2  end)
-        quadrillage_vertical[j]:SetSolidColor("white")
-        quadrillage_vertical[j].Depth:Set(grp.Depth)
+    local timeAxisLabels={}
+    while j<=timeAxisLabelCount do --i.e. this is the x axis, showing time
+        timeAxisLabels[j]=bm(grp)
+        local positionRatio = ((j-1)/(timeAxisLabelCount-1))
+        timeAxisLabels[j].Left:Set(function() return parent.Left()+x1 + graphWidth*positionRatio+1 end)
+        timeAxisLabels[j].Top:Set(function() return parent.Top()+y1 -1  end)
+        timeAxisLabels[j].Right:Set(function() return parent.Left()+x1 + graphWidth*positionRatio+2 end)
+        timeAxisLabels[j].Bottom:Set(function() return parent.Top()+y2  end)
+        timeAxisLabels[j]:SetSolidColor("white")
+        timeAxisLabels[j].Depth:Set(grp.Depth)
 
-        quadrillage_vertical[j].title_label=UIUtil.CreateText(grp,tps_format((j-1)/(nbr_quadrillage_vertical-2)*data_nbr*scoreInterval), 14, UIUtil.titleFont)
-        quadrillage_vertical[j].title_label.Left:Set(parent.Left()+x1 + ((x2-x1))*((tmp-1)/(nbr_quadrillage_vertical-2))+1)
-        quadrillage_vertical[j].title_label.Top:Set(parent.Top()+y2 +10)
-        quadrillage_vertical[j].title_label:SetColor("white")
+        timeAxisLabels[j].title_label=UIUtil.CreateText(grp,tps_format((j-1)/(timeAxisLabelCount-1)*gameTimeSeconds), 14, UIUtil.titleFont)
+        timeAxisLabels[j].title_label.Left:Set(parent.Left()+x1 + graphWidth*((j-1)/(timeAxisLabelCount-1))+1)
+        timeAxisLabels[j].title_label.Top:Set(parent.Top()+y2 +10)
+        timeAxisLabels[j].title_label:SetColor("white")
         j=j+1
     end
+
     --after having draw the background exist if no data
-    local size=1 -- Size of the pixel which compose the line, make the line wider
+    local size=3 -- Size of the pixel which compose the line, make the line wider
     -- ============================= the main function creating the graph
     --
     -- everything that needed the graphs are done are at the end of this thread
     if create_anime_graph then KillThread(create_anime_graph) end
     if true then
         create_anime_graph = ForkThread(function()
-        local periode=0  -- the number of the saved used
-        local x=parent.Left()+ x1  -- the current position on x
-        local dist=(x2-x1)/(data_nbr) -- the distance on the screen between two saved
-        --LOG("dist:",dist)
-        local delta_refresh=(x2-x1)/(6*size) -- the distance in time between the smallest halt possible to make a refresh
-        local delta=0 -- counter for refresh and small halt
-        local line={} -- containe for the actual periode of time all the data to be draw
-        --if graph != nil and graph then graph:Destroy() graph=false end
-        graph={} -- will containt a table for each line and each line will be a table of bitmap
-        for index, dat in player do     graph[dat.index]={}     end -- init the different line
-        local current_player_index=0  -- if 0 we are in replay, otherwise will show the graph to emphasize
-        if not gamemain.GetReplayState() then current_player_index=GetFocusArmy() end
-        WaitSeconds(0.001) -- give time to refresh and displayed the background
-        inc_periode=((data_nbr)/(x2-x1)) -- give the increment on the screen between each periode (i.e. between each saved)
-        if inc_periode<1 then inc_periode=1 end -- can not be <1 => use the whole screen
-        local nbr=0 -- couting the number of iterancy done
-        -- ============ starting
-        t=CurrentTime()
-        WaitFrames(10)
-        t1=CurrentTime()
-        --LOG("------- calculating the timing of the frame")
-        --LOG("Time to display 1 frame (calculate with 10 frames):",(t1-t)/10,'  t:',t,'   t1:',t1)
-        delta_refresh=(x2-x1)*(t1-t)/10*((player_nbr+1)/4)
-        --LOG("So refresh all the ",delta_refresh," pixels displayed (delta_refresh:)")
-        while periode<data_nbr do
-            nbr=nbr+1
-            periode=math.floor(nbr*inc_periode) -- calculate the next periode to use (i.e. skip some of them it more value than the screen can display)
-            -- prepare the data, calculate the ya=start y position and the yb=end position of the ligne for each player for this periode
-            for index, dat in player do
-                if periode==1 then val=0 else val=return_value(periode-1,dat.index,path) end
-                ya=parent.Top() +y2 - val*factor
-                local val=return_value(periode,dat.index,path)
-                yb=parent.Top() +y2  - val*factor
 
-                -- put all the data in this table
-                line[dat.index]={grp=grp,ya=ya,yb=yb,y=ya,  -- note: y is the current position for this graph; the x is commun to all graph
-                    color=dat.color,index=dat.index,
-                    y_factor=(yb-ya)/dist*size} -- important: the factor of deplacement for the bitmap
-            end
-            local sav_x=x
-            while (x<(parent.Left()+ x1 + nbr*dist) and x<(x2+parent.Left()))  do
-                for name,data in line do
-                    graph[data.index][x-x1]=Bitmap(grp)
-                    graph[data.index][x-x1].Left:Set(parent.Left() +x)
-                    if data.y_factor != 0 then
-                    local yn=parent.Top() +data.y+data.y_factor/math.abs(data.y_factor)*size*((math.abs(data.y_factor)+1))
-                        if data.y_factor<0 and (yn+size)<data.yb then yn=data.yb-size end
-                        if data.y_factor>0 and (yn-size)>data.yb then yn=data.yb-size end
-                        graph[data.index][x-x1].Top:Set(yn)
-                    else
-                        graph[data.index][x-x1].Top:Set(parent.Top() +data.y-size)
-                    end
-                    graph[data.index][x-x1].Right:Set(graph[data.index][x-x1].Left() +size)
-                    graph[data.index][x-x1].Bottom:Set(parent.Top() +data.y)
-                    graph[data.index][x-x1]:SetSolidColor(data.color)
-                    graph[data.index][x-x1]:Depth(bg.Depth()+5)
-                    data.y=data.y+data.y_factor
-                end
-                x=x+size
-                delta=delta+1
-                if delta>delta_refresh then
-                    WaitFrames(1) -- do the reshresh, should be far smaller to be smooth...
-                    delta=0
-                end
-            end
-        end
-        for index, data in player do
-            graph[data.index][x2]=Bitmap(grp)
-            graph[data.index][x2].Left:Set(x2)
-            if data.y_factor != 0 then
-                val=return_value(math.floor((nbr-1)*inc_periode),data.index,path)
-                --LOG("1st:",val)
-                ya=parent.Top() +y2 - val*factor
-                ya=graph[data.index][x-x1-size].Top()
-                local val=return_value(0,data.index,path)
-                --LOG("2nd:",val)
-                yb=parent.Top() +y2  - val*factor
-                if yb<y1 then yb=y1+2 end
-                if yb>y2 then yb=y2-2 end
-                --local yn=parent.Top() +data.y+data.y_factor/math.abs(data.y_factor)*size*((math.abs(data.y_factor)+1))
-                --if data.y_factor<0 and (yn+size)<data.yb then yn=data.yb-size end
-                --if data.y_factor>0 and (yn-size)>data.yb then yn=data.yb-size end
-                --  graph[data.index][x2].Top:Set(yn)
-                --else
-                    graph[data.index][x2].Top:Set(parent.Top() +yb)
-                --end
-                --LOG("x: ",x2,"  ya:",ya,"  yb:",yb)
-                graph[data.index][x2].Right:Set(graph[data.index][x2].Left() +size)
-                graph[data.index][x2].Bottom:Set(parent.Top() +ya)
-                graph[data.index][x2]:SetSolidColor(data.color)
-            end
-        end
-        -- ========= end of the drawing of the graph
-        t=CurrentTime()
-        --LOG("total time:",t-t1)
-        -- display the max value
-        local value_graph_label={}
-        for index, dat in player do
-            value_graph_label[dat.index]={}
-            val=math.floor(ReverseScaling(return_value(periode,dat.index,path))) --This is the value label that gets shown on the graph for each player, e.g. for the winner this will be the end-game high score achieved (not sure if this is the highest value at any point in the game or just the score at the end of the game)
-            value_graph_label[dat.index].title_label=UIUtil.CreateText(grp,FormatNumber(val), 14, UIUtil.titleFont)
-            value_graph_label[dat.index].title_label.Right:Set(x-1)
-            value_graph_label[dat.index].title_label.Bottom:Set(line[dat.index].y-1)
-            value_graph_label[dat.index].title_label:SetColor(dat.color)
-            value_graph_label[dat.index].title_label:SetDropShadow(true)
-        end
-        -- pulse the player graph if not in replay  TODO: fix the bug that we are nil when recreating the graph
-        if current_player_index != 0 and current_player_index != nil and graph[current_player_index][1] != nil then
-            for i,bmp in graph[current_player_index] do
-                EffectHelpers.Pulse(bmp,1,.65,1)
-            end
-        end
-        -- for the windows under the mouse on the background
-        local infoText = false
+        --if graph != nil and graph then graph:Destroy() graph=false end
+        WaitSeconds(0.001) -- give time to refresh and displayed the background
+
+        -- Display the mouse hover showing time and value at current position
+        local hoverInfo = Group(grp)
+        hoverInfo.Left:Set(0)
+        hoverInfo.Top:Set(0)
+        hoverInfo.Right:Set(50)
+        hoverInfo.Bottom:Set(30)
+        hoverInfo:DisableHitTest(true)
+        local infoPopupbg = Bitmap(hoverInfo) -- the borders of the windows
+        infoPopupbg:SetSolidColor('white')
+        infoPopupbg:SetAlpha(.6)
+        infoPopupbg.Depth:Set(function() return hoverInfo.Depth()+1 end)
+        infoPopupbg.Width:Set(function() return hoverInfo.Width()+2 end)
+        infoPopupbg.Height:Set(function() return hoverInfo.Height()+2 end)
+        infoPopupbg.Left:Set(function() return hoverInfo.Left()-1 end)
+        infoPopupbg.Bottom:Set(function() return hoverInfo.Bottom() + 2 end)
+        local infoPopup = Bitmap(infoPopupbg)
+        infoPopup:SetSolidColor('black')
+        infoPopup:SetAlpha(.6)
+        infoPopup.Depth:Set(function() return hoverInfo.Depth()+2 end)
+        infoPopup.Width:Set(function() return infoPopupbg.Width() - 4 end)
+        infoPopup.Height:Set(function() return infoPopupbg.Height() - 4 end)
+        infoPopup.Left:Set(function() return infoPopupbg.Left() + 2 end)
+        infoPopup.Bottom:Set(function() return infoPopupbg.Bottom() - 2 end)
+        local infoText = UIUtil.CreateText(hoverInfo, '', 14, UIUtil.titleFont)
+        infoText:SetColor("white")
+        infoText:DisableHitTest()
+        infoText.Left:Set(function() return hoverInfo.Left() + 4 end)
+        infoText.Bottom:Set(function() return hoverInfo.Bottom() - 4 end)
+        infoText.Depth:Set(function() return hoverInfo.Depth()+3 end)
         --displays the value when the mouse is over a graph
         bg.HandleEvent = function(self, event)
             local posX = function() return event.MouseX end -- - bg.Left() end
-            local posY = function() return event.MouseY  end-- - bg.Top() end
-            if infoText != false then
-                infoText:Destroy()
-                infoText = false
-            end
+            local posY = function() return event.MouseY end -- - bg.Top() end
             if posX()>x1 and posX()<x2 and posY()>y1 and posY()<y2 then
-                local  value = tps_format((posX()-x1)/(x2-x1)*scoreInterval*data_nbr) .. " / " .. FormatNumber(math.floor(ReverseScaling((y2-posY())/factor))) --This is the value that gets shown when we hover the mouse over any point in the graph, so want to reverse the scaled value so we see the actual value
-                infoText = UIUtil.CreateText(grp,value, 14, UIUtil.titleFont)
-                infoText.Left:Set(function() return posX()-(infoText.Width()/2) end)
-                infoText.Bottom:Set(function() return posY()-7 end)
-                infoText:SetColor("white")
-                infoText:DisableHitTest()
-                local infoPopupbg = Bitmap(infoText) -- the borders of the windows
-                infoPopupbg:SetSolidColor('white')
-                infoPopupbg:SetAlpha(.6)
-                infoPopupbg.Depth:Set(function() return infoText.Depth()-2 end)
-                local infoPopup = Bitmap(infoText)
-                infoPopup:SetSolidColor('black')
-                infoPopup:SetAlpha(.6)
-                infoPopupbg.Depth:Set(function() return infoText.Depth()-1 end)
-                infoPopup.Width:Set(function() return infoText.Width() +8 end)
-                infoPopup.Height:Set(function() return infoText.Height()+8 end)
-                infoPopup.Left:Set(function() return infoText.Left()-4 end)
-                infoPopup.Bottom:Set(function() return infoText.Bottom()+4 end)
-                infoPopupbg.Width:Set(function() return infoPopup.Width()+2 end)
-                infoPopupbg.Height:Set(function() return infoPopup.Height()+2 end)
-                infoPopupbg.Left:Set(function() return infoPopup.Left()-1 end)
-                infoPopupbg.Bottom:Set(function() return infoPopup.Bottom() +1 end)
+                local timeAtCursor = (posX()-x1)/graphWidth*gameTimeSeconds
+                local valueAtCursor = math.floor(ReverseScaling((y2-posY()) / graphHeight * scaledMaxvalue)) --This is the value that gets shown when we hover the mouse over any point in the graph, so want to reverse the scaled value so we see the actual value
+                local text = tps_format(timeAtCursor) .. " / " .. FormatNumber(valueAtCursor)
+
+                hoverInfo:Show()
+                infoText:SetText(text)
+                hoverInfo.Left:Set(function() return posX()-7 end)
+                hoverInfo.Bottom:Set(function() return posY() + 70 end)
+                hoverInfo.Width:Set(function() return infoText.Width() + 10 end)
+                hoverInfo.Height:Set(function() return infoText.Height() + 10 end)
+            else
+                hoverInfo:Hide()
             end
         end
-    end)
-end
-    if create_anime_graph2 then KillThread(create_anime_graph2) end
-        create_anime_graph2 = ForkThread(function()
-        local periode=0  -- the number of the saved used
-        local x=parent.Left()+ x1  -- the current position on x
-        local dist=(x2-x1)/(data_nbr) -- the distance on the screen between two saved
-        --LOG("dist:",dist)
-        local delta_refresh=(x2-x1)/(6*size) -- the distance in time between the smallest halt possible to make a refresh
-        local delta=0 -- counter for refresh and small halt
-        local line={} -- containe for the actual periode of time all the data to be draw
-        --if graph != nil and graph then graph:Destroy() graph=false end
-        graph2={} -- will containt a table for each line and each line will be a table of bitmap
-        for index, dat in player do     graph2[dat.index]={}    end -- init the different line
-        local current_player_index=0  -- if 0 we are in replay, otherwise will show the graph to emphasize
-        if not gamemain.GetReplayState() then current_player_index=GetFocusArmy() end
-        WaitSeconds(0.001) -- give time to refresh and displayed the background
-        inc_periode=((data_nbr)/(x2-x1)) -- give the increment on the screen between each periode (i.e. between each saved)
-        if inc_periode<1 then inc_periode=1 end -- can not be <1 => use the whole screen
-        local nbr=1 -- couting the number of iterancy done
+        
         -- ============ starting
         t=CurrentTime()
-        WaitFrames(10)
+        WaitFrames(5)
         t1=CurrentTime()
-        --LOG("------- calculating the timing of the frame")
-        --LOG("Time to display 1 frame (calculate with 10 frames):",(t1-t)/10,'  t:',t,'   t1:',t1)
-        delta_refresh=(x2-x1)*(t1-t)/10*((player_nbr+1)/4)
-        --LOG("So refresh all the ",delta_refresh," pixels displayed (delta_refresh:)")
-        while periode<data_nbr do
-            nbr=nbr+1
-            periode=math.floor(nbr*inc_periode) -- calculate the next periode to use (i.e. skip some of them it more value than the screen can display)
-            local tot=0
-            -- prepare the data, calculate the ya=start y position and the yb=end position of the ligne for each player for this periode
+        -- LOG("------- calculating the timing of the frame")
+        -- LOG("Time to display 1 frame (calculate with 10 frames):",(t1-t)/5,'  t:',t,'   t1:',t1)
+        local delta_refresh=graphWidth*(t1-t)/5*((player_nbr+1)/4)  -- the distance in time between the smallest halt possible to make a refresh
+        -- LOG("So refresh all the ",delta_refresh," pixels displayed (delta_refresh:)")
+        -- LOG("data_nbr: ", data_nbr, " finalSegmentTimeFraction: ", finalSegmentTimeFraction)
+
+        local current_player_index=0
+        -- if not gamemain.GetReplayState() then current_player_index=GetFocusArmy() end
+        if current_player_index == 0 then current_player_index = scoreData.focusArmyIndex end
+
+        local x = graphLeft  -- the current position on x
+
+        local graph={} -- will containt a table for each line and each line will be a table of bitmap
+        for index, dat in player do     graph[dat.index]={}     end -- init the different line
+
+        local periode=1  -- the index of the saved score data used
+        local inc_periode=math.max(data_nbr/graphWidth, 1) -- give the increment on the screen between each periode (i.e. between each saved)
+        local nbr=1 -- couting the number of iterancy done
+        local dataSegments={} -- containe for the actual periode of time all the data to be draw
+        while periode <= data_nbr do
+            -- prepare the data, calculate the ya=start y position and the yb=end position of the line for each player for this periode
             for index, dat in player do
-                if periode==1 then val=0 else val=return_value(periode-1,dat.index,path) end
-                if val==nil or val<0.01 or val==false then val=0 end
-                ya=val
-                local val=return_value(periode,dat.index,path) --{"general","currentunits",false}
-                if val==nil or val<0.01 or val==false then val=0 end
-                yb=val
-                -- put all the data in this table
-                line[dat.index]={grp=grp,ya=ya,yb=yb,y=ya,  -- note: y is the current position for this graph; the x is commun to all graph
-                    color=dat.color,index=dat.index,value=val,
-                    y_factor=(yb-ya)/dist*size} -- important: the factor of deplacement for the bitmap
+                dataSegments[dat.index]={
+                    valStart=AdjustValueScale(return_value(periode,dat.index,path)),
+                    valEnd=AdjustValueScale(return_value(periode + inc_periode,dat.index,path)),
+                    color=dat.color,
+                }
             end
-            local totaux=0
-            local sav_x=x
-            while (x<(parent.Left()+ x1 + nbr*dist) and x<(x2+parent.Left()))  do
-                totaux=0
-                for name,data in line do
-                    totaux=totaux+ data.ya+(data.yb - data.ya)*((x-sav_x)/dist)
-                    --data.ya*(1-data.yb*(x/sav_x)/data.ya)
-                end
-                local factor=0
-                if totaux != 0 then  factor=(y2-y1)/totaux end
-                local ya_draw=y2
-                local yb_draw=0
-                for name,data in line do
-                    yb_draw=ya_draw
-                    ya_draw=ya_draw-(data.ya+(data.yb - data.ya)*((x-sav_x)/dist))*factor
-                    --if ya_draw>y2 or ya_draw<0 then ya_draw=y2 end
-                    --if yb_draw>y2 or ya_draw<0 then yb_draw=y2 end
-                    --LOG(ya_draw, '     ',yb_draw)
-                    --data.ya*(1-data.yb*(x/sav_x)/data.ya)*factor
-                    --data.ya*factor*(x/sva_x)
-                    graph2[data.index][x-x1]=Bitmap(grp)
-                    graph2[data.index][x-x1].Left:Set(parent.Left() +x)
-                    --local yn=parent.Top() +data.y+data.y_factor/math.abs(data.y_factor)*size*((math.abs(data.y_factor)+1))
-                    graph2[data.index][x-x1].Top:Set(parent.Top()+ya_draw)
-                    graph2[data.index][x-x1].Right:Set(graph2[data.index][x-x1].Left() +size)
-                    graph2[data.index][x-x1].Bottom:Set(parent.Top() +yb_draw) --+data.y)
-                    graph2[data.index][x-x1]:SetSolidColor(data.color)
-                    graph2[data.index][x-x1]:Depth(bg.Depth()+1)
-                    -- graph2[data.index][x-x1]:SetAlpha(.15)
-                    graph2[data.index][x-x1]:SetAlpha(.15)
+
+            local delta=0 -- counter for refresh and small halt
+            local dataSegmentXStart = x
+            local currentDataSegmentScreenWidth
+            if (periode < data_nbr) then
+                currentDataSegmentScreenWidth = dataSegmentSceenWidth
+            else
+                currentDataSegmentScreenWidth = dataSegmentSceenWidth * finalSegmentTimeFraction
+            end
+            while (x<(graphLeft + nbr*dataSegmentSceenWidth - size) and x < (graphRight - size))  do
+                local pixelStartRatio = (x - dataSegmentXStart) / currentDataSegmentScreenWidth -- ratio 0 to 1 between start and end of the data segment
+                local pixelEndRatio = math.min(1, ((x + size) - dataSegmentXStart) / currentDataSegmentScreenWidth) -- ratio 0 to 1 between start and end of the data segment
+                for index,data in dataSegments do
+                    local extraSize = 0
+                    if index == current_player_index then
+                        extraSize = size
+                    end
+                    local bitmap = bm(grp)
+                    graph[index][x-x1] = bitmap
+                    bitmap.Left:Set(parent.Left() + x - extraSize)
+                    bitmap.Right:Set(bitmap.Left() + size + extraSize)
+                    local pixelStartVal = data.valStart + (data.valEnd - data.valStart) * pixelStartRatio
+                    local pixelEndVal = data.valStart + (data.valEnd - data.valStart) * pixelEndRatio
+                    bitmap.Bottom:Set(graphBottom - math.min(pixelStartVal, pixelEndVal) * yScale + extraSize)
+                    bitmap.Top:Set(graphBottom - math.max(pixelStartVal, pixelEndVal) * yScale - size - extraSize)
+                    bitmap:SetSolidColor(data.color)
+                    bitmap:Depth(bg.Depth()+5)
+                    bitmap:DisableHitTest()
                 end
                 x=x+size
                 delta=delta+1
@@ -992,20 +901,117 @@ end
                     delta=0
                 end
             end
+            nbr=nbr+1
+            periode=math.floor(nbr*inc_periode) -- calculate the next periode to use (i.e. skip some of them it more value than the screen can display)
         end
+        -- ========= end of the drawing of the graph
+        t=CurrentTime()
+        -- LOG("total time:",t-t1)
+        -- display the max values for each player
+        local playerFinalValueLabel={}
+        for index, dat in player do
+            playerFinalValueLabel[dat.index]={}
+            local rawValue = return_value(data_nbr + 1,dat.index,path)
+            val=math.floor(rawValue) --This is the value label that gets shown on the graph for each player, e.g. for the winner this will be the end-game high score achieved (not sure if this is the highest value at any point in the game or just the score at the end of the game)
+            playerFinalValueLabel[dat.index].title_label=UIUtil.CreateText(grp,FormatNumber(val), 14, UIUtil.titleFont)
+            playerFinalValueLabel[dat.index].title_label.Right:Set(graphRight)
+            playerFinalValueLabel[dat.index].title_label.Bottom:Set(graphBottom - AdjustValueScale(rawValue) * yScale)
+            playerFinalValueLabel[dat.index].title_label:SetColor(dat.color)
+            playerFinalValueLabel[dat.index].title_label:SetDropShadow(true)
+        end
+        -- pulse the player graph if not in replay
+        if current_player_index > 0 and current_player_index != nil and graph[current_player_index] != nil then
+            local playerGraphs = graph[current_player_index]
+            for i,bmp in playerGraphs do
+                EffectHelpers.Pulse(bmp,1,.5,1)
+            end
+        end
+        end)
+    end
+    if create_anime_graph2 then KillThread(create_anime_graph2) end
+        create_anime_graph2 = ForkThread(function()
+        local x=parent.Left()+ x1  -- the current position on x
+        local delta_refresh=graphWidth/(6*size) -- the distance in time between the smallest halt possible to make a refresh
+        local delta=0 -- counter for refresh and small halt
+        --if graph != nil and graph then graph:Destroy() graph=false end
+        graph2={} -- will containt a table for each line and each line will be a table of bitmap
+        for index, dat in player do     graph2[dat.index]={}    end -- init the different line
+        WaitSeconds(0.001) -- give time to refresh and displayed the background
+        -- ============ starting
+        t=CurrentTime()
+        WaitFrames(10)
+        t1=CurrentTime()
+        --LOG("------- calculating the timing of the frame")
+        --LOG("Time to display 1 frame (calculate with 10 frames):",(t1-t)/10,'  t:',t,'   t1:',t1)
+        delta_refresh=graphWidth*(t1-t)/10*((player_nbr+1)/4)
+        --LOG("So refresh all the ",delta_refresh," pixels displayed (delta_refresh:)")
+        local periode=1  -- the number of the saved used
+        local inc_periode=math.max(data_nbr/graphWidth, 1) -- give the increment on the screen between each periode (i.e. between each saved)
+        local nbr=1 -- couting the number of iterancy done
+        local dataSegments={} -- containe for the actual periode of time all the data to be draw
+        while periode <= data_nbr do
+            -- prepare the data, calculate the ya=start y position and the yb=end position of the ligne for each player for this periode
+            for index, dat in player do
+                -- put all the data in this table
+                dataSegments[dat.index]={
+                    valStart=return_value(periode,dat.index,path),
+                    valEnd=return_value(periode + inc_periode,dat.index,path),
+                    color=dat.color,
+                }
+            end
+            local pixelTotalValueStart = 0
+            local pixelTotalValueEnd = 0
+            for name,data in dataSegments do
+                pixelTotalValueStart = pixelTotalValueStart + data.valStart
+                pixelTotalValueEnd = pixelTotalValueEnd + data.valEnd
+            end
+            local dataSegmentXStart = x
+            local currentDataSegmentScreenWidth
+            if (periode < data_nbr) then
+                currentDataSegmentScreenWidth = dataSegmentSceenWidth
+            else
+                currentDataSegmentScreenWidth = dataSegmentSceenWidth * finalSegmentTimeFraction
+            end
+            while (x<(graphLeft + nbr*dataSegmentSceenWidth - size) and x < (graphRight - size))  do
+                local pixelStartRatio = (x - dataSegmentXStart) / currentDataSegmentScreenWidth -- ratio 0 to 1 between start and end of the data segment
+                local pixelTotalValue = (pixelTotalValueStart + (pixelTotalValueEnd - pixelTotalValueStart) * pixelStartRatio)
+                local valueAccumulator = 0
+                for index,data in dataSegments do
+                    local pixelStartVal = (data.valStart + (data.valEnd - data.valStart) * pixelStartRatio)
+                    local bitmap = bm(grp)
+                    graph2[index][x-x1]=bitmap
+                    bitmap.Left:Set(parent.Left() + x)
+                    bitmap.Right:Set(bitmap.Left() + size)
+                    bitmap.Top:Set(graphTop + (valueAccumulator + pixelStartVal) / pixelTotalValue  * graphHeight)
+                    bitmap.Bottom:Set(graphTop + (valueAccumulator) / pixelTotalValue * graphHeight)
+                    bitmap:SetSolidColor(data.color)
+                    bitmap:Depth(bg.Depth()+1)
+                    bitmap:SetAlpha(.15)
+                    bitmap:DisableHitTest()
+                    valueAccumulator = valueAccumulator + pixelStartVal
+                end
+                x=x+size
+                delta=delta+1
+                if delta>delta_refresh then
+                    WaitFrames(1) -- do the reshresh, should be far smaller to be smooth...
+                    delta=0
+                end
+            end
+            nbr=nbr+1
+            periode=math.floor(nbr*inc_periode) -- calculate the next periode to use (i.e. skip some of them it more value than the screen can display)
+       end
         -- ========= end of the drawing of the graph
         t=CurrentTime()
         --LOG("total time:",t-t1)
         local j=1
-    local quadrillage_horiz2={}
-    local nbr_quadrillage_horiz2=4 -- how many horizontal axies
-    while j<nbr_quadrillage_horiz2 do
-        local tmp=j
-        quadrillage_horiz2[j]={}
-        quadrillage_horiz2[j].title_label=UIUtil.CreateText(grp,(math.floor((j-1)/(nbr_quadrillage_horiz2-2)*100)).." %", 14, UIUtil.titleFont)
-        quadrillage_horiz2[j].title_label.Left:Set(parent.Left() + x2 +10)
-        quadrillage_horiz2[j].title_label.Bottom:Set(parent.Top() +y2 - (y2-y1-15)*((tmp-1)/(nbr_quadrillage_horiz2-2))+1)
-        quadrillage_horiz2[j].title_label:SetColor("gray")
+    local percentageAxisLabels={}
+    local percentageAxisLabelCount=3 -- how many horizontal axies
+    while j<=percentageAxisLabelCount do
+        percentageAxisLabels[j]={}
+        percentageAxisLabels[j].title_label=UIUtil.CreateText(grp,(math.floor((j-1)/(percentageAxisLabelCount-1)*100)).." %", 14, UIUtil.titleFont)
+        percentageAxisLabels[j].title_label.Left:Set(parent.Left() + x2 +10)
+        percentageAxisLabels[j].title_label.Bottom:Set(parent.Top() +y2 - (graphHeight-15)*((j-1)/(percentageAxisLabelCount-1))+1)
+        percentageAxisLabels[j].title_label:SetColor("gray")
         j=j+1
     end
     end)

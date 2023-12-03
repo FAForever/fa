@@ -13,7 +13,7 @@ local TableGetn = table.getn
 local TableEmpty = table.empty
 
 -- constants
-local NavigateDistanceThresholdSquared = 20 * 20
+local NavigateDistanceThresholdSquared = 25 * 25
 
 ---@class AIPlatoonAdaptiveGuardBehavior : AIPlatoon
 ---@field RetreatCount number 
@@ -45,6 +45,12 @@ AIPlatoonAdaptiveGuardBehavior = Class(AIPlatoon) {
                 return
             end
 
+            if self.PlatoonData.LocationType then
+                self.LocationType = self.PlatoonData.LocationType
+            else
+                self.LocationType = 'MAIN'
+            end
+
             -- Set the movement layer for pathing, included for mods where water or air based engineers may exist
             self.MovementLayer = self:GetNavigationalLayer()
 
@@ -69,12 +75,12 @@ AIPlatoonAdaptiveGuardBehavior = Class(AIPlatoon) {
 
             self:Stop()
 
-            -- pick random unit
-            local units, unitCount = self:GetPlatoonUnits()
-            local unit = units[Random(1, unitCount)]
-
             -- determine navigational label of that unit
-            local position = unit:GetPosition()
+            local position = self:GetPlatoonPosition()
+            if not position then
+                return
+            end
+
             local label, error = NavUtils.GetLabel('Land', position)
 
             if label then
@@ -123,6 +129,11 @@ AIPlatoonAdaptiveGuardBehavior = Class(AIPlatoon) {
                     if bestBase and bestDefense < threshold then
                         self.LocationToGuard = bestBase.Position
                         local platPos = self:GetPlatoonPosition()
+                        if not platPos then
+                            return
+                        end
+
+
                         local guardPos = unitToGuard:GetPosition()
                         local dx = platPos[1] - guardPos[1]
                         local dz = platPos[3] - guardPos[3]
@@ -154,6 +165,10 @@ AIPlatoonAdaptiveGuardBehavior = Class(AIPlatoon) {
         
                     if unitToGuard and not unitToGuard.Dead then
                         local platPos = self:GetPlatoonPosition()
+                        if not platPos then
+                            return
+                        end
+
                         local guardPos = unitToGuard:GetPosition()
                         local dx = platPos[1] - guardPos[1]
                         local dz = platPos[3] - guardPos[3]
@@ -198,33 +213,34 @@ AIPlatoonAdaptiveGuardBehavior = Class(AIPlatoon) {
 
             self:Stop()
 
-            local cache = { 0, 0, 0 }
             local brain = self:GetBrain()
             if not brain.GridPresence then
                 WARN('GridPresence does not exist, unable to detect conflict line')
             end
 
-            if not NavUtils.CanPathToCell(self.MovementLayer, self:GetPlatoonPosition(), destination) then
+            local position = self:GetPlatoonPosition()
+            if not position then
+                return
+            end
+
+            if not NavUtils.CanPathToCell(self.MovementLayer, position, destination) then
                 self:LogDebug(string.format('Attack platoon is going to use transport'))
                 self:ChangeState(self.Transporting)
                 return
             end
 
             while not IsDestroyed(self) do
-                -- pick random unit for a position on the grid
-                local units = self:GetPlatoonUnits()
-                local origin
-                for _, v in units do
-                    if v and not v.Dead then
-                        origin = v:GetPosition()
-                    end
+                local origin = self:GetPlatoonPosition()
+                if not origin then
+                    return
                 end
+
                 if unitToGuard and not IsDestroyed(unitToGuard) then
                     destination = unitToGuard:GetPosition()
                 end
 
                 -- generate a direction
-                local waypoint, length = NavUtils.DirectionTo('Land', origin, destination, 30)
+                local waypoint, length = NavUtils.DirectionTo('Land', origin, destination, 60)
 
                 -- something odd happened: no direction found
                 if not waypoint then
@@ -246,6 +262,9 @@ AIPlatoonAdaptiveGuardBehavior = Class(AIPlatoon) {
                 local wz = waypoint[3]
                 while not IsDestroyed(self) do
                     local position = self:GetPlatoonPosition()
+                    if not position then
+                        return
+                    end
 
                     -- check if we're near our current waypoint
                     local dx = position[1] - wx
@@ -319,8 +338,9 @@ AIPlatoonAdaptiveGuardBehavior = Class(AIPlatoon) {
                 local dx = guardUnitPos[1] - enemyUnitPos[1]
                 local dz = guardUnitPos[3] - enemyUnitPos[3]
                 if dx * dx + dz * dz > 3025 then
-                    IssueClearCommands(self:GetPlatoonUnits())
-                    IssueMove(guardUnitPos)
+                    local units, unitCount = self:GetPlatoonUnits()
+                    IssueClearCommands(units)
+                    IssueMove(units, guardUnitPos)
                     coroutine.yield(30)
                     if not IsDestroyed(unitToGuard) then
                         self:ChangeState(self.GuardUnit)
@@ -333,9 +353,11 @@ AIPlatoonAdaptiveGuardBehavior = Class(AIPlatoon) {
                 -- check if our command is still going
                 if not self:IsCommandsActive(command) then
                     if not IsDestroyed(unitToGuard) then
+                        coroutine.yield(10)
                         self:ChangeState(self.GuardUnit)
                         return
                     else
+                        coroutine.yield(10)
                         self:ChangeState(self.Searching)
                         return
                     end
@@ -357,8 +379,8 @@ AIPlatoonAdaptiveGuardBehavior = Class(AIPlatoon) {
             if unitToGuard and not unitToGuard.Dead then
 
                 -- sanity check
-                local location = self.OpportunityToRaid
-                IssueGuard(self:GetPlatoonUnits(), unitToGuard)
+                local units = self:GetPlatoonUnits()
+                IssueGuard(units, unitToGuard)
                 local guardTime = 0
                 while brain:PlatoonExists(self) and not unitToGuard.Dead do
                     local guardUnitPos = unitToGuard:GetPosition()
@@ -387,19 +409,27 @@ AIPlatoonAdaptiveGuardBehavior = Class(AIPlatoon) {
                         
                     end
                     guardTime = guardTime + 5
-                    WaitSeconds(5)
+                    WaitTicks(50)
                     
-
                     if self.PlatoonData.EngineerGuardTimeLimit and guardTime >= self.PlatoonData.EngineerGuardTimeLimit
                     or (not unitToGuard.Dead and unitToGuard.Layer == 'Seabed' and self.MovementLayer == 'Land') then
-                        IssueClearCommands({self:GetPlatoonUnits()})
+                        local units, unitCount = self:GetPlatoonUnits()
+                        IssueClearCommands(units)
                         coroutine.yield(10)
                         self:ChangeState(self.Searching)
                         return
                     end
+                    if self.ExitGuard then
+                        local plat = brain:MakePlatoon('', '')
+                        local units = self:GetPlatoonUnits()
+                        brain:AssignUnitsToPlatoon(plat, units, 'attack', 'None')
+                        import("/lua/aibrains/platoons/platoon-adaptive-returntobase.lua").AssignToUnitsMachine({ LocationType = self.LocationType}, plat, units)
+                        return
+                    end
                 end
             else
-                IssueClearCommands({self:GetPlatoonUnits()})
+                local units, unitCount = self:GetPlatoonUnits()
+                IssueClearCommands(units)
                 coroutine.yield(10)
                 self:ChangeState(self.Searching)
                 return
@@ -418,7 +448,8 @@ AIPlatoonAdaptiveGuardBehavior = Class(AIPlatoon) {
             local baseToGuardPos = self.LocationToGuard
             if baseToGuardPos then
                 -- sanity check
-                IssueGuard(self:GetPlatoonUnits(), baseToGuardPos)
+                local units, unitCount = self:GetPlatoonUnits()
+                IssueGuard(units, baseToGuardPos)
                 local guardTime = 0
                 local rnd = Random(13,17)
                 WaitSeconds(rnd)
@@ -458,7 +489,8 @@ AIPlatoonAdaptiveGuardBehavior = Class(AIPlatoon) {
                     WaitTicks(50)
                 end
             else
-                IssueClearCommands({self:GetPlatoonUnits()})
+                local units, count = self:GetPlatoonUnits()
+                IssueClearCommands(units)
                 coroutine.yield(10)
                 self:ChangeState(self.Searching)
                 return
@@ -490,6 +522,10 @@ AIPlatoonAdaptiveGuardBehavior = Class(AIPlatoon) {
             while not IsDestroyed(self) do
 
                 local position = self:GetPlatoonPosition()
+                if not position then
+                    return
+                end
+
                 local waypoint, error = NavUtils.RetreatDirectionFrom('Land', position, location, 40)
 
                 if not waypoint then
@@ -504,6 +540,9 @@ AIPlatoonAdaptiveGuardBehavior = Class(AIPlatoon) {
 
                 while not IsDestroyed(self) do
                     local position = self:GetPlatoonPosition()
+                    if not position then
+                        return
+                    end
 
                     -- check if we're near our retreat point
                     local dx = position[1] - wx

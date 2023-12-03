@@ -1,12 +1,6 @@
 UnitBlueprint{
     Description = "<LOC urb0101_desc>Land Factory",
-    AI = {
-        TargetBones = {
-            "URB0101",
-            "B07",
-            "B08",
-        },
-    },
+    AI = { },
     Audio = {
         Construct      = Sound { Bank = 'URB',        Cue = 'URB0101_Construct_Start',    LodCutoff = 'UnitMove_LodCutoff' },
         ConstructLoop  = Sound { Bank = 'URB',        Cue = 'URB0101_Construct_Loop',     LodCutoff = 'UnitMove_LodCutoff' },
@@ -109,7 +103,7 @@ UnitBlueprint{
             BuildAttachBone = "Attachpoint",
             BuildEffectBones = {
                 "Arm01_Muzzle",
-                "Arm02_Muzzle",
+                "Arm06_Muzzle",
             },
         },
         CommandCaps = {

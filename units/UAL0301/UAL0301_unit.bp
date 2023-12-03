@@ -2,10 +2,6 @@ UnitBlueprint{
     Description = "<LOC ual0301_desc>Support Armored Command Unit",
     AI = {
         GuardScanRadius = 26,
-        TargetBones = {
-            "Torso",
-            "AttachPoint",
-        },
     },
     Audio = {
         CaptureLoop                   = Sound { Bank = 'UAL',         Cue = 'UAL0301_Capture_Loop',    LodCutoff = 'UnitMove_LodCutoff' },

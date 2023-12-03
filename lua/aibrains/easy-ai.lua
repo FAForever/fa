@@ -54,7 +54,6 @@ AIBrain = Class(StandardBrain, EconomyComponent) {
         }
 
         self:ForkThread(self.GetBaseDebugInfoThread)
-        self:ForkThread(self.GetPlatoonDebugInfoThread)
         self:IMAPConfiguration()
     end,
 
@@ -313,29 +312,6 @@ AIBrain = Class(StandardBrain, EconomyComponent) {
                     local base = self.BuilderManagers[identifier]
                     local info = base:GetDebugInfo()
                     Sync.AIBaseInfo = info
-                end
-            end
-
-            WaitTicks(10)
-        end
-    end,
-
-    ---@param self EasyAIBrain
-    ---@return AIBaseDebugInfo
-    GetPlatoonDebugInfoThread = function(self)
-        while true do
-            if GetFocusArmy() == self:GetArmyIndex() then
-                local units = DebugGetSelection()
-                if units and units[1] then
-                    local unit = units[1]
-                    if unit.AIPlatoonReference then
-                        Sync.AIPlatoonInfo = {
-                            PlatoonInfo = unit.AIPlatoonReference:GetDebugInfo(),
-                            EntityId = unit.EntityId,
-                            BlueprintId = unit.Blueprint.BlueprintId,
-                            Position = unit:GetPosition(),
-                        }
-                    end
                 end
             end
 

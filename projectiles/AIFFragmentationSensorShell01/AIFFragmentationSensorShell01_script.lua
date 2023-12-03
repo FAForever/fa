@@ -8,8 +8,12 @@ local EffectTemplate = import("/lua/effecttemplates.lua")
 local AArtilleryFragmentationSensorShellProjectile = import("/lua/aeonprojectiles.lua").AArtilleryFragmentationSensorShellProjectile
 local RandomFloat = import("/lua/utilities.lua").GetRandomFloat
 
+---@class AIFFragmentationSensorShell01 : AArtilleryFragmentationSensorShellProjectile
 AIFFragmentationSensorShell01 = ClassProjectile(AArtilleryFragmentationSensorShellProjectile) {
 
+    ---@param self AIFFragmentationSensorShell01
+    ---@param TargetType string
+    ---@param TargetEntity Prop|Unit
     OnImpact = function(self, TargetType, TargetEntity)
         local FxFragEffect = EffectTemplate.Aeon_QuanticClusterFrag01
         local bp = self.Blueprint.Physics
@@ -47,7 +51,7 @@ AIFFragmentationSensorShell01 = ClassProjectile(AArtilleryFragmentationSensorShe
             proj:SetVelocity(velocity)
             proj.DamageData = self.DamageData
         end
-        
+
         self:Destroy()
     end,
 }

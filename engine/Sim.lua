@@ -32,7 +32,7 @@
 ---@alias Object Blip | CollisionBeam | moho.entity_methods | moho.prop_methods | moho.projectile_methods | moho.unit_methods
 ---@alias BoneObject moho.entity_methods | moho.prop_methods | moho.projectile_methods | moho.unit_methods
 ---@alias ReclaimObject moho.prop_methods | moho.unit_methods
----@alias TargetObject moho.prop_methods | moho.unit_methods
+---@alias TargetObject moho.prop_methods | moho.unit_methods | moho.projectile_methods
 
 --- restricts the army from building the unit category
 ---@param army Army
@@ -115,8 +115,9 @@ end
 
 --- Creates a bone manipulator for a unit, allowing it to be animated
 ---@param object BoneObject
+---@param alignWithSpeed boolean    # if set, animation rate takes into account the speed of the unit
 ---@return moho.AnimationManipulator
-function CreateAnimator(object)
+function CreateAnimator(object, alignWithSpeed)
 end
 
 --- Creates a beam that is attached to an entity

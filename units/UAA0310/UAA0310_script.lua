@@ -112,7 +112,6 @@ UAA0310 = ClassUnit(AirTransport, ExternalFactoryComponent) {
             self:DetachAll(self.BuildAttachBone)
             self:SetBusy(false)
             self:OnIdle()
-            LOG("OnIdle")
         end,
 
         OnStartBuild = function(self, unitBuilding, order)
@@ -133,20 +132,7 @@ UAA0310 = ClassUnit(AirTransport, ExternalFactoryComponent) {
 
         OnStopBuild = function(self, unitBeingBuilt)
             AirTransport.OnStopBuild(self, unitBeingBuilt)
-
-
-            local unitBuilding = self.UnitBeingBuilt
-            unitBuilding:DetachFrom(true)
-            self:DetachAll(self.BuildAttachBone)
-
-            if not self:TransportHasAvailableStorage() or self:GetScriptBit('RULEUTC_WeaponToggle') then
-                unitBuilding:ShowBone(0, true)
-            else
-                self:AddUnitToStorage(unitBuilding)
-            end
-
-            self:RequestRefreshUI()
-            ChangeState(self, self.IdleState)
+            ExternalFactoryComponent.OnStopBuildWithStorage(self, unitBeingBuilt)
         end,
     },
 }

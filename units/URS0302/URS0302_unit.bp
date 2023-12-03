@@ -4,9 +4,11 @@ UnitBlueprint{
         AttackAngle = 60,
         GuardReturnRadius = 15,
         TargetBones = {
-            "URS0302",
             "Back_Wake",
-            "Front_Left_Wake",
+            "Back_Turret",
+            "Back_Turret_AA",
+            "Front_Turret",
+            "Front_Turret_AA",
             "Front_Right_Wake",
         },
     },

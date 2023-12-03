@@ -24,7 +24,7 @@ local TableEmpty = table.empty
 local TableRemove = table.remove
 local TableMerged = table.merged
 
--- upvalue globals for performance
+-- upvalue scope for performance
 local type = type
 local Vector = Vector
 local IsEntity = IsEntity
@@ -32,6 +32,8 @@ local GetEntityById = GetEntityById
 local GetSurfaceHeight = GetSurfaceHeight
 local OkayToMessWithArmy = OkayToMessWithArmy
 local EntityCategoryFilterDown = EntityCategoryFilterDown
+local GetCurrentCommandSource = GetCurrentCommandSource
+local GetSystemTimeSecondsOnlyForProfileUse = GetSystemTimeSecondsOnlyForProfileUse
 
 local IssueClearCommands = IssueClearCommands
 local IssueBuildMobile = IssueBuildMobile
@@ -65,6 +67,8 @@ function DoCallback(name, data, units)
 end
 
 --- Common utility function to retrieve the actual units.
+---@param units Unit[]
+---@return Unit[]
 function SecureUnits(units)
     local secure = {}
     if units and type(units) ~= 'table' then
@@ -88,6 +92,27 @@ end
 Callbacks.EmptyCallback = function(data, units)
 end
 
+--- Callback takes a boolean and toggles a stat on given units between 0 and 1
+---@param data table<string, boolean>
+Callbacks.SetStatByCallback = function(data, units)
+    for stat, value in data do
+        if not type(value) == 'boolean' then
+            WARN('SetStatByCallback: received non boolean value ' .. repr(value) .. ' for stat ' .. repr(stat) .. '!')
+            continue
+        end
+        value = (value and 1) or 0 -- numerize our bool
+        for _, u in units or {} do
+            if IsEntity(u) and OkayToMessWithArmy(u.Army) then
+                if not u.Blueprint.General.StatToggles or not u.Blueprint.General.StatToggles[stat] then
+                    WARN('SetStatByCallback: ' .. repr(stat) .. ' is not a valid stat for this unit!')
+                    continue
+                end
+                u:UpdateStat(stat, value)
+            end
+        end
+    end
+end
+
 Callbacks.AutoOvercharge = function(data, units)
     for _, u in units or {} do
         if IsEntity(u) and OkayToMessWithArmy(u.Army) and u.SetAutoOvercharge then
@@ -107,15 +132,6 @@ Callbacks.PersistFerry = function(data, units)
     IssueClearCommands(units)
     for _, r in data.route do
         IssueFerry(units, r)
-    end
-end
-
-Callbacks.TransportLock = function(data)
-    local units = SecureUnits(data.ids)
-    if not units[1] then return end
-
-    for _, u in units do
-        u:TransportLock(data.lock == true)
     end
 end
 
@@ -266,6 +282,28 @@ Callbacks.FlagShield = function(data, units)
 end
 
 -------------------------------------------------------------------------------
+--#region General orders
+
+---@param data { }
+---@param selection Unit[]
+Callbacks.SelfDestruct = function(data, selection)
+    -- verify selection
+    selection = SecureUnits(selection)
+    if (not selection) or TableEmpty(selection) then
+        return
+    end
+
+    -- suppress self destruct in tutorial missions as they screw up the mission
+    if ScenarioInfo.tutorial then
+        return
+    end
+
+    import("/lua/sim/commands/self-destruct.lua").RingExtractor(selection, true)
+end
+
+--#endregion
+
+-------------------------------------------------------------------------------
 --#region Advanced orders
 
 Callbacks.WeaponPriorities = import("/lua/weaponpriorities.lua").SetWeaponPriorities
@@ -402,7 +440,10 @@ Callbacks.RingArtilleryTech3Exp = function(data, selection)
     if (not target) or
         (not target.Army) or
         (not OkayToMessWithArmy(target.Army)) or
-        (not EntityCategoryContains(categories.ARTILLERY * (categories.TECH3 + categories.EXPERIMENTAL) * categories.STRUCTURE, target))
+        (
+        not
+            EntityCategoryContains(categories.ARTILLERY * (categories.TECH3 + categories.EXPERIMENTAL) *
+                categories.STRUCTURE, target))
     then
         return
     end
@@ -518,11 +559,12 @@ do
             return
         end
 
-        import("/lua/sim/commands/distribute-queue.lua").DistributeOrders(selection, target, data.ClearCommands or false, true)
+        import("/lua/sim/commands/distribute-queue.lua").DistributeOrders(selection, target, data.ClearCommands or false
+            , true)
     end
 end
 
-do 
+do
     --- Processes the orders and re-distributes them over the units
     ---@param data { Target: EntityId, ClearCommands: boolean }
     ---@param selection Unit[]
@@ -551,15 +593,118 @@ do
     ---@param data { ClearCommands: boolean }
     ---@param selection Unit[]
     Callbacks.LoadIntoTransports = function(data, selection)
-       -- verify selection
-       selection = SecureUnits(selection)
-       if (not selection) or TableEmpty(selection) then
-           return
-       end
+        -- verify selection
+        selection = SecureUnits(selection)
+        if (not selection) or TableEmpty(selection) then
+            return
+        end
 
-       local transports = EntityCategoryFilterDown(categories.TRANSPORTATION, selection)
-       local transportees = EntityCategoryFilterDown(categories.ALLUNITS - (categories.AIR + categories.TRANSPORTATION), selection)
-       local transportedUnits, transportsUsed, remUnits, remTransports = import("/lua/sim/commands/load-in-transport.lua").LoadIntoTransports(transportees, transports, data.ClearCommands or false, true)
+        local transports = EntityCategoryFilterDown(categories.TRANSPORTATION, selection)
+        local transportees = EntityCategoryFilterDown(categories.ALLUNITS - (categories.AIR + categories.TRANSPORTATION)
+            , selection)
+        local transportedUnits, transportsUsed, remUnits, remTransports = import("/lua/sim/commands/load-in-transport.lua")
+            .LoadIntoTransports(transportees, transports, data.ClearCommands or false, true)
+    end
+end
+
+do
+    local CommandSourceGuards = {}
+
+    ---@param data { }
+    ---@param selection Unit[]
+    Callbacks.AbortNavigation = function(data, selection)
+        -- verify selection
+        selection = SecureUnits(selection)
+        if (not selection) or TableEmpty(selection) then
+            if (GetFocusArmy() == GetCurrentCommandSource()) then
+                print("Unable to interrupt path finding")
+            end
+
+            return
+        end
+
+        -- only apply this to engineers
+        local engineers = EntityCategoryFilterDown(categories.ENGINEER + categories.COMMAND, selection)
+        if table.empty(engineers) then
+            if (GetFocusArmy() == GetCurrentCommandSource()) then
+                print("Unable to interrupt path finding")
+            end
+
+            return
+        end
+
+        -- prevent automation
+        local gameTick = GetGameTick()
+        local commandSource = GetCurrentCommandSource()
+        local commandSourceGuard = CommandSourceGuards[commandSource]
+
+        if commandSourceGuard and commandSourceGuard + 5 >= gameTick then
+            if (GetFocusArmy() == GetCurrentCommandSource()) then
+                print("Unable to interrupt path finding")
+            end
+
+            return
+        end
+
+        CommandSourceGuards[commandSource] = gameTick
+
+        -- perform the command
+        import("/lua/sim/commands/abort-navigation.lua").AbortNavigation(engineers, true)
+    end
+end
+
+do
+    local CommandSourceGuards = {}
+
+    ---@param data { }
+    ---@param selection Unit[]
+    Callbacks.DischargeShields = function(data, selection)
+        -- verify selection
+        selection = SecureUnits(selection)
+        if (not selection) or TableEmpty(selection) then
+            if (GetFocusArmy() == GetCurrentCommandSource()) then
+                print("Unable to discharge")
+            end
+
+            return
+        end
+
+        -- only apply this to units with shields
+        local shead = 1
+        local unitsWithShields = {}
+        for k = 1, table.getn(selection) do
+            local unit = selection[k]
+            if unit.MyShield then
+                unitsWithShields[shead] = unit
+                shead = shead + 1
+            end
+        end
+
+        if table.empty(unitsWithShields) then
+            if (GetFocusArmy() == GetCurrentCommandSource()) then
+                print("Unable to discharge")
+            end
+
+            return
+        end
+
+        -- prevent automation
+        local gameTick = GetGameTick()
+        local commandSource = GetCurrentCommandSource()
+        local commandSourceGuard = CommandSourceGuards[commandSource]
+
+        if commandSourceGuard and commandSourceGuard + 5 >= gameTick then
+            if (GetFocusArmy() == GetCurrentCommandSource()) then
+                print("Unable to discharge")
+            end
+
+            return
+        end
+
+        CommandSourceGuards[commandSource] = gameTick
+
+        -- perform the command
+        import("/lua/sim/commands/discharge-shields.lua").DischargeShields(unitsWithShields, true)
     end
 end
 
@@ -704,21 +849,25 @@ local function ShowRaisedPlatforms(self)
     if not plats then return end
     local pos = self:GetPosition()
     local entities = {}
-    for i=1, (table.getn(plats)/12) do
-        entities[i]={}
-        for b=1,4 do
-            entities[i][b] = import('/lua/sim/Entity.lua').Entity{Owner = self}
+    for i = 1, (table.getn(plats) / 12) do
+        entities[i] = {}
+        for b = 1, 4 do
+            entities[i][b] = import('/lua/sim/Entity.lua').Entity { Owner = self }
             self.Trash:Add(entities[i][b])
             entities[i][b]:SetPosition(Vector(
-                pos[1]+plats[((i-1)*12)+(b*3)-2],
-                pos[2]+plats[((i-1)*12)+(b*3)],
-                pos[3]+plats[((i-1)*12)+(b*3)-1]
+                pos[1] + plats[((i - 1) * 12) + (b * 3) - 2],
+                pos[2] + plats[((i - 1) * 12) + (b * 3)],
+                pos[3] + plats[((i - 1) * 12) + (b * 3) - 1]
             ), true)
         end
-        self.Trash:Add(AttachBeamEntityToEntity(entities[i][1], -2, entities[i][2], -2, self:GetArmy(), '/effects/emitters/build_beam_01_emit.bp'))
-        self.Trash:Add(AttachBeamEntityToEntity(entities[i][1], -2, entities[i][3], -2, self:GetArmy(), '/effects/emitters/build_beam_01_emit.bp'))
-        self.Trash:Add(AttachBeamEntityToEntity(entities[i][4], -2, entities[i][2], -2, self:GetArmy(), '/effects/emitters/build_beam_01_emit.bp'))
-        self.Trash:Add(AttachBeamEntityToEntity(entities[i][4], -2, entities[i][3], -2, self:GetArmy(), '/effects/emitters/build_beam_01_emit.bp'))
+        self.Trash:Add(AttachBeamEntityToEntity(entities[i][1], -2, entities[i][2], -2, self:GetArmy(),
+            '/effects/emitters/build_beam_01_emit.bp'))
+        self.Trash:Add(AttachBeamEntityToEntity(entities[i][1], -2, entities[i][3], -2, self:GetArmy(),
+            '/effects/emitters/build_beam_01_emit.bp'))
+        self.Trash:Add(AttachBeamEntityToEntity(entities[i][4], -2, entities[i][2], -2, self:GetArmy(),
+            '/effects/emitters/build_beam_01_emit.bp'))
+        self.Trash:Add(AttachBeamEntityToEntity(entities[i][4], -2, entities[i][3], -2, self:GetArmy(),
+            '/effects/emitters/build_beam_01_emit.bp'))
     end
 end
 

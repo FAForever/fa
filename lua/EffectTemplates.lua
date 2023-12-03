@@ -546,6 +546,12 @@ AeonBuildBeams02 = {
     EmtBpPath .. 'aeon_build_beam_06_emit.bp',
 }
 
+AeonVolcanoBeam01 = {
+    EmtBpPath .. 'aeon_volcano_beam_01.bp',
+    EmtBpPath .. 'aeon_volcano_beam_02.bp',
+    EmtBpPath .. 'aeon_volcano_beam_03.bp',
+}
+
 CybranBuildUnitBlink01 = { EmtBpPath .. 'build_cybran_blink_blue_01_emit.bp'}
 CybranBuildFlash01 =  EmtBpPath .. 'build_cybran_spark_flash_03_emit.bp'
 CybranBuildSparks01 =  EmtBpPath .. 'build_sparks_blue_01_emit.bp'

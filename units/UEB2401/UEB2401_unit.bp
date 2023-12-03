@@ -140,7 +140,7 @@ UnitBlueprint{
     SelectionThickness = 0.24,
     CollisionOffsetY = -0.25,
     SizeX = 5,
-    SizeY = 2,
+    SizeY = 2.4,
     SizeZ = 5,
     StrategicIconName = "icon_experimental_generic",
     StrategicIconSortPriority = 175,

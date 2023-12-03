@@ -34,6 +34,8 @@
 ---@field CameraFollowTimeout number
 --- how large is the strategic icon square for the projectile
 ---@field StrategicIconSize number
+--- flag to not use generic scorch splats
+---@field NoGenericScorchSplats? boolean
 
 ---@class ProjectileBlueprintEconomy
 --- energy cost to build this projectile
@@ -135,3 +137,4 @@
 ---@field RealisticOrdinance boolean
 --- bombs that always drop stright down
 ---@field StraightDownOrdinance boolean
+---@field OnLostTargetLifetime? number

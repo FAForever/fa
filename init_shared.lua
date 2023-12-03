@@ -46,9 +46,14 @@ if SetProcessPriority and GetProcessAffinityMask and SetProcessAffinityMask then
     -- affinity values acts like a bit mask, we retrieve the mask and shift it if we think there are sufficient computing units
     local success, processAffinityMask, systemAffinityMask = GetProcessAffinityMask();
     if success then
+        -- system has 24 (logical) computing units or more, skip the first two computing units and all cores beyond the first 24. We need 
+        -- to do this because of floating point imprecision - we simply can't deduct a few digits to prevent using the first two cores
+        if systemAffinityMask >= 16777215 then
+            processAffinityMask = 16777212 -- 2 ^ 24 - 3 - 1
+
         -- system has 6 (logical) computing units or more, skip first two computing units
-        if (systemAffinityMask >= 63) and (processAffinityMask == systemAffinityMask) then
-            processAffinityMask = systemAffinityMask - 3
+        elseif (systemAffinityMask >= 63) then
+            processAffinityMask = systemAffinityMask - 4 -- 2 ^ 6 - 3 - 1
         end
 
         -- update the afinity mask
@@ -59,6 +64,8 @@ if SetProcessPriority and GetProcessAffinityMask and SetProcessAffinityMask then
             else
                 LOG("Process - Failed to adjust the process affinity, this may impact your framerate")
             end
+        else
+            LOG("Process - Failed to update the process affinity, this may impact your framerate")
         end
     else
         LOG("Process - Failed to retrieve the process affinity, this may impact your framerate")
@@ -195,13 +202,6 @@ allowedAssetsScd["editor.scd"] = false      -- Unused
 allowedAssetsScd["ambience.scd"] = false    -- Empty 
 allowedAssetsScd["sc_music.scd"] = true
 allowedAssetsScd = LowerHashTable(allowedAssetsScd)
-
--- typical backwards compatible packages
-local allowedAssetsNxt = { }
-allowedAssetsNxt["kyros.nxt"] = true
-allowedAssetsNxt["advanced strategic icons.nxt"] = true
-allowedAssetsNxt["advanced_strategic_icons.nxt"] = true
-allowedAssetsNxt = LowerHashTable(allowedAssetsNxt)
 
 -- default wave banks to prevent collisions
 local soundsBlocked = { }

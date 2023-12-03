@@ -135,7 +135,7 @@ ADFTractorClaw = ClassWeapon(Weapon) {
     end,
 
     --- Attempts to retrieve the unit behind the target, can return false if the blip is too far away from the unit due to jamming
-    ---@param self ADFTractorClaw
+    ---@param self ADFTractorClaw unused
     ---@param blip Blip | Unit
     ---@return Blip | Unit | false
     GetUnitBehindTarget = function(self, blip)
@@ -244,10 +244,10 @@ ADFTractorClaw = ClassWeapon(Weapon) {
 
                 if not IsDestroyed(unit) then
 
-                    while not IsDestroyed(target) and not IsDestroyed(unit) and not unit.Dead and target:GetHealth() >= 730 do
-                        Damage(unit, bonePosition, target, 729, "Normal")
+                    while not IsDestroyed(target) and not IsDestroyed(unit) and not unit.Dead and target:GetHealth() >= (self.Blueprint.TractorDamage or 729)+1 do
+                        Damage(unit, bonePosition, target, (self.Blueprint.TractorDamage or 729), "Normal")
                         Explosion.CreateScalableUnitExplosion(target, 1, true)
-                        WaitTicks(11)
+                        WaitTicks((self.Blueprint.TractorDamageInterval or 10)+1)
                     end
 
                     CreateLightParticle(unit, muzzle, self.Army, 4, 2, 'glow_02', 'ramp_blue_16')
@@ -286,7 +286,7 @@ ADFTractorClaw = ClassWeapon(Weapon) {
     ---@param self ADFTractorClaw
     ---@param target Unit
     ---@param trash TrashBag
-    ---@param muzzle string
+    ---@param muzzle string unused
     TargetFallThread = function(self, target, trash, muzzle)
 
         -- clean up the effects once the unit starts falling
@@ -341,14 +341,14 @@ ADFTractorClaw = ClassWeapon(Weapon) {
     end,
 
     --- Delayed destruction of the trashbag, allows the wreck to copy over the rotators
-    ---@param self ADFTractorClaw
+    ---@param self ADFTractorClaw unused
     ---@param trash TrashBag
     TrashDelayedDestroyThread = function(self, trash)
         WaitTicks(2)
         trash:Destroy()
     end,
 
-    ---@param self ADFTractorClaw
+    ---@param self ADFTractorClaw unused
     ---@param target Unit
     MakeImmune = function (self, target)
         if not IsDestroyed(target) then
@@ -356,7 +356,7 @@ ADFTractorClaw = ClassWeapon(Weapon) {
         end
     end,
 
-    ---@param self ADFTractorClaw
+    ---@param self ADFTractorClaw unused
     ---@param target Unit
     MakeVulnerable = function (self, target)
         if not IsDestroyed(target) then

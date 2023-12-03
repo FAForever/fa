@@ -1,5 +1,13 @@
 UnitBlueprint{
     Description = "<LOC xsb0203_desc>Naval Factory HQ",
+    AI = {
+        TargetBones = {
+            'B04',
+            'B03',
+            'B06',
+            'B05'
+        }
+    },
     Audio = {
         Construct      = Sound { Bank = 'XSB',            Cue = 'XSB0203_Construct_Start',    LodCutoff = 'UnitMove_LodCutoff' },
         ConstructLoop  = Sound { Bank = 'XSB',            Cue = 'XSB0203_Construct_Loop',     LodCutoff = 'UnitMove_LodCutoff' },
@@ -85,7 +93,7 @@ UnitBlueprint{
         BuildCostEnergy = 10000,
         BuildCostMass = 2000,
         BuildRate = 90,
-        BuildTime = 3600,
+        BuildTime = 3200,
         BuildableCategory = {
             "BUILTBYTIER2FACTORY SERAPHIM MOBILE CONSTRUCTION",
             "BUILTBYTIER2FACTORY SERAPHIM STRUCTURE NAVAL",

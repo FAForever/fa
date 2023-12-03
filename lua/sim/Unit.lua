@@ -6,7 +6,6 @@
 -----------------------------------------------------------------
 
 -- Imports. Localise commonly used subfunctions for speed
-local AIUtils = import("/lua/ai/aiutilities.lua")
 local EffectTemplate = import("/lua/effecttemplates.lua")
 local EffectUtilities = import("/lua/effectutilities.lua")
 local EnhancementCommon = import("/lua/enhancementcommon.lua")
@@ -108,7 +107,10 @@ local cUnit = moho.unit_methods
 ---@class Unit : moho.unit_methods, InternalObject, IntelComponent, VeterancyComponent, AIUnitProperties
 ---@field AIManagerIdentifier? string
 ---@field Brain AIBrain
+---@field buildBots? Unit[]
 ---@field Blueprint UnitBlueprint
+---@field BuildEffectsBag TrashBag
+---@field BuildArmManipulator? moho.BuilderArmManipulator
 ---@field Trash TrashBag
 ---@field Layer Layer
 ---@field Army Army
@@ -121,9 +123,13 @@ local cUnit = moho.unit_methods
 ---@field TerrainType TerrainType
 ---@field EngineCommandCap? table<string, boolean>
 ---@field UnitBeingBuilt Unit?
+---@field UnitBuildOrder string
+---@field MyShield Shield?
 ---@field EntityBeingReclaimed Unit | Prop | nil
 ---@field SoundEntity? Unit | Entity
 ---@field AutoModeEnabled? boolean
+---@field OnBeingBuiltEffectsBag TrashBag
+---@field IdleEffectsBag TrashBag
 Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
 
     IsUnit = true,
@@ -271,7 +277,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         end
 
         if self.Brain.CheatEnabled then
-            AIUtils.ApplyCheatBuffs(self)
+            import("/lua/ai/aiutilities.lua").ApplyCheatBuffs(self)
         end
 
         -- for syncing data to UI
@@ -290,6 +296,11 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         if self.Blueprint.Intel.JammerBlips > 0 then
             self.Brain:TrackJammer(self)
             self.ResetJammer = -1
+        end
+
+        -- default to ground fire for structures, experimentals and (S)ACUs
+        if EntityCategoryContains(categories.STRUCTURE + categories.EXPERIMENTAL + categories.COMMAND, self) then
+            self:SetFireState(2)
         end
 
         -- Flags for scripts
@@ -2556,11 +2567,19 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
     ---@param self Unit
     ---@param enable boolean
     BuildManipulatorSetEnabled = function(self, enable)
-        if self.Dead or not self.BuildArmManipulator then return end
+        if IsDestroyed(self) then
+            return
+        end
+
+        local buildArmManipulator = self.BuildArmManipulator
+        if not buildArmManipulator then
+            return
+        end
+
         if enable then
-            self.BuildArmManipulator:Enable()
+            buildArmManipulator:Enable()
         else
-            self.BuildArmManipulator:Disable()
+            buildArmManipulator:Disable()
         end
     end,
 
@@ -2632,16 +2651,37 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         end
     end,
 
+    --- This function is called when engineer A is assisting engineer B that is doing a task. It forces 
+    --- the assisting unit to perform the same task as the unit it is assisting.
     ---@param self Unit
     CheckAssistFocus = function(self)
-        if not (self and EntityCategoryContains(categories.ENGINEER, self)) or self.Dead then
+
+        --- Given engineer A that is assisting engineer B in doing some task. This function fixes the following situations:
+        ---
+        --- - (1) Engineer B is damaged. Engineer B starts the construction of a structure. Engineer A is repairing 
+        --- engineer B instead of assisting with the structure
+        ---
+        --- - (2) Engineer B is building a structure. Engineer A is building the structure too. Engineer B switches to reclaiming 
+        --- the same structure (before it is finished), but engineer A keeps on building the structure. This is a loop and the 
+        --- structure will never cease to exist, the engineers are effectively stuck until the player intervenes
+
+        if self.Dead or not (self and EntityCategoryContains(categories.ENGINEER, self)) then
             return
         end
 
         local guarded = self:GetGuardedUnit()
-        if guarded and not guarded.Dead then
+        if guarded and not (
+            -- do not shift focus for dead or destroyed units
+            guarded.Dead or
+            IsDestroyed(guarded) or
+
+            -- do not shift focus to the unit a factory is building
+            (guarded:GetFractionComplete() >= 1.0 and EntityCategoryContains(categories.FACTORY, guarded)))
+        then
             local focus = guarded:GetFocusUnit()
-            if not focus then return end
+            if not focus then
+                return
+            end
 
             local cmd
             if guarded:IsUnitState('Reclaiming') then
@@ -2740,7 +2780,8 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
 
     ---@param self Unit
     ---@param built Unit
-    OnStopBuild = function(self, built)
+    ---@param order string
+    OnStopBuild = function(self, built, order)
         self:StopBuildingEffects(built)
         self:SetActiveConsumptionInactive()
         self:DoOnUnitBuiltCallbacks(built)
@@ -2924,23 +2965,29 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
     end,
 
     ---@param self Unit
-    ---@param built boolean
+    ---@param built Unit
     ---@param order string
     StartBuildingEffects = function(self, built, order)
-        self.BuildEffectsBag:Add(self:ForkThread(self.CreateBuildEffects, built, order))
+        local buildEffectsBag = self.BuildEffectsBag
+        if buildEffectsBag then
+            local thread = ForkThread(self.CreateBuildEffects, self, built, order)
+            self.Trash:Add(thread)
+            buildEffectsBag:Add(thread)
+        end
     end,
 
     ---@param self Unit
-    ---@param built boolean
+    ---@param built Unit
     ---@param order string
     CreateBuildEffects = function(self, built, order)
     end,
 
     ---@param self Unit
-    ---@param built boolean
+    ---@param built Unit
     StopBuildingEffects = function(self, built)
-        if self.BuildEffectsBag then
-            self.BuildEffectsBag:Destroy()
+        local buildEffectsBag = self.BuildEffectsBag
+        if buildEffectsBag then
+            buildEffectsBag:Destroy()
         end
 
         -- kept after --3355 for backwards compatibility with mods
@@ -3912,7 +3959,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
 
     --- Plays a sound using the unit as a source. Returns true if successful, false otherwise
     ---@param self Unit A unit
-    ---@param sound SoundBlueprint A string identifier that represents the sound to be played.
+    ---@param sound string A string identifier that represents the sound to be played.
     ---@return boolean
     PlayUnitSound = function(self, sound)
         local audio = self.Blueprint.Audio[sound]

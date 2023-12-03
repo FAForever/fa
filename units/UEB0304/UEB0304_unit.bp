@@ -2,7 +2,7 @@ UnitBlueprint{
     Description = "<LOC ueb0304_desc>Quantum Gateway",
     AI = {
         TargetBones = {
-            "UEB0304",
+            "Attachpoint01",
             "Left_Gate_FX",
             "Right_Gate_FX",
             "Attachpoint02",

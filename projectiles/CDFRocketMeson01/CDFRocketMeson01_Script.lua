@@ -1,14 +1,17 @@
---
--- Cybran Dumbfire Rocket "The tadpole"
---
 local CRocketProjectile = import("/lua/cybranprojectiles.lua").CRocketProjectile
+
+--- Cybran Dumbfire Rocket
+---@class CDFRocketMeson01 : CRocketProjectile
 CDFRocketMeson01 = ClassProjectile(CRocketProjectile) {
     PolyTrail = '/effects/emitters/default_polytrail_06_emit.bp',
+
+    ---@param self CDFRocketMeson01
     OnCreate = function(self)
         CRocketProjectile.OnCreate(self)
         self.Trash:Add(ForkThread(self.UpdateThread,self))
    end,
 
+    ---@param self CDFRocketMeson01
     UpdateThread = function(self)
         WaitTicks(2)
         self:SetMesh('/projectiles/CDFRocketMeson01/CDFRocketMesonUnPacked01_mesh')

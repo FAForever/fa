@@ -237,6 +237,7 @@ UnitBlueprint{
             FireTargetLayerCapsTable = {
                 Air = "Air|Land|Water|Seabed",
                 Land = "Air|Land|Water|Seabed",
+                Water = "Air|Land|Water|Seabed",
             },
             FiringRandomness = 0,
             FiringTolerance = 2,

@@ -46,5 +46,8 @@ ProjectileBlueprint {
         LeadTarget = false,
         Lifetime = 4,
         UseGravity = false,
+        TrackTarget = true,
+        TurnRate = 15,
+        OnLostTargetLifetime = 0.5,
     },
 }
