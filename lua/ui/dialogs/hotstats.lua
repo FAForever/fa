@@ -542,7 +542,7 @@ function page_graph(parent)
 
     function reCreateGraph(dataPath, textDesc)
         if page_active_graph then page_active_graph:Destroy() page_active_graph=false end
-        page_active_graph=create_graph(graphArea,dataPath,0,0,0,50)
+        page_active_graph=create_graph(graphArea,dataPath)
         Title_score:SetText(textDesc)
     end
 
@@ -652,7 +652,7 @@ function page_dual(parent)
         :End()
 
     page_active_graph=create_graph(graphArea,info_dialog[5].path)
-    page_active_graph2=create_graph_bar(chartArea,"main_histo",90,GetFrame(0).Bottom()/2+40,GetFrame(0).Right()-100,GetFrame(0).Bottom()-110)
+    page_active_graph2=create_graph_bar(chartArea,"main_histo")
 end
 
 function clean_view()
