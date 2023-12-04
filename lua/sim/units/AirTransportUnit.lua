@@ -51,7 +51,7 @@ AirTransport = ClassUnit(AirUnit, BaseTransport) {
         -- unload is the signal that the engine uses to drop the units. We help the engine here a little bit by
         -- increasing the threshold at which the transport can start dropping the units
 
-        if new == 'Stopped' then
+        if new == 'Stopped' and (not self.Dead or IsDestroyed(self)) then
             local command = self:GetCommandQueue()[1]
             if UnloadCommands[command.commandType] then
                 local navigator = self:GetNavigator()

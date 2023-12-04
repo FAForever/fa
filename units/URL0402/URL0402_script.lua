@@ -22,8 +22,6 @@ local Entity = import("/lua/sim/entity.lua").Entity
 ---@class URL0402 : CWalkingLandUnit
 ---@field AmbientExhaustEffectsBag TrashBag
 URL0402 = ClassUnit(CWalkingLandUnit) {
-    WalkingAnimRate = 1.2,
-
     AmbientExhaustBones = {
         'Exhaust01',
         'Exhaust02',

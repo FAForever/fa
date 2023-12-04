@@ -876,9 +876,12 @@ end
 
 local function SpawnMenuDummyChanges(all_bps)
     for id, bp in pairs(all_bps) do
-        if bp.Categories and not table.find(bp.Categories, 'DRAGBUILD') then
+
+        -- allow all mobile units to be dragged while being built
+        if bp.Categories and table.find(bp.Categories, 'MOBILE') then
             table.insert(bp.Categories, 'DRAGBUILD')
         end
+
         if bp.Physics and bp.Physics.MotionType ~= 'RULEUMT_Air' then
             local FootX, FootZ = GetFoot(bp, 'SizeX'), GetFoot(bp, 'SizeZ')
             local SkirtX, SkirtZ = GetSkirt(bp, 'SizeX'), GetSkirt(bp, 'SizeZ')

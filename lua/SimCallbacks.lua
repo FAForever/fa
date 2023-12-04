@@ -24,7 +24,7 @@ local TableEmpty = table.empty
 local TableRemove = table.remove
 local TableMerged = table.merged
 
--- upvalue globals for performance
+-- upvalue scope for performance
 local type = type
 local Vector = Vector
 local IsEntity = IsEntity
@@ -32,6 +32,8 @@ local GetEntityById = GetEntityById
 local GetSurfaceHeight = GetSurfaceHeight
 local OkayToMessWithArmy = OkayToMessWithArmy
 local EntityCategoryFilterDown = EntityCategoryFilterDown
+local GetCurrentCommandSource = GetCurrentCommandSource
+local GetSystemTimeSecondsOnlyForProfileUse = GetSystemTimeSecondsOnlyForProfileUse
 
 local IssueClearCommands = IssueClearCommands
 local IssueBuildMobile = IssueBuildMobile
@@ -65,6 +67,8 @@ function DoCallback(name, data, units)
 end
 
 --- Common utility function to retrieve the actual units.
+---@param units Unit[]
+---@return Unit[]
 function SecureUnits(units)
     local secure = {}
     if units and type(units) ~= 'table' then
@@ -128,15 +132,6 @@ Callbacks.PersistFerry = function(data, units)
     IssueClearCommands(units)
     for _, r in data.route do
         IssueFerry(units, r)
-    end
-end
-
-Callbacks.TransportLock = function(data)
-    local units = SecureUnits(data.ids)
-    if not units[1] then return end
-
-    for _, u in units do
-        u:TransportLock(data.lock == true)
     end
 end
 
@@ -285,6 +280,28 @@ Callbacks.FlagShield = function(data, units)
         end
     end
 end
+
+-------------------------------------------------------------------------------
+--#region General orders
+
+---@param data { }
+---@param selection Unit[]
+Callbacks.SelfDestruct = function(data, selection)
+    -- verify selection
+    selection = SecureUnits(selection)
+    if (not selection) or TableEmpty(selection) then
+        return
+    end
+
+    -- suppress self destruct in tutorial missions as they screw up the mission
+    if ScenarioInfo.tutorial then
+        return
+    end
+
+    import("/lua/sim/commands/self-destruct.lua").RingExtractor(selection, true)
+end
+
+--#endregion
 
 -------------------------------------------------------------------------------
 --#region Advanced orders
