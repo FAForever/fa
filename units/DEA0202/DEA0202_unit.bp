@@ -382,11 +382,11 @@ UnitBlueprint{
             RackBones = {
                 {
                     MuzzleBones = {
-                        "Right_Contrail",
-                        "Left_Contrail",
-                        "Exhaust",
+                        "Rear_Bomb",
+                        "Left_Wing_Bomb",
+                        "Right_Wing_Bomb",
                     },
-                    RackBone = "Right_Contrail",
+                    RackBone = "Rear_Bomb",
                 },
             },
             RackFireTogether = false,

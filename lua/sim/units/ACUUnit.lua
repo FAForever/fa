@@ -1,4 +1,3 @@
-
 local CommandUnit = import("/lua/sim/units/commandunit.lua").CommandUnit
 
 ---@class ACUUnit : CommandUnit
@@ -102,16 +101,18 @@ ACUUnit = ClassUnit(CommandUnit) {
             --     'DeathExplosion' - when normal unit is killed
             --     'Nuke' - when Paragon is killed
             --     'Deathnuke' - when ACU is killed
-            if IsAlly(self.Army, instigator.Army) and not ((type == 'DeathExplosion' or type == 'Nuke' or type == 'Deathnuke') and not instigator.SelfDestructed) then
+            if IsAlly(self.Army, instigator.Army) and
+                not
+                ((type == 'DeathExplosion' or type == 'Nuke' or type == 'Deathnuke') and not instigator.SelfDestructed) then
                 WARN('Teamkill detected')
-                Sync.Teamkill = {killTime = GetGameTimeSeconds(), instigator = instigator.Army, victim = self.Army}
+                Sync.Teamkill = { killTime = GetGameTimeSeconds(), instigator = instigator.Army, victim = self.Army }
             end
 
             -- prepare sync
             local sync = Sync
-            local events = sync.Events or { }
+            local events = sync.Events or {}
             sync.Events = events
-            local acuDestroyed = events.ACUDestroyed or { }
+            local acuDestroyed = events.ACUDestroyed or {}
             events.ACUDestroyed = acuDestroyed
 
             -- sync the event
@@ -156,7 +157,7 @@ ACUUnit = ClassUnit(CommandUnit) {
     ---@param self ACUUnit
     BuildDisable = function(self)
         while self:IsUnitState('Building') or self:IsUnitState('Enhancing') or self:IsUnitState('Upgrading') or
-                self:IsUnitState('Repairing') or self:IsUnitState('Reclaiming') do
+            self:IsUnitState('Repairing') or self:IsUnitState('Reclaiming') do
             WaitSeconds(0.5)
         end
 

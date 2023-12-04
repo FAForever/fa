@@ -241,6 +241,7 @@ UnitBlueprint{
             FireTargetLayerCapsTable = {
                 Air = "Air|Land|Water|Seabed",
                 Land = "Air|Land|Water|Seabed",
+                Water = "Air|Land|Water|Seabed",
             },
             FiringTolerance = 0.5,
             Label = "Disintegrator01",
@@ -314,6 +315,7 @@ UnitBlueprint{
             FireTargetLayerCapsTable = {
                 Air = "Air|Land|Water",
                 Land = "Air|Land|Water",
+                Water = "Air|Land|Water|Seabed",
             },
             FiringTolerance = 2,
             Label = "Missiles1",

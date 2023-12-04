@@ -178,10 +178,21 @@ function table.removeByValue(t,val)
     end
 end
 
---- table.deepcopy(t) returns a copy of t with all sub-tables also copied.
+---@generic T
+---@param t T
+---@param backrefs? table
+---@return T
 function table.deepcopy(t,backrefs)
+    backrefs = backrefs or { }
+
     if type(t)=='table' then
-        if backrefs==nil then backrefs = {} end
+
+        -- do not deep-copy anything with a metatable as that doesn't make sense. With this we
+        -- naturally exclude deep-copying a brain, unit or other tables that are usually unique
+        if not table.empty(getmetatable(t)) then
+                WARN(reprs(debug.traceback()))
+            return t
+        end
 
         local b = backrefs[t]
         if b then
@@ -193,6 +204,7 @@ function table.deepcopy(t,backrefs)
         for k,v in t do
             r[k] = table.deepcopy(v,backrefs)
         end
+
         return r
     else
         return t

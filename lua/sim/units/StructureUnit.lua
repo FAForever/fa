@@ -71,6 +71,9 @@ StructureUnit = ClassUnit(Unit) {
         self:HideLandBones()
         self.FxBlinkingLightsBag = { }
 
+        -- default to ground fire mode for all structures
+        self:SetFireState(2)
+
         local layer = self.Layer
         local blueprint = self.Blueprint
         local physicsBlueprint = blueprint.Physics

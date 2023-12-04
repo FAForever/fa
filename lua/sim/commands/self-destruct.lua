@@ -1,5 +1,5 @@
---**********************************************************************************
---** Copyright (c) 2023 FAForever
+--******************************************************************************************************
+--** Copyright (c) 2023  Willem 'Jip' Wijnia
 --**
 --** Permission is hereby granted, free of charge, to any person obtaining a copy
 --** of this software and associated documentation files (the "Software"), to deal
@@ -18,31 +18,27 @@
 --** LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 --** OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 --** SOFTWARE.
---**********************************************************************************
+--******************************************************************************************************
 
-local HoverLandUnit = import("/lua/sim/units/hoverlandunit.lua").HoverLandUnit
-local HoverLandUnitOnLayerChange = HoverLandUnit.OnLayerChange
+-- upvalue scope for performance
+local IsDestroyed = IsDestroyed
+local TableGetn = table.getn
 
----@class SlowHoverLandUnit : HoverLandUnit
-SlowHoverLandUnit = ClassUnit(HoverLandUnit) {
+--- Kills the units, triggering their death weapons
+---@param units Unit[]
+---@param doPrint boolean
+function SelfDestruct(units, doPrint)
 
-    ---@param self SlowHoverLandUnit
-    ---@param new string
-    ---@param old string
-    OnLayerChange = function(self, new, old)
-
-        -- call base class to make sure self.layer is set
-        HoverLandUnitOnLayerChange(self, new, old)
-
-        -- Slow these units down when they transition from land to water
-        -- The mult is applied twice thanks to an engine bug, so careful when adjusting it
-        -- Newspeed = oldspeed * mult * mult
-
-        local mult = (self.Blueprint or self:GetBlueprint()).Physics.WaterSpeedMultiplier
-        if new == 'Water' then
-            self:SetSpeedMult(mult)
-        else
-            self:SetSpeedMult(1)
+    local unitsKilled = 0
+    for k = 1, TableGetn(units) do
+        local unit = units[k]
+        if not IsDestroyed(unit) then
+            unit:Kill()
+            unitsKilled = unitsKilled + 1
         end
-    end,
-}
+    end
+
+    if doPrint then
+        print(string.format("Self destructed %d units ", tostring(unitsKilled)))
+    end
+end

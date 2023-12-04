@@ -161,16 +161,16 @@ UnitBlueprint{
             Flare = {
                 Category = "MISSILE TACTICAL",
                 OffsetMult = 1.33,
-                Radius = 15,
+                Radius = 16,
                 Stack = true,
             },
             Label = "AntiMissile",
-            MaxRadius = 40,
+            MaxRadius = 45,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
-            MuzzleVelocity = 15,
+            MuzzleVelocity = 18,
             ProjectileId = "/projectiles/AIMAntiMissile01/AIMAntiMissile01_proj.bp",
-            ProjectileLifetime = 3,
+            ProjectileLifetime = 3.5,
             ProjectilesPerOnFire = 1,
             RackBones = {
                 {

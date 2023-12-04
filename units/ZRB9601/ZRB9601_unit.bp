@@ -1,4 +1,5 @@
 UnitBlueprint {
+    Description = '<LOC zrb9601_desc>Land Factory',
     AI = {},
     Audio = {
         Construct      = Sound { Bank = 'URB',        Cue = 'URB0301_Construct_Start',    LodCutoff = 'UnitMove_LodCutoff' },
