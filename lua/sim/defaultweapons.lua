@@ -1163,11 +1163,11 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
             self:WaitForAndDestroyManips()
 
             local hasTarget = self:WeaponHasTarget()
-            local canFire = self:CanFire()
+            local autoFire = not bp.ManualFire
 
-            if hasTarget and bp.RackSalvoChargeTime > 0 and canFire then
+            if hasTarget and bp.RackSalvoChargeTime > 0 and autoFire then
                 ChangeState(self, self.RackSalvoChargeState)
-            elseif hasTarget and canFire then
+            elseif hasTarget and autoFire then
                 ChangeState(self, self.RackSalvoFireReadyState)
             elseif not hasTarget and bp.WeaponUnpacks and not bp.WeaponUnpackLocksMotion then
                 ChangeState(self, self.WeaponPackingState)
