@@ -958,8 +958,7 @@ float4 TerrainAlbedoXP( VS_OUTPUT pixel) : COLOR
     albedo.rgb = light * ( albedo.rgb + specular.rgb );
 
     float waterDepth = tex2Dproj(UtilitySamplerC,pixel.mTexWT*TerrainScale).g;
-    float4 water = tex1D(WaterRampSampler,waterDepth);
-    albedo.rgb = lerp(albedo.rgb,water.rgb,water.a);
+    albedo.rgb = ApplyWaterColor(pixel.mTexWT.z, waterDepth, albedo.rgb);
 
     return float4(albedo.rgb, 0.01f);
 }
