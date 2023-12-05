@@ -1805,9 +1805,13 @@ float3 splatBlendNormal(float3 n1, float3 n2, float t2height, float opacity, uni
 /* # Sample a 2D 2x2 texture atlas # */
 /* To prevent bleeding from the neighboring tiles, we need to work with padding */
 float4 atlas2D(sampler2D s, float2 uv, uniform float2 offset) {
+    // We need to manually provide the derivatives to prevent seams.
+    // See https://forum.unity.com/threads/tiling-textures-within-an-atlas-by-wrapping-uvs-within-frag-shader-getting-artifacts.535793/
+    float2 uv_ddx = ddx(uv) / 4;
+    float2 uv_ddy = ddy(uv) / 4;
     uv.x = frac(uv.x) / 4 + offset.x + 0.125;
     uv.y = frac(uv.y) / 4 + offset.y + 0.125;
-    return tex2D(s, uv);
+    return tex2Dgrad(s, uv, uv_ddx, uv_ddy);
 }
 
 float3 sampleNormal(sampler2D s, float2 position, uniform float2 scale, float mask) {
@@ -2023,33 +2027,33 @@ float4 TerrainPBRAlbedoPS ( VS_OUTPUT inV) : COLOR
     // Candidates for configurable values are the rotation matrix and the blending blurriness
 }
 
-technique TerrainPBRNormals
-{
-    pass P0
-    {
-        AlphaState( AlphaBlend_Disable_Write_RG )
-        DepthState( Depth_Enable )
-
-        VertexShader = compile vs_1_1 TerrainVS(false);
-        PixelShader = compile ps_2_a TerrainPBRNormalsPS();
-    }
-}
-
-technique TerrainPBR <
-    string usage = "composite";
-    string normals = "TerrainPBRNormals";
->
-{
-    pass P0
-    {
-        AlphaState( AlphaBlend_Disable_Write_RGBA )
-        DepthState( Depth_Enable )
-
-        VertexShader = compile vs_1_1 TerrainVS(true);
-        // If we use ps_3_0 we lose the distance fog
-        PixelShader = compile ps_2_a TerrainPBRAlbedoPS();
-    }
-}
+//technique TerrainPBRNormals
+//{
+//    pass P0
+//    {
+//        AlphaState( AlphaBlend_Disable_Write_RG )
+//        DepthState( Depth_Enable )
+//
+//        VertexShader = compile vs_1_1 TerrainVS(false);
+//        PixelShader = compile ps_2_a TerrainPBRNormalsPS();
+//    }
+//}
+//
+//technique TerrainPBR <
+//    string usage = "composite";
+//    string normals = "TerrainPBRNormals";
+//>
+//{
+//    pass P0
+//    {
+//        AlphaState( AlphaBlend_Disable_Write_RGBA )
+//        DepthState( Depth_Enable )
+//
+//        VertexShader = compile vs_1_1 TerrainVS(true);
+//        // If we use ps_3_0 we lose the distance fog
+//        PixelShader = compile ps_2_a TerrainPBRAlbedoPS();
+//    }
+//}
 
 // Terrain0XX for shaders that are pretty regular
 // Terrain1XX for shaders using roughness maps
