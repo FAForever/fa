@@ -1778,7 +1778,7 @@ float splatLerp(float t1, float t2, float t2height, float opacity, uniform float
     return (t1 * factor1 + t2 * factor2) / (factor1 + factor2);
 }
 
-float4 splatLerp(float4 t1, float4 t2, float t2height, float opacity, uniform float blurriness = 0.2) {
+float4 splatLerp(float4 t1, float4 t2, float t2height, float opacity, uniform float blurriness = 0.12) {
     float height1 = 1 + blurriness;
     float height2 = t2height + opacity;
     float ma = max(height1, height2) - blurriness;
@@ -1787,7 +1787,7 @@ float4 splatLerp(float4 t1, float4 t2, float t2height, float opacity, uniform fl
     return (t1 * factor1 + t2 * factor2) / (factor1 + factor2);
 }
 
-float3 splatBlendNormal(float3 n1, float3 n2, float t2height, float opacity, uniform float blurriness = 0.2) {
+float3 splatBlendNormal(float3 n1, float3 n2, float t2height, float opacity, uniform float blurriness = 0.12) {
     float height1 = 1 + blurriness;
     float height2 = t2height + opacity;
     float ma = max(height1, height2) - blurriness;
@@ -1796,8 +1796,8 @@ float3 splatBlendNormal(float3 n1, float3 n2, float t2height, float opacity, uni
     // These factors are to make low opacity normal maps more visible,
     // as we notice small changes to the albedo maps more easily.
     // The value of 0.5 is just eyeballed.
-    float factor1modified = pow(factor1 / (factor1 + factor2), 0.5);
-    float factor2modified = pow(factor2 / (factor1 + factor2), 0.5);
+    float factor1modified = pow(factor1 / (factor1 + factor2), 0.6);
+    float factor2modified = pow(factor2 / (factor1 + factor2), 0.6);
     // UDN blending
     return normalize(float3((n1.xy * factor1modified + n2.xy * factor2modified), n1.z));
 }
