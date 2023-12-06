@@ -1,7 +1,7 @@
 ---@diagnostic disable:local-limit
 -- ****************************************************************************
 -- **
--- **  File     :  /data/lua/EffectTemplates.lua
+-- **  File     :  /data/lua/effecttemplates.lua
 -- **  Author(s):  Gordon Duclos, Greg Kohne, Matt Vainio, Aaron Lundquist
 -- **
 -- **  Summary  :  Generic templates for commonly used effects
@@ -544,6 +544,12 @@ AeonBuildBeams02 = {
     EmtBpPath .. 'aeon_build_beam_04_emit.bp',
     EmtBpPath .. 'aeon_build_beam_05_emit.bp',
     EmtBpPath .. 'aeon_build_beam_06_emit.bp',
+}
+
+AeonVolcanoBeam01 = {
+    EmtBpPath .. 'aeon_volcano_beam_01.bp',
+    EmtBpPath .. 'aeon_volcano_beam_02.bp',
+    EmtBpPath .. 'aeon_volcano_beam_03.bp',
 }
 
 CybranBuildUnitBlink01 = { EmtBpPath .. 'build_cybran_blink_blue_01_emit.bp'}

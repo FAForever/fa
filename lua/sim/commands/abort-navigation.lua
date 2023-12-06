@@ -30,15 +30,13 @@ local StringFormat = string.format
 --- - For engineers that are assisting they can start assisting immediately if the target is in range (instead of moving into formation)
 --- - For transports that are unloading units are deattached immediately when aborting the move command
 ---@param units Unit[]
----@param doPrint boolean           # if true, prints the total distributed orders
+---@param doPrint boolean           # if true, prints information about the order
 function AbortNavigation(units, doPrint)
     local unitCount = TableGetn(units)
 
     if unitCount == 0 then
         return
     end
-
-    local brain = units[1]:GetAIBrain()
 
     for k = 1, unitCount do
         local unit = units[k]
@@ -48,6 +46,7 @@ function AbortNavigation(units, doPrint)
         end
     end
 
+    local brain = units[1]:GetAIBrain()
     if doPrint and (GetFocusArmy() == brain:GetArmyIndex()) then
         print(StringFormat("Interrupted pathfinding for %s unit(s)", unitCount))
     end

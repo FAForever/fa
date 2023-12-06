@@ -82,7 +82,7 @@ UnitBlueprint{
         BuildCostEnergy = 45000,
         BuildCostMass = 9500,
         BuildRate = 150,
-        BuildTime = 11250,
+        BuildTime = 21600,
         BuildableCategory = {
             "BUILTBYTIER3FACTORY UEF MOBILE CONSTRUCTION",
             "BUILTBYTIER3FACTORY UEF STRUCTURE NAVAL",

@@ -51,6 +51,7 @@ ProjectileBlueprint {
         MaxSpeed = 30,
         RotationalVelocity = 0,
         RotationalVelocityRange = 0,
+        TrackTargetGroundFuzziness = 0.5,
         TrackTarget = true,
         TurnRate = 15,
         UseGravity = false,
