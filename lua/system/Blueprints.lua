@@ -676,6 +676,12 @@ function HandleUnitWithBuildPresets(bps, all_bps)
             tempBp.Economy.BuildCostMass = preset.BuildCostMassOverride or (tempBp.Economy.BuildCostMass + m)
             tempBp.Economy.BuildTime = preset.BuildTimeOverride or (tempBp.Economy.BuildTime + t)
 
+            -- adjust veterancy so that it is as easy to vet with preset SCUs as upgraded SCUs
+            if not bp.VeteranMass then
+                -- blueprints-units.lua gives a default multiplier of 2 for SUBCOMMANDER category units.
+                tempBp.VeteranMassMult = (tempBp.VeteranMassMult or 2) * bp.Economy.BuildCostMass / tempBp.Economy.BuildCostMass
+            end
+
             -- teleport cost adjustments. Manually enhanced SCU with teleport is cheaper than a prebuild SCU because the latter has its cost
             -- adjusted (up). This code sets bp values used in the code to calculate with different base values than the unit cost.
             if preset.TeleportNoCostAdjustment ~= false then
