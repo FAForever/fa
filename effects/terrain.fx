@@ -1770,26 +1770,26 @@ technique LowFidelityLighting
 /* # Blending techniques # */
 
 float splatLerp(float t1, float t2, float t2height, float opacity, uniform float blurriness) {
-    float height1 = 1 + blurriness;
-    float height2 = t2height + opacity;
+    float height1 = 1;
+    float height2 = t2height * (1 - 2 * blurriness) + blurriness + opacity;
     float ma = max(height1, height2) - blurriness;
     float factor1 = max(height1 - ma, 0);
     float factor2 = max(height2 - ma, 0);
     return (t1 * factor1 + t2 * factor2) / (factor1 + factor2);
 }
 
-float4 splatLerp(float4 t1, float4 t2, float t2height, float opacity, uniform float blurriness = 0.12) {
-    float height1 = 1 + blurriness;
-    float height2 = t2height + opacity;
+float4 splatLerp(float4 t1, float4 t2, float t2height, float opacity, uniform float blurriness = 0.06) {
+    float height1 = 1;
+    float height2 = t2height * (1 - 2 * blurriness) + blurriness + opacity;
     float ma = max(height1, height2) - blurriness;
     float factor1 = max(height1 - ma, 0);
     float factor2 = max(height2 - ma, 0);
     return (t1 * factor1 + t2 * factor2) / (factor1 + factor2);
 }
 
-float3 splatBlendNormal(float3 n1, float3 n2, float t2height, float opacity, uniform float blurriness = 0.12) {
-    float height1 = 1 + blurriness;
-    float height2 = t2height + opacity;
+float3 splatBlendNormal(float3 n1, float3 n2, float t2height, float opacity, uniform float blurriness = 0.06) {
+    float height1 = 1;
+    float height2 = t2height * (1 - 2 * blurriness) + blurriness + opacity;
     float ma = max(height1, height2) - blurriness;
     float factor1 = max(height1 - ma, 0);
     float factor2 = max(height2 - ma, 0);
