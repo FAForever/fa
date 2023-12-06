@@ -15,6 +15,7 @@ local DefaultDamage = import("/lua/sim/defaultdamage.lua")
 local ScenarioFramework = import("/lua/scenarioframework.lua")
 
 ---@class CollisionBeam : moho.CollisionBeamEntity
+---@field Trash TrashBag
 CollisionBeam = Class(moho.CollisionBeamEntity) {
 
     FxBeam = { },
@@ -97,7 +98,7 @@ CollisionBeam = Class(moho.CollisionBeamEntity) {
     ---@param self CollisionBeam
     ---@param instigator Unit
     ---@param damageData table
-    ---@param targetEntity? Unit | Prop
+    ---@param targetEntity? Unit
     DoDamage = function(self, instigator, damageData, targetEntity)
         local damage = damageData.DamageAmount or 0
         if damage <= 0 then return end
@@ -384,7 +385,7 @@ CollisionBeam = Class(moho.CollisionBeamEntity) {
     ---@param self CollisionBeam
     ---@param fn function
     ---@param ... any
-    ---@return thread
+    ---@return thread|nil
     ForkThread = function(self, fn, ...)
         if fn then
             local thread = ForkThread(fn, self, unpack(arg))

@@ -1,7 +1,7 @@
 ---@diagnostic disable:local-limit
 -- ****************************************************************************
 -- **
--- **  File     :  /data/lua/EffectTemplates.lua
+-- **  File     :  /data/lua/effecttemplates.lua
 -- **  Author(s):  Gordon Duclos, Greg Kohne, Matt Vainio, Aaron Lundquist
 -- **
 -- **  Summary  :  Generic templates for commonly used effects
