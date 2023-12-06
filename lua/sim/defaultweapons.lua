@@ -1180,9 +1180,6 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
         end,
 
         OnLostTarget = function(self)
-            if self.ReloadEndTime then
-                WaitTicks(self.ReloadEndTime - GetGameTick())
-            end
         end,
     },
 
