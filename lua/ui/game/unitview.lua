@@ -482,7 +482,7 @@ function UpdateWindow(info)
                         elseif upperThreshold >= 10000 then
                             text = string.format('%.1fK/%.1fK', experience / 1000, upperThreshold / 1000)
                         else
-                            text = experience .. '/' .. upperThreshold
+                            text = experience .. '/' .. string.format('%d', upperThreshold)
                         end
                         controls.nextVet:SetText(text)
 
