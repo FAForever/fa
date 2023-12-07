@@ -1207,17 +1207,8 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         if enhancements then
             local activeEnhancements = SimUnitEnhancements[self.EntityId]
             if activeEnhancements then
-                local presetEnhancements = bp.EnhancementPresetAssigned.Enhancements
+                -- add the costs of enhancements AND prerequisites
                 for _, enhName in activeEnhancements do
-                    -- don't add enhancement costs built into the unit cost
-                    if presetEnhancements then
-                        for _, v in presetEnhancements do
-                            if v == enhName then
-                                continue
-                            end
-                        end
-                    end
-                    -- add up the enhancement AND all of its prerequisites
                     repeat
                         local enh = enhancements[enhName]
                         mass = mass + (enh.BuildCostMass or 0)
@@ -1225,6 +1216,17 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
                         time = time + (enh.BuildTime or 0)
                         enhName = enh.Prerequisite
                     until not enhName
+                end
+
+                -- subtract the costs of built-in enhancements
+                local PresetEnhancements = bp.EnhancementPresetAssigned.Enhancements
+                if PresetEnhancements then
+                    for _, enhName in PresetEnhancements do
+                        local enh = enhancements[enhName]
+                        mass = mass - (enh.BuildCostMass or 0)
+                        energy = energy - (enh.BuildCostEnergy or 0)
+                        time = time - (enh.BuildTime or 0)
+                    end
                 end
             end
         end
