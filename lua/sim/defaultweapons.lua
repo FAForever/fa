@@ -361,7 +361,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
         local blueprint = self.Blueprint
 
         -- Handle weapons which must pack before moving
-        if blueprint.WeaponUnpackLocksMotion == true and old == 'Stopped' then
+        if blueprint.WeaponUnpackLocksMotion == true and old == 'Stopped' and self.WeaponPackState ~= 'Packed' then
             self:PackAndMove()
         end
 
