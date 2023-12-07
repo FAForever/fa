@@ -738,9 +738,6 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
                 end
             end
             self:StartEconomyDrain()
-            if bp.WeaponUnpacks and self.WeaponPackState == 'Unpacked' then
-                ChangeState(self, self.WeaponPackingState)
-            end
             if self.NumRackBones > 1 and self.CurrentRackSalvoNumber > 1 then
                 WaitSeconds(bp.RackReloadTimeout)
                 self:PlayFxRackSalvoReloadSequence()
@@ -1104,6 +1101,8 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
                 unit.Trash:Add(ForkThread(self.DisabledWhileReloadingThread, self, 1 / rof))
             end
 
+            local hasTarget = self:WeaponHasTarget()
+
             -- Deal with the rack firing sequence
             if self.CurrentRackSalvoNumber > rackBoneCount then
                 self.CurrentRackSalvoNumber = 1
@@ -1111,17 +1110,21 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
                     ChangeState(self, self.RackSalvoReloadState)
                 elseif bp.RackSalvoChargeTime > 0 then
                     ChangeState(self, self.IdleState)
-                elseif countedProjectile and bp.WeaponUnpacks then
-                    ChangeState(self, self.WeaponPackingState)
-                elseif countedProjectile and not bp.WeaponUnpacks then
-                    ChangeState(self, self.IdleState)
+                elseif countedProjectile or not hasTarget then
+                    if bp.WeaponUnpacks then
+                        ChangeState(self, self.WeaponPackingState)
+                    else
+                        ChangeState(self, self.IdleState)
+                    end
                 else
                     ChangeState(self, self.RackSalvoFireReadyState)
                 end
-            elseif countedProjectile and not bp.WeaponUnpacks then
-                ChangeState(self, self.IdleState)
-            elseif countedProjectile and bp.WeaponUnpacks then
-                ChangeState(self, self.WeaponPackingState)
+            elseif countedProjectile or not hasTarget then
+                if bp.WeaponUnpacks then
+                    ChangeState(self, self.WeaponPackingState)
+                else
+                    ChangeState(self, self.IdleState)
+                end
             else
                 ChangeState(self, self.RackSalvoFireReadyState)
             end
