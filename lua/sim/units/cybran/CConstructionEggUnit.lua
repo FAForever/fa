@@ -49,21 +49,21 @@ CConstructionEggUnit = ClassUnit(CStructureUnit) {
         )
 
         self:ForkThread(function()
-                self.OpenAnimManip = CreateAnimator(self)
-                self.Trash:Add(self.OpenAnimManip)
-                self.OpenAnimManip:PlayAnim(self:GetBlueprint().Display.AnimationOpen, false):SetRate(0.1)
-                self:PlaySound(bp.Audio['EggOpen'])
+            self.OpenAnimManip = CreateAnimator(self)
+            self.Trash:Add(self.OpenAnimManip)
+            self.OpenAnimManip:PlayAnim(self:GetBlueprint().Display.AnimationOpen, false):SetRate(0.1)
+            self:PlaySound(bp.Audio['EggOpen'])
 
-                WaitFor(self.OpenAnimManip)
+            WaitFor(self.OpenAnimManip)
 
-                self.EggSlider = CreateSlider(self, 0, 0, -20, 0, 5)
-                self.Trash:Add(self.EggSlider)
-                self:PlaySound(bp.Audio['EggSink'])
+            self.EggSlider = CreateSlider(self, 0, 0, -20, 0, 5)
+            self.Trash:Add(self.EggSlider)
+            self:PlaySound(bp.Audio['EggSink'])
 
-                WaitFor(self.EggSlider)
+            WaitFor(self.EggSlider)
 
-                self:Destroy()
-            end
+            self:Destroy()
+        end
         )
     end,
 

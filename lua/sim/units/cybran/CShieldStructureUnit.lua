@@ -22,6 +22,5 @@
 
 local ShieldStructureUnit = import('/lua/defaultunits.lua').ShieldStructureUnit
 
--- SHIELD STRUCTURES
 ---@class CShieldStructureUnit : ShieldStructureUnit
 CShieldStructureUnit = ClassUnit(ShieldStructureUnit) {}

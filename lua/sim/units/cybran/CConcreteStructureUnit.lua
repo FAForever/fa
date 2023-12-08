@@ -22,6 +22,5 @@
 
 local ConcreteStructureUnit = import('/lua/defaultunits.lua').ConcreteStructureUnit
 
--- WALL STRUCTURES
 ---@class CConcreteStructureUnit : ConcreteStructureUnit
 CConcreteStructureUnit = ClassUnit(ConcreteStructureUnit) {}

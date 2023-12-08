@@ -22,6 +22,5 @@
 
 local MassFabricationUnit = import('/lua/defaultunits.lua').MassFabricationUnit
 
---  MASS FABRICATION UNITS
 ---@class CMassFabricationUnit : MassFabricationUnit
 CMassFabricationUnit = ClassUnit(MassFabricationUnit) {}

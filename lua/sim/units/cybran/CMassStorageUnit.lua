@@ -22,6 +22,5 @@
 
 local MassStorageUnit = import('/lua/defaultunits.lua').MassStorageUnit
 
---  MASS STORAGE UNITS
 ---@class CMassStorageUnit : MassStorageUnit
 CMassStorageUnit = ClassUnit(MassStorageUnit) {}

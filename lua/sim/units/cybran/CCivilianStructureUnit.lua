@@ -22,6 +22,5 @@
 
 local CStructureUnit = import('/lua/cybranunits.lua').CStructureUnit
 
--- CIVILIAN STRUCTURES
 ---@class CCivilianStructureUnit : CStructureUnit
 CCivilianStructureUnit = ClassUnit(CStructureUnit) {}

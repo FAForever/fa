@@ -22,6 +22,5 @@
 
 local SubUnit = import('/lua/defaultunits.lua').SubUnit
 
--- SUBMARINE UNITS
 ---@class CSubUnit : SubUnit
 CSubUnit = ClassUnit(SubUnit) {}

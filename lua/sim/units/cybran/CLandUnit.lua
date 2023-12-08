@@ -22,6 +22,5 @@
 
 local LandUnit = import('/lua/defaultunits.lua').LandUnit
 
--- LAND UNITS
 ---@class CLandUnit : LandUnit
 CLandUnit = ClassUnit(LandUnit) {}

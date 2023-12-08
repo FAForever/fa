@@ -22,6 +22,5 @@
 
 local StructureUnit = import('/lua/defaultunits.lua').StructureUnit
 
--- STRUCTURES
 ---@class CStructureUnit : StructureUnit
 CStructureUnit = ClassUnit(StructureUnit) {}

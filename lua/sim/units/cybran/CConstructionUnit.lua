@@ -21,12 +21,11 @@
 --**********************************************************************************
 
 local ConstructionUnit = import('/lua/defaultunits.lua').ConstructionUnit
-local ClassUnit = import('/lua/sim/Unit.lua').Unit
 local CConstructionTemplate = import('/lua/cybranunits.lua').CConstructionTemplate
 
 -- CONSTRUCTION UNITS
 ---@class CConstructionUnit : ConstructionUnit, CConstructionTemplate
-CConstructionUnit = ClassUnit(ConstructionUnit, CConstructionTemplate){
+CConstructionUnit = ClassUnit(ConstructionUnit, CConstructionTemplate) {
 
     ---@param self CConstructionUnit
     OnCreate = function(self)
@@ -71,7 +70,7 @@ CConstructionUnit = ClassUnit(ConstructionUnit, CConstructionTemplate){
     end,
 
     ---@param self CConstructionUnit
-    OnDestroy = function(self) 
+    OnDestroy = function(self)
         ConstructionUnit.OnDestroy(self)
         CConstructionTemplate.OnDestroy(self)
     end,

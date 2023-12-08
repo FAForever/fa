@@ -24,7 +24,6 @@ local SeaFactoryUnit = import('/lua/defaultunits.lua').SeaFactoryUnit
 local EffectUtil = import('/lua/effectutilities.lua')
 local StructureUnit = import('/lua/defaultunits.lua').StructureUnit
 
--- SEA FACTORY STRUCTURES
 ---@class CSeaFactoryUnit : SeaFactoryUnit
 ---@field BuildEffectsBag TrashBag
 CSeaFactoryUnit = ClassUnit(SeaFactoryUnit) {
@@ -32,7 +31,8 @@ CSeaFactoryUnit = ClassUnit(SeaFactoryUnit) {
     ---@param self CSeaFactoryUnit
     ---@param unitBeingBuilt Unit
     StartBuildingEffects = function(self, unitBeingBuilt)
-        local thread = self:ForkThread(EffectUtil.CreateCybranBuildBeamsOpti, nil, unitBeingBuilt, self.BuildEffectsBag, false)
+        local thread = self:ForkThread(EffectUtil.CreateCybranBuildBeamsOpti, nil, unitBeingBuilt, self.BuildEffectsBag,
+            false)
         unitBeingBuilt.Trash:Add(thread)
     end,
 
@@ -49,7 +49,8 @@ CSeaFactoryUnit = ClassUnit(SeaFactoryUnit) {
     ---@param self CSeaFactoryUnit
     OnUnpaused = function(self)
         StructureUnit.OnUnpaused(self)
-        if self:GetNumBuildOrders(categories.ALLUNITS) > 0 and not self:IsUnitState('Upgrading') and self:IsUnitState('Building') then
+        if self:GetNumBuildOrders(categories.ALLUNITS) > 0 and not self:IsUnitState('Upgrading') and
+            self:IsUnitState('Building') then
             self:PlayUnitAmbientSound('ConstructLoop')
             self:StartBuildingEffects(self.UnitBeingBuilt)
             self:StartArmsMoving()

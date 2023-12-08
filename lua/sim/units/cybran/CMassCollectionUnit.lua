@@ -22,7 +22,6 @@
 
 local MassCollectionUnit = import('/lua/defaultunits.lua').MassCollectionUnit
 
--- MASS COLLECTION UNITS
 ---@class CMassCollectionUnit : MassCollectionUnit
 ---@field AnimationManipulator moho.AnimationManipulator
 CMassCollectionUnit = ClassUnit(MassCollectionUnit) {

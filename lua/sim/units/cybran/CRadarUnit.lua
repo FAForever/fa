@@ -22,7 +22,6 @@
 
 local RadarUnit = import('/lua/defaultunits.lua').RadarUnit
 
--- RADAR STRUCTURES
 ---@class CRadarUnit : RadarUnit
 ---@field Thread1 thread
 ---@field Thread2 thread
@@ -89,7 +88,7 @@ CRadarUnit = ClassUnit(RadarUnit) {
             trash:Add(thread)
         end
 
-        thread = self.Thread2 
+        thread = self.Thread2
         if not thread then
             thread = ForkThread(self.Dish2Behavior, self)
             self.Thread2 = thread

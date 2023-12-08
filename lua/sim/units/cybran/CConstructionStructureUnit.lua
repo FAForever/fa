@@ -89,7 +89,7 @@ CConstructionStructureUnit = ClassUnit(CStructureUnit, CConstructionTemplate) {
 
         -- make sure the unit is still there
         local unitBeingBuilt = self.UnitBeingBuilt
-        if unitBeingBuilt then 
+        if unitBeingBuilt then
             CStructureUnit.StartBuildingEffects(self, unitBeingBuilt, self.UnitBuildOrder)
             self.AnimationManipulator:SetRate(1)
         end
@@ -103,7 +103,7 @@ CConstructionStructureUnit = ClassUnit(CStructureUnit, CConstructionTemplate) {
     end,
 
     ---@param self CConstructionStructureUnit
-    OnDestroy = function(self) 
+    OnDestroy = function(self)
         CStructureUnit.OnDestroy(self)
         CConstructionTemplate.OnDestroy(self)
     end,

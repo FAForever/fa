@@ -20,75 +20,97 @@
 --** SOFTWARE.
 --**********************************************************************************
 
-local DummyUnit = import('/lua/sim/units/defaultunits.lua').DummyUnit
+local DummyUnit = import('/lua/sim/unit.lua').DummyUnit
+local DummyUnitOnCreate = DummyUnit.OnCreate
 
---- The build bot class for drones. It removes a lot of
--- the basic functionality of a unit to save on performance.
+local UnitSetConsumptionActive = DummyUnit.SetConsumptionActive
+
+-- pre-import for performance
+local ExplosionSmallAir = import("/lua/effecttemplates.lua").ExplosionSmallAir
+
+-- upvalue scope for performance
+local TrashBag = TrashBag
+local TrashBagDestroy = TrashBag.Destroy
+
+local IssueToUnitStop = IssueToUnitStop
+local CreateLightParticle = CreateLightParticle
+local CreateEmitterAtEntity = CreateEmitterAtEntity
+
+--- The build bot class for drones. It removes a lot of the basic functionality of a unit to save on performance.
 ---@class CBuildBotUnit : DummyUnit
+---@field Trash TrashBag
 CBuildBotUnit = ClassDummyUnit(DummyUnit) {
 
     -- Keep track of the builder that made the bot
     SpawnedBy = false,
 
-    --- only initialise what we need (drones typically have some aim functionality)
     ---@param self CBuildBotUnit
-    OnPreCreate = function(self) 
+    OnPreCreate = function(self)
         self.Trash = TrashBag()
-    end,         
-
-    --- only initialise what we need
-    ---@param self CBuildBotUnit
-    OnCreate = function(self)
-        DummyUnit.OnCreate(self)
-
-        -- prevent drone from consuming anything
-        UnitSetConsumptionActive(self, false)
     end,
 
-    --- short-cut when being destroyed
     ---@param self CBuildBotUnit
-    OnDestroy = function(self) 
-        self.Dead = true
-        self.Trash:Destroy()
+    OnDestroy = function(self)
+        TrashBagDestroy(self.Trash)
 
-        if self.SpawnedBy then 
-            self.SpawnedBy.BuildBotsNext = self.SpawnedBy.BuildBotsNext - 1
+        local spawnedBy = self.SpawnedBy
+        if spawnedBy then
+            spawnedBy.BuildBotsNext = spawnedBy.BuildBotsNext - 1
         end
     end,
 
     ---@param self CBuildBotUnit
     Kill = function(self)
-        -- make it go boom
-        if self.PlayDestructionEffects then
-            self:CreateDestructionEffects(1.0)
+        local army = self.Army
+
+        -- create a small flash
+        CreateLightParticle(
+            self,
+            -1,
+            army,
+            1,
+            8,
+            'glow_03',
+            'ramp_flare_02'
+        )
+
+        -- create small air explosion
+        for _, effect in ExplosionSmallAir do
+            CreateEmitterAtEntity(self, army, effect)
         end
 
+        -- create a bit of debris
+        local vx, vy, vz = self:GetVelocity()
+        self:CreateProjectile(
+            '/effects/entities/DebrisMisc04/DebrisMisc04_proj.bp',
+            0, 0, 0,
+            vx, vy, vz
+        )
+
+        self:PlayUnitSound('Destroyed')
+
+        -- flatout destroy the drone
         self:Destroy()
     end,
 
-    --- prevent this type of operations
     ---@param self CBuildBotUnit
     ---@param target Unit unused
     OnStartCapture = function(self, target)
-        IssueStop({self}) -- You can't capture!
+        -- Do not allow this unit to assist in a capture order
+        IssueToUnitStop(self)
     end,
-    
+
     ---@param self CBuildBotUnit
     ---@param target Unit unused
     OnStartReclaim = function(self, target)
-        IssueStop({self}) -- You can't reclaim!
+        -- Do not allow this unit to assist in a reclaim order
+        IssueToUnitStop(self)
     end,
 
     --- short cut - just get destroyed
     ---@param self CBuildBotUnit
     ---@param with any unused
     OnImpact = function(self, with)
-
-        -- make it go boom
-        if self.PlayDestructionEffects then
-            self:CreateDestructionEffects(1.0)
-        end
-
         -- make it sound boom
         self:PlayUnitSound('Destroyed')
 

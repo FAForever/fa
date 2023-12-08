@@ -22,6 +22,5 @@
 
 local TransportBeaconUnit = import('/lua/defaultunits.lua').TransportBeaconUnit
 
--- TRANSPORT BEACON UNITS
 ---@class CTransportBeaconUnit : TransportBeaconUnit
 CTransportBeaconUnit = ClassUnit(TransportBeaconUnit) {}
