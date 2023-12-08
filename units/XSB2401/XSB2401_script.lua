@@ -35,7 +35,6 @@ XSB2401 = ClassUnit(SStructureUnit) {
         SStructureUnit.OnStopBeingBuilt(self, builder, layer)
 
         local bp = self.Blueprint
-        self.Trash:Add(CreateAnimator(self):PlayAnim(bp.Display.AnimationOpen))
         local missileBone = bp.Display.MissileBone
         if missileBone then
             if not self.MissileSlider then

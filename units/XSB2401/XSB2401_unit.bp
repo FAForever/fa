@@ -56,7 +56,6 @@ UnitBlueprint{
                 Weight = 100,
             },
         },
-        AnimationOpen = "/units/uab2305/uab2305_aopen.sca",
         AttackReticleSize = 90,
         BuildAttachBone = "Attachpoint",
         DamageEffects = {
@@ -250,8 +249,6 @@ UnitBlueprint{
             Turreted = false,
             WeaponCategory = "Missile",
             WeaponRepackTimeout = 20,
-            WeaponUnpackAnimation = "/units/uab2305/uab2305_alaunchsequence.sca",
-            WeaponUnpackAnimationRate = 10,
             WeaponUnpacks = true,
         },
         {
