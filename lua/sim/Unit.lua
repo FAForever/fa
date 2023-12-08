@@ -1210,8 +1210,12 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
                 local presetEnhancements = bp.EnhancementPresetAssigned.Enhancements
                 for _, enhName in activeEnhancements do
                     -- don't add enhancement costs built into the unit cost
-                    if presetEnhancements and presetEnhancements[enhName] then
-                        continue
+                    if presetEnhancements then
+                        for _, v in presetEnhancements do
+                            if v == enhName then
+                                continue
+                            end
+                        end
                     end
                     -- add up the enhancement AND all of its prerequisites
                     repeat

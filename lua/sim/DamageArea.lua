@@ -2,7 +2,7 @@ local oldDamageArea = DamageArea
 
 ---Trying to mimic DamageArea as good as possible, used for nukes to bypass the bubble damage absorbation of shields.
 ---@param instigator Unit
----@param location number
+---@param location Vector
 ---@param radius number
 ---@param damage number
 ---@param type string
