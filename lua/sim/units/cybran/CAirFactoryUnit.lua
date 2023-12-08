@@ -21,54 +21,71 @@
 --**********************************************************************************
 
 local AirFactoryUnit = import('/lua/defaultunits.lua').AirFactoryUnit
-local EffectUtil = import('/lua/effectutilities.lua')
+local AirFactoryUnitOnCreate = AirFactoryUnit.OnCreate
+local AirFactoryUnitOnPaused = AirFactoryUnit.OnPaused
+local AirFactoryUnitOnUnpaused = AirFactoryUnit.OnUnpaused
 
--- AIR FACTORY STRUCTURES
+-- pre-import for performance
+local CreateCybranFactoryBuildEffects = import('/lua/effectutilities.lua').CreateCybranFactoryBuildEffects
+
+-- upvalue scope for performance
+local WaitTicks = WaitTicks
+local CreateAnimator = CreateAnimator
+
+local AnimatorPlayAnim = moho.AnimationManipulator.PlayAnim
+local AnimatorSetRate = moho.AnimationManipulator.SetRate
+
 ---@class CAirFactoryUnit : AirFactoryUnit
 ---@field BuildEffectsBag TrashBag
 ---@field BuildAnimManip moho.AnimationManipulator
 CAirFactoryUnit = ClassUnit(AirFactoryUnit) {
 
+    ---@param self AirFactoryUnit
+    OnCreate = function(self)
+        AirFactoryUnitOnCreate(self)
+
+        local buildAnimManip = CreateAnimator(self)
+        AnimatorPlayAnim(buildAnimManip, self.Blueprint.Display.AnimationBuild, true)
+        AnimatorSetRate(buildAnimManip, 0)
+        self.BuildAnimManip = self.Trash:Add(buildAnimManip)
+    end,
+
     ---@param self CAirFactoryUnit
     ---@param unitBeingBuilt Unit
     ---@param order string unused
     CreateBuildEffects = function(self, unitBeingBuilt, order)
-        if not unitBeingBuilt then return end
+        if not unitBeingBuilt then
+            return
+        end
+
         WaitTicks(2)
-        EffectUtil.CreateCybranFactoryBuildEffects(self, unitBeingBuilt, self:GetBlueprint().General.BuildBones,
-            self.BuildEffectsBag)
+        CreateCybranFactoryBuildEffects(self, unitBeingBuilt, self.BuildEffectBones, self.BuildEffectsBag)
     end,
 
     ---@param self CAirFactoryUnit
     ---@param unitBeingBuilt Unit
     StartBuildFx = function(self, unitBeingBuilt)
-        if not unitBeingBuilt then return end
-
-        -- Start build process
-        if not self.BuildAnimManip then
-            self.BuildAnimManip = CreateAnimator(self)
-            self.BuildAnimManip:PlayAnim(self:GetBlueprint().Display.AnimationBuild, true):SetRate(0)
-            self.Trash:Add(self.BuildAnimManip)
+        if not unitBeingBuilt then
+            return
         end
-        self.BuildAnimManip:SetRate(1)
+
+        AnimatorSetRate(self.BuildAnimManip, 1)
     end,
 
     ---@param self CAirFactoryUnit
     StopBuildFx = function(self)
-        if self.BuildAnimManip then
-            self.BuildAnimManip:SetRate(0)
-        end
+        AnimatorSetRate(self.BuildAnimManip, 0);
     end,
 
     ---@param self CAirFactoryUnit
     OnPaused = function(self)
-        AirFactoryUnit.OnPaused(self)
+        AirFactoryUnitOnPaused(self)
         self:StopBuildFx()
     end,
 
     ---@param self CAirFactoryUnit
     OnUnpaused = function(self)
-        AirFactoryUnit.OnUnpaused(self)
+        AirFactoryUnitOnUnpaused(self)
         if self:IsUnitState('Building') then
             self:StartBuildFx(self:GetFocusUnit())
         end

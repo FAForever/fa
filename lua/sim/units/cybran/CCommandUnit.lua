@@ -21,7 +21,19 @@
 --**********************************************************************************
 
 local CommandUnit = import('/lua/defaultunits.lua').CommandUnit
+local CommandUnitOnCreate = CommandUnit.OnCreate
+local CommandUnitDestroyAllBuildEffects = CommandUnit.DestroyAllBuildEffects
+local CommandUnitStopBuildingEffects = CommandUnit.StopBuildingEffects
+local CommandUnitOnPaused = CommandUnit.OnPaused
+local CommandUnitOnDestroy = CommandUnit.OnDestroy
+
 local CConstructionTemplate = import('/lua/cybranunits.lua').CConstructionTemplate
+local CConstructionTemplateOnCreate = CConstructionTemplate.OnCreate
+local CConstructionTemplateDestroyAllBuildEffects = CConstructionTemplate.DestroyAllBuildEffects
+local CConstructionTemplateStopBuildingEffects = CConstructionTemplate.StopBuildingEffects
+local CConstructionTemplateOnPaused = CConstructionTemplate.OnPaused
+local CConstructionTemplateCreateBuildEffects = CConstructionTemplate.CreateBuildEffects
+local CConstructionTemplateOnDestroy = CConstructionTemplate.OnDestroy
 
 ---# CCommandUnit
 ---Cybran Command Units (ACU and SCU) have stealth and cloak enhancements, toggles can be handled in one class
@@ -30,27 +42,27 @@ CCommandUnit = ClassUnit(CommandUnit, CConstructionTemplate) {
 
     ---@param self CCommandUnit
     OnCreate = function(self)
-        CommandUnit.OnCreate(self)
-        CConstructionTemplate.OnCreate(self)
+        CommandUnitOnCreate(self)
+        CConstructionTemplateOnCreate(self)
     end,
 
     ---@param self CCommandUnit
     DestroyAllBuildEffects = function(self)
-        CommandUnit.DestroyAllBuildEffects(self)
-        CConstructionTemplate.DestroyAllBuildEffects(self)
+        CommandUnitDestroyAllBuildEffects(self)
+        CConstructionTemplateDestroyAllBuildEffects(self)
     end,
 
     ---@param self CCommandUnit
     ---@param built Unit
     StopBuildingEffects = function(self, built)
-        CommandUnit.StopBuildingEffects(self, built)
-        CConstructionTemplate.StopBuildingEffects(self, built)
+        CommandUnitStopBuildingEffects(self, built)
+        CConstructionTemplateStopBuildingEffects(self, built)
     end,
 
     ---@param self CCommandUnit
     OnPaused = function(self)
-        CommandUnit.OnPaused(self)
-        CConstructionTemplate.OnPaused(self)
+        CommandUnitOnPaused(self)
+        CConstructionTemplateOnPaused(self)
     end,
 
     ---@param self CCommandUnit
@@ -58,13 +70,13 @@ CCommandUnit = ClassUnit(CommandUnit, CConstructionTemplate) {
     ---@param order number
     ---@param stationary boolean
     CreateBuildEffects = function(self, unitBeingBuilt, order, stationary)
-        CConstructionTemplate.CreateBuildEffects(self, unitBeingBuilt, order, stationary)
+        CConstructionTemplateCreateBuildEffects(self, unitBeingBuilt, order, stationary)
     end,
 
     ---@param self CCommandUnit
-    OnDestroy = function(self) 
-        CommandUnit.OnDestroy(self)
-        CConstructionTemplate.OnDestroy(self)
+    OnDestroy = function(self)
+        CommandUnitOnDestroy(self)
+        CConstructionTemplateOnDestroy(self)
     end,
 
     ---@param self CCommandUnit
