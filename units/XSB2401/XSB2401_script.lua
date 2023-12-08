@@ -32,11 +32,17 @@ XSB2401 = ClassUnit(SStructureUnit) {
         DeathWeapon = ClassWeapon(DeathNukeWeapon) {},
     },
 
+    ---@param self XSB2401
+    ---@param builder Unit
+    ---@param layer string
     StartBeingBuiltEffects = function(self, builder, layer)
         SStructureUnit.StartBeingBuiltEffects(self, builder, layer)
         self.Trash:Add(ForkThread( CreateSeraphimExperimentalBuildBaseThread, self, builder, self.OnBeingBuiltEffectsBag, 2 ))
     end,
 
+    ---@param self XSB2401
+    ---@param builder Unit
+    ---@param layer string
     OnStopBeingBuilt = function(self, builder, layer)
         SStructureUnit.OnStopBeingBuilt(self, builder, layer)
 
@@ -54,6 +60,8 @@ XSB2401 = ClassUnit(SStructureUnit) {
         self.PlayReloadEffects(self:GetWeapon(1))
     end,
 
+    ---@param self XSB2401
+    ---@param weapon SIFExperimentalStrategicMissile
     OnSiloBuildStart = function(self, weapon)
         self.Trash:Add(ForkThread(self.RaiseMissileThread,self))
         self.Trash:Add(ForkThread(self.WatchBuild,self))
@@ -62,11 +70,14 @@ XSB2401 = ClassUnit(SStructureUnit) {
         SStructureUnit.OnSiloBuildStart(self, weapon)
     end,
 
+    --- @param self XSB2401
+    --- @param weapon SIFExperimentalStrategicMissile
     OnSiloBuildEnd = function(self, weapon)
         self.MissileBuilt = true
         SStructureUnit.OnSiloBuildEnd(self,weapon)
     end,
 
+    --- @param self XSB2401
     PlayBuildEffects = function(self)
         self:PlayUnitSound('Construct')
         self:PlayUnitAmbientSound('ConstructLoop')
@@ -95,6 +106,7 @@ XSB2401 = ClassUnit(SStructureUnit) {
         end
     end,
 
+    --- @param self XSB2401
     DestroyReloadEmitters = function(self)
         local effectBones = self.Blueprint.General.BuildBones.BuildEffectBones
         for bidx, bone in self.MissileEffect do
@@ -168,11 +180,13 @@ XSB2401 = ClassUnit(SStructureUnit) {
         end
     end,
 
+    --- @param self XSB2401
     HideMissile = function(self)
         WaitTicks(2)
         self:RetractMissile()
     end,
 
+    --- @param self XSB2401
     RetractMissile = function(self)
         local missileBone = self.Blueprint.Display.MissileBone
         if missileBone then
@@ -183,6 +197,8 @@ XSB2401 = ClassUnit(SStructureUnit) {
         end
     end,
 
+    --- Hides the missile if building is cancelled.
+    --- @param self XSB2401
     WatchBuild = function(self)
         while true do
             if not self:IsUnitState('SiloBuildingAmmo') and not self.MissileBuilt then
@@ -195,6 +211,7 @@ XSB2401 = ClassUnit(SStructureUnit) {
         end
     end,
 
+    --- @param self XSB2401
     ChargeNukeSound = function(self)
         WaitTicks(16)
         self:PlayUnitAmbientSound('NukeCharge')
