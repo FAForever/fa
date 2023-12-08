@@ -46,7 +46,7 @@ CConstructionUnit = ClassUnit(ConstructionUnit, CConstructionTemplate) {
     ---@param self CConstructionUnit
     DestroyAllBuildEffects = function(self)
         ConstructionUnit.DestroyAllBuildEffects(self)
-        CConstructionTemplate.DestroyAllBuildEffects(self)
+        CConstructionzTemplate.DestroyAllBuildEffects(self)
     end,
 
     ---@param self CConstructionUnit
@@ -64,9 +64,9 @@ CConstructionUnit = ClassUnit(ConstructionUnit, CConstructionTemplate) {
 
     ---@param self CConstructionUnit
     ---@param unitBeingBuilt Unit
-    ---@param order number
+    ---@param order string
     CreateBuildEffects = function(self, unitBeingBuilt, order)
-        CConstructionTemplate.CreateBuildEffects(self, unitBeingBuilt, order)
+        CConstructionTemplate.CreateBuildEffects(self, unitBeingBuilt, order, false)
     end,
 
     ---@param self CConstructionUnit

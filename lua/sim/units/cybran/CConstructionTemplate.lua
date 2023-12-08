@@ -128,7 +128,7 @@ CConstructionTemplate = ClassSimple {
     --- When making build effects, try and make the bots.
     ---@param self CConstructionTemplate
     ---@param unitBeingBuilt Unit
-    ---@param order number
+    ---@param order string
     ---@param stationary boolean
     CreateBuildEffects = function(self, unitBeingBuilt, order, stationary)
         -- check if the unit still exists, this can happen when:
