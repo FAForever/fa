@@ -22,6 +22,5 @@
 
 local EnergyStorageUnit = import('/lua/defaultunits.lua').EnergyStorageUnit
 
--- ENERGY STORAGE STRUCTURES
 ---@class CEnergyStorageUnit : EnergyStorageUnit
 CEnergyStorageUnit = ClassUnit(EnergyStorageUnit) {}

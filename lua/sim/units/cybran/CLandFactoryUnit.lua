@@ -23,7 +23,6 @@
 local LandFactoryUnit = import('/lua/defaultunits.lua').LandFactoryUnit
 local EffectUtil = import('/lua/effectutilities.lua')
 
--- LAND FACTORY STRUCTURES
 ---@class CLandFactoryUnit : LandFactoryUnit
 ---@field BuildEffectsBag TrashBag
 ---@field BuildAnimManip moho.AnimationManipulator
@@ -34,7 +33,8 @@ CLandFactoryUnit = ClassUnit(LandFactoryUnit) {
     ---@param order number
     CreateBuildEffects = function(self, unitBeingBuilt, order)
         if not unitBeingBuilt then return end
-        WaitSeconds(0.1)
+
+        WaitTicks(2)
         EffectUtil.CreateCybranFactoryBuildEffects(self, unitBeingBuilt, self:GetBlueprint().General.BuildBones,
             self.BuildEffectsBag)
     end,
