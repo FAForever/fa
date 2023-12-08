@@ -28,7 +28,7 @@ XSB2401 = ClassUnit(SStructureUnit) {
 
     StartBeingBuiltEffects = function(self, builder, layer)
         SStructureUnit.StartBeingBuiltEffects(self, builder, layer)
-        self.Trash:Add(ForkThread( CreateSeraphimExperimentalBuildBaseThread, builder, self.OnBeingBuiltEffectsBag, 2, self ))
+        self.Trash:Add(ForkThread( CreateSeraphimExperimentalBuildBaseThread, self, builder, self.OnBeingBuiltEffectsBag, 2 ))
     end,
 
     OnStopBeingBuilt = function(self, builder, layer)
