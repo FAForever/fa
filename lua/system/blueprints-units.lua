@@ -522,6 +522,12 @@ local function PostProcessUnit(unit)
     end
 
     --#endregion
+
+    -- Override the default 1 build rate given to units
+    -- so that rollover unit view can work with Mantis.
+    if unit.Economy and not unit.Economy.BuildRate then
+        unit.Economy.BuildRate = 0
+    end
 end
 
 ---@param allBlueprints BlueprintsTable
