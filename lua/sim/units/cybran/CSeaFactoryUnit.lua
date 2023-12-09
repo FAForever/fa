@@ -21,47 +21,64 @@
 --**********************************************************************************
 
 local SeaFactoryUnit = import('/lua/defaultunits.lua').SeaFactoryUnit
-local EffectUtil = import('/lua/effectutilities.lua')
-local StructureUnit = import('/lua/defaultunits.lua').StructureUnit
+local SeaFactoryUnitOnPaused = SeaFactoryUnit.OnPaused
+local SeaFactoryUnitOnUnpaused = SeaFactoryUnit.OnUnpaused
+local SeaFactoryUnitOnStartBuild = SeaFactoryUnit.OnStartBuild
+local SeaFactoryUnitOnStopBuild = SeaFactoryUnit.OnStopBuild
+local SeaFactoryUnitOnFailedToBuild = SeaFactoryUnit.OnFailedToBuild
+
+-- pre-import for performance
+local CreateCybranFactoryBuildEffects = import('/lua/effectutilities.lua').CreateCybranFactoryBuildEffects
+
+-- upvalue scope for performance
+local WaitTicks = WaitTicks
+local ForkThread = ForkThread
+local IsDestroyed = IsDestroyed
+
+local TrashBagAdd = TrashBag.Add
 
 ---@class CSeaFactoryUnit : SeaFactoryUnit
 ---@field BuildEffectsBag TrashBag
 CSeaFactoryUnit = ClassUnit(SeaFactoryUnit) {
 
-    ---@param self CSeaFactoryUnit
+    ---@param self CAirFactoryUnit
     ---@param unitBeingBuilt Unit
-    StartBuildingEffects = function(self, unitBeingBuilt)
-        local thread = self:ForkThread(EffectUtil.CreateCybranBuildBeamsOpti, nil, unitBeingBuilt, self.BuildEffectsBag,
-            false)
-        unitBeingBuilt.Trash:Add(thread)
+    ---@param order string unused
+    CreateBuildEffects = function(self, unitBeingBuilt, order)
+        if not unitBeingBuilt then
+            return
+        end
+
+        WaitTicks(2)
+        CreateCybranFactoryBuildEffects(self, unitBeingBuilt, self.BuildEffectBones, self.BuildEffectsBag)
     end,
 
     ---@param self CSeaFactoryUnit
     OnPaused = function(self)
-        StructureUnit.OnPaused(self)
-        if not self.Dead and self:GetFractionComplete() == 1 then
-            self:StopUnitAmbientSound('ConstructLoop')
-            StructureUnit.StopBuildingEffects(self, self.UnitBeingBuilt)
+        SeaFactoryUnitOnPaused(self)
+
+        -- remove the build effects
+        if self:IsUnitState('Building') then
             self:StopArmsMoving()
         end
     end,
 
     ---@param self CSeaFactoryUnit
     OnUnpaused = function(self)
-        StructureUnit.OnUnpaused(self)
-        if self:GetNumBuildOrders(categories.ALLUNITS) > 0 and not self:IsUnitState('Upgrading') and
-            self:IsUnitState('Building') then
-            self:PlayUnitAmbientSound('ConstructLoop')
-            self:StartBuildingEffects(self.UnitBeingBuilt)
+        SeaFactoryUnitOnUnpaused(self)
+
+        -- re-introduce the build effects
+        local unitBeingBuilt = self.UnitBeingBuilt --[[@as Unit]]
+        if self:IsUnitState('Building') and (not IsDestroyed(unitBeingBuilt)) then
             self:StartArmsMoving()
         end
     end,
 
     ---@param self CSeaFactoryUnit
     ---@param unitBeingBuilt Unit
-    ---@param order boolean|string
+    ---@param order string
     OnStartBuild = function(self, unitBeingBuilt, order)
-        SeaFactoryUnit.OnStartBuild(self, unitBeingBuilt, order)
+        SeaFactoryUnitOnStartBuild(self, unitBeingBuilt, order)
         if order ~= 'Upgrade' then
             self:StartArmsMoving()
         end
@@ -69,8 +86,9 @@ CSeaFactoryUnit = ClassUnit(SeaFactoryUnit) {
 
     ---@param self CSeaFactoryUnit
     ---@param unitBuilding Unit
-    OnStopBuild = function(self, unitBuilding)
-        SeaFactoryUnit.OnStopBuild(self, unitBuilding)
+    ---@param order string
+    OnStopBuild = function(self, unitBuilding, order)
+        SeaFactoryUnitOnStopBuild(self, unitBuilding, order)
         if not self.Dead and self:GetFractionComplete() == 1 then
             self:StopArmsMoving()
         end
@@ -78,7 +96,7 @@ CSeaFactoryUnit = ClassUnit(SeaFactoryUnit) {
 
     ---@param self CSeaFactoryUnit
     OnFailedToBuild = function(self)
-        SeaFactoryUnit.OnFailedToBuild(self)
+        SeaFactoryUnitOnFailedToBuild(self)
         if not self.Dead and self:GetFractionComplete() == 1 then
             self:StopArmsMoving()
         end
@@ -86,7 +104,7 @@ CSeaFactoryUnit = ClassUnit(SeaFactoryUnit) {
 
     ---@param self CSeaFactoryUnit
     StartArmsMoving = function(self)
-        self.ArmsThread = self:ForkThread(self.MovingArmsThread)
+        self.ArmsThread = TrashBagAdd(self.Trash, ForkThread(self.MovingArmsThread, self))
     end,
 
     ---@param self CSeaFactoryUnit
@@ -95,8 +113,9 @@ CSeaFactoryUnit = ClassUnit(SeaFactoryUnit) {
 
     ---@param self CSeaFactoryUnit
     StopArmsMoving = function(self)
-        if self.ArmsThread then
-            KillThread(self.ArmsThread)
+        local armsThread = self.ArmsThread
+        if armsThread then
+            KillThread(armsThread)
             self.ArmsThread = nil
         end
     end,

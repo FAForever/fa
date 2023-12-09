@@ -43,6 +43,7 @@ CMassCollectionUnit = ClassUnit(MassCollectionUnit) {
         local buildAnimManip = CreateAnimator(self)
         AnimatorPlayAnim(buildAnimManip, self.Blueprint.Display.AnimationOpen, true)
         AnimatorSetRate(buildAnimManip, 0)
+        self.AnimationManipulator = self.Trash:Add(buildAnimManip)
     end,
 
     ---@param self CMassCollectionUnit
