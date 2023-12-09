@@ -21,47 +21,45 @@
 --**********************************************************************************
 
 local MassCollectionUnit = import('/lua/defaultunits.lua').MassCollectionUnit
+local MassCollectionUnitOnCreate = MassCollectionUnit.OnCreate
+local MassCollectionUnitPlayActiveAnimation = MassCollectionUnit.PlayActiveAnimation
+local MassCollectionUnitOnProductionPaused = MassCollectionUnit.OnProductionPaused
+local MassCollectionUnitOnProductionUnpaused = MassCollectionUnit.OnProductionUnpaused
+
+-- upvalue scope for performance
+local CreateAnimator = CreateAnimator
+
+local AnimatorPlayAnim = moho.AnimationManipulator.PlayAnim
+local AnimatorSetRate = moho.AnimationManipulator.SetRate
 
 ---@class CMassCollectionUnit : MassCollectionUnit
 ---@field AnimationManipulator moho.AnimationManipulator
 CMassCollectionUnit = ClassUnit(MassCollectionUnit) {
 
-    OnStartBuild = function(self, unitBeingBuilt, order)
-        MassCollectionUnit.OnStartBuild(self, unitBeingBuilt, order)
-        if not self.AnimationManipulator then return end
-        self.AnimationManipulator:SetRate(0)
-        self.AnimationManipulator:Destroy()
-        self.AnimationManipulator = nil
+    ---@param self CMassCollectionUnit
+    OnCreate = function(self)
+        MassCollectionUnitOnCreate(self)
+
+        local buildAnimManip = CreateAnimator(self)
+        AnimatorPlayAnim(buildAnimManip, self.Blueprint.Display.AnimationOpen, true)
+        AnimatorSetRate(buildAnimManip, 0)
     end,
 
     ---@param self CMassCollectionUnit
     PlayActiveAnimation = function(self)
-        MassCollectionUnit.PlayActiveAnimation(self)
-
-        local animationManipulator = self.AnimationManipulator
-        if not animationManipulator then
-            animationManipulator = CreateAnimator(self)
-            self.Trash:Add(animationManipulator)
-            self.AnimationManipulator = animationManipulator
-        end
-
-        animationManipulator:PlayAnim(self.Blueprint.Display.AnimationOpen, true)
+        MassCollectionUnitPlayActiveAnimation(self)
+        AnimatorSetRate(self.AnimationManipulator, 1)
     end,
 
     ---@param self CMassCollectionUnit
     OnProductionPaused = function(self)
-        MassCollectionUnit.OnProductionPaused(self)
-        local animationManipulator = self.AnimationManipulator
-        if not animationManipulator then return end
-        animationManipulator:SetRate(0)
+        MassCollectionUnitOnProductionPaused(self)
+        AnimatorSetRate(self.AnimationManipulator, 0);
     end,
 
     ---@param self CMassCollectionUnit
     OnProductionUnpaused = function(self)
-        MassCollectionUnit.OnProductionUnpaused(self)
-        local animationManipulator = self.AnimationManipulator
-        if not animationManipulator then return end
-        animationManipulator:SetRate(1)
+        MassCollectionUnitOnProductionUnpaused(self)
+        AnimatorSetRate(self.AnimationManipulator, 1)
     end,
-
 }

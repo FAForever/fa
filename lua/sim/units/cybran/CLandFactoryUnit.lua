@@ -21,59 +21,74 @@
 --**********************************************************************************
 
 local LandFactoryUnit = import('/lua/defaultunits.lua').LandFactoryUnit
-local EffectUtil = import('/lua/effectutilities.lua')
+local LandFactoryUnitOnCreate = LandFactoryUnit.OnCreate
+local LandFactoryUnitOnPaused = LandFactoryUnit.OnPaused
+local LandFactoryUnitOnUnpaused = LandFactoryUnit.OnUnpaused
+
+-- pre-import for performance
+local CreateCybranFactoryBuildEffects = import('/lua/effectutilities.lua').CreateCybranFactoryBuildEffects
+
+-- upvalue scope for performance
+local WaitTicks = WaitTicks
+local CreateAnimator = CreateAnimator
+
+local AnimatorPlayAnim = moho.AnimationManipulator.PlayAnim
+local AnimatorSetRate = moho.AnimationManipulator.SetRate
 
 ---@class CLandFactoryUnit : LandFactoryUnit
 ---@field BuildEffectsBag TrashBag
 ---@field BuildAnimManip moho.AnimationManipulator
 CLandFactoryUnit = ClassUnit(LandFactoryUnit) {
 
+    ---@param self AirFactoryUnit
+    OnCreate = function(self)
+        LandFactoryUnitOnCreate(self)
+
+        local buildAnimManip = CreateAnimator(self)
+        AnimatorPlayAnim(buildAnimManip, self.Blueprint.Display.AnimationBuild, true)
+        AnimatorSetRate(buildAnimManip, 0)
+        self.BuildAnimManip = self.Trash:Add(buildAnimManip)
+    end,
+
     ---@param self CLandFactoryUnit
     ---@param unitBeingBuilt Unit
-    ---@param order number
-    CreateBuildEffects = function(self, unitBeingBuilt, order)
-        if not unitBeingBuilt then return end
+    CreateBuildEffects = function(self, unitBeingBuilt)
+        if not unitBeingBuilt then
+            return
+        end
 
         WaitTicks(2)
-        EffectUtil.CreateCybranFactoryBuildEffects(self, unitBeingBuilt, self:GetBlueprint().General.BuildBones,
-            self.BuildEffectsBag)
+        CreateCybranFactoryBuildEffects(self, unitBeingBuilt, self.Blueprint.General.BuildBones, self.BuildEffectsBag)
     end,
 
     ---@param self CLandFactoryUnit
     ---@param unitBeingBuilt Unit
     StartBuildFx = function(self, unitBeingBuilt)
         if not unitBeingBuilt then
-            unitBeingBuilt = self:GetFocusUnit()
+            return
         end
 
-        -- Start build process
-        if not self.BuildAnimManip then
-            self.BuildAnimManip = CreateAnimator(self)
-            self.BuildAnimManip:PlayAnim(self:GetBlueprint().Display.AnimationBuild, true):SetRate(0)
-            self.Trash:Add(self.BuildAnimManip)
-        end
-
-        self.BuildAnimManip:SetRate(1)
+        AnimatorSetRate(self.BuildAnimManip, 1)
     end,
 
     ---@param self CLandFactoryUnit
     StopBuildFx = function(self)
-        if self.BuildAnimManip then
-            self.BuildAnimManip:SetRate(0)
-        end
+        AnimatorSetRate(self.BuildAnimManip, 0);
     end,
 
     ---@param self CLandFactoryUnit
     OnPaused = function(self)
-        LandFactoryUnit.OnPaused(self)
-        self:StopBuildFx(self:GetFocusUnit())
+        LandFactoryUnitOnPaused(self)
+        self:StopBuildFx()
     end,
 
     ---@param self CLandFactoryUnit
     OnUnpaused = function(self)
-        LandFactoryUnit.OnUnpaused(self)
-        if self:IsUnitState('Building') then
-            self:StartBuildFx(self:GetFocusUnit())
+        LandFactoryUnitOnUnpaused(self)
+
+        local unitBeingBuilt = self.UnitBeingBuilt
+        if unitBeingBuilt and self:IsUnitState('Building') then
+            self:StartBuildFx(unitBeingBuilt)
         end
     end,
 }
