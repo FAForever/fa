@@ -1503,7 +1503,7 @@ local function CreateAltOrders(availableOrders, availableToggles, units)
                         end
                     end
                     if not foundFreeSlot then
-                        WARN("No free slot for order: " .. item)
+                        SPEW("No free slot for order: " .. item)
                         -- Could break here, but don't, then you'll know how many extra orders you have
                     end
                 end
