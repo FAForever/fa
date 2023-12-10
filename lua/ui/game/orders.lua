@@ -1600,8 +1600,7 @@ function ApplyOverrides(standardOrdersTable, newSelection)
                 if override then
                     for key, value in override do
                         if orderDiffs[orderKey][key] ~= nil and (orderDiffs[orderKey][key] ~= value) then
-                            -- Found order diff already, so mark it false so it gets ignored when applying to table
-                            orderDiffs[orderKey] = false
+                            -- Found order diff we already have
                             break
                         else
                             orderDiffs[orderKey] = orderDiffs[orderKey] or {}
