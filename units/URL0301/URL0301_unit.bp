@@ -492,6 +492,12 @@ UnitBlueprint{
         ConstructionBar = true,
         FactionName = "Cybran",
         Icon = "amph",
+        OrderOverrides = {
+            RULEUTC_StealthToggle = {
+                bitmapId = "stealth-personal",
+                helpText = "toggle_stealth_personal",
+            },
+        },
         SelectionPriority = 3,
     },
     Intel = {
