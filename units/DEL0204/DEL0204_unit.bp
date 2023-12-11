@@ -178,7 +178,7 @@ UnitBlueprint{
     SelectionThickness = 0.62,
     SizeX = 0.9,
     SizeY = 1,
-    SizeZ = 1,
+    SizeZ = 1.2,
     StrategicIconName = "icon_bot2_directfire",
     StrategicIconSortPriority = 115,
     Transport = {
