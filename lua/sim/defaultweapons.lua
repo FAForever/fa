@@ -736,6 +736,9 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
             if unit.Dead then return end
             unit:SetBusy(false)
 
+            -- at this point salvo is always done so reset the data in case firing was interrupted
+            self.CurrentSalvoData = nil
+
             self:WaitForAndDestroyManips()
             local bp = self.Blueprint
             for _, rack in bp.RackBones do
