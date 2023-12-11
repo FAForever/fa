@@ -22,10 +22,9 @@ local CollisionBeam = import("/lua/sim/collisionbeam.lua").CollisionBeam
 local MathClamp = math.clamp
 
 ---@class WeaponSalvoData
----@field target? Unit | Prop   if absent, will use `targetpos` instead
----@field targetpos Vector      stores the last location of the target, or the ground fire location
+---@field target? Unit | Prop   if absent, will use `targetPos` instead
+---@field targetPos Vector      stores the last location upon which we dropped bombs for a target, or the ground fire location
 ---@field lastAccel number      stores the last acceleration that was used
----@field usestore? boolean     a flag that indicates if the target was lost
 
 -- Most weapons derive from this class, including beam weapons later in this file
 ---@class DefaultProjectileWeapon : Weapon
@@ -222,6 +221,9 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
             local target = UnitGetTargetEntity(launcher)
             if target then -- target is a unit / prop
                 targetPos = EntityGetPosition(target)
+                if not target.IsProp then
+                    targetVelX, _, targetVelZ = UnitGetVelocity(target)
+                end
             else -- target is a position i.e. attack ground
                 targetPos = self:GetCurrentTargetPos()
             end
@@ -256,33 +258,32 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
             else -- otherwise, calculate & cache a couple things the first time only
                 data = {
                     lastAccel = 4.75,
-                    targetpos = targetPos,
+                    targetPos = targetPos,
                 }
                 if target then
                     if target.Dead then
-                        data.usestore = true
+                        data.target = nil
                     else
                         data.target = target
                     end
                 end
                 self.CurrentSalvoData = data
             end
-        else -- if it's a successive bomb drop, get the targeting data
+        else -- if it's a successive bomb drop, update the targeting data
             local target = data.target
             if target then
+                LOG("Updating target data")
                 if target.Dead then -- if the unit is destroyed, use the last known position
                     data.target = nil
-                    data.usestore = true -- flag that we lost the target
-                    targetPos = data.targetpos
+                    targetPos = data.targetPos
                 else
                     if not target.IsProp then
                         targetVelX, _, targetVelZ = UnitGetVelocity(target)
                     end
                     targetPos = EntityGetPosition(target)
-                    data.targetpos = targetPos
                 end
             else
-                targetPos = data.targetpos
+                targetPos = data.targetPos
             end
         end
         if not targetPos then
@@ -328,16 +329,26 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
         end
 
         -- how many ticks until the bomb hits the target in xz-space
-        local time = distPos / distVel + self.AdjustedSalvoDelay * (self.SalvoSpreadStart + self.CurrentSalvoNumber)
-        if time == 0 then
+        local time = distPos / distVel
+        local adjustedTime = time + self.AdjustedSalvoDelay * (self.SalvoSpreadStart + self.CurrentSalvoNumber)
+        if adjustedTime == 0 then
             data.lastAccel = 4.75
-            return 4.75
+            return 4.75 
+        end
+
+        -- If we have a target, targetPos may have updated now.
+        -- save the new predicted target position in case we lose the target
+        -- so that we can drop the bomb salvo centered onto there.
+        if data.target then
+            targetPos[1] = targetPos[1] + time * targetVelX
+            targetPos[3] = targetPos[3] + time * targetVelZ
+            data.targetPos = targetPos
         end
 
         -- find out where the target will be at that point in time (it could be moving)
         -- (time and velocity being in ticks cancel out)
         -- what is the height difference at that future position
-        projPosY = projPosY - GetSurfaceHeight(targetPosX + time * targetVelX, targetPosZ + time * targetVelZ)
+        projPosY = projPosY - GetSurfaceHeight(targetPosX + adjustedTime * targetVelX, targetPosZ + adjustedTime * targetVelZ)
 
         -- The basic formula for displacement over time is h = 0.5 * a * t^2
         -- h: displacement, a: acceleration, t: time
@@ -345,7 +356,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
         -- a = 2 * h / t^2
 
         -- also convert time from ticks to seconds (multiply by 10, twice)
-        local acc = 200 * projPosY / (time * time)
+        local acc = 200 * projPosY / (adjustedTime * adjustedTime)
 
         data.lastAccel = acc
         return acc
@@ -725,9 +736,6 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
             if unit.Dead then return end
             unit:SetBusy(false)
 
-            -- at this point salvo is always done so reset the data
-            self.CurrentSalvoData = nil
-
             self:WaitForAndDestroyManips()
             local bp = self.Blueprint
             for _, rack in bp.RackBones do
@@ -1089,6 +1097,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
                 end
             end
 
+            self.CurrentSalvoData = nil
             self:DoOnFireBuffs() -- Found in mohodata weapon.lua
             self.FirstShot = false
             self:StartEconomyDrain()
