@@ -22,7 +22,7 @@
         "*.bp"
     ],
     "[lua]": {
-        "editor.wordBasedSuggestions": "off",
+        "editor.wordBasedSuggestions": false,
     },
     "files.associations": {
         "*.bp": "lua"
