@@ -49,6 +49,19 @@ ExternalFactoryUnit = ClassUnit(Unit) {
     end,
 
     ---@param self ExternalFactoryUnit
+    OnDestroy = function(self)
+        if self.UpdateParentProgressThread then
+            KillThread(self.UpdateParentProgressThread)
+        end
+
+        -- Similar to SeaFactoryUnit
+        local UnitBeingBuilt = self.UnitBeingBuilt
+        if UnitBeingBuilt and not UnitBeingBuilt.Dead and UnitBeingBuilt:GetFractionComplete() < 1 then
+            UnitBeingBuilt:Destroy()
+        end
+    end,
+
+    ---@param self ExternalFactoryUnit
     ---@param parent Unit
     SetParent = function(self, parent)
         self.Parent = parent
