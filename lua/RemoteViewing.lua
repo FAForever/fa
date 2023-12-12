@@ -47,8 +47,9 @@ function RemoteViewing(SuperClass)
         end,
 
         TargetLocationThread = function(self)
-            local Cost = CreateEconomyEvent(self, self:GetBlueprint().Economy.InitialRemoteViewingEnergyDrain, 0, 0.1)
+            local Cost = CreateEconomyEvent(self, self:GetBlueprint().Economy.InitialRemoteViewingEnergyDrain * (self.EnergyMaintAdjMod or 1), 0, 1, self.SetWorkProgress)
             WaitFor(Cost)
+            self:SetWorkProgress(0.0)
             RemoveEconomyEvent(self, Cost)
             self:RequestRefreshUI()
             self.RemoteViewingData.VisibleLocation = self.RemoteViewingData.PendingVisibleLocation
