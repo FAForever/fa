@@ -1,11 +1,24 @@
------------------------------------------------------------------
--- File     :  /lua/cybranunits.lua
--- Author(s):
--- Summary  :
--- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
------------------------------------------------------------------
--- upvalied math functions for performance
-MathMax = math.max
+--**********************************************************************************
+--** Copyright (c) 2023 FAForever
+--**
+--** Permission is hereby granted, free of charge, to any person obtaining a copy
+--** of this software and associated documentation files (the "Software"), to deal
+--** in the Software without restriction, including without limitation the rights
+--** to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+--** copies of the Software, and to permit persons to whom the Software is
+--** furnished to do so, subject to the following conditions:
+--**
+--** The above copyright notice and this permission notice shall be included in all
+--** copies or substantial portions of the Software.
+--**
+--** THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+--** IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+--** FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+--** AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+--** LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+--** OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+--** SOFTWARE.
+--**********************************************************************************
 
 --- Unit Base Classes
 CConstructionTemplate = import('/lua/sim/units/cybran/CConstructionTemplate.lua').CConstructionTemplate
@@ -41,6 +54,8 @@ CConstructionStructureUnit = import('/lua/sim/units/cybran/CConstructionStructur
 CCommandUnit = import('/lua/sim/units/cybran/CCommandUnit.lua').CCommandUnit
 
 -- kept for mod backwards compatibility
+MathMax = math.max
+
 local Util = import("/lua/utilities.lua")
 local CreateCybranBuildBeams = false
 local TrashBag = _G.TrashBag
@@ -67,10 +82,12 @@ local RadarUnit = DefaultUnitsFile.RadarUnit
 local MassCollectionUnit = DefaultUnitsFile.MassCollectionUnit
 local EffectTemplate = import("/lua/effecttemplates.lua")
 local EffectUtil = import("/lua/effectutilities.lua")
+
 -- upvalued effect utility functions for performance
 local SpawnBuildBotsOpti = EffectUtil.SpawnBuildBotsOpti
 local CreateCybranEngineerBuildEffectsOpti = EffectUtil.CreateCybranEngineerBuildEffectsOpti
 local CreateCybranBuildBeamsOpti = EffectUtil.CreateCybranBuildBeamsOpti
+
 -- upvalued globals for performance
 local Random = Random
 local VDist2Sq = VDist2Sq
@@ -81,11 +98,9 @@ local WaitTicks = coroutine.yield
 local IssueMove = IssueMove
 local IssueClearCommands = IssueClearCommands
 -- upvalued moho functions for performance
-local EntityFunctions = _G.moho.entity_methods 
+local EntityFunctions = _G.moho.entity_methods
 local EntityDestroy = EntityFunctions.Destroy
 local EntityGetPosition = EntityFunctions.GetPosition
 local EntityGetPositionXYZ = EntityFunctions.GetPositionXYZ
-EntityFunctions = nil
-local UnitFunctions = _G.moho.unit_methods 
+local UnitFunctions = _G.moho.unit_methods
 local UnitSetConsumptionActive = UnitFunctions.SetConsumptionActive
-UnitFunctions = nil 

@@ -20,40 +20,51 @@
 --** SOFTWARE.
 --**********************************************************************************
 
-local CSeaFactoryUnit = import("/lua/cybranunits.lua").CSeaFactoryUnit
-local CSeaFactoryUnitOnCreate = CSeaFactoryUnit.OnCreate
-local CSeaFactoryUnitStartArmsMoving = CSeaFactoryUnit.StartArmsMoving
-local CSeaFactoryUnitStopArmsMoving = CSeaFactoryUnit.StopArmsMoving
+-- upvalue scope for performance
+local CreateSlider = CreateSlider
+local TrashBagAdd = TrashBag.Add
 
-local Cybran1BuildArmComponent = import("/lua/sim/units/components/Cybran1BuildArmComponent.lua").Cybran1BuildArmComponent
-local Cybran1BuildArmComponentOnCreate = Cybran1BuildArmComponent.OnCreate
-local Cybran1BuildArmComponentStartArmsMoving = Cybran1BuildArmComponent.StartArmsMoving
-local Cybran1BuildArmComponentStopArmsMoving = Cybran1BuildArmComponent.StopArmsMoving
+local SliderSetGoal = moho.SlideManipulator.SetGoal
+local SliderSetSpeed = moho.SlideManipulator.SetSpeed
 
----@class URB0103 : CSeaFactoryUnit, Cybran1BuildArmComponent
-URB0103 = ClassUnit(CSeaFactoryUnit, Cybran1BuildArmComponent) {
+---@class Cybran1BuildArmComponent
+---@field ArmSlider1 moho.SlideManipulator
+Cybran1BuildArmComponent = ClassSimple {
 
-    ArmBone1 = "Right_Arm03",
+    ArmBone1 = false,
 
-    ---@param self URB0103
+    ---@param self BuildArmComponent | Unit
     OnCreate = function(self)
-        CSeaFactoryUnitOnCreate(self)
-        Cybran1BuildArmComponentOnCreate(self)
+        local trash = self.Trash
+
+        self.ArmSlider1 = TrashBagAdd(trash, CreateSlider(self, self.ArmBone1))
     end,
 
-    ---@param self URB0103
+    ---@param self BuildArmComponent | Unit
     StartArmsMoving = function(self)
-        CSeaFactoryUnitStartArmsMoving(self)
-        Cybran1BuildArmComponentStartArmsMoving(self)
+        -- do nothing
     end,
 
-    ---@param self URB0103
+    ---@param self BuildArmComponent | Unit
+    MovingArmsThread = function(self)
+        -- local scope for performance
+        local armSlider1 = self.ArmSlider1
+
+        while true do
+            SliderSetGoal(armSlider1, 40, 0, 0)
+            SliderSetSpeed(armSlider1, 40)
+            WaitFor(armSlider1)
+            SliderSetGoal(armSlider1, -30, 0, 0)
+            SliderSetSpeed(armSlider1, 40)
+            WaitFor(armSlider1)
+        end
+    end,
+
+    ---@param self BuildArmComponent | Unit
     StopArmsMoving = function(self)
-        CSeaFactoryUnitStopArmsMoving(self)
-        Cybran1BuildArmComponentStopArmsMoving(self)
+        -- local scope for performance
+        local armSlider1 = self.ArmSlider1
+
+        SliderSetGoal(armSlider1, 0, 0, 0)
     end,
-
-    MovingArmsThread = Cybran1BuildArmComponent.MovingArmsThread,
 }
-
-TypeClass = URB0103
