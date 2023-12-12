@@ -5368,6 +5368,10 @@ local UnitGetCurrentLayer = _G.moho.unit_methods.GetCurrentLayer
 local UnitGetUnitId = _G.moho.unit_methods.GetUnitId
 
 ---@class DummyUnit : moho.unit_methods
+---@field EntityId EntityId
+---@field Army Army
+---@field Layer Layer
+---@field Blueprint UnitBlueprint
 DummyUnit = ClassDummyUnit(moho.unit_methods) {
 
     IsUnit = true,
@@ -5390,6 +5394,20 @@ DummyUnit = ClassDummyUnit(moho.unit_methods) {
 
     ---@param self DummyUnit
     UpdateAssistersConsumption = function (self) end,
+
+    --- Plays a sound using the unit as a source. Returns true if successful, false otherwise
+    ---@param self DummyUnit A unit
+    ---@param sound string A string identifier that represents the sound to be played.
+    ---@return boolean
+    PlayUnitSound = function(self, sound)
+        local audio = self.Blueprint.Audio[sound]
+        if not audio then
+            return false
+        end
+
+        self:PlaySound(audio)
+        return true
+    end,
 }
 
 -- Backwards compatibility with mods
