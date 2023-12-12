@@ -314,6 +314,74 @@ float4 inPos : POSITION,
 	return result;
 }
 
+const float PI = 3.14159265359;
+
+float FresnelSchlick(float dot, float F0)
+{
+    return F0 + (1.0 - F0) * pow(1.0 - dot, 5.0);
+}
+
+float NormalDistribution(float3 n, float3 h, float roughness)
+{
+    float a2 = roughness*roughness;
+    float nDotH = max(dot(n, h), 0.0);
+    float nDotH2 = nDotH*nDotH;
+
+    float num = a2;
+    float denom = nDotH2 * (a2 - 1.0) + 1.0;
+    denom = PI * denom * denom;
+
+    return num / denom;
+}
+
+float GeometrySchlick(float nDotV, float roughness)
+{
+    float r = (roughness + 1.0);
+    float k = (r*r) / 8.0;
+
+    float num = nDotV;
+    float denom = nDotV * (1.0 - k) + k;
+
+    return num / denom;
+}
+
+float GeometrySmith(float3 n, float nDotV, float3 l, float roughness)
+{
+    float nDotL = max(dot(n, l), 0.0);
+    float gs2 = GeometrySchlick(nDotV, roughness);
+    float gs1 = GeometrySchlick(nDotL, roughness);
+
+    return gs1 * gs2;
+}
+
+float3 calculateSunReflection(float3 R, float3 v, float3 n)
+{
+	float3 color;
+	// Legacy fallback for the old behaviour, so we don't change all maps accidentally.
+	// This check works because the default sun position is under the horizon.
+	if (SunDirection.y < 0.0) {
+		float3 sunReflection = pow(saturate(dot(-R, SunDirection)), SunShininess) * SunColor;
+		color = sunReflection * FresnelSchlick(max(dot(n, v), 0.0), 0.06);
+	} else {
+	float roughness = 1.0 / SunShininess;
+	float facingSpecular = 0.02;
+	float3 l = SunDirection;
+    float3 h = normalize(v + l);
+	float nDotL = max(dot(n, l), 0.0);
+	float nDotV = abs(dot(n, v)) + 0.001;
+	float3 F = FresnelSchlick(max(dot(h, v), 0.0), facingSpecular).xxx;
+    float NDF = NormalDistribution(n, h, roughness);
+    float G = GeometrySmith(n, nDotV, l, roughness);
+
+	float3 numerator = PI * NDF * G * F;
+	// add 0.0001 to avoid division by zero
+    float denominator = 4.0 * nDotV * nDotL + 0.0001;
+    float3 reflected = numerator / denominator;
+	color = reflected * SunColor * nDotL;
+	}
+	return color;
+}
+
 float4 HighFidelityPS( VS_OUTPUT inV, 
 					   uniform bool alphaTestEnable, 
 					   uniform int alphaFunc, 
@@ -379,8 +447,7 @@ float4 HighFidelityPS( VS_OUTPUT inV,
    
    	// Schlick approximation for fresnel
     float NDotV = saturate(dot(viewVector, N));
-	float F0 = 0.08;
-    float fresnel = F0 + (1.0 - F0) * pow(1.0 - NDotV, 5.0);
+    float fresnel = FresnelSchlick(NDotV, 0.08);
 
 	// the default value of 1.5 is way to high, but we want to preserve manually set values in existing maps
 	if (skyreflectionAmount == 1.5)
@@ -388,13 +455,12 @@ float4 HighFidelityPS( VS_OUTPUT inV,
     refractedPixels = lerp(refractedPixels, reflectedPixels, saturate(fresnel * skyreflectionAmount));
 
     // add in the sun reflection
-	float3 sunReflection = pow(saturate(dot(-R, SunDirection)), SunShininess) * SunColor;
-    sunReflection = sunReflection * fresnel;
+	float3 sunReflection = calculateSunReflection(R, viewVector, N);
 	// the sun shouldn't be visible where a unit reflection is
-	sunReflection *= (1 - saturate(reflectedPixels.a * 2));
+	sunReflection *= (1 - saturate(reflectedPixels.a * 4));
 	// we can control this value to have terrain cast a shadow on the water surface
 	sunReflection *= waterTexture.r;
-    refractedPixels.xyz +=  sunReflection;
+    refractedPixels.xyz += sunReflection;
 
     // Lerp in the wave crests
     refractedPixels.xyz = lerp(refractedPixels.xyz, waveCrestColor, (1 - waterTexture.a) * (1 - waterTexture.b) * waveCrest);
