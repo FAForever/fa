@@ -37,9 +37,10 @@ UEFNukeEffectController01 = Class(NullShell) {
         end
 
         self:CreateInitialFireballSmokeRing()
-        self:ForkThread(self.CreateOuterRingWaveSmokeRing)
-        self:ForkThread(self.CreateHeadConvectionSpinners)
-        self:ForkThread(self.CreateFlavorPlumes)
+
+        self.Trash:Add(ForkThread(self.CreateOuterRingWaveSmokeRing, self))
+        self.Trash:Add(ForkThread(self.CreateHeadConvectionSpinners, self))
+        self.Trash:Add(ForkThread(self.CreateFlavorPlumes, self))
 
         WaitTicks(5)
 

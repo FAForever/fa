@@ -29,12 +29,13 @@ Sinker = ClassProjectile(Projectile) {
             local sinker = self
             local wait = delay
 
-            self:ForkThread(
+            self.Trash:Add(ForkThread(
                 function()
                     WaitTicks(wait)
                     sinker:StartSinking(targetEntity, targetBone)
-                end
-            )
+                end,
+                self
+            ))
         else
             self:StartSinking(targEntity, targBone)
         end

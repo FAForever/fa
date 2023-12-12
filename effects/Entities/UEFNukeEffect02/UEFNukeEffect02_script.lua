@@ -14,7 +14,7 @@ UEFNukeEffect02 = Class(NullShell) {
 	---@param self UEFNukeEffect02
 	OnCreate = function(self)
 		NullShell.OnCreate(self)
-		self:ForkThread(self.EffectThread)
+		self.Trash:Add(ForkThread(self.EffectThread,self))
 	end,
 
 	---@param self UEFNukeEffect02

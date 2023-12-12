@@ -68,8 +68,8 @@ SeraphimNukeEffectController01 = Class(NullShell) {
 
     ---@param self SeraphimNukeEffectController01
     EffectThread = function(self)
-        self:ForkThread(self.CreateEffectInnerPlasma)
-        self:ForkThread(self.CreateEffectElectricity)
+		self.Trash:Add(ForkThread(self.CreateEffectInnerPlasma,self))
+        self.Trash:Add(ForkThread(self.CreateEffectElectricity,self))
         local position = self:GetPosition()
 
         -- Knockdown force rings

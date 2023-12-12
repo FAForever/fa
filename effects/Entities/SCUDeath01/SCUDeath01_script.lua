@@ -22,7 +22,7 @@ SCUDeath01 = Class(NullShell) {
         end
 
 		-- Create thread that spawns and controls effects
-        self:ForkThread(self.EffectThread)
+        self.Trash:Add(ForkThread(self.EffectThread,self))
     end,
 
     ---@param self SCUDeath01
@@ -35,7 +35,7 @@ SCUDeath01 = Class(NullShell) {
         end
 
         -- Do Damage
-        self:DoDamage( instigator, self.DamageData, nil )  
+        self:DoDamage( instigator, self.DamageData, nil )
     end,
 
     ---@param self SCUDeath01
@@ -50,7 +50,7 @@ SCUDeath01 = Class(NullShell) {
         local army = self:GetArmy()
         local position = self:GetPosition()
         if position[2] + 2 > GetSurfaceHeight(position[1], position[3]) then
-            self:ForkThread(self.CreateOuterRingWaveSmokeRing)
+            self.Trash:Add(ForkThread(self.CreateOuterRingWaveSmokeRing,self))
         end
 
         -- Create full-screen glow flash
@@ -58,9 +58,9 @@ SCUDeath01 = Class(NullShell) {
         WaitSeconds( 0.25 )
         CreateLightParticle(self, -1, army, 10, 20, 'glow_03', 'ramp_fire_06')
         WaitSeconds( 0.55 )
-        
+
         CreateLightParticle(self, -1, army, 20, 250, 'glow_03', 'ramp_nuke_04')
-        
+
         -- Create ground decals
         local orientation = RandomFloat( 0, 2 * math.pi )
         CreateDecal(position, orientation, 'Crater01_albedo', '', 'Albedo', 20, 20, 1200, 0, army)

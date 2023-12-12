@@ -15,7 +15,7 @@ UnitTeleportEffect02 = Class(NullShell) {
     ---@param self UnitTeleportEffect01
     OnCreate = function(self)
         NullShell.OnCreate(self)
-        self:ForkThread(self.TeleportEffectThread)
+        self.Trash:Add(ForkThread(self.TeleportEffectThread, self))
     end,
 
     ---@param self UnitTeleportEffect01
