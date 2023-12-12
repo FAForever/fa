@@ -54,6 +54,7 @@ ZRB9503 = ClassUnit(CSeaFactoryUnit, Cybran2BuildArmComponent) {
         Cybran2BuildArmComponentStopArmsMoving(self)
     end,
 
+    CreateBuildEffects = Cybran2BuildArmComponent.CreateBuildEffects,
     MovingArmsThread = Cybran2BuildArmComponent.MovingArmsThread,
 }
 

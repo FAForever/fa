@@ -115,7 +115,7 @@ end
 
 --- Creates a bone manipulator for a unit, allowing it to be animated
 ---@param object BoneObject
----@param alignWithSpeed boolean    # if set, animation rate takes into account the speed of the unit
+---@param alignWithSpeed? boolean    # if set, animation rate takes into account the speed of the unit. Defaults to false
 ---@return moho.AnimationManipulator
 function CreateAnimator(object, alignWithSpeed)
 end

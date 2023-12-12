@@ -21,6 +21,7 @@
 --**********************************************************************************
 
 local SeaFactoryUnit = import('/lua/defaultunits.lua').SeaFactoryUnit
+local SeaFactoryUnitOnCreate = SeaFactoryUnit.OnCreate
 local SeaFactoryUnitOnPaused = SeaFactoryUnit.OnPaused
 local SeaFactoryUnitOnUnpaused = SeaFactoryUnit.OnUnpaused
 local SeaFactoryUnitOnStartBuild = SeaFactoryUnit.OnStartBuild
@@ -37,9 +38,26 @@ local IsDestroyed = IsDestroyed
 
 local TrashBagAdd = TrashBag.Add
 
+local CreateAnimator = CreateAnimator
+
+local AnimatorPlayAnim = moho.AnimationManipulator.PlayAnim
+local AnimatorSetRate = moho.AnimationManipulator.SetRate
+
+
 ---@class CSeaFactoryUnit : SeaFactoryUnit
 ---@field BuildEffectsBag TrashBag
 CSeaFactoryUnit = ClassUnit(SeaFactoryUnit) {
+
+    ---@param self CSeaFactoryUnit
+    OnCreate = function(self)
+        SeaFactoryUnitOnCreate(self)
+
+        local buildAnimManip = CreateAnimator(self)
+        AnimatorPlayAnim(buildAnimManip, self.Blueprint.Display.AnimationBuild, true)
+        AnimatorSetRate(buildAnimManip, 0)
+        self.BuildAnimManip = self.Trash:Add(buildAnimManip)
+    end,
+
 
     ---@param self CAirFactoryUnit
     ---@param unitBeingBuilt Unit
@@ -56,11 +74,8 @@ CSeaFactoryUnit = ClassUnit(SeaFactoryUnit) {
     ---@param self CSeaFactoryUnit
     OnPaused = function(self)
         SeaFactoryUnitOnPaused(self)
-
-        -- remove the build effects
-        if self:IsUnitState('Building') then
-            self:StopArmsMoving()
-        end
+        self:StopBuildFx()
+        self:StopArmsMoving()
     end,
 
     ---@param self CSeaFactoryUnit
@@ -70,8 +85,24 @@ CSeaFactoryUnit = ClassUnit(SeaFactoryUnit) {
         -- re-introduce the build effects
         local unitBeingBuilt = self.UnitBeingBuilt --[[@as Unit]]
         if self:IsUnitState('Building') and (not IsDestroyed(unitBeingBuilt)) then
+            self:StartBuildFx(unitBeingBuilt)
             self:StartArmsMoving()
         end
+    end,
+
+    ---@param self CAirFactoryUnit
+    ---@param unitBeingBuilt Unit
+    StartBuildFx = function(self, unitBeingBuilt)
+        if not unitBeingBuilt then
+            return
+        end
+
+        AnimatorSetRate(self.BuildAnimManip, 0.5)
+    end,
+
+    ---@param self CAirFactoryUnit
+    StopBuildFx = function(self)
+        AnimatorSetRate(self.BuildAnimManip, 0);
     end,
 
     ---@param self CSeaFactoryUnit

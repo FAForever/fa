@@ -928,7 +928,7 @@ StructureUnit = ClassUnit(Unit) {
 
             local animation = self:GetUpgradeAnimation(self.UnitBeingBuilt)
             if animation then
-                self.AnimatorUpgradeManip = CreateAnimator(self)
+                self.AnimatorUpgradeManip = CreateAnimator(self):SetPrecedence(1000)
                 self.Trash:Add(self.AnimatorUpgradeManip)
                 local fractionOfComplete = 0
                 self:StartUpgradeEffects(unitBuilding)

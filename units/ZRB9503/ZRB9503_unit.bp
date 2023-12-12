@@ -80,6 +80,7 @@ UnitBlueprint {
         Abilities = {
             '<LOC ability_upgradable>Upgradeable',
         },
+        AnimationBuild = "/units/urb0203/urb0203_aBuild.sca",
         AnimationUpgrade = '/units/zrb9503/zrb9503_aupgrade.sca',
         BuildAttachBone = 'Attachpoint',
         IdleEffects = {

@@ -20,8 +20,21 @@
 --** SOFTWARE.
 --**********************************************************************************
 
+local Entity = import("/lua/sim/entity.lua").Entity
+
+local BeamBuildEmtBp = '/effects/emitters/build_beam_02_emit.bp'
+local CybranBuildSparks01 = import("/lua/effecttemplates.lua").CybranBuildSparks01
+local CybranBuildFlash01 = import("/lua/effecttemplates.lua").CybranBuildFlash01
+
 -- upvalue scope for performance
+local Warp = Warp
+local Random = Random
+local WaitFor = WaitFor
+local WaitTicks = WaitTicks
 local CreateSlider = CreateSlider
+local AttachBeamEntityToEntity = AttachBeamEntityToEntity
+local CreateEmitterOnEntity = CreateEmitterOnEntity
+
 local TrashBagAdd = TrashBag.Add
 
 local SliderSetGoal = moho.SlideManipulator.SetGoal
@@ -31,62 +44,82 @@ local SliderSetSpeed = moho.SlideManipulator.SetSpeed
 ---@field ArmSlider1 moho.SlideManipulator
 ---@field ArmSlider3 moho.SlideManipulator
 ---@field ArmSlider2 moho.SlideManipulator
+---@field ArmBeamEnd1 Entity
+---@field ArmBeamEnd2 Entity
+---@field ArmBeamEnd3 Entity
 Cybran3BuildArmComponent = ClassSimple {
 
     ArmBone1 = false,
-    ArmBone2 = false,
-    ArmBone3 = false,
+    ArmOffset1 = 2.4249, -- LOG(self:GetPosition('Attachpoint')[3] - self:GetPosition(self.ArmBone1)[3])
 
-    ---@param self BuildArmComponent | Unit
+    ArmBone2 = false,
+    ArmOffset2 = 1.2151, -- LOG(self:GetPosition('Attachpoint')[3] - self:GetPosition(self.ArmBone2)[3])
+
+    ArmBone3 = false,
+    ArmOffset3 = 0.0259, -- LOG(self:GetPosition('Attachpoint')[3] - self:GetPosition(self.ArmBone3)[3])
+
+    ---@param self Cybran3BuildArmComponent | FactoryUnit
     OnCreate = function(self)
         local trash = self.Trash
 
-        self.ArmSlider1 = TrashBagAdd(trash, CreateSlider(self, self.ArmBone1))
-        self.ArmSlider2 = TrashBagAdd(trash, CreateSlider(self, self.ArmBone2))
-        self.ArmSlider3 = TrashBagAdd(trash, CreateSlider(self, self.ArmBone3))
+        self.ArmSlider1 = TrashBagAdd(trash, CreateSlider(self, self.ArmBone1, 0, 0, 0, 0, true))
+        self.ArmSlider2 = TrashBagAdd(trash, CreateSlider(self, self.ArmBone2, 0, 0, 0, 0, true))
+        self.ArmSlider3 = TrashBagAdd(trash, CreateSlider(self, self.ArmBone3, 0, 0, 0, 0, true))
+
+        local entitySpecs = { Owner = self }
+        self.ArmBeamEnd1 = TrashBagAdd(trash, Entity(entitySpecs))
+        self.ArmBeamEnd2 = TrashBagAdd(trash, Entity(entitySpecs))
+        self.ArmBeamEnd3 = TrashBagAdd(trash, Entity(entitySpecs))
     end,
 
-    ---@param self BuildArmComponent | Unit
+    ---@param self Cybran3BuildArmComponent | FactoryUnit
     StartArmsMoving = function(self)
         -- do nothing
     end,
 
-    ---@param self BuildArmComponent | Unit
+    ---@param self Cybran3BuildArmComponent | FactoryUnit
     MovingArmsThread = function(self)
-        local direction = 1
-
         -- local scope for performance
         local armSlider1 = self.ArmSlider1
+        local armOffset1 = self.ArmOffset1
         local armSlider2 = self.ArmSlider2
+        local armOffset2 = self.ArmOffset2
         local armSlider3 = self.ArmSlider3
+        local armOffset3 = self.ArmOffset3
 
-        SliderSetGoal(armSlider1, -10, 0, 0)
-        SliderSetSpeed(armSlider1, 40)
-        SliderSetGoal(armSlider2, 20, 0, 0)
-        SliderSetSpeed(armSlider2, 40)
-        SliderSetGoal(armSlider3, 50, 0, 0)
-        SliderSetSpeed(armSlider3, 60)
-        WaitFor(armSlider1)
+        -- determine slide distance based on what we're building
+        local unitBeingBuiltBlueprint = self.UnitBeingBuilt.Blueprint
+        local slideDistance = 0.2 * (unitBeingBuiltBlueprint.Physics.MeshExtentsZ or unitBeingBuiltBlueprint.SizeZ or 6)
+        if slideDistance < 0.6 then
+            slideDistance = 0.6
+        end
+
+        -- define speed of slider based on the distance that we cover
+        SliderSetSpeed(armSlider1, 1)
+        SliderSetSpeed(armSlider2, 1)
+        SliderSetSpeed(armSlider3, 1)
+
+        armOffset1 = armOffset1 - slideDistance
+        armOffset2 = armOffset2
+        armOffset3 = armOffset3 + slideDistance
+
+        SliderSetGoal(armSlider2, armOffset2, 0, 0)
+
         while true do
-            SliderSetGoal(armSlider1, 0, 0, 0)
-            SliderSetSpeed(armSlider1, 40)
-            SliderSetGoal(armSlider2, 0, 0, 0)
-            SliderSetSpeed(armSlider2, 40)
-            SliderSetGoal(armSlider3, 0, 0, 0)
-            SliderSetSpeed(armSlider3, 40)
+            -- the factor 0.5 is to stay away from the build arm in the center
+            SliderSetGoal(armSlider1, armOffset1 - slideDistance + 0.5, 0, 0)
+            SliderSetGoal(armSlider3, armOffset3 + slideDistance - 0.5, 0, 0)
             WaitFor(armSlider3)
-            SliderSetGoal(armSlider1, -10, 0, 0)
-            SliderSetSpeed(armSlider1, 40)
-            SliderSetGoal(armSlider2, 20 + 30 * direction, 0, 0)
-            SliderSetSpeed(armSlider2, 60)
-            SliderSetGoal(armSlider3, 50, 0, 0)
-            SliderSetSpeed(armSlider3, 60)
+            SliderSetGoal(armSlider1, armOffset1 + slideDistance - 0.5, 0, 0)
+            SliderSetGoal(armSlider3, armOffset3 - slideDistance + 0.5, 0, 0)
             WaitFor(armSlider3)
-            direction = direction * -1
+
+            -- make sure we always wait or the sim may get stuck
+            WaitTicks(1)
         end
     end,
 
-    ---@param self BuildArmComponent | Unit
+    ---@param self Cybran3BuildArmComponent | FactoryUnit
     StopArmsMoving = function(self)
         -- local scope for performance
         local armSlider1 = self.ArmSlider1
@@ -94,10 +127,102 @@ Cybran3BuildArmComponent = ClassSimple {
         local armSlider3 = self.ArmSlider3
 
         SliderSetGoal(armSlider1, 0, 0, 0)
-        SliderSetSpeed(armSlider1, 40)
         SliderSetGoal(armSlider2, 0, 0, 0)
-        SliderSetSpeed(armSlider2, 40)
         SliderSetGoal(armSlider3, 0, 0, 0)
-        SliderSetSpeed(armSlider3, 40)
+    end,
+
+    ---@param self Cybran3BuildArmComponent | FactoryUnit
+    ---@param unitBeingBuilt FactoryUnit
+    ---@param order string
+    CreateBuildEffects = function(self, unitBeingBuilt, order)
+        -- delay slightly so that the unit is orientated properly
+        WaitTicks(2)
+
+        -- local scope for performance
+        local army = self.Army
+        local buildEffectsBag = self.BuildEffectsBag
+        local armBeamEnd1 = self.ArmBeamEnd1
+        local armBeamEnd2 = self.ArmBeamEnd2
+        local armBeamEnd3 = self.ArmBeamEnd3
+
+        local armBone1 = self.ArmBone1
+        local armBone2 = self.ArmBone2
+        local armBone3 = self.ArmBone3
+
+        -- create the beams
+        local buildEffectBones = self.BuildEffectBones
+        TrashBagAdd(buildEffectsBag,
+            AttachBeamEntityToEntity(self, buildEffectBones[1], armBeamEnd3, -1, army, BeamBuildEmtBp))
+        TrashBagAdd(buildEffectsBag,
+            AttachBeamEntityToEntity(self, buildEffectBones[2], armBeamEnd2, -1, army, BeamBuildEmtBp))
+        TrashBagAdd(buildEffectsBag,
+            AttachBeamEntityToEntity(self, buildEffectBones[3], armBeamEnd1, -1, army, BeamBuildEmtBp))
+
+        -- create the sparks/flashes
+        TrashBagAdd(buildEffectsBag, CreateEmitterOnEntity(armBeamEnd1, army, CybranBuildSparks01))
+        TrashBagAdd(buildEffectsBag, CreateEmitterOnEntity(armBeamEnd1, army, CybranBuildFlash01))
+        TrashBagAdd(buildEffectsBag, CreateEmitterOnEntity(armBeamEnd2, army, CybranBuildSparks01))
+        TrashBagAdd(buildEffectsBag, CreateEmitterOnEntity(armBeamEnd2, army, CybranBuildFlash01))
+        TrashBagAdd(buildEffectsBag, CreateEmitterOnEntity(armBeamEnd3, army, CybranBuildSparks01))
+        TrashBagAdd(buildEffectsBag, CreateEmitterOnEntity(armBeamEnd3, army, CybranBuildFlash01))
+
+        -- determine build area
+        local unitBeingBuiltBlueprint = self.UnitBeingBuilt.Blueprint
+        local sx = (unitBeingBuiltBlueprint.Physics.MeshExtentsX or unitBeingBuiltBlueprint.SizeX or 1)
+        local sy = (unitBeingBuiltBlueprint.Physics.MeshExtentsY or unitBeingBuiltBlueprint.SizeY or 1)
+        local sz = (unitBeingBuiltBlueprint.Physics.MeshExtentsZ or unitBeingBuiltBlueprint.SizeZ or 1)
+        local sxp = 0.5 * sx
+        local syp = sy
+        local szp = 0.25
+        local r1, r2, r3, az, pz
+        local position = { 0, 0, 0 }
+        local ux, uy, uz = unitBeingBuilt:GetPositionXYZ()
+
+        while not (self.Dead or unitBeingBuilt.Dead) do
+
+            -- get a few random numbers
+            r1, r2, r3 = 0.5 - Random(), 0.5 - Random(), 0.5 - Random()
+
+            -- warp the welding point around. We make sure that the z coordinate is
+            -- always in the mesh/collision box of the unit that we're building
+
+            _, _, az = self:GetPositionXYZ(armBone1)
+            position[1] = ux + r1 * sxp
+            position[2] = uy + (0.5 + r2) * syp
+            pz = az + r3 * szp
+            if pz > uz + 0.5 * sz then
+                pz = uz + 0.3 * sz
+            elseif pz < uz - 0.5 * sz then
+                pz = uz - 0.3 * sz
+            end
+            position[3] = pz
+            Warp(armBeamEnd1, position)
+
+            _, _, az = self:GetPositionXYZ(armBone2)
+            position[1] = ux + r2 * sxp
+            position[2] = uy + (0.5 + r3) * syp
+            pz = az + r1 * szp
+            if pz > uz + 0.5 * sz then
+                pz = uz + 0.3 * sz
+            elseif pz < uz - 0.5 * sz then
+                pz = uz - 0.3 * sz
+            end
+            position[3] = pz
+            Warp(armBeamEnd2, position)
+
+            _, _, az = self:GetPositionXYZ(armBone3)
+            position[1] = ux + r3 * sxp
+            position[2] = uy + (0.5 + r1) * syp
+            pz = az + r2 * szp
+            if pz > uz + 0.3 * sz then
+                pz = uz + 0.3 * sz
+            elseif pz < uz - 0.3 * sz then
+                pz = uz - 0.3 * sz
+            end
+            position[3] = pz
+            Warp(armBeamEnd3, position)
+
+            WaitTicks(2)
+        end
     end,
 }

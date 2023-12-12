@@ -30,8 +30,8 @@ local Cybran3BuildArmComponentOnCreate = Cybran3BuildArmComponent.OnCreate
 local Cybran3BuildArmComponentStartArmsMoving = Cybran3BuildArmComponent.StartArmsMoving
 local Cybran3BuildArmComponentStopArmsMoving = Cybran3BuildArmComponent.StopArmsMoving
 
----@class URB0303 : CSeaFactoryUnit
-URB0303 = ClassUnit(CSeaFactoryUnit) {
+---@class URB0303 : CSeaFactoryUnit, Cybran3BuildArmComponent
+URB0303 = ClassUnit(CSeaFactoryUnit, Cybran3BuildArmComponent) {
 
     ArmBone1 = "Right_Arm03",
     ArmBone2 = "Right_Arm02",
@@ -56,6 +56,7 @@ URB0303 = ClassUnit(CSeaFactoryUnit) {
     end,
 
     MovingArmsThread = Cybran3BuildArmComponent.MovingArmsThread,
+    CreateBuildEffects = Cybran3BuildArmComponent.CreateBuildEffects,
 }
 
 TypeClass = URB0303

@@ -53,6 +53,7 @@ URB0103 = ClassUnit(CSeaFactoryUnit, Cybran1BuildArmComponent) {
         Cybran1BuildArmComponentStopArmsMoving(self)
     end,
 
+    CreateBuildEffects = Cybran1BuildArmComponent.CreateBuildEffects,
     MovingArmsThread = Cybran1BuildArmComponent.MovingArmsThread,
 }
 
