@@ -229,7 +229,7 @@ UnitBlueprint{
     CollisionOffsetZ = -0.05,
     SizeX = 0.7,
     SizeY = 1,
-    SizeZ = 0.7,
+    SizeZ = 0.8,
     StrategicIconName = "icon_land2_engineer",
     StrategicIconSortPriority = 95,
     Transport = { TransportClass = 2 },
