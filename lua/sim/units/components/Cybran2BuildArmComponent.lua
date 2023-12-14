@@ -46,10 +46,10 @@ local SliderSetSpeed = moho.SlideManipulator.SetSpeed
 Cybran2BuildArmComponent = ClassSimple {
 
     ArmBone1 = false,
-    ArmOffset1 = 0.0253, -- LOG(self:GetPosition('Attachpoint')[3] - self:GetPosition(self.ArmBone1)[3])
+    ArmOffset1 = 0,
 
     ArmBone2 = false,
-    ArmOffset2 = 1.2151, -- LOG(self:GetPosition('Attachpoint')[3] - self:GetPosition(self.ArmBone2)[3])
+    ArmOffset2 = 0,
 
     ---@param self Cybran2BuildArmComponent | Unit
     OnCreate = function(self)
@@ -64,11 +64,6 @@ Cybran2BuildArmComponent = ClassSimple {
     end,
 
     ---@param self Cybran2BuildArmComponent | Unit
-    StartArmsMoving = function(self)
-        -- do nothing
-    end,
-
-    ---@param self Cybran2BuildArmComponent | Unit
     MovingArmsThread = function(self)
         -- local scope for performance
         local armSlider1 = self.ArmSlider1
@@ -78,10 +73,12 @@ Cybran2BuildArmComponent = ClassSimple {
 
         -- determine slide distance based on what we're building
         local unitBeingBuiltBlueprint = self.UnitBeingBuilt.Blueprint
-        local slideDistance = 0.9 * 0.25 *
-            (unitBeingBuiltBlueprint.Physics.MeshExtentsZ or unitBeingBuiltBlueprint.SizeZ or 6)
+        local slideDistance = 0.20 * (unitBeingBuiltBlueprint.Physics.MeshExtentsZ or unitBeingBuiltBlueprint.SizeZ or 6
+            )
         if slideDistance < 0.5 then
             slideDistance = 0.5
+        elseif slideDistance > 2 then
+            slideDistance = 2
         end
 
         -- define speed of slider based on the distance that we cover
@@ -154,7 +151,13 @@ Cybran2BuildArmComponent = ClassSimple {
         local position = { 0, 0, 0 }
         local ux, uy, uz = unitBeingBuilt:GetPositionXYZ()
 
-        while not (self.Dead or unitBeingBuilt.Dead) do
+        -- local scope for performance
+        local Warp = Warp
+        local Random = Random
+        local WaitTicks = WaitTicks
+        local GetPositionXYZ = self.GetPositionXYZ
+
+        while not self.Dead do
 
             -- get a few random numbers
             r1, r2, r3 = 0.5 - Random(), 0.5 - Random(), 0.5 - Random()
@@ -162,7 +165,7 @@ Cybran2BuildArmComponent = ClassSimple {
             -- warp the welding point around. We make sure that the z coordinate is
             -- always in the mesh/collision box of the unit that we're building
 
-            _, _, az = self:GetPositionXYZ(armBone1)
+            _, _, az = GetPositionXYZ(self, armBone1)
             position[1] = ux + r1 * sxp
             position[2] = uy + (0.5 + r2) * syp
             pz = az + r3 * szp
@@ -174,7 +177,7 @@ Cybran2BuildArmComponent = ClassSimple {
             position[3] = pz
             Warp(armBeamEnd1, position)
 
-            _, _, az = self:GetPositionXYZ(armBone2)
+            _, _, az = GetPositionXYZ(self, armBone2)
             position[1] = ux + r2 * sxp
             position[2] = uy + (0.5 + r3) * syp
             pz = az + r1 * szp
@@ -186,7 +189,7 @@ Cybran2BuildArmComponent = ClassSimple {
             position[3] = pz
             Warp(armBeamEnd2, position)
 
-            WaitTicks(2)
+            WaitTicks(3)
         end
     end,
 }

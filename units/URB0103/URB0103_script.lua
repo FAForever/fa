@@ -27,14 +27,14 @@ local CSeaFactoryUnitStopArmsMoving = CSeaFactoryUnit.StopArmsMoving
 
 local Cybran1BuildArmComponent = import("/lua/sim/units/components/Cybran1BuildArmComponent.lua").Cybran1BuildArmComponent
 local Cybran1BuildArmComponentOnCreate = Cybran1BuildArmComponent.OnCreate
-local Cybran1BuildArmComponentStartArmsMoving = Cybran1BuildArmComponent.StartArmsMoving
 local Cybran1BuildArmComponentStopArmsMoving = Cybran1BuildArmComponent.StopArmsMoving
 
 ---@class URB0103 : CSeaFactoryUnit, Cybran1BuildArmComponent
 URB0103 = ClassUnit(CSeaFactoryUnit, Cybran1BuildArmComponent) {
 
     ArmBone1 = "Right_Arm03",
-
+    ArmOffset1 = 0.0252, -- LOG(self:GetPosition('Attachpoint')[3] - self:GetPosition(self.ArmBone1)[3])
+    
     ---@param self URB0103
     OnCreate = function(self)
         CSeaFactoryUnitOnCreate(self)
@@ -44,7 +44,6 @@ URB0103 = ClassUnit(CSeaFactoryUnit, Cybran1BuildArmComponent) {
     ---@param self URB0103
     StartArmsMoving = function(self)
         CSeaFactoryUnitStartArmsMoving(self)
-        Cybran1BuildArmComponentStartArmsMoving(self)
     end,
 
     ---@param self URB0103

@@ -45,7 +45,7 @@ local SliderSetSpeed = moho.SlideManipulator.SetSpeed
 Cybran1BuildArmComponent = ClassSimple {
 
     ArmBone1 = false,
-    ArmOffset1 = 0.0252, -- LOG(self:GetPosition('Attachpoint')[3] - self:GetPosition(self.ArmBone1)[3])
+    ArmOffset1 = 0,
 
     ---@param self Cybran1BuildArmComponent | Unit
     OnCreate = function(self)
@@ -55,11 +55,6 @@ Cybran1BuildArmComponent = ClassSimple {
 
         local entitySpecs = { Owner = self }
         self.ArmBeamEnd1 = TrashBagAdd(trash, Entity(entitySpecs))
-    end,
-
-    ---@param self Cybran1BuildArmComponent | Unit
-    StartArmsMoving = function(self)
-        -- do nothing
     end,
 
     ---@param self Cybran1BuildArmComponent | Unit
@@ -74,6 +69,8 @@ Cybran1BuildArmComponent = ClassSimple {
             (unitBeingBuiltBlueprint.Physics.MeshExtentsZ or unitBeingBuiltBlueprint.SizeZ or 6)
         if slideDistance < 0.5 then
             slideDistance = 0.5
+        elseif slideDistance > 4 then
+            slideDistance = 4
         end
 
         -- define speed of slider based on the distance that we cover
@@ -133,7 +130,13 @@ Cybran1BuildArmComponent = ClassSimple {
         local position = { 0, 0, 0 }
         local ux, uy, uz = unitBeingBuilt:GetPositionXYZ()
 
-        while not (self.Dead or unitBeingBuilt.Dead) do
+        -- local scope for performance
+        local Warp = Warp
+        local Random = Random
+        local WaitTicks = WaitTicks
+        local GetPositionXYZ = self.GetPositionXYZ
+
+        while not self.Dead do
 
             -- get a few random numbers
             r1, r2, r3 = 0.5 - Random(), 0.5 - Random(), 0.5 - Random()
@@ -141,7 +144,7 @@ Cybran1BuildArmComponent = ClassSimple {
             -- warp the welding point around. We make sure that the z coordinate is
             -- always in the mesh/collision box of the unit that we're building
 
-            _, _, az = self:GetPositionXYZ(armBone1)
+            _, _, az = GetPositionXYZ(self, armBone1)
             position[1] = ux + r1 * sxp
             position[2] = uy + (0.5 + r2) * syp
             pz = az + r3 * szp
@@ -153,7 +156,7 @@ Cybran1BuildArmComponent = ClassSimple {
             position[3] = pz
             Warp(armBeamEnd1, position)
 
-            WaitTicks(2)
+            WaitTicks(3)
         end
     end,
 }
