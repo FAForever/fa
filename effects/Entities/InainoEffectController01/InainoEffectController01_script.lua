@@ -18,11 +18,11 @@ InainoEffectController01 = Class(NullShell) {
     ---@param self InainoEffectController01
     ---@param Data table unused
     EffectThread = function(self, Data)
-        self.Trash:Add(ForkThread(self.CreateInitialHit, self.Army, self))
-        self.Trash:Add(ForkThread(self.CreateInitialBuildup, self.Army, self))
+        self.Trash:Add(ForkThread(self.CreateInitialHit, self, self.Army))
+        self.Trash:Add(ForkThread(self.CreateInitialBuildup,self, self.Army))
         self.Trash:Add(ForkThread(self.CreateGroundFingers, self))
         self.Trash:Add(ForkThread(self.CreateInitialFingers, self))
-        self.Trash:Add(ForkThread(self.MainBlast, self.Army, self))
+        self.Trash:Add(ForkThread(self.MainBlast, self ,self.Army))
     end,
 
     ---@param self InainoEffectController01
