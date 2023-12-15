@@ -21,12 +21,11 @@
 --** SOFTWARE.
 --******************************************************************************************************
 
-local AIBuilderManager = import("/lua/aibrains/managers/builder-manager.lua").AIBuilderManager
--- local AIPlatoonEngineer = import("/lua/aibrains/platoons/platoon-engineer.lua").AIPlatoonEngineer
-
 local TableGetSize = table.getsize
 
 local WeakValueTable = { __mode = 'v' }
+
+---@class AIEngineerManagerDebugInfo
 
 ---@class AIEngineerManagerReferences
 ---@field TECH1 table<EntityId, Unit>
@@ -44,25 +43,23 @@ local WeakValueTable = { __mode = 'v' }
 ---@field SUBCOMMANDER number
 ---@field COMMAND number
 
----@class AIEngineerManagerDebugInfo
-
----@class AIEngineerManager : AIBuilderManager
+---@class AIEngineerManager
 ---@field DebugInfo AIEngineerManagerDebugInfo
 ---@field Engineers AIEngineerManagerReferences
 ---@field EngineersBeingBuilt AIEngineerManagerReferences     
 ---@field EngineerTotalCount number                 # Recomputed every 10 ticks
 ---@field EngineerCount AIEngineerManagerCount      # Recomputed every 10 ticks
-AIEngineerManager = Class(AIBuilderManager) {
+AIEngineerManager = ClassSimple {
 
     ManagerName = "EngineerManager",
 
     ---@param self AIEngineerManager
     ---@param brain AIBrain
     ---@param base AIBase
-    ---@param locationType LocationType
-    Create = function(self, brain, base, locationType)
-        AIBuilderManager.Create(self, brain, base, locationType)
-        self.Identifier = 'AIEngineerManager at ' .. locationType
+    Create = function(self, brain, base)
+        self.Brain = brain
+        self.Base = base
+        self.Trash = TrashBag()
 
         self.Engineers = {
             TECH1 = setmetatable({}, WeakValueTable),
@@ -226,7 +223,7 @@ AIEngineerManager = Class(AIBuilderManager) {
     --- `Time complexity: O(1)`
     --- 
     --- `Memory complexity: O(1)`
-    ---@param self AIBuilderManager
+    ---@param self AIEngineerManager
     ---@param unit Unit
     ---@param built Unit
     OnUnitStartBuilding = function(self, unit, built)
@@ -236,7 +233,7 @@ AIEngineerManager = Class(AIBuilderManager) {
     end,
 
     --- Called by a unit as it stops building
-    ---@param self AIBuilderManager
+    ---@param self AIEngineerManager
     ---@param unit Unit
     ---@param built Unit
     OnUnitStopBuilding = function(self, unit, built)

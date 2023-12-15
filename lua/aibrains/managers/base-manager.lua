@@ -132,7 +132,7 @@ AIBase = ClassSimple {
 
         -- remove remaining tasks
         for k = head, table.getn(engineerTasks) do
-            engineerTasks[head] = nil
+            engineerTasks[k] = nil
         end
 
         -- sort the tasks by priority
