@@ -110,6 +110,19 @@ local cUnit = moho.unit_methods
 ---@field buildBots? Unit[]
 ---@field Blueprint UnitBlueprint
 ---@field BuildEffectsBag TrashBag
+---@field CaptureEffectsBag TrashBag
+---@field ReclaimEffectsBag TrashBag
+---@field UpgradeEffectsBag TrashBag
+---@field TeleportFxBag TrashBag
+---@field ReleaseEffectsBag TrashBag
+---@field ShieldEffectsBag TrashBag
+---@field IntelEffectsBag TrashBag
+---@field TeleportDestChargeBag TrashBag
+---@field AdjacencyBeamsBag TrashBag
+---@field TeleportSoundChargeBag TrashBag
+---@field DamageEffectsBag TrashBag
+---@field BagsDestroyed TrashBag
+---@field MovementEffectsBag TrashBag
 ---@field BuildArmManipulator? moho.BuilderArmManipulator
 ---@field Trash TrashBag
 ---@field Layer Layer
@@ -130,6 +143,11 @@ local cUnit = moho.unit_methods
 ---@field AutoModeEnabled? boolean
 ---@field OnBeingBuiltEffectsBag TrashBag
 ---@field IdleEffectsBag TrashBag
+---@field WeaponCount number
+---@field WeaponInstances table<string, Weapon>
+---@field Sinking? boolean
+---@field BuildingOpenAnimManip moho.AnimationManipulator
+---@field HasFuel? boolean
 Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
 
     IsUnit = true,
@@ -186,7 +204,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         -- Each unit has a sync table to replicate values to the global sync table to be copied to the user layer at sync time.
         self.Sync = {}
         self.Sync.id = self:GetEntityId()
-        self.Sync.army = self:GetArmy()
+        self.Sync.army = self.Army
         setmetatable(self.Sync, SyncMeta)
 
         self.Trash = self.Trash or TrashBag()
@@ -229,14 +247,14 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
 
     ---@param self Unit
     OnCreate = function(self)
-        local bp = self:GetBlueprint()
+        local bp = self.Blueprint
 
         -- cache often accessed values into inner table
         self.Blueprint = bp
 
         -- cache engine calls
         self.EntityId = self:GetEntityId()
-        self.Army = self:GetArmy()
+        self.Army = self.Army()
         self.UnitId = self:GetUnitId()
         self.Brain = self:GetAIBrain()
 
@@ -401,7 +419,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         -- retrieve info of factory
         local faction = self.Blueprint.FactionCategory
         local layer = self.Blueprint.LayerCategory
-        local aiBrain = self:GetAIBrain()
+        local aiBrain = self.Brain
 
         -- the pessimists we are, remove all the units!
         self:AddBuildRestriction((categories.TECH3 + categories.TECH2) * categories.MOBILE)
@@ -647,7 +665,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
     end,
 
     ---@param self Unit
-    ---@param target Unit
+    ---@param target Unit unused
     StopCaptureEffects = function(self, target)
         if self.CaptureEffectsBag then
             self.CaptureEffectsBag:Destroy()
@@ -903,7 +921,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
     end,
 
     ---@param self Unit
-    ---@param target Unit | Prop
+    ---@param target Unit | Prop unused
     StopReclaimEffects = function(self, target)
         if self.ReclaimEffectsBag then
             self.ReclaimEffectsBag:Destroy()
@@ -918,7 +936,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
     ---@param self Unit
     ---@param captor Unit
     OnCaptured = function(self, captor)
-        if self and not self.Dead and captor and not captor.Dead and self:GetAIBrain() ~= captor:GetAIBrain() then
+        if self and not self.Dead and captor and not captor.Dead and self.Brain ~= captor.Brain then
             if not self:IsCapturable() then
                 self:Kill()
                 return
@@ -944,7 +962,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
 
             -- Ignore army cap during unit transfer in Campaign
             if ScenarioInfo.CampaignMode then
-                captorBrain = captor:GetAIBrain()
+                captorBrain = captor.Brain
                 SetIgnoreArmyUnitCap(captor.Army, true)
             end
 
@@ -1039,13 +1057,13 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
     end,
 
     ---@param self Unit
-    ---@return integer
+    ---@return number
     GetMassBuildAdjMod = function(self)
         return self.MassBuildAdjMod or 1
     end,
 
     ---@param self Unit
-    ---@return integer
+    ---@return number
     GetEnergyBuildAdjMod = function(self)
         return self.EnergyBuildAdjMod or 1
     end,
@@ -1579,7 +1597,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         return true
     end,
 
-    ---@param self Unit
+    ---@param self Unit unused
     ---@param bp UnitBlueprintAnimationDeath[]
     ---@return UnitBlueprintAnimationDeath
     ChooseAnimBlock = function(self, bp)
@@ -1650,7 +1668,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
 
     ---@param self Unit
     ---@param overkillRatio number
-    ---@return Wreckage
+    ---@return Wreckage|nil|Prop
     CreateWreckageProp = function(self, overkillRatio)
         local bp = self.Blueprint
 
@@ -1768,7 +1786,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
     end,
 
     ---@param self Unit
-    ---@param overKillRatio number
+    ---@param overKillRatio number unused
     CreateDestructionEffects = function(self, overKillRatio)
         Explosion.CreateScalableUnitExplosion(self)
     end,
@@ -1877,7 +1895,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
 
     ---@param self Unit
     ---@param overkillRatio number
-    ---@param instigator Unit
+    ---@param instigator Unit unused
     DeathThread = function(self, overkillRatio, instigator)
         local isNaval = EntityCategoryContains(categories.NAVAL, self)
         local shallSink = self:ShallSink()
@@ -2297,7 +2315,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         local blueprintDefense = bp.Defense
         self.isFinishedUnit = true
 
-        self:ForkThread(self.StopBeingBuiltEffects, builder, layer)
+        self.Trash:Add(ForkThread(self.StopBeingBuiltEffects,self, builder, layer))
 
         if self.Layer == 'Water' then
             local surfaceAnim = blueprintDisplay.AnimationSurface
@@ -2382,7 +2400,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         end
 
         if bp.EnhancementPresetAssigned then
-            self:ForkThread(self.CreatePresetEnhancementsThread)
+            self.Trash:Add(ForkThread(self.CreatePresetEnhancementsThread, self))
         end
 
         -- Don't try sending a Notify message from here if we're an ACU
@@ -2394,8 +2412,8 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
     end,
 
     ---@param self Unit
-    ---@param builder Unit
-    ---@param layer string
+    ---@param builder Unit unused
+    ---@param layer string unused
     StartBeingBuiltEffects = function(self, builder, layer)
         local BuildMeshBp = self.Blueprint.Display.BuildMeshBlueprint
         if BuildMeshBp then
@@ -2404,8 +2422,8 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
     end,
 
     ---@param self Unit
-    ---@param builder Unit
-    ---@param layer string
+    ---@param builder Unit unused
+    ---@param layer string unused
     StopBeingBuiltEffects = function(self, builder, layer)
         local bp = self.Blueprint.Display
         local useTerrainType = false
@@ -2428,10 +2446,10 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
 
     ---@param self Unit
     OnFailedToBeBuilt = function(self)
-        self:ForkThread(function()
+        self.Trash:Add(ForkThread(function()
             WaitTicks(1)
             self:Destroy()
-        end)
+        end,self))
     end,
 
     ---@param self Unit
@@ -2723,10 +2741,11 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
 
         -- Prevent UI mods from violating game/scenario restrictions
         local id = built.UnitId
-        local bp = built:GetBlueprint()
+        local bp = built.Blueprint
         local bpSelf = self.Blueprint
-        if not ScenarioInfo.CampaignMode and Game.IsRestricted(id, self.Army) then
-            WARN('Unit.OnStartBuild() Army ' ..self.Army.. ' cannot build restricted unit: ' .. (bp.Description or id))
+        local army = self.Army
+        if not ScenarioInfo.CampaignMode and Game.IsRestricted(id, army) then
+            WARN('Unit.OnStartBuild() Army ' ..army.. ' cannot build restricted unit: ' .. (bp.Description or id))
             self:OnFailedToBuild() -- Don't use: self:OnStopBuild()
             IssueClearFactoryCommands({self})
             IssueToUnitClearCommands(self)
@@ -2990,7 +3009,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
     end,
 
     ---@param self Unit
-    ---@param built Unit
+    ---@param built Unit unused
     StopBuildingEffects = function(self, built)
         local buildEffectsBag = self.BuildEffectsBag
         if buildEffectsBag then
@@ -3442,7 +3461,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
 
     ---@param self Unit
     ---@param new string
-    ---@param old string
+    ---@param old string unused
     OnTerrainTypeChange = function(self, new, old)
         self.TerrainType = new
         if self.MovementEffectsExist then

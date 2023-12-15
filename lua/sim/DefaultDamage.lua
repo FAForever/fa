@@ -27,7 +27,7 @@ local EntityGetPositionXYZ = _G.moho.entity_methods.GetPositionXYZ
 ---@param pulseTime integer
 ---@param damage number
 ---@param damType DamageType
----@param friendly boolean
+---@param friendly boolean unused
 function UnitDoTThread (instigator, unit, pulses, pulseTime, damage, damType, friendly)
 
     -- localize for performance

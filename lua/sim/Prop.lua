@@ -14,7 +14,7 @@ local TableInsert = table.insert
 
 ---@class Prop : moho.prop_methods
 ---@field Trash TrashBag
----@field EntityId number
+---@field EntityId string
 ---@field Blueprint PropBlueprint
 ---@field CachePosition Vector
 ---@field MaxMassReclaim number
@@ -106,14 +106,16 @@ Prop = Class(moho.prop_methods) {
         end
     end,
 
-    ---@param instigator Unit
-    ---@param type DamageType
-    ---@param excessDamageRatio number
+    ---@param self Prop
+    ---@param instigator Unit unused
+    ---@param type DamageType unused
+    ---@param excessDamageRatio number unused
     OnKilled = function(self, instigator, type, excessDamageRatio)
         self:DoPropCallbacks('OnKilled')
         self:Destroy()
     end,
 
+    ---@param self Prop
     ---@param entity Unit
     OnReclaimed = function(self, entity)
         self:DoPropCallbacks('OnReclaimed', entity)
@@ -141,7 +143,7 @@ Prop = Class(moho.prop_methods) {
     ---@param self Prop
     ---@param instigator Unit
     ---@param amount number
-    ---@param direction Vector
+    ---@param direction Vector unused
     ---@param damageType DamageType
     OnDamage = function(self, instigator, amount, direction, damageType)
         -- only applies to trees

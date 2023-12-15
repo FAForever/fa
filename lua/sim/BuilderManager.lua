@@ -66,7 +66,7 @@ BuilderManager = ClassSimple {
         self.Active = false
         self.NumBuilders = 0
         self:SetEnabled(true)
-        self:ForkThread(self.DebugThread)
+        self.Trash:Add(ForkThread(self.DebugThread, self))
     end,
 
     ---@param self BuilderManager
@@ -342,7 +342,7 @@ BuilderManager = ClassSimple {
     ---@param enable boolean
     SetEnabled = function(self, enable)
         if not self.BuilderThread and enable then
-            self.BuilderThread = self:ForkThread(self.ManagerThread)
+            self.BuilderThread = self.Trash:Add(ForkThread(self.ManagerThread, self))
             self.Active = true
         else
             KillThread(self.BuilderThread)
