@@ -24,7 +24,7 @@ local BuilderManager = import("/lua/aibrains/managers/builder-manager.lua").AIBu
 
 local TableGetSize = table.getsize
 
-local WeakValues = { __mode = 'v' }
+local WeakValueTable = { __mode = 'v' }
 
 ---@class AIStructureManagerDebugInfo
 ---@field Structures { TECH1: EntityId[], TECH2: EntityId[], TECH3: EntityId[], EXPERIMENTAL: EntityId[] }
@@ -62,10 +62,10 @@ AIStructureManager = Class(BuilderManager) {
         self.Identifier = 'AIStructureManager at ' .. locationType
 
         self.Structures = {
-            TECH1 = setmetatable({}, WeakValues),
-            TECH2 = setmetatable({}, WeakValues),
-            TECH3 = setmetatable({}, WeakValues),
-            EXPERIMENTAL = setmetatable({}, WeakValues),
+            TECH1 = setmetatable({}, WeakValueTable),
+            TECH2 = setmetatable({}, WeakValueTable),
+            TECH3 = setmetatable({}, WeakValueTable),
+            EXPERIMENTAL = setmetatable({}, WeakValueTable),
         }
 
         self.StructureCount = {
@@ -76,10 +76,10 @@ AIStructureManager = Class(BuilderManager) {
         }
 
         self.StructuresBeingBuilt = {
-            TECH1 = setmetatable({}, WeakValues),
-            TECH2 = setmetatable({}, WeakValues),
-            TECH3 = setmetatable({}, WeakValues),
-            EXPERIMENTAL = setmetatable({}, WeakValues),
+            TECH1 = setmetatable({}, WeakValueTable),
+            TECH2 = setmetatable({}, WeakValueTable),
+            TECH3 = setmetatable({}, WeakValueTable),
+            EXPERIMENTAL = setmetatable({}, WeakValueTable),
         }
 
         self.StructureBeingBuiltCount = {

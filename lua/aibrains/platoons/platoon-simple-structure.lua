@@ -21,6 +21,9 @@ local UnitTypeOrder = {
     'SHIELD',
 }
 
+---@class AITaskStructureTemplate : AITaskTemplate
+---@field Type 'Upgrading'
+
 ---@class AIPlatoonSimpleStructure : AIPlatoon
 ---@field Base AIBase
 ---@field Brain EasyAIBrain

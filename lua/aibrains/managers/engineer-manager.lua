@@ -26,7 +26,7 @@ local AIBuilderManager = import("/lua/aibrains/managers/builder-manager.lua").AI
 
 local TableGetSize = table.getsize
 
-local WeakValues = { __mode = 'v' }
+local WeakValueTable = { __mode = 'v' }
 
 ---@class AIEngineerManagerReferences
 ---@field TECH1 table<EntityId, Unit>
@@ -65,21 +65,21 @@ AIEngineerManager = Class(AIBuilderManager) {
         self.Identifier = 'AIEngineerManager at ' .. locationType
 
         self.Engineers = {
-            TECH1 = setmetatable({}, WeakValues),
-            TECH2 = setmetatable({}, WeakValues),
-            TECH3 = setmetatable({}, WeakValues),
-            EXPERIMENTAL = setmetatable({}, WeakValues),
-            SUBCOMMANDER = setmetatable({}, WeakValues),
-            COMMAND = setmetatable({}, WeakValues),
+            TECH1 = setmetatable({}, WeakValueTable),
+            TECH2 = setmetatable({}, WeakValueTable),
+            TECH3 = setmetatable({}, WeakValueTable),
+            EXPERIMENTAL = setmetatable({}, WeakValueTable),
+            SUBCOMMANDER = setmetatable({}, WeakValueTable),
+            COMMAND = setmetatable({}, WeakValueTable),
         }
 
         self.EngineersBeingBuilt = {
-            TECH1 = setmetatable({}, WeakValues),
-            TECH2 = setmetatable({}, WeakValues),
-            TECH3 = setmetatable({}, WeakValues),
-            EXPERIMENTAL = setmetatable({}, WeakValues),
-            SUBCOMMANDER = setmetatable({}, WeakValues),
-            COMMAND = setmetatable({}, WeakValues),
+            TECH1 = setmetatable({}, WeakValueTable),
+            TECH2 = setmetatable({}, WeakValueTable),
+            TECH3 = setmetatable({}, WeakValueTable),
+            EXPERIMENTAL = setmetatable({}, WeakValueTable),
+            SUBCOMMANDER = setmetatable({}, WeakValueTable),
+            COMMAND = setmetatable({}, WeakValueTable),
         }
 
         self.EngineerTotalCount = 0
@@ -92,7 +92,7 @@ AIEngineerManager = Class(AIBuilderManager) {
             COMMAND = 0,
         }
 
-        self.StructuresBeingBuilt = setmetatable({}, WeakValues)
+        self.StructuresBeingBuilt = setmetatable({}, WeakValueTable)
         self.Trash:Add(ForkThread(self.UpdateEngineerThread, self))
     end,
 

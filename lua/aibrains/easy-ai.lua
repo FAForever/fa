@@ -8,6 +8,8 @@ local StandardBrain = import("/lua/aibrain.lua").AIBrain
 local EconomyComponent = import("/lua/aibrains/components/economy.lua").AIBrainEconomyComponent
 local BaseManager = import("/lua/aibrains/managers/base-manager.lua")
 
+local SimpleEnergyTasks = import("/lua/aibrains/tasks/brain/simple-energy.lua")
+
 ---@class EasyAIBrainBaseTemplates
 ---@field BaseTemplateMain AIBaseTemplate
 
@@ -30,7 +32,7 @@ local BaseManager = import("/lua/aibrains/managers/base-manager.lua")
 ---@field GridReclaim AIGridReclaim
 ---@field GridBrain AIGridBrain
 ---@field GridRecon AIGridRecon
----@field BuilderManagers table<LocationType, AIBase>
+---@field BaseManagers AIBase[]
 AIBrain = Class(StandardBrain, EconomyComponent) {
 
     SkirmishSystems = true,
@@ -42,16 +44,14 @@ AIBrain = Class(StandardBrain, EconomyComponent) {
         StandardBrain.OnCreateAI(self, planName)
         EconomyComponent.OnCreateAI(self)
 
-        self:OnLoadTemplates()
-
-
-        -- start initial base
-        local startX, startZ = self:GetArmyStartPos()
-        local main = BaseManager.CreateBaseManager(self, 'main', { startX, 0, startZ }, 60)
-        main:AddBaseTemplate(self.AIBaseTemplates.BaseTemplateMain)
-        self.BuilderManagers = {
-            MAIN = main
+        self.BaseManagers = {
+            BaseManager.CreateBaseManager(self, { 0, 10} )
         }
+
+        self.BaseManagers[1]:AddBrainTask(SimpleEnergyTasks.EnergyTech1)
+        self.BaseManagers[1]:AddBrainTask(SimpleEnergyTasks.EnergyTech1)
+        self.BaseManagers[1]:AddBrainTask(SimpleEnergyTasks.EnergyTech1)
+        self.BaseManagers[1]:AddBrainTask(SimpleEnergyTasks.EnergyTech1)
 
         self:ForkThread(self.GetBaseDebugInfoThread)
         self:IMAPConfiguration()
@@ -78,32 +78,8 @@ AIBrain = Class(StandardBrain, EconomyComponent) {
     end,
 
     ---@param self EasyAIBrain
-    OnLoadTemplates = function(self)
-        self.AIBaseTemplates = self.AIBaseTemplates or { }
-
-        -- copy over templates from various files
-        local templates
-        templates = import("/lua/aibrains/templates/base/easy-main.lua")
-        for k, template in templates do
-            self.AIBaseTemplates[k] = template
-        end
-    end,
-
-    ---@param self EasyAIBrain
     OnDestroy = function(self)
         StandardBrain.OnDestroy(self)
-
-        if self.BuilderManagers then
-            for _, v in self.BuilderManagers do
-
-                v.EngineerManager:SetEnabled(false)
-                v.FactoryManager:SetEnabled(false)
-                v.PlatoonFormManager:SetEnabled(false)
-                v.FactoryManager:Destroy()
-                v.PlatoonFormManager:Destroy()
-                v.EngineerManager:Destroy()
-            end
-        end
     end,
 
     ---@param self EasyAIBrain
@@ -114,14 +90,6 @@ AIBrain = Class(StandardBrain, EconomyComponent) {
         StandardBrain.OnIntelChange(self, blip, reconType, val)
         local position = blip:GetPosition()
         self.GridRecon:OnIntelChange(position[1], position[3], reconType, val)
-    end,
-
-    ---@param self EasyAIBrain
-    ---@param position Vector
-    ---@param radius number
-    ---@param baseName LocationType
-    AddBaseManagers = function(self, baseName, position, radius)
-        self.BuilderManagers[baseName] = BaseManager.CreateBaseManager(self, baseName, position, radius)
     end,
 
     IMAPConfiguration = function(self)
@@ -160,31 +128,70 @@ AIBrain = Class(StandardBrain, EconomyComponent) {
     --- Retrieves the nearest base for the given position
     ---@param self EasyAIBrain
     ---@param position Vector
-    ---@return LocationType
-    FindNearestBaseIdentifier = function(self, position)
-        local ux, _, uz = position[1], nil, position[3]
-        local nearestManagerIdentifier = nil
-        local nearestDistance = nil
-        for id, managers in self.BuilderManagers do
-            if nearestManagerIdentifier then
-                local location = managers.Position
-                local dx, dz = location[1] - ux, location[3] - uz
-                local distance = dx * dx + dz * dz
-                if distance < nearestDistance then
-                    nearestDistance = distance
+    ---@return AIBase
+    FindNearestBase = function(self, position)
+        return self.BaseManagers[1]
+    end,
 
-                    nearestManagerIdentifier = id
-                end
-            else
-                local location = managers.Position
-                local dx, dz = location[1] - ux, location[3] - uz
-                nearestDistance = dx * dx + dz * dz
-                nearestManagerIdentifier = id
+    ---------------------------------------------------------------------------
+    --#region Brain evaluation
+
+    --- Delay in is game ticks
+    EvaluateDelay = 11,
+
+    ---@param self EasyAIBrain
+    EvaluateBrainThread = function(self)
+        while true do
+            -- evaluate the Brain in a protected call to guarantee we can keep evaluating it in the future
+            local ok, msg = pcall(self.EvaluateBrain, self)
+            if not ok then
+                WARN(msg)
             end
+
+            local evaluateDelay = self.EvaluateDelay
+            if evaluateDelay < 0 then
+                evaluateDelay = 1
+            end
+
+            WaitTicks(evaluateDelay)
+        end
+    end,
+
+    ---@param self EasyAIBrain
+    EvaluateStructureTasks = function(self)
+        local brain = self.Brain
+        local structureTasks = self.StructureTasks
+
+        for k = 1, table.getn(structureTasks) do
+            local structureTask = structureTasks[k]
+
+            -- todo: evaluate if we still need this task
+        end
+    end,
+
+
+    ---@param self EasyAIBrain
+    EvaluateBrain = function(self)
+        local brain = self.Brain
+
+        local engineeringTasks = self.EngineeringTasks
+        local factoryTasks = self.FactoryTasks
+
+
+        self:EvaluateStructureTasks()
+
+        for k = 1, table.getn(engineeringTasks) do
+            local engineeringTask = engineeringTasks[k]
         end
 
-        return nearestManagerIdentifier
+        for k = 1, table.getn(factoryTasks) do
+            local factoryTask = factoryTasks[k]
+        end
+
+
     end,
+
+    --#region
 
     ---------------------------------------------------------------------------
     --#region C hooks
@@ -220,15 +227,8 @@ AIBrain = Class(StandardBrain, EconomyComponent) {
     ---@param builder Unit
     ---@param layer Layer
     OnUnitStartBeingBuilt = function(self, unit, builder, layer)
-        -- find nearest base
-        local nearestBaseIdentifier = builder.AIBaseManager or self:FindNearestBaseIdentifier(unit:GetPosition())
-        unit.AIBaseManager = nearestBaseIdentifier
-
-        -- register unit at managers of base
-        local baseManager = self.BuilderManagers[nearestBaseIdentifier]
-        if baseManager then
-            baseManager:OnUnitStartBeingBuilt(unit, builder, layer)
-        end
+        local nearestBase = self:FindNearestBase(unit:GetPosition())
+        nearestBase:OnUnitStartBeingBuilt(unit, builder, layer)
     end,
 
     --- Called by a unit as it is finished being built
@@ -237,15 +237,16 @@ AIBrain = Class(StandardBrain, EconomyComponent) {
     ---@param builder Unit
     ---@param layer Layer
     OnUnitStopBeingBuilt = function(self, unit, builder, layer)
-        local baseIdentifier = unit.AIBaseManager
-        if not baseIdentifier then
-            baseIdentifier = self:FindNearestBaseIdentifier(unit:GetPosition())
-            unit.AIBaseManager = baseIdentifier
-        end
+        local nearestBase = self:FindNearestBase(unit:GetPosition())
+        nearestBase:OnUnitStopBeingBuilt(unit, builder, layer)
 
-        local managers = self.BuilderManagers[baseIdentifier]
-        if managers then
-            managers:OnUnitStopBeingBuilt(unit, builder, layer)
+        if EntityCategoryContains(categories.ENGINEER * categories.TECH1, unit) then
+            local platoon = self:MakePlatoon('', '')
+            platoon.Base = nearestBase
+            platoon.Brain = self
+            setmetatable(platoon, import("/lua/aibrains/platoons/platoon-simple-engineer.lua").AIPlatoonEngineerSimple)
+            self:AssignUnitsToPlatoon(platoon, {unit}, 'Support', 'GrowthFormation')
+            ChangeState(platoon, platoon.Start)
         end
     end,
 
@@ -253,15 +254,8 @@ AIBrain = Class(StandardBrain, EconomyComponent) {
     ---@param self EasyAIBrain
     ---@param unit Unit
     OnUnitDestroyed = function(self, unit)
-        local baseIdentifier = unit.AIBaseManager
-        if not baseIdentifier then
-            return
-        end
-
-        local managers = self.BuilderManagers[baseIdentifier]
-        if managers then
-            managers:OnUnitDestroyed(unit)
-        end
+        local nearestBase = self:FindNearestBase(unit:GetPosition())
+        nearestBase:OnUnitDestroyed(unit)
     end,
 
     --- Called by a unit as it starts building
@@ -269,15 +263,8 @@ AIBrain = Class(StandardBrain, EconomyComponent) {
     ---@param unit Unit
     ---@param built Unit
     OnUnitStartBuilding = function(self, unit, built)
-        local baseIdentifier = unit.AIBaseManager
-        if not baseIdentifier then
-            return
-        end
-
-        local managers = self.BuilderManagers[baseIdentifier]
-        if managers then
-            managers:OnUnitStartBuilding(unit, built)
-        end
+        local nearestBase = self:FindNearestBase(unit:GetPosition())
+        nearestBase:OnUnitStartBuilding(unit, built)
     end,
 
     --- Called by a unit as it stops building
@@ -285,15 +272,8 @@ AIBrain = Class(StandardBrain, EconomyComponent) {
     ---@param unit Unit
     ---@param built Unit
     OnUnitStopBuilding = function(self, unit, built)
-        local baseIdentifier = unit.AIBaseManager
-        if not baseIdentifier then
-            return
-        end
-
-        local managers = self.BuilderManagers[baseIdentifier]
-        if managers then
-            managers:OnUnitStopBuilding(unit, built)
-        end
+        local nearestBase = self:FindNearestBase(unit:GetPosition())
+        nearestBase:OnUnitStopBuilding(unit, built)
     end,
 
     --#endregion
@@ -305,15 +285,15 @@ AIBrain = Class(StandardBrain, EconomyComponent) {
     ---@return AIBaseDebugInfo
     GetBaseDebugInfoThread = function(self)
         while true do
-            if GetFocusArmy() == self:GetArmyIndex() then
-                local position = GetMouseWorldPos()
-                local identifier = self:FindNearestBaseIdentifier(position)
-                if identifier then
-                    local base = self.BuilderManagers[identifier]
-                    local info = base:GetDebugInfo()
-                    Sync.AIBaseInfo = info
-                end
-            end
+            -- if GetFocusArmy() == self:GetArmyIndex() then
+            --     local position = GetMouseWorldPos()
+            --     local identifier = self:FindNearestBase(position)
+            --     if identifier then
+            --         local base = self.BuilderManagers[identifier]
+            --         local info = base:GetDebugInfo()
+            --         Sync.AIBaseInfo = info
+            --     end
+            -- end
 
             WaitTicks(10)
         end
