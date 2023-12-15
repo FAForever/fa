@@ -13,19 +13,21 @@ local EffectTemplate = import("/lua/effecttemplates.lua")
 CIFBrackmanHackPegs02 = ClassProjectile(import("/lua/cybranprojectiles.lua").CDFBrackmanHackPegProjectile02) {
 
     ---@param self CIFBrackmanHackPegs02
-    ---@param TargetType string
-    ---@param TargetEntity Prop|Unit
+    ---@param TargetType string unused
+    ---@param TargetEntity Prop|Unit unused
     OnImpact = function(self, TargetType, TargetEntity)
+        local army = self.Army
+
         self:SetVelocity(0)
         self:SetBallisticAcceleration(0)
         self.Trash:Add(ForkThread(self.WaitingForDeath,self))
-        self:CreateImpactEffects(self.Army, self.FxImpactLand, 1 )
+        self:CreateImpactEffects(army, self.FxImpactLand, 1 )
         for k, v in EffectTemplate.CBrackmanCrabPegAmbient01 do
-			CreateEmitterOnEntity( self, self.Army, v )
+			CreateEmitterOnEntity( self, army, v )
 		end
     end,
 
-    ---@param self moho.manipulator_methods
+    ---@param self moho.manipulator_methods unused
     ---@param NewPosition Vector
     SetTargetPosition= function(self, NewPosition)
         TargetPos= NewPosition

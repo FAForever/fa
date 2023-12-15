@@ -3,9 +3,9 @@
 -- Summary  : Seraphim Electrum Anti Missile
 -- Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --------------------------------------------------------------------------------
-local SIMAntiMissile01 = import("/lua/seraphimprojectiles.lua").SIMAntiMissile01
+local SIMAntiMissile = import("/lua/seraphimprojectiles.lua").SIMAntiMissile
 
 -- Seraphim Electrum Anti Missile
----@class SIMAntiMissile01 : SIMAntiMissile01
-SIMAntiMissile01 = ClassProjectile(SIMAntiMissile01) {}
-TypeClass = SIMAntiMissile01
+---@class SIMAntiMissile02 : SIMAntiMissile
+SIMAntiMissile02 = ClassProjectile(SIMAntiMissile) {}
+TypeClass = SIMAntiMissile02

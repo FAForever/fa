@@ -26,8 +26,8 @@ SBOOhwalliStategicBomb01 = ClassProjectile(SOhwalliStrategicBombProjectile) {
     end,
 
     ---@param self SBOOhwalliStategicBomb01
-    ---@param targetType string
-    ---@param targetEntity Prop|Unit
+    ---@param targetType string unused
+    ---@param targetEntity Prop|Unit unused
     OnImpact = function(self, targetType, targetEntity)
         local effectController = '/effects/entities/SBOOhwalliBombEffectController01/SBOOhwalliBombEffectController01_proj.bp'
         self:CreateProjectile(effectController, 0, 0, 0, 0, 0, 0)
@@ -50,7 +50,7 @@ SBOOhwalliStategicBomb01 = ClassProjectile(SOhwalliStrategicBombProjectile) {
         self:Destroy()
     end,
 
-    ---@param self SBOOhwalliStategicBomb01
+    ---@param self SBOOhwalliStategicBomb01 unused
     ---@param position Vector
     ---@param instigator? Unit | Projectile
     ---@param damage number

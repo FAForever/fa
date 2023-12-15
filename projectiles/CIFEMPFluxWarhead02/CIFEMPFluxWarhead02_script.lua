@@ -25,24 +25,28 @@ CIFEMPFluxWarhead02 = ClassProjectile(NullShell) {
 
     ---@param self CIFEMPFluxWarhead02
     EffectThread = function(self)
+        local army = self.Army
+        local plumeThread = self.PlumeThread
+        local plumeVelocityThread = self.PlumeVelocityThread
+
         -- Light and Camera Shake
-        CreateLightParticle(self, -1, self.Army, 200, 200, 'beam_white_01', 'ramp_red_09')
+        CreateLightParticle(self, -1, army, 200, 200, 'beam_white_01', 'ramp_red_09')
         self:ShakeCamera(75, 3, 0, 20)
 
         -- Mesh effects
         self.Plumeproj = self:CreateProjectile('/effects/EMPFluxWarhead/EMPFluxWarheadEffect01_proj.bp')
-        self.Trash:Add(ForkThread(self.PlumeThread, self, self.Plumeproj, self.Plumeproj.Blueprint.Display.UniformScale))
-        self.Trash:Add(ForkThread(self.PlumeVelocityThread, self, self.Plumeproj))
+        self.Trash:Add(ForkThread(plumeThread, self, self.Plumeproj, self.Plumeproj.Blueprint.Display.UniformScale))
+        self.Trash:Add(ForkThread(plumeVelocityThread, self, self.Plumeproj))
 
         self.Plumeproj2 = self:CreateProjectile('/effects/EMPFluxWarhead/EMPFluxWarheadEffect02_proj.bp')
-        self.Trash:Add(ForkThread(self.PlumeThread, self, self.Plumeproj2, self.Plumeproj2.Blueprint.Display.UniformScale))
-        self.Trash:Add(ForkThread(self.PlumeVelocityThread, self, self.Plumeproj2))
+        self.Trash:Add(ForkThread(plumeThread, self, self.Plumeproj2, self.Plumeproj2.Blueprint.Display.UniformScale))
+        self.Trash:Add(ForkThread(plumeVelocityThread, self, self.Plumeproj2))
 
         self.Plumeproj3 = self:CreateProjectile('/effects/EMPFluxWarhead/EMPFluxWarheadEffect03_proj.bp')
-        self.Trash:Add(ForkThread(self.PlumeThread, self, self.Plumeproj3, self.Plumeproj3.Blueprint.Display.UniformScale))
-        self.Trash:Add(ForkThread(self.PlumeVelocityThread, self, self.Plumeproj3))
+        self.Trash:Add(ForkThread(plumeThread, self, self.Plumeproj3, self.Plumeproj3.Blueprint.Display.UniformScale))
+        self.Trash:Add(ForkThread(plumeVelocityThread, self, self.Plumeproj3))
 
-        CreateDecal(self:GetPosition(), RandomFloat(0,2*math.pi), 'nuke_scorch_001_albedo', '', 'Albedo', 28, 28, 500, 0, self.Army)
+        CreateDecal(self:GetPosition(), RandomFloat(0,2*math.pi), 'nuke_scorch_001_albedo', '', 'Albedo', 28, 28, 500, 0, army)
 
         -- Emitter Effects
         self.Trash:Add(ForkThread(self.EmitterEffectsThread, self, self.Plumeproj))
@@ -51,12 +55,14 @@ CIFEMPFluxWarhead02 = ClassProjectile(NullShell) {
     ---@param self CIFEMPFluxWarhead02
     ---@param plume Projectile
     EmitterEffectsThread = function(self, plume)
+        local army = self.Army
+
         for k, v in self.PlumeEffects do
-            CreateAttachedEmitter(plume, -1, self.Army, v)
+            CreateAttachedEmitter(plume, -1, army, v)
         end
 
         for k, v in self.NormalEffects do
-            CreateEmitterAtEntity(self, self.Army, v)
+            CreateEmitterAtEntity(self, army, v)
         end
 
         self:StarCloudDispersal()
@@ -103,7 +109,7 @@ CIFEMPFluxWarhead02 = ClassProjectile(NullShell) {
         plume:SetVelocity(0,27 * self.PlumeVelocityScale,0)
     end,
 
-    ---@param self CIFEMPFluxWarhead02
+    ---@param self CIFEMPFluxWarhead02 unused
     ---@param plume Projectile
     ---@param scale number
     PlumeThread = function(self, plume, scale)

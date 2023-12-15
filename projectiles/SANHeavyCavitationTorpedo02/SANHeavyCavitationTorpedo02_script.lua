@@ -24,6 +24,14 @@ SANHeavyCavitationTorpedo02 = ClassProjectile(SHeavyCavitationTorpedo) {
     },
 
     ---@param self SANHeavyCavitationTorpedo02
+    ---@param inWater boolean
+    OnCreate = function(self, inWater)
+        SHeavyCavitationTorpedo.OnCreate(self, inWater)
+        self.Trash:Add(ForkThread(self.ProjectileSplit,self))
+        self.AirTrails = CreateEmitterOnEntity(self,self.Army,EffectTemplate.SHeavyCavitationTorpedoFxTrails02)
+    end,
+
+    ---@param self SANHeavyCavitationTorpedo02
     OnEnterWater = function(self)
         SHeavyCavitationTorpedo.OnEnterWater(self)
         self:SetCollisionShape('Sphere', 0, 0, 0, 0.5)
@@ -33,13 +41,7 @@ SANHeavyCavitationTorpedo02 = ClassProjectile(SHeavyCavitationTorpedo) {
         self:SetCollideSurface(false)
     end,
 
-    ---@param self SANHeavyCavitationTorpedo02
-    ---@param inWater boolean
-    OnCreate = function(self, inWater)
-        SHeavyCavitationTorpedo.OnCreate(self, inWater)
-        self.Trash:Add(ForkThread(self.ProjectileSplit,self))
-        self.AirTrails = CreateEmitterOnEntity(self,self.Army,EffectTemplate.SHeavyCavitationTorpedoFxTrails02)
-    end,
+
 
     ---@param self SANHeavyCavitationTorpedo02
     ProjectileSplit = function(self)

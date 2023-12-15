@@ -29,12 +29,13 @@ Sinker = ClassProjectile(Projectile) {
             local sinker = self
             local wait = delay
 
-            self:ForkThread(
+            self.Trash:Add(ForkThread(
                 function()
                     WaitTicks(wait)
                     sinker:StartSinking(targetEntity, targetBone)
-                end
-            )
+                end,
+                self
+            ))
         else
             self:StartSinking(targEntity, targBone)
         end
@@ -65,7 +66,7 @@ Sinker = ClassProjectile(Projectile) {
     --- Destroy the sinking unit when it hits the bottom of the ocean.
     ---@param self Sinker
     ---@param targetType string
-    ---@param targetEntity Prop|Unit
+    ---@param targetEntity Prop|Unit unused
     OnImpact = function(self, targetType, targetEntity)
         if targetType == 'Terrain' then
             self:Destroy()

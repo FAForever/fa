@@ -13,8 +13,8 @@ local RandomFloat = import("/lua/utilities.lua").GetRandomFloat
 CIFBrackmanHackPegs01 = ClassProjectile(CDFBrackmanHackPegProjectile01) {
 
     ---@param self CIFBrackmanHackPegs01
-    ---@param TargetType string
-    ---@param TargetEntity Prop|Unit
+    ---@param TargetType string unused
+    ---@param TargetEntity Prop|Unit unused
     OnImpact = function(self, TargetType, TargetEntity)
         local FxFragEffect = EffectTemplate.CBrackmanCrabPegPodSplit01
         local ChildProjectileBP = '/projectiles/CIFBrackmanHackPegs02/CIFBrackmanHackPegs02_proj.bp'

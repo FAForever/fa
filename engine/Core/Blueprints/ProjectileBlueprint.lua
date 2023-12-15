@@ -11,6 +11,8 @@
 ---@field Physics ProjectileBlueprintPhysics
 --- Defense information for the projectile
 ---@field Defense ProjectileBlueprintDefense
+--- Audio infomation for the Audio
+---@field Audio ProjectileBlueprintAudio
 
 ---@class ProjectileBlueprintDefense
 ---@field MaxHealth number
@@ -138,3 +140,13 @@
 --- bombs that always drop stright down
 ---@field StraightDownOrdinance boolean
 ---@field OnLostTargetLifetime? number
+--- The range on the flare for to attack torpedoes
+---@field FlareRadius number
+-- Speed at which thing sinks
+---@field SinkSpeed number
+
+
+---@class ProjectileBlueprintAudio
+--- sound to play when the projectile is exploaded
+---@field Explosion SoundHandle
+

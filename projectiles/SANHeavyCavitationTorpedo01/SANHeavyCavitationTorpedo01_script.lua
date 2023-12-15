@@ -10,6 +10,7 @@ local EffectTemplate = import("/lua/effecttemplates.lua")
 --- Heavy Cavitation Torpedo Projectile script, XSA0204
 ---@class SANHeavyCavitationTorpedo01 : SHeavyCavitationTorpedo
 SANHeavyCavitationTorpedo01 = ClassProjectile(SHeavyCavitationTorpedo) {
+    
     FxSplashScale = 0.4,
     FxEnterWaterEmitter = {
         '/effects/emitters/destruction_water_splash_ripples_01_emit.bp',
