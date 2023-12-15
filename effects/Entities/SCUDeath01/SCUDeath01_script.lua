@@ -8,17 +8,22 @@ local NullShell = import("/lua/sim/defaultprojectiles.lua").NullShell
 local Util = import("/lua/utilities.lua")
 local RandomFloat = Util.GetRandomFloat
 
+
+-- upvalue for performance
+local ForkThread = ForkThread
+
+
 ---@class SCUDeath01 : NullShell
 SCUDeath01 = Class(NullShell) {
 
     ---@param self SCUDeath01
     OnCreate = function(self)
         NullShell.OnCreate(self)
-        local myBlueprint = self.Blueprint
+        local bp = self.Blueprint
 
         -- Play the "NukeExplosion" sound
-        if myBlueprint.Audio.NukeExplosion then
-            self:PlaySound(myBlueprint.Audio.NukeExplosion)
+        if bp.Audio.NukeExplosion then
+            self:PlaySound(bp.Audio.NukeExplosion)
         end
 
 		-- Create thread that spawns and controls effects

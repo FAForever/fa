@@ -12,17 +12,23 @@ local SIFInainoStrategicMissileEffect01 = '/effects/Entities/SIFInainoStrategicM
 local SIFInainoStrategicMissileEffect02 = '/effects/Entities/SIFInainoStrategicMissileEffect02/SIFInainoStrategicMissileEffect02_proj.bp'
 local SIFInainoStrategicMissileEffect03 = '/effects/Entities/SIFInainoStrategicMissileEffect03/SIFInainoStrategicMissileEffect03_proj.bp'
 
+-- Up value for performance
+local ForkThread = ForkThread
+
+
 ---@class InainoEffectController01 : NullShell
 InainoEffectController01 = Class(NullShell) {
 
     ---@param self InainoEffectController01
     ---@param Data table unused
     EffectThread = function(self, Data)
-        self.Trash:Add(ForkThread(self.CreateInitialHit, self, self.Army))
-        self.Trash:Add(ForkThread(self.CreateInitialBuildup,self, self.Army))
+        local army = self.Army
+
+        self.Trash:Add(ForkThread(self.CreateInitialHit, self, army))
+        self.Trash:Add(ForkThread(self.CreateInitialBuildup,self, army))
         self.Trash:Add(ForkThread(self.CreateGroundFingers, self))
         self.Trash:Add(ForkThread(self.CreateInitialFingers, self))
-        self.Trash:Add(ForkThread(self.MainBlast, self, self.Army))
+        self.Trash:Add(ForkThread(self.MainBlast, self, army))
     end,
 
     ---@param self InainoEffectController01
@@ -45,17 +51,19 @@ InainoEffectController01 = Class(NullShell) {
     ---@param self InainoEffectController01
     ---@param army number
     MainBlast = function(self, army)
+        local Army = self.Army
+
         WaitSeconds(5.00)
 
         -- Create a light for this thing's flash.
-        CreateLightParticle(self, -1, self.Army, 160, 14, 'flare_lens_add_03', 'ramp_white_07')
+        CreateLightParticle(self, -1, Army, 160, 14, 'flare_lens_add_03', 'ramp_white_07')
 
         -- Create our decals
-        CreateDecal(self:GetPosition(), RandomFloat(0.0,6.28), 'Scorch_012_albedo', '', 'Albedo', 80, 80, 1000, 0, self.Army)
+        CreateDecal(self:GetPosition(), RandomFloat(0.0,6.28), 'Scorch_012_albedo', '', 'Albedo', 80, 80, 1000, 0, Army)
 
         -- Create explosion effects
         for k, v in EffectTemplate.SIFInainoDetonate01 do
-            emit = CreateEmitterAtEntity(self,army,v)
+            emit = CreateEmitterAtEntity(self, army,v)
         end
         self:ShakeCamera(55, 10, 0, 2.5)
 

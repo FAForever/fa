@@ -21,6 +21,7 @@ local WaitTicks = WaitTicks
 local GetTerrainHeight = GetTerrainHeight
 local GetSurfaceHeight = GetSurfaceHeight
 local CreateEmitterAtEntity = CreateEmitterAtEntity
+local ForkThread = ForkThread
 
 
 local BaseRingRiftEffects = {
@@ -95,13 +96,13 @@ SBOOhwalliBombEffectController01 = Class(NullShell) {
     ---@param self SBOOhwalliBombEffectController01
     ---@param army number
     MainBlast = function( self, army )
-		WaitTicks(26)
+        WaitTicks(26)
 
         -- Create a light for this thing's flash.
-        CreateLightParticle(self, -1, self:GetArmy(), 80, 14, 'flare_lens_add_03', 'ramp_white_07' )
+        CreateLightParticle(self, -1, army, 80, 14, 'flare_lens_add_03', 'ramp_white_07' )
 
         -- Create our decals
-        CreateDecal( self:GetPosition(), RandomFloat(0.0,6.28), 'Scorch_012_albedo', '', 'Albedo', 80, 80, 1000, 0, self:GetArmy())
+        CreateDecal( self:GetPosition(), RandomFloat(0.0,6.28), 'Scorch_012_albedo', '', 'Albedo', 80, 80, 1000, 0, army)
 
 		-- Create explosion effects
         for k, v in EffectTemplate.SOhwalliDetonate01 do
@@ -110,7 +111,6 @@ SBOOhwalliBombEffectController01 = Class(NullShell) {
 
         self:CreatePlumes()
 
-        -- self:ShakeCamera( radius, maxShakeEpicenter, minShakeAtRadius, interval )
         self:ShakeCamera( 55, 10, 0, 2.5 )
 
 		WaitTicks(4)
@@ -129,7 +129,7 @@ SBOOhwalliBombEffectController01 = Class(NullShell) {
         local offsetMultiple = 10.0
         local px, pz
 
-        for i = 0, (num_projectiles -1) do            
+        for i = 0, (num_projectiles -1) do
             xVec = (MathSin(angleInitial + (i*horizontal_angle)))
             zVec = (MathCos(angleInitial + (i*horizontal_angle)))
             px = (offsetMultiple*xVec)
