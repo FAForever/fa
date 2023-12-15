@@ -14,7 +14,7 @@ SCUDeath01 = Class(NullShell) {
     ---@param self SCUDeath01
     OnCreate = function(self)
         NullShell.OnCreate(self)
-        local myBlueprint = self:GetBlueprint()
+        local myBlueprint = self.Blueprint
 
         -- Play the "NukeExplosion" sound
         if myBlueprint.Audio.NukeExplosion then
@@ -22,14 +22,14 @@ SCUDeath01 = Class(NullShell) {
         end
 
 		-- Create thread that spawns and controls effects
-        self.Trash:Add(ForkThread(self.EffectThread,self))
+        self.Trash:Add(ForkThread(self.EffectThread, self))
     end,
 
     ---@param self SCUDeath01
     ---@param damageData table
     PassDamageData = function(self, damageData)
         NullShell.PassMetaDamage(self, damageData)
-        local instigator = self:GetLauncher()
+        local instigator = self.Launcher
         if instigator == nil then
             instigator = self
         end
@@ -39,18 +39,18 @@ SCUDeath01 = Class(NullShell) {
     end,
 
     ---@param self SCUDeath01
-    ---@param targetType string
-    ---@param targetEntity Entity
+    ---@param targetType string unused
+    ---@param targetEntity Entity unused
     OnImpact = function(self, targetType, targetEntity)
         self:Destroy()
     end,
 
     ---@param self SCUDeath01
     EffectThread = function(self)
-        local army = self:GetArmy()
+        local army = self.Army
         local position = self:GetPosition()
         if position[2] + 2 > GetSurfaceHeight(position[1], position[3]) then
-            self.Trash:Add(ForkThread(self.CreateOuterRingWaveSmokeRing,self))
+            self.Trash:Add(ForkThread(self.CreateOuterRingWaveSmokeRing, self))
         end
 
         -- Create full-screen glow flash
@@ -64,8 +64,8 @@ SCUDeath01 = Class(NullShell) {
         -- Create ground decals
         local orientation = RandomFloat( 0, 2 * math.pi )
         CreateDecal(position, orientation, 'Crater01_albedo', '', 'Albedo', 20, 20, 1200, 0, army)
-        CreateDecal(position, orientation, 'Crater01_normals', '', 'Normals', 20, 20, 1200, 0, army)       
-        CreateDecal(position, orientation, 'nuke_scorch_003_albedo', '', 'Albedo', 20, 20, 1200, 0, army)    
+        CreateDecal(position, orientation, 'Crater01_normals', '', 'Normals', 20, 20, 1200, 0, army)
+        CreateDecal(position, orientation, 'nuke_scorch_003_albedo', '', 'Albedo', 20, 20, 1200, 0, army)
 
 		-- Knockdown force rings
         DamageRing(self, position, 0.1, 15, 1, 'Force', true)

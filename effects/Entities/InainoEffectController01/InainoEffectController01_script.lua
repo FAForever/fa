@@ -22,7 +22,7 @@ InainoEffectController01 = Class(NullShell) {
         self.Trash:Add(ForkThread(self.CreateInitialBuildup,self, self.Army))
         self.Trash:Add(ForkThread(self.CreateGroundFingers, self))
         self.Trash:Add(ForkThread(self.CreateInitialFingers, self))
-        self.Trash:Add(ForkThread(self.MainBlast, self ,self.Army))
+        self.Trash:Add(ForkThread(self.MainBlast, self, self.Army))
     end,
 
     ---@param self InainoEffectController01

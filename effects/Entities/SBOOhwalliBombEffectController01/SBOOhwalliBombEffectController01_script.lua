@@ -49,9 +49,9 @@ SBOOhwalliBombEffectController01 = Class(NullShell) {
             end
         end
 
-        self.Trash:Add(ForkThread(self.CreateInitialBuildup, army, self))
-		self.Trash:Add(ForkThread(self.CreateRifts, army , self))
-        self.Trash:Add(ForkThread(self.MainBlast, army, self))
+        self.Trash:Add(ForkThread(self.CreateInitialBuildup, self, army))
+		self.Trash:Add(ForkThread(self.CreateRifts, self, army))
+        self.Trash:Add(ForkThread(self.MainBlast, self, army))
     end,
 
     ---@param self SBOOhwalliBombEffectController01
