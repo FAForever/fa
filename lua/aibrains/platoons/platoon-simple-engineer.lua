@@ -87,7 +87,7 @@ AIPlatoonEngineerSimple = Class(AIPlatoon) {
 
     Building = State {
 
-        StateName = 'Waiting',
+        StateName = 'Building',
 
         ---@param self AIPlatoonEngineerSimple
         Main = function(self)
