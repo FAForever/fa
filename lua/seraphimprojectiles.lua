@@ -463,8 +463,8 @@ SExperimentalStrategicMissile = ClassProjectile(NukeProjectile, MultiPolyTrailPr
 }
 
 ---  SERAPHIM ELECTRUM TACTICAL MISSILE DEFENSE
----@class SIMAntiMissile : MultiPolyTrailProjectile
-SIMAntiMissile = ClassProjectile(MultiPolyTrailProjectile) {
+---@class SIMAntiMissile01 : MultiPolyTrailProjectile
+SIMAntiMissile01 = ClassProjectile(MultiPolyTrailProjectile) {
     FxImpactLand = EffectTemplate.SElectrumMissleDefenseHit,
     FxImpactNone= EffectTemplate.SElectrumMissleDefenseHit,
     FxImpactProjectile = EffectTemplate.SElectrumMissleDefenseHit,
