@@ -32,8 +32,9 @@ AANTorpedoCluster01 = ClassProjectile(ATorpedoCluster) {
     ---@param self AANTorpedoCluster01
     ---@param inWater boolean
     OnCreate = function(self, inWater)
+        local army = self.Army
         ATorpedoClusterOnCreate(self, inWater)
-        CreateTrail(self, -1, self.Army, import("/lua/effecttemplates.lua").ATorpedoPolyTrails01)
+        CreateTrail(self, -1, army, import("/lua/effecttemplates.lua").ATorpedoPolyTrails01)
     end,
 
     ---@param self TANAnglerTorpedo06

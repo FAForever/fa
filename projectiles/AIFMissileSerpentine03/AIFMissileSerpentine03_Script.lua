@@ -1,7 +1,7 @@
-local AMissileSerpentine02Projectile = import("/lua/aeonprojectiles.lua").AMissileSerpentine02Projectile
+local AMissileSerpentine02Projectile = import("/lua/aeonprojectiles.lua").AMissileSerpentineProjectile
 
 --- Serpentine Missile 03 : XAS0306
----@class AIFMissileTactical03: AMissileSerpentine02Projectile
+---@class AIFMissileTactical03: AMissileSerpentineProjectile
 AIFMissileTactical03 = ClassProjectile(AMissileSerpentine02Projectile) {
 
     -- separate trajectory components to make it feel like a barrage

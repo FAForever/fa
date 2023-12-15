@@ -12,15 +12,16 @@ local RandomFloat = import("/lua/utilities.lua").GetRandomFloat
 AIFFragmentationSensorShell01 = ClassProjectile(AArtilleryFragmentationSensorShellProjectile) {
 
     ---@param self AIFFragmentationSensorShell01
-    ---@param TargetType string
-    ---@param TargetEntity Prop|Unit
+    ---@param TargetType string unused
+    ---@param TargetEntity Prop|Unit unused
     OnImpact = function(self, TargetType, TargetEntity)
         local FxFragEffect = EffectTemplate.Aeon_QuanticClusterFrag01
         local bp = self.Blueprint.Physics
 
         -- Split effects
         for k, v in FxFragEffect do
-            CreateEmitterAtBone( self, -1, self.Army, v )
+            local army = self.Army
+            CreateEmitterAtBone( self, -1, army, v )
         end
 
         local vx, vy, vz = self:GetVelocity()

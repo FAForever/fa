@@ -36,12 +36,14 @@ AANTorpedoCluster01 = ClassProjectile(ATorpedoCluster) {
 
     ---@param self AANTorpedoCluster01
     OnCreate = function(self)
+        local army = self.Army
         ATorpedoClusterOnCreate(self)
-        CreateTrail(self, -1, self.Army, self.FxTrail)
+        CreateTrail(self, -1, army, self.FxTrail)
     end,
 
     ---@param self AANTorpedoCluster01
     OnEnterWater = function(self)
+        local army = self.Army
         ATorpedoClusterOnEnterWater(self)
 
         -- create two child projectiles
@@ -55,7 +57,7 @@ AANTorpedoCluster01 = ClassProjectile(ATorpedoCluster) {
         local marker = VisionMarkerOpti({ Owner = self })
         marker:UpdatePosition(px, pz)
         marker:UpdateDuration(10)
-        marker:UpdateIntel(self.Army, 5, 'Vision', true)
+        marker:UpdateIntel(army, 5, 'Vision', true)
 
         -- let the children live on
         self:Destroy()
