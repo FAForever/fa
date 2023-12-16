@@ -9,6 +9,14 @@ local EffectTemplate = import("/lua/effecttemplates.lua")
 local Util = import("/lua/utilities.lua")
 local RandomFloat = Util.GetRandomFloat
 
+-- upvalue for perfomance
+local ForkThread = ForkThread
+local TrashBagAdd = TrashBag.Add
+local WaitTicks = WaitTicks
+local MathSin = math.sin
+local MathCos = math.cos
+local MathPi = math.pi
+
 ---@class UEFNukeEffectController01 : NullShell
 UEFNukeEffectController01 = Class(NullShell) {
 
@@ -16,6 +24,7 @@ UEFNukeEffectController01 = Class(NullShell) {
     EffectThread = function(self)
         local position = self:GetPosition()
         local army = self.Army
+        local trash = self.Trash
 
         -- Create projectile that controls plume effects
         local PlumeEffectYOffset = 0
@@ -38,9 +47,9 @@ UEFNukeEffectController01 = Class(NullShell) {
 
         self:CreateInitialFireballSmokeRing()
 
-        self.Trash:Add(ForkThread(self.CreateOuterRingWaveSmokeRing, self))
-        self.Trash:Add(ForkThread(self.CreateHeadConvectionSpinners, self))
-        self.Trash:Add(ForkThread(self.CreateFlavorPlumes, self))
+        TrashBagAdd(trash, ForkThread(self.CreateOuterRingWaveSmokeRing, self))
+        TrashBagAdd(trash, ForkThread(self.CreateHeadConvectionSpinners, self))
+        TrashBagAdd(trash, ForkThread(self.CreateFlavorPlumes, self))
 
         WaitTicks(5)
 
@@ -51,7 +60,7 @@ UEFNukeEffectController01 = Class(NullShell) {
         CreateLightParticle(self, -1, army, 100, 80, 'glow_03', 'ramp_nuke_04')
 
         -- Create ground decals
-        local orientation = RandomFloat(0, 2 * math.pi)
+        local orientation = RandomFloat(0, 2 * MathPi)
         CreateDecal(position, orientation, 'Crater01_albedo', '', 'Albedo', 25, 25, 1200, 0, army)
         CreateDecal(position, orientation, 'Crater01_normals', '', 'Normals', 25, 25, 1200, 0, army)
         CreateDecal(position, orientation, 'nuke_scorch_003_albedo', '', 'Albedo', 30, 30, 1200, 0, army)
@@ -63,13 +72,13 @@ UEFNukeEffectController01 = Class(NullShell) {
     ---@param self UEFNukeEffectController01
     CreateInitialFireballSmokeRing = function(self)
         local sides = 12
-        local angle = (2 * math.pi) / sides
+        local angle = (2 * MathPi) / sides
         local velocity = 1
         local OffsetMod = 8
 
         for i = 0, (sides - 1) do
-            local X = math.sin(i * angle)
-            local Z = math.cos(i * angle)
+            local X = MathSin(i * angle)
+            local Z = MathCos(i * angle)
             self:CreateProjectile('/effects/entities/UEFNukeShockwave01/UEFNukeShockwave01_proj.bp', X * OffsetMod, 1.5,
                 Z * OffsetMod, X, 0, Z)
                 :SetVelocity(velocity):SetAcceleration(-0.5)
@@ -79,14 +88,14 @@ UEFNukeEffectController01 = Class(NullShell) {
     ---@param self UEFNukeEffectController01
     CreateOuterRingWaveSmokeRing = function(self)
         local sides = 32
-        local angle = (2 * math.pi) / sides
+        local angle = (2 * MathPi) / sides
         local velocity = 3
         local OffsetMod = 8
         local projectiles = {}
 
         for i = 0, (sides - 1) do
-            local X = math.sin(i * angle)
-            local Z = math.cos(i * angle)
+            local X = MathSin(i * angle)
+            local Z = MathCos(i * angle)
             local proj = self:CreateProjectile('/effects/entities/UEFNukeShockwave02/UEFNukeShockwave02_proj.bp',
                 X * OffsetMod, 2.5, Z * OffsetMod, X, 0, Z)
                 :SetVelocity(velocity)
@@ -104,7 +113,7 @@ UEFNukeEffectController01 = Class(NullShell) {
     ---@param self UEFNukeEffectController01
     CreateFlavorPlumes = function(self)
         local numProjectiles = 8
-        local angle = (2 * math.pi) / numProjectiles
+        local angle = (2 * MathPi) / numProjectiles
         local angleInitial = RandomFloat(0, angle)
         local angleVariation = angle * 0.75
         local projectiles = {}
@@ -121,9 +130,9 @@ UEFNukeEffectController01 = Class(NullShell) {
         -- Launch projectiles at semi-random angles away from the sphere, with enough
         -- initial velocity to escape sphere core
         for i = 0, (numProjectiles - 1) do
-            xVec = math.sin(angleInitial + (i * angle) + RandomFloat(-angleVariation, angleVariation))
+            xVec = MathSin(angleInitial + (i * angle) + RandomFloat(-angleVariation, angleVariation))
             yVec = RandomFloat(0.2, 1)
-            zVec = math.cos(angleInitial + (i * angle) + RandomFloat(-angleVariation, angleVariation))
+            zVec = MathCos(angleInitial + (i * angle) + RandomFloat(-angleVariation, angleVariation))
             velocity = 1.5
             table.insert(projectiles,
                 self:CreateProjectile('/effects/entities/UEFNukeFlavorPlume01/UEFNukeFlavorPlume01_proj.bp', 0, 0, 0,
@@ -141,15 +150,15 @@ UEFNukeEffectController01 = Class(NullShell) {
     ---@param self UEFNukeEffectController01
     CreateHeadConvectionSpinners = function(self)
         local sides = 10
-        local angle = (2 * math.pi) / sides
+        local angle = (2 * MathPi) / sides
         local HeightOffset = -5
         local velocity = 1
         local OffsetMod = 10
         local projectiles = {}
 
         for i = 0, (sides - 1) do
-            local x = math.sin(i * angle) * OffsetMod
-            local z = math.cos(i * angle) * OffsetMod
+            local x = MathSin(i * angle) * OffsetMod
+            local z = MathCos(i * angle) * OffsetMod
             local proj = self:CreateProjectile('/effects/entities/UEFBillyNukeEffect03/UEFBillyNukeEffect03_proj.bp', x,
                 HeightOffset, z, x, 0, z)
                 :SetVelocity(velocity)
@@ -158,8 +167,8 @@ UEFNukeEffectController01 = Class(NullShell) {
 
         WaitTicks(10)
         for i = 0, (sides - 1) do
-            local x = math.sin(i * angle)
-            local z = math.cos(i * angle)
+            local x = MathSin(i * angle)
+            local z = MathCos(i * angle)
             local proj = projectiles[i + 1]
             proj:SetVelocityAlign(false)
             proj:SetOrientation(OrientFromDir(Util.Cross(Vector(x, 0, z), Vector(0, 1, 0))), true)
@@ -176,18 +185,18 @@ UEFNukeEffectController01 = Class(NullShell) {
         end
 
         local sides = 10
-        local angle = (2 * math.pi) / sides
+        local angle = (2 * MathPi) / sides
         local outer_lower_limit = 2
         local outer_upper_limit = 2
         local outer_lower_height = 2
         local outer_upper_height = 3
 
         sides = 8
-        angle = (2 * math.pi) / sides
+        angle = (2 * MathPi) / sides
         for i = 0, (sides - 1) do
             local magnitude = RandomFloat(outer_lower_limit, outer_upper_limit)
-            local x = math.sin(i * angle + RandomFloat(-angle / 2, angle / 4)) * magnitude
-            local z = math.cos(i * angle + RandomFloat(-angle / 2, angle / 4)) * magnitude
+            local x = MathSin(i * angle + RandomFloat(-angle / 2, angle / 4)) * magnitude
+            local z = MathCos(i * angle + RandomFloat(-angle / 2, angle / 4)) * magnitude
             local velocity = RandomFloat(1, 2.5) * 2
             self:CreateProjectile('/effects/entities/UEFNukeEffect05/UEFNukeEffect05_proj.bp', x,
                 RandomFloat(outer_lower_height, outer_upper_height), z, x, 0, z)

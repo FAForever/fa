@@ -15,6 +15,11 @@ local SIFExperimentalStrategicMissileEffect06 = '/effects/Entities/SIFExperiment
 
 -- upvalue for performance
 local ForkThread = ForkThread
+local WaitSeconds = WaitSeconds
+local MathSin = math.sin
+local MathCos = math.cos
+local TrashBagAdd = TrashBag.Add
+local MathPi = math.pi
 
 ---@class SeraphimNukeEffectController01 : NullShell
 SeraphimNukeEffectController01 = Class(NullShell) {
@@ -24,7 +29,7 @@ SeraphimNukeEffectController01 = Class(NullShell) {
     CreateEffectInnerPlasma = function(self)
         local vx, vy, vz = self:GetVelocity()
         local num_projectiles = 12
-        local horizontal_angle = (2*math.pi) / num_projectiles
+        local horizontal_angle = (2*MathPi) / num_projectiles
         local angleInitial = RandomFloat(0, horizontal_angle)
         local xVec, zVec
         local offsetMultiple = 10.0
@@ -32,8 +37,8 @@ SeraphimNukeEffectController01 = Class(NullShell) {
 
         WaitSeconds(3.5)
         for i = 0, (num_projectiles -1) do
-            xVec = (math.sin(angleInitial + (i*horizontal_angle)))
-            zVec = (math.cos(angleInitial + (i*horizontal_angle)))
+            xVec = (MathSin(angleInitial + (i*horizontal_angle)))
+            zVec = (MathCos(angleInitial + (i*horizontal_angle)))
             px = (offsetMultiple*xVec)
             pz = (offsetMultiple*zVec)
 
@@ -49,7 +54,7 @@ SeraphimNukeEffectController01 = Class(NullShell) {
     CreateEffectElectricity = function(self)
         local vx, vy, vz = self:GetVelocity()
         local num_projectiles = 7
-        local horizontal_angle = (2*math.pi) / num_projectiles
+        local horizontal_angle = (2*MathPi) / num_projectiles
         local angleInitial = RandomFloat(0, horizontal_angle)
         local xVec, zVec
         local offsetMultiple = 0.0
@@ -71,10 +76,12 @@ SeraphimNukeEffectController01 = Class(NullShell) {
 
     ---@param self SeraphimNukeEffectController01
     EffectThread = function(self)
-		self.Trash:Add(ForkThread(self.CreateEffectInnerPlasma,self))
-        self.Trash:Add(ForkThread(self.CreateEffectElectricity,self))
         local position = self:GetPosition()
         local army = self.Army
+        local trash = self.Trash
+
+		TrashBagAdd(trash, ForkThread(self.CreateEffectInnerPlasma,self))
+        TrashBagAdd(trash, ForkThread(self.CreateEffectElectricity,self))
 
         -- Knockdown force rings
         DamageRing(self, position, 0.1, 45, 1, 'Force', true)
@@ -102,22 +109,22 @@ SeraphimNukeEffectController01 = Class(NullShell) {
         end
 
         -- Create ground decals
-        local orientation = RandomFloat(0,2*math.pi)
+        local orientation = RandomFloat(0,2*MathPi)
         CreateDecal(position, orientation, 'Scorch_012_albedo', '', 'Albedo', 300, 300, 1200, 0, army)
         CreateDecal(position, orientation, 'Crater01_normals', '', 'Normals', 150, 150, 1200, 0, army)
 
         -- Create explosion dust ring
         local vx, vy, vz = self:GetVelocity()
         local num_projectiles = 24
-        local horizontal_angle = (2*math.pi) / num_projectiles
+        local horizontal_angle = (2*MathPi) / num_projectiles
         local angleInitial = RandomFloat(0, horizontal_angle)
         local xVec, zVec
         local offsetMultiple = 60.0
         local px, pz
 
         for i = 0, (num_projectiles -1) do
-            xVec = (math.sin(angleInitial + (i*horizontal_angle)))
-            zVec = (math.cos(angleInitial + (i*horizontal_angle)))
+            xVec = (MathSin(angleInitial + (i*horizontal_angle)))
+            zVec = (MathCos(angleInitial + (i*horizontal_angle)))
             px = (offsetMultiple*xVec)
             pz = (offsetMultiple*zVec)
 
@@ -139,16 +146,16 @@ SeraphimNukeEffectController01 = Class(NullShell) {
 
         -- Create fireball plumes to accentuate the explosive detonation
         local num_projectiles = 15
-        local horizontal_angle = (2*math.pi) / num_projectiles
+        local horizontal_angle = (2*MathPi) / num_projectiles
         local angleInitial = RandomFloat(0, horizontal_angle)
         local xVec, yVec, zVec
         local angleVariation = 0.5
         local px, py, pz
 
         for i = 0, (num_projectiles -1) do
-            xVec = math.sin(angleInitial + (i*horizontal_angle) + RandomFloat(-angleVariation, angleVariation))
+            xVec = MathSin(angleInitial + (i*horizontal_angle) + RandomFloat(-angleVariation, angleVariation))
             yVec = RandomFloat(0.3, 1.5) + 1.2
-            zVec = math.cos(angleInitial + (i*horizontal_angle) + RandomFloat(-angleVariation, angleVariation))
+            zVec = MathCos(angleInitial + (i*horizontal_angle) + RandomFloat(-angleVariation, angleVariation))
             px = RandomFloat(7.5, 14.0) * xVec
             py = RandomFloat(7.5, 14.0) * yVec
             pz = RandomFloat(7.5, 14.0) * zVec

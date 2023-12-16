@@ -8,14 +8,23 @@ local NullShell = import("/lua/sim/defaultprojectiles.lua").NullShell
 local RandomFloat = import("/lua/utilities.lua").GetRandomFloat
 local EffectTemplate = import("/lua/effecttemplates.lua")
 
+-- upvalue for perfomance
+local ForkThread = ForkThread
+local TrashBagAdd = TrashBag.Add
+local WaitTicks = WaitTicks
+local MathSin = math.sin
+local MathCos = math.cos
+local MathPi = math.pi
+
 ---@class UnitTeleportEffect03 : NullShell
 UnitTeleportEffect03 = Class(NullShell) {
 
     ---@param self UnitTeleportEffect03
     OnCreate = function(self)
         NullShell.OnCreate(self)
+        local trash = self.Trash
 
-        self.Trash:Add(ForkThread(self.TeleportEffectThread, self))
+        TrashBagAdd(trash,ForkThread(self.TeleportEffectThread, self))
     end,
 
     ---@param self UnitTeleportEffect03
@@ -54,18 +63,18 @@ UnitTeleportEffect03 = Class(NullShell) {
     ---@param army number
     CreateFlares = function(self, army)
         local numFlares = 45
-        local angle = (2 * math.pi) / numFlares
+        local angle = (2 * MathPi) / numFlares
         local angleInitial = 0.0
-        local angleVariation = (2 * math.pi)
+        local angleVariation = (2 * MathPi)
 
         local emit, x, y, z = nil, nil, nil, nil
         local DirectionMul = 0.02
         local OffsetMul = 1
 
         for i = 0, (numFlares - 1) do
-            x = math.sin(angleInitial + (i * angle) + RandomFloat(-angleVariation, angleVariation))
+            x = MathSin(angleInitial + (i * angle) + RandomFloat(-angleVariation, angleVariation))
             y = 0.5
-            z = math.cos(angleInitial + (i * angle) + RandomFloat(-angleVariation, angleVariation))
+            z = MathCos(angleInitial + (i * angle) + RandomFloat(-angleVariation, angleVariation))
 
             for k, v in EffectTemplate.CloudFlareEffects01 do
                 emit = CreateEmitterAtEntity(self, army, v)
@@ -83,13 +92,13 @@ UnitTeleportEffect03 = Class(NullShell) {
     ---@param self UnitTeleportEffect03
     CreateSmokeRing = function(self)
         local blanketSides = 36
-        local blanketAngle = (2 * math.pi) / blanketSides
+        local blanketAngle = (2 * MathPi) / blanketSides
         local blanketVelocity = 8
         local projectileList = {}
 
         for i = 0, (blanketSides - 1) do
-            local blanketX = math.sin(i * blanketAngle)
-            local blanketZ = math.cos(i * blanketAngle)
+            local blanketX = MathSin(i * blanketAngle)
+            local blanketZ = MathCos(i * blanketAngle)
             local proj = self:CreateProjectile('/effects/Nuke/Shockwave01_proj.bp', blanketX * 6, 0.35, blanketZ * 6,
                 blanketX, 0, blanketZ)
                 :SetVelocity(blanketVelocity):SetAcceleration(-3)

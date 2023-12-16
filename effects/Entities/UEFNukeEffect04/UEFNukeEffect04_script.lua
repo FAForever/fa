@@ -7,6 +7,11 @@
 local NullShell = import("/lua/sim/defaultprojectiles.lua").NullShell
 local EffectTemplate = import("/lua/effecttemplates.lua")
 
+-- upvalue for perfomance
+local ForkThread = ForkThread
+local TrashBagAdd = TrashBag.Add
+local WaitTicks = WaitTicks
+
 --- UEFNukeEffect04
 ---@class UEFNukeEffect04 : NullShell
 UEFNukeEffect04 = Class(NullShell) {
@@ -14,7 +19,8 @@ UEFNukeEffect04 = Class(NullShell) {
 	---@param self UEFNukeEffect04
 	OnCreate = function(self)
 		NullShell.OnCreate(self)
-		self.Trash:Add(ForkThread(self.EffectThread,self))
+		local trash = self.Trash
+		TrashBagAdd(trash,ForkThread(self.EffectThread,self))
 	end,
 
 	---@param self UEFNukeEffect04

@@ -8,9 +8,12 @@ local NullShell = import("/lua/sim/defaultprojectiles.lua").NullShell
 local Util = import("/lua/utilities.lua")
 local RandomFloat = Util.GetRandomFloat
 
-
--- upvalue for performance
+-- upvalue for perfomance
 local ForkThread = ForkThread
+local TrashBagAdd = TrashBag.Add
+local MathCos = math.cos
+local MathSin = math.sin
+local MathPi = math.pi
 
 
 ---@class SCUDeath01 : NullShell
@@ -20,6 +23,7 @@ SCUDeath01 = Class(NullShell) {
     OnCreate = function(self)
         NullShell.OnCreate(self)
         local bp = self.Blueprint
+        local trash = self.Trash
 
         -- Play the "NukeExplosion" sound
         if bp.Audio.NukeExplosion then
@@ -27,7 +31,7 @@ SCUDeath01 = Class(NullShell) {
         end
 
 		-- Create thread that spawns and controls effects
-        self.Trash:Add(ForkThread(self.EffectThread, self))
+        TrashBagAdd(trash, ForkThread(self.EffectThread, self))
     end,
 
     ---@param self SCUDeath01
@@ -54,8 +58,10 @@ SCUDeath01 = Class(NullShell) {
     EffectThread = function(self)
         local army = self.Army
         local position = self:GetPosition()
+        local trash = self.Trash
+
         if position[2] + 2 > GetSurfaceHeight(position[1], position[3]) then
-            self.Trash:Add(ForkThread(self.CreateOuterRingWaveSmokeRing, self))
+            TrashBagAdd(trash, ForkThread(self.CreateOuterRingWaveSmokeRing, self))
         end
 
         -- Create full-screen glow flash
@@ -81,14 +87,14 @@ SCUDeath01 = Class(NullShell) {
     ---@param self SCUDeath01
     CreateOuterRingWaveSmokeRing = function(self)
         local sides = 10
-        local angle = (2*math.pi) / sides
+        local angle = (2*MathPi) / sides
         local velocity = 2
         local OffsetMod = 4
         local projectiles = {}
 
         for i = 0, (sides-1) do
-            local X = math.sin(i*angle)
-            local Z = math.cos(i*angle)
+            local X = MathSin(i*angle)
+            local Z = MathCos(i*angle)
             local proj =  self:CreateProjectile('/effects/entities/SCUDeathShockwave01/SCUDeathShockwave01_proj.bp', X * OffsetMod , 2, Z * OffsetMod, X, 0, Z)
                 :SetVelocity(velocity)
             table.insert( projectiles, proj )

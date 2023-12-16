@@ -14,15 +14,16 @@ local EffectTemplate = import("/lua/effecttemplates.lua")
 local SOhwalliBombHit01 = EffectTemplate.SOhwalliBombHit01
 local ExplosionMediumWater = EffectTemplate.ExplosionMediumWater
 
--- upvalue scope for performance
+-- upvalue for perfomance
+local ForkThread = ForkThread
 local MathSin = math.sin
 local MathCos = math.cos
 local WaitTicks = WaitTicks
 local GetTerrainHeight = GetTerrainHeight
 local GetSurfaceHeight = GetSurfaceHeight
 local CreateEmitterAtEntity = CreateEmitterAtEntity
-local ForkThread = ForkThread
-
+local TrashBagAdd = TrashBag.Add
+local MathPi = math.pi
 
 local BaseRingRiftEffects = {
 	'/effects/Entities/SBOOhwalliBombEffect03/SBOOhwalliBombEffect03_proj.bp',
@@ -40,9 +41,9 @@ SBOOhwalliBombEffectController01 = Class(NullShell) {
     OnCreate = function( self )
 		NullShell.OnCreate(self)
 		local army = self.Army
-
-        -- create a water splash effect if we're on water
         local position = self:GetPosition()
+        local trash = self.Trash
+        -- create a water splash effect if we're on water
         if GetSurfaceHeight(position[1], position[3]) > GetTerrainHeight(position[1], position[3]) then
             for _, effect in ExplosionMediumWater do
                 local emitter = CreateEmitterAtEntity(self, army, effect)
@@ -50,9 +51,9 @@ SBOOhwalliBombEffectController01 = Class(NullShell) {
             end
         end
 
-        self.Trash:Add(ForkThread(self.CreateInitialBuildup, self, army))
-		self.Trash:Add(ForkThread(self.CreateRifts, self, army))
-        self.Trash:Add(ForkThread(self.MainBlast, self, army))
+        TrashBagAdd(trash, ForkThread(self.CreateInitialBuildup, self, army))
+		TrashBagAdd(trash, ForkThread(self.CreateRifts, self, army))
+        TrashBagAdd(trash, ForkThread(self.MainBlast, self, army))
     end,
 
     ---@param self SBOOhwalliBombEffectController01
@@ -69,11 +70,10 @@ SBOOhwalliBombEffectController01 = Class(NullShell) {
     CreateRifts = function(self, army )
         -- Create projectiles in a dispersal pattern, that create x/z direction that 
         -- the effects emitters use a path.
-
         local vx, vy, vz = self:GetVelocity()
         local velocity = 70
-        local num_projectiles = 3       
-        local horizontal_angle = (2*math.pi) / num_projectiles
+        local num_projectiles = 3
+        local horizontal_angle = (2*MathPi) / num_projectiles
         local angleInitial = RandomFloat( 0, horizontal_angle )
         local angleVariation = 0.2  --Adjusts horizontal_angle variance spread
         local xVec, zVec
@@ -122,8 +122,8 @@ SBOOhwalliBombEffectController01 = Class(NullShell) {
         plume:SetVelocityAlign(true)
 
         -- Create explosion dust ring
-        local num_projectiles = 16        
-        local horizontal_angle = (2*math.pi) / num_projectiles
+        local num_projectiles = 16
+        local horizontal_angle = (2*MathPi) / num_projectiles
         local angleInitial = RandomFloat( 0, horizontal_angle )
         local xVec, zVec
         local offsetMultiple = 10.0
@@ -146,13 +146,13 @@ SBOOhwalliBombEffectController01 = Class(NullShell) {
     CreatePlumes = function(self)
         -- Create fireball plumes to accentuate the explosive detonation
         local num_projectiles = 7
-        local horizontal_angle = (2*math.pi) / num_projectiles
+        local horizontal_angle = (2*MathPi) / num_projectiles
         local angleInitial = RandomFloat( 0, horizontal_angle )
         local xVec, yVec, zVec
         local angleVariation = 0.5
         local px, py, pz
 
-        for i = 0, (num_projectiles -1) do            
+        for i = 0, (num_projectiles -1) do
             xVec = MathSin(angleInitial + (i*horizontal_angle) + RandomFloat(-angleVariation, angleVariation) )
             yVec = RandomFloat( 0.7, 2.8 ) + 2.0
             zVec = MathCos(angleInitial + (i*horizontal_angle) + RandomFloat(-angleVariation, angleVariation) )
