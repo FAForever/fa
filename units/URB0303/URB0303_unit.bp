@@ -48,6 +48,7 @@ UnitBlueprint{
         SurfaceThreatLevel = 0,
     },
     Display = {
+        AnimationBuild = '/units/urb0303/urb0303_abuild.sca',
         BuildAttachBone = "Attachpoint",
         IdleEffects = {
             Water = {
