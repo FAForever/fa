@@ -201,6 +201,7 @@ UnitBlueprint{
             HelpText = "<LOC uel0301_BubbleShield_help>Support Armored Command Unit. Enhanced during construction with the bubble shield generator enhancement.",
             SortCategory = "SORTOTHER",
             UnitName = "<LOC uel0301_BubbleShield_name>SACU (Shield preset)",
+            SelectionPriority = 1,
         },
         Combat = {
             Description = "<LOC uel0301_Combat_desc>SACU (Combatant preset)",
@@ -212,6 +213,7 @@ UnitBlueprint{
             HelpText = "<LOC uel0301_Combat_help>Support Armored Command Unit. Enhanced during construction with the energy accelerator and heavy plasma refractor enhancements.",
             SortCategory = "SORTOTHER",
             UnitName = "<LOC uel0301_Combat_name>SACU (Combatant preset)",
+            SelectionPriority = 1,
         },
         Engineer = {
             Description = "<LOC uel0301_Engineer_desc>SACU (Engineer preset)",
@@ -251,6 +253,7 @@ UnitBlueprint{
             HelpText = "<LOC uel0301_Rambo_help>Support Armored Command Unit. Enhanced during construction with a personal shield, energy accelerator and heavy plasma refractor enhancements.",
             SortCategory = "SORTOTHER",
             UnitName = "<LOC uel0301_Rambo_name>SACU (Rambo preset)",
+            SelectionPriority = 1,
         },
     },
     Enhancements = {
