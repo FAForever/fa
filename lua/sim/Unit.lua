@@ -2934,7 +2934,6 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
     ---@param self Unit
     ---@param attached Unit
     OnAttachedKilled = function(self, attached)
-        reprsl(arg)
         -- awareness of event for campaign scripts
         local callbacks = self.EventCallbacks['OnAttachedKilled']
         if callbacks then
@@ -2949,11 +2948,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
             aiPlatoon:OnAttachedKilled(self)
         end
     end,
-
-    OnAttachedDestroyed = function(self, ...)
-        reprsl(arg)
-    end,
-
+    
     --- Called as a unit (with transport capabilities) is ready to load in units
     ---@param self Unit
     OnStartTransportLoading = function(self)
