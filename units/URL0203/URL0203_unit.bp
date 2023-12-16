@@ -153,7 +153,7 @@ UnitBlueprint{
     SelectionThickness = 0.7,
     SizeX = 0.9,
     SizeY = 0.5,
-    SizeZ = 1.5,
+    SizeZ = 1.1,
     StrategicIconName = "icon_land2_directfire",
     StrategicIconSortPriority = 125,
     Transport = { TransportClass = 2 },

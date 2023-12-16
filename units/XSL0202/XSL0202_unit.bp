@@ -208,7 +208,7 @@ UnitBlueprint{
     CollisionOffsetZ = -0.05,
     SizeX = 1.1,
     SizeY = 1.2,
-    SizeZ = 1.2,
+    SizeZ = 1.1,
     StrategicIconName = "icon_bot2_directfire",
     StrategicIconSortPriority = 125,
     Transport = { TransportClass = 2 },

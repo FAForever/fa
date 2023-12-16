@@ -134,7 +134,7 @@ UnitBlueprint{
     SelectionThickness = 0.6,
     SizeX = 0.7,
     SizeY = 0.7,
-    SizeZ = 1.1,
+    SizeZ = 0.9,
     StrategicIconName = "icon_land2_antiair",
     StrategicIconSortPriority = 125,
     Transport = { TransportClass = 2 },

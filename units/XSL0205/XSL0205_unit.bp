@@ -194,7 +194,7 @@ UnitBlueprint{
     CollisionOffsetY = 0.1,
     SizeX = 0.8,
     SizeY = 0.75,
-    SizeZ = 1.1,
+    SizeZ = 1.0,
     StrategicIconName = "icon_land2_antiair",
     StrategicIconSortPriority = 125,
     Transport = { TransportClass = 2 },
