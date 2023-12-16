@@ -2857,6 +2857,20 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         end
     end,
 
+    --- Called by the engine when the infinite build is disabled
+    ---@param self Unit
+    OnStopRepeatQueue = function(self)
+    end,
+
+    --- Called by the engine when the infinite build is enabled
+    ---@param self Unit
+    OnStartRepeatQueue = function(self)
+    end,
+
+    --- Called by the engine when the unit is assigned a focus target. Behavior is a bit erradic
+    OnAssignedFocusEntity = function(self)
+    end,
+
     --- Called as this unit (with transport capabilities) deattached another unit from itself
     ---@param self Unit
     ---@param attachBone Bone
@@ -2920,6 +2934,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
     ---@param self Unit
     ---@param attached Unit
     OnAttachedKilled = function(self, attached)
+        reprsl(arg)
         -- awareness of event for campaign scripts
         local callbacks = self.EventCallbacks['OnAttachedKilled']
         if callbacks then
@@ -2933,6 +2948,10 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         if aiPlatoon then
             aiPlatoon:OnAttachedKilled(self)
         end
+    end,
+
+    OnAttachedDestroyed = function(self, ...)
+        reprsl(arg)
     end,
 
     --- Called as a unit (with transport capabilities) is ready to load in units
@@ -4802,12 +4821,22 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         end
     end,
 
+
+    --- Called by the engine when the auto construction mode (usually for missiles) is turned on
+    ---@param self Unit
     OnAutoModeOn = function(self)
         self.AutoModeEnabled = true
     end,
 
+    --- Called by the engine when the auto construction mode (usually for missiles) is turned off
+    ---@param self Unit
     OnAutoModeOff = function(self)
         self.AutoModeEnabled = false
+    end,
+
+    --- Called by the engine when a ferry point is set for this unit
+    ---@param self Unit
+    OnFerryPointSet = function(self)
     end,
 
     -- Utility Functions
