@@ -26,13 +26,13 @@ local EntityCategoryFilterDown = EntityCategoryFilterDown
 
 
 ---@type table<string, CategoryMatcher>
-local categotyActions = {}
+local categoryActions = {}
 function ProcessAction(name)
-    if not categotyActions[name] then
+    if not categoryActions[name] then
         WARN("Attempt to use action " .. name .. " which wasn't registered")
         return
     end
-    categotyActions[name]:Process(GetSelectedUnits())
+    categoryActions[name]:Process(GetSelectedUnits())
 end
 
 ---@class CategoryMatcher
@@ -53,7 +53,7 @@ CategoryMatcher = Class()
     ---@param self CategoryMatcher
     Register = function(self)
         local name = self.description:gsub("[^A-Za-z0-9]+", "_")
-        categotyActions[name] = self
+        categoryActions[name] = self
         import("/lua/keymap/keymapper.lua").SetUserKeyAction(name,
             {
                 action = "UI_Lua import('/lua/keymap/AdvancedKeyActions.lua').ProcessAction('" .. name .. "')",
