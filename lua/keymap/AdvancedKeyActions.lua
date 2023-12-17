@@ -20,8 +20,13 @@
 --** SOFTWARE.
 --******************************************************************************************************
 
-local TableGetN = table.getn
+-- upvalue scope for performance
+local TableGetn = table.getn
+local TableInsert = table.insert
+
+local type = type
 local iscallable = iscallable
+
 local EntityCategoryFilterDown = EntityCategoryFilterDown
 
 
@@ -96,7 +101,7 @@ CategoryAction = Class()
     ---@param self CategoryAction
     ---@param action Action
     Action = function(self, action)
-        table.insert(self._actions, action)
+        TableInsert(self._actions, action)
         return self
     end,
 
@@ -111,7 +116,7 @@ CategoryAction = Class()
         return (not category and not selection)
             or
             (category and selection and
-                TableGetN(EntityCategoryFilterDown(category, selection)) == TableGetN(selection))
+                TableGetn(EntityCategoryFilterDown(category, selection)) == TableGetn(selection))
     end,
 
     ---Set custom category matcher
