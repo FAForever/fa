@@ -156,23 +156,27 @@ function GetNearestIdleLTMex()
     while tech < 4 do
         ConExecute("UI_SelectByCategory +inview +idle MASSEXTRACTION STRUCTURE TECH" .. tech)
         mexes = GetSelectedUnits()
-        if mexes then
-            local minDist = nil
-            local idleMex = nil
-            for _, mex in ipairs(mexes) do
-                local mexPos = mex:GetPosition()
-                local dist = VDist3(mousePos, mexPos)
-                if not underUpgrade[mex] and (not minDist or dist < minDist) then
-                    minDist = dist
-                    idleMex = mex
-                end
-            end
-            if idleMex then
-                SelectUnits { idleMex }
-                break
+        tech = tech + 1
+
+        if not mexes then
+            continue
+        end
+
+        local minDist = nil
+        local idleMex = nil
+        for _, mex in ipairs(mexes) do
+            local mexPos = mex:GetPosition()
+            local dist = VDist3(mousePos, mexPos)
+            if not underUpgrade[mex] and (not minDist or dist < minDist) then
+                minDist = dist
+                idleMex = mex
             end
         end
-        tech = tech + 1
+
+        if idleMex then
+            SelectUnits { idleMex }
+            break
+        end
     end
 end
 
