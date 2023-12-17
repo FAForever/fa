@@ -156,6 +156,6 @@ CategoryMatcher("Enter OC mode / Transport / Toggle repeat build")
         :Action "StartCommandMode order RULEUCC_Transport",
     CategoryAction(categories.COMMAND + categories.SUBCOMMANDER)
         :Action(import('/lua/ui/game/orders.lua').EnterOverchargeMode),
-    CategoryAction(categories.FACTORY * categories.STRUCTURE)
+    CategoryAction(categories.FACTORY)
         :Action(import("/lua/keymap/misckeyactions.lua").ToggleRepeatBuild)
 }
