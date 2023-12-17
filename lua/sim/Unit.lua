@@ -1207,13 +1207,8 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         if enhancements then
             local activeEnhancements = SimUnitEnhancements[self.EntityId]
             if activeEnhancements then
-                local presetEnhancements = bp.EnhancementPresetAssigned.Enhancements
+                -- add the costs of enhancements AND prerequisites
                 for _, enhName in activeEnhancements do
-                    -- don't add enhancement costs built into the unit cost
-                    if presetEnhancements and presetEnhancements[enhName] then
-                        continue
-                    end
-                    -- add up the enhancement AND all of its prerequisites
                     repeat
                         local enh = enhancements[enhName]
                         mass = mass + (enh.BuildCostMass or 0)
@@ -1221,6 +1216,17 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
                         time = time + (enh.BuildTime or 0)
                         enhName = enh.Prerequisite
                     until not enhName
+                end
+
+                -- subtract the costs of built-in enhancements
+                local PresetEnhancements = bp.EnhancementPresetAssigned.Enhancements
+                if PresetEnhancements then
+                    for _, enhName in PresetEnhancements do
+                        local enh = enhancements[enhName]
+                        mass = mass - (enh.BuildCostMass or 0)
+                        energy = energy - (enh.BuildCostEnergy or 0)
+                        time = time - (enh.BuildTime or 0)
+                    end
                 end
             end
         end
@@ -1653,8 +1659,9 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
             return nil
         end
 
-        local mass = bp.Economy.BuildCostMass * (bp.Wreckage.MassMult or 0)
-        local energy = bp.Economy.BuildCostEnergy * (bp.Wreckage.EnergyMult or 0)
+        local mass, energy = self:GetTotalResourceCosts()
+        mass = mass * (bp.Wreckage.MassMult or 0)
+        energy = energy * (bp.Wreckage.EnergyMult or 0)
         local time = (bp.Wreckage.ReclaimTimeMultiplier or 1)
         local pos = self:GetPosition()
         local layer = self.Layer
@@ -2850,6 +2857,20 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         end
     end,
 
+    --- Called by the engine when the infinite build is disabled
+    ---@param self Unit
+    OnStopRepeatQueue = function(self)
+    end,
+
+    --- Called by the engine when the infinite build is enabled
+    ---@param self Unit
+    OnStartRepeatQueue = function(self)
+    end,
+
+    --- Called by the engine when the unit is assigned a focus target. Behavior is a bit erradic
+    OnAssignedFocusEntity = function(self)
+    end,
+
     --- Called as this unit (with transport capabilities) deattached another unit from itself
     ---@param self Unit
     ---@param attachBone Bone
@@ -2927,7 +2948,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
             aiPlatoon:OnAttachedKilled(self)
         end
     end,
-
+    
     --- Called as a unit (with transport capabilities) is ready to load in units
     ---@param self Unit
     OnStartTransportLoading = function(self)
@@ -4795,12 +4816,22 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         end
     end,
 
+
+    --- Called by the engine when the auto construction mode (usually for missiles) is turned on
+    ---@param self Unit
     OnAutoModeOn = function(self)
         self.AutoModeEnabled = true
     end,
 
+    --- Called by the engine when the auto construction mode (usually for missiles) is turned off
+    ---@param self Unit
     OnAutoModeOff = function(self)
         self.AutoModeEnabled = false
+    end,
+
+    --- Called by the engine when a ferry point is set for this unit
+    ---@param self Unit
+    OnFerryPointSet = function(self)
     end,
 
     -- Utility Functions
@@ -5364,6 +5395,10 @@ local UnitGetCurrentLayer = _G.moho.unit_methods.GetCurrentLayer
 local UnitGetUnitId = _G.moho.unit_methods.GetUnitId
 
 ---@class DummyUnit : moho.unit_methods
+---@field EntityId EntityId
+---@field Army Army
+---@field Layer Layer
+---@field Blueprint UnitBlueprint
 DummyUnit = ClassDummyUnit(moho.unit_methods) {
 
     IsUnit = true,
@@ -5386,6 +5421,20 @@ DummyUnit = ClassDummyUnit(moho.unit_methods) {
 
     ---@param self DummyUnit
     UpdateAssistersConsumption = function (self) end,
+
+    --- Plays a sound using the unit as a source. Returns true if successful, false otherwise
+    ---@param self DummyUnit A unit
+    ---@param sound string A string identifier that represents the sound to be played.
+    ---@return boolean
+    PlayUnitSound = function(self, sound)
+        local audio = self.Blueprint.Audio[sound]
+        if not audio then
+            return false
+        end
+
+        self:PlaySound(audio)
+        return true
+    end,
 }
 
 -- Backwards compatibility with mods

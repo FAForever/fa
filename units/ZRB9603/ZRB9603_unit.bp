@@ -75,6 +75,7 @@ UnitBlueprint {
     },
     Description = '<LOC zrb9603_desc>Naval Factory',
     Display = {
+        AnimationBuild = '/units/urb0303/urb0303_abuild.sca',
         BuildAttachBone = 'Attachpoint',
         IdleEffects = {
             Water = {

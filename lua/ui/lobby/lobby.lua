@@ -4356,7 +4356,7 @@ function CreateUI(maxPlayers)
             WaitSeconds(1)
         end
     end)
-    if false then
+    if true then
         import("/lua/ui/events/SnowFlake.lua"). CreateSnowFlakes(GUI)
     end
 end

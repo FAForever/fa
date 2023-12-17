@@ -23,7 +23,7 @@
 local DefaultProjectileWeapon = import('/lua/sim/defaultweapons.lua').DefaultProjectileWeapon
 local DefaultProjectileWeaponPlayFxMuzzleSequence = DefaultProjectileWeapon.PlayFxMuzzleSequence
 
-local EffectTemplate = import('/lua/EffectTemplates.lua')
+local EffectTemplate = import('/lua/effecttemplates.lua')
 
 -- upvalue scope for performance
 local CreateAttachedEmitter = CreateAttachedEmitter
