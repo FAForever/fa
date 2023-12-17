@@ -372,7 +372,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
         local blueprint = self.Blueprint
 
         -- Handle weapons which must pack before moving
-        if blueprint.WeaponUnpackLocksMotion == true and old == 'Stopped' then
+        if blueprint.WeaponUnpackLocksMotion == true and old == 'Stopped' and self.WeaponPackState ~= 'Packed' then
             self:PackAndMove()
         end
 
@@ -562,8 +562,8 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
             unpackAnimator:SetRate(bp.WeaponUnpackAnimationRate)
             self.WeaponPackState = 'Unpacking'
             WaitFor(unpackAnimator)
-            self.WeaponPackState = 'Unpacked'
         end
+        self.WeaponPackState = 'Unpacked'
     end,
 
     -- Played when a weapon packs up
@@ -583,8 +583,8 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
 
             self.WeaponPackState = 'Packing'
             WaitFor(unpackAnimator)
-            self.WeaponPackState = 'Packed'
         end
+        self.WeaponPackState = 'Packed'
     end,
 
     -- Create the visual side of rack recoil
@@ -1113,6 +1113,8 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
                 unit.Trash:Add(ForkThread(self.DisabledWhileReloadingThread, self, 1 / rof))
             end
 
+            local hasTarget = self:WeaponHasTarget()
+
             -- Deal with the rack firing sequence
             if self.CurrentRackSalvoNumber > rackBoneCount then
                 self.CurrentRackSalvoNumber = 1
@@ -1120,27 +1122,28 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
                     ChangeState(self, self.RackSalvoReloadState)
                 elseif bp.RackSalvoChargeTime > 0 then
                     ChangeState(self, self.IdleState)
-                elseif countedProjectile and bp.WeaponUnpacks then
-                    ChangeState(self, self.WeaponPackingState)
-                elseif countedProjectile and not bp.WeaponUnpacks then
-                    ChangeState(self, self.IdleState)
+                elseif countedProjectile or not hasTarget then
+                    if bp.WeaponUnpacks then
+                        ChangeState(self, self.WeaponPackingState)
+                    else
+                        ChangeState(self, self.IdleState)
+                    end
                 else
                     ChangeState(self, self.RackSalvoFireReadyState)
                 end
-            elseif countedProjectile and not bp.WeaponUnpacks then
-                ChangeState(self, self.IdleState)
-            elseif countedProjectile and bp.WeaponUnpacks then
-                ChangeState(self, self.WeaponPackingState)
+            elseif countedProjectile or not hasTarget then
+                if bp.WeaponUnpacks then
+                    ChangeState(self, self.WeaponPackingState)
+                else
+                    ChangeState(self, self.IdleState)
+                end
             else
                 ChangeState(self, self.RackSalvoFireReadyState)
             end
         end,
 
         OnLostTarget = function(self)
-            self.__base.OnLostTarget(self)
-            if self.Blueprint.WeaponUnpacks then
-                ChangeState(self, self.WeaponPackingState)
-            end
+            self.HaltFireOrdered = true
         end,
 
         -- Set a bool so we won't fire if the target reticle is moved
@@ -1168,16 +1171,18 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
             if notExclusive then
                 unit:SetBusy(false)
             end
+            self.ReloadEndTime = GetGameTick() + MATH_IRound(bp.RackSalvoReloadTime*10)
             WaitSeconds(bp.RackSalvoReloadTime)
+            self.ReloadEndTime = nil
 
             self:WaitForAndDestroyManips()
 
             local hasTarget = self:WeaponHasTarget()
-            local canFire = self:CanFire()
+            local autoFire = not bp.ManualFire
 
-            if hasTarget and bp.RackSalvoChargeTime > 0 and canFire then
+            if hasTarget and bp.RackSalvoChargeTime > 0 and autoFire then
                 ChangeState(self, self.RackSalvoChargeState)
-            elseif hasTarget and canFire then
+            elseif hasTarget and autoFire then
                 ChangeState(self, self.RackSalvoFireReadyState)
             elseif not hasTarget and bp.WeaponUnpacks and not bp.WeaponUnpackLocksMotion then
                 ChangeState(self, self.WeaponPackingState)
@@ -1187,6 +1192,9 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
         end,
 
         OnFire = function(self)
+        end,
+
+        OnLostTarget = function(self)
         end,
     },
 
