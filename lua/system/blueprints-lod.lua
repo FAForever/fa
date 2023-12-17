@@ -23,7 +23,7 @@ local function CalculateLODOfProp(prop)
 
             -- https://www.desmos.com/calculator (x * x)
             local factor = (k / n) * (k / n)
-            local LODCutoff = factor * lod + 10
+            local LODCutoff = factor * lod + 400
             -- LOG(string.format("(%s) / %d: %d -> %d", unit.BlueprintId, k, data.LODCutoff, LODCutoff))
             data.LODCutoff = LODCutoff
         end
