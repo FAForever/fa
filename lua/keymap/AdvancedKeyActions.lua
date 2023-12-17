@@ -159,3 +159,27 @@ CategoryMatcher("Enter OC mode / Transport / Toggle repeat build")
     CategoryAction(categories.FACTORY + categories.EXTERNALFACTORY)
         :Action(import("/lua/keymap/misckeyactions.lua").ToggleRepeatBuild)
 }
+
+CategoryMatcher("Select nearest idle t1 engineer / Enter reclaim mode")
+{
+    CategoryAction()
+        :Action "UI_SelectByCategory +inview +nearest +idle ENGINEER TECH1",
+    CategoryAction(categories.ENGINEER)
+        :Action "StartCommandMode order RULEUCC_Reclaim",
+}
+
+CategoryMatcher("Build sensors / Select nearest air scout")
+{
+    CategoryAction()
+        :Action "UI_SelectByCategory +nearest AIR INTELLIGENCE",
+    CategoryAction(categories.ENGINEER)
+        :Action "UI_Lua import('/lua/keymap/hotbuild.lua').buildAction('Sensors')",
+}
+
+CategoryMatcher("Select nearest idle transport / Transport")
+{
+    CategoryAction()
+        :Action "UI_SelectByCategory +nearest +idle AIR TRANSPORTATION",
+    CategoryAction(categories.TRANSPORTATION)
+        :Action "StartCommandMode order RULEUCC_Transport",
+}
