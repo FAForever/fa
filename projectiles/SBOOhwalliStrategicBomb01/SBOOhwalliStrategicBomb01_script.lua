@@ -22,13 +22,17 @@ SBOOhwalliStategicBomb01 = ClassProjectile(SOhwalliStrategicBombProjectile) {
     ---@param inWater boolean
     OnCreate = function(self, inWater)
         SOhwalliStrategicBombProjectileOnCreate(self, inWater)
-        CreateLightParticleIntel(self, -1, self.Army, 15, 5, 'flare_lens_add_02', 'ramp_blue_13')
+        local army = self.Army
+
+        CreateLightParticleIntel(self, -1, army, 15, 5, 'flare_lens_add_02', 'ramp_blue_13')
     end,
 
     ---@param self SBOOhwalliStategicBomb01
     ---@param targetType string unused
     ---@param targetEntity Prop|Unit unused
     OnImpact = function(self, targetType, targetEntity)
+        local army = self.Army
+
         local effectController = '/effects/entities/SBOOhwalliBombEffectController01/SBOOhwalliBombEffectController01_proj.bp'
         self:CreateProjectile(effectController, 0, 0, 0, 0, 0, 0)
 
@@ -38,7 +42,7 @@ SBOOhwalliStategicBomb01 = ClassProjectile(SOhwalliStrategicBombProjectile) {
         local marker = VisionMarkerOpti({ Owner = self })
         marker:UpdatePosition(position[1], position[3])
         marker:UpdateDuration(9)
-        marker:UpdateIntel(self.Army, 12, 'Vision', true)
+        marker:UpdateIntel(army, 12, 'Vision', true)
 
         -- separate damage thread
         local data = self.DamageData

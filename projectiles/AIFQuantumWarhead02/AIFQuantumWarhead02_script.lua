@@ -8,6 +8,13 @@ local NullShell = import("/lua/sim/defaultprojectiles.lua").NullShell
 local RandomFloat = import("/lua/utilities.lua").GetRandomFloat
 local EffectTemplate = import("/lua/effecttemplates.lua")
 
+-- upvalue for perfomance
+local ForkThread = ForkThread
+local TrashBagAdd = TrashBag.Add
+local WaitTicks = WaitTicks
+local MathSin = math.sin
+local MathCos = math.cos
+
 ---@class CIFEMPFluxWarhead02 : NullShell
 AIFQuantumWarhead02 = ClassProjectile(NullShell) {
     NormalEffects = {'/effects/emitters/quantum_warhead_01_emit.bp',},
@@ -15,25 +22,30 @@ AIFQuantumWarhead02 = ClassProjectile(NullShell) {
 
     ---@param self CIFEMPFluxWarhead02
     EffectThread = function(self)
-        CreateLightParticle(self, -1, self.Army, 200, 200, 'beam_white_01', 'ramp_quantum_warhead_flash_01')
+        local army = self.Army
+        local trash = self.Trash
 
-        self.Trash:Add(ForkThread(self.ShakeAndBurnMe,self, self.Army))
-        self.Trash:Add(ForkThread(self.InnerCloudFlares,self, self.Army))
-        self.Trash:Add(ForkThread(self.DistortionField,self))
+        CreateLightParticle(self, -1, army, 200, 200, 'beam_white_01', 'ramp_quantum_warhead_flash_01')
+
+        TrashBagAdd(trash,ForkThread(self.ShakeAndBurnMe,self, army))
+        TrashBagAdd(trash,ForkThread(self.InnerCloudFlares,self, army))
+        TrashBagAdd(trash,ForkThread(self.DistortionField,self))
 
         for k, v in self.NormalEffects do
-            CreateEmitterAtEntity(self, self.Army, v)
+            CreateEmitterAtEntity(self, army, v)
         end
     end,
 
     ---@param self CIFEMPFluxWarhead02
     ---@param army number
     ShakeAndBurnMe = function(self, army)
+        local position = self:GetPosition()
+
         self:ShakeCamera(75, 3, 0, 10)
         WaitTicks(6)
         local orientation = RandomFloat(0,2*math.pi)
-        CreateDecal(self:GetPosition(), orientation, 'Crater01_albedo', '', 'Albedo', 50, 50, 1200, 0, army)
-        CreateDecal(self:GetPosition(), orientation, 'Crater01_normals', '', 'Normals', 50, 50, 1200, 0, army)
+        CreateDecal(position, orientation, 'Crater01_albedo', '', 'Albedo', 50, 50, 1200, 0, army)
+        CreateDecal(position, orientation, 'Crater01_normals', '', 'Normals', 50, 50, 1200, 0, army)
         self:ShakeCamera(105, 10, 0, 2)
         WaitTicks(21)
         self:ShakeCamera(75, 1, 0, 15)
@@ -50,12 +62,11 @@ AIFQuantumWarhead02 = ClassProjectile(NullShell) {
 
         local DirectionMul = 0.02
         local OffsetMul = 4
-        local army = self.Army
 
         for i = 0, (numFlares - 1) do
-            x = math.sin(angleInitial + (i*angle) + RandomFloat(-angleVariation, angleVariation))
+            x = MathSin(angleInitial + (i*angle) + RandomFloat(-angleVariation, angleVariation))
             y = 0.5
-            z = math.cos(angleInitial + (i*angle) + RandomFloat(-angleVariation, angleVariation))
+            z = MathCos(angleInitial + (i*angle) + RandomFloat(-angleVariation, angleVariation))
 
             for k, v in self.CloudFlareEffects do
                 emit = CreateEmitterAtEntity(self, army, v)

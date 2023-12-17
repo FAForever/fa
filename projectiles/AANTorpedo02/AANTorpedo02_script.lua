@@ -23,6 +23,11 @@
 local ATorpedoShipProjectile = import("/lua/aeonprojectiles.lua").ATorpedoShipProjectile
 local ATorpedoShipProjectileOnCreate = ATorpedoShipProjectile.OnCreate
 
+-- Upvalue for performance
+local WaitTicks = WaitTicks
+local ForkThread = ForkThread
+local TrashBagAdd = TrashBag.Add
+
 -- Aeon Torpedo Bomb
 ---@class AANTorpedo02 : ATorpedoShipProjectile
 AANTorpedo02 = ClassProjectile(ATorpedoShipProjectile) {
@@ -33,8 +38,10 @@ AANTorpedo02 = ClassProjectile(ATorpedoShipProjectile) {
     ---@param inWater boolean
     OnCreate = function(self, inWater)
         ATorpedoShipProjectileOnCreate(self, inWater)
+        local trash = self.Trash
+
         self:SetMaxSpeed(8)
-        self.Trash:Add(ForkThread(self.MotionThread, self))
+        TrashBagAdd(trash,ForkThread(self.MotionThread, self))
     end,
 
     ---@param self AANTorpedo02

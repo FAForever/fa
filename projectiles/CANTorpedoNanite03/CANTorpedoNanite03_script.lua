@@ -6,6 +6,9 @@
 -------------------------------------------------------------------------------------------------------
 local CTorpedoShipProjectile = import("/lua/cybranprojectiles.lua").CTorpedoShipProjectile
 
+-- upvalue for perfomance
+local WaitTicks = WaitTicks
+
 --- Cybran Anti-Navy Nanite Torpedo Script Nanite Torpedo releases tiny nanites that do DoT
 ---@class CANTorpedoNanite03 : CTorpedoShipProjectile
 CANTorpedoNanite03 = ClassProjectile(CTorpedoShipProjectile) {

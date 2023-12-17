@@ -7,6 +7,15 @@
 local NullShell = import("/lua/sim/defaultprojectiles.lua").NullShell
 local RandomFloat = import("/lua/utilities.lua").GetRandomFloat
 
+-- upvalue for perfomance
+local ForkThread = ForkThread
+local WaitTicks = WaitTicks
+local CreateEmitterAtEntity = CreateEmitterAtEntity
+local TrashBagAdd = TrashBag.Add
+local MathSin = math.sin
+local MathCos = math.cos
+
+
 ---@class CIFEMPFluxWarhead02 : NullShell
 CIFEMPFluxWarhead02 = ClassProjectile(NullShell) {
     -- Effects attached to moving nuke projectile plume
@@ -26,6 +35,7 @@ CIFEMPFluxWarhead02 = ClassProjectile(NullShell) {
     ---@param self CIFEMPFluxWarhead02
     EffectThread = function(self)
         local army = self.Army
+        local trash = self.Trash
         local plumeThread = self.PlumeThread
         local plumeVelocityThread = self.PlumeVelocityThread
 
@@ -35,21 +45,21 @@ CIFEMPFluxWarhead02 = ClassProjectile(NullShell) {
 
         -- Mesh effects
         self.Plumeproj = self:CreateProjectile('/effects/EMPFluxWarhead/EMPFluxWarheadEffect01_proj.bp')
-        self.Trash:Add(ForkThread(plumeThread, self, self.Plumeproj, self.Plumeproj.Blueprint.Display.UniformScale))
-        self.Trash:Add(ForkThread(plumeVelocityThread, self, self.Plumeproj))
+        TrashBagAdd(trash,ForkThread(plumeThread, self, self.Plumeproj, self.Plumeproj.Blueprint.Display.UniformScale))
+        TrashBagAdd(trash,ForkThread(plumeVelocityThread, self, self.Plumeproj))
 
         self.Plumeproj2 = self:CreateProjectile('/effects/EMPFluxWarhead/EMPFluxWarheadEffect02_proj.bp')
-        self.Trash:Add(ForkThread(plumeThread, self, self.Plumeproj2, self.Plumeproj2.Blueprint.Display.UniformScale))
-        self.Trash:Add(ForkThread(plumeVelocityThread, self, self.Plumeproj2))
+        TrashBagAdd(trash,ForkThread(plumeThread, self, self.Plumeproj2, self.Plumeproj2.Blueprint.Display.UniformScale))
+        TrashBagAdd(trash,ForkThread(plumeVelocityThread, self, self.Plumeproj2))
 
         self.Plumeproj3 = self:CreateProjectile('/effects/EMPFluxWarhead/EMPFluxWarheadEffect03_proj.bp')
-        self.Trash:Add(ForkThread(plumeThread, self, self.Plumeproj3, self.Plumeproj3.Blueprint.Display.UniformScale))
-        self.Trash:Add(ForkThread(plumeVelocityThread, self, self.Plumeproj3))
+        TrashBagAdd(trash,ForkThread(plumeThread, self, self.Plumeproj3, self.Plumeproj3.Blueprint.Display.UniformScale))
+        TrashBagAdd(trash,ForkThread(plumeVelocityThread, self, self.Plumeproj3))
 
         CreateDecal(self:GetPosition(), RandomFloat(0,2*math.pi), 'nuke_scorch_001_albedo', '', 'Albedo', 28, 28, 500, 0, army)
 
         -- Emitter Effects
-        self.Trash:Add(ForkThread(self.EmitterEffectsThread, self, self.Plumeproj))
+        TrashBagAdd(trash,ForkThread(self.EmitterEffectsThread, self, self.Plumeproj))
     end,
 
     ---@param self CIFEMPFluxWarhead02
@@ -84,9 +94,9 @@ CIFEMPFluxWarhead02 = ClassProjectile(NullShell) {
         -- Launch projectiles at semi-random angles away from the sphere, with enough
         -- initial velocity to escape sphere core
         for i = 0, (numProjectiles -1) do
-            xVec = math.sin(angleInitial + (i*angle) + RandomFloat(-angleVariation, angleVariation))
+            xVec = MathSin(angleInitial + (i*angle) + RandomFloat(-angleVariation, angleVariation))
             yVec = 0.3 + RandomFloat(-0.8, 1.0)
-            zVec = math.cos(angleInitial + (i*angle) + RandomFloat(-angleVariation, angleVariation))
+            zVec = MathCos(angleInitial + (i*angle) + RandomFloat(-angleVariation, angleVariation))
             velocity = 2.4 + (yVec * 3)
             table.insert(projectiles, self:CreateProjectile('/projectiles/CIFEMPFluxWarhead03/CIFEMPFluxWarhead03_proj.bp', 0, 0, 0, xVec, yVec, zVec):SetVelocity(velocity):SetBallisticAcceleration(1.0))
         end
@@ -100,13 +110,15 @@ CIFEMPFluxWarhead02 = ClassProjectile(NullShell) {
     ---@param self CIFEMPFluxWarhead02
     ---@param plume Projectile
     PlumeVelocityThread = function(self, plume)
-        plume:SetVelocity(0,5.35 * self.PlumeVelocityScale,0)
+        local plumeVelocityScale = self.PlumeVelocityScale
+
+        plume:SetVelocity(0,5.35 * plumeVelocityScale,0)
         WaitTicks(6)
-        plume:SetVelocity(0,23 * self.PlumeVelocityScale,0)
+        plume:SetVelocity(0,23 * plumeVelocityScale,0)
         WaitTicks(6)
-        plume:SetVelocity(0,45 * self.PlumeVelocityScale,0)
+        plume:SetVelocity(0,45 * plumeVelocityScale,0)
         WaitTicks(14)
-        plume:SetVelocity(0,27 * self.PlumeVelocityScale,0)
+        plume:SetVelocity(0,27 * plumeVelocityScale,0)
     end,
 
     ---@param self CIFEMPFluxWarhead02 unused

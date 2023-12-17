@@ -26,6 +26,7 @@ local CAANanoDartProjectileOnCreate = CAANanoDartProjectile.OnCreate
 -- upvalue scope for performance
 local ForkThread = ForkThread
 local WaitTicks = WaitTicks
+local TrashBagAdd = TrashBag.Add
 
 --- Cybran Anti Air Projectile
 ---@class CAANanoDart04: CAANanoDartProjectile02
@@ -37,10 +38,11 @@ CAANanoDart04 = ClassProjectile(CAANanoDartProjectile) {
         --Set the orientation of this thing to facing the target from the beginning.
         local px, py, pz = self:GetPositionXYZ()
         local targetPos = self:GetCurrentTargetPosition()
+        local trash = self.Trash
 
         --Determine and set the initial velocity of the projectile.
         self:SetVelocity(targetPos[1] - px, targetPos[2] - py - 40, targetPos[3] - pz)
-        self.Trash:Add(ForkThread(self.UpdateThread, self))
+        TrashBagAdd(trash,ForkThread(self.UpdateThread, self))
     end,
 
     ---@param self CAANanoDart04

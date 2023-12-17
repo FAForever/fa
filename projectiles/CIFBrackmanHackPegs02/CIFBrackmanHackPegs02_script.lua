@@ -8,6 +8,11 @@ local TargetPos
 local RandomInt = import("/lua/utilities.lua").GetRandomInt
 local EffectTemplate = import("/lua/effecttemplates.lua")
 
+-- upvalue for perfomance
+local ForkThread = ForkThread
+local WaitTicks = WaitTicks
+local TrashBagAdd = TrashBag.Add
+
 --This one should just like be something kind of new compared to the older version
 ---@class CIFBrackmanHackPegs02 : CDFBrackmanHackPegProjectile02
 CIFBrackmanHackPegs02 = ClassProjectile(import("/lua/cybranprojectiles.lua").CDFBrackmanHackPegProjectile02) {
@@ -17,10 +22,11 @@ CIFBrackmanHackPegs02 = ClassProjectile(import("/lua/cybranprojectiles.lua").CDF
     ---@param TargetEntity Prop|Unit unused
     OnImpact = function(self, TargetType, TargetEntity)
         local army = self.Army
+        local trash = self.Trash
 
         self:SetVelocity(0)
         self:SetBallisticAcceleration(0)
-        self.Trash:Add(ForkThread(self.WaitingForDeath,self))
+        TrashBagAdd(trash,ForkThread(self.WaitingForDeath,self))
         self:CreateImpactEffects(army, self.FxImpactLand, 1 )
         for k, v in EffectTemplate.CBrackmanCrabPegAmbient01 do
 			CreateEmitterOnEntity( self, army, v )

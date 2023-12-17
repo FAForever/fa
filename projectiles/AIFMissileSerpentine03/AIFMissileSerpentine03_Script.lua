@@ -1,8 +1,12 @@
-local AMissileSerpentine02Projectile = import("/lua/aeonprojectiles.lua").AMissileSerpentine02Projectile
+local AMissileSerpentineProjectile = import("/lua/aeonprojectiles.lua").AMissileSerpentine02Projectile
+
+-- upvalue for performance
+local ForkThread = ForkThread
+local TrashBagAdd = TrashBag.Add
 
 --- Serpentine Missile 03 : XAS0306
----@class AIFMissileTactical03: AMissileSerpentine02Projectile
-AIFMissileTactical03 = ClassProjectile(AMissileSerpentine02Projectile) {
+---@class AIFMissileTactical03: AMissileSerpentineProjectile
+AIFMissileTactical03 = ClassProjectile(AMissileSerpentineProjectile) {
 
     -- separate trajectory components to make it feel like a barrage
     LaunchTicks = 26,
@@ -15,9 +19,11 @@ AIFMissileTactical03 = ClassProjectile(AMissileSerpentine02Projectile) {
 
     ---@param self AIFMissileTactical03
     OnCreate = function(self)
-        AMissileSerpentine02Projectile.OnCreate(self)
+        AMissileSerpentineProjectile.OnCreate(self)
+
+        local trash = self.Trash
         self:SetCollisionShape('Sphere', 0, 0, 0, 3.0)
-        self.MoveThread = self.Trash:Add(ForkThread(self.MovementThread, self))
+        self.MoveThread = TrashBagAdd(trash, ForkThread(self.MovementThread, self))
     end,
 }
 TypeClass = AIFMissileTactical03

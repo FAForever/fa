@@ -1,5 +1,10 @@
 local CDepthChargeProjectile = import("/lua/cybranprojectiles.lua").CDepthChargeProjectile
 
+-- upvalue for performance
+local ForkThread = ForkThread
+local TrashBagAdd = TrashBag.Add
+local WaitTicks = WaitTicks
+
 --- Ship-based Anti-Torpedo Script
 ---@class CIMAntiTorpedo02 : CDepthChargeProjectile
 CIMAntiTorpedo02 = ClassProjectile(CDepthChargeProjectile) {
@@ -9,7 +14,8 @@ CIMAntiTorpedo02 = ClassProjectile(CDepthChargeProjectile) {
 	OnCreate = function(self, inWater)
         CDepthChargeProjectile.OnCreate(self, inWater)
         self:SetBallisticAcceleration(0)
-        self.Trash:Add(ForkThread( self.MotionThread,self))
+        local trash = self.Trash
+        TrashBagAdd(trash,ForkThread( self.MotionThread,self))
     end,
 
     ---@param self CIMAntiTorpedo02

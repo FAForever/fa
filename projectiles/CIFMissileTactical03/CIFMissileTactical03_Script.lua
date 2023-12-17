@@ -1,5 +1,9 @@
 local CLOATacticalMissileProjectile = import("/lua/cybranprojectiles.lua").CLOATacticalMissileProjectile
 
+-- upvalue for performance
+local ForkThread = ForkThread
+local TrashBagAdd = TrashBag.Add
+
 --- URB2108 : cybran TML
 --- Cybran "Loa" Tactical Missile, structure unit launched variant of this projectile,
 --- with a higher arc and distance based adjusting trajectory. Splits into child projectile
@@ -11,7 +15,8 @@ CIFMissileTactical03 = ClassProjectile(CLOATacticalMissileProjectile) {
     ---@param self CLOATacticalMissileProjectile
     OnCreate = function(self)
         CLOATacticalMissileProjectile.OnCreate(self)
-        self.MoveThread = self.Trash:Add(ForkThread( self.MovementThread,self ))
+        local trash = self.Trash
+        self.MoveThread = TrashBagAdd(trash,ForkThread( self.MovementThread,self ))
     end,
 }
 TypeClass = CIFMissileTactical03

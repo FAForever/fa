@@ -26,6 +26,7 @@ local CAANanoDartProjectileOnCreate = CAANanoDartProjectile.OnCreate
 -- upvalue scope for performance
 local ForkThread = ForkThread
 local WaitTicks = WaitTicks
+local TrashBagAdd = TrashBag.Add
 
 -- Cybran Anti Air Projectile
 ---@class CAANanoDart01: CAANanoDartProjectile
@@ -34,7 +35,8 @@ CAANanoDart01 = ClassProjectile(CAANanoDartProjectile) {
     ---@param self CAANanoDart01
     OnCreate = function(self)
         CAANanoDartProjectileOnCreate(self)
-        self.Trash:Add(ForkThread(self.UpdateThread, self))
+        local trash = self.Trash
+        TrashBagAdd(trash,ForkThread(self.UpdateThread, self))
     end,
 
     ---@param self CAANanoDart01

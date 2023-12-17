@@ -1,5 +1,10 @@
 local SEnergyLaser = import("/lua/seraphimprojectiles.lua").SEnergyLaser
 
+-- upvalue for perfomance
+local ForkThread = ForkThread
+local WaitTicks = WaitTicks
+local TrashBagAdd = TrashBag.Add
+
 --- Seraphim Energy Being Laser
 ---@class SDFEnergyLaser01 : SEnergyLaser
 SDFEnergyLaser01 = ClassProjectile(SEnergyLaser) {
@@ -7,7 +12,8 @@ SDFEnergyLaser01 = ClassProjectile(SEnergyLaser) {
 	---@param self SDFEnergyLaser01
 	OnCreate = function(self)
 		SEnergyLaser.OnCreate(self)
-        self.Trash:Add(ForkThread( self.MovementThread,self ))
+		local trash = self.Trash
+        TrashBagAdd(trash,ForkThread( self.MovementThread,self ))
     end,
 
 	---@param self SDFEnergyLaser01

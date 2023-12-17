@@ -144,9 +144,15 @@
 ---@field FlareRadius number
 -- Speed at which thing sinks
 ---@field SinkSpeed number
+--- Blueprint String
+---@field FragmentId string
+--- Number of fragments to create
+---@field Fragments number
 
 
 ---@class ProjectileBlueprintAudio
 --- sound to play when the projectile is exploaded
 ---@field Explosion SoundHandle
+--- sound to play when the projectile is impacted
+---@field Impact SoundHandle
 

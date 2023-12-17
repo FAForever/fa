@@ -1,5 +1,11 @@
 local CTorpedoShipProjectile = import("/lua/cybranprojectiles.lua").CTorpedoShipProjectile
 
+-- upvalue for perfomance
+local ForkThread = ForkThread
+local WaitTicks = WaitTicks
+local TrashBagAdd = TrashBag.Add
+
+
 -- Cybran Non-guided Torpedo, Made to be fired from above the water
 ---@class CANTorpedoMeson01 : CTorpedoShipProjectile
 CANTorpedoMeson01 = ClassProjectile(CTorpedoShipProjectile) {
@@ -14,13 +20,15 @@ CANTorpedoMeson01 = ClassProjectile(CTorpedoShipProjectile) {
     ---@param self CANTorpedoMeson01
     OnEnterWater = function(self)
         CTorpedoShipProjectile.OnEnterWater(self)
+        local trash = self.Trash
+
         self:TrackTarget(true)
         self:StayUnderwater(true)
         self:SetBallisticAcceleration(0)
         self:SetTurnRate(120)
         self:SetMaxSpeed(18)
         self:SetVelocity(3)
-        self.Trash:Add(ForkThread(self.SpinUpThread))
+        TrashBagAdd(trash,ForkThread(self.SpinUpThread))
     end,
 
     ---@param self CANTorpedoMeson01

@@ -7,20 +7,24 @@
 local EffectTemplate = import("/lua/effecttemplates.lua")
 local RandomFloat = import("/lua/utilities.lua").GetRandomFloat
 
+local MathSin = math.sin
+local MathCos = math.cos
+
 ---@class AIFQuanticCluster02 : AQuantumCluster
 AIFQuanticCluster02 = ClassProjectile(import("/lua/aeonprojectiles.lua").AQuantumCluster) {
 
     ---@param self AIFQuanticCluster02
-    ---@param TargetType string
-    ---@param TargetEntity Prop|Unit
+    ---@param TargetType string unused
+    ---@param TargetEntity Prop|Unit unused
     OnImpact = function(self, TargetType, TargetEntity)
 
+        local army = self.Army
         local FxFragEffect = EffectTemplate.TFragmentationSensorShellFrag
         local ChildProjectileBP = '/projectiles/AIFQuanticCluster03/AIFQuanticCluster03_proj.bp'
 
         -- Split effects
         for k, v in FxFragEffect do
-            CreateEmitterAtEntity( self, self.Army, v )
+            CreateEmitterAtEntity( self, army, v )
         end
 
         local vx, vy, vz = self:GetVelocity()
@@ -43,8 +47,8 @@ AIFQuanticCluster02 = ClassProjectile(import("/lua/aeonprojectiles.lua").AQuantu
 
         -- Launch projectiles at semi-random angles away from split location
         for i = 0, (numProjectiles -1) do
-            xVec = vx + (math.sin(angleInitial + (i*angle) + RandomFloat(-angleVariation, angleVariation))) * spreadMul
-            zVec = vz + (math.cos(angleInitial + (i*angle) + RandomFloat(-angleVariation, angleVariation))) * spreadMul
+            xVec = vx + (MathSin(angleInitial + (i*angle) + RandomFloat(-angleVariation, angleVariation))) * spreadMul
+            zVec = vz + (MathCos(angleInitial + (i*angle) + RandomFloat(-angleVariation, angleVariation))) * spreadMul
             local proj = self:CreateChildProjectile(ChildProjectileBP)
             proj:SetVelocity(xVec,yVec,zVec)
             proj:SetVelocity(velocity)

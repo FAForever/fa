@@ -39,10 +39,11 @@ AIMAntiMissile01 = ClassProjectile(AIMFlareProjectile) {
     ---@param self AIMAntiMissile01
     OnDestroy = function(self)
         AIMFlareProjectileOnDestroy(self)
-
+        local army = self.Army
         local redirectedMissiles = self.RedirectedMissiles
+
         if redirectedMissiles > 0 then
-            CreateLightParticleIntel(self, -1, self.Army, redirectedMissiles, 5, 'glow_02', 'ramp_blue_22')
+            CreateLightParticleIntel(self, -1, army, redirectedMissiles, 5, 'glow_02', 'ramp_blue_22')
         end
     end,
 }

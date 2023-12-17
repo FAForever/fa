@@ -7,10 +7,19 @@ local SHeavyCavitationTorpedo = import("/lua/seraphimprojectiles.lua").SHeavyCav
 local RandomFloat = import("/lua/utilities.lua").GetRandomFloat
 local EffectTemplate = import("/lua/effecttemplates.lua")
 
+-- upvalue for perfomance
+local ForkThread = ForkThread
+local WaitTicks = WaitTicks
+local CreateEmitterAtEntity = CreateEmitterAtEntity
+local CreateEmitterOnEntity = CreateEmitterOnEntity
+local TrashBagAdd = TrashBag.Add
+local MathSin = math.sin
+local MathCos = math.cos
+
 --- Heavy Cavitation Torpedo Projectile script, XSA0204
 ---@class SANHeavyCavitationTorpedo01 : SHeavyCavitationTorpedo
 SANHeavyCavitationTorpedo01 = ClassProjectile(SHeavyCavitationTorpedo) {
-    
+
     FxSplashScale = 0.4,
     FxEnterWaterEmitter = {
         '/effects/emitters/destruction_water_splash_ripples_01_emit.bp',
@@ -20,25 +29,30 @@ SANHeavyCavitationTorpedo01 = ClassProjectile(SHeavyCavitationTorpedo) {
     ---@param self SANHeavyCavitationTorpedo01
     OnEnterWater = function(self)
         SHeavyCavitationTorpedo.OnEnterWater(self)
+        local army = self.Army
+        local trash = self.Trash
 
         self.AirTrails:Destroy()
-        CreateEmitterOnEntity(self,self.Army,EffectTemplate.SHeavyCavitationTorpedoFxTrails)
+        CreateEmitterOnEntity(self,army,EffectTemplate.SHeavyCavitationTorpedoFxTrails)
 
-        self.Trash:Add(ForkThread(self.ProjectileSplit,self))
+        TrashBagAdd(trash,ForkThread(self.ProjectileSplit,self))
     end,
 
     ---@param self SANHeavyCavitationTorpedo01
     ---@param inWater boolean
     OnCreate = function(self,inWater)
         SHeavyCavitationTorpedo.OnCreate(self,inWater)
+        local army = self.Army
+
         -- if we are starting in the water then immediately switch to tracking in water
         self:TrackTarget(false)
-        self.AirTrails = CreateEmitterOnEntity(self,self.Army,EffectTemplate.SHeavyCavitationTorpedoFxTrails02)
+        self.AirTrails = CreateEmitterOnEntity(self,army,EffectTemplate.SHeavyCavitationTorpedoFxTrails02)
         self:SetCollisionShape('Sphere', 0, 0, 0, 0.5)
     end,
 
     ---@param self SANHeavyCavitationTorpedo01
     ProjectileSplit = function(self)
+        local army = self.Army
         WaitTicks(2)
         local ChildProjectileBP = '/projectiles/SANHeavyCavitationTorpedo04/SANHeavyCavitationTorpedo04_proj.bp'
         local vx, vy, vz = self:GetVelocity()
@@ -66,13 +80,13 @@ SANHeavyCavitationTorpedo01 = ClassProjectile(SHeavyCavitationTorpedo) {
 
         -- Split effects
         for k, v in FxFragEffect do
-            CreateEmitterAtEntity(self, self.Army, v)
+            CreateEmitterAtEntity(self, army, v)
         end
 
         -- Launch projectiles at semi-random angles away from split location
         for i = 0, (numProjectiles -1) do
-            xVec = vx + (math.sin(angleInitial + (i*angle) + RandomFloat(-angleVariation, angleVariation))) * spreadMul
-            zVec = vz + (math.cos(angleInitial + (i*angle) + RandomFloat(-angleVariation, angleVariation))) * spreadMul
+            xVec = vx + (MathSin(angleInitial + (i*angle) + RandomFloat(-angleVariation, angleVariation))) * spreadMul
+            zVec = vz + (MathCos(angleInitial + (i*angle) + RandomFloat(-angleVariation, angleVariation))) * spreadMul
             local proj = self:CreateChildProjectile(ChildProjectileBP)
             proj.DamageData = DividedDamageData
             proj:PassData(self:GetTrackingTarget())

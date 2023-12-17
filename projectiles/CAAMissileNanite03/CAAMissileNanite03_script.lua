@@ -26,6 +26,7 @@ local CAAMissileNaniteProjectileOnCreate = CAAMissileNaniteProjectile.OnCreate
 -- upvalue scope for performance
 local ForkThread = ForkThread
 local WaitTicks = WaitTicks
+local TrashBagAdd = TrashBag.Add
 
 -- AA Missile for Cybrans
 ---@class CAAMissileNanite03: CAAMissileNaniteProjectile03
@@ -34,7 +35,8 @@ CAAMissileNanite03 = ClassProjectile(CAAMissileNaniteProjectile) {
     ---@param self CAAMissileNanite03
     OnCreate = function(self)
         CAAMissileNaniteProjectileOnCreate(self)
-        self.Trash:Add(ForkThread(self.UpdateThread, self))
+        local trash = self.Trash
+        TrashBagAdd(trash, ForkThread(self.UpdateThread, self))
     end,
 
     ---@param self CAAMissileNanite03

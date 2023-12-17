@@ -10,10 +10,9 @@ CDFLaserDisintegrator03 = ClassProjectile(CDisintegratorLaserProjectile) {
     ---@param EffectScale number
     CreateImpactEffects = function(self, army, EffectTable, EffectScale)
         local launcher = self.Launcher
-        local Army = self.Army
         if launcher and launcher:HasEnhancement('EMPCharge') then
-            CreateLightParticle(self, -1, Army, 1.9, 9, 'ring_07', 'ramp_red_04')
-            CreateEmitterAtEntity(self, Army,'/effects/emitters/cybran_empgrenade_hit_03_emit.bp')
+            CreateLightParticle(self, -1, army, 1.9, 9, 'ring_07', 'ramp_red_04')
+            CreateEmitterAtEntity(self, army,'/effects/emitters/cybran_empgrenade_hit_03_emit.bp')
         end
         CDisintegratorLaserProjectile.CreateImpactEffects(self, army, EffectTable, EffectScale)
     end,

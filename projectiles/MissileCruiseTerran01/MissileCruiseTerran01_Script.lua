@@ -1,5 +1,14 @@
 local Projectile = import("/lua/sim/projectile.lua").Projectile
 
+-- upvalue for performance
+local CreateEmitterOnEntity = CreateEmitterOnEntity
+local AttachBeamToEntity = AttachBeamToEntity
+local WaitTicks = WaitTicks
+local ForkThread = ForkThread
+local CreateBeamEmitter = CreateBeamEmitter
+local TrashBagAdd = TrashBag.Add
+
+
 --- script for projectile Missile
 ---@class MissileCruiseTerran01 : Projectile
 MissileCruiseTerran01 = ClassProjectile(Projectile) {
@@ -40,21 +49,24 @@ MissileCruiseTerran01 = ClassProjectile(Projectile) {
     ---@param self MissileCruiseTerran01
     OnCreate = function(self)
         Projectile.OnCreate(self)
-        self:SetCollisionShape('Sphere', 0, 0, 0, 1.0)
-
-        self.trails = {}
         local army = self.Army
+        local trash = self.Trash
+
+        self:SetCollisionShape('Sphere', 0, 0, 0, 1.0)
+        self.trails = {}
 
         for i in self.FxTrails do
             table.insert(self.trails, CreateEmitterOnEntity(self, army,self.FxLaunchTrails[i]):ScaleEmitter(self.FxLaunchTrailScale):OffsetEmitter(0, 0, self.FxLaunchTrailOffset))
         end
         self.MissileExhaust = CreateBeamEmitter('/effects/emitters/missile_cruise_munition_exhaust_beam_01_emit.bp',army)
         AttachBeamToEntity(self.MissileExhaust, self, -1, army)
-        self.Trash:Add(ForkThread(self.CruiseMissileThread,self))
+        TrashBagAdd(trash,ForkThread(self.CruiseMissileThread,self))
     end,
 
     ---@param self MissileCruiseTerran01
     CruiseMissileThread = function(self)
+        local army = self.Army
+
         self:TrackTarget(false)
         WaitTicks(41)
         self:TrackTarget(true)
@@ -67,7 +79,6 @@ MissileCruiseTerran01 = ClassProjectile(Projectile) {
         end
         self.MissileExhaust:Destroy()
         WaitTicks(6) --Falling
-        local army = self.Army
         self.MissileExhaust = CreateBeamEmitter('/effects/emitters/missile_cruise_munition_exhaust_beam_02_emit.bp', army)
         AttachBeamToEntity(self.MissileExhaust, self, -1, army)
 

@@ -1,5 +1,10 @@
 local CLOATacticalChildMissileProjectile = import("/lua/cybranprojectiles.lua").CLOATacticalChildMissileProjectile
 
+-- upvalue for performance
+local ForkThread = ForkThread
+local TrashBagAdd = TrashBag.Add
+local WaitTicks = WaitTicks
+
 --- Cybran "Loa" Tactical Missile, child missiles that create when the mother projectile is shot down by
 --- enemy anti-missile systems
 ---@class CIFMissileTacticalSplit01 : CLOATacticalChildMissileProjectile
@@ -8,7 +13,8 @@ CIFMissileTacticalSplit01 = ClassProjectile(CLOATacticalChildMissileProjectile) 
     ---@param self CIFMissileTacticalSplit01
     OnCreate = function(self)
         CLOATacticalChildMissileProjectile.OnCreate(self)
-        self.MoveThread = self.Trash:Add(ForkThread(self.MovementThread,self))
+        local trash = self.Trash
+        self.MoveThread = TrashBagAdd(trash,ForkThread(self.MovementThread,self))
     end,
 
     -- Give the projectile enough time to get out of the explosion
