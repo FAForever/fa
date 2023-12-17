@@ -177,7 +177,7 @@ CategoryMatcher("Build sensors / Select nearest air scout")
 {
     CategoryAction()
         :Action "UI_SelectByCategory +nearest AIR INTELLIGENCE",
-    CategoryAction(categories.ENGINEER)
+    CategoryAction(categories.ENGINEER + categories.FACTORY + categories.EXTERNALFACTORY)
         :Action "UI_Lua import('/lua/keymap/hotbuild.lua').buildAction('Sensors')",
 }
 
