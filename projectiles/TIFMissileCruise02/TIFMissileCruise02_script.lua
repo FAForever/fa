@@ -24,6 +24,10 @@
 local TMissileCruiseSubProjectile = import("/lua/terranprojectiles.lua").TMissileCruiseSubProjectile
 local EffectTemplate = import("/lua/effecttemplates.lua")
 
+-- upvalue for performance
+local ForkThread = ForkThread
+local TrashBagAdd = TrashBag.Add
+
 --- Used by ues0304
 ---@class TIFMissileCruise02 : TMissileCruiseSubProjectile
 TIFMissileCruise02 = ClassProjectile(TMissileCruiseSubProjectile) {
@@ -55,7 +59,8 @@ TIFMissileCruise02 = ClassProjectile(TMissileCruiseSubProjectile) {
     ---@param self TIFMissileCruise02
     OnCreate = function(self)
         TMissileCruiseSubProjectile.OnCreate(self)
-        self.MoveThread = self.Trash:Add(ForkThread(self.MovementThread, self))
+        local trash = self.Trash
+        self.MoveThread = TrashBagAdd(trash,ForkThread(self.MovementThread, self))
     end,
 
     ---@param self TIFMissileCruise02

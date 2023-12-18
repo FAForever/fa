@@ -24,6 +24,10 @@
 local TIFMissileNuke = import("/lua/terranprojectiles.lua").TIFMissileNuke
 local TacticalMissileComponent = import('/lua/sim/defaultprojectiles.lua').TacticalMissileComponent
 
+-- upvalue for performance
+local ForkThread = ForkThread
+local TrashBagAdd = TrashBag.Add
+
 --- used by uel0001
 ---@class TIFMissileNukeCDR : TIFMissileNuke, TacticalMissileComponent
 TIFMissileNukeCDR = ClassProjectile(TIFMissileNuke, TacticalMissileComponent) {
@@ -45,9 +49,10 @@ TIFMissileNukeCDR = ClassProjectile(TIFMissileNuke, TacticalMissileComponent) {
     ---@param self TIFMissileNukeCDR
     OnCreate = function(self)
         local army = self.Army
+        local trash = self.Trash
 
         TIFMissileNuke.OnCreate(self)
-        self.MoveThread = self.Trash:Add(ForkThread(self.MovementThread, self))
+        self.MoveThread = TrashBagAdd(trash,ForkThread(self.MovementThread, self))
         self.effectEntityPath = '/effects/Entities/UEFNukeEffectController02/UEFNukeEffectController02_proj.bp'
         self:LauncherCallbacks()
 

@@ -26,9 +26,10 @@ SIFThunthoArtilleryShell01 = ClassProjectile(SThunthoArtilleryShell) {
     ---@param TargetType string unused
     ---@param TargetEntity Prop|Unit unused   
     OnImpact = function(self, TargetType, TargetEntity)
+        local army = self.Army
 
         -- the split fx
-        CreateEmitterAtEntity( self, self.Army, SThunderStormCannonProjectileSplitFx[1])
+        CreateEmitterAtEntity( self, army, SThunderStormCannonProjectileSplitFx[1])
 
         -- Create several other projectiles in a dispersal pattern
         local bp = self.Blueprint.Physics

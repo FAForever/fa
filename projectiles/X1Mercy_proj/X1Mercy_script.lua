@@ -1,6 +1,12 @@
 local AMiasmaProjectile = import('/lua/aeonprojectiles.lua').AMiasmaProjectile
 local VisionMarker = import("/lua/sim/vizmarker.lua").VisionMarkerOpti
 
+-- upvalue for performance
+local ForkThread = ForkThread
+local CreateEmitterAtEntity = CreateEmitterAtEntity
+local DamageArea = DamageArea
+local TrashBagAdd = TrashBag.Add
+
 --- script for projectile AIFMiasmaShell
 ---@class X1Mercy : AMiasmaProjectile
 X1Mercy = Class(AMiasmaProjectile) {
@@ -27,12 +33,13 @@ X1Mercy = Class(AMiasmaProjectile) {
     ---@param self X1Mercy
     OnCreate = function(self)
         AMiasmaProjectile.OnCreate(self)
-
+        local trash = self.Trash
         local launcher = self.Launcher
+
         if launcher and not launcher.Dead then
             launcher:ProjectileFired()
         end
-        self.Trash:Add(ForkThread( self.SplitThread, self ))
+        TrashBagAdd(trash, ForkThread( self.SplitThread, self ))
     end,
 
     ---@param self X1Mercy

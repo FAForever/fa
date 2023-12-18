@@ -23,6 +23,10 @@
 local SLaanseTacticalMissile = import("/lua/seraphimprojectiles.lua").SLaanseTacticalMissile
 local TacticalMissileComponent = import('/lua/sim/defaultprojectiles.lua').TacticalMissileComponent
 
+-- upvalue for perfomance
+local ForkThread = ForkThread
+local TrashBagAdd = TrashBag.Add
+
 --- Used by XSS0202
 ---@class SIFLaanseTacticalMissile02 : SLaanseTacticalMissile, TacticalMissileComponent
 SIFLaanseTacticalMissile02 = ClassProjectile(SLaanseTacticalMissile, TacticalMissileComponent) {
@@ -41,7 +45,8 @@ SIFLaanseTacticalMissile02 = ClassProjectile(SLaanseTacticalMissile, TacticalMis
     ---@param self SIFLaanseTacticalMissile02
     OnCreate = function(self)
         SLaanseTacticalMissile.OnCreate(self)
-        self.MoveThread = self.Trash:Add(ForkThread(self.MovementThread, self))
+        local trash = self.Trash
+        self.MoveThread = TrashBagAdd(trash, ForkThread(self.MovementThread, self))
     end,
 }
 TypeClass = SIFLaanseTacticalMissile02

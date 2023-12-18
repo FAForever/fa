@@ -10,10 +10,9 @@ TDFPlasmaHeavy03 = ClassProjectile(THeavyPlasmaCannonProjectile) {
 	---@param EffectScale number
     CreateImpactEffects = function( self, army, EffectTable, EffectScale )
 		local launcher = self.Launcher
-		local Army = self.Army
 		if launcher and launcher:HasEnhancement( 'HighExplosiveOrdnance' ) then
-			CreateLightParticle( self, -1, Army, 2.0, 9, 'ring_08', 'ramp_white_03' ) 
-			CreateEmitterAtEntity(self, Army,'/effects/emitters/terran_subcommander_aoe_01_emit.bp')
+			CreateLightParticle( self, -1, army, 2.0, 9, 'ring_08', 'ramp_white_03' ) 
+			CreateEmitterAtEntity(self, army,'/effects/emitters/terran_subcommander_aoe_01_emit.bp')
 		end
 		THeavyPlasmaCannonProjectile.CreateImpactEffects( self, army, EffectTable, EffectScale )
 	end,
