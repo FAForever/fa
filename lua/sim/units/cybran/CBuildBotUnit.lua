@@ -50,6 +50,14 @@ CBuildBotUnit = ClassDummyUnit(DummyUnit) {
     end,
 
     ---@param self CBuildBotUnit
+    OnCreate = function(self)
+        DummyUnit.OnCreate(self)
+
+        -- prevent drone from consuming anything
+        UnitSetConsumptionActive(self, false)
+    end,
+
+    ---@param self CBuildBotUnit
     OnDestroy = function(self)
         TrashBagDestroy(self.Trash)
 
