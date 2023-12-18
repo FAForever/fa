@@ -9,6 +9,13 @@ local util = import("/lua/utilities.lua")
 local aWeapons = import("/lua/aeonweapons.lua")
 local AAASonicPulseBatteryWeapon = aWeapons.AAASonicPulseBatteryWeapon
 
+-- upvalue for perfomance
+local ClassWeapon = ClassWeapon
+local ForkThread = ForkThread
+local WaitSeconds = WaitSeconds
+local TrashBagAdd = TrashBag.Add
+local MathFloor = math.floor
+
 ---@class UAA0104 : AirTransport
 UAA0104 = ClassUnit(AirTransport) {
     AirDestructionEffectBones = { 'Exhaust', 'Wing_Right', 'Wing_Left', 'Turret_Right', 'Turret_Left',
@@ -25,12 +32,15 @@ UAA0104 = ClassUnit(AirTransport) {
     },
 
     -- Override air destruction effects so we can do something custom here
+    ---@param self UAA0104
+    ---@param scale number unused
     CreateUnitAirDestructionEffects = function(self, scale)
-        self.Trash:Add(ForkThread(self.AirDestructionEffectsThread, self))
+        local trash = self.Trash
+        TrashBagAdd(trash,ForkThread(self.AirDestructionEffectsThread, self))
     end,
 
     AirDestructionEffectsThread = function(self)
-        local numExplosions = math.floor(table.getn(self.AirDestructionEffectBones) * 0.5)
+        local numExplosions = MathFloor(table.getn(self.AirDestructionEffectBones) * 0.5)
         for i = 0, numExplosions do
             explosion.CreateDefaultHitExplosionAtBone(self, self.AirDestructionEffectBones[util.GetRandomInt(1, numExplosions)], 0.5)
             WaitSeconds(util.GetRandomFloat(0.2, 0.9))

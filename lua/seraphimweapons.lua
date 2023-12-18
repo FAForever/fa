@@ -15,6 +15,17 @@ local DefaultProjectileWeapon = WeaponFile.DefaultProjectileWeapon
 local DefaultBeamWeapon = WeaponFile.DefaultBeamWeapon
 local OverchargeWeapon = WeaponFile.OverchargeWeapon
 local EffectTemplate = import("/lua/effecttemplates.lua")
+local SCCollisionBeam = CollisionBeamFile.SCCollisionBeam
+
+-- upvalue for performance
+local CreateAttachedEmitter = CreateAttachedEmitter
+local GetTerrainType = GetTerrainType
+local Random = Random
+local WaitSeconds = WaitSeconds
+local CreateSplat = CreateSplat
+local KillThread = KillThread
+local TrashBagAdd = TrashBag.Add
+
 
 ---@class SANAnaitTorpedo : DefaultProjectileWeapon
 SANAnaitTorpedo = ClassWeapon(DefaultProjectileWeapon) {
@@ -314,6 +325,95 @@ SDFSniperShotSniperMode = ClassWeapon(DefaultProjectileWeapon) {
 
 ---@class SB0OhwalliExperimentalStrategicBombWeapon : DefaultProjectileWeapon
 SB0OhwalliExperimentalStrategicBombWeapon = ClassWeapon(DefaultProjectileWeapon) {}
+
+---@class PhasonCollisionBeam : SCCollisionBeam
+PhasonCollisionBeam = ClassWeapon(SCCollisionBeam) {
+    FxBeamStartPoint = {
+        '/Effects/Emitters/seraphim_experimental_phasonproj_muzzle_flash_01_emit.bp',
+        '/Effects/Emitters/seraphim_experimental_phasonproj_muzzle_flash_02_emit.bp',
+        '/Effects/Emitters/seraphim_experimental_phasonproj_muzzle_flash_03_emit.bp',
+        '/Effects/Emitters/seraphim_experimental_phasonproj_muzzle_flash_04_emit.bp',
+        '/Effects/Emitters/seraphim_experimental_phasonproj_muzzle_flash_05_emit.bp',
+        '/Effects/Emitters/seraphim_experimental_phasonproj_muzzle_flash_06_emit.bp',
+        '/Effects/Emitters/seraphim_electricity_emit.bp'
+    },
+    FxBeam = {
+        '/Effects/Emitters/seraphim_lightning_beam_01_emit.bp',
+    },
+    FxBeamEndPoint = {
+        '/Effects/Emitters/seraphim_lightning_hit_01_emit.bp',
+        '/Effects/Emitters/seraphim_lightning_hit_02_emit.bp',
+        '/Effects/Emitters/seraphim_lightning_hit_03_emit.bp',
+        '/Effects/Emitters/seraphim_lightning_hit_04_emit.bp',
+    },
+
+    TerrainImpactType = 'LargeBeam01',
+    TerrainImpactScale = 0.2,
+    SplatTexture = 'czar_mark01_albedo',
+    ScorchSplatDropTime = 0.25,
+}
+
+---@class PhasonCollisionBeam2 : PhasonCollisionBeam
+PhasonCollisionBeam2 = ClassWeapon(PhasonCollisionBeam) {
+
+    FxBeam = { '/Effects/Emitters/seraphim_lightning_beam_02_emit.bp', },
+    TerrainImpactScale = 0.1,
+
+    ---@param self PhasonCollisionBeam2
+    ---@param impactType string
+    ---@param targetEntity Prop|Unit
+    OnImpact = function(self, impactType, targetEntity)
+        local trash = self.Trash
+        if impactType == 'Terrain' then
+            if self.Scorching == nil then
+                self.Scorching = TrashBagAdd(trash,ForkThread(self.ScorchThread, self))
+            end
+        elseif not impactType == 'Unit' then
+            KillThread(self.Scorching)
+            self.Scorching = nil
+        end
+        PhasonCollisionBeam.OnImpact(self, impactType, targetEntity)
+    end,
+
+    OnDisable = function(self)
+        PhasonCollisionBeam.OnDisable(self)
+        KillThread(self.Scorching)
+        self.Scorching = nil
+    end,
+
+    ScorchThread = function(self)
+        local size = 1 + (Random() * 1.1)
+        local CurrentPosition = self:GetPosition(1)
+        local LastPosition = Vector(0,0,0)
+        local skipCount = 1
+        local Util = import("/lua/utilities.lua")
+
+        while true do
+            if Util.GetDistanceBetweenTwoVectors(CurrentPosition, LastPosition) > 0.25 or skipCount > 100 then
+                CreateSplat(CurrentPosition, Util.GetRandomFloat(0,2*math.pi), self.SplatTexture, size, size, 100, 100, self.Army)
+                LastPosition = CurrentPosition
+                skipCount = 1
+            else
+                skipCount = skipCount + self.ScorchSplatDropTime
+            end
+
+            WaitSeconds(self.ScorchSplatDropTime)
+            size = 1 + (Random() * 1.1)
+            CurrentPosition = self:GetPosition(1)
+        end
+    end,
+}
+
+---@class PhasonBeam : DefaultBeamWeapon
+PhasonBeam = ClassWeapon(DefaultBeamWeapon) {
+    BeamType = PhasonCollisionBeam,
+    FxMuzzleFlash = { },
+    FxChargeMuzzleFlash = { },
+    FxUpackingChargeEffects = EffectTemplate.CMicrowaveLaserCharge01,
+    FxUpackingChargeEffectScale = 0.2,
+}
+
+
 
 --- Kept Mod Support
 local KamikazeWeapon = WeaponFile.KamikazeWeapon

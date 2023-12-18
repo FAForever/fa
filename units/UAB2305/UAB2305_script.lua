@@ -8,14 +8,26 @@
 local AStructureUnit = import("/lua/aeonunits.lua").AStructureUnit
 local AIFQuantumWarhead = import("/lua/aeonweapons.lua").AIFQuantumWarhead
 
+-- upvalue for perfomance
+local WaitTicks = WaitTicks
+local ForkThread = ForkThread
+local CreateAnimator = CreateAnimator
+local CreateAttachedEmitter = CreateAttachedEmitter
+local TrashBagAdd = TrashBag.Add
+
+
 ---@class UAB2305 : AStructureUnit
 UAB2305 = ClassUnit(AStructureUnit) {
     Weapons = {
         QuantumMissiles = ClassWeapon(AIFQuantumWarhead) {
             UnpackEffects01 = { '/effects/emitters/aeon_nuke_unpack_01_emit.bp', },
+
             PlayFxWeaponUnpackSequence = function(self)
+                local unit = self.unit
+                local army = unit.Army
+
                 for k, v in self.UnpackEffects01 do
-                    CreateAttachedEmitter(self.unit, 'B04', self.unit.Army, v)
+                    CreateAttachedEmitter(unit, 'B04', army, v)
                 end
                 AIFQuantumWarhead.PlayFxWeaponUnpackSequence(self)
             end,
@@ -25,19 +37,21 @@ UAB2305 = ClassUnit(AStructureUnit) {
     OnStopBeingBuilt = function(self, builder, layer)
         AStructureUnit.OnStopBeingBuilt(self, builder, layer)
         local bp = self.Blueprint
-        self.Trash:Add(CreateAnimator(self):PlayAnim(bp.Display.AnimationOpen))
-        self.Trash:Add(ForkThread(self.PlayArmSounds,self))
+        local trash = self.Trash
+
+        TrashBagAdd(trash, CreateAnimator(self):PlayAnim(bp.Display.AnimationOpen))
+        TrashBagAdd(trash, ForkThread(self.PlayArmSounds,self))
     end,
 
     PlayArmSounds = function(self)
-        local myBlueprint = self.Blueprint
-        if myBlueprint.Audio.Open and myBlueprint.Audio.Activate then
+        local bp = self.Blueprint
+        if bp.Audio.Open and bp.Audio.Activate then
             WaitTicks(48)
-            self:PlaySound(myBlueprint.Audio.Activate)
+            self:PlaySound(bp.Audio.Activate)
             WaitTicks(38)
-            self:PlaySound(myBlueprint.Audio.Activate)
+            self:PlaySound(bp.Audio.Activate)
             WaitTicks(39)
-            self:PlaySound(myBlueprint.Audio.Activate)
+            self:PlaySound(bp.Audio.Activate)
         end
     end,
 }

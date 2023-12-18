@@ -9,15 +9,21 @@
 --****************************************************************************
 local AEnergyCreationUnit = import("/lua/aeonunits.lua").AEnergyCreationUnit
 
+-- upvalue for perfomance
+local CreateRotator = CreateRotator
+local TrashBagAdd = TrashBag.Add
+
 ---@class UAB1201 : AEnergyCreationUnit
 UAB1201 = ClassUnit(AEnergyCreationUnit) {
     AmbientEffects = 'AT2PowerAmbient',
 
     OnStopBeingBuilt = function(self, builder, layer)
         AEnergyCreationUnit.OnStopBeingBuilt(self, builder, layer)
-        self.Trash:Add(CreateRotator(self, 'Sphere', 'x', nil, 0, 15, 80 + Random(0, 20)))
-        self.Trash:Add(CreateRotator(self, 'Sphere', 'y', nil, 0, 15, 80 + Random(0, 20)))
-        self.Trash:Add(CreateRotator(self, 'Sphere', 'z', nil, 0, 15, 80 + Random(0, 20)))
+        local trash = self.Trash
+
+        TrashBagAdd(trash,CreateRotator(self, 'Sphere', 'x', nil, 0, 15, 80 + Random(0, 20)))
+        TrashBagAdd(trash,CreateRotator(self, 'Sphere', 'y', nil, 0, 15, 80 + Random(0, 20)))
+        TrashBagAdd(trash,CreateRotator(self, 'Sphere', 'z', nil, 0, 15, 80 + Random(0, 20)))
     end,
 }
 

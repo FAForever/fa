@@ -5,17 +5,27 @@
 -------------------------------------------------------------------
 local AMassFabricationUnit = import("/lua/aeonunits.lua").AMassFabricationUnit
 
+-- upvalue for perfomance
+local CreateAnimator = CreateAnimator
+local CreateRotator = CreateRotator
+local Random = Random
+local WaitFor = WaitFor
+local TrashBagAdd = TrashBag.Add
+
+
 ---@class UAB1104 : AMassFabricationUnit
 UAB1104 = ClassUnit(AMassFabricationUnit) {
     OnCreate = function(self)
         AMassFabricationUnit.OnCreate(self)
+        local trash = self.Trash
+
         self.Damaged = false
         self.Open = false
         self.AnimFinished = true
         self.RotFinished = true
         self.Clockwise = true
         self.AnimManip = CreateAnimator(self)
-        self.Trash:Add(self.AnimManip)
+        TrashBagAdd(trash,self.AnimManip)
     end,
 
     OnStopBeingBuilt = function(self,builder,layer)
@@ -25,6 +35,10 @@ UAB1104 = ClassUnit(AMassFabricationUnit) {
 
     OpenState = State {
         Main = function(self)
+            local bp = self.Blueprint
+            local army = self.Army
+            local trash = self.Trash
+
             if self.AmbientEffects then
                 self.AmbientEffects:Destroy()
                 self.AmbientEffects = nil
@@ -32,21 +46,21 @@ UAB1104 = ClassUnit(AMassFabricationUnit) {
 
             if not self.Open then
                 self.Open = true
-                self.AnimManip:PlayAnim(self.Blueprint.Display.AnimationOpen):SetRate(1)
+                self.AnimManip:PlayAnim(bp.Display.AnimationOpen):SetRate(1)
                 WaitFor(self.AnimManip)
             end
 
             if not self.Rotator then
                 self.Rotator = CreateRotator(self, 'Axis', 'z', nil, 0, 50, 0)
-                self.Trash:Add(self.Rotator)
+                TrashBagAdd(trash,self.Rotator)
             else
                 self.Rotator:SetSpinDown(false)
             end
             self.Goal = Random(120, 300)
 
             -- Ambient effects
-            self.AmbientEffects = CreateEmitterAtEntity(self, self.Army, '/effects/emitters/aeon_t1_massfab_ambient_01_emit.bp')
-            self.Trash:Add(self.AmbientEffects)
+            self.AmbientEffects = CreateEmitterAtEntity(self, army, '/effects/emitters/aeon_t1_massfab_ambient_01_emit.bp')
+            TrashBagAdd(trash,self.AmbientEffects)
 
             while not self.Dead do
                 -- spin clockwise

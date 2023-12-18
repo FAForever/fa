@@ -4,12 +4,21 @@
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 ------------------------------------------------------------------
 local ASeaFactoryUnit = import("/lua/aeonunits.lua").ASeaFactoryUnit
+
+-- upvalue for perfomance
+local TrashBagAdd = TrashBag.Add
+
 ---@class UAB0303 : ASeaFactoryUnit
 UAB0303 = ClassUnit(ASeaFactoryUnit) {
+
+    ---@param self UAB0303
     OnCreate = function(self)
         ASeaFactoryUnit.OnCreate(self)
-        self.BuildPointSlider = CreateSlider(self, self.Blueprint.Display.BuildAttachBone or 0, -15, 0, 0, -1)
-        self.Trash:Add(self.BuildPointSlider)
+        local bp = self.blueprint
+        local trash = self.Trash
+
+        self.BuildPointSlider = CreateSlider(self, bp.Display.BuildAttachBone or 0, -15, 0, 0, -1)
+        TrashBagAdd(trash,self.BuildPointSlider)
     end,
 }
 

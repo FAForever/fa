@@ -13,7 +13,7 @@ UAA0203 = ClassUnit(AAirUnit) {
             FxChassisMuzzleFlash = { '/effects/emitters/aeon_gunship_body_illumination_01_emit.bp', },
 
             PlayFxMuzzleSequence = function(self, muzzle)
-                local army = self.unit.Army
+                local army = self.Army
                 for k, v in self.FxMuzzleFlash do
                     CreateAttachedEmitter(self.unit, muzzle, army, v)
                 end

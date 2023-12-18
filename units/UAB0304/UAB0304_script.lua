@@ -8,9 +8,15 @@ local AQuantumGateAmbient = import("/lua/effecttemplates.lua").AQuantumGateAmbie
 
 ---@class UAB0304 : AQuantumGateUnit
 UAB0304 = ClassUnit(AQuantumGateUnit) {
+
+    ---@param self UAB0304
+    ---@param builder Unit
+    ---@param layer string
     OnStopBeingBuilt = function(self,builder,layer)
+        local army = self.Army
+
         for k, v in AQuantumGateAmbient do
-            CreateAttachedEmitter(self, 'UAB0304', self.Army, v)
+            CreateAttachedEmitter(self, 'UAB0304', army, v)
         end
         AQuantumGateUnit.OnStopBeingBuilt(self, builder, layer)
     end,
