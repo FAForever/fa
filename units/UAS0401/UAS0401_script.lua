@@ -19,6 +19,16 @@ local CreateAeonTempestBuildingEffects = import("/lua/effectutilities.lua").Crea
 
 local ExternalFactoryComponent = import("/lua/defaultcomponents.lua").ExternalFactoryComponent
 
+-- upvalue for performance
+local CreateEmitterOnEntity = CreateEmitterOnEntity
+local AttachBeamEntityToEntity = AttachBeamEntityToEntity
+local WaitSeconds = WaitSeconds
+local TrashBagAdd = TrashBag.Add
+local MathMax = math.max
+local WaitFor = WaitFor
+
+
+
 ---@class UAS0401 : ASeaUnit, ExternalFactoryComponent
 UAS0401 = ClassUnit(ASeaUnit, ExternalFactoryComponent) {
     BuildAttachBone = 'Attachpoint01',
@@ -35,11 +45,17 @@ UAS0401 = ClassUnit(ASeaUnit, ExternalFactoryComponent) {
         AntiTorpedo02 = ClassWeapon(AIFQuasarAntiTorpedoWeapon) {},
     },
 
+    ---@param self UAS0401
+    ---@param builder Unit
+    ---@param layer Layer
     StartBeingBuiltEffects = function(self, builder, layer)
         ASeaUnit.StartBeingBuiltEffects(self, builder, layer)
         CreateAeonTempestBuildingEffects(self)
     end,
 
+    ---@param self UAS0401
+    ---@param unitBeingBuilt Unit
+    ---@param order string unused
     CreateBuildEffects = function(self, unitBeingBuilt, order)
         local army = self.Army
         local buildEffectsBag = self.BuildEffectsBag
@@ -59,7 +75,11 @@ UAS0401 = ClassUnit(ASeaUnit, ExternalFactoryComponent) {
         end
     end,
 
+    ---@param self UAS0401
+    ---@param builder Unit
+    ---@param layer Layer
     OnStopBeingBuilt = function(self, builder, layer)
+        local trash = self.Trash
         self:SetWeaponEnabledByLabel('MainGun', true)
         ASeaUnit.OnStopBeingBuilt(self, builder, layer)
         ExternalFactoryComponent.OnStopBeingBuilt(self, builder, layer)
@@ -76,35 +96,42 @@ UAS0401 = ClassUnit(ASeaUnit, ExternalFactoryComponent) {
 
         if not self.SinkSlider then -- Setup the slider and get blueprint values
             self.SinkSlider = CreateSlider(self, 0, 0, 0, 0, 5, true) -- Create sink controller to overlay ontop of original collision detection
-            self.Trash:Add(self.SinkSlider)
+            TrashBagAdd(trash,self.SinkSlider)
         end
 
         self.WatchDepth = false
     end,
 
+    ---@param self UAS0401
     OnFailedToBuild = function(self)
         ASeaUnit.OnFailedToBuild(self)
         ChangeState(self, self.IdleState)
     end,
 
+    ---@param self UAS0401
+    ---@param new any
+    ---@param old any
     OnMotionVertEventChange = function(self, new, old)
         ASeaUnit.OnMotionVertEventChange(self, new, old)
+        local externalFactory = self.ExternalFactory
+        local trash = self.Trash
+
         if new == 'Top' then
             self:RestoreBuildRestrictions()
             self:RequestRefreshUI()
             self:SetWeaponEnabledByLabel('MainGun', true)
             self:PlayUnitSound('Open')
 
-            self.ExternalFactory:RestoreBuildRestrictions()
-            self.ExternalFactory:RequestRefreshUI()
+            externalFactory:RestoreBuildRestrictions()
+            externalFactory:RequestRefreshUI()
         elseif new == 'Down' then
             self:SetWeaponEnabledByLabel('MainGun', false)
             self:AddBuildRestriction(categories.ALLUNITS)
             self:RequestRefreshUI()
             self:PlayUnitSound('Close')
 
-            self.ExternalFactory:AddBuildRestriction(categories.ALLUNITS)
-            self.ExternalFactory:RequestRefreshUI()
+            externalFactory:AddBuildRestriction(categories.ALLUNITS)
+            externalFactory:RequestRefreshUI()
         end
 
         if new == 'Up' and old == 'Bottom' then -- When starting to surface
@@ -114,7 +141,7 @@ UAS0401 = ClassUnit(ASeaUnit, ExternalFactoryComponent) {
         if new == 'Bottom' and old == 'Down' then -- When finished diving
             self.WatchDepth = true
             if not self.DiverThread then
-                self.DiverThread = self:ForkThread(self.DiveDepthThread)
+                self.DiverThread = TrashBagAdd(trash,ForkThread(self.DiveDepthThread,self))
             end
         end
     end,
@@ -126,6 +153,7 @@ UAS0401 = ClassUnit(ASeaUnit, ExternalFactoryComponent) {
         ASeaUnit.OnLayerChange(self, new, old)
     end,
 
+    ---@param self UAS0401
     RolloffBody = function(self)
     end,
 
@@ -133,6 +161,7 @@ UAS0401 = ClassUnit(ASeaUnit, ExternalFactoryComponent) {
     RollOffUnit = function(self)
     end,
 
+    ---@param self UAS0401
     DiveDepthThread = function(self)
         -- Takes the given location, adjusts the Y value to the surface height on that location, with an offset
         local Yoffset = 1.2 -- The default (built in) offset appears to be 0.25 - if the place where thats set is found, that would be epic.
@@ -140,7 +169,7 @@ UAS0401 = ClassUnit(ASeaUnit, ExternalFactoryComponent) {
         while self.WatchDepth == true do
             local pos = self:GetPosition()
             local seafloor = GetTerrainHeight(pos[1], pos[3]) + GetTerrainTypeOffset(pos[1], pos[3]) -- Target depth, in this case the seabed
-            local difference = math.max(((seafloor + Yoffset) - pos[2]), -0.5) -- Doesnt sink too much, just maneuveres the bed better.
+            local difference = MathMax(((seafloor + Yoffset) - pos[2]), -0.5) -- Doesnt sink too much, just maneuveres the bed better.
             self.SinkSlider:SetSpeed(1)
 
             self.SinkSlider:SetGoal(0, difference, 0)
@@ -189,11 +218,11 @@ UAS0401 = ClassUnit(ASeaUnit, ExternalFactoryComponent) {
 
         ---@param self UAS0401
         ---@param unitBeingBuilt Unit
-        OnStopBuild = function(self, unitBeingBuilt)
-            ASeaUnit.OnStopBuild(self, unitBeingBuilt)
+        OnStopBuild = function(self, unitBeingBuilt, order)
+            ASeaUnit.OnStopBuild(self, unitBeingBuilt, order)
 
             local blueprint = unitBeingBuilt.Blueprint
-            local distance = math.max(blueprint.SizeX, blueprint.SizeZ, 6)
+            local distance = MathMax(blueprint.SizeX, blueprint.SizeZ, 6)
             local worldPos = self:CalculateWorldPositionFromRelative({0, 0, - 2 * distance})
             IssueToUnitMoveOffFactory(unitBeingBuilt, worldPos)
             ChangeState(self, self.RollingOffState)
@@ -212,11 +241,16 @@ UAS0401 = ClassUnit(ASeaUnit, ExternalFactoryComponent) {
         end,
     },
 
+    ---@param self UAS0401
+    ---@param instigator Unit
+    ---@param type string
+    ---@param overkillRatio number
     OnKilled = function(self, instigator, type, overkillRatio)
         ExternalFactoryComponent.OnKilled(self, instigator, type, overkillRatio)
-        local watchBone = self:GetBlueprint().WatchBone or 0
+        local watchBone = self.Blueprint.WatchBone or 0
+        local trash = self.Trash
 
-        self:ForkThread(function()
+        TrashBagAdd(trash,ForkThread(function()
             local pos = self:GetPosition()
             local seafloor = GetTerrainHeight(pos[1], pos[3]) + GetTerrainTypeOffset(pos[1], pos[3]) - 1
             while self:GetPosition(watchBone)[2] > seafloor do
@@ -225,13 +259,13 @@ UAS0401 = ClassUnit(ASeaUnit, ExternalFactoryComponent) {
 
             self:CreateWreckage(overkillRatio, instigator)
             self:Destroy()
-        end)
+        end,self))
 
         local layer = self.Layer
         self:DestroyIdleEffects()
         if layer == 'Water' or layer == 'Seabed' or layer == 'Sub' then
-            self.SinkExplosionThread = self:ForkThread(self.ExplosionThread)
-            self.SinkThread = self:ForkThread(self.SinkingThread)
+            self.SinkExplosionThread = TrashBagAdd(trash,ForkThread(self.ExplosionThread,self))
+            self.SinkThread = TrashBagAdd(trash,ForkThread(self.SinkingThread,self))
         end
 
         ASeaUnit.OnKilled(self, instigator, type, overkillRatio)

@@ -19,6 +19,12 @@ local SCUDeathWeapon = import("/lua/sim/defaultweapons.lua").SCUDeathWeapon
 local EffectUtil = import("/lua/effectutilities.lua")
 local Buff = import("/lua/sim/buff.lua")
 
+-- upvalue for performance
+local ForkThread = ForkThread
+local WaitTicks = WaitTicks
+local BuffBlueprint = BuffBlueprint
+
+
 ---@class UAL0301 : CommandUnit
 UAL0301 = ClassUnit(CommandUnit) {
     Weapons = {
@@ -26,10 +32,13 @@ UAL0301 = ClassUnit(CommandUnit) {
         DeathWeapon = ClassWeapon(SCUDeathWeapon) {},
     },
 
+    ---@param self UAL0301
     __init = function(self)
         CommandUnit.__init(self, 'RightReactonCannon')
     end,
 
+    ---@param self UAL0301
+    ---@param unitBeingBuilt Unit
     OnStopBuild = function(self, unitBeingBuilt)
         CommandUnit.OnStopBuild(self, unitBeingBuilt)
         self:BuildManipulatorSetEnabled(false)
@@ -41,6 +50,7 @@ UAL0301 = ClassUnit(CommandUnit) {
         self.BuildingUnit = false
     end,
 
+    ---@param self UAL0301
     OnCreate = function(self)
         CommandUnit.OnCreate(self)
         self:SetCapturable(false)
@@ -48,14 +58,24 @@ UAL0301 = ClassUnit(CommandUnit) {
         self:SetupBuildBones()
     end,
 
+    ---@param self UAL0301
+    ---@param unitBeingBuilt Unit
+    ---@param order string unused
     CreateBuildEffects = function(self, unitBeingBuilt, order)
         EffectUtil.CreateAeonCommanderBuildingEffects(self, unitBeingBuilt, self.BuildEffectBones, self.BuildEffectsBag)
     end,
 
+    ---@param self UAL0301
+    ---@param enh string
     CreateEnhancement = function(self, enh)
         CommandUnit.CreateEnhancement(self, enh)
-        local bp = self.Blueprint.Enhancements[enh]
-        if not bp then return end
+        local bp = self.Blueprint
+        local bpEnh = bp.Enhancements[enh]
+        local bpEcon = bp.Economy
+        local bpBldrte = bpEcon.BuildRate
+        local trash = self.Trash
+
+        if not bpEnh then return end
         -- Teleporter
         if enh == 'Teleporter' then
             self:AddCommandCap('RULEUCC_Teleport')
@@ -64,28 +84,25 @@ UAL0301 = ClassUnit(CommandUnit) {
         -- Shields
         elseif enh == 'Shield' then
             self:AddToggleCap('RULEUTC_ShieldToggle')
-            self:SetEnergyMaintenanceConsumptionOverride(bp.MaintenanceConsumptionPerSecondEnergy or 0)
+            self:SetEnergyMaintenanceConsumptionOverride(bpEnh.MaintenanceConsumptionPerSecondEnergy or 0)
             self:SetMaintenanceConsumptionActive()
-            self:CreateShield(bp)
+            self:CreateShield(bpEnh)
         elseif enh == 'ShieldRemove' then
             self:DestroyShield()
             self:SetMaintenanceConsumptionInactive()
             self:RemoveToggleCap('RULEUTC_ShieldToggle')
         elseif enh == 'ShieldHeavy' then
-            self.Trash:Add(ForkThread(self.CreateHeavyShield, self, bp))
+            TrashBag(trash,ForkThread(self.CreateHeavyShield, self, bpEnh))
         elseif enh == 'ShieldHeavyRemove' then
             self:DestroyShield()
             self:SetMaintenanceConsumptionInactive()
             self:RemoveToggleCap('RULEUTC_ShieldToggle')
             -- ResourceAllocation
         elseif enh == 'ResourceAllocation' then
-            local bp = self.Blueprint.Enhancements[enh]
-            local bpEcon = self.Blueprint.Economy
-            if not bp then return end
-            self:SetProductionPerSecondEnergy((bp.ProductionPerSecondEnergy + bpEcon.ProductionPerSecondEnergy) or 0)
-            self:SetProductionPerSecondMass((bp.ProductionPerSecondMass + bpEcon.ProductionPerSecondMass) or 0)
+            if not bpEnh then return end
+            self:SetProductionPerSecondEnergy((bpEnh.ProductionPerSecondEnergy + bpEcon.ProductionPerSecondEnergy) or 0)
+            self:SetProductionPerSecondMass((bpEnh.ProductionPerSecondMass + bpEcon.ProductionPerSecondMass) or 0)
         elseif enh == 'ResourceAllocationRemove' then
-            local bpEcon = self.Blueprint.Economy
             self:SetProductionPerSecondEnergy(bpEcon.ProductionPerSecondEnergy or 0)
             self:SetProductionPerSecondMass(bpEcon.ProductionPerSecondMass or 0)
             -- Engineering Focus Module
@@ -99,7 +116,7 @@ UAL0301 = ClassUnit(CommandUnit) {
                     Duration = -1,
                     Affects = {
                         BuildRate = {
-                            Add = bp.NewBuildRate - self.Blueprint.Economy.BuildRate,
+                            Add = bpEnh.NewBuildRate - bpBldrte,
                             Mult = 1,
                         },
                     },
@@ -122,7 +139,7 @@ UAL0301 = ClassUnit(CommandUnit) {
                     Duration = -1,
                     Affects = {
                         Regen = {
-                            Add = bp.NewRegenRate - self.Blueprint.Defense.RegenRate,
+                            Add = bpEnh.NewRegenRate - bp.Defense.RegenRate,
                             Mult = 1,
                         },
                     },
@@ -141,17 +158,19 @@ UAL0301 = ClassUnit(CommandUnit) {
             -- StabilitySupressant
         elseif enh == 'StabilitySuppressant' then
             local wep = self:GetWeaponByLabel('RightReactonCannon')
-            wep:AddDamageMod(bp.NewDamageMod or 0)
-            wep:AddDamageRadiusMod(bp.NewDamageRadiusMod or 0)
-            wep:ChangeMaxRadius(bp.NewMaxRadius or 40)
+            wep:AddDamageMod(bpEnh.NewDamageMod or 0)
+            wep:AddDamageRadiusMod(bpEnh.NewDamageRadiusMod or 0)
+            wep:ChangeMaxRadius(bpEnh.NewMaxRadius or 40)
         elseif enh == 'StabilitySuppressantRemove' then
             local wep = self:GetWeaponByLabel('RightReactonCannon')
-            wep:AddDamageMod(-self.Blueprint.Enhancements['RightReactonCannon'].NewDamageMod)
-            wep:AddDamageRadiusMod(bp.NewDamageRadiusMod or 0)
-            wep:ChangeMaxRadius(bp.NewMaxRadius or 30)
+            wep:AddDamageMod(-bp.Enhancements['RightReactonCannon'].NewDamageMod)
+            wep:AddDamageRadiusMod(bpEnh.NewDamageRadiusMod or 0)
+            wep:ChangeMaxRadius(bpEnh.NewMaxRadius or 30)
         end
     end,
 
+    ---@param self UAL0301
+    ---@param bp Blueprint
     CreateHeavyShield = function(self, bp)
         WaitTicks(1)
         self:CreateShield(bp)

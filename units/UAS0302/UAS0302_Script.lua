@@ -6,6 +6,11 @@
 local ASeaUnit = import("/lua/aeonunits.lua").ASeaUnit
 local AAMWillOWisp = import("/lua/aeonweapons.lua").AAMWillOWisp
 local NavalCannonOblivionWeapon = import("/lua/aeonweapons.lua").ADFCannonOblivionNaval
+
+-- upvlaue for perfomance
+local TrashBagAdd = TrashBag.Add
+local CreateAnimator = CreateAnimator
+
 ---@class UAS0302 : ASeaUnit
 UAS0302 = ClassUnit(ASeaUnit) {
     Weapons = {
@@ -18,8 +23,11 @@ UAS0302 = ClassUnit(ASeaUnit) {
 
     OnCreate = function(self)
         ASeaUnit.OnCreate(self)
+        local bp = self.Blueprint
+        local trash = self.Trash
+
         for i = 1, 3 do
-            self.Trash:Add(CreateAnimator(self):PlayAnim(self:GetBlueprint().Weapon[i].AnimationOpen))
+            TrashBagAdd(trash,CreateAnimator(self):PlayAnim(bp.Weapon[i].AnimationOpen))
         end
     end,
 }
