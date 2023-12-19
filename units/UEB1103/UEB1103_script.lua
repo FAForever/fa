@@ -10,36 +10,48 @@
 
 local TMassCollectionUnit = import("/lua/terranunits.lua").TMassCollectionUnit
 
+-- upvalue for performance
+local TrashBadAdd = TrashBag.Add
+
+
 ---@class UEB1103 : TMassCollectionUnit
 UEB1103 = ClassUnit(TMassCollectionUnit) {
 
     OnStartBuild = function(self, unitBeingBuilt, order)
         TMassCollectionUnit.OnStartBuild(self, unitBeingBuilt, order)
-        if not self.AnimationManipulator then return end
-        self.AnimationManipulator:SetRate(0)
-        self.AnimationManipulator:Destroy()
-        self.AnimationManipulator = nil
+        local animManip = self.AnimationManipulator
+
+        if not animManip then return end
+        animManip:SetRate(0)
+        animManip:Destroy()
+        animManip = nil
     end,
 
     PlayActiveAnimation = function(self)
         TMassCollectionUnit.PlayActiveAnimation(self)
-        if not self.AnimationManipulator then
-            self.AnimationManipulator = CreateAnimator(self)
-            self.Trash:Add(self.AnimationManipulator)
+        local trash = self.Trash
+        local bp = self.Blueprint
+        local animManip = self.AnimationManipulator
+
+        if not animManip then
+            animManip = CreateAnimator(self)
+            TrashBadAdd(trash,animManip)
         end
-        self.AnimationManipulator:PlayAnim(self:GetBlueprint().Display.AnimationOpen, true)
+        animManip:PlayAnim(bp.Display.AnimationOpen, true)
     end,
 
     OnProductionPaused = function(self)
         TMassCollectionUnit.OnProductionPaused(self)
-        if not self.AnimationManipulator then return end
-        self.AnimationManipulator:SetRate(0)
+        local animManip = self.AnimationManipulator
+        if not animManip then return end
+        animManip:SetRate(0)
     end,
 
     OnProductionUnpaused = function(self)
         TMassCollectionUnit.OnProductionUnpaused(self)
-        if not self.AnimationManipulator then return end
-        self.AnimationManipulator:SetRate(1)
+        local animManip = self.AnimationManipulator
+        if not animManip then return end
+        animManip:SetRate(1)
     end,
 }
 

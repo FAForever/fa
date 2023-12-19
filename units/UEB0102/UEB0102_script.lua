@@ -9,36 +9,45 @@
 --****************************************************************************
 local TAirFactoryUnit = import("/lua/terranunits.lua").TAirFactoryUnit
 
+-- Upvalue for Performance
+local TrashBagAdd = TrashBag.Add
+local WaitFor = WaitFor
+
 ---@class UEB0102 : TAirFactoryUnit
 UEB0102 = ClassUnit(TAirFactoryUnit) {
-    
+
     StartArmsMoving = function(self)
         TAirFactoryUnit.StartArmsMoving(self)
-        --local unitBldg = self.UnitBeingBuilt
-        if not self.ArmSlider then
-            self.ArmSlider = CreateSlider(self, 'Arm01')
-            self.Trash:Add(self.ArmSlider)
+        local armSlider = self.ArmSlider
+        local trash = self.Trash
+
+        if not armSlider then
+            armSlider = CreateSlider(self, 'Arm01')
+            TrashBagAdd(trash,armSlider)
         end
-        
     end,
 
     MovingArmsThread = function(self)
         TAirFactoryUnit.MovingArmsThread(self)
+        local armSlider = self.ArmSlider
+
         while true do
-            if not self.ArmSlider then return end
-            self.ArmSlider:SetGoal(0, 6, 0)
-            self.ArmSlider:SetSpeed(20)
-            WaitFor(self.ArmSlider)
-            self.ArmSlider:SetGoal(0, -6, 0)
-            WaitFor(self.ArmSlider)
+            if not armSlider then return end
+            armSlider:SetGoal(0, 6, 0)
+            armSlider:SetSpeed(20)
+            WaitFor(armSlider)
+            armSlider:SetGoal(0, -6, 0)
+            WaitFor(armSlider)
         end
     end,
-    
+
     StopArmsMoving = function(self)
         TAirFactoryUnit.StopArmsMoving(self)
-        if not self.ArmSlider then return end
-        self.ArmSlider:SetGoal(0, 0, 0)
-        self.ArmSlider:SetSpeed(40)
+        local armSlider = self.ArmSlider
+
+        if not armSlider then return end
+        armSlider:SetGoal(0, 0, 0)
+        armSlider:SetSpeed(40)
     end,
 }
 
