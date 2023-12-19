@@ -15,7 +15,7 @@ UnitBlueprint{
         "BOT",
         "BUILTBYTIER3FACTORY",
         "CYBRAN",
-        "DIRECTFIRE",
+        "WEAKDIRECTFIRE",
         "LAND",
         "MOBILE",
         "OVERLAYANTIAIR",
@@ -25,7 +25,6 @@ UnitBlueprint{
         "SELECTABLE",
         "TECH3",
         "VISIBLETORECON",
-        "WEAKDIRECTFIRE",
     },
     Defense = {
         AirThreatLevel = 33,

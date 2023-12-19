@@ -50,6 +50,7 @@ UnitBlueprint{
     Display = {
         Abilities = { "<LOC ability_upgradable>Upgradeable" },
         AnimationUpgrade = "/units/urb0203/urb0203_aupgrade.sca",
+        AnimationBuild = "/units/urb0203/urb0203_aBuild.sca",
         BuildAttachBone = "Attachpoint",
         IdleEffects = {
             Water = {

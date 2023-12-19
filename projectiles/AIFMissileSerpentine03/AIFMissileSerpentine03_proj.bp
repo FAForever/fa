@@ -54,7 +54,7 @@ ProjectileBlueprint {
         TrackTarget = true,
         TrackTargetGround = true,
         TrackTargetGroundFuzziness = 1.0,
-        TrackTargetGroundOffset = 2.0,
+        TrackTargetGroundOffset = 2.5,
         TurnRate = 15,
         UseGravity = false,
         VelocityAlign = true,

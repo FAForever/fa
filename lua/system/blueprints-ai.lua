@@ -77,7 +77,7 @@ local function CalculatedDPS(weapon)
         Damage = Damage * (weapon.BeamLifetime / (0.1 + (weapon.BeamCollisionDelay or 0)))
     end
 
-    return Damage / DamageInterval or 0
+    return (Damage / DamageInterval) or 0
 end
 
 ---@param unitBPs UnitBlueprint[]
