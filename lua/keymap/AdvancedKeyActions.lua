@@ -201,7 +201,7 @@ CategoryMatcher("Toggle unit ability (submerge, stealth, shield, land, jamming)"
                 IssueUnitCommand(submergedUnits, "UNITCOMMAND_Dive")
             end
         end),
-    CategoryAction(categories.SHIELD)
+    CategoryAction(categories.SHIELD + categories.PERSONALSHIELD)
         :Action(function(selection)
             local anyShieldsOff = false
             for _, unit in selection do
@@ -213,7 +213,7 @@ CategoryMatcher("Toggle unit ability (submerge, stealth, shield, land, jamming)"
             ToggleScriptBit(selection, 0, not anyShieldsOff)
         end),
     CategoryAction(categories.FAVORSWATER)
-        :Action (function(selection)
+        :Action(function(selection)
             local anyInLandingMode = false
             for _, unit in selection do
                 if GetScriptBit({ unit }, 1) then
