@@ -188,3 +188,40 @@ CategoryMatcher("Select nearest idle transport / Transport")
     CategoryAction(categories.TRANSPORTATION)
         :Action "StartCommandMode order RULEUCC_Transport",
 }
+
+CategoryMatcher("Toggle unit ability (submerge, stealth, shield, land, jamming)")
+{
+    CategoryAction(),
+    CategoryAction(categories.SUBMERSIBLE)
+        :Action(function(selection)
+            local submergedUnits, surfacedUnits = import("/lua/keymap/misckeyactions.lua").SeparateDiveStatus(selection)
+            if not table.empty(surfacedUnits) then
+                IssueUnitCommand(surfacedUnits, "UNITCOMMAND_Dive")
+            elseif not table.empty(submergedUnits) then
+                IssueUnitCommand(submergedUnits, "UNITCOMMAND_Dive")
+            end
+        end),
+    CategoryAction(categories.SHIELD)
+        :Action(function(selection)
+            local anyShieldsOff = false
+            for _, unit in selection do
+                if not GetScriptBit({ unit }, 0) then
+                    anyShieldsOff = true
+                    break
+                end
+            end
+            ToggleScriptBit(selection, 0, not anyShieldsOff)
+        end),
+    CategoryAction(categories.FAVORSWATER)
+        :Action (function(selection)
+            local anyInLandingMode = false
+            for _, unit in selection do
+                if GetScriptBit({ unit }, 1) then
+                    anyInLandingMode = true
+                    break
+                end
+            end
+            ToggleScriptBit(selection, 1, anyInLandingMode)
+        end),
+
+}
