@@ -203,14 +203,14 @@ CategoryMatcher("Toggle unit ability (submerge, stealth, shield, land, jamming)"
         end),
     CategoryAction(categories.SHIELD + categories.PERSONALSHIELD)
         :Action(function(selection)
-            local anyShieldsOff = false
+            local anyShieldsOn = false
             for _, unit in selection do
                 if not GetScriptBit({ unit }, 0) then
-                    anyShieldsOff = true
+                    anyShieldsOn = true
                     break
                 end
             end
-            ToggleScriptBit(selection, 0, not anyShieldsOff)
+            ToggleScriptBit(selection, 0, not anyShieldsOn)
         end),
     CategoryAction(categories.FAVORSWATER)
         :Action(function(selection)
