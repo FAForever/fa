@@ -2943,14 +2943,21 @@ SIFInainoHitRingProjectileFxTrails01 = {
 --  SERAPHIM EXPERIMENTAL NUKE
 -- ------------------------------------------------------------------------
 
+SIFExperimentalStrategicLauncherReload01 = {
+    EmtBpPath .. 'seraphim_expnuke_prelaunch_02_emit.bp', -- -- down + right upward lines
+    EmtBpPath .. 'seraphim_expnuke_prelaunch_03_emit.bp', -- -- down + left upward lines
+    EmtBpPath .. 'seraphim_expnuke_prelaunch_04_emit.bp', -- -- up upward lines
+    EmtBpPath .. 'seraphim_expnuke_prelaunch_05_emit.bp', -- -- down + right coalescing orb
+    EmtBpPath .. 'seraphim_expnuke_prelaunch_06_emit.bp', -- -- down + left coalescing orb
+    EmtBpPath .. 'seraphim_expnuke_prelaunch_07_emit.bp', -- -- up coalescing orb
+}
+
+SIFExperimentalStrategicLauncherLoaded01 = {
+    EmtBpPath .. 'seraphim_expnuke_prelaunch_10_emit.bp', -- -- blueish glow, but infinite lifetime
+}
+
 SIFExperimentalStrategicMissileChargeLaunch01 = {
     EmtBpPath .. 'seraphim_expnuke_prelaunch_01_emit.bp', -- -- glowy plasma at bottom
-    EmtBpPath .. 'seraphim_expnuke_prelaunch_02_emit.bp', -- -- down / right lines
-    EmtBpPath .. 'seraphim_expnuke_prelaunch_03_emit.bp', -- -- down / left lines
-    EmtBpPath .. 'seraphim_expnuke_prelaunch_04_emit.bp', -- -- up lines
-    EmtBpPath .. 'seraphim_expnuke_prelaunch_05_emit.bp', -- -- down / right upward lines
-    EmtBpPath .. 'seraphim_expnuke_prelaunch_06_emit.bp', -- -- down / left upward lines
-    EmtBpPath .. 'seraphim_expnuke_prelaunch_07_emit.bp', -- -- up upward lines
     EmtBpPath .. 'seraphim_expnuke_prelaunch_08_emit.bp', -- -- inward dark lines
     EmtBpPath .. 'seraphim_expnuke_prelaunch_09_emit.bp', -- -- blueish glow
 }

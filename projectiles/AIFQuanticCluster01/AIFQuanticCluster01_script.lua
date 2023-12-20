@@ -5,18 +5,18 @@
 -- Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 ----------------------------------------------------------------------------------------
 local EffectTemplate = import("/lua/effecttemplates.lua")
+local AQuantumCluster = import("/lua/aeonprojectiles.lua").AQuantumCluster
 local RandomFloat = import("/lua/utilities.lua").GetRandomFloat
 
 ---@class AIFQuanticCluster01 : AQuantumCluster
-AIFQuanticCluster01 = ClassProjectile(import("/lua/aeonprojectiles.lua").AQuantumCluster) {
+AIFQuanticCluster01 = ClassProjectile(AQuantumCluster) {
 
     ---@param self AIFQuanticCluster01
     ---@param TargetType string unused
     ---@param TargetEntity Prop|Unit unused
     OnImpact = function(self, TargetType, TargetEntity)
-
         local FxFragEffect = EffectTemplate.TFragmentationSensorShellFrag
-        local ChildProjectileBP = '/projectiles/AIFQuanticCluster02/AIFQuanticCluster02_proj.bp'
+        local bp = self.Blueprint.Physics
 
         -- Split effects
         for k, v in FxFragEffect do
@@ -27,16 +27,17 @@ AIFQuanticCluster01 = ClassProjectile(import("/lua/aeonprojectiles.lua").AQuantu
         local velocity = 6
 
 		-- One initial projectile following same directional path as the original
-        self:CreateChildProjectile(ChildProjectileBP):SetVelocity(vx, vy, vz):SetVelocity(velocity):PassDamageData(self.DamageData)
+        self:CreateChildProjectile(bp.FragmentId):SetVelocity(vx, vy, vz):SetVelocity(velocity):PassDamageData(self.DamageData)
 
 		-- Create several other projectiles in a dispersal pattern
-        local numProjectiles = 8
-        local angle = (2*math.pi) / numProjectiles
+        local numProjectiles = bp.Fragments
+        local angle = (2 * math.pi) / numProjectiles
         local angleInitial = RandomFloat( 0, angle )
 
         -- Randomization of the spread
         local angleVariation = angle * 0.35 -- Adjusts angle variance spread
         local spreadMul = 10 -- Adjusts the width of the dispersal
+        
         local xVec = 0
         local yVec = vy
         local zVec = 0
@@ -45,7 +46,7 @@ AIFQuanticCluster01 = ClassProjectile(import("/lua/aeonprojectiles.lua").AQuantu
         for i = 0, (numProjectiles -1) do
             xVec = vx + (math.sin(angleInitial + (i*angle) + RandomFloat(-angleVariation, angleVariation))) * spreadMul
             zVec = vz + (math.cos(angleInitial + (i*angle) + RandomFloat(-angleVariation, angleVariation))) * spreadMul
-            local proj = self:CreateChildProjectile(ChildProjectileBP)
+            local proj = self:CreateChildProjectile(bp.FragmentId)
             proj:SetVelocity(xVec,yVec,zVec)
             proj:SetVelocity(velocity)
             proj.DamageData = self.DamageData
