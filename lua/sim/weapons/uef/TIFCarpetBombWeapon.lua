@@ -27,21 +27,24 @@ local DefaultProjectileWeaponCreateProjectileAtMuzzle = DefaultProjectileWeapon.
 TIFCarpetBombWeapon = ClassWeapon(DefaultProjectileWeapon) {
     FxMuzzleFlash = { '/effects/emitters/antiair_muzzle_fire_02_emit.bp', },
 
+    -- We adapt this function because it will call every time a projectile is created,
+    -- so we can retarget the weapon to where we want the projectile to go instead
+    -- of the unit AI targeting the weapon for us during that one projectile firing.
     --- This function creates the projectile, and happens when the unit is trying to fire
     --- Called from inside RackSalvoFiringState
     ---@param self TIFCarpetBombWeapon
     ---@param muzzle string
     ---@return Projectile
     CreateProjectileAtMuzzle = function(self, muzzle)
-        -- adapt this function to keep the correct target lock during carpet bombing
         local data = self.CurrentSalvoData
-        if data and data.usestore then
-            local pos = data.targetpos
-            if pos then
-                self:SetTargetGround(pos)
+        if data then -- check if we fired once
+            if data.target then
+                -- last shot we calculated where to drop bombs to hit a certain target
+                -- we don't want to keep updating this location, so remove the target.
+                data.target = nil
             end
+            self:SetTargetGround(data.targetPos)
         end
-
         return DefaultProjectileWeaponCreateProjectileAtMuzzle(self, muzzle)
     end,
 }

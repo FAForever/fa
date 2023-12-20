@@ -22,10 +22,9 @@ local CollisionBeam = import("/lua/sim/collisionbeam.lua").CollisionBeam
 local MathClamp = math.clamp
 
 ---@class WeaponSalvoData
----@field target? Unit | Prop   if absent, will use `targetpos` instead
----@field targetpos Vector      stores the last location of the target, or the ground fire location
+---@field target? Unit | Prop   if absent, will use `targetPos` instead
+---@field targetPos Vector      stores the last location upon which we dropped bombs for a target, or the ground fire location
 ---@field lastAccel number      stores the last acceleration that was used
----@field usestore? boolean     a flag that indicates if the target was lost
 
 -- Most weapons derive from this class, including beam weapons later in this file
 ---@class DefaultProjectileWeapon : Weapon
@@ -223,6 +222,9 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
             local target = UnitGetTargetEntity(launcher)
             if target then -- target is a unit / prop
                 targetPos = EntityGetPosition(target)
+                if not target.IsProp then
+                    targetVelX, _, targetVelZ = UnitGetVelocity(target)
+                end
             else -- target is a position i.e. attack ground
                 targetPos = self:GetCurrentTargetPos()
             end
@@ -257,33 +259,32 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
             else -- otherwise, calculate & cache a couple things the first time only
                 data = {
                     lastAccel = 4.75,
-                    targetpos = targetPos,
+                    targetPos = targetPos,
                 }
                 if target then
                     if target.Dead then
-                        data.usestore = true
+                        data.target = nil
                     else
                         data.target = target
                     end
                 end
                 self.CurrentSalvoData = data
             end
-        else -- if it's a successive bomb drop, get the targeting data
+        else -- if it's a successive bomb drop, update the targeting data
             local target = data.target
             if target then
+                LOG("Updating target data")
                 if target.Dead then -- if the unit is destroyed, use the last known position
                     data.target = nil
-                    data.usestore = true -- flag that we lost the target
-                    targetPos = data.targetpos
+                    targetPos = data.targetPos
                 else
                     if not target.IsProp then
                         targetVelX, _, targetVelZ = UnitGetVelocity(target)
                     end
                     targetPos = EntityGetPosition(target)
-                    data.targetpos = targetPos
                 end
             else
-                targetPos = data.targetpos
+                targetPos = data.targetPos
             end
         end
         if not targetPos then
@@ -329,16 +330,26 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
         end
 
         -- how many ticks until the bomb hits the target in xz-space
-        local time = distPos / distVel + self.AdjustedSalvoDelay * (self.SalvoSpreadStart + self.CurrentSalvoNumber)
-        if time == 0 then
+        local time = distPos / distVel
+        local adjustedTime = time + self.AdjustedSalvoDelay * (self.SalvoSpreadStart + self.CurrentSalvoNumber)
+        if adjustedTime == 0 then
             data.lastAccel = 4.75
-            return 4.75
+            return 4.75 
+        end
+
+        -- If we have a target, targetPos may have updated now.
+        -- save the new predicted target position in case we lose the target
+        -- so that we can drop the bomb salvo centered onto there.
+        if data.target then
+            targetPos[1] = targetPos[1] + time * targetVelX
+            targetPos[3] = targetPos[3] + time * targetVelZ
+            data.targetPos = targetPos
         end
 
         -- find out where the target will be at that point in time (it could be moving)
         -- (time and velocity being in ticks cancel out)
         -- what is the height difference at that future position
-        projPosY = projPosY - GetSurfaceHeight(targetPosX + time * targetVelX, targetPosZ + time * targetVelZ)
+        projPosY = projPosY - GetSurfaceHeight(targetPosX + adjustedTime * targetVelX, targetPosZ + adjustedTime * targetVelZ)
 
         -- The basic formula for displacement over time is h = 0.5 * a * t^2
         -- h: displacement, a: acceleration, t: time
@@ -346,7 +357,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
         -- a = 2 * h / t^2
 
         -- also convert time from ticks to seconds (multiply by 10, twice)
-        local acc = 200 * projPosY / (time * time)
+        local acc = 200 * projPosY / (adjustedTime * adjustedTime)
 
         data.lastAccel = acc
         return acc
@@ -362,7 +373,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
         local blueprint = self.Blueprint
 
         -- Handle weapons which must pack before moving
-        if blueprint.WeaponUnpackLocksMotion == true and old == 'Stopped' then
+        if blueprint.WeaponUnpackLocksMotion == true and old == 'Stopped' and self.WeaponPackState ~= 'Packed' then
             self:PackAndMove()
         end
 
@@ -552,8 +563,8 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
             unpackAnimator:SetRate(bp.WeaponUnpackAnimationRate)
             self.WeaponPackState = 'Unpacking'
             WaitFor(unpackAnimator)
-            self.WeaponPackState = 'Unpacked'
         end
+        self.WeaponPackState = 'Unpacked'
     end,
 
     -- Played when a weapon packs up
@@ -573,8 +584,8 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
 
             self.WeaponPackState = 'Packing'
             WaitFor(unpackAnimator)
-            self.WeaponPackState = 'Packed'
         end
+        self.WeaponPackState = 'Packed'
     end,
 
     -- Create the visual side of rack recoil
@@ -726,7 +737,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
             if unit.Dead then return end
             unit:SetBusy(false)
 
-            -- at this point salvo is always done so reset the data
+            -- at this point salvo is always done so reset the data in case firing was interrupted
             self.CurrentSalvoData = nil
 
             self:WaitForAndDestroyManips()
@@ -1090,6 +1101,7 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
                 end
             end
 
+            self.CurrentSalvoData = nil
             self:DoOnFireBuffs() -- Found in mohodata weapon.lua
             self.FirstShot = false
             self:StartEconomyDrain()
@@ -1102,6 +1114,8 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
                 unit.Trash:Add(ForkThread(self.DisabledWhileReloadingThread, self, 1 / rof))
             end
 
+            local hasTarget = self:WeaponHasTarget()
+
             -- Deal with the rack firing sequence
             if self.CurrentRackSalvoNumber > rackBoneCount then
                 self.CurrentRackSalvoNumber = 1
@@ -1109,27 +1123,28 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
                     ChangeState(self, self.RackSalvoReloadState)
                 elseif bp.RackSalvoChargeTime > 0 then
                     ChangeState(self, self.IdleState)
-                elseif countedProjectile and bp.WeaponUnpacks then
-                    ChangeState(self, self.WeaponPackingState)
-                elseif countedProjectile and not bp.WeaponUnpacks then
-                    ChangeState(self, self.IdleState)
+                elseif countedProjectile or not hasTarget then
+                    if bp.WeaponUnpacks then
+                        ChangeState(self, self.WeaponPackingState)
+                    else
+                        ChangeState(self, self.IdleState)
+                    end
                 else
                     ChangeState(self, self.RackSalvoFireReadyState)
                 end
-            elseif countedProjectile and not bp.WeaponUnpacks then
-                ChangeState(self, self.IdleState)
-            elseif countedProjectile and bp.WeaponUnpacks then
-                ChangeState(self, self.WeaponPackingState)
+            elseif countedProjectile or not hasTarget then
+                if bp.WeaponUnpacks then
+                    ChangeState(self, self.WeaponPackingState)
+                else
+                    ChangeState(self, self.IdleState)
+                end
             else
                 ChangeState(self, self.RackSalvoFireReadyState)
             end
         end,
 
         OnLostTarget = function(self)
-            self.__base.OnLostTarget(self)
-            if self.Blueprint.WeaponUnpacks then
-                ChangeState(self, self.WeaponPackingState)
-            end
+            self.HaltFireOrdered = true
         end,
 
         -- Set a bool so we won't fire if the target reticle is moved
@@ -1157,16 +1172,18 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
             if notExclusive then
                 unit:SetBusy(false)
             end
+            self.ReloadEndTime = GetGameTick() + MATH_IRound(bp.RackSalvoReloadTime*10)
             WaitSeconds(bp.RackSalvoReloadTime)
+            self.ReloadEndTime = nil
 
             self:WaitForAndDestroyManips()
 
             local hasTarget = self:WeaponHasTarget()
-            local canFire = self:CanFire()
+            local autoFire = not bp.ManualFire
 
-            if hasTarget and bp.RackSalvoChargeTime > 0 and canFire then
+            if hasTarget and bp.RackSalvoChargeTime > 0 and autoFire then
                 ChangeState(self, self.RackSalvoChargeState)
-            elseif hasTarget and canFire then
+            elseif hasTarget and autoFire then
                 ChangeState(self, self.RackSalvoFireReadyState)
             elseif not hasTarget and bp.WeaponUnpacks and not bp.WeaponUnpackLocksMotion then
                 ChangeState(self, self.WeaponPackingState)
@@ -1176,6 +1193,9 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
         end,
 
         OnFire = function(self)
+        end,
+
+        OnLostTarget = function(self)
         end,
     },
 

@@ -223,6 +223,7 @@ UnitBlueprint{
             HelpText = "<LOC ual0301_NanoCombat_help>Support Armored Command Unit. Enhanced during construction with the reacton refractor and nano-repair system enhancements.",
             SortCategory = "SORTOTHER",
             UnitName = "<LOC ual0301_NanoCombat_name>SACU (Nano Combatant preset)",
+            SelectionPriority = 1,
         },
         RAS = {
             Description = "<LOC ual0301_RAS_desc>SACU (RAS preset)",
@@ -243,6 +244,7 @@ UnitBlueprint{
             HelpText = "<LOC ual0301_Rambo_help>Support Armored Command Unit. Enhanced during construction with a personal shield and the reacton refractor enhancements.",
             SortCategory = "SORTOTHER",
             UnitName = "<LOC ual0301_Rambo_name>SACU (Rambo preset)",
+            SelectionPriority = 1,
         },
         ShieldCombat = {
             Description = "<LOC ual0301_ShieldCombat_desc>SACU (Shield Combatant preset)",
@@ -254,6 +256,7 @@ UnitBlueprint{
             HelpText = "<LOC ual0301_ShieldCombat_help>Support Armored Command Unit. Enhanced during construction with a personal shield and the reacton refractor enhancements.",
             SortCategory = "SORTOTHER",
             UnitName = "<LOC ual0301_ShieldCombat_name>SACU (Shield Combatant preset)",
+            SelectionPriority = 1,
         },
         SimpleCombat = {
             Description = "<LOC ual0301_SimpleCombat_desc>SACU (Combatant preset)",
@@ -262,6 +265,7 @@ UnitBlueprint{
             HelpText = "<LOC ual0301_SimpleCombat_help>Support Armored Command Unit. Enhanced during construction with the reacton refractor enhancement.",
             SortCategory = "SORTOTHER",
             UnitName = "<LOC ual0301_SimpleCombat_name>SACU (Combatant preset)",
+            SelectionPriority = 1,
         },
     },
     Enhancements = {
