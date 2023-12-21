@@ -272,7 +272,6 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
         else -- if it's a successive bomb drop, update the targeting data
             local target = data.target
             if target then
-                LOG("Updating target data")
                 if target.Dead then -- if the unit is destroyed, use the last known position
                     data.target = nil
                     targetPos = data.targetPos
