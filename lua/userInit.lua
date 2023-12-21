@@ -274,6 +274,7 @@ do
     ---@see GetCurrentFactoryForQueueDisplay    # To get the current queue
     ---@see ClearCurrentFactoryForQueueDisplay  # To clear the current queue
     _G.ClearCurrentFactoryForQueueDisplay = function()
+        LOG("ClearCurrentFactoryForQueueDisplay")
         buildQueueOfUnit = nil
         buildQueue = {}
         OldClearCurrentFactoryForQueueDisplay()
@@ -288,6 +289,7 @@ do
     ---@param userUnit UserUnit
     ---@return UIBuildQueue
     _G.SetCurrentFactoryForQueueDisplay = function(userUnit)
+        LOG("SetCurrentFactoryForQueueDisplay")
         buildQueueOfUnit = userUnit
         buildQueue = OldSetCurrentFactoryForQueueDisplay(userUnit)
         return buildQueue
@@ -302,6 +304,10 @@ do
     ---@param userUnit UserUnit
     ---@return UIBuildQueue
     _G.PeekCurrentFactoryForQueueDisplay = function(userUnit)
+        if IsDestroyed(userUnit) then
+            return { }
+        end
+
         local oldBuildQueueOfUnit = buildQueueOfUnit
         local queue = SetCurrentFactoryForQueueDisplay(userUnit)
 
@@ -320,6 +326,7 @@ do
     ---@see ClearCurrentFactoryForQueueDisplay  # To clear the current queue
     ---@param queue UIBuildQueue
     _G.UpdateCurrentFactoryForQueueDisplay = function(queue)
+        LOG("UpdateCurrentFactoryForQueueDisplay")
         buildQueue = queue
     end
 
@@ -331,8 +338,11 @@ do
     ---@see ClearCurrentFactoryForQueueDisplay  # To clear the current queue
     ---@return UIBuildQueue[]
     _G.GetCurrentFactoryForQueueDisplay = function()
+        LOG("GetCurrentFactoryForQueueDisplay")
         return buildQueue
     end
+
+
 
     --- Decrease the count at a given location of the current build queue
     ---@see DecreaseBuildCountInQueue           # To decrease the build count in the queue
@@ -343,6 +353,8 @@ do
     ---@param index number
     ---@param count number
     _G.DecreaseBuildCountInQueue = function(index, count)
+        LOG("DecreaseBuildCountInQueue")
+
         if not buildQueueOfUnit then
             WARN("Unable to decrease build queue count when no build queue is set")
             return
@@ -375,6 +387,8 @@ do
     ---@param index number
     ---@param count number
     _G.IncreaseBuildCountInQueue = function(index, count)
+        LOG("IncreaseBuildCountInQueue")
+
         if not buildQueueOfUnit then
             WARN("Unable to increase build queue count when no build queue is set")
             return
