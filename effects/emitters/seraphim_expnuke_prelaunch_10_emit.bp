@@ -1,15 +1,15 @@
 EmitterBlueprint {
-	BlueprintId = 'seraphim_expnuke_prelaunch_02',
-	Lifetime = 200.00,
+	BlueprintId = 'seraphim_expnuke_prelaunch_10',
+	Lifetime = -1.00,
 	Repeattime = 50.00,
 	TextureFramecount = 1.00,
 	Blendmode = 3.00,
 	LocalVelocity = true,
 	LocalAcceleration = true,
 	Gravity = false,
-	AlignRotation = true,
+	AlignRotation = false,
 	AlignToBone = false,
-	Flat = false,
+	Flat = true,
 	LODCutoff = 500.00,
 	EmitIfVisible = true,
 	CatchupEmit = true,
@@ -18,23 +18,23 @@ EmitterBlueprint {
 	OnlyEmitOnWater = false,
 	ParticleResistance = false,
 	InterpolateEmission = true,
-	TextureStripcount = 4.00,
+	TextureStripcount = 1.00,
 	SortOrder = 0.00,
 	LowFidelity = true,
 	MedFidelity = true,
 	HighFidelity = true,
-	Texture = '/textures/particles/line_white_add_11.dds',
-	RampTexture = '/textures/particles/ramp_blue_26.dds',
+	Texture = '/textures/particles/glow_02.dds',
+	RampTexture = '/textures/particles/ramp_blue_22.dds',
 	XDirectionCurve = {
 		XRange = 50.00,
 		Keys = {
-			{ x=25.000,y=-1.000,z=0.000 },
+			{ x=25.000,y=0.000,z=0.000 },
 		},
 	},
 	YDirectionCurve = {
 		XRange = 50.00,
 		Keys = {
-			{ x=25.000,y=1.000,z=0.000 },
+			{ x=25.000,y=0.000,z=0.000 },
 		},
 	},
 	ZDirectionCurve = {
@@ -46,19 +46,19 @@ EmitterBlueprint {
 	EmitRateCurve = {
 		XRange = 50.00,
 		Keys = {
-			{ x=0.000,y=0.500,z=0.000 },
+			{ x=6.464,y=0.200,z=0.000 },
 		},
 	},
 	LifetimeCurve = {
 		XRange = 50.00,
 		Keys = {
-			{ x=36.000,y=30.000,z=0.000 },
+			{ x=36.000,y=10.000,z=0.000 },
 		},
 	},
 	VelocityCurve = {
 		XRange = 50.00,
 		Keys = {
-			{ x=25.000,y=0.200,z=0.000 },
+			{ x=25.000,y=0.250,z=0.000 },
 		},
 	},
 	XAccelCurve = {
@@ -94,33 +94,37 @@ EmitterBlueprint {
 	XPosCurve = {
 		XRange = 50.00,
 		Keys = {
-			{ x=25.000,y=6.000,z=0.000 },
+			{ x=25.000,y=0.000,z=0.000 },
 		},
 	},
 	YPosCurve = {
 		XRange = 50.00,
 		Keys = {
-			{ x=25.000,y=-5.000,z=0.000 },
+			{ x=14.116,y=0.000,z=0.000 },
 		},
 	},
 	ZPosCurve = {
 		XRange = 50.00,
 		Keys = {
-			{ x=7.058,y=-3.500,z=0.000 },
+			{ x=25.000,y=-3.000,z=0.000 },
 		},
 	},
 	StartSizeCurve = {
 		XRange = 50.00,
 		Keys = {
-			{ x=25.000,y=0.300,z=0.200 },
+			{ x=0.000,y=0.000,z=0.000 },
+			{ x=10.000,y=2.000,z=0.500 },
+			{ x=25.000,y=2.000,z=0.500 },
 			{ x=50.000,y=0.000,z=0.000 },
 		},
 	},
 	EndSizeCurve = {
 		XRange = 50.00,
 		Keys = {
-			{ x=25.000,y=2.000,z=0.500 },
-			{ x=50.000,y=0.500,z=0.200 },
+			{ x=0.000,y=5.000,z=5.000 },
+			{ x=10.000,y=15.000,z=5.000 },
+			{ x=25.000,y=15.000,z=5.000 },
+			{ x=50.000,y=5.000,z=2.000 },
 		},
 	},
 	InitialRotationCurve = {
