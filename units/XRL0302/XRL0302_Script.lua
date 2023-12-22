@@ -97,6 +97,26 @@ XRL0302 = ClassUnit(CWalkingLandUnit) {
     TrackTargetThread = function(self)
         local navigator = self:GetNavigator()
         while not IsDestroyed(self) do
+
+            -- adjust behavior of the weapon so it only fires when we're trying to attack something
+            local weapon = self:GetWeaponByLabel('Suicide')
+            if weapon then
+                if (
+                    -- we're trying to attack
+                    self:IsUnitState('Attacking') or
+                        -- engineer trying to take us
+                        self:IsUnitState('BeingCaptured') or self:IsUnitState('BeingReclaimed')
+                    )
+                then
+                    LOG("Enabled!")
+                    weapon:SetEnabled(true)
+                else
+                    LOG("Disabled!")
+                    weapon:SetEnabled(false)
+                end
+            end
+
+            -- adjust behavior of tracking 
             local command = self:GetCommandQueue()[1]
             -- confirm that it is an attack command
             if command and command.commandType == 10 then
@@ -108,7 +128,7 @@ XRL0302 = ClassUnit(CWalkingLandUnit) {
                 end
             end
 
-            WaitTicks(10)
+            WaitTicks(6)
         end
     end,
 
@@ -164,7 +184,7 @@ XRL0302 = ClassUnit(CWalkingLandUnit) {
 
         if bp ~= nil then
             self:AddBuff(bp)
-        end 
+        end
     end,
 }
 
