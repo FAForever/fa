@@ -10,12 +10,20 @@
 
 local Unit = import("/lua/sim/unit.lua").Unit
 
+-- upvlaue for perfomance
+local TrashBagAdd = TrashBag.Add
+local ForkThread = ForkThread
+local WaitSeconds = WaitSeconds
+
 ---@class UEB5208 : Unit
 UEB5208 = ClassUnit(Unit) {
 
+
     OnCreate = function(self)
+        local trash = self.Trash
+
         Unit.OnCreate(self)
-        ForkThread( self.WaitingToDie, self )
+        TrashBagAdd(trash,ForkThread( self.WaitingToDie, self ))
     end,
 
     WaitingToDie = function(self)

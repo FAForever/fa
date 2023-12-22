@@ -10,6 +10,11 @@
 
 local TEnergyCreationUnit = import("/lua/terranunits.lua").TEnergyCreationUnit
 
+
+-- Upvalue for performance
+local 
+
+
 ---@class UEB1301 : TEnergyCreationUnit
 UEB1301 = ClassUnit(TEnergyCreationUnit) {
     OnStopBeingBuilt = function(self,builder,layer)
@@ -20,9 +25,9 @@ UEB1301 = ClassUnit(TEnergyCreationUnit) {
     ActiveState = State {
         Main = function(self)
             -- Play the "activate" sound
-            local myBlueprint = self:GetBlueprint()
-            if myBlueprint.Audio.Activate then
-                self:PlaySound(myBlueprint.Audio.Activate)
+            local bp = self.Blueprint
+            if bp.Audio.Activate then
+                self:PlaySound(bp.Audio.Activate)
             end
         end,
 

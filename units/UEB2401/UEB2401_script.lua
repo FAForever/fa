@@ -11,18 +11,24 @@
 local TStructureUnit = import("/lua/terranunits.lua").TStructureUnit
 local TIFArtilleryWeapon = import("/lua/terranweapons.lua").TIFArtilleryWeapon
 
+-- upvalue for perfomance
+local CreateAnimator = CreateAnimator
+local TrashBagAdd = TrashBag.Add
+
 ---@class UEB2401 : TStructureUnit
 UEB2401 = ClassUnit(TStructureUnit) {
     Weapons = {
         MainGun = ClassWeapon(TIFArtilleryWeapon) {
             FxMuzzleFlashScale = 3,
-            
+
             IdleState = State(TIFArtilleryWeapon.IdleState) {
                 OnGotTarget = function(self)
                     TIFArtilleryWeapon.IdleState.OnGotTarget(self)
+                    local bp = self.unit.Blueprint
+
                     if not self.ArtyAnim then
                         self.ArtyAnim = CreateAnimator(self.unit)
-                        self.ArtyAnim:PlayAnim(self.unit:GetBlueprint().Display.AnimationOpen)
+                        self.ArtyAnim:PlayAnim(bp.Display.AnimationOpen)
                         self.unit.Trash:Add(self.ArtyAnim)
                     end
                 end,

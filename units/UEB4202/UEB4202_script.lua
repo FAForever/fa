@@ -10,6 +10,11 @@
 local TShieldStructureUnit = import("/lua/terranunits.lua").TShieldStructureUnit
 local ShieldEffectsComponent = import("/lua/defaultcomponents.lua").ShieldEffectsComponent
 
+-- upvalue for perfomance
+local CreateRotator = CreateRotator
+local TrashBagAdd = TrashBag.Add
+
+
 ---@class UEB4202 : TShieldStructureUnit
 ---@field Rotator1? moho.RotateManipulator
 ---@field Rotator2? moho.RotateManipulator
@@ -18,7 +23,6 @@ UEB4202 = ClassUnit(TShieldStructureUnit, ShieldEffectsComponent) {
     ShieldEffects = {
         '/effects/emitters/terran_shield_generator_t2_01_emit.bp',
         '/effects/emitters/terran_shield_generator_t2_02_emit.bp',
-        -- '/effects/emitters/terran_shield_generator_t2_03_emit.bp',
     },
 
     ---@param self UEB4202
@@ -32,10 +36,12 @@ UEB4202 = ClassUnit(TShieldStructureUnit, ShieldEffectsComponent) {
     ---@param layer Layer
     OnStopBeingBuilt = function(self,builder,layer)
         TShieldStructureUnit.OnStopBeingBuilt(self,builder,layer)
-        self.Rotator1 = CreateRotator(self, 'Spinner', 'y', nil, 10, 5, 10)
+        local trash = self.Trash
+        
         self.Rotator2 = CreateRotator(self, 'B01', 'z', nil, -10, 5, -10)
-        self.Trash:Add(self.Rotator1)
-        self.Trash:Add(self.Rotator2)
+        self.Rotator1 = CreateRotator(self, 'Spinner', 'y', nil, 10, 5, 10)
+        TrashBagAdd(trash, self.Rotator1)
+        TrashBagAdd(trash, self.Rotator2)
     end,
 
     ---@param self UEB4202

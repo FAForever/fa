@@ -11,13 +11,21 @@
 local TStructureUnit = import("/lua/terranunits.lua").TStructureUnit
 local TAMPhalanxWeapon = import("/lua/terranweapons.lua").TAMPhalanxWeapon
 
+-- upvalue for perfomance
+local CreateRotator = CreateRotator
+local TrashBagAdd = TrashBag.Add
+
 ---@class UEB4201 : TStructureUnit
 UEB4201 = ClassUnit(TStructureUnit) {
     Weapons = {
         Turret01 = ClassWeapon(TAMPhalanxWeapon) {
+
                 PlayFxWeaponUnpackSequence = function(self)
+                    local unit = self.unit
+                    local trash = unit.Trash
+
                     if not self.SpinManip then 
-                        self.SpinManip = CreateRotator(self.unit, 'Turret_Barrel_B01', 'z', nil, 270, 180, 60)
+                        self.SpinManip = CreateRotator(unit, 'Turret_Barrel_B01', 'z', nil, 270, 180, 60)
                         self.unit.Trash:Add(self.SpinManip)
                     end
                     if self.SpinManip then
@@ -32,7 +40,7 @@ UEB4201 = ClassUnit(TStructureUnit) {
                     end
                     TAMPhalanxWeapon.PlayFxWeaponPackSequence(self)
                 end,
-            
+
             },
     },
 }
