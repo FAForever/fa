@@ -552,8 +552,7 @@ function UpdateWindow(info)
                 end
 
                 -- show that queue
-                controls.queue.grid:UpdateQueue(SetCurrentFactoryForQueueDisplay(factory))
-                ClearCurrentFactoryForQueueDisplay()
+                controls.queue.grid:UpdateQueue(PeekCurrentFactoryForQueueDisplay(factory))
             else
                 controls.queue:Hide()
             end

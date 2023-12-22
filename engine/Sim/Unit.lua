@@ -355,7 +355,7 @@ end
 function Unit:IsMobile()
 end
 
---- returns true if the unit is moving or not
+--- Returns true if the position has changed with respect to the previous simulation tick
 ---@return boolean
 function Unit:IsMoving()
 end

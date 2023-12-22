@@ -11,6 +11,12 @@ local CAiBrain = {}
 ---@field [2] number z
 ---@field [3] number threat value
 
+---@class BuildingTemplate
+---@field [1] string[] # builder types
+---@field [2] Vector2
+-- @field [...] Vector2
+
+---@alias TemplateBuilderTypeResources "Resource" | "T1Resource" | "T2Resource" | "T3Resource" | "T1HydroCarbon"
 
 --- Assigns a threat value to a given position, which is applied to the iMAP threat grid
 ---@param position Vector
@@ -109,19 +115,41 @@ end
 function CAiBrain:FindClosestArmyWithBase()
 end
  
---- Find a free build place
--- @param buildingType Type of building (T1LandFactory, T4AirExperimental1, T1HydroCarbon etc)
--- @param whatToBuild UnitID
--- @param baseTemplate A default table with buildingTypes of all factions and searchpattern for a build place
--- @param relative true/false. true = build coordinates are relative to the starting location, false = absolute coords
--- @param closeToBuilder true/false. Build near the engineer or the base the engineer is part of.
--- @param optIgnoreAlliance nil/Enemy ignores enemy buildings like massextractors
--- @param BuildLocationX Position where we start to search for a free build area
--- @param BuildLocationZ
--- @param optIgnoreThreatUnder Ignores enemy threat under value
--- @return PlaceToBuild {x, z, y}
-function CAiBrain:FindPlaceToBuild(buildingType, whatToBuild, baseTemplate, relative, closeToBuilder, optIgnoreAlliance, BuildLocationX, BuildLocationZ, optIgnoreThreatUnder)
+--- Takes a builder and returns the closest point that the structure can be
+--- built at in the list of building templates with matching builder types.
+---
+--- Let `startLocation` be the army start position, or the offset override if
+--- present.
+--- Let `targetLocation` be the builder's location (or the army start if somehow
+--- nil), or the offset overide if present.
+--- For each template:
+---    Let each points' location be `templateLocation`, added with
+---    `startLocation` if `relative` is true.
+---    It is considered if `structureName` can be built at this location and,
+---    If `optIgnoreThreatOver` is above 0.0, the anti-surface threat influence
+---    (calculated using ring=0) is less than `optIgnoreThreatOver`.
+--- The point with the small distance between `templateLocation` and
+--- `targetLocation` is returned.
+---
+--- If the builder type is one of `TemplateBuilderTypeResources` (and the
+--- "/nomass" commandline switch is absent), distance is calculated between
+--- `startingLocation` and all nearby deposits (mass points, unless the
+--- structure blueprint has the `"HYDROCARBON"` category) are queried and no
+--- points in the template are used.
+---
+---@param type          string
+---@param structureName filename # blueprint file
+---@param buildingTypes BuildingTemplate[]
+---@param relative      boolean
+---@param builder       Unit
+---@param optIgnoreAlliance?   AllianceType | nil # defaults to `nil`
+---@param optOverridePosX?     number  # defaults to 0.0; ignored if `optOverridePosZ` is absent
+---@param optOverridePosZ?     number  # defaults to 0.0
+---@param optIgnoreThreatOver? integer # defaults to 0 (accept all)
+---@return Vector2 location # a new table of `{x, z, 0}` for resource builder types, the actual point otherwise
+function CAiBrain:FindPlaceToBuild(type, structureName, buildingTypes, relative, builder, optIgnoreAlliance, optOverridePosX, optOverridePosZ, optIgnoreThreatOver)
 end
+
 --- Returns a unit that matches the categories, if available
 ---@param category EntityCategory
 ---@param needToBeIdle boolean
