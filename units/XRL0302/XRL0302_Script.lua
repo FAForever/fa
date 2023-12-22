@@ -108,10 +108,8 @@ XRL0302 = ClassUnit(CWalkingLandUnit) {
                         self:IsUnitState('BeingCaptured') or self:IsUnitState('BeingReclaimed')
                     )
                 then
-                    LOG("Enabled!")
                     weapon:SetEnabled(true)
                 else
-                    LOG("Disabled!")
                     weapon:SetEnabled(false)
                 end
             end
