@@ -42,11 +42,13 @@ end
 
 ---@class CategoryMatcher
 ---@field description string
+---@field actionKey string
 ---@field _actions CategoryAction[]
 CategoryMatcher = Class()
 {
-    __init = function(self, description)
+    __init = function(self, description, actionKey)
         self.description = description
+        self.actionKey = actionKey or self.description:gsub("[^A-Za-z0-9]+", "_")
     end,
 
     __call = function(self, actions)
@@ -57,7 +59,7 @@ CategoryMatcher = Class()
 
     ---@param self CategoryMatcher
     Register = function(self)
-        local name = self.description:gsub("[^A-Za-z0-9]+", "_")
+        local name = self.actionKey
         categoryActions[name] = self
         import("/lua/keymap/keymapper.lua").SetUserKeyAction(name,
             {
@@ -154,7 +156,7 @@ CategoryAction = Class()
     end
 }
 
-CategoryMatcher("Enter OC mode / Transport / Toggle repeat build")
+CategoryMatcher("Enter OC mode / Transport / Toggle repeat build", "oc_mode_transport_repeat_build")
 {
     CategoryAction(), -- do nothing if no selection
     CategoryAction(categories.TRANSPORTATION)
@@ -165,7 +167,7 @@ CategoryMatcher("Enter OC mode / Transport / Toggle repeat build")
         :Action(import("/lua/keymap/misckeyactions.lua").ToggleRepeatBuild)
 }
 
-CategoryMatcher("Reclaim: select nearest idle t1 engineer // enter reclaim mode")
+CategoryMatcher("Reclaim: select nearest idle t1 engineer // enter reclaim mode", "reclaim_combined_action")
 {
     CategoryAction()
         :Action "UI_SelectByCategory +inview +nearest +idle ENGINEER TECH1",
@@ -173,7 +175,7 @@ CategoryMatcher("Reclaim: select nearest idle t1 engineer // enter reclaim mode"
         :Action "StartCommandMode order RULEUCC_Reclaim",
 }
 
-CategoryMatcher("Intel: select nearest air scout // build command mode for sensors")
+CategoryMatcher("Intel: select nearest air scout // build command mode for sensors", "intel_combined_action")
 {
     CategoryAction()
         :Action "UI_SelectByCategory +nearest AIR INTELLIGENCE",
@@ -181,7 +183,7 @@ CategoryMatcher("Intel: select nearest air scout // build command mode for senso
         :Action "UI_Lua import('/lua/keymap/hotbuild.lua').buildAction('Sensors')",
 }
 
-CategoryMatcher("Transporting: select nearest idle transport // transport command mode")
+CategoryMatcher("Transporting: select nearest idle transport // transport command mode", "transport_combined_action")
 {
     CategoryAction()
         :Action "UI_SelectByCategory +nearest +idle AIR TRANSPORTATION",
