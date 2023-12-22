@@ -173,7 +173,7 @@ CategoryMatcher("Reclaim: select nearest idle t1 engineer // enter reclaim mode"
         :Action "StartCommandMode order RULEUCC_Reclaim",
 }
 
-CategoryMatcher("Intel: select nearest scout // build command mode for radars")
+CategoryMatcher("Intel: select nearest air scout // build command mode for sensors")
 {
     CategoryAction()
         :Action "UI_SelectByCategory +nearest AIR INTELLIGENCE",
@@ -181,7 +181,7 @@ CategoryMatcher("Intel: select nearest scout // build command mode for radars")
         :Action "UI_Lua import('/lua/keymap/hotbuild.lua').buildAction('Sensors')",
 }
 
-CategoryMatcher("Transporting: Select nearest idle transport // transport command mode")
+CategoryMatcher("Transporting: select nearest idle transport // transport command mode")
 {
     CategoryAction()
         :Action "UI_SelectByCategory +nearest +idle AIR TRANSPORTATION",
