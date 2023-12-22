@@ -61,8 +61,8 @@ CategoryMatcher = Class()
         categoryActions[name] = self
         import("/lua/keymap/keymapper.lua").SetUserKeyAction(name,
             {
-                action = "UI_Lua import('/lua/keymap/AdvancedKeyActions.lua').ProcessAction('" .. name .. "')",
-                category = "AKA"
+                action = "UI_Lua import('/lua/keymap/CombinedKeyActions.lua').ProcessAction('" .. name .. "')",
+                category = "ordersCombined"
             })
         if import("/lua/keymap/keydescriptions.lua").keyDescriptions[name] then
             WARN(("Overwriting key action description of '%s'"):format(name))
@@ -165,7 +165,7 @@ CategoryMatcher("Enter OC mode / Transport / Toggle repeat build")
         :Action(import("/lua/keymap/misckeyactions.lua").ToggleRepeatBuild)
 }
 
-CategoryMatcher("Select nearest idle t1 engineer / Enter reclaim mode")
+CategoryMatcher("Reclaim: select nearest idle t1 engineer // enter reclaim mode")
 {
     CategoryAction()
         :Action "UI_SelectByCategory +inview +nearest +idle ENGINEER TECH1",
@@ -173,7 +173,7 @@ CategoryMatcher("Select nearest idle t1 engineer / Enter reclaim mode")
         :Action "StartCommandMode order RULEUCC_Reclaim",
 }
 
-CategoryMatcher("Build sensors / Select nearest air scout")
+CategoryMatcher("Intel: select nearest scout // build command mode for radars")
 {
     CategoryAction()
         :Action "UI_SelectByCategory +nearest AIR INTELLIGENCE",
@@ -181,7 +181,7 @@ CategoryMatcher("Build sensors / Select nearest air scout")
         :Action "UI_Lua import('/lua/keymap/hotbuild.lua').buildAction('Sensors')",
 }
 
-CategoryMatcher("Select nearest idle transport / Transport")
+CategoryMatcher("Transporting: Select nearest idle transport // transport command mode")
 {
     CategoryAction()
         :Action "UI_SelectByCategory +nearest +idle AIR TRANSPORTATION",
@@ -223,5 +223,4 @@ CategoryMatcher("Toggle unit ability (submerge, stealth, shield, land, jamming)"
             end
             ToggleScriptBit(selection, 1, anyInLandingMode)
         end),
-
 }

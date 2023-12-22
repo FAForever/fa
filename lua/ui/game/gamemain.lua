@@ -348,7 +348,7 @@ function CreateUI(isReplay)
     RegisterChatFunc(SendResumedBy, 'SendResumedBy')
 
     import("/lua/keymap/hotkeylabels.lua").init()
-    import("/lua/keymap/AdvancedKeyActions.lua")
+    import("/lua/keymap/CombinedKeyActions.lua")
     import("/lua/ui/notify/customiser.lua").init(isReplay, import("/lua/ui/game/borders.lua").GetMapGroup())
     import("/lua/ui/game/reclaim.lua").SetMapSize()
 end

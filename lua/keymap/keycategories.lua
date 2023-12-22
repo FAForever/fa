@@ -9,6 +9,7 @@ keyCategories = {
     ['camera'] = "<LOC keymap_category_0025>Camera",
     ['orders'] = "<LOC keymap_category_0036>Orders",
     ['ordersAdvanced'] = "<LOC keymap_orders_queue_based>Orders - Advanced",
+    ['ordersCombined'] = "<LOC keymap_orders_combined>Orders - Combined actions",
     ['ordersQueueBased'] = "<LOC keymap_orders_queue_based>Orders - Queue manipulation",
     ['ordersContextBased'] = "<LOC keymap_orders_context_based>Orders - Mouse context",
     ['game'] = "<LOC keymap_category_0079>Game",
@@ -25,6 +26,7 @@ keyCategories = {
 
 keyCategoryOrder = {
     'orders',
+    'ordersCombined',
     'ordersAdvanced',
     'ordersQueueBased',
     'ordersContextBased',
