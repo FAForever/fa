@@ -189,38 +189,38 @@ CategoryMatcher("Transporting: Select nearest idle transport // transport comman
         :Action "StartCommandMode order RULEUCC_Transport",
 }
 
-CategoryMatcher("Toggle unit ability (submerge, stealth, shield, land, jamming)")
-{
-    CategoryAction(),
-    CategoryAction(categories.SUBMERSIBLE)
-        :Action(function(selection)
-            local submergedUnits, surfacedUnits = import("/lua/keymap/misckeyactions.lua").SeparateDiveStatus(selection)
-            if not table.empty(surfacedUnits) then
-                IssueUnitCommand(surfacedUnits, "UNITCOMMAND_Dive")
-            elseif not table.empty(submergedUnits) then
-                IssueUnitCommand(submergedUnits, "UNITCOMMAND_Dive")
-            end
-        end),
-    CategoryAction(categories.SHIELD + categories.PERSONALSHIELD)
-        :Action(function(selection)
-            local anyShieldsOn = false
-            for _, unit in selection do
-                if not GetScriptBit({ unit }, 0) then
-                    anyShieldsOn = true
-                    break
-                end
-            end
-            ToggleScriptBit(selection, 0, not anyShieldsOn)
-        end),
-    CategoryAction(categories.FAVORSWATER)
-        :Action(function(selection)
-            local anyInLandingMode = false
-            for _, unit in selection do
-                if GetScriptBit({ unit }, 1) then
-                    anyInLandingMode = true
-                    break
-                end
-            end
-            ToggleScriptBit(selection, 1, anyInLandingMode)
-        end),
-}
+-- CategoryMatcher("Toggle unit ability (submerge, stealth, shield, land, jamming)")
+-- {
+--     CategoryAction(),
+--     CategoryAction(categories.SUBMERSIBLE)
+--         :Action(function(selection)
+--             local submergedUnits, surfacedUnits = import("/lua/keymap/misckeyactions.lua").SeparateDiveStatus(selection)
+--             if not table.empty(surfacedUnits) then
+--                 IssueUnitCommand(surfacedUnits, "UNITCOMMAND_Dive")
+--             elseif not table.empty(submergedUnits) then
+--                 IssueUnitCommand(submergedUnits, "UNITCOMMAND_Dive")
+--             end
+--         end),
+--     CategoryAction(categories.SHIELD + categories.PERSONALSHIELD)
+--         :Action(function(selection)
+--             local anyShieldsOn = false
+--             for _, unit in selection do
+--                 if not GetScriptBit({ unit }, 0) then
+--                     anyShieldsOn = true
+--                     break
+--                 end
+--             end
+--             ToggleScriptBit(selection, 0, not anyShieldsOn)
+--         end),
+--     CategoryAction(categories.FAVORSWATER)
+--         :Action(function(selection)
+--             local anyInLandingMode = false
+--             for _, unit in selection do
+--                 if GetScriptBit({ unit }, 1) then
+--                     anyInLandingMode = true
+--                     break
+--                 end
+--             end
+--             ToggleScriptBit(selection, 1, anyInLandingMode)
+--         end),
+-- }
