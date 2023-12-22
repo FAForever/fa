@@ -10,39 +10,68 @@ local Weapon = import("/lua/sim/weapon.lua").Weapon
 
 local DeathWeaponKamikaze = ClassWeapon(Weapon) {
     OnFire = function(self)
-        if not self.unit.Dead then
-            self.unit:Kill()
+        local unit = self.unit
+        if not unit.Dead then
+            unit:Kill()
         end
     end,
 }
 
+---@class DeathWeaponEMP : Weapon
 local DeathWeaponEMP = ClassWeapon(Weapon) {
-    FxDeath = EffectTemplate.CMobileKamikazeBombExplosion,
+    FxDeath = EffectTemplate.CMobileBeetleExplosion,
+
+    DebrisBlueprints = {
+        '/effects/Entities/BeetleDebris01/BeetleDebris01_proj.bp',
+    },
+
+    ---@param self DeathWeaponEMP
     OnCreate = function(self)
         Weapon.OnCreate(self)
         self:SetWeaponEnabled(false)
     end,
 
+    ---@param self DeathWeaponEMP
     Fire = function(self)
         local blueprint = self.Blueprint
-        local position = self.unit:GetPosition()
+        local unit = self.unit
+        local position = unit:GetPosition()
 
-        local army = self.unit.Army
+        -- do the damage
+        DamageArea(unit, position, blueprint.DamageRadius, blueprint.Damage, blueprint.DamageType or 'Normal',
+            blueprint.DamageFriendly or false)
+
+        -- create explosion effect
+        local army = unit.Army
         for k, v in self.FxDeath do
-            CreateEmitterAtBone(self.unit, -2, army, v)
+            local effect = CreateEmitterAtBone(unit, -2, army, v)
+            effect:ScaleEmitter(0.8)
         end
 
-        if not self.unit.transportDrop then
+        -- create a decal
+        if not unit.transportDrop then
             local rotation = math.random(0, 6.28)
-            DamageArea(self.unit, position, 6, 1, 'TreeForce', true)
-            DamageArea(self.unit, position, 6, 1, 'TreeForce', true)
+            DamageArea(unit, position, 6, 1, 'TreeForce', true)
+            DamageArea(unit, position, 6, 1, 'TreeForce', true)
             CreateDecal(position, rotation, 'scorch_010_albedo', '', 'Albedo', 11, 11, 250, 120, army)
         end
 
-        DamageArea(self.unit, position, blueprint.DamageRadius, blueprint.Damage, blueprint.DamageType or 'Normal',
-            blueprint.DamageFriendly or false)
-        self.unit:PlayUnitSound('Destroyed')
-        self.unit:Destroy()
+        -- create light flash
+        CreateLightParticle(unit, -1, army, 7, 12, 'glow_03', 'ramp_red_06')
+        CreateLightParticle(unit, -1, army, 7, 22, 'glow_03', 'ramp_antimatter_02')
+
+        -- create flying and burning debris
+        local vx, _, vz = unit:GetVelocity()
+        for k = 1, 5 do
+            local blueprint = table.random(self.DebrisBlueprints)
+            local pvx = (vx + Random() - 0.5)
+            local pvz = (vz + Random() - 0.5)
+            unit:CreateProjectile(blueprint, 0, 0.2, 0, pvx, 1, pvz)
+        end
+
+        -- destroy the unit
+        unit:PlayUnitSound('Destroyed')
+        unit:Destroy()
     end,
 }
 
@@ -115,11 +144,9 @@ XRL0302 = ClassUnit(CWalkingLandUnit) {
                 end
             end
 
-            -- adjust behavior of tracking
+            -- adjust behavior of tracking a target so that we speed through the target instead of bump into it
             local command = self:GetCommandQueue()[1]
-            -- confirm that it is an attack command
             if command and command.commandType == 10 then
-                -- override navigator behavior
                 local target = command.target
                 if target then
                     navigator:SetDestUnit(target)

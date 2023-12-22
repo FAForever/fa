@@ -1803,6 +1803,17 @@ CMobileKamikazeBombDeathExplosion = {
     EmtBpPath .. 'cybran_kamibomb_hit_13_emit.bp',  -- -- -- Yellow explosion flash.
 }
 
+CMobileBeetleExplosion = {
+    EmtBpPath .. 'proton_bomb_hit_02_emit.bp',
+    EmtBpPath .. 'proton_artillery_hit_01_emit.bp',
+    EmtBpPath .. 'proton_artillery_hit_02_emit.bp',
+
+    -- EmtBpPath .. 'cybran_kamibomb_hit_01_emit.bp',
+    -- EmtBpPath .. 'cybran_kamibomb_hit_02_emit.bp',
+    -- EmtBpPath .. 'proton_artillery_hit_03_emit.bp',
+    -- EmtBpPath .. 'shockwave_01_emit.bp',
+}
+
 -- ---------------------------------------------------------------
 -- -- -- -- UEF PROJECTILES (previously Terran) -- -- --
 -- ---------------------------------------------------------------
