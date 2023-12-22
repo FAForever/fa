@@ -1807,11 +1807,9 @@ CMobileBeetleExplosion = {
     EmtBpPath .. 'proton_bomb_hit_02_emit.bp',
     EmtBpPath .. 'proton_artillery_hit_01_emit.bp',
     EmtBpPath .. 'proton_artillery_hit_02_emit.bp',
-
-    -- EmtBpPath .. 'cybran_kamibomb_hit_01_emit.bp',
-    -- EmtBpPath .. 'cybran_kamibomb_hit_02_emit.bp',
-    -- EmtBpPath .. 'proton_artillery_hit_03_emit.bp',
-    -- EmtBpPath .. 'shockwave_01_emit.bp',
+    EmtBpPath .. 'quark_bomb_explosion_06_emit.bp',
+    EmtBpPath .. 'antimatter_ring_03_emit.bp',
+    EmtBpPath .. 'antimatter_ring_04_emit.bp',
 }
 
 -- ---------------------------------------------------------------

@@ -45,7 +45,7 @@ local DeathWeaponEMP = ClassWeapon(Weapon) {
         local army = unit.Army
         for k, v in self.FxDeath do
             local effect = CreateEmitterAtBone(unit, -2, army, v)
-            effect:ScaleEmitter(0.8)
+            effect:ScaleEmitter(0.85)
         end
 
         -- create a decal
