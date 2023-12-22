@@ -1575,10 +1575,34 @@ options = {
                 },
             },
             {
+                title = "<LOC OPTIONS_FRAMETIME>Frametime",
+                key = 'frametime',
+                type = 'slider',
+                default = 16,
+                update = function(control, value)
+                    logic = import("/lua/options/optionslogic.lua")
+                    logic.SetValue('vsync', 0)
+                end,
+                set = function(key, value, startup)
+                    if not startup then
+                        ConExecute("sc_FrameTimeClamp " .. tostring(value))
+                    end
+                end,
+                custom = {
+                    min = 4,
+                    max = 16,
+                    inc = 1,
+                },
+            },
+            {
                 title = "<LOC OPTIONS_0148>Vertical Sync",
                 key = 'vsync',
                 type = 'toggle',
                 default = 1,
+                update = function(control, value)
+                    logic = import("/lua/options/optionslogic.lua")
+                    logic.SetValue('frametime', 16)
+                end,
                 set = function(key, value, startup)
                     if not startup then
                         ConExecute("SC_VerticalSync " .. tostring(value))
