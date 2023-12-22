@@ -3,7 +3,7 @@
 
 ![Impression of the game](/images/impression-a.jpg)
 
-Forged Alliance Forever is a vibrant, community-driven [project](https://github.com/FAForever) designed to enhance the gameplay of [Supreme Commander: Forged Alliance](https://store.steampowered.com/app/9420). Our active community has developed a custom [client](https://github.com/FAForever/downlords-faf-client), [backend](https://github.com/FAForever/server) and [website](https://github.com/FAForever/website). We provide a rich gaming experience with an extensive library of community-made maps, mods and co-op scenarios.
+Forged Alliance Forever is a vibrant, community-driven [project](https://github.com/FAForever) designed to enhance the gameplay of [Supreme Commander: Forged Alliance](https://store.steampowered.com/app/9420). Our active community has developed a custom [client](https://github.com/FAForever/downlords-faf-client), [backend](https://github.com/FAForever/server) and [website](https://github.com/FAForever/website). We provide a rich gaming experience with an extensive library of community-made maps, mods and co-op scenarios. The project can be financially supported through [Patreon](https://www.patreon.com/faf).
 
 ## Getting started playing
 
@@ -23,7 +23,6 @@ There are instructions [in English](setup/setup-english.md) and [in Russian](set
 There's an [extensive guide](./setup/setup-english.md) to help you setup a debug environment. Everyone that contributes must adhere to the [rules](https://www.faforever.com/rules) and apply the [contribution guidelines](https://forum.faforever.com/topic/2051/faf-contribution-guidelines) as they discuss issues with other community members.
 
 ## Deployment
--------
 
 There are three branches branches that deployable and are available for players to play on. The deployment procedure is automated. Pushing commits to one of these branches is sufficient to trigger the deployment. 
 
@@ -64,9 +63,3 @@ Specifically steps (1), (2) and (5) are required to create a functioning deploym
  - [Executable patcher](https://github.com/FAForever/FA_Patcher)
  - [Executable patches](https://github.com/FAForever/FA-Binary-Patches)
  - [Exception debugger](https://github.com/FAForever/FADeepProbe)
-
-
-
-
-
-
