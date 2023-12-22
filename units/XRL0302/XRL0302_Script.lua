@@ -8,6 +8,14 @@ local CWalkingLandUnit = import("/lua/cybranunits.lua").CWalkingLandUnit
 local EffectTemplate = import("/lua/effecttemplates.lua")
 local Weapon = import("/lua/sim/weapon.lua").Weapon
 
+-- upvalue scope for performance
+local WaitTicks = WaitTicks
+local ForkThread = ForkThread
+local DamageArea = DamageArea
+local CreateEmitterAtBone = CreateEmitterAtBone
+local CreateDecal = CreateDecal
+local CreateLightParticle = CreateLightParticle
+
 local DeathWeaponKamikaze = ClassWeapon(Weapon) {
     OnFire = function(self)
         local unit = self.unit
@@ -50,7 +58,7 @@ local DeathWeaponEMP = ClassWeapon(Weapon) {
 
         -- create a decal
         if not unit.transportDrop then
-            local rotation = math.random(0, 6.28)
+            local rotation = 6.28 * Random()
             DamageArea(unit, position, 6, 1, 'TreeForce', true)
             DamageArea(unit, position, 6, 1, 'TreeForce', true)
             CreateDecal(position, rotation, 'scorch_010_albedo', '', 'Albedo', 11, 11, 250, 120, army)
