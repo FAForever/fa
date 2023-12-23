@@ -9,6 +9,7 @@ local TSubUnit = import("/lua/terranunits.lua").TSubUnit
 local WeaponFile = import("/lua/terranweapons.lua")
 local TIFCruiseMissileLauncherSub = WeaponFile.TIFCruiseMissileLauncherSub
 local TIFStrategicMissileWeapon = WeaponFile.TIFStrategicMissileWeapon
+local EffectTemplate = import('/lua/effecttemplates.lua')
 
 ---@class UES0304 : TSubUnit
 UES0304 = ClassUnit(TSubUnit) {
@@ -35,6 +36,7 @@ UES0304 = ClassUnit(TSubUnit) {
         },
 
         NukeMissiles = ClassWeapon(TIFStrategicMissileWeapon) {
+            FxMuzzleFlash = EffectTemplate.TIFCruiseMissileLaunchUnderWater,
 
             PlayFxMuzzleChargeSequence = function(self, muzzle)
                 --We don't need to wait for the rotator to finish because MuzzleChargeDelay = 1 in the bp will do that for us.
