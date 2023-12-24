@@ -1476,18 +1476,30 @@ AIBrain = Class(AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerCom
         -- LOG(string.format('OnUnitStopBuilding: %s -> %s', unit.Blueprint.BlueprintId or '', built.Blueprint.BlueprintId or ''))
     end,
 
-    --- Called by a unit as it loses or gains health at fixed intervals of 25%
+    --- Called by a unit when it loses or gains health. Is called at fixed intervals of 25%
     ---@param self AIBrain
     ---@param unit Unit
     ---@param new number # 0.25 / 0.50 / 0.75 / 1.0
     ---@param old number # 0.25 / 0.50 / 0.75 / 1.0
     OnHealthChanged = function(self, unit, new, old)
-        LOG(string.format('OnUnitStopBuilding: %s: %f -> %f', unit.Blueprint.BlueprintId or '', new, old))
+        -- LOG(string.format('OnHealthChanged: %s: %f -> %f', unit.Blueprint.BlueprintId or '', new, old))
 
         -- pass the event to the platoon
         local aiPlatoon = unit.AIPlatoonReference
         if aiPlatoon then
             aiPlatoon:OnHealthChanged(unit, new, old)
+        end
+    end,
+
+    --- Called by a unit of this army when it stops reclaiming
+    ---@param self AIBrain
+    ---@param unit Unit
+    ---@param target Unit | Prop | nil      # is nil when the prop or unit is completely reclaimed
+    OnStopReclaim = function(self, unit, target)
+        -- pass the event to the platoon
+        local aiPlatoon = unit.AIPlatoonReference
+        if aiPlatoon then
+            aiPlatoon:OnStopReclaim(unit, target)
         end
     end,
 
