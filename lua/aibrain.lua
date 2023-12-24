@@ -1433,7 +1433,7 @@ AIBrain = Class(AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerCom
     -------------------------------------------------------------------------------
 
     -------------------------------------------------------------------------------
-    --#region Unit callbacks
+    --#region Unit events
 
     --- Called by a unit as it starts being built
     ---@param self AIBrain
@@ -1474,6 +1474,21 @@ AIBrain = Class(AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerCom
     ---@param built Unit
     OnUnitStopBuilding = function(self, unit, built)
         -- LOG(string.format('OnUnitStopBuilding: %s -> %s', unit.Blueprint.BlueprintId or '', built.Blueprint.BlueprintId or ''))
+    end,
+
+    --- Called by a unit as it loses or gains health at fixed intervals of 25%
+    ---@param self AIBrain
+    ---@param unit Unit
+    ---@param new number # 0.25 / 0.50 / 0.75 / 1.0
+    ---@param old number # 0.25 / 0.50 / 0.75 / 1.0
+    OnHealthChanged = function(self, unit, new, old)
+        LOG(string.format('OnUnitStopBuilding: %s: %f -> %f', unit.Blueprint.BlueprintId or '', new, old))
+
+        -- pass the event to the platoon
+        local aiPlatoon = unit.AIPlatoonReference
+        if aiPlatoon then
+            aiPlatoon:OnHealthChanged(unit, new, old)
+        end
     end,
 
     --#endregion

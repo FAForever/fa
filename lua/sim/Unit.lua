@@ -1330,16 +1330,13 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
 
     --- Health values come in at fixed 25% intervals
     ---@param self Unit
-    ---@param new number
-    ---@param old number
+    ---@param new number # 0.25 / 0.50 / 0.75 / 1.0
+    ---@param old number # 0.25 / 0.50 / 0.75 / 1.0
     OnHealthChanged = function(self, new, old)
         self:ManageDamageEffects(new, old)
 
-        -- awareness of event for AI
-        local aiPlatoon = self.AIPlatoonReference
-        if aiPlatoon then
-            aiPlatoon:OnHealthChanged(self, new, old)
-        end
+        -- inform the brain of the event
+        self.Brain:OnHealthChanged(self, new, old)
     end,
 
     ---@param self Unit
