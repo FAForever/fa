@@ -1503,6 +1503,19 @@ AIBrain = Class(AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerCom
         end
     end,
 
+    --- Called by a unit of this army when it starts reclaiming
+    ---@param self AIBrain
+    ---@param unit Unit
+    ---@param target Unit | Prop
+    OnStartReclaim = function(self, unit, target)
+        -- pass the event to the platoon
+        local aiPlatoon = unit.AIPlatoonReference
+        if aiPlatoon then
+            aiPlatoon:OnStartReclaim(unit, target)
+        end
+    end,
+
+
     --#endregion
     -------------------------------------------------------------------------------
 
