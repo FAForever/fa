@@ -20,14 +20,12 @@
 --** SOFTWARE.
 --******************************************************************************************************
 
-local BuilderManager = import("/lua/aibrains/managers/builder-manager.lua").AIBuilderManager
-
 local IsDestroyed = IsDestroyed
 
 local TableGetSize = table.getsize
 local TableGetn = table.getn
 
-local WeakValues = { __mode = 'v' }
+local WeakValueTable = { __mode = 'v' }
 
 ---@class AIFactoryManagerDebugInfo
 
@@ -66,66 +64,66 @@ local WeakValues = { __mode = 'v' }
 ---@field RESEARCH AIFactoryManagerCountTechs
 ---@field SUPPORT AIFactoryManagerCountTechs
 
----@class AIFactoryManager : AIBuilderManager
+---@class AIFactoryManager 
 ---@field Factories AIFactoryManagerReferences
 ---@field FactoriesBeingBuilt AIFactoryManagerReferences
 ---@field FactoryCount AIFactoryManagerCounts               # Recomputed every 10 ticks
 ---@field FactoryBeingBuiltCount AIFactoryManagerCounts     # Recomputed every 10 ticks
-AIFactoryManager = Class(BuilderManager) {
+AIFactoryManager = ClassSimple {
 
     ManagerName = "FactoryManager",
 
     ---@param self AIFactoryManager
     ---@param brain AIBrain
     ---@param base AIBase
-    ---@param locationType LocationType
-    Create = function(self, brain, base, locationType)
-        BuilderManager.Create(self, brain, base, locationType)
-        self.Identifier = 'AIFactoryManager at ' .. locationType
+    Create = function(self, brain, base)
+        self.Brain = brain
+        self.Base = base
+        self.Trash = TrashBag()
 
         self.Factories = {
             RESEARCH = {
                 TECH1 = {
-                    LAND = setmetatable({}, WeakValues),
-                    AIR = setmetatable({}, WeakValues),
-                    NAVAL = setmetatable({}, WeakValues),
+                    LAND = setmetatable({}, WeakValueTable),
+                    AIR = setmetatable({}, WeakValueTable),
+                    NAVAL = setmetatable({}, WeakValueTable),
                 },
                 TECH2 = {
-                    LAND = setmetatable({}, WeakValues),
-                    AIR = setmetatable({}, WeakValues),
-                    NAVAL = setmetatable({}, WeakValues),
+                    LAND = setmetatable({}, WeakValueTable),
+                    AIR = setmetatable({}, WeakValueTable),
+                    NAVAL = setmetatable({}, WeakValueTable),
                 },
                 TECH3 = {
-                    LAND = setmetatable({}, WeakValues),
-                    AIR = setmetatable({}, WeakValues),
-                    NAVAL = setmetatable({}, WeakValues),
+                    LAND = setmetatable({}, WeakValueTable),
+                    AIR = setmetatable({}, WeakValueTable),
+                    NAVAL = setmetatable({}, WeakValueTable),
                 },
                 EXPERIMENTAL = {
-                    LAND = setmetatable({}, WeakValues),
-                    AIR = setmetatable({}, WeakValues),
-                    NAVAL = setmetatable({}, WeakValues),
+                    LAND = setmetatable({}, WeakValueTable),
+                    AIR = setmetatable({}, WeakValueTable),
+                    NAVAL = setmetatable({}, WeakValueTable),
                 },
             },
             SUPPORT = {
                 TECH1 = {
-                    LAND = setmetatable({}, WeakValues),
-                    AIR = setmetatable({}, WeakValues),
-                    NAVAL = setmetatable({}, WeakValues),
+                    LAND = setmetatable({}, WeakValueTable),
+                    AIR = setmetatable({}, WeakValueTable),
+                    NAVAL = setmetatable({}, WeakValueTable),
                 },
                 TECH2 = {
-                    LAND = setmetatable({}, WeakValues),
-                    AIR = setmetatable({}, WeakValues),
-                    NAVAL = setmetatable({}, WeakValues),
+                    LAND = setmetatable({}, WeakValueTable),
+                    AIR = setmetatable({}, WeakValueTable),
+                    NAVAL = setmetatable({}, WeakValueTable),
                 },
                 TECH3 = {
-                    LAND = setmetatable({}, WeakValues),
-                    AIR = setmetatable({}, WeakValues),
-                    NAVAL = setmetatable({}, WeakValues),
+                    LAND = setmetatable({}, WeakValueTable),
+                    AIR = setmetatable({}, WeakValueTable),
+                    NAVAL = setmetatable({}, WeakValueTable),
                 },
                 EXPERIMENTAL = {
-                    LAND = setmetatable({}, WeakValues),
-                    AIR = setmetatable({}, WeakValues),
-                    NAVAL = setmetatable({}, WeakValues),
+                    LAND = setmetatable({}, WeakValueTable),
+                    AIR = setmetatable({}, WeakValueTable),
+                    NAVAL = setmetatable({}, WeakValueTable),
                 },
             }
         }
@@ -180,46 +178,46 @@ AIFactoryManager = Class(BuilderManager) {
         self.FactoriesBeingBuilt = {
             RESEARCH = {
                 TECH1 = {
-                    LAND = setmetatable({}, WeakValues),
-                    AIR = setmetatable({}, WeakValues),
-                    NAVAL = setmetatable({}, WeakValues),
+                    LAND = setmetatable({}, WeakValueTable),
+                    AIR = setmetatable({}, WeakValueTable),
+                    NAVAL = setmetatable({}, WeakValueTable),
                 },
                 TECH2 = {
-                    LAND = setmetatable({}, WeakValues),
-                    AIR = setmetatable({}, WeakValues),
-                    NAVAL = setmetatable({}, WeakValues),
+                    LAND = setmetatable({}, WeakValueTable),
+                    AIR = setmetatable({}, WeakValueTable),
+                    NAVAL = setmetatable({}, WeakValueTable),
                 },
                 TECH3 = {
-                    LAND = setmetatable({}, WeakValues),
-                    AIR = setmetatable({}, WeakValues),
-                    NAVAL = setmetatable({}, WeakValues),
+                    LAND = setmetatable({}, WeakValueTable),
+                    AIR = setmetatable({}, WeakValueTable),
+                    NAVAL = setmetatable({}, WeakValueTable),
                 },
                 EXPERIMENTAL = {
-                    LAND = setmetatable({}, WeakValues),
-                    AIR = setmetatable({}, WeakValues),
-                    NAVAL = setmetatable({}, WeakValues),
+                    LAND = setmetatable({}, WeakValueTable),
+                    AIR = setmetatable({}, WeakValueTable),
+                    NAVAL = setmetatable({}, WeakValueTable),
                 },
             },
             SUPPORT = {
                 TECH1 = {
-                    LAND = setmetatable({}, WeakValues),
-                    AIR = setmetatable({}, WeakValues),
-                    NAVAL = setmetatable({}, WeakValues),
+                    LAND = setmetatable({}, WeakValueTable),
+                    AIR = setmetatable({}, WeakValueTable),
+                    NAVAL = setmetatable({}, WeakValueTable),
                 },
                 TECH2 = {
-                    LAND = setmetatable({}, WeakValues),
-                    AIR = setmetatable({}, WeakValues),
-                    NAVAL = setmetatable({}, WeakValues),
+                    LAND = setmetatable({}, WeakValueTable),
+                    AIR = setmetatable({}, WeakValueTable),
+                    NAVAL = setmetatable({}, WeakValueTable),
                 },
                 TECH3 = {
-                    LAND = setmetatable({}, WeakValues),
-                    AIR = setmetatable({}, WeakValues),
-                    NAVAL = setmetatable({}, WeakValues),
+                    LAND = setmetatable({}, WeakValueTable),
+                    AIR = setmetatable({}, WeakValueTable),
+                    NAVAL = setmetatable({}, WeakValueTable),
                 },
                 EXPERIMENTAL = {
-                    LAND = setmetatable({}, WeakValues),
-                    AIR = setmetatable({}, WeakValues),
-                    NAVAL = setmetatable({}, WeakValues),
+                    LAND = setmetatable({}, WeakValueTable),
+                    AIR = setmetatable({}, WeakValueTable),
+                    NAVAL = setmetatable({}, WeakValueTable),
                 },
             }
         }
@@ -314,11 +312,6 @@ AIFactoryManager = Class(BuilderManager) {
             local layer = blueprint.LayerCategory
             local id = unit.EntityId
             self.FactoriesBeingBuilt[type][tech][layer][id] = unit
-
-            -- used by platoon functions to find the manager
-            local builderManagerData = unit.BuilderManagerData or {}
-            unit.BuilderManagerData = builderManagerData
-            builderManagerData.FactoryManager = self
         end
     end,
 
@@ -388,11 +381,6 @@ AIFactoryManager = Class(BuilderManager) {
             local id = unit.EntityId
             self.FactoriesBeingBuilt[type][tech][layer][id] = nil
             self.Factories[type][tech][layer][id] = unit
-
-            -- used by platoon functions to find the manager
-            local builderManagerData = unit.BuilderManagerData or {}
-            unit.BuilderManagerData = builderManagerData
-            builderManagerData.StructureManager = self
 
             -- create a new platoon instance
             local platoon = self.Brain:MakePlatoon("FactoryManager - " .. tostring(unit), '') --[[@as AIPlatoon]]
