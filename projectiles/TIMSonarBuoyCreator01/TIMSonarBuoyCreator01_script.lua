@@ -25,12 +25,15 @@ TIMSonarBuoyCreator01 = ClassProjectile(TTorpedoShipProjectile) {
 
     ---@param self TIMSonarBuoyCreator01
     OnEnterWater = function(self)
+        local army = self.Army
+
+
         for i in self.FxExitWaterEmitter do --splash
-            CreateEmitterAtEntity(self,self.Army,self.FxExitWaterEmitter[i]):ScaleEmitter(self.FxSplashScale)
+            CreateEmitterAtEntity(self, army,self.FxExitWaterEmitter[i]):ScaleEmitter(self.FxSplashScale)
         end
 
         local x,y,z = unpack(self:GetPositionXYZ())
-        CreateUnit('ueb5208', self.Army, x, y, z, 0, 0, 0, 0)
+        CreateUnit('ueb5208', army, x, y, z, 0, 0, 0, 0)
 
         self:Destroy()
     end,

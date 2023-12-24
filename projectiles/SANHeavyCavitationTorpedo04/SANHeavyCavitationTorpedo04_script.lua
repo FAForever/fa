@@ -6,6 +6,12 @@
 local SHeavyCavitationTorpedo = import("/lua/seraphimprojectiles.lua").SHeavyCavitationTorpedo
 local EffectTemplate = import("/lua/effecttemplates.lua")
 
+-- upvalue for perfomance
+local ForkThread = ForkThread
+local WaitTicks = WaitTicks
+local CreateEmitterOnEntity = CreateEmitterOnEntity
+local TrashBagAdd = TrashBag.Add
+
 --- Heavy Cavitation Torpedo Projectile script, XSA0204
 ---@class SANHeavyCavitationTorpedo04 : SHeavyCavitationTorpedo
 SANHeavyCavitationTorpedo04 = ClassProjectile(SHeavyCavitationTorpedo) {
@@ -13,9 +19,12 @@ SANHeavyCavitationTorpedo04 = ClassProjectile(SHeavyCavitationTorpedo) {
     ---@param self SANHeavyCavitationTorpedo04
     OnCreate = function(self)
         SHeavyCavitationTorpedo.OnCreate(self)
+        local trash = self.Trash
+        local army = self.Army
+
         self:SetCollisionShape('Sphere', 0, 0, 0, 0.5)
-        self.Trash:Add(ForkThread(self.PauseUntilTrack, self))
-        CreateEmitterOnEntity(self, self.Army, EffectTemplate.SHeavyCavitationTorpedoFxTrails)
+        TrashBagAdd(trash,ForkThread(self.PauseUntilTrack, self))
+        CreateEmitterOnEntity(self, army, EffectTemplate.SHeavyCavitationTorpedoFxTrails)
     end,
 
     ---@param self SANHeavyCavitationTorpedo04

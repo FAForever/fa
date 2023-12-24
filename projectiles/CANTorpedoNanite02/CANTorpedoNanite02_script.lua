@@ -7,6 +7,13 @@
 --****************************************************************************
 local CTorpedoShipProjectile = import("/lua/cybranprojectiles.lua").CTorpedoShipProjectile
 
+-- upvalue for perfomance
+local ForkThread = ForkThread
+local WaitTicks = WaitTicks
+local TrashBagAdd = TrashBag.Add
+
+
+
 ---@class CANTorpedoNanite02 : CTorpedoShipProjectile
 CANTorpedoNanite02 = ClassProjectile(CTorpedoShipProjectile) {
     TrailDelay = 0,
@@ -15,7 +22,8 @@ CANTorpedoNanite02 = ClassProjectile(CTorpedoShipProjectile) {
     ---@param inWater boolean
     OnCreate = function(self, inWater)
         CTorpedoShipProjectile.OnCreate(self, inWater)
-        self.Trash:Add(ForkThread( self.MovementThread,self ))
+        local trash = self.Trash
+        TrashBagAdd(trash,ForkThread( self.MovementThread,self ))
     end,
 
     ---@param self CANTorpedoNanite02
@@ -40,7 +48,8 @@ CANTorpedoNanite02 = ClassProjectile(CTorpedoShipProjectile) {
     ---@param self CANTorpedoNanite02
     OnEnterWater = function(self)
         CTorpedoShipProjectile.OnEnterWater(self)
-        self:CreateImpactEffects(self.Army, self.FxEnterWater, self.FxSplashScale )
+        local army = self.Army
+        self:CreateImpactEffects(army, self.FxEnterWater, self.FxSplashScale )
         self:StayUnderwater(true)
         self:TrackTarget(true)
         self:SetTurnRate(120)

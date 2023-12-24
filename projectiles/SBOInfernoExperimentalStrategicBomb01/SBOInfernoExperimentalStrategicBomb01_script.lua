@@ -15,9 +15,9 @@ SBOInfernoExperimentalStrategicBomb01 = ClassProjectile(SExperimentalStrategicBo
     OnImpact = function(self, TargetType, TargetEntity)
         if not TargetEntity or not EntityCategoryContains(categories.PROJECTILE, TargetEntity) then
             -- Play the explosion sound
-            local myBlueprint = self.Blueprint
-            if myBlueprint.Audio.Explosion then
-                self:PlaySound(myBlueprint.Audio.Explosion)
+            local bp = self.Blueprint
+            if bp.Audio.Explosion then
+                self:PlaySound(bp.Audio.Explosion)
             end
             nukeProjectile = self:CreateProjectile('/effects/entities/SeraphimNukeEffectController01/SeraphimNukeEffectController01_proj.bp', 0, 0, 0, nil, nil, nil):SetCollision(false)
             local pos = self:GetPosition()

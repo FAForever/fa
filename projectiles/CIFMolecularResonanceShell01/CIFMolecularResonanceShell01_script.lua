@@ -8,10 +8,12 @@ CIFMolecularResonanceShell01 = ClassProjectile(CIFMolecularResonanceShell) {
     ---@param targetType string
     ---@param targetEntity Prop|Unit
     OnImpact = function(self, targetType, targetEntity)
+        local army = self.Army
+
 		CIFMolecularResonanceShell.OnImpact(self, targetType, targetEntity)
         -- make it flashy!
-        CreateLightParticle( self, -1, self.Army, 24, 5, 'glow_03', 'ramp_red_10' )
-        CreateLightParticle( self, -1, self.Army, 8, 16, 'glow_03', 'ramp_antimatter_02' )
+        CreateLightParticle( self, -1, army, 24, 5, 'glow_03', 'ramp_red_10' )
+        CreateLightParticle( self, -1, army, 8, 16, 'glow_03', 'ramp_antimatter_02' )
 	end,
 
     ---@param self CIFMolecularResonanceShell01

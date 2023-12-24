@@ -1,6 +1,16 @@
 local GetRandomFloat = import("/lua/utilities.lua").GetRandomFloat
 local Projectile = import("/lua/sim/projectile.lua").Projectile
 
+-- upvalue for performance
+local ForkThread = ForkThread
+local WaitTicks = WaitTicks
+local Warp = Warp
+local GetTerrainHeight = GetTerrainHeight
+local GetTerrainTypeOffset = GetTerrainTypeOffset
+local TrashBagAdd = TrashBag.Add
+
+
+
 ---@class Sinker : Projectile
 Sinker = ClassProjectile(Projectile) {
 
@@ -28,13 +38,15 @@ Sinker = ClassProjectile(Projectile) {
             local targetBone = targBone
             local sinker = self
             local wait = delay
+            local trash = self.Trash
 
-            self:ForkThread(
+            TrashBagAdd(trash, ForkThread(
                 function()
                     WaitTicks(wait)
                     sinker:StartSinking(targetEntity, targetBone)
-                end
-            )
+                end,
+                self
+            ))
         else
             self:StartSinking(targEntity, targBone)
         end
@@ -65,7 +77,7 @@ Sinker = ClassProjectile(Projectile) {
     --- Destroy the sinking unit when it hits the bottom of the ocean.
     ---@param self Sinker
     ---@param targetType string
-    ---@param targetEntity Prop|Unit
+    ---@param targetEntity Prop|Unit unused
     OnImpact = function(self, targetType, targetEntity)
         if targetType == 'Terrain' then
             self:Destroy()

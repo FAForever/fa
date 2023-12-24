@@ -22,7 +22,6 @@
 
 local ADepthChargeProjectile = import("/lua/aeonprojectiles.lua").ADepthChargeProjectile
 local ADepthChargeProjectileOnImpact = ADepthChargeProjectile.OnImpact
-
 local VisionMarkerOpti = import("/lua/sim/vizmarker.lua").VisionMarkerOpti
 
 -- Depth Charge Script

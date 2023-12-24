@@ -7,10 +7,13 @@ AIFMiasmaShell01 = ClassProjectile(AMiasmaProjectile) {
 
     ---@param self AIFMiasmaShell01
     ---@param targetType string
-    ---@param targetEntity Prop|Unit
+    ---@param targetEntity Prop|Unit unused
     OnImpact = function(self, targetType, targetEntity)
         local bp = self.Blueprint.Audio
         local snd = bp['Impact'.. targetType]
+        local army = self.Army
+        local fxImpactNone = self.FxImpactNone
+        local fxNoneHitScale = self.FxNoneHitScale
 
         if snd then
             self:PlaySound(snd)
@@ -19,7 +22,7 @@ AIFMiasmaShell01 = ClassProjectile(AMiasmaProjectile) {
             self:PlaySound(bp.Impact)
         end
 
-		self:CreateImpactEffects( self.Army, self.FxImpactNone, self.FxNoneHitScale )
+		self:CreateImpactEffects( army, fxImpactNone, fxNoneHitScale )
 		local x,y,z = self:GetVelocity()
 		local speed = utilities.GetVectorLength(Vector(x*10,y*10,z*10))
 

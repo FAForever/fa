@@ -1,5 +1,8 @@
 local TTorpedoShipProjectile = import("/lua/terranprojectiles.lua").TTorpedoShipProjectile
 
+-- upvale for performance
+local WaitTicks = WaitTicks
+
 --- Terran Anti Air Missile
 ---@class TANAnglerTorpedo06: TTorpedoShipProjectile
 TANAnglerTorpedo06 = ClassProjectile(TTorpedoShipProjectile) {

@@ -21,12 +21,15 @@
 --******************************************************************************************************
 
 local ATorpedoCluster = import("/lua/aeonprojectiles.lua").ATorpedoCluster
+local ATorpedoPolyTrails01 = import("/lua/effecttemplates.lua").ATorpedoPolyTrails01
+local VisionMarkerOpti = import("/lua/sim/vizmarker.lua").VisionMarkerOpti
 local ATorpedoClusterOnCreate = ATorpedoCluster.OnCreate
 local ATorpedoClusterOnImpact = ATorpedoCluster.OnImpact
 
-local ATorpedoPolyTrails01 = import("/lua/effecttemplates.lua").ATorpedoPolyTrails01
-
-local VisionMarkerOpti = import("/lua/sim/vizmarker.lua").VisionMarkerOpti
+-- upvalue for performance
+local ForkThread = ForkThread
+local WaitTicks = WaitTicks
+local TrashBagAdd = TrashBag.Add
 
 --- Aeon Torpedo Cluster Projectile script, XAA0306
 ---@class AANTorpedoClusterSplit01 : ATorpedoCluster
@@ -36,8 +39,11 @@ AANTorpedoClusterSplit01 = ClassProjectile(ATorpedoCluster) {
     ---@param self AANTorpedoClusterSplit01
     OnCreate = function(self)
         ATorpedoClusterOnCreate(self)
-        self.Trash:Add(ForkThread(self.CountdownExplosion, self))
-        CreateTrail(self, -1, self.Army, ATorpedoPolyTrails01)
+        local trash = self.Trash
+        local army = self.Army
+
+        TrashBagAdd(trash,ForkThread(self.CountdownExplosion, self))
+        CreateTrail(self, -1, army, ATorpedoPolyTrails01)
     end,
 
     ---@param self AANTorpedoClusterSplit01
@@ -51,7 +57,6 @@ AANTorpedoClusterSplit01 = ClassProjectile(ATorpedoCluster) {
     ---@param self TANAnglerTorpedo06
     MovementThread = function(self)
         -- local scope for performance
-        local WaitTicks = WaitTicks
         local IsDestroyed = IsDestroyed
         local ProjectileSetAcceleration = self.SetAcceleration
 
@@ -67,9 +72,11 @@ AANTorpedoClusterSplit01 = ClassProjectile(ATorpedoCluster) {
 
     ---@param self AANTorpedoClusterSplit01
     OnLostTarget = function(self)
+        local trash = self.Trash
+
         self:SetMaxSpeed(2)
         self:SetAcceleration(-0.6)
-        self.Trash:Add(ForkThread(self.CountdownMovement, self))
+        TrashBagAdd(trash,ForkThread(self.CountdownMovement, self))
     end,
 
     ---@param self AANTorpedoClusterSplit01
@@ -86,9 +93,10 @@ AANTorpedoClusterSplit01 = ClassProjectile(ATorpedoCluster) {
     OnImpact = function(self, TargetType, TargetEntity)
         local px, _, pz = self:GetPositionXYZ()
         local marker = VisionMarkerOpti({ Owner = self })
+        local army = self.Army
         marker:UpdatePosition(px, pz)
         marker:UpdateDuration(5)
-        marker:UpdateIntel(self.Army, 5, 'Vision', true)
+        marker:UpdateIntel(army, 5, 'Vision', true)
         ATorpedoClusterOnImpact(self, TargetType, TargetEntity)
     end,
 }

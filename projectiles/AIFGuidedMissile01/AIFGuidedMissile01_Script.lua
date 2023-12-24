@@ -19,6 +19,7 @@ local IsDestroyed = IsDestroyed
 local CreateEmitterOnEntity = CreateEmitterOnEntity
 local CreateEmitterAtEntity = CreateEmitterAtEntity
 local CreateLightParticleIntel = CreateLightParticleIntel
+local TrashbagAdd = TrashBag.Add
 
 ---@class AIFGuidedMissile : AGuidedMissileProjectile
 AIFGuidedMissile = ClassProjectile(AGuidedMissileProjectile) {
@@ -26,14 +27,15 @@ AIFGuidedMissile = ClassProjectile(AGuidedMissileProjectile) {
     ---@param self AIFGuidedMissile
     OnCreate = function(self)
         AGuidedMissileProjectileOnCreate(self)
+        local launcher = self.Launcher
+        local trash = self.Trash
 
         -- tell the mercy to self destruct
-        local launcher = self.Launcher
         if launcher and not IsDestroyed(launcher) then
             launcher:ProjectileFired()
         end
 
-        self.Trash:Add(ForkThread(self.SplitThread, self))
+        TrashbagAdd(trash, ForkThread(self.SplitThread, self))
     end,
 
     ---@param self AIFGuidedMissile
@@ -108,62 +110,3 @@ AIFGuidedMissile = ClassProjectile(AGuidedMissileProjectile) {
     end
 }
 TypeClass = AIFGuidedMissile
-
--- "Umbrella" version
-
---   Create new target above impact point
-
---  local vertTarget = {
---     tx,
---     ty + 8,
---     tz,
--- }
-
--- self:SetNewTargetGround(vertTarget)
-
--- local px, py, pz = self:GetPositionXYZ()
-
--- local timeToImpact = math.floor( (tx-px)/vx )
-
--- WARN("Time to impact: " .. tostring(timeToImpact))
-
--- WaitTicks(timeToImpact - 1)
-
--- -- Launch projectiles at semi-random angles away from split location
-
--- for i = 0, (numProjectiles -1) do
---     xVec = math.sin(i*angle) * spreadMul
---     yVec = -0.5
---     zVec = math.cos(i*angle) * spreadMul
---     local proj = self:CreateChildProjectile(ChildProjectileBP)
---     proj:SetVelocity( xVec, yVec, zVec )
---     proj:SetVelocity( velocity )
---     local newTarget = {
---         tx + radius * math.sin(i*angle),
---         ty,
---         tz + radius * math.cos(i*angle),
---     }
---     proj:SetNewTargetGround(newTarget)
---     proj.DamageData = self.DamageData
--- end
--- self:Destroy()
--- end,
-
--- "Direct" version
--- -- Launch projectiles at semi-random angles away from split location
-
--- for i = 0, (numProjectiles -1) do
---     xVec = vx + math.sin(i*angle) * spreadMul
---     zVec = vz + math.cos(i*angle) * spreadMul
---     local proj = self:CreateChildProjectile(ChildProjectileBP)
---     proj:SetVelocity( xVec, yVec, zVec )
---     proj:SetVelocity( velocity )
---     local newTarget = {
---         tx + radius * math.sin(i*angle),
---         ty,
---         tz + radius * math.cos(i*angle),
---     }
---     proj:SetNewTargetGround(newTarget)
---     proj.DamageData = self.DamageData
--- end
--- self:Destroy()

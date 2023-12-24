@@ -7,6 +7,7 @@
 ---@field Display PropBlueprintDisplay
 ---@field Economy PropBlueprintEconomy
 ---@field Physics PropBlueprintPhysics
+---@field Audio   PropBlueprintAudio
 ---@field ScriptClass PropType Class name for this prop
 ---@field ScriptModule FileName File to find class in
 
@@ -31,3 +32,6 @@
 
 ---@class PropBlueprintPhysics
 ---@field BlockPath boolean
+
+---@class PropBlueprintAudio
+

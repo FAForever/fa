@@ -120,12 +120,15 @@ Projectile = ClassProjectile(ProjectileMethods) {
     ---@param self Projectile The projectile that we're creating
     ---@param inWater? boolean Flag to indicate the projectile is in water or not
     OnCreate = function(self, inWater)
-        local blueprint = self:GetBlueprint() --[[@as ProjectileBlueprint]]
+        local blueprint = self.Blueprint --[[@as ProjectileBlueprint]]
+        local army = self.Army --[[@as number]]
+        local launcher = self.Launcher --[[@as Unit]]
+        local Trash = self.Trash --[[@as TrashBag]]
 
         self.Blueprint = blueprint
-        self.Army = self:GetArmy() --[[@as number]]
-        self.Launcher = self:GetLauncher() --[[@as Unit]]
-        self.Trash = TrashBag() --[[@as TrashBag]]
+        self.Army = army --[[@as number]]
+        self.Launcher = launcher --[[@as Unit]]
+        self.Trash = Trash --[[@as TrashBag]]
 
         -- set some health, if we have some
         local maxHealth = blueprint.Defense.MaxHealth
@@ -186,13 +189,15 @@ Projectile = ClassProjectile(ProjectileMethods) {
     ---@param other Projectile The projectile we're checking the collision with
     ---@return boolean
     OnCollisionCheck = function(self, other)
+        local army = self.Army
+
         -- we can't hit our own
-        if self.Army == other.Army then
+        if army == other.Army then
             return false
         end
 
         -- flag if we can hit allied projectiles
-        local alliedCheck = not (self.CollideFriendly and IsAlly(self.Army, other.Army))
+        local alliedCheck = not (self.CollideFriendly and IsAlly(army, other.Army))
 
         local selfHashedCategories = self.Blueprint.CategoriesHash
         local otherHashedCategories = other.Blueprint.CategoriesHash
@@ -224,13 +229,15 @@ Projectile = ClassProjectile(ProjectileMethods) {
     ---@param firingWeapon Weapon The weapon the beam originates from that we're checking the collision with
     ---@return boolean
     OnCollisionCheckWeapon = function(self, firingWeapon)
+        local army = self.Army
+
         -- we can't hit our own
-        if self.Army == firingWeapon.Army then
+        if army == firingWeapon.Army then
             return false
         end
 
         -- flag that indicates whether we should impact allied projectiles
-        local alliedCheck = not (self.CollideFriendly and IsAlly(self.Army, firingWeapon.Army))
+        local alliedCheck = not (self.CollideFriendly and IsAlly(army, firingWeapon.Army))
 
         local selfHashedCategories = self.Blueprint.CategoriesHash
 
@@ -281,8 +288,8 @@ Projectile = ClassProjectile(ProjectileMethods) {
     --- Called by the engine when the projectile is killed, in other words: intercepted
     ---@param self Projectile
     ---@param instigator Unit
-    ---@param type string
-    ---@param overkillRatio number
+    ---@param type string unused
+    ---@param overkillRatio number unused
     OnKilled = function(self, instigator, type, overkillRatio)
 
         -- callbacks for launcher to have an idea what is going on for AIs
@@ -745,7 +752,7 @@ Projectile = ClassProjectile(ProjectileMethods) {
             for k, v in data.Buffs do
                 if v.Add.OnImpact == true then
                     if v.AppliedToTarget ~= true or (v.Radius and v.Radius > 0) then
-                        target = self:GetLauncher()
+                        target = self.Launcher
                     end
                     -- Check for target validity
                     if target and IsUnit(target) then
@@ -765,8 +772,8 @@ Projectile = ClassProjectile(ProjectileMethods) {
 
     --- Called by Lua to determine whether the projectile should be destroyed
     ---@param self Projectile
-    ---@param targetType string
-    ---@param targetEntity Unit | Prop
+    ---@param targetType string unused
+    ---@param targetEntity string|Projectile|Unit|UserUnit
     OnImpactDestroy = function(self, targetType, targetEntity)
         if self.DestroyOnImpact or
             (not targetEntity) or
@@ -884,7 +891,7 @@ Projectile = ClassProjectile(ProjectileMethods) {
     ---@param self Projectile
     ---@param instigator Unit
     ---@param amount number
-    ---@param vector Vector
+    ---@param vector Vector unused
     ---@param damageType DamageType
     DoTakeDamage = function(self, instigator, amount, vector, damageType)
         -- Check for valid projectile
@@ -957,7 +964,7 @@ Projectile = ClassProjectile(ProjectileMethods) {
     ---@param self Projectile
     ---@param fn function
     ---@param ... any
-    ---@return thread
+    ---@return thread|nil
     ForkThread = function(self, fn, ...)
         if fn then
             local thread = ForkThread(fn, self, unpack(arg))
@@ -988,7 +995,7 @@ Projectile = ClassProjectile(ProjectileMethods) {
 ---@field Army Army
 DummyProjectile = ClassDummyProjectile(ProjectileMethods) {
     ---@param self DummyProjectile
-    ---@param inWater? boolean
+    ---@param inWater? boolean unused
     OnCreate = function(self, inWater)
         -- expected to be cached by all projectiles
         self.Blueprint = EntityGetBlueprint(self)
@@ -996,8 +1003,8 @@ DummyProjectile = ClassDummyProjectile(ProjectileMethods) {
     end,
 
     ---@param self DummyProjectile
-    ---@param targetType string
-    ---@param targetEntity Unit | Prop
+    ---@param targetType string unused
+    ---@param targetEntity Unit | Prop unused
     OnImpact = function(self, targetType, targetEntity)
         self:Destroy()
     end,

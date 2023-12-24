@@ -39,7 +39,7 @@ PlatoonFormManager = Class(BuilderManager) {
 
     ---@param self PlatoonFormManager
     ---@param builderData table
-    ---@param locationType Vector
+    ---@param locationType string
     ---@param builderType string
     ---@return boolean
     AddBuilder = function(self, builderData, locationType, builderType)
@@ -48,7 +48,7 @@ PlatoonFormManager = Class(BuilderManager) {
         return newBuilder
     end,
 
-    ---@param self PlatoonFormManager
+    ---@param self PlatoonFormManager unused
     ---@param templateName string
     ---@return table
     GetPlatoonTemplate = function(self, templateName)
@@ -76,7 +76,7 @@ PlatoonFormManager = Class(BuilderManager) {
     end,
 
     ---@param self PlatoonFormManager
-    ---@param buildingCategory string
+    ---@param buildingCategory EntityCategory
     ---@param builderCategory string
     ---@return table
     GetUnitsBeingBuilt = function(self, buildingCategory, builderCategory)

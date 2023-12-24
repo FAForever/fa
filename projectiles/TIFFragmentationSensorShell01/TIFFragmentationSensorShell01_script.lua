@@ -13,12 +13,14 @@ local MathCos = math.cos
 TIFFragmentationSensorShell01 = ClassProjectile(TArtilleryProjectile) {
 
     ---@param self TIFFragmentationSensorShell01
-    ---@param TargetType string
-    ---@param TargetEntity Prop|Unit
+    ---@param TargetType string unused
+    ---@param TargetEntity Prop|Unit unused
     OnImpact = function(self, TargetType, TargetEntity)
+        local army = self.Army
+
         -- the split fx
-        CreateEmitterAtEntity( self, self.Army, TFragmentationSensorShellFrag[1])
-        CreateEmitterAtEntity( self, self.Army, TFragmentationSensorShellFrag[2])
+        CreateEmitterAtEntity( self, army, TFragmentationSensorShellFrag[1])
+        CreateEmitterAtEntity( self, army, TFragmentationSensorShellFrag[2])
 
         -- Create several other projectiles in a dispersal pattern
         local bp = self.Blueprint.Physics
@@ -42,7 +44,7 @@ TIFFragmentationSensorShell01 = ClassProjectile(TArtilleryProjectile) {
         local marker = VisionMarkerOpti({ Owner = self })
         marker:UpdatePosition(px, pz)
         marker:UpdateDuration(5)
-        marker:UpdateIntel(self.Army, 5, 'Vision', true)
+        marker:UpdateIntel(army, 5, 'Vision', true)
 
 		-- one initial projectile following same directional path as the original
         local proj = self:CreateChildProjectile(bp.FragmentId)

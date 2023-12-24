@@ -58,7 +58,7 @@ FactoryBuilderManager = Class(BuilderManager) {
         self.PlatoonListEmpty = true
 
         self.UseCenterPoint = useCenterPoint or false
-        self:ForkThread(self.RallyPointMonitor)
+        self.Trash:Add(ForkThread(self.RallyPointMonitor, self))
     end,
 
     ---@param self FactoryBuilderManager
@@ -245,7 +245,7 @@ FactoryBuilderManager = Class(BuilderManager) {
     ---@param bType string
     SetupNewFactory = function(self,unit,bType)
         self:SetupFactoryCallbacks({unit}, bType)
-        self:ForkThread(self.DelayRallyPoint, unit)
+        self.Trash:Add(ForkThread(self.DelayRallyPoint, self, unit))
     end,
 
     ---@param self FactoryBuilderManager
@@ -280,7 +280,7 @@ FactoryBuilderManager = Class(BuilderManager) {
                                         end
                 import("/lua/scenariotriggers.lua").CreateUnitBuiltTrigger(factoryWorkFinish, v, categories.ALLUNITS)
             end
-            self:ForkThread(self.DelayBuildOrder, v, bType, 0.1)
+            self.Trash:Add(ForkThread(self.DelayBuildOrder,self, v, bType, 0.1))
         end
     end,
 
@@ -454,7 +454,7 @@ FactoryBuilderManager = Class(BuilderManager) {
             self.Brain:BuildPlatoon(template, {factory}, 1)
         else
             -- No builder found setup way to check again
-            self:ForkThread(self.DelayBuildOrder, factory, bType, 2)
+            self.Trash:Add(ForkThread(self.DelayBuildOrder,self, factory, bType, 2))
         end
     end,
 

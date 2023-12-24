@@ -12,13 +12,13 @@ SIFExperimentalStrategicDeath01 = ClassProjectile(NullShell) {
     EffectThread = function(self)
         local army = self.Army
 
-        CreateLightParticle(self, -1, self.Army, 80, 10, 'glow_02', 'ramp_blue_22')
+        CreateLightParticle(self, -1, army, 80, 10, 'glow_02', 'ramp_blue_22')
         WaitTicks(4)
-        CreateLightParticle(self, -1, self.Army, 40, 30, 'glow_02', 'ramp_blue_16')
+        CreateLightParticle(self, -1, army, 40, 30, 'glow_02', 'ramp_blue_16')
         WaitTicks(31)
-        CreateLightParticle(self, -1, self.Army, 60, 15, 'glow_02', 'ramp_blue_16')
+        CreateLightParticle(self, -1, army, 60, 15, 'glow_02', 'ramp_blue_16')
         WaitTicks(11)
-        CreateLightParticle(self, -1, self.Army, 30, 30, 'glow', 'ramp_blue_22')
+        CreateLightParticle(self, -1, army, 30, 30, 'glow', 'ramp_blue_22')
 
         self.Trash:Add(ForkThread(self.ShakeAndBurnMe,self, army))
         self.Trash:Add(ForkThread(self.DistortionField,self))

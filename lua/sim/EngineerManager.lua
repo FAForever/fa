@@ -35,12 +35,7 @@ EngineerManager = Class(BuilderManager) {
         self.LocationType = self.LocationType or lType
 
         self.ConsumptionUnits = {
-            Engineers = { Category = categories.ENGINEER, Units = {}, UnitsList = {}, Count = 0, },
-
-
-
-
-            
+            Engineers = { Category = categories.ENGINEER, Units = {}, UnitsList = {}, Count = 0, },           
             Fabricators = { Category = categories.MASSFABRICATION * categories.STRUCTURE, Units = {}, UnitsList = {}, Count = 0, },
             Shields = { Category = categories.SHIELD * categories.STRUCTURE, Units = {}, UnitsList = {}, Count = 0, },
             MobileShields = { Category = categories.SHIELD * categories.MOBILE, Units = {}, UnitsList = {}, Count = 0, },
@@ -66,7 +61,7 @@ EngineerManager = Class(BuilderManager) {
     -- Check to see if the unit is buildings something in the category given
     ---@param unit Unit
     ---@param econ any unused
-    ---@param pauseVal number
+    ---@param pauseVal number unused
     ---@param category EntityCategory
     ---@return boolean
     ProductionCheck = function(unit, econ, pauseVal, category)
@@ -93,7 +88,7 @@ EngineerManager = Class(BuilderManager) {
     -- only pause the assisters of experimentals
     ---@param unit Unit
     ---@param econ any unused
-    ---@param pauseVal number
+    ---@param pauseVal number unused
     ---@param category EntityCategory
     ---@return boolean
     ExperimentalCheck = function(unit, econ, pauseVal, category)
@@ -159,7 +154,7 @@ EngineerManager = Class(BuilderManager) {
             --pauseVal = self:DisableMassGroup(self.ConsumptionUnits.Engineers, econ, pauseVal, self.ProductionCheck, categories.STRUCTURE - categories.MASSEXTRACTION - categories.ENERGYPRODUCTION - categories.FACTORY - categories.EXPERIMENTAL)
         end
 
-        self:ForkThread(self.LowMassRepeatThread)
+        self.Trash:Add(ForkThread(self.LowMassRepeatThread, self))
     end,
 
     ---@param self EngineerManager
@@ -288,7 +283,7 @@ EngineerManager = Class(BuilderManager) {
             pauseVal = self:DisableEnergyGroup(self.ConsumptionUnits.Engineers, econ, pauseVal, self.ProductionCheck, categories.ALLUNITS - categories.ENERGYPRODUCTION)
         end
 
-        self:ForkThread(self.LowEnergyRepeatThread)
+        self.Trash:Add(ForkThread(self.LowEnergyRepeatThread,self))
     end,
 
     ---@param self EngineerManager

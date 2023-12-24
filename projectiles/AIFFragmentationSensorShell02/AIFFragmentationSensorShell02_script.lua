@@ -8,6 +8,11 @@ local EffectTemplate = import("/lua/effecttemplates.lua")
 local AArtilleryFragmentationSensorShellProjectile = import("/lua/aeonprojectiles.lua").AArtilleryFragmentationSensorShellProjectile02
 local RandomFloat = import("/lua/utilities.lua").GetRandomFloat
 
+-- upvale for perfomance
+local MathPi = math.pi
+local MathSin = math.sin
+local MathCos = math.cos
+
 --- Aeon Quantic Cluster Fragmentation Sensor shell script , Child Projectile after 1st split - XAB2307
 ---@class AIFFragmentationSensorShell02 : AArtilleryFragmentationSensorShellProjectile02
 AIFFragmentationSensorShell02 = ClassProjectile(AArtilleryFragmentationSensorShellProjectile) {
@@ -19,9 +24,11 @@ AIFFragmentationSensorShell02 = ClassProjectile(AArtilleryFragmentationSensorShe
         if TargetType != 'Shield' then
 	        local FxFragEffect = EffectTemplate.Aeon_QuanticClusterFrag02
             local bp = self.Blueprint.Physics
+			local army = self.Army
+
 	        -- Split effects
 	        for k, v in FxFragEffect do
-	            CreateEmitterAtBone( self, -1, self.Army, v )
+	            CreateEmitterAtBone( self, -1, army, v )
 	        end
 
 			local vx, vy, vz = self:GetVelocity()
@@ -32,7 +39,7 @@ AIFFragmentationSensorShell02 = ClassProjectile(AArtilleryFragmentationSensorShe
 
 			-- Create several other projectiles in a dispersal pattern
             local numProjectiles = bp.Fragments - 1
-            local angle = (2 * math.pi) / numProjectiles
+            local angle = (2 * MathPi) / numProjectiles
             local angleInitial = RandomFloat( 0, angle )
 
             -- Randomization of the spread
@@ -44,8 +51,8 @@ AIFFragmentationSensorShell02 = ClassProjectile(AArtilleryFragmentationSensorShe
 
 	        -- Launch projectiles at semi-random angles away from split location
 	        for i = 0, numProjectiles - 1 do
-	            xVec = vx + (math.sin(angleInitial + (i*angle) + RandomFloat(-angleVariation, angleVariation))) * spreadMul
-	            zVec = vz + (math.cos(angleInitial + (i*angle) + RandomFloat(-angleVariation, angleVariation))) * spreadMul 
+	            xVec = vx + (MathSin(angleInitial + (i*angle) + RandomFloat(-angleVariation, angleVariation))) * spreadMul
+	            zVec = vz + (MathCos(angleInitial + (i*angle) + RandomFloat(-angleVariation, angleVariation))) * spreadMul
                 local proj = self:CreateChildProjectile(bp.FragmentId)
 	            proj:SetVelocity(xVec,yVec,zVec)
 	            proj:SetVelocity(velocity)
@@ -53,7 +60,7 @@ AIFFragmentationSensorShell02 = ClassProjectile(AArtilleryFragmentationSensorShe
 	        end
 	        self:Destroy()
 		else
-	        self:DoDamage( self, self.DamageData, TargetEntity)
+	        self:DoDamage(self, self.DamageData, TargetEntity)
 	        self:OnImpactDestroy(TargetType, TargetEntity)
         end
     end,

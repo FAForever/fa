@@ -8,19 +8,26 @@ local EffectTemplate = import("/lua/effecttemplates.lua")
 local AArtilleryFragmentationSensorShellProjectile = import("/lua/aeonprojectiles.lua").AArtilleryFragmentationSensorShellProjectile
 local RandomFloat = import("/lua/utilities.lua").GetRandomFloat
 
+-- upvale for perfomance
+local MathPi = math.pi
+local MathSin = math.sin
+local MathCos = math.cos
+
+
 ---@class AIFFragmentationSensorShell01 : AArtilleryFragmentationSensorShellProjectile
 AIFFragmentationSensorShell01 = ClassProjectile(AArtilleryFragmentationSensorShellProjectile) {
 
     ---@param self AIFFragmentationSensorShell01
-    ---@param TargetType string
-    ---@param TargetEntity Prop|Unit
+    ---@param TargetType string unused
+    ---@param TargetEntity Prop|Unit unused
     OnImpact = function(self, TargetType, TargetEntity)
         local FxFragEffect = EffectTemplate.Aeon_QuanticClusterFrag01
         local bp = self.Blueprint.Physics
+        local army = self.Army
 
         -- Split effects
         for k, v in FxFragEffect do
-            CreateEmitterAtBone( self, -1, self.Army, v )
+            CreateEmitterAtBone( self, -1, army, v )
         end
 
         local vx, vy, vz = self:GetVelocity()
@@ -31,7 +38,7 @@ AIFFragmentationSensorShell01 = ClassProjectile(AArtilleryFragmentationSensorShe
 
 		-- Create several other projectiles in a dispersal pattern
         local numProjectiles = bp.Fragments - 1
-        local angle = (2 * math.pi) / numProjectiles
+        local angle = (2 * MathPi) / numProjectiles
         local angleInitial = RandomFloat( 0, angle )
 
         -- Randomization of the spread
@@ -44,8 +51,8 @@ AIFFragmentationSensorShell01 = ClassProjectile(AArtilleryFragmentationSensorShe
 
         -- Launch projectiles at semi-random angles away from split location
         for i = 0, numProjectiles - 1 do
-            xVec = vx + (math.sin(angleInitial + (i*angle) + RandomFloat(-angleVariation, angleVariation))) * spreadMul
-            zVec = vz + (math.cos(angleInitial + (i*angle) + RandomFloat(-angleVariation, angleVariation))) * spreadMul
+            xVec = vx + (MathSin(angleInitial + (i*angle) + RandomFloat(-angleVariation, angleVariation))) * spreadMul
+            zVec = vz + (MathCos(angleInitial + (i*angle) + RandomFloat(-angleVariation, angleVariation))) * spreadMul
             local proj = self:CreateChildProjectile(bp.FragmentId)
             proj:SetVelocity(xVec,yVec,zVec)
             proj:SetVelocity(velocity)

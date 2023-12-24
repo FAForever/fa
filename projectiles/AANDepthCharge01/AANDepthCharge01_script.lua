@@ -21,11 +21,19 @@
 --******************************************************************************************************
 
 local ADepthChargeProjectile = import("/lua/aeonprojectiles.lua").ADepthChargeProjectile
+local VisionMarkerOpti = import("/lua/sim/vizmarker.lua").VisionMarkerOpti
 local ADepthChargeProjectileOnCreate = ADepthChargeProjectile.OnCreate
 local ADepthChargeProjectileOnEnterWater = ADepthChargeProjectile.OnEnterWater
 local ADepthChargeProjectileOnImpact = ADepthChargeProjectile.OnImpact
 
-local VisionMarkerOpti = import("/lua/sim/vizmarker.lua").VisionMarkerOpti
+-- upvalue for performance
+local ForkThread = ForkThread
+local TrashBagAdd = TrashBag.Add
+local WaitTicks = WaitTicks
+
+
+
+
 
 -- Depth Charge Script
 ---@class AANDepthCharge01 : ADepthChargeProjectile
@@ -36,8 +44,11 @@ AANDepthCharge01 = ClassProjectile(ADepthChargeProjectile) {
     ---@param self AANDepthCharge01
     OnCreate = function(self)
         ADepthChargeProjectileOnCreate(self)
+
+        local trash = self.Trash
+
         self.HasImpacted = false
-        self.Trash:Add(ForkThread(self.CountdownExplosion, self))
+        TrashBagAdd(trash,ForkThread(self.CountdownExplosion, self))
     end,
 
     ---@param self AANDepthCharge01
@@ -59,9 +70,11 @@ AANDepthCharge01 = ClassProjectile(ADepthChargeProjectile) {
 
     ---@param self AANDepthCharge01
     OnLostTarget = function(self)
+        local trash = self.Trash
+
         self:SetMaxSpeed(2)
         self:SetAcceleration(-0.6)
-        self.Trash:Add(ForkThread(self.CountdownMovement, self))
+        TrashBagAdd(trash,ForkThread(self.CountdownMovement, self))
     end,
 
     ---@param self AANDepthCharge01
@@ -74,11 +87,13 @@ AANDepthCharge01 = ClassProjectile(ADepthChargeProjectile) {
 
     ---@param self AANDepthCharge01
     OnImpact = function(self, TargetType, TargetEntity)
+        local army = self.Army
         local px, _, pz = self:GetPositionXYZ()
         local marker = VisionMarkerOpti({ Owner = self })
+
         marker:UpdatePosition(px, pz)
         marker:UpdateDuration(5)
-        marker:UpdateIntel(self.Army, 5, 'Vision', true)
+        marker:UpdateIntel(army, 5, 'Vision', true)
         ADepthChargeProjectileOnImpact(self, TargetType, TargetEntity)
     end,
 }
