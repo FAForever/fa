@@ -783,10 +783,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
     ---@param unit Unit
     OnStopRepair = function(self, unit)
         -- awareness of event for AI
-        local aiPlatoon = self.AIPlatoonReference
-        if aiPlatoon then
-            aiPlatoon:OnStopRepair(self, unit)
-        end
+        self.Brain:OnStopRepair(self, unit)
     end,
 
     ---@param self Unit
@@ -825,10 +822,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         end
 
         -- awareness of event for AI
-        local aiPlatoon = self.AIPlatoonReference
-        if aiPlatoon then
-            aiPlatoon:OnStartReclaim(self, target)
-        end
+        self.Brain:OnStartReclaim(self, target)
     end,
 
     --- Called when the unit stops reclaiming
@@ -877,10 +871,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         self.OnStartReclaimPropEnergy = nil
 
         -- awareness of event for AI
-        local aiPlatoon = self.AIPlatoonReference
-        if aiPlatoon then
-            aiPlatoon:OnStopReclaim(self, target)
-        end
+        self.Brain:OnStopReclaim(self, target)
     end,
 
     ---@param self Unit

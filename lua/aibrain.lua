@@ -1515,6 +1515,17 @@ AIBrain = Class(AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerCom
         end
     end,
 
+    --- Called by a unit of this army when it stops repairing
+    ---@param self AIBrain
+    ---@param unit Unit
+    ---@param target Unit
+    OnStopRepair = function(self, unit, target)
+        -- awareness of event for AI
+        local aiPlatoon = unit.AIPlatoonReference
+        if aiPlatoon then
+            aiPlatoon:OnStopRepair(unit, target)
+        end
+    end,
 
     --#endregion
     -------------------------------------------------------------------------------
