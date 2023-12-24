@@ -1490,11 +1490,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
             instigator:OnKilledUnit(self)
         end
 
-        -- awareness of event for AI
-        local aiPlatoon = self.AIPlatoonReference
-        if aiPlatoon then
-            aiPlatoon:OnKilled(self, instigator, type, overkillRatio)
-        end
+        self.Brain:OnKilled(self, instigator, type, overkillRatio)
     end,
 
     ---@param self Unit

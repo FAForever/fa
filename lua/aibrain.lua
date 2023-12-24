@@ -1527,6 +1527,20 @@ AIBrain = Class(AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerCom
         end
     end,
 
+    --- Called by a unit of this army when it is killed
+    ---@param self AIBrain
+    ---@param unit Unit
+    ---@param instigator Unit | Projectile | nil
+    ---@param damageType DamageType
+    ---@param overkillRatio number
+    OnKilled = function(self, unit, instigator, damageType, overkillRatio)
+        -- awareness of event for AI
+        local aiPlatoon = unit.AIPlatoonReference
+        if aiPlatoon then
+            aiPlatoon:OnKilled(unit, instigator, damageType, overkillRatio)
+        end
+    end,
+
     --#endregion
     -------------------------------------------------------------------------------
 
