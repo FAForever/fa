@@ -32,8 +32,34 @@ UEL0001 = ClassUnit(ACUUnit) {
         RightZephyr = ClassWeapon(TDFZephyrCannonWeapon) {},
         OverCharge = ClassWeapon(TDFOverchargeWeapon) {},
         AutoOverCharge = ClassWeapon(TDFOverchargeWeapon) {},
-        TacMissile = ClassWeapon(TIFCruiseMissileLauncher) {},
-        TacNukeMissile = ClassWeapon(TIFCruiseMissileLauncher) {},
+        TacMissile = ClassWeapon(TIFCruiseMissileLauncher) {
+            PlayFxRackSalvoChargeSequence = function(self)
+                TIFCruiseMissileLauncher.PlayFxRackSalvoChargeSequence(self)
+                self.unit.MissileHatchSlider:SetGoal(0, 0, 1.9):SetSpeed(1.9/(self.Blueprint.RackSalvoChargeTime - 0.1))
+            end,
+
+            PlayFxRackSalvoReloadSequence = function(self)
+                TIFCruiseMissileLauncher.PlayFxRackSalvoReloadSequence(self)
+                self:ForkThread(function() 
+                    WaitTicks(30) -- Smoke effect lifetime
+                    self.unit.MissileHatchSlider:SetGoal(0, 0, 0):SetSpeed(1.9/(self.Blueprint.RackSalvoReloadTime - 3))
+                end)
+            end,
+        },
+        TacNukeMissile = ClassWeapon(TIFCruiseMissileLauncher) {
+            PlayFxRackSalvoChargeSequence = function(self)
+                TIFCruiseMissileLauncher.PlayFxRackSalvoChargeSequence(self)
+                self.unit.MissileHatchSlider:SetGoal(0, 0, 1.9):SetSpeed(1.9/(self.Blueprint.RackSalvoChargeTime - 0.1))
+            end,
+
+            PlayFxRackSalvoReloadSequence = function(self)
+                TIFCruiseMissileLauncher.PlayFxRackSalvoReloadSequence(self)
+                self:ForkThread(function() 
+                    WaitTicks(30) -- Smoke effect lifetime
+                    self.unit.MissileHatchSlider:SetGoal(0, 0, 0):SetSpeed(1.9/(self.Blueprint.RackSalvoReloadTime - 3))
+                end)
+            end,
+        },
     },
 
     __init = function(self)
@@ -51,6 +77,11 @@ UEL0001 = ClassUnit(ACUUnit) {
         self.HasRightPod = false
         -- Restrict what enhancements will enable later
         self:AddBuildRestriction(categories.UEF * (categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER))
+
+        local hatchBone = "Back_Upgrade_B02"
+        if hatchBone then
+            self.MissileHatchSlider = CreateSlider(self, hatchBone)
+        end
     end,
 
     OnStopBeingBuilt = function(self, builder, layer)
