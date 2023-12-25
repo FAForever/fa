@@ -547,7 +547,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         end
 
         -- for AI events
-        self.Brain:OnPaused(self)
+        self.Brain:OnUnitPaused(self)
     end,
 
     ---@param self Unit
@@ -566,7 +566,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         end
 
         -- for AI events
-        self.Brain:OnUnpaused(self)
+        self.Brain:OnUnitUnpaused(self)
     end,
 
     ---@param self Unit
@@ -2211,10 +2211,11 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
     -- CONSTRUCTING - BEING BUILT
     ----------------------------------------------------------------------------------------------
     ---@param self Unit
-    ---@param unit Unit
+    ---@param builder Unit
     ---@param oldProg number
     ---@param newProg number
-    OnBeingBuiltProgress = function(self, unit, oldProg, newProg)
+    OnBeingBuiltProgress = function(self, builder, oldProg, newProg)
+        self.Brain:OnUnitBeingBuiltProgress(self, builder, oldProg, newProg)
     end,
 
     ---@param self Unit
@@ -2268,7 +2269,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         self:SendNotifyMessage('started')
 
         -- for AI events
-        self.Brain:OnStartBeingBuilt(self, builder, layer)
+        self.Brain:OnUnitStartBeingBuilt(self, builder, layer)
     end,
 
     ---@param self Unit
@@ -2406,7 +2407,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         end
 
         -- for AI events
-        self.Brain:OnStopBeingBuilt(self, builder, layer)
+        self.Brain:OnUnitStopBeingBuilt(self, builder, layer)
 
         return true
     end,
@@ -2452,7 +2453,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         end)
 
         -- for AI events
-        self.Brain:OnFailedToBeBuilt(self)
+        self.Brain:OnUnitFailedToBeBuilt(self)
     end,
 
     ---@param self Unit
@@ -2838,7 +2839,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
     ---@param oldProg number
     ---@param newProg number
     OnBuildProgress = function(self, target, oldProg, newProg)
-        self.Brain:OnBuildProgress(self, target, oldProg, newProg)
+        self.Brain:OnUnitBuildProgress(self, target, oldProg, newProg)
     end,
 
     --- Called as this unit (with transport capabilities) attached another unit to itself
@@ -2858,7 +2859,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         end
 
         -- for AI events
-        self.Brain:OnTransportAttach(self, attachBone, attachedUnit)
+        self.Brain:OnUnitTransportAttach(self, attachBone, attachedUnit)
     end,
 
     --- Called by the engine when the infinite build is disabled
@@ -2892,7 +2893,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         end
 
         -- for AI events
-        self.Brain:OnTransportDetach(self, attachBone, detachedUnit)
+        self.Brain:OnUnitTransportDetach(self, attachBone, detachedUnit)
     end,
 
     --- Called as a unit (with transport capabilities) aborts the transport order
@@ -2906,7 +2907,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
             end
         end
 
-        self.Brain:OnTransportAborted(self)
+        self.Brain:OnUnitTransportAborted(self)
     end,
 
     --- Called as a unit (with transport capabilities) initiates the a transport order
@@ -2921,7 +2922,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         end
 
         -- for AI events
-        self.Brain:OnTransportOrdered(self)
+        self.Brain:OnUnitTransportOrdered(self)
     end,
 
     --- Called as a unit is killed while being transported by a unit (with transport capabilities) of this platoon
@@ -2937,7 +2938,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         end
 
         -- for AI events
-        self.Brain:OnAttachedKilled(self, attached)
+        self.Brain:OnUnitAttachedKilled(self, attached)
     end,
     
     --- Called as a unit (with transport capabilities) is ready to load in units
@@ -2952,7 +2953,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         end
 
         -- for AI events
-        self.Brain:OnStartTransportLoading(self)
+        self.Brain:OnUnitStartTransportLoading(self)
     end,
 
     --- Called as a unit (with transport capabilities) of this platoon is done loading in units
@@ -2967,7 +2968,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         end
 
         -- for AI events
-        self.Brain:OnStopTransportLoading(self)
+        self.Brain:OnUnitStopTransportLoading(self)
     end,
 
     ---@param self Unit
@@ -3082,7 +3083,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         ChangeState(self, self.WorkingState)
 
         -- for AI events
-        self.Brain:OnWorkBegin(self, work)
+        self.Brain:OnUnitWorkBegin(self, work)
 
         -- Inform EnhanceTask that enhancement is not restricted
         return true
@@ -3098,7 +3099,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         self:CleanupEnhancementEffects()
 
         -- for AI events
-        self.Brain:OnWorkEnd(self, work)
+        self.Brain:OnUnitWorkEnd(self, work)
     end,
 
     ---@param self Unit
@@ -3111,7 +3112,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         self:CleanupEnhancementEffects()
 
         -- for AI events
-        self.Brain:OnWorkFail(self, work)
+        self.Brain:OnUnitWorkFail(self, work)
     end,
 
     ---@alias DefaultWorkOrder "BeingBuilt" | "Enhancing" | "FactoryBuilding" | "None" | "Repairing" | "Upgrading"
@@ -4446,7 +4447,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         self:TransportAnimation()
 
         -- for AI events
-        self.Brain:OnStartTransportBeamUp(self, transport, bone)
+        self.Brain:OnUnitStartTransportBeamUp(self, transport, bone)
     end,
 
     ---@param self Unit
@@ -4461,7 +4462,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         end
 
         -- for AI events
-        self.Brain:OnStoptransportBeamUp(self)
+        self.Brain:OnUnitStoptransportBeamUp(self)
     end,
 
     ---@param self Unit
@@ -4521,7 +4522,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         end
 
         -- for AI events
-        self.Brain:OnAddToStorage(self, carrier)
+        self.Brain:OnUnitAddToStorage(self, carrier)
     end,
 
     --- Called from the perspective of the unit that is removed from the storage of another unit
@@ -4550,7 +4551,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         end
 
         -- for AI events
-        self.Brain:OnRemoveFromStorage(self, carrier)
+        self.Brain:OnUnitRemoveFromStorage(self, carrier)
     end,
 
     -- Animation when being dropped from a transport.
@@ -4628,7 +4629,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         self.TeleportThread = self:ForkThread(self.InitiateTeleportThread, teleporter, location, orientation)
 
         -- for AI events
-        self.Brain:OnTeleportUnit(self, teleporter, location, orientation)
+        self.Brain:OnUnitTeleportUnit(self, teleporter, location, orientation)
     end,
 
     ---@param self Unit
@@ -4651,7 +4652,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         self.UnitBeingTeleported = nil
 
         -- for AI events
-        self.Brain:OnFailedTeleport(self)
+        self.Brain:OnUnitFailedTeleport(self)
     end,
 
     ---@param self Unit
@@ -4786,7 +4787,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         self:DoUnitCallbacks('OnAttachedToTransport', transport, bone)
 
         -- for AI events
-        self.Brain:OnAttachedToTransport(self, transport, bone)
+        self.Brain:OnUnitAttachedToTransport(self, transport, bone)
     end,
 
     ---@param self Unit
@@ -4801,7 +4802,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         self:DoUnitCallbacks('OnDetachedFromTransport', transport, bone)
 
         -- for AI events
-        self.Brain:OnDetachedFromTransport(self, transport, bone)
+        self.Brain:OnUnitDetachedFromTransport(self, transport, bone)
     end,
 
     OnDetachedFromTransportThread = function(self, transport, bone)
@@ -5043,7 +5044,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
             end
         end
 
-        self.Brain:OnMissileIntercepted(self, target, defense, position)
+        self.Brain:OnUnitMissileIntercepted(self, target, defense, position)
     end,
 
 
@@ -5064,7 +5065,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
             end
         end
 
-        self.Brain:OnMissileImpactShield(self, target, shield, position)
+        self.Brain:OnUnitMissileImpactShield(self, target, shield, position)
     end,
 
     --- Called when a missile launched by this unit hits the terrain, note that this can be the same location as the target
@@ -5083,7 +5084,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
             end
         end
 
-        self.Brain:OnMissileImpactTerrain(self, target, position)
+        self.Brain:OnUnitMissileImpactTerrain(self, target, position)
     end,
 
     --- Add a callback when a missile launched by this unit is intercepted
@@ -5128,13 +5129,13 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
     ---@param self Unit
     OnShieldEnabled = function(self) 
         -- for AI events
-        self.Brain:OnShieldEnabled(self)
+        self.Brain:OnUnitShieldEnabled(self)
     end,
 
     ---@param self Unit
     OnShieldDisabled = function(self) 
         -- for AI events
-        self.Brain:OnShieldDisabled(self)
+        self.Brain:OnUnitShieldDisabled(self)
     end,
 
     -- Called by the brain when the unit registered itself
@@ -5157,13 +5158,13 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
     ---@param self Unit
     OnNukeArmed = function(self)
         -- for AI events
-        self.Brain:OnNukeArmed(self)
+        self.Brain:OnUnitNukeArmed(self)
     end,
 
     ---@param self Unit
     OnNukeLaunched = function(self)
         -- for AI events
-        self.Brain:OnNukeLaunched(self)
+        self.Brain:OnUnitNukeLaunched(self)
     end,
 
     -- Unknown when these are called

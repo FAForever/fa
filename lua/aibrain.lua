@@ -1467,7 +1467,7 @@ AIBrain = Class(AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerCom
     ---@param unit Unit
     ---@param builder Unit
     ---@param layer Layer
-    OnStartBeingBuilt = function(self, unit, builder, layer)
+    OnUnitStartBeingBuilt = function(self, unit, builder, layer)
         -- LOG(string.format('OnStartBeingBuilt: %s', unit.Blueprint.BlueprintId or ''))
     end,
 
@@ -1476,7 +1476,7 @@ AIBrain = Class(AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerCom
     ---@param unit Unit
     ---@param builder Unit
     ---@param layer Layer
-    OnStopBeingBuilt = function(self, unit, builder, layer)
+    OnUnitStopBeingBuilt = function(self, unit, builder, layer)
         -- LOG(string.format('OnStopBeingBuilt: %s', unit.Blueprint.BlueprintId or ''))
     end,
 
@@ -1492,7 +1492,7 @@ AIBrain = Class(AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerCom
     ---@param unit Unit
     ---@param new number # 0.25 / 0.50 / 0.75 / 1.0
     ---@param old number # 0.25 / 0.50 / 0.75 / 1.0
-    OnHealthChanged = function(self, unit, new, old)
+    OnUnitHealthChanged = function(self, unit, new, old)
         -- LOG(string.format('OnHealthChanged: %s: %f -> %f', unit.Blueprint.BlueprintId or '', new, old))
 
         -- pass the event to the platoon
@@ -1674,21 +1674,21 @@ AIBrain = Class(AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerCom
     ---@param target Unit
     ---@param old number
     ---@param new number
-    OnBuildProgress = function(self, unit, target, old, new)
+    OnUnitBuildProgress = function(self, unit, target, old, new)
         -- do nothing
     end,
 
     --- Called by a unit as it is paused
     ---@param self AIBrain
     ---@param unit Unit
-    OnPaused = function(self, unit)
+    OnUnitPaused = function(self, unit)
         -- do nothing
     end,
 
     --- Called by a unit as it is unpaused
     ---@param self AIBrain
     ---@param unit Unit
-    OnUnpaused = function(self, unit)
+    OnUnitUnpaused = function(self, unit)
         -- do nothing
     end,
 
@@ -1698,15 +1698,15 @@ AIBrain = Class(AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerCom
     ---@param builder Unit
     ---@param old number
     ---@param new number
-    OnBeingBuiltProgress = function(self, unit, builder, old, new)
+    OnUnitBeingBuiltProgress = function(self, unit, builder, old, new)
         -- do nothing
     end,
 
     --- Called by a unit as it failed to be built
     ---@param self AIBrain
     ---@param unit Unit
-    OnFailedToBeBuilt = function(self, unit)
-
+    OnUnitFailedToBeBuilt = function(self, unit)
+        -- do nothing
     end,
 
     --- Called by a transport as it attaches a unit
@@ -1714,7 +1714,7 @@ AIBrain = Class(AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerCom
     ---@param unit Unit
     ---@param attachBone Bone
     ---@param attachedUnit Unit
-    OnTransportAttach = function(self, unit, attachBone, attachedUnit)
+    OnUnitTransportAttach = function(self, unit, attachBone, attachedUnit)
         -- awareness of event for AI
         local aiPlatoon = unit.AIPlatoonReference
         if aiPlatoon then
@@ -1727,7 +1727,7 @@ AIBrain = Class(AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerCom
     ---@param unit Unit
     ---@param attachBone Bone
     ---@param detachedUnit Unit
-    OnTransportDetach = function(self, unit, attachBone, detachedUnit)
+    OnUnitTransportDetach = function(self, unit, attachBone, detachedUnit)
         -- awareness of event for AI
         local aiPlatoon = unit.AIPlatoonReference
         if aiPlatoon then
@@ -1738,7 +1738,7 @@ AIBrain = Class(AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerCom
     --- Called by a transport as it aborts the transport order
     ---@param self AIBrain
     ---@param unit Unit
-    OnTransportAborted = function(self, unit)
+    OnUnitTransportAborted = function(self, unit)
         -- awareness of event for AI
         local aiPlatoon = unit.AIPlatoonReference
         if aiPlatoon then
@@ -1749,7 +1749,7 @@ AIBrain = Class(AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerCom
     --- Called by a transport as it starts the transport order
     ---@param self AIBrain
     ---@param unit Unit
-    OnTransportOrdered = function(self, unit)
+    OnUnitTransportOrdered = function(self, unit)
         -- awareness of event for AI
         local aiPlatoon = unit.AIPlatoonReference
         if aiPlatoon then
@@ -1761,7 +1761,7 @@ AIBrain = Class(AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerCom
     ---@param self AIBrain
     ---@param unit Unit
     ---@param attachedUnit Unit
-    OnAttachedKilled = function(self, unit, attachedUnit)
+    OnUnitAttachedKilled = function(self, unit, attachedUnit)
         -- awareness of event for AI
         local aiPlatoon = unit.AIPlatoonReference
         if aiPlatoon then
@@ -1772,7 +1772,7 @@ AIBrain = Class(AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerCom
     --- Called by a transport when it is ready to load units
     ---@param self AIBrain
     ---@param unit Unit
-    OnStartTransportLoading = function(self, unit)
+    OnUnitStartTransportLoading = function(self, unit)
         -- awareness of event for AI
 
         local aiPlatoon = unit.AIPlatoonReference
@@ -1784,7 +1784,7 @@ AIBrain = Class(AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerCom
     --- Called by a transport when it is done loading units
     ---@param self AIBrain
     ---@param unit Unit
-    OnStopTransportLoading = function(self, unit)
+    OnUnitStopTransportLoading = function(self, unit)
         -- awareness of event for AI
         local aiPlatoon = self.AIPlatoonReference
         if aiPlatoon then
@@ -1797,14 +1797,14 @@ AIBrain = Class(AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerCom
     ---@param unit Unit
     ---@param transport Unit
     ---@param bone Bone
-    OnStartTransportBeamUp = function(self, unit, transport, bone)
+    OnUnitStartTransportBeamUp = function(self, unit, transport, bone)
         -- do nothing
     end,
 
     --- Called by a unit as it is done beaming up to the transport
     ---@param self AIBrain
     ---@param unit Unit
-    OnStoptransportBeamUp = function(self, unit)
+    OnUnitStoptransportBeamUp = function(self, unit)
         -- do nothing
     end,
 
@@ -1813,7 +1813,7 @@ AIBrain = Class(AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerCom
     ---@param unit Unit
     ---@param transport Unit
     ---@param bone Bone
-    OnAttachedToTransport = function(self, unit, transport, bone)
+    OnUnitAttachedToTransport = function(self, unit, transport, bone)
         -- do nothing
     end,
 
@@ -1821,7 +1821,7 @@ AIBrain = Class(AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerCom
     ---@param unit Unit
     ---@param transport Unit
     ---@param bone Bone
-    OnDetachedFromTransport = function(self, unit, transport, bone)
+    OnUnitDetachedFromTransport = function(self, unit, transport, bone)
         -- do nothing
     end,
 
@@ -1829,7 +1829,7 @@ AIBrain = Class(AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerCom
     ---@param self AIBrain
     ---@param unit Unit
     ---@param carrier Unit
-    OnAddToStorage = function(self, unit, carrier)
+    OnUnitAddToStorage = function(self, unit, carrier)
 
         -- awareness of event for AI
         local aiPlatoon = unit.AIPlatoonReference
@@ -1842,7 +1842,7 @@ AIBrain = Class(AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerCom
     ---@param self AIBrain
     ---@param unit Unit
     ---@param carrier Unit
-    OnRemoveFromStorage = function(self, unit, carrier)
+    OnUnitRemoveFromStorage = function(self, unit, carrier)
         -- awareness of event for AI
         local aiPlatoon = unit.AIPlatoonReference
         if aiPlatoon then
@@ -1856,23 +1856,21 @@ AIBrain = Class(AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerCom
     ---@param teleporter any
     ---@param location Vector
     ---@param orientation Quaternion
-    OnTeleportUnit = function(self, unit, teleporter, location, orientation)
+    OnUnitTeleportUnit = function(self, unit, teleporter, location, orientation)
         -- do nothing
     end,
 
     --- Called by a unit when the teleport fails
     ---@param self AIBrain
     ---@param unit Unit
-    OnFailedTeleport = function(self, unit)
+    OnUnitFailedTeleport = function(self, unit)
         -- do nothing
     end,
 
     --- Called by a unit when a shield is enabled
     ---@param self AIBrain
     ---@param unit Unit
-    OnShieldEnabled = function(self, unit)
-        -- do nothing
-
+    OnUnitShieldEnabled = function(self, unit)
         -- awareness of event for AI
         local aiPlatoon = unit.AIPlatoonReference
         if aiPlatoon then
@@ -1883,9 +1881,7 @@ AIBrain = Class(AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerCom
     --- Called by a unit when a shield is disabled
     ---@param self AIBrain
     ---@param unit Unit
-    OnShieldDisabled = function(self, unit)
-        -- do nothing
-
+    OnUnitShieldDisabled = function(self, unit)
         -- awareness of event for AI
         local aiPlatoon = unit.AIPlatoonReference
         if aiPlatoon then
@@ -1896,14 +1892,14 @@ AIBrain = Class(AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerCom
     --- Called by a unit when a strategic asset is ready to fire
     ---@param self AIBrain
     ---@param unit Unit
-    OnNukeArmed = function(self, unit)
+    OnUnitNukeArmed = function(self, unit)
         -- do nothing
     end,
 
     --- Called by a unit when a strategic asset is launched
     ---@param self AIBrain
     ---@param unit Unit
-    OnNukeLaunched = function(self, unit)
+    OnUnitNukeLaunched = function(self, unit)
         -- do nothing
     end,
 
@@ -1911,7 +1907,7 @@ AIBrain = Class(AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerCom
     ---@param self AIBrain
     ---@param unit Unit
     ---@param work any
-    OnWorkBegin = function(self, unit, work)
+    OnUnitWorkBegin = function(self, unit, work)
 
         -- awareness of event for AI
         local aiPlatoon = unit.AIPlatoonReference
@@ -1924,7 +1920,7 @@ AIBrain = Class(AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerCom
     ---@param self AIBrain
     ---@param unit Unit
     ---@param work any
-    OnWorkEnd = function(self, unit, work)
+    OnUnitWorkEnd = function(self, unit, work)
         -- awareness of event for AI
         local aiPlatoon = unit.AIPlatoonReference
         if aiPlatoon then
@@ -1936,7 +1932,7 @@ AIBrain = Class(AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerCom
     ---@param self AIBrain
     ---@param unit Unit
     ---@param work any
-    OnWorkFail = function(self, unit, work)
+    OnUnitWorkFail = function(self, unit, work)
         -- do nothing
     end,
 
@@ -1945,7 +1941,7 @@ AIBrain = Class(AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerCom
     ---@param target Vector
     ---@param shield Unit
     ---@param position Vector
-    OnMissileImpactShield = function(self, unit, target, shield, position)
+    OnUnitMissileImpactShield = function(self, unit, target, shield, position)
 
         -- awareness of event for AI
         local aiPlatoon = unit.AIPlatoonReference
@@ -1958,7 +1954,7 @@ AIBrain = Class(AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerCom
     ---@param self AIPlatoon
     ---@param target Vector
     ---@param position Vector
-    OnMissileImpactTerrain = function(self, unit, target, position)
+    OnUnitMissileImpactTerrain = function(self, unit, target, position)
         -- awareness of event for AI
         local aiPlatoon = unit.AIPlatoonReference
         if aiPlatoon then
@@ -1971,7 +1967,7 @@ AIBrain = Class(AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerCom
     ---@param target Vector
     ---@param defense Unit
     ---@param position Vector
-    OnMissileIntercepted = function(self, unit, target, defense, position)
+    OnUnitMissileIntercepted = function(self, unit, target, defense, position)
         -- awareness of event for AI
         local aiPlatoon = unit.AIPlatoonReference
         if aiPlatoon then
