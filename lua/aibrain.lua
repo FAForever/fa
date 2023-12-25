@@ -603,7 +603,7 @@ AIBrain = Class(AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerCom
             EXPERIMENTAL = {},
         }
 
-        self.PingCallbackList = { }
+        self.PingCallbackList = {}
 
         AIBrainEnergyComponent.CreateBrainShared(self)
         AIBrainHQComponent.CreateBrainShared(self)
@@ -1370,7 +1370,7 @@ AIBrain = Class(AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerCom
     ---@param pingType string
     AddPingCallback = function(self, callback, pingType)
         if callback and pingType then
-            table.insert(self.PingCallbackList, {CallbackFunction = callback, PingType = pingType})
+            table.insert(self.PingCallbackList, { CallbackFunction = callback, PingType = pingType })
         end
     end,
 
@@ -1432,13 +1432,37 @@ AIBrain = Class(AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerCom
     --#endregion
     -------------------------------------------------------------------------------
 
-    -------------------------------------------------------------------------------
+    ---------------------------------------------------------------------------
     --#region Unit events
+
+    --- Represents a list of unit events that are communicated to the brain. It makes it
+    --- easier to respond to conditions that are happening on the battlefield. The following
+    --- unit events are not communicated to the brain:
+    ---
+    --- - OnStorageChange
+    --- - OnConsumptionActive
+    --- - OnConsumptionInActive
+    --- - OnProductionActive
+    --- - OnProductionInActive
+    --- - OnAnimCollision
+    --- - OnTerrainTypeChange
+    --- - OnMotionVertEventChange
+    --- - OnMotionHorzEventChange
+    --- - OnLayerChange
+    --- - OnStartSacrifice
+    --- - OnStopSacrifice
+    --- - OnPrepareArmToBuild
+    --- - OnStartBuilderTracking
+    --- - OnStopBuilderTracking
+    --- - OnStopRepeatQueue
+    --- - OnStartRepeatQueue
+    --- - OnAssignedFocusEntity
+
 
     --- Called by a unit as it starts being built
     ---@param self AIBrain
     ---@param unit Unit
-    ---@param builder Unit  
+    ---@param builder Unit
     ---@param layer Layer
     OnUnitStartBeingBuilt = function(self, unit, builder, layer)
         -- LOG(string.format('OnUnitStartBeingBuilt: %s', unit.Blueprint.BlueprintId or ''))
@@ -1495,7 +1519,7 @@ AIBrain = Class(AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerCom
     ---@param self AIBrain
     ---@param unit Unit
     ---@param target Unit | Prop | nil      # is nil when the prop or unit is completely reclaimed
-    OnStopReclaim = function(self, unit, target)
+    OnUnitStopReclaim = function(self, unit, target)
         -- pass the event to the platoon
         local aiPlatoon = unit.AIPlatoonReference
         if aiPlatoon then
@@ -1507,7 +1531,7 @@ AIBrain = Class(AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerCom
     ---@param self AIBrain
     ---@param unit Unit
     ---@param target Unit | Prop
-    OnStartReclaim = function(self, unit, target)
+    OnUnitStartReclaim = function(self, unit, target)
         -- pass the event to the platoon
         local aiPlatoon = unit.AIPlatoonReference
         if aiPlatoon then
@@ -1515,11 +1539,23 @@ AIBrain = Class(AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerCom
         end
     end,
 
+    --- Called by a unit of this army when it starts repairing
+    ---@param self AIBrain
+    ---@param unit Unit
+    ---@param target Unit
+    OnUnitStartRepair = function(self, unit, target)
+        -- awareness of event for AI
+        local aiPlatoon = unit.AIPlatoonReference
+        if aiPlatoon then
+            aiPlatoon:OnStartRepair(unit, target)
+        end
+    end,
+
     --- Called by a unit of this army when it stops repairing
     ---@param self AIBrain
     ---@param unit Unit
     ---@param target Unit
-    OnStopRepair = function(self, unit, target)
+    OnUnitStopRepair = function(self, unit, target)
         -- awareness of event for AI
         local aiPlatoon = unit.AIPlatoonReference
         if aiPlatoon then
@@ -1533,7 +1569,7 @@ AIBrain = Class(AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerCom
     ---@param instigator Unit | Projectile | nil
     ---@param damageType DamageType
     ---@param overkillRatio number
-    OnKilled = function(self, unit, instigator, damageType, overkillRatio)
+    OnUnitKilled = function(self, unit, instigator, damageType, overkillRatio)
         -- awareness of event for AI
         local aiPlatoon = unit.AIPlatoonReference
         if aiPlatoon then
@@ -1541,8 +1577,471 @@ AIBrain = Class(AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerCom
         end
     end,
 
+    --- Called by a unit of this army when it is reclaimed
+    ---@param self AIBrain
+    ---@param unit Unit
+    ---@param reclaimer Unit
+    OnUnitReclaimed = function(self, unit, reclaimer)
+        -- do nothing
+    end,
+
+    --- Called by a unit of this army when it starts a capture command
+    ---@param self AIBrain
+    ---@param unit Unit
+    ---@param target Unit
+    OnUnitStartCapture = function(self, unit, target)
+        -- do nothing
+    end,
+
+    --- Called by a unit of this army when it stops a capture command
+    ---@param self AIBrain
+    ---@param unit Unit
+    ---@param target Unit
+    OnUnitStopCapture = function(self, unit, target)
+        -- do nothing
+    end,
+
+    --- Called by a unit of this army when it fails a capture command
+    ---@param self AIBrain
+    ---@param unit Unit
+    ---@param target Unit
+    OnUnitFailedCapture = function(self, unit, target)
+        -- do nothing
+    end,
+
+    --- Called by a unit of this army when it starts being captured
+    ---@param self AIBrain
+    ---@param unit Unit
+    ---@param captor Unit
+    OnUnitStartBeingCaptured = function(self, unit, captor)
+        -- do nothing
+    end,
+
+    --- Called by a unit of this army when it stops being captured
+    ---@param self AIBrain
+    ---@param unit Unit
+    ---@param captor Unit
+    OnUnitStopBeingCaptured = function(self, unit, captor)
+        -- do nothing
+    end,
+
+    --- Called by a unit of this army when it failed being captured
+    ---@param self AIBrain
+    ---@param unit Unit
+    ---@param captor Unit
+    OnUnitFailedBeingCaptured = function(self, unit, captor)
+        -- do nothing
+    end,
+
+    --- Called by a unit when it starts building a missile
+    ---@param self AIBrain
+    ---@param unit Unit
+    ---@param weapon Weapon
+    OnUnitSiloBuildStart = function(self, unit, weapon)
+        local aiPlatoon = unit.AIPlatoonReference
+        if aiPlatoon then
+            aiPlatoon:OnSiloBuildStart(unit, weapon)
+        end
+    end,
+
+    --- Called by a unit when it stops building a missile
+    ---@param self AIBrain
+    ---@param unit Unit
+    ---@param weapon Weapon
+    OnUnitSiloBuildEnd = function(self, unit, weapon)
+        local aiPlatoon = unit.AIPlatoonReference
+        if aiPlatoon then
+            aiPlatoon:OnSiloBuildEnd(unit, weapon)
+        end
+    end,
+
+    --- Called by a unit when it starts building another unit
+    ---@param self AIBrain
+    ---@param unit Unit
+    ---@param target Unit
+    ---@param order string
+    OnUnitStartBuild = function(self, unit, target, order)
+        -- awareness of event for AI
+        local aiPlatoon = unit.AIPlatoonReference
+        if aiPlatoon then
+            aiPlatoon:OnStartBuild(unit, target, order)
+        end
+    end,
+
+    --- Called by a unit when it stops building another unit
+    ---@param self AIBrain
+    ---@param unit Unit
+    ---@param target Unit
+    ---@param order string
+    OnUnitStopBuild = function(self, unit, target, order)
+        -- awareness of event for AI
+        local aiPlatoon = unit.AIPlatoonReference
+        if aiPlatoon then
+            aiPlatoon:OnStopBuild(unit, target)
+        end
+    end,
+
+    --- Called by a unit as it is being built
+    ---@param self AIBrain
+    ---@param unit Unit
+    ---@param target Unit
+    ---@param old number
+    ---@param new number
+    OnBuildProgress = function(self, unit, target, old, new)
+        -- do nothing
+    end,
+
+    --- Called by a unit as it is paused
+    ---@param self AIBrain
+    ---@param unit Unit
+    OnPaused = function(self, unit)
+        -- do nothing
+    end,
+
+    --- Called by a unit as it is unpaused
+    ---@param self AIBrain
+    ---@param unit Unit
+    OnUnpaused = function(self, unit)
+        -- do nothing
+    end,
+
+    --- Called by a unit as it is being built. Is called in intervals of 25%
+    ---@param self AIBrain
+    ---@param unit Unit
+    ---@param builder Unit
+    ---@param old number
+    ---@param new number
+    OnBeingBuiltProgress = function(self, unit, builder, old, new)
+        -- do nothing
+    end,
+
+    --- Called by a unit as it failed to be built
+    ---@param self AIBrain
+    ---@param unit Unit
+    OnFailedToBeBuilt = function(self, unit)
+
+    end,
+
+    --- Called by a transport as it attaches a unit
+    ---@param self AIBrain
+    ---@param unit Unit
+    ---@param attachBone Bone
+    ---@param attachedUnit Unit
+    OnTransportAttach = function(self, unit, attachBone, attachedUnit)
+        -- awareness of event for AI
+        local aiPlatoon = unit.AIPlatoonReference
+        if aiPlatoon then
+            aiPlatoon:OnTransportAttach(unit, attachBone, attachedUnit)
+        end
+    end,
+
+    --- Called by a transport as it deattaches a unit
+    ---@param self AIBrain
+    ---@param unit Unit
+    ---@param attachBone Bone
+    ---@param detachedUnit Unit
+    OnTransportDetach = function(self, unit, attachBone, detachedUnit)
+        -- awareness of event for AI
+        local aiPlatoon = unit.AIPlatoonReference
+        if aiPlatoon then
+            aiPlatoon:OnTransportDetach(unit, attachBone, detachedUnit)
+        end
+    end,
+
+    --- Called by a transport as it aborts the transport order
+    ---@param self AIBrain
+    ---@param unit Unit
+    OnTransportAborted = function(self, unit)
+        -- awareness of event for AI
+        local aiPlatoon = unit.AIPlatoonReference
+        if aiPlatoon then
+            aiPlatoon:OnTransportAborted(unit)
+        end
+    end,
+
+    --- Called by a transport as it starts the transport order
+    ---@param self AIBrain
+    ---@param unit Unit
+    OnTransportOrdered = function(self, unit)
+        -- awareness of event for AI
+        local aiPlatoon = unit.AIPlatoonReference
+        if aiPlatoon then
+            aiPlatoon:OnTransportOrdered(unit)
+        end
+    end,
+
+    --- Called by a transport as units that are attached are killed
+    ---@param self AIBrain
+    ---@param unit Unit
+    ---@param attachedUnit Unit
+    OnAttachedKilled = function(self, unit, attachedUnit)
+        -- awareness of event for AI
+        local aiPlatoon = unit.AIPlatoonReference
+        if aiPlatoon then
+            aiPlatoon:OnAttachedKilled(unit)
+        end
+    end,
+
+    --- Called by a transport when it is ready to load units
+    ---@param self AIBrain
+    ---@param unit Unit
+    OnStartTransportLoading = function(self, unit)
+        -- awareness of event for AI
+
+        local aiPlatoon = unit.AIPlatoonReference
+        if aiPlatoon then
+            aiPlatoon:OnStartTransportLoading(unit)
+        end
+    end,
+
+    --- Called by a transport when it is done loading units
+    ---@param self AIBrain
+    ---@param unit Unit
+    OnStopTransportLoading = function(self, unit)
+        -- awareness of event for AI
+        local aiPlatoon = self.AIPlatoonReference
+        if aiPlatoon then
+            aiPlatoon:OnStopTransportLoading(self)
+        end
+    end,
+
+    --- Called by a unit as it beams up to the transport
+    ---@param self AIBrain
+    ---@param unit Unit
+    ---@param transport Unit
+    ---@param bone Bone
+    OnStartTransportBeamUp = function(self, unit, transport, bone)
+        -- do nothing
+    end,
+
+    --- Called by a unit as it is done beaming up to the transport
+    ---@param self AIBrain
+    ---@param unit Unit
+    OnStoptransportBeamUp = function(self, unit)
+        -- do nothing
+    end,
+
+    --- Called by a unit as it is attached to a transport
+    ---@param self AIBrain
+    ---@param unit Unit
+    ---@param transport Unit
+    ---@param bone Bone
+    OnAttachedToTransport = function(self, unit, transport, bone)
+        -- do nothing
+    end,
+
+    ---@param self AIBrain
+    ---@param unit Unit
+    ---@param transport Unit
+    ---@param bone Bone
+    OnDetachedFromTransport = function(self, unit, transport, bone)
+        -- do nothing
+    end,
+
+    --- Called by a unit as it becomes part of the storage of another unit
+    ---@param self AIBrain
+    ---@param unit Unit
+    ---@param carrier Unit
+    OnAddToStorage = function(self, unit, carrier)
+
+        -- awareness of event for AI
+        local aiPlatoon = unit.AIPlatoonReference
+        if aiPlatoon then
+            aiPlatoon:OnAddToStorage(unit, carrier)
+        end
+    end,
+
+    --- Called by a unit as it is released from storage of another unit
+    ---@param self AIBrain
+    ---@param unit Unit
+    ---@param carrier Unit
+    OnRemoveFromStorage = function(self, unit, carrier)
+        -- awareness of event for AI
+        local aiPlatoon = unit.AIPlatoonReference
+        if aiPlatoon then
+            aiPlatoon:OnRemoveFromStorage(unit, carrier)
+        end
+    end,
+
+    --- Called by a unit as it starts teleporting
+    ---@param self AIBrain
+    ---@param unit Unit
+    ---@param teleporter any
+    ---@param location Vector
+    ---@param orientation Quaternion
+    OnTeleportUnit = function(self, unit, teleporter, location, orientation)
+        -- do nothing
+    end,
+
+    --- Called by a unit when the teleport fails
+    ---@param self AIBrain
+    ---@param unit Unit
+    OnFailedTeleport = function(self, unit)
+        -- do nothing
+    end,
+
+    --- Called by a unit when a shield is enabled
+    ---@param self AIBrain
+    ---@param unit Unit
+    OnShieldEnabled = function(self, unit)
+        -- do nothing
+
+        -- awareness of event for AI
+        local aiPlatoon = unit.AIPlatoonReference
+        if aiPlatoon then
+            aiPlatoon:OnShieldEnabled(unit)
+        end
+    end,
+
+    --- Called by a unit when a shield is disabled
+    ---@param self AIBrain
+    ---@param unit Unit
+    OnShieldDisabled = function(self, unit)
+        -- do nothing
+
+        -- awareness of event for AI
+        local aiPlatoon = unit.AIPlatoonReference
+        if aiPlatoon then
+            aiPlatoon:OnShieldDisabled(unit)
+        end
+    end,
+
+    --- Called by a unit when a strategic asset is ready to fire
+    ---@param self AIBrain
+    ---@param unit Unit
+    OnNukeArmed = function(self, unit)
+        -- do nothing
+    end,
+
+    --- Called by a unit when a strategic asset is launched
+    ---@param self AIBrain
+    ---@param unit Unit
+    OnNukeLaunched = function(self, unit)
+        -- do nothing
+    end,
+
+    --- Called when a unit starts the construction of an enhancement
+    ---@param self AIBrain
+    ---@param unit Unit
+    ---@param work any
+    OnWorkBegin = function(self, unit, work)
+
+        -- awareness of event for AI
+        local aiPlatoon = unit.AIPlatoonReference
+        if aiPlatoon then
+            aiPlatoon:OnWorkBegin(unit, work)
+        end
+    end,
+
+    --- Called when a unit stops the construction of an enhancement
+    ---@param self AIBrain
+    ---@param unit Unit
+    ---@param work any
+    OnWorkEnd = function(self, unit, work)
+        -- awareness of event for AI
+        local aiPlatoon = unit.AIPlatoonReference
+        if aiPlatoon then
+            aiPlatoon:OnWorkEnd(unit, work)
+        end
+    end,
+
+    --- Called when a unit aborts the construction of an enhancement
+    ---@param self AIBrain
+    ---@param unit Unit
+    ---@param work any
+    OnWorkFail = function(self, unit, work)
+        -- do nothing
+    end,
+
+    --- Called as a missile launched by a unit of this platoon hits a shield
+    ---@param self AIPlatoon
+    ---@param target Vector
+    ---@param shield Unit
+    ---@param position Vector
+    OnMissileImpactShield = function(self, unit, target, shield, position)
+
+        -- awareness of event for AI
+        local aiPlatoon = unit.AIPlatoonReference
+        if aiPlatoon then
+            aiPlatoon:OnMissileImpactShield(unit, target, shield, position)
+        end
+    end,
+
+    --- Called as a missile launched by a unit of this platoon impacts with the terrain
+    ---@param self AIPlatoon
+    ---@param target Vector
+    ---@param position Vector
+    OnMissileImpactTerrain = function(self, unit, target, position)
+        -- awareness of event for AI
+        local aiPlatoon = unit.AIPlatoonReference
+        if aiPlatoon then
+            aiPlatoon:OnMissileImpactTerrain(unit, target, position)
+        end
+    end,
+
+    --- Called as a missile launched by a unit of this platoon is intercepted
+    ---@param self AIPlatoon
+    ---@param target Vector
+    ---@param defense Unit
+    ---@param position Vector
+    OnMissileIntercepted = function(self, unit, target, defense, position)
+        -- awareness of event for AI
+        local aiPlatoon = unit.AIPlatoonReference
+        if aiPlatoon then
+            aiPlatoon:OnMissileIntercepted(unit, target, defense, position)
+        end
+    end,
+
+    -- OnUnpaused
+    -- OnPaused
+    -- OnBeingBuiltProgress
+    -- OnFailedToBeBuilt
+    -- OnTransportAttach
+    -- OnTransportDetach
+    -- OnTransportAborted
+    -- OnTransportOrdered
+    -- OnAttachedKilled
+    -- OnStartTransportLoading
+    -- OnStopTransportLoading
+    -- OnStartTransportLoading
+    -- OnStopTransportLoading
+    -- OnStartTransportBeamUp
+    -- OnStopTransportBeamUp
+    -- OnAddToStorage
+    -- OnRemoveFromStorage
+    -- OnTeleportUnit
+    -- OnFailedTeleport
+    -- OnAttachedToTransport
+    -- OnDetachedFromTransport
+    -- OnWorkBegin
+    -- OnWorkEnd
+    -- OnWorkFail
+    -- OnShieldEnabled
+    -- OnShieldDisabled
+    -- OnNukeArmed
+    -- OnNukeLaunched
+
+
+    -- OnAutoModeOn?
+    -- OnAutoModeOff?
+    -- OnFerryPointSet?
+
+
+
+    -- OnStartBeingBuilt
+    -- OnStopBeingBuilt
+
+
+
+    -- OnMissileIntercepted
+    -- OnMissileImpactShield
+    -- OnMissileImpactTerrain
+    -- OnAttachedKilled
+
+
+
     --#endregion
-    -------------------------------------------------------------------------------
+    ---------------------------------------------------------------------------
 
     -------------------------------------------------------------------------------
     --#region deprecated
@@ -1567,8 +2066,8 @@ AIBrain = Class(AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerCom
     -------------------------------------------------------------------------------
     --#region legacy functionality
 
-    --- All functions below solely exist because the code is too tightly coupled. 
-    --- We can't remove them without drastically changing how the code base works. 
+    --- All functions below solely exist because the code is too tightly coupled.
+    --- We can't remove them without drastically changing how the code base works.
     --- We can't do that because it would break mod compatibility
 
     ---@deprecated

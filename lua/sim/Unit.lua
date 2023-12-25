@@ -106,6 +106,7 @@ SyncMeta = {
 local cUnit = moho.unit_methods
 ---@class Unit : moho.unit_methods, InternalObject, IntelComponent, VeterancyComponent, AIUnitProperties
 ---@field AIManagerIdentifier? string
+---@field Repairers table<EntityId, Unit>
 ---@field Brain AIBrain
 ---@field buildBots? Unit[]
 ---@field Blueprint UnitBlueprint
@@ -130,6 +131,8 @@ local cUnit = moho.unit_methods
 ---@field AutoModeEnabled? boolean
 ---@field OnBeingBuiltEffectsBag TrashBag
 ---@field IdleEffectsBag TrashBag
+---@field SiloWeapon? Weapon
+---@field SiloProjectile? ProjectileBlueprint
 Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
 
     IsUnit = true,
@@ -192,20 +195,20 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         self.Trash = self.Trash or TrashBag()
 
         self.EventCallbacks = {
-            -- OnKilled = {},
-            -- OnUnitBuilt = {},
-            -- OnStartBuild = {},
-            -- OnReclaimed = {},
-            -- OnStartReclaim = {},
-            -- OnStopReclaim = {},
+            -- OnKilled = {}, -- done
+            -- OnUnitBuilt = {}, -- done
+            -- OnStartBuild = {}, -- done
+            -- OnReclaimed = {}, -- done
+            -- OnStartReclaim = {}, -- done
+            -- OnStopReclaim = {}, -- done
             -- OnStopBeingBuilt = {},
             -- OnCaptured = {},
             -- OnCapturedNewUnit = {},
             -- OnDamaged = {},
-            -- OnStartCapture = {},
-            -- OnStopCapture = {},
-            -- OnFailedCapture = {},
-            -- OnStartBeingCaptured = {},
+            -- OnStartCapture = {}, -- done
+            -- OnStopCapture = {}, -- done
+            -- OnFailedCapture = {}, -- done
+            -- OnStartBeingCaptured = {}, -- done
             -- OnStopBeingCaptured = {},
             -- OnFailedBeingCaptured = {},
             -- OnFailedToBuild = {},
@@ -542,6 +545,9 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
             self:StopUnitAmbientSound('ReclaimLoop')
             self:PlayUnitSound('StopReclaim')
         end
+
+        -- for AI events
+        self.Brain:OnPaused(self)
     end,
 
     ---@param self Unit
@@ -558,6 +564,9 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
             self:PlayUnitSound('StartReclaim')
             self:PlayUnitAmbientSound('ReclaimLoop')
         end
+
+        -- for AI events
+        self.Brain:OnUnpaused(self)
     end,
 
     ---@param self Unit
@@ -622,6 +631,9 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         self:StartCaptureEffects(target)
         self:PlayUnitSound('StartCapture')
         self:PlayUnitAmbientSound('CaptureLoop')
+
+        -- for AI events
+        self.Brain:OnUnitStartCapture(self, target)
     end,
 
     ---@param self Unit
@@ -631,6 +643,9 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         self:StopCaptureEffects(target)
         self:PlayUnitSound('StopCapture')
         self:StopUnitAmbientSound('CaptureLoop')
+
+        -- for AI events
+        self.Brain:OnUnitStopCapture(self, target)
     end,
 
     ---@param self Unit
@@ -661,6 +676,9 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         self:StopCaptureEffects(target)
         self:StopUnitAmbientSound('CaptureLoop')
         self:PlayUnitSound('FailedCapture')
+
+        -- for AI events
+        self.Brain:OnUnitFailedCapture(self, target)
     end,
 
     ---@param self Unit
@@ -728,6 +746,9 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         self:AddCaptor(captor)
         self:DoUnitCallbacks('OnStartBeingCaptured', captor)
         self:PlayUnitSound('StartBeingCaptured')
+
+        -- for AI events
+        self.Brain:OnUnitStartBeingCaptured(self, captor)
     end,
 
     ---@param self Unit
@@ -736,6 +757,9 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         self:RemoveCaptor(captor)
         self:DoUnitCallbacks('OnStopBeingCaptured', captor)
         self:PlayUnitSound('StopBeingCaptured')
+
+        -- for AI events
+        self.Brain:OnUnitStopBeingCaptured(self, captor)
     end,
 
     ---@param self Unit
@@ -744,6 +768,9 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         self:RemoveCaptor(captor)
         self:DoUnitCallbacks('OnFailedBeingCaptured', captor)
         self:PlayUnitSound('FailedBeingCaptured')
+
+        -- for AI events
+        self.Brain:OnUnitFailedBeingCaptured(self, captor)
     end,
 
     ---@param self Unit
@@ -752,6 +779,9 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         self:DoUnitCallbacks('OnReclaimed', reclaimer)
         self.CreateReclaimEndEffects(reclaimer, self)
         self:Destroy()
+
+        -- for AI events
+        self.Brain:OnUnitReclaimed(self, reclaimer)
     end,
 
     ---@param self Unit
@@ -772,18 +802,17 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
             end)
         end
 
-        -- awareness of event for AI
-        local aiPlatoon = self.AIPlatoonReference
-        if aiPlatoon then
-            aiPlatoon:OnStartRepair(self, unit)
-        end
+        -- for AI events
+        self.Brain:OnUnitStartRepair(self, unit)
     end,
 
     ---@param self Unit
     ---@param unit Unit
     OnStopRepair = function(self, unit)
-        -- awareness of event for AI
-        self.Brain:OnStopRepair(self, unit)
+        unit.Repairers[self.EntityId] = nil
+
+        -- for AI events
+        self.Brain:OnUnitStopRepair(self, unit)
     end,
 
     ---@param self Unit
@@ -822,7 +851,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         end
 
         -- awareness of event for AI
-        self.Brain:OnStartReclaim(self, target)
+        self.Brain:OnUnitStartReclaim(self, target)
     end,
 
     --- Called when the unit stops reclaiming
@@ -871,7 +900,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         self.OnStartReclaimPropEnergy = nil
 
         -- awareness of event for AI
-        self.Brain:OnStopReclaim(self, target)
+        self.Brain:OnUnitStopReclaim(self, target)
     end,
 
     ---@param self Unit
@@ -1490,7 +1519,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
             instigator:OnKilledUnit(self)
         end
 
-        self.Brain:OnKilled(self, instigator, type, overkillRatio)
+        self.Brain:OnUnitKilled(self, instigator, type, overkillRatio)
     end,
 
     ---@param self Unit
@@ -2416,6 +2445,9 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
             WaitTicks(1)
             self:Destroy()
         end)
+
+        -- for AI events
+        self.Brain:OnFailedToBeBuilt(self)
     end,
 
     ---@param self Unit
@@ -2424,11 +2456,8 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         self.SiloWeapon = weapon
         self.SiloProjectile = weapon:GetProjectileBlueprint()
 
-        -- awareness of event for AI
-        local aiPlatoon = self.AIPlatoonReference
-        if aiPlatoon then
-            aiPlatoon:OnSiloBuildStart(self, weapon)
-        end
+        -- for AI events
+        self.Brain:OnUnitSiloBuildStart(self, weapon)
     end,
 
     ---@param self Unit
@@ -2437,11 +2466,8 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         self.SiloWeapon = nil
         self.SiloProjectile = nil
 
-        -- awareness of event for AI
-        local aiPlatoon = self.AIPlatoonReference
-        if aiPlatoon then
-            aiPlatoon:OnSiloBuildEnd(self, weapon)
-        end
+        -- for AI events
+        self.Brain:OnUnitSiloBuildEnd(self, weapon)
     end,
 
     -------------------------------------------------------------------------------------------
@@ -2760,11 +2786,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
             self.UpgradesTo = bp.BlueprintId
         end
 
-        -- awareness of event for AI
-        local aiPlatoon = self.AIPlatoonReference
-        if aiPlatoon then
-            aiPlatoon:OnStartBuild(self, built, order)
-        end
+        self.Brain:OnUnitStartBuild(self, built, order)
 
         return true
     end,
@@ -2786,11 +2808,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
             built.Repairers[self.EntityId] = nil
         end
 
-        -- awareness of event for AI
-        local aiPlatoon = self.AIPlatoonReference
-        if aiPlatoon then
-            aiPlatoon:OnStopBuild(self, built)
-        end
+        self.Brain:OnUnitStopBuild(self, built, order)
     end,
 
     ---@param self Unit
@@ -2812,10 +2830,11 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
     end,
 
     ---@param self Unit
-    ---@param unit Unit
+    ---@param target Unit
     ---@param oldProg number
     ---@param newProg number
-    OnBuildProgress = function(self, unit, oldProg, newProg)
+    OnBuildProgress = function(self, target, oldProg, newProg)
+        self.Brain:OnBuildProgress(self, target, oldProg, newProg)
     end,
 
     --- Called as this unit (with transport capabilities) attached another unit to itself
@@ -2834,11 +2853,8 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
             end
         end
 
-        -- awareness of event for AI
-        local aiPlatoon = self.AIPlatoonReference
-        if aiPlatoon then
-            aiPlatoon:OnTransportAttach(self, attachBone, attachedUnit)
-        end
+        -- for AI events
+        self.Brain:OnTransportAttach(self, attachBone, attachedUnit)
     end,
 
     --- Called by the engine when the infinite build is disabled
@@ -2871,11 +2887,8 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
             end
         end
 
-        -- awareness of event for AI
-        local aiPlatoon = self.AIPlatoonReference
-        if aiPlatoon then
-            aiPlatoon:OnTransportDetach(self, attachBone, detachedUnit)
-        end
+        -- for AI events
+        self.Brain:OnTransportDetach(self, attachBone, detachedUnit)
     end,
 
     --- Called as a unit (with transport capabilities) aborts the transport order
@@ -2889,11 +2902,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
             end
         end
 
-        -- awareness of event for AI
-        local aiPlatoon = self.AIPlatoonReference
-        if aiPlatoon then
-            aiPlatoon:OnTransportAborted(self)
-        end
+        self.Brain:OnTransportAborted(self)
     end,
 
     --- Called as a unit (with transport capabilities) initiates the a transport order
@@ -2907,11 +2916,8 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
             end
         end
 
-        -- awareness of event for AI
-        local aiPlatoon = self.AIPlatoonReference
-        if aiPlatoon then
-            aiPlatoon:OnTransportOrdered(self)
-        end
+        -- for AI events
+        self.Brain:OnTransportOrdered(self)
     end,
 
     --- Called as a unit is killed while being transported by a unit (with transport capabilities) of this platoon
@@ -2926,11 +2932,8 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
             end
         end
 
-        -- awareness of event for AI
-        local aiPlatoon = self.AIPlatoonReference
-        if aiPlatoon then
-            aiPlatoon:OnAttachedKilled(self)
-        end
+        -- for AI events
+        self.Brain:OnAttachedKilled(self, attached)
     end,
     
     --- Called as a unit (with transport capabilities) is ready to load in units
@@ -2944,11 +2947,8 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
             end
         end
 
-        -- awareness of event for AI
-        local aiPlatoon = self.AIPlatoonReference
-        if aiPlatoon then
-            aiPlatoon:OnStartTransportLoading(self)
-        end
+        -- for AI events
+        self.Brain:OnStartTransportLoading(self)
     end,
 
     --- Called as a unit (with transport capabilities) of this platoon is done loading in units
@@ -2962,11 +2962,8 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
             end
         end
 
-        -- awareness of event for AI
-        local aiPlatoon = self.AIPlatoonReference
-        if aiPlatoon then
-            aiPlatoon:OnStopTransportLoading(self)
-        end
+        -- for AI events
+        self.Brain:OnStopTransportLoading(self)
     end,
 
     ---@param self Unit
@@ -3080,11 +3077,8 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
 
         ChangeState(self, self.WorkingState)
 
-        -- awareness of event for AI
-        local aiPlatoon = self.AIPlatoonReference
-        if aiPlatoon then
-            aiPlatoon:OnWorkBegin(self, work)
-        end
+        -- for AI events
+        self.Brain:OnWorkBegin(self, work)
 
         -- Inform EnhanceTask that enhancement is not restricted
         return true
@@ -3099,11 +3093,8 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         self:StopUnitAmbientSound('EnhanceLoop')
         self:CleanupEnhancementEffects()
 
-       -- awareness of event for AI
-       local aiPlatoon = self.AIPlatoonReference
-       if aiPlatoon then
-           aiPlatoon:OnWorkEnd(self, work)
-       end
+        -- for AI events
+        self.Brain:OnWorkEnd(self, work)
     end,
 
     ---@param self Unit
@@ -3114,6 +3105,9 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         self:PlayUnitSound('EnhanceFail')
         self:StopUnitAmbientSound('EnhanceLoop')
         self:CleanupEnhancementEffects()
+
+        -- for AI events
+        self.Brain:OnWorkFail(self, work)
     end,
 
     ---@alias DefaultWorkOrder "BeingBuilt" | "Enhancing" | "FactoryBuilding" | "None" | "Repairing" | "Upgrading"
@@ -4426,7 +4420,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
     end,
 
     ---@param self Unit
-    ---@param transport BaseTransport
+    ---@param transport Unit
     ---@param bone Bone
     OnStartTransportBeamUp = function(self, transport, bone)
         self.TransportBeamEffectsBag = self.TransportBeamEffectsBag or TrashBag()
@@ -4446,6 +4440,9 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         TrashAdd(self.TransportBeamEffectsBag, CreateEmitterAtBone(transport, bone, self.Army, EffectTemplate.TTransportGlow01))
 
         self:TransportAnimation()
+
+        -- for AI events
+        self.Brain:OnStartTransportBeamUp(self, transport, bone)
     end,
 
     ---@param self Unit
@@ -4458,6 +4455,9 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         for i = 1, self.WeaponCount do
             self.WeaponInstances[i]:ResetTarget()
         end
+
+        -- for AI events
+        self.Brain:OnStoptransportBeamUp(self)
     end,
 
     ---@param self Unit
@@ -4516,11 +4516,8 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
             end
         end
 
-        -- awareness of event for AI
-        local aiPlatoon = self.AIPlatoonReference
-        if aiPlatoon then
-            aiPlatoon:OnAddToStorage(self, carrier)
-        end
+        -- for AI events
+        self.Brain:OnAddToStorage(self, carrier)
     end,
 
     --- Called from the perspective of the unit that is removed from the storage of another unit
@@ -4548,11 +4545,8 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
             end
         end
 
-        -- awareness of event for AI
-        local aiPlatoon = self.AIPlatoonReference
-        if aiPlatoon then
-            aiPlatoon:OnRemoveFromStorage(self, carrier)
-        end
+        -- for AI events
+        self.Brain:OnRemoveFromStorage(self, carrier)
     end,
 
     -- Animation when being dropped from a transport.
@@ -4628,6 +4622,9 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
 
         self:CleanupTeleportChargeEffects()
         self.TeleportThread = self:ForkThread(self.InitiateTeleportThread, teleporter, location, orientation)
+
+        -- for AI events
+        self.Brain:OnTeleportUnit(self, teleporter, location, orientation)
     end,
 
     ---@param self Unit
@@ -4648,6 +4645,9 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         self:SetWorkProgress(0.0)
         self:SetImmobile(false)
         self.UnitBeingTeleported = nil
+
+        -- for AI events
+        self.Brain:OnFailedTeleport(self)
     end,
 
     ---@param self Unit
@@ -4780,6 +4780,9 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
 
         end
         self:DoUnitCallbacks('OnAttachedToTransport', transport, bone)
+
+        -- for AI events
+        self.Brain:OnAttachedToTransport(self, transport, bone)
     end,
 
     ---@param self Unit
@@ -4792,6 +4795,9 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         self:EnableDefaultToggleCaps()
         self:TransportAnimation(-1)
         self:DoUnitCallbacks('OnDetachedFromTransport', transport, bone)
+
+        -- for AI events
+        self.Brain:OnDetachedFromTransport(self, transport, bone)
     end,
 
     OnDetachedFromTransportThread = function(self, transport, bone)
@@ -5018,7 +5024,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
 
     --- Called when a missile launched by this unit is intercepted
     ---@param self Unit
-    ---@param target Unit
+    ---@param target Vector
     ---@param defense Unit Requires an `IsDestroyed` check as the defense may have been destroyed when the missile is intercepted
     ---@param position Vector Location where the missile got intercepted
     OnMissileIntercepted = function(self, target, defense, position)
@@ -5033,18 +5039,14 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
             end
         end
 
-        -- awareness of event for AI
-        local aiPlatoon = self.AIPlatoonReference
-        if aiPlatoon then
-            aiPlatoon:OnMissileIntercepted(self, target, defense, position)
-        end
+        self.Brain:OnMissileIntercepted(self, target, defense, position)
     end,
 
 
     --- Called when a missile launched by this unit hits a shield
     ---@param self Unit
-    ---@param target Unit
-    ---@param shield Shield  Requires an `IsDestroyed` check when using as the shield may have been destroyed when the missile impacts
+    ---@param target Vector
+    ---@param shield Unit  Requires an `IsDestroyed` check when using as the shield may have been destroyed when the missile impacts
     ---@param position Vector Location where the missile hit the shield
     OnMissileImpactShield = function(self, target, shield, position)
         -- try and run callbacks
@@ -5058,16 +5060,12 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
             end
         end
 
-        -- awareness of event for AI
-        local aiPlatoon = self.AIPlatoonReference
-        if aiPlatoon then
-            aiPlatoon:OnMissileImpactShield(self, target, shield, position)
-        end
+        self.Brain:OnMissileImpactShield(self, target, shield, position)
     end,
 
     --- Called when a missile launched by this unit hits the terrain, note that this can be the same location as the target
     ---@param self Unit
-    ---@param target Unit 
+    ---@param target Vector 
     ---@param position Vector Location where the missile hit the terrain
     OnMissileImpactTerrain = function(self, target, position)
         -- try and run callbacks
@@ -5081,11 +5079,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
             end
         end
 
-        -- awareness of event for AI
-        local aiPlatoon = self.AIPlatoonReference
-        if aiPlatoon then
-            aiPlatoon:OnMissileImpactTerrain(self, target, position)
-        end
+        self.Brain:OnMissileImpactTerrain(self, target, position)
     end,
 
     --- Add a callback when a missile launched by this unit is intercepted
@@ -5129,25 +5123,20 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
     -- Called by the shield class 
     ---@param self Unit
     OnShieldEnabled = function(self) 
-        -- awareness of event for AI
-        local aiPlatoon = self.AIPlatoonReference
-        if aiPlatoon then
-            aiPlatoon:OnShieldEnabled(self)
-        end
+        -- for AI events
+        self.Brain:OnShieldEnabled(self)
     end,
 
     ---@param self Unit
     OnShieldDisabled = function(self) 
-        -- awareness of event for AI
-        local aiPlatoon = self.AIPlatoonReference
-        if aiPlatoon then
-            aiPlatoon:OnShieldDisabled(self)
-        end
+        -- for AI events
+        self.Brain:OnShieldDisabled(self)
     end,
 
     -- Called by the brain when the unit registered itself
     ---@param self Unit
     OnNoExcessEnergy = function(self) end,
+
     ---@param self Unit
     OnExcessEnergy = function(self) end,
 
@@ -5162,10 +5151,16 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
 
     --- called when the unit
     ---@param self Unit
-    OnNukeArmed = function(self) end,
+    OnNukeArmed = function(self)
+        -- for AI events
+        self.Brain:OnNukeArmed(self)
+    end,
 
     ---@param self Unit
-    OnNukeLaunched = function(self) end,
+    OnNukeLaunched = function(self)
+        -- for AI events
+        self.Brain:OnNukeLaunched(self)
+    end,
 
     -- Unknown when these are called
     ---@param self Unit
