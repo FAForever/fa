@@ -2063,8 +2063,6 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
     OnDestroy = function(self)
         self.Dead = true
 
-        self.Brain:OnUnitDestroyed(self)
-
         if self:GetFractionComplete() < 1 then
             self:SendNotifyMessage('cancelled')
         end
@@ -2103,6 +2101,8 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
             self.Brain:UntrackJammer(self)
         end
         
+        -- for AI events
+        self.Brain:OnUnitDestroy(self)
 
         ChangeState(self, self.DeadState)
     end,
@@ -2254,10 +2254,9 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
     OnStartBeingBuilt = function(self, builder, layer)
         self:StartBeingBuiltEffects(builder, layer)
 
-        local aiBrain = self:GetAIBrain()
-        aiBrain:OnUnitStartBeingBuilt(self, builder, layer)
-        if not table.empty(aiBrain.UnitBuiltTriggerList) then
-            for _, v in aiBrain.UnitBuiltTriggerList do
+        local brain = self:GetAIBrain()
+        if not table.empty(brain.UnitBuiltTriggerList) then
+            for _, v in brain.UnitBuiltTriggerList do
                 if EntityCategoryContains(v.Category, self) then
                     self:ForkThread(self.UnitBuiltPercentageCallbackThread, v.Percent, v.Callback)
                 end
@@ -2267,6 +2266,9 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         self.originalBuilder = builder
 
         self:SendNotifyMessage('started')
+
+        -- for AI events
+        self.Brain:OnStartBeingBuilt(self, builder, layer)
     end,
 
     ---@param self Unit
@@ -2296,7 +2298,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
             return false
         end
 
-        self.Brain:OnUnitStopBeingBuilt(self, builder, layer)
+
 
         -- Create any idle effects on unit
         if TrashEmpty(self.IdleEffectsBag) then
@@ -2402,6 +2404,9 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         if self.Blueprint.TechCategory ~= 'COMMAND' then
             self:SendNotifyMessage('completed')
         end
+
+        -- for AI events
+        self.Brain:OnStopBeingBuilt(self, builder, layer)
 
         return true
     end,
@@ -2772,7 +2777,6 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         self:PlayUnitAmbientSound('ConstructLoop')
 
         self:DoOnStartBuildCallbacks(built)
-        self.Brain:OnUnitStartBuilding(self, built)
 
         if order == 'Upgrade' and bp.General.UpgradesFrom == self.UnitId then
             built.DisallowCollisions = true
@@ -2798,7 +2802,6 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         self:StopBuildingEffects(built)
         self:SetActiveConsumptionInactive()
         self:DoOnUnitBuiltCallbacks(built)
-        self.Brain:OnUnitStopBuilding(self, built)
         self:StopUnitAmbientSound('ConstructLoop')
         self:PlayUnitSound('ConstructStop')
         self.TransferUpgradeProgress = nil
@@ -2808,6 +2811,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
             built.Repairers[self.EntityId] = nil
         end
 
+        -- for AI events
         self.Brain:OnUnitStopBuild(self, built, order)
     end,
 

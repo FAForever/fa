@@ -226,9 +226,9 @@ AIBrain = Class(StandardBrain, EconomyComponent) {
     ---@param unit Unit
     ---@param builder Unit
     ---@param layer Layer
-    OnUnitStartBeingBuilt = function(self, unit, builder, layer)
+    OnStartBeingBuilt = function(self, unit, builder, layer)
         local nearestBase = self:FindNearestBase(unit:GetPosition())
-        nearestBase:OnUnitStartBeingBuilt(unit, builder, layer)
+        nearestBase:OnStartBeingBuilt(unit, builder, layer)
     end,
 
     --- Called by a unit as it is finished being built
@@ -236,9 +236,9 @@ AIBrain = Class(StandardBrain, EconomyComponent) {
     ---@param unit Unit
     ---@param builder Unit
     ---@param layer Layer
-    OnUnitStopBeingBuilt = function(self, unit, builder, layer)
+    OnStopBeingBuilt = function(self, unit, builder, layer)
         local nearestBase = self:FindNearestBase(unit:GetPosition())
-        nearestBase:OnUnitStopBeingBuilt(unit, builder, layer)
+        nearestBase:OnStopBeingBuilt(unit, builder, layer)
 
         if EntityCategoryContains(categories.ENGINEER * categories.TECH1, unit) then
             local platoon = self:MakePlatoon('', '')
@@ -253,27 +253,27 @@ AIBrain = Class(StandardBrain, EconomyComponent) {
     --- Called by a unit as it is destroyed
     ---@param self EasyAIBrain
     ---@param unit Unit
-    OnUnitDestroyed = function(self, unit)
+    OnUnitDestroy = function(self, unit)
         local nearestBase = self:FindNearestBase(unit:GetPosition())
-        nearestBase:OnUnitDestroyed(unit)
+        nearestBase:OnUnitDestroy(unit)
     end,
 
     --- Called by a unit as it starts building
     ---@param self EasyAIBrain
     ---@param unit Unit
     ---@param built Unit
-    OnUnitStartBuilding = function(self, unit, built)
+    OnUnitStartBuild = function(self, unit, built)
         local nearestBase = self:FindNearestBase(unit:GetPosition())
-        nearestBase:OnUnitStartBuilding(unit, built)
+        nearestBase:OnUnitStartBuild(unit, built)
     end,
 
     --- Called by a unit as it stops building
     ---@param self EasyAIBrain
     ---@param unit Unit
     ---@param built Unit
-    OnUnitStopBuilding = function(self, unit, built)
+    OnUnitStopBuild = function(self, unit, built)
         local nearestBase = self:FindNearestBase(unit:GetPosition())
-        nearestBase:OnUnitStopBuilding(unit, built)
+        nearestBase:OnUnitStopBuild(unit, built)
     end,
 
     --#endregion
