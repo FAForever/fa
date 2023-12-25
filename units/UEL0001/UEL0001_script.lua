@@ -35,28 +35,28 @@ UEL0001 = ClassUnit(ACUUnit) {
         TacMissile = ClassWeapon(TIFCruiseMissileLauncher) {
             PlayFxRackSalvoChargeSequence = function(self)
                 TIFCruiseMissileLauncher.PlayFxRackSalvoChargeSequence(self)
-                self.unit.MissileHatchSlider:SetGoal(0, 0, 1.9):SetSpeed(1.9/(self.Blueprint.RackSalvoChargeTime - 0.1))
+                self.unit.MissileHatchSlider:SetGoal(0, 0, 1.9):SetSpeed(9.5) -- Matches charge time - 0.1 seconds
             end,
 
             PlayFxRackSalvoReloadSequence = function(self)
                 TIFCruiseMissileLauncher.PlayFxRackSalvoReloadSequence(self)
                 self:ForkThread(function() 
                     WaitTicks(30) -- Smoke effect lifetime
-                    self.unit.MissileHatchSlider:SetGoal(0, 0, 0):SetSpeed(1.9/(self.Blueprint.RackSalvoReloadTime - 3))
+                    self.unit.MissileHatchSlider:SetGoal(0, 0, 0):SetSpeed(1.12) -- Matches reload time - 3 seconds
                 end)
             end,
         },
         TacNukeMissile = ClassWeapon(TIFCruiseMissileLauncher) {
             PlayFxRackSalvoChargeSequence = function(self)
                 TIFCruiseMissileLauncher.PlayFxRackSalvoChargeSequence(self)
-                self.unit.MissileHatchSlider:SetGoal(0, 0, 1.9):SetSpeed(1.9/(self.Blueprint.RackSalvoChargeTime - 0.1))
+                self.unit.MissileHatchSlider:SetGoal(0, 0, 1.9):SetSpeed(9.5) -- Matches charge time - 0.1 seconds
             end,
 
             PlayFxRackSalvoReloadSequence = function(self)
                 TIFCruiseMissileLauncher.PlayFxRackSalvoReloadSequence(self)
                 self:ForkThread(function() 
                     WaitTicks(30) -- Smoke effect lifetime
-                    self.unit.MissileHatchSlider:SetGoal(0, 0, 0):SetSpeed(1.9/(self.Blueprint.RackSalvoReloadTime - 3))
+                    self.unit.MissileHatchSlider:SetGoal(0, 0, 0):SetSpeed(0.077) -- Matches reload time - 3 seconds
                 end)
             end,
         },
