@@ -35,29 +35,41 @@ UEL0001 = ClassUnit(ACUUnit) {
         TacMissile = ClassWeapon(TIFCruiseMissileLauncher) {
             PlayFxRackSalvoChargeSequence = function(self)
                 TIFCruiseMissileLauncher.PlayFxRackSalvoChargeSequence(self)
-                self.unit.MissileHatchSlider:SetGoal(0, 0, 1.9):SetSpeed(9.5) -- Matches charge time - 0.1 seconds
+                local hatch = self.unit.MissileHatchSlider
+                if hatch then
+                    hatch:SetGoal(0, 0, 1.9):SetSpeed(9.5) -- Matches charge time - 0.1 seconds
+                end
             end,
 
             PlayFxRackSalvoReloadSequence = function(self)
                 TIFCruiseMissileLauncher.PlayFxRackSalvoReloadSequence(self)
-                self:ForkThread(function() 
-                    WaitTicks(30) -- Smoke effect lifetime
-                    self.unit.MissileHatchSlider:SetGoal(0, 0, 0):SetSpeed(1.12) -- Matches reload time - 3 seconds
-                end)
+                local hatch = self.unit.MissileHatchSlider
+                if hatch then
+                    self:ForkThread(function() 
+                        WaitTicks(30) -- Smoke effect lifetime
+                        self.unit.MissileHatchSlider:SetGoal(0, 0, 0):SetSpeed(1.12) -- Matches reload time - 3 seconds
+                    end)
+                end
             end,
         },
         TacNukeMissile = ClassWeapon(TIFCruiseMissileLauncher) {
             PlayFxRackSalvoChargeSequence = function(self)
                 TIFCruiseMissileLauncher.PlayFxRackSalvoChargeSequence(self)
-                self.unit.MissileHatchSlider:SetGoal(0, 0, 1.9):SetSpeed(9.5) -- Matches charge time - 0.1 seconds
+                local hatch = self.unit.MissileHatchSlider
+                if hatch then
+                    self.unit.MissileHatchSlider:SetGoal(0, 0, 1.9):SetSpeed(9.5) -- Matches charge time - 0.1 seconds
+                end
             end,
 
             PlayFxRackSalvoReloadSequence = function(self)
                 TIFCruiseMissileLauncher.PlayFxRackSalvoReloadSequence(self)
-                self:ForkThread(function() 
-                    WaitTicks(30) -- Smoke effect lifetime
-                    self.unit.MissileHatchSlider:SetGoal(0, 0, 0):SetSpeed(0.077) -- Matches reload time - 3 seconds
-                end)
+                local hatch = self.unit.MissileHatchSlider
+                if hatch then
+                    self:ForkThread(function() 
+                        WaitTicks(30) -- Smoke effect lifetime
+                        self.unit.MissileHatchSlider:SetGoal(0, 0, 0):SetSpeed(0.077) -- Matches reload time - 3 seconds
+                    end)
+                end
             end,
         },
     },
@@ -78,9 +90,11 @@ UEL0001 = ClassUnit(ACUUnit) {
         -- Restrict what enhancements will enable later
         self:AddBuildRestriction(categories.UEF * (categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER))
 
-        local hatchBone = "Back_Upgrade_B02"
-        if hatchBone then
+        local hatchBone = 'Back_Upgrade_B02'
+        if self:IsValidBone(hatchBone) then
             self.MissileHatchSlider = CreateSlider(self, hatchBone)
+        else
+            WARN('*ERROR: Trying to use the bone, ' .. hatchBone .. ' on unit ' .. self.UnitId .. ' and it does not exist in the model.')
         end
     end,
 
