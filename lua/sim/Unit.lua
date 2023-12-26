@@ -4494,12 +4494,6 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         self:SetDoNotTarget(loading)
         self:SetReclaimable(not loading)
         self:SetCapturable(not loading)
-
-        -- awareness of event for AI
-        local aiPlatoon = self.AIPlatoonReference
-        if aiPlatoon then
-            aiPlatoon:OnStorageChange(self, loading)
-        end
     end,
 
     --- Called from the perspective of the unit that is added to the storage of another unit
