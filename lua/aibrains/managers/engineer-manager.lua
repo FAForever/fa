@@ -173,7 +173,7 @@ AIEngineerManager = ClassSimple {
     ---@param unit Unit
     ---@param builder Unit
     ---@param layer Layer
-    OnUnitStartBeingBuilt = function(self, unit, builder, layer)
+    OnStartBeingBuilt = function(self, unit, builder, layer)
         local blueprint = unit.Blueprint
         if blueprint.CategoriesHash['ENGINEER'] then
             local tech = blueprint.TechCategory
@@ -191,7 +191,7 @@ AIEngineerManager = ClassSimple {
     ---@param unit Unit
     ---@param builder Unit
     ---@param layer Layer
-    OnUnitStopBeingBuilt = function(self, unit, builder, layer)
+    OnStopBeingBuilt = function(self, unit, builder, layer)
         local blueprint = unit.Blueprint
         if blueprint.CategoriesHash['ENGINEER'] then
             local tech = blueprint.TechCategory
@@ -208,7 +208,7 @@ AIEngineerManager = ClassSimple {
     --- `Memory complexity: O(1)`
     ---@param self AIEngineerManager
     ---@param unit Unit
-    OnUnitDestroyed = function(self, unit)
+    OnUnitDestroy = function(self, unit)
         local blueprint = unit.Blueprint
         if blueprint.CategoriesHash['ENGINEER'] then
             local tech = blueprint.TechCategory
@@ -226,7 +226,7 @@ AIEngineerManager = ClassSimple {
     ---@param self AIEngineerManager
     ---@param unit Unit
     ---@param built Unit
-    OnUnitStartBuilding = function(self, unit, built)
+    OnUnitStartBuild = function(self, unit, built)
         local blueprint = unit.Blueprint
         if blueprint.CategoriesHash['ENGINEER'] then
         end
@@ -236,7 +236,7 @@ AIEngineerManager = ClassSimple {
     ---@param self AIEngineerManager
     ---@param unit Unit
     ---@param built Unit
-    OnUnitStopBuilding = function(self, unit, built)
+    OnUnitStopBuild = function(self, unit, built)
         local blueprint = unit.Blueprint
         if blueprint.CategoriesHash['ENGINEER'] then
         end
@@ -245,7 +245,7 @@ AIEngineerManager = ClassSimple {
     --------------------------------------------------------------------------------------------
     -- unit interface
 
-    --- Add a unit to the engineer manager, similar to calling `OnUnitStopBeingBuilt`
+    --- Add a unit to the engineer manager, similar to calling `OnStopBeingBuilt`
     --- 
     --- `Time complexity: O(1)`
     --- 
@@ -260,7 +260,7 @@ AIEngineerManager = ClassSimple {
         self.Engineers[tech][id] = unit
     end,
 
-    --- Remove a unit from the engineer manager, similar to calling `OnUnitDestroyed`
+    --- Remove a unit from the engineer manager, similar to calling `OnUnitDestroy`
     --- 
     --- `Complexity: O(1)`
     --- 

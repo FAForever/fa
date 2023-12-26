@@ -225,7 +225,7 @@ AIStructureManager = ClassSimple {
     ---@param unit Unit
     ---@param builder Unit
     ---@param layer Layer
-    OnUnitStartBeingBuilt = function(self, unit, builder, layer)
+    OnStartBeingBuilt = function(self, unit, builder, layer)
         local blueprint = unit.Blueprint
         if blueprint.CategoriesHash['STRUCTURE'] then
             local tech = blueprint.TechCategory
@@ -239,7 +239,7 @@ AIStructureManager = ClassSimple {
     ---@param unit Unit
     ---@param builder Unit
     ---@param layer Layer
-    OnUnitStopBeingBuilt = function(self, unit, builder, layer)
+    OnStopBeingBuilt = function(self, unit, builder, layer)
         local blueprint = unit.Blueprint
         if blueprint.CategoriesHash['STRUCTURE'] then
             local tech = blueprint.TechCategory
@@ -263,7 +263,7 @@ AIStructureManager = ClassSimple {
     --- Called by a unit as it is destroyed
     ---@param self AIStructureManager
     ---@param unit Unit
-    OnUnitDestroyed = function(self, unit)
+    OnUnitDestroy = function(self, unit)
         local blueprint = unit.Blueprint
         if blueprint.CategoriesHash['STRUCTURE'] then
             local tech = blueprint.TechCategory
@@ -277,31 +277,31 @@ AIStructureManager = ClassSimple {
     ---@param self AIStructureManager
     ---@param unit Unit
     ---@param built Unit
-    OnUnitStartBuilding = function(self, unit, built)
+    OnUnitStartBuild = function(self, unit, built)
     end,
 
     --- Called by a unit as it stops building
     ---@param self AIStructureManager
     ---@param unit Unit
     ---@param built Unit
-    OnUnitStopBuilding = function(self, unit, built)
+    OnUnitStopBuild = function(self, unit, built)
     end,
 
     --------------------------------------------------------------------------------------------
     -- unit interface
 
-    --- Add a unit, similar to calling `OnUnitStopBeingBuilt`
+    --- Add a unit, similar to calling `OnStopBeingBuilt`
     ---@param self AIStructureManager
     ---@param unit Unit
     AddUnit = function(self, unit)
-        self:OnUnitStopBeingBuilt(unit, nil, unit.Layer)
+        self:OnStopBeingBuilt(unit, nil, unit.Layer)
     end,
 
-    --- Remove a unit, similar to calling `OnUnitDestroyed`
+    --- Remove a unit, similar to calling `OnUnitDestroy`
     ---@param self AIStructureManager
     ---@param unit Unit
     RemoveUnit = function(self, unit)
-        self:OnUnitDestroyed(unit)
+        self:OnUnitDestroy(unit)
     end,
 
     ---------------------------------------------------------------------------

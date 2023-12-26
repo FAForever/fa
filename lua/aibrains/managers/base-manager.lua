@@ -209,10 +209,10 @@ AIBase = ClassSimple {
     ---@param unit Unit
     ---@param builder Unit
     ---@param layer Layer
-    OnUnitStartBeingBuilt = function(self, unit, builder, layer)
-        self.FactoryManager:OnUnitStartBeingBuilt(unit, builder, layer)
-        self.EngineerManager:OnUnitStartBeingBuilt(unit, builder, layer)
-        self.StructureManager:OnUnitStartBeingBuilt(unit, builder, layer)
+    OnStartBeingBuilt = function(self, unit, builder, layer)
+        self.FactoryManager:OnStartBeingBuilt(unit, builder, layer)
+        self.EngineerManager:OnStartBeingBuilt(unit, builder, layer)
+        self.StructureManager:OnStartBeingBuilt(unit, builder, layer)
     end,
 
     --- Called by a unit as it is finished being built
@@ -220,39 +220,39 @@ AIBase = ClassSimple {
     ---@param unit Unit
     ---@param builder Unit
     ---@param layer Layer
-    OnUnitStopBeingBuilt = function(self, unit, builder, layer)
-        self.FactoryManager:OnUnitStopBeingBuilt(unit, builder, layer)
-        self.EngineerManager:OnUnitStopBeingBuilt(unit, builder, layer)
-        self.StructureManager:OnUnitStopBeingBuilt(unit, builder, layer)
+    OnStopBeingBuilt = function(self, unit, builder, layer)
+        self.FactoryManager:OnStopBeingBuilt(unit, builder, layer)
+        self.EngineerManager:OnStopBeingBuilt(unit, builder, layer)
+        self.StructureManager:OnStopBeingBuilt(unit, builder, layer)
     end,
 
     --- Called by a unit as it is destroyed
     ---@param self AIBase
     ---@param unit Unit
-    OnUnitDestroyed = function(self, unit)
-        self.FactoryManager:OnUnitDestroyed(unit)
-        self.EngineerManager:OnUnitDestroyed(unit)
-        self.StructureManager:OnUnitDestroyed(unit)
+    OnUnitDestroy = function(self, unit)
+        self.FactoryManager:OnUnitDestroy(unit)
+        self.EngineerManager:OnUnitDestroy(unit)
+        self.StructureManager:OnUnitDestroy(unit)
     end,
 
     --- Called by a unit as it starts building
     ---@param self AIBase
     ---@param unit Unit
     ---@param built Unit
-    OnUnitStartBuilding = function(self, unit, built)
-        self.FactoryManager:OnUnitStartBuilding(unit, built)
-        self.EngineerManager:OnUnitStartBuilding(unit, built)
-        self.StructureManager:OnUnitStartBuilding(unit, built)
+    OnUnitStartBuild = function(self, unit, built)
+        self.FactoryManager:OnUnitStartBuild(unit, built)
+        self.EngineerManager:OnUnitStartBuild(unit, built)
+        self.StructureManager:OnUnitStartBuild(unit, built)
     end,
 
     --- Called by a unit as it stops building
     ---@param self AIBase
     ---@param unit Unit
     ---@param built Unit
-    OnUnitStopBuilding = function(self, unit, built)
-        self.FactoryManager:OnUnitStopBuilding(unit, built)
-        self.EngineerManager:OnUnitStopBuilding(unit, built)
-        self.StructureManager:OnUnitStopBuilding(unit, built)
+    OnUnitStopBuild = function(self, unit, built)
+        self.FactoryManager:OnUnitStopBuild(unit, built)
+        self.EngineerManager:OnUnitStopBuild(unit, built)
+        self.StructureManager:OnUnitStopBuild(unit, built)
     end,
 
     ---------------------------------------------------------------------------
