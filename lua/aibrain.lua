@@ -1453,6 +1453,13 @@ AIBrain = Class(AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerCom
     --- - OnStartRepeatQueue
     --- - OnAssignedFocusEntity
     ---
+    --- And events that are purposefully not communicated:
+    --- 
+    --- - OnDamage
+    --- - OnDamageBy
+    --- - OnMotionHorzEventChange
+    --- - OnMotionVertEventChange
+    ---
     --- If you're interested for one of these events then you're encouraged to make a pull
     --- request to add the event!
 
