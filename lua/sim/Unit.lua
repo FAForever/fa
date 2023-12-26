@@ -1356,7 +1356,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         self:ManageDamageEffects(new, old)
 
         -- inform the brain of the event
-        self.Brain:OnHealthChanged(self, new, old)
+        self.Brain:OnUnitHealthChanged(self, new, old)
     end,
 
     ---@param self Unit
@@ -3011,6 +3011,9 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         self:SetUnitState("Sacrificing", true)
         EffectUtilities.PlaySacrificingEffects(self, targetUnit)
         self.SacrificeTargetUnit = targetUnit
+
+        -- for AI events
+        self.Brain:OnUnitStartSacrifice(self, targetUnit)
     end,
 
     ---@param self Unit
@@ -3020,6 +3023,9 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         EffectUtilities.PlaySacrificeEffects(self, targetUnit)
         self:SetDeathWeaponEnabled(false)
         self:Destroy()
+
+        -- for AI events
+        self.Brain:OnUnitStopSacrifice(self, targetUnit)
     end,
 
     -------------------------------------------------------------------------------------------
@@ -5084,6 +5090,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
             end
         end
 
+        -- for AI events
         self.Brain:OnUnitMissileImpactTerrain(self, target, position)
     end,
 
@@ -5115,15 +5122,27 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
 
     -- Called when the C function unit.SetConsumptionActive is called
     ---@param self Unit
-    OnConsumptionActive = function(self) end,
-    
+    OnConsumptionActive = function(self)
+        -- for AI events
+        self.Brain:OnUnitConsumptionActive(self)
+    end,
+
     ---@param self Unit
-    OnConsumptionInActive = function(self) end,
+    OnConsumptionInActive = function(self) 
+        -- for AI events
+        self.Brain:OnUnitConsumptionInActive(self)
+    end,
 
     -- Called when the C function unit.SetProductionActive is called
-    OnProductionActive = function(self) end,
-    OnProductionInActive = function(self) end,
+    OnProductionActive = function(self)
+        -- for AI events
+        self.Brain:OnUnitProductionActive(self)
+    end,
 
+    OnProductionInActive = function(self)
+        -- for AI events
+        self.Brain:OnUnitProductionInActive(self)
+    end,
 
     -- Called by the shield class 
     ---@param self Unit

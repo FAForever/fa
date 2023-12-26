@@ -150,6 +150,7 @@ function SetupSession()
     local buildRestrictions, enhRestrictions = nil, {}
 
     local restrictions = ScenarioInfo.Options.RestrictedCategories
+
     if restrictions then
         table.print(restrictions, 'RestrictedCategories')
         local presets = import("/lua/ui/lobby/unitsrestrictions.lua").GetPresetsData()

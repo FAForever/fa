@@ -1439,18 +1439,12 @@ AIBrain = Class(AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerCom
     --- easier to respond to conditions that are happening on the battlefield. The following
     --- unit events are not communicated to the brain:
     ---
-    --- - OnStorageChange
-    --- - OnConsumptionActive
-    --- - OnConsumptionInActive
-    --- - OnProductionActive
-    --- - OnProductionInActive
+    --- - OnStorageChange (use OnAddToStorage and OnRemoveFromStorage instead)
     --- - OnAnimCollision
     --- - OnTerrainTypeChange
     --- - OnMotionVertEventChange
     --- - OnMotionHorzEventChange
     --- - OnLayerChange
-    --- - OnStartSacrifice
-    --- - OnStopSacrifice
     --- - OnPrepareArmToBuild
     --- - OnStartBuilderTracking
     --- - OnStopBuilderTracking
@@ -1937,7 +1931,7 @@ AIBrain = Class(AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerCom
     end,
 
     --- Called as a missile launched by a unit of this platoon hits a shield
-    ---@param self AIPlatoon
+    ---@param self AIBrain
     ---@param target Vector
     ---@param shield Unit
     ---@param position Vector
@@ -1951,7 +1945,8 @@ AIBrain = Class(AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerCom
     end,
 
     --- Called as a missile launched by a unit of this platoon impacts with the terrain
-    ---@param self AIPlatoon
+    ---@param self AIBrain
+    ---@param unit Unit
     ---@param target Vector
     ---@param position Vector
     OnUnitMissileImpactTerrain = function(self, unit, target, position)
@@ -1963,7 +1958,8 @@ AIBrain = Class(AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerCom
     end,
 
     --- Called as a missile launched by a unit of this platoon is intercepted
-    ---@param self AIPlatoon
+    ---@param self AIBrain
+    ---@param unit Unit
     ---@param target Vector
     ---@param defense Unit
     ---@param position Vector
@@ -1975,53 +1971,49 @@ AIBrain = Class(AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerCom
         end
     end,
 
-    -- OnUnpaused
-    -- OnPaused
-    -- OnBeingBuiltProgress
-    -- OnFailedToBeBuilt
-    -- OnTransportAttach
-    -- OnTransportDetach
-    -- OnTransportAborted
-    -- OnTransportOrdered
-    -- OnAttachedKilled
-    -- OnStartTransportLoading
-    -- OnStopTransportLoading
-    -- OnStartTransportLoading
-    -- OnStopTransportLoading
-    -- OnStartTransportBeamUp
-    -- OnStopTransportBeamUp
-    -- OnAddToStorage
-    -- OnRemoveFromStorage
-    -- OnTeleportUnit
-    -- OnFailedTeleport
-    -- OnAttachedToTransport
-    -- OnDetachedFromTransport
-    -- OnWorkBegin
-    -- OnWorkEnd
-    -- OnWorkFail
-    -- OnShieldEnabled
-    -- OnShieldDisabled
-    -- OnNukeArmed
-    -- OnNukeLaunched
+    --- Called by a unit as it starts the sacrifice process
+    ---@param self AIBrain
+    ---@param unit Unit
+    ---@param target Unit
+    OnUnitStartSacrifice = function(self, unit, target)
+        -- do nothing
+    end,
 
+    --- Called by a unit as it finishes the sacrifice process. At this point the unit is destroyed
+    ---@param self AIBrain
+    ---@param unit Unit
+    ---@param target Unit
+    OnUnitStopSacrifice = function(self, unit, target)
+        -- do nothing
+    end,
 
-    -- OnAutoModeOn?
-    -- OnAutoModeOff?
-    -- OnFerryPointSet?
+    --- Called by a unit when the consumption of resources is enabled
+    ---@param self AIBrain
+    ---@param unit Unit
+    OnUnitConsumptionActive = function(self, unit)
+        -- do nothing
+    end,
 
+    --- Called by a unit when the consumption of resources is disabled
+    ---@param self AIBrain
+    ---@param unit Unit
+    OnUnitConsumptionInActive = function(self, unit)
+        -- do nothing
+    end,
 
+    --- Called by a unit when the production of resources is enabled
+    ---@param self AIBrain
+    ---@param unit Unit
+    OnUnitProductionActive = function(self, unit)
+        -- do nothing
+    end,
 
-    -- OnStartBeingBuilt
-    -- OnStopBeingBuilt
-
-
-
-    -- OnMissileIntercepted
-    -- OnMissileImpactShield
-    -- OnMissileImpactTerrain
-    -- OnAttachedKilled
-
-
+    --- Called by a unit when the production of resources is disabled
+    ---@param self AIBrain
+    ---@param unit Unit
+    OnUnitProductionInActive = function(self, unit)
+        -- do nothing
+    end,
 
     --#endregion
     ---------------------------------------------------------------------------
