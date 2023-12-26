@@ -304,7 +304,7 @@ AIFactoryManager = ClassSimple {
     ---@param unit Unit
     ---@param builder Unit
     ---@param layer Layer
-    OnUnitStartBeingBuilt = function(self, unit, builder, layer)
+    OnStartBeingBuilt = function(self, unit, builder, layer)
         local blueprint = unit.Blueprint
         if blueprint.CategoriesHash['STRUCTURE'] and blueprint.CategoriesHash['FACTORY'] then
             local type = (blueprint.CategoriesHash['RESEARCH'] and 'RESEARCH') or 'SUPPORT'
@@ -320,14 +320,14 @@ AIFactoryManager = ClassSimple {
     ---@param unit Unit
     ---@param builder Unit
     ---@param layer Layer
-    OnUnitStopBeingBuilt = function(self, unit, builder, layer)
+    OnStopBeingBuilt = function(self, unit, builder, layer)
         self:AddFactory(unit)
     end,
 
     --- Called by a unit as it is destroyed
     ---@param self AIFactoryManager
     ---@param unit Unit
-    OnUnitDestroyed = function(self, unit)
+    OnUnitDestroy = function(self, unit)
         local blueprint = unit.Blueprint
         if blueprint.CategoriesHash['STRUCTURE'] and blueprint.CategoriesHash['FACTORY'] then
             local type = (blueprint.CategoriesHash['RESEARCH'] and 'RESEARCH') or 'SUPPORT'
@@ -343,7 +343,7 @@ AIFactoryManager = ClassSimple {
     ---@param self AIFactoryManager
     ---@param unit Unit
     ---@param built Unit
-    OnUnitStartBuilding = function(self, unit, built)
+    OnUnitStartBuild = function(self, unit, built)
         -- local blueprint = unit.Blueprint
         -- if blueprint.CategoriesHash['STRUCTURE'] then
         -- end
@@ -353,7 +353,7 @@ AIFactoryManager = ClassSimple {
     ---@param self AIFactoryManager
     ---@param unit Unit
     ---@param built Unit
-    OnUnitStopBuilding = function(self, unit, built)
+    OnUnitStopBuild = function(self, unit, built)
         local blueprint = unit.Blueprint
         if blueprint.CategoriesHash['STRUCTURE'] and blueprint.CategoriesHash['FACTORY'] then
             -- self:DelayOrder(unit, 'Any', 10)
@@ -392,7 +392,7 @@ AIFactoryManager = ClassSimple {
         end
     end,
 
-    --- Remove a unit, similar to calling `OnUnitDestroyed`
+    --- Remove a unit, similar to calling `OnUnitDestroy`
     ---@param self AIFactoryManager
     ---@param unit Unit
     RemoveFactory = function(self, unit)
