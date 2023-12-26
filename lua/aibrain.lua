@@ -544,6 +544,7 @@ local CategoriesDummyUnit = categories.DUMMYUNIT
 ---@field Human boolean
 ---@field Civilian boolean
 ---@field Trash TrashBag
+---@field UnitBuiltTriggerList table
 ---@field PingCallbackList { CallbackFunction: fun(pingData: any), PingType: string }[]
 ---@field BrainType 'Human' | 'AI'
 AIBrain = Class(AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerComponent, AIBrainEnergyComponent,
@@ -1703,21 +1704,26 @@ AIBrain = Class(AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerCom
         -- do nothing
     end,
 
-    --- Called by a transport when it is ready to load units
+    --- Event happens when a unit:
+    --- - Starts the loading sequence (transports, carriers)
+    --- - Deploys its cargo (transports, carriers)
     ---@param self AIBrain
     ---@param unit Unit
     OnUnitStartTransportLoading = function(self, unit)
         -- do nothing
     end,
 
-    --- Called by a transport when it is done loading units
+    --- Event happens when a unit:
+    --- - Starts the loading sequence (transports, carriers)
+    --- - Deploys its cargo (transports, carriers)
     ---@param self AIBrain
     ---@param unit Unit
     OnUnitStopTransportLoading = function(self, unit)
         -- do nothing
     end,
 
-    --- Called by a unit as it beams up to the transport
+    --- Event happens when a unit:
+    --- - Starts beaming up to a transport
     ---@param self AIBrain
     ---@param unit Unit
     ---@param transport Unit
@@ -1726,14 +1732,16 @@ AIBrain = Class(AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerCom
         -- do nothing
     end,
 
-    --- Called by a unit as it is done beaming up to the transport
+    --- Event happens when a unit:
+    --- - Stops beaming up to a transport regardless whether it succeeded
     ---@param self AIBrain
     ---@param unit Unit
     OnUnitStoptransportBeamUp = function(self, unit)
         -- do nothing
     end,
 
-    --- Called by a unit as it is attached to a transport
+    --- Event happens when a unit:
+    --- - Attaches to a transport
     ---@param self AIBrain
     ---@param unit Unit
     ---@param transport Unit
@@ -1742,6 +1750,8 @@ AIBrain = Class(AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerCom
         -- do nothing
     end,
 
+    --- Event happens when a unit:
+    --- - Deattaches to a transport
     ---@param self AIBrain
     ---@param unit Unit
     ---@param transport Unit
@@ -1750,7 +1760,8 @@ AIBrain = Class(AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerCom
         -- do nothing
     end,
 
-    --- Called by a unit as it becomes part of the storage of another unit
+    --- Event happens when a unit:
+    --- - Enters the storage of a carrier
     ---@param self AIBrain
     ---@param unit Unit
     ---@param carrier Unit
@@ -1758,7 +1769,8 @@ AIBrain = Class(AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerCom
         -- do nothing
     end,
 
-    --- Called by a unit as it is released from storage of another unit
+    --- Event happens when a unit:
+    --- - Leaves the storage of a carrier
     ---@param self AIBrain
     ---@param unit Unit
     ---@param carrier Unit
@@ -1766,7 +1778,8 @@ AIBrain = Class(AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerCom
         -- do nothing
     end,
 
-    --- Called by a unit as it starts teleporting
+    --- Event happens when a unit:
+    --- - Starts a teleport sequence
     ---@param self AIBrain
     ---@param unit Unit
     ---@param teleporter any
@@ -1776,42 +1789,48 @@ AIBrain = Class(AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerCom
         -- do nothing
     end,
 
-    --- Called by a unit when the teleport fails
+    --- Event happens when a unit:
+    --- - Aborts a teleport sequence
     ---@param self AIBrain
     ---@param unit Unit
     OnUnitFailedTeleport = function(self, unit)
         -- do nothing
     end,
 
-    --- Called by a unit when a shield is enabled
+    --- Event happens when a unit:
+    --- - Enables its shield
     ---@param self AIBrain
     ---@param unit Unit
     OnUnitShieldEnabled = function(self, unit)
         -- do nothing
     end,
 
-    --- Called by a unit when a shield is disabled
+    --- Event happens when a unit:
+    --- - Disables its shield, regardless of the cause
     ---@param self AIBrain
     ---@param unit Unit
     OnUnitShieldDisabled = function(self, unit)
         -- do nothing
     end,
 
-    --- Called by a unit when a strategic asset is ready to fire
+    --- Event happens when a unit:
+    --- - Finishes the construction of a tactical or strategical missile
     ---@param self AIBrain
     ---@param unit Unit
     OnUnitNukeArmed = function(self, unit)
         -- do nothing
     end,
 
-    --- Called by a unit when a strategic asset is launched
+    --- Event happens when a unit:
+    --- - Starts the launch sequence of a strategic missile
     ---@param self AIBrain
     ---@param unit Unit
     OnUnitNukeLaunched = function(self, unit)
         -- do nothing
     end,
 
-    --- Called when a unit starts the construction of an enhancement
+    --- Event happens when a unit:
+    --- - Starts an enhancement
     ---@param self AIBrain
     ---@param unit Unit
     ---@param work any
@@ -1819,7 +1838,8 @@ AIBrain = Class(AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerCom
         -- do nothing
     end,
 
-    --- Called when a unit stops the construction of an enhancement
+    --- Event happens when a unit:
+    --- - Finishes an enhancement
     ---@param self AIBrain
     ---@param unit Unit
     ---@param work any
@@ -1827,7 +1847,8 @@ AIBrain = Class(AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerCom
         -- do nothing
     end,
 
-    --- Called when a unit aborts the construction of an enhancement
+    --- Event happens when a unit:
+    --- - Aborts an enhancement
     ---@param self AIBrain
     ---@param unit Unit
     ---@param work any
@@ -1835,7 +1856,8 @@ AIBrain = Class(AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerCom
         -- do nothing
     end,
 
-    --- Called as a missile launched by a unit of this platoon hits a shield
+    --- Event happens when a unit:
+    --- - Launches a missile that impacts with a shield
     ---@param self AIBrain
     ---@param target Vector
     ---@param shield Unit
@@ -1844,7 +1866,8 @@ AIBrain = Class(AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerCom
         -- do nothing
     end,
 
-    --- Called as a missile launched by a unit of this platoon impacts with the terrain
+    --- Event happens when a unit:
+    --- - Launches a missile that impacts with the terrain (unlike a unit or a shield)
     ---@param self AIBrain
     ---@param unit Unit
     ---@param target Vector
@@ -1853,7 +1876,8 @@ AIBrain = Class(AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerCom
         -- do nothing
     end,
 
-    --- Called as a missile launched by a unit of this platoon is intercepted
+    --- Event happens when a unit:
+    --- - Launches a missile that is intercepted by tactical missile defenses
     ---@param self AIBrain
     ---@param unit Unit
     ---@param target Vector
@@ -1863,7 +1887,8 @@ AIBrain = Class(AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerCom
         -- do nothing
     end,
 
-    --- Called by a unit as it starts the sacrifice process
+    --- Event happens when a unit:
+    --- - Starts finishes the sacrifice command
     ---@param self AIBrain
     ---@param unit Unit
     ---@param target Unit
@@ -1871,7 +1896,8 @@ AIBrain = Class(AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerCom
         -- do nothing
     end,
 
-    --- Called by a unit as it finishes the sacrifice process. At this point the unit is destroyed
+    --- Event happens when a unit:
+    --- - Succesfully finishes the sacrifice command
     ---@param self AIBrain
     ---@param unit Unit
     ---@param target Unit
@@ -1897,14 +1923,18 @@ AIBrain = Class(AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerCom
         -- do nothing
     end,
 
-    --- Called by a unit when the production of resources is enabled
+    --- Event happens when a unit:
+    --- - Starts producing resources (power generators, extractors, ...)
     ---@param self AIBrain
     ---@param unit Unit
     OnUnitProductionActive = function(self, unit)
         -- do nothing
     end,
 
-    --- Called by a unit when the production of resources is disabled
+    --- Event happens when a unit:
+    --- - Stops producing resources (power generators, extractors, ...)
+    ---
+    --- Note: it may not trigger when a unit is killed.
     ---@param self AIBrain
     ---@param unit Unit
     OnUnitProductionInActive = function(self, unit)
