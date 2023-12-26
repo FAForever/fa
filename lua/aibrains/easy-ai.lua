@@ -277,26 +277,6 @@ AIBrain = Class(StandardBrain, EconomyComponent) {
     ---------------------------------------------------------------------------
     --#region Unit events
 
-    --- Represents a list of unit events that are communicated to the brain. It makes it
-    --- easier to respond to conditions that are happening on the battlefield. The following
-    --- unit events are not communicated to the brain:
-    ---
-    --- - OnStorageChange (use OnAddToStorage and OnRemoveFromStorage instead)
-    --- - OnAnimCollision
-    --- - OnTerrainTypeChange
-    --- - OnMotionVertEventChange
-    --- - OnMotionHorzEventChange
-    --- - OnLayerChange
-    --- - OnPrepareArmToBuild
-    --- - OnStartBuilderTracking
-    --- - OnStopBuilderTracking
-    --- - OnStopRepeatQueue
-    --- - OnStartRepeatQueue
-    --- - OnAssignedFocusEntity
-    ---
-    --- If you're interested for one of these events then you're encouraged to make a pull
-    --- request to add the event!
-
     ---@param self EasyAIBrain
     ---@param unit Unit
     ---@param builder Unit
@@ -601,9 +581,7 @@ AIBrain = Class(StandardBrain, EconomyComponent) {
     ---@param new number
     OnUnitBeingBuiltProgress = function(self, unit, builder, old, new)
         StandardBrainOnUnitBeingBuiltProgress(self, unit, builder, old, new)
-        LOG(builder.Blueprint.BlueprintId)
-        LOG(old)
-        LOG(new)
+
         LOG("OnUnitBeingBuiltProgress")
     end,
 
