@@ -68,8 +68,8 @@ UnitBlueprint{
         AirThreatLevel = 16,
         ArmorType = "Experimental",
         EconomyThreatLevel = 0,
-        Health = 11000,
-        MaxHealth = 11000,
+        Health = 9000,
+        MaxHealth = 9000,
         RegenRate = 20,
         Shield = {
             ImpactEffects = "UEFShieldHit01",
@@ -80,7 +80,7 @@ UnitBlueprint{
             ShieldEnergyDrainRechargeTime = 5,
             ShieldMaxHealth = 12000,
             ShieldRechargeTime = 40,
-            ShieldRegenRate = 120,
+            ShieldRegenRate = 180,
             ShieldRegenStartTime = 1,
             ShieldSize = 25,
             ShieldSpillOverDamageMod = 0,
@@ -219,10 +219,10 @@ UnitBlueprint{
         UniformScale = 0.20,
     },
     Economy = {
-        BuildCostEnergy = 300000,
-        BuildCostMass = 18000,
+        BuildCostEnergy = 240000,
+        BuildCostMass = 14000,
         BuildRate = 135,
-        BuildTime = 30000,
+        BuildTime = 25000,
         BuildableCategory = {
             "BUILTBYTIER3FACTORY UEF MOBILE LAND",
             "BUILTBYTIER2FACTORY UEF MOBILE LAND",
@@ -358,7 +358,7 @@ UnitBlueprint{
             },
             BallisticArc = "RULEUBA_LowArc",
             CollideFriendly = false,
-            Damage = 150,
+            Damage = 120,
             DamageRadius = 1.3,
             DamageType = "Normal",
             DisplayName = "Gauss Cannon",
@@ -366,7 +366,7 @@ UnitBlueprint{
                 Land = "Land|Water|Seabed",
                 Seabed = "Land|Water|Seabed",
             },
-            FiringRandomness = 1.1,
+            FiringRandomness = 1.3,
             FiringTolerance = 2,
             HeadingArcCenter = 75,
             HeadingArcRange = 120,
@@ -377,7 +377,7 @@ UnitBlueprint{
             MuzzleVelocity = 25,
             MuzzleVelocityReduceDistance = 90,
             ProjectileId = "/projectiles/TDFGauss04/TDFGauss04_proj.bp",
-            ProjectileLifetimeUsesMultiplier = 1.15,
+            ProjectileLifetimeUsesMultiplier = 1.25,
             ProjectilesPerOnFire = 3,
             RackBones = {
                 {
@@ -435,7 +435,7 @@ UnitBlueprint{
             },
             BallisticArc = "RULEUBA_LowArc",
             CollideFriendly = false,
-            Damage = 150,
+            Damage = 120,
             DamageRadius = 1.3,
             DamageType = "Normal",
             DisplayName = "Gauss Cannon",
@@ -443,7 +443,7 @@ UnitBlueprint{
                 Land = "Land|Water|Seabed",
                 Seabed = "Land|Water|Seabed",
             },
-            FiringRandomness = 1.1,
+            FiringRandomness = 1.3,
             FiringTolerance = 2,
             HeadingArcCenter = 120,
             HeadingArcRange = 130,
@@ -455,7 +455,7 @@ UnitBlueprint{
             MuzzleVelocityReduceDistance = 90,
             PrefersPrimaryWeaponTarget = true,
             ProjectileId = "/projectiles/TDFGauss04/TDFGauss04_proj.bp",
-            ProjectileLifetimeUsesMultiplier = 1.15,
+            ProjectileLifetimeUsesMultiplier = 1.25,
             ProjectilesPerOnFire = 3,
             RackBones = {
                 {
@@ -511,7 +511,7 @@ UnitBlueprint{
             },
             BallisticArc = "RULEUBA_LowArc",
             CollideFriendly = false,
-            Damage = 150,
+            Damage = 120,
             DamageRadius = 1.3,
             DamageType = "Normal",
             DisplayName = "Gauss Cannon",
@@ -519,7 +519,7 @@ UnitBlueprint{
                 Land = "Land|Water|Seabed",
                 Seabed = "Land|Water|Seabed",
             },
-            FiringRandomness = 1.1,
+            FiringRandomness = 1.3,
             FiringTolerance = 2,
             HeadingArcCenter = -75,
             HeadingArcRange = 120,
@@ -531,7 +531,7 @@ UnitBlueprint{
             MuzzleVelocityReduceDistance = 90,
             PrefersPrimaryWeaponTarget = true,
             ProjectileId = "/projectiles/TDFGauss04/TDFGauss04_proj.bp",
-            ProjectileLifetimeUsesMultiplier = 1.15,
+            ProjectileLifetimeUsesMultiplier = 1.25,
             ProjectilesPerOnFire = 3,
             RackBones = {
                 {
@@ -589,7 +589,7 @@ UnitBlueprint{
             },
             BallisticArc = "RULEUBA_LowArc",
             CollideFriendly = false,
-            Damage = 150,
+            Damage = 120,
             DamageRadius = 1.3,
             DamageType = "Normal",
             DisplayName = "Gauss Cannon",
@@ -597,7 +597,7 @@ UnitBlueprint{
                 Land = "Land|Water|Seabed",
                 Seabed = "Land|Water|Seabed",
             },
-            FiringRandomness = 1.1,
+            FiringRandomness = 1.3,
             FiringTolerance = 2,
             HeadingArcCenter = -120,
             HeadingArcRange = 130,
@@ -609,7 +609,7 @@ UnitBlueprint{
             MuzzleVelocityReduceDistance = 90,
             PrefersPrimaryWeaponTarget = true,
             ProjectileId = "/projectiles/TDFGauss04/TDFGauss04_proj.bp",
-            ProjectileLifetimeUsesMultiplier = 1.15,
+            ProjectileLifetimeUsesMultiplier = 1.25,
             ProjectilesPerOnFire = 3,
             RackBones = {
                 {
@@ -683,7 +683,7 @@ UnitBlueprint{
             MuzzleSalvoSize = 1,
             MuzzleVelocity = 60,
             ProjectileId = "/projectiles/TDFRiot02/TDFRiot02_proj.bp",
-            ProjectileLifetimeUsesMultiplier = 1.15,
+            ProjectileLifetimeUsesMultiplier = 1.25,
             RackBones = {
                 {
                     MuzzleBones = { "Riot_Gun_Right_Barrel_Muzzle" },
@@ -745,7 +745,7 @@ UnitBlueprint{
             MuzzleVelocity = 60,
             PrefersPrimaryWeaponTarget = true,
             ProjectileId = "/projectiles/TDFRiot02/TDFRiot02_proj.bp",
-            ProjectileLifetimeUsesMultiplier = 1.15,
+            ProjectileLifetimeUsesMultiplier = 1.25,
             RackBones = {
                 {
                     MuzzleBones = { "Riot_Gun_Left_Barrel_Muzzle" },
