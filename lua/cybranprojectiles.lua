@@ -371,9 +371,9 @@ CIFMolecularResonanceShell = ClassProjectile(SinglePolyTrailProjectile) {
 CIridiumRocketProjectile = ClassProjectile(SingleCompositeEmitterProjectile) {
     PolyTrail = '/effects/emitters/cybran_iridium_missile_polytrail_01_emit.bp',
     BeamName = '/effects/emitters/rocket_iridium_exhaust_beam_01_emit.bp',
-    FxImpactUnit = EffectTemplate.CMissileHit02,
-    FxImpactProp = EffectTemplate.CMissileHit02,
-    FxImpactLand = EffectTemplate.CMissileHit02,
+    FxImpactUnit = EffectTemplate.CCorsairMissileUnitHit01,
+    FxImpactProp = EffectTemplate.CCorsairMissileHit01,
+    FxImpactLand = EffectTemplate.CCorsairMissileLandHit01,
 }
 
 ---  CORSAIR MISSILE PROJECTILES

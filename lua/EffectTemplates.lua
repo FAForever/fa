@@ -1381,7 +1381,7 @@ CCorsairMissileLandHit01 = {
     EmtBpPath .. 'cybran_corsair_missile_hit_01_emit.bp',
     EmtBpPath .. 'cybran_corsair_missile_hit_02_emit.bp',
     EmtBpPath .. 'cybran_corsair_missile_hit_03_emit.bp',
-    EmtBpPath .. 'cybran_corsair_missile_glow_hit_land_01_emit.bp',
+    --EmtBpPath .. 'cybran_corsair_missile_glow_hit_land_01_emit.bp',
     EmtBpPath .. 'cybran_corsair_missile_glow_hit_land_02_emit.bp',
     EmtBpPath .. 'cybran_corsair_missile_hit_ring.bp',
 }
