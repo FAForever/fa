@@ -598,6 +598,8 @@ function WrapAndPlaceText(bp, builder, descID, control)
                                 ReloadTime = math.max(0.1, MATH_IRound(10 * ReloadTime) / 10)
                             end
 
+                            -- Keep track that the firing cycle has a constant rate
+                            local fireRateOnly = true
                             --OnFire is called from FireReadyState at this point, so we need to track time
                             --to know how much the fire rate cooldown has progressed during our fire cycle.
                             local SubCycleTime = 0
@@ -610,6 +612,7 @@ function WrapAndPlaceText(bp, builder, descID, control)
                                     if info.MuzzleSalvoDelay == 0 then
                                         MuzzleCount = table.getsize(Rack.MuzzleBones)
                                     end
+                                    if MuzzleCount > 1 then fireRateOnly = false end
                                     CycleProjs = CycleProjs + MuzzleCount
 
                                     SubCycleTime = SubCycleTime + MuzzleCount * MuzzleDelays
@@ -625,6 +628,7 @@ function WrapAndPlaceText(bp, builder, descID, control)
                             end
                             if FiringCooldown <= (SubCycleTime + ChargeTime + ReloadTime) then
                                 CycleTime = CycleTime + SubCycleTime + ReloadTime + ChargeTime + math.max(0.1, FiringCooldown - SubCycleTime - ChargeTime - ReloadTime)
+                                fireRateOnly = false
                             else
                                 CycleTime = CycleTime + FiringCooldown
                             end
@@ -633,6 +637,12 @@ function WrapAndPlaceText(bp, builder, descID, control)
                                 --Round DPS, or else it gets floored in string.format.
                                 local DPS = MATH_IRound(Damage * CycleProjs / CycleTime)
                                 weaponDetails1 = weaponDetails1..LOCF('<LOC uvd_DPS>', DPS)
+                            end
+
+                            -- Avoid saying a unit fires a salvo when it in fact has a constant rate of fire
+                            if fireRateOnly then
+                                CycleTime = CycleTime / CycleProjs
+                                CycleProjs = 1
                             end
 
                             if CycleProjs > 1 then
