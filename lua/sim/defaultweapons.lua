@@ -1177,7 +1177,9 @@ DefaultProjectileWeapon = ClassWeapon(Weapon) {
             self:WaitForAndDestroyManips()
 
             local hasTarget = self:WeaponHasTarget()
-            local autoFire = not bp.ManualFire
+            -- Weapons that fire after charging will ignore the fire rate if we don't send them to the idle state
+            -- and if we send them to the fire ready state instead, they will ignore charge effects
+            local autoFire = not bp.ManualFire and not bp.RackSalvoFiresAfterCharge
 
             if hasTarget and bp.RackSalvoChargeTime > 0 and autoFire then
                 ChangeState(self, self.RackSalvoChargeState)
