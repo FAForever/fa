@@ -598,9 +598,6 @@ function WrapAndPlaceText(bp, builder, descID, control)
                                 ReloadTime = math.max(0.1, MATH_IRound(10 * ReloadTime) / 10)
                             end
 
-                            --Upon acquiring a target
-                            CycleTime = CycleTime + ChargeTime
-
                             --OnFire is called from FireReadyState at this point, so we need to track time
                             --to know how much the fire rate cooldown has progressed during our fire cycle.
                             local SubCycleTime = 0
@@ -627,7 +624,7 @@ function WrapAndPlaceText(bp, builder, descID, control)
                                 end
                             end
                             if FiringCooldown <= (SubCycleTime + ChargeTime + ReloadTime) then
-                                CycleTime = CycleTime + SubCycleTime + ReloadTime + math.max(0.1, FiringCooldown - SubCycleTime - ChargeTime - ReloadTime)
+                                CycleTime = CycleTime + SubCycleTime + ReloadTime + ChargeTime + math.max(0.1, FiringCooldown - SubCycleTime - ChargeTime - ReloadTime)
                             else
                                 CycleTime = CycleTime + FiringCooldown
                             end
