@@ -617,8 +617,8 @@ function WrapAndPlaceText(bp, builder, descID, control)
 
                                     SubCycleTime = SubCycleTime + MuzzleCount * MuzzleDelays
                                     if not info.RackFireTogether and index ~= RackCount then
-                                        if FiringCooldown <= SubCycleTime then
-                                            CycleTime = CycleTime + SubCycleTime + math.max(0.1, FiringCooldown - SubCycleTime)
+                                        if FiringCooldown <= SubCycleTime + ChargeTime then
+                                            CycleTime = CycleTime + SubCycleTime + ChargeTime + math.max(0.1, FiringCooldown - SubCycleTime - ChargeTime)
                                         else
                                             CycleTime = CycleTime + FiringCooldown
                                         end
