@@ -427,33 +427,33 @@ BuilderManager = ClassSimple {
     --- Called by a unit as it starts being built
     ---@param self BuilderManager
     ---@param unit Unit
-    OnUnitStartBeingBuilt = function(self, unit)
+    OnStartBeingBuilt = function(self, unit)
     end,
 
     --- Called by a unit as it is finished being built
     ---@param self BuilderManager
     ---@param unit Unit
-    OnUnitStopBeingBuilt = function(self, unit)
+    OnStopBeingBuilt = function(self, unit)
     end,
 
     --- Called by a unit as it is destroyed
     ---@param self BuilderManager
     ---@param unit Unit
-    OnUnitDestroyed = function(self, unit)
+    OnUnitDestroy = function(self, unit)
     end,
 
     --- Called by a unit as it starts building
     ---@param self BuilderManager
     ---@param unit Unit
     ---@param built Unit
-    OnUnitStartBuilding = function(self, unit, built)
+    OnUnitStartBuild = function(self, unit, built)
     end,
 
     --- Called by a unit as it stops building
     ---@param self BuilderManager
     ---@param unit Unit
     ---@param built Unit
-    OnUnitStopBuilding = function(self, unit, built)
+    OnUnitStopBuild = function(self, unit, built)
     end,
 
     --------------------------------------------------------------------------------------------

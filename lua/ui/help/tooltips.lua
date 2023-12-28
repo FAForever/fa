@@ -812,6 +812,10 @@ Tooltips = {
         title = "<LOC OPTIONS_0149>Vertical Sync",
         description = "<LOC OPTIONS_0150>Sync to vertical refresh of monitor",
     },
+    options_frametime = {
+        title = "<LOC OPTIONS_FRAMETIME_TITLE>Minimum frametime",
+        description = "<LOC OPTIONS_FRAMETIME_DESCRIPTION>Allows you to manipulate the minimum frametime. Incompatible with vertical sync, which is automatically disabled when you move the slider and apply the settings. May introduce image tearing. Option exists to give players a way to try to match the refresh rate of modern monitors. Note that the framerate is often CPU limited and not GPU limited, especially during visually intense fights. A list of values that map to common refresh rates: \r\n\r\n  - 16 = 60hz\r\n  - 10 = 100hz\r\n  - 8 = 120hz\r\n  - 7 = 144hz\r\n  - 6 = 165hz",
+    },
     options_selectedlanguage = {
         title = "<LOC OPTIONS_0007>Language selection",
         description = "<LOC OPTIONS_0008>Select original or custom languages. Also changes voices if available. (needs game restart)",

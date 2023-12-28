@@ -937,7 +937,7 @@ end
 
 ---
 ---@param unit UserUnit
----@return BuildQueue
+---@return UIBuildQueue
 function SetCurrentFactoryForQueueDisplay(unit)
 end
 

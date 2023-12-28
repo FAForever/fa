@@ -10,13 +10,18 @@ local CybranWeapons = import("/lua/cybranweapons.lua")
 local CIFMissileLoaWeapon = CybranWeapons.CIFMissileLoaWeapon
 local CIFMissileStrategicWeapon = CybranWeapons.CIFMissileStrategicWeapon
 local CANTorpedoLauncherWeapon = CybranWeapons.CANTorpedoLauncherWeapon
+local EffectTemplate = import('/lua/effecttemplates.lua')
 
 ---@class URS0304 : CSubUnit
 URS0304 = ClassUnit(CSubUnit) {
     DeathThreadDestructionWaitTime = 0,
     Weapons = {
-        NukeMissile = ClassWeapon(CIFMissileStrategicWeapon){},
-        CruiseMissile = ClassWeapon(CIFMissileLoaWeapon){},
+        NukeMissile = ClassWeapon(CIFMissileStrategicWeapon){
+            FxMuzzleFlash = EffectTemplate.TIFCruiseMissileLaunchUnderWater,
+        },
+        CruiseMissile = ClassWeapon(CIFMissileLoaWeapon){
+            FxMuzzleFlash = EffectTemplate.TIFCruiseMissileLaunchUnderWater,
+        },
         Torpedo01 = ClassWeapon(CANTorpedoLauncherWeapon){},
         Torpedo02 = ClassWeapon(CANTorpedoLauncherWeapon){},
     },

@@ -31,13 +31,13 @@ local Entity = import("/lua/sim/entity.lua").Entity
 local EffectTemplate = import("/lua/effecttemplates.lua")
 local Util = import("/lua/utilities.lua")
 
-local DeprecatedWarnings = { }
+local DeprecatedWarnings = {}
 
 local VectorCached = Vector(0, 0, 0)
 
 -- cache math and table functions
 local MathSqrt = math.sqrt
-local MathMin = math.min 
+local MathMin = math.min
 
 local TableAssimilate = table.assimilate
 
@@ -54,25 +54,25 @@ local ForkThread = ForkThread
 local ResumeThread = ResumeThread
 local ChangeState = ChangeState
 local ArmyGetHandicap = ArmyGetHandicap
-local CoroutineYield = coroutine.yield 
+local CoroutineYield = coroutine.yield
 local CreateEmitterAtBone = CreateEmitterAtBone
 local _c_CreateShield = _c_CreateShield
 
 -- cache cfunctions
 local EntityGetHealth = _G.moho.entity_methods.GetHealth
 local EntityGetMaxHealth = _G.moho.entity_methods.GetMaxHealth
-local EntitySetHealth = _G.moho.entity_methods.SetHealth 
-local EntitySetMaxHealth = _G.moho.entity_methods.SetMaxHealth 
+local EntitySetHealth = _G.moho.entity_methods.SetHealth
+local EntitySetMaxHealth = _G.moho.entity_methods.SetMaxHealth
 local EntityAdjustHealth = _G.moho.entity_methods.AdjustHealth
-local EntityGetArmy = _G.moho.entity_methods.GetArmy 
+local EntityGetArmy = _G.moho.entity_methods.GetArmy
 local EntityGetEntityId = _G.moho.entity_methods.GetEntityId
 local EntitySetVizToFocusPlayer = _G.moho.entity_methods.SetVizToFocusPlayer
 local EntitySetVizToEnemies = _G.moho.entity_methods.SetVizToEnemies
 local EntitySetVizToAllies = _G.moho.entity_methods.SetVizToAllies
 local EntitySetVizToNeutrals = _G.moho.entity_methods.SetVizToNeutrals
 local EntityAttachBoneTo = _G.moho.entity_methods.AttachBoneTo
-local EntityGetPosition = _G.moho.entity_methods.GetPosition 
-local EntityGetPositionXYZ = _G.moho.entity_methods.GetPositionXYZ 
+local EntityGetPosition = _G.moho.entity_methods.GetPosition
+local EntityGetPositionXYZ = _G.moho.entity_methods.GetPositionXYZ
 local EntitySetMesh = _G.moho.entity_methods.SetMesh
 local EntitySetDrawScale = _G.moho.entity_methods.SetDrawScale
 local EntitySetOrientation = _G.moho.entity_methods.SetOrientation
@@ -86,9 +86,9 @@ local UnitSetScriptBit = _G.moho.unit_methods.SetScriptBit
 local UnitIsUnitState = _G.moho.unit_methods.IsUnitState
 local UnitRevertCollisionShape = _G.moho.unit_methods.RevertCollisionShape
 
-local IEffectOffsetEmitter = _G.moho.IEffect.OffsetEmitter 
+local IEffectOffsetEmitter = _G.moho.IEffect.OffsetEmitter
 
--- cache trashbag functions 
+-- cache trashbag functions
 local TrashBag = TrashBag
 local TrashAdd = TrashBag.Add
 local TrashDestroy = TrashBag.Destroy
@@ -117,13 +117,13 @@ local DEFAULT_OPTIONS = {
 
 -- scan blueprints for the largest shield radius
 LargestShieldDiameter = 0
-for k, bp in __blueprints do 
+for k, bp in __blueprints do
     -- check for blueprints that have a shield and a shield size set
-    if bp.Defense and bp.Defense.Shield and bp.Defense.Shield.ShieldSize then 
+    if bp.Defense and bp.Defense.Shield and bp.Defense.Shield.ShieldSize then
         -- skip Aeon palace and UEF shield boat as they skew the results
-        if not (bp.BlueprintId == "xac2101" or bp.BlueprintId == "xes0205") then 
+        if not (bp.BlueprintId == "xac2101" or bp.BlueprintId == "xes0205") then
             local size = bp.Defense.Shield.ShieldSize
-            if size > LargestShieldDiameter then 
+            if size > LargestShieldDiameter then
                 LargestShieldDiameter = size
             end
         end
@@ -131,7 +131,22 @@ for k, bp in __blueprints do
 end
 
 ---@class Shield : moho.shield_methods, Entity
+---@field Army Army
+---@field EntityId EntityId
 ---@field Brain AIBrain
+---@field Size number
+---@field Owner Unit
+---@field MeshBp string
+---@field MeshZBp string
+---@field SpillOverDmgMod number
+---@field ShieldRechargeTime number
+---@field ShieldEnergyDrainRechargeTime number
+---@field ShieldVerticalOffset number
+---@field RegenRate number
+---@field RegenStartTime number
+---@field PassOverkillDamage boolean
+---@field ImpactMeshBp string
+---@field SkipAttachmentCheck boolean
 Shield = ClassShield(moho.shield_methods, Entity) {
 
     RemainEnabledWhenAttached = false,
@@ -156,7 +171,7 @@ Shield = ClassShield(moho.shield_methods, Entity) {
         self.Brain = spec.Owner:GetAIBrain()
 
         -- copy over information from specifiaction
-        self.Size = spec.Size 
+        self.Size = spec.Size
         self.Owner = spec.Owner
         self.MeshBp = spec.Mesh
         self.MeshZBp = spec.MeshZ
@@ -212,14 +227,14 @@ Shield = ClassShield(moho.shield_methods, Entity) {
         self.ImpactEntitySpecs = { Owner = self.Owner }
 
         -- manage overlapping shields
-        self.OverlappingShields = { }
+        self.OverlappingShields = {}
         self.OverlappingShieldsCount = 0
         self.OverlappingShieldsTick = -1
 
         -- manage overspill
-        self.DamagedTick = { }
-        self.DamagedRegular = { }
-        self.DamagedOverspill = { }
+        self.DamagedTick = {}
+        self.DamagedRegular = {}
+        self.DamagedOverspill = {}
 
         -- manage regeneration thread
         self.RegenThreadSuspended = true
@@ -232,22 +247,22 @@ Shield = ClassShield(moho.shield_methods, Entity) {
 
         -- by default, turn on maintenance and the toggle for the owner
         self.Enabled = true
-        self.Recharged = true 
-        self.RolledFromFactory = false 
+        self.Recharged = true
+        self.RolledFromFactory = false
         self.Owner:SetMaintenanceConsumptionActive()
         UnitSetScriptBit(self.Owner, 'RULEUTC_ShieldToggle', true)
 
         -- then check if we can actually turn it on
-        if not self.Brain.EnergyDepleted then 
+        if not self.Brain.EnergyDepleted then
             self:OnEnergyViable()
-        else 
+        else
             self:OnEnergyDepleted()
         end
     end,
 
     RegenThread = function(self)
 
-        -- cache globals 
+        -- cache globals
         local GetGameTick = GetGameTick
         local CoroutineYield = CoroutineYield
         local SuspendCurrentThread = SuspendCurrentThread
@@ -266,36 +281,35 @@ Shield = ClassShield(moho.shield_methods, Entity) {
             local maxHealth = EntityGetMaxHealth(self)
 
             -- check if we need to suspend ourself
-            if 
-                -- we're at zero health or lower
-                    health <= 0 
+            if -- we're at zero health or lower
+            health <= 0
                 -- we're full health
-                or  health == maxHealth
+                or health == maxHealth
                 -- we're not enabled
-                or  not self.Enabled 
+                or not self.Enabled
                 -- we're not recharged
-                or  not self.Recharged
-            then 
+                or not self.Recharged
+            then
                 -- adjust shield bar one last time
                 self:UpdateShieldRatio(health / maxHealth)
 
                 -- suspend ourselves and wait
-                self.RegenThreadSuspended = true 
+                self.RegenThreadSuspended = true
                 SuspendCurrentThread()
                 self.RegenThreadSuspended = false
-                fromSuspension = true 
+                fromSuspension = true
             end
 
             -- if we didn't suspend then check regeneration conditions
-            if not fromSuspension then 
+            if not fromSuspension then
 
                 -- check if we're allowed to start regenerating again
-                if tick > self.RegenThreadStartTick then 
+                if tick > self.RegenThreadStartTick then
 
-                    -- adjust health, rate is in seconds 
+                    -- adjust health, rate is in seconds
                     EntityAdjustHealth(self, self.Owner, 0.1 * self.RegenRate)
 
-                -- if not, yield for the difference in ticks
+                    -- if not, yield for the difference in ticks
                 end
 
                 -- adjust shield bar as we may be assisted
@@ -309,20 +323,20 @@ Shield = ClassShield(moho.shield_methods, Entity) {
 
     ---@param self Shield
     OnEnergyDepleted = function(self)
-        self.NoEnergyToSustain = true 
+        self.NoEnergyToSustain = true
 
         -- change state if we're enabled
-        if self.Enabled then 
+        if self.Enabled then
             ChangeState(self, self.EnergyDrainedState)
         end
     end,
 
     ---@param self Shield
     OnEnergyViable = function(self)
-        self.NoEnergyToSustain = false 
+        self.NoEnergyToSustain = false
 
         -- change state if we're enabled
-        if self.Enabled then 
+        if self.Enabled then
             ChangeState(self, self.OnState)
         end
     end,
@@ -336,8 +350,8 @@ Shield = ClassShield(moho.shield_methods, Entity) {
         tick = tick or GetGameTick()
 
         -- see if we need to re-compute the overlapping shields as the information we're requesting is of a different tick
-        if tick ~= self.OverlappingShieldsTick then 
-            self.OverlappingShieldsTick = tick 
+        if tick ~= self.OverlappingShieldsTick then
+            self.OverlappingShieldsTick = tick
 
             local brain = self.Brain
             local position = EntityGetPosition(self.Owner)
@@ -348,54 +362,54 @@ Shield = ClassShield(moho.shield_methods, Entity) {
             -- retrieve candidate units
             local units = brain:GetUnitsAroundPoint(CategoriesOverspill, position, 0.5 * diameter, 'Ally')
 
-            if units then 
+            if units then
 
                 -- allocate locals once
                 local shieldOther
                 local radiusOther
                 local distanceToOverlap
                 local osx, osy, osz
-                local d, dx, dy, dz 
-                
+                local d, dx, dy, dz
+
                 -- compute our information only once
                 local psx, psy, psz = EntityGetPositionXYZ(self)
                 local radius = 0.5 * self.Size
 
-                local head = 1 
-                for k, other in units do 
+                local head = 1
+                for k, other in units do
 
                     -- store reference to reduce table lookups
                     shieldOther = other.MyShield
 
                     -- check if it is a different unti and that it has an active shield with a radius
                     -- larger than 0, as engine defaults shield table to 0
-                    if      shieldOther 
+                    if shieldOther
                         and shieldOther.ShieldType ~= "Personal"
                         and shieldOther:IsUp()
                         and shieldOther.Size
-                        and shieldOther.Size > 0 
-                        and self.Owner.EntityId ~= other.EntityId 
-                    then 
+                        and shieldOther.Size > 0
+                        and self.Owner.EntityId ~= other.EntityId
+                    then
 
                         -- compute radius of shield
                         radiusOther = 0.5 * shieldOther.Size
 
                         -- compute total distance to overlap and square it to prevent a square root
-                        distanceToOverlap = radius + radiusOther 
+                        distanceToOverlap = radius + radiusOther
                         distanceToOverlap = distanceToOverlap * distanceToOverlap
 
                         -- retrieve position of other shield
                         osx, osy, osz = EntityGetPositionXYZ(shieldOther)
 
                         -- compute vector from self to other
-                        dx = osx - psx 
-                        dy = osy - psy 
+                        dx = osx - psx
+                        dy = osy - psy
                         dz = osz - psz
 
                         -- compute squared distance and check it
                         d = dx * dx + dy * dy + dz * dz
-                        if d < distanceToOverlap then 
-                            self.OverlappingShields[head] = shieldOther 
+                        if d < distanceToOverlap then
+                            self.OverlappingShields[head] = shieldOther
                             head = head + 1
                         end
                     end
@@ -403,7 +417,7 @@ Shield = ClassShield(moho.shield_methods, Entity) {
 
                 -- keep track of the number of adjacent shields
                 self.OverlappingShieldsCount = head - 1
-            else 
+            else
                 -- no units found
                 self.OverlappingShieldsCount = 0
             end
@@ -433,10 +447,10 @@ Shield = ClassShield(moho.shield_methods, Entity) {
         amount = amount * (1.0 - ArmyGetHandicap(self.Army))
 
         local health = EntityGetHealth(self)
-        if health < amount then 
-            return health 
-        else 
-            return amount 
+        if health < amount then
+            return health
+        else
+            return amount
         end
     end,
 
@@ -445,7 +459,7 @@ Shield = ClassShield(moho.shield_methods, Entity) {
         -- See SimDamage.cpp (DealDamage function) for how this should work
         amount = amount * (self.Owner:GetArmorMult(type))
         amount = amount * (1.0 - ArmyGetHandicap(self.Army))
-        local finalVal =  amount - EntityGetHealth(self)
+        local finalVal = amount - EntityGetHealth(self)
         if finalVal < 0 then
             finalVal = 0
         end
@@ -455,8 +469,8 @@ Shield = ClassShield(moho.shield_methods, Entity) {
     OnDamage = function(self, instigator, amount, vector, damageType)
 
         -- only applies to trees
-        if damageType == "TreeForce" or damageType == "TreeFire" then 
-            return 
+        if damageType == "TreeForce" or damageType == "TreeFire" then
+            return
         end
 
         -- Only called when a shield is directly impacted, so not for Personal Shields
@@ -471,7 +485,7 @@ Shield = ClassShield(moho.shield_methods, Entity) {
         local tick = GetGameTick()
 
         -- damage correction for overcharge
-        
+
         if dmgType == 'Overcharge' then
             local wep = instigator:GetWeaponByLabel('OverCharge')
             if self.StaticShield then -- fixed damage for static shields
@@ -487,28 +501,28 @@ Shield = ClassShield(moho.shield_methods, Entity) {
         if self.ShieldType ~= "Personal" then
 
             local instigatorId = (instigator and instigator.EntityId) or false
-            if instigatorId then 
+            if instigatorId then
 
                 -- reset our status quo for this instigator
-                if self.DamagedTick[instigatorId] ~= tick then 
-                    self.DamagedTick[instigatorId] = tick 
-                    self.DamagedRegular[instigatorId] = false 
-                    self.DamagedOverspill[instigatorId] = 0 
+                if self.DamagedTick[instigatorId] ~= tick then
+                    self.DamagedTick[instigatorId] = tick
+                    self.DamagedRegular[instigatorId] = false
+                    self.DamagedOverspill[instigatorId] = 0
                 end
 
                 -- anything but shield spill damage is regular damage, remove any previous overspill damage from the same instigator during the same tick
-                if dmgType ~= "ShieldSpill" then 
-                    self.DamagedRegular[instigatorId] = tick 
+                if dmgType ~= "ShieldSpill" then
+                    self.DamagedRegular[instigatorId] = tick
                     amount = amount - self.DamagedOverspill[instigatorId]
-                    self.DamagedOverspill[instigatorId] = 0 
-                else 
+                    self.DamagedOverspill[instigatorId] = 0
+                else
                     -- if we have already received regular damage from this instigator at this tick, skip the overspill damage
-                    if self.DamagedRegular[instigatorId] == tick then 
-                        return 
+                    if self.DamagedRegular[instigatorId] == tick then
+                        return
                     end
 
                     -- keep track of overspill damage if we have not received any actual damage yet
-                    self.DamagedOverspill[instigatorId] = self.DamagedOverspill[instigatorId] + amount 
+                    self.DamagedOverspill[instigatorId] = self.DamagedOverspill[instigatorId] + amount
                 end
             end
         end
@@ -523,20 +537,20 @@ Shield = ClassShield(moho.shield_methods, Entity) {
 
             -- check to spawn impact effect
             local r = Random(1, self.Size)
-            if  dmgType ~= "ShieldSpill"
-                and not (       self.LiveImpactEntities > 10
-                            and (r >= 0.2 * self.Size and r < self.LiveImpactEntities))
-            then 
+            if dmgType ~= "ShieldSpill"
+                and not (self.LiveImpactEntities > 10
+                    and (r >= 0.2 * self.Size and r < self.LiveImpactEntities))
+            then
                 ForkThread(self.CreateImpactEffect, self, vector)
             end
 
             -- if we have no health, collapse
             if EntityGetHealth(self) <= 0 then
                 ChangeState(self, self.DamageDrainedState)
-            -- otherwise, attempt to regenerate
-            else 
+                -- otherwise, attempt to regenerate
+            else
                 self.RegenThreadStartTick = tick + 10 * self.RegenStartTime
-                if self.RegenThreadSuspended then 
+                if self.RegenThreadSuspended then
                     ResumeThread(self.RegenThread)
                 end
             end
@@ -544,31 +558,30 @@ Shield = ClassShield(moho.shield_methods, Entity) {
 
         -- overspill damage checks
 
-        if 
-            -- prevent recursively applying overspill
-            doOverspill 
+        if -- prevent recursively applying overspill
+        doOverspill
             -- personal shields do not have overspill damage
             and self.ShieldType ~= "Personal"
             -- we consider damage without an instigator irrelevant, typically force events
-            and IsEntity(instigator) 
+            and IsEntity(instigator)
             -- we consider damage that is 1 or lower irrelevant, typically force events
-            and amount > 1 
+            and amount > 1
             -- do not recursively apply overspill damage
             and dmgType ~= "ShieldSpill"
-        then 
+        then
             local spillAmount = self.SpillOverDmgMod * amount
 
             -- retrieve shields that overlap with us
             local others, count = self:GetOverlappingShields(tick)
 
             -- apply overspill damage to neighbour shields
-            for k = 1, count do 
+            for k = 1, count do
                 others[k]:ApplyDamage(
-                    instigator,         -- instigator
-                    spillAmount,        -- amount
-                    nil,                -- vector
-                    "ShieldSpill",      -- type
-                    false               -- do overspill
+                    instigator, -- instigator
+                    spillAmount, -- amount
+                    nil, -- vector
+                    "ShieldSpill", -- type
+                    false-- do overspill
                 )
             end
         end
@@ -595,7 +608,7 @@ Shield = ClassShield(moho.shield_methods, Entity) {
         local d = MathSqrt(x * x + y * y + z * z)
 
         -- allocate an entity
-        local entity = Entity( self.ImpactEntitySpecs )
+        local entity = Entity(self.ImpactEntitySpecs)
 
         vc[1], vc[2], vc[3] = EntityGetPositionXYZ(self)
         Warp(entity, vc)
@@ -620,7 +633,7 @@ Shield = ClassShield(moho.shield_methods, Entity) {
 
         -- take out the entity again
         EntityDestroy(entity)
-        
+
         self.LiveImpactEntities = self.LiveImpactEntities - 1
     end,
 
@@ -640,7 +653,7 @@ Shield = ClassShield(moho.shield_methods, Entity) {
     OnCollisionCheck = function(self, other)
 
         -- special logic when it is a projectile to simulate air crashes
-        if other.CrashingAirplaneShieldCollisionLogic then 
+        if other.CrashingAirplaneShieldCollisionLogic then
             if other.ShieldImpacted then
                 return false
             else
@@ -651,16 +664,16 @@ Shield = ClassShield(moho.shield_methods, Entity) {
             end
         end
 
-        -- special behavior for projectiles that always collide with 
+        -- special behavior for projectiles that always collide with
         -- shields, like the seraphim storm when the Ythotha dies
         if other.CollideFriendlyShield then
             return true
         end
 
-        if      -- our projectiles do not collide with our shields
-                self.Army == other.Army
-                -- neutral projectiles do not collide with any shields
-            or  other.Army == -1 
+        if -- our projectiles do not collide with our shields
+        self.Army == other.Army
+            -- neutral projectiles do not collide with any shields
+            or other.Army == -1
         then
             return false
         end
@@ -705,7 +718,7 @@ Shield = ClassShield(moho.shield_methods, Entity) {
     end,
 
     RemoveShield = function(self)
-        self._IsUp = false 
+        self._IsUp = false
 
         EntitySetCollisionShape(self, 'None')
 
@@ -716,18 +729,17 @@ Shield = ClassShield(moho.shield_methods, Entity) {
         end
     end,
 
+    ---@param self Shield
     CreateShieldMesh = function(self)
         EntitySetCollisionShape(self, 'Sphere', 0, 0, 0, self.Size / 2)
 
-        EntitySetMesh(self, self.MeshBp)
         EntitySetParentOffset(self, Vector(0, self.ShieldVerticalOffset, 0))
         EntitySetDrawScale(self, self.Size)
 
         if self.MeshZ == nil then
-            local vc = VectorCached 
+            local vc = VectorCached
 
-            self.MeshZ = Entity (self.ImpactEntitySpecs)
-            EntitySetMesh(self.MeshZ, self.MeshZBp)
+            self.MeshZ = Entity(self.ImpactEntitySpecs)
             EntitySetDrawScale(self.MeshZ, self.Size)
 
             vc[1], vc[2], vc[3] = EntityGetPositionXYZ(self.Owner)
@@ -741,16 +753,28 @@ Shield = ClassShield(moho.shield_methods, Entity) {
             EntitySetVizToEnemies(self.MeshZ, 'Intel')
             EntitySetVizToAllies(self.MeshZ, 'Always')
             EntitySetVizToNeutrals(self.MeshZ, 'Intel')
+
+            TrashAdd(self.Trash, ForkThread(self.ShowShieldMeshThread, self))
         end
 
         self._IsUp = true
+    end,
+
+    ---@param self Shield
+    ShowShieldMeshThread = function(self)
+        WaitTicks(1)
+        local mesh = self.MeshZ
+        if mesh then
+            EntitySetMesh(self, self.MeshBp)
+            EntitySetMesh(mesh, self.MeshZBp)
+        end
     end,
 
     -- Basically run a timer, but with visual bar movement
     ChargingUp = function(self, curProgress, time)
 
         local max = 1
-        if not self.DepletedByDamage then 
+        if not self.DepletedByDamage then
             max = EntityGetHealth(self) / EntityGetMaxHealth(self)
         end
 
@@ -769,26 +793,26 @@ Shield = ClassShield(moho.shield_methods, Entity) {
         Main = function(self)
 
             -- always start consuming energy at this point
-            self.Enabled = true 
+            self.Enabled = true
             self.Owner:SetMaintenanceConsumptionActive()
 
             -- if we're attached to a transport then our shield should be off
             if (not self.SkipAttachmentCheck) and (UnitIsUnitState(self.Owner, 'Attached') and self.RolledFromFactory) then
                 ChangeState(self, self.OffState)
 
-            -- if we're still out of energy, go wait for that to fix itself
-            elseif self.NoEnergyToSustain then 
+                -- if we're still out of energy, go wait for that to fix itself
+            elseif self.NoEnergyToSustain then
                 ChangeState(self, self.EnergyDrainedState)
 
-            -- if we are depleted for some reason, go fix that first
-            elseif self.DepletedByEnergy or self.DepletedByDamage or not self.Recharged then 
+                -- if we are depleted for some reason, go fix that first
+            elseif self.DepletedByEnergy or self.DepletedByDamage or not self.Recharged then
                 ChangeState(self, self.RechargeState)
 
-            -- we're all good, go shield things
-            else 
+                -- we're all good, go shield things
+            else
 
                 -- unsuspend the regeneration thread
-                if self.RegenThreadSuspended then 
+                if self.RegenThreadSuspended then
                     ResumeThread(self.RegenThread)
                 end
 
@@ -803,7 +827,7 @@ Shield = ClassShield(moho.shield_methods, Entity) {
 
             -- mobile shields are 'attached' to the factory when they are build, this allows
             -- us to skip the first check of whether we're attached to a transport
-            self.RolledFromFactory = true 
+            self.RolledFromFactory = true
         end,
 
         IsOn = function(self)
@@ -817,8 +841,8 @@ Shield = ClassShield(moho.shield_methods, Entity) {
         Main = function(self)
 
             -- update internal state
-            self.Enabled = false 
-            self.Recharged = false 
+            self.Enabled = false
+            self.Recharged = false
             self.Owner:SetMaintenanceConsumptionInactive()
 
             -- remove the shield and the shield bar
@@ -839,17 +863,17 @@ Shield = ClassShield(moho.shield_methods, Entity) {
         Main = function(self)
 
             -- determine recharge time
-            local rechargeTime = self.ShieldEnergyDrainRechargeTime           
-            if self.DepletedByDamage and self.ShieldRechargeTime > rechargeTime then 
+            local rechargeTime = self.ShieldEnergyDrainRechargeTime
+            if self.DepletedByDamage and self.ShieldRechargeTime > rechargeTime then
                 rechargeTime = self.ShieldRechargeTime
             end
 
             -- wait until we're done charging up
             self:ChargingUp(0, rechargeTime)
 
-            -- determine health 
+            -- determine health
             local health = EntityGetHealth(self)
-            if self.DepletedByDamage then 
+            if self.DepletedByDamage then
                 health = EntityGetMaxHealth(self)
             end
 
@@ -858,8 +882,8 @@ Shield = ClassShield(moho.shield_methods, Entity) {
 
             -- update internal state
             self.DepletedByDamage = false
-            self.DepletedByEnergy = false 
-            self.Recharged = true 
+            self.DepletedByEnergy = false
+            self.Recharged = true
             self.RegenThreadStartTick = GetGameTick() + 10 * self.RegenStartTime
 
             -- back to the regular onstate
@@ -875,8 +899,8 @@ Shield = ClassShield(moho.shield_methods, Entity) {
         Main = function(self)
 
             -- update internal state
-            self.DepletedByDamage = true 
-            self.Recharged = false 
+            self.DepletedByDamage = true
+            self.Recharged = false
 
             -- remove the shield
             self:RemoveShield()
@@ -899,8 +923,8 @@ Shield = ClassShield(moho.shield_methods, Entity) {
         Main = function(self)
 
             -- update internal state
-            self.DepletedByEnergy = true 
-            self.Recharged = false 
+            self.DepletedByEnergy = true
+            self.Recharged = false
 
             -- remove the shield
             self:RemoveShield()
@@ -921,7 +945,7 @@ Shield = ClassShield(moho.shield_methods, Entity) {
     },
 
     DeadState = State {
-        Main = function(self) 
+        Main = function(self)
         end,
 
         IsOn = function(self)
@@ -935,8 +959,8 @@ Shield = ClassShield(moho.shield_methods, Entity) {
 
         Main = function(self)
 
-            -- if not DeprecatedWarnings.DamageRechargeState then 
-            --     DeprecatedWarnings.DamageRechargeState = true 
+            -- if not DeprecatedWarnings.DamageRechargeState then
+            --     DeprecatedWarnings.DamageRechargeState = true
             --     SPEW("DamageRechargeState is deprecated: use shield.RechargeState instead.")
             --     SPEW("Unit type of owner: " .. self.Owner.UnitId)
             --     SPEW("Stacktrace: " .. repr(debug.traceback()))
@@ -949,8 +973,8 @@ Shield = ClassShield(moho.shield_methods, Entity) {
 
     GetCachePosition = function(self)
 
-        -- if not DeprecatedWarnings.GetCachePosition then 
-        --     DeprecatedWarnings.GetCachePosition = true 
+        -- if not DeprecatedWarnings.GetCachePosition then
+        --     DeprecatedWarnings.GetCachePosition = true
         --     SPEW("GetCachePosition is deprecated: use shield:GetPosition() or shield:GetPositionXYZ() instead.")
         --     SPEW("Stacktrace: " .. repr(debug.traceback()))
         -- end
@@ -960,8 +984,8 @@ Shield = ClassShield(moho.shield_methods, Entity) {
 
     SetRechargeTime = function(self, rechargeTime, energyRechargeTime)
 
-        -- if not DeprecatedWarnings.SetRechargeTime then 
-        --     DeprecatedWarnings.SetRechargeTime = true 
+        -- if not DeprecatedWarnings.SetRechargeTime then
+        --     DeprecatedWarnings.SetRechargeTime = true
         --     SPEW("SetRechargeTime is deprecated: set the values shield.ShieldRechargeTime and shield.ShieldEnergyDrainRechargeTime instead.")
         --     SPEW("Stacktrace: " .. repr(debug.traceback()))
         -- end
@@ -972,8 +996,8 @@ Shield = ClassShield(moho.shield_methods, Entity) {
 
     SetVerticalOffset = function(self, offset)
 
-        -- if not DeprecatedWarnings.SetVerticalOffset then 
-        --     DeprecatedWarnings.SetVerticalOffset = true 
+        -- if not DeprecatedWarnings.SetVerticalOffset then
+        --     DeprecatedWarnings.SetVerticalOffset = true
         --     SPEW("SetVerticalOffset is deprecated: set the value shield.ShieldVerticalOffset instead.")
         --     SPEW("Stacktrace: " .. repr(debug.traceback()))
         -- end
@@ -983,8 +1007,8 @@ Shield = ClassShield(moho.shield_methods, Entity) {
 
     SetSize = function(self, size)
 
-        -- if not DeprecatedWarnings.SetSize then 
-        --     DeprecatedWarnings.SetSize = true 
+        -- if not DeprecatedWarnings.SetSize then
+        --     DeprecatedWarnings.SetSize = true
         --     SPEW("SetSize is deprecated: set the value shield.Size instead.")
         --     SPEW("Source: " .. repr(debug.traceback()))
         -- end
@@ -994,8 +1018,8 @@ Shield = ClassShield(moho.shield_methods, Entity) {
 
     SetShieldRegenRate = function(self, rate)
 
-        -- if not DeprecatedWarnings.SetShieldRegenRate then 
-        --     DeprecatedWarnings.SetShieldRegenRate = true 
+        -- if not DeprecatedWarnings.SetShieldRegenRate then
+        --     DeprecatedWarnings.SetShieldRegenRate = true
         --     SPEW("SetShieldRegenRate is deprecated: set the value shield.RegenRate instead.")
         --     SPEW("Stacktrace: " .. repr(debug.traceback()))
         -- end
@@ -1005,8 +1029,8 @@ Shield = ClassShield(moho.shield_methods, Entity) {
 
     SetShieldRegenStartTime = function(self, time)
 
-        -- if not DeprecatedWarnings.SetShieldRegenStartTime then 
-        --     DeprecatedWarnings.SetShieldRegenStartTime = true 
+        -- if not DeprecatedWarnings.SetShieldRegenStartTime then
+        --     DeprecatedWarnings.SetShieldRegenStartTime = true
         --     SPEW("SetShieldRegenStartTime is deprecated: set the value shield.RegenStartTime instead.")
         --     SPEW("Stacktrace: " .. repr(debug.traceback()))
         -- end
@@ -1016,8 +1040,8 @@ Shield = ClassShield(moho.shield_methods, Entity) {
 
     SetType = function(self, type)
 
-        -- if not DeprecatedWarnings.ShieldType then 
-        --     DeprecatedWarnings.ShieldType = true 
+        -- if not DeprecatedWarnings.ShieldType then
+        --     DeprecatedWarnings.ShieldType = true
         --     SPEW("ShieldType is deprecated: set the value shield.ShieldType instead.")
         --     SPEW("Stacktrace: " .. repr(debug.traceback()))
         -- end
@@ -1052,7 +1076,7 @@ PersonalBubble = ClassShield(Shield) {
         -- Was handled by self.PassOverkillDamage bp value, now defunct
         if self.Owner ~= instigator then
             local overkill = self:GetOverkill(instigator, amount, dmgType)
-            if overkill > 0 and self.Owner and IsUnit(self.Owner)  then
+            if overkill > 0 and self.Owner and IsUnit(self.Owner) then
                 self.Owner:DoTakeDamage(instigator, overkill, vector, dmgType)
             end
         end
@@ -1093,7 +1117,7 @@ PersonalBubble = ClassShield(Shield) {
         Main = function(self)
             UnitRevertCollisionShape(self.Owner)
             Shield.RechargeState.Main(self)
-         end
+        end
     },
 }
 
@@ -1131,7 +1155,7 @@ TransportShield = ClassShield(Shield) {
 
             -- prevent ourself and our content from taking damage
             self:SetContentsVulnerable(false)
-            self.Owner.CanTakeDamage = false 
+            self.Owner.CanTakeDamage = false
         end,
 
         AddProtectedUnit = function(self, unit)
@@ -1146,7 +1170,7 @@ TransportShield = ClassShield(Shield) {
 
             -- allow ourself and our content to take damage
             self:SetContentsVulnerable(true)
-            self.Owner.CanTakeDamage = true 
+            self.Owner.CanTakeDamage = true
         end,
     },
 
@@ -1156,7 +1180,7 @@ TransportShield = ClassShield(Shield) {
 
             -- allow ourself and our content to take damage
             self:SetContentsVulnerable(true)
-            self.Owner.CanTakeDamage = true 
+            self.Owner.CanTakeDamage = true
         end
     },
 
@@ -1166,7 +1190,7 @@ TransportShield = ClassShield(Shield) {
 
             -- allow ourself and our content to take damage
             self:SetContentsVulnerable(true)
-            self.Owner.CanTakeDamage = true 
+            self.Owner.CanTakeDamage = true
         end
     },
 }
@@ -1174,7 +1198,7 @@ TransportShield = ClassShield(Shield) {
 --- A shield that sticks to the surface of the unit. Doesn't have its own collision physics, just
 -- grants extra health.
 ---@class PersonalShield : Shield
-PersonalShield = ClassShield(Shield){
+PersonalShield = ClassShield(Shield) {
 
     RemainEnabledWhenAttached = true,
 
@@ -1194,7 +1218,7 @@ PersonalShield = ClassShield(Shield){
         self.ShieldType = 'Personal'
 
         -- cache our shield effect entity
-        self.ShieldEffectEntity = Entity( self.ImpactEntitySpecs )
+        self.ShieldEffectEntity = Entity(self.ImpactEntitySpecs)
     end,
 
     ApplyDamage = function(self, instigator, amount, vector, dmgType, doOverspill)
@@ -1236,7 +1260,7 @@ PersonalShield = ClassShield(Shield){
         -- warp the entity
         vc[1], vc[2], vc[3] = EntityGetPositionXYZ(self)
         Warp(entity, vc)
-        
+
         -- orientate it to orientate the effect
         vc[1], vc[2], vc[3] = -x, -y, -z
         EntitySetOrientation(entity, OrientFromDir(vc), true)
@@ -1335,7 +1359,7 @@ CzarShield = ClassShield(PersonalShield) {
 
         local army = self:GetArmy()
         local OffsetLength = Util.GetVectorLength(vector)
-        local ImpactMesh = Entity ( self.ImpactEntitySpecs )
+        local ImpactMesh = Entity(self.ImpactEntitySpecs)
         local pos = self:GetPosition()
 
         -- Shield has non-standard form (ellipsoid) and no collision, so we need some magic to make impacts look good
@@ -1343,19 +1367,19 @@ CzarShield = ClassShield(PersonalShield) {
         -- Projectiles that come from same elevation (ASF etc.) cause small pulses on the edge of shield using
         -- standard effect from static shields
         if vector.y > 1 then
-            Warp(ImpactMesh, {pos[1], pos[2] + 9.5, pos[3]})
+            Warp(ImpactMesh, { pos[1], pos[2] + 9.5, pos[3] })
 
             ImpactMesh:SetMesh(self.ImpactMeshBigBp)
             ImpactMesh:SetDrawScale(self.Size)
             ImpactMesh:SetOrientation(OrientFromDir(Vector(0, -30, 0)), true)
         elseif vector.y < -1 then
-            Warp(ImpactMesh, {pos[1], pos[2] - 9.5, pos[3]})
+            Warp(ImpactMesh, { pos[1], pos[2] - 9.5, pos[3] })
 
             ImpactMesh:SetMesh(self.ImpactMeshBigBp)
             ImpactMesh:SetDrawScale(self.Size)
             ImpactMesh:SetOrientation(OrientFromDir(Vector(0, 30, 0)), true)
         else
-            Warp(ImpactMesh, {pos[1], pos[2], pos[3]})
+            Warp(ImpactMesh, { pos[1], pos[2], pos[3] })
 
             ImpactMesh:SetMesh(self.ImpactMeshBp)
             ImpactMesh:SetDrawScale(self.Size)

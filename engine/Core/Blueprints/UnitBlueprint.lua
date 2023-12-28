@@ -27,7 +27,7 @@
 ---@alias EnhancementSlot "Back" | "RCH" | "LCH"
 ---@alias TechCategory "TECH1" | "TECH2" | "TECH3" | "EXPERIMENTAL"
 ---@alias LayerCategory "AIR" | "LAND" | "NAVAL"
----@alias FactionCategory "UEF" | "CYBRAN" | "AEON" | "SERAPHIM"
+---@alias FactionCategory "UEF" | "CYBRAN" | "AEON" | "SERAPHIM" | "NOMADS"
 ---@alias IconBackgroundType "air" | "amph" | "land" | "sea"
 
 ---@alias UnitId BlueprintId

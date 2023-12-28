@@ -700,6 +700,7 @@ function HandleUnitWithBuildPresets(bps, all_bps)
             tempBp.BaseBlueprintId = tempBp.BlueprintId
             tempBp.BlueprintId = string.lower(tempBp.BlueprintId .. '_' .. name)
             tempBp.BuildIconSortPriority = preset.BuildIconSortPriority or tempBp.BuildIconSortPriority or 0
+            tempBp.General.SelectionPriority = preset.SelectionPriority or tempBp.General.SelectionPriority or 1
             tempBp.General.UnitName = preset.UnitName or tempBp.General.UnitName
             tempBp.Interface = tempBp.Interface or { }
             tempBp.Interface.HelpText = preset.HelpText or tempBp.Interface.HelpText

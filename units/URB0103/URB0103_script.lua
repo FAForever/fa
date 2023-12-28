@@ -1,44 +1,59 @@
---****************************************************************************
+--**********************************************************************************
+--** Copyright (c) 2023 FAForever
 --**
---**  File     :  /cdimage/units/URB0103/URB0103_script.lua
---**  Author(s):  David Tomandl
+--** Permission is hereby granted, free of charge, to any person obtaining a copy
+--** of this software and associated documentation files (the "Software"), to deal
+--** in the Software without restriction, including without limitation the rights
+--** to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+--** copies of the Software, and to permit persons to whom the Software is
+--** furnished to do so, subject to the following conditions:
 --**
---**  Summary  :  Cybran T1 Naval Factory Script
+--** The above copyright notice and this permission notice shall be included in all
+--** copies or substantial portions of the Software.
 --**
---**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
---****************************************************************************
+--** THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+--** IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+--** FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+--** AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+--** LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+--** OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+--** SOFTWARE.
+--**********************************************************************************
 
 local CSeaFactoryUnit = import("/lua/cybranunits.lua").CSeaFactoryUnit
----@class URB0103 : CSeaFactoryUnit
-URB0103 = ClassUnit(CSeaFactoryUnit) {
+local CSeaFactoryUnitOnCreate = CSeaFactoryUnit.OnCreate
+local CSeaFactoryUnitStartArmsMoving = CSeaFactoryUnit.StartArmsMoving
+local CSeaFactoryUnitStopArmsMoving = CSeaFactoryUnit.StopArmsMoving
 
-    StartArmsMoving = function(self)
-        CSeaFactoryUnit.StartArmsMoving(self)
-        if not self.ArmSlider then
-            self.ArmSlider = CreateSlider(self, 'Right_Arm03')
-            self.Trash:Add(self.ArmSlider)
-        end
-    end,
+local Cybran1BuildArmComponent = import("/lua/sim/units/components/Cybran1BuildArmComponent.lua").Cybran1BuildArmComponent
+local Cybran1BuildArmComponentOnCreate = Cybran1BuildArmComponent.OnCreate
+local Cybran1BuildArmComponentStopArmsMoving = Cybran1BuildArmComponent.StopArmsMoving
 
-    MovingArmsThread = function(self)
-        CSeaFactoryUnit.MovingArmsThread(self)
-        while true do
-            if not self.ArmSlider then return end
-            self.ArmSlider:SetGoal(40, 0, 0)
-            self.ArmSlider:SetSpeed(40)
-            WaitFor(self.ArmSlider)
-            self.ArmSlider:SetGoal(-30, 0, 0)
-            WaitFor(self.ArmSlider)
-        end
-    end,
+---@class URB0103 : CSeaFactoryUnit, Cybran1BuildArmComponent
+URB0103 = ClassUnit(CSeaFactoryUnit, Cybran1BuildArmComponent) {
+
+    ArmBone1 = "Right_Arm03",
+    ArmOffset1 = 0.0252, -- LOG(self:GetPosition('Attachpoint')[3] - self:GetPosition(self.ArmBone1)[3])
     
-    StopArmsMoving = function(self)
-        CSeaFactoryUnit.StopArmsMoving(self)
-        if not self.ArmSlider then return end
-
-        self.ArmSlider:SetGoal(0, 0, 0)
-        self.ArmSlider:SetSpeed(40)
+    ---@param self URB0103
+    OnCreate = function(self)
+        CSeaFactoryUnitOnCreate(self)
+        Cybran1BuildArmComponentOnCreate(self)
     end,
+
+    ---@param self URB0103
+    StartArmsMoving = function(self)
+        CSeaFactoryUnitStartArmsMoving(self)
+    end,
+
+    ---@param self URB0103
+    StopArmsMoving = function(self)
+        CSeaFactoryUnitStopArmsMoving(self)
+        Cybran1BuildArmComponentStopArmsMoving(self)
+    end,
+
+    CreateBuildEffects = Cybran1BuildArmComponent.CreateBuildEffects,
+    MovingArmsThread = Cybran1BuildArmComponent.MovingArmsThread,
 }
 
 TypeClass = URB0103

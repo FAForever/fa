@@ -54,7 +54,7 @@ if SetProcessPriority and GetProcessAffinityMask and SetProcessAffinityMask then
 
         -- system has 6 (logical) computing units or more, skip first two computing units
         elseif (systemAffinityMask >= 63) then
-            processAffinityMask = systemAffinityMask - 4 -- 2 ^ 6 - 3 - 1
+            processAffinityMask = systemAffinityMask - 3 -- (2 ^ 6 - 1) - 3
         end
 
         -- update the afinity mask
