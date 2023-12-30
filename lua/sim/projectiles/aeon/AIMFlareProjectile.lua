@@ -21,6 +21,7 @@
 --**********************************************************************************
 
 local EmitterProjectile = import("/lua/sim/defaultprojectiles.lua").EmitterProjectile
+local Flare = import("/lua/defaultantiprojectile.lua").Flare
 local EffectTemplate = import("/lua/effecttemplates.lua")
 
 -- upvalue scope for performance
@@ -46,11 +47,32 @@ AIMFlareProjectile = ClassProjectile(EmitterProjectile) {
     FxNoneHitScale = 0.4,
     DestroyOnImpact = false,
 
+    ---@param self AIMFlareProjectile
+    ---@param inWater boolean
+    OnCreate = function(self, inWater)
+        EmitterProjectile.OnCreate(self, inWater)
+
+        local flareSpecs = {
+            Radius = 10,
+            Owner = self,
+            Category = "MISSILE TACTICAL",
+        }
+
+        -- 
+        local flares = {}
+        for k = 1, 3 do
+            flareSpecs.Radius = 8 + k * 5
+            flares[k] = self.Trash:Add(Flare(flareSpecs))
+        end
+
+        self.Flares = flares
+    end,
+
     ---@param self AIMAntiMissile01
     ---@param other Projectile
     ---@return boolean
     OnCollisionCheck = function(self, other)
-        -- nullify damage amount when it hits the flare. We do this to prevent projectiles 
+        -- nullify damage amount when it hits the flare. We do this to prevent projectiles
         -- damaging the unit that fired the flare, as if it 'encapsulates' the damage
         if EntityCategoryContains(FlareCategories, other) and
             IsEnemy(self.Army, other.Army)

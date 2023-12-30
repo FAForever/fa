@@ -32,7 +32,6 @@ AIMAntiMissile01 = ClassProjectile(AIMFlareProjectile) {
     ---@param self AIMAntiMissile01
     OnCreate = function(self)
         AIMFlareProjectileOnCreate(self)
-        self:SetCollisionShape('Sphere', 0, 0, 0, 1.0)
         self.RedirectedMissiles = 0
     end,
 

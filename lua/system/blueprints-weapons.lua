@@ -35,9 +35,9 @@ local function ProcessWeapon(unit, weapon, projectile)
 
     -- Tactical, strategical missile defenses and torpedo defenses
     if weapon.RangeCategory == "UWRC_Countermeasure" then
-        weapon.TargetCheckInterval = 0.4
+        weapon.TargetCheckInterval = 0.2
         weapon.AlwaysRecheckTarget = false
-        weapon.TrackingRadius = 1.10
+        weapon.TrackingRadius = 1.0
         weapon.ManualFire = false
         return
     end
