@@ -21,6 +21,8 @@
 --**********************************************************************************
 
 local EmitterProjectile = import("/lua/sim/defaultprojectiles.lua").EmitterProjectile
+local EmitterProjectileOnCreate = EmitterProjectile.OnCreate
+local EmitterProjectileOnDestroy = EmitterProjectile.OnDestroy
 local Flare = import("/lua/defaultantiprojectile.lua").Flare
 local EffectTemplate = import("/lua/effecttemplates.lua")
 
@@ -50,7 +52,10 @@ AIMFlareProjectile = ClassProjectile(EmitterProjectile) {
     ---@param self AIMFlareProjectile
     ---@param inWater boolean
     OnCreate = function(self, inWater)
-        EmitterProjectile.OnCreate(self, inWater)
+        EmitterProjectileOnCreate(self, inWater)
+        self.RedirectedMissiles = 0
+
+        self:SetCollisionShape('Sphere', 0, 0, 0, 1.0)
 
         local flareSpecs = {
             Radius = 10,
@@ -58,7 +63,6 @@ AIMFlareProjectile = ClassProjectile(EmitterProjectile) {
             Category = "MISSILE TACTICAL",
         }
 
-        -- 
         local flares = {}
         for k = 1, 3 do
             flareSpecs.Radius = 8 + k * 5
@@ -66,6 +70,17 @@ AIMFlareProjectile = ClassProjectile(EmitterProjectile) {
         end
 
         self.Flares = flares
+    end,
+
+    ---@param self AIMFlareProjectile
+    OnDestroy = function(self)
+        EmitterProjectileOnDestroy(self)
+
+        -- create a pretty flash depending on the number of missiles we redirected
+        local redirectedMissiles = self.RedirectedMissiles
+        if redirectedMissiles > 0 then
+            CreateLightParticleIntel(self, -1, self.Army, redirectedMissiles, 5, 'glow_02', 'ramp_blue_22')
+        end
     end,
 
     ---@param self AIMAntiMissile01
@@ -77,9 +92,12 @@ AIMFlareProjectile = ClassProjectile(EmitterProjectile) {
         if EntityCategoryContains(FlareCategories, other) and
             IsEnemy(self.Army, other.Army)
         then
-            other.DamageData.DamageAmount = 0
+            -- destroy the other projectile
+            Damage(self.Launcher, other:GetPosition(), other, 200, "Normal")
         end
 
         return true
     end,
+
+
 }

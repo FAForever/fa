@@ -152,7 +152,7 @@ UnitBlueprint{
             DamageType = "Normal",
             DisableWhileReloading = true,
             DisplayName = "Will O Wisp Anti Missile",
-            EffectiveRadius = 15,
+            EffectiveRadius = 18,
             FireTargetLayerCapsTable = {
                 Land = "Air",
                 Water = "Air",
@@ -190,7 +190,7 @@ UnitBlueprint{
             WeaponUnpacks = true,
         },
         {
-            MaxRadius = 12.5,
+            MaxRadius = 18,
             RangeCategory = "UWRC_Countermeasure",
         },
     },

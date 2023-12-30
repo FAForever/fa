@@ -1,4 +1,3 @@
-
 --**********************************************************************************
 --** Copyright (c) 2023 FAForever
 --**
@@ -22,28 +21,9 @@
 --**********************************************************************************
 
 local AIMFlareProjectile = import("/lua/aeonprojectiles.lua").AIMFlareProjectile
-local AIMFlareProjectileOnCreate = AIMFlareProjectile.OnCreate
-local AIMFlareProjectileOnDestroy = AIMFlareProjectile.OnDestroy
 
 ---@class AIMAntiMissile01 : AIMFlareProjectile
 ---@field RedirectedMissiles number
-AIMAntiMissile01 = ClassProjectile(AIMFlareProjectile) {
-
-    ---@param self AIMAntiMissile01
-    OnCreate = function(self)
-        AIMFlareProjectileOnCreate(self)
-        self.RedirectedMissiles = 0
-    end,
-
-    ---@param self AIMAntiMissile01
-    OnDestroy = function(self)
-        AIMFlareProjectileOnDestroy(self)
-
-        local redirectedMissiles = self.RedirectedMissiles
-        if redirectedMissiles > 0 then
-            CreateLightParticleIntel(self, -1, self.Army, redirectedMissiles, 5, 'glow_02', 'ramp_blue_22')
-        end
-    end,
-}
+AIMAntiMissile01 = ClassProjectile(AIMFlareProjectile) {}
 
 TypeClass = AIMAntiMissile01

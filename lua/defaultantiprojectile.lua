@@ -66,7 +66,8 @@ Flare = Class(Entity) {
     ---@return boolean
     OnCollisionCheck = function(self, other)
         local army = self.Army
-        if EntityCategoryContains(FlareCategories, other) and
+        if not IsDestroyed(other) and
+            EntityCategoryContains(FlareCategories, other) and
             IsEnemy(army, other.Army)
         then
             -- take out scripted movement
@@ -79,7 +80,7 @@ Flare = Class(Entity) {
             -- determine whether we redirect
             local owner = self.Owner
             local ownerRedirectedMissiles = owner.RedirectedMissiles
-            if not (ownerRedirectedMissiles >= 3 or other.IsRedirected) then
+            if not (ownerRedirectedMissiles >= 4 or other.IsRedirected) then
                 -- keep track of how many missiles we redirected
                 owner.RedirectedMissiles = owner.RedirectedMissiles + 1
 
@@ -87,7 +88,7 @@ Flare = Class(Entity) {
                 other:SetNewTarget(self.Owner)
                 other:SetTurnRate(120)
 
-                -- projectiles that end due to lifetime still explode and deal damage, 
+                -- projectiles that end due to lifetime still explode and deal damage,
                 -- therefore we straigth out kill the projectile after a short duration
                 other:SetLifetime(3)
                 other.Trash:Add(
@@ -117,7 +118,7 @@ Flare = Class(Entity) {
     KillThread = function(self, projectile, ticksToWait)
         WaitTicks(ticksToWait)
         if not IsDestroyed(projectile) then
-            Damage(nil, projectile:GetPosition(), projectile, 200, "Normal")
+            Damage(self.Owner.Launcher, projectile:GetPosition(), projectile, 200, "Normal")
         end
     end,
 }
