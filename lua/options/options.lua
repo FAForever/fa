@@ -568,7 +568,8 @@ options = {
                 custom = {
                     states = {
                         { text = "<LOC _Off>Off", key = "off" },
-                        { text = "<LOC structure_ringing_extractors_fabs_option_4>Up to 4 Mass Fabricators", key = "inner" },
+                        { text = "<LOC structure_ringing_extractors_fabs_option_4>Up to 4 Mass Fabricators",
+                            key = "inner" },
                         { text = "<LOC structure_ringing_extractors_fabs_option_8>Up to 8 Mass Fabricators", key = "all" },
                     },
                 },
@@ -906,6 +907,25 @@ options = {
                     states = {
                         { text = "<LOC _Off>", key = 0 },
                         { text = "<LOC _On>", key = 1 },
+                    },
+                },
+            },
+
+            {
+                title = "<LOC OPTIONS_STRATEGIC_ICON_SCALE>Scale strategic icons",
+                key = 'strat_icon_scale',
+                type = 'toggle',
+                default = 1.0,
+                set = function(key, value, startup)
+                    if GetCurrentUIState() == 'game' then
+                        ConExecute("ui_StrategicIconScale " .. value)
+                    end
+                end,
+                custom = {
+                    states = {
+                        { text = "<LOC _Off>Off", key = 1.0 },
+                        { text = "<LOC strat_icon_scale-1.5x>1.5x (may cause distortions)", key = 1.5 },
+                        { text = "<LOC strat_icon_scale-2.0x>2.0x (no distortions)", key = 2.0 },
                     },
                 },
             },
