@@ -80,7 +80,7 @@ Flare = Class(Entity) {
             -- determine whether we redirect
             local owner = self.Owner
             local ownerRedirectedMissiles = owner.RedirectedMissiles
-            if not (ownerRedirectedMissiles >= 4 or other.IsRedirected) then
+            if not (ownerRedirectedMissiles >= 3 or other.IsRedirected) then
                 -- keep track of how many missiles we redirected
                 owner.RedirectedMissiles = owner.RedirectedMissiles + 1
 
