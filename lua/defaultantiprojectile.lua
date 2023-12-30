@@ -66,7 +66,7 @@ Flare = Class(Entity) {
     ---@return boolean
     OnCollisionCheck = function(self, other)
         local army = self.Army
-        if not IsDestroyed(other) and
+        if not IsDestroyed(self.Owner) and
             EntityCategoryContains(FlareCategories, other) and
             IsEnemy(army, other.Army)
         then
