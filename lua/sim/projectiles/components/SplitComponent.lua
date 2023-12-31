@@ -32,40 +32,60 @@ SplitComponent = ClassSimple {
     ChildProjectileBlueprint = '/projectiles/CIFMissileTacticalSplit01/CIFMissileTacticalSplit01_proj.bp',
 
     SpreadCone = 2 * MathPi,
-    SpreadMultiplier = 1.0,
-    SpreadMultiplierRange = 1.0,
+    SpreadMultiplier = 0.5,
+    SpreadMultiplierRange = 0,
+
+    RotateOffsetDeg = 0,
+    RotateOffsetRange = 60,
+    ChildRotateOffsetRange = 40,
 
     ---@param self SplitComponent | Projectile
     OnSplit = function(self, inheritTargetGround)
-        local vx, vy, vz = self:GetVelocity()
-
+        local childCount = self.ChildCount
+        local childBlueprint = self.ChildProjectileBlueprint
         local spreadCone = self.SpreadCone
         local spreadMultiplier = self.SpreadMultiplier
         local spreadMultiplierRange = self.SpreadMultiplierRange
-
-        local childCount = self.ChildCount
-        local childBlueprint = self.ChildProjectileBlueprint
-        local childVelocity = self:GetCurrentSpeed() * 5
+        
+        local rotateOffsetRadRandom = (self.RotateOffsetDeg + (Random() - 0.5) * self.RotateOffsetRange) * MathPi / 180
+        local childRotateOffsetRange = self.ChildRotateOffsetRange * MathPi / 180
 
         local childConeSection = spreadCone / childCount
 
+        local vx, vy, vz = self:GetVelocity()
+        local speed = self:GetCurrentSpeed()
+        local wx, wy, wz = vx/speed, vy/speed, vz/speed
+
+
         for i = 0, childCount - 1 do
-            local xVec = vx + MathSin(i * childConeSection) * spreadMultiplier +
-                (2 * spreadMultiplierRange * (Random() - 0.5))
-            local yVec = vy + MathCos(i * childConeSection) * spreadMultiplier +
-                (2 * spreadMultiplierRange * (Random() - 0.5))
-            local zVec = vz + MathCos(i * childConeSection) * spreadMultiplier +
-                (2 * spreadMultiplierRange * (Random() - 0.5))
+            local a = i * childConeSection + rotateOffsetRadRandom + (Random() - 0.5) * childRotateOffsetRange
+
+            local cosA = MathCos(a)
+            local sinA = MathSin(a)
+
+            -- Rotation into forwards-facing circle
+            -- Simplified from Y-axis rotation followed by 90 degree axis-angle rotation on the axis
+            -- perpendicular to Y-axis and the velocity vector
+            local dot = -wz * wz * sinA - wx * wx * sinA
+            local xVec = -wx * wy + -wz * dot
+            local yVec = wx * wx * cosA + wz * wz * cosA
+            local zVec = -wz * wy + wx * dot
             local proj = self:CreateChildProjectile(childBlueprint)
-            -- proj:SetVelocity(xVec, yVec, zVec)
-            -- proj:SetVelocity(childVelocity)
+
+            local spreadRandom = spreadMultiplier + (Random() - 0.5) * spreadMultiplierRange
+            local complement = 1 - spreadRandom
+            -- Set the direction of the projectile
+            proj:SetVelocity(wx * complement + spreadRandom * xVec,
+                             wy * complement + spreadRandom * yVec,
+                             wz * complement + spreadRandom * zVec)
+            -- GetCurrentSpeed() and GetVelocity() return in units of distance/tick,
+            -- but SetVelocity(speed) expects units of distance/second, so we multiply by 10.
+            proj:SetVelocity(speed*10)  
             proj.DamageData = self.DamageData
 
             if inheritTargetGround then
-                proj:SetTurnRate(40)
                 proj:SetNewTargetGround(self:GetCurrentTargetPosition())
-                proj:TrackTarget(false)
-            end
+            end     
         end
     end,
 

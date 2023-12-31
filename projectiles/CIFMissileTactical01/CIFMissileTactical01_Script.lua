@@ -6,6 +6,14 @@ local CLOATacticalMissileProjectile = import("/lua/cybranprojectiles.lua").CLOAT
 ---@class CIFMissileTactical01 : CLOATacticalMissileProjectile
 CIFMissileTactical01 = ClassProjectile(CLOATacticalMissileProjectile) {
     ChildCount = 3,
+    SpreadMultiplier = 0.8,
+    SpreadMultiplierRange = 0.1,
+
+    LaunchTicks = 2,
+    LaunchTurnRate = 0,
+    HeightDistanceFactor = 4,
+    MinHeight = 2,
+    FinalBoostAngle = 50,
 
     FxUnitHitScale = 0.5,
     FxLandHitScale = 0.5,
