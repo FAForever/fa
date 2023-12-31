@@ -16,7 +16,7 @@ gamePatches = {
         version = 3778,
         name = "Hotfix",
         description = {
-            "# Game Version 3777 (24th of December, 2023)",
+            "# Game Version 3778 (31th of December, 2023)",
             "",
             "A concise hotfix addressing lingering issues.",
             "",
