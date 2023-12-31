@@ -470,7 +470,7 @@ end
 --- Deals damage to the target unit
 ---@param instigator TargetObject | nil
 ---@param location Vector origin of the damage, used for effects
----@param target Unit
+---@param target Unit | Projectile | Prop
 ---@param amount number
 ---@param damageType DamageType
 function Damage(instigator, location, target, amount, damageType)
