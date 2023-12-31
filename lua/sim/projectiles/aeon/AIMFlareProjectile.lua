@@ -20,11 +20,12 @@
 --** SOFTWARE.
 --**********************************************************************************
 
+local Flare = import("/lua/defaultantiprojectile.lua").Flare
+local EffectTemplate = import("/lua/effecttemplates.lua")
+
 local EmitterProjectile = import("/lua/sim/defaultprojectiles.lua").EmitterProjectile
 local EmitterProjectileOnCreate = EmitterProjectile.OnCreate
 local EmitterProjectileOnDestroy = EmitterProjectile.OnDestroy
-local Flare = import("/lua/defaultantiprojectile.lua").Flare
-local EffectTemplate = import("/lua/effecttemplates.lua")
 
 -- upvalue scope for performance
 local IsEnemy = IsEnemy
@@ -35,6 +36,7 @@ local FlareCategories = categories.TACTICAL + categories.MISSILE
 
 --- AEON FLARE PROJECTILES
 ---@class AIMFlareProjectile : EmitterProjectile
+---@field RedirectedMissiles number
 AIMFlareProjectile = ClassProjectile(EmitterProjectile) {
     FxTrails = EffectTemplate.AAntiMissileFlare,
     FxTrailScale = 1.0,
@@ -55,7 +57,13 @@ AIMFlareProjectile = ClassProjectile(EmitterProjectile) {
         EmitterProjectileOnCreate(self, inWater)
         self.RedirectedMissiles = 0
 
+        -- missiles that hit the flare are immediately neutralized
         self:SetCollisionShape('Sphere', 0, 0, 0, 1.0)
+
+        -- Create several flares of different sizes. A collision check is done when an entity enters the
+        -- collision box of another entity. As long as the entity remains inside no additional checks
+        -- are done. Therefore we create several flares of different sizes to catch missiles that are
+        -- far out and close by.
 
         local flareSpecs = {
             Radius = 10,
@@ -63,13 +71,11 @@ AIMFlareProjectile = ClassProjectile(EmitterProjectile) {
             Category = "MISSILE TACTICAL",
         }
 
-        local flares = {}
+        local trash = self.Trash
         for k = 1, 3 do
             flareSpecs.Radius = 8 + k * 5
-            flares[k] = self.Trash:Add(Flare(flareSpecs))
+            trash:Add(Flare(flareSpecs))
         end
-
-        self.Flares = flares
     end,
 
     ---@param self AIMFlareProjectile
@@ -87,8 +93,7 @@ AIMFlareProjectile = ClassProjectile(EmitterProjectile) {
     ---@param other Projectile
     ---@return boolean
     OnCollisionCheck = function(self, other)
-        -- nullify damage amount when it hits the flare. We do this to prevent projectiles
-        -- damaging the unit that fired the flare, as if it 'encapsulates' the damage
+        -- flat out destroy the tactical missile when we get in contact with it
         if EntityCategoryContains(FlareCategories, other) and
             IsEnemy(self.Army, other.Army)
         then

@@ -23,7 +23,6 @@
 local AIMFlareProjectile = import("/lua/aeonprojectiles.lua").AIMFlareProjectile
 
 ---@class AIMAntiMissile01 : AIMFlareProjectile
----@field RedirectedMissiles number
 AIMAntiMissile01 = ClassProjectile(AIMFlareProjectile) {}
 
 TypeClass = AIMAntiMissile01
