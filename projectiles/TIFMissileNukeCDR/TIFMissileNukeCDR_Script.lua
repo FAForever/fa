@@ -55,8 +55,8 @@ TIFMissileNukeCDR = ClassProjectile(TIFMissileNuke, TacticalMissileComponent) {
     end,
 
     ---@param self TIFMissileNukeCDR
-    OnEnterWater = function(self)
-        TIFMissileNuke.OnEnterWater(self)
+    OnExitWater = function(self)
+        TIFMissileNuke.OnExitWater(self)
         self:SetDestroyOnWater(true)
     end,
 }

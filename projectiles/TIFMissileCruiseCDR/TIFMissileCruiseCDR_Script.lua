@@ -61,8 +61,8 @@ TIFMissileCruiseCDR = ClassProjectile(TMissileCruiseProjectile) {
     end,
 
     ---@param self TIFMissileCruiseCDR
-    OnEnterWater = function(self)
-        TMissileCruiseProjectile.OnEnterWater(self)
+    OnExitWater = function(self)
+        TMissileCruiseProjectile.OnExitWater(self)
         self:SetDestroyOnWater(true)
     end,
 }

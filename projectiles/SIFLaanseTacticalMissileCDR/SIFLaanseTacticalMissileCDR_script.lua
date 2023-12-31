@@ -44,6 +44,12 @@ SIFLaanseTacticalMissileCDR = ClassProjectile(SLaanseTacticalMissile, TacticalMi
         SLaanseTacticalMissile.OnCreate(self)
         self.MoveThread = self.Trash:Add(ForkThread(self.MovementThread,self))
     end,
+
+    ---@param self SIFLaanseTacticalMissileCDR
+    OnExitWater = function(self)
+        SLaanseTacticalMissile.OnExitWater(self)
+        self:SetDestroyOnWater(true)
+    end,
 }
 TypeClass = SIFLaanseTacticalMissileCDR
 
