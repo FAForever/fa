@@ -924,8 +924,8 @@ options = {
                 custom = {
                     states = {
                         { text = "<LOC _Off>Off", key = 1.0 },
-                        { text = "<LOC strat_icon_scale-1.5x>1.5x (may cause distortions)", key = 1.5 },
-                        { text = "<LOC strat_icon_scale-2.0x>2.0x (no distortions)", key = 2.0 },
+                        { text = "<LOC strat_icon_scale-150>150% (may cause distortions)", key = 1.5 },
+                        { text = "<LOC strat_icon_scale-200>200%", key = 2.0 },
                     },
                 },
             },
