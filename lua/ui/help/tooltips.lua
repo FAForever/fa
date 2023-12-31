@@ -636,7 +636,7 @@ Tooltips = {
     },
     options_strat_icon_scale = {
         title = "<LOC OPTIONS_STRATEGIC_ICON_SCALE_TITLE>Scale strategic icons",
-        description = "<LOC OPTIONS_STRATEGIC_ICON_SCALE_DESCRIPTION>Increase the size of strategic icons. Also scales the pause and stun icons. Can be useful on monitors with a high pixel density. \r\n\r\n1.0x: the default scale.\r\n1.5x: may distort the strategic icons slightly.\r\n2.0x: does not distort the strategic icons, but the strategic icons can be quite large even on a minotor with a high pixel density. ",
+        description = "<LOC OPTIONS_STRATEGIC_ICON_SCALE_DESCRIPTION>Increase the size of strategic icons. Also scales the pause and stun icons. Can be useful on monitors with a high pixel density. \r\n\r\n100%: the default scale.\r\n150%: may distort the strategic icons slightly.\r\n200%: does not distort the strategic icons, but the strategic icons can be quite large even on a minotor with a high pixel density. ",
     },
     options_camera_shake_intensity = {
         title = "<LOC OPTIONS_CAMERA_SHAKE_TITLE>Adjust shake intensity of camera",
