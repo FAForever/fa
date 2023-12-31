@@ -24,7 +24,7 @@
 local SLaanseTacticalMissile = import("/lua/seraphimprojectiles.lua").SLaanseTacticalMissile
 local TacticalMissileComponent = import('/lua/sim/DefaultProjectiles.lua').TacticalMissileComponent
 
---- Used by the ACU
+--- Used by xsl0301
 ---@class SIFLaanseTacticalMissileSCU : SLaanseTacticalMissile, TacticalMissileComponent
 SIFLaanseTacticalMissileSCU = ClassProjectile(SLaanseTacticalMissile, TacticalMissileComponent) {
 
@@ -51,5 +51,4 @@ SIFLaanseTacticalMissileSCU = ClassProjectile(SLaanseTacticalMissile, TacticalMi
         self:SetDestroyOnWater(true)
     end,
 }
-
 TypeClass = SIFLaanseTacticalMissileSCU

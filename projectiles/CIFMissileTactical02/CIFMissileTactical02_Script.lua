@@ -12,7 +12,7 @@ CIFMissileTactical02 = ClassProjectile(CLOATacticalMissileProjectile) {
     ---@param self CIFMissileTactical02
     OnCreate = function(self)
         CLOATacticalMissileProjectile.OnCreate(self)
-        self.MoveThread = self.Trash:Add(ForkThread( self.MovementThread,self ))
+        self.MoveThread = self.Trash:Add(ForkThread(self.MovementThread, self))
     end,
 
     ---@param self CIFMissileTactical02

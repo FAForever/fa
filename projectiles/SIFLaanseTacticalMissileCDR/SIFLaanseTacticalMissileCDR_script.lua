@@ -24,7 +24,7 @@
 local SLaanseTacticalMissile = import("/lua/seraphimprojectiles.lua").SLaanseTacticalMissile
 local TacticalMissileComponent = import('/lua/sim/DefaultProjectiles.lua').TacticalMissileComponent
 
---- Used by the ACU
+--- Used by xsl0001
 ---@class SIFLaanseTacticalMissileCDR : SLaanseTacticalMissile, TacticalMissileComponent
 SIFLaanseTacticalMissileCDR = ClassProjectile(SLaanseTacticalMissile, TacticalMissileComponent) {
 
@@ -42,7 +42,7 @@ SIFLaanseTacticalMissileCDR = ClassProjectile(SLaanseTacticalMissile, TacticalMi
     ---@param self SIFLaanseTacticalMissileCDR
     OnCreate = function(self)
         SLaanseTacticalMissile.OnCreate(self)
-        self.MoveThread = self.Trash:Add(ForkThread(self.MovementThread,self))
+        self.MoveThread = self.Trash:Add(ForkThread(self.MovementThread, self))
     end,
 
     ---@param self SIFLaanseTacticalMissileCDR
