@@ -43,6 +43,13 @@ SIFLaanseTacticalMissileSCU = ClassProjectile(SLaanseTacticalMissile, TacticalMi
     OnCreate = function(self)
         SLaanseTacticalMissile.OnCreate(self)
         self.MoveThread = self.Trash:Add(ForkThread(self.MovementThread, self))
+        self.Trash:Add(ForkThread(self.UpdateThread, self))
+    end,
+
+    ---@param self SIFLaanseTacticalMissileCDR
+    UpdateThread = function(self) 
+        WaitTicks(12)
+        self:SetDestroyOnWater(true)
     end,
 
     ---@param self SIFLaanseTacticalMissileSCU
