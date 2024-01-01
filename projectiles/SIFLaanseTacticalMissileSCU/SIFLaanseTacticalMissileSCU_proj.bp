@@ -51,10 +51,10 @@ ProjectileBlueprint {
         HelpText = 0,
     },
     Physics = {
-        Acceleration = 3,
+        Acceleration = 5,
         DestroyOnWater = false,
-        InitialSpeed = 3,
-        MaxSpeed = 12,
+        InitialSpeed = 5,
+        MaxSpeed = 20,
         RotationalVelocity = 0,
         RotationalVelocityRange = 0,
         TrackTarget = true,

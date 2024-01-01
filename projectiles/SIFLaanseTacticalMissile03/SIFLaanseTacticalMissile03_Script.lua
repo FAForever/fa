@@ -38,6 +38,9 @@ SIFLaanseTacticalMissile03 = ClassProjectile(SLaanseTacticalMissile, TacticalMis
     FinalBoostAngle = 30,
     FinalBoostAngleRange = 0,
 
+    MinSpeed = 20,
+    DistancePerSpeed = 1,
+
     ---@param self SIFLaanseTacticalMissile03
     OnCreate = function(self)
         SLaanseTacticalMissile.OnCreate(self)

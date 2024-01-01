@@ -13,6 +13,7 @@ local EmitterProjectile = DefaultProjectileFile.EmitterProjectile
 local util = import("/lua/utilities.lua")
 local RandomInt = util.GetRandomInt
 local NukeProjectile = DefaultProjectileFile.NukeProjectile
+local TacticalMissileComponent = import('/lua/sim/defaultprojectiles.lua').TacticalMissileComponent
 
 ---  SERAPHIM ANTI-NUKE PROJECTILES
 ---@class SIFHuAntiNuke : SinglePolyTrailProjectile
@@ -212,7 +213,9 @@ SHeavyQuarnonCannon = ClassProjectile(MultiPolyTrailProjectile) {
 ---  SERAPHIM LAANSE TACTICAL MISSILE
 --- ACU / SACU / TML / MML
 ---@class SLaanseTacticalMissile : SinglePolyTrailProjectile
-SLaanseTacticalMissile = ClassProjectile(SinglePolyTrailProjectile) {
+---@field MinSpeed number -- If present, the missile will slow down to this speed as it gets close to the target.
+---@field DistancePerSpeed number -- Higher values slow the missile down earlier.
+SLaanseTacticalMissile = ClassProjectile(SinglePolyTrailProjectile, TacticalMissileComponent) {
     FxImpactLand = EffectTemplate.SLaanseMissleHit,
     FxImpactWater = EffectTemplate.SLaanseMissleHitWater,
     FxImpactProp = EffectTemplate.SLaanseMissleHitUnit,
@@ -228,12 +231,37 @@ SLaanseTacticalMissile = ClassProjectile(SinglePolyTrailProjectile) {
     FxTrails = EffectTemplate.SLaanseMissleExhaust02,
     PolyTrail = EffectTemplate.SLaanseMissleExhaust01,
 
+    MinSpeed = nil,
+    DistancePerSpeed = 2.5,
+
     ---@param self SLaanseTacticalMissile
     OnCreate = function(self)
         SinglePolyTrailProjectile.OnCreate(self)
         local blueprintPhysics = self.Blueprint.Physics
         local radius = 0.105 * (blueprintPhysics.MaxSpeed + blueprintPhysics.MaxSpeedRange)
         self:SetCollisionShape('Sphere', 0, 0, 0, radius)
+        if self.MinSpeed then
+            self.Trash:Add(self:ForkThread(self.SpeedUpdateThread, self.DistancePerSpeed, blueprintPhysics.MaxSpeed, self.MinSpeed))
+        end
+    end,
+
+    ---@param self SLaanseTacticalMissile
+    ---@param distancePerSpeed number
+    ---@param maxSpeed number
+    ---@param minSpeed number
+    SpeedUpdateThread = function(self, distancePerSpeed, maxSpeed, minSpeed)
+        local distance = self:DistanceToTarget()
+        self:SetMaxSpeed(math.clamp(self:DistanceToTarget()/distancePerSpeed, minSpeed, maxSpeed))
+        while distance > maxSpeed * distancePerSpeed do
+            WaitTicks(4)
+            distance = self:DistanceToTarget()
+        end
+        while distance > minSpeed * distancePerSpeed do
+            self:SetMaxSpeed(math.clamp(self:DistanceToTarget()/distancePerSpeed, minSpeed, maxSpeed))
+            distance = self:DistanceToTarget()
+            WaitTicks(2)
+        end
+        self:SetMaxSpeed(minSpeed)
     end,
 
     ---@param self SLaanseTacticalMissile
