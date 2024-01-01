@@ -4,6 +4,8 @@ local AMissileSerpentineProjectile = import("/lua/aeonprojectiles.lua").AMissile
 ---@class AIFMissileSerpentine01: AMissileSerpentineProjectile
 AIFMissileSerpentine01 = ClassProjectile(AMissileSerpentineProjectile) {
 
+    HeightDistanceFactor = 10,
+
     ---@param self AIFMissileSerpentine01
     OnCreate = function(self)
         AMissileSerpentineProjectile.OnCreate(self)
