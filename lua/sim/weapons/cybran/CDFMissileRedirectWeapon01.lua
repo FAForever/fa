@@ -1,118 +1,121 @@
+local DefaultProjectileWeapon = import("/lua/sim/defaultweapons.lua").DefaultProjectileWeapon
+local DefaultProjectileWeaponOnCreate = DefaultProjectileWeapon.OnCreate
+local DefaultProjectileWeaponCreateProjectileAtMuzzle = DefaultProjectileWeapon.CreateProjectileAtMuzzle
 
-local Weapon = import("/lua/sim/weapon.lua").Weapon
-local WeaponOnCreate = Weapon.OnCreate
-local WeaponOnGotTarget = Weapon.OnGotTarget
+---@class CDFMissileRedirectWeapon : DefaultProjectileWeapon
+---@field RedirectTrash TrashBag
+CDFMissileRedirectWeapon01 = ClassWeapon(DefaultProjectileWeapon) {
 
-local ProjectileDetector = import("/lua/sim/entities/ProjectileDetector.lua").ProjectileDetector
+    RedirectBeams = { '/effects/emitters/particle_cannon_beam_02_emit.bp' },
+    EndPointEffects = { '/effects/emitters/particle_cannon_end_01_emit.bp' },
 
----@class CDFMissileRedirectWeapon : Weapon
-CDFMissileRedirectWeapon01 = ClassWeapon(Weapon) {
-
-    ---@param self CDFMissileRedirectWeapon
     OnCreate = function(self)
-        WeaponOnCreate(self)
-        LOG("Hellooo")
+        DefaultProjectileWeaponOnCreate(self)
 
-        local projectileDetector = ProjectileDetector({Owner = self.unit, Weapon = self, Radius = 8, Bone = 'Turret_Muzzle'})
-        self.Trash:Add(projectileDetector)
+        self.RedirectTrash = TrashBag()
     end,
 
     ---@param self CDFMissileRedirectWeapon
-    ---@param projectile Projectile
-    OnProjectileDetected = function(self, projectile)
-        -- already being redirected, bail out
+    ---@param muzzle Bone
+    ---@return Projectile
+    CreateProjectileAtMuzzle = function(self, muzzle)
+        local projectile = self:GetCurrentTarget() --[[@as Projectile]]
         if projectile.IsRedirected then
-            return
+            return nil
         end
 
-        -- allied projectile, bail out
-        if IsAlly(self.Army, projectile.Army) then
-            return
-        end
-
-        -- invalid projectile, bail out
-        if not EntityCategoryContains(categories.MISSILE - categories.STRATEGIC, projectile) then
-            return
-        end
+        projectile.IsRedirected = true
 
         -- find all interesting properties
         local pvx, pvy, pvz = projectile:GetVelocity()
+        local projectileSpeed = projectile:GetCurrentSpeed()
         local projectilePosition = projectile:GetPosition()
         local projectileOrientation = projectile:GetOrientation()
         local projectileLauncher = projectile:GetLauncher() --[[@as Unit]]
         local projectileBlueprintId = projectile.Blueprint.BlueprintId
 
+        -- destroy the original projectile
         projectile:Destroy()
 
-        -- create a new projectile
-        self:ChangeProjectileBlueprint('/projectiles/SIFLaanseTacticalMissile01/SIFLaanseTacticalMissile01_proj.bp')
-        local redirected = self:CreateProjectile('Turret_Muzzle')
-        
-        -- populate the projectile
+        -- change the projectile we produce
+        self:ChangeProjectileBlueprint(projectileBlueprintId)
+
+        -- create the projectile like usual
+        local redirected = DefaultProjectileWeaponCreateProjectileAtMuzzle(self, muzzle)
+
+        -- take out any existing movement threads
+        if redirected.MoveThread then
+            KillThread(redirected.MoveThread)
+            redirected.MoveThread = nil
+        end
+
+        -- match the redirected projectile with the original projectile
         redirected.DamageData = projectile.DamageData
-        redirected:SetLifetime(30)
-        redirected:SetCollideEntity(false)
-        redirected:SetCollideSurface(false)
-        redirected:SetTurnRate(160)
         redirected:SetVelocity(pvx, pvy, pvz)
+        redirected:SetVelocity(10 * projectileSpeed)
         redirected:SetPosition(projectilePosition, true)
         redirected:SetOrientation(projectileOrientation, true)
 
-        -- point it somewhere
-        redirected:SetNewTargetGround({
-            projectilePosition[1] + (2 - 4 * Random()),
-            projectilePosition[2] + 6,
-            projectilePosition[3] + (2 - 4 * Random())
-        })
-        redirected:TrackTarget(true)
-
-        -- redirect it
-        self.Trash:Add(ForkThread(self.RedirectProjectileThread, self, redirected, projectileLauncher))
+        -- redirect behavior
+        self.Trash:Add(ForkThread(self.RedirectBehaviorThread, self, redirected, projectileLauncher))
+        self.Trash:Add(ForkThread(self.RedirectEffectThread, self, redirected, muzzle))
     end,
 
     ---@param self CDFMissileRedirectWeapon
     ---@param redirected Projectile
     ---@param launcher Unit
-    RedirectProjectileThread = function(self, redirected, launcher)
-        -- check after we created the fork thread
+    RedirectBehaviorThread = function(self, redirected, launcher)
         if IsDestroyed(redirected) then
-            LOG("Destroyed!")
             return
         end
 
+        -- rotate towards the sky
+        local position = redirected:GetPosition()
+        redirected:SetLifetime(30)
+        redirected:SetTurnRate(160)
         redirected:SetNewTargetGround({
-            0,
-            1000,
-            0
+            position[1] + (2 - 4 * Random()),
+            position[2] + 12,
+            position[3] + (2 - 4 * Random())
         })
 
-        WaitTicks(4)
+        WaitTicks(10)
 
-        -- check after we created the fork thread
         if IsDestroyed(redirected) then
-            LOG("Destroyed!")
             return
         end
 
-        redirected:SetCollideEntity(true)
-        redirected:SetCollideSurface(true)
-
-        -- if the launcher still exists then we target that
+        -- try to mimic the movement thread of the original missile
         if not IsDestroyed(launcher) then
             redirected.OriginalTarget = launcher
             redirected:OnTrackTargetGround()
-            
-            local movementThread = redirected.MovementThread
-            if movementThread then
-                redirected.MoveThread = redirected.Trash:Add(ForkThread(redirected.MovementThread, redirected))
-            end
-        -- otherwise we destroy the projectile
+            redirected:SetTurnRate(0)
+            redirected.MoveThread = redirected.Trash:Add(ForkThread(redirected.MovementThread, redirected, true))
+            -- otherwise we destroy the projectile
         else
             Damage(nil, position, redirected, 200, "Normal")
         end
     end,
 
-    OnFire = function(self)
-        LOG("OnFire")
+    ---@param self CDFMissileRedirectWeapon
+    ---@param redirected Projectile
+    ---@param muzzle Bone
+    RedirectEffectThread = function(self, redirected, muzzle)
+
+        local army = self.Army
+        local owner = self.unit
+        local trash = self.RedirectTrash
+
+        for k, beam in self.RedirectBeams do
+            trash:Add(AttachBeamEntityToEntity(redirected, -1, owner, muzzle, army, beam))
+        end
+
+        for k, effect in self.EndPointEffects do
+            trash:Add(CreateAttachedEmitter(redirected, -1, army, effect))
+        end
+
+        WaitTicks(14)
+
+        trash:Destroy()
     end,
 }

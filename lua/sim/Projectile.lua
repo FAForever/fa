@@ -120,8 +120,6 @@ Projectile = ClassProjectile(ProjectileMethods) {
     ---@param self Projectile The projectile that we're creating
     ---@param inWater? boolean Flag to indicate the projectile is in water or not
     OnCreate = function(self, inWater)
-        LOG(string.format("OnCreate: %s", self:GetBlueprint().BlueprintId))
-
         local blueprint = self:GetBlueprint() --[[@as ProjectileBlueprint]]
 
         self.Blueprint = blueprint
@@ -180,7 +178,6 @@ Projectile = ClassProjectile(ProjectileMethods) {
             local pos = self:GetCurrentTargetPosition()
             pos[2] = GetSurfaceHeight(pos[1], pos[3])
             self:SetNewTargetGround(pos)
-            LOG("SetNewTargetGround in Projectile")
         end
     end,
 
@@ -189,8 +186,6 @@ Projectile = ClassProjectile(ProjectileMethods) {
     ---@param other Projectile The projectile we're checking the collision with
     ---@return boolean
     OnCollisionCheck = function(self, other)
-        LOG(string.format("OnCollisionCheck: %s", self:GetBlueprint().BlueprintId))
-
         -- we can't hit our own
         if self.Army == other.Army then
             return false
@@ -219,8 +214,6 @@ Projectile = ClassProjectile(ProjectileMethods) {
                 return false
             end
         end
-
-        LOG(alliedCheck)
 
         -- enemies always hit
         return alliedCheck
@@ -273,13 +266,6 @@ Projectile = ClassProjectile(ProjectileMethods) {
     --- Called by the engine when the projectile is destroyed
     ---@param self Projectile
     OnDestroy = function(self)
-        LOG(string.format("OnDestroy: %s", self:GetBlueprint().BlueprintId))
-        -- local size = debug.allocatedsize(self)
-        -- if size > 200 then
-        --     LOG(debug.allocatedsize(self))
-        --     LOG(table.getsize(self))
-        --     reprsl(self)
-        -- end
         local trash = self.Trash
         if trash then
             trash:Destroy()

@@ -26,7 +26,7 @@ local SemiBallisticComponent = import("/lua/sim/projectiles/components/semiballi
 TacticalMissileComponent = ClassSimple(SemiBallisticComponent) {
 
     ---@param self TacticalMissileComponent | Projectile
-    MovementThread = function(self)
+    MovementThread = function(self, skipLaunchSequence)
         local blueprintPhysics = self.Blueprint.Physics
 
         -- are we a wiggler?
@@ -36,21 +36,21 @@ TacticalMissileComponent = ClassSimple(SemiBallisticComponent) {
             zigZagger = true
         end
 
-        -- launch
-        local launchTurnRateRange = self.LaunchTurnRateRange
-        local launchTurnRate = self.LaunchTurnRate + launchTurnRateRange * (2 * Random() - 1)
-        self:SetTurnRate(launchTurnRate)
+        if not skipLaunchSequence then
+            local launchTurnRateRange = self.LaunchTurnRateRange
+            local launchTurnRate = self.LaunchTurnRate + launchTurnRateRange * (2 * Random() - 1)
+            self:SetTurnRate(launchTurnRate)
 
-        local launchTicksRange = self.LaunchTicksRange
-        local launchTicks = self.LaunchTicks + Random(-launchTicksRange, launchTicksRange)
-        WaitTicks(launchTicks)
+            local launchTicksRange = self.LaunchTicksRange
+            local launchTicks = self.LaunchTicks + Random(-launchTicksRange, launchTicksRange)
+            WaitTicks(launchTicks)
+        end
 
         -- boost
         local boostTurnRate, boostTime = self:TurnRateFromAngleAndHeight()
         if boostTime < 0 then
-            return
+            boostTime = 0
         end
-
 
         self:SetTurnRate(boostTurnRate)
         WaitTicks(boostTime * 10 + 1)
