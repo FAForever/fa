@@ -54,7 +54,9 @@ function Projectile:GetTrackingTarget()
 end
 
 ---
----@return Vector
+---@return number
+---@return number
+---@return number
 function Projectile:GetVelocity()
 end
 

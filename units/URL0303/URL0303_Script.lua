@@ -10,6 +10,7 @@ local GetTrueEnemyUnitsInSphere = import("/lua/utilities.lua").GetTrueEnemyUnits
 local cWeapons = import("/lua/cybranweapons.lua")
 local CDFLaserDisintegratorWeapon = cWeapons.CDFLaserDisintegratorWeapon01
 local CDFElectronBolterWeapon = cWeapons.CDFElectronBolterWeapon
+local CDFMissileRedirectWeapon01 = import("/lua/sim/weapons/cybran/CDFMissileRedirectWeapon01.lua").CDFMissileRedirectWeapon01
 local MissileRedirect = import("/lua/defaultantiprojectile.lua").MissileRedirect
 
 ---@class URL0303 : CWalkingLandUnit
@@ -19,21 +20,8 @@ URL0303 = ClassUnit(CWalkingLandUnit) {
     Weapons = {
         Disintigrator = ClassWeapon(CDFLaserDisintegratorWeapon) {},
         HeavyBolter = ClassWeapon(CDFElectronBolterWeapon) {},
+        RedirectMissile = ClassWeapon(CDFMissileRedirectWeapon01) {},
     },
-
-    OnStopBeingBuilt = function(self, builder, layer)
-        CWalkingLandUnit.OnStopBeingBuilt(self, builder, layer)
-        local bp = self.Blueprint.Defense.AntiMissile
-        local antiMissile = MissileRedirect {
-            Owner = self,
-            Radius = bp.Radius,
-            AttachBone = bp.AttachBone,
-            RedirectRateOfFire = bp.RedirectRateOfFire
-        }
-        self.Trash:Add(antiMissile)
-        self.ChargingInitiated = false
-        self.ChargingInProgress = false
-    end,
 
     OnKilled = function(self, instigator, type, overkillRatio)
         CWalkingLandUnit.OnKilled(self, instigator, type, overkillRatio)

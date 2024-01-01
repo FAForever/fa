@@ -1,4 +1,3 @@
-
 --******************************************************************************************************
 --** Copyright (c) 2023  clyf
 --**
@@ -48,7 +47,12 @@ TacticalMissileComponent = ClassSimple(SemiBallisticComponent) {
 
         -- boost
         local boostTurnRate, boostTime = self:TurnRateFromAngleAndHeight()
-        self:SetTurnRate(boostTurnRate)       
+        if boostTime < 0 then
+            return
+        end
+
+
+        self:SetTurnRate(boostTurnRate)
         WaitTicks(boostTime * 10 + 1)
 
         -- glide

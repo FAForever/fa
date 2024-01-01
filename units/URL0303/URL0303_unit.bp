@@ -1,11 +1,11 @@
-UnitBlueprint{
+UnitBlueprint {
     Description = "<LOC url0303_desc>Siege Assault Bot",
     Audio = {
-        AmbientMove = Sound { Bank = 'URL',       Cue = 'URL0303_Move_Loop',  LodCutoff = 'UnitMove_LodCutoff' },
-        Killed      = Sound { Bank = 'URLWeapon', Cue = 'URL0303_Death_EMP',  LodCutoff = 'UnitMove_LodCutoff' },
-        StartMove   = Sound { Bank = 'URL',       Cue = 'URL0303_Move_Start', LodCutoff = 'UnitMove_LodCutoff' },
-        StopMove    = Sound { Bank = 'URL',       Cue = 'URL0303_Move_Stop',  LodCutoff = 'UnitMove_LodCutoff' },
-        UISelection = Sound { Bank = 'Interface', Cue = 'Cybran_Select_Bot',  LodCutoff = 'UnitMove_LodCutoff' },
+        AmbientMove = Sound { Bank = 'URL', Cue = 'URL0303_Move_Loop', LodCutoff = 'UnitMove_LodCutoff' },
+        Killed      = Sound { Bank = 'URLWeapon', Cue = 'URL0303_Death_EMP', LodCutoff = 'UnitMove_LodCutoff' },
+        StartMove   = Sound { Bank = 'URL', Cue = 'URL0303_Move_Start', LodCutoff = 'UnitMove_LodCutoff' },
+        StopMove    = Sound { Bank = 'URL', Cue = 'URL0303_Move_Stop', LodCutoff = 'UnitMove_LodCutoff' },
+        UISelection = Sound { Bank = 'Interface', Cue = 'Cybran_Select_Bot', LodCutoff = 'UnitMove_LodCutoff' },
     },
     BuildIconSortPriority = 20,
     Categories = {
@@ -206,8 +206,10 @@ UnitBlueprint{
         {
             AboveWaterTargetsOnly = true,
             Audio = {
-                Fire              = Sound { Bank = 'URLWeapon', Cue = 'URL0303_Disintegrator',        LodCutoff = 'Weapon_LodCutoff' },
-                MuzzleChargeStart = Sound { Bank = 'URLWeapon', Cue = 'URL0303_Disintegrator_Charge', LodCutoff = 'Weapon_LodCutoff' },
+                Fire              = Sound { Bank = 'URLWeapon', Cue = 'URL0303_Disintegrator',
+                    LodCutoff = 'Weapon_LodCutoff' },
+                MuzzleChargeStart = Sound { Bank = 'URLWeapon', Cue = 'URL0303_Disintegrator_Charge',
+                    LodCutoff = 'Weapon_LodCutoff' },
             },
             BallisticArc = "RULEUBA_LowArc",
             Buffs = {
@@ -340,6 +342,49 @@ UnitBlueprint{
             Turreted = true,
             UseFiringSolutionInsteadOfAimBone = true,
             WeaponCategory = "Direct Fire",
+        },
+        {
+            AboveWaterTargetsOnly = true,
+            BallisticArc = 'RULEUBA_None',
+            Damage = 0,
+            DisplayName = 'Zapper Anti Missile',
+            FireTargetLayerCapsTable = {
+                Land = 'Air',
+                Water = 'Air',
+            },
+            NotExclusive = true,
+            ManualFire = true,
+            FiringTolerance = 0.5,
+            Label = 'RedirectMissile',
+            MaxRadius = 10,
+            MuzzleSalvoSize = 1,
+            RackBones = {
+                {
+                    MuzzleBones = {
+                        'Turret_Muzzle',
+                    },
+                    RackBone = 'Turret_Muzzle',
+                },
+            },
+            RackSalvoSize = 1,
+            RateOfFire = 10,
+            TargetCheckInterval = 5,
+            TargetRestrictDisallow = 'UNTARGETABLE',
+            TargetRestrictOnlyAllow = 'TACTICAL MISSILE',
+            TargetType = 'RULEWTT_Projectile',
+            TrackingRadius = 2,
+            TurretBoneMuzzle = 'Turret_Muzzle',
+            TurretBonePitch = 'Turret_Muzzle',
+            TurretBoneYaw = 'Turret',
+            TurretPitch = 0,
+            TurretPitchRange = 90,
+            TurretPitchSpeed = 180,
+            TurretYaw = 0,
+            TurretYawRange = 180,
+            TurretYawSpeed = 720,
+            Turreted = true,
+            WeaponCategory = 'Defense',
+            WeaponUnpacks = false,
         },
     },
     Wreckage = {
