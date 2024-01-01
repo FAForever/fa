@@ -1041,7 +1041,7 @@ UnitBlueprint {
             BallisticArc = "RULEUBA_None",
             CollideFriendly = false,
             CountedProjectile = true,
-            Damage = 12000,
+            Damage = 12500,
             DamageFriendly = true,
             DamageRadius = 25,
             DamageType = "Nuke",
