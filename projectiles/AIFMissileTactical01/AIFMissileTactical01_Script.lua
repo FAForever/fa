@@ -1,6 +1,6 @@
 local AMissileSerpentineProjectile = import("/lua/aeonprojectiles.lua").AMissileSerpentineProjectile
 
---- Aeon Land-Based Tactical Missile
+--- Used by UAB2108 (T2 Tactical Missile Launcher)
 ---@class AIFMissileTactical01 : AMissileSerpentineProjectile
 AIFMissileTactical01 = ClassProjectile(AMissileSerpentineProjectile) {
 
