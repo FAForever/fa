@@ -27,8 +27,8 @@ TFragmentationGrenade = ClassProjectile(EmitterProjectile) {
     FxTrails = EffectTemplate.THeavyFragmentationGrenadeFxTrails,
 }
 
----@class TIFMissileNuke : NukeProjectile, SingleBeamProjectile
-TIFMissileNuke = ClassProjectile(NukeProjectile, SingleBeamProjectile) {
+---@class TIFMissileNuke : EmitterProjectile, SingleBeamProjectile
+TIFMissileNuke = ClassProjectile(EmitterProjectile, SingleBeamProjectile) {
     BeamName = '/effects/emitters/missile_exhaust_fire_beam_01_emit.bp',
 }
 
@@ -339,6 +339,8 @@ TMissileProjectile = ClassProjectile(SingleBeamProjectile, TacticalMissileCompon
         local blueprintPhysics = self.Blueprint.Physics
         local radius = 0.105 * (blueprintPhysics.MaxSpeed + blueprintPhysics.MaxSpeedRange)
         self:SetCollisionShape('Sphere', 0, 0, 0, radius)
+
+        self.MoveThread = self.Trash:Add(ForkThread(self.MovementThread, self))
     end,
 
     ---@param self TMissileProjectile
