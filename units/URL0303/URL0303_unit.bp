@@ -345,9 +345,6 @@ UnitBlueprint {
         },
         {
             TargetCheckInterval = 0.1,
-            Audio = {
-                Fire = Sound { Bank = 'UELWeapon', Cue = 'UEB4201_Phalanx_01', LodCutoff = 'Weapon_LodCutoff' },
-            },
             AboveWaterTargetsOnly = true,
             BallisticArc = 'RULEUBA_None',
             Damage = 0,
