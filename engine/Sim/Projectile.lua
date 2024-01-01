@@ -33,8 +33,8 @@ end
 function Projectile:CreateChildProjectile(blueprint)
 end
 
----
----@return number
+--- Returns the speed over ticks instead of over seconds. Multiply by 10 to get the (usually) expected speed value
+---@return number 
 function Projectile:GetCurrentSpeed()
 end
 

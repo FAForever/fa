@@ -1,6 +1,40 @@
+--**********************************************************************************
+--** Copyright (c) 2023 FAForever
+--**
+--** Permission is hereby granted, free of charge, to any person obtaining a copy
+--** of this software and associated documentation files (the "Software"), to deal
+--** in the Software without restriction, including without limitation the rights
+--** to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+--** copies of the Software, and to permit persons to whom the Software is
+--** furnished to do so, subject to the following conditions:
+--**
+--** The above copyright notice and this permission notice shall be included in all
+--** copies or substantial portions of the Software.
+--**
+--** THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+--** IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+--** FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+--** AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+--** LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+--** OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+--** SOFTWARE.
+--**********************************************************************************
+
 local DefaultProjectileWeapon = import("/lua/sim/defaultweapons.lua").DefaultProjectileWeapon
 local DefaultProjectileWeaponOnCreate = DefaultProjectileWeapon.OnCreate
 local DefaultProjectileWeaponCreateProjectileAtMuzzle = DefaultProjectileWeapon.CreateProjectileAtMuzzle
+
+-- upvalue scope for performance
+local Damage = Damage
+local Random = Random
+local TrashBag = TrashBag
+local WaitTicks = WaitTicks
+local KillThread = KillThread
+local ForkThread = ForkThread
+local IsDestroyed = IsDestroyed
+local AttachBeamEntityToEntity = AttachBeamEntityToEntity
+local CreateAttachedEmitter = CreateAttachedEmitter
+
 
 ---@class CDFMissileRedirectWeapon : DefaultProjectileWeapon
 ---@field RedirectTrash TrashBag
@@ -9,15 +43,15 @@ CDFMissileRedirectWeapon01 = ClassWeapon(DefaultProjectileWeapon) {
     RedirectBeams = { '/effects/emitters/particle_cannon_beam_02_emit.bp' },
     EndPointEffects = { '/effects/emitters/particle_cannon_end_01_emit.bp' },
 
+    ---@param self CDFMissileRedirectWeapon
     OnCreate = function(self)
         DefaultProjectileWeaponOnCreate(self)
-
         self.RedirectTrash = TrashBag()
     end,
 
     ---@param self CDFMissileRedirectWeapon
     ---@param muzzle Bone
-    ---@return Projectile
+    ---@return Projectile?
     CreateProjectileAtMuzzle = function(self, muzzle)
         local projectile = self:GetCurrentTarget() --[[@as Projectile]]
         if projectile.IsRedirected then
@@ -89,8 +123,15 @@ CDFMissileRedirectWeapon01 = ClassWeapon(DefaultProjectileWeapon) {
         if not IsDestroyed(launcher) then
             redirected.OriginalTarget = launcher
             redirected:OnTrackTargetGround()
-            redirected:SetTurnRate(0)
-            redirected.MoveThread = redirected.Trash:Add(ForkThread(redirected.MovementThread, redirected, true))
+
+            if redirected.MovementThread then
+                -- if it has a movement thread, use that
+                redirected:SetTurnRate(0)
+                redirected.MoveThread = redirected.Trash:Add(ForkThread(redirected.MovementThread, redirected, true))
+            else
+                -- otherwise we just wing it
+                redirected:SetTurnRate(80)
+            end
             -- otherwise we destroy the projectile
         else
             Damage(nil, position, redirected, 200, "Normal")
