@@ -45,7 +45,7 @@ SplitComponent = ClassSimple {
         end
     end,
 
-    --- Zig-zag the projectile
+    --- Zig-zag the projectile to create some diversity
     ---@param self SplitComponent | Projectile
     ---@param childProjectile Projectile
     ZigZagThread = function(self, childProjectile)
