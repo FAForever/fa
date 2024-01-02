@@ -20,7 +20,7 @@
 --** SOFTWARE.
 --******************************************************************************************************
 
-local TMissileCruiseProjectile = import("/lua/terranprojectiles.lua").TMissileCruiseProjectile
+local TIFTacticalNuke = import("/lua/terranprojectiles.lua").TIFTacticalNuke
 local EffectTemplate = import("/lua/effecttemplates.lua")
 
 local VisionMarkerOpti = import("/lua/sim/vizmarker.lua").VisionMarkerOpti
@@ -31,9 +31,9 @@ local ForkThread = ForkThread
 local DamageArea = DamageArea
 
 --- used by uel0001
----@class TIFMissileNukeCDR : TMissileCruiseProjectile
+---@class TIFMissileNukeCDR : TIFTacticalNuke
 ---@field Armed boolean
-TIFMissileNukeCDR = ClassProjectile(TMissileCruiseProjectile) {
+TIFMissileNukeCDR = ClassProjectile(TIFTacticalNuke) {
     -- BeamName = '/effects/emitters/missile_exhaust_fire_beam_01_emit.bp',
     BeamName = '/effects/emitters/missile_exhaust_fire_beam_06_emit.bp',
     InitialEffects = { '/effects/emitters/nuke_munition_launch_trail_02_emit.bp', },
@@ -54,7 +54,10 @@ TIFMissileNukeCDR = ClassProjectile(TMissileCruiseProjectile) {
 
     ---@param self TIFMissileNukeCDR
     OnCreate = function(self)
-        TMissileCruiseProjectile.OnCreate(self)
+        TIFTacticalNuke.OnCreate(self)
+        self.MoveThread = self.Trash:Add(ForkThread(self.MovementThread, self))
+        self.effectEntityPath = '/effects/Entities/UEFNukeEffectController02/UEFNukeEffectController02_proj.bp'
+        self:LauncherCallbacks()
         self.Armed = false
 
         local army = self.Army
@@ -77,7 +80,7 @@ TIFMissileNukeCDR = ClassProjectile(TMissileCruiseProjectile) {
 
     ---@param self TIFMissileNukeCDR
     OnExitWater = function(self)
-        TMissileCruiseProjectile.OnExitWater(self)
+        TIFTacticalNuke.OnExitWater(self)
         self:SetDestroyOnWater(true)
     end,
 
@@ -117,55 +120,37 @@ TIFMissileNukeCDR = ClassProjectile(TMissileCruiseProjectile) {
         local position = self:GetPosition()
 
         if self.Armed then
-
-            -- create an explosion
-            local effectController = '/effects/Entities/UEFNukeEffectController02/UEFNukeEffectController02_proj.bp'
-            self:CreateProjectile(effectController, 0, 0, 0, 0, 0, 0)
-
             -- create vision
             local marker = VisionMarkerOpti({ Owner = self })
             marker:UpdatePosition(position[1], position[3])
             marker:UpdateDuration(9)
             marker:UpdateIntel(self.Army, 12, 'Vision', true)
 
-            -- deal damage
-            local data = self.DamageData
-            local damage = data.DamageAmount
-            local radius = data.DamageRadius or 0
-            local instigator = self.Launcher or self
-            ForkThread(self.DamageThread, self, position, instigator, damage, radius)
+            TIFTacticalNuke.OnImpact(self, targetType, targetEntity)
         else
             -- default tactical explosion
             self:CreateDebris()
+            self:Destroy()
         end
-
-        self:Destroy()
     end,
 
+    --- Called by Lua to process the overriden damage logic of TIFMissileNukeCDR.
+    -- Similar to nuke damage logic, except it does not bypass shields.
+    -- @param self TIFMissileNukeCDR
+    -- @param instigator The launcher, and if it doesn't exist, the projectile itself
+    -- @param DamageData The damage data passed by the weapon
+    -- @param targetEntity The entity we hit, is nil if we hit terrain
+    -- @param cachedPosition A cached position that is passed to prevent table allocations, can not be used in fork threads and / or after a yield statement
     ---@param self TIFMissileNukeCDR
-    ---@param position Vector
-    ---@param instigator? Unit | Projectile
-    ---@param damage number
-    ---@param radius number
-    DamageThread = function(self, position, instigator, damage, radius)
-        -- knock over trees
-        DamageArea(instigator, position, 0.75 * radius, 1, 'TreeForce', true, true)
-        DamageArea(instigator, position, 0.75 * radius, 1, 'TreeForce', true, true)
-
-        -- initial damage
-        DamageArea(instigator, position, radius, 0.1 * damage, 'Normal', true, true)
-        DamageArea(instigator, position, 0.9 * radius, 1, 'TreeFire', true, true)
-
-        -- apply the remaining damage in waves
-        WaitTicks(3)
-        DamageArea(instigator, position, 0.2 * radius, 1, 'Disintegrate', true, true)
-        DamageArea(instigator, position, 0.3 * radius, 0.3 * damage, 'Normal', true, true)
-        WaitTicks(3)
-        DamageArea(instigator, position, 0.3 * radius, 1, 'Disintegrate', true, true)
-        DamageArea(instigator, position, 0.6 * radius, 0.3 * damage, 'Normal', true, true)
-        WaitTicks(3)
-        DamageArea(instigator, position, 0.4 * radius, 1, 'Disintegrate', true, true)
-        DamageArea(instigator, position, 0.9 * radius, 0.3 * damage, 'Normal', true, true)
+    ---@param instigator UEL0001 | TIFMissileNukeCDR
+    ---@param DamageData table
+    ---@param targetEntity Unit | Prop
+    ---@param cachedPosition Vector
+    DoDamage = function(self, instigator, DamageData, targetEntity, cachedPosition)
+        local InnerRing = self.InnerRing
+        local OuterRing = self.OuterRing
+        DamageArea(instigator, cachedPosition, InnerRing.Radius, InnerRing.Damage, 'Normal', true, true)
+        DamageArea(instigator, cachedPosition, OuterRing.Radius, OuterRing.Radius, 'Normal', true, true)
     end,
 }
 TypeClass = TIFMissileNukeCDR

@@ -28,12 +28,14 @@ TFragmentationGrenade = ClassProjectile(EmitterProjectile) {
 }
 
 ---@class TIFMissileNuke : EmitterProjectile, SingleBeamProjectile
-TIFMissileNuke = ClassProjectile(EmitterProjectile, SingleBeamProjectile) {
+TIFMissileNuke = ClassProjectile(NukeProjectile, SingleBeamProjectile) {
     BeamName = '/effects/emitters/missile_exhaust_fire_beam_01_emit.bp',
 }
 
 ---@class TIFTacticalNuke : EmitterProjectile
-TIFTacticalNuke = ClassProjectile(EmitterProjectile) {}
+TIFTacticalNuke = ClassProjectile(NukeProjectile, TacticalMissileComponent, DebrisComponent) {
+    MovementThread = TacticalMissileComponent.MovementThread -- Resolve conflict from base classes
+}
 
 --- UEF GINSU RAPID PULSE BEAM PROJECTILE
 ---@class TAAGinsuRapidPulseBeamProjectile : SingleBeamProjectile
