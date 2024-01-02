@@ -135,6 +135,7 @@ TIFMissileNukeCDR = ClassProjectile(TIFTacticalNuke) {
     end,
 
     --- Called by Lua to process the overriden damage logic of TIFMissileNukeCDR.
+    -- Similar to nuke damage logic, except it does not bypass shields.
     -- @param self TIFMissileNukeCDR
     -- @param instigator The launcher, and if it doesn't exist, the projectile itself
     -- @param DamageData The damage data passed by the weapon
@@ -146,33 +147,10 @@ TIFMissileNukeCDR = ClassProjectile(TIFTacticalNuke) {
     ---@param targetEntity Unit | Prop
     ---@param cachedPosition Vector
     DoDamage = function(self, instigator, DamageData, targetEntity, cachedPosition)
-        ForkThread(self.DamageThread, self, self:GetPosition(), instigator, DamageData.DamageAmount, DamageData.DamageRadius)
-    end,
-
-    ---@param self TIFMissileNukeCDR
-    ---@param position Vector
-    ---@param instigator? Unit | Projectile
-    ---@param damage number
-    ---@param radius number
-    DamageThread = function(self, position, instigator, damage, radius)
-        -- knock over trees
-        DamageArea(instigator, position, 0.75 * radius, 1, 'TreeForce', true, true)
-        DamageArea(instigator, position, 0.75 * radius, 1, 'TreeForce', true, true)
-
-        -- initial damage
-        DamageArea(instigator, position, radius, 0.1 * damage, 'Normal', true, true)
-        DamageArea(instigator, position, 0.9 * radius, 1, 'TreeFire', true, true)
-
-        -- apply the remaining damage in waves
-        WaitTicks(3)
-        DamageArea(instigator, position, 0.2 * radius, 1, 'Disintegrate', true, true)
-        DamageArea(instigator, position, 0.3 * radius, 0.3 * damage, 'Normal', true, true)
-        WaitTicks(3)
-        DamageArea(instigator, position, 0.3 * radius, 1, 'Disintegrate', true, true)
-        DamageArea(instigator, position, 0.6 * radius, 0.3 * damage, 'Normal', true, true)
-        WaitTicks(3)
-        DamageArea(instigator, position, 0.4 * radius, 1, 'Disintegrate', true, true)
-        DamageArea(instigator, position, 0.9 * radius, 0.3 * damage, 'Normal', true, true)
+        local InnerRing = self.InnerRing
+        local OuterRing = self.OuterRing
+        DamageArea(instigator, cachedPosition, InnerRing.Radius, InnerRing.Damage, 'Normal', true, true)
+        DamageArea(instigator, cachedPosition, OuterRing.Radius, OuterRing.Radius, 'Normal', true, true)
     end,
 }
 TypeClass = TIFMissileNukeCDR
