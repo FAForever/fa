@@ -120,29 +120,33 @@ TIFMissileNukeCDR = ClassProjectile(TIFTacticalNuke) {
         local position = self:GetPosition()
 
         if self.Armed then
-
-            -- create an explosion
-            local effectController = '/effects/Entities/UEFNukeEffectController02/UEFNukeEffectController02_proj.bp'
-            self:CreateProjectile(effectController, 0, 0, 0, 0, 0, 0)
-
             -- create vision
             local marker = VisionMarkerOpti({ Owner = self })
             marker:UpdatePosition(position[1], position[3])
             marker:UpdateDuration(9)
             marker:UpdateIntel(self.Army, 12, 'Vision', true)
 
-            -- deal damage
-            local data = self.DamageData
-            local damage = data.DamageAmount
-            local radius = data.DamageRadius or 0
-            local instigator = self.Launcher or self
-            ForkThread(self.DamageThread, self, position, instigator, damage, radius)
+            TIFTacticalNuke.OnImpact(self, targetType, targetEntity)
         else
             -- default tactical explosion
             self:CreateDebris()
+            self:Destroy()
         end
+    end,
 
-        self:Destroy()
+    --- Called by Lua to process the overriden damage logic of TIFMissileNukeCDR.
+    -- @param self TIFMissileNukeCDR
+    -- @param instigator The launcher, and if it doesn't exist, the projectile itself
+    -- @param DamageData The damage data passed by the weapon
+    -- @param targetEntity The entity we hit, is nil if we hit terrain
+    -- @param cachedPosition A cached position that is passed to prevent table allocations, can not be used in fork threads and / or after a yield statement
+    ---@param self TIFMissileNukeCDR
+    ---@param instigator UEL0001 | TIFMissileNukeCDR
+    ---@param DamageData table
+    ---@param targetEntity Unit | Prop
+    ---@param cachedPosition Vector
+    DoDamage = function(self, instigator, DamageData, targetEntity, cachedPosition)
+        ForkThread(self.DamageThread, self, self:GetPosition(), instigator, DamageData.DamageAmount, DamageData.DamageRadius)
     end,
 
     ---@param self TIFMissileNukeCDR
