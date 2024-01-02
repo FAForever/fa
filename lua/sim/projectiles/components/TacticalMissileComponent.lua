@@ -37,6 +37,7 @@ TacticalMissileComponent = ClassSimple(SemiBallisticComponent) {
         end
 
         if not skipLaunchSequence then
+            -- launch
             local launchTurnRateRange = self.LaunchTurnRateRange
             local launchTurnRate = self.LaunchTurnRate + launchTurnRateRange * (2 * Random() - 1)
             self:SetTurnRate(launchTurnRate)
@@ -44,16 +45,16 @@ TacticalMissileComponent = ClassSimple(SemiBallisticComponent) {
             local launchTicksRange = self.LaunchTicksRange
             local launchTicks = self.LaunchTicks + Random(-launchTicksRange, launchTicksRange)
             WaitTicks(launchTicks)
-        end
 
-        -- boost
-        local boostTurnRate, boostTime = self:TurnRateFromAngleAndHeight()
-        if boostTime < 0 then
-            boostTime = 0
-        end
+            -- boost
+            local boostTurnRate, boostTime = self:TurnRateFromAngleAndHeight()
+            if boostTime < 0 then
+                boostTime = 0
+            end
 
-        self:SetTurnRate(boostTurnRate)
-        WaitTicks(boostTime * 10 + 1)
+            self:SetTurnRate(boostTurnRate)
+            WaitTicks(boostTime * 10 + 1)
+        end
 
         -- glide
         local glideTurnRate, glideTime = self:TurnRateFromDistance()

@@ -99,6 +99,9 @@ CDFMissileRedirectWeapon01 = ClassWeapon(DefaultProjectileWeapon) {
     ---@param redirected Projectile
     ---@param launcher Unit
     RedirectBehaviorThread = function(self, redirected, launcher)
+        -- always wait one tick to allow other code to set the target ground before we overwrite it
+        WaitTicks(1)
+
         if IsDestroyed(redirected) then
             return
         end
@@ -107,6 +110,7 @@ CDFMissileRedirectWeapon01 = ClassWeapon(DefaultProjectileWeapon) {
         local position = redirected:GetPosition()
         redirected:SetLifetime(30)
         redirected:SetTurnRate(160)
+        redirected:TrackTarget(true)
         redirected:SetNewTargetGround({
             position[1] + (2 - 4 * Random()),
             position[2] + 12,

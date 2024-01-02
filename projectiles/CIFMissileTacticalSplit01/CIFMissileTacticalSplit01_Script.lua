@@ -8,25 +8,28 @@ CIFMissileTacticalSplit01 = ClassProjectile(CLOATacticalChildMissileProjectile) 
     ---@param self CIFMissileTacticalSplit01
     OnCreate = function(self)
         CLOATacticalChildMissileProjectile.OnCreate(self)
-        self.MoveThread = self.Trash:Add(ForkThread(self.MovementThread,self))
+        self.Trash:Add(ForkThread(self.ZigZagThread, self))
     end,
 
     -- Give the projectile enough time to get out of the explosion
     ---@param self CIFMissileTacticalSplit01
-    MovementThread = function(self)
+    ZigZagThread = function(self)
         self:ChangeMaxZigZag(10)
 
         WaitTicks(3)
 
         self:TrackTarget(true)
 
-        for k = 9, 5, -1 do
-            WaitTicks(6)
+        for k = 9, 1, -1 do
+            WaitTicks(4)
             if not IsDestroyed(self) then
                 self:ChangeMaxZigZag(k)
                 self:ChangeZigZagFrequency(0.1 * k)
             end
         end
+
+        self:ChangeMaxZigZag(0.5)
+        self:ChangeZigZagFrequency(1)
     end,
 }
 TypeClass = CIFMissileTacticalSplit01
