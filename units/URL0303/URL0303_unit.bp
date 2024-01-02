@@ -348,7 +348,7 @@ UnitBlueprint {
             AboveWaterTargetsOnly = true,
             BallisticArc = 'RULEUBA_None',
             Damage = 0,
-            DisplayName = 'Zapper Anti Missile',
+            DisplayName = 'Deflector',
             DisableWhileReloading = true,
             FireTargetLayerCapsTable = {
                 Land = 'Air',
