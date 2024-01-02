@@ -20,7 +20,7 @@
 --** SOFTWARE.
 --******************************************************************************************************
 
-local TMissileCruiseProjectile = import("/lua/terranprojectiles.lua").TMissileCruiseProjectile
+local TIFTacticalNuke = import("/lua/terranprojectiles.lua").TIFTacticalNuke
 local EffectTemplate = import("/lua/effecttemplates.lua")
 
 local VisionMarkerOpti = import("/lua/sim/vizmarker.lua").VisionMarkerOpti
@@ -31,9 +31,9 @@ local ForkThread = ForkThread
 local DamageArea = DamageArea
 
 --- used by uel0001
----@class TIFMissileNukeCDR : TMissileCruiseProjectile
+---@class TIFMissileNukeCDR : TIFTacticalNuke
 ---@field Armed boolean
-TIFMissileNukeCDR = ClassProjectile(TMissileCruiseProjectile) {
+TIFMissileNukeCDR = ClassProjectile(TIFTacticalNuke) {
     -- BeamName = '/effects/emitters/missile_exhaust_fire_beam_01_emit.bp',
     BeamName = '/effects/emitters/missile_exhaust_fire_beam_06_emit.bp',
     InitialEffects = { '/effects/emitters/nuke_munition_launch_trail_02_emit.bp', },
@@ -54,7 +54,10 @@ TIFMissileNukeCDR = ClassProjectile(TMissileCruiseProjectile) {
 
     ---@param self TIFMissileNukeCDR
     OnCreate = function(self)
-        TMissileCruiseProjectile.OnCreate(self)
+        TIFTacticalNuke.OnCreate(self)
+        self.MoveThread = self.Trash:Add(ForkThread(self.MovementThread, self))
+        self.effectEntityPath = '/effects/Entities/UEFNukeEffectController02/UEFNukeEffectController02_proj.bp'
+        self:LauncherCallbacks()
         self.Armed = false
 
         local army = self.Army
@@ -77,7 +80,7 @@ TIFMissileNukeCDR = ClassProjectile(TMissileCruiseProjectile) {
 
     ---@param self TIFMissileNukeCDR
     OnExitWater = function(self)
-        TMissileCruiseProjectile.OnExitWater(self)
+        TIFTacticalNuke.OnExitWater(self)
         self:SetDestroyOnWater(true)
     end,
 
