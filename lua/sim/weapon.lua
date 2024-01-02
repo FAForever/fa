@@ -709,8 +709,7 @@ Weapon = ClassWeapon(WeaponMethods) {
 
         -- attempts to fix weapons that intercept projectiles to being stuck on a projectile while reloading, preventing
         -- other weapons from targeting that projectile. Is a side effect of the blueprint field `DesiredShooterCap`. This
-        -- is the more aggressive variant of `TargetResetWhenReady` as it completely disables the weapon. Should only be used
-        -- for weapons that do not visually track, such as torpedo defenses
+        -- is the more aggressive variant of `TargetResetWhenReady` as it completely disables the weapon.
 
         local reloadTime = math.floor(10 * rateOfFire) - 1
         if reloadTime > 4 then
