@@ -40,16 +40,13 @@ SIFLaanseTacticalMissileCDR = ClassProjectile(SLaanseTacticalMissile, TacticalMi
     FinalBoostAngleRange = 0,
 
     ---@param self SIFLaanseTacticalMissileCDR
-    OnCreate = function(self)
+    ---@param inWater boolean
+    OnCreate = function(self, inWater)
         SLaanseTacticalMissile.OnCreate(self)
+        if not inWater then
+            self:SetDestroyOnWater(true)
+        end
         self.MoveThread = self.Trash:Add(ForkThread(self.MovementThread, self))
-        self.Trash:Add(ForkThread(self.UpdateThread, self))
-    end,
-
-    ---@param self SIFLaanseTacticalMissileCDR
-    UpdateThread = function(self) 
-        WaitTicks(12)
-        self:SetDestroyOnWater(true)
     end,
 
     ---@param self SIFLaanseTacticalMissileCDR

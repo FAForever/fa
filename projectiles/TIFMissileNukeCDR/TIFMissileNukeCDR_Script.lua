@@ -43,22 +43,19 @@ TIFMissileNukeCDR = ClassProjectile(TIFMissileNuke, TacticalMissileComponent) {
     MovementThread = TacticalMissileComponent.MovementThread,
 
     ---@param self TIFMissileNukeCDR
-    OnCreate = function(self)
+    ---@param inWater boolean
+    OnCreate = function(self, inWater)
         TIFMissileNuke.OnCreate(self)
+        if not inWater then
+            self:SetDestroyOnWater(true)
+        end
         self.MoveThread = self.Trash:Add(ForkThread(self.MovementThread, self))
-        self.Trash:Add(ForkThread(self.UpdateThread, self))
         self.effectEntityPath = '/effects/Entities/UEFNukeEffectController02/UEFNukeEffectController02_proj.bp'
         self:LauncherCallbacks()
 
         self:CreateEffects(self.InitialEffects, self.Army, 1)
         self:CreateEffects(self.LaunchEffects, self.Army, 1)
         self:CreateEffects(self.ThrustEffects, self.Army, 1)
-    end,
-
-    ---@param self TIFMissileNukeCDR
-    UpdateThread = function(self) 
-        WaitTicks(12)
-        self:SetDestroyOnWater(true)
     end,
 
     ---@param self TIFMissileNukeCDR

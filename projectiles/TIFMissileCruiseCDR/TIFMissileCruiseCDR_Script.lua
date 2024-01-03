@@ -55,16 +55,13 @@ TIFMissileCruiseCDR = ClassProjectile(TMissileCruiseProjectile) {
     FinalBoostAngle = 30,
 
     ---@param self TIFMissileCruiseCDR
-    OnCreate = function(self)
+    ---@param inWater boolean
+    OnCreate = function(self, inWater)
         TMissileCruiseProjectile.OnCreate(self)
+        if not inWater then
+            self:SetDestroyOnWater(true)
+        end
         self.MoveThread = self.Trash:Add(ForkThread(self.MovementThread, self))
-        self.Trash:Add(ForkThread(self.UpdateThread, self))
-    end,
-
-    ---@param self TIFMissileCruiseCDR
-    UpdateThread = function(self) 
-        WaitTicks(12)
-        self:SetDestroyOnWater(true)
     end,
 
     ---@param self TIFMissileCruiseCDR
