@@ -74,6 +74,8 @@ local ForkThread = ForkThread
 -- cache categories computations
 local OnImpactDestroyCategories = categories.ANTIMISSILE * categories.ALLPROJECTILES
 
+local Quaternion = import("/lua/shared/quaternions.lua").Quaternion
+
 ---@class Projectile : moho.projectile_methods, InternalObject
 ---@field Blueprint ProjectileBlueprint
 ---@field Army number
@@ -140,14 +142,15 @@ Projectile = ClassProjectile(ProjectileMethods) {
         end
     end,
 
+
     --- Called by Lua during the `OnCreate` event when the blueprint field `TrackTargetGround` is set,
-    --- used by tactical missiles to track a patch of ground in the vicinity of the unit
+    --- used by tactical missiles to track a point around/inside the target's hitbox
     ---@param self Projectile
     OnTrackTargetGround = function(self)
         local target = self.OriginalTarget or self:GetTrackingTarget() or self.Launcher:GetTargetEntity()
         if target and target.IsUnit then
             local unitBlueprint = target.Blueprint
-            local cy = unitBlueprint.CollisionOffsetY or 0
+            local cx, cy, cz = unitBlueprint.CollisionOffsetX or 0, unitBlueprint.CollisionOffsetY or 0, unitBlueprint.CollisionOffsetZ or 0
             local sx, sy, sz = unitBlueprint.SizeX or 1, unitBlueprint.SizeY or 1, unitBlueprint.SizeZ or 1
             local px, py, pz = target:GetPositionXYZ()
 
@@ -156,21 +159,29 @@ Projectile = ClassProjectile(ProjectileMethods) {
             local mch = MathCos(heading)
             local msh = MathSin(heading)
 
+            local targetOrientation = Quaternion.new(unpack(target:GetOrientation()))
+
             local physics = self.Blueprint.Physics
             local fuzziness = physics.TrackTargetGroundFuzziness or 0.8
             local offset = physics.TrackTargetGroundOffset or 0
             sx = sx + offset
             sz = sz + offset
 
-            local dx = (Random() - 0.5) * fuzziness * sx
-            local dz = (Random() - 0.5) * fuzziness * sz
+            local dx = (Random() - 0.5) * fuzziness * sx + cx * 2
+            local dz = (Random() - 0.5) * fuzziness * sz - cz * 2
 
-            local target = {
-                px + dx * mch - dz * msh,
-                py,
-                pz + dx * msh + dz * mch,
-            }
-            target[2] = GetSurfaceHeight(target[1], target[3])
+            -- assuming that projectiles that use this function destroy on water
+            -- correct the hitbox size and offset if it extends below the surface to prevent undershooting
+            if cy*2 < sy/2 then
+                sy = sy - (0.5 * sy + 2 * cy)
+                cy = sy/4
+            end
+            -- don't offset under the hitbox, we'll likely miss because projectiles come from above.
+            local dy = (Random() - 0.5) * (sy + offset * 0.5) + cy * 2 + offset * 0.25
+
+            local target = Quaternion.new(0, dx, dy, dz)
+            target = targetOrientation * target * targetOrientation:conj()
+            target = {px - target[2], py - target[3], pz - target[4]}
 
             self:SetNewTargetGround(target)
         else
