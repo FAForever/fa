@@ -357,14 +357,14 @@ UnitBlueprint {
             NotExclusive = true,
             FiringTolerance = 1,
             Label = 'RedirectMissile',
-            MaxRadius = 10,
+            MaxRadius = 12,
             MinRadius = 4,
             ProjectileId = "/projectiles/TDPhalanx01/TDPhalanx01_proj.bp",
             ProjectileLifetimeUsesMultiplier = 2,
             ProjectilesPerOnFire = 1,
             MuzzleSalvoSize = 1,
             MuzzleVelocity = 15,
-            MaxHeightDiff = 0.1,
+            MaxHeightDiff = 5,
             MuzzleSalvoDelay = 0,
             RackBones = {
                 {
