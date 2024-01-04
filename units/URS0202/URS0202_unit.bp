@@ -1,4 +1,4 @@
-UnitBlueprint{
+UnitBlueprint {
     Description = "<LOC urs0202_desc>Cruiser",
     AI = {
         AttackAngle = 0,
@@ -16,11 +16,11 @@ UnitBlueprint{
         },
     },
     Audio = {
-        AmbientMove = Sound { Bank = 'URS',        Cue = 'URS0202_Move_Loop',   LodCutoff = 'UnitMove_LodCutoff' },
-        Killed      = Sound { Bank = 'URSDestroy', Cue = 'URS0202_Destroy',     LodCutoff = 'UnitMove_LodCutoff' },
-        StartMove   = Sound { Bank = 'URS',        Cue = 'URS0202_Move_Start',  LodCutoff = 'UnitMove_LodCutoff' },
-        StopMove    = Sound { Bank = 'URS',        Cue = 'URS0202_Move_Stop',   LodCutoff = 'UnitMove_LodCutoff' },
-        UISelection = Sound { Bank = 'Interface',  Cue = 'Cybran_Select_Naval', LodCutoff = 'UnitMove_LodCutoff' },
+        AmbientMove = Sound { Bank = 'URS', Cue = 'URS0202_Move_Loop', LodCutoff = 'UnitMove_LodCutoff' },
+        Killed      = Sound { Bank = 'URSDestroy', Cue = 'URS0202_Destroy', LodCutoff = 'UnitMove_LodCutoff' },
+        StartMove   = Sound { Bank = 'URS', Cue = 'URS0202_Move_Start', LodCutoff = 'UnitMove_LodCutoff' },
+        StopMove    = Sound { Bank = 'URS', Cue = 'URS0202_Move_Stop', LodCutoff = 'UnitMove_LodCutoff' },
+        UISelection = Sound { Bank = 'Interface', Cue = 'Cybran_Select_Naval', LodCutoff = 'UnitMove_LodCutoff' },
     },
     BuildIconSortPriority = 30,
     Categories = {
@@ -228,9 +228,9 @@ UnitBlueprint{
         {
             AboveWaterTargetsOnly = true,
             Audio = {
-                BarrelLoop  = Sound { Bank = 'URS',       Cue = 'URS_Turret_Sml_Loop',  LodCutoff = 'Weapon_LodCutoff' },
-                BarrelStart = Sound { Bank = 'URS',       Cue = 'URS_Turret_Sml_Start', LodCutoff = 'Weapon_LodCutoff' },
-                Fire        = Sound { Bank = 'URSWeapon', Cue = 'URS0202_Cannon_Dbl',   LodCutoff = 'Weapon_LodCutoff' },
+                BarrelLoop  = Sound { Bank = 'URS', Cue = 'URS_Turret_Sml_Loop', LodCutoff = 'Weapon_LodCutoff' },
+                BarrelStart = Sound { Bank = 'URS', Cue = 'URS_Turret_Sml_Start', LodCutoff = 'Weapon_LodCutoff' },
+                Fire        = Sound { Bank = 'URSWeapon', Cue = 'URS0202_Cannon_Dbl', LodCutoff = 'Weapon_LodCutoff' },
             },
             BallisticArc = "RULEUBA_LowArc",
             CollideFriendly = false,
@@ -354,25 +354,22 @@ UnitBlueprint{
             WeaponCategory = "Anti Air",
         },
         {
-            Audio = {
-                Fire = Sound { Bank = 'URSWeapon', Cue = 'URS0202_Anti_Missile', LodCutoff = 'Weapon_LodCutoff' },
-            },
+            TargetCheckInterval = 0.3,
             BallisticArc = "RULEUBA_None",
-            BeamCollisionDelay = 0.1,
-            BeamLifetime = 0.1,
             CollideFriendly = false,
             Damage = 1,
             DamageType = "Normal",
             DisableWhileReloading = true,
-            DisplayName = "Zapper Anti Missile",
+            DisplayName = "Missile Deflector",
             FireTargetLayerCapsTable = { Water = "Air" },
             FiringTolerance = 5,
-            Label = "Zapper",
-            MaxRadius = 60,
-            MaximumBeamLength = 60,
-            MinRadius = 2,
+            Label = "RedirectMissile",
+            MaxHeightDiff = 8,
+            MaxRadius = 28,
+            MinRadius = 8,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
+            NotExclusive = true,
             RackBones = {
                 {
                     MuzzleBones = { "Zapper_Muzzle" },
@@ -387,7 +384,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_Countermeasure",
-            RateOfFire = 1.0,
+            RateOfFire = 0.30,
             TargetRestrictDisallow = "UNTARGETABLE,STRATEGIC",
             TargetRestrictOnlyAllow = "TACTICAL,MISSILE",
             TargetType = "RULEWTT_Projectile",

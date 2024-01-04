@@ -10,8 +10,7 @@ local CSeaUnit = import("/lua/cybranunits.lua").CSeaUnit
 local CybranWeaponsFile = import("/lua/cybranweapons.lua")
 local CDFProtonCannonWeapon = CybranWeaponsFile.CDFProtonCannonWeapon
 local CAANanoDartWeapon = CybranWeaponsFile.CAANanoDartWeapon
-local CAMZapperWeapon03 = CybranWeaponsFile.CAMZapperWeapon03
-local TargetingLaser = import("/lua/kirvesweapons.lua").TargetingLaserInvisible
+local CDFMissileRedirectWeapon02 = import("/lua/sim/weapons/cybran/CDFMissileRedirectWeapon02.lua").CDFMissileRedirectWeapon02
 
 ---@class URS0202 : CSeaUnit
 URS0202 = ClassUnit(CSeaUnit) {
@@ -37,7 +36,7 @@ URS0202 = ClassUnit(CSeaUnit) {
             ---@param self CAANanoDartWeapon
             OnLostTarget = function(self)
                 CAANanoDartWeapon.OnLostTarget(self)
-                
+
                 -- copy over heading / pitch from aa gun to ground gun
                 local unit = self.unit
                 local aa = unit:GetWeaponManipulatorByLabel('AAGun') --[[@as moho.AimManipulator]]
@@ -51,8 +50,15 @@ URS0202 = ClassUnit(CSeaUnit) {
             end,
         },
         GroundGun = ClassWeapon(CAANanoDartWeapon) {},
-        Zapper = ClassWeapon(CAMZapperWeapon03) {},
+        RedirectMissile = ClassWeapon(CDFMissileRedirectWeapon02) {
+            SphereEffectBp = '/effects/emitters/zapper_electricity_03_emit.bp',
+        },
     },
 }
 
 TypeClass = URS0202
+
+-- backwards compatibility with mods
+
+local TargetingLaser = import("/lua/kirvesweapons.lua").TargetingLaserInvisible
+local CAMZapperWeapon03 = CybranWeaponsFile.CAMZapperWeapon03

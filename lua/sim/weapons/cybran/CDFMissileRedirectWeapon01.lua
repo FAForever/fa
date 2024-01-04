@@ -36,20 +36,20 @@ local AttachBeamEntityToEntity = AttachBeamEntityToEntity
 local CreateAttachedEmitter = CreateAttachedEmitter
 
 
----@class CDFMissileRedirectWeapon : DefaultProjectileWeapon
+---@class CDFMissileRedirectWeapon01 : DefaultProjectileWeapon
 ---@field RedirectTrash TrashBag
 CDFMissileRedirectWeapon01 = ClassWeapon(DefaultProjectileWeapon) {
 
     RedirectBeams = { '/effects/emitters/particle_cannon_beam_02_emit.bp' },
     EndPointEffects = { '/effects/emitters/particle_cannon_end_01_emit.bp' },
 
-    ---@param self CDFMissileRedirectWeapon
+    ---@param self CDFMissileRedirectWeapon01
     OnCreate = function(self)
         DefaultProjectileWeaponOnCreate(self)
         self.RedirectTrash = TrashBag()
     end,
 
-    ---@param self CDFMissileRedirectWeapon
+    ---@param self CDFMissileRedirectWeapon01
     ---@param muzzle Bone
     ---@return Projectile?
     CreateProjectileAtMuzzle = function(self, muzzle)
@@ -95,7 +95,7 @@ CDFMissileRedirectWeapon01 = ClassWeapon(DefaultProjectileWeapon) {
         self.Trash:Add(ForkThread(self.RedirectEffectThread, self, redirected, muzzle))
     end,
 
-    ---@param self CDFMissileRedirectWeapon
+    ---@param self CDFMissileRedirectWeapon01
     ---@param redirected Projectile
     ---@param launcher Unit
     RedirectBehaviorThread = function(self, redirected, launcher)
@@ -142,7 +142,7 @@ CDFMissileRedirectWeapon01 = ClassWeapon(DefaultProjectileWeapon) {
         end
     end,
 
-    ---@param self CDFMissileRedirectWeapon
+    ---@param self CDFMissileRedirectWeapon01
     ---@param redirected Projectile
     ---@param muzzle Bone
     RedirectEffectThread = function(self, redirected, muzzle)
