@@ -62,7 +62,7 @@ UnitBlueprint{
             "<LOC ability_factory>Factory",
             "<LOC ability_radar>Radar",
             "<LOC ability_sonar>Sonar",
-            "<LOC ability_tacmissiledef>Tactical Missile Defense",
+            "<LOC ability_tacticalmissledeflect>Tactical Missile Deflection",
         },
         AnimationDeath = {
             {
@@ -524,7 +524,7 @@ UnitBlueprint{
             TurretBoneYaw = "Zapper_Turret",
             TurretDualManipulators = false,
             TurretPitch = 0,
-            TurretPitchRange = 80,
+            TurretPitchRange = 50,
             TurretPitchSpeed = 180,
             TurretYaw = 0,
             TurretYawRange = 180,
