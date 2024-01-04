@@ -196,7 +196,7 @@ UnitBlueprint{
     SelectionThickness = 0.34,
     CollisionOffsetY = 0,
     SizeSphere = 1.6,
-    SizeX = 2,
+    SizeX = 1.8,
     SizeY = 0.3,
     SizeZ = 1,
     StrategicIconName = "icon_fighter2_directfire",
