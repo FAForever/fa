@@ -50,9 +50,7 @@ URS0202 = ClassUnit(CSeaUnit) {
             end,
         },
         GroundGun = ClassWeapon(CAANanoDartWeapon) {},
-        RedirectMissile = ClassWeapon(CDFMissileRedirectWeapon02) {
-            SphereEffectBp = '/effects/emitters/zapper_electricity_03_emit.bp',
-        },
+        RedirectMissile = ClassWeapon(CDFMissileRedirectWeapon02) {},
     },
 }
 
