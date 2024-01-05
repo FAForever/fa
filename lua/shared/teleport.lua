@@ -29,7 +29,7 @@
 -- Local performance upvalues
 local VDist3 = VDist3
 local MathPow = math.pow
-local MathLog = math.log
+local MathSqrt = math.sqrt
 
 ---@param unit Unit | UserUnit
 ---@param location Vector
@@ -37,20 +37,32 @@ local MathLog = math.log
 ---@return number time
 ---@return number? teleDelay
 TeleportCostFunction = function(unit, location)
-    local bp = unit.Blueprint or unit:GetBlueprint()
+    local bp = unit:GetBlueprint()
+
+    -- use unit position or the location of the last teleport/move command
     local pos = unit:GetPosition()
-    local dist = VDist3(pos,location)
+    local queue = unit:GetCommandQueue() --[[@as (UICommandInfo[])]]
+    if table.getn(queue) > 0 then
+        for k = 1, table.getn(queue) do
+            local command = queue[k]
+            if command.type == 'Teleport' or command.type == 'Move' then
+                pos = command.position
+            end
+        end
+    end
+
+    local dist = VDist3(pos, location)
     local teleDelay = bp.General.TeleportDelay
     local bpEco = bp.Economy
     local energyCost, time
-    
+
     if bpEco.UseVariableTeleportCosts then
         -- New function
         -- energy cost is dist^2
         -- time cost is natural log of dist
-        energyCost = MathPow(dist, 2)
-        time = MathLog(dist)
-        
+        energyCost = MathPow(dist, 1.8)
+        time = MathSqrt(dist)
+
         -- clamp time to teleDelay
         if teleDelay and time < teleDelay then
             time = teleDelay

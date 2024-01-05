@@ -50,6 +50,11 @@ local UserUnit = {}
 --- | 'UNITCOMMAND_Upgrade'
 --- | 'UNITCOMMAND_BuildFactory'
 
+---@class UICommandInfo
+---@field type 'Teleport' | 'Move' | string
+---@field ID number
+---@field position Vector
+
 ---@class MissileInfo
 ---@field nukeSiloBuildCount number
 ---@field nukeSiloMaxStorageCount number
@@ -88,7 +93,7 @@ function UserUnit:GetBuildRate()
 end
 
 --- Returns a table of commands
----@return OrderInfo[]
+---@return UICommandInfo[]
 function UserUnit:GetCommandQueue()
 end
 
