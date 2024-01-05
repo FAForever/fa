@@ -81,6 +81,8 @@ local OnImpactDestroyCategories = categories.ANTIMISSILE * categories.ALLPROJECT
 ---@field Launcher Unit
 ---@field OriginalTarget? Unit
 ---@field DamageData table
+---@field CreatedByWeapon Weapon
+---@field IsRedirected? boolean
 Projectile = ClassProjectile(ProjectileMethods) {
     IsProjectile = true,
     DestroyOnImpact = true,
@@ -264,12 +266,6 @@ Projectile = ClassProjectile(ProjectileMethods) {
     --- Called by the engine when the projectile is destroyed
     ---@param self Projectile
     OnDestroy = function(self)
-        -- local size = debug.allocatedsize(self)
-        -- if size > 200 then
-        --     LOG(debug.allocatedsize(self))
-        --     LOG(table.getsize(self))
-        --     reprsl(self)
-        -- end
         local trash = self.Trash
         if trash then
             trash:Destroy()
@@ -543,14 +539,42 @@ Projectile = ClassProjectile(ProjectileMethods) {
     OnLostTarget = function(self)
         local bp = self.Blueprint.Physics
         local trackTarget = bp.TrackTarget
-        local onLostTargetLifetime = bp.OnLostTargetLifetime or 0.5
-        if trackTarget then
-            self:SetLifetime(onLostTargetLifetime)
+        local trackTargetGround = bp.TrackTargetGround
+        if trackTarget and (not trackTargetGround) then
+            self.Trash:Add(ForkThread(self.RetargetThread, self))
+        end
+    end,
+
+    -- Lua functionality
+
+    ---@param self Projectile
+    RetargetThread = function (self)
+        local createdByWeapon = self.CreatedByWeapon
+        if createdByWeapon then
+            WaitTicks(0.2)
+
+            if IsDestroyed(self) then
+                return
+            end
+
+            if IsDestroyed(createdByWeapon) then
+                return
+            end
+
+            local target = createdByWeapon:GetCurrentTarget()
+            if target then
+                self:SetNewTarget(target)
+                self:TrackTarget(true)
+                return
+            end
         end
 
-        local originalTarget = self.OriginalTarget
-        if originalTarget and not (originalTarget.Dead or IsDestroyed(originalTarget)) then
-            self:SetNewTarget(originalTarget)
+        -- we couldn't find a new target, take us out
+        local bp = self.Blueprint.Physics
+        if bp.OnLostTargetLifetime then
+            self:SetLifetime(bp.OnLostTargetLifetime)
+        else
+            self:SetLifetime(0.5)
         end
     end,
 

@@ -1708,8 +1708,8 @@ AIBrain = Class(StandardBrain) {
     ---@param unit Unit
     ---@param builder Unit  
     ---@param layer Layer
-    OnUnitStartBeingBuilt = function(self, unit, builder, layer)
-        StandardBrain.OnUnitStartBeingBuilt(self, unit, builder, layer)
+    OnStartBeingBuilt = function(self, unit, builder, layer)
+        StandardBrain.OnStartBeingBuilt(self, unit, builder, layer)
 
         -- find nearest base
         local nearestBaseIdentifier = builder.AIManagerIdentifier or self:FindNearestBaseIdentifier(unit:GetPosition())
@@ -1718,7 +1718,7 @@ AIBrain = Class(StandardBrain) {
         -- register unit at managers of base
         local managers = self.BuilderManagers[nearestBaseIdentifier]
         if managers and managers.EngineerManager then
-            managers.EngineerManager:OnUnitStartBeingBuilt(unit, builder, layer)
+            managers.EngineerManager:OnStartBeingBuilt(unit, builder, layer)
         end
     end,
 
@@ -1727,8 +1727,8 @@ AIBrain = Class(StandardBrain) {
     ---@param unit Unit
     ---@param builder Unit
     ---@param layer Layer
-    OnUnitStopBeingBuilt = function(self, unit, builder, layer)
-        StandardBrain.OnUnitStopBeingBuilt(self, unit, builder, layer)
+    OnStopBeingBuilt = function(self, unit, builder, layer)
+        StandardBrain.OnStopBeingBuilt(self, unit, builder, layer)
 
         local baseIdentifier = unit.AIManagerIdentifier
         if not baseIdentifier then
@@ -1738,15 +1738,15 @@ AIBrain = Class(StandardBrain) {
 
         local managers = self.BuilderManagers[baseIdentifier]
         if managers and managers.EngineerManager then
-            managers.EngineerManager:OnUnitStopBeingBuilt(unit, builder, layer)
+            managers.EngineerManager:OnStopBeingBuilt(unit, builder, layer)
         end
     end,
 
     --- Called by a unit as it is destroyed
     ---@param self BaseAIBrain
     ---@param unit Unit
-    OnUnitDestroyed = function(self, unit)
-        StandardBrain.OnUnitDestroyed(self, unit)
+    OnUnitDestroy = function(self, unit)
+        StandardBrain.OnUnitDestroy(self, unit)
 
         local baseIdentifier = unit.AIManagerIdentifier
         if not baseIdentifier then
@@ -1755,7 +1755,7 @@ AIBrain = Class(StandardBrain) {
 
         local managers = self.BuilderManagers[baseIdentifier]
         if managers and managers.EngineerManager then
-            managers.EngineerManager:OnUnitStopBeingBuilt(unit)
+            managers.EngineerManager:OnStopBeingBuilt(unit)
         end
     end,
 
@@ -1763,8 +1763,8 @@ AIBrain = Class(StandardBrain) {
     ---@param self BaseAIBrain
     ---@param unit Unit
     ---@param built Unit
-    OnUnitStartBuilding = function(self, unit, built)
-        StandardBrain.OnUnitStartBuilding(self, unit, built)
+    OnUnitStartBuild = function(self, unit, built)
+        StandardBrain.OnUnitStartBuild(self, unit, built)
 
         local baseIdentifier = unit.AIManagerIdentifier
         if not baseIdentifier then
@@ -1773,7 +1773,7 @@ AIBrain = Class(StandardBrain) {
 
         local managers = self.BuilderManagers[baseIdentifier]
         if managers and managers.EngineerManager then
-            managers.EngineerManager:OnUnitStartBuilding(unit)
+            managers.EngineerManager:OnUnitStartBuild(unit)
         end
     end,
 
@@ -1781,8 +1781,8 @@ AIBrain = Class(StandardBrain) {
     ---@param self BaseAIBrain
     ---@param unit Unit
     ---@param built Unit
-    OnUnitStopBuilding = function(self, unit, built)
-        StandardBrain.OnUnitStopBuilding(self, unit, built)
+    OnUnitStopBuild = function(self, unit, built)
+        StandardBrain.OnUnitStopBuild(self, unit, built)
         
         local baseIdentifier = unit.AIManagerIdentifier
         if not baseIdentifier then
@@ -1791,7 +1791,7 @@ AIBrain = Class(StandardBrain) {
 
         local managers = self.BuilderManagers[baseIdentifier]
         if managers and managers.EngineerManager then
-            managers.EngineerManager:OnUnitStopBuilding(unit)
+            managers.EngineerManager:OnUnitStopBuild(unit)
         end
     end,
 }

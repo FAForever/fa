@@ -14,7 +14,7 @@ UnitBlueprint{
         "BUILTBYTIER2FACTORY",
         "BUILTBYTIER3FACTORY",
         "CYBRAN",
-        "DIRECTFIRE",
+        "WEAKDIRECTFIRE",
         "LAND",
         "MOBILE",
         "OVERLAYANTIAIR",

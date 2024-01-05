@@ -910,10 +910,10 @@ function SpawnCommander(brain, unit, effect, name, pauseAtDeath, deathTrigger, e
     return ACU
 end
 
---- Run teleport effect then delete unit if told to do so
+--- Run teleport effect and then optionally delete the units. The 'CanBeKilled' flag remains false if the unit is not deleted
 ---@param unit Unit
----@param killUnit? boolean
-function FakeTeleportUnit(unit, killUnit)
+---@param destroyUnit? boolean
+function FakeTeleportUnit(unit, destroyUnit)
     IssueStop({unit})
     IssueToUnitClearCommands(unit)
     unit.CanBeKilled = false
@@ -927,15 +927,15 @@ function FakeTeleportUnit(unit, killUnit)
     unit:PlayUnitSound('GateOut')
     WaitSeconds(1)
 
-    if killUnit then
+    if destroyUnit then
         unit:Destroy()
     end
 end
 
---- Run teleport effect then delete unit if told to do so
+--- Run teleport effect and then optionally delete the units. The 'CanBeKilled' flag remains false if the units are not deleted
 ---@param units Unit
----@param killUnits? boolean
-function FakeTeleportUnits(units, killUnits)
+---@param destroyUnits? boolean
+function FakeTeleportUnits(units, destroyUnits)
     IssueStop(units)
     IssueClearCommands(units)
     local buildingUnits = {}
@@ -966,7 +966,7 @@ function FakeTeleportUnits(units, killUnits)
 
     WaitSeconds(1)
 
-    if killUnits then
+    if destroyUnits then
         for _, unit in units do
             if not IsDestroyed(unit) then
                 unit:Destroy()

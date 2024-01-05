@@ -544,6 +544,7 @@ local CategoriesDummyUnit = categories.DUMMYUNIT
 ---@field Human boolean
 ---@field Civilian boolean
 ---@field Trash TrashBag
+---@field UnitBuiltTriggerList table
 ---@field PingCallbackList { CallbackFunction: fun(pingData: any), PingType: string }[]
 ---@field BrainType 'Human' | 'AI'
 AIBrain = Class(AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerComponent, AIBrainEnergyComponent,
@@ -603,7 +604,7 @@ AIBrain = Class(AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerCom
             EXPERIMENTAL = {},
         }
 
-        self.PingCallbackList = { }
+        self.PingCallbackList = {}
 
         AIBrainEnergyComponent.CreateBrainShared(self)
         AIBrainHQComponent.CreateBrainShared(self)
@@ -1370,7 +1371,7 @@ AIBrain = Class(AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerCom
     ---@param pingType string
     AddPingCallback = function(self, callback, pingType)
         if callback and pingType then
-            table.insert(self.PingCallbackList, {CallbackFunction = callback, PingType = pingType})
+            table.insert(self.PingCallbackList, { CallbackFunction = callback, PingType = pingType })
         end
     end,
 
@@ -1420,7 +1421,7 @@ AIBrain = Class(AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerCom
     ---@param cats EntityCategory Unit's category, example: categories.TECH2 .
     ---@param needToBeIdle boolean true/false Unit has to be idle (appears to be not functional).
     ---@param requireBuilt? boolean true/false defaults to false which excludes units that are NOT finished (appears to be not functional).
-    ---@return table
+    ---@return Unit[]
     GetListOfUnits = function(self, cats, needToBeIdle, requireBuilt)
         -- defaults to false, prevent sending nil
         requireBuilt = requireBuilt or false
@@ -1432,16 +1433,44 @@ AIBrain = Class(AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerCom
     --#endregion
     -------------------------------------------------------------------------------
 
-    -------------------------------------------------------------------------------
-    --#region Unit callbacks
+    ---------------------------------------------------------------------------
+    --#region Unit events
+
+    --- Represents a list of unit events that are communicated to the brain. It makes it
+    --- easier to respond to conditions that are happening on the battlefield. The following
+    --- unit events are not communicated to the brain:
+    ---
+    --- - OnStorageChange (use OnAddToStorage and OnRemoveFromStorage instead)
+    --- - OnAnimCollision
+    --- - OnTerrainTypeChange
+    --- - OnMotionVertEventChange
+    --- - OnMotionHorzEventChange
+    --- - OnLayerChange
+    --- - OnPrepareArmToBuild
+    --- - OnStartBuilderTracking
+    --- - OnStopBuilderTracking
+    --- - OnStopRepeatQueue
+    --- - OnStartRepeatQueue
+    --- - OnAssignedFocusEntity
+    ---
+    --- And events that are purposefully not communicated:
+    --- 
+    --- - OnDamage
+    --- - OnDamageBy
+    --- - OnMotionHorzEventChange
+    --- - OnMotionVertEventChange
+    ---
+    --- If you're interested for one of these events then you're encouraged to make a pull
+    --- request to add the event!
+
 
     --- Called by a unit as it starts being built
     ---@param self AIBrain
     ---@param unit Unit
-    ---@param builder Unit  
+    ---@param builder Unit
     ---@param layer Layer
     OnUnitStartBeingBuilt = function(self, unit, builder, layer)
-        -- LOG(string.format('OnUnitStartBeingBuilt: %s', unit.Blueprint.BlueprintId or ''))
+        -- do nothing
     end,
 
     --- Called by a unit as it is finished being built
@@ -1450,34 +1479,477 @@ AIBrain = Class(AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerCom
     ---@param builder Unit
     ---@param layer Layer
     OnUnitStopBeingBuilt = function(self, unit, builder, layer)
-        -- LOG(string.format('OnUnitStopBeingBuilt: %s', unit.Blueprint.BlueprintId or ''))
+        -- do nothing
     end,
 
     --- Called by a unit as it is destroyed
     ---@param self AIBrain
     ---@param unit Unit
-    OnUnitDestroyed = function(self, unit)
-        -- LOG(string.format('OnUnitDestroyed: %s', unit.Blueprint.BlueprintId or ''))
+    OnUnitDestroy = function(self, unit)
+        -- do nothing
     end,
 
-    --- Called by a unit as it starts building
+    --- Called by a unit when it loses or gains health. It is also called when the unit is being built. It is called at fixed intervals of 25%
     ---@param self AIBrain
     ---@param unit Unit
-    ---@param built Unit
-    OnUnitStartBuilding = function(self, unit, built)
-        -- LOG(string.format('OnUnitStartBuilding: %s -> %s', unit.Blueprint.BlueprintId or '', built.Blueprint.BlueprintId or ''))
+    ---@param new number # 0.25 / 0.50 / 0.75 / 1.0
+    ---@param old number # 0.25 / 0.50 / 0.75 / 1.0
+    OnUnitHealthChanged = function(self, unit, new, old)
+        -- do nothing
     end,
 
-    --- Called by a unit as it stops building
+    --- Called by a unit of this army when it stops reclaiming
     ---@param self AIBrain
     ---@param unit Unit
-    ---@param built Unit
-    OnUnitStopBuilding = function(self, unit, built)
-        -- LOG(string.format('OnUnitStopBuilding: %s -> %s', unit.Blueprint.BlueprintId or '', built.Blueprint.BlueprintId or ''))
+    ---@param target Unit | Prop | nil      # is nil when the prop or unit is completely reclaimed
+    OnUnitStopReclaim = function(self, unit, target)
+        -- do nothing
+    end,
+
+    --- Called by a unit of this army when it starts reclaiming
+    ---@param self AIBrain
+    ---@param unit Unit
+    ---@param target Unit | Prop
+    OnUnitStartReclaim = function(self, unit, target)
+        -- do nothing
+    end,
+
+    --- Called by a unit of this army when it starts repairing
+    ---@param self AIBrain
+    ---@param unit Unit
+    ---@param target Unit
+    OnUnitStartRepair = function(self, unit, target)
+        -- do nothing
+    end,
+
+    --- Called by a unit of this army when it stops repairing
+    ---@param self AIBrain
+    ---@param unit Unit
+    ---@param target Unit
+    OnUnitStopRepair = function(self, unit, target)
+        -- do nothing
+    end,
+
+    --- Called by a unit of this army when it is killed
+    ---@param self AIBrain
+    ---@param unit Unit
+    ---@param instigator Unit | Projectile | nil
+    ---@param damageType DamageType
+    ---@param overkillRatio number
+    OnUnitKilled = function(self, unit, instigator, damageType, overkillRatio)
+        -- do nothing
+    end,
+
+    --- Called by a unit of this army when it is reclaimed
+    ---@param self AIBrain
+    ---@param unit Unit
+    ---@param reclaimer Unit
+    OnUnitReclaimed = function(self, unit, reclaimer)
+        -- do nothing
+    end,
+
+    --- Called by a unit of this army when it starts a capture command
+    ---@param self AIBrain
+    ---@param unit Unit
+    ---@param target Unit
+    OnUnitStartCapture = function(self, unit, target)
+        -- do nothing
+    end,
+
+    --- Called by a unit of this army when it stops a capture command
+    ---@param self AIBrain
+    ---@param unit Unit
+    ---@param target Unit
+    OnUnitStopCapture = function(self, unit, target)
+        -- do nothing
+    end,
+
+    --- Called by a unit of this army when it fails a capture command
+    ---@param self AIBrain
+    ---@param unit Unit
+    ---@param target Unit
+    OnUnitFailedCapture = function(self, unit, target)
+        -- do nothing
+    end,
+
+    --- Called by a unit of this army when it starts being captured
+    ---@param self AIBrain
+    ---@param unit Unit
+    ---@param captor Unit
+    OnUnitStartBeingCaptured = function(self, unit, captor)
+        -- do nothing
+    end,
+
+    --- Called by a unit of this army when it stops being captured
+    ---@param self AIBrain
+    ---@param unit Unit
+    ---@param captor Unit
+    OnUnitStopBeingCaptured = function(self, unit, captor)
+        -- do nothing
+    end,
+
+    --- Called by a unit of this army when it failed being captured
+    ---@param self AIBrain
+    ---@param unit Unit
+    ---@param captor Unit
+    OnUnitFailedBeingCaptured = function(self, unit, captor)
+        -- do nothing
+    end,
+
+    --- Called by a unit when it starts building a missile
+    ---@param self AIBrain
+    ---@param unit Unit
+    ---@param weapon Weapon
+    OnUnitSiloBuildStart = function(self, unit, weapon)
+        -- do nothing
+    end,
+
+    --- Called by a unit when it stops building a missile
+    ---@param self AIBrain
+    ---@param unit Unit
+    ---@param weapon Weapon
+    OnUnitSiloBuildEnd = function(self, unit, weapon)
+        -- do nothing
+    end,
+
+    --- Called by a unit when it starts building another unit
+    ---@param self AIBrain
+    ---@param unit Unit
+    ---@param target Unit
+    ---@param order string
+    OnUnitStartBuild = function(self, unit, target, order)
+        -- do nothing
+    end,
+
+    --- Called by a unit when it stops building another unit
+    ---@param self AIBrain
+    ---@param unit Unit
+    ---@param target Unit
+    ---@param order string
+    OnUnitStopBuild = function(self, unit, target, order)
+        -- do nothing
+    end,
+
+    --- Called by a unit as it is being built
+    ---@param self AIBrain
+    ---@param unit Unit
+    ---@param target Unit
+    ---@param old number
+    ---@param new number
+    OnUnitBuildProgress = function(self, unit, target, old, new)
+        -- do nothing
+    end,
+
+    --- Called by a unit as it is paused
+    ---@param self AIBrain
+    ---@param unit Unit
+    OnUnitPaused = function(self, unit)
+        -- do nothing
+    end,
+
+    --- Called by a unit as it is unpaused
+    ---@param self AIBrain
+    ---@param unit Unit
+    OnUnitUnpaused = function(self, unit)
+        -- do nothing
+    end,
+
+    --- Called by a unit as it is being built. It is called for every builder. it is called in intervals of 25%.
+    ---@param self AIBrain
+    ---@param unit Unit
+    ---@param builder Unit
+    ---@param old number
+    ---@param new number
+    OnUnitBeingBuiltProgress = function(self, unit, builder, old, new)
+        -- do nothing
+    end,
+
+    --- Called by a unit as it failed to be built
+    ---@param self AIBrain
+    ---@param unit Unit
+    OnUnitFailedToBeBuilt = function(self, unit)
+        -- do nothing
+    end,
+
+    --- Called by a transport as it attaches a unit
+    ---@param self AIBrain
+    ---@param unit Unit
+    ---@param attachBone Bone
+    ---@param attachedUnit Unit
+    OnUnitTransportAttach = function(self, unit, attachBone, attachedUnit)
+        -- do nothing
+    end,
+
+    --- Called by a transport as it deattaches a unit
+    ---@param self AIBrain
+    ---@param unit Unit
+    ---@param attachBone Bone
+    ---@param detachedUnit Unit
+    OnUnitTransportDetach = function(self, unit, attachBone, detachedUnit)
+        -- do nothing
+    end,
+
+    --- Called by a transport as it aborts the transport order
+    ---@param self AIBrain
+    ---@param unit Unit
+    OnUnitTransportAborted = function(self, unit)
+        -- do nothing
+    end,
+
+    --- Called by a transport as it starts the transport order
+    ---@param self AIBrain
+    ---@param unit Unit
+    OnUnitTransportOrdered = function(self, unit)
+        -- do nothing
+    end,
+
+    --- Called by a transport as units that are attached are killed
+    ---@param self AIBrain
+    ---@param unit Unit
+    ---@param attachedUnit Unit
+    OnUnitAttachedKilled = function(self, unit, attachedUnit)
+        -- do nothing
+    end,
+
+    --- Event happens when a unit:
+    --- - Starts the loading sequence (transports, carriers)
+    --- - Deploys its cargo (transports, carriers)
+    ---@param self AIBrain
+    ---@param unit Unit
+    OnUnitStartTransportLoading = function(self, unit)
+        -- do nothing
+    end,
+
+    --- Event happens when a unit:
+    --- - Starts the loading sequence (transports, carriers)
+    --- - Deploys its cargo (transports, carriers)
+    ---@param self AIBrain
+    ---@param unit Unit
+    OnUnitStopTransportLoading = function(self, unit)
+        -- do nothing
+    end,
+
+    --- Event happens when a unit:
+    --- - Starts beaming up to a transport
+    ---@param self AIBrain
+    ---@param unit Unit
+    ---@param transport Unit
+    ---@param bone Bone
+    OnUnitStartTransportBeamUp = function(self, unit, transport, bone)
+        -- do nothing
+    end,
+
+    --- Event happens when a unit:
+    --- - Stops beaming up to a transport regardless whether it succeeded
+    ---@param self AIBrain
+    ---@param unit Unit
+    OnUnitStoptransportBeamUp = function(self, unit)
+        -- do nothing
+    end,
+
+    --- Event happens when a unit:
+    --- - Attaches to a transport
+    ---@param self AIBrain
+    ---@param unit Unit
+    ---@param transport Unit
+    ---@param bone Bone
+    OnUnitAttachedToTransport = function(self, unit, transport, bone)
+        -- do nothing
+    end,
+
+    --- Event happens when a unit:
+    --- - Deattaches to a transport
+    ---@param self AIBrain
+    ---@param unit Unit
+    ---@param transport Unit
+    ---@param bone Bone
+    OnUnitDetachedFromTransport = function(self, unit, transport, bone)
+        -- do nothing
+    end,
+
+    --- Event happens when a unit:
+    --- - Enters the storage of a carrier
+    ---@param self AIBrain
+    ---@param unit Unit
+    ---@param carrier Unit
+    OnUnitAddToStorage = function(self, unit, carrier)
+        -- do nothing
+    end,
+
+    --- Event happens when a unit:
+    --- - Leaves the storage of a carrier
+    ---@param self AIBrain
+    ---@param unit Unit
+    ---@param carrier Unit
+    OnUnitRemoveFromStorage = function(self, unit, carrier)
+        -- do nothing
+    end,
+
+    --- Event happens when a unit:
+    --- - Starts a teleport sequence
+    ---@param self AIBrain
+    ---@param unit Unit
+    ---@param teleporter any
+    ---@param location Vector
+    ---@param orientation Quaternion
+    OnUnitTeleportUnit = function(self, unit, teleporter, location, orientation)
+        -- do nothing
+    end,
+
+    --- Event happens when a unit:
+    --- - Aborts a teleport sequence
+    ---@param self AIBrain
+    ---@param unit Unit
+    OnUnitFailedTeleport = function(self, unit)
+        -- do nothing
+    end,
+
+    --- Event happens when a unit:
+    --- - Enables its shield
+    ---@param self AIBrain
+    ---@param unit Unit
+    OnUnitShieldEnabled = function(self, unit)
+        -- do nothing
+    end,
+
+    --- Event happens when a unit:
+    --- - Disables its shield, regardless of the cause
+    ---@param self AIBrain
+    ---@param unit Unit
+    OnUnitShieldDisabled = function(self, unit)
+        -- do nothing
+    end,
+
+    --- Event happens when a unit:
+    --- - Finishes the construction of a tactical or strategical missile
+    ---@param self AIBrain
+    ---@param unit Unit
+    OnUnitNukeArmed = function(self, unit)
+        -- do nothing
+    end,
+
+    --- Event happens when a unit:
+    --- - Starts the launch sequence of a strategic missile
+    ---@param self AIBrain
+    ---@param unit Unit
+    OnUnitNukeLaunched = function(self, unit)
+        -- do nothing
+    end,
+
+    --- Event happens when a unit:
+    --- - Starts an enhancement
+    ---@param self AIBrain
+    ---@param unit Unit
+    ---@param work any
+    OnUnitWorkBegin = function(self, unit, work)
+        -- do nothing
+    end,
+
+    --- Event happens when a unit:
+    --- - Finishes an enhancement
+    ---@param self AIBrain
+    ---@param unit Unit
+    ---@param work any
+    OnUnitWorkEnd = function(self, unit, work)
+        -- do nothing
+    end,
+
+    --- Event happens when a unit:
+    --- - Aborts an enhancement
+    ---@param self AIBrain
+    ---@param unit Unit
+    ---@param work any
+    OnUnitWorkFail = function(self, unit, work)
+        -- do nothing
+    end,
+
+    --- Event happens when a unit:
+    --- - Launches a missile that impacts with a shield
+    ---@param self AIBrain
+    ---@param target Vector
+    ---@param shield Unit
+    ---@param position Vector
+    OnUnitMissileImpactShield = function(self, unit, target, shield, position)
+        -- do nothing
+    end,
+
+    --- Event happens when a unit:
+    --- - Launches a missile that impacts with the terrain (unlike a unit or a shield)
+    ---@param self AIBrain
+    ---@param unit Unit
+    ---@param target Vector
+    ---@param position Vector
+    OnUnitMissileImpactTerrain = function(self, unit, target, position)
+        -- do nothing
+    end,
+
+    --- Event happens when a unit:
+    --- - Launches a missile that is intercepted by tactical missile defenses
+    ---@param self AIBrain
+    ---@param unit Unit
+    ---@param target Vector
+    ---@param defense Unit
+    ---@param position Vector
+    OnUnitMissileIntercepted = function(self, unit, target, defense, position)
+        -- do nothing
+    end,
+
+    --- Event happens when a unit:
+    --- - Starts finishes the sacrifice command
+    ---@param self AIBrain
+    ---@param unit Unit
+    ---@param target Unit
+    OnUnitStartSacrifice = function(self, unit, target)
+        -- do nothing
+    end,
+
+    --- Event happens when a unit:
+    --- - Succesfully finishes the sacrifice command
+    ---@param self AIBrain
+    ---@param unit Unit
+    ---@param target Unit
+    OnUnitStopSacrifice = function(self, unit, target)
+        -- do nothing
+    end,
+
+    --- Event happens when a unit:
+    --- - Starts building/repairing another unit (engineers, factories)
+    --- - Starts consuming resources for unit properties (fabricators that produce mass, radars that produce intel)
+    ---@param self AIBrain
+    ---@param unit Unit
+    OnUnitConsumptionActive = function(self, unit)
+        -- do nothing
+    end,
+
+    --- Event happens when a unit:
+    --- - Stops building/repairing another unit (engineers, factories)
+    --- - Stops consuming resources for unit properties (fabricators that produce mass, radars that produce intel)
+    ---@param self AIBrain
+    ---@param unit Unit
+    OnUnitConsumptionInActive = function(self, unit)
+        -- do nothing
+    end,
+
+    --- Event happens when a unit:
+    --- - Starts producing resources (power generators, extractors, ...)
+    ---@param self AIBrain
+    ---@param unit Unit
+    OnUnitProductionActive = function(self, unit)
+        -- do nothing
+    end,
+
+    --- Event happens when a unit:
+    --- - Stops producing resources (power generators, extractors, ...)
+    ---
+    --- Note: it may not trigger when a unit is killed.
+    ---@param self AIBrain
+    ---@param unit Unit
+    OnUnitProductionInActive = function(self, unit)
+        -- do nothing
     end,
 
     --#endregion
-    -------------------------------------------------------------------------------
+    ---------------------------------------------------------------------------
 
     -------------------------------------------------------------------------------
     --#region deprecated
@@ -1502,8 +1974,8 @@ AIBrain = Class(AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerCom
     -------------------------------------------------------------------------------
     --#region legacy functionality
 
-    --- All functions below solely exist because the code is too tightly coupled. 
-    --- We can't remove them without drastically changing how the code base works. 
+    --- All functions below solely exist because the code is too tightly coupled.
+    --- We can't remove them without drastically changing how the code base works.
     --- We can't do that because it would break mod compatibility
 
     ---@deprecated

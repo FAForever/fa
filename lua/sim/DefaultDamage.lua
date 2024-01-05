@@ -51,9 +51,9 @@ end
 
 --- Performs damage over time in a given area.
 ---@param instigator Unit
----@param position number
----@param pulses any
----@param pulseTime integer
+---@param position Vector
+---@param pulses number
+---@param pulseTime number
 ---@param radius number
 ---@param damage number
 ---@param damType DamageType
@@ -78,6 +78,7 @@ end
 -- SCALABLE RADIUS AREA DOT
 -- - Allows for a scalable damage radius that begins with DamageStartRadius and ends
 -- - with DamageEndRadius, interpolates between based on frequency and duration.
+---@deprecated
 ---@param entity Entity
 function ScalableRadiusAreaDoT(entity)
     local spec = entity.Spec.Data

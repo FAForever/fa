@@ -1,5 +1,34 @@
+--**********************************************************************************
+--** Copyright (c) 2023 FAForever
+--**
+--** Permission is hereby granted, free of charge, to any person obtaining a copy
+--** of this software and associated documentation files (the "Software"), to deal
+--** in the Software without restriction, including without limitation the rights
+--** to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+--** copies of the Software, and to permit persons to whom the Software is
+--** furnished to do so, subject to the following conditions:
+--**
+--** The above copyright notice and this permission notice shall be included in all
+--** copies or substantial portions of the Software.
+--**
+--** THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+--** IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+--** FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+--** AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+--** LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+--** OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+--** SOFTWARE.
+--**********************************************************************************
 
 local Unit = import("/lua/sim/unit.lua").Unit
+local UnitOnCreate = Unit.OnCreate
+local UnitOnDestroy = Unit.OnDestroy
+local UnitOnStartBuild = Unit.OnStartBuild
+local UnitOnStopBuild = Unit.OnStopBuild
+local UnitOnFailedToBuild = Unit.OnFailedToBuild
+local UnitOnPaused = Unit.OnPaused
+local UnitOnUnpaused = Unit.OnUnpaused
+
 local FactoryUnit = import("/lua/sim/units/factoryunit.lua").FactoryUnit
 
 ---@class ExternalFactoryUnit : Unit
@@ -11,7 +40,7 @@ ExternalFactoryUnit = ClassUnit(Unit) {
 
     ---@param self ExternalFactoryUnit
     OnCreate = function(self)
-        Unit.OnCreate(self)
+        UnitOnCreate(self)
 
         -- do not show the mesh
         self:HideBone(0, true)
@@ -23,8 +52,23 @@ ExternalFactoryUnit = ClassUnit(Unit) {
         self:SetFireState(2)
 
         -- do not allow the unit to be reclaimed or targeted by weapons
-        self:SetReclaimable (false)
+        self:SetReclaimable(false)
         self:SetDoNotTarget(true)
+    end,
+
+    ---@param self ExternalFactoryUnit
+    OnDestroy = function(self)
+        UnitOnDestroy(self)
+
+        if self.UpdateParentProgressThread then
+            KillThread(self.UpdateParentProgressThread)
+        end
+
+        -- Similar to SeaFactoryUnit
+        local UnitBeingBuilt = self.UnitBeingBuilt
+        if UnitBeingBuilt and not UnitBeingBuilt.Dead and UnitBeingBuilt:GetFractionComplete() < 1 then
+            UnitBeingBuilt:Destroy()
+        end
     end,
 
     ---@param self ExternalFactoryUnit
@@ -52,7 +96,7 @@ ExternalFactoryUnit = ClassUnit(Unit) {
     ---@param unitbuilding Unit
     ---@param order Layer
     OnStartBuild = function(self, unitbuilding, order)
-        Unit.OnStartBuild(self, unitbuilding, order)
+        UnitOnStartBuild(self, unitbuilding, order)
         self.Parent:OnStartBuild(unitbuilding, order)
         self.UnitBeingBuilt = unitbuilding
 
@@ -68,7 +112,7 @@ ExternalFactoryUnit = ClassUnit(Unit) {
     ---@param self ExternalFactoryUnit
     ---@param unitBeingBuilt Unit
     OnStopBuild = function(self, unitBeingBuilt)
-        Unit.OnStopBuild(self, unitBeingBuilt)
+        UnitOnStopBuild(self, unitBeingBuilt)
         self.Parent:OnStopBuild(unitBeingBuilt)
         self.UnitBeingBuilt = nil
 
@@ -84,7 +128,7 @@ ExternalFactoryUnit = ClassUnit(Unit) {
 
     ---@param self ExternalFactoryUnit
     OnFailedToBuild = function(self)
-        Unit.OnFailedToBuild(self)
+        UnitOnFailedToBuild(self)
         self.Parent:OnFailedToBuild()
         self.UnitBeingBuilt = nil
 
@@ -148,7 +192,7 @@ ExternalFactoryUnit = ClassUnit(Unit) {
 
     ---@param self FactoryUnit
     OnPaused = function(self)
-        Unit.OnPaused(self)
+        UnitOnPaused(self)
 
         -- When factory is paused take some action
         if self:IsUnitState('Building') then
@@ -159,7 +203,7 @@ ExternalFactoryUnit = ClassUnit(Unit) {
 
     ---@param self FactoryUnit
     OnUnpaused = function(self)
-        Unit.OnUnpaused(self)
+        UnitOnUnpaused(self)
         if self:IsUnitState('Building') then
             self:PlayUnitAmbientSound('ConstructLoop')
             self:StartBuildingEffects(self.UnitBeingBuilt, self.UnitBuildOrder)
@@ -170,7 +214,7 @@ ExternalFactoryUnit = ClassUnit(Unit) {
     ---@param self Unit
     ---@param overkillRatio number
     ---@return nil
-    CreateWreckage = function (self, overkillRatio)
+    CreateWreckage = function(self, overkillRatio)
     end,
 
     IdleState = FactoryUnit.IdleState,

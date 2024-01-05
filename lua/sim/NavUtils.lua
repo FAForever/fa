@@ -161,7 +161,7 @@ end
 ---@param a NavSection
 ---@param b NavSection
 ---@return number
-local SquaredDistanceTo = function(a, b)
+local SquaredDistanceToSection = function(a, b)
     local dx = a.Center[1] - b.Center[1]
     local dz = a.Center[3] - b.Center[3]
     return dx * dx + dz * dz
@@ -170,9 +170,18 @@ end
 ---@param a NavSection
 ---@param b NavSection
 ---@return number
-local DistanceTo = function(a, b)
+local DistanceToSection = function(a, b)
     local dx = a.Center[1] - b.Center[1]
     local dz = a.Center[3] - b.Center[3]
+    return MathSqrt(dx * dx + dz * dz)
+end
+
+---@param a NavLeaf
+---@param b NavLeaf
+---@return number
+local DistanceToLeaf = function(a, b)
+    local dx = a.px - b.px
+    local dz = a.pz - b.pz
     return MathSqrt(dx * dx + dz * dz)
 end
 
@@ -389,12 +398,57 @@ local function FindSections(grid, position, distance)
     return positions, head - 1
 end
 
+---@param destination NavLeaf 
+---@param cache? NavLeaf[]
+---@return Vector[]
+---@return number   # Number of points in path
+local function TraceLeaves(destination, cache)
+    -- local scope for performance
+    local NavLeaves = NavGenerator.NavLeaves
+
+    ---@type number
+    local head = 1
+
+    ---@type NavLeaf[]
+    local cache = cache or { }
+
+    ---@type NavLeaf | nil
+    local section = NavLeaves[destination.HeapFrom]
+
+    -- trace path from destination
+    while true do
+        if not section then
+            break
+        end
+
+        local leafFrom = NavLeaves[section.HeapFrom]
+        if leafFrom and leafFrom == destination then
+            break
+        end
+
+        cache[head] = section
+        head = head + 1
+
+        section = leafFrom
+    end
+
+    -- reverse the path
+    for k = 1, (0.5 * head) ^ 0 do
+        local temp = cache[k]
+        cache[k] = cache[head - k]
+        cache[head - k] = temp
+    end
+
+    cache[head] = destination
+
+    return cache, head
+end
 
 ---@param destination NavSection 
 ---@param cache? NavSection[]
 ---@return Vector[]
 ---@return number   # Number of points in path
-local function TracePath(destination, cache)
+local function TraceSections(destination, cache)
 
     -- local scope for performance
     local NavSections = NavGenerator.NavSections
@@ -443,7 +497,7 @@ end
 ---@param destination Vector
 ---@param sections NavSection[]
 ---@param count number
-local function PathToPositions(grid, label, origin, destination, sections, count)
+local function SectionsToPositions(grid, label, origin, destination, sections, count)
     ---@type number
     local distance = 0
 
@@ -454,7 +508,7 @@ local function PathToPositions(grid, label, origin, destination, sections, count
     local sectionLast = origin
     for k = 2, count do
         local sectionNext = sections[k]
-        distance = distance + DistanceTo(sectionLast, sectionNext)
+        distance = distance + DistanceToSection(sectionLast, sectionNext)
 
         if k > 1 then
             positions[k - 1] = { unpack(sectionNext.Center) }
@@ -493,6 +547,42 @@ local function PathToPositions(grid, label, origin, destination, sections, count
             end
         end
     end
+
+    return positions, count, distance
+end
+
+---@param grid NavGrid
+---@param label NavLabelIdentifier
+---@param origin NavLeaf
+---@param destination Vector
+---@param leaves NavLeaf[]
+---@param count number
+local function LeavesToPositions(grid, label, origin, destination, leaves, count)
+    ---@type number
+    local distance = 0
+
+    ---@type Vector[]
+    local positions = {  }
+
+    -- turn the path into positions
+    local leafLast = origin
+    for k = 1, count do
+        local leafNext = leaves[k]
+        distance = distance + DistanceToLeaf(leafLast, leafNext)
+
+        if k > 1 then
+            local px = leafNext.px
+            local pz = leafNext.pz
+            local py = GetSurfaceHeight(px, pz)
+            positions[k - 1] = { px, py, pz }
+        end
+
+        leafLast = leafNext
+    end
+
+    -- add in the destination
+    local count = count - 1
+    positions[count] = destination
 
     return positions, count, distance
 end
@@ -598,6 +688,92 @@ end
 ---@param layer NavLayers
 ---@param origin Vector
 ---@param destination Vector
+---@param thresholdLeafSize number      # Minimum size of a leaf to consider it pathable. Size is in ogrids. Defaults to 4
+---@param multiplierLeafSize number     # Multiplier to prefer larger leaves. Defaults to 1. Smaller values reduces the preference. A value of 0 removes the preference all together
+---@return Vector[]?            # List of positions
+---@return ('SystemError' | 'NotGenerated' | 'InvalidLayer' | 'OutsideMap' | 'OriginOutsideMap' | 'OriginUnpathable' | 'DestinationOutsideMap' | 'DestinationUnpathable' | 'Unpathable') | number   # Error message, or the number of positions
+---@return number?              # Length of path
+function DetailedPathTo(layer, origin, destination, thresholdLeafSize, multiplierLeafSize)
+
+    thresholdLeafSize = thresholdLeafSize or 4
+    multiplierLeafSize = multiplierLeafSize or 1
+
+    -- check if generated
+    if not NavGenerator.IsGenerated() then
+        return nil, 'NotGenerated', nil
+    end
+
+    -- check if we can path
+    local ok, msg = CanPathTo(layer, origin, destination)
+    if not ok then
+        return nil, msg
+    end
+
+    -- local scope for performance
+    local NavLeaves = NavGenerator.NavLeaves
+
+    -- setup pathing
+    local seenIdentifier = PathToGetUniqueIdentifier()
+    local grid = FindGrid(layer)                             --[[@as NavGrid]]
+    local originLeaf = FindLeaf(grid, origin)                --[[@as NavLeaf]]
+    local destinationLeaf = FindLeaf(grid, destination)      --[[@as NavLeaf]]
+
+    -- 0th iteration of search
+    originLeaf.HeapFrom = nil
+    originLeaf.HeapAcquiredCosts = 0
+    originLeaf.HeapTotalCosts = DistanceToLeaf(originLeaf, destinationLeaf)
+    originLeaf.HeapIdentifier = seenIdentifier
+
+    -- start using the navigational heap
+    PathToHeap:Clear()
+    PathToHeap:Insert(originLeaf)
+
+    destinationLeaf.HeapFrom = nil
+    destinationLeaf.HeapAcquiredCosts = 0
+    destinationLeaf.HeapTotalCosts = 0
+    destinationLeaf.HeapIdentifier = 0
+
+     -- search iterations
+     while not PathToHeap:IsEmpty() do
+
+        local leaf = PathToHeap:ExtractMin() --[[@as NavLeaf]]
+
+        -- final state
+        if leaf == destinationLeaf then
+            break
+        end
+
+        -- continue state
+        for k = 1, TableGetn(leaf) do
+            local neighbor = NavLeaves[leaf[k]]
+            if neighbor.Label > 0 and (neighbor.HeapIdentifier != seenIdentifier) and (neighbor.Size >= thresholdLeafSize) then
+                neighbor.HeapIdentifier = seenIdentifier
+                neighbor.HeapFrom = leaf.Identifier
+                neighbor.HeapAcquiredCosts = leaf.HeapAcquiredCosts + DistanceToLeaf(leaf, neighbor) + multiplierLeafSize * 0.01 * (513 - neighbor.Size)
+                neighbor.HeapTotalCosts = neighbor.HeapAcquiredCosts + DistanceToLeaf(destinationLeaf, neighbor)
+                PathToHeap:Insert(neighbor)
+            end
+        end
+    end
+
+    -- check if we found a path
+    if destinationLeaf.HeapIdentifier ~= seenIdentifier then
+        return nil, 'SystemError'
+    end
+
+    local sections, sectionCount = TraceLeaves(destinationLeaf)
+    local positions, positionCount, distance = LeavesToPositions(grid, originLeaf.Label, originLeaf, destination, sections, sectionCount)
+
+    -- debugging!
+    DebugRegisterPath('PathTo', positions, origin, destination)
+
+    -- return all the goodies!!
+    return positions, positionCount, distance
+end
+
+---@param layer NavLayers
+---@param origin Vector
+---@param destination Vector
 ---@return Vector[]?            # List of positions
 ---@return ('SystemError' | 'NotGenerated' | 'InvalidLayer' | 'OutsideMap' | 'OriginOutsideMap' | 'OriginUnpathable' | 'DestinationOutsideMap' | 'DestinationUnpathable' | 'Unpathable') | number   # Error message, or the number of positions
 ---@return number?              # Length of path
@@ -625,7 +801,7 @@ function PathTo(layer, origin, destination)
     -- 0th iteration of search
     originSection.HeapFrom = nil
     originSection.HeapAcquiredCosts = 0
-    originSection.HeapTotalCosts = DistanceTo(originSection, destinationSection)
+    originSection.HeapTotalCosts = DistanceToSection(originSection, destinationSection)
     originSection.HeapIdentifier = seenIdentifier
 
     -- start using the navigational heap
@@ -655,8 +831,8 @@ function PathTo(layer, origin, destination)
             if neighbor.Label > 0 and neighbor.HeapIdentifier != seenIdentifier then
                 neighbor.HeapIdentifier = seenIdentifier
                 neighbor.HeapFrom = section.Identifier
-                neighbor.HeapAcquiredCosts = section.HeapAcquiredCosts + DistanceTo(section, neighbor)
-                neighbor.HeapTotalCosts = neighbor.HeapAcquiredCosts + DistanceTo(destinationSection, neighbor)
+                neighbor.HeapAcquiredCosts = section.HeapAcquiredCosts + DistanceToSection(section, neighbor)
+                neighbor.HeapTotalCosts = neighbor.HeapAcquiredCosts + DistanceToSection(destinationSection, neighbor)
                 PathToHeap:Insert(neighbor)
             end
         end
@@ -667,8 +843,8 @@ function PathTo(layer, origin, destination)
         return nil, 'SystemError'
     end
 
-    local sections, sectionCount = TracePath(destinationSection)
-    local positions, positionCount, distance = PathToPositions(grid, originSection.Label, originSection, destination, sections, sectionCount)
+    local sections, sectionCount = TraceSections(destinationSection)
+    local positions, positionCount, distance = SectionsToPositions(grid, originSection.Label, originSection, destination, sections, sectionCount)
 
     -- debugging!
     DebugRegisterPath('PathTo', positions, origin, destination)
@@ -715,7 +891,7 @@ function PathToWithThreatThreshold(layer, origin, destination, aibrain, threatFu
     -- 0th iteration of search
     originSection.HeapFrom = nil
     originSection.HeapAcquiredCosts = 0
-    originSection.HeapTotalCosts = DistanceTo(originSection, destinationSection)
+    originSection.HeapTotalCosts = DistanceToSection(originSection, destinationSection)
     originSection.HeapIdentifier = seenIdentifier
 
     -- start using the navigational heap
@@ -756,8 +932,8 @@ function PathToWithThreatThreshold(layer, origin, destination, aibrain, threatFu
                 else
                     neighbor.HeapIdentifier = seenIdentifier
                     neighbor.HeapFrom = section.Identifier
-                    neighbor.HeapAcquiredCosts = section.HeapAcquiredCosts + DistanceTo(section, neighbor)
-                    neighbor.HeapTotalCosts = neighbor.HeapAcquiredCosts + DistanceTo(destinationSection, neighbor)
+                    neighbor.HeapAcquiredCosts = section.HeapAcquiredCosts + DistanceToSection(section, neighbor)
+                    neighbor.HeapTotalCosts = neighbor.HeapAcquiredCosts + DistanceToSection(destinationSection, neighbor)
                     PathToHeap:Insert(neighbor)
                 end
             end
@@ -769,8 +945,8 @@ function PathToWithThreatThreshold(layer, origin, destination, aibrain, threatFu
         return nil, 'TooMuchThreat', nil, threats, tHead - 1
     end
 
-    local sections, sectionCount = TracePath(destinationSection)
-    local positions, positionCount, distance = PathToPositions(grid, originSection.Label, originSection, destination, sections, sectionCount)
+    local sections, sectionCount = TraceSections(destinationSection)
+    local positions, positionCount, distance = SectionsToPositions(grid, originSection.Label, originSection, destination, sections, sectionCount)
 
     -- debugging!
     DebugRegisterPath('PathTo', positions, origin, destination)
