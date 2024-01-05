@@ -35,8 +35,14 @@ AFactoryUnit = ClassUnit(FactoryUnit) {
     StartBuildFx = function(self, unitBeingBuilt)
         local buildEffectBones = self.BuildEffectBones
         local buildEffectsBag = self.BuildEffectsBag
-        local thread = ForkThread(CreateAeonFactoryBuildingEffects, unitBeingBuilt, buildEffectBones, 'Attachpoint',
-            buildEffectsBag)
+        local thread = ForkThread(
+            CreateAeonFactoryBuildingEffects,
+            self,
+            unitBeingBuilt,
+            buildEffectBones,
+            'Attachpoint',
+            buildEffectsBag
+        )
 
         self.Trash:Add(thread)
         unitBeingBuilt.Trash:Add(thread)
