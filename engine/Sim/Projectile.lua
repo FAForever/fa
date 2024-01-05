@@ -82,6 +82,7 @@ end
 
 ---
 ---@param collide boolean
+---@return Projectile
 function Projectile:SetCollision(collide)
 end
 
