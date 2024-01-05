@@ -2165,25 +2165,27 @@ function FormatData(unitData, type)
 
         import(UIUtil.GetLayoutFilename('construction')).OnTabChangeLayout(type)
     elseif type == 'templates' then
-        table.sort(unitData, function(a, b)
-            if a.key and not b.key then
-                return true
-            elseif b.key and not a.key then
-                return false
-            elseif a.key and b.key then
-                return a.key <= b.key
-            elseif a.name == b.name then
-                return false
-            else
-                if LOC(a.name) <= LOC(b.name) then
+        if unitData then
+            table.sort(unitData, function(a, b)
+                if a.key and not b.key then
                     return true
-                else
+                elseif b.key and not a.key then
                     return false
+                elseif a.key and b.key then
+                    return a.key <= b.key
+                elseif a.name == b.name then
+                    return false
+                else
+                    if LOC(a.name) <= LOC(b.name) then
+                        return true
+                    else
+                        return false
+                    end
                 end
+            end)
+            for _, v in unitData do
+                table.insert(retData, {type = 'templates', id = 'template', template = v})
             end
-        end)
-        for _, v in unitData do
-            table.insert(retData, {type = 'templates', id = 'template', template = v})
         end
         CreateExtraControls('templates')
         SetSecondaryDisplay('buildQueue')
