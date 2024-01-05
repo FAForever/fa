@@ -8,34 +8,46 @@
 
 local SeraphimWeapons = import("/lua/seraphimweapons.lua")
 local SLandUnit = import("/lua/seraphimunits.lua").SLandUnit
+local SLandUnitOnCreate = SLandUnit.OnCreate
+local SLandUnitOnScriptBitSet = SLandUnit.OnScriptBitSet
+local SLandUnitOnScriptBitClear = SLandUnit.OnScriptBitClear
 
 local SDFSihEnergyRifleNormalMode = SeraphimWeapons.SDFSniperShotNormalMode
 local SDFSihEnergyRifleSniperMode = SeraphimWeapons.SDFSniperShotSniperMode
 
+-- upvalue scope for performance
+local WaitTicks = WaitTicks
+local ForkThread = ForkThread
+local CreateAttachedEmitter = CreateAttachedEmitter
+
 ---@class XSL0305 : SLandUnit
 ---@field TrashSniperFx TrashBag
----@field isSniperFiringMode boolean -- Whether the sniper mode is active for next shot
+---@field IsChangingMoveMode boolean
+---@field IsSniperFiringMode boolean # Whether the sniper mode is active for next shot
 XSL0305 = ClassUnit(SLandUnit) {
     Weapons = {
         -- used for both modes of operation
         MainGun = ClassWeapon(SDFSihEnergyRifleNormalMode) {
             RackSalvoFiringState = State(SDFSihEnergyRifleNormalMode.RackSalvoFiringState) {
                 Main = function(self)
-                    if self.unit.isSniperFiringMode ~= nil then
-                        self.unit:ScheduleMovementChange(0, true)
-                        self.unit:ScheduleMovementChange(1 / self:GetWeaponRoF(), false)
+                    local unit = self.unit
+                    if unit.IsSniperFiringMode ~= nil then
+                        unit:ScheduleMovementChange(0, true)
+                        unit:ScheduleMovementChange(1 / self:GetWeaponRoF(), false)
                     end
                     SDFSihEnergyRifleNormalMode.RackSalvoFiringState.Main(self)
                 end,
             }
         },
+
         -- kind of a dummy weapon that carries the data of the sniper mode for the main gun
         SniperGun = ClassWeapon(SDFSihEnergyRifleSniperMode) {},
     },
 
     ---@param self XSL0305
     OnCreate = function(self)
-        SLandUnit.OnCreate(self)
+        SLandUnitOnCreate(self)
+
         self:SetWeaponEnabledByLabel("SniperGun", false)
         self.TrashSniperFx = TrashBag()
     end,
@@ -43,7 +55,8 @@ XSL0305 = ClassUnit(SLandUnit) {
     ---@param self XSL0305
     ---@param bit integer
     OnScriptBitSet = function(self, bit)
-        SLandUnit.OnScriptBitSet(self, bit)
+        SLandUnitOnScriptBitSet(self, bit)
+
         if bit == 1 then
             self:SetSniperMode(true)
         end
@@ -52,7 +65,8 @@ XSL0305 = ClassUnit(SLandUnit) {
     ---@param self XSL0305
     ---@param bit integer
     OnScriptBitClear = function(self, bit)
-        SLandUnit.OnScriptBitClear(self, bit)
+        SLandUnitOnScriptBitClear(self, bit)
+
         if bit == 1 then
             self:SetSniperMode(false)
         end
@@ -62,30 +76,42 @@ XSL0305 = ClassUnit(SLandUnit) {
     ---@param delaySeconds number
     ---@param mode boolean -- true activates the slowdown, false deactivates it.
     ScheduleMovementChange = function(self, delaySeconds, mode)
-        local switchToMoveMode = function(mode)
-            local speedMult = self.Blueprint.Physics.LandSpeedMultiplier or 1 -- left for compatability
-            if mode then
-                speedMult = speedMult * (self.Blueprint.Physics.SniperModeSpeedMultiplier or 0.75)
-                self:SetSpeedMult(speedMult)
-                if not self.TrashSniperFx[1] then
-                    self.TrashSniperFx:Add(CreateAttachedEmitter(self, "XSL0305", self.Army,
-                            "/effects/emitters/seraphim_being_built_ambient_01_emit.bp"))
-                end
-            else
-                self:SetSpeedMult(speedMult)
-                self.TrashSniperFx:Destroy()
-            end
-        end
-
         if delaySeconds == 0 then
-            switchToMoveMode(mode)
-        elseif self.isChangingMoveMode == nil then 
-            self.Trash:Add(ForkThread(function()
-                self.isChangingMoveMode = true
-                WaitSeconds(delaySeconds)
-                switchToMoveMode(mode)
-                self.isChangingMoveMode = nil
-                end))
+            self:SwitchMoveMode(mode)
+        elseif self.IsChangingMoveMode == nil then
+            self.Trash:Add(ForkThread(self.ChangeMoveModeThread, self, delaySeconds, mode))
+        end
+    end,
+
+    ---@param self XSL0305
+    ---@param delaySeconds number
+    ---@param mode boolean -- true activates the slowdown, false deactivates it.
+    ChangeMoveModeThread = function(self, delaySeconds, mode)
+        self.IsChangingMoveMode = true
+        WaitTicks(10 * delaySeconds + 1)
+        self:SwitchMoveMode(mode)
+        self.IsChangingMoveMode = nil
+    end,
+
+    ---@param self XSL0305
+    ---@param mode boolean -- true activates the slowdown, false deactivates it.
+    SwitchMoveMode = function(self, mode)
+        local blueprintPhysics = self.Blueprint.Physics
+
+        local speedMult = blueprintPhysics.LandSpeedMultiplier or 1 -- left for compatability
+        self.TrashSniperFx:Destroy()
+
+        if mode then
+            speedMult = speedMult * (blueprintPhysics.SniperModeSpeedMultiplier or 0.75)
+            self:SetSpeedMult(speedMult)
+            self.TrashSniperFx:Add(
+                CreateAttachedEmitter(
+                    self, "XSL0305", self.Army,
+                    "/effects/emitters/seraphim_being_built_ambient_01_emit.bp"
+                )
+            )
+        else
+            self:SetSpeedMult(speedMult)
         end
     end,
 
@@ -93,17 +119,17 @@ XSL0305 = ClassUnit(SLandUnit) {
     ---@param mode boolean
     SetSniperMode = function(self, mode)
         local label
-        self.isSniperFiringMode = mode
         if mode then
             label = "SniperGun"
-            self.isSniperFiringMode = true
+            self.IsSniperFiringMode = true
         else
             label = "MainGun"
-            self.isSniperFiringMode = nil
+            self.IsSniperFiringMode = nil
         end
-        
+
         local weapon = self:GetWeaponByLabel("MainGun")
         local bp = self:GetWeaponByLabel(label):GetBlueprint()
+
         -- a lot of the firing sequence relies on the stored blueprint - we'll store the current
         -- weapon blueprint so that it works
         weapon.Blueprint = bp
@@ -124,5 +150,5 @@ XSL0305 = ClassUnit(SLandUnit) {
 }
 TypeClass = XSL0305
 
---- Kept for mod support
+--- backwards compatibility with mods
 local EffectUtil = import("/lua/effectutilities.lua")
