@@ -183,9 +183,9 @@ UnitBlueprint{
     SelectionSizeZ = 1.2,
     SelectionThickness = 0.48,
     SizeSphere = 1.6,
-    SizeX = 1.8,
+    SizeX = 1.4,
     SizeY = 1,
-    SizeZ = 1.6,
+    SizeZ = 1.4,
     StrategicIconName = "icon_gunship3_antiair",
     StrategicIconSortPriority = 65,
     Transport = {

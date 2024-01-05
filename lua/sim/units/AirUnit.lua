@@ -43,27 +43,30 @@ AirUnit = ClassUnit(MobileUnit) {
     OnMotionVertEventChange = function(self, new, old)
         MobileUnit.OnMotionVertEventChange(self, new, old)
 
+        local blueprint = self.Blueprint
+        local blueprintIntel = blueprint.Intel
+
         if new == 'Down' then
             -- Turn off the ambient hover sound
             self:StopUnitAmbientSound('ActiveLoop')
         elseif new == 'Bottom' then
-            -- While landed, planes can only see half as far
-            local vis = self.Blueprint.Intel.VisionRadius / 2
-            self:SetIntelRadius('Vision', vis)
-            self:SetIntelRadius('WaterVision', 4)
+            -- reduce vision and collision shape while landed
+            self:SetIntelRadius('Vision', 0.5 * blueprintIntel.VisionRadius)
+            self:SetIntelRadius('WaterVision', 0.5 * blueprintIntel.WaterVisionRadius)
+            self:RevertCollisionShape()
 
-            -- Turn off the ambient hover sound
-            -- It will probably already be off, but there are some odd cases that
-            -- make this a good idea to include here as well.
-            self:StopUnitAmbientSound('ActiveLoop')
-        elseif new == 'Up' or (new == 'Top' and (old == 'Down' or old == 'Bottom')) then
-            -- Set the vision radius back to default
-            local bpVision = self.Blueprint.Intel.VisionRadius
-            if bpVision then
-                self:SetIntelRadius('Vision', bpVision)
-                self:SetIntelRadius('WaterVision', 0)
-            else
-                self:SetIntelRadius('Vision', 0)
+        elseif old == 'Bottom' then
+            -- set vision and collision shape back to default values
+            self:SetIntelRadius('Vision', blueprintIntel.VisionRadius)
+            self:SetIntelRadius('WaterVision', blueprintIntel.WaterVisionRadius)
+            if blueprint.SizeSphere then
+                self:SetCollisionShape(
+                    'Sphere',
+                    blueprint.CollisionSphereOffsetX or 0,
+                    blueprint.CollisionSphereOffsetY or 0,
+                    blueprint.CollisionSphereOffsetZ or 0,
+                    blueprint.SizeSphere
+                )
             end
         end
     end,

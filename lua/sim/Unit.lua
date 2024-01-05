@@ -37,10 +37,7 @@ local rawget = rawget
 
 local UpdateAssistersConsumptionCats = categories.REPAIR - categories.INSIGNIFICANTUNIT     -- anything that repairs but insignificant things, such as drones
 
-local DeprecatedWarnings = { }
-
 local DefaultTerrainType = GetTerrainType(-1, -1)
-
 
 --- Structures that are reused for performance reasons
 --- Maps unit.techCategory to a number so we can do math on it for naval units
@@ -5382,6 +5379,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
     GetUnitBeingBuilt = function(self)
         return self.UnitBeingBuilt
     end,
+
 }
 
 -- upvalued moho functions for performance
