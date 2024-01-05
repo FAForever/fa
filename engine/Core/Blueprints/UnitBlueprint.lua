@@ -40,6 +40,10 @@
 ---@field BuildBotTotal? number
 --- set to an integer that describes the unit's position in the list of build icons
 ---@field BuildIconSortPriority integer
+--- 
+---@field CrashWatchBone Bone
+--- 
+---@field CrashRadius number
 --- the collision x offset used when `SizeSphere` is defined
 ---@field CollisionSphereOffsetX? number
 --- the collision y offset used when `SizeSphere` is defined

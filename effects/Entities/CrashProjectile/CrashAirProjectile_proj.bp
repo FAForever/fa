@@ -1,0 +1,12 @@
+ProjectileBlueprint {
+    Physics = {
+        CollideSurface = true,
+        CollideEntity = true,
+        DestroyOnWater = false,
+        RotationalVelocity = 60,
+        RotationalVelocityRange = 120,
+        UseGravity = true,
+        Lifetime = 100,
+        VelocityAlign = true,
+    },
+}

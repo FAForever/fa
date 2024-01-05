@@ -1,0 +1,13 @@
+ProjectileBlueprint {
+    Physics = {
+        CollideSurface = true,
+        CollideEntity = false,
+        DestroyOnWater = false,
+        UseGravity = true,
+        RotationalVelocity = 10,
+        Lifetime = 100,
+        MaxSpeed = 2,
+        MaxSpeedRange = 0.1,
+        VelocityAlign = true,
+    },
+}
