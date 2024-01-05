@@ -90,6 +90,12 @@ end
 function CopyCurrentReplay(profile, newFilename)
 end
 
+---Copies given string to clipboard, returns true if succeeded
+---@param s string
+---@return boolean
+function CopyToClipboard(s)
+end
+
 --- Creates a Unit AtMouse
 ---@param blueprintId string
 ---@param ownerArmyIndex number
