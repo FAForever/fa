@@ -586,7 +586,7 @@ UnitBlueprint{
         Icon = "amph",
         QuickSelectPriority = 1,
         SelectionPriority = 3,
-        TeleportDelay = 3,
+        TeleportDelay = 10,
     },
     Intel = {
         ActiveIntel = { Omni = true },

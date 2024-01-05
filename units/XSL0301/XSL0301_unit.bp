@@ -528,7 +528,7 @@ UnitBlueprint{
             },
         },
         SelectionPriority = 3,
-        TeleportDelay = 3,
+        TeleportDelay = 10,
     },
     Intel = {
         FreeIntel = true,
