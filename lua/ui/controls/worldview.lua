@@ -17,7 +17,7 @@ local Prefs = import("/lua/user/prefs.lua")
 local OverchargeCanKill = import("/lua/ui/game/unitview.lua").OverchargeCanKill
 local CommandMode = import("/lua/ui/game/commandmode.lua")
 
-
+local TacticalReticle = import("/lua/ui/game/syncstrike.lua").TacticalReticle
 
 WorldViewParams = {
     ui_SelectTolerance = 7.0,
@@ -380,6 +380,7 @@ WorldView = ClassUI(moho.UIWorldView, Control) {
         -- clean up previous cursor
         if not (self.CursorLastEvent == event) and self[self.CursorLastEvent] then
             self[self.CursorLastEvent](self, self.CursorLastIdentifier, false, false)
+            self.CursorTrash:Destroy()
         end
 
         -- attempt to create a new cursor
@@ -632,7 +633,7 @@ WorldView = ClassUI(moho.UIWorldView, Control) {
                 local cursor = self.Cursor
                 cursor[1], cursor[2], cursor[3], cursor[4], cursor[5] = UIUtil.GetCursor(identifier)
                 self:ApplyCursor()
-
+                CommandMode.GetCommandMode()[2].reticle = TacticalReticle(self)
                 self:EnableIgnoreMode(true)
             end
         else
