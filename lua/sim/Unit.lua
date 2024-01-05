@@ -37,11 +37,7 @@ local rawget = rawget
 
 local UpdateAssistersConsumptionCats = categories.REPAIR - categories.INSIGNIFICANTUNIT     -- anything that repairs but insignificant things, such as drones
 
-local DeprecatedWarnings = { }
-
 local DefaultTerrainType = GetTerrainType(-1, -1)
-
-local MohoUnitMethodsRevertCollisionShape = moho.unit_methods.RevertCollisionShape
 
 --- Structures that are reused for performance reasons
 --- Maps unit.techCategory to a number so we can do math on it for naval units
@@ -5384,30 +5380,6 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         return self.UnitBeingBuilt
     end,
 
-    ---------------------------------------------------------------------------
-    --#region C-hooks
-
-    ---@param self Unit
-    RevertCollisionShape = function(self)
-
-        --- Add supports for the `SizeSphere` blueprint field
-
-        local blueprint = self.Blueprint
-        local blueprintSizeSphere = blueprint.SizeSphere
-        if blueprintSizeSphere then
-            self:SetCollisionShape(
-                'Sphere',
-                blueprint.CollisionSphereOffsetX or 0,
-                blueprint.CollisionSphereOffsetY or 0,
-                blueprint.CollisionSphereOffsetZ or 0,
-                blueprint.SizeSphere
-            )
-        else
-            MohoUnitMethodsRevertCollisionShape(self)
-        end
-    end,
-
-    --#endregion
 }
 
 -- upvalued moho functions for performance

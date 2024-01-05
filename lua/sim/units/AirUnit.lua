@@ -53,24 +53,21 @@ AirUnit = ClassUnit(MobileUnit) {
             -- reduce vision and collision shape while landed
             self:SetIntelRadius('Vision', 0.5 * blueprintIntel.VisionRadius)
             self:SetIntelRadius('WaterVision', 0.5 * blueprintIntel.WaterVisionRadius)
-            local blueprintSizeSphere = blueprint.SizeSphere
-            if blueprintSizeSphere then
-                self:SetCollisionShape(
-                    'Box',
-                    blueprint.CollisionOffsetX or 0,
-                    blueprint.CollisionOffsetY or 0,
-                    blueprint.CollisionOffsetZ or 0,
-                    blueprint.SizeX,
-                    blueprint.SizeY,
-                    blueprint.SizeZ
-                )
-            end
+            self:RevertCollisionShape()
 
         elseif old == 'Bottom' then
             -- set vision and collision shape back to default values
             self:SetIntelRadius('Vision', blueprintIntel.VisionRadius)
             self:SetIntelRadius('WaterVision', blueprintIntel.WaterVisionRadius)
-            self:RevertCollisionShape()
+            if blueprint.SizeSphere then
+                self:SetCollisionShape(
+                    'Sphere',
+                    blueprint.CollisionSphereOffsetX or 0,
+                    blueprint.CollisionSphereOffsetY or 0,
+                    blueprint.CollisionSphereOffsetZ or 0,
+                    blueprint.SizeSphere
+                )
+            end
         end
     end,
 
