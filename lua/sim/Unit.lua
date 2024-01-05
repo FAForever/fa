@@ -25,8 +25,6 @@ local Weapon = import("/lua/sim/weapon.lua").Weapon
 local IntelComponent = import('/lua/defaultcomponents.lua').IntelComponent
 local VeterancyComponent = import('/lua/defaultcomponents.lua').VeterancyComponent
 
-local TeleportCostFunction = import('/lua/shared/teleport.lua').TeleportCostFunction
-
 local TrashBag = TrashBag
 local TrashAdd = TrashBag.Add
 local TrashDestroy = TrashBag.Destroy
@@ -4617,7 +4615,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         self:PlayUnitSound('TeleportStart')
         self:PlayUnitAmbientSound('TeleportLoop')
 
-        local energyCost, time, teleDelay = TeleportCostFunction(self, location)
+        local energyCost, time, teleDelay = import('/lua/shared/teleport.lua').TeleportCostFunction(self, location)
 
         if teleDelay then
             self.TeleportDestChargeBag = nil

@@ -24,8 +24,6 @@ local UIUtil = import("/lua/ui/uiutil.lua")
 local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
 local Reticle = import('/lua/ui/controls/reticle.lua').Reticle
 
-local TeleportCostFunction = import("/lua/shared/teleport.lua").TeleportCostFunction
-
 -- Local upvalues for performance
 local GetSelectedUnits = GetSelectedUnits
 
@@ -57,7 +55,7 @@ TeleportReticle = ClassUI(Reticle) {
             local eCost, tCost = 0.,0.
             -- add up our teleport energy costs and find the max time
             for _, unit in GetSelectedUnits() do
-                local eCache, tCache = TeleportCostFunction(unit, mouseWorldPos)
+                local eCache, tCache = import('/lua/shared/teleport.lua').TeleportCostFunction(unit, mouseWorldPos)
                 eCost = eCost + eCache
                 if tCache > tCost then
                     tCost = tCache
