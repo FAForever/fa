@@ -45,13 +45,27 @@ UEL0001 = ClassUnit(ACUUnit) {
                 TIFCruiseMissileLauncher.PlayFxRackSalvoReloadSequence(self)
                 local hatch = self.unit.MissileHatchSlider
                 if hatch then
-                    self:ForkThread(function() 
-                        WaitTicks(30) -- Smoke effect lifetime
-                        self.unit.MissileHatchSlider:SetGoal(0, 0, 0):SetSpeed(1.12) -- Matches reload time - 3 seconds
-                    end)
+                    self.Trash:Add(
+                        ForkThread(
+                            self.CloseHatchThread, self, hatch
+                        )
+                    )
                 end
             end,
+
+            CloseHatchThread = function(self, slider)
+                -- wait for the launch effects to clear
+                WaitTicks(30)
+
+                if IsDestroyed(slider) then
+                    return
+                end
+
+                slider:SetGoal(0, 0, 0)
+                slider:SetSpeed(1.12) -- speed matches reload time
+            end,
         },
+
         TacNukeMissile = ClassWeapon(TIFCruiseMissileLauncher) {
             PlayFxRackSalvoChargeSequence = function(self)
                 TIFCruiseMissileLauncher.PlayFxRackSalvoChargeSequence(self)
@@ -65,11 +79,25 @@ UEL0001 = ClassUnit(ACUUnit) {
                 TIFCruiseMissileLauncher.PlayFxRackSalvoReloadSequence(self)
                 local hatch = self.unit.MissileHatchSlider
                 if hatch then
-                    self:ForkThread(function() 
-                        WaitTicks(30) -- Smoke effect lifetime
-                        self.unit.MissileHatchSlider:SetGoal(0, 0, 0):SetSpeed(0.077) -- Matches reload time - 3 seconds
-                    end)
+                    self.Trash:Add(
+                        ForkThread(
+                            self.CloseHatchThread, self, hatch
+                        )
+                    )
                 end
+            end,
+
+            CloseHatchThread = function(self, slider)
+                -- wait for the launch effects to clear
+                WaitTicks(30)
+
+                if IsDestroyed(slider) then
+                    return
+                end
+
+                -- speed matches reload time
+                slider:SetGoal(0, 0, 0)
+                slider:SetSpeed(0.077)
             end,
         },
     },
@@ -94,7 +122,8 @@ UEL0001 = ClassUnit(ACUUnit) {
         if self:IsValidBone(hatchBone) then
             self.MissileHatchSlider = CreateSlider(self, hatchBone)
         else
-            WARN('*ERROR: Trying to use the bone, ' .. hatchBone .. ' on unit ' .. self.UnitId .. ' and it does not exist in the model.')
+            WARN('*ERROR: Trying to use the bone, ' ..
+                hatchBone .. ' on unit ' .. self.UnitId .. ' and it does not exist in the model.')
         end
     end,
 
@@ -120,7 +149,8 @@ UEL0001 = ClassUnit(ACUUnit) {
     CreateBuildEffects = function(self, unitBeingBuilt, order)
         -- Different effect if we have building cube
         if unitBeingBuilt.BuildingCube then
-            EffectUtil.CreateUEFCommanderBuildSliceBeams(self, unitBeingBuilt, self.BuildEffectBones, self.BuildEffectsBag)
+            EffectUtil.CreateUEFCommanderBuildSliceBeams(self, unitBeingBuilt, self.BuildEffectBones,
+                self.BuildEffectsBag)
         else
             EffectUtil.CreateDefaultBuildBeams(self, unitBeingBuilt, self.BuildEffectBones, self.BuildEffectsBag)
         end
@@ -181,7 +211,7 @@ UEL0001 = ClassUnit(ACUUnit) {
                 end
             end
         else
-            self:CreateEnhancement(pod..'Remove')
+            self:CreateEnhancement(pod .. 'Remove')
         end
     end,
 
@@ -276,7 +306,7 @@ UEL0001 = ClassUnit(ACUUnit) {
             self:DestroyShield()
             self:SetMaintenanceConsumptionInactive()
             self:RemoveToggleCap('RULEUTC_ShieldToggle')
-        elseif enh =='AdvancedEngineering' then
+        elseif enh == 'AdvancedEngineering' then
             local cat = ParseEntityCategory(bp.BuildableCategoryAdds)
             self:RemoveBuildRestriction(cat)
             if not Buffs['UEFACUT2BuildRate'] then
@@ -288,7 +318,7 @@ UEL0001 = ClassUnit(ACUUnit) {
                     Duration = -1,
                     Affects = {
                         BuildRate = {
-                            Add =  bp.NewBuildRate - self:GetBlueprint().Economy.BuildRate,
+                            Add = bp.NewBuildRate - self:GetBlueprint().Economy.BuildRate,
                             Mult = 1,
                         },
                         MaxHealth = {
@@ -303,16 +333,18 @@ UEL0001 = ClassUnit(ACUUnit) {
                 }
             end
             Buff.ApplyBuff(self, 'UEFACUT2BuildRate')
-        elseif enh =='AdvancedEngineeringRemove' then
+        elseif enh == 'AdvancedEngineeringRemove' then
             local bp = self:GetBlueprint().Economy.BuildRate
             if not bp then return end
             self:RestoreBuildRestrictions()
-            self:AddBuildRestriction(categories.UEF * (categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER))
-            self:AddBuildRestriction(categories.UEF * (categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER))
+            self:AddBuildRestriction(categories.UEF *
+                (categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER))
+            self:AddBuildRestriction(categories.UEF *
+                (categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER))
             if Buff.HasBuff(self, 'UEFACUT2BuildRate') then
                 Buff.RemoveBuff(self, 'UEFACUT2BuildRate')
             end
-        elseif enh =='T3Engineering' then
+        elseif enh == 'T3Engineering' then
             local cat = ParseEntityCategory(bp.BuildableCategoryAdds)
             self:RemoveBuildRestriction(cat)
             if not Buffs['UEFACUT3BuildRate'] then
@@ -324,7 +356,7 @@ UEL0001 = ClassUnit(ACUUnit) {
                     Duration = -1,
                     Affects = {
                         BuildRate = {
-                            Add =  bp.NewBuildRate - self:GetBlueprint().Economy.BuildRate,
+                            Add = bp.NewBuildRate - self:GetBlueprint().Economy.BuildRate,
                             Mult = 1,
                         },
                         MaxHealth = {
@@ -339,15 +371,16 @@ UEL0001 = ClassUnit(ACUUnit) {
                 }
             end
             Buff.ApplyBuff(self, 'UEFACUT3BuildRate')
-        elseif enh =='T3EngineeringRemove' then
+        elseif enh == 'T3EngineeringRemove' then
             local bp = self:GetBlueprint().Economy.BuildRate
             if not bp then return end
             self:RestoreBuildRestrictions()
             if Buff.HasBuff(self, 'UEFACUT3BuildRate') then
                 Buff.RemoveBuff(self, 'UEFACUT3BuildRate')
             end
-            self:AddBuildRestriction(categories.UEF * (categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER))
-        elseif enh =='DamageStabilization' then
+            self:AddBuildRestriction(categories.UEF *
+                (categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER))
+        elseif enh == 'DamageStabilization' then
             if not Buffs['UEFACUDamageStabilization'] then
                 BuffBlueprint {
                     Name = 'UEFACUDamageStabilization',
@@ -368,11 +401,11 @@ UEL0001 = ClassUnit(ACUUnit) {
                 }
             end
             Buff.ApplyBuff(self, 'UEFACUDamageStabilization')
-        elseif enh =='DamageStabilizationRemove' then
+        elseif enh == 'DamageStabilizationRemove' then
             if Buff.HasBuff(self, 'UEFACUDamageStabilization') then
                 Buff.RemoveBuff(self, 'UEFACUDamageStabilization')
             end
-        elseif enh =='HeavyAntiMatterCannon' then
+        elseif enh == 'HeavyAntiMatterCannon' then
             local wep = self:GetWeaponByLabel('RightZephyr')
             wep:AddDamageMod(bp.ZephyrDamageMod)
             wep:ChangeMaxRadius(bp.NewMaxRadius or 44)
@@ -380,7 +413,7 @@ UEL0001 = ClassUnit(ACUUnit) {
             oc:ChangeMaxRadius(bp.NewMaxRadius or 44)
             local aoc = self:GetWeaponByLabel('AutoOverCharge')
             aoc:ChangeMaxRadius(bp.NewMaxRadius or 44)
-        elseif enh =='HeavyAntiMatterCannonRemove' then
+        elseif enh == 'HeavyAntiMatterCannonRemove' then
             local bp = self:GetBlueprint().Enhancements['HeavyAntiMatterCannon']
             if not bp then return end
             local wep = self:GetWeaponByLabel('RightZephyr')
@@ -401,11 +434,11 @@ UEL0001 = ClassUnit(ACUUnit) {
             local bpEcon = self:GetBlueprint().Economy
             self:SetProductionPerSecondEnergy(bpEcon.ProductionPerSecondEnergy or 0)
             self:SetProductionPerSecondMass(bpEcon.ProductionPerSecondMass or 0)
-        elseif enh =='TacticalMissile' then
+        elseif enh == 'TacticalMissile' then
             self:AddCommandCap('RULEUCC_Tactical')
             self:AddCommandCap('RULEUCC_SiloBuildTactical')
             self:SetWeaponEnabledByLabel('TacMissile', true)
-        elseif enh =='TacticalNukeMissile' then
+        elseif enh == 'TacticalNukeMissile' then
             self:RemoveCommandCap('RULEUCC_Tactical')
             self:RemoveCommandCap('RULEUCC_SiloBuildTactical')
             self:AddCommandCap('RULEUCC_Nuke')
