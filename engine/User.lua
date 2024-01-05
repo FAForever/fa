@@ -247,7 +247,7 @@ function GetCommandLineArg(option, maxArgs)
 end
 
 --- Returns 'splash', 'frontend', or 'game' depending on the current state of the UI
----@return 'splash' | 'frontend' | 'game'
+---@return 'splash' | 'frontend' | 'game' | 'none'
 function GetCurrentUIState()
 end
 
