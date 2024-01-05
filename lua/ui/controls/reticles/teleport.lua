@@ -28,13 +28,14 @@ local Reticle = import('/lua/ui/controls/reticle.lua').Reticle
 local GetSelectedUnits = GetSelectedUnits
 
 --- Reticle for teleport cost info
----@class TeleportReticle : Reticle
+---@class UITeleportReticle : UIReticle
 ---@field ePrefix Text
 ---@field tPrefix Text
 ---@field eText Text
 ---@field tText Text
 TeleportReticle = ClassUI(Reticle) {
 
+    ---@param self UITeleportReticle
     SetLayout = function(self)
         self.ePrefix = UIUtil.CreateText(self, "Eng Cost: ", 16, UIUtil.bodyFont, true)
         self.tPrefix = UIUtil.CreateText(self, "Max Time: ", 16, UIUtil.bodyFont, true)
@@ -50,9 +51,11 @@ TeleportReticle = ClassUI(Reticle) {
         self.eText:SetColor('ffff00')
     end,
 
+    ---@param self UITeleportReticle
+    ---@param mouseWorldPos Vector
     UpdateDisplay = function(self, mouseWorldPos)
         if self.onMap then
-            local eCost, tCost = 0.,0.
+            local eCost, tCost = 0., 0.
             -- add up our teleport energy costs and find the max time
             for _, unit in GetSelectedUnits() do
                 local eCache, tCache = import('/lua/shared/teleport.lua').TeleportCostFunction(unit, mouseWorldPos)

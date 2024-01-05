@@ -29,7 +29,7 @@ local GetMouseScreenPos = GetMouseScreenPos
 local GetMouseWorldPos = GetMouseWorldPos
 
 --- Reticle base class for displaying images and texts on the cursor
----@class Reticle : Group
+---@class UIReticle : Group
 ---@field parent WorldView
 ---@field Trash TrashBag
 ---@field onMap boolean
@@ -37,6 +37,9 @@ local GetMouseWorldPos = GetMouseWorldPos
 ---@field mapZ number
 Reticle = ClassUI(Group) {
 
+    ---@param self UIReticle
+    ---@param parent Control
+    ---@param data any
     __init = function(self, parent, data)
         -- update our basic information
         Group.__init(self, parent)
@@ -69,6 +72,7 @@ Reticle = ClassUI(Group) {
     end,
 
     --- create and set the initial position of our child components
+    ---@param self UIReticle
     SetLayout = function(self)
         -- override me!
     end,
@@ -79,7 +83,7 @@ Reticle = ClassUI(Group) {
     end,
 
     --- function to update our on/off map state and see if it changed
-    ---@param self Reticle
+    ---@param self UIReticle
     ---@param mouseWorldPos Vector
     UpdateOnMapStatus = function(self, mouseWorldPos)
         if ((mouseWorldPos[1] < 1 or mouseWorldPos[1] > self.mapX - 1) or
@@ -90,7 +94,7 @@ Reticle = ClassUI(Group) {
     end,
 
     --- updates the position of our reticle to align with our mouse
-    ---@param self any
+    ---@param self UIReticle
     UpdatePosition = function(self)
         local pos = GetMouseScreenPos()
         self.Left:Set(pos[1] - self.Width()/2)
@@ -98,8 +102,8 @@ Reticle = ClassUI(Group) {
     end,
 
     --- frame update function
-    ---@param self any
-    ---@param elapsedTime any
+    ---@param self UIReticle
+    ---@param elapsedTime number
     OnFrame = function(self, elapsedTime)
         -- update if we're over the world, hide it otherwise
         if self.WorldView.CursorOverWorld then
@@ -128,7 +132,7 @@ Reticle = ClassUI(Group) {
 }
 
 --- Test display reticle, just displays mouse position and whether we're over the map or not
----@class TestReticle : Reticle
+---@class TestReticle : UIReticle
 TestReticle = ClassUI(Reticle) {
 
     SetLayout = function(self)
