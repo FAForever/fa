@@ -1,4 +1,3 @@
-
 local EscapeHandler = import("/lua/ui/dialogs/eschandler.lua")
 local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
 local Prefs = import("/lua/user/prefs.lua")
@@ -18,7 +17,7 @@ function OpenChangelog()
 end
 
 --- Toggles the debug interface that shows the various groups that are used to divide the dialog
-local debugInterface = false 
+local debugInterface = false
 
 --- A bit of a hack, but allows us to keep track of whether the changelog is open or not. The lobby
 -- is (almost aggressively) trying to keep control of the keyboard on the chat box to prevent hotkeys
@@ -38,14 +37,14 @@ Changelog = ClassUI(Group) {
 
         -- allow us to use escape to quickly get out
 
-        isOpen = true 
+        isOpen = true
         EscapeHandler.PushEscapeHandler(
             function()
                 self:Close()
             end
         )
 
-        -- make sure we're on top of everything else 
+        -- make sure we're on top of everything else
 
         self.Depth:Set(GetFrame(0):GetTopmostDepth() + 1)
 
@@ -81,7 +80,8 @@ Changelog = ClassUI(Group) {
         self.HeaderDebug:SetSolidColor("ffff0000")
         LayoutHelpers.FillParent(self.HeaderDebug, self.Header)
 
-        self.HeaderTitle = UIUtil.CreateText(self.CommonUI, LOC("Changelog of Supreme Commander: Forged Alliance Forever"), 17, 'Arial Gras', true)
+        self.HeaderTitle = UIUtil.CreateText(self.CommonUI,
+            LOC("Changelog of Supreme Commander: Forged Alliance Forever"), 17, 'Arial Gras', true)
         LayoutHelpers.AtVerticalCenterIn(self.HeaderTitle, self.Header)
         self.HeaderTitle.Left:Set(function() return self.Header.Left() + LayoutHelpers.ScaleNumber(10) end)
 
@@ -120,7 +120,8 @@ Changelog = ClassUI(Group) {
         self.FooterBetaBalanceButton = UIUtil.CreateButtonWithDropshadow(self.Footer, '/BUTTON/medium/', "Beta Balance")
         LayoutHelpers.AtVerticalCenterIn(self.FooterBetaBalanceButton, self.Footer)
         LayoutHelpers.DepthOverParent(self.FooterBetaBalanceButton, self.Footer, 5)
-        self.FooterBetaBalanceButton.Left:Set(function() return self.FooterGithubButton.Right() - LayoutHelpers.ScaleNumber(20) end)
+        self.FooterBetaBalanceButton.Left:Set(function() return self.FooterGithubButton.Right() -
+            LayoutHelpers.ScaleNumber(20) end)
         self.FooterBetaBalanceButton.OnClick = function()
             OpenURL('http://patchnotes.faforever.com/fafbeta')
         end
@@ -128,9 +129,19 @@ Changelog = ClassUI(Group) {
         self.FooterDevelopButton = UIUtil.CreateButtonWithDropshadow(self.Footer, '/BUTTON/medium/', "FAF Develop")
         LayoutHelpers.AtVerticalCenterIn(self.FooterDevelopButton, self.Footer)
         LayoutHelpers.DepthOverParent(self.FooterDevelopButton, self.Footer, 5)
-        self.FooterDevelopButton.Left:Set(function() return self.FooterBetaBalanceButton.Right() - LayoutHelpers.ScaleNumber(20) end)
+        self.FooterDevelopButton.Left:Set(function() return self.FooterBetaBalanceButton.Right() -
+            LayoutHelpers.ScaleNumber(20) end)
         self.FooterDevelopButton.OnClick = function()
             OpenURL('http://patchnotes.faforever.com/fafdevelop')
+        end
+
+        self.FooterPatchNotesButton = UIUtil.CreateButtonWithDropshadow(self.Footer, '/BUTTON/medium/', "Balance notes")
+        LayoutHelpers.AtVerticalCenterIn(self.FooterPatchNotesButton, self.Footer, 2)
+        LayoutHelpers.DepthOverParent(self.FooterPatchNotesButton, self.Footer, 5)
+        self.FooterPatchNotesButton.Right:Set(function() return self.Footer.Right() - LayoutHelpers.ScaleNumber(220) end)
+        self.FooterPatchNotesButton:Disable()
+        self.FooterPatchNotesButton.OnClick = function()
+            OpenURL('http://github.com/FAForever/fa/blob/develop/changelog.md')
         end
 
         self.FooterDiscordButton = UIUtil.CreateButtonWithDropshadow(self.Footer, '/BUTTON/medium/', "Report a bug")
@@ -176,7 +187,7 @@ Changelog = ClassUI(Group) {
         self.ContentDivider.Right:Set(self.ContentNotes.Right)
         self.ContentDivider.Bottom:Set(function() return self.Content.Bottom() - LayoutHelpers.ScaleNumber(10) end)
 
-        -- patches 
+        -- patches
 
         self.ContentPatchesList = ItemList(self.ContentPatches)
         LayoutHelpers.FillParentFixedBorder(self.ContentPatchesList, self.ContentPatches, 12)
@@ -209,7 +220,7 @@ Changelog = ClassUI(Group) {
         self:PopulatePatchList()
         self:PopulateWithPatch(0)
 
-        if not debugInterface then 
+        if not debugInterface then
             self.Debug:Hide()
         end
 
@@ -218,13 +229,23 @@ Changelog = ClassUI(Group) {
     --- Populates the dialog with the given patch
     PopulateWithPatch = function(self, index)
         local patch = data.gamePatches[index + 1]
-        if patch then 
+        if patch then
+
+            if patch.hasPrettyPatchnotes then
+                self.FooterPatchNotesButton:Enable()
+                self.FooterPatchNotesButton.OnClick = function()
+                    OpenURL(string.format('http://patchnotes.faforever.com/balance/%s.html', patch.version))
+                end
+            else
+                self.FooterPatchNotesButton:Disable()
+            end
+
             self.ContentPatchesList:SetSelection(index)
             self.HeaderSubtitle:SetText(patch.name)
             self.ContentNotesList:DeleteAllItems()
 
             local altDescription = LOC("<LOC ChangelogDescriptionIdentifier>")
-            for k, line in patch[altDescription] or patch.description do 
+            for k, line in patch[altDescription] or patch.description do
                 self.ContentNotesList:AddItem(line)
             end
         end
@@ -233,7 +254,7 @@ Changelog = ClassUI(Group) {
     --- Populates the list of patches
     PopulatePatchList = function(self)
         self.ContentPatchesList:DeleteAllItems()
-        for k, patch in data.gamePatches do 
+        for k, patch in data.gamePatches do
             self.ContentPatchesList:AddItem(patch.version .. " - " .. patch.name)
         end
     end,

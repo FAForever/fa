@@ -28,27 +28,29 @@ end
 
 function ToggleRepeatBuild()
     local selection = GetSelectedUnits()
-    if selection then
-        local allFactories = true
-        local currentInfiniteQueueCheckStatus = false
-        for _, v in selection do
-            if v:IsRepeatQueue() then
-                currentInfiniteQueueCheckStatus = true
-            end
-
-            if not v:IsInCategory('FACTORY') then
-                allFactories = false
-            end
+    if not selection then return end
+    
+    local allFactories = true
+    local currentInfiniteQueueCheckStatus = false
+    for _, v in selection do
+        if v:IsRepeatQueue() then
+            currentInfiniteQueueCheckStatus = true
         end
 
-        if allFactories then
-            for _, v in selection do
-                if currentInfiniteQueueCheckStatus then
-                    v:ProcessInfo('SetRepeatQueue', 'false')
-                else
-                    v:ProcessInfo('SetRepeatQueue', 'true')
-                end
-            end
+        if not v:IsInCategory('FACTORY') and not v:IsInCategory('EXTERNALFACTORY') then
+            allFactories = false
+            break
+        end
+    end
+
+    if not allFactories then
+        return
+    end
+    local isRepeatBuild = currentInfiniteQueueCheckStatus and 'false' or 'true'
+    for _, v in selection do
+        v:ProcessInfo('SetRepeatQueue', isRepeatBuild)
+        if EntityCategoryContains(categories.EXTERNALFACTORY + categories.EXTERNALFACTORYUNIT, v) then
+            v:GetCreator():ProcessInfo('SetRepeatQueue', isRepeatBuild)
         end
     end
 end
@@ -527,6 +529,16 @@ import("/lua/ui/game/gamemain.lua").ObserveSelection:AddObserver(
 LoadIntoTransports = function(clearCommands)
     print("Load units into transports")
     SimCallback({ Func = 'LoadIntoTransports', Args = { ClearCommands = clearCommands or false } }, true)
+end
+
+AbortNavigation = function()
+    print("Interrupt pathfinding")
+    SimCallback({ Func = 'AbortNavigation', Args = {} }, true)
+end
+
+DischargeShields = function()
+    print("Discharge shields")
+    SimCallback({ Func = 'DischargeShields', Args = {} }, true)
 end
 
 AssignPlatoonBehaviorSilo = function()

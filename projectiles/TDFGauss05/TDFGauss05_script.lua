@@ -1,25 +1,31 @@
---
--- Terran Gauss Cannon Projectile
---
+--******************************************************************************************************
+--** Copyright (c) 2023 FAForever
+--**
+--** Permission is hereby granted, free of charge, to any person obtaining a copy
+--** of this software and associated documentation files (the "Software"), to deal
+--** in the Software without restriction, including without limitation the rights
+--** to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+--** copies of the Software, and to permit persons to whom the Software is
+--** furnished to do so, subject to the following conditions:
+--**
+--** The above copyright notice and this permission notice shall be included in all
+--** copies or substantial portions of the Software.
+--**
+--** THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+--** IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+--** FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+--** AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+--** LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+--** OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+--** SOFTWARE.
+--******************************************************************************************************
+
 local TDFGaussCannonProjectile = import("/lua/terranprojectiles.lua").TDFMediumShipGaussCannonProjectile
+
+--- Terran Gauss Cannon Projectile
+---@class TDFGauss05: TDFMediumShipGaussCannonProjectile
 TDFGauss05 = ClassProjectile(TDFGaussCannonProjectile) {
-    
     FxUnitHitScale = 1.6,
     FxLandHitScale = 1.6,
-
-    OnCreate = function(self, inWater)
-        TDFGaussCannonProjectile.OnCreate(self, inWater)
-        if not inWater then
-            self:SetDestroyOnWater(true)
-        else
-            self.Trash:Add(ForkThread(self.DestroyOnWaterThread,self))
-        end
-    end,
-    
-    DestroyOnWaterThread = function(self)
-        WaitTicks(3)
-        self:SetDestroyOnWater(true)
-    end,
 }
 TypeClass = TDFGauss05
-

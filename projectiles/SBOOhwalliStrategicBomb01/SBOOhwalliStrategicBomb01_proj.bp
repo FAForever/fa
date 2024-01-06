@@ -24,9 +24,6 @@ ProjectileBlueprint {
     Display = {
         CameraFollowTimeout = 2,
         CameraFollowsProjectile = true,
-        ImpactEffects = {
-            Type = 'Small01',
-        },
         StrategicIconSize = 3,
         NoGenericScorchSplats = true
     },

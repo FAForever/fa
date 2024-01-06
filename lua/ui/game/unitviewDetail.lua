@@ -559,49 +559,97 @@ function WrapAndPlaceText(bp, builder, descID, control)
                                 info.NukeInnerRingDamage + info.NukeOuterRingDamage, info.NukeOuterRingDamage,
                                 info.NukeInnerRingRadius, info.NukeOuterRingRadius, info.MinRadius, info.MaxRadius)
                         else
-                            local MuzzleBones = 0
-                            if info.MuzzleSalvoDelay > 0 then
-                                MuzzleBones = info.MuzzleSalvoSize
-                            elseif info.RackBones then
-                                for _, v in info.RackBones do
-                                    MuzzleBones = MuzzleBones + table.getsize(v.MuzzleBones)
-                                end
-                                if not info.RackFireTogether then
-                                    MuzzleBones = MuzzleBones / table.getsize(info.RackBones)
-                                end
-                            else
-                                MuzzleBones = 1
-                            end
-
+                            --DPS Calculations
                             local Damage = info.Damage
                             if info.DamageToShields then
                                 Damage = math.max(Damage, info.DamageToShields)
                             end
                             if info.BeamLifetime > 0 then
-                                Damage = Damage * (info.BeamLifetime * 10 + 1)
-                            end
-                            Damage = Damage * (info.DoTPulses or 1) + (info.InitialDamage or 0)
-                            local ProjectilePhysics = __blueprints[info.ProjectileId].Physics
-                            while ProjectilePhysics do
-                                Damage = Damage * (ProjectilePhysics.Fragments or 1)
-                                ProjectilePhysics = __blueprints[string.lower(ProjectilePhysics.FragmentId or '')].Physics
+                                Damage = Damage * (MATH_IRound(10 * info.BeamLifetime) + 1)
+                            else
+                                Damage = Damage * (info.DoTPulses or 1) + (info.InitialDamage or 0)
+                                local ProjectilePhysics = __blueprints[info.ProjectileId].Physics
+                                while ProjectilePhysics do
+                                    Damage = Damage * (ProjectilePhysics.Fragments or 1)
+                                    ProjectilePhysics = __blueprints[string.lower(ProjectilePhysics.FragmentId or '')].Physics
+                                end
                             end
 
-                            local ReloadTime = math.max((info.RackSalvoChargeTime or 0) + (info.RackSalvoReloadTime or 0) +
-                                (info.MuzzleSalvoDelay or 0) * (info.MuzzleSalvoSize or 1), 1 / info.RateOfFire)
+                            --Simulate the firing cycle to get the reload time.
+                            local CycleProjs = 0 --Projectiles fired per cycle
+                            local CycleTime = 0
+
+                            --Various delays need to be adapted to game tick format.
+                            local FiringCooldown = math.max(0.1, MATH_IRound(10 / info.RateOfFire) / 10)
+                            local ChargeTime = info.RackSalvoChargeTime or 0
+                            if ChargeTime > 0 then
+                                ChargeTime = math.max(0.1, MATH_IRound(10 * ChargeTime) / 10)
+                            end
+                            local MuzzleDelays = info.MuzzleSalvoDelay or 0
+                            if MuzzleDelays > 0 then
+                                MuzzleDelays = math.max(0.1, MATH_IRound(10 * MuzzleDelays) / 10)
+                            end
+                            local MuzzleChargeDelay = info.MuzzleChargeDelay or 0
+                            if MuzzleChargeDelay and MuzzleChargeDelay > 0 then
+                                MuzzleDelays = MuzzleDelays + math.max(0.1, MATH_IRound(10 * MuzzleChargeDelay) / 10)
+                            end
+                            local ReloadTime = info.RackSalvoReloadTime or 0
+                            if ReloadTime > 0 then
+                                ReloadTime = math.max(0.1, MATH_IRound(10 * ReloadTime) / 10)
+                            end
+
+                            -- Keep track that the firing cycle has a constant rate
+                            local singleShot = true
+                            --OnFire is called from FireReadyState at this point, so we need to track time
+                            --to know how much the fire rate cooldown has progressed during our fire cycle.
+                            local SubCycleTime = 0
+                            local RackBones = info.RackBones
+                            if RackBones then --Teleport damage will not have a rack bone
+                                --Save the rack count so we can correctly calculate the final rack's fire cooldown
+                                local RackCount = table.getsize(RackBones)
+                                for index, Rack in RackBones do
+                                    local MuzzleCount = info.MuzzleSalvoSize
+                                    if info.MuzzleSalvoDelay == 0 then
+                                        MuzzleCount = table.getsize(Rack.MuzzleBones)
+                                    end
+                                    if MuzzleCount > 1 then singleShot = false end
+                                    CycleProjs = CycleProjs + MuzzleCount
+
+                                    SubCycleTime = SubCycleTime + MuzzleCount * MuzzleDelays
+                                    if not info.RackFireTogether and index ~= RackCount then
+                                        if FiringCooldown <= SubCycleTime + ChargeTime then
+                                            CycleTime = CycleTime + SubCycleTime + ChargeTime + math.max(0.1, FiringCooldown - SubCycleTime - ChargeTime)
+                                        else
+                                            CycleTime = CycleTime + FiringCooldown
+                                        end
+                                        SubCycleTime = 0
+                                    end
+                                end
+                            end
+                            if FiringCooldown <= (SubCycleTime + ChargeTime + ReloadTime) then
+                                CycleTime = CycleTime + SubCycleTime + ReloadTime + ChargeTime + math.max(0.1, FiringCooldown - SubCycleTime - ChargeTime - ReloadTime)
+                            else
+                                CycleTime = CycleTime + FiringCooldown
+                            end
 
                             if not info.ManualFire and info.WeaponCategory ~= 'Kamikaze' then
-                                local DPS = Damage * MuzzleBones
-                                DPS = DPS / ReloadTime
+                                --Round DPS, or else it gets floored in string.format.
+                                local DPS = MATH_IRound(Damage * CycleProjs / CycleTime)
                                 weaponDetails1 = weaponDetails1..LOCF('<LOC uvd_DPS>', DPS)
                             end
 
-                            if MuzzleBones > 1 then
+                            -- Avoid saying a unit fires a salvo when it in fact has a constant rate of fire
+                            if singleShot and ReloadTime == 0 then
+                                CycleTime = CycleTime / CycleProjs
+                                CycleProjs = 1
+                            end
+
+                            if CycleProjs > 1 then
                                  weaponDetails2 = string.format(LOC('<LOC uvd_0015>Damage: %d x%d, Splash: %d')..', '..LOC('<LOC uvd_Range>')..', '..LOC('<LOC uvd_Reload>'),
-                                    Damage, MuzzleBones, info.DamageRadius, info.MinRadius, info.MaxRadius, ReloadTime)
+                                    Damage, CycleProjs, info.DamageRadius, info.MinRadius, info.MaxRadius, CycleTime)
                             else
                                 weaponDetails2 = string.format(LOC('<LOC uvd_0010>Damage: %d, Splash: %d')..', '..LOC('<LOC uvd_Range>')..', '..LOC('<LOC uvd_Reload>'),
-                                    Damage, info.DamageRadius, info.MinRadius, info.MaxRadius, ReloadTime)
+                                    Damage, info.DamageRadius, info.MinRadius, info.MaxRadius, CycleTime)
                             end
 
 
@@ -615,7 +663,6 @@ function WrapAndPlaceText(bp, builder, descID, control)
                         if info.EnergyRequired > 0 and info.EnergyDrainPerSecond > 0 then
                             local weaponDetails3 = string.format('Charge Cost: -%d E (-%d E/s)', info.EnergyRequired, info.EnergyDrainPerSecond)
                             table.insert(blocks, {color = 'FFFF9595', lines = {weaponDetails3}})
-
                         end
 
                         local ProjectileEco = __blueprints[info.ProjectileId].Economy

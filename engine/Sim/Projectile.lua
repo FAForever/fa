@@ -28,42 +28,44 @@ function Projectile:ChangeZigZagFrequency(freq)
 end
 
 --- Creates a child projectile that inherits the speed and orientation of its parent
----@param blueprint ProjectileBlueprint
+---@param blueprint BlueprintId
 ---@return Projectile
 function Projectile:CreateChildProjectile(blueprint)
 end
 
----
----@return number
+--- Returns the speed over ticks instead of over seconds. Multiply by 10 to get the (usually) expected speed value
+---@return number 
 function Projectile:GetCurrentSpeed()
 end
 
----
+--- Returns the position of the current target.
 ---@return Vector
 function Projectile:GetCurrentTargetPosition()
 end
 
---- Get who launched this projectile
+--- Returns the entity that is responsible for creating this projectile.
 ---@return Entity | Unit | nil
 function Projectile:GetLauncher()
 end
 
----
+--- Returns the target that we're tracking.
 ---@return Entity | Unit | nil
 function Projectile:GetTrackingTarget()
 end
 
----
----@return Vector
+--- Returns the speed over ticks instead of over seconds. Multiply by 10 to get the (usually) expected speed value
+---@return number
+---@return number
+---@return number
 function Projectile:GetVelocity()
 end
 
----
+--- Override the acceleration value in the blueprint.
 ---@param accel number
 function Projectile:SetAcceleration(accel)
 end
 
---- 
+--- Define the ballistic acceleration value, increases velocity in the current direction.
 ---@param accel number
 function Projectile:SetBallisticAcceleration(accel)
 end
@@ -80,14 +82,8 @@ end
 
 ---
 ---@param collide boolean
+---@return Projectile
 function Projectile:SetCollision(collide)
-end
-
---- Unused, damage is passed by the weapon via the damage table
----@deprecated
----@param amount number | nil
----@param radius number | nil
-function Projectile:SetDamage(amount, radius)
 end
 
 ---
@@ -113,7 +109,7 @@ function Projectile:SetMaxSpeed(speed)
 end
 
 ---
----@param object Entity | Unit | Projectile
+---@param object Blip | Entity | Unit | Projectile
 function Projectile:SetNewTarget(object)
 end
 
@@ -141,8 +137,8 @@ end
 
 ---
 ---@param velX number
----@param velY number
----@param velZ number
+---@param velY? number
+---@param velZ? number
 function Projectile:SetVelocity(velX, velY, velZ)
 end
 
@@ -163,6 +159,13 @@ end
 ---
 ---@param track boolean
 function Projectile:TrackTarget(track)
+end
+
+--- Unused, damage is passed by the weapon via the damage table
+---@deprecated
+---@param amount number | nil
+---@param radius number | nil
+function Projectile:SetDamage(amount, radius)
 end
 
 return Projectile

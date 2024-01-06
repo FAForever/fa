@@ -23,6 +23,7 @@ local TableGetn = table.getn
 ---@field Trash TrashBag
 AIPlatoon = Class(moho.platoon_methods) {
 
+    Debug = false,
     PlatoonName = 'PlatoonBase',
     StateName = 'Unknown',
 
@@ -49,7 +50,10 @@ AIPlatoon = Class(moho.platoon_methods) {
         self.Units = units
         for k, unit in units do
             unit.AIPlatoonReference = self
-            unit:SetCustomName(self.PlatoonName)
+
+            if self.Debug then
+                unit:SetCustomName(self.PlatoonName)
+            end
         end
     end,
 
@@ -127,14 +131,28 @@ AIPlatoon = Class(moho.platoon_methods) {
     -- platoon states
 
     ---@param self AIPlatoon
-    ---@param state AIPlatoonState
-    ChangeState = function(self, state)
-        self:LogDebug(string.format('Changing state to: %s', state.StateName))
+    ---@param name AIPlatoonState
+    ---@param state? table
+    ChangeState = function(self, name, state)
+        self:LogDebug(string.format('Changing state to: %s', tostring(name.StateName)))
 
         WaitTicks(1)
 
         if not IsDestroyed(self) then
-            ChangeState(self, state)
+            self.State = state
+            ChangeState(self, name)
+        end
+    end,
+
+    ---@param self AIPlatoon
+    ---@param name AIPlatoonState
+    ---@param state? table
+    ChangeStateExt = function(self, name, state)
+        self:LogDebug(string.format('Changing state to: %s', tostring(name.StateName)))
+
+        if not IsDestroyed(self) then
+            self.State = state
+            ChangeState(self, name)
         end
     end,
 
@@ -304,7 +322,7 @@ AIPlatoon = Class(moho.platoon_methods) {
 
     --- Called as a missile launched by a unit of this platoon is intercepted
     ---@param self AIPlatoon
-    ---@param target Unit
+    ---@param target Vector
     ---@param defense Unit
     ---@param position Vector
     OnMissileIntercepted = function(self, unit, target, defense, position)
@@ -312,7 +330,7 @@ AIPlatoon = Class(moho.platoon_methods) {
 
     --- Called as a missile launched by a unit of this platoon hits a shield
     ---@param self AIPlatoon
-    ---@param target Unit
+    ---@param target Vector
     ---@param shield Unit
     ---@param position Vector
     OnMissileImpactShield = function(self, unit, target, shield, position)
@@ -320,7 +338,7 @@ AIPlatoon = Class(moho.platoon_methods) {
 
     --- Called as a missile launched by a unit of this platoon impacts with the terrain
     ---@param self AIPlatoon
-    ---@param target Unit
+    ---@param target Vector
     ---@param position Vector
     OnMissileImpactTerrain = function(self, unit, target, position)
     end,
@@ -555,6 +573,10 @@ AIPlatoon = Class(moho.platoon_methods) {
         )
 
         return info
+    end,
+
+    ---@param self AIPlatoon
+    Visualize = function(self)
     end,
 
     --#endregion

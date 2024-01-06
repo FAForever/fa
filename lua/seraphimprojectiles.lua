@@ -374,6 +374,7 @@ SLosaareAAAutoCannon02 = ClassProjectile(SLosaareAAAutoCannon) {
 }
 
 ---  SERAPHIM OTHE TACTICAL BOMB
+---@class SOtheTacticalBomb : SinglePolyTrailProjectile
 SOtheTacticalBomb= ClassProjectile(SinglePolyTrailProjectile) {
     FxImpactLand =	EffectTemplate.SOtheBombHit,
     FxImpactNone =	EffectTemplate.SOtheBombHit,
@@ -439,6 +440,7 @@ SUallCavitationTorpedo = ClassProjectile(SinglePolyTrailProjectile) {
 }
 
 ---  SERAPHIM Inaino STRATEGIC MISSILE
+---@class SIFInainoStrategicMissile : NukeProjectile, EmitterProjectile
 SIFInainoStrategicMissile = ClassProjectile(NukeProjectile, EmitterProjectile) {
     ExitWaterTicks = 9,
     FxExitWaterEmitter = EffectTemplate.DefaultProjectileWaterImpact,
@@ -449,6 +451,7 @@ SIFInainoStrategicMissile = ClassProjectile(NukeProjectile, EmitterProjectile) {
 }
 
 ---  SERAPHIM EXPERIMENTAL STRATEGIC MISSILE
+---@class SExperimentalStrategicMissile : NukeProjectile, MultiPolyTrailProjectile
 SExperimentalStrategicMissile = ClassProjectile(NukeProjectile, MultiPolyTrailProjectile) {
     ExitWaterTicks = 9,
     FxExitWaterEmitter = EffectTemplate.DefaultProjectileWaterImpact,

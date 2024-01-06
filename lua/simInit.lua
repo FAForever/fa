@@ -150,6 +150,7 @@ function SetupSession()
     local buildRestrictions, enhRestrictions = nil, {}
 
     local restrictions = ScenarioInfo.Options.RestrictedCategories
+
     if restrictions then
         table.print(restrictions, 'RestrictedCategories')
         local presets = import("/lua/ui/lobby/unitsrestrictions.lua").GetPresetsData()
@@ -381,6 +382,15 @@ function BeginSessionAI()
         for k,file in DiskFindFiles('/lua/AI/AIBaseTemplates', '*.lua') do
             import(file)
         end
+
+        -- allow for debugging code
+        ForkThread(
+            import("/lua/aibrains/utils/debug.lua").AIStateMachineVisualize
+        )
+
+        ForkThread(
+            import("/lua/aibrains/utils/debug.lua").AIStateMachineSyncMessages
+        )
     end
 end
 

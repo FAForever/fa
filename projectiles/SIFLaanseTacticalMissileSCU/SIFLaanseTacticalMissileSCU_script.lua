@@ -24,7 +24,7 @@
 local SLaanseTacticalMissile = import("/lua/seraphimprojectiles.lua").SLaanseTacticalMissile
 local TacticalMissileComponent = import('/lua/sim/DefaultProjectiles.lua').TacticalMissileComponent
 
---- Used by the ACU
+--- Used by xsl0301
 ---@class SIFLaanseTacticalMissileSCU : SLaanseTacticalMissile, TacticalMissileComponent
 SIFLaanseTacticalMissileSCU = ClassProjectile(SLaanseTacticalMissile, TacticalMissileComponent) {
 
@@ -39,10 +39,20 @@ SIFLaanseTacticalMissileSCU = ClassProjectile(SLaanseTacticalMissile, TacticalMi
     FinalBoostAngle = 30,
     FinalBoostAngleRange = 0,
 
-    OnCreate = function(self)
+    ---@param self SIFLaanseTacticalMissileSCU
+    ---@param inWater boolean
+    OnCreate = function(self, inWater)
         SLaanseTacticalMissile.OnCreate(self)
+        if not inWater then
+            self:SetDestroyOnWater(true)
+        end
         self.MoveThread = self.Trash:Add(ForkThread(self.MovementThread, self))
     end,
-}
 
+    ---@param self SIFLaanseTacticalMissileSCU
+    OnExitWater = function(self)
+        SLaanseTacticalMissile.OnExitWater(self)
+        self:SetDestroyOnWater(true)
+    end,
+}
 TypeClass = SIFLaanseTacticalMissileSCU
