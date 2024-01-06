@@ -196,7 +196,7 @@ end
 --- Creates a collision detection manipulator, calling the function
 --- `self:OnAnimTerrainCollision(bone, x, y, z)`
 --- when a bone that is being watched collides with the terrain
----@param unit Unit
+---@param unit moho.unit_methods
 ---@return moho.CollisionManipulator
 function CreateCollisionDetector(unit)
 end

@@ -21,6 +21,7 @@ local PersonalShield = import("/lua/shield.lua").PersonalShield
 local Shield = import("/lua/shield.lua").Shield
 local TransportShield = import("/lua/shield.lua").TransportShield
 local Weapon = import("/lua/sim/weapon.lua").Weapon
+local CrashComponent = import("/lua/sim/units/components/CrashComponent.lua").CrashComponent
 local IntelComponent = import('/lua/defaultcomponents.lua').IntelComponent
 local VeterancyComponent = import('/lua/defaultcomponents.lua').VeterancyComponent
 
@@ -101,7 +102,7 @@ SyncMeta = {
 ---@field Combat? boolean
 
 local cUnit = moho.unit_methods
----@class Unit : moho.unit_methods, InternalObject, IntelComponent, VeterancyComponent, AIUnitProperties
+---@class Unit : moho.unit_methods, InternalObject, IntelComponent, VeterancyComponent, AIUnitProperties, CrashComponent
 ---@field AIManagerIdentifier? string
 ---@field Repairers table<EntityId, Unit>
 ---@field Brain AIBrain
@@ -130,7 +131,8 @@ local cUnit = moho.unit_methods
 ---@field IdleEffectsBag TrashBag
 ---@field SiloWeapon? Weapon
 ---@field SiloProjectile? ProjectileBlueprint
-Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
+---@field TopSpeedEffectsBag TrashBag
+Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent, CrashComponent) {
 
     IsUnit = true,
     Weapons = {},
@@ -268,7 +270,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
             BuffTable = {},
             Affects = {},
         }
-        
+
         self:ShowPresetEnhancementBones()
 
         local bpDeathAnim = bp.Display.AnimationDeath
@@ -1505,7 +1507,10 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
 
         self:DisableShield()
         self:DisableUnitIntel('Killed')
-        self:ForkThread(self.DeathThread, overkillRatio , instigator)
+        -- self:ForkThread(self.DeathThread, overkillRatio , instigator)
+        self:Crash()
+
+
 
         -- awareness for traitor game mode and game statistics
         ArmyBrains[army].LastUnitKilledBy = (instigator or self).Army
@@ -1846,17 +1851,18 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         -- add flag to identify a unit died but is sinking before it is destroyed
         self.Sinking = true 
 
-        local bp = self.Blueprint
-        local scale = (((bp.SizeX or 0) + (bp.SizeZ or 0)) * 0.5)
-        local bone = 0
+        self.SinkThreadInstance = self.Trash:Add(ForkThread(self.SinkThread, self))
+        -- local bp = self.Blueprint
+        -- local scale = (((bp.SizeX or 0) + (bp.SizeZ or 0)) * 0.5)
+        -- local bone = 0
 
-        -- Create sinker projectile
-        local proj = self:CreateProjectileAtBone('/projectiles/Sinker/Sinker_proj.bp', bone)
+        -- -- Create sinker projectile
+        -- local proj = self:CreateProjectileAtBone('/projectiles/Sinker/Sinker_proj.bp', bone)
 
-        -- Start the sinking after a delay of the given number of seconds, attaching to a given bone
-        -- and entity.
-        proj:Start(4 * math.max(2, math.min(7, scale)), self, bone, callback)
-        self.Trash:Add(proj)
+        -- -- Start the sinking after a delay of the given number of seconds, attaching to a given bone
+        -- -- and entity.
+        -- proj:Start(4 * math.max(2, math.min(7, scale)), self, bone, callback)
+        -- self.Trash:Add(proj)
     end,
 
     ---@param self Unit
@@ -1955,7 +1961,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         self:CreateWreckage(overkillRatio or self.overkillRatio)
 
         -- wait at least 1 tick before destroying unit
-        WaitSeconds(math.max(0.1, self.DeathThreadDestructionWaitTime))
+        -- WaitSeconds(math.max(0.1, self.DeathThreadDestructionWaitTime))
 
         -- do not play sound after sinking
         if not self.Sinking then 
@@ -3747,12 +3753,18 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
 
     ---@param self Unit
     DestroyTopSpeedEffects = function(self)
-        TrashDestroy(self.TopSpeedEffectsBag)
+        local topSpeedEffectsBag = self.TopSpeedEffectsBag
+        if topSpeedEffectsBag then
+        TrashDestroy(topSpeedEffectsBag)
+        end
     end,
 
     ---@param self Unit
     DestroyIdleEffects = function(self)
-        TrashDestroy(self.IdleEffectsBag)
+        local idleEffectsBag = self.IdleEffectsBag
+        if idleEffectsBag then
+            TrashDestroy(idleEffectsBag)
+        end
     end,
 
     ---@param self Unit

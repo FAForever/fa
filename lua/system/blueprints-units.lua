@@ -528,6 +528,14 @@ local function PostProcessUnit(unit)
     if unit.Economy and not unit.Economy.BuildRate then
         unit.Economy.BuildRate = 0
     end
+
+    ---------------------------------------------------------------------------
+    --#region Air crash behavior
+
+    unit.CrashWatchBone = unit.CrashWatchBone or 0
+    unit.CrashRadius = unit.CrashRadius or 0
+
+    --#endregion
 end
 
 ---@param allBlueprints BlueprintsTable

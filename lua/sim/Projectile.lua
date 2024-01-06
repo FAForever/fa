@@ -5,6 +5,20 @@
 --  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 ------------------------------------------------------------------
 
+---@alias ProjectileImpactType 
+--- | 'Terrain' 
+--- | 'Shield' 
+--- | 'Water' 
+--- | 'Unit' 
+--- | 'UnitAir' 
+--- | 'Air'
+--- | 'Projectile'
+--- | 'ProjectileUnderwater'
+--- | 'Underwater'
+--- | 'Prop'
+
+---@alias ProjectileImpactEntity Unit | Prop | Projectile | nil
+
 local ProjectileMethods = moho.projectile_methods
 local DefaultDamage = import("/lua/sim/defaultdamage.lua")
 local Flare = import("/lua/defaultantiprojectile.lua").Flare
@@ -296,8 +310,8 @@ Projectile = ClassProjectile(ProjectileMethods) {
 
     --- Called by the engine when the projectile impacts something
     ---@param self Projectile
-    ---@param targetType string
-    ---@param targetEntity Unit | Prop
+    ---@param targetType ProjectileImpactType
+    ---@param targetEntity ProjectileImpactEntity
     OnImpact = function(self, targetType, targetEntity)
 
         -- localize information for performance
