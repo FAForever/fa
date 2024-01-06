@@ -24,5 +24,5 @@ local DefaultProjectileWeapon = import("/lua/sim/defaultweapons.lua").DefaultPro
 
 ---@class AAASonicPulseBatteryWeapon : DefaultProjectileWeapon
 AAASonicPulseBatteryWeapon = ClassWeapon(DefaultProjectileWeapon) {
-    FxMuzzleFlash = {'/effects/emitters/sonic_pulse_muzzle_flash_01_emit.bp', },
+    FxMuzzleFlash = { '/effects/emitters/sonic_pulse_muzzle_flash_01_emit.bp', },
 }

@@ -24,5 +24,5 @@ local DefaultProjectileWeapon = import('/lua/sim/defaultweapons.lua').DefaultPro
 
 ---@class AANDepthChargeBombWeapon02 : DefaultProjectileWeapon
 AANDepthChargeBombWeapon02 = ClassWeapon(DefaultProjectileWeapon) {
-    FxMuzzleFlash = {'/effects/emitters/antiair_muzzle_fire_01_emit.bp', },
+    FxMuzzleFlash = { '/effects/emitters/antiair_muzzle_fire_01_emit.bp', },
 }

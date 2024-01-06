@@ -24,5 +24,5 @@ local DefaultProjectileWeapon = import('/lua/sim/defaultweapons.lua').DefaultPro
 
 ---@class AIFBombQuarkWeapon : DefaultProjectileWeapon
 AIFBombQuarkWeapon = ClassWeapon(DefaultProjectileWeapon) {
-    FxMuzzleFlash = {'/effects/emitters/antiair_muzzle_fire_02_emit.bp', },
+    FxMuzzleFlash = { '/effects/emitters/antiair_muzzle_fire_02_emit.bp', },
 }

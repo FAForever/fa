@@ -28,8 +28,8 @@ local CreateAttachedEmitter = CreateAttachedEmitter
 
 ---@class AAATemporalFizzWeapon : DefaultProjectileWeapon
 AAATemporalFizzWeapon = ClassWeapon(DefaultProjectileWeapon) {
-    FxChargeEffects = {'/effects/emitters/temporal_fizz_muzzle_charge_01_emit.bp', },
-    FxMuzzleFlash = {'/effects/emitters/temporal_fizz_muzzle_flash_01_emit.bp', },
+    FxChargeEffects = { '/effects/emitters/temporal_fizz_muzzle_charge_01_emit.bp', },
+    FxMuzzleFlash = { '/effects/emitters/temporal_fizz_muzzle_flash_01_emit.bp', },
 
     ---@param self AAATemporalFizzWeapon
     PlayFxRackSalvoChargeSequence = function(self)
@@ -48,5 +48,3 @@ AAATemporalFizzWeapon = ClassWeapon(DefaultProjectileWeapon) {
         end
     end,
 }
-
-LOG(repr(debug.listcode(AAATemporalFizzWeapon.PlayFxRackSalvoChargeSequence)))

@@ -27,7 +27,7 @@ local QuantumBeamGeneratorCollisionBeam = import("/lua/defaultcollisionbeams.lua
 AQuantumBeamGenerator = ClassWeapon(DefaultBeamWeapon) {
     BeamType = QuantumBeamGeneratorCollisionBeam,
 
-    FxUpackingChargeEffects = { },
+    FxUpackingChargeEffects = {},
     FxUpackingChargeEffectScale = 1,
 
     ---@param self AQuantumBeamGenerator

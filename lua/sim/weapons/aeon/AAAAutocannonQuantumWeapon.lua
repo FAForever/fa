@@ -24,5 +24,5 @@ local DefaultProjectileWeapon = import("/lua/sim/defaultweapons.lua").DefaultPro
 
 ---@class AAAAutocannonQuantumWeapon : DefaultProjectileWeapon
 AAAAutocannonQuantumWeapon = ClassWeapon(DefaultProjectileWeapon) {
-    FxMuzzleFlash = {'/effects/emitters/quantum_displacement_cannon_flash_01_emit.bp', },
+    FxMuzzleFlash = { '/effects/emitters/quantum_displacement_cannon_flash_01_emit.bp', },
 }

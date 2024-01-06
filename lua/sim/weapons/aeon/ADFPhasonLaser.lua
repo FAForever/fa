@@ -32,8 +32,8 @@ local CreateAttachedEmitter = CreateAttachedEmitter
 ---@class ADFPhasonLaser : DefaultBeamWeapon
 ADFPhasonLaser = ClassWeapon(DefaultBeamWeapon) {
     BeamType = CollisionBeamFile.PhasonLaserCollisionBeam,
-    FxMuzzleFlash = { },
-    FxChargeMuzzleFlash = { },
+    FxMuzzleFlash = {},
+    FxChargeMuzzleFlash = {},
     FxUpackingChargeEffects = EffectTemplate.CMicrowaveLaserCharge01,
     FxUpackingChargeEffectScale = 1,
 

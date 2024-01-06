@@ -24,5 +24,5 @@ local DefaultProjectileWeapon = import("/lua/sim/defaultweapons.lua").DefaultPro
 
 ---@class AAAZealot02MissileWeapon : DefaultProjectileWeapon
 AAAZealot02MissileWeapon = ClassWeapon(DefaultProjectileWeapon) {
-    FxMuzzleFlash = {'/effects/emitters/flash_04_emit.bp'},
+    FxMuzzleFlash = { '/effects/emitters/flash_04_emit.bp' },
 }

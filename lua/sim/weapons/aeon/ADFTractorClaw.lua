@@ -20,8 +20,11 @@
 --** SOFTWARE.
 --**********************************************************************************
 
-local Weapon = import('/lua/sim/weapon.lua').Weapon
-local EffectTemplate = import('/lua/effecttemplates.lua')
+local Entity = import("/lua/sim/entity.lua").Entity
+local Weapon = import("/lua/sim/weapon.lua").Weapon
+
+local Explosion = import("/lua/defaultexplosions.lua")
+local EffectTemplate = import("/lua/effecttemplates.lua")
 
 ---@class ADFTractorClaw : Weapon
 ---@field TractorTrash TrashBag
@@ -55,7 +58,7 @@ ADFTractorClaw = ClassWeapon(Weapon) {
                 if self.RunningTractorThread then
                     -- reset target state
                     local blipOrUnit = self:GetCurrentTarget()
-                    if not IsDestroyed(blipOrUnit) then 
+                    if not IsDestroyed(blipOrUnit) then
                         local target = self:GetUnitBehindTarget(blipOrUnit)
                         if target then
                             self:MakeVulnerable(target)
@@ -76,7 +79,7 @@ ADFTractorClaw = ClassWeapon(Weapon) {
     OnFire = function(self)
         -- only tractor one target at a time
         if self.RunningTractorThread then
-            self.Trash:Add(ForkThread(self.OnInvalidTargetThread,self))
+            self.Trash:Add(ForkThread(self.OnInvalidTargetThread, self))
             return
         end
 
@@ -89,13 +92,13 @@ ADFTractorClaw = ClassWeapon(Weapon) {
         -- only tractor actual units
         local target = self:GetUnitBehindTarget(blipOrUnit)
         if not target then
-            self.Trash:Add(ForkThread(self.OnInvalidTargetThread,self))
+            self.Trash:Add(ForkThread(self.OnInvalidTargetThread, self))
             return
         end
 
         -- only tract units that are not being tracted at the moment
         if target.Tractored then
-            self.Trash:Add(ForkThread(self.OnInvalidTargetThread,self))
+            self.Trash:Add(ForkThread(self.OnInvalidTargetThread, self))
             return
         end
 
@@ -149,7 +152,7 @@ ADFTractorClaw = ClassWeapon(Weapon) {
         self.Trash:Add(trash)
 
         -- apparently `CreateEmitterAtBone` doesn't attach to the bone, only positions it at the bone
-        local effectsEntity = Entity({Owner = unit})
+        local effectsEntity = Entity({ Owner = unit })
         Warp(effectsEntity, unit:GetPosition(self.Blueprint.TurretBoneMuzzle))
         effectsEntity:AttachTo(unit, self.Blueprint.TurretBoneMuzzle)
         trash:Add(effectsEntity)
@@ -160,7 +163,7 @@ ADFTractorClaw = ClassWeapon(Weapon) {
         end
 
         -- create tractor effect
-        for k, effect in self.TractorFx do 
+        for k, effect in self.TractorFx do
             trash:Add(CreateEmitterOnEntity(target, self.Army, effect))
         end
 
@@ -227,10 +230,11 @@ ADFTractorClaw = ClassWeapon(Weapon) {
 
                 if not IsDestroyed(unit) then
 
-                    while not IsDestroyed(target) and not IsDestroyed(unit) and not unit.Dead and target:GetHealth() >= (self.Blueprint.TractorDamage or 729)+1 do
+                    while not IsDestroyed(target) and not IsDestroyed(unit) and not unit.Dead and
+                        target:GetHealth() >= (self.Blueprint.TractorDamage or 729) + 1 do
                         Damage(unit, bonePosition, target, (self.Blueprint.TractorDamage or 729), "Normal")
                         Explosion.CreateScalableUnitExplosion(target, 1, true)
-                        WaitTicks((self.Blueprint.TractorDamageInterval or 10)+1)
+                        WaitTicks((self.Blueprint.TractorDamageInterval or 10) + 1)
                     end
 
                     CreateLightParticle(unit, muzzle, self.Army, 4, 2, 'glow_02', 'ramp_blue_16')
@@ -252,11 +256,11 @@ ADFTractorClaw = ClassWeapon(Weapon) {
                     self:MakeVulnerable(target)
                     trash:Destroy()
                 end
-            else 
+            else
                 self:MakeVulnerable(target)
                 trash:Destroy()
             end
-        else 
+        else
             self:MakeVulnerable(target)
             trash:Destroy()
         end
@@ -286,7 +290,7 @@ ADFTractorClaw = ClassWeapon(Weapon) {
         -- air units drop on their own
         if target.Blueprint.CategoriesHash["AIR"] then
             target:Kill()
-        -- assist land units with a natural drop
+            -- assist land units with a natural drop
         else
             -- let it create the wreck, with the rotator manipulators attached
             target.PlayDeathAnimation = false
@@ -294,7 +298,8 @@ ADFTractorClaw = ClassWeapon(Weapon) {
             target.DestructionExplosionWaitDelayMax = 0
 
             -- create a projectile to help identify when the unit is on the terrain
-            local projectile = target:CreateProjectileAtBone('/effects/entities/ADFTractorFall01/ADFTractorFall01_proj.bp', 0)
+            local projectile = target:CreateProjectileAtBone('/effects/entities/ADFTractorFall01/ADFTractorFall01_proj.bp'
+                , 0)
 
             -- is not defined when the projectile is created underwater
             if not projectile.Blueprint then
@@ -333,7 +338,7 @@ ADFTractorClaw = ClassWeapon(Weapon) {
 
     ---@param self ADFTractorClaw
     ---@param target Unit
-    MakeImmune = function (self, target)
+    MakeImmune = function(self, target)
         if not IsDestroyed(target) then
             target:SetDoNotTarget(true)
         end
@@ -341,7 +346,7 @@ ADFTractorClaw = ClassWeapon(Weapon) {
 
     ---@param self ADFTractorClaw
     ---@param target Unit
-    MakeVulnerable = function (self, target)
+    MakeVulnerable = function(self, target)
         if not IsDestroyed(target) then
             target:SetDoNotTarget(false)
             target.Tractored = nil

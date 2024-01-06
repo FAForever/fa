@@ -24,5 +24,5 @@ local DefaultProjectileWeapon = import("/lua/sim/defaultweapons.lua").DefaultPro
 
 ---@class AIFMissileTacticalSerpentineWeapon : DefaultProjectileWeapon
 AIFMissileTacticalSerpentineWeapon = ClassWeapon(DefaultProjectileWeapon) {
-    FxMuzzleFlash = {'/effects/emitters/aeon_missile_launch_02_emit.bp', },
+    FxMuzzleFlash = { '/effects/emitters/aeon_missile_launch_02_emit.bp', },
 }

@@ -24,5 +24,5 @@ local DefaultProjectileWeapon = import('/lua/sim/defaultweapons.lua').DefaultPro
 
 ---@class AANTorpedoCluster : DefaultProjectileWeapon
 AANTorpedoCluster = ClassWeapon(DefaultProjectileWeapon) {
-    FxMuzzleFlash = {'/effects/emitters/aeon_torpedocluster_flash_01_emit.bp', },
+    FxMuzzleFlash = { '/effects/emitters/aeon_torpedocluster_flash_01_emit.bp', },
 }

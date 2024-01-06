@@ -24,7 +24,7 @@ local DefaultProjectileWeapon = import('/lua/sim/defaultweapons.lua').DefaultPro
 
 ---@class ADFReactonCannon : DefaultProjectileWeapon
 ADFReactonCannon = ClassWeapon(DefaultProjectileWeapon) {
-    FxMuzzleFlash = {'/effects/emitters/reacton_cannon_muzzle_charge_01_emit.bp',
+    FxMuzzleFlash = { '/effects/emitters/reacton_cannon_muzzle_charge_01_emit.bp',
         '/effects/emitters/reacton_cannon_muzzle_charge_02_emit.bp',
         '/effects/emitters/reacton_cannon_muzzle_charge_03_emit.bp',
         '/effects/emitters/reacton_cannon_muzzle_flash_01_emit.bp',

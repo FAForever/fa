@@ -28,5 +28,5 @@ AANChronoTorpedoWeapon = ClassWeapon(DefaultProjectileWeapon) {
         '/effects/emitters/default_muzzle_flash_01_emit.bp',
         '/effects/emitters/default_muzzle_flash_02_emit.bp',
         '/effects/emitters/torpedo_underwater_launch_01_emit.bp',
-   },
+    },
 }

@@ -24,6 +24,6 @@ local DefaultProjectileWeapon = import('/lua/sim/defaultweapons.lua').DefaultPro
 
 ---@class ADFSonicPulsarWeapon : DefaultProjectileWeapon
 ADFSonicPulsarWeapon = ClassWeapon(DefaultProjectileWeapon) {
-    FxMuzzleFlash = {'/effects/emitters/flash_02_emit.bp'},
+    FxMuzzleFlash = { '/effects/emitters/flash_02_emit.bp' },
     FxMuzzleFlashScale = 0.5,
 }

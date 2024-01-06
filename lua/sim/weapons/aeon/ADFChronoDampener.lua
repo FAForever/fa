@@ -63,35 +63,35 @@ ADFChronoDampener = Class(DefaultProjectileWeapon) {
 
                 for i = 1, slices do
 
-                    local radius = i * sliceSize 
+                    local radius = i * sliceSize
                     local targets = utilities.GetTrueEnemyUnitsInSphere(
-                        self, 
-                        self.unit:GetPosition(), 
-                        radius, 
+                        self,
+                        self.unit:GetPosition(),
+                        radius,
                         CategoriesChronoDampener
                     )
 
-                    for k, target in targets do 
+                    for k, target in targets do
 
-                        if not target:BeenDestroyed() then 
-                            if buff.BuffType == 'STUN' then 
+                        if not target:BeenDestroyed() then
+                            if buff.BuffType == 'STUN' then
                                 target:SetStunned(0.1 * stunDuration / slices + 0.1)
                             end
                         end
 
                         -- add initial effect
-                        if not target.InitialStunFxApplied then 
-                            for k, effect in self.FxUnitStunFlash do 
+                        if not target.InitialStunFxApplied then
+                            for k, effect in self.FxUnitStunFlash do
                                 local emit = CreateEmitterOnEntity(target, target.Army, effect)
                                 emit:ScaleEmitter(math.max(target.Blueprint.SizeX, target.Blueprint.SizeZ))
                             end
 
-                            target.InitialStunFxApplied = true 
+                            target.InitialStunFxApplied = true
                         end
 
                         -- add effect on target
                         local count = target:GetBoneCount()
-                        for k, effect in self.FxUnitStun do 
+                        for k, effect in self.FxUnitStun do
                             local emit = CreateEmitterAtBone(
                                 target, Random(0, count - 1), target.Army, effect
                             )
