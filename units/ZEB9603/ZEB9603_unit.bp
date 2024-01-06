@@ -1,4 +1,5 @@
 UnitBlueprint {
+    Description = '<LOC zeb9603_desc>Naval Factory',
     AI = {
         TargetBones = {
             'B13',
@@ -9,36 +10,12 @@ UnitBlueprint {
         },
     },
     Audio = {
-        Construct = Sound {
-            Bank = 'UEB',
-            Cue = 'UEB0303_Construct_Start',
-            LodCutoff = 'UnitMove_LodCutoff',
-        },
-        ConstructLoop = Sound {
-            Bank = 'UEB',
-            Cue = 'UEB0303_Construct_Loop',
-            LodCutoff = 'UnitMove_LodCutoff',
-        },
-        DeathExplosion = Sound {
-            Bank = 'UELDestroy',
-            Cue = 'UEB_Destroy_Lrg_PreDestroy',
-            LodCutoff = 'UnitMove_LodCutoff',
-        },
-        Destroyed = Sound {
-            Bank = 'UELDestroy',
-            Cue = 'UEB_Destroy_Huge',
-            LodCutoff = 'UnitMove_LodCutoff',
-        },
-        DoneBeingBuilt = Sound {
-            Bank = 'UEB',
-            Cue = 'UEB0303_Activate',
-            LodCutoff = 'UnitMove_LodCutoff',
-        },
-        UISelection = Sound {
-            Bank = 'Interface',
-            Cue = 'UEF_Select_Factory',
-            LodCutoff = 'UnitMove_LodCutoff',
-        },
+        Construct      = Sound { Bank = 'UEB',        Cue = 'UEB0303_Construct_Start',    LodCutoff = 'UnitMove_LodCutoff' },
+        ConstructLoop  = Sound { Bank = 'UEB',        Cue = 'UEB0303_Construct_Loop',     LodCutoff = 'UnitMove_LodCutoff' },
+        DeathExplosion = Sound { Bank = 'UELDestroy', Cue = 'UEB_Destroy_Lrg_PreDestroy', LodCutoff = 'UnitMove_LodCutoff' },
+        Destroyed      = Sound { Bank = 'UELDestroy', Cue = 'UEB_Destroy_Huge',           LodCutoff = 'UnitMove_LodCutoff' },
+        DoneBeingBuilt = Sound { Bank = 'UEB',        Cue = 'UEB0303_Activate',           LodCutoff = 'UnitMove_LodCutoff' },
+        UISelection    = Sound { Bank = 'Interface',  Cue = 'UEF_Select_Factory',         LodCutoff = 'UnitMove_LodCutoff' },
     },
     BuildIconSortPriority = 61,
     Categories = {
@@ -76,16 +53,13 @@ UnitBlueprint {
         SubThreatLevel = 0,
         SurfaceThreatLevel = 0,
     },
-    Description = '<LOC zeb9603_desc>Naval Factory',
     Display = {
         BuildAttachBone = 'Attachpoint01',
         IdleEffects = {
             Water = {
                 Effects = {
                     {
-                        Bones = {
-                            'UEB0303',
-                        },
+                        Bones = { 'UEB0303' },
                         Scale = 3,
                         Type = 'SeaIdle01',
                     },
@@ -100,9 +74,9 @@ UnitBlueprint {
                     ShaderName = 'UEFNavy',
                 },
                 {
-                    AlbedoName = 'zeb9603_lod1_albedo.dds',
                     LODCutoff = 600,
                     ShaderName = 'UEFNavy',
+                    AlbedoName = 'zeb9603_lod1_albedo.dds',
                     SpecularName = 'zeb9603_lod1_specteam.dds',
                 },
             },
@@ -115,25 +89,21 @@ UnitBlueprint {
         BuildCostEnergy = 11000,
         BuildCostMass = 2200,
         BuildRate = 150,
-        BuildTime = 3500,
-        DifferentialUpgradeCostCalculation = true,
-        RebuildBonusIds = {
-            'zeb9603',
-        },
+        BuildTime = 10800,
         BuildableCategory = {
             'BUILTBYTIER3FACTORY UEF MOBILE CONSTRUCTION',
             'BUILTBYTIER3FACTORY UEF STRUCTURE NAVAL',
             'BUILTBYTIER3FACTORY UEF MOBILE NAVAL',
             'BUILTBYNAVALTIER3FACTORY UEF MOBILE CONSTRUCTION',
         },
+        DifferentialUpgradeCostCalculation = true,
         InitialRallyX = 0,
         InitialRallyZ = 10,
+        RebuildBonusIds = { 'zeb9603' },
         StorageEnergy = 0,
         StorageMass = 320,
     },
-    Footprint = {
-        MinWaterDepth = 1.5,
-    },
+    Footprint = { MinWaterDepth = 1.5 },
     General = {
         BuildBones = {
             BuildEffectBones = {
@@ -168,12 +138,7 @@ UnitBlueprint {
         UpgradesFrom = 'zeb9503',
         UpgradesFromBase = 'ueb0103',
     },
-    Intel = {
-        VisionRadius = 20,
-    },
-    Interface = {
-        HelpText = '<LOC zeb9603_help>Naval Factory',
-    },
+    Intel = { VisionRadius = 20 },
     LifeBarHeight = 0.075,
     LifeBarOffset = 4.75,
     LifeBarSize = 4.75,

@@ -193,11 +193,12 @@ UnitBlueprint{
             RackReloadTimeout = 10,
             RackSalvoChargeTime = 0.1,
             RackSalvoFiresAfterCharge = true,
-            RackSalvoReloadTime = 0.1,
+            RackSalvoReloadTime = 0.0,
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_AntiAir",
             RateOfFire = 1,
+            TargetCheckInterval = 1.0,
             TargetPriorities = {
                 "(AIR * MOBILE * EXPERIMENTAL - BOMBER)",
                 "AIR MOBILE GROUNDATTACK",

@@ -1,4 +1,3 @@
-
 --******************************************************************************************************
 --** Copyright (c) 2023  clyf
 --**
@@ -27,7 +26,7 @@ local SemiBallisticComponent = import("/lua/sim/projectiles/components/semiballi
 TacticalMissileComponent = ClassSimple(SemiBallisticComponent) {
 
     ---@param self TacticalMissileComponent | Projectile
-    MovementThread = function(self)
+    MovementThread = function(self, skipLaunchSequence)
         local blueprintPhysics = self.Blueprint.Physics
 
         -- are we a wiggler?
@@ -37,19 +36,25 @@ TacticalMissileComponent = ClassSimple(SemiBallisticComponent) {
             zigZagger = true
         end
 
-        -- launch
-        local launchTurnRateRange = self.LaunchTurnRateRange
-        local launchTurnRate = self.LaunchTurnRate + launchTurnRateRange * (2 * Random() - 1)
-        self:SetTurnRate(launchTurnRate)
+        if not skipLaunchSequence then
+            -- launch
+            local launchTurnRateRange = self.LaunchTurnRateRange
+            local launchTurnRate = self.LaunchTurnRate + launchTurnRateRange * (2 * Random() - 1)
+            self:SetTurnRate(launchTurnRate)
 
-        local launchTicksRange = self.LaunchTicksRange
-        local launchTicks = self.LaunchTicks + Random(-launchTicksRange, launchTicksRange)
-        WaitTicks(launchTicks)
+            local launchTicksRange = self.LaunchTicksRange
+            local launchTicks = self.LaunchTicks + Random(-launchTicksRange, launchTicksRange)
+            WaitTicks(launchTicks)
 
-        -- boost
-        local boostTurnRate, boostTime = self:TurnRateFromAngleAndHeight()
-        self:SetTurnRate(boostTurnRate)       
-        WaitTicks(boostTime * 10 + 1)
+            -- boost
+            local boostTurnRate, boostTime = self:TurnRateFromAngleAndHeight()
+            if boostTime < 0 then
+                boostTime = 0
+            end
+
+            self:SetTurnRate(boostTurnRate)
+            WaitTicks(boostTime * 10 + 1)
+        end
 
         -- glide
         local glideTurnRate, glideTime = self:TurnRateFromDistance()

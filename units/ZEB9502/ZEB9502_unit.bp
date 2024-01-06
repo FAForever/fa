@@ -121,7 +121,7 @@ UnitBlueprint {
         BuildCostEnergy = 8000,
         BuildCostMass = 510,
         BuildRate = 40,
-        BuildTime = 1300,
+        BuildTime = 1200,
         DifferentialUpgradeCostCalculation = true,
         RebuildBonusIds = {
             'zeb9502',
@@ -323,18 +323,8 @@ UnitBlueprint {
             0,
         },
         RollOffPoints = {
-            {
-                UnitSpin = 0,
-                X = 0,
-                Y = 0,
-                Z = 3,
-            },
-            {
-                UnitSpin = -90,
-                X = -3,
-                Y = 0,
-                Z = 0,
-            },
+            { UnitSpin = 0,     X = 0,	   Y = 0,     Z = 3 },
+            { UnitSpin = -90,   X = -3,    Y = 0,     Z = 0 },
         },
         SkirtOffsetX = -1.5,
         SkirtOffsetZ = -1.5,

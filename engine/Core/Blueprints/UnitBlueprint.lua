@@ -27,7 +27,7 @@
 ---@alias EnhancementSlot "Back" | "RCH" | "LCH"
 ---@alias TechCategory "TECH1" | "TECH2" | "TECH3" | "EXPERIMENTAL"
 ---@alias LayerCategory "AIR" | "LAND" | "NAVAL"
----@alias FactionCategory "UEF" | "CYBRAN" | "AEON" | "SERAPHIM"
+---@alias FactionCategory "UEF" | "CYBRAN" | "AEON" | "SERAPHIM" | "NOMADS"
 ---@alias IconBackgroundType "air" | "amph" | "land" | "sea"
 
 ---@alias UnitId BlueprintId
@@ -383,7 +383,7 @@
 --- If this shield only blocks weapons marked with `ArtilleryShieldBlocks`.
 --- Should not be defined with `PersonalBubble`, `PersonalShield`, or `TransportShield`.
 ---@field AntiArtilleryShield? boolean
---- impact effect name in `/lua/EffectTemplates.lua`
+--- impact effect name in `/lua/effecttemplates.lua`
 ---@field ImpactEffects? string
 --- effect mesh to be created for impacts on the shield
 ---@field ImpactMesh? FileName

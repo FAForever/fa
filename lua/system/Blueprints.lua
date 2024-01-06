@@ -700,6 +700,7 @@ function HandleUnitWithBuildPresets(bps, all_bps)
             tempBp.BaseBlueprintId = tempBp.BlueprintId
             tempBp.BlueprintId = string.lower(tempBp.BlueprintId .. '_' .. name)
             tempBp.BuildIconSortPriority = preset.BuildIconSortPriority or tempBp.BuildIconSortPriority or 0
+            tempBp.General.SelectionPriority = preset.SelectionPriority or tempBp.General.SelectionPriority or 1
             tempBp.General.UnitName = preset.UnitName or tempBp.General.UnitName
             tempBp.Interface = tempBp.Interface or { }
             tempBp.Interface.HelpText = preset.HelpText or tempBp.Interface.HelpText
@@ -876,9 +877,12 @@ end
 
 local function SpawnMenuDummyChanges(all_bps)
     for id, bp in pairs(all_bps) do
-        if bp.Categories and not table.find(bp.Categories, 'DRAGBUILD') then
+
+        -- allow all mobile units to be dragged while being built
+        if bp.Categories and table.find(bp.Categories, 'MOBILE') then
             table.insert(bp.Categories, 'DRAGBUILD')
         end
+
         if bp.Physics and bp.Physics.MotionType ~= 'RULEUMT_Air' then
             local FootX, FootZ = GetFoot(bp, 'SizeX'), GetFoot(bp, 'SizeZ')
             local SkirtX, SkirtZ = GetSkirt(bp, 'SizeX'), GetSkirt(bp, 'SizeZ')
@@ -979,7 +983,7 @@ function PostModBlueprints(all_bps)
     SetUnitThreatValues(all_bps.Unit)
     BlueprintLoaderUpdateProgress()
 
-    ProcessWeapons(all_bps.Unit)
+    ProcessWeapons(all_bps, all_bps.Unit)
     BlueprintLoaderUpdateProgress()
 
     -- re-computes all the LODs of various entities to match the LOD with the size of the entity

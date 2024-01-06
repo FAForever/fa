@@ -103,7 +103,7 @@ UnitBlueprint{
             BuildAttachBone = "Attachpoint",
             BuildEffectBones = {
                 "Arm01_Muzzle",
-                "Arm02_Muzzle",
+                "Arm06_Muzzle",
             },
         },
         CommandCaps = {

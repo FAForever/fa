@@ -96,7 +96,7 @@ UnitBlueprint{
         BuildCostEnergy = 99400,
         BuildCostMass = 4090,
         BuildRate = 120,
-        BuildTime = 10400,
+        BuildTime = 12000,
         BuildableCategory = {
             "BUILTBYTIER3FACTORY SERAPHIM MOBILE CONSTRUCTION",
             "BUILTBYTIER3FACTORY SERAPHIM STRUCTURE AIR",
@@ -166,6 +166,7 @@ UnitBlueprint{
         MinSpeedPercent = 0,
         MotionType = "RULEUMT_None",
         RollOffPoints = {
+            { UnitSpin = 0,     X = 0,	   Y = 0,     Z = 3 },
             { UnitSpin = 90,    X = 3,     Y = 0,     Z = 0 },
             { UnitSpin = -90,   X = -3,    Y = 0,     Z = 0 },
         },

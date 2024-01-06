@@ -97,8 +97,8 @@ UnitBlueprint{
         BuildTime = 600,
     },
     Footprint = {
-        SizeX = 2,
-        SizeZ = 6,
+        SizeX = 3,
+        SizeZ = 3,
     },
     General = {
         CommandCaps = {
@@ -156,7 +156,7 @@ UnitBlueprint{
     CollisionOffsetZ = 0.1,
     SizeX = 0.8,
     SizeY = 1,
-    SizeZ = 1.65,
+    SizeZ = 1.75,
     StrategicIconName = "icon_ship1_antiair",
     StrategicIconSortPriority = 165,
     Veteran = {

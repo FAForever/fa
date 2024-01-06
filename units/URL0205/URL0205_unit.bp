@@ -39,9 +39,15 @@ UnitBlueprint{
             IconFadeInZoom = 130,
             LODs = {
                 {
-                    LODCutoff = 215,
+                    LODCutoff = 100,
                     Scrolling = true,
                     ShaderName = "Insect",
+                },
+                {
+                    AlbedoName = 'url0205_lod1_albedo.dds',
+                    LODCutoff = 250,
+                    ShaderName = 'Insect',
+                    SpecularName = 'url0205_lod1_specteam.dds',
                 },
             },
         },
