@@ -5,10 +5,10 @@
 ---@operator concat(FileName | string): FileName
 
 ---@class Quaternion
----@field [1] number
----@field [2] number
----@field [3] number
----@field [4] number
+---@field [1] number 	# y
+---@field [2] number 	# z
+---@field [3] number 	# x
+---@field [4] number 	# w
 
 ---@class Vector
 ---@field [1] number
