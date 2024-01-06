@@ -417,8 +417,8 @@ UnitBlueprint{
             Slot = "RCH",
         },
         Shield = {
-            BuildCostEnergy = 109400,
-            BuildCostMass = 1200,
+            BuildCostEnergy = 107500,
+            BuildCostMass = 1050,
             BuildTime = 6720,
             Icon = "sp",
             ImpactEffects = "SeraphimShieldHit01",
