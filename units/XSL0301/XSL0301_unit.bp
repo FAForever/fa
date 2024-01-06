@@ -196,8 +196,8 @@ UnitBlueprint{
         },
     },
     Economy = {
-        BuildCostEnergy = 25800,
-        BuildCostMass = 2050,
+        BuildCostEnergy = 30200,
+        BuildCostMass = 2400,
         BuildRate = 56,
         BuildTime = 14400,
         BuildableCategory = { "BUILTBYTIER3ENGINEER SERAPHIM" },
@@ -281,8 +281,8 @@ UnitBlueprint{
     },
     Enhancements = {
         DamageStabilization = {
-            BuildCostEnergy = 76800,
-            BuildCostMass = 2500,
+            BuildCostEnergy = 74300,
+            BuildCostMass = 2300,
             BuildTime = 5900,
             Icon = "dss",
             Name = "<LOC enhancements_0131>Nano-Repair System",
@@ -311,8 +311,8 @@ UnitBlueprint{
             Slot = "LCH",
         },
         EngineeringThroughput = {
-            BuildCostEnergy = 51800,
-            BuildCostMass = 800,
+            BuildCostEnergy = 47400,
+            BuildCostMass = 450,
             BuildTime = 4200,
             Icon = "efm",
             Name = "<LOC enhancements_0143>Rapid Fabricator",
@@ -338,8 +338,8 @@ UnitBlueprint{
             Slot = "LCH",
         },
         EnhancedSensors = {
-            BuildCostEnergy = 34000,
-            BuildCostMass = 800,
+            BuildCostEnergy = 32100,
+            BuildCostMass = 650,
             BuildTime = 3100,
             Icon = "sre",
             Name = "<LOC enhancements_0141>Enhanced Sensor System",
