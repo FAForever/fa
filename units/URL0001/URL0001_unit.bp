@@ -583,6 +583,13 @@ UnitBlueprint{
         },
         FactionName = "Cybran",
         Icon = "amph",
+        OrderOverrides = {
+            RULEUTC_StealthToggle = {
+                bitmapId = "stealth-personal",
+                helpText = "toggle_stealth_personal",
+            },
+        },
+
         QuickSelectPriority = 1,
         SelectionPriority = 3,
         TeleportDelay = 10,

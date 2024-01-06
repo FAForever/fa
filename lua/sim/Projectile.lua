@@ -266,12 +266,6 @@ Projectile = ClassProjectile(ProjectileMethods) {
     --- Called by the engine when the projectile is destroyed
     ---@param self Projectile
     OnDestroy = function(self)
-        -- local size = debug.allocatedsize(self)
-        -- if size > 200 then
-        --     LOG(debug.allocatedsize(self))
-        --     LOG(table.getsize(self))
-        --     reprsl(self)
-        -- end
         local trash = self.Trash
         if trash then
             trash:Destroy()

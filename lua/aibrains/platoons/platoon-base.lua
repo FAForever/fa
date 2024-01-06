@@ -23,6 +23,7 @@ local TableGetn = table.getn
 ---@field Trash TrashBag
 AIPlatoon = Class(moho.platoon_methods) {
 
+    Debug = false,
     PlatoonName = 'PlatoonBase',
     StateName = 'Unknown',
 
@@ -49,7 +50,10 @@ AIPlatoon = Class(moho.platoon_methods) {
         self.Units = units
         for k, unit in units do
             unit.AIPlatoonReference = self
-            unit:SetCustomName(self.PlatoonName)
+
+            if self.Debug then
+                unit:SetCustomName(self.PlatoonName)
+            end
         end
     end,
 

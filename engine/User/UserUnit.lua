@@ -77,6 +77,16 @@ end
 function UserUnit:GetArmy()
 end
 
+---Returns unit's position interpolated by current frame
+---@return Vector
+function UserUnit:GetInterpolatedPosition()
+end
+
+---Returns unit's fraction of being completed
+---@return number
+function UserUnit:GetFractionComplete()
+end
+
 ---
 ---@return UnitBlueprint
 function UserUnit:GetBlueprint()

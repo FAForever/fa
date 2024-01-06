@@ -177,9 +177,9 @@ UnitBlueprint{
     SelectionThickness = 0.35,
     CollisionOffsetZ = 0.2,
     SizeSphere = 2,
-    SizeX = 2,
+    SizeX = 1.7,
     SizeY = 0.5,
-    SizeZ = 1.6,
+    SizeZ = 1.4,
     StrategicIconName = "icon_bomber3_directfire",
     StrategicIconSortPriority = 55,
     Transport = {

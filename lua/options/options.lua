@@ -917,9 +917,7 @@ options = {
                 type = 'toggle',
                 default = 1.0,
                 set = function(key, value, startup)
-                    if GetCurrentUIState() == 'game' then
-                        ConExecute("ui_StrategicIconScale " .. value)
-                    end
+                    ConExecute("ui_StrategicIconScale " .. value)
                 end,
                 custom = {
                     states = {

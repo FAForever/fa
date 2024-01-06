@@ -48,6 +48,13 @@ UnitBlueprint{
                     Scrolling = true,
                     ShaderName = "Insect",
                 },
+                {
+                    AlbedoName = 'url0111_lod1_albedo.dds',
+                    LODCutoff = 250,
+                    ShaderName = 'Insect',
+                    NormalsName = 'url0111_lod1_normalsTS.dds',
+                    SpecularName = 'url0111_lod1_specteam.dds',
+                },
             },
         },
         MovementEffects = {
