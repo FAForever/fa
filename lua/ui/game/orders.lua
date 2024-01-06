@@ -1520,7 +1520,7 @@ local function CreateAltOrders(availableOrders, availableToggles, units)
     -- Create the alt order buttons
     for index, availOrder in availableOrders do
         if not standardOrdersTable[availOrder] then continue end -- Skip any orders we don't have in our table
-        if not commonOrders[availOrder] then
+        if not commonOrders[availOrder] and slotForOrder[availOrder] ~= nil then
             local orderInfo = standardOrdersTable[availOrder] or AbilityInformation[availOrder]
             local orderCheckbox = AddOrder(orderInfo, slotForOrder[availOrder], true)
 
@@ -1552,7 +1552,7 @@ local function CreateAltOrders(availableOrders, availableToggles, units)
 
     for index, availToggle in availableToggles do
         if not standardOrdersTable[availToggle] then continue end -- Skip any orders we don't have in our table
-        if not commonOrders[availToggle] then
+        if not commonOrders[availToggle] and slotForOrder[availToggle] ~= nil then
             local orderInfo = standardOrdersTable[availToggle] or AbilityInformation[availToggle]
             local orderCheckbox = AddOrder(orderInfo, slotForOrder[availToggle], true)
 
@@ -1671,9 +1671,8 @@ function SetAvailableOrders(availableOrders, availableToggles, newSelection)
         end
     end
 
-    if numValidOrders <= 12 then
-        CreateAltOrders(availableOrders, availableToggles, currentSelection)
-    end
+    CreateAltOrders(availableOrders, availableToggles, currentSelection)
+
 
     controls.orderButtonGrid:EndBatch()
     if table.empty(currentSelection) and controls.bg.Mini then

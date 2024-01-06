@@ -455,7 +455,10 @@ Weapon = ClassWeapon(WeaponMethods) {
     CreateProjectileForWeapon = function(self, bone)
         local proj = self:CreateProjectile(bone)
 
-        -- store the original target, can be nil if ground firing
+        -- used for the retargeting feature
+        proj.CreatedByWeapon = self
+
+        -- used for tactical / strategic defenses to ignore all other collisions
         proj.OriginalTarget = self:GetCurrentTarget()
         if proj.OriginalTarget.GetSource then
             proj.OriginalTarget = proj.OriginalTarget:GetSource()
@@ -697,6 +700,31 @@ Weapon = ClassWeapon(WeaponMethods) {
                 return
             end
             self:SetEnabled(enable)
+        end
+    end,
+
+    ---@param self Weapon
+    ---@param rateOfFire number
+    DisabledWhileReloadingThread = function(self, rateOfFire)
+
+        -- attempts to fix weapons that intercept projectiles to being stuck on a projectile while reloading, preventing
+        -- other weapons from targeting that projectile. Is a side effect of the blueprint field `DesiredShooterCap`. This
+        -- is the more aggressive variant of `TargetResetWhenReady` as it completely disables the weapon.
+
+        local reloadTime = math.floor(10 * rateOfFire) - 1
+        if reloadTime > 4 then
+            if IsDestroyed(self) then
+                return
+            end
+
+            self:SetEnabled(false)
+            WaitTicks(reloadTime)
+
+            if IsDestroyed(self) then
+                return
+            end
+
+            self:SetEnabled(true)
         end
     end,
 

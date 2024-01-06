@@ -11,9 +11,10 @@
 local AircraftCarrier = import("/lua/defaultunits.lua").AircraftCarrier
 local CybranWeaponsFile = import("/lua/cybranweapons.lua")
 local CAAAutocannon = CybranWeaponsFile.CAAAutocannon
-local CAMZapperWeapon = CybranWeaponsFile.CAMZapperWeapon03
 
 local ExternalFactoryComponent = import("/lua/defaultcomponents.lua").ExternalFactoryComponent
+local CDFMissileRedirectWeapon02 = import("/lua/sim/weapons/cybran/CDFMissileRedirectWeapon02.lua").CDFMissileRedirectWeapon02
+
 
 ---@class URS0303 : AircraftCarrier, ExternalFactoryComponent
 URS0303 = ClassUnit(AircraftCarrier, ExternalFactoryComponent) {
@@ -23,7 +24,9 @@ URS0303 = ClassUnit(AircraftCarrier, ExternalFactoryComponent) {
         AAGun02 = ClassWeapon(CAAAutocannon) {},
         AAGun03 = ClassWeapon(CAAAutocannon) {},
         AAGun04 = ClassWeapon(CAAAutocannon) {},
-        Zapper = ClassWeapon(CAMZapperWeapon) {},
+        RedirectMissile = ClassWeapon(CDFMissileRedirectWeapon02) {
+            SphereEffectBp = '/effects/emitters/zapper_electricity_03_emit.bp',
+        },
     },
 
     FactoryAttachBone = 'ExternalFactoryPoint',
@@ -82,3 +85,7 @@ URS0303 = ClassUnit(AircraftCarrier, ExternalFactoryComponent) {
 }
 
 TypeClass = URS0303
+
+-- backwards compatibility with mods
+
+local CAMZapperWeapon = CybranWeaponsFile.CAMZapperWeapon03

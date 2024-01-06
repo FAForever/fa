@@ -568,7 +568,8 @@ options = {
                 custom = {
                     states = {
                         { text = "<LOC _Off>Off", key = "off" },
-                        { text = "<LOC structure_ringing_extractors_fabs_option_4>Up to 4 Mass Fabricators", key = "inner" },
+                        { text = "<LOC structure_ringing_extractors_fabs_option_4>Up to 4 Mass Fabricators",
+                            key = "inner" },
                         { text = "<LOC structure_ringing_extractors_fabs_option_8>Up to 8 Mass Fabricators", key = "all" },
                     },
                 },
@@ -906,6 +907,23 @@ options = {
                     states = {
                         { text = "<LOC _Off>", key = 0 },
                         { text = "<LOC _On>", key = 1 },
+                    },
+                },
+            },
+
+            {
+                title = "<LOC OPTIONS_STRATEGIC_ICON_SCALE>Scale strategic icons",
+                key = 'strat_icon_scale',
+                type = 'toggle',
+                default = 1.0,
+                set = function(key, value, startup)
+                    ConExecute("ui_StrategicIconScale " .. value)
+                end,
+                custom = {
+                    states = {
+                        { text = "<LOC _Off>Off", key = 1.0 },
+                        { text = "<LOC strat_icon_scale-150>150% (may cause distortions)", key = 1.5 },
+                        { text = "<LOC strat_icon_scale-200>200%", key = 2.0 },
                     },
                 },
             },
@@ -1575,10 +1593,34 @@ options = {
                 },
             },
             {
+                title = "<LOC OPTIONS_FRAMETIME>Frametime",
+                key = 'frametime',
+                type = 'slider',
+                default = 16,
+                update = function(control, value)
+                    logic = import("/lua/options/optionslogic.lua")
+                    logic.SetValue('vsync', 0)
+                end,
+                set = function(key, value, startup)
+                    if not startup then
+                        ConExecute("sc_FrameTimeClamp " .. tostring(value))
+                    end
+                end,
+                custom = {
+                    min = 4,
+                    max = 16,
+                    inc = 1,
+                },
+            },
+            {
                 title = "<LOC OPTIONS_0148>Vertical Sync",
                 key = 'vsync',
                 type = 'toggle',
                 default = 1,
+                update = function(control, value)
+                    logic = import("/lua/options/optionslogic.lua")
+                    logic.SetValue('frametime', 16)
+                end,
                 set = function(key, value, startup)
                     if not startup then
                         ConExecute("SC_VerticalSync " .. tostring(value))
