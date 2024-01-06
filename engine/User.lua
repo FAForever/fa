@@ -90,6 +90,12 @@ end
 function CopyCurrentReplay(profile, newFilename)
 end
 
+---Copies given string to clipboard, returns true if succeeded
+---@param s string
+---@return boolean
+function CopyToClipboard(s)
+end
+
 --- Creates a Unit AtMouse
 ---@param blueprintId string
 ---@param ownerArmyIndex number
@@ -247,7 +253,7 @@ function GetCommandLineArg(option, maxArgs)
 end
 
 --- Returns 'splash', 'frontend', or 'game' depending on the current state of the UI
----@return 'splash' | 'frontend' | 'game'
+---@return 'splash' | 'frontend' | 'game' | 'none'
 function GetCurrentUIState()
 end
 
@@ -1093,6 +1099,22 @@ end
 ---@param units UserUnit[]
 ---@param seconds? number
 function UIZoomTo(units, seconds)
+end
+
+---Draws circle in world. Must be called within `WorldView:OnRenderWorld`
+---@param pos Vector
+---@param size number
+---@param color Color
+---@param thickness? number
+function UI_DrawCircle(pos, size, color, thickness)
+end
+
+---Draws rectangle in world. Must be called within `WorldView:OnRenderWorld`
+---@param pos Vector
+---@param size number
+---@param color Color
+---@param thickness? number
+function UI_DrawRect(pos, size, color, thickness)
 end
 
 ---

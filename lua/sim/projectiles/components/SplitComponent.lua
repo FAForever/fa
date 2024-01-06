@@ -1,4 +1,3 @@
-
 --**********************************************************************************
 --** Copyright (c) 2022  Willem 'Jip' Wijnia
 --**
@@ -20,10 +19,6 @@
 --** OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 --** SOFTWARE.
 --**********************************************************************************
-
-local MathSin = math.sin
-local MathCos = math.cos
-local MathPi = math.pi
 
 ---@class SplitComponent
 SplitComponent = ClassSimple {
@@ -86,7 +81,45 @@ SplitComponent = ClassSimple {
             if inheritTargetGround then
                 proj:SetNewTargetGround(self:GetCurrentTargetPosition())
             end     
+
+--         for k = 1, childCount do
+--             local childProjectile = self:CreateChildProjectile(childBlueprint)
+--             childProjectile.DamageData = self.DamageData
+
+--             if inheritTargetGround then
+--                 childProjectile:SetTurnRate(40)
+--                 childProjectile:SetNewTargetGround(self:GetCurrentTargetPosition())
+--                 childProjectile:TrackTarget(false)
+--             end
+
+--             childProjectile.Trash:Add(ForkThread(self.ZigZagThread, self, childProjectile))
+--         end
+--     end,
         end
     end,
+    
+--     --- Zig-zag the projectile to create some diversity
+--     ---@param self SplitComponent | Projectile
+--     ---@param childProjectile Projectile
+--     ZigZagThread = function(self, childProjectile)
+--         childProjectile:ChangeMaxZigZag(10)
+
+--         -- we need this or the zigzag does not work
+--         childProjectile:TrackTarget(true)
+
+--         WaitTicks(9)
+
+--         for k = 9, 1, -1 do
+--             if not IsDestroyed(childProjectile) then
+--                 childProjectile:ChangeMaxZigZag(k)
+--                 childProjectile:ChangeZigZagFrequency(0.1 * k)
+--             end
+
+--             WaitTicks(3)
+--         end
+
+--         if not IsDestroyed(childProjectile) then
+--             childProjectile:ChangeMaxZigZag(0.5)
+--             childProjectile:ChangeZigZagFrequency(1)
 
 }

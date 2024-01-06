@@ -598,9 +598,8 @@ function WrapAndPlaceText(bp, builder, descID, control)
                                 ReloadTime = math.max(0.1, MATH_IRound(10 * ReloadTime) / 10)
                             end
 
-                            --Upon acquiring a target
-                            CycleTime = CycleTime + ChargeTime
-
+                            -- Keep track that the firing cycle has a constant rate
+                            local singleShot = true
                             --OnFire is called from FireReadyState at this point, so we need to track time
                             --to know how much the fire rate cooldown has progressed during our fire cycle.
                             local SubCycleTime = 0
@@ -613,12 +612,13 @@ function WrapAndPlaceText(bp, builder, descID, control)
                                     if info.MuzzleSalvoDelay == 0 then
                                         MuzzleCount = table.getsize(Rack.MuzzleBones)
                                     end
+                                    if MuzzleCount > 1 then singleShot = false end
                                     CycleProjs = CycleProjs + MuzzleCount
 
                                     SubCycleTime = SubCycleTime + MuzzleCount * MuzzleDelays
                                     if not info.RackFireTogether and index ~= RackCount then
-                                        if FiringCooldown <= SubCycleTime then
-                                            CycleTime = CycleTime + SubCycleTime + math.max(0.1, FiringCooldown - SubCycleTime)
+                                        if FiringCooldown <= SubCycleTime + ChargeTime then
+                                            CycleTime = CycleTime + SubCycleTime + ChargeTime + math.max(0.1, FiringCooldown - SubCycleTime - ChargeTime)
                                         else
                                             CycleTime = CycleTime + FiringCooldown
                                         end
@@ -627,7 +627,7 @@ function WrapAndPlaceText(bp, builder, descID, control)
                                 end
                             end
                             if FiringCooldown <= (SubCycleTime + ChargeTime + ReloadTime) then
-                                CycleTime = CycleTime + SubCycleTime + ReloadTime + math.max(0.1, FiringCooldown - SubCycleTime - ChargeTime - ReloadTime)
+                                CycleTime = CycleTime + SubCycleTime + ReloadTime + ChargeTime + math.max(0.1, FiringCooldown - SubCycleTime - ChargeTime - ReloadTime)
                             else
                                 CycleTime = CycleTime + FiringCooldown
                             end
@@ -636,6 +636,12 @@ function WrapAndPlaceText(bp, builder, descID, control)
                                 --Round DPS, or else it gets floored in string.format.
                                 local DPS = MATH_IRound(Damage * CycleProjs / CycleTime)
                                 weaponDetails1 = weaponDetails1..LOCF('<LOC uvd_DPS>', DPS)
+                            end
+
+                            -- Avoid saying a unit fires a salvo when it in fact has a constant rate of fire
+                            if singleShot and ReloadTime == 0 then
+                                CycleTime = CycleTime / CycleProjs
+                                CycleProjs = 1
                             end
 
                             if CycleProjs > 1 then

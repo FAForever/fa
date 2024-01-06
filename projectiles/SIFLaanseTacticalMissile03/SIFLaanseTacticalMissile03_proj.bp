@@ -39,11 +39,6 @@ ProjectileBlueprint {
         StrategicIconSize = 2,
         UniformScale = 0.05,
     },
-    Economy = {
-        BuildCostEnergy = 6000,
-        BuildCostMass = 300,
-        BuildTime = 30,
-    },
     General = {
         Category = 'Missile',
         Faction = 'Seraphim',
