@@ -59,8 +59,8 @@ T1Hydrocarbon = import("/lua/ui/game/hotkeys/context-based-templates-data/T1Hydr
 -------------------------------------------------------------------------------
 --#region By command mode context
 
-AppendMassStorages = import("/lua/ui/game/hotkeys/context-based-templates-data/AppendMassStorages.lua").Template
-AppendMassStoragesAndFabricators = import("/lua/ui/game/hotkeys/context-based-templates-data/AppendMassStoragesAndFabricators.lua").Template
+AppendMassStoragesToExtractors = import("/lua/ui/game/hotkeys/context-based-templates-data/AppendMassStoragesToExtractors.lua").Template
+AppendMassStoragesAndFabricatorsToT3Extractor = import("/lua/ui/game/hotkeys/context-based-templates-data/AppendMassStoragesAndFabricatorsToT3Extractor.lua").Template
 AppendPowerGeneratorsToArtillery = import("/lua/ui/game/hotkeys/context-based-templates-data/AppendPowerGeneratorsToArtillery.lua").Template
 AppendPowerGeneratorsToRadar = import("/lua/ui/game/hotkeys/context-based-templates-data/AppendPowerGeneratorsToRadar.lua").Template
 AppendWallsToPointDefense = import("/lua/ui/game/hotkeys/context-based-templates-data/AppendWallsToPointDefense.lua").Template
