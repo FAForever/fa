@@ -138,7 +138,9 @@ TacticalMissileComponent = ClassSimple(SemiBallisticComponent) {
 
         glideTime = terminalTime
 
-        self:ChangeMaxZigZag(terminalZigZag)
+        if blueprintPhysics.MaxZigZag and blueprintPhysics.MaxZigZag ~= terminalZigZag then
+            self:ChangeMaxZigZag(terminalZigZag)
+        end
 
         -- wait until we've allegedly hit our target
         WaitTicks((glideTime + 1) * 10)
