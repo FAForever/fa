@@ -941,7 +941,7 @@ function PathToWithThreatThreshold(layer, origin, destination, aibrain, threatFu
     end
 
     -- check if we found a path
-    if destinationSection.HeapIdentifier ~= seenIdentifier then
+    if not destinationSection.HeapFrom then
         return nil, 'TooMuchThreat', nil, threats, tHead - 1
     end
 
