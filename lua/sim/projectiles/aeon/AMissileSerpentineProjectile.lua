@@ -70,23 +70,6 @@ AMissileSerpentineProjectile = ClassProjectile(SingleCompositeEmitterProjectile,
         local radius = 0.105 * (blueprintPhysics.MaxSpeed + blueprintPhysics.MaxSpeedRange)
         self:SetCollisionShape('Sphere', 0, 0, 0, radius)
         self.MoveThread = self.Trash:Add(ForkThread(self.MovementThread, self))
-
-        self.Trash:Add(self:ForkThread(self.AccuracyThread, blueprintPhysics.MaxZigZag))
-    end,
-
-    ---@param self AMissileSerpentineProjectile
-    ---@param MaxZigZag number
-    AccuracyThread = function(self, MaxZigZag)
-        local distance = self:DistanceToTarget()
-        while distance > 14 do
-            WaitTicks(4)
-            distance = self:DistanceToTarget()
-        end
-        self:TrackTarget(true)
-        for i = 5, 3, -1 do
-            self:ChangeMaxZigZag(MaxZigZag * i/6)
-            WaitTicks(2)
-        end
     end,
 
     ---@param self AMissileSerpentineProjectile

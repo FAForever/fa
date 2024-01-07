@@ -11,6 +11,8 @@ AIFMissileTactical03 = ClassProjectile(AMissileSerpentine02Projectile) {
     HeightDistanceFactor = 5,
     MinHeight = 10,
     FinalBoostAngle = 45,
+
+    TerminalZigZag = 5,
 }
 TypeClass = AIFMissileTactical03
 

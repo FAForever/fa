@@ -66,6 +66,6 @@ ProjectileBlueprint {
         VelocityAlign = true,
 
         ZigZagFrequency = 1,
-        MaxZigZag = 1
+        MaxZigZag = 1,
     },
 }

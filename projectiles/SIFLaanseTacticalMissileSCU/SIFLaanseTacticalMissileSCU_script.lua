@@ -39,8 +39,8 @@ SIFLaanseTacticalMissileSCU = ClassProjectile(SLaanseTacticalMissile, TacticalMi
     FinalBoostAngle = 30,
     FinalBoostAngleRange = 0,
 
-    MinSpeed = 13,
-    DistancePerSpeed = 2.5,
+    TerminalSpeed = 13,
+    TerminalDistance = 30,
 
     ---@param self SIFLaanseTacticalMissileSCU
     ---@param inWater boolean

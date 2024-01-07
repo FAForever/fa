@@ -38,8 +38,8 @@ SIFLaanseTacticalMissile02 = ClassProjectile(SLaanseTacticalMissile, TacticalMis
     FinalBoostAngle = 30,
     FinalBoostAngleRange = 0,
 
-    MinSpeed = 20,
-    DistancePerSpeed = 1,
+    TerminalSpeed = 20,
+    TerminalDistance = 15,
 
     ---@param self SIFLaanseTacticalMissile02
     OnCreate = function(self)
