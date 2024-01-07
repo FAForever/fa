@@ -62,7 +62,6 @@ T1Hydrocarbon = import("/lua/ui/game/hotkeys/context-based-templates-data/T1Hydr
 AppendMassStorages = import("/lua/ui/game/hotkeys/context-based-templates-data/AppendMassStorages.lua").Template
 AppendMassStoragesAndFabricators = import("/lua/ui/game/hotkeys/context-based-templates-data/AppendMassStoragesAndFabricators.lua").Template
 AppendPowerGeneratorsToArtillery = import("/lua/ui/game/hotkeys/context-based-templates-data/AppendPowerGeneratorsToArtillery.lua").Template
-AppendPowerGeneratorsToEnergyStorage = import("/lua/ui/game/hotkeys/context-based-templates-data/AppendPowerGeneratorsToEnergyStorage.lua").Template
 AppendPowerGeneratorsToRadar = import("/lua/ui/game/hotkeys/context-based-templates-data/AppendPowerGeneratorsToRadar.lua").Template
 AppendWallsToPointDefense = import("/lua/ui/game/hotkeys/context-based-templates-data/AppendWallsToPointDefense.lua").Template
 
