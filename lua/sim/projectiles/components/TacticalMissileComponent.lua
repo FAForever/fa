@@ -22,8 +22,16 @@
 
 local SemiBallisticComponent = import("/lua/sim/projectiles/components/semiballisticcomponent.lua").SemiBallisticComponent
 
+local MathAbs = math.abs
+
 ---@class TacticalMissileComponent : SemiBallisticComponent
+---@field TerminalTime number       # How long before the terminal phase starts, in seconds. Default is 1/4 of the total glide time.
+---@field TerminalDistance number   # How far away the terminal phase starts, overrides TerminalTime.
+---@field TerminalSpeed number      # MaxSpeed of the missile in the terminal phase.
+---@field TerminalZigZag number     # MaxZigZag of the missile in the terminal phase. Default is 0.5.
 TacticalMissileComponent = ClassSimple(SemiBallisticComponent) {
+    
+    TerminalZigZag = 0.5,
 
     ---@param self TacticalMissileComponent | Projectile
     MovementThread = function(self, skipLaunchSequence)
@@ -88,12 +96,52 @@ TacticalMissileComponent = ClassSimple(SemiBallisticComponent) {
             self:SetTurnRate(glideTurnRate)
         end
 
-        -- reduce the maximum zig zag frequency halfway so that they're unlikely to miss targets
-        WaitTicks((0.75 * glideTime + 0.1) * 10)
-        self:ChangeMaxZigZag(0.5)
+        local terminalTime = self.TerminalTime or glideTime * 0.25
+        local terminalDistance = self.TerminalDistance
+        local terminalSpeed = self.TerminalSpeed
+        local terminalZigZag = self.TerminalZigZag
+
+        local maxSpeed = blueprintPhysics.MaxSpeed
+        local accel = blueprintPhysics.Acceleration
+
+        if terminalDistance then
+            terminalTime = terminalDistance / (terminalSpeed or maxSpeed)
+        end
+
+        -- Changing the max speed below the current speed decelerates the projectile in 2 ticks.
+        -- Instead, create a smoother deceleration based on the projectile's actual acceleration.
+        if terminalSpeed then
+            local accelTime = MathAbs(maxSpeed - terminalSpeed) / accel
+
+            -- The glide time is based on max speed, but the terminal phase is based on terminal speed,
+            -- so we have to convert to the common variable of distance
+            -- and then back into time by dividing by max speed.
+            local accelDist = MathAbs((terminalSpeed * terminalSpeed - maxSpeed * maxSpeed) / 2 / accel)
+            local timeBeforeTerminal = glideTime - terminalTime * terminalSpeed / maxSpeed - accelDist / maxSpeed
+            -- Wait until the projectile reaches the point where the terminal phase should start.
+            if timeBeforeTerminal > 0 then
+                WaitTicks(timeBeforeTerminal * 10)
+            end
+
+            -- We will be changing our velocity in the next Wait, so update the lifetime.
+            glideTime = accelTime + terminalTime
+            self:SetLifetime((glideTime + 3))
+
+            for t = 0.2, accelTime, 0.2 do
+                self:SetMaxSpeed(maxSpeed - (maxSpeed - terminalSpeed) * t/accelTime)
+                WaitTicks(3) -- This waits 2 ticks instead of 3 according to GetGameTick().
+            end
+            self:SetMaxSpeed(terminalSpeed)
+        else
+            WaitTicks((glideTime - terminalTime) * 10)
+        end
+
+        glideTime = terminalTime
+
+        self:ChangeMaxZigZag(terminalZigZag)
 
         -- wait until we've allegedly hit our target
-        WaitTicks((0.25 * glideTime + 1) * 10)
+        WaitTicks((glideTime + 1) * 10)
 
         -- then, if we still exist, we just want to stop existing. Therefore we find our way to the ground
         -- target the ground below us slowly turn towards the ground so that we do not fly off indefinitely

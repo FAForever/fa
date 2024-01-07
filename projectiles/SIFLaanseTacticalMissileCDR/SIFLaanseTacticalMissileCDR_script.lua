@@ -39,6 +39,9 @@ SIFLaanseTacticalMissileCDR = ClassProjectile(SLaanseTacticalMissile, TacticalMi
     FinalBoostAngle = 30,
     FinalBoostAngleRange = 0,
 
+    TerminalSpeed = 13,
+    TerminalDistance = 30,
+
     ---@param self SIFLaanseTacticalMissileCDR
     ---@param inWater boolean
     OnCreate = function(self, inWater)
