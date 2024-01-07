@@ -615,7 +615,9 @@ CLOATacticalMissileProjectile = ClassProjectile(SingleBeamProjectile, TacticalMi
             self.DamageData.DamageAmount = self.Launcher.Blueprint.SplitDamage.DamageAmount or 0
             self.DamageData.DamageRadius = self.Launcher.Blueprint.SplitDamage.DamageRadius or 1
 
-            self:OnSplit(true)
+            if not self.IsRedirected then
+                self:OnSplit(true)
+            end
         end
     end,
 

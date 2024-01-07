@@ -85,6 +85,9 @@ SplitComponent = ClassSimple {
             if inheritTargetGround then
                 proj:SetNewTargetGround(self:GetCurrentTargetPosition())
             end     
+            if self.IsRedirected then
+                proj.IsRedirected = true
+            end
 
 --         for k = 1, childCount do
 --             local childProjectile = self:CreateChildProjectile(childBlueprint)

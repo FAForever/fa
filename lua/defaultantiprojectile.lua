@@ -85,7 +85,7 @@ Flare = Class(Entity) {
                 owner.RedirectedMissiles = owner.RedirectedMissiles + 1
 
                 other.IsRedirected = true
-                other:SetNewTarget(self.Owner)
+                other:SetNewTarget(owner)
                 other:SetTurnRate(120)
 
                 -- projectiles that end due to lifetime still explode and deal damage,
@@ -94,7 +94,7 @@ Flare = Class(Entity) {
                 other.Trash:Add(
                     ForkThread(
                         self.KillThread,
-                        self, other, 10 + 5 * Random()
+                        self, other, 7 + 5 * Random()
                     )
                 )
 
