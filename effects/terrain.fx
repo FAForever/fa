@@ -2709,7 +2709,7 @@ float4 Terrain301NormalsPS ( VS_OUTPUT inV, uniform bool halfRange ) : COLOR
     float4 position = TerrainScale * inV.mTexWT;
     // 30° rotation
     float2x2 rotationMatrix = float2x2(float2(0.866, -0.5), float2(0.5, 0.866));
-    position.zw = mul(position, rotationMatrix);
+    position.zw = mul(position.xy, rotationMatrix);
 
     float4 mask0 = tex2D(UtilitySamplerA, position.xy);
     float4 mask1 = tex2D(UtilitySamplerB, position.xy);
@@ -2754,7 +2754,7 @@ float4 Terrain301AlbedoPS ( VS_OUTPUT inV, uniform bool halfRange ) : COLOR
     float4 position = TerrainScale * inV.mTexWT;
     // 30° rotation
     float2x2 rotationMatrix = float2x2(float2(0.866, -0.5), float2(0.5, 0.866));
-    position.zw = mul(position, rotationMatrix);
+    position.zw = mul(position.xy, rotationMatrix);
 
     // do arithmetics to get range from (0, 1) to (-1, 1) as normal maps store their values as (0, 1)
     float3 normal = normalize(2 * SampleScreen(NormalSampler,inV.mTexSS).xyz - 1);
