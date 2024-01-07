@@ -20,6 +20,10 @@
 --** SOFTWARE.
 --**********************************************************************************
 
+local MathSin = math.sin
+local MathCos = math.cos
+local MathPi = math.pi
+
 ---@class SplitComponent
 SplitComponent = ClassSimple {
 
