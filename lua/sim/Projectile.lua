@@ -152,27 +152,26 @@ Projectile = ClassProjectile(ProjectileMethods) {
             local sx, sy, sz = unitBlueprint.SizeX or 1, unitBlueprint.SizeY or 1, unitBlueprint.SizeZ or 1
             local px, py, pz = target:GetPositionXYZ()
 
-            if cy == 0 then -- set default offset
-                cy = sy/4 
-            elseif cy*2 < sy/2 then -- don't target under the surface
-                sy = sy - (0.5 * sy + 2 * cy)
-                cy = sy/4
+            -- don't target below the surface
+            if cy < 0 then
+                sy = sy + cy
+                cy = 0
             end
 
             local physics = self.Blueprint.Physics
             local fuzziness = physics.TrackTargetGroundFuzziness or 0.8
             local offset = physics.TrackTargetGroundOffset or 0
             sx = sx + offset
-            sy = sy + offset
             sz = sz + offset
 
             local dx = sx * (Random() - 0.5) * fuzziness
-            local dy = sy * (Random() - 0.5) * fuzziness + cy * 2
-            local dz = sz * (Random() - 0.5) * fuzziness + cz * 2
+            local dy = (sy + offset) * (Random() - 0.5) * fuzziness + sy/2 + cy
+            local dz = sz * (Random() - 0.5) * fuzziness + cz
 
             -- rotate a vector by a quaternion: q * v * conjugate(q)
             -- Supcom uses y,z,x,w!
             local ty, tz, tx, tw =  unpack(target:GetOrientation())
+            -- compute the product in a single assignment to not have to use temporary, single-use variables.
             local dw
             dw, dx, dy, dz = 
             -tx * dx - tz * dy - ty * dz,
@@ -181,7 +180,7 @@ Projectile = ClassProjectile(ProjectileMethods) {
              tw * dz + tx * dy - tz * dx
 
             tx, tz, ty = -tx, -tz, -ty
-
+            -- compute the product in a single assignment to not have to use temporary, single-use variables.
             dx, dy, dz = 
             dw * tx + dx * tw + dy * ty - dz * tz,
             dw * tz + dy * tw + dz * tx - dx * ty,
@@ -194,7 +193,7 @@ Projectile = ClassProjectile(ProjectileMethods) {
             local pos = self:GetCurrentTargetPosition()
 
             local physics = self.Blueprint.Physics
-            local fuzziness = 0
+            local fuzziness = physics.TrackTargetGroundFuzziness or 0.8
             local offset = physics.TrackTargetGroundOffset or 0
             local dx = (Random() - 0.5) * fuzziness * (1 + offset)
             local dz = (Random() - 0.5) * fuzziness * (1 + offset)
