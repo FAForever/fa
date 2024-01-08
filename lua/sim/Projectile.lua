@@ -178,16 +178,20 @@ Projectile = ClassProjectile(ProjectileMethods) {
             -- Supreme Commander quaternions use y,z,x,w!
             local ty, tz, tx, tw = unpack(target:GetOrientation())
 
-            dw = -tx * dx - tz * dy - ty * dz
-            dx = tw * dx + tz * dz - ty * dy
-            dy = tw * dy + ty * dx - tx * dz
-            dz = tw * dz + tx * dy - tz * dx
+            -- compute the product in a single assignment to not have to use temporary, single-use variables.
+            dw, dx, dy, dz = 
+            -tx * dx - tz * dy - ty * dz,
+             tw * dx + tz * dz - ty * dy,
+             tw * dy + ty * dx - tx * dz,
+             tw * dz + tx * dy - tz * dx
 
             tx, tz, ty = -tx, -tz, -ty
-
-            dx = dw * tx + dx * tw + dy * ty - dz * tz
-            dy = dw * tz + dy * tw + dz * tx - dx * ty
-            dz = dw * ty + dz * tw + dx * tz - dy * tx
+            
+            -- compute the product in a single assignment to not have to use temporary, single-use variables.
+            dx, dy, dz = 
+            dw * tx + dx * tw + dy * ty - dz * tz,
+            dw * tz + dy * tw + dz * tx - dx * ty,
+            dw * ty + dz * tw + dx * tz - dy * tx
 
             local pos = { px + dx, py + dy, pz + dz }
             DrawCircle(pos, 1, 'ffffff')
