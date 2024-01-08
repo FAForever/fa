@@ -154,12 +154,10 @@ Projectile = ClassProjectile(ProjectileMethods) {
             local sx, sy, sz = unitBlueprint.SizeX or 1, unitBlueprint.SizeY or 1, unitBlueprint.SizeZ or 1
             local px, py, pz = target:GetPositionXYZ()
 
-            -- add offset to prefer the lower end of the hitbox
-            if cy == 0 then
-                cy = sy / 4
-            elseif cy * 2 < sy / 2 then
-                sy = sy - (0.5 * sy + 2 * cy)
-                cy = sy / 2
+            -- don't target the part of the hitbox below the surface
+            if cy < 0 then
+                sy = sy + cy
+                cy = 0
             end
 
             local physics = self.Blueprint.Physics
