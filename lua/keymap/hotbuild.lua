@@ -32,7 +32,7 @@ local worldview = import("/lua/ui/game/worldview.lua").viewLeft
 local oldHandleEvent = worldview.HandleEvent
 
 
-function translateExFacUnits(selection)
+function TranslateExFacUnits(selection)
     local exFacs = EntityCategoryFilterDown(categories.EXTERNALFACTORY, selection)   -- get all selected units with a factory attachment
     local nonExFacs = nil
     if not table.empty(exFacs) then
