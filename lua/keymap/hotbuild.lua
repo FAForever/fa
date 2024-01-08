@@ -439,7 +439,7 @@ function buildActionFactoryTemplate(modifier)
 
     local template = effectiveTemplates[cyclePos]
     local selectedTemplate = template.templateData
-    local filteredUnits = translateExFacUnits(selection)
+    local filteredUnits = TranslateExFacUnits(selection)
     if maxPos == 1 then
         for _, units in selectedTemplate do
             local v = units.id
@@ -585,7 +585,7 @@ function buildActionUnit(name, modifier)
 
     local unit = effectiveValues[cyclePos]
 
-    local filteredUnits = translateExFacUnits(selection)
+    local filteredUnits = TranslateExFacUnits(selection)
     if maxPos == 1 then
         if filteredUnits then
             IssueBlueprintCommandToUnits(filteredUnits, "UNITCOMMAND_BuildFactory", unit, count)
