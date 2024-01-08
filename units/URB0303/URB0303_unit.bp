@@ -48,6 +48,7 @@ UnitBlueprint{
         SurfaceThreatLevel = 0,
     },
     Display = {
+        AnimationBuild = '/units/urb0303/urb0303_abuild.sca',
         BuildAttachBone = "Attachpoint",
         IdleEffects = {
             Water = {
@@ -85,7 +86,7 @@ UnitBlueprint{
         BuildCostEnergy = 45000,
         BuildCostMass = 9500,
         BuildRate = 150,
-        BuildTime = 11250,
+        BuildTime = 21600,
         BuildableCategory = {
             "BUILTBYTIER3FACTORY CYBRAN MOBILE CONSTRUCTION",
             "BUILTBYTIER3FACTORY CYBRAN STRUCTURE NAVAL",

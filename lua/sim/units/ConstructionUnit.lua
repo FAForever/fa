@@ -9,6 +9,8 @@ local MobileUnit = import("/lua/sim/units/mobileunit.lua").MobileUnit
 ---@field UnitBuildOrder? string
 ---@field Upgrading? boolean
 ---@field BuildArmManipulator moho.AimManipulator
+---@field BuildEffectBones string[]
+---@field BuildEffectsBag TrashBag
 ---@field StoppedBuilding? boolean
 ConstructionUnit = ClassUnit(MobileUnit) {
 
@@ -112,7 +114,7 @@ ConstructionUnit = ClassUnit(MobileUnit) {
         if self.BuildArmManipulator then
             WaitFor(self.BuildingOpenAnimManip)
             if enable then
-                self.BuildArmManipulator:Enable()
+                self:BuildManipulatorSetEnabled(enable)
             end
         end
     end,

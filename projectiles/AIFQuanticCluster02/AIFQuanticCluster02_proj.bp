@@ -28,5 +28,7 @@ ProjectileBlueprint {
         LeadTarget = false,
         TurnRate = 360,
         VelocityAlign = true,
+        Fragments = 3,
+        FragmentId = '/projectiles/AIFQuanticCluster03/AIFQuanticCluster03_proj.bp',
     },
 }

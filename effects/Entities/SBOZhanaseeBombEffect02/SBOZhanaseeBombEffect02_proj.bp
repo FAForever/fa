@@ -39,7 +39,7 @@ ProjectileBlueprint {
         HelpText = 0,
     },
     Physics = {
-        CollideEntity = false,
+        CollideEntity = true,
         DestroyOnWater = true,
         TrackTarget = false,
         TurnRate = 360,

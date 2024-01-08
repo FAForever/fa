@@ -267,9 +267,7 @@ function Scan()
                 end
 
                 if PathToState.Origin and PathToState.Destination then
-                    local path, n, label = NavUtils.PathTo(PathToState.Layer, PathToState.Origin, PathToState.Destination
-                        ,
-                        ArmyBrains[1])
+                    local path, n, label = NavUtils.DetailedPathTo(PathToState.Layer, PathToState.Origin, PathToState.Destination)
 
                     if not path then
                         DrawLinePop(PathToState.Origin, PathToState.Destination, 'ff0000')

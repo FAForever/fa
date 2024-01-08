@@ -237,7 +237,7 @@ local statFuncs = {
         if options.gui_detailed_unitview == 0 then
             return false
         end
-        if info.userUnit ~= nil and info.userUnit:GetBuildRate() >= 2 then
+        if info.userUnit ~= nil and info.userUnit:GetBuildRate() >= 1 then
             return string.format("%d", math.floor(info.userUnit:GetBuildRate()))
         end
         return false
@@ -552,8 +552,7 @@ function UpdateWindow(info)
                 end
 
                 -- show that queue
-                controls.queue.grid:UpdateQueue(SetCurrentFactoryForQueueDisplay(factory))
-                ClearCurrentFactoryForQueueDisplay()
+                controls.queue.grid:UpdateQueue(PeekCurrentFactoryForQueueDisplay(factory))
             else
                 controls.queue:Hide()
             end
