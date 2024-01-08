@@ -198,7 +198,7 @@ Projectile = ClassProjectile(ProjectileMethods) {
             local pos = self:GetCurrentTargetPosition()
 
             local physics = self.Blueprint.Physics
-            local fuzziness = 0
+            local fuzziness = physics.TrackTargetGroundFuzziness or 0.8
             local offset = physics.TrackTargetGroundOffset or 0
             local dx = (Random() - 0.5) * fuzziness * (1 + offset)
             local dz = (Random() - 0.5) * fuzziness * (1 + offset)
