@@ -245,9 +245,8 @@ UnitBlueprint{
             TargetPriorities = {
                 "TECH3 MOBILE",
                 "TECH2 MOBILE",
-                "COMMAND",
                 "(STRUCTURE * DEFENSE - ANTIMISSILE)",
-                "TECH1 MOBILE",
+                "STRUCTURE",
                 "ALLUNITS",
             },
             TargetRestrictDisallow = "UNTARGETABLE",
