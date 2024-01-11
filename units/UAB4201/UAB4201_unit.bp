@@ -159,7 +159,7 @@ UnitBlueprint{
             },
             FiringTolerance = 360,
             Label = "AntiMissile",
-            MaxRadius = 30,
+            MaxRadius = 24,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
             MuzzleVelocity = 18,
@@ -190,7 +190,7 @@ UnitBlueprint{
             WeaponUnpacks = true,
         },
         {
-            MaxRadius = 18,
+            MaxRadius = 20,
             RangeCategory = "UWRC_Countermeasure",
         },
     },
