@@ -238,7 +238,7 @@ local statFuncs = {
             return false
         end
         if info.userUnit ~= nil and info.userUnit:GetBuildRate() >= 1 then
-            return string.format("%.1f", math.floor(info.userUnit:GetBuildRate() * 10) / 10)
+            return string.format("%.6g", info.userUnit:GetBuildRate())
         end
         return false
     end,
