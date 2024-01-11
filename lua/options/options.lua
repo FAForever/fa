@@ -490,7 +490,8 @@ options = {
                     states = {
                         { text = "<LOC _Off>", key = 'Off' },
                         { text = "<LOC ASSIST_TO_UPGRADE_MASS_TECH1>Tech 1 extractors", key = 'Tech1Extractors' },
-                        { text = "<LOC ASSIST_TO_UPGRADE_MASS_TECH1>Tech 1 and tech 2 extractors", key = 'Tech1Tech2Extractors' },
+                        { text = "<LOC ASSIST_TO_UPGRADE_MASS_TECH1>Tech 1 and tech 2 extractors",
+                            key = 'Tech1Tech2Extractors' },
                     },
                 },
             },
@@ -536,19 +537,6 @@ options = {
                             key = 'OnlyEngineers' },
                         { text = "<LOC _ASSIST_TO_COPY_ENGINEERS_ADD>Engineers and add to the selection",
                             key = 'OnlyEngineersAddToSelection' },
-                    },
-                },
-            },
-
-            {
-                title = "<LOC OPTIONS_0287>Factories Default to Repeat Build",
-                key = 'repeatbuild',
-                type = 'toggle',
-                default = 'Off',
-                custom = {
-                    states = {
-                        { text = "<LOC _Off>", key = 'Off' },
-                        { text = "<LOC _On>", key = 'On' },
                     },
                 },
             },
@@ -642,6 +630,19 @@ options = {
                     states = {
                         { text = "<LOC _Off>Off", key = "off" },
                         { text = "<LOC _On>On", key = "on" },
+                    },
+                },
+            },
+
+            {
+                title = "<LOC OPTIONS_0287>Factories Default to Repeat Build",
+                key = 'repeatbuild',
+                type = 'toggle',
+                default = 'Off',
+                custom = {
+                    states = {
+                        { text = "<LOC _Off>", key = 'Off' },
+                        { text = "<LOC _On>", key = 'On' },
                     },
                 },
             },
