@@ -32,8 +32,51 @@ local TableGetN = table.getn
 local MathPi = math.pi
 local MathAtan = math.atan
 
----@class UserCommand
+---@alias UserCommandType
+--- | 'None' # by-product of other commands
+--- | 'Stop'
+--- | 'Reclaim'
+--- | 'Move'
+--- | 'Attack'
+--- | 'Guard'
+--- | 'AggressiveMove'
+--- | 'Upgrade'
+--- | 'Build'
+--- | 'BuildMobile'
+--- | 'Tactical'
+--- | 'Nuke'
+--- | 'TransportReverseLoadUnits' # when you right click a transport
+--- | 'TransportLoadUnits' # when you right click a unit with a transport in your selection
+--- | 'TransportUnloadUnits'
+--- | 'TransportUnloadSpecificUnits' # when you click to unload specific units
+--- | 'Ferry'
+--- | 'AssistMove' # by-product of other commands
+--- | 'Script' # as an example: enhancements
+--- | 'Capture'
+--- | 'FormMove'
+--- | 'FormAggressiveMove'
+--- | 'OverCharge'
+--- | 'FormAttack'
+--- | 'Teleport'
+--- | 'Patrol'
+--- | 'FormPatrol'
+--- | 'Sacrifice'
+--- | 'Pause'
+--- | 'Dock'
+--- | 'DetachFromTransport'
 
+---@class UserCommandTarget
+---@field EntityId? EntityId
+---@field Position Vector
+---@field Type 'Position' | 'Entity' | 'None'
+
+---@class UserCommand
+---@field Blueprint UnitId
+---@field Clear boolean
+---@field CommandType UserCommandType
+---@field LuaParams table
+---@field Target UserCommandTarget
+---@field Units UserUnit[]
 
 ---@class MeshInfo
 ---@field Position Vector
@@ -282,37 +325,91 @@ local categoriesFactories = categories.STRUCTURE * categories.FACTORY
 local categoriesShields = categories.MOBILE * categories.SHIELD
 local categoriesStructure = categories.STRUCTURE
 
---- Upgrades a tech 1 extractor that is being assisted
 ---@param unit UserUnit
-local function OnGuardUpgrade(guardees, unit)
-    if EntityCategoryContains(categories.MASSEXTRACTION * categories.TECH1, unit) and
-        Prefs.GetFromCurrentProfile('options.assist_to_upgrade') == 'Tech1Extractors'
+local function UpgradeUnit(unit)
+    LOG("UpgradeUnit")
+    if unit:GetFocus() then
+        return
+    end
+
+    ---@type UserUnit[]
+    local units = { unit }
+
+    -- paused units do not start upgrades
+    if GetIsPaused(units) then
+        SetPaused(units, false)
+        WaitTicks(5)
+    end
+
+    -- check if unit still exists
+    if IsDestroyed(unit) then
+        return
+    end
+
+    -- issue the upgrade
+    IssueBlueprintCommandToUnit(
+        unit, "UNITCOMMAND_Upgrade",
+        unit:GetBlueprint().General.UpgradesTo,
+        1, true
+    )
+
+    -- inform the user
+    print("Upgrade unit")
+
+    -- pause it
+    WaitTicks(5)
+    if IsDestroyed(unit) then
+        return
+    end
+
+    SetPaused(units, true)
+end
+
+---@param command UserCommand
+---@param guardees UserUnit[]
+---@param unit UserUnit
+local function OnGuardUpgrade(command, guardees, unit)
+    local unitBlueprint = unit:GetBlueprint()
+
+    -- check for radars
+    local upgradeRadar = Prefs.GetFromCurrentProfile('options.assist_to_upgrade_radar')
+    local upgradeRadarTech1 = upgradeRadar == 'Tech1Radars' or upgradeRadar == 'Tech1Tech2Radars'
+    local upgradeRadarTech2 = upgradeRadar == 'Tech1Tech2Radars'
+    if upgradeRadarTech1 and
+        EntityCategoryContains(categories.STRUCTURE * categories.RADAR * categories.TECH1, unit)
     then
-        ForkThread(
-            function()
-                ---@type UserUnit
-                local units = { unit }
-                if not IsDestroyed(unit) and not unit:GetFocus() then
-                    import("/lua/ui/game/selection.lua").Hidden(
-                        function()
-                            SelectUnits(units)
-                            IssueBlueprintCommand("UNITCOMMAND_Upgrade", unit:GetBlueprint().General.UpgradesTo, 1, true)
-                        end
-                    )
+        ForkThread(UpgradeUnit, unit)
+    end
 
-                    WaitSeconds(0.5)
+    if upgradeRadarTech2 and
+        EntityCategoryContains(categories.STRUCTURE * categories.RADAR * categories.TECH2, unit) and
+        unitBlueprint.Economy.ConsumptionPerSecondEnergy > unit:GetEconData().energyConsumed -- check for any adjacency
+    then
+        ForkThread(UpgradeUnit, unit)
+    end
 
-                    SetPaused(units, true)
-                end
-            end
-        )
+    -- check for mass extractors
+    local upgradeExtractor = Prefs.GetFromCurrentProfile('options.assist_to_upgrade')
+    local upgradeExtractorTech1 = upgradeExtractor == 'Tech1Extractors' or upgradeExtractor == 'Tech1Tech2Extractors'
+    local upgradeExtractorTech2 = upgradeExtractor == 'Tech1Tech2Extractors'
+    if upgradeExtractorTech1 and
+        EntityCategoryContains(categories.STRUCTURE * categories.MASSEXTRACTION * categories.TECH1, unit)
+    then
+        ForkThread(UpgradeUnit, unit)
+    end
+
+    if upgradeExtractorTech2 and
+        EntityCategoryContains(categories.STRUCTURE * categories.MASSEXTRACTION * categories.TECH2, unit) and
+        unitBlueprint.Economy.ProductionPerSecondMass < unit:GetEconData().massProduced -- check for any adjacency
+    then
+        ForkThread(UpgradeUnit, unit)
     end
 end
 
---- Unpauses a
+---@param command UserCommand
 ---@param guardees UserUnit[]
 ---@param target UserUnit
-local function OnGuardUnpause(guardees, target)
+local function OnGuardUnpause(command, guardees, target)
     local prefs = Prefs.GetFromCurrentProfile('options.assist_to_unpause')
     if prefs == 'On' or
         (
@@ -351,7 +448,7 @@ local function OnGuardUnpause(guardees, target)
                             target.ThreadUnpauseCandidates = nil
                             target.ThreadUnpause = nil
                             break
-                            ; end
+                        end
 
                         WaitSeconds(1.0)
                         target = GetUnitById(id)
@@ -368,29 +465,35 @@ local function OnGuardUnpause(guardees, target)
     end
 end
 
+---@param command UserCommand
 ---@param guardees UserUnit[]
 ---@param unit UserUnit
-local function OnGuardCopy(guardees, unit)
+local function OnGuardCopy(command, guardees, unit)
     local prefs = Prefs.GetFromCurrentProfile('options.assist_to_copy_command_queue')
     local engineers = EntityCategoryFilterDown(categories.ENGINEER, guardees)
     if table.getn(engineers) > 0 and
-        (prefs == 'OnlyEngineers') and
+        (prefs == 'OnlyEngineers' or prefs == 'OnlyEngineersAddToSelection') and
         EntityCategoryContains(categories.ENGINEER, unit)
     then
         if IsKeyDown('Control') then
             SimCallback({ Func = 'CopyOrders', Args = { Target = unit:GetEntityId(), ClearCommands = true } }, true)
+
+            if prefs == 'OnlyEngineersAddToSelection' then
+                AddSelectUnits({ unit })
+            end
         end
     end
 end
 
 --- Is called when a unit receies a guard / assist order
+---@param command UserCommand
 ---@param guardees UserUnit[]
 ---@param unit UserUnit
-local function OnGuard(guardees, unit)
+local function OnGuard(command, guardees, unit)
     if unit:GetArmy() == GetFocusArmy() then
-        OnGuardUpgrade(guardees, unit)
-        OnGuardUnpause(guardees, unit)
-        OnGuardCopy(guardees, unit)
+        OnGuardUpgrade(command, guardees, unit)
+        OnGuardUnpause(command, guardees, unit)
+        OnGuardCopy(command, guardees, unit)
     end
 end
 
@@ -433,9 +536,9 @@ function OnCommandIssued(command)
     if command.CommandType == 'Guard' and command.Target.EntityId then
 
         local unit = GetUnitById(command.Target.EntityId)
-        OnGuard(command.Units, unit)
+        OnGuard(command, command.Units, unit)
 
-        -- validate factories assisting other factories
+        -- Detect and fix a simulation freeze by clearing the command queue of all factories that take part in a cycle
         if EntityCategoryContains(categoriesFactories, command.Blueprint) then
             local factories = EntityCategoryFilterDown(categoriesFactories, command.Units) or {}
             if factories[1] then
