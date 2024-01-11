@@ -327,7 +327,7 @@ local categoriesStructure = categories.STRUCTURE
 
 ---@param unit UserUnit
 local function UpgradeUnit(unit)
-    LOG("UpgradeUnit")
+    -- do not upgrade units that are already upgrading
     if unit:GetFocus() then
         return
     end
