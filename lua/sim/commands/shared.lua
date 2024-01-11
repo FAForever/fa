@@ -243,7 +243,7 @@ function SortUnitsByDistanceToPoint(units, px, pz)
     end
 
     -- sort the units
-    TableSort(units,SortByDistance)
+    TableSort(units, SortByDistance)
 
     -- remove distance field
     for _, unit in units do
@@ -261,7 +261,7 @@ end
 --- Sorts the units in-place by tech
 ---@param units Unit[]
 function SortUnitsByTech(units)
-    TableSort(units,SortBytech)
+    TableSort(units, SortBytech)
 end
 
 ---@param offsets {[1]: number, [2]: number}
@@ -332,15 +332,14 @@ end
 ---@param degrees number
 ---@return Vector
 function PointOnUnitCircle(px, pz, radius, degrees)
-    local cx = px + radius * math.cos( (degrees + 90) * 3.14 / 180 );
-    local cz = pz + radius * math.sin( (degrees + 90) * 3.14 / 180 );
+    local cx = px + radius * math.cos((degrees + 90) * 3.14 / 180);
+    local cz = pz + radius * math.sin((degrees + 90) * 3.14 / 180);
     return {
         cx,
         GetSurfaceHeight(cx, cz),
         cz
     }
 end
-
 
 ---@param units Unit[]
 ---@param px number

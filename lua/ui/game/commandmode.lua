@@ -365,10 +365,9 @@ local function UpgradeUnit(unit)
     SetPaused(units, true)
 end
 
----@param command UserCommand
 ---@param guardees UserUnit[]
 ---@param unit UserUnit
-local function OnGuardUpgrade(command, guardees, unit)
+local function OnGuardUpgrade(guardees, unit)
     local unitBlueprint = unit:GetBlueprint()
 
     -- check for radars
@@ -406,10 +405,9 @@ local function OnGuardUpgrade(command, guardees, unit)
     end
 end
 
----@param command UserCommand
 ---@param guardees UserUnit[]
 ---@param target UserUnit
-local function OnGuardUnpause(command, guardees, target)
+local function OnGuardUnpause(guardees, target)
     local prefs = Prefs.GetFromCurrentProfile('options.assist_to_unpause')
     if prefs == 'On' or
         (
@@ -465,10 +463,9 @@ local function OnGuardUnpause(command, guardees, target)
     end
 end
 
----@param command UserCommand
 ---@param guardees UserUnit[]
 ---@param unit UserUnit
-local function OnGuardCopy(command, guardees, unit)
+local function OnGuardCopy(guardees, unit)
     local prefs = Prefs.GetFromCurrentProfile('options.assist_to_copy_command_queue')
     local engineers = EntityCategoryFilterDown(categories.ENGINEER, guardees)
     if table.getn(engineers) > 0 and
@@ -486,14 +483,13 @@ local function OnGuardCopy(command, guardees, unit)
 end
 
 --- Is called when a unit receies a guard / assist order
----@param command UserCommand
 ---@param guardees UserUnit[]
 ---@param unit UserUnit
-local function OnGuard(command, guardees, unit)
+local function OnGuard(guardees, unit)
     if unit:GetArmy() == GetFocusArmy() then
-        OnGuardUpgrade(command, guardees, unit)
-        OnGuardUnpause(command, guardees, unit)
-        OnGuardCopy(command, guardees, unit)
+        OnGuardUpgrade(guardees, unit)
+        OnGuardUnpause(guardees, unit)
+        OnGuardCopy(guardees, unit)
     end
 end
 
@@ -536,7 +532,7 @@ function OnCommandIssued(command)
     if command.CommandType == 'Guard' and command.Target.EntityId then
 
         local unit = GetUnitById(command.Target.EntityId)
-        OnGuard(command, command.Units, unit)
+        OnGuard(command.Units, unit)
 
         -- Detect and fix a simulation freeze by clearing the command queue of all factories that take part in a cycle
         if EntityCategoryContains(categoriesFactories, command.Blueprint) then
