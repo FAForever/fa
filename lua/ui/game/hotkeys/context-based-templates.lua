@@ -40,6 +40,9 @@ local TableHash = table.hash
 
 local StringFormat = string.format
 
+local Prefs = import("/lua/user/prefs.lua")
+UseIngametemplates = Prefs.GetFromCurrentProfile('options.gui_template_merge_context_ingame') == 'on'
+
 -------------------------------------------------------------------------------
 --#region Debugging
 
@@ -56,10 +59,46 @@ end
 --#endregion
 
 -------------------------------------------------------------------------------
+--#region ingame Template conversion
+local TemplatesHelper = import("/lua/ui/game/build_templates.lua")
+-- function to convert in game templates to context based templates
+function loadUserTemplates(ConvertedTemplates)
+    UserTemplates = TemplatesHelper.GetTemplates()
+    -- clear table for reuse
+    for k,_ in ConvertedTemplates do
+        ConvertedTemplates[k] = nil
+    end
+    if UserTemplates then
+        for k = 1, TableGetn(UserTemplates) do
+            local template = {TemplateData = UserTemplates[k].templateData, TemplateSortingOrder = k, Name = UserTemplates[k].name, TriggersOnLand = true,}
+            TableInsert(ConvertedTemplates, template)
+        end
+    end
+end
+---@type ContextBasedTemplate[]
+ConvertedTemplates = {}
+loadUserTemplates(ConvertedTemplates)
+-- hook into add/remove/rename templates function to rebuild local conversion table when templates are added/removed/renamed
+oldAddTemplate = TemplatesHelper.AddTemplate
+TemplatesHelper.AddTemplate = function (newTemplate)
+    oldAddTemplate(newTemplate)
+    loadUserTemplates(ConvertedTemplates)
+end
+
+oldRemoveTemplate = TemplatesHelper.RemoveTemplate
+TemplatesHelper.RemoveTemplate = function (templateID)
+    oldRemoveTemplate(templateID)
+    loadUserTemplates(ConvertedTemplates)
+end
+
+oldRenameTemplate = TemplatesHelper.RenameTemplate
+TemplatesHelper.RenameTemplate = function (templateID, name)
+    oldRenameTemplate(templateID, name)
+    loadUserTemplates(ConvertedTemplates)
+end
+--#endregion
+
 --#region Template discovery
-
--- convert all known templates
-
 ---@type table
 local RawTemplates = import("/lua/ui/game/hotkeys/context-based-templates-data.lua")
 
@@ -192,8 +231,8 @@ local function FilterTemplatesByContext(buildableUnits, prefix)
                 and
                 ((not template.TriggersOnMassDeposit) or ((not userUnit) and (massDeposits > 0))) and
                 ((not template.TriggersOnHydroDeposit) or ((not userUnit) and (hydroDeposits > 0))) and
-                ((not template.TriggersOnLand) or ((not userUnit) and noDeposits and onLand)) and
-                ((not template.TriggersOnWater) or ((not userUnit) and noDeposits and (not onLand))) and
+                (not template.TriggersOnLand) and
+                (not template.TriggersOnWater) and
                 (not template.TriggersOnBuilding)
             then
                 TableInsert(ContextBasedTemplates, template)
@@ -204,16 +243,27 @@ local function FilterTemplatesByContext(buildableUnits, prefix)
 
     -- no templates to use, default to those that trigger on land or water
     if ContextBasedTemplateCount == 0 then
-        for k = 1, TableGetn(Templates) do
-            local template = Templates[k]
-            local valid = ValidateTemplate(template, buildableUnits, prefix)
-            if valid then
-                if -- check conditions based on the context of the mouse
-                (template.TriggersOnLand and onLand) or
-                    (template.TriggersOnWater and (not onLand))
-                then
+        if UseIngametemplates then
+            for k = 1, TableGetn(ConvertedTemplates) do
+                local template = ConvertedTemplates[k]
+                local valid = ValidateTemplate(template, buildableUnits, prefix)
+                if valid then
                     TableInsert(ContextBasedTemplates, template)
                     ContextBasedTemplateCount = ContextBasedTemplateCount + 1
+                end
+            end
+        else
+            for k = 1, TableGetn(Templates) do
+                local template = Templates[k]
+                local valid = ValidateTemplate(template, buildableUnits, prefix)
+                if valid then
+                    if -- check conditions based on the context of the mouse
+                    (template.TriggersOnLand and onLand) or
+                        (template.TriggersOnWater and (not onLand))
+                    then
+                        TableInsert(ContextBasedTemplates, template)
+                        ContextBasedTemplateCount = ContextBasedTemplateCount + 1
+                    end
                 end
             end
         end
