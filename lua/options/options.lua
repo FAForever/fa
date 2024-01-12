@@ -490,7 +490,7 @@ options = {
                     states = {
                         { text = "<LOC _Off>", key = 'Off' },
                         { text = "<LOC ASSIST_TO_UPGRADE_MASS_TECH1>Tech 1 extractors", key = 'Tech1Extractors' },
-                        { text = "<LOC ASSIST_TO_UPGRADE_MASS_TECH1>Tech 1 and tech 2 extractors",
+                        { text = "<LOC ASSIST_TO_UPGRADE_MASS_TECH1_TECH2>Tech 1 and tech 2 extractors",
                             key = 'Tech1Tech2Extractors' },
                     },
                 },
@@ -504,8 +504,8 @@ options = {
                 custom = {
                     states = {
                         { text = "<LOC _Off>", key = 'Off' },
-                        { text = "<LOC ASSIST_TO_UPGRADE_MASS_TECH1>Only tech 1 radars", key = 'Tech1Radars' },
-                        { text = "<LOC ASSIST_TO_UPGRADE_MASS_TECH1>Tech 1 and tech 2 radars", key = 'Tech1Tech2Radars' },
+                        { text = "<LOC ASSIST_TO_UPGRADE_RADAR_TECH1>Only tech 1 radars", key = 'Tech1Radars' },
+                        { text = "<LOC ASSIST_TO_UPGRADE_RADAR_TECH1_TECH2>Tech 1 and tech 2 radars", key = 'Tech1Tech2Radars' },
                     },
                 },
             },
