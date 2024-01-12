@@ -234,6 +234,22 @@ Callbacks.OnPlayerQueryResult = SimPlayerQuery.OnPlayerQueryResult
 
 Callbacks.PingGroupClick = import("/lua/simpinggroup.lua").OnClickCallback
 
+---@param unit Unit
+---@param target? Unit
+---@return boolean
+function IsInvalidAssist(unit, target)
+    if target and target.EntityId == unit.EntityId then
+        return true
+    elseif not target or not target:GetGuardedUnit() then
+        return false
+    else
+        return IsInvalidAssist(unit, target:GetGuardedUnit())
+    end
+end
+
+--- Detect and fix a simulation freeze by clearing the command queue of all factories that take part in a cycle
+---@param data { target: EntityId}
+---@param units any
 Callbacks.ValidateAssist = function(data, units)
     units = SecureUnits(units)
     local target = GetEntityById(data.target)
@@ -244,16 +260,6 @@ Callbacks.ValidateAssist = function(data, units)
                 return
             end
         end
-    end
-end
-
-function IsInvalidAssist(unit, target)
-    if target and target.EntityId == unit.EntityId then
-        return true
-    elseif not target or not target:GetGuardedUnit() then
-        return false
-    else
-        return IsInvalidAssist(unit, target:GetGuardedUnit())
     end
 end
 
