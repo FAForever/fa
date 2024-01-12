@@ -24,11 +24,10 @@
 Template = {
     Name = 'Power generators',
     TriggersOnUnit = categories.ARTILLERY * categories.STRUCTURE * categories.TECH2,
-    TriggersOnSelection = categories.TECH1 + categories.TECH2 + categories.TECH3 + categories.COMMAND,
     TemplateSortingOrder = 100,
     TemplateData = {
-        0,
-        0,
+        6,
+        6,
         {
             'uab1101',
             33986,

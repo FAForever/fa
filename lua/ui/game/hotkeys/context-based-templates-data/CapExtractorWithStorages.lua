@@ -26,8 +26,8 @@ Template = {
     TriggersOnUnit = categories.MASSEXTRACTION,
     TemplateSortingOrder = 100,
     TemplateData = {
-        0,
-        0,
+        6,
+        6,
         {
             'uab1106',
             33986,
