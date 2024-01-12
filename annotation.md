@@ -75,9 +75,6 @@ AIBrain = Class(moho.aibrain_methods) {
     OnCreateHuman = function(self, planName)
         self:CreateBrainShared(planName)
         self.BrainType = 'Human'
-
-        -- human-only behavior
-        self.EnergyExcessThread = ForkThread(self.ToggleEnergyExcessUnitsThread, self)
     end,
 
     --- (...)

@@ -33,7 +33,7 @@
 ---| "RULEUCC_Invalid"
 
 ---@alias EngineToggleCap
----| "RULEUTC_ShieldToggle"
+---| "RULEUTC_ShieldToggle" # use is inverted in comparison to the other toggles
 ---| "RULEUTC_WeaponToggle"
 ---| "RULEUTC_JammingToggle"
 ---| "RULEUTC_IntelToggle"

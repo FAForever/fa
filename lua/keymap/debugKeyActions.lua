@@ -1,5 +1,4 @@
-
---- A key action allows a user to bind key bindings to an action. The format 
+--- A key action allows a user to bind key bindings to an action. The format
 --- of a key action is defined in the 'UIKeyAction' annotation class. Key
 --- actions are defined in tables. The key of a key action acts as an
 --- identifier. The same identifier is used to assign a description to the
@@ -219,6 +218,10 @@ local keyActionsDebug = {
     },
     ['debug_toggle_pannels'] = {
         action = 'UI_ToggleGamePanels',
+        category = 'debug',
+    },
+    ['debug_test_hotkey'] = {
+        action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").Test()',
         category = 'debug',
     },
 }

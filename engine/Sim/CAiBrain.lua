@@ -114,7 +114,7 @@ end
 ---@unknown
 function CAiBrain:FindClosestArmyWithBase()
 end
- 
+
 --- Takes a builder and returns the closest point that the structure can be
 --- built at in the list of building templates with matching builder types.
 ---
@@ -147,7 +147,7 @@ end
 ---@param optOverridePosZ?     number  # defaults to 0.0
 ---@param optIgnoreThreatOver? integer # defaults to 0 (accept all)
 ---@return Vector2 location # a new table of `{x, z, 0}` for resource builder types, the actual point otherwise
-function CAiBrain:FindPlaceToBuild(type, structureName, buildingTypes, relative, builder, optIgnoreAlliance, optOverridePosX, optOverridePosZ, optIgnoreThreatOver)
+function CAiBrain:FindPlaceToBuild(type, structureName, buildingTypes, relative, builder, optIgnoreAlliance, builderoptOverridePosX, optOverridePosZ, optIgnoreThreatOver)
 end
 
 --- Returns a unit that matches the categories, if available
@@ -236,7 +236,7 @@ end
 
 --- Returns current resource income.
 ---@param resource 'ENERGY'|'MASS'.
--- @return Number.
+---@return number
 function CAiBrain:GetEconomyIncome(resource)
 end
 
@@ -282,7 +282,7 @@ end
 --- Always reports a threatvalue of zero for Allies or self.
 --- threatType and armyIndex are not required.
 --- @param ring number 1 or 2
---- 1 = Single, 2 = With surrounding IMPA blocks 
+--- 1 = Single, 2 = With surrounding IMPA blocks
 --- ..........   ..........
 --- ..........   ....xxx...
 --- .....X....   ....xXx...

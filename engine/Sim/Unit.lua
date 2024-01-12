@@ -57,7 +57,6 @@ local Unit = {}
 function Unit:AddBuildRestriction(category)
 end
 
-
 --- Also adds a button to the UI, or enables it, for the unit to use the new command.
 ---@param capName CommandCap
 function Unit:AddCommandCap(capName)
@@ -150,12 +149,12 @@ end
 function Unit:GetCommandQueue()
 end
 
---- Returns the energy consumption of the unit
+--- Returns the energy consumption of the unit. When consumption is disabled it returns 0.
 ---@return number
 function Unit:GetConsumptionPerSecondEnergy()
 end
 
---- Returns the mass consumption of the unit
+--- Returns the mass consumption of the unit. When consumption is disabled it returns 0.
 ---@return number
 function Unit:GetConsumptionPerSecondMass()
 end
@@ -604,7 +603,7 @@ function Unit:SetRegenRate(rate)
 end
 
 --- sets the script bit
----@param bit number
+---@param bit EngineToggleCap
 ---@param state boolean
 function Unit:SetScriptBit(bit, state)
 end
