@@ -26,8 +26,8 @@ Template = {
     TriggersOnUnit = categories.STRUCTURE * categories.ARTILLERY * categories.SIZE20,
     TemplateSortingOrder = 100,
     TemplateData = {
-        0,
-        0,
+        24,
+        24,
         {
             'uab1301',
             101,

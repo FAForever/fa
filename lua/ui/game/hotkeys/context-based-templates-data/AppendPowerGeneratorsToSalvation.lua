@@ -26,8 +26,8 @@ Template = {
     TriggersOnBuilding = categories.STRUCTURE * categories.ARTILLERY * categories.SIZE20,
     TemplateSortingOrder = 100,
     TemplateData = {
-        0,
-        0,
+        26,
+        26,
         {
             'dummy',
             0,

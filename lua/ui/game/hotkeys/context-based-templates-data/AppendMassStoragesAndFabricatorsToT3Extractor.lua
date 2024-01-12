@@ -26,8 +26,8 @@ Template = {
     TriggersOnBuilding = categories.MASSEXTRACTION * categories.TECH3,
     TemplateSortingOrder = 110,
     TemplateData = {
-        0,
-        0,
+        10,
+        10,
         {
             'dummy',
             1,
