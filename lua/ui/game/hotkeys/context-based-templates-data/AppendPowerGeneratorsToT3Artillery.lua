@@ -1,5 +1,5 @@
 --******************************************************************************************************
---** Copyright (c) 2023  Willem 'Jip' Wijnia
+--** Copyright (c) 2024  Il1i1
 --**
 --** Permission is hereby granted, free of charge, to any person obtaining a copy
 --** of this software and associated documentation files (the "Software"), to deal
@@ -23,11 +23,17 @@
 ---@type ContextBasedTemplate
 Template = {
     Name = 'Power generators',
-    TriggersOnUnit = categories.STRUCTURE * categories.ARTILLERY * (categories.TECH3 + categories.EXPERIMENTAL) - categories.SIZE20,
+    TriggersOnBuilding = categories.STRUCTURE * categories.ARTILLERY * (categories.TECH3 + categories.EXPERIMENTAL) - categories.SIZE20,
     TemplateSortingOrder = 100,
     TemplateData = {
         0,
         0,
+        {
+            'dummy',
+            0,
+            2,
+            2,
+        },
         {
             'uab1301',
             5352,
