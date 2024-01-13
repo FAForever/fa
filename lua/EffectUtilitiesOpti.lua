@@ -68,7 +68,7 @@ function SpawnBuildBots(builder, botBlueprintId, botBone)
     local bots = builder.BuildBots
     if not bots then
         builder.BuildBotsNext = 1
-        builder.BuildBots = { }
+        builder.BuildBots = {}
         bots = builder.BuildBots
 
         -- make it weak so that the garbage collection can clean up the table when the unit is destroyed
@@ -96,7 +96,7 @@ function SpawnBuildBots(builder, botBlueprintId, botBone)
             -- get a random direction for the bot
             angle = angle + angleChange
             xVec = MathSin(angle)
-            zVec = MathSqrt(1 - xVec*xVec)
+            zVec = MathSqrt(1 - xVec * xVec)
 
             -- make the bot
             local botBlueprint = botBlueprintId or CybranBuildBotBlueprints[k] or 'ura0001o'
@@ -173,7 +173,8 @@ function CreateCybranBuildBeams(builder, bots, unitBeingBuilt, buildEffectsBag, 
     if not noBuilderBeams then
         if builder.BuildEffectBones then
             for _, bone in builder.BuildEffectBones do
-                TrashBagAdd(buildEffectsBag, AttachBeamEntityToEntity(builder, bone, beamEndBuilder, -1, army, BeamBuildEmtBp))
+                TrashBagAdd(buildEffectsBag,
+                    AttachBeamEntityToEntity(builder, bone, beamEndBuilder, -1, army, BeamBuildEmtBp))
             end
         end
     end
@@ -197,6 +198,8 @@ function CreateCybranBuildBeams(builder, bots, unitBeingBuilt, buildEffectsBag, 
 
     -- perform the build animation
     while not (builder.Dead or unitBeingBuilt.Dead) do
+
+        LOG("CreateCybranBuildBeams thread")
 
         -- get a few random numbers
         local r1, r2, r3 = Random(), Random(), Random()
@@ -233,7 +236,8 @@ function CreateCybranEngineerBuildEffects(builder, buildBones, buildBots, total)
         local bot = buildBots[k]
         if bone and bot and not bot.Tracked then
             bot.Tracked = true
-            TrashBagAdd(bot.Trash, AttachBeamEntityToEntity(builder, bone, bot, -1, army, '/effects/emitters/build_beam_03_emit.bp'))
+            TrashBagAdd(bot.Trash,
+                AttachBeamEntityToEntity(builder, bone, bot, -1, army, '/effects/emitters/build_beam_03_emit.bp'))
         end
     end
 end

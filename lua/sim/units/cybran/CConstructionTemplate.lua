@@ -32,27 +32,35 @@ local EntityDestroy = EntityFunctions.Destroy
 local EntityGetPosition = EntityFunctions.GetPosition
 local EntityGetPositionXYZ = EntityFunctions.GetPositionXYZ
 
+local WeakValues = { __mode = "v" }
+
 --- A class to managing the build bots. Make sure to call all the relevant functions.
 ---@class CConstructionTemplate
 ---@field BotBlueprintId? string
+---@field BuildBotTotal number
+---@field BuildBots Unit[]
+---@field BuildBotsNext number
 CConstructionTemplate = ClassSimple {
 
     BotBlueprintId = false,
     BotBone = 0,
 
     --- Prepares the values required to support bots
-    ---@param self CConstructionTemplate
+    ---@param self CConstructionTemplate | Unit
     OnCreate = function(self)
         -- cache the total amount of drones
         self.BuildBotTotal = self:GetBlueprint().BuildBotTotal or
             math.min(math.ceil((10 + self:GetBuildRate()) / 15), 10)
+
+        self.BuildBots = setmetatable({}, WeakValues)
+        self.BuildBotsNext = 1
     end,
 
     --- When dying, destroy everything.
-    ---@param self CConstructionTemplate
+    ---@param self CConstructionTemplate | Unit
     DestroyAllBuildEffects = function(self)
-        -- make sure we're not dead (then bots are destroyed by trashbag)
-        if self.Dead then
+        -- early exit
+        if self.Dead or IsDestroyed(self) or self.ReturnBotsThreadInstance then
             return
         end
 
@@ -62,22 +70,18 @@ CConstructionTemplate = ClassSimple {
             -- check if we still have active bots
             local buildBotCount = self.BuildBotsNext - 1
             if buildBotCount > 0 then
-                -- return the active bots
-                local returnBotsThreadInstance = ForkThread(self.ReturnBotsThread, self, 0.2)
-                TrashBagAdd(self.Trash, returnBotsThreadInstance)
-
                 -- save thread so that we can kill it if the bots suddenly get an additional task.
-                self.ReturnBotsThreadInstance = returnBotsThreadInstance
+                self.ReturnBotsThreadInstance = TrashBagAdd(self.Trash, ForkThread(self.ReturnBotsThread, self, 0.2))
             end
         end
     end,
 
     --- When stopping to build, send the bots back after a bit.
-    ---@param self CConstructionTemplate
+    ---@param self CConstructionTemplate | Unit
     ---@param built Unit
     StopBuildingEffects = function(self, built)
-        -- make sure we're not dead (then bots are destroyed by trashbag)
-        if self.Dead then
+        -- early exit
+        if self.Dead or IsDestroyed(self) or self.ReturnBotsThreadInstance then
             return
         end
 
@@ -88,25 +92,21 @@ CConstructionTemplate = ClassSimple {
             -- check if we still have active bots
             local buildBotCount = self.BuildBotsNext - 1
             if buildBotCount > 0 then
-                -- return the active bots
-                local returnBotsThreadInstance = ForkThread(self.ReturnBotsThread, self, 0.2)
-                TrashBagAdd(self.Trash, returnBotsThreadInstance)
-
                 -- save thread so that we can kill it if the bots suddenly get an additional task.
-                self.ReturnBotsThreadInstance = returnBotsThreadInstance
+                self.ReturnBotsThreadInstance = TrashBagAdd(self.Trash, ForkThread(self.ReturnBotsThread, self, 0.2))
             end
         end
     end,
 
     --- When pausing, send the bots back after a bit.
-    ---@param self CConstructionTemplate
+    ---@param self CConstructionTemplate | Unit
     ---@param delay? number
     OnPaused = function(self, delay)
         -- delay until they move back
         delay = delay or (0.5 + 2) * Random()
 
-        -- make sure thread is not running already
-        if self.ReturnBotsThreadInstance then
+        -- early exit
+        if self.Dead or IsDestroyed(self) or self.ReturnBotsThreadInstance then
             return
         end
 
@@ -115,18 +115,14 @@ CConstructionTemplate = ClassSimple {
         if bots then
             local buildBotCount = self.BuildBotsNext - 1
             if buildBotCount > 0 then
-                -- return the active bots
-                local returnBotsThreadInstance = ForkThread(self.ReturnBotsThread, self, 0.2)
-                TrashBagAdd(self.Trash, returnBotsThreadInstance)
-
                 -- save thread so that we can kill it if the bots suddenly get an additional task.
-                self.ReturnBotsThreadInstance = returnBotsThreadInstance
+                self.ReturnBotsThreadInstance = TrashBagAdd(self.Trash, ForkThread(self.ReturnBotsThread, self, 0.2))
             end
         end
     end,
 
     --- When making build effects, try and make the bots.
-    ---@param self CConstructionTemplate
+    ---@param self CConstructionTemplate | Unit
     ---@param unitBeingBuilt Unit
     ---@param order string
     ---@param stationary boolean
@@ -138,19 +134,17 @@ CConstructionTemplate = ClassSimple {
             -- Prevent an AI from (ab)using the bots for other purposes than building
             local builderArmy = self.Army
             local unitBeingBuiltArmy = unitBeingBuilt.Army
-            if builderArmy == unitBeingBuiltArmy or ArmyBrains[builderArmy].BrainType == "Human" then
+            if builderArmy == unitBeingBuiltArmy then
                 SpawnBuildBotsOpti(self, self.BotBlueprintId, self.BotBone)
-                if stationary then
-                    CreateCybranEngineerBuildEffectsOpti(self, self.BuildEffectBones, self.BuildBots, self.BuildBotTotal
-                        , self.BuildEffectsBag)
-                end
-                CreateCybranBuildBeamsOpti(self, self.BuildBots, unitBeingBuilt, self.BuildEffectsBag, stationary)
+                CreateCybranEngineerBuildEffectsOpti(self, self.BuildEffectBones, self.BuildBots, self.BuildBotTotal
+                    , self.BuildEffectsBag)
+                CreateCybranBuildBeamsOpti(self, self.BuildBots, unitBeingBuilt, self.BuildEffectsBag, true)
             end
         end
     end,
 
     --- When destroyed, destroy the bots too.
-    ---@param self CConstructionTemplate
+    ---@param self CConstructionTemplate | Unit
     OnDestroy = function(self)
         -- destroy bots if we have them
         if self.BuildBotsNext > 1 then
@@ -161,7 +155,7 @@ CConstructionTemplate = ClassSimple {
     end,
 
     --- Destroys all the bots of a builder. Assumes the bots exist
-    ---@param self CConstructionTemplate
+    ---@param self CConstructionTemplate | Unit
     ---@param bots Unit[]
     ---@param count number
     DestroyBotsThread = function(self, bots, count)
@@ -185,7 +179,7 @@ CConstructionTemplate = ClassSimple {
     end,
 
     --- Destroys all the bots of a builder. Assumes the bots exist
-    ---@param self CConstructionTemplate
+    ---@param self CConstructionTemplate | Unit
     ---@param delay number
     ReturnBotsThread = function(self, delay)
 
