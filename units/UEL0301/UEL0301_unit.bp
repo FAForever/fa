@@ -55,6 +55,7 @@ UnitBlueprint{
         "UEF",
         "USEBUILDPRESETS",
         "VISIBLETORECON",
+        "SNIPEMODE",
     },
     Defense = {
         AirThreatLevel = 0,
@@ -653,8 +654,9 @@ UnitBlueprint{
                 "MOBILE EXPERIMENTAL",
                 "MOBILE TECH3",
                 "MOBILE TECH2",
-                "(STRUCTURE * DEFENSE - ANTIMISSILE)",
                 "MOBILE TECH1",
+                "COMMAND",
+                "(STRUCTURE * DEFENSE - ANTIMISSILE)",
                 "ALLUNITS",
             },
             TargetRestrictDisallow = "UNTARGETABLE",
