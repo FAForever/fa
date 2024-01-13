@@ -1,8 +1,9 @@
-
 local StructureUnit = import("/lua/sim/units/structureunit.lua").StructureUnit
 
 ---@class MassFabricationUnit : StructureUnit
 MassFabricationUnit = ClassUnit(StructureUnit) {
+
+    ApplyExcessEnergyTask = true,
 
     ---@param self MassFabricationUnit
     ---@param builder Unit
@@ -11,6 +12,13 @@ MassFabricationUnit = ClassUnit(StructureUnit) {
         StructureUnit.OnStopBeingBuilt(self, builder, layer)
         self:SetMaintenanceConsumptionActive()
         self:SetProductionActive(true)
+
+        if self.ApplyExcessEnergyTask then
+            IssueToUnitScript(self, {
+                TaskName = "ExcessEnergyTask",
+                Ratio = 0.5,
+            })
+        end
     end,
 
     ---@param self MassFabricationUnit

@@ -151,3 +151,13 @@ IssueToUnitStop = function(unit)
     UnitsCache[1] = unit
     IssueStop(UnitsCache)
 end
+
+---@class UnitScriptOrder : table
+---@field TaskName string
+
+---@param unit moho.unit_methods
+---@param order UnitScriptOrder
+IssueToUnitScript = function(unit, order)
+    UnitsCache[1] = unit
+    IssueScript(UnitsCache, order)
+end
