@@ -104,7 +104,7 @@ UnitBlueprint{
         InitialRallyZ = 10,
         RebuildBonusIds = { "xsb0203" },
         StorageEnergy = 0,
-        StorageMass = 160,
+        StorageMass = 0,
     },
     Footprint = { MinWaterDepth = 1.5 },
     General = {

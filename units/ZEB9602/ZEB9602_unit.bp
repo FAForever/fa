@@ -128,7 +128,7 @@ UnitBlueprint {
             'BUILTBYAIRTIER3FACTORY UEF MOBILE CONSTRUCTION',
         },
         StorageEnergy = 0,
-        StorageMass = 320,
+        StorageMass = 0,
     },
     Footprint = {
         SizeX = 5,

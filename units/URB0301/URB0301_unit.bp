@@ -89,7 +89,7 @@ UnitBlueprint{
         DifferentialUpgradeCostCalculation = true,
         RebuildBonusIds = { "urb0301" },
         StorageEnergy = 0,
-        StorageMass = 320,
+        StorageMass = 0,
     },
     Footprint = {
         SizeX = 5,
