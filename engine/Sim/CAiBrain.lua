@@ -147,7 +147,7 @@ end
 ---@param optOverridePosZ?     number  # defaults to 0.0
 ---@param optIgnoreThreatOver? integer # defaults to 0 (accept all)
 ---@return Vector2 location # a new table of `{x, z, 0}` for resource builder types, the actual point otherwise
-function CAiBrain:FindPlaceToBuild(type, structureName, buildingTypes, relative, builder, optIgnoreAlliance, builderoptOverridePosX, optOverridePosZ, optIgnoreThreatOver)
+function CAiBrain:FindPlaceToBuild(type, structureName, buildingTypes, relative, builder, optIgnoreAlliance, optOverridePosX, optOverridePosZ, optIgnoreThreatOver)
 end
 
 --- Returns a unit that matches the categories, if available
