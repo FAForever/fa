@@ -101,7 +101,6 @@ ExcessEnergyTask = Class(ScriptTask) {
             if unitEnergyConsumption > 0 then
                 -- check if we should stop maintenance
                 if brainEnergyIncome < 0 then
-                    DrawCircle(unit:GetPosition(), 2, 'ff0000')
                     unitSetScriptBit(unit, 'RULEUTC_ProductionToggle', true)
                     unitSetScriptBit(unit, 'RULEUTC_ShieldToggle', false) -- yes, this is the elephant in the room
                     unitSetScriptBit(unit, 'RULEUTC_JammingToggle', true)
@@ -115,7 +114,6 @@ ExcessEnergyTask = Class(ScriptTask) {
                 -- we need to use the blueprint value because the real value (that may be adjusted
                 -- due to adjacency) is not known when the unit energy consumption is disabled
                 if unit.Blueprint.Economy.MaintenanceConsumptionPerSecondEnergy < brainEnergyIncome then
-                    DrawCircle(unit:GetPosition(), 2, '00ff00')
                     unitSetScriptBit(unit, 'RULEUTC_ProductionToggle', false)
                     unitSetScriptBit(unit, 'RULEUTC_ShieldToggle', true) -- yes, this is the elephant in the room
                     unitSetScriptBit(unit, 'RULEUTC_JammingToggle', false)
