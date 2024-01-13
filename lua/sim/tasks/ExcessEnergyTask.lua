@@ -51,8 +51,8 @@ ExcessEnergyTask = Class(ScriptTask) {
         -- check whether the task is valid for this unit
         local unit = ScriptTaskGetUnit(self)
         local consumesEnergy = unit.Blueprint.Economy.MaintenanceConsumptionPerSecondEnergy
-        local isExtractor = EntityCategoryContains(categories.MASSEXTRACTION, unit)
-        if (not consumesEnergy) or isExtractor then
+        local validStructure = EntityCategoryContains(categories.STRUCTURE - categories.MASSEXTRACTION, unit)
+        if (not consumesEnergy) or validStructure then
             self.InvalidTask = true
         end
 
