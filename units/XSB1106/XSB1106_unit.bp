@@ -75,7 +75,7 @@ UnitBlueprint{
         BuildCostMass = 200,
         BuildTime = 250,
         RebuildBonusIds = { "xsb1106" },
-        StorageMass = 500,
+        StorageMass = 1000,
     },
     Footprint = {
         SizeX = 1,

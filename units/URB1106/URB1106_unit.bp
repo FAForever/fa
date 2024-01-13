@@ -78,7 +78,7 @@ UnitBlueprint{
         BuildCostMass = 200,
         BuildTime = 250,
         RebuildBonusIds = { "urb1106" },
-        StorageMass = 500,
+        StorageMass = 1000,
     },
     General = {
         CommandCaps = {
