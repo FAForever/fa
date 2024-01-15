@@ -10,25 +10,31 @@ function ShowFPS()
         return
     end
     
-    fps = UIUtil.CreateText(GetFrame(0), '', 30)
-    fps:SetColor('ffffffff')
+    fps = UIUtil.CreateText(GetFrame(0), '', 12)
+    fps:SetColor('ffffff')
+    fps:SetFont(UIUtil.fixedFont, 12)
     fps:SetDropShadow(true)
     fps:DisableHitTest()
     fps.Depth:Set(GetFrame(0):GetTopmostDepth() + 1)
-    LayoutHelpers.AtLeftTopIn(fps, GetFrame(0))
+    LayoutHelpers.AtRightTopIn(fps, GetFrame(0), 425, 0)
     
     fps:SetNeedsFrameUpdate(true)
     fps.OnFrame = function(self, deltatime)
-        for key, val in __EngineStats.Children do
-            if val.Name == 'Frame' then
-                for childKey, childVal in val.Children do
-                    if childVal.Name == 'FPS' then
-                        self:SetText(string.format("%2.1f", childVal.Value))
-                        break
+        if not self.timer or self.timer > 0.4 then
+            for key, val in __EngineStats.Children do
+                if val.Name == 'Frame' then
+                    for childKey, childVal in val.Children do
+                        if childVal.Name == 'FPS' then
+                            self:SetText(string.format("FPS: %.0f", childVal.Value))
+                            break
+                        end
                     end
+                    break
                 end
-                break
             end
+            self.timer = 0
+        else
+            self.timer = self.timer + deltatime
         end
     end
 end
