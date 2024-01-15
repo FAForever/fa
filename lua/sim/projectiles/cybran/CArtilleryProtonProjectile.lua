@@ -37,8 +37,10 @@ CArtilleryProtonProjectile = ClassProjectile(SinglePolyTrailProjectile) {
     ---@param targetType string
     ---@param targetEntity Unit
     OnImpact = function(self, targetType, targetEntity)
+        local army = self.Army
+
         EmitterProjectile.OnImpact(self, targetType, targetEntity)
-        CreateLightParticle( self, -1, self.Army, 7, 12, 'glow_03', 'ramp_red_06' )
-        CreateLightParticle( self, -1, self.Army, 7, 22, 'glow_03', 'ramp_antimatter_02' )
+        CreateLightParticle( self, -1, army, 7, 12, 'glow_03', 'ramp_red_06' )
+        CreateLightParticle( self, -1, army, 7, 22, 'glow_03', 'ramp_antimatter_02' )
     end,
 }

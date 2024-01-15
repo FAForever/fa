@@ -23,6 +23,9 @@
 local NullShell = import('/lua/sim/defaultprojectiles.lua').NullShell
 local EffectTemplate = import("/lua/effecttemplates.lua")
 
+local MathSin = math.sin
+local MathCos = math.cos
+
 --- CYBRAN PROTON PROJECTILES
 --- T3 strategic bomber
 ---@class CIFProtonBombProjectile : NullShell
@@ -36,15 +39,17 @@ CIFProtonBombProjectile = ClassProjectile(NullShell) {
     ---@param targetType string
     ---@param targetEntity Unit
     OnImpact = function(self, targetType, targetEntity)
-        CreateLightParticle(self, -1, self.Army, 12, 28, 'glow_03', 'ramp_proton_flash_02')
-        CreateLightParticle(self, -1, self.Army, 8, 22, 'glow_03', 'ramp_antimatter_02')
+        local army = self.Army
+
+        CreateLightParticle(self, -1, army, 12, 28, 'glow_03', 'ramp_proton_flash_02')
+        CreateLightParticle(self, -1, army, 8, 22, 'glow_03', 'ramp_antimatter_02')
 
         local blanketSides = 12
         local blanketAngle = (2*math.pi) / blanketSides
         local blanketVelocity = 6.25
         for i = 0, (blanketSides-1) do
-            local blanketX = math.sin(i*blanketAngle)
-            local blanketZ = math.cos(i*blanketAngle)
+            local blanketX = MathSin(i*blanketAngle)
+            local blanketZ = MathCos(i*blanketAngle)
             self:CreateProjectile('/effects/entities/EffectProtonAmbient01/EffectProtonAmbient01_proj.bp', blanketX, 0.5, blanketZ, blanketX, 0, blanketZ):SetVelocity(blanketVelocity):SetAcceleration(-0.3)
         end
         NullShell.OnImpact(self, targetType, targetEntity)

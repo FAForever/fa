@@ -22,7 +22,9 @@
 
 local EffectTemplate = import("/lua/effecttemplates.lua")
 local SingleBeamProjectile = import('/lua/sim/defaultprojectiles.lua').SingleBeamProjectile
-local TacticalMissileComponent = import('/lua/terranprojectiles.lua').TacticalMissileComponent
+local TacticalMissileComponent = import('/lua/sim/defaultprojectiles.lua').TacticalMissileComponent
+local DebrisComponent = import('/lua/sim/projectiles/components/DebrisComponent.lua').DebrisComponent
+local SplitComponent = import('/lua/sim/projectiles/components/SplitComponent.lua').SplitComponent
 
 ---  CYBRAN ROCKET PROJECILES
 ---@class CLOATacticalMissileProjectile : SingleBeamProjectile, TacticalMissileComponent, SplitComponent, DebrisComponent
@@ -62,7 +64,6 @@ CLOATacticalMissileProjectile = ClassProjectile(SingleBeamProjectile, TacticalMi
     ---@param inWater boolean
     OnCreate = function(self, inWater)
         SingleBeamProjectile.OnCreate(self, inWater)
-        
         local blueprintPhysics = self.Blueprint.Physics
         local radius = 0.105 * (blueprintPhysics.MaxSpeed + blueprintPhysics.MaxSpeedRange)
         self:SetCollisionShape('Sphere', 0, 0, 0, radius)
