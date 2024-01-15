@@ -12,8 +12,8 @@ local RandomFloat = import("/lua/utilities.lua").GetRandomFloat
 AIFQuanticCluster02 = ClassProjectile(AQuantumCluster) {
 
     ---@param self AIFQuanticCluster02
-    ---@param TargetType string
-    ---@param TargetEntity Prop|Unit
+    ---@param TargetType string unused
+    ---@param TargetEntity Prop|Unit unused
     OnImpact = function(self, TargetType, TargetEntity)
         local FxFragEffect = EffectTemplate.TFragmentationSensorShellFrag
         local bp = self.Blueprint.Physics

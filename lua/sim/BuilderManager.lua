@@ -66,7 +66,7 @@ BuilderManager = ClassSimple {
         self.Active = false
         self.NumBuilders = 0
         self:SetEnabled(true)
-        self:ForkThread(self.DebugThread)
+        self.Trash:Add(ForkThread(self.DebugThread, self))
     end,
 
     ---@param self BuilderManager
@@ -239,9 +239,9 @@ BuilderManager = ClassSimple {
     end,
 
     --- Returns true if the given builders matches the manager-specific parameters
-    ---@param self BuilderManager
-    ---@param builder Builder
-    ---@param params table
+    ---@param self BuilderManager unused
+    ---@param builder Builder unused
+    ---@param params table unused
     ---@return boolean
     BuilderParamCheck = function(self, builder, params)
         return true
@@ -335,14 +335,15 @@ BuilderManager = ClassSimple {
         end
 
         TableSort(self.BuilderData[bType].Builders, BuilderSortLambda)
-        self.BuilderData[bType].NeedSort = false
+        needSort = self.BuilderData[bType].NeedSort == false
+        return needSort
     end,
 
     ---@param self BuilderManager
     ---@param enable boolean
     SetEnabled = function(self, enable)
         if not self.BuilderThread and enable then
-            self.BuilderThread = self:ForkThread(self.ManagerThread)
+            self.BuilderThread = self.Trash:Add(ForkThread(self.ManagerThread, self))
             self.Active = true
         else
             KillThread(self.BuilderThread)
@@ -485,7 +486,7 @@ BuilderManager = ClassSimple {
 
     --- This function should not be required
     ---@deprecated
-    ---@param self BuilderManager
+    ---@param self BuilderManager unused
     ---@param oldtable table
     ---@return table
     RebuildTable = function(self, oldtable)

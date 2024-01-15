@@ -9,11 +9,17 @@ local AMiasmaProjectile = import('/lua/aeonprojectiles.lua').AMiasmaProjectile
 local utilities = import('/lua/utilities.lua')
 local VisionMarker = import("/lua/sim/vizmarker.lua").VisionMarkerOpti
 
-
+---@class AIFGuidedMissile02 : AGuidedMissileProjectile
 AIFGuidedMissile02 = ClassProjectile(AGuidedMissileProjectile) {
+
+    ---@param self AIFGuidedMissile02
+    ---@param TargetType string
+    ---@param TargetEntity Prop|Unit unused
     OnImpact = function(self, TargetType, TargetEntity)
-        local bp = self:GetBlueprint().Audio
+        local bp = self.Blueprint.Audio
         local snd = bp['Impact' .. TargetType]
+        local army = self.Army
+        
         if snd then
             self:PlaySound(snd)
             --Generic Impact Sound
@@ -27,15 +33,11 @@ AIFGuidedMissile02 = ClassProjectile(AGuidedMissileProjectile) {
 
         local px, py, pz = self:GetPositionXYZ()
         entity:UpdatePosition(px, pz)
-        entity:UpdateIntel(self.Army, 12, 'Vision', true)
+        entity:UpdateIntel(army, 12, 'Vision', true)
         entity:UpdateDuration(10)
 
-        --emitter = CreateEmitterAtEntity(self, self.Army, '/effects/emitters/_Mercy_Circle_1.bp')
-        --emitter = CreateEmitterAtEntity(self, self.Army, '/effects/emitters/_Mercy_Circle_2.bp')
-        --local emitter = CreateEmitterAtEntity(self, self.Army, '/effects/emitters/_Mercy_Circle.bp')
-
         -- let bloom thrive a bit
-        CreateLightParticleIntel(self, -1, self.Army, 5, 8, 'glow_02', 'ramp_flare_02')
+        CreateLightParticleIntel(self, -1, army, 5, 8, 'glow_02', 'ramp_flare_02')
 
         self:Destroy()
     end,

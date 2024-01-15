@@ -14,7 +14,7 @@ TeleportSpinner03 = Class(NullShell) {
     ---@param self TeleportSpinner03
     OnCreate = function(self)
         NullShell.OnCreate(self)
-        local army = self:GetArmy()
+        local army = self.Army
 
         for k, v in EffectTemplate.CSGTestSpinner3 do
             CreateEmitterOnEntity( self, army, v )

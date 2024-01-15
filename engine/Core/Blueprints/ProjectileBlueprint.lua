@@ -138,3 +138,7 @@
 --- bombs that always drop stright down
 ---@field StraightDownOrdinance boolean
 ---@field OnLostTargetLifetime? number
+--- Projectile BP File
+---@field FragmentId string
+--- Number of fragments to create
+---@field Fragments number

@@ -21,7 +21,8 @@ AIFFragmentationSensorShell02 = ClassProjectile(AArtilleryFragmentationSensorShe
             local bp = self.Blueprint.Physics
 	        -- Split effects
 	        for k, v in FxFragEffect do
-	            CreateEmitterAtBone( self, -1, self.Army, v )
+				local army = self.Army
+	            CreateEmitterAtBone( self, -1, army, v )
 	        end
 
 			local vx, vy, vz = self:GetVelocity()

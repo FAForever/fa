@@ -10,8 +10,11 @@ TacticalDebris02 = ClassDummyProjectile(GenericDebris) {
     OnImpact = function(self, targetType, targetEntity)
         GenericDebris.OnImpact(self, targetType, targetEntity)
 
-        DamageArea(self, self:GetPosition(), 2, 1, 'TreeFire', false, false)
-        CreateLightParticle(self, -1, self.Army, 3, 6, 'flare_lens_add_02', 'ramp_fire_13')
+        local army = self.Army
+        local position = self:GetPosition()
+
+        DamageArea(self, position, 2, 1, 'TreeFire', false, false)
+        CreateLightParticle(self, -1, army, 3, 6, 'flare_lens_add_02', 'ramp_fire_13')
     end,
 }
 TypeClass = TacticalDebris02

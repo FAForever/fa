@@ -32,7 +32,7 @@ X1Mercy = Class(AMiasmaProjectile) {
         if launcher and not launcher:IsDead() then
             launcher:ProjectileFired()
         end
-        self:ForkThread( self.SplitThread )
+        self.Trash:Add(ForkThread( self.SplitThread , self))
     end,
 
     ---@param self X1Mercy

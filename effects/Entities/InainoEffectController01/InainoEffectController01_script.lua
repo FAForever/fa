@@ -12,17 +12,27 @@ local SIFInainoStrategicMissileEffect01 = '/effects/Entities/SIFInainoStrategicM
 local SIFInainoStrategicMissileEffect02 = '/effects/Entities/SIFInainoStrategicMissileEffect02/SIFInainoStrategicMissileEffect02_proj.bp'
 local SIFInainoStrategicMissileEffect03 = '/effects/Entities/SIFInainoStrategicMissileEffect03/SIFInainoStrategicMissileEffect03_proj.bp'
 
+-- upvalue for perfomance
+local ForkThread = ForkThread
+local TrashBagAdd = TrashBag.Add
+local MathSin = math.sin
+local MathCos = math.cos
+local MathPi = math.pi
+
 ---@class InainoEffectController01 : NullShell
 InainoEffectController01 = Class(NullShell) {
 
-    ---@param self InainoEffectController01
-    ---@param Data table
+    ---@param self InainoEffectController01 self
+    ---@param Data table unused
     EffectThread = function(self, Data)
-        self:ForkThread(self.CreateInitialHit, self.Army)
-        self:ForkThread(self.CreateInitialBuildup, self.Army)
-        self:ForkThread(self.CreateGroundFingers)
-        self:ForkThread(self.CreateInitialFingers)
-        self:ForkThread(self.MainBlast, self.Army)
+        local army = self.Army
+        local trash = self.Trash
+
+        TrashBagAdd(trash, ForkThread(self.CreateInitialHit, self, army))
+        TrashBagAdd(trash, ForkThread(self.CreateInitialBuildup,self, army))
+        TrashBagAdd(trash, ForkThread(self.CreateGroundFingers, self))
+        TrashBagAdd(trash, ForkThread(self.CreateInitialFingers, self))
+        TrashBagAdd(trash, ForkThread(self.MainBlast, self, army))
     end,
 
     ---@param self InainoEffectController01
@@ -42,20 +52,20 @@ InainoEffectController01 = Class(NullShell) {
         end
     end,
 
-    ---@param self InainoEffectController01
-    ---@param army number
+    ---@param self InainoEffectController01 self
+    ---@param army number army number
     MainBlast = function(self, army)
         WaitSeconds(5.00)
 
         -- Create a light for this thing's flash.
-        CreateLightParticle(self, -1, self.Army, 160, 14, 'flare_lens_add_03', 'ramp_white_07')
+        CreateLightParticle(self, -1, army, 160, 14, 'flare_lens_add_03', 'ramp_white_07')
 
         -- Create our decals
-        CreateDecal(self:GetPosition(), RandomFloat(0.0,6.28), 'Scorch_012_albedo', '', 'Albedo', 80, 80, 1000, 0, self.Army)
+        CreateDecal(self:GetPosition(), RandomFloat(0.0,6.28), 'Scorch_012_albedo', '', 'Albedo', 80, 80, 1000, 0, army)
 
         -- Create explosion effects
         for k, v in EffectTemplate.SIFInainoDetonate01 do
-            emit = CreateEmitterAtEntity(self,army,v)
+            emit = CreateEmitterAtEntity(self, army,v)
         end
         self:ShakeCamera(55, 10, 0, 2.5)
 
@@ -72,15 +82,15 @@ InainoEffectController01 = Class(NullShell) {
         -- Create explosion dust ring
         local vx, vy, vz = self:GetVelocity()
         local num_projectiles = 16
-        local horizontal_angle = (2*math.pi) / num_projectiles
+        local horizontal_angle = (2*MathPi) / num_projectiles
         local angleInitial = RandomFloat(0, horizontal_angle)
         local xVec, zVec
         local offsetMultiple = 30.0
         local px, pz
 
         for i = 0, (num_projectiles -1) do
-            xVec = (math.sin(angleInitial + (i*horizontal_angle)))
-            zVec = (math.cos(angleInitial + (i*horizontal_angle)))
+            xVec = (MathSin(angleInitial + (i*horizontal_angle)))
+            zVec = (MathCos(angleInitial + (i*horizontal_angle)))
             px = (offsetMultiple*xVec)
             pz = (offsetMultiple*zVec)
 
@@ -95,13 +105,13 @@ InainoEffectController01 = Class(NullShell) {
     CreateGroundFingers = function(self)
         -- Outward rushing fingers that spawn the upward fingers
         local num_projectiles = 5
-        local horizontal_angle = (2*math.pi) / num_projectiles
+        local horizontal_angle = (2*MathPi) / num_projectiles
         local xVec, zVec
         local px, pz
 
         for i = 0, (num_projectiles -1) do
-            xVec = math.sin(i*horizontal_angle)
-            zVec = math.cos(i*horizontal_angle)
+            xVec = MathSin(i*horizontal_angle)
+            zVec = MathSin(i*horizontal_angle)
             px = 1 * xVec
             pz = 1 * zVec
 
@@ -115,13 +125,13 @@ InainoEffectController01 = Class(NullShell) {
         WaitSeconds(1.75)
         -- Upward rising fingers that join to form explosion
         local num_projectiles = 5
-        local horizontal_angle = (2*math.pi) / num_projectiles
+        local horizontal_angle = (2*MathPi) / num_projectiles
         local xVec, zVec
         local px, pz
 
         for i = 0, (num_projectiles -1) do
-            xVec = math.sin(i*horizontal_angle)
-            zVec = math.cos(i*horizontal_angle)
+            xVec = MathSin(i*horizontal_angle)
+            zVec = MathCos(i*horizontal_angle)
             px = 25.0 * xVec
             pz = 25.0 * zVec
 

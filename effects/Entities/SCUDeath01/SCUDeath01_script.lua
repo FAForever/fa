@@ -8,49 +8,60 @@ local NullShell = import("/lua/sim/defaultprojectiles.lua").NullShell
 local Util = import("/lua/utilities.lua")
 local RandomFloat = Util.GetRandomFloat
 
+-- upvalue for perfomance
+local ForkThread = ForkThread
+local TrashBagAdd = TrashBag.Add
+local MathCos = math.cos
+local MathSin = math.sin
+local MathPi = math.pi
+
+
 ---@class SCUDeath01 : NullShell
 SCUDeath01 = Class(NullShell) {
 
     ---@param self SCUDeath01
     OnCreate = function(self)
         NullShell.OnCreate(self)
-        local myBlueprint = self:GetBlueprint()
+        local bp = self.Blueprint
+        local trash = self.Trash
 
         -- Play the "NukeExplosion" sound
-        if myBlueprint.Audio.NukeExplosion then
-            self:PlaySound(myBlueprint.Audio.NukeExplosion)
+        if bp.Audio.NukeExplosion then
+            self:PlaySound(bp.Audio.NukeExplosion)
         end
 
 		-- Create thread that spawns and controls effects
-        self:ForkThread(self.EffectThread)
+        TrashBagAdd(trash, ForkThread(self.EffectThread, self))
     end,
 
     ---@param self SCUDeath01
     ---@param damageData table
     PassDamageData = function(self, damageData)
         NullShell.PassMetaDamage(self, damageData)
-        local instigator = self:GetLauncher()
+        local instigator = self.Launcher
         if instigator == nil then
             instigator = self
         end
 
         -- Do Damage
-        self:DoDamage( instigator, self.DamageData, nil )  
+        self:DoDamage( instigator, self.DamageData, nil )
     end,
 
     ---@param self SCUDeath01
-    ---@param targetType string
-    ---@param targetEntity Entity
+    ---@param targetType string unused
+    ---@param targetEntity Entity unused
     OnImpact = function(self, targetType, targetEntity)
         self:Destroy()
     end,
 
     ---@param self SCUDeath01
     EffectThread = function(self)
-        local army = self:GetArmy()
+        local army = self.Army
         local position = self:GetPosition()
+        local trash = self.Trash
+
         if position[2] + 2 > GetSurfaceHeight(position[1], position[3]) then
-            self:ForkThread(self.CreateOuterRingWaveSmokeRing)
+            TrashBagAdd(trash, ForkThread(self.CreateOuterRingWaveSmokeRing, self))
         end
 
         -- Create full-screen glow flash
@@ -58,14 +69,14 @@ SCUDeath01 = Class(NullShell) {
         WaitSeconds( 0.25 )
         CreateLightParticle(self, -1, army, 10, 20, 'glow_03', 'ramp_fire_06')
         WaitSeconds( 0.55 )
-        
+
         CreateLightParticle(self, -1, army, 20, 250, 'glow_03', 'ramp_nuke_04')
-        
+
         -- Create ground decals
         local orientation = RandomFloat( 0, 2 * math.pi )
         CreateDecal(position, orientation, 'Crater01_albedo', '', 'Albedo', 20, 20, 1200, 0, army)
-        CreateDecal(position, orientation, 'Crater01_normals', '', 'Normals', 20, 20, 1200, 0, army)       
-        CreateDecal(position, orientation, 'nuke_scorch_003_albedo', '', 'Albedo', 20, 20, 1200, 0, army)    
+        CreateDecal(position, orientation, 'Crater01_normals', '', 'Normals', 20, 20, 1200, 0, army)
+        CreateDecal(position, orientation, 'nuke_scorch_003_albedo', '', 'Albedo', 20, 20, 1200, 0, army)
 
 		-- Knockdown force rings
         DamageRing(self, position, 0.1, 15, 1, 'Force', true)
@@ -76,14 +87,14 @@ SCUDeath01 = Class(NullShell) {
     ---@param self SCUDeath01
     CreateOuterRingWaveSmokeRing = function(self)
         local sides = 10
-        local angle = (2*math.pi) / sides
+        local angle = (2*MathPi) / sides
         local velocity = 2
         local OffsetMod = 4
         local projectiles = {}
 
         for i = 0, (sides-1) do
-            local X = math.sin(i*angle)
-            local Z = math.cos(i*angle)
+            local X = MathSin(i*angle)
+            local Z = MathCos(i*angle)
             local proj =  self:CreateProjectile('/effects/entities/SCUDeathShockwave01/SCUDeathShockwave01_proj.bp', X * OffsetMod , 2, Z * OffsetMod, X, 0, Z)
                 :SetVelocity(velocity)
             table.insert( projectiles, proj )
