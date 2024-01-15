@@ -195,7 +195,7 @@ UnitBlueprint{
             RackRecoilDistance = 0,
             RackReloadTimeout = 6,
             RackSalvoChargeTime = 0,
-            RackSalvoReloadTime = 10,
+            RackSalvoReloadTime = 6,
 
             RackSalvoSize = 1,
             RackSlavedToTurret = false,

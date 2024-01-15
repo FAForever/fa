@@ -26,8 +26,8 @@ Template = {
     TriggersOnBuilding = (categories.AIR * categories.SUPPORTFACTORY * categories.TECH3),
     TemplateSortingOrder = 100,
     TemplateData = {
-        0,
-        0,
+        24,
+        24,
         {
             'dummy',
             0,

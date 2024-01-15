@@ -1,6 +1,6 @@
 EmitterBlueprint {
 	BlueprintId = 'seraphim_expnuke_prelaunch_03',
-	Lifetime = 50.00,
+	Lifetime = 200.00,
 	Repeattime = 50.00,
 	TextureFramecount = 1.00,
 	Blendmode = 3.00,

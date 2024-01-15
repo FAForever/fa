@@ -24,7 +24,7 @@ local TableEmpty = table.empty
 local TableRemove = table.remove
 local TableMerged = table.merged
 
--- upvalue globals for performance
+-- upvalue scope for performance
 local type = type
 local Vector = Vector
 local IsEntity = IsEntity
@@ -32,6 +32,8 @@ local GetEntityById = GetEntityById
 local GetSurfaceHeight = GetSurfaceHeight
 local OkayToMessWithArmy = OkayToMessWithArmy
 local EntityCategoryFilterDown = EntityCategoryFilterDown
+local GetCurrentCommandSource = GetCurrentCommandSource
+local GetSystemTimeSecondsOnlyForProfileUse = GetSystemTimeSecondsOnlyForProfileUse
 
 local IssueClearCommands = IssueClearCommands
 local IssueBuildMobile = IssueBuildMobile
@@ -65,6 +67,8 @@ function DoCallback(name, data, units)
 end
 
 --- Common utility function to retrieve the actual units.
+---@param units Unit[]
+---@return Unit[]
 function SecureUnits(units)
     local secure = {}
     if units and type(units) ~= 'table' then
@@ -128,15 +132,6 @@ Callbacks.PersistFerry = function(data, units)
     IssueClearCommands(units)
     for _, r in data.route do
         IssueFerry(units, r)
-    end
-end
-
-Callbacks.TransportLock = function(data)
-    local units = SecureUnits(data.ids)
-    if not units[1] then return end
-
-    for _, u in units do
-        u:TransportLock(data.lock == true)
     end
 end
 
@@ -239,6 +234,22 @@ Callbacks.OnPlayerQueryResult = SimPlayerQuery.OnPlayerQueryResult
 
 Callbacks.PingGroupClick = import("/lua/simpinggroup.lua").OnClickCallback
 
+---@param unit Unit
+---@param target? Unit
+---@return boolean
+function IsInvalidAssist(unit, target)
+    if target and target.EntityId == unit.EntityId then
+        return true
+    elseif not target or not target:GetGuardedUnit() then
+        return false
+    else
+        return IsInvalidAssist(unit, target:GetGuardedUnit())
+    end
+end
+
+--- Detect and fix a simulation freeze by clearing the command queue of all factories that take part in a cycle
+---@param data { target: EntityId}
+---@param units any
 Callbacks.ValidateAssist = function(data, units)
     units = SecureUnits(units)
     local target = GetEntityById(data.target)
@@ -249,16 +260,6 @@ Callbacks.ValidateAssist = function(data, units)
                 return
             end
         end
-    end
-end
-
-function IsInvalidAssist(unit, target)
-    if target and target.EntityId == unit.EntityId then
-        return true
-    elseif not target or not target:GetGuardedUnit() then
-        return false
-    else
-        return IsInvalidAssist(unit, target:GetGuardedUnit())
     end
 end
 
@@ -285,6 +286,28 @@ Callbacks.FlagShield = function(data, units)
         end
     end
 end
+
+-------------------------------------------------------------------------------
+--#region General orders
+
+---@param data { }
+---@param selection Unit[]
+Callbacks.SelfDestruct = function(data, selection)
+    -- verify selection
+    selection = SecureUnits(selection)
+    if (not selection) or TableEmpty(selection) then
+        return
+    end
+
+    -- suppress self destruct in tutorial missions as they screw up the mission
+    if ScenarioInfo.tutorial then
+        return
+    end
+
+    import("/lua/sim/commands/self-destruct.lua").RingExtractor(selection, true)
+end
+
+--#endregion
 
 -------------------------------------------------------------------------------
 --#region Advanced orders
@@ -636,6 +659,60 @@ do
     end
 end
 
+do
+    local CommandSourceGuards = {}
+
+    ---@param data { }
+    ---@param selection Unit[]
+    Callbacks.DischargeShields = function(data, selection)
+        -- verify selection
+        selection = SecureUnits(selection)
+        if (not selection) or TableEmpty(selection) then
+            if (GetFocusArmy() == GetCurrentCommandSource()) then
+                print("Unable to discharge")
+            end
+
+            return
+        end
+
+        -- only apply this to units with shields
+        local shead = 1
+        local unitsWithShields = {}
+        for k = 1, table.getn(selection) do
+            local unit = selection[k]
+            if unit.MyShield then
+                unitsWithShields[shead] = unit
+                shead = shead + 1
+            end
+        end
+
+        if table.empty(unitsWithShields) then
+            if (GetFocusArmy() == GetCurrentCommandSource()) then
+                print("Unable to discharge")
+            end
+
+            return
+        end
+
+        -- prevent automation
+        local gameTick = GetGameTick()
+        local commandSource = GetCurrentCommandSource()
+        local commandSourceGuard = CommandSourceGuards[commandSource]
+
+        if commandSourceGuard and commandSourceGuard + 5 >= gameTick then
+            if (GetFocusArmy() == GetCurrentCommandSource()) then
+                print("Unable to discharge")
+            end
+
+            return
+        end
+
+        CommandSourceGuards[commandSource] = gameTick
+
+        -- perform the command
+        import("/lua/sim/commands/discharge-shields.lua").DischargeShields(unitsWithShields, true)
+    end
+end
 
 --#endregion
 

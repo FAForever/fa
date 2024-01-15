@@ -7,6 +7,9 @@ local TableRandom = table.random
 local ParseEntityCategory = ParseEntityCategory
 local EntityCategoryGetUnitList = EntityCategoryGetUnitList
 
+---@class AITaskFactoryTemplate : AITaskTemplate
+---@field Type 'Building'
+
 ---@class AIPlatoonSimpleFactory : AIPlatoon
 ---@field Base AIBase
 ---@field Brain EasyAIBrain

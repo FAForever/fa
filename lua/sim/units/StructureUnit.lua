@@ -52,6 +52,7 @@ local StructureUnitOnStartBeingBuiltRotateBuildings = categories.STRUCTURE * (ca
 ---@field DeathAnimManip moho.AnimationManipulator
 ---@field OnBeingBuiltEffectsBag TrashBag
 ---@field AdjacencyBeamsBag TrashBag
+---@field BuildEffectsBag TrashBag
 StructureUnit = ClassUnit(Unit) {
     LandBuiltHiddenBones = {'Floatation'},
     MinConsumptionPerSecondEnergy = 1,
@@ -69,6 +70,9 @@ StructureUnit = ClassUnit(Unit) {
         Unit.OnCreate(self)
         self:HideLandBones()
         self.FxBlinkingLightsBag = { }
+
+        -- default to ground fire mode for all structures
+        self:SetFireState(2)
 
         local layer = self.Layer
         local blueprint = self.Blueprint

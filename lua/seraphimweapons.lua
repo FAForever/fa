@@ -1,13 +1,9 @@
---****************************************************************************
---**
---**  File     :  /lua/seraphimweapons.lua
---**  Author(s):  Greg Kohne, Gordon Duclos,
---**              Matt Vainio, Aaron Lundquist, Dru Staltman, Jessica St. Croix
---**
---**  Summary  :  Default definitions of Seraphim weapons
---**
---**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
---****************************************************************************
+-----------------------------------------------------------------------------------------------------------
+-- File     :  /lua/seraphimweapons.lua
+-- Author(s):  Greg Kohne, Gordon Duclos, Matt Vainio, Aaron Lundquist, Dru Staltman, Jessica St. Croix
+-- Summary  :  Default definitions of Seraphim weapons
+-- Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
+-----------------------------------------------------------------------------------------------------------
 
 SANAnaitTorpedo = import('/lua/sim/weapons/seraphim/SANAnaitTorpedo.lua').SANAnaitTorpedo
 SDFExperimentalPhasonProj = import('/lua/sim/weapons/seraphim/SDFExperimentalPhasonProj.lua').SDFExperimentalPhasonProj
@@ -56,7 +52,6 @@ SDFHeavyQuarnonCannon = import('/lua/sim/weapons/seraphim/SDFHeavyQuarnonCannon.
 SDFSniperShotNormalMode = import('/lua/sim/weapons/seraphim/SDFSniperShotNormalMode.lua').SDFSniperShotNormalMode
 SDFSniperShotSniperMode = import('/lua/sim/weapons/seraphim/SDFSniperShotSniperMode.lua').SDFSniperShotSniperMode
 SB0OhwalliExperimentalStrategicBombWeapon = import('/lua/sim/weapons/seraphim/SB0OhwalliExperimentalStrategicBombWeapon.lua').SB0OhwalliExperimentalStrategicBombWeapon
-
 
 --- Kept Mod Support
 local WeaponFile = import("/lua/sim/defaultweapons.lua")

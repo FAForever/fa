@@ -1357,4 +1357,8 @@ WorldView = ClassUI(moho.UIWorldView, Control) {
     OnIconsVisible = function(self, areIconsVisible)
         -- called when strat icons are turned on/off
     end,
+
+    OnRenderWorld = function (self, delta)
+        -- called when custom world rendering is enabled
+    end,
 }
