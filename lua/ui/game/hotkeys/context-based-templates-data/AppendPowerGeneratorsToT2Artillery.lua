@@ -22,65 +22,41 @@
 
 ---@type ContextBasedTemplate
 Template = {
-    Name = 'Air grid',
-    TriggersOnBuilding = (categories.AIR * categories.SUPPORTFACTORY * categories.TECH3),
+    Name = 'Power generators',
+    TriggersOnBuilding = (categories.ARTILLERY * categories.TECH2),
     TemplateSortingOrder = 100,
     TemplateData = {
-        24,
-        24,
+        6,
+        6,
         {
             'dummy',
             0,
+            0,
+            0
+        },
+        {
+            'uab1101',
+            1,
             2,
-            2
+            0
         },
         {
-            'uab1301',
-            1,
-            10,
-            2
-        },
-        {
-            'zab9602',
-            1,
-            10,
-            10
-        },
-        {
-            'uab1301',
+            'uab1101',
             2,
-            -6,
-            2
+            -2,
+            0
         },
         {
-            'zab9602',
-            1,
-            -6,
-            10
-        },
-        {
-            'uab1301',
+            'uab1101',
             3,
-            2,
-            -6
+            0,
+            -2
         },
         {
-            'zab9602',
-            1,
-            10,
-            -6
-        },
-        {
-            'uab1301',
+            'uab1101',
             4,
-            2,
-            10
-        },
-        {
-            'zab9602',
-            1,
-            -6,
-            -6
+            0,
+            2
         },
     }
 }

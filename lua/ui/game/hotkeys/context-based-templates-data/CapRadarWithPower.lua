@@ -26,8 +26,8 @@ Template = {
     TriggersOnUnit = (categories.RADAR + categories.OMNI) * categories.STRUCTURE,
     TemplateSortingOrder = 100,
     TemplateData = {
-        0,
-        0,
+        6,
+        6,
         {
             'uab1101',
             33986,

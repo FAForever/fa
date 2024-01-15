@@ -1,4 +1,3 @@
-
 --**********************************************************************************
 --** Copyright (c) 2023 FAForever
 --**
@@ -70,6 +69,8 @@ AMissileSerpentineProjectile = ClassProjectile(SingleCompositeEmitterProjectile,
         local blueprintPhysics = self.Blueprint.Physics
         local radius = 0.105 * (blueprintPhysics.MaxSpeed + blueprintPhysics.MaxSpeedRange)
         self:SetCollisionShape('Sphere', 0, 0, 0, radius)
+
+        self.MoveThread = self.Trash:Add(ForkThread(self.MovementThread, self))
     end,
 
     ---@param self AMissileSerpentineProjectile

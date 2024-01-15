@@ -1,5 +1,5 @@
 --******************************************************************************************************
---** Copyright (c) 2023  Willem 'Jip' Wijnia
+--** Copyright (c) 2024  Il1i1
 --**
 --** Permission is hereby granted, free of charge, to any person obtaining a copy
 --** of this software and associated documentation files (the "Software"), to deal
@@ -22,8 +22,8 @@
 
 ---@type ContextBasedTemplate
 Template = {
-    Name = 'Air grid',
-    TriggersOnBuilding = (categories.AIR * categories.SUPPORTFACTORY * categories.TECH3),
+    Name = 'Power generators',
+    TriggersOnBuilding = categories.STRUCTURE * categories.ARTILLERY * (categories.TECH3 + categories.EXPERIMENTAL) - categories.SIZE20,
     TemplateSortingOrder = 100,
     TemplateData = {
         24,
@@ -32,55 +32,31 @@ Template = {
             'dummy',
             0,
             2,
-            2
+            2,
         },
         {
             'uab1301',
-            1,
+            5352,
             10,
             2
         },
         {
-            'zab9602',
-            1,
-            10,
+            'uab1301',
+            5369,
+            2,
             10
         },
         {
             'uab1301',
-            2,
+            5385,
             -6,
             2
         },
         {
-            'zab9602',
-            1,
-            -6,
-            10
-        },
-        {
             'uab1301',
-            3,
+            5408,
             2,
             -6
-        },
-        {
-            'zab9602',
-            1,
-            10,
-            -6
-        },
-        {
-            'uab1301',
-            4,
-            2,
-            10
-        },
-        {
-            'zab9602',
-            1,
-            -6,
-            -6
-        },
-    }
+        }
+    },
 }

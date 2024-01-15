@@ -1,5 +1,5 @@
 --******************************************************************************************************
---** Copyright (c) 2023  Willem 'Jip' Wijnia
+--** Copyright (c) 2024  Il1I1
 --**
 --** Permission is hereby granted, free of charge, to any person obtaining a copy
 --** of this software and associated documentation files (the "Software"), to deal
@@ -22,65 +22,89 @@
 
 ---@type ContextBasedTemplate
 Template = {
-    Name = 'Air grid',
-    TriggersOnBuilding = (categories.AIR * categories.SUPPORTFACTORY * categories.TECH3),
+    Name = 'Power generators',
+    TriggersOnBuilding = categories.STRUCTURE * categories.OPTICS * categories.TECH3 * categories.CYBRAN,
     TemplateSortingOrder = 100,
     TemplateData = {
-        24,
-        24,
+        10,
+        10,
         {
             'dummy',
+            2600,
+            2,
+            2
+        },
+        {
+            'uab1101',
+            2605,
             0,
+            6
+        },
+        {
+            'uab1101',
+            2621,
             2,
-            2
+            6
         },
         {
-            'uab1301',
-            1,
-            10,
-            2
-        },
-        {
-            'zab9602',
-            1,
-            10,
-            10
-        },
-        {
-            'uab1301',
-            2,
-            -6,
-            2
-        },
-        {
-            'zab9602',
-            1,
-            -6,
-            10
-        },
-        {
-            'uab1301',
-            3,
-            2,
-            -6
-        },
-        {
-            'zab9602',
-            1,
-            10,
-            -6
-        },
-        {
-            'uab1301',
+            'uab1101',
+            2636,
             4,
-            2,
-            10
+            6
         },
         {
-            'zab9602',
-            1,
-            -6,
-            -6
+            'uab1101',
+            2651,
+            6,
+            4
         },
-    }
+        {
+            'uab1101',
+            2666,
+            6,
+            2
+        },
+        {
+            'uab1101',
+            2680,
+            6,
+            0
+        },
+        {
+            'uab1101',
+            2695,
+            4,
+            -2
+        },
+        {
+            'uab1101',
+            2710,
+            2,
+            -2
+        },
+        {
+            'uab1101',
+            2724,
+            0,
+            -2
+        },
+        {
+            'uab1101',
+            2738,
+            -2,
+            0
+        },
+        {
+            'uab1101',
+            2753,
+            -2,
+            2
+        },
+        {
+            'uab1101',
+            2767,
+            -2,
+            4
+        }
+    },
 }

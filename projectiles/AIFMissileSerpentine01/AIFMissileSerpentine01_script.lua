@@ -3,11 +3,10 @@ local AMissileSerpentineProjectile = import("/lua/aeonprojectiles.lua").AMissile
 -- Aeon Serpentine Missile
 ---@class AIFMissileSerpentine01: AMissileSerpentineProjectile
 AIFMissileSerpentine01 = ClassProjectile(AMissileSerpentineProjectile) {
-
-    ---@param self AIFMissileSerpentine01
-    OnCreate = function(self)
-        AMissileSerpentineProjectile.OnCreate(self)
-        self.MoveThread = self.Trash:Add(ForkThread( self.MovementThread,self ))
-    end,
+    LaunchTicks = 2,
+    LaunchTurnRate = 6,
+    HeightDistanceFactor = 8,
+    MinHeight = 2,
+    FinalBoostAngle = 20,
 }
 TypeClass = AIFMissileSerpentine01

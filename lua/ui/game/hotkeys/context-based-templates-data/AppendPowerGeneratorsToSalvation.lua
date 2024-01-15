@@ -1,5 +1,5 @@
 --******************************************************************************************************
---** Copyright (c) 2023  Willem 'Jip' Wijnia
+--** Copyright (c) 2024  Il1i1
 --**
 --** Permission is hereby granted, free of charge, to any person obtaining a copy
 --** of this software and associated documentation files (the "Software"), to deal
@@ -22,65 +22,68 @@
 
 ---@type ContextBasedTemplate
 Template = {
-    Name = 'Air grid',
-    TriggersOnBuilding = (categories.AIR * categories.SUPPORTFACTORY * categories.TECH3),
+    Name = 'Power generators',
+    TriggersOnBuilding = categories.STRUCTURE * categories.ARTILLERY * categories.SIZE20,
     TemplateSortingOrder = 100,
     TemplateData = {
-        24,
-        24,
+        26,
+        26,
         {
             'dummy',
             0,
-            2,
-            2
-        },
-        {
-            'uab1301',
-            1,
-            10,
-            2
-        },
-        {
-            'zab9602',
-            1,
-            10,
-            10
-        },
-        {
-            'uab1301',
-            2,
-            -6,
-            2
-        },
-        {
-            'zab9602',
-            1,
-            -6,
-            10
-        },
-        {
-            'uab1301',
             3,
-            2,
-            -6
-        },
-        {
-            'zab9602',
-            1,
-            10,
-            -6
+            3
         },
         {
             'uab1301',
-            4,
-            2,
-            10
+            101,
+            12,
+            2
         },
         {
-            'zab9602',
-            1,
+            'uab1101',
+            102,
+            9,
+            7
+        },
+        {
+            'uab1301',
+            111,
+            4,
+            12
+        },
+        {
+            'uab1101',
+            112,
+            -1,
+            9
+        },
+
+        {
+            'uab1301',
+            121,
             -6,
+            4
+        },
+        {
+            'uab1101',
+            122,
+            -3,
+            -1
+        },
+
+        {
+            'uab1301',
+            131,
+            2,
             -6
         },
-    }
+        {
+            'uab1101',
+            132,
+            7,
+            -3
+        },
+
+    },
 }
