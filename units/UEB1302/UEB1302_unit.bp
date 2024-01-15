@@ -12,6 +12,7 @@ UnitBlueprint{
         "BUILTBYTIER3COMMANDER",
         "BUILTBYTIER3ENGINEER",
         "ECONOMIC",
+        "DRAGBUILD",
         "MASSEXTRACTION",
         "MASSPRODUCTION",
         "PRODUCTSC1",

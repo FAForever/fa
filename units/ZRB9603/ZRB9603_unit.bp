@@ -75,6 +75,7 @@ UnitBlueprint {
     },
     Description = '<LOC zrb9603_desc>Naval Factory',
     Display = {
+        AnimationBuild = '/units/urb0303/urb0303_abuild.sca',
         BuildAttachBone = 'Attachpoint',
         IdleEffects = {
             Water = {
@@ -114,7 +115,7 @@ UnitBlueprint {
         BuildCostEnergy = 11000,
         BuildCostMass = 2200,
         BuildRate = 150,
-        BuildTime = 3500,
+        BuildTime = 10800,
         DifferentialUpgradeCostCalculation = true,
         RebuildBonusIds = {
             'zrb9603',

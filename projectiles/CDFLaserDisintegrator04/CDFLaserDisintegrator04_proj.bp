@@ -45,5 +45,8 @@ ProjectileBlueprint {
         InitialSpeed = 15,
         ProjectileLifetime = 1.5,
         UseGravity = true,
+        TrackTarget = true,
+        TurnRate = 15,
+        OnLostTargetLifetime = 0.5,
     },
 }

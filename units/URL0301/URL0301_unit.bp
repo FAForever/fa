@@ -199,6 +199,7 @@ UnitBlueprint{
             HelpText = "<LOC url0301_AntiAir_help>Support Armored Command Unit. Enhanced during construction with the nanite missile system enhancement.",
             SortCategory = "SORTOTHER",
             UnitName = "<LOC url0301_AntiAir_name>SACU (Anti-Air preset)",
+            SelectionPriority = 1,
         },
         Cloak = {
             Description = "<LOC url0301_Cloak_desc>SACU (Cloak preset)",
@@ -211,6 +212,7 @@ UnitBlueprint{
             HelpText = "<LOC url0301_Cloak_help>Support Armored Command Unit. Enhanced during construction with the personal cloaking generator and disintegrator amplifier enhancements.",
             SortCategory = "SORTOTHER",
             UnitName = "<LOC url0301_Cloak_name>SACU (Cloak preset)",
+            SelectionPriority = 1,
         },
         Combat = {
             Description = "<LOC url0301_Combat_desc>SACU (Combatant preset)",
@@ -222,6 +224,7 @@ UnitBlueprint{
             HelpText = "<LOC url0301_Combat_help>Support Armored Command Unit. Enhanced during construction with the EMP burst and disintegrator amplifier enhancements.",
             SortCategory = "SORTOTHER",
             UnitName = "<LOC url0301_Combat_name>SACU (Combatant preset)",
+            SelectionPriority = 1,
         },
         Engineer = {
             Description = "<LOC url0301_Engineer_desc>SACU (Engineer preset)",
@@ -250,6 +253,7 @@ UnitBlueprint{
             HelpText = "<LOC url0301_Rambo_help>Support Armored Command Unit. Enhanced during construction with the EMP burst, disintegrator amplifier and nano-repair system enhancements.",
             SortCategory = "SORTOTHER",
             UnitName = "<LOC url0301_Rambo_name>SACU (Rambo preset)",
+            SelectionPriority = 1,
         },
         Stealth = {
             Description = "<LOC url0301_Stealth_desc>SACU (Stealth preset)",
@@ -258,6 +262,7 @@ UnitBlueprint{
             HelpText = "<LOC url0301_Stealth_help>Support Armored Command Unit. Enhanced during construction with the personal stealth generator enhancement.",
             SortCategory = "SORTOTHER",
             UnitName = "<LOC url0301_Stealth_name>SACU (Stealth preset)",
+            SelectionPriority = 1,
         },
     },
     Enhancements = {
@@ -492,6 +497,12 @@ UnitBlueprint{
         ConstructionBar = true,
         FactionName = "Cybran",
         Icon = "amph",
+        OrderOverrides = {
+            RULEUTC_StealthToggle = {
+                bitmapId = "stealth-personal",
+                helpText = "toggle_stealth_personal",
+            },
+        },
         SelectionPriority = 3,
     },
     Intel = {

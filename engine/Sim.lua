@@ -115,8 +115,9 @@ end
 
 --- Creates a bone manipulator for a unit, allowing it to be animated
 ---@param object BoneObject
+---@param alignWithSpeed? boolean    # if set, animation rate takes into account the speed of the unit. Defaults to false
 ---@return moho.AnimationManipulator
-function CreateAnimator(object)
+function CreateAnimator(object, alignWithSpeed)
 end
 
 --- Creates a beam that is attached to an entity
@@ -469,7 +470,7 @@ end
 --- Deals damage to the target unit
 ---@param instigator TargetObject | nil
 ---@param location Vector origin of the damage, used for effects
----@param target Unit
+---@param target Unit | Projectile | Prop
 ---@param amount number
 ---@param damageType DamageType
 function Damage(instigator, location, target, amount, damageType)

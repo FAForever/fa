@@ -140,6 +140,7 @@ UnitBlueprint{
         },
         FactionName = "Cybran",
         Icon = "amph",
+        SelectionPriority = 5,
         UnitName = "<LOC url0401_name>Scathis",
     },
     Intel = {

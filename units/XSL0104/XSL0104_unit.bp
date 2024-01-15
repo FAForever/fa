@@ -166,7 +166,7 @@ UnitBlueprint{
     CollisionOffsetZ = -0.05,
     SizeX = 0.7,
     SizeY = 0.6,
-    SizeZ = 0.7,
+    SizeZ = 0.8,
     StrategicIconName = "icon_land1_antiair",
     StrategicIconSortPriority = 135,
     Transport = { CanFireFromTransport = false },

@@ -136,9 +136,9 @@ UnitBlueprint{
         UniformScale = 0.075,
     },
     Economy = {
-        BuildCostEnergy = 8400,
-        BuildCostMass = 420,
-        BuildTime = 2400,
+        BuildCostEnergy = 12600,
+        BuildCostMass = 360,
+        BuildTime = 2800,
     },
     Footprint = {
         MaxSlope = 0.25,
@@ -196,7 +196,7 @@ UnitBlueprint{
     SelectionThickness = 0.34,
     CollisionOffsetY = 0,
     SizeSphere = 1.6,
-    SizeX = 2,
+    SizeX = 1.8,
     SizeY = 0.3,
     SizeZ = 1,
     StrategicIconName = "icon_fighter2_directfire",
@@ -382,11 +382,11 @@ UnitBlueprint{
             RackBones = {
                 {
                     MuzzleBones = {
-                        "Right_Contrail",
-                        "Left_Contrail",
-                        "Exhaust",
+                        "Rear_Bomb",
+                        "Left_Wing_Bomb",
+                        "Right_Wing_Bomb",
                     },
-                    RackBone = "Right_Contrail",
+                    RackBone = "Rear_Bomb",
                 },
             },
             RackFireTogether = false,

@@ -19,8 +19,6 @@ local CConstructionTemplate = import("/lua/cybranunits.lua").CConstructionTempla
 
 ---@class XRL0403 : CWalkingLandUnit, CConstructionTemplate
 XRL0403 = ClassUnit(CWalkingLandUnit, CConstructionTemplate) {
-    WalkingAnimRate = 1.2,
-
     BotBlueprintId = 'ura0001o',
     BotBone = 'Centraltgt',
 

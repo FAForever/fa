@@ -58,10 +58,11 @@ ProjectileBlueprint {
 
         TrackTarget = true,
         TrackTargetGround = true,
+        TrackTargetGroundFuzziness = 0.5,
         TurnRate = 0,
         VelocityAlign = true,
 
-        MaxZigZag = 5,
-        ZigZagFrequency = 0.5,
+        MaxZigZag = 4,
+        ZigZagFrequency = 0.4,
     },
 }
