@@ -19,69 +19,81 @@ function AnimatePingMesh(entity)
 end
 
 function SpawnPing(data)
-    if not PingsRemaining[data.Owner] then
-        PingsRemaining[data.Owner] = PingLimit
-    end
 
-    if PingsRemaining[data.Owner] > 0 then
-        if data.Marker and PingMarkers[data.Owner] and table.getsize(PingMarkers[data.Owner]) >= MaxPingMarkers then
-            return
-        elseif data.Marker and not PingMarkers[data.Owner] then
-            PingMarkers[data.Owner] = {}
-        end
-        PingsRemaining[data.Owner] = PingsRemaining[data.Owner] - 1
+    reprsl(data)
+    SendData(data)
 
-        if data.Marker and GetPingID(data.Owner) then
-            data.ID = GetPingID(data.Owner)
-            PingMarkers[data.Owner][data.ID] = data
-        else
-            local Entity = import("/lua/sim/entity.lua").Entity
-            data.Location[2] = data.Location[2]+2
-            local pingSpec = {Owner = data.Owner, Location = data.Location}
-            local ping = Entity(pingSpec)
-            Warp(ping, Vector(data.Location[1], data.Location[2], data.Location[3]))
-            ping:SetVizToFocusPlayer('Always')
-            ping:SetVizToEnemies('Never')
-            ping:SetVizToAllies('Always')
-            ping:SetVizToNeutrals('Never')
-            ping:SetMesh('/meshes/game/ping_'..data.Mesh)
+    import('/lua/simsyncutils.lua').SyncUIChatMessage({
+        EventType = 'PingHelp',
+        From = data.Owner + 1,
+        To = 'Allies',
+        Location = data.Location,
+        Text = "requires your attention"
+    })
 
-            local animThread = ForkThread(AnimatePingMesh, ping)
-            ForkThread(function()
-                WaitSeconds(data.Lifetime)
-                KillThread(animThread)
-                ping:Destroy()
-            end)
-        end
+    -- if not PingsRemaining[data.Owner] then
+    --     PingsRemaining[data.Owner] = PingLimit
+    -- end
 
-        SendData(data)
+    -- if PingsRemaining[data.Owner] > 0 then
+    --     if data.Marker and PingMarkers[data.Owner] and table.getsize(PingMarkers[data.Owner]) >= MaxPingMarkers then
+    --         return
+    --     elseif data.Marker and not PingMarkers[data.Owner] then
+    --         PingMarkers[data.Owner] = {}
+    --     end
+    --     PingsRemaining[data.Owner] = PingsRemaining[data.Owner] - 1
 
-        -- Callbacks to allied brains
-        for num,brain in ArmyBrains do
-            if data.Owner + 1 ~= num and IsAlly(num, data.Owner + 1) then
-                ArmyBrains[num]:DoPingCallbacks(data)
-                if not SUtils.IsAIArmy(data.Owner + 1) then
-                    ArmyBrains[num]:DoAIPing(data)
-                end
-            end
-        end
+    --     if data.Marker and GetPingID(data.Owner) then
+    --         data.ID = GetPingID(data.Owner)
+    --         PingMarkers[data.Owner][data.ID] = data
+    --     else
+    --         local Entity = import("/lua/sim/entity.lua").Entity
+    --         data.Location[2] = data.Location[2]+2
+    --         local pingSpec = {Owner = data.Owner, Location = data.Location}
+    --         local ping = Entity(pingSpec)
+    --         Warp(ping, Vector(data.Location[1], data.Location[2], data.Location[3]))
+    --         ping:SetVizToFocusPlayer('Always')
+    --         ping:SetVizToEnemies('Never')
+    --         ping:SetVizToAllies('Always')
+    --         ping:SetVizToNeutrals('Never')
+    --         ping:SetMesh('/meshes/game/ping_'..data.Mesh)
 
-        ForkThread(function(owner) WaitSeconds(PingTimeout) PingsRemaining[owner] = PingsRemaining[owner] + 1 end, data.Owner)
-    end
+    --         local animThread = ForkThread(AnimatePingMesh, ping)
+    --         ForkThread(function()
+    --             WaitSeconds(data.Lifetime)
+    --             KillThread(animThread)
+    --             ping:Destroy()
+    --         end)
+    --     end
+
+
+
+    --     -- Callbacks to allied brains
+    --     for num,brain in ArmyBrains do
+    --         if data.Owner + 1 ~= num and IsAlly(num, data.Owner + 1) then
+    --             ArmyBrains[num]:DoPingCallbacks(data)
+    --             if not SUtils.IsAIArmy(data.Owner + 1) then
+    --                 ArmyBrains[num]:DoAIPing(data)
+    --             end
+    --         end
+    --     end
+
+    --     ForkThread(function(owner) WaitSeconds(PingTimeout) PingsRemaining[owner] = PingsRemaining[owner] + 1 end, data.Owner)
+    -- end
 end
 
 function SpawnSpecialPing(data)
     --This function is used to generate automatic nuke pings
     local Entity = import("/lua/sim/entity.lua").Entity
-    data.Location[2] = data.Location[2]+2
-    local pingSpec = {Owner = data.Owner, Location = data.Location}
+    data.Location[2] = data.Location[2] + 2
+    local pingSpec = { Owner = data.Owner, Location = data.Location }
     local ping = Entity(pingSpec)
     Warp(ping, Vector(data.Location[1], data.Location[2], data.Location[3]))
     ping:SetVizToFocusPlayer('Always')
     ping:SetVizToEnemies('Never')
     ping:SetVizToAllies('Always')
     ping:SetVizToNeutrals('Never')
-    ping:SetMesh('/meshes/game/ping_'..data.Mesh)
+    ping:SetMesh('/meshes/game/ping_' .. data.Mesh)
     local animThread = ForkThread(AnimatePingMesh, ping)
     ForkThread(function()
         WaitSeconds(data.Lifetime)
@@ -92,7 +104,7 @@ function SpawnSpecialPing(data)
     SendData(data)
 
     -- Callbacks to allied brains
-    for num,brain in ArmyBrains do
+    for num, brain in ArmyBrains do
         if data.Owner + 1 ~= num and IsAlly(num, data.Owner + 1) then
             ArmyBrains[num]:DoPingCallbacks(data)
             if not SUtils.IsAIArmy(data.Owner + 1) then
@@ -115,7 +127,7 @@ function OnArmyDefeat(armyID)
     armyID = armyID - 1
     if PingMarkers[armyID] then
         for i, v in PingMarkers[armyID] do
-            UpdateMarker({Action = 'delete', ID = i, Owner = v.Spec.Owner})
+            UpdateMarker({ Action = 'delete', ID = i, Owner = v.Spec.Owner })
         end
     end
 end
@@ -125,13 +137,13 @@ function OnArmyChange()
     LOG('syncing max ping markers: ', MaxPingMarkers)
     --Flush all of the current markers on the UI side
     if not Sync.Ping then Sync.Ping = {} end
-    table.insert(Sync.Ping, {Action = 'flush'})
+    table.insert(Sync.Ping, { Action = 'flush' })
     --Add All of the relevant marker data on the next sync
     local focus = GetFocusArmy()
     if focus ~= -1 then
         ForkThread(function()
             for ownerID, pingTable in PingMarkers do
-                if IsAlly(ownerID+1, focus) then
+                if IsAlly(ownerID + 1, focus) then
                     for pingID, ping in pingTable do
                         ping.Renew = true
                         SendData(ping)
@@ -159,7 +171,7 @@ function UpdateMarker(data)
             if focus ~= -1 then
                 ForkThread(function()
                     for ownerID, pingTable in PingMarkers do
-                        if IsAlly(ownerID+1, focus) then
+                        if IsAlly(ownerID + 1, focus) then
                             for pingID, ping in pingTable do
                                 ping.Renew = true
                                 SendData(ping)
@@ -176,7 +188,7 @@ end
 
 function SendData(data)
     local focus = GetFocusArmy()
-    if focus ~= -1 and IsAlly(data.Owner+1, focus) then
+    if focus ~= -1 and IsAlly(data.Owner + 1, focus) then
         if not Sync.Ping then Sync.Ping = {} end
         table.insert(Sync.Ping, data)
     end

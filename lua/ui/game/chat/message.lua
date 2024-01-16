@@ -38,7 +38,9 @@ local armies = GetArmiesTable()
 ---@field IsExtension boolean   # if true then this line is an extension of the previous line
 ---@field To Text               # indicates for whom the messages are
 ---@field Name Text             # name of the player
----@field Icon Bitmap           # usually faction icon of the player
+---@field IconFaction Bitmap    # usually faction icon of the player
+---@field IconEvent Bitmap
+---@field IconCamera Bitmap
 ---@field Color Bitmap          # color of the player
 ---@field Content Text          # text message of the player
 ChatMessage = ClassUI(Group) {
@@ -54,8 +56,11 @@ ChatMessage = ClassUI(Group) {
         self.Content = UIUtil.CreateText(self, "", 12, UIUtil.bodyFont)
         self.To = UIUtil.CreateText(self, "", 12, UIUtil.bodyFont)
         self.Name = UIUtil.CreateText(self, "", 12, UIUtil.bodyFont)
-        self.Icon = UIUtil.CreateBitmapColor(self, '00000000')
         self.Color = UIUtil.CreateBitmapColor(self, '00ffffff')
+
+        self.IconFaction = UIUtil.CreateBitmapColor(self, '00000000')
+        self.IconEvent = UIUtil.CreateBitmapColor(self, '00ffffff')
+        self.IconCamera = UIUtil.CreateBitmapColor(self, 'ff00ffff')
     end,
 
     ---@param self UIChatMessage
@@ -69,27 +74,39 @@ ChatMessage = ClassUI(Group) {
         LayoutHelpers.LayoutFor(self)
             :Over(parent, 10)
 
-        LayoutHelpers.LayoutFor(self.Icon)
+        LayoutHelpers.LayoutFor(self.IconEvent)
             :Width(12)
             :Height(12)
             :AtLeftTopIn(self, 2)
             :Under(self, 2)
 
+        LayoutHelpers.LayoutFor(self.IconFaction)
+            :Width(12)
+            :Height(12)
+            :RightOf(self.IconEvent, 2)
+            :Under(self, 2)
+
         LayoutHelpers.LayoutFor(self.Color)
-            :Fill(self.Icon)
-            :Under(self.Icon, 2)
+            :Fill(self.IconFaction)
+            :Under(self.IconFaction, 2)
 
         LayoutHelpers.LayoutFor(self.Name)
-            :RightOf(self.Icon, 2)
+            :RightOf(self.IconFaction, 2)
             :Under(self, 2)
 
         LayoutHelpers.LayoutFor(self.To)
             :RightOf(self.Name, 2)
             :Under(self, 2)
 
+        LayoutHelpers.LayoutFor(self.IconCamera)
+            :Width(12)
+            :Height(12)
+            :AtRightTopIn(self, 2)
+            :Under(self, 2)
+
         LayoutHelpers.LayoutFor(self.Content)
             :RightOf(self.To, 2)
-            :Right(self.Right)
+            :LeftOf(self.IconCamera)
             :Under(self, 2)
 
         LayoutHelpers.LayoutFor(self.Background)
@@ -125,12 +142,16 @@ ChatMessage = ClassUI(Group) {
         if self.IsExtension then
             self.Name:Hide()
             self.To:Hide()
-            self.Icon:Hide()
+            self.IconFaction:Hide()
+            self.IconCamera:Hide()
+            self.IconEvent:Hide()
             self.Color:Hide()
         else
             self.Name:Show()
             self.To:Show()
-            self.Icon:Show()
+            self.IconFaction:Show()
+            self.IconCamera:Show()
+            self.IconEvent:Show()
             self.Color:Show()
         end
 
@@ -172,7 +193,7 @@ ChatMessage = ClassUI(Group) {
             -- populate this line of content
             local army = armies.armiesTable[message.From]
             local factions = import("/lua/factions.lua").Factions
-            self.Icon:SetTexture(UIUtil.UIFile(factions[army.faction + 1].Icon or
+            self.IconFaction:SetTexture(UIUtil.UIFile(factions[army.faction + 1].IconFaction or
                 '/widgets/faction-icons-alpha_bmp/observer_ico.dds'))
 
             local textRecipients = ":"
@@ -189,6 +210,9 @@ ChatMessage = ClassUI(Group) {
             self.To:SetText(textRecipients)
             self.Name:SetText(army.nickname)
             self.Color:SetSolidColor(army.color)
+
+            self.IconCamera:SetHidden(message.Location != nil)
+            self.IconEvent:SetHidden(message.EventType != nil)
         else
             self:Hide()
         end
@@ -204,14 +228,16 @@ ChatMessage = ClassUI(Group) {
             self.Content:Show()
             self.Name:Hide()
             self.To:Hide()
-            self.Icon:Hide()
+            self.IconFaction:Hide()
+            self.IconCamera:Hide()
+            self.IconEvent:Hide()
             self.Color:Hide()
         else
             self.Content:SetText(content)
             self.Content:Show()
             self.Name:Show()
             self.To:Show()
-            self.Icon:Show()
+            self.IconFaction:Show()
             self.Color:Show()
         end
     end,

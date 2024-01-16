@@ -1015,7 +1015,7 @@ WorldView = ClassUI(moho.UIWorldView, Control) {
                     pingBmp.data = pingData
                     pingBmp:SetNeedsFrameUpdate(true)
                     pingBmp.OnFrame = function(ping, deltatime)
-                        local camZoomedIn = true
+                        local camZoomedIn = false
                         if GetCamera(self._cameraName):GetTargetZoom() > ((GetCamera(self._cameraName):GetMaxZoom() - GetCamera(self._cameraName):GetMinZoom()) * .4) then
                             camZoomedIn = false
                         end

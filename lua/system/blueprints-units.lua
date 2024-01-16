@@ -591,6 +591,22 @@ end
 ---@param units UnitBlueprint[]
 function PostProcessUnits(allBlueprints, units)
     for _, unit in units do
+
+        if not unit.CategoriesHash["SNIPEMODE"] then
+            if unit.Weapon then
+                for _, weapon in unit.Weapon do
+                    if weapon.TargetPriorities then
+                        for _, targetPriority in weapon.TargetPriorities do
+                            -- LOG(unit.Description, weapon.Label, targetPriority)
+                            if string.find(targetPriority, "COMMAND") then
+                                LOG(unit.Description, "missing snipe mode category!")
+                            end
+                        end
+                    end
+                end
+            end
+        end
+
         PostProcessUnit(unit)
     end
 

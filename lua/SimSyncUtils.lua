@@ -97,8 +97,8 @@ function SyncUIEventMessage(message)
 
     -- always see our own messages
     if message.From == GetFocusArmy() then
-        Sync.ReceiveChatMessage = Sync.ReceiveChatMessage or { }
-        table.insert(Sync.ReceiveChatMessage, message)
+        Sync.ReceiveEventMessage = Sync.ReceiveEventMessage or { }
+        table.insert(Sync.ReceiveEventMessage, message)
         return
     end
 end

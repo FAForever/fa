@@ -70,15 +70,24 @@ local WARN = function(message)
     _G.WARN("Chat.lua - " .. tostring(message))
 end
 
+---@alias UIPingType
+--- | "Assist"
+--- | "Attack"
+--- | "Defend"
+
 ---@class UIMessage
 ---@field ReceivedAtTime number         # timestamp of when it was received
 ---@field To 'All' | 'Allies' | 'Enemies' | number  # recipient(s)
 ---@field From number                   # sender
 ---@field Text string                   # message content
+---@field Location? Vector
 ---@field Camera? UserCameraSettings    # some messages contain camera coordinates
----@field EventType?  'Nuke' | 'Resources' | 'Ping-Help' | 'Ping-Attack' | 'Ping-Assist'
+---@field EventType?  'Nuke' | 'Resources' | 'PingHelp' | 'PingAttack' | 'PingAssist'
 
 local Instance = nil
+
+---@type UIPingType[]
+Pings = {}
 
 ---@type UIMessage[]
 ChatMessages = {}
@@ -369,6 +378,7 @@ ChatWindow = ClassUI(Window) {
         self.EditRecipientsPicker:AddOnRecipientPickedCallback(
             function(recipient)
                 self.Recipients:Set(recipient)
+                self.Edit:AcquireFocus()
             end, 'Chat.lua'
         )
 
@@ -468,6 +478,7 @@ ChatWindow = ClassUI(Window) {
     ---@param self UIChatWindow
     OnClose = function(self)
         self.WindowState = 'Closed'
+        self.Edit:AbandonFocus()
         self:Hide()
     end,
 
