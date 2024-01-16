@@ -640,11 +640,11 @@ UnitBlueprint{
             RateOfFire = 1,
             TargetPriorities = {
                 "MOBILE EXPERIMENTAL",
+                "COMMAND",
                 "MOBILE TECH3",
                 "MOBILE TECH2",
-                "MOBILE TECH1",
-                "COMMAND",
                 "(STRUCTURE * DEFENSE - ANTIMISSILE)",
+                "MOBILE TECH1",
                 "ALLUNITS",
             },
             TargetRestrictDisallow = "UNTARGETABLE",
