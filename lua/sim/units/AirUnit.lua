@@ -214,6 +214,18 @@ AirUnit = ClassUnit(MobileUnit) {
             self.Trash:Add(proj)
 
             self:VeterancyDispersal()
+
+            local army = self.Army
+            -- awareness for traitor game mode and game statistics
+            ArmyBrains[army].LastUnitKilledBy = (instigator or self).Army
+            ArmyBrains[army]:AddUnitStat(self.UnitId, "lost", 1)
+
+            -- awareness of instigator that it killed a unit, but it can also be a projectile or nil
+            if instigator and instigator.OnKilledUnit then
+                instigator:OnKilledUnit(self)
+            end
+
+            self.Brain:OnUnitKilled(self, instigator, type, overkillRatio)
         else
             MobileUnit.OnKilled(self, instigator, type, overkillRatio)
         end
