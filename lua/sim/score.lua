@@ -18,20 +18,18 @@ local categoriesToCollect = {
     structures = categories.STRUCTURE,
 }
 
--- The 'kills', 'built', and 'loss' stats for each category are checked for each army at the end of the game
--- Format specifications and required categories for achievements: https://github.com/FAForever/fa/issues/5813
+-- Format specifications for achievements: https://github.com/FAForever/fa/issues/5813
+-- Unit categories used in achievements: https://github.com/FAForever/server/blob/develop/server/stats/game_stats_service.py
+-- Unit IDs used for unit categories: https://github.com/FAForever/server/blob/develop/server/stats/unit.py
+
+-- The 'kills', 'built', and 'loss' stats for each category are checked for each army at the end of the game_stats_service
 local categoriesForAchievements = {
-    tech1 = categories.TECH1,
-    tech2 = categories.TECH2,
-    tech3 = categories.TECH3,
-    engineer = categories.ENGINEER,
     transportation = categories.TRANSPORTATION, 
     sacu = categories.SUBCOMMANDER,
 }
 
 -- The stats for these units are checked for each army at the end of the game.
 -- They can have custom stats on top of the 3 standard ones.
--- Unit IDs used for achievements: https://github.com/FAForever/server/blob/develop/server/stats/unit.py
 local unitIdsForAchievements = {
     -- ACUs
     -- lowest_health custom stat
@@ -67,38 +65,6 @@ local unitIdsForAchievements = {
     'xsb2401', -- YOLONA_OSS
     'xsa0402', -- AHWASSA
     'xsl0401', -- YTHOTHA
-
-    -- Transporters
-    'uaa0107', -- CHARIOT
-    'uaa0104', -- ALUMINAR
-    'ura0107', -- SKYHOOK
-    'ura0104', -- DRAGON_FLY
-    'uea0107', -- C6_COURIER
-    'uea0104', -- C14_STAR_LIFTER
-    'xea0306', -- CONTINENTAL
-    'xsa0107', -- VISH
-    'xsa0104', -- VISHALA
-
-    -- SACUs
-    'ual0301', -- AEON_SACU
-    'url0301', -- CYBRAN_SACU
-    'uel0301', -- UEF_SACU
-    'xsl0301', -- SERAPHIM_SACU
-
-    -- Engineers
-    'ual0105', -- AEON_T1_ENGINEER
-    'ual0208', -- AEON_T2_ENGINEER
-    'ual0309', -- AEON_T3_ENGINEER
-    'url0105', -- CYBRAN_T1_ENGINEER
-    'url0208', -- CYBRAN_T2_ENGINEER
-    'url0309', -- CYBRAN_T3_ENGINEER
-    'uel0105', -- UEF_T1_ENGINEER
-    'uel0208', -- UEF_T2_ENGINEER
-    'xel0209', -- UEF_T2_FIELD_ENGINEER
-    'uel0309', -- UEF_T3_ENGINEER
-    'xsl0105', -- SERAPHIM_T1_ENGINEER
-    'xsl0208', -- SERAPHIM_T2_ENGINEER
-    'xsl0309', -- SERAPHIM_T3_ENGINEER
 
     -- Other units
     'daa0206', -- MERCY
