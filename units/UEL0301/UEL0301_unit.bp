@@ -656,7 +656,6 @@ UnitBlueprint{
                 "MOBILE TECH3",
                 "MOBILE TECH2",
                 "(STRUCTURE * DEFENSE - ANTIMISSILE)",
-                "MOBILE TECH1",
                 "ALLUNITS",
             },
             TargetRestrictDisallow = "UNTARGETABLE",
