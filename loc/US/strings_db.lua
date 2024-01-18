@@ -1807,17 +1807,17 @@ Unit_Description_0331="High-power Torpedo Bomber designed to engage heavily armo
 Unit_Description_0419="Kamikaze drone with a short operational range and practically non-existent armour. Can inflict enormous damage to regions with no anti-air presence."
 
 -- AEON -- Naval Units
-Unit_Description_0246="Naval support unit. Equipped with direct fire weapons, radar, sonar and torpedo defenses."
-Unit_Description_0247="Basic Attack Submarine."
+Unit_Description_0246="Naval support unit. Equipped with two direct fire weapons, radar, sonar and torpedo defense."
+Unit_Description_0247="Basic Attack Submarine. Cannot engage land-based or floating units."
 Unit_Description_0248="Anti-Air support ship."
-Unit_Description_0249="Anti-Aircraft naval vessel. Armed with an anti-air missile system and direct fire cannon. Equipped with tactical missile defense flares and a full sensor suite."
-Unit_Description_0250="Primary surface combatant with powerful direct fire cannons."
+Unit_Description_0249="Anti-Aircraft naval vessel. Armed with an anti-air missile system and a direct fire cannon. Equipped with tactical missile defense flares and a full sensor suite."
+Unit_Description_0250="Primary surface combatant, with powerful direct fire cannons."
 Unit_Description_0251="Long-range direct-fire surface bombardment ship."
 Unit_Description_0252="Aircraft Carrier. Can store, transport and repair aircraft. Armed with surface-to-air missile launchers."
 Unit_Description_0253="Strategic Missile Submarine. Armed with long-range tactical missiles and can build and launch strategic nuclear weapons. Can fire while submerged."
-Unit_Description_0254="Experimental Submersible Factory Battleship. Armed with long range bombardment cannon and depth charges which ignore torpedo defenses. Equipped with torpedo defense, naval factory, and full sensor suite."
-Unit_Description_0332="Dedicated submersible killer armed with a torpedo tube and fantastic torpedo defense."
-Unit_Description_0333="Missile bombardment ship. Rapidly fires long range, high accuracy tactical missiles."
+Unit_Description_0254="Experimental Submersible Factory Battleship. Armed with a long range cannon for shore bombardment and depth charges which ignore torpedo defenses. Equipped with torpedo defense, naval factory, and full sensor suite."
+Unit_Description_0332="Dedicated submersible killer, armed with a torpedo tube and torpedo defense."
+Unit_Description_0333="Missile bombardment ship. Rapidly fires long range tactical missiles."
 
 -- AEON -- Offensive Structures
 Unit_Description_0255="Low-end defensive tower that attacks land- and sea-based units. Does not engage aircraft or submerged units."
