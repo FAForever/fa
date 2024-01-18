@@ -102,11 +102,6 @@ AirUnit = ClassUnit(MobileUnit) {
     OnImpact = function(self, with)
         if self.GroundImpacted then return end
 
-        -- Immediately destroy units outside the map
-        if not ScenarioFramework.IsUnitInPlayableArea(self) then
-            self:Destroy()
-        end
-
         -- Only call this code once
         self.GroundImpacted = true
 
