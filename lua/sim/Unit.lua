@@ -1702,8 +1702,8 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
             energy = energy * 0.6
         end
 
-        -- Create offmap aircraft wrecks on-map.
-        if EntityCategoryContains(categories.AIR, self) then
+        -- Create potentially offmap wrecks on-map.
+        if EntityCategoryContains(categories.AIR, self) or self.killedInTransport then
             pos = GetNearestPlayablePoint(pos)
         end
 

@@ -95,9 +95,8 @@ MobileUnit = ClassUnit(Unit, TreadComponent) {
     ---@param type string
     ---@param overkillRatio number
     OnKilled = function(self, instigator, type, overkillRatio)
-        -- This unit was in a transport and OnKilled will be called by the transport's OnImpact.
-        if self.killedInTransport then
-            self.killedInTransport = false
+        if self.willBeKilledByTransport then
+            self.willBeKilledByTransport = false
         else
             UnitOnKilled(self, instigator, type, overkillRatio)
         end
