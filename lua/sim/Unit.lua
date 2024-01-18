@@ -1523,6 +1523,8 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
     ---@param unitKilled Unit
     ---@param experience number | nil
     OnKilledUnit = function (self, unitKilled, experience)
+        ArmyBrains[self.Army]:AddUnitStat(unitKilled.UnitId, "kills", 1)
+        
         if experience then
             VeterancyComponent.OnKilledUnit(self, unitKilled, experience)
         end
