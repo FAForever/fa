@@ -36,7 +36,9 @@ end
 function ShowFPS()
     if fps then
         fps:Destroy()
+        stdPanel:Destroy()
         fps = false
+        showFPS = false
         return
     end
 
@@ -56,8 +58,18 @@ function ShowFPS()
 	stdPanel.Depth:Set(GetFrame(0):GetTopmostDepth() + 1)
 	LayoutHelpers.AtRightTopIn(stdPanel, GetFrame(0), 425, 0)
 
+    local updateTimer = 0
+    local updateInterval = 0.25
+
     fps:SetNeedsFrameUpdate(true)
     fps.OnFrame = function(self, deltatime)
+        updateTimer = updateTimer + deltatime
+        if updateTimer < updateInterval then
+			return
+		end
+
+        updateTimer = updateTimer - updateInterval
+
         for key, val in __EngineStats.Children do
             if val.Name == 'Frame' then
                 for childKey, childVal in val.Children do
