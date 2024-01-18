@@ -46,7 +46,15 @@ function ShowFPS()
     fps:SetDropShadow(true)
     fps:DisableHitTest()
     fps.Depth:Set(GetFrame(0):GetTopmostDepth() + 1)
-    LayoutHelpers.AtRightTopIn(fps, GetFrame(0), 425, 0)
+    LayoutHelpers.AtRightTopIn(fps, GetFrame(0), 495, 0)
+
+    stdPanel = UIUtil.CreateText(GetFrame(0), '', 12)
+	stdPanel:SetColor('ffffff')
+	stdPanel:SetFont(UIUtil.fixedFont, 12)
+	stdPanel:SetDropShadow(true)
+	stdPanel:DisableHitTest()
+	stdPanel.Depth:Set(GetFrame(0):GetTopmostDepth() + 1)
+	LayoutHelpers.AtRightTopIn(stdPanel, GetFrame(0), 425, 0)
 
     fps:SetNeedsFrameUpdate(true)
     fps.OnFrame = function(self, deltatime)
@@ -64,7 +72,8 @@ function ShowFPS()
                         local mean = Statistics.Mean(framerates, framerateMax)
                         local std = Statistics.Deviation(framerates, framerateMax, mean)
 
-                        self:SetText(string.format("FPS: %03.0f (σ %0.03f)", mean, std))
+                        self:SetText(string.format("FPS: %03.0f", mean))
+                        stdPanel:SetText(string.format("(σ %07.02f)", std))
                         break
                     end
                 end
