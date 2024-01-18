@@ -131,37 +131,39 @@ UnitBlueprint{
         },
         MovementEffects = {
             Land = {
-                Footfall = {
-                    Bones = {
-                        {
-                            FootBone = "Exhaust_Leg_L01",
-                            Scale = 0.58,
-                            Type = "FootFall01",
-                        },
-                        {
-                            FootBone = "Exhaust_Leg_L02",
-                            Scale = 0.58,
-                            Type = "FootFall01",
-                        },
-                        {
-                            FootBone = "Exhaust_Leg_L03",
-                            Scale = 0.58,
-                            Type = "FootFall01",
-                        },
-                        {
-                            FootBone = "Exhaust_Leg_R01",
-                            Scale = 0.58,
-                            Type = "FootFall01",
-                        },
-                        {
-                            FootBone = "Exhaust_Leg_R02",
-                            Scale = 0.58,
-                            Type = "FootFall01",
-                        },
-                        {
-                            FootBone = "Exhaust_Leg_R03",
-                            Scale = 0.58,
-                            Type = "FootFall01",
+                Effects = {
+                    Footfall = {
+                        Bones = {
+                            {
+                                FootBone = "Exhaust_Leg_L01",
+                                Scale = 0.58,
+                                Type = "FootFall01",
+                            },
+                            {
+                                FootBone = "Exhaust_Leg_L02",
+                                Scale = 0.58,
+                                Type = "FootFall01",
+                            },
+                            {
+                                FootBone = "Exhaust_Leg_L03",
+                                Scale = 0.58,
+                                Type = "FootFall01",
+                            },
+                            {
+                                FootBone = "Exhaust_Leg_R01",
+                                Scale = 0.58,
+                                Type = "FootFall01",
+                            },
+                            {
+                                FootBone = "Exhaust_Leg_R02",
+                                Scale = 0.58,
+                                Type = "FootFall01",
+                            },
+                            {
+                                FootBone = "Exhaust_Leg_R03",
+                                Scale = 0.58,
+                                Type = "FootFall01",
+                            },
                         },
                     },
                 },
