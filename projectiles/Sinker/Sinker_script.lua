@@ -67,7 +67,7 @@ Sinker = ClassProjectile(Projectile) {
     ---@param targetType string
     ---@param targetEntity Prop|Unit
     OnImpact = function(self, targetType, targetEntity)
-        if targetType == 'Terrain' then
+        if targetType == 'Terrain' or targetType == 'Underwater' then
             self:Destroy()
             if self.callback then
                 ForkThread(self.callback)
