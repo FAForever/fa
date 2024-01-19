@@ -148,10 +148,10 @@ UnitBlueprint{
         UnitName = "<LOC xes0307_name>Neptune Class",
     },
     Intel = {
-        RadarRadius = 50,
+        RadarRadius = 48,
         SonarRadius = 20,
         VisionRadius = 40,
-        WaterVisionRadius = 50,
+        WaterVisionRadius = 48,
     },
     LifeBarHeight = 0.075,
     LifeBarOffset = 5.2,
