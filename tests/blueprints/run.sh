@@ -38,12 +38,16 @@ echo "Lua table written to $output_file"
 
 # Run the tests
 
+had_error=0
+tests_complete=0
+
 run_test() {
     file="$1"
 
     output="$(lua "$file" 2>&1 |
         sed "s:/dev/fd/[0-9]\+:$file:g")"
 
+    echo $output
     if [[ $output != "" ]]; then
         echo "$output" >/dev/fd/2
         if [[ "$output" == *"FAIL"* ]]; then
@@ -53,3 +57,10 @@ run_test() {
 }
 
 run_test "./tests/blueprints/unit.spec.lua"
+
+if [[ $had_error != 0 ]]; then
+    echo "Tests returned errors."
+    exit $had_error
+else
+    echo "Tests OK."
+fi
