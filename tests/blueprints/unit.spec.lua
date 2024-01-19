@@ -20,7 +20,8 @@
 --** SOFTWARE.
 --******************************************************************************************************
 
-local luft = require "../luft"
+---@type Luft
+local luft = require "../luft.lua"
 
 ---@type UnitBlueprint[]
 local BlueprintUnits = {}
