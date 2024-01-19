@@ -44,7 +44,7 @@ end
 ---@param bp UnitBlueprint
 function UnitBlueprint(bp)
     if bp.Description then
-        BlueprintUnits[bp.Description] = bp
+        BlueprintUnits[bp.Description] = { bp }
     end
 end
 
@@ -84,12 +84,13 @@ luft.describe(
             "%s",
             BlueprintUnits,
 
-            ---@param unitBlueprint UnitBlueprint
-            function(unitBlueprint)
-                print(unitBlueprint.Intel)
+            ---@param unitBlueprintPacked UnitBlueprint[]
+            function(unitBlueprintPacked)
+                local unitBlueprint = unpack(unitBlueprintPacked)
+                print(unitBlueprint.Description)
                 if unitBlueprint.Intel then
                     local visionRadius = unitBlueprint.Intel.VisionRadius
-                    print(visionRadius)
+
                     if visionRadius and visionRadius > 0 then
                         luft.test(
                             "Vision radius",
