@@ -50,7 +50,7 @@ end
 
 ---@type { Files : string[] }
 local GeneratedFile = {}
-dofile("/tests/blueprints/generated-unit-blueprint-list.lua")
+dofile("blueprints/generated-unit-blueprint-list.lua")
 
 for k, blueprintFile in ipairs(Files) do
     dofile(blueprintFile)
