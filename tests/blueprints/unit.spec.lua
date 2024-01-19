@@ -52,5 +52,37 @@ local GeneratedFile = {}
 doscript("/tests/blueprints/generated-unit-blueprint-list.lua", GeneratedFile)
 
 for k, blueprintFile in ipairs(GeneratedFile.Files) do
-    io.output(blueprintFile)
+    doscript(blueprintFile)
 end
+
+local BlueprintIntelNameToOgrids = {
+    CloakFieldRadius = 4,
+    OmniRadius = 4,
+    RadarRadius = 4,
+    RadarStealthFieldRadius = 4,
+    SonarRadius = 4,
+    SonarStealthFieldRadius = 4,
+    WaterVisionRadius = 4,
+    VisionRadius = 2,
+}
+
+luft.describe(
+    'Unit blueprints - intel radius values',
+    function()
+        luft.test_all(
+            "Vision radius",
+            BlueprintUnits,
+
+            ---@param unitBlueprint UnitBlueprint
+            function(unitBlueprint)
+                if unitBlueprint.Intel then
+                    local visionRadius = unitBlueprint.Intel.VisionRadius
+                    if visionRadius and visionRadius > 0 then
+                        local visionRadiusOnGrid = math.floor(visionRadius / 2) * 2
+                        luft.expect(visionRadiusOnGrid).to.be(visionRadius)
+                    end
+                end
+            end
+        )
+    end
+)

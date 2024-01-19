@@ -15,7 +15,6 @@ declare -A lua_files
 # Iterate over Lua files in the directory
 for file in "$directory"/*/*.bp; do
     if [ -f "$file" ]; then
-        echo "Processing file: $file"
 
         # Add the file to the Lua table
         filename=$(basename "$file")
