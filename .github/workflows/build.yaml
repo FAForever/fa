@@ -37,6 +37,6 @@ jobs:
       - name: Install bash
         run: apk add bash findutils
       - name: Run Lua tests
-        run: "bash ./tests/blueprints/run.sh"
+        run: "bash ./run_lua_blueprint_tests.sh"
 
 
