@@ -55,7 +55,7 @@ run_test() {
     fi
 }
 
-run_test "./tests/blueprints/unit.spec.lua"
+run_test "./tests/unit.spec.lua"
 
 if [[ $had_error != 0 ]]; then
     echo "Tests returned errors."
