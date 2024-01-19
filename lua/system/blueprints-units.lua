@@ -25,6 +25,17 @@ local BlueprintNameToIntel = {
     SonarStealthFieldRadius = 'SonarStealthField',
 }
 
+local BlueprintIntelNameToOgrids = {
+    CloakFieldRadius = 4,
+    OmniRadius = 4,
+    RadarRadius = 4,
+    RadarStealthFieldRadius = 4,
+    SonarRadius = 4,
+    SonarStealthFieldRadius = 4,
+    WaterVision = 4,
+    Vision = 2,
+}
+
 local LabelToVeterancyUse = {
     ['DeathWeapon'] = true,
     ['DeathImpact'] = true,
@@ -527,6 +538,34 @@ local function PostProcessUnit(unit)
     -- so that rollover unit view can work with Mantis.
     if unit.Economy and not unit.Economy.BuildRate then
         unit.Economy.BuildRate = 0
+    end
+
+    ---------------------------------------------------------------------------
+    --#region Sanity check for intel values
+
+    -- Intel is visualised as a circle but it works in squares/blocks. You can
+    -- view the intel that a unit produces via a console command 'dbg Radar'.
+    --
+    -- It appears the engine divides the radius by the grid size and floors the
+    -- result. Therefore not all intel values and/or changes are actually 
+    -- meaningful. With this code we check all intel values and point out those
+    -- that are not accurate.
+
+    if unit.Intel then
+        for nameIntel, radius in unit.Intel do
+            local ogrids = BlueprintIntelNameToOgrids[nameIntel]
+            if ogrids then
+                local radiusOnGrid = math.floor(radius / ogrids) * ogrids
+                if radiusOnGrid != radius then
+                    WARN(
+                        string.format(
+                            "Intel radius of %s (= %d) for %s does not match intel grid (%d ogrids), should be either %d or %d",
+                            tostring(unit.BlueprintId), radius, nameIntel, ogrids, radiusOnGrid, radiusOnGrid + ogrids
+                            )
+                        )
+                end
+            end
+        end
     end
 end
 
