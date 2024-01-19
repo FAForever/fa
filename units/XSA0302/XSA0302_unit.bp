@@ -148,7 +148,7 @@ UnitBlueprint{
         UnitName = "<LOC xsa0302_name>Iaselen",
     },
     Intel = {
-        OmniRadius = 28,
+        OmniRadius = 26,
         RadarRadius = 96,
         SonarRadius = 96,
         VisionRadius = 64,
