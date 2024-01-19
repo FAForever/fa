@@ -150,7 +150,7 @@ UnitBlueprint{
         UnitName = "<LOC ues0201_name>Valiant Class",
     },
     Intel = {
-        RadarRadius = 36,
+        RadarRadius = 40,
         SonarRadius = 36,
         VisionRadius = 32,
         WaterVisionRadius = 44,

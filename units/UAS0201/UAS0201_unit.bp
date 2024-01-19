@@ -131,7 +131,7 @@ UnitBlueprint{
         UnitName = "<LOC uas0201_name>Exodus Class",
     },
     Intel = {
-        RadarRadius = 36,
+        RadarRadius = 40,
         SonarRadius = 36,
         VisionRadius = 32,
         WaterVisionRadius = 44,

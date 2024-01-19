@@ -148,7 +148,7 @@ UnitBlueprint{
         UnitName = "<LOC xss0201_name>Uashavoh",
     },
     Intel = {
-        RadarRadius = 36,
+        RadarRadius = 40,
         SonarRadius = 36,
         VisionRadius = 32,
         WaterVisionRadius = 44,
