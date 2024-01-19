@@ -53,7 +53,10 @@ local GeneratedFile = {}
 dofile("blueprints/generated-unit-blueprint-list.lua")
 
 for k, blueprintFile in ipairs(Files) do
-    dofile("../" .. blueprintFile)
+    -- ./units/UEL0301/UEL0301_PersonalShield_mesh.bp
+    -- to
+    -- ../units/UEL0301/UEL0301_PersonalShield_mesh.bp
+    dofile("." .. blueprintFile)
 end
 
 local BlueprintIntelNameToOgrids = {
