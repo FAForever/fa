@@ -31,6 +31,7 @@ jobs:
     needs: syntax
     runs-on: ubuntu-latest
     container: faforever/lua:v5.0-1
+    steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
