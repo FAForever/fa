@@ -8,10 +8,8 @@ jobs:
     runs-on: ubuntu-latest
     container: faforever/lua:v5.0-1
     steps:
-      - name: Install bash
-        run: apk add bash findutils
-      - name: Install git
-        run: apk add git findutils
+      - name: Install utilities
+        run: apk add bash git findutils
       - name: Checkout code
         uses: actions/checkout@v4
         with:
@@ -23,10 +21,8 @@ jobs:
     runs-on: ubuntu-latest
     container: faforever/lua:v5.0-1
     steps:
-      - name: Install bash
-        run: apk add bash findutils
-      - name: Install git
-        run: apk add git findutils
+      - name: Install utilities
+        run: apk add bash git findutils
       - name: Checkout code
         uses: actions/checkout@v4
       - name: Run Lua tests
@@ -36,10 +32,8 @@ jobs:
     runs-on: ubuntu-latest
     container: faforever/lua:v5.0-1
     steps:
-      - name: Install bash
-        run: apk add bash findutils
-      - name: Install git
-        run: apk add git findutils
+      - name: Install utilities
+        run: apk add bash git findutils
       - name: Checkout code
         uses: actions/checkout@v4
       - name: Run Lua tests
