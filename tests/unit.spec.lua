@@ -84,13 +84,12 @@ luft.describe(
             "%s",
             BlueprintUnits,
 
+            ---@param name string
             ---@param unitBlueprintPacked UnitBlueprint[]
-            function(unitBlueprintPacked)
+            function(name, unitBlueprintPacked)
                 local unitBlueprint = unpack(unitBlueprintPacked)
-                print(unitBlueprint.Description)
                 if unitBlueprint.Intel then
                     local visionRadius = unitBlueprint.Intel.VisionRadius
-
                     if visionRadius and visionRadius > 0 then
                         luft.test(
                             "Vision radius",
