@@ -56,7 +56,7 @@ run_test() {
 }
 
 pushd tests >/dev/null
-run_test "./tests/unit.spec.lua"
+run_test "./unit.spec.lua"
 popd >/dev/null
 
 if [[ $had_error != 0 ]]; then
