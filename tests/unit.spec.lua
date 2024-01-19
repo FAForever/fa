@@ -86,8 +86,10 @@ luft.describe(
 
             ---@param unitBlueprint UnitBlueprint
             function(unitBlueprint)
+                print(unitBlueprint.Intel)
                 if unitBlueprint.Intel then
                     local visionRadius = unitBlueprint.Intel.VisionRadius
+                    print(visionRadius)
                     if visionRadius and visionRadius > 0 then
                         luft.test(
                             "Vision radius",
