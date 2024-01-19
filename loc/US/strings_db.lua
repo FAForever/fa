@@ -1624,15 +1624,15 @@ Unit_Description_0135="Slow-moving Heavy Artillery, which deals damage in a larg
 Unit_Description_0136="Experimental Amphibious Spiderbot, armed with a powerful Microwave Laser, blasters, torpedoes and a weak anti-air solution. Equipped with sonar and a stealth field generator."
 Unit_Description_0137="Experimental Mobile Rapid-fire Artillery, which shoots a Salvo of 20 shells before reloading. Extremely inaccurate but deals damage in a huge Area-Of-Effect. Must be stationary to fire."
 Unit_Description_0317="Fast-moving Mobile Bomb, explodes in an EMP blast with a large Area-Of-Effect."
-Unit_Description_0318="Extremely heavy Amphibious Assault Robot, equipped with direct fire blasters, weak torpedoes and anti-torpedo flares. Designed to engage enemy, heavy units, and defense structures."
+Unit_Description_0318="Extremely heavy Amphibious Assault Robot, equipped with direct fire blasters, weak torpedoes and anti-torpedo flares. Designed to engage enemy heavy units and defense structures."
 Unit_Description_0319="Experimental Amphibious Megabot, armed with Proton Cannons, torpedoes and weak anti-air. Equipped with anti-torpedo flares and an egg-based engineering system."
 Unit_Description_0444="Lightly armoured support robot, armed with a long-range rocket launcher."
 
 -- CYBRAN -- Crab Egg Units
 Unit_Description_0447="Tech 3 amphibious construction, repair, capture and reclamation unit."
-Unit_Description_0448="Extremely heavy Amphibious Assault Robot equipped with direct fire blasters, weak torpedoes and anti-torpedo flares. Designed to engage enemy Experimental units, heavy units, and defense structures."
-Unit_Description_0449="Mobile Anti-Air with a low-speed Area-Of-Effect munition, excellent against enemy gunships."
-Unit_Description_0450="Slow-moving Heavy Artillery. Must be stationary to fire."
+Unit_Description_0448="Extremely heavy Amphibious Assault Robot, equipped with direct fire blasters, weak torpedoes and anti-torpedo flares. Designed to engage enemy heavy units and defense structures."
+Unit_Description_0449="Mobile Anti-Air unit. Shoots slow moving projectiles which deal damage in a large Area-Of-Effect. Excellent against enemy gunships."
+Unit_Description_0450="Slow-moving Heavy Artillery, which deals damage in a large Area-Of-Effect. Must be stationary to fire."
 
 -- CYBRAN -- Air Units
 Unit_Description_0138="Fast aerial reconnaissance vehicle."
