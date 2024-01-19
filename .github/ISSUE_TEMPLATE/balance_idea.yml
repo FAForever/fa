@@ -25,10 +25,10 @@ body:
     id: Reason
     attributes:
       label: Reason
-      description: Why are you suggesting this change?
+      description: Why are pros/cons for this chanage according to you?
       value: ""
       required: true
   - type: markdown
     attributes:
       value: |
-        Thank you for suggesting your balance idea. The balance team will review your suggestion and get back to you as soon as possible.
+        Thank you for suggesting your balance idea. The balance team will review your suggestion and will take it into condideration and report back you in time.
