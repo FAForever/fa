@@ -31,11 +31,6 @@ while read file; do
 done < <(find . -name '*.lua')
 popd >/dev/null
 
-# run the tests that apply to unit blueprints
-source ./tests/blueprints/run.sh
-run_test "./tests/blueprints/unit.spec.lua"
-((tests_complete++))
-
 echo "Ran $tests_complete tests"
 
 if [[ $had_error != 0 ]]; then
