@@ -16,7 +16,6 @@ jobs:
         run: "bash ./run_lua_syntax_checker.sh"
   tests:
     name: Tests
-    needs: syntax
     runs-on: ubuntu-latest
     container: faforever/lua:v5.0-1
     steps:
@@ -28,7 +27,6 @@ jobs:
         run: "bash ./run_lua_tests.sh"
   testUnits:
     name: Sanity check on unit blueprints
-    needs: syntax
     runs-on: ubuntu-latest
     container: faforever/lua:v5.0-1
     steps:
