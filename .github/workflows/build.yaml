@@ -8,10 +8,14 @@ jobs:
     runs-on: ubuntu-latest
     container: faforever/lua:v5.0-1
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
       - name: Install bash
         run: apk add bash findutils
+      - name: Install git
+        run: apk add git findutils
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          sp
       - name: Check Lua syntax
         run: "bash ./run_lua_syntax_checker.sh"
   tests:
@@ -19,10 +23,12 @@ jobs:
     runs-on: ubuntu-latest
     container: faforever/lua:v5.0-1
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
       - name: Install bash
         run: apk add bash findutils
+      - name: Install git
+        run: apk add git findutils
+      - name: Checkout code
+        uses: actions/checkout@v4
       - name: Run Lua tests
         run: "bash ./run_lua_tests.sh"
   testUnits:
@@ -30,9 +36,11 @@ jobs:
     runs-on: ubuntu-latest
     container: faforever/lua:v5.0-1
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
       - name: Install bash
         run: apk add bash findutils
+      - name: Install git
+        run: apk add git findutils
+      - name: Checkout code
+        uses: actions/checkout@v4
       - name: Run Lua tests
         run: "bash ./run_lua_blueprint_tests.sh"
