@@ -147,7 +147,7 @@ UnitBlueprint{
         UnitName = "<LOC uaa0304_name>Shocker",
     },
     Intel = {
-        RadarRadius = 65,
+        RadarRadius = 64,
         VisionRadius = 32,
     },
     LifeBarHeight = 0.075,

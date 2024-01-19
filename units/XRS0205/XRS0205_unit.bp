@@ -146,7 +146,7 @@ UnitBlueprint{
     Intel = {
         RadarRadius = 60,
         RadarStealthFieldRadius = 40,
-        SonarRadius = 62,
+        SonarRadius = 60,
         SonarStealthFieldRadius = 40,
         VisionRadius = 32,
     },

@@ -515,7 +515,7 @@ UnitBlueprint{
         ReactivateTime = 2,
         SonarStealth = true,
         VisionRadius = 26,
-        WaterVisionRadius = 26,
+        WaterVisionRadius = 24,
     },
     LifeBarHeight = 0.075,
     LifeBarOffset = 0.4,
