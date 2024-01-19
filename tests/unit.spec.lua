@@ -43,7 +43,9 @@ end
 
 ---@param bp UnitBlueprint
 function UnitBlueprint(bp)
-    table.insert(BlueprintUnits, bp)
+    if bp.Description then
+        BlueprintUnits[bp.Description] = bp
+    end
 end
 
 ---@param bp MeshBlueprint
@@ -78,8 +80,8 @@ local BlueprintIntelNameToOgrids = {
 luft.describe(
     'Unit blueprints - intel radius values',
     function()
-        luft.test_all(
-            "Vision radius",
+        luft.describe_each(
+            "%s - Vision radius",
             BlueprintUnits,
 
             ---@param unitBlueprint UnitBlueprint
