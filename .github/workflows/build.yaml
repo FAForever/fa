@@ -37,6 +37,7 @@ jobs:
         with:
           sparse-checkout: |
             units
+            tests
       - name: Install bash
         run: apk add bash findutils
       - name: Run Lua tests
