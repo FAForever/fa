@@ -86,18 +86,18 @@ luft.describe(
 
             ---@param unitBlueprint UnitBlueprint
             function(unitBlueprint)
-                luft.test(
-                    "Vision radius",
-                    function()
-                        if unitBlueprint.Intel then
-                            local visionRadius = unitBlueprint.Intel.VisionRadius
-                            if visionRadius and visionRadius > 0 then
+                if unitBlueprint.Intel then
+                    local visionRadius = unitBlueprint.Intel.VisionRadius
+                    if visionRadius and visionRadius > 0 then
+                        luft.test(
+                            "Vision radius",
+                            function()
                                 local visionRadiusOnGrid = math.floor(visionRadius / 2) * 2
                                 luft.expect(visionRadiusOnGrid).to.be(visionRadius)
                             end
-                        end
+                        )
                     end
-                )
+                end
             end
         )
     end
