@@ -14,7 +14,7 @@ run_test() {
 
   if [[ $output != "" ]]; then
     echo "$output" >/dev/fd/2
-    if [[ "$output" == *"FAIL"* ]]; then
+    if [[ "$output" == *"FAIL"* || "$output" == *"stack traceback"* ]]; then
       had_error=1
     fi
   fi

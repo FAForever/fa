@@ -34,10 +34,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        with:
-          sparse-checkout: |
-            units
-            tests
       - name: Install bash
         run: apk add bash findutils
       - name: Run Lua tests
