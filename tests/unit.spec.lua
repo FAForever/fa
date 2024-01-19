@@ -46,6 +46,11 @@ function UnitBlueprint(bp)
     table.insert(BlueprintUnits, bp)
 end
 
+---@param bp MeshBlueprint
+function MeshBlueprint(bp)
+    return bp
+end
+
 -------------------------------------------------------------------------------
 
 ---@type { Files : string[] }
