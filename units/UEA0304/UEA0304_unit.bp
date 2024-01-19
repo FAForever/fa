@@ -185,7 +185,7 @@ UnitBlueprint{
             Min = 20,
         },
         JammerBlips = 4,
-        RadarRadius = 65,
+        RadarRadius = 64,
         VisionRadius = 32,
     },
     LifeBarHeight = 0.075,

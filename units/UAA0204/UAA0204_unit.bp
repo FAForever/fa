@@ -157,7 +157,7 @@ UnitBlueprint{
         UnitName = "<LOC uaa0204_name>Skimmer",
     },
     Intel = {
-        SonarRadius = 45,
+        SonarRadius = 44,
         VisionRadius = 32,
     },
     LifeBarHeight = 0.075,

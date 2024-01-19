@@ -137,7 +137,7 @@ UnitBlueprint{
         JammerBlips = 20,
         ReactivateTime = 6,
         ShowIntelOnSelect = true,
-        SonarRadius = 450,
+        SonarRadius = 448,
         VisionRadius = 32,
         WaterVisionRadius = 24,
     },

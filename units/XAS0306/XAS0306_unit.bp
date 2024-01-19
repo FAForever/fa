@@ -135,10 +135,10 @@ UnitBlueprint{
         UnitName = "<LOC xas0306_name>Torrent Class",
     },
     Intel = {
-        RadarRadius = 110,
+        RadarRadius = 108,
         SonarRadius = 20,
         VisionRadius = 70,
-        WaterVisionRadius = 50,
+        WaterVisionRadius = 48,
     },
     LifeBarHeight = 0.075,
     LifeBarOffset = 6.2,

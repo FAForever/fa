@@ -168,9 +168,9 @@ UnitBlueprint{
         UnitName = "<LOC xss0304_name>Yathsou",
     },
     Intel = {
-        SonarRadius = 90,
+        SonarRadius = 88,
         VisionRadius = 32,
-        WaterVisionRadius = 55,
+        WaterVisionRadius = 56,
     },
     LifeBarHeight = 0.075,
     LifeBarOffset = 1.5,
