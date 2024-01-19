@@ -1652,14 +1652,14 @@ Unit_Description_0418="Fast Assault Fighter, armed with powerful long-range miss
 
 -- CYBRAN -- Naval Units
 Unit_Description_0149="Naval support unit. Equipped with direct fire and anti-air weapons, radar, and sonar."
-Unit_Description_0150="Basic Attack Submarine. Can surface to enable a weak direct fire cannon for additional power."
-Unit_Description_0151="Anti-Aircraft Naval vessel. Armed with anti-air weaponry and direct fire cannons. Equipped with tactical missile defense, air staging facilities and a full sensor suite."
-Unit_Description_0152="Amphibious primary surface combatant with powerful direct fire cannons, torpedoes, basic anti-air weapons, torpedo defense, and a full sensor suite. Can sprout legs and walk on land."
+Unit_Description_0150="Basic Attack Submarine. Can surface to enable a weak direct fire cannon for additional firepower."
+Unit_Description_0151="Anti-Aircraft Naval vessel. Armed with anti-air weaponry and direct fire cannons. Equipped with a tactical missile defense, a full sensor suite and an air staging facility."
+Unit_Description_0152="Amphibious primary surface combatant, with powerful direct fire cannons, torpedoes, basic anti-air weapons and an effective torpedo defense. Can sprout legs and walk on land."
 Unit_Description_0153="Long-range Surface Bombardment Ship. Armed with direct fire cannons and weak anti-air and torpedoes. Equipped with tactical missile defense and a full sensor suite."
-Unit_Description_0154="Aircraft carrier. Can store, transport and repair aircraft. Armed with light AA auto-cannons and an anti-missile turret."
-Unit_Description_0155="Strategic Missile Submarine. Armed with long-range tactical missiles, torpedoes, and can build and launch strategic EMP weapons. Equipped with a personal stealth generator. Can fire while submerged."
-Unit_Description_0322="Dedicated submersible killer armed with a torpedo tube and fantastic torpedo defense. Equipped with a personal stealth generator."
-Unit_Description_0323="Stealth Field and sensor boat defended only by fantastic anti-torpedo flares. Extremely useful in any sized navy."
+Unit_Description_0154="Aircraft carrier. Can store, transport and repair aircraft. Armed with powerful AA auto-cannons. Equipped with tactical missile defense and a full sensor suite."
+Unit_Description_0155="Strategic Missile Submarine. Can build and launch strategic EMP weapons. Armed with long-range tactical missiles and torpedoes. Equipped with a personal stealth generator. Can fire while submerged."
+Unit_Description_0322="Dedicated submersible killer, armed with a torpedo tube and torpedo defense. Equipped with a personal stealth generator."
+Unit_Description_0323="Stealth Field and sensor boat, defended only by fantastic anti-torpedo flares. Extremely useful in any sized navy."
 
 -- CYBRAN -- Offensive Buildings
 Unit_Description_0176="Low-end defensive tower that attacks land- and sea-based units. Does not engage aircraft or submerged units."
@@ -1813,9 +1813,9 @@ Unit_Description_0248="Anti-Air support ship."
 Unit_Description_0249="Anti-Aircraft naval vessel. Armed with an anti-air missile system and a direct fire cannon. Equipped with tactical missile defense flares and a full sensor suite."
 Unit_Description_0250="Primary surface combatant, with powerful direct fire cannons."
 Unit_Description_0251="Long-range direct-fire surface bombardment ship."
-Unit_Description_0252="Aircraft Carrier. Can store, transport and repair aircraft. Armed with surface-to-air missile launchers."
-Unit_Description_0253="Strategic Missile Submarine. Armed with long-range tactical missiles and can build and launch strategic nuclear weapons. Can fire while submerged."
-Unit_Description_0254="Experimental Submersible Factory Battleship. Armed with a long range cannon for shore bombardment and depth charges which ignore torpedo defenses. Equipped with torpedo defense, naval factory, and full sensor suite."
+Unit_Description_0252="Aircraft Carrier. Can store, transport and repair aircraft. Armed with powerful surface-to-air missile launchers. Equipped with tactical missile defense and a full sensor suite."
+Unit_Description_0253="Strategic Missile Submarine. Can build and launch strategic nuclear weapons. Armed with long-range tactical missiles. Can fire while submerged."
+Unit_Description_0254="Experimental Submersible Factory Battleship. Armed with a long range cannon for shore bombardment and depth charges which ignore torpedo defenses. Equipped with torpedo defense, a full sensor suite and a naval factory."
 Unit_Description_0332="Dedicated submersible killer, armed with a torpedo tube and torpedo defense."
 Unit_Description_0333="Missile bombardment ship. Rapidly fires long range tactical missiles."
 
@@ -1963,7 +1963,7 @@ Unit_Description_0364="Anti-Aircraft naval vessel. Armed with an anti-air weapon
 Unit_Description_0365="Primary Submersible surface combatant with powerful direct fire lasers, torpedoes, basic anti-air weapons, torpedo defense, and a full sensor suite."
 Unit_Description_0366="Surface Bombardment Ship. Armed with direct fire cannons and weak anti-air. Equipped with tactical missile defense and a full sensor suite. Can build and launch full-strength strategic nuclear weapons."
 Unit_Description_0367="Heavy Assault Submarine armed with extremely powerful torpedoes and effective torpedo defenses. Can surface to engage with strong anti-air cannons."
-Unit_Description_0368="Aircraft Carrier. Can store, transport and repair aircraft. Armed with two pairs of AA auto-cannons."
+Unit_Description_0368="Aircraft carrier. Can store, transport and repair aircraft. Armed with powerful AA auto-cannons and a tactical missile launcher. Equipped with tactical missile defense and a full sensor suite."
 
 -- SERAPHIM -- Offensive Structures
 Unit_Description_0369="Low-end defensive tower that attacks land- and sea-based units. Does not engage aircraft or submerged units."
