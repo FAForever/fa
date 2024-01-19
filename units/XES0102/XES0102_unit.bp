@@ -128,7 +128,7 @@ UnitBlueprint{
     Intel = {
         SonarRadius = 35,
         VisionRadius = 32,
-        WaterVisionRadius = 55,
+        WaterVisionRadius = 56,
     },
     LifeBarHeight = 0.075,
     LifeBarOffset = 0.7,
@@ -243,7 +243,7 @@ UnitBlueprint{
             },
             DisplayName = "Smart Charge AntiTorpedo",
             DisableWhileReloading = true,
-            FireTargetLayerCapsTable = { Water = "Sub|Water|Seabed|Land" },
+            FireTargetLayerCapsTable = { Water = "Water" },
             FiringRandomness = 0,
             FiringTolerance = 15,
             Label = "AntiTorpedo",

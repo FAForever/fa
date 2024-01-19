@@ -612,7 +612,7 @@ function WrapAndPlaceText(bp, builder, descID, control)
                                     if info.MuzzleSalvoDelay == 0 then
                                         MuzzleCount = table.getsize(Rack.MuzzleBones)
                                     end
-                                    if MuzzleCount > 1 then singleShot = false end
+                                    if MuzzleCount > 1 or info.RackFireTogether and RackCount > 1 then singleShot = false end
                                     CycleProjs = CycleProjs + MuzzleCount
 
                                     SubCycleTime = SubCycleTime + MuzzleCount * MuzzleDelays
