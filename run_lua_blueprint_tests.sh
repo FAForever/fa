@@ -55,7 +55,9 @@ run_test() {
     fi
 }
 
+pushd tests >/dev/null
 run_test "./tests/unit.spec.lua"
+popd >/dev/null
 
 if [[ $had_error != 0 ]]; then
     echo "Tests returned errors."
@@ -64,4 +66,4 @@ else
     echo "Tests OK."
 fi
 
-  echo "${lua --help}"
+echo "${lua--help}"
