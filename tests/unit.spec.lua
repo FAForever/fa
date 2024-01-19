@@ -95,7 +95,7 @@ luft.describe(
                             "Vision radius",
                             function()
                                 local visionRadiusOnGrid = math.floor(visionRadius / 2) * 2
-                                luft.expect(visionRadiusOnGrid).to.be(visionRadius)
+                                luft.expect(visionRadius).to.be(visionRadiusOnGrid)
                             end
                         )
                     end
@@ -106,7 +106,7 @@ luft.describe(
                             "Cloak field radius",
                             function()
                                 local cloakFieldRadiusOnGrid = math.floor(cloakFieldRadius / 4) * 4
-                                luft.expect(cloakFieldRadiusOnGrid).to.be(cloakFieldRadius)
+                                luft.expect(cloakFieldRadius).to.be(cloakFieldRadiusOnGrid)
                             end
                         )
                     end
@@ -117,7 +117,7 @@ luft.describe(
                             "Omni field radius",
                             function()
                                 local omniRadiusOnGrid = math.floor(omniRadius / 4) * 4
-                                luft.expect(omniRadiusOnGrid).to.be(omniRadius)
+                                luft.expect(omniRadius).to.be(omniRadiusOnGrid)
                             end
                         )
                     end
@@ -128,7 +128,7 @@ luft.describe(
                             "Radar field radius",
                             function()
                                 local radarRadiusOnGrid = math.floor(radarRadius / 4) * 4
-                                luft.expect(radarRadiusOnGrid).to.be(radarRadius)
+                                luft.expect(radarRadius).to.be(radarRadiusOnGrid)
                             end
                         )
                     end
@@ -139,7 +139,7 @@ luft.describe(
                             "Radar stealth field radius",
                             function()
                                 local radarStealthFieldRadiusOnGrid = math.floor(radarStealthFieldRadius / 4) * 4
-                                luft.expect(radarStealthFieldRadiusOnGrid).to.be(radarStealthFieldRadius)
+                                luft.expect(radarStealthFieldRadius).to.be(radarStealthFieldRadiusOnGrid)
                             end
                         )
                     end
@@ -150,7 +150,7 @@ luft.describe(
                             "Sonar field radius",
                             function()
                                 local sonarRadiusOnGrid = math.floor(sonarRadius / 4) * 4
-                                luft.expect(sonarRadiusOnGrid).to.be(sonarRadius)
+                                luft.expect(sonarRadius).to.be(sonarRadiusOnGrid)
                             end
                         )
                     end
@@ -161,7 +161,7 @@ luft.describe(
                             "Sonar stealth field radius",
                             function()
                                 local sonarStealthFieldRadiusOnGrid = math.floor(sonarStealthFieldRadius / 4) * 4
-                                luft.expect(sonarStealthFieldRadiusOnGrid).to.be(sonarStealthFieldRadius)
+                                luft.expect(sonarStealthFieldRadius).to.be(sonarStealthFieldRadiusOnGrid)
                             end
                         )
                     end
@@ -172,7 +172,7 @@ luft.describe(
                             "Water vision radius",
                             function()
                                 local waterVisionRadiusOnGrid = math.floor(waterVisionRadius / 4) * 4
-                                luft.expect(waterVisionRadiusOnGrid).to.be(waterVisionRadius)
+                                luft.expect(waterVisionRadius).to.be(waterVisionRadiusOnGrid)
                             end
                         )
                     end
