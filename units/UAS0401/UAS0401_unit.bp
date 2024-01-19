@@ -418,8 +418,8 @@ UnitBlueprint{
             DisableWhileReloading = true,
             DisplayName = "Quasar Anti Torpedo",
             FireTargetLayerCapsTable = {
-                Sub = "Sub|Water",
-                Water = "Sub|Water",
+                Sub = "Water",
+                Water = "Water",
             },
             FiringTolerance = 180,
             Label = "AntiTorpedo01",

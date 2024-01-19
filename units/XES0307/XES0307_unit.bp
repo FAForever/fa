@@ -462,7 +462,7 @@ UnitBlueprint{
             },
             DisableWhileReloading = true,
             DisplayName = "Smart Charge AntiTorpedo",
-            FireTargetLayerCapsTable = { Water = "Sub|Water|Seabed" },
+            FireTargetLayerCapsTable = { Water = "Water" },
             FiringRandomness = 0,
             FiringTolerance = 15,
             Label = "AntiTorpedo",

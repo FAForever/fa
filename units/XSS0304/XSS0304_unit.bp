@@ -288,8 +288,8 @@ UnitBlueprint{
             DisableWhileReloading = true,
             DisplayName = "Ajellu Anti-Torpedo Defense",
             FireTargetLayerCapsTable = {
-                Sub = "Seabed|Sub|Water",
-                Water = "Seabed|Sub|Water",
+                Sub = "Water",
+                Water = "Water",
             },
             FiringTolerance = 50,
             Label = "AntiTorpedoLeft",
@@ -343,8 +343,8 @@ UnitBlueprint{
             DisableWhileReloading = true,
             DisplayName = "Ajellu Anti-Torpedo Defense",
             FireTargetLayerCapsTable = {
-                Sub = "Seabed|Sub|Water",
-                Water = "Seabed|Sub|Water",
+                Sub = "Water",
+                Water = "Water",
             },
             FiringTolerance = 50,
             Label = "AntiTorpedoRight",

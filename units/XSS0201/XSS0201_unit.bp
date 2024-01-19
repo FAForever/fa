@@ -390,9 +390,8 @@ UnitBlueprint{
             DisplayName = "Ajellu Anti-Torpedo Defense",
             EffectiveRadius = 42,
             FireTargetLayerCapsTable = {
-                Seabed = "Seabed|Sub|Water",
-                Sub = "Seabed|Sub|Water",
-                Water = "Seabed|Sub|Water",
+                Sub = "Water",
+                Water = "Water",
             },
             FiringTolerance = 90,
             Label = "AntiTorpedo",
