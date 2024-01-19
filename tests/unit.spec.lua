@@ -99,6 +99,83 @@ luft.describe(
                             end
                         )
                     end
+
+                    local cloakFieldRadius = unitBlueprint.Intel.CloakFieldRadius
+                    if cloakFieldRadius and cloakFieldRadius > 0 then
+                        luft.test(
+                            "Cloak field radius",
+                            function()
+                                local cloakFieldRadiusOnGrid = math.floor(cloakFieldRadius / 4) * 4
+                                luft.expect(cloakFieldRadiusOnGrid).to.be(cloakFieldRadius)
+                            end
+                        )
+                    end
+
+                    local omniRadius = unitBlueprint.Intel.OmniRadius
+                    if omniRadius and omniRadius > 0 then
+                        luft.test(
+                            "Cloak field radius",
+                            function()
+                                local omniRadiusOnGrid = math.floor(omniRadius / 4) * 4
+                                luft.expect(omniRadiusOnGrid).to.be(omniRadius)
+                            end
+                        )
+                    end
+
+                    local radarRadius = unitBlueprint.Intel.RadarRadius
+                    if radarRadius and radarRadius > 0 then
+                        luft.test(
+                            "Cloak field radius",
+                            function()
+                                local radarRadiusOnGrid = math.floor(radarRadius / 4) * 4
+                                luft.expect(radarRadiusOnGrid).to.be(radarRadius)
+                            end
+                        )
+                    end
+
+                    local radarStealthFieldRadius = unitBlueprint.Intel.RadarStealthFieldRadius
+                    if radarStealthFieldRadius and radarStealthFieldRadius > 0 then
+                        luft.test(
+                            "Cloak field radius",
+                            function()
+                                local radarStealthFieldRadiusOnGrid = math.floor(radarStealthFieldRadius / 4) * 4
+                                luft.expect(radarStealthFieldRadiusOnGrid).to.be(radarStealthFieldRadius)
+                            end
+                        )
+                    end
+
+                    local sonarRadius = unitBlueprint.Intel.SonarRadius
+                    if sonarRadius and sonarRadius > 0 then
+                        luft.test(
+                            "Cloak field radius",
+                            function()
+                                local sonarRadiusOnGrid = math.floor(sonarRadius / 4) * 4
+                                luft.expect(sonarRadiusOnGrid).to.be(sonarRadius)
+                            end
+                        )
+                    end
+
+                    local sonarStealthFieldRadius = unitBlueprint.Intel.SonarStealthFieldRadius
+                    if sonarStealthFieldRadius and sonarStealthFieldRadius > 0 then
+                        luft.test(
+                            "Cloak field radius",
+                            function()
+                                local sonarStealthFieldRadiusOnGrid = math.floor(sonarStealthFieldRadius / 4) * 4
+                                luft.expect(sonarStealthFieldRadiusOnGrid).to.be(sonarStealthFieldRadius)
+                            end
+                        )
+                    end
+
+                    local waterVisionRadius = unitBlueprint.Intel.WaterVisionRadius
+                    if waterVisionRadius and waterVisionRadius > 0 then
+                        luft.test(
+                            "Cloak field radius",
+                            function()
+                                local waterVisionRadiusOnGrid = math.floor(waterVisionRadius / 4) * 4
+                                luft.expect(waterVisionRadiusOnGrid).to.be(waterVisionRadius)
+                            end
+                        )
+                    end
                 end
             end
         )
