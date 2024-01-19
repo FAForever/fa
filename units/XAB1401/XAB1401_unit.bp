@@ -119,7 +119,7 @@ UnitBlueprint{
         ToggleCaps = { RULEUTC_ProductionToggle = false },
         UnitName = "<LOC xab1401_name>Paragon",
     },
-    Intel = { VisionRadius = 15 },
+    Intel = { VisionRadius = 14 },
     LifeBarHeight = 0.075,
     LifeBarOffset = 3.1,
     LifeBarSize = 5.5,
