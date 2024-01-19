@@ -34,7 +34,7 @@ local stdPanel = false
 local framerateCurrent = 1
 
 ---@type number
-local framerateMax = 30
+local framerateMax = 60
 
 ---@type number[]
 local framerates = {}
