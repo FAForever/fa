@@ -32,8 +32,8 @@ local BlueprintIntelNameToOgrids = {
     RadarStealthFieldRadius = 4,
     SonarRadius = 4,
     SonarStealthFieldRadius = 4,
-    WaterVision = 4,
-    Vision = 2,
+    WaterVisionRadius = 4,
+    VisionRadius = 2,
 }
 
 local LabelToVeterancyUse = {
