@@ -53,7 +53,7 @@ local GeneratedFile = {}
 dofile("blueprints/generated-unit-blueprint-list.lua")
 
 for k, blueprintFile in ipairs(Files) do
-    dofile(blueprintFile)
+    dofile("../" .. blueprintFile)
 end
 
 local BlueprintIntelNameToOgrids = {

@@ -26,7 +26,7 @@ done
 lua_table="Files = {\n"
 
 for key in "${!lua_files[@]}"; do
-    lua_table="$lua_table \"../${lua_files[$key]}\",\n"
+    lua_table="$lua_table \"${lua_files[$key]}\",\n"
 done
 
 lua_table="$lua_table}\n"
