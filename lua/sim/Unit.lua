@@ -40,6 +40,7 @@ local UpdateAssistersConsumptionCats = categories.REPAIR - categories.INSIGNIFIC
 local DefaultTerrainType = GetTerrainType(-1, -1)
 
 local GetNearestPlayablePoint = import("/lua/scenarioframework.lua").GetNearestPlayablePoint
+local IsHumanUnit = import("/lua/scenarioframework.lua").IsHumanUnit
 
 --- Structures that are reused for performance reasons
 --- Maps unit.techCategory to a number so we can do math on it for naval units
@@ -1702,8 +1703,8 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
             energy = energy * 0.6
         end
 
-        -- Create potentially offmap wrecks on-map.
-        if EntityCategoryContains(categories.AIR, self) or self.killedInTransport then
+        -- Create potentially offmap wrecks on-map. Exclude campaign maps that may do weird scripted things.
+        if IsHumanUnit(self) and not ScenarioInfo.CampaignMode then
             pos = GetNearestPlayablePoint(pos)
         end
 
