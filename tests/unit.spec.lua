@@ -81,18 +81,23 @@ luft.describe(
     'Unit blueprints - intel radius values',
     function()
         luft.describe_each(
-            "%s - Vision radius",
+            "%s",
             BlueprintUnits,
 
             ---@param unitBlueprint UnitBlueprint
             function(unitBlueprint)
-                if unitBlueprint.Intel then
-                    local visionRadius = unitBlueprint.Intel.VisionRadius
-                    if visionRadius and visionRadius > 0 then
-                        local visionRadiusOnGrid = math.floor(visionRadius / 2) * 2
-                        luft.expect(visionRadiusOnGrid).to.be(visionRadius)
+                luft.test(
+                    "Vision radius",
+                    function()
+                        if unitBlueprint.Intel then
+                            local visionRadius = unitBlueprint.Intel.VisionRadius
+                            if visionRadius and visionRadius > 0 then
+                                local visionRadiusOnGrid = math.floor(visionRadius / 2) * 2
+                                luft.expect(visionRadiusOnGrid).to.be(visionRadius)
+                            end
+                        end
                     end
-                end
+                )
             end
         )
     end
