@@ -50,10 +50,10 @@ end
 
 ---@type { Files : string[] }
 local GeneratedFile = {}
-doscript("/tests/blueprints/generated-unit-blueprint-list.lua", GeneratedFile)
+dofile("/tests/blueprints/generated-unit-blueprint-list.lua")
 
-for k, blueprintFile in ipairs(GeneratedFile.Files) do
-    doscript(blueprintFile)
+for k, blueprintFile in ipairs(Files) do
+    dofile(blueprintFile)
 end
 
 local BlueprintIntelNameToOgrids = {
