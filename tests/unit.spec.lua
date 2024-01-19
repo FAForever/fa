@@ -97,7 +97,7 @@ luft.describe(
                             "Vision radius",
                             function()
                                 local visionRadiusOnGrid = math.floor(visionRadius / 2) * 2
-                                luft.expect(visionRadius).to.be(visionRadiusOnGrid)
+                                luft.expect(visionRadius).to.be.equal(visionRadiusOnGrid)
                             end
                         )
                     end
@@ -108,7 +108,7 @@ luft.describe(
                             "Cloak field radius",
                             function()
                                 local cloakFieldRadiusOnGrid = math.floor(cloakFieldRadius / 4) * 4
-                                luft.expect(cloakFieldRadius).to.equal(cloakFieldRadiusOnGrid)
+                                luft.expect(cloakFieldRadius).to.be.equal(cloakFieldRadiusOnGrid)
                             end
                         )
                     end
@@ -119,7 +119,7 @@ luft.describe(
                             "Omni field radius",
                             function()
                                 local omniRadiusOnGrid = math.floor(omniRadius / 4) * 4
-                                luft.expect(omniRadius).to.equal(omniRadiusOnGrid)
+                                luft.expect(omniRadius).to.be.equal(omniRadiusOnGrid)
                             end
                         )
                     end
@@ -130,7 +130,7 @@ luft.describe(
                             "Radar field radius",
                             function()
                                 local radarRadiusOnGrid = math.floor(radarRadius / 4) * 4
-                                luft.expect(radarRadius).to.equal(radarRadiusOnGrid)
+                                luft.expect(radarRadius).to.be.equal(radarRadiusOnGrid)
                             end
                         )
                     end
@@ -141,7 +141,7 @@ luft.describe(
                             "Radar stealth field radius",
                             function()
                                 local radarStealthFieldRadiusOnGrid = math.floor(radarStealthFieldRadius / 4) * 4
-                                luft.expect(radarStealthFieldRadius).to.equal(radarStealthFieldRadiusOnGrid)
+                                luft.expect(radarStealthFieldRadius).to.be.equal(radarStealthFieldRadiusOnGrid)
                             end
                         )
                     end
@@ -152,7 +152,7 @@ luft.describe(
                             "Sonar field radius",
                             function()
                                 local sonarRadiusOnGrid = math.floor(sonarRadius / 4) * 4
-                                luft.expect(sonarRadius).to.equal(sonarRadiusOnGrid)
+                                luft.expect(sonarRadius).to.be.equal(sonarRadiusOnGrid)
                             end
                         )
                     end
@@ -163,7 +163,7 @@ luft.describe(
                             "Sonar stealth field radius",
                             function()
                                 local sonarStealthFieldRadiusOnGrid = math.floor(sonarStealthFieldRadius / 4) * 4
-                                luft.expect(sonarStealthFieldRadius).to.equal(sonarStealthFieldRadiusOnGrid)
+                                luft.expect(sonarStealthFieldRadius).to.be.equal(sonarStealthFieldRadiusOnGrid)
                             end
                         )
                     end
@@ -174,7 +174,7 @@ luft.describe(
                             "Water vision radius",
                             function()
                                 local waterVisionRadiusOnGrid = math.floor(waterVisionRadius / 4) * 4
-                                luft.expect(waterVisionRadius).to.equal(waterVisionRadiusOnGrid)
+                                luft.expect(waterVisionRadius).to.be.equal(waterVisionRadiusOnGrid)
                             end
                         )
                     end
@@ -183,7 +183,7 @@ luft.describe(
                         luft.test(
                             "Unique radar and sonar radia",
                             function()
-                                luft.expect(radarRadius).to.unequal(sonarRadius)
+                                luft.expect(radarRadius).to.be.unequal(sonarRadius)
                             end
                         )
                     end
