@@ -63,3 +63,5 @@ if [[ $had_error != 0 ]]; then
 else
     echo "Tests OK."
 fi
+
+  echo "${lua --help}"
