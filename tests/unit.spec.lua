@@ -183,7 +183,7 @@ luft.describe(
                         luft.test(
                             "Unique radar and sonar radia",
                             function()
-                                luft.expect(radarRadius).to.be.unequal(sonarRadius)
+                                luft.expect(radarRadius)["to.not"].equal(sonarRadius)
                             end
                         )
                     end
