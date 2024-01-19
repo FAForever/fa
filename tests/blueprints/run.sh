@@ -47,12 +47,12 @@ run_test() {
     output="$(lua "$file" 2>&1 |
         sed "s:/dev/fd/[0-9]\+:$file:g")"
 
-if [[ $output != "" ]]; then
-    echo "$output" >/dev/fd/2
-    if [[ "$output" == *"FAIL"* || "$output" == *"stack traceback"* ]]; then
-        had_error=1
+    if [[ $output != "" ]]; then
+        echo "$output" >/dev/fd/2
+        if [[ "$output" == *"FAIL"* || "$output" == *"stack traceback"* ]]; then
+            had_error=1
+        fi
     fi
-fi
 }
 
 run_test "./tests/blueprints/unit.spec.lua"
