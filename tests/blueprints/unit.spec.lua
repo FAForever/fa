@@ -21,7 +21,7 @@
 --******************************************************************************************************
 
 ---@type Luft
-local luft = require "../luft.lua"
+local luft = require "luft"
 
 ---@type UnitBlueprint[]
 local BlueprintUnits = {}
