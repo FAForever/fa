@@ -24,21 +24,43 @@ local UIUtil = import("/lua/ui/uiutil.lua")
 local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
 local Statistics = import("/lua/shared/statistics.lua")
 
+---@type Control | false
 local fps = false
 
+---@type Control | false
+local stdPanel = false
+
+---@type number
 local framerateCurrent = 1
+
+---@type number
 local framerateMax = 30
+
+---@type number[]
 local framerates = {}
 for k = 1, framerateMax do
     framerates[k] = 0
 end
 
+---@type number
+local updateTimer = 0
+
+---@type number
+local updateInterval = 0.25
+
 function ShowFPS()
-    if fps then
-        fps:Destroy()
-        stdPanel:Destroy()
-        fps = false
-        showFPS = false
+    -- act as a toggle
+    if fps or stdPanel then
+        if fps then
+            fps:Destroy()
+            fps = false
+        end
+
+        if stdPanel then
+            stdPanel:Destroy()
+            stdPanel = false
+        end
+
         return
     end
 
@@ -51,28 +73,19 @@ function ShowFPS()
     LayoutHelpers.AtRightTopIn(fps, GetFrame(0), 495, 0)
 
     stdPanel = UIUtil.CreateText(GetFrame(0), '', 12)
-	stdPanel:SetColor('ffffff')
-	stdPanel:SetFont(UIUtil.fixedFont, 12)
-	stdPanel:SetDropShadow(true)
-	stdPanel:DisableHitTest()
-	stdPanel.Depth:Set(GetFrame(0):GetTopmostDepth() + 1)
-	LayoutHelpers.AtRightTopIn(stdPanel, GetFrame(0), 425, 0)
-
-    local updateTimer = 0
-    local updateInterval = 0.25
+    stdPanel:SetColor('ffffff')
+    stdPanel:SetFont(UIUtil.fixedFont, 12)
+    stdPanel:SetDropShadow(true)
+    stdPanel:DisableHitTest()
+    stdPanel.Depth:Set(GetFrame(0):GetTopmostDepth() + 1)
+    LayoutHelpers.AtRightTopIn(stdPanel, GetFrame(0), 425, 0)
 
     fps:SetNeedsFrameUpdate(true)
     fps.OnFrame = function(self, deltatime)
-        updateTimer = updateTimer + deltatime
-        if updateTimer < updateInterval then
-			return
-		end
-
-        updateTimer = updateTimer - updateInterval
-
-        for key, val in __EngineStats.Children do
+        -- update fps values consistently
+        for _, val in __EngineStats.Children do
             if val.Name == 'Frame' then
-                for childKey, childVal in val.Children do
+                for _, childVal in val.Children do
                     if childVal.Name == 'FPS' then
 
                         framerates[framerateCurrent] = childVal.Value
@@ -80,17 +93,23 @@ function ShowFPS()
                         if framerateCurrent > framerateMax then
                             framerateCurrent = 1
                         end
-
-                        local mean = Statistics.Mean(framerates, framerateMax)
-                        local std = Statistics.Deviation(framerates, framerateMax, mean)
-
-                        self:SetText(string.format("FPS: %03.0f", mean))
-                        stdPanel:SetText(string.format("(σ %07.02f)", std))
                         break
                     end
                 end
                 break
             end
+        end
+
+        -- update text in an interval to make it easier to read
+        updateTimer = updateTimer + deltatime
+        if updateTimer > updateInterval then
+            updateTimer = updateTimer - updateInterval
+
+            local mean = Statistics.Mean(framerates, framerateMax)
+            local std = Statistics.Deviation(framerates, framerateMax, mean)
+
+            self:SetText(string.format("FPS: %03.0f", mean))
+            stdPanel:SetText(string.format("(σ %07.02f)", std))
         end
     end
 end
@@ -99,5 +118,9 @@ end
 function __moduleinfo.OnDirty()
     if fps then
         fps:Destroy()
+    end
+
+    if stdPanel then
+        stdPanel:Destroy()
     end
 end
