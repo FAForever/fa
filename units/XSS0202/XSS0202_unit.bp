@@ -126,9 +126,9 @@ UnitBlueprint{
         UnitName = "<LOC xss0202_name>Ithalua",
     },
     Intel = {
-        RadarRadius = 150,
+        RadarRadius = 148,
         SonarRadius = 120,
-        VisionRadius = 65,
+        VisionRadius = 64,
         WaterVisionRadius = 60,
     },
     LifeBarHeight = 0.075,

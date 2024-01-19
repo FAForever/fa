@@ -157,7 +157,7 @@ UnitBlueprint{
         UnitName = "<LOC xsa0204_name>Uosioz",
     },
     Intel = {
-        SonarRadius = 45,
+        SonarRadius = 44,
         VisionRadius = 32,
     },
     LifeBarHeight = 0.075,
