@@ -1,5 +1,5 @@
 --******************************************************************************************************
---** Copyright (c) 2022  Willem 'Jip' Wijnia
+--** Copyright (c) 2024 FAForever
 --**
 --** Permission is hereby granted, free of charge, to any person obtaining a copy
 --** of this software and associated documentation files (the "Software"), to deal
@@ -47,27 +47,10 @@ end
 
 -------------------------------------------------------------------------------
 
----@param directory string
----@return string[]
-function DiskFindFiles(directory)
-    local i, t, popen = 0, {}, io.popen
-    local pfile = popen('ls -a "' .. directory .. '"')
-    if (pfile) then
-        for filename in pfile:lines() do
-            if string.sub(filename, -4) == '.lua' then
-                i = i + 1
-                t[i] = filename
-            end
-        end
+---@type { Files : string[] }
+local GeneratedFile = {}
+doscript("/tests/blueprints/generated-unit-blueprint-list.lua", GeneratedFile)
 
-        pfile:close()
-    end
-    return t
-end
-
----@type string[]
-local blueprintFiles = DiskFindFiles('../units')
-
-for k, blueprintFile in ipairs(blueprintFiles) do
+for k, blueprintFile in ipairs(GeneratedFile.Files) do
     io.output(blueprintFile)
 end

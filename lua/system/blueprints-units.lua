@@ -617,7 +617,7 @@ function PostProcessUnitWithExternalFactory(allBlueprints, unit)
 end
 
 ---@param unit UnitBlueprint
-function CheckIntelValues(unit)
+function TestIntelValues(unit)
 
     ---------------------------------------------------------------------------
     --#region Sanity check for intel values
@@ -657,7 +657,7 @@ function PostProcessUnits(allBlueprints, units)
     end
 
     for _, unit in units do
-        CheckIntelValues(unit)
+        TestIntelValues(unit)
     end
 
     for _, unit in units do
