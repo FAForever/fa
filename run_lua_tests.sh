@@ -9,11 +9,11 @@ tests_complete=0
 run_test() {
   file="$1"
 
-  output="$(lua "$file" 2>&1 \
-    | sed "s:/dev/fd/[0-9]\+:$file:g")"
+  output="$(lua "$file" 2>&1 |
+    sed "s:/dev/fd/[0-9]\+:$file:g")"
 
   if [[ $output != "" ]]; then
-    echo "$output" > /dev/fd/2
+    echo "$output" >/dev/fd/2
     if [[ "$output" == *"FAIL"* ]]; then
       had_error=1
     fi
@@ -26,13 +26,15 @@ while read file; do
   # exclude the unit tester module
   if [ "$file" != "./lust.lua" ]; then
     run_test "$file"
-    ((tests_complete ++))
+    ((tests_complete++))
   fi
 done < <(find . -name '*.lua')
 popd >/dev/null
 
 # run the tests that apply to unit blueprints
 source ./tests/blueprints/run.sh
+run_test "./tests/blueprints/unit.spec.lua"
+((tests_complete++))
 
 echo "Ran $tests_complete tests"
 
