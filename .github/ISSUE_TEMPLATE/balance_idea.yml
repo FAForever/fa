@@ -1,0 +1,34 @@
+name: Balance Idea
+description: Suggest a balance change for the game.
+title: "[Balance Idea]: "
+labels: ["area: balance idea"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for suggesting a balance change for the game! Please fill out the following clearly when sudjesting a chnage.
+  - type: input
+    id: Contact
+    attributes:
+      label: Contact Details
+      description: What is your FAF/Discord Username?
+      value: ""
+      required: false
+  - type: textarea
+    id: Description
+    attributes:
+      label: Description
+      description: What is the change you are suggesting?
+      value: ""
+      required: true
+  - type: textarea
+    id: Reason
+    attributes:
+      label: Reason
+      description: Why are you suggesting this change?
+      value: ""
+      required: true
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for suggesting your balance idea. The balance team will review your suggestion and get back to you as soon as possible.
