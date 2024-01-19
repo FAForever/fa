@@ -91,6 +91,20 @@ luft.describe(
             function(name, unitBlueprintPacked)
                 local unitBlueprint = unpack(unitBlueprintPacked)
                 if unitBlueprint.Intel then
+
+                    -----------------------------------------------------------
+                    --#region Intel radius matches intel grid
+
+                    -- The game uses a grid to keep track of the intel of an
+                    -- army. The grid is coarse, for vision each cell takes up
+                    -- 2 ogrids and for all other intel it is 4 ogrids. As a 
+                    -- result a unit with 28, 29, 30, or 31 radar range will 
+                    -- practically see the same units but visually to the player
+                    -- it appears larger.
+
+                    -- You can use the console command 'dbg Radar' to see the
+                    -- intel grid.
+
                     local visionRadius = unitBlueprint.Intel.VisionRadius
                     if visionRadius and visionRadius > 0 then
                         luft.test(
@@ -179,6 +193,13 @@ luft.describe(
                         )
                     end
 
+                    -----------------------------------------------------------
+                    --#region Unique radia
+
+                    -- Range rings may render on top of each other. When that
+                    -- happens one or more range rings are visually hidden from
+                    -- the user. In this section we prevent that.
+
                     if radarRadius and sonarRadius then
                         luft.test(
                             "Unique radar and sonar radia",
@@ -187,6 +208,62 @@ luft.describe(
                             end
                         )
                     end
+
+                    if radarRadius and sonarStealthFieldRadius then
+                        luft.test(
+                            "Unique radar and sonar stealth field radia",
+                            function()
+                                luft.expect(radarRadius)["to.not"].equal(sonarStealthFieldRadius)
+                            end
+                        )
+                    end
+
+                    if radarRadius and radarStealthFieldRadius then
+                        luft.test(
+                            "Unique radar and radar stealth field radia",
+                            function()
+                                luft.expect(radarRadius)["to.not"].equal(radarStealthFieldRadius)
+                            end
+                        )
+                    end
+
+                    if radarRadius and cloakFieldRadius then
+                        luft.test(
+                            "Unique radar and cloak field radia",
+                            function()
+                                luft.expect(radarRadius)["to.not"].equal(cloakFieldRadius)
+                            end
+                        )
+                    end
+
+                    if sonarRadius and sonarStealthFieldRadius then
+                        luft.test(
+                            "Unique sonar and sonar stealth field radia",
+                            function()
+                                luft.expect(sonarRadius)["to.not"].equal(sonarStealthFieldRadius)
+                            end
+                        )
+                    end
+
+                    if sonarRadius and radarStealthFieldRadius then
+                        luft.test(
+                            "Unique sonar and radar stealth field radia",
+                            function()
+                                luft.expect(sonarRadius)["to.not"].equal(radarStealthFieldRadius)
+                            end
+                        )
+                    end
+
+                    if sonarRadius and cloakFieldRadius then
+                        luft.test(
+                            "Unique sonar and cloak field radia",
+                            function()
+                                luft.expect(sonarRadius)["to.not"].equal(cloakFieldRadius)
+                            end
+                        )
+                    end
+
+                    --#endregion
                 end
             end
         )
