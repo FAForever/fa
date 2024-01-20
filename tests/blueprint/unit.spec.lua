@@ -274,7 +274,7 @@ luft.describe(
                                         local firingInterval = 10 / rateOfFire
 
                                         luft.expect(rateOfFire)["to.not"].equal(0)
-                                        luft.expect(1/firingInterval).to.be.close.to(1/math.floor(firingInterval + 0.5))
+                                        luft.expect(10 * firingInterval).to.be.close.to(10 * math.floor(firingInterval + 0.5))
                                     end
                                 )
                             end
