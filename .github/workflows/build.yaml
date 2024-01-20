@@ -1,6 +1,6 @@
 name: Build
 
-on: [pull_request]
+on: [push]
 
 jobs:
   syntax:
@@ -28,6 +28,11 @@ jobs:
         run: apk add bash git findutils
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            *.sh
+            *.lua
+            *.bp
       - name: Run Lua tests
         run: "bash ./run_lua_tests.sh"
   testUnits:
@@ -39,5 +44,10 @@ jobs:
         run: apk add bash git findutils
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            *.sh
+            *.lua
+            *.bp
       - name: Run Lua tests
         run: "bash ./run_lua_blueprint_tests.sh"
