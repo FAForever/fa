@@ -52,7 +52,7 @@ run_test() {
 
     if [[ $output != "" ]]; then
         echo "$output" >/dev/fd/2
-        if [[ "$output" == *"FAIL"* || "$output" == *"stack traceback"* ]]; then
+        if [[ "$output" == *"FAIL"* || "$output" == *"lua:"* ]]; then
             had_error=1
         fi
     fi
