@@ -131,7 +131,11 @@ TIFMissileNukeCDR = ClassProjectile(TIFTacticalNuke) {
             marker:UpdateDuration(9)
             marker:UpdateIntel(self.Army, 12, 'Vision', true)
 
-            TIFTacticalNuke.OnImpact(self, targetType, targetEntity)
+            if EntityCategoryContains(categories.AEON * categories.PROJECTILE * categories.ANTIMISSILE, targetEntity) then
+                self:Destroy()
+            else
+                TIFTacticalNuke.OnImpact(self, targetType, targetEntity)
+            end
         else
             -- default tactical explosion
             self:CreateDebris()
