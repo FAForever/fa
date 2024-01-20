@@ -52,15 +52,13 @@ run_test() {
 
     if [[ $output != "" ]]; then
         echo "$output" >/dev/fd/2
-        if [[ "$output" == *"FAIL"* || "$output" == *"stack traceback"* ]]; then
+        if [[ "$output" == *"FAIL"* || "$output" == *"lua:"* ]]; then
             had_error=1
         fi
     fi
 }
 
-pushd tests >/dev/null
-run_test "./unit.spec.lua"
-popd >/dev/null
+run_test "./tests/blueprint/unit.spec.lua"
 
 if [[ $had_error != 0 ]]; then
     echo "Tests returned errors."

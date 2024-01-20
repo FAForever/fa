@@ -13,19 +13,15 @@ run_test() {
 
   if [[ $output != "" ]]; then
     echo "$output" >/dev/fd/2
-    if [[ "$output" == *"FAIL"* || "$output" == *"stack traceback"* ]]; then
+    if [[ "$output" == *"FAIL"* || "$output" == *"lua:"* ]]; then
       had_error=1
     fi
   fi
 }
 
 # make sure the test files run in the tests directory
-pushd tests >/dev/null
-
-run_test "test_colors.lua"
-run_test "test_utils.lua"
-
-popd >/dev/null
+run_test "./tests/utility/color.spec.lua"
+run_test "./tests/utility/string.spec.lua"
 
 if [[ $had_error != 0 ]]; then
   echo "Tests returned errors."

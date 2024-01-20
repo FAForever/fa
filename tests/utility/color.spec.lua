@@ -2,20 +2,21 @@
 --** Shared under the MIT license
 --**************************************************************************************************
 
-local luft = require "luft"
+local luft = require "./tests/packages/luft"
 
 -- color library
-dofile "../lua/shared/color.lua"
+dofile "./lua/shared/color.lua"
 
 local function hueShuffle(hue, a, b, c)
-        if 0 <= hue and hue < 1 then  return a, b, c
-    elseif 1 <= hue and hue < 2 then  return b, a, c
-    elseif 2 <= hue and hue < 3 then  return c, a, b
-    elseif 3 <= hue and hue < 4 then  return c, b, a
-    elseif 4 <= hue and hue < 5 then  return b, c, a
-    elseif 5 <= hue and hue <=6 then  return a, c, b
+    if 0 <= hue and hue < 1 then return a, b, c
+    elseif 1 <= hue and hue < 2 then return b, a, c
+    elseif 2 <= hue and hue < 3 then return c, a, b
+    elseif 3 <= hue and hue < 4 then return c, b, a
+    elseif 4 <= hue and hue < 5 then return b, c, a
+    elseif 5 <= hue and hue <= 6 then return a, c, b
     end
 end
+
 local function HCItoRGB(hue, chroma, intensity)
     hue = hue * 6
     local secondary = chroma * (1 - math.abs(math.mod(hue, 2) - 1))
@@ -27,12 +28,12 @@ local function HSVtoRGBsimp(hue, sat, val)
     local intensity = val - chroma
     return HCItoRGB(hue, chroma, intensity)
 end
+
 local function HSLtoRGBsimp(hue, sat, lit)
     local chroma = sat * (1 - math.abs(2 * lit - 1))
     local intensity = lit - chroma / 2
     return HCItoRGB(hue, chroma, intensity)
 end
-
 
 local function RGBtoHVC(r, g, b)
     local hue = 0
@@ -41,9 +42,9 @@ local function RGBtoHVC(r, g, b)
     if chroma ~= 0 then
         -- order matters here, probably
         if false then
-            elseif value == r then  hue = 0 + (g - b) / chroma
-            elseif value == g then  hue = 2 + (b - r) / chroma
-            elseif value == b then  hue = 4 + (r - g) / chroma
+        elseif value == r then hue = 0 + (g - b) / chroma
+        elseif value == g then hue = 2 + (b - r) / chroma
+        elseif value == b then hue = 4 + (r - g) / chroma
         end
         if hue < 0 then
             hue = hue + 6
@@ -63,6 +64,7 @@ local function RGBtoHSVsimp(r, g, b)
     end
     return hue, sat, value
 end
+
 local function RGBtoHSLsimp(r, g, b)
     local hue, value, chroma = RGBtoHVC(r, g, b)
     local lit = value - chroma / 2
@@ -73,7 +75,6 @@ local function RGBtoHSLsimp(r, g, b)
     return hue, sat, lit
 end
 
-
 local function HSVtoHSLsimp(h, s, v)
     local lit = v * (1 - s / 2)
     local sat = 0
@@ -82,6 +83,7 @@ local function HSVtoHSLsimp(h, s, v)
     end
     return h, sat, lit
 end
+
 local function HSLtoHSVsimp(h, s, l)
     local val = l + s * math.min(l, 1 - l)
     local sat = 0
@@ -91,70 +93,69 @@ local function HSLtoHSVsimp(h, s, l)
     return h, sat, val
 end
 
-
 luft.describe("Color functions", function()
     local colorConversions = {
-        HSV = {RGBtoHSVsimp, HSVtoRGBsimp, RGBtoHSV, HSVtoRGB},
-        HSL = {RGBtoHSLsimp, HSLtoRGBsimp, RGBtoHSL, HSLtoRGB},
+        HSV = { RGBtoHSVsimp, HSVtoRGBsimp, RGBtoHSV, HSVtoRGB },
+        HSL = { RGBtoHSLsimp, HSLtoRGBsimp, RGBtoHSL, HSLtoRGB },
     }
     local testColors = {
-    --    R    G    B                subtest
-        {0.0, 0.0, 0.0},              -- 1
-        {0.1635, 0.0, 0.0},           -- 2
-        {0.2, 0.0, 0.0},              -- 3
-        {0.36543256, 0.0, 0.0},       -- 4
-        {0.7, 0.0, 0.0},              -- 5
-        {1.0, 0.0, 0.0},              -- 6
-        {1.0, 0.93278, 0.0},          -- 7
-        {1.0, 0.7, 0.0},              -- 8
-        {1.0, 0.5, 0.0},              -- 9
-        {1.0, 0.49, 0.0},             -- 10
-        {1.0, 0.3, 0.0},              -- 11
-        {1.0, 0.219, 0.0},            -- 12
-        {1.0, 0.218, 0.0},            -- 13
-        {1.0, 0.21799999475479, 0.0}, -- 14
-        {1.0, 0.21799898147583, 0.0}, -- 15
-        {1.0, 0.199, 0.0},            -- 16
-        {1.0, 0.2, 0.0},              -- 17
-        {1.0, 0.1, 0.0},              -- 18
-        {1.0, 1.0, 0.0},              -- 19
-        {0.5, 1.0, 0.0},              -- 20
-        {0.0, 1.0, 0.0},              -- 21
-        {0.0, 1.0, 0.4},              -- 22
-        {0.0, 1.0, 1.0},              -- 23
-        {0.0, 0.9, 1.0},              -- 24
-        {0.0, 0.0, 1.0},              -- 25
-        {0.5, 0.0, 1.0},              -- 26
-        {1.0, 0.0, 1.0},              -- 27
-        {1.0, 1.0, 1.0},              -- 28
+        --    R    G    B                subtest
+        { 0.0, 0.0, 0.0 }, -- 1
+        { 0.1635, 0.0, 0.0 }, -- 2
+        { 0.2, 0.0, 0.0 }, -- 3
+        { 0.36543256, 0.0, 0.0 }, -- 4
+        { 0.7, 0.0, 0.0 }, -- 5
+        { 1.0, 0.0, 0.0 }, -- 6
+        { 1.0, 0.93278, 0.0 }, -- 7
+        { 1.0, 0.7, 0.0 }, -- 8
+        { 1.0, 0.5, 0.0 }, -- 9
+        { 1.0, 0.49, 0.0 }, -- 10
+        { 1.0, 0.3, 0.0 }, -- 11
+        { 1.0, 0.219, 0.0 }, -- 12
+        { 1.0, 0.218, 0.0 }, -- 13
+        { 1.0, 0.21799999475479, 0.0 }, -- 14
+        { 1.0, 0.21799898147583, 0.0 }, -- 15
+        { 1.0, 0.199, 0.0 }, -- 16
+        { 1.0, 0.2, 0.0 }, -- 17
+        { 1.0, 0.1, 0.0 }, -- 18
+        { 1.0, 1.0, 0.0 }, -- 19
+        { 0.5, 1.0, 0.0 }, -- 20
+        { 0.0, 1.0, 0.0 }, -- 21
+        { 0.0, 1.0, 0.4 }, -- 22
+        { 0.0, 1.0, 1.0 }, -- 23
+        { 0.0, 0.9, 1.0 }, -- 24
+        { 0.0, 0.0, 1.0 }, -- 25
+        { 0.5, 0.0, 1.0 }, -- 26
+        { 1.0, 0.0, 1.0 }, -- 27
+        { 1.0, 1.0, 1.0 }, -- 28
 
-        {0.6, 0.6, 0.6},              -- 29
-        {0.3, 0.2, 0.0},              -- 30
-        {1.0, 0.2, 0.0},              -- 31
-        {1.0, 0.7, 0.2},              -- 32
-        {1.0, 1.0, 0.2},              -- 33
-        {0.5, 1.0, 0.2},              -- 34
-        {0.2, 1.0, 0.2},              -- 35
-        {0.2, 1.0, 0.4},              -- 36
-        {0.2, 1.0, 1.0},              -- 37
-        {0.2, 0.9, 1.0},              -- 38
-        {0.2, 0.0, 1.0},              -- 39
-        {0.5, 0.2, 1.0},              -- 40
-        {1.0, 0.2, 1.0},              -- 41
-        {1.0, 1.0, 1.0},              -- 42
+        { 0.6, 0.6, 0.6 }, -- 29
+        { 0.3, 0.2, 0.0 }, -- 30
+        { 1.0, 0.2, 0.0 }, -- 31
+        { 1.0, 0.7, 0.2 }, -- 32
+        { 1.0, 1.0, 0.2 }, -- 33
+        { 0.5, 1.0, 0.2 }, -- 34
+        { 0.2, 1.0, 0.2 }, -- 35
+        { 0.2, 1.0, 0.4 }, -- 36
+        { 0.2, 1.0, 1.0 }, -- 37
+        { 0.2, 0.9, 1.0 }, -- 38
+        { 0.2, 0.0, 1.0 }, -- 39
+        { 0.5, 0.2, 1.0 }, -- 40
+        { 1.0, 0.2, 1.0 }, -- 41
+        { 1.0, 1.0, 1.0 }, -- 42
 
-        {2, 2, 3},
-        {242, 64, 4},
-        {23, 54, 124},
-        {123, 4, 144},
-        {201, 194, 95},
-        {255, 255, 255},
-        {255, 255, 0},
-        {255, 0, 255},
-        {0, 255, 255},
-        {0, 0, 255},
-        {0, 255, 0},
-        {255, 0, 0},
+        { 2, 2, 3 },
+        { 242, 64, 4 },
+        { 23, 54, 124 },
+        { 123, 4, 144 },
+        { 201, 194, 95 },
+        { 255, 255, 255 },
+        { 255, 255, 0 },
+        { 255, 0, 255 },
+        { 0, 255, 255 },
+        { 0, 0, 255 },
+        { 0, 255, 0 },
+        { 255, 0, 0 },
     }
     luft.margin_of_error = 0.00000029
     luft.describe_each("%s to RGB", colorConversions, function(name, fnSet)

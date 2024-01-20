@@ -1,4 +1,4 @@
-name: Build
+name: Test
 
 on: [push]
 
@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     container: faforever/lua:v5.0-1
     steps:
-      - name: Install utilities
+      - name: Install tooling
         run: apk add bash git findutils
       - name: Checkout code
         uses: actions/checkout@v4
@@ -18,13 +18,13 @@ jobs:
             *.lua
             *.bp
       - name: Check Lua syntax
-        run: "bash ./run_lua_syntax_checker.sh"
+        run: "bash ./tests/run-syntax-test.sh"
   tests:
-    name: Tests
+    name: Utility tests
     runs-on: ubuntu-latest
     container: faforever/lua:v5.0-1
     steps:
-      - name: Install utilities
+      - name: Install tooling
         run: apk add bash git findutils
       - name: Checkout code
         uses: actions/checkout@v4
@@ -34,13 +34,13 @@ jobs:
             *.lua
             *.bp
       - name: Run Lua tests
-        run: "bash ./run_lua_tests.sh"
+        run: "bash ./tests/run-utility-tests.sh"
   testUnits:
-    name: Sanity check on unit blueprints
+    name: Blueprint tests
     runs-on: ubuntu-latest
     container: faforever/lua:v5.0-1
     steps:
-      - name: Install utilities
+      - name: Install tooling
         run: apk add bash git findutils
       - name: Checkout code
         uses: actions/checkout@v4
@@ -50,4 +50,4 @@ jobs:
             *.lua
             *.bp
       - name: Run Lua tests
-        run: "bash ./run_lua_blueprint_tests.sh"
+        run: "bash ./tests/run-blueprint-tests.sh"

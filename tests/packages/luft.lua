@@ -9,7 +9,7 @@
 --**************************************************************************************************
 
 -- Useful for better test output
-require "../lua/system/repr.lua"
+require "./lua/system/repr.lua"
 
 ---@class Luft
 ---@field print fun(...)      printer used by the `out` function family
@@ -70,41 +70,41 @@ Luft.strings = {
     fail = "FAIL",
     bad_argument_count = "expected %s arguments, but got %s", -- expected args, actual args
     subtest_fail = "%s %s, subtest %s, assertion %s:", -- result indicator, test name, subtest name, expect number
-    test_fail = "%s %s, assertion %s:",                -- result indicator, test name, expect number
-    test_success = "%s %s",                           -- result indicator, test name
+    test_fail = "%s %s, assertion %s:", -- result indicator, test name, expect number
+    test_success = "%s %s", -- result indicator, test name
     unknown_error = "unknown error",
     support_required = "expected support values",
     condition_unnegated = "to",
-    condition_negated =   "to not",
-    type_nil =      "nil",
-    type_nonnil =   "non-nil",
-    type_truthy =   "truthy",
-    type_falsy =    "falsy",
-    type_boolean =  "a boolean",
-    type_number =   "a number",
-    type_integer =  "an integer",
-    type_float =    "a float",
-    type_string =   "a string",
+    condition_negated = "to not",
+    type_nil = "nil",
+    type_nonnil = "non-nil",
+    type_truthy = "truthy",
+    type_falsy = "falsy",
+    type_boolean = "a boolean",
+    type_number = "a number",
+    type_integer = "an integer",
+    type_float = "a float",
+    type_string = "a string",
     type_function = "a function",
     type_userdata = "userdata",
-    type_table =    "a table",
-    type_positive =    "positive",
+    type_table = "a table",
+    type_positive = "positive",
     type_nonpositive = "non-positive",
-    type_negative =    "negative",
+    type_negative = "negative",
     type_nonnegative = "non-negative",
     cond_exist = "exist",
-    cond_an = "an %s",  -- type
+    cond_an = "an %s", -- type
     cond_equal = "equal",
     cond_unequal = "unequal",
     cond_succeed = "succeed",
     cond_fail = "fail",
     cond_strict_eq = "exactly equal",
-    cond_contains = "contain %s",    -- contained
+    cond_contains = "contain %s", -- contained
     cond_within = "within %s of %s", -- error, target
-    expectation1 =   "expected %s %s %s",            -- value, state condition, expected
-    expectation1be = "expected %s %s be %s",         -- value, state condition, expected
-    expectation2 =   "expected %s and %s %s %s",     -- value1, value2, state condition, expected
-    expectation2be = "expected %s and %s %s be %s",  -- value1, value2, state condition, expected
+    expectation1 = "expected %s %s %s", -- value, state condition, expected
+    expectation1be = "expected %s %s be %s", -- value, state condition, expected
+    expectation2 = "expected %s and %s %s %s", -- value1, value2, state condition, expected
+    expectation2be = "expected %s and %s %s be %s", -- value1, value2, state condition, expected
 }
 Luft.modules_ran = 0
 Luft.total_module_errors = 0
@@ -189,6 +189,7 @@ local function addTo(augend, addand, merge)
         augend[key] = val
     end
 end
+
 addTo(Luft, env)
 
 
@@ -303,6 +304,7 @@ end
 function Luft.out(...)
     return Luft.print(Luft.indentation .. table.concat(arg, '\t'))
 end
+
 --- Formats arguments and prints them to the testing unit's printer using its indentation system.
 --- Convenience for `Luft.out(formatter:format(...))`
 ---@param formatter string
@@ -311,7 +313,6 @@ function Luft.outf(formatter, ...)
     return Luft.out(formatter:format(unpack(arg)))
 end
 
-
 --- Prints to the testing unit's printer using its indentation system in a specified color.
 --- Convenience for `Luft.out(Luft.string_color(col, str))`.
 ---@param col string
@@ -319,6 +320,7 @@ end
 function Luft.outc(col, str)
     return Luft.out(Luft.string_color(col, str))
 end
+
 --- Formats arguments and prints them to the testing unit's printer using its indentation system in
 --- a specified color.
 --- Convenience for `Luft.out(Luft.string_color(col, formatter:format(...)))`.
@@ -328,7 +330,6 @@ end
 function Luft.outcf(col, formatter, ...)
     return Luft.out(Luft.string_color(col, formatter:format(unpack(arg))))
 end
-
 
 ---@overload fun(...)
 --- Prints to the testing unit's printer using its indentation system with a specified indentation
@@ -343,6 +344,7 @@ function Luft.indent_out(amt, ...)
         return Luft.indent(1, Luft.out, amt, unpack(arg))
     end
 end
+
 ---@overload fun(formatter: string, ...)
 --- Formats arguments and prints them to the testing unit's printer using its indentation system
 --- with a specified indentation change (defaulting to `1`).
@@ -358,7 +360,6 @@ function Luft.indent_outf(amt, formatter, ...)
     end
 end
 
-
 ---@overload fun(col: string, str: string)
 --- Prints to the testing unit's printer using its indentation system with a specified indentation
 --- change (defaulting to `1`) and col.
@@ -373,6 +374,7 @@ function Luft.indent_outc(amt, col, str)
         return Luft.indent_out(1, Luft.string_color(amt, col))
     end
 end
+
 ---@overload fun(col: string, formatter: string, ...)
 --- Formats arguments and prints them to the testing unit's printer using its indentation system
 --- with a specified indentation change (defaulting to `1`).
@@ -387,7 +389,6 @@ function Luft.indent_outcf(amt, col, formatter, ...)
         return Luft.indent_outc(1, amt, amt:format(formatter, unpack(arg)))
     end
 end
-
 
 ---@param name string
 ---@param expect number
@@ -561,7 +562,6 @@ function Luft.after(fn)
     return Luft
 end
 
-
 ------------------------------
 -- Assertions
 ------------------------------
@@ -632,7 +632,6 @@ function Assertion:GetCurrentNode()
     return self.head or PathNode.Nodes.root
 end
 
-
 ---@param test fun(...): boolean, string
 ---@param args? any[]
 ---@return number numArgs
@@ -648,9 +647,9 @@ function Assertion:CallEach(test, args)
     local argCount = 0
 
     local lists, iterators = {}, {}
-    if values then   table.insert(lists, values)   end
-    if args then     table.insert(lists, args)     end
-    if support then  table.insert(lists, support)  end
+    if values then table.insert(lists, values) end
+    if args then table.insert(lists, args) end
+    if support then table.insert(lists, support) end
 
     local eachn
     -- find the number of times we will be iterating
@@ -712,7 +711,7 @@ function Assertion:CallEach(test, args)
                     for j = 2, list.n do
                         rep = rep .. ", " .. repru(list[j])
                     end
-                    arguments[iterators[k]] = '{' .. rep .. '}'
+                    arguments[ iterators[k] ] = '{' .. rep .. '}'
                 end
             end
             for j = 1, argCount do
@@ -782,7 +781,6 @@ function PathNode:GetNext(word)
     return self.Nodes[word]
 end
 
-
 do
     local nodes = PathNode.Nodes
     local strings = Luft.strings
@@ -812,7 +810,7 @@ do
     end
 
     nodes["root"] = {
-        To = {"not", "to"},
+        To = { "not", "to" },
     }
     nodes["not"] = {
         To = "to",
@@ -820,10 +818,10 @@ do
     }
     nodes["to"] = {
         NotName = "not_to",
-        To = {"to.not", "succeed", "to.equal", "be", "have"},
+        To = { "to.not", "succeed", "to.equal", "be", "have" },
     }
     nodes["to.not"] = {
-        To = {"succeed", "to.equal", "be", "have"},
+        To = { "succeed", "to.equal", "be", "have" },
         Chain = negate,
     }
     nodes["succeed"] = {
@@ -895,13 +893,13 @@ do
     nodes["greater"] = {
         To = "than",
         Chain = function(sert)
-            sert.support = {true}
+            sert.support = { true }
         end;
     }
     nodes["less"] = {
         To = "than",
         Chain = function(sert)
-            sert.support = {false}
+            sert.support = { false }
         end;
     }
     nodes["than"] = {
@@ -947,7 +945,7 @@ do
     nodes["close"] = {
         To = "close.to",
         Chain = function(sert)
-            sert.support = {Luft.margin_of_error, n = 1}
+            sert.support = { Luft.margin_of_error, n = 1 }
         end;
     }
     nodes["close.to"] = {
@@ -1086,6 +1084,7 @@ do
         end
         from[route] = to
     end
+
     local function connectTo(from, to)
         if not to then return end
         connectVia(from, to, to.Name)
@@ -1147,6 +1146,7 @@ function Luft.spy(target, name, run)
             return tar(unpack(arg))
         end
     end
+
     spy.capture = capture
 
     if type(target) == "table" then
