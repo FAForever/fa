@@ -58,9 +58,7 @@ run_test() {
     fi
 }
 
-pushd tests >/dev/null
-run_test "./unit.spec.lua"
-popd >/dev/null
+run_test "./tests/blueprint/unit.spec.lua"
 
 if [[ $had_error != 0 ]]; then
     echo "Tests returned errors."

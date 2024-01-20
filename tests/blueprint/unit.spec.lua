@@ -24,7 +24,7 @@
 -- folder of the repository!
 
 ---@type Luft
-local luft = require "luft"
+local luft = require "/tests/packages/luft"
 
 ---@type UnitBlueprint[]
 local BlueprintUnits = {}

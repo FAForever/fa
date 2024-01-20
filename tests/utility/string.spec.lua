@@ -1,8 +1,8 @@
 -- Test framework
-local luft = require "luft"
+local luft = require "/test/packages/luft"
 
 -- Functions are imported to the global scope...
-require "../lua/system/utils.lua"
+require "/lua/system/utils.lua"
 
 luft.describe("Utils", function()
     luft.describe("StringSplit", function()
