@@ -1697,7 +1697,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         mass = mass * mass_tech_mult
 
         -- Reduce the mass value of submerged wrecks
-        if layer == 'Water' or layer == 'Sub' then
+        if layer == 'Water' or layer == 'Sub' or layer == 'Seabed' then
             mass = mass * 0.6
             energy = energy * 0.6
         end
