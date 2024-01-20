@@ -1,7 +1,10 @@
 # sanity checks on the unit blueprint files
 
 directory="./units"
-output_file="./tests/blueprints/generated-unit-blueprint-list.lua"
+
+mkdir "./tests/generated"
+
+output_file="./tests/generated/unit-blueprint-list.lua"
 
 # Check if the directory exists
 if [ ! -d "$directory" ]; then
