@@ -635,10 +635,10 @@ function _OnBeat()
         for index, scoreData in currentScores do
             for _, line in controls.armyLines do
                 if line.armyID == index then
-                    if scoreData.name then
-                        line.name:SetText(scoreData.name)
-                        updatePlayerName(line)
-                    end
+                    -- if scoreData.name then
+                    --     line.name:SetText(scoreData.name)
+                    --     updatePlayerName(line)
+                    -- end
                     if scoreData.general.score >= 0 then
                         line.score:SetText(fmtnum(scoreData.general.score))
                     end

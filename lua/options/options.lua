@@ -898,6 +898,26 @@ options = {
             },
 
             {
+                title = "<LOC options_show_player_names_title>Show Player Names",
+                key = 'options_show_player_names',
+                type = 'toggle',
+                default = 0,
+                set = function(key, value, startup)
+                    if GetCurrentUIState() == 'game' then
+                        import("/lua/ui/override/SessionClients.lua").OptionShowPlayerNames = value
+                        import("/lua/ui/override/ArmiesTable.lua").OptionShowPlayerNames = value
+                    end
+                end,
+                custom = {
+                    states = {
+                        { text = "<LOC _On>", key = 'on' },
+                        { text = "<LOC options_show_player_names_allies_only>Allies only", key = 'allies-only' },
+                        { text = "<LOC _Off>Allies only", key = 'off' },
+                    },
+                },
+            },
+
+            {
                 title = "<LOC OPTIONS_0242>Always Show Custom Names",
                 key = 'gui_render_custom_names',
                 type = 'toggle',
