@@ -1,5 +1,5 @@
 -- Test framework
-local luft = require "./test/packages/luft"
+local luft = require "./tests/packages/luft"
 
 -- Functions are imported to the global scope...
 require "./lua/system/utils.lua"

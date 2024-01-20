@@ -2,7 +2,7 @@
 --** Shared under the MIT license
 --**************************************************************************************************
 
-local luft = require "./test/packages/luft"
+local luft = require "./tests/packages/luft"
 
 -- color library
 dofile "./lua/shared/color.lua"
