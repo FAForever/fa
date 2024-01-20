@@ -119,10 +119,10 @@ UnitBlueprint{
         UnitName = "<LOC xab3301_name>Eye of Rhianne",
     },
     Intel = {
-        OmniRadius = 15,
+        OmniRadius = 16,
         ReactivateTime = 10,
         RemoteViewingRadius = 25,
-        VisionRadius = 15,
+        VisionRadius = 14,
     },
     LifeBarHeight = 0.075,
     LifeBarOffset = 0.9,

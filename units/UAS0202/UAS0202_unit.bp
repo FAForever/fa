@@ -121,9 +121,9 @@ UnitBlueprint{
         UnitName = "<LOC uas0202_name>Infinity Class",
     },
     Intel = {
-        RadarRadius = 150,
+        RadarRadius = 148,
         SonarRadius = 120,
-        VisionRadius = 65,
+        VisionRadius = 64,
         WaterVisionRadius = 60,
     },
     LifeBarHeight = 0.075,

@@ -126,7 +126,7 @@ UnitBlueprint{
         UnitName = "<LOC ual0101_name>Spirit",
     },
     Intel = {
-        RadarRadius = 50,
+        RadarRadius = 48,
         VisionRadius = 24,
     },
     LifeBarHeight = 0.075,

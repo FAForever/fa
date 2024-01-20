@@ -148,10 +148,10 @@ UnitBlueprint{
         UnitName = "<LOC xss0201_name>Uashavoh",
     },
     Intel = {
-        RadarRadius = 35,
-        SonarRadius = 37,
+        RadarRadius = 40,
+        SonarRadius = 36,
         VisionRadius = 32,
-        WaterVisionRadius = 45,
+        WaterVisionRadius = 44,
     },
     LifeBarHeight = 0.075,
     LifeBarOffset = 2.5,

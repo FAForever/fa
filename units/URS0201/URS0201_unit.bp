@@ -238,10 +238,10 @@ UnitBlueprint{
         UnitName = "<LOC urs0201_name>Salem Class",
     },
     Intel = {
-        RadarRadius = 35,
-        SonarRadius = 37,
+        RadarRadius = 36,
+        SonarRadius = 32,
         VisionRadius = 32,
-        WaterVisionRadius = 45,
+        WaterVisionRadius = 44,
     },
     LifeBarHeight = 0.075,
     LifeBarOffset = 1.8,
