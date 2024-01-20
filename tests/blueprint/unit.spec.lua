@@ -270,7 +270,7 @@ luft.describe(
                                 luft.test(
                                     "Rate of fire",
                                     function()
-                                        local actualRateOfFire = math.round(10 / rateOfFire) * 10
+                                        local actualRateOfFire = math.floor(10 / rateOfFire + 0.5) * 10
 
                                         luft.expect(rateOfFire)["to.not"].equal(0)
                                         luft.expect(rateOfFire).to.be.equal.close(actualRateOfFire)
