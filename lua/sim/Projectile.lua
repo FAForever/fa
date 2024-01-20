@@ -122,6 +122,13 @@ Projectile = ClassProjectile(ProjectileMethods) {
     OnCreate = function(self, inWater)
         local blueprint = self:GetBlueprint() --[[@as ProjectileBlueprint]]
 
+
+        LOG("GetMaxZigZag", self:GetMaxZigZag())
+        LOG("GetZigZagFrequency", self:GetZigZagFrequency())
+        LOG("GetCurrentTargetPositionXYZ ", self:GetCurrentTargetPositionXYZ())
+        LOG("GetCurrentTargetPosition", unpack(self:GetCurrentTargetPosition()))
+        self:SetNewTargetGroundXYZ (0, 0, 0)
+
         self.Blueprint = blueprint
         self.Army = self:GetArmy() --[[@as number]]
         self.Launcher = self:GetLauncher() --[[@as Unit]]
@@ -167,7 +174,7 @@ Projectile = ClassProjectile(ProjectileMethods) {
             sz = sz + offset
 
             local dx = sx * (Random() - 0.5) * fuzziness
-            local dy = (sy + offset) * (Random() - 0.5) * fuzziness + sy/2 + cy
+            local dy = (sy + offset) * (Random() - 0.5) * fuzziness + sy / 2 + cy
             local dz = sz * (Random() - 0.5) * fuzziness + cz
             local dw
 
@@ -176,19 +183,17 @@ Projectile = ClassProjectile(ProjectileMethods) {
             local ty, tz, tx, tw = unpack(target:GetOrientation())
 
             -- compute the product in a single assignment to not have to use temporary, single-use variables.
-            dw, dx, dy, dz = 
-            -tx * dx - tz * dy - ty * dz,
-             tw * dx + tz * dz - ty * dy,
-             tw * dy + ty * dx - tx * dz,
-             tw * dz + tx * dy - tz * dx
+            dw, dx, dy, dz = -tx * dx - tz * dy - ty * dz,
+                tw * dx + tz * dz - ty * dy,
+                tw * dy + ty * dx - tx * dz,
+                tw * dz + tx * dy - tz * dx
 
             tx, tz, ty = -tx, -tz, -ty
-            
+
             -- compute the product in a single assignment to not have to use temporary, single-use variables.
-            dx, dy, dz = 
-            dw * tx + dx * tw + dy * ty - dz * tz,
-            dw * tz + dy * tw + dz * tx - dx * ty,
-            dw * ty + dz * tw + dx * tz - dy * tx
+            dx, dy, dz = dw * tx + dx * tw + dy * ty - dz * tz,
+                dw * tz + dy * tw + dz * tx - dx * ty,
+                dw * ty + dz * tw + dx * tz - dy * tx
 
             local pos = { px + dx, py + dy, pz + dz }
             self:SetNewTargetGround(pos)
