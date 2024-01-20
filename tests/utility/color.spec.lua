@@ -5,7 +5,7 @@
 local luft = require "./test/packages/luft"
 
 -- color library
-dofile "/lua/shared/color.lua"
+dofile "./lua/shared/color.lua"
 
 local function hueShuffle(hue, a, b, c)
         if 0 <= hue and hue < 1 then  return a, b, c

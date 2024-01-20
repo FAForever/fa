@@ -9,7 +9,7 @@
 --**************************************************************************************************
 
 -- Useful for better test output
-require "/lua/system/repr.lua"
+require "./lua/system/repr.lua"
 
 ---@class Luft
 ---@field print fun(...)      printer used by the `out` function family
