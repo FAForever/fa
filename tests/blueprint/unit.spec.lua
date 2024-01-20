@@ -44,7 +44,7 @@ end
 ---@param bp UnitBlueprint
 function UnitBlueprint(bp)
     if bp.Description then
-        BlueprintUnits[bp.Description] = { bp }
+        BlueprintUnits[bp.Description] = bp
     end
 end
 
@@ -66,13 +66,12 @@ luft.describe(
     'Unit blueprints - intel radius values',
     function()
         luft.describe_each(
-            "%s",
+            "Unit %s",
             BlueprintUnits,
 
             ---@param name string
-            ---@param unitBlueprintPacked UnitBlueprint[]
-            function(name, unitBlueprintPacked)
-                local unitBlueprint = unpack(unitBlueprintPacked)
+            ---@param unitBlueprint UnitBlueprint
+            function(name, unitBlueprint)
                 if unitBlueprint.Intel then
 
                     -----------------------------------------------------------
@@ -247,6 +246,39 @@ luft.describe(
                     end
 
                     --#endregion
+                end
+
+                if unitBlueprint.Weapon then
+                    local weapons = {}
+                    for _, weapon in pairs(unitBlueprint.Weapon) do
+                        weapons[weapon.Label or 'unknown'] = weapon
+                    end
+
+                    luft.describe_each(
+                        "Weapon %s",
+                        weapons,
+
+                        ---@param name string
+                        ---@param weaponBlueprint WeaponBlueprint
+                        function(name, weaponBlueprint)
+                            if (weaponBlueprint.DummyWeapon) then
+                                return
+                            end
+
+                            local rateOfFire = weaponBlueprint.RateOfFire
+                            if rateOfFire then
+                                luft.test(
+                                    "Rate of fire",
+                                    function()
+                                        local actualRateOfFire = math.round(10 / rateOfFire) * 10
+
+                                        luft.expect(rateOfFire)["to.not"].equal(0)
+                                        luft.expect(rateOfFire).to.be.equal.close(actualRateOfFire)
+                                    end
+                                )
+                            end
+                        end
+                    )
                 end
             end
         )
