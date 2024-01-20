@@ -164,7 +164,7 @@ AirTransport = ClassUnit(AirUnit, BaseTransport) {
                 end
             end
             if not EntityCategoryContains(categories.COMMAND, unit) then
-                unit.willBeKilledByTransport = true
+                unit.killedInTransport = true
                 table.insert(self.cargo, unit)
             end
         end

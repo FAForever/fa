@@ -95,8 +95,9 @@ MobileUnit = ClassUnit(Unit, TreadComponent) {
     ---@param type string
     ---@param overkillRatio number
     OnKilled = function(self, instigator, type, overkillRatio)
-        if self.willBeKilledByTransport then
-            self.willBeKilledByTransport = false
+        -- OnKilled will be called a second time by the transport's OnImpact
+        if self.killedInTransport then
+            self.killedInTransport = false
         else
             UnitOnKilled(self, instigator, type, overkillRatio)
         end
