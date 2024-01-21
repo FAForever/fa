@@ -1616,16 +1616,16 @@ Unit_Description_0127="Front-loaded Mobile Artillery unit. Armed with an EMP she
 Unit_Description_0128="Mobile Anti-Air, effective against low-end enemy air units. Can target land units if there are no air units in range but at a massive penalty in accuracy."
 Unit_Description_0129="Heavy Assault Tank, designed to take large armies and fortified bases head-on."
 Unit_Description_0130="Fast, Submersible Amphibious Tank, armed with direct fire weaponry and a weak torpedo launcher."
-Unit_Description_0131="Lightly armoured Mobile Missile Launcher, designed to attack buildings at long range. Armed with missiles which split when shot by tactical missile defense systems. Out-ranges T2 Point defense."
+Unit_Description_0131="Lightly armoured Mobile Missile Launcher, designed to attack buildings at long ranges. Armed with missiles which split when intercepted by tactical missile defense systems. Out-ranges T2 Point defense."
 Unit_Description_0132="Mobile Anti-Air unit. Shoots slow moving projectiles which deal damage in a large Area-Of-Effect. Excellent against enemy gunships."
 Unit_Description_0133="Mobile Stealth Field Generator. The field is active even inside of Transports, hiding all loaded units."
-Unit_Description_0134="Extremely fast Heavy Raiding Bot which explodes in an EMP blast. Equipped with a tactical missile deflection field."
+Unit_Description_0134="Extremely fast Heavy Raiding Bot which explodes in an EMP blast when detroyed. Equipped with a tactical missile deflection field."
 Unit_Description_0135="Slow-moving Heavy Artillery, which deals damage in a large Area-Of-Effect. Must be stationary to fire."
 Unit_Description_0136="Experimental Amphibious Spiderbot, armed with a powerful Microwave Laser, blasters, torpedoes and a weak anti-air solution. Equipped with sonar and a stealth field generator."
 Unit_Description_0137="Experimental Mobile Rapid-fire Artillery, which shoots a Salvo of 20 shells before reloading. Extremely inaccurate but deals damage in a huge Area-Of-Effect. Must be stationary to fire."
 Unit_Description_0317="Fast-moving Mobile Bomb, explodes in an EMP blast with a large Area-Of-Effect."
 Unit_Description_0318="Extremely heavy Amphibious Assault Robot, equipped with direct fire blasters, weak torpedoes and anti-torpedo flares. Designed to engage enemy heavy units and defense structures."
-Unit_Description_0319="Experimental Amphibious Megabot, armed with Proton Cannons, torpedoes and weak anti-air. Equipped with anti-torpedo flares and an egg-based engineering system."
+Unit_Description_0319="Experimental Amphibious Megabot, armed with Proton Cannons, torpedoes and a weak anti-air solution. Equipped with anti-torpedo flares and an egg-based engineering system."
 Unit_Description_0444="Lightly armoured support robot, armed with a long-range rocket launcher."
 
 -- CYBRAN -- Crab Egg Units
@@ -1656,7 +1656,7 @@ Unit_Description_0150="Basic Attack Submarine. Can surface to enable a weak dire
 Unit_Description_0151="Anti-Aircraft Naval vessel. Armed with anti-air weaponry and direct fire cannons. Equipped with a tactical missile defense, a full sensor suite and an air staging facility."
 Unit_Description_0152="Amphibious primary surface combatant, with powerful direct fire cannons, torpedoes, basic anti-air weapons and an effective torpedo defense. Can sprout legs and walk on land."
 Unit_Description_0153="Long-range Surface Bombardment Ship. Armed with direct fire cannons and weak anti-air and torpedoes. Equipped with tactical missile defense and a full sensor suite."
-Unit_Description_0154="Aircraft carrier. Can store, transport and repair aircraft. Armed with powerful AA auto-cannons. Equipped with tactical missile defense and a full sensor suite."
+Unit_Description_0154="Aircraft Carrier. Can store, transport and repair aircraft. Armed with powerful AA auto-cannons. Equipped with tactical missile defense and a full sensor suite."
 Unit_Description_0155="Strategic Missile Submarine. Can build and launch strategic EMP weapons. Armed with long-range tactical missiles and torpedoes. Equipped with a personal stealth generator. Can fire while submerged."
 Unit_Description_0322="Dedicated submersible killer, armed with a torpedo tube and torpedo defense. Equipped with a personal stealth generator."
 Unit_Description_0323="Stealth Field and sensor boat, defended only by fantastic anti-torpedo flares. Extremely useful in any sized navy."
@@ -1815,9 +1815,9 @@ Unit_Description_0250="Primary surface combatant, with powerful direct fire cann
 Unit_Description_0251="Long-range direct-fire surface bombardment ship."
 Unit_Description_0252="Aircraft Carrier. Can store, transport and repair aircraft. Armed with powerful surface-to-air missile launchers. Equipped with tactical missile defense and a full sensor suite."
 Unit_Description_0253="Strategic Missile Submarine. Can build and launch strategic nuclear weapons. Armed with long-range tactical missiles. Can fire while submerged."
-Unit_Description_0254="Experimental Submersible Factory Battleship. Armed with a long range cannon for shore bombardment and depth charges which ignore torpedo defenses. Equipped with torpedo defense, a full sensor suite and a naval factory."
+Unit_Description_0254="Experimental Submersible Factory Battleship. Armed with a long-range cannon for shore bombardment and depth charges which ignore torpedo defenses. Equipped with an effective torpedo defense, a full sensor suite and a naval factory."
 Unit_Description_0332="Dedicated submersible killer, armed with a torpedo tube and torpedo defense."
-Unit_Description_0333="Missile bombardment ship. Rapidly fires long range tactical missiles."
+Unit_Description_0333="Missile bombardment ship. Rapidly fires long-range tactical missiles."
 
 -- AEON -- Offensive Structures
 Unit_Description_0255="Low-end defensive tower that attacks land- and sea-based units. Does not engage aircraft or submerged units."
@@ -1963,7 +1963,7 @@ Unit_Description_0364="Anti-Aircraft naval vessel. Armed with an anti-air weapon
 Unit_Description_0365="Primary Submersible surface combatant with powerful direct fire lasers, torpedoes, basic anti-air weapons, torpedo defense, and a full sensor suite."
 Unit_Description_0366="Surface Bombardment Ship. Armed with direct fire cannons and weak anti-air. Equipped with tactical missile defense and a full sensor suite. Can build and launch full-strength strategic nuclear weapons."
 Unit_Description_0367="Heavy Assault Submarine armed with extremely powerful torpedoes and effective torpedo defenses. Can surface to engage with strong anti-air cannons."
-Unit_Description_0368="Aircraft carrier. Can store, transport and repair aircraft. Armed with powerful AA auto-cannons and a tactical missile launcher. Equipped with tactical missile defense and a full sensor suite."
+Unit_Description_0368="Aircraft Carrier. Can store, transport and repair aircraft. Armed with powerful AA auto-cannons and a tactical missile launcher. Equipped with tactical missile defense and a full sensor suite."
 
 -- SERAPHIM -- Offensive Structures
 Unit_Description_0369="Low-end defensive tower that attacks land- and sea-based units. Does not engage aircraft or submerged units."
