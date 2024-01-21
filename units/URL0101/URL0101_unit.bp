@@ -112,7 +112,7 @@ UnitBlueprint{
     Intel = {
         ActiveIntel = { Radar = true },
         Cloak = true,
-        RadarRadius = 45,
+        RadarRadius = 44,
         VisionRadius = 24,
     },
     LifeBarHeight = 0.075,

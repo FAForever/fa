@@ -234,6 +234,22 @@ Callbacks.OnPlayerQueryResult = SimPlayerQuery.OnPlayerQueryResult
 
 Callbacks.PingGroupClick = import("/lua/simpinggroup.lua").OnClickCallback
 
+---@param unit Unit
+---@param target? Unit
+---@return boolean
+function IsInvalidAssist(unit, target)
+    if target and target.EntityId == unit.EntityId then
+        return true
+    elseif not target or not target:GetGuardedUnit() then
+        return false
+    else
+        return IsInvalidAssist(unit, target:GetGuardedUnit())
+    end
+end
+
+--- Detect and fix a simulation freeze by clearing the command queue of all factories that take part in a cycle
+---@param data { target: EntityId}
+---@param units any
 Callbacks.ValidateAssist = function(data, units)
     units = SecureUnits(units)
     local target = GetEntityById(data.target)
@@ -244,16 +260,6 @@ Callbacks.ValidateAssist = function(data, units)
                 return
             end
         end
-    end
-end
-
-function IsInvalidAssist(unit, target)
-    if target and target.EntityId == unit.EntityId then
-        return true
-    elseif not target or not target:GetGuardedUnit() then
-        return false
-    else
-        return IsInvalidAssist(unit, target:GetGuardedUnit())
     end
 end
 
@@ -716,19 +722,6 @@ end
 --- An anti cheat check that passes when there is only 1 player or cheats are enabled
 ---@return boolean
 local PassesAntiCheatCheck = function()
-    -- perform UI checks on sim to prevent cheating
-    local count = 0
-    for k, brain in ArmyBrains do
-        if brain.BrainType == "Human" then
-            count = count + 1
-        end
-    end
-
-    -- allow when there is 1 or less players
-    if count <= 1 then
-        return true
-    end
-
     -- allow when cheats are enabled
     return CheatsEnabled()
 end

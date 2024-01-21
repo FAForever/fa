@@ -1,8 +1,8 @@
 -- Test framework
-local luft = require "luft"
+local luft = require "./tests/packages/luft"
 
 -- Functions are imported to the global scope...
-require "../lua/system/utils.lua"
+require "./lua/system/utils.lua"
 
 luft.describe("Utils", function()
     luft.describe("StringSplit", function()
@@ -11,18 +11,18 @@ luft.describe("Utils", function()
         end)
 
         luft.test("Default", function()
-            luft.expect(StringSplit("Hello:World")).to.equal({"Hello", "World"})
+            luft.expect(StringSplit("Hello:World")).to.equal({ "Hello", "World" })
             luft.expect(StringSplit("Hello:foo:World"))
-                .to.equal({"Hello", "foo", "World"})
+                .to.equal({ "Hello", "foo", "World" })
         end)
 
         luft.test("Separator", function()
             luft.expect(StringSplit("Hello World", ' '))
-                .to.equal({"Hello", "World"})
+                .to.equal({ "Hello", "World" })
             luft.expect(StringSplit("Hello foo World", ' '))
-                .to.equal({"Hello", "foo", "World"})
+                .to.equal({ "Hello", "foo", "World" })
             luft.expect(StringSplit("Hello |foo| World", '|'))
-                .to.equal({"Hello ", "foo", " World"})
+                .to.equal({ "Hello ", "foo", " World" })
         end)
     end)
 

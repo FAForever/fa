@@ -102,11 +102,6 @@ AirUnit = ClassUnit(MobileUnit) {
     OnImpact = function(self, with)
         if self.GroundImpacted then return end
 
-        -- Immediately destroy units outside the map
-        if not ScenarioFramework.IsUnitInPlayableArea(self) then
-            self:Destroy()
-        end
-
         -- Only call this code once
         self.GroundImpacted = true
 
@@ -181,7 +176,9 @@ AirUnit = ClassUnit(MobileUnit) {
         -- Additional stupidity: An idle transport, bot loaded and unloaded, counts as 'Land' layer so it would die with the wreck hovering.
         -- It also wouldn't call this code, and hence the cargo destruction. Awful!
         if self:GetFractionComplete() == 1 and
-            (self.Layer == 'Air' or EntityCategoryContains(categories.TRANSPORTATION, self)) then
+            (self.Layer == 'Air' or EntityCategoryContains(categories.TRANSPORTATION, self))
+        then
+            self.Dead = true
             self:CreateUnitAirDestructionEffects(1.0)
             self:DestroyTopSpeedEffects()
             self:DestroyBeamExhaust()
@@ -214,6 +211,18 @@ AirUnit = ClassUnit(MobileUnit) {
             self.Trash:Add(proj)
 
             self:VeterancyDispersal()
+
+            local army = self.Army
+            -- awareness for traitor game mode and game statistics
+            ArmyBrains[army].LastUnitKilledBy = (instigator or self).Army
+            ArmyBrains[army]:AddUnitStat(self.UnitId, "lost", 1)
+
+            -- awareness of instigator that it killed a unit, but it can also be a projectile or nil
+            if instigator and instigator.OnKilledUnit then
+                instigator:OnKilledUnit(self)
+            end
+
+            self.Brain:OnUnitKilled(self, instigator, type, overkillRatio)
         else
             MobileUnit.OnKilled(self, instigator, type, overkillRatio)
         end

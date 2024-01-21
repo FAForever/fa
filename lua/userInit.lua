@@ -65,12 +65,16 @@ function WaitSeconds(n)
     end
 end
 
---- Waits the given number of ticks. Always waits at least four frames
+--- Waits the given number of ticks. Always waits at least two frames
 ---@param ticks any
 function WaitTicks(ticks)
+    -- local scope for performance
+    local GameTick = GameTick
+    local WaitFrames = WaitFrames
+
     local start = GameTick()
     repeat
-        WaitFrames(4)
+        WaitFrames(2)
     until (start + ticks) <= GameTick()
 end
 

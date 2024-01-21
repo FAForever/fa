@@ -157,9 +157,9 @@ UnitBlueprint{
         UnitName = "<LOC ues0202_name>Governor Class",
     },
     Intel = {
-        RadarRadius = 150,
+        RadarRadius = 152,
         SonarRadius = 120,
-        VisionRadius = 65,
+        VisionRadius = 64,
         WaterVisionRadius = 60,
     },
     LifeBarHeight = 0.075,

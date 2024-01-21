@@ -26,8 +26,8 @@ Template = {
     TriggersOnMassDeposit = true,
     TemplateSortingOrder = 100,
     TemplateData = {
-        0,
-        0,
+        2,
+        2,
         {
             'uab1103',
             1,

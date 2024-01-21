@@ -22,12 +22,12 @@
 
 ---@type ContextBasedTemplate
 Template = {
-    Name = 'Power generators',
-    TriggersOnBuilding = (categories.ARTILLERY * categories.TECH2),
+    Name = 'Storages',
+    TriggersOnBuilding = categories.MASSEXTRACTION * (categories.TECH2 + categories.TECH3),
     TemplateSortingOrder = 100,
     TemplateData = {
-        0,
-        0,
+        6,
+        6,
         {
             'dummy',
             0,
@@ -35,25 +35,25 @@ Template = {
             0
         },
         {
-            'uab1101',
+            'uab1106',
             1,
             2,
             0
         },
         {
-            'uab1101',
+            'uab1106',
             2,
             -2,
             0
         },
         {
-            'uab1101',
+            'uab1106',
             3,
             0,
             -2
         },
         {
-            'uab1101',
+            'uab1106',
             4,
             0,
             2

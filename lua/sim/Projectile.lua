@@ -141,41 +141,69 @@ Projectile = ClassProjectile(ProjectileMethods) {
     end,
 
     --- Called by Lua during the `OnCreate` event when the blueprint field `TrackTargetGround` is set,
-    --- used by tactical missiles to track a patch of ground in the vicinity of the unit
+    --- used by tactical missiles to track a point around/inside the target's hitbox
     ---@param self Projectile
     OnTrackTargetGround = function(self)
         local target = self.OriginalTarget or self:GetTrackingTarget() or self.Launcher:GetTargetEntity()
         if target and target.IsUnit then
+
             local unitBlueprint = target.Blueprint
-            local cy = unitBlueprint.CollisionOffsetY or 0
+
+            -- X-offset units often have displaced center bones, so they're not accounted for.
+            local cy, cz = unitBlueprint.CollisionOffsetY or 0, unitBlueprint.CollisionOffsetZ or 0
             local sx, sy, sz = unitBlueprint.SizeX or 1, unitBlueprint.SizeY or 1, unitBlueprint.SizeZ or 1
             local px, py, pz = target:GetPositionXYZ()
 
-            -- take into account heading
-            local heading = -1 * target:GetHeading() -- inverse heading because Supreme Commander :)
-            local mch = MathCos(heading)
-            local msh = MathSin(heading)
+            -- don't target the part of the hitbox below the surface
+            if cy < 0 then
+                sy = sy + cy
+                cy = 0
+            end
 
             local physics = self.Blueprint.Physics
             local fuzziness = physics.TrackTargetGroundFuzziness or 0.8
             local offset = physics.TrackTargetGroundOffset or 0
             sx = sx + offset
-            sy = sy + offset
             sz = sz + offset
 
-            local dx = (Random() - 0.5) * fuzziness * sx
-            local dy = (Random() - 0.5) * fuzziness * sy
-            local dz = (Random() - 0.5) * fuzziness * sz
+            local dx = sx * (Random() - 0.5) * fuzziness
+            local dy = (sy + offset) * (Random() - 0.5) * fuzziness + sy/2 + cy
+            local dz = sz * (Random() - 0.5) * fuzziness + cz
+            local dw
 
-            local target = {
-                px + dx * mch - dz * msh,
-                py + cy + 0.5 * sy + dy,
-                pz + dx * msh + dz * mch,
-            }
+            -- Rotate a vector by a quaternion: q * v * conjugate(q)
+            -- Supreme Commander quaternions use y,z,x,w!
+            local ty, tz, tx, tw = unpack(target:GetOrientation())
 
-            self:SetNewTargetGround(target)
+            -- compute the product in a single assignment to not have to use temporary, single-use variables.
+            dw, dx, dy, dz = 
+            -tx * dx - tz * dy - ty * dz,
+             tw * dx + tz * dz - ty * dy,
+             tw * dy + ty * dx - tx * dz,
+             tw * dz + tx * dy - tz * dx
+
+            tx, tz, ty = -tx, -tz, -ty
+            
+            -- compute the product in a single assignment to not have to use temporary, single-use variables.
+            dx, dy, dz = 
+            dw * tx + dx * tw + dy * ty - dz * tz,
+            dw * tz + dy * tw + dz * tx - dx * ty,
+            dw * ty + dz * tw + dx * tz - dy * tx
+
+            local pos = { px + dx, py + dy, pz + dz }
+            self:SetNewTargetGround(pos)
         else
             local pos = self:GetCurrentTargetPosition()
+
+            local physics = self.Blueprint.Physics
+            local fuzziness = physics.TrackTargetGroundFuzziness or 0.8
+            local offset = physics.TrackTargetGroundOffset or 0
+            local dx = (Random() - 0.5) * fuzziness * (1 + offset)
+            local dz = (Random() - 0.5) * fuzziness * (1 + offset)
+
+            pos[1] = pos[1] + dx
+            pos[3] = pos[3] + dz
+
             pos[2] = GetSurfaceHeight(pos[1], pos[3])
             self:SetNewTargetGround(pos)
         end
@@ -548,7 +576,7 @@ Projectile = ClassProjectile(ProjectileMethods) {
     -- Lua functionality
 
     ---@param self Projectile
-    RetargetThread = function (self)
+    RetargetThread = function(self)
         local createdByWeapon = self.CreatedByWeapon
         if createdByWeapon then
             WaitTicks(0.2)
