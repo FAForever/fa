@@ -912,7 +912,7 @@ options = {
                     states = {
                         { text = "<LOC _On>", key = 'on' },
                         { text = "<LOC options_show_player_names_allies_only>Allies only", key = 'allies-only' },
-                        { text = "<LOC _Off>Allies only", key = 'off' },
+                        -- { text = "<LOC _Off>", key = 'off' },
                     },
                 },
             },
