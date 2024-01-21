@@ -1454,7 +1454,7 @@ AIBrain = Class(AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerCom
     --- - OnAssignedFocusEntity
     ---
     --- And events that are purposefully not communicated:
-    --- 
+    ---
     --- - OnDamage
     --- - OnDamageBy
     --- - OnMotionHorzEventChange
