@@ -15,7 +15,7 @@ local DepthCharge = import("/lua/defaultantiprojectile.lua").DepthCharge
 local NukeProjectile = DefaultProjectileFile.NukeProjectile
 
 local DebrisComponent = import('/lua/sim/projectiles/components/DebrisComponent.lua').DebrisComponent
-local TacticalMissileComponent = import('/lua/sim/DefaultProjectiles.lua').TacticalMissileComponent
+local TacticalMissileComponent = import("/lua/sim/projectiles/components/tacticalmissilecomponent.lua").TacticalMissileComponent
 
 ---@class TFragmentationGrenade : EmitterProjectile
 TFragmentationGrenade = ClassProjectile(EmitterProjectile) {
@@ -27,12 +27,12 @@ TFragmentationGrenade = ClassProjectile(EmitterProjectile) {
     FxTrails = EffectTemplate.THeavyFragmentationGrenadeFxTrails,
 }
 
----@class TIFMissileNuke : EmitterProjectile, SingleBeamProjectile
+---@class TIFMissileNuke : NukeProjectile, SingleBeamProjectile
 TIFMissileNuke = ClassProjectile(NukeProjectile, SingleBeamProjectile) {
     BeamName = '/effects/emitters/missile_exhaust_fire_beam_01_emit.bp',
 }
 
----@class TIFTacticalNuke : EmitterProjectile
+---@class TIFTacticalNuke : NukeProjectile, TacticalMissileComponent, DebrisComponent
 TIFTacticalNuke = ClassProjectile(NukeProjectile, TacticalMissileComponent, DebrisComponent) {
     MovementThread = TacticalMissileComponent.MovementThread -- Resolve conflict from base classes
 }

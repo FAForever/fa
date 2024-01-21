@@ -49,17 +49,17 @@ TIFMissileNukeCDR = ClassProjectile(TIFTacticalNuke) {
 
     -- reduce due to distance
     LaunchTicks = 6,
-    HeightDistanceFactor = 7,
-    FinalBoostAngle = 30,
+    HeightDistanceFactor = 10,
+    FinalBoostAngle = 90,
 
     ---@param self TIFMissileNukeCDR
     ---@param inWater boolean
     OnCreate = function(self, inWater)
-        TIFMissileNuke.OnCreate(self)
+        TIFTacticalNuke.OnCreate(self)
         if not inWater then
             self:SetDestroyOnWater(true)
         end
-    
+
         self.MoveThread = self.Trash:Add(ForkThread(self.MovementThread, self))
         self.effectEntityPath = '/effects/Entities/UEFNukeEffectController02/UEFNukeEffectController02_proj.bp'
         self:LauncherCallbacks()
@@ -85,7 +85,7 @@ TIFMissileNukeCDR = ClassProjectile(TIFTacticalNuke) {
 
     ---@param self TIFMissileNukeCDR
     OnExitWater = function(self)
-        TIFMissileNuke.OnExitWater(self)
+        TIFTacticalNuke.OnExitWater(self)
         self:SetDestroyOnWater(true)
     end,
 
