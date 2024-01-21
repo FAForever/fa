@@ -2404,7 +2404,7 @@ function SetSecondaryDisplay(type)
         local data = {}
         if type == 'buildQueue' then
             modifiedCommandQueue = table.copy(currentCommandQueue or {})
-            if table.getn(sortedOptions.selection) == 1 then
+            if sortedOptions.selection and table.getn(sortedOptions.selection) == 1 then
                 IntegrateEnhancements()
             end
 
@@ -2430,7 +2430,7 @@ function SetSecondaryDisplay(type)
                 end
             end
 
-            if table.getn(sortedOptions.selection) == 1 and not table.empty(data) then
+            if sortedOptions.selection and table.getn(sortedOptions.selection) == 1 and not table.empty(data) then
                 controls.secondaryProgress:SetNeedsFrameUpdate(true)
             else
                 controls.secondaryProgress:SetNeedsFrameUpdate(false)
