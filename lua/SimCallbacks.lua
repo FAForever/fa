@@ -722,19 +722,6 @@ end
 --- An anti cheat check that passes when there is only 1 player or cheats are enabled
 ---@return boolean
 local PassesAntiCheatCheck = function()
-    -- perform UI checks on sim to prevent cheating
-    local count = 0
-    for k, brain in ArmyBrains do
-        if brain.BrainType == "Human" then
-            count = count + 1
-        end
-    end
-
-    -- allow when there is 1 or less players
-    if count <= 1 then
-        return true
-    end
-
     -- allow when cheats are enabled
     return CheatsEnabled()
 end
