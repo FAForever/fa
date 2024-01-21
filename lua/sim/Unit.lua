@@ -39,6 +39,8 @@ local UpdateAssistersConsumptionCats = categories.REPAIR - categories.INSIGNIFIC
 
 local DefaultTerrainType = GetTerrainType(-1, -1)
 
+local GetNearestPlayablePoint = import("/lua/scenarioframework.lua").GetNearestPlayablePoint
+
 --- Structures that are reused for performance reasons
 --- Maps unit.techCategory to a number so we can do math on it for naval units
 
@@ -1702,6 +1704,11 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
             energy = energy * 0.6
         end
 
+        -- Create potentially offmap wrecks on-map. Exclude campaign maps that may do weird scripted things.
+        if self.Brain.BrainType == 'Human' and (not ScenarioInfo.CampaignMode) then
+            pos = GetNearestPlayablePoint(pos)
+        end
+
         local halfBuilt = self:GetFractionComplete() < 1
 
         -- Make sure air / naval wrecks stick to ground / seabottom, unless they're in a factory.
@@ -1722,7 +1729,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         -- Attempt to copy our animation pose to the prop. Only works if
         -- the mesh and skeletons are the same, but will not produce an error if not.
         if self.Tractored or (layer ~= 'Air' or (layer == "Air" and halfBuilt)) then
-            TryCopyPose(self, prop, true)
+            TryCopyPose(self, prop, false)
         end
 
         -- Create some ambient wreckage smoke
