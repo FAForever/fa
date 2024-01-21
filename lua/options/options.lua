@@ -901,7 +901,7 @@ options = {
                 title = "<LOC options_show_player_names_title>Show Player Names",
                 key = 'options_show_player_names',
                 type = 'toggle',
-                default = 0,
+                default = 'on',
                 set = function(key, value, startup)
                     if GetCurrentUIState() == 'game' then
                         import("/lua/ui/override/SessionClients.lua").OptionShowPlayerNames = value
