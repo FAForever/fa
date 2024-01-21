@@ -1704,7 +1704,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         end
 
         -- Create potentially offmap wrecks on-map. Exclude campaign maps that may do weird scripted things.
-        if IsHumanUnit(self) and not ScenarioInfo.CampaignMode then
+        if self.Brain.BrainType == 'Human' and (not ScenarioInfo.CampaignMode) then
             pos = GetNearestPlayablePoint(pos)
         end
 
