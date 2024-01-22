@@ -26,7 +26,7 @@ UnitBlueprint{
         "PRODUCTFA",
         "RECLAIMABLE",
         "SELECTABLE",
-        "SIZE20",
+        "SIZE16",
         "SNIPEMODE",
         "STRATEGIC",
         "STRUCTURE",
@@ -80,8 +80,8 @@ UnitBlueprint{
         RebuildBonusIds = { "xab2307" },
     },
     Footprint = {
-        SizeX = 7,
-        SizeZ = 7,
+        SizeX = 5,
+        SizeZ = 5,
     },
     General = {
         CommandCaps = {
@@ -127,8 +127,8 @@ UnitBlueprint{
         MotionType = "RULEUMT_None",
         SkirtOffsetX = -1.5,
         SkirtOffsetZ = -1.5,
-        SkirtSizeX = 10,
-        SkirtSizeZ = 10,
+        SkirtSizeX = 8,
+        SkirtSizeZ = 8,
         TurnRate = 0,
     },
     SelectionSizeX = 3.2,
