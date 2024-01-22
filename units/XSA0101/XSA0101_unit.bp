@@ -158,10 +158,10 @@ UnitBlueprint{
     },
     Intel = {
         IntelDurationOnDeath = 20,
-        RadarRadius = 65,
-        SonarRadius = 30,
+        RadarRadius = 64,
+        SonarRadius = 28,
         VisionRadius = 42,
-        VisionRadiusOnDeath = 30,
+        VisionRadiusOnDeath = 28,
     },
     LifeBarHeight = 0.075,
     LifeBarOffset = 0.4,

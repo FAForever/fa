@@ -711,7 +711,11 @@ function OnSelectionChanged(oldSelection, newSelection, added, removed)
     import("/lua/ui/game/unitview.lua").OnSelection(newSelection)
 end
 
+---@param newQueue UIBuildQueue
 function OnQueueChanged(newQueue)
+    -- update the Lua representation of the queue
+    UpdateCurrentFactoryForQueueDisplay(newQueue)
+
     if not gameUIHidden then
         import("/lua/ui/game/construction.lua").OnQueueChanged(newQueue)
     end

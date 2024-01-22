@@ -905,7 +905,7 @@ function CreateCompositeExplosionMeshes(object)
 end
 
 -----------------------------------------------------------------
---  Replaced by new effect structure (see EffectTemplates.lua) --
+--  Replaced by new effect structure (see effecttemplates.lua) --
 -----------------------------------------------------------------
 
 ---@param object Unit

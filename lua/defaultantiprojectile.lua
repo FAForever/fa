@@ -9,10 +9,20 @@
 --****************************************************************************
 local Entity = import("/lua/sim/entity.lua").Entity
 local GetRandomFloat = import("/lua/utilities.lua").GetRandomFloat
+local AeonVolcanoBeam01 = import("/lua/effecttemplates.lua").AeonVolcanoBeam01
+
+-- upvalue scope for performance
+local IsEnemy = IsEnemy
+local KillThread = KillThread
+local EntityCategoryContains = EntityCategoryContains
+local AttachBeamEntityToEntity = AttachBeamEntityToEntity
+
+-- pre-computed for performance
+local FlareCategories = categories.TACTICAL + categories.MISSILE
 
 ---@class FlareSpec
 ---@field Army Army
----@field Owner string
+---@field Owner Unit | Projectile
 ---@field Radius number defaults to `5`
 ---@field OffsetMult number defaults to `0`
 ---@field RedirectCat UnparsedCategory defaults to `"MISSILE"`
@@ -31,6 +41,10 @@ local GetRandomFloat = import("/lua/utilities.lua").GetRandomFloat
 ---@field AttachBone Bone
 
 ---@class Flare : Entity
+---@field Army Army
+---@field Owner Unit | Projectile
+---@field Radius number
+---@field OffsetMult number
 Flare = Class(Entity) {
 
     ---@param self Flare
@@ -43,7 +57,6 @@ Flare = Class(Entity) {
         self:SetCollisionShape('Sphere', 0, 0, self.Radius * self.OffsetMult, self.Radius)
         self:SetDrawScale(self.Radius)
         self:AttachTo(spec.Owner, -1)
-        self.RedirectCat = spec.Category or 'MISSILE'
     end,
 
     --- We only divert projectiles. The flare-projectile itself will be responsible for
@@ -52,24 +65,61 @@ Flare = Class(Entity) {
     ---@param other Projectile
     ---@return boolean
     OnCollisionCheck = function(self, other)
-        if EntityCategoryContains(ParseEntityCategory(self.RedirectCat), other) and
-            IsEnemy(self.Army, other.Army)
+        local army = self.Army
+        if not IsDestroyed(self.Owner) and
+            EntityCategoryContains(FlareCategories, other) and
+            IsEnemy(army, other.Army)
         then
-            -- take out any scripted movement
-            if other.MoveThread then
-                KillThread(other.MoveThread)
+            -- take out scripted movement
+            local otherMoveThread = other.MoveThread
+            if otherMoveThread then
+                KillThread(otherMoveThread)
                 other.MoveThread = nil
             end
 
-            if not other.IsRedirected then
+            -- determine whether we redirect
+            local owner = self.Owner
+            local ownerRedirectedMissiles = owner.RedirectedMissiles
+            if not (ownerRedirectedMissiles >= 3 or other.IsRedirected) then
+                -- keep track of how many missiles we redirected
+                owner.RedirectedMissiles = owner.RedirectedMissiles + 1
+
                 other.IsRedirected = true
-                other:SetLifetime(4 + 2 * Random())
                 other:SetNewTarget(self.Owner)
                 other:SetTurnRate(120)
+
+                -- projectiles that end due to lifetime still explode and deal damage,
+                -- therefore we straigth out kill the projectile after a short duration
+                other:SetLifetime(3)
+                other.Trash:Add(
+                    ForkThread(
+                        self.KillThread,
+                        self, other, 10 + 5 * Random()
+                    )
+                )
+
+                local trash = owner.Trash
+
+                -- create beams to help the player understand what is going on with the missiles
+                for _, beam in AeonVolcanoBeam01 do
+                    local beam = AttachBeamEntityToEntity(owner, -1, other, -1, army, beam)
+                    trash:Add(beam)
+                    other.Trash:Add(beam)
+                end
             end
         end
 
         return false
+    end,
+
+    --- Kills the projectile after waiting for a short duration
+    ---@param self Flare
+    ---@param projectile Projectile
+    KillThread = function(self, projectile, ticksToWait)
+        WaitTicks(ticksToWait)
+        if not IsDestroyed(projectile) then
+            Damage(self.Owner.Launcher, projectile:GetPosition(), projectile, 200, "Normal")
+        end
     end,
 }
 

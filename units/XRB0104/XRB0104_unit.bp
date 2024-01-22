@@ -142,7 +142,7 @@ UnitBlueprint{
         UnitName = "<LOC xrb0104_name>The Hive",
         UpgradesTo = "xrb0204",
     },
-    Intel = { VisionRadius = 15 },
+    Intel = { VisionRadius = 14 },
     LifeBarHeight = 0.075,
     LifeBarOffset = 1.1,
     LifeBarSize = 1.25,

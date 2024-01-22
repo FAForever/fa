@@ -195,7 +195,7 @@ UnitBlueprint{
             RackRecoilDistance = 0,
             RackReloadTimeout = 6,
             RackSalvoChargeTime = 0,
-            RackSalvoReloadTime = 10,
+            RackSalvoReloadTime = 6,
 
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
@@ -206,9 +206,9 @@ UnitBlueprint{
             SkipReadyState = true,
             TargetPriorities = {
                 "STRUCTURE DEFENSE",
-                "TECH3 MOBILE",
-                "TECH2 MOBILE",
-                "TECH1 MOBILE",
+                "SNIPER",
+                "SHIELD",
+                "STRUCTURE",
                 "ALLUNITS",
             },
             TargetRestrictDisallow = "UNTARGETABLE",

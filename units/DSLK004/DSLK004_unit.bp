@@ -11,7 +11,7 @@ UnitBlueprint{
     Categories = {
         "ANTIAIR",
         "BUILTBYTIER3FACTORY",
-        "DIRECTFIRE",
+        "WEAKDIRECTFIRE",
         "LAND",
         "MOBILE",
         "OVERLAYANTIAIR",
@@ -22,7 +22,6 @@ UnitBlueprint{
         "SERAPHIM",
         "TECH3",
         "VISIBLETORECON",
-        "WEAKDIRECTFIRE",
     },
     Defense = {
         AirThreatLevel = 120,

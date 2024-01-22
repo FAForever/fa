@@ -149,7 +149,7 @@ UnitBlueprint{
     },
     Intel = {
         VisionRadius = 26,
-        WaterVisionRadius = 26,
+        WaterVisionRadius = 24,
     },
     LifeBarHeight = 0.075,
     LifeBarOffset = 0.35,
@@ -245,9 +245,8 @@ UnitBlueprint{
             TargetPriorities = {
                 "TECH3 MOBILE",
                 "TECH2 MOBILE",
-                "COMMAND",
                 "(STRUCTURE * DEFENSE - ANTIMISSILE)",
-                "TECH1 MOBILE",
+                "STRUCTURE",
                 "ALLUNITS",
             },
             TargetRestrictDisallow = "UNTARGETABLE",

@@ -36,6 +36,7 @@ UnitBlueprint{
         "BUILTBYTIER3COMMANDER",
         "BUILTBYTIER3ENGINEER",
         "CARRIER",
+        "CQUEMOV",
         "DRAGBUILD",
         "EXPERIMENTAL",
         "INTELLIGENCE",
@@ -252,7 +253,7 @@ UnitBlueprint{
         UnitName = "<LOC ues0401_name>Atlantis",
     },
     Intel = {
-        RadarRadius = 250,
+        RadarRadius = 256,
         SonarRadius = 252,
         VisionRadius = 100,
         WaterVisionRadius = 100,

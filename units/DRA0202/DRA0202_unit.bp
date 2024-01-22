@@ -155,7 +155,7 @@ UnitBlueprint{
         UnitName = "<LOC dra0202_name>Corsair",
     },
     Intel = {
-        RadarRadius = 65,
+        RadarRadius = 64,
         VisionRadius = 32,
     },
     LifeBarHeight = 0.075,
@@ -182,9 +182,9 @@ UnitBlueprint{
     SelectionSizeZ = 1.35,
     SelectionThickness = 0.29,
     SizeSphere = 1.6,
-    SizeX = 1.4,
+    SizeX = 1.2,
     SizeY = 0.3,
-    SizeZ = 2.2,
+    SizeZ = 1.6,
     StrategicIconName = "icon_fighter2_directfire",
     StrategicIconSortPriority = 55,
     Transport = {

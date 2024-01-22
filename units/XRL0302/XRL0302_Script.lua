@@ -8,41 +8,78 @@ local CWalkingLandUnit = import("/lua/cybranunits.lua").CWalkingLandUnit
 local EffectTemplate = import("/lua/effecttemplates.lua")
 local Weapon = import("/lua/sim/weapon.lua").Weapon
 
+-- upvalue scope for performance
+local WaitTicks = WaitTicks
+local ForkThread = ForkThread
+local DamageArea = DamageArea
+local CreateEmitterAtBone = CreateEmitterAtBone
+local CreateDecal = CreateDecal
+local CreateLightParticle = CreateLightParticle
+
 local DeathWeaponKamikaze = ClassWeapon(Weapon) {
     OnFire = function(self)
-        if not self.unit.Dead then
-            self.unit:Kill()
+        local unit = self.unit
+        if not unit.Dead then
+            unit:Kill()
         end
     end,
 }
 
+---@class DeathWeaponEMP : Weapon
 local DeathWeaponEMP = ClassWeapon(Weapon) {
-    FxDeath = EffectTemplate.CMobileKamikazeBombExplosion,
+    FxDeath = EffectTemplate.CMobileBeetleExplosion,
+
+    DebrisBlueprints = {
+        '/effects/Entities/BeetleDebris01/BeetleDebris01_proj.bp',
+    },
+
+    ---@param self DeathWeaponEMP
     OnCreate = function(self)
         Weapon.OnCreate(self)
         self:SetWeaponEnabled(false)
     end,
 
+    ---@param self DeathWeaponEMP
     Fire = function(self)
         local blueprint = self.Blueprint
-        local position = self.unit:GetPosition()
+        local unit = self.unit
+        local position = unit:GetPosition()
 
-        local army = self.unit.Army
+        -- do the damage
+        DamageArea(unit, position, blueprint.DamageRadius, blueprint.Damage, blueprint.DamageType or 'Normal',
+            blueprint.DamageFriendly or false)
+
+        -- create explosion effect
+        local army = unit.Army
         for k, v in self.FxDeath do
-            CreateEmitterAtBone(self.unit, -2, army, v)
+            local effect = CreateEmitterAtBone(unit, -2, army, v)
+            effect:ScaleEmitter(0.85)
         end
 
-        if not self.unit.transportDrop then
-            local rotation = math.random(0, 6.28)
-            DamageArea(self.unit, position, 6, 1, 'TreeForce', true)
-            DamageArea(self.unit, position, 6, 1, 'TreeForce', true)
+        -- create a decal
+        if not unit.transportDrop then
+            local rotation = 6.28 * Random()
+            DamageArea(unit, position, 6, 1, 'TreeForce', true)
+            DamageArea(unit, position, 6, 1, 'TreeForce', true)
             CreateDecal(position, rotation, 'scorch_010_albedo', '', 'Albedo', 11, 11, 250, 120, army)
         end
 
-        DamageArea(self.unit, position, blueprint.DamageRadius, blueprint.Damage, blueprint.DamageType or 'Normal',
-            blueprint.DamageFriendly or false)
-        self.unit:PlayUnitSound('Destroyed')
-        self.unit:Destroy()
+        -- create light flash
+        CreateLightParticle(unit, -1, army, 7, 12, 'glow_03', 'ramp_red_06')
+        CreateLightParticle(unit, -1, army, 7, 22, 'glow_03', 'ramp_antimatter_02')
+
+        -- create flying and burning debris
+        local vx, _, vz = unit:GetVelocity()
+        for k = 1, 5 do
+            local blueprint = table.random(self.DebrisBlueprints)
+            local pvx = (vx + Random() - 0.5)
+            local pvz = (vz + Random() - 0.5)
+            unit:CreateProjectile(blueprint, 0, 0.2, 0, pvx, 1, pvz)
+        end
+
+        -- destroy the unit
+        unit:PlayUnitSound('Destroyed')
+        unit:Destroy()
     end,
 }
 
@@ -77,6 +114,7 @@ XRL0302 = ClassUnit(CWalkingLandUnit) {
         '/effects/emitters/cannon_muzzle_smoke_12_emit.bp',
     },
 
+    ---@param self XRL0302
     OnCreate = function(self)
         CWalkingLandUnit.OnCreate(self)
         self.EffectsBagXRL = TrashBag()
@@ -84,22 +122,70 @@ XRL0302 = ClassUnit(CWalkingLandUnit) {
         self:CreateTerrainTypeEffects(self.IntelEffects.Cloak, 'FXIdle', self.Layer, nil, self.EffectsBag)
         self.PeriodicFXThread = ForkThread(self.EmitPeriodicEffects, self)
         self.Trash:Add(self.PeriodicFXThread)
+
+        self.Trash:Add(
+            ForkThread(
+                self.TrackTargetThread, self
+            )
+        )
     end,
 
+    ---@param self XRL0302
+    TrackTargetThread = function(self)
+        local navigator = self:GetNavigator()
+        local weapon = self:GetWeaponByLabel('Suicide')
+
+        while not IsDestroyed(self) do
+
+            -- adjust behavior of the weapon so it only fires when we're trying to attack something
+            if weapon then
+                if (
+                    -- we're trying to attack
+                    self:IsUnitState('Attacking') or
+                        -- engineer trying to take us
+                        self:IsUnitState('BeingCaptured') or self:IsUnitState('BeingReclaimed')
+                    )
+                then
+                    weapon:SetEnabled(true)
+                else
+                    weapon:SetEnabled(false)
+                end
+            end
+
+            -- adjust behavior of tracking a target so that we speed through the target instead of bump into it
+            local command = self:GetCommandQueue()[1]
+            if command and command.commandType == 10 then
+                local target = command.target
+                if target then
+                    navigator:SetDestUnit(target)
+                    navigator:SetSpeedThroughGoal(true)
+                end
+            end
+
+            WaitTicks(6)
+        end
+    end,
+
+    ---@param self XRL0302
+    ---@param builder Unit
+    ---@param layer Layer
     OnStopBeingBuilt = function(self, builder, layer)
         CWalkingLandUnit.OnStopBeingBuilt(self, builder, layer)
         self.Trash:Add(ForkThread(self.HideUnit, self))
     end,
 
+    ---@param self XRL0302
     HideUnit = function(self)
         WaitTicks(1)
         self:SetMesh(self.Blueprint.Display.CloakMeshBlueprint, true)
     end,
 
+    ---@param self XRL0302
     OnProductionPaused = function(self)
         self:GetWeaponByLabel('Suicide'):FireWeapon()
     end,
 
+    ---@param self XRL0302
     EmitPeriodicEffects = function(self)
         local army = self.Army
         local ambientLandExhaustEffects = self.AmbientLandExhaustEffects
@@ -115,6 +201,7 @@ XRL0302 = ClassUnit(CWalkingLandUnit) {
         end
     end,
 
+    ---@param self XRL0302
     DoDeathWeapon = function(self)
         if self:IsBeingBuilt() then return end
         CWalkingLandUnit.DoDeathWeapon(self)

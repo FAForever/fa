@@ -131,37 +131,39 @@ UnitBlueprint{
         },
         MovementEffects = {
             Land = {
-                Footfall = {
-                    Bones = {
-                        {
-                            FootBone = "Exhaust_Leg_L01",
-                            Scale = 0.58,
-                            Type = "FootFall01",
-                        },
-                        {
-                            FootBone = "Exhaust_Leg_L02",
-                            Scale = 0.58,
-                            Type = "FootFall01",
-                        },
-                        {
-                            FootBone = "Exhaust_Leg_L03",
-                            Scale = 0.58,
-                            Type = "FootFall01",
-                        },
-                        {
-                            FootBone = "Exhaust_Leg_R01",
-                            Scale = 0.58,
-                            Type = "FootFall01",
-                        },
-                        {
-                            FootBone = "Exhaust_Leg_R02",
-                            Scale = 0.58,
-                            Type = "FootFall01",
-                        },
-                        {
-                            FootBone = "Exhaust_Leg_R03",
-                            Scale = 0.58,
-                            Type = "FootFall01",
+                Effects = {
+                    Footfall = {
+                        Bones = {
+                            {
+                                FootBone = "Exhaust_Leg_L01",
+                                Scale = 0.58,
+                                Type = "FootFall01",
+                            },
+                            {
+                                FootBone = "Exhaust_Leg_L02",
+                                Scale = 0.58,
+                                Type = "FootFall01",
+                            },
+                            {
+                                FootBone = "Exhaust_Leg_L03",
+                                Scale = 0.58,
+                                Type = "FootFall01",
+                            },
+                            {
+                                FootBone = "Exhaust_Leg_R01",
+                                Scale = 0.58,
+                                Type = "FootFall01",
+                            },
+                            {
+                                FootBone = "Exhaust_Leg_R02",
+                                Scale = 0.58,
+                                Type = "FootFall01",
+                            },
+                            {
+                                FootBone = "Exhaust_Leg_R03",
+                                Scale = 0.58,
+                                Type = "FootFall01",
+                            },
                         },
                     },
                 },
@@ -236,10 +238,10 @@ UnitBlueprint{
         UnitName = "<LOC urs0201_name>Salem Class",
     },
     Intel = {
-        RadarRadius = 35,
-        SonarRadius = 37,
+        RadarRadius = 36,
+        SonarRadius = 32,
         VisionRadius = 32,
-        WaterVisionRadius = 45,
+        WaterVisionRadius = 44,
     },
     LifeBarHeight = 0.075,
     LifeBarOffset = 1.8,
@@ -483,7 +485,7 @@ UnitBlueprint{
             },
             DisableWhileReloading = true,
             DisplayName = "Anti Torpedo Solution",
-            FireTargetLayerCapsTable = { Water = "Seabed|Sub|Water" },
+            FireTargetLayerCapsTable = { Water = "Water" },
             FiringTolerance = 2,
             Label = "AntiTorpedoF",
             MaxRadius = 30,

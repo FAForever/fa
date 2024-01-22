@@ -146,8 +146,8 @@ UnitBlueprint{
         UnitName = "<LOC ura0101_name>Flying Eyes",
     },
     Intel = {
-        RadarRadius = 65,
-        SonarRadius = 30,
+        RadarRadius = 64,
+        SonarRadius = 28,
         VisionRadius = 42,
     },
     LifeBarHeight = 0.075,

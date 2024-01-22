@@ -1,4 +1,3 @@
-
 --******************************************************************************************************
 --** Copyright (c) 2023  clyf
 --**
@@ -27,7 +26,7 @@ local SemiBallisticComponent = import("/lua/sim/projectiles/components/semiballi
 TacticalMissileComponent = ClassSimple(SemiBallisticComponent) {
 
     ---@param self TacticalMissileComponent | Projectile
-    MovementThread = function(self)
+    MovementThread = function(self, skipLaunchSequence)
         local blueprintPhysics = self.Blueprint.Physics
 
         -- are we a wiggler?
@@ -37,22 +36,30 @@ TacticalMissileComponent = ClassSimple(SemiBallisticComponent) {
             zigZagger = true
         end
 
-        -- launch
-        local launchTurnRateRange = self.LaunchTurnRateRange
-        local launchTurnRate = self.LaunchTurnRate + launchTurnRateRange * (2 * Random() - 1)
-        self:SetTurnRate(launchTurnRate)
+        if not skipLaunchSequence then
+            -- launch
+            local launchTurnRateRange = self.LaunchTurnRateRange
+            local launchTurnRate = self.LaunchTurnRate + launchTurnRateRange * (2 * Random() - 1)
+            self:SetTurnRate(launchTurnRate)
 
-        local launchTicksRange = self.LaunchTicksRange
-        local launchTicks = self.LaunchTicks + Random(-launchTicksRange, launchTicksRange)
-        WaitTicks(launchTicks)
+            local launchTicksRange = self.LaunchTicksRange
+            local launchTicks = self.LaunchTicks + Random(-launchTicksRange, launchTicksRange)
+            WaitTicks(launchTicks)
 
-        -- boost
-        local boostTurnRate, boostTime = self:TurnRateFromAngleAndHeight()
-        self:SetTurnRate(boostTurnRate)       
-        WaitTicks(boostTime * 10 + 1)
+            -- boost
+            local boostTurnRate, boostTime = self:TurnRateFromAngleAndHeight()
+            if boostTime < 0 then
+                boostTime = 0
+            end
+
+            self:SetTurnRate(boostTurnRate)
+            WaitTicks(boostTime * 10 + 1)
+        end
 
         -- glide
         local glideTurnRate, glideTime = self:TurnRateFromDistance()
+
+        self:SetLifetime((glideTime + 3))
 
         -- try to create a smooth transition for zig-zaggers
         if zigZagger then
@@ -81,35 +88,23 @@ TacticalMissileComponent = ClassSimple(SemiBallisticComponent) {
             self:SetTurnRate(glideTurnRate)
         end
 
-        self:SetLifetime((glideTime + 3))
-
-        -- for non-zigzaggers, reduce the maximum zig zag frequency halfway so that they're unlikely to miss targets
-        if not zigZagger then
-            glideTime = 0.5 * glideTime
-            WaitTicks((glideTime + 0.1) * 10)
-            self:ChangeMaxZigZag(0.2)
-        end
+        -- reduce the maximum zig zag frequency halfway so that they're unlikely to miss targets
+        WaitTicks((0.75 * glideTime + 0.1) * 10)
+        self:ChangeMaxZigZag(0.5)
 
         -- wait until we've allegedly hit our target
-        WaitTicks((glideTime + 1) * 10)
+        WaitTicks((0.25 * glideTime + 1) * 10)
 
-        -- then, if we still exist, we just want to stop existing. Therefore we find
-        -- our way to the ground
-        if not self:BeenDestroyed() then
+        -- then, if we still exist, we just want to stop existing. Therefore we find our way to the ground
+        -- target the ground below us slowly turn towards the ground so that we do not fly off indefinitely
+        local position = self:GetPosition()
+        position[2] = GetSurfaceHeight(position[1], position[3])
+        self:SetNewTargetGround(position)
 
-            -- target the ground below us slowly turn towards the ground so that we do not fly off indefinitely
-            local position = self:GetPosition()
-            position[2] = GetSurfaceHeight(position[1], position[3])
-            self:SetNewTargetGround(position)
-
-            for k = 4, 1, -1 do
-                if IsDestroyed(self) then
-                    break
-                end
-
-                self:SetTurnRate(10 * k)
-                WaitTicks(6)
-            end
+        -- increase turn rate to aim towards the ground
+        for k = 4, 1, -1 do
+            self:SetTurnRate(10 * k)
+            WaitTicks(6)
         end
     end,
 }

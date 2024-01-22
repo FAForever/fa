@@ -700,6 +700,7 @@ function HandleUnitWithBuildPresets(bps, all_bps)
             tempBp.BaseBlueprintId = tempBp.BlueprintId
             tempBp.BlueprintId = string.lower(tempBp.BlueprintId .. '_' .. name)
             tempBp.BuildIconSortPriority = preset.BuildIconSortPriority or tempBp.BuildIconSortPriority or 0
+            tempBp.General.SelectionPriority = preset.SelectionPriority or tempBp.General.SelectionPriority or 1
             tempBp.General.UnitName = preset.UnitName or tempBp.General.UnitName
             tempBp.Interface = tempBp.Interface or { }
             tempBp.Interface.HelpText = preset.HelpText or tempBp.Interface.HelpText
@@ -841,12 +842,6 @@ function PreModBlueprints(all_bps)
             }
         end
 
-        local bpIsAirScout =  bp.CategoriesHash.SCOUT and bp.CategoriesHash.AIR
-        local isCarrier = bp.CategoriesHash.AIRSTAGINGPLATFORM and bp.CategoriesHash.NAVAL
-        local isArty = bp.CategoriesHash.ARTILLERY and bp.CategoriesHash.TECH1
-        if bp.Intel.VisionRadius and not bpIsAirScout and not isCarrier and not isArty then
-            bp.Intel.VisionRadius = math.ceil(1.15*bp.Intel.VisionRadius)
-        end
         -- Synchronize hashed categories with actual categories
         bp.Categories = table.unhash(bp.CategoriesHash)
 
@@ -876,9 +871,12 @@ end
 
 local function SpawnMenuDummyChanges(all_bps)
     for id, bp in pairs(all_bps) do
-        if bp.Categories and not table.find(bp.Categories, 'DRAGBUILD') then
+
+        -- allow all mobile units to be dragged while being built
+        if bp.Categories and table.find(bp.Categories, 'MOBILE') then
             table.insert(bp.Categories, 'DRAGBUILD')
         end
+
         if bp.Physics and bp.Physics.MotionType ~= 'RULEUMT_Air' then
             local FootX, FootZ = GetFoot(bp, 'SizeX'), GetFoot(bp, 'SizeZ')
             local SkirtX, SkirtZ = GetSkirt(bp, 'SizeX'), GetSkirt(bp, 'SizeZ')
