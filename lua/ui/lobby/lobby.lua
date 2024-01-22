@@ -1806,21 +1806,70 @@ local function AssignAutoTeams()
 end
 
 local function AssignAINames()
+    --Assigns a random name from the predefined list of AI names by default.  Includes functionality for AI devs to instead have campaign faction appropriate characters assigned as the name
     local aiNames = import("/lua/ui/lobby/ainames.lua").ainames
     local nameSlotsTaken = {}
+    local tbSpecialAISlotsTakenByFaction = {}
+    local bUsingSpecialAINickname = false
+    local tsSpecialAIPersonality = {'m28ai', 'm28aicheat'} --If an AI modder wants their AI to take on campaign AI names, they can add the relevant AI personalities to this table
+    local bIsSpecialAI
     for index, faction in FactionData.Factions do
         nameSlotsTaken[index] = {}
     end
     for index, player in gameInfo.PlayerOptions do
         if not player.Human then
-            local playerFaction = player.Faction
-            local factionNames = aiNames[FactionData.Factions[playerFaction].Key]
-            local ranNum
-            repeat
-                ranNum = math.random(1, table.getn(factionNames))
-            until nameSlotsTaken[playerFaction][ranNum] == nil
-            nameSlotsTaken[playerFaction][ranNum] = true
-            player.PlayerName = factionNames[ranNum] .. " (" .. player.PlayerName .. ")"
+            bUsingSpecialAINickname = false
+            bIsSpecialAI = false
+            --Is this an AI that is listed the above table to use a campaign personality?
+            if player.AIPersonality then
+                for iEntry, sPersonality in tsSpecialAIPersonality do
+                    if sPersonality == player.AIPersonality then
+                        bIsSpecialAI = true
+                        break
+                    end
+                end
+            end
+            if bIsSpecialAI then --(note: Although in theory import(gameInfo.GameOptions.ScenarioFile).ScenarioInfo.type == 'skirmish' could be used to check if this is a skirmish map, this can cause errors depending on the map scenario file when importing, hence have left out; comment remaining for if this is considered further in the future
+                --Pick a random campaign personality aligned to the faction of the player, provided it hasn't already been assigned:
+                local refFactionUEF = 1
+                local refFactionAeon = 2
+                local refFactionCybran = 3
+                local refFactionSeraphim = 4
+                local tsPersonalityNamesByFaction = {[refFactionUEF] = {[1] = 'Fletcher', [2] = 'Hall'}, [refFactionAeon] = {[1] = 'Celene', [2] = 'Rhiza', [3] = 'Vendetta', [4] = 'Kael', [5] = 'Gari'}, [refFactionCybran]={[1] = 'Dostya', [2]='Hex5', [3] = 'Brackman', [4]='QAI'}, [refFactionSeraphim]={[1]='ThelUuthow', [2]='OumEoshi'}}
+                local tiAvailableNicknameIndex = {}
+                local iPotentialNames = 0
+                local iFaction = player.Faction
+                local sNickname
+                if tsPersonalityNamesByFaction[iFaction] then
+                    --Check which names havent already been assigned to other players:
+                    for iEntry, sName in tsPersonalityNamesByFaction[player.Faction] do
+                        if not(tbSpecialAISlotsTakenByFaction[iFaction][iEntry]) then
+                            table.insert(tiAvailableNicknameIndex, iEntry)
+                            iPotentialNames = iPotentialNames + 1
+                        end
+                    end
+                    if iPotentialNames > 0 then
+                        --Pick a random name out of the ones for this faction that havent already been assigned
+                        local iRand = math.random(1, iPotentialNames)
+                        sNickname = tsPersonalityNamesByFaction[iFaction][tiAvailableNicknameIndex[iRand]]
+                        bUsingSpecialAINickname = true
+                        player.PlayerName = sNickname..' ('..player.PlayerName..')'
+                        if not(tbSpecialAISlotsTakenByFaction[iFaction]) then tbSpecialAISlotsTakenByFaction[iFaction] = {} end
+                        tbSpecialAISlotsTakenByFaction[iFaction][tiAvailableNicknameIndex[iRand]] = true
+                    end
+                end
+            end
+            --If no campaign personality has been assigned, then pick a random faction appropriate name from the table of AI names:
+            if not(bUsingSpecialAINickname) then
+                local playerFaction = player.Faction
+                local factionNames = aiNames[FactionData.Factions[playerFaction].Key]
+                local ranNum
+                repeat
+                    ranNum = math.random(1, table.getn(factionNames))
+                until nameSlotsTaken[playerFaction][ranNum] == nil
+                nameSlotsTaken[playerFaction][ranNum] = true
+                player.PlayerName = factionNames[ranNum] .. " (" .. player.PlayerName .. ")"
+            end
         end
     end
 end
@@ -2154,12 +2203,55 @@ local function TryLaunch(skipNoObserversCheck)
         FixFactionIndexes()
         AssignRandomStartSpots()
         AssignAINames()
+        --Determine ratings:
         local allRatings = {}
         local clanTags = {}
         for k, player in gameInfo.PlayerOptions do
             if player.Human and player.PL then
                 allRatings[player.PlayerName] = player.PL
                 clanTags[player.PlayerName] = player.PlayerClan
+            elseif not(player.Human) and player.AIPersonality then
+                --Allow AI devs to come up with estimated ratings for their AI here, based on the AI personality
+                local iBaseRating, iApproxRating, bIsCheatingAI
+                local iOmniCheat = 0
+                local iResourceBaseMod = 500 --i.e. if had AiX 1.5, then its rank shoudl be increased by 50% * this
+                local iBuildRateBaseMod = 500 --i.e. if had AiX 1.5, then its rank shoudl be increased by 50% * this
+                local iHigherThreshold = 2000 --The point at which the AI rating will be increased at a much lower rate to avoid absurd ratings
+                local iGeneralRatingFactor = 0.9 --The expected rating should be multiplied by this - e.g. can use to be a bit conservative with the AI expected rating (since it impacts on which player gets units in fullshare)
+                if player.AIPersonality == 'm28ai' then
+                    iBaseRating = 750
+                elseif player.AIPersonality == 'm27ai' then
+                    iBaseRating = 750
+                elseif player.AIPersonality == 'm28aicheat' then
+                    iBaseRating = 750
+                    bIsCheatingAI = true
+                    iResourceBaseMod = 1700
+                    iBuildRateBaseMod = 1300
+                    iOmniCheat = 50
+                elseif player.AIPersonality == 'm27aicheat' then
+                    iBaseRating = 750
+                    bIsCheatingAI = true
+                    iResourceBaseMod = 1600
+                    iBuildRateBaseMod = 1200
+                    iOmniCheat = 50
+                end
+                --Does the AI in question have rating options specified? If not then revert to default (rating of 0)
+                if iBaseRating then
+                    if bIsCheatingAI then
+                        local iResourceMultiplier = tonumber(gameInfo.GameOptions.CheatMult)
+                        local iBuildMultiplier = tonumber(gameInfo.GameOptions.BuildMult)
+                        iApproxRating = math.max(iBaseRating + iOmniCheat + (iResourceMultiplier - 1) * iResourceBaseMod + (iBuildMultiplier - 1) * iBuildRateBaseMod, 0)
+                        if iApproxRating > iHigherThreshold then
+                            iApproxRating = iHigherThreshold + (iApproxRating - iHigherThreshold) * 0.2
+                        end
+                    else
+                        iApproxRating = iBaseRating
+                    end
+                    iApproxRating = iApproxRating * iGeneralRatingFactor
+                    --Round to the nearest 25:
+                    iApproxRating = math.round(iApproxRating / 25) * 25
+                    allRatings[player.PlayerName] = iApproxRating
+                end
             end
 
             if player.OwnerID == localPlayerID then
