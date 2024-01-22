@@ -94,10 +94,10 @@ UnitBlueprint{
         UniformScale = 0.2,
     },
     Economy = {
-        BuildCostEnergy = 35000,
-        BuildCostMass = 2080,
+        BuildCostEnergy = 39000,
+        BuildCostMass = 2240,
         BuildRate = 50,
-        BuildTime = 3000,
+        BuildTime = 3300,
         BuildableCategory = { "urb4207" },
         DifferentialUpgradeCostCalculation = true,
         MaintenanceConsumptionPerSecondEnergy = 400,
