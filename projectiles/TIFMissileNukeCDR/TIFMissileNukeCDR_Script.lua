@@ -50,7 +50,7 @@ TIFMissileNukeCDR = ClassProjectile(TIFTacticalNuke) {
     -- reduce due to distance
     LaunchTicks = 6,
     HeightDistanceFactor = 10,
-    FinalBoostAngle = 90,
+    FinalBoostAngle = 60,
 
     ---@param self TIFMissileNukeCDR
     ---@param inWater boolean
@@ -93,22 +93,22 @@ TIFMissileNukeCDR = ClassProjectile(TIFTacticalNuke) {
     ---@param launchEffects moho.IEffect[]
     ArmMissileThread = function(self, launchEffects)
         WaitTicks(7)
-        for k, effect in ipairs(launchEffects) do
+        for k, effect in launchEffects do
             effect:ScaleEmitter(0.9)
         end
 
         WaitTicks(7)
-        for k, effect in ipairs(launchEffects) do
+        for k, effect in launchEffects do
             effect:ScaleEmitter(0.7)
         end
 
         WaitTicks(7)
-        for k, effect in ipairs(launchEffects) do
+        for k, effect in launchEffects do
             effect:ScaleEmitter(0.5)
         end
 
         WaitTicks(7)
-        for k, effect in ipairs(launchEffects) do
+        for k, effect in launchEffects do
             effect:ScaleEmitter(0.3)
         end
 

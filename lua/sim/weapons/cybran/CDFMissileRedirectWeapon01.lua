@@ -67,6 +67,8 @@ CDFMissileRedirectWeapon01 = ClassWeapon(DefaultProjectileWeapon) {
         local projectileOrientation = projectile:GetOrientation()
         local projectileLauncher = projectile:GetLauncher() --[[@as Unit]]
         local projectileBlueprintId = projectile.Blueprint.BlueprintId
+        local projectileInnerRing = projectile.InnerRing
+        local projectileOuterRing = projectile.OuterRing
 
         -- destroy the original projectile
         projectile:Destroy()
@@ -85,6 +87,8 @@ CDFMissileRedirectWeapon01 = ClassWeapon(DefaultProjectileWeapon) {
 
         -- match the redirected projectile with the original projectile
         redirected.DamageData = projectile.DamageData
+        redirected.InnerRing = projectileInnerRing
+        redirected.OuterRing = projectileOuterRing
         redirected:SetVelocity(pvx, pvy, pvz)
         redirected:SetVelocity(10 * projectileSpeed)
         redirected:SetPosition(projectilePosition, true)
@@ -109,7 +113,7 @@ CDFMissileRedirectWeapon01 = ClassWeapon(DefaultProjectileWeapon) {
         -- rotate towards the sky
         local position = redirected:GetPosition()
         redirected:SetLifetime(30)
-        redirected:SetTurnRate(160)
+        redirected:SetTurnRate(240)
         redirected:TrackTarget(true)
         redirected:SetNewTargetGround({
             position[1] + (2 - 4 * Random()),
