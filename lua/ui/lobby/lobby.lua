@@ -1805,6 +1805,7 @@ local function AssignAutoTeams()
     end
 end
 
+---@param bIsSkirmishMap bool
 local function AssignAINames(bIsSkirmishMap)
     --Assigns a random name from the predefined list of AI names by default.  Includes functionality for AI devs to instead have campaign faction appropriate characters assigned as the name
     local aiNames = import("/lua/ui/lobby/ainames.lua").ainames
@@ -2075,6 +2076,10 @@ function UpdateAvailableSlots(numAvailStartSpots, scenario)
     gameInfo.firstUpdateAvailableSlotsDone = true
 end
 
+---@param sPersonality string
+---@param tGameOptions table
+---@param tScenarioInfo table
+---@return number or nil
 local function GetApproximateAIPersonalityRating(sPersonality, tGameOptions, tScenarioInfo)
     --Returns either the approximate rating for the AI, or nil if an approximate rating isnt to be used
     --Allow AI devs to come up with estimated ratings for their AI here, based on the AI personality
