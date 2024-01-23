@@ -1805,7 +1805,7 @@ local function AssignAutoTeams()
     end
 end
 
-local function AssignAINames()
+local function AssignAINames(bIsSkirmishMap)
     --Assigns a random name from the predefined list of AI names by default.  Includes functionality for AI devs to instead have campaign faction appropriate characters assigned as the name
     local aiNames = import("/lua/ui/lobby/ainames.lua").ainames
     local nameSlotsTaken = {}
@@ -1821,7 +1821,7 @@ local function AssignAINames()
             bUsingSpecialAINickname = false
             bIsSpecialAI = false
             --Is this an AI that is listed the above table to use a campaign personality?
-            if player.AIPersonality then
+            if bIsSkirmishMap and player.AIPersonality then
                 for iEntry, sPersonality in tsSpecialAIPersonality do
                     if sPersonality == player.AIPersonality then
                         bIsSpecialAI = true
@@ -2075,6 +2075,67 @@ function UpdateAvailableSlots(numAvailStartSpots, scenario)
     gameInfo.firstUpdateAvailableSlotsDone = true
 end
 
+local function GetApproximateAIPersonalityRating(sPersonality, tGameOptions, tScenarioInfo)
+    --Returns either the approximate rating for the AI, or nil if an approximate rating isnt to be used
+    --Allow AI devs to come up with estimated ratings for their AI here, based on the AI personality
+    local iBaseRating, iApproxRating, bIsCheatingAI
+    local iOmniCheat = 0
+    local iResourceBaseMod = 500 --i.e. if had AiX 1.5, then its rank shoudl be increased by 50% * this
+    local iBuildRateBaseMod = 500 --i.e. if had AiX 1.5, then its rank shoudl be increased by 50% * this
+    local iHigherThreshold = 2000 --The point at which the AI rating will be increased at a much lower rate to avoid absurd ratings
+    local tiMapFactorsBySize = {[5]=0.85,[10]=0.95,[20]=1, [40]=0.9} --The expected rating should be multiplied by this based on the map size
+    if sPersonality == 'm28ai' then
+        iBaseRating = 800
+    elseif sPersonality == 'm27ai' then
+        iBaseRating = 800
+    elseif sPersonality == 'm28aicheat' then
+        iBaseRating = 800
+        bIsCheatingAI = true
+        iResourceBaseMod = 1700
+        iBuildRateBaseMod = 1300
+        iOmniCheat = 50
+    elseif sPersonality == 'm27aicheat' then
+        iBaseRating = 800
+        bIsCheatingAI = true
+        iResourceBaseMod = 1600
+        iBuildRateBaseMod = 1200
+        iOmniCheat = 50
+    --To add ratings for other AI, include an elseif statement for the AI personality, similarly to the above, set iBaseRating equal to the approx rating of the AI (no cheats enabled), and then adjust the other variables as desired from the default values
+    end
+    --Does the AI in question have rating options specified? If not then revert to default (rating of 0)
+    if iBaseRating then
+        if not(iMapFactor) then iMapFactor = 1 end
+        if bIsCheatingAI then
+            local iResourceMultiplier = tonumber(tGameOptions.CheatMult)
+            local iBuildMultiplier = tonumber(tGameOptions.BuildMult)
+            iApproxRating = math.max(iBaseRating + iOmniCheat + (iResourceMultiplier - 1) * iResourceBaseMod + (iBuildMultiplier - 1) * iBuildRateBaseMod, 0)
+            if iApproxRating > iHigherThreshold then
+                iApproxRating = iHigherThreshold + (iApproxRating - iHigherThreshold) * 0.2
+            end
+        else
+            iApproxRating = iBaseRating
+        end
+        --Adjust the rating based on the size of the map:
+        --Get the map size
+        local iMapSize = math.max((tScenarioInfo.size[1] or 0), (tScenarioInfo.size[2] or 0))
+        local iMapFactor
+        if iMapSize <= 256 then
+            iMapFactor = tiMapFactorsBySize[5]
+        elseif iMapSize <= 512 then
+            iMapFactor = tiMapFactorsBySize[10]
+        elseif iMapSize <= 1024 then
+            iMapFactor = tiMapFactorsBySize[20]
+        else
+            iMapFactor = tiMapFactorsBySize[40]
+        end
+
+        iApproxRating = iApproxRating * iMapFactor
+        --Round to the nearest 25:
+        iApproxRating = math.round(iApproxRating / 25) * 25
+    end
+    return iApproxRating
+end
+
 local function TryLaunch(skipNoObserversCheck)
     if not singlePlayer then
         local notReady = GetPlayersNotReady()
@@ -2202,7 +2263,10 @@ local function TryLaunch(skipNoObserversCheck)
         -- fix faction indexes
         FixFactionIndexes()
         AssignRandomStartSpots()
-        AssignAINames()
+
+        scenarioInfo = MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile) --Do here so we can get map info for AI ratings
+        AssignAINames(scenarioInfo.type == 'skirmish')
+
         --Determine ratings:
         local allRatings = {}
         local clanTags = {}
@@ -2211,45 +2275,8 @@ local function TryLaunch(skipNoObserversCheck)
                 allRatings[player.PlayerName] = player.PL
                 clanTags[player.PlayerName] = player.PlayerClan
             elseif not(player.Human) and player.AIPersonality then
-                --Allow AI devs to come up with estimated ratings for their AI here, based on the AI personality
-                local iBaseRating, iApproxRating, bIsCheatingAI
-                local iOmniCheat = 0
-                local iResourceBaseMod = 500 --i.e. if had AiX 1.5, then its rank shoudl be increased by 50% * this
-                local iBuildRateBaseMod = 500 --i.e. if had AiX 1.5, then its rank shoudl be increased by 50% * this
-                local iHigherThreshold = 2000 --The point at which the AI rating will be increased at a much lower rate to avoid absurd ratings
-                local iGeneralRatingFactor = 0.9 --The expected rating should be multiplied by this - e.g. can use to be a bit conservative with the AI expected rating (since it impacts on which player gets units in fullshare)
-                if player.AIPersonality == 'm28ai' then
-                    iBaseRating = 750
-                elseif player.AIPersonality == 'm27ai' then
-                    iBaseRating = 750
-                elseif player.AIPersonality == 'm28aicheat' then
-                    iBaseRating = 750
-                    bIsCheatingAI = true
-                    iResourceBaseMod = 1700
-                    iBuildRateBaseMod = 1300
-                    iOmniCheat = 50
-                elseif player.AIPersonality == 'm27aicheat' then
-                    iBaseRating = 750
-                    bIsCheatingAI = true
-                    iResourceBaseMod = 1600
-                    iBuildRateBaseMod = 1200
-                    iOmniCheat = 50
-                end
-                --Does the AI in question have rating options specified? If not then revert to default (rating of 0)
-                if iBaseRating then
-                    if bIsCheatingAI then
-                        local iResourceMultiplier = tonumber(gameInfo.GameOptions.CheatMult)
-                        local iBuildMultiplier = tonumber(gameInfo.GameOptions.BuildMult)
-                        iApproxRating = math.max(iBaseRating + iOmniCheat + (iResourceMultiplier - 1) * iResourceBaseMod + (iBuildMultiplier - 1) * iBuildRateBaseMod, 0)
-                        if iApproxRating > iHigherThreshold then
-                            iApproxRating = iHigherThreshold + (iApproxRating - iHigherThreshold) * 0.2
-                        end
-                    else
-                        iApproxRating = iBaseRating
-                    end
-                    iApproxRating = iApproxRating * iGeneralRatingFactor
-                    --Round to the nearest 25:
-                    iApproxRating = math.round(iApproxRating / 25) * 25
+                local iApproxRating = GetApproximateAIPersonalityRating(player.AIPersonality, gameInfo.GameOptions, scenarioInfo)
+                if iApproxRating then
                     allRatings[player.PlayerName] = iApproxRating
                 end
             end
@@ -2261,7 +2288,7 @@ local function TryLaunch(skipNoObserversCheck)
         gameInfo.GameOptions['Ratings'] = allRatings
         gameInfo.GameOptions['ClanTags'] = clanTags
 
-        scenarioInfo = MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile)
+
 
         -- Load in the default map options if they are not set manually
 
