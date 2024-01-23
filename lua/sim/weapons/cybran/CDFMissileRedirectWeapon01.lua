@@ -69,6 +69,7 @@ CDFMissileRedirectWeapon01 = ClassWeapon(DefaultProjectileWeapon) {
         local projectileBlueprintId = projectile.Blueprint.BlueprintId
         local projectileInnerRing = projectile.InnerRing
         local projectileOuterRing = projectile.OuterRing
+        local projectileHealth = projectile:GetHealth()
 
         -- destroy the original projectile
         projectile:Destroy()
@@ -93,6 +94,7 @@ CDFMissileRedirectWeapon01 = ClassWeapon(DefaultProjectileWeapon) {
         redirected:SetVelocity(10 * projectileSpeed)
         redirected:SetPosition(projectilePosition, true)
         redirected:SetOrientation(projectileOrientation, true)
+        redirected:SetHealth(nil, projectileHealth)
 
         -- redirect behavior
         self.Trash:Add(ForkThread(self.RedirectBehaviorThread, self, redirected, projectileLauncher))
