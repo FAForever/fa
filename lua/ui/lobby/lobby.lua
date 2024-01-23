@@ -2079,7 +2079,7 @@ end
 ---@param sPersonality string
 ---@param tGameOptions table
 ---@param tScenarioInfo table
----@return number or nil
+---@return number
 local function GetApproximateAIPersonalityRating(sPersonality, tGameOptions, tScenarioInfo)
     --Returns either the approximate rating for the AI, or nil if an approximate rating isnt to be used
     --Allow AI devs to come up with estimated ratings for their AI here, based on the AI personality
@@ -2109,7 +2109,6 @@ local function GetApproximateAIPersonalityRating(sPersonality, tGameOptions, tSc
     end
     --Does the AI in question have rating options specified? If not then revert to default (rating of 0)
     if iBaseRating then
-        if not(iMapFactor) then iMapFactor = 1 end
         if bIsCheatingAI then
             local iResourceMultiplier = tonumber(tGameOptions.CheatMult)
             local iBuildMultiplier = tonumber(tGameOptions.BuildMult)
@@ -2133,6 +2132,7 @@ local function GetApproximateAIPersonalityRating(sPersonality, tGameOptions, tSc
         else
             iMapFactor = tiMapFactorsBySize[40]
         end
+        if not(iMapFactor) then iMapFactor = 1 end
 
         iApproxRating = iApproxRating * iMapFactor
         --Round to the nearest 25:
