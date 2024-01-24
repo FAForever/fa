@@ -988,7 +988,6 @@ local function OverchargeInit(control, unitList)
     end
 
     control._isAutoMode = IsAutoOCMode(unitList)
-    LOG(control._isAutoMode)
 
     control._curHelpText = control._data.helpText
     if control._isAutoMode then
