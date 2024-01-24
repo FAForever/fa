@@ -137,7 +137,6 @@ OverchargeWeapon = ClassWeapon(DefaultProjectileWeapon) {
         aimControl:SetPrecedence(20)
         unit.BuildArmManipulator:SetPrecedence(0)
         aimControl:SetHeadingPitch(unit:GetWeaponManipulatorByLabel(weaponLabel):GetHeadingPitch())
-        unit:UpdateStat("AutoOC", 1)
         self.enabled = true
     end,
 
@@ -159,7 +158,6 @@ OverchargeWeapon = ClassWeapon(DefaultProjectileWeapon) {
         unit.BuildArmManipulator:SetPrecedence(0)
         unit:GetWeaponManipulatorByLabel(weaponLabel):SetHeadingPitch(aimControl:GetHeadingPitch())
 
-        unit:UpdateStat("AutoOC", 0)
         self.enabled = false
     end,
 
