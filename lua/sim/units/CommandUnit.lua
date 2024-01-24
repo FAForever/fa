@@ -145,7 +145,7 @@ CommandUnit = ClassUnit(WalkingLandUnit) {
         if wep.NeedsUpgrade then return end
 
         wep:SetAutoOvercharge(auto)
-        self.Sync.AutoOvercharge = auto
+        self:UpdateStat("AutoOC", auto and 1 or 0)
     end,
 
     ---@param self CommandUnit

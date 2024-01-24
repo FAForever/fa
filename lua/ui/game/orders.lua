@@ -150,7 +150,8 @@ end
 
 -- Local logic data
 local orderCheckboxMap = false
-local currentSelection = false
+---@type UserUnit[]
+local currentSelection = nil
 
 -- Helper function to create order bitmaps
 -- Note, your bitmaps must be in /game/orders/ and have the standard button naming convention
@@ -956,9 +957,9 @@ function FindOCWeapon(bp)
 
     return
 end
-
+---@param units UserUnit[]
 local function IsAutoOCMode(units)
-    return UnitData[units[1]:GetEntityId()].AutoOvercharge == true
+    return units[1]:GetStat("AutoOC",0).Value == 1
 end
 
 local function OverchargeInit(control, unitList)
@@ -987,6 +988,7 @@ local function OverchargeInit(control, unitList)
     end
 
     control._isAutoMode = IsAutoOCMode(unitList)
+    LOG(control._isAutoMode)
 
     control._curHelpText = control._data.helpText
     if control._isAutoMode then
@@ -1007,7 +1009,8 @@ function OverchargeBehavior(self, modifiers)
         EnterOverchargeMode()
     elseif modifiers.Right then
         self._curHelpText = self._data.helpText
-        if self._isAutoMode then
+        local isAutoOC = IsAutoOCMode(currentSelection)
+        if isAutoOC then
             self.autoModeIcon:SetAlpha(0)
             self._isAutoMode = false
         else
@@ -1019,8 +1022,7 @@ function OverchargeBehavior(self, modifiers)
             controls.mouseoverDisplay.text:SetText(self._curHelpText)
         end
 
-        local cb = {Func = 'AutoOvercharge', Args = {auto = self._isAutoMode == true} }
-        SimCallback(cb, true)
+        SimCallback({Func = 'AutoOvercharge', Args = {auto = self._isAutoMode == true} }, true)
     end
 end
 
