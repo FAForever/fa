@@ -14,42 +14,56 @@ function GetAItypes()
             name = "<LOC lobui_0347>AI: Easy",
             requiresNavMesh = true,
             baseAI = true,
+            rating = 300,
+            ratingCheatMultiplier = 0.0,
         },
         {
             key = 'medium',
             name = "<LOC lobui_0349>AI: Normal",
             requiresNavMesh = true,
             baseAI = true,
+            rating = 450,
+            ratingCheatMultiplier = 0.0,
         },
         {
             key = 'adaptive',
             name = "<LOC lobui_0368>AI: Adaptive",
             requiresNavMesh = true,
             baseAI = true,
+            rating = 600,
+            ratingCheatMultiplier = 0.0,
         },
         {
             key = 'rush',
             name = "<LOC lobui_0360>AI: Rush",
             requiresNavMesh = true,
             baseAI = true,
+            rating = 600,
+            ratingCheatMultiplier = 0.0,
         },
         {
             key = 'turtle',
             name = "<LOC lobui_0372>AI: Turtle",
             requiresNavMesh = true,
             baseAI = true,
+            rating = 600,
+            ratingCheatMultiplier = 0.0,
         },
         {
             key = 'tech',
             name = "<LOC lobui_0370>AI: Tech",
             requiresNavMesh = true,
             baseAI = true,
+            rating = 600,
+            ratingCheatMultiplier = 0.0,
         },
         {
             key = 'random',
             name = "<LOC lobui_0374>AI: Random",
             requiresNavMesh = true,
             baseAI = true,
+            rating = 600,
+            ratingCheatMultiplier = 0.0,
         }
     }
 
@@ -84,9 +98,9 @@ function GetAItypes()
     -- loop over all installed mods
     for Index, ModData in simMods do
         -- check if we have a CustomAIs_v2 folder (then we have an AI mod)
-        if exists(ModData.location..'/lua/AI/CustomAIs_v2') then
+        if exists(ModData.location .. '/lua/AI/CustomAIs_v2') then
             -- get all AI files from CustomAIs_v2 folder
-            ModAIFiles = DiskFindFiles(ModData.location..'/lua/AI/CustomAIs_v2', '*.lua')
+            ModAIFiles = DiskFindFiles(ModData.location .. '/lua/AI/CustomAIs_v2', '*.lua')
             -- check, if we have found at least 1 file
             if ModAIFiles[1] then
                 -- loop over all AI files
@@ -106,11 +120,51 @@ function GetAItypes()
     end
 
     --Default GPG Cheating AIs
-    table.insert(aitypes, { key = 'adaptivecheat', name = "<LOC lobui_0379>AIx: Adaptive", requiresNavMesh = true, baseAI = true })
-    table.insert(aitypes, { key = 'rushcheat', name = "<LOC lobui_0380>AIx: Rush", requiresNavMesh = true, baseAI = true })
-    table.insert(aitypes, { key = 'turtlecheat', name = "<LOC lobui_0384>AIx: Turtle", requiresNavMesh = true,  baseAI = true})
-    table.insert(aitypes, { key = 'techcheat', name = "<LOC lobui_0385>AIx: Tech", requiresNavMesh = true, baseAI = true })
-    table.insert(aitypes, { key = 'randomcheat', name = "<LOC lobui_0395>AIx: Random", requiresNavMesh = true, baseAI = true })
+    table.insert(aitypes,
+        {
+            key = 'adaptivecheat',
+            name = "<LOC lobui_0379>AIx: Adaptive",
+            requiresNavMesh = true,
+            baseAI = true,
+            rating = 800,
+            ratingCheatMultiplier = 100.0
+        })
+    table.insert(aitypes,
+        {
+            key = 'rushcheat',
+            name = "<LOC lobui_0380>AIx: Rush",
+            requiresNavMesh = true,
+            baseAI = true,
+            rating = 800,
+            ratingCheatMultiplier = 100.0
+        })
+    table.insert(aitypes,
+        {
+            key = 'turtlecheat',
+            name = "<LOC lobui_0384>AIx: Turtle",
+            requiresNavMesh = true,
+            baseAI = true,
+            rating = 800,
+            ratingCheatMultiplier = 100.0
+        })
+    table.insert(aitypes,
+        {
+            key = 'techcheat',
+            name = "<LOC lobui_0385>AIx: Tech",
+            requiresNavMesh = true,
+            baseAI = true,
+            rating = 800,
+            ratingCheatMultiplier = 100.0
+        })
+    table.insert(aitypes,
+        {
+            key = 'randomcheat',
+            name = "<LOC lobui_0395>AIx: Random",
+            requiresNavMesh = true,
+            baseAI = true,
+            rating = 800,
+            ratingCheatMultiplier = 100.0
+        })
 
     --Load Custom Cheating AIs - old style
     for i, v in AIFilesold do
@@ -135,9 +189,9 @@ function GetAItypes()
     -- loop over all installed mods
     for Index, ModData in simMods do
         -- check if we have a CustomAIs_v2 folder (then we have an AI mod)
-        if exists(ModData.location..'/lua/AI/CustomAIs_v2') then
+        if exists(ModData.location .. '/lua/AI/CustomAIs_v2') then
             -- get all AI files from CustomAIs_v2 folder
-            ModAIFiles = DiskFindFiles(ModData.location..'/lua/AI/CustomAIs_v2', '*.lua')
+            ModAIFiles = DiskFindFiles(ModData.location .. '/lua/AI/CustomAIs_v2', '*.lua')
             -- check, if we have found at least 1 file
             if ModAIFiles[1] then
                 -- loop over all AI files

@@ -474,12 +474,20 @@ function GetAIPlayerData(name, AIPersonality, slot)
     -- retrieve properties from AI table
     local baseAI = false
     local requiresNavMesh = false
+    local rating = 0
+    local ratingCheatMultiplier = 1.0
     for k, entry in aitypes do 
         if entry.key == AIPersonality then
             requiresNavMesh = requiresNavMesh or entry.requiresNavMesh
             baseAI = baseAI or entry.baseAI
+            rating = entry.rating or 0
+            ratingCheatMultiplier = entry.ratingCheatMultiplier or 1.0
         end
     end
+
+    -- try and take into account the multiplier
+    local buildMultiplier = tonumber(gameInfo.GameOptions.BuildMult) or 1.0
+    local resourceMultiplier = tonumber(gameInfo.GameOptions.CheatMult) or 1.0
 
     return PlayerData(
         {
@@ -493,7 +501,11 @@ function GetAIPlayerData(name, AIPersonality, slot)
 
             -- properties from AI table
             RequiresNavMesh = requiresNavMesh,
-            BaseAI = baseAI
+            BaseAI = baseAI,
+            PL = rating + (ratingCheatMultiplier * (buildMultiplier + resourceMultiplier)),
+
+            AIRating = rating,
+            AIRatingCheatMultiplier = ratingCheatMultiplier
         }
 )
 end
@@ -2157,9 +2169,19 @@ local function TryLaunch(skipNoObserversCheck)
         local allRatings = {}
         local clanTags = {}
         for k, player in gameInfo.PlayerOptions do
-            if player.Human and player.PL then
+            if player.PL then
                 allRatings[player.PlayerName] = player.PL
                 clanTags[player.PlayerName] = player.PlayerClan
+
+                reprsl(player)
+                if not player.Human then
+
+                    -- try and take into account the multiplier
+                    local multiplier = player.AIRatingCheatMultiplier or 1.0
+                    local buildMultiplier = tonumber(gameInfo.GameOptions.BuildMult) or 1.0
+                    local resourceMultiplier = tonumber(gameInfo.GameOptions.CheatMult) or 1.0
+                    allRatings[player.PlayerName] = player.AIRating + (multiplier * (buildMultiplier + resourceMultiplier));
+                end
             end
 
             if player.OwnerID == localPlayerID then
@@ -2255,6 +2277,20 @@ local function UpdateGame()
 
     if gameInfo.GameOptions.ScenarioFile and (gameInfo.GameOptions.ScenarioFile ~= "") then
         scenarioInfo = MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile)
+
+        -- update AI rating as game settings change
+        for k = 1, 16 do
+            local playerOptions = gameInfo.PlayerOptions[k]
+            if playerOptions then
+                if not playerOptions.Human then
+                    -- try and take into account the multiplier
+                    local multiplier = playerOptions.AIRatingCheatMultiplier or 1.0
+                    local buildMultiplier = tonumber(gameInfo.GameOptions.BuildMult) or 1.0
+                    local resourceMultiplier = tonumber(gameInfo.GameOptions.CheatMult) or 1.0
+                    playerOptions.PL = playerOptions.AIRating + (multiplier * (buildMultiplier + resourceMultiplier));
+                end
+            end
+        end
 
         if scenarioInfo and scenarioInfo.map and scenarioInfo.map ~= '' then
             GUI.mapView:SetScenario(scenarioInfo)
