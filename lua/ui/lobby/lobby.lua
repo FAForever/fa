@@ -2173,7 +2173,6 @@ local function TryLaunch(skipNoObserversCheck)
                 allRatings[player.PlayerName] = player.PL
                 clanTags[player.PlayerName] = player.PlayerClan
 
-                reprsl(player)
                 if not player.Human then
 
                     -- try and take into account the multiplier
