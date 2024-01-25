@@ -489,10 +489,11 @@ function ComputeAIRating(gameOptions, aiLobbyProperties)
     end
 
     -- process various multipliers to determine rating
+    local omniValue = (gameOptions.OmniCheat == 'on' and aiLobbyProperties.ratingOmniBonus) or 0.0
     local mapMultiplier = aiLobbyProperties.ratingMapMultiplier[maparea] or 1.0
     local cheatBuildValue = (aiLobbyProperties.ratingBuildMultiplier or 0.0) * (tonumber(gameOptions.BuildMult) or 1.0)
     local cheatResourceValue = (aiLobbyProperties.ratingBuildMultiplier or 0.0) * (tonumber(gameOptions.CheatMult) or 1.0)
-    return math.floor(mapMultiplier * (aiLobbyProperties.rating + cheatBuildValue + cheatResourceValue))
+    return math.floor(mapMultiplier * (aiLobbyProperties.rating + cheatBuildValue + cheatResourceValue + omniValue))
 end
 
 function GetAIPlayerData(name, AIPersonality, slot)

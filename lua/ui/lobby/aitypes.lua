@@ -12,8 +12,8 @@
 ---@field rating number
 ---@field ratingCheatMultiplier number
 ---@field ratingBuildMultiplier number
----@field ratingMapAbsolute number[]
 ---@field ratingMapMultiplier number[]
+---@field ratingOmniBonus number
 
 function GetAItypes()
     --Table of AI Names to return
@@ -25,7 +25,7 @@ function GetAItypes()
             rating = 300,
             ratingCheatMultiplier = 0.0,
             ratingBuildMultiplier = 0.0,
-            ratingOmniMultiplier = 1.0,
+            ratingOmniBonus = 0.0,
             ratingMapMultiplier = {
                 [256] = 1.0,   -- 5x5
                 [512] = 1.0,   -- 10x10
@@ -41,7 +41,7 @@ function GetAItypes()
             rating = 450,
             ratingCheatMultiplier = 0.0,
             ratingBuildMultiplier = 0.0,
-            ratingOmniMultiplier = 1.0,
+            ratingOmniBonus = 0.0,
             ratingMapMultiplier = {
                 [256] = 1.0,   -- 5x5
                 [512] = 1.0,   -- 10x10
@@ -57,7 +57,7 @@ function GetAItypes()
             rating = 600,
             ratingCheatMultiplier = 0.0,
             ratingBuildMultiplier = 0.0,
-            ratingOmniMultiplier = 1.0,
+            ratingOmniBonus = 0.0,
             ratingMapMultiplier = {
                 [256] = 1.0,   -- 5x5
                 [512] = 1.0,   -- 10x10
@@ -73,7 +73,7 @@ function GetAItypes()
             rating = 600,
             ratingCheatMultiplier = 0.0,
             ratingBuildMultiplier = 0.0,
-            ratingOmniMultiplier = 1.0,
+            ratingOmniBonus = 0.0,
             ratingMapMultiplier = {
                 [256] = 1.0,   -- 5x5
                 [512] = 1.0,   -- 10x10
@@ -89,7 +89,7 @@ function GetAItypes()
             rating = 600,
             ratingCheatMultiplier = 0.0,
             ratingBuildMultiplier = 0.0,
-            ratingOmniMultiplier = 1.0,
+            ratingOmniBonus = 0.0,
             ratingMapMultiplier = {
                 [256] = 1.0,   -- 5x5
                 [512] = 1.0,   -- 10x10
@@ -105,7 +105,7 @@ function GetAItypes()
             rating = 600,
             ratingCheatMultiplier = 0.0,
             ratingBuildMultiplier = 0.0,
-            ratingOmniMultiplier = 1.0,
+            ratingOmniBonus = 0.0,
             ratingMapMultiplier = {
                 [256] = 1.0,   -- 5x5
                 [512] = 1.0,   -- 10x10
@@ -121,7 +121,7 @@ function GetAItypes()
             rating = 600,
             ratingCheatMultiplier = 0.0,
             ratingBuildMultiplier = 0.0,
-            ratingOmniMultiplier = 1.0,
+            ratingOmniBonus = 0.0,
             ratingMapMultiplier = {
                 [256] = 1.0,   -- 5x5
                 [512] = 1.0,   -- 10x10
@@ -193,7 +193,7 @@ function GetAItypes()
             rating = 800,
             ratingCheatMultiplier = 100.0,
             ratingBuildMultiplier = 100.0,
-            ratingOmniMultiplier = 1.2,
+            ratingOmniBonus = 200,
             ratingMapMultiplier = {
                 [256] = 1.0,   -- 5x5
                 [512] = 1.0,   -- 10x10
@@ -210,7 +210,7 @@ function GetAItypes()
             rating = 800,
             ratingCheatMultiplier = 100.0,
             ratingBuildMultiplier = 100.0,
-            ratingOmniMultiplier = 1.2,
+            ratingOmniBonus = 200,
             ratingMapMultiplier = {
                 [256] = 1.0,   -- 5x5
                 [512] = 1.0,   -- 10x10
@@ -227,7 +227,7 @@ function GetAItypes()
             rating = 800,
             ratingCheatMultiplier = 100.0,
             ratingBuildMultiplier = 100.0,
-            ratingOmniMultiplier = 1.2,
+            ratingOmniBonus = 200,
             ratingMapMultiplier = {
                 [256] = 1.0,   -- 5x5
                 [512] = 1.0,   -- 10x10
@@ -244,7 +244,7 @@ function GetAItypes()
             rating = 800,
             ratingCheatMultiplier = 100.0,
             ratingBuildMultiplier = 100.0,
-            ratingOmniMultiplier = 1.2,
+            ratingOmniBonus = 200,
             ratingMapMultiplier = {
                 [256] = 1.0,   -- 5x5
                 [512] = 1.0,   -- 10x10
@@ -261,7 +261,7 @@ function GetAItypes()
             rating = 800,
             ratingCheatMultiplier = 100.0,
             ratingBuildMultiplier = 100.0,
-            ratingOmniMultiplier = 1.2,
+            ratingOmniBonus = 200,
             ratingMapMultiplier = {
                 [256] = 1.0,   -- 5x5
                 [512] = 1.0,   -- 10x10
