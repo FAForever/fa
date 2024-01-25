@@ -32,6 +32,21 @@ local worldview = import("/lua/ui/game/worldview.lua").viewLeft
 local oldHandleEvent = worldview.HandleEvent
 
 
+function TranslateExFacUnits(selection)
+    local exFacs = EntityCategoryFilterDown(categories.EXTERNALFACTORY, selection)   -- get all selected units with a factory attachment
+    local nonExFacs = nil
+    if not table.empty(exFacs) then
+        nonExFacs = EntityCategoryFilterOut(categories.EXTERNALFACTORY, selection) -- get all selected Units without a factory attachment
+        for _, exFac in exFacs do
+            table.insert(nonExFacs, exFac:GetCreator()) -- for each unit with a factory attachment add the attachment to the list of factories
+        end
+        -- in case we've somehow selected both the platform and the factory, only put the fac in once
+        nonExFacs = table.unique(nonExFacs)
+    end
+    return nonExFacs
+end
+
+
 function initCycleButtons(values)
     local buttonH = 48
     local buttonW = 48
@@ -266,7 +281,7 @@ end
 --- A 'hack' to allow us to detect whether the `ButtonRelease` event was from a left-click
 factoryHotkeyLastClickWasLeft = false
 
-function factoryHotkey(units, count)
+function factoryHotkey(units, count, selection, exFacUnits)
     CommandMode.StartCommandMode("build", {name = ''})
 
     -- Another 'hack' that is, uuhh - a hack. Override the event handle of the world view. If it doesn't 
@@ -279,14 +294,22 @@ function factoryHotkey(units, count)
                     if IsKeyDown("Shift") then
                         count = 5
                     end
-                    IssueBlueprintCommand("UNITCOMMAND_BuildFactory", units, count)
+                    if exFacUnits then
+                        IssueBlueprintCommandToUnits(exFacUnits, "UNITCOMMAND_BuildFactory", units, count)
+                    else
+                        IssueBlueprintCommand("UNITCOMMAND_BuildFactory", units, count)
+                    end
                     count = 1
-                    factoryHotkey(units, count)
+                    factoryHotkey(units, count, selection, exFacUnits)
                 else
                     for _, unit in units do
                         local v = unit.id
                         local count = unit.count
-                        IssueBlueprintCommand("UNITCOMMAND_BuildFactory", v, count)
+                        if exFacUnits then
+                            IssueBlueprintCommandToUnits(exFacUnits, "UNITCOMMAND_BuildFactory", v, count)
+                        else
+                            IssueBlueprintCommand("UNITCOMMAND_BuildFactory", v, count)
+                        end
                     end
                     StopCycleMap(self, event)
                 end
@@ -416,15 +439,19 @@ function buildActionFactoryTemplate(modifier)
 
     local template = effectiveTemplates[cyclePos]
     local selectedTemplate = template.templateData
-
+    local filteredUnits = TranslateExFacUnits(selection)
     if maxPos == 1 then
         for _, units in selectedTemplate do
             local v = units.id
             local count = units.count
-            IssueBlueprintCommand("UNITCOMMAND_BuildFactory", v, count)
+            if filteredUnits then
+                IssueBlueprintCommandToUnits(filteredUnits, "UNITCOMMAND_BuildFactory", v, count)
+            else
+                IssueBlueprintCommand("UNITCOMMAND_BuildFactory", v, count)
+            end
         end
     else
-        factoryHotkey(selectedTemplate)
+        factoryHotkey(selectedTemplate, nil, selection, filteredUnits)
     end
 end
 
@@ -558,11 +585,16 @@ function buildActionUnit(name, modifier)
 
     local unit = effectiveValues[cyclePos]
 
+    local filteredUnits = TranslateExFacUnits(selection)
     if maxPos == 1 then
-        IssueBlueprintCommand("UNITCOMMAND_BuildFactory", unit, count)
+        if filteredUnits then
+            IssueBlueprintCommandToUnits(filteredUnits, "UNITCOMMAND_BuildFactory", unit, count)
+        else
+            IssueBlueprintCommand("UNITCOMMAND_BuildFactory", unit, count)
+        end
         Construction.RefreshUI()
     else
-        factoryHotkey(unit, count)
+        factoryHotkey(unit, count, selection, filteredUnits)
     end
 end
 
