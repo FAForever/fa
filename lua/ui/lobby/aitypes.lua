@@ -22,7 +22,7 @@ function GetAItypes()
             key = 'easy',
             name = "<LOC lobui_0347>AI: Easy",
 
-            rating = 300,
+            rating = 100,
             ratingCheatMultiplier = 0.0,
             ratingBuildMultiplier = 0.0,
             ratingOmniBonus = 0.0,
@@ -38,7 +38,7 @@ function GetAItypes()
             key = 'medium',
             name = "<LOC lobui_0349>AI: Normal",
 
-            rating = 450,
+            rating = 250,
             ratingCheatMultiplier = 0.0,
             ratingBuildMultiplier = 0.0,
             ratingOmniBonus = 0.0,
@@ -54,7 +54,7 @@ function GetAItypes()
             key = 'adaptive',
             name = "<LOC lobui_0368>AI: Adaptive",
 
-            rating = 600,
+            rating = 350,
             ratingCheatMultiplier = 0.0,
             ratingBuildMultiplier = 0.0,
             ratingOmniBonus = 0.0,
@@ -70,7 +70,7 @@ function GetAItypes()
             key = 'rush',
             name = "<LOC lobui_0360>AI: Rush",
 
-            rating = 600,
+            rating = 350,
             ratingCheatMultiplier = 0.0,
             ratingBuildMultiplier = 0.0,
             ratingOmniBonus = 0.0,
@@ -86,7 +86,7 @@ function GetAItypes()
             key = 'turtle',
             name = "<LOC lobui_0372>AI: Turtle",
 
-            rating = 600,
+            rating = 350,
             ratingCheatMultiplier = 0.0,
             ratingBuildMultiplier = 0.0,
             ratingOmniBonus = 0.0,
@@ -102,7 +102,7 @@ function GetAItypes()
             key = 'tech',
             name = "<LOC lobui_0370>AI: Tech",
 
-            rating = 600,
+            rating = 350,
             ratingCheatMultiplier = 0.0,
             ratingBuildMultiplier = 0.0,
             ratingOmniBonus = 0.0,
@@ -118,7 +118,7 @@ function GetAItypes()
             key = 'random',
             name = "<LOC lobui_0374>AI: Random",
 
-            rating = 600,
+            rating = 400,
             ratingCheatMultiplier = 0.0,
             ratingBuildMultiplier = 0.0,
             ratingOmniBonus = 0.0,
@@ -190,9 +190,9 @@ function GetAItypes()
             key = 'adaptivecheat',
             name = "<LOC lobui_0379>AIx: Adaptive",
 
-            rating = 800,
-            ratingCheatMultiplier = 100.0,
-            ratingBuildMultiplier = 100.0,
+            rating = 350,
+            ratingCheatMultiplier = 110.0,
+            ratingBuildMultiplier = 110.0,
             ratingOmniBonus = 200,
             ratingMapMultiplier = {
                 [256] = 1.0,   -- 5x5
@@ -207,9 +207,9 @@ function GetAItypes()
             key = 'rushcheat',
             name = "<LOC lobui_0380>AIx: Rush",
 
-            rating = 800,
-            ratingCheatMultiplier = 100.0,
-            ratingBuildMultiplier = 100.0,
+            rating = 350,
+            ratingCheatMultiplier = 110.0,
+            ratingBuildMultiplier = 110.0,
             ratingOmniBonus = 200,
             ratingMapMultiplier = {
                 [256] = 1.0,   -- 5x5
@@ -224,9 +224,9 @@ function GetAItypes()
             key = 'turtlecheat',
             name = "<LOC lobui_0384>AIx: Turtle",
 
-            rating = 800,
-            ratingCheatMultiplier = 100.0,
-            ratingBuildMultiplier = 100.0,
+            rating = 350,
+            ratingCheatMultiplier = 110.0,
+            ratingBuildMultiplier = 110.0,
             ratingOmniBonus = 200,
             ratingMapMultiplier = {
                 [256] = 1.0,   -- 5x5
@@ -241,9 +241,9 @@ function GetAItypes()
             key = 'techcheat',
             name = "<LOC lobui_0385>AIx: Tech",
 
-            rating = 800,
-            ratingCheatMultiplier = 100.0,
-            ratingBuildMultiplier = 100.0,
+            rating = 350,
+            ratingCheatMultiplier = 110.0,
+            ratingBuildMultiplier = 110.0,
             ratingOmniBonus = 200,
             ratingMapMultiplier = {
                 [256] = 1.0,   -- 5x5
@@ -258,9 +258,9 @@ function GetAItypes()
             key = 'randomcheat',
             name = "<LOC lobui_0395>AIx: Random",
 
-            rating = 800,
-            ratingCheatMultiplier = 100.0,
-            ratingBuildMultiplier = 100.0,
+            rating = 500,
+            ratingCheatMultiplier = 110.0,
+            ratingBuildMultiplier = 110.0,
             ratingOmniBonus = 200,
             ratingMapMultiplier = {
                 [256] = 1.0,   -- 5x5
