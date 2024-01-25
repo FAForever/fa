@@ -19,8 +19,6 @@ function GetAItypes()
         {
             key = 'easy',
             name = "<LOC lobui_0347>AI: Easy",
-            requiresNavMesh = true,
-            baseAI = true,
 
             rating = 300,
             ratingCheatMultiplier = 0.0,
@@ -29,8 +27,6 @@ function GetAItypes()
         {
             key = 'medium',
             name = "<LOC lobui_0349>AI: Normal",
-            requiresNavMesh = true,
-            baseAI = true,
 
             rating = 450,
             ratingCheatMultiplier = 0.0,
@@ -39,8 +35,6 @@ function GetAItypes()
         {
             key = 'adaptive',
             name = "<LOC lobui_0368>AI: Adaptive",
-            requiresNavMesh = true,
-            baseAI = true,
 
             rating = 600,
             ratingCheatMultiplier = 0.0,
@@ -49,8 +43,6 @@ function GetAItypes()
         {
             key = 'rush',
             name = "<LOC lobui_0360>AI: Rush",
-            requiresNavMesh = true,
-            baseAI = true,
 
             rating = 600,
             ratingCheatMultiplier = 0.0,
@@ -59,8 +51,6 @@ function GetAItypes()
         {
             key = 'turtle',
             name = "<LOC lobui_0372>AI: Turtle",
-            requiresNavMesh = true,
-            baseAI = true,
 
             rating = 600,
             ratingCheatMultiplier = 0.0,
@@ -69,8 +59,6 @@ function GetAItypes()
         {
             key = 'tech',
             name = "<LOC lobui_0370>AI: Tech",
-            requiresNavMesh = true,
-            baseAI = true,
 
             rating = 600,
             ratingCheatMultiplier = 0.0,
@@ -79,8 +67,6 @@ function GetAItypes()
         {
             key = 'random',
             name = "<LOC lobui_0374>AI: Random",
-            requiresNavMesh = true,
-            baseAI = true,
 
             rating = 600,
             ratingCheatMultiplier = 0.0,
@@ -145,8 +131,6 @@ function GetAItypes()
         {
             key = 'adaptivecheat',
             name = "<LOC lobui_0379>AIx: Adaptive",
-            requiresNavMesh = true,
-            baseAI = true,
 
             rating = 800,
             ratingCheatMultiplier = 100.0,
@@ -156,8 +140,6 @@ function GetAItypes()
         {
             key = 'rushcheat',
             name = "<LOC lobui_0380>AIx: Rush",
-            requiresNavMesh = true,
-            baseAI = true,
 
             rating = 800,
             ratingCheatMultiplier = 100.0,
@@ -167,8 +149,6 @@ function GetAItypes()
         {
             key = 'turtlecheat',
             name = "<LOC lobui_0384>AIx: Turtle",
-            requiresNavMesh = true,
-            baseAI = true,
 
             rating = 800,
             ratingCheatMultiplier = 100.0,
@@ -178,8 +158,6 @@ function GetAItypes()
         {
             key = 'techcheat',
             name = "<LOC lobui_0385>AIx: Tech",
-            requiresNavMesh = true,
-            baseAI = true,
 
             rating = 800,
             ratingCheatMultiplier = 100.0,
@@ -189,8 +167,6 @@ function GetAItypes()
         {
             key = 'randomcheat',
             name = "<LOC lobui_0395>AIx: Random",
-            requiresNavMesh = true,
-            baseAI = true,
 
             rating = 800,
             ratingCheatMultiplier = 100.0,
