@@ -12,6 +12,8 @@
 ---@field rating number
 ---@field ratingCheatMultiplier number
 ---@field ratingBuildMultiplier number
+---@field ratingMapAbsolute number[]
+---@field ratingMapMultiplier number[]
 
 function GetAItypes()
     --Table of AI Names to return
@@ -23,6 +25,13 @@ function GetAItypes()
             rating = 300,
             ratingCheatMultiplier = 0.0,
             ratingBuildMultiplier = 0.0,
+            ratingMapMultiplier = {
+                [256] = 1.0,   -- 5x5
+                [512] = 1.0,   -- 10x10
+                [1024] = 0.9,  -- 20x20
+                [2048] = 0.75, -- 40x40
+                [4096] = 0.6,  -- 80x80
+            }
         },
         {
             key = 'medium',
@@ -31,6 +40,13 @@ function GetAItypes()
             rating = 450,
             ratingCheatMultiplier = 0.0,
             ratingBuildMultiplier = 0.0,
+            ratingMapMultiplier = {
+                [256] = 1.0,   -- 5x5
+                [512] = 1.0,   -- 10x10
+                [1024] = 0.9,  -- 20x20
+                [2048] = 0.75, -- 40x40
+                [4096] = 0.6,  -- 80x80
+            }
         },
         {
             key = 'adaptive',
@@ -39,6 +55,13 @@ function GetAItypes()
             rating = 600,
             ratingCheatMultiplier = 0.0,
             ratingBuildMultiplier = 0.0,
+            ratingMapMultiplier = {
+                [256] = 1.0,   -- 5x5
+                [512] = 1.0,   -- 10x10
+                [1024] = 0.9,  -- 20x20
+                [2048] = 0.75, -- 40x40
+                [4096] = 0.6,  -- 80x80
+            }
         },
         {
             key = 'rush',
@@ -47,6 +70,13 @@ function GetAItypes()
             rating = 600,
             ratingCheatMultiplier = 0.0,
             ratingBuildMultiplier = 0.0,
+            ratingMapMultiplier = {
+                [256] = 1.0,   -- 5x5
+                [512] = 1.0,   -- 10x10
+                [1024] = 0.9,  -- 20x20
+                [2048] = 0.75, -- 40x40
+                [4096] = 0.6,  -- 80x80
+            }
         },
         {
             key = 'turtle',
@@ -55,6 +85,13 @@ function GetAItypes()
             rating = 600,
             ratingCheatMultiplier = 0.0,
             ratingBuildMultiplier = 0.0,
+            ratingMapMultiplier = {
+                [256] = 1.0,   -- 5x5
+                [512] = 1.0,   -- 10x10
+                [1024] = 0.9,  -- 20x20
+                [2048] = 0.75, -- 40x40
+                [4096] = 0.6,  -- 80x80
+            }
         },
         {
             key = 'tech',
@@ -63,6 +100,13 @@ function GetAItypes()
             rating = 600,
             ratingCheatMultiplier = 0.0,
             ratingBuildMultiplier = 0.0,
+            ratingMapMultiplier = {
+                [256] = 1.0,   -- 5x5
+                [512] = 1.0,   -- 10x10
+                [1024] = 0.9,  -- 20x20
+                [2048] = 0.75, -- 40x40
+                [4096] = 0.6,  -- 80x80
+            }
         },
         {
             key = 'random',
@@ -71,6 +115,13 @@ function GetAItypes()
             rating = 600,
             ratingCheatMultiplier = 0.0,
             ratingBuildMultiplier = 0.0,
+            ratingMapMultiplier = {
+                [256] = 1.0,   -- 5x5
+                [512] = 1.0,   -- 10x10
+                [1024] = 0.9,  -- 20x20
+                [2048] = 0.75, -- 40x40
+                [4096] = 0.6,  -- 80x80
+            }
         }
     }
 
@@ -135,6 +186,13 @@ function GetAItypes()
             rating = 800,
             ratingCheatMultiplier = 100.0,
             ratingBuildMultiplier = 100.0,
+            ratingMapMultiplier = {
+                [256] = 1.0,   -- 5x5
+                [512] = 1.0,   -- 10x10
+                [1024] = 0.9,  -- 20x20
+                [2048] = 0.75, -- 40x40
+                [4096] = 0.6,  -- 80x80
+            }
         })
     table.insert(aitypes,
         {
@@ -144,6 +202,13 @@ function GetAItypes()
             rating = 800,
             ratingCheatMultiplier = 100.0,
             ratingBuildMultiplier = 100.0,
+            ratingMapMultiplier = {
+                [256] = 1.0,   -- 5x5
+                [512] = 1.0,   -- 10x10
+                [1024] = 0.9,  -- 20x20
+                [2048] = 0.75, -- 40x40
+                [4096] = 0.6,  -- 80x80
+            }
         })
     table.insert(aitypes,
         {
@@ -153,6 +218,13 @@ function GetAItypes()
             rating = 800,
             ratingCheatMultiplier = 100.0,
             ratingBuildMultiplier = 100.0,
+            ratingMapMultiplier = {
+                [256] = 1.0,   -- 5x5
+                [512] = 1.0,   -- 10x10
+                [1024] = 0.9,  -- 20x20
+                [2048] = 0.75, -- 40x40
+                [4096] = 0.6,  -- 80x80
+            }
         })
     table.insert(aitypes,
         {
@@ -162,6 +234,13 @@ function GetAItypes()
             rating = 800,
             ratingCheatMultiplier = 100.0,
             ratingBuildMultiplier = 100.0,
+            ratingMapMultiplier = {
+                [256] = 1.0,   -- 5x5
+                [512] = 1.0,   -- 10x10
+                [1024] = 0.9,  -- 20x20
+                [2048] = 0.75, -- 40x40
+                [4096] = 0.6,  -- 80x80
+            }
         })
     table.insert(aitypes,
         {
@@ -171,6 +250,13 @@ function GetAItypes()
             rating = 800,
             ratingCheatMultiplier = 100.0,
             ratingBuildMultiplier = 100.0,
+            ratingMapMultiplier = {
+                [256] = 1.0,   -- 5x5
+                [512] = 1.0,   -- 10x10
+                [1024] = 0.9,  -- 20x20
+                [2048] = 0.75, -- 40x40
+                [4096] = 0.6,  -- 80x80
+            }
         })
 
     --Load Custom Cheating AIs - old style

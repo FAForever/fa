@@ -456,6 +456,7 @@ function GetLocalPlayerData()
 )
 end
 
+--- Compute an estimation of the rating of the given AI. The values originate from 'aitypes.lua'
 ---@param gameOptions table
 ---@param aiLobbyProperties AILobbyProperties
 ---@return number
@@ -469,10 +470,21 @@ function ComputeAIRating(gameOptions, aiLobbyProperties)
         return 0
     end
 
-    -- try and take into account the multiplier
+    if not gameInfo.GameOptions.ScenarioFile then
+        return 0
+    end
+
+    -- try and take into account map
+    local scenarioInfo = MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile)
+    if not (scenarioInfo and scenarioInfo.size and scenarioInfo.size[1] and scenarioInfo.size[2]) then
+        return 0
+    end
+
+    -- process various multipliers to determine rating
+    local mapMultiplier = aiLobbyProperties.ratingMapMultiplier[math.max(scenarioInfo.size[1], scenarioInfo.size[2])] or 1.0
     local cheatBuildValue = (aiLobbyProperties.ratingBuildMultiplier or 0.0) * (tonumber(gameOptions.BuildMult) or 1.0)
     local cheatResourceValue = (aiLobbyProperties.ratingBuildMultiplier or 0.0) * (tonumber(gameOptions.CheatMult) or 1.0)
-    return aiLobbyProperties.rating + cheatBuildValue + cheatResourceValue
+    return math.floor(mapMultiplier * (aiLobbyProperties.rating + cheatBuildValue + cheatResourceValue))
 end
 
 function GetAIPlayerData(name, AIPersonality, slot)
@@ -509,7 +521,7 @@ function GetAIPlayerData(name, AIPersonality, slot)
             PlayerColor = AIColor,
             ArmyColor = AIColor,
 
-            PL = ComputeAIRating(gameInfo, aiLobbyProperties),
+            PL = ComputeAIRating(gameInfo.GameOptions, aiLobbyProperties),
 
             -- keep track of the AI lobby properties for easier access
             AILobbyProperties = aiLobbyProperties,
