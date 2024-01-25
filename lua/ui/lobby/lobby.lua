@@ -483,7 +483,7 @@ function ComputeAIRating(gameOptions, aiLobbyProperties)
     -- clamp the value
     local maparea = math.max(scenarioInfo.size[1], scenarioInfo.size[2])
     if maparea < 256 then
-        maparea = 128
+        maparea = 256
     elseif maparea > 4096 then
         maparea = 4096
     end
