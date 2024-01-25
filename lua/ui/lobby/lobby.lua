@@ -480,8 +480,16 @@ function ComputeAIRating(gameOptions, aiLobbyProperties)
         return 0
     end
 
+    -- clamp the value
+    local maparea = math.max(scenarioInfo.size[1], scenarioInfo.size[2])
+    if maparea < 256 then
+        maparea = 128
+    elseif maparea > 4096 then
+        maparea = 4096
+    end
+
     -- process various multipliers to determine rating
-    local mapMultiplier = aiLobbyProperties.ratingMapMultiplier[math.max(scenarioInfo.size[1], scenarioInfo.size[2])] or 1.0
+    local mapMultiplier = aiLobbyProperties.ratingMapMultiplier[maparea] or 1.0
     local cheatBuildValue = (aiLobbyProperties.ratingBuildMultiplier or 0.0) * (tonumber(gameOptions.BuildMult) or 1.0)
     local cheatResourceValue = (aiLobbyProperties.ratingBuildMultiplier or 0.0) * (tonumber(gameOptions.CheatMult) or 1.0)
     return math.floor(mapMultiplier * (aiLobbyProperties.rating + cheatBuildValue + cheatResourceValue))
