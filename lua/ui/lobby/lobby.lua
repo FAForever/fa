@@ -456,6 +456,25 @@ function GetLocalPlayerData()
 )
 end
 
+---@param gameOptions table
+---@param aiLobbyProperties AILobbyProperties
+---@return number
+function ComputeAIRating(gameOptions, aiLobbyProperties)
+
+    if not aiLobbyProperties then
+        return 0
+    end
+
+    if not aiLobbyProperties.rating then
+        return 0
+    end
+
+    -- try and take into account the multiplier
+    local cheatBuildValue = (aiLobbyProperties.ratingBuildMultiplier or 0.0) * (tonumber(gameOptions.BuildMult) or 1.0)
+    local cheatResourceValue = (aiLobbyProperties.ratingBuildMultiplier or 0.0) * (tonumber(gameOptions.CheatMult) or 1.0)
+    return aiLobbyProperties.rating + cheatBuildValue + cheatResourceValue
+end
+
 function GetAIPlayerData(name, AIPersonality, slot)
    local AIColor
    -- gets the color of the player/AI occupying the slot directly prior if available
@@ -472,22 +491,13 @@ function GetAIPlayerData(name, AIPersonality, slot)
     end
 
     -- retrieve properties from AI table
-    local baseAI = false
-    local requiresNavMesh = false
-    local rating = 0
-    local ratingCheatMultiplier = 1.0
+    ---@type AILobbyProperties | nil
+    local aiLobbyProperties = nil
     for k, entry in aitypes do 
         if entry.key == AIPersonality then
-            requiresNavMesh = requiresNavMesh or entry.requiresNavMesh
-            baseAI = baseAI or entry.baseAI
-            rating = entry.rating or 0
-            ratingCheatMultiplier = entry.ratingCheatMultiplier or 1.0
+            aiLobbyProperties = entry
         end
     end
-
-    -- try and take into account the multiplier
-    local buildMultiplier = tonumber(gameInfo.GameOptions.BuildMult) or 1.0
-    local resourceMultiplier = tonumber(gameInfo.GameOptions.CheatMult) or 1.0
 
     return PlayerData(
         {
@@ -499,13 +509,10 @@ function GetAIPlayerData(name, AIPersonality, slot)
             PlayerColor = AIColor,
             ArmyColor = AIColor,
 
-            -- properties from AI table
-            RequiresNavMesh = requiresNavMesh,
-            BaseAI = baseAI,
-            PL = rating + (ratingCheatMultiplier * (buildMultiplier + resourceMultiplier)),
+            PL = ComputeAIRating(gameInfo, aiLobbyProperties),
 
-            AIRating = rating,
-            AIRatingCheatMultiplier = ratingCheatMultiplier
+            -- keep track of the AI lobby properties for easier access
+            AILobbyProperties = aiLobbyProperties,
         }
 )
 end
@@ -2174,12 +2181,7 @@ local function TryLaunch(skipNoObserversCheck)
                 clanTags[player.PlayerName] = player.PlayerClan
 
                 if not player.Human then
-
-                    -- try and take into account the multiplier
-                    local multiplier = player.AIRatingCheatMultiplier or 1.0
-                    local buildMultiplier = tonumber(gameInfo.GameOptions.BuildMult) or 1.0
-                    local resourceMultiplier = tonumber(gameInfo.GameOptions.CheatMult) or 1.0
-                    allRatings[player.PlayerName] = player.AIRating + (multiplier * (buildMultiplier + resourceMultiplier));
+                    allRatings[player.PlayerName] = ComputeAIRating(gameInfo.GameOptions, player.AILobbyProperties)
                 end
             end
 
@@ -2282,11 +2284,7 @@ local function UpdateGame()
             local playerOptions = gameInfo.PlayerOptions[k]
             if playerOptions then
                 if not playerOptions.Human then
-                    -- try and take into account the multiplier
-                    local multiplier = playerOptions.AIRatingCheatMultiplier or 1.0
-                    local buildMultiplier = tonumber(gameInfo.GameOptions.BuildMult) or 1.0
-                    local resourceMultiplier = tonumber(gameInfo.GameOptions.CheatMult) or 1.0
-                    playerOptions.PL = playerOptions.AIRating + (multiplier * (buildMultiplier + resourceMultiplier));
+                    playerOptions.PL = ComputeAIRating(gameInfo.GameOptions, playerOptions.AILobbyProperties);
                 end
             end
         end

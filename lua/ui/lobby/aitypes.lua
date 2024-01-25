@@ -6,6 +6,13 @@
 --* Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
+---@class AILobbyProperties
+---@field key string
+---@field name string
+---@field rating number
+---@field ratingCheatMultiplier number
+---@field ratingBuildMultiplier number
+
 function GetAItypes()
     --Table of AI Names to return
     local aitypes = {
@@ -14,56 +21,70 @@ function GetAItypes()
             name = "<LOC lobui_0347>AI: Easy",
             requiresNavMesh = true,
             baseAI = true,
+
             rating = 300,
             ratingCheatMultiplier = 0.0,
+            ratingBuildMultiplier = 0.0,
         },
         {
             key = 'medium',
             name = "<LOC lobui_0349>AI: Normal",
             requiresNavMesh = true,
             baseAI = true,
+
             rating = 450,
             ratingCheatMultiplier = 0.0,
+            ratingBuildMultiplier = 0.0,
         },
         {
             key = 'adaptive',
             name = "<LOC lobui_0368>AI: Adaptive",
             requiresNavMesh = true,
             baseAI = true,
+
             rating = 600,
             ratingCheatMultiplier = 0.0,
+            ratingBuildMultiplier = 0.0,
         },
         {
             key = 'rush',
             name = "<LOC lobui_0360>AI: Rush",
             requiresNavMesh = true,
             baseAI = true,
+
             rating = 600,
             ratingCheatMultiplier = 0.0,
+            ratingBuildMultiplier = 0.0,
         },
         {
             key = 'turtle',
             name = "<LOC lobui_0372>AI: Turtle",
             requiresNavMesh = true,
             baseAI = true,
+
             rating = 600,
             ratingCheatMultiplier = 0.0,
+            ratingBuildMultiplier = 0.0,
         },
         {
             key = 'tech',
             name = "<LOC lobui_0370>AI: Tech",
             requiresNavMesh = true,
             baseAI = true,
+
             rating = 600,
             ratingCheatMultiplier = 0.0,
+            ratingBuildMultiplier = 0.0,
         },
         {
             key = 'random',
             name = "<LOC lobui_0374>AI: Random",
             requiresNavMesh = true,
             baseAI = true,
+
             rating = 600,
             ratingCheatMultiplier = 0.0,
+            ratingBuildMultiplier = 0.0,
         }
     }
 
@@ -126,8 +147,10 @@ function GetAItypes()
             name = "<LOC lobui_0379>AIx: Adaptive",
             requiresNavMesh = true,
             baseAI = true,
+
             rating = 800,
-            ratingCheatMultiplier = 100.0
+            ratingCheatMultiplier = 100.0,
+            ratingBuildMultiplier = 100.0,
         })
     table.insert(aitypes,
         {
@@ -135,8 +158,10 @@ function GetAItypes()
             name = "<LOC lobui_0380>AIx: Rush",
             requiresNavMesh = true,
             baseAI = true,
+
             rating = 800,
-            ratingCheatMultiplier = 100.0
+            ratingCheatMultiplier = 100.0,
+            ratingBuildMultiplier = 100.0,
         })
     table.insert(aitypes,
         {
@@ -144,8 +169,10 @@ function GetAItypes()
             name = "<LOC lobui_0384>AIx: Turtle",
             requiresNavMesh = true,
             baseAI = true,
+
             rating = 800,
-            ratingCheatMultiplier = 100.0
+            ratingCheatMultiplier = 100.0,
+            ratingBuildMultiplier = 100.0,
         })
     table.insert(aitypes,
         {
@@ -153,8 +180,10 @@ function GetAItypes()
             name = "<LOC lobui_0385>AIx: Tech",
             requiresNavMesh = true,
             baseAI = true,
+
             rating = 800,
-            ratingCheatMultiplier = 100.0
+            ratingCheatMultiplier = 100.0,
+            ratingBuildMultiplier = 100.0,
         })
     table.insert(aitypes,
         {
@@ -162,8 +191,10 @@ function GetAItypes()
             name = "<LOC lobui_0395>AIx: Random",
             requiresNavMesh = true,
             baseAI = true,
+
             rating = 800,
-            ratingCheatMultiplier = 100.0
+            ratingCheatMultiplier = 100.0,
+            ratingBuildMultiplier = 100.0,
         })
 
     --Load Custom Cheating AIs - old style
