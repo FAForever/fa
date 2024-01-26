@@ -83,6 +83,7 @@ UnitBlueprint{
         SkipDynamicThreatCalculations = true,
         SubThreatLevel = 0,
         SurfaceThreatLevel = 45,
+        TeleportMaxRadius = 350,
     },
     Display = {
         Abilities = {

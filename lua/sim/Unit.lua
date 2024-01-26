@@ -4627,6 +4627,11 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
             return
         end
 
+        local x, _, z = self:GetPositionXYZ()
+        if VDist2(location[1], location[3], x, z) > self.Blueprint.Defense.TeleportMaxRadius then
+            return
+        end
+
         if self.TeleportDrain then
             RemoveEconomyEvent(self, self.TeleportDrain)
             self.TeleportDrain = nil

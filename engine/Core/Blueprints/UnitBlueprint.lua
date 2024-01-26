@@ -378,6 +378,8 @@
 --- how much direct fire, indirect fire, and bombing capability it has.
 --- Different AI's can interpret this value differently.
 ---@field SurfaceThreatLevel number
+--- The maximum range of the unit's teleporter.
+---@field TeleportMaxRadius? number
 
 ---@class UnitBlueprintDefenseShield
 --- If this shield only blocks weapons marked with `ArtilleryShieldBlocks`.

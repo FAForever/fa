@@ -67,6 +67,7 @@ UnitBlueprint{
         RegenRate = 15,
         SubThreatLevel = 0,
         SurfaceThreatLevel = 527,
+        TeleportMaxRadius = 350,
     },
     Display = {
         Abilities = {
