@@ -9,13 +9,18 @@ local ASubUnit = import("/lua/aeonunits.lua").ASubUnit
 local WeaponFile = import("/lua/aeonweapons.lua")
 local AIFMissileTacticalSerpentineWeapon = WeaponFile.AIFMissileTacticalSerpentineWeapon
 local AIFQuantumWarhead = WeaponFile.AIFQuantumWarhead
+local EffectTemplate = import('/lua/effecttemplates.lua')
 
 ---@class UAS0304 : ASubUnit
 UAS0304 = ClassUnit(ASubUnit) {
     DeathThreadDestructionWaitTime = 0,
     Weapons = {
-        CruiseMissiles = ClassWeapon(AIFMissileTacticalSerpentineWeapon) {},
-        NukeMissiles = ClassWeapon(AIFQuantumWarhead) {},
+        CruiseMissiles = ClassWeapon(AIFMissileTacticalSerpentineWeapon) {
+        	FxMuzzleFlash = EffectTemplate.TIFCruiseMissileLaunchUnderWater,
+        },
+        NukeMissiles = ClassWeapon(AIFQuantumWarhead) {
+        	FxMuzzleFlash = EffectTemplate.TIFCruiseMissileLaunchUnderWater,
+        },
     },
 }
 

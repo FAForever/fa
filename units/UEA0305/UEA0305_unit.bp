@@ -274,7 +274,7 @@ UnitBlueprint {
     SizeSphere = 1.6,
     SizeX = 1,
     SizeY = 0.5,
-    SizeZ = 2,
+    SizeZ = 1.2,
     StrategicIconName = "icon_gunship3_directfire",
     StrategicIconSortPriority = 55,
     Transport = {

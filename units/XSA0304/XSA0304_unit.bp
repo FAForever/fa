@@ -168,7 +168,7 @@ UnitBlueprint{
         UnitName = "<LOC xsa0304_name>Sinntha",
     },
     Intel = {
-        RadarRadius = 65,
+        RadarRadius = 64,
         VisionRadius = 32,
     },
     LifeBarHeight = 0.075,

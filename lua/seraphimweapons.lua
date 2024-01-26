@@ -62,7 +62,7 @@ SIFHuAntiNukeWeapon = ClassWeapon(DefaultProjectileWeapon) {
 ---@class SIFExperimentalStrategicMissile : DefaultProjectileWeapon
 SIFExperimentalStrategicMissile = ClassWeapon(DefaultProjectileWeapon) {
     FxMuzzleFlash = EffectTemplate.SIFExperimentalStrategicMissileLaunch01,
-    FxChargeMuzzleFlash = EffectTemplate.SIFExperimentalStrategicMissileChargeLaunch01,
+    FxRackChargeMuzzleFlash = EffectTemplate.SIFExperimentalStrategicMissileChargeLaunch01,
 }
 
 ---@class SDFPhasicAutoGunWeapon : DefaultProjectileWeapon

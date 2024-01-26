@@ -634,6 +634,10 @@ Tooltips = {
         title = "<LOC OPTIONS_0115>Always Render Strategic Icons",
         description = "<LOC OPTIONS_0116>Strategic icons are always shown, regardless of zoom distance",
     },
+    options_strat_icon_scale = {
+        title = "<LOC OPTIONS_STRATEGIC_ICON_SCALE_TITLE>Scale strategic icons",
+        description = "<LOC OPTIONS_STRATEGIC_ICON_SCALE_DESCRIPTION>Increase the size of strategic icons. Also scales the pause and stun icons. Can be useful on monitors with a high pixel density. \r\n\r\n100%: the default scale.\r\n150%: may distort the strategic icons slightly.\r\n200%: does not distort the strategic icons, but the strategic icons can be quite large even on a minotor with a high pixel density. ",
+    },
     options_camera_shake_intensity = {
         title = "<LOC OPTIONS_CAMERA_SHAKE_TITLE>Adjust shake intensity of camera",
         description = "<LOC OPTIONS_CAMERA_SHAKE_DESCRIPTION>Adjusts the shake intensity: 0% is no shaking at all and 100% is the default shake behavior. \r\nLarge explosions and units can shake the camera to improve immersion, but practically it can be annoying.",
@@ -811,6 +815,10 @@ Tooltips = {
     options_vsync = {
         title = "<LOC OPTIONS_0149>Vertical Sync",
         description = "<LOC OPTIONS_0150>Sync to vertical refresh of monitor",
+    },
+    options_frametime = {
+        title = "<LOC OPTIONS_FRAMETIME_TITLE>Minimum frametime",
+        description = "<LOC OPTIONS_FRAMETIME_DESCRIPTION>Allows you to manipulate the minimum frametime. Incompatible with vertical sync, which is automatically disabled when you move the slider and apply the settings. May introduce image tearing. Option exists to give players a way to try to match the refresh rate of modern monitors. Note that the framerate is often CPU limited and not GPU limited, especially during visually intense fights. A list of values that map to common refresh rates: \r\n\r\n  - 16 = 60hz\r\n  - 10 = 100hz\r\n  - 8 = 120hz\r\n  - 7 = 144hz\r\n  - 6 = 165hz",
     },
     options_selectedlanguage = {
         title = "<LOC OPTIONS_0007>Language selection",

@@ -78,7 +78,7 @@ local orderDelegations = {
     toggle_all =            {"toggle_shield","toggle_shield_dome","toggle_radar","toggle_sonar","toggle_omni",
                                 "toggle_cloak","toggle_jamming","toggle_stealth_field","toggle_scrying"},
 
-    toggle_intelshield =    {"toggle_shield","toggle_shield_dome","toggle_radar","toggle_sonar","toggle_omni"},
+    toggle_intelshield =    {"toggle_shield","toggle_shield_dome","toggle_radar","toggle_sonar","toggle_omni","toggle_scrying"},
     toggle_shield =         {"toggle_shield"},
     toggle_shield_dome =    {"toggle_shield_dome"},
 
@@ -89,7 +89,7 @@ local orderDelegations = {
 
     mode =                  {"mode"},
 
-    toggle_intel =          {"toggle_radar", "toggle_sonar", "toggle_omni"},
+    toggle_intel =          {"toggle_radar", "toggle_sonar", "toggle_omni","toggle_scrying"},
     toggle_scrying =        {"toggle_scrying"},
     scry_target =           {"scry_target"},
 }

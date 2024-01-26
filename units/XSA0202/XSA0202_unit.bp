@@ -168,7 +168,7 @@ UnitBlueprint{
         UnitName = "<LOC xsa0202_name>Notha",
     },
     Intel = {
-        RadarRadius = 65,
+        RadarRadius = 64,
         VisionRadius = 32,
     },
     LifeBarHeight = 0.075,

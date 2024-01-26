@@ -66,7 +66,8 @@ Flare = Class(Entity) {
     ---@return boolean
     OnCollisionCheck = function(self, other)
         local army = self.Army
-        if EntityCategoryContains(FlareCategories, other) and
+        if not IsDestroyed(self.Owner) and
+            EntityCategoryContains(FlareCategories, other) and
             IsEnemy(army, other.Army)
         then
             -- take out scripted movement
@@ -80,15 +81,24 @@ Flare = Class(Entity) {
             local owner = self.Owner
             local ownerRedirectedMissiles = owner.RedirectedMissiles
             if not (ownerRedirectedMissiles >= 3 or other.IsRedirected) then
+                -- keep track of how many missiles we redirected
+                owner.RedirectedMissiles = owner.RedirectedMissiles + 1
+
                 other.IsRedirected = true
-                other:SetLifetime(1.0 + 0.5 * Random())
                 other:SetNewTarget(self.Owner)
                 other:SetTurnRate(120)
 
-                local trash = owner.Trash
+                -- projectiles that end due to lifetime still explode and deal damage,
+                -- therefore we straigth out kill the projectile after a short duration
+                other:SetLifetime(3)
+                other.Trash:Add(
+                    ForkThread(
+                        self.KillThread,
+                        self, other, 10 + 5 * Random()
+                    )
+                )
 
-                -- keep track of how many missiles we redirected
-                owner.RedirectedMissiles = owner.RedirectedMissiles + 1
+                local trash = owner.Trash
 
                 -- create beams to help the player understand what is going on with the missiles
                 for _, beam in AeonVolcanoBeam01 do
@@ -100,6 +110,16 @@ Flare = Class(Entity) {
         end
 
         return false
+    end,
+
+    --- Kills the projectile after waiting for a short duration
+    ---@param self Flare
+    ---@param projectile Projectile
+    KillThread = function(self, projectile, ticksToWait)
+        WaitTicks(ticksToWait)
+        if not IsDestroyed(projectile) then
+            Damage(self.Owner.Launcher, projectile:GetPosition(), projectile, 200, "Normal")
+        end
     end,
 }
 

@@ -134,7 +134,7 @@ UnitBlueprint{
         RadarStealthFieldRadius = 40,
         ReactivateTime = 6,
         ShowIntelOnSelect = true,
-        SonarRadius = 450,
+        SonarRadius = 448,
         SonarStealthFieldRadius = 40,
         VisionRadius = 32,
         WaterVisionRadius = 24,

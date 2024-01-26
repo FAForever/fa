@@ -1,4 +1,4 @@
-UnitBlueprint{
+UnitBlueprint {
     Description = "<LOC uel0001_desc>Armored Command Unit",
     AI = {
         GuardRadius = 10,
@@ -91,9 +91,9 @@ UnitBlueprint{
         AnimationWalkRate = 1.7,
         AttackReticleSize = 55,
         DamageEffects = {
-            { Bone = 0,     OffsetX = 0.25,  OffsetY = 0.75,  OffsetZ = 0 },
-            { Bone = 0,     OffsetX = -0.25, OffsetY = 0.75,  OffsetZ = 0 },
-            { Bone = 0,     OffsetX = -0.35, OffsetY = 0.1,   OffsetZ = 0 },
+            { Bone = 0, OffsetX = 0.25, OffsetY = 0.75, OffsetZ = 0 },
+            { Bone = 0, OffsetX = -0.25, OffsetY = 0.75, OffsetZ = 0 },
+            { Bone = 0, OffsetX = -0.35, OffsetY = 0.1, OffsetZ = 0 },
         },
         IdleEffects = {
             Seabed = {
@@ -611,21 +611,16 @@ UnitBlueprint{
             Icon = "pqt",
             MaintenanceConsumptionPerSecondEnergy = 10000,
             Name = "<LOC enhancements_0059>Personal Teleporter",
-            ShowBones = { "Left_Upgrade" },
-            Slot = "LCH",
-            UpgradeEffectBones = {
-                "Left_Upgrade",
-                "Left_Upgrade_Muzzle",
-                "Left_Arm_Muzzle",
-                "Left_Arm_Barrel",
-            },
+            ShowBones = { "Back_Upgrade_B01" },
+            Slot = "Back",
+            UpgradeEffectBones = { "Back_Upgrade_B01" },
             UpgradeUnitAmbientBones = { "UEL0001" },
         },
         TeleporterRemove = {
             BuildCostEnergy = 1,
             BuildCostMass = 1,
             BuildTime = 0.1,
-            HideBones = { "Left_Upgrade" },
+            HideBones = { "Back_Upgrade_B01" },
             Icon = "pqt",
             Name = "<LOC enhancements_0060>Remove Personal Teleporter",
             Prerequisite = "Teleporter",
@@ -633,7 +628,7 @@ UnitBlueprint{
                 "Teleporter",
                 "TeleporterRemove",
             },
-            Slot = "LCH",
+            Slot = "Back",
         },
     },
     General = {
@@ -675,9 +670,9 @@ UnitBlueprint{
     },
     Intel = {
         FreeIntel = true,
-        OmniRadius = 26,
+        OmniRadius = 24,
         VisionRadius = 26,
-        WaterVisionRadius = 26,
+        WaterVisionRadius = 24,
     },
     LifeBarHeight = 0.15,
     LifeBarOffset = 0.65,
@@ -1003,8 +998,8 @@ UnitBlueprint{
             RackFireTogether = false,
             RackRecoilDistance = 0,
             RackReloadTimeout = 10,
-            RackSalvoChargeTime = 0,
-            RackSalvoReloadTime = 5,
+            RackSalvoChargeTime = 0.3,
+            RackSalvoReloadTime = 4.7,
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_IndirectFire",
@@ -1017,10 +1012,11 @@ UnitBlueprint{
             TargetRestrictDisallow = "UNTARGETABLE",
             Turreted = false,
             WeaponCategory = "Missile",
-            WeaponRepackTimeout = 5,
+            WeaponRepackTimeout = 0,
             WeaponUnpacks = true,
         },
         {
+
             AboveWaterTargetsOnly = true,
             Audio = {
                 Fire = Sound { Bank = 'UELWeapon', Cue = 'UEL0111_Missile_Cruise', LodCutoff = 'Weapon_LodCutoff' },
@@ -1046,7 +1042,7 @@ UnitBlueprint{
             ManualFire = true,
             MaxProjectileStorage = 1,
             MaxRadius = 256,
-            MinRadius = 15,
+            MinRadius = 26,
             MuzzleChargeDelay = 0,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
@@ -1071,8 +1067,8 @@ UnitBlueprint{
             RackFireTogether = false,
             RackRecoilDistance = 0,
             RackReloadTimeout = 10,
-            RackSalvoChargeTime = 0,
-            RackSalvoReloadTime = 30,
+            RackSalvoChargeTime = 0.3,
+            RackSalvoReloadTime = 29.7,
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_IndirectFire",
@@ -1080,8 +1076,9 @@ UnitBlueprint{
             TargetRestrictDisallow = "UNTARGETABLE",
             Turreted = false,
             WeaponCategory = "Missile",
-            WeaponRepackTimeout = 5,
+            WeaponRepackTimeout = 0,
             WeaponUnpacks = true,
+
         },
         {
             AboveWaterTargetsOnly = true,

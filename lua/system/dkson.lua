@@ -161,7 +161,8 @@ end
 updatedecpoint()
 
 local function num2str (num)
-    return replace(fsub(tostring(num), numfilter, ""), decpoint, ".")
+    -- An overflowing number will return "1.#INF", so we need to get rid of the trailing period.
+    return replace(fsub(fsub(tostring(num), numfilter, ""), ".$", ""), decpoint, ".")
 end
 
 local function str2num (str)

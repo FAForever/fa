@@ -2266,6 +2266,7 @@ function AntiOffMapMainThread()
         end
     end
 end
+
 -- This is for bad units who choose to go off map, shame on them
 function MoveOnMapThread(unit)
     unit.OffMapTime = 0
@@ -2293,7 +2294,16 @@ end
 --- Clears a unit's orders and issues a move order to the closest point on the map
 ---@param unit Unit
 function MoveOnMap(unit)
-    local position = unit:GetPosition()
+    local nearestPoint = GetNearestPlayablePoint( unit:GetPosition() )
+
+    IssueToUnitClearCommands(unit)
+    IssueToUnitMove(unit, nearestPoint)
+end
+
+--- Returns the closest point on the map
+---@param pos Vector
+---@return Vector
+function GetNearestPlayablePoint(position)
     local playableArea = ScenarioInfo.PlayableArea
     local nearestPoint = {position[1], position[2], position[3]}
 
@@ -2309,8 +2319,7 @@ function MoveOnMap(unit)
         nearestPoint[3] = playableArea[4] - 5
     end
 
-    IssueToUnitClearCommands(unit)
-    IssueToUnitMove(unit, nearestPoint)
+    return nearestPoint
 end
 
 --- Returns if the unit's army is human

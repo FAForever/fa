@@ -138,7 +138,7 @@ UnitBlueprint{
         UpgradesTo = "xsb3201",
     },
     Intel = {
-        RadarRadius = 115,
+        RadarRadius = 116,
         ReactivateTime = 2,
         ShowIntelOnSelect = true,
         VisionRadius = 20,
