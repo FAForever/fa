@@ -4627,9 +4627,13 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
             return
         end
 
-        local x, _, z = self:GetPositionXYZ()
-        if VDist2(location[1], location[3], x, z) > self.Blueprint.Defense.TeleportMaxRadius then
-            return
+        local maxRadius = self.Blueprint.Defense.TeleportMaxRadius
+        if maxRadius then
+            local x, _, z = self:GetPositionXYZ()
+            if VDist2(location[1], location[3], x, z) > self.Blueprint.Defense.TeleportMaxRadius then
+                FloatingEntityText(self.EntityId, LOC("<LOC tooltipui0754>Teleport Destination too far!"))
+                return
+            end
         end
 
         if self.TeleportDrain then

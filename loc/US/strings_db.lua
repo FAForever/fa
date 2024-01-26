@@ -5944,6 +5944,8 @@ tooltipui0751 = "Select attached factory"
 tooltipui0752 = "Select base unit"
 tooltipui0753 = "Right click to automatically deploy constructed units"
 
+tooltipui0754 = "Teleport Destination too far!"
+
 trans_log_0000="Transmission Log"
 uaa0101_desc="Air Scout"
 uaa0101_help="Air Scout"
