@@ -494,12 +494,12 @@ function ComputeAIRating(gameOptions, aiLobbyProperties)
     local cheatResourceMultiplier = (tonumber(gameOptions.CheatMult) or 1.0) - 1.0
 
     -- if they're smaller than 1.0 then the AI doesn't get better; it gets worse!
-    if cheatBuildMultiplier < 1 and cheatBuildMultiplier > 0 then
-        cheatBuildMultiplier = -1 / cheatBuildMultiplier
+    if cheatBuildMultiplier < 0 then
+        cheatBuildMultiplier = 1 / cheatBuildMultiplier
     end
 
-    if cheatResourceMultiplier < 1 and cheatResourceMultiplier > 0 then
-        cheatResourceMultiplier = -1 / cheatResourceMultiplier
+    if cheatResourceMultiplier < 0 then
+        cheatResourceMultiplier = 1 / cheatResourceMultiplier
     end
 
     -- compute the actual values
