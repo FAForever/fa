@@ -1,4 +1,4 @@
-last_version = 3800
+last_version = 3780
 
 ---@alias PatchNotesType "Hotfix"|"Developers patch"|"Balance patch"
 
@@ -13,7 +13,7 @@ last_version = 3800
 ---@type PatchNotes[]
 gamePatches = {
     {
-        version = 3800,
+        version = 3780,
         name = "Hotfix",
         description = {
             "# Game Version 3779 (11th of January, 2024)",
