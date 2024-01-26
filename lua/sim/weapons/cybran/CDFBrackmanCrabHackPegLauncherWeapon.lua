@@ -24,6 +24,8 @@ local DefaultProjectileWeapon = import('/lua/sim/defaultweapons.lua').DefaultPro
 
 ---@class CDFBrackmanCrabHackPegLauncherWeapon : DefaultProjectileWeapon
 CDFBrackmanCrabHackPegLauncherWeapon = ClassWeapon(DefaultProjectileWeapon) {
-    FxMuzzleFlash = { '/effects/emitters/proton_cannon_muzzle_01_emit.bp',
-        '/effects/emitters/proton_cannon_muzzle_02_emit.bp', },
+    FxMuzzleFlash = {
+        '/effects/emitters/proton_cannon_muzzle_01_emit.bp',
+        '/effects/emitters/proton_cannon_muzzle_02_emit.bp',
+    },
 }
