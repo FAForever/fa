@@ -83,6 +83,8 @@ local OnImpactDestroyCategories = categories.ANTIMISSILE * categories.ALLPROJECT
 ---@field DamageData table
 ---@field CreatedByWeapon Weapon
 ---@field IsRedirected? boolean
+---@field InnerRing? NukeAOE
+---@field OuterRing? NukeAOE
 Projectile = ClassProjectile(ProjectileMethods) {
     IsProjectile = true,
     DestroyOnImpact = true,
