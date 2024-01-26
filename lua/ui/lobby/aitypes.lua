@@ -191,8 +191,8 @@ function GetAItypes()
             name = "<LOC lobui_0379>AIx: Adaptive",
 
             rating = 450,
-            ratingCheatMultiplier = 160.0,
-            ratingBuildMultiplier = 160.0,
+            ratingCheatMultiplier = 150.0,
+            ratingBuildMultiplier = 150.0,
             ratingOmniBonus = 200,
             ratingMapMultiplier = {
                 [256] = 1.0,   -- 5x5
@@ -208,8 +208,8 @@ function GetAItypes()
             name = "<LOC lobui_0380>AIx: Rush",
 
             rating = 450,
-            ratingCheatMultiplier = 160.0,
-            ratingBuildMultiplier = 160.0,
+            ratingCheatMultiplier = 150.0,
+            ratingBuildMultiplier = 150.0,
             ratingOmniBonus = 200,
             ratingMapMultiplier = {
                 [256] = 1.0,   -- 5x5
@@ -225,8 +225,8 @@ function GetAItypes()
             name = "<LOC lobui_0384>AIx: Turtle",
 
             rating = 450,
-            ratingCheatMultiplier = 160.0,
-            ratingBuildMultiplier = 160.0,
+            ratingCheatMultiplier = 150.0,
+            ratingBuildMultiplier = 150.0,
             ratingOmniBonus = 200,
             ratingMapMultiplier = {
                 [256] = 1.0,   -- 5x5
@@ -242,8 +242,8 @@ function GetAItypes()
             name = "<LOC lobui_0385>AIx: Tech",
 
             rating = 450,
-            ratingCheatMultiplier = 160.0,
-            ratingBuildMultiplier = 160.0,
+            ratingCheatMultiplier = 150.0,
+            ratingBuildMultiplier = 150.0,
             ratingOmniBonus = 200,
             ratingMapMultiplier = {
                 [256] = 1.0,   -- 5x5
@@ -259,8 +259,8 @@ function GetAItypes()
             name = "<LOC lobui_0395>AIx: Random",
 
             rating = 550,
-            ratingCheatMultiplier = 160.0,
-            ratingBuildMultiplier = 160.0,
+            ratingCheatMultiplier = 150.0,
+            ratingBuildMultiplier = 150.0,
             ratingOmniBonus = 200,
             ratingMapMultiplier = {
                 [256] = 1.0,   -- 5x5
