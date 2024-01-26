@@ -489,11 +489,24 @@ function ComputeAIRating(gameOptions, aiLobbyProperties)
     end
 
     -- process various multipliers to determine rating
-    local omniValue = (gameOptions.OmniCheat == 'on' and aiLobbyProperties.ratingOmniBonus) or 0.0
     local mapMultiplier = aiLobbyProperties.ratingMapMultiplier[maparea] or 1.0
-    local cheatBuildValue = (aiLobbyProperties.ratingBuildMultiplier or 0.0) * (tonumber(gameOptions.BuildMult) or 1.0)
-    local cheatResourceValue = (aiLobbyProperties.ratingCheatMultiplier or 0.0) * (tonumber(gameOptions.CheatMult) or 1.0)
-    return math.floor(mapMultiplier * (aiLobbyProperties.rating + cheatBuildValue + cheatResourceValue + omniValue))
+    local cheatBuildMultiplier = (tonumber(gameOptions.BuildMult) or 1.0) - 1.0
+    local cheatResourceMultiplier = (tonumber(gameOptions.CheatMult) or 1.0) - 1.0
+
+    -- if they're smaller than 1.0 then the AI doesn't get better; it gets worse!
+    if cheatBuildMultiplier < 1 and cheatResourceMultiplier > 0 then
+        cheatBuildMultiplier = -1 / cheatBuildMultiplier
+    end
+
+    if cheatResourceMultiplier < 1 and cheatResourceMultiplier > 0 then
+        cheatResourceMultiplier = -1 / cheatResourceMultiplier
+    end
+
+    -- compute the actual values
+    local cheatBuildValue = (aiLobbyProperties.ratingBuildMultiplier or 0.0) * cheatBuildMultiplier
+    local cheatResourceValue = (aiLobbyProperties.ratingCheatMultiplier or 0.0) * cheatResourceMultiplier
+    local cheatOmniValue = (gameOptions.OmniCheat == 'on' and aiLobbyProperties.ratingOmniBonus) or 0.0
+    return math.floor(mapMultiplier * (aiLobbyProperties.rating + cheatBuildValue + cheatResourceValue + cheatOmniValue))
 end
 
 function GetAIPlayerData(name, AIPersonality, slot)
