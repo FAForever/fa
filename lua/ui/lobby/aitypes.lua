@@ -9,11 +9,12 @@
 ---@class AILobbyProperties
 ---@field key string
 ---@field name string
----@field rating number
----@field ratingCheatMultiplier number
----@field ratingBuildMultiplier number
----@field ratingMapMultiplier number[]
----@field ratingOmniBonus number
+---@field rating? number
+---@field ratingCheatMultiplier? number
+---@field ratingBuildMultiplier? number
+---@field ratingMapMultiplier? number[]
+---@field ratingOmniBonus? number
+---@field ratingNegativeThreshold? number
 
 function GetAItypes()
     --Table of AI Names to return
@@ -194,6 +195,7 @@ function GetAItypes()
             ratingCheatMultiplier = 150.0,
             ratingBuildMultiplier = 150.0,
             ratingOmniBonus = 200,
+            ratingNegativeThreshold = -50,
             ratingMapMultiplier = {
                 [256] = 1.0,   -- 5x5
                 [512] = 1.0,   -- 10x10
@@ -211,6 +213,7 @@ function GetAItypes()
             ratingCheatMultiplier = 150.0,
             ratingBuildMultiplier = 150.0,
             ratingOmniBonus = 200,
+            ratingNegativeThreshold = -50,
             ratingMapMultiplier = {
                 [256] = 1.0,   -- 5x5
                 [512] = 1.0,   -- 10x10
@@ -228,6 +231,7 @@ function GetAItypes()
             ratingCheatMultiplier = 150.0,
             ratingBuildMultiplier = 150.0,
             ratingOmniBonus = 200,
+            ratingNegativeThreshold = -50,
             ratingMapMultiplier = {
                 [256] = 1.0,   -- 5x5
                 [512] = 1.0,   -- 10x10
@@ -245,6 +249,7 @@ function GetAItypes()
             ratingCheatMultiplier = 150.0,
             ratingBuildMultiplier = 150.0,
             ratingOmniBonus = 200,
+            ratingNegativeThreshold = -50,
             ratingMapMultiplier = {
                 [256] = 1.0,   -- 5x5
                 [512] = 1.0,   -- 10x10
@@ -262,6 +267,7 @@ function GetAItypes()
             ratingCheatMultiplier = 150.0,
             ratingBuildMultiplier = 150.0,
             ratingOmniBonus = 200,
+            ratingNegativeThreshold = -50,
             ratingMapMultiplier = {
                 [256] = 1.0,   -- 5x5
                 [512] = 1.0,   -- 10x10
