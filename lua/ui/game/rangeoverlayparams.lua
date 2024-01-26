@@ -135,6 +135,18 @@ RangeOverlayParams = {
         Type = 1,
         Tooltip = "overlay_misc",
     },
+    Teleport = {
+        key = 'teleport',
+        Label = '<LOC range_0014>Teleport Range',
+        Categories = categories.OVERLAYTELEPORT,
+        NormalColor = glowAllNormal..'7b61d8',
+        SelectColor = glowAllSelect..'8c75d0',
+        RolloverColor = glowAllOver..'9c86e9',
+        Inner = innerMilitary,
+        Outer = outerMilitary,
+        Type = 3,
+        Tooltip = "overlay_teleport",
+    },
 
     AllIntel = {
         key = 'allintel',

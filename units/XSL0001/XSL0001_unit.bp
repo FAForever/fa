@@ -60,6 +60,7 @@ UnitBlueprint{
         "OVERLAYDIRECTFIRE",
         "OVERLAYINDIRECTFIRE",
         "OVERLAYOMNI",
+        "OVERLAYTELEPORT",
         "PATROLHELPER",
         "PRODUCTFA",
         "RECLAIM",

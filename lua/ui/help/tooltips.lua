@@ -2225,6 +2225,10 @@ Tooltips = {
         title = "<LOC tooltipui0617>Combine Intelligence",
         description = "<LOC tooltipui0618>Combine all sub-filters into a single overlay",
     },
+    overlay_teleport = {
+        title = "<LOC tooltipui0755>Teleport Range",
+        description = "<LOC tooltipui0756>Toggle the range overlays of your teleporters",
+    },
 
     -- **********************
     -- ** Faction select

@@ -42,6 +42,7 @@ UnitBlueprint{
         "MOBILE",
         "OVERLAYDIRECTFIRE",
         "OVERLAYOMNI",
+        "OVERLAYTELEPORT",
         "PATROLHELPER",
         "PRODUCTFA",
         "RECLAIM",

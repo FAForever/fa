@@ -136,6 +136,7 @@ categories = {
     OVERLAYOMNI = categoryValue,
     OVERLAYRADAR = categoryValue,
     OVERLAYSONAR = categoryValue,
+    OVERLAYTELEPORT = categoryValue
     PATROLHELPER = categoryValue,
     PERSONALSHIELD = categoryValue,
     POD = categoryValue,
@@ -375,6 +376,7 @@ categories = {
 ---| "OVERLAYOMNI"
 ---| "OVERLAYRADAR"
 ---| "OVERLAYSONAR"
+---| "OVERLAYTELEPORT"
 ---| "PATROLHELPER"
 ---| "PERSONALSHIELD"
 ---| "POD"

@@ -53,6 +53,7 @@ UnitBlueprint {
         "OVERLAYDIRECTFIRE",
         "OVERLAYINDIRECTFIRE",
         "OVERLAYOMNI",
+        "OVERLAYTELEPORT",
         "PATROLHELPER",
         "PODSTAGINGPLATFORM",
         "PRODUCTSC1",

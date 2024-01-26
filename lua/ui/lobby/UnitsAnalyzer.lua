@@ -169,6 +169,7 @@ CategoriesHidden  = {
     ["OVERLAYSONAR"] = true,
     ["OVERLAYDIRECTFIRE"] = true,
     ["OVERLAYRADAR"] = true,
+    ["OVERLAYTELEPORT"] = true,
     ["OVERLAYOMNI"] = true,
     ["OVERLAYDEFENSE"] = true,
     ["OVERLAYANTINAVY"] = true,
