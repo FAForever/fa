@@ -18,6 +18,7 @@
 ---@field Ready boolean
 ---@field StartSpot number
 ---@field Team number
+---@field AILobbyProperties? AILobbyProperties
 
 
 local WatchedValueTable = import("/lua/ui/lobby/data/watchedvalue/watchedvaluetable.lua").WatchedValueTable
