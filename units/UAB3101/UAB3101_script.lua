@@ -25,17 +25,16 @@ UAB3101 = ClassUnit(ARadarUnit) {
     end,
 
     OnIntelEnabled = function(self, intel)
-        local rotator = self.Rotator1
         local trash = self.Trash
 
         ARadarUnit.OnIntelEnabled(self, intel)
-        if not rotator then
-            rotator= CreateRotator(self, 'B01', 'y')
-            TrashBagAdd(trash,rotator)
+        if not  self.Rotator1 then
+            self.Rotator1 = CreateRotator(self, 'B01', 'y')
+            TrashBagAdd(trash, self.Rotator1)
         end
-        rotator:SetSpinDown(false)
-        rotator:SetTargetSpeed(30)
-        rotator:SetAccel(20)
+         self.Rotator1:SetSpinDown(false)
+         self.Rotator1:SetTargetSpeed(30)
+         self.Rotator1:SetAccel(20)
     end,
 }
 

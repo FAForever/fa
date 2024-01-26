@@ -19,37 +19,32 @@ UAB3201 = ClassUnit(ARadarUnit) {
 
     OnIntelDisabled = function(self, intel)
         ARadarUnit.OnIntelDisabled(self, intel)
-        local rotator1 = self.Rotator1
-        local rotator2 = self.Rotator2
-
-        rotator1:SetSpinDown(true)
-        rotator1:SetAccel(60)
-        rotator2:SetSpinDown(true)
-        rotator2:SetAccel(60)
+        self.Rotator1:SetSpinDown(true)
+        self.Rotator1:SetAccel(60)
+        self.Rotator2:SetSpinDown(true)
+        self.Rotator2:SetAccel(60)
     end,
 
     OnIntelEnabled = function(self, intel)
         ARadarUnit.OnIntelEnabled(self, intel)
-        local rotator1 = self.Rotator1
-        local rotator2 = self.Rotator2
         local trash = self.Trash
 
-        if not rotator1 then
-            rotator1 = CreateRotator(self, 'B02', 'y')
-            TrashBagAdd(trash,rotator1)
+        if not self.Rotator1 then
+            self.Rotator1 = CreateRotator(self, 'B02', 'y')
+            TrashBagAdd(trash,self.Rotator1)
         end
-        rotator1:SetSpinDown(false)
-        rotator1:SetTargetSpeed(30)
-        rotator1:SetAccel(20)
+        self.Rotator1:SetSpinDown(false)
+        self.Rotator1:SetTargetSpeed(30)
+        self.Rotator1:SetAccel(20)
 
 
-        if not rotator2 then
-            rotator2 = CreateRotator(self, 'B01', 'y')
-            TrashBagAdd(trash,rotator2)
+        if not self.Rotator2 then
+            self.Rotator2 = CreateRotator(self, 'B01', 'y')
+            TrashBagAdd(trash,self.Rotator2)
         end
-        rotator2:SetSpinDown(false)
-        rotator2:SetTargetSpeed(60)
-        rotator2:SetAccel(20)
+        self.Rotator2:SetSpinDown(false)
+        self.Rotator2:SetTargetSpeed(60)
+        self.Rotator2:SetAccel(20)
     end,
 }
 
