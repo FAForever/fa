@@ -199,6 +199,7 @@ skins = {
             RULEUCC_Sacrifice = {'/textures/ui/common/game/cursors/sacrifice-.dds', 15, 15, 13, 12},
             RULEUCC_Transport = {'/textures/ui/common/game/cursors/unload-.dds', 15, 3, 14, 12},
             RULEUCC_Teleport = {'/textures/ui/common/game/cursors/transport.dds', 15, 15},
+            RULEUCC_TeleportDisabled = {'/textures/ui/common/game/cursors/transport-invalid.dds', 15, 15},
             RULEUCC_Script = {'/textures/ui/common/game/cursors/attack.dds', 15, 15},
             RULEUCC_Invalid = {'/textures/ui/common/game/cursors/attack-invalid.dds', 15, 15},
             COORDINATED_ATTACK = {'/textures/ui/common/game/cursors/attack_coordinated.dds', 15, 15},

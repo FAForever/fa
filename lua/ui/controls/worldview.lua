@@ -17,6 +17,9 @@ local Prefs = import("/lua/user/prefs.lua")
 local OverchargeCanKill = import("/lua/ui/game/unitview.lua").OverchargeCanKill
 local CommandMode = import("/lua/ui/game/commandmode.lua")
 
+-- upvalued for performance
+local GetSelectedUnits = GetSelectedUnits
+
 
 
 WorldViewParams = {
@@ -613,11 +616,24 @@ WorldView = ClassUI(moho.UIWorldView, Control) {
     ---@param changed boolean
     OnCursorTeleport = function(self, identifier, enabled, changed, commandData)
         if enabled then
-            if changed then
-                local cursor = self.Cursor
-                cursor[1], cursor[2], cursor[3], cursor[4], cursor[5] = UIUtil.GetCursor(identifier)
-                self:ApplyCursor()
+            local mouseX, _, mouseZ = unpack(GetMouseWorldPos())
+            local selection = GetSelectedUnits()
+
+            local reference = identifier
+            for i, unit in selection do
+                local maxRadius = unit:GetBlueprint().Defense.TeleportMaxRadius
+                if maxRadius then
+                    local unitX, _, unitZ = unpack(unit:GetPosition())
+                    if VDist2(mouseX, mouseZ, unitX, unitZ) > maxRadius then
+                        reference = reference .. "Disabled"
+                        break
+                    end
+                end
             end
+            local cursor = self.Cursor
+            cursor[1], cursor[2], cursor[3], cursor[4], cursor[5] = UIUtil.GetCursor(reference)
+
+            self:ApplyCursor()
         end
     end,
 
