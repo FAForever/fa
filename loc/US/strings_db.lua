@@ -1485,15 +1485,15 @@ Unit_Description_0417="Fast Assault Fighter, armed with two high-damage anti-air
 
 -- UEF -- Naval Units
 Unit_Description_0049="Naval support unit. Equipped with direct fire and anti-air weapons, radar, sonar and a radar jammer."
-Unit_Description_0050="Basic Attack Submarine. Can surface to enable a weak direct fire cannon for additional power."
-Unit_Description_0051="Anti-Aircraft naval vessel. Armed with an anti-air missile system, tactical missile launcher and weak direct fire cannon. Equipped with tactical missile defense and a full sensor suite."
-Unit_Description_0052="Primary surface combatant with powerful direct fire cannons, weak torpedoes, basic anti-air weapons, torpedo defense, and a full sensor suite."
-Unit_Description_0053="Extremely long-range Surface Bombardment Ship. Armed with direct fire cannons and weak anti-air. Equipped with tactical missile defense and a full sensor suite. Manual ground-fire from these cannons can hit submerged units."
-Unit_Description_0054="Strategic Missile Submarine. Armed with long-range tactical missiles and can build and launch full-strength strategic nuclear weapons. Can fire while submerged."
-Unit_Description_0055="Experimental Submersible Aircraft Carrier. Armed with powerful torpedoes and, while surfaced, anti-air SAMs. Equipped with air staging, factory, and a full sensor suite."
-Unit_Description_0310="Lightly armoured dedicated submersible killing boat armed with a torpedo tube and fantastic torpedo defense. Vulnerable to direct fire."
-Unit_Description_0311="Naval Shield Generator. Provides protection for all nearby vessels. Shields transfer residual damage to intersecting bubbles."
-Unit_Description_0312="Direct Fire Anti-Navy Assault Ship armed with lasers, weak anti-air and torpedoes, tactical missile and torpedo defenses, and full sensor suite."
+Unit_Description_0050="Basic Attack Submarine. Can surface to enable a weak direct fire cannon for additional firepower."
+Unit_Description_0051="Anti-Aircraft naval vessel. Armed with an anti-air missile system, a tactical missile launcher and a weak direct fire cannon. Equipped with tactical missile defense and a full sensor suite."
+Unit_Description_0052="Primary surface combatant, armed with powerful direct fire cannons and weak torpedoes. Equipped with an anti-air Railgun and torpedo defense."
+Unit_Description_0053="Extremely long-range Surface Bombardment Ship. Armed with direct fire cannons and weak anti-air Railguns. Equipped with tactical missile defense."
+Unit_Description_0054="Strategic Missile Submarine. Can build and launch strategic nuclear weapons. Armed with long-range tactical missiles. Can fire while submerged."
+Unit_Description_0055="Experimental, Submersible Aircraft Carrier. Armed with powerful torpedoes and, while surfaced, anti-air SAMs. Equipped with air staging, a full sensor suite and an air factory."
+Unit_Description_0310="Lightly armoured, dedicated submersible killing boat, armed with a torpedo tube and torpedo defense. Vulnerable to direct fire."
+Unit_Description_0311="Naval Shield Generator, which provides protection to units beneath its large shield. Shields transfer residual damage to intersecting bubbles."
+Unit_Description_0312="Direct Fire Anti-Navy Assault Ship, armed with very powerful lasers and weak torpedoes. Equipped with tactical missile and torpedo defenses."
 
 -- UEF -- Offensive Structures
 Unit_Description_0057="Low-end defensive tower that attacks land- and sea-based units. Does not engage aircraft or submerged units."
@@ -1800,7 +1800,7 @@ Unit_Description_0241="Extremely fast Spy Plane, with a large visual radius, rad
 Unit_Description_0242="Lightly armed Air Transport equipped with anti-air weapons. Can carry 12 T1 units, 6 T2 units, 2 T3 units (Plus 4 T1), or 1 T3 unit (Plus 4 T2)."
 Unit_Description_0243="High-end air fighter. Designed to engage air units of any type."
 Unit_Description_0244="Strategic Bomber designed to surgically destroy key targets."
-Unit_Description_0245="Experimental Floating Fortress. Armed with unbelievably powerful central beam, incredible anti-air weaponry and depth charges. Equipped with air staging, factory, and a full sensor suite."
+Unit_Description_0245="Experimental Floating Fortress. Armed with unbelievably powerful central beam, incredible anti-air weaponry and depth charges. Equipped with air staging, a full sensor suite and an air factory."
 Unit_Description_0329="Quick, maneuverable Anti-Air Fighter with more armour and firepower than the Interceptor."
 Unit_Description_0330="Versatile Assault Gunship. Armed with a direct fire cannon and powerful anti-air rockets."
 Unit_Description_0331="High-power Torpedo Bomber designed to engage heavily armoured naval units."
@@ -1815,7 +1815,7 @@ Unit_Description_0250="Primary surface combatant, with powerful direct fire cann
 Unit_Description_0251="Long-range direct-fire surface bombardment ship."
 Unit_Description_0252="Aircraft Carrier. Can store, transport and repair aircraft. Armed with powerful surface-to-air missile launchers. Equipped with tactical missile defense and a full sensor suite."
 Unit_Description_0253="Strategic Missile Submarine. Can build and launch strategic nuclear weapons. Armed with long-range tactical missiles. Can fire while submerged."
-Unit_Description_0254="Experimental Submersible Factory Battleship. Armed with a long-range cannon for shore bombardment and depth charges which ignore torpedo defenses. Equipped with an effective torpedo defense, a full sensor suite and a naval factory."
+Unit_Description_0254="Experimental Submersible Factory Battleship. Armed with a long-range cannon for shore bombardment and depth charges, which ignore torpedo defenses. Equipped with an effective torpedo defense, a full sensor suite and a naval factory."
 Unit_Description_0332="Dedicated submersible killer, armed with a torpedo tube and torpedo defense."
 Unit_Description_0333="Missile bombardment ship. Rapidly fires long-range tactical missiles."
 
