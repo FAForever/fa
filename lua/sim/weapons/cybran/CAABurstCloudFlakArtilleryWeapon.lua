@@ -24,9 +24,5 @@ local DefaultProjectileWeapon = import('/lua/sim/defaultweapons.lua').DefaultPro
 
 ---@class CAABurstCloudFlakArtilleryWeapon : DefaultProjectileWeapon
 CAABurstCloudFlakArtilleryWeapon = ClassWeapon(DefaultProjectileWeapon) {
-    FxMuzzleFlash = {
-        '/effects/emitters/default_muzzle_flash_01_emit.bp',
-        '/effects/emitters/default_muzzle_flash_02_emit.bp'
-    },
     FxMuzzleFlashScale = 1.5,
 }

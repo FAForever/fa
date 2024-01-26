@@ -24,6 +24,9 @@ local DefaultBeamWeapon = import('/lua/sim/defaultweapons.lua').DefaultBeamWeapo
 local MicrowaveLaserCollisionBeam01 = import("/lua/defaultcollisionbeams.lua").MicrowaveLaserCollisionBeam01
 local CMicrowaveLaserCharge01 = import('/lua/effecttemplates.lua').CMicrowaveLaserCharge01
 
+-- upvalue scope for performance
+local CreateRotator = CreateRotator
+
 --- SPIDER BOT WEAPON!
 ---@class CDFHeavyMicrowaveLaserGenerator : DefaultBeamWeapon
 ---@field RotatorManip moho.RotateManipulator
@@ -42,8 +45,7 @@ CDFHeavyMicrowaveLaserGenerator = ClassWeapon(DefaultBeamWeapon) {
         if not rotator then
             local unit = self.unit
             rotator = CreateRotator(unit, 'Center_Turret_Barrel', 'z')
-            unit.Trash:Add(rotator)
-            self.RotatorManip = rotator
+            self.RotatorManip = unit.Trash:Add(rotator)
         end
 
         -- set their respective properties when firing
