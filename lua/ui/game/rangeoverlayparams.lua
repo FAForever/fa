@@ -41,8 +41,8 @@ local glowIntelOver = '10'
 ---@field NormalColor Color
 ---@field SelectColor Color
 ---@field RolloverColor Color
----@field Inner number[]
----@field Outer number[]
+---@field Inner number[]    # Thickness of minimum range line (zoomed in, zoomed out)
+---@field Outer number[]    # Thickness of maximum range line (zoomed in, zoomed out)
 ---@field Type number
 ---@field Combo? boolean
 ---@field Tooltip string
