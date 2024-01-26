@@ -174,7 +174,7 @@ UnitBlueprint{
             Label = "MainGun",
             MaxRadius = 4000,
             MinRadius = 175,
-            MuzzleChargeDelay = 0.15,
+            MuzzleChargeDelay = 0.2,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
             MuzzleVelocity = 98,
