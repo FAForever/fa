@@ -1105,12 +1105,19 @@ function GetPositionsInRadius(layer, position, distance, thresholdSize, cache)
     cache = cache or { }
 
     -- transform sections into positions
-    for k, section in sections do
-        cache[head] = section.Center
-        head = head + 1
+    for k = 1, count do
+        local sectionCenter = sections[k].Center
+
+        -- see if the section exists in the layer/grid that we're interested in
+        if FindSection(grid, sectionCenter) then
+            DrawCircle(sectionCenter, 10, 'ff0000')
+            cache[head] = sectionCenter
+            head = head + 1
+        end
     end
 
     -- clear up remainder of the cache
+    LOG(head, TableGetn(cache))
     for k = head, TableGetn(cache) do
         cache[k] = nil
     end
