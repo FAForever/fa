@@ -129,6 +129,7 @@ categories = {
     OVERLAYANTIAIR = categoryValue,
     OVERLAYANTINAVY = categoryValue,
     OVERLAYCOUNTERINTEL = categoryValue,
+    OVERLAYCOUNTERMEASURE = categoryValue,
     OVERLAYDEFENSE = categoryValue,
     OVERLAYDIRECTFIRE = categoryValue,
     OVERLAYINDIRECTFIRE = categoryValue,

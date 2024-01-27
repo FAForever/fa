@@ -82,9 +82,6 @@ SPEW(StringFormat("Found %d templates", table.getn(Templates)))
 
 --#endregion
 
----@type 'Unknown' | 'ByCommandMode' | 'ByMouseContext'
-local ContextBasedMode = 'Unknown'
-
 ---@type ContextBasedTemplate[]
 local ContextBasedTemplates = {}
 
@@ -101,17 +98,6 @@ CommandMode.AddEndBehavior(
         if not table.empty(ContextBasedTemplates) then
             ContextBasedTemplates = {}
             ContextBasedTemplateStep = 0
-        end
-
-        ContextBasedMode = 'Unknown'
-    end,
-    'ContextBasedTemplates'
-)
-
-CommandMode.AddStartBehavior(
-    function(mode, data)
-        if mode == 'build' and ContextBasedMode == 'Unknown' then
-            ContextBasedMode = 'ByCommandMode'
         end
     end,
     'ContextBasedTemplates'
@@ -163,6 +149,9 @@ end
 ---@param buildableUnits table<BlueprintId, boolean>
 ---@param prefix string
 local function FilterTemplatesByContext(buildableUnits, prefix)
+
+
+
     -- deposit scan radius depending on zoom level to make it easier to place extractors while zoomed out
     local radius = 2
     local camera = GetCamera('WorldCamera')
@@ -175,7 +164,8 @@ local function FilterTemplatesByContext(buildableUnits, prefix)
 
     -- gather information to determine the context
     local info = GetRolloverInfo()
-    local userUnit = info.userUnit
+    local unitBlueprintId = info.blueprintId
+
     local position = GetMouseWorldPos()
     local elevation = GetMouseTerrainElevation()
     local massDeposits = TableGetn(GetDepositsAroundPoint(position[1], position[3], radius, 1))
@@ -188,12 +178,14 @@ local function FilterTemplatesByContext(buildableUnits, prefix)
         local valid = ValidateTemplate(template, buildableUnits, prefix)
         if valid then
             if -- check conditions based on the context of the mouse
-            ((not template.TriggersOnUnit) or (userUnit and EntityCategoryContains(template.TriggersOnUnit, userUnit)))
+            (
+                (not template.TriggersOnUnit) or
+                    (unitBlueprintId and EntityCategoryContains(template.TriggersOnUnit, unitBlueprintId)))
                 and
-                ((not template.TriggersOnMassDeposit) or ((not userUnit) and (massDeposits > 0))) and
-                ((not template.TriggersOnHydroDeposit) or ((not userUnit) and (hydroDeposits > 0))) and
-                ((not template.TriggersOnLand) or ((not userUnit) and noDeposits and onLand)) and
-                ((not template.TriggersOnWater) or ((not userUnit) and noDeposits and (not onLand))) and
+                ((not template.TriggersOnMassDeposit) or ((not unitBlueprintId) and (massDeposits > 0))) and
+                ((not template.TriggersOnHydroDeposit) or ((not unitBlueprintId) and (hydroDeposits > 0))) and
+                ((not template.TriggersOnLand) or ((not unitBlueprintId) and noDeposits and onLand)) and
+                ((not template.TriggersOnWater) or ((not unitBlueprintId) and noDeposits and (not onLand))) and
                 (not template.TriggersOnBuilding)
             then
                 TableInsert(ContextBasedTemplates, template)
@@ -222,12 +214,23 @@ end
 
 ---@param buildableUnits table<BlueprintId, boolean>
 ---@param prefix string
+---@return boolean
 local function FilterTemplatesByCommandMode(buildableUnits, prefix)
+    -- retrieve from command mode
     local commandMode = import("/lua/ui/game/commandmode.lua").GetCommandMode()
     local blueprintId = commandMode[2].name
 
+    -- if not available, retrieve from command below our mouse
     if not blueprintId then
-        return
+        local highlightCommand = GetHighlightCommand()
+        if highlightCommand.blueprintId then
+            blueprintId = highlightCommand.blueprintId
+        end
+    end
+
+    -- if still not available then give up
+    if not blueprintId then
+        return false
     end
 
     for k = 1, TableGetn(Templates) do
@@ -247,6 +250,8 @@ local function FilterTemplatesByCommandMode(buildableUnits, prefix)
             end
         end
     end
+
+    return ContextBasedTemplateCount > 0
 end
 
 --- Provides a sense of order to the chosen templates
@@ -260,11 +265,6 @@ end
 Cycle = function()
 
     local start = GetSystemTimeSeconds()
-
-    -- default to the mouse context
-    if ContextBasedMode == 'Unknown' then
-        ContextBasedMode = 'ByMouseContext'
-    end
 
     local selectedUnits = GetSelectedUnits()
     if selectedUnits and not TableEmpty(selectedUnits) then
@@ -299,9 +299,9 @@ Cycle = function()
         ContextBasedTemplates = {}
         ContextBasedTemplateCount = 0
 
-        if ContextBasedMode == 'ByCommandMode' then
-            FilterTemplatesByCommandMode(buildableUnits, prefix)
-        else
+        -- first try to filter by command mode
+        local applies = FilterTemplatesByCommandMode(buildableUnits, prefix)
+        if not applies then
             FilterTemplatesByContext(buildableUnits, prefix)
         end
 
