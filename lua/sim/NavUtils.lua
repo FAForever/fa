@@ -1110,14 +1110,12 @@ function GetPositionsInRadius(layer, position, distance, thresholdSize, cache)
 
         -- see if the section exists in the layer/grid that we're interested in
         if FindSection(grid, sectionCenter) then
-            DrawCircle(sectionCenter, 10, 'ff0000')
             cache[head] = sectionCenter
             head = head + 1
         end
     end
 
     -- clear up remainder of the cache
-    LOG(head, TableGetn(cache))
     for k = head, TableGetn(cache) do
         cache[k] = nil
     end
