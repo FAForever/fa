@@ -5236,7 +5236,8 @@ local MessageHandlers = {
                 return false
             end
 
-            if string.len(data.PlayerOptions.PlayerName) > 32 then
+            local charactersInPlayerName = string.len(data.PlayerOptions.PlayerName)
+            if charactersInPlayerName < 3 or charactersInPlayerName > 32 then
                 return false
             end
 
