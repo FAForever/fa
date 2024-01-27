@@ -5210,7 +5210,7 @@ local MessageHandlers = {
     },
 
     AddPlayer = {
-        
+
         ---@class LobbyAddPlayerData
         ---@field PlayerOptions PlayerData
         ---@field SenderId number
@@ -5236,9 +5236,20 @@ local MessageHandlers = {
                 return false
             end
 
-            if string.len(data.PlayerOptions.PlayerName) > 40 then
+            if string.len(data.PlayerOptions.PlayerName) > 32 then
                 return false
             end
+
+            if data.PlayerOptions.PlayerClan then
+                if type(data.PlayerOptions.PlayerClan) != 'string' then
+                    return false
+                end
+
+                if string.len(data.PlayerOptions.PlayerClan) > 3 then
+                    return false
+                end
+            end
+
 
             if not data.PlayerOptions.OwnerID then
                 return false
