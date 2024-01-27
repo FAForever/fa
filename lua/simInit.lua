@@ -440,14 +440,14 @@ function BeginSessionTeams()
 
     -- setup special team options
     if ScenarioInfo.Options.CommonArmy == 'Union' then
-        BeginSessionUnionArmy()
+        BeginSessionUnionArmy(teams)
     elseif ScenarioInfo.Options.CommonArmy == 'Common' then
-        BeginSessionCommonArmy()
+        BeginSessionCommonArmy(teams)
     end
 end
 
 --- Setup for union army, where all teams can control the units of its allies
-function BeginSessionUnionArmy()
+function BeginSessionUnionArmy(teams)
     local humanIndex = 0
     for i, brain in ArmyBrains do
         if brain.BrainType ~= 'Human' then continue end
@@ -461,17 +461,7 @@ end
 
 
 --- Setup for common army, where all teams are batched together into one army
-function BeginSessionCommonArmy()
-    local teams = {}
-    for name,army in ScenarioInfo.ArmySetup do
-        if army.Team > 1 then
-            if not teams[army.Team] then
-                teams[army.Team] = {}
-            end
-            table.insert(teams[army.Team],army.ArmyIndex)
-        end
-    end
-
+function BeginSessionCommonArmy(teams)
     local humanIndex = 0
     local IsHuman = {}
     for _, brain in ArmyBrains do
@@ -513,7 +503,9 @@ function BeginSessionCommonArmy()
                         local v1 = ArmyBrains[i]:GetEconomyStored('MASS') + ArmyBrains[i2]:GetEconomyStored('MASS')
                         local v2 = ArmyBrains[i]:GetEconomyStored('ENERGY') + ArmyBrains[i2]:GetEconomyStored('ENERGY')
                         SetArmyEconomy(i, v1, v2)
-                        SetFocusArmy(i - 1)
+                        if i2 == GetFocusArmy() then
+                            SetFocusArmy(i - 1)
+                        end
                         break
                     end
                 end, i, i2, Units[1])
