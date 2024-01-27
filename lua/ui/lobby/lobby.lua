@@ -5210,11 +5210,49 @@ local MessageHandlers = {
     },
 
     AddPlayer = {
+        
+        ---@class LobbyAddPlayerData
+        ---@field PlayerOptions PlayerData
+        ---@field SenderId number
+        ---@field SenderName string
+        ---@field Type string
+
+        ---@param data LobbyAddPlayerData
         Accept = function(data)
-            return data.PlayerOptions.OwnerID and 
-                data.PlayerOptions.OwnerID == data.SenderID and
-                not FindNameForID(data.SenderID) and
-                lobbyComm:IsHost()
+            -- we need to do quite a bit of checks to prevent malicious values
+            if type(data.PlayerOptions.MEAN) != 'number' then
+                return false
+            end
+
+            if type (data.PlayerOptions.NG) != 'number' then
+                return false
+            end
+
+            if type(data.PlayerOptions.Faction) != 'number' then
+                return false
+            end
+
+            if type(data.PlayerOptions.PlayerName) != 'string' then
+                return false
+            end
+
+            if string.len(data.PlayerOptions.PlayerName) > 40 then
+                return false
+            end
+
+            if not data.PlayerOptions.OwnerID then
+                return false
+            end
+
+            if not (data.PlayerOptions.OwnerID == data.SenderID) then
+                return false
+            end
+
+            if FindNameForID(data.SenderID) then
+                return false
+            end
+            
+            return lobbyComm:IsHost()
         end,
         Reject = function(data)
             lobbyComm:EjectPeer(data.SenderID, "Invalid player data.")
