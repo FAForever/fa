@@ -1,5 +1,12 @@
 ---@meta
 
+---@class UIHighlightedCommand
+---@field x number
+---@field y number
+---@field z number
+---@field targetId? EntityId
+---@field blueprintId? UnitId
+---@field commandType number
 
 ---@alias SubmergeStatus
 ---| -1  # submerged
@@ -293,6 +300,11 @@ end
 --- Returns a formatted string displaying the time the game has been played
 ---@return string
 function GetGameTime()
+end
+
+--- Returns information about the command of the command graph that is below the cursor
+---@return UIHighlightedCommand?
+function GetHighlightCommand()
 end
 
 --- Returns a table of idle engineer units for the army
