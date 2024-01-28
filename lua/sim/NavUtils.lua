@@ -1210,10 +1210,11 @@ end
 ---@param layer NavLayers
 ---@param origin Vector
 ---@param distance number
+---@param threshold number  # unused
 ---@param cache? Vector[]
 ---@return Vector[] | nil
 ---@return number | ('NotGenerated' | 'OutsideMap' | 'NoResults' | 'InvalidLayer')
-function DirectionsFrom(layer, origin, distance, cache)
+function DirectionsFrom(layer, origin, distance, threshold, cache)
     -- check if generated
     if not NavGenerator.IsGenerated() then
         return nil, 'NotGenerated'
