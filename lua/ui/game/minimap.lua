@@ -131,12 +131,19 @@ function CreateMinimap(parent)
         end
         frameCount = frameCount + 1
     end
-    controls.displayGroup.OnPinCheck = function(control, checked)
-        control:SetSizeLock(checked)
-        control:SetPositionLock(checked)
-        -- add save pin in prefs
-    end
+	controls.displayGroup.OnPinCheck = function(control, checked)
+		control:SetSizeLock(checked)
+		control:SetPositionLock(checked)
+		Prefs.SetToCurrentProfile('minimapPin', checked)
+		Prefs.SavePreferences()
+	end
     Tooltip.AddCheckboxTooltip(controls.displayGroup._pinBtn, 'minimap_pin')
+
+    local minimapPin = Prefs.GetFromCurrentProfile('minimapPin')
+
+	if minimapPin ~= nil then
+		controls.displayGroup._pinBtn:SetCheck(minimapPin)
+	end
 
     controls.displayGroup.resetBtn = Button(controls.displayGroup.TitleGroup,
         UIUtil.SkinnableFile('/game/menu-btns/default_btn_up.dds'),
