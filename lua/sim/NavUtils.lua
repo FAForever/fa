@@ -1210,7 +1210,7 @@ end
 ---@param layer NavLayers
 ---@param origin Vector
 ---@param distance number
----@param threshold number  # unused
+---@param threshold? number  # legacy, unused
 ---@param cache? Vector[]
 ---@return Vector[] | nil
 ---@return number | ('NotGenerated' | 'OutsideMap' | 'NoResults' | 'InvalidLayer')
