@@ -1123,6 +1123,62 @@ function GetPositionsInRadius(layer, position, distance, thresholdSize, cache)
     return cache, head - 1
 end
 
+---@param layer NavLayers
+---@param position Vector
+---@param distance number
+---@param thresholdSize? number
+---@param cache? Vector[]
+---@return Vector[] | nil
+---@return number | ('NotGenerated' | 'InvalidLayer' | 'OutsideMap' | 'SystemError' | 'Unpathable' | 'NoData' | 'NoResults')?
+function GetDetailedPositionsInRadius(layer, position, distance, thresholdSize, cache)
+    -- check layer argument
+    local grid = FindGrid(layer)
+    if not grid then
+        return nil, 'InvalidLayer'
+    end
+
+    local gridAir = FindGrid('Air')
+    if not gridAir then
+        return nil, 'SystemError'
+    end
+
+    -- find surrounding points of interest
+    local sections, count = FindSections(gridAir, position, distance, NavSectionCache)
+    if not sections then
+        local msg = count --[[@as string]]
+        return nil, msg
+    end
+
+    -- try and use the cache
+    local head = 1
+    cache = cache or { }
+
+    -- transform sections into positions
+    for k = 1, count do
+        local sectionCenter = sections[k].Center
+
+        -- see if the section exists in the layer/grid that we're interested in
+        local section = FindSection(grid, sectionCenter)
+        if section then
+            local leaves = section.Leaves
+            for l = 1, TableGetn(leaves) do
+                local leaf = leaves[l]
+                if leaf.Size > thresholdSize then
+                    cache[head] = { leaf.px, GetSurfaceHeight(leaf.px, leaf.pz), leaf.pz }
+                    head = head + 1
+                end
+            end
+        end
+    end
+
+    -- clear up remainder of the cache
+    for k = head, TableGetn(cache) do
+        cache[k] = nil
+    end
+
+    return cache, head - 1
+end
+
 --- Returns the metadata of a label.
 ---@param id number
 ---@return NavLabelMetadata?
@@ -1154,10 +1210,11 @@ end
 ---@param layer NavLayers
 ---@param origin Vector
 ---@param distance number
+---@param threshold? number  # legacy, unused
 ---@param cache? Vector[]
 ---@return Vector[] | nil
 ---@return number | ('NotGenerated' | 'OutsideMap' | 'NoResults' | 'InvalidLayer')
-function DirectionsFrom(layer, origin, distance, cache)
+function DirectionsFrom(layer, origin, distance, threshold, cache)
     -- check if generated
     if not NavGenerator.IsGenerated() then
         return nil, 'NotGenerated'
