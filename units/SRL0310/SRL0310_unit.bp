@@ -17,6 +17,7 @@ UnitBlueprint {
     },
     BuildIconSortPriority = 40,
     Categories = {
+        "ANTISHIELD",
         'SELECTABLE',
         'BUILTBYTIER3FACTORY',
         'CYBRAN',
@@ -30,12 +31,10 @@ UnitBlueprint {
     },
     CollisionOffsetY = -0.2,
     Defense = {
-        AirThreatLevel = 0,
         ArmorType = 'Normal',
-        EconomyThreatLevel = 0,
-        Health = 1300,
-        MaxHealth = 1300,
-        SurfaceThreatLevel = 9,
+        EconomyThreatLevel = 1,
+        Health = 800,
+        MaxHealth = 800,
     },
     Description = '<LOC srl0310_desc>Mobile EMP Missile Launcher',
     Display = {
@@ -302,6 +301,7 @@ UnitBlueprint {
         WreckageLayers = {
             Land = true,
             Seabed = true,
+            Water = true,
         },
     },
 }
