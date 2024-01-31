@@ -177,7 +177,7 @@ UnitBlueprint{
             MuzzleChargeDelay = 0.15,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
-            MuzzleVelocity = 150,
+            MuzzleVelocity = 180,
             MuzzleVelocityReduceDistance = 4000,
             ProjectileId = "/projectiles/AIFFragmentationSensorShell01/AIFFragmentationSensorShell01_proj.bp",
             ProjectileLifetime = 150,
