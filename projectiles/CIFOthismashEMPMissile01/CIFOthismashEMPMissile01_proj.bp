@@ -1,0 +1,71 @@
+ProjectileBlueprint {
+    Audio = {
+        Impact = Sound {
+            Bank = 'Impacts',
+            Cue = 'CYB_Expl_Med_Impact',
+            LodCutoff = 'Weapon_LodCutoff',
+        },
+        ImpactTerrain = Sound {
+            Bank = 'Impacts',
+            Cue = 'Impact_Land_Gen_CYBRAN',
+            LodCutoff = 'Weapon_LodCutoff',
+        },
+        ImpactWater = Sound {
+            Bank = 'Impacts',
+            Cue = 'Impact_Water_Splash_CYBRAN',
+            LodCutoff = 'Weapon_LodCutoff',
+        },
+    },
+    Categories = {
+        'PROJECTILE',
+        'INDIRECTFIRE',
+        'MISSILE',
+    },
+    Defense = {
+        Health = 1,
+        MaxHealth = 1,
+    },
+    Display = {
+        ImpactEffects = {
+            Scale = 1,
+            Type = 'Medium03',
+        },
+        Mesh = {
+            LODs = {
+                {
+                    AlbedoName = '/mods/BrewLAN/units/SRL0310/SRL0310_albedo.dds',
+                    NormalsName = '/mods/BrewLAN/units/SRL0310/SRL0310_normalsts.dds',
+                    SpecularName = '/mods/BrewLAN/units/SRL0310/SRL0310_specteam.dds',
+                    LODCutoff = 150,
+                    ShaderName = 'TMeshAlpha',
+                },
+            },
+        },
+        StrategicIconSize = 1,
+        UniformScale = 0.03,
+    },
+    General = {
+        Category = 'Missile',
+        EntityCategory = {
+            'PROJECTILE',
+            'INDIRECTFIRE',
+            'MISSILE',
+        },
+        Faction = 'Cybran',
+        Weapon = 'Othismash EMP Missile',
+    },
+    Interface = {
+        HelpText = 'Othismash EMP Missile',
+    },
+    Physics = {
+        Acceleration = 20,
+        DestroyOnWater = true,
+        InitialSpeed = 0,
+        MaxSpeed = 80,
+        MaxZigZag = 5,
+        TrackTarget = true,
+        TurnRate = 360,
+        VelocityAlign = true,
+        ZigZagFrequency = 1,
+    },
+}
