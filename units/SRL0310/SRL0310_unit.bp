@@ -54,39 +54,39 @@ UnitBlueprint {
         },
         AnimationDeath = {
             {
-                Animation = '/mods/BrewLAN/units/SRL0310/SRL0310_ADeath01.sca',
+                Animation = '/units/SRL0310/SRL0310_ADeath01.sca',
                 AnimationRateMax = 3.3,
                 AnimationRateMin = 3,
                 Weight = 1,
             },
             {
-                Animation = '/mods/BrewLAN/units/SRL0310/SRL0310_ADeath02.sca',
+                Animation = '/units/SRL0310/SRL0310_ADeath02.sca',
                 AnimationRateMax = 3.3,
                 AnimationRateMin = 3,
                 Weight = 1,
             },
             {
-                Animation = '/mods/BrewLAN/units/SRL0310/SRL0310_ADeath03.sca',
+                Animation = '/units/SRL0310/SRL0310_ADeath03.sca',
                 AnimationRateMax = 3.3,
                 AnimationRateMin = 3,
                 Weight = 1,
             },
             {
-                Animation = '/mods/BrewLAN/units/SRL0310/SRL0310_ADeath04.sca',
+                Animation = '/units/SRL0310/SRL0310_ADeath04.sca',
                 AnimationRateMax = 3.3,
                 AnimationRateMin = 3,
                 Weight = 1,
             },
             {
-                Animation = '/mods/BrewLAN/units/SRL0310/SRL0310_ADeath05.sca',
+                Animation = '/units/SRL0310/SRL0310_ADeath05.sca',
                 AnimationRateMax = 3.3,
                 AnimationRateMin = 3,
                 Weight = 1,
             },
         },
-        AnimationTransform = '/mods/BrewLAN/units/SRL0310/SRL0310_ATransformWater.sca',
-        AnimationWalk = '/mods/BrewLAN/units/SRL0310/SRL0310_ARun.sca',
-        AnimationSwim = '/mods/BrewLAN/units/SRL0310/SRL0310_ASwim.sca',
+        AnimationTransform = '/units/SRL0310/SRL0310_ATransformWater.sca',
+        AnimationWalk = '/units/SRL0310/SRL0310_ARun.sca',
+        AnimationSwim = '/units/SRL0310/SRL0310_ASwim.sca',
         AnimationWalkRate = 0.75,
         IdleEffects = {
             Water = {
@@ -132,7 +132,7 @@ UnitBlueprint {
         },
         TransportAnimation = {
             {
-                Animation = '/mods/BrewLAN/units/SRL0310/SRL0310_AFold.sca',
+                Animation = '/units/SRL0310/SRL0310_AFold.sca',
                 Weight = 100,
             },
         },
@@ -158,7 +158,7 @@ UnitBlueprint {
         },
         FactionName = 'Cybran',
         Icon = 'amph',
-        UnitName = '<LOC srl0310_name>Steve',
+        UnitName = '<LOC srl0310_name>Othismash',
     },
     Intel = {
         VisionRadius = 20,
@@ -247,7 +247,7 @@ UnitBlueprint {
             MuzzleVelocity = 21,
             MuzzleVelocityRandom = 0.4,
             MuzzleVelocityReduceDistance = 60,
-            ProjectileId = '/mods/brewlan/projectiles/CIFOthismashEMPMissile01/CIFOthismashEMPMissile01_proj.bp',
+            ProjectileId = '/projectiles/CIFOthismashEMPMissile01/CIFOthismashEMPMissile01_proj.bp',
             ProjectileLifetimeUsesMultiplier = 3,
             RackBones = {
                 {
