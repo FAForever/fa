@@ -33,9 +33,9 @@ ProjectileBlueprint {
         Mesh = {
             LODs = {
                 {
-                    AlbedoName = '/mods/BrewLAN/units/SRL0310/SRL0310_albedo.dds',
-                    NormalsName = '/mods/BrewLAN/units/SRL0310/SRL0310_normalsts.dds',
-                    SpecularName = '/mods/BrewLAN/units/SRL0310/SRL0310_specteam.dds',
+                    AlbedoName = '/units/SRL0310/SRL0310_albedo.dds',
+                    NormalsName = '/units/SRL0310/SRL0310_normalsts.dds',
+                    SpecularName = '/units/SRL0310/SRL0310_specteam.dds',
                     LODCutoff = 150,
                     ShaderName = 'TMeshAlpha',
                 },
