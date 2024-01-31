@@ -623,5 +623,6 @@ Description = {
     ['drlk001'] = "<LOC Unit_Description_0462> Mobile Anti-Air unit. Armed with a high-speed missiles, excellent against enemy gunships or air-fighters. Capable of switching weapon to anti-land attack but with smaller damage.",
     ['dalk003'] = "<LOC Unit_Description_0463> Mobile Anti-Air unit. Armed with a high-impact projectiles, excellent against enemy gunships or air-fighters.",
     ['dslk004'] = "<LOC Unit_Description_0464> Mobile Anti-Air unit. Armed with a long-range lasers, excellent against enemy gunships or air-fighters. Capable of switching weapon to anti-land attack but with smaller damage.",
+    ['srl0310'] = "<LOC Unit_Description_srl0310> Mobile support unit. Designed to attack and destroy enemy shields. Weapon system only very briefly stuns enemy units.",
 
 }
