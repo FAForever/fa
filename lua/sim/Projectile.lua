@@ -16,6 +16,7 @@ local Random = Random
 local IsAlly = IsAlly
 local ForkThread = ForkThread
 local DamageArea = DamageArea
+local IsDestroyed = IsDestroyed
 local CreateSplat = CreateSplat
 local CreateEmitterAtBone = CreateEmitterAtBone
 local CreateEmitterAtEntity = CreateEmitterAtEntity
