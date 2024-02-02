@@ -161,7 +161,7 @@ UnitBlueprint{
         UnitName = "<LOC xaa0306_name>Solace",
     },
     Intel = {
-        SonarRadius = 90,
+        SonarRadius = 88,
         VisionRadius = 32,
     },
     LifeBarHeight = 0.075,

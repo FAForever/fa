@@ -83,6 +83,8 @@ local OnImpactDestroyCategories = categories.ANTIMISSILE * categories.ALLPROJECT
 ---@field DamageData table
 ---@field CreatedByWeapon Weapon
 ---@field IsRedirected? boolean
+---@field InnerRing? NukeAOE
+---@field OuterRing? NukeAOE
 Projectile = ClassProjectile(ProjectileMethods) {
     IsProjectile = true,
     DestroyOnImpact = true,
@@ -164,12 +166,11 @@ Projectile = ClassProjectile(ProjectileMethods) {
             local fuzziness = physics.TrackTargetGroundFuzziness or 0.8
             local offset = physics.TrackTargetGroundOffset or 0
             sx = sx + offset
-            sy = sy + offset
             sz = sz + offset
 
             local dx = sx * (Random() - 0.5) * fuzziness
-            local dy = sy * (Random() - 0.5) * fuzziness + cy * 2
-            local dz = sz * (Random() - 0.5) * fuzziness + cz * 2
+            local dy = (sy + offset) * (Random() - 0.5) * fuzziness + sy/2 + cy
+            local dz = sz * (Random() - 0.5) * fuzziness + cz
             local dw
 
             -- Rotate a vector by a quaternion: q * v * conjugate(q)
@@ -192,7 +193,6 @@ Projectile = ClassProjectile(ProjectileMethods) {
             dw * ty + dz * tw + dx * tz - dy * tx
 
             local pos = { px + dx, py + dy, pz + dz }
-            DrawCircle(pos, 1, 'ffffff')
             self:SetNewTargetGround(pos)
         else
             local pos = self:GetCurrentTargetPosition()

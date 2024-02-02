@@ -456,6 +456,66 @@ function GetLocalPlayerData()
 )
 end
 
+--- Compute an estimation of the rating of the given AI. The values originate from 'aitypes.lua'
+---@param gameOptions table
+---@param aiLobbyProperties AILobbyProperties
+---@return number
+function ComputeAIRating(gameOptions, aiLobbyProperties)
+
+    if not aiLobbyProperties then
+        return 0
+    end
+
+    if not aiLobbyProperties.rating then
+        return 0
+    end
+
+    if not gameInfo.GameOptions.ScenarioFile then
+        return 0
+    end
+
+    -- try and take into account map
+    local scenarioInfo = MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile)
+    if not (scenarioInfo and scenarioInfo.size and scenarioInfo.size[1] and scenarioInfo.size[2]) then
+        return 0
+    end
+
+    -- clamp the value
+    local maparea = math.max(scenarioInfo.size[1], scenarioInfo.size[2])
+    if maparea < 256 then
+        maparea = 256
+    elseif maparea > 4096 then
+        maparea = 4096
+    end
+
+    -- process various multipliers to determine rating
+    local mapMultiplier = aiLobbyProperties.ratingMapMultiplier[maparea] or 1.0
+    local cheatBuildMultiplier = (tonumber(gameOptions.BuildMult) or 1.0) - 1.0
+    local cheatResourceMultiplier = (tonumber(gameOptions.CheatMult) or 1.0) - 1.0
+
+    -- if they're smaller than 1.0 then the AI doesn't get better; it gets worse!
+    if cheatBuildMultiplier < 0 then
+        cheatBuildMultiplier = 1 / cheatBuildMultiplier
+    end
+
+    if cheatResourceMultiplier < 0 then
+        cheatResourceMultiplier = 1 / cheatResourceMultiplier
+    end
+
+    -- compute the rating
+    local cheatBuildValue = (aiLobbyProperties.ratingBuildMultiplier or 0.0) * cheatBuildMultiplier
+    local cheatResourceValue = (aiLobbyProperties.ratingCheatMultiplier or 0.0) * cheatResourceMultiplier
+    local cheatOmniValue = (gameOptions.OmniCheat == 'on' and aiLobbyProperties.ratingOmniBonus) or 0.0
+    local rating = mapMultiplier * (aiLobbyProperties.rating + cheatBuildValue + cheatResourceValue + cheatOmniValue)
+
+    -- prevent very low numbers
+    if rating < aiLobbyProperties.ratingNegativeThreshold then
+        rating = aiLobbyProperties.ratingNegativeThreshold + (rating - aiLobbyProperties.ratingNegativeThreshold) * 0.2
+    end
+
+    return math.floor(rating)
+end
+
 function GetAIPlayerData(name, AIPersonality, slot)
    local AIColor
    -- gets the color of the player/AI occupying the slot directly prior if available
@@ -472,12 +532,11 @@ function GetAIPlayerData(name, AIPersonality, slot)
     end
 
     -- retrieve properties from AI table
-    local baseAI = false
-    local requiresNavMesh = false
+    ---@type AILobbyProperties | nil
+    local aiLobbyProperties = nil
     for k, entry in aitypes do 
         if entry.key == AIPersonality then
-            requiresNavMesh = requiresNavMesh or entry.requiresNavMesh
-            baseAI = baseAI or entry.baseAI
+            aiLobbyProperties = entry
         end
     end
 
@@ -491,9 +550,10 @@ function GetAIPlayerData(name, AIPersonality, slot)
             PlayerColor = AIColor,
             ArmyColor = AIColor,
 
-            -- properties from AI table
-            RequiresNavMesh = requiresNavMesh,
-            BaseAI = baseAI
+            PL = ComputeAIRating(gameInfo.GameOptions, aiLobbyProperties),
+
+            -- keep track of the AI lobby properties for easier access
+            AILobbyProperties = aiLobbyProperties,
         }
 )
 end
@@ -2157,9 +2217,13 @@ local function TryLaunch(skipNoObserversCheck)
         local allRatings = {}
         local clanTags = {}
         for k, player in gameInfo.PlayerOptions do
-            if player.Human and player.PL then
+            if player.PL then
                 allRatings[player.PlayerName] = player.PL
                 clanTags[player.PlayerName] = player.PlayerClan
+
+                if not player.Human then
+                    allRatings[player.PlayerName] = ComputeAIRating(gameInfo.GameOptions, player.AILobbyProperties)
+                end
             end
 
             if player.OwnerID == localPlayerID then
@@ -2255,6 +2319,16 @@ local function UpdateGame()
 
     if gameInfo.GameOptions.ScenarioFile and (gameInfo.GameOptions.ScenarioFile ~= "") then
         scenarioInfo = MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile)
+
+        -- update AI rating as game settings change
+        for k = 1, 16 do
+            local playerOptions = gameInfo.PlayerOptions[k]
+            if playerOptions then
+                if not playerOptions.Human then
+                    playerOptions.PL = ComputeAIRating(gameInfo.GameOptions, playerOptions.AILobbyProperties);
+                end
+            end
+        end
 
         if scenarioInfo and scenarioInfo.map and scenarioInfo.map ~= '' then
             GUI.mapView:SetScenario(scenarioInfo)
@@ -5136,11 +5210,61 @@ local MessageHandlers = {
     },
 
     AddPlayer = {
+
+        ---@class LobbyAddPlayerData
+        ---@field PlayerOptions PlayerData
+        ---@field SenderId number
+        ---@field SenderName string
+        ---@field Type string
+
+        ---@param data LobbyAddPlayerData
         Accept = function(data)
-            return data.PlayerOptions.OwnerID and 
-                data.PlayerOptions.OwnerID == data.SenderID and
-                not FindNameForID(data.SenderID) and
-                lobbyComm:IsHost()
+            -- we need to do quite a bit of checks to prevent malicious values
+            if type(data.PlayerOptions.MEAN) != 'number' then
+                return false
+            end
+
+            if type (data.PlayerOptions.NG) != 'number' then
+                return false
+            end
+
+            if type(data.PlayerOptions.Faction) != 'number' then
+                return false
+            end
+
+            if type(data.PlayerOptions.PlayerName) != 'string' then
+                return false
+            end
+
+            local charactersInPlayerName = string.len(data.PlayerOptions.PlayerName)
+            if charactersInPlayerName < 3 or charactersInPlayerName > 32 then
+                return false
+            end
+
+            if data.PlayerOptions.PlayerClan then
+                if type(data.PlayerOptions.PlayerClan) != 'string' then
+                    return false
+                end
+
+                if string.len(data.PlayerOptions.PlayerClan) > 3 then
+                    return false
+                end
+            end
+
+
+            if not data.PlayerOptions.OwnerID then
+                return false
+            end
+
+            if not (data.PlayerOptions.OwnerID == data.SenderID) then
+                return false
+            end
+
+            if FindNameForID(data.SenderID) then
+                return false
+            end
+            
+            return lobbyComm:IsHost()
         end,
         Reject = function(data)
             lobbyComm:EjectPeer(data.SenderID, "Invalid player data.")

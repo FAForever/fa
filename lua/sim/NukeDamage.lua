@@ -1,4 +1,8 @@
 ---@class NukeAOE
+---@field Damage number
+---@field Radius number
+---@field Ticks number
+---@field TotalTime number
 NukeAOE = ClassSimple {
     Damage = false,
     Radius = false,

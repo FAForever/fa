@@ -39,6 +39,8 @@ local UpdateAssistersConsumptionCats = categories.REPAIR - categories.INSIGNIFIC
 
 local DefaultTerrainType = GetTerrainType(-1, -1)
 
+local GetNearestPlayablePoint = import("/lua/scenarioframework.lua").GetNearestPlayablePoint
+
 --- Structures that are reused for performance reasons
 --- Maps unit.techCategory to a number so we can do math on it for naval units
 
@@ -1523,6 +1525,8 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
     ---@param unitKilled Unit
     ---@param experience number | nil
     OnKilledUnit = function (self, unitKilled, experience)
+        ArmyBrains[self.Army]:AddUnitStat(unitKilled.UnitId, "kills", 1)
+        
         if experience then
             VeterancyComponent.OnKilledUnit(self, unitKilled, experience)
         end
@@ -1695,9 +1699,14 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         mass = mass * mass_tech_mult
 
         -- Reduce the mass value of submerged wrecks
-        if layer == 'Water' or layer == 'Sub' then
+        if layer == 'Water' or layer == 'Sub' or layer == 'Seabed' then
             mass = mass * 0.6
             energy = energy * 0.6
+        end
+
+        -- Create potentially offmap wrecks on-map. Exclude campaign maps that may do weird scripted things.
+        if self.Brain.BrainType == 'Human' and (not ScenarioInfo.CampaignMode) then
+            pos = GetNearestPlayablePoint(pos)
         end
 
         local halfBuilt = self:GetFractionComplete() < 1
@@ -1720,7 +1729,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         -- Attempt to copy our animation pose to the prop. Only works if
         -- the mesh and skeletons are the same, but will not produce an error if not.
         if self.Tractored or (layer ~= 'Air' or (layer == "Air" and halfBuilt)) then
-            TryCopyPose(self, prop, true)
+            TryCopyPose(self, prop, false)
         end
 
         -- Create some ambient wreckage smoke

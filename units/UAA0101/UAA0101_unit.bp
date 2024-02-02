@@ -159,8 +159,8 @@ UnitBlueprint{
         UnitName = "<LOC uaa0101_name>Mirage",
     },
     Intel = {
-        RadarRadius = 65,
-        SonarRadius = 30,
+        RadarRadius = 64,
+        SonarRadius = 28,
         VisionRadius = 42,
     },
     LifeBarHeight = 0.075,

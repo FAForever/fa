@@ -160,10 +160,10 @@ UnitBlueprint{
         UnitName = "<LOC ura0302_name>Spook",
     },
     Intel = {
-        OmniRadius = 30,
-        RadarRadius = 96,
+        OmniRadius = 28,
+        RadarRadius = 100,
         RadarStealth = true,
-        SonarRadius = 98,
+        SonarRadius = 96,
         VisionRadius = 64,
     },
     LifeBarHeight = 0.075,

@@ -662,9 +662,9 @@ UnitBlueprint{
     },
     Intel = {
         FreeIntel = true,
-        OmniRadius = 26,
+        OmniRadius = 24,
         VisionRadius = 26,
-        WaterVisionRadius = 26,
+        WaterVisionRadius = 24,
     },
     LifeBarHeight = 0.15,
     LifeBarOffset = 0.5,

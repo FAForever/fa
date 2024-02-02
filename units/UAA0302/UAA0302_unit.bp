@@ -148,7 +148,7 @@ UnitBlueprint{
         UnitName = "<LOC uaa0302_name>Seer",
     },
     Intel = {
-        OmniRadius = 30,
+        OmniRadius = 28,
         RadarRadius = 96,
         VisionRadius = 64,
     },

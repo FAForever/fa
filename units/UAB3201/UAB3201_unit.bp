@@ -136,7 +136,7 @@ UnitBlueprint{
         RadarRadius = 200,
         ReactivateTime = 4,
         ShowIntelOnSelect = true,
-        VisionRadius = 25,
+        VisionRadius = 24,
     },
     LifeBarHeight = 0.075,
     LifeBarOffset = 0.5,

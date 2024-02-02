@@ -167,7 +167,7 @@ UnitBlueprint{
         UnitName = "<LOC ura0204_name>Cormorant",
     },
     Intel = {
-        SonarRadius = 45,
+        SonarRadius = 44,
         VisionRadius = 32,
     },
     LifeBarHeight = 0.075,
