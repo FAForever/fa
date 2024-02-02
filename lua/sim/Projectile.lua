@@ -199,18 +199,14 @@ Projectile = ClassProjectile(ProjectileMethods) {
 
             self:SetNewTargetGroundXYZ(px + dx, py + dy, pz + dz)
         else
-            local pos = self:GetCurrentTargetPosition()
+            local px, _, pz = self:GetCurrentTargetPositionXYZ()
 
             local physics = self.Blueprint.Physics
             local fuzziness = physics.TrackTargetGroundFuzziness or 0.8
             local offset = physics.TrackTargetGroundOffset or 0
-            local dx = (Random() - 0.5) * fuzziness * (1 + offset)
-            local dz = (Random() - 0.5) * fuzziness * (1 + offset)
-
-            local tx = pos[1] + dx
-            local tz = pos[3] + dz
-            local ty = GetSurfaceHeight(tx, tz)
-            self:SetNewTargetGroundXYZ(tx, ty, tz)
+            local tx = px + (Random() - 0.5) * fuzziness * (1 + offset)
+            local tz = pz + (Random() - 0.5) * fuzziness * (1 + offset)
+            self:SetNewTargetGroundXYZ(tx, GetSurfaceHeight(tx, tz), tz)
         end
     end,
 
