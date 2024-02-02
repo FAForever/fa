@@ -9,9 +9,41 @@ local DefaultDamage = import("/lua/sim/defaultdamage.lua")
 local Flare = import("/lua/defaultantiprojectile.lua").Flare
 local DepthCharge = import("/lua/defaultantiprojectile.lua").DepthCharge
 
+-- upvalue scope for performance
+local unpack = unpack
+local Damage = Damage
+local Random = Random
+local IsAlly = IsAlly
+local ForkThread = ForkThread
+local DamageArea = DamageArea
+local CreateSplat = CreateSplat
+local CreateEmitterAtBone = CreateEmitterAtBone
+local CreateEmitterAtEntity = CreateEmitterAtEntity
+local EntityCategoryContains = EntityCategoryContains
+
+local ProjectileMethods = moho.projectile_methods
+local ProjectileMethodsCreateChildProjectile = ProjectileMethods.CreateChildProjectile
+local ProjectileMethodsGetMaxZigZag = ProjectileMethods.GetMaxZigZag
+local ProjectileMethodsGetZigZagFrequency = ProjectileMethods.GetZigZagFrequency
+
+local EntityMethods = _G.moho.entity_methods
+local EntityGetBlueprint = EntityMethods.GetBlueprint
+local EntityGetArmy = EntityMethods.GetArmy
+local EntitySetMaxHealth = EntityMethods.SetMaxHealth
+local EntitySetHealth = EntityMethods.SetHealth
+local EntityGetPositionXYZ = EntityMethods.GetPositionXYZ
+local EntityDestroy = EntityMethods.Destroy
+local EntityGetOrientation = EntityMethods.GetOrientation
+
+local TrashBag = TrashBag
+local TrashBagAdd = TrashBag.Add
+local TrashBagDestroy = TrashBag.Destroy
+
+local TableEmpty = table.empty
 local TableGetn = table.getn
 
-
+-- cache categories computations
+local OnImpactDestroyCategories = categories.ANTIMISSILE * categories.ALLPROJECTILES
 
 -- scorch mark interaction
 local ScorchSplatTextures = {
@@ -46,40 +78,6 @@ local OnImpactPreviousX = 0
 local OnImpactPreviousZ = 0
 
 local VectorCached = Vector(0, 0, 0)
-
--- upvalue scope for performance
-local unpack = unpack
-local Damage = Damage
-local Random = Random
-local IsAlly = IsAlly
-local ForkThread = ForkThread
-local DamageArea = DamageArea
-local CreateSplat = CreateSplat
-local CreateEmitterAtBone = CreateEmitterAtBone
-local CreateEmitterAtEntity = CreateEmitterAtEntity
-local EntityCategoryContains = EntityCategoryContains
-
-local ProjectileMethods = moho.projectile_methods
-local ProjectileMethodsCreateChildProjectile = ProjectileMethods.CreateChildProjectile
-local ProjectileMethodsGetMaxZigZag = ProjectileMethods.GetMaxZigZag
-local ProjectileMethodsGetZigZagFrequency = ProjectileMethods.GetZigZagFrequency
-
-local EntityMethods = _G.moho.entity_methods
-local EntityGetBlueprint = EntityMethods.GetBlueprint
-local EntityGetArmy = EntityMethods.GetArmy
-local EntitySetMaxHealth = EntityMethods.SetMaxHealth
-local EntitySetHealth = EntityMethods.SetHealth
-local EntityGetPositionXYZ = EntityMethods.GetPositionXYZ
-local EntityDestroy = EntityMethods.Destroy
-
-local TrashBag = TrashBag
-local TrashBagAdd = TrashBag.Add
-local TrashBagDestroy = TrashBag.Destroy
-
-local TableEmpty = table.empty
-
--- cache categories computations
-local OnImpactDestroyCategories = categories.ANTIMISSILE * categories.ALLPROJECTILES
 
 ---@class Projectile : moho.projectile_methods, InternalObject
 ---@field Blueprint ProjectileBlueprint
@@ -129,12 +127,13 @@ Projectile = ClassProjectile(ProjectileMethods) {
     ---@param self Projectile The projectile that we're creating
     ---@param inWater? boolean Flag to indicate the projectile is in water or not
     OnCreate = function(self, inWater)
-        local blueprint = self:GetBlueprint() --[[@as ProjectileBlueprint]]
+        local blueprint = EntityGetBlueprint(self) --[[@as ProjectileBlueprint]]
+        local trash = TrashBag() --[[@as TrashBag]]
 
         self.Blueprint = blueprint
-        self.Army = self:GetArmy() --[[@as number]]
+        self.Trash = trash
+        self.Army = EntityGetArmy(self) --[[@as number]]
         self.Launcher = self:GetLauncher() --[[@as Unit]]
-        self.Trash = TrashBag() --[[@as TrashBag]]
 
         -- set some health, if we have some
         local maxHealth = blueprint.Defense.MaxHealth
@@ -145,14 +144,8 @@ Projectile = ClassProjectile(ProjectileMethods) {
 
         -- do not track target, but track where the target was
         if blueprint.Physics.TrackTargetGround then
-            self.Trash:Add(ForkThread(self.OnTrackTargetGround, self))
+            TrashBagAdd(trash, ForkThread(self.OnTrackTargetGround, self))
         end
-
-        -- LOG("GetMaxZigZag", self:GetMaxZigZag())
-        -- LOG("GetZigZagFrequency", self:GetZigZagFrequency())
-        -- LOG("GetCurrentTargetPositionXYZ ", self:GetCurrentTargetPositionXYZ())
-        -- LOG("GetCurrentTargetPosition", unpack(self:GetCurrentTargetPosition()))
-        -- self:SetNewTargetGroundXYZ (0, 0, 0)
     end,
 
     --- Called by Lua during the `OnCreate` event when the blueprint field `TrackTargetGround` is set,
@@ -188,7 +181,7 @@ Projectile = ClassProjectile(ProjectileMethods) {
 
             -- Rotate a vector by a quaternion: q * v * conjugate(q)
             -- Supreme Commander quaternions use y,z,x,w!
-            local ty, tz, tx, tw = unpack(target:GetOrientation())
+            local ty, tz, tx, tw = unpack(EntityGetOrientation(target))
 
             -- compute the product in a single assignment to not have to use temporary, single-use variables.
             dw, dx, dy, dz = -tx * dx - tz * dy - ty * dz,
@@ -307,7 +300,7 @@ Projectile = ClassProjectile(ProjectileMethods) {
     OnDestroy = function(self)
         local trash = self.Trash
         if trash then
-            trash:Destroy()
+            TrashBagDestroy(trash)
         end
     end,
 
@@ -580,7 +573,7 @@ Projectile = ClassProjectile(ProjectileMethods) {
         local trackTarget = bp.TrackTarget
         local trackTargetGround = bp.TrackTargetGround
         if trackTarget and (not trackTargetGround) then
-            self.Trash:Add(ForkThread(self.RetargetThread, self))
+            TrashBagAdd(self.Trash, ForkThread(self.RetargetThread, self))
         end
     end,
 
@@ -944,7 +937,44 @@ Projectile = ClassProjectile(ProjectileMethods) {
         end
     end,
 
-    -- Deprecated functionality
+    ---------------------------------------------------------------------------
+    --#region C hooks
+
+    --- Creates a child projectile that inherits the speed, orientation and launcher of its parent
+    ---@param blueprint BlueprintId
+    ---@return Projectile
+    CreateChildProjectile = function(self, blueprint)
+        local childProjectile = ProjectileMethodsCreateChildProjectile(self, blueprint)
+        childProjectile.Launcher = self.Launcher
+        return childProjectile
+    end,
+
+    --- Returns the zig zag distance of the projectile.
+    ---@param self Projectile
+    ---@return number
+    GetMaxZigZag = function(self)
+        local distance = ProjectileMethodsGetMaxZigZag(self)
+        if distance == -1 then
+            distance = self.Blueprint.Physics.MaxZigZag or 0
+        end
+
+        return distance
+    end,
+
+    --- Returns the zig zag frequency of the projectile.
+    ---@param self Projectile
+    ---@return number
+    GetZigZagFrequency = function(self)
+        local frequency = ProjectileMethodsGetZigZagFrequency(self)
+        if frequency == -1 then
+            frequency = self.Blueprint.Physics.ZigZagFrequency or 0
+        end
+
+        return frequency
+    end,
+
+    ---------------------------------------------------------------------------
+    --#region Deprecated functionality
 
     ---@deprecated
     ---@param self Projectile
@@ -999,42 +1029,6 @@ Projectile = ClassProjectile(ProjectileMethods) {
         else
             return nil
         end
-    end,
-
-    ---------------------------------------------------------------------------
-    --#region C hooks
-
-    --- Creates a child projectile that inherits the speed, orientation and launcher of its parent
-    ---@param blueprint BlueprintId
-    ---@return Projectile
-    CreateChildProjectile = function(self, blueprint)
-        local childProjectile = ProjectileMethodsCreateChildProjectile(self, blueprint)
-        childProjectile.Launcher = self.Launcher
-        return childProjectile
-    end,
-
-    --- Returns the zig zag distance of the projectile.
-    ---@param self Projectile
-    ---@return number
-    GetMaxZigZag = function(self)
-        local distance = ProjectileMethodsGetMaxZigZag(self)
-        if distance == -1 then
-            distance = self.Blueprint.Physics.MaxZigZag or 0
-        end
-
-        return distance
-    end,
-
-    --- Returns the zig zag frequency of the projectile.
-    ---@param self Projectile
-    ---@return number
-    GetZigZagFrequency = function(self)
-        local frequency = ProjectileMethodsGetZigZagFrequency(self)
-        if frequency == -1 then
-            frequency = self.Blueprint.Physics.ZigZagFrequency or 0
-        end
-
-        return frequency
     end,
 }
 
