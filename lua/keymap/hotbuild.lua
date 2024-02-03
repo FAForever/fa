@@ -17,6 +17,7 @@ local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
 local Effect = import("/lua/maui/effecthelpers.lua")
 
 local Factions = import("/lua/factions.lua").Factions
+local FactionInUnitBpToKey = import("/lua/factions.lua").FactionInUnitBpToKey
 
 local upgradeTab = import("/lua/keymap/upgradetab.lua").upgradeTab
 local ModifyBuildables = import("/lua/ui/notify/enhancementqueue.lua").ModifyBuildablesForACU
