@@ -2706,6 +2706,7 @@ function OnSelection(buildableCategories, selection, isOldSelection)
                 if currentFaction then
                     sortedOptions.templates = {}
                     local function ConvertID(BPID)
+                        LOG(BPID)
                         local prefixes = currentFaction.GAZ_UI_Info.BuildingIdPrefixes or {}
                         for k, prefix in prefixes do
                             local newBPID = string.gsub(BPID, "(%a+)(%d+)", prefix .. "%2")

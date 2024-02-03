@@ -42,7 +42,6 @@ local TableEmpty = table.empty
 --- Retrieves the (cached) index of the current profile. 
 ---@return number?  # nil when there are no profiles
 local function GetCurrentProfileIndex()
-    -- LOG("GetCurrentProfile")
     local current = GetPreference('profile.current')
     if not current then
         -- reset our cache
@@ -127,7 +126,6 @@ end
 --- Returns the (cached) current profile. 
 ---@return table?   # nil when there are no profiles
 function GetCurrentProfile()
-    LOG("GetCurrentProfile")
     local currentProfileIndex = GetCurrentProfileIndex()
     if not currentProfileIndex then
         return nil
@@ -145,7 +143,6 @@ end
 ---@param fieldName string
 ---@return any
 function GetFromCurrentProfile(fieldName)
-    LOG("GetFromCurrentProfile", fieldName)
     local currentProfile = GetCurrentProfile()
     if not currentProfile then
         return nil
@@ -171,12 +168,21 @@ function GetFromCurrentProfile(fieldName)
     end
 end
 
+--- Returns a value from the current profile.
+---@param fieldName string
+---@return any
+function GetFieldFromCurrentProfile(fieldName)
+    local currentProfile = GetCurrentProfile()
+    if not currentProfile then
+        return nil
+    end
+    return currentProfile[fieldName]
+end
+
 --- Updates a value in the current profile.
 ---@param fieldName string
 ---@param data any
 function SetToCurrentProfile(fieldName, data)
-    LOG("SetToCurrentProfile", fieldName, data)
-
     local currentProfileIndex = GetCurrentProfileIndex()
     if not currentProfileIndex then
         return
