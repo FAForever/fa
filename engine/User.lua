@@ -366,8 +366,9 @@ end
 function GetOptions(key)
 end
 
---- Retrieves a value in the memory-stored preference file. The value trieved is a deep copy of what resides in the actual 
---- preference file. Therefore this function can be expensive to use directly.
+--- Retrieves a value in the memory-stored preference file. The value retrieved is a deep copy of what resides in the actual 
+--- preference file. Therefore this function can be expensive to use directly - if you're not careful you may be allocating 
+--- kilobytes worth of data!
 ---
 --- You're encouraged to use `/lua/user/prefs.lua` to interact with the preference file.
 ---@param string string
@@ -1011,7 +1012,7 @@ end
 function SetPausedOfUnit(unit, pause)
 end
 
---- Updates a value in the memory-stored preference file.
+--- Updates a value in the preference file. Updating the preference file on disk is delayed until the application exits.
 ---
 --- You're encouraged to use `/lua/user/prefs.lua` to interact with the preference file.
 ---@param key string
