@@ -622,7 +622,7 @@ function CreateScorchMarkSplat(obj, scale, army)
         UpvaluedScorchSplatTextures[Random(1, ScorchSplatTexturesN)],
         scale * 4, scale * 4,
         200 + 150 * Random(),
-        60 + 60 * Random(),
+        300 * 300 * Random(),
         army
     )
 end
@@ -639,7 +639,7 @@ function CreateScorchMarkDecal(obj, scale, army)
         '', 'Albedo', 
         scale * 3, scale * 3, 
         200 + 150 * Random(), 
-        60 + 60 * Random(), 
+        300 * 300 * Random(), 
         army
     )
 end
