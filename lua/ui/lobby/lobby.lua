@@ -550,7 +550,9 @@ function GetAIPlayerData(name, AIPersonality, slot)
             PlayerColor = AIColor,
             ArmyColor = AIColor,
 
-            PL = ComputeAIRating(gameInfo.GameOptions, aiLobbyProperties),
+            PL = iRating,
+            MEAN = iRating,
+            DEV = 0,
 
             -- keep track of the AI lobby properties for easier access
             AILobbyProperties = aiLobbyProperties,
@@ -2326,6 +2328,8 @@ local function UpdateGame()
             if playerOptions then
                 if not playerOptions.Human then
                     playerOptions.PL = ComputeAIRating(gameInfo.GameOptions, playerOptions.AILobbyProperties);
+                    playerOptions.MEAN = playerOptions.PL
+                    playerOptions.DEV = 0
                 end
             end
         end
@@ -2568,7 +2572,7 @@ function ShowGameQuality()
         local playerOptions = gameInfo.PlayerOptions[i]
         if playerOptions then
             -- Can't do it for AI, either, not sensibly.
-            if not playerOptions.Human then
+            if not playerOptions.Human and (playerOptions.MEAN or 0) == 0 then
                 return
             end
 
