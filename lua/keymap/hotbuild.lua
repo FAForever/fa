@@ -16,6 +16,8 @@ local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
 local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
 local Effect = import("/lua/maui/effecthelpers.lua")
 
+local Factions = import("/lua/factions.lua").Factions
+
 local upgradeTab = import("/lua/keymap/upgradetab.lua").upgradeTab
 local ModifyBuildables = import("/lua/ui/notify/enhancementqueue.lua").ModifyBuildablesForACU
 
@@ -453,42 +455,51 @@ function buildActionTemplate(modifier)
     local buildableUnits = EntityCategoryGetUnitList(buildableCategories)
 
     -- Allow all races to build other races templates
-    local currentFaction = selection[1]:GetBlueprint().General.FactionName
+    local unitFactionName = selection[1]:GetBlueprint().General.FactionName
+    local currentFaction = Factions[ FactionInUnitBpToKey[unitFactionName] ]
     if options.gui_all_race_templates ~= 0 and currentFaction then
-        local function ConvertID(BPID)
-            local prefixes = {
-                ["AEON"] = { "uab", "xab", "dab" },
-                ["UEF"] = { "ueb", "xeb", "deb" },
-                ["CYBRAN"] = { "urb", "xrb", "drb" },
-                ["SERAPHIM"] = { "xsb", "usb", "dsb" },
-            }
-            for i, prefix in prefixes[string.upper(currentFaction)] do
-                if table.find(buildableUnits, string.gsub(BPID, "(%a+)(%d+)", prefix .. "%2")) then
-                    return string.gsub(BPID, "(%a+)(%d+)", prefix .. "%2")
-                end
-            end
-            return false
-        end
-
+        local prefixes = currentFaction.GAZ_UI_Info.BuildingIdPrefixes or {}
         for templateIndex, template in allTemplates do
             local valid = true
-            local converted = false
             for _, entry in template.templateData do
                 if type(entry) == 'table' then
+
+                    -- check if entry is valid
+                    if not entry[1] then
+                        valid = false
+                        break
+                    end
+
+                    -- check if we can build the entry
+                    local converted = false
                     if not table.find(buildableUnits, entry[1]) then
-                        entry[1] = ConvertID(entry[1])
-                        converted = true
-                        if not table.find(buildableUnits, entry[1]) then
+                        for k, prefix in prefixes do
+                            local convertedId = string.gsub(entry[1], "(%a+)(%d+)", prefix .. "%2")
+                            if table.find(buildableUnits, convertedId) then
+                                converted = true
+                                entry[1] = convertedId
+                                break
+                            end
+                        end
+
+                        if not converted then
                             valid = false
                             break
                         end
                     end
                 end
             end
+
             if valid then
-                if converted then
-                    template.icon = ConvertID(template.icon)
+                -- also try to convert the template icon
+                for k, prefix in prefixes do
+                    local convertedId = string.gsub(template.icon, "(%a+)(%d+)", prefix .. "%2")
+                    if table.find(buildableUnits, convertedId) then
+                        template.icon = convertedId
+                        break
+                    end
                 end
+
                 template.templateID = templateIndex
                 table.insert(effectiveTemplates, template)
                 table.insert(effectiveIcons, template.icon)
