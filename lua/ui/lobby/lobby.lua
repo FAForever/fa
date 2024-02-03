@@ -539,6 +539,7 @@ function GetAIPlayerData(name, AIPersonality, slot)
             aiLobbyProperties = entry
         end
     end
+    local iRating = ComputeAIRating(gameInfo.GameOptions, aiLobbyProperties)
 
     return PlayerData(
         {
