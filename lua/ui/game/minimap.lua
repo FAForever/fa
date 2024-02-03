@@ -135,7 +135,6 @@ function CreateMinimap(parent)
 		control:SetSizeLock(checked)
 		control:SetPositionLock(checked)
 		Prefs.SetToCurrentProfile('minimapPin', checked)
-		Prefs.SavePreferences()
 	end
     Tooltip.AddCheckboxTooltip(controls.displayGroup._pinBtn, 'minimap_pin')
 
