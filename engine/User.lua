@@ -366,7 +366,10 @@ end
 function GetOptions(key)
 end
 
+--- Retrieves a value in the memory-stored preference file. The value trieved is a deep copy of what resides in the actual 
+--- preference file. Therefore this function can be expensive to use directly.
 ---
+--- You're encouraged to use `/lua/user/prefs.lua` to interact with the preference file.
 ---@param string string
 ---@param default any?
 ---@return any
@@ -846,7 +849,10 @@ end
 function RestartSession()
 end
 
+--- Writes the preferences to disk to make it persistent. This is an expensive operation. The 
+--- game does this automatically when it exits, there should be no reason to call this manually.
 ---
+--- You're encouraged to use `/lua/user/prefs.lua` to interact with the preference file.
 function SavePreferences()
 end
 
@@ -1005,7 +1011,9 @@ end
 function SetPausedOfUnit(unit, pause)
 end
 
+--- Updates a value in the memory-stored preference file.
 ---
+--- You're encouraged to use `/lua/user/prefs.lua` to interact with the preference file.
 ---@param key string
 ---@param obj any
 function SetPreference(key, obj)
