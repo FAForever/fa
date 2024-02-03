@@ -33,7 +33,7 @@
 local Prefs = import("/lua/user/prefs.lua")
 
 ---@type 'on' | 'allies-only' | 'off'
-OptionShowPlayerNames = Prefs.GetFromCurrentProfile('options.options_show_player_names')
+OptionShowPlayerNames = Prefs.GetFromCurrentProfile('options.options_show_player_names') or 'on'
 
 ---@param clients Client[]
 ---@return Client[]
