@@ -248,7 +248,7 @@ UnitBlueprint{
     LifeBarSize = 1.5,
     Physics = {
         AltMotionType = "RULEUMT_Water",
-        BackUpDistance = 5,
+        BackUpDistance = 10,
         BankingSlope = 0,
         BuildOnLayerCaps = {
             LAYER_Air = false,
