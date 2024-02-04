@@ -21,18 +21,16 @@ SRL0310 = Class(CLandUnit) {
 
     OnLayerChange = function(self, new, old)
         CLandUnit.OnLayerChange(self, new, old)
-        if old ~= 'None' then --Prevent this from triggering imediately
-            if self.TransformThread and (new == 'Land' or new == 'Water') then
-                KillThread(self.TransformThread)
-                self.TransformThread = nil
-            end
-            if new == 'Water' and old == 'Land' then
-                self.TransformThread = self:ForkThread(self.LayerTransform, false)
-                self.Animator:PlayAnim(__blueprints.srl0310.Display.AnimationSwim, true)
-            elseif new == 'Land' and old == 'Water' then
-                self.TransformThread = self:ForkThread(self.LayerTransform, true)
-                self.Animator:PlayAnim(__blueprints.srl0310.Display.AnimationWalk, true)
-            end
+        if self.TransformThread and (new == 'Land' or new == 'Water') then
+            KillThread(self.TransformThread)
+            self.TransformThread = nil
+        end
+        if new == 'Water' then
+            self.TransformThread = self:ForkThread(self.LayerTransform, false, old=='Air')
+            self.Animator:PlayAnim(__blueprints.srl0310.Display.AnimationSwim, true)
+        elseif new == 'Land' and old ~= 'None' then
+            self.TransformThread = self:ForkThread(self.LayerTransform, true, old=='Air')
+            self.Animator:PlayAnim(__blueprints.srl0310.Display.AnimationWalk, true)
         end
     end,
 
@@ -42,17 +40,15 @@ SRL0310 = Class(CLandUnit) {
             self.Animator = CreateAnimator(self, true)
             self.Animator:SetDirectionalAnim(true)
         end
-        if old == 'Stopped' then
+        if old == 'Stopped' and new ~= 'Stopped' then
             self.Animator:PlayAnim(self:GetCurrentLayer()=='Water' and __blueprints.srl0310.Display.AnimationSwim or __blueprints.srl0310.Display.AnimationWalk, true)
             self.Animator:SetRate(__blueprints.srl0310.Display.AnimationWalkRate or 1)
-        --[[elseif new == 'Stopped' then
-            if self.IdleAnim and not self:IsDead() then
-                self.Animator:PlayAnim(self.IdleAnim, true)
-            end]]
+        elseif new == 'Stopped' then
+            self.Animator:SetRate(0)
         end
     end,
 
-    LayerTransform = function(self, land)
+    LayerTransform = function(self, land, instant)
         if not self.TransformAnimator then
             self.TransformAnimator = CreateAnimator(self)
         end
@@ -63,8 +59,10 @@ SRL0310 = Class(CLandUnit) {
             self.TransformAnimator
                 :PlayAnim(__blueprints.srl0310.Display.AnimationTransform)
                 :SetRate(-self.TransformAnimator:GetAnimationDuration() / dur)
-                :SetAnimationFraction(1)
-            coroutine.yield(dur * 10)
+                :SetAnimationFraction(instant and 0 or 1)
+            if not instant then
+                coroutine.yield(dur * 10)
+            end
             self:SetImmobile(false)
             --self:RevertCollisionShape()
         else
@@ -73,8 +71,10 @@ SRL0310 = Class(CLandUnit) {
             self.TransformAnimator
                 :PlayAnim(__blueprints.srl0310.Display.AnimationTransform)
                 :SetRate(self.TransformAnimator:GetAnimationDuration() / dur)
-                :SetAnimationFraction(0)
-            coroutine.yield(dur * 10)
+                :SetAnimationFraction(instant and 1 or 0)
+            if not instant then
+                coroutine.yield(dur * 10)
+            end
             self:SetImmobile(false)
             ---Collision box partially in the water
             --local bp = __blueprints[self.BpId]
