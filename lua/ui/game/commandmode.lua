@@ -371,7 +371,7 @@ local function OnGuardUpgrade(guardees, unit)
     local unitBlueprint = unit:GetBlueprint()
 
     -- check for radars
-    local upgradeRadar = Prefs.GetFromCurrentProfile('options.assist_to_upgrade_radar')
+    local upgradeRadar = Prefs.GetFieldFromCurrentProfile('options').assist_to_upgrade_radar
     local upgradeRadarTech1 = upgradeRadar == 'Tech1Radars' or upgradeRadar == 'Tech1Tech2Radars'
     local upgradeRadarTech2 = upgradeRadar == 'Tech1Tech2Radars'
     if upgradeRadarTech1 and
@@ -388,7 +388,7 @@ local function OnGuardUpgrade(guardees, unit)
     end
 
     -- check for mass extractors
-    local upgradeExtractor = Prefs.GetFromCurrentProfile('options.assist_to_upgrade')
+    local upgradeExtractor = Prefs.GetFieldFromCurrentProfile('options').assist_to_upgrade
     local upgradeExtractorTech1 = upgradeExtractor == 'Tech1Extractors' or upgradeExtractor == 'Tech1Tech2Extractors'
     local upgradeExtractorTech2 = upgradeExtractor == 'Tech1Tech2Extractors'
     if upgradeExtractorTech1 and
@@ -408,7 +408,7 @@ end
 ---@param guardees UserUnit[]
 ---@param target UserUnit
 local function OnGuardUnpause(guardees, target)
-    local prefs = Prefs.GetFromCurrentProfile('options.assist_to_unpause')
+    local prefs = Prefs.GetFieldFromCurrentProfile('options').assist_to_unpause
     if prefs == 'On' or
         (
         prefs == 'ExtractorsAndRadars' and
@@ -466,7 +466,7 @@ end
 ---@param guardees UserUnit[]
 ---@param unit UserUnit
 local function OnGuardCopy(guardees, unit)
-    local prefs = Prefs.GetFromCurrentProfile('options.assist_to_copy_command_queue')
+    local prefs = Prefs.GetFieldFromCurrentProfile('options').assist_to_copy_command_queue
     local engineers = EntityCategoryFilterDown(categories.ENGINEER, guardees)
     if table.getn(engineers) > 0 and
         (prefs == 'OnlyEngineers' or prefs == 'OnlyEngineersAddToSelection') and
