@@ -539,6 +539,7 @@ function GetAIPlayerData(name, AIPersonality, slot)
             aiLobbyProperties = entry
         end
     end
+    local iRating = ComputeAIRating(gameInfo.GameOptions, aiLobbyProperties)
 
     return PlayerData(
         {
@@ -550,7 +551,9 @@ function GetAIPlayerData(name, AIPersonality, slot)
             PlayerColor = AIColor,
             ArmyColor = AIColor,
 
-            PL = ComputeAIRating(gameInfo.GameOptions, aiLobbyProperties),
+            PL = iRating,
+            MEAN = iRating,
+            DEV = 0,
 
             -- keep track of the AI lobby properties for easier access
             AILobbyProperties = aiLobbyProperties,
@@ -2326,6 +2329,8 @@ local function UpdateGame()
             if playerOptions then
                 if not playerOptions.Human then
                     playerOptions.PL = ComputeAIRating(gameInfo.GameOptions, playerOptions.AILobbyProperties);
+                    playerOptions.MEAN = playerOptions.PL
+                    playerOptions.DEV = 0
                 end
             end
         end
@@ -2417,7 +2422,6 @@ local function UpdateGame()
                 function()
                     -- store in preferences so that we can retrieve it during blueprint loading
                     SetPreference('PreGameData', preGameData)
-                    SavePreferences()
                 end
             )
 
@@ -2568,7 +2572,7 @@ function ShowGameQuality()
         local playerOptions = gameInfo.PlayerOptions[i]
         if playerOptions then
             -- Can't do it for AI, either, not sensibly.
-            if not playerOptions.Human then
+            if not playerOptions.Human and (playerOptions.MEAN or 0) == 0 then
                 return
             end
 
@@ -6663,7 +6667,6 @@ end
 -- Write the given list of preset profiles to persistent storage.
 function SavePresetsList(list)
     Prefs.SetToCurrentProfile("LobbyPresets", list)
-    SavePreferences()
 end
 
 --- Delegate to UIUtil's CreateInputDialog, adding the ridiculus chatEdit hack.
