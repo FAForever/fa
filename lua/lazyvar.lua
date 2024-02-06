@@ -15,7 +15,7 @@ local WeakKeyMeta = { __mode = 'k' }
 
 ---@alias Lazy<T> T | LazyVar<T> | fun(): T
 
----@class LazyVar<T> : Destroyable, OnDirtyListener, function
+---@class LazyVar : Destroyable, OnDirtyListener, function
 ---@field OnDirty? function
 ---@field [1] any                           # Cached result of what we represent
 ---@field [2] boolean                       # Flag whether the lazy var is busy

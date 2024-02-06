@@ -21,6 +21,7 @@
 --******************************************************************************************************
 
 local Window = import("/lua/maui/window.lua").Window
+local Matrix = import("/lua/maui/matrix.lua").Matrix
 
 local UIUtil = import("/lua/ui/uiutil.lua")
 local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
@@ -197,6 +198,9 @@ UIConnectionDialog = ClassUI(Window) {
             :RightOf(self.ItemQuietDevLabel, 2)
 
         self:SetWindowAlpha(0.8)
+
+        LayoutHelpers.LayoutFor(self.MatrixTest)
+            :Below(self.ItemQuietDevLabel)
     end,
 
     --- Called when the control is destroyed
