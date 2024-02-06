@@ -1934,11 +1934,6 @@ local keyActionsUI = {
         action = 'UI_Lua import("/lua/ui/game/objectivedetail.lua").ToggleDisplay()',
         category = 'ui'
     },
-
-    ['connectivity'] = {
-        action = 'UI_Lua import("/lua/ui/dialogs/connection/ConnectionDialog.lua").ToggleDialog()',
-        category = 'ui'
-    },
 }
 
 ---@type table<string, UIKeyAction>
