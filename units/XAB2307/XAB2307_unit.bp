@@ -163,8 +163,8 @@ UnitBlueprint{
             DamageRadius = 2,
             DamageType = "Normal",
             DisplayName = "Rapid-Fire Artillery Cannon",
-            EnergyDrainPerSecond = 17857,
-            EnergyRequired = 25000,
+            EnergyDrainPerSecond = 10714,
+            EnergyRequired = 15000,
             FireTargetLayerCapsTable = {
                 Land = "Land|Water|Seabed",
                 Water = "Land|Water|Seabed",
