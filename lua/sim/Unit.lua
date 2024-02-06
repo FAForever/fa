@@ -4606,6 +4606,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
     -------------------------------------------------------------------------------------------
     -- TELEPORTING
     -------------------------------------------------------------------------------------------
+
     ---@param self Unit
     ---@param teleporter any
     ---@param location Vector
@@ -4677,38 +4678,18 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         self:PlayUnitSound('TeleportStart')
         self:PlayUnitAmbientSound('TeleportLoop')
 
-        local bp = self.Blueprint
-        local teleDelay = bp.General.TeleportDelay
-        local bpEco = bp.Economy
-        local energyCost, time
-        
-        if bpEco then
-            local mass = (bpEco.TeleportMassCost or bpEco.BuildCostMass or 1) * (bpEco.TeleportMassMod or 0.01)
-            local energy = (bpEco.TeleportEnergyCost or bpEco.BuildCostEnergy or 1) * (bpEco.TeleportEnergyMod or 0.01)
-            energyCost = mass + energy
-            time = energyCost * (bpEco.TeleportTimeMod or 0.01)
-        end
+        local energyCost, time, teleDelay = import('/lua/shared/teleport.lua').TeleportCostFunction(self, location)
 
         if teleDelay then
-            energyCostMod = (time + teleDelay) / time
-            time = time + teleDelay
-            energyCost = energyCost * energyCostMod
-
             self.TeleportDestChargeBag = nil
             self.TeleportCybranSphere = nil  -- this fixes some "...Game object has been destroyed" bugs in EffectUtilities.lua:TeleportChargingProgress
-
-            self.TeleportDrain = CreateEconomyEvent(self, energyCost or 100, 0, time or 5, self.UpdateTeleportProgress)
-
-            -- Create teleport charge effect + exit animation delay
-            self:PlayTeleportChargeEffects(location, orientation, teleDelay)
-            WaitFor(self.TeleportDrain)
-        else
-            self.TeleportDrain = CreateEconomyEvent(self, energyCost or 100, 0, time or 5, self.UpdateTeleportProgress)
-
-            -- Create teleport charge effect
-            self:PlayTeleportChargeEffects(location, orientation)
-            WaitFor(self.TeleportDrain)
         end
+
+        self.TeleportDrain = CreateEconomyEvent(self, energyCost or 100, 0, time or 5, self.UpdateTeleportProgress)
+
+        -- Create teleport charge effect + exit animation delay
+        self:PlayTeleportChargeEffects(location, orientation, teleDelay)
+        WaitFor(self.TeleportDrain)
 
         if self.TeleportDrain then
             RemoveEconomyEvent(self, self.TeleportDrain)

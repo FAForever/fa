@@ -211,6 +211,7 @@ UnitBlueprint{
         TeleportEnergyMod = 5.42,
         TeleportMassMod = 0,
         TeleportTimeMod = 0.0001,
+        UseVariableTeleportCosts = true,
     },
     EnhancementPresets = {
         AdvancedCombat = {
