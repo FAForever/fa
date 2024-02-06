@@ -200,7 +200,6 @@ end
 local cursorText = false
 
 function StartCursorText(x, y, text, color, time, flash)
-    LOG("StartCursorText")
     if cursorText and cursorText._inTimer then return end -- if cursor text has a time, don't stomp it
     if cursorText then cursorText:Destroy() end
     cursorText = Text(GetFrame(0))
