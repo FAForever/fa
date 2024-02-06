@@ -49,7 +49,7 @@ Subject = ClassSimple {
             return
         end
 
-        local oldSubject = self.Subjects[identifier]
+        local oldSubject = self.Subscribers[identifier]
         if oldSubject then
             WARN(StringFormat("Overwriting subject with identifier '%s' for observable '%s'", identifier, self.Name))
         end
