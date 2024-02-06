@@ -17,6 +17,7 @@ UnitBlueprint{
     BuildIconSortPriority = 200,
     Categories = {
         "CONSTRUCTION",
+        "DRAGBUILD",
         "ENGINEERSTATION",
         "OVERLAYMISC",
         "PODSTAGINGPLATFORM",
