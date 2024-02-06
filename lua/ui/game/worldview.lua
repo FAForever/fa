@@ -148,7 +148,7 @@ function CreateMainWorldView(parent, mapGroup, mapGroupRight)
         viewLeft = import("/lua/ui/controls/worldview.lua").WorldView(mapGroup, 'WorldCamera', 1, false) -- depth value should be below minimap
         viewLeft:Register('WorldCamera', nil, '<LOC map_view_0004>Split View Left', 2)
         -- Note: UIRP values need to be a bitwise OR of flags. The lines below originally used the | operator but Travis CI doesn't like it. In these cases + works instead as long as the values never change.
-        viewLeft:SetRenderPass(UIUtil.UIRP_UnderWorld + UIUtil.UIRP_PostGlow) -- don't change this or the camera will lag one frame behind
+        -- viewLeft:SetRenderPass(UIUtil.UIRP_UnderWorld + UIUtil.UIRP_PostGlow) -- don't change this or the camera will lag one frame behind
         LayoutHelpers.FillParent(viewLeft, mapGroup)
         viewLeft:GetsGlobalCameraCommands(true)
 

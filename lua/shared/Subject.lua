@@ -27,7 +27,7 @@ local StringFormat = string.format
 
 ---@class Observable<T>
 ---@field Name string
----@field Subjects table<string, fun(value: any)>
+---@field Subscribers table<string, fun(value: any)>
 Subject = ClassSimple {
 
     ---@generic T
@@ -35,15 +35,15 @@ Subject = ClassSimple {
     ---@param name string
     __init = function(self, name)
         self.Name = name
-        self.Subjects = {}
+        self.Subscribers = {}
     end,
 
-    --- Adds an observer.
+    --- Adds a subscriber.
     ---@generic T
     ---@param self Observable
     ---@param callback fun(entity: T)
     ---@param identifier string
-    AddObserver = function(self, callback, identifier)
+    Subscribe = function(self, callback, identifier)
         if not type(identifier) == "string" then
             WARN(StringFormat("Invalid subject identifier %s for observable %s", tostring(identifier), self.Name))
             return
@@ -54,27 +54,27 @@ Subject = ClassSimple {
             WARN(StringFormat("Overwriting subject with identifier '%s' for observable '%s'", identifier, self.Name))
         end
 
-        self.Subjects[identifier] = callback
+        self.Subscribers[identifier] = callback
     end,
 
-    --- Removes an observer.
+    --- Removes a subscriber.
     ---@param self Observable
     ---@param identifier string
-    RemoveObserver = function(self, identifier)
+    Unsubscribe = function(self, identifier)
         if not type(identifier) == "string" then
             WARN(StringFormat("Invalid subject identifier %s for observable %s", tostring(identifier), self.Name))
             return
         end
 
-        self.Subjects[identifier] = nil;
+        self.Subscribers[identifier] = nil;
     end,
 
-    ---
+    --- Feeds the next piece of data which is then broadcasted to all subscribers.
     ---@generic T
     ---@param self Observable
     ---@param value T
     Next = function(self, value)
-        for k, callback in self.Listeners do
+        for k, callback in self.Subscribers do
             callback(value)
         end
     end,
