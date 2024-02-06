@@ -67,6 +67,28 @@ local Cached = PostprocessClients(GlobalGetSessionClients())
 Observable = import("/lua/shared/observable.lua").Create()
 Observable:Set(Cached)
 
+--- Override global function to return our cache
+---@return Client[]
+_G.GetSessionClients = function()
+    return Cached
+end
+
+--- A simple tick thread that updates the cache
+local function TickThread()
+    while true do
+        -- allows us to be more responsive on tick interval changes
+        WaitSeconds(1)
+        -- update the cache and inform observers
+        Cached = PostprocessClients(GlobalGetSessionClients())
+        Observable:Set(Cached)
+    end
+end
+
+ForkThread(TickThread)
+
+-------------------------------------------------------------------------------
+--#region Deprecated functionality
+
 --- Interval for when we update the cache
 local TickInterval = 2.0
 
@@ -75,39 +97,18 @@ local TickInterval = 2.0
 -- when FastInterval() is called again before ResetInterval() is.
 local TickIntervalResetCounter = 0
 
---- A simple tick thread that updates the cache
-local function TickThread()
-    while true do
-        -- allows us to be more responsive on tick interval changes
-        WaitSeconds(0.5 * TickInterval)
-        WaitSeconds(0.5 * TickInterval)
-        WaitSeconds(0.5 * TickInterval)
-        WaitSeconds(0.5 * TickInterval)
-
-        -- update the cache and inform observers
-        Cached = PostprocessClients(GlobalGetSessionClients())
-        Observable:Set(Cached)
-    end
-end
-
---- Override global function to return our cache
----@return Client[]
-_G.GetSessionClients = function()
-    return Cached
-end
-
---- A getter to return the check interval
+---@deprecated
 function GetInterval()
     return TickInterval
 end
 
---- Increases the check interval to every 0.025 seconds or a framerate of 40.
+---@deprecated
 function FastInterval()
     TickIntervalResetCounter = TickIntervalResetCounter + 1
     TickInterval = 0.025
 end
 
---- Resets the interval to every 2.0 seconds or a framerate of 0.5.
+---@deprecated
 function ResetInterval()
     TickIntervalResetCounter = TickIntervalResetCounter - 1
     if TickIntervalResetCounter == 0 then
@@ -115,4 +116,4 @@ function ResetInterval()
     end
 end
 
-ForkThread(TickThread)
+-------------------------------------------------------------------------------
