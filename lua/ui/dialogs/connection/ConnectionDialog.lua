@@ -1,5 +1,5 @@
 --******************************************************************************************************
---** Copyright (c) 2024  FAForever
+--** Copyright (c) 2024 FAForever
 --**
 --** Permission is hereby granted, free of charge, to any person obtaining a copy
 --** of this software and associated documentation files (the "Software"), to deal
@@ -20,29 +20,38 @@
 --** SOFTWARE.
 --******************************************************************************************************
 
+local Window = import("/lua/maui/window.lua").Window
+
 local UIUtil = import("/lua/ui/uiutil.lua")
 local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
-
-local Window = import("/lua/maui/window.lua").Window
-local Combo = import("/lua/ui/controls/combo.lua").Combo
-local IntegerSlider = import("/lua/maui/slider.lua").IntegerSlider
-
-local Grid   = import("/lua/maui/grid.lua").Grid
 
 local UIConnectionDialogDot = import("/lua/ui/dialogs/connection/ConnectionDialogDot.lua").UIConnectionDialogDot
 local SessionClientsOverride = import("/lua/ui/override/sessionclients.lua")
 
----@class UIConnectionDialogMessage
+local ConnectionDialogData = import("/lua/ui/dialogs/connection/ConnectionDialogData.lua")
+
+---@class UIConnectionDialogMessage : number[]
 ---@field Identifier string
 ---@field Sendee number
----@field Ping number[]
----@field Quiet number[]
 
 ---@type UIConnectionDialog | false
 local UIConnectionDialogInstance = false
 
 ---@class UIConnectionDialog : Window
 ---@field Grid Grid
+---@field ItemClientAValue Text
+---@field ItemClientBValue Text
+---@field ItemClientArrow Text
+---@field ItemPingLabel Text
+---@field ItemPingAvgLabel Text
+---@field ItemPingAvgValue Text
+---@field ItemPingDevLabel Text
+---@field ItemPingDevValue Text
+---@field ItemQuietLabel Text
+---@field ItemQuietAvgLabel Text
+---@field ItemQuietAvgValue Text
+---@field ItemQuietDevLabel Text
+---@field ItemQuietDevValue Text
 UIConnectionDialog = ClassUI(Window) {
 
     _MessageIdentifier = "Connection",
@@ -59,96 +68,35 @@ UIConnectionDialog = ClassUI(Window) {
         local config = false
         local lockSize = true
         local lockPosition = false
-        local identifier = "ConnectionDialog"
+        local identifier = "ConnectionDialog1"
         local defaultPosition = {
             Left = 10,
             Top = 300,
             Right = 310,
-            Bottom = 525
+            Bottom = 625
         }
 
         Window.__init(self, parent, title, icon, pin, config, lockSize, lockPosition, identifier, defaultPosition)
-
-        do
-            -- this is where we send the clients information to the other players. We use
-            -- a 'structure of arrays' as that is cheaper to send without abstracting the
-            -- information too much.
-
-            ---@type number[]
-            local recipients = {}
-
-            ---@type UIConnectionDialogMessage
-            local message = {
-                Identifier = self._MessageIdentifier,
-                Ping = {},
-                Quiet = {},
-            }
-
-            SessionClientsOverride.Observable:AddObserver(
-
-            ---@param clients Client[]
-                function(clients)
-                    -- clean up old entries
-                    for k = 1, table.getn(recipients) do
-                        recipients[k] = nil
-                    end
-
-                    recipientHead = 1
-
-                    -- populate with new entries
-                    for k = 1, table.getn(clients) do
-                        local client = clients[k]
-                        if client.connected then
-                            recipients[recipientHead] = k
-                            recipientHead = recipientHead + 1
-
-                            message.Ping[k * 2] = client.ping
-                            message.Quiet[k * 2] = client.quiet
-                        else
-                            message.Ping[k] = -1
-                            message.Quiet[k] = -1
-                        end
-
-                        if client["local"] then
-                            message.Sendee = k
-                        end
-                    end
-
-                    -- send the clients table to the other players
-                    SessionSendChatMessage(recipients, message)
-                end,
-                self._MessageIdentifier
-            )
-        end
 
         do
 
             -- this is where we receive the information from other players. We interpret
             -- and update our internal state along with our interface.
 
+            ForkThread(self.TransmitMessageThread, self)
+
             import("/lua/ui/game/gamemain.lua").RegisterChatFunc(
-                ---@param sender string
-                ---@param data UIConnectionDialogMessage
+            ---@param sender string
+            ---@param data UIConnectionDialogMessage
                 function(sender, data)
-
-                    local clients = GetSessionClients()
-                    local clientCount = table.getn(clients)
-
-                    local grid = self.Grid
-                    for k = 1, clientCount do
-                        ---@type UIConnectionDialogDot
-                        local item = grid[data.Sendee][k]
-                        item:Update(data.Ping[k], 0, data.Quiet[k], 0)
-                    end
-
-                    LOG("UIConnectionDialog", sender, reprsl(data))
+                    self:ReceiveMessage(data)
                 end,
                 self._MessageIdentifier
             )
 
         end
 
-        do 
+        do
 
             -- this is where we create the interface that users can use to navigate the data
 
@@ -156,10 +104,10 @@ UIConnectionDialog = ClassUI(Window) {
             local clientCount = table.getn(clients)
 
             ---@type Grid
-            local grid = { }
+            local grid = {}
             for x = 1, clientCount do
                 local clientA = clients[x]
-                grid[x] = { }
+                grid[x] = {}
                 for y = 1, clientCount do
                     local clientB = clients[y]
                     local uiDot = UIConnectionDialogDot(self, clientA.name, clientB.name)
@@ -168,6 +116,22 @@ UIConnectionDialog = ClassUI(Window) {
             end
 
             self.Grid = grid
+
+            self.ItemClientAValue = UIUtil.CreateText(self.ClientGroup, '...', 12, UIUtil.bodyFont)
+            self.ItemClientBValue = UIUtil.CreateText(self.ClientGroup, '...', 12, UIUtil.bodyFont)
+            self.ItemClientArrow = UIUtil.CreateText(self.ClientGroup, ' -> ', 12, UIUtil.bodyFont)
+
+            self.ItemPingLabel = UIUtil.CreateText(self.ClientGroup, 'Ping: ', 14, UIUtil.bodyFont)
+            self.ItemPingAvgLabel = UIUtil.CreateText(self.ClientGroup, '- average: ', 12, UIUtil.bodyFont)
+            self.ItemPingAvgValue = UIUtil.CreateText(self.ClientGroup, '...', 12, UIUtil.bodyFont)
+            self.ItemPingDevLabel = UIUtil.CreateText(self.ClientGroup, '- standard deviation: ', 12, UIUtil.bodyFont)
+            self.ItemPingDevValue = UIUtil.CreateText(self.ClientGroup, '...', 12, UIUtil.bodyFont)
+
+            self.ItemQuietLabel = UIUtil.CreateText(self.ClientGroup, 'Quiet: ', 14, UIUtil.bodyFont)
+            self.ItemQuietAvgLabel = UIUtil.CreateText(self.ClientGroup, '- average: ', 12, UIUtil.bodyFont)
+            self.ItemQuietAvgValue = UIUtil.CreateText(self.ClientGroup, '...', 12, UIUtil.bodyFont)
+            self.ItemQuietDevLabel = UIUtil.CreateText(self.ClientGroup, '- standard deviation: ', 12, UIUtil.bodyFont)
+            self.ItemQuietDevValue = UIUtil.CreateText(self.ClientGroup, '...', 12, UIUtil.bodyFont)
         end
     end,
 
@@ -183,9 +147,54 @@ UIConnectionDialog = ClassUI(Window) {
         for x = 1, clientCount do
             for y = 1, clientCount do
                 LayoutHelpers.LayoutFor(grid[x][y])
-                    :AtLeftTopIn(self, 26 * x, 26 * y )
+                    :AtLeftTopIn(self.ClientGroup, 14 + 26 * (x - 1), 10 + 26 * (y - 1))
             end
         end
+
+        -- client information
+
+        LayoutHelpers.LayoutFor(self.ItemClientAValue)
+            :AtLeftTopIn(self.ClientGroup, 14, 20 + 26 * clientCount)
+
+        LayoutHelpers.LayoutFor(self.ItemClientArrow)
+            :RightOf(self.ItemClientAValue, 2)
+
+        LayoutHelpers.LayoutFor(self.ItemClientBValue)
+            :RightOf(self.ItemClientArrow, 2)
+
+        -- ping information
+
+        LayoutHelpers.LayoutFor(self.ItemPingLabel)
+            :Below(self.ItemClientAValue, 2)
+
+        LayoutHelpers.LayoutFor(self.ItemPingAvgLabel)
+            :Below(self.ItemPingLabel, 2)
+
+        LayoutHelpers.LayoutFor(self.ItemPingAvgValue)
+            :RightOf(self.ItemPingAvgLabel, 2)
+
+        LayoutHelpers.LayoutFor(self.ItemPingDevLabel)
+            :Below(self.ItemPingAvgLabel, 2)
+
+        LayoutHelpers.LayoutFor(self.ItemPingDevValue)
+            :RightOf(self.ItemPingDevLabel, 2)
+
+        -- quiet information
+
+        LayoutHelpers.LayoutFor(self.ItemQuietLabel)
+            :Below(self.ItemPingDevLabel, 2)
+
+        LayoutHelpers.LayoutFor(self.ItemQuietAvgLabel)
+            :Below(self.ItemQuietLabel, 2)
+
+        LayoutHelpers.LayoutFor(self.ItemQuietAvgValue)
+            :RightOf(self.ItemQuietAvgLabel, 2)
+
+        LayoutHelpers.LayoutFor(self.ItemQuietDevLabel)
+            :Below(self.ItemQuietAvgLabel, 2)
+
+        LayoutHelpers.LayoutFor(self.ItemQuietDevValue)
+            :RightOf(self.ItemQuietDevLabel, 2)
 
         self:SetWindowAlpha(0.8)
     end,
@@ -196,6 +205,104 @@ UIConnectionDialog = ClassUI(Window) {
         Window.OnDestroy(self)
     end,
 
+    ---@param self UIConnectionDialog
+    TransmitMessageThread = function(self)
+
+        ---@type number[]
+        local mCache = {}
+
+        ---@type number[]
+        local sCache = {}
+
+        ---@type number[]
+        local recipients = {}
+
+        ---@type UIConnectionDialogMessage
+        local message = {
+            Identifier = self._MessageIdentifier,
+            Sendee = -1,
+        }
+
+        while not IsDestroyed(self) do
+
+            -- this is where we send the clients information to the other players. We use
+            -- a 'structure of arrays' as that is cheaper to send without abstracting the
+            -- information too much.
+
+            local clients = GetSessionClients()
+            local clientCount = table.getn(clients)
+
+            -- determine recipients
+            for k = 1, clientCount do
+                recipients[k] = nil
+            end
+
+            local recipientHead = 1
+            for k = 1, clientCount do
+                local client = clients[k]
+                if client.connected then
+                    recipients[recipientHead] = k
+                    recipientHead = recipientHead + 1
+                end
+
+                if client["local"] then
+                    message.Sendee = k
+                end
+            end
+
+            for k = 1, table.getn(message) do
+                message[k] = nil
+            end
+
+            -- populate with ping values
+            mCache, sCache = ConnectionDialogData.ComputeStatisticsPing(mCache, sCache)
+            for k = 1, clientCount do
+                message[k + 0 * clientCount] = mCache[k]
+            end
+
+            for k = 1, clientCount do
+                message[k + 1 * clientCount] = sCache[k]
+            end
+
+            -- populate with quiet values
+            mCache, sCache = ConnectionDialogData.ComputeStatisticsQuiet(mCache, sCache)
+            for k = 1, clientCount do
+                message[k + 2 * clientCount] = mCache[k]
+            end
+
+            for k = 1, clientCount do
+                message[k + 3 * clientCount] = sCache[k]
+            end
+
+            -- send out the message
+            SessionSendChatMessage(recipients, message)
+
+            -- delay frequency when we're not visible
+            if self:IsHidden() then
+                WaitSeconds(16.0)
+            else
+                WaitSeconds(2.0)
+            end
+        end
+    end,
+
+    ---@param self UIConnectionDialog
+    ---@param message UIConnectionDialogMessage
+    ReceiveMessage = function(self, message)
+        local clients = GetSessionClients()
+        local clientCount = table.getn(clients)
+
+        local grid = self.Grid
+        for k = 1, clientCount do
+            ---@type UIConnectionDialogDot
+            local item = grid[message.Sendee][k]
+            local pingMean = message[k + 0 * clientCount]
+            local pingDeviation = message[k + 1 * clientCount]
+            local quietMean = message[k + 2 * clientCount]
+            local quietDeviation = message[k + 3 * clientCount]
+            item:Update(pingMean, pingDeviation, quietMean, quietDeviation)
+        end
+    end,
 
     --- Called by the engine when the dialog changes visiblity via `Control:Show()` and `Control:Hide()`
     ---@param self UIConnectionDialog
@@ -209,12 +316,26 @@ UIConnectionDialog = ClassUI(Window) {
     ---@param item UIConnectionDialogDot
     ---@param event KeyEvent
     OnHover = function(self, item, event)
-
+        if event.Type == 'MouseExit' then
+            self.ItemClientAValue:SetText('...')
+            self.ItemClientBValue:SetText('...')
+            self.ItemPingAvgValue:SetText('...')
+            self.ItemPingDevValue:SetText('...')
+            self.ItemQuietAvgValue:SetText('...')
+            self.ItemQuietDevValue:SetText('...')
+        else
+            self.ItemClientAValue:SetText(item.ClientA)
+            self.ItemClientBValue:SetText(item.ClientB)
+            self.ItemPingAvgValue:SetText(string.format('%.2f', item.ClientPingAvg))
+            self.ItemPingDevValue:SetText(string.format('%.2f', item.ClientPingSd))
+            self.ItemQuietAvgValue:SetText(string.format('%.2f', item.ClientQuietAvg))
+            self.ItemQuietDevValue:SetText(string.format('%.2f', item.ClientQuietSd))
+        end
     end,
 
     ---@param self UIConnectionDialog
     OnClose = function(self)
-        self:Destroy()
+        self:Hide()
     end,
 }
 
@@ -237,7 +358,8 @@ end
 
 --- Toggle the dialog
 function ToggleDialog()
-    if (not UIConnectionDialogInstance) or UIConnectionDialogInstance:IsHidden() then
+    if (not UIConnectionDialogInstance) or IsDestroyed(UIConnectionDialogInstance) or
+        UIConnectionDialogInstance:IsHidden() then
         OpenDialog()
     else
         CloseDialog()

@@ -120,7 +120,7 @@ UIConnectionDialogDot = ClassUI(Group) {
             color[3] = 0.25
         else
             color[1] = math.min(quietAvg / 100, 1)
-            color[2] = 1
+            color[2] = 1 - math.min(quietAvg / 100, 1)
             color[3] = 0
         end
 

@@ -77,7 +77,7 @@ end
 local function TickThread()
     while true do
         -- allows us to be more responsive on tick interval changes
-        WaitSeconds(1)
+        WaitSeconds(0.1)
         -- update the cache and inform observers
         Cached = PostprocessClients(GlobalGetSessionClients())
         Observable:Set(Cached)
