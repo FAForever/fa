@@ -767,9 +767,13 @@ StructureUnit = ClassUnit(Unit) {
                     local progress = adjacentUnit:GetWorkProgress()
                     if progress < 0.99 then
                         adjacentUnit:StopSiloBuild()
-                        IssueSiloBuildTactical({adjacentUnit})
+                        if EntityCategoryContains(categories.STRATEGIC, adjacentUnit) then
+                            IssueSiloBuildNuke({adjacentUnit})
+                        else
+                            IssueSiloBuildTactical({adjacentUnit})
+                        end
+                        
                         adjacentUnit:GiveNukeSiloBlocks(progress)
-                        LOG(autoModeEnabled)
                         adjacentUnit:SetAutoMode(autoModeEnabled)
                     end
                 end
