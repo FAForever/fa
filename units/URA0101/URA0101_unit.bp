@@ -181,9 +181,9 @@ UnitBlueprint{
     CollisionOffsetY = 0,
     CollisionOffsetZ = 0,
     SizeSphere = 2.0,
-    SizeX = 0.4,
-    SizeY = 0.15,
-    SizeZ = 0.6,
+    SizeX = 0.8,
+    SizeY = 0.4,
+    SizeZ = 1.0,
     StrategicIconName = "icon_fighter1_intel",
     StrategicIconSortPriority = 75,
     Transport = {
