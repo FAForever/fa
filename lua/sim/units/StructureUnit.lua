@@ -772,7 +772,7 @@ StructureUnit = ClassUnit(Unit) {
                         else
                             IssueSiloBuildTactical({adjacentUnit})
                         end
-                        
+
                         adjacentUnit:GiveNukeSiloBlocks(progress)
                         adjacentUnit:SetAutoMode(autoModeEnabled)
                     end
