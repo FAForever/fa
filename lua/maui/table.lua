@@ -25,23 +25,28 @@ local LayoutHelpersScaleNumber = import("/lua/maui/layouthelpers.lua").ScaleNumb
 
 local Group = import("/lua/maui/group.lua").Group
 local Group__init = Group.__init
-local CreateLazyVar = import("/lua/lazyvar.lua").Create
+
+local LazyVarCreate = import("/lua/lazyvar.lua").Create
 
 -- upvalue scope for performance
 local WARN = WARN
 local StringFormat = string.format
 
---- The matrix is fixed in terms of columns, rows and item size. The width and height of the matrix is pre-defined, just like a bitmap.
----@class UIMatrix : Group
+--- A table with columns and rows. All columns have the same width and all rows have the same height.
+---
+--- Overrides the following properties:
+--- - Width
+--- - Height
+---@class UITable : Group
 ---@field _Columns number       # number of columns (horizontal/width)
 ---@field _Rows number          # number of rows (vertical/height)
 ---@field _ItemWidth number     # width of item
 ---@field _ItemHeight number    # height of item
 ---@field _ItemGap number       # gap between items
 ---@field _Grid Control[][]
-Matrix = ClassUI(Group) {
+Table = ClassUI(Group) {
 
-    ---@param self UIMatrix
+    ---@param self UITable
     ---@param parent Control
     ---@param columns number        # will be corrected for ui scale
     ---@param rows number           # will be corrected for ui scale
@@ -49,13 +54,13 @@ Matrix = ClassUI(Group) {
     ---@param itemHeight number     # will be corrected for ui scale
     ---@param itemGap number        # will be corrected for ui scale
     __init = function(self, parent, columns, rows, itemWidth, itemHeight, itemGap, debugName)
-        Group__init(self, parent, debugName or (StringFormat("Matrix (%s)", tostring(self))))
+        Group__init(self, parent, debugName or (StringFormat("Table (%s)", tostring(self))))
 
-        self._Columns = CreateLazyVar(columns)
-        self._Rows = CreateLazyVar(rows)
-        self._ItemWidth = CreateLazyVar(itemWidth)
-        self._ItemHeight = CreateLazyVar(itemHeight)
-        self._ItemGap = CreateLazyVar(itemGap)
+        self._Columns = LazyVarCreate(columns)
+        self._Rows = LazyVarCreate(rows)
+        self._ItemWidth = LazyVarCreate(itemWidth)
+        self._ItemHeight = LazyVarCreate(itemHeight)
+        self._ItemGap = LazyVarCreate(itemGap)
 
         local grid = {}
         for k = 1, columns do
@@ -65,7 +70,7 @@ Matrix = ClassUI(Group) {
         self._Grid = grid
     end,
 
-    ---@param self UIMatrix
+    ---@param self UITable
     ---@param parent Control
     __post_init = function(self, parent)
         self.Width:Set(function()
@@ -93,7 +98,7 @@ Matrix = ClassUI(Group) {
         end)
     end,
 
-    ---@param self UIMatrix
+    ---@param self UITable
     ---@param x number
     ---@param y number
     _ValidateIndices = function(self, x, y)
@@ -117,10 +122,10 @@ Matrix = ClassUI(Group) {
     end,
 
     ---------------------------------------------------------------------------
-    --#region Interface
+    --#region Public interface
 
     --- Retrieve the item at the given indices. Returns nil if it is not set.
-    ---@param self UIMatrix
+    ---@param self UITable
     ---@param x number
     ---@param y number
     ---@return Control?
@@ -133,7 +138,13 @@ Matrix = ClassUI(Group) {
     end,
 
     --- Set the item at the given indices. Adjusts the width/height of the item to match the width/height of the matrix.
-    ---@param self UIMatrix
+    ---
+    --- Overrides the following properties of the item:
+    --- - Width
+    --- - Height
+    --- - Top
+    --- - Left
+    ---@param self UITable
     ---@param item Control
     ---@param x number
     ---@param y number
@@ -178,7 +189,7 @@ Matrix = ClassUI(Group) {
     end,
 
     --- Destroys the item at the given indices.
-    ---@param self UIMatrix
+    ---@param self UITable
     ---@param x number
     ---@param y number
     DestroyItem = function(self, x, y)
@@ -196,7 +207,7 @@ Matrix = ClassUI(Group) {
     --#region Properties
 
     --- Set the columns of the matrix. Destroys all controls that are outside of the new dimensions of the matrix.
-    ---@param self UIMatrix
+    ---@param self UITable
     ---@param columns number
     SetColumns = function(self, columns)
         local oldColumns = self._Columns()
@@ -214,7 +225,7 @@ Matrix = ClassUI(Group) {
     end,
 
     --- Set the rows of the matrix. Destroys all controls that are outside of the new dimensions of the matrix.
-    ---@param self UIMatrix
+    ---@param self UITable
     ---@param rows number
     SetRows = function(self, rows)
         local oldRows = self._Rows()
@@ -232,19 +243,19 @@ Matrix = ClassUI(Group) {
         self._Rows:SetValue(rows)
     end,
 
-    ---@param self UIMatrix
+    ---@param self UITable
     ---@param itemWidth number
     SetItemWidth = function(self, itemWidth)
         self._ItemWidth:SetValue(itemWidth)
     end,
 
-    ---@param self UIMatrix
+    ---@param self UITable
     ---@param itemHeight number
     SetItemHeight = function(self, itemHeight)
         self._ItemHeight:SetValue(itemHeight)
     end,
 
-    ---@param self UIMatrix
+    ---@param self UITable
     ---@param itemGap number
     SetItemGap = function(self, itemGap)
         self._ItemGap:SetValue(itemGap)
@@ -255,7 +266,7 @@ Matrix = ClassUI(Group) {
     ---------------------------------------------------------------------------
     --#region Debugging
 
-    ---@param self UIMatrix
+    ---@param self UITable
     ---@param message string
     Warning = function(self, message)
         WARN(StringFormat("%s - %s", self:GetName(), message))
