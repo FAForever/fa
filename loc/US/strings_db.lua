@@ -1453,7 +1453,7 @@ Unit_Description_0024="Equips the standard SACU Cannon with Area-Of-Effect damag
 -- UEF -- Land Units
 Unit_Description_0025="Fast, lightly armoured reconnaissance vehicle. Armed with a machine gun and a basic sensor suite."
 Unit_Description_0026="Lightly armoured fast-moving raiding unit. Poor in direct combat. Can fire from Air Transports."
-Unit_Description_0027="Front-loaded Mobile Artillery unit, designed to inflict massive damage to buildings. Its shells create a field of vision in the place of impact. Slower rate-of-fire compared to its counterparts."
+Unit_Description_0027="Front-loaded Mobile Artillery unit, designed to inflict massive damage to buildings. Its shells create a field of vision in the place of impact. Slower rate of fire compared to its counterparts."
 Unit_Description_0028="Mobile Anti-Air, effective against low-end enemy air units."
 Unit_Description_0029="Main Battle Tank, armed with a single cannon. Slower but more heavily armoured compared to its counterparts."
 Unit_Description_0030="Heavy Assault Tank, designed to take large armies and fortified bases head-on."
@@ -1774,20 +1774,20 @@ Unit_Description_0175="Adds Teleportation capability. Requires considerable ener
 
 -- AEON -- Land Units
 Unit_Description_0223="Fast, lightly armoured, amphibious reconnaissance vehicle. Armed with a machine gun and a basic sensor suite."
-Unit_Description_0224="Lightly armoured fast-moving raiding unit. Poor in direct combat. Can fire from Air Transports."
-Unit_Description_0225="Poorly armoured amphibious Main Battle Tank. Makes up for its lack of HP with a much longer range than the other factions' tanks."
+Unit_Description_0224="Lightly armoured, fast-moving raiding unit. Poor in direct combat. Can fire from Air Transports."
+Unit_Description_0225="Poorly armoured, amphibious Main Battle Tank. Makes up for its lack of HP with a much longer range than the other factions' tanks."
 Unit_Description_0226="Mobile Artillery unit, designed to inflict massive damage to buildings. Highest overall damage output compared to its counterparts. Cannot shoot backwards."
 Unit_Description_0227="Mobile Anti-Air, effective against low-end enemy air units."
 Unit_Description_0228="Shielded Heavy Assault Tank, designed to take large armies and fortified bases head-on."
 Unit_Description_0229="Lightly armoured Mobile Missile Launcher, designed to attack buildings at long range. Out-ranges T2 Point defense."
 Unit_Description_0230="Amphibious Mobile Anti-Air unit. Shoots slow moving projectiles which deal damage in a large Area-Of-Effect. Excellent against enemy gunships."
-Unit_Description_0231="Amphibious Mobile Shield Generator which provides protection to units beneath its shield. Shields transfer residual damage to intersecting bubbles."
+Unit_Description_0231="Amphibious Mobile Shield Generator, which provides protection to units beneath its shield. Shields transfer residual damage to intersecting bubbles."
 Unit_Description_0232="Fast, Shielded Heavy Assault robot. Can repair units and structures but also reclaim wreckages and natural resources."
 Unit_Description_0233="Slow-moving Heavy Artillery. Can fire while moving."
 Unit_Description_0234="Experimental Sacred Assault robot. Armed with a laser and magnetic grapple claws which crush enemy units."
-Unit_Description_0327="Cheap and fast-moving Hovering Amphibious Tank."
-Unit_Description_0328="Sniper Robot, with paper-thin armour. Designed to deal damage at higher ranges. Inaccurate while in motion."
-Unit_Description_0442="Support Tank, armed with weaponry which is ineffective against armour, but annihilates shields."
+Unit_Description_0327="Cheap and fast-moving, Hovering Amphibious Tank."
+Unit_Description_0328="Lightly armored Sniper Bot. Designed to deal damage at higher ranges. Inaccurate while in motion."
+Unit_Description_0442="Hovering Support Tank, armed with weaponry which is ineffective against armour, but annihilates shields."
 
  -- AEON -- Air Units
 Unit_Description_0235="Fast aerial reconnaissance vehicle."
@@ -1928,18 +1928,18 @@ Unit_Description_0439="Adds Teleportation capability. Requires considerable ener
 Unit_Description_0440="Expands the SACU's weaponry with an Overcharge function identical to that of the standard ACU. Requires 100000 energy storage for maximum damage."
 
 -- SERAPHIM -- Land Units
-Unit_Description_0337="Light, fast mobile reconnaissance unit. When stationary, deploys cloaking and stealth fields."
-Unit_Description_0338="Lightly armoured tank armed with a single cannon."
+Unit_Description_0337="Light, fast mobile reconnaissance unit. Possesses a special ability, which makes the unit invisible to both radar and visual sensors when it is immobile. Can be used to obstruct mass spots when enabled. Can be disabled by moving the unit and is countered by Omni Sensors."
+Unit_Description_0338="Main Battle Tank, armed with a single cannon."
 Unit_Description_0339="Amphibious Mobile Artillery unit, designed to inflict massive damage to buildings. More effective against armies compared to its counterparts but also more expensive."
 Unit_Description_0340="Mobile Anti-Air, effective against low-end enemy air units."
-Unit_Description_0341="Heavy Assault Robot designed to take large armies and fortified bases head-on."
-Unit_Description_0342="Amphibious tank. Armed with a single cannon."
-Unit_Description_0343="Lightly armoured Mobile Missile Launcher designed to attack buildings at long range. Out-ranges T2 Point defense."
-Unit_Description_0344="Mobile anti-air flak launcher."
-Unit_Description_0345="Heavy Siege Tank armed with direct fire weaponry and weak torpedoes."
-Unit_Description_0346="Lightly armored, fast sniper bot. Armed with an extremely powerful energy rifle. Inaccurate while in motion."
+Unit_Description_0341="Heavy Assault Robot, designed to take large armies and fortified bases head-on."
+Unit_Description_0342="Fast-moving, Hovering Amphibious Tank. Armed with a high damage cannon."
+Unit_Description_0343="Lightly armoured Mobile Missile Launcher, designed to attack buildings at long range. Out-ranges T2 Point defense."
+Unit_Description_0344="Amphibious Mobile Anti-Air unit. Shoots slow moving projectiles which deal damage in a large Area-Of-Effect. Excellent against enemy gunships."
+Unit_Description_0345="Amphibious Heavy Siege Tank, armed with powerful direct fire weaponry and weak torpedoes."
+Unit_Description_0346="Lightly armored Sniper Bot. Designed to deal damage at higher ranges. Inaccurate while in motion."
 Unit_Description_0347="Slow-moving Heavy Artillery. Must be stationary to fire."
-Unit_Description_0348="High-end mobile shield generator."
+Unit_Description_0348="High-end, Amphibious Mobile Shield Generator, which provides protection to units beneath its shield. Shields transfer residual damage to intersecting bubbles."
 Unit_Description_0349="Armed with direct fire cannons, a central Plasma Ball Launcher, and powerful anti-air flak. When destroyed, a short-lived energy being is released, damaging nearby units."
 
  -- SERAPHIM -- Air Units
