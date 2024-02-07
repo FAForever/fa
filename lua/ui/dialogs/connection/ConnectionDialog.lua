@@ -198,9 +198,6 @@ UIConnectionDialog = ClassUI(Window) {
             :RightOf(self.ItemQuietDevLabel, 2)
 
         self:SetWindowAlpha(0.8)
-
-        LayoutHelpers.LayoutFor(self.MatrixTest)
-            :Below(self.ItemQuietDevLabel)
     end,
 
     --- Called when the control is destroyed
