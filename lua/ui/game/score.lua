@@ -855,7 +855,7 @@ function Contract()
                 PlaySound(sound)
                 controls.bg:Hide()
                 controls.collapseArrow:Hide()
-                if Prefs.GetFromCurrentProfile("scoreoverlay") ~= false then
+                if Prefs.GetFieldFromCurrentProfile("scoreoverlay") ~= false then
                     needExpand = true
                 end
             else
@@ -871,7 +871,7 @@ end
 function InitialAnimation(state)
     controls.bg.Right:Set(savedParent.Right() + controls.bg.Width())
     controls.bg:Hide()
-    if Prefs.GetFromCurrentProfile("scoreoverlay") ~= false then
+    if Prefs.GetFieldFromCurrentProfile("scoreoverlay") ~= false then
         controls.collapseArrow:SetCheck(false, true)
         controls.bg:Show()
         controls.bg:SetNeedsFrameUpdate(true)

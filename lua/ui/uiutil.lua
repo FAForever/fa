@@ -526,7 +526,7 @@ function GetCursor(id)
 end
 
 --- Creates the one cursor used by the game
----@return Cursor
+---@return UICursor
 function CreateCursor()
     return Cursor(GetCursor("DEFAULT"))
 end
