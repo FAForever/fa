@@ -26,6 +26,7 @@ UnitBlueprint{
         "MOBILE",
         "NAVAL",
         "NUKE",
+        "NUKESUB",
         "OVERLAYANTINAVY",
         "OVERLAYINDIRECTFIRE",
         "OVERLAYSONAR",

@@ -258,7 +258,7 @@ function GetCurrentUIState()
 end
 
 ---
----@return Cursor
+---@return UICursor
 function GetCursor()
 end
 
@@ -366,7 +366,11 @@ end
 function GetOptions(key)
 end
 
+--- Retrieves a value in the memory-stored preference file. The value retrieved is a deep copy of what resides in the actual 
+--- preference file. Therefore this function can be expensive to use directly - if you're not careful you may be allocating 
+--- kilobytes worth of data!
 ---
+--- You're encouraged to use `/lua/user/prefs.lua` to interact with the preference file.
 ---@param string string
 ---@param default any?
 ---@return any
@@ -846,7 +850,10 @@ end
 function RestartSession()
 end
 
+--- Writes the preferences to disk to make it persistent. This is an expensive operation. The 
+--- game does this automatically when it exits, there should be no reason to call this manually.
 ---
+--- You're encouraged to use `/lua/user/prefs.lua` to interact with the preference file.
 function SavePreferences()
 end
 
@@ -948,7 +955,7 @@ function SetCurrentFactoryForQueueDisplay(unit)
 end
 
 ---
----@param cursor Cursor
+---@param cursor UICursor
 function SetCursor(cursor)
 end
 
@@ -1005,7 +1012,9 @@ end
 function SetPausedOfUnit(unit, pause)
 end
 
+--- Updates a value in the preference file. Updating the preference file on disk is delayed until the application exits.
 ---
+--- You're encouraged to use `/lua/user/prefs.lua` to interact with the preference file.
 ---@param key string
 ---@param obj any
 function SetPreference(key, obj)
@@ -1147,7 +1156,7 @@ function WorldIsPlaying()
 end
 
 --- For internal use by `Cursor.__init()`
----@param cursor Cursor
+---@param cursor UICursor
 ---@param spec fa-class | nil
 function _c_CreateCursor(cursor, spec)
 end

@@ -2938,17 +2938,11 @@ Platoon = Class(moho.platoon_methods) {
         local PlatoonFormation = self.PlatoonData.UseFormation or 'NoFormation'
         self:SetPlatoonFormationOverride(PlatoonFormation)
 
-        for k,v in self:GetPlatoonUnits() do
-            if v.Dead then
-                continue
-            end
-
-            if v.Layer != 'Sub' then
-                continue
-            end
-
-            if v:TestCommandCaps('RULEUCC_Dive') then
-                IssueDive({v})
+        for _,v in platoonUnits do
+            if not v.Dead then
+                if v.Layer ~= 'Sub' and v:TestCommandCaps('RULEUCC_Dive') then
+                    IssueDive({v})
+                end
             end
         end
 

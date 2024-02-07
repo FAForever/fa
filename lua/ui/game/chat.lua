@@ -42,7 +42,7 @@ local defOptions = { all_color = 1,
         feed_background = false,
         feed_persist = true}
 
-local ChatOptions = Prefs.GetFromCurrentProfile("chatoptions") or {}
+local ChatOptions = Prefs.GetFieldFromCurrentProfile("chatoptions") or {}
 for option, value in defOptions do
      if ChatOptions[option] == nil then
         ChatOptions[option] = value
@@ -1259,7 +1259,7 @@ function CreateConfigWindow()
         borderColor = 'ff415055',
     }
 
-    local defPosition = Prefs.GetFromCurrentProfile('chat_config') or nil
+    local defPosition = Prefs.GetFieldFromCurrentProfile('chat_config') or nil
     GUI.config = Window(GetFrame(0), '<LOC chat_0008>Chat Options', nil, nil, nil, true, true, 'chat_config', defPosition, windowTextures)
     GUI.config.Depth:Set(GetFrame(0):GetTopmostDepth() + 1)
     Tooltip.AddButtonTooltip(GUI.config._closeBtn, 'chat_close')
