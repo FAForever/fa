@@ -51,6 +51,10 @@ ADFChronoDampener = Class(DefaultProjectileWeapon) {
                     self:PlaySound(bp.Audio.Fire)
                 end
 
+                -- extract radius information early to scale the effect size
+                local radius = (primaryWeapon and primaryWeapon:GetMaxRadius()) or buff.Radius
+                self.FxMuzzleFlashScale = 0.5 * radius/35
+
                 self:PlayFxMuzzleSequence(1)
                 self:StartEconomyDrain()
                 self:OnWeaponFired()
@@ -61,7 +65,6 @@ ADFChronoDampener = Class(DefaultProjectileWeapon) {
                 -- extract information from the buff blueprint
                 local buff = bp.Buffs[1]
                 local stunDuration = buff.Duration
-                local radius = (primaryWeapon and primaryWeapon:GetMaxRadius()) or buff.Radius
                 local sliceSize = radius / slices
 
                 for i = 1, slices do
