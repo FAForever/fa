@@ -753,6 +753,8 @@
 --- Multiplied by the resulting total energy cost of the teleport to get its required time.
 --- Treated as `0.01` when absent.
 ---@field TeleportTimeMod? number
+--- Whether to use the new variable teleport cost calculation method, or revert to the old
+---@field UseVariableTeleportCosts? boolean
 
 ---@class UnitBlueprintExternalFactory
 ---@field SelectionSizeX? number

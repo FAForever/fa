@@ -258,7 +258,7 @@ function GetCurrentUIState()
 end
 
 ---
----@return Cursor
+---@return UICursor
 function GetCursor()
 end
 
@@ -955,7 +955,7 @@ function SetCurrentFactoryForQueueDisplay(unit)
 end
 
 ---
----@param cursor Cursor
+---@param cursor UICursor
 function SetCursor(cursor)
 end
 
@@ -1156,7 +1156,7 @@ function WorldIsPlaying()
 end
 
 --- For internal use by `Cursor.__init()`
----@param cursor Cursor
+---@param cursor UICursor
 ---@param spec fa-class | nil
 function _c_CreateCursor(cursor, spec)
 end
