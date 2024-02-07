@@ -959,8 +959,8 @@ UnitBlueprint{
             WeaponUnpacks = false,
         },
         {
-            AboveWaterFireOnly = false,
-            AboveWaterTargetsOnly = false,
+            AboveWaterFireOnly = true,
+            AboveWaterTargetsOnly = true,
             BallisticArc = "RULEUBA_None",
             Buffs = {
                 {
@@ -982,9 +982,9 @@ UnitBlueprint{
             EnergyDrainPerSecond = 200,
             EnergyRequired = 200,
             FireTargetLayerCapsTable = {
-                Land = "Land|Water|Sub|Seabed",
-                Seabed = "Land|Water|Sub|Seabed",
-                Water = "Land|Water|Sub|Seabed",
+                Land = "Land|Water|Seabed",
+                Seabed = "Land|Water|Seabed",
+                Water = "Land|Water|Seabed",
             },
             FiringTolerance = 360,
             Label = "ChronoDampener",
