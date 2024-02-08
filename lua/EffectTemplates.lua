@@ -4434,8 +4434,8 @@ Aeon_HeavyDisruptorCannonUnitHit = table.concatenate(Aeon_HeavyDisruptorCannonLa
 
 
 Aeon_QuanticClusterChargeMuzzleFlash= {
-    EmtBpPath .. 'aeon_quanticcluster_muzzle_flash_01_emit.bp',
-    EmtBpPath .. 'aeon_quanticcluster_muzzle_flash_02_emit.bp',
+    EmtBpPath .. 'aeon_quanticcluster_muzzle_flash_01_emit.bp', -- inwards lines
+    EmtBpPath .. 'aeon_quanticcluster_muzzle_flash_02_emit.bp', -- barrel flash
 }
 
 Aeon_QuanticClusterMuzzleFlash= {
