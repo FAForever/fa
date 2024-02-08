@@ -23,8 +23,8 @@ EmitterBlueprint {
 	LowFidelity = true,
 	MedFidelity = true,
 	HighFidelity = true,
-	Texture = [[/textures/particles/ring_07.dds]],
-	RampTexture = [[/textures/particles/ramp_quantum_warhead_flash_01.dds]],
+	Texture = '/textures/particles/ring_07.dds',
+	RampTexture = '/textures/particles/ramp_quantum_warhead_flash_01.dds',
 	XDirectionCurve = {
 		XRange = 1.00,
 		Keys = {
