@@ -26,108 +26,103 @@ local DefaultProjectileWeapon = import("/lua/sim/defaultweapons.lua").DefaultPro
 local EffectTemplate = import("/lua/effecttemplates.lua")
 local utilities = import('/lua/utilities.lua')
 
-local CategoriesChronoDampener = categories.MOBILE - (categories.COMMAND + categories.EXPERIMENTAL + categories.AIR)
-
 ---@class ADFChronoDampener : DefaultProjectileWeapon
 ADFChronoDampener = Class(DefaultProjectileWeapon) {
     FxMuzzleFlash = EffectTemplate.AChronoDampenerLarge,
     FxMuzzleFlashScale = 0.5,
     FxUnitStun = EffectTemplate.Aeon_HeavyDisruptorCannonMuzzleCharge,
-    FxUnitStunFlash = EffectTemplate.ADisruptorCannonMuzzle01,
+    FxUnitStunFlash = EffectTemplate.Aeon_HeavyDisruptorCannonUnitHit,
 
-    RackSalvoFiringState = State(DefaultProjectileWeapon.RackSalvoFiringState) {
-        Main = function(self)
-            local bp = self.Blueprint
-            ---@type Unit
-            local unit = self.unit
-            local primaryWeapon = unit:GetWeaponByLabel('RightDisruptor')
+    ---@param self ADFChronoDampener
+    OnCreate = function(self)
+        DefaultProjectileWeapon.OnCreate(self)
+        -- Stores the original FX scale so it can be adjusted by range changes
+        self.OriginalFxMuzzleFlashScale = self.FxMuzzleFlashScale
 
-            -- Align to a tick which is a multiple of 50
-            WaitTicks(51 - math.mod(GetGameTick(), 50))
-
-            while true do
-
-                if bp.Audio.Fire then
-                    self:PlaySound(bp.Audio.Fire)
-                end
-
-                self:PlayFxMuzzleSequence(1)
-                self:StartEconomyDrain()
-                self:OnWeaponFired()
-
-                -- some constants that need to go into blueprint
-                local slices = 10
-
-                -- extract information from the buff blueprint
-                local buff = bp.Buffs[1]
-                local stunDuration = buff.Duration
-                local radius = (primaryWeapon and primaryWeapon:GetMaxRadius()) or buff.Radius
-                local sliceSize = radius / slices
-
-                for i = 1, slices do
-
-                    local radius = i * sliceSize
-                    local targets = utilities.GetTrueEnemyUnitsInSphere(
-                        self,
-                        self.unit:GetPosition(),
-                        radius,
-                        CategoriesChronoDampener
-                    )
-
-                    for k, target in targets do
-
-                        if not target:BeenDestroyed() then
-                            if buff.BuffType == 'STUN' then
-                                target:SetStunned(0.1 * stunDuration / slices + 0.1)
-                            end
-                        end
-
-                        -- add initial effect
-                        if not target.InitialStunFxApplied then
-                            for k, effect in self.FxUnitStunFlash do
-                                local emit = CreateEmitterOnEntity(target, target.Army, effect)
-                                emit:ScaleEmitter(math.max(target.Blueprint.SizeX, target.Blueprint.SizeZ))
-                            end
-
-                            target.InitialStunFxApplied = true
-                        end
-
-                        -- add effect on target
-                        local count = target:GetBoneCount()
-                        for k, effect in self.FxUnitStun do
-                            local emit = CreateEmitterAtBone(
-                                target, Random(0, count - 1), target.Army, effect
-                            )
-
-                            -- scale the effect a bit
-                            emit:ScaleEmitter(0.5)
-
-                            -- change lod to match outer lod of unit
-                            local lods = target.Blueprint.Display.Mesh.LODs
-                            if lods then
-                                emit:SetEmitterParam("LODCUTOFF", lods[table.getn(lods)].LODCutoff)
-                            end
-                        end
-                    end
-
-                    WaitTicks(stunDuration / slices + 1)
-                end
-
-                WaitTicks(51 - stunDuration)
-            end
-        end,
-
-        OnFire = function(self)
-        end,
-
-        OnLostTarget = function(self)
-            ChangeState(self, self.IdleState)
-            DefaultProjectileWeapon.OnLostTarget(self)
-        end,
-    },
+        local buff = self.Blueprint.Buffs[1]
+        self.CategoriesToStun = ParseEntityCategory(buff.TargetAllow) - ParseEntityCategory(buff.TargetDisallow)
+    end,
 
     ---@param self ADFChronoDampener
     ---@param muzzle string
     CreateProjectileAtMuzzle = function(self, muzzle)
+        local bp = self.Blueprint
+
+        if bp.Audio.Fire then
+            self:PlaySound(bp.Audio.Fire)
+        end
+
+        self.Trash:Add(ForkThread(self.ExpandingStunThread, self))
+    end,
+
+    --- Thread to avoid waiting in the firing cycle and stalling the main cannon.
+    ---@param self ADFChronoDampener
+    ExpandingStunThread = function(self)
+        -- extract information from the buff blueprint
+        local bp = self.Blueprint
+        local buff = bp.Buffs[1]
+        local stunDuration = buff.Duration
+        local radius = self:GetMaxRadius()
+        local slices = 10
+        local sliceSize = radius / slices
+        local sliceTime = stunDuration * 10 / slices + 1
+        local initialStunFxAppliedUnits = {}
+
+        for i = 1, slices do
+
+            local radius = i * sliceSize
+            local targets = utilities.GetTrueEnemyUnitsInSphere(
+                self,
+                self.unit:GetPosition(),
+                radius,
+                self.CategoriesToStun
+            )
+            local effectScale = (0.5 + (slices-i) / (slices-1) * 1.5)
+
+            for k, target in targets do
+                -- add stun
+                if not target:BeenDestroyed() then
+                    if buff.BuffType == 'STUN' then
+                        target:SetStunned(stunDuration / slices + 0.1)
+                    end
+                end
+
+                -- add initial effect
+                if not initialStunFxAppliedUnits[target] then
+                    for k, effect in self.FxUnitStunFlash do
+                        local emit = CreateEmitterOnEntity(target, target.Army, effect)
+                        emit:ScaleEmitter(effectScale * math.max(target.Blueprint.SizeX, target.Blueprint.SizeZ))
+                    end
+
+                    initialStunFxAppliedUnits[target] = true
+                end
+
+                -- add effect on target
+                local count = target:GetBoneCount()
+                for k, effect in self.FxUnitStun do
+                    local emit = CreateEmitterAtBone(
+                        target, Random(0, count - 1), target.Army, effect
+                    )
+
+                    -- scale the effect a bit
+                    emit:ScaleEmitter(0.5)
+
+                    -- change lod to match outer lod of unit
+                    local lods = target.Blueprint.Display.Mesh.LODs
+                    if lods then
+                        emit:SetEmitterParam("LODCUTOFF", lods[table.getn(lods)].LODCutoff)
+                    end
+                end
+            end
+
+            WaitTicks(sliceTime)
+        end
+    end,
+
+    ---@param self ADFChronoDampener
+    ---@param radius number
+    ChangeMaxRadius = function(self, radius)
+        DefaultProjectileWeapon.ChangeMaxRadius(self, radius)
+        self.FxMuzzleFlashScale = self.OriginalFxMuzzleFlashScale * radius / self.Blueprint.MaxRadius
     end,
 }
