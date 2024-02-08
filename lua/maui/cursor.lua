@@ -3,13 +3,14 @@
 -- SetDefaultTexture(filename, hotspotX, hotspotY)
 -- Reset() -- re-applies default texture
 
----@class Cursor : moho.cursor_methods, InternalObject
+---@class UICursor : moho.cursor_methods, InternalObject
 ---@field _hotspotX number
 ---@field _hotspotY number
 ---@field _filename LazyVar<FileName>
 ---@field _animThread? thread
+---@field ReticleInformation UIReticle
 Cursor = ClassUI(moho.cursor_methods) {
-    ---@param self Cursor
+    ---@param self UICursor
     ---@param defaultTexture FileName
     ---@param defaultHotspotX number
     ---@param defaultHotspotY number
@@ -29,7 +30,7 @@ Cursor = ClassUI(moho.cursor_methods) {
         self._animThread = nil
     end,
 
-    ---@param self Cursor
+    ---@param self UICursor
     ---@param filename FileName
     ---@param hotspotX? number defaults to 0
     ---@param hotspotY? number defaults to 0
@@ -62,11 +63,11 @@ Cursor = ClassUI(moho.cursor_methods) {
         end
     end,
 
-    ---@param self Cursor
+    ---@param self UICursor
     Reset = function(self)
         if self._animThread then
             KillThread(self._animThread)
         end
         self:ResetToDefault()
-    end
+    end,
 }

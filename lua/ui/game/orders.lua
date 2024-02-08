@@ -150,7 +150,8 @@ end
 
 -- Local logic data
 local orderCheckboxMap = false
-local currentSelection = false
+---@type UserUnit[]
+local currentSelection = nil
 
 -- Helper function to create order bitmaps
 -- Note, your bitmaps must be in /game/orders/ and have the standard button naming convention
@@ -956,9 +957,9 @@ function FindOCWeapon(bp)
 
     return
 end
-
+---@param units UserUnit[]
 local function IsAutoOCMode(units)
-    return UnitData[units[1]:GetEntityId()].AutoOvercharge == true
+    return units[1]:GetStat("AutoOC",0).Value == 1
 end
 
 local function OverchargeInit(control, unitList)
@@ -1007,7 +1008,8 @@ function OverchargeBehavior(self, modifiers)
         EnterOverchargeMode()
     elseif modifiers.Right then
         self._curHelpText = self._data.helpText
-        if self._isAutoMode then
+        local isAutoOC = IsAutoOCMode(currentSelection)
+        if isAutoOC then
             self.autoModeIcon:SetAlpha(0)
             self._isAutoMode = false
         else
@@ -1019,8 +1021,7 @@ function OverchargeBehavior(self, modifiers)
             controls.mouseoverDisplay.text:SetText(self._curHelpText)
         end
 
-        local cb = {Func = 'AutoOvercharge', Args = {auto = self._isAutoMode == true} }
-        SimCallback(cb, true)
+        SimCallback({Func = 'AutoOvercharge', Args = {auto = self._isAutoMode == true} }, true)
     end
 end
 
@@ -1503,7 +1504,7 @@ local function CreateAltOrders(availableOrders, availableToggles, units)
                         end
                     end
                     if not foundFreeSlot then
-                        WARN("No free slot for order: " .. item)
+                        SPEW("No free slot for order: " .. item)
                         -- Could break here, but don't, then you'll know how many extra orders you have
                     end
                 end
@@ -1520,7 +1521,7 @@ local function CreateAltOrders(availableOrders, availableToggles, units)
     -- Create the alt order buttons
     for index, availOrder in availableOrders do
         if not standardOrdersTable[availOrder] then continue end -- Skip any orders we don't have in our table
-        if not commonOrders[availOrder] then
+        if not commonOrders[availOrder] and slotForOrder[availOrder] ~= nil then
             local orderInfo = standardOrdersTable[availOrder] or AbilityInformation[availOrder]
             local orderCheckbox = AddOrder(orderInfo, slotForOrder[availOrder], true)
 
@@ -1552,7 +1553,7 @@ local function CreateAltOrders(availableOrders, availableToggles, units)
 
     for index, availToggle in availableToggles do
         if not standardOrdersTable[availToggle] then continue end -- Skip any orders we don't have in our table
-        if not commonOrders[availToggle] then
+        if not commonOrders[availToggle] and slotForOrder[availToggle] ~= nil then
             local orderInfo = standardOrdersTable[availToggle] or AbilityInformation[availToggle]
             local orderCheckbox = AddOrder(orderInfo, slotForOrder[availToggle], true)
 
@@ -1600,8 +1601,7 @@ function ApplyOverrides(standardOrdersTable, newSelection)
                 if override then
                     for key, value in override do
                         if orderDiffs[orderKey][key] ~= nil and (orderDiffs[orderKey][key] ~= value) then
-                            -- Found order diff already, so mark it false so it gets ignored when applying to table
-                            orderDiffs[orderKey] = false
+                            -- Found order diff we already have
                             break
                         else
                             orderDiffs[orderKey] = orderDiffs[orderKey] or {}
@@ -1671,9 +1671,8 @@ function SetAvailableOrders(availableOrders, availableToggles, newSelection)
         end
     end
 
-    if numValidOrders <= 12 then
-        CreateAltOrders(availableOrders, availableToggles, currentSelection)
-    end
+    CreateAltOrders(availableOrders, availableToggles, currentSelection)
+
 
     controls.orderButtonGrid:EndBatch()
     if table.empty(currentSelection) and controls.bg.Mini then

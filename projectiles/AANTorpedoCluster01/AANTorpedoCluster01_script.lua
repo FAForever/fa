@@ -44,9 +44,11 @@ AANTorpedoCluster01 = ClassProjectile(ATorpedoCluster) {
     OnEnterWater = function(self)
         ATorpedoClusterOnEnterWater(self)
 
-        -- create two child projectiles
-        for i = 0, 1 do
-            proj = self:CreateChildProjectile('/projectiles/AANTorpedoClusterSplit01/AANTorpedoClusterSplit01_proj.bp')
+        -- create child projectiles
+        local bp = self.Blueprint.Physics
+        local numProjectiles = bp.Fragments
+        for i = 0, numProjectiles do
+            proj = self:CreateChildProjectile(bp.FragmentId)
             proj.DamageData = self.DamageData
         end
 

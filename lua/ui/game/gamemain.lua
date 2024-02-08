@@ -711,7 +711,11 @@ function OnSelectionChanged(oldSelection, newSelection, added, removed)
     import("/lua/ui/game/unitview.lua").OnSelection(newSelection)
 end
 
+---@param newQueue UIBuildQueue
 function OnQueueChanged(newQueue)
+    -- update the Lua representation of the queue
+    UpdateCurrentFactoryForQueueDisplay(newQueue)
+
     if not gameUIHidden then
         import("/lua/ui/game/construction.lua").OnQueueChanged(newQueue)
     end
@@ -1014,16 +1018,34 @@ function HideNISBars()
     end
 end
 
+---@type table<string, fun(sender: string, data: table)>
 local chatFuncs = {}
 
-function RegisterChatFunc(func, dataTag)
-    table.insert(chatFuncs, {id = dataTag, func = func})
+---@param func fun(sender: string, data: table)
+---@param identifier string
+function RegisterChatFunc(func, identifier)
+    chatFuncs[identifier] = func
 end
 
+--- Called by the engine as (chat) messages are received.
+---@param sender string     # username
+---@param data table        
 function ReceiveChat(sender, data)
-    for i, chatFuncEntry in chatFuncs do
-        if data[chatFuncEntry.id] then
-            chatFuncEntry.func(sender, data)
+    if data.Identifier then
+
+        -- we highly encourage to use the 'Identifier' field to quickly identify the correct function
+
+        local func = chatFuncs[data.Identifier]
+        if func then
+            func(sender, data)
+        end
+    else
+        -- for legacy support we also search through the chat functions the 'old way'
+
+        for identifier, func in chatFuncs do
+            if data[identifier] then
+                func(sender, data)
+            end
         end
     end
 end

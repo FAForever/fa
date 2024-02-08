@@ -15,6 +15,7 @@ UnitBlueprint{
         "CQUEMOV",
         "CYBRAN",
         "ECONOMIC",
+        "DRAGBUILD",
         "MASSEXTRACTION",
         "MASSPRODUCTION",
         "PRODUCTSC1",

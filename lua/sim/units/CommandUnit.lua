@@ -1,4 +1,3 @@
-
 local EffectTemplate = import("/lua/effecttemplates.lua")
 
 local WalkingLandUnit = import("/lua/sim/units/walkinglandunit.lua").WalkingLandUnit
@@ -103,9 +102,10 @@ CommandUnit = ClassUnit(WalkingLandUnit) {
         -- assisting builds of other races, just not *starting* them.
         -- We skip the check if we're assisting another builder: it's up to them to have the ability
         -- to start this build, not us.
-        if not self:GetGuardedUnit() and unitBeingBuilt:GetFractionComplete() == 0 and not self:CanBuild(unitBeingBuilt.Blueprint.BlueprintId) then
-            IssueStop({self})
-            IssueClearCommands({self})
+        if not self:GetGuardedUnit() and unitBeingBuilt:GetFractionComplete() == 0 and
+            not self:CanBuild(unitBeingBuilt.Blueprint.BlueprintId) then
+            IssueStop({ self })
+            IssueClearCommands({ self })
             unitBeingBuilt:Destroy()
         end
     end,
@@ -145,7 +145,7 @@ CommandUnit = ClassUnit(WalkingLandUnit) {
         if wep.NeedsUpgrade then return end
 
         wep:SetAutoOvercharge(auto)
-        self.Sync.AutoOvercharge = auto
+        self:UpdateStat("AutoOC", auto and 1 or 0)
     end,
 
     ---@param self CommandUnit
@@ -161,7 +161,8 @@ CommandUnit = ClassUnit(WalkingLandUnit) {
     ---@param bones Bone[]
     WarpInEffectThread = function(self, bones)
         self:PlayUnitSound('CommanderArrival')
-        self:CreateProjectile('/effects/entities/UnitTeleport01/UnitTeleport01_proj.bp', 0, 1.35, 0, nil, nil, nil):SetCollision(false)
+        self:CreateProjectile('/effects/entities/UnitTeleport01/UnitTeleport01_proj.bp', 0, 1.35, 0, nil, nil, nil):
+            SetCollision(false)
         WaitSeconds(2.1)
 
         local bp = self.Blueprint

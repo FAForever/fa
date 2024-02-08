@@ -237,8 +237,8 @@ local statFuncs = {
         if options.gui_detailed_unitview == 0 then
             return false
         end
-        if info.userUnit ~= nil and info.userUnit:GetBuildRate() >= 2 then
-            return string.format("%d", math.floor(info.userUnit:GetBuildRate()))
+        if info.userUnit ~= nil and info.userUnit:GetBuildRate() >= 1 then
+            return string.format("%.6g", info.userUnit:GetBuildRate())
         end
         return false
     end,
@@ -532,9 +532,9 @@ function UpdateWindow(info)
 
         -- -- Build queue upon hovering of unit
 
-        local always = Prefs.GetFromCurrentProfile('options.gui_queue_on_hover_02') == 'always'
+        local always = Prefs.GetFieldFromCurrentProfile('options').gui_queue_on_hover_02 == 'always'
         local isObserver = GameMain.OriginalFocusArmy == -1 or GetFocusArmy() == -1
-        local whenObserving = Prefs.GetFromCurrentProfile('options.gui_queue_on_hover_02') == 'only-obs'
+        local whenObserving = Prefs.GetFieldFromCurrentProfile('options').gui_queue_on_hover_02 == 'only-obs'
 
         if always or (whenObserving and isObserver) then
             if (info.userUnit ~= nil) and EntityCategoryContains(UpdateWindowShowQueueOfUnit, info.userUnit) and
@@ -552,8 +552,7 @@ function UpdateWindow(info)
                 end
 
                 -- show that queue
-                controls.queue.grid:UpdateQueue(SetCurrentFactoryForQueueDisplay(factory))
-                ClearCurrentFactoryForQueueDisplay()
+                controls.queue.grid:UpdateQueue(PeekCurrentFactoryForQueueDisplay(factory))
             else
                 controls.queue:Hide()
             end

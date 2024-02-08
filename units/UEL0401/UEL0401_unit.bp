@@ -57,6 +57,7 @@ UnitBlueprint{
         "PRODUCTSC1",
         "RECLAIMABLE",
         "SELECTABLE",
+        "SHIELD",
         "SHOWQUEUE",
         "SNIPEMODE",
         "UEF",
@@ -288,7 +289,7 @@ UnitBlueprint{
     LifeBarOffset = 4.35,
     LifeBarSize = 5.75,
     Physics = {
-        BackUpDistance = 15,
+        BackUpDistance = 30,
         BankingSlope = 3,
         BuildOnLayerCaps = {
             LAYER_Air = false,
@@ -680,7 +681,7 @@ UnitBlueprint{
             MaxRadius = 45,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
-            MuzzleVelocity = 45,
+            MuzzleVelocity = 60,
             ProjectileId = "/projectiles/TDFRiot02/TDFRiot02_proj.bp",
             ProjectileLifetimeUsesMultiplier = 1.15,
             RackBones = {
@@ -741,7 +742,7 @@ UnitBlueprint{
             MaxRadius = 45,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
-            MuzzleVelocity = 45,
+            MuzzleVelocity = 60,
             PrefersPrimaryWeaponTarget = true,
             ProjectileId = "/projectiles/TDFRiot02/TDFRiot02_proj.bp",
             ProjectileLifetimeUsesMultiplier = 1.15,

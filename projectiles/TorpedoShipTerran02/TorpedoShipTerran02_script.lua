@@ -1,8 +1,6 @@
--- Terran Land-based torpedo
-
 local TTorpedoShipProjectile = import("/lua/terranprojectiles.lua").TTorpedoShipProjectile
 
---- Unused
+--- Unused : Terran Land-based torpedo
 ---@class TorpedoShipTerran02 : TTorpedoShipProjectile
 TorpedoShipTerran02 = ClassProjectile(TTorpedoShipProjectile) {
     FxSplashScale = 1,
@@ -14,5 +12,4 @@ TorpedoShipTerran02 = ClassProjectile(TTorpedoShipProjectile) {
         '/effects/emitters/destruction_water_splash_plume_01_emit.bp',
     },
 }
-
 TypeClass = TorpedoShipTerran02

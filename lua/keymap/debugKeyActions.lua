@@ -221,6 +221,10 @@ local keyActionsDebug = {
         action = 'UI_ToggleGamePanels',
         category = 'debug',
     },
+    ['debug_connectivity'] = {
+        action = 'UI_Lua import("/lua/ui/dialogs/connection/ConnectionDialog.lua").ToggleDialog()',
+        category = 'ui'
+    },
 }
 
 ---@type table<string, UIKeyAction>
@@ -283,6 +287,26 @@ local keyActionsDebugAI = {
     },
     ['toggle_platoon_simple_structure'] = {
         action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").AIPlatoonSimpleStructureBehavior()',
+        category = 'ai'
+    },
+    ['create_build_template_02'] = {
+        action = 'UI_Lua import("/lua/ui/game/aichunktemplates.lua").PopulateChunkTemplate(2)',
+        category = 'ai'
+    },
+    ['create_build_template_04'] = {
+        action = 'UI_Lua import("/lua/ui/game/aichunktemplates.lua").PopulateChunkTemplate(4)',
+        category = 'ai'
+    },
+    ['create_build_template_08'] = {
+        action = 'UI_Lua import("/lua/ui/game/aichunktemplates.lua").PopulateChunkTemplate(8)',
+        category = 'ai'
+    },
+    ['create_build_template_16'] = {
+        action = 'UI_Lua import("/lua/ui/game/aichunktemplates.lua").PopulateChunkTemplate(16)',
+        category = 'ai'
+    },
+    ['create_build_template_32'] = {
+        action = 'UI_Lua import("/lua/ui/game/aichunktemplates.lua").PopulateChunkTemplate(32)',
         category = 'ai'
     },
 }

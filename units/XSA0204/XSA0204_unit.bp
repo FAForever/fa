@@ -157,7 +157,7 @@ UnitBlueprint{
         UnitName = "<LOC xsa0204_name>Uosioz",
     },
     Intel = {
-        SonarRadius = 45,
+        SonarRadius = 44,
         VisionRadius = 32,
     },
     LifeBarHeight = 0.075,
@@ -211,7 +211,7 @@ UnitBlueprint{
             AutoInitiateAttackCommand = true,
             BallisticArc = "RULEUBA_None",
             CollideFriendly = false,
-            Damage = 250,
+            Damage = 150,
             DamageType = "Normal",
             DisplayName = "Cavitation Cluster Torpedo",
             FireTargetLayerCapsTable = {
@@ -225,8 +225,8 @@ UnitBlueprint{
             Label = "Bomb",
             MaxRadius = 42,
             MinRadius = 4,
-            MuzzleSalvoDelay = 0.3,
-            MuzzleSalvoSize = 3,
+            MuzzleSalvoDelay = 0.1,
+            MuzzleSalvoSize = 5,
             MuzzleVelocity = 0,
             ProjectileId = "/projectiles/SANHeavyCavitationTorpedo01/SANHeavyCavitationTorpedo01_proj.bp",
             ProjectileLifetime = 20,

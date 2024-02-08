@@ -13,12 +13,10 @@ local SingleBeamProjectile = DefaultProjectileFile.SingleBeamProjectile
 local SinglePolyTrailProjectile = DefaultProjectileFile.SinglePolyTrailProjectile
 local MultiPolyTrailProjectile = DefaultProjectileFile.MultiPolyTrailProjectile
 local SingleCompositeEmitterProjectile = DefaultProjectileFile.SingleCompositeEmitterProjectile
-local DepthCharge = import("/lua/defaultantiprojectile.lua").DepthCharge
 local NullShell = DefaultProjectileFile.NullShell
 local EffectTemplate = import("/lua/effecttemplates.lua")
 local NukeProjectile = DefaultProjectileFile.NukeProjectile
-
-local TacticalMissileComponent = import('/lua/sim/DefaultProjectiles.lua').TacticalMissileComponent
+local TacticalMissileComponent = import('/lua/sim/defaultprojectiles.lua').TacticalMissileComponent
 local SplitComponent = import('/lua/sim/projectiles/components/SplitComponent.lua').SplitComponent
 local DebrisComponent = import('/lua/sim/projectiles/components/DebrisComponent.lua').DebrisComponent
 
@@ -552,6 +550,7 @@ CRocketProjectile = ClassProjectile(SingleBeamProjectile) {
 
 ---  CYBRAN ROCKET PROJECILES
 ---@class CLOATacticalMissileProjectile : SingleBeamProjectile, TacticalMissileComponent, SplitComponent, DebrisComponent
+---@field SplitDamage { DamageAmount: number, DamageRadius: number }
 CLOATacticalMissileProjectile = ClassProjectile(SingleBeamProjectile, TacticalMissileComponent, SplitComponent, DebrisComponent) {
     BeamName = '/effects/emitters/missile_loa_munition_exhaust_beam_01_emit.bp',
     FxTrails = {'/effects/emitters/missile_cruise_munition_trail_01_emit.bp',},
@@ -605,7 +604,7 @@ CLOATacticalMissileProjectile = ClassProjectile(SingleBeamProjectile, TacticalMi
     end,
 
     ---@param self CLOATacticalMissileProjectile
-    ---@param instigator Unit | Projectile
+    ---@param instigator Unit
     ---@param amount number
     ---@param vector Vector
     ---@param damageType DamageType
@@ -844,3 +843,4 @@ CKrilTorpedo = ClassProjectile(OnWaterEntryEmitterProjectile) {}
 local DefaultExplosion = import("/lua/defaultexplosions.lua")
 local RandomFloat = import("/lua/utilities.lua").GetRandomFloat
 local MultiBeamProjectile = DefaultProjectileFile.MultiBeamProjectile
+local DepthCharge = import("/lua/defaultantiprojectile.lua").DepthCharge

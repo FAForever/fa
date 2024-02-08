@@ -304,8 +304,8 @@ UnitBlueprint{
             DisableWhileReloading = true,
             DisplayName = "Anti-Torpedo Flare",
             FireTargetLayerCapsTable = {
-                Sub = "Seabed|Sub|Water",
-                Water = "Seabed|Sub|Water",
+                Sub = "Water",
+                Water = "Water",
             },
             FiringTolerance = 2,
             Label = "AntiTorpedo01",

@@ -197,7 +197,7 @@ UnitBlueprint{
     Intel = {
         SonarRadius = 60,
         VisionRadius = 16,
-        WaterVisionRadius = 35,
+        WaterVisionRadius = 36,
     },
     LifeBarHeight = 0.075,
     LifeBarOffset = 1.4,
@@ -277,10 +277,22 @@ UnitBlueprint{
                     MuzzleBones = { "Muzzle_01" },
                     RackBone = "Muzzle_01",
                 },
+                {
+                    MuzzleBones = { "Muzzle_02" },
+                    RackBone = "Muzzle_02",
+                },
+                {
+                    MuzzleBones = { "Muzzle_03" },
+                    RackBone = "Muzzle_03",
+                },
+                {
+                    MuzzleBones = { "Muzzle_04" },
+                    RackBone = "Muzzle_04",
+                },
             },
             RackFireTogether = false,
             RackRecoilDistance = 0,
-            RackReloadTimeout = 0,
+            RackReloadTimeout = 30,
             RackSalvoChargeTime = 0,
             RackSalvoReloadTime = 0,
             RackSalvoSize = 1,

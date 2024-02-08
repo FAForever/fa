@@ -42,13 +42,6 @@ TIFMissileCruise05 = ClassProjectile(TMissileCruiseProjectile) {
     FxUnitHitScale = 0.90,
     FxWaterHitScale = 0.90,
     FxOnKilledScale = 0.90,
-
-    ---@param self TIFMissileCruise05
-    OnCreate = function(self)
-        TMissileCruiseProjectile.OnCreate(self)
-        self.MoveThread = self.Trash:Add(ForkThread(self.MovementThread, self))
-    end,
-
 }
 TypeClass = TIFMissileCruise05
 

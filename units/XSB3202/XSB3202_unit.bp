@@ -130,8 +130,8 @@ UnitBlueprint{
     Intel = {
         ReactivateTime = 4,
         ShowIntelOnSelect = true,
-        SonarRadius = 350,
-        VisionRadius = 25,
+        SonarRadius = 348,
+        VisionRadius = 24,
     },
     LifeBarHeight = 0.075,
     LifeBarOffset = 0.45,

@@ -1,7 +1,7 @@
 ---@diagnostic disable:local-limit
 -- ****************************************************************************
 -- **
--- **  File     :  /data/lua/EffectTemplates.lua
+-- **  File     :  /data/lua/effecttemplates.lua
 -- **  Author(s):  Gordon Duclos, Greg Kohne, Matt Vainio, Aaron Lundquist
 -- **
 -- **  Summary  :  Generic templates for commonly used effects
@@ -544,6 +544,12 @@ AeonBuildBeams02 = {
     EmtBpPath .. 'aeon_build_beam_04_emit.bp',
     EmtBpPath .. 'aeon_build_beam_05_emit.bp',
     EmtBpPath .. 'aeon_build_beam_06_emit.bp',
+}
+
+AeonVolcanoBeam01 = {
+    EmtBpPath .. 'aeon_volcano_beam_01.bp',
+    EmtBpPath .. 'aeon_volcano_beam_02.bp',
+    EmtBpPath .. 'aeon_volcano_beam_03.bp',
 }
 
 CybranBuildUnitBlink01 = { EmtBpPath .. 'build_cybran_blink_blue_01_emit.bp'}
@@ -1803,6 +1809,15 @@ CMobileKamikazeBombDeathExplosion = {
     EmtBpPath .. 'cybran_kamibomb_hit_13_emit.bp',  -- -- -- Yellow explosion flash.
 }
 
+CMobileBeetleExplosion = {
+    EmtBpPath .. 'proton_bomb_hit_02_emit.bp',
+    EmtBpPath .. 'proton_artillery_hit_01_emit.bp',
+    EmtBpPath .. 'proton_artillery_hit_02_emit.bp',
+    EmtBpPath .. 'quark_bomb_explosion_06_emit.bp',
+    EmtBpPath .. 'antimatter_ring_03_emit.bp',
+    EmtBpPath .. 'antimatter_ring_04_emit.bp',
+}
+
 -- ---------------------------------------------------------------
 -- -- -- -- UEF PROJECTILES (previously Terran) -- -- --
 -- ---------------------------------------------------------------
@@ -2937,14 +2952,21 @@ SIFInainoHitRingProjectileFxTrails01 = {
 --  SERAPHIM EXPERIMENTAL NUKE
 -- ------------------------------------------------------------------------
 
+SIFExperimentalStrategicLauncherReload01 = {
+    EmtBpPath .. 'seraphim_expnuke_prelaunch_02_emit.bp', -- -- down + right upward lines
+    EmtBpPath .. 'seraphim_expnuke_prelaunch_03_emit.bp', -- -- down + left upward lines
+    EmtBpPath .. 'seraphim_expnuke_prelaunch_04_emit.bp', -- -- up upward lines
+    EmtBpPath .. 'seraphim_expnuke_prelaunch_05_emit.bp', -- -- down + right coalescing orb
+    EmtBpPath .. 'seraphim_expnuke_prelaunch_06_emit.bp', -- -- down + left coalescing orb
+    EmtBpPath .. 'seraphim_expnuke_prelaunch_07_emit.bp', -- -- up coalescing orb
+}
+
+SIFExperimentalStrategicLauncherLoaded01 = {
+    EmtBpPath .. 'seraphim_expnuke_prelaunch_10_emit.bp', -- -- blueish glow, but infinite lifetime
+}
+
 SIFExperimentalStrategicMissileChargeLaunch01 = {
     EmtBpPath .. 'seraphim_expnuke_prelaunch_01_emit.bp', -- -- glowy plasma at bottom
-    EmtBpPath .. 'seraphim_expnuke_prelaunch_02_emit.bp', -- -- down / right lines
-    EmtBpPath .. 'seraphim_expnuke_prelaunch_03_emit.bp', -- -- down / left lines
-    EmtBpPath .. 'seraphim_expnuke_prelaunch_04_emit.bp', -- -- up lines
-    EmtBpPath .. 'seraphim_expnuke_prelaunch_05_emit.bp', -- -- down / right upward lines
-    EmtBpPath .. 'seraphim_expnuke_prelaunch_06_emit.bp', -- -- down / left upward lines
-    EmtBpPath .. 'seraphim_expnuke_prelaunch_07_emit.bp', -- -- up upward lines
     EmtBpPath .. 'seraphim_expnuke_prelaunch_08_emit.bp', -- -- inward dark lines
     EmtBpPath .. 'seraphim_expnuke_prelaunch_09_emit.bp', -- -- blueish glow
 }
@@ -4412,8 +4434,8 @@ Aeon_HeavyDisruptorCannonUnitHit = table.concatenate(Aeon_HeavyDisruptorCannonLa
 
 
 Aeon_QuanticClusterChargeMuzzleFlash= {
-    EmtBpPath .. 'aeon_quanticcluster_muzzle_flash_01_emit.bp',
-    EmtBpPath .. 'aeon_quanticcluster_muzzle_flash_02_emit.bp',
+    EmtBpPath .. 'aeon_quanticcluster_muzzle_flash_01_emit.bp', -- inwards lines
+    EmtBpPath .. 'aeon_quanticcluster_muzzle_flash_02_emit.bp', -- barrel flash
 }
 
 Aeon_QuanticClusterMuzzleFlash= {

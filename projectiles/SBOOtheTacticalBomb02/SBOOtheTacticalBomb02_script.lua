@@ -4,5 +4,8 @@
 -- Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 -------------------------------------------------------------------------------
 local SOtheTacticalBomb = import("/lua/seraphimprojectiles.lua").SOtheTacticalBomb
+
+--- Othe Tactical Bomb script, XSA0202
+---@class SBOOtheTacticalBomb02 : SOtheTacticalBomb
 SBOOtheTacticalBomb02 = ClassProjectile(SOtheTacticalBomb) { }
 TypeClass = SBOOtheTacticalBomb02

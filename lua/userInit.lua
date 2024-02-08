@@ -65,12 +65,16 @@ function WaitSeconds(n)
     end
 end
 
---- Waits the given number of ticks. Always waits at least four frames
+--- Waits the given number of ticks. Always waits at least two frames
 ---@param ticks any
 function WaitTicks(ticks)
+    -- local scope for performance
+    local GameTick = GameTick
+    local WaitFrames = WaitFrames
+
     local start = GameTick()
     repeat
-        WaitFrames(4)
+        WaitFrames(2)
     until (start + ticks) <= GameTick()
 end
 
@@ -246,5 +250,164 @@ do
     _G.IssueBlueprintCommandToUnit = function(unit, command, blueprintid, count, clear)
         UnitsCache[1] = unit
         IssueBlueprintCommandToUnits(UnitsCache, command, blueprintid, count, clear)
+    end
+end
+
+do
+    ---@alias UIBuildQueue UIBuildQueueItem[]
+
+    ---@class UIBuildQueueItem
+    ---@field count number
+    ---@field id UnitId
+
+    ---@type UserUnit | nil
+    local buildQueueOfUnit = nil
+
+    ---@type UIBuildQueue
+    local buildQueue = {}
+
+    local OldClearCurrentFactoryForQueueDisplay = _G.ClearCurrentFactoryForQueueDisplay
+    local OldSetCurrentFactoryForQueueDisplay = _G.SetCurrentFactoryForQueueDisplay
+    local OldDecreaseBuildCountInQueue = _G.DecreaseBuildCountInQueue
+    local OldIncreaseBuildCountInQueue = _G.IncreaseBuildCountInQueue
+
+    --- Clears the current build queue
+    ---@see DecreaseBuildCountInQueue           # To decrease the build count in the queue
+    ---@see IncreaseBuildCountInQueue           # To increase the build count in the queue
+    ---@see SetCurrentFactoryForQueueDisplay    # To set the current queue
+    ---@see GetCurrentFactoryForQueueDisplay    # To get the current queue
+    ---@see ClearCurrentFactoryForQueueDisplay  # To clear the current queue
+    _G.ClearCurrentFactoryForQueueDisplay = function()
+        buildQueueOfUnit = nil
+        buildQueue = {}
+        OldClearCurrentFactoryForQueueDisplay()
+    end
+
+    --- Defines the current build queue
+    ---@see DecreaseBuildCountInQueue           # To decrease the build count in the queue
+    ---@see IncreaseBuildCountInQueue           # To increase the build count in the queue
+    ---@see SetCurrentFactoryForQueueDisplay    # To set the current queue
+    ---@see GetCurrentFactoryForQueueDisplay    # To get the current queue
+    ---@see ClearCurrentFactoryForQueueDisplay  # To clear the current queue
+    ---@param userUnit UserUnit
+    ---@return UIBuildQueue
+    _G.SetCurrentFactoryForQueueDisplay = function(userUnit)
+        buildQueueOfUnit = userUnit
+        buildQueue = OldSetCurrentFactoryForQueueDisplay(userUnit)
+        return buildQueue
+    end
+
+    --- Retrieve the build queue without changing the global state
+    ---@see DecreaseBuildCountInQueue           # To decrease the build count in the queue
+    ---@see IncreaseBuildCountInQueue           # To increase the build count in the queue
+    ---@see SetCurrentFactoryForQueueDisplay    # To set the current queue
+    ---@see GetCurrentFactoryForQueueDisplay    # To get the current queue
+    ---@see ClearCurrentFactoryForQueueDisplay  # To clear the current queue
+    ---@param userUnit UserUnit
+    ---@return UIBuildQueue
+    _G.PeekCurrentFactoryForQueueDisplay = function(userUnit)
+        if IsDestroyed(userUnit) then
+            return {}
+        end
+
+        local oldBuildQueueOfUnit = buildQueueOfUnit
+        local queue = SetCurrentFactoryForQueueDisplay(userUnit)
+
+        if oldBuildQueueOfUnit then
+            SetCurrentFactoryForQueueDisplay(oldBuildQueueOfUnit)
+        end
+
+        return queue
+    end
+
+    --- Update the current command queue. Does not update the internal state of the engine - do not use directly!
+    ---@see DecreaseBuildCountInQueue           # To decrease the build count in the queue
+    ---@see IncreaseBuildCountInQueue           # To increase the build count in the queue
+    ---@see SetCurrentFactoryForQueueDisplay    # To set the current queue
+    ---@see GetCurrentFactoryForQueueDisplay    # To get the current queue
+    ---@see ClearCurrentFactoryForQueueDisplay  # To clear the current queue
+    ---@param queue UIBuildQueue
+    _G.UpdateCurrentFactoryForQueueDisplay = function(queue)
+        buildQueue = queue
+    end
+
+    --- Retrieves the current build queue
+    ---@see DecreaseBuildCountInQueue           # To decrease the build count in the queue
+    ---@see IncreaseBuildCountInQueue           # To increase the build count in the queue
+    ---@see SetCurrentFactoryForQueueDisplay    # To set the current queue
+    ---@see GetCurrentFactoryForQueueDisplay    # To get the current queue
+    ---@see ClearCurrentFactoryForQueueDisplay  # To clear the current queue
+    ---@return UIBuildQueue[]
+    _G.GetCurrentFactoryForQueueDisplay = function()
+        return buildQueue
+    end
+
+    --- Decrease the count at a given location of the current build queue
+    ---@see DecreaseBuildCountInQueue           # To decrease the build count in the queue
+    ---@see IncreaseBuildCountInQueue           # To increase the build count in the queue
+    ---@see SetCurrentFactoryForQueueDisplay    # To set the current queue
+    ---@see GetCurrentFactoryForQueueDisplay    # To get the current queue
+    ---@see ClearCurrentFactoryForQueueDisplay  # To clear the current queue
+    ---@param index number
+    ---@param count number
+    _G.DecreaseBuildCountInQueue = function(index, count)
+        if not buildQueueOfUnit then
+            WARN("Unable to decrease build queue count when no build queue is set")
+            return
+        end
+
+        if table.empty(buildQueue) then
+            WARN("Unable to decrease build queue is empty")
+            return
+        end
+
+        if index < 1 then
+            WARN("Unable to decrease build queue count when index is smaller than 1")
+            return
+        end
+
+        if index > table.getn(buildQueue) then
+            WARN("Unable to decrease build queue count when queue index is larger than the elements in the queue")
+            return
+        end
+
+        return OldDecreaseBuildCountInQueue(index, count)
+    end
+
+    --- Increase the count at a given location of the current build queue
+    ---@see DecreaseBuildCountInQueue           # To decrease the build count in the queue
+    ---@see IncreaseBuildCountInQueue           # To increase the build count in the queue
+    ---@see SetCurrentFactoryForQueueDisplay    # To set the current queue
+    ---@see GetCurrentFactoryForQueueDisplay    # To get the current queue
+    ---@see ClearCurrentFactoryForQueueDisplay  # To clear the current queue
+    ---@param index number
+    ---@param count number
+    _G.IncreaseBuildCountInQueue = function(index, count)
+        if not buildQueueOfUnit then
+            WARN("Unable to increase build queue count when no build queue is set")
+            return
+        end
+
+        if table.empty(buildQueue) then
+            WARN("Unable to increase build queue is empty")
+            return
+        end
+
+        if table.empty(buildQueue) then
+            WARN("Unable to increase build queue count when no build queue is set")
+            return
+        end
+
+        if index < 1 then
+            WARN("Unable to increase build queue count when index is smaller than 1")
+            return
+        end
+
+        if index > table.getn(buildQueue) then
+            WARN("Unable to increase build queue count when queue index is larger than the elements in the queue")
+            return
+        end
+
+        return OldIncreaseBuildCountInQueue(index, count)
     end
 end

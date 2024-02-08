@@ -1,4 +1,3 @@
-
 local Unit = import("/lua/sim/unit.lua").Unit
 local explosion = import("/lua/defaultexplosions.lua")
 local EffectUtil = import("/lua/effectutilities.lua")
@@ -50,6 +49,10 @@ local StructureUnitOnStartBeingBuiltRotateBuildings = categories.STRUCTURE * (ca
 ---@field TarmacBag StructureTarmacBag
 ---@field TerrainSlope table            # exists for backwards compatibility
 ---@field FxBlinkingLightsBag table     # exists for backwards compatibility
+---@field DeathAnimManip moho.AnimationManipulator
+---@field OnBeingBuiltEffectsBag TrashBag
+---@field AdjacencyBeamsBag TrashBag
+---@field BuildEffectsBag TrashBag
 StructureUnit = ClassUnit(Unit) {
     LandBuiltHiddenBones = {'Floatation'},
     MinConsumptionPerSecondEnergy = 1,
@@ -67,6 +70,9 @@ StructureUnit = ClassUnit(Unit) {
         Unit.OnCreate(self)
         self:HideLandBones()
         self.FxBlinkingLightsBag = { }
+
+        -- default to ground fire mode for all structures
+        self:SetFireState(2)
 
         local layer = self.Layer
         local blueprint = self.Blueprint
@@ -528,7 +534,7 @@ StructureUnit = ClassUnit(Unit) {
     end,
 
     ---@param self StructureUnit
-    ---@param overkillRatio number
+    ---@param overkillRatio number unused
     CreateDestructionEffects = function(self, overkillRatio)
         if explosion.GetAverageBoundingXZRadius(self) < 1.0 then
             explosion.CreateScalableUnitExplosion(self)
@@ -542,7 +548,7 @@ StructureUnit = ClassUnit(Unit) {
     -- Modified to use same upgrade logic as the ui. This adds more upgrade options via General.UpgradesFromBase blueprint option
     ---@param self StructureUnit
     ---@param unitBeingBuilt Unit
-    ---@param order boolean
+    ---@param order string
     OnStartBuild = function(self, unitBeingBuilt, order)
         -- Check for death loop
         if not Unit.OnStartBuild(self, unitBeingBuilt, order) then
@@ -628,13 +634,13 @@ StructureUnit = ClassUnit(Unit) {
         Unit.StopBeingBuiltEffects(self, builder, layer)
     end,
 
-    ---@param self StructureUnit
+    ---@param self StructureUnit unused
     ---@param unitBeingBuilt Unit
     StartUpgradeEffects = function(self, unitBeingBuilt)
         unitBeingBuilt:HideBone(0, true)
     end,
 
-    ---@param self StructureUnit
+    ---@param self StructureUnit unused
     ---@param unitBeingBuilt Unit
     StopUpgradeEffects = function(self, unitBeingBuilt)
         unitBeingBuilt:ShowBone(0, true)
@@ -761,9 +767,13 @@ StructureUnit = ClassUnit(Unit) {
                     local progress = adjacentUnit:GetWorkProgress()
                     if progress < 0.99 then
                         adjacentUnit:StopSiloBuild()
-                        IssueSiloBuildTactical({adjacentUnit})
+                        if EntityCategoryContains(categories.STRATEGIC, adjacentUnit) then
+                            IssueSiloBuildNuke({adjacentUnit})
+                        else
+                            IssueSiloBuildTactical({adjacentUnit})
+                        end
+
                         adjacentUnit:GiveNukeSiloBlocks(progress)
-                        LOG(autoModeEnabled)
                         adjacentUnit:SetAutoMode(autoModeEnabled)
                     end
                 end

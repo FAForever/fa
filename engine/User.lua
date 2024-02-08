@@ -90,6 +90,12 @@ end
 function CopyCurrentReplay(profile, newFilename)
 end
 
+---Copies given string to clipboard, returns true if succeeded
+---@param s string
+---@return boolean
+function CopyToClipboard(s)
+end
+
 --- Creates a Unit AtMouse
 ---@param blueprintId string
 ---@param ownerArmyIndex number
@@ -247,12 +253,12 @@ function GetCommandLineArg(option, maxArgs)
 end
 
 --- Returns 'splash', 'frontend', or 'game' depending on the current state of the UI
----@return 'splash' | 'frontend' | 'game'
+---@return 'splash' | 'frontend' | 'game' | 'none'
 function GetCurrentUIState()
 end
 
 ---
----@return Cursor
+---@return UICursor
 function GetCursor()
 end
 
@@ -360,7 +366,11 @@ end
 function GetOptions(key)
 end
 
+--- Retrieves a value in the memory-stored preference file. The value retrieved is a deep copy of what resides in the actual 
+--- preference file. Therefore this function can be expensive to use directly - if you're not careful you may be allocating 
+--- kilobytes worth of data!
 ---
+--- You're encouraged to use `/lua/user/prefs.lua` to interact with the preference file.
 ---@param string string
 ---@param default any?
 ---@return any
@@ -840,7 +850,10 @@ end
 function RestartSession()
 end
 
+--- Writes the preferences to disk to make it persistent. This is an expensive operation. The 
+--- game does this automatically when it exits, there should be no reason to call this manually.
 ---
+--- You're encouraged to use `/lua/user/prefs.lua` to interact with the preference file.
 function SavePreferences()
 end
 
@@ -937,12 +950,12 @@ end
 
 ---
 ---@param unit UserUnit
----@return BuildQueue
+---@return UIBuildQueue
 function SetCurrentFactoryForQueueDisplay(unit)
 end
 
 ---
----@param cursor Cursor
+---@param cursor UICursor
 function SetCursor(cursor)
 end
 
@@ -999,7 +1012,9 @@ end
 function SetPausedOfUnit(unit, pause)
 end
 
+--- Updates a value in the preference file. Updating the preference file on disk is delayed until the application exits.
 ---
+--- You're encouraged to use `/lua/user/prefs.lua` to interact with the preference file.
 ---@param key string
 ---@param obj any
 function SetPreference(key, obj)
@@ -1095,6 +1110,22 @@ end
 function UIZoomTo(units, seconds)
 end
 
+---Draws circle in world. Must be called within `WorldView:OnRenderWorld`
+---@param pos Vector
+---@param size number
+---@param color Color
+---@param thickness? number
+function UI_DrawCircle(pos, size, color, thickness)
+end
+
+---Draws rectangle in world. Must be called within `WorldView:OnRenderWorld`
+---@param pos Vector
+---@param size number
+---@param color Color
+---@param thickness? number
+function UI_DrawRect(pos, size, color, thickness)
+end
+
 ---
 ---@param view WorldView
 ---@param point Vector2
@@ -1125,7 +1156,7 @@ function WorldIsPlaying()
 end
 
 --- For internal use by `Cursor.__init()`
----@param cursor Cursor
+---@param cursor UICursor
 ---@param spec fa-class | nil
 function _c_CreateCursor(cursor, spec)
 end

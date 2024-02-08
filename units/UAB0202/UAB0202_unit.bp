@@ -81,7 +81,7 @@ UnitBlueprint{
         BuildCostEnergy = 18000,
         BuildCostMass = 920,
         BuildRate = 40,
-        BuildTime = 2000,
+        BuildTime = 2300,
         BuildableCategory = {
             "BUILTBYTIER2FACTORY AEON MOBILE CONSTRUCTION",
             "BUILTBYTIER2FACTORY AEON STRUCTURE AIR",
@@ -168,6 +168,7 @@ UnitBlueprint{
             2.2,   1.5,   0,       --Bottom right
         },
         RollOffPoints = {
+            { UnitSpin = 0,     X = 0,	   Y = 0,     Z = 3 },
             { UnitSpin = 90,    X = 3,     Y = 0,     Z = 0 },
             { UnitSpin = -90,   X = -3,    Y = 0,     Z = 0 },
         },

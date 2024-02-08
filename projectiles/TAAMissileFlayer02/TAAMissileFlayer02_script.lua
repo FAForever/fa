@@ -1,9 +1,6 @@
---
--- Terran Anti Air Missile
---
 local TMissileAAProjectile = import("/lua/terranprojectiles.lua").TMissileAAProjectile
-TAAMissileFlayer02 = ClassProjectile(TMissileAAProjectile) {
-}
 
+--- Terran Anti Air Missile
+---@class TAAMissileFlayer02: TMissileAAProjectile
+TAAMissileFlayer02 = ClassProjectile(TMissileAAProjectile) {}
 TypeClass = TAAMissileFlayer02
-

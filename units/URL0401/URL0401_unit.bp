@@ -140,11 +140,12 @@ UnitBlueprint{
         },
         FactionName = "Cybran",
         Icon = "amph",
+        SelectionPriority = 5,
         UnitName = "<LOC url0401_name>Scathis",
     },
     Intel = {
         VisionRadius = 26,
-        WaterVisionRadius = 26,
+        WaterVisionRadius = 24,
     },
     LifeBarHeight = 0.075,
     LifeBarOffset = 3.7,

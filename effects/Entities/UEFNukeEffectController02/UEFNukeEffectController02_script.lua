@@ -9,10 +9,20 @@ local EffectTemplate = import("/lua/effecttemplates.lua")
 local Util = import("/lua/utilities.lua")
 local RandomFloat = Util.GetRandomFloat
 
+---@class UEFNukeEffectController01 : NullShell
 UEFNukeEffectController01 = Class(NullShell) {
+
+    ---@param self any
+    ---@param inWater any
+    OnCreate = function(self, inWater)
+        NullShell.OnCreate(self, inWater)
+        ForkThread(self.EffectThread, self)
+    end,
+
+    ---@param self UEFNukeEffectController01
     EffectThread = function(self)
-        local position = self:GetPosition()
         local army = self.Army
+        local position = self:GetPosition()
 
         -- Create projectile that controls plume effects
         local PlumeEffectYOffset = 0
@@ -34,28 +44,25 @@ UEFNukeEffectController01 = Class(NullShell) {
         end
 
         self:CreateInitialFireballSmokeRing()
-        self:ForkThread(self.CreateOuterRingWaveSmokeRing)
         self:ForkThread(self.CreateHeadConvectionSpinners)
         self:ForkThread(self.CreateFlavorPlumes)
 
-        WaitTicks(5)
 
-        local pos = self:GetPosition()
-        DamageArea(self, pos, 27, 1, 'Force', true)
-        DamageArea(self, pos, 27, 1, 'Force', true)
-
-        CreateLightParticle(self, -1, army, 100, 80, 'glow_03', 'ramp_nuke_04')
-
+        
         -- Create ground decals
         local orientation = RandomFloat(0, 2 * math.pi)
-        CreateDecal(position, orientation, 'Crater01_albedo', '', 'Albedo', 25, 25, 1200, 0, army)
-        CreateDecal(position, orientation, 'Crater01_normals', '', 'Normals', 25, 25, 1200, 0, army)
-        CreateDecal(position, orientation, 'nuke_scorch_003_albedo', '', 'Albedo', 30, 30, 1200, 0, army)
+        CreateDecal(position, orientation, 'Crater01_albedo', '', 'Albedo', 20, 20, 1200, 0, army)
+        CreateDecal(position, orientation, 'Crater01_normals', '', 'Normals', 20, 20, 1200, 0, army)
+
+        WaitTicks(5)
+
+        CreateLightParticle(self, -1, army, 100, 120, 'glow_03', 'ramp_nuke_04')
 
         WaitTicks(90)
         self:CreateGroundPlumeConvectionEffects(army)
     end,
 
+    ---@param self UEFNukeEffectController01
     CreateInitialFireballSmokeRing = function(self)
         local sides = 12
         local angle = (2 * math.pi) / sides
@@ -71,30 +78,7 @@ UEFNukeEffectController01 = Class(NullShell) {
         end
     end,
 
-    CreateOuterRingWaveSmokeRing = function(self)
-        local sides = 32
-        local angle = (2 * math.pi) / sides
-        local velocity = 3
-        local OffsetMod = 8
-        local projectiles = {}
-
-        for i = 0, (sides - 1) do
-            local X = math.sin(i * angle)
-            local Z = math.cos(i * angle)
-            local proj = self:CreateProjectile('/effects/entities/UEFNukeShockwave02/UEFNukeShockwave02_proj.bp',
-                X * OffsetMod, 2.5, Z * OffsetMod, X, 0, Z)
-                :SetVelocity(velocity)
-            table.insert(projectiles, proj)
-        end
-
-        WaitTicks(30)
-
-        -- Slow projectiles down to normal speed
-        for k, v in projectiles do
-            v:SetAcceleration(-0.45)
-        end
-    end,
-
+    ---@param self UEFNukeEffectController01
     CreateFlavorPlumes = function(self)
         local numProjectiles = 8
         local angle = (2 * math.pi) / numProjectiles
@@ -131,6 +115,7 @@ UEFNukeEffectController01 = Class(NullShell) {
         end
     end,
 
+    ---@param self UEFNukeEffectController01
     CreateHeadConvectionSpinners = function(self)
         local sides = 10
         local angle = (2 * math.pi) / sides
@@ -160,6 +145,8 @@ UEFNukeEffectController01 = Class(NullShell) {
         end
     end,
 
+    ---@param self UEFNukeEffectController01
+    ---@param army number
     CreateGroundPlumeConvectionEffects = function(self, army)
         for k, v in EffectTemplate.TNukeGroundConvectionEffects01 do
             CreateEmitterAtEntity(self, army, v)
@@ -185,5 +172,4 @@ UEFNukeEffectController01 = Class(NullShell) {
         end
     end,
 }
-
 TypeClass = UEFNukeEffectController01

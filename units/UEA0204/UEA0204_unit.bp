@@ -166,7 +166,7 @@ UnitBlueprint{
         UnitName = "<LOC uea0204_name>Stork",
     },
     Intel = {
-        SonarRadius = 45,
+        SonarRadius = 44,
         VisionRadius = 32,
     },
     LifeBarHeight = 0.075,
@@ -220,7 +220,7 @@ UnitBlueprint{
             AutoInitiateAttackCommand = true,
             BallisticArc = "RULEUBA_None",
             CollideFriendly = false,
-            Damage = 250,
+            Damage = 150,
             DamageType = "Normal",
             DisplayName = "Angler Torpedo",
             FireTargetLayerCapsTable = {
@@ -234,8 +234,8 @@ UnitBlueprint{
             Label = "Torpedo",
             MaxRadius = 42,
             MinRadius = 4,
-            MuzzleSalvoDelay = 0.6,
-            MuzzleSalvoSize = 3,
+            MuzzleSalvoDelay = 0.2,
+            MuzzleSalvoSize = 5,
             MuzzleVelocity = 0,
             ProjectileId = "/projectiles/TANAnglerTorpedo06/TANAnglerTorpedo06_proj.bp",
             ProjectileLifetime = 20,

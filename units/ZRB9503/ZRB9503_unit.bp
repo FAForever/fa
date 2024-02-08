@@ -80,6 +80,7 @@ UnitBlueprint {
         Abilities = {
             '<LOC ability_upgradable>Upgradeable',
         },
+        AnimationBuild = "/units/urb0203/urb0203_aBuild.sca",
         AnimationUpgrade = '/units/zrb9503/zrb9503_aupgrade.sca',
         BuildAttachBone = 'Attachpoint',
         IdleEffects = {
@@ -121,7 +122,7 @@ UnitBlueprint {
         BuildCostEnergy = 5500,
         BuildCostMass = 1100,
         BuildRate = 90,
-        BuildTime = 3000,
+        BuildTime = 2000,
         DifferentialUpgradeCostCalculation = true,
         RebuildBonusIds = {
             'zrb9503',

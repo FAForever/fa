@@ -5,5 +5,7 @@
 -------------------------------------------------------------------------------
 local SOtheTacticalBomb = import("/lua/seraphimprojectiles.lua").SOtheTacticalBomb
 
+--- Othe Tactical Bomb script, XSA0103
+---@class SBOOtheTacticalBomb01 : SOtheTacticalBomb
 SBOOtheTacticalBomb01 = ClassProjectile(SOtheTacticalBomb) { }
 TypeClass = SBOOtheTacticalBomb01

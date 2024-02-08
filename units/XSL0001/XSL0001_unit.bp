@@ -231,6 +231,7 @@ UnitBlueprint{
         TeleportEnergyMod = 0.03,
         TeleportMassMod = 0,
         TeleportTimeMod = 0.0001,
+        UseVariableTeleportCosts = true,
     },
     Enhancements = {
         AdvancedEngineering = {
@@ -662,9 +663,9 @@ UnitBlueprint{
     },
     Intel = {
         FreeIntel = true,
-        OmniRadius = 26,
+        OmniRadius = 24,
         VisionRadius = 26,
-        WaterVisionRadius = 26,
+        WaterVisionRadius = 24,
     },
     LifeBarHeight = 0.15,
     LifeBarOffset = 0.5,
