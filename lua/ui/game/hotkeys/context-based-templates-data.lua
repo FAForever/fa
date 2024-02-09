@@ -39,15 +39,6 @@
 -------------------------------------------------------------------------------
 --#region By mouse context
 
-CapExtractorWithStorages = import("/lua/ui/game/hotkeys/context-based-templates-data/CapExtractorWithStorages.lua").Template
-CapExtractorWithFabs = import("/lua/ui/game/hotkeys/context-based-templates-data/CapExtractorWithFabs.lua").Template
-CapRadarWithPower = import("/lua/ui/game/hotkeys/context-based-templates-data/CapRadarWithPower.lua").Template
-CapOpticsWithPower = import("/lua/ui/game/hotkeys/context-based-templates-data/CapOpticsWithPower.lua").Template
-CapT2ArtilleryWithPower = import("/lua/ui/game/hotkeys/context-based-templates-data/CapT2ArtilleryWithPower.lua").Template
-CapT3FabricatorWithStorages = import("/lua/ui/game/hotkeys/context-based-templates-data/CapT3FabricatorWithStorages.lua").Template
-CapT2ArtilleryWithPower = import("/lua/ui/game/hotkeys/context-based-templates-data/CapT2ArtilleryWithPower.lua").Template
-CapT3ArtilleryWithPower = import("/lua/ui/game/hotkeys/context-based-templates-data/CapT3ArtilleryWithPower.lua").Template
-CapSalvationWithPower = import("/lua/ui/game/hotkeys/context-based-templates-data/CapSalvationWithPower.lua").Template
 PointDefense = import("/lua/ui/game/hotkeys/context-based-templates-data/PointDefense.lua").Template
 AirDefenseLand = import("/lua/ui/game/hotkeys/context-based-templates-data/AirDefenseLand.lua").Template
 AirDefenseWater = import("/lua/ui/game/hotkeys/context-based-templates-data/AirDefenseWater.lua").Template
@@ -61,18 +52,25 @@ T1Hydrocarbon = import("/lua/ui/game/hotkeys/context-based-templates-data/T1Hydr
 --#endregion
 
 -------------------------------------------------------------------------------
---#region By command mode context
+--#region By (unit) blueprint id
 
+AppendExtractorWithStorages = import("/lua/ui/game/hotkeys/context-based-templates-data/AppendExtractorWithStorages.lua").Template
+AppendExtractorWithFabs = import("/lua/ui/game/hotkeys/context-based-templates-data/AppendExtractorWithFabs.lua").Template
+AppendRadarWithPower = import("/lua/ui/game/hotkeys/context-based-templates-data/AppendRadarWithPower.lua").Template
+AppendOpticsWithPower = import("/lua/ui/game/hotkeys/context-based-templates-data/AppendOpticsWithPower.lua").Template
+AppendT2ArtilleryWithPower = import("/lua/ui/game/hotkeys/context-based-templates-data/AppendT2ArtilleryWithPower.lua").Template
+AppendT3FabricatorWithStorages = import("/lua/ui/game/hotkeys/context-based-templates-data/AppendT3FabricatorWithStorages.lua").Template
+AppendT2ArtilleryWithPower = import("/lua/ui/game/hotkeys/context-based-templates-data/AppendT2ArtilleryWithPower.lua").Template
+AppendT3ArtilleryWithPower = import("/lua/ui/game/hotkeys/context-based-templates-data/AppendT3ArtilleryWithPower.lua").Template
+AppendSalvationWithPower = import("/lua/ui/game/hotkeys/context-based-templates-data/AppendSalvationWithPower.lua").Template
 AppendPowerGeneratorsToT2Artillery = import("/lua/ui/game/hotkeys/context-based-templates-data/AppendPowerGeneratorsToT2Artillery.lua").Template
 AppendPowerGeneratorsToT3Artillery = import("/lua/ui/game/hotkeys/context-based-templates-data/AppendPowerGeneratorsToT3Artillery.lua").Template
 AppendPowerGeneratorsToSalvation = import("/lua/ui/game/hotkeys/context-based-templates-data/AppendPowerGeneratorsToSalvation.lua").Template
 AppendPowerGeneratorsToEnergyStorage = import("/lua/ui/game/hotkeys/context-based-templates-data/AppendPowerGeneratorsToEnergyStorage.lua").Template
--- Soothsayer and Eye have different footprints so they need different appending templates.
 AppendPowerGeneratorsToSoothsayer = import("/lua/ui/game/hotkeys/context-based-templates-data/AppendPowerGeneratorsToSoothsayer.lua").Template
 AppendPowerGeneratorsToEye = import("/lua/ui/game/hotkeys/context-based-templates-data/AppendPowerGeneratorsToEye.lua").Template
 AppendPowerGeneratorsToTML = import("/lua/ui/game/hotkeys/context-based-templates-data/AppendPowerGeneratorsToTML.lua").Template
 AppendWallsToPointDefense = import("/lua/ui/game/hotkeys/context-based-templates-data/AppendWallsToPointDefense.lua").Template
-
 AppendAirGrid = import("/lua/ui/game/hotkeys/context-based-templates-data/AppendAirGrid.lua").Template
 
 --#endregion
