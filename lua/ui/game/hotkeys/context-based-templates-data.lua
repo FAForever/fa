@@ -24,16 +24,17 @@
 ---@field Name string                           # Printed on screen when cycling the templates
 ---@field TemplateData BuildTemplate            # A regular build template, except that it is written in Pascal Case and usually the first unit is removed
 ---@field TemplateSortingOrder number           # Lower numbers end up first in the queue
+---@field TemplateBlueprintId BlueprintId       
 ---
 --- By mouse context
----@field TriggersOnUnit? EntityCategory        # When defined, includes this template when the unit the mouse is hovering over matches the categories
+---@field TriggersOnUnit? EntityCategory        # When defined, includes this template when the player is hovering over a unit, a build order for a given unit or a unit in build preview that matches the categories
 ---@field TriggersOnLand? boolean               # When true, includes this template when the mouse is over land and not over a deposit
 ---@field TriggersOnWater? boolean              # When true, includes this template when the mouse is over water and not over a deposit
 ---@field TriggersOnMassDeposit? boolean        # When true, includes this template when the mouse is over a mass deposit
 ---@field TriggersOnHydroDeposit? boolean       # When true, includes this template when the mouse is over a hydrocarbon deposit
 ---
--- By command mode context
----@field TriggersOnBuilding? EntityCategory    # when defined, includes this template when the unit that is being built matches the categories
+-- deprecated
+---@field TriggersOnBuilding? EntityCategory    # when defined, includes this template when the unit that is being built matches the categories. Is deprecated, use TriggersOnUnit instead.
 
 -------------------------------------------------------------------------------
 --#region By mouse context
@@ -62,13 +63,10 @@ T1Hydrocarbon = import("/lua/ui/game/hotkeys/context-based-templates-data/T1Hydr
 -------------------------------------------------------------------------------
 --#region By command mode context
 
-AppendMassStoragesToExtractors = import("/lua/ui/game/hotkeys/context-based-templates-data/AppendMassStoragesToExtractors.lua").Template
-AppendMassStoragesAndFabricatorsToT3Extractor = import("/lua/ui/game/hotkeys/context-based-templates-data/AppendMassStoragesAndFabricatorsToT3Extractor.lua").Template
 AppendPowerGeneratorsToT2Artillery = import("/lua/ui/game/hotkeys/context-based-templates-data/AppendPowerGeneratorsToT2Artillery.lua").Template
 AppendPowerGeneratorsToT3Artillery = import("/lua/ui/game/hotkeys/context-based-templates-data/AppendPowerGeneratorsToT3Artillery.lua").Template
 AppendPowerGeneratorsToSalvation = import("/lua/ui/game/hotkeys/context-based-templates-data/AppendPowerGeneratorsToSalvation.lua").Template
 AppendPowerGeneratorsToEnergyStorage = import("/lua/ui/game/hotkeys/context-based-templates-data/AppendPowerGeneratorsToEnergyStorage.lua").Template
-AppendPowerGeneratorsToRadar = import("/lua/ui/game/hotkeys/context-based-templates-data/AppendPowerGeneratorsToRadar.lua").Template
 -- Soothsayer and Eye have different footprints so they need different appending templates.
 AppendPowerGeneratorsToSoothsayer = import("/lua/ui/game/hotkeys/context-based-templates-data/AppendPowerGeneratorsToSoothsayer.lua").Template
 AppendPowerGeneratorsToEye = import("/lua/ui/game/hotkeys/context-based-templates-data/AppendPowerGeneratorsToEye.lua").Template
