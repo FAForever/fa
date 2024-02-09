@@ -624,7 +624,11 @@ VeterancyComponent = ClassSimple {
     DoTakeDamage = function(self, instigator, amount, vector, damageType)
         amount = MathMin(amount, self:GetMaxHealth())
         self.VetDamageTaken = self.VetDamageTaken + amount
-        if instigator and instigator.IsUnit and not IsDestroyed(instigator) then
+        if instigator and
+            instigator.IsUnit and
+            (not IsDestroyed(instigator)) and
+            IsEnemy(self.Army, instigator.Army)
+        then
             local entityId = instigator.EntityId
             local vetInstigators = self.VetInstigators
             local vetDamage = self.VetDamage
