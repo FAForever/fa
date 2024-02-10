@@ -7,7 +7,8 @@ SRL0310 = Class(CLandUnit) {
             FxMuzzleFlash = {
                 '/effects/emitters/cybran_artillery_muzzle_flash_01_emit.bp',
                 '/effects/emitters/cybran_artillery_muzzle_flash_02_emit.bp',
-                '/effects/emitters/cybran_artillery_muzzle_smoke_01_emit.bp',
+                -- '/effects/emitters/cybran_artillery_muzzle_smoke_01_emit.bp',
+                '/effects/emitters/cybran_hoplight_muzzle_smoke_01_emit.bp',
             },
 
             CreateProjectileAtMuzzle = function(self, muzzle)
