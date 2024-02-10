@@ -11,7 +11,7 @@ UnitBlueprint{
     Categories = {
         "AEON",
         "ANTISHIELD",
-        --"BUILTBYTIER3FACTORY",
+        "BUILTBYTIER3FACTORY",
         "DIRECTFIRE",
         "HOVER",
         "LAND",
