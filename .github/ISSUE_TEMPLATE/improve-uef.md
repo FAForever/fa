@@ -49,3 +49,20 @@ You can find all relevant shaders in [mesh.fx](/effects/mesh.fx).
 | Albedo       | R         | G         | B        | Unused                                      |
 | Normals      | Unused    | Y         | Unused   | X                                           |
 | Spec         | Roughness | Roughness | Emission | Team color / Metallic + roughness reduction |
+
+Relevant details to individual channels:
+
+- Albedo.R = Red channel of albedo, no other behavior
+- Albedo.G = Green channel of albedo, no other behavior
+- Albedo.B = Blue channel of albedo, no other behavior
+- Albedo.A = Unused
+
+- Normals.R = Unused
+- Normals.G = Y direction of normals in tangent space
+- Normals.B = Unused
+- Normals.A = X direction of normals in tangent space
+
+- Spec.R = Plane cockpit mask and it can reduce roughness and increase albedo if the value is larger than 0.65
+- Spec.G = Roughness
+- Spec.B = Emission and it increases roughness
+- Spec.A = Team color and it decreases roughness
