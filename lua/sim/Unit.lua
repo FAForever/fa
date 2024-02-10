@@ -1730,7 +1730,6 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         -- Attempt to copy our animation pose to the prop. Only works if
         -- the mesh and skeletons are the same, but will not produce an error if not.
         if self.Tractored or (layer ~= 'Air' or (layer == "Air" and halfBuilt)) then
-            LOG(wasOutside)
             TryCopyPose(self, prop, not wasOutside)
         end
 
