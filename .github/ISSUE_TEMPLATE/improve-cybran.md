@@ -44,11 +44,11 @@ You can find all relevant shaders in [mesh.fx](/effects/mesh.fx).
 
 ### Relevant texture interpretations
 
-| Cybran  | R        | G         | B        | A                                           |
-| ------- | -------- | --------- | -------- | ------------------------------------------- |
-| Albedo  | R        | G         | B        | Unused                                      |
-| Normals | Y (copy) | Y         | Y (copy) | X                                           |
-| Spec    | Metallic | Roughness | Emission | Team color / Metallic + roughness reduction |
+| Mesh shaders | R        | G         | B        | A                                           |
+| ------------ | -------- | --------- | -------- | ------------------------------------------- |
+| Albedo       | R        | G         | B        | Unused                                      |
+| Normals      | Y (copy) | Y         | Y (copy) | X                                           |
+| Spec         | Metallic | Roughness | Emission | Team color / Metallic + roughness reduction |
 
 Relevant details to individual channels for the high-fidelity (PBR) preset:
 
