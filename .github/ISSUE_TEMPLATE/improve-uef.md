@@ -8,18 +8,26 @@ assignees: ""
 
 ## Lua script related issues
 
+## Effect related issues
+
+- [ ] Tracks are correct (if applicable)
+- [ ] Footfalls are correct (if applicable)
+
 ## Texture related issues
 
 - [ ] Correct albedo intensity
 - [ ] Correct team color channel
 - [ ] Correct roughness channel
 - [ ] Correct metallic channel(s)
-- [ ] Correct are wrong
+- [ ] Correct normals
 
 ## Mesh/bone related issues
 
 - [ ] Bones for target recoil exist
 - [ ] Bones for targeting exist (only relevant for large units)
+- [ ] LOD1 exists
+- [ ] LOD2 exists (optionally)
+- [ ] LOD3 exists (optionally)
 
 ## Relevant shaders
 
