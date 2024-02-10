@@ -1678,6 +1678,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         energy = energy * (bp.Wreckage.EnergyMult or 0)
         local time = (bp.Wreckage.ReclaimTimeMultiplier or 1)
         local pos = self:GetPosition()
+        local wasOutside = false
         local layer = self.Layer
 
         -- Reduce the mass value based on the tech tier
@@ -1706,7 +1707,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
 
         -- Create potentially offmap wrecks on-map. Exclude campaign maps that may do weird scripted things.
         if self.Brain.BrainType == 'Human' and (not ScenarioInfo.CampaignMode) then
-            pos = GetNearestPlayablePoint(pos)
+            pos, wasOutside = GetNearestPlayablePoint(pos)
         end
 
         local halfBuilt = self:GetFractionComplete() < 1
@@ -1729,10 +1730,8 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         -- Attempt to copy our animation pose to the prop. Only works if
         -- the mesh and skeletons are the same, but will not produce an error if not.
         if self.Tractored or (layer ~= 'Air' or (layer == "Air" and halfBuilt)) then
-            TryCopyPose(self, prop, true)
-
-            -- we need the prop to copy the world transform of the unit, but we do want to preserve wrecks so that they end up in the playable area of the map
-            Warp(prop, pos)
+            LOG(wasOutside)
+            TryCopyPose(self, prop, not wasOutside)
         end
 
         -- Create some ambient wreckage smoke
