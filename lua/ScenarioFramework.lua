@@ -2305,29 +2305,40 @@ end
 ---@return Vector
 ---@return boolean
 function GetNearestPlayablePoint(position)
+    local px, _, pz = unpack(position)
     local playableArea = ScenarioInfo.PlayableArea
-    local nearestPoint = {position[1], position[2], position[3]}
+
+    -- keep track whether the point is actually outside the map
     local isOutside = false
 
-    if position[1] < playableArea[1] then
+    if px < playableArea[1] then
         isOutside = true
-        nearestPoint[1] = playableArea[1] + 5
-    elseif position[1] > playableArea[3] then
+        px = playableArea[1] + 5
+    elseif px > playableArea[3] then
         isOutside = true
-        nearestPoint[1] = playableArea[3] - 5
+        px = playableArea[3] - 5
     end
 
-    if position[3] < playableArea[2] then
+    if pz < playableArea[2] then
         isOutside = true
-        nearestPoint[3] = playableArea[2] + 5
-    elseif position[3] > playableArea[4] then
+        pz = playableArea[2] + 5
+    elseif pz > playableArea[4] then
         isOutside = true
-        nearestPoint[3] = playableArea[4] - 5
+        pz = playableArea[4] - 5
     end
 
-    nearestPoint[2] = GetTerrainHeight(nearestPoint[1], nearestPoint[3])
+    -- if it really is outside the map then we allocate a new vector
+    if isOutside then
+        return {
+            px, 
+            GetTerrainHeight(px, pz),
+            pz
+        }, true
 
-    return nearestPoint, isOutside
+    end
+
+    -- otherwise nothing has changed, so return the existing position
+    return position, false
 end
 
 --- Returns if the unit's army is human
