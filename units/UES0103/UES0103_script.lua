@@ -1,37 +1,84 @@
-----****************************************************************************
-----**
-----**  File     :  /cdimage/units/UES0103/UES0103_script.lua
-----**  Author(s):  John Comes, David Tomandl, Jessica St. Croix
-----**
-----**  Summary  :  UEF Frigate Script
-----**
-----**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-----****************************************************************************
+--******************************************************************************************************
+--** Copyright (c) 2023 FAForever
+--**
+--** Permission is hereby granted, free of charge, to any person obtaining a copy
+--** of this software and associated documentation files (the "Software"), to deal
+--** in the Software without restriction, including without limitation the rights
+--** to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+--** copies of the Software, and to permit persons to whom the Software is
+--** furnished to do so, subject to the following conditions:
+--**
+--** The above copyright notice and this permission notice shall be included in all
+--** copies or substantial portions of the Software.
+--**
+--** THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+--** IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+--** FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+--** AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+--** LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+--** OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+--** SOFTWARE.
+--******************************************************************************************************
+
 local TSeaUnit = import("/lua/terranunits.lua").TSeaUnit
+local TSeaUnitOnStopBeingBuilt = TSeaUnit.OnStopBeingBuilt
+local TSeaUnitOnKilled = TSeaUnit.OnKilled
+
 local TAALinkedRailgun = import("/lua/terranweapons.lua").TAALinkedRailgun
 local TDFGaussCannonWeapon = import("/lua/terranweapons.lua").TDFGaussCannonWeapon
-local Entity = import("/lua/sim/entity.lua").Entity
+
+-- upvalue scope for performance
+local CreateRotator = CreateRotator
+
+local TrashBagAdd = TrashBag.Add
+local RotatorSetTargetSpeed = moho.RotateManipulator.SetTargetSpeed
+local RotatorSetAccel = moho.RotateManipulator.SetAccel
 
 ---@class UES0103 : TSeaUnit
+---@field Spinner01 moho.RotateManipulator
+---@field Spinner02 moho.RotateManipulator
+---@field Spinner03 moho.RotateManipulator
 UES0103 = ClassUnit(TSeaUnit) {
     Weapons = {
         MainGun = ClassWeapon(TDFGaussCannonWeapon) {},
         AAGun = ClassWeapon(TAALinkedRailgun) {},
     },
 
-    OnStopBeingBuilt = function(self,builder,layer)
-        TSeaUnit.OnStopBeingBuilt(self,builder,layer)
-        self.Trash:Add(CreateRotator(self, 'Spinner01', 'y', nil, 360, 0, 180))
-        self.Trash:Add(CreateRotator(self, 'Spinner02', 'y', nil, 90, 0, 180))
-        self.Trash:Add(CreateRotator(self, 'Spinner03', 'y', nil, -180, 0, -180))
-        self.RadarEnt = Entity {}
-        self.Trash:Add(self.RadarEnt)
-        local bp = self:GetBlueprint()
-        self.RadarEnt:InitIntel(self.Army, 'Radar', bp.Intel.RadarRadius or 75)
-        self.RadarEnt:EnableIntel('Radar')
-        self.RadarEnt:InitIntel(self.Army, 'Sonar', bp.Intel.SonarRadius or 75)
-        self.RadarEnt:EnableIntel('Sonar')
-        self.RadarEnt:AttachBoneTo(-1, self, 0)
+    ---@param self UES0103
+    ---@param builder Unit
+    ---@param layer Layer
+    OnStopBeingBuilt = function(self, builder, layer)
+        TSeaUnitOnStopBeingBuilt(self, builder, layer)
+
+        local trash = self.Trash
+        self.Spinner01 = TrashBagAdd(trash, CreateRotator(self, 'Spinner01', 'y', nil, 360, 0, 180))
+        self.Spinner02 = TrashBagAdd(trash, CreateRotator(self, 'Spinner02', 'y', nil, 90, 0, 180))
+        self.Spinner03 = TrashBagAdd(trash, CreateRotator(self, 'Spinner03', 'y', nil, -180, 0, -180))
+    end,
+
+    ---@param self UES0103
+    ---@param instigator Unit
+    ---@param type DamageType
+    ---@param overkillRatio number
+    OnKilled = function(self, instigator, type, overkillRatio)
+        TSeaUnitOnKilled(self, instigator, type, overkillRatio)
+
+        if self:GetFractionComplete() >= 1.0 then
+
+            local spinner
+
+            spinner = self.Spinner01
+            RotatorSetTargetSpeed(spinner, 0)
+            RotatorSetAccel(spinner, -40)
+
+            spinner = self.Spinner02
+            RotatorSetTargetSpeed(spinner, 0)
+            RotatorSetAccel(spinner, -10)
+
+            spinner = self.Spinner03
+            RotatorSetTargetSpeed(spinner, 0)
+            RotatorSetAccel(spinner, 20)
+        end
     end,
 }
 
