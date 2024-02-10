@@ -6,6 +6,12 @@ labels: "graphics"
 assignees: ""
 ---
 
+# Name of Unit
+
+_Screenshot of unit_
+
+- Blueprint identifier: _e.g., uel0001_
+
 ## Lua script related issues
 
 ## Effect related issues
