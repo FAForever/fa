@@ -64,8 +64,9 @@ ProjectileBlueprint {
         MaxSpeed = 80,
         MaxZigZag = 5,
         TrackTarget = true,
+        LeadTarget = true,
         TurnRate = 360,
         VelocityAlign = true,
-        ZigZagFrequency = 1,
+        ZigZagFrequency = 0.2,
     },
 }

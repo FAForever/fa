@@ -16,7 +16,7 @@ CDFRocketIridium03 = Class(CIridiumRocketProjectile) {
                 self,
                 {0,0,0},
                 targetEntity,
-                self.Data>targetEntity:GetHealth() and targetEntity:GetHealth() or self.Data,
+                self.Data,
                 'Normal'
             )
         end
