@@ -1,6 +1,6 @@
 ---
-name: Unit improvements for the UEF faction
-about: Suggest visual improvements to a unit that belongs to the UEF faction
+name: Unit improvements for the Cybran faction
+about: Suggest visual improvements to a unit that belongs to the Cybran faction
 title: ""
 labels: "area: graphics"
 assignees: ""
@@ -10,7 +10,7 @@ assignees: ""
 
 _Screenshot of unit_
 
-- Blueprint identifier: _e.g., uel0001_
+- Blueprint identifier: _e.g., url0001_
 
 ## Lua script related issues
 
@@ -39,16 +39,16 @@ _Screenshot of unit_
 
 You can find all relevant shaders in [mesh.fx](/effects/mesh.fx).
 
-- Mesh shader techniques: `Unit_HighFidelity` / `Unit_MedFidelity` / `Unit_LowFidelity`
-- Shield shader techniques: `ShieldUEF_MedFidelity` / `ShieldUEF_LowFidelity`
+- Mesh shader techniques: `Insect_HighFidelity` / `Insect_MedFidelity` / `Insect_LowFidelity`
+- Shield shader techniques: `ShieldCybran_MedFidelity` / `ShieldCybran_LowFidelity`
 
 ### Relevant texture interpretations
 
-| Mesh shaders | R         | G         | B        | A                                           |
-| ------------ | --------- | --------- | -------- | ------------------------------------------- |
-| Albedo       | R         | G         | B        | Unused                                      |
-| Normals      | Y (copy)  | Y         | Y (copy) | X                                           |
-| Spec         | Roughness | Roughness | Emission | Team color / Metallic + roughness reduction |
+| Cybran  | R        | G         | B        | A                                           |
+| ------- | -------- | --------- | -------- | ------------------------------------------- |
+| Albedo  | R        | G         | B        | Unused                                      |
+| Normals | Y (copy) | Y         | Y (copy) | X                                           |
+| Spec    | Metallic | Roughness | Emission | Team color / Metallic + roughness reduction |
 
 Relevant details to individual channels for the high-fidelity (PBR) preset:
 
@@ -62,7 +62,7 @@ Relevant details to individual channels for the high-fidelity (PBR) preset:
 - Normals.B = Copied Y direction (to prevent compression artifacts)
 - Normals.A = X direction of normals in tangent space
 
-- Spec.R = Plane cockpit mask and it can reduce roughness and increase albedo if the value is larger than 0.65
-- Spec.G = Roughness
-- Spec.B = Emission and it increases roughness
-- Spec.A = Team color and it decreases roughness and metallic
+- Spec.R = Metallic
+- Spec.G = Roughness and increase to metallic if the value is larger than 0.1
+- Spec.B = Emission
+- Spec.A = Team color and it decreases metallic
