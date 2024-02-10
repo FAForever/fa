@@ -78,6 +78,31 @@ UES0103 = ClassUnit(TSeaUnit) {
             spinner = self.Spinner03
             RotatorSetTargetSpeed(spinner, 0)
             RotatorSetAccel(spinner, 20)
+
+            -- create sparkles
+            local emit
+            local army = self.Army
+            local trash = self.Trash
+
+            emit = TrashBagAdd(trash,
+                CreateAttachedEmitter(self, 'Spinner01', army, '/effects/emitters/sparks_11_emit.bp'))
+            emit:SetEmitterParam('REPEATTIME', Random(20, 40))
+
+            emit = TrashBagAdd(trash,
+                CreateAttachedEmitter(self, 'Spinner02', army, '/effects/emitters/sparks_11_emit.bp'))
+            emit:SetEmitterParam('REPEATTIME', Random(20, 40))
+
+            emit = TrashBagAdd(trash,
+                CreateAttachedEmitter(self, 'Spinner03', army, '/effects/emitters/sparks_11_emit.bp'))
+            emit:SetEmitterParam('REPEATTIME', Random(20, 40))
+
+            -- create a short debrish-isch flash, as if the dishes explode
+            CreateLightParticleIntel(self, 'Spinner01', army, 0.15 + 0.05 * Random(2, 4), Random(3, 6), 'debris_alpha_03'
+                , 'ramp_antimatter_01')
+            CreateLightParticleIntel(self, 'Spinner02', army, 0.15 + 0.05 * Random(2, 4), Random(3, 6), 'debris_alpha_03'
+                , 'ramp_antimatter_01')
+            CreateLightParticleIntel(self, 'Spinner03', army, 0.15 + 0.05 * Random(2, 4), Random(3, 6), 'debris_alpha_03'
+                , 'ramp_antimatter_01')
         end
     end,
 }
