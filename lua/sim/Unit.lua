@@ -1729,7 +1729,10 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         -- Attempt to copy our animation pose to the prop. Only works if
         -- the mesh and skeletons are the same, but will not produce an error if not.
         if self.Tractored or (layer ~= 'Air' or (layer == "Air" and halfBuilt)) then
-            TryCopyPose(self, prop, false)
+            TryCopyPose(self, prop, true)
+
+            -- we need the prop to copy the world transform of the unit, but we do want to preserve wrecks so that they end up in the playable area of the map
+            Warp(prop, pos)
         end
 
         -- Create some ambient wreckage smoke
