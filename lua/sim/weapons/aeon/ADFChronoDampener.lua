@@ -60,6 +60,7 @@ ADFChronoDampener = Class(DefaultProjectileWeapon) {
     ExpandingStunThread = function(self)
         -- extract information from the buff blueprint
         local bp = self.Blueprint
+        local reloadTimeTicks = MATH_IRound(10/bp.RateOfFire)
         local buff = bp.Buffs[1]
         local stunDuration = buff.Duration
         local radius = self:GetMaxRadius()
@@ -67,6 +68,7 @@ ADFChronoDampener = Class(DefaultProjectileWeapon) {
         local sliceSize = radius / slices
         local sliceTime = stunDuration * 10 / slices + 1
         local initialStunFxAppliedUnits = {}
+        local tick = GetGameTick()
 
         for i = 1, slices do
 
@@ -77,27 +79,50 @@ ADFChronoDampener = Class(DefaultProjectileWeapon) {
                 radius,
                 self.CategoriesToStun
             )
-            local effectScale = (0.5 + (slices-i) / (slices-1) * 1.5)
+            local fxUnitStunFlashScale = (0.5 + (slices-i) / (slices-1) * 1.5)
 
             for k, target in targets do
+
+                -- add stun effect only on targets our Chrono Dampener stunned
+                if initialStunFxAppliedUnits[target] then
+                    local count = target:GetBoneCount()
+                    for k, effect in self.FxUnitStun do
+                        local emit = CreateEmitterAtBone(
+                            target, Random(0, count - 1), target.Army, effect
+                        )
+
+                        -- scale the effect a bit
+                        emit:ScaleEmitter(0.5)
+
+                        -- change lod to match outer lod of unit
+                        local lods = target.Blueprint.Display.Mesh.LODs
+                        if lods then
+                            emit:SetEmitterParam("LODCUTOFF", lods[table.getn(lods)].LODCutoff)
+                        end
+                    end
+                end
+
+                -- prevent multiple Chrono Dampeners from stunlocking units with desynchronized firings
+                if target.chronoProtectionTick > tick then
+                    continue
+                end
+
                 -- add stun
                 if not target:BeenDestroyed() then
                     if buff.BuffType == 'STUN' then
-                        target:SetStunned(stunDuration / slices + 0.1)
+                        target:SetStunned(stunDuration * (slices - i + 1) / slices + 0.1)
+                        target.chronoProtectionTick = tick + reloadTimeTicks
                     end
                 end
 
-                -- add initial effect
-                if not initialStunFxAppliedUnits[target] then
-                    for k, effect in self.FxUnitStunFlash do
-                        local emit = CreateEmitterOnEntity(target, target.Army, effect)
-                        emit:ScaleEmitter(effectScale * math.max(target.Blueprint.SizeX, target.Blueprint.SizeZ))
-                    end
-
-                    initialStunFxAppliedUnits[target] = true
+                -- add initial flash effect
+                for k, effect in self.FxUnitStunFlash do
+                    local emit = CreateEmitterOnEntity(target, target.Army, effect)
+                    emit:ScaleEmitter(fxUnitStunFlashScale * math.max(target.Blueprint.SizeX, target.Blueprint.SizeZ))
                 end
+                initialStunFxAppliedUnits[target] = true
 
-                -- add effect on target
+                -- add initial stun effect on target
                 local count = target:GetBoneCount()
                 for k, effect in self.FxUnitStun do
                     local emit = CreateEmitterAtBone(
