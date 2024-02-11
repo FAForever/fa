@@ -68,7 +68,7 @@ ADFChronoDampener = Class(DefaultProjectileWeapon) {
         local sliceSize = radius / slices
         local sliceTime = stunDuration * 10 / slices + 1
         local initialStunFxAppliedUnits = {}
-        local tick = GetGameTick()
+        local fireTick = GetGameTick()
 
         for i = 1, slices do
 
@@ -80,6 +80,7 @@ ADFChronoDampener = Class(DefaultProjectileWeapon) {
                 self.CategoriesToStun
             )
             local fxUnitStunFlashScale = (0.5 + (slices-i) / (slices-1) * 1.5)
+            local currentTick = GetGameTick()
 
             for k, target in targets do
 
@@ -103,7 +104,7 @@ ADFChronoDampener = Class(DefaultProjectileWeapon) {
                 end
 
                 -- prevent multiple Chrono Dampeners from stunlocking units with desynchronized firings
-                if target.chronoProtectionTick > tick then
+                if target.chronoProtectionTick > currentTick then
                     continue
                 end
 
@@ -111,7 +112,7 @@ ADFChronoDampener = Class(DefaultProjectileWeapon) {
                 if not target:BeenDestroyed() then
                     if buff.BuffType == 'STUN' then
                         target:SetStunned(stunDuration * (slices - i + 1) / slices + 0.1)
-                        target.chronoProtectionTick = tick + reloadTimeTicks
+                        target.chronoProtectionTick = fireTick + reloadTimeTicks
                     end
                 end
 
