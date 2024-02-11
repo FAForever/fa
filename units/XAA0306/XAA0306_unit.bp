@@ -215,7 +215,7 @@ UnitBlueprint{
             AutoInitiateAttackCommand = true,
             BallisticArc = "RULEUBA_None",
             CollideFriendly = false,
-            Damage = 500,
+            Damage = 400,
             DamageType = "Normal",
             DisplayName = "Torpedo Cluster",
             FireTargetLayerCapsTable = {
@@ -230,7 +230,7 @@ UnitBlueprint{
             MaxRadius = 32,
             MinRadius = 4,
             MuzzleSalvoDelay = 0.4,
-            MuzzleSalvoSize = 4,
+            MuzzleSalvoSize = 5,
             MuzzleVelocity = 0,
             ProjectileId = "/projectiles/AANTorpedoCluster01/AANTorpedoCluster01_proj.bp",
             ProjectileLifetime = 30,
