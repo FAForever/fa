@@ -318,11 +318,11 @@ struct NORMALMAPPED_VERTEX
     float3 tangent : TEXCOORD4;
     float3 binormal : TEXCOORD5;
     float4 texcoord0 : TEXCOORD0;
-    float3 viewDirection : TEXCOORD6;
+    float4 viewDirection : TEXCOORD6;
     float4 shadow : TEXCOORD2;
     float4 color : COLOR0;
     float4 material : TEXCOORD1;	/// various uses
-    float2 depth : TEXCOORD7;
+    float4 depth : TEXCOORD7;
 };
 
 struct EFFECT_VERTEX
@@ -370,6 +370,14 @@ struct SHIELDIMPACT_VERTEX
     float2 texcoord2 : TEXCOORD2;
     float4 material : TEXCOORD3;
     float  depth : TEXCOORD4;
+};
+
+float4x4 thresholdMatrix =
+{
+    1.0 / 17.0,  9.0 / 17.0,  3.0 / 17.0, 11.0 / 17.0,
+    13.0 / 17.0,  5.0 / 17.0, 15.0 / 17.0,  7.0 / 17.0,
+    4.0 / 17.0, 12.0 / 17.0,  2.0 / 17.0, 10.0 / 17.0,
+    16.0 / 17.0,  8.0 / 17.0, 14.0 / 17.0,  6.0 / 17.0
 };
 
 ///////////////////////////////////////
@@ -1320,6 +1328,7 @@ NORMALMAPPED_VERTEX NormalMappedVS(
     vertex.position = mul( float4(position,1), worldMatrix);
     vertex.depth.xy = float2(vertex.position.y - surfaceElevation,material.x);
     vertex.shadow = ComputeShadowTexcoord( vertex.position);
+    vertex.shadow.w = 1;
 
     // I'm not sure why this is working, should use the camera position for view vector calculation once that is available
     vertex.viewDirection = -mul(viewMatrix, mul( vertex.position, viewMatrix));
@@ -1334,6 +1343,8 @@ NORMALMAPPED_VERTEX NormalMappedVS(
     vertex.normal = mul( normal, rotationMatrix);
     vertex.tangent = mul( tangent, rotationMatrix);
     vertex.binormal = mul( binormal, rotationMatrix);
+
+    vertex.depth.zw = 10 * position.xz;
 
     return vertex;
 }
@@ -1366,6 +1377,7 @@ NORMALMAPPED_VERTEX UnitFalloffVS(
     vertex.position = mul( float4(position,1), worldMatrix);
     vertex.depth.xy = float2(vertex.position.y - surfaceElevation,material.x);
     vertex.shadow = ComputeShadowTexcoord( vertex.position);
+    vertex.depth.zw = vertex.position.xy;
 
     vertex.viewDirection = -mul(viewMatrix, mul( vertex.position, viewMatrix));
     vertex.viewDirection = normalize(vertex.viewDirection);
@@ -1417,7 +1429,12 @@ NORMALMAPPED_VERTEX UndulatingNormalMappedVS(
     vertex.shadow = ComputeShadowTexcoord( vertex.position);
 
     vertex.viewDirection = -mul(viewMatrix, mul( vertex.position, viewMatrix));
-    vertex.viewDirection = normalize(vertex.viewDirection);
+
+    // try to pass position and camera distance to the shader
+    vertex.depth.zw = 100 * vertex.position.xz;
+    vertex.viewDirection.w = length(mul( vertex.position, viewMatrix));
+    vertex.viewDirection.xyz = normalize(vertex.viewDirection.xyz);
+
     vertex.position = mul( vertex.position, mul( viewMatrix, projMatrix));
 
     vertex.texcoord0 = texcoord0;
@@ -1428,6 +1445,8 @@ NORMALMAPPED_VERTEX UndulatingNormalMappedVS(
     vertex.normal = mul( normal, rotationMatrix);
     vertex.tangent = mul( tangent, rotationMatrix);
     vertex.binormal = mul( binormal, rotationMatrix);
+
+
 
     return vertex;
 }
@@ -2867,6 +2886,13 @@ float4 NormalMappedPS( NORMALMAPPED_VERTEX vertex,
 {
     if ( 1 == mirrored ) clip(vertex.depth.x);
 
+    float wpx = vertex.depth.z;
+    float wpz = vertex.depth.w;
+    float lod = 1- clamp(vertex.viewDirection.w, 0.1, 300) / 300;
+    clip(lod - thresholdMatrix[wpx % 4][wpz % 4]);
+
+    // return float4(lod, lod, lod, 1.0);
+
     float3x3 rotationMatrix = float3x3( vertex.binormal, vertex.tangent, vertex.normal);
     float3 normal = ComputeNormal( normalsSampler, vertex.texcoord0.zw, rotationMatrix);
     float dotLightNormal = dot(sunDirection,normal);
@@ -2896,6 +2922,9 @@ float4 NormalMappedPS( NORMALMAPPED_VERTEX vertex,
     if( alphaTestEnable )
         AlphaTestD3D10( alpha, alphaFunc, alphaRef );
 #endif
+
+
+
     return float4( color.rgb, alpha );
 }
 
