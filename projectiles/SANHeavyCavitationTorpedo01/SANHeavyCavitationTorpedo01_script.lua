@@ -44,7 +44,7 @@ SANHeavyCavitationTorpedo01 = ClassProjectile(SHeavyCavitationTorpedo) {
         local velocity = 10
 
         -- Create projectiles in a dispersal pattern
-        local numProjectiles = 3
+        local numProjectiles = 2
         local angle = (2*math.pi) / numProjectiles
         local angleInitial = RandomFloat(0, angle)
 
