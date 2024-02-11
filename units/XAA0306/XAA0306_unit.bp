@@ -229,7 +229,7 @@ UnitBlueprint{
             Label = "Bomb",
             MaxRadius = 32,
             MinRadius = 4,
-            MuzzleSalvoDelay = 0.4,
+            MuzzleSalvoDelay = 0.3,
             MuzzleSalvoSize = 5,
             MuzzleVelocity = 0,
             ProjectileId = "/projectiles/AANTorpedoCluster01/AANTorpedoCluster01_proj.bp",
