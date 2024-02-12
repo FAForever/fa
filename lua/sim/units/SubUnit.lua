@@ -1,4 +1,3 @@
-
 local EffectTemplate = import("/lua/effecttemplates.lua")
 
 local Entity = import("/lua/sim/entity.lua").Entity
@@ -39,8 +38,10 @@ SubUnit = ClassUnit(MobileUnit) {
         end
 
         if new == 'Top' or new == 'Bottom' then
-            self:AddCommandCap("RULEUCC_Dive")
-            self:RequestRefreshUI()
+			if bp.General.CommandCaps.RULEUCC_Dive then
+				self:AddCommandCap("RULEUCC_Dive")
+				self:RequestRefreshUI()
+			end
         end
     end,
 }
