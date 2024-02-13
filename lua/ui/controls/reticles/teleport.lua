@@ -54,7 +54,7 @@ TeleportReticle = ClassUI(Reticle) {
         LayoutHelpers.Below(self.BuildTimeIcon, self.EnergyCostIcon, 4)
         LayoutHelpers.RightOf(self.tText, self.BuildTimeIcon, 0)
 
-        self.eText:SetColor('ffff00')
+        self.eText:SetColor('fff7c70f') -- from economy_mini.lua, same color as the energy stored/storage text
     end,
 
     ---@param self UITeleportReticle
