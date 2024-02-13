@@ -41,9 +41,11 @@ TeleportReticle = ClassUI(Reticle) {
     SetLayout = function(self)
         self.BuildTimeIcon = Bitmap(self)
         self.BuildTimeIcon:SetTexture(UIUtil.UIFile('/game/unit_view_icons/time.dds'))
+        LayoutHelpers.SetDimensions(self.BuildTimeIcon, 19, 19)
 
         self.EnergyCostIcon = Bitmap(self)
         self.EnergyCostIcon:SetTexture(UIUtil.UIFile('/game/unit_view_icons/energy.dds'))
+        LayoutHelpers.SetDimensions(self.EnergyCostIcon, 19, 19)
 
         self.eText = UIUtil.CreateText(self, "eCost", 16, UIUtil.bodyFont, true)
         self.tText = UIUtil.CreateText(self, "tCost", 16, UIUtil.bodyFont, true)
