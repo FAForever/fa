@@ -42,15 +42,17 @@ TeleportCostFunction = function(unit, location)
     -- use unit position by default
     local pos = unit:GetPosition()
 
-    -- or use the position of the last teleport/move command
-    local queue = unit:GetCommandQueue() --[[@as (UICommandInfo[])]]
-    if table.getn(queue) > 0 then
-        for k = 1, table.getn(queue) do
-            local command = queue[k]
+    -- or, if queuing commands, use the position of the last teleport/move command
+    if IsKeyDown('Shift') then
+        local queue = unit:GetCommandQueue() --[[@as (UICommandInfo[])]]
+        if table.getn(queue) > 0 then
+            for k = 1, table.getn(queue) do
+                local command = queue[k]
 
-            -- this if statement can only be true in the UI code
-            if command.type == 'Teleport' or command.type == 'Move' then
-                pos = command.position
+                -- this if statement can only be true in the UI code
+                if command.type == 'Teleport' or command.type == 'Move' then
+                    pos = command.position
+                end
             end
         end
     end
