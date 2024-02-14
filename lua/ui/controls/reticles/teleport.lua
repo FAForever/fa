@@ -50,9 +50,9 @@ TeleportReticle = ClassUI(Reticle) {
         self.eText = UIUtil.CreateText(self, "eCost", 16, UIUtil.bodyFont, true)
         self.tText = UIUtil.CreateText(self, "tCost", 16, UIUtil.bodyFont, true)
         LayoutHelpers.RightOf(self.EnergyCostIcon, self, 4)
-        LayoutHelpers.RightOf(self.eText, self.EnergyCostIcon, 0)
+        LayoutHelpers.RightOf(self.eText, self.EnergyCostIcon, 2)
         LayoutHelpers.Below(self.BuildTimeIcon, self.EnergyCostIcon, 4)
-        LayoutHelpers.RightOf(self.tText, self.BuildTimeIcon, 0)
+        LayoutHelpers.RightOf(self.tText, self.BuildTimeIcon, 2)
 
         self.eText:SetColor('fff7c70f') -- from economy_mini.lua, same color as the energy stored/storage text
     end,
