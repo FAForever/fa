@@ -1486,7 +1486,7 @@ Unit_Description_0417="Fast Assault Fighter, armed with two high-damage anti-air
 -- UEF -- Naval Units
 Unit_Description_0049="Naval support unit. Armed with a direct fire Gauss cannon and an anti-air Railgun. Equipped with radar and sonar systems, in addition to a radar jammer."
 Unit_Description_0050="Basic Attack Submarine. Can surface to enable a weak direct fire cannon for additional firepower."
-Unit_Description_0051="Anti-Aircraft naval vessel. Armed with an anti-air missile system, a tactical missile launcher and a weak direct fire cannon. Equipped with tactical missile defense and a full sensor suite."
+Unit_Description_0051="Anti-Aircraft naval vessel. Armed with an anti-air missile system, a tactical missile launcher and a weak direct fire cannon. Equipped with a tactical missile defense system and a full sensor suite."
 Unit_Description_0052="Primary surface combatant, armed with powerful direct fire cannons and weak torpedoes. Equipped with an anti-air Railgun and torpedo defense."
 Unit_Description_0053="Extremely long-range Surface Bombardment Ship. Armed with direct fire cannons and weak anti-air Railguns. Equipped with tactical missile defense."
 Unit_Description_0054="Strategic Missile Submarine. Can build and launch strategic nuclear weapons. Armed with long-range tactical missiles. Can fire while submerged."
@@ -1653,7 +1653,7 @@ Unit_Description_0418="Fast Assault Fighter, armed with powerful long-range miss
 -- CYBRAN -- Naval Units
 Unit_Description_0149="Naval support unit. Armed with a direct fire Proton cannon and an anti-air auto-cannon. Equipped with radar and sonar systems."
 Unit_Description_0150="Basic Attack Submarine. Can surface to enable a weak direct fire cannon for additional firepower."
-Unit_Description_0151="Anti-Aircraft Naval vessel. Armed with anti-air weaponry and direct fire cannons. Equipped with a tactical missile defense, a full sensor suite and an air staging facility."
+Unit_Description_0151="Anti-Aircraft Naval vessel. Armed with an anti-air missile system and direct fire cannons. Equipped with a tactical missile defense system, a full sensor suite and an air staging facility."
 Unit_Description_0152="Amphibious primary surface combatant, with powerful direct fire cannons, torpedoes, basic anti-air weapons and an effective torpedo defense. Can sprout legs and walk on land."
 Unit_Description_0153="Long-range Surface Bombardment Ship. Armed with direct fire cannons and weak anti-air and torpedoes. Equipped with tactical missile defense and a full sensor suite."
 Unit_Description_0154="Aircraft Carrier. Can store, transport and repair aircraft. Armed with powerful AA auto-cannons. Equipped with tactical missile defense and a full sensor suite."
@@ -1958,8 +1958,8 @@ Unit_Description_0361="Experimental Bomber, capable of devastating entire bases.
 
 -- SERAPHIM -- Naval Units
 Unit_Description_0362="Naval support unit. Armed with a direct fire auto-cannon and an anti-air auto-gun. Equipped with radar and sonar systems."
-Unit_Description_0363="Basic Attack Submarine. Can surface to use an extra direct-fire weapon."
-Unit_Description_0364="Anti-Aircraft naval vessel. Armed with an anti-air weaponry and a tactical missile launcher. Equipped with tactical missile defense and a full sensor suite."
+Unit_Description_0363="Basic Attack Submarine. Can surface to enable a weak direct fire cannon for additional firepower."
+Unit_Description_0364="Anti-Aircraft naval vessel. Armed with an anti-air flak-system, an anti-air Gatling gun and a tactical missile launcher. Equipped with a tactical missile defense system and a full sensor suite."
 Unit_Description_0365="Primary Submersible surface combatant with powerful direct fire lasers, torpedoes, basic anti-air weapons, torpedo defense, and a full sensor suite."
 Unit_Description_0366="Surface Bombardment Ship. Armed with direct fire cannons and weak anti-air. Equipped with tactical missile defense and a full sensor suite. Can build and launch full-strength strategic nuclear weapons."
 Unit_Description_0367="Heavy Assault Submarine armed with extremely powerful torpedoes and effective torpedo defenses. Can surface to engage with strong anti-air cannons."
