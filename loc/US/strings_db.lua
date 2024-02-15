@@ -1484,7 +1484,7 @@ Unit_Description_0309="Heavily armoured, shielded Air Transport. Armed with two 
 Unit_Description_0417="Fast Assault Fighter, armed with two high-damage anti-air Railguns and powerful Damage-Over-Time napalm bombs."
 
 -- UEF -- Naval Units
-Unit_Description_0049="Naval support unit. Equipped with direct fire and anti-air weapons, radar, sonar and a radar jammer."
+Unit_Description_0049="Naval support unit. Armed with a direct fire Gauss cannon and an anti-air Railgun. Equipped with radar and sonar systems, in addition to a radar jammer."
 Unit_Description_0050="Basic Attack Submarine. Can surface to enable a weak direct fire cannon for additional firepower."
 Unit_Description_0051="Anti-Aircraft naval vessel. Armed with an anti-air missile system, a tactical missile launcher and a weak direct fire cannon. Equipped with tactical missile defense and a full sensor suite."
 Unit_Description_0052="Primary surface combatant, armed with powerful direct fire cannons and weak torpedoes. Equipped with an anti-air Railgun and torpedo defense."
@@ -1651,7 +1651,7 @@ Unit_Description_0321="Heavily armoured Gunship, armed with a powerful laser and
 Unit_Description_0418="Fast Assault Fighter, armed with powerful long-range missiles and a weak anti-air missile system."
 
 -- CYBRAN -- Naval Units
-Unit_Description_0149="Naval support unit. Equipped with direct fire and anti-air weapons, radar, and sonar."
+Unit_Description_0149="Naval support unit. Armed with a direct fire Proton cannon and an anti-air auto-cannon. Equipped with radar and sonar systems."
 Unit_Description_0150="Basic Attack Submarine. Can surface to enable a weak direct fire cannon for additional firepower."
 Unit_Description_0151="Anti-Aircraft Naval vessel. Armed with anti-air weaponry and direct fire cannons. Equipped with a tactical missile defense, a full sensor suite and an air staging facility."
 Unit_Description_0152="Amphibious primary surface combatant, with powerful direct fire cannons, torpedoes, basic anti-air weapons and an effective torpedo defense. Can sprout legs and walk on land."
@@ -1807,7 +1807,7 @@ Unit_Description_0331="High-power Torpedo Bomber, designed to engage heavily arm
 Unit_Description_0419="Kamikaze drone, with a short operational range and practically non-existent armour. Can inflict enormous damage to regions with no anti-air presence."
 
 -- AEON -- Naval Units
-Unit_Description_0246="Naval support unit. Equipped with two direct fire weapons, radar, sonar and torpedo defense."
+Unit_Description_0246="Naval support unit. Armed with two direct-fire cannons and an anti-torpedo defense. Equipped with radar and sonar systems."
 Unit_Description_0247="Basic Attack Submarine. Cannot engage land-based or floating units."
 Unit_Description_0248="Anti-Air support ship."
 Unit_Description_0249="Anti-Aircraft naval vessel. Armed with an anti-air missile system and a direct fire cannon. Equipped with tactical missile defense flares and a full sensor suite."
@@ -1957,7 +1957,7 @@ Unit_Description_0360="Strategic Bomber, designed to surgically destroy key targ
 Unit_Description_0361="Experimental Bomber, capable of devastating entire bases. Armed with an experimental tactical bomb and four AA auto-cannons."
 
 -- SERAPHIM -- Naval Units
-Unit_Description_0362="Low-end naval support unit."
+Unit_Description_0362="Naval support unit. Armed with a direct fire auto-cannon and an anti-air auto-gun. Equipped with radar and sonar systems."
 Unit_Description_0363="Basic Attack Submarine. Can surface to use an extra direct-fire weapon."
 Unit_Description_0364="Anti-Aircraft naval vessel. Armed with an anti-air weaponry and a tactical missile launcher. Equipped with tactical missile defense and a full sensor suite."
 Unit_Description_0365="Primary Submersible surface combatant with powerful direct fire lasers, torpedoes, basic anti-air weapons, torpedo defense, and a full sensor suite."
