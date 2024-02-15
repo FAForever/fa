@@ -57,7 +57,7 @@ AttackFormationLand = function(blueprintCountCache, blueprintListCache)
 
     local preference = {}
 
-    for index = 1, 2 do
+    for index = 1, 3 do
 
         -- clean up prefererence table
         for key, _  in CategoriesLand do
@@ -124,44 +124,6 @@ AttackFormationLand = function(blueprintCountCache, blueprintListCache)
         -- bijwerken van de lijst aan blueprints
         blueprintListCache = UpdateBlueprintListCache(blueprintCountCache, blueprintListCache)
     end
-
-    -- choose a formation
-    local formation = SmallLandFormation
-
-    -- go through the formation to apply the preference
-    local countRows = table.getn(formation)
-
-    for ly = 1, countRows do
-        local row = formation[ly]
-        local countColumns = table.getn(row)
-        local halfColumns = math.floor(0.5 * countColumns)
-
-        -- go through reach column
-        for lx = 1, countColumns do
-
-            -- map two dimensional index to one dimensional array
-            local oi       = (ly - 1) * countColumns + lx
-            local occupied = oc[oi]
-
-            -- if this cell is not occupied
-            if not occupied then
-
-                -- and we fit the category, then we put ourselves there
-                for k = 1, table.getn(blueprintListCache) do
-                    local blueprintId = blueprintListCache[k]
-                    local blueprintIdCount = blueprintCountCache[blueprintId]
-                    if blueprintIdCount > 0 then
-                        blueprintCountCache[blueprintId] = blueprintCountCache[blueprintId] - 1
-
-                        oc[oi] = blueprintId
-                        TacticalFormation[oi] = { lx - halfColumns, -1 * ly, categories[blueprintId], 0, true }
-                        break
-                    end
-                end
-            end
-        end
-    end
-
 
     return TacticalFormation
 end
