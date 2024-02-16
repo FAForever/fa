@@ -36,7 +36,7 @@ OneRowLandFormation = {
     Identifier = 'OneRowLandFormation',
     SpacingMultiplier = 1.15,
     [1] = {
-        RowDelay = 0,
+        Delay = 0,
         DirectFireFirst,
         DirectFireFirst,
         ArtilleryFirst,
@@ -51,7 +51,7 @@ TwoRowLandFormation = {
     Identifier = 'TwoRowLandFormation',
     SpacingMultiplier = 1.2,
     [1] = {
-        RowDelay = 0,
+        Delay = 0,
         DirectFireFirst,
         DirectFireFirst,
         DirectFireFirst,
@@ -61,7 +61,7 @@ TwoRowLandFormation = {
         DirectFireFirst
     },
     [2] = {
-        RowDelay = 0,
+        Delay = 0,
         DirectFireFirst,
         MissileFirst,
         AntiAirFirst,
@@ -76,7 +76,7 @@ ThreeRowLandFormation = {
     Identifier = 'ThreeRowLandFormation',
     SpacingMultiplier = 1.25,
     [1] = {
-        RowDelay = 0,
+        Delay = 0,
         DirectFireFirst,
         DirectFireFirst,
         DirectFireFirst,
@@ -88,7 +88,7 @@ ThreeRowLandFormation = {
         DirectFireFirst
     },
     [2] = {
-        RowDelay = 0,
+        Delay = 0,
         DirectFireFirst,
         MissileFirst,
         ShieldFirst,
@@ -100,7 +100,7 @@ ThreeRowLandFormation = {
         DirectFireFirst
     },
     [3] = {
-        RowDelay = 0,
+        Delay = 0,
         DirectFireFirst,
         IntelligenceFirst,
         ArtilleryFirst,

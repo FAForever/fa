@@ -30,6 +30,8 @@ local LandFormationOrders = import('/lua/shared/Formations/FormationGroups.lua')
 local CategoriesLand = import("/lua/shared/Formations/FormationGroups.lua").CategoriesLand
 
 -- upvalue scope for performance
+local EntityCategoryContains = EntityCategoryContains
+
 local TableGetn = table.getn
 
 --- A table that contains the blueprint lookups that we can re-use.
@@ -56,7 +58,7 @@ AttackFormationLand = function(blueprintCountCache, blueprintListCache, unitCoun
 
     -- clean up occupation data
     for o = 1, TableGetn(oc) do
-        oc[o] = false
+        oc[o] = nil
     end
 
     -- choose a formation that best matches the unit count
@@ -143,6 +145,9 @@ end
 ---@param units (Unit[] | UserUnit[])
 ---@return TacticalFormation
 AttackFormation = function(units)
+
+    LOG("AttackFormation")
+
     -- clean up old formation data
     for k = 1, TableGetn(TacticalFormation) do
         TacticalFormation[k] = nil
@@ -153,65 +158,4 @@ AttackFormation = function(units)
     local maximumFootprintSize = MaximumFootprint(blueprintLookup)
 
     return AttackFormationLand(blueprintLookup, blueprintList, unitCount)
-
-    -- -- choose a formation
-    -- local formation = SmallLandFormation
-
-    -- -- for each unit
-    -- for blueprintId, count in blueprintLookup do
-
-    --     local processed = 0
-    --     -- go through each category layer
-    --     for c = 1, table.getsize(CategoriesLand) do
-
-
-
-    --         -- go through reach row
-    --         local countRows = table.getn(formation)
-    --         local halfRows = math.floor(0.5 * countRows)
-
-    --         for ly = 1, countRows do
-    --             local row = formation[ly]
-    --             local countColumns = table.getn(row)
-    --             local halfColumns = math.floor(0.5 * countColumns)
-
-    --             -- go through reach column
-    --             for lx = 1, countColumns do
-    --                 local cell = row[lx]
-
-    --                 local oi       = (ly - 1) * countColumns + lx
-    --                 local occupied = oc[oi]
-
-    --                 -- if this cell is not occupied
-    --                 if not occupied then
-
-    --                     -- and we fit the category, then we put ourselves there
-    --                     local categoryIdentifier = cell[c]
-    --                     if EntityCategoryContains(categoryIdentifier, blueprintId) then
-    --                         TacticalFormation[oi] = { lx - halfColumns, -1 * ly, categories[blueprintId], 0, true }
-    --                         oc[oi] = true
-
-    --                         -- skip to the next category
-    --                         processed = processed + 1
-    --                         if processed >= count then
-    --                             break
-    --                         end
-    --                     end
-    --                 end
-    --             end
-
-    --             -- skip to the next category
-    --             if processed >= count then
-    --                 break
-    --             end
-    --         end
-
-    --         -- skip to the next category
-    --         if processed >= count then
-    --             break
-    --         end
-    --     end
-    -- end
-
-    -- return TacticalFormation
 end
