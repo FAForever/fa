@@ -34,7 +34,7 @@ local EngineeringFirst = import("/lua/shared/Formations/FormationGroups.lua").La
 
 OneRowLandFormation = {
     Identifier = 'OneRowLandFormation',
-    SpacingMultiplier = 1.4,
+    SpacingMultiplier = 1.15,
     [1] = {
         RowDelay = 0,
         DirectFireFirst,
@@ -49,7 +49,7 @@ OneRowLandFormation = {
 
 TwoRowLandFormation = {
     Identifier = 'TwoRowLandFormation',
-    SpacingMultiplier = 1.35,
+    SpacingMultiplier = 1.2,
     [1] = {
         RowDelay = 0,
         DirectFireFirst,
@@ -74,7 +74,7 @@ TwoRowLandFormation = {
 
 ThreeRowLandFormation = {
     Identifier = 'ThreeRowLandFormation',
-    SpacingMultiplier = 1.30,
+    SpacingMultiplier = 1.25,
     [1] = {
         RowDelay = 0,
         DirectFireFirst,
@@ -115,7 +115,7 @@ ThreeRowLandFormation = {
 
 FourRowLandFormation = {
     Identifier = 'FourRowLandFormation',
-    SpacingMultiplier = 1.25,
+    SpacingMultiplier = 1.3,
     [1] = {
         Delay = 0,
         DirectFireFirst,
