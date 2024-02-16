@@ -341,7 +341,7 @@ WorldView = ClassUI(moho.UIWorldView, Control) {
             order = self.CursorOverride
 
         -- special override
-        elseif holdAltToAttackMove == 'On' and IsKeyDown(KeyCodeAlt) and selection then
+        elseif holdAltToAttackMove == 'On' and IsKeyDown(KeyCodeAlt) and not IsKeyDown(KeyCodeCtrl) and selection then
             order = 'RULEUCC_AttackAlt'
 
         -- usual order structure
