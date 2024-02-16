@@ -25,9 +25,12 @@ local MaximumFootprint = import('/lua/shared/Formations/shared.lua').MaximumFoot
 local GetFormationPosition = import('/lua/shared/Formations/shared.lua').GetFormationPosition
 local UpdateBlueprintListCache = import('/lua/shared/Formations/shared.lua').UpdateBlueprintListCache
 
-local SmallLandFormation = import('/lua/shared/Formations/AttackFormations/Land.lua').SmallLandFormation
+local LandFormations = import('/lua/shared/Formations/AttackFormations/Land.lua').LandFormations
 local LandFormationOrders = import('/lua/shared/Formations/FormationGroups.lua').LandFormationOrders
 local CategoriesLand = import("/lua/shared/Formations/FormationGroups.lua").CategoriesLand
+
+-- upvalue scope for performance
+local TableGetn = table.getn
 
 --- A table that contains the blueprint lookups that we can re-use.
 local BlueprintLookup = {}
@@ -48,11 +51,21 @@ end
 
 ---@param blueprintCountCache BlueprintLookupTable
 ---@param blueprintListCache BlueprintId[]
-AttackFormationLand = function(blueprintCountCache, blueprintListCache)
+---@param unitCount number
+AttackFormationLand = function(blueprintCountCache, blueprintListCache, unitCount)
 
     -- clean up occupation data
-    for o = 1, table.getn(oc) do
+    for o = 1, TableGetn(oc) do
         oc[o] = false
+    end
+
+    -- choose a formation that best matches the unit count
+    local formation = LandFormations[1]
+    for k = 1, TableGetn(LandFormations) do
+        if LandFormations[k].Count > unitCount then
+            formation = LandFormations[k]
+            break
+        end
     end
 
     local preference = {}
@@ -62,14 +75,14 @@ AttackFormationLand = function(blueprintCountCache, blueprintListCache)
         -- clean up prefererence table
         for key, _  in CategoriesLand do
             preference[key] = preference[key] or {}
-            for l = 1, table.getn(preference) do
+            for l = 1, TableGetn(preference) do
                 preference[key][l] = nil
             end
         end
 
         -- populate preference table
         for _, blueprint in blueprintListCache do
-            for k = 1, table.getn(LandFormationOrders) do
+            for k = 1, TableGetn(LandFormationOrders) do
                 local landFormationOrder = LandFormationOrders[k]
                 local landFormationKey = landFormationOrder[index]
                 local landFormationCategory = CategoriesLand[ landFormationKey ]
@@ -81,15 +94,12 @@ AttackFormationLand = function(blueprintCountCache, blueprintListCache)
             end
         end
 
-        -- choose a formation
-        local formation = SmallLandFormation
-
         -- go through the formation to apply the preference
-        local countRows = table.getn(formation)
+        local countRows = TableGetn(formation)
 
         for ly = 1, countRows do
             local row = formation[ly]
-            local countColumns = table.getn(row)
+            local countColumns = TableGetn(row)
             local halfColumns = math.floor(0.5 * countColumns)
 
             -- go through reach column
@@ -106,14 +116,14 @@ AttackFormationLand = function(blueprintCountCache, blueprintListCache)
                     -- and we fit the category, then we put ourselves there
                     local categoryIdentifier = cell[index]
                     local firstPreferences = preference[categoryIdentifier]
-                    for k = 1, table.getn(firstPreferences) do
+                    for k = 1, TableGetn(firstPreferences) do
                         local blueprintId = firstPreferences[k]
                         local blueprintIdCount = blueprintCountCache[blueprintId]
                         if blueprintIdCount > 0 then
                             blueprintCountCache[blueprintId] = blueprintCountCache[blueprintId] - 1
 
                             oc[oi] = blueprintId
-                            TacticalFormation[oi] = { lx - halfColumns, -1 * ly, categories[blueprintId], 0, true }
+                            TacticalFormation[oi] = { 1.25 * (lx - halfColumns), 1.25 * (-1 * ly), categories[blueprintId], 0, true }
                             break
                         end
                     end
@@ -132,7 +142,7 @@ end
 ---@return TacticalFormation
 AttackFormation = function(units)
     -- clean up old formation data
-    for k = 1, table.getn(TacticalFormation) do
+    for k = 1, TableGetn(TacticalFormation) do
         TacticalFormation[k] = nil
     end
 
@@ -140,7 +150,7 @@ AttackFormation = function(units)
     local blueprintLookup, blueprintList, unitCount = ToBlueprintLookup(units, BlueprintLookup, BlueprintList)
     local maximumFootprintSize = MaximumFootprint(blueprintLookup)
 
-    return AttackFormationLand(blueprintLookup, blueprintList)
+    return AttackFormationLand(blueprintLookup, blueprintList, unitCount)
 
     -- -- choose a formation
     -- local formation = SmallLandFormation

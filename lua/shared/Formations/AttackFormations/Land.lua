@@ -20,6 +20,8 @@
 --** SOFTWARE.
 --******************************************************************************************************
 
+local Debug = true
+
 local DirectFireFirst = import("/lua/shared/Formations/FormationGroups.lua").LandDirectFireFirst
 local MissileFirst = import("/lua/shared/Formations/FormationGroups.lua").LandMissileFirst
 local ArtilleryFirst = import("/lua/shared/Formations/FormationGroups.lua").LandArtilleryFirst
@@ -30,39 +32,162 @@ local CounterintelligenceFirst = import("/lua/shared/Formations/FormationGroups.
 local IntelligenceFirst = import("/lua/shared/Formations/FormationGroups.lua").LandIntelligenceFirst
 local EngineeringFirst = import("/lua/shared/Formations/FormationGroups.lua").LandEngineeringFirst
 
---- A small attack formation for up to 27 units.
-SmallLandFormation = {
+OneRowLandFormation = {
+    Identifier = 'OneRowLandFormation',
     [1] = {
-        DirectFireFirst, -- 1 y
-        DirectFireFirst, -- 2 y
-        DirectFireFirst, -- 3 y
-        DirectFireFirst, -- 4 y
-        DirectFireFirst, -- 5 y
-        DirectFireFirst, -- 6 y
-        DirectFireFirst, -- 7 y
-        DirectFireFirst, -- 8 y
-        DirectFireFirst -- 9 y
-    },
-    [2] = {
-        DirectFireFirst, -- 10 y
-        MissileFirst, -- 11 y
-        ShieldFirst, -- 12 y
-        AntiAirFirst, -- 13 y
-        CounterintelligenceFirst, -- 14 y
-        AntiAirFirst, -- 15 n
-        ShieldFirst, -- 16 y
-        MissileFirst, -- 17 n
-        DirectFireFirst -- 18 y
-    },
-    [3] = {
-        DirectFireFirst, -- 19 y
-        IntelligenceFirst, -- 20 y
-        ArtilleryFirst, -- 21 n
-        SniperFirst, -- 22 n
-        EngineeringFirst, -- 23 n
-        SniperFirst, -- 24 ?
-        ArtilleryFirst, -- 25 y
-        IntelligenceFirst, -- 26 y
-        DirectFireFirst -- 27
+        DirectFireFirst,
+        DirectFireFirst,
+        ArtilleryFirst,
+        IntelligenceFirst,
+        ArtilleryFirst,
+        DirectFireFirst,
+        DirectFireFirst
     },
 }
+
+TwoRowLandFormation = {
+    Identifier = 'TwoRowLandFormation',
+    [1] = {
+        DirectFireFirst,
+        DirectFireFirst,
+        DirectFireFirst,
+        DirectFireFirst,
+        DirectFireFirst,
+        DirectFireFirst,
+        DirectFireFirst
+    },
+    [2] = {
+        DirectFireFirst,
+        MissileFirst,
+        AntiAirFirst,
+        CounterintelligenceFirst,
+        AntiAirFirst,
+        MissileFirst,
+        DirectFireFirst
+    },
+}
+
+ThreeRowLandFormation = {
+    Identifier = 'ThreeRowLandFormation',
+    [1] = {
+        DirectFireFirst,
+        DirectFireFirst,
+        DirectFireFirst,
+        DirectFireFirst,
+        DirectFireFirst,
+        DirectFireFirst,
+        DirectFireFirst,
+        DirectFireFirst,
+        DirectFireFirst
+    },
+    [2] = {
+        DirectFireFirst,
+        MissileFirst,
+        ShieldFirst,
+        AntiAirFirst,
+        CounterintelligenceFirst,
+        AntiAirFirst,
+        ShieldFirst,
+        MissileFirst,
+        DirectFireFirst
+    },
+    [3] = {
+        DirectFireFirst,
+        IntelligenceFirst,
+        ArtilleryFirst,
+        SniperFirst,
+        EngineeringFirst,
+        SniperFirst,
+        ArtilleryFirst,
+        IntelligenceFirst,
+        DirectFireFirst
+    },
+}
+
+FourRowLandFormation = {
+    Identifier = 'FourRowLandFormation',
+    [1] = {
+        DirectFireFirst,
+        DirectFireFirst,
+        DirectFireFirst,
+        DirectFireFirst,
+        DirectFireFirst,
+        DirectFireFirst,
+        DirectFireFirst,
+        DirectFireFirst,
+        DirectFireFirst,
+        DirectFireFirst,
+        DirectFireFirst
+    },
+    [2] = {
+        DirectFireFirst,
+        DirectFireFirst,
+        MissileFirst,
+        ShieldFirst,
+        AntiAirFirst,
+        CounterintelligenceFirst,
+        AntiAirFirst,
+        ShieldFirst,
+        MissileFirst,
+        DirectFireFirst,
+        DirectFireFirst,
+    },
+    [3] = {
+        DirectFireFirst,
+        IntelligenceFirst,
+        ArtilleryFirst,
+        ArtilleryFirst,
+        SniperFirst,
+        EngineeringFirst,
+        SniperFirst,
+        ArtilleryFirst,
+        ArtilleryFirst,
+        IntelligenceFirst,
+        DirectFireFirst
+    },
+    [4] = {
+        DirectFireFirst,
+        IntelligenceFirst,
+        ArtilleryFirst,
+        MissileFirst,
+        SniperFirst,
+        EngineeringFirst,
+        SniperFirst,
+        MissileFirst,
+        ArtilleryFirst,
+        IntelligenceFirst,
+        DirectFireFirst
+    },
+}
+
+LandFormations = {
+    OneRowLandFormation,
+    TwoRowLandFormation,
+    ThreeRowLandFormation,
+    FourRowLandFormation,
+}
+
+for k = 1, table.getn(LandFormations) do
+    local formation = LandFormations[k]
+
+    -- compute the number of units in the formation
+    local count = 0
+    for r = 1, table.getn(formation) do
+        for c = 1, table.getn(formation[r]) do
+            if not table.empty(formation[r][c]) then
+                count = count + 1
+            end
+        end
+    end
+
+    if Debug then
+        local identifier = formation.Identifier
+        if not identifier then
+            WARN(string.format('Invalid attack land formation identifier for %d', k))
+        else
+            SPEW(string.format("Attack land formation %s with %d units", identifier, count))
+        end
+    end
+
+    formation.Count = count
+end
