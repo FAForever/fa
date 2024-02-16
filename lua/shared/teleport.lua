@@ -73,6 +73,8 @@ TeleportCostFunction = function(unit, location)
         if teleDelay and time < teleDelay then
             time = teleDelay
         end
+        -- make sure the teleport destination effects appear on time
+        teleDelay = time * 0.4
     else
         -- original cost function
         if bpEco then
