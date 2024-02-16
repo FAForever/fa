@@ -26,11 +26,10 @@ local GetFormationPosition = import('/lua/shared/Formations/shared.lua').GetForm
 local UpdateBlueprintListCache = import('/lua/shared/Formations/shared.lua').UpdateBlueprintListCache
 
 local LandFormations = import('/lua/shared/Formations/AttackFormations/Land.lua').LandFormations
-local LandFormationOrders = import('/lua/shared/Formations/FormationGroups.lua').LandFormationOrders
-local CategoriesLand = import("/lua/shared/Formations/FormationGroups.lua").CategoriesLand
 
--- upvalue scope for performance
-local EntityCategoryContains = EntityCategoryContains
+local LandFormationPreferencesCache = import("/lua/shared/Formations/LandFormationPreferences.lua").LandFormationPreferencesCache
+local CleanupLandFormationPreferences = import("/lua/shared/Formations/LandFormationPreferences.lua").CleanupLandFormationPreferences
+local PopulateLandFormationPreferences = import("/lua/shared/Formations/LandFormationPreferences.lua").PopulateLandFormationPreferences
 
 local TableGetn = table.getn
 
@@ -72,31 +71,12 @@ AttackFormationLand = function(blueprintCountCache, blueprintListCache, unitCoun
 
     local spacingMultiplier = formation.SpacingMultiplier
 
-    local preference = {}
+    local preference = LandFormationPreferencesCache
 
     for index = 1, 3 do
 
-        -- clean up prefererence table
-        for key, _  in CategoriesLand do
-            preference[key] = preference[key] or {}
-            for l = 1, TableGetn(preference) do
-                preference[key][l] = nil
-            end
-        end
-
-        -- populate preference table
-        for _, blueprint in blueprintListCache do
-            for k = 1, TableGetn(LandFormationOrders) do
-                local landFormationOrder = LandFormationOrders[k]
-                local landFormationKey = landFormationOrder[index]
-                local landFormationCategory = CategoriesLand[ landFormationKey ]
-
-                if EntityCategoryContains(landFormationCategory, blueprint) then
-                    table.insert(preference[landFormationKey], blueprint)
-                    break
-                end
-            end
-        end
+        CleanupLandFormationPreferences(preference)
+        PopulateLandFormationPreferences(preference, blueprintListCache, index)
 
         -- go through the formation to apply the preference
         local countRows = TableGetn(formation)
@@ -120,6 +100,7 @@ AttackFormationLand = function(blueprintCountCache, blueprintListCache, unitCoun
                     -- and we fit the category, then we put ourselves there
                     local categoryIdentifier = cell[index]
                     local firstPreferences = preference[categoryIdentifier]
+
                     for k = 1, TableGetn(firstPreferences) do
                         local blueprintId = firstPreferences[k]
                         local blueprintIdCount = blueprintCountCache[blueprintId]

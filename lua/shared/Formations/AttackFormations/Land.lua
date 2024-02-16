@@ -22,15 +22,15 @@
 
 local Debug = true
 
-local DirectFireFirst = import("/lua/shared/Formations/FormationGroups.lua").LandDirectFireFirst
-local MissileFirst = import("/lua/shared/Formations/FormationGroups.lua").LandMissileFirst
-local ArtilleryFirst = import("/lua/shared/Formations/FormationGroups.lua").LandArtilleryFirst
-local ShieldFirst = import("/lua/shared/Formations/FormationGroups.lua").LandShieldFirst
-local SniperFirst = import("/lua/shared/Formations/FormationGroups.lua").LandSniperFirst
-local AntiAirFirst = import("/lua/shared/Formations/FormationGroups.lua").LandAntiAirFirst
-local CounterintelligenceFirst = import("/lua/shared/Formations/FormationGroups.lua").LandCounterintelligenceFirst
-local IntelligenceFirst = import("/lua/shared/Formations/FormationGroups.lua").LandIntelligenceFirst
-local EngineeringFirst = import("/lua/shared/Formations/FormationGroups.lua").LandEngineeringFirst
+local DirectFireFirst = import("/lua/shared/Formations/LandFormationPreferences.lua").LandDirectFireFirst
+local MissileFirst = import("/lua/shared/Formations/LandFormationPreferences.lua").LandMissileFirst
+local ArtilleryFirst = import("/lua/shared/Formations/LandFormationPreferences.lua").LandArtilleryFirst
+local ShieldFirst = import("/lua/shared/Formations/LandFormationPreferences.lua").LandShieldFirst
+local SniperFirst = import("/lua/shared/Formations/LandFormationPreferences.lua").LandSniperFirst
+local AntiAirFirst = import("/lua/shared/Formations/LandFormationPreferences.lua").LandAntiAirFirst
+local CounterintelligenceFirst = import("/lua/shared/Formations/LandFormationPreferences.lua").LandCounterintelligenceFirst
+local IntelligenceFirst = import("/lua/shared/Formations/LandFormationPreferences.lua").LandIntelligenceFirst
+local EngineeringFirst = import("/lua/shared/Formations/LandFormationPreferences.lua").LandEngineeringFirst
 
 OneRowLandFormation = {
     Identifier = 'OneRowLandFormation',

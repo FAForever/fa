@@ -79,51 +79,51 @@ end
 
 local LAND = categories.LAND
 
-CategoriesLandDirectFire = LAND * CategoriesDirectFire
-CategoriesLandSniper = LAND * CategoriesSniper
-CategoriesLandArtillery = LAND * CategoriesArtillery
-CategoriesLandMissile = LAND * CategoriesMissile
-CategoriesLandAntiAir = LAND * CategoriesAntiAir
-CategoriesLandShield = LAND * CategoriesShield
-CategoriesLandEngineering = LAND * CategoriesEngineering
-CategoriesLandScout = LAND * CategoriesScout
-CategoriesLandCounterintelligence = LAND * CategoriesCounterintelligence
+LandFormationCategoriesDirectFire = LAND * CategoriesDirectFire
+LandFormationCategoriesSniper = LAND * CategoriesSniper
+LandFormationCategoriesArtillery = LAND * CategoriesArtillery
+LandFormationCategoriesMissile = LAND * CategoriesMissile
+LandFormationCategoriesAntiAir = LAND * CategoriesAntiAir
+LandFormationCategoriesShield = LAND * CategoriesShield
+LandFormationCategoriesEngineering = LAND * CategoriesEngineering
+LandFormationCategoriesScout = LAND * CategoriesScout
+LandFormationCategoriesCounterintelligence = LAND * CategoriesCounterintelligence
 
-CategoriesLand = {
+LandFormationCategories = {
     CategoriesCommand = CategoriesCommand,
     CategoriesSupportCommand = CategoriesSupportCommand,
-    CategoriesLandEngineering = CategoriesLandEngineering,
+    LandFormationCategoriesEngineering = LandFormationCategoriesEngineering,
 
-    CategoriesLandDirectFire = CategoriesLandDirectFire,
-    CategoriesLandSniper = CategoriesLandSniper,
-    CategoriesLandArtillery = CategoriesLandArtillery,
-    CategoriesLandMissile = CategoriesLandMissile,
-    CategoriesLandAntiAir = CategoriesLandAntiAir,
-    CategoriesLandShield = CategoriesLandShield,
-    CategoriesLandScout = CategoriesLandScout,
-    CategoriesLandCounterintelligence = CategoriesLandCounterintelligence,
+    LandFormationCategoriesDirectFire = LandFormationCategoriesDirectFire,
+    LandFormationCategoriesSniper = LandFormationCategoriesSniper,
+    LandFormationCategoriesArtillery = LandFormationCategoriesArtillery,
+    LandFormationCategoriesMissile = LandFormationCategoriesMissile,
+    LandFormationCategoriesAntiAir = LandFormationCategoriesAntiAir,
+    LandFormationCategoriesShield = LandFormationCategoriesShield,
+    LandFormationCategoriesScout = LandFormationCategoriesScout,
+    LandFormationCategoriesCounterintelligence = LandFormationCategoriesCounterintelligence,
 
     CategoriesAllUnits = CategoriesAllUnits,
 }
 
 if Debug then
-    for k, v in CategoriesLand do
+    for k, v in LandFormationCategories do
         SPEW(string.format(" - %s", k), repru(EntityCategoryGetUnitList(v), 1000 * 1000))
     end
 end
 
 LandCommandFirst = { "CategoriesCommand", "CategoriesSupportCommand", "CategoriesAllUnits" }
-LandDirectFireFirst = { "CategoriesLandDirectFire", "CategoriesLandArtillery", "CategoriesAllUnits" }
-LandMissileFirst = { "CategoriesLandMissile", "CategoriesLandArtillery", "CategoriesAllUnits" }
-LandArtilleryFirst = { "CategoriesLandArtillery", "CategoriesLandMissile", "CategoriesAllUnits" }
-LandShieldFirst = { "CategoriesLandShield", "CategoriesLandScout", "CategoriesAllUnits" }
-LandSniperFirst = { "CategoriesLandSniper", "CategoriesLandMissile", "CategoriesAllUnits" }
-LandAntiAirFirst = { "CategoriesLandAntiAir", "CategoriesLandShield", "CategoriesAllUnits" }
-LandCounterintelligenceFirst = { "CategoriesLandCounterintelligence", "CategoriesLandScout", "CategoriesAllUnits" }
-LandIntelligenceFirst = { "CategoriesLandScout", "CategoriesLandShield", "CategoriesAllUnits" }
-LandEngineeringFirst = { "CategoriesLandEngineering", "CategoriesSupportCommand", "CategoriesAllUnits" }
+LandDirectFireFirst = { "LandFormationCategoriesDirectFire", "LandFormationCategoriesArtillery", "CategoriesAllUnits" }
+LandMissileFirst = { "LandFormationCategoriesMissile", "LandFormationCategoriesArtillery", "CategoriesAllUnits" }
+LandArtilleryFirst = { "LandFormationCategoriesArtillery", "LandFormationCategoriesMissile", "CategoriesAllUnits" }
+LandShieldFirst = { "LandFormationCategoriesShield", "LandFormationCategoriesScout", "CategoriesAllUnits" }
+LandSniperFirst = { "LandFormationCategoriesSniper", "LandFormationCategoriesMissile", "CategoriesAllUnits" }
+LandAntiAirFirst = { "LandFormationCategoriesAntiAir", "LandFormationCategoriesShield", "CategoriesAllUnits" }
+LandCounterintelligenceFirst = { "LandFormationCategoriesCounterintelligence", "LandFormationCategoriesScout", "CategoriesAllUnits" }
+LandIntelligenceFirst = { "LandFormationCategoriesScout", "LandFormationCategoriesShield", "CategoriesAllUnits" }
+LandEngineeringFirst = { "LandFormationCategoriesEngineering", "CategoriesSupportCommand", "CategoriesAllUnits" }
 
-LandFormationOrders = {
+LandFormationPreferences = {
      { Name = "LandCommandFirst", unpack (LandCommandFirst) },
      { Name = "LandDirectFireFirst", unpack (LandDirectFireFirst) },
      { Name = "LandMissileFirst", unpack (LandMissileFirst) },
@@ -137,7 +137,7 @@ LandFormationOrders = {
 }
 
 if Debug then
-    for k, v in LandFormationOrders do
+    for k, v in LandFormationPreferences do
         SPEW(string.format(" - %s", k), table.getn(v))
     end
 end
