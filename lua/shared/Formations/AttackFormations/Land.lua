@@ -34,7 +34,9 @@ local EngineeringFirst = import("/lua/shared/Formations/FormationGroups.lua").La
 
 OneRowLandFormation = {
     Identifier = 'OneRowLandFormation',
+    SpacingMultiplier = 1.4,
     [1] = {
+        RowDelay = 0,
         DirectFireFirst,
         DirectFireFirst,
         ArtilleryFirst,
@@ -47,7 +49,9 @@ OneRowLandFormation = {
 
 TwoRowLandFormation = {
     Identifier = 'TwoRowLandFormation',
+    SpacingMultiplier = 1.35,
     [1] = {
+        RowDelay = 0,
         DirectFireFirst,
         DirectFireFirst,
         DirectFireFirst,
@@ -57,6 +61,7 @@ TwoRowLandFormation = {
         DirectFireFirst
     },
     [2] = {
+        RowDelay = 0,
         DirectFireFirst,
         MissileFirst,
         AntiAirFirst,
@@ -69,7 +74,9 @@ TwoRowLandFormation = {
 
 ThreeRowLandFormation = {
     Identifier = 'ThreeRowLandFormation',
+    SpacingMultiplier = 1.30,
     [1] = {
+        RowDelay = 0,
         DirectFireFirst,
         DirectFireFirst,
         DirectFireFirst,
@@ -81,6 +88,7 @@ ThreeRowLandFormation = {
         DirectFireFirst
     },
     [2] = {
+        RowDelay = 0,
         DirectFireFirst,
         MissileFirst,
         ShieldFirst,
@@ -92,6 +100,7 @@ ThreeRowLandFormation = {
         DirectFireFirst
     },
     [3] = {
+        RowDelay = 0,
         DirectFireFirst,
         IntelligenceFirst,
         ArtilleryFirst,
@@ -106,7 +115,9 @@ ThreeRowLandFormation = {
 
 FourRowLandFormation = {
     Identifier = 'FourRowLandFormation',
+    SpacingMultiplier = 1.25,
     [1] = {
+        Delay = 0,
         DirectFireFirst,
         DirectFireFirst,
         DirectFireFirst,
@@ -120,6 +131,7 @@ FourRowLandFormation = {
         DirectFireFirst
     },
     [2] = {
+        Delay = 0,
         DirectFireFirst,
         DirectFireFirst,
         MissileFirst,
@@ -133,6 +145,7 @@ FourRowLandFormation = {
         DirectFireFirst,
     },
     [3] = {
+        Delay = 0,
         DirectFireFirst,
         IntelligenceFirst,
         ArtilleryFirst,
@@ -146,6 +159,7 @@ FourRowLandFormation = {
         DirectFireFirst
     },
     [4] = {
+        Delay = 0,
         DirectFireFirst,
         IntelligenceFirst,
         ArtilleryFirst,

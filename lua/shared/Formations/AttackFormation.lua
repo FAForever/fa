@@ -68,6 +68,8 @@ AttackFormationLand = function(blueprintCountCache, blueprintListCache, unitCoun
         end
     end
 
+    local spacingMultiplier = formation.SpacingMultiplier
+
     local preference = {}
 
     for index = 1, 3 do
@@ -123,7 +125,7 @@ AttackFormationLand = function(blueprintCountCache, blueprintListCache, unitCoun
                             blueprintCountCache[blueprintId] = blueprintCountCache[blueprintId] - 1
 
                             oc[oi] = blueprintId
-                            TacticalFormation[oi] = { 1.25 * (lx - halfColumns), 1.25 * (-1 * ly), categories[blueprintId], 0, true }
+                            TacticalFormation[oi] = { spacingMultiplier * (lx - halfColumns), spacingMultiplier * (-1 * ly), categories[blueprintId], row.Delay, true }
                             break
                         end
                     end
