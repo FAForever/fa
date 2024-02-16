@@ -465,6 +465,9 @@ WorldView = ClassUI(moho.UIWorldView, Control) {
             cursor[1], cursor[2], cursor[3], cursor[4], cursor[5] = UIUtil.GetCursor('HOVERCOMMAND')
         end
 
+        local command = GetHighlightCommand()
+        reprsl(command)
+
         self:ApplyCursor()
     end,
 
