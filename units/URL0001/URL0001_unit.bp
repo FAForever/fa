@@ -594,7 +594,7 @@ UnitBlueprint{
         QuickSelectPriority = 1,
         SelectionPriority = 3,
         TeleportDelay = 15,
-        TeleportFlatEnergyCost = 150000,
+        TeleportFlatEnergyCost = 75000,
     },
     Intel = {
         ActiveIntel = { Omni = true },
