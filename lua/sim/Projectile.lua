@@ -580,7 +580,7 @@ Projectile = ClassProjectile(ProjectileMethods) {
     RetargetThread = function(self)
         local createdByWeapon = self.CreatedByWeapon
         if createdByWeapon then
-            WaitTicks(0.2)
+            WaitTicks(0.5)
 
             if IsDestroyed(self) then
                 return
