@@ -59,13 +59,15 @@ TeleportCostFunction = function(unit, location)
 
     local dist = VDist3(pos, location)
     local teleDelay = bp.General.TeleportDelay or 15
-    local teleportFlatEnergyCost = bp.General.TeleportFlatEnergyCost or 150000
+    local teleportFlatEnergyCost = bp.General.TeleportFlatEnergyCost or 75000
+    local teleportMaximumEnergyCost = bp.General.TeleportMaximumEnergyCost or 2500000
+    local teleportMaximumDuration = bp.General.TeleportMaximumDuration or 50
     local bpEco = bp.Economy
     local energyCost, time
 
     if bpEco.UseVariableTeleportCosts then
-        energyCost = teleportFlatEnergyCost + dist * dist
-        time = teleDelay + (0.005 * dist) * (0.005 * dist)
+        energyCost = math.min(teleportFlatEnergyCost + dist * dist, teleportMaximumEnergyCost)
+        time = math.min(teleDelay + (0.005 * dist) * (0.005 * dist), teleportMaximumDuration)
 
         -- make sure the teleport destination effects appear on time
         teleDelay = time * 0.4
