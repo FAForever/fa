@@ -216,7 +216,7 @@ UnitBlueprint{
             AutoInitiateAttackCommand = true,
             BallisticArc = "RULEUBA_None",
             CollideFriendly = false,
-            Damage = 37,5,
+            Damage = 37.5,
             DamageRadius = 0,
             DamageType = "Normal",
             DisplayName = "Nanite Torpedo",
