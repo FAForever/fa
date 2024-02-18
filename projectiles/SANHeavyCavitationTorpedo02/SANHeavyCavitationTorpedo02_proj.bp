@@ -21,7 +21,8 @@ ProjectileBlueprint {
         'PROJECTILE',
         'ANTINAVY',
         'TORPEDO',
-        'NOSPLASHDAMAGE'
+        'NOSPLASHDAMAGE',
+        'UNTARGETABLE',
     },
     Defense = {
         Health = 1,

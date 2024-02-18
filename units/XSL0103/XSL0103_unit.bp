@@ -237,7 +237,7 @@ UnitBlueprint{
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_IndirectFire",
             RateOfFire = 0.35,
-            SlavedToBody = true,
+            SlavedToBody = false,
             SlavedToBodyArcRange = 45,
             TargetPriorities = {
                 "STRUCTURE EXPERIMENTAL",
@@ -268,7 +268,7 @@ UnitBlueprint{
             TurretPitchRange = 90,
             TurretPitchSpeed = 70,
             TurretYaw = 0,
-            TurretYawRange = 45,
+            TurretYawRange = 180,
             TurretYawSpeed = 70,
             Turreted = true,
             WeaponCategory = "Artillery",
