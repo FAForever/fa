@@ -1,3 +1,4 @@
+
 local EffectTemplate = import("/lua/effecttemplates.lua")
 
 local Entity = import("/lua/sim/entity.lua").Entity
@@ -23,7 +24,7 @@ SubUnit = ClassUnit(MobileUnit) {
         self.SoundEntity = Entity()
         self.Trash:Add(self.SoundEntity)
         Warp(self.SoundEntity, self:GetPosition())
-        self.SoundEntity:AttachTo(self, -1)
+        self.SoundEntity:AttachTo(self,-1)
     end,
 
     ---@param self Unit
@@ -32,17 +33,14 @@ SubUnit = ClassUnit(MobileUnit) {
     OnMotionVertEventChange = function(self, new, old)
         MobileUnit.OnMotionVertEventChange(self, new, old)
 
-        -- only temporarily remove/add dive command if the submarine should have a dive command
-        if self.Blueprint.General.CommandCaps.RULEUCC_Dive then
-            if new == 'Up' or new == 'Down' then
-                self:RemoveCommandCap("RULEUCC_Dive")
-                self:RequestRefreshUI()
-            end
+        if new == 'Up' or new == 'Down' then
+            self:RemoveCommandCap("RULEUCC_Dive")
+            self:RequestRefreshUI()
+        end
 
-            if new == 'Top' or new == 'Bottom' then
-                self:AddCommandCap("RULEUCC_Dive")
-                self:RequestRefreshUI()
-            end
+        if new == 'Top' or new == 'Bottom' then
+            self:AddCommandCap("RULEUCC_Dive")
+            self:RequestRefreshUI()
         end
     end,
 }
