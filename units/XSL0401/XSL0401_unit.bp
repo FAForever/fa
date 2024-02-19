@@ -1,6 +1,7 @@
 UnitBlueprint{
     Description = "<LOC xsl0401_desc>Experimental Assault Bot",
     AI = {
+        AttackAngle = 1,
         TargetBones = {
             "pelvis",
             "Torso",
@@ -296,7 +297,6 @@ UnitBlueprint{
             SlavedToBody = true,
             SlavedToBodyArcRange = 135,
             TargetPriorities = {
-                "COMMAND",
                 "EXPERIMENTAL",
                 "SUBCOMMANDER",
                 "TECH3 MOBILE",
@@ -512,10 +512,12 @@ UnitBlueprint{
             RangeCategory = "UWRC_AntiAir",
             RateOfFire = 3,
             TargetPriorities = {
-                "AIR MOBILE TECH3 BOMBER",
-                "AIR MOBILE BOMBER",
+                "(AIR * MOBILE * EXPERIMENTAL - BOMBER)",
                 "AIR MOBILE GROUNDATTACK",
+                "AIR MOBILE TECH2 BOMBER",
+                "AIR MOBILE TECH1 BOMBER",
                 "AIR MOBILE TRANSPORTATION",
+                "AIR MOBILE BOMBER",
                 "AIR MOBILE",
                 "ALLUNITS",
             },
@@ -583,10 +585,12 @@ UnitBlueprint{
             RangeCategory = "UWRC_AntiAir",
             RateOfFire = 3,
             TargetPriorities = {
-                "AIR MOBILE TECH3 BOMBER",
-                "AIR MOBILE BOMBER",
+                "(AIR * MOBILE * EXPERIMENTAL - BOMBER)",
                 "AIR MOBILE GROUNDATTACK",
+                "AIR MOBILE TECH2 BOMBER",
+                "AIR MOBILE TECH1 BOMBER",
                 "AIR MOBILE TRANSPORTATION",
+                "AIR MOBILE BOMBER",
                 "AIR MOBILE",
                 "ALLUNITS",
             },
