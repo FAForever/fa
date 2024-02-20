@@ -52,9 +52,9 @@ ProjectileBlueprint {
         HelpText = 0,
     },
     Physics = {
-        Acceleration = 3,
+        Acceleration = 5,
         DestroyOnWater = true,
-        InitialSpeed = 3,
+        InitialSpeed = 5,
         LifeTime = 30,
         MaxSpeed = 20,
         RotationalVelocity = 0,
