@@ -25,12 +25,13 @@ local SemiBallisticComponent = import("/lua/sim/projectiles/components/semiballi
 local MathAbs = math.abs
 
 ---@class TacticalMissileComponent : SemiBallisticComponent
----@field TerminalTime number       # How long before the terminal phase starts, in seconds. Default is 1/4 of the total glide time.
----@field TerminalDistance number   # How far away the terminal phase starts, overrides TerminalTime.
+---@field TerminalTimeFactor number # Duration of the terminal phase as a proportion of glide time. Default is 0.25.
+---@field TerminalDistance number   # Approximate distance from the target where terminal phase starts, overrides TerminalTimeFactor.
 ---@field TerminalSpeed number      # MaxSpeed of the missile in the terminal phase.
 ---@field TerminalZigZag number     # MaxZigZag of the missile in the terminal phase. Default is 0.5.
 TacticalMissileComponent = ClassSimple(SemiBallisticComponent) {
     
+    TerminalTimeFactor = 0.25,
     TerminalZigZag = 0.5,
 
     ---@param self TacticalMissileComponent | Projectile
@@ -96,7 +97,7 @@ TacticalMissileComponent = ClassSimple(SemiBallisticComponent) {
             self:SetTurnRate(glideTurnRate)
         end
 
-        local terminalTime = self.TerminalTime or glideTime * 0.25
+        local terminalTime = glideTime * self.TerminalTimeFactor
         local terminalDistance = self.TerminalDistance
         local terminalSpeed = self.TerminalSpeed
         local terminalZigZag = self.TerminalZigZag
