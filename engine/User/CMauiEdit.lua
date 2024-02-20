@@ -157,13 +157,16 @@ function CMauiEdit:ShowCaret(show)
 end
 
 ---@class EventModifiers
----@field Shift? true
 ---@field Alt? true
+---@field Ctrl? true
+---@field Left? true
+---@field Right? true
+---@field Shift? true
 
 ---@class KeyEvent
 ---@field Control Control
 ---@field KeyCode number
----@field Modifiers EventModifiers only `Shift` and `Alt` are acceptable modifiers
+---@field Modifiers EventModifiers
 ---@field MouseX number
 ---@field MouseY number
 ---@field RawKeyCode number
