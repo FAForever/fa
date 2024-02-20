@@ -23,7 +23,7 @@
 ---@type ContextBasedTemplate
 Template = {
     Name = 'Power generators',
-    TriggersOnBuilding = categories.TACTICALMISSILEPLATFORM * categories.TECH2,
+    TriggersOnUnit = categories.TACTICALMISSILEPLATFORM * categories.TECH2,
     TemplateSortingOrder = 100,
     TemplateData = {
         6,

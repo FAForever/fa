@@ -151,6 +151,10 @@ UnitBlueprint{
         UnitName = "<LOC ues0103_name>Thunderhead Class",
     },
     Intel = {
+        ActiveIntel = {
+            Radar = true,
+            Sonar = true,
+        },
         JamRadius = {
             Max = 70,
             Min = 70,
