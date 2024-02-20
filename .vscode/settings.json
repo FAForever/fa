@@ -37,6 +37,18 @@
     ],
 
     // used for grammar checks of changelog
-    "grammarly.files.include": ["**/changelog-dev.md", "**/changelog.md", "**/*.txt"]
+    "grammarly.files.include": [
+        "**/changelog-dev.md",
+        "**/changelog.md",
+        "**/*.txt"
+    ],
+    "cSpell.words": [
+        "desync",
+        "desyncs",
+        "fafbeta",
+        "fafdevelop",
+        "gameplay",
+        "gametype"
+    ]
 }
 
