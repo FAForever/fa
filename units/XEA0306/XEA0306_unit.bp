@@ -342,9 +342,6 @@ UnitBlueprint{
             TargetPriorities = {                
                 "ANTIAIR",
                 "GROUNDATTACK",
-                "TECH3 MOBILE",
-                "TECH2 MOBILE",
-                "TECH1 MOBILE",
                 "ALLUNITS",
             },
             TargetRestrictDisallow = "HIGHALTAIR, UNTARGETABLE",
@@ -405,9 +402,6 @@ UnitBlueprint{
             TargetPriorities = {                
                 "ANTIAIR",
                 "GROUNDATTACK",
-                "TECH3 MOBILE",
-                "TECH2 MOBILE",
-                "TECH1 MOBILE",
                 "ALLUNITS",
             },
             TargetRestrictDisallow = "HIGHALTAIR, UNTARGETABLE",
