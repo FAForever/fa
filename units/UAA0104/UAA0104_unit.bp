@@ -181,7 +181,7 @@ UnitBlueprint{
         Class1Capacity = 12,
         Class2AttachSize = 2,
         Class3AttachSize = 4,
-        SlotsLarge = 2,
+        SlotsLarge = 3,
         SlotsMedium = 6,
         SlotsSmall = 12,
         TransportClass = 10,
