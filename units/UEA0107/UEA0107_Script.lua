@@ -14,6 +14,16 @@ local util = import("/lua/utilities.lua")
 local AirTransport = import("/lua/defaultunits.lua").AirTransport
 local DummyWeapon = import("/lua/aeonweapons.lua").AAASonicPulseBatteryWeapon
 
+-- upvalue for perfomance
+local TrashBagAdd = TrashBag.Add
+local ForkThread = ForkThread
+local CreateAnimator = CreateAnimator
+local CreateThrustController = CreateThrustController
+local CreateSlider = CreateSlider
+local WaitSeconds = WaitSeconds
+local MathFloor = math.floor
+
+
 ---@class UEA0107 : AirTransport
 UEA0107 = ClassUnit(AirTransport) {
 
@@ -30,21 +40,26 @@ UEA0107 = ClassUnit(AirTransport) {
 
         PlayDestructionEffects = true,
 
+        ---@param self UEA0107
+        ---@param builder Unit
+        ---@param layer string
         OnStopBeingBuilt = function(self,builder,layer)
             AirTransport.OnStopBeingBuilt(self,builder,layer)
+            local trash = self.Trash
+            local landingAnimManip = CreateAnimator(self)
+            local bp = self.Blueprint
 
             -- create the engine thrust manipulators
             for _, bone in self.EngineRotateBones do
                 local controller = CreateThrustController(self, 'Thruster', bone)
                 controller:SetThrustingParam(-0.25, 0.25, -0.75, 0.75, -0.0, 0.0, 1.0, 0.25)
-                self.Trash:Add(controller)
+                TrashBagAdd(trash,controller)
             end
 
-            self.LandingAnimManip = CreateAnimator(self)
-            self.LandingAnimManip:SetPrecedence(0)
-            self.Trash:Add(self.LandingAnimManip)
-            self.LandingAnimManip:PlayAnim(self:GetBlueprint().Display.AnimationLand):SetRate(1)
-            self:ForkThread(self.ExpandThread)
+            landingAnimManip:SetPrecedence(0)
+            TrashBagAdd(trash,landingAnimManip)
+            landingAnimManip:PlayAnim(bp.Display.AnimationLand):SetRate(1)
+            TrashBagAdd(trash,ForkThread(self.ExpandThread, self))
         end,
 
         OnMotionVertEventChange = function(self, new, old)
@@ -58,11 +73,12 @@ UEA0107 = ClassUnit(AirTransport) {
 
         -- Override air destruction effects so we can do something custom here
         CreateUnitAirDestructionEffects = function(self, scale)
-            self:ForkThread(self.AirDestructionEffectsThread, self)
+            local trash = self.Trash
+            TrashBagAdd(trash,ForkThread(self.AirDestructionEffectsThread, self))
         end,
 
         AirDestructionEffectsThread = function(self)
-            local numExplosions = math.floor(table.getn(self.AirDestructionEffectBones) * 0.5)
+            local numExplosions = MathFloor(table.getn(self.AirDestructionEffectBones) * 0.5)
             for i = 0, numExplosions do
                 explosion.CreateDefaultHitExplosionAtBone(self, self.AirDestructionEffectBones[util.GetRandomInt(1, numExplosions)], 0.5)
                 WaitSeconds(util.GetRandomFloat(0.2, 0.9))
@@ -71,6 +87,8 @@ UEA0107 = ClassUnit(AirTransport) {
 
         OnCreate = function(self)
             AirTransport.OnCreate(self)
+            local trash = self.Trash
+
             self.Sliders = {}
             self.Sliders[1] = CreateSlider(self, 'Tail')
             self.Sliders[1]:SetGoal(0, 0, 15)
@@ -78,7 +96,7 @@ UEA0107 = ClassUnit(AirTransport) {
             self.Sliders[2]:SetGoal(0, 0, -15)
             for k, v in self.Sliders do
                 v:SetSpeed(-1)
-                self.Trash:Add(v)
+                TrashBagAdd(trash,v)
             end
         end,
 
@@ -96,7 +114,7 @@ UEA0107 = ClassUnit(AirTransport) {
         end,
 
         GetUnitSizes = function(self)
-            local bp = self:GetBlueprint()
+            local bp = self.Blueprint
             if self:GetFractionComplete() < 1.0 then
                 return bp.SizeX, bp.SizeY, bp.SizeZ * 0.5
             else

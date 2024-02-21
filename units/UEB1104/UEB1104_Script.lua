@@ -9,6 +9,13 @@
 --****************************************************************************
 local TMassFabricationUnit = import("/lua/terranunits.lua").TMassFabricationUnit
 
+-- upvalue for perfomance
+local ChangeState = ChangeState
+local CreateSlider = CreateSlider
+local WaitFor = WaitFor
+
+
+
 ---@class UEB1104 : TMassFabricationUnit
 UEB1104 = ClassUnit(TMassFabricationUnit) {
 
@@ -49,11 +56,11 @@ UEB1104 = ClassUnit(TMassFabricationUnit) {
 
     ActiveState = State {
         Main = function(self)
-            local myBlueprint = self:GetBlueprint()
+            local bp = self.Blueprint
 
             -- Play the "activate" sound
-            if myBlueprint.Audio.Activate then
-                self:PlaySound(myBlueprint.Audio.Activate)
+            if bp.Audio.Activate then
+                self:PlaySound(bp.Audio.Activate)
             end
 
             -- Initiate the unit's ambient movement sound

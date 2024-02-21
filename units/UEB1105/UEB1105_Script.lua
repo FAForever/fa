@@ -9,12 +9,18 @@
 --****************************************************************************
 local TEnergyStorageUnit = import("/lua/terranunits.lua").TEnergyStorageUnit
 
+-- upvalue for perfomance
+local TrashBagAdd = TrashBag.Add
+
+
 ---@class UEB1105 : TEnergyStorageUnit
 UEB1105 = ClassUnit(TEnergyStorageUnit) {
 
     OnCreate = function(self)
         TEnergyStorageUnit.OnCreate(self)
-        self.Trash:Add(CreateStorageManip(self, 'B01', 'ENERGY', 0, 0, -0.6, 0, 0, 0))
+        local trash = self.Trash
+
+        TrashBagAdd(trash,CreateStorageManip(self, 'B01', 'ENERGY', 0, 0, -0.6, 0, 0, 0))
     end,
 
 }

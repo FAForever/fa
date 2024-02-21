@@ -7,31 +7,44 @@ local AStructureUnit = import("/lua/aeonunits.lua").AStructureUnit
 local AAMSaintWeapon = import("/lua/aeonweapons.lua").AAMSaintWeapon
 local nukeFiredOnGotTarget = false
 
+-- upvalue for perfomance
+local WaitSeconds = WaitSeconds
+local ForkThread = ForkThread
+local TrashBagAdd = TrashBag.Add
+
 ---@class UAB4302 : AStructureUnit
 UAB4302 = ClassUnit(AStructureUnit) {
     Weapons = {
         MissileRack = ClassWeapon(AAMSaintWeapon) {
             IdleState = State(AAMSaintWeapon.IdleState) {
+
                 OnGotTarget = function(self)
                     local bp = self.Blueprint
-                    if (bp.WeaponUnpackLockMotion != true or (bp.WeaponUnpackLocksMotion == true and not self.unit:IsUnitState('Moving'))) then
+                    local unit = self.unit
+
+                    if (bp.WeaponUnpackLockMotion != true or (bp.WeaponUnpackLocksMotion == true and not unit:IsUnitState('Moving'))) then
                         if (bp.CountedProjectile == false) or self:CanFire() then
                              nukeFiredOnGotTarget = true
                         end
                     end
                     AAMSaintWeapon.IdleState.OnGotTarget(self)
                 end,
+
                 OnFire = function(self)
+                    local unit = self.unit
+                    local bp = unit.Blueprint
+                    local trash = self.Trash
+
                     if not nukeFiredOnGotTarget then
                         AAMSaintWeapon.IdleState.OnFire(self)
                     end
                     nukeFiredOnGotTarget = false
-                    
-                    self.Trash:Add(ForkThread(function()
-                        self.unit:SetBusy(true)
-                        WaitSeconds(1/self.unit.Blueprint.Weapon[1].RateOfFire + .2)
-                        self.unit:SetBusy(false)
-                    end))
+
+                    TrashBagAdd(trash,ForkThread(function()
+                        unit:SetBusy(true)
+                        WaitSeconds(1/bp.Weapon[1].RateOfFire + .2)
+                        unit:SetBusy(false)
+                    end,self))
                 end,
             },
         },

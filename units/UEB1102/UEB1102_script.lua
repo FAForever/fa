@@ -10,6 +10,10 @@
 
 local TEnergyCreationUnit = import("/lua/terranunits.lua").TEnergyCreationUnit
 
+-- upvalue for perfomance
+local TrashBadAdd = TrashBag.Add
+local CreateAttachedEmitter = CreateAttachedEmitter
+
 ---@class UEB1102 : TEnergyCreationUnit
 UEB1102 = ClassUnit(TEnergyCreationUnit) {
     AirEffects = {'/effects/emitters/hydrocarbon_smoke_01_emit.bp',},
@@ -19,8 +23,10 @@ UEB1102 = ClassUnit(TEnergyCreationUnit) {
 
     OnStopBeingBuilt = function(self,builder,layer)
         TEnergyCreationUnit.OnStopBeingBuilt(self,builder,layer)
-
         local effects, bones, scale = nil, nil, 1
+        local trash = self.Trash
+        local army = self.Army
+
         if self.Layer == 'Land' then
             effects = self.AirEffects
             bones = self.AirEffectsBones
@@ -33,7 +39,7 @@ UEB1102 = ClassUnit(TEnergyCreationUnit) {
         if effects and bones then
             for _, effect in effects do
                 for _, bone in bones do
-                    self.Trash:Add(CreateAttachedEmitter(self, bone, self.Army, effect):ScaleEmitter(scale):OffsetEmitter(0,-.1,0))
+                    TrashBadAdd(trash,CreateAttachedEmitter(self, bone, army, effect):ScaleEmitter(scale):OffsetEmitter(0,-.1,0))
                 end
             end
         end

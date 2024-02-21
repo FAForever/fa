@@ -70,8 +70,8 @@ UAS0303 = ClassUnit(AircraftCarrier, ExternalFactoryComponent) {
             self.UnitDoneBeingBuilt = false
         end,
 
-        OnStopBuild = function(self, unitBeingBuilt)
-            AircraftCarrier.OnStopBuild(self, unitBeingBuilt)
+        OnStopBuild = function(self, unitBeingBuilt, order)
+            AircraftCarrier.OnStopBuild(self, unitBeingBuilt, order)
             ExternalFactoryComponent.OnStopBuildWithStorage(self, unitBeingBuilt)
         end,
     },

@@ -16,7 +16,9 @@ local CreateAeonColossusBuildingEffects = import("/lua/effectutilities.lua").Cre
 local MathSqrt = math.sqrt
 local MathCos = math.cos
 local MathSin = math.sin
-
+local MathAtan2 = math.atan2
+local TrashBagAdd = TrashBag.Add
+local WaitTicks = WaitTicks
 
 -- store for performance
 local ZeroDegrees = Vector(0, 0, 1)
@@ -45,11 +47,15 @@ UAL0401 = ClassUnit(AWalkingLandUnit) {
         LeftArmTractor = ClassWeapon(ADFTractorClaw) {},
     },
 
+    ---@param self UAL0401
+    ---@param spec table
     OnCreate = function(self, spec)
         AWalkingLandUnit.OnCreate(self, spec)
-        self.Trash:Add(ForkThread(self.AdjustWeaponsThread, self))
+        local trash = self.Trash
+        TrashBagAdd(trash,ForkThread(self.AdjustWeaponsThread, self))
     end,
 
+    ---@param self UAL0401
     AdjustWeaponsThread = function(self)
         while not self.Dead do
             -- only perform this logic if the unit is on the move
@@ -85,19 +91,29 @@ UAL0401 = ClassUnit(AWalkingLandUnit) {
         end
     end,
 
+    ---@param self UAL0401
+    ---@param layer string
     StartBeingBuiltEffects = function(self, builder, layer)
         AWalkingLandUnit.StartBeingBuiltEffects(self, builder, layer)
         CreateAeonColossusBuildingEffects(self)
+        local bp = self.Blueprint
         -- adjust collision box due to build animation
-        self:SetCollisionShape('Box',0.3,3.25,-0.65,self.Blueprint.SizeX * 0.5, self.Blueprint.SizeY * 0.5, (self.Blueprint.SizeZ * 0.7))
+        self:SetCollisionShape('Box',0.3,3.25,-0.65,bp.SizeX * 0.5, bp.SizeY * 0.5, (bp.SizeZ * 0.7))
     end,
 
+    ---@param self UAL0401
+    ---@param builder Unit
+    ---@param layer string
     OnStopBeingBuilt = function(self,builder,layer)
         AWalkingLandUnit.OnStopBeingBuilt(self,builder,layer)
         -- adjust collision box due to build animation
         self:RevertCollisionShape()
     end,
 
+    ---@param self UAL0401
+    ---@param instigator Unit
+    ---@param type string
+    ---@param overkillRatio number
     OnKilled = function(self, instigator, type, overkillRatio)
         AWalkingLandUnit.OnKilled(self, instigator, type, overkillRatio)
 
@@ -116,11 +132,15 @@ UAL0401 = ClassUnit(AWalkingLandUnit) {
         end
     end,
 
+    ---@param self UAL0401
+    ---@param overkillRatio number
+    ---@param instigator Unit unused
     DeathThread = function(self, overkillRatio, instigator)
+        local bp = self.Blueprint
         self:PlayUnitSound('Destroyed')
         explosion.CreateDefaultHitExplosionAtBone(self, 'Torso', 4.0)
         explosion.CreateDebrisProjectiles(self, explosion.GetAverageBoundingXYZRadius(self),
-            { self.Blueprint.SizeX, self.Blueprint.SizeY, self.Blueprint.SizeZ })
+            { bp.SizeX, bp.SizeY, bp.SizeZ })
         WaitTicks(1)
         explosion.CreateDefaultHitExplosionAtBone(self, 'Right_Leg_B02', 1.0)
         WaitTicks(1)
@@ -145,17 +165,15 @@ UAL0401 = ClassUnit(AWalkingLandUnit) {
         end
 
         -- only apply death damage when the unit is sufficiently build
-        local bp = self.Blueprint
         local FractionThreshold = bp.General.FractionThreshold or 0.5
         if self:GetFractionComplete() >= FractionThreshold then
-            local bp = self.Blueprint
             local position = self:GetPosition()
             local qx, qy, qz, qw = unpack(self:GetOrientation())
-            local a = math.atan2(2.0 * (qx * qz + qw * qy), qw * qw + qx * qx - qz * qz - qy * qy)
+            local a = MathAtan2(2.0 * (qx * qz + qw * qy), qw * qw + qx * qx - qz * qz - qy * qy)
             for i, numWeapons in bp.Weapon do
                 if bp.Weapon[i].Label == 'CollossusDeath' then
-                    position[3] = position[3] + 5 * math.cos(a)
-                    position[1] = position[1] + 5 * math.sin(a)
+                    position[3] = position[3] + 5 * MathCos(a)
+                    position[1] = position[1] + 5 * MathSin(a)
                     DamageArea(self, position, bp.Weapon[i].DamageRadius, bp.Weapon[i].Damage, bp.Weapon[i].DamageType,
                         bp.Weapon[i].DamageFriendly)
                     break

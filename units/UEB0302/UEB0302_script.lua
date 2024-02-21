@@ -10,6 +10,11 @@
 
 local TAirFactoryUnit = import("/lua/terranunits.lua").TAirFactoryUnit
 
+-- upvalue for perfomance
+local CreateSlider = CreateSlider
+local WaitFor = WaitFor
+local TrashBagAdd = TrashBag.Add
+
 
 ---@class UEB0302 : TAirFactoryUnit
 UEB0302 = ClassUnit(TAirFactoryUnit) {
@@ -18,41 +23,50 @@ UEB0302 = ClassUnit(TAirFactoryUnit) {
 
     StartArmsMoving = function(self)
         TAirFactoryUnit.StartArmsMoving(self)
-        if not self.ArmSlider1 then
-            self.ArmSlider1 = CreateSlider(self, 'Arm01')
-            self.Trash:Add(self.ArmSlider1)
+        local trash = self.Trash
+        local armSlider1 = self.ArmSlider1
+        local armSlider2 = self.ArmSlider2
+        local armSlider3 = self.ArmSlider3
+
+        if not armSlider1 then
+            armSlider1 = CreateSlider(self, 'Arm01')
+            TrashBagAdd(trash, armSlider1)
         end
-        if not self.ArmSlider2 then
-            self.ArmSlider2 = CreateSlider(self, 'Arm02')
-            self.Trash:Add(self.ArmSlider2)
+        if not armSlider2 then
+            armSlider2 = CreateSlider(self, 'Arm02')
+            TrashBagAdd(trash, armSlider2)
         end
-        if not self.ArmSlider3 then
-            self.ArmSlider3 = CreateSlider(self, 'Arm03')
-            self.Trash:Add(self.ArmSlider3)
+        if not armSlider3 then
+            armSlider3 = CreateSlider(self, 'Arm03')
+            TrashBagAdd(trash, armSlider3)
         end
     end,
 
     MovingArmsThread = function(self)
         TAirFactoryUnit.MovingArmsThread(self)
         local dir = 1
+        local armSlider1 = self.ArmSlider1
+        local armSlider2 = self.ArmSlider2
+        local armSlider3 = self.ArmSlider3
+
         while true do
-            if not self.ArmSlider1 then return end
-            if not self.ArmSlider2 then return end
-            if not self.ArmSlider3 then return end
-            self.ArmSlider1:SetGoal(0, -5, 0)
-            self.ArmSlider1:SetSpeed(20)
-            self.ArmSlider2:SetGoal(0, 2 * dir, 0)
-            self.ArmSlider2:SetSpeed(10)
-            self.ArmSlider3:SetGoal(0, 5, 0)
-            self.ArmSlider3:SetSpeed(20)
-            WaitFor(self.ArmSlider3)
-            self.ArmSlider1:SetGoal(0, 0, 0)
-            self.ArmSlider1:SetSpeed(20)
-            self.ArmSlider2:SetGoal(0, 0, 0)
-            self.ArmSlider2:SetSpeed(10)
-            self.ArmSlider3:SetGoal(0, 0, 0)
-            self.ArmSlider3:SetSpeed(20)
-            WaitFor(self.ArmSlider3)
+            if not armSlider1 then return end
+            if not armSlider2 then return end
+            if not armSlider3 then return end
+            armSlider1:SetGoal(0, -5, 0)
+            armSlider1:SetSpeed(20)
+            armSlider2:SetGoal(0, 2 * dir, 0)
+            armSlider2:SetSpeed(10)
+            armSlider3:SetGoal(0, 5, 0)
+            armSlider3:SetSpeed(20)
+            WaitFor(armSlider3)
+            armSlider1:SetGoal(0, 0, 0)
+            armSlider1:SetSpeed(20)
+            armSlider2:SetGoal(0, 0, 0)
+            armSlider2:SetSpeed(10)
+            armSlider3:SetGoal(0, 0, 0)
+            armSlider3:SetSpeed(20)
+            WaitFor(armSlider3)
             dir = dir * -1
         end
     end,

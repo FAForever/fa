@@ -17,6 +17,17 @@ local AirTransport = import("/lua/defaultunits.lua").AirTransport
 local TAirToAirLinkedRailgun = WeaponsFile.TAirToAirLinkedRailgun
 local TDFRiotWeapon = WeaponsFile.TDFRiotWeapon
 
+-- upvalue for perfomance
+local TrashBagAdd = TrashBag.Add
+local ForkThread = ForkThread
+local CreateAnimator = CreateAnimator
+local CreateThrustController = CreateThrustController
+local CreateSlider = CreateSlider
+local WaitSeconds = WaitSeconds
+local MathFloor = math.floor
+
+
+
 ---@class UEA0104 : AirTransport
 UEA0104 = ClassUnit(AirTransport) {
     AirDestructionEffectBones = { 'Char04', 'Char03', 'Char02', 'Char01',
@@ -36,23 +47,31 @@ UEA0104 = ClassUnit(AirTransport) {
 
     EngineRotateBones = {'Front_Right_Engine', 'Front_Left_Engine', 'Back_Left_Engine', 'Back_Right_Engine', },
 
+    ---@param self UEA0104
+    ---@param builder Unit
+    ---@param layer string
     OnStopBeingBuilt = function(self,builder,layer)
         AirTransport.OnStopBeingBuilt(self,builder,layer)
+        local trash = self.Trash
+        local bp = self.Blueprint
+        local landingAnimManip = CreateAnimator(self)
 
         -- create the engine thrust manipulators
         for _, bone in self.EngineRotateBones do
             local controller = CreateThrustController(self, 'Thruster', bone)
             controller:SetThrustingParam(-0.25, 0.25, -0.75, 0.75, -0.0, 0.0, 1.0, 0.25)
-            self.Trash:Add(controller)
+            TrashBagAdd(trash,controller)
         end
 
-        self.LandingAnimManip = CreateAnimator(self)
-        self.LandingAnimManip:SetPrecedence(0)
-        self.Trash:Add(self.LandingAnimManip)
-        self.LandingAnimManip:PlayAnim(self:GetBlueprint().Display.AnimationLand):SetRate(1)
-        self:ForkThread(self.ExpandThread)
+        landingAnimManip:SetPrecedence(0)
+        TrashBagAdd(trash,landingAnimManip)
+        landingAnimManip:PlayAnim(bp.Display.AnimationLand):SetRate(1)
+        TrashBagAdd(trash,ForkThread(self.ExpandThread, self))
     end,
 
+    ---@param self UEA0104
+    ---@param new any
+    ---@param old any
     OnMotionVertEventChange = function(self, new, old)
         AirTransport.OnMotionVertEventChange(self, new, old)
         if (new == 'Down') then
@@ -63,36 +82,46 @@ UEA0104 = ClassUnit(AirTransport) {
     end,
 
     -- Override air destruction effects so we can do something custom here
+    ---@param self UEA0104
+    ---@param scale number unused
     CreateUnitAirDestructionEffects = function(self, scale)
-        self:ForkThread(self.AirDestructionEffectsThread, self)
+        local trash = self.Trash
+        TrashBagAdd(trash,ForkThread(self.AirDestructionEffectsThread, self))
     end,
 
+    ---@param self UEA0104
     AirDestructionEffectsThread = function(self)
-        local numExplosions = math.floor(table.getn(self.AirDestructionEffectBones) * 0.5)
+        local numExplosions = MathFloor(table.getn(self.AirDestructionEffectBones) * 0.5)
         for i = 0, numExplosions do
             explosion.CreateDefaultHitExplosionAtBone(self, self.AirDestructionEffectBones[util.GetRandomInt(1, numExplosions)], 0.5)
             WaitSeconds(util.GetRandomFloat(0.2, 0.9))
         end
     end,
 
+    ---@param self UEA0104
     OnCreate = function(self)
+        self.Sliders = {}
+        local sliders = self.Sliders
+        local trash = self.Trash
+
+
         AirTransport.OnCreate(self)
         -- CreateSlider(unit, bone, [goal_x, goal_y, goal_z, [speed,
-        self.Sliders = {}
-        self.Sliders[1] = CreateSlider(self, 'Char01')
-        self.Sliders[1]:SetGoal(0, 0, -35)
-        self.Sliders[2] = CreateSlider(self, 'Char02')
-        self.Sliders[2]:SetGoal(0, 0, -15)
-        self.Sliders[3] = CreateSlider(self, 'Char03')
-        self.Sliders[3]:SetGoal(0, 0, 15)
-        self.Sliders[4] = CreateSlider(self, 'Char04')
-        self.Sliders[4]:SetGoal(0, 0, 35)
-        for k, v in self.Sliders do
+        sliders[1] = CreateSlider(self, 'Char01')
+        sliders[1]:SetGoal(0, 0, -35)
+        sliders[2] = CreateSlider(self, 'Char02')
+        sliders[2]:SetGoal(0, 0, -15)
+        sliders[3] = CreateSlider(self, 'Char03')
+        sliders[3]:SetGoal(0, 0, 15)
+        sliders[4] = CreateSlider(self, 'Char04')
+        sliders[4]:SetGoal(0, 0, 35)
+        for k, v in sliders do
             v:SetSpeed(-1)
-            self.Trash:Add(v)
+            TrashBagAdd(trash,v)
         end
     end,
 
+    ---@param self UEA0104
     ExpandThread = function(self)
         if self.Sliders then
             for k, v in self.Sliders do
@@ -107,7 +136,7 @@ UEA0104 = ClassUnit(AirTransport) {
     end,
 
     GetUnitSizes = function(self)
-        local bp = self:GetBlueprint()
+        local bp = self.Blueprint
         if self:GetFractionComplete() < 1.0 then
             return bp.SizeX, bp.SizeY, bp.SizeZ * 0.5
         else

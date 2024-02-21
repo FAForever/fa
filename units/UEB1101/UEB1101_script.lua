@@ -9,10 +9,23 @@
 ----****************************************************************************
 local TEnergyCreationUnit = import("/lua/terranunits.lua").TEnergyCreationUnit
 
+-- upvalue for perfomance
+local CreateSlider = CreateCollisionDetector
+local CreateRotator = CreateRotator
+local WaitFor = WaitFor
+local WaitSeconds = WaitSeconds
+local TrashBadAdd = TrashBag.Add
+
+
+
 ---@class UEB1101 : TEnergyCreationUnit
 UEB1101 = ClassUnit(TEnergyCreationUnit) {
+
     OnCreate = function(self)
         TEnergyCreationUnit.OnCreate(self)
+        local trash = self.Trash
+
+
         self.Sliders = {
             Slider1 = CreateSlider(self, 'B03'),
             Slider2 = CreateSlider(self, 'B04'),
@@ -24,10 +37,10 @@ UEB1101 = ClassUnit(TEnergyCreationUnit) {
             Spinner2 = CreateRotator(self, 'B02', 'y', nil, 0, 30, 360):SetTargetSpeed(0),
         }
         for k, v in self.Sliders do
-            self.Trash:Add(v)
+            TrashBadAdd(trash,v)
         end
         for k, v in self.Spinners do
-            self.Trash:Add(v)
+            TrashBadAdd(trash,v)
         end
     end,
 
@@ -50,26 +63,29 @@ UEB1101 = ClassUnit(TEnergyCreationUnit) {
 
     OpeningState = State {
         Main = function(self)
-            local bp = self:GetBlueprint()
+            local bp = self.Blueprint
+            local sliders = self.Sliders
+            local spinners = self.Spinners
+
             if bp.Audio.Activate then
                 self:PlaySound(bp.Audio.Activate)
             end
-            self.Sliders.Slider1:SetGoal(0, 0, -3)
-            self.Sliders.Slider1:SetSpeed(5)
-            self.Sliders.Slider2:SetGoal(-3, 0, 0)
-            self.Sliders.Slider2:SetSpeed(5)
-            self.Sliders.Slider3:SetGoal(0, 0, 3)
-            self.Sliders.Slider3:SetSpeed(5)
-            self.Sliders.Slider4:SetGoal(3, 0, 0)
-            self.Sliders.Slider4:SetSpeed(5)
-            for k, v in self.Sliders do
+            sliders.Slider1:SetGoal(0, 0, -3)
+            sliders.Slider1:SetSpeed(5)
+            sliders.Slider2:SetGoal(-3, 0, 0)
+            sliders.Slider2:SetSpeed(5)
+            sliders.Slider3:SetGoal(0, 0, 3)
+            sliders.Slider3:SetSpeed(5)
+            sliders.Slider4:SetGoal(3, 0, 0)
+            sliders.Slider4:SetSpeed(5)
+            for k, v in sliders do
                 WaitFor(v)
             end
-            for k, v in self.Spinners do
+            for k, v in spinners do
                 v:SetSpinDown(false)
             end
-            self.Spinners.Spinner1:SetTargetSpeed(180)
-            self.Spinners.Spinner2:SetTargetSpeed(-90)
+            spinners.Spinner1:SetTargetSpeed(180)
+            spinners.Spinner2:SetTargetSpeed(-90)
             WaitSeconds(5)
             ChangeState(self, self.IdleOpenState)
         end,
@@ -77,8 +93,11 @@ UEB1101 = ClassUnit(TEnergyCreationUnit) {
 
     IdleOpenState = State {
         Main = function(self)
-            self.Effect1 = CreateAttachedEmitter(self, 'Exhaust01', self.Army, '/effects/emitters/economy_electricity_01_emit.bp')
-            self.Trash:Add(self.Effecct1)
+            local trash = self.Trash
+            local army = self.Army
+
+            self.Effect1 = CreateAttachedEmitter(self, 'Exhaust01', army, '/effects/emitters/economy_electricity_01_emit.bp')
+            TrashBadAdd(trash, self.Effecct1)
         end,
     },
 

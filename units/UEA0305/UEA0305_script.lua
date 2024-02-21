@@ -10,6 +10,9 @@ local TWeapons = import("/lua/terranweapons.lua")
 local TDFHeavyPlasmaCannonWeapon = TWeapons.TDFHeavyPlasmaCannonWeapon
 local TAirToAirLinkedRailgun = TWeapons.TAirToAirLinkedRailgun
 
+-- upvalue for perfomance
+local TrashBagAdd = TrashBag.Add
+
 
 ---@class UEA0305 : TAirUnit
 UEA0305 = ClassUnit(TAirUnit) {
@@ -27,12 +30,13 @@ UEA0305 = ClassUnit(TAirUnit) {
     OnStopBeingBuilt = function(self,builder,layer)
         TAirUnit.OnStopBeingBuilt(self,builder,layer)
         self:SetMaintenanceConsumptionActive()
+        local trash = self.Trash
 
         -- create the engine thrust manipulators
         for _, bone in self.EngineRotateBones do
             local controller = CreateThrustController(self, 'Thruster', bone)
             controller:SetThrustingParam(-0.0, 0.0, -0.25, 0.25, -0.1, 1, 1.0, 0.25 )
-            self.Trash:Add(controller)
+            TrashBagAdd(trash,controller)
         end
     end,
 

@@ -15,6 +15,9 @@ UAL0303 = ClassUnit(AWalkingLandUnit) {
         FrontTurret01 = ClassWeapon(ADFLaserHighIntensityWeapon) {}
     },
 
+    ---@param self UAL0303
+    ---@param unitBeingBuilt Unit
+    ---@param order string unused
     CreateBuildEffects = function(self, unitBeingBuilt, order)
         EffectUtil.CreateAeonCommanderBuildingEffects(self, unitBeingBuilt, self.Blueprint.General.BuildBones.BuildEffectBones, self.BuildEffectsBag)
     end,
