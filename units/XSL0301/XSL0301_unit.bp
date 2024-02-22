@@ -868,7 +868,7 @@ UnitBlueprint{
             MuzzleChargeDelay = 0.2,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
-            MuzzleVelocity = 7,
+            MuzzleVelocity = 12,
             ProjectileId = "/projectiles/SIFLaanseTacticalMissileSCU/SIFLaanseTacticalMissileSCU_proj.bp",
             ProjectileLifetime = 80,
             ProjectilesPerOnFire = 1,

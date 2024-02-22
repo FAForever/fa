@@ -24,10 +24,11 @@
 local SLaanseTacticalMissile = import("/lua/seraphimprojectiles.lua").SLaanseTacticalMissile
 local TacticalMissileComponent = import('/lua/sim/DefaultProjectiles.lua').TacticalMissileComponent
 
---- used by XSB0208
+--- used by XSB2108
 ---@class SIFLaanseTacticalMissile04 : SLaanseTacticalMissile, TacticalMissileComponent
 SIFLaanseTacticalMissile04 = ClassProjectile(SLaanseTacticalMissile, TacticalMissileComponent) {
-    LaunchTicks = 16,
+
+    LaunchTicks = 9,
     LaunchTicksRange = 1,
     LaunchTurnRate = 20,
     LaunchTurnRateRange = 1,
