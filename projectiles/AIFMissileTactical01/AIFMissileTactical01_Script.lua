@@ -4,6 +4,8 @@ local AMissileSerpentineProjectile = import("/lua/aeonprojectiles.lua").AMissile
 ---@class AIFMissileTactical01 : AMissileSerpentineProjectile
 AIFMissileTactical01 = ClassProjectile(AMissileSerpentineProjectile) {
 
+    TerminalZigZagMultiplier = 0.5,
+
     ---@param self AIFMissileTactical01
     OnCreate = function(self)
         AMissileSerpentineProjectile.OnCreate(self)

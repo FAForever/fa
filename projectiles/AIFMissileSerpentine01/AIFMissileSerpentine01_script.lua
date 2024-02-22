@@ -8,5 +8,7 @@ AIFMissileSerpentine01 = ClassProjectile(AMissileSerpentineProjectile) {
     HeightDistanceFactor = 8,
     MinHeight = 2,
     FinalBoostAngle = 20,
+
+    TerminalZigZagMultiplier = 0.5,
 }
 TypeClass = AIFMissileSerpentine01

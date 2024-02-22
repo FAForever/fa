@@ -28,20 +28,21 @@ local MathAbs = math.abs
 ---@field TerminalTimeFactor number # Duration of the terminal phase as a proportion of glide time. Default is 0.25.
 ---@field TerminalDistance number   # Approximate distance from the target where terminal phase starts, overrides TerminalTimeFactor.
 ---@field TerminalSpeed number      # MaxSpeed of the missile in the terminal phase.
----@field TerminalZigZag number     # MaxZigZag of the missile in the terminal phase. Default is 0.5.
+---@field TerminalZigZagMultiplier number     # MaxZigZag of the missile in the terminal phase. Default is 0.25.
 TacticalMissileComponent = ClassSimple(SemiBallisticComponent) {
     
     TerminalTimeFactor = 0.25,
-    TerminalZigZag = 0.5,
+    TerminalZigZagMultiplier = 0.25,
 
     ---@param self TacticalMissileComponent | Projectile
     MovementThread = function(self, skipLaunchSequence)
         local blueprintPhysics = self.Blueprint.Physics
+        local blueprintMaxZigZag = blueprintPhysics.MaxZigZag
 
         -- are we a wiggler?
         local zigZagger = false
-        if blueprintPhysics.MaxZigZag and
-            blueprintPhysics.MaxZigZag > self.MaxZigZagThreshold then
+        if blueprintMaxZigZag and
+            blueprintMaxZigZag > self.MaxZigZagThreshold then
             zigZagger = true
         end
 
@@ -100,7 +101,7 @@ TacticalMissileComponent = ClassSimple(SemiBallisticComponent) {
         local terminalTime = glideTime * self.TerminalTimeFactor
         local terminalDistance = self.TerminalDistance
         local terminalSpeed = self.TerminalSpeed
-        local terminalZigZag = self.TerminalZigZag
+        local terminalZigZagMultiplier = self.TerminalZigZagMultiplier
 
         local maxSpeed = blueprintPhysics.MaxSpeed
         local accel = blueprintPhysics.Acceleration
@@ -139,7 +140,10 @@ TacticalMissileComponent = ClassSimple(SemiBallisticComponent) {
 
         glideTime = terminalTime
 
-        self:ChangeMaxZigZag(terminalZigZag)
+        -- at this point we just want to make sure we hit the target, we increase the glide turn rate based
+        -- on the zig zag that the missile had during flight to make sure it can align if it needs to
+        self:ChangeMaxZigZag(terminalZigZagMultiplier * blueprintMaxZigZag)
+        self:SetTurnRate((1 + 0.6 * blueprintMaxZigZag) * glideTurnRate)
 
         -- wait until we've allegedly hit our target
         WaitTicks((glideTime + 1) * 10)
