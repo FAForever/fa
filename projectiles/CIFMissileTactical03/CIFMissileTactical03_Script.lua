@@ -6,7 +6,7 @@ local CLOATacticalMissileProjectile = import("/lua/cybranprojectiles.lua").CLOAT
 --- if it takes enough damage.
 ---@class CIFMissileTactical03 : CLOATacticalMissileProjectile
 CIFMissileTactical03 = ClassProjectile(CLOATacticalMissileProjectile) {
-    NumChildMissiles = 3,
+    ChildCount = 3,
 
     ---@param self CLOATacticalMissileProjectile
     OnCreate = function(self)
