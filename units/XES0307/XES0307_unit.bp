@@ -19,7 +19,6 @@ UnitBlueprint{
     BuildIconSortPriority = 20,
     Categories = {
         "ANTIMISSILE",
-        "ANTINAVY",
         "BATTLESHIP",
         "BUILTBYTIER3FACTORY",
         "DIRECTFIRE",
@@ -37,6 +36,7 @@ UnitBlueprint{
         "TECH3",
         "UEF",
         "VISIBLETORECON",
+        "WEAKANTINAVY",
     },
     Defense = {
         AirThreatLevel = 0,
