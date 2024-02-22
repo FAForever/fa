@@ -193,7 +193,6 @@ UnitBlueprint{
             FireTargetLayerCapsTable = { Water = "Land|Water|Seabed" },
             FiringTolerance = 2,
             Label = "Missile",
-            MaxProjectileStorage = 1,
             MaxRadius = 150,
             MinRadius = 18,
             MuzzleSalvoDelay = 0,
