@@ -340,10 +340,10 @@ local UnitBuildEffects = {
 ---@param buildEffectsBag TrashBag
 function CreateCybranFactoryBuildEffects(builder, unitBeingBuilt, buildBones, buildEffectsBag)
     CreateCybranBuildBeamsOpti(builder, nil, unitBeingBuilt, buildEffectsBag, false)
-    WaitTicks(10)
+    WaitTicks(8)
 
     local builderArmy = builder.Army
-    while not unitBeingBuilt:BeenDestroyed() do
+    if not unitBeingBuilt:BeenDestroyed() then
         for _, bone in buildBones.BuildEffectBones do
             for _, effect in BuildEffects do
                 TrashBagAdd(buildEffectsBag, CreateAttachedEmitter(builder, bone, builderArmy, effect))
