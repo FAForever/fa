@@ -3923,23 +3923,37 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         end
     end,
 
+    --- Multiplies the time it takes to capture a unit, defaults to 1.0. Often
+    --- used by campaign events.
     ---@param self Unit
-    ---@param time_mult number
-    SetCaptureTimeMultiplier = function(self, time_mult)
-        self.CaptureTimeMultiplier = time_mult
+    ---@param captureTimeMultiplier number
+    SetCaptureTimeMultiplier = function(self, captureTimeMultiplier)
+        self.CaptureTimeMultiplier = captureTimeMultiplier
     end,
 
-    -- Return the total time in seconds, cost in energy, and cost in mass to capture the given target.
+    --- Return the total time in seconds, cost in energy, and cost in mass to 
+    --- capture the given target. The function is called for all attached units 
+    --- to the target, the results are combined by the engine.
     ---@param self Unit
-    ---@param target_entity Entity
+    ---@param target Unit
     ---@return number time
     ---@return number energy
     ---@return number zero
-    GetCaptureCosts = function(self, target_entity)
-        local target_bp = target_entity:GetBlueprint().Economy
-        local bp = self.Blueprint.Economy
-        local time = ((target_bp.BuildTime or 10) / self:GetBuildRate()) / 2
-        local energy = target_bp.BuildCostEnergy or 100
+    GetCaptureCosts = function(self, target)
+        -- if the target is not a unit then we ignore it
+        if not target.IsUnit then
+            return 0, 0, 0
+        end
+
+        -- if the target is not fully built then we ignore it, applies to factories
+        if target:GetFractionComplete() < 1.0 then
+            return 0, 0, 0
+        end
+
+        -- compute capture costs
+        local targetBlueprintEconomy = target.Blueprint.Economy
+        local time = ((targetBlueprintEconomy.BuildTime or 10) / self:GetBuildRate()) / 2
+        local energy = targetBlueprintEconomy.BuildCostEnergy or 100
         time = time * (self.CaptureTimeMultiplier or 1)
 
         return time, energy, 0
