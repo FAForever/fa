@@ -197,8 +197,8 @@ function CreateExtendedToolTip(parent, text, desc, width, padding, descFontSize,
     desc = LOC(desc)
     -- scale padding by UI scaling factor so we do not need to do this later in code
     -- when adjusting position of tooltip elements
-    -- default padding should be 2-4 to text is not to close to tooltip border but kept original value
-    padding = LayoutHelpers.ScaleNumber(padding or 0)
+    -- using passed or default padding to 5 so text is not to close too tooltip's border
+    padding = LayoutHelpers.ScaleNumber(padding or 5)
     -- using passed font size or falling back to default values which should be the same but kept original values
     descFontSize = descFontSize or 12
     textFontSize = textFontSize or 14
