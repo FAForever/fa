@@ -15,18 +15,6 @@
 local FormationGroups = import("/lua/shared/Formations/FormationGroups.lua")
 local AttackFormation2 = import("/lua/shared/Formations/AttackFormation.lua").AttackFormation
 
---- A list of formation positions. The number of entries represents the number of units in the formation.
----@alias TacticalFormation FormationPosition[]
-
---- We do not assign a formation position to a specific unit. Instead, we define an offset 
---- and which categories a units needs to satisfy to occupy that location. 
----@class FormationPosition
----@field [1] number            # x offset
----@field [2] number            # z offset
----@field [3] EntityCategory    # categories of the unit that can occupy this position
----@field [4] number            # formation delay, is floored and therefore decimal values are meaningless. All units of a given number will move at once, starting at 0
----@field [5] boolean           # flag whether rotation matters for this position
-
 -- upvalue scope for performance
 local TableGetn = table.getn
 local TableInsert = table.insert
@@ -256,7 +244,15 @@ end
 ---@return table
 function GrowthFormation(formationUnits)
 
+    local formation = import("/lua/shared/Formations/GrowFormation.lua").ComputeFormation
     
+    local ok, msg = pcall(formation, formationUnits)
+    if ok then
+        local formation = formation(formationUnits)
+        return formation
+    else
+        WARN(msg)
+    end
 
     LOG('GrowthFormation')
     local cachedResults = GetCachedResults(formationUnits, 'GrowthFormation')
