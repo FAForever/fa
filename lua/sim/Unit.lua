@@ -41,6 +41,8 @@ local DefaultTerrainType = GetTerrainType(-1, -1)
 
 local GetNearestPlayablePoint = import("/lua/scenarioframework.lua").GetNearestPlayablePoint
 
+
+
 --- Structures that are reused for performance reasons
 --- Maps unit.techCategory to a number so we can do math on it for naval units
 
@@ -103,6 +105,8 @@ SyncMeta = {
 ---@field Combat? boolean
 
 local cUnit = moho.unit_methods
+local cUnitGetBuildRate = cUnit.GetBuildRate
+
 ---@class Unit : moho.unit_methods, InternalObject, IntelComponent, VeterancyComponent, AIUnitProperties
 ---@field AIManagerIdentifier? string
 ---@field Repairers table<EntityId, Unit>
@@ -132,6 +136,8 @@ local cUnit = moho.unit_methods
 ---@field IdleEffectsBag TrashBag
 ---@field SiloWeapon? Weapon
 ---@field SiloProjectile? ProjectileBlueprint
+---@field ReclaimTimeMultiplier? number
+---@field CaptureTimeMultiplier? number
 Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
 
     IsUnit = true,
@@ -1076,7 +1082,12 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
 
     ---@param self Unit
     GetBuildRate = function(self)
-        return math.max(moho.unit_methods.GetBuildRate(self), 0.00001) -- Make sure we're never returning 0, this value will be used to divide with
+        local buildrate = cUnitGetBuildRate(self)
+        if buildrate < 0 then
+            buildrate = 0.00001
+        else
+            return buildrate
+        end
     end,
 
     ---@param self Unit
@@ -3896,31 +3907,44 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         self.ReclaimTimeMultiplier = time_mult
     end,
 
-    -- Return the total time in seconds, cost in energy, and cost in mass to reclaim the given target from 100%.
-    -- The energy and mass costs will normally be negative, to indicate that you gain mass/energy back.
+    --- Returns the duration, energy cost, and mass cost to reclaim the given
+    --- target when it has full health. The engine then factors in the
+    --- progression.
+    ---
+    --- Is called each tick to recompute the costs.
     ---@param self Unit
-    ---@param target_entity Entity
-    ---@return number time
-    ---@return number energy
-    ---@return number mass
-    GetReclaimCosts = function(self, target_entity)
-        if IsUnit(target_entity) then
-            local bp = self.Blueprint
-            local target_bp = target_entity:GetBlueprint()
-            local mtime = target_bp.Economy.BuildCostEnergy / self:GetBuildRate()
-            local etime = target_bp.Economy.BuildCostMass / self:GetBuildRate()
-            local time = mtime
-            if mtime < etime then
-                time = etime
+    ---@param target Unit | Prop
+    ---@return number time      # time in seconds
+    ---@return number energy    # only applies to props
+    ---@return number mass      # only applies to props
+    GetReclaimCosts = function(self, target)
+        if target.IsProp then
+            return target:GetReclaimCosts(self)
+        end
+
+        if target.IsUnit then
+            local buildrate = self:GetBuildRate()
+            local reclaimTimeMultiplier = self.ReclaimTimeMultiplier or 1
+            local targetBlueprintEconomy = target.Blueprint.Economy
+            local buildEnergyCosts = targetBlueprintEconomy.BuildCostEnergy
+            local buildMassCosts = targetBlueprintEconomy.BuildCostMass
+
+            -- find largest build cost value, this is always energy? :)
+            local costs = buildEnergyCosts
+            if buildMassCosts > buildEnergyCosts then
+                costs = buildMassCosts
             end
 
-            time = time * (self.ReclaimTimeMultiplier or 1)
-            time = math.max((time / 10), 0.0001)  -- This should never be 0 or we'll divide by 0
+            duration = (0.1 * costs * reclaimTimeMultiplier) / buildrate
+            if duration < 0 then
+                duration = 1
+            end
 
-            return time, target_bp.Economy.BuildCostEnergy, target_bp.Economy.BuildCostMass
-        elseif IsProp(target_entity) then
-            return target_entity:GetReclaimCosts(self)
+            -- for units the energy and mass fields are ignored but they do need to exist or the engine burps
+            return duration, 0, 0
         end
+
+        return 0, 0, 0
     end,
 
     --- Multiplies the time it takes to capture a unit, defaults to 1.0. Often
@@ -3936,7 +3960,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
     --- to the target, the results are combined by the engine.
     ---@param self Unit
     ---@param target Unit
-    ---@return number time
+    ---@return number time      # time in seconds
     ---@return number energy
     ---@return number zero
     GetCaptureCosts = function(self, target)
@@ -3955,6 +3979,9 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         local time = ((targetBlueprintEconomy.BuildTime or 10) / self:GetBuildRate()) / 2
         local energy = targetBlueprintEconomy.BuildCostEnergy or 100
         time = time * (self.CaptureTimeMultiplier or 1)
+        if time < 0 then
+            time = 1
+        end
 
         return time, energy, 0
     end,
