@@ -5,7 +5,7 @@ local CLOATacticalMissileProjectile = import("/lua/cybranprojectiles.lua").CLOAT
 --- Splits into child projectile if it takes enough damage.
 ---@class CIFMissileTactical01 : CLOATacticalMissileProjectile
 CIFMissileTactical01 = ClassProjectile(CLOATacticalMissileProjectile) {
-    NumChildMissiles = 3,
+    ChildCount = 3,
 
     FxUnitHitScale = 0.5,
     FxLandHitScale = 0.5,

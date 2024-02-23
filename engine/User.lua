@@ -1,5 +1,12 @@
 ---@meta
 
+---@class UIHighlightedCommand
+---@field x number
+---@field y number
+---@field z number
+---@field targetId? EntityId
+---@field blueprintId? UnitId
+---@field commandType number
 
 ---@alias SubmergeStatus
 ---| -1  # submerged
@@ -258,7 +265,7 @@ function GetCurrentUIState()
 end
 
 ---
----@return Cursor
+---@return UICursor
 function GetCursor()
 end
 
@@ -293,6 +300,11 @@ end
 --- Returns a formatted string displaying the time the game has been played
 ---@return string
 function GetGameTime()
+end
+
+--- Returns information about the command of the command graph that is below the cursor
+---@return UIHighlightedCommand?
+function GetHighlightCommand()
 end
 
 --- Returns a table of idle engineer units for the army
@@ -955,7 +967,7 @@ function SetCurrentFactoryForQueueDisplay(unit)
 end
 
 ---
----@param cursor Cursor
+---@param cursor UICursor
 function SetCursor(cursor)
 end
 
@@ -1156,7 +1168,7 @@ function WorldIsPlaying()
 end
 
 --- For internal use by `Cursor.__init()`
----@param cursor Cursor
+---@param cursor UICursor
 ---@param spec fa-class | nil
 function _c_CreateCursor(cursor, spec)
 end

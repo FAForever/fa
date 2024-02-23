@@ -1678,6 +1678,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         energy = energy * (bp.Wreckage.EnergyMult or 0)
         local time = (bp.Wreckage.ReclaimTimeMultiplier or 1)
         local pos = self:GetPosition()
+        local wasOutside = false
         local layer = self.Layer
 
         -- Reduce the mass value based on the tech tier
@@ -1706,7 +1707,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
 
         -- Create potentially offmap wrecks on-map. Exclude campaign maps that may do weird scripted things.
         if self.Brain.BrainType == 'Human' and (not ScenarioInfo.CampaignMode) then
-            pos = GetNearestPlayablePoint(pos)
+            pos, wasOutside = GetNearestPlayablePoint(pos)
         end
 
         local halfBuilt = self:GetFractionComplete() < 1
@@ -1729,7 +1730,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         -- Attempt to copy our animation pose to the prop. Only works if
         -- the mesh and skeletons are the same, but will not produce an error if not.
         if self.Tractored or (layer ~= 'Air' or (layer == "Air" and halfBuilt)) then
-            TryCopyPose(self, prop, false)
+            TryCopyPose(self, prop, not wasOutside)
         end
 
         -- Create some ambient wreckage smoke
@@ -4606,6 +4607,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
     -------------------------------------------------------------------------------------------
     -- TELEPORTING
     -------------------------------------------------------------------------------------------
+
     ---@param self Unit
     ---@param teleporter any
     ---@param location Vector
@@ -4677,38 +4679,18 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         self:PlayUnitSound('TeleportStart')
         self:PlayUnitAmbientSound('TeleportLoop')
 
-        local bp = self.Blueprint
-        local teleDelay = bp.General.TeleportDelay
-        local bpEco = bp.Economy
-        local energyCost, time
-        
-        if bpEco then
-            local mass = (bpEco.TeleportMassCost or bpEco.BuildCostMass or 1) * (bpEco.TeleportMassMod or 0.01)
-            local energy = (bpEco.TeleportEnergyCost or bpEco.BuildCostEnergy or 1) * (bpEco.TeleportEnergyMod or 0.01)
-            energyCost = mass + energy
-            time = energyCost * (bpEco.TeleportTimeMod or 0.01)
-        end
+        local energyCost, time, teleDelay = import('/lua/shared/teleport.lua').TeleportCostFunction(self, location)
 
         if teleDelay then
-            energyCostMod = (time + teleDelay) / time
-            time = time + teleDelay
-            energyCost = energyCost * energyCostMod
-
             self.TeleportDestChargeBag = nil
             self.TeleportCybranSphere = nil  -- this fixes some "...Game object has been destroyed" bugs in EffectUtilities.lua:TeleportChargingProgress
-
-            self.TeleportDrain = CreateEconomyEvent(self, energyCost or 100, 0, time or 5, self.UpdateTeleportProgress)
-
-            -- Create teleport charge effect + exit animation delay
-            self:PlayTeleportChargeEffects(location, orientation, teleDelay)
-            WaitFor(self.TeleportDrain)
-        else
-            self.TeleportDrain = CreateEconomyEvent(self, energyCost or 100, 0, time or 5, self.UpdateTeleportProgress)
-
-            -- Create teleport charge effect
-            self:PlayTeleportChargeEffects(location, orientation)
-            WaitFor(self.TeleportDrain)
         end
+
+        self.TeleportDrain = CreateEconomyEvent(self, energyCost or 100, 0, time or 5, self.UpdateTeleportProgress)
+
+        -- Create teleport charge effect + exit animation delay
+        self:PlayTeleportChargeEffects(location, orientation, teleDelay)
+        WaitFor(self.TeleportDrain)
 
         if self.TeleportDrain then
             RemoveEconomyEvent(self, self.TeleportDrain)

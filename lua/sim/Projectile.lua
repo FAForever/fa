@@ -202,10 +202,12 @@ Projectile = ClassProjectile(ProjectileMethods) {
             local px, _, pz = self:GetCurrentTargetPositionXYZ()
 
             local physics = self.Blueprint.Physics
-            local fuzziness = physics.TrackTargetGroundFuzziness or 0.8
+            local fuzziness = physics.TrackTargetGroundFuzziness or 0
             local offset = physics.TrackTargetGroundOffset or 0
             local tx = px + (Random() - 0.5) * fuzziness * (1 + offset)
             local tz = pz + (Random() - 0.5) * fuzziness * (1 + offset)
+
+            DrawCircle({tx, GetSurfaceHeight(tx, tz), tz}, 1, 'ffffff')
             self:SetNewTargetGroundXYZ(tx, GetSurfaceHeight(tx, tz), tz)
         end
     end,
@@ -580,7 +582,7 @@ Projectile = ClassProjectile(ProjectileMethods) {
     RetargetThread = function(self)
         local createdByWeapon = self.CreatedByWeapon
         if createdByWeapon then
-            WaitTicks(0.2)
+            WaitTicks(0.5)
 
             if IsDestroyed(self) then
                 return

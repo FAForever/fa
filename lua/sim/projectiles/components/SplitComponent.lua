@@ -20,6 +20,9 @@
 --** SOFTWARE.
 --**********************************************************************************
 
+-- upvalue scope for performance
+local ForkThread = ForkThread
+
 ---@class SplitComponent
 SplitComponent = ClassSimple {
 
@@ -33,7 +36,16 @@ SplitComponent = ClassSimple {
 
         for k = 1, childCount do
             local childProjectile = self:CreateChildProjectile(childBlueprint)
+
+            -- sometimes the OnCreate is not called by the engine
+            if not childProjectile.Trash then
+                continue
+            end
+
+            -- inherit some properties
+            childProjectile.Launcher = self.Launcher
             childProjectile.DamageData = self.DamageData
+            childProjectile.CreatedByWeapon = self.CreatedByWeapon
 
             if inheritTargetGround then
                 childProjectile:SetTurnRate(40)
