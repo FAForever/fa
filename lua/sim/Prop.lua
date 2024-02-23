@@ -277,6 +277,7 @@ Prop = Class(moho.prop_methods) {
         local time = (timeReclaim or 0) * (maxValue / reclaimer:GetBuildRate())
         time = time / 10
 
+        LOG(time)
         -- prevent division by 0 when the prop has no value
         if time < 0 then
             time = 0.0001
