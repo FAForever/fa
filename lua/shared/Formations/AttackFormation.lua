@@ -31,6 +31,36 @@ local LandFormationPreferencesCache = import("/lua/shared/Formations/LandFormati
 local CleanupLandFormationPreferences = import("/lua/shared/Formations/LandFormationPreferences.lua").CleanupLandFormationPreferences
 local PopulateLandFormationPreferences = import("/lua/shared/Formations/LandFormationPreferences.lua").PopulateLandFormationPreferences
 
+---@class AttackFormationRow
+---@field Delay number
+---@field [1] EntityCategory[]
+---@field [2] EntityCategory[]
+---@field [3] EntityCategory[]
+---@field [4] EntityCategory[]
+---@field [5] EntityCategory[]
+---@field [6] EntityCategory[]
+---@field [7] EntityCategory[]
+---@field [8] EntityCategory[]
+---@field [9] EntityCategory[]
+---@field [10] EntityCategory[]
+
+---@class AttackFormation
+---@field Count number
+---@field Rows number
+---@field Columns number
+---@field FootprintSizeXMultiplier number
+---@field FootprintSizeZMultiplier number
+---@field [1] AttackFormationRow
+---@field [2] AttackFormationRow
+---@field [3] AttackFormationRow
+---@field [4] AttackFormationRow
+---@field [5] AttackFormationRow
+---@field [6] AttackFormationRow
+---@field [7] AttackFormationRow
+---@field [8] AttackFormationRow
+---@field [9] AttackFormationRow
+---@field [10] AttackFormationRow
+
 local TableGetn = table.getn
 
 --- A table that contains the blueprint lookups that we can re-use.
@@ -42,23 +72,18 @@ local BlueprintList = {}
 local TacticalFormation = {}
 
 ---@type BlueprintId[]
-local oc = {}
-
--- pre-populate the first 2048 cells
-for k = 1, 2048 do
-    oc[k] = nil
-    TacticalFormation[k] = nil
-end
+local OccupationCache = {}
+local FootprintCache = {}
 
 ---@param blueprintCountCache BlueprintLookupTable
 ---@param blueprintListCache BlueprintId[]
 ---@param unitCount number
-AttackFormationLand = function(blueprintCountCache, blueprintListCache, unitCount)
-
-    -- clean up occupation data
-    for o = 1, TableGetn(oc) do
-        oc[o] = nil
-    end
+---@param occupationCache Blueprint[]
+---@param footprintCache number[]
+---@return AttackFormation  # formation rows
+---@return Blueprint[]      # occupation cache
+---@return number[]         # footprint cache
+AttackFormationLand = function(blueprintCountCache, blueprintListCache, unitCount, occupationCache, footprintCache)
 
     -- choose a formation that best matches the unit count
     local formation = LandFormations[1]
@@ -69,37 +94,49 @@ AttackFormationLand = function(blueprintCountCache, blueprintListCache, unitCoun
         end
     end
 
-    local spacingMultiplier = formation.SpacingMultiplier
+    -- local scope for quick access
+    local formationCount = formation.Count
+    local formationRows = formation.Rows
+    local formationColumns = formation.Columns
+    local landFormationPreferencesCache = LandFormationPreferencesCache
 
-    local preference = LandFormationPreferencesCache
+    ---------------------------------------------------------------------------
+    --#region Clean up caches
+    for o = 1, formationCount do
+        occupationCache[o] = nil
+    end
+
+    for ly = 1, formationRows do
+        footprintCache[ly] = 0
+    end
+
+    --#endregion
 
     for index = 1, 3 do
 
-        CleanupLandFormationPreferences(preference)
-        PopulateLandFormationPreferences(preference, blueprintListCache, index)
+        -- prepare this iteration
+        CleanupLandFormationPreferences(landFormationPreferencesCache)
+        PopulateLandFormationPreferences(landFormationPreferencesCache, blueprintListCache, index)
 
-        -- go through the formation to apply the preference
-        local countRows = TableGetn(formation)
-
-        for ly = 1, countRows do
-            local row = formation[ly]
-            local countColumns = TableGetn(row)
-            local halfColumns = math.floor(0.5 * countColumns)
+        -- populate the formation
+        for ly = 1, formationRows do
+            local formationRow = formation[ly]
+            local formationRowDelay = formationRow.Delay
 
             -- go through reach column
-            for lx = 1, countColumns do
-                local cell = row[lx]
+            for lx = 1, formationColumns do
+                local cell = formationRow[lx]
 
                 -- map two dimensional index to one dimensional array
-                local oi       = (ly - 1) * countColumns + lx
-                local occupied = oc[oi]
+                local oi       = (ly - 1) * formationColumns + lx
+                local occupied = occupationCache[oi]
 
                 -- if this cell is not occupied
                 if not occupied then
 
                     -- and we fit the category, then we put ourselves there
                     local categoryIdentifier = cell[index]
-                    local firstPreferences = preference[categoryIdentifier]
+                    local firstPreferences = landFormationPreferencesCache[categoryIdentifier]
 
                     for k = 1, TableGetn(firstPreferences) do
                         local blueprintId = firstPreferences[k]
@@ -107,8 +144,15 @@ AttackFormationLand = function(blueprintCountCache, blueprintListCache, unitCoun
                         if blueprintIdCount > 0 then
                             blueprintCountCache[blueprintId] = blueprintCountCache[blueprintId] - 1
 
-                            oc[oi] = blueprintId
-                            TacticalFormation[oi] = { spacingMultiplier * (lx - halfColumns), spacingMultiplier * (-1 * ly), categories[blueprintId], row.Delay, true }
+                            -- update occupation cache
+                            occupationCache[oi] = blueprintId
+
+                            -- update footprint cache
+                            local blueprintFootprintSizeZ = __blueprints[blueprintId].Footprint.SizeZ
+                            if (footprintCache[ly]) < blueprintFootprintSizeZ then
+                                footprintCache[ly] = blueprintFootprintSizeZ
+                            end
+
                             break
                         end
                     end
@@ -120,23 +164,65 @@ AttackFormationLand = function(blueprintCountCache, blueprintListCache, unitCoun
         blueprintListCache = UpdateBlueprintListCache(blueprintCountCache, blueprintListCache)
     end
 
-    return TacticalFormation
+    return formation, occupationCache, footprintCache
 end
 
 ---@param units (Unit[] | UserUnit[])
 ---@return TacticalFormation
 AttackFormation = function(units)
-
-    LOG("AttackFormation")
-
-    -- clean up old formation data
-    for k = 1, TableGetn(TacticalFormation) do
-        TacticalFormation[k] = nil
-    end
+    -- local scope for performance
+    local occupationCache = OccupationCache
+    local footprintCache = FootprintCache
+    local tacticalFormation = TacticalFormation
 
     -- gather information about the units
     local blueprintLookup, blueprintList, unitCount = ToBlueprintLookup(units, BlueprintLookup, BlueprintList)
     local maximumFootprintSize = MaximumFootprint(blueprintLookup)
 
-    return AttackFormationLand(blueprintLookup, blueprintList, unitCount)
+    do -- create land/amphibious formations
+        local formation, occupationCache, footprintCache = AttackFormationLand(
+            blueprintLookup, blueprintList, unitCount, occupationCache, footprintCache)
+
+        -- retrieve information
+        local formationCount = formation.Count
+        local formationRows = formation.Rows
+        local formationColumns = formation.Columns
+        local formationHalfColumns = 0.5 * formationColumns
+        local formationFootprintSizeXMultiplier = formation.FootprintSizeXMultiplier
+        local formationFootprintSizeZMultiplier = formation.FootprintSizeZMultiplier
+
+        for ly = 1, formationRows do
+            local formationRow = formation[ly]
+            local formationRowDelay = formationRow.Delay
+            local formationRowFootprintSizeZ = footprintCache[ly]
+
+            for lx = 1, formationColumns do
+                -- map two dimensional index to one dimensional array
+                local oi       = (ly - 1) * formationColumns + lx
+                local occupied = occupationCache[oi]
+
+                if occupied then
+                    tacticalFormation[oi] = {
+                        formationFootprintSizeXMultiplier * (lx - formationHalfColumns),
+                        formationFootprintSizeZMultiplier * (-1 * ly),
+                        categories[occupied], formationRowDelay, true
+                    }
+                end
+            end
+        end
+    end
+
+    do -- create air formations
+
+    end
+
+    do -- create water formations
+
+    end
+
+    do -- create submarine formations
+
+    end
+
+    return tacticalFormation
 end

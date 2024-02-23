@@ -32,9 +32,11 @@ local CounterintelligenceFirst = import("/lua/shared/Formations/LandFormationPre
 local IntelligenceFirst = import("/lua/shared/Formations/LandFormationPreferences.lua").LandIntelligenceFirst
 local EngineeringFirst = import("/lua/shared/Formations/LandFormationPreferences.lua").LandEngineeringFirst
 
+---@type AttackFormation
 OneRowLandFormation = {
     Identifier = 'OneRowLandFormation',
-    SpacingMultiplier = 1.15,
+    FootprintSizeXMultiplier = 1.15,
+    FootprintSizeZMultiplier = 1.15,
     [1] = {
         Delay = 0,
         DirectFireFirst,
@@ -49,7 +51,8 @@ OneRowLandFormation = {
 
 TwoRowLandFormation = {
     Identifier = 'TwoRowLandFormation',
-    SpacingMultiplier = 1.2,
+    FootprintSizeXMultiplier = 1.2,
+    FootprintSizeZMultiplier = 1.2,
     [1] = {
         Delay = 0,
         DirectFireFirst,
@@ -74,7 +77,8 @@ TwoRowLandFormation = {
 
 ThreeRowLandFormation = {
     Identifier = 'ThreeRowLandFormation',
-    SpacingMultiplier = 1.25,
+    FootprintSizeXMultiplier = 1.25,
+    FootprintSizeZMultiplier = 1.25,
     [1] = {
         Delay = 0,
         DirectFireFirst,
@@ -115,7 +119,8 @@ ThreeRowLandFormation = {
 
 FourRowLandFormation = {
     Identifier = 'FourRowLandFormation',
-    SpacingMultiplier = 1.3,
+    FootprintSizeXMultiplier = 1.3,
+    FootprintSizeZMultiplier = 1.3,
     [1] = {
         Delay = 0,
         DirectFireFirst,
@@ -203,5 +208,7 @@ for k = 1, table.getn(LandFormations) do
         end
     end
 
+    formation.Rows = table.getn(formation)
+    formation.Columns = table.getn(formation[1])
     formation.Count = count
 end

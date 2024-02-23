@@ -64,6 +64,7 @@ LandFormationCategoriesShield = LAND * (SHIELD)
 LandFormationCategoriesEngineering = LAND * (ENGINEER) - (COMMAND)
 LandFormationCategoriesScout = LAND * (SCOUT) - (DIRECTFIRE + ANTIAIR + INDIRECTFIRE)
 LandFormationCategoriesCounterintelligence = LAND * (COUNTERINTELLIGENCE) - (DIRECTFIRE + ANTIAIR + INDIRECTFIRE)
+LandFormationCategoriesEngineeering = LAND * (ENGINEER) - (DIRECTFIRE + ANTIAIR + INDIRECTFIRE)
 
 LandFormationCategories = {
     CategoriesAllUnits = CategoriesAllUnits,
@@ -80,6 +81,7 @@ LandFormationCategories = {
     LandFormationCategoriesShield = LandFormationCategoriesShield,
     LandFormationCategoriesScout = LandFormationCategoriesScout,
     LandFormationCategoriesCounterintelligence = LandFormationCategoriesCounterintelligence,
+    LandFormationCategoriesEngineeering = LandFormationCategoriesEngineeering,
 }
 
 if Debug then
