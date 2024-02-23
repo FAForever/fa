@@ -3932,7 +3932,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
             -- find largest build cost value, this is always energy? :)
             local costs = buildEnergyCosts
             if buildMassCosts > buildEnergyCosts then
-                costs = buildEnergyCosts
+                costs = buildMassCosts
             end
 
             duration = (0.1 * costs * reclaimTimeMultiplier) / buildrate
