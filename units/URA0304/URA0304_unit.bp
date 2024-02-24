@@ -61,6 +61,7 @@ UnitBlueprint{
         "STRATEGICBOMBER",
         "TECH3",
         "VISIBLETORECON",
+        "ANTIAIRWEAK",
     },
     Defense = {
         AirThreatLevel = 3.5,
