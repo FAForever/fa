@@ -84,7 +84,6 @@ ComputeFormation = function(units)
         local horizontalOffset = 0
         if unitsRemainingCount < formationColumns then
             horizontalOffset = sparsityMultiplier * 0.5 * (formationColumns - unitsRemainingCount)
-            LOG(horizontalOffset)
         end
 
         -- from center to the right
@@ -93,7 +92,7 @@ ComputeFormation = function(units)
 
             local unit = units[oi]
             if unit then
-                local formation = GetFormationEntry(oi)
+                local formation = GetFormationEntry(oi + 1)
                 formation[1] = horizontalOffset + sparsityMultiplier * (lx - formationCenter)
                 formation[2] = sparsityMultiplier * (-1 * ly)
                 formation[3] = categories[unit:GetBlueprint().BlueprintId]
@@ -107,7 +106,7 @@ ComputeFormation = function(units)
 
             local unit = units[oi]
             if unit then
-                local formation = GetFormationEntry(oi)
+                local formation = GetFormationEntry(oi + 1)
                 formation[1] = horizontalOffset + sparsityMultiplier * (lx - formationCenter)
                 formation[2] = sparsityMultiplier * (-1 * ly)
                 formation[3] = categories[unit:GetBlueprint().BlueprintId]
@@ -115,6 +114,7 @@ ComputeFormation = function(units)
             end
         end
 
+        -- break if we have no units left
         if unitsRemainingCount > formationColumns then
             unitsRemainingCount = unitsRemainingCount - formationColumns
         else
