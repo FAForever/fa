@@ -25,6 +25,8 @@ local EffectTemplate = import("/lua/effecttemplates.lua")
 
 ---@class AIFQuanticArtillery : DefaultProjectileWeapon
 AIFQuanticArtillery = ClassWeapon(DefaultProjectileWeapon) {
+	FxMuzzleFlashScale = 1.25,
+	FxChargeMuzzleFlashScale = 1.25,
     FxMuzzleFlash = EffectTemplate.Aeon_QuanticClusterMuzzleFlash,
     FxChargeMuzzleFlash = EffectTemplate.Aeon_QuanticClusterChargeMuzzleFlash,
 }

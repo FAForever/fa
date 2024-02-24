@@ -49,9 +49,6 @@ OverchargeWeapon = ClassWeapon(DefaultProjectileWeapon) {
             self:OnDisableWeapon()
             WaitSeconds(1 / self.Blueprint.RateOfFire)
             self.unit:SetOverchargePaused(false)
-            if self.AutoMode then
-                self.AutoThread = self:ForkThread(self.AutoEnable)
-            end
         end
     end,
 
@@ -72,17 +69,16 @@ OverchargeWeapon = ClassWeapon(DefaultProjectileWeapon) {
     SetAutoOvercharge = function(self, auto)
         self.AutoMode = auto
 
+        local autoThread = self.AutoThread
+        if autoThread then
+            KillThread(autoThread)
+            self.AutoThread = nil
+        end
+
         if self.AutoMode then
             self.AutoThread = self:ForkThread(self.AutoEnable)
-        else
-            local autoThread = self.AutoThread
-            if autoThread then
-                KillThread(autoThread)
-                self.AutoThread = nil
-            end
-            if self.enabled then
-                self:OnDisableWeapon()
-            end
+        elseif self.enabled then
+            self:OnDisableWeapon()
         end
     end,
 
@@ -159,6 +155,10 @@ OverchargeWeapon = ClassWeapon(DefaultProjectileWeapon) {
         unit:GetWeaponManipulatorByLabel(weaponLabel):SetHeadingPitch(aimControl:GetHeadingPitch())
 
         self.enabled = false
+
+        if self.AutoMode then
+            self.AutoThread = self:ForkThread(self.AutoEnable)
+        end
     end,
 
     ---@param self OverchargeWeapon

@@ -223,6 +223,9 @@ local keyActionsDebug = {
     ['debug_test_hotkey'] = {
         action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").Test()',
         category = 'debug',
+    ['debug_connectivity'] = {
+        action = 'UI_Lua import("/lua/ui/dialogs/connection/ConnectionDialog.lua").ToggleDialog()',
+        category = 'ui'
     },
 }
 

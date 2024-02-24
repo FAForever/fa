@@ -482,14 +482,30 @@ options = {
             -- },
 
             {
-                title = "<LOC ASSIST_TO_UPGRADE>Assist to upgrade",
+                title = "<LOC ASSIST_TO_UPGRADE>Assist to upgrade mass extractors",
                 key = 'assist_to_upgrade',
                 type = 'toggle',
                 default = 'Off',
                 custom = {
                     states = {
                         { text = "<LOC _Off>", key = 'Off' },
-                        { text = "<LOC ASSIST_TO_UPGRADE_MASS_TECH1>Only tech 1 extractors", key = 'Tech1Extractors' },
+                        { text = "<LOC ASSIST_TO_UPGRADE_MASS_TECH1>Tech 1 extractors", key = 'Tech1Extractors' },
+                        { text = "<LOC ASSIST_TO_UPGRADE_MASS_TECH1_TECH2>Tech 1 and tech 2 extractors",
+                            key = 'Tech1Tech2Extractors' },
+                    },
+                },
+            },
+
+            {
+                title = "<LOC ASSIST_TO_UPGRADE>Assist to upgrade radars",
+                key = 'assist_to_upgrade_radar',
+                type = 'toggle',
+                default = 'Off',
+                custom = {
+                    states = {
+                        { text = "<LOC _Off>", key = 'Off' },
+                        { text = "<LOC ASSIST_TO_UPGRADE_RADAR_TECH1>Only tech 1 radars", key = 'Tech1Radars' },
+                        { text = "<LOC ASSIST_TO_UPGRADE_RADAR_TECH1_TECH2>Tech 1 and tech 2 radars", key = 'Tech1Tech2Radars' },
                     },
                 },
             },
@@ -517,21 +533,10 @@ options = {
                 custom = {
                     states = {
                         { text = "<LOC _Off>Off", key = 'Off' },
-                        { text = "<LOC _ASSIST_TO_COPY_ENGINEERS>Only engineers",
+                        { text = "<LOC _ASSIST_TO_COPY_ENGINEERS>Engineers",
                             key = 'OnlyEngineers' },
-                    },
-                },
-            },
-
-            {
-                title = "<LOC OPTIONS_0287>Factories Default to Repeat Build",
-                key = 'repeatbuild',
-                type = 'toggle',
-                default = 'Off',
-                custom = {
-                    states = {
-                        { text = "<LOC _Off>", key = 'Off' },
-                        { text = "<LOC _On>", key = 'On' },
+                        { text = "<LOC _ASSIST_TO_COPY_ENGINEERS_ADD>Engineers and add to the selection",
+                            key = 'OnlyEngineersAddToSelection' },
                     },
                 },
             },
@@ -625,6 +630,19 @@ options = {
                     states = {
                         { text = "<LOC _Off>Off", key = "off" },
                         { text = "<LOC _On>On", key = "on" },
+                    },
+                },
+            },
+
+            {
+                title = "<LOC OPTIONS_0287>Factories Default to Repeat Build",
+                key = 'repeatbuild',
+                type = 'toggle',
+                default = 'Off',
+                custom = {
+                    states = {
+                        { text = "<LOC _Off>", key = 'Off' },
+                        { text = "<LOC _On>", key = 'On' },
                     },
                 },
             },
@@ -875,6 +893,26 @@ options = {
                     states = {
                         { text = "<LOC _Off>", key = 0 },
                         { text = "<LOC _On>", key = 1 },
+                    },
+                },
+            },
+
+            {
+                title = "<LOC options_show_player_names_title>Show Player Names",
+                key = 'options_show_player_names',
+                type = 'toggle',
+                default = 'on',
+                set = function(key, value, startup)
+                    if GetCurrentUIState() == 'game' then
+                        import("/lua/ui/override/SessionClients.lua").OptionShowPlayerNames = value
+                        import("/lua/ui/override/ArmiesTable.lua").OptionShowPlayerNames = value
+                    end
+                end,
+                custom = {
+                    states = {
+                        { text = "<LOC _On>", key = 'on' },
+                        { text = "<LOC options_show_player_names_allies_only>Allies only", key = 'allies-only' },
+                        -- { text = "<LOC _Off>", key = 'off' },
                     },
                 },
             },

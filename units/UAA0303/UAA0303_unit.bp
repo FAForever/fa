@@ -217,7 +217,7 @@ UnitBlueprint{
                 Air = "Air|Land|Water",
                 Land = "Air|Land|Water",
             },
-            FiringTolerance = 2,
+            FiringTolerance = 0,
             Label = "AutoCannon1",
             MaxRadius = 30,
             MuzzleSalvoDelay = 0,
@@ -259,7 +259,7 @@ UnitBlueprint{
             TurretYawRange = 55,
             TurretYawSpeed = 360,
             Turreted = true,
-            UseFiringSolutionInsteadOfAimBone = false,
+            UseFiringSolutionInsteadOfAimBone = true,
             WeaponCategory = "Anti Air",
         },
         {

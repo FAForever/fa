@@ -178,7 +178,7 @@ UnitBlueprint{
         UnitName = "<LOC ura0304_name>Revenant",
     },
     Intel = {
-        RadarRadius = 65,
+        RadarRadius = 64,
         RadarStealth = true,
         VisionRadius = 32,
     },

@@ -56,7 +56,7 @@ Specifically steps (1), (2) and (5) are required to create a functioning deploym
 ### Lua plugin
 
  - [FA Lua intellisense extension](https://github.com/FAForever/fa-lua-vscode-extension)
- - [FA Lua intellisense langauge server](https://github.com/FAForever/fa-lua-language-server)
+ - [FA Lua intellisense language server](https://github.com/FAForever/fa-lua-language-server)
 
 ### Assembly patches
 

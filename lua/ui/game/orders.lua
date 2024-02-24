@@ -20,6 +20,7 @@ local UIMain = import("/lua/ui/uimain.lua")
 local Select = import("/lua/ui/game/selection.lua")
 local EnhancementQueue = import("/lua/ui/notify/enhancementqueue.lua")
 local SetWeaponPriorities = import("/lua/keymap/misckeyactions.lua").SetWeaponPriorities
+local LoadIntoTransports = import("/lua/ui/game/hotkeys/load-in-transport.lua").LoadIntoTransports
 local CommandMode = import("/lua/ui/game/commandmode.lua")
 local Construction = import("/lua/ui/game/construction.lua")
 
@@ -150,7 +151,8 @@ end
 
 -- Local logic data
 local orderCheckboxMap = false
-local currentSelection = false
+---@type UserUnit[]
+local currentSelection = nil
 
 -- Helper function to create order bitmaps
 -- Note, your bitmaps must be in /game/orders/ and have the standard button naming convention
@@ -956,9 +958,9 @@ function FindOCWeapon(bp)
 
     return
 end
-
+---@param units UserUnit[]
 local function IsAutoOCMode(units)
-    return UnitData[units[1]:GetEntityId()].AutoOvercharge == true
+    return units[1]:GetStat("AutoOC",0).Value == 1
 end
 
 local function OverchargeInit(control, unitList)
@@ -1007,7 +1009,8 @@ function OverchargeBehavior(self, modifiers)
         EnterOverchargeMode()
     elseif modifiers.Right then
         self._curHelpText = self._data.helpText
-        if self._isAutoMode then
+        local isAutoOC = IsAutoOCMode(currentSelection)
+        if isAutoOC then
             self.autoModeIcon:SetAlpha(0)
             self._isAutoMode = false
         else
@@ -1019,8 +1022,7 @@ function OverchargeBehavior(self, modifiers)
             controls.mouseoverDisplay.text:SetText(self._curHelpText)
         end
 
-        local cb = {Func = 'AutoOvercharge', Args = {auto = self._isAutoMode == true} }
-        SimCallback(cb, true)
+        SimCallback({Func = 'AutoOvercharge', Args = {auto = self._isAutoMode == true} }, true)
     end
 end
 
@@ -1092,6 +1094,18 @@ AutoDeployInit = function(self, selection)
     end
 end
 
+local function TransportOrderBehavior(self, modifiers)
+    if modifiers.Left then
+        StandardOrderBehavior(self, modifiers)
+    elseif modifiers.Right then
+        if modifiers.Shift then
+            LoadIntoTransports(false)
+        else
+            LoadIntoTransports(true)
+        end
+    end
+end
+
 ---@alias CommandCap EngineCommandCap
 ---| "AttackMove"
 ---| "DroneL"
@@ -1130,7 +1144,7 @@ local defaultOrdersTable = {
     RULEUCC_SiloBuildTactical = {   helpText = "build_tactical",    bitmapId = 'silo-build-tactical',   preferredSlot = 9,  behavior = BuildOrderBehavior,          initialStateFunc = BuildInitFunction},
     RULEUCC_SiloBuildNuke = {       helpText = "build_nuke",        bitmapId = 'silo-build-nuke',       preferredSlot = 9,  behavior = BuildOrderBehavior,          initialStateFunc = BuildInitFunction},
     RULEUCC_Script = {              helpText = "special_action",    bitmapId = 'overcharge',            preferredSlot = 8,  behavior = StandardOrderBehavior},
-    RULEUCC_Transport = {           helpText = "transport",         bitmapId = 'unload',                preferredSlot = 9,  behavior = StandardOrderBehavior},
+    RULEUCC_Transport = {           helpText = "transport",         bitmapId = 'unload',                preferredSlot = 9,  behavior = TransportOrderBehavior},
     RULEUCC_Nuke = {                helpText = "fire_nuke",         bitmapId = 'launch-nuke',           preferredSlot = 10, behavior = StandardOrderBehavior, ButtonTextFunc = NukeBtnText},
     RULEUCC_Tactical = {            helpText = "fire_tactical",     bitmapId = 'launch-tactical',       preferredSlot = 10, behavior = StandardOrderBehavior, ButtonTextFunc = TacticalBtnText},
     RULEUCC_Teleport = {            helpText = "teleport",          bitmapId = 'teleport',              preferredSlot = 10, behavior = StandardOrderBehavior},

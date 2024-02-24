@@ -51,12 +51,5 @@ TIFMissileCruise01 = ClassProjectile(TMissileCruiseProjectile) {
 
     -- reduce height due to distance
     FinalBoostAngle = 30,
-
-    ---@param self SLaanseMissileWeapon
-    OnCreate = function(self)
-        TMissileCruiseProjectile.OnCreate(self)
-        self.MoveThread = self.Trash:Add(ForkThread(self.MovementThread, self))
-    end,
-
 }
 TypeClass = TIFMissileCruise01

@@ -157,7 +157,7 @@ UnitBlueprint{
         UnitName = "<LOC uaa0204_name>Skimmer",
     },
     Intel = {
-        SonarRadius = 45,
+        SonarRadius = 44,
         VisionRadius = 32,
     },
     LifeBarHeight = 0.075,
@@ -212,7 +212,7 @@ UnitBlueprint{
             AutoInitiateAttackCommand = true,
             BallisticArc = "RULEUBA_None",
             CollideFriendly = false,
-            Damage = 150,
+            Damage = 187.5,
             DamageType = "Normal",
             DisplayName = "Harmonic Torpedo",
             FireTargetLayerCapsTable = {
@@ -227,7 +227,7 @@ UnitBlueprint{
             MaxRadius = 42,
             MinRadius = 4,
             MuzzleSalvoDelay = 0.2,
-            MuzzleSalvoSize = 5,
+            MuzzleSalvoSize = 4,
             MuzzleVelocity = 0,
             ProjectileId = "/projectiles/AANTorpedo03/AANTorpedo03_proj.bp",
             ProjectileLifetime = 20,

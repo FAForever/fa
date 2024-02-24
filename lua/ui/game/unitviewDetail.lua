@@ -402,7 +402,7 @@ GetAbilityDesc = {
         return cnt
     end,
     ability_massive = function(bp)
-        return string.format(LOC('<LOC uvd_0010>Damage: %d, Splash: %d'),
+        return string.format(LOC('<LOC uvd_0010>Damage: %.7g, Splash: %.3g'),
             bp.Display.MovementEffects.Land.Footfall.Damage.Amount,
             bp.Display.MovementEffects.Land.Footfall.Damage.Radius)
     end,
@@ -555,7 +555,7 @@ function WrapAndPlaceText(bp, builder, descID, control)
                         end
                         local weaponDetails2
                         if info.NukeInnerRingDamage then
-                            weaponDetails2 = string.format(LOC('<LOC uvd_0014>Damage: %d - %d, Splash: %d - %d')..', '..LOC('<LOC uvd_Range>'),
+                            weaponDetails2 = string.format(LOC('<LOC uvd_0014>Damage: %.8g - %.8g, Splash: %.3g - %.3g')..', '..LOC('<LOC uvd_Range>'),
                                 info.NukeInnerRingDamage + info.NukeOuterRingDamage, info.NukeOuterRingDamage,
                                 info.NukeInnerRingRadius, info.NukeOuterRingRadius, info.MinRadius, info.MaxRadius)
                         else
@@ -612,7 +612,7 @@ function WrapAndPlaceText(bp, builder, descID, control)
                                     if info.MuzzleSalvoDelay == 0 then
                                         MuzzleCount = table.getsize(Rack.MuzzleBones)
                                     end
-                                    if MuzzleCount > 1 then singleShot = false end
+                                    if MuzzleCount > 1 or info.RackFireTogether and RackCount > 1 then singleShot = false end
                                     CycleProjs = CycleProjs + MuzzleCount
 
                                     SubCycleTime = SubCycleTime + MuzzleCount * MuzzleDelays
@@ -645,10 +645,10 @@ function WrapAndPlaceText(bp, builder, descID, control)
                             end
 
                             if CycleProjs > 1 then
-                                 weaponDetails2 = string.format(LOC('<LOC uvd_0015>Damage: %d x%d, Splash: %d')..', '..LOC('<LOC uvd_Range>')..', '..LOC('<LOC uvd_Reload>'),
+                                 weaponDetails2 = string.format(LOC('<LOC uvd_0015>Damage: %.8g x%d, Splash: %.3g')..', '..LOC('<LOC uvd_Range>')..', '..LOC('<LOC uvd_Reload>'),
                                     Damage, CycleProjs, info.DamageRadius, info.MinRadius, info.MaxRadius, CycleTime)
                             else
-                                weaponDetails2 = string.format(LOC('<LOC uvd_0010>Damage: %d, Splash: %d')..', '..LOC('<LOC uvd_Range>')..', '..LOC('<LOC uvd_Reload>'),
+                                weaponDetails2 = string.format(LOC('<LOC uvd_0010>Damage: %.7g, Splash: %.3g')..', '..LOC('<LOC uvd_Range>')..', '..LOC('<LOC uvd_Reload>'),
                                     Damage, info.DamageRadius, info.MinRadius, info.MaxRadius, CycleTime)
                             end
 
@@ -676,11 +676,11 @@ function WrapAndPlaceText(bp, builder, descID, control)
                         local info = weapon.info
                         local weaponDetails = LOCStr(name)..' ('..LOCStr(info.WeaponCategory)..') '
                         if info.NukeInnerRingDamage then
-                            weaponDetails = weaponDetails..LOCF('<LOC uvd_0014>Damage: %d - %d, Splash: %d - %d',
+                            weaponDetails = weaponDetails..LOCF('<LOC uvd_0014>Damage: %.8g - %.8g, Splash: %.3g - %.3g',
                                 info.NukeInnerRingDamage + info.NukeOuterRingDamage, info.NukeOuterRingDamage,
                                 info.NukeInnerRingRadius, info.NukeOuterRingRadius)
                         else
-                            weaponDetails = weaponDetails..LOCF('<LOC uvd_0010>Damage: %d, Splash: %d',
+                            weaponDetails = weaponDetails..LOCF('<LOC uvd_0010>Damage: %.7g, Splash: %.3g',
                                 info.Damage, info.DamageRadius)
                         end
                         if weapon.count > 1 then

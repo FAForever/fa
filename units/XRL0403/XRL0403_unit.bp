@@ -218,7 +218,7 @@ UnitBlueprint {
     LifeBarOffset = 3.7,
     LifeBarSize = 9,
     Physics = {
-        BackUpDistance = 12,
+        BackUpDistance = 15,
         BankingSlope = 0,
         BuildOnLayerCaps = {
             LAYER_Air = false,
@@ -248,8 +248,8 @@ UnitBlueprint {
     SelectionSizeX = 5.3,
     SelectionSizeZ = 5.3,
     SelectionThickness = 0.35,
-    CollisionOffsetY = 2.1,
-    CollisionOffsetZ = -0.6,
+    CollisionOffsetY = 2.35,
+    CollisionOffsetZ = -1.2,
     SizeX = 4.6,
     SizeY = 3.7,
     SizeZ = 7.3,
@@ -496,7 +496,7 @@ UnitBlueprint {
             },
             DisableWhileReloading = true,
             DisplayName = "Anti-Torpedo Flare",
-            FireTargetLayerCapsTable = { Seabed = "Seabed|Sub|Water" },
+            FireTargetLayerCapsTable = { Seabed = "Water" },
             FiringTolerance = 2,
             Label = "AntiTorpedo",
             MaxRadius = 25,

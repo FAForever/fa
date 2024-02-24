@@ -106,7 +106,7 @@ UnitBlueprint{
     LifeBarOffset = 1,
     LifeBarSize = 1.2,
     Physics = {
-        BackUpDistance = 4,
+        BackUpDistance = 10,
         BankingSlope = 0,
         BuildOnLayerCaps = {
             LAYER_Air = false,
@@ -206,9 +206,9 @@ UnitBlueprint{
             SkipReadyState = true,
             TargetPriorities = {
                 "STRUCTURE DEFENSE",
-                "TECH3 MOBILE",
-                "TECH2 MOBILE",
-                "TECH1 MOBILE",
+                "SNIPER",
+                "SHIELD",
+                "STRUCTURE",
                 "ALLUNITS",
             },
             TargetRestrictDisallow = "UNTARGETABLE",

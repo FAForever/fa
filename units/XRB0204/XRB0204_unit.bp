@@ -141,7 +141,7 @@ UnitBlueprint{
         UpgradesFrom = "xrb0104",
         UpgradesTo = "xrb0304",
     },
-    Intel = { VisionRadius = 15 },
+    Intel = { VisionRadius = 14 },
     LifeBarHeight = 0.075,
     LifeBarOffset = 1.1,
     LifeBarSize = 1.25,

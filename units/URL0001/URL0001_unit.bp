@@ -225,6 +225,7 @@ UnitBlueprint{
         TeleportEnergyMod = 0.03,
         TeleportMassMod = 0,
         TeleportTimeMod = 0.0001,
+        UseVariableTeleportCosts = true,
     },
     Enhancements = {
         AdvancedEngineering = {
@@ -592,20 +593,21 @@ UnitBlueprint{
 
         QuickSelectPriority = 1,
         SelectionPriority = 3,
-        TeleportDelay = 10,
+        TeleportDelay = 15,
+        TeleportFlatEnergyCost = 75000,
     },
     Intel = {
         ActiveIntel = { Omni = true },
         Cloak = true,
         FreeIntel = false,
-        OmniRadius = 26,
+        OmniRadius = 24,
         RadarStealth = true,
         ReactivateTime = 2,
         Sonar = true,
-        SonarRadius = 26,
+        SonarRadius = 24,
         SonarStealth = true,
         VisionRadius = 26,
-        WaterVisionRadius = 26,
+        WaterVisionRadius = 24,
     },
     LifeBarHeight = 0.15,
     LifeBarOffset = 0.5,

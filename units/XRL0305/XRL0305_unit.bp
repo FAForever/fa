@@ -127,7 +127,7 @@ UnitBlueprint{
     },
     Intel = {
         VisionRadius = 26,
-        WaterVisionRadius = 26,
+        WaterVisionRadius = 24,
     },
     LifeBarHeight = 0.075,
     LifeBarOffset = 0.55,
@@ -301,7 +301,7 @@ UnitBlueprint{
             DisableWhileReloading = true,
             DisplayName = "Anti-Torpedo Flare",
             EffectiveRadius = 29,
-            FireTargetLayerCapsTable = { Seabed = "Sub|Water|Seabed" },
+            FireTargetLayerCapsTable = { Seabed = "Water" },
             FiringTolerance = 2,
             Label = "AntiTorpedo",
             MaxRadius = 34,
