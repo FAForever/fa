@@ -1085,9 +1085,9 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         local buildrate = cUnitGetBuildRate(self)
         if buildrate < 0 then
             buildrate = 0.00001
-        else
-            return buildrate
         end
+
+        return buildrate
     end,
 
     ---@param self Unit
