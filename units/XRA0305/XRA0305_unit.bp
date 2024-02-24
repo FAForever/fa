@@ -50,6 +50,7 @@ UnitBlueprint{
         "SNIPEMODE",
         "TECH3",
         "VISIBLETORECON",
+        "ANTIAIRWEAK",
     },
     Defense = {
         AirThreatLevel = 2,
