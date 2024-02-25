@@ -20,46 +20,53 @@
 --** SOFTWARE.
 --******************************************************************************************************
 
----@alias BlueprintLookupTable table<BlueprintId, number>
+-- upvalue scope for performance
+local TableInsert = table.insert
+local TableSetn = table.setn
+local TableGetn = table.getn
 
---- Converts a list of units into a blueprint-based lookup table.
+--- Lookup table to retrieve the count of a given unit type.
+---@alias FormationBlueprintCount table<BlueprintId, number>
+
+--- Lookup table to retrieve the unit types that belong in a formation layer.
+---@alias FormationBlueprintList table<FormationCategory, BlueprintId[]>
+
+--- Transforms a list of units into a lookup datastructure to make them computationally cheaper to work with.
 ---@param units (Unit[] | UserUnit[])
----@param blueprintListCache BlueprintId[]
----@param blueprintCountCache BlueprintLookupTable
----@return BlueprintLookupTable
----@return BlueprintId[]
+---@param blueprintCountCache FormationBlueprintCount
+---@param blueprintListCache FormationBlueprintList
+---@return FormationBlueprintCount
+---@return FormationBlueprintList
 ---@return number # total number of units
-ToBlueprintLookup = function(units, blueprintListCache, blueprintCountCache)
+ComputeFormationProperties = function(units, blueprintCountCache, blueprintListCache)
     blueprintCountCache = blueprintCountCache or {}
-    blueprintListCache = blueprintListCache or {}
-    local blueprintTotalCount = 0
-    local blueprintListCount = 0
+    blueprintListCache = blueprintListCache or { Land = {}, Air = {}, Naval = {}, Submersible = {} }
 
-    -- clean the cache
-    for unitBlueprintId, _ in blueprintCountCache do
-        blueprintCountCache[unitBlueprintId] = nil
+    -- clear the cache
+    for blueprintId, count in blueprintCountCache do
+        blueprintCountCache[blueprintId] = nil
     end
 
-    -- clean the cache
-    for k = 1, table.getn(blueprintListCache) do
-        blueprintListCache[k] = nil
+    -- clear the cache
+    for layer, blueprintIds in blueprintListCache do
+        TableSetn(blueprintIds, 0)
     end
 
     -- (re-)populate the cache
     for k, unit in units do
-        local unitBlueprint = unit:GetBlueprint()
+        local unitBlueprint = unit:GetBlueprint() --[[@as UnitBlueprint]]
         local unitBlueprintId = unitBlueprint.BlueprintId
+        local unitblueprintFormationCategory = unitBlueprint.FormationCategory
         if not blueprintCountCache[unitBlueprintId] then
             blueprintCountCache[unitBlueprintId] = 1
-
-            blueprintListCount = blueprintListCount + 1
-            blueprintListCache[blueprintListCount] = unitBlueprintId
+            TableInsert(blueprintListCache[unitblueprintFormationCategory], unitBlueprintId)
         else
             blueprintCountCache[unitBlueprintId] = blueprintCountCache[unitBlueprintId] + 1
         end
     end
 
     -- count all the entries in the cache
+    local blueprintTotalCount = 0
     for _, unitCount in blueprintCountCache do
         blueprintTotalCount = blueprintTotalCount + unitCount
     end
@@ -67,59 +74,40 @@ ToBlueprintLookup = function(units, blueprintListCache, blueprintCountCache)
     return blueprintCountCache, blueprintListCache, blueprintTotalCount
 end
 
---- Returns the maximum footprint size of all unit types in the lookup table.
----@param lookup BlueprintLookupTable
----@return number
-MaximumFootprint = function(lookup)
-    local maximumFootprint = 0
+--- Updates the lookup datastructures to reflect the current state.
+---@param blueprintCountCache FormationBlueprintCount
+---@param blueprintListCache FormationBlueprintList
+---@return FormationBlueprintCount
+---@return FormationBlueprintList
+---@return number # total number of units
+UpdateFormationProperties = function(blueprintCountCache, blueprintListCache)
+    for layer, blueprintIds in blueprintListCache do
 
-    for unitBlueprintId, _ in lookup do
-        local unitBlueprint = __blueprints[unitBlueprintId] --[[@as UnitBlueprint]]
-        local unitSize = math.max(unitBlueprint.Footprint.SizeX or 1, unitBlueprint.Footprint.SizeZ or 1)
-        if unitSize and unitSize > maximumFootprint then
-            maximumFootprint = unitSize
+        -- retrieve the original count and reset it
+        local count = TableGetn(blueprintListCache)
+        TableSetn(blueprintIds, 0)
+
+        -- only re-insert blueprint ids that we still have units of
+        for k = 1, count do
+            local blueprintId = blueprintIds[k]
+            if blueprintCountCache[blueprintId] > 0 then
+                TableInsert(blueprintIds, blueprintId)
+            else
+                blueprintCountCache[blueprintId] = nil
+            end
+        end
+
+        -- remove any excess entries, this isn't strictly necessary but it makes debugging easier
+        for k = TableGetn(blueprintIds) + 1, count do
+            blueprintIds[k] = nil
         end
     end
 
-    return maximumFootprint
-end
-
----@param blueprintCountCache BlueprintLookupTable
----@param blueprintListCache BlueprintId[]
----@return BlueprintId[]
-UpdateBlueprintListCache = function(blueprintCountCache, blueprintListCache)
-    local head  = 1
-    local count = table.getn(blueprintListCache)
-    for k = 1, count do
-        if blueprintCountCache[ blueprintListCache[k] ] > 0 then
-            blueprintListCache[head] = blueprintListCache[k]
-            head = head + 1
-        end
+    -- count all the entries in the cache
+    local blueprintTotalCount = 0
+    for _, unitCount in blueprintCountCache do
+        blueprintTotalCount = blueprintTotalCount + unitCount
     end
 
-    -- clean up remaining entries
-    for k = head, count do
-        blueprintListCache[k] = nil
-    end
-
-    return blueprintListCache
-end
-
---- A table that contains formation positions that we can re-use.
-
----@type FormationPosition[]
-local FormationPositions = {}
-
----@param index number
----@return FormationPosition
-GetFormationPosition = function(index)
-    local formation = FormationPositions[index] --[[@as FormationPosition]]
-    if not formation then
-        formation = {
-            0, 0, categories.ALLUNITS, 0, true
-        }
-        FormationPositions[index] = formation
-    end
-
-    return formation
+    return blueprintCountCache, blueprintListCache, blueprintTotalCount
 end

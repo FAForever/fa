@@ -20,8 +20,7 @@
 --** SOFTWARE.
 --******************************************************************************************************
 
-local ToBlueprintLookup = import('/lua/shared/Formations/shared.lua').ToBlueprintLookup
-local MaximumFootprint = import('/lua/shared/Formations/shared.lua').MaximumFootprint
+local ComputeFormationProperties = import('/lua/shared/Formations/shared.lua').ComputeFormationProperties
 local GetFormationEntry = import('/lua/shared/Formations/Formation.lua').GetFormationEntry
 
 local LandFormations = import('/lua/shared/Formations/AttackFormations/Land.lua').LandFormations
@@ -31,11 +30,16 @@ local CleanupLandFormationPreferences = import("/lua/shared/Formations/LandForma
 local PopulateLandFormationPreferences = import("/lua/shared/Formations/LandFormationPreferences.lua").PopulateLandFormationPreferences
 
 --- A table that contains the blueprint lookups that we can re-use.
----@type BlueprintLookupTable
-local BlueprintLookup = {}
+---@type FormationBlueprintCount
+local FormationBlueprintCountCache = {}
 
----@type Blueprint[]
-local BlueprintList = {}
+---@type FormationBlueprintList
+local FormationBlueprintListCache = {
+    Land = {},
+    Air = {},
+    Naval = {},
+    Submersible = {}
+}
 
 --- A table that contains the tactical formation that we can re-use.
 ---@type Formation
@@ -60,16 +64,24 @@ local ComputeDimensions = function(unitCount)
     end
 end
 
+local GetFormationCategory = function (formationBlueprintCountCache, formationBlueprintListCache, row, column)
+    return 0
+    
+end
+
 ---@param units (Unit[] | UserUnit[])
 ---@return Formation
 ComputeFormation = function(units)
 
     -- local scope for performance
     local tacticalFormation = TacticalFormation
+    table.setn(tacticalFormation, 0)
 
     -- gather information about the units
-    local blueprintLookup, blueprintList, unitCount = ToBlueprintLookup(units, BlueprintLookup, BlueprintList)
-    local maximumFootprintSize = MaximumFootprint(blueprintLookup)
+    local formationBlueprintCountCache, formationBlueprintListCache, unitCount = ComputeFormationProperties(units, FormationBlueprintCountCache, FormationBlueprintListCache)
+
+    LOG("formationBlueprintCountCache", repru(formationBlueprintCountCache))
+    LOG("formationBlueprintListCache", repru(formationBlueprintListCache))
 
     local formationRows, formationColumns = ComputeDimensions(unitCount)
     local formationCenter = math.ceil(0.5 * formationColumns)
@@ -79,39 +91,27 @@ ComputeFormation = function(units)
 
     -- populate the formation
     for ly = 1, formationRows do
-
         -- offset for the last row
         local horizontalOffset = 0
-        if unitsRemainingCount < formationColumns then
-            horizontalOffset = sparsityMultiplier * 0.5 * (formationColumns - unitsRemainingCount)
-        end
+        -- if unitsRemainingCount < formationColumns then
+        --     horizontalOffset 
+        --     horizontalOffset = sparsityMultiplier * 0.5 * (formationColumns - unitsRemainingCount)
+        -- end
 
-        -- from center to the right
-        for lx = formationCenter, formationColumns do
-            local oi = (ly - 1) * formationColumns + lx - 1
-
-            local unit = units[oi]
-            if unit then
-                local formation = GetFormationEntry(oi + 1)
-                formation[1] = horizontalOffset + sparsityMultiplier * (lx - formationCenter)
-                formation[2] = sparsityMultiplier * (-1 * ly)
-                formation[3] = categories[unit:GetBlueprint().BlueprintId]
-                tacticalFormation[oi] = formation
+        for lx = 0, formationColumns - 1 do
+            -- pattern that grows from the center
+            local offset = math.ceil(0.5 * lx)
+            local ox = offset
+            if math.mod(lx, 2) == 0 then
+                ox = -1 * offset
             end
-        end
 
-        -- from center to the left
-        for lx = formationCenter, 1, -1 do
-            local oi = (ly - 1) * formationColumns + lx - 1
-
-            local unit = units[oi]
-            if unit then
-                local formation = GetFormationEntry(oi + 1)
-                formation[1] = horizontalOffset + sparsityMultiplier * (lx - formationCenter)
-                formation[2] = sparsityMultiplier * (-1 * ly)
-                formation[3] = categories[unit:GetBlueprint().BlueprintId]
-                tacticalFormation[oi] = formation
-            end
+            local formationIndex = table.getn(tacticalFormation) + 1
+            local formation = GetFormationEntry(formationIndex)
+            formation[1] = horizontalOffset + sparsityMultiplier * ox
+            formation[2] = sparsityMultiplier * (-1 * ly)
+            formation[3] = categories.ALLUNITS
+            table.insert(tacticalFormation, formation)
         end
 
         -- break if we have no units left
@@ -123,7 +123,7 @@ ComputeFormation = function(units)
     end
 
     -- clean up remaining entries
-    for k = unitCount, table.getn(tacticalFormation) do
+    for k = unitCount + 1, table.getn(tacticalFormation) do
         tacticalFormation[k] = nil
     end
 

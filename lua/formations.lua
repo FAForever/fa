@@ -12,9 +12,6 @@
 
 ---@alias UnitFormations 'AttackFormation' | 'GrowthFormation' | 'NoFormation' | 'None' | 'none'
 
-local FormationGroups = import("/lua/shared/Formations/FormationGroups.lua")
-local AttackFormation2 = import("/lua/shared/Formations/AttackFormation.lua").AttackFormation
-
 -- upvalue scope for performance
 local TableGetn = table.getn
 local TableInsert = table.insert
@@ -176,14 +173,6 @@ end
 ---@param formationUnits Unit[]
 ---@return table
 function AttackFormation(formationUnits)
-    local ok, msg = pcall(AttackFormation2, formationUnits)
-    if ok then
-        local formation = AttackFormation2(formationUnits)
-        return formation
-    else
-        WARN(msg)
-    end
-
     local cachedResults = GetCachedResults(formationUnits, 'AttackFormation')
     if cachedResults then
         return cachedResults
@@ -243,6 +232,8 @@ end
 ---@param formationUnits Unit[]
 ---@return table
 function GrowthFormation(formationUnits)
+
+    LOG("GrowthFormation")
 
     local formation = import("/lua/shared/Formations/GrowFormation.lua").ComputeFormation
     
