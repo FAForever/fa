@@ -1,6 +1,6 @@
 UnitBlueprint{
     Description = "<LOC ual0105_desc>Engineer",
-    AI = { GuardScanRadius = 26 },
+    AI = { GuardScanRadius = 10, GuardRadius = 5, },
     Audio = {
         AmbientMove        = Sound { Bank = 'UAL',        Cue = 'UAL0105_Move_Loop',       LodCutoff = 'UnitMove_LodCutoff' },
         CaptureLoop        = Sound { Bank = 'UAL',        Cue = 'UAL0105_Capture_Loop',    LodCutoff = 'UnitMove_LodCutoff' },
@@ -127,7 +127,7 @@ UnitBlueprint{
         BuildRate = 5,
         BuildTime = 260,
         BuildableCategory = { "BUILTBYTIER1ENGINEER AEON" },
-        MaxBuildDistance = 5,
+        MaxBuildDistance = 10,
         SacrificeEnergyMult = 0.6,
         SacrificeMassMult = 0.6,
         StorageEnergy = 0,

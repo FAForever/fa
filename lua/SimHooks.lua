@@ -161,3 +161,10 @@ IssueToUnitScript = function(unit, order)
     UnitsCache[1] = unit
     IssueScript(UnitsCache, order)
 end
+
+---@param unit moho.unit_methods
+---@param target moho.prop_methods | moho.unit_methods
+IssueToUnitReclaim = function(unit, target)
+    UnitsCache[1] = unit
+    IssueReclaim(UnitsCache, target)
+end

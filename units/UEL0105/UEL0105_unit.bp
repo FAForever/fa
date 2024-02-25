@@ -1,6 +1,6 @@
 UnitBlueprint{
     Description = "<LOC uel0105_desc>Engineer",
-    AI = { GuardScanRadius = 26 },
+    AI = { GuardScanRadius = 10 },
     Audio = {
         AmbientMove        = Sound { Bank = 'UEL',        Cue = 'UEL0105_Move_Loop',       LodCutoff = 'UnitMove_LodCutoff' },
         CaptureLoop        = Sound { Bank = 'UEL',        Cue = 'UEL0105_Capture_Loop',    LodCutoff = 'UnitMove_LodCutoff' },
@@ -135,7 +135,7 @@ UnitBlueprint{
         BuildRate = 5,
         BuildTime = 260,
         BuildableCategory = { "BUILTBYTIER1ENGINEER UEF" },
-        MaxBuildDistance = 5,
+        MaxBuildDistance = 10,
         StorageEnergy = 0,
         StorageMass = 10,
         TeleportEnergyMod = 0.15,

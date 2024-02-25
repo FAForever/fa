@@ -669,7 +669,7 @@ end
 
 Test = function()
 
-    orderTable = { TaskName = 'ExcessEnergyTask' }
-    IssueCommand("UNITCOMMAND_Script", orderTable, true)
+    local orderTable = { TaskName = 'AutonomousReclaimTask' }
+    IssueCommand("UNITCOMMAND_Script", orderTable, false)
     LOG("issues task!")
 end
