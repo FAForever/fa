@@ -63,7 +63,7 @@ UnitBlueprint{
         "TRANSPORTFOCUS",
         "UEF",
         "VISIBLETORECON",
-        "ANTIAIRWEAK",
+        "WEAKANTIAIR",
         "WEAKDIRECTFIRE",
     },
     Defense = {
