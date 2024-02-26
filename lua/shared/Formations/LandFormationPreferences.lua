@@ -28,155 +28,86 @@ if Debug then
     SPEW("Debug information for land formation preferences: ")
 end
 
--- upvalue scope for performance
-local EntityCategoryContains = EntityCategoryContains
-
-local TableGetn = table.getn
-local TableSetn = table.setn
-local TableInsert = table.insert
-
 -------------------------------------------------------------------------------
 --#region Formation preferences
 
+LandGeneralFirst = {
+    LandFormationCategories.LandFormationCategoriesDirectFire,
+    LandFormationCategories.LandFormationCategoriesSupportCommand,
+    LandFormationCategories.LandFormationCategoriesAntiAir,
+    LandFormationCategories.LandFormationCategoriesShield,
+    LandFormationCategories.LandFormationCategoriesScout,
+    LandFormationCategories.LandFormationCategoriesCommand,
+    LandFormationCategories.LandFormationCategoriesMissile,
+    LandFormationCategories.LandFormationCategoriesArtillery,
+    LandFormationCategories.CategoriesAllUnits
+}
+
+LandColumnPreferences = {
+    LandFormationCategories.LandFormationCategoriesAntiAir,
+    LandFormationCategories.LandFormationCategoriesShield,
+    LandFormationCategories.LandFormationCategoriesScout,
+}
+
 LandCommandFirst = {
-    "LandFormationCategoriesCommand",
-    "LandFormationCategoriesSupportCommand",
-    "CategoriesAllUnits"
+    LandFormationCategories.LandFormationCategoriesCommand,
+    LandFormationCategories.LandFormationCategoriesSupportCommand,
+    LandFormationCategories.CategoriesAllUnits
 }
 
 LandDirectFireFirst = {
-    "LandFormationCategoriesDirectFire",
-    "LandFormationCategoriesArtillery",
-    "CategoriesAllUnits"
+    LandFormationCategories.LandFormationCategoriesDirectFire,
+    LandFormationCategories.LandFormationCategoriesSupportCommand,
+    LandFormationCategories.LandFormationCategoriesArtillery,
+    LandFormationCategories.CategoriesAllUnits
 }
 
 LandMissileFirst = {
-    "LandFormationCategoriesMissile",
-    "LandFormationCategoriesArtillery",
-    "CategoriesAllUnits"
+    LandFormationCategories.LandFormationCategoriesMissile,
+    LandFormationCategories.LandFormationCategoriesArtillery,
+    LandFormationCategories.CategoriesAllUnits
 }
 
 LandArtilleryFirst = {
-    "LandFormationCategoriesArtillery",
-    "LandFormationCategoriesMissile",
-    "CategoriesAllUnits"
+    LandFormationCategories.LandFormationCategoriesArtillery,
+    LandFormationCategories.LandFormationCategoriesMissile,
+    LandFormationCategories.CategoriesAllUnits
 }
 
 LandShieldFirst = {
-    "LandFormationCategoriesShield",
-    "LandFormationCategoriesScout",
-    "CategoriesAllUnits"
+    LandFormationCategories.LandFormationCategoriesShield,
+    LandFormationCategories.LandFormationCategoriesScout,
+    LandFormationCategories.CategoriesAllUnits
 }
 
 LandSniperFirst = {
-    "LandFormationCategoriesSniper",
-    "LandFormationCategoriesMissile",
-    "CategoriesAllUnits"
+    LandFormationCategories.LandFormationCategoriesSniper,
+    LandFormationCategories.LandFormationCategoriesMissile,
+    LandFormationCategories.CategoriesAllUnits
 }
 
 LandAntiAirFirst = {
-    "LandFormationCategoriesAntiAir",
-    "LandFormationCategoriesShield",
-    "CategoriesAllUnits"
+    LandFormationCategories.LandFormationCategoriesAntiAir,
+    LandFormationCategories.LandFormationCategoriesShield,
+    LandFormationCategories.CategoriesAllUnits
 }
 
 LandCounterintelligenceFirst = {
-    "LandFormationCategoriesCounterintelligence",
-    "LandFormationCategoriesScout",
-    "CategoriesAllUnits"
+    LandFormationCategories.LandFormationCategoriesCounterintelligence,
+    LandFormationCategories.LandFormationCategoriesScout,
+    LandFormationCategories.CategoriesAllUnits
 }
 
 LandIntelligenceFirst = {
-    "LandFormationCategoriesScout",
-    "LandFormationCategoriesShield",
-    "CategoriesAllUnits"
+    LandFormationCategories.LandFormationCategoriesScout,
+    LandFormationCategories.LandFormationCategoriesShield,
+    LandFormationCategories.CategoriesAllUnits
 }
 
 LandEngineeringFirst = {
-    "LandFormationCategoriesEngineeering",
-    "LandFormationCategoriesSupportCommand",
-    "CategoriesAllUnits"
+    LandFormationCategories.LandFormationCategoriesEngineeering,
+    LandFormationCategories.LandFormationCategoriesSupportCommand,
+    LandFormationCategories.CategoriesAllUnits
 }
-
-LandFormationPreferences = {
-    { Name = "LandCommandFirst", unpack(LandCommandFirst) },
-    { Name = "LandDirectFireFirst", unpack(LandDirectFireFirst) },
-    { Name = "LandMissileFirst", unpack(LandMissileFirst) },
-    { Name = "LandArtilleryFirst", unpack(LandArtilleryFirst) },
-    { Name = "LandShieldFirst", unpack(LandShieldFirst) },
-    { Name = "LandSniperFirst", unpack(LandSniperFirst) },
-    { Name = "LandAntiAirFirst", unpack(LandAntiAirFirst) },
-    { Name = "LandCounterintelligenceFirst", unpack(LandCounterintelligenceFirst) },
-    { Name = "LandIntelligenceFirst", unpack(LandIntelligenceFirst) },
-    { Name = "LandEngineeringFirst", unpack(LandEngineeringFirst) },
-}
-
-if Debug then
-    for k, landFormationPreference in LandFormationPreferences do
-        SPEW(string.format(" - %s", k), table.getn(landFormationPreference))
-
-        for l = 1, table.getn(landFormationPreference) do
-            local landFormationCategory = landFormationPreference[l]
-            if not LandFormationCategories[landFormationCategory] then
-                WARN(
-                    string.format(
-                        "Invalid land formation category '%s' in land formation preference '%s'",
-                        landFormationCategory, landFormationPreference.Name
-                    )
-                )
-            end
-        end
-    end
-end
-
---#endregion
-
--------------------------------------------------------------------------------
---#region Cached data structure
-
----@class CachedLandFormationPreferences
-
-LandFormationPreferencesCache = {}
-
--- clean up prefererence table
-for key, _ in LandFormationCategories do
-    LandFormationPreferencesCache[key] = {}
-end
-
----@param landFormationPreferencesCache CachedLandFormationPreferences
----@return CachedLandFormationPreferences
-function CleanupLandFormationPreferences(landFormationPreferencesCache)
-    for key, _ in LandFormationCategories do
-        local landFormationPreference = landFormationPreferencesCache[key]
-        for l = 1, TableGetn(landFormationPreference) do
-            landFormationPreference[l] = nil
-        end
-
-        TableSetn(landFormationPreference, 0)
-    end
-
-    return landFormationPreferencesCache
-end
-
----@param landFormationPreferencesCache CachedLandFormationPreferences
----@param blueprintListCache BlueprintId[]
----@param index number
----@return CachedLandFormationPreferences
-function PopulateLandFormationPreferences(landFormationPreferencesCache, blueprintListCache, index)
-    for _, blueprint in blueprintListCache do
-        for k = 1, TableGetn(LandFormationPreferences) do
-            local landFormationOrder = LandFormationPreferences[k]
-            local landFormationKey = landFormationOrder[index]
-            local landFormationCategory = LandFormationCategories[landFormationKey]
-
-            if EntityCategoryContains(landFormationCategory, blueprint) then
-                TableInsert(landFormationPreferencesCache[landFormationKey], blueprint)
-                break
-            end
-        end
-    end
-
-    return landFormationPreferencesCache
-end
 
 --#endregion
