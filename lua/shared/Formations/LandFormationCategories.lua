@@ -55,7 +55,7 @@ CategoriesAllUnits = categories.ALLUNITS
 LandFormationCategoriesCommand = COMMAND
 LandFormationCategoriesSupportCommand = categories.SUBCOMMANDER
 
-LandFormationCategoriesDirectFire = LAND * (DIRECTFIRE) - (SNIPER + WEAKDIRECTFIRE + COMMAND)
+LandFormationCategoriesDirectFire = LAND * (DIRECTFIRE) - (SNIPER + WEAKDIRECTFIRE + COMMAND + SCOUT)
 LandFormationCategoriesSniper = LAND * (SNIPER)
 LandFormationCategoriesArtillery = LAND * (ARTILLERY + INDIRECTFIRE) - (WEAKINDIRECTFIRE)
 LandFormationCategoriesMissile = LAND * (SILO) - (WEAKINDIRECTFIRE)

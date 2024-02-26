@@ -153,7 +153,7 @@ ComputeFormation = function(units)
             -- that may make sense, such as shields and anti-air units.
 
             local blueprintId
-            local columnMod = math.mod(offset, table.getn(LandColumnPreferences))
+            local columnMod = math.mod(offset, table.getn(LandColumnPreferences) + 1)
             if ly == 1 or columnMod == 0 then
                 blueprintId = GetFormationCategory(
                     formationBlueprintCountCache,
@@ -165,7 +165,7 @@ ComputeFormation = function(units)
                     formationBlueprintCountCache,
                     formationBlueprintListCache["Land"],
                     LandColumnPreferences,
-                    columnMod + 1
+                    columnMod
                 )
             end
 
