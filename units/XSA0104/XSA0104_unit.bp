@@ -60,7 +60,7 @@ UnitBlueprint{
         "TRANSPORTBUILTBYTIER3FACTORY",
         "TRANSPORTFOCUS",
         "VISIBLETORECON",
-        "ANTIAIRWEAK",
+        "WEAKANTIAIR",
         "WEAKDIRECTFIRE",
     },
     Defense = {
