@@ -29,7 +29,10 @@ local LandColumnPreferences = import("/lua/shared/Formations/LandFormationPrefer
 
 --- A table that contains the blueprint lookups that we can re-use.
 ---@type FormationBlueprintCount
-local FormationBlueprintCountCache = {}
+local FormationBlueprintCountCacheA = {}
+
+---@type FormationBlueprintCount
+local FormationBlueprintCountCacheB = {}
 
 ---@type FormationBlueprintList
 local FormationBlueprintListCache = {
@@ -44,8 +47,15 @@ local FormationBlueprintListCache = {
 local TacticalFormation = {}
 
 -- upvalue scope for performance
+local EntityCategoryContains = EntityCategoryContains
+
 local MathSqrt = math.sqrt
 local MathCeil = math.ceil
+local MathMod = math.mod
+
+local TableGetn = table.getn
+local TableSetn = table.setn
+local TableInsert = table.insert
 
 --- Computes a square-shaped formation for the given unit count.
 ---@param unitCount number
@@ -55,7 +65,7 @@ local ComputeDimensions = function(unitCount)
     local sqrt = MathSqrt(unitCount)
     local ceil = MathCeil(sqrt)
 
-    if math.mod(ceil, 2) == 0 then
+    if MathMod(ceil, 2) == 0 then
         return ceil - 1, ceil + 1
     else
         return ceil, ceil
@@ -67,9 +77,9 @@ end
 ---@param preferences EntityCategory[]
 ---@return BlueprintId?
 local GetFormationCategory = function(formationBlueprintCountCache, formationBlueprintListCache, preferences)
-    for k = 1, table.getn(preferences) do
+    for k = 1, TableGetn(preferences) do
         local category = preferences[k]
-        for l = 1, table.getn(formationBlueprintListCache) do
+        for l = 1, TableGetn(formationBlueprintListCache) do
             local blueprintId = formationBlueprintListCache[l]
             if formationBlueprintCountCache[blueprintId] > 0 and EntityCategoryContains(category, blueprintId) then
                 formationBlueprintCountCache[blueprintId] = formationBlueprintCountCache[blueprintId] - 1
@@ -86,8 +96,8 @@ end
 ---@param preferences EntityCategory[]
 ---@return BlueprintId?
 local GetFormationColumnCategory = function(formationBlueprintCountCache, formationBlueprintListCache, preferences, index)
-    local category = LandColumnPreferences[index]
-    for l = 1, table.getn(formationBlueprintListCache) do
+    local category = preferences[index]
+    for l = 1, TableGetn(formationBlueprintListCache) do
         local blueprintId = formationBlueprintListCache[l]
         if formationBlueprintCountCache[blueprintId] > 0 and EntityCategoryContains(category, blueprintId) then
             formationBlueprintCountCache[blueprintId] = formationBlueprintCountCache[blueprintId] - 1
@@ -104,14 +114,39 @@ ComputeFormation = function(units)
 
     -- local scope for performance
     local tacticalFormation = TacticalFormation
-    table.setn(tacticalFormation, 0)
+    local formationBlueprintCountCacheA = FormationBlueprintCountCacheA
+    local formationBlueprintCountCacheB = FormationBlueprintCountCacheB
 
     -- gather information about the units
     local formationBlueprintCountCache, formationBlueprintListCache, unitCount = ComputeFormationProperties(
         units,
-        FormationBlueprintCountCache,
+        FormationBlueprintCountCacheA,
         FormationBlueprintListCache
     )
+
+    -- check if the formation is the same as the last one to avoid duplicate computations
+    local equal = true
+    for blueprintId, count in pairs(formationBlueprintCountCacheA) do
+        if formationBlueprintCountCacheB[blueprintId] ~= count then
+            equal = false
+            break
+        end
+    end
+
+    if equal then
+        return tacticalFormation
+    else
+        for blueprintId, _ in formationBlueprintCountCacheB do
+            formationBlueprintCountCacheB[blueprintId] = nil
+        end
+
+        for blueprintId, count in pairs(formationBlueprintCountCacheA) do
+            formationBlueprintCountCacheB[blueprintId] = count
+        end
+    end
+
+    -- formation is not the same, re-compute it!
+    TableSetn(tacticalFormation, 0)
 
     local formationRows, formationColumns = ComputeDimensions(unitCount)
 
@@ -123,7 +158,7 @@ ComputeFormation = function(units)
         -- offset for the last row a tiny bit when the number of units is uneven
         local horizontalOffset = 0
         if unitsRemainingCount < formationColumns then
-            if math.mod(unitsRemainingCount, 2) == 0 then
+            if MathMod(unitsRemainingCount, 2) == 0 then
                 horizontalOffset = -0.5 * sparsityMultiplier
             end
         end
@@ -138,9 +173,9 @@ ComputeFormation = function(units)
             --
             -- which is exactly what we want!
 
-            local offset = math.ceil(0.5 * lx)
+            local offset = MathCeil(0.5 * lx)
             local ox = offset
-            if math.mod(lx, 2) == 0 then
+            if MathMod(lx, 2) == 0 then
                 ox = -1 * offset
             end
 
@@ -153,7 +188,7 @@ ComputeFormation = function(units)
             -- that may make sense, such as shields and anti-air units.
 
             local blueprintId
-            local columnMod = math.mod(offset, table.getn(LandColumnPreferences) + 1)
+            local columnMod = MathMod(offset, TableGetn(LandColumnPreferences) + 1)
             if ly == 1 or columnMod == 0 then
                 blueprintId = GetFormationCategory(
                     formationBlueprintCountCache,
@@ -173,7 +208,7 @@ ComputeFormation = function(units)
             -- this should never happen, but life's full of surprises.
 
             if not blueprintId then
-                for k = 1, table.getn(formationBlueprintListCache["Land"]) do
+                for k = 1, TableGetn(formationBlueprintListCache["Land"]) do
                     local remainingBlueprintId = formationBlueprintListCache["Land"][k]
                     if formationBlueprintCountCache[remainingBlueprintId] > 0 then
                         formationBlueprintCountCache[remainingBlueprintId] = formationBlueprintCountCache[
@@ -187,12 +222,12 @@ ComputeFormation = function(units)
             -------------------------------------------------------------------
             -- add the formation entry.
 
-            local formationIndex = table.getn(tacticalFormation) + 1
+            local formationIndex = TableGetn(tacticalFormation) + 1
             local formation = GetFormationEntry(formationIndex)
             formation[1] = horizontalOffset + sparsityMultiplier * ox
             formation[2] = sparsityMultiplier * (-1 * ly)
             formation[3] = categories[blueprintId]
-            table.insert(tacticalFormation, formation)
+            TableInsert(tacticalFormation, formation)
         end
 
         -- break if we have no units left
@@ -204,7 +239,7 @@ ComputeFormation = function(units)
     end
 
     -- clean up remaining entries
-    for k = unitCount + 1, table.getn(tacticalFormation) do
+    for k = unitCount + 1, TableGetn(tacticalFormation) do
         tacticalFormation[k] = nil
     end
 
