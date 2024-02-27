@@ -173,9 +173,11 @@ end
 ---@param formationUnits Unit[]
 ---@return table
 function AttackFormation(formationUnits)
-    local cachedResults = GetCachedResults(formationUnits, 'AttackFormation')
-    if cachedResults then
-        return cachedResults
+
+    local start = 0
+    local getSystemTimeSecondsOnlyForProfileUse = rawget(_G, 'GetSystemTimeSecondsOnlyForProfileUse')
+    if getSystemTimeSecondsOnlyForProfileUse then
+        start = getSystemTimeSecondsOnlyForProfileUse()
     end
 
     FormationPos = {}
@@ -225,7 +227,10 @@ function AttackFormation(formationUnits)
     BlockBuilderLand(subUnitsList, subBlock, SubCategories, 1)
     BlockBuilderAir(unitsList.Air, AttackChevronBlock, 1)
 
-    CacheResults(FormationPos, formationUnits, 'AttackFormation')
+    if getSystemTimeSecondsOnlyForProfileUse then
+        SPEW("Formation computation took " .. (getSystemTimeSecondsOnlyForProfileUse() - start) .. " seconds.")
+    end
+    
     return FormationPos
 end
 

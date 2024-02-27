@@ -82,7 +82,6 @@ local GetFormationCategory = function(formationBlueprintCountCache, formationBlu
         for l = 1, TableGetn(formationBlueprintListCache) do
             local blueprintId = formationBlueprintListCache[l]
             if formationBlueprintCountCache[blueprintId] > 0 and EntityCategoryContains(category, blueprintId) then
-                formationBlueprintCountCache[blueprintId] = formationBlueprintCountCache[blueprintId] - 1
                 return blueprintId
             end
         end
@@ -100,7 +99,6 @@ local GetFormationColumnCategory = function(formationBlueprintCountCache, format
     for l = 1, TableGetn(formationBlueprintListCache) do
         local blueprintId = formationBlueprintListCache[l]
         if formationBlueprintCountCache[blueprintId] > 0 and EntityCategoryContains(category, blueprintId) then
-            formationBlueprintCountCache[blueprintId] = formationBlueprintCountCache[blueprintId] - 1
             return blueprintId
         end
     end
@@ -111,6 +109,12 @@ end
 ---@param units (Unit[] | UserUnit[])
 ---@return Formation
 ComputeFormation = function(units)
+
+    local start = 0
+    local getSystemTimeSecondsOnlyForProfileUse = rawget(_G, 'GetSystemTimeSecondsOnlyForProfileUse')
+    if getSystemTimeSecondsOnlyForProfileUse then
+        start = getSystemTimeSecondsOnlyForProfileUse()
+    end
 
     -- local scope for performance
     local tacticalFormation = TacticalFormation
@@ -125,24 +129,29 @@ ComputeFormation = function(units)
     )
 
     -- check if the formation is the same as the last one to avoid duplicate computations
-    local equal = true
-    for blueprintId, count in pairs(formationBlueprintCountCacheA) do
-        if formationBlueprintCountCacheB[blueprintId] ~= count then
-            equal = false
-            break
-        end
-    end
+    -- local equal = true
+    -- for blueprintId, count in pairs(formationBlueprintCountCacheA) do
+    --     if formationBlueprintCountCacheB[blueprintId] ~= count then
+    --         equal = false
+    --         break
+    --     end
+    -- end
 
-    if equal then
-        return tacticalFormation
-    else
-        for blueprintId, _ in formationBlueprintCountCacheB do
-            formationBlueprintCountCacheB[blueprintId] = nil
-        end
+    -- if equal then
+    --     return tacticalFormation
+    -- else
+    --     for blueprintId, _ in formationBlueprintCountCacheB do
+    --         formationBlueprintCountCacheB[blueprintId] = nil
+    --     end
 
-        for blueprintId, count in pairs(formationBlueprintCountCacheA) do
-            formationBlueprintCountCacheB[blueprintId] = count
-        end
+    --     for blueprintId, count in pairs(formationBlueprintCountCacheA) do
+    --         formationBlueprintCountCacheB[blueprintId] = count
+    --     end
+    -- end
+
+    -- clean up old entries
+    for k = 1, TableGetn(tacticalFormation) do
+        tacticalFormation[k] = nil
     end
 
     -- formation is not the same, re-compute it!
@@ -185,49 +194,43 @@ ComputeFormation = function(units)
             -- the general category, this garantees that if we have direct fire
             -- units that they end up in the front row. From the second row
             -- onwards we use a simple modulus to put categories in between
-            -- that may make sense, such as shields and anti-air units.
+            -- that may make sense, such as shields and anti-air units
 
-            local blueprintId
+            local blueprintId = GetFormationCategory(
+                formationBlueprintCountCache,
+                formationBlueprintListCache["Land"],
+                LandGeneralFirst
+            )
+
             local columnMod = MathMod(offset, TableGetn(LandColumnPreferences) + 1)
-            if ly == 1 or columnMod == 0 then
-                blueprintId = GetFormationCategory(
-                    formationBlueprintCountCache,
-                    formationBlueprintListCache["Land"],
-                    LandGeneralFirst
-                )
-            else
-                blueprintId = GetFormationColumnCategory(
+            if ly > 1 and columnMod > 0 then
+                local altBlueprintId = GetFormationColumnCategory(
                     formationBlueprintCountCache,
                     formationBlueprintListCache["Land"],
                     LandColumnPreferences,
                     columnMod
                 )
-            end
 
-            -------------------------------------------------------------------
-            -- this should never happen, but life's full of surprises.
-
-            if not blueprintId then
-                for k = 1, TableGetn(formationBlueprintListCache["Land"]) do
-                    local remainingBlueprintId = formationBlueprintListCache["Land"][k]
-                    if formationBlueprintCountCache[remainingBlueprintId] > 0 then
-                        formationBlueprintCountCache[remainingBlueprintId] = formationBlueprintCountCache[
-                            remainingBlueprintId] - 1
-                        blueprintId = remainingBlueprintId
-                        break
-                    end
+                if altBlueprintId then
+                    blueprintId = altBlueprintId
                 end
             end
 
-            -------------------------------------------------------------------
-            -- add the formation entry.
+            if blueprintId then
 
-            local formationIndex = TableGetn(tacticalFormation) + 1
-            local formation = GetFormationEntry(formationIndex)
-            formation[1] = horizontalOffset + sparsityMultiplier * ox
-            formation[2] = sparsityMultiplier * (-1 * ly)
-            formation[3] = categories[blueprintId]
-            TableInsert(tacticalFormation, formation)
+                -- decrease the count of the blueprint
+                formationBlueprintCountCache[blueprintId] = formationBlueprintCountCache[blueprintId] - 1
+
+                -------------------------------------------------------------------
+                -- add the formation entry
+
+                local formationIndex = TableGetn(tacticalFormation) + 1
+                local formation = GetFormationEntry(formationIndex)
+                formation[1] = horizontalOffset + sparsityMultiplier * ox
+                formation[2] = sparsityMultiplier * (-1 * ly)
+                formation[3] = categories[blueprintId]
+                TableInsert(tacticalFormation, formation)
+            end
         end
 
         -- break if we have no units left
@@ -238,9 +241,8 @@ ComputeFormation = function(units)
         end
     end
 
-    -- clean up remaining entries
-    for k = unitCount + 1, TableGetn(tacticalFormation) do
-        tacticalFormation[k] = nil
+    if getSystemTimeSecondsOnlyForProfileUse then
+        SPEW("Formation computation took " .. (getSystemTimeSecondsOnlyForProfileUse() - start) .. " seconds.")
     end
 
     return tacticalFormation

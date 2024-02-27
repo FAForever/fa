@@ -44,8 +44,8 @@ LandGeneralFirst = {
 }
 
 LandColumnPreferences = {
+    LandFormationCategories.LandFormationCategoriesShield,
     LandFormationCategories.LandFormationCategoriesAntiAir,
-    LandFormationCategories.LandFormationCategoriesShield + LandFormationCategories.LandFormationCategoriesCounterintelligence,
     LandFormationCategories.LandFormationCategoriesScout,
 }
 
