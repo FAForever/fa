@@ -213,7 +213,7 @@ UnitBlueprint{
             RenderFireClock = true,
             TargetPriorities = {
                 "EXPERIMENTAL MASSFABRICATION",
-                "(EXPERIMENTAL * ARTILLERY - FACTORY)",
+                "EXPERIMENTAL STRATEGIC ARTILLERY",
                 "TECH3 ANTIMISSILE",
                 "NUKE STRUCTURE",
                 "TECH3 STRUCTURE ARTILLERY",
