@@ -1441,7 +1441,7 @@ Unit_Description_0015="Adds a second Engineering Drone.\n\n+5 Buildpower Drone"
 
 -- UEF -- Support Commander Units/Upgrades
 Unit_Description_0016="A highly versatile combat and engineering unit useful on late-stage battlefields."
-Unit_Description_0017="Creates an Engineering Drone which act as a flying Engineer. Assists the SACU by default, but can be given its own orders.\n\n+35 Buildpower Drone"
+Unit_Description_0017="Creates an Engineering Drone which act as a flying T3 Engineer. Assists the SACU by default, but can be given its own orders.\n\n+35 Buildpower Drone"
 Unit_Description_0018="Creates a protective Personal Shield around the SACU. Requires energy to run.\n\nShield Regen Rate = 50 HP/s\nShield Recharge Time = 170 seconds"
 Unit_Description_0019="Replaces the SACU's Personal Shield with a Bubble Shield which protects friendly units inside it. Requires additional energy to run. Shields transfer residual damage to intersecting bubbles.\n\nShield Regen Rate = 150 HP/s\nShield Recharge Time = 215 seconds"
 Unit_Description_0020="Adds a Radar Jammer which creates false radar images. Countered by omni sensors."
