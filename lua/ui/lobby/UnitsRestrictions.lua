@@ -78,7 +78,7 @@ Expressions = {
     -- added exclusion of engineers and structures because they are restricted by other presets
     LAND        = "(LAND - ENGINEER - STRUCTURE + SUBCOMMANDER)",
     -- added restriction of air staging structures because they are not needed when all air units are restricted
-    AIR         = "(STRUCTURE * AIRSTAGINGPLATFORM) + (AIR - POD)",
+    AIR         = "(STRUCTURE * AIRSTAGINGPLATFORM) + (AIR - POD) - (SATELLITE + ORBITALSYSTEM)",
     NAVAL       = "((STRUCTURE * NAVAL * FACTORY) + (NAVAL * MOBILE - MOBILESONAR))",
     HOVER       = "(HOVER - INSIGNIFICANTUNIT - ENGINEER)",
     AMPHIBIOUS  = "(AMPHIBIOUS)",
@@ -168,7 +168,7 @@ Expressions = {
     INTEL_OPTICS = "(STRUCTURE * OPTICS)", -- "xab3301 + xrb3301",
     INTEL_SONAR  = "(STRUCTURE * SONAR) + MOBILESONAR",
     INTEL_BASE   = "(((OMNI + RADAR + SONAR) * STRUCTURE) + MOBILESONAR - DEFENSE)",
-    INTEL_AIR    = "(((OMNI + RADAR + SONAR + SCOUT) * AIR) - BOMBER - DEFENSE - GROUNDATTACK - ANTIAIR - ANTINAVY)",
+    INTEL_AIR    = "(((OMNI + RADAR + SONAR + SCOUT) * AIR) - BOMBER - DEFENSE - GROUNDATTACK - ANTIAIR - ANTINAVY - SATELLITE)",
     INTEL_LAND   = "(((OMNI + RADAR + SONAR + SCOUT) * LAND) - COMMAND - DEFENSE - SUBCOMMANDER - ANTIAIR - ANTINAVY)",
 
     STEALTH_BASE = "(STEALTHFIELD * STRUCTURE)",
