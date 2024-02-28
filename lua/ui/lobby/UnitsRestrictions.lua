@@ -75,8 +75,8 @@ Expressions = {
     TMLBASE     = "(STRUCTURE * TACTICALMISSILEPLATFORM)", -- xsb2108 + urb2108 + ueb2108 + uab2108
     TMLMOBILE   = "(MOBILE * LAND * INDIRECTFIRE * SILO)", -- XSL0111 + URL0111 + UEL0111 + UAL0111 + XEL0306
 
-    -- added exclusion of engineers and structures because they are restricted by other presets
-    LAND        = "(LAND - ENGINEER - STRUCTURE + SUBCOMMANDER)",
+    -- added exclusion of engineers, structures, and Scathis because they are restricted by other presets
+    LAND        = "(LAND - ENGINEER - STRUCTURE + SUBCOMMANDER - url0401)",
     -- added restriction of air staging structures because they are not needed when all air units are restricted
     AIR         = "(STRUCTURE * AIRSTAGINGPLATFORM) + (AIR - POD)",
     NAVAL       = "((STRUCTURE * NAVAL * FACTORY) + (NAVAL * MOBILE - MOBILESONAR))",
