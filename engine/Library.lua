@@ -133,6 +133,12 @@ end
 function table.getn2(list)
 end
 
+--- Defines the size of a list
+---@param list table
+---@param count integer
+function table.setn(list, count)
+end
+
 table.getsize = nil
 
 --- Returns the total number of keys in a table
