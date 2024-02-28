@@ -56,7 +56,7 @@ Expressions = {
     SERAPHIM    = "(SERAPHIM - COMMAND)",
     NOMADS      = "(NOMADS - COMMAND)",
 
-    T4ARTY      = "(ARTILLERY * EXPERIMENTAL) - FACTORY",  -- "xab2307 + url0401 + ueb2401"
+    T4ARTY      = "(ARTILLERY * EXPERIMENTAL * STRATEGIC) - FACTORY",  -- "xab2307 + url0401 + ueb2401"
     T3ARTY      = "(ARTILLERY * STRUCTURE * TECH3)",  -- "uab2302 + urb2302 + ueb2302 + xsb2302", Heavy Artillery
     T2ARTY      = "(ARTILLERY * STRUCTURE * TECH2)",
     T1ARTY      = "(ARTILLERY * STRUCTURE * TECH1)",

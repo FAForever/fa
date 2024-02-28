@@ -33,6 +33,7 @@ UnitBlueprint{
         "RECLAIMABLE",
         "SELECTABLE",
         "SHOWATTACKRETICLE",
+        "STRATEGIC",
         "SNIPEMODE",
         "VISIBLETORECON",
     },
