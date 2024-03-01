@@ -29,7 +29,6 @@ UnitBlueprint{
         "SELECTABLE",
         "SIZE12",
         "SORTSTRATEGIC",
-        "STRATEGIC",
         "STRUCTURE",
         "TECH1",
         "VISIBLETORECON",
