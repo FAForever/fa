@@ -129,25 +129,25 @@ ComputeFormation = function(units)
     )
 
     -- check if the formation is the same as the last one to avoid duplicate computations
-    -- local equal = true
-    -- for blueprintId, count in pairs(formationBlueprintCountCacheA) do
-    --     if formationBlueprintCountCacheB[blueprintId] ~= count then
-    --         equal = false
-    --         break
-    --     end
-    -- end
+    local equal = true
+    for blueprintId, count in pairs(formationBlueprintCountCacheA) do
+        if formationBlueprintCountCacheB[blueprintId] ~= count then
+            equal = false
+            break
+        end
+    end
 
-    -- if equal then
-    --     return tacticalFormation
-    -- else
-    --     for blueprintId, _ in formationBlueprintCountCacheB do
-    --         formationBlueprintCountCacheB[blueprintId] = nil
-    --     end
+    if equal then
+        return tacticalFormation
+    else
+        for blueprintId, _ in formationBlueprintCountCacheB do
+            formationBlueprintCountCacheB[blueprintId] = nil
+        end
 
-    --     for blueprintId, count in pairs(formationBlueprintCountCacheA) do
-    --         formationBlueprintCountCacheB[blueprintId] = count
-    --     end
-    -- end
+        for blueprintId, count in pairs(formationBlueprintCountCacheA) do
+            formationBlueprintCountCacheB[blueprintId] = count
+        end
+    end
 
     -- clean up old entries
     for k = 1, TableGetn(tacticalFormation) do
