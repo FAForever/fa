@@ -12,6 +12,9 @@
 
 ---@alias UnitFormations 'AttackFormation' | 'GrowthFormation' | 'NoFormation' | 'None' | 'none'
 
+local af = 0
+local gf = 0
+local gf2 = 0
 
 SurfaceFormations = {
     'AttackFormation',
@@ -36,6 +39,7 @@ local MaxCacheSize = 30
 ---@param formationType UnitFormations
 ---@return boolean
 function GetCachedResults(formationUnits, formationType)
+
     local cache = FormationCache[formationType]
     if not cache then
         return false
@@ -706,6 +710,11 @@ end
 ---@param formationUnits Unit[]
 ---@return table
 function AttackFormation(formationUnits)
+    af = af + 1
+    if math.mod(af, 100) == 0 then
+        LOG('AttackFormation calls: '..af)
+    end
+
     local cachedResults = GetCachedResults(formationUnits, 'AttackFormation')
     if cachedResults then
         return cachedResults
@@ -764,6 +773,11 @@ end
 ---@param formationUnits Unit[]
 ---@return table
 function GrowthFormation(formationUnits)
+    gf = gf + 1
+    if math.mod(gf, 100) == 0 then
+        LOG('GrowthFormation calls: '..gf)
+    end
+
     local cachedResults = GetCachedResults(formationUnits, 'GrowthFormation')
     if cachedResults then
         return cachedResults
@@ -840,6 +854,12 @@ end
 ---@param formationUnits Unit[]
 ---@return table
 function GuardFormation(formationUnits)
+    gf2 = gf2 + 1
+    if math.mod(gf2, 100) == 0 then
+        LOG('GuardFormation calls: '..gf2)
+    end
+
+
     -- Not worth caching GuardFormation because it's almost never called repeatedly with the same units.
     local FormationPos = {}
 
