@@ -16,6 +16,13 @@ AIPlatoonEngineerBehavior = Class(AIPlatoon) {
         --- Initial state of any state machine
         ---@param self AIPlatoonEngineerBehavior
         Main = function(self)
+            local function FinishBuildCallBack(eng)
+                --RNGLOG('AntiNavy Threat is '..repr(unit.PlatoonHandle.CurrentPlatoonThreatAntiNavy))
+                if eng.PlatoonHandle.StateName ~= 'FinishBuildTask' then
+                    eng.PlatoonHandle:LogDebug(string.format('Engineer Finished Build Task'))
+                    eng.PlatoonHandle:ChangeStateExt(eng.PlatoonHandle.FinishBuildTask)
+                end
+            end
             local aiBrain = self:GetBrain()
             self.LocationType = self.BuilderData.LocationType or 'MAIN'
             self.MovementLayer = self:GetNavigationalLayer()
@@ -28,8 +35,9 @@ AIPlatoonEngineerBehavior = Class(AIPlatoon) {
                 if not v.BuilderManagerData.EngineerManager and aiBrain.BuilderManagers[self.LocationType].EngineerManager then
                     v.BuilderManagerData.EngineerManager = aiBrain.BuilderManagers[self.LocationType].EngineerManager
                 end
+                import('/lua/ScenarioTriggers.lua').CreateUnitBuiltTrigger(FinishBuildCallBack(v), v, categories.ALLUNITS)
             end
-
+            
 
             self:ChangeState(self.DecideWhatToDo)
             return
@@ -82,6 +90,27 @@ AIPlatoonEngineerBehavior = Class(AIPlatoon) {
             return
         end,
 
+        FinishBuildTask = State {
+
+            StateName = 'FinishBuildTask',
+    
+            --- Initial state of any state machine
+            ---@param self AIPlatoonEngineerBehavior
+            Main = function(self)
+                if self.Dead then
+                    return
+                end
+                local platoonUnits = self:GetPlatoonUnits()
+                if self.EngineerBuildQueue and not table.empty(self.EngineerBuildQueue) then
+                    table.remove(self.EngineerBuildQueue, 1)
+                end
+                for _, v in platoonUnits do
+                    v:IssueClearCommands()
+                end
+                self:ChangeState(self.DecideWhatToDo)
+            end,
+        },
+
         SetBuilderData = State {
 
             StateName = 'SetBuilderData',
@@ -93,9 +122,19 @@ AIPlatoonEngineerBehavior = Class(AIPlatoon) {
                     self:ChangeState(self.Error)
                     return
                 end
-
+                local aiBrain = self:GetBrain()
+                local engUnit = self:GetPlatoonUnits()[1]
                 local cons = self.PlatoonData.Construction
                 local buildingTmpl, buildingTmplFile, baseTmpl, baseTmplFile, baseTmplDefault
+                local factionIndex = aiBrain:GetFactionIndex()
+                buildingTmplFile = import(cons.BuildingTemplateFile or '/lua/BuildingTemplates.lua')
+                buildingTmpl = buildingTmplFile[(cons.BuildingTemplate or 'BuildingTemplates')][factionIndex]
+                self.EngineerBuildQueue = {}
+                for _, v in cons.BuildStructures do
+                    local whatToBuild = aiBrain:DecideWhatToBuild(engUnit, v, buildingTmpl)
+                    table.insert(self.EngineerBuildQueue, {whatToBuild, buildLocation, relative, borderWarning})
+                end
+
     
     
             end,
