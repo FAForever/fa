@@ -22,17 +22,22 @@
 
 -- upvalue scope for performance
 local TableSort = table.sort
-local TableInsert = table.insert
 local TableSetn = table.setn
 local TableGetn = table.getn
+local TableInsert = table.insert
 
----@param a UnitBlueprint
----@param b UnitBlueprint
+--- Sorts the list of blueprint ids first by tech level and then by (footprint) size
+---@param a BlueprintId
+---@param b BlueprintId
 ---@return boolean
 local SortByTech = function(a, b)
+    ---@type UnitBlueprint
     local ba = __blueprints[a]
+
+    ---@type UnitBlueprint
     local bb = __blueprints[b]
-    return ba.FormationTechIndex > bb.FormationTechIndex
+
+    return (ba.FormationTechIndex + 0.01 * ba.Footprint.SizeZ) > (bb.FormationTechIndex + 0.01 * ba.Footprint.SizeZ)
 end
 
 --- Lookup table to retrieve the count of a given unit type.
@@ -66,7 +71,7 @@ ComputeFormationProperties = function(units, blueprintCountCache, blueprintListC
         TableSetn(blueprintIds, 0)
     end
 
-    -- (re-)populate the cache
+    -- populate the cache
     for k, unit in units do
         local unitBlueprint = unit:GetBlueprint() --[[@as UnitBlueprint]]
         local unitBlueprintId = unitBlueprint.BlueprintId

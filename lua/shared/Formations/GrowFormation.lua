@@ -45,6 +45,9 @@ local FormationBlueprintListCache = {
     Submersible = {}
 }
 
+---@type number[]
+local FormationColumnOccupied = { }
+
 --- A table that contains the tactical formation that we can re-use.
 ---@type Formation
 local TacticalFormation = {}
@@ -146,7 +149,7 @@ ComputeFormation = function(units)
 
     local formationRows, formationColumns = ComputeDimensions(unitCount)
 
-    local sparsityMultiplier = 1.25
+    local sparsityMultiplier = 1.5
     local unitsRemainingCount = unitCount
 
     -- populate the formation
@@ -244,6 +247,8 @@ ComputeFormation = function(units)
                 formation[1] = horizontalOffset + sparsityMultiplier * ox
                 formation[2] = sparsityMultiplier * (-1 * ly)
                 formation[3] = categories[blueprintId]
+                formation[4] = 0
+                formation[5] = true
                 TableInsert(tacticalFormation, formation)
             end
         end

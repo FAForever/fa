@@ -230,7 +230,7 @@ function AttackFormation(formationUnits)
     if getSystemTimeSecondsOnlyForProfileUse then
         SPEW("Formation computation took " .. (getSystemTimeSecondsOnlyForProfileUse() - start) .. " seconds.")
     end
-    
+
     return FormationPos
 end
 
