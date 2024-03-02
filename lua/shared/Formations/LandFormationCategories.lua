@@ -62,7 +62,7 @@ LandFormationCategoriesMissile = LAND * (SILO) - (WEAKINDIRECTFIRE)
 LandFormationCategoriesAntiAir = LAND * (ANTIAIR) - (WEAKANTIAIR)
 LandFormationCategoriesShield = LAND * (SHIELD)
 LandFormationCategoriesEngineering = LAND * (ENGINEER) - (COMMAND)
-LandFormationCategoriesScout = LAND * (SCOUT) - (DIRECTFIRE + ANTIAIR + INDIRECTFIRE)
+LandFormationCategoriesScout = LAND * (SCOUT)
 LandFormationCategoriesCounterintelligence = LAND * (COUNTERINTELLIGENCE) - (DIRECTFIRE + ANTIAIR + INDIRECTFIRE)
 LandFormationCategoriesEngineeering = LAND * (ENGINEER) - (DIRECTFIRE + ANTIAIR + INDIRECTFIRE)
 

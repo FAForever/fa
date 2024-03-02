@@ -24,8 +24,11 @@ local ComputeFormationProperties = import('/lua/shared/Formations/shared.lua').C
 local GetFormationEntry = import('/lua/shared/Formations/Formation.lua').GetFormationEntry
 
 -- preferences for land
-local LandGeneralFirst = import("/lua/shared/Formations/LandFormationPreferences.lua").LandGeneralFirst
-local LandColumnPreferences = import("/lua/shared/Formations/LandFormationPreferences.lua").LandColumnPreferences
+local LandGeneralPreferences = import("/lua/shared/Formations/LandFormationPreferences.lua").LandGeneralPreferences
+local LandShieldPreferences = import("/lua/shared/Formations/LandFormationPreferences.lua").LandShieldPreferences
+local LandCounterIntelligencePreferences = import("/lua/shared/Formations/LandFormationPreferences.lua").LandCounterIntelligencePreferences
+local LandAntiAirPreferences = import("/lua/shared/Formations/LandFormationPreferences.lua").LandAntiAirPreferences
+local LandCounterScoutPreferences = import("/lua/shared/Formations/LandFormationPreferences.lua").LandCounterScoutPreferences
 
 --- A table that contains the blueprint lookups that we can re-use.
 ---@type FormationBlueprintCount
@@ -84,22 +87,6 @@ local GetFormationCategory = function(formationBlueprintCountCache, formationBlu
             if formationBlueprintCountCache[blueprintId] > 0 and EntityCategoryContains(category, blueprintId) then
                 return blueprintId
             end
-        end
-    end
-
-    return nil
-end
-
----@param formationBlueprintCountCache FormationBlueprintCount
----@param formationBlueprintListCache BlueprintId[]
----@param preferences EntityCategory[]
----@return BlueprintId?
-local GetFormationColumnCategory = function(formationBlueprintCountCache, formationBlueprintListCache, preferences, index)
-    local category = preferences[index]
-    for l = 1, TableGetn(formationBlueprintListCache) do
-        local blueprintId = formationBlueprintListCache[l]
-        if formationBlueprintCountCache[blueprintId] > 0 and EntityCategoryContains(category, blueprintId) then
-            return blueprintId
         end
     end
 
@@ -196,24 +183,51 @@ ComputeFormation = function(units)
             -- onwards we use a simple modulus to put categories in between
             -- that may make sense, such as shields and anti-air units
 
-            local blueprintId = GetFormationCategory(
-                formationBlueprintCountCache,
-                formationBlueprintListCache["Land"],
-                LandGeneralFirst
-            )
+            local blueprintId
 
-            local columnMod = MathMod(offset, TableGetn(LandColumnPreferences) + 1)
-            if ly > 1 and columnMod > 0 then
-                local altBlueprintId = GetFormationColumnCategory(
+            if ly > 1 then
+
+                local rowMod4 = MathMod(ly, 4)
+                local columnMod3 = MathMod(offset, 3)
+
+                if (rowMod4 == 0 or rowMod4 == 2) and columnMod3 == 2 then
+                    -- we'd like a shield here
+                    blueprintId = GetFormationCategory(
+                        formationBlueprintCountCache,
+                        formationBlueprintListCache["Land"],
+                        LandShieldPreferences
+                    )
+                elseif rowMod4 == 3 and columnMod3 == 2 then
+                    -- we'd like counter intelligence or a scout here
+                    blueprintId = GetFormationCategory(
+                        formationBlueprintCountCache,
+                        formationBlueprintListCache["Land"],
+                        LandCounterIntelligencePreferences
+                    )
+                elseif rowMod4 == 3 and columnMod3 == 1 then
+                    -- we'd like a scout here
+                    blueprintId = GetFormationCategory(
+                        formationBlueprintCountCache,
+                        formationBlueprintListCache["Land"],
+                        LandCounterScoutPreferences
+                    )
+                elseif rowMod4 == 0 and (columnMod3 == 0 or columnMod3 == 1) then
+                    -- we'd like anti air here
+                    blueprintId = GetFormationCategory(
+                        formationBlueprintCountCache,
+                        formationBlueprintListCache["Land"],
+                        LandAntiAirPreferences)
+                end
+            end
+
+            -- find a general category if we have no specific category
+
+            if not blueprintId then
+                blueprintId = GetFormationCategory(
                     formationBlueprintCountCache,
                     formationBlueprintListCache["Land"],
-                    LandColumnPreferences,
-                    columnMod
+                    LandGeneralPreferences
                 )
-
-                if altBlueprintId then
-                    blueprintId = altBlueprintId
-                end
             end
 
             if blueprintId then

@@ -31,7 +31,7 @@ end
 -------------------------------------------------------------------------------
 --#region Formation preferences
 
-LandGeneralFirst = {
+LandGeneralPreferences = {
     LandFormationCategories.LandFormationCategoriesDirectFire,
     LandFormationCategories.LandFormationCategoriesSupportCommand,
     LandFormationCategories.LandFormationCategoriesAntiAir,
@@ -43,71 +43,21 @@ LandGeneralFirst = {
     LandFormationCategories.CategoriesAllUnits
 }
 
-LandColumnPreferences = {
+LandShieldPreferences = {
     LandFormationCategories.LandFormationCategoriesShield,
-    LandFormationCategories.LandFormationCategoriesAntiAir,
-    LandFormationCategories.LandFormationCategoriesScout,
 }
 
-LandCommandFirst = {
-    LandFormationCategories.LandFormationCategoriesCommand,
-    LandFormationCategories.LandFormationCategoriesSupportCommand,
-    LandFormationCategories.CategoriesAllUnits
-}
-
-LandDirectFireFirst = {
-    LandFormationCategories.LandFormationCategoriesDirectFire,
-    LandFormationCategories.LandFormationCategoriesSupportCommand,
-    LandFormationCategories.LandFormationCategoriesArtillery,
-    LandFormationCategories.CategoriesAllUnits
-}
-
-LandMissileFirst = {
-    LandFormationCategories.LandFormationCategoriesMissile,
-    LandFormationCategories.LandFormationCategoriesArtillery,
-    LandFormationCategories.CategoriesAllUnits
-}
-
-LandArtilleryFirst = {
-    LandFormationCategories.LandFormationCategoriesArtillery,
-    LandFormationCategories.LandFormationCategoriesMissile,
-    LandFormationCategories.CategoriesAllUnits
-}
-
-LandShieldFirst = {
-    LandFormationCategories.LandFormationCategoriesShield,
-    LandFormationCategories.LandFormationCategoriesScout,
-    LandFormationCategories.CategoriesAllUnits
-}
-
-LandSniperFirst = {
-    LandFormationCategories.LandFormationCategoriesSniper,
-    LandFormationCategories.LandFormationCategoriesMissile,
-    LandFormationCategories.CategoriesAllUnits
-}
-
-LandAntiAirFirst = {
-    LandFormationCategories.LandFormationCategoriesAntiAir,
-    LandFormationCategories.LandFormationCategoriesShield,
-    LandFormationCategories.CategoriesAllUnits
-}
-
-LandCounterintelligenceFirst = {
+LandCounterIntelligencePreferences = {
     LandFormationCategories.LandFormationCategoriesCounterintelligence,
     LandFormationCategories.LandFormationCategoriesScout,
-    LandFormationCategories.CategoriesAllUnits
 }
 
-LandIntelligenceFirst = {
+LandAntiAirPreferences = {
+    LandFormationCategories.LandFormationCategoriesAntiAir,
+}
+
+LandCounterScoutPreferences = {
     LandFormationCategories.LandFormationCategoriesScout,
-    LandFormationCategories.LandFormationCategoriesShield,
-    LandFormationCategories.CategoriesAllUnits
-}
-
-LandEngineeringFirst = {
-    LandFormationCategories.LandFormationCategoriesEngineeering,
-    LandFormationCategories.LandFormationCategoriesSupportCommand,
-    LandFormationCategories.CategoriesAllUnits
 }
 
 --#endregion
