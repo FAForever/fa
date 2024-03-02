@@ -37,7 +37,7 @@ local SortByTech = function(a, b)
     ---@type UnitBlueprint
     local bb = __blueprints[b]
 
-    return (ba.FormationTechIndex + 0.01 * ba.Footprint.SizeZ) > (bb.FormationTechIndex + 0.01 * ba.Footprint.SizeZ)
+    return (ba.FormationTechIndex + 0.01 * ba.Footprint.SizeX) > (bb.FormationTechIndex + 0.01 * ba.Footprint.SizeX)
 end
 
 --- Lookup table to retrieve the count of a given unit type.
@@ -151,12 +151,12 @@ ComputeFootprintData = function(blueprintCountCache, blueprintIds)
     for k = 1, TableGetn(blueprintIds) do
         local blueprintId = blueprintIds[k]
         local blueprintCount = blueprintCountCache[blueprintId]
-        local blueprintFootprintZ  = __blueprints[blueprintId].Footprint.SizeZ
+        local blueprintFootprintSize  = __blueprints[blueprintId].Footprint.SizeX
 
         if blueprintCount > 0 then
-            footprintTotalLength = footprintTotalLength + blueprintCount * blueprintFootprintZ
-            if blueprintFootprintZ > footprintMaximum then
-                footprintMaximum = blueprintFootprintZ
+            footprintTotalLength = footprintTotalLength + blueprintCount * blueprintFootprintSize
+            if blueprintFootprintSize > footprintMaximum then
+                footprintMaximum = blueprintFootprintSize
             end
         end
     end

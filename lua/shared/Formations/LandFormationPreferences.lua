@@ -49,7 +49,6 @@ LandShieldPreferences = {
 
 LandCounterIntelligencePreferences = {
     LandFormationCategories.LandFormationCategoriesCounterintelligence,
-    LandFormationCategories.LandFormationCategoriesScout,
 }
 
 LandAntiAirPreferences = {

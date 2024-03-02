@@ -98,6 +98,176 @@ local GetFormationCategory = function(formationBlueprintCountCache, formationBlu
     return nil
 end
 
+---comment
+---@param formationBlueprintCountCache FormationBlueprintCount
+---@param blueprintIds BlueprintId[]
+ComputeLandFormation = function(formationBlueprintCountCache, blueprintIds)
+
+    -- local scope for performance
+    local tacticalFormation = TacticalFormation
+    local formationColumnOccupied = FormationColumnOccupied
+
+    -- compute total land unit count
+    local unitsToProcess = 0
+    for k = 1, TableGetn(blueprintIds) do
+        local blueprintId = blueprintIds[k]
+        unitsToProcess = unitsToProcess + formationBlueprintCountCache[blueprintId]
+    end
+
+    -- compute length of each row
+    local footprintTotalLength, footprintMaximum = ComputeFootprintData(
+        formationBlueprintCountCache,
+        blueprintIds
+    )
+    local formationRowLength = 2 * MathCeil(MathSqrt(footprintTotalLength))
+    local inverseFootprintMaximum = 1.5 / footprintMaximum
+
+
+    LOG('footprintMaximum', footprintMaximum)
+    local sparsityMultiplier = 1.5
+
+    local lx = 0
+    local ly = 0
+
+    for k = 1, TableGetn(formationColumnOccupied) do
+        formationColumnOccupied[k] = 0
+    end
+
+    -- process rows
+    while unitsToProcess > 0 do
+
+        lx = 1
+        ly = ly + 1
+
+        -- we decrease the columns one as we move a row backwards the rows
+        for k = 1, TableGetn(formationColumnOccupied) do
+            formationColumnOccupied[k] = formationColumnOccupied[k] - 1
+        end
+
+        -- process columns (of a row)
+        while (unitsToProcess > 0) and (lx < formationRowLength)  do
+
+            -- skip if the column on this row is occupied
+            if formationColumnOccupied[lx] > 0 then
+                lx = lx + 1
+                continue
+            end
+
+            -------------------------------------------------------------------
+            -- pattern that allows us to grow from the center, as an example for
+            -- 7 units the results look like:
+            --
+            -- - 0  -1  1   -2  2   -3  3
+            --
+            -- which is exactly what we want!
+
+            local offset = MathCeil(0.5 * (lx - 1))
+            local ox = offset
+            if MathMod(lx, 2) == 0 then
+                ox = -1 * offset
+            end
+
+            -------------------------------------------------------------------
+            -- the category magic part where we try to find a pattern for the
+            -- unit categories that looks decent. The first row is always the
+            -- the general category, this garantees that if we have direct fire
+            -- units that they end up in the front row. From the second row
+            -- onwards we use a simple modulus to put categories in between
+            -- that may make sense, such as shields and anti-air units
+
+            local blueprintId
+
+            if ly > 1 then
+
+                local rowMod4 = MathMod(ly, 4)
+                local columnMod3 = MathMod(offset, 3)
+
+                if (rowMod4 == 0 or rowMod4 == 2) and columnMod3 == 2 then
+                    -- we'd like a shield here
+                    blueprintId = GetFormationCategory(
+                        formationBlueprintCountCache,
+                        blueprintIds,
+                        LandShieldPreferences
+                    )
+                elseif rowMod4 == 3 and columnMod3 == 2 then
+                    -- we'd like counter intelligence or a scout here
+                    blueprintId = GetFormationCategory(
+                        formationBlueprintCountCache,
+                        blueprintIds,
+                        LandCounterIntelligencePreferences
+                    )
+                elseif rowMod4 == 3 and columnMod3 == 1 then
+                    -- we'd like a scout here
+                    blueprintId = GetFormationCategory(
+                        formationBlueprintCountCache,
+                        blueprintIds,
+                        LandCounterScoutPreferences
+                    )
+                elseif rowMod4 == 0 and (columnMod3 == 0 or columnMod3 == 1) then
+                    -- we'd like anti air here
+                    blueprintId = GetFormationCategory(
+                        formationBlueprintCountCache,
+                        blueprintIds,
+                        LandAntiAirPreferences
+                    )
+                end
+            end
+
+            -- find a general category if we have no specific category
+
+            if not blueprintId then
+                blueprintId = GetFormationCategory(
+                    formationBlueprintCountCache,
+                    blueprintIds,
+                    LandGeneralPreferences
+                )
+            end
+
+            if blueprintId then
+
+                -- decrease the total unit count
+                unitsToProcess = unitsToProcess - 1
+
+                -- decrease the blueprint unit count
+                formationBlueprintCountCache[blueprintId] = formationBlueprintCountCache[blueprintId] - 1
+
+                local blueprintFootprint = __blueprints[blueprintId].Footprint
+                local blueprintFootprintSizeX = blueprintFootprint.SizeX
+                local blueprintFootprintSizeZ = blueprintFootprint.SizeZ
+
+                local blueprintFootprintSizeXMod2 = MathMod(blueprintFootprintSizeX, 2)
+                if blueprintFootprintSizeXMod2 == 0 then
+                    blueprintFootprintSizeX = blueprintFootprintSizeX - 1
+                end
+
+                -- occupy the next few rows for the current columns to make space for this unit
+                for k = 0, blueprintFootprintSizeX - 1 do
+                    formationColumnOccupied[lx + k] = blueprintFootprintSizeZ - 1
+                end
+
+                -- increase the current formation length
+                lx = lx + blueprintFootprintSizeX
+
+                -------------------------------------------------------------------
+                -- add the formation entry
+
+                local formationIndex = TableGetn(tacticalFormation) + 1
+                local formation = GetFormationEntry(formationIndex)
+                formation[1] = sparsityMultiplier * (inverseFootprintMaximum * ox)
+                formation[2] = sparsityMultiplier * (inverseFootprintMaximum * (-1 * ly))
+                formation[3] = categories[blueprintId]
+                formation[4] = 0
+                formation[5] = true
+                TableInsert(tacticalFormation, formation)
+            else
+                LOG("No blueprint!", lx, unitsToProcess, formationRowLength, ly, formationColumnOccupied[lx])
+                lx = lx + 1
+                unitsToProcess = unitsToProcess - 1
+            end
+        end
+    end
+end
+
 ---@param units (Unit[] | UserUnit[])
 ---@return Formation
 ComputeFormation = function(units)
@@ -149,12 +319,12 @@ ComputeFormation = function(units)
     -- formation is not the same, re-compute it!
     TableSetn(tacticalFormation, 0)
 
-    local footprintTotalLength, footprintMaximum = ComputeFootprintData(
-        formationBlueprintCountCache,
-        formationBlueprintListCache.Land
-    )
+    ComputeLandFormation(formationBlueprintCountCache, formationBlueprintListCache["Land"])
 
-    LOG(footprintTotalLength, footprintMaximum)
+    do
+        return tacticalFormation
+    end
+
     local formationRows, formationColumns = ComputeDimensions(unitCount)
 
     local sparsityMultiplier = 1.5
@@ -170,7 +340,7 @@ ComputeFormation = function(units)
             end
         end
 
-        for lx = 0, formationColumns - 1 do
+        for lx = 1, formationColumns do
 
             -------------------------------------------------------------------
             -- pattern that allows us to grow from the center, as an example for
@@ -180,7 +350,7 @@ ComputeFormation = function(units)
             --
             -- which is exactly what we want!
 
-            local offset = MathCeil(0.5 * lx)
+            local offset = MathCeil(0.5 * (lx - 1))
             local ox = offset
             if MathMod(lx, 2) == 0 then
                 ox = -1 * offset

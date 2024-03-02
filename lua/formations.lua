@@ -16,6 +16,8 @@
 local TableGetn = table.getn
 local TableInsert = table.insert
 
+local MathCeil = math.ceil
+
 SurfaceFormations = {
     'AttackFormation',
     'GrowthFormation',
@@ -512,7 +514,7 @@ function BlockBuilderLand(unitsList, formationBlock, categoryTable, spacing)
                             if whichCol == 1 then
                                 xPos = 0
                             else
-                                xPos = math.ceil(((whichCol - 1) / 2)) + offsetX
+                                xPos = MathCeil(((whichCol - 1) / 2)) + offsetX
                                 if not (math.mod(whichCol, 2) == 0) then
                                     xPos = xPos * -1
                                 end

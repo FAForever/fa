@@ -323,10 +323,7 @@ local function PostProcessUnit(unit)
             unit.SizeDamageEffectsScale = 2.0
         end
     end
-
-    unit.Footprint = unit.Footprint or {}
-    unit.Footprint.SizeMax = math.max(unit.Footprint.SizeX or 1, unit.Footprint.SizeZ or 1)
-
+    
     -- Pre-compute intel state
 
     -- gather data
