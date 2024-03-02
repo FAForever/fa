@@ -21,15 +21,29 @@
 --******************************************************************************************************
 
 -- upvalue scope for performance
+local TableSort = table.sort
 local TableInsert = table.insert
 local TableSetn = table.setn
 local TableGetn = table.getn
+
+---@param a UnitBlueprint
+---@param b UnitBlueprint
+---@return boolean
+local SortByTech = function(a, b)
+    local ba = __blueprints[a]
+    local bb = __blueprints[b]
+    return ba.FormationTechIndex > bb.FormationTechIndex
+end
 
 --- Lookup table to retrieve the count of a given unit type.
 ---@alias FormationBlueprintCount table<BlueprintId, number>
 
 --- Lookup table to retrieve the unit types that belong in a formation layer.
----@alias FormationBlueprintList table<FormationCategory, BlueprintId[]>
+---@class FormationBlueprintList
+---@field Land BlueprintId[]
+---@field Air BlueprintId[]
+---@field Naval BlueprintId[]
+---@field Submersible BlueprintId[]
 
 --- Transforms a list of units into a lookup datastructure to make them computationally cheaper to work with.
 ---@param units (Unit[] | UserUnit[])
@@ -56,10 +70,10 @@ ComputeFormationProperties = function(units, blueprintCountCache, blueprintListC
     for k, unit in units do
         local unitBlueprint = unit:GetBlueprint() --[[@as UnitBlueprint]]
         local unitBlueprintId = unitBlueprint.BlueprintId
-        local unitblueprintFormationCategory = unitBlueprint.FormationCategory
+        local unitblueprintFormationLayer = unitBlueprint.FormationLayer
         if not blueprintCountCache[unitBlueprintId] then
             blueprintCountCache[unitBlueprintId] = 1
-            TableInsert(blueprintListCache[unitblueprintFormationCategory], unitBlueprintId)
+            TableInsert(blueprintListCache[unitblueprintFormationLayer], unitBlueprintId)
         else
             blueprintCountCache[unitBlueprintId] = blueprintCountCache[unitBlueprintId] + 1
         end
@@ -70,6 +84,12 @@ ComputeFormationProperties = function(units, blueprintCountCache, blueprintListC
     for _, unitCount in blueprintCountCache do
         blueprintTotalCount = blueprintTotalCount + unitCount
     end
+
+    -- sort the lists by tech level, this way we always get the most advanced units first
+    TableSort(blueprintListCache.Air, SortByTech)
+    TableSort(blueprintListCache.Land, SortByTech)
+    TableSort(blueprintListCache.Naval, SortByTech)
+    TableSort(blueprintListCache.Submersible, SortByTech)
 
     return blueprintCountCache, blueprintListCache, blueprintTotalCount
 end

@@ -116,7 +116,7 @@ ComputeFormation = function(units)
     )
 
     -- check if the formation is the same as the last one to avoid duplicate computations
-    local equal = true
+    local equal = false
     for blueprintId, count in pairs(formationBlueprintCountCacheA) do
         if formationBlueprintCountCacheB[blueprintId] ~= count then
             equal = false
@@ -216,7 +216,8 @@ ComputeFormation = function(units)
                     blueprintId = GetFormationCategory(
                         formationBlueprintCountCache,
                         formationBlueprintListCache["Land"],
-                        LandAntiAirPreferences)
+                        LandAntiAirPreferences
+                    )
                 end
             end
 
@@ -256,7 +257,7 @@ ComputeFormation = function(units)
     end
 
     if getSystemTimeSecondsOnlyForProfileUse then
-        SPEW("Formation computation took " .. (getSystemTimeSecondsOnlyForProfileUse() - start) .. " seconds.")
+        SPEW("Formation computation took " .. (getSystemTimeSecondsOnlyForProfileUse() - start) .. " seconds for " .. unitCount .. " units.")
     end
 
     return tacticalFormation

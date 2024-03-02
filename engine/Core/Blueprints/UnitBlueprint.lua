@@ -29,7 +29,8 @@
 ---@alias LayerCategory "AIR" | "LAND" | "NAVAL"
 ---@alias FactionCategory "UEF" | "CYBRAN" | "AEON" | "SERAPHIM" | "NOMADS"
 ---@alias IconBackgroundType "air" | "amph" | "land" | "sea"
----@alias FormationCategory 'Land' | 'Air' | 'Naval' | 'Submersible' | 'Hover'
+---@alias FormationLayer 'Land' | 'Air' | 'Naval' | 'Submersible' | 'Hover'
+---@alias FormationTech number
 
 ---@alias UnitId BlueprintId
 
@@ -120,8 +121,10 @@
 ---@field SizeDamageEffectsScale number
 --- auto-generated tech category from `Categories`
 ---@field TechCategory TechCategory
---- auto-generated formation category based on the motion type
----@field FormationCategory FormationCategory
+--- auto-generated formation layer based on the motion type
+---@field FormationLayer FormationLayer
+--- auto-generated formation tech index based on the category
+---@field FormationTechIndex FormationTech
 ---
 --- adds categories to `Categories` and then is deleted. Takes precedence over `DelCategories`
 ---@field AddCategories? CategoryName[]

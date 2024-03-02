@@ -648,12 +648,65 @@ function TestIntelValues(unit)
     end
 end
 
+---@param unitBlueprint UnitBlueprint
+function AddFormationData(unitBlueprint)
+    -- add formation layer category
+    if not unitBlueprint.FormationLayer then
+        for category, identifier in {LAND = 'Land', AIR = 'Air', NAVAL = 'Naval', SUBMERSIBLE = 'Submersible'} do
+            if unitBlueprint.CategoriesHash[category] then
+                unitBlueprint.FormationLayer = identifier
+                break
+            end
+        end
+    end
+
+    -- add formation sorting index
+    if not unitBlueprint.FormationTechIndex then
+        local formationTechIndex = 0
+
+        if unitBlueprint.CategoriesHash["COMMAND"] then
+            formationTechIndex = 0
+
+        elseif unitBlueprint.CategoriesHash['TECH1'] then
+            formationTechIndex = 1
+
+            -- basic mod support for tech 1 experimentals
+            if unitBlueprint.CategoriesHash['EXPERIMENTAL'] then
+                formationTechIndex = 1.5
+            end
+
+        elseif unitBlueprint.CategoriesHash['TECH2'] then
+            formationTechIndex = 2
+
+            -- basic mod support for tech 2 experimentals
+            if unitBlueprint.CategoriesHash['EXPERIMENTAL'] then
+                formationTechIndex = 2.5
+            end
+        elseif unitBlueprint.CategoriesHash['TECH3'] then
+            formationTechIndex = 3
+
+            -- basic mod support for tech 3 experimentals
+            if unitBlueprint.CategoriesHash['EXPERIMENTAL'] then
+                formationTechIndex = 3.5
+            end
+        elseif unitBlueprint.CategoriesHash['EXPERIMENTAL'] then
+            formationTechIndex = 4
+        end
+
+        -- always put these at the back
+
+
+        unitBlueprint.FormationTechIndex = formationTechIndex
+    end
+end
+
 --- Post-processes all units
 ---@param allBlueprints BlueprintsTable
 ---@param units UnitBlueprint[]
 function PostProcessUnits(allBlueprints, units)
     for _, unit in units do
         PostProcessUnit(unit)
+        AddFormationData(unit)
     end
 
     for _, unit in units do

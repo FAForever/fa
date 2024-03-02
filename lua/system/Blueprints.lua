@@ -814,14 +814,6 @@ function PreModBlueprints(all_bps)
             end
         end
 
-        -- Add formation layer category
-        for category, identifier in {LAND = 'Land', AIR = 'Air', NAVAL = 'Naval', SUBMERSIBLE = 'Submersible'} do
-            if bp.CategoriesHash[category] then
-                bp.FormationCategory = identifier
-                break
-            end
-        end
-
         -- Add faction category
         bp.FactionCategory = string.upper(bp.General.FactionName or 'Unknown')
 
