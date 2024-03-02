@@ -21,6 +21,8 @@
 --******************************************************************************************************
 
 local ComputeFormationProperties = import('/lua/shared/Formations/shared.lua').ComputeFormationProperties
+local ComputeFootprintData = import('/lua/shared/Formations/shared.lua').ComputeFootprintData
+
 local GetFormationEntry = import('/lua/shared/Formations/Formation.lua').GetFormationEntry
 
 -- preferences for land
@@ -46,7 +48,7 @@ local FormationBlueprintListCache = {
 }
 
 ---@type number[]
-local FormationColumnOccupied = { }
+local FormationColumnOccupied = {}
 
 --- A table that contains the tactical formation that we can re-use.
 ---@type Formation
@@ -147,6 +149,12 @@ ComputeFormation = function(units)
     -- formation is not the same, re-compute it!
     TableSetn(tacticalFormation, 0)
 
+    local footprintTotalLength, footprintMaximum = ComputeFootprintData(
+        formationBlueprintCountCache,
+        formationBlueprintListCache.Land
+    )
+
+    LOG(footprintTotalLength, footprintMaximum)
     local formationRows, formationColumns = ComputeDimensions(unitCount)
 
     local sparsityMultiplier = 1.5
@@ -262,7 +270,8 @@ ComputeFormation = function(units)
     end
 
     if getSystemTimeSecondsOnlyForProfileUse then
-        SPEW("Formation computation took " .. (getSystemTimeSecondsOnlyForProfileUse() - start) .. " seconds for " .. unitCount .. " units.")
+        SPEW("Formation computation took " ..
+            (getSystemTimeSecondsOnlyForProfileUse() - start) .. " seconds for " .. unitCount .. " units.")
     end
 
     return tacticalFormation

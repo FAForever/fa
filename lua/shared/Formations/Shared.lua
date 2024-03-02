@@ -136,3 +136,30 @@ UpdateFormationProperties = function(blueprintCountCache, blueprintListCache)
 
     return blueprintCountCache, blueprintListCache, blueprintTotalCount
 end
+
+---
+---@param blueprintCountCache FormationBlueprintCount
+---@param blueprintIds BlueprintId[]
+---@return number # all size-z footprints combined
+---@return number # the largest size-z footprint
+ComputeFootprintData = function(blueprintCountCache, blueprintIds)
+    -- local scope for performance
+    local __blueprints = __blueprints
+
+    local footprintMaximum = 0
+    local footprintTotalLength = 0
+    for k = 1, TableGetn(blueprintIds) do
+        local blueprintId = blueprintIds[k]
+        local blueprintCount = blueprintCountCache[blueprintId]
+        local blueprintFootprintZ  = __blueprints[blueprintId].Footprint.SizeZ
+
+        if blueprintCount > 0 then
+            footprintTotalLength = footprintTotalLength + blueprintCount * blueprintFootprintZ
+            if blueprintFootprintZ > footprintMaximum then
+                footprintMaximum = blueprintFootprintZ
+            end
+        end
+    end
+
+    return footprintTotalLength, footprintMaximum
+end
