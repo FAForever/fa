@@ -343,8 +343,8 @@ UnitBlueprint {
             Slot = "RCH",
         },
         LeftPod = {
-            BuildCostEnergy = 9600,
-            BuildCostMass = 360,
+            BuildCostEnergy = 10800,
+            BuildCostMass = 320,
             BuildTime = 800,
             Icon = "led",
             Name = "<LOC enhancements_0043>C-D1 Shoulder Drone",
@@ -400,8 +400,8 @@ UnitBlueprint {
             Slot = "RCH",
         },
         RightPod = {
-            BuildCostEnergy = 9600,
-            BuildCostMass = 360,
+            BuildCostEnergy = 10800,
+            BuildCostMass = 320,
             BuildTime = 800,
             Icon = "red",
             Name = "<LOC enhancements_0047>C-D2 Shoulder Drone",
