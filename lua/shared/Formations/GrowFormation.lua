@@ -127,7 +127,7 @@ ComputeLandFormation = function(formationBlueprintCountCache, blueprintIds, form
     local formationRowLengthHalf = MathCeil(MathSqrt(footprintTotalLength))
     local formationRowLength = 2 * formationRowLengthHalf
 
-    local sparsityMultiplier = 1.5
+    local sparsityMultiplier = 1.25
 
     local lx = 0
     local ly = 0
@@ -264,7 +264,7 @@ ComputeLandFormation = function(formationBlueprintCountCache, blueprintIds, form
                 local formationIndex = TableGetn(tacticalFormation) + 1
                 local formation = GetFormationEntry(formationIndex)
                 formation[1] = sparsityMultiplier * (formationScale * ox)
-                formation[2] = sparsityMultiplier * (formationScale * (-1 * ly))
+                formation[2] = sparsityMultiplier * (formationScale * (-1 * ly - 0.5 * blueprintFootprintSizeZ) )
                 formation[3] = categories[blueprintId]
                 formation[4] = 0
                 formation[5] = true
