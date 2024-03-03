@@ -23,6 +23,7 @@
 local ComputeFormationProperties = import('/lua/shared/Formations/shared.lua').ComputeFormationProperties
 local ComputeFootprintData = import('/lua/shared/Formations/shared.lua').ComputeFootprintData
 local ComputeFormationScale = import('/lua/shared/Formations/shared.lua').ComputeFormationScale
+
 local FormationScaleParameters = import('/lua/shared/Formations/shared.lua').FormationScaleParameters
 
 local GetFormationEntry = import('/lua/shared/Formations/Formation.lua').GetFormationEntry
@@ -237,12 +238,6 @@ ComputeLandFormation = function(formationBlueprintCountCache, blueprintIds, form
                 local blueprintFootprintSizeX = blueprintFootprint.SizeX
                 local blueprintFootprintSizeZ = blueprintFootprint.SizeZ
 
-                -- local offsetLocal = 0
-                -- local blueprintFootprintSizeXMod2 = MathMod(blueprintFootprintSizeX, 2)
-                -- if blueprintFootprintSizeXMod2 == 1 then
-                --     offsetLocal = 0.5
-                -- end
-
                 -- occupy the next few rows for the current columns to make space for this unit
                 local lower = MathCeil(-0.5 * blueprintFootprintSizeX / sparsityMultiplier)
                 local upper = MathFloor(0.5 * blueprintFootprintSizeX / sparsityMultiplier)
@@ -253,8 +248,6 @@ ComputeLandFormation = function(formationBlueprintCountCache, blueprintIds, form
                     end
                 end
 
-                -- LOG(lx, ox, blueprintId, lower, upper, repru(formationColumnOccupied))
-
                 -- increase the current formation length
                 lx = lx + 1
 
@@ -264,7 +257,7 @@ ComputeLandFormation = function(formationBlueprintCountCache, blueprintIds, form
                 local formationIndex = TableGetn(tacticalFormation) + 1
                 local formation = GetFormationEntry(formationIndex)
                 formation[1] = sparsityMultiplier * (formationScale * ox)
-                formation[2] = sparsityMultiplier * (formationScale * (-1 * ly - 0.5 * blueprintFootprintSizeZ) )
+                formation[2] = sparsityMultiplier * (formationScale * (-1 * ly - 0.5 * blueprintFootprintSizeZ))
                 formation[3] = categories[blueprintId]
                 formation[4] = 0
                 formation[5] = true

@@ -95,7 +95,7 @@ local SortByTech = function(a, b)
     ---@type UnitBlueprint
     local bb = __blueprints[b]
 
-    return (ba.FormationTechIndex + 0.01 * ba.Footprint.SizeX) > (bb.FormationTechIndex + 0.01 * ba.Footprint.SizeX)
+    return (ba.FormationTechIndex + 0.01 * ba.Footprint.SizeX) > (bb.FormationTechIndex + 0.01 * bb.Footprint.SizeX)
 end
 
 --- Lookup table to retrieve the count of a given unit type.
@@ -195,10 +195,10 @@ UpdateFormationProperties = function(blueprintCountCache, blueprintListCache)
     return blueprintCountCache, blueprintListCache, blueprintTotalCount
 end
 
----
+--- Computes the footprint data of a formation.
 ---@param blueprintCountCache FormationBlueprintCount
 ---@param blueprintIds BlueprintId[]
----@return number # all size-z footprints combined
+---@return number # all size-x footprints combined
 ---@return number # the smallest size-z footprint
 ---@return number # the largest size-z footprint
 ComputeFootprintData = function(blueprintCountCache, blueprintIds)
