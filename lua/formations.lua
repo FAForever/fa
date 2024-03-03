@@ -242,17 +242,15 @@ function GrowthFormation(formationUnits)
 
     LOG("GrowthFormation")
 
-    local formation = import("/lua/shared/Formations/GrowFormation.lua").ComputeFormation
+    local formation = import("/lua/shared/Formations/GrowthFormation.lua").ComputeFormation
     
     local ok, msg = pcall(formation, formationUnits)
     if ok then
-        local formation = formation(formationUnits)
-        return formation
+        return msg
     else
         WARN(msg)
     end
 
-    LOG('GrowthFormation')
     local cachedResults = GetCachedResults(formationUnits, 'GrowthFormation')
     if cachedResults then
         return cachedResults

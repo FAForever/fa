@@ -22,9 +22,9 @@
 
 local ComputeFormationProperties = import('/lua/shared/Formations/shared.lua').ComputeFormationProperties
 local ComputeFootprintData = import('/lua/shared/Formations/shared.lua').ComputeFootprintData
-local ComputeFormationScale = import('/lua/shared/Formations/shared.lua').ComputeFormationScale
 
-local FormationScaleParameters = import('/lua/shared/Formations/shared.lua').FormationScaleParameters
+local FormationScaleParameters = import('/lua/shared/Formations/FormationScale.lua').FormationScaleParameters
+local ComputeFormationScale = import('/lua/shared/Formations/FormationScale.lua').ComputeFormationScale
 
 local GetFormationEntry = import('/lua/shared/Formations/Formation.lua').GetFormationEntry
 
@@ -165,7 +165,6 @@ ComputeLandFormation = function(formationBlueprintCountCache, blueprintIds, form
 
             -- skip if the column on this row is occupied
             if formationColumnOccupied[ox + formationRowLengthHalf + 1] > 0 then
-                -- LOG(lx, ox + formationRowLengthHalf, "skipped")
                 lx = lx + 1
                 continue
             end
@@ -257,7 +256,7 @@ ComputeLandFormation = function(formationBlueprintCountCache, blueprintIds, form
                 local formationIndex = TableGetn(tacticalFormation) + 1
                 local formation = GetFormationEntry(formationIndex)
                 formation[1] = sparsityMultiplier * (formationScale * ox)
-                formation[2] = sparsityMultiplier * (formationScale * (-1 * ly - 0.5 * blueprintFootprintSizeZ))
+                formation[2] = sparsityMultiplier * (formationScale * (-1 * (ly - 1) - 0.5 * blueprintFootprintSizeZ))
                 formation[3] = categories[blueprintId]
                 formation[4] = 0
                 formation[5] = true
@@ -325,8 +324,8 @@ ComputeFormation = function(units)
     ComputeLandFormation(formationBlueprintCountCache, formationBlueprintListCache.Land, FormationScaleParameters.Land)
 
     if getSystemTimeSecondsOnlyForProfileUse then
-        SPEW("Formation computation took " ..
-            (getSystemTimeSecondsOnlyForProfileUse() - start) .. " seconds for " .. unitCount .. " units.")
+        local stop = getSystemTimeSecondsOnlyForProfileUse()
+        SPEW("Formation took", stop - start, "seconds for", unitCount, "units.", start, stop)
     end
 
     do

@@ -50,21 +50,21 @@ local WEAKINDIRECTFIRE = categories.WEAKINDIRECTFIRE
 -------------------------------------------------------------------------------
 --#region Formation categories
 
-CategoriesAllUnits = categories.ALLUNITS
+local CategoriesAllUnits = categories.ALLUNITS
 
-LandFormationCategoriesCommand = COMMAND
-LandFormationCategoriesSupportCommand = categories.SUBCOMMANDER
+local LandFormationCategoriesCommand = COMMAND
+local LandFormationCategoriesSupportCommand = categories.SUBCOMMANDER
 
-LandFormationCategoriesDirectFire = LAND * (DIRECTFIRE) - (SNIPER + WEAKDIRECTFIRE + COMMAND + SCOUT)
-LandFormationCategoriesSniper = LAND * (SNIPER)
-LandFormationCategoriesArtillery = LAND * (ARTILLERY + INDIRECTFIRE) - (WEAKINDIRECTFIRE)
-LandFormationCategoriesMissile = LAND * (SILO) - (WEAKINDIRECTFIRE)
-LandFormationCategoriesAntiAir = LAND * (ANTIAIR) - (WEAKANTIAIR)
-LandFormationCategoriesShield = LAND * (SHIELD)
-LandFormationCategoriesEngineering = LAND * (ENGINEER) - (COMMAND)
-LandFormationCategoriesScout = LAND * (SCOUT)
-LandFormationCategoriesCounterintelligence = LAND * (COUNTERINTELLIGENCE) - (DIRECTFIRE + ANTIAIR + INDIRECTFIRE)
-LandFormationCategoriesEngineeering = LAND * (ENGINEER) - (DIRECTFIRE + ANTIAIR + INDIRECTFIRE)
+local LandFormationCategoriesDirectFire = LAND * (DIRECTFIRE) - (SNIPER + WEAKDIRECTFIRE + COMMAND + SCOUT)
+local LandFormationCategoriesSniper = LAND * (SNIPER)
+local LandFormationCategoriesArtillery = LAND * (ARTILLERY + INDIRECTFIRE) - (WEAKINDIRECTFIRE)
+local LandFormationCategoriesMissile = LAND * (SILO) - (WEAKINDIRECTFIRE)
+local LandFormationCategoriesAntiAir = LAND * (ANTIAIR) - (WEAKANTIAIR)
+local LandFormationCategoriesShield = LAND * (SHIELD)
+local LandFormationCategoriesEngineering = LAND * (ENGINEER) - (COMMAND)
+local LandFormationCategoriesScout = LAND * (SCOUT)
+local LandFormationCategoriesCounterintelligence = LAND * (COUNTERINTELLIGENCE) - (DIRECTFIRE + ANTIAIR + INDIRECTFIRE)
+local LandFormationCategoriesEngineeering = LAND * (ENGINEER) - (DIRECTFIRE + ANTIAIR + INDIRECTFIRE)
 
 LandFormationCategories = {
     CategoriesAllUnits = CategoriesAllUnits,

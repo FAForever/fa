@@ -21,10 +21,14 @@
 --******************************************************************************************************
 
 -- upvalue scope for performance
+local __blueprints = __blueprints
+
 local TableSort = table.sort
 local TableSetn = table.setn
 local TableGetn = table.getn
 local TableInsert = table.insert
+
+local MathMax = math.max
 
 ---@class FormationScaleParametersOfLayer
 ---@field GridSizeFraction number
@@ -74,7 +78,7 @@ ComputeFormationScale = function(formationScaleParametersOfLayer, footprintMinim
     -- Unfortunately the engine separates land/naval units from air units and calls the formation function separately for both groups.
     -- That means if a CZAR and some light tanks are selected together, the tank formation will be scaled by the CZAR's size and we can't compensate.
 
-    local gridSize = math.max(
+    local gridSize = MathMax(
         footprintMinimum * formationScaleParametersOfLayer.GridSizeFraction,
         footprintMinimum + formationScaleParametersOfLayer.GridSizeAbsolute
     )
