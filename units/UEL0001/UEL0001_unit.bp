@@ -344,8 +344,8 @@ UnitBlueprint {
         },
         LeftPod = {
             BuildCostEnergy = 9600,
-            BuildCostMass = 480,
-            BuildTime = 1200,
+            BuildCostMass = 360,
+            BuildTime = 800,
             Icon = "led",
             Name = "<LOC enhancements_0043>C-D1 Shoulder Drone",
             ShowBones = { "Back_Upgrade_B01" },
@@ -401,8 +401,8 @@ UnitBlueprint {
         },
         RightPod = {
             BuildCostEnergy = 9600,
-            BuildCostMass = 480,
-            BuildTime = 1200,
+            BuildCostMass = 360,
+            BuildTime = 800,
             Icon = "red",
             Name = "<LOC enhancements_0047>C-D2 Shoulder Drone",
             Prerequisite = "LeftPod",
