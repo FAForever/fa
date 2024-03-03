@@ -119,17 +119,18 @@ ComputeLandFormation = function(formationBlueprintCountCache, blueprintIds)
         formationBlueprintCountCache,
         blueprintIds
     )
-    local formationRowLength = 2 * MathCeil(MathSqrt(footprintTotalLength))
+    local formationRowLengthHalf = MathCeil(MathSqrt(footprintTotalLength))
+    local formationRowLength = 2 * formationRowLengthHalf
     local inverseFootprintMaximum = 1.5 / footprintMaximum
 
 
-    LOG('footprintMaximum', footprintMaximum)
+    -- LOG('footprintMaximum', footprintMaximum)
     local sparsityMultiplier = 1.5
 
     local lx = 0
     local ly = 0
 
-    for k = 1, TableGetn(formationColumnOccupied) do
+    for k = 1, formationRowLength do
         formationColumnOccupied[k] = 0
     end
 
@@ -147,12 +148,6 @@ ComputeLandFormation = function(formationBlueprintCountCache, blueprintIds)
         -- process columns (of a row)
         while (unitsToProcess > 0) and (lx < formationRowLength)  do
 
-            -- skip if the column on this row is occupied
-            if formationColumnOccupied[lx] > 0 then
-                lx = lx + 1
-                continue
-            end
-
             -------------------------------------------------------------------
             -- pattern that allows us to grow from the center, as an example for
             -- 7 units the results look like:
@@ -165,6 +160,13 @@ ComputeLandFormation = function(formationBlueprintCountCache, blueprintIds)
             local ox = offset
             if MathMod(lx, 2) == 0 then
                 ox = -1 * offset
+            end
+
+            -- skip if the column on this row is occupied
+            if formationColumnOccupied[ox + formationRowLengthHalf + 1] > 0 then
+                -- LOG(lx, ox + formationRowLengthHalf, "skipped")
+                lx = lx + 1
+                continue
             end
 
             -------------------------------------------------------------------
@@ -235,18 +237,24 @@ ComputeLandFormation = function(formationBlueprintCountCache, blueprintIds)
                 local blueprintFootprintSizeX = blueprintFootprint.SizeX
                 local blueprintFootprintSizeZ = blueprintFootprint.SizeZ
 
-                local blueprintFootprintSizeXMod2 = MathMod(blueprintFootprintSizeX, 2)
-                if blueprintFootprintSizeXMod2 == 0 then
-                    blueprintFootprintSizeX = blueprintFootprintSizeX - 1
-                end
+                -- local offsetLocal = 0
+                -- local blueprintFootprintSizeXMod2 = MathMod(blueprintFootprintSizeX, 2)
+                -- if blueprintFootprintSizeXMod2 == 1 then
+                --     offsetLocal = 0.5
+                -- end
 
                 -- occupy the next few rows for the current columns to make space for this unit
-                for k = 0, blueprintFootprintSizeX - 1 do
-                    formationColumnOccupied[lx + k] = blueprintFootprintSizeZ - 1
+                local lower = (math.ceil(-0.5 * blueprintFootprintSizeX))
+                local upper = math.floor(0.5 * blueprintFootprintSizeX)
+                for k = lower, upper do
+                    local index = ox + formationRowLengthHalf + k + 1
+                    formationColumnOccupied[index] = blueprintFootprintSizeZ - 1
                 end
 
+                -- LOG(lx, ox, blueprintId, lower, upper, repru(formationColumnOccupied))
+
                 -- increase the current formation length
-                lx = lx + blueprintFootprintSizeX
+                lx = lx + 1
 
                 -------------------------------------------------------------------
                 -- add the formation entry
@@ -320,6 +328,11 @@ ComputeFormation = function(units)
     TableSetn(tacticalFormation, 0)
 
     ComputeLandFormation(formationBlueprintCountCache, formationBlueprintListCache["Land"])
+
+    if getSystemTimeSecondsOnlyForProfileUse then
+        SPEW("Formation computation took " ..
+            (getSystemTimeSecondsOnlyForProfileUse() - start) .. " seconds for " .. unitCount .. " units.")
+    end
 
     do
         return tacticalFormation
@@ -437,11 +450,6 @@ ComputeFormation = function(units)
         else
             break
         end
-    end
-
-    if getSystemTimeSecondsOnlyForProfileUse then
-        SPEW("Formation computation took " ..
-            (getSystemTimeSecondsOnlyForProfileUse() - start) .. " seconds for " .. unitCount .. " units.")
     end
 
     return tacticalFormation
