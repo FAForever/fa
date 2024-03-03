@@ -60,6 +60,7 @@ local EntityCategoryContains = EntityCategoryContains
 local MathSqrt = math.sqrt
 local MathCeil = math.ceil
 local MathMod = math.mod
+local MathFloor = math.floor
 
 local TableGetn = table.getn
 local TableSetn = table.setn
@@ -98,7 +99,7 @@ local GetFormationCategory = function(formationBlueprintCountCache, formationBlu
     return nil
 end
 
----comment
+--- Constructs a land formation for the given blueprint identifiers.
 ---@param formationBlueprintCountCache FormationBlueprintCount
 ---@param blueprintIds BlueprintId[]
 ComputeLandFormation = function(formationBlueprintCountCache, blueprintIds)
@@ -123,8 +124,6 @@ ComputeLandFormation = function(formationBlueprintCountCache, blueprintIds)
     local formationRowLength = 2 * formationRowLengthHalf
     local inverseFootprintMaximum = 1.5 / footprintMaximum
 
-
-    -- LOG('footprintMaximum', footprintMaximum)
     local sparsityMultiplier = 1.5
 
     local lx = 0
@@ -146,15 +145,13 @@ ComputeLandFormation = function(formationBlueprintCountCache, blueprintIds)
         end
 
         -- process columns (of a row)
-        while (unitsToProcess > 0) and (lx < formationRowLength)  do
+        while (unitsToProcess > 0) and (lx < formationRowLength) do
 
             -------------------------------------------------------------------
             -- pattern that allows us to grow from the center, as an example for
             -- 7 units the results look like:
             --
             -- - 0  -1  1   -2  2   -3  3
-            --
-            -- which is exactly what we want!
 
             local offset = MathCeil(0.5 * (lx - 1))
             local ox = offset
@@ -244,11 +241,13 @@ ComputeLandFormation = function(formationBlueprintCountCache, blueprintIds)
                 -- end
 
                 -- occupy the next few rows for the current columns to make space for this unit
-                local lower = (math.ceil(-0.5 * blueprintFootprintSizeX))
-                local upper = math.floor(0.5 * blueprintFootprintSizeX)
+                local lower = MathCeil(-0.5 * blueprintFootprintSizeX)
+                local upper = MathFloor(0.5 * blueprintFootprintSizeX)
                 for k = lower, upper do
                     local index = ox + formationRowLengthHalf + k + 1
-                    formationColumnOccupied[index] = blueprintFootprintSizeZ - 1
+                    if index > 0 and index <= formationRowLength then
+                        formationColumnOccupied[index] = blueprintFootprintSizeZ - 1
+                    end
                 end
 
                 -- LOG(lx, ox, blueprintId, lower, upper, repru(formationColumnOccupied))
