@@ -48,53 +48,6 @@ local LandCounterIntelligencePreferences = import("/lua/shared/Formations/Format
 local LandAntiAirPreferences = import("/lua/shared/Formations/FormationLandPreferences.lua").LandAntiAirPreferences
 local LandCounterScoutPreferences = import("/lua/shared/Formations/FormationLandPreferences.lua").LandCounterScoutPreferences
 
---- Various parameters based on the behavior of the engine when there are units of different sizes in a formation.
----@class FormationScaleParametersOfLayer
-FormationScaleParameters = {
-    Land = {
-        GridSizeFraction = 2.75,
-        GridSizeAbsolute = 2,
-        MinSeparationFraction = 2.25,
-    },
-
-    Air = {
-        GridSizeFraction = 1.3,
-        GridSizeAbsolute = 2,
-        MinSeparationFraction = 1,
-    },
-
-    Naval = {
-        GridSizeFraction = 1.75,
-        GridSizeAbsolute = 4,
-        MinSeparationFraction = 1.15,
-    },
-
-    Submersible = {
-        GridSizeFraction = 1.75,
-        GridSizeAbsolute = 4,
-        MinSeparationFraction = 1.15,
-    },
-}
-
---- Computes the scale of the formation to compensate for the behavior of the engine.
----@param formationScaleParametersOfLayer FormationScaleParametersOfLayer
----@param footprintMaximum number
-ComputeFormationScale = function(formationScaleParametersOfLayer, footprintMinimum, footprintMaximum)
-
-    -- A distance of 1 in formation coordinates translates to (largestFootprint + 2) in world coordinates.
-    -- Unfortunately the engine separates land/naval units from air units and calls the formation function separately for both groups.
-    -- That means if a CZAR and some light tanks are selected together, the tank formation will be scaled by the CZAR's size and we can't compensate.
-
-    local gridSize = MathMax(
-        footprintMinimum * formationScaleParametersOfLayer.GridSizeFraction,
-        footprintMinimum + formationScaleParametersOfLayer.GridSizeAbsolute
-    )
-
-    local gridScale = gridSize / (footprintMaximum + 2)
-
-    return gridScale
-end
-
 --- Sorts the list of blueprint ids first by tech level and then by (footprint) size
 ---@param a BlueprintId
 ---@param b BlueprintId
@@ -185,8 +138,8 @@ ComputeFormationProperties = function(units, blueprintCountCache, blueprintListC
     TableSort(blueprintListCache.Submersible, SortByTech)
 
     -- populate land list cache
-    for k = 1, TableGetn(blueprintListCache) do
-        local blueprintId = blueprintListCache[k]
+    for k = 1, TableGetn(blueprintListCacheLand) do
+        local blueprintId = blueprintListCacheLand[k]
 
         for c = 1, TableGetn(LandShieldPreferences) do
             if EntityCategoryContains(LandShieldPreferences[c], blueprintId) then

@@ -122,24 +122,28 @@ end
 
 --- Constructs a land formation for the given blueprint identifiers.
 ---@param formationBlueprintCountCache FormationBlueprintCount
----@param blueprintIds FormationBlueprintListLand
-ComputeLandFormation = function(formationBlueprintCountCache, blueprintIds, formationScaleParameters)
-
+---@param formationBlueprintListLand FormationBlueprintListLand
+ComputeLandFormation = function(formationBlueprintCountCache, formationBlueprintListLand, formationScaleParameters)
     -- local scope for performance
     local tacticalFormation = TacticalFormation
     local formationColumnOccupied = FormationColumnOccupied
 
+    local formationBlueprintListLandShield = formationBlueprintListLand.Shield
+    local formationBlueprintListLandCounterIntelligence = formationBlueprintListLand.CounterIntelligence
+    local formationBlueprintListLandScout = formationBlueprintListLand.Scout
+    local formationBlueprintListLandAntiAir = formationBlueprintListLand.AntiAir
+
     -- compute total land unit count
     local unitsToProcess = 0
-    for k = 1, TableGetn(blueprintIds) do
-        local blueprintId = blueprintIds[k]
+    for k = 1, TableGetn(formationBlueprintListLand) do
+        local blueprintId = formationBlueprintListLand[k]
         unitsToProcess = unitsToProcess + formationBlueprintCountCache[blueprintId]
     end
 
     -- compute length of each row
     local footprintTotalLength, footprintMinimum, footprintMaximum = ComputeFootprintData(
         formationBlueprintCountCache,
-        blueprintIds
+        formationBlueprintListLand
     )
 
     local formationScale = ComputeFormationScale(formationScaleParameters, footprintMinimum, footprintMaximum)
@@ -204,31 +208,27 @@ ComputeLandFormation = function(formationBlueprintCountCache, blueprintIds, form
 
                 if (rowMod4 == 0 or rowMod4 == 2) and columnMod3 == 2 then
                     -- we'd like a shield here
-                    blueprintId = GetFormationCategory(
+                    blueprintId = GetCachedFormationCategory(
                         formationBlueprintCountCache,
-                        blueprintIds,
-                        LandShieldPreferences
+                        formationBlueprintListLandShield
                     )
                 elseif rowMod4 == 3 and columnMod3 == 2 then
                     -- we'd like counter intelligence or a scout here
-                    blueprintId = GetFormationCategory(
+                    blueprintId = GetCachedFormationCategory(
                         formationBlueprintCountCache,
-                        blueprintIds,
-                        LandCounterIntelligencePreferences
+                        formationBlueprintListLandCounterIntelligence
                     )
                 elseif rowMod4 == 3 and columnMod3 == 1 then
                     -- we'd like a scout here
-                    blueprintId = GetFormationCategory(
+                    blueprintId = GetCachedFormationCategory(
                         formationBlueprintCountCache,
-                        blueprintIds,
-                        LandCounterScoutPreferences
+                        formationBlueprintListLandScout
                     )
                 elseif rowMod4 == 0 and (columnMod3 == 0 or columnMod3 == 1) then
                     -- we'd like anti air here
-                    blueprintId = GetFormationCategory(
+                    blueprintId = GetCachedFormationCategory(
                         formationBlueprintCountCache,
-                        blueprintIds,
-                        LandAntiAirPreferences
+                        formationBlueprintListLandAntiAir
                     )
                 end
             end
@@ -238,7 +238,7 @@ ComputeLandFormation = function(formationBlueprintCountCache, blueprintIds, form
             if not blueprintId then
                 blueprintId = GetFormationCategory(
                     formationBlueprintCountCache,
-                    blueprintIds,
+                    formationBlueprintListLand,
                     LandGeneralPreferences
                 )
             end

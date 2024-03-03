@@ -253,7 +253,7 @@ function GrowthFormation(formationUnits)
             start = getSystemTimeSecondsOnlyForProfileUse()
         end
     
-        for k = 1, 10 do
+        for k = 1, 20 do
             formation(formationUnits)
         end
 
