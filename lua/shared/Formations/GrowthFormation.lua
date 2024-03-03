@@ -44,7 +44,13 @@ local FormationBlueprintCountCacheB = {}
 
 ---@type FormationBlueprintList
 local FormationBlueprintListCache = {
-    Land = {},
+    Land = {
+        General = {},
+        AntiAir = {},
+        Shield = {},
+        Scout = {},
+        CounterIntelligence = {},
+    },
     Air = {},
     Naval = {},
     Submersible = {}
@@ -102,9 +108,21 @@ local GetFormationCategory = function(formationBlueprintCountCache, formationBlu
     return nil
 end
 
+---@param formationBlueprintCountCache FormationBlueprintCount
+---@param formationBlueprintListCache BlueprintId[]
+---@return BlueprintId?
+local GetCachedFormationCategory = function(formationBlueprintCountCache, formationBlueprintListCache)
+    for k = 1, TableGetn(formationBlueprintListCache) do
+        local blueprintId = formationBlueprintListCache[k]
+        if formationBlueprintCountCache[blueprintId] > 0 then
+            return blueprintId
+        end
+    end
+end
+
 --- Constructs a land formation for the given blueprint identifiers.
 ---@param formationBlueprintCountCache FormationBlueprintCount
----@param blueprintIds BlueprintId[]
+---@param blueprintIds FormationBlueprintListLand
 ComputeLandFormation = function(formationBlueprintCountCache, blueprintIds, formationScaleParameters)
 
     -- local scope for performance
@@ -274,12 +292,6 @@ end
 ---@return Formation
 ComputeFormation = function(units)
 
-    local start = 0
-    local getSystemTimeSecondsOnlyForProfileUse = rawget(_G, 'GetSystemTimeSecondsOnlyForProfileUse')
-    if getSystemTimeSecondsOnlyForProfileUse then
-        start = getSystemTimeSecondsOnlyForProfileUse()
-    end
-
     -- local scope for performance
     local tacticalFormation = TacticalFormation
     local formationBlueprintCountCacheA = FormationBlueprintCountCacheA
@@ -322,11 +334,6 @@ ComputeFormation = function(units)
     TableSetn(tacticalFormation, 0)
 
     ComputeLandFormation(formationBlueprintCountCache, formationBlueprintListCache.Land, FormationScaleParameters.Land)
-
-    if getSystemTimeSecondsOnlyForProfileUse then
-        local stop = getSystemTimeSecondsOnlyForProfileUse()
-        SPEW("Formation took", stop - start, "seconds for", unitCount, "units.", start, stop)
-    end
 
     do
         return tacticalFormation

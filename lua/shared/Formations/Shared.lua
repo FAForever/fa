@@ -41,6 +41,13 @@ local MathMax = math.max
 ---@field Naval FormationScaleParametersOfLayer
 ---@field Submersible FormationScaleParametersOfLayer
 
+-- preferences for land
+local LandGeneralPreferences = import("/lua/shared/Formations/FormationLandPreferences.lua").LandGeneralPreferences
+local LandShieldPreferences = import("/lua/shared/Formations/FormationLandPreferences.lua").LandShieldPreferences
+local LandCounterIntelligencePreferences = import("/lua/shared/Formations/FormationLandPreferences.lua").LandCounterIntelligencePreferences
+local LandAntiAirPreferences = import("/lua/shared/Formations/FormationLandPreferences.lua").LandAntiAirPreferences
+local LandCounterScoutPreferences = import("/lua/shared/Formations/FormationLandPreferences.lua").LandCounterScoutPreferences
+
 --- Various parameters based on the behavior of the engine when there are units of different sizes in a formation.
 ---@class FormationScaleParametersOfLayer
 FormationScaleParameters = {
@@ -105,9 +112,16 @@ end
 --- Lookup table to retrieve the count of a given unit type.
 ---@alias FormationBlueprintCount table<BlueprintId, number>
 
+---@class FormationBlueprintListLand
+---@field General BlueprintId[][]
+---@field AntiAir BlueprintId[]
+---@field Shield BlueprintId[]
+---@field Scout BlueprintId[]
+---@field CounterIntelligence BlueprintId[]
+
 --- Lookup table to retrieve the unit types that belong in a formation layer.
 ---@class FormationBlueprintList
----@field Land BlueprintId[]
+---@field Land FormationBlueprintListLand
 ---@field Air BlueprintId[]
 ---@field Naval BlueprintId[]
 ---@field Submersible BlueprintId[]
@@ -128,12 +142,30 @@ ComputeFormationProperties = function(units, blueprintCountCache, blueprintListC
         blueprintCountCache[blueprintId] = nil
     end
 
-    -- clear the cache
-    for layer, blueprintIds in blueprintListCache do
-        TableSetn(blueprintIds, 0)
+    -- clear land list cache
+    local blueprintListCacheLand = blueprintListCache.Land
+    TableSetn(blueprintListCacheLand, 0)
+    TableSetn(blueprintListCacheLand.AntiAir, 0)
+    TableSetn(blueprintListCacheLand.Shield, 0)
+    TableSetn(blueprintListCacheLand.Scout, 0)
+    TableSetn(blueprintListCacheLand.CounterIntelligence, 0)
+    for k = 1, TableGetn(blueprintListCacheLand.General) do
+        TableSetn(blueprintListCacheLand.General[k], 0)
     end
 
-    -- populate the cache
+    -- clear air list cache
+    local blueprintListCacheAir = blueprintListCache.Air
+    TableSetn(blueprintListCacheAir, 0)
+
+    -- clear naval list cache
+    local blueprintListCacheNaval = blueprintListCache.Naval
+    TableSetn(blueprintListCacheNaval, 0)
+
+    -- clear submersible list cache
+    local blueprintListCacheSubmersible = blueprintListCache.Submersible
+    TableSetn(blueprintListCacheSubmersible, 0)
+
+    -- populate the general cache
     for k, unit in units do
         local unitBlueprint = unit:GetBlueprint() --[[@as UnitBlueprint]]
         local unitBlueprintId = unitBlueprint.BlueprintId
@@ -146,17 +178,52 @@ ComputeFormationProperties = function(units, blueprintCountCache, blueprintListC
         end
     end
 
+    -- sort the lists by tech level, this way we always get the most advanced units first
+    TableSort(blueprintListCache.Air, SortByTech)
+    TableSort(blueprintListCache.Land, SortByTech)
+    TableSort(blueprintListCache.Naval, SortByTech)
+    TableSort(blueprintListCache.Submersible, SortByTech)
+
+    -- populate land list cache
+    for k = 1, TableGetn(blueprintListCache) do
+        local blueprintId = blueprintListCache[k]
+
+        for c = 1, TableGetn(LandShieldPreferences) do
+            if EntityCategoryContains(LandShieldPreferences[c], blueprintId) then
+                TableInsert(blueprintListCacheLand.Shield, blueprintId)
+                break
+            end
+        end
+
+        for c = 1, TableGetn(LandCounterIntelligencePreferences) do
+            if EntityCategoryContains(LandCounterIntelligencePreferences[c], blueprintId) then
+                TableInsert(blueprintListCacheLand.CounterIntelligence, blueprintId)
+                break
+            end
+        end
+
+        for c = 1, TableGetn(LandAntiAirPreferences) do
+            if EntityCategoryContains(LandAntiAirPreferences[c], blueprintId) then
+                TableInsert(blueprintListCacheLand.AntiAir, blueprintId)
+                break
+            end
+        end
+
+        for c = 1, TableGetn(LandCounterScoutPreferences) do
+            if EntityCategoryContains(LandCounterScoutPreferences[c], blueprintId) then
+                TableInsert(blueprintListCacheLand.Scout, blueprintId)
+                break
+            end
+        end
+    end
+
     -- count all the entries in the cache
     local blueprintTotalCount = 0
     for _, unitCount in blueprintCountCache do
         blueprintTotalCount = blueprintTotalCount + unitCount
     end
 
-    -- sort the lists by tech level, this way we always get the most advanced units first
-    TableSort(blueprintListCache.Air, SortByTech)
-    TableSort(blueprintListCache.Land, SortByTech)
-    TableSort(blueprintListCache.Naval, SortByTech)
-    TableSort(blueprintListCache.Submersible, SortByTech)
+
 
     return blueprintCountCache, blueprintListCache, blueprintTotalCount
 end

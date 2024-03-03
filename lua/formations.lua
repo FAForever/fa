@@ -246,6 +246,22 @@ function GrowthFormation(formationUnits)
     
     local ok, msg = pcall(formation, formationUnits)
     if ok then
+
+        local start = 0
+        local getSystemTimeSecondsOnlyForProfileUse = rawget(_G, 'GetSystemTimeSecondsOnlyForProfileUse')
+        if getSystemTimeSecondsOnlyForProfileUse then
+            start = getSystemTimeSecondsOnlyForProfileUse()
+        end
+    
+        for k = 1, 10 do
+            formation(formationUnits)
+        end
+
+        if getSystemTimeSecondsOnlyForProfileUse then
+            local stop = getSystemTimeSecondsOnlyForProfileUse()
+            SPEW("Formation took", stop - start, "seconds for", table.getn(formationUnits) + 1, "units.", start, stop)
+        end
+
         return msg
     else
         WARN(msg)
