@@ -22,13 +22,12 @@
 
 -- upvalue scope for performance
 local __blueprints = __blueprints
+local EntityCategoryContains = EntityCategoryContains
 
 local TableSort = table.sort
 local TableSetn = table.setn
 local TableGetn = table.getn
 local TableInsert = table.insert
-
-local MathMax = math.max
 
 ---@class FormationScaleParametersOfLayer
 ---@field GridSizeFraction number
@@ -105,10 +104,16 @@ end
 ---@return FormationBlueprintList
 ---@return number # total number of units
 ComputeFormationProperties = function(units, blueprintCountCache, blueprintListCache)
-    blueprintCountCache = blueprintCountCache or {}
-    blueprintListCache = blueprintListCache or { Land = {}, Air = {}, Naval = {}, Submersible = {} }
 
-    -- clear the cache
+    -- local scope for performance
+    local TableSort = table.sort
+    local TableSetn = table.setn
+    local TableGetn = table.getn
+    local TableInsert = table.insert
+
+    local EntityCategoryContains = EntityCategoryContains
+
+    -- clear the count cache
     for blueprintId, count in blueprintCountCache do
         blueprintCountCache[blueprintId] = nil
     end
@@ -207,7 +212,7 @@ end
 --- Updates the lookup datastructures to reflect the current state by removing blueprint ids that have no units left.
 ---@param blueprintCountCache FormationBlueprintCount
 ---@param blueprintIds BlueprintId[]
-UpdateFormationProperties = function(blueprintCountCache, blueprintIds)
+UpdateFormationCategories = function(blueprintCountCache, blueprintIds)
     local head = 1
     for k = 1, TableGetn(blueprintIds) do
         local blueprintId = blueprintIds[k]
@@ -228,16 +233,16 @@ end
 --- Updates the lookup datastructures for land formations to reflect the current state.
 ---@param blueprintCountCache FormationBlueprintCount
 ---@param blueprintListCacheLand FormationBlueprintListLand
-UpdateFormationLandProperties = function(blueprintCountCache, blueprintListCacheLand)
+UpdateFormationLandCategories = function(blueprintCountCache, blueprintListCacheLand)
 
-    UpdateFormationProperties(blueprintCountCache, blueprintListCacheLand.Shield)
-    UpdateFormationProperties(blueprintCountCache, blueprintListCacheLand.CounterIntelligence)
-    UpdateFormationProperties(blueprintCountCache, blueprintListCacheLand.AntiAir)
-    UpdateFormationProperties(blueprintCountCache, blueprintListCacheLand.Scout)
+    UpdateFormationCategories(blueprintCountCache, blueprintListCacheLand.Shield)
+    UpdateFormationCategories(blueprintCountCache, blueprintListCacheLand.CounterIntelligence)
+    UpdateFormationCategories(blueprintCountCache, blueprintListCacheLand.AntiAir)
+    UpdateFormationCategories(blueprintCountCache, blueprintListCacheLand.Scout)
 
     local blueprintListCacheLandGeneral = blueprintListCacheLand.General
     for k = 1, TableGetn(blueprintListCacheLandGeneral) do
-        UpdateFormationProperties(blueprintCountCache, blueprintListCacheLandGeneral[k])
+        UpdateFormationCategories(blueprintCountCache, blueprintListCacheLandGeneral[k])
     end
 end
 

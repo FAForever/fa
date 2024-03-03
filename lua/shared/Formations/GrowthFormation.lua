@@ -22,11 +22,12 @@
 
 local FormationBlueprintListCache = import('/lua/shared/Formations/shared.lua').FormationBlueprintListCache
 local ComputeFormationProperties = import('/lua/shared/Formations/shared.lua').ComputeFormationProperties
-local UpdateFormationLandProperties = import('/lua/shared/Formations/shared.lua').UpdateFormationLandProperties
-local ComputeFootprintData = import('/lua/shared/Formations/shared.lua').ComputeFootprintData
+local UpdateFormationLandCategories = import('/lua/shared/Formations/shared.lua').UpdateFormationLandCategories
 
 local FormationScaleParameters = import('/lua/shared/Formations/FormationScale.lua').FormationScaleParameters
 local ComputeFormationScale = import('/lua/shared/Formations/FormationScale.lua').ComputeFormationScale
+
+local ComputeFootprintData = import('/lua/shared/Formations/FormationFootprints.lua').ComputeFootprintData
 
 local GetFormationEntry = import('/lua/shared/Formations/Formation.lua').GetFormationEntry
 
@@ -53,6 +54,7 @@ local TableGetn = table.getn
 local TableSetn = table.setn
 local TableInsert = table.insert
 
+--- Returns the first blueprint identifier that is still available in the formationBlueprintCountCache.
 ---@param formationBlueprintCountCache FormationBlueprintCount
 ---@param formationBlueprintListCache BlueprintId[]
 ---@return BlueprintId?
@@ -65,6 +67,7 @@ local GetCachedFormationSpecificCategory = function(formationBlueprintCountCache
     end
 end
 
+--- Returns the first blueprint identifier that is still available in the formationBlueprintCountCache.
 ---@param formationBlueprintCountCache FormationBlueprintCount
 ---@param formationBlueprintListCache BlueprintId[][]
 local GetCachedFormationGeneralCategory = function(formationBlueprintCountCache, formationBlueprintListCache)
@@ -246,7 +249,7 @@ ComputeLandFormation = function(formationBlueprintCountCache, formationBlueprint
         end
 
         -- update the lookup data for the next row
-        UpdateFormationLandProperties(formationBlueprintCountCache, formationBlueprintListLand)
+        UpdateFormationLandCategories(formationBlueprintCountCache, formationBlueprintListLand)
     end
 end
 
