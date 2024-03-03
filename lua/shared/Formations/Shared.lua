@@ -26,6 +26,62 @@ local TableSetn = table.setn
 local TableGetn = table.getn
 local TableInsert = table.insert
 
+---@class FormationScaleParametersOfLayer
+---@field GridSizeFraction number
+---@field GridSizeAbsolute number
+---@field MinSeparationFraction number
+
+---@class FormationScaleParameters
+---@field Land FormationScaleParametersOfLayer
+---@field Air FormationScaleParametersOfLayer
+---@field Naval FormationScaleParametersOfLayer
+---@field Submersible FormationScaleParametersOfLayer
+
+FormationScaleParameters = {
+    Land = {
+        GridSizeFraction = 2.75,
+        GridSizeAbsolute = 2,
+        MinSeparationFraction = 2.25,
+    },
+
+    Air = {
+        GridSizeFraction = 1.3,
+        GridSizeAbsolute = 2,
+        MinSeparationFraction = 1,
+    },
+
+    Naval = {
+        GridSizeFraction = 1.75,
+        GridSizeAbsolute = 4,
+        MinSeparationFraction = 1.15,
+    },
+
+    Submersible = {
+        GridSizeFraction = 1.75,
+        GridSizeAbsolute = 4,
+        MinSeparationFraction = 1.15,
+    },
+}
+
+---
+---@param formationScaleParametersOfLayer FormationScaleParametersOfLayer
+---@param footprintMaximum number
+ComputeFormationScale = function(formationScaleParametersOfLayer, footprintMinimum, footprintMaximum)
+
+    -- A distance of 1 in formation coordinates translates to (largestFootprint + 2) in world coordinates.
+    -- Unfortunately the engine separates land/naval units from air units and calls the formation function separately for both groups.
+    -- That means if a CZAR and some light tanks are selected together, the tank formation will be scaled by the CZAR's size and we can't compensate.
+
+    local gridSize = math.max(
+        footprintMinimum * formationScaleParametersOfLayer.GridSizeFraction,
+        footprintMinimum + formationScaleParametersOfLayer.GridSizeAbsolute
+    )
+
+    local gridScale = gridSize / (footprintMaximum + 2)
+
+    return gridScale
+end
+
 --- Sorts the list of blueprint ids first by tech level and then by (footprint) size
 ---@param a BlueprintId
 ---@param b BlueprintId
@@ -141,25 +197,32 @@ end
 ---@param blueprintCountCache FormationBlueprintCount
 ---@param blueprintIds BlueprintId[]
 ---@return number # all size-z footprints combined
+---@return number # the smallest size-z footprint
 ---@return number # the largest size-z footprint
 ComputeFootprintData = function(blueprintCountCache, blueprintIds)
     -- local scope for performance
     local __blueprints = __blueprints
 
+    local footprintMinimum = 1000
     local footprintMaximum = 0
     local footprintTotalLength = 0
     for k = 1, TableGetn(blueprintIds) do
-        local blueprintId = blueprintIds[k]
-        local blueprintCount = blueprintCountCache[blueprintId]
-        local blueprintFootprintSize  = __blueprints[blueprintId].Footprint.SizeX
+        local blueprintId            = blueprintIds[k]
+        local blueprintCount         = blueprintCountCache[blueprintId]
+        local blueprintFootprintSize = __blueprints[blueprintId].Footprint.SizeX
 
         if blueprintCount > 0 then
             footprintTotalLength = footprintTotalLength + blueprintCount * blueprintFootprintSize
+
             if blueprintFootprintSize > footprintMaximum then
                 footprintMaximum = blueprintFootprintSize
+            end
+
+            if blueprintFootprintSize < footprintMinimum then
+                footprintMinimum = blueprintFootprintSize
             end
         end
     end
 
-    return footprintTotalLength, footprintMaximum
+    return footprintTotalLength, footprintMinimum, footprintMaximum
 end

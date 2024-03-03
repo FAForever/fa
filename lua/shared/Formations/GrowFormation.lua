@@ -22,6 +22,8 @@
 
 local ComputeFormationProperties = import('/lua/shared/Formations/shared.lua').ComputeFormationProperties
 local ComputeFootprintData = import('/lua/shared/Formations/shared.lua').ComputeFootprintData
+local ComputeFormationScale = import('/lua/shared/Formations/shared.lua').ComputeFormationScale
+local FormationScaleParameters = import('/lua/shared/Formations/shared.lua').FormationScaleParameters
 
 local GetFormationEntry = import('/lua/shared/Formations/Formation.lua').GetFormationEntry
 
@@ -102,7 +104,7 @@ end
 --- Constructs a land formation for the given blueprint identifiers.
 ---@param formationBlueprintCountCache FormationBlueprintCount
 ---@param blueprintIds BlueprintId[]
-ComputeLandFormation = function(formationBlueprintCountCache, blueprintIds)
+ComputeLandFormation = function(formationBlueprintCountCache, blueprintIds, formationScaleParameters)
 
     -- local scope for performance
     local tacticalFormation = TacticalFormation
@@ -116,14 +118,13 @@ ComputeLandFormation = function(formationBlueprintCountCache, blueprintIds)
     end
 
     -- compute length of each row
-    local footprintTotalLength, footprintMaximum = ComputeFootprintData(
+    local footprintTotalLength, footprintMinimum, footprintMaximum = ComputeFootprintData(
         formationBlueprintCountCache,
         blueprintIds
     )
     local formationRowLengthHalf = MathCeil(MathSqrt(footprintTotalLength))
     local formationRowLength = 2 * formationRowLengthHalf
-    local inverseFootprintMaximum = 1.5 / footprintMaximum
-
+    local formationScale = ComputeFormationScale(formationScaleParameters, footprintMinimum, footprintMaximum)
     local sparsityMultiplier = 1.5
 
     local lx = 0
@@ -260,8 +261,8 @@ ComputeLandFormation = function(formationBlueprintCountCache, blueprintIds)
 
                 local formationIndex = TableGetn(tacticalFormation) + 1
                 local formation = GetFormationEntry(formationIndex)
-                formation[1] = sparsityMultiplier * (inverseFootprintMaximum * ox)
-                formation[2] = sparsityMultiplier * (inverseFootprintMaximum * (-1 * ly))
+                formation[1] = sparsityMultiplier * (formationScale * ox)
+                formation[2] = sparsityMultiplier * (formationScale * (-1 * ly))
                 formation[3] = categories[blueprintId]
                 formation[4] = 0
                 formation[5] = true
@@ -326,7 +327,7 @@ ComputeFormation = function(units)
     -- formation is not the same, re-compute it!
     TableSetn(tacticalFormation, 0)
 
-    ComputeLandFormation(formationBlueprintCountCache, formationBlueprintListCache["Land"])
+    ComputeLandFormation(formationBlueprintCountCache, formationBlueprintListCache.Land, FormationScaleParameters.Land)
 
     if getSystemTimeSecondsOnlyForProfileUse then
         SPEW("Formation computation took " ..
