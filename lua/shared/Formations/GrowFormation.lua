@@ -244,12 +244,12 @@ ComputeLandFormation = function(formationBlueprintCountCache, blueprintIds, form
                 -- end
 
                 -- occupy the next few rows for the current columns to make space for this unit
-                local lower = MathCeil(-0.5 * blueprintFootprintSizeX)
-                local upper = MathFloor(0.5 * blueprintFootprintSizeX)
+                local lower = MathCeil(-0.5 * blueprintFootprintSizeX / sparsityMultiplier)
+                local upper = MathFloor(0.5 * blueprintFootprintSizeX / sparsityMultiplier)
                 for k = lower, upper do
                     local index = ox + formationRowLengthHalf + k + 1
                     if index > 0 and index <= formationRowLength then
-                        formationColumnOccupied[index] = blueprintFootprintSizeZ - 1
+                        formationColumnOccupied[index] = MathCeil(blueprintFootprintSizeZ / sparsityMultiplier)
                     end
                 end
 
