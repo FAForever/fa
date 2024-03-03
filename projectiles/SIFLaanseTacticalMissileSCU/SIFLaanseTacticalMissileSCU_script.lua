@@ -24,11 +24,11 @@
 local SLaanseTacticalMissile = import("/lua/seraphimprojectiles.lua").SLaanseTacticalMissile
 local TacticalMissileComponent = import('/lua/sim/DefaultProjectiles.lua').TacticalMissileComponent
 
---- Used by xsl0301
+--- Used by XSL0301
 ---@class SIFLaanseTacticalMissileSCU : SLaanseTacticalMissile, TacticalMissileComponent
 SIFLaanseTacticalMissileSCU = ClassProjectile(SLaanseTacticalMissile, TacticalMissileComponent) {
 
-    LaunchTicks = 16,
+    LaunchTicks = 8,
     LaunchTicksRange = 1,
     LaunchTurnRate = 20,
     LaunchTurnRateRange = 1,
@@ -38,6 +38,9 @@ SIFLaanseTacticalMissileSCU = ClassProjectile(SLaanseTacticalMissile, TacticalMi
     MinHeightRange = 0,
     FinalBoostAngle = 30,
     FinalBoostAngleRange = 0,
+
+    TerminalSpeed = 13,
+    TerminalDistance = 30,
 
     ---@param self SIFLaanseTacticalMissileSCU
     ---@param inWater boolean
