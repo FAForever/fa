@@ -3949,7 +3949,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         return 0, 0, 0
     end,
 
-    --- Multiplies the time it takes to capture a unit, defaults to 1.0. Often
+    --- Multiplies the time the unit takes to capture others, defaults to 1.0. Often
     --- used by campaign events.
     ---@param self Unit
     ---@param captureTimeMultiplier number
