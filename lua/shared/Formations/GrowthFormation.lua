@@ -29,11 +29,11 @@ local ComputeFormationScale = import('/lua/shared/Formations/FormationScale.lua'
 local GetFormationEntry = import('/lua/shared/Formations/Formation.lua').GetFormationEntry
 
 -- preferences for land
-local LandGeneralPreferences = import("/lua/shared/Formations/LandFormationPreferences.lua").LandGeneralPreferences
-local LandShieldPreferences = import("/lua/shared/Formations/LandFormationPreferences.lua").LandShieldPreferences
-local LandCounterIntelligencePreferences = import("/lua/shared/Formations/LandFormationPreferences.lua").LandCounterIntelligencePreferences
-local LandAntiAirPreferences = import("/lua/shared/Formations/LandFormationPreferences.lua").LandAntiAirPreferences
-local LandCounterScoutPreferences = import("/lua/shared/Formations/LandFormationPreferences.lua").LandCounterScoutPreferences
+local LandGeneralPreferences = import("/lua/shared/Formations/FormationLandPreferences.lua").LandGeneralPreferences
+local LandShieldPreferences = import("/lua/shared/Formations/FormationLandPreferences.lua").LandShieldPreferences
+local LandCounterIntelligencePreferences = import("/lua/shared/Formations/FormationLandPreferences.lua").LandCounterIntelligencePreferences
+local LandAntiAirPreferences = import("/lua/shared/Formations/FormationLandPreferences.lua").LandAntiAirPreferences
+local LandCounterScoutPreferences = import("/lua/shared/Formations/FormationLandPreferences.lua").LandCounterScoutPreferences
 
 --- A table that contains the blueprint lookups that we can re-use.
 ---@type FormationBlueprintCount

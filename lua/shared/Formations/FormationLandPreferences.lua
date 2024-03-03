@@ -20,13 +20,7 @@
 --** SOFTWARE.
 --******************************************************************************************************
 
-local LandFormationCategories = import("/lua/shared/Formations/LandFormationCategories.lua").LandFormationCategories
-
-local Debug = true
-
-if Debug then
-    SPEW("Debug information for land formation preferences: ")
-end
+local LandFormationCategories = import("/lua/shared/Formations/FormationLandCategories.lua").LandFormationCategories
 
 -------------------------------------------------------------------------------
 --#region Formation preferences

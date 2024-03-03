@@ -41,7 +41,7 @@ local TacticalFormationEntries = { }
 GetFormationEntry = function(index)
     local formationEntry = TacticalFormationEntries[index]
     if not formationEntry then
-        formationEntry = { 
+        formationEntry = {
             0, 0, categories.ALLUNITS, 0, false
         }
         TacticalFormationEntries[index] = formationEntry
