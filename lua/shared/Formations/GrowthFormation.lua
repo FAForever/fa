@@ -20,7 +20,9 @@
 --** SOFTWARE.
 --******************************************************************************************************
 
+local FormationBlueprintListCache = import('/lua/shared/Formations/shared.lua').FormationBlueprintListCache
 local ComputeFormationProperties = import('/lua/shared/Formations/shared.lua').ComputeFormationProperties
+local UpdateFormationLandProperties = import('/lua/shared/Formations/shared.lua').UpdateFormationLandProperties
 local ComputeFootprintData = import('/lua/shared/Formations/shared.lua').ComputeFootprintData
 
 local FormationScaleParameters = import('/lua/shared/Formations/FormationScale.lua').FormationScaleParameters
@@ -41,20 +43,6 @@ local FormationBlueprintCountCacheA = {}
 
 ---@type FormationBlueprintCount
 local FormationBlueprintCountCacheB = {}
-
----@type FormationBlueprintList
-local FormationBlueprintListCache = {
-    Land = {
-        General = {},
-        AntiAir = {},
-        Shield = {},
-        Scout = {},
-        CounterIntelligence = {},
-    },
-    Air = {},
-    Naval = {},
-    Submersible = {}
-}
 
 ---@type number[]
 local FormationColumnOccupied = {}
@@ -111,11 +99,25 @@ end
 ---@param formationBlueprintCountCache FormationBlueprintCount
 ---@param formationBlueprintListCache BlueprintId[]
 ---@return BlueprintId?
-local GetCachedFormationCategory = function(formationBlueprintCountCache, formationBlueprintListCache)
+local GetCachedFormationSpecificCategory = function(formationBlueprintCountCache, formationBlueprintListCache)
     for k = 1, TableGetn(formationBlueprintListCache) do
         local blueprintId = formationBlueprintListCache[k]
         if formationBlueprintCountCache[blueprintId] > 0 then
             return blueprintId
+        end
+    end
+end
+
+---@param formationBlueprintCountCache FormationBlueprintCount
+---@param formationBlueprintListCache BlueprintId[][]
+local GetCachedFormationGeneralCategory = function(formationBlueprintCountCache, formationBlueprintListCache)
+    for k = 1, TableGetn(formationBlueprintListCache) do
+        local blueprintIds = formationBlueprintListCache[k]
+        for b = 1, TableGetn(blueprintIds) do
+            local blueprintId = blueprintIds[b]
+            if formationBlueprintCountCache[blueprintId] > 0 then
+                return blueprintId
+            end
         end
     end
 end
@@ -128,6 +130,7 @@ ComputeLandFormation = function(formationBlueprintCountCache, formationBlueprint
     local tacticalFormation = TacticalFormation
     local formationColumnOccupied = FormationColumnOccupied
 
+    local formationBlueprintListLandGeneral = formationBlueprintListLand.General
     local formationBlueprintListLandShield = formationBlueprintListLand.Shield
     local formationBlueprintListLandCounterIntelligence = formationBlueprintListLand.CounterIntelligence
     local formationBlueprintListLandScout = formationBlueprintListLand.Scout
@@ -208,25 +211,25 @@ ComputeLandFormation = function(formationBlueprintCountCache, formationBlueprint
 
                 if (rowMod4 == 0 or rowMod4 == 2) and columnMod3 == 2 then
                     -- we'd like a shield here
-                    blueprintId = GetCachedFormationCategory(
+                    blueprintId = GetCachedFormationSpecificCategory(
                         formationBlueprintCountCache,
                         formationBlueprintListLandShield
                     )
                 elseif rowMod4 == 3 and columnMod3 == 2 then
                     -- we'd like counter intelligence or a scout here
-                    blueprintId = GetCachedFormationCategory(
+                    blueprintId = GetCachedFormationSpecificCategory(
                         formationBlueprintCountCache,
                         formationBlueprintListLandCounterIntelligence
                     )
                 elseif rowMod4 == 3 and columnMod3 == 1 then
                     -- we'd like a scout here
-                    blueprintId = GetCachedFormationCategory(
+                    blueprintId = GetCachedFormationSpecificCategory(
                         formationBlueprintCountCache,
                         formationBlueprintListLandScout
                     )
                 elseif rowMod4 == 0 and (columnMod3 == 0 or columnMod3 == 1) then
                     -- we'd like anti air here
-                    blueprintId = GetCachedFormationCategory(
+                    blueprintId = GetCachedFormationSpecificCategory(
                         formationBlueprintCountCache,
                         formationBlueprintListLandAntiAir
                     )
@@ -236,10 +239,9 @@ ComputeLandFormation = function(formationBlueprintCountCache, formationBlueprint
             -- find a general category if we have no specific category
 
             if not blueprintId then
-                blueprintId = GetFormationCategory(
+                blueprintId = GetCachedFormationGeneralCategory(
                     formationBlueprintCountCache,
-                    formationBlueprintListLand,
-                    LandGeneralPreferences
+                    formationBlueprintListLandGeneral
                 )
             end
 
@@ -285,6 +287,9 @@ ComputeLandFormation = function(formationBlueprintCountCache, formationBlueprint
                 unitsToProcess = unitsToProcess - 1
             end
         end
+
+        -- update the lookup data for the next row
+        UpdateFormationLandProperties(formationBlueprintCountCache, formationBlueprintListLand)
     end
 end
 

@@ -79,6 +79,24 @@ end
 ---@field Naval BlueprintId[]
 ---@field Submersible BlueprintId[]
 
+---@type FormationBlueprintList
+FormationBlueprintListCache = {
+    Land = {
+        General = {},
+        AntiAir = {},
+        Shield = {},
+        Scout = {},
+        CounterIntelligence = {},
+    },
+    Air = {},
+    Naval = {},
+    Submersible = {}
+}
+
+for k = 1, TableGetn(LandGeneralPreferences) do
+    TableInsert(FormationBlueprintListCache.Land.General, {})
+end
+
 --- Transforms a list of units into a lookup datastructure to make them computationally cheaper to work with.
 ---@param units (Unit[] | UserUnit[])
 ---@param blueprintCountCache FormationBlueprintCount
@@ -168,6 +186,13 @@ ComputeFormationProperties = function(units, blueprintCountCache, blueprintListC
                 break
             end
         end
+
+        for c = 1, TableGetn(LandGeneralPreferences) do
+            if EntityCategoryContains(LandGeneralPreferences[c], blueprintId) then
+                TableInsert(blueprintListCacheLand.General[c], blueprintId)
+                break
+            end
+        end
     end
 
     -- count all the entries in the cache
@@ -175,48 +200,45 @@ ComputeFormationProperties = function(units, blueprintCountCache, blueprintListC
     for _, unitCount in blueprintCountCache do
         blueprintTotalCount = blueprintTotalCount + unitCount
     end
-
-
 
     return blueprintCountCache, blueprintListCache, blueprintTotalCount
 end
 
---- Updates the lookup datastructures to reflect the current state.
+--- Updates the lookup datastructures to reflect the current state by removing blueprint ids that have no units left.
 ---@param blueprintCountCache FormationBlueprintCount
----@param blueprintListCache FormationBlueprintList
----@return FormationBlueprintCount
----@return FormationBlueprintList
----@return number # total number of units
-UpdateFormationProperties = function(blueprintCountCache, blueprintListCache)
-    for layer, blueprintIds in blueprintListCache do
-
-        -- retrieve the original count and reset it
-        local count = TableGetn(blueprintListCache)
-        TableSetn(blueprintIds, 0)
-
-        -- only re-insert blueprint ids that we still have units of
-        for k = 1, count do
-            local blueprintId = blueprintIds[k]
-            if blueprintCountCache[blueprintId] > 0 then
-                TableInsert(blueprintIds, blueprintId)
-            else
-                blueprintCountCache[blueprintId] = nil
-            end
-        end
-
-        -- remove any excess entries, this isn't strictly necessary but it makes debugging easier
-        for k = TableGetn(blueprintIds) + 1, count do
-            blueprintIds[k] = nil
+---@param blueprintIds BlueprintId[]
+UpdateFormationProperties = function(blueprintCountCache, blueprintIds)
+    local head = 1
+    for k = 1, TableGetn(blueprintIds) do
+        local blueprintId = blueprintIds[k]
+        if blueprintCountCache[blueprintId] > 0 then
+            blueprintIds[head] = blueprintId
+            head = head + 1
         end
     end
 
-    -- count all the entries in the cache
-    local blueprintTotalCount = 0
-    for _, unitCount in blueprintCountCache do
-        blueprintTotalCount = blueprintTotalCount + unitCount
+    -- remove lingering entries
+    for k = head, TableGetn(blueprintIds) do
+        blueprintIds[k] = nil
     end
 
-    return blueprintCountCache, blueprintListCache, blueprintTotalCount
+    TableSetn(blueprintIds, head - 1)
+end
+
+--- Updates the lookup datastructures for land formations to reflect the current state.
+---@param blueprintCountCache FormationBlueprintCount
+---@param blueprintListCacheLand FormationBlueprintListLand
+UpdateFormationLandProperties = function(blueprintCountCache, blueprintListCacheLand)
+
+    UpdateFormationProperties(blueprintCountCache, blueprintListCacheLand.Shield)
+    UpdateFormationProperties(blueprintCountCache, blueprintListCacheLand.CounterIntelligence)
+    UpdateFormationProperties(blueprintCountCache, blueprintListCacheLand.AntiAir)
+    UpdateFormationProperties(blueprintCountCache, blueprintListCacheLand.Scout)
+
+    local blueprintListCacheLandGeneral = blueprintListCacheLand.General
+    for k = 1, TableGetn(blueprintListCacheLandGeneral) do
+        UpdateFormationProperties(blueprintCountCache, blueprintListCacheLandGeneral[k])
+    end
 end
 
 --- Computes the footprint data of a formation.
