@@ -37,6 +37,8 @@ local TableInsert = table.insert
 ---@field Naval FormationScaleParametersOfLayer
 ---@field Submersible FormationScaleParametersOfLayer
 
+--- Various parameters based on the behavior of the engine when there are units of different sizes in a formation.
+---@class FormationScaleParametersOfLayer
 FormationScaleParameters = {
     Land = {
         GridSizeFraction = 2.75,
@@ -63,7 +65,7 @@ FormationScaleParameters = {
     },
 }
 
----
+--- Computes the scale of the formation to compensate for the behavior of the engine.
 ---@param formationScaleParametersOfLayer FormationScaleParametersOfLayer
 ---@param footprintMaximum number
 ComputeFormationScale = function(formationScaleParametersOfLayer, footprintMinimum, footprintMaximum)

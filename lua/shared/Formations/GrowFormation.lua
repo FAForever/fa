@@ -122,9 +122,11 @@ ComputeLandFormation = function(formationBlueprintCountCache, blueprintIds, form
         formationBlueprintCountCache,
         blueprintIds
     )
+
+    local formationScale = ComputeFormationScale(formationScaleParameters, footprintMinimum, footprintMaximum)
     local formationRowLengthHalf = MathCeil(MathSqrt(footprintTotalLength))
     local formationRowLength = 2 * formationRowLengthHalf
-    local formationScale = ComputeFormationScale(formationScaleParameters, footprintMinimum, footprintMaximum)
+
     local sparsityMultiplier = 1.5
 
     local lx = 0
