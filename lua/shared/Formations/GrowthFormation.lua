@@ -128,7 +128,12 @@ ComputeLandFormation = function(formationBlueprintCountCache, formationBlueprint
         lx = 1
         ly = ly + 1
 
-        -- we decrease the columns one as we move a row backwards the rows
+        -------------------------------------------------------------------
+        -- feature: prevent overlapping units in the formation 
+        --
+        -- As we're starting a new row we can decrement the occupied 
+        -- columns to free them up again as we progress more rows. 
+
         for k = 1, TableGetn(formationColumnOccupied) do
             formationColumnOccupied[k] = formationColumnOccupied[k] - 1
         end
@@ -137,7 +142,9 @@ ComputeLandFormation = function(formationBlueprintCountCache, formationBlueprint
         while (unitsToProcess > 0) and (lx < formationRowLength) do
 
             -------------------------------------------------------------------
-            -- pattern that allows us to grow from the center, as an example for
+            -- feature: place units from the center of the formation
+            -- 
+            -- Pattern that allows us to grow from the center, as an example for
             -- 7 units the results look like:
             --
             -- - 0  -1  1   -2  2   -3  3
@@ -148,6 +155,14 @@ ComputeLandFormation = function(formationBlueprintCountCache, formationBlueprint
                 ox = -1 * offset
             end
 
+            -------------------------------------------------------------------
+            -- feature: prevent overlapping units in the formation 
+            --
+            -- A column can be occupied when a relative large unit is placed in
+            -- the formation. Any number larger than 0 indicates the column is 
+            -- blocked for the same amount of rows. This is a simple way to
+            -- avoid overlapping units in the formation.
+
             -- skip if the column on this row is occupied
             if formationColumnOccupied[ox + formationRowLengthHalf + 1] > 0 then
                 lx = lx + 1
@@ -155,7 +170,9 @@ ComputeLandFormation = function(formationBlueprintCountCache, formationBlueprint
             end
 
             -------------------------------------------------------------------
-            -- the category magic part where we try to find a pattern for the
+            -- feature: incorporate unit type preferences in the formation
+            -- 
+            -- The category magic part where we try to find a pattern for the
             -- unit categories that looks decent. The first row is always the
             -- the general category, this garantees that if we have direct fire
             -- units that they end up in the front row. From the second row
@@ -196,7 +213,7 @@ ComputeLandFormation = function(formationBlueprintCountCache, formationBlueprint
                 end
             end
 
-            -- find a general category if we have no specific category
+            -- Find a general category if we have no specific category
 
             if not blueprintId then
                 blueprintId = GetCachedFormationGeneralCategory(
@@ -207,11 +224,19 @@ ComputeLandFormation = function(formationBlueprintCountCache, formationBlueprint
 
             if blueprintId then
 
-                -- decrease the total unit count
-                unitsToProcess = unitsToProcess - 1
+                -------------------------------------------------------------------
+                -- When we reach this point then we should always have a blueprint, 
+                -- the if-statement above only exists to satisfy the type checker.
 
-                -- decrease the blueprint unit count
+                -- we're consuming a unit, reduce the relevant counter
                 formationBlueprintCountCache[blueprintId] = formationBlueprintCountCache[blueprintId] - 1
+
+                -------------------------------------------------------------------
+                -- feature: prevent overlapping units in the formation 
+                --
+                -- This is where we occupy future columns based on the footprint 
+                -- size of the unit. This allows us to avoid overlapping units in
+                -- the formation.
 
                 local blueprintFootprint = __blueprints[blueprintId].Footprint
                 local blueprintFootprintSizeX = blueprintFootprint.SizeX
@@ -227,11 +252,8 @@ ComputeLandFormation = function(formationBlueprintCountCache, formationBlueprint
                     end
                 end
 
-                -- increase the current formation length
-                lx = lx + 1
-
                 -------------------------------------------------------------------
-                -- add the formation entry
+                -- And finally we describe the formation entry for the unit
 
                 local formationIndex = TableGetn(tacticalFormation) + 1
                 local formation = GetFormationEntry(formationIndex)
@@ -243,9 +265,16 @@ ComputeLandFormation = function(formationBlueprintCountCache, formationBlueprint
                 TableInsert(tacticalFormation, formation)
             else
                 LOG("No blueprint!", lx, unitsToProcess, formationRowLength, ly, formationColumnOccupied[lx])
-                lx = lx + 1
-                unitsToProcess = unitsToProcess - 1
             end
+
+            -------------------------------------------------------------------
+            -- Regardless of whether we have a blueprint or not, we need to 
+            -- keep incrementing/decrementing these values or we'll end up in
+            -- an infinite loop. Infinite loops are bad.
+
+            lx = lx + 1
+            unitsToProcess = unitsToProcess - 1
+
         end
 
         -- update the lookup data for the next row
