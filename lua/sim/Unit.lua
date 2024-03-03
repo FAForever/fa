@@ -24,6 +24,8 @@ local Weapon = import("/lua/sim/weapon.lua").Weapon
 local IntelComponent = import('/lua/defaultcomponents.lua').IntelComponent
 local VeterancyComponent = import('/lua/defaultcomponents.lua').VeterancyComponent
 
+local GetBlueprintCaptureCost = import('/lua/shared/captureCost.lua').GetBlueprintCaptureCost
+
 local TrashBag = TrashBag
 local TrashAdd = TrashBag.Add
 local TrashDestroy = TrashBag.Destroy
@@ -3976,8 +3978,8 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
 
         -- compute capture costs
         local targetBlueprintEconomy = target.Blueprint.Economy
-        local time = ((targetBlueprintEconomy.BuildTime or 10) / self:GetBuildRate()) / 2
-        local energy = targetBlueprintEconomy.BuildCostEnergy or 100
+        local time, energy = GetBlueprintCaptureCost(target.Blueprint, self:GetBuildRate())
+
         time = time * (self.CaptureTimeMultiplier or 1)
         if time < 0 then
             time = 1

@@ -26,6 +26,8 @@ local UIUtil = import("/lua/ui/uiutil.lua")
 local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
 local Reticle = import('/lua/ui/controls/reticle.lua').Reticle
 
+local GetBlueprintCaptureCost = import('/lua/shared/captureCost.lua').GetBlueprintCaptureCost
+ 
 -- Local upvalues for performance
 local GetRolloverInfo = GetRolloverInfo
 local GetSelectedUnits = GetSelectedUnits
@@ -49,7 +51,7 @@ CaptureReticle = ClassUI(Reticle) {
             totalBuildRate = totalBuildRate + unit:GetBuildRate()
         end
         self.selectionBuildRate = totalBuildRate
-        self.focusArmy = GetArmiesTable().focusArmy
+        self.focusArmy = GetFocusArmy()
 
         self.BuildTimeIcon = Bitmap(self)
         self.BuildTimeIcon:SetTexture(UIUtil.UIFile('/game/unit_view_icons/time.dds'))
@@ -72,11 +74,10 @@ CaptureReticle = ClassUI(Reticle) {
     ---@param self CaptureReticle
     UpdateDisplay = function(self)
         local rolloverInfo = GetRolloverInfo()
-        local isEnemy, targetBp
+        local isNotAlly, targetBp
         local isCapturable = true
         if rolloverInfo then
-            -- armyIndex is 0-indexed, but IsAlly requires 1-indexed armies.
-            isEnemy = not IsAlly(self.focusArmy, rolloverInfo.armyIndex + 1)
+            isNotAlly = not IsAlly(self.focusArmy, rolloverInfo.armyIndex + 1)
             targetBp = __blueprints[rolloverInfo.blueprintId]
             -- `Unit:IsCapturable()` is sim-side so we will use what we have in the bp.
             -- May not work with units from mods or changed by script.
@@ -89,20 +90,12 @@ CaptureReticle = ClassUI(Reticle) {
                 end
             end
         end
-        if isEnemy and isCapturable then
+        if isNotAlly and isCapturable then
             if self:IsHidden() then
                 self:SetHidden(false)
             end
 
-            local targetBpEconomy = targetBp.Economy
-            -- Mimic Unit.lua GetCaptureCosts calculations
-            local time = ((targetBpEconomy.BuildTime or 10) / self.selectionBuildRate) / 2
-            local energy = targetBpEconomy.BuildCostEnergy or 100
-            -- This multiplier is sim-side. It would be nice to have, but it is rarely used.
-            -- time = time * (self.CaptureTimeMultiplier or 1)
-            if time < 0 then
-                time = 1
-            end
+            local time, energy = GetBlueprintCaptureCost(targetBp, self.selectionBuildRate)
 
             self.eText:SetText(string.format('%.0f (-%.0f)', energy, energy/time))
             local minutes = MathFloor(time/60)
