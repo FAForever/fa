@@ -131,7 +131,6 @@
     LifeBarOffset = 0.4,
     LifeBarSize = 0.75,
     Physics = {
-        BackUpDistance = 6,
         BankingSlope = 0,
         BuildOnLayerCaps = {
             LAYER_Air = false,
