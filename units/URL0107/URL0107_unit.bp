@@ -148,7 +148,7 @@
         MaxSteerForce = 10,
         MinSpeedPercent = 0,
         MotionType = "RULEUMT_Land",
-        RotateOnSpot = false,
+        RotateOnSpot = true,
         TurnRadius = 2,
         TurnRate = 80,
     },
