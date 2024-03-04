@@ -179,6 +179,7 @@ UnitBlueprint{
         MinSpeedPercent = 0,
         MotionType = "RULEUMT_Hover",
         RotateBodyWhileMoving = true,
+        RotateOnSpot = false,
         TurnFacingRate = 120,
         TurnRadius = 5,
         TurnRate = 90,
