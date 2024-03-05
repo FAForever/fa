@@ -684,7 +684,9 @@ function CommonLogic()
 
         btn.Count = UIUtil.CreateText(btn.Icon, '', 20, UIUtil.bodyFont)
         btn.Count:SetColor('ffffffff')
-        btn.Count:SetDropShadow(true)
+        -- creating shadow background behind the text box for better visibility of unit count
+        -- this is similar to existing styling of keybinding displayed in contruction menu
+        btn.Count:SetColorShadow('88060606')
         btn.Count:DisableHitTest()
         LayoutHelpers.AtBottomIn(btn.Count, btn, 4)
         LayoutHelpers.AtRightIn(btn.Count, btn, 3)
@@ -720,10 +722,13 @@ function CommonLogic()
 
         btn.Count = UIUtil.CreateText(btn.Icon, '', 20, UIUtil.bodyFont)
         btn.Count:SetColor('ffffffff')
-        btn.Count:SetDropShadow(true)
+        -- creating shadow background behind the text box for better visibility of unit count
+        -- this is similar to existing styling of keybinding displayed in contruction menu
+        btn.Count:SetColorShadow('88060606')
         btn.Count:DisableHitTest()
         LayoutHelpers.AtBottomIn(btn.Count, btn)
         LayoutHelpers.AtRightIn(btn.Count, btn)
+
         btn.LowFuel = Bitmap(btn)
         btn.LowFuel:SetSolidColor('ffff0000')
         btn.LowFuel:DisableHitTest()

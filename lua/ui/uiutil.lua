@@ -552,6 +552,29 @@ function CreateText(parent, label, pointSize, font, dropshadow)
     return text
 end
 
+--- Returns background bitmap behind specified target control with optional styling parameters
+--- for example creating semitransparent background behind text control or an icon
+---@param target Control
+---@param color? LazyVarColor
+---@param left? number
+---@param top? number
+---@param right? number
+---@param bottom? number
+---@param targetDepth? number
+---@param bitmapDepth? number
+---@return Bitmap
+function CreateBackground(target, color, left, top, right, bottom, targetDepth, bitmapDepth)
+    local bitmap = Bitmap(target)
+    bitmap:DisableHitTest()
+    bitmap:SetSolidColor(color or '88060606')
+    bitmap.Depth:Set(function() return bitmapDepth or (target:GetParent().Depth() + 1) end)
+    target.Depth:Set(function() return targetDepth or (target:GetParent().Depth() + 2) end)
+    -- by default, offseting the bitmap outside (negative values) on left and right side
+    -- and not offsetting on top and bottom becaause text already has small margin on top/bottom
+    LayoutHelpers.OffsetIn(bitmap, target, left or -1, top or 0, right or -1, bottom or 0)
+    return bitmap
+end
+
 ---@param parent Control
 ---@param filename FileName
 ---@param border? number
