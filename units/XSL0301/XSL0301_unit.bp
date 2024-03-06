@@ -616,7 +616,7 @@ UnitBlueprint{
             MuzzleVelocity = 25,
             MuzzleVelocityReduceDistance = 5,
             ProjectileId = "/projectiles/SDFLightChronatronCannon01/SDFLightChronatronCannon01_proj.bp",
-            ProjectileLifetimeUsesMultiplier = 1.15,
+            ProjectileLifetimeUsesMultiplier = 1.30,
             ProjectilesPerOnFire = 1,
             RackBones = {
                 {

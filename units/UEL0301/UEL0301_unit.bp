@@ -633,7 +633,7 @@ UnitBlueprint{
             MuzzleSalvoSize = 1,
             MuzzleVelocity = 25,
             ProjectileId = "/projectiles/TDFPlasmaHeavy03/TDFPlasmaHeavy03_proj.bp",
-            ProjectileLifetimeUsesMultiplier = 1.15,
+            ProjectileLifetimeUsesMultiplier = 1.30,
             ProjectilesPerOnFire = 1,
             RackBones = {
                 {
