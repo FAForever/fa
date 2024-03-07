@@ -172,7 +172,7 @@ UnitBlueprint{
     CollisionOffsetY = -0.25,
     SizeX = 0.9,
     SizeY = 1,
-    SizeZ = 0.7,
+    SizeZ = 0.95,
     StrategicIconName = "icon_structure2_intel",
     StrategicIconSortPriority = 230,
     Wreckage = {
