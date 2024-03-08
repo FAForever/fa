@@ -140,12 +140,43 @@ GetNextAirFactory = getGetNextFactory("AIR")
 GetNextNavalFactory = getGetNextFactory("NAVAL")
 
 function GetNearestIdleLTMex()
+    ConExecute "UI_SelectByCategory +inview MASSEXTRACTION STRUCTURE"
+    ---@type UserUnit[]
+    local mexes = GetSelectedUnits()
+    if not mexes then
+        return
+    end
+    local underUpgrade = {}
+    for _, mex in ipairs(mexes) do
+        local focus = mex:GetFocus()
+        if focus then
+            underUpgrade[focus] = true
+        end
+    end
     local tech = 1
+    local mousePos = GetMouseWorldPos()
     while tech < 4 do
-        ConExecute('UI_SelectByCategory +nearest +idle +inview MASSEXTRACTION TECH' .. tech)
+        ConExecute("UI_SelectByCategory +inview +idle MASSEXTRACTION STRUCTURE TECH" .. tech)
+        mexes = GetSelectedUnits()
         tech = tech + 1
-        local tempList = GetSelectedUnits()
-        if tempList ~= nil and not table.empty(tempList) then
+
+        if not mexes then
+            continue
+        end
+
+        local minDist = nil
+        local idleMex = nil
+        for _, mex in ipairs(mexes) do
+            local mexPos = mex:GetPosition()
+            local dist = VDist3(mousePos, mexPos)
+            if not underUpgrade[mex] and (not minDist or dist < minDist) then
+                minDist = dist
+                idleMex = mex
+            end
+        end
+
+        if idleMex then
+            SelectUnits { idleMex }
             break
         end
     end
