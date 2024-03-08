@@ -157,7 +157,7 @@ function PickBestTravelFormationIndex(typeName, distance)
     else
         return 1;
     end
-    
+
 end
 
 ---@param typeName string
@@ -175,10 +175,12 @@ end
 ---@param formationUnits Unit[]
 ---@return table
 function AttackFormation(formationUnits)
+    LOG(formationUnits[0]:GetBlueprint().Description .. " AttackFormation")
 
     local start = 0
     local getSystemTimeSecondsOnlyForProfileUse = rawget(_G, 'GetSystemTimeSecondsOnlyForProfileUse')
     if getSystemTimeSecondsOnlyForProfileUse then
+
         start = getSystemTimeSecondsOnlyForProfileUse()
     end
 
@@ -243,7 +245,7 @@ function GrowthFormation(formationUnits)
     LOG("GrowthFormation")
 
     local formation = import("/lua/shared/Formations/GrowthFormation.lua").ComputeFormation
-    
+
     local ok, msg = pcall(formation, formationUnits)
     if ok then
 
@@ -252,7 +254,7 @@ function GrowthFormation(formationUnits)
         if getSystemTimeSecondsOnlyForProfileUse then
             start = getSystemTimeSecondsOnlyForProfileUse()
         end
-    
+
         for k = 1, 20 do
             formation(formationUnits)
         end
@@ -342,6 +344,37 @@ end
 ---@param formationUnits Unit[]
 ---@return table
 function GuardFormation(formationUnits)
+
+    LOG("GuardFormation")
+
+    do
+        local formation = import("/lua/shared/Formations/GuardFormation.lua").ComputeFormation
+
+        local ok, msgOrFormation = pcall(formation, formationUnits)
+        if ok then
+
+            local start = 0
+            local getSystemTimeSecondsOnlyForProfileUse = rawget(_G, 'GetSystemTimeSecondsOnlyForProfileUse')
+            if getSystemTimeSecondsOnlyForProfileUse then
+                start = getSystemTimeSecondsOnlyForProfileUse()
+            end
+
+            for k = 1, 1 do
+                formation(formationUnits)
+            end
+
+            if getSystemTimeSecondsOnlyForProfileUse then
+                local stop = getSystemTimeSecondsOnlyForProfileUse()
+                SPEW("Guard formation took", stop - start, "seconds for", table.getn(formationUnits) + 1, "units.", start
+                    , stop)
+            end
+
+            return msgOrFormation
+        else
+            WARN(msgOrFormation)
+        end
+    end
+
     LOG('GuardFormation')
     -- Not worth caching GuardFormation because it's almost never called repeatedly with the same units.
     local FormationPos = {}
@@ -356,7 +389,7 @@ function GuardFormation(formationUnits)
             remainingShields = remainingShields + 1
         end
 
-        local fs = u:GetBlueprint().Footprint.SizeMax
+        local fs = math.max(u:GetBlueprint().Footprint.SizeX, u:GetBlueprint().Footprint.SizeZ)
         footprintCounts[fs] = (footprintCounts[fs] or 0) + 1
     end
 
@@ -540,7 +573,8 @@ function BlockBuilderLand(unitsList, formationBlock, categoryTable, spacing)
                         end
 
                         TableInsert(FormationPos,
-                            { xPos * spacing, (-formationLength - offsetY) * spacing, groupData.Filter, 0.1 * formationLength,
+                            { xPos * spacing, (-formationLength - offsetY) * spacing, groupData.Filter,
+                                0.1 * formationLength,
                                 true })
                         inserted = true
 
@@ -1168,7 +1202,8 @@ function CategorizeUnits(formationUnits)
         end
         if not identified then
             WARN('*FORMATION DEBUG: Unit ' ..
-                u:GetBlueprint().BlueprintId .. ' was excluded from the formation because its layer could not be determined.')
+                u:GetBlueprint().BlueprintId ..
+                ' was excluded from the formation because its layer could not be determined.')
         end
     end
 
