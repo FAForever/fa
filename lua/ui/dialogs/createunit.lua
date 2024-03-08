@@ -29,9 +29,9 @@ local NumArmies = table.getsize(ArmiesAndObserver)
 local WindowBorderThickness = 10
 local WindowHeaderThickness = 30
 
--- Helper values, changing these will break stuff, not configure stuff
-local FilterWidth = 83 * UIScale
-local FilterHeaderWidth = 90 * UIScale
+-- Helper values in pixels that will be automaticlly scaled by functions in LayoutHelpers
+local FilterToggleWidth = 83 -- width of toogle button including small margin
+local FilterHeaderWidth = 95 -- width of header label and checkbox
 
 local dialog, nameDialog, windowGroup, debugConfig
 local EscThread
@@ -170,6 +170,7 @@ function SourceListTabs()
             {
                 display = '<LOC spawn_filter_vanilla>Core Game',
                 key = 'vanilla',
+                tooltip = 'Toggle units from orignial FA and FAF patches',
                 sortFunc = function(unitID, modloc)
                     return string.sub(__blueprints[unitID].Source, 1, 7) == "/units/"
                 end,
@@ -183,7 +184,8 @@ function SourceListTabs()
                 local key = string.gsub(string.lower(mod.name),"%s+", "_")
                 specialFilterControls[key] = mod.location
                 table.insert(list, {
-                    title = titleFit(mod.name),
+                    display = titleFit(mod.name),
+                    tooltip = 'Toggle units from ' .. mod.name,
                     key = key,
                     sortFunc = function(unitID, modloc) return modloc..'/' == string.sub(__blueprints[unitID].Source, 1, (modloc):len()+1) end,
                 })
@@ -634,7 +636,9 @@ end
 
 function CreateNameFilter(data)
     local group = Group(windowGroup)
-    group.Width:Set(dialog.Width)
+    -- dynamiclly adjust witdh of this group depending on width of the dialog 
+    group.Width:Set(function() return dialog.Width() - (WindowBorderThickness * 2 * UIScale) end)
+
     if data.choices and data.choices[1] and table.getn(data.choices) > FilterColumnCount then
         LayoutHelpers.SetHeight(group, 30 + math.floor((table.getn(data.choices)-1)/FilterColumnCount) * 25)
     else
@@ -672,7 +676,7 @@ function CreateNameFilter(data)
             group.items[index] = UIUtil.CreateCheckboxStd(group, '/dialogs/toggle_btn/toggle')
 
             if index == 1 then
-                LayoutHelpers.AtLeftTopIn(group.items[index], group, 95)
+                LayoutHelpers.AtLeftTopIn(group.items[index], group, FilterHeaderWidth)
             elseif index < FilterColumnCount+1 then
                 LayoutHelpers.RightOf(group.items[index], group.items[index-1])
             else
@@ -731,12 +735,13 @@ function CreateNameFilter(data)
         group.edit:SetBackgroundColor('ff333333')
         group.edit:SetHighlightForegroundColor(UIUtil.highlightColor)
         group.edit:SetHighlightBackgroundColor("880085EF")
-        group.edit.Width:Set(windowGroup.Width() - FilterHeaderWidth - (20 * UIScale) )
+        -- keeping width of the edit box aligned with width of 5 filter toggle buttons
+        LayoutHelpers.SetWidth(group.edit, (FilterToggleWidth - 3) * 5)
         LayoutHelpers.SetHeight(group.edit, 20)
         group.edit:SetText(filterSet[data.key].editText or searchText)
         group.edit:SetFont(UIUtil.bodyFont, 15)
         group.edit:SetMaxChars(20)
-        LayoutHelpers.AtLeftIn(group.edit, group, 95)
+        LayoutHelpers.AtLeftIn(group.edit, group, FilterHeaderWidth + 5)
         LayoutHelpers.AtVerticalCenterIn(group.edit, group)
         group.edit.filterKey = data.key
         group.edit.key = data.key
@@ -756,31 +761,30 @@ function CreateNameFilter(data)
         end
 
         group.edit.OnTextChanged = function(self, new, old)
-            -- initialize search box to previus search term when it was not intialized to prevent keymapping messing with it
+            -- ignoring text changes until this search box is initialized to prevent keybinding
+            -- mapped to openning this dialog, being injected as an input for search box
             if not group.edit.isInitialized then
                 group.edit.isInitialized = true
-                group.edit:SetText(new)
-            end
-
-            searchText = new
-            filterSet[self.key].editText = new
-
-            if new == '' then
-                group.hint:SetAlpha(1, false)
-                activeFilters[self.key][self.filterKey] = nil
-                if group.check:IsChecked() then
-                    group.check:SetCheck(false)
-                end
+                group.edit:SetText('')
             else
-                group.hint:SetAlpha(0, false)
-                activeFilters[self.key][self.filterKey] = self.sortFunc
-                if not group.check:IsChecked() then
+                -- ignoring empty/whitespaces strings when searching for units
+                -- because they are not clearly visibile and units might not be found, e.g. " Engineer"
+                new = StringTrim(new)
+                if new == '' then
+                    group.hint:SetAlpha(1, false)
+                    group.check:SetCheck(false)
+                    activeFilters[self.key][self.filterKey] = nil
+                else
+                    group.hint:SetAlpha(0, false)
                     group.check:SetCheck(true)
+                    activeFilters[self.key][self.filterKey] = self.sortFunc
+                    searchText = new
+                    filterSet[self.key].editText = new
                 end
+
+                RefreshList()
             end
 
-            
-            RefreshList()
         end
 
         dialog.searchBox = group.edit
@@ -823,9 +827,10 @@ function CreateDialog()
 
     -- Configurable values
     local TeamGridCellMinWidth = getOptions().spawn_menu_team_column_min_width or 145
+    -- window dimensions are always in unscaled pixels because they are be scaled by the window's function
     local DefaultHeight = 450
-    local DefaultWidth = FilterHeaderWidth + FilterWidth * 5
-    local MinWidth = FilterHeaderWidth + FilterWidth * 2
+    local DefaultWidth = FilterHeaderWidth + (FilterToggleWidth * 5)
+    local MinimumWidth = FilterHeaderWidth + (FilterToggleWidth * 5)
 
     local DefaultWindowLocation = {
         Top = 50,
@@ -847,7 +852,7 @@ function CreateDialog()
     )
     dialog:SetWindowAlpha((options.spawn_menu_alpha or 80)/100)
     dialog.Depth:Set(GetFrame(0):GetTopmostDepth() + 1)
-    dialog:SetMinimumResize(MinWidth+WindowBorderThickness+WindowBorderThickness, DefaultHeight+WindowHeaderThickness+WindowBorderThickness)
+    dialog:SetMinimumResize(MinimumWidth + WindowBorderThickness * 2, DefaultHeight + WindowBorderThickness * 2)
     dialog.isPopulated = false -- tracking status of dialog populated by UI elements
 
     dialog.OnClose = function(self)
@@ -868,7 +873,9 @@ function CreateDialog()
 
     windowGroup = CreateWindowContentGroup(dialog)
 
-    FilterColumnCount = math.floor((windowGroup.Width()-FilterHeaderWidth)/FilterWidth)
+    -- calculating number of filter toggles that can fit in width of dialog
+    -- this value is used for wrapping toggles to below other toggles when dialog is too small
+    FilterColumnCount = math.floor((windowGroup.Width() - (FilterHeaderWidth * UIScale)) / (FilterToggleWidth * UIScale))
 
     UpdateTeamGridCounts(math.floor((windowGroup.Width())/TeamGridCellMinWidth))
 
@@ -962,7 +969,7 @@ function CreateDialog()
 
     local function SetFooterHeighest(obj)
         if footerGroup.Top() > obj.Top() then
-            footerGroup.Top:Set(obj.Top)
+            footerGroup.Top:Set(function() return obj.Top() - 5 end)
         end
     end
 
@@ -973,11 +980,11 @@ function CreateDialog()
             if options.spawn_menu_footer_text_input then
                 inputfield = numImputSettings(Edit(footerGroup), textlabel, inputdata)
                 if i == 1 then
-                    LayoutHelpers.AtBottomIn(textlabel, footerGroup, 10)
-                    LayoutHelpers.AtLeftIn(textlabel, footerGroup, 5)
+                    LayoutHelpers.AtBottomIn(textlabel, footerGroup, 5)
+                    LayoutHelpers.AtLeftIn(textlabel, footerGroup, 10)
                 else
                     local previousInput = footerGroup['input'..NumberInputFields[DialogMode][i-1].label]
-                    LayoutHelpers.RightOf(textlabel, previousInput, 25)
+                    LayoutHelpers.RightOf(textlabel, previousInput, 75)
                 end
             else--if inputdata.type == 'slider' then
                 inputfield = Group(footerGroup)
@@ -993,9 +1000,11 @@ function CreateDialog()
                 slider._currentValue:Set(inputdata.default)
                 local value = UIUtil.CreateText(inputfield, slider:GetValue(), 12, "Arial")
                 LayoutHelpers.RightOf(inputfield, textlabel)
-                LayoutHelpers.Below(slider, textlabel, 5)
+                -- LayoutHelpers.Below(slider, textlabel, 5)
+                LayoutHelpers.AtLeftIn(slider, textlabel, -8)
+                LayoutHelpers.AnchorToBottom(slider, textlabel, 5)
                 LayoutHelpers.RightOf(value, textlabel, 10)
-                LayoutHelpers.SetWidth(inputfield, slider.Width()+30)
+                LayoutHelpers.SetWidth(inputfield, slider.Width())
                 slider.OnValueChanged = function(self, newValue)
                     value:SetText(newValue)
                 end
@@ -1003,12 +1012,12 @@ function CreateDialog()
 
                 if i == 1 then
                     LayoutHelpers.AtBottomIn(textlabel, footerGroup, 30)
-                    LayoutHelpers.AtLeftIn(textlabel, footerGroup, 5)
+                    LayoutHelpers.AtLeftIn(textlabel, footerGroup, 10)
                     LayoutHelpers.AtLeftIn(inputfield, footerGroup, 5)
                 else
                     local previousInput = footerGroup['input'..NumberInputFields[DialogMode][i-1].label]
-                    LayoutHelpers.RightOf(textlabel, previousInput, 5)
-                    LayoutHelpers.RightOf(inputfield, previousInput, 5)
+                    LayoutHelpers.RightOf(textlabel, previousInput, 10)
+                    LayoutHelpers.RightOf(inputfield, previousInput, 10)
                 end
             end
 
@@ -1270,12 +1279,12 @@ function CreateDialog()
     local filterPresetLabel = UIUtil.CreateText(windowGroup, 'Filter Preset', 14, UIUtil.bodyFont)
     LayoutHelpers.Below(filterPresetLabel, armiesGroup, 5)
     LayoutHelpers.AtLeftIn(filterPresetLabel, windowGroup, 5)
-    filterPresetLabel.Width:Set(function() return FilterHeaderWidth end)
+    filterPresetLabel.Width:Set(function() return (FilterHeaderWidth - 5) * UIScale end)
 
     local filterPresetCombo = import('/lua/ui/controls/combo.lua').Combo(windowGroup, 14, 10, nil, nil, "UI_Tab_Click_01", "UI_Tab_Rollover_01")
     LayoutHelpers.Below(filterPresetCombo, armiesGroup, 10)
-    LayoutHelpers.RightOf(filterPresetCombo, filterPresetLabel, 10)
-    filterPresetCombo.Width:Set(function() return 2 * FilterWidth - (20 * UIScale) end)
+    LayoutHelpers.RightOf(filterPresetCombo, filterPresetLabel, 2)
+    filterPresetCombo.Width:Set(function() return (2 * FilterToggleWidth - 15) * UIScale end)
     filterPresetCombo.OnClick = function(self, index, text, skipUpdate)
         SetFilters(self.keyMap[index])
     end
@@ -1311,7 +1320,7 @@ function CreateDialog()
         return btn
     end
 
-    local filterSaveButton = CreatePressButton 'Save'
+    local filterSaveButton = CreatePressButton('Save')
     LayoutHelpers.Below(filterSaveButton, armiesGroup)
     LayoutHelpers.RightOf(filterSaveButton, filterPresetCombo, 10)
     LayoutHelpers.AtVerticalCenterIn(filterSaveButton, filterPresetCombo)
@@ -1330,7 +1339,7 @@ function CreateDialog()
         end)
     end
 
-    local filterDeleteButton = CreatePressButton 'Delete'
+    local filterDeleteButton = CreatePressButton('Delete')
     LayoutHelpers.Below(filterDeleteButton, armiesGroup)
     LayoutHelpers.RightOf(filterDeleteButton, filterSaveButton)
     LayoutHelpers.AtVerticalCenterIn(filterDeleteButton, filterPresetCombo)
@@ -1483,7 +1492,7 @@ function CreateDialog()
         local faction = Logic.GetUnitFactionInfo(unitData)
         mouseover = Bitmap(windowGroup)
         mouseover:SetSolidColor('DD111111')
-        
+
         mouseover.fill = Bitmap(mouseover)
         mouseover.fill:SetSolidColor(faction.color or 'DD232323')
         mouseover.fill:SetAlpha(0.15, false)
@@ -1613,7 +1622,7 @@ function CreateDialog()
             unitSelector.id = UIUtil.CreateText(unitSelector, '', 12, 'Arial')
             LayoutHelpers.AtLeftTopIn(unitSelector.id, unitSelector, options.spawn_menu_show_icons and 25 or 5)
             unitSelector.desc = UIUtil.CreateText(unitSelector, '', 12, UIUtil.bodyFont)
-            LayoutHelpers.AtLeftTopIn(unitSelector.desc, unitSelector, (DialogMode == 'templates' and 50 or 120) + (options.spawn_menu_show_icons and 36 or 18))
+            LayoutHelpers.AtLeftTopIn(unitSelector.desc, unitSelector, (DialogMode == 'templates' and 50 or 140) + (options.spawn_menu_show_icons and 36 or 18))
             if options.spawn_menu_show_icons then
                 unitSelector.imageBG = Bitmap(unitSelector)
                 unitSelector.imageBG.Height:Set(16 * UIScale)

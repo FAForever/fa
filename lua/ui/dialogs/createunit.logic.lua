@@ -62,7 +62,7 @@ function IsDummy(unitID) return HasCategory(unitID, 'DUMMYUNIT') or HasCategory(
 function IsEngineerTech3(unitID) return HasCategory(unitID, 'TECH3') and HasCategory(unitID, 'ENGINEER') and not HasCategory(unitID, 'SUBCOMMANDER') end
 function IsEngineerTech4(unitID) return HasCategory(unitID, 'TECH3') and HasCategory(unitID, 'SUBCOMMANDER') and HasCategory(unitID, 'USEBUILDPRESETS') end
 function IsUnitTesting(unitID) return unitID == 'xab1401' or HasCategory(unitID, 'COMMAND') or IsEngineerTech3(unitID) or IsEngineerTech4(unitID) end
- 
+
 function IsUnitPlayable(unitID)
     local bp = __blueprints[unitID]
     return bp.CategoriesHash.SELECTABLE
@@ -70,6 +70,7 @@ function IsUnitPlayable(unitID)
        and not bp.CategoriesHash.OPERATION
        and not bp.CategoriesHash.INSIGNIFICANTUNIT
        and not bp.CategoriesHash.UNTARGETABLE
+       and not bp.CategoriesHash.TELEPORTBEACON
 end
 
 function GetUnitDescription(id)
@@ -83,7 +84,7 @@ function GetUnitDescription(id)
     end
 
     if bp.Description and bp.Description ~= '' then
-        info = info .. ' ' .. LOC(bp.Description)
+        info = info .. ' ' .. LOC(bp.Description):gsub("T4 ", "")
     else
         info = info .. ' [NO bp.Description]'
     end
