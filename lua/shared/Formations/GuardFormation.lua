@@ -235,16 +235,30 @@ function ComputeFormation(units)
     ---@type Unit
     local guardedunit = units[0]:GetGuardedUnit()
 
-    ---@type UnitBlueprint
-    local guardedBlueprint = guardedunit:GetBlueprint().Formation
-    if guardedBlueprint.Embedded then
-        ComputeEmbeddedFormation(
-            tacticalFormation,
-            formationBlueprintCountCache,
-            formationBlueprintListCache.Shield,
-            guardedBlueprint,
-            0, 0
-        )
+    ---@type UnitBlueprintFormations
+    local guardedBlueprintFormation = guardedunit:GetBlueprint().Formation
+    if guardedBlueprintFormation.EmbeddedFormations then
+        local guardedBlueprintFormationEmbedShieldAt = guardedBlueprintFormation.EmbedShieldsAt
+        if guardedBlueprintFormationEmbedShieldAt then
+            ComputeEmbeddedFormation(
+                tacticalFormation,
+                formationBlueprintCountCache,
+                formationBlueprintListCache.Shield,
+                guardedBlueprintFormationEmbedShieldAt,
+                0, 0
+            )
+        end
+
+        local guardedBlueprintFormationEmbedAntiAirAt = guardedBlueprintFormation.EmbedAntiAirAt
+        if guardedBlueprintFormationEmbedAntiAirAt then
+            ComputeEmbeddedFormation(
+                tacticalFormation,
+                formationBlueprintCountCache,
+                formationBlueprintListCache.AntiAir,
+                guardedBlueprintFormationEmbedAntiAirAt,
+                0, 0
+            )
+        end
     end
 
     local circleOffset = 2
@@ -318,8 +332,6 @@ function ComputeFormation(units)
             TableInsert(tacticalFormation, formation)
         end
     end
-
-    reprsl(tacticalFormation)
 
     return tacticalFormation
 end

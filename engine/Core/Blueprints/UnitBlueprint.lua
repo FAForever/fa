@@ -93,6 +93,7 @@
 ---@field ExternalFactory? UnitBlueprintExternalFactory
 ---@field Enhancements?  table<Enhancement, UnitBlueprintEnhancement>
 ---@field EnhancementPresets? table<string, UnitBlueprintEnhancementPreset>
+---@field Formation UnitBlueprintFormations
 ---@field General UnitBlueprintGeneral
 ---@field Intel UnitBlueprintIntel
 ---@field Interface UnitBlueprintInterface
@@ -121,10 +122,6 @@
 ---@field SizeDamageEffectsScale number
 --- auto-generated tech category from `Categories`
 ---@field TechCategory TechCategory
---- auto-generated formation layer based on the motion type
----@field FormationLayer FormationLayer
---- auto-generated formation tech index based on the category
----@field FormationTechIndex FormationTech
 ---
 --- adds categories to `Categories` and then is deleted. Takes precedence over `DelCategories`
 ---@field AddCategories? CategoryName[]
@@ -448,7 +445,6 @@
 --- Should not be defined with `AntiArtilleryShield`, `PersonalBubble`, or `PersonalShield`.
 ---@field TransportShield? boolean
 
-
 ---@class UnitBlueprintDisplay
 --- Used by the Aeon build animation for a custom mercury pool
 ---@field AeonMercuryPool? string
@@ -581,6 +577,16 @@
 
 ---@class UnitBlueprintEffects
 ---@field Effects UnitBlueprintEffect[]
+
+---@class UnitBlueprintFormations
+--- List of {x, z, x, z, ...} coordinates where to embed anti air
+---@field EmbedAntiAirAt number[]
+--- List of {x, z, x, z, ...} coordinates where to embed shields
+---@field EmbedShieldsAt number[]
+--- auto-generated formation layer based on the motion type
+---@field FormationLayer FormationLayer
+--- auto-generated formation tech index based on the category
+---@field FormationTechIndex FormationTech
 
 ---@class UnitBlueprintMovementEffects : UnitBlueprintEffects
 --- Contrails shown behind aircraft (in SupCom usually behind tips of wings).

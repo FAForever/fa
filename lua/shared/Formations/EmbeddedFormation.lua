@@ -20,19 +20,9 @@
 --** SOFTWARE.
 --******************************************************************************************************
 
-local ComputeFormationProperties = import('/lua/shared/Formations/shared.lua').ComputeFormationProperties
-local UpdateFormationLandCategories = import('/lua/shared/Formations/shared.lua').UpdateFormationLandCategories
-
-local FormationScaleParameters = import('/lua/shared/Formations/FormationScale.lua').FormationScaleParameters
-local ComputeFormationScale = import('/lua/shared/Formations/FormationScale.lua').ComputeFormationScale
-
-local ComputeFootprintData = import('/lua/shared/Formations/FormationFootprints.lua').ComputeFootprintData
-
 local GetFormationEntry = import('/lua/shared/Formations/Formation.lua').GetFormationEntry
 
 local TableGetn = table.getn
-local TableSetn = table.setn
-local TableSort = table.sort
 local TableInsert = table.insert
 
 --- Returns the first blueprint identifier that is still available in the formationBlueprintCountCache.
