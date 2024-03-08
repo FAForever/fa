@@ -136,8 +136,12 @@ UnitBlueprint{
     },
     Formation = {
         EmbeddedFormations = true,
-        EmbedAntiAirAt = { 2.5, 1.0, 2.5, -1.0, -2.5, 1.0, -2.5, -1.0},
+        EmbedAntiAirAt = { 1.5, 2.0, 1.5, -2.0, -1.5, 2.0, -1.5, -2.0},
         EmbedShieldsAt = { 1.5, 1.0, 1.5, -1.0, -1.5, 1.0, -1.5, -1.0},
+        SizeX = 12,
+        SizeZ = 12,
+        OffsetX = 6,
+        OffsetZ = 6,
     },
     General = {
         CommandCaps = {
