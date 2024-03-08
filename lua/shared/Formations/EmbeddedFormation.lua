@@ -30,9 +30,48 @@ local ComputeFootprintData = import('/lua/shared/Formations/FormationFootprints.
 
 local GetFormationEntry = import('/lua/shared/Formations/Formation.lua').GetFormationEntry
 
----@param target (Unit[] | UserUnit[])
----@param blueprintCountCache FormationBlueprintCount
----@param blueprintListCache BlueprintId[]
-ComputeFormation = function(blueprintCountCache, blueprintListCache, target)
+local TableGetn = table.getn
+local TableSetn = table.setn
+local TableSort = table.sort
+local TableInsert = table.insert
 
+--- Returns the first blueprint identifier that is still available in the formationBlueprintCountCache.
+---@param formationBlueprintCountCache FormationBlueprintCount
+---@param formationBlueprintListCache BlueprintId[]
+---@return BlueprintId?
+local GetCachedFormationSpecificCategory = function(formationBlueprintCountCache, formationBlueprintListCache)
+    for k = 1, TableGetn(formationBlueprintListCache) do
+        local blueprintId = formationBlueprintListCache[k]
+        if formationBlueprintCountCache[blueprintId] > 0 then
+            return blueprintId
+        end
+    end
+end
+
+---@param tacticalFormation Formation
+---@param blueprintCountCache FormationBlueprintCount
+---@param blueprintListCache BlueprintId[]  
+---@param offsets number[] # { lx, lz, lx, lz, ... }
+---@param cx number
+---@param cz number
+ComputeEmbeddedFormation = function(tacticalFormation, blueprintCountCache, blueprintListCache, offsets, cx, cz)
+    for k = 0, 0.5 * TableGetn(offsets) - 1 do
+        local lox = offsets[2 * k + 1]
+        local loz = offsets[2 * k + 2]
+
+        local blueprintId = GetCachedFormationSpecificCategory(blueprintCountCache, blueprintListCache)
+        if blueprintId then
+            local formationIndex = TableGetn(tacticalFormation) + 1
+            local formation = GetFormationEntry(formationIndex)
+            formation[1] = cx + lox
+            formation[2] = cz + loz
+            formation[3] = categories[blueprintId]
+            formation[4] = 0
+            formation[5] = false
+            TableInsert(tacticalFormation, formation)
+
+            -- we've consumed a unit, reduce the relevant counter
+            blueprintCountCache[blueprintId] = blueprintCountCache[blueprintId] - 1
+        end
+    end
 end

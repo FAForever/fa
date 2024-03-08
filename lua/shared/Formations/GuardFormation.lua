@@ -20,6 +20,7 @@
 --** SOFTWARE.
 --******************************************************************************************************
 
+local ComputeEmbeddedFormation = import('/lua/shared/Formations/EmbeddedFormation.lua').ComputeEmbeddedFormation
 local GetFormationEntry = import('/lua/shared/Formations/Formation.lua').GetFormationEntry
 
 --- A table that contains the blueprint lookups that we can re-use.
@@ -234,6 +235,18 @@ function ComputeFormation(units)
     ---@type Unit
     local guardedunit = units[0]:GetGuardedUnit()
 
+    ---@type UnitBlueprint
+    local guardedBlueprint = guardedunit:GetBlueprint().Formation
+    if guardedBlueprint.Embedded then
+        ComputeEmbeddedFormation(
+            tacticalFormation,
+            formationBlueprintCountCache,
+            formationBlueprintListCache.Shield,
+            guardedBlueprint,
+            0, 0
+        )
+    end
+
     local circleOffset = 2
     local circleMultiplier = 0.2
     local circleUnitCount = 12
@@ -303,9 +316,10 @@ function ComputeFormation(units)
             formation[4] = 0
             formation[5] = false
             TableInsert(tacticalFormation, formation)
-
         end
     end
+
+    reprsl(tacticalFormation)
 
     return tacticalFormation
 end

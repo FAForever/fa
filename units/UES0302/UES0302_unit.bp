@@ -134,6 +134,11 @@ UnitBlueprint{
         SizeX = 5,
         SizeZ = 16,
     },
+    Formation = {
+        Embedded = true,
+        EmbedAntiAir = { 1.5, 1.0, 1.5, -1.0, -1.5, 1.0, -1.5, -1.0},
+        EmbedShields = { 1.5, 1.0, 1.5, -1.0, -1.5, 1.0, -1.5, -1.0},
+    },
     General = {
         CommandCaps = {
             RULEUCC_Attack = true,
