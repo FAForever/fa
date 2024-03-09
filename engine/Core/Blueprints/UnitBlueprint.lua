@@ -584,9 +584,17 @@
 --- List of {x, z, x, z, ...} coordinates where to embed shields
 ---@field EmbedShieldsAt number[]
 --- auto-generated formation layer based on the motion type
----@field FormationLayer FormationLayer
+---@field Layer FormationLayer
 --- auto-generated formation tech index based on the category
----@field FormationTechIndex FormationTech
+---@field SortingIndex number
+--- alternative to the footprint size of the unit, can be used to make room for embedded units
+---@field SizeX? number
+--- alternative to the footprint size of the unit, can be used to make room for embedded units
+---@field SizeZ? number
+--- alternative offset to the center of the footprint, can be used to make room for embedded units
+---@field OffsetX? number
+--- alternative offset to the center of the footprint, can be used to make room for embedded units
+---@field OffsetZ? number
 
 ---@class UnitBlueprintMovementEffects : UnitBlueprintEffects
 --- Contrails shown behind aircraft (in SupCom usually behind tips of wings).

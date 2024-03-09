@@ -647,53 +647,55 @@ end
 
 ---@param unitBlueprint UnitBlueprint
 function AddFormationData(unitBlueprint)
-    -- add formation layer category
-    if not unitBlueprint.FormationLayer then
-        for category, identifier in {LAND = 'Land', AIR = 'Air', NAVAL = 'Naval', SUBMERSIBLE = 'Submersible'} do
-            if unitBlueprint.CategoriesHash[category] then
-                unitBlueprint.FormationLayer = identifier
-                break
-            end
-        end
-    end
-
     -- add formation sorting index
-    if not unitBlueprint.FormationTechIndex then
-        local formationTechIndex = 0
+    if not unitBlueprint.Formation then
+        unitBlueprint.Formation = { }
 
-        if unitBlueprint.CategoriesHash["COMMAND"] then
-            formationTechIndex = 0
-
-        elseif unitBlueprint.CategoriesHash['TECH1'] then
-            formationTechIndex = 1
-
-            -- basic mod support for tech 1 experimentals
-            if unitBlueprint.CategoriesHash['EXPERIMENTAL'] then
-                formationTechIndex = 1.5
+        if not unitBlueprint.Formation.Layer then
+            for category, identifier in {LAND = 'Land', AIR = 'Air', NAVAL = 'Naval', SUBMERSIBLE = 'Submersible'} do
+                if unitBlueprint.CategoriesHash[category] then
+                    unitBlueprint.Formation.Layer = identifier
+                    break
+                end
             end
-
-        elseif unitBlueprint.CategoriesHash['TECH2'] then
-            formationTechIndex = 2
-
-            -- basic mod support for tech 2 experimentals
-            if unitBlueprint.CategoriesHash['EXPERIMENTAL'] then
-                formationTechIndex = 2.5
-            end
-        elseif unitBlueprint.CategoriesHash['TECH3'] then
-            formationTechIndex = 3
-
-            -- basic mod support for tech 3 experimentals
-            if unitBlueprint.CategoriesHash['EXPERIMENTAL'] then
-                formationTechIndex = 3.5
-            end
-        elseif unitBlueprint.CategoriesHash['EXPERIMENTAL'] then
-            formationTechIndex = 4
         end
 
-        -- always put these at the back
+        if not unitBlueprint.Formation.SortingIndex then
+            local formationSortingIndex = 0
 
+            if unitBlueprint.CategoriesHash["COMMAND"] then
+                formationSortingIndex = 0
 
-        unitBlueprint.FormationTechIndex = formationTechIndex
+            elseif unitBlueprint.CategoriesHash['TECH1'] then
+                formationSortingIndex = 1
+
+                -- basic mod support for tech 1 experimentals
+                if unitBlueprint.CategoriesHash['EXPERIMENTAL'] then
+                    formationSortingIndex = 1.5
+                end
+
+            elseif unitBlueprint.CategoriesHash['TECH2'] then
+                formationSortingIndex = 2
+
+                -- basic mod support for tech 2 experimentals
+                if unitBlueprint.CategoriesHash['EXPERIMENTAL'] then
+                    formationSortingIndex = 2.5
+                end
+            elseif unitBlueprint.CategoriesHash['TECH3'] then
+                formationSortingIndex = 3
+
+                -- basic mod support for tech 3 experimentals
+                if unitBlueprint.CategoriesHash['EXPERIMENTAL'] then
+                    formationSortingIndex = 3.5
+                end
+            elseif unitBlueprint.CategoriesHash['EXPERIMENTAL'] then
+                formationSortingIndex = 4
+            end
+
+            -- always put these at the back
+
+            unitBlueprint.Formation.SortingIndex = formationSortingIndex + 0.1 * math.max(unitBlueprint.SizeX, unitBlueprint.SizeZ)
+        end
     end
 end
 

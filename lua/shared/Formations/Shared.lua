@@ -51,14 +51,8 @@ local LandCounterScoutPreferences = import("/lua/shared/Formations/FormationLand
 ---@param a BlueprintId
 ---@param b BlueprintId
 ---@return boolean
-local SortByTech = function(a, b)
-    ---@type UnitBlueprint
-    local ba = __blueprints[a]
-
-    ---@type UnitBlueprint
-    local bb = __blueprints[b]
-
-    return (ba.FormationTechIndex + 0.01 * ba.Footprint.SizeX) > (bb.FormationTechIndex + 0.01 * bb.Footprint.SizeX)
+local FormationSortLambda = function(a, b)
+    return __blueprints[a].Formation.SortingIndex > __blueprints[b].Formation.SortingIndex
 end
 
 --- Lookup table to retrieve the count of a given unit type.
@@ -145,7 +139,7 @@ ComputeFormationProperties = function(units, blueprintCountCache, blueprintListC
     for k, unit in units do
         local unitBlueprint = unit:GetBlueprint() --[[@as UnitBlueprint]]
         local unitBlueprintId = unitBlueprint.BlueprintId
-        local unitblueprintFormationLayer = unitBlueprint.FormationLayer
+        local unitblueprintFormationLayer = unitBlueprint.Formation.Layer
         if not blueprintCountCache[unitBlueprintId] then
             blueprintCountCache[unitBlueprintId] = 1
             TableInsert(blueprintListCache[unitblueprintFormationLayer], unitBlueprintId)
@@ -155,10 +149,10 @@ ComputeFormationProperties = function(units, blueprintCountCache, blueprintListC
     end
 
     -- sort the lists by tech level, this way we always get the most advanced units first
-    TableSort(blueprintListCache.Air, SortByTech)
-    TableSort(blueprintListCache.Land, SortByTech)
-    TableSort(blueprintListCache.Naval, SortByTech)
-    TableSort(blueprintListCache.Submersible, SortByTech)
+    TableSort(blueprintListCache.Air, FormationSortLambda)
+    TableSort(blueprintListCache.Land, FormationSortLambda)
+    TableSort(blueprintListCache.Naval, FormationSortLambda)
+    TableSort(blueprintListCache.Submersible, FormationSortLambda)
 
     -- populate land list cache
     for k = 1, TableGetn(blueprintListCacheLand) do
