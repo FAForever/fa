@@ -22,6 +22,7 @@
 --******************************************************************************************************
 
 local TMissileCruiseProjectile = import("/lua/terranprojectiles.lua").TMissileCruiseProjectile
+local TMissileCruiseProjectileOnImpact = TMissileCruiseProjectile.OnImpact
 local EffectTemplate = import("/lua/effecttemplates.lua")
 
 --- --- Used by ueb2108
@@ -51,5 +52,15 @@ TIFMissileCruise01 = ClassProjectile(TMissileCruiseProjectile) {
 
     -- reduce height due to distance
     FinalBoostAngle = 30,
+
+    --- Called by the engine when the projectile impacts something
+    ---@param self Projectile
+    ---@param targetType string
+    ---@param targetEntity Unit | Prop
+    OnImpact = function(self, targetType, targetEntity)
+        TMissileCruiseProjectileOnImpact(self, targetType, targetEntity)
+
+        CreateLightParticleIntel(self, -1, self.Army, 7, 4, 'glow_02', 'ramp_antimatter_02')
+    end
 }
 TypeClass = TIFMissileCruise01

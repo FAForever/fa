@@ -2,12 +2,12 @@ ProjectileBlueprint {
     Audio = {
         Impact = Sound {
             Bank = 'Impacts',
-            Cue = 'AEON_Expl_Med_Impact',
+            Cue = 'AEON_Expl_Lrg_Naval',
             LodCutoff = 'Weapon_LodCutoff',
         },
         ImpactTerrain = Sound {
             Bank = 'Impacts',
-            Cue = 'Impact_Land_Gen_AEON',
+            Cue = 'AEON_Expl_Lrg_Naval',
             LodCutoff = 'Weapon_LodCutoff',
         },
         ImpactWater = Sound {
@@ -67,4 +67,5 @@ ProjectileBlueprint {
         MaxZigZag = 4,
         ZigZagFrequency = 0.2,
     },
+    StrategicIconName = '/textures/ui/common/game/strategicicons/icon_tactical_missile.png',
 }
