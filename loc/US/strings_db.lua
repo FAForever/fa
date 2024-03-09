@@ -1549,8 +1549,8 @@ Unit_Description_0078="Tech 3 amphibious construction, repair, capture and recla
 Unit_Description_0315="Tech 2 Fast-moving amphibious construction, repair, capture and reclamation unit armed with a Riot Gun, radar and radar jamming. Can only build offensive buildings, no economy."
 Unit_Description_0446="Houses one flying Drone which automatically assists or repairs any unit with its operational radius. Can be ordered to fly around and reclaim, but cannot initiate construction."
 Unit_Description_0453="Houses two flying Drones, each of which automatically assists or repairs any unit with its operational radius. Can be ordered to fly around and reclaim, but cannot initiate construction."
-Unit_Description_0458="Flying Drone which can assist, repairs, and reclaim any unit. Can be ordered to initiate construction of T1 structures. It's vulnerable to any air fighters or anti-air units"
-Unit_Description_0459="Flying Drone which can assist, repairs, and reclaim any unit. Can be ordered to initiate construction of T3 structures. It's vulnerable to any air fighters or anti-air units"
+Unit_Description_0458="Flying Drone which can assist, repair, and reclaim any unit. Can be ordered to initiate the construction of T1 structures. It's vulnerable to any air fighters or anti-air units."
+Unit_Description_0459="Flying Drone which can assist, repair, and reclaim any unit. Cannot be ordered to initiate the construction of structures. It's vulnerable to any air fighters or anti-air units."
 
 -- UEF -- Factories HQ
 Unit_Description_0079="Constructs Tech 1 Land units. Upgradeable to T2 Factory HQ which allows you to upgrade other T1 factories to T2 support factories for a much cheaper cost."
