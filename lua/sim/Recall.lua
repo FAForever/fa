@@ -296,6 +296,7 @@ function SetRecallVote(data)
     -- determine team voting status
     local isRequest = true
     local lastVote = true
+    local yesVotes = 0
     local teammates = 0
     local team = {}
     for index, ally in ArmyBrains do
@@ -305,6 +306,9 @@ function SetRecallVote(data)
                     SyncCannotRequestRecall("ai")
                 end
                 return
+            end
+            if ally.RecallVote then
+                yesVotes = yesVotes + 1
             end
             local allyHasVoted = ally.RecallVote ~= nil
             lastVote = lastVote and allyHasVoted -- only the last vote if all allies have also voted
@@ -332,6 +336,11 @@ function SetRecallVote(data)
         -- individual recall request cooldown
         SPEW("Army " .. tostring(army) .. " recall vote: " .. (vote and "yes" or "no"))
         brain.RecallVote = vote
+
+        -- if the vote will already be decided with this vote, close the voting session
+        if not lastVote and vote and RecallRequestAccepted(yesVotes + 1, teammates) then
+            lastVote = true
+        end
         ArmyVoteRecall(army, vote, lastVote)
     end
 end
