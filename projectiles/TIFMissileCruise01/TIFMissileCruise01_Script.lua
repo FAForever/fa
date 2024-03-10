@@ -54,12 +54,13 @@ TIFMissileCruise01 = ClassProjectile(TMissileCruiseProjectile) {
     FinalBoostAngle = 30,
 
     --- Called by the engine when the projectile impacts something
-    ---@param self Projectile
+    ---@param self TIFMissileCruise01
     ---@param targetType string
     ---@param targetEntity Unit | Prop
     OnImpact = function(self, targetType, targetEntity)
         TMissileCruiseProjectileOnImpact(self, targetType, targetEntity)
 
+        -- create light flashes
         CreateLightParticleIntel(self, -1, self.Army, 7, 4, 'glow_02', 'ramp_antimatter_02')
     end
 }

@@ -45,7 +45,7 @@ CIFMissileTactical03 = ClassProjectile(CLOATacticalMissileProjectile) {
     end,
 
     --- Called by the engine when the projectile impacts something
-    ---@param self Projectile
+    ---@param self CIFMissileTactical02
     ---@param targetType string
     ---@param targetEntity Unit | Prop
     OnImpact = function(self, targetType, targetEntity)
@@ -59,7 +59,7 @@ CIFMissileTactical03 = ClassProjectile(CLOATacticalMissileProjectile) {
 
         -- create flying and burning debris for the child projectiles
         local vx, _, vz = self:GetVelocity()
-        for k = 1, 3 do
+        for k = 1, self.ChildCount do
             local blueprint = TableRandom(self.DebrisBlueprints)
             local pvx = 0.5 * (vx + Random() - 0.5)
             local pvz = 0.5 * (vz + Random() - 0.5)
