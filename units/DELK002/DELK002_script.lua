@@ -10,6 +10,9 @@ local TAAPhalanxWeapon = import("/lua/kirvesweapons.lua").TAAPhalanxWeapon
 local EffectUtils = import("/lua/effectutilities.lua")
 local Effects = import("/lua/effecttemplates.lua")
 
+-- upvalue for performance
+local CreateRotator = CreateRotator
+local TrashBagAdd = TrashBag.Add
 
 ---@class DELK002 : TLandUnit
 DELK002 = ClassUnit(TLandUnit) {
@@ -17,29 +20,35 @@ DELK002 = ClassUnit(TLandUnit) {
         GatlingCannon = ClassWeapon(TAAPhalanxWeapon)
         {
             PlayFxWeaponPackSequence = function(self)
+                local unit = self.unit
+                local army = self.Army
+
                 if self.SpinManip1 then
                     self.SpinManip1:SetTargetSpeed(0)
                 end
                 if self.SpinManip2 then
                     self.SpinManip2:SetTargetSpeed(0)
                 end
-                EffectUtils.CreateBoneEffectsOpti(self.unit, 'Left_Muzzle', self.unit.Army, Effects.WeaponSteam01)
-                EffectUtils.CreateBoneEffectsOpti(self.unit, 'Right_Muzzle', self.unit.Army, Effects.WeaponSteam01)
+                EffectUtils.CreateBoneEffectsOpti(unit, 'Left_Muzzle', army, Effects.WeaponSteam01)
+                EffectUtils.CreateBoneEffectsOpti(unit, 'Right_Muzzle', army, Effects.WeaponSteam01)
                 TAAPhalanxWeapon.PlayFxWeaponPackSequence(self)
             end,
 
             PlayFxRackSalvoChargeSequence = function(self)
+                local trash = self.Trash
+                local unit = self.unit
+
                 if not self.SpinManip1 then
-                    self.SpinManip1 = CreateRotator(self.unit, 'Right_Barrel', 'z', nil, 360, 180, 60)
-                    self.unit.Trash:Add(self.SpinManip1)
+                    self.SpinManip1 = CreateRotator(unit, 'Right_Barrel', 'z', nil, 360, 180, 60)
+                    TrashBagAdd(trash,self.SpinManip1)
                 end
 
                 if self.SpinManip1 then
                     self.SpinManip1:SetTargetSpeed(500)
                 end
                 if not self.SpinManip2 then
-                    self.SpinManip2 = CreateRotator(self.unit, 'Left_Barrel', 'z', nil, 360, 180, 60)
-                    self.unit.Trash:Add(self.SpinManip2)
+                    self.SpinManip2 = CreateRotator(unit, 'Left_Barrel', 'z', nil, 360, 180, 60)
+                    TrashBagAdd(trash,self.SpinManip2)
                 end
 
                 if self.SpinManip2 then
@@ -49,14 +58,17 @@ DELK002 = ClassUnit(TLandUnit) {
             end,
 
             PlayFxRackSalvoReloadSequence = function(self)
+                local unit = self.unit
+                local army = self.Army
+
                 if self.SpinManip1 then
                     self.SpinManip1:SetTargetSpeed(200)
                 end
                 if self.SpinManip2 then
                     self.SpinManip2:SetTargetSpeed(200)
                 end
-                EffectUtils.CreateBoneEffectsOpti(self.unit, 'Left_Muzzle', self.unit.Army, Effects.WeaponSteam01)
-                EffectUtils.CreateBoneEffectsOpti(self.unit, 'Right_Muzzle', self.unit.Army, Effects.WeaponSteam01)
+                EffectUtils.CreateBoneEffectsOpti(unit, 'Left_Muzzle',  army, Effects.WeaponSteam01)
+                EffectUtils.CreateBoneEffectsOpti(unit, 'Right_Muzzle', army, Effects.WeaponSteam01)
                 TAAPhalanxWeapon.PlayFxRackSalvoChargeSequence(self)
             end,
         },

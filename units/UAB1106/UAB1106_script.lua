@@ -10,16 +10,17 @@
 
 local AMassStorageUnit = import("/lua/aeonunits.lua").AMassStorageUnit
 
+-- upvalue for perfomance
+local TrashBagAdd = TrashBag.Add
+
+
 ---@class UAB1106 : AMassStorageUnit
 UAB1106 = ClassUnit(AMassStorageUnit) {
 
     OnStopBeingBuilt = function(self,builder,layer)
         AMassStorageUnit.OnStopBeingBuilt(self,builder,layer)
-        self.Trash:Add(CreateStorageManip(self, 'B01', 'MASS', 0, 0, 0, 0, 0, .41))
-    end,
-
-    AnimThread = function(self)
-        
+        local trash = self.Trash
+        TrashBagAdd(trash,CreateStorageManip(self, 'B01', 'MASS', 0, 0, 0, 0, 0, .41))
     end,
 }
 

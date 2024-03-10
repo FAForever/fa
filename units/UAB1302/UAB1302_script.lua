@@ -5,6 +5,11 @@
 -------------------------------------------------------------------
 local AMassCollectionUnit = import("/lua/aeonunits.lua").AMassCollectionUnit
 
+-- upvalue for perfomance
+local TrashBagAdd = TrashBag.Add
+local Waitfor = WaitFor
+
+
 ---@class UAB1302 : AMassCollectionUnit
 UAB1302 = ClassUnit(AMassCollectionUnit) {
 
@@ -14,17 +19,21 @@ UAB1302 = ClassUnit(AMassCollectionUnit) {
     end,
 
     OnStopBeingBuilt = function(self, builder, layer)
-        self.ExtractionAnimManip:PlayAnim(self.Blueprint.Display.AnimationActivate):SetRate(1)
-        self.Trash:Add(self.ExtractionAnimManip)
+        local bp = self.Blueprint
+        local trash = self.Trash
+
+        self.ExtractionAnimManip:PlayAnim(bp.Display.AnimationActivate):SetRate(1)
+        TrashBagAdd(trash,self.ExtractionAnimManip)
         AMassCollectionUnit.OnStopBeingBuilt(self, builder, layer)
         ChangeState(self, self.ActiveState)
     end,
 
     ActiveState = State {
         Main = function(self)
+            local bp = self.Blueprint
             WaitFor(self.ExtractionAnimManip)
             while not self:IsDead() do
-                self.ExtractionAnimManip:PlayAnim(self.Blueprint.Display.AnimationActivate):SetRate(1)
+                self.ExtractionAnimManip:PlayAnim(bp.Display.AnimationActivate):SetRate(1)
                 WaitFor(self.ExtractionAnimManip)
             end
         end,

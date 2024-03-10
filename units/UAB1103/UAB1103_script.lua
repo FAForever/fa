@@ -5,6 +5,11 @@
 -------------------------------------------------------------------
 local AMassCollectionUnit = import("/lua/aeonunits.lua").AMassCollectionUnit
 
+-- upvalue for perfomance
+local CreateAnimator = CreateAnimator
+local TrashBagAdd = TrashBag.Add
+
+
 ---@class UAB1103 : AMassCollectionUnit
 UAB1103 = ClassUnit(AMassCollectionUnit) {
     OnStartBuild = function(self, unitBeingBuilt, order)
@@ -17,9 +22,11 @@ UAB1103 = ClassUnit(AMassCollectionUnit) {
 
     PlayActiveAnimation = function(self)
         AMassCollectionUnit.PlayActiveAnimation(self)
+        local trash = self.trash
+
         if not self.AnimationManipulator then
             self.AnimationManipulator = CreateAnimator(self)
-            self.Trash:Add(self.AnimationManipulator)
+            TrashBagAdd(trash,self.AnimationManipulator)
         end
         self.AnimationManipulator:PlayAnim(self.Blueprint.Display.AnimationActivate, true)
     end,

@@ -10,12 +10,15 @@
 
 local ARadarUnit = import("/lua/aeonunits.lua").ARadarUnit
 
+-- upvalue for performance
+local CreateRotator = CreateRotator
+local TrashBagAdd = TrashBag.Add
+
 ---@class UAB3201 : ARadarUnit
 UAB3201 = ClassUnit(ARadarUnit) {
 
     OnIntelDisabled = function(self, intel)
         ARadarUnit.OnIntelDisabled(self, intel)
-        
         self.Rotator1:SetSpinDown(true)
         self.Rotator1:SetAccel(60)
         self.Rotator2:SetSpinDown(true)
@@ -24,11 +27,12 @@ UAB3201 = ClassUnit(ARadarUnit) {
 
     OnIntelEnabled = function(self, intel)
         ARadarUnit.OnIntelEnabled(self, intel)
+        local trash = self.Trash
 
         if not self.Rotator1 then
             self.Rotator1 = CreateRotator(self, 'B02', 'y')
-            self.Trash:Add(self.Rotator1)
-        end            
+            TrashBagAdd(trash,self.Rotator1)
+        end
         self.Rotator1:SetSpinDown(false)
         self.Rotator1:SetTargetSpeed(30)
         self.Rotator1:SetAccel(20)
@@ -36,7 +40,7 @@ UAB3201 = ClassUnit(ARadarUnit) {
 
         if not self.Rotator2 then
             self.Rotator2 = CreateRotator(self, 'B01', 'y')
-            self.Trash:Add(self.Rotator2)
+            TrashBagAdd(trash,self.Rotator2)
         end
         self.Rotator2:SetSpinDown(false)
         self.Rotator2:SetTargetSpeed(60)

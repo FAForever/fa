@@ -17,6 +17,10 @@ local CreateAeonCZARBuildingEffects = import("/lua/effectutilities.lua").CreateA
 
 local ExternalFactoryComponent = import("/lua/defaultcomponents.lua").ExternalFactoryComponent
 
+-- upvalue for perfomance
+local ClassWeapon = ClassWeapon
+local TrashBagAdd = TrashBag.Add
+
 ---@class UAA0310 : AirTransport, ExternalFactoryComponent
 UAA0310 = ClassUnit(AirTransport, ExternalFactoryComponent) {
     DestroyNoFallRandomChance = 1.1,
@@ -35,13 +39,22 @@ UAA0310 = ClassUnit(AirTransport, ExternalFactoryComponent) {
         AAFizz02 = ClassWeapon(AAATemporalFizzWeapon) {},
     },
 
+    ---@param self UAA0310
+    ---@param builder Unit
+    ---@param layer Layer
     StartBeingBuiltEffects = function(self, builder, layer)
         AirTransport.StartBeingBuiltEffects(self, builder, layer)
         CreateAeonCZARBuildingEffects(self)
     end,
 
+    ---@param self UAA0310
+    ---@param instigator Unit
+    ---@param type string
+    ---@param overkillRatio number
     OnKilled = function(self, instigator, type, overkillRatio)
         ExternalFactoryComponent.OnKilled(self, instigator, type, overkillRatio)
+        local trash = self.Trash
+        local detector = self.detector
 
         local wep = self:GetWeaponByLabel('QuantumBeamGeneratorWeapon')
         for _, v in wep.Beams do
@@ -52,18 +65,18 @@ UAA0310 = ClassUnit(AirTransport, ExternalFactoryComponent) {
             v.Beam:Destroy()
         end
 
-        self.detector = CreateCollisionDetector(self)
-        self.Trash:Add(self.detector)
-        self.detector:WatchBone('Left_Turret01_Muzzle')
-        self.detector:WatchBone('Right_Turret01_Muzzle')
-        self.detector:WatchBone('Left_Turret02_WepFocus')
-        self.detector:WatchBone('Right_Turret02_WepFocus')
-        self.detector:WatchBone('Left_Turret03_Muzzle')
-        self.detector:WatchBone('Right_Turret03_Muzzle')
-        self.detector:WatchBone('Attachpoint01')
-        self.detector:WatchBone('Attachpoint02')
-        self.detector:EnableTerrainCheck(true)
-        self.detector:Enable()
+        detector = CreateCollisionDetector(self)
+        TrashBagAdd(trash,self.detector)
+        detector:WatchBone('Left_Turret01_Muzzle')
+        detector:WatchBone('Right_Turret01_Muzzle')
+        detector:WatchBone('Left_Turret02_WepFocus')
+        detector:WatchBone('Right_Turret02_WepFocus')
+        detector:WatchBone('Left_Turret03_Muzzle')
+        detector:WatchBone('Right_Turret03_Muzzle')
+        detector:WatchBone('Attachpoint01')
+        detector:WatchBone('Attachpoint02')
+        detector:EnableTerrainCheck(true)
+        detector:Enable()
 
         AirTransport.OnKilled(self, instigator, type, overkillRatio)
     end,
@@ -75,6 +88,11 @@ UAA0310 = ClassUnit(AirTransport, ExternalFactoryComponent) {
         AirTransport.OnLayerChange(self, new, old)
     end,
 
+    ---@param self UAA0310
+    ---@param bone string
+    ---@param x number
+    ---@param y number
+    ---@param z number
     OnAnimTerrainCollision = function(self, bone, x, y, z)
         local blueprint = self.Blueprint
         local position = { x, y, z }
@@ -85,26 +103,33 @@ UAA0310 = ClassUnit(AirTransport, ExternalFactoryComponent) {
             { blueprint.SizeX, blueprint.SizeY, blueprint.SizeZ })
     end,
 
+    ---@param self UAA0310
+    ---@param builder Unit
+    ---@param layer Layer
     OnStopBeingBuilt = function(self, builder, layer)
         AirTransport.OnStopBeingBuilt(self, builder, layer)
         ExternalFactoryComponent.OnStopBeingBuilt(self, builder, layer)
         ChangeState(self, self.IdleState)
     end,
 
+    ---@param self UAA0310
     OnFailedToBuild = function(self)
         AirTransport.OnFailedToBuild(self)
         ChangeState(self, self.IdleState)
     end,
 
+    ---@param self UAA0310
+    ---@param bpShield table
     CreateShield = function(self, bpShield)
         local bpShield = table.deepcopy(bpShield)
+        local trash = self.trash
         self:DestroyShield()
 
         self.MyShield = CzarShield(bpShield, self)
 
         self:SetFocusEntity(self.MyShield)
         self:EnableShield()
-        self.Trash:Add(self.MyShield)
+        TrashBagAdd(trash,self.MyShield)
     end,
 
     IdleState = State {

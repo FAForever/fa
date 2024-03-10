@@ -15,8 +15,8 @@ DRLK001 = ClassUnit(CWalkingLandUnit) {
         TargetPainter = ClassWeapon(TargetingLaser) {
             FxMuzzleFlash = {'/effects/emitters/particle_cannon_muzzle_02_emit.bp'}, 
         },
-        
-	AAGun = ClassWeapon(CAANanoDartWeapon) {
+
+	    AAGun = ClassWeapon(CAANanoDartWeapon) {
             IdleState = State (CAANanoDartWeapon.IdleState) {
                 OnGotTarget = function(self)
                     CAANanoDartWeapon.IdleState.OnGotTarget(self)

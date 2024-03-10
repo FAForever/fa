@@ -4,6 +4,11 @@
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -------------------------------------------------------------------
 local AEnergyCreationUnit = import("/lua/aeonunits.lua").AEnergyCreationUnit
+
+-- upvalue for perfomance
+local CreateAttachedEmitter = CreateAttachedEmitter
+local TrashBagAdd = TrashBag.Add
+
 ---@class UAB1102 : AEnergyCreationUnit
 UAB1102 = ClassUnit(AEnergyCreationUnit) {
     AirEffects = {'/effects/emitters/hydrocarbon_smoke_01_emit.bp',},
@@ -16,6 +21,9 @@ UAB1102 = ClassUnit(AEnergyCreationUnit) {
         local effects = {}
         local bones = {}
         local scale = 0.75
+        local trash = self.Trash
+        local army = self.Army
+
         if self:GetCurrentLayer() == 'Land' then
             effects = self.AirEffects
             bones = self.AirEffectsBones
@@ -26,7 +34,7 @@ UAB1102 = ClassUnit(AEnergyCreationUnit) {
         end
         for keys, values in effects do
             for keysbones, valuesbones in bones do
-                self.Trash:Add(CreateAttachedEmitter(self, valuesbones, self.Army, values):ScaleEmitter(scale):OffsetEmitter(0,-0.2,1))
+                TrashBagAdd(trash,CreateAttachedEmitter(self, valuesbones, army, values):ScaleEmitter(scale):OffsetEmitter(0,-0.2,1))
             end
         end
     end,

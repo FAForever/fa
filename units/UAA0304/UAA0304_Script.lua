@@ -14,7 +14,9 @@ UAA0304 = ClassUnit(AAirUnit) {
     },
 
     OnDamage = function(self, instigator, amount, vector, damageType)
-        if instigator and instigator.Blueprint.CategoriesHash.STRATEGICBOMBER and instigator.Army == self.Army then
+        local army = self.Army
+
+        if instigator and instigator.Blueprint.CategoriesHash.STRATEGICBOMBER and instigator.Army == army then
             return
         end
         AAirUnit.OnDamage(self, instigator, amount, vector, damageType)
