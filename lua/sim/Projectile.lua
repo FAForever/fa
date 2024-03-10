@@ -207,7 +207,6 @@ Projectile = ClassProjectile(ProjectileMethods) {
             local tx = px + (Random() - 0.5) * fuzziness * (1 + offset)
             local tz = pz + (Random() - 0.5) * fuzziness * (1 + offset)
 
-            DrawCircle({tx, GetSurfaceHeight(tx, tz), tz}, 1, 'ffffff')
             self:SetNewTargetGroundXYZ(tx, GetSurfaceHeight(tx, tz), tz)
         end
     end,
