@@ -22,6 +22,10 @@
 --******************************************************************************************************
 
 local SLaanseTacticalMissile = import("/lua/seraphimprojectiles.lua").SLaanseTacticalMissile
+local SLaanseTacticalMissileOnImpact = SLaanseTacticalMissile.OnImpact
+local SLaanseTacticalMissileOnCreate = SLaanseTacticalMissile.OnCreate
+local SLaanseTacticalMissileOnExitWater = SLaanseTacticalMissile.OnExitWater
+
 local TacticalMissileComponent = import('/lua/sim/DefaultProjectiles.lua').TacticalMissileComponent
 
 --- Used by XSL0001
@@ -45,7 +49,7 @@ SIFLaanseTacticalMissileCDR = ClassProjectile(SLaanseTacticalMissile, TacticalMi
     ---@param self SIFLaanseTacticalMissileCDR
     ---@param inWater boolean
     OnCreate = function(self, inWater)
-        SLaanseTacticalMissile.OnCreate(self)
+        SLaanseTacticalMissileOnCreate(self)
         if not inWater then
             self:SetDestroyOnWater(true)
         end
@@ -54,9 +58,23 @@ SIFLaanseTacticalMissileCDR = ClassProjectile(SLaanseTacticalMissile, TacticalMi
 
     ---@param self SIFLaanseTacticalMissileCDR
     OnExitWater = function(self)
-        SLaanseTacticalMissile.OnExitWater(self)
+        SLaanseTacticalMissileOnExitWater(self)
         self:SetDestroyOnWater(true)
     end,
+
+    --- Called by the engine when the projectile impacts something
+    ---@param self Projectile
+    ---@param targetType string
+    ---@param targetEntity Unit | Prop
+    OnImpact = function(self, targetType, targetEntity)
+        SLaanseTacticalMissileOnImpact(self, targetType, targetEntity)
+
+        local army = self.Army
+
+        -- create light flashes
+        CreateLightParticleIntel(self, -1, army, 6, 2, 'flare_lens_add_02', 'ramp_blue_build_spray')
+        CreateLightParticleIntel(self, -1, army, 10, 4, 'flare_lens_add_02', 'ramp_ser_11')
+    end
 }
 TypeClass = SIFLaanseTacticalMissileCDR
 
