@@ -7744,6 +7744,24 @@ lobui_0795="No manual sharing of units"
 lobui_0796="Partial Share"
 lobui_0797="Your buildings and engineers will be transferred to your highest rated ally when you die.  Your other units will be destroyed when you die, except those captured by the enemy."
 
+lobui_0798="DC Share Conditions"
+lobui_0799="Set what happens to a player's units when they disconnect. In Assassination, only applies if an ACU is at full health/shield."
+lobui_0800="Same as Share Condition"
+lobui_0801="Treat disconnecting players the same as defeated players."
+
+-- unranked lobby option
+lobui_0802="Unrate"
+lobui_0803="Provides a toggle to unrate a game. Note that if this is set to no the game can still be unrated due to other lobby options, unrated sim mods and / or the map being unrated."
+lobui_0804="No"
+lobui_0805="This game will be rated if all the criteria for a rated game are met."
+lobui_0806="Yes"
+lobui_0807="This game will not be rated."
+
+lobui_0808="Recall Disconnected ACUs"
+lobui_0809="Should disconnecting players' full health/shield ACUs be recalled, preventing their explosion?"
+lobui_0810="ACUs explode when their player disconnects."
+lobui_0811="ACUs that are at full health and shield are recalled when their player disconnects."
+
 aisettings_0001="AIx Cheat Multiplier"
 aisettings_0002="Set the cheat multiplier for the cheating AIs."
 aisettings_0003="Cheat multiplier of %s"
@@ -8193,14 +8211,6 @@ aireplace_0004="A disconnected player will cause the destruction of their units 
 
 chat_send_type_title="Default recipient: allies"
 chat_send_type_description="When enabled, enter sends messages to allies and holding shift + enter sends to all. When not enabled, the behavior is reversed."
-
--- unranked lobby option
-lobui_0802="Unrate"
-lobui_0803="Provides a toggle to unrate a game. Note that if this is set to no the game can still be unrated due to other lobby options, unrated sim mods and / or the map being unrated."
-lobui_0804="No"
-lobui_0805="This game will be rated if all the criteria for a rated game are met."
-lobui_0806="Yes"
-lobui_0807="This game will not be rated."
 
 replay_id="Replay id"
 map_version="Map version"
