@@ -18,7 +18,7 @@ UnitBlueprint{
     BuildIconSortPriority = 20,
     Categories = {
         "ANTINAVY",
-        "ANTISUB", 
+        "ANTITORPEDO", 
         "BUILTBYTIER2FACTORY",
         "BUILTBYTIER3FACTORY",
         "CYBRAN",
