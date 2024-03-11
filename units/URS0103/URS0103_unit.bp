@@ -41,6 +41,7 @@ UnitBlueprint{
         "SONAR",
         "TECH1",
         "VISIBLETORECON",
+        "WEAKANTIAIR",
     },
     Defense = {
         AirThreatLevel = 2,
