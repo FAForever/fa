@@ -23,6 +23,7 @@ UnitBlueprint{
     Categories = {
         "ANTIMISSILE",
         "WEAKANTIAIR",
+        "WEAKANTINAVY",
         "BATTLESHIP",
         "BUILTBYTIER3FACTORY",
         "CYBRAN",
