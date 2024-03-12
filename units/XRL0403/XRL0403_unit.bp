@@ -218,7 +218,7 @@ UnitBlueprint {
     LifeBarOffset = 3.7,
     LifeBarSize = 9,
     Physics = {
-        BackUpDistance = 12,
+        BackUpDistance = 15,
         BankingSlope = 0,
         BuildOnLayerCaps = {
             LAYER_Air = false,
@@ -237,6 +237,7 @@ UnitBlueprint {
         MinSpeedPercent = 0,
         MotionType = "RULEUMT_Amphibious",
         SinkLower = true,
+        RotateOnSpot = false,
         SkirtOffsetX = -1.5,
         SkirtOffsetZ = -1.5,
         SkirtSizeX = 9,

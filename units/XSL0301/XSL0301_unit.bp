@@ -616,7 +616,7 @@ UnitBlueprint{
             MuzzleVelocity = 25,
             MuzzleVelocityReduceDistance = 5,
             ProjectileId = "/projectiles/SDFLightChronatronCannon01/SDFLightChronatronCannon01_proj.bp",
-            ProjectileLifetimeUsesMultiplier = 1.15,
+            ProjectileLifetimeUsesMultiplier = 1.3,
             ProjectilesPerOnFire = 1,
             RackBones = {
                 {
@@ -868,7 +868,7 @@ UnitBlueprint{
             MuzzleChargeDelay = 0.2,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
-            MuzzleVelocity = 7,
+            MuzzleVelocity = 12,
             ProjectileId = "/projectiles/SIFLaanseTacticalMissileSCU/SIFLaanseTacticalMissileSCU_proj.bp",
             ProjectileLifetime = 80,
             ProjectilesPerOnFire = 1,

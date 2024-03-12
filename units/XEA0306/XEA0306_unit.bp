@@ -63,6 +63,8 @@ UnitBlueprint{
         "TRANSPORTFOCUS",
         "UEF",
         "VISIBLETORECON",
+        "WEAKANTIAIR",
+        "WEAKDIRECTFIRE",
     },
     Defense = {
         AirThreatLevel = 18,
