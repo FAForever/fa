@@ -169,9 +169,9 @@ UnitBlueprint{
     SelectionSizeZ = 0.6,
     SelectionThickness = 0.66,
     CollisionOffsetY = -0.25,
-    SizeX = 0.9,
+    SizeX = 1.2,
     SizeY = 1,
-    SizeZ = 0.95,
+    SizeZ = 1,
     StrategicIconName = "icon_structure2_intel",
     StrategicIconSortPriority = 230,
     Wreckage = {
