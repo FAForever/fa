@@ -157,7 +157,7 @@ UnitBlueprint {
         },
         FactionName = 'Cybran',
         Icon = 'amph',
-        UnitName = '<LOC srl0310_name>Othismash',
+        UnitName = '<LOC srl0310_name>Pulsar',
     },
     Intel = {
         VisionRadius = 20,
