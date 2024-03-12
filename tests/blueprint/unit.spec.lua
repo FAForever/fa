@@ -63,7 +63,7 @@ for k, blueprintFile in ipairs(Files) do
 end
 
 luft.describe(
-    'Unit blueprints - intel radius values',
+    'Unit blueprints',
     function()
         luft.describe_each(
             "Unit %s",
@@ -265,6 +265,16 @@ luft.describe(
                                 return
                             end
 
+                            -----------------------------------------------------------
+                            --#region Rate of fire limitations
+
+                            -- The game runs in ticks and therefore not every rate of 
+                            -- fire is possible. The game will round the rate of fire,
+                            -- but as a result minor changes may not always have an 
+                            -- actual impact in-game. These tests guarantee that when
+                            -- a rate of fire is adjusted that it is always the actual
+                            -- rate of fire that the game uses.
+
                             local rateOfFire = weaponBlueprint.RateOfFire
                             if rateOfFire then
                                 luft.test(
@@ -303,6 +313,9 @@ luft.describe(
                                     end
                                 )
                             end
+
+                            --#endregion
+
                         end
                     )
                 end
