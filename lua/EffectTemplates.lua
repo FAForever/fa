@@ -1635,17 +1635,23 @@ CMissileHit02a = {
     EmtBpPath .. 'cybran_iridium_hit_land_02_emit.bp',
     EmtBpPath .. 'cybran_iridium_hit_ring_01_emit.bp',
 }
+
 CMissileHit02b = {
     EmtBpPath .. 'cybran_corsair_missile_glow_hit_unit_01_emit.bp',
 }
 
 CMissileHit02 = table.concatenate(FireCloudSml01, FlashSml01, FlareSml01, CMissileHit02a)
+
 CMissileLOAHit01 = {
     EmtBpPath .. 'cybran_missile_hit_01_emit.bp',
     EmtBpPath .. 'cybran_missile_hit_02_emit.bp',
-    EmtBpPath .. 'cybran_missile_hit_03_emit.bp',
-    EmtBpPath .. 'antimatter_ring_03_emit.bp',
-    EmtBpPath .. 'antimatter_ring_04_emit.bp',
+}
+
+CMissileLOAHit02 = {
+    EmtBpPath .. 'cybran_missile_hit_01_emit.bp',
+    EmtBpPath .. 'cybran_missile_hit_02_emit.bp',
+    EmtBpPath .. 'cybran_missile_hit_04_emit.bp',
+    EmtBpPath .. 'cybran_missile_hit_06_emit.bp',
 }
 
 -- CMolecularResonanceHitUnit01 = {
@@ -1656,6 +1662,7 @@ CMissileLOAHit01 = {
 --    EmtBpPath .. 'molecular_resonance_cannon_ring_03_emit.bp',
 --    EmtBpPath .. 'molecular_resonance_cannon_ring_04_emit.bp',
 -- }
+
 CMolecularResonanceHitUnit01 = {
     EmtBpPath .. 'cybran_light_artillery_hit_01_emit.bp',
     EmtBpPath .. 'cybran_light_artillery_hit_02_emit.bp',
@@ -1670,6 +1677,7 @@ CMolecularResonanceHitLand01 = {
 -- ------------------------------------------------------------------------
 --  CYBRAN MOLECULAR RIPPER CANNON EMITTERS
 -- ------------------------------------------------------------------------
+
 CMolecularRipperFlash01 = {
     EmtBpPath .. 'molecular_ripper_flash_01_emit.bp',
     EmtBpPath .. 'molecular_ripper_flash_02_emit.bp',
@@ -1678,6 +1686,7 @@ CMolecularRipperFlash01 = {
     EmtBpPath .. 'molecular_cannon_muzzle_flash_01_emit.bp',
     EmtBpPath .. 'molecular_cannon_muzzle_flash_02_emit.bp',
 }
+
 CMolecularRipperOverChargeFlash01 = {
     EmtBpPath .. 'molecular_ripper_flash_01_emit.bp',
     EmtBpPath .. 'molecular_ripper_oc_charge_01_emit.bp',
@@ -1687,11 +1696,13 @@ CMolecularRipperOverChargeFlash01 = {
     EmtBpPath .. 'default_muzzle_flash_01_emit.bp',
     EmtBpPath .. 'default_muzzle_flash_02_emit.bp'
 }
+
 CMolecularCannon01 = {
     EmtBpPath .. 'molecular_ripper_01_emit.bp',
     EmtBpPath .. 'molecular_ripper_02_emit.bp',
     EmtBpPath .. 'molecular_ripper_03_emit.bp',
 }
+
 CMolecularRipperHit01 = {
     EmtBpPath .. 'molecular_ripper_hit_01_emit.bp',
     EmtBpPath .. 'molecular_ripper_hit_02_emit.bp',

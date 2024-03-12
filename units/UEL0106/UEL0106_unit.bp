@@ -203,7 +203,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = true,
             RangeCategory = "UWRC_DirectFire",
-            RateOfFire = 3,
+            RateOfFire = 3.333,
             TargetPriorities = {
                 "TECH3 MOBILE",
                 "TECH2 MOBILE",
