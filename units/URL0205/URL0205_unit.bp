@@ -226,7 +226,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_AntiAir",
-            RateOfFire = 1.6,
+            RateOfFire = 1.666,
             TargetPriorities = {
                 "(AIR * MOBILE * EXPERIMENTAL - BOMBER)",
                 "AIR MOBILE GROUNDATTACK",

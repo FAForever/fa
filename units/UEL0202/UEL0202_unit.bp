@@ -194,7 +194,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = true,
             RangeCategory = "UWRC_DirectFire",
-            RateOfFire = 0.8,
+            RateOfFire = 0.769,
             TargetPriorities = {
                 "MOBILE",
                 "(STRUCTURE * DEFENSE - ANTIMISSILE)",

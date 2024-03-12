@@ -302,7 +302,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_DirectFire",
-            RateOfFire = 1.667,
+            RateOfFire = 1.66667,
             TargetPriorities = {
                 "TECH3 MOBILE",
                 "TECH2 MOBILE",
@@ -400,7 +400,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_AntiAir",
-            RateOfFire = 1.667,
+            RateOfFire = 1.66667,
             TargetPriorities = {
                 "AIR MOBILE TECH3 BOMBER",
                 "AIR MOBILE BOMBER",
