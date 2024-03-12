@@ -25,6 +25,8 @@ UnitBlueprint{
     Categories = {
         "AMPHIBIOUS",
         "ANTINAVY",
+        "ANTITORPEDO",
+        "WEAKANTIAIR", 
         "BUILTBYTIER2FACTORY",
         "BUILTBYTIER3FACTORY",
         "CYBRAN",
