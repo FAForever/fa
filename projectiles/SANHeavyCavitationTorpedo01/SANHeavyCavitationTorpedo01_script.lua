@@ -1,83 +1,79 @@
-﻿-- File     :  /data/projectiles/SANHeavyCavitationTorpedo01/SANHeavyCavitationTorpedo01_script.lua
--- Author(s):  Gordon Duclos
--- Summary  :  Heavy Cavitation Torpedo Projectile script, XSA0204
--- Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
------------------------------------------------------------------------------------------------------
+﻿--******************************************************************************************************
+--** Copyright (c) 2023 FAForever
+--**
+--** Permission is hereby granted, free of charge, to any person obtaining a copy
+--** of this software and associated documentation files (the "Software"), to deal
+--** in the Software without restriction, including without limitation the rights
+--** to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+--** copies of the Software, and to permit persons to whom the Software is
+--** furnished to do so, subject to the following conditions:
+--**
+--** The above copyright notice and this permission notice shall be included in all
+--** copies or substantial portions of the Software.
+--**
+--** THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+--** IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+--** FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+--** AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+--** LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+--** OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+--** SOFTWARE.
+--******************************************************************************************************
+
 local SHeavyCavitationTorpedo = import("/lua/seraphimprojectiles.lua").SHeavyCavitationTorpedo
-local RandomFloat = import("/lua/utilities.lua").GetRandomFloat
+local SHeavyCavitationTorpedoOnEnterWater = SHeavyCavitationTorpedo.OnEnterWater
+local SHeavyCavitationTorpedoOnCreate = SHeavyCavitationTorpedo.OnCreate
+
+local SplitComponent = import('/lua/sim/projectiles/components/splitcomponent.lua').SplitComponent
+
 local EffectTemplate = import("/lua/effecttemplates.lua")
 
+-- upvalue scope for performance
+local CreateEmitterAtEntity = CreateEmitterAtEntity
+
 --- Heavy Cavitation Torpedo Projectile script, XSA0204
----@class SANHeavyCavitationTorpedo01 : SHeavyCavitationTorpedo
-SANHeavyCavitationTorpedo01 = ClassProjectile(SHeavyCavitationTorpedo) {
+---@class SANHeavyCavitationTorpedo01 : SHeavyCavitationTorpedo, SplitComponent`
+SANHeavyCavitationTorpedo01 = ClassProjectile(SHeavyCavitationTorpedo, SplitComponent) {
     FxSplashScale = 0.4,
-    FxEnterWaterEmitter = {
-        '/effects/emitters/destruction_water_splash_ripples_01_emit.bp',
-        '/effects/emitters/destruction_water_splash_wash_01_emit.bp',
+    FxTrails = {
+        EffectTemplate.SHeavyCavitationTorpedoFxTrails02
     },
+
+    FxEnterWater = EffectTemplate.WaterSplash01,
+
+    FxSplit = {
+        -- '/effects/emitters/seraphim_heayvcavitation_torpedo_projectile_hit_01_emit.bp', -- large white flash, which we exclude because it looks bad in large quantities
+        '/effects/emitters/seraphim_heayvcavitation_torpedo_projectile_hit_02_emit.bp', -- soft small water splash
+        '/effects/emitters/seraphim_heayvcavitation_torpedo_projectile_hit_03_emit.bp', -- large white flare
+        '/effects/emitters/seraphim_heayvcavitation_torpedo_projectile_hit_04_emit.bp', -- small black flare
+        '/effects/emitters/seraphim_heayvcavitation_torpedo_projectile_hit_05_emit.bp', -- soft large water splash
+    },
+
+    ChildCount = 3,
+    ChildProjectileBlueprint = '/projectiles/SANHeavyCavitationTorpedo04/SANHeavyCavitationTorpedo04_proj.bp',
+
+    ---@param self SANHeavyCavitationTorpedo01
+    OnCreate = function(self)
+        SHeavyCavitationTorpedoOnCreate(self)
+
+        -- let gravity take over
+        self:TrackTarget(false)
+    end,
 
     ---@param self SANHeavyCavitationTorpedo01
     OnEnterWater = function(self)
-        SHeavyCavitationTorpedo.OnEnterWater(self)
+        SHeavyCavitationTorpedoOnEnterWater(self)
 
-        self.AirTrails:Destroy()
-        CreateEmitterOnEntity(self,self.Army,EffectTemplate.SHeavyCavitationTorpedoFxTrails)
-
-        self.Trash:Add(ForkThread(self.ProjectileSplit,self))
-    end,
-
-    ---@param self SANHeavyCavitationTorpedo01
-    ---@param inWater boolean
-    OnCreate = function(self,inWater)
-        SHeavyCavitationTorpedo.OnCreate(self,inWater)
-        -- if we are starting in the water then immediately switch to tracking in water
-        self:TrackTarget(false)
-        self.AirTrails = CreateEmitterOnEntity(self,self.Army,EffectTemplate.SHeavyCavitationTorpedoFxTrails02)
-        self:SetCollisionShape('Sphere', 0, 0, 0, 0.5)
-    end,
-
-    ---@param self SANHeavyCavitationTorpedo01
-    ProjectileSplit = function(self)
-        WaitTicks(2)
-        local ChildProjectileBP = '/projectiles/SANHeavyCavitationTorpedo04/SANHeavyCavitationTorpedo04_proj.bp'
-        local vx, vy, vz = self:GetVelocity()
-        local velocity = 10
-
-        -- Create projectiles in a dispersal pattern
-        local numProjectiles = 3
-        local angle = (2*math.pi) / numProjectiles
-        local angleInitial = RandomFloat(0, angle)
-
-        -- Randomization of the spread
-        local angleVariation = angle * 0.3 -- Adjusts angle variance spread
-        local spreadMul = 0.4 -- Adjusts the width of the dispersal
-        local xVec = 0
-        local yVec = vy
-        local zVec = 0
-
-        -- Divide the damage between each projectile.  The damage in the BP is used as the initial projectile's
-        -- damage, in case the torpedo hits something before it splits.
-        local DividedDamageData = self.DamageData
-        DividedDamageData.DamageAmount = DividedDamageData.DamageAmount / numProjectiles
-        self.DamageData = nil
-
-        local FxFragEffect = EffectTemplate.SHeavyCavitationTorpedoSplit
-
-        -- Split effects
-        for k, v in FxFragEffect do
-            CreateEmitterAtEntity(self, self.Army, v)
+        -- create a split effect
+        local army = self.Army
+        for _, emit in self.FxSplit do
+            CreateEmitterAtEntity(self, army, emit)
         end
 
-        -- Launch projectiles at semi-random angles away from split location
-        for i = 0, (numProjectiles -1) do
-            xVec = vx + (math.sin(angleInitial + (i*angle) + RandomFloat(-angleVariation, angleVariation))) * spreadMul
-            zVec = vz + (math.cos(angleInitial + (i*angle) + RandomFloat(-angleVariation, angleVariation))) * spreadMul
-            local proj = self:CreateChildProjectile(ChildProjectileBP)
-            proj.DamageData = DividedDamageData
-            proj:PassData(self:GetTrackingTarget())
-            proj:SetVelocity(xVec,yVec,zVec)
-            proj:SetVelocity(velocity)
-        end
+        -- split damage over each child
+        self.DamageData.DamageAmount = self.DamageData.DamageAmount / self.ChildCount
+        
+        self:OnSplit(false)
         self:Destroy()
     end,
 }

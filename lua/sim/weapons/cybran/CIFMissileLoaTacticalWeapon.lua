@@ -1,5 +1,5 @@
---******************************************************************************************************
---** Copyright (c) 2023  Willem 'Jip' Wijnia
+--**********************************************************************************
+--** Copyright (c) 2023 FAForever
 --**
 --** Permission is hereby granted, free of charge, to any person obtaining a copy
 --** of this software and associated documentation files (the "Software"), to deal
@@ -18,39 +18,14 @@
 --** LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 --** OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 --** SOFTWARE.
---******************************************************************************************************
+--**********************************************************************************
 
----@type ContextBasedTemplate
-Template = {
-    Name = 'Storages',
-    TriggersOnUnit = categories.MASSEXTRACTION,
-    TemplateSortingOrder = 100,
-    TemplateData = {
-        6,
-        6,
-        {
-            'uab1106',
-            33986,
-            2,
-            0
-        },
-        {
-            'uab1106',
-            33993,
-            -2,
-            0
-        },
-        {
-            'uab1106',
-            34000,
-            0,
-            -2
-        },
-        {
-            'uab1106',
-            34008,
-            0,
-            2
-        },
-    }
+local DefaultProjectileWeapon = import('/lua/sim/defaultweapons.lua').DefaultProjectileWeapon
+
+---@class CIFMissileLoaTacticalWeapon : DefaultProjectileWeapon
+CIFMissileLoaTacticalWeapon = ClassWeapon(DefaultProjectileWeapon) {
+    FxMuzzleFlash = {
+        '/effects/emitters/cybran_tactical_missile_launch_01_emit.bp',
+        '/effects/emitters/cybran_tactical_missile_launch_02_emit.bp',
+    },
 }

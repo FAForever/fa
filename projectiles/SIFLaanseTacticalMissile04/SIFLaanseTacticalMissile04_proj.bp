@@ -66,6 +66,7 @@ ProjectileBlueprint {
         VelocityAlign = true,
 
         ZigZagFrequency = 1,
-        MaxZigZag = 1
+        MaxZigZag = 1,
     },
+    StrategicIconName = '/textures/ui/common/game/strategicicons/icon_tactical_missile.dds',
 }

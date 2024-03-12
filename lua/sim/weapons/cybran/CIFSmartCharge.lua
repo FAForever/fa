@@ -1,5 +1,5 @@
---******************************************************************************************************
---** Copyright (c) 2023  Willem 'Jip' Wijnia
+--**********************************************************************************
+--** Copyright (c) 2023 FAForever
 --**
 --** Permission is hereby granted, free of charge, to any person obtaining a copy
 --** of this software and associated documentation files (the "Software"), to deal
@@ -18,39 +18,27 @@
 --** LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 --** OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 --** SOFTWARE.
---******************************************************************************************************
+--**********************************************************************************
 
----@type ContextBasedTemplate
-Template = {
-    Name = 'Power generators',
-    TriggersOnUnit = categories.STRUCTURE * categories.ARTILLERY * (categories.TECH3 + categories.EXPERIMENTAL) - categories.SIZE20,
-    TemplateSortingOrder = 100,
-    TemplateData = {
-        24,
-        24,
-        {
-            'uab1301',
-            5352,
-            10,
-            2
-        },
-        {
-            'uab1301',
-            5369,
-            2,
-            10
-        },
-        {
-            'uab1301',
-            5385,
-            -6,
-            2
-        },
-        {
-            'uab1301',
-            5408,
-            2,
-            -6
-        }
-    },
+local DefaultProjectileWeapon = import('/lua/sim/defaultweapons.lua').DefaultProjectileWeapon
+
+---@class CIFSmartCharge : DefaultProjectileWeapon
+CIFSmartCharge = ClassWeapon(DefaultProjectileWeapon) {
+
+    ---@param self CDFHeavyMicrowaveLaserGenerator
+    ---@param muzzle string
+    ---@return Projectile
+    CreateProjectileAtMuzzle = function(self, muzzle)
+        local proj = DefaultProjectileWeapon.CreateProjectileAtMuzzle(self, muzzle)
+        if not proj or proj:BeenDestroyed() then
+            return proj
+        end
+
+        local blueprint = self.Blueprint.DepthCharge
+        if blueprint then
+            proj:AddDepthCharge(blueprint)
+        end
+
+        return proj
+    end,
 }

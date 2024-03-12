@@ -23,7 +23,7 @@ function ParseTableOfCategories(inputString)
                 local clean = category
                 clean = string.gsub(clean, '{', '')
                 clean = string.gsub(clean, '}', '')
-                clean = string.gsub(clean, ' ', '')
+                clean = string.gsub(clean, '%s', '')
                 clean = string.gsub(clean, 'categories.', '')
                 categories[k] = clean
             end

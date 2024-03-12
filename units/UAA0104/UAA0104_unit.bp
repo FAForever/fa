@@ -58,6 +58,7 @@ UnitBlueprint{
         "TRANSPORTBUILTBYTIER3FACTORY",
         "TRANSPORTFOCUS",
         "VISIBLETORECON",
+        "WEAKANTIAIR",
     },
     Defense = {
         AirThreatLevel = 3.5,

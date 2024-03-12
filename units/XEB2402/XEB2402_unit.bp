@@ -26,6 +26,7 @@ UnitBlueprint{
         "SELECTABLE",
         "SHOWQUEUE",
         "SORTCONSTRUCTION",
+        "STRATEGIC",
         "STRUCTURE",
         "UEF",
         "VISIBLETORECON",

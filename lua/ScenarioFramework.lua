@@ -2266,6 +2266,7 @@ function AntiOffMapMainThread()
         end
     end
 end
+
 -- This is for bad units who choose to go off map, shame on them
 function MoveOnMapThread(unit)
     unit.OffMapTime = 0
@@ -2293,24 +2294,51 @@ end
 --- Clears a unit's orders and issues a move order to the closest point on the map
 ---@param unit Unit
 function MoveOnMap(unit)
-    local position = unit:GetPosition()
-    local playableArea = ScenarioInfo.PlayableArea
-    local nearestPoint = {position[1], position[2], position[3]}
-
-    if position[1] < playableArea[1] then
-        nearestPoint[1] = playableArea[1] + 5
-    elseif position[1] > playableArea[3] then
-        nearestPoint[1] = playableArea[3] - 5
-    end
-
-    if position[3] < playableArea[2] then
-        nearestPoint[3] = playableArea[2] + 5
-    elseif position[3] > playableArea[4] then
-        nearestPoint[3] = playableArea[4] - 5
-    end
+    local nearestPoint = GetNearestPlayablePoint( unit:GetPosition() )
 
     IssueToUnitClearCommands(unit)
     IssueToUnitMove(unit, nearestPoint)
+end
+
+--- Returns the closest point on the map
+---@param position Vector
+---@return Vector
+---@return boolean
+function GetNearestPlayablePoint(position)
+    local px, _, pz = unpack(position)
+    local playableArea = ScenarioInfo.PlayableArea
+
+    -- keep track whether the point is actually outside the map
+    local isOutside = false
+
+    if px < playableArea[1] then
+        isOutside = true
+        px = playableArea[1] + 5
+    elseif px > playableArea[3] then
+        isOutside = true
+        px = playableArea[3] - 5
+    end
+
+    if pz < playableArea[2] then
+        isOutside = true
+        pz = playableArea[2] + 5
+    elseif pz > playableArea[4] then
+        isOutside = true
+        pz = playableArea[4] - 5
+    end
+
+    -- if it really is outside the map then we allocate a new vector
+    if isOutside then
+        return {
+            px, 
+            GetTerrainHeight(px, pz),
+            pz
+        }, true
+
+    end
+
+    -- otherwise nothing has changed, so return the existing position
+    return position, false
 end
 
 --- Returns if the unit's army is human

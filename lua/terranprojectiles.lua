@@ -15,7 +15,7 @@ local DepthCharge = import("/lua/defaultantiprojectile.lua").DepthCharge
 local NukeProjectile = DefaultProjectileFile.NukeProjectile
 
 local DebrisComponent = import('/lua/sim/projectiles/components/DebrisComponent.lua').DebrisComponent
-local TacticalMissileComponent = import('/lua/sim/DefaultProjectiles.lua').TacticalMissileComponent
+local TacticalMissileComponent = import("/lua/sim/projectiles/components/tacticalmissilecomponent.lua").TacticalMissileComponent
 
 ---@class TFragmentationGrenade : EmitterProjectile
 TFragmentationGrenade = ClassProjectile(EmitterProjectile) {
@@ -32,8 +32,10 @@ TIFMissileNuke = ClassProjectile(NukeProjectile, SingleBeamProjectile) {
     BeamName = '/effects/emitters/missile_exhaust_fire_beam_01_emit.bp',
 }
 
----@class TIFTacticalNuke : EmitterProjectile
-TIFTacticalNuke = ClassProjectile(EmitterProjectile) {}
+---@class TIFTacticalNuke : NukeProjectile, TacticalMissileComponent, DebrisComponent
+TIFTacticalNuke = ClassProjectile(NukeProjectile, TacticalMissileComponent, DebrisComponent) {
+    MovementThread = TacticalMissileComponent.MovementThread -- Resolve conflict from base classes
+}
 
 --- UEF GINSU RAPID PULSE BEAM PROJECTILE
 ---@class TAAGinsuRapidPulseBeamProjectile : SingleBeamProjectile
@@ -339,6 +341,8 @@ TMissileProjectile = ClassProjectile(SingleBeamProjectile, TacticalMissileCompon
         local blueprintPhysics = self.Blueprint.Physics
         local radius = 0.105 * (blueprintPhysics.MaxSpeed + blueprintPhysics.MaxSpeedRange)
         self:SetCollisionShape('Sphere', 0, 0, 0, radius)
+
+        self.MoveThread = self.Trash:Add(ForkThread(self.MovementThread, self))
     end,
 
     ---@param self TMissileProjectile

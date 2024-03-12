@@ -151,6 +151,7 @@ UnitBlueprint{
     LifeBarOffset = 0.4,
     LifeBarSize = 0.6,
     Physics = {
+        BackUpDistance = 6,
         BankingSlope = 0,
         BuildOnLayerCaps = {
             LAYER_Air = false,
@@ -165,7 +166,7 @@ UnitBlueprint{
         MaxAcceleration = 2.7,
         MaxBrake = 2.7,
         MaxSpeed = 2.7,
-        MaxSpeedReverse = 0,
+        MaxSpeedReverse = 2.7,
         MaxSteerForce = 10,
         MeshExtentsX = 0.55,
         MeshExtentsY = 0.35,
@@ -237,7 +238,7 @@ UnitBlueprint{
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_IndirectFire",
             RateOfFire = 0.35,
-            SlavedToBody = true,
+            SlavedToBody = false,
             SlavedToBodyArcRange = 45,
             TargetPriorities = {
                 "STRUCTURE EXPERIMENTAL",
@@ -268,7 +269,7 @@ UnitBlueprint{
             TurretPitchRange = 90,
             TurretPitchSpeed = 70,
             TurretYaw = 0,
-            TurretYawRange = 45,
+            TurretYawRange = 180,
             TurretYawSpeed = 70,
             Turreted = true,
             WeaponCategory = "Artillery",

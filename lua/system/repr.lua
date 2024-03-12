@@ -19,7 +19,7 @@ local skip = {
 }
 
 local function IsState(t)
-    return (t.__State and true) or false
+    return (rawget(t, "__State") and true) or false
 end
 
 local function IsVector(t)
@@ -27,31 +27,31 @@ local function IsVector(t)
 end
 
 local function IsUnit(t) 
-    return (t.AddCommandCap and true) or false
+    return (rawget(t, "AddCommandCap") and true) or false
 end
 
 local function IsProp(t) 
-    return (t.AddPropCallback and true) or false
+    return (rawget(t, "AddPropCallback") and true) or false
 end
 
 local function IsProjectile(t) 
-    return (t.ChangeDetonateBelowHeight and true) or false
+    return (rawget(t, "ChangeDetonateBelowHeight") and true) or false
 end
 
 local function IsBrain(t)
-    return (t.AssignThreatAtPosition and true) or false
+    return (rawget(t, "AssignThreatAtPosition") and true) or false
 end
 
 local function IsWeapon(t)
-    return (t.WeaponHasTarget and true) or false
+    return (rawget(t, "WeaponHasTarget") and true) or false
 end
 
 local function IsTrashbag(t)
-    return (t.Add and t.Destroy and t.Empty and true) or false 
+    return (rawget(t, "Add") and rawget(t, "Destroy") and rawget(t, "Empty") and true) or false 
 end
 
 local function IsLazyVar(t)
-    return (t.Set and t.SetFunction and t.SetValue and true) or false 
+    return (rawget(t, "Set") and rawget(t, "SetFunction") and rawget(t, "SetValue") and true) or false 
 end
 
 local function _FormatHeader(t)

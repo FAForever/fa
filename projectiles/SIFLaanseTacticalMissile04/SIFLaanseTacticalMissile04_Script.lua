@@ -22,12 +22,15 @@
 --******************************************************************************************************
 
 local SLaanseTacticalMissile = import("/lua/seraphimprojectiles.lua").SLaanseTacticalMissile
+local SLaanseTacticalMissileOnCreate = SLaanseTacticalMissile.OnCreate
+local SLaanseTacticalMissileOnImpact = SLaanseTacticalMissile.OnImpact
 local TacticalMissileComponent = import('/lua/sim/DefaultProjectiles.lua').TacticalMissileComponent
 
---- used by XSB0208
+--- used by XSB2108
 ---@class SIFLaanseTacticalMissile04 : SLaanseTacticalMissile, TacticalMissileComponent
 SIFLaanseTacticalMissile04 = ClassProjectile(SLaanseTacticalMissile, TacticalMissileComponent) {
-    LaunchTicks = 16,
+
+    LaunchTicks = 9,
     LaunchTicksRange = 1,
     LaunchTurnRate = 20,
     LaunchTurnRateRange = 1,
@@ -38,10 +41,28 @@ SIFLaanseTacticalMissile04 = ClassProjectile(SLaanseTacticalMissile, TacticalMis
     FinalBoostAngle = 30,
     FinalBoostAngleRange = 0,
 
+    TerminalSpeed = 13,
+    TerminalDistance = 30,
+
     ---@param self SIFLaanseTacticalMissile04
     OnCreate = function(self)
-        SLaanseTacticalMissile.OnCreate(self)
+        SLaanseTacticalMissileOnCreate(self)
+
         self.MoveThread = self.Trash:Add(ForkThread(self.MovementThread, self))
     end,
+
+    --- Called by the engine when the projectile impacts something
+    ---@param self Projectile
+    ---@param targetType string
+    ---@param targetEntity Unit | Prop
+    OnImpact = function(self, targetType, targetEntity)
+        SLaanseTacticalMissileOnImpact(self, targetType, targetEntity)
+
+        local army = self.Army
+
+        -- create light flashes
+        CreateLightParticleIntel(self, -1, army, 6, 2, 'flare_lens_add_02', 'ramp_blue_build_spray')
+        CreateLightParticleIntel(self, -1, army, 10, 4, 'flare_lens_add_02', 'ramp_ser_11')
+    end
 }
 TypeClass = SIFLaanseTacticalMissile04
