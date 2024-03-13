@@ -236,7 +236,7 @@ globalOpts = {
     {
         default = 1,
         label = "<LOC lobui_0798>DC Share Conditions",
-        help = "<LOC lobui_0799>Set what happens to a player's units when they disconnect",
+        help = "<LOC lobui_0799>Set what happens to a player's units when they disconnect. In Assassination, only applies if an ACU is at full health/shield.",
         key = 'AbandonmentShare',
         values = {
             {
@@ -279,17 +279,17 @@ globalOpts = {
     {
         default = 1,
         label = "<LOC lobui_0808>Recall Disconnected ACUs",
-        help = "<LOC lobui_0809>Should disconnecting players' ACUs be recalled, preventing their explosion?",
+        help = "<LOC lobui_0809>Should disconnecting players' full health/shield ACUs be recalled, preventing their explosion?",
         key = 'AbandonmentRecall',
         values = {
             {
                 text = "<LOC _No>No",
-                help = "<LOC lobui_0811>ACUs explode when their player disconnects.",
+                help = "<LOC lobui_0810>ACUs explode when their player disconnects.",
                 key = false,
             },
             {
                 text = "<LOC _Yes>Yes",
-                help = "<LOC lobui_0810>ACUs are recalled when their player disconnects.",
+                help = "<LOC lobui_0811>ACUs that are at full health and shield are recalled when their player disconnects.",
                 key = true,
             },
         },
