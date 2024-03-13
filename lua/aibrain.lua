@@ -14,6 +14,9 @@ local KillArmy = import("/lua/simutils.lua").KillArmy
 local DisableAI = import("/lua/simutils.lua").DisableAI
 local TransferUnitsToBrain = import("/lua/simutils.lua").TransferUnitsToBrain
 local TransferUnitsToHighestBrain = import("/lua/simutils.lua").TransferUnitsToHighestBrain
+local UpdateUnitCap = import("/lua/simutils.lua").UpdateUnitCap
+local SimPingOnArmyDefeat = import("/lua/simping.lua").OnArmyDefeat
+local RecallOnArmyDefeat = import("/lua/sim/Recall.lua")
 local CalculateBrainScore = import("/lua/sim/score.lua").CalculateBrainScore
 
 local StorageManagerBrainComponent = import("/lua/aibrains/components/StorageManagerBrainComponent.lua").StorageManagerBrainComponent
@@ -438,9 +441,10 @@ AIBrain = Class(FactoryManagerBrainComponent, StatManagerBrainComponent, JammerM
     OnDefeat = function(self)
         self.Status = 'Defeat'
 
-        import("/lua/simutils.lua").UpdateUnitCap(self:GetArmyIndex())
-        import("/lua/simping.lua").OnArmyDefeat(self:GetArmyIndex())
-        import("/lua/sim/Recall.lua").OnArmyDefeat(self:GetArmyIndex())
+        local selfIndex = self:GetArmyIndex()
+        UpdateUnitCap(selfIndex)
+        SimPingOnArmyDefeat(selfIndex)
+        RecallOnArmyDefeat(selfIndex)
 
         -- AI
         if self.BrainType == 'AI' then
@@ -470,7 +474,7 @@ AIBrain = Class(FactoryManagerBrainComponent, StatManagerBrainComponent, JammerM
     ---@param recallingUnits Unit[]
     RecallArmyThread = function(self, recallingUnits)
         if recallingUnits then
-            import("/lua/scenarioframework.lua").FakeTeleportUnits(recallingUnits, true)
+            FakeTeleportUnits(recallingUnits, true)
         end
         self:OnRecalled()
     end,
@@ -479,9 +483,9 @@ AIBrain = Class(FactoryManagerBrainComponent, StatManagerBrainComponent, JammerM
         -- TODO: create a common function for `OnDefeat` and `OnRecall`
         self.Status = "Recalled"
 
-        local army = self.Army
-        import("/lua/simutils.lua").UpdateUnitCap(army)
-        import("/lua/simping.lua").OnArmyDefeat(army)
+        local selfIndex = self:GetArmyIndex()
+        UpdateUnitCap(selfIndex)
+        OnArmyDefeat(selfIndex)
 
         -- AI
         if self.BrainType == "AI" then
@@ -495,10 +499,10 @@ AIBrain = Class(FactoryManagerBrainComponent, StatManagerBrainComponent, JammerM
             brain.index = index
             brain.score = CalculateBrainScore(brain)
 
-            if not brain:IsDefeated() and army ~= index then
+            if not brain:IsDefeated() and selfIndex ~= index then
                 if ArmyIsCivilian(index) then
                     table.insert(civilians, brain)
-                elseif IsEnemy(army, brain:GetArmyIndex()) then
+                elseif IsEnemy(selfIndex, brain:GetArmyIndex()) then
                     table.insert(enemies, brain)
                 end
             end
@@ -506,12 +510,12 @@ AIBrain = Class(FactoryManagerBrainComponent, StatManagerBrainComponent, JammerM
 
         -- Recalling has different share conditions than defeat because the entire team recalls simultaneously.
         -- Recalling recalls all SACU, so they shouldn't be transferred.
-        local cat = categories.ALLUNITS - categories.WALL - categories.COMMAND - categories.SUBCOMMANDER
+        local recallCat = categories.ALLUNITS - categories.WALL - categories.COMMAND - categories.SUBCOMMANDER
         local shareOption = ScenarioInfo.Options.Share
         if shareOption == 'CivilianDeserter' then
-            TransferUnitsToBrain(self, civilians, shareOption, cat)
+            TransferUnitsToBrain(self, civilians, shareOption, recallCat)
         elseif shareOption == 'Defectors' then
-            TransferUnitsToHighestBrain(self, enemies, shareOption, cat)
+            TransferUnitsToHighestBrain(self, enemies, shareOption, recallCat)
         end
 
         -- let the average, team vs team game end first
