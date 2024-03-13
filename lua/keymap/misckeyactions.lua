@@ -29,7 +29,7 @@ end
 function ToggleRepeatBuild()
     local selection = GetSelectedUnits()
     if not selection then return end
-    
+
     local allFactories = true
     local currentInfiniteQueueCheckStatus = false
     for _, v in selection do
@@ -665,4 +665,11 @@ end
 
 TogglePerformanceMetricsWindow = function()
     local instance = import("/lua/ui/lobby/sim-performance-popup.lua").OpenWindow()
+end
+
+Test = function()
+
+    local orderTable = { TaskName = 'AutonomousReclaimTask' }
+    IssueCommand("UNITCOMMAND_Script", orderTable, false)
+    LOG("issues task!")
 end

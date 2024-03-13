@@ -114,7 +114,7 @@ end
 ---@unknown
 function CAiBrain:FindClosestArmyWithBase()
 end
- 
+
 --- Takes a builder and returns the closest point that the structure can be
 --- built at in the list of building templates with matching builder types.
 ---
@@ -236,7 +236,7 @@ end
 
 --- Returns current resource income.
 ---@param resource 'ENERGY'|'MASS'.
--- @return Number.
+---@return number
 function CAiBrain:GetEconomyIncome(resource)
 end
 
@@ -282,7 +282,7 @@ end
 --- Always reports a threatvalue of zero for Allies or self.
 --- threatType and armyIndex are not required.
 --- @param ring number 1 or 2
---- 1 = Single, 2 = With surrounding IMPA blocks 
+--- 1 = Single, 2 = With surrounding IMPA blocks
 --- ..........   ..........
 --- ..........   ....xxx...
 --- .....X....   ....xXx...

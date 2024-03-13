@@ -701,11 +701,10 @@ end
 function IssueBlueprintCommandToUnit(unit, command, blueprintid, count, clear)
 end
 
----
----@param command any
----@param string any?
----@param clear boolean?
-function IssueCommand(command, string, clear)
+---@param command UserUnitCommand
+---@param commandData table
+---@param clear boolean
+function IssueCommand(command, commandData, clear)
 end
 
 ---

@@ -1,33 +1,9 @@
-
 local StructureUnit = import("/lua/sim/units/structureunit.lua").StructureUnit
 
 ---@class MassFabricationUnit : StructureUnit
 MassFabricationUnit = ClassUnit(StructureUnit) {
 
-    ---@param self MassFabricationUnit
-    ---@param bit number
-    OnScriptBitSet = function(self, bit)
-        if bit == 4 then
-            -- no longer track us, we want to be disabled
-            self.Brain:RemoveEnergyExcessUnit(self)
-
-            -- immediately disable production
-            self:OnProductionPaused()
-        else
-            StructureUnit.OnScriptBitSet(self, bit)
-        end
-    end,
-
-    ---@param self MassFabricationUnit
-    ---@param bit number
-    OnScriptBitClear = function (self, bit)
-        if bit == 4 then
-            -- make brain track us to enable / disable accordingly
-            self.Brain:AddDisabledEnergyExcessUnit(self)
-        else
-            StructureUnit.OnScriptBitClear(self, bit)
-        end
-    end,
+    ApplyExcessEnergyTask = true,
 
     ---@param self MassFabricationUnit
     ---@param builder Unit
@@ -37,8 +13,12 @@ MassFabricationUnit = ClassUnit(StructureUnit) {
         self:SetMaintenanceConsumptionActive()
         self:SetProductionActive(true)
 
-        -- make brain track us to enable / disable accordingly
-        self.Brain:AddEnabledEnergyExcessUnit(self)
+        if self.ApplyExcessEnergyTask then
+            IssueToUnitScript(self, {
+                TaskName = "ExcessEnergyTask",
+                Ratio = 0.5,
+            })
+        end
     end,
 
     ---@param self MassFabricationUnit
