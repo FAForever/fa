@@ -664,7 +664,294 @@ function UpdateUnitCap(deadArmy)
     end
 end
 
+--- Transfer a brain's units to other brains.
+---@param self AIBrain
+---@param brains AIBrain[]
+---@param shareOption 'FullShare' | 'ShareUntilDeath' | 'PartialShare' | 'TransferToKiller' | 'Defectors' | 'CivilianDeserter'
+---@param categoriesToTransfer? EntityCategory      # Defaults to ALLUNITS - WALL - COMMAND
+function TransferUnitsToBrain(self, brains, shareOption, categoriesToTransfer)
+    if not table.empty(brains) then
+        local units
+        if shareOption == 'FullShare' then
+            local indexes = {}
+            for _, brain in brains do
+                table.insert(indexes, brain.index)
+            end
+            units = self:GetListOfUnits(categories.ALLUNITS - categories.WALL - categories.COMMAND, false)
+            TransferUnfinishedUnitsAfterDeath(units, indexes)
+        end
+
+        for k, brain in brains do
+            if categoriesToTransfer then
+                units = self:GetListOfUnits(categoriesToTransfer, false)
+            else
+                units = self:GetListOfUnits(categories.ALLUNITS - categories.WALL - categories.COMMAND, false)
+            end
+            if units and not table.empty(units) then
+                local givenUnitCount = table.getn(TransferUnitsOwnership(units, brain.index))
+
+                -- only show message when we actually gift that player some units
+                if givenUnitCount > 0 then
+                    Sync.ArmyTransfer = { {
+                        from = self.index, 
+                        to = brain.index, 
+                        reason = "fullshare" 
+                    } }
+                end
+
+                -- Prevent giving the same units to multiple armies
+                WaitSeconds(1)
+            end
+        end
+    end
+end
+
+--- Transfer a brain's units to other brains, sorted by positive rating and then score.
+---@param self AIBrain
+---@param brains AIBrain[]
+---@param shareOption 'FullShare' | 'ShareUntilDeath' | 'PartialShare' | 'TransferToKiller' | 'Defectors' | 'CivilianDeserter'
+---@param categoriesToTransfer? EntityCategory      # Defaults to ALLUNITS - WALL - COMMAND
+function TransferUnitsToHighestBrain(self, brains, shareOption, categoriesToTransfer)
+    if not table.empty(brains) then
+        local ratings = ScenarioInfo.Options.Ratings
+        for _, brain in brains do
+            if ratings[brain.Nickname] then
+                brain.rating = ratings[brain.Nickname]
+            else
+                -- if there is no rating, create a fake negative rating based on score
+                brain.rating = -1 / brain.score
+            end
+        end
+        -- sort brains by rating
+        table.sort(brains, function(a, b) return a.rating > b.rating end)
+        TransferUnitsToBrain(self, brains, shareOption, categoriesToTransfer)
+    end
+end
+
+--local helper functions for KillArmy
+
+---@param self AIBrain
+local function KillWalls(self)
+    local tokill = self:GetListOfUnits(categories.WALL, false)
+    if tokill and not table.empty(tokill) then
+        for index, unit in tokill do
+            unit:Kill()
+        end
+    end
+end
+
+--- Remove the borrowed status from units we lent to allies.
+---@param brains AIBrain[]
+---@param selfIndex number
+local function TransferOwnershipOfBorrowedUnits(brains, selfIndex)
+    for index, brain in brains do
+        local units = brain:GetListOfUnits(categories.ALLUNITS, false)
+        if units and not table.empty(units) then
+            for _, unit in units do
+                if unit.oldowner == selfIndex then
+                    unit.oldowner = nil
+                end
+            end
+        end
+    end
+end
+
+--- Return units transferred to me to their original owner (if alive)
+---@param self AIBrain
+local function ReturnBorrowedUnits(self)
+    local units = self:GetListOfUnits(categories.ALLUNITS - categories.WALL, false)
+    local borrowed = {}
+    for index, unit in units do
+        local oldowner = unit.oldowner
+        if oldowner and oldowner ~= self:GetArmyIndex() and not GetArmyBrain(oldowner):IsDefeated() then
+            if not borrowed[oldowner] then
+                borrowed[oldowner] = {}
+            end
+            table.insert(borrowed[oldowner], unit)
+        end
+    end
+
+    for owner, units in borrowed do
+        TransferUnitsOwnership(units, owner)
+    end
+
+    WaitSeconds(1)
+end
+
+--- Take back units I gave away. Mainly needed to stop mods that auto-give after death from bypassing share conditions.
+---@param selfIndex number
+---@param brains AIBrain[]
+local function GetBackUnits(selfIndex, brains)
+    local given = {}
+    for index, brain in brains do
+        local units = brain:GetListOfUnits(categories.ALLUNITS - categories.WALL, false)
+        if units and not table.empty(units) then
+            for _, unit in units do
+                if unit.oldowner == selfIndex then
+                    table.insert(given, unit)
+                    unit.oldowner = nil
+                end
+            end
+        end
+    end
+
+    TransferUnitsOwnership(given, selfIndex)
+end
+
+--- Transfer units to the player who killed me
+---@param self AIBrain
+local function TransferUnitsToKiller(self)
+    local selfIndex = self:GetArmyIndex()
+    local killerIndex = 0
+    local units = self:GetListOfUnits(categories.ALLUNITS - categories.WALL - categories.COMMAND, false)
+    if units and not table.empty(units) then
+        if ScenarioInfo.Options.Victory == 'demoralization' then
+            killerIndex = ArmyBrains[selfIndex].CommanderKilledBy or selfIndex
+            TransferUnitsOwnership(units, killerIndex)
+        else
+            killerIndex = ArmyBrains[selfIndex].LastUnitKilledBy or selfIndex
+            TransferUnitsOwnership(units, killerIndex)
+        end
+    end
+    WaitSeconds(1)
+end
+
+local CalculateBrainScore = import("/lua/sim/score.lua").CalculateBrainScore
+
+--- Kills an army according to the given share condition.
+---@param self AIBrain
+---@param shareOption 'FullShare' | 'ShareUntilDeath' | 'PartialShare' | 'TransferToKiller' | 'Defectors' | 'CivilianDeserter'
+function KillArmy(self, shareOption)
+
+    -- Kill all walls while the ACU is blowing up
+    if shareOption == 'ShareUntilDeath' then
+        ForkThread(KillWalls)
+    end
+
+    WaitSeconds(10) -- Wait for commander explosion, then transfer units.
+
+    local selfIndex = self:GetArmyIndex()
+
+    local BrainCategories = { Enemies = {}, Civilians = {}, Allies = {} }
+
+    -- Sort brains out into mutually exclusive categories
+    for index, brain in ArmyBrains do
+        brain.index = index
+        brain.score = CalculateBrainScore(brain)
+
+        if not brain:IsDefeated() and selfIndex ~= index then
+            if ArmyIsCivilian(index) then
+                table.insert(BrainCategories.Civilians, brain)
+            elseif IsEnemy(selfIndex, brain:GetArmyIndex()) then
+                table.insert(BrainCategories.Enemies, brain)
+            else
+                table.insert(BrainCategories.Allies, brain)
+            end
+        end
+    end
+
+    -- This part determines the share condition
+    if shareOption == 'ShareUntilDeath' then
+        KillSharedUnits(selfIndex)
+        ReturnBorrowedUnits(self)
+    elseif shareOption == 'FullShare' then
+        TransferUnitsToHighestBrain(self, BrainCategories.Allies, shareOption)
+        TransferOwnershipOfBorrowedUnits(BrainCategories.Allies, selfIndex)
+    elseif shareOption == 'PartialShare' then
+        KillSharedUnits(selfIndex, categories.ALLUNITS - categories.STRUCTURE - categories.ENGINEER)
+        ReturnBorrowedUnits(self)
+        TransferUnitsToHighestBrain(self, BrainCategories.Allies, categories.STRUCTURE + categories.ENGINEER, shareOption)
+        TransferOwnershipOfBorrowedUnits(BrainCategories.Allies, selfIndex)
+    else
+        GetBackUnits(selfIndex, BrainCategories.Allies)
+        if shareOption == 'CivilianDeserter' then
+            TransferUnitsToBrain(self, BrainCategories.Civilians, shareOption)
+        elseif shareOption == 'TransferToKiller' then
+            TransferUnitsToKiller(self)
+        elseif shareOption == 'Defectors' then
+            TransferUnitsToHighestBrain(self, BrainCategories.Enemies, shareOption)
+        else -- Something went wrong in settings. Act like share until death to avoid abuse
+            WARN('Invalid share condition was used for this game. Defaulting to killing all units')
+            KillSharedUnits(selfIndex)
+            ReturnBorrowedUnits(self)
+        end
+    end
+
+    -- Kill all units left over
+    local tokill = self:GetListOfUnits(categories.ALLUNITS - categories.WALL, false)
+    if tokill and not table.empty(tokill) then
+        for index, unit in tokill do
+            unit:Kill()
+        end
+    end
+end
+
 --#endregion
+
+local SorianUtils = import("/lua/ai/sorianutilities.lua")
+
+--- Disables the AI for non-player armies.
+---@param self AIBrain
+function DisableAI(self)
+    local army = self.Army
+    -- print AI "ilost" text to chat
+    SorianUtils.AISendChat("enemies", ArmyBrains[army].Nickname, "ilost")
+    -- remove PlatoonHandle from all AI units before we kill / transfer the army
+    local units = self:GetListOfUnits(categories.ALLUNITS - categories.WALL, false)
+    if units and units[1] then
+        local halt = 0
+        local haltUnits = {}
+        for _, unit in units do
+            if not unit.Dead then
+                local handle = unit.PlatoonHandle
+                if handle and self:PlatoonExists(handle) then
+                    handle:Stop()
+                    handle:PlatoonDisbandNoAssign()
+                end
+                halt = halt + 1
+                haltUnits[halt] = unit
+            end
+        end
+        IssueStop(haltUnits)
+        IssueClearCommands(haltUnits)
+    end
+
+    -- Stop the AI from executing AI plans
+    self.RepeatExecution = false
+
+    -- removing AI BrainConditionsMonitor
+    if self.ConditionsMonitor then
+        self.ConditionsMonitor:Destroy()
+    end
+
+    -- removing AI BuilderManagers
+    if self.BuilderManagers then
+        for _, v in self.BuilderManagers do
+            local manager = v.EngineerManager
+            manager:SetEnabled(false)
+            manager:Destroy()
+            manager = v.FactoryManager
+            manager:SetEnabled(false)
+            manager:Destroy()
+            manager = v.PlatoonFormManager
+            manager:SetEnabled(false)
+            manager:Destroy()
+            manager = v.StrategyManager
+            if manager then
+                manager:SetEnabled(false)
+                manager:Destroy()
+            end
+            v.EngineerManager = nil
+            v.FactoryManager = nil
+            v.PlatoonFormManager = nil
+            v.BaseSettings = nil
+            v.BuilderHandles = nil
+            v.Position = nil
+        end
+    end
+    -- delete the AI pathcache
+    self.PathCache = nil
+end
 
 ------------------------------------------------------------------------------------------------------------------------
 --#region Non-Unit Transfer Diplomacy
