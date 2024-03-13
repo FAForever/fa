@@ -2,42 +2,14 @@
 --
 -- General Sim scripts
 
--- ==============================================================================
--- Diplomacy
--- ==============================================================================
+------------------------------------------------------------------------------------------------------------------------
+--#region General Unit Transfer Scripts
 
 local CreateWreckage = import("/lua/wreckage.lua").CreateWreckage
 
 local transferUnbuiltCategory = categories.ALLUNITS
 local transferUnitsCategory = categories.ALLUNITS - categories.INSIGNIFICANTUNIT
 local buildersCategory = categories.ALLUNITS - categories.CONSTRUCTION - categories.ENGINEER
-
-local sharedUnits = {}
-
----@param owner number
--- categoriesToKill is an optional input (it defaults to all categories)
-function KillSharedUnits(owner, categoriesToKill)
-    local sharedUnitOwner = sharedUnits[owner]
-    if sharedUnitOwner and not table.empty(sharedUnitOwner) then
-        local sharedUnitOwnerSize = table.getn(sharedUnitOwner)
-        for i = sharedUnitOwnerSize, 1, -1 do
-            local unit = sharedUnitOwner[i]
-            if not unit.Dead and unit.oldowner == owner then
-                if categoriesToKill then
-                    if EntityCategoryContains(categoriesToKill, unit) then
-                        table.remove(sharedUnits[owner], i)
-                        unit:Kill()
-                    end
-                else
-                    unit:Kill()
-                end
-            end
-        end
-        if not categoriesToKill then
-            sharedUnits[owner] = {}
-        end
-    end
-end
 
 -- used to make more expensive units transfer first, in case there's a unit cap issue
 local function TransferUnitsOwnershipComparator(a, b)
@@ -61,6 +33,8 @@ local function TransferUnitsOwnershipDelayedWeapons(weapon)
         end
     end
 end
+
+local sharedUnits = {}
 
 --- Transfers units to an army, returning the new units (since changing the army
 --- replaces the units with new ones)
@@ -625,43 +599,37 @@ function GiveUnitsToPlayer(data, units)
     end
 end
 
----@param data {Army: number, Value: boolean}
-function SetResourceSharing(data)
-    local army = data.Army
-    if not OkayToMessWithArmy(army) then
-        return
-    end
-    local brain = GetArmyBrain(army)
-    brain:SetResourceSharing(data.Value)
-end
+--#endregion
 
----@param data {Army: number, Value: boolean}
-function RequestAlliedVictory(data)
-    -- You cannot change this in a team game
-    if ScenarioInfo.TeamGame then
-        return
-    end
-    local army = data.Army
-    if not OkayToMessWithArmy(army) then
-        return
-    end
-    local brain = GetArmyBrain(army)
-    brain.RequestingAlliedVictory = data.Value
-end
+------------------------------------------------------------------------------------------------------------------------
+--#region Army Death Unit Transfer
 
----@param data {Army: number, Value: boolean}
-function SetOfferDraw(data)
-    local army = data.Army
-    if not OkayToMessWithArmy(army) then
-        return
-    end
-    local brain = GetArmyBrain(army)
-    brain.OfferingDraw = data.Value
-end
+--- Functions related to dealing with unit ownership when an army dies based on share conditions.
 
--- ==============================================================================
--- UNIT CAP
--- ==============================================================================
+---@param owner number
+-- categoriesToKill is an optional input (it defaults to all categories)
+function KillSharedUnits(owner, categoriesToKill)
+    local sharedUnitOwner = sharedUnits[owner]
+    if sharedUnitOwner and not table.empty(sharedUnitOwner) then
+        local sharedUnitOwnerSize = table.getn(sharedUnitOwner)
+        for i = sharedUnitOwnerSize, 1, -1 do
+            local unit = sharedUnitOwner[i]
+            if not unit.Dead and unit.oldowner == owner then
+                if categoriesToKill then
+                    if EntityCategoryContains(categoriesToKill, unit) then
+                        table.remove(sharedUnits[owner], i)
+                        unit:Kill()
+                    end
+                else
+                    unit:Kill()
+                end
+            end
+        end
+        if not categoriesToKill then
+            sharedUnits[owner] = {}
+        end
+    end
+end
 
 --- Given that `deadArmy` just died, redistributes their unit cap based on the scenario options
 ---@param deadArmy number
@@ -694,6 +662,45 @@ function UpdateUnitCap(deadArmy)
             SetArmyUnitCap(brain.index, caps[i] + capChng)
         end
     end
+end
+
+--#endregion
+
+------------------------------------------------------------------------------------------------------------------------
+--#region Non-Unit Transfer Diplomacy
+
+---@param data {Army: number, Value: boolean}
+function SetResourceSharing(data)
+    local army = data.Army
+    if not OkayToMessWithArmy(army) then
+        return
+    end
+    local brain = GetArmyBrain(army)
+    brain:SetResourceSharing(data.Value)
+end
+
+---@param data {Army: number, Value: boolean}
+function RequestAlliedVictory(data)
+    -- You cannot change this in a team game
+    if ScenarioInfo.TeamGame then
+        return
+    end
+    local army = data.Army
+    if not OkayToMessWithArmy(army) then
+        return
+    end
+    local brain = GetArmyBrain(army)
+    brain.RequestingAlliedVictory = data.Value
+end
+
+---@param data {Army: number, Value: boolean}
+function SetOfferDraw(data)
+    local army = data.Army
+    if not OkayToMessWithArmy(army) then
+        return
+    end
+    local brain = GetArmyBrain(army)
+    brain.OfferingDraw = data.Value
 end
 
 ---@param data {Sender: number, Msg: string}
@@ -770,6 +777,8 @@ import("/lua/simplayerquery.lua").AddResultListener("OfferAlliance", OnAllianceR
 
 local vectorCross = import('/lua/utilities.lua').Cross
 local upVector = Vector(0, 1, 0)
+
+--#endregion
 
 --- Draw XYZ axes of an entity's bone for one tick
 ---@param entity moho.entity_methods
