@@ -18,6 +18,7 @@ local UpdateUnitCap = import("/lua/simutils.lua").UpdateUnitCap
 local SimPingOnArmyDefeat = import("/lua/simping.lua").OnArmyDefeat
 local RecallOnArmyDefeat = import("/lua/sim/Recall.lua")
 local CalculateBrainScore = import("/lua/sim/score.lua").CalculateBrainScore
+local FakeTeleportUnits = import("/lua/scenarioframework.lua").FakeTeleportUnits
 
 local StorageManagerBrainComponent = import("/lua/aibrains/components/StorageManagerBrainComponent.lua").StorageManagerBrainComponent
 local FactoryManagerBrainComponent = import("/lua/aibrains/components/FactoryManagerBrainComponent.lua").FactoryManagerBrainComponent
@@ -439,6 +440,10 @@ AIBrain = Class(FactoryManagerBrainComponent, StatManagerBrainComponent, JammerM
 
     ---@param self AIBrain
     OnDefeat = function(self)
+        -- OnDefeat runs after AbandonedByPlayer, so we need to prevent killing the army twice
+        if self.Status == 'Defeat' then
+            return
+        end 
         self.Status = 'Defeat'
 
         local selfIndex = self:GetArmyIndex()
@@ -458,9 +463,59 @@ AIBrain = Class(FactoryManagerBrainComponent, StatManagerBrainComponent, JammerM
         end
     end,
 
+    --- Called by the engine when a player disconnects.
+    ---@param self AIBrain
     AbandonedByPlayer = function(self)
         if not IsGameOver() then
-            self:OnDefeat()
+            self.Status = 'Defeat'
+
+            import("/lua/simutils.lua").UpdateUnitCap(self:GetArmyIndex())
+            import("/lua/simping.lua").OnArmyDefeat(self:GetArmyIndex())
+
+            -- AI
+            if self.BrainType == 'AI' then
+                DisableAI(self)
+            end
+
+            local shareOption = ScenarioInfo.Options.AbandonmentShare
+            local recallAcuOption = ScenarioInfo.Options.AbandonmentRecall
+
+            -- Don't apply disconnect rules for players/ACUs that might be defeated soon,
+            -- and might have intentionally disconnected.
+            if recallAcuOption or shareOption ~= 'SameAsShare' then
+                local safeCommanders = {}
+
+                local commanders = self:GetListOfUnits(categories.COMMAND, false)
+                for _, com in commanders do
+                    if com:GetHealth() == com:GetMaxHealth() then
+                        local comShield = com.MyShield
+                        if comShield then
+                            if comShield:GetHealth() == comShield:GetMaxHealth() then
+                                table.insert(safeCommanders, com)
+                            end
+                        else
+                            table.insert(safeCommanders, com)
+                        end
+                    end
+                end
+
+                -- Only handle Assassination victory, as in other settings the player is unlikely to be defeated soon
+                local victoryOption = ScenarioInfo.Options.Victory
+                if shareOption == 'SameAsShare' or victoryOption == 'demoralization' and table.empty(safeCommanders) then
+                    shareOption = ScenarioInfo.Options.Share
+                end
+
+                if recallAcuOption then            
+                    -- KillArmy waits 10 seconds before acting, while FakeTeleport waits 3 seconds, so the ACU shouldn't explode.
+                    ForkThread(FakeTeleportUnits, safeCommanders, true)
+                end
+            end
+
+            ForkThread(KillArmy, self, shareOption)
+
+            if self.Trash then
+                self.Trash:Destroy()
+            end
         end
     end,
 
