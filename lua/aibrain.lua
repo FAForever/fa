@@ -14,6 +14,8 @@ local KillArmy = import("/lua/simutils.lua").KillArmy
 local DisableAI = import("/lua/simutils.lua").DisableAI
 local TransferUnitsToBrain = import("/lua/simutils.lua").TransferUnitsToBrain
 local TransferUnitsToHighestBrain = import("/lua/simutils.lua").TransferUnitsToHighestBrain
+local UpdateUnitCap = import("/lua/simutils.lua").UpdateUnitCap
+local OnArmyDefeat = import("/lua/simping.lua").OnArmyDefeat
 local CalculateBrainScore = import("/lua/sim/score.lua").CalculateBrainScore
 local FakeTeleportUnits = import("/lua/scenarioframework.lua").FakeTeleportUnits
 local Factions = import('/lua/factions.lua').GetFactions(true)
@@ -923,8 +925,9 @@ AIBrain = Class(AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerCom
         end 
         self.Status = 'Defeat'
 
-        import("/lua/simutils.lua").UpdateUnitCap(self:GetArmyIndex())
-        import("/lua/simping.lua").OnArmyDefeat(self:GetArmyIndex())
+        local selfIndex = self:GetArmyIndex()
+        UpdateUnitCap(selfIndex)
+        OnArmyDefeat(selfIndex)
 
         -- AI
         if self.BrainType == 'AI' then
@@ -944,8 +947,9 @@ AIBrain = Class(AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerCom
         if not IsGameOver() then
             self.Status = 'Defeat'
 
-            import("/lua/simutils.lua").UpdateUnitCap(self:GetArmyIndex())
-            import("/lua/simping.lua").OnArmyDefeat(self:GetArmyIndex())
+            local selfIndex = self:GetArmyIndex()
+            UpdateUnitCap(selfIndex)
+            OnArmyDefeat(selfIndex)
 
             -- AI
             if self.BrainType == 'AI' then
@@ -1004,7 +1008,7 @@ AIBrain = Class(AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerCom
     ---@param recallingUnits Unit[]
     RecallArmyThread = function(self, recallingUnits)
         if recallingUnits then
-            import("/lua/scenarioframework.lua").FakeTeleportUnits(recallingUnits, true)
+            FakeTeleportUnits(recallingUnits, true)
         end
         self:OnRecalled()
     end,
@@ -1012,9 +1016,9 @@ AIBrain = Class(AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerCom
     OnRecalled = function(self)
         self.Status = "Recalled"
 
-        local army = self.Army
-        import("/lua/simutils.lua").UpdateUnitCap(army)
-        import("/lua/simping.lua").OnArmyDefeat(army)
+        local selfIndex = self:GetArmyIndex()
+        UpdateUnitCap(selfIndex)
+        OnArmyDefeat(selfIndex)
 
         -- AI
         if self.BrainType == "AI" then
@@ -1028,10 +1032,10 @@ AIBrain = Class(AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerCom
             brain.index = index
             brain.score = CalculateBrainScore(brain)
 
-            if not brain:IsDefeated() and army ~= index then
+            if not brain:IsDefeated() and selfIndex ~= index then
                 if ArmyIsCivilian(index) then
                     table.insert(civilians, brain)
-                elseif IsEnemy(army, brain:GetArmyIndex()) then
+                elseif IsEnemy(selfIndex, brain:GetArmyIndex()) then
                     table.insert(enemies, brain)
                 end
             end
@@ -1039,12 +1043,12 @@ AIBrain = Class(AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerCom
 
         -- Recalling has different share conditions than defeat because the entire team recalls simultaneously.
         -- Recalling recalls all SACU, so they shouldn't be transferred.
-        local cat = categories.ALLUNITS - categories.WALL - categories.COMMAND - categories.SUBCOMMANDER
+        local recallCat = categories.ALLUNITS - categories.WALL - categories.COMMAND - categories.SUBCOMMANDER
         local shareOption = ScenarioInfo.Options.Share
         if shareOption == 'CivilianDeserter' then
-            TransferUnitsToBrain(self, civilians, cat)
+            TransferUnitsToBrain(self, civilians, recallCat)
         elseif shareOption == 'Defectors' then
-            TransferUnitsToHighestBrain(self, enemies, cat)
+            TransferUnitsToHighestBrain(self, enemies, recallCat)
         end
 
         -- let the average, team vs team game end first
