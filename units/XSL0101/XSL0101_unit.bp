@@ -185,7 +185,7 @@ UnitBlueprint{
     SizeZ = 0.9,
     StrategicIconName = "icon_bot1_intel",
     StrategicIconSortPriority = 135,
-    Transport = { CanFireFromTransport = false },
+    Transport = { CanFireFromTransport = true },
     Veteran = {
         Level1 = 2,
         Level2 = 4,
@@ -205,6 +205,7 @@ UnitBlueprint{
             DamageType = "Normal",
             DisplayName = "Phasic Autogun",
             FireTargetLayerCapsTable = {
+                Air = "Land|Water|Seabed",
                 Land = "Land|Water|Seabed",
                 Water = "Land|Water|Seabed",
             },
