@@ -895,58 +895,63 @@ local SorianUtils = import("/lua/ai/sorianutilities.lua")
 function DisableAI(self)
     local army = self.Army
     -- print AI "ilost" text to chat
-    SorianUtils.AISendChat("enemies", ArmyBrains[army].Nickname, "ilost")
+    SorianUtils.AISendChat('enemies', ArmyBrains[self:GetArmyIndex()].Nickname, 'ilost')
     -- remove PlatoonHandle from all AI units before we kill / transfer the army
     local units = self:GetListOfUnits(categories.ALLUNITS - categories.WALL, false)
-    if units and units[1] then
-        local halt = 0
-        local haltUnits = {}
+    if units and not table.empty(units) then
         for _, unit in units do
             if not unit.Dead then
-                local handle = unit.PlatoonHandle
-                if handle and self:PlatoonExists(handle) then
-                    handle:Stop()
-                    handle:PlatoonDisbandNoAssign()
+                if unit.PlatoonHandle and self:PlatoonExists(unit.PlatoonHandle) then
+                    unit.PlatoonHandle:Stop()
+                    unit.PlatoonHandle:PlatoonDisbandNoAssign()
                 end
-                halt = halt + 1
-                haltUnits[halt] = unit
+                IssueStop({ unit })
+                IssueToUnitClearCommands(unit)
             end
         end
-        IssueStop(haltUnits)
-        IssueClearCommands(haltUnits)
     end
-
     -- Stop the AI from executing AI plans
     self.RepeatExecution = false
-
     -- removing AI BrainConditionsMonitor
     if self.ConditionsMonitor then
         self.ConditionsMonitor:Destroy()
     end
-
     -- removing AI BuilderManagers
     if self.BuilderManagers then
-        for _, v in self.BuilderManagers do
-            local manager = v.EngineerManager
-            manager:SetEnabled(false)
-            manager:Destroy()
-            manager = v.FactoryManager
-            manager:SetEnabled(false)
-            manager:Destroy()
-            manager = v.PlatoonFormManager
-            manager:SetEnabled(false)
-            manager:Destroy()
-            manager = v.StrategyManager
-            if manager then
-                manager:SetEnabled(false)
-                manager:Destroy()
+        for k, manager in self.BuilderManagers do
+            if manager.EngineerManager then
+                manager.EngineerManager:SetEnabled(false)
             end
-            v.EngineerManager = nil
-            v.FactoryManager = nil
-            v.PlatoonFormManager = nil
-            v.BaseSettings = nil
-            v.BuilderHandles = nil
-            v.Position = nil
+
+            if manager.FactoryManager then
+                manager.FactoryManager:SetEnabled(false)
+            end
+
+            if manager.PlatoonFormManager then
+                manager.PlatoonFormManager:SetEnabled(false)
+            end
+
+            if manager.EngineerManager then
+                manager.EngineerManager:Destroy()
+            end
+
+            if manager.FactoryManager then
+                manager.FactoryManager:Destroy()
+            end
+
+            if manager.PlatoonFormManager then
+                manager.PlatoonFormManager:Destroy()
+            end
+            if manager.StrategyManager then
+                manager.StrategyManager:SetEnabled(false)
+                manager.StrategyManager:Destroy()
+            end
+            self.BuilderManagers[k].EngineerManager = nil
+            self.BuilderManagers[k].FactoryManager = nil
+            self.BuilderManagers[k].PlatoonFormManager = nil
+            self.BuilderManagers[k].BaseSettings = nil
+            self.BuilderManagers[k].BuilderHandles = nil
+            self.BuilderManagers[k].Position = nil
         end
     end
     -- delete the AI pathcache
