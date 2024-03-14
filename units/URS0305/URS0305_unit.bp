@@ -143,7 +143,7 @@ UnitBlueprint{
     LifeBarOffset = 0.35,
     LifeBarSize = 1.25,
     Physics = {
-        BackUpDistance = 0,
+        BackUpDistance = 10,
         BankingSlope = 0,
         BuildOnLayerCaps = {
             LAYER_Air = false,
@@ -158,7 +158,7 @@ UnitBlueprint{
         MaxAcceleration = 4.5,
         MaxBrake = 4.5,
         MaxSpeed = 4.5,
-        MaxSpeedReverse = 0,
+        MaxSpeedReverse = 4.5,
         MaxSteerForce = 5,
         MinSpeedPercent = 0,
         MotionType = "RULEUMT_Water",
