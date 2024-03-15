@@ -1,4 +1,3 @@
-
 local Prefs = import("/lua/user/prefs.lua")
 local WorldMesh = import("/lua/ui/controls/worldmesh.lua").WorldMesh
 local meshSphere = '/env/Common/Props/sphere_lod0.scm'
@@ -14,7 +13,7 @@ local KeyCodeShift = 16
 local offset = CurrentTime()
 
 ---@class CastingPaintMessage
----@field CastingMouse boolean 
+---@field CastingMouse boolean
 ---@field Position Vector
 ---@field Time number
 
@@ -30,7 +29,7 @@ end
 --- Returns a list of clients that are considered observers
 ---@return number[]
 local function GetObserverClients()
-    local observers = { }
+    local observers = {}
     for k, client in clients do
         local isPlayer = false
         for l, army in armies do
@@ -51,13 +50,13 @@ end
 local Trash = TrashBag()
 
 ---@type table<WorldMesh, boolean>
-local Unused = { }
+local Unused = {}
 
 ---@type table<WorldMesh, CastingPaintMessage>
-local InUse = { }
+local InUse = {}
 
 ---@type table<string, Vector>
-local Samples = { }
+local Samples = {}
 
 local EntityMesh = {
     MeshName = meshSphere,
