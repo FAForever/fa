@@ -13,6 +13,9 @@ for i,m in ipairs(import("/lua/mods.lua").GetUiMods()) do
     table.insert(__active_mods, m)
 end
 
-LOG('Active mods in session: ',repr(__active_mods))
+LOG('Active mods in session:')
+for _, mod in __active_mods do
+    LOG(string.format('\t"%-30s v%02d (%-37s by %s', mod.name..'"', mod.version, mod.uid..')', mod.author))
+end
 
 doscript '/lua/UserSync.lua'
