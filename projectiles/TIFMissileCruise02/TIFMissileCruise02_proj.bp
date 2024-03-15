@@ -45,7 +45,7 @@ ProjectileBlueprint {
                 },
             },
         },
-        StrategicIconSize = 2,
+        StrategicIconSize = 4,
         UniformScale = 0.15,
     },
     General = {
@@ -80,5 +80,4 @@ ProjectileBlueprint {
         ZigZagFrequency = 1,
         MaxZigZag = 1
     },
-    StrategicIconName = '/textures/ui/common/game/strategicicons/icon_tactical_missile.dds',
 }
