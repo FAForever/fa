@@ -377,7 +377,7 @@ UnitBlueprint{
             MuzzleVelocity = 25,
             MuzzleVelocityReduceDistance = 90,
             ProjectileId = "/projectiles/TDFGauss04/TDFGauss04_proj.bp",
-            ProjectileLifetimeUsesMultiplier = 1.15,
+            ProjectileLifetimeUsesMultiplier = 1.6,
             ProjectilesPerOnFire = 3,
             RackBones = {
                 {
@@ -455,7 +455,7 @@ UnitBlueprint{
             MuzzleVelocityReduceDistance = 90,
             PrefersPrimaryWeaponTarget = true,
             ProjectileId = "/projectiles/TDFGauss04/TDFGauss04_proj.bp",
-            ProjectileLifetimeUsesMultiplier = 1.15,
+            ProjectileLifetimeUsesMultiplier = 1.6,
             ProjectilesPerOnFire = 3,
             RackBones = {
                 {
@@ -531,7 +531,7 @@ UnitBlueprint{
             MuzzleVelocityReduceDistance = 90,
             PrefersPrimaryWeaponTarget = true,
             ProjectileId = "/projectiles/TDFGauss04/TDFGauss04_proj.bp",
-            ProjectileLifetimeUsesMultiplier = 1.15,
+            ProjectileLifetimeUsesMultiplier = 1.6,
             ProjectilesPerOnFire = 3,
             RackBones = {
                 {
@@ -609,7 +609,7 @@ UnitBlueprint{
             MuzzleVelocityReduceDistance = 90,
             PrefersPrimaryWeaponTarget = true,
             ProjectileId = "/projectiles/TDFGauss04/TDFGauss04_proj.bp",
-            ProjectileLifetimeUsesMultiplier = 1.15,
+            ProjectileLifetimeUsesMultiplier = 1.6,
             ProjectilesPerOnFire = 3,
             RackBones = {
                 {
