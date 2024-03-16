@@ -319,7 +319,7 @@ UnitBlueprint{
             BuildCostMass = 380,
             BuildTime = 2500,
             Icon = "ed",
-            Name = "<LOC enhancements_0065>C-D2 Engineering Drone",
+            Name = "<LOC enhancements_0065>C-D3 Engineering Drone",
             Slot = "Back",
             UpgradeEffectBones = { "AttachSpecial01" },
             UpgradeUnitAmbientBones = { "UEL0301" },
@@ -329,7 +329,7 @@ UnitBlueprint{
             BuildCostMass = 1,
             BuildTime = 0.1,
             Icon = "ed",
-            Name = "<LOC enhancements_0066>C-D2 Remove Engineering Drone",
+            Name = "<LOC enhancements_0066>C-D3 Remove Engineering Drone",
             Prerequisite = "Pod",
             RemoveEnhancements = {
                 "Pod",
@@ -633,7 +633,7 @@ UnitBlueprint{
             MuzzleSalvoSize = 1,
             MuzzleVelocity = 25,
             ProjectileId = "/projectiles/TDFPlasmaHeavy03/TDFPlasmaHeavy03_proj.bp",
-            ProjectileLifetimeUsesMultiplier = 1.15,
+            ProjectileLifetimeUsesMultiplier = 1.3,
             ProjectilesPerOnFire = 1,
             RackBones = {
                 {

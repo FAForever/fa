@@ -2,12 +2,12 @@ ProjectileBlueprint {
     Audio = {
         Impact = Sound {
             Bank = 'Impacts',
-            Cue = 'UEF_Expl_Med_Impact',
+            Cue = 'UEF_Expl_Lrg_Naval',
             LodCutoff = 'Weapon_LodCutoff',
         },
         ImpactTerrain = Sound {
             Bank = 'Impacts',
-            Cue = 'Impact_Land_Gen_UEF',
+            Cue = 'UEF_Expl_Lrg_Naval',
             LodCutoff = 'Weapon_LodCutoff',
         },
         ImpactWater = Sound {
@@ -43,7 +43,7 @@ ProjectileBlueprint {
                 },
             },
         },
-        StrategicIconSize = 3,
+        StrategicIconSize = 4,
         UniformScale = 0.15,
     },
     Economy = {
