@@ -24,9 +24,45 @@ local debugInterface = false
 -- from working :sad:
 isOpen = false
 
----@class Changelog : Group
+---@alias PatchNotesType "Hotfix"|"Developers patch"|"Balance patch"
+
+---@class PatchNotes
+---@field version number | string       # Patch version
+---@field hasPrettyGithubRelease boolean  # URL to the release on Github
+---@field name PatchNotesType           # Patch type
+---@field hasPrettyPatchnotes boolean   # Refers to patchnotes.faforever.com, defaults to false
+---@field descriptionFR string[]        # French translation
+---@field descriptionRU string[]        # Russian translation
+---@field description string[]          # Default changelog in English
+
+---@class UIChangelog : Group
+---@field Debug Group
+---@field CommonUI Group
+---@field Border Border
+---@field Background Bitmap
+---@field DialogBackground Bitmap
+---@field Header Group
+---@field HeaderDebug Bitmap
+---@field HeaderTitle Text
+---@field HeaderEscapeButton Button
+---@field HeaderSubtitle Text
+---@field Footer Group
+---@field FooterDebug Bitmap
+---@field FooterGithubButton Button
+---@field FooterPatchNotesButton Button
+---@field FooterDiscordButton Button
+---@field Content Group
+---@field ContentDebug Bitmap
+---@field ContentNotes Group
+---@field ContentNotesDebug Bitmap
+---@field ContentPatches Group
+---@field ContentPatchesDebug Bitmap
+---@field ContentDivider Bitmap
+---@field ContentPatchesList ItemList
 Changelog = ClassUI(Group) {
 
+    ---@param self UIChangelog
+    ---@param parent Control
     __init = function(self, parent)
         Group.__init(self, parent)
 
@@ -117,31 +153,13 @@ Changelog = ClassUI(Group) {
             OpenURL('http://github.com/FAForever/fa/releases')
         end
 
-        self.FooterBetaBalanceButton = UIUtil.CreateButtonWithDropshadow(self.Footer, '/BUTTON/medium/', "Beta Balance")
-        LayoutHelpers.AtVerticalCenterIn(self.FooterBetaBalanceButton, self.Footer)
-        LayoutHelpers.DepthOverParent(self.FooterBetaBalanceButton, self.Footer, 5)
-        self.FooterBetaBalanceButton.Left:Set(function() return self.FooterGithubButton.Right() -
-            LayoutHelpers.ScaleNumber(20) end)
-        self.FooterBetaBalanceButton.OnClick = function()
-            OpenURL('http://patchnotes.faforever.com/fafbeta')
-        end
-
-        self.FooterDevelopButton = UIUtil.CreateButtonWithDropshadow(self.Footer, '/BUTTON/medium/', "FAF Develop")
-        LayoutHelpers.AtVerticalCenterIn(self.FooterDevelopButton, self.Footer)
-        LayoutHelpers.DepthOverParent(self.FooterDevelopButton, self.Footer, 5)
-        self.FooterDevelopButton.Left:Set(function() return self.FooterBetaBalanceButton.Right() -
-            LayoutHelpers.ScaleNumber(20) end)
-        self.FooterDevelopButton.OnClick = function()
-            OpenURL('http://patchnotes.faforever.com/fafdevelop')
-        end
-
-        self.FooterPatchNotesButton = UIUtil.CreateButtonWithDropshadow(self.Footer, '/BUTTON/medium/', "Balance notes")
+        self.FooterPatchNotesButton = UIUtil.CreateButtonWithDropshadow(self.Footer, '/BUTTON/medium/', "Patchnotes")
         LayoutHelpers.AtVerticalCenterIn(self.FooterPatchNotesButton, self.Footer, 2)
         LayoutHelpers.DepthOverParent(self.FooterPatchNotesButton, self.Footer, 5)
         self.FooterPatchNotesButton.Right:Set(function() return self.Footer.Right() - LayoutHelpers.ScaleNumber(220) end)
         self.FooterPatchNotesButton:Disable()
         self.FooterPatchNotesButton.OnClick = function()
-            OpenURL('http://github.com/FAForever/fa/blob/develop/changelog.md')
+            OpenURL('http://patchnotes.faforever.com')
         end
 
         self.FooterDiscordButton = UIUtil.CreateButtonWithDropshadow(self.Footer, '/BUTTON/medium/', "Report a bug")
@@ -227,14 +245,26 @@ Changelog = ClassUI(Group) {
     end,
 
     --- Populates the dialog with the given patch
+    ---@param self UIChangelog
+    ---@param index number
     PopulateWithPatch = function(self, index)
         local patch = data.gamePatches[index + 1]
+
         if patch then
+
+            if patch.hasPrettyGithubRelease then
+                self.FooterGithubButton:Enable()
+                self.FooterGithubButton.OnClick = function()
+                    OpenURL(string.format('http://github.com/FAForever/fa/releases/tag/%d', patch.version))
+                end
+            else
+                self.FooterGithubButton:Disable()
+            end
 
             if patch.hasPrettyPatchnotes then
                 self.FooterPatchNotesButton:Enable()
                 self.FooterPatchNotesButton.OnClick = function()
-                    OpenURL(string.format('http://patchnotes.faforever.com/balance/%s.html', patch.version))
+                    OpenURL('http://patchnotes.faforever.com')
                 end
             else
                 self.FooterPatchNotesButton:Disable()
@@ -248,10 +278,14 @@ Changelog = ClassUI(Group) {
             for k, line in patch[altDescription] or patch.description do
                 self.ContentNotesList:AddItem(line)
             end
+        else
+            self.FooterGithubButton:Disable()
+            self.FooterPatchNotesButton:Disable()
         end
     end,
 
     --- Populates the list of patches
+    ---@param self UIChangelog
     PopulatePatchList = function(self)
         self.ContentPatchesList:DeleteAllItems()
         for k, patch in data.gamePatches do
@@ -260,6 +294,7 @@ Changelog = ClassUI(Group) {
     end,
 
     --- Destroys the dialog
+    ---@param self UIChangelog
     Close = function(self)
 
         -- prevent the dialog from popping up again
