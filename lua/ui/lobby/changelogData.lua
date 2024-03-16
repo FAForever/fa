@@ -1,14 +1,5 @@
+---@type number
 last_version = 3780
-
----@alias PatchNotesType "Hotfix"|"Developers patch"|"Balance patch"
-
----@class PatchNotes
----@field version number | string       # Patch version
----@field name PatchNotesType           # Patch type
----@field hasPrettyPatchnotes boolean   # Refers to patchnotes.faforever.com, defaults to false
----@field descriptionFR string[]        # French translation
----@field descriptionRU string[]        # Russian translation
----@field description string[]          # Default changelog in English
 
 ---@type PatchNotes[]
 gamePatches = {
