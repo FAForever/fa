@@ -3,7 +3,7 @@
 
 General useful tooling:
 
-- [GifToScreen](https://www.screentogif.com/): Free, open source screen recorder that can export to MP4. If the changes are visual, these can help you tell us exactly what the changes imply!
+- [ScreenToGif](https://www.screentogif.com/): Free, open source screen recorder that can export to MP4. If the changes are visual, these can help you tell us exactly what the changes imply!
 
  -->
 
