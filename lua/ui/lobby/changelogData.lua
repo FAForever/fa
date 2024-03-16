@@ -1,8 +1,34 @@
 ---@type number
-last_version = 3780
+last_version = 3801
 
 ---@type PatchNotes[]
 gamePatches = {
+    {
+        version = 3801,
+        name = "Developers patch",
+        hasPrettyGithubRelease = true,
+        description = {
+            "# Game Version 3801 (16th of March, 2024)",
+            "",
+            "The first development iteration of 2024 is here!",
+            "",
+            "There's a lot of goodies in this iteration. Most notably this developers iteration is also soaked with various ",
+            "balance changes. From 2024 and onwards we no longer have separate development and balance patches.",
+            "",
+            "The in-game changelog will no longer include all the details of the changes. You can find the complete ",
+            "changelog on Github. You can use the button in the bottom-left corner of this dialog to immediately jump to ",
+            "details of the changes of the selected game version.",
+            "",
+            "With gratitude to all those who took the time to contribute,",
+            "",
+            "Jip",
+            "",
+            "_One does wonder - how did we jump from game version 3780 to 3801? The answer is simple - we did a whoopsie and ",
+            "pushed game version 3800 instead of 3780 to the FAF Develop game type. Now, it won't update the game type unless ",
+            "the game version is equal or more than 3800. As game version 3800 is already occupied we now have game version ",
+            "3801._",
+        }
+    },
     {
         version = 3780,
         name = "Hotfix",
