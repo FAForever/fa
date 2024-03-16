@@ -6,6 +6,7 @@ gamePatches = {
     {
         version = 3780,
         name = "Hotfix",
+        hasPrettyGithubRelease = true,
         description = {
             "# Game Version 3779 (11th of January, 2024)",
             "",
@@ -57,6 +58,7 @@ gamePatches = {
     {
         version = 3779,
         name = "Developers patch",
+        hasPrettyGithubRelease = true,
         description = {
             "# Game Version 3779 (21th of January, 2024)",
             "",
@@ -272,6 +274,7 @@ gamePatches = {
     {
         version = 3778,
         name = "Hotfix",
+        hasPrettyGithubRelease = true,
         description = {
             "# Game Version 3778 (31th of December, 2023)",
             "",
@@ -364,6 +367,7 @@ gamePatches = {
     {
         version = 3777,
         name = "Developers patch",
+        hasPrettyGithubRelease = true,
         description = {
             "# Game version 3777 (24th of December, 2023)",
             "",
@@ -533,6 +537,7 @@ gamePatches = {
     {
         version = 3776,
         name = "Hotfix",
+        hasPrettyGithubRelease = true,
         description = {
             "# Game version 3776 (30th of November, 2023)",
             "",
@@ -640,6 +645,7 @@ gamePatches = {
         version = 3775,
         name = "Balance patch",
         hasPrettyPatchnotes = true,
+        hasPrettyGithubRelease = true,
         description = {
             "# Game version 3775 (19th of November, 2023) ",
             "",
@@ -660,6 +666,7 @@ gamePatches = {
     {
         version = 3774,
         name = "Hotfix",
+        hasPrettyGithubRelease = true,
         description = {
             "# Game version 3774 (15th of November, 2023)",
             "",
@@ -719,6 +726,7 @@ gamePatches = {
     {
         version = 3773,
         name = "Hotfix",
+        hasPrettyGithubRelease = true,
         description = {
             "# Game version 3773 (4th of November, 2023)",
             "",
@@ -768,6 +776,7 @@ gamePatches = {
     {
         version = 3772,
         name = "Hotfix",
+        hasPrettyGithubRelease = true,
         description = {
             "# Game version 3772 (2th of November, 2023)",
             "",
@@ -864,6 +873,7 @@ gamePatches = {
     {
         version = 3771,
         name = "Developers patch",
+        hasPrettyGithubRelease = true,
         description = {
             "# Game version 3771 (29th of October, 2023)",
             "",
@@ -1062,6 +1072,7 @@ gamePatches = {
     {
         version = 3769,
         name = "Hotfix",
+        hasPrettyGithubRelease = true,
         description = {
             "# Game version 3769 (24th of September, 2023)",
             "",
@@ -1102,6 +1113,7 @@ gamePatches = {
     {
         version = 3767,
         name = "Hotfix",
+        hasPrettyGithubRelease = true,
         description = {
             "# Game version 3767 (17th of September, 2023)",
             "",
@@ -1161,6 +1173,7 @@ gamePatches = {
     {
         version = 3766,
         name = "Hotfix",
+        hasPrettyGithubRelease = true,
         description = {
             "# Game version 3766 (9th of September, 2023)",
             "",
@@ -1239,6 +1252,7 @@ gamePatches = {
     {
         version = 3765,
         name = "Developers patch",
+        hasPrettyGithubRelease = true,
         description = {
             "# Game version 3765 (2nd of September, 2023)",
             "",
@@ -1401,6 +1415,7 @@ gamePatches = {
     {
         version = 3764,
         name = "Hotfix",
+        hasPrettyGithubRelease = true,
         description = {
             "See the patch notes of 3762 and 3758 for the full patch notes.",
             "",
@@ -1491,6 +1506,7 @@ gamePatches = {
     {
         version = 3763,
         name = "Hotfix",
+        hasPrettyGithubRelease = true,
         description = {
             "See the patch notes of 3762 and 3758 for the full patch notes.",
             "",
@@ -1533,6 +1549,7 @@ gamePatches = {
     {
         version = 3762,
         name = "Hotfix",
+        hasPrettyGithubRelease = true,
         description = {
             "",
             "See the patch notes of 3762 and 3758 for the full patch notes.",
@@ -1615,6 +1632,7 @@ gamePatches = {
     {
         version = 3761,
         name = "Balance patch",
+        hasPrettyGithubRelease = true,
         description = {
             "The main objective of this patch is to enhance the viability of a diverse range of strategies by ",
             "boosting raiding capabilities, balancing overpowered units, and introducing novel ways to utilize ",
@@ -1668,6 +1686,7 @@ gamePatches = {
     {
         version = 3760,
         name = "Hotfix",
+        hasPrettyGithubRelease = true,
         description = {
             "See the patch notes of 3758 for all the details of the second development iteration.",
             "",
@@ -1711,6 +1730,7 @@ gamePatches = {
     {
         version = 3758,
         name = "Developers patch",
+        hasPrettyGithubRelease = true,
         description = {
             "There are a lot of goodies in this iteration! The changelog format has been adjusted to make it easier to read.",
             "It now contains less detailed information and more general descriptions. Additionally, the in-game changelog",
@@ -2004,6 +2024,7 @@ gamePatches = {
     {
         version = 3757,
         name = 'Balance patch',
+        hasPrettyGithubRelease = true,
         description = {
             "# Game version 3757 (20th of May, 2023)",
             "",
@@ -2042,6 +2063,7 @@ gamePatches = {
     {
         version = 3756,
         name = "Hotfix",
+        hasPrettyGithubRelease = true,
         description = {
             "",
             "Hopefully this is the last hotfix for now. Includes various fixes of recent and longstanding bugs.",
@@ -2098,6 +2120,7 @@ gamePatches = {
     {
         version = 3755,
         name = "Hotfix",
+        hasPrettyGithubRelease = true,
         description = {
             "",
             "See the patch notes of 3751 for the full patch notes.",
@@ -2114,6 +2137,7 @@ gamePatches = {
     {
         version = 3754,
         name = "Hotfix",
+        hasPrettyGithubRelease = true,
         description = {
             "See the patch notes of 3751 for the full patch notes.",
             "",
@@ -2224,6 +2248,7 @@ gamePatches = {
     {
         version = 3753,
         name = "Hotfix",
+        hasPrettyGithubRelease = true,
         description = {
             "",
             "# Game version 3753 (25th of February, 2022)",
@@ -2250,6 +2275,7 @@ gamePatches = {
     {
         version = 3752,
         name = "Hotfix",
+        hasPrettyGithubRelease = true,
         description = {
             "",
             "# Game version 3752 (25th of February, 2022)",
@@ -2269,6 +2295,7 @@ gamePatches = {
     {
         version = 3751,
         name = "Developers patch",
+        hasPrettyGithubRelease = true,
         description = {
             "# Game version 3751 (25th of February, 2022)",
             "",
@@ -2667,6 +2694,7 @@ gamePatches = {
     {
         version = 3750,
         name = "Balance patch",
+        hasPrettyGithubRelease = true,
         hasPrettyPatchnotes = true,
         description = {
             "## Land",
@@ -3164,6 +3192,7 @@ gamePatches = {
     {
         version = 3749,
         name = 'Developers patch',
+        hasPrettyGithubRelease = true,
         description = {
             "",
             "Happy holidays everyone!",
@@ -3196,6 +3225,7 @@ gamePatches = {
     {
         version = 3748,
         name = 'Hotfix',
+        hasPrettyGithubRelease = true,
         description = {
             "",
             "## Bug fixes",
@@ -3214,6 +3244,7 @@ gamePatches = {
     {
         version = 3747,
         name = 'Hotfix',
+        hasPrettyGithubRelease = true,
         description = {
             "",
             "## Features",
@@ -3303,6 +3334,7 @@ gamePatches = {
     {
         version = 3746,
         name = 'Hotfix',
+        hasPrettyGithubRelease = true,
         description = {
             "",
             "# Game version 3746 (6th of November, 2022)",
@@ -3372,6 +3404,7 @@ gamePatches = {
     {
         version = 3745,
         name = 'Developers patch',
+        hasPrettyGithubRelease = true,
         description = {
             "",
             "# Game version 3745 (6th of November, 2022)",
@@ -3771,6 +3804,7 @@ gamePatches = {
     {
         version = 3744,
         name = 'Hotfix',
+        hasPrettyGithubRelease = true,
         description = {
             "The maintainers of Nomads have resolved the issues with tactical and strategical defenses! They should",
             "now work as intended again.",
@@ -3793,6 +3827,7 @@ gamePatches = {
     {
         version = 3743,
         name = 'Hotfix',
+        hasPrettyGithubRelease = true,
         description = {
             "There's an issue with tactical and strategic defenses not working when Nomads is enabled. This is due to",
             "changes to the base game done by patch 3741 that guarantees SMDs to function properly when there are",
@@ -3825,6 +3860,7 @@ gamePatches = {
     {
         version = 3742,
         name = 'Hotfix',
+        hasPrettyGithubRelease = true,
         description = {
             "# Game version 3742 (21st of August, 2022)",
             "",
@@ -3841,6 +3877,7 @@ gamePatches = {
     {
         version = 3741,
         name = 'Developers patch',
+        hasPrettyGithubRelease = true,
         description = {
             "# Game version 3741 (21st of August, 2022)",
             "",
@@ -4172,6 +4209,7 @@ gamePatches = {
     {
         version = 3740,
         name = "Hotfix",
+        hasPrettyGithubRelease = true,
         description = {
             "## Bug fixes",
             "",
@@ -4217,6 +4255,7 @@ gamePatches = {
     {
         version = 3739,
         name = "Hotfix",
+        hasPrettyGithubRelease = true,
         descriptionFR = {
             "## Correction de Bug",
             "",
@@ -4248,6 +4287,7 @@ gamePatches = {
     {
         version = 3738,
         name = "Developers patch",
+        hasPrettyGithubRelease = true,
         descriptionFR = {
 
             "Note de patch 3738 (19 juin 2022)",
@@ -4923,6 +4963,7 @@ gamePatches = {
     {
         version = 3737,
         name = "Developers patch",
+        hasPrettyGithubRelease = true,
         description = {
             " ### Features",
             "",
@@ -5006,6 +5047,7 @@ gamePatches = {
     {
         version = 3736,
         name = "Developers patch",
+        hasPrettyGithubRelease = true,
         description = {
             "### Features",
             "",
@@ -5084,6 +5126,7 @@ gamePatches = {
     {
         version = 3735,
         name = "Hotfix",
+        hasPrettyGithubRelease = true,
         description = {
             "### Bug fixes",
             "",
@@ -5120,6 +5163,7 @@ gamePatches = {
     {
         version = 3734,
         name = "Hotfix",
+        hasPrettyGithubRelease = true,
         description = {
             "### Bug fixes",
             "",
@@ -5134,6 +5178,7 @@ gamePatches = {
     {
         version = 3733,
         name = "Hotfix",
+        hasPrettyGithubRelease = true,
         description = {
             "### Bug fixes",
             "",
@@ -5147,6 +5192,7 @@ gamePatches = {
     {
         version = 3732,
         name = "Developers patch",
+        hasPrettyGithubRelease = true,
         description = {
             "### Features",
             "",
@@ -5480,6 +5526,7 @@ gamePatches = {
     {
         version = 3731,
         name = "Hotfix",
+        hasPrettyGithubRelease = true,
         description = {
             "### Features",
             "- Improve scoreboard (#3633)",
@@ -5530,6 +5577,7 @@ gamePatches = {
     {
         version = 3730,
         name = "Hotfix",
+        hasPrettyGithubRelease = true,
         description = {
             "",
             "Games using the featured mod Nomads will break when playing the Aeon ",
@@ -5557,6 +5605,7 @@ gamePatches = {
     {
         version = 3729,
         name = "Developers patch",
+        hasPrettyGithubRelease = true,
         description = {
             "### Features",
             " - (#3615) Happy Christmas (in advance) ^_^",
@@ -5575,6 +5624,7 @@ gamePatches = {
     {
         version = 3729,
         name = "Developers patch",
+        hasPrettyGithubRelease = true,
         description = {
             "A quick FAQ:",
             "- I lost all my mods, where did they go?",
@@ -5810,6 +5860,7 @@ gamePatches = {
     {
         version = 3727,
         name = "Hotfix",
+        hasPrettyGithubRelease = true,
         description = {
             '  **Bugs** ',
             '  - (#3571) Fix tree groups when they split',
@@ -5827,6 +5878,7 @@ gamePatches = {
     {
         version = 3726,
         name = "Hotfix",
+        hasPrettyGithubRelease = true,
         description = {
             '**Bugs** ',
             '- (#3565) Reverts changes to the buff mechanic',
@@ -5843,6 +5895,7 @@ gamePatches = {
         version = 3725,
         name = "Balance patch",
         hasPrettyPatchnotes = true,
+        hasPrettyGithubRelease = true,
         description = {
             '**Land**',
             '- Zthuee',
@@ -5966,6 +6019,7 @@ gamePatches = {
     {
         version = 3724,
         name = "Developers patch",
+        hasPrettyGithubRelease = true,
         description = {
             '**Gameplay**',
             ' - (#3450) An alternative approach to loading in custom strategic icons',
@@ -6014,6 +6068,7 @@ gamePatches = {
     {
         version = 3722,
         name = 'Hotfix',
+        hasPrettyGithubRelease = true,
         description = {
             '**Lobby**',
             'Updated balance patchnotes link',

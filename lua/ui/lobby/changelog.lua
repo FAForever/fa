@@ -28,6 +28,7 @@ isOpen = false
 
 ---@class PatchNotes
 ---@field version number | string       # Patch version
+---@field hasPrettyGithubRelease boolean  # URL to the release on Github
 ---@field name PatchNotesType           # Patch type
 ---@field hasPrettyPatchnotes boolean   # Refers to patchnotes.faforever.com, defaults to false
 ---@field descriptionFR string[]        # French translation
@@ -35,7 +36,6 @@ isOpen = false
 ---@field description string[]          # Default changelog in English
 
 ---@class UIChangelog : Group
----@field SelectedPatch PatchNotes
 ---@field Debug Group
 ---@field CommonUI Group
 ---@field Border Border
@@ -162,7 +162,7 @@ Changelog = ClassUI(Group) {
                 LayoutHelpers.ScaleNumber(20)
         end)
         self.FooterBetaBalanceButton.OnClick = function()
-            OpenURL('http://patchnotes.faforever.com/fafbeta')
+            OpenURL('http://patchnotes.faforever.com')
         end
 
         self.FooterDevelopButton = UIUtil.CreateButtonWithDropshadow(self.Footer, '/BUTTON/medium/', "FAF Develop")
@@ -271,14 +271,22 @@ Changelog = ClassUI(Group) {
     ---@param index number
     PopulateWithPatch = function(self, index)
         local patch = data.gamePatches[index + 1]
-        self.SelectedPatch = patch
 
         if patch then
-            self.SelectedPatch = patch
+
+            if patch.hasPrettyGithubRelease then
+                self.FooterGithubButton:Enable()
+                self.FooterGithubButton.OnClick = function()
+                    OpenURL(string.format('http://github.com/FAForever/fa/releases/tag/%d', patch.version))
+                end
+            else
+                self.FooterGithubButton:Disable()
+            end
+
             if patch.hasPrettyPatchnotes then
                 self.FooterPatchNotesButton:Enable()
                 self.FooterPatchNotesButton.OnClick = function()
-                    OpenURL(string.format('http://patchnotes.faforever.com/balance/%s.html', patch.version))
+                    OpenURL('http://patchnotes.faforever.com')
                 end
             else
                 self.FooterPatchNotesButton:Disable()
@@ -292,6 +300,9 @@ Changelog = ClassUI(Group) {
             for k, line in patch[altDescription] or patch.description do
                 self.ContentNotesList:AddItem(line)
             end
+        else
+            self.FooterGithubButton:Disable()
+            self.FooterPatchNotesButton:Disable()
         end
     end,
 
