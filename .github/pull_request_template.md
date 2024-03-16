@@ -1,10 +1,9 @@
-# Title
 
 <!-- 
 
-    General useful tooling:
+General useful tooling:
 
-    - [GifToScreen](https://www.screentogif.com/): Free, open source screen recorder that can export to MP4. If the changes are visual, these can help you tell us exactly what the changes imply!
+- [GifToScreen](https://www.screentogif.com/): Free, open source screen recorder that can export to MP4. If the changes are visual, these can help you tell us exactly what the changes imply!
 
  -->
 
@@ -12,9 +11,9 @@
 
 <!-- 
 
-    A clear and concise description (or visuals) of what the changes imply. If 
-    it closes an issue, make sure to use closing keywords to automatically link 
-    the issue.
+A clear and concise description (or visuals) of what the changes imply. If 
+it closes an issue, make sure to use closing keywords to automatically link 
+the issue.
 
 -->
 
@@ -22,14 +21,17 @@
 
 <!-- 
 
-    List all relevant testing that you've done to confirm the changes work.
+List all relevant testing that you've done to confirm the changes work.
 
 -->
 
 ## Additional context
 
-<!-- Add any other context about the pull request here. -->
+<!-- 
 
+Add any other context about the pull request here. 
+
+-->
 
 ## Checklist
 
