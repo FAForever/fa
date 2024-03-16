@@ -1669,7 +1669,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
         end
         local bp = self.Blueprint
         local fractionComplete = self:GetFractionComplete()
-        if fractionComplete < 0.5 or (bp.TechCategory == 'EXPERIMENTAL' or bp.CategoriesHash["STRUCTURE"] and fractionComplete < 1) then
+        if fractionComplete < 0.5 or ((bp.TechCategory == 'EXPERIMENTAL' or bp.CategoriesHash["STRUCTURE"]) and fractionComplete < 1) then
             return
         end
         return self:CreateWreckageProp(overkillRatio)
