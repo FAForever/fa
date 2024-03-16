@@ -35,5 +35,5 @@ Add any other context about the pull request here.
 
 ## Checklist
 
-- [ ] Changes are documented using comments where useful
+- [ ] Changes are annotated, including comments where useful
 - [ ] Changes are documented in the changelog for the next game version
