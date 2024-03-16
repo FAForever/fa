@@ -49,8 +49,6 @@ isOpen = false
 ---@field Footer Group
 ---@field FooterDebug Bitmap
 ---@field FooterGithubButton Button
----@field FooterBetaBalanceButton Button
----@field FooterDevelopButton Button
 ---@field FooterPatchNotesButton Button
 ---@field FooterDiscordButton Button
 ---@field Content Group
@@ -155,33 +153,13 @@ Changelog = ClassUI(Group) {
             OpenURL('http://github.com/FAForever/fa/releases')
         end
 
-        self.FooterBetaBalanceButton = UIUtil.CreateButtonWithDropshadow(self.Footer, '/BUTTON/medium/', "Beta Balance")
-        LayoutHelpers.AtVerticalCenterIn(self.FooterBetaBalanceButton, self.Footer)
-        LayoutHelpers.DepthOverParent(self.FooterBetaBalanceButton, self.Footer, 5)
-        self.FooterBetaBalanceButton.Left:Set(function() return self.FooterGithubButton.Right() -
-                LayoutHelpers.ScaleNumber(20)
-        end)
-        self.FooterBetaBalanceButton.OnClick = function()
-            OpenURL('http://patchnotes.faforever.com')
-        end
-
-        self.FooterDevelopButton = UIUtil.CreateButtonWithDropshadow(self.Footer, '/BUTTON/medium/', "FAF Develop")
-        LayoutHelpers.AtVerticalCenterIn(self.FooterDevelopButton, self.Footer)
-        LayoutHelpers.DepthOverParent(self.FooterDevelopButton, self.Footer, 5)
-        self.FooterDevelopButton.Left:Set(function() return self.FooterBetaBalanceButton.Right() -
-                LayoutHelpers.ScaleNumber(20)
-        end)
-        self.FooterDevelopButton.OnClick = function()
-            OpenURL('http://patchnotes.faforever.com/fafdevelop')
-        end
-
-        self.FooterPatchNotesButton = UIUtil.CreateButtonWithDropshadow(self.Footer, '/BUTTON/medium/', "Balance notes")
+        self.FooterPatchNotesButton = UIUtil.CreateButtonWithDropshadow(self.Footer, '/BUTTON/medium/', "Patchnotes")
         LayoutHelpers.AtVerticalCenterIn(self.FooterPatchNotesButton, self.Footer, 2)
         LayoutHelpers.DepthOverParent(self.FooterPatchNotesButton, self.Footer, 5)
         self.FooterPatchNotesButton.Right:Set(function() return self.Footer.Right() - LayoutHelpers.ScaleNumber(220) end)
         self.FooterPatchNotesButton:Disable()
         self.FooterPatchNotesButton.OnClick = function()
-            OpenURL('http://github.com/FAForever/fa/blob/develop/changelog.md')
+            OpenURL('http://patchnotes.faforever.com')
         end
 
         self.FooterDiscordButton = UIUtil.CreateButtonWithDropshadow(self.Footer, '/BUTTON/medium/', "Report a bug")
