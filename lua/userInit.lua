@@ -115,9 +115,21 @@ end
 
 
 do
-    -- upvalues for security reasons
+    -- upvalue scope for security reasons
+    local tonumber = tonumber
     local lower = string.lower
     local find = string.find
+    local match = string.match
+
+    local TableGetn = table.getn
+
+    local GameTick = GameTick
+    local GetFocusArmy = GetFocusArmy
+    local SessionIsReplay = SessionIsReplay
+    local SessionRequestPause = SessionRequestPause
+    local GetSessionClients = GetSessionClients
+
+    local tickstamp = 0
 
     local oldConExecute = ConExecute
 
@@ -128,6 +140,67 @@ do
         -- do not allow network changes
         if find(lower, 'net_') then
             return
+        end
+
+        -- do a basic check
+        if find(lower, 'setfocusarmy') then
+            if not SessionIsReplay() then
+                local clients = GetSessionClients()
+                local currentFocusArmy = GetFocusArmy()
+                local proposedFocusArmy = tonumber(match(command, '%d+'))
+
+                if find(command, '-') then
+                    proposedFocusArmy = proposedFocusArmy * -1
+                else
+                    proposedFocusArmy = proposedFocusArmy + 1
+                end
+
+                LOG("ConExecute: " .. command, currentFocusArmy, proposedFocusArmy)
+
+                if TableGetn(clients) > 0 and proposedFocusArmy and currentFocusArmy != proposedFocusArmy then
+                    command = "SetFocusArmy " .. (currentFocusArmy - 1)
+
+                    -- try to inform moderators
+                    SimCallback(
+                        {
+                            Func="GiveResourcesToPlayer",
+                            Args= {
+                                From=currentFocusArmy,
+                                To=currentFocusArmy,
+                                Mass=0,
+                                Energy=0,
+                                Sender=currentFocusArmy, 
+                                Msg=string.format("Is trying to change focus army from %d to %d via 'ConExecute'!", currentFocusArmy, proposedFocusArmy)
+                            },
+                        },
+                        false
+                    )
+
+                    local tick = GameTick()
+                    if tickstamp + 10 > tick then
+                        -- try to inform moderators
+                        SimCallback(
+                            {
+                                Func="GiveResourcesToPlayer",
+                                Args= {
+                                    From=currentFocusArmy,
+                                    To=currentFocusArmy,
+                                    Mass=0,
+                                    Energy=0,
+                                    Sender=currentFocusArmy, 
+                                    Msg=string.format("Is (aggressively) trying to change focus army from %d to %d via 'ConExecute'!", currentFocusArmy, proposedFocusArmy)
+                                },
+                            },
+                            false
+                        )
+
+                        -- just to be annoying
+                        SessionRequestPause()
+                    end
+    
+                    tickstamp = tick
+                end
+            end
         end
 
         oldConExecute(command)
@@ -142,6 +215,65 @@ do
         -- do not allow network changes
         if find(lower, 'net_') then
             return
+        end
+
+        -- do a basic check
+        if find(lower, 'setfocusarmy') then
+            if not SessionIsReplay() then
+                local clients = GetSessionClients()
+                local currentFocusArmy = GetFocusArmy()
+                local proposedFocusArmy = tonumber(match(command, '%d+'))
+
+                if find(command, '-') then
+                    proposedFocusArmy = proposedFocusArmy * -1
+                else
+                    proposedFocusArmy = proposedFocusArmy + 1
+                end
+
+                if TableGetn(clients) > 0 and proposedFocusArmy and currentFocusArmy != proposedFocusArmy then
+                    command = "SetFocusArmy " .. (currentFocusArmy - 1)
+
+                    -- try to inform moderators
+                    SimCallback(
+                        {
+                            Func="GiveResourcesToPlayer",
+                            Args= {
+                                From=currentFocusArmy,
+                                To=currentFocusArmy,
+                                Mass=0,
+                                Energy=0,
+                                Sender=currentFocusArmy, 
+                                Msg=string.format("Is trying to change focus army from %d to %d via 'ConExecuteSave'!", currentFocusArmy, proposedFocusArmy)
+                            },
+                        },
+                        false
+                    )
+
+                    local tick = GameTick()
+                    if tickstamp + 10 > tick then
+                        -- try to inform moderators
+                        SimCallback(
+                            {
+                                Func="GiveResourcesToPlayer",
+                                Args= {
+                                    From=currentFocusArmy,
+                                    To=currentFocusArmy,
+                                    Mass=0,
+                                    Energy=0,
+                                    Sender=currentFocusArmy, 
+                                    Msg=string.format("Is (aggressively) trying to change focus army from %d to %d via 'ConExecuteSave'!", currentFocusArmy, proposedFocusArmy)
+                                },
+                            },
+                            false
+                        )
+
+                        -- just to be annoying
+                        SessionRequestPause()
+                    end
+    
+                    tickstamp = tick
+                end
+            end
         end
 
         oldConExecuteSave(command)
@@ -409,5 +541,74 @@ do
         end
 
         return OldIncreaseBuildCountInQueue(index, count)
+    end
+end
+
+do
+    -- upvalue scope for security reasons
+    local TableGetn = table.getn
+
+    local GameTick = GameTick
+    local GetFocusArmy = GetFocusArmy
+    local SessionIsReplay = SessionIsReplay
+    local SessionRequestPause = SessionRequestPause
+    local GetSessionClients = GetSessionClients
+    local oldSetFocusArmy = SetFocusArmy
+    local tickstamp = 0
+
+
+    _G.SetFocusArmy = function(number)
+        -- do a basic check
+        if not SessionIsReplay() then
+            local clients = GetSessionClients()
+            local currentFocusArmy = GetFocusArmy()
+            local proposedFocusArmy = number
+
+            if TableGetn(clients) > 0 and proposedFocusArmy and currentFocusArmy != proposedFocusArmy then
+                number = currentFocusArmy
+
+                -- try to inform moderators
+                SimCallback(
+                    {
+                        Func="GiveResourcesToPlayer",
+                        Args= {
+                            From=currentFocusArmy,
+                            To=currentFocusArmy,
+                            Mass=0,
+                            Energy=0,
+                            Sender=currentFocusArmy, 
+                            Msg=string.format("Is trying to change focus army from %d to %d via 'SetFocusArmy'!", currentFocusArmy, proposedFocusArmy)
+                        },
+                    },
+                    false
+                )
+
+                local tick = GameTick()
+                if tickstamp + 10 > tick then
+                    -- try to inform moderators
+                    SimCallback(
+                        {
+                            Func="GiveResourcesToPlayer",
+                            Args= {
+                                From=currentFocusArmy,
+                                To=currentFocusArmy,
+                                Mass=0,
+                                Energy=0,
+                                Sender=currentFocusArmy, 
+                                Msg=string.format("Is (aggressively) trying to change focus army from %d to %d via 'SetFocusArmy'!", currentFocusArmy, proposedFocusArmy)
+                            },
+                        },
+                        false
+                    )
+
+                    -- just to be annoying
+                    SessionRequestPause()
+                end
+
+                tickstamp = tick
+            end
+        end
+
+        oldSetFocusArmy(number)
     end
 end
