@@ -178,7 +178,7 @@ do
                                 Mass=0,
                                 Energy=0,
                                 Sender=localClient.name,
-                                Msg=string.format("Is trying to change focus army from %d to %d via 'ConExecute'!", currentFocusArmy, proposedFocusArmy)
+                                Msg=string.format("Is trying to change focus army from %d to %d via ConExecute!", currentFocusArmy, proposedFocusArmy)
                             },
                         },
                         true
@@ -196,7 +196,7 @@ do
                                     Mass=0,
                                     Energy=0,
                                     Sender=localClient.name,
-                                    Msg=string.format("Is (aggressively) trying to change focus army from %d to %d via 'ConExecute'!", currentFocusArmy, proposedFocusArmy)
+                                    Msg=string.format("Is (aggressively) trying to change focus army from %d to %d via ConExecute!", currentFocusArmy, proposedFocusArmy)
                                 },
                             },
                             true
@@ -259,7 +259,7 @@ do
                                 Mass=0,
                                 Energy=0,
                                 Sender=localClient.name,
-                                Msg=string.format("Is trying to change focus army from %d to %d via 'ConExecuteSave'!", currentFocusArmy, proposedFocusArmy)
+                                Msg=string.format("Is trying to change focus army from %d to %d via ConExecuteSave!", currentFocusArmy, proposedFocusArmy)
                             },
                         },
                         true
@@ -277,7 +277,7 @@ do
                                     Mass=0,
                                     Energy=0,
                                     Sender=localClient.name,
-                                    Msg=string.format("Is (aggressively) trying to change focus army from %d to %d via 'ConExecuteSave'!", currentFocusArmy, proposedFocusArmy)
+                                    Msg=string.format("Is (aggressively) trying to change focus army from %d to %d via ConExecuteSave!", currentFocusArmy, proposedFocusArmy)
                                 },
                             },
                             true
@@ -601,7 +601,7 @@ do
                             Mass=0,
                             Energy=0,
                             Sender=localClient.name,
-                            Msg=string.format("Is trying to change focus army from %d to %d via 'SetFocusArmy'!", currentFocusArmy, proposedFocusArmy)
+                            Msg=string.format("Is trying to change focus army from %d to %d via SetFocusArmy!", currentFocusArmy, proposedFocusArmy)
                         },
                     },
                     true
@@ -619,7 +619,7 @@ do
                                 Mass=0,
                                 Energy=0,
                                 Sender=localClient.name,
-                                Msg=string.format("Is (aggressively) trying to change focus army from %d to %d via 'SetFocusArmy'!", currentFocusArmy, proposedFocusArmy)
+                                Msg=string.format("Is (aggressively) trying to change focus army from %d to %d via SetFocusArmy!", currentFocusArmy, proposedFocusArmy)
                             },
                         },
                         true
