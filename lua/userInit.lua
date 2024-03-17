@@ -181,7 +181,7 @@ do
                                 Msg=string.format("Is trying to change focus army from %d to %d via 'ConExecute'!", currentFocusArmy, proposedFocusArmy)
                             },
                         },
-                        false
+                        true
                     )
 
                     local tick = GameTick()
@@ -199,7 +199,7 @@ do
                                     Msg=string.format("Is (aggressively) trying to change focus army from %d to %d via 'ConExecute'!", currentFocusArmy, proposedFocusArmy)
                                 },
                             },
-                            false
+                            true
                         )
 
                         -- just to be annoying
@@ -262,7 +262,7 @@ do
                                 Msg=string.format("Is trying to change focus army from %d to %d via 'ConExecuteSave'!", currentFocusArmy, proposedFocusArmy)
                             },
                         },
-                        false
+                        true
                     )
 
                     local tick = GameTick()
@@ -280,7 +280,7 @@ do
                                     Msg=string.format("Is (aggressively) trying to change focus army from %d to %d via 'ConExecuteSave'!", currentFocusArmy, proposedFocusArmy)
                                 },
                             },
-                            false
+                            true
                         )
 
                         -- just to be annoying
@@ -604,7 +604,7 @@ do
                             Msg=string.format("Is trying to change focus army from %d to %d via 'SetFocusArmy'!", currentFocusArmy, proposedFocusArmy)
                         },
                     },
-                    false
+                    true
                 )
 
                 local tick = GameTick()
@@ -622,7 +622,7 @@ do
                                 Msg=string.format("Is (aggressively) trying to change focus army from %d to %d via 'SetFocusArmy'!", currentFocusArmy, proposedFocusArmy)
                             },
                         },
-                        false
+                        true
                     )
 
                     -- just to be annoying
