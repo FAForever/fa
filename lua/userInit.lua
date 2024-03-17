@@ -128,6 +128,7 @@ do
     local SessionIsReplay = SessionIsReplay
     local SessionRequestPause = SessionRequestPause
     local GetSessionClients = GetSessionClients
+    local SessionGetScenarioInfo = SessionGetScenarioInfo
 
     local tickstamp = 0
 
@@ -154,7 +155,9 @@ do
 
         -- do a basic check
         if find(lower, 'setfocusarmy') then
-            if not SessionIsReplay() then
+            local isCheatsEnabled = SessionGetScenarioInfo().Options.CheatsEnabled == "true"
+
+            if not (SessionIsReplay() or isCheatsEnabled) then
                 local clients = GetSessionClients()
                 local localClient = nil
                 for k = 1, TableGetn(clients) do
@@ -175,7 +178,7 @@ do
 
                 LOG("ConExecute: " .. command, currentFocusArmy, proposedFocusArmy)
 
-                if localClient and TableGetn(clients) > 0 and proposedFocusArmy and currentFocusArmy != proposedFocusArmy then
+                if localClient and TableGetn(clients) > 1 and proposedFocusArmy and currentFocusArmy != proposedFocusArmy then
                     command = "SetFocusArmy " .. (currentFocusArmy - 1)
 
                     -- try to inform moderators
@@ -247,7 +250,9 @@ do
 
         -- do a basic check
         if find(lower, 'setfocusarmy') then
-            if not SessionIsReplay() then
+            local isCheatsEnabled = SessionGetScenarioInfo().Options.CheatsEnabled == "true"
+
+            if not (SessionIsReplay() or isCheatsEnabled) then
                 local clients = GetSessionClients()
                 local localClient = nil
                 for k = 1, TableGetn(clients) do
@@ -266,7 +271,7 @@ do
                     proposedFocusArmy = proposedFocusArmy + 1
                 end
 
-                if localClient and TableGetn(clients) > 0 and proposedFocusArmy and currentFocusArmy != proposedFocusArmy then
+                if localClient and TableGetn(clients) > 1 and proposedFocusArmy and currentFocusArmy != proposedFocusArmy then
                     command = "SetFocusArmy " .. (currentFocusArmy - 1)
 
                     -- try to inform moderators
@@ -651,6 +656,7 @@ do
     local GetFocusArmy = GetFocusArmy
     local SessionIsReplay = SessionIsReplay
     local SessionRequestPause = SessionRequestPause
+    local SessionGetScenarioInfo = SessionGetScenarioInfo
     local GetSessionClients = GetSessionClients
     local oldSetFocusArmy = SetFocusArmy
     local tickstamp = 0
@@ -658,7 +664,8 @@ do
 
     _G.SetFocusArmy = function(number)
         -- do a basic check
-        if not SessionIsReplay() then
+        local isCheatsEnabled = SessionGetScenarioInfo().Options.CheatsEnabled == "true"
+        if not (SessionIsReplay() or isCheatsEnabled) then
             local clients = GetSessionClients()
             local localClient = nil
             for k = 1, TableGetn(clients) do
@@ -671,7 +678,7 @@ do
             local currentFocusArmy = GetFocusArmy()
             local proposedFocusArmy = number
 
-            if localClient and TableGetn(clients) > 0 and proposedFocusArmy and currentFocusArmy != proposedFocusArmy then
+            if localClient and TableGetn(clients) > 1 and proposedFocusArmy and currentFocusArmy != proposedFocusArmy then
                 number = currentFocusArmy
 
                 -- try to inform moderators
