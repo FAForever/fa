@@ -1,8 +1,22 @@
 ---@type number
-last_version = 3801
+last_version = 3802
 
 ---@type PatchNotes[]
 gamePatches = {
+    {
+        version = 3802,
+        name = "Hotfix",
+        hasPrettyGithubRelease = true,
+        description = {
+            "# Game Version 3802 (17th of March, 2024)",
+            "",
+            "Various small fixes for bugs that were reported by players.",
+            "",
+            "With gratitude to all those who took the time to report issues,",
+            "",
+            "Jip",
+        }
+    },
     {
         version = 3801,
         name = "Developers patch",

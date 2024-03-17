@@ -130,7 +130,7 @@ function OnSync()
                         Mass=0,
                         Energy=0,
                         Sender=localClient.name,
-                        Msg={ to='moderators', text = string.format("Switched focus army from %d to %d!", Sync.FocusArmyChanged.old, Sync.FocusArmyChanged.new) }
+                        Msg={ to='moderators', text = string.format("Switched focus army from %s to %s!", tostring(Sync.FocusArmyChanged.old), tostring(Sync.FocusArmyChanged.new)) }
                     },
                 },
                 true
