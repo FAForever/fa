@@ -487,15 +487,9 @@ AIBrain = Class(FactoryManagerBrainComponent, StatManagerBrainComponent, JammerM
 
                 local commanders = self:GetListOfUnits(categories.COMMAND, false)
                 for _, com in commanders do
-                    if com:GetHealth() == com:GetMaxHealth() then
-                        local comShield = com.MyShield
-                        if comShield then
-                            if comShield:GetHealth() == comShield:GetMaxHealth() then
-                                table.insert(safeCommanders, com)
-                            end
-                        else
-                            table.insert(safeCommanders, com)
-                        end
+                    -- 2 minutes since last damaged
+                    if com.LastTickDamaged == nil or com.LastTickDamaged + 1200 <= GetGameTick() then
+                        table.insert(safeCommanders, com)
                     end
                 end
 

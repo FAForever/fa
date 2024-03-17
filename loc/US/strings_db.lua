@@ -7745,7 +7745,7 @@ lobui_0796="Partial Share"
 lobui_0797="Your buildings and engineers will be transferred to your highest rated ally when you die.  Your other units will be destroyed when you die, except those captured by the enemy."
 
 lobui_0798="DC Share Conditions"
-lobui_0799="Set what happens to a player's units when they disconnect. In Assassination, only applies if an ACU is at full health/shield."
+lobui_0799="Set what happens to a player's units when they disconnect. In Assassination, only applies if an ACU has not been damaged in the last 2 minutes."
 lobui_0800="Same as Share Condition"
 lobui_0801="Treat disconnecting players the same as defeated players."
 
@@ -7758,9 +7758,9 @@ lobui_0806="Yes"
 lobui_0807="This game will not be rated."
 
 lobui_0808="Recall Disconnected ACUs"
-lobui_0809="Should disconnecting players' full health/shield ACUs be recalled, preventing their explosion?"
+lobui_0809="Should disconnecting players' ACUs be recalled, preventing their explosion if they were not damaged in the last 2 minutes?"
 lobui_0810="ACUs explode when their player disconnects."
-lobui_0811="ACUs that are at full health and shield are recalled when their player disconnects."
+lobui_0811="ACUs not damaged in the last 2 minutes are recalled when their player disconnects."
 
 aisettings_0001="AIx Cheat Multiplier"
 aisettings_0002="Set the cheat multiplier for the cheating AIs."
