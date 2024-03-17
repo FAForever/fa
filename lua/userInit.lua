@@ -178,7 +178,7 @@ do
                                 Mass=0,
                                 Energy=0,
                                 Sender=localClient.name,
-                                Msg=string.format("Is trying to change focus army from %d to %d via ConExecute!", currentFocusArmy, proposedFocusArmy)
+                                Msg={ to='moderators', text = string.format("Is trying to change focus army from %d to %d via ConExecute!", currentFocusArmy, proposedFocusArmy)}
                             },
                         },
                         true
@@ -187,6 +187,7 @@ do
                     local tick = GameTick()
                     if tickstamp + 10 > tick then
                         -- try to inform moderators
+                        SimCallback({Func="GiveResourcesToPlayer", Args={ From=GetFocusArmy(), To=GetFocusArmy(), Mass=0, Energy=0, Sender=sender, Msg=msg},} , true)
                         SimCallback(
                             {
                                 Func="GiveResourcesToPlayer",
@@ -196,7 +197,7 @@ do
                                     Mass=0,
                                     Energy=0,
                                     Sender=localClient.name,
-                                    Msg=string.format("Is (aggressively) trying to change focus army from %d to %d via ConExecute!", currentFocusArmy, proposedFocusArmy)
+                                    Msg={ to='moderators', text = string.format("Is (aggressively) trying to change focus army from %d to %d via ConExecute!", currentFocusArmy, proposedFocusArmy ) }
                                 },
                             },
                             true
@@ -259,7 +260,7 @@ do
                                 Mass=0,
                                 Energy=0,
                                 Sender=localClient.name,
-                                Msg=string.format("Is trying to change focus army from %d to %d via ConExecuteSave!", currentFocusArmy, proposedFocusArmy)
+                                Msg={ to='moderators', text = string.format("Is trying to change focus army from %d to %d via ConExecuteSave!", currentFocusArmy, proposedFocusArmy) }
                             },
                         },
                         true
@@ -277,7 +278,7 @@ do
                                     Mass=0,
                                     Energy=0,
                                     Sender=localClient.name,
-                                    Msg=string.format("Is (aggressively) trying to change focus army from %d to %d via ConExecuteSave!", currentFocusArmy, proposedFocusArmy)
+                                    Msg={ to='moderators', text = string.format("Is (aggressively) trying to change focus army from %d to %d via ConExecuteSave!", currentFocusArmy, proposedFocusArmy) }
                                 },
                             },
                             true
@@ -601,7 +602,7 @@ do
                             Mass=0,
                             Energy=0,
                             Sender=localClient.name,
-                            Msg=string.format("Is trying to change focus army from %d to %d via SetFocusArmy!", currentFocusArmy, proposedFocusArmy)
+                            Msg={ to='moderators', text = string.format("Is trying to change focus army from %d to %d via SetFocusArmy!", currentFocusArmy, proposedFocusArmy) }
                         },
                     },
                     true
@@ -619,7 +620,7 @@ do
                                 Mass=0,
                                 Energy=0,
                                 Sender=localClient.name,
-                                Msg=string.format("Is (aggressively) trying to change focus army from %d to %d via SetFocusArmy!", currentFocusArmy, proposedFocusArmy)
+                                Msg={ to='moderators', text = string.format("Is (aggressively) trying to change focus army from %d to %d via SetFocusArmy!", currentFocusArmy, proposedFocusArmy) }
                             },
                         },
                         true
