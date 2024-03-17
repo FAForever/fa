@@ -52,6 +52,7 @@ local Callbacks = {}
 ---@param data table
 ---@param units? Unit[]
 function DoCallback(name, data, units)
+    LOG(name, repru(data))
     local start = GetSystemTimeSecondsOnlyForProfileUse()
     local fn = Callbacks[name];
     if fn then
