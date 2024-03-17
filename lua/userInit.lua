@@ -176,7 +176,7 @@ do
                     proposedFocusArmy = proposedFocusArmy + 1
                 end
 
-                if localClient and TableGetn(clients) > 1 and proposedFocusArmy and currentFocusArmy != proposedFocusArmy then
+                if localClient and TableGetn(clients) > 1 and proposedFocusArmy then
                     command = "SetFocusArmy " .. (currentFocusArmy - 1)
 
                     -- try to inform moderators
@@ -207,14 +207,11 @@ do
                                     Mass=0,
                                     Energy=0,
                                     Sender=localClient.name,
-                                    Msg={ to='moderators', text = string.format("Is (aggressively) trying to change focus army from %d to %d via ConExecute!", currentFocusArmy, proposedFocusArmy ) }
+                                    Msg={ to='moderators', text = string.format("Is (continously) trying to change focus army from %d to %d via ConExecute!", currentFocusArmy, proposedFocusArmy ) }
                                 },
                             },
                             true
                         )
-
-                        -- just to be annoying
-                        SessionRequestPause()
                     end
     
                     tickstamp = tick
@@ -269,7 +266,7 @@ do
                     proposedFocusArmy = proposedFocusArmy + 1
                 end
 
-                if localClient and TableGetn(clients) > 1 and proposedFocusArmy and currentFocusArmy != proposedFocusArmy then
+                if localClient and TableGetn(clients) > 1 and proposedFocusArmy then
                     command = "SetFocusArmy " .. (currentFocusArmy - 1)
 
                     -- try to inform moderators
@@ -300,14 +297,11 @@ do
                                     Mass=0,
                                     Energy=0,
                                     Sender=localClient.name,
-                                    Msg={ to='moderators', text = string.format("Is (aggressively) trying to change focus army from %d to %d via ConExecuteSave!", currentFocusArmy, proposedFocusArmy) }
+                                    Msg={ to='moderators', text = string.format("Is (continously) trying to change focus army from %d to %d via ConExecuteSave!", currentFocusArmy, proposedFocusArmy) }
                                 },
                             },
                             true
                         )
-
-                        -- just to be annoying
-                        SessionRequestPause()
                     end
     
                     tickstamp = tick
@@ -676,7 +670,7 @@ do
             local currentFocusArmy = GetFocusArmy()
             local proposedFocusArmy = number
 
-            if localClient and TableGetn(clients) > 1 and proposedFocusArmy and currentFocusArmy != proposedFocusArmy then
+            if localClient and TableGetn(clients) > 1 and proposedFocusArmy then
                 number = currentFocusArmy
 
                 -- try to inform moderators
@@ -707,14 +701,11 @@ do
                                 Mass=0,
                                 Energy=0,
                                 Sender=localClient.name,
-                                Msg={ to='moderators', text = string.format("Is (aggressively) trying to change focus army from %d to %d via SetFocusArmy!", currentFocusArmy, proposedFocusArmy) }
+                                Msg={ to='moderators', text = string.format("Is (continously) trying to change focus army from %d to %d via SetFocusArmy!", currentFocusArmy, proposedFocusArmy) }
                             },
                         },
                         true
                     )
-
-                    -- just to be annoying
-                    SessionRequestPause()
                 end
 
                 tickstamp = tick
