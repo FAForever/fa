@@ -166,7 +166,7 @@ do
                         break
                     end
                 end
-                
+
                 local currentFocusArmy = GetFocusArmy()
                 local proposedFocusArmy = tonumber(match(command, '%d+'))
 
@@ -175,8 +175,6 @@ do
                 else
                     proposedFocusArmy = proposedFocusArmy + 1
                 end
-
-                LOG("ConExecute: " .. command, currentFocusArmy, proposedFocusArmy)
 
                 if localClient and TableGetn(clients) > 1 and proposedFocusArmy and currentFocusArmy != proposedFocusArmy then
                     command = "SetFocusArmy " .. (currentFocusArmy - 1)

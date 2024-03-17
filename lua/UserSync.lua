@@ -108,6 +108,35 @@ function OnSync()
         if Sync.GameEnded then
             GpgNetSend('GameEnded')
         end
+
+        -- Informs moderators that the focus army has changed for the local player
+        if Sync.FocusArmyChanged then
+            local clients = GetSessionClients()
+            local localClient = nil
+            for k = 1, table.getn(clients) do
+                if clients[k]["local"] then
+                    localClient = clients[k]
+                    break
+                end
+            end
+
+            -- try to inform moderators
+            SimCallback(
+                {
+                    Func="GiveResourcesToPlayer",
+                    Args= {
+                        From=Sync.FocusArmyChanged.old,
+                        To=Sync.FocusArmyChanged.old,
+                        Mass=0,
+                        Energy=0,
+                        Sender=localClient.name,
+                        Msg={ to='moderators', text = string.format("Switched focus army from %d to %d!", Sync.FocusArmyChanged.old, Sync.FocusArmyChanged.new) }
+                    },
+                },
+                true
+            )
+        end
+
     end
 
     -- old sync callbacks
