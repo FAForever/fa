@@ -566,7 +566,7 @@ RestoreCameraPosition = function()
     camera:MoveTo(settings.Focus, { settings.Heading, settings.Pitch, 0 }, settings.Zoom, 0)
 end
 
-local function SeparateDiveStatus(units)
+function SeparateDiveStatus(units)
     local dummyUnitTable = {}
     local categoriesSubmersible = categories.SUBMERSIBLE
 
