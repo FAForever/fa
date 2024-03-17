@@ -8,7 +8,7 @@ gamePatches = {
         name = "Hotfix",
         hasPrettyGithubRelease = true,
         description = {
-            "# Game Version 3803 (17th of March, 2023)",
+            "# Game Version 3803 (17th of March, 2024)",
             "",
             "Various small fixes for bugs that were reported by players.",
             "",
