@@ -142,6 +142,16 @@ do
             return
         end
 
+        -- inform allies about self-destructed units
+        if find(lower, 'killselectedunits') then
+            local selectedUnits = GetSelectedUnits()
+            SessionSendChatMessage(import('/lua/ui/game/clientutils.lua').GetAllies(), {
+                to = 'allies',
+                text = string.format('Self-destructed %d units', TableGetn(selectedUnits)),
+                Chat = true,
+            })
+        end
+
         -- do a basic check
         if find(lower, 'setfocusarmy') then
             if not SessionIsReplay() then
@@ -225,6 +235,16 @@ do
             return
         end
 
+        -- inform allies about self-destructed units
+        if find(lower, 'killselectedunits') then
+            local selectedUnits = GetSelectedUnits()
+            SessionSendChatMessage(import('/lua/ui/game/clientutils.lua').GetAllies(), {
+                to = 'allies',
+                text = string.format('Self-destructed %d units', TableGetn(selectedUnits)),
+                Chat = true,
+            })
+        end
+
         -- do a basic check
         if find(lower, 'setfocusarmy') then
             if not SessionIsReplay() then
@@ -293,6 +313,24 @@ do
         end
 
         oldConExecuteSave(command)
+    end
+
+    local oldSimCallback = SimCallback
+
+    ---@param callback SimCallback
+    ---@param addUnitSelection boolean
+    _G.SimCallback = function(callback, addUnitSelection)
+        -- inform allies about self-destructed units
+        if callback.Func == 'ToggleSelfDestruct' then
+            local selectedUnits = GetSelectedUnits()
+            SessionSendChatMessage(import('/lua/ui/game/clientutils.lua').GetAllies(), {
+                to = 'allies',
+                text = string.format('Self-destructed %d units', TableGetn(selectedUnits)),
+                Chat = true,
+            })
+        end
+
+        oldSimCallback(callback, addUnitSelection or false)
     end
 
     --- Retrieves the terrain elevation, can be compared with the y coordinate of `GetMouseWorldPos` to determine if the mouse is above water
