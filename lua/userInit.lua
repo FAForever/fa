@@ -320,6 +320,16 @@ do
     ---@param callback SimCallback
     ---@param addUnitSelection boolean
     _G.SimCallback = function(callback, addUnitSelection)
+        local clients = GetSessionClients()
+        local localClient = nil
+        for k = 1, TableGetn(clients) do
+            if clients[k]["local"] then
+                localClient = clients[k]
+                break
+            end
+        end
+        local currentFocusArmy = GetFocusArmy()
+
         -- inform allies about self-destructed units
         if callback.Func == 'ToggleSelfDestruct' then
             local selectedUnits = GetSelectedUnits()
@@ -328,6 +338,41 @@ do
                 text = string.format('Self-destructed %d units', TableGetn(selectedUnits)),
                 Chat = true,
             })
+        end
+
+        -- inform moderators about pings
+        if callback.Func == 'SpawnPing' then
+            if callback.Args.Marker then
+                SimCallback(
+                    {
+                        Func="GiveResourcesToPlayer",
+                        Args= {
+                            From=currentFocusArmy,
+                            To=currentFocusArmy,
+                            Mass=0,
+                            Energy=0,
+                            Sender=localClient.name,
+                            Msg={ to='moderators', text = string.format("Created a marker with the text: '%s'", tostring(callback.Args.Name)) }
+                        },
+                    },
+                    true
+                )
+            else
+                SimCallback(
+                    {
+                        Func="GiveResourcesToPlayer",
+                        Args= {
+                            From=currentFocusArmy,
+                            To=currentFocusArmy,
+                            Mass=0,
+                            Energy=0,
+                            Sender=localClient.name,
+                            Msg={ to='moderators', text = string.format("Created a ping of type '%s'", tostring(callback.Args.Type)) }
+                        },
+                    },
+                    true
+                )
+            end
         end
 
         oldSimCallback(callback, addUnitSelection or false)
