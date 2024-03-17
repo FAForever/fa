@@ -146,6 +146,14 @@ do
         if find(lower, 'setfocusarmy') then
             if not SessionIsReplay() then
                 local clients = GetSessionClients()
+                local localClient = nil
+                for k = 1, TableGetn(clients) do
+                    if clients[k]["local"] then
+                        localClient = clients[k]
+                        break
+                    end
+                end
+                
                 local currentFocusArmy = GetFocusArmy()
                 local proposedFocusArmy = tonumber(match(command, '%d+'))
 
@@ -157,7 +165,7 @@ do
 
                 LOG("ConExecute: " .. command, currentFocusArmy, proposedFocusArmy)
 
-                if TableGetn(clients) > 0 and proposedFocusArmy and currentFocusArmy != proposedFocusArmy then
+                if localClient and TableGetn(clients) > 0 and proposedFocusArmy and currentFocusArmy != proposedFocusArmy then
                     command = "SetFocusArmy " .. (currentFocusArmy - 1)
 
                     -- try to inform moderators
@@ -169,7 +177,7 @@ do
                                 To=currentFocusArmy,
                                 Mass=0,
                                 Energy=0,
-                                Sender=currentFocusArmy, 
+                                Sender=localClient.name,
                                 Msg=string.format("Is trying to change focus army from %d to %d via 'ConExecute'!", currentFocusArmy, proposedFocusArmy)
                             },
                         },
@@ -187,7 +195,7 @@ do
                                     To=currentFocusArmy,
                                     Mass=0,
                                     Energy=0,
-                                    Sender=currentFocusArmy, 
+                                    Sender=localClient.name,
                                     Msg=string.format("Is (aggressively) trying to change focus army from %d to %d via 'ConExecute'!", currentFocusArmy, proposedFocusArmy)
                                 },
                             },
@@ -221,6 +229,14 @@ do
         if find(lower, 'setfocusarmy') then
             if not SessionIsReplay() then
                 local clients = GetSessionClients()
+                local localClient = nil
+                for k = 1, TableGetn(clients) do
+                    if clients[k]["local"] then
+                        localClient = clients[k]
+                        break
+                    end
+                end
+
                 local currentFocusArmy = GetFocusArmy()
                 local proposedFocusArmy = tonumber(match(command, '%d+'))
 
@@ -230,7 +246,7 @@ do
                     proposedFocusArmy = proposedFocusArmy + 1
                 end
 
-                if TableGetn(clients) > 0 and proposedFocusArmy and currentFocusArmy != proposedFocusArmy then
+                if localClient and TableGetn(clients) > 0 and proposedFocusArmy and currentFocusArmy != proposedFocusArmy then
                     command = "SetFocusArmy " .. (currentFocusArmy - 1)
 
                     -- try to inform moderators
@@ -242,7 +258,7 @@ do
                                 To=currentFocusArmy,
                                 Mass=0,
                                 Energy=0,
-                                Sender=currentFocusArmy, 
+                                Sender=localClient.name,
                                 Msg=string.format("Is trying to change focus army from %d to %d via 'ConExecuteSave'!", currentFocusArmy, proposedFocusArmy)
                             },
                         },
@@ -260,7 +276,7 @@ do
                                     To=currentFocusArmy,
                                     Mass=0,
                                     Energy=0,
-                                    Sender=currentFocusArmy, 
+                                    Sender=localClient.name,
                                     Msg=string.format("Is (aggressively) trying to change focus army from %d to %d via 'ConExecuteSave'!", currentFocusArmy, proposedFocusArmy)
                                 },
                             },
@@ -561,10 +577,18 @@ do
         -- do a basic check
         if not SessionIsReplay() then
             local clients = GetSessionClients()
+            local localClient = nil
+            for k = 1, TableGetn(clients) do
+                if clients[k]["local"] then
+                    localClient = clients[k]
+                    break
+                end
+            end
+
             local currentFocusArmy = GetFocusArmy()
             local proposedFocusArmy = number
 
-            if TableGetn(clients) > 0 and proposedFocusArmy and currentFocusArmy != proposedFocusArmy then
+            if localClient and TableGetn(clients) > 0 and proposedFocusArmy and currentFocusArmy != proposedFocusArmy then
                 number = currentFocusArmy
 
                 -- try to inform moderators
@@ -576,7 +600,7 @@ do
                             To=currentFocusArmy,
                             Mass=0,
                             Energy=0,
-                            Sender=currentFocusArmy, 
+                            Sender=localClient.name,
                             Msg=string.format("Is trying to change focus army from %d to %d via 'SetFocusArmy'!", currentFocusArmy, proposedFocusArmy)
                         },
                     },
@@ -594,7 +618,7 @@ do
                                 To=currentFocusArmy,
                                 Mass=0,
                                 Energy=0,
-                                Sender=currentFocusArmy, 
+                                Sender=localClient.name,
                                 Msg=string.format("Is (aggressively) trying to change focus army from %d to %d via 'SetFocusArmy'!", currentFocusArmy, proposedFocusArmy)
                             },
                         },
