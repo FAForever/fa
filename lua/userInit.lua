@@ -187,7 +187,6 @@ do
                     local tick = GameTick()
                     if tickstamp + 10 > tick then
                         -- try to inform moderators
-                        SimCallback({Func="GiveResourcesToPlayer", Args={ From=GetFocusArmy(), To=GetFocusArmy(), Mass=0, Energy=0, Sender=sender, Msg=msg},} , true)
                         SimCallback(
                             {
                                 Func="GiveResourcesToPlayer",
