@@ -19,8 +19,9 @@ jobs:
             *.bp
       - name: Check Lua syntax
         run: "bash ./tests/run-syntax-test.sh"
-  tests:
+  testUtils:
     name: Utility tests
+    needs: [syntax]
     runs-on: ubuntu-latest
     container: faforever/lua:v5.0-1
     steps:
@@ -37,6 +38,7 @@ jobs:
         run: "bash ./tests/run-utility-tests.sh"
   testUnits:
     name: Blueprint tests
+    needs: [syntax]
     runs-on: ubuntu-latest
     container: faforever/lua:v5.0-1
     steps:

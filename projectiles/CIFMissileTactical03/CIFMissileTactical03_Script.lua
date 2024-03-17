@@ -20,6 +20,8 @@
 --** SOFTWARE.
 --******************************************************************************************************
 
+local EffectTemplate = import("/lua/effecttemplates.lua")
+
 local CLOATacticalMissileProjectile = import("/lua/cybranprojectiles.lua").CLOATacticalMissileProjectile
 local CLOATacticalMissileProjectileOnImpact = CLOATacticalMissileProjectile.OnImpact
 local CLOATacticalMissileProjectileOnCreate = CLOATacticalMissileProjectile.OnCreate
@@ -37,6 +39,10 @@ local TableRandom = table.random
 ---@class CIFMissileTactical03 : CLOATacticalMissileProjectile
 CIFMissileTactical03 = ClassProjectile(CLOATacticalMissileProjectile) {
     ChildCount = 3,
+
+    FxImpactUnit = EffectTemplate.CMissileLOAHit02,
+    FxImpactLand = EffectTemplate.CMissileLOAHit02,
+    FxImpactProp = EffectTemplate.CMissileLOAHit02,
 
     ---@param self CLOATacticalMissileProjectile
     OnCreate = function(self)

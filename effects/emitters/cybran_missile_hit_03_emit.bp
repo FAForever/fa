@@ -1,8 +1,8 @@
---used by CIFProtonBomb01, ura0304,
+--used by CIFMissileTactical01
 EmitterBlueprint {
 	BlueprintId = 'proton_bomb_hit_02',
-	Lifetime = 3.00,
-	Repeattime = 3.00,
+	Lifetime = 16.00,
+	Repeattime = 16.00,
 	TextureFramecount = 1.00,
 	Blendmode = 3.00,
 	LocalVelocity = true,

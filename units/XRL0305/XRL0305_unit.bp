@@ -12,6 +12,7 @@ UnitBlueprint{
         "AMPHIBIOUS",
         "ANTIMISSILE",
         "ANTINAVY",
+        "ANTITORPEDO", 
         "BOT",
         "BUILTBYTIER3FACTORY",
         "CYBRAN",

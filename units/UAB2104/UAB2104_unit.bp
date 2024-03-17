@@ -186,7 +186,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_AntiAir",
-            RateOfFire = 1.6,
+            RateOfFire = 1.666,
             TargetPriorities = {
                 "EXPERIMENTAL",
                 "AIR MOBILE TECH3 BOMBER",

@@ -36,7 +36,7 @@ ProjectileBlueprint {
             Type = 'Medium01',
         },
         MeshBlueprint = '/projectiles/SIFLaanseTacticalMissile01/SIFLaanseTacticalMissile01_mesh.bp',
-        StrategicIconSize = 2,
+        StrategicIconSize = 4,
     },
     Economy = {
         BuildCostEnergy = 3600,
@@ -66,5 +66,4 @@ ProjectileBlueprint {
         ZigZagFrequency = 1,
         MaxZigZag = 1
     },
-    StrategicIconName = '/textures/ui/common/game/strategicicons/icon_tactical_missile.dds',
 }

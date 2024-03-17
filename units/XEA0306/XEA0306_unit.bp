@@ -289,7 +289,7 @@ UnitBlueprint{
         Class3AttachSize = 4,
         SlotsLarge = 6,
         SlotsMedium = 12,
-        SlotsSmall = 24,
+        SlotsSmall = 28,
         TransportClass = 10,
     },
     UseOOBTestZoom = 200,
@@ -340,7 +340,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_DirectFire",
-            RateOfFire = 2.2,
+            RateOfFire = 2.0,
             TargetPriorities = {                
                 "ANTIAIR",
                 "GROUNDATTACK",
@@ -400,7 +400,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_DirectFire",
-            RateOfFire = 2.2,
+            RateOfFire = 2.0,
             TargetPriorities = {                
                 "ANTIAIR",
                 "GROUNDATTACK",
@@ -479,7 +479,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_AntiAir",
-            RateOfFire = 3,
+            RateOfFire = 3.333,
             TargetPriorities = {
                 "TECH3 ANTIAIR",
                 "TECH2 ANTIAIR",
@@ -563,7 +563,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_AntiAir",
-            RateOfFire = 3,
+            RateOfFire = 3.333,
             TargetPriorities = {
                 "TECH3 ANTIAIR",
                 "TECH2 ANTIAIR",
@@ -647,7 +647,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_AntiAir",
-            RateOfFire = 3,
+            RateOfFire = 3.333,
             TargetPriorities = {
                 "TECH3 ANTIAIR",
                 "TECH2 ANTIAIR",
@@ -731,7 +731,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_AntiAir",
-            RateOfFire = 3,
+            RateOfFire = 3.333,
             TargetPriorities = {
                 "TECH3 ANTIAIR",
                 "TECH2 ANTIAIR",

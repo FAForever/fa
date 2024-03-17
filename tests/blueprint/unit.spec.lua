@@ -44,7 +44,7 @@ end
 ---@param bp UnitBlueprint
 function UnitBlueprint(bp)
     if bp.Description then
-        BlueprintUnits[bp.Description] = { bp }
+        BlueprintUnits[bp.Description] = bp
     end
 end
 
@@ -63,16 +63,15 @@ for k, blueprintFile in ipairs(Files) do
 end
 
 luft.describe(
-    'Unit blueprints - intel radius values',
+    'Unit blueprints',
     function()
         luft.describe_each(
-            "%s",
+            "Unit %s",
             BlueprintUnits,
 
             ---@param name string
-            ---@param unitBlueprintPacked UnitBlueprint[]
-            function(name, unitBlueprintPacked)
-                local unitBlueprint = unpack(unitBlueprintPacked)
+            ---@param unitBlueprint UnitBlueprint
+            function(name, unitBlueprint)
                 if unitBlueprint.Intel then
 
                     -----------------------------------------------------------
@@ -247,6 +246,78 @@ luft.describe(
                     end
 
                     --#endregion
+                end
+
+                if unitBlueprint.Weapon then
+                    local weapons = {}
+                    for _, weapon in pairs(unitBlueprint.Weapon) do
+                        weapons[weapon.Label or 'unknown'] = weapon
+                    end
+
+                    luft.describe_each(
+                        "Weapon %s",
+                        weapons,
+
+                        ---@param name string
+                        ---@param weaponBlueprint WeaponBlueprint
+                        function(name, weaponBlueprint)
+                            if (weaponBlueprint.DummyWeapon) then
+                                return
+                            end
+
+                            -----------------------------------------------------------
+                            --#region Rate of fire limitations
+
+                            -- The game runs in ticks and therefore not every rate of 
+                            -- fire is possible. The game will round the rate of fire,
+                            -- but as a result minor changes may not always have an 
+                            -- actual impact in-game. These tests guarantee that when
+                            -- a rate of fire is adjusted that it is always the actual
+                            -- rate of fire that the game uses.
+
+                            local rateOfFire = weaponBlueprint.RateOfFire
+                            if rateOfFire then
+                                luft.test(
+                                    "Rate of fire",
+                                    function()
+
+                                        luft.expect(rateOfFire).to.be.number()
+
+                                        if rateOfFire > 6.6666 then
+                                            luft.expect(rateOfFire).to.be.close.to(10)
+                                        elseif rateOfFire > 4.0 then
+                                            luft.expect(rateOfFire).to.be.close.to(5)
+                                        elseif rateOfFire > 2.8571 then
+                                            luft.expect(rateOfFire).to.be.close.to(3.333)
+                                        elseif rateOfFire > 2.2222 then
+                                            luft.expect(rateOfFire).to.be.close.to(2.5)
+                                        elseif rateOfFire > 1.8182 then
+                                            luft.expect(rateOfFire).to.be.close.to(2.0)
+                                        elseif rateOfFire > 1.5384 then
+                                            luft.expect(rateOfFire).to.be.close.to(1.666)
+                                        elseif rateOfFire > 1.3333 then
+                                            luft.expect(rateOfFire).to.be.close.to(1.428)
+                                        elseif rateOfFire > 1.1765 then
+                                            luft.expect(rateOfFire).to.be.close.to(1.25)
+                                        elseif rateOfFire > 1.0526 then
+                                            luft.expect(rateOfFire).to.be.close.to(1.111)
+                                        elseif rateOfFire > 0.9524 then
+                                            luft.expect(rateOfFire).to.be.close.to(1.0)
+                                        elseif rateOfFire > 0.8696 then
+                                            luft.expect(rateOfFire).to.be.close.to(0.909)
+                                        elseif rateOfFire > 0.8 then
+                                            luft.expect(rateOfFire).to.be.close.to(0.833)
+                                        elseif rateOfFire > 0.7407 then
+                                            luft.expect(rateOfFire).to.be.close.to(0.769)
+                                        end
+                                    end
+                                )
+                            end
+
+                            --#endregion
+
+                        end
+                    )
                 end
             end
         )

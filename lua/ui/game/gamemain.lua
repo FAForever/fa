@@ -756,6 +756,22 @@ function OnUserPause(pause)
             return
         end
 
+        if not SessionIsReplay() then
+            if pause then
+                SessionSendChatMessage(import('/lua/ui/game/clientutils.lua').GetAll(), {
+                    to = 'all',
+                    text = 'Paused the game',
+                    Chat = true,
+                })
+            else
+                SessionSendChatMessage(import('/lua/ui/game/clientutils.lua').GetAll(), {
+                    to = 'all',
+                    text = 'Unpaused the game',
+                    Chat = true,
+                })
+            end
+        end
+
         if pause then
             import("/lua/ui/game/missiontext.lua").PauseTransmission()
         else
