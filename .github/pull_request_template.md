@@ -1,6 +1,7 @@
 <!-- General useful tooling:
     - [ScreenToGif](https://www.screentogif.com/): Free, open source screen recorder that can export to MP4. If the changes are visual, these can help you tell us exactly what the changes imply!
 -->
+<!-- Feel free to remove unused parts of this template. -->
 
 ## Description of the proposed changes
 <!-- A clear and concise description (or visuals) of what the changes imply. 
