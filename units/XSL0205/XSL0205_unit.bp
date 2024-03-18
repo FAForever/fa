@@ -158,6 +158,7 @@ UnitBlueprint{
     LifeBarOffset = 0.58,
     LifeBarSize = 0.8,
     Physics = {
+        BackUpDistance = 8,
         BankingSlope = 0.5,
         BuildOnLayerCaps = {
             LAYER_Air = false,
@@ -172,7 +173,7 @@ UnitBlueprint{
         MaxAcceleration = 2.6,
         MaxBrake = 2.6,
         MaxSpeed = 2.6,
-        MaxSpeedReverse = 0,
+        MaxSpeedReverse = 2.6,
         MaxSteerForce = 5,
         MeshExtentsX = 1.1,
         MeshExtentsY = 0.5,
@@ -192,9 +193,10 @@ UnitBlueprint{
     SelectionSizeZ = 0.8,
     SelectionThickness = 0.5,
     CollisionOffsetY = 0.1,
+    CollisionOffsetZ = 0.05,
     SizeX = 0.8,
     SizeY = 0.75,
-    SizeZ = 1.0,
+    SizeZ = 1.1,
     StrategicIconName = "icon_land2_antiair",
     StrategicIconSortPriority = 125,
     Transport = { TransportClass = 2 },

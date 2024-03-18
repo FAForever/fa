@@ -819,6 +819,8 @@ function SurroundWithBorder(control, texturePath, fudgeX, fudgeY)
 
     border:Surround(control, fudgeX or 62, fudgeY or 62)
     LayoutHelpers.DepthOverParent(border, control, 2)
+
+    return border
 end
 
 --- Creates a checkbox using the default checkbox texture. Kept as its own entry point for the

@@ -78,7 +78,7 @@ UnitBlueprint{
         TurnRate = 180,
     },
     SizeX = 0.5,
-    SizeY = 0.3,
+    SizeY = 0.5,
     SizeZ = 0.5,
     Weapon = {
         {

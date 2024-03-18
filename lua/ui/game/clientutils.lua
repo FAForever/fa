@@ -1,5 +1,5 @@
 --******************************************************************************************************
---** Copyright (c) 2024  Il1i1
+--** Copyright (c) 2024 FAForever
 --**
 --** Permission is hereby granted, free of charge, to any person obtaining a copy
 --** of this software and associated documentation files (the "Software"), to deal
@@ -20,64 +20,51 @@
 --** SOFTWARE.
 --******************************************************************************************************
 
----@type ContextBasedTemplate
-Template = {
-    Name = 'Power generators',
-    TriggersOnUnit = categories.STRUCTURE * categories.ARTILLERY * categories.SIZE20,
-    TemplateSortingOrder = 100,
-    TemplateData = {
-        24,
-        24,
-        {
-            'uab1301',
-            101,
-            11,
-            1
-        },
-        {
-            'uab1101',
-            102,
-            8,
-            6
-        },
-        {
-            'uab1301',
-            111,
-            3,
-            11
-        },
-        {
-            'uab1101',
-            112,
-            -2,
-            8
-        },
+-- upvalue scope for performance
+local TableKeys = table.keys
 
-        {
-            'uab1301',
-            121,
-            -7,
-            3
-        },
-        {
-            'uab1101',
-            122,
-            -4,
-            -2
-        },
+local IsAlly = IsAlly
 
-        {
-            'uab1301',
-            131,
-            1,
-            -7
-        },
-        {
-            'uab1101',
-            132,
-            6,
-            -4
-        },
+--- Returns all clients in the game
+---@return number[]
+function GetAll()
+    local clients = GetSessionClients()
+    local focusArmy = GetFocusArmy()
 
-    },
-}
+    -- skip for observers
+    if focusArmy <= 0 then
+        return {}
+    end
+
+    local recipients = {}
+    for k, client in clients do
+        for l, source in client.authorizedCommandSources do
+            recipients[source] = true
+        end
+    end
+
+    return TableKeys(recipients)
+end
+
+--- Returns all allied clients in the game
+---@return number[]
+function GetAllies()
+    local clients = GetSessionClients()
+    local focusArmy = GetFocusArmy()
+
+    -- skip for observers
+    if focusArmy <= 0 then
+        return {}
+    end
+
+    local recipients = {}
+    for k, client in clients do
+        for l, source in client.authorizedCommandSources do
+            if IsAlly(focusArmy, source) then
+                recipients[source] = true
+            end
+        end
+    end
+
+    return TableKeys(recipients)
+end

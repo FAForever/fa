@@ -21,6 +21,7 @@ UnitBlueprint{
         "RECLAIMABLE",
         "SELECTABLE",
         "SIZE12",
+        "STRATEGIC",
         "STRUCTURE",
         "VISIBLETORECON",
         "VOLATILE",

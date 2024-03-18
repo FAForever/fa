@@ -23,34 +23,40 @@
 ---@type ContextBasedTemplate
 Template = {
     Name = 'Power generators',
-    TriggersOnUnit = categories.STRUCTURE * categories.ARTILLERY * (categories.TECH3 + categories.EXPERIMENTAL) - categories.SIZE20,
+    TriggersOnUnit = categories.ARTILLERY * categories.STRUCTURE * categories.TECH2,
     TemplateSortingOrder = 100,
     TemplateData = {
-        24,
-        24,
+        6,
+        6,
         {
-            'uab1301',
-            5352,
-            10,
+            'dummy',
+            0,
+            0,
+            0
+        },
+        {
+            'uab1101',
+            33986,
+            2,
+            0
+        },
+        {
+            'uab1101',
+            33993,
+            -2,
+            0
+        },
+        {
+            'uab1101',
+            34000,
+            0,
+            -2
+        },
+        {
+            'uab1101',
+            34008,
+            0,
             2
         },
-        {
-            'uab1301',
-            5369,
-            2,
-            10
-        },
-        {
-            'uab1301',
-            5385,
-            -6,
-            2
-        },
-        {
-            'uab1301',
-            5408,
-            2,
-            -6
-        }
-    },
+    }
 }

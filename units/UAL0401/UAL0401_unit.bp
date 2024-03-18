@@ -96,52 +96,54 @@ UnitBlueprint{
         },
         MovementEffects = {
             Land = {
-                Footfall = {
-                    Bones = {
-                        {
-                            FootBone = "Right_Footfall",
-                            HipBone = "Right_Leg_B01",
-                            KneeBone = "Right_Leg_B02",
-                            MaxFootFall = -0.25,
-                            Offset = { z = -1 },
-                            StraightLegs = false,
-                            Tread = {
-                                TreadLifeTime = 135,
-                                TreadMarks = "collosus_tread_02",
-                                TreadMarksSizeX = 1.7,
-                                TreadMarksSizeZ = 1.7,
-                                TreadOffset = { -0.95, 0, 0.85 },
+                Effects = {
+                    Footfall = {
+                        Bones = {
+                            {
+                                FootBone = "Right_Footfall",
+                                HipBone = "Right_Leg_B01",
+                                KneeBone = "Right_Leg_B02",
+                                MaxFootFall = -0.25,
+                                Offset = { z = -1 },
+                                StraightLegs = false,
+                                Tread = {
+                                    TreadLifeTime = 135,
+                                    TreadMarks = "collosus_tread_02",
+                                    TreadMarksSizeX = 1.7,
+                                    TreadMarksSizeZ = 1.7,
+                                    TreadOffset = { -0.95, 0, 0.85 },
+                                },
+                                Type = "FootFall01",
                             },
-                            Type = "FootFall01",
-                        },
-                        {
-                            FootBone = "Left_Footfall",
-                            HipBone = "Left_Leg_B01",
-                            KneeBone = "Left_Leg_B02",
-                            MaxFootFall = -0.25,
-                            Offset = { z = -1 },
-                            StraightLegs = false,
-                            Tread = {
-                                TreadLifeTime = 135,
-                                TreadMarks = "collosus_tread_01",
-                                TreadMarksSizeX = 1.7,
-                                TreadMarksSizeZ = 1.7,
-                                TreadOffset = { 1, 0, 0.85 },
+                            {
+                                FootBone = "Left_Footfall",
+                                HipBone = "Left_Leg_B01",
+                                KneeBone = "Left_Leg_B02",
+                                MaxFootFall = -0.25,
+                                Offset = { z = -1 },
+                                StraightLegs = false,
+                                Tread = {
+                                    TreadLifeTime = 135,
+                                    TreadMarks = "collosus_tread_01",
+                                    TreadMarksSizeX = 1.7,
+                                    TreadMarksSizeZ = 1.7,
+                                    TreadOffset = { 1, 0, 0.85 },
+                                },
+                                Type = "FootFall01",
                             },
-                            Type = "FootFall01",
                         },
-                    },
-                    CameraShake = {
-                        Interval = 0.25,
-                        MaxShakeEpicenter = 0.3,
-                        MinShakeAtRadius = 0,
-                        Radius = 20,
-                    },
-                    Damage = {
-                        Amount = 3500,
-                        DamageFriendly = false,
-                        Radius = 1,
-                        Type = "ExperimentalFootfall",
+                        CameraShake = {
+                            Interval = 0.25,
+                            MaxShakeEpicenter = 0.3,
+                            MinShakeAtRadius = 0,
+                            Radius = 20,
+                        },
+                        Damage = {
+                            Amount = 3500,
+                            DamageFriendly = false,
+                            Radius = 1,
+                            Type = "ExperimentalFootfall",
+                        },
                     },
                 },
             },

@@ -94,7 +94,7 @@ Tooltips = {
     },
     transport = {
         title = "<LOC tooltipui0018>Transport",
-        description = "",
+        description = "<LOC tooltipui0019>Left click for transport order. Right click to load into transports.",
         keyID = "transport",
     },
     fire_nuke = {

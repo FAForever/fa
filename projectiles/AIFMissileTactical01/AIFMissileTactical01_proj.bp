@@ -2,12 +2,12 @@ ProjectileBlueprint {
     Audio = {
         Impact = Sound {
             Bank = 'Impacts',
-            Cue = 'AEON_Expl_Med_Impact',
+            Cue = 'AEON_Expl_Lrg_Naval',
             LodCutoff = 'Weapon_LodCutoff',
         },
         ImpactTerrain = Sound {
             Bank = 'Impacts',
-            Cue = 'Impact_Land_Gen_AEON',
+            Cue = 'AEON_Expl_Lrg_Naval',
             LodCutoff = 'Weapon_LodCutoff',
         },
         ImpactWater = Sound {
@@ -36,7 +36,7 @@ ProjectileBlueprint {
             Type = 'Medium01',
         },
         MeshBlueprint = '/projectiles/AIFMissileSerpentine01/AIFMissileSerpentine01_mesh.bp',
-        StrategicIconSize = 3,
+        StrategicIconSize = 4,
         UniformScale = 0.035,
     },
     Economy = {
@@ -64,7 +64,7 @@ ProjectileBlueprint {
         UseGravity = false,
         VelocityAlign = true,
 
-        MaxZigZag = 5,
+        MaxZigZag = 4,
         ZigZagFrequency = 0.2,
     },
 }

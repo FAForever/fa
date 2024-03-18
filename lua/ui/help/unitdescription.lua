@@ -117,9 +117,9 @@ Description = {
     ['xel0209'] = "<LOC Unit_Description_0315> Tech 2 amphibious construction, repair, capture and reclamation unit. Armed with a Riot Gun and internal radar and jammer.",
     ['xeb0104'] = "<LOC Unit_Description_0446> Houses one flying Drone which automatically assists or repairs any unit with its operational radius. Can be ordered to fly around and reclaim, but cannot initiate construction.",
     ['xeb0204'] = "<LOC Unit_Description_0453> Houses two flying Drones, each of which automatically assists or repairs any unit with its operational radius. Can be ordered to fly around and reclaim, but cannot initiate construction.",
-    ['uea0001'] = "<LOC Unit_Description_0458> Flying Drone which can assists, repairs, and reclaim any unit. Can be ordered to initiate construction of T1 structures. It's vulnerable to any air fighters or anti-air units",
-    ['uea0003'] = "<LOC Unit_Description_0458> Flying Drone which can assists, repairs, and reclaim any unit. Can be ordered to initiate construction of T1 structures. It's vulnerable to any air fighters or anti-air units",
-    ['xea3204'] = "<LOC Unit_Description_0459> Flying Drone which can assists, repairs, and reclaim any unit. Can be ordered to initiate construction of T3 structures. It's vulnerable to any air fighters or anti-air units",
+    ['uea0001'] = "<LOC Unit_Description_0457> Flying Drone, which can assist, repair, and reclaim any unit. Can be ordered to initiate the construction of T1 structures. Vulnerable to any air fighters or anti-air units.",
+    ['uea0003'] = "<LOC Unit_Description_0458> Flying Drone, which can assist, repair, and reclaim any unit. Can be ordered to initiate the construction of T3 structures. Vulnerable to any air fighters or anti-air units.",
+    ['xea3204'] = "<LOC Unit_Description_0459> Flying Drone, which can assist, repair, and reclaim any unit. Cannot be ordered to initiate the construction of structures. Vulnerable to any air fighters or anti-air units.",
 
     -- UEF -- Factories HQ
     ['ueb0101'] = "<LOC Unit_Description_0079> Constructs Tech 1 Land units. Upgradeable to T2 Factory HQ which allows you to upgrade other T1 factories to T2 support factories for a much cheaper cost.",

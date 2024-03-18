@@ -22,35 +22,89 @@
 
 ---@type ContextBasedTemplate
 Template = {
-    Name = 'Power generators',
-    TriggersOnUnit = categories.ARTILLERY * categories.STRUCTURE * categories.TECH2,
-    TemplateSortingOrder = 100,
+    Name = 'Storages and fabricators',
+    TriggersOnUnit = categories.MASSEXTRACTION * (categories.TECH2 + categories.TECH3),
+    TemplateSortingOrder = 101,
     TemplateData = {
-        6,
-        6,
+        10,
+        10,
         {
-            'uab1101',
-            33986,
-            2,
+            'dummy',
+            0,
+            0,
             0
         },
         {
-            'uab1101',
-            33993,
+            'uab1106',
+            30057,
             -2,
             0
         },
         {
-            'uab1101',
-            34000,
+            'uab1106',
+            30070,
+            2,
+            0
+        },
+        {
+            'uab1106',
+            30083,
             0,
             -2
         },
         {
-            'uab1101',
-            34008,
+            'uab1106',
+            30096,
             0,
             2
         },
-    }
+        {
+            'uab1104',
+            30109,
+            -4,
+            0
+        },
+        {
+            'uab1104',
+            30134,
+            -2,
+            2
+        },
+        {
+            'uab1104',
+            30158,
+            0,
+            4
+        },
+        {
+            'uab1104',
+            30182,
+            2,
+            2
+        },
+        {
+            'uab1104',
+            30206,
+            4,
+            0
+        },
+        {
+            'uab1104',
+            30231,
+            2,
+            -2
+        },
+        {
+            'uab1104',
+            30255,
+            0,
+            -4
+        },
+        {
+            'uab1104',
+            30279,
+            -2,
+            -2
+        }
+    },
 }

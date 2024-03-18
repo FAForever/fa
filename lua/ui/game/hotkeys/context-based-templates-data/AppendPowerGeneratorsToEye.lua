@@ -23,7 +23,7 @@
 ---@type ContextBasedTemplate
 Template = {
     Name = 'Power generators',
-    TriggersOnBuilding = categories.STRUCTURE * categories.OPTICS * categories.TECH3 * categories.AEON,
+    TriggersOnUnit = categories.STRUCTURE * categories.OPTICS * categories.TECH3 * categories.AEON,
     TemplateSortingOrder = 100,
     TemplateData = {
         10,
@@ -31,80 +31,80 @@ Template = {
         {
             'dummy',
             2600,
-            1,
-            1
+            2,
+            2
         },
         {
             'uab1101',
             2605,
-            -1,
-            5
+            0,
+            6
         },
         {
             'uab1101',
             2621,
-            1,
-            5
+            2,
+            6
         },
         {
             'uab1101',
             2636,
-            3,
-            5
+            4,
+            6
         },
         {
             'uab1101',
             2651,
-            5,
-            3
+            6,
+            4
         },
         {
             'uab1101',
             2666,
-            5,
-            1
+            6,
+            2
         },
         {
             'uab1101',
             2680,
-            5,
-            -1
+            6,
+            0
         },
         {
             'uab1101',
             2695,
-            3,
-            -3
+            4,
+            -2
         },
         {
             'uab1101',
             2710,
-            1,
-            -3
+            2,
+            -2
         },
         {
             'uab1101',
             2724,
-            -1,
-            -3
+            0,
+            -2
         },
         {
             'uab1101',
             2738,
-            -3,
-            -1
+            -2,
+            0
         },
         {
             'uab1101',
             2753,
-            -3,
-            1
+            -2,
+            2
         },
         {
             'uab1101',
             2767,
-            -3,
-            3
+            -2,
+            4
         }
     },
 }
