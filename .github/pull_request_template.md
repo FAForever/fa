@@ -4,7 +4,7 @@
 
 ## Description of the proposed changes
 <!-- A clear and concise description (or visuals) of what the changes imply. 
-If it closes an issue, make sure to use closing keywords to automatically link the issue. -->
+If it closes an issue, make sure to link the issue by using "(Closes/Fixes/Resolves) #(Issue Number)" in your pull request. -->
 
 
 ## Testing done on the proposed changes
