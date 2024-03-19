@@ -11,7 +11,6 @@ UnitBlueprint{
     BuildIconSortPriority = 20,
     Categories = {
         "ANTINAVY",
-        "BUILTBYEXPERIMENTALSUB",
         "BUILTBYTIER2FACTORY",
         "BUILTBYTIER3FACTORY",
         "LIGHTBOAT",
@@ -32,8 +31,8 @@ UnitBlueprint{
         AirThreatLevel = 0,
         ArmorType = "Normal",
         EconomyThreatLevel = 0,
-        Health = 1750,
-        MaxHealth = 1750,
+        Health = 2000,
+        MaxHealth = 2000,
         RegenRate = 0,
         SubThreatLevel = 10,
         SurfaceThreatLevel = 0,
@@ -134,7 +133,7 @@ UnitBlueprint{
     LifeBarOffset = 0.7,
     LifeBarSize = 0.5,
     Physics = {
-        BackUpDistance = 5,
+        BackUpDistance = 10,
         BankingSlope = 0,
         BuildOnLayerCaps = {
             LAYER_Air = false,

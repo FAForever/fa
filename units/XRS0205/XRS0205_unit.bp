@@ -18,7 +18,6 @@ UnitBlueprint{
     },
     BuildIconSortPriority = 40,
     Categories = {
-        "BUILTBYEXPERIMENTALSUB",
         "BUILTBYTIER2FACTORY",
         "BUILTBYTIER3FACTORY",
         "COUNTERINTELLIGENCE",
@@ -155,7 +154,7 @@ UnitBlueprint{
     LifeBarOffset = 1.3,
     LifeBarSize = 1.15,
     Physics = {
-        BackUpDistance = 5,
+        BackUpDistance = 10,
         BankingSlope = 0,
         BuildOnLayerCaps = {
             LAYER_Air = false,
