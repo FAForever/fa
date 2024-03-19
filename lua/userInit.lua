@@ -155,67 +155,25 @@ do
 
         -- do a basic check
         if find(lower, 'setfocusarmy') then
-            local isCheatsEnabled = SessionGetScenarioInfo().Options.CheatsEnabled == "true"
-
-            if not (SessionIsReplay() or isCheatsEnabled) then
-                local clients = GetSessionClients()
-                local localClient = nil
-                for k = 1, TableGetn(clients) do
-                    if clients[k]["local"] then
-                        localClient = clients[k]
-                        break
-                    end
-                end
-
+            if not SessionIsReplay() then
                 local currentFocusArmy = GetFocusArmy()
                 local proposedFocusArmy = tonumber(match(command, '%d+'))
-
                 if find(command, '-') then
                     proposedFocusArmy = proposedFocusArmy * -1
                 else
                     proposedFocusArmy = proposedFocusArmy + 1
                 end
 
-                if localClient and TableGetn(clients) > 1 and proposedFocusArmy then
-                    command = "SetFocusArmy " .. (currentFocusArmy - 1)
-
-                    -- try to inform moderators
-                    SimCallback(
-                        {
-                            Func="GiveResourcesToPlayer",
-                            Args= {
-                                From=currentFocusArmy,
-                                To=currentFocusArmy,
-                                Mass=0,
-                                Energy=0,
-                                Sender=localClient.name,
-                                Msg={ to='moderators', text = string.format("Is trying to change focus army from %d to %d via ConExecute!", currentFocusArmy, proposedFocusArmy)}
-                            },
+                -- try to inform moderators
+                SimCallback(
+                    {
+                        Func="ModeratorEvent",
+                        Args= {
+                            From = currentFocusArmy,
+                            Message = string.format("Is changing focus army from %d to %d via ConExecute!", currentFocusArmy, proposedFocusArmy),
                         },
-                        true
-                    )
-
-                    local tick = GameTick()
-                    if tickstamp + 10 > tick then
-                        -- try to inform moderators
-                        SimCallback(
-                            {
-                                Func="GiveResourcesToPlayer",
-                                Args= {
-                                    From=currentFocusArmy,
-                                    To=currentFocusArmy,
-                                    Mass=0,
-                                    Energy=0,
-                                    Sender=localClient.name,
-                                    Msg={ to='moderators', text = string.format("Is (continously) trying to change focus army from %d to %d via ConExecute!", currentFocusArmy, proposedFocusArmy ) }
-                                },
-                            },
-                            true
-                        )
-                    end
-    
-                    tickstamp = tick
-                end
+                    }
+                )
             end
         end
 
@@ -245,67 +203,25 @@ do
 
         -- do a basic check
         if find(lower, 'setfocusarmy') then
-            local isCheatsEnabled = SessionGetScenarioInfo().Options.CheatsEnabled == "true"
-
-            if not (SessionIsReplay() or isCheatsEnabled) then
-                local clients = GetSessionClients()
-                local localClient = nil
-                for k = 1, TableGetn(clients) do
-                    if clients[k]["local"] then
-                        localClient = clients[k]
-                        break
-                    end
-                end
-
+            if not (SessionIsReplay()) then
                 local currentFocusArmy = GetFocusArmy()
                 local proposedFocusArmy = tonumber(match(command, '%d+'))
-
                 if find(command, '-') then
                     proposedFocusArmy = proposedFocusArmy * -1
                 else
                     proposedFocusArmy = proposedFocusArmy + 1
                 end
 
-                if localClient and TableGetn(clients) > 1 and proposedFocusArmy then
-                    command = "SetFocusArmy " .. (currentFocusArmy - 1)
-
-                    -- try to inform moderators
-                    SimCallback(
-                        {
-                            Func="GiveResourcesToPlayer",
-                            Args= {
-                                From=currentFocusArmy,
-                                To=currentFocusArmy,
-                                Mass=0,
-                                Energy=0,
-                                Sender=localClient.name,
-                                Msg={ to='moderators', text = string.format("Is trying to change focus army from %d to %d via ConExecuteSave!", currentFocusArmy, proposedFocusArmy) }
-                            },
+                -- try to inform moderators
+                SimCallback(
+                    {
+                        Func="ModeratorEvent",
+                        Args= {
+                            From = currentFocusArmy,
+                            Message = string.format("Is changing focus army from %d to %d via ConExecuteSave!", currentFocusArmy, proposedFocusArmy),
                         },
-                        true
-                    )
-
-                    local tick = GameTick()
-                    if tickstamp + 10 > tick then
-                        -- try to inform moderators
-                        SimCallback(
-                            {
-                                Func="GiveResourcesToPlayer",
-                                Args= {
-                                    From=currentFocusArmy,
-                                    To=currentFocusArmy,
-                                    Mass=0,
-                                    Energy=0,
-                                    Sender=localClient.name,
-                                    Msg={ to='moderators', text = string.format("Is (continously) trying to change focus army from %d to %d via ConExecuteSave!", currentFocusArmy, proposedFocusArmy) }
-                                },
-                            },
-                            true
-                        )
-                    end
-    
-                    tickstamp = tick
-                end
+                    }
+                )
             end
         end
 
@@ -658,58 +574,19 @@ do
         -- do a basic check
         local isCheatsEnabled = SessionGetScenarioInfo().Options.CheatsEnabled == "true"
         if not (SessionIsReplay() or isCheatsEnabled) then
-            local clients = GetSessionClients()
-            local localClient = nil
-            for k = 1, TableGetn(clients) do
-                if clients[k]["local"] then
-                    localClient = clients[k]
-                    break
-                end
-            end
-
             local currentFocusArmy = GetFocusArmy()
             local proposedFocusArmy = number
 
-            if localClient and TableGetn(clients) > 1 and proposedFocusArmy then
-                number = currentFocusArmy
-
-                -- try to inform moderators
-                SimCallback(
-                    {
-                        Func="GiveResourcesToPlayer",
-                        Args= {
-                            From=currentFocusArmy,
-                            To=currentFocusArmy,
-                            Mass=0,
-                            Energy=0,
-                            Sender=localClient.name,
-                            Msg={ to='moderators', text = string.format("Is trying to change focus army from %d to %d via SetFocusArmy!", currentFocusArmy, proposedFocusArmy) }
-                        },
+            -- try to inform moderators
+            SimCallback(
+                {
+                    Func="ModeratorEvent",
+                    Args= {
+                        From = currentFocusArmy,
+                        Message = string.format("Is changing focus army from %d to %d via SetFocusArmy!", currentFocusArmy, proposedFocusArmy),
                     },
-                    true
-                )
-
-                local tick = GameTick()
-                if tickstamp + 10 > tick then
-                    -- try to inform moderators
-                    SimCallback(
-                        {
-                            Func="GiveResourcesToPlayer",
-                            Args= {
-                                From=currentFocusArmy,
-                                To=currentFocusArmy,
-                                Mass=0,
-                                Energy=0,
-                                Sender=localClient.name,
-                                Msg={ to='moderators', text = string.format("Is (continously) trying to change focus army from %d to %d via SetFocusArmy!", currentFocusArmy, proposedFocusArmy) }
-                            },
-                        },
-                        true
-                    )
-                end
-
-                tickstamp = tick
-            end
+                }
+            )
         end
 
         oldSetFocusArmy(number)
