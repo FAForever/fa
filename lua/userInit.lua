@@ -123,12 +123,9 @@ do
 
     local TableGetn = table.getn
 
-    local GameTick = GameTick
     local GetFocusArmy = GetFocusArmy
     local SessionIsReplay = SessionIsReplay
-    local SessionRequestPause = SessionRequestPause
     local GetSessionClients = GetSessionClients
-    local SessionGetScenarioInfo = SessionGetScenarioInfo
 
     local tickstamp = 0
 
@@ -146,11 +143,18 @@ do
         -- inform allies about self-destructed units
         if find(lower, 'killselectedunits') then
             local selectedUnits = GetSelectedUnits()
-            SessionSendChatMessage(import('/lua/ui/game/clientutils.lua').GetAllies(), {
-                to = 'allies',
-                text = string.format('Self-destructed %d units', TableGetn(selectedUnits)),
-                Chat = true,
-            })
+            local currentFocusArmy = GetFocusArmy()
+
+            -- try to inform moderators
+            SimCallback(
+                {
+                    Func="ModeratorEvent",
+                    Args= {
+                        From = currentFocusArmy,
+                        Message = string.format('Self-destructed %d units', TableGetn(selectedUnits)),
+                    },
+                }
+            )
         end
 
         -- do a basic check
@@ -194,11 +198,18 @@ do
         -- inform allies about self-destructed units
         if find(lower, 'killselectedunits') then
             local selectedUnits = GetSelectedUnits()
-            SessionSendChatMessage(import('/lua/ui/game/clientutils.lua').GetAllies(), {
-                to = 'allies',
-                text = string.format('Self-destructed %d units', TableGetn(selectedUnits)),
-                Chat = true,
-            })
+            local currentFocusArmy = GetFocusArmy()
+
+            -- try to inform moderators
+            SimCallback(
+                {
+                    Func="ModeratorEvent",
+                    Args= {
+                        From = currentFocusArmy,
+                        Message = string.format('Self-destructed %d units', TableGetn(selectedUnits)),
+                    },
+                }
+            )
         end
 
         -- do a basic check
@@ -246,44 +257,42 @@ do
         -- inform allies about self-destructed units
         if callback.Func == 'ToggleSelfDestruct' then
             local selectedUnits = GetSelectedUnits()
-            SessionSendChatMessage(import('/lua/ui/game/clientutils.lua').GetAllies(), {
-                to = 'allies',
-                text = string.format('Self-destructed %d units', TableGetn(selectedUnits)),
-                Chat = true,
-            })
+ 
+            -- try to inform moderators
+            SimCallback(
+                {
+                    Func="ModeratorEvent",
+                    Args= {
+                        From = currentFocusArmy,
+                        Message = string.format('Self-destructed %d units', TableGetn(selectedUnits)),
+                    },
+                }
+            )
         end
 
         -- inform moderators about pings
         if callback.Func == 'SpawnPing' then
             if callback.Args.Marker then
+                -- try to inform moderators
                 SimCallback(
                     {
-                        Func="GiveResourcesToPlayer",
+                        Func="ModeratorEvent",
                         Args= {
-                            From=currentFocusArmy,
-                            To=currentFocusArmy,
-                            Mass=0,
-                            Energy=0,
-                            Sender=localClient.name,
-                            Msg={ to='moderators', text = string.format("Created a marker with the text: '%s'", tostring(callback.Args.Name)) }
+                            From = currentFocusArmy,
+                            Message = string.format("Created a marker with the text: '%s'", tostring(callback.Args.Name)),
                         },
-                    },
-                    true
+                    }
                 )
             else
+                -- try to inform moderators
                 SimCallback(
                     {
-                        Func="GiveResourcesToPlayer",
+                        Func="ModeratorEvent",
                         Args= {
-                            From=currentFocusArmy,
-                            To=currentFocusArmy,
-                            Mass=0,
-                            Energy=0,
-                            Sender=localClient.name,
-                            Msg={ to='moderators', text = string.format("Created a ping of type '%s'", tostring(callback.Args.Type)) }
+                            From = currentFocusArmy,
+                            Message = string.format("Created a ping of type '%s'", tostring(callback.Args.Type)),
                         },
-                    },
-                    true
+                    }
                 )
             end
         end
