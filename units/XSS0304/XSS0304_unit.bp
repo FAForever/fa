@@ -19,7 +19,6 @@ UnitBlueprint{
     Categories = {
         "ANTIAIR",
         "ANTINAVY",
-        "BUILTBYEXPERIMENTALSUB",
         "BUILTBYTIER3FACTORY",
         "MOBILE",
         "NAVAL",
