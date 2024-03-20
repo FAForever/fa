@@ -1049,11 +1049,10 @@ function SendPlatoonWithTransports(aiBrain, platoon, destination, attempts, bSki
                 local atest, stest
                 local landpath,  landpathlength, landreason, lastlocationtested, path, pathlength, reason
 				-- locate the requested markers within markerrange of the supplied location	that the platoon can safely land at
-				local markerRadius = math.min(aiBrain.IMAPConfig.IMAPSize * 2, 164)
+				local markerRadius = math.min(aiBrain.IMAPConfig.IMAPSize * 3, 128)
 				markerlist = NavUtils.DirectionsFromWithThreatThreshold(layer, destination, markerRadius, aiBrain, NavUtils.ThreatFunctions.AntiAir, airthreatMax, aiBrain.IMAPConfig.Rings)
 				-- sort the markers by closest distance to final destination
 				TableSort( markerlist, function(a,b) local VDist2Sq = VDist2Sq return VDist2Sq( a[1],a[3], destination[1],destination[3] ) < VDist2Sq( b[1],b[3], destination[1],destination[3] )  end )
-
 				-- loop thru each marker -- see if you can form a safe path on the surface 
 				-- and a safe path for the transports -- use the first one that satisfies both
 				for _, v in markerlist do
@@ -1073,7 +1072,7 @@ function SendPlatoonWithTransports(aiBrain, platoon, destination, attempts, bSki
                         landpath = false
                         landpathlength = 0
 						-- can the platoon path safely from this marker to the final destination 
-						landpath, landreason, landpathlength = NavUtils.PathToWithThreatThreshold(layer, destination, lastlocationtested, aiBrain, NavUtils.ThreatFunctions.AntiAir, threatMax, aiBrain.IMAPConfig.Rings)
+						landpath, landreason, landpathlength = NavUtils.PathToWithThreatThreshold(layer, destination, lastlocationtested, aiBrain, NavUtils.ThreatFunctions.AntiSurface, threatMax, aiBrain.IMAPConfig.Rings)
 						-- can the transports reach that marker ?
 						if landpath then
                             path = false
