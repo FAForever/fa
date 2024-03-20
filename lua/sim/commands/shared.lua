@@ -62,13 +62,61 @@ UnitQueueDataToCommand = {
     },
     [10] = {
         Type = "Attack",
-        Callback = IssueAttack,
+        ---@param units Unit[]
+        ---@param target Unit | Prop | Vector | Blip
+        ---@return boolean
+        Callback = function(units, target)
+
+            -- check if we have units
+            if table.empty(units) then
+                return false
+            end
+
+            -- if it is a blip then we must have vision on it
+            if not table.empty(getmetatable(target)) and IsBlip(target) then
+                local unitArmy = units[1].Army
+                if target:IsSeenNow(unitArmy) or target:IsOnRadar(unitArmy) or target:IsOnSonar(unitArmy) or target:IsOnOmni(unitArmy) then
+                    IssueAttack(units, target)
+                    return true
+                else
+                    return false
+                end
+            end
+
+            IssueAttack(units, target)
+
+            return true
+        end,
         BatchOrders = true,
         FullRedundancy = true,
     },
     [11] = {
         Type = "FormAttack",
-        Callback = IssueAttack,
+        ---@param units Unit[]
+        ---@param target Unit | Prop | Vector | Blip
+        ---@return boolean
+        Callback = function(units, target)
+
+            -- check if we have units
+            if table.empty(units) then
+                return false
+            end
+
+            -- if it is a blip then we must have vision on it
+            if not table.empty(getmetatable(target)) and IsBlip(target) then
+                local unitArmy = units[1].Army
+                if target:IsSeenNow(unitArmy) or target:IsOnRadar(unitArmy) or target:IsOnSonar(unitArmy) or target:IsOnOmni(unitArmy) then
+                    IssueAttack(units, target)
+                    return true
+                else
+                    return false
+                end
+            end
+
+            IssueAttack(units, target)
+
+            return true
+        end,
         BatchOrders = true,
         FullRedundancy = true,
     },
