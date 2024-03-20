@@ -366,7 +366,7 @@ local keyActionsSelectionQuickSelect = {
         category = 'selection',
     },
     ['select_surface_bombers'] = {
-        action = 'UI_Lua import("/lua/keymap/smartselection.lua").smartSelect("AIR BOMBER -ANTINAVY")',
+        action = 'UI_Lua import("/lua/keymap/smartselection.lua").smartSelect("AIR BOMBER -ANTINAVY -BOMB")',
         category = 'selection',
     },
     ['select_torpedo_bombers'] = {

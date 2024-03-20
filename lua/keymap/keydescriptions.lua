@@ -558,6 +558,6 @@ keyDescriptions = {
     ['copy_orders'] = '<LOC key_desc_copy_orders>Copy orders of the unit the mouse is on top of',
     ['shift_copy_orders'] = '<LOC key_desc_shift_copy_orders>Copy orders of the unit the mouse is on top of',
 
-    ['select_surface_bombers'] = '<LOC key_desc_0407>Select all Bombers (Non-Torpedo)',
+    ['select_surface_bombers'] = '<LOC key_desc_0407>Select all Bombers (Normal)',
     ['select_torpedo_bombers'] = '<LOC key_desc_0408>Select all Bombers (Torpedo)',
 }
