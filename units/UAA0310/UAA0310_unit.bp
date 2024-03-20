@@ -51,7 +51,6 @@ UnitBlueprint{
         "AIR",
         "AIRSTAGINGPLATFORM",
         "ANTIAIR",
-        "ANTINAVY",
         "BUILTBYTIER3COMMANDER",
         "BUILTBYTIER3ENGINEER",
         "CANNOTUSEAIRSTAGING",
@@ -78,6 +77,7 @@ UnitBlueprint{
         "SNIPEMODE",
         "TARGETCHASER",
         "VISIBLETORECON",
+        "WEAKANTINAVY",
         "EXTERNALFACTORY"
     },
     Defense = {
