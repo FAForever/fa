@@ -122,7 +122,6 @@ end
 
 function OnArmyChange()
     Sync.MaxPingMarkers = MaxPingMarkers
-    LOG('syncing max ping markers: ', MaxPingMarkers)
     --Flush all of the current markers on the UI side
     if not Sync.Ping then Sync.Ping = {} end
     table.insert(Sync.Ping, {Action = 'flush'})
