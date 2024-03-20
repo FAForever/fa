@@ -18,6 +18,7 @@ UnitBlueprint{
     },
     BuildIconSortPriority = 40,
     Categories = {
+        "ANTITORPEDO",
         "BUILTBYTIER2FACTORY",
         "BUILTBYTIER3FACTORY",
         "COUNTERINTELLIGENCE",

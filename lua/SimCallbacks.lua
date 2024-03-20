@@ -1247,3 +1247,19 @@ Callbacks.AIPlatoonSimpleStructureBehavior = function(data, units)
 end
 
 --#endregion
+
+-------------------------------------------------------------------------------
+--#region Moderator related functionality
+
+---@class CallbackModeratorEventData
+---@field From number
+---@field Message string
+
+---@param data CallbackModeratorEventData
+Callbacks.ModeratorEvent = function(data)
+    -- show up in the game logs
+    local brain = GetArmyBrain(GetCurrentCommandSource())
+    SPEW(string.format("Moderator event for %s: %s", tostring(brain.Nickname), repru(data, 10000)))
+end
+
+--#endregion
