@@ -111,32 +111,17 @@ function OnSync()
 
         -- Informs moderators that the focus army has changed for the local player
         if Sync.FocusArmyChanged then
-            local clients = GetSessionClients()
-            local localClient = nil
-            for k = 1, table.getn(clients) do
-                if clients[k]["local"] then
-                    localClient = clients[k]
-                    break
-                end
-            end
-
             -- try to inform moderators
             SimCallback(
                 {
-                    Func="GiveResourcesToPlayer",
+                    Func="ModeratorEvent",
                     Args= {
-                        From=Sync.FocusArmyChanged.old,
-                        To=Sync.FocusArmyChanged.old,
-                        Mass=0,
-                        Energy=0,
-                        Sender=localClient.name,
-                        Msg={ to='moderators', text = string.format("Switched focus army from %s to %s!", tostring(Sync.FocusArmyChanged.old), tostring(Sync.FocusArmyChanged.new)) }
+                        From = Sync.FocusArmyChanged.old,
+                        Message = string.format("Switched focus army from %s to %s!", tostring(Sync.FocusArmyChanged.old), tostring(Sync.FocusArmyChanged.new)),
                     },
-                },
-                true
+                }
             )
         end
-
     end
 
     -- old sync callbacks
