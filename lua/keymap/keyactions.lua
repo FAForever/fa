@@ -365,6 +365,14 @@ local keyActionsSelectionQuickSelect = {
         action = 'UI_SelectByCategory AIR BOMBER',
         category = 'selection',
     },
+    ['select_surface_bombers'] = {
+        action = 'UI_Lua import("/lua/keymap/smartselection.lua").smartSelect("AIR BOMBER -ANTINAVY")',
+        category = 'selection',
+    },
+    ['select_torpedo_bombers'] = {
+        action = 'UI_SelectByCategory AIR BOMBER ANTINAVY',
+        category = 'selection',
+    },
     ['select_anti_air_fighters'] = {
         action = 'UI_Lua import("/lua/keymap/smartselection.lua").smartSelect("AIR HIGHALTAIR ANTIAIR -BOMBER -EXPERIMENTAL")',
         category = 'selection',
