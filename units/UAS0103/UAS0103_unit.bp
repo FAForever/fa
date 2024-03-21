@@ -16,7 +16,6 @@ UnitBlueprint{
     Categories = {
         "AEON",
         "ANTITORPEDO",
-        "BUILTBYEXPERIMENTALSUB",
         "BUILTBYTIER1FACTORY",
         "BUILTBYTIER2FACTORY",
         "BUILTBYTIER3FACTORY",
