@@ -228,6 +228,7 @@ local function FilterTemplatesByUnitContext(buildableUnits, prefix)
     -- try and retrieve blueprint id from command mode
     local commandMode = import("/lua/ui/game/commandmode.lua").GetCommandMode()
     local blueprintId = commandMode[2].name
+    local fromCommandMode = (blueprintId and true) or false
 
     -- try and retrieve blueprint id from highlight command
     if not blueprintId then
@@ -250,28 +251,31 @@ local function FilterTemplatesByUnitContext(buildableUnits, prefix)
         return false
     end
 
-    -- add the blueprint id that we're hovering over
-    local convertedBlueprintId = ConvertBlueprintId(blueprintId, prefix)
-    local convertedBlueprint = __blueprints[convertedBlueprintId]
-    local templateUnitBlueprintFromId = convertedBlueprint.General.UpgradesFrom
-    local templateUnitBlueprintBaseId = convertedBlueprint.General.UpgradesFromBase
+    -- we have a blueprint that is not from the command mode. If we do include it
+    -- then we're cycling through the same blueprint twice
+    if not fromCommandMode then
+        local convertedBlueprintId = ConvertBlueprintId(blueprintId, prefix)
+        local convertedBlueprint = __blueprints[convertedBlueprintId]
+        local templateUnitBlueprintFromId = convertedBlueprint.General.UpgradesFrom
+        local templateUnitBlueprintBaseId = convertedBlueprint.General.UpgradesFromBase
 
-    local validBlueprintId
-    if convertedBlueprint then
-        if buildableUnits[convertedBlueprintId] then
-            validBlueprintId = convertedBlueprintId
-        elseif templateUnitBlueprintFromId and buildableUnits[templateUnitBlueprintFromId] then
-            validBlueprintId = templateUnitBlueprintFromId
-        elseif templateUnitBlueprintBaseId and buildableUnits[templateUnitBlueprintBaseId] then
-            validBlueprintId = templateUnitBlueprintBaseId
+        local validBlueprintId
+        if convertedBlueprint then
+            if buildableUnits[convertedBlueprintId] then
+                validBlueprintId = convertedBlueprintId
+            elseif templateUnitBlueprintFromId and buildableUnits[templateUnitBlueprintFromId] then
+                validBlueprintId = templateUnitBlueprintFromId
+            elseif templateUnitBlueprintBaseId and buildableUnits[templateUnitBlueprintBaseId] then
+                validBlueprintId = templateUnitBlueprintBaseId
+            end
         end
-    end
 
-    if validBlueprintId then
-        SingletonTemplate.Name = LOC(__blueprints[validBlueprintId].Description)
-        SingletonTemplate.TemplateData[3][1] = validBlueprintId
-        TableInsert(ContextBasedTemplates, SingletonTemplate)
-        ContextBasedTemplateCount = ContextBasedTemplateCount + 1
+        if validBlueprintId then
+            SingletonTemplate.Name = LOC(__blueprints[validBlueprintId].Description)
+            SingletonTemplate.TemplateData[3][1] = validBlueprintId
+            TableInsert(ContextBasedTemplates, SingletonTemplate)
+            ContextBasedTemplateCount = ContextBasedTemplateCount + 1
+        end
     end
 
     -- add templates that match the unit that we're hovering over
