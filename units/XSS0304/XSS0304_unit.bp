@@ -20,7 +20,6 @@ UnitBlueprint{
         "ANTIAIR",
         "ANTINAVY",
         "ANTITORPEDO",
-        "BUILTBYEXPERIMENTALSUB",
         "BUILTBYTIER3FACTORY",
         "MOBILE",
         "NAVAL",

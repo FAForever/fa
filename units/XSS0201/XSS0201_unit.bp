@@ -20,7 +20,6 @@ UnitBlueprint{
     Categories = {
         "ANTINAVY",
         "ANTITORPEDO",
-        "BUILTBYEXPERIMENTALSUB",
         "BUILTBYTIER2FACTORY",
         "BUILTBYTIER3FACTORY",
         "DESTROYER",
