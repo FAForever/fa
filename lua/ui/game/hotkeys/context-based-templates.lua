@@ -232,7 +232,6 @@ local function FilterTemplatesByUnitContext(buildableUnits, prefix)
     -- try and retrieve blueprint id from highlight command
     if not blueprintId then
         local highlightCommand = GetHighlightCommand()
-        reprsl(highlightCommand)
         if highlightCommand and highlightCommand.blueprintId then
             blueprintId = highlightCommand.blueprintId
         end
