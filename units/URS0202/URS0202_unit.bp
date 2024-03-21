@@ -42,7 +42,6 @@ UnitBlueprint {
         "OVERLAYSONAR",
         "PRODUCTSC1",
         "RECLAIMABLE",
-        "REPAIR",
         "SELECTABLE",
         "SNIPEMODE",
         "TECH2",
