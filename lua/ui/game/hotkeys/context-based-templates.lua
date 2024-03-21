@@ -250,7 +250,31 @@ local function FilterTemplatesByUnitContext(buildableUnits, prefix)
         return false
     end
 
-    -- see if any templates match the blueprint id
+    -- add the blueprint id that we're hovering over
+    local convertedBlueprintId = ConvertBlueprintId(blueprintId, prefix)
+    local convertedBlueprint = __blueprints[convertedBlueprintId]
+    local templateUnitBlueprintFromId = convertedBlueprint.General.UpgradesFrom
+    local templateUnitBlueprintBaseId = convertedBlueprint.General.UpgradesFromBase
+
+    local validBlueprintId
+    if convertedBlueprint then
+        if buildableUnits[convertedBlueprintId] then
+            validBlueprintId = convertedBlueprintId
+        elseif templateUnitBlueprintFromId and buildableUnits[templateUnitBlueprintFromId] then
+            validBlueprintId = templateUnitBlueprintFromId
+        elseif templateUnitBlueprintBaseId and buildableUnits[templateUnitBlueprintBaseId] then
+            validBlueprintId = templateUnitBlueprintBaseId
+        end
+    end
+
+    if validBlueprintId then
+        SingletonTemplate.Name = LOC(__blueprints[validBlueprintId].Description)
+        SingletonTemplate.TemplateData[3][1] = validBlueprintId
+        TableInsert(ContextBasedTemplates, SingletonTemplate)
+        ContextBasedTemplateCount = ContextBasedTemplateCount + 1
+    end
+
+    -- add templates that match the unit that we're hovering over
     for k = 1, TableGetn(Templates) do
         local template = Templates[k]
         local trigger = template.TriggersOnUnit or template.TriggersOnBuilding
@@ -264,32 +288,6 @@ local function FilterTemplatesByUnitContext(buildableUnits, prefix)
                 TableInsert(ContextBasedTemplates, template)
                 ContextBasedTemplateCount = ContextBasedTemplateCount + 1
             end
-        end
-    end
-
-    -- act like a color picker but then for units, see if there's something useful that we can build
-    if ContextBasedTemplateCount == 0 then
-        local convertedBlueprintId = ConvertBlueprintId(blueprintId, prefix)
-        local convertedBlueprint = __blueprints[convertedBlueprintId]
-        local templateUnitBlueprintFromId = convertedBlueprint.General.UpgradesFrom
-        local templateUnitBlueprintBaseId = convertedBlueprint.General.UpgradesFromBase
-
-        local validBlueprintId
-        if convertedBlueprint then
-            if buildableUnits[convertedBlueprintId] then
-                validBlueprintId = convertedBlueprintId
-            elseif templateUnitBlueprintFromId and buildableUnits[templateUnitBlueprintFromId] then
-                validBlueprintId = templateUnitBlueprintFromId
-            elseif templateUnitBlueprintBaseId and buildableUnits[templateUnitBlueprintBaseId] then
-                validBlueprintId = templateUnitBlueprintBaseId
-            end
-        end
-
-        if validBlueprintId then
-            SingletonTemplate.Name = LOC(__blueprints[validBlueprintId].Description)
-            SingletonTemplate.TemplateData[3][1] = validBlueprintId
-            TableInsert(ContextBasedTemplates, SingletonTemplate)
-            ContextBasedTemplateCount = ContextBasedTemplateCount + 1
         end
     end
 
