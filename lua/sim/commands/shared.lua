@@ -20,16 +20,168 @@
 --** SOFTWARE.
 --******************************************************************************************************
 
--- upvalue scope for performance
-local MathCeil = math.ceil
-local TableSort = table.sort
-
 ---@class DistributeOrderInfo
----@field Callback? fun(units: Unit[], target: Vector | Entity, arg3?: any, arg4?: any)
+---@field Callback? fun(units: Unit[], target: Vector | Entity, arg3?: any, arg4?: any): boolean
 ---@field Type string                   # Describes the intended order, useful for debugging
 ---@field BatchOrders boolean           # When set, assigns orders to groups of units
 ---@field FullRedundancy boolean        # When set, attempts to add full redundancy when reasonable by assigning multiple orders to each group
 ---@field Redundancy number             # When set, assigns orders to individual units. Number of orders assigned is equal to the redundancy factor
+
+
+-- upvalue scope for performance
+local IssueNuke = IssueNuke
+local IssueMove = IssueMove
+local IssueGuard = IssueGuard
+local IssuePatrol = IssuePatrol
+local IssueAttack = IssueAttack
+local IssueRepair = IssueRepair
+local IssueCapture = IssueCapture
+local IssueReclaim = IssueReclaim
+local IssueTeleport = IssueTeleport
+local IssueTactical = IssueTactical
+local IssueSacrifice = IssueSacrifice
+local IssueBuildAllMobile = IssueBuildAllMobile
+local IssueAggressiveMove = IssueAggressiveMove
+local IssueTransportUnload = IssueTransportUnload
+
+local MathCeil = math.ceil
+local TableSort = table.sort
+
+---@param units Unit[]
+---@param position Vector
+---@return boolean
+local IssueNukeCallback = function(units, position)
+    IssueNuke(units, position)
+    return true
+end
+
+---@param units Unit[]
+---@param position Vector
+---@return boolean
+local IssueMoveCallback = function(units, position)
+    IssueMove(units, position)
+    return true
+end
+
+---@param units Unit[]
+---@param target Unit | Vector
+---@return boolean
+local IssueGuardCallback = function(units, target)
+    IssueGuard(units, target)
+    return true
+end
+
+---@param units Unit[]
+---@param position Vector
+---@return boolean
+local IssuePatrolCallback = function(units, position)
+    IssuePatrol(units, position)
+    return true
+end
+
+---@param units Unit[]
+---@param target Unit | Vector | Prop | Blip
+---@return boolean
+local IssueAttackCallback = function (units, target)
+
+    -- check if we have units
+    if table.empty(units) then
+        return false
+    end
+
+    -- if it is a blip then we must have vision on it
+    if not table.empty(getmetatable(target)) and IsBlip(target) then
+        local unitArmy = units[1].Army --[[@as number]]
+        if target:IsSeenNow(unitArmy) or target:IsOnRadar(unitArmy) or target:IsOnSonar(unitArmy) or target:IsOnOmni(unitArmy) then
+            IssueAttack(units, target)
+            return true
+        else
+            return false
+        end
+    end
+
+    -- target is a vector or a prop, either is always fine
+    IssueAttack(units, target)
+    return true
+end
+
+---@param units Unit[]
+---@param target Unit
+---@return boolean
+local IssueRepairCallback = function(units, target)
+    IssueRepair(units, target)
+    return true
+end
+
+---@param units Unit[]
+---@param target Unit
+---@return boolean
+local IssueCaptureCallback = function(units, target)
+    IssueCapture(units, target)
+    return true
+end
+
+---@param units Unit[]
+---@param target Unit | Prop | Vector
+---@return boolean
+local IssueReclaimCallback = function(units, target)
+    if IsDestroyed(target) then
+        return false
+    end
+
+    pcall(IssueReclaim, units, target)
+    return true
+end
+
+---@param units Unit[]
+---@param target Vector
+---@return boolean
+local IssueTeleportCallback = function(units, target)
+    IssueTeleport(units, target)
+    return true
+end
+
+---@param units Unit[]
+---@param target Vector
+---@return boolean
+local IssueTacticalCallback = function(units, target)
+    IssueTactical(units, target)
+    return true
+end
+
+---@param units Unit[]
+---@param target Unit
+---@return boolean
+local IssueSacrificeCallback = function(units, target)
+    IssueSacrifice(units, target)
+    return true
+end
+
+---@param units Unit[]
+---@param target Vector
+---@return boolean
+local IssueAggressiveMoveCallback = function(units, target)
+    IssueAggressiveMove(units, target)
+    return true
+end
+
+---@param units Unit[]
+---@param target Vector
+---@return boolean
+local IssueTransportUnloadCallback = function(units, target)
+    IssueTransportUnload(units, target)
+    return true
+end
+
+---@param units Unit[]
+---@param position Vector
+---@param blueprintID string
+---@param table number[] # A list of alternative build locations, similar to AiBrain.BuildStructure. Doesn't appear to function properly
+---@return boolean
+local IssueBuildAllMobileCallback = function (units, position, blueprintID, table)
+    IssueBuildAllMobile(units, position, blueprintID, table)
+    return true
+end
 
 --- The order of this list is determined in the engine, see also the files in:
 --- - https://github.com/FAForever/FA-Binary-Patches/pull/22
@@ -38,13 +190,13 @@ UnitQueueDataToCommand = {
     [1] = { Type = "Stop", },
     [2] = {
         Type = "Move",
-        Callback = IssueMove,
+        Callback = IssueMoveCallback,
         BatchOrders = true,
     },
     [3] = { Type = "Dive", },
     [4] = {
         Type = "FormMove",
-        Callback = IssueMove,
+        Callback = IssueMoveCallback,
         BatchOrders = true,
     },
     [5] = { Type = "BuildSiloTactical", },
@@ -52,125 +204,71 @@ UnitQueueDataToCommand = {
     [7] = { Type = "BuildFactory", },
     [8] = {
         Type = "BuildMobile",
-        Callback = IssueBuildAllMobile,
+        Callback = IssueBuildAllMobileCallback,
         Redundancy = 1,
     },
     [9] = {
         Type = "BuildAssist",
-        Callback = IssueGuard,
+        Callback = IssueGuardCallback,
         BatchOrders = true,
     },
     [10] = {
         Type = "Attack",
-        ---@param units Unit[]
-        ---@param target Unit | Prop | Vector | Blip
-        ---@return boolean
-        Callback = function(units, target)
-
-            -- check if we have units
-            if table.empty(units) then
-                return false
-            end
-
-            -- if it is a blip then we must have vision on it
-            if not table.empty(getmetatable(target)) and IsBlip(target) then
-                local unitArmy = units[1].Army
-                if target:IsSeenNow(unitArmy) or target:IsOnRadar(unitArmy) or target:IsOnSonar(unitArmy) or target:IsOnOmni(unitArmy) then
-                    IssueAttack(units, target)
-                    return true
-                else
-                    return false
-                end
-            end
-
-            IssueAttack(units, target)
-
-            return true
-        end,
+        Callback = IssueAttackCallback,
         BatchOrders = true,
         FullRedundancy = true,
     },
     [11] = {
         Type = "FormAttack",
-        ---@param units Unit[]
-        ---@param target Unit | Prop | Vector | Blip
-        ---@return boolean
-        Callback = function(units, target)
-
-            -- check if we have units
-            if table.empty(units) then
-                return false
-            end
-
-            -- if it is a blip then we must have vision on it
-            if not table.empty(getmetatable(target)) and IsBlip(target) then
-                local unitArmy = units[1].Army
-                if target:IsSeenNow(unitArmy) or target:IsOnRadar(unitArmy) or target:IsOnSonar(unitArmy) or target:IsOnOmni(unitArmy) then
-                    IssueAttack(units, target)
-                    return true
-                else
-                    return false
-                end
-            end
-
-            IssueAttack(units, target)
-
-            return true
-        end,
+        Callback = IssueAttackCallback,
         BatchOrders = true,
         FullRedundancy = true,
     },
     [12] = {
         Type = "Nuke",
-        Callback = IssueNuke,
+        Callback = IssueNukeCallback,
         Redundancy = 1,
     },
     [13] = {
         Type = "Tactical",
-        Callback = IssueTactical,
+        Callback = IssueTacticalCallback,
         Redundancy = 1,
     },
     [14] = {
         Type = "Teleport",
-        Callback = IssueTeleport,
+        Callback = IssueTeleportCallback,
         Redundancy = 1,
     },
     [15] = {
         Type = "Guard",
-        Callback = IssueGuard,
+        Callback = IssueGuardCallback,
         BatchOrders = true,
     },
     [16] = {
         Type = "Patrol",
-        Callback = IssuePatrol,
+        Callback = IssuePatrolCallback,
         Redundancy = 3,
     },
     [17] = { Type = "Ferry", },
     [18] = {
         Type = "FormPatrol",
-        Callback = IssuePatrol,
+        Callback = IssuePatrolCallback,
         Redundancy = 3,
     },
     [19] = {
         Type = "Reclaim",
-        Callback = function(units, positionOrEntity)
-            if IsDestroyed(positionOrEntity) then
-                return
-            end
-
-            pcall(IssueReclaim, units, positionOrEntity)
-        end,
+        Callback = IssueReclaimCallback,
         BatchOrders = true,
     },
     [20] = {
         Type = "Repair",
-        Callback = IssueRepair,
+        Callback = IssueRepairCallback,
         BatchOrders = true,
         FullRedundancy = true,
     },
     [21] = {
         Type = "Capture",
-        Callback = IssueCapture,
+        Callback = IssueCaptureCallback,
         BatchOrders = true,
         FullRedundancy = true,
     },
@@ -178,7 +276,7 @@ UnitQueueDataToCommand = {
     [23] = { Type = "TransportReverseLoadUnits", },
     [24] = {
         Type = "TransportUnloadUnits",
-        Callback = IssueTransportUnload,
+        Callback = IssueTransportUnloadCallback,
         Redundancy = 1,
     },
     [25] = { Type = "TransportUnloadSpecificUnits", },
@@ -187,26 +285,26 @@ UnitQueueDataToCommand = {
     [28] = { Type = "Script", },
     [29] = {
         Type = "AssistCommander",
-        Callback = IssueGuard,
+        Callback = IssueGuardCallback,
         BatchOrders = true,
     },
     [30] = { Type = "KillSelf", },
     [31] = { Type = "DestroySelf", },
     [32] = {
         Type = "Sacrifice",
-        Callback = IssueSacrifice,
+        Callback = IssueSacrificeCallback,
         BatchOrders = true,
     },
     [33] = { Type = "Pause", },
     [34] = { Type = "OverCharge", },
     [35] = {
         Type = "AggressiveMove",
-        Callback = IssueAggressiveMove,
+        Callback = IssueAggressiveMoveCallback,
         BatchOrders = true,
     },
     [36] = {
         Type = "FormAggressiveMove",
-        Callback = IssueAggressiveMove,
+        Callback = IssueAggressiveMoveCallback,
         BatchOrders = true,
     },
     [37] = { Type = "AssistMove", },

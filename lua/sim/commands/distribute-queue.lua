@@ -37,7 +37,7 @@ local LoadIntoTransports = import("/lua/sim/commands/load-in-transport.lua").Loa
 
 --- Processes the orders and re-distributes them over the units. Assumes that all units in the
 --- selection to have the same command queue. If that is not the case then orders are lost
---- 
+---
 --- Does not support distributing orders over factories
 ---@param units Unit[]              # the units that we apply the distributed orders to
 ---@param target Unit               # the unit that we read the queue of
@@ -152,7 +152,7 @@ DistributeOrders = function(units, target, clearCommands, doPrint)
     -- special snowflake implementation for transport load commands
 
     -- a special routine to make it more user friendly. What we do here is to
-    -- make sure that the load orders are applied immediately. All orders 
+    -- make sure that the load orders are applied immediately. All orders
     -- before the load orders are ignored. The remaining orders are distributed
     -- over the units that end up being transported.
 
@@ -162,7 +162,7 @@ DistributeOrders = function(units, target, clearCommands, doPrint)
     -- before you finished giving orders
 
     -- there is an odd interaction when you want to distribute orders of transports
-    -- that are currently waiting for a load order. We cannot clear the command 
+    -- that are currently waiting for a load order. We cannot clear the command
     -- queue as that would cancel the load order too. Until we have better control
     -- over what we clear from the command queue the user will have to wait until
     -- the loading is complete before he can issue unload orders for the transports
@@ -177,10 +177,11 @@ DistributeOrders = function(units, target, clearCommands, doPrint)
 
     if indexOfTransportOrder then
         -- filter out all transports
-        local unitsWithNoTransports = EntityCategoryFilterDown(categories.ALLUNITS - (categories.TRANSPORTATION + categories.AIR), units)
+        local unitsWithNoTransports = EntityCategoryFilterDown(categories.ALLUNITS -
+            (categories.TRANSPORTATION + categories.AIR), units)
 
         -- retrieve all transports we use in orders
-        local transports = { }
+        local transports = {}
         for k, order in groups[indexOfTransportOrder] do
             if order.target and EntityCategoryContains(categories.TRANSPORTATION, order.target) then
                 TableInsert(transports, order.target)
@@ -189,7 +190,8 @@ DistributeOrders = function(units, target, clearCommands, doPrint)
 
         -- try and issue the transport orders. Only apply distribution to units that are transported
         if (TableGetn(transports) > 0) and (TableGetn(unitsWithNoTransports) > 0) then
-            local transportedUnits, transportsUsed, remainingUnits, remainingTransports = LoadIntoTransports(unitsWithNoTransports, transports, true, true)
+            local transportedUnits, transportsUsed, remainingUnits, remainingTransports = LoadIntoTransports(unitsWithNoTransports
+                , transports, true, true)
             units = transportedUnits
         end
 
@@ -252,8 +254,9 @@ DistributeOrders = function(units, target, clearCommands, doPrint)
                         dummyVectorTable[1] = order.x
                         dummyVectorTable[2] = order.y
                         dummyVectorTable[3] = order.z
-                        issueOrder(dummyUnitTable, dummyVectorTable, order.blueprintId, dummyEmptyTable)
-                        distributedOrders = distributedOrders + 1
+                        if issueOrder(dummyUnitTable, dummyVectorTable, order.blueprintId, dummyEmptyTable) then
+                            distributedOrders = distributedOrders + 1
+                        end
                     end
                 elseif orderCount > unitCount then
 
@@ -270,8 +273,9 @@ DistributeOrders = function(units, target, clearCommands, doPrint)
                             dummyVectorTable[1] = order.x
                             dummyVectorTable[2] = order.y
                             dummyVectorTable[3] = order.z
-                            issueOrder(dummyUnitTable, dummyVectorTable, order.blueprintId, dummyEmptyTable)
-                            distributedOrders = distributedOrders + 1
+                            if issueOrder(dummyUnitTable, dummyVectorTable, order.blueprintId, dummyEmptyTable) then
+                                distributedOrders = distributedOrders + 1
+                            end
                         end
                     end
                 else
@@ -291,8 +295,9 @@ DistributeOrders = function(units, target, clearCommands, doPrint)
                         start = start + batch
                         for _, unit in unitBatch do
                             dummyUnitTable[1] = unit
-                            issueOrder(dummyUnitTable, dummyVectorTable, order.blueprintId, dummyEmptyTable)
-                            distributedOrders = distributedOrders + 1
+                            if issueOrder(dummyUnitTable, dummyVectorTable, order.blueprintId, dummyEmptyTable) then
+                                distributedOrders = distributedOrders + 1
+                            end
                         end
                     end
                 end
@@ -321,8 +326,9 @@ DistributeOrders = function(units, target, clearCommands, doPrint)
                             local order = group[index]
                             local unitBatch = PopulateBatch(start, batch - 1, units, dummyBatchTable)
                             local targetOrEntity = order.target or PopulateLocation(order, dummyVectorTable)
-                            issueOrder(unitBatch, targetOrEntity)
-                            distributedOrders = distributedOrders + 1
+                            if issueOrder(unitBatch, targetOrEntity) then
+                                distributedOrders = distributedOrders + 1
+                            end
                         end
 
                         start = start + batch
@@ -339,8 +345,9 @@ DistributeOrders = function(units, target, clearCommands, doPrint)
                             local orderBatch = PopulateBatch(start, batch - 1, group, dummyBatchTable)
                             start = start + batch
                             for _, order in orderBatch do
-                                issueOrder(dummyUnitTable, order.target or PopulateLocation(order, dummyVectorTable))
-                                distributedOrders = distributedOrders + 1
+                                if issueOrder(dummyUnitTable, order.target or PopulateLocation(order, dummyVectorTable)) then
+                                    distributedOrders = distributedOrders + 1
+                                end
                             end
                         end
                     else
@@ -353,8 +360,9 @@ DistributeOrders = function(units, target, clearCommands, doPrint)
                             local order = group[k]
                             local unitBatch = PopulateBatch(start, batch - 1, units, dummyBatchTable)
                             start = start + batch
-                            issueOrder(unitBatch, order.target or PopulateLocation(order, dummyVectorTable))
-                            distributedOrders = distributedOrders + 1
+                            if issueOrder(unitBatch, order.target or PopulateLocation(order, dummyVectorTable)) then
+                                distributedOrders = distributedOrders + 1
+                            end
                         end
                     end
                 end
@@ -367,8 +375,9 @@ DistributeOrders = function(units, target, clearCommands, doPrint)
                         local order = group[MathMod(offset, orderCount) + 1]
                         offset = offset + 1
                         dummyUnitTable[1] = unit
-                        issueOrder(dummyUnitTable, order.target or PopulateLocation(order, dummyVectorTable))
-                        distributedOrders = distributedOrders + 1
+                        if issueOrder(dummyUnitTable, order.target or PopulateLocation(order, dummyVectorTable)) then
+                            distributedOrders = distributedOrders + 1
+                        end
                     end
                 end
             end
@@ -378,7 +387,11 @@ DistributeOrders = function(units, target, clearCommands, doPrint)
     ---------------------------------------------------------------------------
     -- inform user and observers
 
-    if doPrint and (distributedOrders > 0) and (GetFocusArmy() == brain:GetArmyIndex()) then
-        print(string.format("Distributed %d orders", tostring(distributedOrders)))
+    if doPrint and (GetFocusArmy() == brain:GetArmyIndex()) then
+        if distributedOrders > 0 then
+            print(string.format("Distributed %d orders", tostring(distributedOrders)))
+        else
+            print(string.format("No orders to distribute"))
+        end
     end
 end
