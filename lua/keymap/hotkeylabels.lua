@@ -113,6 +113,7 @@ function getKeyTables()
     local upgradeKey = false
     local orderKeys = {
         -- Special assignment for the attack move order because it can't be bound from the user key map
+        -- Keyed the same as the tooltip for the attack move button
     	["attack_move"] = {
             ["key"] = 'RMB',
             ["colour"] = colours[3],
