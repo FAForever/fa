@@ -113,7 +113,6 @@ UnitQueueDataToCommand = {
             pcall(IssueReclaim, units, positionOrEntity)
         end,
         BatchOrders = true,
-        FullRedundancy = true,
     },
     [20] = {
         Type = "Repair",

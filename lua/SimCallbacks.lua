@@ -52,7 +52,6 @@ local Callbacks = {}
 ---@param data table
 ---@param units? Unit[]
 function DoCallback(name, data, units)
-    LOG(name, repru(data))
     local start = GetSystemTimeSecondsOnlyForProfileUse()
     local fn = Callbacks[name];
     if fn then
@@ -1245,6 +1244,22 @@ Callbacks.AIPlatoonSimpleStructureBehavior = function(data, units)
     end
 
     import("/lua/aibrains/platoons/platoon-simple-structure.lua").DebugAssignToUnits(data, units)
+end
+
+--#endregion
+
+-------------------------------------------------------------------------------
+--#region Moderator related functionality
+
+---@class CallbackModeratorEventData
+---@field From number
+---@field Message string
+
+---@param data CallbackModeratorEventData
+Callbacks.ModeratorEvent = function(data)
+    -- show up in the game logs
+    local brain = GetArmyBrain(GetCurrentCommandSource())
+    SPEW(string.format("Moderator event for %s: %s", tostring(brain.Nickname), repru(data, 10000)))
 end
 
 --#endregion

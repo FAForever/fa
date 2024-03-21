@@ -163,11 +163,10 @@ end
 function EntityCategoryFilterOut(category, units)
 end
 
---- Executes some Lua code in the sim
+--- Executes some Lua code in the sim. Requires cheats to be enabled
 ---@param func function
----@param ... any this may actually be a comma-separated string of args instead of a vararg
----@return any
-function ExecLuaInSim(func, ...)
+---@param value any
+function ExecLuaInSim(func, value)
 end
 
 --- Requests that the application shut down

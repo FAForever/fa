@@ -51,6 +51,7 @@ UnitBlueprint{
         "AIR",
         "AIRSTAGINGPLATFORM",
         "ANTIAIR",
+        "ANTINAVY",
         "BUILTBYTIER3COMMANDER",
         "BUILTBYTIER3ENGINEER",
         "CANNOTUSEAIRSTAGING",

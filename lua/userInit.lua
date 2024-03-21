@@ -123,10 +123,8 @@ do
 
     local TableGetn = table.getn
 
-    local GameTick = GameTick
     local GetFocusArmy = GetFocusArmy
     local SessionIsReplay = SessionIsReplay
-    local SessionRequestPause = SessionRequestPause
     local GetSessionClients = GetSessionClients
 
     local tickstamp = 0
@@ -142,72 +140,44 @@ do
             return
         end
 
+        -- inform allies about self-destructed units
+        if find(lower, 'killselectedunits') then
+            local selectedUnits = GetSelectedUnits()
+            local currentFocusArmy = GetFocusArmy()
+
+            -- try to inform moderators
+            SimCallback(
+                {
+                    Func="ModeratorEvent",
+                    Args= {
+                        From = currentFocusArmy,
+                        Message = string.format('Self-destructed %d units', TableGetn(selectedUnits)),
+                    },
+                }
+            )
+        end
+
         -- do a basic check
         if find(lower, 'setfocusarmy') then
             if not SessionIsReplay() then
-                local clients = GetSessionClients()
-                local localClient = nil
-                for k = 1, TableGetn(clients) do
-                    if clients[k]["local"] then
-                        localClient = clients[k]
-                        break
-                    end
-                end
-                
                 local currentFocusArmy = GetFocusArmy()
                 local proposedFocusArmy = tonumber(match(command, '%d+'))
-
                 if find(command, '-') then
                     proposedFocusArmy = proposedFocusArmy * -1
                 else
                     proposedFocusArmy = proposedFocusArmy + 1
                 end
 
-                LOG("ConExecute: " .. command, currentFocusArmy, proposedFocusArmy)
-
-                if localClient and TableGetn(clients) > 0 and proposedFocusArmy and currentFocusArmy != proposedFocusArmy then
-                    command = "SetFocusArmy " .. (currentFocusArmy - 1)
-
-                    -- try to inform moderators
-                    SimCallback(
-                        {
-                            Func="GiveResourcesToPlayer",
-                            Args= {
-                                From=currentFocusArmy,
-                                To=currentFocusArmy,
-                                Mass=0,
-                                Energy=0,
-                                Sender=localClient.name,
-                                Msg={ to='moderators', text = string.format("Is trying to change focus army from %d to %d via ConExecute!", currentFocusArmy, proposedFocusArmy)}
-                            },
+                -- try to inform moderators
+                SimCallback(
+                    {
+                        Func="ModeratorEvent",
+                        Args= {
+                            From = currentFocusArmy,
+                            Message = string.format("Is changing focus army from %d to %d via ConExecute!", currentFocusArmy, proposedFocusArmy),
                         },
-                        true
-                    )
-
-                    local tick = GameTick()
-                    if tickstamp + 10 > tick then
-                        -- try to inform moderators
-                        SimCallback(
-                            {
-                                Func="GiveResourcesToPlayer",
-                                Args= {
-                                    From=currentFocusArmy,
-                                    To=currentFocusArmy,
-                                    Mass=0,
-                                    Energy=0,
-                                    Sender=localClient.name,
-                                    Msg={ to='moderators', text = string.format("Is (aggressively) trying to change focus army from %d to %d via ConExecute!", currentFocusArmy, proposedFocusArmy ) }
-                                },
-                            },
-                            true
-                        )
-
-                        -- just to be annoying
-                        SessionRequestPause()
-                    end
-    
-                    tickstamp = tick
-                end
+                    }
+                )
             end
         end
 
@@ -225,74 +195,109 @@ do
             return
         end
 
+        -- inform allies about self-destructed units
+        if find(lower, 'killselectedunits') then
+            local selectedUnits = GetSelectedUnits()
+            local currentFocusArmy = GetFocusArmy()
+
+            -- try to inform moderators
+            SimCallback(
+                {
+                    Func="ModeratorEvent",
+                    Args= {
+                        From = currentFocusArmy,
+                        Message = string.format('Self-destructed %d units', TableGetn(selectedUnits)),
+                    },
+                }
+            )
+        end
+
         -- do a basic check
         if find(lower, 'setfocusarmy') then
-            if not SessionIsReplay() then
-                local clients = GetSessionClients()
-                local localClient = nil
-                for k = 1, TableGetn(clients) do
-                    if clients[k]["local"] then
-                        localClient = clients[k]
-                        break
-                    end
-                end
-
+            if not (SessionIsReplay()) then
                 local currentFocusArmy = GetFocusArmy()
                 local proposedFocusArmy = tonumber(match(command, '%d+'))
-
                 if find(command, '-') then
                     proposedFocusArmy = proposedFocusArmy * -1
                 else
                     proposedFocusArmy = proposedFocusArmy + 1
                 end
 
-                if localClient and TableGetn(clients) > 0 and proposedFocusArmy and currentFocusArmy != proposedFocusArmy then
-                    command = "SetFocusArmy " .. (currentFocusArmy - 1)
-
-                    -- try to inform moderators
-                    SimCallback(
-                        {
-                            Func="GiveResourcesToPlayer",
-                            Args= {
-                                From=currentFocusArmy,
-                                To=currentFocusArmy,
-                                Mass=0,
-                                Energy=0,
-                                Sender=localClient.name,
-                                Msg={ to='moderators', text = string.format("Is trying to change focus army from %d to %d via ConExecuteSave!", currentFocusArmy, proposedFocusArmy) }
-                            },
+                -- try to inform moderators
+                SimCallback(
+                    {
+                        Func="ModeratorEvent",
+                        Args= {
+                            From = currentFocusArmy,
+                            Message = string.format("Is changing focus army from %d to %d via ConExecuteSave!", currentFocusArmy, proposedFocusArmy),
                         },
-                        true
-                    )
-
-                    local tick = GameTick()
-                    if tickstamp + 10 > tick then
-                        -- try to inform moderators
-                        SimCallback(
-                            {
-                                Func="GiveResourcesToPlayer",
-                                Args= {
-                                    From=currentFocusArmy,
-                                    To=currentFocusArmy,
-                                    Mass=0,
-                                    Energy=0,
-                                    Sender=localClient.name,
-                                    Msg={ to='moderators', text = string.format("Is (aggressively) trying to change focus army from %d to %d via ConExecuteSave!", currentFocusArmy, proposedFocusArmy) }
-                                },
-                            },
-                            true
-                        )
-
-                        -- just to be annoying
-                        SessionRequestPause()
-                    end
-    
-                    tickstamp = tick
-                end
+                    }
+                )
             end
         end
 
         oldConExecuteSave(command)
+    end
+
+    local oldSimCallback = SimCallback
+
+    ---@param callback SimCallback
+    ---@param addUnitSelection boolean
+    _G.SimCallback = function(callback, addUnitSelection)
+        local clients = GetSessionClients()
+        local localClient = nil
+        for k = 1, TableGetn(clients) do
+            if clients[k]["local"] then
+                localClient = clients[k]
+                break
+            end
+        end
+        local currentFocusArmy = GetFocusArmy()
+
+        -- inform allies about self-destructed units
+        if callback.Func == 'ToggleSelfDestruct' then
+            local selectedUnits = GetSelectedUnits()
+ 
+            -- try to inform moderators
+            SimCallback(
+                {
+                    Func="ModeratorEvent",
+                    Args= {
+                        From = currentFocusArmy,
+                        Message = string.format('Self-destructed %d units', TableGetn(selectedUnits)),
+                    },
+                }
+            )
+        end
+
+        -- inform moderators about pings
+        if callback.Func == 'SpawnPing' then
+            if callback.Args.Marker then
+                -- try to inform moderators
+                SimCallback(
+                    {
+                        Func="ModeratorEvent",
+                        Args= {
+                            From = currentFocusArmy,
+                            Message = string.format("Created a marker with the text: '%s'", tostring(callback.Args.Name)),
+                        },
+                    }
+                )
+            else
+                -- try to inform moderators
+                SimCallback(
+                    {
+                        Func="ModeratorEvent",
+                        Args= {
+                            From = currentFocusArmy,
+                            Message = string.format("Created a ping of type '%s'", tostring(callback.Args.Type)),
+                        },
+                    }
+                )
+            end
+        end
+
+        oldSimCallback(callback, addUnitSelection or false)
     end
 
     --- Retrieves the terrain elevation, can be compared with the y coordinate of `GetMouseWorldPos` to determine if the mouse is above water
@@ -568,6 +573,7 @@ do
     local GetFocusArmy = GetFocusArmy
     local SessionIsReplay = SessionIsReplay
     local SessionRequestPause = SessionRequestPause
+    local SessionGetScenarioInfo = SessionGetScenarioInfo
     local GetSessionClients = GetSessionClients
     local oldSetFocusArmy = SetFocusArmy
     local tickstamp = 0
@@ -575,62 +581,21 @@ do
 
     _G.SetFocusArmy = function(number)
         -- do a basic check
-        if not SessionIsReplay() then
-            local clients = GetSessionClients()
-            local localClient = nil
-            for k = 1, TableGetn(clients) do
-                if clients[k]["local"] then
-                    localClient = clients[k]
-                    break
-                end
-            end
-
+        local isCheatsEnabled = SessionGetScenarioInfo().Options.CheatsEnabled == "true"
+        if not (SessionIsReplay() or isCheatsEnabled) then
             local currentFocusArmy = GetFocusArmy()
             local proposedFocusArmy = number
 
-            if localClient and TableGetn(clients) > 0 and proposedFocusArmy and currentFocusArmy != proposedFocusArmy then
-                number = currentFocusArmy
-
-                -- try to inform moderators
-                SimCallback(
-                    {
-                        Func="GiveResourcesToPlayer",
-                        Args= {
-                            From=currentFocusArmy,
-                            To=currentFocusArmy,
-                            Mass=0,
-                            Energy=0,
-                            Sender=localClient.name,
-                            Msg={ to='moderators', text = string.format("Is trying to change focus army from %d to %d via SetFocusArmy!", currentFocusArmy, proposedFocusArmy) }
-                        },
+            -- try to inform moderators
+            SimCallback(
+                {
+                    Func="ModeratorEvent",
+                    Args= {
+                        From = currentFocusArmy,
+                        Message = string.format("Is changing focus army from %d to %d via SetFocusArmy!", currentFocusArmy, proposedFocusArmy),
                     },
-                    true
-                )
-
-                local tick = GameTick()
-                if tickstamp + 10 > tick then
-                    -- try to inform moderators
-                    SimCallback(
-                        {
-                            Func="GiveResourcesToPlayer",
-                            Args= {
-                                From=currentFocusArmy,
-                                To=currentFocusArmy,
-                                Mass=0,
-                                Energy=0,
-                                Sender=localClient.name,
-                                Msg={ to='moderators', text = string.format("Is (aggressively) trying to change focus army from %d to %d via SetFocusArmy!", currentFocusArmy, proposedFocusArmy) }
-                            },
-                        },
-                        true
-                    )
-
-                    -- just to be annoying
-                    SessionRequestPause()
-                end
-
-                tickstamp = tick
-            end
+                }
+            )
         end
 
         oldSetFocusArmy(number)
