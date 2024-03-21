@@ -60,6 +60,8 @@ end
 
 -- convert all known templates
 
+local SingletonTemplate = { TemplateData = { 0, 0, { 'dummy', 0, 0, 0 } }}
+
 ---@type table
 local RawTemplates = import("/lua/ui/game/hotkeys/context-based-templates-data.lua")
 
@@ -98,10 +100,35 @@ CommandMode.AddEndBehavior(
         if not table.empty(ContextBasedTemplates) then
             ContextBasedTemplates = {}
             ContextBasedTemplateStep = 0
+            ClearBuildTemplates()
         end
     end,
     'ContextBasedTemplates'
 )
+
+--- Converts the blueprint id to the preferred faction
+---@param blueprintId BlueprintId
+---@param prefix 'ua' | 'ue' | 'ur' | 'xs' | 'xn'
+---@return BlueprintId
+local function ConvertBlueprintId(blueprintId, prefix)
+    local templateUnitBlueprintId = prefix .. blueprintId:sub(3)
+
+    -- because the support factories originate from mods they do not adhere to the
+    -- standard blueprint convention for factions; very annoying ^^
+    local isSupportFactory = blueprintId:sub(1, 1) == 'z'
+    if isSupportFactory then
+        templateUnitBlueprintId = 'z' .. prefix:sub(2, 2) .. blueprintId:sub(3)
+    end
+
+    -- same here but then for units that are part of the Forged Alliance expansion; they
+    -- do not adhere to blueprint standards
+    local isExpansion = blueprintId:sub(1, 1) == 'x' and blueprintId:sub(1, 2) ~= 'xs'
+    if isExpansion then
+        templateUnitBlueprintId = 'x' .. prefix:sub(2, 2) .. blueprintId:sub(3)
+    end
+
+    return templateUnitBlueprintId
+end
 
 --- Validates the template in-place, returns whether the process succeeded
 ---@param template ContextBasedTemplate
@@ -114,27 +141,20 @@ local function ValidateTemplate(template, buildableUnits, prefix)
 
     for l = 3, TableGetn(template.TemplateData) do
         local templateUnit = template.TemplateData[l]
-        local templateUnitBlueprintId = prefix .. templateUnit[1]:sub(3)
+        local templateUnitBlueprintId = ConvertBlueprintId(templateUnit[1], prefix)
 
-        -- because the support factories originate from mods they do not adhere to the
-        -- standard blueprint convention for factions; very annoying ^^
-        local isSupportFactory = templateUnit[1]:sub(1, 1) == 'z'
-        if isSupportFactory then
-            templateUnitBlueprintId = 'z' .. prefix:sub(2, 2) .. templateUnit[1]:sub(3)
-        end
-
-        -- same here but then for units that are part of the Forged Alliance expansion; they
-        -- do not adhere to blueprint standards
-        local isExpansion = templateUnit[1]:sub(1, 1) == 'x' and templateUnit[1]:sub(1, 2) ~= 'xs'
-        if isExpansion then
-            templateUnitBlueprintId = 'x' .. prefix:sub(2, 2) .. templateUnit[1]:sub(3)
-        end
-
-        -- proceed as usual
+        -- proceed as usual, try and find a template
+        ---@type UnitBlueprint
         local templateUnitBlueprint = __blueprints[templateUnitBlueprintId]
+        local templateUnitBlueprintFromId = templateUnitBlueprint.General.UpgradesFrom
+        local templateUnitBlueprintBaseId = templateUnitBlueprint.General.UpgradesFromBase
         if templateUnitBlueprint then
             if buildableUnits[templateUnitBlueprintId] then
                 templateUnit[1] = templateUnitBlueprintId
+            elseif templateUnitBlueprintFromId and buildableUnits[templateUnitBlueprintFromId] then
+                templateUnit[1] = templateUnitBlueprintFromId
+            elseif templateUnitBlueprintBaseId and buildableUnits[templateUnitBlueprintBaseId] then
+                templateUnit[1] = templateUnitBlueprintBaseId
             else
                 allUnitsBuildable = false
             end
@@ -212,7 +232,7 @@ local function FilterTemplatesByUnitContext(buildableUnits, prefix)
     -- try and retrieve blueprint id from highlight command
     if not blueprintId then
         local highlightCommand = GetHighlightCommand()
-        if highlightCommand.blueprintId then
+        if highlightCommand and highlightCommand.blueprintId then
             blueprintId = highlightCommand.blueprintId
         end
     end
@@ -220,7 +240,9 @@ local function FilterTemplatesByUnitContext(buildableUnits, prefix)
     -- try and retrieve blueprint id from rollover info
     if not blueprintId then
         local info = GetRolloverInfo()
-        blueprintId = info.blueprintId
+        if info.userUnit then
+            blueprintId = info.blueprintId
+        end
     end
 
     -- if still not available then give up and bail out
@@ -228,7 +250,31 @@ local function FilterTemplatesByUnitContext(buildableUnits, prefix)
         return false
     end
 
-    -- see if any templates match the blueprint id
+    -- add the blueprint id that we're hovering over
+    local convertedBlueprintId = ConvertBlueprintId(blueprintId, prefix)
+    local convertedBlueprint = __blueprints[convertedBlueprintId]
+    local templateUnitBlueprintFromId = convertedBlueprint.General.UpgradesFrom
+    local templateUnitBlueprintBaseId = convertedBlueprint.General.UpgradesFromBase
+
+    local validBlueprintId
+    if convertedBlueprint then
+        if buildableUnits[convertedBlueprintId] then
+            validBlueprintId = convertedBlueprintId
+        elseif templateUnitBlueprintFromId and buildableUnits[templateUnitBlueprintFromId] then
+            validBlueprintId = templateUnitBlueprintFromId
+        elseif templateUnitBlueprintBaseId and buildableUnits[templateUnitBlueprintBaseId] then
+            validBlueprintId = templateUnitBlueprintBaseId
+        end
+    end
+
+    if validBlueprintId then
+        SingletonTemplate.Name = LOC(__blueprints[validBlueprintId].Description)
+        SingletonTemplate.TemplateData[3][1] = validBlueprintId
+        TableInsert(ContextBasedTemplates, SingletonTemplate)
+        ContextBasedTemplateCount = ContextBasedTemplateCount + 1
+    end
+
+    -- add templates that match the unit that we're hovering over
     for k = 1, TableGetn(Templates) do
         local template = Templates[k]
         local trigger = template.TriggersOnUnit or template.TriggersOnBuilding
@@ -329,7 +375,7 @@ Cycle = function()
                 ClearBuildTemplates()
             end
 
-            print(StringFormat("(%d/%d) %s", index, ContextBasedTemplateCount, template.Name))
+            print(StringFormat("(%d/%d) %s", index, ContextBasedTemplateCount, tostring(template.Name)))
         end
 
         ContextBasedTemplateStep = ContextBasedTemplateStep + 1
