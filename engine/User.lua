@@ -943,7 +943,7 @@ function SessionSendChatMessage(client, message)
 end
 
 --- Set this as an active build template
----@param template BuildTemplate
+---@param template BuildQueue
 function SetActiveBuildTemplate(template)
 end
 

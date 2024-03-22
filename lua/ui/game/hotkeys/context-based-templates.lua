@@ -60,8 +60,6 @@ end
 
 -- convert all known templates
 
-local SingletonTemplate = { TemplateData = { 0, 0, { 'dummy', 0, 0, 0 } }}
-
 ---@type table
 local RawTemplates = import("/lua/ui/game/hotkeys/context-based-templates-data.lua")
 
@@ -81,6 +79,134 @@ for k, template in RawTemplates do
 end
 
 SPEW(StringFormat("Found %d templates", table.getn(Templates)))
+
+--#endregion
+
+-------------------------------------------------------------------------------
+--#region Utility functions to work with blueprints
+
+--- Converts the blueprint id to a different faction
+---@param blueprintId BlueprintId
+---@param prefix 'ua' | 'ue' | 'ur' | 'xs' | 'xn'
+---@return BlueprintId
+local function ConvertBlueprintId(blueprintId, prefix)
+    local templateUnitBlueprintId = prefix .. blueprintId:sub(3)
+
+    -- Because the support factories originate from mods they do not adhere to the
+    -- standard blueprint convention for factions; very annoying ^^
+    local isSupportFactory = blueprintId:sub(1, 1) == 'z'
+    if isSupportFactory then
+        templateUnitBlueprintId = 'z' .. prefix:sub(2, 2) .. blueprintId:sub(3)
+    end
+
+    -- Same here but then for units that are part of the Forged Alliance expansion; they
+    -- do not adhere to blueprint standards; still annoying ^^
+    local isExpansion = blueprintId:sub(1, 1) == 'x' and blueprintId:sub(1, 2) ~= 'xs'
+    if isExpansion then
+        templateUnitBlueprintId = 'x' .. prefix:sub(2, 2) .. blueprintId:sub(3)
+    end
+
+    return templateUnitBlueprintId
+end
+
+--- Converts the blueprint id to the preferred faction. If that blueprint is not buildable then it will try to find a blueprint that is buildable by lowering the tech and/or upgrade level
+---@param blueprintId BlueprintId
+---@param buildableUnits table<BlueprintId, boolean>
+---@param prefix 'ua' | 'ue' | 'ur' | 'xs' | 'xn'
+---@return BlueprintId?
+local function FindBuildableBlueprintId(blueprintId, buildableUnits, prefix)
+    local convertedBlueprintId = ConvertBlueprintId(blueprintId, prefix)
+
+    -- This is where we check and validate the 
+
+    local blueprint = __blueprints[convertedBlueprintId]
+    if blueprint then
+        if buildableUnits[convertedBlueprintId] then
+            return blueprintId
+        end
+
+        local blueprintFromId = blueprint.General.UpgradesFrom
+        if blueprintFromId and buildableUnits[blueprintFromId] then
+            return blueprintFromId
+        end
+
+        local blueprintBaseId = blueprint.General.UpgradesFromBase
+        if blueprintBaseId and buildableUnits[blueprintBaseId] then
+            return blueprintBaseId
+        end
+    end
+
+    -- we can't build it
+    return nil
+end
+
+--#endregion
+
+-------------------------------------------------------------------------------
+--#region Template caching
+
+---@type ContextBasedTemplate
+local SingletonTemplate = { 
+    Name = 'singleton',
+    TemplateData = { 0, 0, { 'dummy', 0, 0, 0 } }
+}
+
+---@type BuildQueue
+local Cachedtemplate = { 0, 0 }
+
+---@type BuildTemplateBuilding[]
+local TemplateEntries = { }
+
+---@param index number
+---@return BuildTemplateBuilding
+local function GetTemplateEntry(index)
+    local template = TemplateEntries[index]
+    if not template then
+        template = { 'dummy', 0, 0, 0 }
+        TemplateEntries[index] = template
+    end
+
+    return template
+end
+
+---@param template ContextBasedTemplate
+---@param cache BuildQueue
+---@return BuildQueue
+local function ConvertTemplate(template, buildableUnits, prefix, cache)
+    local templateData = template.TemplateData
+
+    -- clear the cache
+    for k = 3, table.getn(cache) do
+        cache[k] = nil
+    end
+
+    -- width/height
+    cache[1] = templateData[1]
+    cache[2] = templateData[2]
+
+    -- the first entry is special as we allow to change it
+    cache[3] = GetTemplateEntry(1)
+    cache[3][1] = FindBuildableBlueprintId(templateData[3][1], buildableUnits, prefix)
+    cache[3][2] = templateData[3][2]
+    cache[3][3] = templateData[3][3]
+    cache[3][4] = templateData[3][4]
+
+    -- all the other entries can only change faction
+    for k = 4, TableGetn(templateData) do
+        ---@type BuildTemplateBuilding
+        local templateBuilding = templateData[k]
+        local templateUnitBlueprintId = ConvertBlueprintId(templateBuilding[1], prefix)
+        if templateUnitBlueprintId then
+            local entry = GetTemplateEntry(k)
+            entry[1] = templateUnitBlueprintId
+            entry[2] = templateBuilding[2]
+            entry[3] = templateBuilding[3]
+            entry[4] = templateBuilding[4]
+            cache[k] = entry
+        end
+    end
+    return cache
+end
 
 --#endregion
 
@@ -106,64 +232,29 @@ CommandMode.AddEndBehavior(
     'ContextBasedTemplates'
 )
 
---- Converts the blueprint id to the preferred faction
----@param blueprintId BlueprintId
----@param prefix 'ua' | 'ue' | 'ur' | 'xs' | 'xn'
----@return BlueprintId
-local function ConvertBlueprintId(blueprintId, prefix)
-    local templateUnitBlueprintId = prefix .. blueprintId:sub(3)
-
-    -- because the support factories originate from mods they do not adhere to the
-    -- standard blueprint convention for factions; very annoying ^^
-    local isSupportFactory = blueprintId:sub(1, 1) == 'z'
-    if isSupportFactory then
-        templateUnitBlueprintId = 'z' .. prefix:sub(2, 2) .. blueprintId:sub(3)
-    end
-
-    -- same here but then for units that are part of the Forged Alliance expansion; they
-    -- do not adhere to blueprint standards
-    local isExpansion = blueprintId:sub(1, 1) == 'x' and blueprintId:sub(1, 2) ~= 'xs'
-    if isExpansion then
-        templateUnitBlueprintId = 'x' .. prefix:sub(2, 2) .. blueprintId:sub(3)
-    end
-
-    return templateUnitBlueprintId
-end
-
 --- Validates the template in-place, returns whether the process succeeded
 ---@param template ContextBasedTemplate
 ---@param buildableUnits table<BlueprintId, boolean>
 ---@param prefix 'ua' | 'ue' | 'ur' | 'xs' | 'xn'
 ---@return boolean
 local function ValidateTemplate(template, buildableUnits, prefix)
-    local allUnitsExist = true
-    local allUnitsBuildable = true
 
-    for l = 3, TableGetn(template.TemplateData) do
-        local templateUnit = template.TemplateData[l]
-        local templateUnitBlueprintId = ConvertBlueprintId(templateUnit[1], prefix)
+    -- check the first entry separate as we're allowed to change it
+    local transformableBlueprintId = template.TemplateData[3][1]
+    local transformedBlueprintId = FindBuildableBlueprintId(transformableBlueprintId, buildableUnits, prefix)
+    if not transformedBlueprintId then
+        return false
+    end
 
-        -- proceed as usual, try and find a template
-        ---@type UnitBlueprint
-        local templateUnitBlueprint = __blueprints[templateUnitBlueprintId]
-        local templateUnitBlueprintFromId = templateUnitBlueprint.General.UpgradesFrom
-        local templateUnitBlueprintBaseId = templateUnitBlueprint.General.UpgradesFromBase
-        if templateUnitBlueprint then
-            if buildableUnits[templateUnitBlueprintId] then
-                templateUnit[1] = templateUnitBlueprintId
-            elseif templateUnitBlueprintFromId and buildableUnits[templateUnitBlueprintFromId] then
-                templateUnit[1] = templateUnitBlueprintFromId
-            elseif templateUnitBlueprintBaseId and buildableUnits[templateUnitBlueprintBaseId] then
-                templateUnit[1] = templateUnitBlueprintBaseId
-            else
-                allUnitsBuildable = false
-            end
-        else
-            allUnitsExist = false
+    -- check the remainder by just converting the faction
+    for l = 4, TableGetn(template.TemplateData) do
+        local templateUnitBlueprintId = ConvertBlueprintId(template.TemplateData[l][1], prefix)
+        if not buildableUnits[templateUnitBlueprintId] then
+            return false
         end
     end
 
-    return allUnitsExist and allUnitsBuildable
+    return true
 end
 
 ---@param buildableUnits table<BlueprintId, boolean>
@@ -254,25 +345,11 @@ local function FilterTemplatesByUnitContext(buildableUnits, prefix)
     -- we have a blueprint that is not from the command mode. If we do include it
     -- then we're cycling through the same blueprint twice
     if not fromCommandMode then
-        local convertedBlueprintId = ConvertBlueprintId(blueprintId, prefix)
-        local convertedBlueprint = __blueprints[convertedBlueprintId]
-        local templateUnitBlueprintFromId = convertedBlueprint.General.UpgradesFrom
-        local templateUnitBlueprintBaseId = convertedBlueprint.General.UpgradesFromBase
+        local buildableBlueprintId = FindBuildableBlueprintId(blueprintId, buildableUnits, prefix)
 
-        local validBlueprintId
-        if convertedBlueprint then
-            if buildableUnits[convertedBlueprintId] then
-                validBlueprintId = convertedBlueprintId
-            elseif templateUnitBlueprintFromId and buildableUnits[templateUnitBlueprintFromId] then
-                validBlueprintId = templateUnitBlueprintFromId
-            elseif templateUnitBlueprintBaseId and buildableUnits[templateUnitBlueprintBaseId] then
-                validBlueprintId = templateUnitBlueprintBaseId
-            end
-        end
-
-        if validBlueprintId then
-            SingletonTemplate.Name = LOC(__blueprints[validBlueprintId].Description)
-            SingletonTemplate.TemplateData[3][1] = validBlueprintId
+        if buildableBlueprintId then
+            SingletonTemplate.Name = LOC(__blueprints[buildableBlueprintId].Description)
+            SingletonTemplate.TemplateData[3][1] = buildableBlueprintId
             TableInsert(ContextBasedTemplates, SingletonTemplate)
             ContextBasedTemplateCount = ContextBasedTemplateCount + 1
         end
@@ -374,7 +451,8 @@ Cycle = function()
 
             -- only turn it into a build template when we have more than 1 unit in it
             if TableGetn(template.TemplateData) > 3 then
-                SetActiveBuildTemplate(template.TemplateData)
+                local convertedTemplate = ConvertTemplate(template, buildableUnits, prefix, Cachedtemplate)
+                SetActiveBuildTemplate(convertedTemplate)
             else
                 ClearBuildTemplates()
             end

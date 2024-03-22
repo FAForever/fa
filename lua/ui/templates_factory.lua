@@ -5,8 +5,8 @@
 ---@field [4] number position z
 
 ---@class BuildQueue
----@field [1] number
----@field [2] number
+---@field [1] number        # width that is used when drag building the template
+---@field [2] number        # height that is used when drag building the template
 ---@field [3] BuildTemplateBuilding
 --@field [...] BuildTemplateBuilding
 
