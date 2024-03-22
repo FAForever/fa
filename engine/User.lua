@@ -204,7 +204,7 @@ function GenerateBuildTemplateFromSelection()
 end
 
 --- Gets active build template back to Lua
----@return BuildTemplate
+---@return UIBuildTemplate
 function GetActiveBuildTemplate()
 end
 
@@ -943,7 +943,7 @@ function SessionSendChatMessage(client, message)
 end
 
 --- Set this as an active build template
----@param template BuildQueue
+---@param template UIBuildTemplate
 function SetActiveBuildTemplate(template)
 end
 

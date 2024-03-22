@@ -22,7 +22,7 @@
 
 ---@class ContextBasedTemplate
 ---@field Name string                           # Printed on screen when cycling the templates
----@field TemplateData BuildQueue            # A regular build template, except that it is written in Pascal Case and usually the first unit is removed
+---@field TemplateData UIBuildTemplate          # A regular build template, except that it is written in Pascal Case and usually the first unit is removed
 ---@field TemplateSortingOrder number           # Lower numbers end up first in the queue
 ---@field TemplateBlueprintId BlueprintId       
 ---

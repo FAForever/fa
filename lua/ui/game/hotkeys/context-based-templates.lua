@@ -151,14 +151,14 @@ local SingletonTemplate = {
     TemplateData = { 0, 0, { 'dummy', 0, 0, 0 } }
 }
 
----@type BuildQueue
+---@type UIBuildTemplate
 local Cachedtemplate = { 0, 0 }
 
----@type BuildTemplateBuilding[]
+---@type UIBuildTemplateBuilding[]
 local TemplateEntries = { }
 
 ---@param index number
----@return BuildTemplateBuilding
+---@return UIBuildTemplateBuilding
 local function GetTemplateEntry(index)
     local template = TemplateEntries[index]
     if not template then
@@ -170,8 +170,8 @@ local function GetTemplateEntry(index)
 end
 
 ---@param template ContextBasedTemplate
----@param cache BuildQueue
----@return BuildQueue
+---@param cache UIBuildTemplate
+---@return UIBuildTemplate
 local function ConvertTemplate(template, buildableUnits, prefix, cache)
     local templateData = template.TemplateData
 
@@ -193,7 +193,8 @@ local function ConvertTemplate(template, buildableUnits, prefix, cache)
 
     -- all the other entries can only change faction
     for k = 4, TableGetn(templateData) do
-        ---@type BuildTemplateBuilding
+
+        ---@type UIBuildTemplateBuilding
         local templateBuilding = templateData[k]
         local templateUnitBlueprintId = ConvertBlueprintId(templateBuilding[1], prefix)
         if templateUnitBlueprintId then
