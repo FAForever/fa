@@ -80,7 +80,7 @@ local IssuePatrolCallback = function(units, position)
 end
 
 ---@param units Unit[]
----@param target Unit | Vector | Prop | Blip
+---@param target Unit | Prop | Blip | table
 ---@return boolean
 local IssueAttackCallback = function (units, target)
 
@@ -92,12 +92,20 @@ local IssueAttackCallback = function (units, target)
     -- if it is a blip then we must have vision on it
     if not table.empty(getmetatable(target)) and IsBlip(target) then
         local unitArmy = units[1].Army --[[@as number]]
-        if target:IsSeenNow(unitArmy) or target:IsOnRadar(unitArmy) or target:IsOnSonar(unitArmy) or target:IsOnOmni(unitArmy) then
+
+        -- for structures it is sufficient to have seen it once
+        if EntityCategoryContains(categories.STRUCTURE, target) and target:IsSeenEver(unitArmy) then
             IssueAttack(units, target)
             return true
-        else
-            return false
+
+        -- for anything else we need to have some form of active intel
+        elseif target:IsSeenNow(unitArmy) or target:IsOnRadar(unitArmy) or target:IsOnSonar(unitArmy) or target:IsOnOmni(unitArmy) then
+            IssueAttack(units, target)
+            return true
         end
+
+        -- blip but we have no intel on it
+        return false
     end
 
     -- target is a vector or a prop, either is always fine
