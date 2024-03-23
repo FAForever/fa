@@ -44,7 +44,6 @@ AirDefenseLand = import("/lua/ui/game/hotkeys/context-based-templates-data/AirDe
 AirDefenseWater = import("/lua/ui/game/hotkeys/context-based-templates-data/AirDefenseWater.lua").Template
 TorpedoDefense = import("/lua/ui/game/hotkeys/context-based-templates-data/TorpedoDefense.lua").Template
 T1Extractor = import("/lua/ui/game/hotkeys/context-based-templates-data/T1Extractor.lua").Template
-T2ExtractorWithStorages = import("/lua/ui/game/hotkeys/context-based-templates-data/T2ExtractorWithStorages.lua").Template
 T3ExtractorWithStorages = import("/lua/ui/game/hotkeys/context-based-templates-data/T3ExtractorWithStorages.lua").Template
 T3ExtractorWithStoragesAndFabs = import("/lua/ui/game/hotkeys/context-based-templates-data/T3ExtractorWithStoragesAndFabs.lua").Template
 T1Hydrocarbon = import("/lua/ui/game/hotkeys/context-based-templates-data/T1Hydrocarbon.lua").Template

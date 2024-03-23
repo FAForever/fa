@@ -145,15 +145,18 @@ end
 -------------------------------------------------------------------------------
 --#region Template caching
 
+--- The template that we use when we want to copy the build order or unit that we're hovering over
 ---@type ContextBasedTemplate
-local SingletonTemplate = { 
+local SingletonTemplate = {
     Name = 'singleton',
     TemplateData = { 0, 0, { 'dummy', 0, 0, 0 } }
 }
 
+--- Cached build template entries to avoid (de)allocating memory
 ---@type UIBuildTemplate
 local Cachedtemplate = { 0, 0 }
 
+--- Cached template to avoid (de)allocating memory
 ---@type UIBuildTemplateBuilding[]
 local TemplateEntries = { }
 
@@ -169,6 +172,34 @@ local function GetTemplateEntry(index)
     return template
 end
 
+--- Validates the template in-place, returns whether the process succeeded
+---@see 'ConvertTemplate' for an alternative version that also converts the template
+---@param template ContextBasedTemplate
+---@param buildableUnits table<BlueprintId, boolean>
+---@param prefix 'ua' | 'ue' | 'ur' | 'xs' | 'xn'
+---@return boolean
+local function ValidateTemplate(template, buildableUnits, prefix)
+
+    -- check the first entry separate as we're allowed to change it
+    local transformableBlueprintId = template.TemplateData[3][1]
+    local transformedBlueprintId = FindBuildableBlueprintId(transformableBlueprintId, buildableUnits, prefix)
+    if not transformedBlueprintId then
+        return false
+    end
+
+    -- check the remainder by just converting the faction
+    for l = 4, TableGetn(template.TemplateData) do
+        local templateUnitBlueprintId = ConvertBlueprintId(template.TemplateData[l][1], prefix)
+        if not buildableUnits[templateUnitBlueprintId] then
+            return false
+        end
+    end
+
+    return true
+end
+
+--- Converts the template by creating a copy, resulting in a new template that is faction independent
+---@see 'ValidateTemplate' for an alternative that just validates
 ---@param template ContextBasedTemplate
 ---@param cache UIBuildTemplate
 ---@return UIBuildTemplate
@@ -198,12 +229,18 @@ local function ConvertTemplate(template, buildableUnits, prefix, cache)
         local templateBuilding = templateData[k]
         local templateUnitBlueprintId = ConvertBlueprintId(templateBuilding[1], prefix)
         if templateUnitBlueprintId then
-            local entry = GetTemplateEntry(k)
+            local entry = GetTemplateEntry(k - 2)
+            cache[k] = entry
+
+            -- blueprint id
             entry[1] = templateUnitBlueprintId
+
+            -- priority
             entry[2] = templateBuilding[2]
+
+            -- offset
             entry[3] = templateBuilding[3]
             entry[4] = templateBuilding[4]
-            cache[k] = entry
         end
     end
     return cache
@@ -233,31 +270,9 @@ CommandMode.AddEndBehavior(
     'ContextBasedTemplates'
 )
 
---- Validates the template in-place, returns whether the process succeeded
----@param template ContextBasedTemplate
----@param buildableUnits table<BlueprintId, boolean>
----@param prefix 'ua' | 'ue' | 'ur' | 'xs' | 'xn'
----@return boolean
-local function ValidateTemplate(template, buildableUnits, prefix)
-
-    -- check the first entry separate as we're allowed to change it
-    local transformableBlueprintId = template.TemplateData[3][1]
-    local transformedBlueprintId = FindBuildableBlueprintId(transformableBlueprintId, buildableUnits, prefix)
-    if not transformedBlueprintId then
-        return false
-    end
-
-    -- check the remainder by just converting the faction
-    for l = 4, TableGetn(template.TemplateData) do
-        local templateUnitBlueprintId = ConvertBlueprintId(template.TemplateData[l][1], prefix)
-        if not buildableUnits[templateUnitBlueprintId] then
-            return false
-        end
-    end
-
-    return true
-end
-
+--- Retrieves templates based on the context of the mouse, including:
+--- - Whether the mouse is over a deposit
+--- - Whether the mouse is over land or water
 ---@param buildableUnits table<BlueprintId, boolean>
 ---@param prefix string
 local function FilterTemplatesByMouseContext(buildableUnits, prefix)
@@ -271,6 +286,7 @@ local function FilterTemplatesByMouseContext(buildableUnits, prefix)
         end
     end
 
+    -- retrieve the context of the mouse
     local position = GetMouseWorldPos()
     local elevation = GetMouseTerrainElevation()
     local massDeposits = TableGetn(GetDepositsAroundPoint(position[1], position[3], radius, 1))
@@ -278,17 +294,21 @@ local function FilterTemplatesByMouseContext(buildableUnits, prefix)
     local noDeposits = (massDeposits == 0) and (hydroDeposits == 0)
     local onLand = elevation + 0.1 >= position[2]
 
+    -- find templates based on the context of the mouse
     for k = 1, TableGetn(Templates) do
         local template = Templates[k]
         local valid = ValidateTemplate(template, buildableUnits, prefix)
         if valid then
-            if -- check conditions based on the context of the mouse
-            ((not template.TriggersOnUnit) and (not template.TriggersOnBuilding)) and
-                ((not template.TriggersOnMassDeposit) or (massDeposits > 0)) and
-                ((not template.TriggersOnHydroDeposit) or (hydroDeposits > 0)) and
-                ((not template.TriggersOnLand) or noDeposits and onLand) and
-                ((not template.TriggersOnWater) or noDeposits and (not onLand))
-            then
+            if massDeposits > 0 and template.TriggersOnMassDeposit then
+                TableInsert(ContextBasedTemplates, template)
+                ContextBasedTemplateCount = ContextBasedTemplateCount + 1
+            elseif hydroDeposits > 0 and template.TriggersOnHydroDeposit then
+                TableInsert(ContextBasedTemplates, template)
+                ContextBasedTemplateCount = ContextBasedTemplateCount + 1
+            elseif noDeposits and onLand and template.TriggersOnLand then
+                TableInsert(ContextBasedTemplates, template)
+                ContextBasedTemplateCount = ContextBasedTemplateCount + 1
+            elseif noDeposits and (not onLand) and template.TriggersOnWater then
                 TableInsert(ContextBasedTemplates, template)
                 ContextBasedTemplateCount = ContextBasedTemplateCount + 1
             end
@@ -343,13 +363,13 @@ local function FilterTemplatesByUnitContext(buildableUnits, prefix)
         return false
     end
 
-    -- we have a blueprint that is not from the command mode. If we do include it
-    -- then we're cycling through the same blueprint twice
+    -- we have a blueprint that is not from the command mode, we therefore include that as the first
+    -- 'template' to build
     if not fromCommandMode then
         local buildableBlueprintId = FindBuildableBlueprintId(blueprintId, buildableUnits, prefix)
 
         if buildableBlueprintId then
-            SingletonTemplate.Name = LOC(__blueprints[buildableBlueprintId].Description)
+            SingletonTemplate.Name = LOC(__blueprints[buildableBlueprintId].Description) or 'Unknown'
             SingletonTemplate.TemplateData[3][1] = buildableBlueprintId
             TableInsert(ContextBasedTemplates, SingletonTemplate)
             ContextBasedTemplateCount = ContextBasedTemplateCount + 1
