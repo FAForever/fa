@@ -13,7 +13,6 @@ UnitBlueprint{
         "AEON",
         "ANTIAIR",
         "ANTIMISSILE",
-        "BUILTBYEXPERIMENTALSUB",
         "BUILTBYTIER2FACTORY",
         "BUILTBYTIER3FACTORY",
         "CRUISER",

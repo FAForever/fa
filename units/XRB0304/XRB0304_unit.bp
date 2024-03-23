@@ -136,6 +136,7 @@ UnitBlueprint{
         ToggleCaps = { RULEUTC_ProductionToggle = true },
         UnitName = "<LOC xrb0304_name>The Hive",
         UpgradesFrom = "xrb0204",
+        UpgradesFromBase = "xrb0104",
     },
     Intel = { VisionRadius = 14 },
     LifeBarHeight = 0.075,
