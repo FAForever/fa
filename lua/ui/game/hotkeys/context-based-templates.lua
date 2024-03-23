@@ -266,7 +266,14 @@ CommandMode.AddEndBehavior(
 
             TableSetn(ContextBasedTemplates, 0)
             ContextBasedTemplateStep = 0
-            ClearBuildTemplates()
+
+            -- We can't clear the build templates here as the majority of UI mods do not properly 
+            -- restore the build template when manipulating the selection and/or command mode.
+            --
+            -- Sadly though, this means that the build template will be visible when the player
+            -- the player tries to spawn in units via the unit cheat menu.
+
+            -- ClearBuildTemplates()
         end
     end,
     'ContextBasedTemplates'
