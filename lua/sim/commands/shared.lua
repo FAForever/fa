@@ -27,7 +27,6 @@
 ---@field FullRedundancy boolean        # When set, attempts to add full redundancy when reasonable by assigning multiple orders to each group
 ---@field Redundancy number             # When set, assigns orders to individual units. Number of orders assigned is equal to the redundancy factor
 
-
 -- upvalue scope for performance
 local IssueNuke = IssueNuke
 local IssueMove = IssueMove
