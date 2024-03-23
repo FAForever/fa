@@ -4458,6 +4458,9 @@ key_desc_0403="build static artilleries + mobile artilleries"
 key_desc_0404="build TML & SML + mobile missile launchers + nuke subs / battleship & missile ship & sera / uef cruisers"
 key_desc_0405="Dock"
 
+key_desc_0407="Select all Bombers (Normal)"
+key_desc_0408="Select all Bombers (Torpedo)"
+
 keymap_category_0000="UI"
 keymap_category_0004="Selection"
 keymap_category_0025="Camera"
