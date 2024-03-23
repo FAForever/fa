@@ -35,6 +35,7 @@ local ClearBuildTemplates = ClearBuildTemplates
 local TableInsert = table.insert
 local TableSort = table.sort
 local TableGetn = table.getn
+local TableSetn = table.setn
 local TableEmpty = table.empty
 local TableHash = table.hash
 
@@ -116,7 +117,6 @@ end
 ---@return BlueprintId?
 local function FindBuildableBlueprintId(blueprintId, buildableUnits, prefix)
     local convertedBlueprintId = ConvertBlueprintId(blueprintId, prefix)
-
     -- This is where we check and validate the 
 
     local blueprint = __blueprints[convertedBlueprintId]
@@ -254,15 +254,17 @@ local ContextBasedTemplates = {}
 ---@type number
 local ContextBasedTemplateStep = 0
 
----@type number
-local ContextBasedTemplateCount = 0
 
 -- reset the state when command mode ends and we were trying to do something
 local CommandMode = import("/lua/ui/game/commandmode.lua")
 CommandMode.AddEndBehavior(
     function(mode, data)
-        if not table.empty(ContextBasedTemplates) then
-            ContextBasedTemplates = {}
+        if TableGetn(ContextBasedTemplates) > 0 then
+            for k = 1, TableGetn(ContextBasedTemplates) do
+                ContextBasedTemplates[k] = nil
+            end
+
+            TableSetn(ContextBasedTemplates, 0)
             ContextBasedTemplateStep = 0
             ClearBuildTemplates()
         end
@@ -301,22 +303,18 @@ local function FilterTemplatesByMouseContext(buildableUnits, prefix)
         if valid then
             if massDeposits > 0 and template.TriggersOnMassDeposit then
                 TableInsert(ContextBasedTemplates, template)
-                ContextBasedTemplateCount = ContextBasedTemplateCount + 1
             elseif hydroDeposits > 0 and template.TriggersOnHydroDeposit then
                 TableInsert(ContextBasedTemplates, template)
-                ContextBasedTemplateCount = ContextBasedTemplateCount + 1
             elseif noDeposits and onLand and template.TriggersOnLand then
                 TableInsert(ContextBasedTemplates, template)
-                ContextBasedTemplateCount = ContextBasedTemplateCount + 1
             elseif noDeposits and (not onLand) and template.TriggersOnWater then
                 TableInsert(ContextBasedTemplates, template)
-                ContextBasedTemplateCount = ContextBasedTemplateCount + 1
             end
         end
     end
 
     -- no templates to use, default to those that trigger on land or water
-    if ContextBasedTemplateCount == 0 then
+    if TableGetn(ContextBasedTemplates) == 0 then
         for k = 1, TableGetn(Templates) do
             local template = Templates[k]
             local valid = ValidateTemplate(template, buildableUnits, prefix)
@@ -326,7 +324,6 @@ local function FilterTemplatesByMouseContext(buildableUnits, prefix)
                     (template.TriggersOnWater and (not onLand))
                 then
                     TableInsert(ContextBasedTemplates, template)
-                    ContextBasedTemplateCount = ContextBasedTemplateCount + 1
                 end
             end
         end
@@ -372,7 +369,6 @@ local function FilterTemplatesByUnitContext(buildableUnits, prefix)
             SingletonTemplate.Name = LOC(__blueprints[buildableBlueprintId].Description) or 'Unknown'
             SingletonTemplate.TemplateData[3][1] = buildableBlueprintId
             TableInsert(ContextBasedTemplates, SingletonTemplate)
-            ContextBasedTemplateCount = ContextBasedTemplateCount + 1
         end
     end
 
@@ -388,12 +384,11 @@ local function FilterTemplatesByUnitContext(buildableUnits, prefix)
 
             if valid then
                 TableInsert(ContextBasedTemplates, template)
-                ContextBasedTemplateCount = ContextBasedTemplateCount + 1
             end
         end
     end
 
-    return ContextBasedTemplateCount > 0
+    return TableGetn(ContextBasedTemplates) > 0
 end
 
 --- Provides a sense of order to the chosen templates
@@ -440,8 +435,11 @@ Cycle = function()
 
         -- only recompute the templates when we left command mode
         if ContextBasedTemplateStep == 0 then
-            ContextBasedTemplates = {}
-            ContextBasedTemplateCount = 0
+            for k = 1, TableGetn(ContextBasedTemplates) do
+                ContextBasedTemplates[k] = nil
+            end
+
+            TableSetn(ContextBasedTemplates, 0)
 
             -- first try to filter by command mode
             local applies = FilterTemplatesByUnitContext(buildableUnits, prefix)
@@ -451,7 +449,7 @@ Cycle = function()
         end
 
         -- absolutely nothing available
-        if ContextBasedTemplateCount == 0 then
+        if TableGetn(ContextBasedTemplates) == 0 then
             print("No templates available")
             return
         end
@@ -466,8 +464,11 @@ Cycle = function()
         -- start the command mode to allow us to build
         local template = ContextBasedTemplates[index]
         if template then
+            -- the first entry is special as we allow to change it
+            local buildableBlueprintId = FindBuildableBlueprintId(template.TemplateData[3][1], buildableUnits, prefix) --[[@as string]]
+
             import("/lua/ui/game/commandmode.lua").SetIgnoreSelection(true)
-            import("/lua/ui/game/commandmode.lua").StartCommandMode('build', { name = template.TemplateData[3][1] })
+            import("/lua/ui/game/commandmode.lua").StartCommandMode('build', { name = buildableBlueprintId })
             import("/lua/ui/game/commandmode.lua").SetIgnoreSelection(false)
 
             -- only turn it into a build template when we have more than 1 unit in it
@@ -478,7 +479,7 @@ Cycle = function()
                 ClearBuildTemplates()
             end
 
-            print(StringFormat("(%d/%d) %s", index, ContextBasedTemplateCount, tostring(template.Name)))
+            print(StringFormat("(%d/%d) %s", index, TableGetn(ContextBasedTemplates), tostring(template.Name)))
         end
 
         ContextBasedTemplateStep = ContextBasedTemplateStep + 1
