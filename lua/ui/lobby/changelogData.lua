@@ -1,8 +1,23 @@
 ---@type number
-last_version = 3802
+last_version = 3804
 
 ---@type PatchNotes[]
 gamePatches = {
+    {
+        version = 3804,
+        name = "Hotfix",
+        hasPrettyGithubRelease = true,
+        description = {
+            "# Game Version 3804 (24th of March, 2024)",
+            "",
+            "Fixes various issues that were introduced in the past game versions. The most notable issue is the bug where the fog of war is not ",
+            "removed when a game ends.",
+            "",
+            "With gratitude to all those who took the time to report issues,",
+            "",
+            "Jip",
+        }
+    },
     {
         version = 3803,
         name = "Hotfix",
