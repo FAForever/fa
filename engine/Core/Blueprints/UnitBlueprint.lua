@@ -961,7 +961,7 @@
 ---@field UpgradesFrom? UnitId
 --- what unit, if any, this unit can be upgraded to
 ---@field UpgradesTo? UnitId
---- the base unit from which all units in this upgrade chain can be upgraded from
+--- the base unit from which all units in this upgrade chain can be upgraded from. If this field is lacking then the unit may refuse to upgrade even when `UpgradesFrom` and `UpgradesTo` are set
 ---@field UpgradesFromBase? UnitId
 ---
 --- auto-generated field from `CommandCaps`
