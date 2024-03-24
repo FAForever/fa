@@ -122,7 +122,7 @@ local function FindBuildableBlueprintId(blueprintId, buildableUnits, prefix)
     local blueprint = __blueprints[convertedBlueprintId]
     if blueprint then
         if buildableUnits[convertedBlueprintId] then
-            return blueprintId
+            return convertedBlueprintId
         end
 
         local blueprintFromId = blueprint.General.UpgradesFrom
