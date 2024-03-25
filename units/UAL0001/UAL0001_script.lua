@@ -269,4 +269,22 @@ UAL0001 = ClassUnit(ACUUnit) {
     end
 }
 
+if true then
+
+    local oldUAL0001 = UAL0001
+    UAL0001 = ClassUnit(UAL0001) {
+        --- Adds a single level of veterancy
+        ---@param self Unit | VeterancyComponent
+        AddVetLevel = function(self)
+            oldUAL0001.AddVetLevel(self)
+
+            -- replace the mesh
+            local temp = string.format('/units/ual0001/wide/Aeon%d_mesh', self.VetLevel)
+            self:SetMesh(temp, true)
+        end
+    }
+
+end
+
+
 TypeClass = UAL0001
