@@ -529,7 +529,7 @@ function WrapAndPlaceText(bp, builder, descID, control)
                 for _, weapon in bp.Weapon do
                     if not weapon.WeaponCategory then continue end
                     local dest = weapons.basic
-                    if weapon.EnabledByEnhancement then
+                    if (weapon.EnabledByEnhancement) or (weapon.WeaponCategory == 'Teleport') then
                         dest = weapons.upgrades
                     end
                     if (weapon.FireOnDeath) or (weapon.WeaponCategory == 'Death') then
@@ -645,7 +645,7 @@ function WrapAndPlaceText(bp, builder, descID, control)
                             end
 
                             if CycleProjs > 1 then
-                                 weaponDetails2 = string.format(LOC('<LOC uvd_0015>Damage: %.8g x%d, Splash: %.3g')..', '..LOC('<LOC uvd_Range>')..', '..LOC('<LOC uvd_Reload>'),
+                                weaponDetails2 = string.format(LOC('<LOC uvd_0015>Damage: %.8g x%d, Splash: %.3g')..', '..LOC('<LOC uvd_Range>')..', '..LOC('<LOC uvd_Reload>'),
                                     Damage, CycleProjs, info.DamageRadius, info.MinRadius, info.MaxRadius, CycleTime)
                             elseif info.WeaponCategory == "Teleport" then
                                 weaponDetails2 = string.format(LOC('<LOC uvd_0010>Damage: %.7g, Splash: %.3g'),
