@@ -110,6 +110,7 @@ UnitBlueprint{
         UnitName = "<LOC xsb1202_name>Hyalatoh",
         UpgradesFrom = "xsb1103",
         UpgradesTo = "xsb1302",
+        UpgradesFromBase = "xsb1103",
     },
     Intel = { VisionRadius = 20 },
     LifeBarHeight = 0.075,

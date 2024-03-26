@@ -96,6 +96,7 @@ UnitBlueprint{
         SelectionPriority = 5,
         ToggleCaps = { RULEUTC_ProductionToggle = true },
         UpgradesFrom = "uab1202",
+        UpgradesFromBase = "uab1103"
     },
     Intel = { VisionRadius = 20 },
     LifeBarHeight = 0.075,

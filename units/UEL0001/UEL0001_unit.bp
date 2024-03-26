@@ -46,7 +46,6 @@ UnitBlueprint {
         "ENERGYPRODUCTION",
         "ENGINEER",
         "LAND",
-        "MASSFABRICATION",
         "MASSPRODUCTION",
         "MOBILE",
         "OVERLAYDEFENSE",

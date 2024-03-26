@@ -103,6 +103,7 @@ UnitBlueprint{
         ToggleCaps = { RULEUTC_ProductionToggle = true },
         UpgradesFrom = "urb1103",
         UpgradesTo = "urb1302",
+        UpgradesFromBase = "urb1103",
     },
     Intel = { VisionRadius = 20 },
     LifeBarHeight = 0.075,

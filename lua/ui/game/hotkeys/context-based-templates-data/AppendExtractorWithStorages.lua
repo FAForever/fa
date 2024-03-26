@@ -23,7 +23,7 @@
 ---@type ContextBasedTemplate
 Template = {
     Name = 'Storages',
-    TriggersOnUnit = (categories.TECH2 + categories.TECH3) * categories.MASSEXTRACTION,
+    TriggersOnUnit = categories.MASSEXTRACTION,
     TemplateSortingOrder = 100,
     TemplateData = {
         6,

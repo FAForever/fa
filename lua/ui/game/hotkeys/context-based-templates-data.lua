@@ -22,7 +22,7 @@
 
 ---@class ContextBasedTemplate
 ---@field Name string                           # Printed on screen when cycling the templates
----@field TemplateData BuildTemplate            # A regular build template, except that it is written in Pascal Case and usually the first unit is removed
+---@field TemplateData UIBuildTemplate          # A regular build template, except that it is written in Pascal Case and usually the first unit is removed
 ---@field TemplateSortingOrder number           # Lower numbers end up first in the queue
 ---@field TemplateBlueprintId BlueprintId       
 ---
@@ -43,12 +43,11 @@ PointDefense = import("/lua/ui/game/hotkeys/context-based-templates-data/PointDe
 AirDefenseLand = import("/lua/ui/game/hotkeys/context-based-templates-data/AirDefenseLand.lua").Template
 AirDefenseWater = import("/lua/ui/game/hotkeys/context-based-templates-data/AirDefenseWater.lua").Template
 TorpedoDefense = import("/lua/ui/game/hotkeys/context-based-templates-data/TorpedoDefense.lua").Template
-T1Extractor = import("/lua/ui/game/hotkeys/context-based-templates-data/T1Extractor.lua").Template
-T2ExtractorWithStorages = import("/lua/ui/game/hotkeys/context-based-templates-data/T2ExtractorWithStorages.lua").Template
+T3Extractor = import("/lua/ui/game/hotkeys/context-based-templates-data/T3Extractor.lua").Template
 T3ExtractorWithStorages = import("/lua/ui/game/hotkeys/context-based-templates-data/T3ExtractorWithStorages.lua").Template
 T3ExtractorWithStoragesAndFabs = import("/lua/ui/game/hotkeys/context-based-templates-data/T3ExtractorWithStoragesAndFabs.lua").Template
 T1Hydrocarbon = import("/lua/ui/game/hotkeys/context-based-templates-data/T1Hydrocarbon.lua").Template
-
+    
 --#endregion
 
 -------------------------------------------------------------------------------
@@ -67,8 +66,6 @@ AppendPowerGeneratorsToT2Artillery = import("/lua/ui/game/hotkeys/context-based-
 AppendPowerGeneratorsToT3Artillery = import("/lua/ui/game/hotkeys/context-based-templates-data/AppendPowerGeneratorsToT3Artillery.lua").Template
 AppendPowerGeneratorsToSalvation = import("/lua/ui/game/hotkeys/context-based-templates-data/AppendPowerGeneratorsToSalvation.lua").Template
 AppendPowerGeneratorsToEnergyStorage = import("/lua/ui/game/hotkeys/context-based-templates-data/AppendPowerGeneratorsToEnergyStorage.lua").Template
-AppendPowerGeneratorsToSoothsayer = import("/lua/ui/game/hotkeys/context-based-templates-data/AppendPowerGeneratorsToSoothsayer.lua").Template
-AppendPowerGeneratorsToEye = import("/lua/ui/game/hotkeys/context-based-templates-data/AppendPowerGeneratorsToEye.lua").Template
 AppendPowerGeneratorsToTML = import("/lua/ui/game/hotkeys/context-based-templates-data/AppendPowerGeneratorsToTML.lua").Template
 AppendWallsToPointDefense = import("/lua/ui/game/hotkeys/context-based-templates-data/AppendWallsToPointDefense.lua").Template
 AppendAirGrid = import("/lua/ui/game/hotkeys/context-based-templates-data/AppendAirGrid.lua").Template
