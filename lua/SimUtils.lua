@@ -912,36 +912,25 @@ function KillArmyOnDelayedRecall(self, shareOption, shareTime)
     local newUnits = TransferUnitsToHighestBrain(self, brainCategories.Allies, 'FullShare', categories.ALLUNITS)
     local sharedCommanders = EntityCategoryFilterDown(categories.COMMAND, newUnits)
 
-    local oneComAlive
-    if not table.empty(sharedCommanders) then
-        -- create a countdown to show when the ACU recalls
-        for _, com in sharedCommanders do
-            StartCountdown(com.EntityId, math.floor((shareTime - GetGameTick())/10))
-        end
-
-        while GetGameTick() < shareTime do
-            if table.empty(sharedCommanders) then
-                LOG("table empty sharedcoms")
-                break
-            else
-                oneComAlive = false
-                for _, com in sharedCommanders do
-                    if not com.Dead then
-                        oneComAlive = true
-                        break
-                    end
-                end
-                if not oneComAlive then
-                    LOG("no coms alive")
-                    break
-                end
-            end
-            WaitTicks(1)
-        end
-        -- KillArmy waits 10 seconds before acting, while FakeTeleport waits 3 seconds, so the ACU shouldn't explode.
-        ForkThread(FakeTeleportUnits, sharedCommanders, true)
+    -- create a countdown to show when the ACU recalls
+    for _, com in sharedCommanders do
+        StartCountdown(com.EntityId, math.floor((shareTime - GetGameTick())/10))
     end
 
+    local oneComAlive = true
+    while GetGameTick() < shareTime and oneComAlive do
+        oneComAlive = false
+        for _, com in sharedCommanders do
+            if not com.Dead then
+                oneComAlive = true
+                break
+            end
+        end
+        WaitTicks(1)
+    end
+
+    -- KillArmy waits 10 seconds before acting, while FakeTeleport waits 3 seconds, so the ACU shouldn't explode.
+    ForkThread(FakeTeleportUnits, sharedCommanders, true)
     KillArmy(self, shareOption)
 end
 
@@ -954,21 +943,12 @@ function KillArmyOnACUDeath(self, shareOption)
     local newUnits = TransferUnitsToHighestBrain(self, brainCategories.Allies, 'FullShare', categories.ALLUNITS)
     local sharedCommanders = EntityCategoryFilterDown(categories.COMMAND, newUnits)
 
-    local oneComAlive
-    while true do
-        if table.empty(sharedCommanders) then
-            LOG("table empty sharedcoms")
-            break
-        else
-            oneComAlive = false
-            for _, com in sharedCommanders do
-                if not com.Dead then
-                    oneComAlive = true
-                    break
-                end
-            end
-            if not oneComAlive then
-                LOG("no coms alive")
+    local oneComAlive = true
+    while oneComAlive do
+        oneComAlive = false
+        for _, com in sharedCommanders do
+            if not com.Dead then
+                oneComAlive = true
                 break
             end
         end
