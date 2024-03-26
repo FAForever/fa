@@ -298,7 +298,7 @@ globalOpts = {
                 key = 'RecallDelayed',
             },
             {
-                text = "Recall",
+                text = "Permanent",
                 help = "Disconnected ACUs are permanently shared to allies. In Assassination, the DC share condition is applied to that player's units when the shared ACU dies.",
                 key = 'Permanent',
             },
