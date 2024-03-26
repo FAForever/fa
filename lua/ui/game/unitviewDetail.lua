@@ -503,7 +503,7 @@ function WrapAndPlaceText(bp, builder, descID, control)
                             local armorName = armor[i]
                             armorName = string.sub(armorName, 1, string.find(armorName, ' ') - 1)
                             armorName = LOC('<LOC an_'..armorName..'>')..' - '..string.format('%0.1f', tonumber(armor[i]:sub(armorName:len() + 2, armor[i]:len())) * 100)
-                            if row < 1 then
+                            if row < 0 then
                                 armorDetails = armorName
                                 row = 1
                             else
