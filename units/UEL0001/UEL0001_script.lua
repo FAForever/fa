@@ -25,6 +25,19 @@ local TDFOverchargeWeapon = TerranWeaponFile.TDFOverchargeWeapon
 local EffectUtil = import("/lua/effectutilities.lua")
 local Buff = import("/lua/sim/buff.lua")
 
+-- upvalues for perfomance
+local CreateAnimator = CreateAnimator
+local ForkThread = ForkThread
+local KillThread = KillThread
+local WaitTicks = WaitTicks
+local WaitSeconds = WaitSeconds
+local CreateEconomyEvent = CreateEconomyEvent
+local RemoveEconomyEvent = RemoveEconomyEvent
+local ParseEntityCategory = ParseEntityCategory
+local TrashBagAdd = TrashBag.Add
+local WaitFor = WaitFor
+
+
 ---@class UEL0001 : ACUUnit
 UEL0001 = ClassUnit(ACUUnit) {
     Weapons = {
@@ -102,10 +115,12 @@ UEL0001 = ClassUnit(ACUUnit) {
         },
     },
 
+    ---@param self UEL0001
     __init = function(self)
         ACUUnit.__init(self, 'RightZephyr')
     end,
 
+    ---@param self UEL0001
     OnCreate = function(self)
         ACUUnit.OnCreate(self)
         self:SetCapturable(false)
@@ -127,6 +142,9 @@ UEL0001 = ClassUnit(ACUUnit) {
         end
     end,
 
+    ---@param self UEL0001
+    ---@param builder Unit
+    ---@param layer string
     OnStopBeingBuilt = function(self, builder, layer)
         ACUUnit.OnStopBeingBuilt(self, builder, layer)
         if self:BeenDestroyed() then return end
@@ -139,6 +157,9 @@ UEL0001 = ClassUnit(ACUUnit) {
         self:ForkThread(self.GiveInitialResources)
     end,
 
+    ---@param self UEL0001
+    ---@param unitBeingBuilt Unit
+    ---@param order string
     OnStartBuild = function(self, unitBeingBuilt, order)
         ACUUnit.OnStartBuild(self, unitBeingBuilt, order)
         if self.Animator then
@@ -146,6 +167,9 @@ UEL0001 = ClassUnit(ACUUnit) {
         end
     end,
 
+    ---@param self UEL0001
+    ---@param unitBeingBuilt Unit
+    ---@param order string unused
     CreateBuildEffects = function(self, unitBeingBuilt, order)
         -- Different effect if we have building cube
         if unitBeingBuilt.BuildingCube then
@@ -156,7 +180,13 @@ UEL0001 = ClassUnit(ACUUnit) {
         end
     end,
 
+    ---@param self UEL0001
+    ---@param PodNumber number
     RebuildPod = function(self, PodNumber)
+        local army = self.Army
+        local trash = self.Trash
+
+
         if PodNumber == 1 then
             -- Force pod rebuilds to queue up
             if self.RebuildingPod2 ~= nil then
@@ -170,10 +200,10 @@ UEL0001 = ClassUnit(ACUUnit) {
                 RemoveEconomyEvent(self, self.RebuildingPod)
                 self.RebuildingPod = nil
                 local location = self:GetPosition('AttachSpecial02')
-                local pod = CreateUnitHPR('UEA0001', self.Army, location[1], location[2], location[3], 0, 0, 0)
+                local pod = CreateUnitHPR('UEA0001', army, location[1], location[2], location[3], 0, 0, 0)
                 pod:SetParent(self, 'LeftPod')
                 pod:SetCreator(self)
-                self.Trash:Add(pod)
+                TrashBagAdd(trash,pod)
                 self.LeftPod = pod
             end
         elseif PodNumber == 2 then
@@ -189,16 +219,19 @@ UEL0001 = ClassUnit(ACUUnit) {
                 RemoveEconomyEvent(self, self.RebuildingPod2)
                 self.RebuildingPod2 = nil
                 local location = self:GetPosition('AttachSpecial01')
-                local pod = CreateUnitHPR('UEA0001', self.Army, location[1], location[2], location[3], 0, 0, 0)
+                local pod = CreateUnitHPR('UEA0001', army, location[1], location[2], location[3], 0, 0, 0)
                 pod:SetParent(self, 'RightPod')
                 pod:SetCreator(self)
-                self.Trash:Add(pod)
+                TrashBagAdd(trash,pod)
                 self.RightPod = pod
             end
         end
         self:RequestRefreshUI()
     end,
 
+    ---@param self UEL0001
+    ---@param pod string
+    ---@param rebuildDrone boolean
     NotifyOfPodDeath = function(self, pod, rebuildDrone)
         if rebuildDrone == true then
             if pod == 'LeftPod' then
@@ -231,6 +264,8 @@ UEL0001 = ClassUnit(ACUUnit) {
         attachee:SetDoNotTarget(false)
     end,
 
+    ---@param self UEL0001
+    ---@param enh string
     CreateEnhancement = function(self, enh)
         ACUUnit.CreateEnhancement(self, enh)
 

@@ -9,6 +9,10 @@
 --****************************************************************************
 local TRadarUnit = import("/lua/terranunits.lua").TRadarUnit
 
+-- upvalue for perfomance
+local CreateRotator = CreateRotator
+local TrashBadAdd = TrashBag.Add
+
 ---@class UEB3201 : TRadarUnit
 ---@field UpperRotator? moho.RotateManipulator
 UEB3201 = ClassUnit(TRadarUnit) {
@@ -24,9 +28,11 @@ UEB3201 = ClassUnit(TRadarUnit) {
     ---@param self UEB3201
     OnIntelEnabled = function(self, intel)
         TRadarUnit.OnIntelEnabled(self, intel)
+        local trash = self.Trash
+
         if not self.UpperRotator then
             self.UpperRotator = CreateRotator(self, 'Upper_Array', 'z')
-            self.Trash:Add(self.UpperRotator)
+            TrashBadAdd(trash,self.UpperRotator)
         end
         self.UpperRotator:SetTargetSpeed(10)
         self.UpperRotator:SetAccel(5)

@@ -10,35 +10,52 @@
 
 local TMassFabricationUnit = import("/lua/terranunits.lua").TMassFabricationUnit
 
+-- Upvalue for perfomance
+local CreateRotator = CreateRotator
+local CreateEmitterAtEntity = CreateEmitterAtEntity
+local TrashBagAdd = TrashBag.Add
+
 ---@class UEB1303 : TMassFabricationUnit
 UEB1303 = ClassUnit(TMassFabricationUnit) {
 
     OnStopBeingBuilt = function(self,builder,layer)
         TMassFabricationUnit.OnStopBeingBuilt(self,builder,layer)
-        self.Rotator = CreateRotator(self, 'Spinner', 'z')
-        self.Rotator:SetAccel(10)
-        self.Rotator:SetTargetSpeed(40)
-        self.Trash:Add(self.Rotator)
-		self.AmbientEffects = CreateEmitterAtEntity(self, self:GetArmy(), '/effects/emitters/uef_t3_massfab_ambient_01_emit.bp')
-		self.Trash:Add(self.AmbientEffects)        
-    
+        local rotator = self.Rotator
+        local army = self.Army
+        local trash = self.Trash
+        local ambientEffects = self.AmbientEffects
+
+        rotator = CreateRotator(self, 'Spinner', 'z')
+        rotator:SetAccel(10)
+        rotator:SetTargetSpeed(40)
+        TrashBagAdd(trash, rotator)
+		ambientEffects = CreateEmitterAtEntity(self, army, '/effects/emitters/uef_t3_massfab_ambient_01_emit.bp')
+		TrashBagAdd(trash,ambientEffects)
     end,
-    
+
     OnProductionPaused = function(self)
         TMassFabricationUnit.OnProductionPaused(self)
-        self.Rotator:SetSpinDown(true)
-		if self.AmbientEffects then
-			self.AmbientEffects:Destroy()
-			self.AmbientEffects = nil
-		end            
+        local rotator = self.Rotator
+        local ambientEffects = self.AmbientEffects
+
+        rotator:SetSpinDown(true)
+		if ambientEffects then
+			ambientEffects:Destroy()
+			ambientEffects = nil
+		end
     end,
-    
+
     OnProductionUnpaused = function(self)
         TMassFabricationUnit.OnProductionUnpaused(self)
-        self.Rotator:SetTargetSpeed(40)
-        self.Rotator:SetSpinDown(false)
-		self.AmbientEffects = CreateEmitterAtEntity(self, self:GetArmy(), '/effects/emitters/uef_t3_massfab_ambient_01_emit.bp')
-		self.Trash:Add(self.AmbientEffects)          
+        local rotator = self.Rotator
+        local army = self.Army
+        local ambientEffects = self.AmbientEffects
+        local trash = self.Trash
+
+        rotator:SetTargetSpeed(40)
+        rotator:SetSpinDown(false)
+		ambientEffects = CreateEmitterAtEntity(self, army, '/effects/emitters/uef_t3_massfab_ambient_01_emit.bp')
+		TrashBagAdd(trash,ambientEffects)          
     end,
 }
 
