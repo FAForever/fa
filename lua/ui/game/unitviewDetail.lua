@@ -647,7 +647,8 @@ function WrapAndPlaceText(bp, builder, descID, control)
                             if CycleProjs > 1 then
                                 weaponDetails2 = string.format(LOC('<LOC uvd_0015>Damage: %.8g x%d, Splash: %.3g')..', '..LOC('<LOC uvd_Range>')..', '..LOC('<LOC uvd_Reload>'),
                                     Damage, CycleProjs, info.DamageRadius, info.MinRadius, info.MaxRadius, CycleTime)
-                            elseif info.WeaponCategory == "Teleport" then
+                            -- Do not display 'Range' and Reload stats for 'Teleport in' and Kamikaze weapons
+                            elseif info.WeaponCategory == 'Teleport' or info.WeaponCategory == 'Kamikaze' then
                                 weaponDetails2 = string.format(LOC('<LOC uvd_0010>Damage: %.7g, Splash: %.3g'),
                                 Damage, info.DamageRadius)
                             else
