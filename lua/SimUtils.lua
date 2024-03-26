@@ -40,9 +40,10 @@ local sharedUnits = {}
 --- replaces the units with new ones)
 ---@param units Unit[]
 ---@param toArmy number
----@param captured boolean?
+---@param captured? boolean
+---@param noRestrictions boolean
 ---@return Unit[]?
-function TransferUnitsOwnership(units, toArmy, captured)
+function TransferUnitsOwnership(units, toArmy, captured, noRestrictions)
     local toBrain = GetArmyBrain(toArmy)
     if not toBrain or toBrain:IsDefeated() or not units or table.empty(units) then
         return
@@ -147,7 +148,7 @@ function TransferUnitsOwnership(units, toArmy, captured)
         unit.IsBeingTransferred = true
 
         -- changing owner
-        local newUnit = ChangeUnitArmy(unit, toArmy)
+        local newUnit = ChangeUnitArmy(unit, toArmy, noRestrictions or false)
         if not newUnit then
             continue
         end
@@ -606,6 +607,9 @@ end
 
 --- Functions related to dealing with unit ownership when an army dies based on share conditions.
 
+local CalculateBrainScore = import("/lua/sim/score.lua").CalculateBrainScore
+local FakeTeleportUnits = import("/lua/scenarioframework.lua").FakeTeleportUnits
+
 ---@param owner number
 -- categoriesToKill is an optional input (it defaults to all categories)
 function KillSharedUnits(owner, categoriesToKill)
@@ -669,6 +673,7 @@ end
 ---@param brains AIBrain[]
 ---@param shareOption 'FullShare' | 'ShareUntilDeath' | 'PartialShare' | 'TransferToKiller' | 'Defectors' | 'CivilianDeserter'
 ---@param categoriesToTransfer? EntityCategory      # Defaults to ALLUNITS - WALL - COMMAND
+---@return Unit[]?
 function TransferUnitsToBrain(self, brains, shareOption, categoriesToTransfer)
     if not table.empty(brains) then
         local units
@@ -681,6 +686,8 @@ function TransferUnitsToBrain(self, brains, shareOption, categoriesToTransfer)
             TransferUnfinishedUnitsAfterDeath(units, indexes)
         end
 
+        local totalNewUnits = {}
+
         for k, brain in brains do
             if categoriesToTransfer then
                 units = self:GetListOfUnits(categoriesToTransfer, false)
@@ -688,7 +695,10 @@ function TransferUnitsToBrain(self, brains, shareOption, categoriesToTransfer)
                 units = self:GetListOfUnits(categories.ALLUNITS - categories.WALL - categories.COMMAND, false)
             end
             if units and not table.empty(units) then
-                local givenUnitCount = table.getn(TransferUnitsOwnership(units, brain.index))
+                local newUnits = TransferUnitsOwnership(units, brain.index, false, true)
+                table.destructiveCat(totalNewUnits, newUnits)
+
+                local givenUnitCount = table.getn(newUnits)
 
                 -- only show message when we actually gift that player some units
                 if givenUnitCount > 0 then
@@ -703,7 +713,32 @@ function TransferUnitsToBrain(self, brains, shareOption, categoriesToTransfer)
                 WaitSeconds(1)
             end
         end
+
+        return totalNewUnits
     end
+end
+
+--- Returns a table of the allies and enemies of a brain, and civilians.
+---@param armyIndex number
+---@return { Civilians: AIBrain[], Enemies: AIBrain[], Allies: AIBrain[] } BrainCategories
+function GetAllegianceCategories(armyIndex)
+    local BrainCategories = { Enemies = {}, Civilians = {}, Allies = {} }
+
+    for index, brain in ArmyBrains do
+        brain.index = index
+
+        if not brain:IsDefeated() and armyIndex ~= index then
+            if ArmyIsCivilian(index) then
+                table.insert(BrainCategories.Civilians, brain)
+            elseif IsEnemy(armyIndex, brain:GetArmyIndex()) then
+                table.insert(BrainCategories.Enemies, brain)
+            else
+                table.insert(BrainCategories.Allies, brain)
+            end
+        end
+    end
+
+    return BrainCategories
 end
 
 --- Transfer a brain's units to other brains, sorted by positive rating and then score.
@@ -711,6 +746,7 @@ end
 ---@param brains AIBrain[]
 ---@param shareOption 'FullShare' | 'ShareUntilDeath' | 'PartialShare' | 'TransferToKiller' | 'Defectors' | 'CivilianDeserter'
 ---@param categoriesToTransfer? EntityCategory      # Defaults to ALLUNITS - WALL - COMMAND
+---@return Unit[]?
 function TransferUnitsToHighestBrain(self, brains, shareOption, categoriesToTransfer)
     if not table.empty(brains) then
         local ratings = ScenarioInfo.Options.Ratings
@@ -719,12 +755,12 @@ function TransferUnitsToHighestBrain(self, brains, shareOption, categoriesToTran
                 brain.rating = ratings[brain.Nickname]
             else
                 -- if there is no rating, create a fake negative rating based on score
-                brain.rating = -1 / brain.score
+                brain.rating = -1 / CalculateBrainScore(brain)
             end
         end
         -- sort brains by rating
         table.sort(brains, function(a, b) return a.rating > b.rating end)
-        TransferUnitsToBrain(self, brains, shareOption, categoriesToTransfer)
+        return TransferUnitsToBrain(self, brains, shareOption, categoriesToTransfer)
     end
 end
 
@@ -772,7 +808,7 @@ local function ReturnBorrowedUnits(self)
     end
 
     for owner, units in borrowed do
-        TransferUnitsOwnership(units, owner)
+        TransferUnitsOwnership(units, owner, false, true)
     end
 
     WaitSeconds(1)
@@ -795,7 +831,7 @@ local function GetBackUnits(selfIndex, brains)
         end
     end
 
-    TransferUnitsOwnership(given, selfIndex)
+    TransferUnitsOwnership(given, selfIndex, false, true)
 end
 
 --- Transfer units to the player who killed me
@@ -807,16 +843,14 @@ local function TransferUnitsToKiller(self)
     if units and not table.empty(units) then
         if ScenarioInfo.Options.Victory == 'demoralization' then
             killerIndex = ArmyBrains[selfIndex].CommanderKilledBy or selfIndex
-            TransferUnitsOwnership(units, killerIndex)
+            TransferUnitsOwnership(units, killerIndex, false, true)
         else
             killerIndex = ArmyBrains[selfIndex].LastUnitKilledBy or selfIndex
-            TransferUnitsOwnership(units, killerIndex)
+            TransferUnitsOwnership(units, killerIndex, false, true)
         end
     end
     WaitSeconds(1)
 end
-
-local CalculateBrainScore = import("/lua/sim/score.lua").CalculateBrainScore
 
 --- Kills an army according to the given share condition.
 ---@param self AIBrain
@@ -825,30 +859,14 @@ function KillArmy(self, shareOption)
 
     -- Kill all walls while the ACU is blowing up
     if shareOption == 'ShareUntilDeath' then
-        ForkThread(KillWalls)
+        ForkThread(KillWalls, self)
     end
 
     WaitSeconds(10) -- Wait for commander explosion, then transfer units.
 
     local selfIndex = self:GetArmyIndex()
 
-    local BrainCategories = { Enemies = {}, Civilians = {}, Allies = {} }
-
-    -- Sort brains out into mutually exclusive categories
-    for index, brain in ArmyBrains do
-        brain.index = index
-        brain.score = CalculateBrainScore(brain)
-
-        if not brain:IsDefeated() and selfIndex ~= index then
-            if ArmyIsCivilian(index) then
-                table.insert(BrainCategories.Civilians, brain)
-            elseif IsEnemy(selfIndex, brain:GetArmyIndex()) then
-                table.insert(BrainCategories.Enemies, brain)
-            else
-                table.insert(BrainCategories.Allies, brain)
-            end
-        end
-    end
+    local BrainCategories = GetAllegianceCategories(selfIndex)
 
     -- This part determines the share condition
     if shareOption == 'ShareUntilDeath' then
@@ -860,7 +878,7 @@ function KillArmy(self, shareOption)
     elseif shareOption == 'PartialShare' then
         KillSharedUnits(selfIndex, categories.ALLUNITS - categories.STRUCTURE - categories.ENGINEER)
         ReturnBorrowedUnits(self)
-        TransferUnitsToHighestBrain(self, BrainCategories.Allies, categories.STRUCTURE + categories.ENGINEER, shareOption)
+        TransferUnitsToHighestBrain(self, BrainCategories.Allies, shareOption, categories.STRUCTURE + categories.ENGINEER)
         TransferOwnershipOfBorrowedUnits(BrainCategories.Allies, selfIndex)
     else
         GetBackUnits(selfIndex, BrainCategories.Allies)
@@ -884,6 +902,64 @@ function KillArmy(self, shareOption)
             unit:Kill()
         end
     end
+end
+
+local StartCountdown = StartCountdown -- as defined in SymSync.lua
+
+--- When the shared ACUs die or recall after the share time expires, kills an army according to the given share condition.
+---@param self AIBrain
+---@param shareOption 'FullShare' | 'ShareUntilDeath' | 'PartialShare' | 'TransferToKiller' | 'Defectors' | 'CivilianDeserter'
+---@param shareTime number Game time in ticks
+function KillArmyOnDelayedRecall(self, shareOption, shareTime)
+    -- Share units including ACUs and walls and keep track of ACUs
+    local brainCategories = GetAllegianceCategories(self:GetArmyIndex())
+    local newUnits = TransferUnitsToHighestBrain(self, brainCategories.Allies, 'FullShare', categories.ALLUNITS)
+    local sharedCommanders = EntityCategoryFilterDown(categories.COMMAND, newUnits)
+
+    -- create a countdown to show when the ACU recalls
+    for _, com in sharedCommanders do
+        StartCountdown(com.EntityId, math.floor((shareTime - GetGameTick())/10))
+    end
+
+    local oneComAlive = true
+    while GetGameTick() < shareTime and oneComAlive do
+        oneComAlive = false
+        for _, com in sharedCommanders do
+            if not com.Dead then
+                oneComAlive = true
+                break
+            end
+        end
+        WaitTicks(1)
+    end
+
+    -- KillArmy waits 10 seconds before acting, while FakeTeleport waits 3 seconds, so the ACU shouldn't explode.
+    ForkThread(FakeTeleportUnits, sharedCommanders, true)
+    KillArmy(self, shareOption)
+end
+
+--- When the shared ACUs die, kills an army according to the given share condition.
+---@param self AIBrain
+---@param shareOption 'FullShare' | 'ShareUntilDeath' | 'PartialShare' | 'TransferToKiller' | 'Defectors' | 'CivilianDeserter'
+function KillArmyOnACUDeath(self, shareOption)
+    -- Share units including ACUs and walls and keep track of ACUs
+    local brainCategories = GetAllegianceCategories(self:GetArmyIndex())
+    local newUnits = TransferUnitsToHighestBrain(self, brainCategories.Allies, 'FullShare', categories.ALLUNITS)
+    local sharedCommanders = EntityCategoryFilterDown(categories.COMMAND, newUnits)
+
+    local oneComAlive = true
+    while oneComAlive do
+        oneComAlive = false
+        for _, com in sharedCommanders do
+            if not com.Dead then
+                oneComAlive = true
+                break
+            end
+        end
+        WaitTicks(1)
+    end
+
+    KillArmy(self, shareOption)
 end
 
 --#endregion

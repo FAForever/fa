@@ -29,8 +29,8 @@
 ---@field RandomMap 'Off' | 'Official' | 'All'
 ---@field Score 'no' | 'yes'
 ---@field Share 'FullShare' | 'ShareUntilDeath' | 'PartialShare' | 'TransferToKiller' | 'Defectors' | 'CivilianDeserter'
----@field AbandonmentShare 'SameAsShare' | 'FullShare' | 'ShareUntilDeath' | 'PartialShare' | 'TransferToKiller' | 'Defectors' | 'CivilianDeserter'
----@field AbandonmentRecall boolean
+---@field DisconnectShare 'SameAsShare' | 'FullShare' | 'ShareUntilDeath' | 'PartialShare' | 'TransferToKiller' | 'Defectors' | 'CivilianDeserter'
+---@field DisconnectShareCommanders 'Explode' | 'Recall' | 'RecallDelayed' | 'Permanent'
 ---@field ShareUnitCap 'none' | 'allies' | 'all'
 ---@field Timeouts '0' | '3'| '-1'
 ---@field UnitCap '125' | '250' | '375' | '500' | '625' | '750' | '875' | '1000' | '1250' | '1500'
@@ -236,8 +236,8 @@ globalOpts = {
     {
         default = 1,
         label = "<LOC lobui_0798>DC Share Conditions",
-        help = "<LOC lobui_0799>Set what happens to a player's units when they disconnect. In Assassination, only applies if an ACU has not been damaged in the last 2 minutes.",
-        key = 'AbandonmentShare',
+        help = "<LOC lobui_0799>Set what happens to a player's units when they disconnect.",
+        key = 'DisconnectShare',
         values = {
             {
                 text = "<LOC lobui_0800>Same as Share Condition",
@@ -278,19 +278,29 @@ globalOpts = {
     },
     {
         default = 1,
-        label = "<LOC lobui_0808>Recall Disconnected ACUs",
-        help = "<LOC lobui_0809>Should disconnecting players' ACUs be recalled, preventing their explosion if they were not damaged in the last 2 minutes?",
-        key = 'AbandonmentRecall',
+        label = "<LOC lobui_0808>DC ACU Share Conditions",
+        help = "<LOC lobui_0809>Set what happens to a player's ACU when they disconnect.",
+        key = 'DisconnectShareCommanders',
         values = {
             {
-                text = "<LOC _No>No",
-                help = "<LOC lobui_0810>ACUs explode when their player disconnects.",
-                key = false,
+                text = "Explode",
+                help = "<LOC lobui_0810>ACUs explode when their player disconnects. In Assassination, the DC share condition is applied only if they have not been damaged in the last 2 minutes.",
+                key = 'Explode',
             },
             {
-                text = "<LOC _Yes>Yes",
-                help = "<LOC lobui_0811>ACUs not damaged in the last 2 minutes are recalled when their player disconnects.",
-                key = true,
+                text = "Recall",
+                help = "<LOC lobui_0811>ACUs not damaged in the last 2 minutes are recalled when their player disconnects. In Assassination, the DC share condition is applied only if they have not been damaged in the last 2 minutes.",
+                key = 'Recall',
+            },
+            {
+                text = "Delayed Recall",
+                help = "Disconnected ACUs are shared to allies for 2 minutes or until 5 minutes into the match before it recalls. In Assassination, the DC share condition is applied to that player's units when the shared ACU dies or recalls.",
+                key = 'RecallDelayed',
+            },
+            {
+                text = "Permanent",
+                help = "Disconnected ACUs are permanently shared to allies. In Assassination, the DC share condition is applied to that player's units when the shared ACU dies.",
+                key = 'Permanent',
             },
         },
     },

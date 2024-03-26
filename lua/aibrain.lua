@@ -11,6 +11,8 @@ local SUtils = import("/lua/ai/sorianutilities.lua")
 local TransferUnitsOwnership = import("/lua/simutils.lua").TransferUnitsOwnership
 local TransferUnfinishedUnitsAfterDeath = import("/lua/simutils.lua").TransferUnfinishedUnitsAfterDeath
 local KillArmy = import("/lua/simutils.lua").KillArmy
+local KillArmyOnDelayedRecall = import("/lua/simutils.lua").KillArmyOnDelayedRecall
+local KillArmyOnACUDeath = import("/lua/simutils.lua").KillArmyOnACUDeath
 local DisableAI = import("/lua/simutils.lua").DisableAI
 local TransferUnitsToBrain = import("/lua/simutils.lua").TransferUnitsToBrain
 local TransferUnitsToHighestBrain = import("/lua/simutils.lua").TransferUnitsToHighestBrain
@@ -477,12 +479,17 @@ AIBrain = Class(FactoryManagerBrainComponent, StatManagerBrainComponent, JammerM
                 DisableAI(self)
             end
 
-            local shareOption = ScenarioInfo.Options.AbandonmentShare
-            local recallAcuOption = ScenarioInfo.Options.AbandonmentRecall
+            local shareOption = ScenarioInfo.Options.DisconnectShare
+            local shareAcuOption = ScenarioInfo.Options.DisconnectShareCommanders
+            local victoryOption = ScenarioInfo.Options.Victory
+            
+            if shareOption == 'SameAsShare' then
+                shareOption = ScenarioInfo.Options.Share
+            end
 
-            -- Don't apply disconnect rules for players/ACUs that might be defeated soon,
+            -- Don't apply instant-effect disconnect rules for players/ACUs that might be defeated soon,
             -- and might have intentionally disconnected.
-            if recallAcuOption or shareOption ~= 'SameAsShare' then
+            if shareAcuOption == 'Explode' or shareAcuOption == 'Recall' then
                 local safeCommanders = {}
 
                 local commanders = self:GetListOfUnits(categories.COMMAND, false)
@@ -494,18 +501,37 @@ AIBrain = Class(FactoryManagerBrainComponent, StatManagerBrainComponent, JammerM
                 end
 
                 -- Only handle Assassination victory, as in other settings the player is unlikely to be defeated soon
-                local victoryOption = ScenarioInfo.Options.Victory
-                if shareOption == 'SameAsShare' or victoryOption == 'demoralization' and table.empty(safeCommanders) then
+                if victoryOption == 'demoralization' and table.empty(safeCommanders) then
                     shareOption = ScenarioInfo.Options.Share
                 end
 
-                if recallAcuOption then            
+                if shareAcuOption == 'Recall' then
                     -- KillArmy waits 10 seconds before acting, while FakeTeleport waits 3 seconds, so the ACU shouldn't explode.
                     ForkThread(FakeTeleportUnits, safeCommanders, true)
                 end
+
+                ForkThread(KillArmy, self, shareOption)
+
+            elseif shareAcuOption == 'RecallDelayed' or shareAcuOption == 'Permanent' then
+
+                if victoryOption ~= 'demoralization' then
+                    shareOption = 'FullShare'
+                end
+
+                if shareAcuOption == 'RecallDelayed' then
+                    local shareTime = GetGameTick() + 1200
+                    if shareTime < 3000 then
+                        shareTime = 3000
+                    end
+                    ForkThread(KillArmyOnDelayedRecall, self, shareOption, shareTime)
+                else
+                    ForkThread(KillArmyOnACUDeath, self, shareOption)
+                end
+            else
+                WARN('Invalid disconnection ACU share condition was used for this game. Defaulting to exploding ACU.')
+                ForkThread(KillArmy, self, shareOption)
             end
 
-            ForkThread(KillArmy, self, shareOption)
 
             if self.Trash then
                 self.Trash:Destroy()
@@ -546,7 +572,6 @@ AIBrain = Class(FactoryManagerBrainComponent, StatManagerBrainComponent, JammerM
         -- Sort brains out into mutually exclusive categories
         for index, brain in ArmyBrains do
             brain.index = index
-            brain.score = CalculateBrainScore(brain)
 
             if not brain:IsDefeated() and selfIndex ~= index then
                 if ArmyIsCivilian(index) then
