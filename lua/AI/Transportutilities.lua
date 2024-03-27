@@ -1045,66 +1045,70 @@ function SendPlatoonWithTransports(aiBrain, platoon, destination, attempts, bSki
 			-- a local function to find an alternate Drop point which satisfies both transports and platoon for threat and a path to the goal
 			local FindSafeDropZoneWithPath = function( platoon, transportplatoon, markerrange, destination, threatMax, airthreatMax, threatType, layer)
 				
-				local markerlist = {}
                 local atest, stest
                 local landpath,  landpathlength, landreason, lastlocationtested, path, pathlength, reason
 				-- locate the requested markers within markerrange of the supplied location	that the platoon can safely land at
 				local markerRadius = math.min(aiBrain.IMAPConfig.IMAPSize * 3, 128)
-				markerlist = NavUtils.DirectionsFromWithThreatThreshold(layer, destination, markerRadius, aiBrain, NavUtils.ThreatFunctions.AntiAir, airthreatMax, aiBrain.IMAPConfig.Rings)
-				-- sort the markers by closest distance to final destination
-				TableSort( markerlist, function(a,b) local VDist2Sq = VDist2Sq return VDist2Sq( a[1],a[3], destination[1],destination[3] ) < VDist2Sq( b[1],b[3], destination[1],destination[3] )  end )
-				-- loop thru each marker -- see if you can form a safe path on the surface 
-				-- and a safe path for the transports -- use the first one that satisfies both
-				for _, v in markerlist do
-                    if lastlocationtested and TableEqual(lastlocationtested, v) then
-                        continue
-                    end
-
-                    lastlocationtested = TableCopy( v )
-					-- test the real values for that position
-					stest, atest = GetRealThreatAtPosition( lastlocationtested, 80 )
-			
-                    if TransportDialog then                    
-                        LOG("*AI DEBUG "..aiBrain.Nickname.." "..transportplatoon.BuilderName.." examines position "..repr(v).." "..repr(lastlocationtested).."  Surface threat "..stest.." -- Air threat "..atest)
-                    end
-		
-					if stest <= threatMax and atest <= airthreatMax then
-                        landpath = false
-                        landpathlength = 0
-						-- can the platoon path safely from this marker to the final destination 
-						landpath, landreason, landpathlength = NavUtils.PathToWithThreatThreshold(layer, destination, lastlocationtested, aiBrain, NavUtils.ThreatFunctions.AntiSurface, threatMax, aiBrain.IMAPConfig.Rings)
-						-- can the transports reach that marker ?
-						if landpath then
-                            path = false
-                            pathlength = 0
-                            path, reason, pathlength = NavUtils.PathToWithThreatThreshold('Air', lastlocationtested, GetPlatoonPosition(platoon), aiBrain, NavUtils.ThreatFunctions.AntiAir, airthreatMax, aiBrain.IMAPConfig.Rings)
-							if path then
-                                if TransportDialog then
-                                    LOG("*AI DEBUG "..aiBrain.Nickname.." "..repr(platoon.BuilderName).." gets path to "..repr(destination).." from landing at "..repr(lastlocationtested).." path length is "..pathlength.." using threatmax of "..threatMax)
-                                    LOG("*AI DEBUG "..aiBrain.Nickname.." "..repr(platoon.BuilderName).." path reason "..landreason.." route is "..repr(landpath))
-                                end
-								return lastlocationtested
-							else
-                                if TransportDialog then
-                                    LOG("*AI DEBUG "..aiBrain.Nickname.." "..repr(platoon.BuilderName).." got transports but they cannot find a safe drop point")
-                                end
-                            end
+				local markerlist = NavUtils.DirectionsFromWithThreatThreshold(layer, destination, markerRadius, aiBrain, NavUtils.ThreatFunctions.AntiAir, airthreatMax, aiBrain.IMAPConfig.Rings)
+				if not table.empty(markerlist) then
+					if TransportDialog then                    
+						LOG("*AI DEBUG "..aiBrain.Nickname.." "..transportplatoon.BuilderName.." Safe Drop radius is  "..markerRadius.." number of positions to test is "..table.getn(markerlist))
+					end
+					-- sort the markers by closest distance to final destination
+					TableSort( markerlist, function(a,b) local VDist2Sq = VDist2Sq return VDist2Sq( a[1],a[3], destination[1],destination[3] ) < VDist2Sq( b[1],b[3], destination[1],destination[3] )  end )
+					-- loop thru each marker -- see if you can form a safe path on the surface 
+					-- and a safe path for the transports -- use the first one that satisfies both
+					for _, v in markerlist do
+						if lastlocationtested and TableEqual(lastlocationtested, v) then
+							continue
 						end
-                        if platoonpath then
-                            lastlocationtested = false
-                            for k,v in platoonpath do
-                                stest, atest = GetRealThreatAtPosition( v, 80 )
-                                if stest <= threatMax and atest <= airthreatMax then
-                                    lastlocationtested = TableCopy(v)
-                                end
-                            end
-                            if lastlocationtested then
-                                if TransportDialog then
-                                    LOG("*AI DEBUG "..aiBrain.Nickname.." "..repr(platoon.BuilderName).." using platoon path position "..repr(v) )
-                                end
-                                return lastlocationtested, 'booga'
-                            end
-                        end
+
+						lastlocationtested = TableCopy( v )
+						-- test the real values for that position
+						stest, atest = GetRealThreatAtPosition( lastlocationtested, 80 )
+				
+						if TransportDialog then                    
+							LOG("*AI DEBUG "..aiBrain.Nickname.." "..transportplatoon.BuilderName.." examines position "..repr(v).." "..repr(lastlocationtested).."  Surface threat "..stest.." -- Air threat "..atest)
+						end
+			
+						if stest <= threatMax and atest <= airthreatMax then
+							landpath = false
+							landpathlength = 0
+							-- can the platoon path safely from this marker to the final destination 
+							landpath, landreason, landpathlength = NavUtils.PathToWithThreatThreshold(layer, destination, lastlocationtested, aiBrain, NavUtils.ThreatFunctions.AntiSurface, threatMax, aiBrain.IMAPConfig.Rings)
+							-- can the transports reach that marker ?
+							if landpath then
+								path = false
+								pathlength = 0
+								path, reason, pathlength = NavUtils.PathToWithThreatThreshold('Air', lastlocationtested, GetPlatoonPosition(platoon), aiBrain, NavUtils.ThreatFunctions.AntiAir, airthreatMax, aiBrain.IMAPConfig.Rings)
+								if path then
+									if TransportDialog then
+										LOG("*AI DEBUG "..aiBrain.Nickname.." "..repr(platoon.BuilderName).." gets path to "..repr(destination).." from landing at "..repr(lastlocationtested).." path length is "..pathlength.." using threatmax of "..threatMax)
+										LOG("*AI DEBUG "..aiBrain.Nickname.." "..repr(platoon.BuilderName).." path reason "..landreason.." route is "..repr(landpath))
+									end
+									return lastlocationtested
+								else
+									if TransportDialog then
+										LOG("*AI DEBUG "..aiBrain.Nickname.." "..repr(platoon.BuilderName).." got transports but they cannot find a safe drop point")
+									end
+								end
+							end
+							if platoonpath then
+								lastlocationtested = false
+								for k,v in platoonpath do
+									stest, atest = GetRealThreatAtPosition( v, 80 )
+									if stest <= threatMax and atest <= airthreatMax then
+										lastlocationtested = TableCopy(v)
+									end
+								end
+								if lastlocationtested then
+									if TransportDialog then
+										LOG("*AI DEBUG "..aiBrain.Nickname.." "..repr(platoon.BuilderName).." using platoon path position "..repr(v) )
+									end
+									return lastlocationtested, 'booga'
+								end
+							end
+						end
 					end
 				end
 				return false, nil
