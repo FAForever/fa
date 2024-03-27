@@ -17,7 +17,7 @@ local UIUtil = import("/lua/ui/uiutil.lua")
 local reclaim = import("/lua/ui/game/reclaim.lua")
 local UpdateReclaim = reclaim.UpdateReclaim
 local sendEnhancementMessage = import("/lua/ui/notify/notify.lua").sendEnhancementMessage
-local SetPlayableArea = reclaim.SetPlayableArea
+local ReclaimSetPlayableArea = reclaim.SetPlayableArea
 
 local SyncCallbacks = { }
 function AddOnSyncCallback(cb, identifier)
@@ -244,7 +244,7 @@ function OnSync()
     end
 
     if Sync.NewPlayableArea then
-        SetPlayableArea(Sync.NewPlayableArea)
+        ReclaimSetPlayableArea(Sync.NewPlayableArea)
     end
 
     if Sync.StartPositions then
