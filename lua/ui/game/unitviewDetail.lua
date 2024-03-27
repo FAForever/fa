@@ -662,7 +662,12 @@ function WrapAndPlaceText(bp, builder, descID, control)
                             weaponDetails1 = weaponDetails1..' x'..weapon.count
                         end
                         table.insert(blocks, {color = UIUtil.fontColor, lines = {weaponDetails1}})
-                        table.insert(blocks, {color = 'FFFFB0B0', lines = {weaponDetails2}})
+                        
+                        if info.DamageType == 'Overcharge' then
+							table.insert(blocks, {color = 'FF40BF40', lines = {weaponDetails2}})
+						else
+							table.insert(blocks, {color = 'FFFFB0B0', lines = {weaponDetails2}})
+						end
 
                         if info.EnergyRequired > 0 and info.EnergyDrainPerSecond > 0 then
                             local weaponDetails3 = string.format('Charge Cost: -%d E (-%d E/s)', info.EnergyRequired, info.EnergyDrainPerSecond)
