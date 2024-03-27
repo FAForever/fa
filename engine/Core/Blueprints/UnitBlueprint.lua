@@ -1000,7 +1000,7 @@
 --- used by the Seraphim T1 air scout for how long the after-death vison remains
 ---@field IntelDurationOnDeath? number
 --- how far we create fake blips
----@field JamRadius {Max: number, Min: number}
+---@field JamRadius { Max: number, Min: number }
 --- how many blips does a jammer produce
 ---@field JammerBlips number
 --- used by the Soothsayer
@@ -1030,7 +1030,7 @@
 --- how far our sonar stealth goes
 ---@field SonarStealthFieldRadius number
 --- how far off displace blips
----@field SpoofRadius {Max: number, Min: number}
+---@field SpoofRadius { Max: number, Min: number }
 --- used by the Selen to define how it needs to sit still while its cloak is enabled for it to work
 ---@field StealthWaitTime? number
 --- how far the unit can see above water and land

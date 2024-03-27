@@ -66,8 +66,9 @@
 --- objects the lobby uses
 ---@field Options? GameOptions
 ---
----@field PlayableAreaWidth number
----@field PlayableAreaHeight number
+---@field PlayableAreaWidth number Syncs when the playable area changes
+---@field PlayableAreaHeight number Syncs when the playable area changes
+---@field PlayableRect { [1]: number, [2]: number, [3]: number, [4]: number } Coordinates `{x0, y0, x1, y1}` of the playable area Rectangle. Syncs when the playable area changes.
 
 
 local OutdatedMaps = import("/etc/faf/mapblacklist.lua").MapBlacklist
