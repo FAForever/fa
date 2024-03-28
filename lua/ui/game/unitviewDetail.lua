@@ -399,7 +399,7 @@ GetAbilityDesc = {
             if v.RemoveEnhancements or (not v.Slot) then continue end
             cnt = cnt + 1
         end
-        return cnt
+        return LOCF('<LOC uvd_0016>', cnt)
     end,
     ability_massive = function(bp)
         return string.format(LOC('<LOC uvd_0010>Damage: %.7g, Splash: %.3g'),
@@ -503,7 +503,7 @@ function WrapAndPlaceText(bp, builder, descID, control)
                             local armorName = armor[i]
                             armorName = string.sub(armorName, 1, string.find(armorName, ' ') - 1)
                             armorName = LOC('<LOC an_'..armorName..'>')..' - '..string.format('%0.1f', tonumber(armor[i]:sub(armorName:len() + 2, armor[i]:len())) * 100)
-                            if row < 1 then
+                            if row < 0 then
                                 armorDetails = armorName
                                 row = 1
                             else
@@ -529,7 +529,7 @@ function WrapAndPlaceText(bp, builder, descID, control)
                 for _, weapon in bp.Weapon do
                     if not weapon.WeaponCategory then continue end
                     local dest = weapons.basic
-                    if weapon.EnabledByEnhancement then
+                    if (weapon.EnabledByEnhancement) or (weapon.WeaponCategory == 'Teleport') then
                         dest = weapons.upgrades
                     end
                     if (weapon.FireOnDeath) or (weapon.WeaponCategory == 'Death') then
@@ -645,8 +645,12 @@ function WrapAndPlaceText(bp, builder, descID, control)
                             end
 
                             if CycleProjs > 1 then
-                                 weaponDetails2 = string.format(LOC('<LOC uvd_0015>Damage: %.8g x%d, Splash: %.3g')..', '..LOC('<LOC uvd_Range>')..', '..LOC('<LOC uvd_Reload>'),
+                                weaponDetails2 = string.format(LOC('<LOC uvd_0015>Damage: %.8g x%d, Splash: %.3g')..', '..LOC('<LOC uvd_Range>')..', '..LOC('<LOC uvd_Reload>'),
                                     Damage, CycleProjs, info.DamageRadius, info.MinRadius, info.MaxRadius, CycleTime)
+                            -- Do not display 'Range' and Reload stats for 'Teleport in' and Kamikaze weapons
+                            elseif info.WeaponCategory == 'Teleport' or info.WeaponCategory == 'Kamikaze' then
+                                weaponDetails2 = string.format(LOC('<LOC uvd_0010>Damage: %.7g, Splash: %.3g'),
+                                Damage, info.DamageRadius)
                             else
                                 weaponDetails2 = string.format(LOC('<LOC uvd_0010>Damage: %.7g, Splash: %.3g')..', '..LOC('<LOC uvd_Range>')..', '..LOC('<LOC uvd_Reload>'),
                                     Damage, info.DamageRadius, info.MinRadius, info.MaxRadius, CycleTime)
@@ -658,7 +662,14 @@ function WrapAndPlaceText(bp, builder, descID, control)
                             weaponDetails1 = weaponDetails1..' x'..weapon.count
                         end
                         table.insert(blocks, {color = UIUtil.fontColor, lines = {weaponDetails1}})
-                        table.insert(blocks, {color = 'FFFFB0B0', lines = {weaponDetails2}})
+                        
+                        if info.DamageType == 'Overcharge' then
+                            table.insert(blocks, {color = 'FF40BF40', lines = {weaponDetails2}})
+                        elseif info.Label == 'Suicide' then
+                            table.insert(blocks, {color = 'FFFF0000', lines = {weaponDetails2}})
+                        else
+                            table.insert(blocks, {color = 'FFFFB0B0', lines = {weaponDetails2}})
+                        end
 
                         if info.EnergyRequired > 0 and info.EnergyDrainPerSecond > 0 then
                             local weaponDetails3 = string.format('Charge Cost: -%d E (-%d E/s)', info.EnergyRequired, info.EnergyDrainPerSecond)

@@ -6760,6 +6760,7 @@ uvd_0012="Speed: %0.1f, Reverse: %0.1f, Acceleration: %0.1f, Turning: %d"
 uvd_0013="Vision: %d, Underwater Vision: %d, Regen: %0.1f, Cap Cost: %0.1f"
 uvd_0014="Damage: %.8g - %.8g, Splash: %.3g - %.3g"
 uvd_0015="Damage: %.8g x%d, Splash: %.3g"
+uvd_0016="Enhancements available: %d"
 
 uvd_DPS="(DPS: %d)"
 uvd_ManualFire="(Manual Fire)"
