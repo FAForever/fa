@@ -18,6 +18,7 @@ local OverchargeCanKill = import("/lua/ui/game/unitview.lua").OverchargeCanKill
 local CommandMode = import("/lua/ui/game/commandmode.lua")
 
 local TeleportReticle = import("/lua/ui/controls/reticles/teleport.lua").TeleportReticle
+local CaptureReticle = import("/lua/ui/controls/reticles/capture.lua").CaptureReticle
 
 WorldViewParams = {
     ui_SelectTolerance = 7.0,
@@ -792,6 +793,7 @@ WorldView = ClassUI(moho.UIWorldView, Control) {
                 local cursor = self.Cursor
                 cursor[1], cursor[2], cursor[3], cursor[4], cursor[5] = UIUtil.GetCursor(identifier)
                 self:ApplyCursor()
+                CaptureReticle(self)
             end
         end
     end,

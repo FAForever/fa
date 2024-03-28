@@ -1,5 +1,5 @@
 --******************************************************************************************************
---** Copyright (c) 2022  clyf
+--** Copyright (c) 2024  IL1I1
 --**
 --** Permission is hereby granted, free of charge, to any person obtaining a copy
 --** of this software and associated documentation files (the "Software"), to deal
@@ -26,19 +26,33 @@ local UIUtil = import("/lua/ui/uiutil.lua")
 local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
 local Reticle = import('/lua/ui/controls/reticle.lua').Reticle
 
+local GetBlueprintCaptureCost = import('/lua/shared/captureCost.lua').GetBlueprintCaptureCost
+ 
 -- Local upvalues for performance
+local GetRolloverInfo = GetRolloverInfo
 local GetSelectedUnits = GetSelectedUnits
+local MathFloor = math.floor
 
---- Reticle for teleport cost info
----@class TeleportReticle : UIReticle
+--- Reticle for capture cost info
+---@class CaptureReticle : UIReticle
 ---@field BuildTimeIcon Bitmap
 ---@field EnergyCostIcon Bitmap
 ---@field eText Text
 ---@field tText Text
-TeleportReticle = ClassUI(Reticle) {
+---@field selectionBuildRate number
+---@field focusArmy Army
+CaptureReticle = ClassUI(Reticle) {
 
-    ---@param self TeleportReticle
+    ---@param self CaptureReticle
     SetLayout = function(self)
+        local selection = GetSelectedUnits()
+        local totalBuildRate = 0
+        for _, unit in selection do
+            totalBuildRate = totalBuildRate + unit:GetBuildRate()
+        end
+        self.selectionBuildRate = totalBuildRate
+        self.focusArmy = GetFocusArmy()
+
         self.BuildTimeIcon = Bitmap(self)
         self.BuildTimeIcon:SetTexture(UIUtil.UIFile('/game/unit_view_icons/time.dds'))
         LayoutHelpers.SetDimensions(self.BuildTimeIcon, 19, 19)
@@ -57,27 +71,39 @@ TeleportReticle = ClassUI(Reticle) {
         self.eText:SetColor('fff7c70f') -- from economy_mini.lua, same color as the energy stored/storage text
     end,
 
-    ---@param self TeleportReticle
-    ---@param mouseWorldPos Vector
-    UpdateDisplay = function(self, mouseWorldPos)
-        if self.onMap then
-            local eCost, tCost = 0., 0.
-            -- add up our teleport energy costs and find the max time
-            for _, unit in GetSelectedUnits() do
-                local eCache, tCache = import('/lua/shared/teleport.lua').TeleportCostFunction(unit, mouseWorldPos)
-                eCost = eCost + eCache
-                if tCache > tCost then
-                    tCost = tCache
+    ---@param self CaptureReticle
+    UpdateDisplay = function(self)
+        local rolloverInfo = GetRolloverInfo()
+        local isNotAlly, targetBp
+        local isCapturable = true
+        if rolloverInfo then
+            isNotAlly = not IsAlly(self.focusArmy, rolloverInfo.armyIndex + 1)
+            targetBp = __blueprints[rolloverInfo.blueprintId]
+            -- `Unit:IsCapturable()` is sim-side so we will use what we have in the bp.
+            -- May not work with units from mods or changed by script.
+            if targetBp.Display.Abilities then
+                for _, ability in targetBp.Display.Abilities do
+                    if ability == "<LOC ability_notcap>Not Capturable" then
+                        isCapturable = false
+                        break
+                    end
                 end
             end
-            -- update our text
-            self.eText:SetText(string.format('%.0f (-%.0f)', eCost, eCost/tCost))
-            self.tText:SetText(string.format('%.1f', tCost))
+        end
+        if isNotAlly and isCapturable then
+            if self:IsHidden() then
+                self:SetHidden(false)
+            end
+
+            local time, energy = GetBlueprintCaptureCost(targetBp, self.selectionBuildRate)
+
+            self.eText:SetText(string.format('%.0f (-%.0f)', energy, energy/time))
+            local minutes = MathFloor(time/60)
+            local seconds = time - 60 * minutes
+            self.tText:SetText(string.format('%02.0f:%02.0f', minutes, seconds))
         else
-            if self.changedOnMap then
-                self.eText:SetText('--')
-                self.tText:SetText('--')
-                self.changedOnMap = false
+            if not self:IsHidden() then
+                self:Hide()
             end
         end
     end,
