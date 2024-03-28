@@ -33,7 +33,9 @@ local CategoriesAllUnits = categories.ALLUNITS
 
 local NavalFormationCategoriesLightBoat = categories.LIGHTBOAT
 local NavalFormationCategoriesFrigate = categories.FRIGATE
-local NavalFormationCategoriesDestroyer = categories.DESTROYER + (categories.DIRECTFIRE - (categories.FRIGATE + categories.WEAKDIRECTFIRE))
+local NavalFormationCategoriesDestroyer = categories.DESTROYER +
+    (categories.DIRECTFIRE - (categories.FRIGATE + categories.WEAKDIRECTFIRE))
+local NavalFormationCategoriesBattleship = categories.BATTLESHIP
 local NavalFormationCategoriesCruiser = (categories.CRUISER + categories.ANTIAIR) - categories.FRIGATE
 local NavalFormationCategoriesBombardment = categories.BATTLESHIP + categories.INDIRECTFIRE
 local NavalFormationCategoriesCarrier = categories.CARRIER
@@ -45,9 +47,10 @@ NavalFormationCategories = {
     CategoriesAllUnits = categories.NAVAL * CategoriesAllUnits,
 
     NavalFormationCategoriesLightBoat = categories.NAVAL * NavalFormationCategoriesLightBoat,
-    
+
     NavalFormationCategoriesFrigate = categories.NAVAL * NavalFormationCategoriesFrigate,
     NavalFormationCategoriesDestroyer = categories.NAVAL * NavalFormationCategoriesDestroyer,
+    NavalFormationCategoriesBattleship = categories.NAVAL * NavalFormationCategoriesBattleship,
 
     NavalFormationCategoriesCruiser = categories.NAVAL * NavalFormationCategoriesCruiser,
     NavalFormationCategoriesSonar = categories.NAVAL * NavalFormationCategoriesSonar,
