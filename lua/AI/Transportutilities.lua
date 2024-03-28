@@ -975,7 +975,7 @@ function SendPlatoonWithTransports(aiBrain, platoon, destination, attempts, bSki
         local ALLUNITS = categories.ALLUNITS
         local TESTUNITS = ALLUNITS - categories.FACTORY - categories.ECONOMIC - categories.SHIELD - categories.WALL
 
-		local airthreat, airthreatMax, Defense, markerrange, mythreat, path, reason, pathlength, surthreat, transportcount,units, transportLocation
+		local airthreat, airthreatMax, Defense, mythreat, path, reason, pathlength, surthreat, transportcount,units, transportLocation
 
 		-- prohibit LAND platoons from traveling to water locations
 		if MovementLayer == 'Land' then
@@ -1043,11 +1043,11 @@ function SendPlatoonWithTransports(aiBrain, platoon, destination, attempts, bSki
 			end
 
 			-- a local function to find an alternate Drop point which satisfies both transports and platoon for threat and a path to the goal
-			local FindSafeDropZoneWithPath = function( platoon, transportplatoon, markerrange, destination, threatMax, airthreatMax, threatType, layer)
+			local FindSafeDropZoneWithPath = function( platoon, transportplatoon, destination, threatMax, airthreatMax, threatType, layer)
 				
                 local atest, stest
                 local landpath,  landpathlength, landreason, lastlocationtested, path, pathlength, reason
-				-- locate the requested markers within markerrange of the supplied location	that the platoon can safely land at
+				-- locate the requested markers within 128 unit radius of the supplied location	that the platoon can safely land at
 				local markerRadius = math.min(aiBrain.IMAPConfig.IMAPSize * 3, 128)
 				local markerlist = NavUtils.DirectionsFromWithThreatThreshold(layer, destination, markerRadius, aiBrain, NavUtils.ThreatFunctions.AntiAir, airthreatMax, aiBrain.IMAPConfig.Rings)
 				if not table.empty(markerlist) then
@@ -1143,17 +1143,15 @@ function SendPlatoonWithTransports(aiBrain, platoon, destination, attempts, bSki
 		-- if the destination doesn't look good, use alternate or false
 		if surthreat > mythreat or airthreat > airthreatMax then
             if (mythreat * 1.5) > surthreat then
-                -- otherwise we'll look for a safe drop zone at least 50% closer than we already are
-                markerrange = VDist3( GetPlatoonPosition(platoon), destination ) * .5
                 if TransportDialog then
-                    LOG("*AI DEBUG "..aiBrain.Nickname.." "..repr(platoon.BuilderName).." carried by "..transportplatoon.BuilderName.." seeking alternate landing zone within "..markerrange.." of destination "..repr(destination))
+                    LOG("*AI DEBUG "..aiBrain.Nickname.." "..repr(platoon.BuilderName).." carried by "..transportplatoon.BuilderName.." seeking alternate landing zone of destination "..repr(destination))
                 end
                 transportLocation = false
                 -- If destination is too hot -- locate the nearest movement marker that is safe
                 if MovementLayer == 'Amphibious' then
-                    transportLocation = FindSafeDropZoneWithPath( platoon, transportplatoon, markerrange, destination, mythreat, airthreatMax, 'AntiSurface', MovementLayer)
+                    transportLocation = FindSafeDropZoneWithPath( platoon, transportplatoon, destination, mythreat, airthreatMax, 'AntiSurface', MovementLayer)
                 else
-                    transportLocation = FindSafeDropZoneWithPath( platoon, transportplatoon, markerrange, destination, mythreat, airthreatMax, 'AntiSurface', MovementLayer)
+                    transportLocation = FindSafeDropZoneWithPath( platoon, transportplatoon, destination, mythreat, airthreatMax, 'AntiSurface', MovementLayer)
                 end
                 if transportLocation then
                     if TransportDialog then
