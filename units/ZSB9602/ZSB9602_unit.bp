@@ -196,7 +196,7 @@ UnitBlueprint {
             LAYER_Water = false,
         },
         DragCoefficient = 0.2,
-        FlattenSkirt = false,
+        FlattenSkirt = true,
         MaxSteerForce = 0,
         MeshExtentsX = 6,
         MeshExtentsY = 4,
