@@ -65,6 +65,12 @@ end
 ---@field Scout BlueprintId[]
 ---@field CounterIntelligence BlueprintId[]
 
+---@class FormationBlueprintListNaval
+---@field General BlueprintId[][]
+---@field AntiAir BlueprintId[]
+---@field Shield BlueprintId[]
+---@field CounterIntelligence BlueprintId[]
+
 --- Lookup table to retrieve the unit types that belong in a formation layer.
 ---@class FormationBlueprintList
 ---@field Land FormationBlueprintListLand

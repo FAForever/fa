@@ -55,33 +55,33 @@ local CategoriesAllUnits = categories.ALLUNITS
 local LandFormationCategoriesCommand = COMMAND
 local LandFormationCategoriesSupportCommand = categories.SUBCOMMANDER
 
-local LandFormationCategoriesDirectFire = LAND * (DIRECTFIRE) - (SNIPER + WEAKDIRECTFIRE + COMMAND + SCOUT)
-local LandFormationCategoriesSniper = LAND * (SNIPER)
-local LandFormationCategoriesArtillery = LAND * (ARTILLERY + INDIRECTFIRE) - (WEAKINDIRECTFIRE)
-local LandFormationCategoriesMissile = LAND * (SILO) - (WEAKINDIRECTFIRE)
-local LandFormationCategoriesAntiAir = LAND * (ANTIAIR) - (WEAKANTIAIR)
-local LandFormationCategoriesShield = LAND * (SHIELD)
-local LandFormationCategoriesEngineering = LAND * (ENGINEER) - (COMMAND)
-local LandFormationCategoriesScout = LAND * (SCOUT)
-local LandFormationCategoriesCounterintelligence = LAND * (COUNTERINTELLIGENCE) - (DIRECTFIRE + ANTIAIR + INDIRECTFIRE)
-local LandFormationCategoriesEngineeering = LAND * (ENGINEER) - (DIRECTFIRE + ANTIAIR + INDIRECTFIRE)
+local LandFormationCategoriesDirectFire = (DIRECTFIRE) - (SNIPER + WEAKDIRECTFIRE + COMMAND + SCOUT)
+local LandFormationCategoriesSniper = (SNIPER)
+local LandFormationCategoriesArtillery = (ARTILLERY + INDIRECTFIRE) - (WEAKINDIRECTFIRE)
+local LandFormationCategoriesMissile = (SILO) - (WEAKINDIRECTFIRE)
+local LandFormationCategoriesAntiAir = (ANTIAIR) - (WEAKANTIAIR)
+local LandFormationCategoriesShield = (SHIELD)
+local LandFormationCategoriesEngineering = (ENGINEER) - (COMMAND)
+local LandFormationCategoriesScout = (SCOUT)
+local LandFormationCategoriesCounterintelligence = (COUNTERINTELLIGENCE) - (DIRECTFIRE + ANTIAIR + INDIRECTFIRE)
+local LandFormationCategoriesEngineeering = (ENGINEER) - (DIRECTFIRE + ANTIAIR + INDIRECTFIRE)
 
 LandFormationCategories = {
     CategoriesAllUnits = CategoriesAllUnits,
 
-    LandFormationCategoriesCommand = LandFormationCategoriesCommand,
-    LandFormationCategoriesSupportCommand = LandFormationCategoriesSupportCommand,
-    LandFormationCategoriesEngineering = LandFormationCategoriesEngineering,
+    LandFormationCategoriesCommand = LAND * LandFormationCategoriesCommand,
+    LandFormationCategoriesSupportCommand = LAND * LandFormationCategoriesSupportCommand,
+    LandFormationCategoriesEngineering = LAND * LandFormationCategoriesEngineering,
 
-    LandFormationCategoriesDirectFire = LandFormationCategoriesDirectFire,
-    LandFormationCategoriesSniper = LandFormationCategoriesSniper,
-    LandFormationCategoriesArtillery = LandFormationCategoriesArtillery,
-    LandFormationCategoriesMissile = LandFormationCategoriesMissile,
-    LandFormationCategoriesAntiAir = LandFormationCategoriesAntiAir,
-    LandFormationCategoriesShield = LandFormationCategoriesShield,
-    LandFormationCategoriesScout = LandFormationCategoriesScout,
-    LandFormationCategoriesCounterintelligence = LandFormationCategoriesCounterintelligence,
-    LandFormationCategoriesEngineeering = LandFormationCategoriesEngineeering,
+    LandFormationCategoriesDirectFire = LAND * LandFormationCategoriesDirectFire,
+    LandFormationCategoriesSniper = LAND * LandFormationCategoriesSniper,
+    LandFormationCategoriesArtillery = LAND * LandFormationCategoriesArtillery,
+    LandFormationCategoriesMissile = LAND * LandFormationCategoriesMissile,
+    LandFormationCategoriesAntiAir = LAND * LandFormationCategoriesAntiAir,
+    LandFormationCategoriesShield = LAND * LandFormationCategoriesShield,
+    LandFormationCategoriesScout = LAND * LandFormationCategoriesScout,
+    LandFormationCategoriesCounterintelligence = LAND * LandFormationCategoriesCounterintelligence,
+    LandFormationCategoriesEngineeering = LAND * LandFormationCategoriesEngineeering,
 }
 
 if Debug then
