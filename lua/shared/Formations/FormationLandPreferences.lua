@@ -49,7 +49,7 @@ LandAntiAirPreferences = {
     LandFormationCategories.LandFormationCategoriesAntiAir,
 }
 
-LandCounterScoutPreferences = {
+LandScoutPreferences = {
     LandFormationCategories.LandFormationCategoriesScout,
 }
 

@@ -45,7 +45,13 @@ local LandGeneralPreferences = import("/lua/shared/Formations/FormationLandPrefe
 local LandShieldPreferences = import("/lua/shared/Formations/FormationLandPreferences.lua").LandShieldPreferences
 local LandCounterIntelligencePreferences = import("/lua/shared/Formations/FormationLandPreferences.lua").LandCounterIntelligencePreferences
 local LandAntiAirPreferences = import("/lua/shared/Formations/FormationLandPreferences.lua").LandAntiAirPreferences
-local LandCounterScoutPreferences = import("/lua/shared/Formations/FormationLandPreferences.lua").LandCounterScoutPreferences
+local LandScoutPreferences = import("/lua/shared/Formations/FormationLandPreferences.lua").LandScoutPreferences
+
+-- preferences for naval
+local NavalGeneralPreferences = import("/lua/shared/Formations/FormationNavalPreferences.lua").NavalGeneralPreferences
+local NavalShieldPreferences = import("/lua/shared/Formations/FormationNavalPreferences.lua").NavalShieldPreferences
+local NavalCounterIntelligencePreferences = import("/lua/shared/Formations/FormationNavalPreferences.lua").NavalCounterIntelligencePreferences
+local NavalAntiAirPreferences = import("/lua/shared/Formations/FormationNavalPreferences.lua").NavalAntiAirPreferences
 
 --- Sorts the list of blueprint ids first by tech level and then by (footprint) size
 ---@param a BlueprintId
@@ -185,8 +191,8 @@ ComputeFormationProperties = function(units, blueprintCountCache, blueprintListC
             end
         end
 
-        for c = 1, TableGetn(LandCounterScoutPreferences) do
-            if EntityCategoryContains(LandCounterScoutPreferences[c], blueprintId) then
+        for c = 1, TableGetn(LandScoutPreferences) do
+            if EntityCategoryContains(LandScoutPreferences[c], blueprintId) then
                 TableInsert(blueprintListCacheLand.Scout, blueprintId)
                 break
             end
