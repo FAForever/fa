@@ -34,6 +34,7 @@ LandGeneralPreferences = {
     LandFormationCategories.LandFormationCategoriesCommand,
     LandFormationCategories.LandFormationCategoriesMissile,
     LandFormationCategories.LandFormationCategoriesArtillery,
+
     LandFormationCategories.CategoriesAllUnits
 }
 

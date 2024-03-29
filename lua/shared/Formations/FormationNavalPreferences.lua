@@ -26,8 +26,6 @@ local NavalFormationCategories = import("/lua/shared/Formations/FormationNavalCa
 --#region Formation preferences
 
 NavalGeneralPreferences = {
-    NavalFormationCategories.CategoriesAllUnits,
-
     NavalFormationCategories.NavalFormationCategoriesFrigate,
     NavalFormationCategories.NavalFormationCategoriesDestroyer,
     NavalFormationCategories.NavalFormationCategoriesBattleship,
@@ -38,6 +36,8 @@ NavalGeneralPreferences = {
     NavalFormationCategories.navalFormationCategoriesShield,
     NavalFormationCategories.NavalFormationCategoriesCounterIntelligence,
     NavalFormationCategories.NavalFormationCategoriesSonar,
+
+    NavalFormationCategories.CategoriesAllUnits,
 }
 
 NavalShieldPreferences = {

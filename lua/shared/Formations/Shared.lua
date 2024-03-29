@@ -81,7 +81,7 @@ end
 ---@class FormationBlueprintList
 ---@field Land FormationBlueprintListLand
 ---@field Air BlueprintId[]
----@field Naval BlueprintId[]
+---@field Naval FormationBlueprintListNaval
 ---@field Submersible BlueprintId[]
 
 ---@type FormationBlueprintList
@@ -94,11 +94,21 @@ FormationBlueprintListCache = {
         CounterIntelligence = {},
     },
     Air = {},
-    Naval = {},
+    Naval = {
+        General = {},
+        AntiAir = {},
+        Shield = {},
+        CounterIntelligence = {}
+    },
     Submersible = {}
 }
 
+-- dynamically populate the general caches
 for k = 1, TableGetn(LandGeneralPreferences) do
+    TableInsert(FormationBlueprintListCache.Land.General, {})
+end
+
+for k = 1, TableGetn(NavalGeneralPreferences) do
     TableInsert(FormationBlueprintListCache.Land.General, {})
 end
 
@@ -142,6 +152,13 @@ ComputeFormationProperties = function(units, blueprintCountCache, blueprintListC
     -- clear naval list cache
     local blueprintListCacheNaval = blueprintListCache.Naval
     TableSetn(blueprintListCacheNaval, 0)
+    TableSetn(blueprintListCacheNaval, 0)
+    TableSetn(blueprintListCacheNaval.AntiAir, 0)
+    TableSetn(blueprintListCacheNaval.Shield, 0)
+    TableSetn(blueprintListCacheNaval.CounterIntelligence, 0)
+    for k = 1, TableGetn(blueprintListCacheNaval.General) do
+        TableSetn(blueprintListCacheNaval.General[k], 0)
+    end
 
     -- clear submersible list cache
     local blueprintListCacheSubmersible = blueprintListCache.Submersible
@@ -201,6 +218,39 @@ ComputeFormationProperties = function(units, blueprintCountCache, blueprintListC
         for c = 1, TableGetn(LandGeneralPreferences) do
             if EntityCategoryContains(LandGeneralPreferences[c], blueprintId) then
                 TableInsert(blueprintListCacheLand.General[c], blueprintId)
+                break
+            end
+        end
+    end
+
+    -- populate naval list cache
+    for k = 1, TableGetn(blueprintListCacheNaval) do
+        local blueprintId = blueprintListCacheNaval[k]
+
+        for c = 1, TableGetn(NavalShieldPreferences) do
+            if EntityCategoryContains(NavalShieldPreferences[c], blueprintId) then
+                TableInsert(blueprintListCacheNaval.Shield, blueprintId)
+                break
+            end
+        end
+
+        for c = 1, TableGetn(NavalCounterIntelligencePreferences) do
+            if EntityCategoryContains(NavalCounterIntelligencePreferences[c], blueprintId) then
+                TableInsert(blueprintListCacheNaval.CounterIntelligence, blueprintId)
+                break
+            end
+        end
+
+        for c = 1, TableGetn(NavalAntiAirPreferences) do
+            if EntityCategoryContains(NavalAntiAirPreferences[c], blueprintId) then
+                TableInsert(blueprintListCacheNaval.AntiAir, blueprintId)
+                break
+            end
+        end
+
+        for c = 1, TableGetn(NavalGeneralPreferences) do
+            if EntityCategoryContains(NavalGeneralPreferences[c], blueprintId) then
+                TableInsert(blueprintListCacheNaval.General[c], blueprintId)
                 break
             end
         end
