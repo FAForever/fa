@@ -30,7 +30,16 @@ URL0303 = ClassUnit(CWalkingLandUnit) {
         CreateLightParticle(self, -1, self.Army, 24, 62, 'flare_lens_add_02', 'ramp_red_10')
 
         -- apply a stun manually
-        local targets = GetTrueEnemyUnitsInSphere(self, self:GetPosition(), 10, categories.MOBILE - (categories.EXPERIMENTAL + categories.COMMAND))
+        local radius = 10
+        local bpWeapon = self.Blueprint.Weapon
+        for _, v in bpWeapon do 
+            if v.Label == 'DeathStun' then
+                radius = v.DamageRadius
+                break
+            end
+        end
+
+        local targets = GetTrueEnemyUnitsInSphere(self, self:GetPosition(), radius, categories.MOBILE - (categories.EXPERIMENTAL + categories.COMMAND))
         if targets then
             for k = 1, table.getn(targets) do
                 local target = targets[k]
