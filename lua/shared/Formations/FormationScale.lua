@@ -76,7 +76,7 @@ ComputeFormationScale = function(formationScaleParametersOfLayer, footprintMinim
         footprintMinimum + formationScaleParametersOfLayer.GridSizeAbsolute
     )
 
-    local gridScale = gridSize / (footprintMaximum + 2)
+    local gridScale = gridSize / (footprintMaximum * footprintMaximum + 2)
 
     return gridScale
 end

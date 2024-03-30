@@ -142,6 +142,7 @@ UnitBlueprint{
         SizeZ = 12,
         OffsetX = 6,
         OffsetZ = 6,
+        Layer = 'Naval',
     },
     General = {
         CommandCaps = {

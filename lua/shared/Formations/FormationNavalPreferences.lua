@@ -26,9 +26,9 @@ local NavalFormationCategories = import("/lua/shared/Formations/FormationNavalCa
 --#region Formation preferences
 
 NavalGeneralPreferences = {
+    NavalFormationCategories.NavalFormationCategoriesBattleship,
     NavalFormationCategories.NavalFormationCategoriesFrigate,
     NavalFormationCategories.NavalFormationCategoriesDestroyer,
-    NavalFormationCategories.NavalFormationCategoriesBattleship,
     NavalFormationCategories.NavalFormationCategoriesLightBoat,
     NavalFormationCategories.NavalFormationCategoriesCruiser,
     NavalFormationCategories.NavalFormationCategoriesCarrier,

@@ -249,20 +249,20 @@ function GrowthFormation(formationUnits)
     local ok, msg = pcall(formation, formationUnits)
     if ok then
 
-        local start = 0
-        local getSystemTimeSecondsOnlyForProfileUse = rawget(_G, 'GetSystemTimeSecondsOnlyForProfileUse')
-        if getSystemTimeSecondsOnlyForProfileUse then
-            start = getSystemTimeSecondsOnlyForProfileUse()
-        end
+        -- local start = 0
+        -- local getSystemTimeSecondsOnlyForProfileUse = rawget(_G, 'GetSystemTimeSecondsOnlyForProfileUse')
+        -- if getSystemTimeSecondsOnlyForProfileUse then
+        --     start = getSystemTimeSecondsOnlyForProfileUse()
+        -- end
 
-        for k = 1, 20 do
-            formation(formationUnits)
-        end
+        -- for k = 1, 20 do
+        --     formation(formationUnits)
+        -- end
 
-        if getSystemTimeSecondsOnlyForProfileUse then
-            local stop = getSystemTimeSecondsOnlyForProfileUse()
-            SPEW("Formation took", stop - start, "seconds for", table.getn(formationUnits) + 1, "units.", start, stop)
-        end
+        -- if getSystemTimeSecondsOnlyForProfileUse then
+        --     local stop = getSystemTimeSecondsOnlyForProfileUse()
+        --     SPEW("Formation took", stop - start, "seconds for", table.getn(formationUnits) + 1, "units.", start, stop)
+        -- end
 
         return msg
     else
@@ -571,6 +571,8 @@ function BlockBuilderLand(unitsList, formationBlock, categoryTable, spacing)
                         if formationBlock.HomogenousRows and not rowType then
                             rowType = type
                         end
+
+                        LOG(xPos * spacing, (-formationLength - offsetY) * spacing)
 
                         TableInsert(FormationPos,
                             { xPos * spacing, (-formationLength - offsetY) * spacing, groupData.Filter,

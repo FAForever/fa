@@ -44,7 +44,7 @@ end
 ---@param offsets number[] # { lx, lz, lx, lz, ... }
 ---@param cx number
 ---@param cz number
-ComputeEmbeddedFormation = function(tacticalFormation, blueprintCountCache, blueprintListCache, offsets, cx, cz)
+ComputeEmbeddedFormation = function(tacticalFormation, blueprintCountCache, blueprintListCache, offsets, sx, sz, cx, cz)
     for k = 0, 0.5 * TableGetn(offsets) - 1 do
         local lox = offsets[2 * k + 1]
         local loz = offsets[2 * k + 2]
@@ -53,8 +53,8 @@ ComputeEmbeddedFormation = function(tacticalFormation, blueprintCountCache, blue
         if blueprintId then
             local formationIndex = TableGetn(tacticalFormation) + 1
             local formation = GetFormationEntry(formationIndex)
-            formation[1] = cx + lox
-            formation[2] = cz + loz
+            formation[1] = cx + sx * lox
+            formation[2] = cz + sz * loz
             formation[3] = categories[blueprintId]
             formation[4] = 0
             formation[5] = false

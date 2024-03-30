@@ -78,7 +78,7 @@ local SortByTech = function(a, b)
     ---@type UnitBlueprint
     local bb = __blueprints[b]
 
-    return (ba.FormationTechIndex + 0.01 * ba.Footprint.SizeX) > (bb.FormationTechIndex + 0.01 * bb.Footprint.SizeX)
+    return (ba.Formation.SortingIndex) > (bb.Formation.SortingIndex)
 end
 
 --- Returns the first blueprint identifier that is still available in the formationBlueprintCountCache.
@@ -245,7 +245,7 @@ function ComputeFormation(units)
                 formationBlueprintCountCache,
                 formationBlueprintListCache.Shield,
                 guardedBlueprintFormationEmbedShieldAt,
-                0, 0
+                1, 1, 0, 0
             )
         end
 
@@ -256,7 +256,7 @@ function ComputeFormation(units)
                 formationBlueprintCountCache,
                 formationBlueprintListCache.AntiAir,
                 guardedBlueprintFormationEmbedAntiAirAt,
-                0, 0
+                1, 1, 0, 0
             )
         end
     end

@@ -109,7 +109,7 @@ for k = 1, TableGetn(LandGeneralPreferences) do
 end
 
 for k = 1, TableGetn(NavalGeneralPreferences) do
-    TableInsert(FormationBlueprintListCache.Land.General, {})
+    TableInsert(FormationBlueprintListCache.Naval.General, {})
 end
 
 --- Transforms a list of units into a lookup datastructure to make them computationally cheaper to work with.
@@ -299,6 +299,20 @@ UpdateFormationLandCategories = function(blueprintCountCache, blueprintListCache
     local blueprintListCacheLandGeneral = blueprintListCacheLand.General
     for k = 1, TableGetn(blueprintListCacheLandGeneral) do
         UpdateFormationCategories(blueprintCountCache, blueprintListCacheLandGeneral[k])
+    end
+end
+
+--- Updates the lookup datastructures for land formations to reflect the current state.
+---@param blueprintCountCache FormationBlueprintCount
+---@param blueprintListCacheNaval FormationBlueprintListNaval
+UpdateFormationNavalCategories = function(blueprintCountCache, blueprintListCacheNaval)
+
+    UpdateFormationCategories(blueprintCountCache, blueprintListCacheNaval.Shield)
+    UpdateFormationCategories(blueprintCountCache, blueprintListCacheNaval.CounterIntelligence)
+    UpdateFormationCategories(blueprintCountCache, blueprintListCacheNaval.AntiAir)
+    local blueprintListCacheNavalGeneral = blueprintListCacheNaval.General
+    for k = 1, TableGetn(blueprintListCacheNavalGeneral) do
+        UpdateFormationCategories(blueprintCountCache, blueprintListCacheNavalGeneral[k])
     end
 end
 
