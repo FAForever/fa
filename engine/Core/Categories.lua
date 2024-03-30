@@ -13,17 +13,25 @@ categories = {
     ALLPROJECTILES = categoryValue,
     ALLUNITS = categoryValue,
     AMPHIBIOUS = categoryValue,
+    --- Used for units that can target air units
     ANTIAIR = categoryValue,
+    --- Used by support commander presets
     ANTIAIRPRESET = categoryValue,
+    --- Used for units that can target missiles
     ANTIMISSILE = categoryValue,
+    --- Used for units that can target submarines (torpedoes and depth charges)
     ANTINAVY = categoryValue,
+    --- Used for units that are specifically designed to target shields
     ANTISHIELD = categoryValue,
+    --- Unused, see `ANTINAVY` instead
     ANTISUB = categoryValue,
+    --- Used for units that can target torpedoes
     ANTITORPEDO = categoryValue,
     ARTILLERY = categoryValue,
     ASF = categoryValue,
     BATTLESHIP = categoryValue,
     BENIGN = categoryValue,
+    --- Used for units that die when attacking
     BOMB = categoryValue,
     BOMBER = categoryValue,
     BOT = categoryValue,

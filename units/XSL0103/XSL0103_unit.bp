@@ -151,6 +151,7 @@ UnitBlueprint{
     LifeBarOffset = 0.4,
     LifeBarSize = 0.6,
     Physics = {
+        BackUpDistance = 6,
         BankingSlope = 0,
         BuildOnLayerCaps = {
             LAYER_Air = false,
@@ -165,7 +166,7 @@ UnitBlueprint{
         MaxAcceleration = 2.7,
         MaxBrake = 2.7,
         MaxSpeed = 2.7,
-        MaxSpeedReverse = 0,
+        MaxSpeedReverse = 2.7,
         MaxSteerForce = 10,
         MeshExtentsX = 0.55,
         MeshExtentsY = 0.35,

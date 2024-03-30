@@ -19,6 +19,7 @@ UnitBlueprint{
     Categories = {
         "AIRSTAGINGPLATFORM",
         "ANTIAIR",
+        "ANTIMISSILE",
         "BUILTBYTIER3FACTORY",
         "CARRIER",
         "INDIRECTFIRE",
@@ -247,7 +248,7 @@ UnitBlueprint{
             MinRadius = 20,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
-            MuzzleVelocity = 5,
+            MuzzleVelocity = 12,
             ProjectileId = "/projectiles/SIFLaanseTacticalMissile03/SIFLaanseTacticalMissile03_proj.bp",
             ProjectileLifetime = 60,
             RackBones = {

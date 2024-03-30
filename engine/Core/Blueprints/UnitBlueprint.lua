@@ -962,8 +962,14 @@
 ---@field TarmacGlowDecal? any unused
 --- defines the tech level used for display purposes
 ---@field TechLevel UnitTechLevel
---- if present, makes the "teleport" ability show up in the unit view with the delay of this value
+--- if present, makes the "teleport" ability show up in the unit view with the delay of this value. Defaults to 15 seconds.
 ---@field TeleportDelay? number
+--- if present, adds a flat energy cost to the "teleport" ability. Defaults to 150000 energy. Only applies when `UseVariableTeleportCosts` is true.
+---@field TeleportFlatEnergyCost? number
+--- Only applies when `UseVariableTeleportCosts` is true. Defaults to 2.500.000 energy.
+---@field TeleportMaximumEnergyCost? number
+--- Only applies when `UseVariableTeleportCosts` is true. Defaults to 50 seconds.
+---@field TeleportMaximumDuration? number
 --- table of toggle capabilities available for this unit
 ---@field ToggleCaps table<ToggleCap, boolean>
 --- table of boolean toggles set/got with SetStatByCallback/GetStat
@@ -975,7 +981,7 @@
 ---@field UpgradesFrom? UnitId
 --- what unit, if any, this unit can be upgraded to
 ---@field UpgradesTo? UnitId
---- the base unit from which all units in this upgrade chain can be upgraded from
+--- the base unit from which all units in this upgrade chain can be upgraded from. If this field is lacking then the unit may refuse to upgrade even when `UpgradesFrom` and `UpgradesTo` are set
 ---@field UpgradesFromBase? UnitId
 ---
 --- auto-generated field from `CommandCaps`

@@ -58,6 +58,7 @@ UnitBlueprint{
         "TRANSPORTBUILTBYTIER3FACTORY",
         "TRANSPORTFOCUS",
         "VISIBLETORECON",
+        "WEAKANTIAIR",
     },
     Defense = {
         AirThreatLevel = 3.5,
@@ -181,7 +182,7 @@ UnitBlueprint{
         Class1Capacity = 12,
         Class2AttachSize = 2,
         Class3AttachSize = 4,
-        SlotsLarge = 2,
+        SlotsLarge = 3,
         SlotsMedium = 6,
         SlotsSmall = 12,
         TransportClass = 10,

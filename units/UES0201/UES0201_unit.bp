@@ -19,6 +19,7 @@ UnitBlueprint{
     BuildIconSortPriority = 30,
     Categories = {
         "ANTINAVY",
+        "ANTITORPEDO",
         "BUILTBYTIER2FACTORY",
         "BUILTBYTIER3FACTORY",
         "DESTROYER",
@@ -33,10 +34,13 @@ UnitBlueprint{
         "PRODUCTSC1",
         "RECLAIMABLE",
         "SELECTABLE",
+        "SHOWATTACKRETICLE",
         "SNIPEMODE",
         "TECH2",
         "UEF",
         "VISIBLETORECON",
+        "WEAKANTIAIR",
+        "WEAKANTINAVY",
     },
     Defense = {
         AirThreatLevel = 1,

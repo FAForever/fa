@@ -20,6 +20,7 @@ UnitBlueprint{
     Categories = {
         "ANTIMISSILE",
         "ANTINAVY",
+        "ANTITORPEDO",
         "BATTLESHIP",
         "BUILTBYTIER3FACTORY",
         "DIRECTFIRE",
@@ -37,6 +38,7 @@ UnitBlueprint{
         "TECH3",
         "UEF",
         "VISIBLETORECON",
+        "WEAKANTINAVY",
     },
     Defense = {
         AirThreatLevel = 0,

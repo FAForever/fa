@@ -77,6 +77,7 @@ UnitBlueprint{
         "SNIPEMODE",
         "TARGETCHASER",
         "VISIBLETORECON",
+        "WEAKANTINAVY",
         "EXTERNALFACTORY"
     },
     Defense = {
@@ -326,7 +327,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_AntiAir",
-            RateOfFire = 0.8,
+            RateOfFire = 0.769,
             TargetPriorities = {
                 "(AIR * MOBILE - INTELLIGENCE)",
                 "ALLUNITS",
@@ -384,7 +385,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_AntiAir",
-            RateOfFire = 0.8,
+            RateOfFire = 0.769,
             TargetPriorities = {
                 "(AIR * MOBILE - INTELLIGENCE)",
                 "ALLUNITS",
@@ -442,7 +443,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_AntiAir",
-            RateOfFire = 0.8,
+            RateOfFire = 0.769,
             TargetPriorities = {
                 "(AIR * MOBILE - INTELLIGENCE)",
                 "ALLUNITS",
@@ -500,7 +501,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_AntiAir",
-            RateOfFire = 0.8,
+            RateOfFire = 0.769,
             TargetPriorities = {
                 "(AIR * MOBILE - INTELLIGENCE)",
                 "ALLUNITS",

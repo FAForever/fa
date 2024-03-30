@@ -1,5 +1,5 @@
 --******************************************************************************************************
---** Copyright (c) 2023  Willem 'Jip' Wijnia
+--** Copyright (c) 2024 FAForever
 --**
 --** Permission is hereby granted, free of charge, to any person obtaining a copy
 --** of this software and associated documentation files (the "Software"), to deal
@@ -20,19 +20,51 @@
 --** SOFTWARE.
 --******************************************************************************************************
 
----@type ContextBasedTemplate
-Template = {
-    Name = 'Extractor',
-    TriggersOnMassDeposit = true,
-    TemplateSortingOrder = 100,
-    TemplateData = {
-        2,
-        2,
-        {
-            'uab1103',
-            1,
-            0,
-            0
-        },
-    },
-}
+-- upvalue scope for performance
+local TableKeys = table.keys
+
+local IsAlly = IsAlly
+
+--- Returns all clients in the game
+---@return number[]
+function GetAll()
+    local clients = GetSessionClients()
+    local focusArmy = GetFocusArmy()
+
+    -- skip for observers
+    if focusArmy <= 0 then
+        return {}
+    end
+
+    local recipients = {}
+    for k, client in clients do
+        for l, source in client.authorizedCommandSources do
+            recipients[source] = true
+        end
+    end
+
+    return TableKeys(recipients)
+end
+
+--- Returns all allied clients in the game
+---@return number[]
+function GetAllies()
+    local clients = GetSessionClients()
+    local focusArmy = GetFocusArmy()
+
+    -- skip for observers
+    if focusArmy <= 0 then
+        return {}
+    end
+
+    local recipients = {}
+    for k, client in clients do
+        for l, source in client.authorizedCommandSources do
+            if IsAlly(focusArmy, source) then
+                recipients[source] = true
+            end
+        end
+    end
+
+    return TableKeys(recipients)
+end

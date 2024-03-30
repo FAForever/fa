@@ -37,7 +37,6 @@ UnitBlueprint{
         "ENERGYPRODUCTION",
         "ENGINEER",
         "LAND",
-        "MASSFABRICATION",
         "MASSPRODUCTION",
         "MOBILE",
         "OVERLAYDIRECTFIRE",
@@ -532,7 +531,8 @@ UnitBlueprint{
             },
         },
         SelectionPriority = 3,
-        TeleportDelay = 10,
+        TeleportDelay = 15,
+        TeleportFlatEnergyCost = 75000,
     },
     Intel = {
         FreeIntel = true,
@@ -615,7 +615,7 @@ UnitBlueprint{
             MuzzleVelocity = 25,
             MuzzleVelocityReduceDistance = 5,
             ProjectileId = "/projectiles/SDFLightChronatronCannon01/SDFLightChronatronCannon01_proj.bp",
-            ProjectileLifetimeUsesMultiplier = 1.15,
+            ProjectileLifetimeUsesMultiplier = 1.3,
             ProjectilesPerOnFire = 1,
             RackBones = {
                 {
@@ -867,7 +867,7 @@ UnitBlueprint{
             MuzzleChargeDelay = 0.2,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
-            MuzzleVelocity = 7,
+            MuzzleVelocity = 12,
             ProjectileId = "/projectiles/SIFLaanseTacticalMissileSCU/SIFLaanseTacticalMissileSCU_proj.bp",
             ProjectileLifetime = 80,
             ProjectilesPerOnFire = 1,

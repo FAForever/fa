@@ -101,6 +101,7 @@ UnitBlueprint{
         ToggleCaps = { RULEUTC_ProductionToggle = true },
         UnitName = "<LOC xsb1302_name>Hyalatoh",
         UpgradesFrom = "xsb1202",
+        UpgradesFromBase = "xsb1103"
     },
     Intel = { VisionRadius = 20 },
     LifeBarHeight = 0.075,

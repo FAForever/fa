@@ -36,6 +36,7 @@ UnitBlueprint{
         "TECH1",
         "UEF",
         "VISIBLETORECON",
+        "WEAKDIRECTFIRE"
     },
     Defense = {
         AirThreatLevel = 0,

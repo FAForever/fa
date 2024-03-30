@@ -1,23 +1,24 @@
----@class BuildTemplateBuilding
+---@class UIBuildTemplateBuilding
 ---@field [1] string unit id
 ---@field [2] number build order
 ---@field [3] number position x
 ---@field [4] number position z
 
----@class BuildQueue
----@field [1] number
----@field [2] number
----@field [3] BuildTemplateBuilding
---@field [...] BuildTemplateBuilding
+---@class UIBuildTemplate
+---@field [1] number        # width that is used when drag building the template
+---@field [2] number        # height that is used when drag building the template
+---@field [3] UIBuildTemplateBuilding
+--@field [...] UIBuildTemplateBuilding
 
----@class BuildTemplate
+---@class UIBuildTemplateData
 ---@field templateData table
 ---@field name string
 ---@field icon string unit id
 
 
 local Prefs = import("/lua/user/prefs.lua")
----@type BuildTemplate[]
+
+---@type UIBuildTemplateData[]
 local templates = Prefs.GetFromCurrentProfile('build_templates_factory') or {}
 local UIUtil = import("/lua/ui/uiutil.lua")
 

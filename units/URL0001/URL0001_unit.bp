@@ -47,7 +47,6 @@ UnitBlueprint{
         "ENERGYPRODUCTION",
         "ENGINEER",
         "LAND",
-        "MASSFABRICATION",
         "MASSPRODUCTION",
         "MOBILE",
         "OVERLAYDIRECTFIRE",
@@ -593,7 +592,8 @@ UnitBlueprint{
 
         QuickSelectPriority = 1,
         SelectionPriority = 3,
-        TeleportDelay = 10,
+        TeleportDelay = 15,
+        TeleportFlatEnergyCost = 75000,
     },
     Intel = {
         ActiveIntel = { Omni = true },

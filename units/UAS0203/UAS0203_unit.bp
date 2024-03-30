@@ -19,7 +19,6 @@ UnitBlueprint{
     Categories = {
         "AEON",
         "ANTINAVY",
-        "BUILTBYEXPERIMENTALSUB",
         "BUILTBYTIER1FACTORY",
         "BUILTBYTIER2FACTORY",
         "BUILTBYTIER3FACTORY",
@@ -167,7 +166,7 @@ UnitBlueprint{
             RULEUCC_Attack = true,
             RULEUCC_CallTransport = false,
             RULEUCC_Capture = false,
-            RULEUCC_Dive = true,
+            RULEUCC_Dive = false,
             RULEUCC_Guard = true,
             RULEUCC_Move = true,
             RULEUCC_Nuke = false,

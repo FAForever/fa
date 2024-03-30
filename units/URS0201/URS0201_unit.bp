@@ -25,6 +25,8 @@ UnitBlueprint{
     Categories = {
         "AMPHIBIOUS",
         "ANTINAVY",
+        "ANTITORPEDO",
+        "WEAKANTIAIR", 
         "BUILTBYTIER2FACTORY",
         "BUILTBYTIER3FACTORY",
         "CYBRAN",
@@ -396,7 +398,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_AntiAir",
-            RateOfFire = 1.5,
+            RateOfFire = 1.428,
             TargetPriorities = {
                 "AIR MOBILE TECH3 BOMBER",
                 "AIR MOBILE BOMBER",

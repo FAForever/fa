@@ -47,7 +47,6 @@ UnitBlueprint{
         "BUILTBYTIER3FACTORY",
         "HIGHALTAIR",
         "MOBILE",
-        "NUKE",
         "OVERLAYANTIAIR",
         "OVERLAYRADAR",
         "PRODUCTSC1",
@@ -59,6 +58,7 @@ UnitBlueprint{
         "TECH3",
         "UEF",
         "VISIBLETORECON",
+        "WEAKANTIAIR",
     },
     Defense = {
         AirThreatLevel = 5.5,
@@ -333,7 +333,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_AntiAir",
-            RateOfFire = 1.5,
+            RateOfFire = 1.428,
             TargetPriorities = {
                 "AIR MOBILE",
                 "AIR MOBILE -INTELLIGENCE",
@@ -394,7 +394,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_AntiAir",
-            RateOfFire = 1.5,
+            RateOfFire = 1.428,
             TargetPriorities = {
                 "AIR MOBILE",
                 "AIR MOBILE -INTELLIGENCE",

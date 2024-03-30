@@ -143,8 +143,6 @@ local SixWideSubAttackFormation = import("/lua/shared/Formations/NavalCategories
 local EightWideSubAttackFormation = import("/lua/shared/Formations/NavalCategories.lua").EightWideSubAttackFormation
 local TenWideSubAttackFormation = import("/lua/shared/Formations/NavalCategories.lua").TenWideSubAttackFormation
 
---#endregion
-
 -- ============ Formation Pickers ============
 ---@param typeName string
 ---@param distance Vector
