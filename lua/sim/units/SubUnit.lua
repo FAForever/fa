@@ -2,6 +2,8 @@ local EffectTemplate = import("/lua/effecttemplates.lua")
 
 local Entity = import("/lua/sim/entity.lua").Entity
 local MobileUnit = import("/lua/sim/units/mobileunit.lua").MobileUnit
+local MobileUnitOnCreate = MobileUnit.OnCreate
+local MobileUnitOnMotionVertEventChange = MobileUnit.OnMotionVertEventChange
 
 ---@class SubUnit : MobileUnit
 SubUnit = ClassUnit(MobileUnit) {
@@ -17,7 +19,7 @@ SubUnit = ClassUnit(MobileUnit) {
     ---@param self SubUnit
     ---@param spec any
     OnCreate = function(self, spec)
-        MobileUnit.OnCreate(self, spec)
+        MobileUnitOnCreate(self, spec)
 
         -- submarines do not make a sound by default, we want them to make sound so we use an entity as source instead
         self.SoundEntity = Entity()
@@ -30,7 +32,7 @@ SubUnit = ClassUnit(MobileUnit) {
     ---@param new string
     ---@param old string
     OnMotionVertEventChange = function(self, new, old)
-        MobileUnit.OnMotionVertEventChange(self, new, old)
+        MobileUnitOnMotionVertEventChange(self, new, old)
 
         -- only temporarily remove/add dive command if the submarine should have a dive command
         if self.Blueprint.General.CommandCaps.RULEUCC_Dive then
