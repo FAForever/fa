@@ -1,5 +1,12 @@
 
 local StructureUnit = import("/lua/sim/units/structureunit.lua").StructureUnit
+local StructureUnitOnScriptBitSet = StructureUnit.OnScriptBitSet
+local StructureUnitOnScriptBitClear = StructureUnit.OnScriptBitClear
+local StructureUnitOnStopBeingBuilt = StructureUnit.OnStopBeingBuilt
+local StructureUnitOnProductionPaused = StructureUnit.OnProductionPaused
+local StructureUnitOnProductionUnpaused = StructureUnit.OnProductionUnpaused
+local StructureUnitOnConsumptionActive = StructureUnit.OnConsumptionActive
+local StructureUnitOnConsumptionInActive = StructureUnit.OnConsumptionInActive
 
 ---@class MassFabricationUnit : StructureUnit
 MassFabricationUnit = ClassUnit(StructureUnit) {
@@ -14,7 +21,7 @@ MassFabricationUnit = ClassUnit(StructureUnit) {
             -- immediately disable production
             self:OnProductionPaused()
         else
-            StructureUnit.OnScriptBitSet(self, bit)
+            StructureUnitOnScriptBitSet(self, bit)
         end
     end,
 
@@ -25,7 +32,7 @@ MassFabricationUnit = ClassUnit(StructureUnit) {
             -- make brain track us to enable / disable accordingly
             self.Brain:AddDisabledEnergyExcessUnit(self)
         else
-            StructureUnit.OnScriptBitClear(self, bit)
+            StructureUnitOnScriptBitClear(self, bit)
         end
     end,
 
@@ -33,7 +40,7 @@ MassFabricationUnit = ClassUnit(StructureUnit) {
     ---@param builder Unit
     ---@param layer Layer
     OnStopBeingBuilt = function(self, builder, layer)
-        StructureUnit.OnStopBeingBuilt(self, builder, layer)
+        StructureUnitOnStopBeingBuilt(self, builder, layer)
         self:SetMaintenanceConsumptionActive()
         self:SetProductionActive(true)
 
@@ -43,7 +50,7 @@ MassFabricationUnit = ClassUnit(StructureUnit) {
 
     ---@param self MassFabricationUnit
     OnConsumptionActive = function(self)
-        StructureUnit.OnConsumptionActive(self)
+        StructureUnitOnConsumptionActive(self)
         self:SetMaintenanceConsumptionActive()
         self:SetProductionActive(true)
         self:ApplyAdjacencyBuffs()
@@ -52,7 +59,7 @@ MassFabricationUnit = ClassUnit(StructureUnit) {
 
     ---@param self MassFabricationUnit
     OnConsumptionInActive = function(self)
-        StructureUnit.OnConsumptionInActive(self)
+        StructureUnitOnConsumptionInActive(self)
         self:SetMaintenanceConsumptionInactive()
         self:SetProductionActive(false)
         self:RemoveAdjacencyBuffs()
@@ -61,13 +68,13 @@ MassFabricationUnit = ClassUnit(StructureUnit) {
 
     ---@param self MassFabricationUnit
     OnProductionPaused = function(self)
-        StructureUnit.OnProductionPaused(self)
+        StructureUnitOnProductionPaused(self)
         self:StopUnitAmbientSound('ActiveLoop')
     end,
 
     ---@param self MassFabricationUnit
     OnProductionUnpaused = function(self)
-        StructureUnit.OnProductionUnpaused(self)
+        StructureUnitOnProductionUnpaused(self)
         self:PlayUnitAmbientSound('ActiveLoop')
     end,
 
