@@ -21,6 +21,7 @@
 --**********************************************************************************
 
 local AmphibiousLandUnit = import("/lua/sim/units/amphibiouslandunit.lua").AmphibiousLandUnit
+local AmphibiousLandUnitOnLayerChange = AmphibiousLandUnit
 
 ---@class SlowAmphibiousLandUnit : AmphibiousLandUnit
 SlowAmphibiousLandUnit = ClassUnit(AmphibiousLandUnit) {
@@ -29,7 +30,9 @@ SlowAmphibiousLandUnit = ClassUnit(AmphibiousLandUnit) {
     ---@param new string
     ---@param old string
     OnLayerChange = function(self, new, old)
-        AmphibiousLandUnit.OnLayerChange(self, new, old)
+        AmphibiousLandUnitOnLayerChange(self, new, old)
+
+        -- the layer change is called before `OnCreate` is when a unit is created, hence the field `self.Blueprint` may not exist
 
         local mult = (self.Blueprint or self:GetBlueprint()).Physics.WaterSpeedMultiplier
         if new == 'Seabed' then
