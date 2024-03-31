@@ -33,8 +33,10 @@ local GetMouseWorldPos = GetMouseWorldPos
 ---@field parent WorldView
 ---@field Trash TrashBag
 ---@field onMap boolean
----@field mapX number
----@field mapZ number
+---@field mapX0 number
+---@field mapY0 number
+---@field mapX1 number
+---@field mapY1 number
 Reticle = ClassUI(Group) {
 
     ---@param self UIReticle
@@ -51,8 +53,8 @@ Reticle = ClassUI(Group) {
         self.changedOnMap = true
 
         -- get map dimensions for on and off map update check
-        local scenarioInfo = SessionGetScenarioInfo()
-        self.mapX, self.mapZ = scenarioInfo.PlayableAreaWidth, scenarioInfo.PlayableAreaHeight
+        local PlayableRect = SessionGetScenarioInfo().PlayableRect
+        self.mapX0, self.mapY0, self.mapX1, self.mapY1 = unpack(PlayableRect)
 
         -- set dimensions, default 64x64
         local xDim, yDim = data.xDim or 64, data.yDim or 64
@@ -86,8 +88,11 @@ Reticle = ClassUI(Group) {
     ---@param self UIReticle
     ---@param mouseWorldPos Vector
     UpdateOnMapStatus = function(self, mouseWorldPos)
-        if ((mouseWorldPos[1] < 1 or mouseWorldPos[1] > self.mapX - 1) or
-        (mouseWorldPos[3] < 1 or mouseWorldPos[3] > self.mapZ - 1)) == self.onMap then
+        if (
+            (mouseWorldPos[1] < self.mapX0 + 1 or mouseWorldPos[1] > self.mapX1 - 1)
+             or (mouseWorldPos[3] < self.mapY0 + 1 or mouseWorldPos[3] > self.mapY1 - 1)
+           ) == self.onMap
+        then
             self.changedOnMap = true
             self.onMap = not self.onMap
         end
