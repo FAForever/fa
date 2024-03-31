@@ -7,8 +7,8 @@ MeshBlueprint {
             NormalsName = '/units/UAL0001/UAL0001_NormalsTS.dds',
             SpecularName = '/units/UAL0001/UAL0001_SpecTeam.dds',
             LookupName = '/effects/entities/PhaseShield/PhaseShieldLookup.dds',
-            ShaderName = 'Unit',
-            LODCutoff = 195,
+            ShaderName = 'Aeon',
+            LODCutoff = 215,
         },
     },
 }

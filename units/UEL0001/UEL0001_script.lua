@@ -464,4 +464,23 @@ UEL0001 = ClassUnit(ACUUnit) {
     end,
 }
 
+if true then
+
+    local oldUEL0001 = UEL0001
+    UEL0001 = ClassUnit(UEL0001) {
+        --- Adds a single level of veterancy
+        ---@param self Unit | VeterancyComponent
+        AddVetLevel = function(self)
+            oldUEL0001.AddVetLevel(self)
+
+            LOG("UEL0001 AddVetLevel")
+
+            -- replace the mesh
+            local temp = string.format('/units/uel0001/wide/UEF%d_mesh', self.VetLevel)
+            self:SetMesh(temp, true)
+        end
+    }
+
+end
+
 TypeClass = UEL0001
