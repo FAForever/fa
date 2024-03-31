@@ -394,4 +394,22 @@ XSL0001 = ClassUnit(ACUUnit) {
     end,
 }
 
+if true then
+
+    local oldXSL0001 = XSL0001
+    XSL0001 = ClassUnit(XSL0001) {
+        --- Adds a single level of veterancy
+        ---@param self Unit | VeterancyComponent
+        AddVetLevel = function(self)
+            oldXSL0001.AddVetLevel(self)
+
+            -- replace the mesh
+            local temp = string.format('/units/xsl0001/wide/Sera%d_mesh', self.VetLevel)
+            self:SetMesh(temp, true)
+        end
+    }
+
+end
+
+
 TypeClass = XSL0001
