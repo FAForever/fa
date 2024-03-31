@@ -399,7 +399,7 @@ GetAbilityDesc = {
             if v.RemoveEnhancements or (not v.Slot) then continue end
             cnt = cnt + 1
         end
-        return LOCF('<LOC uvd_0016>', cnt)
+        return LOCF('<LOC uvd_0016>Enhancements: %d', cnt)
     end,
     ability_massive = function(bp)
         return string.format(LOC('<LOC uvd_0010>Damage: %.7g, Splash: %.3g'),
@@ -503,7 +503,7 @@ function WrapAndPlaceText(bp, builder, descID, control)
                             local armorName = armor[i]
                             armorName = string.sub(armorName, 1, string.find(armorName, ' ') - 1)
                             armorName = LOC('<LOC an_'..armorName..'>')..' - '..string.format('%0.1f', tonumber(armor[i]:sub(armorName:len() + 2, armor[i]:len())) * 100)
-                            if row < 0 then
+                            if row < 1 then
                                 armorDetails = armorName
                                 row = 1
                             else
@@ -529,7 +529,7 @@ function WrapAndPlaceText(bp, builder, descID, control)
                 for _, weapon in bp.Weapon do
                     if not weapon.WeaponCategory then continue end
                     local dest = weapons.basic
-                    if (weapon.EnabledByEnhancement) or (weapon.WeaponCategory == 'Teleport') then
+                    if weapon.EnabledByEnhancement then
                         dest = weapons.upgrades
                     end
                     if (weapon.FireOnDeath) or (weapon.WeaponCategory == 'Death') then
@@ -639,21 +639,25 @@ function WrapAndPlaceText(bp, builder, descID, control)
                             end
 
                             -- Avoid saying a unit fires a salvo when it in fact has a constant rate of fire
-                            if singleShot and ReloadTime == 0 then
+                            if singleShot and ReloadTime == 0 and CycleProjs > 1 then
                                 CycleTime = CycleTime / CycleProjs
                                 CycleProjs = 1
                             end
 
                             if CycleProjs > 1 then
                                 weaponDetails2 = string.format(LOC('<LOC uvd_0015>Damage: %.8g x%d, Splash: %.3g')..', '..LOC('<LOC uvd_Range>')..', '..LOC('<LOC uvd_Reload>'),
-                                    Damage, CycleProjs, info.DamageRadius, info.MinRadius, info.MaxRadius, CycleTime)
-                            -- Do not display 'Range' and Reload stats for 'Teleport in' and Kamikaze weapons
-                            elseif info.WeaponCategory == 'Teleport' or info.WeaponCategory == 'Kamikaze' then
+                                Damage, CycleProjs, info.DamageRadius, info.MinRadius, info.MaxRadius, CycleTime)
+                            -- Do not display Reload stats for Kamikaze weapons
+                            elseif info.WeaponCategory == 'Kamikaze' then
+                                weaponDetails2 = string.format(LOC('<LOC uvd_0010>Damage: %.7g, Splash: %.3g')..', '..LOC('<LOC uvd_Range>'),
+                                Damage, info.DamageRadius, info.MinRadius, info.MaxRadius)
+                            -- Do not display 'Range' and Reload stats for 'Teleport in' weapons
+                            elseif info.WeaponCategory == 'Teleport' then
                                 weaponDetails2 = string.format(LOC('<LOC uvd_0010>Damage: %.7g, Splash: %.3g'),
                                 Damage, info.DamageRadius)
                             else
                                 weaponDetails2 = string.format(LOC('<LOC uvd_0010>Damage: %.7g, Splash: %.3g')..', '..LOC('<LOC uvd_Range>')..', '..LOC('<LOC uvd_Reload>'),
-                                    Damage, info.DamageRadius, info.MinRadius, info.MaxRadius, CycleTime)
+                                Damage, info.DamageRadius, info.MinRadius, info.MaxRadius, CycleTime)
                             end
 
 
@@ -664,8 +668,8 @@ function WrapAndPlaceText(bp, builder, descID, control)
                         table.insert(blocks, {color = UIUtil.fontColor, lines = {weaponDetails1}})
                         
                         if info.DamageType == 'Overcharge' then
-                            table.insert(blocks, {color = 'FF40BF40', lines = {weaponDetails2}})
-                        elseif info.Label == 'Suicide' then
+                            table.insert(blocks, {color = 'FF40BF40', lines = {weaponDetails2}}) -- Same color as auto-overcharge highlight (autocast_green.dds)
+                        elseif info.WeaponCategory == 'Kamikaze' then
                             table.insert(blocks, {color = 'FFFF0000', lines = {weaponDetails2}})
                         else
                             table.insert(blocks, {color = 'FFFFB0B0', lines = {weaponDetails2}})
