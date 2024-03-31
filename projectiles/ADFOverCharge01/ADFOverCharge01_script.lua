@@ -58,6 +58,8 @@ TDFOverCharge01 = ClassProjectile(ALaserBotProjectile, OverchargeProjectile) {
 
 if true then
 
+    -- Nyan cat seasonal event
+
     local oldTDFOverCharge01 = TDFOverCharge01
     TDFOverCharge01 = Class(oldTDFOverCharge01) {
         ---@param self TDFOverCharge01

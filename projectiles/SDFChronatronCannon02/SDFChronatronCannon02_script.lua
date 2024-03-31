@@ -30,6 +30,8 @@ SDFChronatronCannon02 = ClassProjectile(SChronatronCannonOverCharge, OverchargeP
 
 if true then
 
+    -- Nyan cat seasonal event
+
     local oldSDFChronatronCannon02 = SDFChronatronCannon02
     SDFChronatronCannon02 = Class(oldSDFChronatronCannon02) {
         ---@param self SDFChronatronCannon02
