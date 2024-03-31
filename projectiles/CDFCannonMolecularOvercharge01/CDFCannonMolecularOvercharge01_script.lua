@@ -28,4 +28,27 @@ CDFCannonMolecular01 = ClassProjectile(CMolecularCannonProjectile, OverchargePro
         OverchargeProjectile.OnCreate(self)
     end,
 }
+
+if true then
+
+    local oldCDFCannonMolecular01 = CDFCannonMolecular01
+    CDFCannonMolecular01 = Class(oldCDFCannonMolecular01) {
+        ---@param self CDFCannonMolecular01
+        OnCreate = function(self)
+            local vx, vy, vz, w = unpack(self:GetOrientation())
+            if vz >= 0 then
+                self.FxTrails = { '/effects/emitters/nyan_trail.bp',
+                    '/effects/emitters/nyan_01.bp' }
+            else
+                self.FxTrails = { '/effects/emitters/nyan_trail.bp',
+                    '/effects/emitters/nyan_02.bp' }
+            end
+
+            oldCDFCannonMolecular01.OnCreate(self)
+        end,
+    }
+
+end
+
+
 TypeClass = CDFCannonMolecular01
