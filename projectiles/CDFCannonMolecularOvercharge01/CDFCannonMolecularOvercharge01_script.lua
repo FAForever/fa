@@ -32,6 +32,7 @@ CDFCannonMolecular01 = ClassProjectile(CMolecularCannonProjectile, OverchargePro
 if true then
 
     -- Nyan cat seasonal event
+    -- For those living under a rock, see also: https://www.nyan.cat/
 
     local oldCDFCannonMolecular01 = CDFCannonMolecular01
     CDFCannonMolecular01 = Class(oldCDFCannonMolecular01) {

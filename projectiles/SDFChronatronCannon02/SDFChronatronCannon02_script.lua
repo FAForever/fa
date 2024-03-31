@@ -29,6 +29,7 @@ SDFChronatronCannon02 = ClassProjectile(SChronatronCannonOverCharge, OverchargeP
 if true then
 
     -- Nyan cat seasonal event
+    -- For those living under a rock, see also: https://www.nyan.cat/
 
     local oldSDFChronatronCannon02 = SDFChronatronCannon02
     SDFChronatronCannon02 = Class(oldSDFChronatronCannon02) {
