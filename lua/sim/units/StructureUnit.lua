@@ -41,8 +41,8 @@ local GetTarmac = import("/lua/tarmacs.lua").GetTarmacType
 
 -- compute once and store as upvalue for performance
 local StructureUnitRotateTowardsEnemiesLand = categories.STRUCTURE + categories.LAND + categories.NAVAL
-local StructureUnitRotateTowardsEnemiesArtillery = categories.ARTILLERY * (categories.TECH2 + categories.TECH3 + categories.EXPERIMENTAL)
-local StructureUnitOnStartBeingBuiltRotateBuildings = categories.STRUCTURE * (categories.DIRECTFIRE + categories.INDIRECTFIRE) * (categories.DEFENSE + (categories.ARTILLERY - (categories.TECH3 + categories.EXPERIMENTAL)))
+local StructureUnitOnStartBeingBuiltRotateBuildings = categories.STRUCTURE * ((categories.DIRECTFIRE + categories.INDIRECTFIRE + categories.ANTINAVY) + (categories.DEFENSE + categories.ARTILLERY))
+local StructureUnitRotateStaticArty = categories.ARTILLERY * (categories.TECH2 + categories.TECH3 + categories.EXPERIMENTAL) -- These always point towards map center and only rotate at 90degree steps
 
 ---@class StructureUnit : Unit
 ---@field AdjacentUnits? Unit[]
@@ -156,33 +156,36 @@ StructureUnit = ClassUnit(Unit) {
             threat = -1,
         }
 
-        -- determine radius
-        local radius = 40
-        local weapons = self.Blueprint.Weapon
-        if weapons then
-            for k, weapon in weapons do
-                if weapon.MaxRadius and weapon.MaxRadius > radius then
-                    radius = 1.1 * weapon.MaxRadius
+        -- find targets in range unless a static arty
+        if not EntityCategoryContains(StructureUnitRotateStaticArty, self) then
+            -- determine radius
+            local radius = 40
+            local weapons = self.Blueprint.Weapon
+            if weapons then
+                for k, weapon in weapons do
+                    if weapon.MaxRadius and weapon.MaxRadius > radius then
+                        radius = 1.1 * weapon.MaxRadius
+                    end
                 end
             end
-        end
 
-        local cats = EntityCategoryContains(categories.ANTIAIR, self) and categories.AIR or (StructureUnitRotateTowardsEnemiesLand)
-        local units = brain:GetUnitsAroundPoint(cats, pos, radius, 'Enemy')
+            local cats = EntityCategoryContains(categories.ANTIAIR, self) and categories.AIR or (StructureUnitRotateTowardsEnemiesLand)
+            local units = brain:GetUnitsAroundPoint(cats, pos, radius, 'Enemy')
 
-        if units then
-            for _, u in units do
-                local blip = u:GetBlip(self.Army)
-                if blip then
+            if units then
+                for _, u in units do
+                    local blip = u:GetBlip(self.Army)
+                    if blip then
 
-                    -- check if we've got it on radar and whether it is identified by army in question
-                    local radar = blip:IsOnRadar(self.Army)
-                    local identified = blip:IsSeenEver(self.Army)
-                    if radar or identified then
-                        local threat = (identified and u.Blueprint.Defense.SurfaceThreatLevel) or 1
-                        if threat >= target.threat then
-                            target.location = u:GetPosition()
-                            target.threat = threat
+                        -- check if we've got it on radar and whether it is identified by army in question
+                        local radar = blip:IsOnRadar(self.Army)
+                        local identified = blip:IsSeenEver(self.Army)
+                        if radar or identified then
+                            local threat = (identified and u.Blueprint.Defense.SurfaceThreatLevel) or 1
+                            if threat >= target.threat then
+                                target.location = u:GetPosition()
+                                target.threat = threat
+                            end
                         end
                     end
                 end
@@ -193,8 +196,8 @@ StructureUnit = ClassUnit(Unit) {
         local rad = math.atan2(target.location[1] - pos[1], target.location[3] - pos[3])
         local degrees = rad * (180 / math.pi)
 
-        if EntityCategoryContains(StructureUnitRotateTowardsEnemiesArtillery, self) then
-            degrees = MathFloor((degrees + 90) / 180) * 180
+        if EntityCategoryContains(StructureUnitRotateStaticArty, self) then
+            degrees = MathFloor((degrees + 45) / 90) * 90 -- The static artys might have footprint that might affect pathing/terrain unless rotation is at 90 angle steps.
         end
 
         local rotator = CreateRotator(self, 0, 'y', degrees, nil, nil)
