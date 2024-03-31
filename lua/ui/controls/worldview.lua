@@ -156,7 +156,8 @@ end
 local function AttackDecalFunc(mode)
     return RadiusDecalFunction(
         function(w)
-            return w.ManualFire == false and w.WeaponCategory ~= 'Teleport' and w.WeaponCategory ~= "Death" and w.WeaponCategory ~= "Anti Air"
+            return w.ManualFire == false and w.WeaponCategory ~= 'Teleport' and w.WeaponCategory ~= "Death"
+                and w.WeaponCategory ~= "Anti Air" and w.DamageType ~= 'Overcharge' and not w.EnabledByEnhancement
         end
 )
 end
