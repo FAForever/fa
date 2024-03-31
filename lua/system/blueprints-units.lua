@@ -323,10 +323,7 @@ local function PostProcessUnit(unit)
             unit.SizeDamageEffectsScale = 2.0
         end
     end
-
-    unit.Footprint = unit.Footprint or {}
-    unit.Footprint.SizeMax = math.max(unit.Footprint.SizeX or 1, unit.Footprint.SizeZ or 1)
-
+    
     -- Pre-compute intel state
 
     -- gather data
@@ -648,12 +645,67 @@ function TestIntelValues(unit)
     end
 end
 
+---@param unitBlueprint UnitBlueprint
+function AddFormationData(unitBlueprint)
+    -- add formation sorting index
+    if not unitBlueprint.Formation then
+        unitBlueprint.Formation = { }
+
+        if not unitBlueprint.Formation.Layer then
+            for category, identifier in {LAND = 'Land', AIR = 'Air', NAVAL = 'Naval', SUBMERSIBLE = 'Submersible'} do
+                if unitBlueprint.CategoriesHash[category] then
+                    unitBlueprint.Formation.Layer = identifier
+                    break
+                end
+            end
+        end
+
+        if not unitBlueprint.Formation.SortingIndex then
+            local formationSortingIndex = 0
+
+            if unitBlueprint.CategoriesHash["COMMAND"] then
+                formationSortingIndex = 0
+
+            elseif unitBlueprint.CategoriesHash['TECH1'] then
+                formationSortingIndex = 1
+
+                -- basic mod support for tech 1 experimentals
+                if unitBlueprint.CategoriesHash['EXPERIMENTAL'] then
+                    formationSortingIndex = 1.5
+                end
+
+            elseif unitBlueprint.CategoriesHash['TECH2'] then
+                formationSortingIndex = 2
+
+                -- basic mod support for tech 2 experimentals
+                if unitBlueprint.CategoriesHash['EXPERIMENTAL'] then
+                    formationSortingIndex = 2.5
+                end
+            elseif unitBlueprint.CategoriesHash['TECH3'] then
+                formationSortingIndex = 3
+
+                -- basic mod support for tech 3 experimentals
+                if unitBlueprint.CategoriesHash['EXPERIMENTAL'] then
+                    formationSortingIndex = 3.5
+                end
+            elseif unitBlueprint.CategoriesHash['EXPERIMENTAL'] then
+                formationSortingIndex = 4
+            end
+
+            -- always put these at the back
+
+            unitBlueprint.Formation.SortingIndex = formationSortingIndex + 0.1 * math.max(unitBlueprint.SizeX, unitBlueprint.SizeZ)
+        end
+    end
+end
+
 --- Post-processes all units
 ---@param allBlueprints BlueprintsTable
 ---@param units UnitBlueprint[]
 function PostProcessUnits(allBlueprints, units)
     for _, unit in units do
         PostProcessUnit(unit)
+        AddFormationData(unit)
     end
 
     for _, unit in units do

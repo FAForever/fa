@@ -29,6 +29,8 @@
 ---@alias LayerCategory "AIR" | "LAND" | "NAVAL"
 ---@alias FactionCategory "UEF" | "CYBRAN" | "AEON" | "SERAPHIM" | "NOMADS"
 ---@alias IconBackgroundType "air" | "amph" | "land" | "sea"
+---@alias FormationLayer 'Land' | 'Air' | 'Naval' | 'Submersible' | 'Hover'
+---@alias FormationTech number
 
 ---@alias UnitId BlueprintId
 
@@ -91,6 +93,7 @@
 ---@field ExternalFactory? UnitBlueprintExternalFactory
 ---@field Enhancements?  table<Enhancement, UnitBlueprintEnhancement>
 ---@field EnhancementPresets? table<string, UnitBlueprintEnhancementPreset>
+---@field Formation UnitBlueprintFormations
 ---@field General UnitBlueprintGeneral
 ---@field Intel UnitBlueprintIntel
 ---@field Interface UnitBlueprintInterface
@@ -442,7 +445,6 @@
 --- Should not be defined with `AntiArtilleryShield`, `PersonalBubble`, or `PersonalShield`.
 ---@field TransportShield? boolean
 
-
 ---@class UnitBlueprintDisplay
 --- Used by the Aeon build animation for a custom mercury pool
 ---@field AeonMercuryPool? string
@@ -575,6 +577,24 @@
 
 ---@class UnitBlueprintEffects
 ---@field Effects UnitBlueprintEffect[]
+
+---@class UnitBlueprintFormations
+--- List of {x, z, x, z, ...} coordinates where to embed anti air
+---@field EmbedAntiAirAt number[]
+--- List of {x, z, x, z, ...} coordinates where to embed shields
+---@field EmbedShieldsAt number[]
+--- auto-generated formation layer based on the motion type
+---@field Layer FormationLayer
+--- auto-generated formation tech index based on the category
+---@field SortingIndex number
+--- alternative to the footprint size of the unit, can be used to make room for embedded units
+---@field SizeX? number
+--- alternative to the footprint size of the unit, can be used to make room for embedded units
+---@field SizeZ? number
+--- alternative offset to the center of the footprint, can be used to make room for embedded units
+---@field OffsetX? number
+--- alternative offset to the center of the footprint, can be used to make room for embedded units
+---@field OffsetZ? number
 
 ---@class UnitBlueprintMovementEffects : UnitBlueprintEffects
 --- Contrails shown behind aircraft (in SupCom usually behind tips of wings).

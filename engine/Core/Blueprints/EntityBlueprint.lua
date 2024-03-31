@@ -83,3 +83,4 @@
 ---@field OccupancyCaps? number
 ---@field SizeX? number
 ---@field SizeZ? number
+---@field SizeMax? number

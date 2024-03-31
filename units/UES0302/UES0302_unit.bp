@@ -135,6 +135,16 @@ UnitBlueprint{
         SizeX = 5,
         SizeZ = 16,
     },
+    Formation = {
+        EmbeddedFormations = true,
+        EmbedAntiAirAt = { 1.5, 2.0, 1.5, -2.0, -1.5, 2.0, -1.5, -2.0},
+        EmbedShieldsAt = { 1.5, 1.0, 1.5, -1.0, -1.5, 1.0, -1.5, -1.0},
+        SizeX = 12,
+        SizeZ = 12,
+        OffsetX = 6,
+        OffsetZ = 6,
+        Layer = 'Naval',
+    },
     General = {
         CommandCaps = {
             RULEUCC_Attack = true,
