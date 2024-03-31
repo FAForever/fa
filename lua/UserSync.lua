@@ -108,6 +108,20 @@ function OnSync()
         if Sync.GameEnded then
             GpgNetSend('GameEnded')
         end
+
+        -- Informs moderators that the focus army has changed for the local player
+        if Sync.FocusArmyChanged then
+            -- try to inform moderators
+            SimCallback(
+                {
+                    Func="ModeratorEvent",
+                    Args= {
+                        From = Sync.FocusArmyChanged.old,
+                        Message = string.format("Switched focus army from %s to %s!", tostring(Sync.FocusArmyChanged.old), tostring(Sync.FocusArmyChanged.new)),
+                    },
+                }
+            )
+        end
     end
 
     -- old sync callbacks

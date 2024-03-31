@@ -31,6 +31,7 @@ categories = {
     ASF = categoryValue,
     BATTLESHIP = categoryValue,
     BENIGN = categoryValue,
+    --- Used for units that die when attacking
     BOMB = categoryValue,
     BOMBER = categoryValue,
     BOT = categoryValue,

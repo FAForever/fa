@@ -736,7 +736,7 @@ end
 
 --- Orders a group of units to attack a target
 ---@param units Unit[]
----@param target Unit
+---@param target Unit | Vector | Prop | Blip
 ---@return SimCommand
 function IssueAttack(units, target)
 end
