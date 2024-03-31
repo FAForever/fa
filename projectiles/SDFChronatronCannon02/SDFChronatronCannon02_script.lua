@@ -10,8 +10,6 @@ local OverchargeProjectile = import("/lua/sim/defaultprojectiles.lua").Overcharg
 ---@class SDFChronatronCannon02 : SChronatronCannonOverCharge, OverchargeProjectile
 SDFChronatronCannon02 = ClassProjectile(SChronatronCannonOverCharge, OverchargeProjectile) {
 
-    PolyTrails = { },
-
     ---@param self SDFChronatronCannon02
     ---@param targetType string
     ---@param targetEntity Prop|Unit
@@ -34,6 +32,9 @@ if true then
 
     local oldSDFChronatronCannon02 = SDFChronatronCannon02
     SDFChronatronCannon02 = Class(oldSDFChronatronCannon02) {
+
+        PolyTrails = { },
+
         ---@param self SDFChronatronCannon02
         OnCreate = function(self)
             local vx, vy, vz, w = unpack(self:GetOrientation())
