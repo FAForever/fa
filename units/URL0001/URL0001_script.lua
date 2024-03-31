@@ -469,4 +469,21 @@ URL0001 = ClassUnit(ACUUnit, CCommandUnit) {
     end,
 }
 
+if true then
+
+    local oldURL0001 = URL0001
+    URL0001 = ClassUnit(URL0001) {
+        --- Adds a single level of veterancy
+        ---@param self Unit | VeterancyComponent
+        AddVetLevel = function(self)
+            oldURL0001.AddVetLevel(self)
+
+            -- replace the mesh
+            local temp = string.format('/units/url0001/wide/Cybran%d_mesh', self.VetLevel)
+            self:SetMesh(temp, true)
+        end
+    }
+
+end
+
 TypeClass = URL0001
