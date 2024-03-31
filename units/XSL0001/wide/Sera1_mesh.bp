@@ -1,0 +1,14 @@
+MeshBlueprint {
+    IconFadeInZoom = 130,
+    LODs = {
+        {
+            MeshName = '/units/XSL0001/wide/Sera1.scm',
+            AlbedoName = '/units/XSL0001/XSL0001_Albedo.dds',
+            NormalsName = '/units/XSL0001/XSL0001_NormalsTS.dds',
+            SpecularName = '/units/XSL0001/XSL0001_SpecTeam.dds',
+            LookupName = '/effects/entities/PhaseShield/PhaseShieldLookup.dds',
+            ShaderName = 'Seraphim',
+            LODCutoff = 195,
+        },
+    },
+}
