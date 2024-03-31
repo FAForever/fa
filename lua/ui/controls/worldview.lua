@@ -39,7 +39,7 @@ local unitsToWeaponsCached = { }
 
 --- Returns all unique weapon blueprints that match the predicate, and are from units with the `SHOWATTACKRETICLE` category set
 ---@param predicate function<WeaponBlueprint>
----@return table<UnitId, WeaponBlueprint[]> unitsToWeapons
+---@return table<UnitId, WeaponBlueprint[] | false> unitsToWeapons
 local function GetSelectedWeaponsWithReticules(predicate)
     local selectedUnits = GetSelectedUnits()
 
@@ -80,11 +80,13 @@ local function RadiusDecalFunction(predicate)
     -- The maximum damage radius of a selected missile weapon.
     local maxRadius = 0
     for _, weapons in unitsToWeapons do
-        for _, w in weapons do
-            if w.FixedSpreadRadius and w.FixedSpreadRadius + w.DamageRadius > maxRadius then
-                maxRadius = w.FixedSpreadRadius + w.DamageRadius
-            elseif w.DamageRadius > maxRadius then
-                maxRadius = w.DamageRadius
+        if weapons then
+            for _, w in weapons do
+                if w.FixedSpreadRadius and w.FixedSpreadRadius + w.DamageRadius > maxRadius then
+                    maxRadius = w.FixedSpreadRadius + w.DamageRadius
+                elseif w.DamageRadius > maxRadius then
+                    maxRadius = w.DamageRadius
+                end
             end
         end
     end
@@ -113,13 +115,15 @@ local function NukeDecalFunc()
     local inner = 0
     local outer = 0
     for _, weapons in unitsToWeapons do
-        for _, w in weapons do
-            if w.NukeOuterRingRadius > outer then
-                outer = w.NukeOuterRingRadius
-            end
+        if weapons then
+            for _, w in weapons do
+                if w.NukeOuterRingRadius > outer then
+                    outer = w.NukeOuterRingRadius
+                end
 
-            if w.NukeInnerRingRadius > inner then
-                inner = w.NukeInnerRingRadius
+                if w.NukeInnerRingRadius > inner then
+                    inner = w.NukeInnerRingRadius
+                end
             end
         end
     end
