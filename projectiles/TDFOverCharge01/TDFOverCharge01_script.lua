@@ -30,28 +30,4 @@ TDFOverCharge01 = ClassProjectile(TLaserBotProjectile, OverchargeProjectile) {
     end,
 }
 
-if true then
-
-    -- Nyan cat seasonal event
-    -- For those living under a rock, see also: https://www.nyan.cat/
-
-    local oldTDFOverCharge01 = TDFOverCharge01
-    TDFOverCharge01 = Class(oldTDFOverCharge01) {
-        ---@param self TDFOverCharge01
-        OnCreate = function(self)
-            local vx, vy, vz, w = unpack(self:GetOrientation())
-            if vz >= 0 then
-                self.FxTrails = { '/effects/emitters/nyan_trail.bp',
-                    '/effects/emitters/nyan_01.bp' }
-            else
-                self.FxTrails = { '/effects/emitters/nyan_trail.bp',
-                    '/effects/emitters/nyan_02.bp' }
-            end
-
-            oldTDFOverCharge01.OnCreate(self)
-        end,
-    }
-
-end
-
 TypeClass = TDFOverCharge01

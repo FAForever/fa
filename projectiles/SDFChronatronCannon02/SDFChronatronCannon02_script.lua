@@ -25,33 +25,4 @@ SDFChronatronCannon02 = ClassProjectile(SChronatronCannonOverCharge, OverchargeP
         OverchargeProjectile.OnCreate(self)
     end,
 }
-
-if true then
-
-    -- Nyan cat seasonal event
-    -- For those living under a rock, see also: https://www.nyan.cat/
-
-    local oldSDFChronatronCannon02 = SDFChronatronCannon02
-    SDFChronatronCannon02 = Class(oldSDFChronatronCannon02) {
-
-        PolyTrails = { },
-
-        ---@param self SDFChronatronCannon02
-        OnCreate = function(self)
-            local vx, vy, vz, w = unpack(self:GetOrientation())
-            if vz >= 0 then
-                self.FxTrails = { '/effects/emitters/nyan_trail.bp',
-                    '/effects/emitters/nyan_01.bp' }
-            else
-                self.FxTrails = { '/effects/emitters/nyan_trail.bp',
-                    '/effects/emitters/nyan_02.bp' }
-            end
-
-            oldSDFChronatronCannon02.OnCreate(self)
-        end,
-    }
-
-end
-
-
 TypeClass = SDFChronatronCannon02
