@@ -107,7 +107,7 @@ UnitBlueprint{
                                 Offset = { z = -1 },
                                 StraightLegs = false,
                                 Tread = {
-                                    TreadLifeTime = 135,
+                                    TreadLifeTime = 8,
                                     TreadMarks = "collosus_tread_02",
                                     TreadMarksSizeX = 1.7,
                                     TreadMarksSizeZ = 1.7,
@@ -123,7 +123,7 @@ UnitBlueprint{
                                 Offset = { z = -1 },
                                 StraightLegs = false,
                                 Tread = {
-                                    TreadLifeTime = 135,
+                                    TreadLifeTime = 8,
                                     TreadMarks = "collosus_tread_01",
                                     TreadMarksSizeX = 1.7,
                                     TreadMarksSizeZ = 1.7,

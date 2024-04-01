@@ -331,7 +331,7 @@ end
 
 --- makes the unit's bone invisible
 ---@param bone Bone
----@param affectChildren boolean
+---@param affectChildren? boolean
 function Unit:HideBone(bone, affectChildren)
 end
 
@@ -660,7 +660,7 @@ end
 --- makes the unit's bone visible, and if `affectChildren` is true, all child bones as well
 --- (this is almost always what you want)
 ---@param bone Bone
----@param affectChildren boolean
+---@param affectChildren? boolean
 function Unit:ShowBone(bone, affectChildren)
 end
 

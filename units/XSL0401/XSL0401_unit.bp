@@ -124,8 +124,8 @@ UnitBlueprint{
                             Offset = { z = -1 },
                             StraightLegs = false,
                             Tread = {
-                                TreadLifeTime = 135,
-                                TreadMarks = "CommanderPrint_albedo",
+                                TreadLifeTime = 8,
+                                TreadMarks = "ythotha_tread_right_01",
                                 TreadMarksSizeX = 1.7,
                                 TreadMarksSizeZ = 1.7,
                                 TreadOffset = { -1, 0, 2 },
@@ -140,8 +140,8 @@ UnitBlueprint{
                             Offset = { z = -1 },
                             StraightLegs = false,
                             Tread = {
-                                TreadLifeTime = 135,
-                                TreadMarks = "CommanderPrint_albedo",
+                                TreadLifeTime = 8,
+                                TreadMarks = "ythotha_tread_left_01",
                                 TreadMarksSizeX = 1.7,
                                 TreadMarksSizeZ = 1.7,
                                 TreadOffset = { 1, 0, 2 },
