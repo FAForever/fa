@@ -632,7 +632,7 @@ function WrapAndPlaceText(bp, builder, descID, control)
                                 CycleTime = CycleTime + FiringCooldown
                             end
 
-                            if not info.ManualFire and info.WeaponCategory ~= 'Kamikaze' and info.RangeCategory ~= 'UWRC_Countermeasure' then
+                            if not info.ManualFire and info.WeaponCategory ~= 'Kamikaze' and info.WeaponCategory ~= 'Defense' then
                                 --Round DPS, or else it gets floored in string.format.
                                 local DPS = MATH_IRound(Damage * CycleProjs / CycleTime)
                                 weaponDetails1 = weaponDetails1..LOCF('<LOC uvd_DPS>', DPS)
