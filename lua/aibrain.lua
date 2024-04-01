@@ -587,9 +587,9 @@ AIBrain = Class(FactoryManagerBrainComponent, StatManagerBrainComponent, JammerM
         local recallCat = categories.ALLUNITS - categories.WALL - categories.COMMAND - categories.SUBCOMMANDER
         local shareOption = ScenarioInfo.Options.Share
         if shareOption == 'CivilianDeserter' then
-            TransferUnitsToBrain(self, civilians, shareOption, recallCat)
+            TransferUnitsToBrain(self, civilians, false, recallCat, "CivilianDeserter")
         elseif shareOption == 'Defectors' then
-            TransferUnitsToHighestBrain(self, enemies, shareOption, recallCat)
+            TransferUnitsToHighestBrain(self, enemies, false, recallCat, "Defectors")
         end
 
         -- let the average, team vs team game end first
