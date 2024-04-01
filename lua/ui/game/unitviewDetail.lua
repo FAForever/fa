@@ -399,7 +399,7 @@ GetAbilityDesc = {
             if v.RemoveEnhancements or (not v.Slot) then continue end
             cnt = cnt + 1
         end
-        return cnt
+        return LOCF('<LOC uvd_0016>Enhancements: %d', cnt)
     end,
     ability_massive = function(bp)
         return string.format(LOC('<LOC uvd_0010>Damage: %.7g, Splash: %.3g'),
@@ -639,17 +639,25 @@ function WrapAndPlaceText(bp, builder, descID, control)
                             end
 
                             -- Avoid saying a unit fires a salvo when it in fact has a constant rate of fire
-                            if singleShot and ReloadTime == 0 then
+                            if singleShot and ReloadTime == 0 and CycleProjs > 1 then
                                 CycleTime = CycleTime / CycleProjs
                                 CycleProjs = 1
                             end
 
                             if CycleProjs > 1 then
-                                 weaponDetails2 = string.format(LOC('<LOC uvd_0015>Damage: %.8g x%d, Splash: %.3g')..', '..LOC('<LOC uvd_Range>')..', '..LOC('<LOC uvd_Reload>'),
-                                    Damage, CycleProjs, info.DamageRadius, info.MinRadius, info.MaxRadius, CycleTime)
+                                weaponDetails2 = string.format(LOC('<LOC uvd_0015>Damage: %.8g x%d, Splash: %.3g')..', '..LOC('<LOC uvd_Range>')..', '..LOC('<LOC uvd_Reload>'),
+                                Damage, CycleProjs, info.DamageRadius, info.MinRadius, info.MaxRadius, CycleTime)
+                            -- Do not display Reload stats for Kamikaze weapons
+                            elseif info.WeaponCategory == 'Kamikaze' then
+                                weaponDetails2 = string.format(LOC('<LOC uvd_0010>Damage: %.7g, Splash: %.3g')..', '..LOC('<LOC uvd_Range>'),
+                                Damage, info.DamageRadius, info.MinRadius, info.MaxRadius)
+                            -- Do not display 'Range' and Reload stats for 'Teleport in' weapons
+                            elseif info.WeaponCategory == 'Teleport' then
+                                weaponDetails2 = string.format(LOC('<LOC uvd_0010>Damage: %.7g, Splash: %.3g'),
+                                Damage, info.DamageRadius)
                             else
                                 weaponDetails2 = string.format(LOC('<LOC uvd_0010>Damage: %.7g, Splash: %.3g')..', '..LOC('<LOC uvd_Range>')..', '..LOC('<LOC uvd_Reload>'),
-                                    Damage, info.DamageRadius, info.MinRadius, info.MaxRadius, CycleTime)
+                                Damage, info.DamageRadius, info.MinRadius, info.MaxRadius, CycleTime)
                             end
 
 
@@ -658,7 +666,14 @@ function WrapAndPlaceText(bp, builder, descID, control)
                             weaponDetails1 = weaponDetails1..' x'..weapon.count
                         end
                         table.insert(blocks, {color = UIUtil.fontColor, lines = {weaponDetails1}})
-                        table.insert(blocks, {color = 'FFFFB0B0', lines = {weaponDetails2}})
+
+                        if info.DamageType == 'Overcharge' then
+                            table.insert(blocks, {color = 'FF5AB34B', lines = {weaponDetails2}}) -- Same color as auto-overcharge highlight (autocast_green.dds)
+                        elseif info.WeaponCategory == 'Kamikaze' then
+                            table.insert(blocks, {color = 'FFFF2C2C', lines = {weaponDetails2}})
+                        else
+                            table.insert(blocks, {color = 'FFFFB0B0', lines = {weaponDetails2}})
+                        end
 
                         if info.EnergyRequired > 0 and info.EnergyDrainPerSecond > 0 then
                             local weaponDetails3 = string.format('Charge Cost: -%d E (-%d E/s)', info.EnergyRequired, info.EnergyDrainPerSecond)
