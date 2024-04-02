@@ -104,6 +104,9 @@ XSL0101 = ClassUnit(SWalkingLandUnit) {
         self.Trash:Add(ForkThread(self.HideUnit, self))
     end,
 
+    ---@param self XSL0101
+    ---@param new HorizontalMovementState
+    ---@param old HorizontalMovementState
     OnMotionHorzEventChange = function(self, new, old)
         if new == 'Stopped' then
             KillThread(self.CloakThread)

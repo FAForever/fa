@@ -47,6 +47,9 @@ XSS0201 = ClassUnit(SSubUnit) {
         SSubUnit.OnKilled(self, instigator, type, overkillRatio)
     end,
 
+    ---@param self XSS0201
+    ---@param new VerticalMovementState
+    ---@param old VerticalMovementState
     OnMotionVertEventChange = function(self, new, old)
         SSubUnit.OnMotionVertEventChange(self, new, old)
         if new == 'Top' then

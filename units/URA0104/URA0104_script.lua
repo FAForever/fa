@@ -52,6 +52,9 @@ URA0104 = ClassUnit(AirTransport) {
         self.OpenAnim:PlayAnim(self:GetBlueprint().Display.AnimationOpen, false):SetRate(1)
     end,
 
+    ---@param self URA0104
+    ---@param new VerticalMovementState
+    ---@param old VerticalMovementState
     OnMotionVertEventChange = function(self, new, old)
         AirTransport.OnMotionVertEventChange(self, new, old)
         -- Aborting a landing

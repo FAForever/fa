@@ -6,7 +6,7 @@
 local CAirUnit = import("/lua/cybranunits.lua").CAirUnit
 local CDFLaserHeavyWeapon = import("/lua/cybranweapons.lua").CDFLaserHeavyWeapon02
 
----@class URA0203 : CAirUnit
+---@class XRA0105 : CAirUnit
 URA0203 = ClassUnit(CAirUnit) {
     Weapons = {
         MainGun = ClassWeapon(CDFLaserHeavyWeapon) {}
@@ -18,6 +18,9 @@ URA0203 = ClassUnit(CAirUnit) {
         CAirUnit.OnStopBeingBuilt(self, builder, layer)
     end,
 
+    ---@param self XRA0105
+    ---@param new VerticalMovementState
+    ---@param old VerticalMovementState
     OnMotionVertEventChange = function(self, new, old)
         CAirUnit.OnMotionVertEventChange(self, new, old)
 

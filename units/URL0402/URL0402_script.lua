@@ -317,6 +317,9 @@ URL0402 = ClassUnit(CWalkingLandUnit) {
         end
     end,
 
+    ---@param self URL0402
+    ---@param new HorizontalMovementState
+    ---@param old HorizontalMovementState
     OnMotionHorzEventChange = function(self, new, old)
         CWalkingLandUnit.OnMotionHorzEventChange(self, new, old)
 

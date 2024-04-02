@@ -27,6 +27,9 @@ URS0201 = ClassUnit(CSeaUnit) {
         AntiTorpedoB = ClassWeapon(CIFSmartCharge) {},
     },
 
+    ---@param self URS0201
+    ---@param new HorizontalMovementState
+    ---@param old HorizontalMovementState
     OnMotionHorzEventChange = function(self, new, old)
         CSeaUnit.OnMotionHorzEventChange(self, new, old)
         if self.Dead then return end
