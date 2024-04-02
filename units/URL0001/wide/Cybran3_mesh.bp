@@ -1,0 +1,14 @@
+MeshBlueprint {
+    IconFadeInZoom = 130,
+    LODs = {
+        {
+            MeshName = '/units/URL0001/wide/Cybran3.scm',
+            AlbedoName = '/units/URL0001/URL0001_Albedo.dds',
+            NormalsName = '/units/URL0001/URL0001_NormalsTS.dds',
+            SpecularName = '/units/URL0001/URL0001_SpecTeam.dds',
+            LookupName = '/effects/entities/PhaseShield/PhaseShieldLookup.dds',
+            ShaderName = 'Insect',
+            LODCutoff = 235,
+        },
+    },
+}

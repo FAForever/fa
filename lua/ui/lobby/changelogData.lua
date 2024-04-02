@@ -1,8 +1,79 @@
 ---@type number
-last_version = 3801
+last_version = 3806
 
 ---@type PatchNotes[]
 gamePatches = {
+    {
+        version = 3806,
+        name = "Hotfix",
+        hasPrettyGithubRelease = true,
+        description = {
+            "# Game Version 3806 (31th of March, 2024)",
+            "",
+            "Fixes various bugs and visual inconsistencies that were reported by players.",
+            "",
+            "With gratitude to all those who took the time to report issues,",
+            "",
+            "Jip",
+        }
+    },
+    {
+        version = 3805,
+        name = "Hotfix",
+        hasPrettyGithubRelease = true,
+        description = {
+            "# Game Version 3805 (24th of March, 2024)",
+            "",
+            "Fixes various issues that were introduced in the past game versions.",
+            "",
+            "With gratitude to all those who took the time to report issues,",
+            "",
+            "Jip",
+        }
+    },
+    {
+        version = 3804,
+        name = "Hotfix",
+        hasPrettyGithubRelease = true,
+        description = {
+            "# Game Version 3804 (24th of March, 2024)",
+            "",
+            "Fixes various issues that were introduced in the past game versions. The most notable issue is the bug where the fog of war is not ",
+            "removed when a game ends.",
+            "",
+            "With gratitude to all those who took the time to report issues,",
+            "",
+            "Jip",
+        }
+    },
+    {
+        version = 3803,
+        name = "Hotfix",
+        hasPrettyGithubRelease = true,
+        description = {
+            "# Game Version 3803 (17th of March, 2024)",
+            "",
+            "Various small fixes for bugs that were reported by players.",
+            "",
+            "With gratitude to all those who took the time to report issues,",
+            "",
+            "Jip",
+        }
+    },
+    {
+        version = 3802,
+        name = "Hotfix",
+        hasPrettyGithubRelease = true,
+        description = {
+            "# Game Version 3802 (17th of March, 2024)",
+            "",
+            "Various small fixes for bugs that were reported by players.",
+            "",
+            "With gratitude to all those who took the time to report issues,",
+            "",
+            "Jip",
+        }
+    },
     {
         version = 3801,
         name = "Developers patch",

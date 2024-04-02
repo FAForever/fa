@@ -15,7 +15,6 @@ UnitBlueprint{
         "ECONOMIC",
         "ENERGYPRODUCTION",
         "EXPERIMENTAL",
-        "MASSFABRICATION",
         "MASSPRODUCTION",
         "PRODUCTFA",
         "RECLAIMABLE",

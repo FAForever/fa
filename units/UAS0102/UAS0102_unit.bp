@@ -12,7 +12,6 @@ UnitBlueprint{
     Categories = {
         "AEON",
         "ANTIAIR",
-        "BUILTBYEXPERIMENTALSUB",
         "BUILTBYTIER1FACTORY",
         "BUILTBYTIER2FACTORY",
         "BUILTBYTIER3FACTORY",

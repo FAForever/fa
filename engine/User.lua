@@ -163,11 +163,10 @@ end
 function EntityCategoryFilterOut(category, units)
 end
 
---- Executes some Lua code in the sim
+--- Executes some Lua code in the sim. Requires cheats to be enabled
 ---@param func function
----@param ... any this may actually be a comma-separated string of args instead of a vararg
----@return any
-function ExecLuaInSim(func, ...)
+---@param value any
+function ExecLuaInSim(func, value)
 end
 
 --- Requests that the application shut down
@@ -205,7 +204,7 @@ function GenerateBuildTemplateFromSelection()
 end
 
 --- Gets active build template back to Lua
----@return BuildTemplate
+---@return UIBuildTemplate
 function GetActiveBuildTemplate()
 end
 
@@ -895,6 +894,7 @@ function SessionGetLocalCommandSource()
 end
 
 --- Return the table of scenario info that was originally passed to the sim on launch
+--- Unlike other engine functions that return tables, this function returns the same table each time it is called.
 ---@return UIScenarioInfo
 function SessionGetScenarioInfo()
 end
@@ -944,7 +944,7 @@ function SessionSendChatMessage(client, message)
 end
 
 --- Set this as an active build template
----@param template BuildTemplate
+---@param template UIBuildTemplate
 function SetActiveBuildTemplate(template)
 end
 

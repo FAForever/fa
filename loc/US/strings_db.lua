@@ -4458,6 +4458,9 @@ key_desc_0403="build static artilleries + mobile artilleries"
 key_desc_0404="build TML & SML + mobile missile launchers + nuke subs / battleship & missile ship & sera / uef cruisers"
 key_desc_0405="Dock"
 
+key_desc_0407="Select all Bombers (Normal)"
+key_desc_0408="Select all Bombers (Torpedo)"
+
 keymap_category_0000="UI"
 keymap_category_0004="Selection"
 keymap_category_0025="Camera"
@@ -6757,6 +6760,7 @@ uvd_0012="Speed: %0.1f, Reverse: %0.1f, Acceleration: %0.1f, Turning: %d"
 uvd_0013="Vision: %d, Underwater Vision: %d, Regen: %0.1f, Cap Cost: %0.1f"
 uvd_0014="Damage: %.8g - %.8g, Splash: %.3g - %.3g"
 uvd_0015="Damage: %.8g x%d, Splash: %.3g"
+uvd_0016="Enhancements: %d"
 
 uvd_DPS="(DPS: %d)"
 uvd_ManualFire="(Manual Fire)"

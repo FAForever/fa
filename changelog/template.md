@@ -1,4 +1,4 @@
-# Game Version XYZW 
+# Game Version XYZW
 
 ## Bug Fixes
 
