@@ -1048,7 +1048,7 @@ function SendPlatoonWithTransports(aiBrain, platoon, destination, attempts, bSki
                 local atest, stest
                 local landpath,  landpathlength, landreason, lastlocationtested, path, pathlength, reason
 				-- locate the requested markers within 128 unit radius of the supplied location	that the platoon can safely land at
-				local markerRadius = math.min(aiBrain.IMAPConfig.IMAPSize * 3, 128)
+				local markerRadius = math.min(aiBrain.IMAPConfig.IMAPSize * 4, 164)
 				local markerlist = NavUtils.DirectionsFromWithThreatThreshold(layer, destination, markerRadius, aiBrain, NavUtils.ThreatFunctions.AntiAir, airthreatMax, aiBrain.IMAPConfig.Rings)
 				if not table.empty(markerlist) then
 					if TransportDialog then                    
