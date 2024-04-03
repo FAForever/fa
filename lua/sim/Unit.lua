@@ -3515,7 +3515,7 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
             end
 
             if boneTable.Tread and self:GetTTTreadType(self:GetPosition(bone)) ~= 'None' then
-                CreateSplatOnBone(self, boneTable.Tread.TreadOffset, 0, boneTable.Tread.TreadMarks, boneTable.Tread.TreadMarksSizeX, boneTable.Tread.TreadMarksSizeZ, 100, boneTable.Tread.TreadLifeTime or 15, self.Army)
+                CreateSplatOnBone(self, boneTable.Tread.TreadOffset, 0, boneTable.Tread.TreadMarks, boneTable.Tread.TreadMarksSizeX, boneTable.Tread.TreadMarksSizeZ, 100, boneTable.Tread.TreadLifeTime or 4, self.Army)
                 local treadOffsetX = boneTable.Tread.TreadOffset[1]
                 if x and x > 0 then
                     if layer ~= 'Seabed' then
