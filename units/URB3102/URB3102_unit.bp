@@ -70,10 +70,10 @@ UnitBlueprint{
         UniformScale = 0.125,
     },
     Economy = {
-        BuildCostEnergy = 1275,
+        BuildCostEnergy = 1250,
         BuildCostMass = 150,
-        BuildRate = 14.08,
-        BuildTime = 127.5,
+        BuildRate = 15,
+        BuildTime = 125,
         BuildableCategory = { "urb3202" },
         MaintenanceConsumptionPerSecondEnergy = 20,
         RebuildBonusIds = {
