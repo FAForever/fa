@@ -827,6 +827,7 @@ function FormatData()
             LineGroups[category].collapsed = linesCollapsed
 
             for source, message in data do
+                if not clarityTable[source] then continue end
                 local messageLine = {
                     source = source,
                     category = category,
