@@ -827,7 +827,9 @@ function FormatData()
             LineGroups[category].collapsed = linesCollapsed
 
             for source, message in data do
+                -- Will break customiser if alias from `clarityTable` is nil
                 if not clarityTable[source] then continue end
+
                 local messageLine = {
                     source = source,
                     category = category,
