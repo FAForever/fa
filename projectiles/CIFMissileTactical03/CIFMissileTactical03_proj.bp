@@ -1,13 +1,13 @@
 ProjectileBlueprint {
     Audio = {
         Impact = Sound {
-            Bank = 'Impacts',
-            Cue = 'CYB_Expl_Med_Impact',
+            Bank = 'Explosions',
+            Cue = 'Explosion_Bomb',
             LodCutoff = 'Weapon_LodCutoff',
         },
         ImpactTerrain = Sound {
-            Bank = 'Impacts',
-            Cue = 'Impact_Land_Gen_CYBRAN',
+            Bank = 'Explosions',
+            Cue = 'Explosion_Bomb',
             LodCutoff = 'Weapon_LodCutoff',
         },
         ImpactWater = Sound {
@@ -36,7 +36,7 @@ ProjectileBlueprint {
             Type = 'Medium02',
         },
         MeshBlueprint = '/projectiles/CIFMissileTactical01/CIFMissileTactical01_mesh.bp',
-        StrategicIconSize = 3,
+        StrategicIconSize = 4,
         UniformScale = 0.1,
     },
     Economy = {

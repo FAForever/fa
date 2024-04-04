@@ -2422,7 +2422,6 @@ local function UpdateGame()
                 function()
                     -- store in preferences so that we can retrieve it during blueprint loading
                     SetPreference('PreGameData', preGameData)
-                    SavePreferences()
                 end
             )
 
@@ -6668,7 +6667,6 @@ end
 -- Write the given list of preset profiles to persistent storage.
 function SavePresetsList(list)
     Prefs.SetToCurrentProfile("LobbyPresets", list)
-    SavePreferences()
 end
 
 --- Delegate to UIUtil's CreateInputDialog, adding the ridiculus chatEdit hack.

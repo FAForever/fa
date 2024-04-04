@@ -25,6 +25,7 @@
 local TableRandom = table.random
 
 ---@class DebrisComponent
+---@field DebrisBlueprints BlueprintId[]
 DebrisComponent = ClassSimple {
 
     DebrisBlueprints = {

@@ -115,9 +115,19 @@ end
 
 
 do
-    -- upvalues for security reasons
+    -- upvalue scope for security reasons
+    local tonumber = tonumber
     local lower = string.lower
     local find = string.find
+    local match = string.match
+
+    local TableGetn = table.getn
+
+    local GetFocusArmy = GetFocusArmy
+    local SessionIsReplay = SessionIsReplay
+    local GetSessionClients = GetSessionClients
+
+    local tickstamp = 0
 
     local oldConExecute = ConExecute
 
@@ -128,6 +138,47 @@ do
         -- do not allow network changes
         if find(lower, 'net_') then
             return
+        end
+
+        -- inform allies about self-destructed units
+        if find(lower, 'killselectedunits') then
+            local selectedUnits = GetSelectedUnits()
+            local currentFocusArmy = GetFocusArmy()
+
+            -- try to inform moderators
+            SimCallback(
+                {
+                    Func="ModeratorEvent",
+                    Args= {
+                        From = currentFocusArmy,
+                        Message = string.format('Self-destructed %d units', TableGetn(selectedUnits)),
+                    },
+                }
+            )
+        end
+
+        -- do a basic check
+        if find(lower, 'setfocusarmy') then
+            if not SessionIsReplay() then
+                local currentFocusArmy = GetFocusArmy()
+                local proposedFocusArmy = tonumber(match(command, '%d+'))
+                if find(command, '-') then
+                    proposedFocusArmy = proposedFocusArmy * -1
+                else
+                    proposedFocusArmy = proposedFocusArmy + 1
+                end
+
+                -- try to inform moderators
+                SimCallback(
+                    {
+                        Func="ModeratorEvent",
+                        Args= {
+                            From = currentFocusArmy,
+                            Message = string.format("Is changing focus army from %d to %d via ConExecute!", currentFocusArmy, proposedFocusArmy),
+                        },
+                    }
+                )
+            end
         end
 
         oldConExecute(command)
@@ -144,7 +195,109 @@ do
             return
         end
 
+        -- inform allies about self-destructed units
+        if find(lower, 'killselectedunits') then
+            local selectedUnits = GetSelectedUnits()
+            local currentFocusArmy = GetFocusArmy()
+
+            -- try to inform moderators
+            SimCallback(
+                {
+                    Func="ModeratorEvent",
+                    Args= {
+                        From = currentFocusArmy,
+                        Message = string.format('Self-destructed %d units', TableGetn(selectedUnits)),
+                    },
+                }
+            )
+        end
+
+        -- do a basic check
+        if find(lower, 'setfocusarmy') then
+            if not (SessionIsReplay()) then
+                local currentFocusArmy = GetFocusArmy()
+                local proposedFocusArmy = tonumber(match(command, '%d+'))
+                if find(command, '-') then
+                    proposedFocusArmy = proposedFocusArmy * -1
+                else
+                    proposedFocusArmy = proposedFocusArmy + 1
+                end
+
+                -- try to inform moderators
+                SimCallback(
+                    {
+                        Func="ModeratorEvent",
+                        Args= {
+                            From = currentFocusArmy,
+                            Message = string.format("Is changing focus army from %d to %d via ConExecuteSave!", currentFocusArmy, proposedFocusArmy),
+                        },
+                    }
+                )
+            end
+        end
+
         oldConExecuteSave(command)
+    end
+
+    local oldSimCallback = SimCallback
+
+    ---@param callback SimCallback
+    ---@param addUnitSelection boolean
+    _G.SimCallback = function(callback, addUnitSelection)
+        local clients = GetSessionClients()
+        local localClient = nil
+        for k = 1, TableGetn(clients) do
+            if clients[k]["local"] then
+                localClient = clients[k]
+                break
+            end
+        end
+        local currentFocusArmy = GetFocusArmy()
+
+        -- inform allies about self-destructed units
+        if callback.Func == 'ToggleSelfDestruct' then
+            local selectedUnits = GetSelectedUnits()
+ 
+            -- try to inform moderators
+            SimCallback(
+                {
+                    Func="ModeratorEvent",
+                    Args= {
+                        From = currentFocusArmy,
+                        Message = string.format('Self-destructed %d units', TableGetn(selectedUnits)),
+                    },
+                }
+            )
+        end
+
+        -- inform moderators about pings
+        if callback.Func == 'SpawnPing' then
+            if callback.Args.Marker then
+                -- try to inform moderators
+                SimCallback(
+                    {
+                        Func="ModeratorEvent",
+                        Args= {
+                            From = currentFocusArmy,
+                            Message = string.format("Created a marker with the text: '%s'", tostring(callback.Args.Name)),
+                        },
+                    }
+                )
+            else
+                -- try to inform moderators
+                SimCallback(
+                    {
+                        Func="ModeratorEvent",
+                        Args= {
+                            From = currentFocusArmy,
+                            Message = string.format("Created a ping of type '%s'", tostring(callback.Args.Type)),
+                        },
+                    }
+                )
+            end
+        end
+
+        oldSimCallback(callback, addUnitSelection or false)
     end
 
     --- Retrieves the terrain elevation, can be compared with the y coordinate of `GetMouseWorldPos` to determine if the mouse is above water
@@ -315,6 +468,8 @@ do
 
         if oldBuildQueueOfUnit then
             SetCurrentFactoryForQueueDisplay(oldBuildQueueOfUnit)
+        else
+            ClearCurrentFactoryForQueueDisplay()
         end
 
         return queue
@@ -409,5 +564,42 @@ do
         end
 
         return OldIncreaseBuildCountInQueue(index, count)
+    end
+end
+
+do
+    -- upvalue scope for security reasons
+    local TableGetn = table.getn
+
+    local GameTick = GameTick
+    local GetFocusArmy = GetFocusArmy
+    local SessionIsReplay = SessionIsReplay
+    local SessionRequestPause = SessionRequestPause
+    local SessionGetScenarioInfo = SessionGetScenarioInfo
+    local GetSessionClients = GetSessionClients
+    local oldSetFocusArmy = SetFocusArmy
+    local tickstamp = 0
+
+
+    _G.SetFocusArmy = function(number)
+        -- do a basic check
+        local isCheatsEnabled = SessionGetScenarioInfo().Options.CheatsEnabled == "true"
+        if not (SessionIsReplay() or isCheatsEnabled) then
+            local currentFocusArmy = GetFocusArmy()
+            local proposedFocusArmy = number
+
+            -- try to inform moderators
+            SimCallback(
+                {
+                    Func="ModeratorEvent",
+                    Args= {
+                        From = currentFocusArmy,
+                        Message = string.format("Is changing focus army from %d to %d via SetFocusArmy!", currentFocusArmy, proposedFocusArmy),
+                    },
+                }
+            )
+        end
+
+        oldSetFocusArmy(number)
     end
 end

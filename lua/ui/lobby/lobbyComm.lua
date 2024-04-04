@@ -91,6 +91,13 @@ LobbyComm = ClassUI(moho.lobby_methods) {
         LOG('Peer Disconnected : (name=' .. peerName .. ', uid=' .. uid .. ')')
     end,
     LaunchFailed = function(self, reasonKey) end,
+
+
+    ---@param self LobbyComm
+    LaunchGame = function(self, info)
+        SavePreferences()
+        moho.lobby_methods.LaunchGame(self, info)
+    end,
 }
 
 function CreateLobbyComm(protocol, localport, localPlayerName, localPlayerUID, natTraversalProvider)

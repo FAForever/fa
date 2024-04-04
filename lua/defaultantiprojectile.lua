@@ -18,7 +18,7 @@ local EntityCategoryContains = EntityCategoryContains
 local AttachBeamEntityToEntity = AttachBeamEntityToEntity
 
 -- pre-computed for performance
-local FlareCategories = categories.TACTICAL + categories.MISSILE
+local FlareCategories = categories.TACTICAL * categories.MISSILE
 
 ---@class FlareSpec
 ---@field Army Army

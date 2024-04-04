@@ -38,7 +38,6 @@ UnitBlueprint{
         "ENERGYPRODUCTION",
         "ENGINEER",
         "LAND",
-        "MASSFABRICATION",
         "MASSPRODUCTION",
         "MOBILE",
         "OVERLAYDIRECTFIRE",
@@ -627,7 +626,7 @@ UnitBlueprint{
             MuzzleSalvoSize = 1,
             MuzzleVelocity = 18,
             ProjectileId = "/projectiles/CDFLaserDisintegrator03/CDFLaserDisintegrator03_proj.bp",
-            ProjectileLifetimeUsesMultiplier = 2.4,
+            ProjectileLifetimeUsesMultiplier = 1.4,
             ProjectilesPerOnFire = 1,
             RackBones = {
                 {

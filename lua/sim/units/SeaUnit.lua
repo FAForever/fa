@@ -26,8 +26,6 @@ local MobileUnitOnStopBeingBuilt = MobileUnit.OnStopBeingBuilt
 SeaUnit = ClassUnit(MobileUnit) {
     DeathThreadDestructionWaitTime = 0,
     ShowUnitDestructionDebris = false,
-    PlayEndestructionEffects = false,
-    CollidedBones = 0,
 
     ---@param self SeaUnit
     ---@param builder Unit

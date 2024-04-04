@@ -2705,37 +2705,49 @@ function OnSelection(buildableCategories, selection, isOldSelection)
 
                 if currentFaction then
                     sortedOptions.templates = {}
-                    local function ConvertID(BPID)
-                        local prefixes = currentFaction.GAZ_UI_Info.BuildingIdPrefixes or {}
-                        for k, prefix in prefixes do
-                            local newBPID = string.gsub(BPID, "(%a+)(%d+)", prefix .. "%2")
-                            if table.find(buildableUnits, newBPID) then
-                                return newBPID
-                            end
-                        end
-                        return false
-                    end
 
+                    local prefixes = currentFaction.GAZ_UI_Info.BuildingIdPrefixes or {}
                     for templateIndex, template in templates do
                         local valid = true
-                        local converted = false
                         for _, entry in template.templateData do
                             if type(entry) == 'table' then
-                                if not table.find(buildableUnits, entry[1]) then
 
-                                    entry[1] = ConvertID(entry[1])
-                                    converted = true
-                                    if not table.find(buildableUnits, entry[1]) then
+                                -- check if entry is valid
+                                if not entry[1] then
+                                    valid = false
+                                    break
+                                end
+
+                                -- check if we can build the entry
+                                local converted = false
+                                if not table.find(buildableUnits, entry[1]) then
+                                    for k, prefix in prefixes do
+                                        local convertedId = string.gsub(entry[1], "(%a+)(%d+)", prefix .. "%2")
+                                        if table.find(buildableUnits, convertedId) then
+                                            converted = true
+                                            entry[1] = convertedId
+                                            break
+                                        end
+                                    end
+
+                                    if not converted then
                                         valid = false
                                         break
                                     end
                                 end
                             end
                         end
+
                         if valid then
-                            if converted then
-                                template.icon = ConvertID(template.icon)
+                            -- also try to convert the template icon
+                            for k, prefix in prefixes do
+                                local convertedId = string.gsub(template.icon, "(%a+)(%d+)", prefix .. "%2")
+                                if table.find(buildableUnits, convertedId) then
+                                    template.icon = convertedId
+                                    break
+                                end
                             end
+
                             template.templateID = templateIndex
                             table.insert(sortedOptions.templates, template)
                         end

@@ -107,6 +107,7 @@ UnitBlueprint{
         UnitName = "<LOC ueb1202_name>Mass Pump 2",
         UpgradesFrom = "ueb1103",
         UpgradesTo = "ueb1302",
+        UpgradesFromBase = "ueb1103",
     },
     Intel = { VisionRadius = 20 },
     LifeBarHeight = 0.075,

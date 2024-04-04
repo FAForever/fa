@@ -1,5 +1,5 @@
 --******************************************************************************************************
---** Copyright (c) 2024  Il1I1
+--** Copyright (c) 2023  Willem 'Jip' Wijnia
 --**
 --** Permission is hereby granted, free of charge, to any person obtaining a copy
 --** of this software and associated documentation files (the "Software"), to deal
@@ -22,80 +22,86 @@
 
 ---@type ContextBasedTemplate
 Template = {
-    Name = 'Power generators',
-    TriggersOnUnit = categories.STRUCTURE * categories.OPTICS * categories.TECH3,
+    Name = 'Storages',
+    TriggersOnUnit = categories.STRUCTURE * categories.MASSFABRICATION * categories.TECH3,
     TemplateSortingOrder = 100,
     TemplateData = {
-        0,
-        0,
+        10,
+        10,
         {
-            'uab1101',
+            'dummy',
+            0,
+            0,
+            0
+        },
+        {
+            'uab1106',
             2605,
             -2,
             4
         },
         {
-            'uab1101',
+            'uab1106',
             2621,
             0,
             4
         },
         {
-            'uab1101',
+            'uab1106',
             2636,
             2,
             4
         },
         {
-            'uab1101',
+            'uab1106',
             2651,
             4,
             2
         },
         {
-            'uab1101',
+            'uab1106',
             2666,
             4,
             0
         },
         {
-            'uab1101',
+            'uab1106',
             2680,
             4,
             -2
         },
         {
-            'uab1101',
+            'uab1106',
             2695,
             2,
             -4
         },
         {
-            'uab1101',
+            'uab1106',
             2710,
             0,
             -4
         },
         {
-            'uab1101',
+            'uab1106',
             2724,
             -2,
             -4
         },
         {
-            'uab1101',
+            'uab1106',
             2738,
             -4,
             -2
         },
         {
-            'uab1101',
+            'uab1106',
             2753,
             -4,
             0
         },
         {
-            'uab1101',
+            'uab1106',
             2767,
             -4,
             2

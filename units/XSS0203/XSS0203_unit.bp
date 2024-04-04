@@ -18,6 +18,7 @@ UnitBlueprint{
     BuildIconSortPriority = 30,
     Categories = {
         "ANTINAVY",
+        "ANTITORPEDO",
         "BUILTBYTIER1FACTORY",
         "BUILTBYTIER2FACTORY",
         "BUILTBYTIER3FACTORY",
@@ -371,7 +372,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_DirectFire",
-            RateOfFire = 1.5,
+            RateOfFire = 1.428,
             ReTargetOnMiss = true,
             TargetPriorities = {
                 "MOBILE",
