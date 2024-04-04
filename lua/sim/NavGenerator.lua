@@ -1881,8 +1881,8 @@ function Generate()
     print(infoMessage)
     SPEW(infoMessage)
 
-    local allocatedSizeGrids = import('/lua/system/utils.lua').ToBytes(NavGrids) / (1024 * 1024)
-    local allocatedSizeLabels = import('/lua/system/utils.lua').ToBytes(NavLabels, { Node = true }) / (1024 * 1024)
+    local allocatedSizeGrids = debug.allocatedrsize(NavGrids) / (1024 * 1024)
+    local allocatedSizeLabels = debug.allocatedrsize.ToBytes(NavLabels, { Node = true }) / (1024 * 1024)
 
     local infoMessage = string.format("Allocating %.1fmb memory", allocatedSizeGrids)
     print(infoMessage)

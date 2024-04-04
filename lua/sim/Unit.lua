@@ -2319,8 +2319,6 @@ Unit = ClassUnit(moho.unit_methods, IntelComponent, VeterancyComponent) {
             return false
         end
 
-
-
         -- Create any idle effects on unit
         if TrashEmpty(self.IdleEffectsBag) then
             self:CreateIdleEffects()
