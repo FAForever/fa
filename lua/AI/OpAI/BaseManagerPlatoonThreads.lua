@@ -755,7 +755,7 @@ function ExpansionEngineer(platoon)
     end
 end
 
---- Guts of the build thing
+---@param brain AIBrain
 ---@param platoon Platoon
 function ExpansionPlatoonDestroyed(brain, platoon)
     local aiBrain = platoon:GetBrain()
