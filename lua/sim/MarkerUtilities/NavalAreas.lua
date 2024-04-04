@@ -150,8 +150,10 @@ function Generate()
     -- generate for spawn locations
     for k = 1, spawnCount do
         local thresholdDistance = 40
-        if mapSize > 1024 then
-            thresholdDistance = 50
+        if mapSize >= 2048 then
+            thresholdDistance = 650
+        elseif mapSize >= 1024 then
+            thresholdDistance = 150
         end
         GenerateForExpansion(spawns[k], thresholdDistance, thresholdSize, thresholdArea)
     end
