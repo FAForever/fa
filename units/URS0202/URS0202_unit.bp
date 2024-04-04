@@ -177,7 +177,7 @@ UnitBlueprint {
     LifeBarOffset = 2.5,
     LifeBarSize = 1.75,
     Physics = {
-        BackUpDistance = 10,
+        BackUpDistance = 5,
         BankingSlope = 0,
         BuildOnLayerCaps = {
             LAYER_Air = false,
