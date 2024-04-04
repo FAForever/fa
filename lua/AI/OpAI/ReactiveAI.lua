@@ -44,9 +44,11 @@ TrackingCategories = {
 }
 
 ---@class ReactiveAI : OpAI
+---@field ReactionData table
+---@field GetBuilderType function
 ReactiveAI = Class(OpAI) {
 
-    ---@param self OpAI
+    ---@param self ReactiveAI
     ---@param brain AIBrain
     ---@param location Vector
     ---@param triggeringEventType any
@@ -188,7 +190,7 @@ ReactiveAI = Class(OpAI) {
     GetBuilderData = function( self, builderData, typeData, builderType, triggeringEventType, reactionType )
     end,
 
-    ---@param self OpAI
+    ---@param self ReactiveAI
     ---@param triggeringEventType any
     ---@param reactionType any
     ---@return any

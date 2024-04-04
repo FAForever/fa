@@ -23,12 +23,18 @@ function ParseEntityCategoryProperly(categoryExpression)
 
     -- Map operator tokens to their corresponding functions: used for building the category set.
     local OPERATOR_FUNCTIONS = {
+        ---@param a EntityCategory
+        ---@param b EntityCategory
         ["-"] = function(a, b)
             return a - b
         end,
+        ---@param a EntityCategory
+        ---@param b EntityCategory
         ["+"] = function(a, b)
             return a + b
         end,
+        ---@param a EntityCategory
+        ---@param b EntityCategory
         ["*"] = function(a, b)
             return a * b
         end,
@@ -95,6 +101,7 @@ function ParseEntityCategoryProperly(categoryExpression)
 
     --- Given two categories and an operator token, return the result of applying the operator to
     -- the two categories (in the order given)
+    ---@return EntityCategory | nil
     local function mergeCategories(currentCategory, newCategory, operator)
         -- Initialization case.
         if not operator and not currentCategory then
@@ -111,6 +118,7 @@ function ParseEntityCategoryProperly(categoryExpression)
 
     -- Parsing time. Since Lua-operators on category objects work correctly, we simply have to
     -- translate the expression we have into those as we go along.
+    ---@return EntityCategory | nil
     local function _parseSubexpression(start, finish)
         local currentCategory = nil
 

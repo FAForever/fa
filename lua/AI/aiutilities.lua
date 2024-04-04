@@ -889,7 +889,7 @@ end
 ---@param markerType MarkerType
 ---@param startX Vector
 ---@param startZ Vector
----@param extraTypes string
+---@param extraTypes? string
 ---@return unknown
 ---@return unknown
 function AIGetClosestMarkerLocation(aiBrain, markerType, startX, startZ, extraTypes)
@@ -1306,13 +1306,13 @@ function GetUnitBaseStructureVector(unit)
 end
 
 ---@param aiBrain AIBrain
----@param category string
+---@param category EntityCategory
 ---@param location Vector
 ---@param radius number
----@param min number
----@param max number
----@param rings number
----@param tType string
+---@param min? number
+---@param max? number
+---@param rings? number
+---@param tType? string
 ---@return table
 function GetOwnUnitsAroundPoint(aiBrain, category, location, radius, min, max, rings, tType)
     local units = aiBrain:GetUnitsAroundPoint(category, location, radius, 'Ally')
@@ -1748,7 +1748,7 @@ end
 ---@param units Unit[]
 ---@param transports AirUnit[]
 ---@param location Vector
----@param transportPlatoon Platoon
+---@param transportPlatoon? Platoon
 ---@return boolean
 function UseTransports(units, transports, location, transportPlatoon)
     local aiBrain

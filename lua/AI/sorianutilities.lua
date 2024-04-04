@@ -712,7 +712,7 @@ end
 ---     - Launch Time: ~3 seconds
 ---@param platoon Platoon
 ---@param target Unit
----@return boolean
+---@return Vector
 function LeadTarget(platoon, target)
     -- Get launcher and target position
     local LauncherPos = platoon:GetPlatoonPosition()
@@ -822,7 +822,7 @@ function LeadTarget(platoon, target)
         return false
     end
     -- return extrapolated target position / missile impact coordinates
-    return {MissileImpactX, Target2SecPos[2], MissileImpactY}
+    return Vector(MissileImpactX, Target2SecPos[2], MissileImpactY)
 end
 
 --- Checks to see if there is terrain blocking a unit from hiting a target.

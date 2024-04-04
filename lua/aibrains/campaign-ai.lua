@@ -13,6 +13,12 @@ local StandardBrain = import("/lua/aibrain.lua").AIBrain
 --- brain is a 'blunt' copy of the functionality that is required to run various campaign maps.
 ---@class CampaignAIBrain: AIBrain
 ---@field PBM AiPlatoonBuildManager
+---@field AIPlansList table
+---@field LayerPref string
+---@field ConstantEval boolean
+---@field CurrentPlan string
+---@field RepeatExecution boolean
+---@field CurrentPlanScript table
 AIBrain = Class(StandardBrain) {
 
     --- Called after `SetupSession` but before `BeginSession` - no initial units, props or resources exist at this point
@@ -45,7 +51,7 @@ AIBrain = Class(StandardBrain) {
 
     --- Called after `SetupSession` but before `BeginSession` - no initial units, props or resources exist at this point
     ---@param self CampaignAIBrain
-    ---@param planName string
+    ---@param planName FileName
     CreateBrainShared = function(self, planName)
         StandardBrain.CreateBrainShared(self, planName)
 
@@ -902,7 +908,7 @@ AIBrain = Class(StandardBrain) {
     --- IF either is nil, then it will do the other.
     --- This way you can remove all of one type or all of one rectangle
     ---@param self CampaignAIBrain
-    ---@param loc Vector
+    ---@param loc? Vector
     ---@param locType string
     PBMRemoveBuildLocation = function(self, loc, locType)
         for k, v in self.PBM.Locations do

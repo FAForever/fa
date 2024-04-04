@@ -181,11 +181,11 @@ function CanConditionalBuild(singleEngineerPlatoon)
     end
 
     -- What we should build from the conditional build list.
-    local buildIndex = 0
+    local buildIndex = nil
 
     -- Go through the list of conditional builds and see if any of the conditions are met
     table.foreachi(bManager.ConditionalBuildTable, function(index, build)
-        if buildIndex ~= 0 then return end
+        if buildIndex ~= nil then return end
 
         -- Check if this engineer can build this particular structure
         if type(build.name) == 'table' then --table of units to build at random
@@ -235,7 +235,7 @@ function CanConditionalBuild(singleEngineerPlatoon)
     end)
 
     -- Bail out if we didnt find a conditional unit
-    if buildIndex == 0 then return false end
+    if not buildIndex then return false end
 
     -- Save index for use
     bManager.ConditionalBuildData.Index = buildIndex
@@ -415,7 +415,7 @@ function DoConditionalBuild(singleEngineerPlatoon)
     local result = aiBrain:BuildStructure(engineer, unitToBuild.type, {unitToBuild.Position[1], unitToBuild.Position[3], 0})
 
     -- Enter build monitoring loop
-    local unitInstance = false
+    local unitInstance
     while aiBrain:PlatoonExists(singleEngineerPlatoon) do
         if not unitInstance then
             unitInstance = engineer.UnitBeingBuilt
@@ -497,6 +497,7 @@ function BaseManagerPatrolLocationFactoriesAI(platoon)
 
         platoon:Patrol(movePos)
 
+        ---@cast facNum integer
         table.remove(posTable, facNum)
     end
 end
@@ -613,8 +614,9 @@ function BaseManagerAssistThread(platoon)
                         highNum = guardNum
                     end
                 end
-                if unit:GetGuardedUnit() then
-                    if unit:GetGuardedUnit().Dead or EntityCategoryContains(categories.FACTORY, unit:GetGuardedUnit()) or
+                local guardedUnit = unit:GetGuardedUnit()
+                if guardedUnit then
+                    if guardedUnit.Dead or EntityCategoryContains(categories.FACTORY, guardedUnit) or
                             highNum > lowNum + 1 then
                         assistee = currLow
                     end
@@ -700,7 +702,7 @@ function ExpansionEngineer(platoon)
     end
 
     local bManager = aiBrain.BaseManagers[data.BaseName]
-    local cmd = false
+    local cmd
     for num, eData in bManager.ExpansionBaseData do
         -- Find out what expansion base needs engineers
         if BMBC.NumEngiesInExpansionBase(aiBrain, data.BaseName, eData.BaseName) then
@@ -753,7 +755,7 @@ function ExpansionEngineer(platoon)
     end
 end
 
----@param brain AIBrain
+--- Guts of the build thing
 ---@param platoon Platoon
 function ExpansionPlatoonDestroyed(brain, platoon)
     local aiBrain = platoon:GetBrain()
@@ -842,7 +844,7 @@ function BaseManagerEngineerThread(platoon)
     for dNum, levelData in baseManager.LevelNames do
         if levelData.Priority > 0 then
             for _, v in structurePriorities do
-                local unitType = false
+                local unitType
                 if v ~= 'ALLUNITS' then
                     unitType = v
                 end
@@ -863,7 +865,7 @@ function BaseManagerEngineerThread(platoon)
                                 return
                             end
 
-                            if not markedUnfinished and eng.UnitBeingBuilt then
+                            if not markedUnfinished and eng.UnitBeingBuilt and unitName then
                                 baseManager.UnfinishedBuildings[unitName] = true
                             end
 
@@ -879,7 +881,7 @@ function BaseManagerEngineerThread(platoon)
                                 end
                             end
                         until eng.Dead or eng:IsIdleState()
-                        if not eng.Dead then
+                        if not eng.Dead and unitName then
                             baseManager.UnfinishedBuildings[unitName] = nil
                             baseManager:DecrementUnitBuildCounter(unitName)
                         end
@@ -900,7 +902,7 @@ end
 ---@param buildingType string
 ---@param platoon Platoon
 ---@return boolean
----@return boolean
+---@return boolean?
 function BuildBaseManagerStructure(aiBrain, eng, baseManager, levelName, buildingType, platoon)
     local buildTemplate = aiBrain.BaseTemplates[baseManager.BaseName .. levelName].Template
     local buildList = aiBrain.BaseTemplates[baseManager.BaseName .. levelName].List
@@ -1168,7 +1170,7 @@ function BaseManagerTMLAI(platoon)
 
     while aiBrain:PlatoonExists(platoon) do
         if BMBC.TMLsEnabled(aiBrain, baseName) then
-            local target = false
+            local target
             while unit:GetTacticalSiloAmmoCount() < 1 or not target do
                 WaitSeconds(5)
                 target = false
@@ -1351,7 +1353,7 @@ function UnitUpgradeThread(unit)
     end
 
     -- Determine the type of unit
-    local unitType = false
+    local unitType
     if EntityCategoryContains(categories.COMMAND, unit) then
         unitType = 'DefaultACU'
     elseif EntityCategoryContains(categories.SUBCOMMANDER, unit) then
