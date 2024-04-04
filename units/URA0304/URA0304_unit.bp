@@ -61,6 +61,7 @@ UnitBlueprint{
         "STRATEGICBOMBER",
         "TECH3",
         "VISIBLETORECON",
+        "WEAKANTIAIR",
     },
     Defense = {
         AirThreatLevel = 3.5,
@@ -327,7 +328,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = true,
             RangeCategory = "UWRC_AntiAir",
-            RateOfFire = 1.5,
+            RateOfFire = 1.428,
             TargetPriorities = {
                 "AIR MOBILE",
                 "AIR MOBILE -INTELLIGENCE",
@@ -391,7 +392,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = true,
             RangeCategory = "UWRC_AntiAir",
-            RateOfFire = 1.5,
+            RateOfFire = 1.428,
             TargetPriorities = {
                 "AIR MOBILE",
                 "AIR MOBILE -INTELLIGENCE",

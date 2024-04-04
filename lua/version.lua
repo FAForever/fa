@@ -1,7 +1,7 @@
 
-local Version = "3801"
----@alias PATCH "3801"
----@alias VERSION "1.5.3801"
+local Version = "3807"
+---@alias PATCH "3807"
+---@alias VERSION "1.5.3807"
 ---@return PATCH
 function GetVersion()
     LOG('Supreme Commander: Forged Alliance version ' .. Version)

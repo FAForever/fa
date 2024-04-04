@@ -49,7 +49,7 @@ UnitBlueprint{
         "SELECTABLE",
         "SHOWQUEUE",
         "STATIONASSISTPOD",
-        "TECH1",
+        "TECH2",
         "UEF",
         "VISIBLETORECON",
     },

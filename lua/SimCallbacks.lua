@@ -714,6 +714,33 @@ do
     end
 end
 
+do
+
+    ---@param data table
+    ---@param selection Unit[]
+    Callbacks.ExtendReclaimOrder = function(data, selection)
+        -- verify selection
+        selection = SecureUnits(selection)
+        if (not selection) or TableEmpty(selection) then
+            return
+        end
+
+        -- verify the command queue
+        local unit = selection[1]
+        local queue = unit:GetCommandQueue()
+        local lastCommand = queue[table.getn(queue)]
+
+        reprsl(lastCommand)
+        if not (lastCommand and lastCommand.commandType == 19 and lastCommand.target) then
+            return
+        end
+
+        local target = lastCommand.target --[[@as Unit | Prop]]
+        import("/lua/sim/commands/area-reclaim-order.lua").AreaReclaimOrder(selection, target, true)
+    end
+
+end
+
 --#endregion
 
 -------------------------------------------------------------------------------
@@ -1244,6 +1271,22 @@ Callbacks.AIPlatoonSimpleStructureBehavior = function(data, units)
     end
 
     import("/lua/aibrains/platoons/platoon-simple-structure.lua").DebugAssignToUnits(data, units)
+end
+
+--#endregion
+
+-------------------------------------------------------------------------------
+--#region Moderator related functionality
+
+---@class CallbackModeratorEventData
+---@field From number
+---@field Message string
+
+---@param data CallbackModeratorEventData
+Callbacks.ModeratorEvent = function(data)
+    -- show up in the game logs
+    local brain = GetArmyBrain(GetCurrentCommandSource())
+    SPEW(string.format("Moderator event for %s: %s", tostring(brain.Nickname), repru(data, 10000)))
 end
 
 --#endregion

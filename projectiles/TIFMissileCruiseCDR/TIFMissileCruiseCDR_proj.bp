@@ -42,7 +42,7 @@ ProjectileBlueprint {
                 },
             },
         },
-        StrategicIconSize = 2,
+        StrategicIconSize = 4,
         UniformScale = 0.15,
     },
     Economy = {

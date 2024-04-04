@@ -36,7 +36,7 @@ ProjectileBlueprint {
             Type = 'Medium01',
         },
         MeshBlueprint = '/projectiles/SIFLaanseTacticalMissile01/SIFLaanseTacticalMissile01_mesh.bp',
-        StrategicIconSize = 3,
+        StrategicIconSize = 4,
         UniformScale = 0.05,
     },
     Economy = {
