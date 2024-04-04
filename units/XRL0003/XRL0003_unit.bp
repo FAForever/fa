@@ -86,7 +86,7 @@ UnitBlueprint{
         FactionName = "Cybran",
         Icon = "amph",
     },
-    Intel = { VisionRadius = 5 },
+    Intel = { VisionRadius = 4 },
     LifeBarHeight = 0.075,
     LifeBarOffset = 0.5,
     LifeBarSize = 1,

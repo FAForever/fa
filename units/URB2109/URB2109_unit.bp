@@ -99,9 +99,9 @@ UnitBlueprint{
         UnitName = "<LOC urb2109_name>Scuttle",
     },
     Intel = {
-        SonarRadius = 35,
+        SonarRadius = 36,
         VisionRadius = 12,
-        WaterVisionRadius = 45,
+        WaterVisionRadius = 44,
     },
     LifeBarHeight = 0.075,
     LifeBarOffset = 0.35,

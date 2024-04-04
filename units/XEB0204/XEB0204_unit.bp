@@ -17,6 +17,7 @@ UnitBlueprint{
     BuildIconSortPriority = 200,
     Categories = {
         "CONSTRUCTION",
+        "DRAGBUILD",
         "ENGINEERSTATION",
         "OVERLAYMISC",
         "PODSTAGINGPLATFORM",
@@ -138,8 +139,9 @@ UnitBlueprint{
         SelectionPriority = 5,
         UnitName = "<LOC xeb0204_name>The Kennel",
         UpgradesFrom = "xeb0104",
+        UpgradesFromBase = "xeb0104",
     },
-    Intel = { VisionRadius = 15 },
+    Intel = { VisionRadius = 14 },
     LifeBarHeight = 0.075,
     LifeBarOffset = 0.35,
     LifeBarSize = 1.25,

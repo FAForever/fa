@@ -57,6 +57,8 @@ UnitBlueprint{
         "TRANSPORTBUILTBYTIER3FACTORY",
         "TRANSPORTFOCUS",
         "VISIBLETORECON",
+        "WEAKDIRECTFIRE",
+        "WEAKANTIAIR",
     },
     Defense = {
         AirThreatLevel = 4.5,
@@ -256,7 +258,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = true,
             RangeCategory = "UWRC_DirectFire",
-            RateOfFire = 3,
+            RateOfFire = 3.333,
             TargetPriorities = { "ALLUNITS" },
             TargetRestrictDisallow = "UNTARGETABLE",
             TurretBoneMuzzle = "Front_Down_Turret_Muzzle",
@@ -312,7 +314,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_AntiAir",
-            RateOfFire = 3,
+            RateOfFire = 3.333,
             TargetPriorities = {
                 "AIR MOBILE",
                 "AIR MOBILE -INTELLIGENCE",

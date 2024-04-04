@@ -470,7 +470,7 @@ end
 --- Deals damage to the target unit
 ---@param instigator TargetObject | nil
 ---@param location Vector origin of the damage, used for effects
----@param target Unit
+---@param target Unit | Projectile | Prop
 ---@param amount number
 ---@param damageType DamageType
 function Damage(instigator, location, target, amount, damageType)
@@ -626,8 +626,7 @@ function GetMapSize()
 end
 
 ---@overload fun(x0: number, z0: number, x1: number, z1: number): ReclaimObject[] | nil
---- Returns the reclaimable objects inside the given rectangle.
---- This includes props, units, wreckages.
+--- Returns the reclaimable objects inside the given rectangle. This includes props, units and wrecks. Unlike the brain functions, this function uses either the collision box (OO) or the visual box (AAB) for the query and is therefore much more accurate.
 ---@param rectangle Rectangle
 ---@return ReclaimObject[] | nil
 function GetReclaimablesInRect(rectangle)
@@ -736,7 +735,7 @@ end
 
 --- Orders a group of units to attack a target
 ---@param units Unit[]
----@param target Unit
+---@param target Unit | Vector | Prop | Blip
 ---@return SimCommand
 function IssueAttack(units, target)
 end

@@ -21,6 +21,14 @@
 --**********************************************************************************
 
 local Unit = import("/lua/sim/unit.lua").Unit
+local UnitOnCreate = Unit.OnCreate
+local UnitOnDestroy = Unit.OnDestroy
+local UnitOnStartBuild = Unit.OnStartBuild
+local UnitOnStopBuild = Unit.OnStopBuild
+local UnitOnFailedToBuild = Unit.OnFailedToBuild
+local UnitOnPaused = Unit.OnPaused
+local UnitOnUnpaused = Unit.OnUnpaused
+
 local FactoryUnit = import("/lua/sim/units/factoryunit.lua").FactoryUnit
 
 ---@class ExternalFactoryUnit : Unit
@@ -32,7 +40,7 @@ ExternalFactoryUnit = ClassUnit(Unit) {
 
     ---@param self ExternalFactoryUnit
     OnCreate = function(self)
-        Unit.OnCreate(self)
+        UnitOnCreate(self)
 
         -- do not show the mesh
         self:HideBone(0, true)
@@ -46,6 +54,21 @@ ExternalFactoryUnit = ClassUnit(Unit) {
         -- do not allow the unit to be reclaimed or targeted by weapons
         self:SetReclaimable(false)
         self:SetDoNotTarget(true)
+    end,
+
+    ---@param self ExternalFactoryUnit
+    OnDestroy = function(self)
+        UnitOnDestroy(self)
+
+        if self.UpdateParentProgressThread then
+            KillThread(self.UpdateParentProgressThread)
+        end
+
+        -- Similar to SeaFactoryUnit
+        local UnitBeingBuilt = self.UnitBeingBuilt
+        if UnitBeingBuilt and not UnitBeingBuilt.Dead and UnitBeingBuilt:GetFractionComplete() < 1 then
+            UnitBeingBuilt:Destroy()
+        end
     end,
 
     ---@param self ExternalFactoryUnit
@@ -73,7 +96,7 @@ ExternalFactoryUnit = ClassUnit(Unit) {
     ---@param unitbuilding Unit
     ---@param order Layer
     OnStartBuild = function(self, unitbuilding, order)
-        Unit.OnStartBuild(self, unitbuilding, order)
+        UnitOnStartBuild(self, unitbuilding, order)
         self.Parent:OnStartBuild(unitbuilding, order)
         self.UnitBeingBuilt = unitbuilding
 
@@ -89,7 +112,7 @@ ExternalFactoryUnit = ClassUnit(Unit) {
     ---@param self ExternalFactoryUnit
     ---@param unitBeingBuilt Unit
     OnStopBuild = function(self, unitBeingBuilt)
-        Unit.OnStopBuild(self, unitBeingBuilt)
+        UnitOnStopBuild(self, unitBeingBuilt)
         self.Parent:OnStopBuild(unitBeingBuilt)
         self.UnitBeingBuilt = nil
 
@@ -105,7 +128,7 @@ ExternalFactoryUnit = ClassUnit(Unit) {
 
     ---@param self ExternalFactoryUnit
     OnFailedToBuild = function(self)
-        Unit.OnFailedToBuild(self)
+        UnitOnFailedToBuild(self)
         self.Parent:OnFailedToBuild()
         self.UnitBeingBuilt = nil
 
@@ -169,7 +192,7 @@ ExternalFactoryUnit = ClassUnit(Unit) {
 
     ---@param self FactoryUnit
     OnPaused = function(self)
-        Unit.OnPaused(self)
+        UnitOnPaused(self)
 
         -- When factory is paused take some action
         if self:IsUnitState('Building') then
@@ -180,7 +203,7 @@ ExternalFactoryUnit = ClassUnit(Unit) {
 
     ---@param self FactoryUnit
     OnUnpaused = function(self)
-        Unit.OnUnpaused(self)
+        UnitOnUnpaused(self)
         if self:IsUnitState('Building') then
             self:PlayUnitAmbientSound('ConstructLoop')
             self:StartBuildingEffects(self.UnitBeingBuilt, self.UnitBuildOrder)

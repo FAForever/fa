@@ -20,11 +20,18 @@ local MathPi = math.pi
 ---@class UEFNukeEffectController01 : NullShell
 UEFNukeEffectController01 = Class(NullShell) {
 
+    ---@param self any
+    ---@param inWater any
+    OnCreate = function(self, inWater)
+        NullShell.OnCreate(self, inWater)
+        ForkThread(self.EffectThread, self)
+    end,
+
     ---@param self UEFNukeEffectController01
     EffectThread = function(self)
-        local position = self:GetPosition()
         local army = self.Army
         local trash = self.Trash
+        local position = self:GetPosition()
 
         -- Create projectile that controls plume effects
         local PlumeEffectYOffset = 0
@@ -46,25 +53,15 @@ UEFNukeEffectController01 = Class(NullShell) {
         end
 
         self:CreateInitialFireballSmokeRing()
-
-        TrashBagAdd(trash, ForkThread(self.CreateOuterRingWaveSmokeRing, self))
         TrashBagAdd(trash, ForkThread(self.CreateHeadConvectionSpinners, self))
         TrashBagAdd(trash, ForkThread(self.CreateFlavorPlumes, self))
 
-        WaitTicks(5)
-
-        local pos = self:GetPosition()
-        DamageArea(self, pos, 27, 1, 'Force', true)
-        DamageArea(self, pos, 27, 1, 'Force', true)
-
-        CreateLightParticle(self, -1, army, 100, 80, 'glow_03', 'ramp_nuke_04')
-
-        -- Create ground decals
+    -- Create ground decals
         local orientation = RandomFloat(0, 2 * MathPi)
         CreateDecal(position, orientation, 'Crater01_albedo', '', 'Albedo', 25, 25, 1200, 0, army)
         CreateDecal(position, orientation, 'Crater01_normals', '', 'Normals', 25, 25, 1200, 0, army)
-        CreateDecal(position, orientation, 'nuke_scorch_003_albedo', '', 'Albedo', 30, 30, 1200, 0, army)
-
+        WaitTicks(5)
+        CreateLightParticle(self, -1, army, 100, 120, 'glow_03', 'ramp_nuke_04')
         WaitTicks(90)
         self:CreateGroundPlumeConvectionEffects(army)
     end,
@@ -82,31 +79,6 @@ UEFNukeEffectController01 = Class(NullShell) {
             self:CreateProjectile('/effects/entities/UEFNukeShockwave01/UEFNukeShockwave01_proj.bp', X * OffsetMod, 1.5,
                 Z * OffsetMod, X, 0, Z)
                 :SetVelocity(velocity):SetAcceleration(-0.5)
-        end
-    end,
-
-    ---@param self UEFNukeEffectController01
-    CreateOuterRingWaveSmokeRing = function(self)
-        local sides = 32
-        local angle = (2 * MathPi) / sides
-        local velocity = 3
-        local OffsetMod = 8
-        local projectiles = {}
-
-        for i = 0, (sides - 1) do
-            local X = MathSin(i * angle)
-            local Z = MathCos(i * angle)
-            local proj = self:CreateProjectile('/effects/entities/UEFNukeShockwave02/UEFNukeShockwave02_proj.bp',
-                X * OffsetMod, 2.5, Z * OffsetMod, X, 0, Z)
-                :SetVelocity(velocity)
-            table.insert(projectiles, proj)
-        end
-
-        WaitTicks(30)
-
-        -- Slow projectiles down to normal speed
-        for k, v in projectiles do
-            v:SetAcceleration(-0.45)
         end
     end,
 

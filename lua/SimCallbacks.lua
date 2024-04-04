@@ -234,6 +234,22 @@ Callbacks.OnPlayerQueryResult = SimPlayerQuery.OnPlayerQueryResult
 
 Callbacks.PingGroupClick = import("/lua/simpinggroup.lua").OnClickCallback
 
+---@param unit Unit
+---@param target? Unit
+---@return boolean
+function IsInvalidAssist(unit, target)
+    if target and target.EntityId == unit.EntityId then
+        return true
+    elseif not target or not target:GetGuardedUnit() then
+        return false
+    else
+        return IsInvalidAssist(unit, target:GetGuardedUnit())
+    end
+end
+
+--- Detect and fix a simulation freeze by clearing the command queue of all factories that take part in a cycle
+---@param data { target: EntityId}
+---@param units any
 Callbacks.ValidateAssist = function(data, units)
     units = SecureUnits(units)
     local target = GetEntityById(data.target)
@@ -244,16 +260,6 @@ Callbacks.ValidateAssist = function(data, units)
                 return
             end
         end
-    end
-end
-
-function IsInvalidAssist(unit, target)
-    if target and target.EntityId == unit.EntityId then
-        return true
-    elseif not target or not target:GetGuardedUnit() then
-        return false
-    else
-        return IsInvalidAssist(unit, target:GetGuardedUnit())
     end
 end
 
@@ -708,6 +714,33 @@ do
     end
 end
 
+do
+
+    ---@param data table
+    ---@param selection Unit[]
+    Callbacks.ExtendReclaimOrder = function(data, selection)
+        -- verify selection
+        selection = SecureUnits(selection)
+        if (not selection) or TableEmpty(selection) then
+            return
+        end
+
+        -- verify the command queue
+        local unit = selection[1]
+        local queue = unit:GetCommandQueue()
+        local lastCommand = queue[table.getn(queue)]
+
+        reprsl(lastCommand)
+        if not (lastCommand and lastCommand.commandType == 19 and lastCommand.target) then
+            return
+        end
+
+        local target = lastCommand.target --[[@as Unit | Prop]]
+        import("/lua/sim/commands/area-reclaim-order.lua").AreaReclaimOrder(selection, target, true)
+    end
+
+end
+
 --#endregion
 
 -------------------------------------------------------------------------------
@@ -716,19 +749,6 @@ end
 --- An anti cheat check that passes when there is only 1 player or cheats are enabled
 ---@return boolean
 local PassesAntiCheatCheck = function()
-    -- perform UI checks on sim to prevent cheating
-    local count = 0
-    for k, brain in ArmyBrains do
-        if brain.BrainType == "Human" then
-            count = count + 1
-        end
-    end
-
-    -- allow when there is 1 or less players
-    if count <= 1 then
-        return true
-    end
-
     -- allow when cheats are enabled
     return CheatsEnabled()
 end
@@ -1251,6 +1271,22 @@ Callbacks.AIPlatoonSimpleStructureBehavior = function(data, units)
     end
 
     import("/lua/aibrains/platoons/platoon-simple-structure.lua").DebugAssignToUnits(data, units)
+end
+
+--#endregion
+
+-------------------------------------------------------------------------------
+--#region Moderator related functionality
+
+---@class CallbackModeratorEventData
+---@field From number
+---@field Message string
+
+---@param data CallbackModeratorEventData
+Callbacks.ModeratorEvent = function(data)
+    -- show up in the game logs
+    local brain = GetArmyBrain(GetCurrentCommandSource())
+    SPEW(string.format("Moderator event for %s: %s", tostring(brain.Nickname), repru(data, 10000)))
 end
 
 --#endregion

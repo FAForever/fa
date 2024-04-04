@@ -118,7 +118,7 @@ URL0001 = ClassUnit(ACUUnit, CCommandUnit) {
             RemoveUnitEnhancement(self, 'TeleporterRemove')
             self:RemoveCommandCap('RULEUCC_Teleport')
         elseif enh == 'StealthGenerator' then
-            self:AddToggleCap('RULEUTC_CloakToggle')
+            self:AddToggleCap('RULEUTC_StealthToggle')
             self.StealthEnh = true
             self:EnableUnitIntel('Enhancement', 'RadarStealth')
             self:EnableUnitIntel('Enhancement', 'SonarStealth')
@@ -145,7 +145,7 @@ URL0001 = ClassUnit(ACUUnit, CCommandUnit) {
                 Buff.ApplyBuff(self, 'CybranACUStealthBonus')
             end
         elseif enh == 'StealthGeneratorRemove' then
-            self:RemoveToggleCap('RULEUTC_CloakToggle')
+            self:RemoveToggleCap('RULEUTC_StealthToggle')
             self:DisableUnitIntel('Enhancement', 'RadarStealth')
             self:DisableUnitIntel('Enhancement', 'SonarStealth')
             self.StealthEnh = nil
@@ -177,7 +177,7 @@ URL0001 = ClassUnit(ACUUnit, CCommandUnit) {
             end
         elseif enh == 'FAF_SelfRepairSystemRemove' then
             -- remove prerequisites
-            self:RemoveToggleCap('RULEUTC_CloakToggle')
+            self:RemoveToggleCap('RULEUTC_StealthToggle')
             self:DisableUnitIntel('Enhancement', 'RadarStealth')
             self:DisableUnitIntel('Enhancement', 'SonarStealth')
             self.StealthEnh = nil
@@ -191,6 +191,8 @@ URL0001 = ClassUnit(ACUUnit, CCommandUnit) {
             end
         elseif enh == 'CloakingGenerator' then
             if not bp then return end
+            self:RemoveToggleCap('RULEUTC_StealthToggle')
+            self:AddToggleCap('RULEUTC_CloakToggle')
             self.StealthEnh = nil
             self.CloakEnh = true
             self:EnableUnitIntel('Enhancement', 'Cloak')

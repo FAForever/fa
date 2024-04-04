@@ -149,6 +149,7 @@ UnitBlueprint{
             BallisticArc = "RULEUBA_None",
             CollideFriendly = false,
             Damage = 175,
+            DamageFriendly = false,
             DamageRadius = 1,
             DamageType = "Normal",
             DisplayName = "Heavy Plasma Gatling Cannon",

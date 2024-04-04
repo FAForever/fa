@@ -524,7 +524,7 @@ AIBrain = Class(StandardBrain, EconomyComponent) {
             EngineerManager = EngineerManager.CreateEngineerManager(self, baseName, position, radius),
             BuilderHandles = {},
             Position = position,
-            BaseType = MarkerUtilities.GetMarker(baseName).Name or 'Main',
+            BaseType = MarkerUtilities.GetMarker(baseName).Type or 'MAIN',
             Layer = baseLayer,
         }
 

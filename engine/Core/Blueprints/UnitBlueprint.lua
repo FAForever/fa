@@ -27,7 +27,7 @@
 ---@alias EnhancementSlot "Back" | "RCH" | "LCH"
 ---@alias TechCategory "TECH1" | "TECH2" | "TECH3" | "EXPERIMENTAL"
 ---@alias LayerCategory "AIR" | "LAND" | "NAVAL"
----@alias FactionCategory "UEF" | "CYBRAN" | "AEON" | "SERAPHIM"
+---@alias FactionCategory "UEF" | "CYBRAN" | "AEON" | "SERAPHIM" | "NOMADS"
 ---@alias IconBackgroundType "air" | "amph" | "land" | "sea"
 
 ---@alias UnitId BlueprintId
@@ -753,6 +753,8 @@
 --- Multiplied by the resulting total energy cost of the teleport to get its required time.
 --- Treated as `0.01` when absent.
 ---@field TeleportTimeMod? number
+--- Whether to use the new variable teleport cost calculation method, or revert to the old
+---@field UseVariableTeleportCosts? boolean
 
 ---@class UnitBlueprintExternalFactory
 ---@field SelectionSizeX? number
@@ -940,8 +942,14 @@
 ---@field TarmacGlowDecal? any unused
 --- defines the tech level used for display purposes
 ---@field TechLevel UnitTechLevel
---- if present, makes the "teleport" ability show up in the unit view with the delay of this value
+--- if present, makes the "teleport" ability show up in the unit view with the delay of this value. Defaults to 15 seconds.
 ---@field TeleportDelay? number
+--- if present, adds a flat energy cost to the "teleport" ability. Defaults to 150000 energy. Only applies when `UseVariableTeleportCosts` is true.
+---@field TeleportFlatEnergyCost? number
+--- Only applies when `UseVariableTeleportCosts` is true. Defaults to 2.500.000 energy.
+---@field TeleportMaximumEnergyCost? number
+--- Only applies when `UseVariableTeleportCosts` is true. Defaults to 50 seconds.
+---@field TeleportMaximumDuration? number
 --- table of toggle capabilities available for this unit
 ---@field ToggleCaps table<ToggleCap, boolean>
 --- table of boolean toggles set/got with SetStatByCallback/GetStat
@@ -953,7 +961,7 @@
 ---@field UpgradesFrom? UnitId
 --- what unit, if any, this unit can be upgraded to
 ---@field UpgradesTo? UnitId
---- the base unit from which all units in this upgrade chain can be upgraded from
+--- the base unit from which all units in this upgrade chain can be upgraded from. If this field is lacking then the unit may refuse to upgrade even when `UpgradesFrom` and `UpgradesTo` are set
 ---@field UpgradesFromBase? UnitId
 ---
 --- auto-generated field from `CommandCaps`
@@ -992,7 +1000,7 @@
 --- used by the Seraphim T1 air scout for how long the after-death vison remains
 ---@field IntelDurationOnDeath? number
 --- how far we create fake blips
----@field JamRadius {Max: number, Min: number}
+---@field JamRadius { Max: number, Min: number }
 --- how many blips does a jammer produce
 ---@field JammerBlips number
 --- used by the Soothsayer
@@ -1022,7 +1030,7 @@
 --- how far our sonar stealth goes
 ---@field SonarStealthFieldRadius number
 --- how far off displace blips
----@field SpoofRadius {Max: number, Min: number}
+---@field SpoofRadius { Max: number, Min: number }
 --- used by the Selen to define how it needs to sit still while its cloak is enabled for it to work
 ---@field StealthWaitTime? number
 --- how far the unit can see above water and land

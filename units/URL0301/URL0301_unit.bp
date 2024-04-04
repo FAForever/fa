@@ -38,7 +38,6 @@ UnitBlueprint{
         "ENERGYPRODUCTION",
         "ENGINEER",
         "LAND",
-        "MASSFABRICATION",
         "MASSPRODUCTION",
         "MOBILE",
         "OVERLAYDIRECTFIRE",
@@ -53,6 +52,7 @@ UnitBlueprint{
         "TECH3",
         "USEBUILDPRESETS",
         "VISIBLETORECON",
+        "SNIPEMODE",
     },
     Defense = {
         AirThreatLevel = 0,
@@ -497,6 +497,12 @@ UnitBlueprint{
         ConstructionBar = true,
         FactionName = "Cybran",
         Icon = "amph",
+        OrderOverrides = {
+            RULEUTC_StealthToggle = {
+                bitmapId = "stealth-personal",
+                helpText = "toggle_stealth_personal",
+            },
+        },
         SelectionPriority = 3,
     },
     Intel = {
@@ -508,7 +514,7 @@ UnitBlueprint{
         ReactivateTime = 2,
         SonarStealth = true,
         VisionRadius = 26,
-        WaterVisionRadius = 26,
+        WaterVisionRadius = 24,
     },
     LifeBarHeight = 0.075,
     LifeBarOffset = 0.4,
@@ -620,7 +626,7 @@ UnitBlueprint{
             MuzzleSalvoSize = 1,
             MuzzleVelocity = 18,
             ProjectileId = "/projectiles/CDFLaserDisintegrator03/CDFLaserDisintegrator03_proj.bp",
-            ProjectileLifetimeUsesMultiplier = 2.4,
+            ProjectileLifetimeUsesMultiplier = 1.4,
             ProjectilesPerOnFire = 1,
             RackBones = {
                 {
@@ -639,10 +645,10 @@ UnitBlueprint{
             RateOfFire = 1,
             TargetPriorities = {
                 "MOBILE EXPERIMENTAL",
+                "COMMAND",
                 "MOBILE TECH3",
                 "MOBILE TECH2",
                 "(STRUCTURE * DEFENSE - ANTIMISSILE)",
-                "MOBILE TECH1",
                 "ALLUNITS",
             },
             TargetRestrictDisallow = "UNTARGETABLE",

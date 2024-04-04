@@ -114,9 +114,9 @@ UnitBlueprint{
         UnitName = "<LOC xsb2109_name>Sou-atha",
     },
     Intel = {
-        SonarRadius = 35,
+        SonarRadius = 36,
         VisionRadius = 12,
-        WaterVisionRadius = 45,
+        WaterVisionRadius = 44,
     },
     LifeBarHeight = 0.075,
     LifeBarOffset = 0.4,

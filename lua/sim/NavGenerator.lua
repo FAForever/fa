@@ -386,7 +386,22 @@ local ClassCompressedLabelTree = function(specs)
     return setmetatable(specs, FactoryCompressedLabelTree)
 end
 
----@class NavSection
+---@class NavPathingData
+---@field HeapFrom? NavLeafIdentifier   # Populated during path finding
+---@field HeapAcquiredCosts? number     # Populated during path finding
+---@field HeapTotalCosts? number        # Populated during path finding
+---@field HeapIdentifier? number        # Populated during path finding
+
+---@class NavLeaf : NavPathingData
+---@field Root NavTree
+---@field Identifier NavLeafIdentifier
+---@field Size number               # Element count starting at { bx + ox, bz + oz }, used as a parameter during path finding to determine if a unit can pass
+---@field Label number              # Label for efficient `CanPathTo` check
+---@field Section number            
+---@field px number                 # x-coordinate of center in world space
+---@field pz number                 # z-coordinate of center in world space
+
+---@class NavSection : NavPathingData
 ---@field Area number
 ---@field Center Vector
 ---@field Identifier NavSectionIdentifier
@@ -394,23 +409,6 @@ end
 ---@field Leaves NavLeaf[]
 ---@field Neighbors NavSectionIdentifier[]
 ---@field Tree NavTreeIdentifier
----@field HeapFrom NavSectionIdentifier
----@field HeapIdentifier number
----@field HeapAcquiredCosts number
----@field HeapTotalCosts number
-
----@class NavLeaf 
----@field Root NavTree
----@field Identifier number
----@field Size number               # Element count starting at { bx + ox, bz + oz }, used as a parameter during path finding to determine if a unit can pass
----@field Label number              # Label for efficient `CanPathTo` check
----@field Section number            
----@field px number                 # x-coordinate of center in world space
----@field pz number                 # z-coordinate of center in world space
----@field From? NavLeaf             # Populated during path finding
----@field HeapAcquiredCosts? number     # Populated during path finding
----@field HeapTotalCosts? number        # Populated during path finding
----@field Seen? number              # Populated during path finding
 
 --- A simplified quad tree that acts as a compression of the pathing capabilities of a section of the heightmap
 ---@class NavTree: table<number, NavLeaf | number>
@@ -419,8 +417,6 @@ end
 ---@field Labels table<number, number>      # Maps a label to the ratio of area that it occupies in this tree
 ---@field Leaves table <number, NavLeaf[]>  # Maps a label to the leaves that represent that label, sorted from largest to smallest
 ---@field Sections table <number, table<number, NavLeaf[]>>
----@field Seen number | nil                 # Used during navigating
----@field Threat number | nil               # Used during navigating
 CompressedLabelTree = ClassCompressedLabelTree {
 
     ---@param self NavTree
@@ -1713,11 +1709,6 @@ local function ComputeTreeInformation(mapHasWater)
                     cz = cz / av
 
                     section.Center = { cx, GetSurfaceHeight(cx, cz), cz }
-
-                    if av > 1 then
-                        DrawCircle(section.Center, 10, 'ffffff')
-                    end
-
                     sections[label][sHead] = section
 
                     -- proceed with processing the next section

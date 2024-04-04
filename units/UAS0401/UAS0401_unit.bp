@@ -31,6 +31,7 @@ UnitBlueprint{
     BuildIconSortPriority = 120,
     Categories = {
         "AEON",
+        "ANTITORPEDO",
         "ANTINAVY",
         "BATTLESHIP",
         "BUILTBYTIER3COMMANDER",
@@ -219,8 +220,8 @@ UnitBlueprint{
         UnitName = "<LOC uas0401_name>Tempest",
     },
     Intel = {
-        RadarRadius = 150,
-        SonarRadius = 250,
+        RadarRadius = 148,
+        SonarRadius = 248,
         VisionRadius = 100,
         WaterVisionRadius = 100,
     },
@@ -418,8 +419,8 @@ UnitBlueprint{
             DisableWhileReloading = true,
             DisplayName = "Quasar Anti Torpedo",
             FireTargetLayerCapsTable = {
-                Sub = "Sub|Water",
-                Water = "Sub|Water",
+                Sub = "Water",
+                Water = "Water",
             },
             FiringTolerance = 180,
             Label = "AntiTorpedo01",

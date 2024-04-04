@@ -193,7 +193,7 @@ UnitBlueprint{
             RackReloadTimeout = 10,
             RackSalvoChargeTime = 0.1,
             RackSalvoFiresAfterCharge = true,
-            RackSalvoReloadTime = 0.1,
+            RackSalvoReloadTime = 0.0,
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_AntiAir",

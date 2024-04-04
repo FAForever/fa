@@ -143,7 +143,7 @@ UnitBlueprint{
         UnitName = "<LOC xeb0104_name>The Kennel",
         UpgradesTo = "xeb0204",
     },
-    Intel = { VisionRadius = 15 },
+    Intel = { VisionRadius = 14 },
     LifeBarHeight = 0.075,
     LifeBarOffset = 0.35,
     LifeBarSize = 1.25,
