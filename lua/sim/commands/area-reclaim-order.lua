@@ -55,7 +55,6 @@ local function ReclaimAdjacentUnits (units, target, doPrint)
 
     -- exclude the expansion and faction identifier
     local blueprintIdPostfix = string.sub(target.Blueprint.BlueprintId, 2)
-
     while TableGetn(stack) > 0 do
         local current = TableRemove(stack)
         if current != target then
@@ -65,7 +64,7 @@ local function ReclaimAdjacentUnits (units, target, doPrint)
         local adjacentUnits = current.AdjacentUnits
         if adjacentUnits then
             for _, unit in adjacentUnits do
-                if blueprintIdPostfix == string.sub(target.Blueprint.BlueprintId, 2) then
+                if blueprintIdPostfix == string.sub(unit.Blueprint.BlueprintId, 2) then
                     if not seen[unit.EntityId] then
                         seen[unit.EntityId] = true
                         TableInsert(stack, unit)
