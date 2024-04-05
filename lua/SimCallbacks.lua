@@ -730,7 +730,6 @@ do
         local queue = unit:GetCommandQueue()
         local lastCommand = queue[table.getn(queue)]
 
-        reprsl(lastCommand)
         if not (lastCommand and lastCommand.commandType == 19 and lastCommand.target) then
             return
         end
