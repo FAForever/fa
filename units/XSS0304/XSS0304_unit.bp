@@ -227,7 +227,7 @@ UnitBlueprint{
             },
             BallisticArc = "RULEUBA_None",
             CollideFriendly = false,
-            Damage = 320,
+            Damage = 400,
             DamageType = "Normal",
             DisplayName = "Uall Cavitation Torpedo",
             FireTargetLayerCapsTable = {
@@ -237,7 +237,7 @@ UnitBlueprint{
             FiringTolerance = 2000,
             Label = "TorpedoFront",
             MaxRadius = 65,
-            MuzzleSalvoDelay = 0.8,
+            MuzzleSalvoDelay = 1,
             MuzzleSalvoSize = 4,
             MuzzleVelocity = 10,
             ProjectileId = "/projectiles/SANUallCavitationTorpedo04/SANUallCavitationTorpedo04_proj.bp",
@@ -260,7 +260,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_AntiNavy",
-            RateOfFire = 0.25,
+            RateOfFire = 0.2,
             SlavedToBody = true,
             SlavedToBodyArcRange = 10,
             TargetPriorities = {
