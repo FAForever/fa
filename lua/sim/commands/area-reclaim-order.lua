@@ -86,11 +86,7 @@ end
 ---@param target Prop
 ---@param doPrint boolean
 local function ReclaimNearbyProps (units, target, doPrint)
-    local radius = 1.5
-    if target.IsTreeGroup then
-        radius = 0.1
-    end
-
+    local radius = 1.0
     local px, _, pz = target:GetPositionXYZ()
     local adjacentReclaim = GetReclaimablesInRect(px - radius, pz - radius, px + radius, pz + radius)
     local processed = 0
@@ -98,7 +94,12 @@ local function ReclaimNearbyProps (units, target, doPrint)
     if adjacentReclaim then
         for k = 1, TableGetn(adjacentReclaim) do
             local entity = adjacentReclaim[k] --[[@as Prop]]
-            if target != entity and IsProp(entity) and entity.MaxMassReclaim > 0 and (entity.IsTree == target.IsTree) then
+            local ex, _, ez = entity:GetPositionXYZ()
+            if target != entity and IsProp(entity) and
+                entity.MaxMassReclaim > 0 and
+                entity.IsTree == target.IsTree and
+                VDist2(px, pz, ex, ez) <= radius
+            then
                 IssueReclaim(units, entity)
                 processed = processed + 1
             end
