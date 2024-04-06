@@ -14,8 +14,14 @@ local categoriesToCollect = {
     air = categories.AIR,
     naval = categories.NAVAL,
     cdr = categories.COMMAND,
+    sacu = categories.SUBCOMMANDER,
+    engineer = categories.ENGINEER,
+    tech1 = categories.TECH1,
+    tech2 = categories.TECH2,
+    tech3 = categories.TECH3,
     experimental = categories.EXPERIMENTAL,
     structures = categories.STRUCTURE,
+    transportation = categories.TRANSPORTATION
 }
 
 -- Format specifications for achievements: https://github.com/FAForever/fa/issues/5813
