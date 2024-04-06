@@ -101,6 +101,7 @@ armordefinition = {
         'Normal 1.0',
         'CzarBeam 0.25',
         'OtheTacticalBomb 0.1',
+        'Deathnuke 0.75',
     },
     {
         -- Armor Type name
