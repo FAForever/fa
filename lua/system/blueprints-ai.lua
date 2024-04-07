@@ -269,16 +269,6 @@ function SetUnitThreatValues(unitBPs)
             end
         end
 
-        -- Sanitise the table
-        for i, v in cache do
-            -- Round appropriately
-            if v < 1 then
-                cache[i] = 0
-            else
-                cache[i] = MathFloor(v + 0.5)
-            end
-        end
-
         -- transfer information to blueprint table
         for k, v in cache do
             bp.Defense[k] = v
