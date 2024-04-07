@@ -20,6 +20,7 @@ local categoriesToCollect = {
 }
 
 -- Format specifications for achievements: https://github.com/FAForever/fa/issues/5813
+-- Example JSON with all the expected fields: https://github.com/FAForever/server/blob/665454a5d8a2d97a1b512f89bcadef7a25343e6a/tests/data/game_stats_simple_win.json#L38
 -- Unit categories used in achievements: `def _category_stats` in https://github.com/FAForever/server/blob/develop/server/stats/game_stats_service.py
 -- Unit IDs used for unit categories: https://github.com/FAForever/server/blob/develop/server/stats/unit.py
 -- The 'kills', 'built', and 'loss' stats for each category are checked for each army at the end of the game
