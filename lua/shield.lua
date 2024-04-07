@@ -149,7 +149,7 @@ end
 ---@field PassOverkillDamage boolean
 ---@field ImpactMeshBp string
 ---@field SkipAttachmentCheck boolean
----@field AbsorptionType AbsorptionType
+---@field AbsorptionTypeDamageTypeToMulti table<DamageType, number>
 Shield = ClassShield(moho.shield_methods, Entity) {
 
     RemainEnabledWhenAttached = false,
@@ -223,8 +223,8 @@ Shield = ClassShield(moho.shield_methods, Entity) {
             self.CommandShield = true
         end
 
-        -- lookup our damage absorption type
-        self.AbsorptionType = ownerBp.Defense.Shield.AbsorptionType or "Default"
+        -- lookup our damage absorption type's table
+        self.AbsorptionTypeDamageTypeToMulti = shieldAbsorptionValues[ownerBp.Defense.Shield.AbsorptionType or "Default"]
 
         -- use trashbag of the unit that owns us
         self.Trash = self.Owner.Trash
@@ -455,7 +455,7 @@ Shield = ClassShield(moho.shield_methods, Entity) {
     ---@return number damageAbsorbed If not all damage is absorbed, the remainder passes to targets under the shield.
     OnGetDamageAbsorption = function(self, instigator, amount, type)
         -- Allow decoupling the shield from the owner's armor multiplier
-        local absorptionMulti = shieldAbsorptionValues[self.AbsorptionType][type] or self.Owner:GetArmorMult(type)
+        local absorptionMulti = self.AbsorptionTypeDamageTypeToMulti[type] or self.Owner:GetArmorMult(type)
 
         -- Like armor damage, first multiply by armor reduction, then apply handicap
         -- See SimDamage.cpp (DealDamage function) for how this should work
