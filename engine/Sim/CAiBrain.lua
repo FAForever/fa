@@ -45,7 +45,7 @@ end
 ---@param builder Unit
 ---@param blueprintID UnitId
 ---@param buildLocation Vector
----@param buildRelative boolean if true, the location is used as an offset to the builders current location
+---@param buildRelative? boolean if true, the location is used as an offset to the builders current location
 function CAiBrain:BuildStructure(builder, blueprintID, buildLocation, buildRelative)
 end
 
@@ -138,7 +138,7 @@ end
 --- points in the template are used.
 ---
 ---@param type          string
----@param structureName filename # blueprint file
+---@param structureName FileName # blueprint file
 ---@param buildingTypes BuildingTemplate[]
 ---@param relative      boolean
 ---@param builder       Unit
@@ -327,8 +327,8 @@ end
 --- ..........   ....xxx...
 --- ..........   ..........
 ---@param restriction boolean
----@param threatType BrainThreatType
----@param armyIndex number defaults to use all enemy armies.
+---@param threatType? BrainThreatType
+---@param armyIndex? number defaults to use all enemy armies.
 ---@return Vector
 ---@return number
 function CAiBrain:GetHighestThreatPosition(ring, restriction, threatType, armyIndex)
@@ -394,7 +394,7 @@ end
 ---@param position Vector
 ---@param radius number in game units
 ---@param restriction boolean
----@param threatType BrainThreatType
+---@param threatType? BrainThreatType
 ---@param armyIndex? number defaults to this brain's index
 ---@return number
 function CAiBrain:GetThreatAtPosition(position, radius, restriction, threatType, armyIndex)

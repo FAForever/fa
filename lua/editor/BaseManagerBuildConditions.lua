@@ -258,7 +258,7 @@ end
 
 ---@param aiBrain AIBrain
 ---@param baseName string
----@param catTable string
+---@param catTable table
 ---@return boolean
 function CategoriesBeingBuilt(aiBrain, baseName, catTable)
     if not aiBrain.BaseManagers[baseName] then

@@ -1,3 +1,4 @@
+---@diagnostic disable: undefined-global
 -- Info about exe patches and new lua<->engine functions
 
 -- sim version of GetStat(). Awesome function as it already sends a string, integer and unit object to engine +

@@ -25,6 +25,7 @@ local CoroutineYield = coroutine.yield
 ---@field TargetAIBrain AIBrain
 
 ---@class PlatoonTable
+---@field PlatoonTemplate string
 ---@alias AIResult "defeat" | "draw" | "victor"
 ---@alias HqTech "TECH2" | "TECH3"
 ---@alias HqLayer "AIR" | "LAND" | "NAVY"
@@ -547,6 +548,13 @@ local CategoriesDummyUnit = categories.DUMMYUNIT
 ---@field UnitBuiltTriggerList table
 ---@field PingCallbackList { CallbackFunction: fun(pingData: any), PingType: string }[]
 ---@field BrainType 'Human' | 'AI'
+---@field BaseTemplates table
+---@field BaseManagers table
+---@field AttackData table
+---@field AttackManager table
+---@field BuilderManagers table
+---@field IntelData table
+---@field PBM table
 AIBrain = Class(AIBrainHQComponent, AIBrainStatisticsComponent, AIBrainJammerComponent, AIBrainEnergyComponent,
     moho.aibrain_methods) {
 

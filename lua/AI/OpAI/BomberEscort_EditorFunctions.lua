@@ -82,7 +82,7 @@ end
 ---@param platoon Platoon
 function BomberEscortAI(platoon)
     local aiBrain = platoon:GetBrain()
-    local target = false
+    local target
     --local cmd = false
     while aiBrain:PlatoonExists(platoon) do
         target = false

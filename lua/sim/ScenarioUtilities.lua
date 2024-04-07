@@ -1069,8 +1069,8 @@ end
 ---Creates the specified group in game.
 ---@param strArmy string
 ---@param strGroup string
----@param wreckage Wreckage
----@param balance number
+---@param wreckage? boolean
+---@param balance? number
 ---@return Unit[]|nil
 ---@return table|nil
 ---@return Platoon[]|nil
