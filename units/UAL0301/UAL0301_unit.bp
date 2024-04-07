@@ -698,6 +698,7 @@ UnitBlueprint{
             DamageType = "Normal",
             DisplayName = "Teleport in",
             DummyWeapon = true,
+            EnabledByEnhancement = "Teleporter",
             Label = "TeleportWeapon",
             ManualFire = true,
             MaxRadius = 1,

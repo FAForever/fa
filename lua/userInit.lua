@@ -468,6 +468,8 @@ do
 
         if oldBuildQueueOfUnit then
             SetCurrentFactoryForQueueDisplay(oldBuildQueueOfUnit)
+        else
+            ClearCurrentFactoryForQueueDisplay()
         end
 
         return queue

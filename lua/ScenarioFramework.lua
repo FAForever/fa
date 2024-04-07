@@ -1246,8 +1246,8 @@ function SetPlayableArea(rect, voFlag)
     local x1 = rect.x1 - math.mod(rect.x1, 4)
     local y1 = rect.y1 - math.mod(rect.y1, 4)
 
-    LOG(string.format('Debug: SetPlayableArea before round : %s, %s %s, %s', rect.x0, rect.y0, rect.x1, rect.y1))
-    LOG(string.format('Debug: SetPlayableArea after round : %s, %s %s, %s', x0, y0, x1, y1))
+    SPEW(string.format('SetPlayableArea before round : %s, %s %s, %s', rect.x0, rect.y0, rect.x1, rect.y1))
+    SPEW(string.format('SetPlayableArea after round : %s, %s %s, %s', x0, y0, x1, y1))
 
     ScenarioInfo.MapData.PlayableRect = {x0, y0, x1, y1}
     rect.x0 = x0

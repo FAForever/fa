@@ -714,6 +714,32 @@ do
     end
 end
 
+do
+
+    ---@param data table
+    ---@param selection Unit[]
+    Callbacks.ExtendReclaimOrder = function(data, selection)
+        -- verify selection
+        selection = SecureUnits(selection)
+        if (not selection) or TableEmpty(selection) then
+            return
+        end
+
+        -- verify the command queue
+        local unit = selection[1]
+        local queue = unit:GetCommandQueue()
+        local lastCommand = queue[table.getn(queue)]
+
+        if not (lastCommand and lastCommand.commandType == 19 and lastCommand.target) then
+            return
+        end
+
+        local target = lastCommand.target --[[@as Unit | Prop]]
+        import("/lua/sim/commands/area-reclaim-order.lua").AreaReclaimOrder(selection, target, true)
+    end
+
+end
+
 --#endregion
 
 -------------------------------------------------------------------------------
