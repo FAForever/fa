@@ -655,6 +655,7 @@
 
 ---@class UnitBlueprintTarmac
 ---@field Albedo FileName
+---@field Albedo2 FileName
 ---@field DeathLifetime number
 ---@field FadeOut number
 ---@field Length number
