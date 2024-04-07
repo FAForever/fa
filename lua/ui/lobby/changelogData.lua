@@ -1,8 +1,22 @@
 ---@type number
-last_version = 3807
+last_version = 3808
 
 ---@type PatchNotes[]
 gamePatches = {
+    {
+        version = 3808,
+        name = "Hotfix",
+        hasPrettyGithubRelease = true,
+        description = {
+            "# Game Version 3808 (7th of April, 2024)",
+            "",
+            "A small hotfix because we it appears we finally managed to get achievements working again. ",
+            "",
+            "With gratitude to all those who took the time to report issues,",
+            "",
+            "Jip",
+        }
+    },
     {
         version = 3807,
         name = "Hotfix",
