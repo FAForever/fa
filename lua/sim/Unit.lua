@@ -83,6 +83,17 @@ SyncMeta = {
     end,
 }
 
+--- All the following unit fields originate from buffs.
+---@class UnitBuffFields
+---@field EnergyBuildAdjMod? number
+---@field MassBuildAdjMod? number
+---@field EnergyMaintAdjMod? number
+---@field MassMaintAdjMod? number
+---@field EnergyProdAdjMod? number
+---@field MassProdAdjMod? number
+---@field AdjEnergyMod? number
+---@field AdjRoFMod? number
+
 ---@class UnitCommand
 ---@field x number
 ---@field y number
@@ -107,7 +118,7 @@ SyncMeta = {
 local cUnit = moho.unit_methods
 local cUnitGetBuildRate = cUnit.GetBuildRate
 
----@class Unit : moho.unit_methods, InternalObject, IntelComponent, VeterancyComponent, AIUnitProperties
+---@class Unit : moho.unit_methods, InternalObject, IntelComponent, VeterancyComponent, AIUnitProperties, UnitBuffFields
 ---@field AIManagerIdentifier? string
 ---@field Repairers table<EntityId, Unit>
 ---@field Brain AIBrain
