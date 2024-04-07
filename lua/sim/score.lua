@@ -22,12 +22,13 @@ local categoriesToCollect = {
 -- Format specifications for achievements: https://github.com/FAForever/fa/issues/5813
 -- Unit categories used in achievements: `def _category_stats` in https://github.com/FAForever/server/blob/develop/server/stats/game_stats_service.py
 -- Unit IDs used for unit categories: https://github.com/FAForever/server/blob/develop/server/stats/unit.py
-
 -- The 'kills', 'built', and 'loss' stats for each category are checked for each army at the end of the game
 local categoriesForAchievements = {
     transportation = categories.TRANSPORTATION, 
     sacu = categories.SUBCOMMANDER,
-    -- Tracked by FAF server events but doesn't increment any achievements
+
+    -- Tracked by FAF server events but doesn't increment any achievements. We do need to include them
+    -- or the achievements do not update as a whole.
     engineer = categories.ENGINEER,
     tech1 = categories.TECH1,
     tech2 = categories.TECH2,
