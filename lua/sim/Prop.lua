@@ -342,7 +342,7 @@ Prop = Class(moho.prop_methods) {
             -- attempt to make the prop
             ok, out = pcall(self.CreatePropAtBone, self, ibone, blueprint)
             if ok then
-                out:SetMaxReclaimValues(time, mass, energy)
+                --out:SetMaxReclaimValues(time, mass, energy)
                 props[ibone] = out
             else
                 WARN("Unable to split a prop: " .. self.Blueprint.BlueprintId .. " -> " .. blueprint)
