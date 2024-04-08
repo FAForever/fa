@@ -1882,7 +1882,7 @@ function Generate()
     SPEW(infoMessage)
 
     local allocatedSizeGrids = debug.allocatedrsize(NavGrids) / (1024 * 1024)
-    local allocatedSizeLabels = debug.allocatedrsize.ToBytes(NavLabels, { Node = true }) / (1024 * 1024)
+    local allocatedSizeLabels = debug.allocatedrsize(NavLabels, { Node = true }) / (1024 * 1024)
 
     local infoMessage = string.format("Allocating %.1fmb memory", allocatedSizeGrids)
     print(infoMessage)
