@@ -33,7 +33,6 @@
 ---@field newline string
 ---@field meta boolean
 ---@field indent string
----@field cycles table<any, number>
 local Inspector = {}
 local Inspector_mt = { __index = Inspector }
 
@@ -163,23 +162,6 @@ local function getKeys(t)
     return keys, keysLen, seqLen
 end
 
----@param x any
----@param cycles table<any, number>
-local function countCycles(x, cycles)
-    if type(x) == "table" then
-        if cycles[x] then
-            cycles[x] = cycles[x] + 1
-        else
-            cycles[x] = 1
-            for k, v in rawpairs(x) do
-                countCycles(k, cycles)
-                countCycles(v, cycles)
-            end
-            countCycles(getmetatable(x), cycles)
-        end
-    end
-end
-
 ---@param buf table
 ---@param str string
 local function puts(buf, str)
@@ -275,6 +257,7 @@ end
 ---@param options? DebugInspectOptions
 ---@return string
 local function inspect(root, options)
+    LOG(debug.traceback())
     options = options or {}
 
     local depth = options.depth or 1
@@ -282,14 +265,10 @@ local function inspect(root, options)
     local indent = options.indent or '  '
     local meta = options.meta or false
 
-    local cycles = {}
-    countCycles(root, cycles)
-
     ---@type DebugInspector
     local inspector = setmetatable({
         buf = { n = 0 },
         ids = {},
-        cycles = cycles,
         depth = depth,
         meta = meta,
         level = 0,

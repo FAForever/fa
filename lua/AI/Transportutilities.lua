@@ -1792,7 +1792,11 @@ function WatchUnitLoading( transport, units, aiBrain, UnitPlatoon)
 			unitsdead = false
 			loading = true
 			-- here is where we issue the Load command to the transport --
-			safecall("Unable to IssueTransportLoad units are "..repr(units), IssueTransportLoad, newunits, transport )
+			local ok, msg = pcall(IssueTransportLoad, {u}, transport )
+			if not ok then
+				LOG("Unable to IssueTransportLoad to: " .. repr(u.Blueprint.BlueprintId))
+			end
+
 			break
 		end
 	end
