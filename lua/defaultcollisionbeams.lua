@@ -20,7 +20,7 @@
 --** SOFTWARE.
 --**********************************************************************************
 
--- Base beam
+-- Base beam that defines default effects
 SCCollisionBeam = import("/lua/sim/collisionBeams/SCCollisionBeam.lua").SCCollisionBeam
 
 -- UEF
@@ -38,14 +38,15 @@ UnstablePhasonLaserCollisionBeam = import("/lua/sim/collisionBeams/UnstablePhaso
 UltraChromaticBeamGeneratorCollisionBeam = import("/lua/sim/collisionBeams/UltraChromaticBeamGeneratorCollisionBeam.lua").UltraChromaticBeamGeneratorCollisionBeam
 UltraChromaticBeamGeneratorCollisionBeam02 = import("/lua/sim/collisionBeams/UltraChromaticBeamGeneratorCollisionBeam02.lua").UltraChromaticBeamGeneratorCollisionBeam02
 
--- Unused UEF, Cybran, Aeon, Seraphim
+-- Unused Beams
+-- UEF
 GinsuCollisionBeam = import("/lua/sim/collisionBeams/GinsuCollisionBeam.lua").GinsuCollisionBeam
-
+-- Cybran
 ParticleCannonCollisionBeam = import("/lua/sim/collisionBeams/ParticleCannonCollisionBeam.lua").ParticleCannonCollisionBeam
-
+-- Aeon
 DisruptorBeamCollisionBeam = import("/lua/sim/collisionBeams/DisruptorBeamCollisionBeam.lua").DisruptorBeamCollisionBeam 
 TractorClawCollisionBeam = import("/lua/sim/collisionBeams/TractorClawCollisionBeam.lua").TractorClawCollisionBeam
-
+-- Seraphim
 ExperimentalPhasonLaserCollisionBeam = import("/lua/sim/collisionBeams/ExperimentalPhasonLaserCollisionBeam.lua").ExperimentalPhasonLaserCollisionBeam
 
 --#region Backwards compatibility
