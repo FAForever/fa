@@ -2,9 +2,7 @@ local EffectTemplate = import("/lua/effecttemplates.lua")
 
 local SCCollisionBeam = import("/lua/defaultcollisionbeams.lua").SCCollisionBeam
 
--------------------------------
---   Ginsu COLLISION BEAM
--------------------------------
+-- Not used. Barely visible, gray, unimpressive beam.
 ---@class GinsuCollisionBeam : SCCollisionBeam
 GinsuCollisionBeam = Class(SCCollisionBeam) {
     FxBeam = EffectTemplate.TAAGinsuBeam,

@@ -4,15 +4,11 @@ local Util = import("/lua/utilities.lua")
 local CollisionBeam = import("/lua/sim/collisionbeam.lua").CollisionBeam
 local SCCollisionBeam = import("/lua/defaultcollisionbeams.lua").SCCollisionBeam
 
-------------------------------------
---   QUANTUM BEAM GENERATOR COLLISION BEAM
-------------------------------------
---- unknown unit (big size though)
+-- Not used. Seraphim style experimental-sized beam, like the Galactic Colossus's beam
 ---@class ExperimentalPhasonLaserCollisionBeam : SCCollisionBeam
 ---@field BeamEffectsBag TrashBag
 ---@field Trash TrashBag
 ExperimentalPhasonLaserCollisionBeam = Class(SCCollisionBeam) { 
-
     TerrainImpactType = 'LargeBeam01',
     TerrainImpactScale = 1,
     FxBeamStartPoint = EffectTemplate.SExperimentalPhasonLaserMuzzle01,
@@ -22,7 +18,7 @@ ExperimentalPhasonLaserCollisionBeam = Class(SCCollisionBeam) {
     ScorchSplatDropTime = 0.1,
 
     ---@param self ExperimentalPhasonLaserCollisionBeam
-    ---@param impactType string
+    ---@param impactType ImpactType
     ---@param targetEntity? Prop|Unit
     OnImpact = function(self, impactType, targetEntity)
         if impactType ~= 'Shield' and impactType ~= 'Water' and impactType ~= 'Air' and impactType ~= 'UnitAir' and impactType ~= 'Projectile' then

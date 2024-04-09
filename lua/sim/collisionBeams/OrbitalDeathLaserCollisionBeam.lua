@@ -4,12 +4,9 @@ local Util = import("/lua/utilities.lua")
 
 local SCCollisionBeam = import("/lua/defaultcollisionbeams.lua").SCCollisionBeam
 
-------------------------------------
---   ORBITAL DEATH LASER COLLISION BEAM
-------------------------------------
+-- Used by Novax Defense Satellite XEA0002's TOrbitalDeathLaserBeamWeapon
 ---@class OrbitalDeathLaserCollisionBeam : SCCollisionBeam
 OrbitalDeathLaserCollisionBeam = Class(SCCollisionBeam) { 
-    -- used by satellite
     TerrainImpactType = 'LargeBeam02',
     TerrainImpactScale = 1,
 
@@ -21,7 +18,7 @@ OrbitalDeathLaserCollisionBeam = Class(SCCollisionBeam) {
     ScorchSplatDropTime = 0.5,
 
     ---@param self OrbitalDeathLaserCollisionBeam
-    ---@param impactType string
+    ---@param impactType ImpactType
     ---@param targetEntity? Prop|Unit
     OnImpact = function(self, impactType, targetEntity)
         if impactType ~= 'Shield' and impactType ~= 'Water' and impactType ~= 'Air' and impactType ~= 'UnitAir' and impactType ~= 'Projectile' then
@@ -36,7 +33,7 @@ OrbitalDeathLaserCollisionBeam = Class(SCCollisionBeam) {
     end,
 
     ---@param self OrbitalDeathLaserCollisionBeam
-    OnDisable = function( self )
+    OnDisable = function(self)
         CollisionBeam.OnDisable(self)
         KillThread(self.Scorching)
         self.Scorching = nil   

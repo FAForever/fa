@@ -4,10 +4,10 @@ local Util = import("/lua/utilities.lua")
 local CollisionBeam = import("/lua/sim/collisionbeam.lua").CollisionBeam
 local SCCollisionBeam = import("/lua/defaultcollisionbeams.lua").SCCollisionBeam
 
---- used by ML & cyb ACU
+-- Used by Cybran Monkeylord URL0402's CDFHeavyMicrowaveLaserGenerator
+-- Also is the base class for Cybran ACU's Microwave Laser's collision beam
 ---@class MicrowaveLaserCollisionBeam01 : SCCollisionBeam
 MicrowaveLaserCollisionBeam01 = Class(SCCollisionBeam) {
-
     TerrainImpactType = 'LargeBeam01',
     TerrainImpactScale = 1,
     FxBeamStartPoint = EffectTemplate.CMicrowaveLaserMuzzle01,
@@ -17,7 +17,7 @@ MicrowaveLaserCollisionBeam01 = Class(SCCollisionBeam) {
     ScorchSplatDropTime = 0.25,
 
     ---@param self MicrowaveLaserCollisionBeam01
-    ---@param impactType string
+    ---@param impactType ImpactType
     ---@param targetEntity? Prop|Unit
     OnImpact = function(self, impactType, targetEntity)
         if impactType ~= 'Shield' and impactType ~= 'Water' and impactType ~= 'Air' and impactType ~= 'UnitAir' and impactType ~= 'Projectile' then

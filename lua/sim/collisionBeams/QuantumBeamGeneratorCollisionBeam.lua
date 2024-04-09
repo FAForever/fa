@@ -4,10 +4,7 @@ local Util = import("/lua/utilities.lua")
 local CollisionBeam = import("/lua/sim/collisionbeam.lua").CollisionBeam
 local SCCollisionBeam = import("/lua/defaultcollisionbeams.lua").SCCollisionBeam
 
-------------------------------------
---   QUANTUM BEAM GENERATOR COLLISION BEAM
-------------------------------------
---- used by CZAR
+-- Used by Aeon CZAR UAA0310's AQuantumBeamGenerator
 ---@class QuantumBeamGeneratorCollisionBeam : SCCollisionBeam
 QuantumBeamGeneratorCollisionBeam = Class(SCCollisionBeam) { 
     TerrainImpactType = 'LargeBeam02',
@@ -21,7 +18,7 @@ QuantumBeamGeneratorCollisionBeam = Class(SCCollisionBeam) {
     ScorchSplatDropTime = 0.5,
 
     ---@param self QuantumBeamGeneratorCollisionBeam
-    ---@param impactType string
+    ---@param impactType ImpactType
     ---@param targetEntity? Prop|Unit
     OnImpact = function(self, impactType, targetEntity)
         if impactType ~= 'Shield' and impactType ~= 'Water' and impactType ~= 'Air' and impactType ~= 'UnitAir' and impactType ~= 'Projectile' then

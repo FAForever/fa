@@ -5,10 +5,9 @@ local Util = import("/lua/utilities.lua")
 local CollisionBeam = import("/lua/sim/collisionbeam.lua").CollisionBeam
 local SCCollisionBeam = import("/lua/defaultcollisionbeams.lua").SCCollisionBeam
 
+-- Used by Seraphim Othuy (Ythotha's lightning storm) XSL0402's SDFUnstablePhasonBeam
 ---@class UnstablePhasonLaserCollisionBeam : SCCollisionBeam
 UnstablePhasonLaserCollisionBeam = Class(SCCollisionBeam) { 
-    -- ythota death energy ball
-
     TerrainImpactType = 'LargeBeam01',
     TerrainImpactScale = 1,
     FxBeamStartPoint = EffectTemplate.SExperimentalUnstablePhasonLaserMuzzle01,
@@ -18,7 +17,7 @@ UnstablePhasonLaserCollisionBeam = Class(SCCollisionBeam) {
     ScorchSplatDropTime = 0.25,
 
     ---@param self ExperimentalPhasonLaserCollisionBeam
-    ---@param impactType string
+    ---@param impactType ImpactType
     ---@param targetEntity? Prop|Unit
     OnImpact = function(self, impactType, targetEntity)
         if impactType ~= 'Shield' and impactType ~= 'Water' and impactType ~= 'Air' and impactType ~= 'UnitAir' and impactType ~= 'Projectile' then

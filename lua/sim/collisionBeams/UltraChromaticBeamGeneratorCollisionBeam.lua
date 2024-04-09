@@ -4,10 +4,10 @@ local Util = import("/lua/utilities.lua")
 local CollisionBeam = import("/lua/sim/collisionbeam.lua").CollisionBeam
 local SCCollisionBeam = import("/lua/defaultcollisionbeams.lua").SCCollisionBeam
 
--- This is for sera destro and sera T2 point defense.
+-- Used by Seraphim T2 Point Defense XSB2301's SDFUltraChromaticBeamGenerator
+-- Also is the base class for Seraphim Destroyer's beam generators' collision beam
 ---@class UltraChromaticBeamGeneratorCollisionBeam : SCCollisionBeam
 UltraChromaticBeamGeneratorCollisionBeam = Class(SCCollisionBeam) {
-
     TerrainImpactType = 'LargeBeam01',
     TerrainImpactScale = 1,
     FxBeamStartPoint = EffectTemplate.SUltraChromaticBeamGeneratorMuzzle01,
@@ -17,7 +17,7 @@ UltraChromaticBeamGeneratorCollisionBeam = Class(SCCollisionBeam) {
     ScorchSplatDropTime = 0.25,
 
     ---@param self UltraChromaticBeamGeneratorCollisionBeam
-    ---@param impactType string
+    ---@param impactType ImpactType
     ---@param targetEntity? Prop|Unit
     OnImpact = function(self, impactType, targetEntity)
         if impactType ~= 'Shield' and impactType ~= 'Water' and impactType ~= 'Air' and impactType ~= 'UnitAir' and impactType ~= 'Projectile' then

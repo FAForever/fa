@@ -4,10 +4,9 @@ local Util = import("/lua/utilities.lua")
 local CollisionBeam = import("/lua/sim/collisionbeam.lua").CollisionBeam
 local SCCollisionBeam = import("/lua/defaultcollisionbeams.lua").SCCollisionBeam
 
+-- Used by Aeon Galactic Colossus UAL0401's ADFPhasonLaser
 ---@class PhasonLaserCollisionBeam : SCCollisionBeam
 PhasonLaserCollisionBeam = Class(SCCollisionBeam) { 
-    -- used by GC
-
     TerrainImpactType = 'LargeBeam01',
     TerrainImpactScale = 1,
     FxBeamStartPoint = EffectTemplate.APhasonLaserMuzzle01,
@@ -17,7 +16,7 @@ PhasonLaserCollisionBeam = Class(SCCollisionBeam) {
     ScorchSplatDropTime = 0.25,
 
     ---@param self PhasonLaserCollisionBeam
-    ---@param impactType string
+    ---@param impactType ImpactType
     ---@param targetEntity? Prop|Unit
     OnImpact = function(self, impactType, targetEntity)
         if impactType ~= 'Shield' and impactType ~= 'Water' and impactType ~= 'Air' and impactType ~= 'UnitAir' and impactType ~= 'Projectile' then
