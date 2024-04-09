@@ -24,6 +24,7 @@ local DefaultBeamWeapon = import('/lua/sim/defaultweapons.lua').DefaultBeamWeapo
 local EffectTemplate = import('/lua/effecttemplates.lua')
 local CollisionBeamFile = import('/lua/defaultcollisionbeams.lua')
 
+--- Unused
 ---@class SDFExperimentalPhasonLaser : DefaultBeamWeapon
 SDFExperimentalPhasonLaser = ClassWeapon(DefaultBeamWeapon) {
     BeamType = CollisionBeamFile.ExperimentalPhasonLaserCollisionBeam,

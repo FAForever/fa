@@ -23,6 +23,7 @@
 local DefaultProjectileWeapon = import('/lua/sim/defaultweapons.lua').DefaultProjectileWeapon
 local EffectTemplate = import('/lua/effecttemplates.lua')
 
+--- Used by XSA0104
 ---@class SDFHeavyPhasicAutoGunWeapon : DefaultProjectileWeapon
 SDFHeavyPhasicAutoGunWeapon = ClassWeapon(DefaultProjectileWeapon) {
     FxMuzzleFlash = EffectTemplate.HeavyPhasicAutoGunMuzzleFlash,

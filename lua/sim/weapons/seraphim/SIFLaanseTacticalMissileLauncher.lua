@@ -23,7 +23,7 @@
 local DefaultProjectileWeapon = import('/lua/sim/defaultweapons.lua').DefaultProjectileWeapon
 local EffectTemplate = import('/lua/effecttemplates.lua')
 
--- Units: XSL0111
+-- Units: XSL0001, XSL0301
 ---@class SIFLaanseTacticalMissileLauncher : DefaultProjectileWeapon
 SIFLaanseTacticalMissileLauncher = ClassWeapon(DefaultProjectileWeapon) {
     FxMuzzleFlash = EffectTemplate.SLaanseMissleMuzzleFlash,

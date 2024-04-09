@@ -23,6 +23,7 @@
 local DefaultProjectileWeapon = import('/lua/sim/defaultweapons.lua').DefaultProjectileWeapon
 local EffectTemplate = import('/lua/effecttemplates.lua')
 
+--- Used by XSL0304
 ---@class SIFSuthanusMobileArtilleryCannon : DefaultProjectileWeapon
 SIFSuthanusMobileArtilleryCannon = ClassWeapon(DefaultProjectileWeapon) {
     FxChargeMuzzleFlash = EffectTemplate.SRifterMobileArtilleryChargeMuzzleFlash,

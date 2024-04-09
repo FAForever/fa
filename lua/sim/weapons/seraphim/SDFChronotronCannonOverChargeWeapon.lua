@@ -23,6 +23,7 @@
 local OverchargeWeapon = import('/lua/sim/defaultweapons.lua').OverchargeWeapon
 local EffectTemplate = import('/lua/effecttemplates.lua')
 
+--- Used by XSL0001
 ---@class SDFChronotronCannonOverChargeWeapon : OverchargeWeapon
 SDFChronotronCannonOverChargeWeapon = ClassWeapon(OverchargeWeapon) {
     FxMuzzleFlash = EffectTemplate.SChronotronCannonOverChargeMuzzle,

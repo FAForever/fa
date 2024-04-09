@@ -23,6 +23,7 @@
 local DefaultProjectileWeapon = import('/lua/sim/defaultweapons.lua').DefaultProjectileWeapon
 local EffectTemplate = import('/lua/effecttemplates.lua')
 
+--- Used by XSB4302
 ---@class SIFHuAntiNukeWeapon : DefaultProjectileWeapon
 SIFHuAntiNukeWeapon = ClassWeapon(DefaultProjectileWeapon) {
     FxMuzzleFlash = EffectTemplate.SKhuAntiNukeMuzzleFlash,
