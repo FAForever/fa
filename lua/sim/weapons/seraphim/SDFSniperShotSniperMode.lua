@@ -23,6 +23,7 @@
 local DefaultProjectileWeapon = import('/lua/sim/defaultweapons.lua').DefaultProjectileWeapon
 local EffectTemplate = import('/lua/effecttemplates.lua')
 
+--- used by XSL0305
 ---@class SDFSniperShotSniperMode : DefaultProjectileWeapon
 SDFSniperShotSniperMode = ClassWeapon(DefaultProjectileWeapon) {
     FxMuzzleFlash = EffectTemplate.SDFSniperShotMuzzleFlash,

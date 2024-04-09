@@ -21,9 +21,10 @@
 --**********************************************************************************
 
 local DefaultProjectileWeapon = import('/lua/sim/defaultweapons.lua').DefaultProjectileWeapon
-local EffectTemplate = import('/lua/effecttemplates.lua').SElectrumMissleDefenseMuzzleFlash
+local EffectTemplate = import('/lua/effecttemplates.lua')
 
+--- Used by XSB4201, XSS0202, XSS0302, XSS0303
 ---@class SAMElectrumMissileDefense : DefaultProjectileWeapon
 SAMElectrumMissileDefense = ClassWeapon(DefaultProjectileWeapon) {
-    FxMuzzleFlash = EffectTemplate,
+    FxMuzzleFlash = EffectTemplate.SElectrumMissleDefenseMuzzleFlash,
 }

@@ -21,9 +21,10 @@
 --**********************************************************************************
 
 local DefaultProjectileWeapon = import('/lua/sim/defaultweapons.lua').DefaultProjectileWeapon
-local EffectTemplate = import('/lua/effecttemplates.lua').SAnaitTorpedoMuzzleFlash
+local EffectTemplate = import('/lua/effecttemplates.lua')
 
+--- Used by XSS0201
 ---@class SANAnaitTorpedo : DefaultProjectileWeapon
 SANAnaitTorpedo = ClassWeapon(DefaultProjectileWeapon) {
-    FxMuzzleFlash = EffectTemplate,
+    FxMuzzleFlash = EffectTemplate.SAnaitTorpedoMuzzleFlash,
 }

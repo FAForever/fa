@@ -21,9 +21,10 @@
 --**********************************************************************************
 
 local DefaultProjectileWeapon = import('/lua/sim/defaultweapons.lua').DefaultProjectileWeapon
-local EffectTemplate = import('/lua/effecttemplates.lua').SLosaareAutoCannonMuzzleFlashAirUnit
+local EffectTemplate = import('/lua/effecttemplates.lua')
 
+--- Used by XSA0303
 ---@class SAALosaareAutoCannonWeaponAirUnit : DefaultProjectileWeapon
 SAALosaareAutoCannonWeaponAirUnit = ClassWeapon(DefaultProjectileWeapon) {
-    FxMuzzleFlash = EffectTemplate,
+    FxMuzzleFlash = EffectTemplate.SLosaareAutoCannonMuzzleFlashAirUnit,
 }

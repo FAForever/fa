@@ -21,10 +21,10 @@
 --**********************************************************************************
 
 local DefaultProjectileWeapon = import('/lua/sim/defaultweapons.lua').DefaultProjectileWeapon
-local EffectTemplate = import('/lua/effecttemplates.lua').SAireauBolterMuzzleFlash
+local EffectTemplate = import('/lua/effecttemplates.lua')
 
--- Units: XSL0303
+-- Units: XSL0202, XSL0303
 ---@class SDFAireauBolterWeapon : DefaultProjectileWeapon
 SDFAireauBolterWeapon = ClassWeapon(DefaultProjectileWeapon) {
-    FxMuzzleFlash = EffectTemplate,
+    FxMuzzleFlash = EffectTemplate.SAireauBolterMuzzleFlash,
 }

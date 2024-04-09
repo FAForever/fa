@@ -24,6 +24,7 @@ local DefaultBeamWeapon = import('/lua/sim/defaultweapons.lua').DefaultBeamWeapo
 local EffectTemplate = import('/lua/effecttemplates.lua')
 local CollisionBeamFile = import('/lua/defaultcollisionbeams.lua')
 
+--- Used by XSL0402
 ---@class SDFUnstablePhasonBeam : DefaultBeamWeapon
 SDFUnstablePhasonBeam = ClassWeapon(DefaultBeamWeapon) {
     BeamType = CollisionBeamFile.UnstablePhasonLaserCollisionBeam,

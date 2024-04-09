@@ -23,6 +23,7 @@
 local DefaultProjectileWeapon = import('/lua/sim/defaultweapons.lua').DefaultProjectileWeapon
 local EffectTemplate = import('/lua/effecttemplates.lua')
 
+--- Used by XSA0304
 ---@class SIFBombZhanaseeWeapon : DefaultProjectileWeapon
 SIFBombZhanaseeWeapon = ClassWeapon(DefaultProjectileWeapon) {
     FxMuzzleFlash = EffectTemplate.SZhanaseeMuzzleFlash01,

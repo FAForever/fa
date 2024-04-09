@@ -23,7 +23,7 @@
 local DefaultProjectileWeapon = import('/lua/sim/defaultweapons.lua').DefaultProjectileWeapon
 local EffectTemplate = import('/lua/effecttemplates.lua')
 
--- Units: XSB2303
+-- Used by: XSB2303
 ---@class SIFZthuthaamArtilleryCannon : DefaultProjectileWeapon
 SIFZthuthaamArtilleryCannon = ClassWeapon(DefaultProjectileWeapon) {
     FxMuzzleFlash= EffectTemplate.SZthuthaamArtilleryMuzzleFlash,
