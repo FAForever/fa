@@ -18,7 +18,7 @@ UnitBlueprint{
     },
     BuildIconSortPriority = 40,
     Categories = {
-        "BUILTBYEXPERIMENTALSUB",
+        "ANTITORPEDO",
         "BUILTBYTIER2FACTORY",
         "BUILTBYTIER3FACTORY",
         "COUNTERINTELLIGENCE",
@@ -36,6 +36,7 @@ UnitBlueprint{
         "STEALTHFIELD",
         "TECH2",
         "VISIBLETORECON",
+        "ANTITORPEDO",
     },
     Defense = {
         AirThreatLevel = 0,

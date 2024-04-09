@@ -12,7 +12,6 @@ UnitBlueprint{
     Categories = {
         "ANTIAIR",
         "ANTIMISSILE",
-        "BUILTBYEXPERIMENTALSUB",
         "BUILTBYTIER2FACTORY",
         "BUILTBYTIER3FACTORY",
         "CRUISER",
@@ -193,12 +192,11 @@ UnitBlueprint{
             FireTargetLayerCapsTable = { Water = "Land|Water|Seabed" },
             FiringTolerance = 2,
             Label = "Missile",
-            MaxProjectileStorage = 1,
             MaxRadius = 150,
-            MinRadius = 17.5,
+            MinRadius = 18,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
-            MuzzleVelocity = 5,
+            MuzzleVelocity = 12,
             ProjectileId = "/projectiles/SIFLaanseTacticalMissile02/SIFLaanseTacticalMissile02_proj.bp",
             ProjectileLifetime = 60,
             RackBones = {
@@ -339,7 +337,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = true,
             RangeCategory = "UWRC_AntiAir",
-            RateOfFire = 3,
+            RateOfFire = 3.333,
             TargetPriorities = {
                 "EXPERIMENTAL",
                 "AIR MOBILE TECH3 BOMBER",

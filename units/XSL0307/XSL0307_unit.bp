@@ -176,6 +176,7 @@ UnitBlueprint{
     LifeBarOffset = 0.45,
     LifeBarSize = 0.8,
     Physics = {
+        BackUpDistance = 10,
         BankingSlope = 0.5,
         BuildOnLayerCaps = {
             LAYER_Air = false,
@@ -190,7 +191,7 @@ UnitBlueprint{
         MaxAcceleration = 4,
         MaxBrake = 4,
         MaxSpeed = 4,
-        MaxSpeedReverse = 0,
+        MaxSpeedReverse = 4,
         MaxSteerForce = 1000,
         MeshExtentsX = 1,
         MeshExtentsY = 0.65,
@@ -198,7 +199,7 @@ UnitBlueprint{
         MinSpeedPercent = 0,
         MotionType = "RULEUMT_Hover",
         RotateBodyWhileMoving = true,
-        RotateOnSpot = true,
+        RotateOnSpot = false,
         RotateOnSpotThreshold = 0.1,
         TurnFacingRate = 120,
         TurnRadius = 0,

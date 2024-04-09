@@ -56,7 +56,7 @@ Expressions = {
     SERAPHIM    = "(SERAPHIM - COMMAND)",
     NOMADS      = "(NOMADS - COMMAND)",
 
-    T4ARTY      = "(ARTILLERY * EXPERIMENTAL) - FACTORY",  -- "xab2307 + url0401 + ueb2401"
+    T4ARTY      = "(ARTILLERY * EXPERIMENTAL * STRATEGIC) - FACTORY",  -- "xab2307 + url0401 + ueb2401"
     T3ARTY      = "(ARTILLERY * STRUCTURE * TECH3)",  -- "uab2302 + urb2302 + ueb2302 + xsb2302", Heavy Artillery
     T2ARTY      = "(ARTILLERY * STRUCTURE * TECH2)",
     T1ARTY      = "(ARTILLERY * STRUCTURE * TECH1)",
@@ -75,13 +75,13 @@ Expressions = {
     TMLBASE     = "(STRUCTURE * TACTICALMISSILEPLATFORM)", -- xsb2108 + urb2108 + ueb2108 + uab2108
     TMLMOBILE   = "(MOBILE * LAND * INDIRECTFIRE * SILO)", -- XSL0111 + URL0111 + UEL0111 + UAL0111 + XEL0306
 
-    -- added exclusion of engineers and structures because they are restricted by other presets
-    LAND        = "(LAND - ENGINEER - STRUCTURE + SUBCOMMANDER)",
+    -- added exclusion of engineers, structures, and Scathis because they are restricted by other presets
+    LAND        = "(LAND - ENGINEER - STRUCTURE + SUBCOMMANDER - url0401)",
     -- added restriction of air staging structures because they are not needed when all air units are restricted
-    AIR         = "(STRUCTURE * AIRSTAGINGPLATFORM) + (AIR - POD)",
+    AIR         = "(STRUCTURE * AIRSTAGINGPLATFORM) + (AIR - POD) - (SATELLITE + ORBITALSYSTEM)",
     NAVAL       = "((STRUCTURE * NAVAL * FACTORY) + (NAVAL * MOBILE - MOBILESONAR))",
     HOVER       = "(HOVER - INSIGNIFICANTUNIT - ENGINEER)",
-    AMPHIBIOUS  = "(AMPHIBIOUS)",
+    AMPHIBIOUS  = "(AMPHIBIOUS - COMMAND)",
     SUBS        = "((NAVAL * SUBMERSIBLE) - STRUCTURE)",
     BOTS        = "(LAND * BOT)",
     BASE        = "(STRUCTURE - FACTORY - MASSEXTRACTION - MASSSTORAGE - MASSFABRICATION - ENERGYPRODUCTION - ENERGYSTORAGE + MOBILESONAR)",
@@ -168,7 +168,7 @@ Expressions = {
     INTEL_OPTICS = "(STRUCTURE * OPTICS)", -- "xab3301 + xrb3301",
     INTEL_SONAR  = "(STRUCTURE * SONAR) + MOBILESONAR",
     INTEL_BASE   = "(((OMNI + RADAR + SONAR) * STRUCTURE) + MOBILESONAR - DEFENSE)",
-    INTEL_AIR    = "(((OMNI + RADAR + SONAR + SCOUT) * AIR) - BOMBER - DEFENSE - GROUNDATTACK - ANTIAIR - ANTINAVY)",
+    INTEL_AIR    = "(((OMNI + RADAR + SONAR + SCOUT) * AIR) - BOMBER - DEFENSE - GROUNDATTACK - ANTIAIR - ANTINAVY - SATELLITE)",
     INTEL_LAND   = "(((OMNI + RADAR + SONAR + SCOUT) * LAND) - COMMAND - DEFENSE - SUBCOMMANDER - ANTIAIR - ANTINAVY)",
 
     STEALTH_BASE = "(STEALTHFIELD * STRUCTURE)",

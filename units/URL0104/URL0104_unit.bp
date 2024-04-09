@@ -114,6 +114,7 @@ UnitBlueprint{
     LifeBarOffset = 0.3,
     LifeBarSize = 0.5,
     Physics = {
+        BackUpDistance = 6,
         BankingSlope = 0,
         BuildOnLayerCaps = {
             LAYER_Air = false,
@@ -127,11 +128,11 @@ UnitBlueprint{
         MaxAcceleration = 2.9,
         MaxBrake = 2.9,
         MaxSpeed = 2.9,
-        MaxSpeedReverse = 0,
+        MaxSpeedReverse = 2.9,
         MaxSteerForce = 10,
         MinSpeedPercent = 0,
         MotionType = "RULEUMT_Land",
-        RotateOnSpot = true,
+        RotateOnSpot = false,
         RotateOnSpotThreshold = 0.5,
         TurnRadius = 5,
         TurnRate = 90,
