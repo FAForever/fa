@@ -20,6 +20,8 @@
 --** SOFTWARE.
 --******************************************************************************************************
 
+local Bitmap   = import("/lua/maui/bitmap.lua").Bitmap
+
 local UIUtil = import("/lua/ui/uiutil.lua")
 local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
 local Reticle = import('/lua/ui/controls/reticle.lua').Reticle
@@ -37,18 +39,22 @@ TeleportReticle = ClassUI(Reticle) {
 
     ---@param self UITeleportReticle
     SetLayout = function(self)
-        self.ePrefix = UIUtil.CreateText(self, "Eng Cost: ", 16, UIUtil.bodyFont, true)
-        self.tPrefix = UIUtil.CreateText(self, "Max Time: ", 16, UIUtil.bodyFont, true)
+        self.BuildTimeIcon = Bitmap(self)
+        self.BuildTimeIcon:SetTexture(UIUtil.UIFile('/game/unit_view_icons/time.dds'))
+        LayoutHelpers.SetDimensions(self.BuildTimeIcon, 19, 19)
+
+        self.EnergyCostIcon = Bitmap(self)
+        self.EnergyCostIcon:SetTexture(UIUtil.UIFile('/game/unit_view_icons/energy.dds'))
+        LayoutHelpers.SetDimensions(self.EnergyCostIcon, 19, 19)
+
         self.eText = UIUtil.CreateText(self, "eCost", 16, UIUtil.bodyFont, true)
         self.tText = UIUtil.CreateText(self, "tCost", 16, UIUtil.bodyFont, true)
-        LayoutHelpers.RightOf(self.ePrefix, self, 4)
-        LayoutHelpers.RightOf(self.eText, self.ePrefix, 0)
-        LayoutHelpers.Below(self.tPrefix, self.ePrefix, 4)
-        LayoutHelpers.RightOf(self.tText, self.tPrefix, 0)
+        LayoutHelpers.RightOf(self.EnergyCostIcon, self, 4)
+        LayoutHelpers.RightOf(self.eText, self.EnergyCostIcon, 2)
+        LayoutHelpers.Below(self.BuildTimeIcon, self.EnergyCostIcon, 4)
+        LayoutHelpers.RightOf(self.tText, self.BuildTimeIcon, 2)
 
-        self.ePrefix:SetColor('654bc2')
-        self.tPrefix:SetColor('654bc2')
-        self.eText:SetColor('ffff00')
+        self.eText:SetColor('fff7c70f') -- from economy_mini.lua, same color as the energy stored/storage text
     end,
 
     ---@param self UITeleportReticle
@@ -65,8 +71,8 @@ TeleportReticle = ClassUI(Reticle) {
                 end
             end
             -- update our text
-            self.eText:SetText(string.format('%.0f', eCost))
-            self.tText:SetText(string.format('%.2f', tCost))
+            self.eText:SetText(string.format('%.0f (-%.0f)', eCost, eCost/tCost))
+            self.tText:SetText(string.format('%.1f', tCost))
         else
             if self.changedOnMap then
                 self.eText:SetText('--')

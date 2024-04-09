@@ -22,17 +22,27 @@
 
 local SemiBallisticComponent = import("/lua/sim/projectiles/components/semiballisticcomponent.lua").SemiBallisticComponent
 
+local MathAbs = math.abs
+
 ---@class TacticalMissileComponent : SemiBallisticComponent
+---@field TerminalTimeFactor number # Duration of the terminal phase as a proportion of glide time. Default is 0.25.
+---@field TerminalDistance number   # Approximate distance from the target where terminal phase starts, overrides TerminalTimeFactor.
+---@field TerminalSpeed number      # MaxSpeed of the missile in the terminal phase.
+---@field TerminalZigZagMultiplier number     # MaxZigZag of the missile in the terminal phase. Default is 0.25.
 TacticalMissileComponent = ClassSimple(SemiBallisticComponent) {
+    
+    TerminalTimeFactor = 0.25,
+    TerminalZigZagMultiplier = 0.25,
 
     ---@param self TacticalMissileComponent | Projectile
     MovementThread = function(self, skipLaunchSequence)
         local blueprintPhysics = self.Blueprint.Physics
+        local blueprintMaxZigZag = blueprintPhysics.MaxZigZag
 
         -- are we a wiggler?
         local zigZagger = false
-        if blueprintPhysics.MaxZigZag and
-            blueprintPhysics.MaxZigZag > self.MaxZigZagThreshold then
+        if blueprintMaxZigZag and
+            blueprintMaxZigZag > self.MaxZigZagThreshold then
             zigZagger = true
         end
 
@@ -88,12 +98,55 @@ TacticalMissileComponent = ClassSimple(SemiBallisticComponent) {
             self:SetTurnRate(glideTurnRate)
         end
 
-        -- reduce the maximum zig zag frequency halfway so that they're unlikely to miss targets
-        WaitTicks((0.75 * glideTime + 0.1) * 10)
-        self:ChangeMaxZigZag(0.5)
+        local terminalTime = glideTime * self.TerminalTimeFactor
+        local terminalDistance = self.TerminalDistance
+        local terminalSpeed = self.TerminalSpeed
+        local terminalZigZagMultiplier = self.TerminalZigZagMultiplier
+
+        local maxSpeed = blueprintPhysics.MaxSpeed
+        local accel = blueprintPhysics.Acceleration
+
+        if terminalDistance then
+            terminalTime = terminalDistance / (terminalSpeed or maxSpeed)
+        end
+
+        -- Changing the max speed below the current speed decelerates the projectile in 2 ticks.
+        -- Instead, create a smoother deceleration based on the projectile's actual acceleration.
+        if terminalSpeed then
+            local accelTime = MathAbs(maxSpeed - terminalSpeed) / accel
+
+            -- The glide time is based on max speed, but the terminal phase is based on terminal speed,
+            -- so we have to convert to the common variable of distance
+            -- and then back into time by dividing by max speed.
+            local accelDist = MathAbs((terminalSpeed * terminalSpeed - maxSpeed * maxSpeed) / 2 / accel)
+            local timeBeforeTerminal = glideTime - terminalTime * terminalSpeed / maxSpeed - accelDist / maxSpeed
+            -- Wait until the projectile reaches the point where the terminal phase should start.
+            if timeBeforeTerminal > 0 then
+                WaitTicks(timeBeforeTerminal * 10)
+            end
+
+            -- We will be changing our velocity in the next Wait, so update the lifetime.
+            glideTime = accelTime + terminalTime
+            self:SetLifetime((glideTime + 3))
+
+            for t = 0.2, accelTime, 0.2 do
+                self:SetMaxSpeed(maxSpeed - (maxSpeed - terminalSpeed) * t/accelTime)
+                WaitTicks(3) -- This waits 2 ticks instead of 3 according to GetGameTick().
+            end
+            self:SetMaxSpeed(terminalSpeed)
+        else
+            WaitTicks((glideTime - terminalTime) * 10)
+        end
+
+        glideTime = terminalTime
+
+        -- at this point we just want to make sure we hit the target, we increase the glide turn rate based
+        -- on the zig zag that the missile had during flight to make sure it can align if it needs to
+        self:ChangeMaxZigZag(terminalZigZagMultiplier * blueprintMaxZigZag)
+        self:SetTurnRate((1 + 0.6 * blueprintMaxZigZag) * glideTurnRate)
 
         -- wait until we've allegedly hit our target
-        WaitTicks((0.25 * glideTime + 1) * 10)
+        WaitTicks((glideTime + 1) * 10)
 
         -- then, if we still exist, we just want to stop existing. Therefore we find our way to the ground
         -- target the ground below us slowly turn towards the ground so that we do not fly off indefinitely

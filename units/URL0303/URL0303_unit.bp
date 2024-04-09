@@ -10,7 +10,6 @@ UnitBlueprint {
     BuildIconSortPriority = 20,
     Categories = {
         "ANTIMISSILE",
-        "BOMB",
         "BOT",
         "BUILTBYTIER3FACTORY",
         "CYBRAN",
@@ -43,7 +42,6 @@ UnitBlueprint {
     },
     Display = {
         Abilities = {
-            "<LOC ability_suicideweapon>Suicide Weapon",
             "<LOC ability_stun>EMP Weapon",
             "<LOC ability_tacticalmissledeflect>Tactical Missile Deflection",
             "<LOC ability_deathaoe>Volatile",

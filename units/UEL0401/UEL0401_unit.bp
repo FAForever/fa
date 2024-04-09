@@ -1,7 +1,7 @@
 UnitBlueprint{
     Description = "<LOC uel0401_desc>Experimental Mobile Factory",
     AI = {
-        AttackAngle = 10,
+        AttackAngle = 20,
         RefuelingMultiplier = 75,
         RefuelingRepairAmount = 500,
         RepairConsumeEnergy = 30,
@@ -377,7 +377,7 @@ UnitBlueprint{
             MuzzleVelocity = 25,
             MuzzleVelocityReduceDistance = 90,
             ProjectileId = "/projectiles/TDFGauss04/TDFGauss04_proj.bp",
-            ProjectileLifetimeUsesMultiplier = 1.15,
+            ProjectileLifetimeUsesMultiplier = 1.6,
             ProjectilesPerOnFire = 3,
             RackBones = {
                 {
@@ -455,7 +455,7 @@ UnitBlueprint{
             MuzzleVelocityReduceDistance = 90,
             PrefersPrimaryWeaponTarget = true,
             ProjectileId = "/projectiles/TDFGauss04/TDFGauss04_proj.bp",
-            ProjectileLifetimeUsesMultiplier = 1.15,
+            ProjectileLifetimeUsesMultiplier = 1.6,
             ProjectilesPerOnFire = 3,
             RackBones = {
                 {
@@ -531,7 +531,7 @@ UnitBlueprint{
             MuzzleVelocityReduceDistance = 90,
             PrefersPrimaryWeaponTarget = true,
             ProjectileId = "/projectiles/TDFGauss04/TDFGauss04_proj.bp",
-            ProjectileLifetimeUsesMultiplier = 1.15,
+            ProjectileLifetimeUsesMultiplier = 1.6,
             ProjectilesPerOnFire = 3,
             RackBones = {
                 {
@@ -609,7 +609,7 @@ UnitBlueprint{
             MuzzleVelocityReduceDistance = 90,
             PrefersPrimaryWeaponTarget = true,
             ProjectileId = "/projectiles/TDFGauss04/TDFGauss04_proj.bp",
-            ProjectileLifetimeUsesMultiplier = 1.15,
+            ProjectileLifetimeUsesMultiplier = 1.6,
             ProjectilesPerOnFire = 3,
             RackBones = {
                 {
@@ -698,7 +698,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_DirectFire",
-            RateOfFire = 3,
+            RateOfFire = 3.333,
             TargetPriorities = {
                 "TECH1 MOBILE",
                 "TECH2 MOBILE",
@@ -760,7 +760,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_DirectFire",
-            RateOfFire = 3,
+            RateOfFire = 3.333,
             TargetPriorities = {
                 "TECH1 MOBILE",
                 "TECH2 MOBILE",
@@ -826,7 +826,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_AntiAir",
-            RateOfFire = 1.5,
+            RateOfFire = 1.428,
             TargetPriorities = {
                 "AIR MOBILE TECH3 BOMBER",
                 "AIR MOBILE BOMBER",
@@ -896,7 +896,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_AntiAir",
-            RateOfFire = 1.5,
+            RateOfFire = 1.428,
             TargetPriorities = {
                 "AIR MOBILE TECH3 BOMBER",
                 "AIR MOBILE BOMBER",
