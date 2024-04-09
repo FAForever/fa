@@ -6,6 +6,6 @@ local MicrowaveLaserCollisionBeam01 = import("/lua/defaultcollisionbeams.lua").M
 MicrowaveLaserCollisionBeam02 = Class(MicrowaveLaserCollisionBeam01) {
     TerrainImpactScale = 1,
     FxBeamStartPoint = EffectTemplate.CMicrowaveLaserMuzzle01,
-    FxBeam = {'/effects/emitters/microwave_laser_beam_02_emit.bp'},
+    FxBeam = EffectTemplate.CMicrowaveLaserBeam02,
     FxBeamEndPoint = EffectTemplate.CMicrowaveLaserEndPoint01,
 }

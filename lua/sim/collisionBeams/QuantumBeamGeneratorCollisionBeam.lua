@@ -1,3 +1,4 @@
+local EffectTemplate = import("/lua/effecttemplates.lua")
 local Util = import("/lua/utilities.lua")
 
 local CollisionBeam = import("/lua/sim/collisionbeam.lua").CollisionBeam
@@ -12,19 +13,9 @@ QuantumBeamGeneratorCollisionBeam = Class(SCCollisionBeam) {
     TerrainImpactType = 'LargeBeam02',
     TerrainImpactScale = 1,
 
-    FxBeam = {'/effects/emitters/quantum_generator_beam_01_emit.bp'},
-    FxBeamEndPoint = {
-		'/effects/emitters/quantum_generator_end_01_emit.bp',
-        '/effects/emitters/quantum_generator_end_03_emit.bp',
-        '/effects/emitters/quantum_generator_end_04_emit.bp',
-        '/effects/emitters/quantum_generator_end_05_emit.bp',
-        '/effects/emitters/quantum_generator_end_06_emit.bp',
-	},
-    FxBeamStartPoint = {
-		'/effects/emitters/quantum_generator_01_emit.bp',
-        '/effects/emitters/quantum_generator_02_emit.bp',
-        '/effects/emitters/quantum_generator_04_emit.bp',
-    },
+    FxBeam =  EffectTemplate.AQuantumBeamGeneratorBeam,
+    FxBeamEndPoint = EffectTemplate.AQuantumBeamGeneratorMuzzleFlash01,
+    FxBeamStartPoint = EffectTemplate.AQuantumBeamGeneratorHit01,
 
     SplatTexture = 'czar_mark01_albedo',
     ScorchSplatDropTime = 0.5,

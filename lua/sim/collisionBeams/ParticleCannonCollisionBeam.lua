@@ -1,3 +1,5 @@
+local EffectTemplate = import("/lua/effecttemplates.lua")
+
 local SCCollisionBeam = import("/lua/defaultcollisionbeams.lua").SCCollisionBeam
 
 ------------------------------------
@@ -5,13 +7,7 @@ local SCCollisionBeam = import("/lua/defaultcollisionbeams.lua").SCCollisionBeam
 ------------------------------------
 ---@class ParticleCannonCollisionBeam : SCCollisionBeam
 ParticleCannonCollisionBeam = Class(SCCollisionBeam) {
-    FxBeam = {
-		'/effects/emitters/particle_cannon_beam_01_emit.bp',
-        '/effects/emitters/particle_cannon_beam_02_emit.bp'
-	},
-    FxBeamEndPoint = {
-		'/effects/emitters/particle_cannon_end_01_emit.bp',
-		'/effects/emitters/particle_cannon_end_02_emit.bp',
-	},
+    FxBeam = EffectTemplate.CParticleCannonBeam,
+    FxBeamEndPoint = EffectTemplate.CParticleCannonHit02,
     FxBeamEndPointScale = 1,
 }

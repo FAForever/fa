@@ -1160,6 +1160,10 @@ AQuarkBombHitUnit01 = AQuarkBombHit01
 AQuarkBombHitAirUnit01 = AQuarkBombHit02
 AQuarkBombHitLand01 = AQuarkBombHit01
 
+APhasonLaserBeam = {
+    EmtBpPath .. 'phason_laser_beam_01_emit.bp',
+}
+
 APhasonLaserMuzzle01 = {
     EmtBpPath .. 'phason_laser_muzzle_01_emit.bp',
     EmtBpPath .. 'phason_laser_muzzle_02_emit.bp',
@@ -1317,6 +1321,15 @@ CSoothSayerAmbient = {
 -- ---------------------------------------------------------------
 -- -- -- -- CYBRAN PROJECTILES -- -- --
 -- ---------------------------------------------------------------
+
+CZapperBeam = {
+    EmtBpPath .. 'zapper_beam_01_emit.bp',
+}
+
+CZapperHit01 = {
+    EmtBpPath .. 'cannon_muzzle_flash_01_emit.bp',
+    EmtBpPath .. 'sparks_07_emit.bp',
+}
 
 CBrackmanCrabPegPodSplit01 = {
     EmtBpPath .. 'cybran_brackman_crab_pegpod_split_01_emit.bp',
@@ -1615,6 +1628,14 @@ CLaserMuzzleFlash03 = {
     EmtBpPath .. 'cybran_laser_muzzle_flash_04_emit.bp',
 }
 
+CMicrowaveLaserBeam01 = {
+    EmtBpPath .. 'microwave_laser_beam_01_emit.bp',
+}
+
+CMicrowaveLaserBeam02 = { -- thinner ACU laser
+    EmtBpPath .. 'microwave_laser_beam_02_emit.bp',
+}
+
 CMicrowaveLaserMuzzle01 = {
     EmtBpPath .. 'microwave_laser_flash_01_emit.bp',
     EmtBpPath .. 'microwave_laser_muzzle_01_emit.bp',
@@ -1731,6 +1752,15 @@ CNeutronClusterBombHitWater01 = CNeutronClusterBombHit01
 CParticleCannonHit01 = { EmtBpPath .. 'laserturret_hit_flash_01_emit.bp', }
 CParticleCannonHitUnit01 = table.concatenate(CParticleCannonHit01, UnitHitShrapnel01)
 CParticleCannonHitLand01 = table.concatenate(CParticleCannonHit01)
+
+CParticleCannonBeam = { -- For unused particle cannon beam
+    EmtBpPath .. 'particle_cannon_beam_01_emit.bp',
+    EmtBpPath .. 'particle_cannon_beam_02_emit.bp',
+}
+CParticleCannonHit02 = { -- For unused particle cannon beam
+    EmtBpPath .. 'particle_cannon_end_01_emit.bp',
+    EmtBpPath .. 'particle_cannon_end_02_emit.bp',
+}
 
 CProtonBombHit01 = {
     EmtBpPath .. 'proton_bomb_hit_01_emit.bp',
@@ -1852,6 +1882,32 @@ CMobileBeetleExplosion = {
 -- -- -- -- UEF PROJECTILES (previously Terran) -- -- --
 -- ---------------------------------------------------------------
 
+-- ------------------------------------------------------------------------
+--  TERRAN ORBITAL DEATH LASER EMITTERS
+-- ------------------------------------------------------------------------
+TOrbitalDeathLaserBeam = {
+   EmtBpPath .. 'uef_orbital_death_laser_beam_01_emit.bp'
+}
+
+TOrbitalDeathLaserMuzzleFlash01 = {
+    EmtBpPath .. 'uef_orbital_death_laser_muzzle_01_emit.bp', -- random bright blueish dots
+    EmtBpPath .. 'uef_orbital_death_laser_muzzle_02_emit.bp', -- molecular, small details
+    EmtBpPath .. 'uef_orbital_death_laser_muzzle_03_emit.bp', -- darkening lines
+    EmtBpPath .. 'uef_orbital_death_laser_muzzle_04_emit.bp', -- small downward sparks
+    EmtBpPath .. 'uef_orbital_death_laser_muzzle_05_emit.bp', -- big glow
+}
+
+TOrbitalDeathLaserHit01 = {
+    EmtBpPath .. 'uef_orbital_death_laser_end_01_emit.bp',           -- big glow
+    EmtBpPath .. 'uef_orbital_death_laser_end_02_emit.bp',           -- random bright blueish dots
+    EmtBpPath .. 'uef_orbital_death_laser_end_03_emit.bp',           -- darkening lines
+    EmtBpPath .. 'uef_orbital_death_laser_end_04_emit.bp',           -- molecular, small details
+    EmtBpPath .. 'uef_orbital_death_laser_end_05_emit.bp',           -- rings
+    EmtBpPath .. 'uef_orbital_death_laser_end_06_emit.bp',           -- upward sparks
+    EmtBpPath .. 'uef_orbital_death_laser_end_07_emit.bp',           -- outward line streaks
+    EmtBpPath .. 'uef_orbital_death_laser_end_08_emit.bp',           -- center glow
+    EmtBpPath .. 'uef_orbital_death_laser_end_distort_emit.bp',  -- screen distortion    
+}
 
 -- ------------------------------------------------------------------------
 --  TERRAN ANTI-MATTER SHELL EMITTERS
@@ -2115,6 +2171,24 @@ TAAGinsuHitUnit = {
     EmtBpPath .. 'ginsu_laser_hit_unit_01_emit.bp',
     EmtBpPath .. 'laserturret_hit_flash_03_emit.bp',
     EmtBpPath .. 'destruction_unit_hit_shrapnel_01_emit.bp',
+}
+
+TAAGinsuBeam = { -- unused
+    EmtBpPath .. 'riot_gun_beam_01_emit.bp',
+    EmtBpPath .. 'riot_gun_beam_02_emit.bp',
+}
+
+TAAGinsuEndPoint = { -- unused
+    EmtBpPath .. 'sparks_02_emit.bp',
+}
+
+TAAGinsuHitLand02 = { -- unused
+    EmtBpPath .. 'destruction_land_hit_puff_01_emit.bp',
+    EmtBpPath .. 'destruction_explosion_flash_01_emit.bp',
+}
+
+TAAGinsuHitUnit02 = { -- unused
+    EmtBpPath .. 'riotgun_hit_flash_01_emit.bp',
 }
 
 
@@ -4334,6 +4408,37 @@ SDFSniperShotPolytrail = {
 -- -- -- -- -- -- -- AEON PROJECTILES -- -- -- -- -- --
 -- ---------------------------------------------------------------
 
+ADisruptorBeamBeam = {
+    EmtBpPath .. 'disruptor_beam_01_emit.bp',
+}
+
+ADisruptorBeamMuzzleFlash01 = {
+    EmtBpPath .. 'aeon_commander_disruptor_flash_01_emit.bp',
+    EmtBpPath .. 'aeon_commander_disruptor_flash_02_emit.bp',
+}
+
+ADisruptorBeamHit01 = {
+    EmtBpPath .. 'aeon_commander_disruptor_hit_01_emit.bp',
+    EmtBpPath .. 'aeon_commander_disruptor_hit_02_emit.bp',
+}
+
+AQuantumBeamGeneratorBeam = {
+    EmtBpPath .. 'quantum_generator_beam_01_emit.bp',
+}
+
+AQuantumBeamGeneratorMuzzleFlash01 = {
+    EmtBpPath .. 'quantum_generator_01_emit.bp',
+    EmtBpPath .. 'quantum_generator_02_emit.bp',
+    EmtBpPath .. 'quantum_generator_04_emit.bp',
+}
+
+AQuantumBeamGeneratorHit01 = {
+    EmtBpPath .. 'quantum_generator_end_01_emit.bp',
+    EmtBpPath .. 'quantum_generator_end_03_emit.bp',
+    EmtBpPath .. 'quantum_generator_end_04_emit.bp',
+    EmtBpPath .. 'quantum_generator_end_05_emit.bp',
+    EmtBpPath .. 'quantum_generator_end_06_emit.bp',
+}
 
 Aeon_QuadLightLaserCannonMuzzleFlash = {
     EmtBpPath .. 'aeon_dualquantum_cannon_muzzle_flash_emit.bp',

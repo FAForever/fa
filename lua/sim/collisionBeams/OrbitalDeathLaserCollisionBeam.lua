@@ -1,4 +1,5 @@
 local CollisionBeam = import("/lua/sim/collisionbeam.lua").CollisionBeam
+local EffectTemplate = import("/lua/effecttemplates.lua")
 local Util = import("/lua/utilities.lua")
 
 local SCCollisionBeam = import("/lua/defaultcollisionbeams.lua").SCCollisionBeam
@@ -12,25 +13,9 @@ OrbitalDeathLaserCollisionBeam = Class(SCCollisionBeam) {
     TerrainImpactType = 'LargeBeam02',
     TerrainImpactScale = 1,
 
-    FxBeam = {'/effects/emitters/uef_orbital_death_laser_beam_01_emit.bp'},
-    FxBeamEndPoint = {
-		'/effects/emitters/uef_orbital_death_laser_end_01_emit.bp',			-- big glow
-		'/effects/emitters/uef_orbital_death_laser_end_02_emit.bp',			-- random bright blueish dots
-		'/effects/emitters/uef_orbital_death_laser_end_03_emit.bp',			-- darkening lines
-		'/effects/emitters/uef_orbital_death_laser_end_04_emit.bp',			-- molecular, small details
-		'/effects/emitters/uef_orbital_death_laser_end_05_emit.bp',			-- rings
-		'/effects/emitters/uef_orbital_death_laser_end_06_emit.bp',			-- upward sparks
-		'/effects/emitters/uef_orbital_death_laser_end_07_emit.bp',			-- outward line streaks
-		'/effects/emitters/uef_orbital_death_laser_end_08_emit.bp',			-- center glow
-		'/effects/emitters/uef_orbital_death_laser_end_distort_emit.bp',	-- screen distortion
-	},
-    FxBeamStartPoint = {
-		'/effects/emitters/uef_orbital_death_laser_muzzle_01_emit.bp',	-- random bright blueish dots
-		'/effects/emitters/uef_orbital_death_laser_muzzle_02_emit.bp',	-- molecular, small details
-		'/effects/emitters/uef_orbital_death_laser_muzzle_03_emit.bp',	-- darkening lines
-		'/effects/emitters/uef_orbital_death_laser_muzzle_04_emit.bp',	-- small downward sparks
-		'/effects/emitters/uef_orbital_death_laser_muzzle_05_emit.bp',	-- big glow
-    },
+    FxBeam = EffectTemplate.TOrbitalDeathLaserBeam,
+    FxBeamEndPoint = EffectTemplate.TOrbitalDeathLaserMuzzleFlash01,
+    FxBeamStartPoint = EffectTemplate.TOrbitalDeathLaserHit01,
 
     SplatTexture = 'czar_mark01_albedo',
     ScorchSplatDropTime = 0.5,
