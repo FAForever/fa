@@ -20,27 +20,32 @@
 --** SOFTWARE.
 --**********************************************************************************
 
---Base beam
+-- Base beam
 SCCollisionBeam = import("/lua/sim/collisionBeams/SCCollisionBeam.lua").SCCollisionBeam
---UEF
+
+-- UEF
 TDFHiroCollisionBeam = import("/lua/sim/collisionBeams/TDFHiroCollisionBeam.lua").TDFHiroCollisionBeam
 OrbitalDeathLaserCollisionBeam = import("/lua/sim/collisionBeams/OrbitalDeathLaserCollisionBeam.lua").OrbitalDeathLaserCollisionBeam
---Cybran
+-- Cybran
 ZapperCollisionBeam = import("/lua/sim/collisionBeams/ZapperCollisionBeam.lua").ZapperCollisionBeam
 MicrowaveLaserCollisionBeam01 = import("/lua/sim/collisionBeams/MicrowaveLaserCollisionBeam01.lua").MicrowaveLaserCollisionBeam01
 MicrowaveLaserCollisionBeam02 = import("/lua/sim/collisionBeams/MicrowaveLaserCollisionBeam02.lua").MicrowaveLaserCollisionBeam02
---Aeon
+-- Aeon
 QuantumBeamGeneratorCollisionBeam = import("/lua/sim/collisionBeams/QuantumBeamGeneratorCollisionBeam.lua").QuantumBeamGeneratorCollisionBeam
-TractorClawCollisionBeam = import("/lua/sim/collisionBeams/TractorClawCollisionBeam.lua").TractorClawCollisionBeam
 PhasonLaserCollisionBeam = import("/lua/sim/collisionBeams/PhasonLaserCollisionBeam.lua").PhasonLaserCollisionBeam
---Seraphim
+-- Seraphim
 UnstablePhasonLaserCollisionBeam = import("/lua/sim/collisionBeams/UnstablePhasonLaserCollisionBeam.lua").UnstablePhasonLaserCollisionBeam
 UltraChromaticBeamGeneratorCollisionBeam = import("/lua/sim/collisionBeams/UltraChromaticBeamGeneratorCollisionBeam.lua").UltraChromaticBeamGeneratorCollisionBeam
 UltraChromaticBeamGeneratorCollisionBeam02 = import("/lua/sim/collisionBeams/UltraChromaticBeamGeneratorCollisionBeam02.lua").UltraChromaticBeamGeneratorCollisionBeam02
---Unused (UEF, Cybran, Aeon, Seraphim)
+
+-- Unused UEF, Cybran, Aeon, Seraphim
 GinsuCollisionBeam = import("/lua/sim/collisionBeams/GinsuCollisionBeam.lua").GinsuCollisionBeam
+
 ParticleCannonCollisionBeam = import("/lua/sim/collisionBeams/ParticleCannonCollisionBeam.lua").ParticleCannonCollisionBeam
+
 DisruptorBeamCollisionBeam = import("/lua/sim/collisionBeams/DisruptorBeamCollisionBeam.lua").DisruptorBeamCollisionBeam 
+TractorClawCollisionBeam = import("/lua/sim/collisionBeams/TractorClawCollisionBeam.lua").TractorClawCollisionBeam
+
 ExperimentalPhasonLaserCollisionBeam = import("/lua/sim/collisionBeams/ExperimentalPhasonLaserCollisionBeam.lua").ExperimentalPhasonLaserCollisionBeam
 
 --#region Backwards compatibility
