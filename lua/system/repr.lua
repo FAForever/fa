@@ -253,6 +253,7 @@ function Inspector:putValue(v)
     end
 end
 
+--- Debugging code to inspect a table. This can be an extensive operation, at no point should this code run outside of a debugging session!
 ---@param root any
 ---@param options? DebugInspectOptions
 ---@return string
