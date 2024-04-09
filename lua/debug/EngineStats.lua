@@ -98,7 +98,6 @@ function AddStats(parentCtrl, children, indent, add)
             else
                 hideItems[name] = true
             end
-            repr(hideItems)
         end
 
         local hidden = hideItems[name]
