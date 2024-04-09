@@ -227,7 +227,7 @@ UnitBlueprint{
             },
             BallisticArc = "RULEUBA_None",
             CollideFriendly = false,
-            Damage = 400,
+            Damage = 380,
             DamageType = "Normal",
             DisplayName = "Uall Cavitation Torpedo",
             FireTargetLayerCapsTable = {
@@ -260,7 +260,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_AntiNavy",
-            RateOfFire = 0.2,
+            RateOfFire = 0.22,
             SlavedToBody = true,
             SlavedToBodyArcRange = 10,
             TargetPriorities = {
