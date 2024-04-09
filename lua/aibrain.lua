@@ -436,7 +436,7 @@ local AIBrainEnergyComponent = ClassSimple {
 
                         -- allow for debugging
                         if not ok then
-                            WARN("ToggleEnergyExcessUnitsThread: " .. repr(msg))
+                            WARN(string.format("ToggleEnergyExcessUnitsThread: %s", tostring(msg)))
                         end
 
                         break
@@ -465,7 +465,7 @@ local AIBrainEnergyComponent = ClassSimple {
 
                         -- allow for debugging
                         if not ok then
-                            WARN("ToggleEnergyExcessUnitsThread: " .. repr(msg))
+                            WARN(string.format("ToggleEnergyExcessUnitsThread: %s", tostring(msg)))
                         end
 
                         break
