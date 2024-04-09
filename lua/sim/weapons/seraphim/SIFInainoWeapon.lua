@@ -23,6 +23,7 @@
 local DefaultProjectileWeapon = import('/lua/sim/defaultweapons.lua').DefaultProjectileWeapon
 local EffectTemplate = import('/lua/effecttemplates.lua')
 
+--- Used by XSB2305, XSS0302
 ---@class SIFInainoWeapon : DefaultProjectileWeapon
 SIFInainoWeapon = ClassWeapon(DefaultProjectileWeapon) {
     FxMuzzleFlash = EffectTemplate.SIFInainoLaunch01,

@@ -23,6 +23,7 @@
 local DefaultProjectileWeapon = import('/lua/sim/defaultweapons.lua').DefaultProjectileWeapon
 local EffectTemplate = import('/lua/effecttemplates.lua')
 
+--- Used by XSB2401
 ---@class SIFExperimentalStrategicMissile : DefaultProjectileWeapon
 SIFExperimentalStrategicMissile = ClassWeapon(DefaultProjectileWeapon) {
     FxMuzzleFlash = EffectTemplate.SIFExperimentalStrategicMissileLaunch01,

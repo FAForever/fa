@@ -21,23 +21,31 @@
 --**********************************************************************************
 
 local DefaultProjectileWeapon = import('/lua/sim/defaultweapons.lua').DefaultProjectileWeapon
+local DefaultProjectileWeaponPlayFxMuzzleSequence = DefaultProjectileWeapon.PlayFxMuzzleSequence
+
 local EffectTemplate = import('/lua/effecttemplates.lua')
 
--- Units: XSL0303
+-- upvalue scope for performance
+local GetTerrainType = GetTerrainType
+local CreateAttachedEmitter = CreateAttachedEmitter
+
+-- Units: XSL0203, XSL0303
 ---@class SDFThauCannon : DefaultProjectileWeapon
 SDFThauCannon = ClassWeapon(DefaultProjectileWeapon) {
     FxMuzzleFlash = EffectTemplate.STauCannonMuzzleFlash,
     FxMuzzleTerrainTypeName = 'ThauTerrainMuzzle',
 
     PlayFxMuzzleSequence = function(self, muzzle)
-        DefaultProjectileWeapon.PlayFxMuzzleSequence(self, muzzle)
-        local pos = self.unit:GetPosition()
-        local TerrainType = GetTerrainType(pos.x,pos.z)
-        local effectTable = TerrainType.FXOther[self.unit.Layer][self.FxMuzzleTerrainTypeName]
-        if effectTable ~= nil then
-            local army = self.unit.Army
+        DefaultProjectileWeaponPlayFxMuzzleSequence(self, muzzle)
+        local unit = self.unit
+        local px, _, pz = unit:GetPositionXYZ()
+
+        local TerrainType = GetTerrainType(px, pz)
+        local effectTable = TerrainType.FXOther[unit.Layer][self.FxMuzzleTerrainTypeName]
+        if effectTable then
+            local army = unit.Army
             for k, v in effectTable do
-                CreateAttachedEmitter(self.unit, muzzle, army, v)
+                CreateAttachedEmitter(unit, muzzle, army, v)
             end
         end
     end,
