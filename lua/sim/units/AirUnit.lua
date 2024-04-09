@@ -1,9 +1,12 @@
 local MobileUnit = import("/lua/sim/units/mobileunit.lua").MobileUnit
+local MobileUnitOnCreate = MobileUnit.OnCreate
+local MobileUnitOnMotionVertEventChange = MobileUnit.OnMotionVertEventChange
+local MobileUnitOnKilled = MobileUnit.OnKilled
+local MobileUnitOnCollisionCheck = MobileUnit.OnCollisionCheck
 
-local explosion = import("/lua/defaultexplosions.lua")
 local EffectUtil = import("/lua/effectutilities.lua")
 local EffectTemplate = import("/lua/effecttemplates.lua")
-local ScenarioFramework = import("/lua/scenarioframework.lua")
+local DefaultExplosions = import("/lua/defaultexplosions.lua")
 
 ---@class AirUnit : MobileUnit
 AirUnit = ClassUnit(MobileUnit) {
@@ -19,7 +22,7 @@ AirUnit = ClassUnit(MobileUnit) {
 
     ---@param self AirUnit
     OnCreate = function(self)
-        MobileUnit.OnCreate(self)
+        MobileUnitOnCreate(self)
         self.HasFuel = true
         self:AddPingPong()
     end,
@@ -41,7 +44,7 @@ AirUnit = ClassUnit(MobileUnit) {
     ---@param new string
     ---@param old string
     OnMotionVertEventChange = function(self, new, old)
-        MobileUnit.OnMotionVertEventChange(self, new, old)
+        MobileUnitOnMotionVertEventChange(self, new, old)
 
         local blueprint = self.Blueprint
         local blueprintIntel = blueprint.Intel
@@ -154,12 +157,12 @@ AirUnit = ClassUnit(MobileUnit) {
     ---@param self AirUnit
     ---@param scale number
     CreateUnitAirDestructionEffects = function(self, scale)
-        local scale = explosion.GetAverageBoundingXZRadius(self)
+        local scale = DefaultExplosions.GetAverageBoundingXZRadius(self)
         local blueprint = self.Blueprint
-        explosion.CreateDefaultHitExplosion(self, scale)
+        DefaultExplosions.CreateDefaultHitExplosion(self, scale)
 
         if self.ShowUnitDestructionDebris then
-            explosion.CreateDebrisProjectiles(self, scale, { blueprint.SizeX, blueprint.SizeY, blueprint.SizeZ })
+            DefaultExplosions.CreateDebrisProjectiles(self, scale, { blueprint.SizeX, blueprint.SizeY, blueprint.SizeZ })
         end
     end,
 
@@ -224,7 +227,7 @@ AirUnit = ClassUnit(MobileUnit) {
 
             self.Brain:OnUnitKilled(self, instigator, type, overkillRatio)
         else
-            MobileUnit.OnKilled(self, instigator, type, overkillRatio)
+            MobileUnitOnKilled(self, instigator, type, overkillRatio)
         end
     end,
 
@@ -253,6 +256,6 @@ AirUnit = ClassUnit(MobileUnit) {
             return false
         end
 
-        return MobileUnit.OnCollisionCheck(self, other, firingWeapon)
+        return MobileUnitOnCollisionCheck(self, other, firingWeapon)
     end,
 }

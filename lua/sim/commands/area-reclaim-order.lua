@@ -22,6 +22,7 @@
 
 -- upvalue scope for performance
 local TableGetn = table.getn
+local TableSort = table.sort
 local TableSetn = table.setn
 local TableInsert = table.insert
 local TableRemove = table.remove
@@ -31,12 +32,22 @@ local StringFormat = string.format
 local IssueReclaim = IssueReclaim
 
 ---@type table<EntityId, boolean>
+local distances = { }
+
+---@type table<EntityId, boolean>
 local seen = { }
 
 ---@type Unit[]
 local stack = { }
 
---- Applies a reclaim order to all adjacent units
+---@param a Prop
+---@param b Prop
+---@return boolean
+local lambdaSortProps = function(a, b)
+    return distances[a.EntityId] < distances[b.EntityId]
+end
+
+--- Applies a reclaim order to all adjacent units of the same type
 ---@param units Unit[]
 ---@param target StructureUnit
 ---@param doPrint boolean
@@ -53,9 +64,8 @@ local function ReclaimAdjacentUnits (units, target, doPrint)
 
     local processed = 0
 
-    -- exclude the expansion and faction identifier
+    -- exclude the expansion (u/x) and faction identifier (a/e/s/r)
     local blueprintIdPostfix = string.sub(target.Blueprint.BlueprintId, 2)
-
     while TableGetn(stack) > 0 do
         local current = TableRemove(stack)
         if current != target then
@@ -65,7 +75,7 @@ local function ReclaimAdjacentUnits (units, target, doPrint)
         local adjacentUnits = current.AdjacentUnits
         if adjacentUnits then
             for _, unit in adjacentUnits do
-                if blueprintIdPostfix == string.sub(target.Blueprint.BlueprintId, 2) then
+                if blueprintIdPostfix == string.sub(unit.Blueprint.BlueprintId, 2) then
                     if not seen[unit.EntityId] then
                         seen[unit.EntityId] = true
                         TableInsert(stack, unit)
@@ -86,21 +96,43 @@ end
 ---@param target Prop
 ---@param doPrint boolean
 local function ReclaimNearbyProps (units, target, doPrint)
-    local radius = 1.5
-    if target.IsTreeGroup then
-        radius = 0.1
-    end
-
+    local processed = 0
+    local radius = 4.0
     local px, _, pz = target:GetPositionXYZ()
     local adjacentReclaim = GetReclaimablesInRect(px - radius, pz - radius, px + radius, pz + radius)
-    local processed = 0
 
     if adjacentReclaim then
+        -- clean up previous iterations
+        for entityId, _ in distances do
+            distances[entityId] = nil
+        end
+
+        -- compute distances
         for k = 1, TableGetn(adjacentReclaim) do
             local entity = adjacentReclaim[k] --[[@as Prop]]
-            if target != entity and IsProp(entity) and entity.MaxMassReclaim > 0 and (entity.IsTree == target.IsTree) then
+            local ex, _, ez = entity:GetPositionXYZ()
+            local dx, dz = px - ex, pz - ez
+            distances[entity.EntityId] = dx * dx + dz * dz
+        end
+
+        -- sort the props by distance
+        TableSort(adjacentReclaim, lambdaSortProps)
+
+        for k = 1, TableGetn(adjacentReclaim) do
+            local entity = adjacentReclaim[k] --[[@as Prop]]
+            if target != entity and IsProp(entity) and
+                entity.MaxMassReclaim > 0 and
+                entity.IsTree == target.IsTree and
+                distances[entity.EntityId] <= radius * radius
+            then
                 IssueReclaim(units, entity)
                 processed = processed + 1
+            end
+
+            -- limit the number of props to add so that we do not create too many reclaim orders. The command queue
+            -- is limited to 501 commands, this limit exists to make it very difficult to reach the cap.
+            if processed >= 6 then
+                break
             end
         end
     end
