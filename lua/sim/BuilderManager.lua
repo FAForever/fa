@@ -134,7 +134,7 @@ BuilderManager = ClassSimple {
                 ', line:' ..
                 debug.getinfo(1).currentline ..
                 '] *BUILDERMANAGER ERROR: Invalid builder type: ' ..
-                repr(builderType) .. ' - in builder: ' .. newBuilder.BuilderName)
+                tostring(builderType) .. ' - in builder: ' .. newBuilder.BuilderName)
             return
         end
 

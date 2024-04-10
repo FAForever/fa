@@ -23,6 +23,7 @@
 local DefaultProjectileWeapon = import('/lua/sim/defaultweapons.lua').DefaultProjectileWeapon
 local EffectTemplate = import('/lua/effecttemplates.lua')
 
+--- Used by XSS0302
 ---@class SDFHeavyQuarnonCannon : DefaultProjectileWeapon
 SDFHeavyQuarnonCannon = ClassWeapon(DefaultProjectileWeapon) {
     FxMuzzleFlash = EffectTemplate.SHeavyQuarnonCannonMuzzleFlash,

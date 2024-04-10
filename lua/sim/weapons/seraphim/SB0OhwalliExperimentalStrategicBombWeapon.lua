@@ -22,5 +22,6 @@
 
 local DefaultProjectileWeapon = import('/lua/sim/defaultweapons.lua').DefaultProjectileWeapon
 
+--- Used by XSA0402
 ---@class SB0OhwalliExperimentalStrategicBombWeapon : DefaultProjectileWeapon
 SB0OhwalliExperimentalStrategicBombWeapon = ClassWeapon(DefaultProjectileWeapon) {}
