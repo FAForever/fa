@@ -152,6 +152,8 @@ XRL0403 = ClassUnit(CWalkingLandUnit, CConstructionTemplate) {
     end,
 
     ---@param self XRL0403
+    ---@param new HorizontalMovementState
+    ---@param old HorizontalMovementState
     OnMotionHorzEventChange = function(self, new, old)
         CWalkingLandUnit.OnMotionHorzEventChange(self, new, old)
 

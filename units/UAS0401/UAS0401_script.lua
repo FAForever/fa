@@ -87,6 +87,9 @@ UAS0401 = ClassUnit(ASeaUnit, ExternalFactoryComponent) {
         ChangeState(self, self.IdleState)
     end,
 
+    ---@param self UAS0401
+    ---@param new VerticalMovementState
+    ---@param old VerticalMovementState
     OnMotionVertEventChange = function(self, new, old)
         ASeaUnit.OnMotionVertEventChange(self, new, old)
         if new == 'Top' then

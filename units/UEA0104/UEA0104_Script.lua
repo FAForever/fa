@@ -53,6 +53,9 @@ UEA0104 = ClassUnit(AirTransport) {
         self:ForkThread(self.ExpandThread)
     end,
 
+    ---@param self UEA0104
+    ---@param new VerticalMovementState
+    ---@param old VerticalMovementState
     OnMotionVertEventChange = function(self, new, old)
         AirTransport.OnMotionVertEventChange(self, new, old)
         if (new == 'Down') then
