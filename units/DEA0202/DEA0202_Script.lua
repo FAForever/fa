@@ -12,7 +12,7 @@ local TAirUnit = import("/lua/terranunits.lua").TAirUnit
 local TAirToAirLinkedRailgun = import("/lua/terranweapons.lua").TAirToAirLinkedRailgun
 local TIFCarpetBombWeapon = import("/lua/terranweapons.lua").TIFCarpetBombWeapon
 
--- upvalaue for perfomance
+-- upvalue for perfomance
 local TrashBagAdd = TrashBag.Add
 
 ---@class DEA0202 : TAirUnit
@@ -84,11 +84,11 @@ DEA0202 = ClassUnit(TAirUnit) {
 
         if not self.LWingRotator then
             self.LWingRotator = CreateRotator(self, 'Left_Wing', 'y')
-            TrashBagAdd(trash,self.LWingRotator)
+            TrashBagAdd(trash, self.LWingRotator)
         end
         if not self.RWingRotator then
             self.RWingRotator = CreateRotator(self, 'Right_Wing', 'y')
-            TrashBagAdd(trash,self.RWingRotator)
+            TrashBagAdd(trash, self.RWingRotator)
         end
         local fighterAngle = -105
         local bomberAngle = 0
@@ -117,7 +117,7 @@ DEA0202 = ClassUnit(TAirUnit) {
     OnCreate = function(self)
         TAirUnit.OnCreate(self)
         local trash = self.Trash
-        TrashBagAdd(trash,ForkThread(self.MonitorWings, self))
+        TrashBagAdd(trash, ForkThread(self.MonitorWings, self))
     end,
 
     MonitorWings = function(self)

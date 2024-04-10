@@ -12,7 +12,7 @@ UAB0304 = ClassUnit(AQuantumGateUnit) {
     ---@param self UAB0304
     ---@param builder Unit
     ---@param layer string
-    OnStopBeingBuilt = function(self,builder,layer)
+    OnStopBeingBuilt = function(self, builder, layer)
         local army = self.Army
 
         for k, v in AQuantumGateAmbient do

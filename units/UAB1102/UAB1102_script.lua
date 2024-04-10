@@ -16,8 +16,8 @@ UAB1102 = ClassUnit(AEnergyCreationUnit) {
     WaterEffects = {'/effects/emitters/underwater_idle_bubbles_01_emit.bp',},
     WaterEffectsBones = {'Extension02'},
 
-    OnStopBeingBuilt = function(self,builder,layer)
-        AEnergyCreationUnit.OnStopBeingBuilt(self,builder,layer)
+    OnStopBeingBuilt = function(self, builder, layer)
+        AEnergyCreationUnit.OnStopBeingBuilt(self, builder, layer)
         local effects = {}
         local bones = {}
         local scale = 0.75
@@ -34,7 +34,7 @@ UAB1102 = ClassUnit(AEnergyCreationUnit) {
         end
         for keys, values in effects do
             for keysbones, valuesbones in bones do
-                TrashBagAdd(trash,CreateAttachedEmitter(self, valuesbones, army, values):ScaleEmitter(scale):OffsetEmitter(0,-0.2,1))
+                TrashBagAdd(trash, CreateAttachedEmitter(self, valuesbones, army, values):ScaleEmitter(scale):OffsetEmitter(0, -0.2, 1))
             end
         end
     end,

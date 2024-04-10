@@ -9,8 +9,9 @@
 --****************************************************************************
 local AEnergyCreationUnit = import("/lua/aeonunits.lua").AEnergyCreationUnit
 
--- upvale for perfomance
+-- upvalue for perfomance
 local TrashBagAdd = TrashBag.Add
+local Random = Random
 
 ---@class UAB1301 : AEnergyCreationUnit
 UAB1301 = ClassUnit(AEnergyCreationUnit) {
@@ -20,9 +21,9 @@ UAB1301 = ClassUnit(AEnergyCreationUnit) {
         AEnergyCreationUnit.OnStopBeingBuilt(self, builder, layer)
         local trash = self.Trash
 
-        TrashBagAdd(trash,CreateRotator(self, 'Sphere', 'x', nil, 0, 15, 80 + Random(0, 20)))
-        TrashBagAdd(trash,CreateRotator(self, 'Sphere', 'y', nil, 0, 15, 80 + Random(0, 20)))
-        TrashBagAdd(trash,CreateRotator(self, 'Sphere', 'z', nil, 0, 15, 80 + Random(0, 20)))
+        TrashBagAdd(trash, CreateRotator(self, 'Sphere', 'x', nil, 0, 15, 80 + Random(0, 20)))
+        TrashBagAdd(trash, CreateRotator(self, 'Sphere', 'y', nil, 0, 15, 80 + Random(0, 20)))
+        TrashBagAdd(trash, CreateRotator(self, 'Sphere', 'z', nil, 0, 15, 80 + Random(0, 20)))
     end,
 }
 

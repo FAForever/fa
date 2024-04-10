@@ -30,19 +30,25 @@ UAB4202 = ClassUnit(AShieldStructureUnit, ShieldEffectsComponent) {
         AShieldStructureUnit.OnShieldEnabled(self)
         ShieldEffectsComponent.OnShieldEnabled(self)
 
-        if not self.OrbManip1 then
-            self.OrbManip1 = CreateRotator(self, 'Orb', 'x', nil, 0, 45, -45)
+        local orbManip1 = self.OrbManip1
+        if not orbManip1 then
+            orbManip1 = CreateRotator(self, 'Orb', '-x', nil, 0, 45, 45)
             self.Trash:Add(self.OrbManip1)
+            self.OrbManip1 = orbManip1
+        else
+            orbManip1:SetSpinDown(false)
+            orbManip1:SetTargetSpeed(45)
         end
 
-        self.OrbManip1:SetTargetSpeed(-45)
-
-        if not self.OrbManip2 then
-            self.OrbManip2 = CreateRotator(self, 'Orb', 'z', nil, 0, 45, 45)
+        local orbManip2 = self.OrbManip2 
+        if not orbManip2 then
+            orbManip2 = CreateRotator(self, 'Orb', 'z', nil, 0, 45, 45)
             self.Trash:Add(self.OrbManip2)
+            self.OrbManip2 = orbManip2
+        else
+            orbManip2:SetSpinDown(false)
+            orbManip2:SetTargetSpeed(45)
         end
-
-        self.OrbManip2:SetTargetSpeed(45)
     end,
 
     OnShieldDisabled = function(self)
@@ -51,12 +57,10 @@ UAB4202 = ClassUnit(AShieldStructureUnit, ShieldEffectsComponent) {
 
         if self.OrbManip1 then
             self.OrbManip1:SetSpinDown(true)
-            self.OrbManip1:SetTargetSpeed(0)
         end
 
         if self.OrbManip2 then
             self.OrbManip2:SetSpinDown(true)
-            self.OrbManip2:SetTargetSpeed(0)
         end
     end,
 

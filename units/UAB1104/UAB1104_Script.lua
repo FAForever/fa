@@ -14,6 +14,13 @@ local TrashBagAdd = TrashBag.Add
 
 
 ---@class UAB1104 : AMassFabricationUnit
+---@field Damaged boolean
+---@field Open boolean
+---@field AnimFinished boolean
+---@field RotFinished boolean
+---@field Clockwise boolean 
+---@field AnimManip moho.AnimationManipulator
+---@field Goal number
 UAB1104 = ClassUnit(AMassFabricationUnit) {
     OnCreate = function(self)
         AMassFabricationUnit.OnCreate(self)
@@ -25,7 +32,7 @@ UAB1104 = ClassUnit(AMassFabricationUnit) {
         self.RotFinished = true
         self.Clockwise = true
         self.AnimManip = CreateAnimator(self)
-        TrashBagAdd(trash,self.AnimManip)
+        TrashBagAdd(trash, self.AnimManip)
     end,
 
     OnStopBeingBuilt = function(self,builder,layer)
@@ -50,33 +57,35 @@ UAB1104 = ClassUnit(AMassFabricationUnit) {
                 WaitFor(self.AnimManip)
             end
 
-            if not self.Rotator then
-                self.Rotator = CreateRotator(self, 'Axis', 'z', nil, 0, 50, 0)
-                TrashBagAdd(trash,self.Rotator)
+            local rotator = self.Rotator
+            if not rotator then
+                rotator = CreateRotator(self, 'Axis', 'z', nil, 0, 50, 0)
+                TrashBagAdd(trash, rotator)
+                self.Rotator = rotator
             else
-                self.Rotator:SetSpinDown(false)
+                rotator:SetSpinDown(false)
             end
             self.Goal = Random(120, 300)
 
             -- Ambient effects
             self.AmbientEffects = CreateEmitterAtEntity(self, army, '/effects/emitters/aeon_t1_massfab_ambient_01_emit.bp')
-            TrashBagAdd(trash,self.AmbientEffects)
+            TrashBagAdd(trash, self.AmbientEffects)
 
             while not self.Dead do
                 -- spin clockwise
                 if not self.Clockwise then
-                    self.Rotator:SetTargetSpeed(self.Goal)
+                    rotator:SetTargetSpeed(self.Goal)
                     self.Clockwise = true
                 else
-                    self.Rotator:SetTargetSpeed(-self.Goal)
+                    rotator:SetTargetSpeed(-self.Goal)
                     self.Clockwise = false
                 end
-                WaitFor(self.Rotator)
+                WaitFor(rotator)
 
                 -- slow down to change directions
-                self.Rotator:SetTargetSpeed(0)
-                WaitFor(self.Rotator)
-                self.Rotator:SetSpeed(0)
+                rotator:SetTargetSpeed(0)
+                WaitFor(rotator)
+                rotator:SetSpeed(0)
                 self.Goal = Random(120, 300)
             end
         end,
@@ -94,23 +103,26 @@ UAB1104 = ClassUnit(AMassFabricationUnit) {
                 self.AmbientEffects = nil
             end
 
-            if self.Open and self.Rotator then
-                if self.Clockwise == true then
-                    self.Rotator:SetSpinDown(true)
-                    self.Rotator:SetTargetSpeed(self.Goal)
-                else
-                    self.Rotator:SetTargetSpeed(0)
-                    WaitFor(self.Rotator)
-                    self.Rotator:SetSpinDown(true)
-                    self.Rotator:SetTargetSpeed(self.Goal)
-                end
-                WaitFor(self.Rotator)
-            end
-
             if self.Open then
-                self.AnimManip:SetRate(-1)
+                local rotator = self.Rotator
+                if rotator then
+                    if self.Clockwise == true then
+                        rotator:SetSpinDown(true)
+                        rotator:SetTargetSpeed(self.Goal)
+                    else
+                        rotator:SetTargetSpeed(0)
+                        WaitFor(rotator)
+                        rotator:SetSpinDown(true)
+                        rotator:SetTargetSpeed(self.Goal)
+                    end
+                    WaitFor(rotator)
+                end
+
+                local animManip = self.AnimManip
+
+                animManip:SetRate(-1)
                 self.Open = false
-                WaitFor(self.AnimManip)
+                WaitFor(animManip)
             end
         end,
 

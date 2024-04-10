@@ -15,6 +15,8 @@ local ForkThread = ForkThread
 local WaitSeconds = WaitSeconds
 local TrashBagAdd = TrashBag.Add
 local MathFloor = math.floor
+local GetRandomInt = util.GetRandomInt
+local GetRandomFloat = util.GetRandomFloat
 
 ---@class UAA0104 : AirTransport
 UAA0104 = ClassUnit(AirTransport) {
@@ -36,14 +38,15 @@ UAA0104 = ClassUnit(AirTransport) {
     ---@param scale number unused
     CreateUnitAirDestructionEffects = function(self, scale)
         local trash = self.Trash
-        TrashBagAdd(trash,ForkThread(self.AirDestructionEffectsThread, self))
+        TrashBagAdd(trash, ForkThread(self.AirDestructionEffectsThread, self))
     end,
 
     AirDestructionEffectsThread = function(self)
-        local numExplosions = MathFloor(table.getn(self.AirDestructionEffectBones) * 0.5)
+        local airDestructionEffectBones = self.AirDestructionEffectBones
+        local numExplosions = MathFloor(table.getn(airDestructionEffectBones) * 0.5)
         for i = 0, numExplosions do
-            explosion.CreateDefaultHitExplosionAtBone(self, self.AirDestructionEffectBones[util.GetRandomInt(1, numExplosions)], 0.5)
-            WaitSeconds(util.GetRandomFloat(0.2, 0.9))
+            explosion.CreateDefaultHitExplosionAtBone(self, airDestructionEffectBones[GetRandomInt(1, numExplosions)], 0.5)
+            WaitSeconds(GetRandomFloat(0.2, 0.9))
         end
     end,
 }

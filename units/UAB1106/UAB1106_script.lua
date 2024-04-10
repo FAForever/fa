@@ -17,10 +17,10 @@ local TrashBagAdd = TrashBag.Add
 ---@class UAB1106 : AMassStorageUnit
 UAB1106 = ClassUnit(AMassStorageUnit) {
 
-    OnStopBeingBuilt = function(self,builder,layer)
-        AMassStorageUnit.OnStopBeingBuilt(self,builder,layer)
+    OnStopBeingBuilt = function(self, builder, layer)
+        AMassStorageUnit.OnStopBeingBuilt(self, builder, layer)
         local trash = self.Trash
-        TrashBagAdd(trash,CreateStorageManip(self, 'B01', 'MASS', 0, 0, 0, 0, 0, .41))
+        TrashBagAdd(trash, CreateStorageManip(self, 'B01', 'MASS', 0, 0, 0, 0, 0, .41))
     end,
 }
 

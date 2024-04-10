@@ -40,7 +40,7 @@ DELK002 = ClassUnit(TLandUnit) {
 
                 if not self.SpinManip1 then
                     self.SpinManip1 = CreateRotator(unit, 'Right_Barrel', 'z', nil, 360, 180, 60)
-                    TrashBagAdd(trash,self.SpinManip1)
+                    TrashBagAdd(trash, self.SpinManip1)
                 end
 
                 if self.SpinManip1 then
@@ -48,7 +48,7 @@ DELK002 = ClassUnit(TLandUnit) {
                 end
                 if not self.SpinManip2 then
                     self.SpinManip2 = CreateRotator(unit, 'Left_Barrel', 'z', nil, 360, 180, 60)
-                    TrashBagAdd(trash,self.SpinManip2)
+                    TrashBagAdd(trash, self.SpinManip2)
                 end
 
                 if self.SpinManip2 then
@@ -67,7 +67,7 @@ DELK002 = ClassUnit(TLandUnit) {
                 if self.SpinManip2 then
                     self.SpinManip2:SetTargetSpeed(200)
                 end
-                EffectUtils.CreateBoneEffectsOpti(unit, 'Left_Muzzle',  army, Effects.WeaponSteam01)
+                EffectUtils.CreateBoneEffectsOpti(unit, 'Left_Muzzle', army, Effects.WeaponSteam01)
                 EffectUtils.CreateBoneEffectsOpti(unit, 'Right_Muzzle', army, Effects.WeaponSteam01)
                 TAAPhalanxWeapon.PlayFxRackSalvoChargeSequence(self)
             end,

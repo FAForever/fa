@@ -53,8 +53,6 @@ UAA0310 = ClassUnit(AirTransport, ExternalFactoryComponent) {
     ---@param overkillRatio number
     OnKilled = function(self, instigator, type, overkillRatio)
         ExternalFactoryComponent.OnKilled(self, instigator, type, overkillRatio)
-        local trash = self.Trash
-        local detector = self.detector
 
         local wep = self:GetWeaponByLabel('QuantumBeamGeneratorWeapon')
         for _, v in wep.Beams do
@@ -65,8 +63,13 @@ UAA0310 = ClassUnit(AirTransport, ExternalFactoryComponent) {
             v.Beam:Destroy()
         end
 
-        detector = CreateCollisionDetector(self)
-        TrashBagAdd(trash,self.detector)
+        local trash = self.Trash
+        local detector = self.detector
+        if not detector then
+            detector = CreateCollisionDetector(self)
+            TrashBagAdd(trash, detector)
+            self.detector = detector
+        end
         detector:WatchBone('Left_Turret01_Muzzle')
         detector:WatchBone('Right_Turret01_Muzzle')
         detector:WatchBone('Left_Turret02_WepFocus')
@@ -122,7 +125,7 @@ UAA0310 = ClassUnit(AirTransport, ExternalFactoryComponent) {
     ---@param bpShield table
     CreateShield = function(self, bpShield)
         local bpShield = table.deepcopy(bpShield)
-        local trash = self.trash
+        local trash = self.Trash
         self:DestroyShield()
 
         self.MyShield = CzarShield(bpShield, self)

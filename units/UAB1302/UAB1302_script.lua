@@ -11,6 +11,8 @@ local Waitfor = WaitFor
 
 
 ---@class UAB1302 : AMassCollectionUnit
+---@field ExtractionAnimManip moho.AnimationManipulator
+---@field ArmsUp boolean
 UAB1302 = ClassUnit(AMassCollectionUnit) {
 
     OnCreate = function(self)
@@ -19,22 +21,25 @@ UAB1302 = ClassUnit(AMassCollectionUnit) {
     end,
 
     OnStopBeingBuilt = function(self, builder, layer)
-        local bp = self.Blueprint
+        local animationActivate = self.Blueprint.Display.AnimationActivate
         local trash = self.Trash
+        local extractionAnimManip = self.ExtractionAnimManip
 
-        self.ExtractionAnimManip:PlayAnim(bp.Display.AnimationActivate):SetRate(1)
-        TrashBagAdd(trash,self.ExtractionAnimManip)
+        extractionAnimManip:PlayAnim(animationActivate):SetRate(1)
+        TrashBagAdd(trash, extractionAnimManip)
         AMassCollectionUnit.OnStopBeingBuilt(self, builder, layer)
         ChangeState(self, self.ActiveState)
     end,
 
     ActiveState = State {
         Main = function(self)
-            local bp = self.Blueprint
-            WaitFor(self.ExtractionAnimManip)
+            local animationActivate = self.Blueprint.Display.AnimationActivate
+            local extractionAnimManip = self.ExtractionAnimManip
+
+            WaitFor(extractionAnimManip)
             while not self:IsDead() do
-                self.ExtractionAnimManip:PlayAnim(bp.Display.AnimationActivate):SetRate(1)
-                WaitFor(self.ExtractionAnimManip)
+                self.ExtractionAnimManip:PlayAnim(animationActivate):SetRate(1)
+                WaitFor(extractionAnimManip)
             end
         end,
 
@@ -46,13 +51,15 @@ UAB1302 = ClassUnit(AMassCollectionUnit) {
 
     InActiveState = State {
         Main = function(self)
-            WaitFor(self.ExtractionAnimManip)
+            local extractionAnimManip = self.ExtractionAnimManip
+
+            WaitFor(extractionAnimManip)
             if self.ArmsUp == true then
-                self.ExtractionAnimManip:SetRate(-1)
-                WaitFor(self.ExtractionAnimManip)
+                extractionAnimManip:SetRate(-1)
+                WaitFor(extractionAnimManip)
                 self.ArmsUp = false
             end
-            WaitFor(self.ExtractionAnimManip)
+            WaitFor(extractionAnimManip)
         end,
 
         OnProductionUnpaused = function(self)
