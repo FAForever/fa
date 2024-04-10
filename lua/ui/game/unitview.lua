@@ -139,8 +139,23 @@ local statFuncs = {
     function(info)
         local massUsed = math.max(info.massRequested, info.massConsumed)
         if info.massProduced > 0 or massUsed > 0 then
-            return string.format('%+d', math.ceil(info.massProduced - massUsed)),
-                UIUtil.UIFile('/game/unit_view_icons/mass.dds'), '00000000'
+
+            local diff = string.format('%.2f', info.massProduced - massUsed)
+            local userUnit = info.userUnit
+            if userUnit and EntityCategoryContains(categories.STRUCTURE, userUnit) then
+                if EntityCategoryContains(categories.FACTORY, userUnit) then
+                    return diff, UIUtil.UIFile('/game/unit_view_icons/mass.dds'), '00000000'
+                else
+                    -- extractors, fabricators, etc
+                    LOG("Extractor!!!")
+                    local massProduction = userUnit:GetBlueprint().Economy.ProductionPerSecondMass
+                    local massProductionDiff = info.massProduced - massProduction
+                    diff = string.format("%s (+%.2f)", diff, massProductionDiff)
+                    return diff, UIUtil.UIFile('/game/unit_view_icons/mass.dds'), '00000000'
+                end
+            end
+
+            return diff, UIUtil.UIFile('/game/unit_view_icons/mass.dds'), '00000000'
         elseif info.armyIndex + 1 ~= GetFocusArmy() and info.kills == 0 and info.shieldRatio <= 0 then
             local armyData = GetArmiesTable().armiesTable[info.armyIndex + 1]
             local icon = Factions.Factions[armyData.faction + 1].Icon
@@ -156,7 +171,7 @@ local statFuncs = {
     function(info)
         local energyUsed = math.max(info.energyRequested, info.energyConsumed)
         if info.energyProduced > 0 or energyUsed > 0 then
-            return string.format('%+d', math.ceil(info.energyProduced - energyUsed))
+            return string.format('%.2f', info.energyProduced - energyUsed)
         else
             return false
         end
