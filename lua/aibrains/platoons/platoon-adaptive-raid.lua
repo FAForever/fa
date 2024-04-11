@@ -180,11 +180,11 @@ AIPlatoonAdaptiveRaidBehavior = Class(AIPlatoon) {
                 end
                 if unpathableCandidateCount > 0 then
                     self:LogDebug(string.format('unpathableCandidateCount '..unpathableCandidateCount))
-                    self:LogDebug(string.format('Current raid position is '..repr(expansion.position)))
+                    self:LogDebug(string.format('Current raid position is {%f, %f, %f}', unpack(expansion.position)))
                 end
                 self.LocationToRaid = expansion.position
                 if self.LocationToRaid then
-                    self:LogDebug(string.format('Location to raid is '..repr(self.LocationToRaid)))
+                    self:LogDebug(string.format('Location to raid is {%f, %f, %f}', unpack(self.LocationToRaid)))
                 else
                     self:LogDebug(string.format('Location to raid is nil'))
                 end
