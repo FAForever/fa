@@ -31,6 +31,8 @@ local Entity = import("/lua/sim/entity.lua").Entity
 local EffectTemplate = import("/lua/effecttemplates.lua")
 local Util = import("/lua/utilities.lua")
 
+local shieldAbsorptionValues = import("/lua/ShieldAbsorptionValues.lua").shieldAbsorptionValues
+
 local DeprecatedWarnings = {}
 
 local VectorCached = Vector(0, 0, 0)
@@ -147,6 +149,7 @@ end
 ---@field PassOverkillDamage boolean
 ---@field ImpactMeshBp string
 ---@field SkipAttachmentCheck boolean
+---@field AbsorptionTypeDamageTypeToMulti table<DamageType, number>
 Shield = ClassShield(moho.shield_methods, Entity) {
 
     RemainEnabledWhenAttached = false,
@@ -212,12 +215,16 @@ Shield = ClassShield(moho.shield_methods, Entity) {
         EntityAttachBoneTo(self, -1, spec.Owner, -1)
 
         -- lookup as to whether we're static or a commander shield
-        local ownerCategories = self.Owner.Blueprint.CategoriesHash
+        local ownerBp = self.Owner.Blueprint
+        local ownerCategories = ownerBp.CategoriesHash
         if ownerCategories.STRUCTURE then
             self.StaticShield = true
         elseif ownerCategories.COMMAND then
             self.CommandShield = true
         end
+
+        -- lookup our damage absorption type's table
+        self.AbsorptionTypeDamageTypeToMulti = shieldAbsorptionValues[ownerBp.Defense.Shield.AbsorptionType or "Default"]
 
         -- use trashbag of the unit that owns us
         self.Trash = self.Owner.Trash
@@ -440,10 +447,19 @@ Shield = ClassShield(moho.shield_methods, Entity) {
     -- under the shield. The default is to always absorb as much as possible
     -- but the reason this function exists is to allow flexible implementations
     -- like shields that only absorb partial damage (like armor).
+    --- How much of incoming damage is absorbed by the shield. Used by the engine to calculate remainder spillover damage
+    ---@param self Shield
+    ---@param instigator Unit
+    ---@param amount number
+    ---@param type DamageType
+    ---@return number damageAbsorbed If not all damage is absorbed, the remainder passes to targets under the shield.
     OnGetDamageAbsorption = function(self, instigator, amount, type)
+        -- Allow decoupling the shield from the owner's armor multiplier
+        local absorptionMulti = self.AbsorptionTypeDamageTypeToMulti[type] or self.Owner:GetArmorMult(type)
+
         -- Like armor damage, first multiply by armor reduction, then apply handicap
         -- See SimDamage.cpp (DealDamage function) for how this should work
-        amount = amount * (self.Owner:GetArmorMult(type))
+        amount = amount * absorptionMulti
         amount = amount * (1.0 - ArmyGetHandicap(self.Army))
 
         local health = EntityGetHealth(self)
@@ -454,6 +470,12 @@ Shield = ClassShield(moho.shield_methods, Entity) {
         end
     end,
 
+    -- Used by PersonalShield and PersonalBubble to pass damage to the Owner Unit
+    ---@param self Shield
+    ---@param instigator Unit
+    ---@param amount number
+    ---@param type DamageType
+    ---@return number overkillDamage
     GetOverkill = function(self, instigator, amount, type)
         -- Like armor damage, first multiply by armor reduction, then apply handicap
         -- See SimDamage.cpp (DealDamage function) for how this should work

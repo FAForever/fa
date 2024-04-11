@@ -1,5 +1,5 @@
 --**********************************************************************************
---** Copyright (c) 2023 FAForever
+--** Copyright (c) 2024 FAForever
 --**
 --** Permission is hereby granted, free of charge, to any person obtaining a copy
 --** of this software and associated documentation files (the "Software"), to deal
@@ -20,27 +20,32 @@
 --** SOFTWARE.
 --**********************************************************************************
 
-DefaultProjectileWeapon = import("/lua/sim/weapons/DefaultProjectileWeapon.lua").DefaultProjectileWeapon
-KamikazeWeapon = import("/lua/sim/weapons/KamikazeWeapon.lua").KamikazeWeapon
-BareBonesWeapon = import("/lua/sim/weapons/BareBonesWeapon.lua").BareBonesWeapon
-OverchargeWeapon = import("/lua/sim/weapons/OverchargeWeapon.lua").OverchargeWeapon
-DefaultBeamWeapon = import("/lua/sim/weapons/DefaultBeamWeapon.lua").DefaultBeamWeapon
-DeathNukeWeapon = import("/lua/sim/weapons/DeathNukeWeapon.lua").DeathNukeWeapon
-SCUDeathWeapon = import("/lua/sim/weapons/SCUDeathWeapon.lua").SCUDeathWeapon
-ACUDeathWeapon = import("/lua/sim/weapons/ACUDeathWeapon.lua").ACUDeathWeapon
+local BareBonesWeapon = import("/lua/sim/weapons/BareBonesWeapon.lua").BareBonesWeapon
 
--- kept for mod backwards compatibility
-local Weapon = import("/lua/sim/weapon.lua").Weapon
-local XZDist = import("/lua/utilities.lua").XZDistanceTwoVectors
+--- Creates effects similar to DeathNukeWeapon, but its damage does not bypass shields.
+---@class ACUDeathWeapon : BareBonesWeapon
+ACUDeathWeapon = ClassWeapon(BareBonesWeapon) {
+    ---@param self ACUDeathWeapon
+    OnFire = function(self)
+    end,
 
-local EntityMethods = moho.entity_methods
-local EntityGetPosition = EntityMethods.GetPosition
-local EntityGetPositionXYZ = EntityMethods.GetPositionXYZ
+    ---@param self ACUDeathWeapon
+    Fire = function(self)
+        local bp = self.Blueprint
+        local unit = self.unit
+        local proj = unit:CreateProjectile(bp.ProjectileId, 0, 0, 0, nil, nil, nil):SetCollision(false)
+        proj:ForkThread(proj.EffectThread)
 
-local UnitMethods = moho.unit_methods
-local UnitGetVelocity = UnitMethods.GetVelocity
-local UnitGetTargetEntity = UnitMethods.GetTargetEntity
+        -- Play the explosion sound
+        local audNukeExplosion = proj.Blueprint.Audio.NukeExplosion
+        if audNukeExplosion then
+            self:PlaySound(audNukeExplosion)
+        end
 
-local MathClamp = math.clamp
-local GetSurfaceHeight = GetSurfaceHeight
-local VDist2 = VDist2
+        --Inner then outer ring damage
+        DamageArea(unit, unit:GetPosition(), bp.NukeInnerRingRadius, bp.NukeInnerRingDamage,
+            bp.DamageType or 'Normal', bp.DamageFriendly or false, false)
+        DamageArea(unit, unit:GetPosition(), bp.NukeOuterRingRadius, bp.NukeOuterRingDamage,
+            bp.DamageType or 'Normal', bp.DamageFriendly or false, false)
+    end,
+}

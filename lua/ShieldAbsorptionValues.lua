@@ -1,5 +1,5 @@
 --**********************************************************************************
---** Copyright (c) 2023 FAForever
+--** Copyright (c) 2024 FAForever
 --**
 --** Permission is hereby granted, free of charge, to any person obtaining a copy
 --** of this software and associated documentation files (the "Software"), to deal
@@ -20,27 +20,14 @@
 --** SOFTWARE.
 --**********************************************************************************
 
-DefaultProjectileWeapon = import("/lua/sim/weapons/DefaultProjectileWeapon.lua").DefaultProjectileWeapon
-KamikazeWeapon = import("/lua/sim/weapons/KamikazeWeapon.lua").KamikazeWeapon
-BareBonesWeapon = import("/lua/sim/weapons/BareBonesWeapon.lua").BareBonesWeapon
-OverchargeWeapon = import("/lua/sim/weapons/OverchargeWeapon.lua").OverchargeWeapon
-DefaultBeamWeapon = import("/lua/sim/weapons/DefaultBeamWeapon.lua").DefaultBeamWeapon
-DeathNukeWeapon = import("/lua/sim/weapons/DeathNukeWeapon.lua").DeathNukeWeapon
-SCUDeathWeapon = import("/lua/sim/weapons/SCUDeathWeapon.lua").SCUDeathWeapon
-ACUDeathWeapon = import("/lua/sim/weapons/ACUDeathWeapon.lua").ACUDeathWeapon
+---@alias AbsorptionType
+---| "Default"
 
--- kept for mod backwards compatibility
-local Weapon = import("/lua/sim/weapon.lua").Weapon
-local XZDist = import("/lua/utilities.lua").XZDistanceTwoVectors
-
-local EntityMethods = moho.entity_methods
-local EntityGetPosition = EntityMethods.GetPosition
-local EntityGetPositionXYZ = EntityMethods.GetPositionXYZ
-
-local UnitMethods = moho.unit_methods
-local UnitGetVelocity = UnitMethods.GetVelocity
-local UnitGetTargetEntity = UnitMethods.GetTargetEntity
-
-local MathClamp = math.clamp
-local GetSurfaceHeight = GetSurfaceHeight
-local VDist2 = VDist2
+--- Defines what proportion of damage a shield of `AbsorptionType` absorbs from a specific `DamageType`
+--- Overrides the behavior of shields absorbing damage depending on their owner's armor type
+---@type table<AbsorptionType, table<DamageType, number>>
+shieldAbsorptionValues = {
+	["Default"] = {
+		["Deathnuke"] = 1.0
+	},
+}
