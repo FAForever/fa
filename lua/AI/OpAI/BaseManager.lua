@@ -1285,7 +1285,7 @@ BaseManager = ClassSimple {
         local unitNames = self.AIBrain.BaseTemplates[addName].UnitNames
         local buildCounter = self.AIBrain.BaseTemplates[addName].BuildCounter
         if not tblUnit then
-            error('*AI DEBUG - Group: ' .. repr(name) .. ' not found for Army: ' .. repr(army), 2)
+            error('*AI DEBUG - Group: ' .. tostring(name) .. ' not found for Army: ' .. tostring(army), 2)
         else
             -- Convert building to the proper type to be built if needed (ex: T2 and T3 factories to T1)
             for i, unit in tblUnit do
