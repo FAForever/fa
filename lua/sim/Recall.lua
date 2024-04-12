@@ -339,7 +339,7 @@ function SetRecallVote(data)
         -- if the vote will already be decided with this vote, close the voting session
         if not lastVote and (
             vote and RecallRequestAccepted(likeVotes + 1, teammates) or -- will succeed with our vote
-            !vote and !RecallRequestAccepted(teammates - (likeVotes + 1), teammates) -- won't ever be able to succeed
+            not vote and not RecallRequestAccepted(teammates - (likeVotes + 1), teammates) -- won't ever be able to succeed
         ) then
             lastVote = true
         end
