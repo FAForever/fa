@@ -36,10 +36,12 @@ UnitBlueprint{
         "RECLAIMABLE",
         "SELECTABLE",
         "SNIPEMODE",
+        "SHOWATTACKRETICLE",
         "SONAR",
         "TECH1",
         "UEF",
         "VISIBLETORECON",
+        "WEAKANTIAIR",
     },
     Defense = {
         AirThreatLevel = 1,

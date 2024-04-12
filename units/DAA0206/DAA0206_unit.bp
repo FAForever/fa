@@ -36,6 +36,7 @@ UnitBlueprint{
     Categories = {
         "AEON",
         "AIR",
+        "BOMB",
         "BOMBER",
         "CANNOTUSEAIRSTAGING",
         "MOBILE",

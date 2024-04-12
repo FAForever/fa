@@ -27,6 +27,7 @@ OverchargeWeapon = import("/lua/sim/weapons/OverchargeWeapon.lua").OverchargeWea
 DefaultBeamWeapon = import("/lua/sim/weapons/DefaultBeamWeapon.lua").DefaultBeamWeapon
 DeathNukeWeapon = import("/lua/sim/weapons/DeathNukeWeapon.lua").DeathNukeWeapon
 SCUDeathWeapon = import("/lua/sim/weapons/SCUDeathWeapon.lua").SCUDeathWeapon
+ACUDeathWeapon = import("/lua/sim/weapons/ACUDeathWeapon.lua").ACUDeathWeapon
 
 -- kept for mod backwards compatibility
 local Weapon = import("/lua/sim/weapon.lua").Weapon

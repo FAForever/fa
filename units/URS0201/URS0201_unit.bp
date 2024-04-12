@@ -25,6 +25,8 @@ UnitBlueprint{
     Categories = {
         "AMPHIBIOUS",
         "ANTINAVY",
+        "ANTITORPEDO",
+        "WEAKANTIAIR", 
         "BUILTBYTIER2FACTORY",
         "BUILTBYTIER3FACTORY",
         "CYBRAN",
@@ -248,7 +250,7 @@ UnitBlueprint{
     LifeBarSize = 1.5,
     Physics = {
         AltMotionType = "RULEUMT_Water",
-        BackUpDistance = 5,
+        BackUpDistance = 10,
         BankingSlope = 0,
         BuildOnLayerCaps = {
             LAYER_Air = false,
@@ -396,7 +398,7 @@ UnitBlueprint{
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_AntiAir",
-            RateOfFire = 1.5,
+            RateOfFire = 1.428,
             TargetPriorities = {
                 "AIR MOBILE TECH3 BOMBER",
                 "AIR MOBILE BOMBER",

@@ -1,6 +1,6 @@
 
 local GetTerrainHeight = GetTerrainHeight
-local type = type
+local FlattenMapRect = FlattenMapRect
 
 local MathMax = math.max
 local MathAtan = math.atan

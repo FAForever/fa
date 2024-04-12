@@ -42,7 +42,6 @@ UnitBlueprint {
         "OVERLAYSONAR",
         "PRODUCTSC1",
         "RECLAIMABLE",
-        "REPAIR",
         "SELECTABLE",
         "SNIPEMODE",
         "TECH2",
@@ -328,7 +327,7 @@ UnitBlueprint {
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = "UWRC_AntiAir",
-            RateOfFire = 0.8,
+            RateOfFire = 0.769,
             TargetCheckInterval = 1.0,
             TargetPriorities = {
                 "AIR MOBILE TECH3 BOMBER",
