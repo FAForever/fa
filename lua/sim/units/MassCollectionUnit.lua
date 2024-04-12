@@ -1,5 +1,12 @@
 
 local StructureUnit = import("/lua/sim/units/structureunit.lua").StructureUnit
+local StructureUnitOnConsumptionActive = StructureUnit.OnConsumptionActive
+local StructureUnitOnConsumptionInActive = StructureUnit.OnConsumptionInActive
+local StructureUnitOnStopBeingBuilt = StructureUnit.OnStopBeingBuilt
+local StructureUnitOnStartBuild = StructureUnit.OnStartBuild
+local StructureUnitOnStopBuild = StructureUnit.OnStopBuild
+local StructureUnitOnProductionPaused = StructureUnit.OnProductionPaused
+local StructureUnitOnProductionUnpaused = StructureUnit.OnProductionUnpaused
 
 ---@class MassCollectionUnit : StructureUnit
 ---@field ConsumptionActive boolean
@@ -8,14 +15,14 @@ MassCollectionUnit = ClassUnit(StructureUnit) {
 
     ---@param self MassCollectionUnit
     OnConsumptionActive = function(self)
-        StructureUnit.OnConsumptionActive(self)
+        StructureUnitOnConsumptionActive(self)
         self:ApplyAdjacencyBuffs()
         self.ConsumptionActive = true
     end,
 
     ---@param self MassCollectionUnit
     OnConsumptionInActive = function(self)
-        StructureUnit.OnConsumptionInActive(self)
+        StructureUnitOnConsumptionInActive(self)
         self:RemoveAdjacencyBuffs()
         self.ConsumptionActive = false
     end,
@@ -24,25 +31,24 @@ MassCollectionUnit = ClassUnit(StructureUnit) {
     ---@param builder Unit
     ---@param layer string
     OnStopBeingBuilt = function(self, builder, layer)
-        StructureUnit.OnStopBeingBuilt(self, builder, layer)
+        StructureUnitOnStopBeingBuilt(self, builder, layer)
         self:SetMaintenanceConsumptionActive()
     end,
 
-    ---comment
     ---@param self MassCollectionUnit
     ---@param unitbuilding MassCollectionUnit
     ---@param order boolean
     OnStartBuild = function(self, unitbuilding, order)
-        StructureUnit.OnStartBuild(self, unitbuilding, order)
+        StructureUnitOnStartBuild(self, unitbuilding, order)
         self:AddCommandCap('RULEUCC_Stop')
-        self.UpgradeWatcher = self:ForkThread(self.WatchUpgradeConsumption)
+        self.UpgradeWatcher = self:ForkThread(self.WatchUpgradeConsumption) --[[@as thread]]
     end,
 
     ---@param self MassCollectionUnit
     ---@param unitbuilding MassCollectionUnit
-    ---@param order boolean
+    ---@param order string
     OnStopBuild = function(self, unitbuilding, order)
-        StructureUnit.OnStopBuild(self, unitbuilding, order)
+        StructureUnitOnStopBuild(self, unitbuilding, order)
         self:RemoveCommandCap('RULEUCC_Stop')
         if self.UpgradeWatcher then
             KillThread(self.UpgradeWatcher)
@@ -104,13 +110,13 @@ MassCollectionUnit = ClassUnit(StructureUnit) {
 
     ---@param self MassCollectionUnit
     OnProductionPaused = function(self)
-        StructureUnit.OnProductionPaused(self)
+        StructureUnitOnProductionPaused(self)
         self:StopUnitAmbientSound('ActiveLoop')
     end,
 
     ---@param self MassCollectionUnit
     OnProductionUnpaused = function(self)
-        StructureUnit.OnProductionUnpaused(self)
+        StructureUnitOnProductionUnpaused(self)
         self:PlayUnitAmbientSound('ActiveLoop')
     end,
 }

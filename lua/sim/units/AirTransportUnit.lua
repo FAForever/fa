@@ -41,8 +41,8 @@ AirTransport = ClassUnit(AirUnit, BaseTransport) {
     end,
 
     ---@param self AirTransport
-    ---@param new string
-    ---@param old string
+    ---@param new HorizontalMovementState
+    ---@param old HorizontalMovementState
     OnMotionHorzEventChange = function(self, new, old)
         AirUnitOnMotionHorzEventChange(self, new, old)
 
